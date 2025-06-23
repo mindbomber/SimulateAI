@@ -1,0 +1,583 @@
+/**
+ * Simulation-specific styles
+ * Styles for simulation components, UI elements, and interactions
+ */
+
+/* UI Components */
+.ui-component {
+    position: absolute;
+    font-family: var(--font-family-primary);
+    font-size: var(--font-size-sm);
+}
+
+/* Panel Styles */
+.uipanel {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(10px);
+}
+
+.panel-header {
+    font-weight: var(--font-weight-bold);
+    color: var(--color-gray-900);
+    border-bottom: 1px solid var(--color-gray-200);
+    padding-bottom: var(--spacing-2);
+    margin-bottom: var(--spacing-3);
+}
+
+.panel-content {
+    line-height: var(--line-height-relaxed);
+    color: var(--color-gray-700);
+    margin-bottom: var(--spacing-4);
+}
+
+.panel-controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+}
+
+.panel-button {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border: none;
+    border-radius: var(--radius-base);
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    min-height: 32px;
+}
+
+.panel-button:hover,
+.panel-button:focus {
+    background: var(--color-primary-dark);
+    transform: translateY(-1px);
+}
+
+.panel-button:active {
+    transform: translateY(0);
+}
+
+/* Slider Styles */
+.slider-container {
+    margin-bottom: var(--spacing-3);
+}
+
+.slider-container label {
+    display: block;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-gray-700);
+    margin-bottom: var(--spacing-1);
+}
+
+.panel-slider {
+    width: 100%;
+    height: 20px;
+    border-radius: var(--radius-base);
+    background: var(--color-gray-200);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.panel-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-full);
+    background: var(--color-primary);
+    cursor: pointer;
+    border: 2px solid var(--color-white);
+    box-shadow: var(--shadow-sm);
+}
+
+.panel-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-full);
+    background: var(--color-primary);
+    cursor: pointer;
+    border: 2px solid var(--color-white);
+    box-shadow: var(--shadow-sm);
+}
+
+.panel-slider:focus::-webkit-slider-thumb {
+    box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.3);
+}
+
+.panel-slider:focus::-moz-range-thumb {
+    box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.3);
+}
+
+/* Ethics Display */
+.ethicsdisplay {
+    background: rgba(0, 0, 0, 0.85);
+    color: var(--color-white);
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(10px);
+}
+
+.ethics-meter {
+    margin-bottom: var(--spacing-2);
+}
+
+.ethics-meter:last-child {
+    margin-bottom: 0;
+}
+
+.ethics-meter .meter-label {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    margin-bottom: var(--spacing-1);
+}
+
+.ethics-meter .meter-bar {
+    width: 100%;
+    height: 12px;
+    background: var(--color-gray-600);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    position: relative;
+}
+
+.ethics-meter .meter-fill {
+    height: 100%;
+    background: linear-gradient(90deg, 
+        var(--color-error) 0%, 
+        var(--color-warning) 50%, 
+        var(--color-success) 100%);
+    transition: width 0.3s ease;
+    border-radius: var(--radius-md);
+}
+
+.ethics-meter .meter-value {
+    position: absolute;
+    right: var(--spacing-1);
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-white);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+    pointer-events: none;
+}
+
+/* Feedback System */
+.feedbacksystem {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(10px);
+}
+
+.feedback-list {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: var(--spacing-1);
+}
+
+.feedback-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.feedback-list::-webkit-scrollbar-track {
+    background: var(--color-gray-100);
+    border-radius: var(--radius-base);
+}
+
+.feedback-list::-webkit-scrollbar-thumb {
+    background: var(--color-gray-400);
+    border-radius: var(--radius-base);
+}
+
+.feedback-list::-webkit-scrollbar-thumb:hover {
+    background: var(--color-gray-500);
+}
+
+.feedback-item {
+    padding: var(--spacing-2);
+    margin-bottom: var(--spacing-1);
+    border-radius: var(--radius-base);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-normal);
+    animation: slideIn 0.3s ease;
+}
+
+.feedback-item:last-child {
+    margin-bottom: 0;
+}
+
+.feedback-positive {
+    border-left: 3px solid var(--color-success);
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.feedback-negative {
+    border-left: 3px solid var(--color-error);
+    background: rgba(244, 67, 54, 0.1);
+}
+
+.feedback-neutral {
+    border-left: 3px solid var(--color-primary);
+    background: rgba(0, 124, 186, 0.1);
+}
+
+.feedback-excellent {
+    border-left: 3px solid var(--color-success);
+    background: rgba(139, 195, 74, 0.1);
+}
+
+.feedback-concerning {
+    border-left: 3px solid var(--color-warning);
+    background: rgba(255, 152, 0, 0.1);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Button Component */
+.button {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+}
+
+.button:hover,
+.button:focus {
+    background: var(--color-primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.button:active {
+    transform: translateY(0);
+}
+
+.button:disabled {
+    background: var(--color-gray-400);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.button:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* Slider Component */
+.slider {
+    display: flex;
+    flex-direction: column;
+}
+
+.slider label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-gray-700);
+    margin-bottom: var(--spacing-1);
+}
+
+.slider input[type="range"] {
+    width: 100%;
+    height: 6px;
+    border-radius: var(--radius-base);
+    background: var(--color-gray-300);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    margin: var(--spacing-2) 0;
+}
+
+.slider input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-full);
+    background: var(--color-primary);
+    cursor: pointer;
+    border: 2px solid var(--color-white);
+    box-shadow: var(--shadow-sm);
+}
+
+.slider input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-full);
+    background: var(--color-primary);
+    cursor: pointer;
+    border: 2px solid var(--color-white);
+    box-shadow: var(--shadow-sm);
+}
+
+.slider-value {
+    font-size: var(--font-size-xs);
+    color: var(--color-gray-600);
+    text-align: right;
+    margin-top: var(--spacing-1);
+}
+
+/* Ethics Meters in Modal */
+.ethics-meters {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+    min-width: 200px;
+}
+
+.ethics-meters h4 {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-gray-900);
+    margin-bottom: var(--spacing-2);
+    text-align: center;
+}
+
+/* Simulation Canvas/SVG Container */
+.simulation-canvas {
+    width: 100%;
+    height: 100%;
+    background: var(--color-white);
+    border-radius: var(--radius-base);
+    overflow: hidden;
+}
+
+/* Interactive Elements */
+.interactive-element {
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.interactive-element:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
+
+.interactive-element:focus {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.interactive-element.dragging {
+    z-index: 100;
+    opacity: 0.9;
+    transform: scale(1.1);
+    cursor: grabbing;
+}
+
+/* Scenario Progress */
+.scenario-progress {
+    background: var(--color-gray-100);
+    border-radius: var(--radius-base);
+    padding: var(--spacing-2) var(--spacing-3);
+    margin-bottom: var(--spacing-3);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--color-gray-200);
+    border-radius: var(--radius-base);
+    overflow: hidden;
+    margin-bottom: var(--spacing-1);
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--color-primary);
+    border-radius: var(--radius-base);
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: var(--font-size-xs);
+    color: var(--color-gray-600);
+    text-align: center;
+}
+
+/* Decision Points */
+.decision-point {
+    background: var(--color-white);
+    border: 2px solid var(--color-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-4);
+    margin: var(--spacing-3);
+    box-shadow: var(--shadow-md);
+    animation: fadeInUp 0.5s ease;
+}
+
+.decision-title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-gray-900);
+    margin-bottom: var(--spacing-3);
+}
+
+.decision-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+}
+
+.decision-option {
+    background: var(--color-gray-50);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-base);
+    padding: var(--spacing-3);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.decision-option:hover,
+.decision-option:focus {
+    background: var(--color-primary-light);
+    background: rgba(77, 166, 217, 0.1);
+    border-color: var(--color-primary);
+}
+
+.decision-option.selected {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary-dark);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Tooltip */
+.tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.9);
+    color: var(--color-white);
+    padding: var(--spacing-2) var(--spacing-3);
+    border-radius: var(--radius-base);
+    font-size: var(--font-size-xs);
+    white-space: nowrap;
+    z-index: 1000;
+    pointer-events: none;
+    animation: fadeIn 0.2s ease;
+}
+
+.tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Responsive Simulation UI */
+@media (max-width: 768px) {
+    .ui-component {
+        font-size: var(--font-size-xs);
+    }
+    
+    .panel-button {
+        min-height: 40px;
+        font-size: var(--font-size-sm);
+    }
+    
+    .ethics-meters {
+        min-width: 150px;
+    }
+    
+    .decision-point {
+        margin: var(--spacing-2);
+        padding: var(--spacing-3);
+    }
+    
+    .decision-title {
+        font-size: var(--font-size-base);
+    }
+}
+
+/* Dark mode simulation UI */
+@media (prefers-color-scheme: dark) {
+    .ui-component {
+        color: var(--color-gray-100);
+    }
+    
+    .uipanel {
+        background: rgba(33, 33, 33, 0.95);
+        border-color: var(--color-gray-600);
+        color: var(--color-gray-100);
+    }
+    
+    .panel-header {
+        color: var(--color-white);
+        border-color: var(--color-gray-600);
+    }
+    
+    .panel-content {
+        color: var(--color-gray-300);
+    }
+    
+    .decision-point {
+        background: var(--color-gray-800);
+        border-color: var(--color-primary);
+        color: var(--color-gray-100);
+    }
+    
+    .decision-option {
+        background: var(--color-gray-700);
+        border-color: var(--color-gray-600);
+        color: var(--color-gray-100);
+    }
+    
+    .decision-option:hover,
+    .decision-option:focus {
+        background: var(--color-gray-600);
+    }
+}
+
+/* High contrast mode for simulations */
+.high-contrast .ui-component {
+    border: 2px solid var(--color-black);
+}
+
+.high-contrast .decision-option {
+    border: 2px solid var(--color-black);
+}
+
+.high-contrast .decision-option.selected {
+    background: var(--color-black);
+    color: var(--color-white);
+}

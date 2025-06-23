@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" role="img" aria-label="Autonomy and Oversight Simulation Thumbnail">
+  <rect width="300" height="200" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="150" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#2c3e50">
+    Autonomy &amp; Oversight
+  </text>
+  
+  <!-- Human figure -->
+  <g transform="translate(70, 80)">
+    <circle cx="0" cy="0" r="15" fill="#3498db"/>
+    <rect x="-12" y="10" width="24" height="30" fill="#3498db" rx="5"/>
+    <text x="0" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">HUMAN</text>
+  </g>
+  
+  <!-- Robot/AI figure -->
+  <g transform="translate(230, 80)">
+    <rect x="-12" y="-15" width="24" height="24" fill="#95a5a6" rx="3"/>
+    <circle cx="-6" cy="-8" r="2" fill="#e74c3c"/>
+    <circle cx="6" cy="-8" r="2" fill="#e74c3c"/>
+    <rect x="-8" y="-2" width="16" height="3" fill="#34495e"/>
+    <rect x="-10" y="5" width="20" height="25" fill="#95a5a6" rx="3"/>
+    <text x="0" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">AI</text>
+  </g>
+  
+  <!-- Control/communication lines -->
+  <path d="M 100 95 Q 150 75 200 95" stroke="#f39c12" stroke-width="3" fill="none"/>
+  <path d="M 200 105 Q 150 125 100 105" stroke="#27ae60" stroke-width="3" fill="none"/>
+  
+  <!-- Control panel -->
+  <rect x="125" y="140" width="50" height="30" fill="#34495e" rx="3"/>
+  <circle cx="135" cy="150" r="3" fill="#e74c3c"/>
+  <circle cx="145" cy="150" r="3" fill="#f39c12"/>
+  <circle cx="155" cy="150" r="3" fill="#27ae60"/>
+  <circle cx="165" cy="150" r="3" fill="#3498db"/>
+  
+  <rect x="130" y="157" width="15" height="8" fill="#27ae60"/>
+  <rect x="155" y="157" width="15" height="8" fill="#e74c3c"/>
+  
+  <!-- Arrows indicating oversight -->
+  <path d="M 150 75 L 150 65" stroke="#9b59b6" stroke-width="2" marker-end="url(#oversight)"/>
+  <text x="150" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#9b59b6">OVERSIGHT</text>
+  
+  <!-- Arrow marker -->
+  <defs>
+    <marker id="oversight" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#9b59b6"/>
+    </marker>
+  </defs>
+</svg>

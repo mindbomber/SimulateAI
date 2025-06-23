@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" role="img" aria-label="Misinformation and Trust Simulation Thumbnail">
+  <rect width="300" height="200" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="150" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#2c3e50">
+    Misinformation &amp; Trust
+  </text>
+  
+  <!-- News/Social Media Interface -->
+  <rect x="50" y="50" width="200" height="120" fill="white" stroke="#bdc3c7" stroke-width="2" rx="8"/>
+  
+  <!-- Header bar -->
+  <rect x="50" y="50" width="200" height="25" fill="#3498db" rx="8 8 0 0"/>
+  <circle cx="65" cy="62" r="3" fill="white"/>
+  <circle cx="75" cy="62" r="3" fill="white"/>
+  <circle cx="85" cy="62" r="3" fill="white"/>
+  
+  <!-- Post 1 (Verified) -->
+  <rect x="60" y="85" width="180" height="30" fill="#d5f4e6" stroke="#27ae60" stroke-width="1" rx="3"/>
+  <circle cx="75" cy="95" r="4" fill="#27ae60"/>
+  <path d="M 72 95 L 75 98 L 79 92" stroke="white" stroke-width="1.5" fill="none"/>
+  <text x="85" y="98" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">Verified news source</text>
+  <text x="85" y="108" font-family="Arial, sans-serif" font-size="8" fill="#7f8c8d">Fact-checked content</text>
+  
+  <!-- Post 2 (Suspicious) -->
+  <rect x="60" y="120" width="180" height="30" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="1" rx="3"/>
+  <circle cx="75" cy="130" r="4" fill="#e17055"/>
+  <text x="75" y="133" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="white">?</text>
+  <text x="85" y="133" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">Unverified claim</text>
+  <text x="85" y="143" font-family="Arial, sans-serif" font-size="8" fill="#7f8c8d">No source provided</text>
+  
+  <!-- Viral spread indicator -->
+  <g transform="translate(260, 100)">
+    <circle cx="0" cy="0" r="8" fill="#e74c3c" opacity="0.3"/>
+    <circle cx="0" cy="0" r="12" fill="#e74c3c" opacity="0.2"/>
+    <circle cx="0" cy="0" r="16" fill="#e74c3c" opacity="0.1"/>
+    <text x="0" y="3" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#e74c3c">VIRAL</text>
+  </g>
+  
+  <!-- Trust meter -->
+  <rect x="270" y="120" width="15" height="40" fill="none" stroke="#95a5a6" stroke-width="1"/>
+  <rect x="270" y="140" width="15" height="20" fill="#e74c3c"/>
+  <rect x="270" y="130" width="15" height="10" fill="#f39c12"/>
+  <rect x="270" y="120" width="15" height="10" fill="#27ae60"/>
+  <text x="292" y="143" font-family="Arial, sans-serif" font-size="8" fill="#7f8c8d">TRUST</text>
+  
+  <!-- Magnifying glass for fact-checking -->
+  <circle cx="40" cy="140" r="12" fill="none" stroke="#3498db" stroke-width="2"/>
+  <line x1="49" y1="149" x2="58" y2="158" stroke="#3498db" stroke-width="2"/>
+  <text x="40" y="144" text-anchor="middle" font-family="Arial, sans-serif" font-size="6" fill="#3498db">FACT</text>
+</svg>

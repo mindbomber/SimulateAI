@@ -1,0 +1,23 @@
+{
+  "name": "ai-ethics-simulations",
+  "version": "1.0.0",
+  "description": "Interactive AI and Robotics Safety Education Platform",
+  "main": "index.html",  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "echo \"Tests will be added\" && exit 0",
+    "lint": "eslint src/js/**/*.js",
+    "format": "prettier --write src/**/*.{js,css,html}"
+  },
+  "keywords": ["ai", "ethics", "education", "simulation", "robotics", "safety"],
+  "author": "SimulateAI",
+  "license": "MIT",  "devDependencies": {
+    "vite": "^5.0.0",
+    "csso-cli": "^4.0.2",
+    "terser": "^5.43.1",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0"
+  },
+  "dependencies": {}
+}

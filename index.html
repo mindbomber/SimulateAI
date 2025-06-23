@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Ethics Simulations - Interactive Learning Platform</title>
+    <meta name="description" content="Learn AI and robotics safety through interactive simulations and games">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/simulations.css">
+    <link rel="stylesheet" href="src/styles/accessibility.css">
+    
+    <!-- Icons and Favicons -->
+    <link rel="icon" type="image/svg+xml" href="src/assets/icons/favicon.svg">
+    <link rel="icon" type="image/png" href="src/assets/icons/favicon.png">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="src/js/core/engine.js" as="script">
+    <link rel="preload" href="src/styles/main.css" as="style">
+</head>
+<body>
+    <!-- Skip to content for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Header -->
+    <header class="header" role="banner">
+        <div class="header-container">
+            <div class="logo">
+                <img src="src/assets/icons/logo.svg" alt="AI Ethics Simulations" class="logo-image">
+                <h1 class="site-title">AI Ethics Simulations</h1>
+            </div>
+            
+            <nav class="main-nav" role="navigation" aria-label="Main navigation">
+                <ul class="nav-list">
+                    <li><a href="#home" class="nav-link active" aria-current="page">Home</a></li>
+                    <li><a href="#simulations" class="nav-link">Simulations</a></li>
+                    <li><a href="#educator-tools" class="nav-link">Educator Tools</a></li>
+                    <li><a href="#about" class="nav-link">About</a></li>
+                </ul>
+            </nav>
+            
+            <!-- Accessibility controls -->
+            <div class="accessibility-controls">
+                <button class="btn-icon" id="toggle-high-contrast" aria-label="Toggle high contrast mode">
+                    <span class="icon">🎨</span>
+                </button>
+                <button class="btn-icon" id="toggle-large-text" aria-label="Toggle large text">
+                    <span class="icon">🔍</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="main-content" role="main">
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <h2 class="hero-title">Learn AI Ethics Through Interactive Simulations</h2>
+                <p class="hero-description">
+                    Explore the ethical dimensions of artificial intelligence and robotics through 
+                    engaging, game-like simulations designed for learners of all ages.
+                </p>
+                <div class="hero-actions">
+                    <button class="btn btn-primary" id="start-learning">Start Learning</button>
+                    <button class="btn btn-secondary" id="educator-guide">Educator Guide</button>
+                </div>
+            </div>
+            
+            <!-- Demo simulation preview -->
+            <div class="hero-simulation">
+                <div id="hero-demo" class="simulation-preview" aria-label="Interactive demo simulation">
+                    <!-- Dynamic content will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Simulations Grid -->
+        <section class="simulations-section" id="simulations">
+            <div class="section-header">
+                <h2 class="section-title">Explore Simulations</h2>
+                <p class="section-description">
+                    Each simulation focuses on a different aspect of AI ethics and safety
+                </p>
+            </div>
+            
+            <div class="simulations-grid" role="grid" aria-label="Available simulations">
+                <!-- Simulation cards will be dynamically generated -->
+            </div>
+        </section>
+
+        <!-- Educator Tools Section -->
+        <section class="educator-section" id="educator-tools">
+            <div class="section-header">
+                <h2 class="section-title">Educator Resources</h2>
+                <p class="section-description">
+                    Tools and materials to integrate AI ethics education into your curriculum
+                </p>
+            </div>
+            
+            <div class="educator-grid">
+                <div class="educator-card">
+                    <h3>Lesson Plans</h3>
+                    <p>Ready-to-use curriculum aligned with educational standards</p>
+                    <button class="btn btn-outline">Download</button>
+                </div>
+                
+                <div class="educator-card">
+                    <h3>Assessment Tools</h3>
+                    <p>Quizzes and reflection activities for measuring learning</p>
+                    <button class="btn btn-outline">View Tools</button>
+                </div>
+                
+                <div class="educator-card">
+                    <h3>Analytics Dashboard</h3>
+                    <p>Track student progress and ethical decision patterns</p>
+                    <button class="btn btn-outline">Open Dashboard</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-content">
+            <p>&copy; 2025 AI Ethics Simulations. Open source educational platform.</p>
+            <nav class="footer-nav" aria-label="Footer navigation">
+                <a href="#privacy">Privacy</a>
+                <a href="#accessibility">Accessibility</a>
+                <a href="#contact">Contact</a>
+            </nav>
+        </div>
+    </footer>
+
+    <!-- Simulation Modal -->
+    <div id="simulation-modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title" class="modal-title"></h2>
+                <button class="modal-close" aria-label="Close simulation">×</button>
+            </div>
+            
+            <div class="modal-body">
+                <div id="simulation-container" class="simulation-container">
+                    <!-- Active simulation will be loaded here -->
+                </div>
+                
+                <div class="simulation-controls">
+                    <div class="ethics-meters">
+                        <!-- Dynamic ethics meters -->
+                    </div>
+                    
+                    <div class="simulation-actions">
+                        <button class="btn btn-secondary" id="reset-simulation">Reset</button>
+                        <button class="btn btn-primary" id="next-scenario">Next Scenario</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading indicator -->
+    <div id="loading" class="loading" aria-hidden="true">
+        <div class="loading-spinner"></div>
+        <p>Loading simulation...</p>
+    </div>    <!-- Scripts -->
+    <script type="module" src="src/js/app.js"></script>
+</body>
+</html>
