@@ -2,19 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>AI Ethics Simulations - Interactive Learning Platform</title>
     <meta name="description" content="Learn AI and robotics safety through interactive simulations and games">
-      <!-- Styles -->
+    
+    <!-- Styles -->
     <link rel="stylesheet" href="src/styles/main.css">
     <link rel="stylesheet" href="src/styles/simulations.css">
     <link rel="stylesheet" href="src/styles/accessibility.css">
     <link rel="stylesheet" href="src/styles/hero-demo.css">
-      <!-- Icons and Favicons -->
+    <link rel="stylesheet" href="src/styles/enhanced-objects.css">    <link rel="stylesheet" href="src/styles/bias-fairness.css">
+    <link rel="stylesheet" href="src/styles/layout-fixes.css">
+    
+    <!-- Icons and Favicons -->
     <link rel="icon" type="image/svg+xml" href="src/assets/icons/favicon.svg">
     
     <!-- Preload critical resources -->
     <link rel="preload" href="src/styles/main.css" as="style">
+    
+    <!-- Inert polyfill for older browsers -->
+    <script>
+        // Check if inert is supported, if not load polyfill
+        if (!('inert' in HTMLElement.prototype)) {
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/wicg-inert@3.1.2/dist/inert.min.js';
+            document.head.appendChild(script);
+        }
+    </script>
 </head>
 <body>
     <!-- Skip to content for accessibility -->
@@ -27,8 +41,12 @@
                 <img src="src/assets/icons/logo.svg" alt="AI Ethics Simulations" class="logo-image">
                 <h1 class="site-title">AI Ethics Simulations</h1>
             </div>
-            
-            <nav class="main-nav" role="navigation" aria-label="Main navigation">
+              <nav class="main-nav" role="navigation" aria-label="Main navigation">
+                <button class="mobile-menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
                 <ul class="nav-list">
                     <li><a href="#home" class="nav-link active" aria-current="page">Home</a></li>
                     <li><a href="#simulations" class="nav-link">Simulations</a></li>
@@ -121,36 +139,47 @@
     <!-- Footer -->
     <footer class="footer" role="contentinfo">
         <div class="footer-content">
-            <p>&copy; 2025 AI Ethics Simulations. Open source educational platform.</p>
-            <nav class="footer-nav" aria-label="Footer navigation">
+            <p>&copy; 2025 AI Ethics Simulations. Open source educational platform.</p>            <nav class="footer-nav" aria-label="Footer navigation">
                 <a href="#privacy">Privacy</a>
                 <a href="#accessibility">Accessibility</a>
                 <a href="#contact">Contact</a>
             </nav>
         </div>
     </footer>
-
+    
     <!-- Simulation Modal -->
-    <div id="simulation-modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div id="simulation-modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" inert>
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="modal-title" class="modal-title"></h2>
                 <button class="modal-close" aria-label="Close simulation">×</button>
             </div>
-            
-            <div class="modal-body">
-                <div id="simulation-container" class="simulation-container">
+              <div class="modal-body">
+                <div id="simulation-container" class="simulation-container" role="main" aria-label="Interactive simulation">
                     <!-- Active simulation will be loaded here -->
                 </div>
                 
                 <div class="simulation-controls">
                     <div class="ethics-meters">
-                        <!-- Dynamic ethics meters -->
+                        <!-- Enhanced ethics meters with visual engine will be loaded here -->
+                        <div class="ethics-meters-header">
+                            <h3>Ethics Monitoring</h3>
+                            <p>Track how your decisions affect different ethical dimensions</p>
+                        </div>
+                        <div class="meters-container">
+                            <!-- Enhanced meters will be dynamically created here -->
+                        </div>
                     </div>
                     
                     <div class="simulation-actions">
-                        <button class="btn btn-secondary" id="reset-simulation">Reset</button>
-                        <button class="btn btn-primary" id="next-scenario">Next Scenario</button>
+                        <div class="actions-header">
+                            <h3>Simulation Controls</h3>
+                        </div>
+                        <div class="actions-container">
+                            <!-- Enhanced interactive buttons will be created here -->
+                            <button class="btn btn-secondary" id="reset-simulation" style="display: none;">Reset</button>
+                            <button class="btn btn-primary" id="next-scenario" style="display: none;">Next Scenario</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -161,7 +190,9 @@
     <div id="loading" class="loading" aria-hidden="true">
         <div class="loading-spinner"></div>
         <p>Loading simulation...</p>
-    </div>    <!-- Scripts -->
+    </div>
+    
+    <!-- Scripts -->
     <script type="module" src="src/js/app.js"></script>
 </body>
 </html>

@@ -1,0 +1,227 @@
+/**
+ * Enhanced Objects Styles - Support for Visual Engine UI Components
+ * Provides styling for enhanced interactive objects and their containers
+ */
+
+/* Enhanced Ethics Meters */
+.enhanced-ethics-meters {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.ethics-meters-header {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.ethics-meters-header h3 {
+    margin: 0 0 5px 0;
+    color: var(--color-gray-900);
+    font-size: 1.2rem;
+}
+
+.ethics-meters-header p {
+    margin: 0;
+    color: var(--color-gray-600);
+    font-size: 0.9rem;
+}
+
+.meters-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Enhanced Action Buttons */
+.actions-header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.actions-header h3 {
+    margin: 0;
+    color: var(--color-gray-900);
+    font-size: 1.1rem;
+}
+
+.actions-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Enhanced Simulation Sliders */
+.simulation-sliders {
+    margin: 20px 0;
+    padding: 20px;
+    background: var(--color-gray-50);
+    border: 1px solid var(--color-gray-300);
+    border-radius: 8px;
+}
+
+.simulation-sliders h3 {
+    margin: 0 0 15px 0;
+    color: var(--color-gray-900);
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+/* Enhanced Simulation Cards */
+.enhanced-sim-button {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.enhanced-sim-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.enhanced-sim-button:active {
+    transform: translateY(0);
+}
+
+.enhanced-sim-button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.enhanced-sim-button:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* Visual Engine Canvas Containers */
+.visual-engine-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.visual-engine-container canvas {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .enhanced-ethics-meters {
+        gap: 10px;
+    }
+    
+    .enhanced-ethics-meters canvas {
+        width: 100% !important;
+        height: auto !important;
+    }
+    
+    .actions-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .simulation-sliders {
+        padding: 15px;
+    }
+    
+    .simulation-sliders canvas {
+        width: 100% !important;
+        height: auto !important;
+    }
+}
+
+/* High Contrast Mode Support */
+.high-contrast .enhanced-ethics-meters,
+.high-contrast .simulation-sliders {
+    border: 2px solid var(--color-accent);
+    background: var(--color-white);
+}
+
+.high-contrast .enhanced-sim-button {
+    border: 2px solid var(--color-gray-900);
+    font-weight: bold;
+}
+
+.high-contrast .enhanced-sim-button:focus {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+/* Large Text Mode Support */
+.large-text .ethics-meters-header h3,
+.large-text .actions-header h3 {
+    font-size: 1.4rem;
+}
+
+.large-text .ethics-meters-header p {
+    font-size: 1.1rem;
+}
+
+.large-text .enhanced-sim-button {
+    font-size: 1.1rem;
+    padding: 12px 24px;
+}
+
+/* Loading and Animation States */
+.enhanced-object-loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.enhanced-object-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+    );
+    animation: loading-shimmer 1.5s infinite;
+}
+
+@keyframes loading-shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Focus and Accessibility */
+.enhanced-sim-button:focus,
+.visual-engine-container:focus-within {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+/* Skip link for enhanced objects */
+.skip-to-enhanced-controls {
+    position: absolute;
+    left: -9999px;
+    z-index: 999;
+    padding: 8px 16px;
+    background: var(--color-primary);
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.skip-to-enhanced-controls:focus {
+    left: 8px;
+    top: 8px;
+}

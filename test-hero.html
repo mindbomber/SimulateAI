@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hero Demo Test</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/hero-demo.css">
+</head>
+<body>
+    <div style="padding: 20px;">
+        <h1>Hero Demo Test</h1>
+        <div id="hero-demo" style="max-width: 800px; margin: 20px 0;"></div>
+        
+        <div id="console-output" style="background: #f0f0f0; padding: 10px; margin-top: 20px; font-family: monospace; white-space: pre-wrap;"></div>
+    </div>
+
+    <script>
+        // Capture console output
+        const consoleDiv = document.getElementById('console-output');
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        console.log = function(...args) {
+            consoleDiv.textContent += 'LOG: ' + args.join(' ') + '\n';
+            originalLog.apply(console, args);
+        };
+        
+        console.error = function(...args) {
+            consoleDiv.textContent += 'ERROR: ' + args.join(' ') + '\n';
+            originalError.apply(console, args);
+        };
+    </script>
+
+    <script type="module">
+        console.log('Loading hero demo module...');
+        try {
+            const HeroDemo = (await import('./src/js/components/hero-demo.js')).default;
+            console.log('Hero demo module loaded successfully');
+            
+            const demo = new HeroDemo();
+            console.log('Hero demo instance created');
+        } catch (error) {
+            console.error('Error loading hero demo:', error);
+        }
+    </script>
+</body>
+</html>

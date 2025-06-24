@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Engine Demo - SimulateAI</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .demo-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        #visual-engine-demo {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            position: relative;
+        }
+        
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background: #007cba;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background: #005a87;
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .info-panel {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        
+        .info-panel h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .stat-label {
+            font-weight: bold;
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            color: #333;
+            margin-top: 5px;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #f5c6cb;
+            margin: 20px 0;
+        }
+        
+        /* Accessibility styles */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: #000;
+            color: #fff;
+            padding: 8px;
+            text-decoration: none;
+            z-index: 100;
+        }
+        
+        .skip-link:focus {
+            top: 6px;
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <div class="container">
+        <header>
+            <h1>Visual Engine Demo</h1>
+            <p class="description">
+                Interactive demonstration of the SimulateAI Visual Engine with multiple rendering modes, 
+                animations, accessibility features, and performance monitoring.
+            </p>
+        </header>
+
+        <main id="main-content">
+            <div class="demo-container">
+                <div id="visual-engine-demo"></div>
+                
+                <div class="controls">
+                    <button id="toggle-renderer">Switch Renderer</button>
+                    <button id="toggle-debug">Toggle Debug</button>
+                    <button id="test-accessibility">Test Accessibility</button>
+                    <button id="stress-test">Stress Test</button>
+                    <button id="reset-demo">Reset Demo</button>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <h3>Performance & Engine Information</h3>
+                <div class="stats" id="stats-container">
+                    <div class="stat-item">
+                        <div class="stat-label">Renderer</div>
+                        <div class="stat-value" id="stat-renderer">Loading...</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">FPS</div>
+                        <div class="stat-value" id="stat-fps">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Objects</div>
+                        <div class="stat-value" id="stat-objects">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Interactive</div>
+                        <div class="stat-value" id="stat-interactive">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Frame Time</div>
+                        <div class="stat-value" id="stat-frametime">0ms</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Animations</div>
+                        <div class="stat-value" id="stat-animations">0</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import VisualEngineDemo from './src/js/demos/visual-engine-demo.js';
+        
+        let demo = null;
+        let currentRenderer = 'auto';
+        const renderers = ['auto', 'canvas', 'svg', 'webgl'];
+        let rendererIndex = 0;
+
+        async function initializeDemo() {
+            try {
+                const container = document.getElementById('visual-engine-demo');
+                if (!container) {
+                    throw new Error('Demo container not found');
+                }
+
+                demo = new VisualEngineDemo(container, {
+                    title: 'Visual Engine Showcase',
+                    description: 'Comprehensive demonstration of all engine features',
+                    debug: false,
+                    renderMode: currentRenderer,
+                    accessibility: true
+                });
+
+                console.log('Visual Engine Demo initialized successfully');
+                updateStats();
+                
+                // Start performance monitoring
+                setInterval(updateStats, 1000);
+
+            } catch (error) {
+                console.error('Failed to initialize demo:', error);
+                showError('Failed to initialize Visual Engine Demo: ' + error.message);
+            }
+        }
+
+        function showError(message) {
+            const container = document.getElementById('visual-engine-demo');
+            container.innerHTML = `
+                <div class="error-message">
+                    <strong>Error:</strong> ${message}
+                    <br><br>
+                    Please check the browser console for more details.
+                </div>
+            `;
+        }
+
+        function updateStats() {
+            if (!demo || !demo.engine) return;
+
+            try {
+                const stats = demo.engine.getStats();
+                const animationCount = demo.engine.animationManager ? 
+                    demo.engine.animationManager.getActiveAnimationCount() : 0;
+
+                document.getElementById('stat-renderer').textContent = stats.renderer || 'Unknown';
+                document.getElementById('stat-fps').textContent = stats.fps || 0;
+                document.getElementById('stat-objects').textContent = stats.objects || 0;
+                document.getElementById('stat-interactive').textContent = stats.interactiveObjects || 0;
+                document.getElementById('stat-frametime').textContent = (stats.frameTime || 0).toFixed(1) + 'ms';
+                document.getElementById('stat-animations').textContent = animationCount;
+            } catch (error) {
+                console.warn('Failed to update stats:', error);
+            }
+        }
+
+        function switchRenderer() {
+            rendererIndex = (rendererIndex + 1) % renderers.length;
+            currentRenderer = renderers[rendererIndex];
+            
+            console.log('Switching to renderer:', currentRenderer);
+            
+            if (demo) {
+                demo.destroy();
+            }
+            
+            setTimeout(() => {
+                initializeDemo();
+            }, 100);
+        }
+
+        function toggleDebug() {
+            if (demo && demo.engine) {
+                demo.engine.options.debug = !demo.engine.options.debug;
+                
+                if (demo.engine.options.debug) {
+                    demo.engine.createDebugPanel();
+                } else if (demo.engine.debugPanel) {
+                    demo.engine.debugPanel.style.display = 'none';
+                }
+            }
+        }
+
+        function testAccessibility() {
+            if (demo && demo.engine && demo.engine.accessibilityManager) {
+                demo.engine.accessibilityManager.announce('Accessibility test: Focus navigation and screen reader support active');
+                demo.engine.accessibilityManager.showKeyboardShortcuts();
+            }
+        }
+
+        function stressTest() {
+            if (!demo) return;
+            
+            console.log('Running stress test...');
+            
+            // Add many animated objects
+            const colors = ['#ff5722', '#9c27b0', '#3f51b5', '#009688', '#ff9800', '#e91e63', '#795548'];
+            
+            for (let i = 0; i < 50; i++) {
+                const obj = {
+                    type: 'circle',
+                    id: `stress_${i}`,
+                    x: Math.random() * 600,
+                    y: Math.random() * 400 + 100,
+                    radius: Math.random() * 20 + 5,
+                    fill: colors[Math.floor(Math.random() * colors.length)],
+                    visible: true,
+                    
+                    update: function(deltaTime) {
+                        this.x += (Math.random() - 0.5) * 2;
+                        this.y += (Math.random() - 0.5) * 2;
+                        
+                        // Wrap around screen
+                        if (this.x < 0) this.x = 600;
+                        if (this.x > 600) this.x = 0;
+                        if (this.y < 100) this.y = 500;
+                        if (this.y > 500) this.y = 100;
+                    }
+                };
+                
+                demo.engine.addObject(obj);
+            }
+            
+            demo.updateStatus('Stress test running with 50 animated objects');
+        }
+
+        function resetDemo() {
+            if (demo) {
+                demo.destroy();
+                setTimeout(() => {
+                    initializeDemo();
+                }, 100);
+            }
+        }
+
+        // Setup event listeners
+        document.getElementById('toggle-renderer').addEventListener('click', switchRenderer);
+        document.getElementById('toggle-debug').addEventListener('click', toggleDebug);
+        document.getElementById('test-accessibility').addEventListener('click', testAccessibility);
+        document.getElementById('stress-test').addEventListener('click', stressTest);
+        document.getElementById('reset-demo').addEventListener('click', resetDemo);
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializeDemo);
+        
+        // Make demo globally available for debugging
+        window.visualEngineDemo = () => demo;
+    </script>
+</body>
+</html>

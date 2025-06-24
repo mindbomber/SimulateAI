@@ -1,0 +1,105 @@
+/* This file will be used to fix the main.css duplications */
+/* Clean simulation container rules */
+
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    flex: 1;
+}
+
+.simulation-container {
+    flex: 1;
+    position: relative;
+    background: var(--color-gray-50);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    min-width: 200px;
+    overflow: auto;
+    word-wrap: break-word;
+    hyphens: auto;
+    scroll-behavior: smooth;
+}
+
+/* Ensure simulation controls don't interfere with simulation content */
+.simulation-controls {
+    flex-shrink: 0;
+    border-top: 1px solid var(--color-gray-200);
+    padding: var(--spacing-6);
+    background: var(--color-white);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: var(--spacing-4);
+}
+
+/* Handle cases where simulation creates its own UI */
+.simulation-container > .bias-simulation-container,
+.simulation-container > .bias-simulation-enhanced {
+    height: 100%;
+    overflow: auto;
+}
+
+/* Handle empty simulation container */
+.simulation-container:empty::before {
+    content: "Loading simulation...";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--color-gray-500);
+    font-style: italic;
+}
+
+/* Improve canvas rendering within simulation container */
+.simulation-container canvas {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Fix potential z-index issues */
+.simulation-container .feedback-modal {
+    z-index: 1001; /* Above the main modal */
+}
+
+/* Loading state for simulation container */
+.simulation-container.loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.simulation-container.loading::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+/* Error state for simulation container */
+.simulation-container.error {
+    border: 2px solid var(--color-error);
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.simulation-container.error::before {
+    content: "Error loading simulation. Please try again.";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--color-error);
+    font-weight: bold;
+}

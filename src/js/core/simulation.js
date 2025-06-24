@@ -4,6 +4,7 @@
  */
 
 import StorageManager from '../utils/storage.js';
+import { UIComponent, UIPanel, EthicsDisplay, FeedbackSystem } from './ui.js';
 
 class EthicsSimulation {
     constructor(id, config = {}) {

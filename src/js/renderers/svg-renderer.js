@@ -312,6 +312,127 @@ class SVGRenderer {
     }
   }
 
+  // Required methods for Visual Engine integration
+  get type() {
+    return 'svg';
+  }
+
+  getElement() {
+    return this.svg;
+  }
+
+  render(scene) {
+    this.clear();
+    if (scene && scene.render) {
+      scene.render(this);
+    }
+  }
+
+  renderObject(object) {
+    if (!object || object.visible === false) return;
+    
+    // Create SVG group for this object
+    const group = this.createSVGElement('g', {
+      class: 'scene-object'
+    });
+    
+    // Apply transformations
+    const transforms = [];
+    
+    if (object.x || object.y) {
+      transforms.push(`translate(${object.x || 0}, ${object.y || 0})`);
+    }
+    
+    if (object.rotation) {
+      transforms.push(`rotate(${object.rotation * 180 / Math.PI})`);
+    }
+    
+    if (object.scale && object.scale !== 1) {
+      transforms.push(`scale(${object.scale})`);
+    }
+    
+    if (transforms.length > 0) {
+      group.setAttribute('transform', transforms.join(' '));
+    }
+    
+    if (object.alpha !== undefined) {
+      group.setAttribute('opacity', object.alpha);
+    }
+    
+    // Render based on object type
+    let element;
+    if (object.render) {
+      // Let object render itself
+      object.render(this, group);
+    } else if (object.type) {
+      element = this.renderByType(object);
+    }
+    
+    if (element) {
+      group.appendChild(element);
+    }
+    
+    this.mainGroup.appendChild(group);
+  }
+
+  renderByType(object) {
+    switch (object.type) {
+      case 'rect':
+        return this.createSVGElement('rect', {
+          width: object.width || 50,
+          height: object.height || 50,
+          fill: object.fill || 'transparent',
+          stroke: object.stroke || 'none',
+          'stroke-width': object.strokeWidth || 1
+        });
+        
+      case 'circle':
+        return this.createSVGElement('circle', {
+          r: object.radius || 25,
+          fill: object.fill || 'transparent',
+          stroke: object.stroke || 'none',
+          'stroke-width': object.strokeWidth || 1
+        });
+        
+      case 'text':
+        const textElement = this.createSVGElement('text', {
+          'font-family': object.font || 'Arial',
+          'font-size': object.fontSize || 14,
+          fill: object.fill || '#000000',
+          'text-anchor': object.align || 'start'
+        });
+        textElement.textContent = object.text || '';
+        return textElement;
+        
+      default:
+        // Draw a simple placeholder
+        return this.createSVGElement('rect', {
+          x: -5,
+          y: -5,
+          width: 10,
+          height: 10,
+          fill: '#ff0000'
+        });
+    }
+  }
+
+  resize() {
+    if (this.container && this.svg) {
+      const rect = this.container.getBoundingClientRect();
+      this.options.width = rect.width;
+      this.options.height = rect.height;
+      
+      this.svg.setAttribute('viewBox', `0 0 ${this.options.width} ${this.options.height}`);
+    }
+  }
+
+  destroy() {
+    if (this.svg && this.svg.parentNode) {
+      this.svg.parentNode.removeChild(this.svg);
+    }
+    this.animations.clear();
+  }
+
   // Utility methods
   addToLayer(layerName, element) {
     const layer = this.getLayer(layerName);
@@ -335,16 +456,6 @@ class SVGRenderer {
 
   exportSVG() {
     return new XMLSerializer().serializeToString(this.svg);
-  }
-
-  destroy() {
-    // Stop all animations
-    this.animations.clear();
-    
-    // Remove from DOM
-    if (this.svg && this.svg.parentNode) {
-      this.svg.parentNode.removeChild(this.svg);
-    }
   }
 }
 

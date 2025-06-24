@@ -206,13 +206,16 @@ class AnalyticsManager {
             enabled,
             timestamp: Date.now()
         });
-    }
-
-    static trackError(error, context = {}) {
+    }    static trackError(error, context = {}) {
+        if (!error) {
+            console.warn('Analytics: Attempted to track null/undefined error');
+            return;
+        }
+        
         this.trackEvent('error', {
-            message: error.message,
+            message: error.message || 'Unknown error',
             stack: error.stack?.substring(0, 500), // Limit stack trace length
-            type: error.constructor.name,
+            type: error.constructor?.name || 'Unknown',
             context
         }, true); // Mark as urgent
     }

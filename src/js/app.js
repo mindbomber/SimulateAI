@@ -4,7 +4,7 @@
  */
 
 // Import core modules
-import { SimulationEngine } from './core/engine.js';
+import VisualEngine from './core/visual-engine.js';
 import EthicsSimulation from './core/simulation.js';
 import { UIComponent, UIPanel, EthicsDisplay, FeedbackSystem, Button, Slider } from './core/ui.js';
 import AccessibilityManager from './core/accessibility.js';
@@ -13,25 +13,44 @@ import AccessibilityManager from './core/accessibility.js';
 import StorageManager from './utils/storage.js';
 import AnalyticsManager from './utils/analytics.js';
 import Helpers from './utils/helpers.js';
+import CanvasManager from './utils/canvas-manager.js';
 
 // Import renderers
 import CanvasRenderer from './renderers/canvas-renderer.js';
 import SVGRenderer from './renderers/svg-renderer.js';
 
 // Import components
-import HeroDemo from './components/hero-demo.js';
+// import HeroDemo from './components/hero-demo.js'; // Removed - using integrated demo instead
+
+// Import enhanced objects
+import { BaseObject, EthicsMeter, InteractiveButton, InteractiveSlider } from './objects/enhanced-objects.js';
 
 class AIEthicsApp {
     constructor() {
         this.currentSimulation = null;
         this.engine = null;
+        this.visualEngine = null;
         this.simulations = new Map();
         this.isInitialized = false;
+        this.heroDemo = null;
+        
+        // Enhanced objects for UI
+        this.ethicsMeters = new Map();
+        this.interactiveButtons = new Map();
+        this.simulationSliders = new Map();
+        
+        // Canvas management IDs
+        this.currentSimulationCanvasId = null;
+        this.ethicsMetersCanvasId = null;
+        this.interactiveButtonsCanvasId = null;
+        this.simulationSlidersCanvasId = null;
+        this.heroDemoCanvasId = null;
         
         // UI elements
         this.modal = null;
         this.simulationContainer = null;
         this.simulationsGrid = null;
+        this.lastFocusedElement = null; // For focus restoration
         
         // Available simulations
         this.availableSimulations = [
@@ -79,9 +98,7 @@ class AIEthicsApp {
 
         try {
             // Initialize core systems
-            await this.initializeSystems();
-            
-            // Setup UI
+            await this.initializeSystems();            // Setup UI
             this.setupUI();
             
             // Load simulations
@@ -94,9 +111,10 @@ class AIEthicsApp {
             this.setupAccessibility();
               // Render initial state
             this.render();
-            
-            // Initialize hero demo
-            this.initializeHeroDemo();
+              // Initialize hero demo
+            await this.initializeHeroDemo();
+              // Initialize enhanced objects (after visual engine is set up)
+            await this.initializeEnhancedObjects();
             
             this.isInitialized = true;
             console.log('AI Ethics App initialized successfully');
@@ -110,11 +128,19 @@ class AIEthicsApp {
             
         } catch (error) {
             console.error('Failed to initialize app:', error);
-            this.showError('Failed to initialize the application. Please refresh the page.');
-        }
+            this.showError('Failed to initialize the application. Please refresh the page.');        }
     }
 
     async initializeSystems() {
+        // Visual Engine will be initialized later when we have canvas elements
+        // Just store the configuration for now
+        this.visualEngineConfig = {
+            renderMode: 'canvas',
+            accessibility: true,
+            highPerformance: false,
+            debug: false
+        };
+
         // Systems are already initialized via their modules
         // StorageManager and AnalyticsManager auto-initialize
         console.log('Core systems initialized');
@@ -129,9 +155,10 @@ class AIEthicsApp {
         
         if (!this.simulationsGrid) {
             console.error('Simulations grid not found');
-            return;
-        }
-    }    async loadSimulations() {
+            return;        }
+    }
+
+    async loadSimulations() {
         // Load simulation classes
         const simulationModules = {
             'bias-fairness': () => import('./simulations/bias-fairness.js')
@@ -173,6 +200,13 @@ class AIEthicsApp {
             
             if (closeBtn) {
                 closeBtn.addEventListener('click', () => this.closeSimulation());
+                
+                // Add focus trapping to the modal
+                this.modal.addEventListener('keydown', (e) => {
+                    if (e.key === 'Tab') {
+                        this.trapFocusInModal(e);
+                    }
+                });
             }
             
             if (resetBtn) {
@@ -207,10 +241,52 @@ class AIEthicsApp {
                 this.toggleHighContrast();
             });
         }
-        
-        if (largeTextBtn) {
+          if (largeTextBtn) {
             largeTextBtn.addEventListener('click', () => {
                 this.toggleLargeText();
+            });
+        }
+
+        // Enhanced simulation card buttons (delegated event handling)
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('enhanced-sim-button')) {
+                e.preventDefault();
+                const simulationId = e.target.getAttribute('data-simulation');
+                if (simulationId) {
+                    this.startSimulation(simulationId);
+                }
+            }
+        });
+        
+        // Mobile navigation toggle
+        const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+        const navList = document.querySelector('.nav-list');
+        
+        if (mobileMenuToggle && navList) {
+            mobileMenuToggle.addEventListener('click', () => {
+                const isExpanded = mobileMenuToggle.getAttribute('aria-expanded') === 'true';
+                
+                mobileMenuToggle.setAttribute('aria-expanded', !isExpanded);
+                navList.classList.toggle('open');
+                
+                // Close menu when clicking outside
+                if (!isExpanded) {
+                    document.addEventListener('click', function closeMenu(e) {
+                        if (!mobileMenuToggle.contains(e.target) && !navList.contains(e.target)) {
+                            mobileMenuToggle.setAttribute('aria-expanded', 'false');
+                            navList.classList.remove('open');
+                            document.removeEventListener('click', closeMenu);
+                        }
+                    });
+                }
+            });
+            
+            // Close menu when navigation link is clicked
+            navList.addEventListener('click', (e) => {
+                if (e.target.classList.contains('nav-link')) {
+                    mobileMenuToggle.setAttribute('aria-expanded', 'false');
+                    navList.classList.remove('open');
+                }
             });
         }
     }
@@ -224,13 +300,12 @@ class AIEthicsApp {
         }
         
         if (preferences.accessibility?.largeText) {
-            document.body.classList.add('large-text');
-        }
+            document.body.classList.add('large-text');        }
     }
 
     render() {
         this.renderSimulationsGrid();
-        this.renderHeroDemo();
+        // Hero demo is now handled by the HeroDemo class
     }
 
     renderSimulationsGrid() {
@@ -280,9 +355,8 @@ class AIEthicsApp {
                         <span class="grade">${Helpers.getEthicsGrade(score).grade}</span>
                     </div>
                 ` : ''}
-                
-                <div class="card-actions">
-                    <button class="btn btn-primary" onclick="app.startSimulation('${simulation.id}')">
+                  <div class="card-actions">
+                    <button class="btn btn-primary enhanced-sim-button" data-simulation="${simulation.id}">
                         ${isCompleted ? 'Retry' : 'Start'} Simulation
                     </button>
                 </div>
@@ -308,50 +382,29 @@ class AIEthicsApp {
         return card;
     }
 
-    renderHeroDemo() {
-        const demoContainer = document.getElementById('hero-demo');
-        if (!demoContainer) return;
-
-        // Create a simple animated demo
-        demoContainer.innerHTML = `
-            <div class="demo-ethics-meter">
-                <h4>Ethics in Action</h4>
-                <div class="demo-meter">
-                    <div class="meter-label">Fairness</div>
-                    <div class="meter-bar">
-                        <div class="meter-fill" style="width: 75%; background: #4caf50;"></div>
-                    </div>
-                </div>
-                <div class="demo-meter">
-                    <div class="meter-label">Transparency</div>
-                    <div class="meter-bar">
-                        <div class="meter-fill" style="width: 60%; background: #ff9800;"></div>
-                    </div>
-                </div>
-                <div class="demo-meter">
-                    <div class="meter-label">Privacy</div>
-                    <div class="meter-bar">
-                        <div class="meter-fill" style="width: 85%; background: #4caf50;"></div>
-                    </div>
-                </div>
-                <p class="demo-text">Interactive simulations help you understand the impact of your decisions</p>
-            </div>
-        `;
-
-        // Animate the demo
-        const fills = demoContainer.querySelectorAll('.meter-fill');
-        fills.forEach((fill, index) => {
-            setTimeout(() => {
-                fill.style.transition = 'width 1s ease';
-                fill.style.width = fill.style.width; // Trigger animation
-            }, index * 200);
-        });
-    }
-
-    // Simulation management
+    /**
+     * Simulation management
+     */
     async startSimulation(simulationId) {
         try {
             this.showLoading();
+
+            // Cleanup previous simulation canvases and engines
+            if (this.currentSimulation && this.currentSimulation.cleanup) {
+                this.currentSimulation.cleanup();
+            }
+
+            // Cleanup any existing simulation canvas
+            if (this.currentSimulationCanvasId) {
+                CanvasManager.removeCanvas(this.currentSimulationCanvasId);
+                this.currentSimulationCanvasId = null;
+            }
+
+            // Cleanup hero demo canvas if running
+            if (this.heroDemoCanvasId) {
+                CanvasManager.removeCanvas(this.heroDemoCanvasId);
+                this.heroDemoCanvasId = null;
+            }
             
             const simConfig = this.simulations.get(simulationId);
             if (!simConfig) {
@@ -359,16 +412,52 @@ class AIEthicsApp {
             }
 
             // Track simulation start
-            AnalyticsManager.trackSimulationStart(simulationId, simConfig.title);
+            AnalyticsManager.trackSimulationStart(simulationId, simConfig.title);            // Get simulation container
+            const simulationContainer = document.getElementById('simulation-container');
+            if (!simulationContainer) {
+                throw new Error('Simulation container not found');
+            }
+            
+            // Add loading state to container
+            simulationContainer.classList.add('loading');
+            simulationContainer.setAttribute('aria-busy', 'true');
+            simulationContainer.setAttribute('aria-label', `Loading ${simConfig.title} simulation`);
+            
+            // Clear previous content and remove any error states
+            simulationContainer.innerHTML = '';
+            simulationContainer.classList.remove('error');
+              // Create managed canvas for the simulation
+            const { canvas, id } = CanvasManager.createCanvas({
+                width: 600,
+                height: 400,
+                container: simulationContainer,
+                className: 'simulation-canvas',
+                id: `simulation-${simulationId}`
+            });
 
-            // Create simulation engine
-            this.engine = new SimulationEngine('simulation-container', {
-                width: 800,
-                height: 600,
+            // Store canvas ID for cleanup
+            this.currentSimulationCanvasId = id;
+
+            // Apply responsive styling to canvas
+            canvas.style.cssText = `
+                max-width: 100%;
+                max-height: 100%;
+                width: auto;
+                height: auto;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                background: #fff;
+            `;            // Create visual engine using canvas manager
+            this.engine = await CanvasManager.createVisualEngine(id, {
                 renderMode: 'canvas',
                 accessibility: true,
-                debug: false
+                debug: false,
+                width: 600,
+                height: 400
             });
+
+            // Set the container reference on the engine for simulation compatibility
+            this.engine.container = simulationContainer;
 
             // Create the specific simulation instance
             this.currentSimulation = await this.createSimulationInstance(simulationId, simConfig);
@@ -382,64 +471,104 @@ class AIEthicsApp {
             
             // Setup simulation event listeners
             this.setupSimulationEventListeners();
-            
-            // Show the modal
+              // Show the modal
             this.showSimulationModal(simConfig);
             
             // Start the engine
             this.engine.start();
-            
-            // Start the simulation
+              // Start the simulation
             this.currentSimulation.start();
             
             this.hideLoading();
+              // Remove loading state from container
+            if (simulationContainer) {
+                simulationContainer.classList.remove('loading');
+                simulationContainer.removeAttribute('aria-busy');
+                simulationContainer.setAttribute('aria-label', `${simConfig.title} simulation`);
+            }
             
-        } catch (error) {
+            // Re-initialize enhanced UI objects for this simulation
+            await this.refreshEnhancedObjects();
+            
+            // Update ethics meters with initial values
+            this.updateEthicsMeters();
+              } catch (error) {
             console.error('Failed to start simulation:', error);
             this.hideLoading();
+            
+            // Add error state to container
+            const simulationContainer = document.getElementById('simulation-container');
+            if (simulationContainer) {
+                simulationContainer.classList.remove('loading');
+                simulationContainer.classList.add('error');
+                simulationContainer.removeAttribute('aria-busy');
+                simulationContainer.setAttribute('aria-label', 'Simulation failed to load');
+                simulationContainer.innerHTML = `
+                    <div style="text-align: center; padding: 2rem;">
+                        <h3>Simulation Failed to Load</h3>
+                        <p>There was an error loading the simulation. Please try again.</p>
+                        <button class="btn btn-primary" onclick="this.closest('.modal').querySelector('.modal-close').click()">Close</button>
+                    </div>
+                `;
+            }
+            
             this.showError('Failed to start the simulation. Please try again.');
         }
-    }
+    }    async createSimulationInstance(simulationId, config) {
+        try {
+            // Load the specific simulation class based on ID
+            switch (simulationId) {
+                case 'bias-fairness':
+                    const { default: BiasSimulation } = await import('./simulations/bias-fairness.js');
+                    const biasSimulation = new BiasSimulation(simulationId);
+                    // Set container reference
+                    biasSimulation.container = document.getElementById('simulation-container');
+                    return biasSimulation;
+                
+                default:
+                    // Fallback to basic simulation for unimplemented simulations
+                    const basicScenarios = [
+                        {
+                            id: 'intro',
+                            title: 'Introduction',
+                            description: 'Welcome to the AI Ethics simulation',
+                            objective: 'Learn the basics of ethical decision-making in AI'
+                        },
+                        {
+                            id: 'decision1',
+                            title: 'First Decision',
+                            description: 'Make your first ethical choice',
+                            objective: 'Choose the most ethical option'
+                        },
+                        {
+                            id: 'conclusion',
+                            title: 'Conclusion',
+                            description: 'Reflect on your decisions',
+                            objective: 'Review your ethical choices'
+                        }
+                    ];
 
-    async createSimulationInstance(simulationId, config) {
-        // For now, create a basic simulation instance
-        // In a real implementation, this would load the specific simulation class
-        
-        const basicScenarios = [
-            {
-                id: 'intro',
-                title: 'Introduction',
-                description: 'Welcome to the AI Ethics simulation',
-                objective: 'Learn the basics of ethical decision-making in AI'
-            },
-            {
-                id: 'decision1',
-                title: 'First Decision',
-                description: 'Make your first ethical choice',
-                objective: 'Choose the most ethical option'
-            },
-            {
-                id: 'conclusion',
-                title: 'Conclusion',
-                description: 'Reflect on your decisions',
-                objective: 'Review your ethical choices'
+                    const simulation = new EthicsSimulation(simulationId, {
+                        title: config.title,
+                        description: config.description,
+                        difficulty: config.difficulty,
+                        duration: config.duration,
+                        scenarios: basicScenarios,
+                        ethicsMetrics: [
+                            { name: 'fairness', label: 'Fairness', value: 50 },
+                            { name: 'transparency', label: 'Transparency', value: 50 },
+                            { name: 'privacy', label: 'Privacy', value: 50 }
+                        ]
+                    });
+                    
+                    // Set container reference
+                    simulation.container = document.getElementById('simulation-container');
+                    return simulation;
             }
-        ];
-
-        const simulation = new EthicsSimulation(simulationId, {
-            title: config.title,
-            description: config.description,
-            difficulty: config.difficulty,
-            duration: config.duration,
-            scenarios: basicScenarios,
-            ethicsMetrics: [
-                { name: 'fairness', label: 'Fairness', value: 50 },
-                { name: 'transparency', label: 'Transparency', value: 50 },
-                { name: 'privacy', label: 'Privacy', value: 50 }
-            ]
-        });
-
-        return simulation;
+        } catch (error) {
+            console.error(`Failed to load simulation ${simulationId}:`, error);
+            throw error;
+        }
     }
 
     setupSimulationEventListeners() {
@@ -458,9 +587,7 @@ class AIEthicsApp {
             // Update UI for new scenario
             this.updateModalTitle(data.scenario.title);
         });
-    }
-
-    showSimulationModal(simConfig) {
+    }    showSimulationModal(simConfig) {
         if (!this.modal) return;
 
         const title = this.modal.querySelector('#modal-title');
@@ -468,13 +595,52 @@ class AIEthicsApp {
             title.textContent = simConfig.title;
         }
 
+        // Store the currently focused element to restore later
+        this.lastFocusedElement = document.activeElement;
+
+        // Remove inert from modal and set aria-hidden to false
+        this.modal.removeAttribute('inert');
         this.modal.setAttribute('aria-hidden', 'false');
         this.modal.style.display = 'flex';
         
-        // Focus management
-        const firstFocusable = this.modal.querySelector('button, [tabindex="0"]');
-        if (firstFocusable) {
-            firstFocusable.focus();
+        // Make background content inert
+        const mainContent = document.getElementById('main-content');
+        if (mainContent) {
+            mainContent.setAttribute('inert', '');
+        }
+        
+        // Focus management - focus the close button initially
+        const closeButton = this.modal.querySelector('.modal-close');
+        if (closeButton) {
+            closeButton.focus();
+        }
+    }
+
+    /**
+     * Trap focus within modal for accessibility
+     */
+    trapFocusInModal(event) {
+        if (!this.modal || this.modal.hasAttribute('aria-hidden')) return;
+
+        const focusableElements = this.modal.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        
+        const firstFocusable = focusableElements[0];
+        const lastFocusable = focusableElements[focusableElements.length - 1];
+
+        if (event.shiftKey) {
+            // Shift + Tab
+            if (document.activeElement === firstFocusable) {
+                lastFocusable.focus();
+                event.preventDefault();
+            }
+        } else {
+            // Tab
+            if (document.activeElement === lastFocusable) {
+                firstFocusable.focus();
+                event.preventDefault();
+            }
         }
     }
 
@@ -490,14 +656,52 @@ class AIEthicsApp {
             this.engine = null;
         }
 
-        if (this.modal) {
+        // Cleanup all managed canvases
+        const canvasesToCleanup = [
+            this.currentSimulationCanvasId,
+            this.ethicsMetersCanvasId,
+            this.interactiveButtonsCanvasId,
+            this.simulationSlidersCanvasId
+        ];
+
+        canvasesToCleanup.forEach(canvasId => {
+            if (canvasId) {
+                CanvasManager.removeCanvas(canvasId);
+            }
+        });
+
+        // Reset canvas IDs
+        this.currentSimulationCanvasId = null;
+        this.ethicsMetersCanvasId = null;
+        this.interactiveButtonsCanvasId = null;
+        this.simulationSlidersCanvasId = null;        if (this.modal) {
+            // Remove focus from any focused elements inside the modal first
+            const focusedElement = this.modal.querySelector(':focus');
+            if (focusedElement) {
+                focusedElement.blur();
+            }
+            
+            // Restore focus to the element that was focused before the modal opened
+            if (this.lastFocusedElement && document.contains(this.lastFocusedElement)) {
+                this.lastFocusedElement.focus();
+            }
+            
+            // Make modal inert and hide it
+            this.modal.setAttribute('inert', '');
             this.modal.setAttribute('aria-hidden', 'true');
             this.modal.style.display = 'none';
-        }
-
-        // Clear simulation container
+            
+            // Remove inert from main content
+            const mainContent = document.getElementById('main-content');
+            if (mainContent) {
+                mainContent.removeAttribute('inert');
+            }
+        }        // Clear simulation container
         if (this.simulationContainer) {
             this.simulationContainer.innerHTML = '';
+            this.simulationContainer.classList.remove('loading', 'error');
+            this.simulationContainer.removeAttribute('aria-busy');
+            this.simulationContainer.removeAttribute('aria-label');
         }
     }
 
@@ -539,78 +743,987 @@ class AIEthicsApp {
         if (modalTitle) {
             modalTitle.textContent = title;
         }
-    }
-
-    // UI utility methods
-    scrollToSimulations() {
-        const simulationsSection = document.getElementById('simulations');
-        if (simulationsSection) {
-            Helpers.scrollToElement(simulationsSection);
-        }
-    }
-
-    openEducatorTools() {
-        const educatorSection = document.getElementById('educator-tools');
-        if (educatorSection) {
-            Helpers.scrollToElement(educatorSection);
-        }
-        
-        AnalyticsManager.trackEducatorToolUsage('navigation', 'header_button');
-    }
-
-    toggleHighContrast() {
-        const isEnabled = document.body.classList.toggle('high-contrast');
-        
-        // Save preference
-        const preferences = StorageManager.getUserPreferences();
-        preferences.accessibility.highContrast = isEnabled;
-        StorageManager.saveUserPreferences(preferences);
-        
-        AnalyticsManager.trackAccessibilityUsage('high_contrast', isEnabled);
-    }
-
-    toggleLargeText() {
-        const isEnabled = document.body.classList.toggle('large-text');
-        
-        // Save preference
-        const preferences = StorageManager.getUserPreferences();
-        preferences.accessibility.largeText = isEnabled;
-        StorageManager.saveUserPreferences(preferences);
-        
-        AnalyticsManager.trackAccessibilityUsage('large_text', isEnabled);
-    }
-
-    showLoading() {
-        if (this.loading) {
-            this.loading.setAttribute('aria-hidden', 'false');
-            this.loading.style.display = 'flex';
-        }
-    }
-
-    hideLoading() {
-        if (this.loading) {
-            this.loading.setAttribute('aria-hidden', 'true');
-            this.loading.style.display = 'none';
-        }
-    }
-
-    showError(message) {
-        // Simple error display - in a real app, you'd want a proper error modal
-        alert(`Error: ${message}`);
-        
-        AnalyticsManager.trackError(new Error(message), { context: 'app_error' });
-    }
-
-    initializeHeroDemo() {
+    }    /**
+     * Initialize enhanced objects for simulation UI
+     */
+    async initializeEnhancedObjects() {
         try {
-            // Initialize the hero demo component
-            this.heroDemo = new HeroDemo();
-            console.log('Hero demo initialized');
+            await this.setupEthicsMeters();
+            await this.setupInteractiveButtons();
+            await this.setupSimulationSliders();
+            console.log('Enhanced objects initialized successfully');
+        } catch (error) {
+            console.error('Failed to initialize enhanced objects:', error);
+            // Fallback to basic UI
+            this.setupFallbackUI();
+        }
+    }
+
+    /**
+     * Setup fallback UI when enhanced objects fail
+     */
+    setupFallbackUI() {
+        console.log('Setting up fallback UI');
+        
+        // Make sure the original buttons are visible
+        const resetBtn = document.getElementById('reset-simulation');
+        const nextBtn = document.getElementById('next-scenario');
+        
+        if (resetBtn) {
+            resetBtn.style.display = 'inline-block';
+            resetBtn.addEventListener('click', () => this.resetSimulation());
+        }
+        
+        if (nextBtn) {
+            nextBtn.style.display = 'inline-block';
+            nextBtn.addEventListener('click', () => this.nextScenario());
+        }
+        
+        // Add basic ethics meters text
+        const metersContainer = document.querySelector('.ethics-meters .meters-container');
+        if (metersContainer) {
+            metersContainer.innerHTML = `
+                <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                    <div class="basic-meter">
+                        <strong>Fairness:</strong> <span id="fairness-value">50%</span>
+                    </div>
+                    <div class="basic-meter">
+                        <strong>Transparency:</strong> <span id="transparency-value">50%</span>
+                    </div>
+                    <div class="basic-meter">
+                        <strong>Accountability:</strong> <span id="accountability-value">50%</span>
+                    </div>
+                    <div class="basic-meter">
+                        <strong>Privacy:</strong> <span id="privacy-value">50%</span>
+                    </div>
+                </div>
+            `;
+        }
+    }    /**
+     * Setup ethics meters using enhanced objects
+     */
+    async setupEthicsMeters() {
+        try {
+            const ethicsContainer = document.querySelector('.ethics-meters');
+            if (!ethicsContainer) {
+                console.warn('Ethics meters container not found');
+                return;
+            }
+
+            // Skip if this is inside the hero demo
+            const isInHeroDemo = ethicsContainer.closest('#hero-demo') !== null;
+            if (isInHeroDemo) {
+                console.log('Skipping enhanced ethics meters for hero demo - using CSS-based meters');
+                return;
+            }
+
+            // Clear existing content in meters container
+            const metersContainer = ethicsContainer.querySelector('.meters-container');
+            if (metersContainer) {
+                metersContainer.innerHTML = '';
+            }// Create ethics meter container
+            const meterContainer = document.createElement('div');
+            meterContainer.className = 'enhanced-ethics-meters';
+            meterContainer.style.cssText = `
+                display: flex;
+                gap: 20px;
+                padding: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            `;
+
+            // Append meter container to meters container first
+            if (metersContainer) {
+                metersContainer.appendChild(meterContainer);
+            }
+
+            // Create managed canvas for ethics meters
+            const { canvas, id } = CanvasManager.createCanvas({
+                width: 800,
+                height: 200,
+                container: meterContainer,
+                className: 'ethics-meters-canvas',
+                id: `ethics-meters-${Date.now()}` // Make ID unique for each creation
+            });
+
+            // Store canvas ID for cleanup
+            this.ethicsMetersCanvasId = id;
+
+            // Apply styling to canvas
+            canvas.style.cssText = `
+                max-width: 100%;
+                height: auto;
+                border-radius: 8px;
+                background: #f8f9fa;
+            `;
+
+            // Initialize visual engine with managed canvas
+            if (!this.visualEngine) {
+                this.visualEngine = await CanvasManager.createVisualEngine(id, this.visualEngineConfig);
+            } else {
+                // If visual engine already exists, just reinitialize with new canvas
+                this.visualEngine.container = canvas;
+                this.visualEngine.init();
+            }
+            
+            // Ensure the visual engine and scene are properly initialized
+            if (!this.visualEngine || !this.visualEngine.scene) {
+                throw new Error('Visual engine or scene not properly initialized');
+            }
+
+            // Create ethics meters
+            const meterConfigs = [
+                {
+                    id: 'fairness-meter',
+                    label: 'Fairness',
+                    description: 'How fair and unbiased are the AI decisions?',
+                    color: '#28a745',
+                    position: { x: 100, y: 100 }
+                },
+                {
+                    id: 'transparency-meter',
+                    label: 'Transparency',
+                    description: 'How clear and explainable are the AI processes?',
+                    color: '#007bff',
+                    position: { x: 300, y: 100 }
+                },
+                {
+                    id: 'accountability-meter',
+                    label: 'Accountability',
+                    description: 'How responsible and accountable is the AI system?',
+                    color: '#ffc107',
+                    position: { x: 500, y: 100 }
+                },
+                {
+                    id: 'privacy-meter',
+                    label: 'Privacy',
+                    description: 'How well does the AI protect user privacy?',
+                    color: '#6f42c1',
+                    position: { x: 700, y: 100 }
+                }
+            ];
+
+            meterConfigs.forEach(config => {
+                const meter = new EthicsMeter({
+                    id: config.id,
+                    x: config.position.x,
+                    y: config.position.y,
+                    width: 120,
+                    height: 80,
+                    label: config.label,
+                    value: 0.5, // Starting value
+                    color: config.color,
+                    ariaLabel: `${config.label}: ${config.description}`,
+                    showLabel: true,
+                    showValue: true,
+                    animated: true
+                });                this.ethicsMeters.set(config.id, meter);
+                this.visualEngine.scene.add(meter);
+            });
+
+            if (metersContainer) {
+                metersContainer.appendChild(meterContainer);
+            } else {
+                ethicsContainer.appendChild(meterContainer);
+            }
+
+            console.log('Ethics meters initialized with enhanced objects');
+        } catch (error) {
+            console.error('Failed to setup ethics meters:', error);
+            throw error; // Re-throw to trigger fallback
+        }
+    }    /**
+     * Setup interactive buttons using enhanced objects
+     */
+    async setupInteractiveButtons() {
+        try {
+            const actionsContainer = document.querySelector('.simulation-actions .actions-container');
+            if (!actionsContainer) {
+                console.warn('Actions container not found, trying fallback');
+                const fallbackContainer = document.querySelector('.simulation-actions');
+                if (!fallbackContainer) {
+                    console.error('No actions container found at all');
+                    return;
+                }
+                // Create actions-container if it doesn't exist
+                const newActionsContainer = document.createElement('div');
+                newActionsContainer.className = 'actions-container';
+                fallbackContainer.appendChild(newActionsContainer);
+                return await this.setupInteractiveButtons(); // Retry
+            }
+
+        // Clear existing buttons but keep structure
+        const existingButtons = actionsContainer.querySelectorAll('.btn');
+        existingButtons.forEach(btn => {
+            if (!btn.classList.contains('enhanced-button')) {
+                btn.style.display = 'none';
+            }
+        });        // Create managed canvas for buttons
+        const { canvas: buttonCanvas, id: buttonCanvasId } = CanvasManager.createCanvas({
+            width: 600,
+            height: 100,
+            container: actionsContainer,
+            className: 'interactive-buttons-canvas',
+            id: `interactive-buttons-${Date.now()}`
+        });
+
+        // Store canvas ID for cleanup
+        this.interactiveButtonsCanvasId = buttonCanvasId;
+
+        buttonCanvas.style.cssText = `
+            max-width: 100%;
+            height: auto;
+            margin: 10px 0;
+        `;
+
+        // Initialize button visual engine using canvas manager
+        const buttonEngine = await CanvasManager.createVisualEngine(buttonCanvasId, {
+            renderMode: 'canvas',
+            accessibility: true,
+            debug: false
+        });// Create interactive buttons
+        const resetButton = new InteractiveButton({
+            id: 'reset-button',
+            x: 100,
+            y: 50,
+            width: 120,
+            height: 40,
+            text: 'Reset',
+            variant: 'secondary',
+            ariaLabel: 'Reset simulation to initial state'
+        });
+
+        const nextButton = new InteractiveButton({
+            id: 'next-button',
+            x: 350,
+            y: 50,
+            width: 150,
+            height: 40,
+            text: 'Next Scenario',
+            variant: 'primary',
+            ariaLabel: 'Proceed to next scenario'
+        });
+
+        // Set up click event handlers
+        resetButton.on('click', () => this.resetSimulation());
+        nextButton.on('click', () => this.nextScenario());        this.interactiveButtons.set('reset', resetButton);
+        this.interactiveButtons.set('next', nextButton);
+
+        buttonEngine.scene.add(resetButton);
+        buttonEngine.scene.add(nextButton);// Store button engine reference
+        this.buttonEngine = buttonEngine;
+
+        console.log('Interactive buttons initialized with enhanced objects');
+        } catch (error) {
+            console.error('Failed to setup interactive buttons:', error);
+            throw error; // Re-throw to trigger fallback
+        }
+    }
+
+    /**
+     * Setup simulation sliders for parameter control
+     */
+    async setupSimulationSliders() {
+        // Find or create slider container
+        let sliderContainer = document.querySelector('.simulation-sliders');
+        if (!sliderContainer) {
+            sliderContainer = document.createElement('div');
+            sliderContainer.className = 'simulation-sliders';
+            sliderContainer.style.cssText = `
+                margin: 20px 0;
+                padding: 15px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                background: #f8f9fa;
+            `;
+            
+            // Add to simulation controls
+            const controls = document.querySelector('.simulation-controls');
+            if (controls) {
+                controls.appendChild(sliderContainer);
+            }
+        }        // Create managed canvas for sliders
+        const { canvas: sliderCanvas, id: sliderCanvasId } = CanvasManager.createCanvas({
+            width: 700,
+            height: 200,
+            container: sliderContainer,
+            className: 'simulation-sliders-canvas',
+            id: `simulation-sliders-${Date.now()}`
+        });
+
+        // Store canvas ID for cleanup
+        this.simulationSlidersCanvasId = sliderCanvasId;
+
+        sliderCanvas.style.cssText = `
+            max-width: 100%;
+            height: auto;
+        `;
+
+        // Initialize slider visual engine using canvas manager
+        const sliderEngine = await CanvasManager.createVisualEngine(sliderCanvasId, {
+            renderMode: 'canvas',
+            accessibility: true,
+            debug: false
+        });
+
+        // Create simulation parameter sliders
+        const sliderConfigs = [
+            {
+                id: 'ai-autonomy',
+                label: 'AI Autonomy Level',
+                description: 'How much autonomy should the AI have?',
+                position: { x: 50, y: 50 },
+                min: 0,
+                max: 100,
+                value: 50
+            },
+            {
+                id: 'human-oversight',
+                label: 'Human Oversight',
+                description: 'Level of human oversight in decisions',
+                position: { x: 50, y: 120 },
+                min: 0,
+                max: 100,
+                value: 70
+            }
+        ];        sliderConfigs.forEach(config => {
+            const slider = new InteractiveSlider({
+                id: config.id,
+                x: config.position.x,
+                y: config.position.y,
+                width: 300,
+                height: 40,
+                min: config.min,
+                max: config.max,
+                value: config.value,
+                label: config.label,
+                ariaLabel: `${config.label}: ${config.description}`,
+                showLabel: true,
+                showValue: true
+            });
+
+            // Set up value change event handler
+            slider.on('valueChange', (event) => this.onSliderChange(config.id, event.value));            this.simulationSliders.set(config.id, slider);
+            sliderEngine.scene.add(slider);
+        });
+
+        // Store slider engine reference
+        this.sliderEngine = sliderEngine;
+
+        console.log('Simulation sliders initialized with enhanced objects');
+    }
+
+    /**
+     * Handle slider value changes
+     */
+    onSliderChange(sliderId, value) {
+        console.log(`Slider ${sliderId} changed to: ${value}`);
+        
+        // Update simulation parameters based on slider changes
+        if (this.currentSimulation) {
+            switch (sliderId) {
+                case 'ai-autonomy':
+                    this.currentSimulation.setParameter('autonomy', value / 100);
+                    break;
+                case 'human-oversight':
+                    this.currentSimulation.setParameter('oversight', value / 100);
+                    break;
+            }
+        }
+
+        // Update ethics meters based on parameter changes
+        this.updateEthicsMeters();
+    }
+
+    /**
+     * Update ethics meters based on current simulation state
+     */
+    updateEthicsMeters() {
+        if (!this.currentSimulation || !this.ethicsMeters.size) return;
+
+        // Get current ethics scores from simulation
+        const scores = this.currentSimulation.getEthicsScores?.() || {};
+
+        this.ethicsMeters.forEach((meter, id) => {
+            const scoreKey = id.replace('-meter', '');
+            const score = scores[scoreKey] || 0.5;
+            meter.setValue(score, true); // Animate the change
+        });
+    }
+
+    /**
+     * Reset simulation and enhanced objects
+     */
+    resetSimulation() {
+        if (this.currentSimulation) {
+            this.currentSimulation.reset();
+        }
+
+        // Reset all sliders to default values
+        this.simulationSliders.forEach(slider => {
+            slider.setValue(slider.defaultValue || 50, true);
+        });
+
+        // Reset ethics meters
+        this.ethicsMeters.forEach(meter => {
+            meter.setValue(0.5, true);
+        });
+
+        console.log('Simulation reset with enhanced objects');
+    }
+
+    /**
+     * Proceed to next scenario
+     */
+    nextScenario() {
+        if (this.currentSimulation && this.currentSimulation.nextScenario) {
+            this.currentSimulation.nextScenario();
+            this.updateEthicsMeters();
+        }
+
+        console.log('Advanced to next scenario');
+    }
+
+    /**
+     * Refresh enhanced objects when simulation changes
+     */    async refreshEnhancedObjects() {
+        // Clean up existing UI canvases before recreating
+        const uiCanvasesToCleanup = [
+            this.ethicsMetersCanvasId,
+            this.interactiveButtonsCanvasId,
+            this.simulationSlidersCanvasId
+        ];
+
+        uiCanvasesToCleanup.forEach(canvasId => {
+            if (canvasId) {
+                CanvasManager.removeCanvas(canvasId);
+            }
+        });
+
+        // Reset UI canvas IDs
+        this.ethicsMetersCanvasId = null;
+        this.interactiveButtonsCanvasId = null;
+        this.simulationSlidersCanvasId = null;
+
+        // Re-setup ethics meters for new simulation
+        await this.setupEthicsMeters();
+        
+        // Buttons remain the same but may need state updates
+        this.updateButtonStates();
+        
+        // Sliders may need value updates
+        this.updateSliderStates();
+        
+        console.log('Enhanced objects refreshed for new simulation');
+    }    /**
+     * Update button states based on simulation
+     */
+    updateButtonStates() {
+        const resetButton = this.interactiveButtons.get('reset');
+        const nextButton = this.interactiveButtons.get('next');
+        
+        if (resetButton) {
+            resetButton.isDisabled = false;
+        }
+        
+        if (nextButton && this.currentSimulation) {
+            // Enable next button if there are more scenarios
+            const hasNext = this.currentSimulation.hasNextScenario?.() || true;
+            nextButton.isDisabled = !hasNext;
+        }
+    }
+
+    /**
+     * Update slider states based on simulation
+     */
+    updateSliderStates() {
+        if (!this.currentSimulation) return;
+        
+        // Get current simulation parameters
+        const params = this.currentSimulation.getParameters?.() || {};
+        
+        this.simulationSliders.forEach((slider, id) => {
+            const paramKey = id.replace('-', '');
+            if (params[paramKey] !== undefined) {
+                slider.setValue(params[paramKey] * 100, false); // Don't animate on init
+            }
+        });
+    }    /**
+     * Setup hero demo with interactive scenario
+     */
+    async initializeHeroDemo() {
+        try {
+            console.log('initializeHeroDemo starting...');
+            
+            // Wait a bit to ensure DOM is ready
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            const heroContainer = document.getElementById('hero-demo');
+            console.log('Hero container found:', !!heroContainer);
+            
+            if (heroContainer) {
+                console.log('Setting up hero demo...');
+                this.setupHeroDemo();
+                console.log('Hero demo setup complete');
+            } else {
+                console.error('Hero demo container not found in DOM');
+            }
         } catch (error) {
             console.error('Failed to initialize hero demo:', error);
         }
+    }    /**
+     * Setup hero demo with interactive ethics scenario
+     */
+    setupHeroDemo() {
+        const heroContainer = document.getElementById('hero-demo');
+        if (!heroContainer) {
+            console.error('Hero container not found!');
+            return;
+        }
+
+        console.log('Setting up hero demo content...');
+        heroContainer.innerHTML = `
+            <div class="hero-demo-container">
+                <div class="demo-header">
+                    <h3 class="demo-title">Try It: AI Ethics in Action</h3>
+                    <p class="demo-subtitle">Make decisions and see their ethical impact in real-time</p>
+                </div>
+                
+                <div class="demo-content">
+                    <div class="scenario-panel">
+                        <div class="scenario-header">
+                            <h4 class="scenario-title">AI Hiring Assistant</h4>
+                        </div>
+                        
+                        <div class="scenario-question">
+                            Your AI system is screening job applications. What data should it use to rank candidates?
+                        </div>
+                        
+                        <div class="scenario-choices">
+                            <button class="choice-btn" data-choice="0">
+                                <span class="choice-text">Skills, experience, and education only</span>
+                                <span class="choice-impact">+Fair, +Transparent</span>
+                            </button>
+                            <button class="choice-btn" data-choice="1">
+                                <span class="choice-text">Include age and photo for 'cultural fit'</span>
+                                <span class="choice-impact">-Fair, -Transparent</span>
+                            </button>
+                            <button class="choice-btn" data-choice="2">
+                                <span class="choice-text">Add anonymous demographic data for diversity tracking</span>
+                                <span class="choice-impact">+Fair, ++Transparent</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="ethics-panel">
+                        <h4 class="ethics-title">Ethics Impact</h4>
+                        <div class="ethics-meters">
+                            <div class="ethics-meter">
+                                <div class="meter-header">
+                                    <span class="meter-label">Fairness</span>
+                                    <span class="meter-value">75%</span>
+                                </div>
+                                <div class="meter-bar">
+                                    <div class="meter-fill fairness-fill" style="width: 75%;"></div>
+                                </div>
+                            </div>
+                            <div class="ethics-meter">
+                                <div class="meter-header">
+                                    <span class="meter-label">Transparency</span>
+                                    <span class="meter-value">60%</span>
+                                </div>
+                                <div class="meter-bar">
+                                    <div class="meter-fill transparency-fill" style="width: 60%;"></div>
+                                </div>
+                            </div>
+                            <div class="ethics-meter">
+                                <div class="meter-header">
+                                    <span class="meter-label">Accountability</span>
+                                    <span class="meter-value">80%</span>
+                                </div>
+                                <div class="meter-bar">
+                                    <div class="meter-fill accountability-fill" style="width: 80%;"></div>
+                                </div>
+                            </div>                        </div>
+                        
+                        <button class="btn btn-primary demo-cta" data-simulation="bias-fairness">
+                            Try Full Simulation →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        console.log('Hero demo content added, setting up interactivity...');
+        
+        // Add event listeners for interactive choices
+        this.setupHeroDemoInteractivity();
+        
+        // Animate the initial meters
+        this.animateHeroDemo();
+        
+        console.log('Hero demo setup complete!');
+    }    /**
+     * Setup interactivity for hero demo
+     */
+    setupHeroDemoInteractivity() {
+        const heroContainer = document.getElementById('hero-demo');
+        if (!heroContainer) return;
+
+        const choiceButtons = heroContainer.querySelectorAll('.choice-btn');
+
+        choiceButtons.forEach((btn, index) => {
+            btn.addEventListener('click', () => {
+                // Remove active state from all buttons
+                choiceButtons.forEach(b => b.classList.remove('active'));
+                // Add active state to clicked button
+                btn.classList.add('active');
+
+                // Show feedback based on choice
+                const feedbacks = [
+                    {
+                        text: "Great choice! Using only relevant qualifications reduces bias and promotes fairness.",
+                        meters: { fairness: 90, transparency: 85, accountability: 90 }
+                    },
+                    {
+                        text: "This could introduce age and appearance bias into hiring decisions, reducing fairness.",
+                        meters: { fairness: 30, transparency: 40, accountability: 35 }
+                    },
+                    {
+                        text: "Good balance - helps track diversity without introducing direct bias.",
+                        meters: { fairness: 85, transparency: 95, accountability: 85 }
+                    }
+                ];
+
+                const feedback = feedbacks[index];
+                
+                // Show feedback in popup
+                this.showHeroDemoFeedback(feedback);
+
+                // Animate meter updates
+                this.updateHeroDemoMeters(feedback.meters);
+            });
+        });        // Add event listener for CTA button
+        const ctaButton = heroContainer.querySelector('.demo-cta');
+        if (ctaButton) {
+            ctaButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.startSimulation('bias-fairness');
+            });
+        }
+    }    /**
+     * Show hero demo feedback in a popover
+     */
+    showHeroDemoFeedback(feedback) {
+        // Remove any existing popover
+        const existingPopover = document.querySelector('.hero-demo-feedback-popover');
+        if (existingPopover) {
+            existingPopover.remove();
+        }        // Create feedback popover
+        const popover = document.createElement('div');
+        popover.className = 'hero-demo-feedback-popover';
+        popover.setAttribute('role', 'tooltip');
+        popover.setAttribute('aria-live', 'polite');
+        popover.setAttribute('aria-label', 'Choice feedback');
+        
+        // Check if mobile
+        const isMobile = window.innerWidth <= 767;
+        
+        if (isMobile) {
+            // Mobile: fixed position at bottom
+            popover.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+                padding: 15px;
+                border-radius: 12px;
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+                border: 1px solid rgba(59, 130, 246, 0.2);
+                z-index: 2000;
+                max-width: calc(100vw - 40px);
+                width: 90%;
+                text-align: center;
+                animation: popoverFadeInMobile 0.3s ease-out;
+                font-size: 0.85rem;
+            `;        } else {
+            // Desktop: positioned above choice buttons
+            popover.style.cssText = `
+                position: absolute;
+                bottom: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                margin-bottom: 10px;
+                background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+                padding: 15px;
+                border-radius: 12px;
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+                border: 1px solid rgba(59, 130, 246, 0.2);
+                z-index: 1000;
+                max-width: 300px;
+                width: 90%;
+                text-align: center;
+                animation: popoverFadeIn 0.3s ease-out;
+                font-size: 0.85rem;
+            `;
+        }        // Create arrow pointing down (only for desktop)
+        let arrow = null;
+        if (!isMobile) {
+            arrow = document.createElement('div');
+            arrow.style.cssText = `
+                position: absolute;
+                bottom: -8px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 0;
+                height: 0;
+                border-left: 8px solid transparent;
+                border-right: 8px solid transparent;
+                border-top: 8px solid white;
+                filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.1));
+            `;
+        }
+
+        // Add CSS animations if not already present
+        if (!document.getElementById('hero-popover-animations')) {
+            const style = document.createElement('style');
+            style.id = 'hero-popover-animations';            style.textContent = `                @keyframes popoverFadeIn {
+                    from { 
+                        opacity: 0; 
+                        transform: translateX(-50%) translateY(10px);
+                    }
+                    to { 
+                        opacity: 1; 
+                        transform: translateX(-50%) translateY(0);
+                    }
+                }
+                @keyframes popoverFadeInMobile {
+                    from { 
+                        opacity: 0; 
+                        transform: translateX(-50%) translateY(20px);
+                    }
+                    to { 
+                        opacity: 1; 
+                        transform: translateX(-50%) translateY(0);
+                    }
+                }                @keyframes popoverFadeOut {
+                    from { 
+                        opacity: 1; 
+                        transform: translateX(-50%) translateY(0);
+                    }
+                    to { 
+                        opacity: 0; 
+                        transform: translateX(-50%) translateY(10px);
+                    }
+                }
+                @keyframes popoverFadeOutMobile {
+                    from { 
+                        opacity: 1; 
+                        transform: translateX(-50%) translateY(0);
+                    }
+                    to { 
+                        opacity: 0; 
+                        transform: translateX(-50%) translateY(20px);
+                    }
+                }
+                @keyframes bounceIn {
+                    0% { transform: scale(0.3); opacity: 0; }
+                    50% { transform: scale(1.05); }
+                    70% { transform: scale(0.9); }
+                    100% { transform: scale(1); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+        }        popover.innerHTML = `
+            <div class="feedback-icon" style="font-size: 1.5rem; margin-bottom: 0.5rem; animation: bounceIn 0.6s ease-out 0.2s both;">
+                ${feedback.meters.fairness > 70 ? '✅' : feedback.meters.fairness < 50 ? '⚠️' : '💡'}
+            </div>
+            <div style="font-weight: 600; margin-bottom: 0.5rem; color: #333; font-size: 0.9rem;">
+                ${feedback.meters.fairness > 70 ? 'Great Choice!' : feedback.meters.fairness < 50 ? 'Consider This' : 'Good Balance'}
+            </div>
+            <p style="margin: 0; line-height: 1.4; color: #666;">${feedback.text}</p>
+        `;// Add arrow to popover (only for desktop)
+        if (arrow) {
+            popover.appendChild(arrow);
+        }        // Position popover appropriately
+        if (isMobile) {
+            // For mobile, add to body for fixed positioning
+            document.body.appendChild(popover);
+        } else {
+            // For desktop, position relative to choice buttons
+            const heroContainer = document.getElementById('hero-demo');
+            const scenarioChoices = heroContainer?.querySelector('.scenario-choices');
+            
+            if (scenarioChoices) {
+                scenarioChoices.style.position = 'relative';
+                scenarioChoices.appendChild(popover);
+            } else {
+                heroContainer.style.position = 'relative';
+                heroContainer.appendChild(popover);
+            }
+        }// Auto-hide the popover after 4 seconds
+        setTimeout(() => {
+            if (popover.parentNode) {
+                const fadeOutAnimation = isMobile ? 'popoverFadeOutMobile' : 'popoverFadeOut';
+                popover.style.animation = `${fadeOutAnimation} 0.3s ease-out`;
+                setTimeout(() => {
+                    if (popover.parentNode) {
+                        popover.remove();
+                    }
+                }, 300);
+            }
+        }, 4000);
+
+        // Hide popover on click anywhere
+        const hideOnClick = (e) => {
+            if (!popover.contains(e.target)) {
+                if (popover.parentNode) {
+                    const fadeOutAnimation = isMobile ? 'popoverFadeOutMobile' : 'popoverFadeOut';
+                    popover.style.animation = `${fadeOutAnimation} 0.3s ease-out`;
+                    setTimeout(() => {
+                        if (popover.parentNode) {
+                            popover.remove();
+                        }
+                    }, 300);
+                }
+                document.removeEventListener('click', hideOnClick);
+            }
+        };
+        
+        // Add click listener after a brief delay to avoid immediate triggering
+        setTimeout(() => {
+            document.addEventListener('click', hideOnClick);
+        }, 100);
+    }
+
+    /**
+     * Update hero demo meters with animation
+     */
+    updateHeroDemoMeters(values) {
+        const heroContainer = document.getElementById('hero-demo');
+        if (!heroContainer) return;
+
+        Object.entries(values).forEach(([metric, value]) => {
+            const fill = heroContainer.querySelector(`.${metric}-fill`);
+            const valueSpan = fill ? fill.closest('.ethics-meter').querySelector('.meter-value') : null;
+            
+            if (fill && valueSpan) {
+                fill.style.transition = 'width 0.8s ease-out';
+                fill.style.width = `${value}%`;
+                
+                // Animate the text value
+                const startValue = parseInt(valueSpan.textContent);
+                const endValue = value;
+                const duration = 800;
+                const startTime = performance.now();
+                
+                const animate = (currentTime) => {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const currentValue = Math.round(startValue + (endValue - startValue) * progress);
+                    valueSpan.textContent = `${currentValue}%`;
+                      if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    }
+                };
+                
+                requestAnimationFrame(animate);
+            }
+        });
+    }
+
+    /**
+     * Animate hero demo meters for visual appeal
+     */
+    animateHeroDemo() {
+        const heroContainer = document.getElementById('hero-demo');
+        if (!heroContainer) return;
+
+        const meters = heroContainer.querySelectorAll('.meter-fill');
+        meters.forEach((meter, index) => {
+            setTimeout(() => {
+                meter.style.transition = 'width 1s ease-out';
+                const currentWidth = meter.style.width || '0%';
+                meter.style.width = '0%';
+                setTimeout(() => {
+                    meter.style.width = currentWidth;
+                }, 50);            }, index * 300);
+        });
+    }
+
+    /**
+     * Initialize enhanced objects for hero demo (simplified version)
+     */
+    async initializeHeroDemoObjects() {
+        // This method is now simplified - the demo uses CSS-based visualization
+        // instead of complex canvas rendering for better performance
+        console.log('Hero demo objects initialized (CSS-based)');
+    }
+
+    /**
+     * Show error message to user
+     */
+    showError(message) {
+        console.error('App Error:', message);
+        
+        // Try to show error in UI if possible
+        const loading = document.getElementById('loading');
+        if (loading) {
+            loading.innerHTML = `
+                <div class="error-message" style="color: red; text-align: center; padding: 20px;">
+                    <h3>Error</h3>
+                    <p>${message}</p>
+                    <button onclick="window.location.reload()" style="margin-top: 10px; padding: 8px 16px;">
+                        Reload Page
+                    </button>
+                </div>
+            `;
+            loading.style.display = 'block';
+            loading.setAttribute('aria-hidden', 'false');
+        } else {
+            // Fallback to alert if no loading element
+            alert(message);
+        }
+    }
+
+    /**
+     * Show loading indicator
+     */
+    showLoading() {
+        const loading = document.getElementById('loading');
+        if (loading) {
+            loading.style.display = 'block';
+            loading.setAttribute('aria-hidden', 'false');
+        }
+    }
+
+    /**
+     * Hide loading indicator
+     */
+    hideLoading() {
+        const loading = document.getElementById('loading');
+        if (loading) {
+            loading.style.display = 'none';
+            loading.setAttribute('aria-hidden', 'true');
+        }
+    }
+
+    /**
+     * Alias for startSimulation for compatibility with hero demo
+     */
+    openSimulation(simulationId) {
+        return this.startSimulation(simulationId);
     }
 }
+
+/**
+ * Fallback for script loading issues
+ */
+window.addEventListener('error', (event) => {
+    console.error('Error occurred:', event.message);
+    alert('An error occurred while loading the application. Please try again later.');
+});
 
 // Initialize the application
 const app = new AIEthicsApp();

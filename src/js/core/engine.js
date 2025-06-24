@@ -3,6 +3,12 @@
  * Supports multiple rendering modes: SVG, Canvas, and WebGL
  */
 
+import { InputManager } from './input-manager.js';
+import AccessibilityManager from './accessibility.js';
+import CanvasRenderer from '../renderers/canvas-renderer.js';
+import SVGRenderer from '../renderers/svg-renderer.js';
+import WebGLRenderer from '../renderers/webgl-renderer.js';
+
 class SimulationEngine {
     constructor(containerId, config = {}) {
         this.container = document.getElementById(containerId);
@@ -368,4 +374,5 @@ class Scene {
 }
 
 // Export for ES6 modules
-export { SimulationEngine, Scene };
+export { SimulationEngine };
+export default SimulationEngine;

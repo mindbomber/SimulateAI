@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hero Demo Test</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/hero-demo.css">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>Hero Demo Test Page</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Hero Demo Container</h2>
+        <div id="hero-demo" class="simulation-preview" aria-label="Interactive demo simulation">
+            <!-- Demo will load here -->
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Console Output</h2>
+        <div id="console-output"></div>
+    </div>
+
+    <script type="module">
+        import HeroDemo from './src/js/components/hero-demo.js';
+        
+        console.log('Test page loaded, starting hero demo...');
+        
+        // Override console.log to show in page
+        const originalLog = console.log;
+        const originalError = console.error;
+        const outputDiv = document.getElementById('console-output');
+        
+        function addToOutput(type, message) {
+            const div = document.createElement('div');
+            div.style.color = type === 'error' ? 'red' : 'black';
+            div.textContent = `[${type}] ${message}`;
+            outputDiv.appendChild(div);
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToOutput('log', args.join(' '));
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToOutput('error', args.join(' '));
+        };
+        
+        // Test the hero demo
+        try {
+            console.log('Creating HeroDemo instance...');
+            const heroDemo = new HeroDemo();
+            console.log('HeroDemo created successfully');
+        } catch (error) {
+            console.error('Failed to create HeroDemo:', error.message);
+        }
+    </script>
+</body>
+</html>

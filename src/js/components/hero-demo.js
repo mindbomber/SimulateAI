@@ -3,8 +3,8 @@
  * Demonstrates AI hiring bias scenarios with real-time ethics feedback
  */
 
-class HeroDemo {
-    constructor() {
+class HeroDemo {    constructor() {
+        console.log('HeroDemo constructor called');
         this.container = document.getElementById('hero-demo');
         this.currentScenario = 0;
         this.ethicsScores = {
@@ -60,10 +60,14 @@ class HeroDemo {
         ];
         
         this.init();
-    }
-
-    init() {
-        if (!this.container) return;
+    }    init() {
+        console.log('HeroDemo init called');
+        if (!this.container) {
+            console.error('Hero demo container not found');
+            return;
+        }
+        
+        console.log('Hero demo container found, rendering...');
         
         this.container.innerHTML = `
             <div class="hero-demo-container">
@@ -111,9 +115,9 @@ class HeroDemo {
                 </div>
             </div>
         `;
-        
-        this.attachEventListeners();
+          this.attachEventListeners();
         this.updateEthicsDisplay();
+        console.log('Hero demo initialization completed');
     }
 
     renderChoices(scenarioIndex) {

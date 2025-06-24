@@ -367,6 +367,105 @@ class CanvasRenderer {
     }
   }
 
+  // Required methods for Visual Engine integration
+  get type() {
+    return 'canvas';
+  }
+
+  getElement() {
+    return this.canvas;
+  }
+
+  render(scene) {
+    this.clear();
+    if (scene && scene.render) {
+      scene.render(this);
+    }
+  }
+
+  renderObject(object) {
+    if (!object || object.visible === false) return;
+    
+    this.ctx.save();
+    
+    // Apply transformations
+    if (object.x || object.y) {
+      this.ctx.translate(object.x || 0, object.y || 0);
+    }
+    
+    if (object.rotation) {
+      this.ctx.rotate(object.rotation);
+    }
+    
+    if (object.scale && object.scale !== 1) {
+      this.ctx.scale(object.scale, object.scale);
+    }
+    
+    if (object.alpha !== undefined) {
+      this.ctx.globalAlpha = object.alpha;
+    }
+    
+    // Render based on object type
+    if (object.render) {
+      object.render(this);
+    } else if (object.type) {
+      this.renderByType(object);
+    }
+    
+    this.ctx.restore();
+  }
+
+  renderByType(object) {
+    switch (object.type) {
+      case 'rect':
+        this.drawRect(0, 0, object.width || 50, object.height || 50, {
+          fill: object.fill,
+          stroke: object.stroke,
+          strokeWidth: object.strokeWidth
+        });
+        break;
+        
+      case 'circle':
+        this.drawCircle(0, 0, object.radius || 25, {
+          fill: object.fill,
+          stroke: object.stroke,
+          strokeWidth: object.strokeWidth
+        });
+        break;
+        
+      case 'text':
+        this.drawText(object.text || '', 0, 0, {
+          font: object.font,
+          fill: object.fill,
+          align: object.align
+        });
+        break;
+        
+      default:
+        // Draw a simple placeholder
+        this.drawRect(-5, -5, 10, 10, { fill: '#ff0000' });
+    }
+  }
+
+  resize() {
+    if (this.container) {
+      const rect = this.container.getBoundingClientRect();
+      this.options.width = rect.width;
+      this.options.height = rect.height;
+      
+      this.canvas.width = this.options.width * this.options.pixelRatio;
+      this.canvas.height = this.options.height * this.options.pixelRatio;
+      this.ctx.scale(this.options.pixelRatio, this.options.pixelRatio);
+    }
+  }
+
+  destroy() {
+    if (this.canvas && this.canvas.parentNode) {
+      this.canvas.parentNode.removeChild(this.canvas);
+    }
+    this.animations.clear();
+  }
+
   // Utility methods
   getImageData(x = 0, y = 0, width = this.options.width, height = this.options.height) {
     return this.ctx.getImageData(x, y, width, height);
