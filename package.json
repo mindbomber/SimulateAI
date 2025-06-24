@@ -9,10 +9,17 @@
     "test": "echo \"Tests will be added\" && exit 0",
     "lint": "eslint src/js/**/*.js",
     "format": "prettier --write src/**/*.{js,css,html}"
-  },
-  "keywords": ["ai", "ethics", "education", "simulation", "robotics", "safety"],
+  },  "keywords": ["ai", "ethics", "education", "simulation", "robotics", "safety"],
   "author": "SimulateAI",
-  "license": "MIT",  "devDependencies": {
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mindbomber/SimulateAI.git"
+  },
+  "homepage": "https://github.com/mindbomber/SimulateAI#readme",
+  "bugs": {
+    "url": "https://github.com/mindbomber/SimulateAI/issues"
+  },"devDependencies": {
     "vite": "^5.0.0",
     "csso-cli": "^4.0.2",
     "terser": "^5.43.1",

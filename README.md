@@ -63,6 +63,32 @@ SimulateAI/
 - **Social Media Algorithms**: Impact of recommendation systems
 - **Facial Recognition**: Privacy and surveillance considerations
 
+## Getting Started
+
+### Prerequisites
+- Node.js (16.0 or higher)
+- npm (7.0 or higher)
+- Modern web browser with ES6+ support
+
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/mindbomber/SimulateAI.git
+   ```
+2. Navigate to the project directory:
+   ```bash
+   cd SimulateAI
+   ```
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+5. Open your browser to `http://localhost:3000`
+
 ## Development
 
 ### Available Scripts
@@ -86,8 +112,14 @@ SimulateAI is built on the principle that complex ethical concepts become more a
 
 ## License
 
-[License to be determined]
+MIT License - This project is open source and available for educational use.
+
+## Repository
+
+- **GitHub**: https://github.com/mindbomber/SimulateAI
+- **Issues**: https://github.com/mindbomber/SimulateAI/issues
+- **Contributions**: Welcome! Please see our contributing guidelines in the development guide.
 
 ## Contact
 
-[Contact information to be added]
+For questions about this educational platform, please open an issue on GitHub.

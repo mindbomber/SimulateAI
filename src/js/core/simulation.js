@@ -3,6 +3,8 @@
  * Provides common functionality for ethics tracking, UI management, and educational features
  */
 
+import StorageManager from '../utils/storage.js';
+
 class EthicsSimulation {
     constructor(id, config = {}) {
         this.id = id;

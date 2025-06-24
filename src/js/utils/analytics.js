@@ -3,6 +3,8 @@
  * Privacy-focused analytics for educational insights
  */
 
+import StorageManager from './storage.js';
+
 class AnalyticsManager {
     static isInitialized = false;
     static config = {

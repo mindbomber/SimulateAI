@@ -9,9 +9,10 @@
 - Git for version control
 
 ### Installation
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Start development server: `npm run dev`
+1. Clone the repository: `git clone https://github.com/mindbomber/SimulateAI.git`
+2. Navigate to project directory: `cd SimulateAI`
+3. Install dependencies: `npm install`
+4. Start development server: `npm run dev`
 
 ## Project Architecture
 

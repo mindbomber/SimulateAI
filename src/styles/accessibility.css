@@ -267,7 +267,8 @@ input[disabled] {
   }
 }
 
-/* Dark mode support */
+/* Dark mode support - DISABLED for now to default to light mode */
+/*
 @media (prefers-color-scheme: dark) {
   :root {
     --text-color: #ffffff;
@@ -295,11 +296,11 @@ input[disabled] {
   input,
   select,
   textarea {
-    background-color: var(--card-background);
-    border-color: var(--border-color);
+    background-color: var(--card-background);    border-color: var(--border-color);
     color: var(--text-color);
   }
 }
+*/
 
 /* Accessibility announcements */
 .aria-live-region {
