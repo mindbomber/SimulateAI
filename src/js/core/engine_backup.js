@@ -228,9 +228,7 @@ class SimulationEngine {
             throw new EngineError('Failed to initialize SimulationEngine', 
                 { containerId, config }, error);
         }
-    }
-
-    init() {
+    }    init() {
         try {
             EnginePerformanceMonitor.startOperation('engine_init');
 
@@ -263,9 +261,7 @@ class SimulationEngine {
             this.handleError(new EngineError('Engine initialization failed', 
                 { renderMode: this.config.renderMode }, error));
         }
-    }
-
-    setupRenderer() {
+    }    setupRenderer() {
         try {
             EnginePerformanceMonitor.startOperation('renderer_setup');
 
@@ -346,9 +342,7 @@ class SimulationEngine {
         if (this.config.accessibility) {
             this.accessibilityManager = new AccessibilityManager(this.container, this);
         }
-    }
-
-    setupPerformanceMonitoring() {
+    }    setupPerformanceMonitoring() {
         try {
             EnginePerformanceMonitor.startOperation('performance_setup');
 
@@ -407,6 +401,26 @@ class SimulationEngine {
         this.trackRenderTimes = false;
         this.trackUpdateTimes = false;
         this.performanceWarnings = false;
+    }
+
+    setupDebugTools() {
+        // Create debug overlay
+        const debugOverlay = document.createElement('div');
+        debugOverlay.className = 'debug-overlay';
+        debugOverlay.style.cssText = `
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            border-radius: 4px;
+            z-index: 1000;
+        `;
+        this.container.appendChild(debugOverlay);
+        this.debugOverlay = debugOverlay;
     }
 
     setupAnimationManager() {
@@ -636,7 +650,7 @@ class SimulationEngine {
         } catch (recoveryError) {
             console.error('Renderer recovery failed:', recoveryError);
         }
-    }
+   }
 
     // Component management
     addComponent(component) {
@@ -1108,9 +1122,7 @@ class SimulationEngine {
             performance: this.performanceData,
             theme: this.themeConfig
         };
-    }
-
-    updateConfiguration(newConfig) {
+    }    updateConfiguration(newConfig) {
         try {
             Object.assign(this.config, newConfig);
             
@@ -1198,6 +1210,297 @@ class SimulationEngine {
         this.debugKeyboardCleanup = () => {
             document.removeEventListener('keydown', handleDebugKeys);
         };
+    }
+}
+
+// Enhanced Scene management class with performance optimization
+class Scene {
+    constructor() {
+        this.components = [];
+        this.engine = null;
+        this.componentIndex = new Map(); // Performance optimization for lookups
+        this.dirtyComponents = new Set(); // Track components that need updates
+    }
+
+    setEngine(engine) {
+        this.engine = engine;
+    }
+
+    add(component) {
+        try {
+            if (this.components.indexOf(component) === -1) {
+                this.components.push(component);
+                
+                // Index component for fast lookups
+                if (component.id) {
+                    this.componentIndex.set(component.id, component);
+                }
+                
+                // Mark as dirty for initial update
+                this.dirtyComponents.add(component);
+                
+                // Apply theme if available
+                if (this.engine?.themeConfig && component.applyTheme) {
+                    component.applyTheme(this.engine.themeConfig);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to add component to scene:', error);
+        }
+    }
+
+    remove(component) {
+        try {
+            const index = this.components.indexOf(component);
+            if (index !== -1) {
+                this.components.splice(index, 1);
+                
+                // Remove from index
+                if (component.id && this.componentIndex.has(component.id)) {
+                    this.componentIndex.delete(component.id);
+                }
+                
+                // Remove from dirty set
+                this.dirtyComponents.delete(component);
+            }
+        } catch (error) {
+            console.error('Failed to remove component from scene:', error);
+        }
+    }
+
+    findById(id) {
+        return this.componentIndex.get(id);
+    }
+
+    update(deltaTime) {
+        try {
+            // Update only active components
+            for (let component of this.components) {
+                if (component.active !== false) {
+                    try {
+                        component.update(deltaTime);
+                        this.dirtyComponents.delete(component); // Mark as clean
+                    } catch (componentError) {
+                        console.error('Component update error:', componentError);
+                        if (this.engine) {
+                            this.engine.handleError(new EngineError('Component update failed', 
+                                { componentId: component.id || 'unknown' }, componentError));
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Scene update error:', error);
+        }
+    }
+
+    render(renderer) {
+        try {
+            // Render only visible components
+            for (let component of this.components) {
+                if (component.visible !== false) {
+                    try {
+                        component.render(renderer);
+                    } catch (componentError) {
+                        console.error('Component render error:', componentError);
+                        if (this.engine) {
+                            this.engine.handleError(new EngineError('Component render failed', 
+                                { componentId: component.id || 'unknown' }, componentError));
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Scene render error:', error);
+        }
+    }
+
+    handleInput(type, event) {
+        try {
+            // Handle input events in reverse order (top to bottom)
+            for (let i = this.components.length - 1; i >= 0; i--) {
+                const component = this.components[i];
+                if (component.handleInput) {
+                    try {
+                        if (component.handleInput(type, event)) {
+                            // Event was handled, stop propagation
+                            break;
+                        }
+                    } catch (componentError) {
+                        console.error('Component input handler error:', componentError);
+                        if (this.engine) {
+                            this.engine.handleError(new EngineError('Component input handling failed', 
+                                { componentId: component.id || 'unknown', inputType: type }, componentError));
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Scene input handling error:', error);
+        }
+    }
+
+    getComponentCount() {
+        return this.components.length;
+    }
+
+    getDirtyComponentCount() {
+        return this.dirtyComponents.size;
+    }
+
+    getComponentsByType(type) {
+        return this.components.filter(component => component.type === type);
+    }
+
+    clear() {
+        try {
+            // Cleanup all components
+            for (let component of this.components) {
+                if (component.destroy) {
+                    component.destroy();
+                }
+            }
+            
+            this.components = [];
+            this.componentIndex.clear();
+            this.dirtyComponents.clear();
+        } catch (error) {
+            console.error('Scene clear error:', error);
+        }
+    }
+
+    // Performance and debugging methods
+    getPerformanceInfo() {
+        return {
+            totalComponents: this.components.length,
+            activeComponents: this.components.filter(c => c.active !== false).length,
+            visibleComponents: this.components.filter(c => c.visible !== false).length,
+            dirtyComponents: this.dirtyComponents.size,
+            indexedComponents: this.componentIndex.size
+        };
+    }
+}
+            debugOverlay.className = 'debug-overlay';
+            debugOverlay.setAttribute('role', 'complementary');
+            debugOverlay.setAttribute('aria-label', 'Debug Information');
+            
+            const baseStyles = `
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                padding: 12px;
+                font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+                font-size: 11px;
+                border-radius: 6px;
+                z-index: 10000;
+                min-width: 200px;
+                backdrop-filter: blur(8px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                pointer-events: none;
+                user-select: none;
+            `;
+            
+            const themeStyles = this.config.darkMode ? 
+                'background: rgba(0, 0, 0, 0.9); color: #e0e0e0; border-color: rgba(255, 255, 255, 0.2);' :
+                'background: rgba(255, 255, 255, 0.9); color: #333; border-color: rgba(0, 0, 0, 0.1);';
+            
+            debugOverlay.style.cssText = baseStyles + themeStyles;
+            
+            this.container.appendChild(debugOverlay);
+            this.debugOverlay = debugOverlay;
+            
+            // Add debug keyboard shortcuts
+            this.setupDebugKeyboard();
+            
+        } catch (error) {
+            console.warn('Debug tools setup failed:', error);
+        }
+    }
+
+    setupDebugKeyboard() {
+        // Debug keyboard shortcuts
+        const handleDebugKeys = (event) => {
+            if (!this.config.debug) return;
+            
+            // Ctrl/Cmd + Shift + D: Toggle debug overlay
+            if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'D') {
+                event.preventDefault();
+                if (this.debugOverlay) {
+                    this.debugOverlay.style.display = 
+                        this.debugOverlay.style.display === 'none' ? 'block' : 'none';
+                }
+            }
+            
+            // Ctrl/Cmd + Shift + P: Performance snapshot
+            if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'P') {
+                event.preventDefault();
+                console.log('Engine Performance Snapshot:', this.getMetrics());
+            }
+        };
+        
+        document.addEventListener('keydown', handleDebugKeys);
+        
+        // Store cleanup function
+        this.debugKeyboardCleanup = () => {
+            document.removeEventListener('keydown', handleDebugKeys);
+        };
+    }
+class Scene {
+    constructor() {
+        this.components = [];
+        this.engine = null;
+    }
+
+    setEngine(engine) {
+        this.engine = engine;
+    }
+
+    add(component) {
+        if (this.components.indexOf(component) === -1) {
+            this.components.push(component);
+        }
+    }
+
+    remove(component) {
+        const index = this.components.indexOf(component);
+        if (index !== -1) {
+            this.components.splice(index, 1);
+        }
+    }
+
+    update(deltaTime) {
+        for (let component of this.components) {
+            if (component.active !== false) {
+                component.update(deltaTime);
+            }
+        }
+    }
+
+    render(renderer) {
+        for (let component of this.components) {
+            if (component.visible !== false) {
+                component.render(renderer);
+            }
+        }
+    }
+
+    handleInput(type, event) {
+        // Handle input events in reverse order (top to bottom)
+        for (let i = this.components.length - 1; i >= 0; i--) {
+            const component = this.components[i];
+            if (component.handleInput && component.handleInput(type, event)) {
+                // Event was handled, stop propagation
+                break;
+            }
+        }
+    }
+
+    getComponentCount() {
+        return this.components.length;
+    }
+
+    clear() {
+        this.components = [];
     }
 }
 
