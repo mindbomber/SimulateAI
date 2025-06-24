@@ -1,24 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+<head>    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#1a73e8">
+    <meta name="color-scheme" content="light dark">
     <title>AI Ethics Simulations - Interactive Learning Platform</title>
     <meta name="description" content="Learn AI and robotics safety through interactive simulations and games">
+    <meta name="keywords" content="AI ethics, robotics, education, simulations, interactive learning, accessibility">
+    <meta name="author" content="SimulateAI Team">
     
-    <!-- Styles -->
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="AI Ethics Simulations - Interactive Learning Platform">
+    <meta property="og:description" content="Learn AI and robotics safety through interactive simulations and games">
+    <meta property="og:url" content="https://ai-ethics-simulations.com">
+    
+    <!-- Accessibility -->
+    <meta name="accessibility-features" content="keyboard-navigation,skip-links,high-contrast,large-text,screen-reader-support">
+      <!-- Styles -->
     <link rel="stylesheet" href="src/styles/main.css">
-    <link rel="stylesheet" href="src/styles/simulations.css">
     <link rel="stylesheet" href="src/styles/accessibility.css">
+    <link rel="stylesheet" href="src/styles/simulations.css">
+    <link rel="stylesheet" href="src/styles/layout-components.css">
+    <link rel="stylesheet" href="src/styles/advanced-ui-components.css">
+    <link rel="stylesheet" href="src/styles/enhanced-objects.css">
+    <link rel="stylesheet" href="src/styles/input-utility-components.css">
     <link rel="stylesheet" href="src/styles/hero-demo.css">
-    <link rel="stylesheet" href="src/styles/enhanced-objects.css">    <link rel="stylesheet" href="src/styles/bias-fairness.css">
+    <link rel="stylesheet" href="src/styles/bias-fairness.css">
     <link rel="stylesheet" href="src/styles/layout-fixes.css">
     
     <!-- Icons and Favicons -->
     <link rel="icon" type="image/svg+xml" href="src/assets/icons/favicon.svg">
-    
-    <!-- Preload critical resources -->
+      <!-- Preload critical resources -->
     <link rel="preload" href="src/styles/main.css" as="style">
+    <link rel="preload" href="src/styles/accessibility.css" as="style">
+    <link rel="preload" href="src/js/app.js" as="script" crossorigin>
+    
+    <!-- DNS prefetch for external resources -->
+    <link rel="dns-prefetch" href="//unpkg.com">
+    
+    <!-- Resource hints -->
+    <link rel="prefetch" href="src/js/core/engine.js">
+    <link rel="prefetch" href="src/js/core/accessibility.js">
+    <link rel="prefetch" href="src/js/core/animation-manager.js">
     
     <!-- Inert polyfill for older browsers -->
     <script>
@@ -30,9 +54,15 @@
         }
     </script>
 </head>
-<body>
-    <!-- Skip to content for accessibility -->
+<body>    <!-- Skip to content for accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- ARIA live regions for announcements -->
+    <div id="aria-live-polite" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+    <div id="aria-live-assertive" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
+    
+    <!-- Status and notification area -->
+    <div id="status-region" role="status" aria-live="polite" class="sr-only"></div>
     
     <!-- Header -->
     <header class="header" role="banner">
@@ -54,14 +84,23 @@
                     <li><a href="#about" class="nav-link">About</a></li>
                 </ul>
             </nav>
-            
-            <!-- Accessibility controls -->
-            <div class="accessibility-controls">
-                <button class="btn-icon" id="toggle-high-contrast" aria-label="Toggle high contrast mode">
-                    <span class="icon">🎨</span>
+              <!-- Accessibility controls -->
+            <div class="accessibility-controls" role="group" aria-label="Accessibility options">
+                <button class="btn-icon" id="toggle-high-contrast" aria-label="Toggle high contrast mode" aria-pressed="false">
+                    <span class="icon" aria-hidden="true">🎨</span>
+                    <span class="sr-only">High Contrast</span>
                 </button>
-                <button class="btn-icon" id="toggle-large-text" aria-label="Toggle large text">
-                    <span class="icon">🔍</span>
+                <button class="btn-icon" id="toggle-large-text" aria-label="Toggle large text" aria-pressed="false">
+                    <span class="icon" aria-hidden="true">🔍</span>
+                    <span class="sr-only">Large Text</span>
+                </button>
+                <button class="btn-icon" id="toggle-reduced-motion" aria-label="Toggle reduced motion" aria-pressed="false">
+                    <span class="icon" aria-hidden="true">⏸️</span>
+                    <span class="sr-only">Reduced Motion</span>
+                </button>
+                <button class="btn-icon" id="toggle-dark-mode" aria-label="Toggle dark mode" aria-pressed="false">
+                    <span class="icon" aria-hidden="true">🌙</span>
+                    <span class="sr-only">Dark Mode</span>
                 </button>
             </div>
         </div>
@@ -146,27 +185,29 @@
             </nav>
         </div>
     </footer>
-    
-    <!-- Simulation Modal -->
-    <div id="simulation-modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" inert>
+      <!-- Simulation Modal -->
+    <div id="simulation-modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-title" inert>
+        <div class="modal-backdrop" aria-hidden="true"></div>
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="modal-title" class="modal-title"></h2>
-                <button class="modal-close" aria-label="Close simulation">×</button>
+                <button class="modal-close" aria-label="Close simulation" type="button">
+                    <span aria-hidden="true">×</span>
+                </button>
             </div>
-              <div class="modal-body">
+            <div class="modal-body">
                 <div id="simulation-container" class="simulation-container" role="main" aria-label="Interactive simulation">
                     <!-- Active simulation will be loaded here -->
                 </div>
                 
-                <div class="simulation-controls">
+                <div class="simulation-controls" role="complementary" aria-label="Simulation controls and metrics">
                     <div class="ethics-meters">
                         <!-- Enhanced ethics meters with visual engine will be loaded here -->
                         <div class="ethics-meters-header">
                             <h3>Ethics Monitoring</h3>
                             <p>Track how your decisions affect different ethical dimensions</p>
                         </div>
-                        <div class="meters-container">
+                        <div class="meters-container" role="group" aria-label="Ethics meters">
                             <!-- Enhanced meters will be dynamically created here -->
                         </div>
                     </div>
@@ -175,24 +216,77 @@
                         <div class="actions-header">
                             <h3>Simulation Controls</h3>
                         </div>
-                        <div class="actions-container">
+                        <div class="actions-container" role="group" aria-label="Simulation action buttons">
                             <!-- Enhanced interactive buttons will be created here -->
-                            <button class="btn btn-secondary" id="reset-simulation" style="display: none;">Reset</button>
-                            <button class="btn btn-primary" id="next-scenario" style="display: none;">Next Scenario</button>
+                            <button class="btn btn-secondary" id="reset-simulation" style="display: none;" type="button">
+                                <span class="btn-text">Reset</span>
+                                <span class="btn-description sr-only">Reset the current simulation to start over</span>
+                            </button>
+                            <button class="btn btn-primary" id="next-scenario" style="display: none;" type="button">
+                                <span class="btn-text">Next Scenario</span>
+                                <span class="btn-description sr-only">Continue to the next scenario</span>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>    <!-- Loading indicator -->
+    <div id="loading" class="loading" aria-hidden="true" role="status">
+        <div class="loading-spinner" aria-hidden="true"></div>
+        <p class="loading-text">Loading simulation...</p>
+        <div class="loading-progress" role="progressbar" aria-label="Loading progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar"></div>
+        </div>
     </div>
-
-    <!-- Loading indicator -->
-    <div id="loading" class="loading" aria-hidden="true">
-        <div class="loading-spinner"></div>
-        <p>Loading simulation...</p>
+    
+    <!-- Error boundary -->
+    <div id="error-boundary" class="error-boundary" role="alert" aria-hidden="true">
+        <div class="error-content">
+            <h2>Something went wrong</h2>
+            <p class="error-message"></p>
+            <div class="error-actions">
+                <button class="btn btn-primary" id="retry-action" type="button">Try Again</button>
+                <button class="btn btn-secondary" id="report-error" type="button">Report Issue</button>
+            </div>
+        </div>
     </div>
     
     <!-- Scripts -->
     <script type="module" src="src/js/app.js"></script>
+    
+    <!-- Performance monitoring -->
+    <script>
+        // Enhanced performance monitoring for our modernized engine
+        if ('performance' in window && 'mark' in performance) {
+            performance.mark('page-start');
+            
+            window.addEventListener('load', () => {
+                performance.mark('page-loaded');
+                performance.measure('page-load-time', 'page-start', 'page-loaded');
+                
+                // Report to our analytics system
+                const measure = performance.getEntriesByName('page-load-time')[0];
+                if (measure && window.AnalyticsManager) {
+                    window.AnalyticsManager.trackPerformance('page-load', measure.duration);
+                }
+            });
+        }
+        
+        // Enhanced error handling
+        window.addEventListener('error', (event) => {
+            console.error('Global error:', event.error);
+            if (window.ErrorBoundary) {
+                window.ErrorBoundary.handleError(event.error);
+            }
+        });
+        
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('Unhandled promise rejection:', event.reason);
+            if (window.ErrorBoundary) {
+                window.ErrorBoundary.handleError(event.reason);
+            }
+        });
+    </script>
 </body>
 </html>

@@ -4,10 +4,12 @@
  */
 
 // Import core modules
+import SimulationEngine from './core/engine.js';
 import VisualEngine from './core/visual-engine.js';
 import EthicsSimulation from './core/simulation.js';
 import { UIComponent, UIPanel, EthicsDisplay, FeedbackSystem, Button, Slider } from './core/ui.js';
 import AccessibilityManager from './core/accessibility.js';
+import AnimationManager from './core/animation-manager.js';
 
 // Import utilities
 import StorageManager from './utils/storage.js';
@@ -25,6 +27,11 @@ import SVGRenderer from './renderers/svg-renderer.js';
 // Import enhanced objects
 import { BaseObject, EthicsMeter, InteractiveButton, InteractiveSlider } from './objects/enhanced-objects.js';
 
+// Import layout and UI components
+import { LayoutManager, ResponsiveGrid, FlexContainer } from './objects/layout-components.js';
+import { AdvancedButton, TabContainer, Modal, Tooltip } from './objects/advanced-ui-components.js';
+import { InputField, FormValidator, SearchBox } from './objects/input-utility-components.js';
+
 class AIEthicsApp {
     constructor() {
         this.currentSimulation = null;
@@ -33,6 +40,11 @@ class AIEthicsApp {
         this.simulations = new Map();
         this.isInitialized = false;
         this.heroDemo = null;
+        
+        // Modernized managers
+        this.accessibilityManager = null;
+        this.animationManager = null;
+        this.layoutManager = null;
         
         // Enhanced objects for UI
         this.ethicsMeters = new Map();
@@ -51,6 +63,19 @@ class AIEthicsApp {
         this.simulationContainer = null;
         this.simulationsGrid = null;
         this.lastFocusedElement = null; // For focus restoration
+        
+        // Theme and preferences
+        this.currentTheme = 'light';
+        this.preferences = {
+            reducedMotion: false,
+            highContrast: false,
+            largeText: false,
+            darkMode: false
+        };
+        
+        // Error handling
+        this.errorBoundary = null;
+        this.lastError = null;
         
         // Available simulations
         this.availableSimulations = [
@@ -91,14 +116,20 @@ class AIEthicsApp {
                 tags: ['misinformation', 'trust', 'communication', 'verification']
             }
         ];
-    }
-
-    async init() {
+    }    async init() {
         if (this.isInitialized) return;
 
         try {
+            // Initialize theme detection first
+            this.initializeTheme();
+            
+            // Initialize error handling
+            this.initializeErrorHandling();
+            
             // Initialize core systems
-            await this.initializeSystems();            // Setup UI
+            await this.initializeSystems();
+            
+            // Setup UI
             this.setupUI();
             
             // Load simulations
@@ -109,41 +140,308 @@ class AIEthicsApp {
             
             // Initialize accessibility
             this.setupAccessibility();
-              // Render initial state
+            
+            // Render initial state
             this.render();
-              // Initialize hero demo
+            
+            // Initialize hero demo
             await this.initializeHeroDemo();
-              // Initialize enhanced objects (after visual engine is set up)
+            
+            // Initialize enhanced objects (after visual engine is set up)
             await this.initializeEnhancedObjects();
             
             this.isInitialized = true;
-            console.log('AI Ethics App initialized successfully');
+            console.log('AI Ethics App initialized successfully with modernized infrastructure');
             
             // Track initialization
             AnalyticsManager.trackEvent('app_initialized', {
                 simulations_available: this.availableSimulations.length,
                 browser: Helpers.getBrowserInfo().browser,
-                device: Helpers.getDeviceType()
+                device: Helpers.getDeviceType(),
+                theme: this.currentTheme,
+                accessibility_enabled: this.preferences.highContrast || this.preferences.largeText
             });
             
         } catch (error) {
             console.error('Failed to initialize app:', error);
-            this.showError('Failed to initialize the application. Please refresh the page.');        }
+            this.handleError(error, 'Failed to initialize the application. Please refresh the page.');
+        }
+    }
+
+    /**
+     * Initialize theme detection and monitoring
+     */
+    initializeTheme() {
+        // Detect system preferences
+        const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+        const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+        const prefersHighContrast = window.matchMedia?.('(prefers-contrast: high)').matches;
+        
+        this.preferences = {
+            reducedMotion: prefersReducedMotion,
+            darkMode: prefersDark,
+            highContrast: prefersHighContrast,
+            largeText: false // User preference only
+        };
+        
+        this.currentTheme = prefersHighContrast ? 'high-contrast' : (prefersDark ? 'dark' : 'light');
+        
+        // Apply initial theme
+        this.applyTheme();
+        
+        // Monitor theme changes
+        this.setupThemeMonitoring();
+        
+        console.log('Theme initialized:', this.currentTheme, this.preferences);
+    }
+    
+    /**
+     * Setup theme change monitoring
+     */
+    setupThemeMonitoring() {
+        const darkModeQuery = window.matchMedia?.('(prefers-color-scheme: dark)');
+        const reducedMotionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+        const highContrastQuery = window.matchMedia?.('(prefers-contrast: high)');
+
+        const handleThemeChange = () => {
+            const newPreferences = {
+                reducedMotion: reducedMotionQuery?.matches || false,
+                darkMode: darkModeQuery?.matches || false,
+                highContrast: highContrastQuery?.matches || false,
+                largeText: this.preferences.largeText // Preserve user setting
+            };
+            
+            if (JSON.stringify(newPreferences) !== JSON.stringify(this.preferences)) {
+                this.preferences = newPreferences;
+                this.currentTheme = newPreferences.highContrast ? 'high-contrast' : 
+                                 (newPreferences.darkMode ? 'dark' : 'light');
+                this.applyTheme();
+                this.announceThemeChange();
+            }
+        };
+
+        darkModeQuery?.addEventListener?.('change', handleThemeChange);
+        reducedMotionQuery?.addEventListener?.('change', handleThemeChange);
+        highContrastQuery?.addEventListener?.('change', handleThemeChange);
+    }
+    
+    /**
+     * Apply current theme to the application
+     */
+    applyTheme() {
+        const body = document.body;
+        
+        // Remove existing theme classes
+        body.classList.remove('dark-mode', 'high-contrast', 'reduced-motion', 'large-text');
+        
+        // Apply current theme classes
+        if (this.preferences.darkMode) body.classList.add('dark-mode');
+        if (this.preferences.highContrast) body.classList.add('high-contrast');
+        if (this.preferences.reducedMotion) body.classList.add('reduced-motion');
+        if (this.preferences.largeText) body.classList.add('large-text');
+        
+        // Update theme color meta tag
+        const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+        if (themeColorMeta) {
+            const themeColor = this.preferences.darkMode ? '#1a1a1a' : '#1a73e8';
+            themeColorMeta.setAttribute('content', themeColor);
+        }
+        
+        // Update managers if they exist
+        if (this.animationManager) {
+            this.animationManager.updateConfiguration({
+                enableAnimations: !this.preferences.reducedMotion,
+                reducedMotion: this.preferences.reducedMotion
+            });
+        }
+        
+        if (this.accessibilityManager) {
+            this.accessibilityManager.updateTheme(this.preferences);
+        }
+    }
+    
+    /**
+     * Announce theme changes for accessibility
+     */
+    announceThemeChange() {
+        const announcement = `Theme changed to ${this.currentTheme.replace('-', ' ')} mode`;
+        
+        if (this.accessibilityManager) {
+            this.accessibilityManager.announce(announcement);
+        } else {
+            // Fallback announcement
+            const liveRegion = document.getElementById('aria-live-polite');
+            if (liveRegion) {
+                liveRegion.textContent = announcement;
+            }
+        }
+    }
+    
+    /**
+     * Initialize error handling and recovery
+     */
+    initializeErrorHandling() {
+        // Create error boundary element
+        this.errorBoundary = document.getElementById('error-boundary');
+        
+        // Global error handlers
+        window.addEventListener('error', (event) => {
+            this.handleError(event.error, 'A JavaScript error occurred');
+        });
+        
+        window.addEventListener('unhandledrejection', (event) => {
+            this.handleError(event.reason, 'An unhandled promise rejection occurred');
+        });
+        
+        console.log('Error handling initialized');
+    }
+    
+    /**
+     * Enhanced error handling with recovery options
+     */
+    handleError(error, userMessage = 'An unexpected error occurred') {
+        this.lastError = error;
+        console.error('App Error:', error);
+        
+        // Track error for analytics
+        AnalyticsManager.trackEvent('app_error', {
+            error_message: error.message || String(error),
+            error_stack: error.stack,
+            user_agent: navigator.userAgent,
+            timestamp: new Date().toISOString()
+        });
+        
+        // Show error to user
+        this.showError(userMessage);
+        
+        // Announce error for accessibility
+        if (this.accessibilityManager) {
+            this.accessibilityManager.announce(`Error: ${userMessage}`, 'assertive');
+        }
+    }
+    
+    /**
+     * Show error in error boundary
+     */
+    showError(message, isRecoverable = true) {
+        if (!this.errorBoundary) {
+            // Fallback to alert if no error boundary
+            alert(message);
+            return;
+        }
+        
+        const errorContent = this.errorBoundary.querySelector('.error-content');
+        if (errorContent) {
+            const messageEl = errorContent.querySelector('.error-message');
+            const retryBtn = errorContent.querySelector('#retry-action');
+            const reportBtn = errorContent.querySelector('#report-error');
+            
+            if (messageEl) messageEl.textContent = message;
+            
+            // Setup retry functionality
+            if (retryBtn && isRecoverable) {
+                retryBtn.style.display = 'inline-block';
+                retryBtn.onclick = () => {
+                    this.hideError();
+                    // Attempt to recover by reinitializing
+                    if (!this.isInitialized) {
+                        this.init();
+                    }
+                };
+            } else if (retryBtn) {
+                retryBtn.style.display = 'none';
+            }
+            
+            // Setup error reporting
+            if (reportBtn) {
+                reportBtn.onclick = () => {
+                    this.reportError();
+                };
+            }
+        }
+        
+        this.errorBoundary.setAttribute('aria-hidden', 'false');
+        this.errorBoundary.style.display = 'flex';
+    }
+    
+    /**
+     * Hide error boundary
+     */
+    hideError() {
+        if (this.errorBoundary) {
+            this.errorBoundary.setAttribute('aria-hidden', 'true');
+            this.errorBoundary.style.display = 'none';
+        }
+    }
+    
+    /**
+     * Report error to analytics/support
+     */
+    reportError() {
+        if (this.lastError) {
+            const errorReport = {
+                message: this.lastError.message || String(this.lastError),
+                stack: this.lastError.stack,
+                userAgent: navigator.userAgent,
+                url: window.location.href,
+                timestamp: new Date().toISOString(),
+                appState: {
+                    initialized: this.isInitialized,
+                    currentSimulation: this.currentSimulation?.id,
+                    theme: this.currentTheme
+                }
+            };
+            
+            // Send to analytics
+            AnalyticsManager.trackEvent('error_reported', errorReport);
+            
+            // Show confirmation
+            alert('Error report sent. Thank you for helping us improve the application.');
+        }
     }
 
     async initializeSystems() {
-        // Visual Engine will be initialized later when we have canvas elements
-        // Just store the configuration for now
-        this.visualEngineConfig = {
-            renderMode: 'canvas',
-            accessibility: true,
-            highPerformance: false,
-            debug: false
-        };
+        try {
+            // Initialize layout manager with theme support
+            this.layoutManager = new LayoutManager({
+                responsive: true,
+                theme: this.currentTheme,
+                reducedMotion: this.preferences.reducedMotion
+            });
+            
+            // Initialize animation manager with theme preferences
+            this.animationManager = new AnimationManager({
+                enableAnimations: !this.preferences.reducedMotion,
+                reducedMotion: this.preferences.reducedMotion,
+                performanceMode: this.preferences.reducedMotion ? 'compatibility' : 'balanced'
+            });
+            
+            // Initialize accessibility manager with current preferences
+            this.accessibilityManager = new AccessibilityManager(document.body, {
+                theme: this.currentTheme,
+                preferences: this.preferences
+            });
+            
+            // Visual Engine will be initialized later when we have canvas elements
+            // Just store the configuration for now
+            this.visualEngineConfig = {
+                renderMode: 'canvas',
+                accessibility: true,
+                highPerformance: !this.preferences.reducedMotion,
+                debug: false,
+                darkMode: this.preferences.darkMode,
+                highContrast: this.preferences.highContrast,
+                reducedMotion: this.preferences.reducedMotion
+            };
 
-        // Systems are already initialized via their modules
-        // StorageManager and AnalyticsManager auto-initialize
-        console.log('Core systems initialized');
+            // Systems are already initialized via their modules
+            // StorageManager and AnalyticsManager auto-initialize
+            console.log('Core systems initialized with modernized infrastructure');
+            
+        } catch (error) {
+            console.error('Failed to initialize systems:', error);
+            throw error;
+        }
     }
 
     setupUI() {
@@ -1249,7 +1547,7 @@ class AIEthicsApp {
             }
         });
     }    /**
-     * Setup hero demo with interactive scenario
+     * Initialize hero demo with interactive scenario
      */
     async initializeHeroDemo() {
         try {
@@ -1715,6 +2013,163 @@ class AIEthicsApp {
     openSimulation(simulationId) {
         return this.startSimulation(simulationId);
     }
+
+    /**
+     * Navigation and utility methods
+     */
+
+    /**
+     * Scroll to simulations section
+     */
+    scrollToSimulations() {
+        const simulationsSection = document.querySelector('#simulations, .simulations-section');
+        if (simulationsSection) {
+            simulationsSection.scrollIntoView({ 
+                behavior: this.preferences.reducedMotion ? 'auto' : 'smooth',
+                block: 'start'
+            });
+            
+            // Announce navigation for accessibility
+            if (this.accessibilityManager) {
+                this.accessibilityManager.announce('Navigated to simulations section');
+            }
+            
+            // Track navigation
+            AnalyticsManager.trackUserInteraction('scroll_to_simulations', 'hero_button');
+        }
+    }
+
+    /**
+     * Open educator tools interface
+     */
+    openEducatorTools() {
+        // For now, show information about educator features
+        // In a full implementation, this would open a dedicated educator interface
+        const educatorContent = `
+            <h3>Educator Tools</h3>
+            <p>Educator tools include:</p>
+            <ul>
+                <li>Student progress tracking</li>
+                <li>Curriculum integration guides</li>
+                <li>Assessment rubrics</li>
+                <li>Discussion prompts</li>
+                <li>Real-world case studies</li>
+            </ul>
+            <p>Contact us at educator@aiethics.example.com for full access.</p>
+        `;
+        
+        // Show in a simple modal for now
+        this.showInfoModal('Educator Tools', educatorContent);
+        
+        // Track educator interest
+        AnalyticsManager.trackUserInteraction('educator_tools_clicked', 'hero_button');
+    }
+
+    /**
+     * Toggle high contrast mode
+     */
+    toggleHighContrast() {
+        this.preferences.highContrast = !this.preferences.highContrast;
+        
+        // Apply theme changes
+        this.applyTheme();
+        
+        // Save preference
+        const userPrefs = StorageManager.getUserPreferences();
+        userPrefs.accessibility = userPrefs.accessibility || {};
+        userPrefs.accessibility.highContrast = this.preferences.highContrast;
+        StorageManager.setUserPreferences(userPrefs);
+        
+        // Announce change
+        const status = this.preferences.highContrast ? 'enabled' : 'disabled';
+        if (this.accessibilityManager) {
+            this.accessibilityManager.announce(`High contrast mode ${status}`);
+        }
+        
+        // Track usage
+        AnalyticsManager.trackUserInteraction('toggle_high_contrast', status);
+        
+        console.log(`High contrast mode ${status}`);
+    }
+
+    /**
+     * Toggle large text mode
+     */
+    toggleLargeText() {
+        this.preferences.largeText = !this.preferences.largeText;
+        
+        // Apply theme changes
+        this.applyTheme();
+        
+        // Save preference
+        const userPrefs = StorageManager.getUserPreferences();
+        userPrefs.accessibility = userPrefs.accessibility || {};
+        userPrefs.accessibility.largeText = this.preferences.largeText;
+        StorageManager.setUserPreferences(userPrefs);
+        
+        // Announce change
+        const status = this.preferences.largeText ? 'enabled' : 'disabled';
+        if (this.accessibilityManager) {
+            this.accessibilityManager.announce(`Large text mode ${status}`);
+        }
+        
+        // Track usage
+        AnalyticsManager.trackUserInteraction('toggle_large_text', status);
+        
+        console.log(`Large text mode ${status}`);
+    }
+
+    /**
+     * Show informational modal
+     */
+    showInfoModal(title, content) {
+        // Create modal if it doesn't exist
+        let infoModal = document.getElementById('info-modal');
+        if (!infoModal) {
+            infoModal = document.createElement('div');
+            infoModal.id = 'info-modal';
+            infoModal.className = 'modal';
+            infoModal.setAttribute('role', 'dialog');
+            infoModal.setAttribute('aria-modal', 'true');
+            infoModal.setAttribute('aria-hidden', 'true');
+            infoModal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 id="info-modal-title"></h2>
+                        <button class="modal-close" aria-label="Close modal">&times;</button>
+                    </div>
+                    <div class="modal-body" id="info-modal-body"></div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" onclick="document.getElementById('info-modal').style.display='none'">Close</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(infoModal);
+            
+            // Setup close functionality
+            const closeBtn = infoModal.querySelector('.modal-close');
+            closeBtn.addEventListener('click', () => {
+                infoModal.style.display = 'none';
+                infoModal.setAttribute('aria-hidden', 'true');
+            });
+        }
+        
+        // Set content
+        document.getElementById('info-modal-title').textContent = title;
+        document.getElementById('info-modal-body').innerHTML = content;
+        
+        // Show modal
+        infoModal.style.display = 'flex';
+        infoModal.setAttribute('aria-hidden', 'false');
+        
+        // Focus management
+        const closeButton = infoModal.querySelector('.modal-close');
+        if (closeButton) {
+            closeButton.focus();
+        }
+    }
+
+    // ...existing code...
 }
 
 /**

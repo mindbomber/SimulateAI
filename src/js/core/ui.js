@@ -1,10 +1,126 @@
 /**
- * UI Components System
- * Provides reusable UI components for simulations
+ * Enhanced UI Components System - Modern UI component framework for SimulateAI
+ * Provides WCAG 2.1 AA compliant, responsive, and theme-aware UI components
+ * 
+ * Features:
+ * - Full accessibility compliance (WCAG 2.1 AA)
+ * - Dark mode and theme integration
+ * - Performance optimization and monitoring
+ * - Advanced animation support
+ * - Touch and mobile optimization
+ * - Error handling and recovery
+ * - RTL language support
+ * - Screen reader compatibility
+ * 
+ * @version 2.0.0
+ * @author SimulateAI Team
+ * @license Apache-2.0
  */
 
+// Enhanced constants and configuration
+const UI_CONSTANTS = {
+    ANIMATION_DURATION: 300,
+    DEBOUNCE_DELAY: 150,
+    FOCUS_DELAY: 16,
+    TOUCH_TARGET_SIZE: 44,
+    FOCUS_RING_WIDTH: 2,
+    RIPPLE_DURATION: 600,
+    BREAKPOINTS: {
+        mobile: 768,
+        tablet: 1024,
+        desktop: 1200
+    }
+};
+
+const THEME_COLORS = {
+    light: {
+        primary: '#1a73e8',
+        secondary: '#34a853',
+        surface: '#ffffff',
+        background: '#f8f9fa',
+        text: '#202124',
+        border: '#dadce0'
+    },
+    dark: {
+        primary: '#4285f4',
+        secondary: '#34a853',
+        surface: '#2d2d30',
+        background: '#1e1e1e',
+        text: '#e8eaed',
+        border: '#5f6368'
+    },
+    highContrast: {
+        primary: '#000000',
+        secondary: '#000000',
+        surface: '#ffffff',
+        background: '#ffffff',
+        text: '#000000',
+        border: '#000000'
+    }
+};
+
+/**
+ * Enhanced theme detection and management for UI components
+ */
+class UIThemeManager {
+    static getCurrentTheme() {
+        const prefersHighContrast = window.matchMedia?.('(prefers-contrast: high)').matches;
+        const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+        const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+        
+        return {
+            name: prefersHighContrast ? 'highContrast' : (prefersDark ? 'dark' : 'light'),
+            highContrast: prefersHighContrast,
+            darkMode: prefersDark,
+            reducedMotion: prefersReducedMotion,
+            colors: THEME_COLORS[prefersHighContrast ? 'highContrast' : (prefersDark ? 'dark' : 'light')]
+        };
+    }
+    
+    static applyThemeToElement(element, theme = this.getCurrentTheme()) {
+        element.style.setProperty('--theme-primary', theme.colors.primary);
+        element.style.setProperty('--theme-secondary', theme.colors.secondary);
+        element.style.setProperty('--theme-surface', theme.colors.surface);
+        element.style.setProperty('--theme-background', theme.colors.background);
+        element.style.setProperty('--theme-text', theme.colors.text);
+        element.style.setProperty('--theme-border', theme.colors.border);
+    }
+}
+
+/**
+ * Performance monitoring utility for UI components
+ */
+class UIPerformanceMonitor {
+    static measurements = new Map();
+    
+    static startMeasurement(id) {
+        this.measurements.set(id, performance.now());
+    }
+    
+    static endMeasurement(id) {
+        const start = this.measurements.get(id);
+        if (start) {
+            const duration = performance.now() - start;
+            this.measurements.delete(id);
+            if (duration > 16) { // Flag slow operations (> 1 frame)
+                console.warn(`UI operation '${id}' took ${duration.toFixed(2)}ms`);
+            }
+            return duration;
+        }
+        return 0;
+    }
+}
+
+/**
+ * Enhanced UIComponent - Base class for all UI components
+ * Provides modern accessibility, theming, and performance features
+ */
 class UIComponent {
     constructor(config = {}) {
+        // Performance monitoring
+        UIPerformanceMonitor.startMeasurement(`ui-component-init-${this.constructor.name}`);
+        
+        // Core properties
         this.id = config.id || `ui-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         this.position = config.position || { x: 0, y: 0 };
         this.size = config.size || { width: 100, height: 100 };
@@ -12,33 +128,304 @@ class UIComponent {
         this.active = config.active !== false;
         this.zIndex = config.zIndex || 0;
         
+        // Enhanced properties
         this.engine = null;
         this.element = null;
         this.styles = config.styles || {};
+        this.theme = UIThemeManager.getCurrentTheme();
+        this.accessible = config.accessible !== false;
+        this.responsive = config.responsive !== false;
+        this.animated = config.animated !== false && !this.theme.reducedMotion;
         
+        // Event system
         this.events = new Map();
+        this.listeners = new Map();
         
+        // Accessibility properties
+        this.ariaLabel = config.ariaLabel || '';
+        this.ariaRole = config.ariaRole || 'button';
+        this.focusable = config.focusable !== false;
+        this.tabIndex = config.tabIndex || (this.focusable ? 0 : -1);
+        
+        // Performance properties
+        this.performanceOptions = {
+            useGPU: config.useGPU !== false,
+            enableVirtualization: config.enableVirtualization === true,
+            debounceEvents: config.debounceEvents !== false
+        };
+        
+        // Error handling
+        this.errorHandler = config.errorHandler || this.defaultErrorHandler.bind(this);
+        
+        // Initialize component
         this.createElement();
         this.applyStyles();
-    }
-
-    createElement() {
-        this.element = document.createElement('div');
-        this.element.className = `ui-component ${this.constructor.name.toLowerCase()}`;
-        this.element.id = this.id;
+        this.setupAccessibility();
+        this.setupEventListeners();
+        this.setupThemeMonitoring();
         
-        this.updateElementPosition();
+        UIPerformanceMonitor.endMeasurement(`ui-component-init-${this.constructor.name}`);
     }
 
+    /**
+     * Create DOM element with modern features
+     */
+    createElement() {
+        try {
+            this.element = document.createElement(this.getElementTag());
+            this.element.className = this.getElementClasses();
+            this.element.id = this.id;
+            
+            // Apply theme CSS variables
+            UIThemeManager.applyThemeToElement(this.element, this.theme);
+            
+            this.updateElementPosition();
+            
+        } catch (error) {
+            this.errorHandler(error, 'createElement');
+        }
+    }
+    
+    /**
+     * Get element tag (override in subclasses)
+     */
+    getElementTag() {
+        return 'div';
+    }
+    
+    /**
+     * Get element CSS classes
+     */
+    getElementClasses() {
+        const baseClasses = [
+            'ui-component',
+            `ui-${this.constructor.name.toLowerCase()}`,
+            'theme-aware'
+        ];
+        
+        if (this.responsive) baseClasses.push('responsive');
+        if (this.animated) baseClasses.push('animated');
+        if (this.theme.highContrast) baseClasses.push('high-contrast');
+        if (this.theme.darkMode) baseClasses.push('dark-mode');
+        
+        return baseClasses.join(' ');
+    }
+
+    /**
+     * Apply modern styles with CSS custom properties
+     */
     applyStyles() {
-        Object.assign(this.element.style, {
-            position: 'absolute',
-            boxSizing: 'border-box',
-            userSelect: 'none',
-            ...this.styles
-        });
+        try {
+            const baseStyles = {
+                position: 'absolute',
+                boxSizing: 'border-box',
+                userSelect: 'none',
+                outline: 'none',
+                transition: this.animated ? 'all 0.3s ease' : 'none',
+                
+                // Custom properties for theming
+                backgroundColor: 'var(--theme-surface)',
+                color: 'var(--theme-text)',
+                borderColor: 'var(--theme-border)',
+                
+                // Accessibility enhancements
+                minWidth: this.focusable ? `${UI_CONSTANTS.TOUCH_TARGET_SIZE}px` : 'auto',
+                minHeight: this.focusable ? `${UI_CONSTANTS.TOUCH_TARGET_SIZE}px` : 'auto',
+                
+                // Performance optimizations
+                willChange: this.animated ? 'transform, opacity' : 'auto',
+                backfaceVisibility: 'hidden',
+                transform: 'translateZ(0)', // Force GPU layer
+                
+                ...this.styles
+            };
+            
+            Object.assign(this.element.style, baseStyles);
+            
+            // Add focus styles
+            this.addFocusStyles();
+            
+        } catch (error) {
+            this.errorHandler(error, 'applyStyles');
+        }
+    }
+    
+    /**
+     * Add modern focus styles
+     */
+    addFocusStyles() {
+        if (!this.focusable) return;
+        
+        const style = document.createElement('style');
+        style.textContent = `
+            #${this.id}:focus {
+                outline: ${UI_CONSTANTS.FOCUS_RING_WIDTH}px solid var(--theme-primary);
+                outline-offset: 2px;
+                box-shadow: 0 0 0 4px var(--theme-primary)20;
+            }
+            
+            #${this.id}:focus:not(:focus-visible) {
+                outline: none;
+                box-shadow: none;
+            }
+        `;
+        
+        document.head.appendChild(style);
     }
 
+    /**
+     * Setup comprehensive accessibility features
+     */
+    setupAccessibility() {
+        if (!this.accessible || !this.element) return;
+        
+        try {
+            // ARIA attributes
+            if (this.ariaLabel) {
+                this.element.setAttribute('aria-label', this.ariaLabel);
+            }
+            
+            if (this.ariaRole) {
+                this.element.setAttribute('role', this.ariaRole);
+            }
+            
+            // Focus management
+            this.element.setAttribute('tabindex', this.tabIndex);
+            
+            // Screen reader support
+            this.element.setAttribute('aria-hidden', this.visible ? 'false' : 'true');
+            
+            // Touch accessibility
+            if ('ontouchstart' in window) {
+                this.element.style.touchAction = 'manipulation';
+            }
+            
+        } catch (error) {
+            this.errorHandler(error, 'setupAccessibility');
+        }
+    }
+    
+    /**
+     * Setup modern event listeners with performance optimization
+     */
+    setupEventListeners() {
+        if (!this.element) return;
+        
+        try {
+            // Keyboard navigation
+            if (this.focusable) {
+                this.addEventListener('keydown', this.handleKeyDown.bind(this));
+                this.addEventListener('keyup', this.handleKeyUp.bind(this));
+            }
+            
+            // Mouse events
+            this.addEventListener('mouseenter', this.handleMouseEnter.bind(this));
+            this.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
+            
+            // Touch events (with passive listeners for performance)
+            if ('ontouchstart' in window) {
+                this.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: true });
+                this.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: true });
+            }
+            
+            // Focus events
+            this.addEventListener('focus', this.handleFocus.bind(this));
+            this.addEventListener('blur', this.handleBlur.bind(this));
+            
+        } catch (error) {
+            this.errorHandler(error, 'setupEventListeners');
+        }
+    }
+    
+    /**
+     * Setup theme change monitoring
+     */
+    setupThemeMonitoring() {
+        // Monitor system theme changes
+        const darkModeQuery = window.matchMedia?.('(prefers-color-scheme: dark)');
+        const contrastQuery = window.matchMedia?.('(prefers-contrast: high)');
+        const motionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+        
+        const handleThemeChange = () => {
+            this.theme = UIThemeManager.getCurrentTheme();
+            this.updateTheme();
+        };
+        
+        darkModeQuery?.addEventListener?.('change', handleThemeChange);
+        contrastQuery?.addEventListener?.('change', handleThemeChange);
+        motionQuery?.addEventListener?.('change', handleThemeChange);
+        
+        // Store references for cleanup
+        this.themeQueries = { darkModeQuery, contrastQuery, motionQuery };
+        this.themeChangeHandler = handleThemeChange;
+    }
+    
+    /**
+     * Update component when theme changes
+     */
+    updateTheme() {
+        try {
+            this.animated = !this.theme.reducedMotion;
+            this.element.className = this.getElementClasses();
+            UIThemeManager.applyThemeToElement(this.element, this.theme);
+            this.applyStyles();
+            
+            this.emit('themeChanged', this.theme);
+            
+        } catch (error) {
+            this.errorHandler(error, 'updateTheme');
+        }
+    }
+
+    /**
+     * Enhanced event handling methods
+     */
+    handleKeyDown(event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            this.emit('activate', { event, source: 'keyboard' });
+        }
+        
+        this.emit('keyDown', { event, key: event.key });
+    }
+    
+    handleKeyUp(event) {
+        this.emit('keyUp', { event, key: event.key });
+    }
+    
+    handleMouseEnter(event) {
+        this.element.classList.add('hover');
+        this.emit('mouseEnter', { event });
+    }
+    
+    handleMouseLeave(event) {
+        this.element.classList.remove('hover');
+        this.emit('mouseLeave', { event });
+    }
+    
+    handleTouchStart(event) {
+        this.element.classList.add('active');
+        this.emit('touchStart', { event });
+    }
+    
+    handleTouchEnd(event) {
+        this.element.classList.remove('active');
+        this.emit('touchEnd', { event });
+    }
+    
+    handleFocus(event) {
+        this.element.classList.add('focused');
+        this.emit('focus', { event });
+    }
+    
+    handleBlur(event) {
+        this.element.classList.remove('focused');
+        this.emit('blur', { event });
+    }
+    
+    /**
+     * Enhanced utility methods
+     */
     updateElementPosition() {
         if (this.element) {
             this.element.style.left = `${this.position.x}px`;
@@ -46,6 +433,30 @@ class UIComponent {
             this.element.style.width = `${this.size.width}px`;
             this.element.style.height = `${this.size.height}px`;
             this.element.style.zIndex = this.zIndex;
+            
+            // Update responsive behavior
+            if (this.responsive) {
+                this.updateResponsiveStyles();
+            }
+        }
+    }
+    
+    /**
+     * Update responsive styles based on screen size
+     */
+    updateResponsiveStyles() {
+        const width = window.innerWidth;
+        const isMobile = width < UI_CONSTANTS.BREAKPOINTS.mobile;
+        const isTablet = width < UI_CONSTANTS.BREAKPOINTS.tablet;
+        
+        this.element.classList.toggle('mobile', isMobile);
+        this.element.classList.toggle('tablet', isTablet && !isMobile);
+        this.element.classList.toggle('desktop', !isTablet);
+        
+        // Adjust touch targets on mobile
+        if (isMobile && this.focusable) {
+            this.element.style.minWidth = `${UI_CONSTANTS.TOUCH_TARGET_SIZE}px`;
+            this.element.style.minHeight = `${UI_CONSTANTS.TOUCH_TARGET_SIZE}px`;
         }
     }
 
@@ -72,14 +483,84 @@ class UIComponent {
         this.visible = true;
         if (this.element) {
             this.element.style.display = 'block';
+            this.element.setAttribute('aria-hidden', 'false');
+            
+            if (this.animated) {
+                this.element.style.opacity = '0';
+                this.element.style.transform = 'scale(0.95)';
+                
+                requestAnimationFrame(() => {
+                    this.element.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    this.element.style.opacity = '1';
+                    this.element.style.transform = 'scale(1)';
+                });
+            }
         }
+        
+        this.emit('show');
     }
 
     hide() {
         this.visible = false;
         if (this.element) {
-            this.element.style.display = 'none';
+            if (this.animated) {
+                this.element.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                this.element.style.opacity = '0';
+                this.element.style.transform = 'scale(0.95)';
+                
+                setTimeout(() => {
+                    this.element.style.display = 'none';
+                    this.element.setAttribute('aria-hidden', 'true');
+                }, 300);
+            } else {
+                this.element.style.display = 'none';
+                this.element.setAttribute('aria-hidden', 'true');
+            }
         }
+        
+        this.emit('hide');
+    }
+    
+    /**
+     * Enhanced event system with debouncing
+     */
+    addEventListener(event, callback, options = {}) {
+        if (this.performanceOptions.debounceEvents && 
+            ['resize', 'scroll', 'mousemove'].includes(event)) {
+            callback = this.debounce(callback, UI_CONSTANTS.DEBOUNCE_DELAY);
+        }
+        
+        this.element?.addEventListener(event, callback, options);
+        
+        // Store for cleanup
+        if (!this.listeners.has(event)) {
+            this.listeners.set(event, []);
+        }
+        this.listeners.get(event).push({ callback, options });
+    }
+    
+    removeEventListener(event, callback) {
+        this.element?.removeEventListener(event, callback);
+        
+        // Clean up stored listeners
+        const listeners = this.listeners.get(event);
+        if (listeners) {
+            const index = listeners.findIndex(l => l.callback === callback);
+            if (index > -1) {
+                listeners.splice(index, 1);
+            }
+        }
+    }
+    
+    /**
+     * Debounce utility for performance
+     */
+    debounce(func, delay) {
+        let timeoutId;
+        return (...args) => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => func.apply(this, args), delay);
+        };
     }
 
     on(event, callback) {
@@ -91,38 +572,116 @@ class UIComponent {
 
     emit(event, data = {}) {
         if (this.events.has(event)) {
-            this.events.get(event).forEach(callback => callback(data));
+            this.events.get(event).forEach(callback => {
+                try {
+                    callback(data);
+                } catch (error) {
+                    this.errorHandler(error, `emit-${event}`);
+                }
+            });
         }
+    }
+    
+    /**
+     * Default error handler
+     */
+    defaultErrorHandler(error, context) {
+        console.error(`UI Component Error (${context}):`, error);
+        
+        // Emit error event for external handling
+        this.emit('error', { error, context });
+    }
+    
+    /**
+     * Announce text for screen readers
+     */
+    announce(text, priority = 'polite') {
+        const announcement = document.createElement('div');
+        announcement.setAttribute('aria-live', priority);
+        announcement.setAttribute('aria-atomic', 'true');
+        announcement.style.position = 'absolute';
+        announcement.style.left = '-10000px';
+        announcement.style.width = '1px';
+        announcement.style.height = '1px';
+        announcement.style.overflow = 'hidden';
+        
+        document.body.appendChild(announcement);
+        
+        setTimeout(() => {
+            announcement.textContent = text;
+            setTimeout(() => {
+                document.body.removeChild(announcement);
+            }, 1000);
+        }, 100);
     }
 
     update(deltaTime) {
-        // Override in subclasses
+        // Override in subclasses for custom update logic
+        this.emit('update', { deltaTime });
     }
 
     render(renderer) {
         // UI components render to DOM, not canvas/svg
+        // Override in subclasses if needed
     }
 
+    /**
+     * Enhanced cleanup with memory leak prevention
+     */
     destroy() {
-        if (this.element && this.element.parentNode) {
-            this.element.parentNode.removeChild(this.element);
+        try {
+            // Remove all event listeners
+            this.listeners.forEach((listeners, event) => {
+                listeners.forEach(({ callback }) => {
+                    this.element?.removeEventListener(event, callback);
+                });
+            });
+            this.listeners.clear();
+            
+            // Clean up theme monitoring
+            if (this.themeQueries) {
+                const { darkModeQuery, contrastQuery, motionQuery } = this.themeQueries;
+                darkModeQuery?.removeEventListener?.('change', this.themeChangeHandler);
+                contrastQuery?.removeEventListener?.('change', this.themeChangeHandler);
+                motionQuery?.removeEventListener?.('change', this.themeChangeHandler);
+            }
+            
+            // Remove DOM element
+            if (this.element && this.element.parentNode) {
+                this.element.parentNode.removeChild(this.element);
+            }
+            
+            // Clear references
+            this.element = null;
+            this.engine = null;
+            this.events.clear();
+            
+            this.emit('destroyed');
+            
+        } catch (error) {
+            this.errorHandler(error, 'destroy');
         }
-        this.events.clear();
     }
 }
 
+/**
+ * Enhanced UIPanel - Modern panel component with accessibility and theming
+ */
 class UIPanel extends UIComponent {
     constructor(config = {}) {
         super({
             ...config,
+            ariaRole: 'dialog',
+            ariaLabel: config.title || 'Panel',
             styles: {
-                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                border: '1px solid #ccc',
-                borderRadius: '8px',
-                padding: '10px',
-                boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                backgroundColor: 'var(--theme-surface)',
+                border: '1px solid var(--theme-border)',
+                borderRadius: '12px',
+                padding: '20px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                 fontSize: '14px',
-                fontFamily: 'Arial, sans-serif',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                backdropFilter: 'blur(10px)',
                 ...config.styles
             }
         });
@@ -130,25 +689,113 @@ class UIPanel extends UIComponent {
         this.title = config.title || '';
         this.content = config.content || '';
         this.components = [];
+        this.resizable = config.resizable === true;
+        this.closable = config.closable !== false;
+        this.modal = config.modal === true;
 
         this.createContent();
+        this.setupPanelBehavior();
+    }
+    
+    /**
+     * Get appropriate element tag for panels
+     */
+    getElementTag() {
+        return 'section';
+    }
+    
+    /**
+     * Get enhanced CSS classes for panels
+     */
+    getElementClasses() {
+        const classes = super.getElementClasses();
+        const panelClasses = ['ui-panel'];
+        
+        if (this.modal) panelClasses.push('modal');
+        if (this.resizable) panelClasses.push('resizable');
+        if (this.closable) panelClasses.push('closable');
+        
+        return `${classes} ${panelClasses.join(' ')}`;
     }
 
     createContent() {
-        this.element.innerHTML = `
-            ${this.title ? `<div class="panel-header">${this.title}</div>` : ''}
-            <div class="panel-content">${this.content}</div>
-            <div class="panel-controls"></div>
-        `;
+        try {
+            this.element.innerHTML = `
+                ${this.closable ? `
+                    <button class="panel-close" aria-label="Close panel" tabindex="0">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                ` : ''}
+                ${this.title ? `
+                    <header class="panel-header">
+                        <h2 class="panel-title">${this.title}</h2>
+                    </header>
+                ` : ''}
+                <main class="panel-content" role="main">${this.content}</main>
+                <footer class="panel-controls" role="toolbar"></footer>
+            `;
+
+            this.styleContent();
+            
+        } catch (error) {
+            this.errorHandler(error, 'createContent');
+        }
+    }
+    
+    /**
+     * Apply modern styling to panel content
+     */
+    styleContent() {
+        // Style the close button
+        const closeBtn = this.element.querySelector('.panel-close');
+        if (closeBtn) {
+            Object.assign(closeBtn.style, {
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                background: 'none',
+                border: 'none',
+                fontSize: '24px',
+                color: 'var(--theme-text)',
+                cursor: 'pointer',
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'background-color 0.2s ease'
+            });
+            
+            closeBtn.addEventListener('click', () => this.close());
+            closeBtn.addEventListener('mouseenter', () => {
+                closeBtn.style.backgroundColor = 'var(--theme-border)';
+            });
+            closeBtn.addEventListener('mouseleave', () => {
+                closeBtn.style.backgroundColor = 'transparent';
+            });
+        }
 
         // Style the header
         const header = this.element.querySelector('.panel-header');
         if (header) {
             Object.assign(header.style, {
-                fontWeight: 'bold',
-                marginBottom: '10px',
-                paddingBottom: '5px',
-                borderBottom: '1px solid #eee'
+                fontWeight: '600',
+                marginBottom: '16px',
+                paddingBottom: '12px',
+                borderBottom: '1px solid var(--theme-border)',
+                color: 'var(--theme-text)'
+            });
+        }
+
+        // Style the title
+        const title = this.element.querySelector('.panel-title');
+        if (title) {
+            Object.assign(title.style, {
+                margin: '0',
+                fontSize: '18px',
+                fontWeight: '600',
+                color: 'var(--theme-text)'
             });
         }
 
@@ -156,10 +803,169 @@ class UIPanel extends UIComponent {
         const content = this.element.querySelector('.panel-content');
         if (content) {
             Object.assign(content.style, {
-                marginBottom: '10px',
-                lineHeight: '1.4'
+                marginBottom: '16px',
+                lineHeight: '1.5',
+                color: 'var(--theme-text)',
+                maxHeight: this.modal ? '60vh' : 'none',
+                overflowY: this.modal ? 'auto' : 'visible'
             });
         }
+        
+        // Style the controls
+        const controls = this.element.querySelector('.panel-controls');
+        if (controls) {
+            Object.assign(controls.style, {
+                display: 'flex',
+                gap: '8px',
+                flexWrap: 'wrap',
+                justifyContent: 'flex-end',
+                paddingTop: '12px',
+                borderTop: '1px solid var(--theme-border)'
+            });
+        }
+    }
+    
+    /**
+     * Setup panel-specific behavior
+     */
+    setupPanelBehavior() {
+        // Modal behavior
+        if (this.modal) {
+            this.setupModalBehavior();
+        }
+        
+        // Resizable behavior
+        if (this.resizable) {
+            this.setupResizableBehavior();
+        }
+        
+        // Escape key handling
+        this.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && this.closable) {
+                this.close();
+            }
+        });
+    }
+    
+    /**
+     * Setup modal dialog behavior
+     */
+    setupModalBehavior() {
+        // Create backdrop
+        this.backdrop = document.createElement('div');
+        this.backdrop.className = 'panel-backdrop';
+        Object.assign(this.backdrop.style, {
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(4px)',
+            zIndex: this.zIndex - 1,
+            display: 'none'
+        });
+        
+        // Close on backdrop click
+        this.backdrop.addEventListener('click', (event) => {
+            if (event.target === this.backdrop) {
+                this.close();
+            }
+        });
+        
+        document.body.appendChild(this.backdrop);
+    }
+    
+    /**
+     * Setup resizable behavior
+     */
+    setupResizableBehavior() {
+        // Add resize handles
+        const handles = ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'];
+        handles.forEach(direction => {
+            const handle = document.createElement('div');
+            handle.className = `resize-handle resize-${direction}`;
+            handle.style.cssText = `
+                position: absolute;
+                background: transparent;
+                cursor: ${direction}-resize;
+            `;
+            
+            switch (direction) {
+                case 'n': case 's':
+                    handle.style.cssText += 'left: 0; right: 0; height: 4px;';
+                    handle.style[direction === 'n' ? 'top' : 'bottom'] = '-2px';
+                    break;
+                case 'e': case 'w':
+                    handle.style.cssText += 'top: 0; bottom: 0; width: 4px;';
+                    handle.style[direction === 'e' ? 'right' : 'left'] = '-2px';
+                    break;
+                default: // corners
+                    handle.style.cssText += 'width: 8px; height: 8px;';
+                    if (direction.includes('n')) handle.style.top = '-4px';
+                    if (direction.includes('s')) handle.style.bottom = '-4px';
+                    if (direction.includes('e')) handle.style.right = '-4px';
+                    if (direction.includes('w')) handle.style.left = '-4px';
+            }
+            
+            this.setupResizeHandle(handle, direction);
+            this.element.appendChild(handle);
+        });
+    }
+    
+    /**
+     * Setup individual resize handle
+     */
+    setupResizeHandle(handle, direction) {
+        let isResizing = false;
+        let startX, startY, startWidth, startHeight, startLeft, startTop;
+        
+        handle.addEventListener('mousedown', (event) => {
+            isResizing = true;
+            startX = event.clientX;
+            startY = event.clientY;
+            
+            const rect = this.element.getBoundingClientRect();
+            startWidth = rect.width;
+            startHeight = rect.height;
+            startLeft = rect.left;
+            startTop = rect.top;
+            
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+            
+            event.preventDefault();
+        });
+        
+        const handleMouseMove = (event) => {
+            if (!isResizing) return;
+            
+            const deltaX = event.clientX - startX;
+            const deltaY = event.clientY - startY;
+            
+            let newWidth = startWidth;
+            let newHeight = startHeight;
+            let newLeft = startLeft;
+            let newTop = startTop;
+            
+            if (direction.includes('e')) newWidth += deltaX;
+            if (direction.includes('w')) { newWidth -= deltaX; newLeft += deltaX; }
+            if (direction.includes('s')) newHeight += deltaY;
+            if (direction.includes('n')) { newHeight -= deltaY; newTop += deltaY; }
+            
+            // Apply constraints
+            newWidth = Math.max(200, newWidth);
+            newHeight = Math.max(150, newHeight);
+            
+            this.setSize(newWidth, newHeight);
+            this.setPosition(newLeft, newTop);
+        };
+        
+        const handleMouseUp = () => {
+            isResizing = false;
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
     }
 
     setContent(html) {
@@ -168,30 +974,155 @@ class UIPanel extends UIComponent {
             contentEl.innerHTML = html;
         }
     }
+    
+    /**
+     * Close panel with animation
+     */
+    close() {
+        this.emit('beforeClose');
+        
+        if (this.animated) {
+            this.element.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            this.element.style.opacity = '0';
+            this.element.style.transform = 'scale(0.95)';
+            
+            if (this.backdrop) {
+                this.backdrop.style.transition = 'opacity 0.3s ease';
+                this.backdrop.style.opacity = '0';
+            }
+            
+            setTimeout(() => {
+                this.hide();
+                this.emit('closed');
+            }, 300);
+        } else {
+            this.hide();
+            this.emit('closed');
+        }
+    }
+    
+    /**
+     * Show panel with modal behavior
+     */
+    show() {
+        if (this.modal && this.backdrop) {
+            this.backdrop.style.display = 'block';
+            if (this.animated) {
+                this.backdrop.style.opacity = '0';
+                requestAnimationFrame(() => {
+                    this.backdrop.style.transition = 'opacity 0.3s ease';
+                    this.backdrop.style.opacity = '1';
+                });
+            }
+        }
+        
+        super.show();
+        
+        // Focus management for accessibility
+        const firstFocusable = this.element.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (firstFocusable) {
+            setTimeout(() => firstFocusable.focus(), 100);
+        }
+    }
+    
+    /**
+     * Hide panel and backdrop
+     */
+    hide() {
+        if (this.backdrop) {
+            this.backdrop.style.display = 'none';
+        }
+        
+        super.hide();
+    }
 
-    addButton(text, onClick, styles = {}) {
+    /**
+     * Add modern button with accessibility and theming
+     */
+    addButton(text, onClick, options = {}) {
         const button = document.createElement('button');
         button.textContent = text;
-        button.className = 'panel-button';
+        button.className = 'panel-button ui-button';
+        button.type = 'button';
         
+        // Accessibility attributes
+        if (options.ariaLabel) {
+            button.setAttribute('aria-label', options.ariaLabel);
+        }
+        
+        if (options.disabled) {
+            button.disabled = true;
+            button.setAttribute('aria-disabled', 'true');
+        }
+        
+        // Apply modern styling
         Object.assign(button.style, {
-            padding: '5px 10px',
-            margin: '2px',
-            border: '1px solid #007cba',
-            backgroundColor: '#007cba',
+            padding: '8px 16px',
+            margin: '4px',
+            border: 'none',
+            backgroundColor: 'var(--theme-primary)',
             color: 'white',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '12px',
-            ...styles
+            borderRadius: '6px',
+            cursor: options.disabled ? 'not-allowed' : 'pointer',
+            fontSize: '14px',
+            fontWeight: '500',
+            fontFamily: 'inherit',
+            minHeight: `${UI_CONSTANTS.TOUCH_TARGET_SIZE}px`,
+            transition: 'all 0.2s ease',
+            outline: 'none',
+            opacity: options.disabled ? '0.6' : '1',
+            ...options.styles
         });
 
-        button.addEventListener('click', onClick);
-        button.addEventListener('mouseenter', () => {
-            button.style.backgroundColor = '#005a87';
+        // Enhanced event handling
+        if (!options.disabled) {
+            button.addEventListener('click', (event) => {
+                try {
+                    onClick(event);
+                } catch (error) {
+                    this.errorHandler(error, 'button-click');
+                }
+            });
+            
+            // Hover effects
+            button.addEventListener('mouseenter', () => {
+                if (!button.disabled) {
+                    button.style.transform = 'translateY(-1px)';
+                    button.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+                }
+            });
+            
+            button.addEventListener('mouseleave', () => {
+                button.style.transform = 'translateY(0)';
+                button.style.boxShadow = 'none';
+            });
+            
+            // Active state
+            button.addEventListener('mousedown', () => {
+                button.style.transform = 'translateY(0) scale(0.98)';
+            });
+            
+            button.addEventListener('mouseup', () => {
+                button.style.transform = 'translateY(-1px) scale(1)';
+            });
+            
+            // Keyboard handling
+            button.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    button.click();
+                }
+            });
+        }
+
+        // Add focus styles
+        button.addEventListener('focus', () => {
+            button.style.outline = `2px solid var(--theme-primary)`;
+            button.style.outlineOffset = '2px';
         });
-        button.addEventListener('mouseleave', () => {
-            button.style.backgroundColor = '#007cba';
+        
+        button.addEventListener('blur', () => {
+            button.style.outline = 'none';
         });
 
         const controls = this.element.querySelector('.panel-controls');
@@ -202,41 +1133,181 @@ class UIPanel extends UIComponent {
         return button;
     }
 
-    addSlider(label, min, max, value, onChange, styles = {}) {
+    /**
+     * Add modern slider with accessibility and theming
+     */
+    addSlider(label, min, max, value, onChange, options = {}) {
         const container = document.createElement('div');
         container.className = 'slider-container';
-        container.style.marginBottom = '10px';
+        container.style.marginBottom = '16px';
 
+        // Create label
         const labelEl = document.createElement('label');
         labelEl.textContent = label;
-        labelEl.style.display = 'block';
-        labelEl.style.marginBottom = '5px';
-        labelEl.style.fontSize = '12px';
+        labelEl.style.cssText = `
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--theme-text);
+        `;
 
+        // Create slider input
         const slider = document.createElement('input');
         slider.type = 'range';
         slider.min = min;
         slider.max = max;
         slider.value = value;
+        slider.step = options.step || 1;
         slider.className = 'panel-slider';
+        
+        // Generate unique ID for accessibility
+        const sliderId = `slider-${this.id}-${Date.now()}`;
+        slider.id = sliderId;
+        labelEl.setAttribute('for', sliderId);
+        
+        // Accessibility attributes
+        slider.setAttribute('role', 'slider');
+        slider.setAttribute('aria-valuemin', min);
+        slider.setAttribute('aria-valuemax', max);
+        slider.setAttribute('aria-valuenow', value);
+        slider.setAttribute('aria-label', label);
 
+        // Apply modern styling
         Object.assign(slider.style, {
             width: '100%',
-            marginBottom: '5px',
-            ...styles
+            height: '6px',
+            borderRadius: '3px',
+            background: 'var(--theme-border)',
+            outline: 'none',
+            appearance: 'none',
+            marginBottom: '8px',
+            cursor: 'pointer',
+            ...options.styles
         });
+        
+        // Style the thumb (webkit browsers)
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = `
+            #${sliderId}::-webkit-slider-thumb {
+                appearance: none;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background: var(--theme-primary);
+                cursor: pointer;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                transition: transform 0.2s ease;
+            }
+            
+            #${sliderId}::-webkit-slider-thumb:hover {
+                transform: scale(1.1);
+            }
+            
+            #${sliderId}::-moz-range-thumb {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background: var(--theme-primary);
+                cursor: pointer;
+                border: none;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+            
+            #${sliderId}:focus::-webkit-slider-thumb {
+                outline: 2px solid var(--theme-primary);
+                outline-offset: 2px;
+            }
+        `;
+        document.head.appendChild(styleSheet);
 
-        const valueDisplay = document.createElement('span');
-        valueDisplay.textContent = value;
-        valueDisplay.style.fontSize = '12px';
-        valueDisplay.style.color = '#666';
+        // Create value display
+        const valueDisplay = document.createElement('div');
+        valueDisplay.className = 'slider-value-display';
+        valueDisplay.style.cssText = `
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--theme-text);
+            opacity: 0.8;
+        `;
+        
+        const currentValue = document.createElement('span');
+        currentValue.textContent = value;
+        currentValue.style.fontWeight = '600';
+        
+        const minMaxDisplay = document.createElement('span');
+        minMaxDisplay.textContent = `${min} - ${max}`;
+        
+        valueDisplay.appendChild(currentValue);
+        valueDisplay.appendChild(minMaxDisplay);
 
+        // Enhanced event handling
+        const handleInput = (e) => {
+            const newValue = parseFloat(e.target.value);
+            currentValue.textContent = newValue;
+            slider.setAttribute('aria-valuenow', newValue);
+            
+            try {
+                onChange(newValue, e);
+            } catch (error) {
+                this.errorHandler(error, 'slider-change');
+            }
+        };
+        
+        // Debounce for performance
+        const debouncedHandler = this.debounce(handleInput, 16); // ~60fps
+        slider.addEventListener('input', debouncedHandler);
+        
+        // Immediate feedback for accessibility
         slider.addEventListener('input', (e) => {
             const newValue = parseFloat(e.target.value);
-            valueDisplay.textContent = newValue;
-            onChange(newValue);
+            currentValue.textContent = newValue;
+            slider.setAttribute('aria-valuenow', newValue);
+        });
+        
+        // Keyboard enhancements
+        slider.addEventListener('keydown', (event) => {
+            const step = parseFloat(slider.step);
+            let currentVal = parseFloat(slider.value);
+            
+            switch (event.key) {
+                case 'ArrowUp':
+                case 'ArrowRight':
+                    event.preventDefault();
+                    currentVal = Math.min(max, currentVal + step);
+                    break;
+                case 'ArrowDown':
+                case 'ArrowLeft':
+                    event.preventDefault();
+                    currentVal = Math.max(min, currentVal - step);
+                    break;
+                case 'Home':
+                    event.preventDefault();
+                    currentVal = min;
+                    break;
+                case 'End':
+                    event.preventDefault();
+                    currentVal = max;
+                    break;
+                case 'PageUp':
+                    event.preventDefault();
+                    currentVal = Math.min(max, currentVal + step * 10);
+                    break;
+                case 'PageDown':
+                    event.preventDefault();
+                    currentVal = Math.max(min, currentVal - step * 10);
+                    break;
+                default:
+                    return;
+            }
+            
+            slider.value = currentVal;
+            handleInput({ target: slider });
         });
 
+        // Assemble the slider component
         container.appendChild(labelEl);
         container.appendChild(slider);
         container.appendChild(valueDisplay);
@@ -246,332 +1317,1813 @@ class UIPanel extends UIComponent {
             controls.appendChild(container);
         }
 
-        return { container, slider, valueDisplay };
+        return { 
+            container, 
+            slider, 
+            valueDisplay, 
+            setValue: (newValue) => {
+                slider.value = newValue;
+                currentValue.textContent = newValue;
+                slider.setAttribute('aria-valuenow', newValue);
+            }
+        };
     }
+    
+    /**
+     * Enhanced destroy method for panels
+     */
+    destroy() {
+        // Clean up backdrop
+        if (this.backdrop && this.backdrop.parentNode) {
+            this.backdrop.parentNode.removeChild(this.backdrop);
+        }
+        
+        super.destroy();
+    }
+
+    // ...existing panel methods...
 }
 
+/**
+ * Enhanced EthicsDisplay - Modern ethics metrics visualization with accessibility
+ */
 class EthicsDisplay extends UIComponent {
     constructor(config = {}) {
         super({
             ...config,
+            ariaRole: 'status',
+            ariaLabel: 'Ethics metrics display',
+            accessible: true,
+            animated: config.animated !== false,
             styles: {
-                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                color: 'white',
-                borderRadius: '8px',
-                padding: '15px',
-                fontSize: '12px',
-                fontFamily: 'Arial, sans-serif',
+                backgroundColor: 'var(--theme-surface)',
+                color: 'var(--theme-text)',
+                border: '1px solid var(--theme-border)',
+                borderRadius: '12px',
+                padding: '20px',
+                fontSize: '14px',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                backdropFilter: 'blur(10px)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                 ...config.styles
             }
         });
 
         this.metrics = config.metrics || new Map();
+        this.showLabels = config.showLabels !== false;
+        this.showValues = config.showValues !== false;
+        this.format = config.format || 'percentage'; // 'percentage' | 'decimal' | 'score'
+        this.colorMode = config.colorMode || 'gradient'; // 'gradient' | 'threshold' | 'single'
+        this.animated = config.animated !== false && !this.theme.reducedMotion;
+        
+        // Color schemes for different themes
+        this.colorSchemes = {
+            gradient: {
+                low: '#ef4444',      // Red
+                medium: '#f59e0b',   // Amber  
+                high: '#22c55e'      // Green
+            },
+            threshold: {
+                poor: '#ef4444',
+                fair: '#f59e0b', 
+                good: '#22c55e',
+                excellent: '#06b6d4'
+            }
+        };
+
         this.createMetersDisplay();
+        this.setupLiveRegion();
+    }
+    
+    /**
+     * Get appropriate element tag
+     */
+    getElementTag() {
+        return 'section';
+    }
+    
+    /**
+     * Get enhanced CSS classes
+     */
+    getElementClasses() {
+        const classes = super.getElementClasses();
+        const displayClasses = ['ethics-display'];
+        
+        if (this.animated) displayClasses.push('animated');
+        if (this.colorMode) displayClasses.push(`color-${this.colorMode}`);
+        
+        return `${classes} ${displayClasses.join(' ')}`;
     }
 
     createMetersDisplay() {
-        this.element.innerHTML = '<h3 style="margin: 0 0 10px 0; font-size: 14px;">Ethics Metrics</h3>';
+        try {
+            this.element.innerHTML = `
+                <header class="ethics-header">
+                    <h3 class="ethics-title">Ethics Metrics</h3>
+                    <div class="ethics-summary" aria-live="polite"></div>
+                </header>
+                <main class="ethics-meters" role="main"></main>
+            `;
 
+            this.styleHeader();
+            this.renderMeters();
+            
+        } catch (error) {
+            this.errorHandler(error, 'createMetersDisplay');
+        }
+    }
+    
+    /**
+     * Style the header elements
+     */
+    styleHeader() {
+        const header = this.element.querySelector('.ethics-header');
+        if (header) {
+            Object.assign(header.style, {
+                marginBottom: '16px',
+                borderBottom: '1px solid var(--theme-border)',
+                paddingBottom: '12px'
+            });
+        }
+        
+        const title = this.element.querySelector('.ethics-title');
+        if (title) {
+            Object.assign(title.style, {
+                margin: '0 0 8px 0',
+                fontSize: '18px',
+                fontWeight: '600',
+                color: 'var(--theme-text)'
+            });
+        }
+        
+        const summary = this.element.querySelector('.ethics-summary');
+        if (summary) {
+            Object.assign(summary.style, {
+                fontSize: '12px',
+                color: 'var(--theme-text)',
+                opacity: '0.8'
+            });
+        }
+    }
+    
+    /**
+     * Setup live region for screen readers
+     */
+    setupLiveRegion() {
+        this.liveRegion = document.createElement('div');
+        this.liveRegion.setAttribute('aria-live', 'polite');
+        this.liveRegion.setAttribute('aria-atomic', 'false');
+        this.liveRegion.style.cssText = `
+            position: absolute;
+            left: -10000px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        `;
+        
+        this.element.appendChild(this.liveRegion);
+    }
+    
+    /**
+     * Render all ethics meters
+     */
+    renderMeters() {
+        const container = this.element.querySelector('.ethics-meters');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
         this.metrics.forEach((metric, name) => {
-            const meterContainer = document.createElement('div');
-            meterContainer.className = 'ethics-meter';
-            meterContainer.style.marginBottom = '8px';
+            const meterElement = this.createMeter(metric, name);
+            container.appendChild(meterElement);
+        });
+        
+        this.updateSummary();
+    }
+    
+    /**
+     * Create individual ethics meter
+     */
+    createMeter(metric, name) {
+        const meterContainer = document.createElement('div');
+        meterContainer.className = 'ethics-meter';
+        meterContainer.setAttribute('data-metric', name);
+        
+        // Generate unique IDs for accessibility
+        const meterId = `meter-${this.id}-${name}`;
+        const labelId = `label-${this.id}-${name}`;
+        const valueId = `value-${this.id}-${name}`;
+        
+        const value = Math.round(metric.value || 0);
+        const formattedValue = this.formatValue(metric.value || 0);
+        const color = this.getColorForValue(metric.value || 0);
+        const description = metric.description || `${metric.label} level`;
+        
+        meterContainer.innerHTML = `
+            ${this.showLabels ? `
+                <div class="meter-label" id="${labelId}">
+                    ${metric.label}
+                    ${metric.description ? `<span class="meter-description">${metric.description}</span>` : ''}
+                </div>
+            ` : ''}
+            
+            <div class="meter-container" role="progressbar" 
+                 aria-labelledby="${labelId}" 
+                 aria-describedby="${valueId}"
+                 aria-valuemin="0" 
+                 aria-valuemax="100" 
+                 aria-valuenow="${value}"
+                 aria-valuetext="${formattedValue} ${description}">
+                 
+                <div class="meter-track"></div>
+                <div class="meter-fill" style="width: 0%; background-color: ${color};"></div>
+                
+                ${this.showValues ? `
+                    <div class="meter-value" id="${valueId}" aria-hidden="true">
+                        ${formattedValue}
+                    </div>
+                ` : ''}
+            </div>
+        `;
 
-            const label = document.createElement('div');
-            label.textContent = metric.label;
-            label.style.fontSize = '11px';
-            label.style.marginBottom = '3px';
+        this.styleMeter(meterContainer, metric);
+        
+        return meterContainer;
+    }
+    
+    /**
+     * Style individual meter
+     */
+    styleMeter(container, metric) {
+        Object.assign(container.style, {
+            marginBottom: '16px',
+            position: 'relative'
+        });
+        
+        const label = container.querySelector('.meter-label');
+        if (label) {
+            Object.assign(label.style, {
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: 'var(--theme-text)'
+            });
+        }
+        
+        const description = container.querySelector('.meter-description');
+        if (description) {
+            Object.assign(description.style, {
+                fontSize: '12px',
+                fontWeight: '400',
+                opacity: '0.7',
+                fontStyle: 'italic'
+            });
+        }
+        
+        const meterContainer = container.querySelector('.meter-container');
+        if (meterContainer) {
+            Object.assign(meterContainer.style, {
+                position: 'relative',
+                height: '12px',
+                borderRadius: '6px',
+                overflow: 'hidden',
+                backgroundColor: 'var(--theme-border)',
+                border: '1px solid var(--theme-border)'
+            });
+        }
+        
+        const track = container.querySelector('.meter-track');
+        if (track) {
+            Object.assign(track.style, {
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                width: '100%',
+                height: '100%',
+                backgroundColor: this.theme.darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                borderRadius: '6px'
+            });
+        }
+        
+        const fill = container.querySelector('.meter-fill');
+        if (fill) {
+            Object.assign(fill.style, {
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                height: '100%',
+                borderRadius: '6px',
+                transition: this.animated ? 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease' : 'none',
+                backgroundImage: this.colorMode === 'gradient' ? 
+                    'linear-gradient(90deg, var(--meter-color) 0%, var(--meter-color) 100%)' : 'none'
+            });
+        }
+        
+        const valueDisplay = container.querySelector('.meter-value');
+        if (valueDisplay) {
+            Object.assign(valueDisplay.style, {
+                position: 'absolute',
+                right: '8px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                fontSize: '11px',
+                fontWeight: '600',
+                color: 'var(--theme-text)',
+                textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                pointerEvents: 'none'
+            });
+        }
+    }
+    
+    /**
+     * Get color for metric value
+     */
+    getColorForValue(value) {
+        if (this.colorMode === 'single') {
+            return this.colorSchemes.gradient.high;
+        }
+        
+        const normalized = Math.max(0, Math.min(100, value)) / 100;
+        
+        if (this.colorMode === 'threshold') {
+            if (normalized < 0.3) return this.colorSchemes.threshold.poor;
+            if (normalized < 0.5) return this.colorSchemes.threshold.fair;
+            if (normalized < 0.8) return this.colorSchemes.threshold.good;
+            return this.colorSchemes.threshold.excellent;
+        }
+        
+        // Gradient mode
+        if (normalized < 0.5) {
+            return this.interpolateColor(
+                this.colorSchemes.gradient.low,
+                this.colorSchemes.gradient.medium,
+                normalized * 2
+            );
+        } else {
+            return this.interpolateColor(
+                this.colorSchemes.gradient.medium,
+                this.colorSchemes.gradient.high,
+                (normalized - 0.5) * 2
+            );
+        }
+    }
+    
+    /**
+     * Interpolate between two hex colors
+     */
+    interpolateColor(color1, color2, factor) {
+        const c1 = this.hexToRgb(color1);
+        const c2 = this.hexToRgb(color2);
+        
+        const r = Math.round(c1.r + (c2.r - c1.r) * factor);
+        const g = Math.round(c1.g + (c2.g - c1.g) * factor);
+        const b = Math.round(c1.b + (c2.b - c1.b) * factor);
+        
+        return `rgb(${r}, ${g}, ${b})`;
+    }
+    
+    /**
+     * Convert hex color to RGB
+     */
+    hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : { r: 0, g: 0, b: 0 };
+    }
+    
+    /**
+     * Format value based on format setting
+     */
+    formatValue(value) {
+        switch (this.format) {
+            case 'decimal':
+                return (value / 100).toFixed(2);
+            case 'score':
+                return `${Math.round(value)}/100`;
+            case 'percentage':
+            default:
+                return `${Math.round(value)}%`;
+        }
+    }
 
-            const meterBg = document.createElement('div');
-            meterBg.style.cssText = `
-                width: 100%;
-                height: 12px;
-                background: #333;
-                border-radius: 6px;
-                overflow: hidden;
-                position: relative;
-            `;
+    /**
+     * Update ethics summary
+     */
+    updateSummary() {
+        const summary = this.element.querySelector('.ethics-summary');
+        if (!summary || this.metrics.size === 0) return;
+        
+        const values = Array.from(this.metrics.values()).map(m => m.value || 0);
+        const average = values.reduce((sum, val) => sum + val, 0) / values.length;
+        const totalMetrics = this.metrics.size;
+        
+        const gradeText = this.getEthicsGrade(average);
+        summary.textContent = `Overall: ${this.formatValue(average)} (${gradeText}) • ${totalMetrics} metrics`;
+    }
+    
+    /**
+     * Get ethics grade based on average score
+     */
+    getEthicsGrade(score) {
+        if (score >= 90) return 'Excellent';
+        if (score >= 80) return 'Good';
+        if (score >= 70) return 'Fair';
+        if (score >= 60) return 'Needs Improvement';
+        return 'Critical Issues';
+    }
 
-            const meterFill = document.createElement('div');
-            meterFill.className = 'meter-fill';
-            meterFill.style.cssText = `
-                height: 100%;
-                background: linear-gradient(90deg, #ff4444 0%, #ffaa00 50%, #00aa00 100%);
-                width: ${metric.value}%;
-                transition: width 0.3s ease;
-                border-radius: 6px;
-            `;
+    /**
+     * Update specific metric with animation
+     */
+    updateMetric(metricName, newValue, options = {}) {
+        const metric = this.metrics.get(metricName);
+        if (!metric) return;
 
-            const valueLabel = document.createElement('div');
-            valueLabel.className = 'meter-value';
-            valueLabel.textContent = metric.value;
-            valueLabel.style.cssText = `
-                position: absolute;
-                right: 5px;
-                top: 50%;
-                transform: translateY(-50%);
-                font-size: 10px;
-                color: white;
-                text-shadow: 1px 1px 1px rgba(0,0,0,0.7);
-            `;
+        const oldValue = metric.value || 0;
+        metric.value = Math.max(0, Math.min(100, newValue));
+        
+        const meterElement = this.element.querySelector(`[data-metric="${metricName}"]`);
+        if (!meterElement) return;
 
-            meterBg.appendChild(meterFill);
-            meterBg.appendChild(valueLabel);
-            meterContainer.appendChild(label);
-            meterContainer.appendChild(meterBg);
+        const fill = meterElement.querySelector('.meter-fill');
+        const valueDisplay = meterElement.querySelector('.meter-value');
+        const progressBar = meterElement.querySelector('.meter-container');
+        
+        if (fill) {
+            const newColor = this.getColorForValue(metric.value);
+            fill.style.backgroundColor = newColor;
+            
+            if (this.animated && !this.theme.reducedMotion) {
+                // Animate the width change
+                fill.style.width = `${metric.value}%`;
+            } else {
+                fill.style.width = `${metric.value}%`;
+            }
+        }
 
-            this.element.appendChild(meterContainer);
+        if (valueDisplay) {
+            valueDisplay.textContent = this.formatValue(metric.value);
+        }
+
+        if (progressBar) {
+            progressBar.setAttribute('aria-valuenow', Math.round(metric.value));
+            progressBar.setAttribute('aria-valuetext', 
+                `${this.formatValue(metric.value)} ${metric.description || metric.label}`);
+        }
+
+        // Announce significant changes for accessibility
+        if (Math.abs(newValue - oldValue) >= 10) {
+            const changeText = `${metric.label} changed to ${this.formatValue(metric.value)}`;
+            this.announce(changeText);
+        }
+
+        this.updateSummary();
+        this.emit('metricUpdated', { metricName, oldValue, newValue: metric.value });
+    }
+
+    /**
+     * Add new metric
+     */
+    addMetric(name, config) {
+        this.metrics.set(name, {
+            label: config.label || name,
+            value: config.value || 0,
+            description: config.description || '',
+            color: config.color || null
+        });
+        
+        this.renderMeters();
+        this.emit('metricAdded', { name, config });
+    }
+
+    /**
+     * Remove metric
+     */
+    removeMetric(name) {
+        if (this.metrics.delete(name)) {
+            this.renderMeters();
+            this.emit('metricRemoved', { name });
+        }
+    }
+
+    /**
+     * Get all metric values
+     */
+    getMetrics() {
+        const result = {};
+        this.metrics.forEach((metric, name) => {
+            result[name] = metric.value;
+        });
+        return result;
+    }
+
+    /**
+     * Set multiple metrics at once
+     */
+    setMetrics(values) {
+        Object.entries(values).forEach(([name, value]) => {
+            if (this.metrics.has(name)) {
+                this.updateMetric(name, value);
+            }
         });
     }
 
-    updateMetric(metricName, value) {
-        const meterFill = this.element.querySelector(`.ethics-meter:nth-child(${
-            Array.from(this.metrics.keys()).indexOf(metricName) + 2
-        }) .meter-fill`);
+    /**
+     * Reset all metrics to zero
+     */
+    resetMetrics() {
+        this.metrics.forEach((metric, name) => {
+            this.updateMetric(name, 0);
+        });
         
-        const valueLabel = this.element.querySelector(`.ethics-meter:nth-child(${
-            Array.from(this.metrics.keys()).indexOf(metricName) + 2
-        }) .meter-value`);
-
-        if (meterFill) {
-            meterFill.style.width = `${value}%`;
-        }
-        
-        if (valueLabel) {
-            valueLabel.textContent = Math.round(value);
-        }
-
-        // Update the metric value
-        const metric = this.metrics.get(metricName);
-        if (metric) {
-            metric.value = value;
-        }
+        this.emit('metricsReset');
     }
 }
 
+/**
+ * Enhanced FeedbackSystem - Modern feedback component with accessibility and theming
+ */
 class FeedbackSystem extends UIComponent {
     constructor(config = {}) {
         super({
             ...config,
+            ariaRole: 'alert',
+            ariaLabel: 'Feedback system',
+            accessible: true,
+            animated: config.animated !== false,
             styles: {
-                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                padding: '10px',
-                fontSize: '12px',
-                fontFamily: 'Arial, sans-serif',
-                overflow: 'hidden',
+                backgroundColor: 'var(--theme-surface)',
+                color: 'var(--theme-text)',
+                border: '1px solid var(--theme-border)',
+                borderRadius: '12px',
+                padding: '16px',
+                fontSize: '14px',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                maxWidth: '400px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                 ...config.styles
             }
         });
 
-        this.feedbacks = [];
-        this.maxFeedbacks = config.maxFeedbacks || 5;
+        this.feedbackQueue = [];
+        this.currentFeedback = null;
+        this.autoHide = config.autoHide !== false;
+        this.hideDelay = config.hideDelay || 5000;
+        this.maxItems = config.maxItems || 5;
+        this.position = config.position || 'top-right'; // top-right, top-left, bottom-right, bottom-left
         
-        this.createFeedbackDisplay();
+        this.createFeedbackContainer();
+        this.setupPositioning();
     }
-
-    createFeedbackDisplay() {
-        this.element.innerHTML = `
-            <h3 style="margin: 0 0 10px 0; font-size: 14px;">Feedback</h3>
-            <div class="feedback-list" style="height: calc(100% - 30px); overflow-y: auto;"></div>
-        `;
+    
+    /**
+     * Get appropriate element tag
+     */
+    getElementTag() {
+        return 'aside';
     }
-
-    addFeedback(text, type = 'neutral', duration = 5000) {
-        const feedback = {
-            id: Date.now(),
-            text,
-            type,
-            timestamp: new Date(),
-            duration
-        };
-
-        this.feedbacks.unshift(feedback);
+    
+    /**
+     * Get enhanced CSS classes
+     */
+    getElementClasses() {
+        const classes = super.getElementClasses();
+        const feedbackClasses = ['feedback-system', `position-${this.position}`];
         
-        // Remove old feedbacks
-        if (this.feedbacks.length > this.maxFeedbacks) {
-            this.feedbacks = this.feedbacks.slice(0, this.maxFeedbacks);
-        }
-
-        this.renderFeedbacks();
-
-        // Auto-remove after duration
-        if (duration > 0) {
-            setTimeout(() => {
-                this.removeFeedback(feedback.id);
-            }, duration);
-        }
+        if (this.animated) feedbackClasses.push('animated');
+        
+        return `${classes} ${feedbackClasses.join(' ')}`;
     }
 
-    removeFeedback(id) {
-        this.feedbacks = this.feedbacks.filter(f => f.id !== id);
-        this.renderFeedbacks();
-    }
+    createFeedbackContainer() {
+        try {
+            this.element.innerHTML = `
+                <div class="feedback-header" style="display: none;">
+                    <h3 class="feedback-title">Notifications</h3>
+                    <button class="feedback-clear" aria-label="Clear all notifications">Clear All</button>
+                </div>
+                <div class="feedback-list" role="log" aria-live="polite" aria-atomic="false"></div>
+            `;
 
-    renderFeedbacks() {
-        const list = this.element.querySelector('.feedback-list');
-        if (!list) return;
-
-        list.innerHTML = '';
-
-        this.feedbacks.forEach(feedback => {
-            const item = document.createElement('div');
-            item.className = `feedback-item feedback-${feedback.type}`;
+            this.setupFeedbackBehavior();
             
-            const colors = {
-                positive: '#4caf50',
-                negative: '#f44336',
-                neutral: '#2196f3',
-                excellent: '#8bc34a',
-                concerning: '#ff9800'
+        } catch (error) {
+            this.errorHandler(error, 'createFeedbackContainer');
+        }
+    }
+    
+    /**
+     * Setup feedback system positioning
+     */
+    setupPositioning() {
+        const positions = {
+            'top-right': { top: '20px', right: '20px' },
+            'top-left': { top: '20px', left: '20px' },
+            'bottom-right': { bottom: '20px', right: '20px' },
+            'bottom-left': { bottom: '20px', left: '20px' }
+        };
+        
+        const pos = positions[this.position] || positions['top-right'];
+        
+        Object.assign(this.element.style, {
+            position: 'fixed',
+            ...pos,
+            zIndex: '9999',
+            pointerEvents: 'auto'
+        });
+    }
+    
+    /**
+     * Setup feedback behavior
+     */
+    setupFeedbackBehavior() {
+        const clearButton = this.element.querySelector('.feedback-clear');
+        if (clearButton) {
+            clearButton.addEventListener('click', () => this.clearAll());
+            
+            Object.assign(clearButton.style, {
+                background: 'none',
+                border: 'none',
+                color: 'var(--theme-primary)',
+                cursor: 'pointer',
+                fontSize: '12px',
+                textDecoration: 'underline'
+            });
+        }
+    }
+
+    /**
+     * Show feedback message with enhanced styling and accessibility
+     */
+    showFeedback(message, type = 'info', options = {}) {
+        try {
+            const feedback = {
+                id: `feedback-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                message,
+                type,
+                timestamp: new Date(),
+                duration: options.duration || this.hideDelay,
+                persistent: options.persistent === true,
+                actions: options.actions || []
             };
 
-            item.style.cssText = `
-                padding: 8px;
-                margin-bottom: 5px;
-                border-left: 3px solid ${colors[feedback.type] || colors.neutral};
-                background: rgba(0,0,0,0.05);
-                border-radius: 3px;
-                font-size: 11px;
-                line-height: 1.3;
-                animation: slideIn 0.3s ease;
-            `;
+            // Add to queue and process
+            this.feedbackQueue.push(feedback);
+            if (this.feedbackQueue.length > this.maxItems) {
+                this.feedbackQueue.shift();
+            }
 
-            const time = feedback.timestamp.toLocaleTimeString();
-            item.innerHTML = `
-                <div style="color: #666; font-size: 10px; margin-bottom: 2px;">${time}</div>
-                <div>${feedback.text}</div>
-            `;
+            this.renderFeedback(feedback);
+            
+            // Auto-hide if not persistent
+            if (this.autoHide && !feedback.persistent) {
+                setTimeout(() => {
+                    this.hideFeedback(feedback.id);
+                }, feedback.duration);
+            }
 
-            list.appendChild(item);
+            this.emit('feedbackShown', feedback);
+            return feedback.id;
+            
+        } catch (error) {
+            this.errorHandler(error, 'showFeedback');
+            return null;
+        }
+    }
+    
+    /**
+     * Render individual feedback item
+     */
+    renderFeedback(feedback) {
+        const container = this.element.querySelector('.feedback-list');
+        if (!container) return;
+
+        const feedbackElement = document.createElement('div');
+        feedbackElement.className = `feedback-item feedback-${feedback.type}`;
+        feedbackElement.setAttribute('data-feedback-id', feedback.id);
+        feedbackElement.setAttribute('role', 'alert');
+        feedbackElement.setAttribute('aria-live', 'assertive');
+        
+        const typeIcons = {
+            success: '✓',
+            error: '✕',
+            warning: '⚠',
+            info: 'ℹ'
+        };
+        
+        const typeColors = {
+            success: '#22c55e',
+            error: '#ef4444',
+            warning: '#f59e0b',
+            info: '#3b82f6'
+        };
+
+        feedbackElement.innerHTML = `
+            <div class="feedback-icon" aria-hidden="true">${typeIcons[feedback.type] || typeIcons.info}</div>
+            <div class="feedback-content">
+                <div class="feedback-message">${feedback.message}</div>
+                ${feedback.actions.length > 0 ? `
+                    <div class="feedback-actions">
+                        ${feedback.actions.map(action => `
+                            <button class="feedback-action" data-action="${action.id}">
+                                ${action.label}
+                            </button>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            </div>
+            ${!feedback.persistent ? `
+                <button class="feedback-close" aria-label="Close notification" data-close="${feedback.id}">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            ` : ''}
+        `;
+
+        // Style the feedback item
+        Object.assign(feedbackElement.style, {
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '12px',
+            padding: '16px',
+            marginBottom: '12px',
+            backgroundColor: 'var(--theme-surface)',
+            border: `1px solid ${typeColors[feedback.type]}`,
+            borderLeft: `4px solid ${typeColors[feedback.type]}`,
+            borderRadius: '8px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            position: 'relative',
+            opacity: '0',
+            transform: this.position.includes('top') ? 'translateY(-20px)' : 'translateY(20px)',
+            transition: this.animated ? 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' : 'none'
+        });
+        
+        // Style components
+        this.styleFeedbackComponents(feedbackElement, feedback, typeColors[feedback.type]);
+        
+        // Setup event handlers
+        this.setupFeedbackEventHandlers(feedbackElement, feedback);
+
+        container.appendChild(feedbackElement);
+
+        // Animate in
+        if (this.animated) {
+            requestAnimationFrame(() => {
+                feedbackElement.style.opacity = '1';
+                feedbackElement.style.transform = 'translateY(0)';
+            });
+        } else {
+            feedbackElement.style.opacity = '1';
+            feedbackElement.style.transform = 'translateY(0)';
+        }
+
+        // Show header if we have multiple items
+        this.updateHeader();
+    }
+    
+    /**
+     * Style feedback components
+     */
+    styleFeedbackComponents(element, feedback, accentColor) {
+        const icon = element.querySelector('.feedback-icon');
+        if (icon) {
+            Object.assign(icon.style, {
+                color: accentColor,
+                fontSize: '18px',
+                fontWeight: 'bold',
+                minWidth: '20px',
+                textAlign: 'center'
+            });
+        }
+        
+        const content = element.querySelector('.feedback-content');
+        if (content) {
+            Object.assign(content.style, {
+                flex: '1',
+                lineHeight: '1.4'
+            });
+        }
+        
+        const message = element.querySelector('.feedback-message');
+        if (message) {
+            Object.assign(message.style, {
+                color: 'var(--theme-text)',
+                marginBottom: feedback.actions.length > 0 ? '8px' : '0'
+            });
+        }
+        
+        const actions = element.querySelector('.feedback-actions');
+        if (actions) {
+            Object.assign(actions.style, {
+                display: 'flex',
+                gap: '8px',
+                flexWrap: 'wrap'
+            });
+        }
+        
+        // Style action buttons
+        element.querySelectorAll('.feedback-action').forEach(btn => {
+            Object.assign(btn.style, {
+                padding: '4px 12px',
+                border: `1px solid ${accentColor}`,
+                backgroundColor: 'transparent',
+                color: accentColor,
+                borderRadius: '4px',
+                fontSize: '12px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+            });
+            
+            btn.addEventListener('mouseenter', () => {
+                btn.style.backgroundColor = accentColor;
+                btn.style.color = 'white';
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                btn.style.backgroundColor = 'transparent';
+                btn.style.color = accentColor;
+            });
+        });
+        
+        const closeBtn = element.querySelector('.feedback-close');
+        if (closeBtn) {
+            Object.assign(closeBtn.style, {
+                position: 'absolute',
+                top: '8px',
+                right: '8px',
+                background: 'none',
+                border: 'none',
+                fontSize: '18px',
+                color: 'var(--theme-text)',
+                cursor: 'pointer',
+                width: '24px',
+                height: '24px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                opacity: '0.7',
+                transition: 'all 0.2s ease'
+            });
+            
+            closeBtn.addEventListener('mouseenter', () => {
+                closeBtn.style.opacity = '1';
+                closeBtn.style.backgroundColor = 'var(--theme-border)';
+            });
+            
+            closeBtn.addEventListener('mouseleave', () => {
+                closeBtn.style.opacity = '0.7';
+                closeBtn.style.backgroundColor = 'transparent';
+            });
+        }
+    }
+    
+    /**
+     * Setup event handlers for feedback item
+     */
+    setupFeedbackEventHandlers(element, feedback) {
+        // Close button
+        const closeBtn = element.querySelector('.feedback-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                this.hideFeedback(feedback.id);
+            });
+        }
+        
+        // Action buttons
+        element.querySelectorAll('.feedback-action').forEach(btn => {
+            btn.addEventListener('click', (event) => {
+                const actionId = btn.getAttribute('data-action');
+                const action = feedback.actions.find(a => a.id === actionId);
+                
+                if (action && action.handler) {
+                    try {
+                        action.handler(feedback, event);
+                    } catch (error) {
+                        this.errorHandler(error, 'feedback-action');
+                    }
+                }
+                
+                // Hide feedback after action unless persistent
+                if (!feedback.persistent) {
+                    this.hideFeedback(feedback.id);
+                }
+            });
+        });
+        
+        // Keyboard navigation
+        element.addEventListener('keydown', (event) => {
+            if (this.disabled) return;
+            
+            if (event.key === 'Escape') {
+                this.hideFeedback(feedback.id);
+            }
         });
     }
 
-    clear() {
-        this.feedbacks = [];
-        this.renderFeedbacks();
+    /**
+     * Hide specific feedback item
+     */
+    hideFeedback(feedbackId) {
+        const element = this.element.querySelector(`[data-feedback-id="${feedbackId}"]`);
+        if (!element) return;
+
+        if (this.animated) {
+            element.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            element.style.opacity = '0';
+            element.style.transform = this.position.includes('top') ? 'translateY(-20px)' : 'translateY(20px)';
+            element.style.maxHeight = '0';
+            element.style.marginBottom = '0';
+            element.style.padding = '0 16px';
+            
+            setTimeout(() => {
+                if (element.parentNode) {
+                    element.parentNode.removeChild(element);
+                }
+                this.updateHeader();
+            }, 300);
+        } else {
+            element.parentNode?.removeChild(element);
+            this.updateHeader();
+        }
+
+        // Remove from queue
+        this.feedbackQueue = this.feedbackQueue.filter(f => f.id !== feedbackId);
+        
+        this.emit('feedbackHidden', { feedbackId });
+    }
+
+    /**
+     * Update header visibility
+     */
+    updateHeader() {
+        const header = this.element.querySelector('.feedback-header');
+        const items = this.element.querySelectorAll('.feedback-item');
+        
+        if (header) {
+            header.style.display = items.length > 1 ? 'flex' : 'none';
+            
+            if (items.length > 1) {
+                Object.assign(header.style, {
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '12px 16px',
+                    borderBottom: '1px solid var(--theme-border)',
+                    marginBottom: '12px'
+                });
+            }
+        }
+    }
+
+    /**
+     * Convenience methods for different feedback types
+     */
+    showSuccess(message, options = {}) {
+        return this.showFeedback(message, 'success', options);
+    }
+
+    showError(message, options = {}) {
+        return this.showFeedback(message, 'error', { ...options, persistent: true });
+    }
+
+    showWarning(message, options = {}) {
+        return this.showFeedback(message, 'warning', options);
+    }
+
+    showInfo(message, options = {}) {
+        return this.showFeedback(message, 'info', options);
+    }
+
+    /**
+     * Clear all feedback items
+     */
+    clearAll() {
+        const items = this.element.querySelectorAll('.feedback-item');
+        items.forEach(item => {
+            const feedbackId = item.getAttribute('data-feedback-id');
+            this.hideFeedback(feedbackId);
+        });
+        
+        this.emit('allFeedbackCleared');
+    }
+
+    /**
+     * Get current feedback count
+     */
+    getCount() {
+        return this.feedbackQueue.length;
+    }
+
+    /**
+     * Check if feedback system has any items
+     */
+    hasItems() {
+        return this.feedbackQueue.length > 0;
     }
 }
 
+/**
+ * Enhanced Button - Modern button component with accessibility and theming
+ */
 class Button extends UIComponent {
     constructor(config = {}) {
         super({
             ...config,
+            ariaRole: 'button',
+            focusable: true,
+            tabIndex: config.disabled ? -1 : 0,
             styles: {
-                backgroundColor: '#007cba',
-                color: 'white',
+                padding: '12px 24px',
                 border: 'none',
-                borderRadius: '6px',
-                padding: '10px 20px',
-                cursor: 'pointer',
+                borderRadius: '8px',
                 fontSize: '14px',
-                fontFamily: 'Arial, sans-serif',
-                textAlign: 'center',
-                lineHeight: '1',
-                transition: 'background-color 0.2s ease',
+                fontWeight: '500',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                cursor: config.disabled ? 'not-allowed' : 'pointer',
+                minHeight: `${UI_CONSTANTS.TOUCH_TARGET_SIZE}px`,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                textDecoration: 'none',
+                outline: 'none',
+                transition: 'all 0.2s ease',
                 ...config.styles
             }
         });
 
-        this.text = config.text || 'Button';
+        this.text = config.text || '';
+        this.icon = config.icon || null;
+        this.variant = config.variant || 'primary'; // primary, secondary, outline, ghost
+        this.size = config.size || 'medium'; // small, medium, large
+        this.disabled = config.disabled === true;
+        this.loading = config.loading === true;
         this.onClick = config.onClick || (() => {});
         
-        this.setupButton();
+        this.createButton();
+        this.applyVariantStyles();
+        this.setupButtonBehavior();
+    }
+    
+    /**
+     * Get appropriate element tag
+     */
+    getElementTag() {
+        return 'button';
+    }
+    
+    /**
+     * Get enhanced CSS classes
+     */
+    getElementClasses() {
+        const classes = super.getElementClasses();
+        const buttonClasses = [
+            'ui-button',
+            `variant-${this.variant}`,
+            `size-${this.size}`
+        ];
+        
+        if (this.disabled) buttonClasses.push('disabled');
+        if (this.loading) buttonClasses.push('loading');
+        
+        return `${classes} ${buttonClasses.join(' ')}`;
     }
 
-    setupButton() {
-        this.element.textContent = this.text;
-        this.element.style.display = 'flex';
-        this.element.style.alignItems = 'center';
-        this.element.style.justifyContent = 'center';
-
-        this.element.addEventListener('click', this.onClick);
+    createButton() {
+        try {
+            this.element.type = 'button';
+            this.element.disabled = this.disabled;
+            
+            if (this.ariaLabel) {
+                this.element.setAttribute('aria-label', this.ariaLabel);
+            }
+            
+            if (this.disabled) {
+                this.element.setAttribute('aria-disabled', 'true');
+            }
+            
+            this.updateButtonContent();
+            
+        } catch (error) {
+            this.errorHandler(error, 'createButton');
+        }
+    }
+    
+    /**
+     * Update button content
+     */
+    updateButtonContent() {
+        const content = [];
+        
+        if (this.loading) {
+            content.push('<span class="button-spinner" aria-hidden="true">⟳</span>');
+        } else if (this.icon) {
+            content.push(`<span class="button-icon" aria-hidden="true">${this.icon}</span>`);
+        }
+        
+        if (this.text) {
+            content.push(`<span class="button-text">${this.text}</span>`);
+        }
+        
+        this.element.innerHTML = content.join('');
+        
+        // Style the spinner
+        const spinner = this.element.querySelector('.button-spinner');
+        if (spinner) {
+            Object.assign(spinner.style, {
+                animation: 'spin 1s linear infinite',
+                display: 'inline-block'
+            });
+            
+            // Add spin animation if not exists
+            if (!document.getElementById('button-spin-animation')) {
+                const style = document.createElement('style');
+                style.id = 'button-spin-animation';
+                style.textContent = `
+                    @keyframes spin {
+                        from { transform: rotate(0deg); }
+                        to { transform: rotate(360deg); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+    }
+    
+    /**
+     * Apply variant-specific styles
+     */
+    applyVariantStyles() {
+        const variants = {
+            primary: {
+                backgroundColor: 'var(--theme-primary)',
+                color: 'white',
+                border: '1px solid var(--theme-primary)'
+            },
+            secondary: {
+                backgroundColor: 'var(--theme-border)',
+                color: 'var(--theme-text)',
+                border: '1px solid var(--theme-border)'
+            },
+            outline: {
+                backgroundColor: 'transparent',
+                color: 'var(--theme-primary)',
+                border: '1px solid var(--theme-primary)'
+            },
+            ghost: {
+                backgroundColor: 'transparent',
+                color: 'var(--theme-text)',
+                border: '1px solid transparent'
+            }
+        };
+        
+        const sizes = {
+            small: { padding: '8px 16px', fontSize: '12px', minHeight: '32px' },
+            medium: { padding: '12px 24px', fontSize: '14px', minHeight: '44px' },
+            large: { padding: '16px 32px', fontSize: '16px', minHeight: '52px' }
+        };
+        
+        const variantStyles = variants[this.variant] || variants.primary;
+        const sizeStyles = sizes[this.size] || sizes.medium;
+        
+        Object.assign(this.element.style, variantStyles, sizeStyles);
+        
+        if (this.disabled) {
+            this.element.style.opacity = '0.6';
+            this.element.style.cursor = 'not-allowed';
+        }
+    }
+    
+    /**
+     * Setup button behavior and interactions
+     */
+    setupButtonBehavior() {
+        if (this.disabled) return;
+        
+        // Click handler
+        this.element.addEventListener('click', (event) => {
+            if (this.loading) return;
+            
+            try {
+                this.onClick(event);
+                this.emit('click', { event });
+            } catch (error) {
+                this.errorHandler(error, 'button-click');
+            }
+        });
+        
+        // Hover effects
         this.element.addEventListener('mouseenter', () => {
-            this.element.style.backgroundColor = '#005a87';
+            if (this.disabled || this.loading) return;
+            
+            this.element.style.transform = 'translateY(-1px)';
+            this.element.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+            
+            // Variant-specific hover effects
+            if (this.variant === 'primary') {
+                this.element.style.filter = 'brightness(1.1)';
+            } else if (this.variant === 'outline' || this.variant === 'ghost') {
+                this.element.style.backgroundColor = 'var(--theme-primary)';
+                this.element.style.color = 'white';
+            }
         });
+        
         this.element.addEventListener('mouseleave', () => {
-            this.element.style.backgroundColor = '#007cba';
+            if (this.disabled || this.loading) return;
+            
+            this.element.style.transform = 'translateY(0)';
+            this.element.style.boxShadow = 'none';
+            this.element.style.filter = 'none';
+            
+            // Reset variant styles
+            this.applyVariantStyles();
         });
+        
+        // Active state
         this.element.addEventListener('mousedown', () => {
-            this.element.style.transform = 'scale(0.98)';
+            if (this.disabled || this.loading) return;
+            this.element.style.transform = 'translateY(0) scale(0.98)';
         });
+        
         this.element.addEventListener('mouseup', () => {
-            this.element.style.transform = 'scale(1)';
+            if (this.disabled || this.loading) return;
+            this.element.style.transform = 'translateY(-1px) scale(1)';
+        });
+        
+        // Keyboard navigation
+        this.element.addEventListener('keydown', (event) => {
+            if (this.disabled || this.loading) return;
+            
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                this.element.click();
+            }
         });
     }
 
+    /**
+     * Set button text
+     */
     setText(text) {
         this.text = text;
-        this.element.textContent = text;
+        this.updateButtonContent();
     }
-
-    setEnabled(enabled) {
-        this.element.disabled = !enabled;
-        this.element.style.opacity = enabled ? '1' : '0.6';
-        this.element.style.cursor = enabled ? 'pointer' : 'not-allowed';
+    
+    /**
+     * Set button icon
+     */
+    setIcon(icon) {
+        this.icon = icon;
+        this.updateButtonContent();
+    }
+    
+    /**
+     * Set loading state
+     */
+    setLoading(loading) {
+        this.loading = loading;
+        this.element.classList.toggle('loading', loading);
+        this.updateButtonContent();
+        
+        if (loading) {
+            this.element.setAttribute('aria-busy', 'true');
+        } else {
+            this.element.removeAttribute('aria-busy');
+        }
+    }
+    
+    /**
+     * Set disabled state
+     */
+    setDisabled(disabled) {
+        this.disabled = disabled;
+        this.element.disabled = disabled;
+        this.element.classList.toggle('disabled', disabled);
+        
+        if (disabled) {
+            this.element.setAttribute('aria-disabled', 'true');
+            this.element.tabIndex = -1;
+        } else {
+            this.element.removeAttribute('aria-disabled');
+            this.element.tabIndex = 0;
+        }
+        
+        this.applyVariantStyles();
+    }
+    
+    /**
+     * Set button variant
+     */
+    setVariant(variant) {
+        this.element.classList.remove(`variant-${this.variant}`);
+        this.variant = variant;
+        this.element.classList.add(`variant-${this.variant}`);
+        this.applyVariantStyles();
     }
 }
 
+/**
+ * Enhanced Slider - Modern slider component with accessibility and theming
+ */
 class Slider extends UIComponent {
     constructor(config = {}) {
         super({
             ...config,
-            size: config.size || { width: 200, height: 40 }
+            ariaRole: 'slider',
+            focusable: true,
+            tabIndex: config.disabled ? -1 : 0,
+            styles: {
+                position: 'relative',
+                width: '200px',
+                height: '24px',
+                ...config.styles
+            }
         });
 
         this.min = config.min || 0;
         this.max = config.max || 100;
-        this.value = config.value || 50;
+        this.value = Math.max(this.min, Math.min(this.max, config.value || this.min));
         this.step = config.step || 1;
+        this.disabled = config.disabled === true;
         this.label = config.label || '';
+        this.showValue = config.showValue !== false;
+        this.showLabels = config.showLabels === true;
+        this.orientation = config.orientation || 'horizontal'; // horizontal | vertical
         this.onChange = config.onChange || (() => {});
-
+        
+        this.isDragging = false;
+        
         this.createSlider();
+        this.setupSliderBehavior();
+    }
+    
+    /**
+     * Get enhanced CSS classes
+     */
+    getElementClasses() {
+        const classes = super.getElementClasses();
+        const sliderClasses = [
+            'ui-slider',
+            `orientation-${this.orientation}`
+        ];
+        
+        if (this.disabled) sliderClasses.push('disabled');
+        
+        return `${classes} ${sliderClasses.join(' ')}`;
     }
 
     createSlider() {
-        this.element.innerHTML = `
-            ${this.label ? `<label style="display: block; margin-bottom: 5px; font-size: 12px;">${this.label}</label>` : ''}
-            <div style="position: relative; height: 20px;">
-                <input type="range" 
-                       min="${this.min}" 
-                       max="${this.max}" 
-                       value="${this.value}" 
-                       step="${this.step}"
-                       style="width: 100%; height: 100%;">
-                <div class="slider-value" style="position: absolute; right: 0; top: 22px; font-size: 11px; color: #666;">
-                    ${this.value}
+        try {
+            // Set ARIA attributes
+            this.element.setAttribute('aria-valuemin', this.min);
+            this.element.setAttribute('aria-valuemax', this.max);
+            this.element.setAttribute('aria-valuenow', this.value);
+            
+            if (this.label) {
+                this.element.setAttribute('aria-label', this.label);
+            }
+            
+            if (this.disabled) {
+                this.element.setAttribute('aria-disabled', 'true');
+            }
+
+            this.element.innerHTML = `
+                ${this.label && this.showLabels ? `
+                    <div class="slider-label">${this.label}</div>
+                ` : ''}
+                <div class="slider-container">
+                    <div class="slider-track"></div>
+                    <div class="slider-filled"></div>
+                    <div class="slider-thumb" role="slider"></div>
+                    ${this.showLabels ? `
+                        <div class="slider-labels">
+                            <span class="slider-min-label">${this.min}</span>
+                            <span class="slider-max-label">${this.max}</span>
+                        </div>
+                    ` : ''}
                 </div>
-            </div>
-        `;
+                ${this.showValue ? `
+                    <div class="slider-value" aria-live="polite">${this.value}</div>
+                ` : ''}
+            `;
 
-        const input = this.element.querySelector('input[type="range"]');
+            this.styleSlider();
+            this.updateSliderPosition();
+            
+        } catch (error) {
+            this.errorHandler(error, 'createSlider');
+        }
+    }
+    
+    /**
+     * Style slider components
+     */
+    styleSlider() {
+        const container = this.element.querySelector('.slider-container');
+        const track = this.element.querySelector('.slider-track');
+        const filled = this.element.querySelector('.slider-filled');
+        const thumb = this.element.querySelector('.slider-thumb');
+        const label = this.element.querySelector('.slider-label');
         const valueDisplay = this.element.querySelector('.slider-value');
-
-        input.addEventListener('input', (e) => {
-            this.value = parseFloat(e.target.value);
-            valueDisplay.textContent = this.value;
-            this.onChange(this.value);
+        const labels = this.element.querySelector('.slider-labels');
+        
+        if (container) {
+            Object.assign(container.style, {
+                position: 'relative',
+                width: this.orientation === 'horizontal' ? '100%' : '24px',
+                height: this.orientation === 'horizontal' ? '24px' : '200px',
+                margin: this.orientation === 'horizontal' ? '12px 0' : '0 12px'
+            });
+        }
+        
+        if (track) {
+            Object.assign(track.style, {
+                position: 'absolute',
+                backgroundColor: 'var(--theme-border)',
+                borderRadius: '12px',
+                ...(this.orientation === 'horizontal' ? {
+                    top: '50%',
+                    left: '0',
+                    right: '0',
+                    height: '6px',
+                    transform: 'translateY(-50%)'
+                } : {
+                    left: '50%',
+                    top: '0',
+                    bottom: '0',
+                    width: '6px',
+                    transform: 'translateX(-50%)'
+                })
+            });
+        }
+        
+        if (filled) {
+            Object.assign(filled.style, {
+                position: 'absolute',
+                backgroundColor: 'var(--theme-primary)',
+                borderRadius: '12px',
+                transition: this.animated ? 'all 0.2s ease' : 'none',
+                ...(this.orientation === 'horizontal' ? {
+                    top: '50%',
+                    left: '0',
+                    height: '6px',
+                    transform: 'translateY(-50%)'
+                } : {
+                    left: '50%',
+                    bottom: '0',
+                    width: '6px',
+                    transform: 'translateX(-50%)'
+                })
+            });
+        }
+        
+        if (thumb) {
+            Object.assign(thumb.style, {
+                position: 'absolute',
+                width: '20px',
+                height: '20px',
+                backgroundColor: 'var(--theme-primary)',
+                borderRadius: '50%',
+                border: '2px solid white',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                cursor: this.disabled ? 'not-allowed' : 'grab',
+                transition: this.animated ? 'all 0.2s ease' : 'none',
+                opacity: this.disabled ? '0.6' : '1',
+                ...(this.orientation === 'horizontal' ? {
+                    top: '50%',
+                    transform: 'translate(-50%, -50%)'
+                } : {
+                    left: '50%',
+                    transform: 'translate(-50%, 50%)'
+                })
+            });
+        }
+        
+        if (label) {
+            Object.assign(label.style, {
+                fontSize: '14px',
+                fontWeight: '500',
+                color: 'var(--theme-text)',
+                marginBottom: this.orientation === 'horizontal' ? '8px' : '0',
+                marginRight: this.orientation === 'vertical' ? '8px' : '0'
+            });
+        }
+        
+        if (valueDisplay) {
+            Object.assign(valueDisplay.style, {
+                fontSize: '12px',
+                fontWeight: '600',
+                color: 'var(--theme-primary)',
+                textAlign: 'center',
+                marginTop: this.orientation === 'horizontal' ? '8px' : '0',
+                marginLeft: this.orientation === 'vertical' ? '8px' : '0'
+            });
+        }
+        
+        if (labels) {
+            Object.assign(labels.style, {
+                display: 'flex',
+                justifyContent: 'space-between',
+                fontSize: '11px',
+                color: 'var(--theme-text)',
+                opacity: '0.7',
+                marginTop: this.orientation === 'horizontal' ? '4px' : '0',
+                ...(this.orientation === 'vertical' ? {
+                    flexDirection: 'column',
+                    height: '100%',
+                    position: 'absolute',
+                    left: '100%',
+                    top: '0',
+                    marginLeft: '8px'
+                } : {})
+            });
+        }
+    }
+    
+    /**
+     * Update slider position based on current value
+     */
+    updateSliderPosition() {
+        const percentage = ((this.value - this.min) / (this.max - this.min)) * 100;
+        const filled = this.element.querySelector('.slider-filled');
+        const thumb = this.element.querySelector('.slider-thumb');
+        
+        if (this.orientation === 'horizontal') {
+            if (filled) filled.style.width = `${percentage}%`;
+            if (thumb) thumb.style.left = `${percentage}%`;
+        } else {
+            if (filled) filled.style.height = `${percentage}%`;
+            if (thumb) thumb.style.bottom = `${percentage}%`;
+        }
+    }
+    
+    /**
+     * Setup slider behavior and interactions
+     */
+    setupSliderBehavior() {
+        if (this.disabled) return;
+        
+        const container = this.element.querySelector('.slider-container');
+        const thumb = this.element.querySelector('.slider-thumb');
+        
+        if (!container || !thumb) return;
+        
+        // Mouse events
+        thumb.addEventListener('mousedown', this.handleMouseDown.bind(this));
+        container.addEventListener('click', this.handleTrackClick.bind(this));
+        
+        // Touch events
+        thumb.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
+        
+        // Keyboard events
+        this.element.addEventListener('keydown', this.handleKeyDown.bind(this));
+        
+        // Focus events
+        this.element.addEventListener('focus', () => {
+            thumb.style.boxShadow = '0 0 0 3px var(--theme-primary)30, 0 2px 4px rgba(0,0,0,0.2)';
+        });
+        
+        this.element.addEventListener('blur', () => {
+            thumb.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
         });
     }
-
-    setValue(value) {
-        this.value = Math.max(this.min, Math.min(this.max, value));
-        const input = this.element.querySelector('input[type="range"]');
-        const valueDisplay = this.element.querySelector('.slider-value');
+    
+    /**
+     * Handle mouse down on thumb
+     */
+    handleMouseDown(event) {
+        if (this.disabled) return;
         
-        if (input) input.value = this.value;
-        if (valueDisplay) valueDisplay.textContent = this.value;
+        event.preventDefault();
+        this.isDragging = true;
+        
+        const thumb = this.element.querySelector('.slider-thumb');
+        if (thumb) {
+            thumb.style.cursor = 'grabbing';
+        }
+        
+        document.addEventListener('mousemove', this.handleMouseMove.bind(this));
+        document.addEventListener('mouseup', this.handleMouseUp.bind(this));
+        
+        this.emit('dragStart', { value: this.value });
+    }
+    
+    /**
+     * Handle mouse move during drag
+     */
+    handleMouseMove(event) {
+        if (!this.isDragging || this.disabled) return;
+        
+        this.updateValueFromEvent(event);
+    }
+    
+    /**
+     * Handle mouse up to end drag
+     */
+    handleMouseUp(event) {
+        if (!this.isDragging) return;
+        
+        this.isDragging = false;
+        
+        const thumb = this.element.querySelector('.slider-thumb');
+        if (thumb) {
+            thumb.style.cursor = 'grab';
+        }
+        
+        document.removeEventListener('mousemove', this.handleMouseMove.bind(this));
+        document.removeEventListener('mouseup', this.handleMouseUp.bind(this));
+        
+        this.emit('dragEnd', { value: this.value });
+    }
+    
+    /**
+     * Handle touch start
+     */
+    handleTouchStart(event) {
+        if (this.disabled) return;
+        
+        event.preventDefault();
+        this.isDragging = true;
+        
+        document.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
+        document.addEventListener('touchend', this.handleTouchEnd.bind(this));
+        
+        this.emit('dragStart', { value: this.value });
+    }
+    
+    /**
+     * Handle touch move
+     */
+    handleTouchMove(event) {
+        if (!this.isDragging || this.disabled) return;
+        
+        event.preventDefault();
+        this.updateValueFromEvent(event.touches[0]);
+    }
+    
+    /**
+     * Handle touch end
+     */
+    handleTouchEnd(event) {
+        if (!this.isDragging) return;
+        
+        this.isDragging = false;
+        
+        document.removeEventListener('touchmove', this.handleTouchMove.bind(this));
+        document.removeEventListener('touchend', this.handleTouchEnd.bind(this));
+        
+        this.emit('dragEnd', { value: this.value });
+    }
+    
+    /**
+     * Handle track click
+     */
+    handleTrackClick(event) {
+        if (this.disabled || this.isDragging) return;
+        
+        const thumb = event.target.closest('.slider-thumb');
+        if (thumb) return; // Don't handle clicks on the thumb
+        
+        this.updateValueFromEvent(event);
+    }
+    
+    /**
+     * Handle keyboard navigation
+     */
+    handleKeyDown(event) {
+        if (this.disabled) return;
+        
+        let newValue = this.value;
+        const largeStep = this.step * 10;
+        
+        switch (event.key) {
+            case 'ArrowRight':
+            case 'ArrowUp':
+                event.preventDefault();
+                newValue = Math.min(this.max, this.value + this.step);
+                break;
+            case 'ArrowLeft':
+            case 'ArrowDown':
+                event.preventDefault();
+                newValue = Math.max(this.min, this.value - this.step);
+                break;
+            case 'PageUp':
+                event.preventDefault();
+                newValue = Math.min(this.max, this.value + largeStep);
+                break;
+            case 'PageDown':
+                event.preventDefault();
+                newValue = Math.max(this.min, this.value - largeStep);
+                break;
+            case 'Home':
+                event.preventDefault();
+                newValue = this.min;
+                break;
+            case 'End':
+                event.preventDefault();
+                newValue = this.max;
+                break;
+            default:
+                return;
+        }
+        
+        this.setValue(newValue);
+    }
+    
+    /**
+     * Update value from mouse/touch event
+     */
+    updateValueFromEvent(event) {
+        const container = this.element.querySelector('.slider-container');
+        if (!container) return;
+        
+        const rect = container.getBoundingClientRect();
+        let percentage;
+        
+        if (this.orientation === 'horizontal') {
+            percentage = (event.clientX - rect.left) / rect.width;
+        } else {
+            percentage = 1 - ((event.clientY - rect.top) / rect.height);
+        }
+        
+        percentage = Math.max(0, Math.min(1, percentage));
+        const newValue = this.min + (percentage * (this.max - this.min));
+        const steppedValue = Math.round(newValue / this.step) * this.step;
+        
+        this.setValue(steppedValue);
+    }
+
+    /**
+     * Set slider value
+     */
+    setValue(value) {
+        const oldValue = this.value;
+        this.value = Math.max(this.min, Math.min(this.max, value));
+        
+        // Update display
+        this.updateSliderPosition();
+        
+        // Update ARIA
+        this.element.setAttribute('aria-valuenow', this.value);
+        
+        // Update value display
+        const valueDisplay = this.element.querySelector('.slider-value');
+        if (valueDisplay) {
+            valueDisplay.textContent = this.value;
+        }
+        
+        // Call onChange if value actually changed
+        if (oldValue !== this.value) {
+            try {
+                this.onChange(this.value, oldValue);
+                this.emit('change', { value: this.value, oldValue });
+            } catch (error) {
+                this.errorHandler(error, 'slider-change');
+            }
+        }
+    }
+    
+    /**
+     * Get current value
+     */
+    getValue() {
+        return this.value;
+    }
+    
+    /**
+     * Set disabled state
+     */
+    setDisabled(disabled) {
+        this.disabled = disabled;
+        this.element.classList.toggle('disabled', disabled);
+        
+        if (disabled) {
+            this.element.setAttribute('aria-disabled', 'true');
+            this.element.tabIndex = -1;
+        } else {
+            this.element.removeAttribute('aria-disabled');
+            this.element.tabIndex = 0;
+        }
+        
+        this.styleSlider();
     }
 }
 
-// Export for ES6 modules
-export {
-    UIComponent,
-    UIPanel,
-    EthicsDisplay,
-    FeedbackSystem,
-    Button,
-    Slider
+// Export all UI components
+export { 
+    UIComponent, 
+    UIPanel, 
+    EthicsDisplay, 
+    FeedbackSystem, 
+    Button, 
+    Slider,
+    UIThemeManager,
+    UIPerformanceMonitor,
+    UI_CONSTANTS,
+    THEME_COLORS
 };
