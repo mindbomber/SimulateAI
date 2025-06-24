@@ -1,77 +1,406 @@
-# SimulateAI - Interactive AI Ethics Education Platform
+# SimulateAI - Enhanced Interactive Object System
 
-## Overview
+## 🎯 Project Overview
 
-SimulateAI is an educational platform inspired by PhET simulations, designed to teach AI and robotics safety and ethics through interactive, game-like simulations. The platform focuses on making complex ethical concepts accessible and engaging for learners of all levels.
+The Enhanced Interactive Object System is a comprehensive upgrade to SimulateAI's Visual Engine, providing advanced UI components, accessibility features, and a robust component registry system. This system addresses gaps in the original interactive object implementation by introducing specialized components for modal dialogs, navigation menus, data visualization, forms, and contextual help.
 
-## Features
+## ✨ Key Features
 
-- **Interactive Simulations**: Game-like scenarios exploring AI ethics concepts
-- **Multi-Renderer Engine**: Support for SVG, Canvas, and WebGL rendering
-- **Accessibility First**: Full keyboard navigation, screen reader support, and inclusive design
-- **Educational Tools**: Resources for educators and comprehensive progress tracking
-- **Privacy-Focused**: Local storage with optional anonymous analytics
+### 🧩 Advanced UI Components
+- **Modal Dialog System**: Feature-rich dialogs with animations, focus management, and accessibility
+- **Navigation Menus**: Horizontal and vertical navigation with keyboard support
+- **Data Visualization**: Interactive charts (line, bar, pie) with responsive design
+- **Form Components**: Comprehensive form inputs with validation and accessibility
+- **Tooltip System**: Smart positioning tooltips with customizable delays
 
-## Technology Stack
+### 🎯 Priority Components (NEW)
+- **DataTable**: Sortable, filterable data display with pagination and export capabilities
+- **NotificationToast**: Multi-type notification system with auto-dismiss and actions
+- **LoadingSpinner**: Versatile loading indicators with progress tracking and cancellation
 
-- **Frontend**: HTML5, JavaScript (ES6+), CSS3
-- **Rendering**: SVG, Canvas API, WebGL
-- **Build Tools**: Vite, ESLint, Prettier
-- **Testing**: Jest (planned)
+### 🏗️ Layout Components (NEW)
+- **TabContainer**: Multi-tab interface with reorderable tabs, badges, and keyboard navigation
+- **ProgressStepper**: Visual progress indicator for multi-step processes with validation
+- **SplitPane**: Resizable and collapsible panes for flexible layout management
+- **TreeView**: Hierarchical data display with expand/collapse and multi-selection
+- **FileUpload**: Drag-and-drop file upload with validation and progress tracking
 
-## Project Structure
+### 🎨 Component Registry
+- Centralized component management and instantiation
+- Type-safe component creation and destruction
+- Instance tracking and memory management
+- Extensible architecture for custom components
+
+### ♿ Accessibility First
+- ARIA roles, labels, and states for all components
+- Comprehensive keyboard navigation support
+- Screen reader compatibility
+- High contrast and reduced motion support
+- Focus management and trapped focus for modals
+
+### ⚡ Performance Optimized
+- Efficient rendering with multiple backend support (Canvas, SVG, WebGL)
+- Component pooling and memory management
+- Optimized event handling and update cycles
+- Debug tools and performance monitoring
+
+## 📁 Project Structure
 
 ```
 SimulateAI/
 ├── src/
 │   ├── js/
-│   │   ├── core/           # Core engine and simulation framework
-│   │   ├── simulations/    # Individual simulation modules
-│   │   ├── components/     # Reusable UI components
-│   │   └── utils/          # Utility functions and helpers
-│   ├── styles/             # CSS and styling
-│   └── assets/             # Images, icons, and media
-├── public/                 # Static public assets
-├── docs/                   # Documentation and guides
-└── dist/                   # Built application (generated)
+│   │   ├── core/
+│   │   │   └── visual-engine.js         # Enhanced with component registry
+│   │   ├── objects/
+│   │   │   ├── interactive-objects.js   # Base interactive components
+│   │   │   ├── enhanced-objects.js      # Enhanced object utilities
+│   │   │   ├── advanced-ui-components.js # Advanced UI components
+│   │   │   ├── priority-components.js   # High-priority components
+│   │   │   └── layout-components.js     # Layout management components
+│   │   └── demos/
+│   │       ├── visual-engine-demo.js    # Original demo
+│   │       ├── advanced-ui-demo.js      # Advanced components demo
+│   │       ├── priority-components-demo.js # Priority components demo
+│   │       └── layout-components-demo.js   # Layout components demo
+│   └── styles/
+│       ├── advanced-ui-components.css   # Advanced component styles
+│       ├── priority-components.css      # Priority component styles
+│       └── layout-components.css        # Layout component styles
+├── docs/
+│   └── enhanced-interactive-object-system.md  # Complete documentation
+├── tests/
+│   └── ui-components-test.js           # Comprehensive test suite
+├── advanced-ui-demo.html               # Interactive demo page
+└── README.md                           # This file
 ```
 
-## Quick Start
+## 🚀 Quick Start
 
-1. **Clone and install dependencies:**
-   ```bash
-   npm install
-   ```
+### 1. Basic Setup
 
-2. **Start development server:**
-   ```bash
-   npm run dev
-   ```
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="src/styles/advanced-ui-components.css">
+</head>
+<body>
+    <div id="demo-container" style="width: 800px; height: 600px;"></div>
+    
+    <script type="module">
+        import VisualEngine from './src/js/core/visual-engine.js';
+        
+        // Initialize the Visual Engine
+        const engine = new VisualEngine(document.getElementById('demo-container'), {
+            renderMode: 'auto',
+            accessibility: true,
+            debug: true
+        });
+        
+        // Create components using the registry
+        const button = engine.createComponent('button', {
+            x: 50, y: 50,
+            text: 'Click Me!',
+            onClick: () => alert('Hello World!')
+        });
+        
+        const chart = engine.createComponent('chart', {
+            x: 50, y: 150,            width: 400, height: 200,
+            type: 'line',
+            data: [[10, 20, 15, 25, 30]],
+            labels: ['A', 'B', 'C', 'D', 'E'],
+            title: 'Sample Data'
+        });
+        
+        engine.start();
+    </script>
+</body>
+</html>
+```
 
-3. **Build for production:**
-   ```bash
-   npm run build
-   ```
+### 2. Running the Demos
 
-## Simulations
+Open the interactive demo pages in a modern web browser to see all components in action:
 
-### Planned Simulations
-- **Bias & Fairness**: Explore algorithmic bias in hiring and lending
-- **Privacy & Consent**: Interactive scenarios about data collection
-- **Transparency & Explainability**: Understanding AI decision-making
-- **Autonomous Vehicles**: Ethical dilemmas in self-driving cars
-- **Social Media Algorithms**: Impact of recommendation systems
-- **Facial Recognition**: Privacy and surveillance considerations
+```bash
+# If using a local server (recommended)
+python -m http.server 8000
+# or
+npx serve .
 
-## Getting Started
+# Then navigate to:
+# http://localhost:8000/advanced-ui-demo.html          # Advanced UI components
+# http://localhost:8000/priority-components-demo.html  # Priority components
+# http://localhost:8000/layout-components-demo.html    # Layout components
+```
 
-### Prerequisites
-- Node.js (16.0 or higher)
-- npm (7.0 or higher)
-- Modern web browser with ES6+ support
+**Available Demos:**
+- **Advanced UI Demo** (`advanced-ui-demo.html`): Modal dialogs, navigation menus, charts, form fields, and tooltips
+- **Priority Components Demo** (`priority-components-demo.html`): Data tables, notification toasts, and loading spinners
+- **Layout Components Demo** (`layout-components-demo.html`): Tab containers, progress steppers, split panes, tree views, and file upload
 
-### Installation
-1. Clone the repository:
+### 3. Running Tests
+
+```javascript
+// In browser console or test environment
+import UIComponentTestSuite from './tests/ui-components-test.js';
+
+const testSuite = new UIComponentTestSuite();
+await testSuite.runAllTests();
+```
+
+## 📚 Components Reference
+
+### Core Interactive Components
+
+| Component | Description | Key Features |
+|-----------|-------------|--------------|
+| `Button` | Interactive button with click handling | Visual states, keyboard support, custom styling |
+| `Slider` | Draggable value input control | Range validation, step increments, accessibility |
+| `Meter` | Progress/value display component | Customizable fill, labels, value formatting |
+| `Label` | Text display with formatting | Font styling, color options, dynamic updates |
+
+### Priority Components (NEW)
+
+| Component | Description | Key Features |
+|-----------|-------------|--------------|
+| `DataTable` | Sortable, filterable data table | Pagination, row selection, export, accessibility |
+| `NotificationToast` | Multi-type notification system | Auto-dismiss, actions, smart positioning |
+| `LoadingSpinner` | Versatile loading indicators | Progress tracking, cancellation, multiple sizes |
+
+### Layout Components (NEW)
+
+| Component | Description | Key Features |
+|-----------|-------------|--------------|
+| `TabContainer` | Multi-tab interface | Reorderable tabs, badges, close buttons, keyboard navigation |
+| `ProgressStepper` | Multi-step process indicator | Horizontal/vertical, validation, click navigation |
+| `SplitPane` | Resizable layout panes | Drag-to-resize, collapsible, nested layouts |
+| `TreeView` | Hierarchical data display | Expand/collapse, multi-selection, icons, lazy loading |
+| `FileUpload` | File upload with drag-drop | Validation, progress tracking, multiple files |
+
+### Advanced UI Components
+
+| Component | Description | Key Features |
+|-----------|-------------|--------------|
+| `ModalDialog` | Feature-rich dialog system | Animations, focus trapping, backdrop handling |
+| `NavigationMenu` | Menu system with keyboard navigation | Horizontal/vertical layouts, selection states |
+| `Chart` | Data visualization component | Line/bar/pie charts, legends, responsive design |
+| `FormField` | Form input with validation | Multiple input types, error handling, accessibility |
+| `Tooltip` | Contextual help system | Smart positioning, delay configuration, rich content |
+
+## 🎨 Usage Examples
+
+### Creating a Modal Dialog
+
+```javascript
+const modal = engine.createComponent('modal-dialog', {
+    title: 'Confirmation',
+    content: `
+        <p>Are you sure you want to delete this item?</p>
+        <p>This action cannot be undone.</p>
+    `,
+    buttons: [
+        { text: 'Cancel', action: 'close', variant: 'secondary' },
+        { text: 'Delete', callback: handleDelete, variant: 'danger' }
+    ],
+    closable: true,
+    backdrop: true,
+    animation: 'slide'
+});
+
+modal.open();
+```
+
+### Building a Navigation Interface
+
+```javascript
+const navigation = engine.createComponent('navigation-menu', {
+    x: 20, y: 20,
+    width: 250, height: 400,
+    orientation: 'vertical',
+    items: [
+        { text: 'Dashboard', icon: '📊', action: () => showDashboard() },
+        { text: 'Analytics', icon: '📈', action: () => showAnalytics() },
+        { text: 'Settings', icon: '⚙️', action: () => showSettings() },
+        { text: 'Help', icon: '❓', action: () => showHelp() }
+    ]
+});
+```
+
+### Creating Priority Components
+
+```javascript
+// DataTable with AI model results
+const dataTable = engine.createComponent('data-table', {
+    x: 20, y: 60,
+    width: 700, height: 350,
+    columns: [
+        { key: 'name', title: 'Model Name', sortable: true },
+        { key: 'accuracy', title: 'Accuracy', type: 'number', format: v => `${(v*100).toFixed(1)}%` },
+        { key: 'bias_score', title: 'Bias Score', sortable: true },
+        { key: 'ethics_rating', title: 'Ethics Rating' }
+    ],
+    data: aiModelResults,
+    pagination: true,
+    pageSize: 15
+});
+
+// Success notification
+const successToast = engine.createComponent('notification-toast', {
+    message: 'Model training completed successfully!',
+    type: 'success',
+    duration: 5000,
+    actions: [
+        { text: 'View Results', callback: showResults },
+        { text: 'Export Data', callback: exportData }
+    ]
+});
+
+// Loading spinner with progress
+const loadingSpinner = engine.createComponent('loading-spinner', {
+    x: 400, y: 300,
+    size: 'large',
+    message: 'Training neural network...',
+    progress: 0.65,
+    cancellable: true,
+    onCancel: stopTraining
+});
+```
+
+### Creating Data Visualizations
+
+```javascript
+// Line chart
+const lineChart = engine.createComponent('chart', {
+    x: 50, y: 100,
+    width: 500, height: 250,
+    type: 'line',
+    data: [
+        [10, 25, 18, 35, 42, 28, 55], // Series 1
+        [15, 20, 30, 25, 38, 45, 40]  // Series 2
+    ],
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+    title: 'Performance Trends',
+    colors: ['#3498db', '#e74c3c'],
+    showLegend: true
+});
+```
+
+### Building Layout Components
+
+```javascript
+// Tab container for multi-view interface
+const tabContainer = engine.createComponent('tab-container', {
+    x: 50, y: 50,
+    width: 700, height: 400,
+    tabs: [
+        { id: 'overview', title: 'Overview', icon: '📊', content: 'System overview' },
+        { id: 'data', title: 'Data View', icon: '📁', content: 'Data visualization' },
+        { id: 'analysis', title: 'Analysis', icon: '🔍', content: 'Analysis results' }
+    ],
+    closeable: true,
+    reorderable: true
+});
+
+// Progress stepper for workflows
+const workflowStepper = engine.createComponent('progress-stepper', {
+    x: 50, y: 500,
+    width: 700, height: 80,
+    steps: [
+        { id: 'data', title: 'Data Collection', completed: true },
+        { id: 'processing', title: 'Processing', completed: true },
+        { id: 'analysis', title: 'Analysis', completed: false },
+        { id: 'results', title: 'Results', completed: false }
+    ],
+    currentStep: 2,
+    allowStepClick: true
+});
+
+// Split pane layout
+const splitPane = engine.createComponent('split-pane', {
+    x: 50, y: 50,
+    width: 800, height: 500,
+    orientation: 'horizontal',
+    split: 0.3,
+    resizable: true,
+    collapsible: true,
+    leftPane: 'Navigation content',
+    rightPane: 'Main content area'
+});
+
+// Tree view for hierarchical data
+const treeView = engine.createComponent('tree-view', {
+    x: 50, y: 50,
+    width: 300, height: 400,
+    data: [
+        {
+            id: 'models',
+            label: 'AI Models',
+            icon: '🤖',
+            children: [
+                { id: 'nn', label: 'Neural Networks', icon: '🧠' },
+                { id: 'ml', label: 'Machine Learning', icon: '📊' }
+            ]
+        }
+    ],
+    multiSelect: true,
+    showCheckboxes: true
+});
+
+// File upload component
+const fileUpload = engine.createComponent('file-upload', {
+    x: 50, y: 50,
+    width: 400, height: 200,
+    multiple: true,
+    accept: '.csv,.json,.txt',
+    maxFileSize: 10 * 1024 * 1024, // 10MB
+    uploadText: 'Drop training data files here'
+});
+```
+
+## ♿ Accessibility Features
+
+### Keyboard Navigation
+- **Tab/Shift+Tab**: Navigate between interactive elements
+- **Enter/Space**: Activate buttons and controls
+- **Arrow Keys**: Navigate menus and adjust sliders
+- **Escape**: Close modals and dropdowns
+- **Home/End**: Jump to first/last items
+
+### Screen Reader Support
+- Proper semantic markup and ARIA roles
+- Descriptive labels and help text
+- Live regions for dynamic content updates
+- State change announcements
+
+## 🧪 Testing
+
+### Running the Test Suite
+
+```javascript
+// Automated testing
+import UIComponentTestSuite from './tests/ui-components-test.js';
+
+const testSuite = new UIComponentTestSuite();
+const results = await testSuite.runAllTests();
+
+console.log(`Tests: ${results.passed}/${results.total} passed`);
+```
+
+## 📞 Support
+
+- **Documentation**: [Enhanced Interactive Object System Guide](docs/enhanced-interactive-object-system.md)
+- **Examples**: Check the `advanced-ui-demo.html` file
+- **Tests**: Run the test suite for verification
+
+---
+
+## 🎉 Conclusion
+
+The Enhanced Interactive Object System represents a significant advancement in SimulateAI's UI capabilities. With its comprehensive component library, accessibility-first design, and extensible architecture, it provides a solid foundation for building sophisticated AI simulation interfaces.
+
+**Ready to build amazing AI simulation interfaces? Start with the demo and explore the possibilities!** 🚀
    ```bash
    git clone https://github.com/mindbomber/SimulateAI.git
    ```

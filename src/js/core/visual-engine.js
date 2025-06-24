@@ -12,6 +12,13 @@ import CanvasRenderer from '../renderers/canvas-renderer.js';
 import SVGRenderer from '../renderers/svg-renderer.js';
 import WebGLRenderer from '../renderers/webgl-renderer.js';
 
+// Import interactive components
+import { Button, Slider, Meter, Label } from '../objects/interactive-objects.js';
+import { InteractiveButton, InteractiveSlider, EthicsMeter } from '../objects/enhanced-objects.js';
+import { ModalDialog, NavigationMenu, Chart, FormField, Tooltip } from '../objects/advanced-ui-components.js';
+import { DataTable, NotificationToast, LoadingSpinner } from '../objects/priority-components.js';
+import { TabContainer, ProgressStepper, SplitPane, TreeView, FileUpload } from '../objects/layout-components.js';
+
 export class VisualEngine {
     constructor(container, options = {}) {
         this.container = container;
@@ -51,19 +58,19 @@ export class VisualEngine {
         this.config = this.options;
         
         this.init();
-    }
-
-    init() {
+    }    init() {
         console.log('VisualEngine: Initializing...');
         
         this.setupRenderer();
         this.setupInputManager();
-        this.setupAccessibility();
-        this.setupEventListeners();
+        this.setupAccessibility();        this.setupEventListeners();
         this.setupPerformanceMonitoring();
+        this.setupComponentRegistry();
         
         console.log(`VisualEngine: Initialized with ${this.renderer.type} renderer`);
-    }    setupRenderer() {
+    }
+
+    setupRenderer() {
         const mode = this.determineOptimalRenderMode();
         
         switch(mode) {
@@ -121,6 +128,88 @@ export class VisualEngine {
         if (this.options.debug) {
             this.createDebugPanel();
         }
+    }
+
+    setupComponentRegistry() {
+        this.componentRegistry = new Map();
+        this.componentInstances = new Map();
+        
+        // Register core components
+        this.registerComponent('button', Button);
+        this.registerComponent('slider', Slider);
+        this.registerComponent('meter', Meter);
+        this.registerComponent('label', Label);
+        
+        // Register enhanced components
+        this.registerComponent('interactive-button', InteractiveButton);
+        this.registerComponent('interactive-slider', InteractiveSlider);
+        this.registerComponent('ethics-meter', EthicsMeter);
+        
+        // Register advanced UI components
+        this.registerComponent('modal-dialog', ModalDialog);
+        this.registerComponent('navigation-menu', NavigationMenu);
+        this.registerComponent('chart', Chart);
+        this.registerComponent('form-field', FormField);
+        this.registerComponent('tooltip', Tooltip);
+          // Register priority components
+        this.registerComponent('data-table', DataTable);
+        this.registerComponent('notification-toast', NotificationToast);
+        this.registerComponent('loading-spinner', LoadingSpinner);
+        
+        // Register layout components
+        this.registerComponent('tab-container', TabContainer);
+        this.registerComponent('progress-stepper', ProgressStepper);
+        this.registerComponent('split-pane', SplitPane);
+        this.registerComponent('tree-view', TreeView);
+        this.registerComponent('file-upload', FileUpload);
+        
+        console.log('Component registry initialized with', this.componentRegistry.size, 'component types');
+    }
+
+    registerComponent(name, componentClass) {
+        this.componentRegistry.set(name, componentClass);
+        this.componentInstances.set(name, new Set());
+    }
+
+    createComponent(type, options = {}) {
+        const ComponentClass = this.componentRegistry.get(type);
+        if (!ComponentClass) {
+            console.warn(`Component type "${type}" not found in registry`);
+            return null;
+        }
+        
+        const component = new ComponentClass(options);
+        this.componentInstances.get(type).add(component);
+        
+        // Add to scene
+        this.addObject(component);
+        
+        return component;
+    }
+
+    destroyComponent(component) {
+        // Find component type and remove from instances
+        for (const [type, instances] of this.componentInstances) {
+            if (instances.has(component)) {
+                instances.delete(component);
+                break;
+            }
+        }
+        
+        // Remove from scene
+        this.removeObject(component);
+    }
+
+    getComponentsByType(type) {
+        return Array.from(this.componentInstances.get(type) || []);
+    }
+
+    getAllComponents() {
+        const all = [];
+        for (const instances of this.componentInstances.values()) {
+            all.push(...instances);
+        }
+        return all;
     }
 
     determineOptimalRenderMode() {

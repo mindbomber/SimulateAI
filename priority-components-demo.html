@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priority Components Demo - SimulateAI</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .demo-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .demo-header h1 {
+            font-size: 2.5rem;
+            margin: 0 0 10px 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .demo-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        .demo-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+            margin: 0 auto;
+            max-width: 1240px;
+        }
+
+        .demo-toolbar {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .demo-info {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .demo-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-running {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-stopped {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .demo-stats {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-size: 0.9rem;
+            min-width: 200px;
+            backdrop-filter: blur(10px);
+        }
+
+        .demo-stats h4 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 1rem;
+        }
+
+        .demo-stats .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            padding: 2px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .demo-stats .stat-label {
+            color: #666;
+        }
+
+        .demo-stats .stat-value {
+            font-weight: 600;
+            color: #007bff;
+        }
+
+        .feature-list {
+            margin-top: 20px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .feature-list h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .feature-item {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #007bff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .feature-item h4 {
+            margin: 0 0 8px 0;
+            color: #007bff;
+            font-size: 1rem;
+        }
+
+        .feature-item p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .feature-item ul {
+            margin: 8px 0 0 0;
+            padding-left: 16px;
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .demo-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .demo-actions {
+                justify-content: center;
+            }
+
+            .demo-stats {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 20px auto;
+                max-width: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-header">
+        <h1>Priority Components Demo</h1>
+        <p>Advanced reusable UI components for SimulateAI - DataTable, Notifications, and Loading Spinners</p>
+    </div>
+
+    <div class="demo-container">
+        <div class="demo-toolbar">
+            <div class="demo-info">
+                <span class="status-indicator status-running" id="engine-status">
+                    <span>●</span> Engine Running
+                </span>
+                <span>Renderer: <strong id="renderer-type">Canvas</strong></span>
+                <span>FPS: <strong id="fps-counter">60</strong></span>
+            </div>
+            <div class="demo-actions">
+                <button class="btn btn-success" id="start-demo" onclick="startDemo()">Start Demo</button>
+                <button class="btn btn-danger" id="stop-demo" onclick="stopDemo()" disabled>Stop Demo</button>
+                <button class="btn btn-secondary" onclick="refreshDemo()">Refresh</button>
+                <button class="btn btn-primary" onclick="exportData()">Export Demo Data</button>
+            </div>
+        </div>
+
+        <!-- Demo canvas will be inserted here -->
+        <div id="demo-container"></div>
+    </div>
+
+    <!-- Live statistics panel -->
+    <div class="demo-stats">
+        <h4>Live Statistics</h4>
+        <div class="stat-item">
+            <span class="stat-label">Components:</span>
+            <span class="stat-value" id="component-count">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Notifications:</span>
+            <span class="stat-value" id="notification-count">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Registered Types:</span>
+            <span class="stat-value" id="registered-types">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Memory Usage:</span>
+            <span class="stat-value" id="memory-usage">N/A</span>
+        </div>
+    </div>
+
+    <!-- Feature overview -->
+    <div class="feature-list">
+        <h3>Featured Components</h3>
+        <div class="feature-grid">
+            <div class="feature-item">
+                <h4>📊 DataTable</h4>
+                <p>Advanced data table with sorting, filtering, pagination, and row selection.</p>
+                <ul>
+                    <li>Multi-column sorting</li>
+                    <li>Real-time filtering</li>
+                    <li>Pagination for large datasets</li>
+                    <li>Row selection and export</li>
+                    <li>Accessibility support</li>
+                </ul>
+            </div>
+            <div class="feature-item">
+                <h4>🔔 NotificationToast</h4>
+                <p>Flexible notification system with multiple types and auto-dismiss.</p>
+                <ul>
+                    <li>Success, error, warning, info types</li>
+                    <li>Auto-dismiss with progress</li>
+                    <li>Action buttons support</li>
+                    <li>Smart positioning</li>
+                    <li>Accessibility announcements</li>
+                </ul>
+            </div>
+            <div class="feature-item">
+                <h4>⏳ LoadingSpinner</h4>
+                <p>Versatile loading indicators for async operations and progress tracking.</p>
+                <ul>
+                    <li>Multiple sizes and styles</li>
+                    <li>Determinate and indeterminate modes</li>
+                    <li>Progress percentage display</li>
+                    <li>Cancellation support</li>
+                    <li>Overlay and inline modes</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import PriorityComponentsDemo from './src/js/demos/priority-components-demo.js';
+        
+        let demo = null;
+        let statsInterval = null;
+
+        // Make functions globally available
+        window.startDemo = startDemo;
+        window.stopDemo = stopDemo;
+        window.refreshDemo = refreshDemo;
+        window.exportData = exportData;
+
+        async function startDemo() {
+            console.log('Starting Priority Components Demo...');
+            
+            try {
+                // Show loading state
+                document.getElementById('start-demo').disabled = true;
+                document.getElementById('start-demo').textContent = 'Starting...';
+                document.querySelector('.demo-container').classList.add('loading');
+
+                // Initialize demo
+                demo = new PriorityComponentsDemo();
+                await demo.init();
+
+                // Update UI
+                document.getElementById('start-demo').disabled = true;
+                document.getElementById('stop-demo').disabled = false;
+                document.getElementById('start-demo').textContent = 'Demo Running';
+                document.querySelector('.demo-container').classList.remove('loading');
+                
+                // Update status
+                const statusEl = document.getElementById('engine-status');
+                statusEl.className = 'status-indicator status-running';
+                statusEl.innerHTML = '<span>●</span> Engine Running';
+
+                // Start statistics updates
+                startStatsUpdates();
+
+                console.log('Demo started successfully');
+            } catch (error) {
+                console.error('Failed to start demo:', error);
+                
+                // Reset UI on error
+                document.getElementById('start-demo').disabled = false;
+                document.getElementById('start-demo').textContent = 'Start Demo';
+                document.querySelector('.demo-container').classList.remove('loading');
+                
+                alert('Failed to start demo. Check console for details.');
+            }
+        }
+
+        function stopDemo() {
+            console.log('Stopping demo...');
+            
+            if (demo) {
+                demo.destroy();
+                demo = null;
+            }
+
+            // Stop statistics updates
+            if (statsInterval) {
+                clearInterval(statsInterval);
+                statsInterval = null;
+            }
+
+            // Update UI
+            document.getElementById('start-demo').disabled = false;
+            document.getElementById('stop-demo').disabled = true;
+            document.getElementById('start-demo').textContent = 'Start Demo';
+            
+            // Update status
+            const statusEl = document.getElementById('engine-status');
+            statusEl.className = 'status-indicator status-stopped';
+            statusEl.innerHTML = '<span>●</span> Engine Stopped';
+
+            // Clear stats
+            document.getElementById('component-count').textContent = '0';
+            document.getElementById('notification-count').textContent = '0';
+            document.getElementById('registered-types').textContent = '0';
+            document.getElementById('memory-usage').textContent = 'N/A';
+
+            console.log('Demo stopped');
+        }
+
+        function refreshDemo() {
+            console.log('Refreshing demo...');
+            
+            if (demo) {
+                stopDemo();
+                setTimeout(startDemo, 100);
+            } else {
+                startDemo();
+            }
+        }
+
+        function exportData() {
+            console.log('Exporting demo data...');
+            
+            if (demo) {
+                const stats = demo.getComponentStats();
+                const exportData = {
+                    timestamp: new Date().toISOString(),
+                    statistics: stats,
+                    components: Array.from(demo.components.keys()),
+                    notifications: demo.notifications.length
+                };
+
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `priority-components-demo-${Date.now()}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+
+                console.log('Demo data exported');
+            } else {
+                alert('Demo is not running. Start the demo first.');
+            }
+        }
+
+        function startStatsUpdates() {
+            if (statsInterval) return;
+
+            statsInterval = setInterval(() => {
+                if (!demo || !demo.engine) return;
+
+                try {
+                    const stats = demo.getComponentStats();
+                    
+                    document.getElementById('component-count').textContent = stats.totalComponents;
+                    document.getElementById('notification-count').textContent = stats.notifications;
+                    document.getElementById('registered-types').textContent = stats.registeredTypes;
+                    
+                    // Update FPS if available
+                    if (demo.engine.performanceStats) {
+                        document.getElementById('fps-counter').textContent = 
+                            Math.round(demo.engine.performanceStats.fps || 60);
+                    }
+
+                    // Update memory usage if available
+                    if (performance.memory) {
+                        const usedMB = Math.round(performance.memory.usedJSHeapSize / 1048576);
+                        document.getElementById('memory-usage').textContent = `${usedMB} MB`;
+                    }
+                } catch (error) {
+                    console.warn('Stats update failed:', error);
+                }
+            }, 1000);
+        }
+
+        // Auto-start demo on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Page loaded, initializing demo...');
+            // Slight delay to ensure everything is ready
+            setTimeout(startDemo, 500);
+        });
+
+        // Handle page unload
+        window.addEventListener('beforeunload', () => {
+            if (demo) {
+                stopDemo();
+            }
+        });
+
+        // Handle visibility changes for performance
+        document.addEventListener('visibilitychange', () => {
+            if (demo && demo.engine) {
+                if (document.hidden) {
+                    demo.engine.pause();
+                } else {
+                    demo.engine.resume();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

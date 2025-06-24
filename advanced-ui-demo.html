@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SimulateAI - Enhanced Interactive Object System Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .demo-container {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        #demo-canvas {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .controls button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .controls button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .info-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            max-width: 300px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-panel h3 {
+            margin-bottom: 10px;
+            color: #4fc3f7;
+        }
+
+        .info-panel ul {
+            list-style: none;
+        }
+
+        .info-panel li {
+            margin-bottom: 5px;
+            padding: 2px 0;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .error {
+            background: rgba(244, 67, 54, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .demo-container {
+                padding: 10px;
+            }
+            
+            #demo-canvas {
+                width: 100% !important;
+                height: auto !important;
+            }
+            
+            .info-panel {
+                position: relative;
+                margin: 10px;
+            }
+        }
+
+        /* Accessibility enhancements */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            body {
+                background: white;
+                color: black;
+            }
+            
+            .header {
+                background: black;
+                color: white;
+            }
+            
+            #demo-canvas {
+                border: 2px solid black;
+            }
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+    
+    <!-- Link to advanced UI components CSS -->
+    <link rel="stylesheet" href="../styles/advanced-ui-components.css">
+</head>
+<body>
+    <header class="header">
+        <h1>Enhanced Interactive Object System</h1>
+        <p>
+            Comprehensive demonstration of SimulateAI's advanced UI components featuring modal dialogs, 
+            navigation menus, data visualization, form components, tooltips, and accessibility features.
+        </p>
+    </header>
+
+    <main class="demo-container">
+        <div id="demo-canvas" style="width: 1200px; height: 800px;">
+            <div class="loading">
+                <div>Loading Enhanced UI Components Demo...</div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="controls">
+        <button id="reset-btn" title="Reset demo to initial state (Ctrl+R)">Reset Demo</button>
+        <button id="help-btn" title="Show help information (Ctrl+H)">Help</button>
+        <button id="toggle-debug" title="Toggle debug information">Toggle Debug</button>
+        <button id="accessibility-btn" title="Test accessibility features">Accessibility Test</button>
+    </footer>
+
+    <aside class="info-panel" id="info-panel">
+        <h3>Component Status</h3>
+        <ul id="component-list">
+            <li>🔄 Initializing components...</li>
+        </ul>
+        <div style="margin-top: 10px; font-size: 11px; color: #90caf9;">
+            <strong>Keyboard Shortcuts:</strong><br>
+            • Ctrl+H: Help<br>
+            • Ctrl+R: Reset<br>
+            • Esc: Close Modals<br>
+            • Tab: Navigate UI
+        </div>
+    </aside>
+
+    <!-- Screen reader announcements -->
+    <div id="sr-announcements" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+    <script type="module">
+        import AdvancedUIDemo from './src/js/demos/advanced-ui-demo.js';
+
+        class DemoController {
+            constructor() {
+                this.demo = null;
+                this.isDebugMode = true;
+                this.componentStatus = new Map();
+                
+                this.init();
+            }
+
+            async init() {
+                try {
+                    await this.setupDemo();
+                    this.setupEventListeners();
+                    this.startStatusMonitoring();
+                    this.announceToScreenReader('Enhanced UI Components Demo loaded successfully');
+                } catch (error) {
+                    this.handleError(error);
+                }
+            }
+
+            async setupDemo() {
+                const container = document.getElementById('demo-canvas');
+                
+                // Clear loading message
+                container.innerHTML = '';
+                
+                // Initialize the advanced UI demo
+                this.demo = new AdvancedUIDemo(container, {
+                    debug: this.isDebugMode,
+                    title: 'Interactive Object System Showcase',
+                    description: 'Complete demonstration of all advanced UI components'
+                });
+
+                // Wait for initialization
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                this.updateComponentStatus();
+            }
+
+            setupEventListeners() {
+                // Control buttons
+                document.getElementById('reset-btn').addEventListener('click', () => {
+                    this.resetDemo();
+                });
+
+                document.getElementById('help-btn').addEventListener('click', () => {
+                    this.showHelp();
+                });
+
+                document.getElementById('toggle-debug').addEventListener('click', () => {
+                    this.toggleDebug();
+                });
+
+                document.getElementById('accessibility-btn').addEventListener('click', () => {
+                    this.testAccessibility();
+                });
+
+                // Global keyboard shortcuts
+                document.addEventListener('keydown', (event) => {
+                    if (event.ctrlKey) {
+                        switch(event.key) {
+                            case 'h':
+                                this.showHelp();
+                                event.preventDefault();
+                                break;
+                            case 'r':
+                                this.resetDemo();
+                                event.preventDefault();
+                                break;
+                        }
+                    }
+                });
+
+                // Window resize handling
+                window.addEventListener('resize', () => {
+                    this.handleResize();
+                });
+            }
+
+            startStatusMonitoring() {
+                setInterval(() => {
+                    this.updateComponentStatus();
+                }, 2000);
+            }
+
+            updateComponentStatus() {
+                if (!this.demo || !this.demo.engine) return;
+
+                const stats = this.demo.engine.getStats();
+                const components = this.demo.engine.getAllComponents();
+                
+                const componentList = document.getElementById('component-list');
+                componentList.innerHTML = `
+                    <li>📊 Total Components: ${components.length}</li>
+                    <li>🎭 Interactive Objects: ${stats.interactiveObjects}</li>
+                    <li>⚡ FPS: ${stats.fps}</li>
+                    <li>🖥️ Renderer: ${stats.renderer}</li>
+                    <li>🔄 Status: ${stats.isRunning ? 'Running' : 'Stopped'}</li>
+                `;
+
+                // Component type breakdown
+                const componentTypes = new Map();
+                components.forEach(comp => {
+                    const type = comp.constructor.name;
+                    componentTypes.set(type, (componentTypes.get(type) || 0) + 1);
+                });
+
+                componentTypes.forEach((count, type) => {
+                    const li = document.createElement('li');
+                    li.textContent = `${this.getComponentIcon(type)} ${type}: ${count}`;
+                    componentList.appendChild(li);
+                });
+            }
+
+            getComponentIcon(componentType) {
+                const icons = {
+                    'Button': '🔘',
+                    'Slider': '🎚️',
+                    'Meter': '📊',
+                    'Label': '🏷️',
+                    'ModalDialog': '📋',
+                    'NavigationMenu': '🧭',
+                    'Chart': '📈',
+                    'FormField': '📝',
+                    'Tooltip': '💭'
+                };
+                return icons[componentType] || '🔧';
+            }
+
+            resetDemo() {
+                if (this.demo) {
+                    this.demo.resetDemo();
+                    this.announceToScreenReader('Demo reset to initial state');
+                }
+            }
+
+            showHelp() {
+                if (this.demo) {
+                    this.demo.showHelp();
+                }
+            }
+
+            toggleDebug() {
+                this.isDebugMode = !this.isDebugMode;
+                
+                const button = document.getElementById('toggle-debug');
+                button.textContent = this.isDebugMode ? 'Hide Debug' : 'Show Debug';
+                
+                if (this.demo && this.demo.engine) {
+                    this.demo.engine.options.debug = this.isDebugMode;
+                }
+                
+                this.announceToScreenReader(`Debug mode ${this.isDebugMode ? 'enabled' : 'disabled'}`);
+            }
+
+            testAccessibility() {
+                // Test accessibility features
+                const components = this.demo.engine.getAllComponents();
+                let accessibleCount = 0;
+                
+                components.forEach(comp => {
+                    if (comp.ariaRole || comp.accessibilityConfig) {
+                        accessibleCount++;
+                    }
+                });
+
+                const message = `Accessibility test: ${accessibleCount} of ${components.length} components have accessibility features`;
+                this.announceToScreenReader(message);
+                console.log(message);
+                
+                // Test keyboard navigation
+                this.testKeyboardNavigation();
+            }
+
+            testKeyboardNavigation() {
+                // Focus on first interactive element
+                const interactiveElements = document.querySelectorAll('button, input, select, textarea, [tabindex]');
+                if (interactiveElements.length > 0) {
+                    interactiveElements[0].focus();
+                    this.announceToScreenReader('Keyboard navigation test started. Use Tab to navigate.');
+                }
+            }
+
+            handleResize() {
+                if (this.demo && this.demo.engine) {
+                    // Handle responsive design
+                    const container = document.getElementById('demo-canvas');
+                    const rect = container.getBoundingClientRect();
+                    
+                    if (rect.width < 768) {
+                        // Mobile layout adjustments
+                        container.style.width = '100%';
+                        container.style.height = 'auto';
+                    }
+                }
+            }
+
+            announceToScreenReader(message) {
+                const announcements = document.getElementById('sr-announcements');
+                announcements.textContent = message;
+                
+                // Clear after a moment so subsequent announcements work
+                setTimeout(() => {
+                    announcements.textContent = '';
+                }, 1000);
+            }
+
+            handleError(error) {
+                console.error('Demo initialization error:', error);
+                
+                const container = document.getElementById('demo-canvas');
+                container.innerHTML = `
+                    <div class="error">
+                        <h3>Demo Initialization Error</h3>
+                        <p>Failed to load the Enhanced UI Components Demo.</p>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <button onclick="location.reload()">Reload Page</button>
+                    </div>
+                `;
+                
+                this.announceToScreenReader('Demo failed to load. Please check console for details.');
+            }
+
+            destroy() {
+                if (this.demo) {
+                    this.demo.destroy();
+                }
+            }
+        }
+
+        // Initialize demo controller when page loads
+        window.addEventListener('load', () => {
+            window.demoController = new DemoController();
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (window.demoController) {
+                window.demoController.destroy();
+            }
+        });
+    </script>
+</body>
+</html>
