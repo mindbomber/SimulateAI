@@ -1,13 +1,13 @@
 {
     "mcp.filesystem.allowedDirectories": [
-        "c:/Users/soria/OneDrive/Desktop/SimulateAI"
+        "C:/Users/soria/VibeCoding/SimulateAI"
     ],
     "mcp.servers": {
         "filesystem": {
             "command": "npx",
             "args": [
                 "@modelcontextprotocol/server-filesystem",
-                "c:/Users/soria/OneDrive/Desktop/SimulateAI"
+                "C:/Users/soria/VibeCoding/SimulateAI"
             ],
             "type": "stdio"
         }
