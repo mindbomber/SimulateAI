@@ -131,6 +131,17 @@
     position: relative;
     flex: 1;
     min-width: 0;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.progress-stepper__step:hover:not(.progress-stepper__step--disabled) {
+    opacity: 0.8;
+}
+
+.progress-stepper__step--disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 .progress-stepper--vertical .progress-stepper__step {
@@ -150,7 +161,7 @@
     font-size: 12px;
     font-weight: bold;
     position: relative;
-    z-index: 2;
+    z-index: 10;
     transition: all 0.3s ease;
 }
 
@@ -184,7 +195,7 @@
     height: 2px;
     background-color: #e9ecef;
     position: relative;
-    z-index: 1;
+    z-index: 5;
 }
 
 .progress-stepper--vertical .progress-stepper__line {
@@ -206,19 +217,18 @@
 .progress-stepper--vertical .progress-stepper__content {
     margin-left: 12px;
     margin-top: -20px;
-}
-
-.progress-stepper__title {
-    font-size: 11px;
-    font-weight: bold;
-    color: #333333;
-    margin-bottom: 2px;
-}
-
-.progress-stepper__description {
-    font-size: 10px;
-    color: #666666;
-}
+}    .progress-stepper__title {
+        font-size: 11px;
+        font-weight: bold;
+        color: #333333;
+        margin-bottom: 2px;
+    }
+    
+    .progress-stepper__description {
+        font-size: 10px;
+        color: #666666;
+        line-height: 1.3;
+    }
 
 .progress-stepper__step--active .progress-stepper__title {
     color: #007bff;
@@ -508,6 +518,11 @@
     font-size: 12px;
 }
 
+.file-upload__file-item--error {
+    border-color: #dc3545;
+    background-color: #ffeaea;
+}
+
 .file-upload__file-icon {
     margin-right: 8px;
     color: #666666;
@@ -564,6 +579,61 @@
     background-color: rgba(255, 255, 255, 0.9);
     padding: 2px 8px;
     border-radius: 4px;
+}
+
+/* =============================================================================
+   ERROR STATES AND VISUAL FEEDBACK
+   ============================================================================= */
+
+.tab-container--error {
+    border-color: #dc3545;
+}
+
+.tab-container__tab--error {
+    border-bottom-color: #dc3545;
+    color: #dc3545;
+}
+
+.progress-stepper__step--error .progress-stepper__circle {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: #ffffff;
+}
+
+.tree-view--error {
+    border-color: #dc3545;
+}
+
+.file-upload--error {
+    border-color: #dc3545;
+    background-color: #ffeaea;
+}
+
+/* Loading states */
+.tab-container--loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.progress-stepper--loading .progress-stepper__circle {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
+
+/* Improved disabled states */
+.tab-container__tab--disabled,
+.progress-stepper__step--disabled,
+.tree-view__node--disabled,
+.file-upload--disabled {
+    filter: grayscale(100%);
 }
 
 /* =============================================================================
@@ -633,6 +703,15 @@
         border-bottom-color: #63b3ed;
     }
     
+    .tab-container__tab--disabled {
+        color: #718096;
+    }
+    
+    .tab-container__content {
+        background-color: #2d3748;
+        color: #e2e8f0;
+    }
+    
     .progress-stepper__circle--inactive {
         background-color: #4a5568;
         border-color: #4a5568;
@@ -641,6 +720,14 @@
     
     .progress-stepper__line {
         background-color: #4a5568;
+    }
+    
+    .progress-stepper__title {
+        color: #e2e8f0;
+    }
+    
+    .progress-stepper__description {
+        color: #a0aec0;
     }
     
     .split-pane__splitter {
@@ -660,9 +747,19 @@
         color: #63b3ed;
     }
     
+    .tree-view__expand-icon,
+    .tree-view__icon {
+        color: #a0aec0;
+    }
+    
+    .tree-view__checkbox {
+        border-color: #718096;
+    }
+    
     .file-upload {
         background-color: #1a202c;
         border-color: #4a5568;
+        color: #e2e8f0;
     }
     
     .file-upload:hover {
@@ -670,9 +767,27 @@
         background-color: #2c5282;
     }
     
+    .file-upload__text {
+        color: #e2e8f0;
+    }
+    
     .file-upload__file-item {
         background-color: #2d3748;
         border-color: #4a5568;
+        color: #e2e8f0;
+    }
+    
+    .file-upload__file-size {
+        color: #a0aec0;
+    }
+    
+    .file-upload__progress {
+        background-color: #4a5568;
+    }
+    
+    .file-upload__progress-text {
+        color: #e2e8f0;
+        background-color: rgba(45, 55, 72, 0.9);
     }
 }
 
@@ -683,7 +798,9 @@
 .tab-container__tab:focus,
 .progress-stepper__step:focus,
 .tree-view__node:focus,
-.file-upload:focus {
+.file-upload:focus,
+.file-upload__button:focus,
+.tree-view__expand-icon:focus {
     outline: 2px solid #007bff;
     outline-offset: 2px;
 }
@@ -691,11 +808,21 @@
 @media (prefers-reduced-motion: reduce) {
     .tab-container__tab,
     .progress-stepper__circle,
+    .progress-stepper__line,
     .split-pane__splitter,
     .tree-view__node,
+    .tree-view__expand-icon,
     .file-upload,
-    .file-upload__progress-bar {
+    .file-upload__progress-bar,
+    .file-upload__button,
+    .tab-container__tab-close,
+    .tree-view__checkbox {
         transition: none;
+        animation: none;
+    }
+    
+    .file-upload--drag-over {
+        transform: none;
     }
 }
 
@@ -714,5 +841,33 @@
     
     .progress-stepper__circle {
         border-width: 3px;
+    }
+    
+    .progress-stepper__line {
+        height: 3px;
+    }
+    
+    .tree-view__checkbox {
+        border-width: 2px;
+    }
+    
+    .file-upload {
+        border-width: 3px;
+    }
+    
+    /* Enhanced contrast colors */
+    .tab-container__tab--active {
+        color: #0056b3;
+        border-bottom-color: #0056b3;
+    }
+    
+    .progress-stepper__circle--active {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+    
+    .tree-view__node--selected {
+        background-color: #0056b3;
+        color: #ffffff;
     }
 }

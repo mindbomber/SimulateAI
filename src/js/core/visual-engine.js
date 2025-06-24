@@ -18,6 +18,7 @@ import { InteractiveButton, InteractiveSlider, EthicsMeter } from '../objects/en
 import { ModalDialog, NavigationMenu, Chart, FormField, Tooltip } from '../objects/advanced-ui-components.js';
 import { DataTable, NotificationToast, LoadingSpinner } from '../objects/priority-components.js';
 import { TabContainer, ProgressStepper, SplitPane, TreeView, FileUpload } from '../objects/layout-components.js';
+import { ColorPicker, Accordion, DateTimePicker, NumberInput, Drawer, SearchBox } from '../objects/input-utility-components.js';
 
 export class VisualEngine {
     constructor(container, options = {}) {
@@ -46,9 +47,9 @@ export class VisualEngine {
         this.frameCount = 0;
         this.fpsCounter = 0;
         this.lastFPSUpdate = 0;
-        
-        // Performance monitoring
-        this.performanceStats = {            fps: 0,
+          // Performance monitoring
+        this.performanceStats = {
+            fps: 0,
             frameTime: 0,
             renderTime: 0,
             updateTime: 0
@@ -56,14 +57,15 @@ export class VisualEngine {
         
         // Add compatibility alias for EthicsSimulation
         this.config = this.options;
-        
-        this.init();
-    }    init() {
+          this.init();
+    }
+
+    init() {
         console.log('VisualEngine: Initializing...');
-        
-        this.setupRenderer();
+          this.setupRenderer();
         this.setupInputManager();
-        this.setupAccessibility();        this.setupEventListeners();
+        this.setupAccessibility();
+        this.setupEventListeners();
         this.setupPerformanceMonitoring();
         this.setupComponentRegistry();
         
@@ -105,14 +107,19 @@ export class VisualEngine {
             this.accessibilityManager = new AccessibilityManager(this.container);
             this.accessibilityManager.engine = this;
         }
-    }
-
-    setupEventListeners() {
+    }    setupEventListeners() {
         // Handle container resize
-        const resizeObserver = new ResizeObserver(() => {
-            this.handleResize();
-        });
-        resizeObserver.observe(this.container);
+        if (typeof ResizeObserver !== 'undefined') {
+            const resizeObserver = new ResizeObserver(() => {
+                this.handleResize();
+            });
+            resizeObserver.observe(this.container);
+        } else {
+            // Fallback for older browsers
+            window.addEventListener('resize', () => {
+                this.handleResize();
+            });
+        }
         
         // Handle visibility changes for performance optimization
         document.addEventListener('visibilitychange', () => {
@@ -149,12 +156,11 @@ export class VisualEngine {
         this.registerComponent('modal-dialog', ModalDialog);
         this.registerComponent('navigation-menu', NavigationMenu);
         this.registerComponent('chart', Chart);
-        this.registerComponent('form-field', FormField);
-        this.registerComponent('tooltip', Tooltip);
-          // Register priority components
+        this.registerComponent('form-field', FormField);        this.registerComponent('tooltip', Tooltip);
+        
+        // Register priority components
         this.registerComponent('data-table', DataTable);
-        this.registerComponent('notification-toast', NotificationToast);
-        this.registerComponent('loading-spinner', LoadingSpinner);
+        this.registerComponent('notification-toast', NotificationToast);        this.registerComponent('loading-spinner', LoadingSpinner);
         
         // Register layout components
         this.registerComponent('tab-container', TabContainer);
@@ -163,31 +169,45 @@ export class VisualEngine {
         this.registerComponent('tree-view', TreeView);
         this.registerComponent('file-upload', FileUpload);
         
+        // Register input/utility components
+        this.registerComponent('color-picker', ColorPicker);
+        this.registerComponent('accordion', Accordion);
+        this.registerComponent('datetime-picker', DateTimePicker);
+        this.registerComponent('number-input', NumberInput);
+        this.registerComponent('drawer', Drawer);
+        this.registerComponent('search-box', SearchBox);
+        
         console.log('Component registry initialized with', this.componentRegistry.size, 'component types');
     }
 
     registerComponent(name, componentClass) {
         this.componentRegistry.set(name, componentClass);
         this.componentInstances.set(name, new Set());
-    }
-
-    createComponent(type, options = {}) {
+    }    createComponent(type, options = {}) {
         const ComponentClass = this.componentRegistry.get(type);
         if (!ComponentClass) {
             console.warn(`Component type "${type}" not found in registry`);
             return null;
         }
         
-        const component = new ComponentClass(options);
-        this.componentInstances.get(type).add(component);
+        try {
+            const component = new ComponentClass(options);
+            this.componentInstances.get(type).add(component);
+            
+            // Add to scene
+            this.addObject(component);
+            
+            return component;
+        } catch (error) {
+            console.error(`Failed to create component of type "${type}":`, error);
+            return null;
+        }
+    }destroyComponent(component) {
+        if (!component) {
+            console.warn('Attempted to destroy null/undefined component');
+            return;
+        }
         
-        // Add to scene
-        this.addObject(component);
-        
-        return component;
-    }
-
-    destroyComponent(component) {
         // Find component type and remove from instances
         for (const [type, instances] of this.componentInstances) {
             if (instances.has(component)) {
@@ -249,17 +269,21 @@ export class VisualEngine {
         } catch (e) {
             return false;
         }
-    }
-
-    detectLowEndDevice() {
+    }    detectLowEndDevice() {
         // Basic heuristics for detecting low-end devices
-        const memory = navigator.deviceMemory;
-        const cores = navigator.hardwareConcurrency;
-        
-        if (memory && memory < 2) return true; // Less than 2GB RAM
-        if (cores && cores < 2) return true;   // Single core
-        
-        return false;
+        try {
+            const memory = navigator.deviceMemory;
+            const cores = navigator.hardwareConcurrency;
+            
+            if (memory && memory < 2) return true; // Less than 2GB RAM
+            if (cores && cores < 2) return true;   // Single core
+            
+            return false;
+        } catch (error) {
+            // If device detection fails, assume it's not a low-end device
+            console.warn('Device detection failed:', error);
+            return false;
+        }
     }
 
     // Animation loop with performance optimization
@@ -351,14 +375,17 @@ export class VisualEngine {
             this.performanceStats.fps = Math.round((this.frameCount * 1000) / (currentTime - this.lastFPSUpdate));
             this.frameCount = 0;
             this.lastFPSUpdate = currentTime;
-            
-            if (this.options.debug) {
+              if (this.options.debug) {
                 this.updateDebugPanel();
             }
-        }    }
-
-    // Object management
+        }
+    }    // Object management
     addObject(object) {
+        if (!object) {
+            console.warn('Attempted to add null/undefined object to scene');
+            return null;
+        }
+        
         this.scene.add(object);
         
         if (this.accessibilityManager && object.isInteractive && object.accessibilityConfig) {
@@ -369,6 +396,11 @@ export class VisualEngine {
     }
 
     removeObject(object) {
+        if (!object) {
+            console.warn('Attempted to remove null/undefined object from scene');
+            return;
+        }
+        
         this.scene.remove(object);
         
         if (this.accessibilityManager && object.isInteractive) {
@@ -441,25 +473,27 @@ export class VisualEngine {
         }
         
         this.container.appendChild(this.debugPanel);
-    }
-
-    updateDebugPanel() {
+    }    updateDebugPanel() {
         if (!this.debugPanel) return;
         
-        const stats = this.performanceStats;
-        const objects = this.scene.objects.length;
-        const interactiveObjects = this.scene.interactiveObjects.length;
-        
-        this.debugPanel.innerHTML = `
-            <div><strong>Visual Engine Debug</strong></div>
-            <div>FPS: ${stats.fps}</div>
-            <div>Frame Time: ${stats.frameTime.toFixed(2)}ms</div>
-            <div>Update Time: ${stats.updateTime.toFixed(2)}ms</div>
-            <div>Render Time: ${stats.renderTime.toFixed(2)}ms</div>
-            <div>Objects: ${objects}</div>
-            <div>Interactive: ${interactiveObjects}</div>
-            <div>Renderer: ${this.renderer.type}</div>
-        `;
+        try {
+            const stats = this.performanceStats;
+            const objects = this.scene.objects ? this.scene.objects.length : 0;
+            const interactiveObjects = this.scene.interactiveObjects ? this.scene.interactiveObjects.length : 0;
+            
+            this.debugPanel.innerHTML = `
+                <div><strong>Visual Engine Debug</strong></div>
+                <div>FPS: ${stats.fps}</div>
+                <div>Frame Time: ${stats.frameTime.toFixed(2)}ms</div>
+                <div>Update Time: ${stats.updateTime.toFixed(2)}ms</div>
+                <div>Render Time: ${stats.renderTime.toFixed(2)}ms</div>
+                <div>Objects: ${objects}</div>
+                <div>Interactive: ${interactiveObjects}</div>
+                <div>Renderer: ${this.renderer ? this.renderer.type : 'None'}</div>
+            `;
+        } catch (error) {
+            console.error('Error updating debug panel:', error);
+        }
     }
 
     // Utility methods
@@ -472,26 +506,40 @@ export class VisualEngine {
             isRunning: this.isRunning,
             isPaused: this.isPaused
         };
-    }
-
-    // Cleanup
+    }    // Cleanup
     destroy() {
-        this.stop();
-        
-        if (this.inputManager) {
-            this.inputManager.destroy();
+        try {
+            this.stop();
+            
+            if (this.inputManager && typeof this.inputManager.destroy === 'function') {
+                this.inputManager.destroy();
+            }
+            
+            if (this.renderer && typeof this.renderer.destroy === 'function') {
+                this.renderer.destroy();
+            }
+            
+            if (this.accessibilityManager && typeof this.accessibilityManager.destroy === 'function') {
+                this.accessibilityManager.destroy();
+            }
+            
+            if (this.debugPanel && this.debugPanel.parentNode) {
+                this.debugPanel.parentNode.removeChild(this.debugPanel);
+            }
+            
+            if (this.scene && typeof this.scene.clear === 'function') {
+                this.scene.clear();
+            }
+            
+            // Clear component instances
+            if (this.componentInstances) {
+                this.componentInstances.clear();
+            }
+            
+            console.log('VisualEngine: Destroyed');
+        } catch (error) {
+            console.error('Error during VisualEngine destruction:', error);
         }
-        
-        if (this.renderer && this.renderer.destroy) {
-            this.renderer.destroy();
-        }
-        
-        if (this.debugPanel && this.debugPanel.parentNode) {
-            this.debugPanel.parentNode.removeChild(this.debugPanel);
-        }
-        
-        this.scene.clear();
-        console.log('VisualEngine: Destroyed');
     }
 }
 

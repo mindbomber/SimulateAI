@@ -25,6 +25,14 @@ The Enhanced Interactive Object System is a comprehensive upgrade to SimulateAI'
 - **TreeView**: Hierarchical data display with expand/collapse and multi-selection
 - **FileUpload**: Drag-and-drop file upload with validation and progress tracking
 
+### 🎛️ Input & Utility Components (NEW)
+- **ColorPicker**: Advanced color selection with HSL wheel, alpha support, and presets
+- **DateTimePicker**: Comprehensive date/time selection with calendar and time controls
+- **NumberInput**: Precise numeric input with validation, step controls, and formatting
+- **Accordion**: Collapsible content sections with smooth animations
+- **Drawer**: Sliding panels from any side with overlay and animation support
+- **SearchBox**: Smart search with autocomplete, debouncing, and suggestions
+
 ### 🎨 Component Registry
 - Centralized component management and instantiation
 - Type-safe component creation and destruction
@@ -57,7 +65,8 @@ SimulateAI/
 │   │   │   ├── enhanced-objects.js      # Enhanced object utilities
 │   │   │   ├── advanced-ui-components.js # Advanced UI components
 │   │   │   ├── priority-components.js   # High-priority components
-│   │   │   └── layout-components.js     # Layout management components
+│   │   │   ├── layout-components.js     # Layout management components
+│   │   │   └── input-utility-components.js # Input & utility components
 │   │   └── demos/
 │   │       ├── visual-engine-demo.js    # Original demo
 │   │       ├── advanced-ui-demo.js      # Advanced components demo
@@ -71,9 +80,12 @@ SimulateAI/
 │   └── enhanced-interactive-object-system.md  # Complete documentation
 ├── tests/
 │   └── ui-components-test.js           # Comprehensive test suite
+├── NO_HTML_GENERATION_POLICY.md       # Component development policy
 ├── advanced-ui-demo.html               # Interactive demo page
 └── README.md                           # This file
 ```
+
+**Note**: New components no longer generate individual HTML demo or test files. See `NO_HTML_GENERATION_POLICY.md` for details.
 
 ## 🚀 Quick Start
 
@@ -133,12 +145,14 @@ npx serve .
 # http://localhost:8000/advanced-ui-demo.html          # Advanced UI components
 # http://localhost:8000/priority-components-demo.html  # Priority components
 # http://localhost:8000/layout-components-demo.html    # Layout components
+# http://localhost:8000/input-utility-demo.html        # Input & utility components
 ```
 
 **Available Demos:**
 - **Advanced UI Demo** (`advanced-ui-demo.html`): Modal dialogs, navigation menus, charts, form fields, and tooltips
 - **Priority Components Demo** (`priority-components-demo.html`): Data tables, notification toasts, and loading spinners
 - **Layout Components Demo** (`layout-components-demo.html`): Tab containers, progress steppers, split panes, tree views, and file upload
+- **Input & Utility Demo** (`input-utility-demo.html`): Color picker, date/time picker, number input, accordion, drawer, and search box
 
 ### 3. Running Tests
 
@@ -188,6 +202,17 @@ await testSuite.runAllTests();
 | `Chart` | Data visualization component | Line/bar/pie charts, legends, responsive design |
 | `FormField` | Form input with validation | Multiple input types, error handling, accessibility |
 | `Tooltip` | Contextual help system | Smart positioning, delay configuration, rich content |
+
+### Input & Utility Components (NEW)
+
+| Component | Description | Key Features |
+|-----------|-------------|--------------|
+| `ColorPicker` | Advanced color selection | HSL wheel, alpha support, presets, multiple formats |
+| `DateTimePicker` | Date and time input | Calendar interface, time controls, date validation |
+| `NumberInput` | Precise numeric input | Step controls, validation, precision formatting |
+| `Accordion` | Collapsible content sections | Smooth animations, multiple expand modes |
+| `Drawer` | Sliding panel component | Multiple positions, overlay, animation support |
+| `SearchBox` | Smart search input | Autocomplete, debouncing, suggestions |
 
 ## 🎨 Usage Examples
 
@@ -359,6 +384,91 @@ const fileUpload = engine.createComponent('file-upload', {
 });
 ```
 
+### Creating Input & Utility Components
+
+```javascript
+// Advanced color picker
+const colorPicker = engine.createComponent('color-picker', {
+    x: 50, y: 50,
+    value: '#3498db',
+    showAlpha: true,
+    presets: ['#3498db', '#e74c3c', '#2ecc71', '#f39c12']
+});
+
+colorPicker.on('colorChanged', (event) => {
+    updateThemeColor(event.value);
+});
+
+// Date range picker for analytics
+const dateRange = engine.createComponent('datetime-picker', {
+    x: 300, y: 50,
+    showTime: false,
+    format: 'YYYY-MM-DD',
+    minDate: new Date('2024-01-01'),
+    maxDate: new Date()
+});
+
+// Smart search with suggestions
+const searchBox = engine.createComponent('search-box', {
+    x: 50, y: 150,
+    placeholder: 'Search AI models...',
+    suggestions: [
+        'Neural Network',
+        'Deep Learning Model',
+        'Computer Vision',
+        'Natural Language Processing',
+        'Reinforcement Learning'
+    ],
+    debounceDelay: 300
+});
+
+searchBox.on('search', async (event) => {
+    const results = await searchModels(event.query);
+    displaySearchResults(results);
+});
+
+// Settings accordion
+const settingsAccordion = engine.createComponent('accordion', {
+    x: 400, y: 150,
+    width: 350,
+    items: [
+        {
+            id: 'model-settings',
+            title: 'Model Configuration',
+            icon: '🤖',
+            content: 'Learning rate, batch size, epochs configuration...'
+        },
+        {
+            id: 'data-settings',
+            title: 'Data Processing',
+            icon: '📊',
+            content: 'Data preprocessing, augmentation, validation split...'
+        },
+        {
+            id: 'export-settings',
+            title: 'Export Options',
+            icon: '💾',
+            content: 'Model export formats, optimization settings...'
+        }
+    ]
+});
+
+// Navigation drawer
+const navigationDrawer = engine.createComponent('drawer', {
+    position: 'left',
+    width: 280,
+    title: 'AI Toolkit',
+    content: `
+        🏠 Dashboard
+        🧠 Neural Networks
+        👁️ Computer Vision
+        💬 NLP Models
+        📈 Analytics
+        ⚙️ Settings
+    `
+});
+```
+
 ## ♿ Accessibility Features
 
 ### Keyboard Navigation
@@ -388,11 +498,44 @@ const results = await testSuite.runAllTests();
 console.log(`Tests: ${results.passed}/${results.total} passed`);
 ```
 
+### Component Development Policy
+
+**⚠️ Important**: As of the latest update, **we no longer generate HTML demo files or test files** for new components. This policy helps maintain consistency and reduces maintenance overhead.
+
+For new components, create:
+- ✅ JavaScript demo classes (integrated with existing demos)
+- ✅ CSS stylesheets
+- ✅ JavaScript test suites
+- ✅ Markdown documentation
+- ❌ ~~HTML demo pages~~
+- ❌ ~~HTML test files~~
+
+See `NO_HTML_GENERATION_POLICY.md` for complete details.
+
 ## 📞 Support
 
 - **Documentation**: [Enhanced Interactive Object System Guide](docs/enhanced-interactive-object-system.md)
-- **Examples**: Check the `advanced-ui-demo.html` file
-- **Tests**: Run the test suite for verification
+- **Developer Guide**: [Component Development Workflow](docs/DEVELOPER_GUIDE.md)
+- **Policy Document**: [HTML Generation Policy](NO_HTML_GENERATION_POLICY.md)
+- **Examples**: Check existing HTML demo files for usage examples
+- **Tests**: Run the JavaScript test suites for verification
+- **Component Verification**: Run `npm run verify` to check all components
+
+### Development Quick Start
+
+```bash
+# Verify project structure and policy compliance
+npm run verify
+
+# Check that no HTML generation policy is followed
+npm run check-policy
+
+# Format code according to standards
+npm run format
+
+# Lint JavaScript files
+npm run lint
+```
 
 ---
 

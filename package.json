@@ -8,8 +8,10 @@
     "preview": "vite preview",
     "test": "echo \"Tests will be added\" && exit 0",
     "lint": "eslint src/js/**/*.js",
-    "format": "prettier --write src/**/*.{js,css,html}"
-  },  "keywords": ["ai", "ethics", "education", "simulation", "robotics", "safety"],
+    "format": "prettier --write src/**/*.{js,css,html}",
+    "verify": "node verify-components.js",
+    "check-policy": "echo \"Checking HTML generation policy compliance...\" && node verify-components.js"
+  },"keywords": ["ai", "ethics", "education", "simulation", "robotics", "safety"],
   "author": "SimulateAI",
   "license": "MIT",
   "repository": {

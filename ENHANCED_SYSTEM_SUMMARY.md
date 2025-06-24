@@ -1,5 +1,21 @@
 # Enhanced Interactive Object System - Project Summary
 
+## ⚠️ IMPORTANT: HTML GENERATION POLICY UPDATE
+
+**As of the latest update, this project no longer generates HTML demo files or test files for new components.**
+
+### Policy Changes:
+- ❌ **NO new HTML demo files** (e.g., `new-component-demo.html`)
+- ❌ **NO new HTML test files** (e.g., `new-component-test.html`)
+- ✅ **JavaScript demos integrated** with existing demo frameworks
+- ✅ **JavaScript test suites** for comprehensive testing
+- ✅ **Markdown documentation** for all components
+- ✅ **Existing HTML demos maintained** but no new ones created
+
+**See `NO_HTML_GENERATION_POLICY.md` and `docs/DEVELOPER_GUIDE.md` for complete details.**
+
+---
+
 ## 🎯 Audit Results and Gap Analysis
 
 ### Original System Gaps Identified
@@ -251,6 +267,58 @@ const modal = engine.createComponent('modal-dialog', {
 
 modal.open();
 ```
+
+## 🔄 Updated Development Workflow
+
+### Component Development Process (Post-Policy Update)
+
+#### 1. Component Creation
+```javascript
+// 1. Implement component in appropriate category file
+export class NewComponent extends InteractiveObject {
+    constructor(options = {}) {
+        super({ type: 'new-component', ...options });
+        this.initialize();
+    }
+}
+
+// 2. Register in Visual Engine
+engine.registerComponent('new-component', NewComponent);
+
+// 3. Integrate with existing demo framework
+demo.createNewComponentDemo();
+```
+
+#### 2. Testing Strategy
+- ✅ **JavaScript Test Suites**: Comprehensive unit and integration tests
+- ✅ **Demo Integration**: Add to existing demo classes
+- ❌ ~~HTML Test Files~~: No longer created
+- ✅ **Documentation**: Markdown-based component docs
+
+#### 3. File Structure for New Components
+```
+New Component Development:
+├── src/js/objects/category-components.js    # Implementation
+├── src/js/demos/category-demo.js           # Demo integration
+├── src/styles/category-components.css      # Styling
+├── tests/category-test.js                  # Testing
+├── docs/category-components.md             # Documentation
+└── (NO HTML files created)                 # Policy compliance
+```
+
+#### 4. Integration Points
+- **Visual Engine**: Component registration and lifecycle
+- **Demo Framework**: Add to existing demo classes, not new HTML files
+- **CSS Framework**: Extend existing stylesheets
+- **Test Framework**: Add to existing test suites
+- **Documentation**: Update markdown files and README
+
+### Benefits of New Workflow
+- 🎯 **Reduced Complexity**: Fewer files per component
+- 🚀 **Faster Development**: No HTML file creation overhead
+- 🧪 **Better Testing**: JavaScript tests more robust than HTML
+- 📚 **Consistent Documentation**: Centralized in existing systems
+- 🔧 **Easier Maintenance**: Fewer files to maintain and update
 
 ## ✅ Success Metrics
 

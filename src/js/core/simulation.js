@@ -4,6 +4,7 @@
  */
 
 import StorageManager from '../utils/storage.js';
+import AnalyticsManager from '../utils/analytics.js';
 import { UIComponent, UIPanel, EthicsDisplay, FeedbackSystem } from './ui.js';
 
 class EthicsSimulation {
@@ -110,9 +111,12 @@ class EthicsSimulation {
         
         this.informationPanel = panel;
         this.engine.addComponent(panel);
-    }
-
-    createFeedbackSystem() {
+    }    createFeedbackSystem() {
+        if (!this.engine || !this.engine.config) {
+            console.error('Engine not properly initialized for feedback system');
+            return;
+        }
+        
         this.feedbackSystem = new FeedbackSystem({
             position: { x: this.engine.config.width - 220, y: 10 },
             size: { width: 200, height: 400 }
@@ -122,6 +126,11 @@ class EthicsSimulation {
     }
 
     setupEthicsDisplay() {
+        if (!this.engine || !this.engine.config) {
+            console.error('Engine not properly initialized for ethics display');
+            return;
+        }
+        
         // Create ethics meters display
         this.ethicsDisplay = new EthicsDisplay({
             metrics: this.ethicsMetrics,
@@ -130,17 +139,30 @@ class EthicsSimulation {
         });
         
         this.engine.addComponent(this.ethicsDisplay);
-    }
-
-    // Scenario management
+    }    // Scenario management
     loadScenario(index) {
+        if (!this.scenarios || !Array.isArray(this.scenarios)) {
+            console.error('Scenarios not properly initialized');
+            return;
+        }
+        
         if (index >= this.scenarios.length) {
             this.completeSimulation();
             return;
         }
         
+        if (index < 0) {
+            console.error('Invalid scenario index:', index);
+            return;
+        }
+        
         this.currentScenario = index;
         const scenario = this.scenarios[index];
+        
+        if (!scenario) {
+            console.error('Scenario not found at index:', index);
+            return;
+        }
         
         this.clearScenarioComponents();
         this.setupScenarioComponents(scenario);
@@ -163,19 +185,29 @@ class EthicsSimulation {
     setupScenarioComponents(scenario) {
         // Override in specific simulations
         console.log('Setting up scenario:', scenario.title);
-    }
-
-    updateInformationPanel(scenario) {
-        if (this.informationPanel) {
-            this.informationPanel.setContent(`
-                <h3>${scenario.title}</h3>
-                <p>${scenario.description}</p>
-                <div class="scenario-info">
-                    <p><strong>Objective:</strong> ${scenario.objective}</p>
-                    <p><strong>Scenario ${this.currentScenario + 1}</strong> of ${this.scenarios.length}</p>
-                </div>
-            `);
+    }    updateInformationPanel(scenario) {
+        if (!this.informationPanel) {
+            console.warn('Information panel not initialized');
+            return;
         }
+        
+        if (!scenario) {
+            console.error('Cannot update information panel: scenario is null/undefined');
+            return;
+        }
+        
+        const title = scenario.title || 'Unknown Scenario';
+        const description = scenario.description || 'No description available';
+        const objective = scenario.objective || 'No objective specified';
+        
+        this.informationPanel.setContent(`
+            <h3>${title}</h3>
+            <p>${description}</p>
+            <div class="scenario-info">
+                <p><strong>Objective:</strong> ${objective}</p>
+                <p><strong>Scenario ${this.currentScenario + 1}</strong> of ${this.scenarios.length}</p>
+            </div>
+        `);
     }
 
     // Ethics tracking methods
@@ -212,9 +244,7 @@ class EthicsSimulation {
         this.provideFeedback(metricName, change, reasoning);
         
         this.emit('ethics:updated', record);
-    }
-
-    logEthicalDecision(category, change, reasoning) {
+    }    logEthicalDecision(category, change, reasoning) {
         const decision = {
             timestamp: Date.now(),
             simulationId: this.id,
@@ -226,9 +256,18 @@ class EthicsSimulation {
             allMetrics: Object.fromEntries(this.ethicsMetrics)
         };
         
-        // Store in local storage and analytics
-        StorageManager.logDecision(decision);
-        AnalyticsManager.trackEthicsDecision(decision);
+        // Store in local storage and analytics with error handling
+        try {
+            StorageManager.logDecision(decision);
+        } catch (error) {
+            console.error('Failed to log decision to storage:', error);
+        }
+        
+        try {
+            AnalyticsManager.trackEthicsDecision(decision);
+        } catch (error) {
+            console.error('Failed to track decision in analytics:', error);
+        }
     }
 
     provideFeedback(metricName, change, reasoning) {
@@ -349,16 +388,28 @@ class EthicsSimulation {
         const report = this.generateCompletionReport();
         
         this.emit('simulation:completed', { score: this.state.score, report });
-    }
-
-    calculateFinalScore() {
+    }    calculateFinalScore() {
+        if (!this.ethicsMetrics || this.ethicsMetrics.size === 0) {
+            console.warn('No ethics metrics available for score calculation');
+            this.state.score = 0;
+            return;
+        }
+        
         let totalScore = 0;
         let totalWeight = 0;
         
         this.ethicsMetrics.forEach(metric => {
-            totalScore += metric.value * metric.weight;
-            totalWeight += metric.weight;
+            if (typeof metric.value === 'number' && typeof metric.weight === 'number') {
+                totalScore += metric.value * metric.weight;
+                totalWeight += metric.weight;
+            }
         });
+        
+        if (totalWeight === 0) {
+            console.warn('Total weight is zero, cannot calculate score');
+            this.state.score = 0;
+            return;
+        }
         
         this.state.score = Math.round(totalScore / totalWeight);
     }
@@ -424,14 +475,60 @@ class EthicsSimulation {
     showHelp() {
         // Display help information
         this.emit('help:requested');
+    }    getProgress() {
+        const totalScenarios = this.scenarios ? this.scenarios.length : 0;
+        const currentScenario = Math.max(0, this.currentScenario);
+        
+        if (totalScenarios === 0) {
+            return {
+                scenario: 0,
+                totalScenarios: 0,
+                percentage: 0
+            };
+        }
+        
+        return {
+            scenario: currentScenario + 1,
+            totalScenarios,
+            percentage: ((currentScenario + 1) / totalScenarios) * 100
+        };
     }
 
-    getProgress() {
-        return {
-            scenario: this.currentScenario + 1,
-            totalScenarios: this.scenarios.length,
-            percentage: ((this.currentScenario + 1) / this.scenarios.length) * 100
-        };
+    // Cleanup and resource management
+    destroy() {
+        try {
+            // Clear all components
+            this.clearScenarioComponents();
+            
+            // Remove UI components
+            if (this.engine) {
+                if (this.controlPanel) {
+                    this.engine.removeComponent(this.controlPanel);
+                }
+                if (this.informationPanel) {
+                    this.engine.removeComponent(this.informationPanel);
+                }
+                if (this.feedbackSystem) {
+                    this.engine.removeComponent(this.feedbackSystem);
+                }
+                if (this.ethicsDisplay) {
+                    this.engine.removeComponent(this.ethicsDisplay);
+                }
+            }
+            
+            // Clear event listeners
+            this.events.clear();
+            
+            // Reset state
+            this.state = null;
+            this.ethicsMetrics.clear();
+            this.ethicsHistory = [];
+            this.components = [];
+            
+            console.log(`EthicsSimulation ${this.id}: Destroyed`);
+        } catch (error) {
+            console.error('Error during simulation cleanup:', error);
+        }
     }
 }
 

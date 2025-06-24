@@ -93,17 +93,19 @@ export class TabContainer extends BaseObject {
             disabled: tabData.disabled || false,
             ...tabData
         };
-        
+          let insertIndex;
         if (index >= 0 && index < this.tabs.length) {
             this.tabs.splice(index, 0, newTab);
+            insertIndex = index;
             if (index <= this.activeTabIndex) {
                 this.activeTabIndex++;
             }
         } else {
             this.tabs.push(newTab);
+            insertIndex = this.tabs.length - 1;
         }
         
-        this.emit('tabAdded', { tab: newTab, index: this.tabs.length - 1 });
+        this.emit('tabAdded', { tab: newTab, index: insertIndex });
         return true;
     }
     
@@ -322,14 +324,26 @@ export class TabContainer extends BaseObject {
             renderer.font = isActive ? 'bold 12px Arial' : '12px Arial';
             renderer.textAlign = 'left';
             renderer.textBaseline = 'middle';
-            
-            const maxTextWidth = bounds.width - (textX - bounds.x) - 30;
+              const maxTextWidth = bounds.width - (textX - bounds.x) - 30;
             let title = tab.title;
-            if (renderer.measureText(title).width > maxTextWidth) {
-                while (renderer.measureText(title + '...').width > maxTextWidth && title.length > 0) {
-                    title = title.slice(0, -1);
+            const titleWidth = renderer.measureText(title).width;
+            if (titleWidth > maxTextWidth) {
+                const ellipsis = '...';
+                const ellipsisWidth = renderer.measureText(ellipsis).width;
+                const availableWidth = maxTextWidth - ellipsisWidth;
+                
+                // Binary search for optimal length
+                let left = 0;
+                let right = title.length;
+                while (left < right) {
+                    const mid = Math.floor((left + right + 1) / 2);
+                    if (renderer.measureText(title.substring(0, mid)).width <= availableWidth) {
+                        left = mid;
+                    } else {
+                        right = mid - 1;
+                    }
                 }
-                title += '...';
+                title = title.substring(0, left) + ellipsis;
             }
             
             renderer.fillText(title, textX, bounds.y + bounds.height / 2);
@@ -867,8 +881,7 @@ export class SplitPane extends BaseObject {
         this.split = Math.max(minRatio, Math.min(maxRatio, ratio));
         this.emit('splitChanged', { split: this.split });
     }
-    
-    collapse(pane) {
+      collapse(pane) {
         if (!this.collapsible) return;
         
         if (pane === 'left' || pane === 'right') {
@@ -1084,17 +1097,16 @@ export class TreeView extends BaseObject {
     buildVisibleNodes() {
         this.visibleNodes = [];
         this.buildVisibleNodesRecursive(this.data, 0);
-    }
-    
-    buildVisibleNodesRecursive(nodes, level) {
+    }    buildVisibleNodesRecursive(nodes, level) {
         for (const node of nodes) {
+            const nodeId = node.id || `node-${level}-${this.visibleNodes.length}`;
             this.visibleNodes.push({
                 ...node,
                 level,
-                id: node.id || `node-${this.visibleNodes.length}`
+                id: nodeId
             });
             
-            if (node.children && this.expandedNodes.has(node.id)) {
+            if (node.children && this.expandedNodes.has(nodeId)) {
                 this.buildVisibleNodesRecursive(node.children, level + 1);
             }
         }
@@ -1145,8 +1157,7 @@ export class TreeView extends BaseObject {
             selectedNodes: Array.from(this.selectedNodes) 
         });
     }
-    
-    findNode(nodeId, nodes = this.data) {
+      findNode(nodeId, nodes = this.data) {
         for (const node of nodes) {
             if (node.id === nodeId) {
                 return node;
@@ -1320,8 +1331,7 @@ export class TreeView extends BaseObject {
         renderer.fillText(node.label || node.title || node.name || node.id, 
                          textX, y + this.nodeHeight / 2);
     }
-    
-    renderScrollbar(renderer) {
+      renderScrollbar(renderer) {
         const scrollbarWidth = 8;
         const scrollbarX = this.width - scrollbarWidth;
         
@@ -1332,7 +1342,8 @@ export class TreeView extends BaseObject {
         // Scrollbar thumb
         const totalHeight = this.visibleNodes.length * this.nodeHeight;
         const thumbHeight = Math.max(20, (this.height / totalHeight) * this.height);
-        const thumbY = (this.scrollY / (totalHeight - this.height)) * (this.height - thumbHeight);
+        const scrollRange = totalHeight - this.height;
+        const thumbY = scrollRange > 0 ? (this.scrollY / scrollRange) * (this.height - thumbHeight) : 0;
         
         renderer.fillStyle = '#c0c0c0';
         renderer.fillRect(scrollbarX + 1, thumbY, scrollbarWidth - 2, thumbHeight);
