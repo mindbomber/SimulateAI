@@ -1,30 +1,139 @@
 /**
  * Enhanced Interactive Objects - Complete object system for SimulateAI
  * Provides sophisticated UI components with accessibility and animations
+ * 
+ * @version 2.0.0
+ * @author SimulateAI Team
+ * @license Apache-2.0
  */
 
-// Base Object Foundation
+// Constants for performance and consistency
+const DEFAULT_ANIMATION_DURATION = 300;
+const DEFAULT_EASING = 'easeInOut';
+const TOUCH_TARGET_SIZE = 44;
+const FOCUS_RING_WIDTH = 2;
+const RIPPLE_DURATION = 600;
+
+// Animation frame management
+class AnimationManager {
+    constructor() {
+        this.animations = new Map();
+        this.isRunning = false;
+        this.rafId = null;
+    }
+
+    add(id, callback) {
+        this.animations.set(id, callback);
+        this.start();
+    }
+
+    remove(id) {
+        this.animations.delete(id);
+        if (this.animations.size === 0) {
+            this.stop();
+        }
+    }
+
+    start() {
+        if (!this.isRunning) {
+            this.isRunning = true;
+            this.tick();
+        }
+    }
+
+    stop() {
+        if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+        }
+        this.isRunning = false;
+    }
+
+    tick() {
+        const currentTime = performance.now();
+        
+        for (const [id, callback] of this.animations) {
+            try {
+                const shouldContinue = callback(currentTime);
+                if (!shouldContinue) {
+                    this.animations.delete(id);
+                }
+            } catch (error) {
+                console.error(`Animation error for ${id}:`, error);
+                this.animations.delete(id);
+            }
+        }
+
+        if (this.animations.size > 0) {
+            this.rafId = requestAnimationFrame(() => this.tick());
+        } else {
+            this.stop();
+        }
+    }
+
+    clear() {
+        this.animations.clear();
+        this.stop();
+    }
+}
+
+// Global animation manager instance
+const animationManager = new AnimationManager();
+
+// Utility functions
+const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+const lerp = (start, end, progress) => start + (end - start) * progress;
+const validateNumber = (value, defaultValue = 0) => typeof value === 'number' && !isNaN(value) ? value : defaultValue;
+const validateString = (value, defaultValue = '') => typeof value === 'string' ? value : defaultValue;
+
+// Enhanced easing functions
+const EasingFunctions = {
+    linear: (t) => t,
+    easeIn: (t) => t * t,
+    easeOut: (t) => 1 - (1 - t) * (1 - t),
+    easeInOut: (t) => t < 0.5 ? 2 * t * t : 1 - 2 * (1 - t) * (1 - t),
+    easeInCubic: (t) => t * t * t,
+    easeOutCubic: (t) => 1 - Math.pow(1 - t, 3),
+    easeInOutCubic: (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
+    easeInQuart: (t) => t * t * t * t,
+    easeOutQuart: (t) => 1 - Math.pow(1 - t, 4),
+    easeInOutQuart: (t) => t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2,
+    bounce: (t) => {
+        const n1 = 7.5625;
+        const d1 = 2.75;
+        if (t < 1 / d1) return n1 * t * t;
+        if (t < 2 / d1) return n1 * (t -= 1.5 / d1) * t + 0.75;
+        if (t < 2.5 / d1) return n1 * (t -= 2.25 / d1) * t + 0.9375;
+        return n1 * (t -= 2.625 / d1) * t + 0.984375;
+    }
+};
+
+// Base Object Foundation with Enhanced Features
 export class BaseObject {
+    /**
+     * Creates a new BaseObject instance
+     * @param {Object} options - Configuration options
+     */
     constructor(options = {}) {
-        // Core properties
-        this.id = options.id || this.generateId();
-        this.x = options.x || 0;
-        this.y = options.y || 0;
-        this.z = options.z || 0;
-        this.width = options.width || 100;
-        this.height = options.height || 50;
-        this.rotation = options.rotation || 0;
-        this.scaleX = options.scaleX || 1;
-        this.scaleY = options.scaleY || 1;
-        this.alpha = options.alpha !== undefined ? options.alpha : 1;
+        // Validate and set core properties
+        this.id = validateString(options.id) || this.generateId();
+        this.x = validateNumber(options.x, 0);
+        this.y = validateNumber(options.y, 0);
+        this.z = validateNumber(options.z, 0);
+        this.width = validateNumber(options.width, 100);
+        this.height = validateNumber(options.height, 50);
+        this.rotation = validateNumber(options.rotation, 0);
+        this.scaleX = validateNumber(options.scaleX, 1);
+        this.scaleY = validateNumber(options.scaleY, 1);
+        this.alpha = validateNumber(options.alpha, 1);
         this.visible = options.visible !== false;
         
-        // Interaction states
+        // Interaction states with validation
         this.isInteractive = options.interactive !== false;
-        this.isDraggable = options.draggable || false;
-        this.isResizable = options.resizable || false;
+        this.isDraggable = Boolean(options.draggable);
+        this.isResizable = Boolean(options.resizable);
         this.isFocusable = options.focusable !== false;
-        this.isSelectable = options.selectable || false;
+        this.isSelectable = Boolean(options.selectable);
         
         // Current states
         this.isHovered = false;
@@ -32,114 +141,285 @@ export class BaseObject {
         this.isDragging = false;
         this.isSelected = false;
         this.isPressed = false;
-        this.isDisabled = options.disabled || false;
+        this.isDisabled = Boolean(options.disabled);
         
-        // Styling
-        this.theme = options.theme || 'default';
-        this.className = options.className || '';
+        // Styling with validation
+        this.theme = validateString(options.theme, 'default');
+        this.className = validateString(options.className);
         this.style = { ...options.style };
         
-        // Accessibility
-        this.ariaLabel = options.ariaLabel || '';
-        this.ariaRole = options.ariaRole || 'generic';
-        this.ariaDescribedBy = options.ariaDescribedBy || '';
-        this.tabIndex = options.tabIndex || (this.isInteractive ? 0 : -1);
+        // Enhanced accessibility
+        this.ariaLabel = validateString(options.ariaLabel);
+        this.ariaRole = validateString(options.ariaRole, 'generic');
+        this.ariaDescribedBy = validateString(options.ariaDescribedBy);
+        this.ariaExpanded = options.ariaExpanded;
+        this.ariaPressed = options.ariaPressed;
+        this.ariaChecked = options.ariaChecked;
+        this.tabIndex = validateNumber(options.tabIndex, this.isInteractive ? 0 : -1);
         
-        // Event handlers
+        // Enhanced event system
         this.eventHandlers = new Map();
         this.setupDefaultHandlers(options);
         
-        // Animation support
+        // Improved animation support
         this.animations = new Map();
         this.transitions = new Map();
+        this.animationQueue = [];
         
         // Parent/child relationships
         this.parent = null;
         this.children = [];
         this.scene = null;
         
-        // Layout properties
+        // Enhanced layout properties
         this.layout = {
-            type: options.layout?.type || 'absolute',
-            padding: options.layout?.padding || { top: 0, right: 0, bottom: 0, left: 0 },
-            margin: options.layout?.margin || { top: 0, right: 0, bottom: 0, left: 0 },
-            align: options.layout?.align || 'start',
-            justify: options.layout?.justify || 'start'
+            type: validateString(options.layout?.type, 'absolute'),
+            padding: this.validateSpacing(options.layout?.padding),
+            margin: this.validateSpacing(options.layout?.margin),
+            align: validateString(options.layout?.align, 'start'),
+            justify: validateString(options.layout?.justify, 'start'),
+            flexDirection: validateString(options.layout?.flexDirection, 'row'),
+            flexWrap: validateString(options.layout?.flexWrap, 'nowrap'),
+            gap: validateNumber(options.layout?.gap, 0)
         };
+
+        // Performance tracking
+        this.lastRenderTime = 0;
+        this.renderCount = 0;
+        this.needsRedraw = true;
+
+        // Error handling
+        this.errorHandler = options.errorHandler || this.defaultErrorHandler;
+
+        // Cleanup tracking
+        this.isDestroyed = false;
+        this.cleanupTasks = [];
     }
 
+    /**
+     * Validates spacing object (margin, padding)
+     * @param {Object|number} spacing 
+     * @returns {Object}
+     */
+    validateSpacing(spacing) {
+        if (typeof spacing === 'number') {
+            return { top: spacing, right: spacing, bottom: spacing, left: spacing };
+        }
+        if (spacing && typeof spacing === 'object') {
+            return {
+                top: validateNumber(spacing.top, 0),
+                right: validateNumber(spacing.right, 0),
+                bottom: validateNumber(spacing.bottom, 0),
+                left: validateNumber(spacing.left, 0)
+            };
+        }
+        return { top: 0, right: 0, bottom: 0, left: 0 };
+    }
+
+    /**
+     * Default error handler
+     * @param {Error} error 
+     * @param {string} context 
+     */
+    defaultErrorHandler(error, context) {
+        console.error(`Error in ${this.constructor.name} (${this.id}) - ${context}:`, error);
+    }
+
+    /**
+     * Generates a unique ID for the object
+     * @returns {string}
+     */
     generateId() {
-        return `obj_${Math.random().toString(36).substr(2, 9)}`;
-    }
-
+        return `obj_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }    /**
+     * Sets up default event handlers from options
+     * @param {Object} options 
+     */
     setupDefaultHandlers(options) {
-        const events = ['click', 'doubleClick', 'hover', 'focus', 'blur', 'keyDown', 'keyUp', 'drag', 'drop'];
+        const events = [
+            'click', 'doubleClick', 'hover', 'hoverEnd', 'focus', 'blur', 
+            'keyDown', 'keyUp', 'mouseDown', 'mouseUp', 'mouseMove',
+            'drag', 'dragStart', 'dragEnd', 'drop', 'change', 'input'
+        ];
+        
         events.forEach(event => {
             const handlerName = `on${event.charAt(0).toUpperCase()}${event.slice(1)}`;
-            if (options[handlerName]) {
+            if (typeof options[handlerName] === 'function') {
                 this.on(event, options[handlerName]);
             }
         });
     }
 
-    // Event system
+    // Enhanced Event System
+    /**
+     * Adds an event listener
+     * @param {string} event - Event name
+     * @param {Function} handler - Event handler function
+     * @returns {BaseObject} - Returns this for chaining
+     */
     on(event, handler) {
+        if (typeof handler !== 'function') {
+            this.errorHandler(new Error('Event handler must be a function'), 'on');
+            return this;
+        }
+
         if (!this.eventHandlers.has(event)) {
             this.eventHandlers.set(event, []);
         }
         this.eventHandlers.get(event).push(handler);
+        
+        // Add to cleanup tasks
+        this.cleanupTasks.push(() => this.off(event, handler));
+        
         return this;
     }
 
+    /**
+     * Removes an event listener
+     * @param {string} event - Event name
+     * @param {Function} handler - Event handler function to remove
+     * @returns {BaseObject} - Returns this for chaining
+     */
     off(event, handler) {
         if (this.eventHandlers.has(event)) {
             const handlers = this.eventHandlers.get(event);
             const index = handlers.indexOf(handler);
             if (index > -1) {
                 handlers.splice(index, 1);
+                if (handlers.length === 0) {
+                    this.eventHandlers.delete(event);
+                }
             }
         }
         return this;
     }
 
+    /**
+     * Emits an event to all registered handlers
+     * @param {string} event - Event name
+     * @param {Object} data - Event data
+     * @returns {BaseObject} - Returns this for chaining
+     */
     emit(event, data = {}) {
+        if (this.isDestroyed) return this;
+
         if (this.eventHandlers.has(event)) {
+            const eventData = { 
+                ...data, 
+                target: this, 
+                type: event, 
+                timestamp: performance.now(),
+                preventDefault: () => { eventData.defaultPrevented = true; },
+                stopPropagation: () => { eventData.propagationStopped = true; }
+            };
+
             this.eventHandlers.get(event).forEach(handler => {
                 try {
-                    handler.call(this, { ...data, target: this, type: event });
+                    if (!eventData.propagationStopped) {
+                        handler.call(this, eventData);
+                    }
                 } catch (error) {
-                    console.error(`Error in event handler for ${event}:`, error);
+                    this.errorHandler(error, `event:${event}`);
                 }
             });
         }
         return this;
-    }
-
-    // Parent/child management
+    }    // Enhanced Parent/Child Management
+    /**
+     * Adds a child object
+     * @param {BaseObject} child - Child object to add
+     * @returns {BaseObject} - Returns this for chaining
+     */
     addChild(child) {
+        if (!(child instanceof BaseObject)) {
+            this.errorHandler(new Error('Child must be a BaseObject instance'), 'addChild');
+            return this;
+        }
+
         if (child.parent) {
             child.parent.removeChild(child);
         }
+        
         child.parent = this;
+        child.scene = this.scene;
         this.children.push(child);
+        
+        this.emit('childAdded', { child });
         return this;
     }
 
+    /**
+     * Removes a child object
+     * @param {BaseObject} child - Child object to remove
+     * @returns {BaseObject} - Returns this for chaining
+     */
     removeChild(child) {
         const index = this.children.indexOf(child);
         if (index > -1) {
             this.children.splice(index, 1);
             child.parent = null;
+            child.scene = null;
+            this.emit('childRemoved', { child });
         }
         return this;
     }
 
-    // Bounds checking
-    containsPoint(x, y) {
-        return x >= this.x && x <= this.x + this.width &&
-               y >= this.y && y <= this.y + this.height;
+    /**
+     * Removes all children
+     * @returns {BaseObject} - Returns this for chaining
+     */
+    removeAllChildren() {
+        while (this.children.length > 0) {
+            this.removeChild(this.children[0]);
+        }
+        return this;
     }
 
+    /**
+     * Finds a child by ID
+     * @param {string} id - Child ID to find
+     * @returns {BaseObject|null} - Found child or null
+     */
+    findChildById(id) {
+        return this.children.find(child => child.id === id) || null;
+    }
+
+    /**
+     * Finds children by class name
+     * @param {string} className - Class name to search for
+     * @returns {BaseObject[]} - Array of matching children
+     */
+    findChildrenByClass(className) {
+        return this.children.filter(child => child.className.includes(className));
+    }
+
+    // Enhanced Bounds and Collision Detection
+    /**
+     * Checks if a point is within this object's bounds
+     * @param {number} x - X coordinate
+     * @param {number} y - Y coordinate
+     * @param {boolean} useTransform - Whether to apply transformations
+     * @returns {boolean}
+     */
+    containsPoint(x, y, useTransform = false) {
+        if (!this.visible || this.alpha <= 0) return false;
+
+        let bounds = this.getBounds();
+        
+        if (useTransform && (this.rotation !== 0 || this.scaleX !== 1 || this.scaleY !== 1)) {
+            // For simplicity, use bounding box of transformed object
+            // In a real implementation, you might want more precise collision detection
+            bounds = this.getTransformedBounds();
+        }
+
+        return x >= bounds.x && x <= bounds.right &&
+               y >= bounds.y && y <= bounds.bottom;
+    }
+
+    /**
+     * Gets the bounding box of this object
+     * @returns {Object} - Bounds object with x, y, width, height, right, bottom
+     */
     getBounds() {
         return {
             x: this.x,
@@ -147,148 +427,541 @@ export class BaseObject {
             width: this.width,
             height: this.height,
             right: this.x + this.width,
-            bottom: this.y + this.height
+            bottom: this.y + this.height,
+            centerX: this.x + this.width / 2,
+            centerY: this.y + this.height / 2
         };
     }
 
-    // Input handling
+    /**
+     * Gets transformed bounds (approximate)
+     * @returns {Object} - Transformed bounds
+     */
+    getTransformedBounds() {
+        const bounds = this.getBounds();
+        
+        // Apply scaling
+        const scaledWidth = bounds.width * Math.abs(this.scaleX);
+        const scaledHeight = bounds.height * Math.abs(this.scaleY);
+        
+        // For rotation, use bounding box of rotated rectangle
+        if (this.rotation !== 0) {
+            const cos = Math.abs(Math.cos(this.rotation));
+            const sin = Math.abs(Math.sin(this.rotation));
+            const newWidth = scaledWidth * cos + scaledHeight * sin;
+            const newHeight = scaledWidth * sin + scaledHeight * cos;
+            
+            return {
+                x: bounds.centerX - newWidth / 2,
+                y: bounds.centerY - newHeight / 2,
+                width: newWidth,
+                height: newHeight,
+                right: bounds.centerX + newWidth / 2,
+                bottom: bounds.centerY + newHeight / 2,
+                centerX: bounds.centerX,
+                centerY: bounds.centerY
+            };
+        }
+        
+        return {
+            x: bounds.centerX - scaledWidth / 2,
+            y: bounds.centerY - scaledHeight / 2,
+            width: scaledWidth,
+            height: scaledHeight,
+            right: bounds.centerX + scaledWidth / 2,
+            bottom: bounds.centerY + scaledHeight / 2,
+            centerX: bounds.centerX,
+            centerY: bounds.centerY
+        };
+    }
+
+    /**
+     * Checks if this object intersects with another object
+     * @param {BaseObject} other - Other object to check
+     * @returns {boolean}
+     */
+    intersects(other) {
+        if (!other instanceof BaseObject) return false;
+        
+        const bounds1 = this.getBounds();
+        const bounds2 = other.getBounds();
+        
+        return !(bounds1.right < bounds2.x || 
+                bounds1.x > bounds2.right || 
+                bounds1.bottom < bounds2.y || 
+                bounds1.y > bounds2.bottom);
+    }    // Enhanced Input Handling
+    /**
+     * Handles input events with improved error handling and performance
+     * @param {string} eventType - Type of input event
+     * @param {Object} eventData - Event data
+     * @returns {boolean} - Whether the event was handled
+     */
     handleInput(eventType, eventData) {
-        if (!this.isInteractive || !this.visible || this.isDisabled) return false;
-
-        switch (eventType) {
-            case 'mousedown':
-                if (this.containsPoint(eventData.x, eventData.y)) {
-                    this.isPressed = true;
-                    this.emit('mouseDown', { ...eventData, localX: eventData.x - this.x, localY: eventData.y - this.y });
-                    return true;
-                }
-                break;
-
-            case 'mouseup':
-                if (this.isPressed) {
-                    this.isPressed = false;
-                    this.emit('mouseUp', eventData);
-                    
-                    if (this.containsPoint(eventData.x, eventData.y)) {
-                        this.emit('click', eventData);
-                    }
-                    return true;
-                }
-                break;
-
-            case 'mousemove':
-                const wasHovered = this.isHovered;
-                this.isHovered = this.containsPoint(eventData.x, eventData.y);
-                
-                if (this.isHovered && !wasHovered) {
-                    this.emit('hover', { ...eventData, localX: eventData.x - this.x, localY: eventData.y - this.y });
-                } else if (!this.isHovered && wasHovered) {
-                    this.emit('hoverEnd', eventData);
-                }
-                
-                if (this.isHovered) {
-                    this.emit('mouseMove', { ...eventData, localX: eventData.x - this.x, localY: eventData.y - this.y });
-                }
-                break;
-
-            case 'keydown':
-                if (this.isFocused) {
-                    this.emit('keyDown', eventData);
-                    return true;
-                }
-                break;
+        if (!this.isInteractive || !this.visible || this.isDisabled || this.isDestroyed) {
+            return false;
         }
 
+        try {
+            switch (eventType) {
+                case 'mousedown':
+                case 'pointerdown':
+                    return this.handlePointerDown(eventData);
+                
+                case 'mouseup':
+                case 'pointerup':
+                    return this.handlePointerUp(eventData);
+                
+                case 'mousemove':
+                case 'pointermove':
+                    return this.handlePointerMove(eventData);
+                
+                case 'keydown':
+                    return this.handleKeyDown(eventData);
+                
+                case 'keyup':
+                    return this.handleKeyUp(eventData);
+                
+                case 'wheel':
+                    return this.handleWheel(eventData);
+                
+                case 'focus':
+                    return this.handleFocus(eventData);
+                
+                case 'blur':
+                    return this.handleBlur(eventData);
+                
+                default:
+                    return false;
+            }
+        } catch (error) {
+            this.errorHandler(error, `handleInput:${eventType}`);
+            return false;
+        }
+    }
+
+    handlePointerDown(eventData) {
+        if (this.containsPoint(eventData.x, eventData.y)) {
+            this.isPressed = true;
+            const localData = {
+                ...eventData,
+                localX: eventData.x - this.x,
+                localY: eventData.y - this.y
+            };
+            this.emit('mouseDown', localData);
+            this.emit('pointerDown', localData);
+            return true;
+        }
         return false;
     }
 
-    // Animation support
-    animate(property, targetValue, duration = 300, easing = 'easeInOut') {
-        return new Promise((resolve) => {
-            const startValue = this[property];
-            const startTime = performance.now();
+    handlePointerUp(eventData) {
+        if (this.isPressed) {
+            this.isPressed = false;
+            this.emit('mouseUp', eventData);
+            this.emit('pointerUp', eventData);
             
-            const animationId = `${property}_${Date.now()}`;
-            
-            const animate = (currentTime) => {
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const easedProgress = this.applyEasing(progress, easing);
+            if (this.containsPoint(eventData.x, eventData.y)) {
+                this.emit('click', eventData);
                 
-                this[property] = startValue + (targetValue - startValue) * easedProgress;
-                
-                if (progress < 1) {
-                    requestAnimationFrame(animate);
+                // Double click detection
+                const now = performance.now();
+                if (this.lastClickTime && now - this.lastClickTime < 500) {
+                    this.emit('doubleClick', eventData);
+                    this.lastClickTime = 0;
                 } else {
-                    this.animations.delete(animationId);
-                    resolve();
+                    this.lastClickTime = now;
                 }
-            };
-            
-            this.animations.set(animationId, animate);
-            requestAnimationFrame(animate);
-        });
+            }
+            return true;
+        }
+        return false;
     }
 
-    applyEasing(progress, easing) {
-        switch (easing) {
-            case 'linear': return progress;
-            case 'easeIn': return progress * progress;
-            case 'easeOut': return 1 - (1 - progress) * (1 - progress);
-            case 'easeInOut': return progress < 0.5 
-                ? 2 * progress * progress 
-                : 1 - 2 * (1 - progress) * (1 - progress);
-            default: return progress;
+    handlePointerMove(eventData) {
+        const wasHovered = this.isHovered;
+        this.isHovered = this.containsPoint(eventData.x, eventData.y);
+        
+        const localData = {
+            ...eventData,
+            localX: eventData.x - this.x,
+            localY: eventData.y - this.y
+        };
+
+        if (this.isHovered && !wasHovered) {
+            this.emit('hover', localData);
+            this.emit('mouseEnter', localData);
+        } else if (!this.isHovered && wasHovered) {
+            this.emit('hoverEnd', localData);
+            this.emit('mouseLeave', localData);
+        }
+        
+        if (this.isHovered || this.isDragging) {
+            this.emit('mouseMove', localData);
+            this.emit('pointerMove', localData);
+        }
+
+        // Handle dragging
+        if (this.isDragging) {
+            this.emit('drag', localData);
+            return true;
+        }
+
+        return this.isHovered;
+    }
+
+    handleKeyDown(eventData) {
+        if (this.isFocused) {
+            this.emit('keyDown', eventData);
+            
+            // Handle common accessibility keys
+            switch (eventData.key) {
+                case 'Enter':
+                case ' ':
+                    if (!eventData.defaultPrevented) {
+                        this.emit('click', { ...eventData, synthetic: true });
+                    }
+                    break;
+                case 'Escape':
+                    this.blur();
+                    break;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    handleKeyUp(eventData) {
+        if (this.isFocused) {
+            this.emit('keyUp', eventData);
+            return true;
+        }
+        return false;
+    }
+
+    handleWheel(eventData) {
+        if (this.containsPoint(eventData.x, eventData.y)) {
+            this.emit('wheel', eventData);
+            return true;
+        }
+        return false;
+    }
+
+    handleFocus(eventData) {
+        if (!this.isFocused && this.isFocusable) {
+            this.isFocused = true;
+            this.emit('focus', eventData);
+            return true;
+        }
+        return false;
+    }
+
+    handleBlur(eventData) {
+        if (this.isFocused) {
+            this.isFocused = false;
+            this.emit('blur', eventData);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Programmatically focus this object
+     */
+    focus() {
+        if (this.isFocusable && !this.isDisabled && !this.isDestroyed) {
+            this.handleFocus({ synthetic: true });
         }
     }
 
-    // Update lifecycle
-    update(deltaTime) {
-        this.children.forEach(child => {
-            if (child.update) {
-                child.update(deltaTime);
+    /**
+     * Programmatically blur this object
+     */
+    blur() {
+        if (this.isFocused) {
+            this.handleBlur({ synthetic: true });
+        }
+    }// Enhanced Animation System
+    /**
+     * Animates a property to a target value
+     * @param {string|Object} property - Property name or object of property/value pairs
+     * @param {number} targetValue - Target value (ignored if property is object)
+     * @param {number} duration - Animation duration in milliseconds
+     * @param {string|Function} easing - Easing function name or custom function
+     * @returns {Promise} - Resolves when animation completes
+     */
+    animate(property, targetValue, duration = DEFAULT_ANIMATION_DURATION, easing = DEFAULT_EASING) {
+        if (this.isDestroyed) return Promise.resolve();
+
+        // Handle multiple properties
+        if (typeof property === 'object') {
+            const promises = Object.entries(property).map(([prop, value]) => 
+                this.animate(prop, value, targetValue || duration, duration || easing)
+            );
+            return Promise.all(promises);
+        }
+
+        return new Promise((resolve, reject) => {
+            try {
+                const startValue = this[property];
+                if (startValue === undefined) {
+                    reject(new Error(`Property '${property}' not found`));
+                    return;
+                }
+
+                const startTime = performance.now();
+                const animationId = `${property}_${startTime}`;
+                const easingFn = typeof easing === 'function' ? easing : EasingFunctions[easing] || EasingFunctions.linear;
+
+                const animate = (currentTime) => {
+                    if (this.isDestroyed) {
+                        resolve();
+                        return false;
+                    }
+
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const easedProgress = easingFn(progress);
+
+                    this[property] = lerp(startValue, targetValue, easedProgress);
+                    this.needsRedraw = true;
+
+                    if (progress < 1) {
+                        return true; // Continue animation
+                    } else {
+                        this.animations.delete(animationId);
+                        resolve();
+                        return false; // Animation complete
+                    }
+                };
+
+                this.animations.set(animationId, animate);
+                animationManager.add(animationId, animate);
+
+                // Add to cleanup tasks
+                this.cleanupTasks.push(() => {
+                    animationManager.remove(animationId);
+                    this.animations.delete(animationId);
+                });
+
+            } catch (error) {
+                this.errorHandler(error, 'animate');
+                reject(error);
             }
         });
     }
 
-    // Render lifecycle
+    /**
+     * Stops all animations for this object
+     */
+    stopAnimations() {
+        for (const animationId of this.animations.keys()) {
+            animationManager.remove(animationId);
+        }
+        this.animations.clear();
+    }
+
+    /**
+     * Queues an animation to run after current animations complete
+     * @param {Function} animationFn - Function that returns an animation promise
+     * @returns {Promise}
+     */
+    queueAnimation(animationFn) {
+        const promise = this.animationQueue.length === 0 
+            ? animationFn() 
+            : this.animationQueue[this.animationQueue.length - 1].then(animationFn);
+        
+        this.animationQueue.push(promise);
+        
+        // Clean up completed animations
+        promise.finally(() => {
+            const index = this.animationQueue.indexOf(promise);
+            if (index > -1) {
+                this.animationQueue.splice(index, 1);
+            }
+        });
+
+        return promise;
+    }    // Enhanced Lifecycle Methods
+    /**
+     * Updates the object and its children
+     * @param {number} deltaTime - Time since last update in milliseconds
+     */
+    update(deltaTime) {
+        if (this.isDestroyed) return;
+
+        try {
+            // Update animations (handled by AnimationManager)
+            
+            // Update children
+            for (let i = this.children.length - 1; i >= 0; i--) {
+                const child = this.children[i];
+                if (child && typeof child.update === 'function') {
+                    child.update(deltaTime);
+                }
+            }
+
+            // Custom update logic (override in subclasses)
+            this.onUpdate(deltaTime);
+
+        } catch (error) {
+            this.errorHandler(error, 'update');
+        }
+    }
+
+    /**
+     * Override in subclasses for custom update logic
+     * @param {number} deltaTime 
+     */
+    onUpdate(deltaTime) {
+        // Override in subclasses
+    }
+
+    /**
+     * Renders the object and its children
+     * @param {Object} renderer - Renderer object
+     */
     render(renderer) {
-        if (!this.visible) return;
+        if (!this.visible || this.alpha <= 0 || this.isDestroyed) return;
         
-        renderer.save();
+        try {
+            this.renderCount++;
+            this.lastRenderTime = performance.now();
+
+            renderer.save();
+            
+            // Apply transformations
+            this.applyTransforms(renderer);
+            
+            // Render this object
+            this.renderSelf(renderer);
+            
+            // Render children
+            this.renderChildren(renderer);
+            
+            renderer.restore();
+
+            this.needsRedraw = false;
+
+        } catch (error) {
+            this.errorHandler(error, 'render');
+            renderer.restore(); // Ensure we restore state even on error
+        }
+    }
+
+    /**
+     * Applies transformations to the renderer
+     * @param {Object} renderer 
+     */
+    applyTransforms(renderer) {
+        if (this.x || this.y) {
+            renderer.translate(this.x, this.y);
+        }
         
-        // Apply transformations
-        if (this.x || this.y) renderer.translate(this.x, this.y);
-        if (this.rotation) renderer.rotate(this.rotation);
-        if (this.scaleX !== 1 || this.scaleY !== 1) renderer.scale(this.scaleX, this.scaleY);
-        if (this.alpha !== 1) renderer.setAlpha(this.alpha);
+        if (this.rotation) {
+            renderer.translate(this.width / 2, this.height / 2);
+            renderer.rotate(this.rotation);
+            renderer.translate(-this.width / 2, -this.height / 2);
+        }
         
-        // Render this object
-        this.renderSelf(renderer);
+        if (this.scaleX !== 1 || this.scaleY !== 1) {
+            renderer.translate(this.width / 2, this.height / 2);
+            renderer.scale(this.scaleX, this.scaleY);
+            renderer.translate(-this.width / 2, -this.height / 2);
+        }
         
-        // Render children
-        this.children.forEach(child => {
-            if (child.render) {
+        if (this.alpha !== 1) {
+            renderer.globalAlpha *= this.alpha;
+        }
+    }
+
+    /**
+     * Renders child objects
+     * @param {Object} renderer 
+     */
+    renderChildren(renderer) {
+        for (const child of this.children) {
+            if (child && typeof child.render === 'function') {
                 child.render(renderer);
             }
-        });
-        
-        renderer.restore();
+        }
     }
 
+    /**
+     * Override in subclasses to implement custom rendering
+     * @param {Object} renderer 
+     */
     renderSelf(renderer) {
         // Override in subclasses
     }
 
-    // Cleanup
+    /**
+     * Gets debug information about this object
+     * @returns {Object}
+     */
+    getDebugInfo() {
+        return {
+            id: this.id,
+            className: this.constructor.name,
+            bounds: this.getBounds(),
+            visible: this.visible,
+            interactive: this.isInteractive,
+            children: this.children.length,
+            animations: this.animations.size,
+            renderCount: this.renderCount,
+            lastRenderTime: this.lastRenderTime
+        };
+    }
+
+    /**
+     * Enhanced cleanup method
+     */
     destroy() {
-        this.eventHandlers.clear();
-        this.animations.clear();
-        this.children.forEach(child => child.destroy());
-        this.children = [];
-        
-        if (this.parent) {
-            this.parent.removeChild(this);
+        if (this.isDestroyed) return;
+
+        try {
+            this.isDestroyed = true;
+
+            // Emit destroy event
+            this.emit('destroy');
+
+            // Stop all animations
+            this.stopAnimations();
+
+            // Clear event handlers
+            this.eventHandlers.clear();
+
+            // Run cleanup tasks
+            this.cleanupTasks.forEach(task => {
+                try {
+                    task();
+                } catch (error) {
+                    this.errorHandler(error, 'cleanup');
+                }
+            });
+            this.cleanupTasks = [];
+
+            // Destroy children
+            while (this.children.length > 0) {
+                const child = this.children[0];
+                this.removeChild(child);
+                if (typeof child.destroy === 'function') {
+                    child.destroy();
+                }
+            }
+
+            // Remove from parent
+            if (this.parent) {
+                this.parent.removeChild(this);
+            }
+
+            // Clear references
+            this.parent = null;
+            this.scene = null;
+            this.eventHandlers = null;
+            this.animations = null;
+            this.transitions = null;        } catch (error) {
+            this.errorHandler(error, 'destroy');
         }
     }
 }
@@ -840,8 +1513,98 @@ export class InteractiveSlider extends BaseObject {
         if (this.showValue) {
             renderer.fillStyle = this.colors.text;
             renderer.font = '11px Arial';
-            renderer.textAlign = 'center';
-            const valueText = `${Math.round(this.value)}${this.unit}`;            renderer.fillText(valueText, handleX, this.height + 15);
+            renderer.textAlign = 'center';            const valueText = `${Math.round(this.value)}${this.unit}`;
+            renderer.fillText(valueText, handleX, this.height + 15);
         }
     }
 }
+
+// Enhanced Scene Management
+export class Scene extends BaseObject {
+    constructor(options = {}) {
+        super({
+            ...options,
+            interactive: false
+        });
+
+        this.camera = {
+            x: 0,
+            y: 0,
+            zoom: 1
+        };
+
+        this.layers = new Map();
+        this.defaultLayer = 'default';
+        
+        // Performance monitoring
+        this.frameCount = 0;
+        this.lastFrameTime = 0;
+        this.fps = 0;
+        this.fpsUpdateInterval = 1000;
+        this.lastFpsUpdate = 0;
+    }
+
+    addToLayer(object, layerName = this.defaultLayer) {
+        if (!this.layers.has(layerName)) {
+            this.layers.set(layerName, []);
+        }
+        this.layers.get(layerName).push(object);
+        object.scene = this;
+    }
+
+    removeFromLayer(object, layerName = this.defaultLayer) {
+        if (this.layers.has(layerName)) {
+            const layer = this.layers.get(layerName);
+            const index = layer.indexOf(object);
+            if (index > -1) {
+                layer.splice(index, 1);
+                object.scene = null;
+            }
+        }
+    }
+
+    render(renderer) {
+        const currentTime = performance.now();
+        
+        // Update FPS
+        this.frameCount++;
+        if (currentTime - this.lastFpsUpdate >= this.fpsUpdateInterval) {
+            this.fps = this.frameCount;
+            this.frameCount = 0;
+            this.lastFpsUpdate = currentTime;
+        }
+
+        renderer.save();
+        
+        // Apply camera transform
+        renderer.translate(-this.camera.x, -this.camera.y);
+        renderer.scale(this.camera.zoom, this.camera.zoom);
+
+        // Render layers in order
+        for (const [layerName, objects] of this.layers) {
+            objects.forEach(object => {
+                if (object.render) {
+                    object.render(renderer);
+                }
+            });
+        }
+
+        renderer.restore();
+        
+        this.lastFrameTime = currentTime;
+    }
+}
+
+// Export utility functions and classes
+export { 
+    animationManager, 
+    EasingFunctions, 
+    clamp, 
+    lerp, 
+    validateNumber, 
+    validateString,
+    TOUCH_TARGET_SIZE,
+    FOCUS_RING_WIDTH,
+    DEFAULT_ANIMATION_DURATION,
+    DEFAULT_EASING
+};

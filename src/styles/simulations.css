@@ -463,7 +463,7 @@
     border-color: var(--color-primary-dark);
 }
 
-@keyframes fadeInUp {
+@keyframes fadeIn {
     from {
         opacity: 0;
         transform: translateY(20px);
@@ -504,80 +504,734 @@
     to { opacity: 1; }
 }
 
-/* Responsive Simulation UI */
-@media (max-width: 768px) {
-    .ui-component {
-        font-size: var(--font-size-xs);
+/* Reduced Motion Accessibility Support */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
     
-    .panel-button {
-        min-height: 40px;
-        font-size: var(--font-size-sm);
+    .interactive-element:hover {
+        transform: none !important;
     }
     
-    .ethics-meters {
-        min-width: 150px;
+    .interactive-element.dragging {
+        transform: none !important;
+    }
+    
+    .panel-button:hover,
+    .panel-button:focus,
+    .button:hover,
+    .button:focus {
+        transform: none !important;
+    }
+    
+    .feedback-item {
+        animation: none !important;
     }
     
     .decision-point {
-        margin: var(--spacing-2);
-        padding: var(--spacing-3);
+        animation: none !important;
+    }
+    
+    .tooltip {
+        animation: none !important;
+    }
+}
+
+/* Enhanced High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    :root {
+        --simulation-border-width: 3px;
+        --simulation-focus-width: 4px;
+    }
+    
+    .ui-component,
+    .uipanel,
+    .feedbacksystem,
+    .decision-point,
+    .button,
+    .panel-button {
+        border: var(--simulation-border-width, 3px) solid var(--color-black);
+    }
+    
+    .panel-button:focus,
+    .button:focus,
+    .decision-option:focus,
+    .interactive-element:focus {
+        outline: var(--simulation-focus-width, 4px) solid var(--color-primary);
+        outline-offset: 2px;
+        border-color: var(--color-black);
+    }
+    
+    .ethics-meter .meter-bar {
+        border: 2px solid var(--color-black);
+    }
+    
+    .ethics-meter .meter-fill {
+        background: var(--color-black) !important;
+    }
+    
+    .progress-bar {
+        border: 2px solid var(--color-black);
+    }
+    
+    .progress-fill {
+        background: var(--color-black) !important;
+    }
+    
+    .tooltip {
+        background: var(--color-black) !important;
+        color: var(--color-white) !important;
+        border: 2px solid var(--color-white);
+    }
+}
+
+/* Focus-Visible Enhancement for Better Keyboard Navigation */
+.panel-button:focus-visible,
+.button:focus-visible,
+.decision-option:focus-visible,
+.interactive-element:focus-visible,
+.panel-slider:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 5px rgba(0, 124, 186, 0.2);
+}
+
+/* ARIA State Styling */
+[aria-pressed="true"] {
+    background: var(--color-primary-dark) !important;
+    color: var(--color-white);
+    border-color: var(--color-primary-dark);
+}
+
+[aria-selected="true"] {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary-dark);
+}
+
+[aria-expanded="true"] .panel-button {
+    background: var(--color-primary-dark);
+}
+
+[aria-disabled="true"],
+[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+[aria-invalid="true"] {
+    border-color: var(--color-error) !important;
+    box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2);
+}
+
+/* Loading States for Simulation Components */
+.ui-component.loading,
+.simulation-canvas.loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.ui-component.loading::after,
+.simulation-canvas.loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--color-gray-300);
+    border-top: 2px solid var(--color-primary);
+    border-radius: 50%;
+    animation: simulationSpin 1s linear infinite;
+    z-index: 10;
+}
+
+@keyframes simulationSpin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Error States for Simulation Components */
+.ui-component.error,
+.simulation-canvas.error {
+    border-color: var(--color-error);
+    background: rgba(244, 67, 54, 0.1);
+}
+
+.ui-component.error::before,
+.simulation-canvas.error::before {
+    content: "⚠️ Component Error";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--color-error);
+    font-weight: bold;
+    font-size: var(--font-size-xs);
+    text-align: center;
+    z-index: 10;
+    background: var(--color-white);
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: var(--radius-base);
+    border: 1px solid var(--color-error);
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .panel-button,
+    .button,
+    .decision-option {
+        min-height: 44px;
+        min-width: 44px;
+        padding: var(--spacing-3) var(--spacing-4);
+    }
+    
+    .interactive-element {
+        min-width: 44px;
+        min-height: 44px;
+    }
+    
+    .panel-slider::-webkit-slider-thumb {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .panel-slider::-moz-range-thumb {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .slider input[type="range"]::-webkit-slider-thumb {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .slider input[type="range"]::-moz-range-thumb {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .tooltip {
+        display: none; /* Hide tooltips on touch devices */
+    }
+}
+
+/* RTL (Right-to-Left) Language Support */
+[dir="rtl"] .feedback-item {
+    border-left: none;
+    border-right: 3px solid;
+}
+
+[dir="rtl"] .feedback-positive {
+    border-right-color: var(--color-success);
+}
+
+[dir="rtl"] .feedback-negative {
+    border-right-color: var(--color-error);
+}
+
+[dir="rtl"] .feedback-neutral {
+    border-right-color: var(--color-primary);
+}
+
+[dir="rtl"] .feedback-excellent {
+    border-right-color: var(--color-success);
+}
+
+[dir="rtl"] .feedback-concerning {
+    border-right-color: var(--color-warning);
+}
+
+[dir="rtl"] .ethics-meter .meter-value {
+    right: auto;
+    left: var(--spacing-1);
+}
+
+[dir="rtl"] .slider-value {
+    text-align: left;
+}
+
+[dir="rtl"] .tooltip::after {
+    left: auto;
+    right: 50%;
+    margin-left: 0;
+    margin-right: -5px;
+}
+
+/* Enhanced Color Contrast for Better Accessibility */
+.feedback-positive {
+    border-left-color: #2e7d32;
+    background: rgba(46, 125, 50, 0.15);
+    color: #1b5e20;
+}
+
+.feedback-negative {
+    border-left-color: #c62828;
+    background: rgba(198, 40, 40, 0.15);
+    color: #b71c1c;
+}
+
+.feedback-neutral {
+    border-left-color: #1976d2;
+    background: rgba(25, 118, 210, 0.15);
+    color: #0d47a1;
+}
+
+.feedback-excellent {
+    border-left-color: #388e3c;
+    background: rgba(56, 142, 60, 0.15);
+    color: #1b5e20;
+}
+
+.feedback-concerning {
+    border-left-color: #f57c00;
+    background: rgba(245, 124, 0, 0.15);
+    color: #e65100;
+}
+
+/* Print Styles for Simulations */
+@media print {
+    .ui-component,
+    .uipanel,
+    .feedbacksystem,
+    .decision-point {
+        background: white !important;
+        color: black !important;
+        border: 1px solid black !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+    }
+    
+    .panel-button,
+    .button {
+        background: white !important;
+        color: black !important;
+        border: 1px solid black !important;
+    }
+    
+    .interactive-element {
+        position: static !important;
+    }
+    
+    .tooltip {
+        display: none !important;
+    }
+    
+    .ethics-meter .meter-fill {
+        background: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 2px,
+            black 2px,
+            black 4px
+        ) !important;
+    }
+    
+    .progress-fill {
+        background: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 2px,
+            black 2px,
+            black 4px
+        ) !important;
+    }
+    
+    .simulation-canvas {
+        border: 2px solid black !important;
+        background: white !important;
+    }
+}
+
+/* Enhanced Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .feedbacksystem {
+        background: rgba(33, 33, 33, 0.95);
+        border-color: var(--color-gray-600);
+    }
+    
+    .ethics-meters h4 {
+        color: var(--color-gray-100);
+    }
+    
+    .scenario-progress {
+        background: var(--color-gray-800);
+    }
+    
+    .progress-text {
+        color: var(--color-gray-400);
     }
     
     .decision-title {
-        font-size: var(--font-size-base);
-    }
-}
-
-/* Dark mode simulation UI */
-@media (prefers-color-scheme: dark) {
-    .ui-component {
         color: var(--color-gray-100);
     }
     
-    .uipanel {
-        background: rgba(33, 33, 33, 0.95);
-        border-color: var(--color-gray-600);
-        color: var(--color-gray-100);
-    }
-    
-    .panel-header {
-        color: var(--color-white);
-        border-color: var(--color-gray-600);
-    }
-    
-    .panel-content {
+    .slider label {
         color: var(--color-gray-300);
     }
     
-    .decision-point {
-        background: var(--color-gray-800);
-        border-color: var(--color-primary);
-        color: var(--color-gray-100);
+    .slider-value {
+        color: var(--color-gray-400);
+    }
+    
+    .simulation-canvas {
+        background: var(--color-gray-900);
+    }
+    
+    .tooltip {
+        background: rgba(255, 255, 255, 0.9);
+        color: var(--color-gray-900);
+    }
+    
+    .tooltip::after {
+        border-color: rgba(255, 255, 255, 0.9) transparent transparent transparent;
+    }
+}
+
+/* Simulation-Specific Utility Classes */
+.simulation-hidden {
+    display: none !important;
+}
+
+.simulation-visible {
+    display: block !important;
+}
+
+.simulation-centered {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.simulation-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    background: var(--color-white);
+}
+
+.simulation-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.simulation-paused {
+    filter: grayscale(50%);
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.simulation-highlighted {
+    outline: 3px solid var(--color-warning);
+    outline-offset: 2px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Performance Optimizations for Simulations */
+.ui-component,
+.simulation-canvas,
+.interactive-element {
+    contain: layout style;
+    will-change: auto;
+}
+
+.interactive-element.dragging {
+    will-change: transform;
+}
+
+.ethics-meter .meter-fill,
+.progress-fill {
+    will-change: width;
+}
+
+/* Simulation State Indicators */
+.simulation-state {
+    position: absolute;
+    top: var(--spacing-2);
+    right: var(--spacing-2);
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: var(--radius-base);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    z-index: 100;
+}
+
+.simulation-state.running {
+    background: rgba(76, 175, 80, 0.9);
+    color: var(--color-white);
+}
+
+.simulation-state.paused {
+    background: rgba(255, 170, 0, 0.9);
+    color: var(--color-white);
+}
+
+.simulation-state.stopped {
+    background: rgba(244, 67, 54, 0.9);
+    color: var(--color-white);
+}
+
+.simulation-state.completed {
+    background: rgba(0, 124, 186, 0.9);
+    color: var(--color-white);
+}
+
+/* Enhanced Drag and Drop Support */
+.drag-source {
+    cursor: grab;
+}
+
+.drag-source:active {
+    cursor: grabbing;
+}
+
+.drop-zone {
+    border: 2px dashed var(--color-gray-400);
+    border-radius: var(--radius-lg);
+    background: rgba(0, 124, 186, 0.05);
+    transition: all var(--transition-fast);
+}
+
+.drop-zone.drag-over {
+    border-color: var(--color-primary);
+    background: rgba(0, 124, 186, 0.1);
+}
+
+.drop-zone.drop-valid {
+    border-color: var(--color-success);
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.drop-zone.drop-invalid {
+    border-color: var(--color-error);
+    background: rgba(244, 67, 54, 0.1);
+}
+
+/* Simulation Timeline Components */
+.simulation-timeline {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-3);
+    background: var(--color-gray-50);
+    border-radius: var(--radius-lg);
+    margin: var(--spacing-3) 0;
+}
+
+.timeline-controls {
+    display: flex;
+    gap: var(--spacing-1);
+}
+
+.timeline-button {
+    background: var(--color-white);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-base);
+    padding: var(--spacing-2);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    min-height: 32px;
+}
+
+.timeline-button:hover,
+.timeline-button:focus {
+    background: var(--color-gray-100);
+    border-color: var(--color-primary);
+}
+
+.timeline-button.active {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary-dark);
+}
+
+.timeline-scrubber {
+    flex: 1;
+    height: 4px;
+    background: var(--color-gray-300);
+    border-radius: var(--radius-base);
+    position: relative;
+    cursor: pointer;
+}
+
+.timeline-progress {
+    height: 100%;
+    background: var(--color-primary);
+    border-radius: var(--radius-base);
+    transition: width 0.1s ease;
+}
+
+.timeline-marker {
+    position: absolute;
+    top: -4px;
+    width: 12px;
+    height: 12px;
+    background: var(--color-primary);
+    border: 2px solid var(--color-white);
+    border-radius: var(--radius-full);
+    transform: translateX(-50%);
+    cursor: grab;
+    box-shadow: var(--shadow-sm);
+}
+
+.timeline-marker:active {
+    cursor: grabbing;
+}
+
+/* Enhanced Accessibility for Screen Readers */
+.sr-only-simulation {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Live Region for Dynamic Updates */
+.simulation-live-region {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* Simulation Help and Instructions */
+.simulation-help {
+    background: rgba(255, 235, 59, 0.1);
+    border: 1px solid var(--color-warning);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-3);
+    margin: var(--spacing-2) 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-800);
+}
+
+.simulation-help .help-title {
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--spacing-1);
+    color: var(--color-gray-900);
+}
+
+.simulation-instructions {
+    background: rgba(33, 150, 243, 0.1);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-3);
+    margin: var(--spacing-2) 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-800);
+}
+
+.simulation-instructions .instruction-step {
+    margin-bottom: var(--spacing-2);
+    padding-left: var(--spacing-4);
+    position: relative;
+}
+
+.simulation-instructions .instruction-step::before {
+    content: counter(step-counter);
+    counter-increment: step-counter;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: var(--color-primary);
+    color: var(--color-white);
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+}
+
+.simulation-instructions {
+    counter-reset: step-counter;
+}
+
+/* Reduced Motion Alternatives for Loading States */
+@media (prefers-reduced-motion: reduce) {
+    .ui-component.loading::after,
+    .simulation-canvas.loading::after {
+        animation: none;
+        content: "Loading...";
+        border: none;
+        border-radius: var(--radius-base);
+        width: auto;
+        height: auto;
+        background: var(--color-primary);
+        color: var(--color-white);
+        padding: var(--spacing-1) var(--spacing-2);
+        font-size: var(--font-size-xs);
+    }
+    
+    .simulation-highlighted {
+        animation: none;
+        outline-color: var(--color-error);
+    }
+}
+
+/* Enhanced Mobile and Small Screen Support */
+@media (max-width: 480px) {
+    .simulation-timeline {
+        flex-direction: column;
+        gap: var(--spacing-2);
+    }
+    
+    .timeline-controls {
+        order: 2;
+        justify-content: center;
+    }
+    
+    .timeline-scrubber {
+        order: 1;
+        height: 6px;
+    }
+    
+    .simulation-help,
+    .simulation-instructions {
+        padding: var(--spacing-2);
+        font-size: var(--font-size-xs);
+    }
+    
+    .decision-options {
+        gap: var(--spacing-3);
     }
     
     .decision-option {
-        background: var(--color-gray-700);
-        border-color: var(--color-gray-600);
-        color: var(--color-gray-100);
+        padding: var(--spacing-4);
+        font-size: var(--font-size-sm);
     }
-    
-    .decision-option:hover,
-    .decision-option:focus {
-        background: var(--color-gray-600);
-    }
-}
-
-/* High contrast mode for simulations */
-.high-contrast .ui-component {
-    border: 2px solid var(--color-black);
-}
-
-.high-contrast .decision-option {
-    border: 2px solid var(--color-black);
-}
-
-.high-contrast .decision-option.selected {
-    background: var(--color-black);
-    color: var(--color-white);
 }
