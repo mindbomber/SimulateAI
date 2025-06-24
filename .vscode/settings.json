@@ -1,0 +1,18 @@
+{
+    "mcp.filesystem.allowedDirectories": [
+        "c:/Users/soria/OneDrive/Desktop/SimulateAI"
+    ],
+    "mcp.servers": {
+        "filesystem": {
+            "command": "npx",
+            "args": [
+                "@modelcontextprotocol/server-filesystem",
+                "c:/Users/soria/OneDrive/Desktop/SimulateAI"
+            ],
+            "type": "stdio"
+        }
+    },
+    "chat.mcp.serverSampling": {
+
+    }
+}
