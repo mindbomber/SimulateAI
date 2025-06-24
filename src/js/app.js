@@ -18,6 +18,9 @@ import Helpers from './utils/helpers.js';
 import CanvasRenderer from './renderers/canvas-renderer.js';
 import SVGRenderer from './renderers/svg-renderer.js';
 
+// Import components
+import HeroDemo from './components/hero-demo.js';
+
 class AIEthicsApp {
     constructor() {
         this.currentSimulation = null;
@@ -89,9 +92,11 @@ class AIEthicsApp {
             
             // Initialize accessibility
             this.setupAccessibility();
-            
-            // Render initial state
+              // Render initial state
             this.render();
+            
+            // Initialize hero demo
+            this.initializeHeroDemo();
             
             this.isInitialized = true;
             console.log('AI Ethics App initialized successfully');
@@ -594,6 +599,16 @@ class AIEthicsApp {
         alert(`Error: ${message}`);
         
         AnalyticsManager.trackError(new Error(message), { context: 'app_error' });
+    }
+
+    initializeHeroDemo() {
+        try {
+            // Initialize the hero demo component
+            this.heroDemo = new HeroDemo();
+            console.log('Hero demo initialized');
+        } catch (error) {
+            console.error('Failed to initialize hero demo:', error);
+        }
     }
 }
 
