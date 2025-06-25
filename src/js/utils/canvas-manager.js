@@ -4,7 +4,7 @@
  * 
  * Features:
  * - WCAG 2.1 AA compliant canvas accessibility
- * - Dark mode and theme integration
+ * - Theme integration
  * - Performance monitoring and optimization
  * - Advanced error handling and recovery
  * - Touch and gesture support
@@ -47,14 +47,12 @@ const CANVAS_EVENTS = {
 class CanvasTheme {
     static getCurrentTheme() {
         const prefersHighContrast = window.matchMedia?.('(prefers-contrast: high)').matches;
-        const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
         const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
         
         return {
             highContrast: prefersHighContrast,
-            darkMode: prefersDark,
             reducedMotion: prefersReducedMotion,
-            theme: prefersHighContrast ? 'highContrast' : (prefersDark ? 'dark' : 'light')
+            theme: prefersHighContrast ? 'highContrast' : 'light'
         };
     }
     
@@ -62,12 +60,9 @@ class CanvasTheme {
         const currentTheme = theme || this.getCurrentTheme();
         
         return {
-            backgroundColor: currentTheme.highContrast ? '#000000' : 
-                           (currentTheme.darkMode ? '#1a1a1a' : '#ffffff'),
-            borderColor: currentTheme.highContrast ? '#ffff00' : 
-                        (currentTheme.darkMode ? '#404040' : '#e0e0e0'),
-            focusColor: currentTheme.highContrast ? '#ffff00' : 
-                       (currentTheme.darkMode ? '#4da6ff' : '#007bff')
+            backgroundColor: currentTheme.highContrast ? '#000000' : '#ffffff',
+            borderColor: currentTheme.highContrast ? '#ffff00' : '#e0e0e0',
+            focusColor: currentTheme.highContrast ? '#ffff00' : '#007bff'
         };
     }
 }
@@ -185,7 +180,6 @@ class CanvasManager {    constructor() {
      * Setup theme change monitoring
      */
     setupThemeMonitoring() {
-        const darkModeQuery = window.matchMedia?.('(prefers-color-scheme: dark)');
         const contrastQuery = window.matchMedia?.('(prefers-contrast: high)');
         const motionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
         
@@ -195,12 +189,11 @@ class CanvasManager {    constructor() {
             this.emit(CANVAS_EVENTS.THEME_CHANGED, { theme: this.theme });
         };
         
-        darkModeQuery?.addEventListener?.('change', handleThemeChange);
         contrastQuery?.addEventListener?.('change', handleThemeChange);
         motionQuery?.addEventListener?.('change', handleThemeChange);
         
         // Store references for cleanup
-        this.themeQueries = { darkModeQuery, contrastQuery, motionQuery };
+        this.themeQueries = { contrastQuery, motionQuery };
         this.themeChangeHandler = handleThemeChange;
     }
     
@@ -261,7 +254,6 @@ class CanvasManager {    constructor() {
         canvas.style.outline = 'none';
         
         // Add theme classes
-        canvas.classList.toggle('canvas-dark-mode', this.theme.darkMode);
         canvas.classList.toggle('canvas-high-contrast', this.theme.highContrast);
         canvas.classList.toggle('canvas-reduced-motion', this.theme.reducedMotion);
     }    /**
@@ -754,9 +746,8 @@ class CanvasManager {    constructor() {
             
             // Remove theme change listeners
             if (this.themeQueries) {
-                const { darkModeQuery, contrastQuery, motionQuery } = this.themeQueries;
+                const { contrastQuery, motionQuery } = this.themeQueries;
                 
-                darkModeQuery?.removeEventListener?.('change', this.themeChangeHandler);
                 contrastQuery?.removeEventListener?.('change', this.themeChangeHandler);
                 motionQuery?.removeEventListener?.('change', this.themeChangeHandler);
             }

@@ -39,14 +39,12 @@ const SCREEN_READER_PATTERNS = {
 class AccessibilityTheme {
     static getCurrentTheme() {
         const prefersHighContrast = window.matchMedia?.('(prefers-contrast: high)').matches;
-        const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
         const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
         
         return {
             highContrast: prefersHighContrast,
-            darkMode: prefersDark,
             reducedMotion: prefersReducedMotion,
-            theme: prefersHighContrast ? 'highContrast' : (prefersDark ? 'dark' : 'light')
+            theme: prefersHighContrast ? 'highContrast' : 'light'
         };
     }
     
@@ -64,7 +62,7 @@ class AccessibilityTheme {
         return {
             outline: '2px solid #007bff',
             outlineOffset: '2px',
-            backgroundColor: currentTheme.darkMode ? 'rgba(77, 166, 255, 0.1)' : 'rgba(0, 123, 255, 0.1)'
+            backgroundColor: 'rgba(0, 123, 255, 0.1)'
         };
     }
 }
@@ -218,14 +216,13 @@ class AccessibilityManager {
     
     updateContainerTheme() {
         this.container.classList.toggle('high-contrast', this.theme.highContrast);
-        this.container.classList.toggle('dark-mode', this.theme.darkMode);
         this.container.classList.toggle('reduced-motion', this.theme.reducedMotion);
         
         // Update CSS custom properties for enhanced theming
         this.container.style.setProperty('--accessibility-focus-color', 
-            this.theme.highContrast ? '#ffff00' : (this.theme.darkMode ? '#4da6ff' : '#007bff'));
+            this.theme.highContrast ? '#ffff00' : '#007bff');
         this.container.style.setProperty('--accessibility-bg-color', 
-            this.theme.highContrast ? '#000000' : (this.theme.darkMode ? '#1a1a1a' : '#ffffff'));
+            this.theme.highContrast ? '#000000' : '#ffffff');
     }
     
     setupThemeIntegration() {
@@ -267,7 +264,6 @@ class AccessibilityManager {
     
     observeThemeChanges() {
         // Watch for system theme changes
-        const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
         const contrastQuery = window.matchMedia('(prefers-contrast: high)');
         const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
         
@@ -279,13 +275,11 @@ class AccessibilityManager {
             this.announce(`Theme updated: ${this.theme.theme} mode`);
         };
         
-        if (darkModeQuery.addEventListener) {
-            darkModeQuery.addEventListener('change', updateTheme);
+        if (contrastQuery.addEventListener) {
             contrastQuery.addEventListener('change', updateTheme);
             motionQuery.addEventListener('change', updateTheme);
         } else {
             // Fallback for older browsers
-            darkModeQuery.addListener(updateTheme);
             contrastQuery.addListener(updateTheme);
             motionQuery.addListener(updateTheme);
         }
@@ -688,7 +682,7 @@ class AccessibilityManager {
             right: 10px;
             display: flex;
             gap: 5px;
-            background: ${this.theme.darkMode ? '#2d2d2d' : '#ffffff'};
+            background: #ffffff;
             border: 2px solid ${this.theme.highContrast ? '#ffff00' : '#007bff'};
             border-radius: 4px;
             padding: 5px;
@@ -1799,12 +1793,10 @@ class AccessibilityManager {
             document.removeEventListener('focusout', this.onFocusChange);
             
             // Remove theme change listeners
-            const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
             const contrastQuery = window.matchMedia('(prefers-contrast: high)');
             const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
             
-            if (darkModeQuery.removeEventListener) {
-                darkModeQuery.removeEventListener('change', this.updateTheme);
+            if (contrastQuery.removeEventListener) {
                 contrastQuery.removeEventListener('change', this.updateTheme);
                 motionQuery.removeEventListener('change', this.updateTheme);
             }

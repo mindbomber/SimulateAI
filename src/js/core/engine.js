@@ -125,14 +125,12 @@ class EnginePerformanceMonitor {
 class EngineTheme {
     static getCurrentTheme() {
         const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-        const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
         const prefersHighContrast = window.matchMedia?.('(prefers-contrast: high)').matches;
         
         return {
             reducedMotion: prefersReducedMotion,
-            darkMode: prefersDark,
             highContrast: prefersHighContrast,
-            theme: prefersHighContrast ? 'highContrast' : (prefersDark ? 'dark' : 'light')
+            theme: prefersHighContrast ? 'highContrast' : 'light'
         };
     }
     
@@ -141,7 +139,6 @@ class EngineTheme {
         
         return {
             reducedMotion: currentTheme.reducedMotion,
-            darkMode: currentTheme.darkMode,
             highContrast: currentTheme.highContrast,
             performanceMode: currentTheme.reducedMotion ? PERFORMANCE_MODES.COMPATIBILITY : PERFORMANCE_MODES.BALANCED
         };
@@ -169,7 +166,6 @@ class SimulationEngine {
                 debug: config.debug || false,
                 targetFPS: config.targetFPS || ENGINE_CONSTANTS.TARGET_FPS,
                 enableAnimations: !this.themeConfig.reducedMotion && config.enableAnimations !== false,
-                darkMode: this.themeConfig.darkMode,
                 highContrast: this.themeConfig.highContrast,
                 autoSave: config.autoSave !== false,
                 memoryCleanup: config.memoryCleanup !== false,
@@ -279,7 +275,6 @@ class SimulationEngine {
             // Apply theme-specific renderer configuration
             const rendererConfig = {
                 ...this.config,
-                darkMode: this.config.darkMode,
                 highContrast: this.config.highContrast,
                 reducedMotion: this.themeConfig.reducedMotion
             };
@@ -437,7 +432,6 @@ class SimulationEngine {
 
     setupThemeMonitoring() {
         // Monitor theme changes
-        const darkModeQuery = window.matchMedia?.('(prefers-color-scheme: dark)');
         const reducedMotionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
         const highContrastQuery = window.matchMedia?.('(prefers-contrast: high)');
 
@@ -449,9 +443,6 @@ class SimulationEngine {
             }
         };
 
-        if (darkModeQuery?.addEventListener) {
-            darkModeQuery.addEventListener('change', handleThemeChange);
-        }
         if (reducedMotionQuery?.addEventListener) {
             reducedMotionQuery.addEventListener('change', handleThemeChange);
         }
@@ -461,7 +452,6 @@ class SimulationEngine {
 
         // Store cleanup functions
         this.themeCleanup = () => {
-            darkModeQuery?.removeEventListener?.('change', handleThemeChange);
             reducedMotionQuery?.removeEventListener?.('change', handleThemeChange);
             highContrastQuery?.removeEventListener?.('change', handleThemeChange);
         };
@@ -486,19 +476,17 @@ class SimulationEngine {
 
         // Update container classes for theme
         const themeClasses = [];
-        if (this.config.darkMode) themeClasses.push('dark-mode');
         if (this.config.highContrast) themeClasses.push('high-contrast');
         if (this.themeConfig.reducedMotion) themeClasses.push('reduced-motion');
 
         this.container.className = this.container.className
-            .replace(/\b(dark-mode|high-contrast|reduced-motion)\b/g, '')
+            .replace(/\b(high-contrast|reduced-motion)\b/g, '')
             .trim() + ' ' + themeClasses.join(' ');
     }
 
     handleThemeChange() {
         try {
             // Update configuration
-            this.config.darkMode = this.themeConfig.darkMode;
             this.config.highContrast = this.themeConfig.highContrast;
             this.config.enableAnimations = !this.themeConfig.reducedMotion && this.config.enableAnimations !== false;
 
@@ -1115,7 +1103,7 @@ class SimulationEngine {
             Object.assign(this.config, newConfig);
             
             // Apply configuration changes
-            if (newConfig.darkMode !== undefined || newConfig.highContrast !== undefined) {
+            if (newConfig.highContrast !== undefined) {
                 this.applyTheme();
             }
             
@@ -1154,9 +1142,7 @@ class SimulationEngine {
                 user-select: none;
             `;
             
-            const themeStyles = this.config.darkMode ? 
-                'background: rgba(0, 0, 0, 0.9); color: #e0e0e0; border-color: rgba(255, 255, 255, 0.2);' :
-                'background: rgba(255, 255, 255, 0.9); color: #333; border-color: rgba(0, 0, 0, 0.1);';
+            const themeStyles = 'background: rgba(255, 255, 255, 0.9); color: #333; border-color: rgba(0, 0, 0, 0.1);';
             
             debugOverlay.style.cssText = baseStyles + themeStyles;
             

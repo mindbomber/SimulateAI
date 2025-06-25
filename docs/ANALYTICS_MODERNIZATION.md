@@ -102,7 +102,7 @@ AnalyticsManager.init({
 sessionData: {
     sessionId: 'unique_session_id',
     startTime: timestamp,
-    theme: { darkMode: false, highContrast: false },
+    theme: { highContrast: false },
     accessibility: { screenReader: false, keyboardNav: true },
     performance: { memory: 45.2, connection: '4g' },
     userAgent: 'truncated_for_privacy'

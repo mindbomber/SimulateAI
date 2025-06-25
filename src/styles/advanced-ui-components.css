@@ -1,47 +1,46 @@
 /**
  * Advanced UI Components Styles
  * Modern, accessible styles for modal dialogs, navigation menus, charts, forms, and tooltips
- * Enhanced with CSS custom properties, dark mode, accessibility, and responsive design
+ * Enhanced with CSS custom properties, accessibility, and responsive design
  */
 
-/* ===== CSS CUSTOM PROPERTIES FOR CONSISTENCY ===== */
+/* ===== CSS CUSTOM PROPERTIES FOR ADVANCED UI COMPONENTS ===== */
 :root {
-    /* Advanced UI Component Colors - Light Mode */
+    /* Component-specific colors (inherits base colors from main.css) */
     --modal-backdrop: rgba(0, 0, 0, 0.5);
-    --modal-background: var(--color-white, #ffffff);
-    --modal-border: var(--color-gray-200, #e0e0e0);
-    --modal-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    --modal-background: var(--color-white);
+    --modal-border: var(--color-gray-200);
+    --modal-shadow: var(--shadow-xl);
     
-    --nav-background: var(--color-white, #ffffff);
-    --nav-border: var(--color-gray-200, #e0e0e0);
-    --nav-item-hover: var(--color-gray-50, #f5f5f5);
-    --nav-item-selected: var(--color-primary, #2196f3);
-    --nav-item-focus: var(--color-warning, #ff9800);
+    --nav-background: var(--color-white);
+    --nav-border: var(--color-gray-200);
+    --nav-item-hover: var(--color-gray-50);
+    --nav-item-selected: var(--color-primary);
+    --nav-item-focus: var(--color-warning);
     
-    --form-background: var(--color-white, #ffffff);
-    --form-border: var(--color-gray-400, #ccc);
-    --form-border-focus: var(--color-primary, #2196f3);
-    --form-border-error: var(--color-error, #f44336);
-    --form-disabled-bg: var(--color-gray-50, #f5f5f5);
+    --form-background: var(--color-white);
+    --form-border: var(--color-gray-400);
+    --form-border-focus: var(--color-primary);
+    --form-border-error: var(--color-error);
+    --form-disabled-bg: var(--color-gray-50);
     
     --tooltip-background: rgba(0, 0, 0, 0.9);
-    --tooltip-text: var(--color-white, #ffffff);
+    --tooltip-text: var(--color-white);
     
-    /* Component Sizing */
-    --modal-border-radius: var(--radius-lg, 8px);
-    --button-border-radius: var(--radius-base, 4px);
-    --input-border-radius: var(--radius-base, 4px);
+    /* Component sizing (uses main.css border radius tokens) */
+    --modal-border-radius: var(--radius-lg);
+    --button-border-radius: var(--radius-base);
+    --input-border-radius: var(--radius-base);
     
-    /* Animation Timing */
-    --transition-fast: var(--transition-fast, 0.2s ease);
+    /* Component-specific animations */
     --transition-modal: 0.3s ease-out;
     
-    /* Z-Index Scale */
+    /* Component z-index scale */
     --z-modal-backdrop: 999;
     --z-modal: 1000;
     --z-tooltip: 1500;
     
-    /* Touch Target Sizes */
+    /* Touch targets and focus (accessibility) */
     --touch-target-min: 44px;
     --focus-ring-width: 2px;
     --focus-ring-offset: 2px;
@@ -914,52 +913,6 @@
 .form-label {
     text-rendering: optimizeLegibility;
     font-feature-settings: "kern" 1;
-}
-
-/* ===== DARK MODE SUPPORT ===== */
-@media (prefers-color-scheme: dark) {
-    :root {
-        /* Dark mode color overrides */
-        --modal-backdrop: rgba(0, 0, 0, 0.8);
-        --modal-background: var(--color-gray-800, #424242);
-        --modal-border: var(--color-gray-600, #616161);
-        --modal-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-        
-        --nav-background: var(--color-gray-800, #424242);
-        --nav-border: var(--color-gray-600, #616161);
-        --nav-item-hover: var(--color-gray-700, #515151);
-        --nav-item-selected: var(--color-primary-light, #4da6d9);
-        
-        --form-background: var(--color-gray-800, #424242);
-        --form-border: var(--color-gray-600, #616161);
-        --form-border-focus: var(--color-primary-light, #4da6d9);
-        --form-disabled-bg: var(--color-gray-700, #515151);
-        
-        --tooltip-background: rgba(255, 255, 255, 0.95);
-        --tooltip-text: var(--color-gray-900, #333);
-    }
-    
-    .modal-title,
-    .chart-title,
-    .form-label,
-    .nav-item {
-        color: var(--color-gray-100, #f0f0f0);
-    }
-    
-    .form-input,
-    .form-select,
-    .form-textarea {
-        color: var(--color-gray-100, #f0f0f0);
-    }
-    
-    .form-input::placeholder,
-    .form-textarea::placeholder {
-        color: var(--color-gray-400, #9e9e9e);
-    }
-    
-    .legend-item {
-        color: var(--color-gray-200, #e0e0e0);
-    }
 }
 
 /* ===== ENHANCED ACCESSIBILITY FEATURES ===== */

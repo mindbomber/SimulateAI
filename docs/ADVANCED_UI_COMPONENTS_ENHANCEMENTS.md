@@ -205,7 +205,6 @@ Comprehensive modernization and enhancement of the advanced-ui-components.css fi
 - ✅ **Buttons**: Primary, secondary with loading states
 
 ### Media Query Support
-- ✅ `@media (prefers-color-scheme: dark)` - Dark mode
 - ✅ `@media (prefers-reduced-motion: reduce)` - Motion sensitivity
 - ✅ `@media (prefers-contrast: high)` - High contrast mode
 - ✅ `@media (hover: none) and (pointer: coarse)` - Touch devices

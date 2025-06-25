@@ -41,14 +41,12 @@ const EASING_PRESETS = {
 class AnimationTheme {
     static getCurrentTheme() {
         const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-        const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
         const prefersHighContrast = window.matchMedia?.('(prefers-contrast: high)').matches;
         
         return {
             reducedMotion: prefersReducedMotion,
-            darkMode: prefersDark,
             highContrast: prefersHighContrast,
-            theme: prefersHighContrast ? 'highContrast' : (prefersDark ? 'dark' : 'light')
+            theme: prefersHighContrast ? 'highContrast' : 'light'
         };
     }
     
@@ -192,7 +190,6 @@ export class AnimationManager {    constructor(engine) {
     setupThemeIntegration() {
         // Watch for theme changes
         const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-        const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
         const contrastQuery = window.matchMedia('(prefers-contrast: high)');
         
         const updateTheme = () => {
@@ -204,12 +201,11 @@ export class AnimationManager {    constructor(engine) {
         
         if (reducedMotionQuery.addEventListener) {
             reducedMotionQuery.addEventListener('change', updateTheme);
-            darkModeQuery.addEventListener('change', updateTheme);
             contrastQuery.addEventListener('change', updateTheme);
         }
         
         // Store listeners for cleanup
-        this.themeListeners = { reducedMotionQuery, darkModeQuery, contrastQuery, updateTheme };
+        this.themeListeners = { reducedMotionQuery, contrastQuery, updateTheme };
     }
     
     setupAccessibilityFeatures() {
@@ -1292,11 +1288,10 @@ export class AnimationManager {    constructor(engine) {
     removeEventListeners() {
         try {
             if (this.themeListeners) {
-                const { reducedMotionQuery, darkModeQuery, contrastQuery, updateTheme } = this.themeListeners;
+                const { reducedMotionQuery, contrastQuery, updateTheme } = this.themeListeners;
                 
                 if (reducedMotionQuery.removeEventListener) {
                     reducedMotionQuery.removeEventListener('change', updateTheme);
-                    darkModeQuery.removeEventListener('change', updateTheme);
                     contrastQuery.removeEventListener('change', updateTheme);
                 }
             }
@@ -1405,7 +1400,6 @@ AnimationManager.getSystemAnimationPreferences = function() {
     
     return {
         reducedMotion: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false,
-        darkMode: window.matchMedia?.('(prefers-color-scheme: dark)').matches || false,
         highContrast: window.matchMedia?.('(prefers-contrast: high)').matches || false,
         animationSupport: this.detectAnimationSupport()
     };

@@ -21,7 +21,7 @@ Successfully completed the comprehensive modernization of core rendering and uti
 ## Key Modernization Features
 
 ### 🎨 Theme & Accessibility
-- **Dark Mode Support**: Complete theme system with light, dark, and high-contrast modes
+- **Theme Support**: Complete theme system with light and high-contrast modes
 - **Accessibility Compliance**: WCAG 2.1 AA standards, screen reader support, keyboard navigation
 - **Reduced Motion**: Respects user preferences for motion sensitivity
 - **Focus Management**: Enhanced focus visibility and ARIA support

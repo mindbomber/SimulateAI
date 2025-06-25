@@ -418,20 +418,16 @@ class CanvasRenderer {
    */
   setupThemeMonitoring() {
     if (window.matchMedia) {
-      const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
       const contrastQuery = window.matchMedia('(prefers-contrast: high)');
       
       const updateTheme = () => {
         let newTheme = 'light';
         if (contrastQuery.matches) {
           newTheme = 'high_contrast';
-        } else if (darkModeQuery.matches) {
-          newTheme = 'dark';
         }
         this.setTheme(newTheme);
       };
       
-      darkModeQuery.addEventListener('change', updateTheme);
       contrastQuery.addEventListener('change', updateTheme);
       
       // Initial theme detection
@@ -1252,7 +1248,7 @@ class CanvasRenderer {
   generateSliceColor(index, total) {
     const hue = (index / total) * 360;
     const saturation = 70;
-    const lightness = this.currentTheme === CANVAS_CONSTANTS.THEMES.DARK ? 60 : 50;
+    const lightness = 50;
     return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
   }
   

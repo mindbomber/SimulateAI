@@ -100,17 +100,16 @@
     <script>
         // Check if we can access the main app's storage
         function checkStates() {
-            const systemDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
-            document.getElementById('system-dark').textContent = systemDark ? 'Yes' : 'No';
-            document.getElementById('media-dark').textContent = systemDark ? 'Yes' : 'No';
+            const systemDark = false; // Dark mode removed from system
+            document.getElementById('system-dark').textContent = 'No';
+            document.getElementById('media-dark').textContent = 'No';
             
             // Try to read app storage
             try {
                 const appStorage = localStorage.getItem('ai_ethics_accessibility');
                 if (appStorage) {
                     const parsed = JSON.parse(appStorage);
-                    document.getElementById('app-dark').textContent = 
-                        parsed.darkMode !== undefined ? (parsed.darkMode ? 'Yes' : 'No') : 'Not Set';
+                    document.getElementById('app-dark').textContent = 'No (Dark mode removed)';
                 } else {
                     document.getElementById('app-dark').textContent = 'No Storage';
                 }
@@ -141,16 +140,11 @@
             results.appendChild(div);
         }
         
-        // Monitor system theme changes
-        const darkModeQuery = window.matchMedia?.('(prefers-color-scheme: dark)');
-        darkModeQuery?.addEventListener?.('change', (e) => {
-            addTestResult(`System theme changed to: ${e.matches ? 'Dark' : 'Light'}`, 'info');
-            checkStates();
-        });
+        // Dark mode monitoring removed from system
         
         // Initial check
         checkStates();
-        addTestResult('Theme test page loaded', 'success');
+        addTestResult('Theme test page loaded (dark mode removed)', 'success');
     </script>
 </body>
 </html>

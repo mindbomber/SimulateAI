@@ -111,7 +111,7 @@ const result = await StorageManager.importData(jsonData, options);
 
 ### Theme Integration
 - Storage preferences include theme settings
-- Dark mode and accessibility preferences persist
+- Accessibility preferences persist
 - Cross-tab theme synchronization
 
 ### Accessibility Support

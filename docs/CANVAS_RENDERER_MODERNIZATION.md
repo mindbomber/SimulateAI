@@ -238,7 +238,6 @@ drawButton(x, y, width, height, 'Click Me', {
 ### Automatic Detection
 ```javascript
 // Automatically detects user preferences
-const darkMode = window.matchMedia('(prefers-color-scheme: dark)');
 const highContrast = window.matchMedia('(prefers-contrast: high)');
 ```
 

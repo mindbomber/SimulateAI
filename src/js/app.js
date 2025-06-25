@@ -4,33 +4,62 @@
  */
 
 // Import core modules
-import SimulationEngine from './core/engine.js';
-import VisualEngine from './core/visual-engine.js';
 import EthicsSimulation from './core/simulation.js';
-import { UIComponent, UIPanel, EthicsDisplay, FeedbackSystem, Button, Slider } from './core/ui.js';
 import AccessibilityManager from './core/accessibility.js';
 import AnimationManager from './core/animation-manager.js';
 
 // Import utilities
-import { simpleStorage, userPreferences, userProgress } from './utils/simple-storage.js';
+import { userPreferences, userProgress } from './utils/simple-storage.js';
 import { simpleAnalytics } from './utils/simple-analytics.js';
 import Helpers from './utils/helpers.js';
 import canvasManager from './utils/canvas-manager.js';
 
-// Import renderers
-import CanvasRenderer from './renderers/canvas-renderer.js';
-import SVGRenderer from './renderers/svg-renderer.js';
-
-// Import components
-// import HeroDemo from './components/hero-demo.js'; // Removed - using integrated demo instead
-
 // Import enhanced objects
-import { BaseObject, EthicsMeter, InteractiveButton, InteractiveSlider } from './objects/enhanced-objects.js';
+import { EthicsMeter, InteractiveButton, InteractiveSlider } from './objects/enhanced-objects.js';
 
-// Import layout and UI components
-import { TabContainer } from './objects/layout-components.js';
-import { ModalDialog, Tooltip } from './objects/advanced-ui-components.js';
-import { SearchBox } from './objects/input-utility-components.js';
+// Constants for app configuration
+const APP_CONSTANTS = {
+    VIEWPORT: {
+        MOBILE_BREAKPOINT: 767
+    },
+    DEFAULTS: {
+        SCORE_VALUE: 0.5,
+        SLIDER_VALUE: 50,
+        METER_VALUE: 0.5,
+        ETHICS_METER_VALUE: 50
+    },
+    FEEDBACK: {
+        EXCELLENT_THRESHOLD: 70,
+        GOOD_THRESHOLD: 50
+    },
+    TIMING: {
+        ANIMATION_DELAY: 300,
+        NOTIFICATION_DURATION: 4000,
+        STAGGER_DELAY: 300,
+        QUICK_DELAY: 50
+    }
+};
+
+// Debug utility to replace console statements
+const AppDebug = {
+    log: (message, data = null) => {
+        if (window.DEBUG_MODE || localStorage.getItem('debug') === 'true') {
+            // eslint-disable-next-line no-console
+            console.log(`[App] ${message}`, data || '');
+        }
+    },
+    warn: (message, data = null) => {
+        if (window.DEBUG_MODE || localStorage.getItem('debug') === 'true') {
+            // eslint-disable-next-line no-console
+            console.warn(`[App] ${message}`, data || '');
+        }
+    },
+    error: (message, error = null) => {
+        // Always show errors
+        // eslint-disable-next-line no-console
+        console.error(`[App] ${message}`, error || '');
+    }
+};
 
 class AIEthicsApp {
     constructor() {
@@ -68,8 +97,7 @@ class AIEthicsApp {
         this.preferences = {
             reducedMotion: false,
             highContrast: false,
-            largeText: false,
-            darkMode: false
+            largeText: false
         };
         
         // Error handling
@@ -150,7 +178,7 @@ class AIEthicsApp {
             await this.initializeEnhancedObjects();
             
             this.isInitialized = true;
-            console.log('AI Ethics App initialized successfully with modernized infrastructure');
+            AppDebug.log('AI Ethics App initialized successfully with modernized infrastructure');
             
             // Track initialization
             simpleAnalytics.trackEvent('app_initialized', {
@@ -162,7 +190,7 @@ class AIEthicsApp {
             });
             
         } catch (error) {
-            console.error('Failed to initialize app:', error);
+            AppDebug.error('Failed to initialize app:', error);
             this.handleError(error, 'Failed to initialize the application. Please refresh the page.');
         }
     }
@@ -173,7 +201,6 @@ class AIEthicsApp {
     initializeTheme() {
         // Detect system preferences
         const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-        const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
         const prefersHighContrast = window.matchMedia?.('(prefers-contrast: high)').matches;
         
         // Get saved user preferences (they override system preferences)
@@ -182,12 +209,11 @@ class AIEthicsApp {
         // Use saved preferences if they exist, otherwise use system preferences
         this.preferences = {
             reducedMotion: savedPreferences.reducedMotion !== undefined ? savedPreferences.reducedMotion : prefersReducedMotion,
-            darkMode: savedPreferences.darkMode !== undefined ? savedPreferences.darkMode : prefersDark,
             highContrast: savedPreferences.highContrast !== undefined ? savedPreferences.highContrast : prefersHighContrast,
             largeText: savedPreferences.largeText || false // Default to false
         };
         
-        this.currentTheme = this.preferences.highContrast ? 'high-contrast' : (this.preferences.darkMode ? 'dark' : 'light');
+        this.currentTheme = this.preferences.highContrast ? 'high-contrast' : 'light';
         
         // Apply initial theme
         this.applyTheme();
@@ -195,14 +221,13 @@ class AIEthicsApp {
         // Monitor theme changes
         this.setupThemeMonitoring();
         
-        console.log('Theme initialized:', this.currentTheme, this.preferences);
+        AppDebug.log('Theme initialized:', this.currentTheme, this.preferences);
     }
     
     /**
      * Setup theme change monitoring
      */
     setupThemeMonitoring() {
-        const darkModeQuery = window.matchMedia?.('(prefers-color-scheme: dark)');
         const reducedMotionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
         const highContrastQuery = window.matchMedia?.('(prefers-contrast: high)');
 
@@ -217,9 +242,6 @@ class AIEthicsApp {
             if (savedPreferences.reducedMotion === undefined) {
                 newPreferences.reducedMotion = reducedMotionQuery?.matches || false;
             }
-            if (savedPreferences.darkMode === undefined) {
-                newPreferences.darkMode = darkModeQuery?.matches || false;
-            }
             if (savedPreferences.highContrast === undefined) {
                 newPreferences.highContrast = highContrastQuery?.matches || false;
             }
@@ -227,16 +249,14 @@ class AIEthicsApp {
             
             if (JSON.stringify(newPreferences) !== JSON.stringify(this.preferences)) {
                 this.preferences = newPreferences;
-                this.currentTheme = newPreferences.highContrast ? 'high-contrast' : 
-                                 (newPreferences.darkMode ? 'dark' : 'light');
+                this.currentTheme = newPreferences.highContrast ? 'high-contrast' : 'light';
                 this.applyTheme();
                 this.announceThemeChange();
                 
-                console.log('System theme changed, updated non-user-set preferences:', newPreferences);
+                AppDebug.log('System theme changed, updated non-user-set preferences:', newPreferences);
             }
         };
 
-        darkModeQuery?.addEventListener?.('change', handleThemeChange);
         reducedMotionQuery?.addEventListener?.('change', handleThemeChange);
         highContrastQuery?.addEventListener?.('change', handleThemeChange);
     }
@@ -245,13 +265,12 @@ class AIEthicsApp {
      * Apply current theme to the application
      */
     applyTheme() {
-        const body = document.body;
+        const { body } = document;
         
         // Remove existing theme classes
-        body.classList.remove('dark-mode', 'high-contrast', 'reduced-motion', 'large-text');
+        body.classList.remove('high-contrast', 'reduced-motion', 'large-text');
         
         // Apply current theme classes
-        if (this.preferences.darkMode) body.classList.add('dark-mode');
         if (this.preferences.highContrast) body.classList.add('high-contrast');
         if (this.preferences.reducedMotion) body.classList.add('reduced-motion');
         if (this.preferences.largeText) body.classList.add('large-text');
@@ -262,16 +281,14 @@ class AIEthicsApp {
         // Update theme color meta tag
         const themeColorMeta = document.querySelector('meta[name="theme-color"]');
         if (themeColorMeta) {
-            const themeColor = this.preferences.darkMode ? '#1a1a1a' : '#1a73e8';
+            const themeColor = '#1a73e8'; // Always use light theme color
             themeColorMeta.setAttribute('content', themeColor);
         }
         
         // Update managers if they exist
         if (this.animationManager) {
-            this.animationManager.updateConfiguration({
-                enableAnimations: !this.preferences.reducedMotion,
-                reducedMotion: this.preferences.reducedMotion
-            });
+            // Update the animation manager theme when preferences change
+            this.animationManager.updateAnimationDefaults();
         }
         
         if (this.accessibilityManager) {
@@ -283,14 +300,10 @@ class AIEthicsApp {
      * Update accessibility button states
      */
     updateButtonStates() {
-        const darkModeBtn = document.getElementById('toggle-dark-mode');
         const highContrastBtn = document.getElementById('toggle-high-contrast');
         const largeTextBtn = document.getElementById('toggle-large-text');
         const reducedMotionBtn = document.getElementById('toggle-reduced-motion');
         
-        if (darkModeBtn) {
-            darkModeBtn.setAttribute('aria-pressed', this.preferences.darkMode.toString());
-        }
         if (highContrastBtn) {
             highContrastBtn.setAttribute('aria-pressed', this.preferences.highContrast.toString());
         }
@@ -335,7 +348,7 @@ class AIEthicsApp {
             this.handleError(event.reason, 'An unhandled promise rejection occurred');
         });
         
-        console.log('Error handling initialized');
+        AppDebug.log('Error handling initialized');
     }
     
     /**
@@ -343,7 +356,7 @@ class AIEthicsApp {
      */
     handleError(error, userMessage = 'An unexpected error occurred') {
         this.lastError = error;
-        console.error('App Error:', error);
+        AppDebug.error('App Error:', error);
         
         // Track error for analytics
         simpleAnalytics.trackEvent('app_error', {
@@ -464,17 +477,16 @@ class AIEthicsApp {
                 accessibility: true,
                 highPerformance: !this.preferences.reducedMotion,
                 debug: false,
-                darkMode: this.preferences.darkMode,
                 highContrast: this.preferences.highContrast,
                 reducedMotion: this.preferences.reducedMotion
             };
 
             // Systems are already initialized via their modules
             // Simple analytics auto-initializes
-            console.log('Core systems initialized with modernized infrastructure');
+            AppDebug.log('Core systems initialized with modernized infrastructure');
             
         } catch (error) {
-            console.error('Failed to initialize systems:', error);
+            AppDebug.error('Failed to initialize systems:', error);
             throw error;
         }
     }
@@ -487,22 +499,13 @@ class AIEthicsApp {
         this.loading = document.getElementById('loading');
         
         if (!this.simulationsGrid) {
-            console.error('Simulations grid not found');
+            AppDebug.error('Simulations grid not found');
             return;        }
     }
 
     async loadSimulations() {
-        // Load simulation classes
-        const simulationModules = {
-            'bias-fairness': () => import('./simulations/bias-fairness.js')
-            // TODO: Add more simulations
-            // 'consent-transparency': () => import('./simulations/consent-transparency.js'),
-            // 'autonomy-oversight': () => import('./simulations/autonomy-oversight.js'),
-            // 'misinformation-trust': () => import('./simulations/misinformation-trust.js')
-        };
-
-        // For now, we'll create placeholder simulations
-        // In a real implementation, these would be separate modules
+        // Simulations are loaded dynamically in createSimulationInstance()
+        // Store available simulation configs in the simulations Map
         this.availableSimulations.forEach(simConfig => {
             this.simulations.set(simConfig.id, simConfig);
         });
@@ -568,7 +571,6 @@ class AIEthicsApp {
         // Accessibility controls
         const highContrastBtn = document.getElementById('toggle-high-contrast');
         const largeTextBtn = document.getElementById('toggle-large-text');
-        const darkModeBtn = document.getElementById('toggle-dark-mode');
         const reducedMotionBtn = document.getElementById('toggle-reduced-motion');
         
         if (highContrastBtn) {
@@ -579,12 +581,6 @@ class AIEthicsApp {
           if (largeTextBtn) {
             largeTextBtn.addEventListener('click', () => {
                 this.toggleLargeText();
-            });
-        }
-
-        if (darkModeBtn) {
-            darkModeBtn.addEventListener('click', () => {
-                this.toggleDarkMode();
             });
         }
 
@@ -604,38 +600,6 @@ class AIEthicsApp {
                 }
             }
         });
-        
-        // Mobile navigation toggle
-        const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
-        const navList = document.querySelector('.nav-list');
-        
-        if (mobileMenuToggle && navList) {
-            mobileMenuToggle.addEventListener('click', () => {
-                const isExpanded = mobileMenuToggle.getAttribute('aria-expanded') === 'true';
-                
-                mobileMenuToggle.setAttribute('aria-expanded', !isExpanded);
-                navList.classList.toggle('open');
-                
-                // Close menu when clicking outside
-                if (!isExpanded) {
-                    document.addEventListener('click', function closeMenu(e) {
-                        if (!mobileMenuToggle.contains(e.target) && !navList.contains(e.target)) {
-                            mobileMenuToggle.setAttribute('aria-expanded', 'false');
-                            navList.classList.remove('open');
-                            document.removeEventListener('click', closeMenu);
-                        }
-                    });
-                }
-            });
-            
-            // Close menu when navigation link is clicked
-            navList.addEventListener('click', (e) => {
-                if (e.target.classList.contains('nav-link')) {
-                    mobileMenuToggle.setAttribute('aria-expanded', 'false');
-                    navList.classList.remove('open');
-                }
-            });
-        }
     }
 
     setupAccessibility() {
@@ -834,7 +798,7 @@ class AIEthicsApp {
             // Update ethics meters with initial values
             this.updateEthicsMeters();
               } catch (error) {
-            console.error('Failed to start simulation:', error);
+            AppDebug.error('Failed to start simulation:', error);
             this.hideLoading();
             
             // Add error state to container
@@ -859,14 +823,15 @@ class AIEthicsApp {
         try {
             // Load the specific simulation class based on ID
             switch (simulationId) {
-                case 'bias-fairness':
+                case 'bias-fairness': {
                     const { default: BiasSimulation } = await import('./simulations/bias-fairness.js');
                     const biasSimulation = new BiasSimulation(simulationId);
                     // Set container reference
                     biasSimulation.container = document.getElementById('simulation-container');
                     return biasSimulation;
+                }
                 
-                default:
+                default: {
                     // Fallback to basic simulation for unimplemented simulations
                     const basicScenarios = [
                         {
@@ -896,18 +861,19 @@ class AIEthicsApp {
                         duration: config.duration,
                         scenarios: basicScenarios,
                         ethicsMetrics: [
-                            { name: 'fairness', label: 'Fairness', value: 50 },
-                            { name: 'transparency', label: 'Transparency', value: 50 },
-                            { name: 'privacy', label: 'Privacy', value: 50 }
+                            { name: 'fairness', label: 'Fairness', value: APP_CONSTANTS.DEFAULTS.ETHICS_METER_VALUE },
+                            { name: 'transparency', label: 'Transparency', value: APP_CONSTANTS.DEFAULTS.ETHICS_METER_VALUE },
+                            { name: 'privacy', label: 'Privacy', value: APP_CONSTANTS.DEFAULTS.ETHICS_METER_VALUE }
                         ]
                     });
                     
                     // Set container reference
                     simulation.container = document.getElementById('simulation-container');
                     return simulation;
+                }
             }
         } catch (error) {
-            console.error(`Failed to load simulation ${simulationId}:`, error);
+            AppDebug.error(`Failed to load simulation ${simulationId}:`, error);
             throw error;
         }
     }
@@ -921,7 +887,7 @@ class AIEthicsApp {
 
         this.currentSimulation.on('ethics:updated', (data) => {
             // Handle ethics updates
-            console.log('Ethics updated:', data);
+            AppDebug.log('Ethics updated:', data);
         });
 
         this.currentSimulation.on('scenario:loaded', (data) => {
@@ -1053,12 +1019,6 @@ class AIEthicsApp {
         }
     }
 
-    nextScenario() {
-        if (this.currentSimulation) {
-            this.currentSimulation.nextScenario();
-        }
-    }
-
     onSimulationCompleted(data) {
         // Save completion data
         const progress = userProgress.getSimulationProgress(this.currentSimulation.id);
@@ -1099,9 +1059,9 @@ class AIEthicsApp {
             await this.setupEthicsMeters();
             await this.setupInteractiveButtons();
             await this.setupSimulationSliders();
-            console.log('Enhanced objects initialized successfully');
+            AppDebug.log('Enhanced objects initialized successfully');
         } catch (error) {
-            console.error('Failed to initialize enhanced objects:', error);
+            AppDebug.error('Failed to initialize enhanced objects:', error);
             // Fallback to basic UI
             this.setupFallbackUI();
         }
@@ -1111,7 +1071,7 @@ class AIEthicsApp {
      * Setup fallback UI when enhanced objects fail
      */
     setupFallbackUI() {
-        console.log('Setting up fallback UI');
+        AppDebug.log('Setting up fallback UI');
         
         // Make sure the original buttons are visible
         const resetBtn = document.getElementById('reset-simulation');
@@ -1154,14 +1114,14 @@ class AIEthicsApp {
         try {
             const ethicsContainer = document.querySelector('.ethics-meters');
             if (!ethicsContainer) {
-                console.warn('Ethics meters container not found');
+                AppDebug.warn('Ethics meters container not found');
                 return;
             }
 
             // Skip if this is inside the hero demo
             const isInHeroDemo = ethicsContainer.closest('#hero-demo') !== null;
             if (isInHeroDemo) {
-                console.log('Skipping enhanced ethics meters for hero demo - using CSS-based meters');
+                AppDebug.log('Skipping enhanced ethics meters for hero demo - using CSS-based meters');
                 return;
             }
 
@@ -1275,9 +1235,9 @@ class AIEthicsApp {
                 ethicsContainer.appendChild(meterContainer);
             }
 
-            console.log('Ethics meters initialized with enhanced objects');
+            AppDebug.log('Ethics meters initialized with enhanced objects');
         } catch (error) {
-            console.error('Failed to setup ethics meters:', error);
+            AppDebug.error('Failed to setup ethics meters:', error);
             throw error; // Re-throw to trigger fallback
         }
     }    /**
@@ -1287,17 +1247,18 @@ class AIEthicsApp {
         try {
             const actionsContainer = document.querySelector('.simulation-actions .actions-container');
             if (!actionsContainer) {
-                console.warn('Actions container not found, trying fallback');
+                AppDebug.warn('Actions container not found, trying fallback');
                 const fallbackContainer = document.querySelector('.simulation-actions');
                 if (!fallbackContainer) {
-                    console.error('No actions container found at all');
+                    AppDebug.error('No actions container found at all');
                     return;
                 }
                 // Create actions-container if it doesn't exist
                 const newActionsContainer = document.createElement('div');
                 newActionsContainer.className = 'actions-container';
                 fallbackContainer.appendChild(newActionsContainer);
-                return await this.setupInteractiveButtons(); // Retry
+                await this.setupInteractiveButtons(); // Retry
+                return;
             }
 
         // Clear existing buttons but keep structure
@@ -1325,7 +1286,7 @@ class AIEthicsApp {
             buttonCanvasId = canvasResult.id;
             
         } catch (canvasError) {
-            console.warn('Failed to create canvas for interactive buttons:', canvasError);
+            AppDebug.warn('Failed to create canvas for interactive buttons:', canvasError);
             // Create a simple fallback div instead
             buttonCanvas = document.createElement('div');
             buttonCanvas.className = 'interactive-buttons-fallback';
@@ -1334,7 +1295,7 @@ class AIEthicsApp {
                 <button class="btn btn-primary enhanced-button" id="next-scenario-fallback">Next</button>
             `;
             actionsContainer.appendChild(buttonCanvas);
-            console.log('Using fallback buttons instead of canvas');
+            AppDebug.log('Using fallback buttons instead of canvas');
             return; // Exit early with fallback
         }
 
@@ -1362,9 +1323,9 @@ class AIEthicsApp {
                 throw new Error('canvasManager.createVisualEngine returned null');
             }
         } catch (engineError) {
-            console.warn('Failed to create visual engine for buttons:', engineError);
+            AppDebug.warn('Failed to create visual engine for buttons:', engineError);
             // Use a simple fallback without visual engine
-            console.log('Interactive buttons will use standard DOM elements');
+            AppDebug.log('Interactive buttons will use standard DOM elements');
             return;
         }// Create interactive buttons
         const resetButton = new InteractiveButton({
@@ -1398,9 +1359,9 @@ class AIEthicsApp {
         buttonEngine.scene.add(nextButton);// Store button engine reference
         this.buttonEngine = buttonEngine;
 
-        console.log('Interactive buttons initialized with enhanced objects');
+        AppDebug.log('Interactive buttons initialized with enhanced objects');
         } catch (error) {
-            console.error('Failed to setup interactive buttons:', error);
+            AppDebug.error('Failed to setup interactive buttons:', error);
             throw error; // Re-throw to trigger fallback
         }
     }
@@ -1495,14 +1456,14 @@ class AIEthicsApp {
         // Store slider engine reference
         this.sliderEngine = sliderEngine;
 
-        console.log('Simulation sliders initialized with enhanced objects');
+        AppDebug.log('Simulation sliders initialized with enhanced objects');
     }
 
     /**
      * Handle slider value changes
      */
     onSliderChange(sliderId, value) {
-        console.log(`Slider ${sliderId} changed to: ${value}`);
+        AppDebug.log(`Slider ${sliderId} changed to: ${value}`);
         
         // Update simulation parameters based on slider changes
         if (this.currentSimulation) {
@@ -1531,7 +1492,7 @@ class AIEthicsApp {
 
         this.ethicsMeters.forEach((meter, id) => {
             const scoreKey = id.replace('-meter', '');
-            const score = scores[scoreKey] || 0.5;
+            const score = scores[scoreKey] || APP_CONSTANTS.DEFAULTS.SCORE_VALUE;
             meter.setValue(score, true); // Animate the change
         });
     }
@@ -1546,15 +1507,15 @@ class AIEthicsApp {
 
         // Reset all sliders to default values
         this.simulationSliders.forEach(slider => {
-            slider.setValue(slider.defaultValue || 50, true);
+            slider.setValue(slider.defaultValue || APP_CONSTANTS.DEFAULTS.SLIDER_VALUE, true);
         });
 
         // Reset ethics meters
         this.ethicsMeters.forEach(meter => {
-            meter.setValue(0.5, true);
+            meter.setValue(APP_CONSTANTS.DEFAULTS.METER_VALUE, true);
         });
 
-        console.log('Simulation reset with enhanced objects');
+        AppDebug.log('Simulation reset with enhanced objects');
     }
 
     /**
@@ -1566,7 +1527,7 @@ class AIEthicsApp {
             this.updateEthicsMeters();
         }
 
-        console.log('Advanced to next scenario');
+        AppDebug.log('Advanced to next scenario');
     }
 
     /**
@@ -1599,11 +1560,11 @@ class AIEthicsApp {
         // Sliders may need value updates
         this.updateSliderStates();
         
-        console.log('Enhanced objects refreshed for new simulation');
+        AppDebug.log('Enhanced objects refreshed for new simulation');
     }    /**
-     * Update button states based on simulation
+     * Update enhanced button states based on simulation
      */
-    updateButtonStates() {
+    updateEnhancedButtonStates() {
         const resetButton = this.interactiveButtons.get('reset');
         const nextButton = this.interactiveButtons.get('next');
         
@@ -1638,23 +1599,23 @@ class AIEthicsApp {
      */
     async initializeHeroDemo() {
         try {
-            console.log('initializeHeroDemo starting...');
+            AppDebug.log('initializeHeroDemo starting...');
             
             // Wait a bit to ensure DOM is ready
             await new Promise(resolve => setTimeout(resolve, 100));
             
             const heroContainer = document.getElementById('hero-demo');
-            console.log('Hero container found:', !!heroContainer);
+            AppDebug.log('Hero container found:', !!heroContainer);
             
             if (heroContainer) {
-                console.log('Setting up hero demo...');
+                AppDebug.log('Setting up hero demo...');
                 this.setupHeroDemo();
-                console.log('Hero demo setup complete');
+                AppDebug.log('Hero demo setup complete');
             } else {
-                console.error('Hero demo container not found in DOM');
+                AppDebug.error('Hero demo container not found in DOM');
             }
         } catch (error) {
-            console.error('Failed to initialize hero demo:', error);
+            AppDebug.error('Failed to initialize hero demo:', error);
         }
     }    /**
      * Setup hero demo with interactive ethics scenario
@@ -1662,11 +1623,11 @@ class AIEthicsApp {
     setupHeroDemo() {
         const heroContainer = document.getElementById('hero-demo');
         if (!heroContainer) {
-            console.error('Hero container not found!');
+            AppDebug.error('Hero container not found!');
             return;
         }
 
-        console.log('Setting up hero demo content...');
+        AppDebug.log('Setting up hero demo content...');
         heroContainer.innerHTML = `
             <div class="hero-demo-container">
                 <div class="demo-header">
@@ -1739,7 +1700,7 @@ class AIEthicsApp {
             </div>
         `;
         
-        console.log('Hero demo content added, setting up interactivity...');
+        AppDebug.log('Hero demo content added, setting up interactivity...');
         
         // Add event listeners for interactive choices
         this.setupHeroDemoInteractivity();
@@ -1747,7 +1708,7 @@ class AIEthicsApp {
         // Animate the initial meters
         this.animateHeroDemo();
         
-        console.log('Hero demo setup complete!');
+        AppDebug.log('Hero demo setup complete!');
     }    /**
      * Setup interactivity for hero demo
      */
@@ -1812,7 +1773,7 @@ class AIEthicsApp {
         popover.setAttribute('aria-label', 'Choice feedback');
         
         // Check if mobile
-        const isMobile = window.innerWidth <= 767;
+        const isMobile = window.innerWidth <= APP_CONSTANTS.VIEWPORT.MOBILE_BREAKPOINT;
         
         if (isMobile) {
             // Mobile: fixed position at bottom
@@ -1922,10 +1883,10 @@ class AIEthicsApp {
             document.head.appendChild(style);
         }        popover.innerHTML = `
             <div class="feedback-icon" style="font-size: 1.5rem; margin-bottom: 0.5rem; animation: bounceIn 0.6s ease-out 0.2s both;">
-                ${feedback.meters.fairness > 70 ? '✅' : feedback.meters.fairness < 50 ? '⚠️' : '💡'}
+                ${feedback.meters.fairness > APP_CONSTANTS.FEEDBACK.EXCELLENT_THRESHOLD ? '✅' : feedback.meters.fairness < APP_CONSTANTS.FEEDBACK.GOOD_THRESHOLD ? '⚠️' : '💡'}
             </div>
             <div style="font-weight: 600; margin-bottom: 0.5rem; color: #333; font-size: 0.9rem;">
-                ${feedback.meters.fairness > 70 ? 'Great Choice!' : feedback.meters.fairness < 50 ? 'Consider This' : 'Good Balance'}
+                ${feedback.meters.fairness > APP_CONSTANTS.FEEDBACK.EXCELLENT_THRESHOLD ? 'Great Choice!' : feedback.meters.fairness < APP_CONSTANTS.FEEDBACK.GOOD_THRESHOLD ? 'Consider This' : 'Good Balance'}
             </div>
             <p style="margin: 0; line-height: 1.4; color: #666;">${feedback.text}</p>
         `;// Add arrow to popover (only for desktop)
@@ -1956,9 +1917,9 @@ class AIEthicsApp {
                     if (popover.parentNode) {
                         popover.remove();
                     }
-                }, 300);
+                }, APP_CONSTANTS.TIMING.ANIMATION_DELAY);
             }
-        }, 4000);
+        }, APP_CONSTANTS.TIMING.NOTIFICATION_DURATION);
 
         // Hide popover on click anywhere
         const hideOnClick = (e) => {
@@ -1970,7 +1931,7 @@ class AIEthicsApp {
                         if (popover.parentNode) {
                             popover.remove();
                         }
-                    }, 300);
+                    }, APP_CONSTANTS.TIMING.ANIMATION_DELAY);
                 }
                 document.removeEventListener('click', hideOnClick);
             }
@@ -2033,7 +1994,7 @@ class AIEthicsApp {
                 meter.style.width = '0%';
                 setTimeout(() => {
                     meter.style.width = currentWidth;
-                }, 50);            }, index * 300);
+                }, APP_CONSTANTS.TIMING.QUICK_DELAY);            }, index * APP_CONSTANTS.TIMING.STAGGER_DELAY);
         });
     }
 
@@ -2043,14 +2004,14 @@ class AIEthicsApp {
     async initializeHeroDemoObjects() {
         // This method is now simplified - the demo uses CSS-based visualization
         // instead of complex canvas rendering for better performance
-        console.log('Hero demo objects initialized (CSS-based)');
+        AppDebug.log('Hero demo objects initialized (CSS-based)');
     }
 
     /**
-     * Show error message to user
+     * Show error message in loading element
      */
-    showError(message) {
-        console.error('App Error:', message);
+    showErrorInLoading(message) {
+        AppDebug.error('App Error:', message);
         
         // Try to show error in UI if possible
         const loading = document.getElementById('loading');
@@ -2175,7 +2136,7 @@ class AIEthicsApp {
         // Track usage
         simpleAnalytics.trackInteraction('toggle_high_contrast', status);
         
-        console.log(`High contrast mode ${status}`);
+        AppDebug.log(`High contrast mode ${status}`);
     }
 
     /**
@@ -2201,33 +2162,7 @@ class AIEthicsApp {
         // Track usage
         simpleAnalytics.trackInteraction('toggle_large_text', status);
         
-        console.log(`Large text mode ${status}`);
-    }
-
-    /**
-     * Toggle dark mode
-     */
-    toggleDarkMode() {
-        this.preferences.darkMode = !this.preferences.darkMode;
-        
-        // Apply theme changes
-        this.applyTheme();
-        
-        // Save preference
-        const currentSettings = userPreferences.getAccessibilitySettings();
-        currentSettings.darkMode = this.preferences.darkMode;
-        userPreferences.setAccessibilitySettings(currentSettings);
-        
-        // Announce change
-        const status = this.preferences.darkMode ? 'enabled' : 'disabled';
-        if (this.accessibilityManager) {
-            this.accessibilityManager.announce(`Dark mode ${status}`);
-        }
-        
-        // Track usage
-        simpleAnalytics.trackInteraction('toggle_dark_mode', status);
-        
-        console.log(`Dark mode ${status}`);
+        AppDebug.log(`Large text mode ${status}`);
     }
 
     /**
@@ -2253,7 +2188,7 @@ class AIEthicsApp {
         // Track usage
         simpleAnalytics.trackInteraction('toggle_reduced_motion', status);
         
-        console.log(`Reduced motion mode ${status}`);
+        AppDebug.log(`Reduced motion mode ${status}`);
     }
 
     /**
@@ -2265,12 +2200,12 @@ class AIEthicsApp {
         if (!infoModal) {
             infoModal = document.createElement('div');
             infoModal.id = 'info-modal';
-            infoModal.className = 'modal';
+            infoModal.className = 'modal-backdrop';
             infoModal.setAttribute('role', 'dialog');
             infoModal.setAttribute('aria-modal', 'true');
             infoModal.setAttribute('aria-hidden', 'true');
             infoModal.innerHTML = `
-                <div class="modal-content">
+                <div class="modal-dialog">
                     <div class="modal-header">
                         <h2 id="info-modal-title"></h2>
                         <button class="modal-close" aria-label="Close modal">&times;</button>
@@ -2313,7 +2248,7 @@ class AIEthicsApp {
  * Fallback for script loading issues
  */
 window.addEventListener('error', (event) => {
-    console.error('Error occurred:', event.message);
+    AppDebug.error('Error occurred:', event.message);
     alert('An error occurred while loading the application. Please try again later.');
 });
 

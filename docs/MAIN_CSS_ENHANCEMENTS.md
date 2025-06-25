@@ -9,15 +9,7 @@ Comprehensive audit and enhancement of the main.css file to improve accessibilit
 - **Fixed**: Consolidated duplicate `.simulation-container` rules into a single, comprehensive rule
 - **Improved**: Removed redundant CSS declarations and organized styles more efficiently
 
-### 2. Dark Mode Support
-- **Added**: Complete dark mode support using `@media (prefers-color-scheme: dark)`
-- **Features**:
-  - Dark color palette with proper contrast ratios
-  - Adjusted primary colors for better visibility in dark mode
-  - Hero section gradient adapted for dark themes
-  - Modal and simulation container backgrounds optimized
-
-### 3. Accessibility Enhancements
+### 2. Accessibility Enhancements
 - **Added**: Reduced motion support with `@media (prefers-reduced-motion: reduce)`
   - Disables animations and transitions for users with motion sensitivity
   - Maintains functionality while removing visual motion
@@ -94,7 +86,7 @@ Comprehensive audit and enhancement of the main.css file to improve accessibilit
 - ✅ Reduced CSS redundancy
 
 ### User Experience
-- ✅ Dark mode support for better viewing in low light
+- ✅ Accessibility enhancements for better user experience
 - ✅ Responsive design maintained and enhanced
 - ✅ Better visual feedback for all interactions
 - ✅ Print-friendly layouts

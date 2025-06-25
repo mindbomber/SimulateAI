@@ -3,7 +3,7 @@
 <head>    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#1a73e8">
-    <meta name="color-scheme" content="light dark">
+    <meta name="color-scheme" content="light">
     <title>AI Ethics Simulations - Interactive Learning Platform</title>
     <meta name="description" content="Learn AI and robotics safety through interactive simulations and games">
     <meta name="keywords" content="AI ethics, robotics, education, simulations, interactive learning, accessibility">
@@ -17,22 +17,35 @@
     
     <!-- Accessibility -->
     <meta name="accessibility-features" content="keyboard-navigation,skip-links,high-contrast,large-text,screen-reader-support">
-      <!-- Styles -->
+      <!-- Styles - Optimized load order for CSS architecture -->
+    <!-- 1. Design tokens and base styles -->
     <link rel="stylesheet" href="src/styles/main.css">
     <link rel="stylesheet" href="src/styles/accessibility.css">
+    
+    <!-- 2. Base component styles -->
     <link rel="stylesheet" href="src/styles/simulations.css">
     <link rel="stylesheet" href="src/styles/layout-components.css">
+    
+    <!-- 3. Advanced component systems -->
     <link rel="stylesheet" href="src/styles/advanced-ui-components.css">
     <link rel="stylesheet" href="src/styles/enhanced-objects.css">
+    
+    <!-- 4. Utility components -->
     <link rel="stylesheet" href="src/styles/input-utility-components.css">
-    <link rel="stylesheet" href="src/styles/hero-demo.css">
-    <link rel="stylesheet" href="src/styles/bias-fairness.css">
-    <link rel="stylesheet" href="src/styles/layout-fixes.css">
+    <link rel="stylesheet" href="src/styles/form-input-components.css">
+    
+    <!-- 5. UI utility components -->
     <link rel="stylesheet" href="src/styles/notification-toast.css">
-    <link rel="stylesheet" href="src/styles/reusable-modal.css">
+
     <link rel="stylesheet" href="src/styles/card-component.css">
     <link rel="stylesheet" href="src/styles/loader-spinner.css">
-    <link rel="stylesheet" href="src/styles/form-input-components.css">
+    
+    <!-- 6. Page-specific and theme styles -->
+    <link rel="stylesheet" href="src/styles/hero-demo.css">
+    <link rel="stylesheet" href="src/styles/bias-fairness.css">
+    
+    <!-- 7. Layout fixes and overrides (always last) -->
+    <link rel="stylesheet" href="src/styles/layout-fixes.css">
     
     <!-- Icons and Favicons -->
     <link rel="icon" type="image/svg+xml" href="src/assets/icons/favicon.svg">
@@ -77,11 +90,6 @@
                 <h1 class="site-title">AI Ethics Simulations</h1>
             </div>
               <nav class="main-nav" role="navigation" aria-label="Main navigation">
-                <button class="mobile-menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
-                    <span class="hamburger-line"></span>
-                    <span class="hamburger-line"></span>
-                    <span class="hamburger-line"></span>
-                </button>
                 <ul class="nav-list">
                     <li><a href="#home" class="nav-link active" aria-current="page">Home</a></li>
                     <li><a href="#simulations" class="nav-link">Simulations</a></li>
@@ -102,10 +110,6 @@
                 <button class="btn-icon" id="toggle-reduced-motion" aria-label="Toggle reduced motion" aria-pressed="false">
                     <span class="icon" aria-hidden="true">⏸️</span>
                     <span class="sr-only">Reduced Motion</span>
-                </button>
-                <button class="btn-icon" id="toggle-dark-mode" aria-label="Toggle dark mode" aria-pressed="false">
-                    <span class="icon" aria-hidden="true">🌙</span>
-                    <span class="sr-only">Dark Mode</span>
                 </button>
             </div>
         </div>
@@ -178,6 +182,90 @@
                 </div>
             </div>
         </section>
+
+        <!-- About Section -->
+        <section class="about-section" id="about">
+            <div class="section-header">
+                <h2 class="section-title">About AI Ethics Simulations</h2>
+                <p class="section-description">
+                    Our mission is to make AI ethics education accessible and engaging for everyone
+                </p>
+            </div>
+            
+            <div class="about-content">
+                <div class="about-card">
+                    <h3>Our Mission</h3>
+                    <p>To democratize AI ethics education through interactive learning experiences that prepare learners for responsible AI development and deployment.</p>
+                </div>
+                
+                <div class="about-card">
+                    <h3>Open Source</h3>
+                    <p>All our simulations and educational content are open source, enabling educators worldwide to adapt and improve our materials.</p>
+                </div>
+                
+                <div class="about-card">
+                    <h3>Research-Based</h3>
+                    <p>Our content is grounded in the latest research in AI ethics, cognitive science, and educational technology.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Privacy Section -->
+        <section class="privacy-section" id="privacy">
+            <div class="section-header">
+                <h2 class="section-title">Privacy Policy</h2>
+            </div>
+            
+            <div class="privacy-content">
+                <p>We are committed to protecting your privacy. This platform:</p>
+                <ul>
+                    <li>Stores learning progress locally in your browser</li>
+                    <li>Uses anonymized analytics to improve our educational content</li>
+                    <li>Does not share personal information with third parties</li>
+                    <li>Complies with educational privacy standards (FERPA, COPPA)</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Accessibility Section -->
+        <section class="accessibility-section" id="accessibility">
+            <div class="section-header">
+                <h2 class="section-title">Accessibility Statement</h2>
+            </div>
+            
+            <div class="accessibility-content">
+                <p>This platform is designed to be accessible to all learners. Features include:</p>
+                <ul>
+                    <li>Keyboard navigation support</li>
+                    <li>Screen reader compatibility</li>
+                    <li>High contrast and large text options</li>
+                    <li>Reduced motion settings for users with vestibular disorders</li>
+                    <li>WCAG 2.1 AA compliance</li>
+                </ul>
+                <p>If you encounter any accessibility barriers, please <a href="#contact">contact us</a>.</p>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact-section" id="contact">
+            <div class="section-header">
+                <h2 class="section-title">Contact Us</h2>
+            </div>
+            
+            <div class="contact-content">
+                <p>We'd love to hear from you! Reach out for:</p>
+                <ul>
+                    <li>Technical support</li>
+                    <li>Educational partnerships</li>
+                    <li>Feedback and suggestions</li>
+                    <li>Accessibility concerns</li>
+                </ul>
+                <div class="contact-info">
+                    <p><strong>Email:</strong> <a href="mailto:info@ai-ethics-simulations.com">info@ai-ethics-simulations.com</a></p>
+                    <p><strong>GitHub:</strong> <a href="https://github.com/ai-ethics-simulations" target="_blank" rel="noopener noreferrer">ai-ethics-simulations</a></p>
+                </div>
+            </div>
+        </section>
     </main>
 
     <!-- Footer -->
@@ -190,10 +278,9 @@
             </nav>
         </div>
     </footer>
-      <!-- Simulation Modal -->
-    <div id="simulation-modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-title" inert>
-        <div class="modal-backdrop" aria-hidden="true"></div>
-        <div class="modal-content">
+      <!-- Simulation Modal - Updated to use advanced-ui-components.css modal system -->
+    <div id="simulation-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-title" inert>
+        <div class="modal-dialog">
             <div class="modal-header">
                 <h2 id="modal-title" class="modal-title"></h2>
                 <button class="modal-close" aria-label="Close simulation" type="button">
@@ -261,8 +348,9 @@
     <script type="module" src="src/js/utils/simple-storage.js"></script>
     <script type="module" src="src/js/utils/simple-analytics.js"></script>
     <script type="module" src="src/js/components/notification-toast.js"></script>
+    <script type="module" src="src/js/components/modal-utility.js"></script>
     <script type="module" src="src/js/app.js"></script>
-    <script type="module" src="src/js/components/reusable-modal.js"></script>
+
     <script type="module" src="src/js/components/card-component.js"></script>
     <script type="module" src="src/js/components/loader-spinner.js"></script>
     <script type="module" src="src/js/components/form-input-components.js"></script>

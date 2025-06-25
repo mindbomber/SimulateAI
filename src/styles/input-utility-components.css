@@ -690,34 +690,4 @@
     outline-offset: 2px;
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    .color-picker-popup,
-    .datetime-picker-popup,
-    .drawer,
-    .search-box-suggestions {
-        background: #343a40;
-        border-color: #495057;
-        color: #f8f9fa;
-    }
-    
-    .accordion {
-        background: #343a40;
-        border-color: #495057;
-    }
-    
-    .accordion-header {
-        background: #495057;
-        color: #f8f9fa;
-    }
-    
-    .accordion-header:hover,
-    .accordion-header.active {
-        background: #5a6268;
-    }
-    
-    .accordion-content {
-        background: #343a40;
-        color: #f8f9fa;
-    }
-}
+

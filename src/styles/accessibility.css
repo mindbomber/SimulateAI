@@ -267,41 +267,6 @@ input[disabled] {
   }
 }
 
-/* Dark mode support - DISABLED for now to default to light mode */
-/*
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text-color: #ffffff;
-    --background-color: #1a1a1a;
-    --card-background: #2d2d2d;
-    --border-color: #404040;
-    --muted-color: #b0b0b0;
-  }
-  
-  body {
-    background-color: var(--background-color);
-    color: var(--text-color);
-  }
-  
-  .card,
-  .panel {
-    background-color: var(--card-background);
-    border-color: var(--border-color);
-  }
-  
-  .text-muted {
-    color: var(--muted-color);
-  }
-  
-  input,
-  select,
-  textarea {
-    background-color: var(--card-background);    border-color: var(--border-color);
-    color: var(--text-color);
-  }
-}
-*/
-
 /* Accessibility announcements */
 .aria-live-region {
   position: absolute;

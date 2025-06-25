@@ -1,7 +1,7 @@
 /**
  * Enhanced Objects Styles - Modern Support for Visual Engine UI Components
  * Comprehensive styling for enhanced interactive objects and their containers
- * with accessibility, dark mode, and performance optimizations
+ * with accessibility and performance optimizations
  */
 
 /* ===== CSS CUSTOM PROPERTIES FOR ENHANCED OBJECTS ===== */
@@ -593,40 +593,7 @@
     box-shadow: var(--enhanced-shadow-sm);
 }
 
-/* ===== DARK MODE SUPPORT ===== */
-@media (prefers-color-scheme: dark) {
-    :root {
-        /* Enhanced Objects Dark Mode Colors */
-        --enhanced-bg-primary: var(--color-gray-800, #1f2937);
-        --enhanced-bg-secondary: var(--color-gray-900, #111827);
-        --enhanced-border: var(--color-gray-600, #6b7280);
-        --enhanced-border-focus: var(--color-primary-light, #3b82f6);
-        --enhanced-text-primary: var(--color-gray-100, #f3f4f6);
-        --enhanced-text-secondary: var(--color-gray-300, #d1d5db);
-        --enhanced-text-muted: var(--color-gray-400, #9ca3af);
-        
-        /* Dark mode shadows */
-        --enhanced-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-        --enhanced-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-        --enhanced-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-        --enhanced-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.6);
-    }
-}
 
-[data-theme="dark"] {
-    --enhanced-bg-primary: var(--color-gray-800, #1f2937);
-    --enhanced-bg-secondary: var(--color-gray-900, #111827);
-    --enhanced-border: var(--color-gray-600, #6b7280);
-    --enhanced-border-focus: var(--color-primary-light, #3b82f6);
-    --enhanced-text-primary: var(--color-gray-100, #f3f4f6);
-    --enhanced-text-secondary: var(--color-gray-300, #d1d5db);
-    --enhanced-text-muted: var(--color-gray-400, #9ca3af);
-    
-    --enhanced-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-    --enhanced-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-    --enhanced-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-    --enhanced-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.6);
-}
 
 /* ===== REDUCED MOTION SUPPORT ===== */
 @media (prefers-reduced-motion: reduce) {

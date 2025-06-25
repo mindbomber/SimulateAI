@@ -65,15 +65,13 @@ const THEME_COLORS = {
 class UIThemeManager {
     static getCurrentTheme() {
         const prefersHighContrast = window.matchMedia?.('(prefers-contrast: high)').matches;
-        const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
         const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
         
         return {
-            name: prefersHighContrast ? 'highContrast' : (prefersDark ? 'dark' : 'light'),
+            name: prefersHighContrast ? 'highContrast' : 'light',
             highContrast: prefersHighContrast,
-            darkMode: prefersDark,
             reducedMotion: prefersReducedMotion,
-            colors: THEME_COLORS[prefersHighContrast ? 'highContrast' : (prefersDark ? 'dark' : 'light')]
+            colors: THEME_COLORS[prefersHighContrast ? 'highContrast' : 'light']
         };
     }
     
@@ -206,7 +204,6 @@ class UIComponent {
         if (this.responsive) baseClasses.push('responsive');
         if (this.animated) baseClasses.push('animated');
         if (this.theme.highContrast) baseClasses.push('high-contrast');
-        if (this.theme.darkMode) baseClasses.push('dark-mode');
         
         return baseClasses.join(' ');
     }
@@ -342,7 +339,6 @@ class UIComponent {
      */
     setupThemeMonitoring() {
         // Monitor system theme changes
-        const darkModeQuery = window.matchMedia?.('(prefers-color-scheme: dark)');
         const contrastQuery = window.matchMedia?.('(prefers-contrast: high)');
         const motionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
         
@@ -351,12 +347,11 @@ class UIComponent {
             this.updateTheme();
         };
         
-        darkModeQuery?.addEventListener?.('change', handleThemeChange);
         contrastQuery?.addEventListener?.('change', handleThemeChange);
         motionQuery?.addEventListener?.('change', handleThemeChange);
         
         // Store references for cleanup
-        this.themeQueries = { darkModeQuery, contrastQuery, motionQuery };
+        this.themeQueries = { contrastQuery, motionQuery };
         this.themeChangeHandler = handleThemeChange;
     }
     
@@ -640,8 +635,7 @@ class UIComponent {
             
             // Clean up theme monitoring
             if (this.themeQueries) {
-                const { darkModeQuery, contrastQuery, motionQuery } = this.themeQueries;
-                darkModeQuery?.removeEventListener?.('change', this.themeChangeHandler);
+                const { contrastQuery, motionQuery } = this.themeQueries;
                 contrastQuery?.removeEventListener?.('change', this.themeChangeHandler);
                 motionQuery?.removeEventListener?.('change', this.themeChangeHandler);
             }
@@ -711,7 +705,7 @@ class UIPanel extends UIComponent {
         const classes = super.getElementClasses();
         const panelClasses = ['ui-panel'];
         
-        if (this.modal) panelClasses.push('modal');
+        if (this.modal) panelClasses.push('modal-dialog');
         if (this.resizable) panelClasses.push('resizable');
         if (this.closable) panelClasses.push('closable');
         
@@ -853,7 +847,7 @@ class UIPanel extends UIComponent {
     setupModalBehavior() {
         // Create backdrop
         this.backdrop = document.createElement('div');
-        this.backdrop.className = 'panel-backdrop';
+        this.backdrop.className = 'modal-backdrop';
         Object.assign(this.backdrop.style, {
             position: 'fixed',
             top: '0',
@@ -1603,7 +1597,7 @@ class EthicsDisplay extends UIComponent {
                 left: '0',
                 width: '100%',
                 height: '100%',
-                backgroundColor: this.theme.darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                backgroundColor: 'rgba(0,0,0,0.1)',
                 borderRadius: '6px'
             });
         }

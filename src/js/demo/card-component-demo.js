@@ -14,10 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
             {
                 label: 'Show Modal',
                 onClick: () => {
-                    const modal = new window.ReusableModal({
+                    const modal = new window.ModalUtility({
                         title: 'Card Modal',
                         content: '<p>This modal was triggered from a card action button.</p>',
-                        footer: '<button id="card-modal-ok" style="background:#3b82f6;color:#fff;padding:8px 16px;border:none;border-radius:4px;cursor:pointer;">OK</button>'
+                        footer: '<button id="card-modal-ok" class="btn btn-primary">OK</button>'
                     });
                     modal.open();
                     setTimeout(() => {

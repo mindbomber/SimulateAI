@@ -1,5 +1,5 @@
-// Demo for ReusableModal
-import ReusableModal from '../components/reusable-modal.js';
+// Demo for ModalUtility (new modal system)
+import ModalUtility from '../components/modal-utility.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Add demo button
@@ -9,12 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(demoBtn);
 
     demoBtn.addEventListener('click', () => {
-        const modal = new ReusableModal({
-            title: 'Reusable Modal Demo',
-            content: '<p>This is a reusable modal/dialog component. You can use it for confirmations, alerts, forms, or any custom content.</p>',
-            footer: '<button id="modal-ok-btn" style="background:#10b981;color:#fff;padding:8px 16px;border:none;border-radius:4px;cursor:pointer;">OK</button>',
+        const modal = new ModalUtility({
+            title: 'Modal Utility Demo',
+            content: '<p>This is the new modal utility using the advanced-ui-components.css modal system. This replaces the old ReusableModal for better consistency.</p>',
+            footer: '<button id="modal-ok-btn" class="btn btn-primary">OK</button>',
             onClose: () => {
-                window.NotificationToast.info('Modal Closed', 'You closed the demo modal.');
+                if (window.NotificationToast) {
+                    window.NotificationToast.info('Modal Closed', 'You closed the demo modal.');
+                }
             }
         });
         modal.open();

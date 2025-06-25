@@ -288,11 +288,10 @@ class ComponentTheme {
 
     static getCurrentTheme() {
         const mediaQuery = window.matchMedia;
-        const prefersColorScheme = mediaQuery && mediaQuery('(prefers-color-scheme: dark)').matches;
         const prefersHighContrast = mediaQuery && mediaQuery('(prefers-contrast: high)').matches;
         
         if (prefersHighContrast) return this.themes.highContrast;
-        return prefersColorScheme ? this.themes.dark : this.themes.light;
+        return this.themes.light;
     }
 
     static getColor(colorName, customTheme = null) {

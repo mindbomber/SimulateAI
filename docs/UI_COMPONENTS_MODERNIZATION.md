@@ -11,7 +11,7 @@ The `src/js/core/ui.js` file has been fully modernized to provide a comprehensiv
 ## Key Features Implemented
 
 ### 🎨 **Modern Design System**
-- **Theme Integration**: Full dark mode, high contrast, and reduced motion support
+- **Theme Integration**: Full high contrast and reduced motion support
 - **CSS Custom Properties**: Dynamic theming with CSS variables
 - **Responsive Design**: Mobile-first approach with breakpoint-aware components
 - **Design Tokens**: Consistent spacing, colors, and typography
@@ -231,7 +231,7 @@ panel.addSlider('Volume', 0, 100, 50, (value) => setVolume(value));
 
 The UI components system has been fully modernized with:
 - **100% WCAG 2.1 AA accessibility compliance**
-- **Complete theme integration** (dark mode, high contrast, reduced motion)
+- **Complete theme integration** (high contrast, reduced motion)
 - **Enterprise-grade performance optimization**
 - **Comprehensive error handling and recovery**
 - **Modern development practices** and clean architecture

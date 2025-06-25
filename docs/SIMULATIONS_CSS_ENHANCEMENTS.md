@@ -140,17 +140,7 @@ Comprehensive enhancement of the simulations.css file to improve accessibility, 
   - Improved paint performance for interactive elements
   - Reduced layout thrashing during interactions
 
-### 9. Enhanced Dark Mode
-
-#### Comprehensive Dark Theme
-- **Enhanced**: Existing dark mode with additional components
-- **Features**:
-  - Complete dark mode coverage for all components
-  - Proper contrast ratios in dark theme
-  - Consistent styling across light and dark modes
-  - Enhanced tooltip visibility in dark mode
-
-### 10. Help and Instruction Systems
+### 9. Help and Instruction Systems
 
 #### User Guidance Components
 - **Added**: Help and instruction styling

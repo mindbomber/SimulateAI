@@ -75,7 +75,7 @@ export class VisualEngine {
         
         // Add compatibility alias for EthicsSimulation
         this.config = this.options;
-          this.init();
+        this.init();
     }
 
     init() {
@@ -126,7 +126,9 @@ export class VisualEngine {
             this.accessibilityManager = new AccessibilityManager(this.container);
             this.accessibilityManager.engine = this;
         }
-    }    setupEventListeners() {
+    }
+
+    setupEventListeners() {
         // Handle container resize
         if (typeof ResizeObserver !== 'undefined') {
             const resizeObserver = new ResizeObserver((entries) => {
@@ -175,11 +177,13 @@ export class VisualEngine {
         this.registerComponent('modal-dialog', ModalDialog);
         this.registerComponent('navigation-menu', NavigationMenu);
         this.registerComponent('chart', Chart);
-        this.registerComponent('form-field', FormField);        this.registerComponent('tooltip', Tooltip);
+        this.registerComponent('form-field', FormField);
+        this.registerComponent('tooltip', Tooltip);
         
         // Register priority components
         this.registerComponent('data-table', DataTable);
-        this.registerComponent('notification-toast', NotificationToast);        this.registerComponent('loading-spinner', LoadingSpinner);
+        this.registerComponent('notification-toast', NotificationToast);
+        this.registerComponent('loading-spinner', LoadingSpinner);
         
         // Register layout components
         this.registerComponent('tab-container', TabContainer);
@@ -202,7 +206,9 @@ export class VisualEngine {
     registerComponent(name, componentClass) {
         this.componentRegistry.set(name, componentClass);
         this.componentInstances.set(name, new Set());
-    }    createComponent(type, options = {}) {
+    }
+
+    createComponent(type, options = {}) {
         const ComponentClass = this.componentRegistry.get(type);
         if (!ComponentClass) {
             this.logWarning(`Component type "${type}" not found in registry`);
@@ -221,7 +227,9 @@ export class VisualEngine {
             this.logError(`Failed to create component of type "${type}"`, error);
             return null;
         }
-    }    destroyComponent(component) {
+    }
+
+    destroyComponent(component) {
         if (!component) {
             this.logWarning('Attempted to destroy null/undefined component');
             return;
@@ -288,7 +296,9 @@ export class VisualEngine {
         } catch (e) {
             return false;
         }
-    }    detectLowEndDevice() {
+    }
+
+    detectLowEndDevice() {
         // Basic heuristics for detecting low-end devices
         try {
             const memory = navigator.deviceMemory;
@@ -394,11 +404,13 @@ export class VisualEngine {
             this.performanceStats.fps = Math.round((this.frameCount * ENGINE_CONSTANTS.FPS_UPDATE_INTERVAL) / (currentTime - this.lastFPSUpdate));
             this.frameCount = 0;
             this.lastFPSUpdate = currentTime;
-              if (this.options.debug) {
+            if (this.options.debug) {
                 this.updateDebugPanel();
             }
         }
-    }    // Object management
+    }
+
+    // Object management
     addObject(object) {
         if (!object) {
             this.logWarning('Attempted to add null/undefined object to scene');
@@ -504,7 +516,9 @@ export class VisualEngine {
         }
         
         this.container.appendChild(this.debugPanel);
-    }    updateDebugPanel() {
+    }
+
+    updateDebugPanel() {
         if (!this.debugPanel) return;
         
         try {
@@ -565,7 +579,7 @@ export class VisualEngine {
         }
         
         // Emit error event for external handling
-        this.emit?.('error', {
+        this.emit('error', {
             message,
             error: error?.message || error,
             timestamp: Date.now()
@@ -578,11 +592,13 @@ export class VisualEngine {
             ...this.performanceStats,
             objects: this.scene.objects.length,
             interactiveObjects: this.scene.interactiveObjects.length,
-            renderer: this.renderer.type,
+            renderer: this.renderer ? this.renderer.type : 'None',
             isRunning: this.isRunning,
             isPaused: this.isPaused
         };
-    }    // Cleanup
+    }
+
+    // Cleanup
     destroy() {
         try {
             this.stop();

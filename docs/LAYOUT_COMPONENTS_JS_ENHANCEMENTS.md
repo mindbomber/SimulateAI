@@ -1,12 +1,12 @@
 # Layout Components JS Enhancements
 
 ## Overview
-Complete modernization of all layout components (`TabContainer`, `ProgressStepper`, `SplitPane`, `TreeView`, `FileUpload`) with accessibility, dark mode, performance optimizations, and advanced features.
+Complete modernization of all layout components (`TabContainer`, `ProgressStepper`, `SplitPane`, `TreeView`, `FileUpload`) with accessibility, performance optimizations, and advanced features.
 
 ## 🎯 Enhancement Summary
 
 ### Infrastructure Additions
-- **ComponentTheme**: Advanced theming system with dark mode support
+- **ComponentTheme**: Advanced theming system
 - **PerformanceMonitor**: Real-time performance tracking and optimization
 - **ComponentError**: Comprehensive error handling and recovery
 - **AnimationManager**: Smooth, accessible animations with reduced motion support
@@ -20,9 +20,8 @@ Complete modernization of all layout components (`TabContainer`, `ProgressSteppe
    - Focus management and indicators
    - High contrast mode support
 
-2. **Dark Mode & Theming**
-   - Automatic theme detection
-   - Dynamic color palette switching
+2. **Accessibility & Theming**
+   - High contrast mode support
    - CSS custom properties integration
    - Theme change event handling
 
@@ -449,10 +448,10 @@ newTab.on('tabReordered', (event) => {
 
 | Component | Status | Features | Accessibility | Performance | Theme Support |
 |-----------|--------|----------|---------------|-------------|---------------|
-| **TabContainer** | ✅ Complete | ✅ Advanced | ✅ Full ARIA | ✅ Optimized | ✅ Dark Mode |
-| **ProgressStepper** | ✅ Complete | ✅ Advanced | ✅ Full ARIA | ✅ Optimized | ✅ Dark Mode |
-| **SplitPane** | ✅ Complete | ✅ Advanced | ✅ Full ARIA | ✅ Optimized | ✅ Dark Mode |
-| **TreeView** | ✅ Complete | ✅ Advanced | ✅ Full ARIA | ✅ Optimized | ✅ Dark Mode |
-| **FileUpload** | ✅ Complete | ✅ Advanced | ✅ Full ARIA | ✅ Optimized | ✅ Dark Mode |
+| **TabContainer** | ✅ Complete | ✅ Advanced | ✅ Full ARIA | ✅ Optimized | ✅ Theming |
+| **ProgressStepper** | ✅ Complete | ✅ Advanced | ✅ Full ARIA | ✅ Optimized | ✅ Theming |
+| **SplitPane** | ✅ Complete | ✅ Advanced | ✅ Full ARIA | ✅ Optimized | ✅ Theming |
+| **TreeView** | ✅ Complete | ✅ Advanced | ✅ Full ARIA | ✅ Optimized | ✅ Theming |
+| **FileUpload** | ✅ Complete | ✅ Advanced | ✅ Full ARIA | ✅ Optimized | ✅ Theming |
 
-**All layout components are now fully modernized with comprehensive accessibility, performance optimizations, dark mode support, and advanced features.**
+**All layout components are now fully modernized with comprehensive accessibility, performance optimizations, theming support, and advanced features.**

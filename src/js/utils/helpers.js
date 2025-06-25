@@ -40,14 +40,6 @@ const HELPERS_CONSTANTS = {
             danger: '#ff0000',
             success: '#00ff00'
         },
-        DARK_MODE: {
-            background: '#1a1a1a',
-            text: '#e0e0e0',
-            primary: '#4da6ff',
-            secondary: '#66bb6a',
-            danger: '#f44336',
-            success: '#4caf50'
-        },
         LIGHT_MODE: {
             background: '#ffffff',
             text: '#333333',
@@ -122,15 +114,13 @@ class HelperCache {
  */
 class ThemeHelpers {
     static getCurrentTheme() {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         const prefersHighContrast = window.matchMedia('(prefers-contrast: high)').matches;
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         
         return {
-            darkMode: prefersDark,
             highContrast: prefersHighContrast,
             reducedMotion: prefersReducedMotion,
-            theme: prefersHighContrast ? 'highContrast' : (prefersDark ? 'dark' : 'light')
+            theme: prefersHighContrast ? 'highContrast' : 'light'
         };
     }
     
@@ -139,8 +129,6 @@ class ThemeHelpers {
         
         if (currentTheme.highContrast) {
             return HELPERS_CONSTANTS.ACCESSIBILITY_COLORS.HIGH_CONTRAST;
-        } else if (currentTheme.darkMode) {
-            return HELPERS_CONSTANTS.ACCESSIBILITY_COLORS.DARK_MODE;
         }
         
         return HELPERS_CONSTANTS.ACCESSIBILITY_COLORS.LIGHT_MODE;
@@ -154,7 +142,7 @@ class ThemeHelpers {
         element.style.color = colors.text;
         
         // Add theme-specific classes
-        element.classList.remove('theme-light', 'theme-dark', 'theme-high-contrast');
+        element.classList.remove('theme-light', 'theme-high-contrast');
         element.classList.add(`theme-${currentTheme.theme}`);
         
         if (currentTheme.reducedMotion) {
@@ -166,12 +154,6 @@ class ThemeHelpers {
     
     static createThemeObserver(callback) {
         const observers = [];
-        
-        // Dark mode observer
-        const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        const darkModeHandler = (e) => callback('darkMode', e.matches);
-        darkModeQuery.addEventListener('change', darkModeHandler);
-        observers.push(() => darkModeQuery.removeEventListener('change', darkModeHandler));
         
         // High contrast observer
         const contrastQuery = window.matchMedia('(prefers-contrast: high)');
@@ -961,8 +943,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
     static getEthicsColor(value, options = {}) {
         const {
             highContrast = false,
-            colorBlindSafe = false,
-            theme = 'light'
+            colorBlindSafe = false
         } = options;
         
         value = this.clamp(value, 0, 100);
@@ -979,15 +960,6 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
             if (value < 30) return '#d73027'; // Red-orange
             if (value < 60) return '#fee08b'; // Yellow-orange
             return '#4575b4'; // Blue
-        }
-        
-        // Theme-aware colors
-        if (theme === 'dark') {
-            if (value < 50) {
-                return this.interpolateColor('#ff6b6b', '#feca57', value / 50);
-            } else {
-                return this.interpolateColor('#feca57', '#48cae4', (value - 50) / 50);
-            }
         }
         
         // Default light theme
@@ -1074,7 +1046,6 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
         const {
             steps = 5,
             lightBackground = '#ffffff',
-            darkBackground = '#000000',
             highContrast = false
         } = options;
         
@@ -1085,8 +1056,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
             base: baseColor,
             variations: [],
             accessible: {
-                onLight: [],
-                onDark: []
+                onLight: []
             }
         };
         
@@ -1094,29 +1064,19 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
         for (let i = 0; i < steps; i++) {
             const factor = i / (steps - 1);
             const lightVariation = this.interpolateColor(baseColor, '#ffffff', factor * 0.8);
-            const darkVariation = this.interpolateColor(baseColor, '#000000', factor * 0.8);
             
             palette.variations.push({
                 light: lightVariation,
-                dark: darkVariation,
                 factor: this.roundTo(factor, 2)
             });
             
-            // Check accessibility on both backgrounds
+            // Check accessibility on light background
             const lightContrast = this.checkColorAccessibility(lightVariation, lightBackground);
-            const darkContrast = this.checkColorAccessibility(darkVariation, darkBackground);
             
             if (lightContrast.passesNormal) {
                 palette.accessible.onLight.push({
                     color: lightVariation,
                     contrast: lightContrast.ratio
-                });
-            }
-            
-            if (darkContrast.passesNormal) {
-                palette.accessible.onDark.push({
-                    color: darkVariation,
-                    contrast: darkContrast.ratio
                 });
             }
         }
@@ -2564,7 +2524,6 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
         const preferences = {
             reduceMotion: false,
             highContrast: false,
-            darkMode: false,
             largeText: false,
             reducedTransparency: false
         };
@@ -2573,7 +2532,6 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
         if (window.matchMedia) {
             preferences.reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
             preferences.highContrast = window.matchMedia('(prefers-contrast: high)').matches;
-            preferences.darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
             
             // Check for other accessibility preferences if supported
             try {

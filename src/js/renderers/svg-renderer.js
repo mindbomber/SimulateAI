@@ -504,20 +504,16 @@ class SVGRenderer {
    */
   setupThemeMonitoring() {
     if (window.matchMedia) {
-      const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
       const contrastQuery = window.matchMedia('(prefers-contrast: high)');
       
       const updateTheme = () => {
         let newTheme = 'light';
         if (contrastQuery.matches) {
           newTheme = 'high_contrast';
-        } else if (darkModeQuery.matches) {
-          newTheme = 'dark';
         }
         this.setTheme(newTheme);
       };
       
-      darkModeQuery.addEventListener('change', updateTheme);
       contrastQuery.addEventListener('change', updateTheme);
       
       // Initial theme detection
@@ -636,11 +632,6 @@ class SVGRenderer {
       .svg-renderer[data-theme="light"] {
         background: ${this.currentTheme.background};
         color: ${this.currentTheme.foreground};
-      }
-      
-      .svg-renderer[data-theme="dark"] {
-        background: ${SVG_CONSTANTS.THEMES.DARK.background};
-        color: ${SVG_CONSTANTS.THEMES.DARK.foreground};
       }
       
       .svg-renderer[data-theme="high_contrast"] {

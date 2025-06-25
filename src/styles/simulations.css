@@ -249,7 +249,8 @@
     }
 }
 
-/* Button Component */
+/* DEPRECATED: Use .btn and .btn-primary instead of .button */
+/* Legacy .button class maintained for backward compatibility */
 .button {
     background: var(--color-primary);
     color: var(--color-white);
@@ -262,6 +263,9 @@
     align-items: center;
     justify-content: center;
     min-height: 40px;
+    padding: var(--spacing-2) var(--spacing-4);
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-tight);
 }
 
 .button:hover,
@@ -847,51 +851,6 @@
     .simulation-canvas {
         border: 2px solid black !important;
         background: white !important;
-    }
-}
-
-/* Enhanced Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-    .feedbacksystem {
-        background: rgba(33, 33, 33, 0.95);
-        border-color: var(--color-gray-600);
-    }
-    
-    .ethics-meters h4 {
-        color: var(--color-gray-100);
-    }
-    
-    .scenario-progress {
-        background: var(--color-gray-800);
-    }
-    
-    .progress-text {
-        color: var(--color-gray-400);
-    }
-    
-    .decision-title {
-        color: var(--color-gray-100);
-    }
-    
-    .slider label {
-        color: var(--color-gray-300);
-    }
-    
-    .slider-value {
-        color: var(--color-gray-400);
-    }
-    
-    .simulation-canvas {
-        background: var(--color-gray-900);
-    }
-    
-    .tooltip {
-        background: rgba(255, 255, 255, 0.9);
-        color: var(--color-gray-900);
-    }
-    
-    .tooltip::after {
-        border-color: rgba(255, 255, 255, 0.9) transparent transparent transparent;
     }
 }
 

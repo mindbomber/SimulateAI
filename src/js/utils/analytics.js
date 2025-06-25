@@ -50,15 +50,13 @@ const ANALYTICS_EVENTS = {
  */
 class AnalyticsTheme {
     static getCurrentTheme() {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         const prefersHighContrast = window.matchMedia('(prefers-contrast: high)').matches;
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         
         return {
-            darkMode: prefersDark,
             highContrast: prefersHighContrast,
             reducedMotion: prefersReducedMotion,
-            theme: prefersHighContrast ? 'highContrast' : (prefersDark ? 'dark' : 'light')
+            theme: prefersHighContrast ? 'highContrast' : 'light'
         };
     }
     
@@ -479,12 +477,6 @@ class AnalyticsManager {
      * Setup theme monitoring for accessibility insights
      */
     static setupThemeMonitoring() {
-        // Monitor dark mode changes
-        const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        darkModeQuery.addEventListener('change', (e) => {
-            this.trackThemeChange('dark_mode', e.matches);
-        });
-        
         // Monitor high contrast changes
         const contrastQuery = window.matchMedia('(prefers-contrast: high)');
         contrastQuery.addEventListener('change', (e) => {
@@ -497,7 +489,7 @@ class AnalyticsManager {
             this.trackThemeChange('reduced_motion', e.matches);
         });
         
-        this.themeObserver = { darkModeQuery, contrastQuery, motionQuery };
+        this.themeObserver = { contrastQuery, motionQuery };
     }
     
     /**
@@ -2032,7 +2024,6 @@ class AnalyticsManager {
      */
     static analyzeThemePreferences(themeChanges) {
         const preferences = {
-            dark: 0,
             light: 0,
             highContrast: 0,
             reducedMotion: 0
@@ -2042,9 +2033,6 @@ class AnalyticsManager {
             const { type, enabled } = event.data || {};
             if (enabled) {
                 switch (type) {
-                    case 'dark_mode':
-                        preferences.dark++;
-                        break;
                     case 'high_contrast':
                         preferences.highContrast++;
                         break;
