@@ -102,14 +102,10 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     console.log('BiasSimulation.setupUI() called');
     
     try {
-      // Use enhanced objects from the visual engine if available
-      if (this.engine && this.engine.createEthicsMeter) {
-        console.log('Using enhanced UI');
-        this.setupEnhancedUI();
-      } else {
-        console.log('Using basic UI fallback');
-        this.setupBasicUI();
-      }
+      // Force basic UI for now to avoid canvas cleanup issues
+      // Enhanced UI with canvases is being cleaned up prematurely
+      console.log('Using basic UI (canvas management disabled)');
+      this.setupBasicUI();
       console.log('UI setup completed successfully');
     } catch (error) {
       console.error('Error setting up UI:', error);
@@ -143,6 +139,28 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       this.setupResultsDisplay(container);
 
       if (this.container) {
+        console.log('Clearing and setting up enhanced container:', this.container);
+        console.log('Container innerHTML before clearing:', this.container.innerHTML);
+        
+        // Force complete cleanup of container
+        while (this.container.firstChild) {
+          this.container.removeChild(this.container.firstChild);
+        }
+        
+        // Clear any residual text content
+        this.container.textContent = '';
+        
+        // Reset all attributes and properties
+        this.container.className = 'simulation-container';
+        this.container.removeAttribute('aria-busy');
+        this.container.removeAttribute('aria-label');
+        this.container.removeAttribute('role');
+        this.container.style.cssText = '';
+        
+        // Force a DOM reflow to ensure cleanup
+        this.container.offsetHeight;
+        
+        console.log('Container innerHTML after clearing:', this.container.innerHTML);
         console.log('Appending enhanced UI to container:', this.container);
         this.container.appendChild(container);
         console.log('Enhanced UI successfully appended');
@@ -309,27 +327,44 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
             }
           };
         }
-      };      // Get simulation container from engine
-      this.container = this.engine.container || document.getElementById('simulation-container');
+      };
+
+      // Get simulation container from engine with improved fallback logic
+      console.log('Engine instance:', this.engine);
+      console.log('Engine container:', this.engine?.container);
       
-      console.log('Container set to:', this.container);
+      // Try multiple container sources
+      this.container = this.engine?.container || 
+                      document.getElementById('simulation-container') ||
+                      document.querySelector('.simulation-container') ||
+                      document.querySelector('main') ||
+                      document.querySelector('#app') ||
+                      document.body;
+      
+      console.log('Container resolved to:', this.container);
+      console.log('Container type:', this.container?.tagName);
+      console.log('Container exists in DOM:', document.contains(this.container));
       
       if (!this.container) {
-        console.error('No simulation container available');
+        console.error('No simulation container available - cannot proceed');
         return;
       }
 
       const container = this.ui.createElement('div', {
         className: 'bias-simulation-container',
-        style: 'display: flex; gap: 20px; height: 100%; padding: 20px;'
+        style: 'display: flex !important; gap: 20px; height: 100% !important; padding: 20px; background: white !important; border: 2px solid red !important; min-height: 400px !important; width: 100% !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 1000 !important;'
       });
+
+      console.log('Created main container element:', container);
+      console.log('Container styles:', container.style.cssText);
 
     // Control Panel
     const controlPanel = this.ui.createPanel({
       title: 'Algorithm Settings',
       className: 'controls-panel',
-      style: 'width: 300px;'
+      style: 'width: 300px; background: lightblue; border: 2px solid blue;'
     });
+    console.log('Created control panel:', controlPanel);
 
     // Bias sliders
     Object.keys(this.biasSettings).forEach(biasType => {
@@ -359,11 +394,13 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     const resultsPanel = this.ui.createPanel({
       title: 'Hiring Results',
       className: 'results-panel',
-      style: 'flex: 1;'
+      style: 'flex: 1; background: lightgreen; border: 2px solid green;'
     });
+    console.log('Created results panel:', resultsPanel);
 
     this.resultsContainer = this.ui.createElement('div', {
-      className: 'results-container'
+      className: 'results-container',
+      innerHTML: '<p style="color: black; font-weight: bold;">Click "Run Hiring Algorithm" to see results</p>'
     });
     resultsPanel.appendChild(this.resultsContainer);
 
@@ -371,18 +408,88 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     const statsPanel = this.ui.createPanel({
       title: 'Bias Metrics',
       className: 'stats-panel',
-      style: 'width: 250px;'
+      style: 'width: 250px; background: lightyellow; border: 2px solid orange;'
     });
+    console.log('Created stats panel:', statsPanel);
 
     this.statsContainer = this.ui.createElement('div', {
-      className: 'stats-container'
+      className: 'stats-container',
+      innerHTML: '<p style="color: black; font-weight: bold;">Statistics will appear here</p>'
     });
-    statsPanel.appendChild(this.statsContainer);    container.appendChild(controlPanel);
+    statsPanel.appendChild(this.statsContainer);
+
+    // Append all panels to the main container
+    console.log('Appending panels to main container...');
+    container.appendChild(controlPanel);
+    console.log('Control panel appended');
     container.appendChild(resultsPanel);
-    container.appendChild(statsPanel);    // Ensure container is properly available
+    console.log('Results panel appended');
+    container.appendChild(statsPanel);
+    console.log('Stats panel appended');
+    console.log('Main container children count:', container.children.length);
+
+    // Ensure container is properly available and clear it first
     if (this.container) {
-      console.log('Appending UI to container:', this.container);
+      console.log('Clearing and setting up container:', this.container);
+      console.log('Container innerHTML before clearing:', this.container.innerHTML);
+      
+      // Force complete cleanup of container
+      while (this.container.firstChild) {
+        this.container.removeChild(this.container.firstChild);
+      }
+      
+      // Clear any residual text content
+      this.container.textContent = '';
+      
+      // Reset all attributes and properties and force visibility
+      this.container.className = 'simulation-container bias-simulation-active';
+      this.container.removeAttribute('aria-busy');
+      this.container.removeAttribute('aria-label');
+      this.container.removeAttribute('role');
+      this.container.style.cssText = 'flex: 1 !important; display: block !important; align-items: stretch !important; justify-content: stretch !important; background: #f0f0f0 !important; min-height: 400px !important; overflow: visible !important; visibility: visible !important; opacity: 1 !important; position: relative !important; padding: 0 !important;';
+      
+      // Force a DOM reflow to ensure cleanup
+      this.container.offsetHeight;
+      
+      console.log('Container innerHTML after clearing:', this.container.innerHTML);
+      console.log('Appending main UI container to simulation container...');
+      console.log('Main container element:', container);
+      console.log('Simulation container element:', this.container);
       this.container.appendChild(container);
+      console.log('Final simulation container HTML:', this.container.innerHTML);
+      console.log('Container computed styles:', window.getComputedStyle(this.container));
+      console.log('Container bounding rect:', this.container.getBoundingClientRect());
+      
+      // Debug the inner bias-simulation-container
+      const biasContainer = this.container.querySelector('.bias-simulation-container');
+      if (biasContainer) {
+        console.log('Bias container found:', biasContainer);
+        console.log('Bias container bounding rect:', biasContainer.getBoundingClientRect());
+        
+        const computedStyles = window.getComputedStyle(biasContainer);
+        console.log('Bias container visibility:', computedStyles.visibility);
+        console.log('Bias container display:', computedStyles.display);
+        console.log('Bias container opacity:', computedStyles.opacity);
+        console.log('Bias container overflow:', computedStyles.overflow);
+        console.log('Bias container z-index:', computedStyles.zIndex);
+        console.log('Bias container position:', computedStyles.position);
+        console.log('Bias container color:', computedStyles.color);
+        console.log('Bias container background-color:', computedStyles.backgroundColor);
+        console.log('Bias container border:', computedStyles.border);
+        
+        // Fix container sizing and overflow issues
+        biasContainer.style.cssText += '; height: auto !important; max-height: 100% !important; overflow: auto !important; box-sizing: border-box !important;';
+        console.log('Applied container size fixes');
+        
+        // Ensure the parent simulation container can accommodate the content
+        if (container) {
+          container.style.cssText += '; height: auto !important; min-height: 500px !important; max-height: 80vh !important; overflow: auto !important;';
+          console.log('Applied simulation container size fixes');
+        }
+      } else {
+        console.error('Bias container not found in DOM!');
+      }
+      
       console.log('UI successfully appended to container');
     } else {
       console.error('Simulation container not available');
@@ -893,19 +1000,50 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
    */
   cleanup() {
     try {
-      // Remove all managed canvases
-      Object.values(this.canvasIds).forEach(canvasId => {
-        if (canvasId) {
-          CanvasManager.removeCanvas(canvasId);
+      console.log('BiasSimulation cleanup called');
+      
+      // Clear container content first
+      if (this.container) {
+        console.log('Cleaning up container:', this.container);
+        console.log('Container innerHTML before cleanup:', this.container.innerHTML);
+        
+        // Force complete cleanup of container
+        while (this.container.firstChild) {
+          this.container.removeChild(this.container.firstChild);
         }
-      });
+        
+        // Clear any residual text content
+        this.container.textContent = '';
+        
+        // Reset all attributes and properties
+        this.container.className = 'simulation-container';
+        this.container.removeAttribute('aria-busy');
+        this.container.removeAttribute('aria-label');
+        this.container.removeAttribute('role');
+        this.container.style.cssText = '';
+        
+        // Force a DOM reflow to ensure cleanup
+        this.container.offsetHeight;
+        
+        console.log('Container innerHTML after cleanup:', this.container.innerHTML);
+      }
 
-      // Reset canvas IDs
-      this.canvasIds = {
-        controls: null,
-        metrics: null,
-        analytics: null
-      };
+      // Only remove canvases if they were actually created
+      if (this.canvasIds) {
+        Object.entries(this.canvasIds).forEach(([key, canvasId]) => {
+          if (canvasId && CanvasManager.canvases && CanvasManager.canvases.has(canvasId)) {
+            console.log(`Removing canvas: ${key} -> ${canvasId}`);
+            CanvasManager.removeCanvas(canvasId);
+          }
+        });
+
+        // Reset canvas IDs
+        this.canvasIds = {
+          controls: null,
+          metrics: null,
+          analytics: null
+        };
+      }
 
       // Clear engine references
       this.controlsEngine = null;
@@ -914,6 +1052,10 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       this.biasSliders = null;
       this.actionButtons = null;
       this.biasMeters = null;
+
+      // Clear UI references
+      this.resultsContainer = null;
+      this.statsContainer = null;
 
       console.log('Bias simulation cleanup completed');
     } catch (error) {
@@ -928,7 +1070,10 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     // Cleanup canvases first
     this.cleanup();
     
-    // Reset simulation data
+    // Call parent reset method
+    super.reset();
+    
+    // Reset simulation-specific data
     this.currentRound = 0;
     this.clearMetrics();
     this.generateCandidates();
@@ -974,6 +1119,14 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     setTimeout(() => {
       this.setupUI();
     }, 100);
+  }
+
+  /**
+   * Set the container element for this simulation
+   */
+  setContainer(container) {
+    this.container = container;
+    console.log('BiasSimulation container set to:', this.container);
   }
 
   getReflectionQuestions() {

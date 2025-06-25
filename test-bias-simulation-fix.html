@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Bias Simulation Container Fix</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/bias-fairness.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-controls {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        
+        .test-controls button {
+            margin-right: 10px;
+            padding: 10px 20px;
+            background: #007acc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .test-controls button:hover {
+            background: #005a9e;
+        }
+        
+        .simulation-container {
+            min-height: 600px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: white;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            background: #e7f3ff;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Bias Simulation Container Fix Test</h1>
+        <p>This test verifies that the bias simulation container is properly cleared between runs.</p>
+        
+        <div class="test-controls">
+            <button onclick="startBasicSimulation()">Start Basic Simulation</button>
+            <button onclick="startEnhancedSimulation()">Start Enhanced Simulation</button>
+            <button onclick="clearSimulation()">Clear Simulation</button>
+            <button onclick="inspectContainer()">Inspect Container</button>
+        </div>
+        
+        <div class="simulation-container" id="simulationContainer">
+            <p>Simulation will appear here...</p>
+        </div>
+        
+        <div class="status" id="status">Ready to test...</div>
+    </div>
+
+    <!-- Load core modules -->
+    <script src="src/js/utils/canvas-manager.js"></script>
+    <script src="src/js/utils/helpers.js"></script>
+    <script src="src/js/core/engine.js"></script>
+    <script src="src/js/renderers/canvas-renderer.js"></script>
+    <script src="src/js/simulations/bias-fairness.js"></script>
+
+    <script>
+        let biasSimulation = null;
+        let statusElement = null;
+        
+        function log(message) {
+            if (!statusElement) {
+                statusElement = document.getElementById('status');
+            }
+            const timestamp = new Date().toLocaleTimeString();
+            statusElement.textContent += `[${timestamp}] ${message}\n`;
+            console.log(message);
+        }
+        
+        function startBasicSimulation() {
+            log('Starting basic simulation...');
+            
+            try {
+                // Clean up any existing simulation
+                if (biasSimulation) {
+                    biasSimulation.cleanup();
+                    biasSimulation = null;
+                }
+                
+                const container = document.getElementById('simulationContainer');
+                log(`Container before setup: ${container.innerHTML.length} chars, ${container.children.length} children`);
+                
+                // Create new simulation
+                biasSimulation = new BiasSimulation();
+                biasSimulation.setContainer(container);
+                biasSimulation.setupBasicUI();
+                
+                log(`Container after setup: ${container.innerHTML.length} chars, ${container.children.length} children`);
+                log('Basic simulation started successfully');
+                
+            } catch (error) {
+                log(`Error starting basic simulation: ${error.message}`);
+                console.error(error);
+            }
+        }
+        
+        function startEnhancedSimulation() {
+            log('Starting enhanced simulation...');
+            
+            try {
+                // Clean up any existing simulation
+                if (biasSimulation) {
+                    biasSimulation.cleanup();
+                    biasSimulation = null;
+                }
+                
+                const container = document.getElementById('simulationContainer');
+                log(`Container before setup: ${container.innerHTML.length} chars, ${container.children.length} children`);
+                
+                // Create new simulation
+                biasSimulation = new BiasSimulation();
+                biasSimulation.setContainer(container);
+                biasSimulation.setupEnhancedUI();
+                
+                log(`Container after setup: ${container.innerHTML.length} chars, ${container.children.length} children`);
+                log('Enhanced simulation started successfully');
+                
+            } catch (error) {
+                log(`Error starting enhanced simulation: ${error.message}`);
+                console.error(error);
+            }
+        }
+        
+        function clearSimulation() {
+            log('Clearing simulation...');
+            
+            try {
+                const container = document.getElementById('simulationContainer');
+                log(`Container before cleanup: ${container.innerHTML.length} chars, ${container.children.length} children`);
+                
+                if (biasSimulation) {
+                    biasSimulation.cleanup();
+                    biasSimulation = null;
+                }
+                
+                log(`Container after cleanup: ${container.innerHTML.length} chars, ${container.children.length} children`);
+                log('Simulation cleared successfully');
+                
+            } catch (error) {
+                log(`Error clearing simulation: ${error.message}`);
+                console.error(error);
+            }
+        }
+        
+        function inspectContainer() {
+            const container = document.getElementById('simulationContainer');
+            log('Container inspection:');
+            log(`- innerHTML length: ${container.innerHTML.length}`);
+            log(`- textContent length: ${container.textContent.length}`);
+            log(`- children count: ${container.children.length}`);
+            log(`- className: "${container.className}"`);
+            log(`- First 100 chars of innerHTML: "${container.innerHTML.substring(0, 100)}"`);
+            log(`- First 100 chars of textContent: "${container.textContent.substring(0, 100)}"`);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            statusElement = document.getElementById('status');
+            log('Test page loaded and ready');
+        });
+    </script>
+</body>
+</html>

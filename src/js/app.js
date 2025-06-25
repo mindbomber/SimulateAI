@@ -1,5 +1,5 @@
 /**
- * Main Application - AI Ethics Simulations Platform
+ * Main Application - SimulateAI Educational Platform
  * Initializes the platform and manages the overall application state
  */
 
@@ -7,6 +7,9 @@
 import EthicsSimulation from './core/simulation.js';
 import AccessibilityManager from './core/accessibility.js';
 import AnimationManager from './core/animation-manager.js';
+import EducatorToolkit from './core/educator-toolkit.js';
+import DigitalScienceLab from './core/digital-science-lab.js';
+import ScenarioGenerator from './core/scenario-generator.js';
 
 // Import utilities
 import { userPreferences, userProgress } from './utils/simple-storage.js';
@@ -74,6 +77,11 @@ class AIEthicsApp {
         this.accessibilityManager = null;
         this.animationManager = null;
         
+        // Core educational modules
+        this.educatorToolkit = null;
+        this.digitalScienceLab = null;
+        this.scenarioGenerator = null;
+        
         // Enhanced objects for UI
         this.ethicsMeters = new Map();
         this.interactiveButtons = new Map();
@@ -108,12 +116,14 @@ class AIEthicsApp {
         this.availableSimulations = [
             {
                 id: 'bias-fairness',
-                title: 'Bias & Fairness',
-                description: 'Explore how algorithmic bias affects decision-making and learn to design fairer AI systems.',
+                title: 'AI Ethics Explorer',
+                description: 'Explore real-world AI scenarios and see how different choices affect various groups in society. No right answers - just learning through cause and effect.',
                 difficulty: 'beginner',
-                duration: 600, // 10 minutes
+                duration: 1200, // 20 minutes
                 thumbnail: 'src/assets/images/bias-fairness-thumb.svg',
-                tags: ['bias', 'fairness', 'discrimination', 'algorithms']
+                tags: ['ethics', 'fairness', 'education', 'scenarios', 'open-ended'],
+                useCanvas: false, // HTML-only simulation, no canvas needed
+                renderMode: 'html'
             },
             {
                 id: 'consent-transparency',
@@ -470,6 +480,9 @@ class AIEthicsApp {
                 preferences: this.preferences
             });
             
+            // Initialize core educational modules
+            await this.initializeCoreModules();
+            
             // Visual Engine will be initialized later when we have canvas elements
             // Just store the configuration for now
             this.visualEngineConfig = {
@@ -488,6 +501,113 @@ class AIEthicsApp {
         } catch (error) {
             AppDebug.error('Failed to initialize systems:', error);
             throw error;
+        }
+    }
+
+    /**
+     * Initialize core educational modules
+     */
+    async initializeCoreModules() {
+        try {
+            // Initialize Educator Toolkit
+            this.educatorToolkit = new EducatorToolkit();
+            AppDebug.log('Educator Toolkit initialized');
+            
+            // Initialize Digital Science Lab
+            this.digitalScienceLab = new DigitalScienceLab();
+            AppDebug.log('Digital Science Lab initialized');
+            
+            // Initialize Scenario Generator
+            this.scenarioGenerator = new ScenarioGenerator();
+            AppDebug.log('Scenario Generator initialized');
+            
+            // Connect the modules for integrated functionality
+            this.connectEducationalModules();
+            
+        } catch (error) {
+            AppDebug.error('Failed to initialize core educational modules:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Connect educational modules for integrated functionality
+     */
+    connectEducationalModules() {
+        // Connect scenario generator to educator toolkit for assessment alignment
+        if (this.educatorToolkit && this.scenarioGenerator) {
+            this.educatorToolkit.setScenarioGenerator(this.scenarioGenerator);
+        }
+        
+        // Connect digital science lab to both toolkit and generator
+        if (this.digitalScienceLab) {
+            if (this.educatorToolkit) {
+                this.digitalScienceLab.setEducatorToolkit(this.educatorToolkit);
+            }
+            if (this.scenarioGenerator) {
+                this.digitalScienceLab.setScenarioGenerator(this.scenarioGenerator);
+            }
+        }
+        
+        AppDebug.log('Educational modules connected successfully');
+    }
+
+    /**
+     * Connect core educational modules to a simulation instance
+     * @param {Object} simulation - The simulation instance
+     * @param {Object} config - The simulation configuration
+     */
+    connectModulesToSimulation(simulation, config) {
+        try {
+            // Connect Educator Toolkit
+            if (this.educatorToolkit && simulation) {
+                simulation.educatorToolkit = this.educatorToolkit;
+                
+                // Get curriculum alignment for this simulation
+                const curriculumAlignment = this.educatorToolkit.getCurriculumAlignment(config.tags || []);
+                if (curriculumAlignment) {
+                    simulation.curriculumAlignment = curriculumAlignment;
+                }
+                
+                // Get assessment tools for this simulation
+                const assessmentTools = this.educatorToolkit.getAssessmentTools(config.difficulty);
+                if (assessmentTools) {
+                    simulation.assessmentTools = assessmentTools;
+                }
+            }
+            
+            // Connect Digital Science Lab
+            if (this.digitalScienceLab && simulation) {
+                simulation.digitalScienceLab = this.digitalScienceLab;
+                
+                // Get relevant lab stations for this simulation
+                const relevantStations = this.digitalScienceLab.getRelevantStations(config.tags || []);
+                if (relevantStations) {
+                    simulation.labStations = relevantStations;
+                }
+            }
+            
+            // Connect Scenario Generator
+            if (this.scenarioGenerator && simulation) {
+                simulation.scenarioGenerator = this.scenarioGenerator;
+                
+                // If this simulation can use generated scenarios, provide them
+                if (simulation.supportsGeneratedScenarios) {
+                    const generatedScenarios = this.scenarioGenerator.generateScenarios(
+                        config.tags?.[0] || 'general',
+                        config.difficulty || 'beginner'
+                    );
+                    if (generatedScenarios) {
+                        simulation.generatedScenarios = generatedScenarios;
+                    }
+                }
+            }
+            
+            AppDebug.log(`Educational modules connected to simulation: ${simulation.id || 'unknown'}`);
+            
+        } catch (error) {
+            AppDebug.error('Failed to connect educational modules to simulation:', error);
+            // Non-critical error - simulation can still function without full integration
         }
     }
 
@@ -743,26 +863,52 @@ class AIEthicsApp {
             // Store canvas ID for cleanup
             this.currentSimulationCanvasId = id;
 
-            // Apply responsive styling to canvas
-            canvas.style.cssText = `
-                max-width: 100%;
-                max-height: 100%;
-                width: auto;
-                height: auto;
-                border: 1px solid #ddd;
-                border-radius: 8px;
-                background: #fff;
-            `;            // Create visual engine using canvas manager
-            this.engine = await canvasManager.createVisualEngine(id, {
-                renderMode: 'canvas',
-                accessibility: true,
-                debug: false,
-                width: 600,
-                height: 400
-            });
+            // Check if simulation needs canvas or is HTML-only
+            if (simConfig.useCanvas !== false && simConfig.renderMode !== 'html') {
+                // Apply responsive styling to canvas
+                canvas.style.cssText = `
+                    max-width: 100%;
+                    max-height: 100%;
+                    width: auto;
+                    height: auto;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    background: #fff;
+                `;
 
-            // Set the container reference on the engine for simulation compatibility
-            this.engine.container = simulationContainer;
+                // Create visual engine using canvas manager
+                this.engine = await canvasManager.createVisualEngine(id, {
+                    renderMode: 'canvas',
+                    accessibility: true,
+                    debug: false,
+                    width: 600,
+                    height: 400
+                });
+
+                // Set the container reference on the engine for simulation compatibility
+                this.engine.container = simulationContainer;
+            } else {
+                // For HTML-only simulations, create a simple mock engine with just the container
+                this.engine = {
+                    container: simulationContainer,
+                    type: 'html',
+                    renderMode: 'html',
+                    start: () => {
+                        // Mock engine started for HTML simulation
+                    },
+                    stop: () => {
+                        // Mock engine stopped for HTML simulation  
+                    },
+                    destroy: () => {
+                        // Mock engine destroyed for HTML simulation
+                    }
+                };
+                
+                // Remove the canvas element since it's not needed
+                if (canvas && canvas.parentNode) {
+                    canvas.parentNode.removeChild(canvas);
+                }
+            }
 
             // Create the specific simulation instance
             this.currentSimulation = await this.createSimulationInstance(simulationId, simConfig);
@@ -821,14 +967,16 @@ class AIEthicsApp {
         }
     }    async createSimulationInstance(simulationId, config) {
         try {
+            let simulation;
+            
             // Load the specific simulation class based on ID
             switch (simulationId) {
                 case 'bias-fairness': {
-                    const { default: BiasSimulation } = await import('./simulations/bias-fairness.js');
-                    const biasSimulation = new BiasSimulation(simulationId);
+                    const { default: BiasExplorerSimulation } = await import('./simulations/bias-fairness-v2.js');
+                    simulation = new BiasExplorerSimulation(simulationId);
                     // Set container reference
-                    biasSimulation.container = document.getElementById('simulation-container');
-                    return biasSimulation;
+                    simulation.container = document.getElementById('simulation-container');
+                    break;
                 }
                 
                 default: {
@@ -837,8 +985,8 @@ class AIEthicsApp {
                         {
                             id: 'intro',
                             title: 'Introduction',
-                            description: 'Welcome to the AI Ethics simulation',
-                            objective: 'Learn the basics of ethical decision-making in AI'
+                            description: 'Welcome to this open-ended exploration of AI ethics',
+                            objective: 'Explore different perspectives and discover consequences of choices'
                         },
                         {
                             id: 'decision1',
@@ -854,7 +1002,7 @@ class AIEthicsApp {
                         }
                     ];
 
-                    const simulation = new EthicsSimulation(simulationId, {
+                    simulation = new EthicsSimulation(simulationId, {
                         title: config.title,
                         description: config.description,
                         difficulty: config.difficulty,
@@ -869,9 +1017,16 @@ class AIEthicsApp {
                     
                     // Set container reference
                     simulation.container = document.getElementById('simulation-container');
-                    return simulation;
+                    break;
                 }
             }
+            
+            // Connect core educational modules to the simulation
+            if (simulation) {
+                this.connectModulesToSimulation(simulation, config);
+            }
+            
+            return simulation;
         } catch (error) {
             AppDebug.error(`Failed to load simulation ${simulationId}:`, error);
             throw error;
@@ -1057,8 +1212,10 @@ class AIEthicsApp {
     async initializeEnhancedObjects() {
         try {
             await this.setupEthicsMeters();
-            await this.setupInteractiveButtons();
-            await this.setupSimulationSliders();
+            // Skip interactive buttons and sliders setup to avoid canvas cleanup issues
+            // These will be created by individual simulations if needed
+            // await this.setupInteractiveButtons();
+            // await this.setupSimulationSliders();
             AppDebug.log('Enhanced objects initialized successfully');
         } catch (error) {
             AppDebug.error('Failed to initialize enhanced objects:', error);
@@ -2078,6 +2235,7 @@ class AIEthicsApp {
             });
             
             // Announce navigation for accessibility
+           
             if (this.accessibilityManager) {
                 this.accessibilityManager.announce('Navigated to simulations section');
             }

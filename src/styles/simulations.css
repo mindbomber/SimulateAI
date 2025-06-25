@@ -249,46 +249,8 @@
     }
 }
 
-/* DEPRECATED: Use .btn and .btn-primary instead of .button */
-/* Legacy .button class maintained for backward compatibility */
-.button {
-    background: var(--color-primary);
-    color: var(--color-white);
-    border: none;
-    border-radius: var(--radius-md);
-    font-weight: var(--font-weight-medium);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 40px;
-    padding: var(--spacing-2) var(--spacing-4);
-    font-size: var(--font-size-sm);
-    line-height: var(--line-height-tight);
-}
-
-.button:hover,
-.button:focus {
-    background: var(--color-primary-dark);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-}
-
-.button:active {
-    transform: translateY(0);
-}
-
-.button:disabled {
-    background: var(--color-gray-400);
-    cursor: not-allowed;
-    opacity: 0.6;
-}
-
-.button:disabled:hover {
-    transform: none;
-    box-shadow: none;
-}
+/* DEPRECATED: Use .btn and .btn-primary from main.css instead */
+/* Legacy .button class removed - migrate to .btn system */
 
 /* Slider Component */
 .slider {

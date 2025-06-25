@@ -4,16 +4,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#1a73e8">
     <meta name="color-scheme" content="light">
-    <title>AI Ethics Simulations - Interactive Learning Platform</title>
-    <meta name="description" content="Learn AI and robotics safety through interactive simulations and games">
-    <meta name="keywords" content="AI ethics, robotics, education, simulations, interactive learning, accessibility">
-    <meta name="author" content="SimulateAI Team">
+    <title>SimulateAI - AI Ethics Education Through Interactive Simulations</title>
+    <meta name="description" content="Empower educators and learners to explore AI ethics, robotics, and emerging technologies through open-ended, consequence-driven simulations that mirror real-world scenarios">
+    <meta name="keywords" content="AI ethics education, robotics ethics, ISTE standards, interactive simulations, educator resources, PhET-inspired learning, consequence-driven education, open-ended exploration">
+    <meta name="author" content="SimulateAI Educational Platform">
     
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="AI Ethics Simulations - Interactive Learning Platform">
-    <meta property="og:description" content="Learn AI and robotics safety through interactive simulations and games">
-    <meta property="og:url" content="https://ai-ethics-simulations.com">
+    <meta property="og:title" content="SimulateAI - AI Ethics Education Through Interactive Simulations">
+    <meta property="og:description" content="Empower educators and learners to explore AI ethics, robotics, and emerging technologies through open-ended, consequence-driven simulations that mirror real-world scenarios">
+    <meta property="og:url" content="https://simulateai.org">
     
     <!-- Accessibility -->
     <meta name="accessibility-features" content="keyboard-navigation,skip-links,high-contrast,large-text,screen-reader-support">
@@ -44,8 +44,11 @@
     <link rel="stylesheet" href="src/styles/hero-demo.css">
     <link rel="stylesheet" href="src/styles/bias-fairness.css">
     
-    <!-- 7. Layout fixes and overrides (always last) -->
+    <!-- 7. Layout fixes and overrides -->
     <link rel="stylesheet" href="src/styles/layout-fixes.css">
+    
+    <!-- 8. Ethics Explorer overrides (must be last for highest specificity) -->
+    <link rel="stylesheet" href="src/styles/ethics-explorer.css">
     
     <!-- Icons and Favicons -->
     <link rel="icon" type="image/svg+xml" href="src/assets/icons/favicon.svg">
@@ -86,8 +89,8 @@
     <header class="header" role="banner">
         <div class="header-container">
             <div class="logo">
-                <img src="src/assets/icons/logo.svg" alt="AI Ethics Simulations" class="logo-image">
-                <h1 class="site-title">AI Ethics Simulations</h1>
+                <img src="src/assets/icons/logo.svg" alt="SimulateAI Educational Platform" class="logo-image">
+                <h1 class="site-title">SimulateAI</h1>
             </div>
               <nav class="main-nav" role="navigation" aria-label="Main navigation">
                 <ul class="nav-list">
@@ -120,14 +123,14 @@
         <!-- Hero Section -->
         <section class="hero" id="home">
             <div class="hero-content">
-                <h2 class="hero-title">Learn AI Ethics Through Interactive Simulations</h2>
+                <h2 class="hero-title">Explore AI Ethics Through Open-Ended Discovery</h2>
                 <p class="hero-description">
-                    Explore the ethical dimensions of artificial intelligence and robotics through 
-                    engaging, game-like simulations designed for learners of all ages.
+                    SimulateAI empowers educators and learners of all ages to explore the complex world of AI ethics, 
+                    robotics, and emerging technologies through consequence-driven simulations that mirror real-world scenarios.
                 </p>
                 <div class="hero-actions">
-                    <button class="btn btn-primary" id="start-learning">Start Learning</button>
-                    <button class="btn btn-secondary" id="educator-guide">Educator Guide</button>
+                    <button class="btn btn-primary" id="start-learning">Start Exploring</button>
+                    <button class="btn btn-secondary" id="educator-guide">Educator Resources</button>
                 </div>
             </div>
             
@@ -142,9 +145,10 @@
         <!-- Simulations Grid -->
         <section class="simulations-section" id="simulations">
             <div class="section-header">
-                <h2 class="section-title">Explore Simulations</h2>
+                <h2 class="section-title">Open-Ended Exploration Scenarios</h2>
                 <p class="section-description">
-                    Each simulation focuses on a different aspect of AI ethics and safety
+                    Each simulation presents real-world challenges with no predetermined "correct" answers—explore consequences, 
+                    perspectives, and solutions through guided discovery
                 </p>
             </div>
             
@@ -156,28 +160,28 @@
         <!-- Educator Tools Section -->
         <section class="educator-section" id="educator-tools">
             <div class="section-header">
-                <h2 class="section-title">Educator Resources</h2>
+                <h2 class="section-title">Comprehensive Educator Support</h2>
                 <p class="section-description">
-                    Tools and materials to integrate AI ethics education into your curriculum
+                    ISTE-aligned resources and professional development tools for seamless classroom integration
                 </p>
             </div>
             
             <div class="educator-grid">
                 <div class="educator-card">
-                    <h3>Lesson Plans</h3>
-                    <p>Ready-to-use curriculum aligned with educational standards</p>
-                    <button class="btn btn-outline">Download</button>
+                    <h3>Standards-Aligned Curriculum</h3>
+                    <p>Ready-to-use lesson plans aligned with ISTE Standards and educational best practices</p>
+                    <button class="btn btn-outline">Download Resources</button>
                 </div>
                 
                 <div class="educator-card">
-                    <h3>Assessment Tools</h3>
-                    <p>Quizzes and reflection activities for measuring learning</p>
-                    <button class="btn btn-outline">View Tools</button>
+                    <h3>Open-Ended Assessment Tools</h3>
+                    <p>Rubrics and reflection frameworks for evaluating critical thinking and ethical reasoning</p>
+                    <button class="btn btn-outline">View Assessment Tools</button>
                 </div>
                 
                 <div class="educator-card">
-                    <h3>Analytics Dashboard</h3>
-                    <p>Track student progress and ethical decision patterns</p>
+                    <h3>Learning Analytics Dashboard</h3>
+                    <p>Track student exploration patterns and evidence-based learning outcomes</p>
                     <button class="btn btn-outline">Open Dashboard</button>
                 </div>
             </div>
@@ -186,26 +190,26 @@
         <!-- About Section -->
         <section class="about-section" id="about">
             <div class="section-header">
-                <h2 class="section-title">About AI Ethics Simulations</h2>
+                <h2 class="section-title">About SimulateAI</h2>
                 <p class="section-description">
-                    Our mission is to make AI ethics education accessible and engaging for everyone
+                    Digital science laboratory for AI ethics education—where discovery drives understanding
                 </p>
             </div>
             
             <div class="about-content">
                 <div class="about-card">
-                    <h3>Our Mission</h3>
-                    <p>To democratize AI ethics education through interactive learning experiences that prepare learners for responsible AI development and deployment.</p>
+                    <h3>Our Educational Mission</h3>
+                    <p>Empowering educators and learners through open-ended, consequence-driven simulations that build critical thinking skills and ethical reasoning frameworks for an AI-driven world.</p>
                 </div>
                 
                 <div class="about-card">
-                    <h3>Open Source</h3>
-                    <p>All our simulations and educational content are open source, enabling educators worldwide to adapt and improve our materials.</p>
+                    <h3>PhET-Inspired Excellence</h3>
+                    <p>Following proven educational models, we create research-based, universally accessible simulations with comprehensive pedagogical integration for all learning environments.</p>
                 </div>
                 
                 <div class="about-card">
-                    <h3>Research-Based</h3>
-                    <p>Our content is grounded in the latest research in AI ethics, cognitive science, and educational technology.</p>
+                    <h3>Professional Standards</h3>
+                    <p>ISTE-aligned resources, evidence-based outcomes, and measurable learning objectives designed to meet the highest educational technology standards.</p>
                 </div>
             </div>
         </section>
@@ -249,20 +253,22 @@
         <!-- Contact Section -->
         <section class="contact-section" id="contact">
             <div class="section-header">
-                <h2 class="section-title">Contact Us</h2>
+                <h2 class="section-title">Connect With SimulateAI</h2>
             </div>
             
             <div class="contact-content">
-                <p>We'd love to hear from you! Reach out for:</p>
+                <p>Join our educational community! Connect with us for:</p>
                 <ul>
-                    <li>Technical support</li>
-                    <li>Educational partnerships</li>
-                    <li>Feedback and suggestions</li>
-                    <li>Accessibility concerns</li>
+                    <li>Educator support and professional development</li>
+                    <li>Institutional partnerships and ISTE certification</li>
+                    <li>Technical assistance and platform guidance</li>
+                    <li>Curriculum integration and assessment support</li>
+                    <li>Accessibility resources and accommodations</li>
                 </ul>
                 <div class="contact-info">
-                    <p><strong>Email:</strong> <a href="mailto:info@ai-ethics-simulations.com">info@ai-ethics-simulations.com</a></p>
-                    <p><strong>GitHub:</strong> <a href="https://github.com/ai-ethics-simulations" target="_blank" rel="noopener noreferrer">ai-ethics-simulations</a></p>
+                    <p><strong>Email:</strong> <a href="mailto:educators@simulateai.org">educators@simulateai.org</a></p>
+                    <p><strong>GitHub:</strong> <a href="https://github.com/simulateai" target="_blank" rel="noopener noreferrer">SimulateAI Open Source</a></p>
+                    <p><strong>Resources:</strong> <a href="docs/EDUCATOR_GUIDE.md">Educator Guide</a> | <a href="docs/ISTE_CERTIFICATION_ROADMAP.md">ISTE Certification</a></p>
                 </div>
             </div>
         </section>
@@ -271,10 +277,11 @@
     <!-- Footer -->
     <footer class="footer" role="contentinfo">
         <div class="footer-content">
-            <p>&copy; 2025 AI Ethics Simulations. Open source educational platform.</p>            <nav class="footer-nav" aria-label="Footer navigation">
+            <p>&copy; 2025 SimulateAI Educational Platform. Open source AI ethics education for all learners.</p>            <nav class="footer-nav" aria-label="Footer navigation">
                 <a href="#privacy">Privacy</a>
                 <a href="#accessibility">Accessibility</a>
                 <a href="#contact">Contact</a>
+                <a href="docs/EDUCATOR_GUIDE.md">Educators</a>
             </nav>
         </div>
     </footer>

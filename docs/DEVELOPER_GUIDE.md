@@ -1,8 +1,25 @@
-# Developer Guide - Component Development Workflow
+# Developer Guide - SimulateAI Educational Platform
 
-## 🚀 New Component Development Process
+## 🎯 Development Philosophy
 
-This guide outlines the updated workflow for creating new UI components in the SimulateAI project, following our **No HTML Generation Policy**.
+### Mission-Driven Development
+Every technical decision in SimulateAI serves our educational mission: **empowering learners of all ages to explore AI ethics through open-ended, consequence-driven simulations**. Our development follows the digital science laboratory approach—no "correct" answers, just cause-and-effect exploration.
+
+### Educational Excellence Standards
+- **Accessibility First**: All components must meet WCAG guidelines
+- **Research-Based Design**: Following PhET Interactive Simulations principles
+- **ISTE Standards Alignment**: Building toward educational technology certification
+- **Universal Design**: Scalable for elementary through professional development
+
+### Technical Principles
+- **Modular Architecture**: Reusable components enable diverse simulation creation
+- **Open-Ended Systems**: Support multiple perspectives and solutions
+- **Real-World Scenarios**: Mirror actual AI ethics challenges and consequences
+- **Educator Integration**: Seamless classroom adoption with comprehensive resources
+
+## 🚀 Component Development Workflow
+
+This guide outlines the development process for creating new educational components, following our **No HTML Generation Policy** and mission-driven approach.
 
 ## 📋 Step-by-Step Workflow
 

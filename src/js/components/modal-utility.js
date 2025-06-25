@@ -177,6 +177,7 @@ export default ModalUtility;
 // Make available globally for backward compatibility
 if (typeof window !== 'undefined') {
     window.ModalUtility = ModalUtility;
+    // TEMPORARILY COMMENTED OUT - might be causing conflicts
     // Also provide as ReusableModal for drop-in replacement
-    window.ReusableModal = ModalUtility;
+    // window.ReusableModal = ModalUtility;
 }

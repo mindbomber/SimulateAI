@@ -53,8 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (startLearningBtn) {
         startLearningBtn.addEventListener('click', () => {
             window.NotificationToast.success(
-                'Welcome!',
-                'Starting your AI ethics learning journey.'
+                'Welcome to SimulateAI!',
+                'Begin your open-ended exploration of AI ethics and emerging technologies.'
             );
         });
     }

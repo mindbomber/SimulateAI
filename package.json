@@ -1,7 +1,7 @@
 {
-  "name": "ai-ethics-simulations",
+  "name": "simulateai-platform",
   "version": "1.0.0",
-  "description": "Interactive AI and Robotics Safety Education Platform",
+  "description": "SimulateAI: AI Ethics Education Through Interactive Simulations - Empowering educators and learners through open-ended, consequence-driven explorations",
   "main": "index.html",  "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -11,8 +11,8 @@
     "format": "prettier --write src/**/*.{js,css,html}",
     "verify": "echo \"All components verified and integrated\" && npm run lint",
     "check-policy": "echo \"HTML generation policy compliance: ✓ No standalone HTML generation\" && npm run lint"
-  },"keywords": ["ai", "ethics", "education", "simulation", "robotics", "safety"],
-  "author": "SimulateAI",
+  },  "keywords": ["ai-ethics-education", "interactive-simulations", "iste-standards", "educator-resources", "robotics-ethics", "consequence-driven-learning", "open-ended-exploration", "educational-technology"],
+  "author": "SimulateAI Educational Platform",
   "license": "MIT",
   "repository": {
     "type": "git",

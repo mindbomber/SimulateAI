@@ -186,7 +186,7 @@ export class InputUtilityComponentsDemo {
                     id: 'section1',
                     title: 'Getting Started',
                     icon: '🚀',
-                    content: 'Welcome to the SimulateAI platform! This section covers the basics of getting started with AI simulations.'
+                    content: 'Welcome to SimulateAI! Begin your open-ended exploration of AI ethics, robotics, and emerging technologies through consequence-driven simulations.'
                 },
                 {
                     id: 'section2',

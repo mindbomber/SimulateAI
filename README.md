@@ -1,12 +1,33 @@
-# SimulateAI - Enhanced Interactive Object System
+# SimulateAI - AI Ethics Education Platform
 
-## 🎯 Project Overview
+## 🎯 Mission & Vision
 
-The Enhanced Interactive Object System is a comprehensive upgrade to SimulateAI's Visual Engine, providing advanced UI components, accessibility features, and a robust component registry system. This system addresses gaps in the original interactive object implementation by introducing specialized components for modal dialogs, navigation menus, data visualization, forms, and contextual help.
+**SimulateAI empowers educators and learners of all ages to explore the complex world of AI ethics, robotics, and emerging technologies through open-ended, consequence-driven simulations that mirror real-world scenarios.**
 
-## ✨ Key Features
+### Digital Science Laboratory Approach
+Like a digital science lab, SimulateAI provides open-ended exploration with no "correct" answers—just cause-and-effect learning through realistic scenarios. Inspired by PhET Interactive Simulations (University of Colorado Boulder), we create research-based educational experiences designed for universal accessibility and seamless classroom integration.
 
-### 🧩 Advanced UI Components
+### Educational Excellence Goals
+- **ISTE Standards Alignment**: Designed to meet educational technology certification requirements
+- **Evidence-Based Learning**: Measurable outcomes in critical thinking and ethical reasoning  
+- **Universal Design**: Accessible to diverse learners across elementary through professional levels
+- **Real-World Relevance**: Scenarios reflecting actual AI ethics challenges and societal impacts
+
+## ✨ Core Features
+
+### 🤖 AI Ethics Simulations
+- **Bias Detection**: Explore how AI systems can impact different groups in society
+- **Fairness Exploration**: Navigate complex trade-offs in algorithmic decision-making
+- **Safety Scenarios**: Investigate consequences of AI deployment choices
+- **Real-World Applications**: Hiring, lending, healthcare, and education use cases
+
+### 🎓 Comprehensive Educator Resources
+- **Lesson Plans**: Standards-aligned activities for multiple grade levels
+- **Assessment Rubrics**: Evaluation frameworks for open-ended learning
+- **Discussion Guides**: Structured conversation starters and reflection questions
+- **Professional Development**: Training materials for confident technology integration
+
+### 🧩 Advanced Technical Architecture
 - **Modal Dialog System**: Feature-rich dialogs with animations, focus management, and accessibility
 - **Navigation Menus**: Horizontal and vertical navigation with keyboard support
 - **Data Visualization**: Interactive charts (line, bar, pie) with responsive design
