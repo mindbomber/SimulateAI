@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post-Simulation Modal Test - SimulateAI</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .test-container {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .test-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #1f2937;
+        }
+
+        .test-description {
+            color: #6b7280;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        .test-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .test-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 180px;
+        }
+
+        .test-btn.primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .test-btn.secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .test-btn.primary:hover {
+            background: #2563eb;
+        }
+
+        .test-btn.secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .test-scenarios {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .scenario-card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .scenario-card:hover {
+            background: #f1f5f9;
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+        }
+
+        .scenario-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .scenario-description {
+            font-size: 0.875rem;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .status-new {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-testing {
+            background: #fef3c7;
+            color: #92400e;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 class="test-title">🎯 Post-Simulation Modal Test</h1>
+        <p class="test-description">
+            Test the comprehensive post-simulation reflection modal that provides structured 
+            reflection, learning reinforcement, and progress tracking after simulation completion.
+        </p>
+
+        <div class="test-buttons">
+            <button class="test-btn primary" onclick="testBasicModal()">
+                Test Basic Modal
+            </button>
+            <button class="test-btn secondary" onclick="testWithData()">
+                Test with Sample Data
+            </button>
+        </div>
+
+        <div class="test-scenarios">
+            <div class="scenario-card" onclick="testPerformanceLevel('excellent')">
+                <div class="scenario-title">🎉 Excellent Performance</div>
+                <div class="scenario-description">
+                    High ethical scores, thoughtful decisions, and consistent reasoning.
+                </div>
+                <div class="status-indicator status-new">Ready to Test</div>
+            </div>
+
+            <div class="scenario-card" onclick="testPerformanceLevel('good')">
+                <div class="scenario-title">✅ Good Performance</div>
+                <div class="scenario-description">
+                    Solid ethical decisions with room for improvement in some areas.
+                </div>
+                <div class="status-indicator status-new">Ready to Test</div>
+            </div>
+
+            <div class="scenario-card" onclick="testPerformanceLevel('average')">
+                <div class="scenario-title">📋 Average Performance</div>
+                <div class="scenario-description">
+                    Mixed results with both strong and weak decision-making moments.
+                </div>
+                <div class="status-indicator status-new">Ready to Test</div>
+            </div>
+
+            <div class="scenario-card" onclick="testPerformanceLevel('needs_improvement')">
+                <div class="scenario-title">🔄 Needs Improvement</div>
+                <div class="scenario-description">
+                    Multiple areas for growth in ethical reasoning and decision-making.
+                </div>
+                <div class="status-indicator status-new">Ready to Test</div>
+            </div>
+
+            <div class="scenario-card" onclick="testLongSession()">
+                <div class="scenario-title">⏱️ Long Session</div>
+                <div class="scenario-description">
+                    Extended simulation with many decisions and complex scenarios.
+                </div>
+                <div class="status-indicator status-testing">In Development</div>
+            </div>
+
+            <div class="scenario-card" onclick="testMinimalData()">
+                <div class="scenario-title">📊 Minimal Data</div>
+                <div class="scenario-description">
+                    Test with limited session data to ensure graceful handling.
+                </div>
+                <div class="status-indicator status-testing">In Development</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal container will be injected here -->
+    <div id="modal-container"></div>
+
+    <script type="module">
+        import { PostSimulationModal } from './src/js/components/post-simulation-modal.js';
+
+        // Test data generators
+        function generateTestSessionData(performance = 'good', decisionCount = 5) {
+            const decisions = [];
+            const baseScores = {
+                excellent: { min: 0.8, max: 1.0 },
+                good: { min: 0.6, max: 0.9 },
+                average: { min: 0.4, max: 0.7 },
+                needs_improvement: { min: 0.1, max: 0.5 }
+            };
+
+            const scoreRange = baseScores[performance] || baseScores.good;
+
+            for (let i = 0; i < decisionCount; i++) {
+                const score = Math.random() * (scoreRange.max - scoreRange.min) + scoreRange.min;
+                decisions.push({
+                    id: `decision_${i + 1}`,
+                    title: `Ethical Decision ${i + 1}`,
+                    description: `A complex ethical decision point in the simulation`,
+                    ethicalScore: score,
+                    timestamp: new Date(Date.now() - (decisionCount - i) * 120000).toISOString(),
+                    userChoice: `Option ${Math.floor(Math.random() * 3) + 1}`,
+                    consequences: `Impact analysis for decision ${i + 1}`
+                });
+            }
+
+            return {
+                sessionId: `session_${Date.now()}`,
+                simulationId: 'bias-fairness',
+                startTime: new Date(Date.now() - decisionCount * 180000).toISOString(),
+                endTime: new Date().toISOString(),
+                duration: decisionCount * 180000, // 3 minutes per decision
+                decisions: decisions,
+                ethicsMeters: {
+                    fairness: Math.random() * 0.4 + 0.6,
+                    transparency: Math.random() * 0.4 + 0.5,
+                    accountability: Math.random() * 0.4 + 0.7,
+                    privacy: Math.random() * 0.4 + 0.6
+                },
+                userEngagement: {
+                    timeSpent: decisionCount * 180000,
+                    resourcesViewed: Math.floor(Math.random() * 5) + 1,
+                    helpSought: Math.floor(Math.random() * 3),
+                    notesCount: Math.floor(Math.random() * 8) + 2
+                }
+            };
+        }
+
+        // Test functions
+        window.testBasicModal = function() {
+            console.log('Testing basic post-simulation modal...');
+            
+            const sessionData = generateTestSessionData('good', 3);
+            
+            new PostSimulationModal({
+                simulationId: 'bias-fairness',
+                sessionData: sessionData,
+                onComplete: (reflectionData) => {
+                    console.log('Modal completed with reflection data:', reflectionData);
+                    alert('✅ Reflection completed! Check console for data.');
+                },
+                onSkip: () => {
+                    console.log('User skipped reflection');
+                    alert('⏭️ Reflection skipped.');
+                },
+                onRetry: () => {
+                    console.log('User wants to retry simulation');
+                    alert('🔄 Retry simulation requested.');
+                }
+            });
+        };
+
+        window.testWithData = function() {
+            console.log('Testing modal with comprehensive sample data...');
+            
+            const sessionData = generateTestSessionData('excellent', 8);
+            
+            new PostSimulationModal({
+                simulationId: 'bias-fairness',
+                sessionData: sessionData,
+                showExpertMode: true,
+                onComplete: (reflectionData) => {
+                    console.log('Modal completed with reflection data:', reflectionData);
+                    console.log('Session summary:', {
+                        duration: sessionData.duration,
+                        decisions: sessionData.decisions.length,
+                        averageScore: sessionData.decisions.reduce((sum, d) => sum + d.ethicalScore, 0) / sessionData.decisions.length
+                    });
+                    alert('✅ Comprehensive reflection completed! Check console for detailed data.');
+                },
+                onSkip: () => {
+                    console.log('User skipped comprehensive reflection');
+                    alert('⏭️ Comprehensive reflection skipped.');
+                }
+            });
+        };
+
+        window.testPerformanceLevel = function(performance) {
+            console.log(`Testing modal with ${performance} performance level...`);
+            
+            const decisionCounts = {
+                excellent: 10,
+                good: 7,
+                average: 5,
+                needs_improvement: 4
+            };
+
+            const sessionData = generateTestSessionData(performance, decisionCounts[performance]);
+            
+            new PostSimulationModal({
+                simulationId: 'bias-fairness',
+                sessionData: sessionData,
+                onComplete: (reflectionData) => {
+                    console.log(`${performance} performance reflection completed:`, reflectionData);
+                    alert(`✅ ${performance.toUpperCase()} performance reflection completed!`);
+                },
+                onSkip: () => {
+                    console.log(`User skipped ${performance} performance reflection`);
+                    alert(`⏭️ ${performance} performance reflection skipped.`);
+                }
+            });
+        };
+
+        window.testLongSession = function() {
+            console.log('Testing modal with long session data...');
+            
+            const sessionData = generateTestSessionData('good', 15);
+            sessionData.duration = 45 * 60 * 1000; // 45 minutes
+            
+            // Add more complex data
+            sessionData.achievements = [
+                'Critical Thinker',
+                'Ethical Champion', 
+                'Bias Detector'
+            ];
+            
+            sessionData.challenges = [
+                'Complex Multi-stakeholder Decision',
+                'Conflicting Ethical Principles',
+                'Resource Constraint Scenario'
+            ];
+
+            new PostSimulationModal({
+                simulationId: 'bias-fairness',
+                sessionData: sessionData,
+                showExpertMode: true,
+                onComplete: (reflectionData) => {
+                    console.log('Long session reflection completed:', reflectionData);
+                    alert('✅ Long session reflection completed! Excellent perseverance!');
+                }
+            });
+        };
+
+        window.testMinimalData = function() {
+            console.log('Testing modal with minimal data...');
+            
+            const sessionData = {
+                sessionId: `minimal_${Date.now()}`,
+                simulationId: 'bias-fairness',
+                startTime: new Date(Date.now() - 300000).toISOString(),
+                endTime: new Date().toISOString(),
+                duration: 300000, // 5 minutes
+                decisions: [
+                    {
+                        id: 'decision_1',
+                        title: 'Quick Decision',
+                        ethicalScore: 0.7
+                    }
+                ]
+            };
+
+            new PostSimulationModal({
+                simulationId: 'bias-fairness',
+                sessionData: sessionData,
+                onComplete: (reflectionData) => {
+                    console.log('Minimal data reflection completed:', reflectionData);
+                    alert('✅ Minimal data reflection completed!');
+                }
+            });
+        };
+
+        // Add some helpful console messages
+        console.log('🎯 Post-Simulation Modal Test Environment Ready!');
+        console.log('Available test functions:');
+        console.log('- testBasicModal(): Test basic modal functionality');
+        console.log('- testWithData(): Test with comprehensive sample data');
+        console.log('- testPerformanceLevel(level): Test different performance levels');
+        console.log('- testLongSession(): Test extended session data');
+        console.log('- testMinimalData(): Test minimal data handling');
+    </script>
+</body>
+</html>

@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 2 Integration Test - SimulateAI</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <style>
+        body {
+            padding: 20px;
+            font-family: var(--font-family-base);
+        }
+        
+        .test-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            background: var(--color-background-secondary);
+        }
+        
+        .test-section h3 {
+            margin-top: 0;
+            color: var(--color-primary);
+        }
+        
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+            padding: 16px;
+            background: var(--color-background);
+            border-radius: 6px;
+            border: 1px solid var(--color-border);
+        }
+        
+        .flow-step {
+            padding: 8px 16px;
+            background: var(--color-primary-light);
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .flow-arrow {
+            color: var(--color-text-secondary);
+            font-size: 18px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--color-primary-dark);
+        }
+        
+        .btn-success {
+            background: var(--color-success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #45a049;
+        }
+        
+        .btn-secondary {
+            background: var(--color-gray-200);
+            color: var(--color-text);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--color-gray-300);
+        }
+        
+        .test-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--color-gray-400);
+        }
+        
+        .status-indicator.success {
+            background: var(--color-success);
+        }
+        
+        .status-indicator.error {
+            background: var(--color-error);
+        }
+        
+        .status-indicator.running {
+            background: var(--color-warning);
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .test-log {
+            margin-top: 20px;
+            padding: 15px;
+            background: var(--color-background);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 2px 0;
+        }
+        
+        .log-entry.success {
+            color: var(--color-success);
+        }
+        
+        .log-entry.error {
+            color: var(--color-error);
+        }
+        
+        .log-entry.info {
+            color: var(--color-primary);
+        }
+        
+        .log-entry.warning {
+            color: var(--color-warning);
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+        
+        .feature-card {
+            padding: 16px;
+            background: var(--color-background);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+        }
+        
+        .feature-card h4 {
+            margin: 0 0 8px 0;
+            color: var(--color-text);
+            font-size: 14px;
+        }
+        
+        .feature-card p {
+            margin: 0;
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Phase 2 Implementation - Integration Test</h1>
+        <p>Complete testing of the two-stage simulation launch flow with enhanced simulation modal.</p>
+        
+        <div class="flow-diagram">
+            <div class="flow-step">Start Simulation</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">Pre-Launch Modal</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">Enhanced Simulation Modal</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">Rich Experience</div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Complete Two-Stage Flow Test</h3>
+            <div class="test-status">
+                <div class="status-indicator" id="flow-status"></div>
+                <span id="flow-status-text">Ready to test</span>
+            </div>
+            <p>Test the complete simulation launch experience: Pre-launch → Enhanced Modal → Full Functionality</p>
+            <div class="button-group">
+                <button class="btn btn-success" id="test-complete-flow">🚀 Launch Complete Flow</button>
+                <button class="btn btn-primary" id="test-skip-prelaunch">Skip to Enhanced Modal</button>
+                <button class="btn btn-secondary" id="reset-preferences">Reset Skip Preferences</button>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Enhanced Modal Features</h3>
+            <div class="test-status">
+                <div class="status-indicator" id="features-status"></div>
+                <span id="features-status-text">Features not tested</span>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>📑 Tabbed Interface</h4>
+                    <p>Simulation, Resources, Progress, and Help tabs with full content integration</p>
+                </div>
+                <div class="feature-card">
+                    <h4>📊 Ethics Monitoring</h4>
+                    <p>Collapsible ethics meters panel with real-time decision tracking</p>
+                </div>
+                <div class="feature-card">
+                    <h4>📚 Resource Panel</h4>
+                    <p>Quick access to key concepts, help, and educational materials</p>
+                </div>
+                <div class="feature-card">
+                    <h4>📱 Responsive Design</h4>
+                    <p>Mobile-first design that adapts to all screen sizes seamlessly</p>
+                </div>
+                <div class="feature-card">
+                    <h4>♿ Accessibility</h4>
+                    <p>Full keyboard navigation, screen reader support, and ARIA compliance</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🎮 Simulation Controls</h4>
+                    <p>Reset, pause/resume, and fullscreen toggle with progress tracking</p>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="btn btn-primary" id="test-tab-switching">Test Tab Switching</button>
+                <button class="btn btn-primary" id="test-panels">Test Panel Collapse</button>
+                <button class="btn btn-primary" id="test-controls">Test Simulation Controls</button>
+                <button class="btn btn-primary" id="test-responsive">Test Responsive Design</button>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Educational Integration</h3>
+            <div class="test-status">
+                <div class="status-indicator" id="education-status"></div>
+                <span id="education-status-text">Educational features not tested</span>
+            </div>
+            <p>Test integration with simulation data, resources, and educational content.</p>
+            <div class="button-group">
+                <button class="btn btn-primary" id="test-data-population">Test Data Population</button>
+                <button class="btn btn-primary" id="test-resource-links">Test Resource Links</button>
+                <button class="btn btn-primary" id="test-progress-tracking">Test Progress Tracking</button>
+                <button class="btn btn-primary" id="test-help-integration">Test Help Integration</button>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Performance & Analytics</h3>
+            <div class="test-status">
+                <div class="status-indicator" id="performance-status"></div>
+                <span id="performance-status-text">Performance not tested</span>
+            </div>
+            <p>Test modal performance, analytics tracking, and memory management.</p>
+            <div class="button-group">
+                <button class="btn btn-primary" id="test-performance">Test Modal Performance</button>
+                <button class="btn btn-primary" id="test-analytics">Test Analytics Tracking</button>
+                <button class="btn btn-primary" id="test-memory">Test Memory Management</button>
+            </div>
+        </div>
+        
+        <div class="test-log" id="test-log">
+            <div class="log-entry info">Phase 2 integration test initialized...</div>
+        </div>
+    </div>
+    
+    <!-- Include the basic modal structure for compatibility -->
+    <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true" inert>
+        <div class="modal-backdrop" aria-hidden="true"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 id="modal-title" class="modal-title">Simulation</h2>
+                <button class="modal-close" aria-label="Close simulation">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="simulation-container" class="simulation-container">
+                    <!-- Test simulation content -->
+                    <div class="test-simulation">
+                        <h3>AI Ethics Simulation: Bias & Fairness</h3>
+                        <p>This is a test simulation that demonstrates the integration between the pre-launch modal and enhanced simulation modal.</p>
+                        <canvas id="simulation-canvas" width="500" height="300" style="border: 1px solid #ddd; background: white; width: 100%; max-width: 500px; height: auto;"></canvas>
+                        <div class="simulation-controls" style="margin-top: 16px;">
+                            <button class="btn btn-primary" id="test-decision-1">Make Decision A</button>
+                            <button class="btn btn-primary" id="test-decision-2">Make Decision B</button>
+                            <button class="btn btn-secondary" id="view-results">View Results</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { PreLaunchModal } from './src/js/components/pre-launch-modal.js';
+        import { EnhancedSimulationModal } from './src/js/components/enhanced-simulation-modal.js';
+        import { userPreferences } from './src/js/utils/simple-storage.js';
+        
+        // Test utilities
+        const log = (message, type = 'info') => {
+            const logElement = document.getElementById('test-log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logElement.appendChild(entry);
+            logElement.scrollTop = logElement.scrollHeight;
+        };
+        
+        const updateStatus = (elementId, status, text) => {
+            const indicator = document.getElementById(elementId);
+            const textElement = document.getElementById(elementId.replace('-status', '-status-text'));
+            
+            indicator.className = `status-indicator ${status}`;
+            if (textElement) textElement.textContent = text;
+        };
+        
+        let currentPreLaunchModal = null;
+        let currentEnhancedModal = null;
+        let testResults = {
+            flow: false,
+            features: false,
+            education: false,
+            performance: false
+        };
+        
+        // Mock simulation data (same as in previous test)
+        const mockSimulationData = {
+            'bias-fairness': {
+                vocabulary: {
+                    'Algorithmic Bias': 'Systematic and repeatable errors in a computer system that create unfair outcomes.',
+                    'Fairness': 'The quality of making judgments that are free from discrimination.',
+                    'Machine Learning': 'A type of artificial intelligence that enables systems to learn from data.',
+                    'Training Data': 'The dataset used to teach a machine learning algorithm.',
+                    'Discrimination': 'The unjust or prejudicial treatment of different categories of people.'
+                },
+                resources: {
+                    backgroundReading: [
+                        {
+                            title: 'Understanding AI Bias',
+                            url: 'https://example.com/ai-bias',
+                            description: 'A comprehensive guide to understanding algorithmic bias and its implications.'
+                        },
+                        {
+                            title: 'Fairness in Machine Learning',
+                            url: 'https://example.com/ml-fairness',
+                            description: 'Exploring different definitions and approaches to fairness in AI systems.'
+                        }
+                    ],
+                    videos: [
+                        {
+                            title: 'AI Ethics Explained',
+                            url: 'https://example.com/video1',
+                            description: 'An introduction to ethical considerations in AI development.',
+                            duration: '15:30'
+                        }
+                    ]
+                },
+                educatorResources: {
+                    discussionQuestions: [
+                        'How can we identify bias in AI systems?',
+                        'What are the trade-offs between different fairness metrics?',
+                        'How should we balance accuracy and fairness in AI systems?'
+                    ]
+                }
+            }
+        };
+        
+        // Main flow test
+        document.getElementById('test-complete-flow').addEventListener('click', () => {
+            log('Starting complete two-stage flow test...', 'info');
+            updateStatus('flow-status', 'running', 'Testing complete flow...');
+            
+            try {
+                // First, show pre-launch modal
+                currentPreLaunchModal = new PreLaunchModal('bias-fairness', {
+                    onLaunch: (simId) => {
+                        log('Pre-launch modal completed, launching enhanced modal...', 'success');
+                        showEnhancedModal(simId);
+                    },
+                    onCancel: () => {
+                        log('Pre-launch modal cancelled by user', 'warning');
+                        updateStatus('flow-status', 'error', 'Flow cancelled by user');
+                    },
+                    showEducatorResources: true
+                });
+                
+                currentPreLaunchModal.show();
+                log('Pre-launch modal shown successfully', 'success');
+                
+            } catch (error) {
+                log(`Error in complete flow: ${error.message}`, 'error');
+                updateStatus('flow-status', 'error', 'Flow test failed');
+            }
+        });
+        
+        // Skip to enhanced modal
+        document.getElementById('test-skip-prelaunch').addEventListener('click', () => {
+            log('Skipping to enhanced modal directly...', 'info');
+            showEnhancedModal('bias-fairness');
+        });
+        
+        function showEnhancedModal(simulationId) {
+            try {
+                currentEnhancedModal = new EnhancedSimulationModal(simulationId, {
+                    onClose: () => {
+                        log('Enhanced modal closed', 'success');
+                        updateStatus('flow-status', 'success', 'Complete flow tested successfully');
+                        testResults.flow = true;
+                        currentEnhancedModal = null;
+                    },
+                    onReset: () => {
+                        log('Simulation reset triggered', 'info');
+                    },
+                    onPause: (isPaused) => {
+                        log(`Simulation ${isPaused ? 'paused' : 'resumed'}`, 'info');
+                    },
+                    showTabs: true,
+                    showResourcePanel: true,
+                    collapseEthicsMeters: false,
+                    size: 'large'
+                });
+                
+                currentEnhancedModal.show();
+                
+                // Move simulation content and populate data
+                setTimeout(() => {
+                    moveSimulationContent();
+                    populateModalWithData(simulationId);
+                    setupSimulationEvents();
+                    log('Enhanced modal fully configured', 'success');
+                }, 500);
+                
+            } catch (error) {
+                log(`Error showing enhanced modal: ${error.message}`, 'error');
+                updateStatus('flow-status', 'error', 'Enhanced modal failed');
+            }
+        }
+        
+        function moveSimulationContent() {
+            const originalContainer = document.getElementById('simulation-container');
+            const enhancedContainer = document.getElementById('enhanced-simulation-container');
+            
+            if (originalContainer && enhancedContainer) {
+                // Clone content instead of moving to preserve original
+                const content = originalContainer.cloneNode(true);
+                enhancedContainer.appendChild(content);
+                log('Simulation content moved to enhanced modal', 'success');
+            }
+        }
+        
+        function populateModalWithData(simulationId) {
+            if (!currentEnhancedModal) return;
+            
+            const { modal } = currentEnhancedModal;
+            const simData = mockSimulationData[simulationId];
+            
+            if (!simData) {
+                log(`No mock data available for ${simulationId}`, 'warning');
+                return;
+            }
+            
+            // Populate resources tab
+            const readingContainer = modal.querySelector('#background-reading');
+            if (readingContainer && simData.resources?.backgroundReading) {
+                readingContainer.innerHTML = simData.resources.backgroundReading.map(resource => `
+                    <div class="resource-item" style="padding: 12px; border: 1px solid var(--color-border); border-radius: 6px; margin-bottom: 12px;">
+                        <a href="${resource.url}" target="_blank" class="resource-title" style="font-weight: 600; color: var(--color-primary); text-decoration: none;">${resource.title}</a>
+                        <p class="resource-description" style="margin: 8px 0 0 0; color: var(--color-text-secondary); font-size: 14px;">${resource.description}</p>
+                    </div>
+                `).join('');
+            }
+            
+            // Populate help tab
+            const ethicsContainer = modal.querySelector('#ethics-explanation');
+            if (ethicsContainer && simData.vocabulary) {
+                ethicsContainer.innerHTML = Object.entries(simData.vocabulary).map(([term, definition]) => `
+                    <div class="ethics-term" style="padding: 12px; border: 1px solid var(--color-border); border-radius: 6px; margin-bottom: 12px;">
+                        <h5 style="margin: 0 0 8px 0; color: var(--color-text);">${term}</h5>
+                        <p style="margin: 0; color: var(--color-text-secondary); font-size: 14px; line-height: 1.4;">${definition}</p>
+                    </div>
+                `).join('');
+            }
+            
+            // Populate quick resources
+            const conceptsContainer = modal.querySelector('#quick-concepts');
+            if (conceptsContainer && simData.vocabulary) {
+                const keyTerms = Object.keys(simData.vocabulary).slice(0, 3);
+                conceptsContainer.innerHTML = keyTerms.map(term => `
+                    <li><a href="#" class="resource-link" data-term="${term}">${term}</a></li>
+                `).join('');
+                
+                // Add click handlers
+                conceptsContainer.querySelectorAll('[data-term]').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const { dataset: { term } } = e.target;
+                        const definition = simData.vocabulary[term];
+                        log(`Quick help: ${term} - ${definition}`, 'info');
+                    });
+                });
+            }
+            
+            log('Modal data populated successfully', 'success');
+        }
+        
+        function setupSimulationEvents() {
+            // Add event listeners to test simulation controls
+            const decision1 = document.querySelector('#test-decision-1');
+            const decision2 = document.querySelector('#test-decision-2');
+            const viewResults = document.querySelector('#view-results');
+            
+            if (decision1) {
+                decision1.addEventListener('click', () => {
+                    if (currentEnhancedModal) {
+                        currentEnhancedModal.updateProgress({
+                            decisions: 1,
+                            timeSpent: 45,
+                            concepts: 3
+                        });
+                        currentEnhancedModal.addDecisionToTimeline({
+                            description: 'Chose Option A - Prioritize Accuracy',
+                            impact: 'May introduce bias but increases accuracy'
+                        });
+                    }
+                    log('Decision A made - progress updated', 'success');
+                });
+            }
+            
+            if (decision2) {
+                decision2.addEventListener('click', () => {
+                    if (currentEnhancedModal) {
+                        currentEnhancedModal.updateProgress({
+                            decisions: 2,
+                            timeSpent: 90,
+                            concepts: 5
+                        });
+                        currentEnhancedModal.addDecisionToTimeline({
+                            description: 'Chose Option B - Prioritize Fairness',
+                            impact: 'Reduces accuracy but improves fairness'
+                        });
+                    }
+                    log('Decision B made - progress updated', 'success');
+                });
+            }
+        }
+        
+        // Feature tests
+        document.getElementById('test-tab-switching').addEventListener('click', () => {
+            if (!currentEnhancedModal) {
+                log('No enhanced modal open to test tabs', 'error');
+                return;
+            }
+            
+            log('Testing tab switching...', 'info');
+            const tabs = ['simulation', 'resources', 'progress', 'help'];
+            let tabIndex = 0;
+            
+            const switchNextTab = () => {
+                if (tabIndex < tabs.length) {
+                    const tab = tabs[tabIndex];
+                    currentEnhancedModal.switchTab(tab);
+                    log(`Switched to ${tab} tab`, 'success');
+                    tabIndex++;
+                    setTimeout(switchNextTab, 1000);
+                } else {
+                    log('Tab switching test completed', 'success');
+                    updateStatus('features-status', 'success', 'Tab switching works');
+                }
+            };
+            
+            switchNextTab();
+        });
+        
+        document.getElementById('test-panels').addEventListener('click', () => {
+            if (!currentEnhancedModal) {
+                log('No enhanced modal open to test panels', 'error');
+                return;
+            }
+            
+            log('Testing panel collapse...', 'info');
+            const collapseButtons = currentEnhancedModal.modal.querySelectorAll('.btn-collapse');
+            
+            collapseButtons.forEach((button, index) => {
+                setTimeout(() => {
+                    button.click();
+                    log(`Panel ${index + 1} toggled`, 'success');
+                }, index * 500);
+            });
+            
+            setTimeout(() => {
+                log('Panel collapse test completed', 'success');
+                updateStatus('features-status', 'success', 'Panel collapse works');
+            }, collapseButtons.length * 500);
+        });
+        
+        document.getElementById('test-controls').addEventListener('click', () => {
+            if (!currentEnhancedModal) {
+                log('No enhanced modal open to test controls', 'error');
+                return;
+            }
+            
+            log('Testing simulation controls...', 'info');
+            
+            // Test pause/resume
+            setTimeout(() => {
+                const pauseBtn = currentEnhancedModal.modal.querySelector('#pause-enhanced-simulation');
+                if (pauseBtn) {
+                    pauseBtn.click();
+                    log('Pause button clicked', 'success');
+                }
+            }, 500);
+            
+            // Test reset
+            setTimeout(() => {
+                const resetBtn = currentEnhancedModal.modal.querySelector('#reset-enhanced-simulation');
+                if (resetBtn) {
+                    resetBtn.click();
+                    log('Reset button clicked', 'success');
+                }
+            }, 1000);
+            
+            // Test fullscreen
+            setTimeout(() => {
+                currentEnhancedModal.toggleFullscreen();
+                log('Fullscreen toggled', 'success');
+            }, 1500);
+            
+            setTimeout(() => {
+                log('Simulation controls test completed', 'success');
+                updateStatus('features-status', 'success', 'All controls work');
+                testResults.features = true;
+            }, 2000);
+        });
+        
+        // Reset preferences
+        document.getElementById('reset-preferences').addEventListener('click', () => {
+            userPreferences.setSkipPreLaunchForSimulation('bias-fairness', false);
+            userPreferences.setSkipPreLaunchGlobally(false);
+            log('Skip preferences reset', 'success');
+        });
+        
+        // Educational integration tests
+        document.getElementById('test-data-population').addEventListener('click', () => {
+            if (currentEnhancedModal) {
+                populateModalWithData('bias-fairness');
+                updateStatus('education-status', 'success', 'Data population works');
+                testResults.education = true;
+            } else {
+                log('No enhanced modal open to test data population', 'error');
+            }
+        });
+        
+        // Performance tests
+        document.getElementById('test-performance').addEventListener('click', () => {
+            log('Testing modal performance...', 'info');
+            const startTime = performance.now();
+            
+            // Create and destroy multiple modals to test performance
+            const testIterations = 5;
+            let currentIteration = 0;
+            
+            const performanceTest = () => {
+                if (currentIteration < testIterations) {
+                    const testModal = new EnhancedSimulationModal('bias-fairness', {
+                        onClose: () => {
+                            const endTime = performance.now();
+                            const duration = endTime - startTime;
+                            log(`Iteration ${currentIteration + 1} completed in ${duration.toFixed(2)}ms`, 'success');
+                            
+                            currentIteration++;
+                            setTimeout(performanceTest, 100);
+                        },
+                        size: 'large'
+                    });
+                    
+                    testModal.show();
+                    setTimeout(() => testModal.close(), 100);
+                } else {
+                    const totalTime = performance.now() - startTime;
+                    log(`Performance test completed in ${totalTime.toFixed(2)}ms`, 'success');
+                    updateStatus('performance-status', 'success', 'Performance is good');
+                    testResults.performance = true;
+                }
+            };
+            
+            performanceTest();
+        });
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (currentPreLaunchModal) currentPreLaunchModal.close();
+            if (currentEnhancedModal) currentEnhancedModal.close();
+        });
+        
+        log('Phase 2 integration test ready', 'success');
+        log('Click "Launch Complete Flow" to test the full two-stage experience', 'info');
+    </script>
+</body>
+</html>

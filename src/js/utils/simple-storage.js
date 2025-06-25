@@ -258,12 +258,47 @@ class UserPreferences {
         this.storage.set('accessibility', settings);
     }
     
+    // Pre-launch modal preferences
+    getPreLaunchSettings() {
+        return this.storage.get('preLaunchSettings', {
+            skipPreLaunch: false,
+            skipPreLaunchFor: {},
+            alwaysShowEducatorResources: true
+        });
+    }
+    
+    setPreLaunchSettings(settings) {
+        this.storage.set('preLaunchSettings', settings);
+    }
+    
+    // Convenience methods for pre-launch modal
+    shouldSkipPreLaunch(simulationId = null) {
+        const settings = this.getPreLaunchSettings();
+        if (simulationId) {
+            return settings.skipPreLaunch || settings.skipPreLaunchFor[simulationId];
+        }
+        return settings.skipPreLaunch;
+    }
+    
+    setSkipPreLaunchFor(simulationId, skip = true) {
+        const settings = this.getPreLaunchSettings();
+        settings.skipPreLaunchFor[simulationId] = skip;
+        this.setPreLaunchSettings(settings);
+    }
+    
+    setSkipPreLaunchGlobally(skip = true) {
+        const settings = this.getPreLaunchSettings();
+        settings.skipPreLaunch = skip;
+        this.setPreLaunchSettings(settings);
+    }
+    
     // All preferences as one object
     getAllPreferences() {
         return {
             theme: this.getTheme(),
             language: this.getLanguage(),
-            accessibility: this.getAccessibilitySettings()
+            accessibility: this.getAccessibilitySettings(),
+            preLaunch: this.getPreLaunchSettings()
         };
     }
 }

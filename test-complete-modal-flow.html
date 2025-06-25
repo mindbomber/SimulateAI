@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three-Stage Modal Flow Test - SimulateAI</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .test-container {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .test-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #1f2937;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .test-description {
+            color: #6b7280;
+            margin-bottom: 32px;
+            line-height: 1.6;
+            font-size: 1.125rem;
+        }
+
+        .flow-stages {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin: 32px 0;
+        }
+
+        .stage-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .stage-card.active {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(59, 130, 246, 0.15);
+        }
+
+        .stage-card.completed {
+            border-color: #10b981;
+            background: #ecfdf5;
+        }
+
+        .stage-number {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 32px;
+            height: 32px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+
+        .stage-card.completed .stage-number {
+            background: #10b981;
+        }
+
+        .stage-icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+
+        .stage-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .stage-description {
+            color: #6b7280;
+            font-size: 0.875rem;
+            line-height: 1.4;
+            margin-bottom: 16px;
+        }
+
+        .stage-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .status-active {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .test-controls {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 32px 0;
+        }
+
+        .test-btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 200px;
+            font-size: 1rem;
+        }
+
+        .test-btn.primary {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+
+        .test-btn.secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 2px solid #e2e8f0;
+        }
+
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .test-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .test-progress {
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .progress-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        .progress-details {
+            color: #6b7280;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .simulation-scenarios {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 32px;
+        }
+
+        .scenario-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .scenario-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .scenario-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .scenario-icon {
+            font-size: 1.5rem;
+        }
+
+        .scenario-name {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .scenario-description {
+            color: #6b7280;
+            font-size: 0.875rem;
+            line-height: 1.4;
+            margin-bottom: 16px;
+        }
+
+        .scenario-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .feature-tag {
+            background: #eff6ff;
+            color: #1e40af;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .flow-stages {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .test-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .simulation-scenarios {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 class="test-title">🎯 Complete Modal Flow Test</h1>
+        <p class="test-description">
+            Test the complete three-stage simulation experience: Pre-Launch → Simulation → Post-Simulation reflection.
+            This comprehensive test validates the entire user journey from preparation to completion.
+        </p>
+
+        <div class="flow-stages">
+            <div class="stage-card" id="stage-1">
+                <div class="stage-number">1</div>
+                <div class="stage-icon">🚀</div>
+                <div class="stage-title">Pre-Launch</div>
+                <div class="stage-description">
+                    Educational preparation, learning objectives, and context setting
+                </div>
+                <div class="stage-status status-pending" id="status-1">Pending</div>
+            </div>
+
+            <div class="stage-card" id="stage-2">
+                <div class="stage-number">2</div>
+                <div class="stage-icon">🎮</div>
+                <div class="stage-title">Simulation</div>
+                <div class="stage-description">
+                    Interactive simulation with enhanced modal, tabs, and real-time tracking
+                </div>
+                <div class="stage-status status-pending" id="status-2">Pending</div>
+            </div>
+
+            <div class="stage-card" id="stage-3">
+                <div class="stage-number">3</div>
+                <div class="stage-icon">🤔</div>
+                <div class="stage-title">Reflection</div>
+                <div class="stage-description">
+                    Structured reflection, analysis, and personalized learning recommendations
+                </div>
+                <div class="stage-status status-pending" id="status-3">Pending</div>
+            </div>
+        </div>
+
+        <div class="test-controls">
+            <button class="test-btn primary" onclick="startCompleteFlow()" id="start-flow-btn">
+                🚀 Start Complete Flow
+            </button>
+            <button class="test-btn secondary" onclick="resetFlow()" id="reset-btn" disabled>
+                🔄 Reset Test
+            </button>
+        </div>
+
+        <div class="test-progress" id="progress-panel" style="display: none;">
+            <div class="progress-title" id="progress-title">Starting flow...</div>
+            <div class="progress-details" id="progress-details">Initializing simulation environment</div>
+        </div>
+
+        <div class="simulation-scenarios">
+            <div class="scenario-card" onclick="testScenario('bias-fairness')">
+                <div class="scenario-header">
+                    <div class="scenario-icon">⚖️</div>
+                    <div class="scenario-name">Bias & Fairness</div>
+                </div>
+                <div class="scenario-description">
+                    Explore algorithmic bias and fairness in AI decision-making systems.
+                </div>
+                <div class="scenario-features">
+                    <span class="feature-tag">3 Stages</span>
+                    <span class="feature-tag">Ethics Focus</span>
+                    <span class="feature-tag">Real-world</span>
+                </div>
+            </div>
+
+            <div class="scenario-card" onclick="testScenario('privacy-security')">
+                <div class="scenario-header">
+                    <div class="scenario-icon">🔒</div>
+                    <div class="scenario-name">Privacy & Security</div>
+                </div>
+                <div class="scenario-description">
+                    Navigate privacy protection and security considerations in AI systems.
+                </div>
+                <div class="scenario-features">
+                    <span class="feature-tag">3 Stages</span>
+                    <span class="feature-tag">Privacy Focus</span>
+                    <span class="feature-tag">Compliance</span>
+                </div>
+            </div>
+
+            <div class="scenario-card" onclick="testScenario('transparency-explainability')">
+                <div class="scenario-header">
+                    <div class="scenario-icon">💡</div>
+                    <div class="scenario-name">Transparency</div>
+                </div>
+                <div class="scenario-description">
+                    Balance transparency requirements with system complexity and performance.
+                </div>
+                <div class="scenario-features">
+                    <span class="feature-tag">3 Stages</span>
+                    <span class="feature-tag">Explainability</span>
+                    <span class="feature-tag">Technical</span>
+                </div>
+            </div>
+
+            <div class="scenario-card" onclick="testScenario('custom-demo')">
+                <div class="scenario-header">
+                    <div class="scenario-icon">🎨</div>
+                    <div class="scenario-name">Custom Demo</div>
+                </div>
+                <div class="scenario-description">
+                    Test with custom parameters and synthetic data for demonstration purposes.
+                </div>
+                <div class="scenario-features">
+                    <span class="feature-tag">Configurable</span>
+                    <span class="feature-tag">Demo Data</span>
+                    <span class="feature-tag">Testing</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { PreLaunchModal } from './src/js/components/pre-launch-modal.js';
+        import { EnhancedSimulationModal } from './src/js/components/enhanced-simulation-modal.js';
+        import { PostSimulationModal } from './src/js/components/post-simulation-modal.js';
+
+        // Test state management
+        let currentStage = 0;
+        let testSessionData = {};
+        let flowInProgress = false;
+
+        // Generate realistic test data
+        function generateSessionData(simulationId, performance = 'good') {
+            const decisions = [];
+            const decisionCount = Math.floor(Math.random() * 8) + 3; // 3-10 decisions
+            
+            const scoreRanges = {
+                excellent: [0.8, 1.0],
+                good: [0.6, 0.9],
+                average: [0.4, 0.7],
+                needs_improvement: [0.1, 0.5]
+            };
+            
+            const [minScore, maxScore] = scoreRanges[performance] || scoreRanges.good;
+            
+            for (let i = 0; i < decisionCount; i++) {
+                const score = Math.random() * (maxScore - minScore) + minScore;
+                decisions.push({
+                    id: `decision_${i + 1}`,
+                    title: `Ethical Decision Point ${i + 1}`,
+                    description: `A complex decision involving multiple stakeholders and ethical considerations`,
+                    ethicalScore: score,
+                    timestamp: new Date(Date.now() - (decisionCount - i) * 120000).toISOString(),
+                    userChoice: `Option ${Math.floor(Math.random() * 3) + 1}`,
+                    reasoning: `User reasoning for decision ${i + 1}`,
+                    consequences: `Analysis of potential impacts and outcomes`,
+                    stakeholders: ['Users', 'Developers', 'Society', 'Organization'],
+                    ethicalPrinciples: ['Fairness', 'Transparency', 'Accountability', 'Privacy']
+                });
+            }
+
+            return {
+                sessionId: `session_${Date.now()}`,
+                simulationId: simulationId,
+                startTime: new Date(Date.now() - decisionCount * 180000).toISOString(),
+                endTime: new Date().toISOString(),
+                duration: decisionCount * 180000,
+                decisions: decisions,
+                ethicsMeters: {
+                    fairness: Math.random() * 0.4 + 0.6,
+                    transparency: Math.random() * 0.4 + 0.5,
+                    accountability: Math.random() * 0.4 + 0.7,
+                    privacy: Math.random() * 0.4 + 0.6,
+                    beneficence: Math.random() * 0.4 + 0.65
+                },
+                userEngagement: {
+                    resourcesViewed: Math.floor(Math.random() * 8) + 2,
+                    helpRequested: Math.floor(Math.random() * 4),
+                    notesCreated: Math.floor(Math.random() * 6) + 1,
+                    timeInReflection: Math.floor(Math.random() * 300) + 120
+                },
+                achievements: [],
+                challenges: []
+            };
+        }
+
+        // Update stage UI
+        function updateStageUI(stage, status) {
+            // Reset all stages
+            for (let i = 1; i <= 3; i++) {
+                const stageEl = document.getElementById(`stage-${i}`);
+                const statusEl = document.getElementById(`status-${i}`);
+                
+                stageEl.classList.remove('active', 'completed');
+                statusEl.classList.remove('status-pending', 'status-active', 'status-completed');
+                
+                if (i < stage) {
+                    stageEl.classList.add('completed');
+                    statusEl.classList.add('status-completed');
+                    statusEl.textContent = 'Completed';
+                } else if (i === stage) {
+                    stageEl.classList.add('active');
+                    statusEl.classList.add('status-active');
+                    statusEl.textContent = status || 'Active';
+                } else {
+                    statusEl.classList.add('status-pending');
+                    statusEl.textContent = 'Pending';
+                }
+            }
+        }
+
+        // Update progress panel
+        function updateProgress(title, details) {
+            const progressPanel = document.getElementById('progress-panel');
+            const progressTitle = document.getElementById('progress-title');
+            const progressDetails = document.getElementById('progress-details');
+            
+            progressPanel.style.display = 'block';
+            progressTitle.textContent = title;
+            progressDetails.textContent = details;
+        }
+
+        // Start complete three-stage flow
+        window.startCompleteFlow = function(simulationId = 'bias-fairness') {
+            if (flowInProgress) return;
+            
+            flowInProgress = true;
+            currentStage = 1;
+            
+            // Update UI
+            document.getElementById('start-flow-btn').disabled = true;
+            document.getElementById('reset-btn').disabled = false;
+            updateStageUI(1, 'Preparing');
+            updateProgress('Stage 1: Pre-Launch Preparation', 'Loading educational context and learning objectives...');
+            
+            console.log('🚀 Starting complete three-stage flow for:', simulationId);
+            
+            // Stage 1: Pre-Launch Modal
+            setTimeout(() => {
+                updateProgress('Stage 1: Pre-Launch Modal Active', 'Review learning objectives and prepare for simulation');
+                
+                new PreLaunchModal({
+                    simulationId: simulationId,
+                    onLaunch: (preferences) => {
+                        console.log('✅ Pre-launch completed, preferences:', preferences);
+                        startSimulationStage(simulationId, preferences);
+                    },
+                    onCancel: () => {
+                        console.log('❌ Pre-launch cancelled');
+                        resetFlow();
+                    }
+                });
+            }, 500);
+        };
+
+        // Start simulation stage
+        function startSimulationStage(simulationId, preLaunchPreferences) {
+            currentStage = 2;
+            updateStageUI(2, 'Running');
+            updateProgress('Stage 2: Simulation Active', 'Engaging with AI ethics scenarios and making decisions');
+            
+            console.log('🎮 Starting simulation stage...');
+            
+            // Simulate the enhanced simulation modal
+            setTimeout(() => {
+                // Generate session data based on simulation
+                testSessionData = generateSessionData(simulationId);
+                
+                // For testing, we'll simulate the enhanced simulation modal
+                // In production, this would be the actual simulation
+                updateProgress('Stage 2: Simulation in Progress', 'Making ethical decisions and tracking progress...');
+                
+                // Simulate simulation duration (shortened for testing)
+                setTimeout(() => {
+                    console.log('✅ Simulation completed, session data:', testSessionData);
+                    startReflectionStage(simulationId, testSessionData);
+                }, 2000);
+                
+            }, 1000);
+        }
+
+        // Start reflection stage
+        function startReflectionStage(simulationId, sessionData) {
+            currentStage = 3;
+            updateStageUI(3, 'Reflecting');
+            updateProgress('Stage 3: Post-Simulation Reflection', 'Analyzing decisions and planning continued learning');
+            
+            console.log('🤔 Starting reflection stage...');
+            
+            setTimeout(() => {
+                new PostSimulationModal({
+                    simulationId: simulationId,
+                    sessionData: sessionData,
+                    onComplete: (reflectionData) => {
+                        console.log('✅ Reflection completed:', reflectionData);
+                        completeFlow();
+                    },
+                    onSkip: () => {
+                        console.log('⏭️ Reflection skipped');
+                        completeFlow();
+                    }
+                });
+            }, 500);
+        }
+
+        // Complete the entire flow
+        function completeFlow() {
+            updateStageUI(4, 'Completed');
+            updateProgress('🎉 Flow Complete!', 'All three stages completed successfully. Ready for another test.');
+            
+            flowInProgress = false;
+            document.getElementById('start-flow-btn').disabled = false;
+            
+            console.log('🎉 Complete three-stage flow finished!');
+            console.log('Session summary:', {
+                duration: testSessionData.duration,
+                decisions: testSessionData.decisions?.length || 0,
+                stages: ['Pre-Launch', 'Simulation', 'Reflection']
+            });
+        }
+
+        // Reset flow
+        window.resetFlow = function() {
+            flowInProgress = false;
+            currentStage = 0;
+            testSessionData = {};
+            
+            updateStageUI(0, 'Reset');
+            document.getElementById('progress-panel').style.display = 'none';
+            document.getElementById('start-flow-btn').disabled = false;
+            document.getElementById('reset-btn').disabled = true;
+            
+            console.log('🔄 Flow reset');
+        };
+
+        // Test individual scenarios
+        window.testScenario = function(simulationId) {
+            if (flowInProgress) {
+                alert('A test is already in progress. Please reset first.');
+                return;
+            }
+            
+            console.log(`🎯 Testing scenario: ${simulationId}`);
+            startCompleteFlow(simulationId);
+        };
+
+        // Initialize
+        console.log('🎯 Complete Modal Flow Test Environment Ready!');
+        console.log('Available functions:');
+        console.log('- startCompleteFlow(simulationId): Start full three-stage test');
+        console.log('- testScenario(simulationId): Test specific simulation scenario');
+        console.log('- resetFlow(): Reset test state');
+        
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                if (!flowInProgress) {
+                    startCompleteFlow();
+                }
+            } else if (e.key === 'Escape') {
+                if (flowInProgress) {
+                    resetFlow();
+                }
+            }
+        });
+        
+        console.log('⌨️ Keyboard shortcuts:');
+        console.log('- Ctrl+Enter: Start complete flow');
+        console.log('- Escape: Reset flow');
+    </script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Launch Modal Test</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/modal.css">
+    <link rel="stylesheet" href="src/styles/pre-launch-modal.css">
+</head>
+<body>
+    <div id="main-content">
+        <h1>Pre-Launch Modal Test</h1>
+        <button id="test-btn" class="btn btn-primary">Test Pre-Launch Modal</button>
+    </div>
+
+    <!-- Modal container -->
+    <div id="modal-container"></div>
+
+    <script type="module">
+        import { PreLaunchModal } from './src/js/components/pre-launch-modal.js';
+
+        document.getElementById('test-btn').addEventListener('click', () => {
+            const prelaunchModal = new PreLaunchModal('bias-fairness', {
+                onLaunch: () => {
+                    console.log('User wants to launch simulation!');
+                    alert('Simulation would launch now!');
+                },
+                onCancel: () => {
+                    console.log('User cancelled');
+                    alert('User cancelled');
+                },
+                showEducatorResources: true
+            });
+            
+            prelaunchModal.show();
+        });
+    </script>
+</body>
+</html>

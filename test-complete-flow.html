@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Simulation Launch Flow Test</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/modal.css">
+</head>
+<body>
+    <div id="main-content" class="container">
+        <h1>Simulation Launch Flow Test</h1>
+        
+        <div class="test-section">
+            <h2>Pre-Launch Modal Test</h2>
+            <button id="test-prelaunch" class="btn btn-primary">Test Pre-Launch Modal</button>
+            <button id="skip-and-launch" class="btn btn-secondary">Test Direct Launch (Skip Pre-Launch)</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>User Preferences</h2>
+            <button id="show-preferences" class="btn btn-info">Show Current Preferences</button>
+            <button id="reset-skip" class="btn btn-warning">Reset Skip Preferences</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>Integration Test</h2>
+            <button id="test-full-flow" class="btn btn-success">Test Complete Flow (Like Real App)</button>
+        </div>
+        
+        <div id="results" style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 8px; display: none;">
+            <h3>Test Results:</h3>
+            <pre id="results-content"></pre>
+        </div>
+    </div>
+
+    <!-- Modal container -->
+    <div id="modal-container"></div>
+
+    <script type="module">
+        import { PreLaunchModal } from './src/js/components/pre-launch-modal.js';
+        import { userPreferences } from './src/js/utils/simple-storage.js';
+
+        const resultsDiv = document.getElementById('results');
+        const resultsContent = document.getElementById('results-content');
+
+        function showResults(data) {
+            resultsContent.textContent = JSON.stringify(data, null, 2);
+            resultsDiv.style.display = 'block';
+        }
+
+        // Test pre-launch modal
+        document.getElementById('test-prelaunch').addEventListener('click', () => {
+            const modal = new PreLaunchModal('bias-fairness', {
+                onLaunch: (simId) => {
+                    showResults({ action: 'launched', simulationId: simId, preferences: userPreferences.getAllPreferences() });
+                },
+                onCancel: () => {
+                    showResults({ action: 'cancelled', preferences: userPreferences.getAllPreferences() });
+                }
+            });
+            modal.show();
+        });
+
+        // Test direct launch
+        document.getElementById('skip-and-launch').addEventListener('click', () => {
+            showResults({ action: 'direct_launch', message: 'This would skip pre-launch and go directly to simulation' });
+        });
+
+        // Show preferences
+        document.getElementById('show-preferences').addEventListener('click', () => {
+            showResults(userPreferences.getAllPreferences());
+        });
+
+        // Reset skip preferences
+        document.getElementById('reset-skip').addEventListener('click', () => {
+            userPreferences.setSkipPreLaunchGlobally(false);
+            const settings = userPreferences.getPreLaunchSettings();
+            settings.skipPreLaunchFor = {};
+            userPreferences.setPreLaunchSettings(settings);
+            showResults({ action: 'reset_complete', preferences: userPreferences.getAllPreferences() });
+        });
+
+        // Test full flow (simulates what the app would do)
+        document.getElementById('test-full-flow').addEventListener('click', () => {
+            const simulationId = 'bias-fairness';
+            const shouldSkip = userPreferences.shouldSkipPreLaunch(simulationId);
+            
+            if (shouldSkip) {
+                showResults({ action: 'would_skip_to_simulation', simulationId, reason: 'User preferences indicate skip' });
+            } else {
+                const modal = new PreLaunchModal(simulationId, {
+                    onLaunch: (simId) => {
+                        showResults({ action: 'prelaunch_then_simulation', simulationId: simId });
+                    },
+                    onCancel: () => {
+                        showResults({ action: 'prelaunch_cancelled' });
+                    }
+                });
+                modal.show();
+            }
+        });
+    </script>
+</body>
+</html>

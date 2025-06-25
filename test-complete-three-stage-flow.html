@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Complete Three-Stage Modal Flow - SimulateAI</title>
+    
+    <!-- Import main styles -->
+    <link rel="stylesheet" href="src/styles/main.css">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .test-header h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        
+        .test-header .subtitle {
+            color: #718096;
+            font-size: 1.1em;
+        }
+        
+        .test-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .test-card {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.2s ease;
+        }
+        
+        .test-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+        
+        .test-card h3 {
+            margin: 0 0 10px 0;
+            color: #2d3748;
+        }
+        
+        .test-card p {
+            margin: 0 0 15px 0;
+            color: #718096;
+            font-size: 0.9em;
+        }
+        
+        .test-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+        
+        .test-button:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+        
+        .test-button:active {
+            transform: translateY(0);
+        }
+        
+        .status-area {
+            background: #1a202c;
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .status-area .log-entry {
+            margin-bottom: 5px;
+            padding: 2px 0;
+        }
+        
+        .status-area .log-entry.info {
+            color: #63b3ed;
+        }
+        
+        .status-area .log-entry.success {
+            color: #68d391;
+        }
+        
+        .status-area .log-entry.error {
+            color: #fc8181;
+        }
+        
+        /* Modal container (gets dynamically created) */
+        .modal-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .test-container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .test-controls {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <header class="test-header">
+            <h1>Complete Three-Stage Modal Flow Test</h1>
+            <p class="subtitle">Test the complete simulation flow: Pre-Launch → Enhanced Simulation → Post-Simulation</p>
+        </header>
+        
+        <div class="test-controls">
+            <div class="test-card">
+                <h3>🚀 Stage 1: Pre-Launch Modal</h3>
+                <p>Test the educational pre-launch modal with simulation information, learning objectives, and educator resources.</p>
+                <button class="test-button" onclick="testPreLaunchModal()">Test Pre-Launch Modal</button>
+            </div>
+            
+            <div class="test-card">
+                <h3>🎯 Stage 2: Enhanced Simulation Modal</h3>
+                <p>Test the enhanced simulation modal with tabbed interface, resources panel, and ethics meters.</p>
+                <button class="test-button" onclick="testEnhancedModal()">Test Enhanced Modal</button>
+            </div>
+            
+            <div class="test-card">
+                <h3>🤔 Stage 3: Post-Simulation Modal</h3>
+                <p>Test the reflection modal with guided questions, progress tracking, and session summary.</p>
+                <button class="test-button" onclick="testPostSimulationModal()">Test Post-Simulation Modal</button>
+            </div>
+            
+            <div class="test-card">
+                <h3>🔄 Complete Flow Test</h3>
+                <p>Test the complete three-stage flow from start to finish, simulating real user behavior.</p>
+                <button class="test-button" onclick="testCompleteFlow()">Test Complete Flow</button>
+            </div>
+            
+            <div class="test-card">
+                <h3>📱 Mobile Responsive Test</h3>
+                <p>Test modal responsiveness and mobile behavior. Use browser dev tools to simulate mobile.</p>
+                <button class="test-button" onclick="testMobileFlow()">Test Mobile Flow</button>
+            </div>
+            
+            <div class="test-card">
+                <h3>♿ Accessibility Test</h3>
+                <p>Test keyboard navigation, screen reader support, and focus management across all modals.</p>
+                <button class="test-button" onclick="testAccessibility()">Test Accessibility</button>
+            </div>
+        </div>
+        
+        <div id="status-container">
+            <h3>Test Status & Logs</h3>
+            <div id="status-area" class="status-area">
+                <div class="log-entry info">Ready to test modal flows...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal container will be created dynamically -->
+    <div id="modal-container" class="modal-container" aria-hidden="true" inert></div>
+
+    <!-- Import modules -->
+    <script type="module">
+        import { PreLaunchModal } from './src/js/components/pre-launch-modal.js';
+        import { EnhancedSimulationModal } from './src/js/components/enhanced-simulation-modal.js';
+        import { PostSimulationModal } from './src/js/components/post-simulation-modal.js';
+        import { simulationInfo } from './src/js/data/simulation-info.js';
+
+        // Test utilities
+        const statusArea = document.getElementById('status-area');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${timestamp}] ${message}`;
+            statusArea.appendChild(entry);
+            statusArea.scrollTop = statusArea.scrollHeight;
+        }
+
+        // Mock simulation data for testing
+        const mockSimulationData = {
+            id: 'bias-fairness',
+            title: 'AI Ethics Explorer',
+            description: 'Explore real-world AI scenarios and see how different choices affect various groups in society.',
+            sessionData: {
+                duration: 1200,
+                scenariosCompleted: 3,
+                ethicsScores: {
+                    fairness: 0.8,
+                    transparency: 0.7,
+                    accountability: 0.9
+                },
+                choices: [
+                    { scenario: 'Hiring Algorithm', choice: 'Include diversity metrics', impact: 'positive' },
+                    { scenario: 'Loan Approval', choice: 'Remove bias indicators', impact: 'positive' },
+                    { scenario: 'Content Moderation', choice: 'Human oversight', impact: 'positive' }
+                ]
+            }
+        };
+
+        // Test functions
+        window.testPreLaunchModal = function() {
+            log('Testing Pre-Launch Modal...', 'info');
+            
+            const modal = new PreLaunchModal('bias-fairness', {
+                onLaunch: () => {
+                    log('✅ Pre-Launch Modal: User clicked "Start Exploration"', 'success');
+                    // Simulate transition to enhanced modal
+                    setTimeout(() => testEnhancedModal(), 500);
+                },
+                onCancel: () => {
+                    log('⏭️ Pre-Launch Modal: User clicked "Maybe Later"', 'info');
+                },
+                showEducatorResources: true
+            });
+            
+            modal.show();
+            log('Pre-Launch Modal displayed', 'success');
+        };
+
+        window.testEnhancedModal = function() {
+            log('Testing Enhanced Simulation Modal...', 'info');
+            
+            // Create a simplified simulation mock for testing
+            const mockSimulation = {
+                id: 'bias-fairness',
+                getMetrics: () => ({
+                    fairness: 0.75,
+                    transparency: 0.6,
+                    accountability: 0.8
+                }),
+                on: (event, callback) => {
+                    // Mock event listener
+                    if (event === 'simulation:completed') {
+                        // Simulate completion after 5 seconds
+                        setTimeout(() => {
+                            log('🎯 Enhanced Modal: Simulation completed event triggered', 'info');
+                            callback(mockSimulationData.sessionData);
+                        }, 5000);
+                    }
+                }
+            };
+            
+            const modal = new EnhancedSimulationModal('bias-fairness', {
+                simulation: mockSimulation,
+                onClose: () => {
+                    log('❌ Enhanced Modal: User closed modal', 'info');
+                },
+                onMinimize: () => {
+                    log('📉 Enhanced Modal: User minimized modal', 'info');
+                }
+            });
+            
+            modal.show();
+            log('Enhanced Simulation Modal displayed', 'success');
+            log('⏱️ Auto-completion will trigger in 5 seconds...', 'info');
+        };
+
+        window.testPostSimulationModal = function() {
+            log('Testing Post-Simulation Modal...', 'info');
+            
+            const modal = new PostSimulationModal('bias-fairness', {
+                sessionData: mockSimulationData.sessionData,
+                onComplete: () => {
+                    log('✅ Post-Simulation Modal: User completed reflection', 'success');
+                },
+                onSkip: () => {
+                    log('⏭️ Post-Simulation Modal: User skipped reflection', 'info');
+                },
+                onRestart: () => {
+                    log('🔄 Post-Simulation Modal: User wants to restart', 'info');
+                    // Could trigger pre-launch modal again
+                    setTimeout(() => testPreLaunchModal(), 500);
+                }
+            });
+            
+            modal.show();
+            log('Post-Simulation Modal displayed', 'success');
+        };
+
+        window.testCompleteFlow = function() {
+            log('🚀 Starting Complete Three-Stage Flow Test...', 'info');
+            log('This will simulate the full user journey', 'info');
+            
+            // Stage 1: Pre-Launch
+            const preModal = new PreLaunchModal('bias-fairness', {
+                onLaunch: () => {
+                    log('✅ Flow Stage 1 Complete: Pre-Launch → Enhanced Modal', 'success');
+                    
+                    // Stage 2: Enhanced Simulation (with auto-completion)
+                    setTimeout(() => {
+                        const mockSimulation = {
+                            id: 'bias-fairness',
+                            getMetrics: () => ({
+                                fairness: 0.75,
+                                transparency: 0.6,
+                                accountability: 0.8
+                            }),
+                            on: (event, callback) => {
+                                if (event === 'simulation:completed') {
+                                    setTimeout(() => {
+                                        log('✅ Flow Stage 2 Complete: Enhanced Modal → Post-Simulation', 'success');
+                                        callback(mockSimulationData.sessionData);
+                                        
+                                        // Stage 3: Post-Simulation
+                                        setTimeout(() => {
+                                            const postModal = new PostSimulationModal('bias-fairness', {
+                                                sessionData: mockSimulationData.sessionData,
+                                                onComplete: () => {
+                                                    log('🎉 Flow Complete: All three stages successfully tested!', 'success');
+                                                    log('User journey: Pre-Launch → Simulation → Reflection → Complete', 'success');
+                                                },
+                                                onSkip: () => {
+                                                    log('⏭️ Flow Complete: User skipped reflection but completed flow', 'info');
+                                                },
+                                                onRestart: () => {
+                                                    log('🔄 Flow Restart: User wants to explore again', 'info');
+                                                }
+                                            });
+                                            postModal.show();
+                                        }, 1000);
+                                    }, 3000);
+                                }
+                            }
+                        };
+                        
+                        const enhancedModal = new EnhancedSimulationModal('bias-fairness', {
+                            simulation: mockSimulation,
+                            onClose: () => {
+                                log('❌ Flow Interrupted: User closed enhanced modal', 'info');
+                            }
+                        });
+                        enhancedModal.show();
+                        log('⏱️ Enhanced modal will auto-complete in 3 seconds...', 'info');
+                    }, 1000);
+                },
+                onCancel: () => {
+                    log('❌ Flow Interrupted: User cancelled at pre-launch', 'info');
+                }
+            });
+            
+            preModal.show();
+        };
+
+        window.testMobileFlow = function() {
+            log('📱 Testing Mobile Responsive Flow...', 'info');
+            log('💡 Use browser dev tools to simulate mobile viewport', 'info');
+            
+            // Test each modal with mobile-specific checks
+            testPreLaunchModal();
+            
+            setTimeout(() => {
+                log('📱 Check: Pre-launch modal responsiveness', 'info');
+                log('📱 Verify: Touch targets are at least 44px', 'info');
+                log('📱 Verify: Text is readable without zooming', 'info');
+            }, 2000);
+        };
+
+        window.testAccessibility = function() {
+            log('♿ Testing Accessibility Features...', 'info');
+            log('⌨️ Use Tab key to navigate through modal elements', 'info');
+            log('⌨️ Use Enter/Space to activate buttons', 'info');
+            log('⌨️ Use Escape to close modals', 'info');
+            log('🔊 Test with screen reader if available', 'info');
+            
+            // Test focus management
+            testPreLaunchModal();
+            
+            setTimeout(() => {
+                log('♿ Check: Focus is trapped within modal', 'info');
+                log('♿ Check: Focus returns to trigger element on close', 'info');
+                log('♿ Check: ARIA labels and roles are present', 'info');
+                log('♿ Check: Color contrast meets WCAG standards', 'info');
+            }, 2000);
+        };
+
+        // Initialize logging
+        log('Three-Stage Modal Flow Test Ready', 'success');
+        log('Use the buttons above to test individual stages or complete flow', 'info');
+    </script>
+</body>
+</html>

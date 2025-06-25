@@ -3,6 +3,11 @@
  * Modern, accessible, and responsive design
  */
 
+/* Import additional stylesheets */
+@import './pre-launch-modal.css';
+@import './enhanced-simulation-modal.css';
+@import './post-simulation-modal.css';
+
 /* CSS Custom Properties */
 :root {
     /* Colors */
