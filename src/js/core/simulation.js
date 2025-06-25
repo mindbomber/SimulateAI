@@ -3,9 +3,21 @@
  * Provides common functionality for ethics tracking, UI management, and educational features
  */
 
-import { simpleStorage, userProgress } from '../utils/simple-storage.js';
+import { simpleStorage } from '../utils/simple-storage.js';
 import { simpleAnalytics } from '../utils/simple-analytics.js';
-import { UIComponent, UIPanel, EthicsDisplay, FeedbackSystem } from './ui.js';
+import { UIPanel, EthicsDisplay, FeedbackSystem } from './ui.js';
+
+// Constants to avoid magic numbers
+const SIMULATION_CONSTANTS = {
+    DEFAULT_DURATION: 300, // 5 minutes in seconds
+    DEFAULT_METRIC_VALUE: 50,
+    FEEDBACK_PANEL_WIDTH: 220,
+    FEEDBACK_PANEL_MARGIN: 10,
+    ETHICS_PANEL_WIDTH: 250,
+    ETHICS_PANEL_HEIGHT: 150,
+    ETHICS_PANEL_Y_OFFSET: 420,
+    ETHICS_PANEL_WIDTH_OFFSET: 240
+};
 
 class EthicsSimulation {
     constructor(id, config = {}) {
@@ -13,7 +25,7 @@ class EthicsSimulation {
         this.title = config.title || 'Untitled Simulation';
         this.description = config.description || '';
         this.difficulty = config.difficulty || 'beginner'; // beginner, intermediate, advanced
-        this.duration = config.duration || 300; // seconds
+        this.duration = config.duration || SIMULATION_CONSTANTS.DEFAULT_DURATION;
         this.tags = config.tags || [];
         
         // Ethics tracking
@@ -44,10 +56,10 @@ class EthicsSimulation {
 
     initializeEthicsMetrics(metrics) {
         const defaultMetrics = [
-            { name: 'fairness', label: 'Fairness', value: 50, weight: 1 },
-            { name: 'transparency', label: 'Transparency', value: 50, weight: 1 },
-            { name: 'privacy', label: 'Privacy', value: 50, weight: 1 },
-            { name: 'accountability', label: 'Accountability', value: 50, weight: 1 }
+            { name: 'fairness', label: 'Fairness', value: SIMULATION_CONSTANTS.DEFAULT_METRIC_VALUE, weight: 1 },
+            { name: 'transparency', label: 'Transparency', value: SIMULATION_CONSTANTS.DEFAULT_METRIC_VALUE, weight: 1 },
+            { name: 'privacy', label: 'Privacy', value: SIMULATION_CONSTANTS.DEFAULT_METRIC_VALUE, weight: 1 },
+            { name: 'accountability', label: 'Accountability', value: SIMULATION_CONSTANTS.DEFAULT_METRIC_VALUE, weight: 1 }
         ];
         
         const allMetrics = [...defaultMetrics, ...metrics];
@@ -55,7 +67,7 @@ class EthicsSimulation {
         allMetrics.forEach(metric => {
             this.ethicsMetrics.set(metric.name, {
                 label: metric.label,
-                value: metric.value || 50,
+                value: metric.value || SIMULATION_CONSTANTS.DEFAULT_METRIC_VALUE,
                 min: metric.min || 0,
                 max: metric.max || 100,
                 weight: metric.weight || 1,
@@ -113,12 +125,15 @@ class EthicsSimulation {
         this.engine.addComponent(panel);
     }    createFeedbackSystem() {
         if (!this.engine || !this.engine.config) {
-            console.error('Engine not properly initialized for feedback system');
+            this.handleError('Engine not properly initialized for feedback system');
             return;
         }
         
         this.feedbackSystem = new FeedbackSystem({
-            position: { x: this.engine.config.width - 220, y: 10 },
+            position: { 
+                x: this.engine.config.width - SIMULATION_CONSTANTS.FEEDBACK_PANEL_WIDTH, 
+                y: SIMULATION_CONSTANTS.FEEDBACK_PANEL_MARGIN 
+            },
             size: { width: 200, height: 400 }
         });
         
@@ -127,22 +142,28 @@ class EthicsSimulation {
 
     setupEthicsDisplay() {
         if (!this.engine || !this.engine.config) {
-            console.error('Engine not properly initialized for ethics display');
+            this.handleError('Engine not properly initialized for ethics display');
             return;
         }
         
         // Create ethics meters display
         this.ethicsDisplay = new EthicsDisplay({
             metrics: this.ethicsMetrics,
-            position: { x: this.engine.config.width - 250, y: 420 },
-            size: { width: 240, height: 150 }
+            position: { 
+                x: this.engine.config.width - SIMULATION_CONSTANTS.ETHICS_PANEL_WIDTH, 
+                y: SIMULATION_CONSTANTS.ETHICS_PANEL_Y_OFFSET 
+            },
+            size: { 
+                width: SIMULATION_CONSTANTS.ETHICS_PANEL_WIDTH_OFFSET, 
+                height: SIMULATION_CONSTANTS.ETHICS_PANEL_HEIGHT 
+            }
         });
         
         this.engine.addComponent(this.ethicsDisplay);
     }    // Scenario management
     loadScenario(index) {
         if (!this.scenarios || !Array.isArray(this.scenarios)) {
-            console.error('Scenarios not properly initialized');
+            this.handleError('Scenarios not properly initialized');
             return;
         }
         
@@ -152,7 +173,7 @@ class EthicsSimulation {
         }
         
         if (index < 0) {
-            console.error('Invalid scenario index:', index);
+            this.handleError(`Invalid scenario index: ${index}`);
             return;
         }
         
@@ -160,7 +181,7 @@ class EthicsSimulation {
         const scenario = this.scenarios[index];
         
         if (!scenario) {
-            console.error('Scenario not found at index:', index);
+            this.handleError(`Scenario not found at index: ${index}`);
             return;
         }
         
@@ -184,15 +205,21 @@ class EthicsSimulation {
 
     setupScenarioComponents(scenario) {
         // Override in specific simulations
-        console.log('Setting up scenario:', scenario.title);
-    }    updateInformationPanel(scenario) {
+        // Log scenario setup in development only
+        if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.log('Setting up scenario:', scenario.title);
+        }
+    }
+
+    updateInformationPanel(scenario) {
         if (!this.informationPanel) {
-            console.warn('Information panel not initialized');
+            this.handleError('Information panel not initialized');
             return;
         }
         
         if (!scenario) {
-            console.error('Cannot update information panel: scenario is null/undefined');
+            this.handleError('Cannot update information panel: scenario is null/undefined');
             return;
         }
         
@@ -214,7 +241,7 @@ class EthicsSimulation {
     updateEthicsMetric(metricName, change, reasoning = '') {
         const metric = this.ethicsMetrics.get(metricName);
         if (!metric) {
-            console.warn(`Ethics metric '${metricName}' not found`);
+            this.handleError(`Ethics metric '${metricName}' not found`);
             return;
         }
         
@@ -260,13 +287,13 @@ class EthicsSimulation {
         try {
             simpleStorage.set(`decision_${this.id}_${Date.now()}`, decision);
         } catch (error) {
-            console.error('Failed to log decision to storage:', error);
+            this.handleError('Failed to log decision to storage', error);
         }
         
         try {
             simpleAnalytics.trackEvent('ethics_decision', decision);
         } catch (error) {
-            console.error('Failed to track decision in analytics:', error);
+            this.handleError('Failed to track decision in analytics', error);
         }
     }
 
@@ -390,7 +417,7 @@ class EthicsSimulation {
         this.emit('simulation:completed', { score: this.state.score, report });
     }    calculateFinalScore() {
         if (!this.ethicsMetrics || this.ethicsMetrics.size === 0) {
-            console.warn('No ethics metrics available for score calculation');
+            this.handleError('No ethics metrics available for score calculation');
             this.state.score = 0;
             return;
         }
@@ -406,7 +433,7 @@ class EthicsSimulation {
         });
         
         if (totalWeight === 0) {
-            console.warn('Total weight is zero, cannot calculate score');
+            this.handleError('Total weight is zero, cannot calculate score');
             this.state.score = 0;
             return;
         }
@@ -442,7 +469,7 @@ class EthicsSimulation {
                 try {
                     callback(data);
                 } catch (error) {
-                    console.error(`Error in event handler for ${event}:`, error);
+                    this.handleError(`Error in event handler for ${event}`, error);
                 }
             });
         }
@@ -452,7 +479,7 @@ class EthicsSimulation {
     getAccessibilityDescription() {
         return `${this.title}: ${this.description}. Current ethics scores: ${
             Array.from(this.ethicsMetrics.entries())
-                .map(([name, metric]) => `${metric.label}: ${metric.value}`)
+                .map(([_name, metric]) => `${metric.label}: ${metric.value}`)
                 .join(', ')
         }`;
     }
@@ -467,7 +494,7 @@ class EthicsSimulation {
         this.updateSimulation(deltaTime);
     }
 
-    updateSimulation(deltaTime) {
+    updateSimulation(_deltaTime) {
         // Override in specific simulations
     }
 
@@ -492,6 +519,33 @@ class EthicsSimulation {
             totalScenarios,
             percentage: ((currentScenario + 1) / totalScenarios) * 100
         };
+    }
+
+    // Error handling
+    handleError(message, error = null) {
+        const errorData = {
+            simulationId: this.id,
+            message,
+            error: error?.message || 'Unknown error',
+            timestamp: Date.now(),
+            scenario: this.currentScenario
+        };
+        
+        // Track error in analytics
+        try {
+            simpleAnalytics.trackEvent('simulation_error', errorData);
+        } catch (analyticsError) {
+            // Silent fail for analytics
+        }
+        
+        // Emit error event for UI handling
+        this.emit('error', errorData);
+        
+        // Store error for debugging in development
+        if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.error(`Simulation Error [${this.id}]:`, message, error);
+        }
     }
 
     // Cleanup and resource management
@@ -525,9 +579,13 @@ class EthicsSimulation {
             this.ethicsHistory = [];
             this.components = [];
             
-            console.log(`EthicsSimulation ${this.id}: Destroyed`);
+            // Log destruction in development only
+            if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+                // eslint-disable-next-line no-console
+                console.log(`EthicsSimulation ${this.id}: Destroyed`);
+            }
         } catch (error) {
-            console.error('Error during simulation cleanup:', error);
+            this.handleError('Error during simulation cleanup', error);
         }
     }
 }

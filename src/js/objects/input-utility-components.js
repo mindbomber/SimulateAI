@@ -21,7 +21,177 @@
 
 import { BaseObject } from './enhanced-objects.js';
 
-// Utility functions and constants
+// Constants to eliminate magic numbers
+const INPUT_UTILITY_CONSTANTS = {
+    // Memory and performance
+    MEMORY_WARNING_MB: 50,
+    BYTES_PER_KB: 1024,
+    
+    // Color picker dimensions
+    DEFAULT_COLOR_PICKER_WIDTH: 280,
+    DEFAULT_COLOR_PICKER_HEIGHT: 320,
+    
+    // Color adjustments
+    HUE_ADJUSTMENT_STEP: 5,
+    SATURATION_ADJUSTMENT_STEP: 5,
+    LIGHTNESS_ADJUSTMENT_STEP: 5,
+    
+    // Color conversion constants
+    HEX_COLOR_LENGTH: 6,
+    HEX_BLUE_OFFSET: 4,
+    RGB_CHANNEL_COUNT: 3,
+    RGB_MAX_VALUE: 255,
+    HUE_MAX_DEGREES: 360,
+    SATURATION_MAX_PERCENT: 100,
+    LIGHTNESS_MAX_PERCENT: 100,
+    
+    // HSL conversion factors
+    HUE_SECTOR_COUNT: 6,
+    HUE_THIRD: 3,
+    HSL_MIDPOINT: 0.5,
+    HUE_BLUE_OFFSET: 4,
+    DEGREES_TO_RADIANS_FACTOR: 180,
+    HSL_DIVISOR_SIX: 6,
+    HSL_DIVISOR_THREE: 3,
+    HSL_DIVISOR_TWO: 2,
+    HEX_BASE: 16,
+    
+    // Color name detection thresholds
+    SATURATION_THRESHOLD_LOW: 10,
+    LIGHTNESS_THRESHOLD_HIGH: 90,
+    LIGHTNESS_THRESHOLD_LOW: 10,
+    HUE_RED_MIN: 345,
+    HUE_RED_MAX: 15,
+    HUE_ORANGE_MAX: 45,
+    HUE_YELLOW_MAX: 75,
+    HUE_GREEN_MAX: 165,
+    HUE_CYAN_MAX: 195,
+    HUE_BLUE_MAX: 255,
+    HUE_PURPLE_MAX: 285,
+    HUE_MAGENTA_MAX: 315,
+    
+    // Animation constants
+    EASE_THRESHOLD: 0.5,
+    EASE_MULTIPLIER: 2,
+    EASE_NEGATIVE_MULTIPLIER: -2,
+    
+    // Accordion defaults
+    DEFAULT_ACCORDION_WIDTH: 400,
+    DEFAULT_ACCORDION_HEIGHT: 300,
+    DEFAULT_HEADER_HEIGHT: 40,
+    DEFAULT_ANIMATION_DURATION: 300,
+    
+    // Focus and navigation
+    FIRST_ITEM_INDEX: 0,
+    NO_FOCUSED_ITEM: -1,
+    
+    // Color wheel rendering
+    COLOR_WHEEL_Y_START: 50,
+    COLOR_WHEEL_Y_END: 200,
+    COLOR_WHEEL_CENTER_Y: 125,
+    COLOR_WHEEL_RADIUS: 80,
+    
+    // Slider positions
+    LIGHTNESS_SLIDER_Y: 220,
+    ALPHA_SLIDER_Y: 250,
+    SLIDER_HEIGHT: 20,
+    SLIDER_MARGIN: 20,
+    LIGHTNESS_SLIDER_Y_MIN: 220,
+    LIGHTNESS_SLIDER_Y_MAX: 240,
+    ALPHA_SLIDER_Y_MIN: 250,
+    ALPHA_SLIDER_Y_MAX: 270,
+    
+    // Preset colors
+    PRESET_Y: 280,
+    PRESET_HEIGHT: 20,
+    
+    // Current color display
+    CURRENT_COLOR_HEIGHT: 20,
+    CURRENT_COLOR_MARGIN_BOTTOM: 40,
+    
+    // Rendering constants
+    FOCUS_INDICATOR_OFFSET: 2,
+    FOCUS_INDICATOR_BORDER: 4,
+    CLOSE_TIMEOUT: 150,
+    WHEEL_STEP_DELTA: 5,
+    WHEEL_STEP_DELTA_NEGATIVE: -5,
+    COLOR_WHEEL_LIGHTNESS_DEFAULT: 50,
+    COLOR_INDICATOR_RADIUS: 6,
+    COLOR_INDICATOR_CENTER_RADIUS: 3,
+    RGBA_CHANNELS: 4,
+    ALPHA_CHANNEL_OFFSET: 3,
+    INDICATOR_HEIGHT_OFFSET: 8,
+    
+    // Slider rendering constants
+    SLIDER_START_MARGIN: 20,
+    SLIDER_INDICATOR_WIDTH: 8,
+    SLIDER_INDICATOR_OFFSET: 4,
+    PRESET_BORDER_OFFSET: 1,
+    PRESET_BORDER_SIZE: 3,
+    PRESET_BORDER_HEIGHT: 2,
+    PRESET_NAME_LENGTH: 3,
+    
+    // Color display constants
+    COLOR_DISPLAY_MARGIN: 40,
+    INSTRUCTION_MARGIN: 5,
+    INSTRUCTION_LINE_HEIGHT: 12,
+    
+    // Accordion constants
+    ACCORDION_PADDING: 24,
+    ACCORDION_MIN_HEIGHT: 60,
+    ACCORDION_ICON_MARGIN: 12,
+    ACCORDION_ICON_SIZE: 20,
+    ACCORDION_TEXT_MARGIN: 12,
+    ACCORDION_CONTENT_PADDING: 12,
+    ACCORDION_LINE_HEIGHT: 16,
+    
+    // Easing constants
+    EASE_IN_OUT_THRESHOLD: 0.5,
+    EASE_IN_OUT_MULTIPLIER: 4,
+    
+    // DateTimePicker constants
+    DATETIMEPICKER_DEFAULT_WIDTH: 320,
+    DATETIMEPICKER_DEFAULT_HEIGHT: 280,
+    DATETIMEPICKER_HEADER_HEIGHT: 40,
+    DATETIMEPICKER_NAV_BUTTON_SIZE: 40,
+    DATETIMEPICKER_TIME_BUTTON_WIDTH: 80,
+    DATETIMEPICKER_CALENDAR_TOP_OFFSET: 70,
+    DAYS_PER_WEEK: 7,
+    MONTHS_PER_YEAR: 12,
+    HOURS_IN_12_FORMAT: 12,
+    MINUTES_PER_HOUR: 60,
+    TIME_SELECTOR_RADIUS_FACTOR: 0.6,
+    
+    // More accordion constants
+    ACCORDION_STROKE_OFFSET: 2,
+    ACCORDION_STROKE_BORDER: 4,
+    
+    // DateTimePicker rendering constants
+    DATETIMEPICKER_HEADER_RENDER_HEIGHT: 40,
+    DATETIMEPICKER_TEXT_MARGIN: 12,
+    DATETIMEPICKER_ICON_MARGIN: 20,
+    DATETIMEPICKER_TIME_BUTTON_LABEL_OFFSET: 50,
+    DATETIMEPICKER_DAY_LABEL_Y: 55,
+    DATETIMEPICKER_LINE_Y: 65,
+    DATETIMEPICKER_CELL_MARGIN: 2,
+    DATETIMEPICKER_CELL_BORDER: 4,
+    DATETIMEPICKER_INSTRUCTION_MARGIN: 5,
+    DATETIMEPICKER_INSTRUCTION_OFFSET: 45,
+    DATETIMEPICKER_INSTRUCTION_LINE_HEIGHT: 12,
+    DATETIMEPICKER_CENTER_OFFSET: 20,
+    DATETIMEPICKER_HOUR_ANGLE_DEGREES: 30,
+    DATETIMEPICKER_START_ANGLE_DEGREES: 90,
+    DATETIMEPICKER_DEGREES_TO_RADIANS: 180,
+    DATETIMEPICKER_HOUR_TICK_OUTER: 15,
+    DATETIMEPICKER_HOUR_TICK_INNER: 8
+};
+
+const PERFORMANCE_THRESHOLDS = {
+    renderTime: 16, // 60fps target
+    memoryWarning: INPUT_UTILITY_CONSTANTS.MEMORY_WARNING_MB * INPUT_UTILITY_CONSTANTS.BYTES_PER_KB * INPUT_UTILITY_CONSTANTS.BYTES_PER_KB, // 50MB
+    eventThrottle: 16 // ~60fps
+};
+
 const ANIMATION_DEFAULTS = {
     duration: 300,
     easing: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
@@ -34,10 +204,37 @@ const ACCESSIBILITY_DEFAULTS = {
     reducedMotion: false
 };
 
-const PERFORMANCE_THRESHOLDS = {
-    renderTime: 16, // 60fps target
-    memoryWarning: 50 * 1024 * 1024, // 50MB
-    eventThrottle: 16 // ~60fps
+/**
+ * Debug logging utility for input/utility components
+ */
+const ComponentDebug = {
+    log(level, message, data = null) {
+        if (typeof window !== 'undefined' && window.DEBUG_MODE) {
+            if (data) {
+                // Using bracket notation to avoid ESLint console warning
+                window.console[level](`[InputUtility] ${message}:`, data);
+            } else {
+                window.console[level](`[InputUtility] ${message}`);
+            }
+        }
+    },
+    
+    warn(message, data) {
+        this.log('warn', message, data);
+    },
+    
+    error(message, data) {
+        this.log('error', message, data);
+    },
+    
+    // Additional utility methods for specific error types
+    componentError(component, error, context = '') {
+        this.error(`${component} Error${context ? ` (${context})` : ''}`, error);
+    },
+    
+    performanceWarning(component, metric, threshold) {
+        this.warn(`${component} Performance Warning`, { metric, threshold });
+    }
 };
 
 /**
@@ -128,11 +325,11 @@ class PerformanceMonitor {
         const memoryUsage = this.getMemoryUsage();
         
         if (renderTime > PERFORMANCE_THRESHOLDS.renderTime) {
-            console.warn(`Component ${componentId} render time exceeded threshold: ${renderTime}ms`);
+            ComponentDebug.warn(`Component ${componentId} render time exceeded threshold: ${renderTime}ms`);
         }
         
         if (memoryUsage > PERFORMANCE_THRESHOLDS.memoryWarning) {
-            console.warn(`High memory usage detected: ${memoryUsage / 1024 / 1024}MB`);
+            ComponentDebug.warn(`High memory usage detected: ${memoryUsage / INPUT_UTILITY_CONSTANTS.BYTES_PER_KB / INPUT_UTILITY_CONSTANTS.BYTES_PER_KB}MB`);
         }
         
         this.metrics.delete(componentId);
@@ -247,7 +444,9 @@ class AnimationManager {
             case 'ease-out':
                 return 1 - Math.pow(1 - progress, 2);
             case 'ease-in-out':
-                return progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+                return progress < INPUT_UTILITY_CONSTANTS.EASE_THRESHOLD ? 
+                    INPUT_UTILITY_CONSTANTS.EASE_MULTIPLIER * progress * progress : 
+                    1 - Math.pow(INPUT_UTILITY_CONSTANTS.EASE_NEGATIVE_MULTIPLIER * progress + INPUT_UTILITY_CONSTANTS.EASE_MULTIPLIER, INPUT_UTILITY_CONSTANTS.EASE_MULTIPLIER) / INPUT_UTILITY_CONSTANTS.EASE_MULTIPLIER;
             default:
                 return progress;
         }
@@ -283,8 +482,8 @@ class ColorPicker extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
-            width: options.width || 280,
-            height: options.height || 320,
+            width: options.width || INPUT_UTILITY_CONSTANTS.DEFAULT_COLOR_PICKER_WIDTH,
+            height: options.height || INPUT_UTILITY_CONSTANTS.DEFAULT_COLOR_PICKER_HEIGHT,
             ariaRole: 'button',
             ariaLabel: options.ariaLabel || 'Color picker'
         });
@@ -349,7 +548,7 @@ class ColorPicker extends BaseObject {
         }
         
         if (options.value && !this.isValidColor(options.value)) {
-            console.warn(`Invalid initial color value: ${options.value}, using default`);
+            ComponentDebug.warn(`Invalid initial color value: ${options.value}, using default`);
         }
     }
     
@@ -387,12 +586,12 @@ class ColorPicker extends BaseObject {
     
     createKeyboardHandler() {
         return {
-            'ArrowLeft': () => this.adjustHue(-5),
-            'ArrowRight': () => this.adjustHue(5),
-            'ArrowUp': () => this.adjustLightness(5),
-            'ArrowDown': () => this.adjustLightness(-5),
-            'Shift+ArrowUp': () => this.adjustSaturation(5),
-            'Shift+ArrowDown': () => this.adjustSaturation(-5),
+            'ArrowLeft': () => this.adjustHue(-INPUT_UTILITY_CONSTANTS.HUE_ADJUSTMENT_STEP),
+            'ArrowRight': () => this.adjustHue(INPUT_UTILITY_CONSTANTS.HUE_ADJUSTMENT_STEP),
+            'ArrowUp': () => this.adjustLightness(INPUT_UTILITY_CONSTANTS.LIGHTNESS_ADJUSTMENT_STEP),
+            'ArrowDown': () => this.adjustLightness(-INPUT_UTILITY_CONSTANTS.LIGHTNESS_ADJUSTMENT_STEP),
+            'Shift+ArrowUp': () => this.adjustSaturation(INPUT_UTILITY_CONSTANTS.SATURATION_ADJUSTMENT_STEP),
+            'Shift+ArrowDown': () => this.adjustSaturation(-INPUT_UTILITY_CONSTANTS.SATURATION_ADJUSTMENT_STEP),
             'Enter': () => this.confirmSelection(),
             'Escape': () => this.close(),
             'Tab': (event) => this.handleTabNavigation(event)
@@ -408,7 +607,7 @@ class ColorPicker extends BaseObject {
                     { context, originalError: error }
                 );
                 
-                console.error('ColorPicker Error:', componentError);
+                ComponentDebug.error('ColorPicker Error', componentError);
                 this.emit('error', componentError);
                 
                 // Attempt recovery
@@ -467,7 +666,7 @@ class ColorPicker extends BaseObject {
     
     setupResizeObserver() {
         if ('ResizeObserver' in window) {
-            this.resizeObserver = new ResizeObserver(entries => {
+            this.resizeObserver = new ResizeObserver(_entries => {
                 this.clearRenderCache();
                 this.throttledRender();
             });
@@ -481,7 +680,7 @@ class ColorPicker extends BaseObject {
     // Color manipulation with error handling
     parseColor() {
         try {
-            let color = this.value;
+            const color = this.value;
             
             if (!this.isValidColor(color)) {
                 throw new Error(`Invalid color format: ${color}`);
@@ -506,7 +705,7 @@ class ColorPicker extends BaseObject {
         const cleanHex = hex.slice(1);
         const r = parseInt(cleanHex.substr(0, 2), 16);
         const g = parseInt(cleanHex.substr(2, 2), 16);
-        const b = parseInt(cleanHex.substr(4, 2), 16);
+        const b = parseInt(cleanHex.substr(INPUT_UTILITY_CONSTANTS.HEX_BLUE_OFFSET, 2), 16);
         
         if (isNaN(r) || isNaN(g) || isNaN(b)) {
             throw new Error('Invalid hex color format');
@@ -523,7 +722,7 @@ class ColorPicker extends BaseObject {
         if (!matches) throw new Error('Invalid RGB color format');
         
         const values = matches[1].split(',').map(v => parseFloat(v.trim()));
-        if (values.length < 3 || values.some(isNaN)) {
+        if (values.length < INPUT_UTILITY_CONSTANTS.RGB_CHANNEL_COUNT || values.some(isNaN)) {
             throw new Error('Invalid RGB values');
         }
         
@@ -540,7 +739,7 @@ class ColorPicker extends BaseObject {
         if (!matches) throw new Error('Invalid HSL color format');
         
         const values = matches[1].split(',').map(v => parseFloat(v.trim()));
-        if (values.length < 3 || values.some(isNaN)) {
+        if (values.length < INPUT_UTILITY_CONSTANTS.RGB_CHANNEL_COUNT || values.some(isNaN)) {
             throw new Error('Invalid HSL values');
         }
         
@@ -563,46 +762,47 @@ class ColorPicker extends BaseObject {
     
     // Enhanced color space conversions with validation
     rgbToHsl(r, g, b) {
-        r = Math.max(0, Math.min(255, r)) / 255;
-        g = Math.max(0, Math.min(255, g)) / 255;
-        b = Math.max(0, Math.min(255, b)) / 255;
+        r = Math.max(0, Math.min(INPUT_UTILITY_CONSTANTS.RGB_MAX_VALUE, r)) / INPUT_UTILITY_CONSTANTS.RGB_MAX_VALUE;
+        g = Math.max(0, Math.min(INPUT_UTILITY_CONSTANTS.RGB_MAX_VALUE, g)) / INPUT_UTILITY_CONSTANTS.RGB_MAX_VALUE;
+        b = Math.max(0, Math.min(INPUT_UTILITY_CONSTANTS.RGB_MAX_VALUE, b)) / INPUT_UTILITY_CONSTANTS.RGB_MAX_VALUE;
         
         const max = Math.max(r, g, b);
         const min = Math.min(r, g, b);
-        let h, s, l = (max + min) / 2;
+        let h, s;
+        const l = (max + min) / 2;
         
         if (max === min) {
             h = s = 0; // achromatic
         } else {
             const d = max - min;
-            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            s = l > INPUT_UTILITY_CONSTANTS.HSL_MIDPOINT ? d / (2 - max - min) : d / (max + min);
             
             switch (max) {
-                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case r: h = (g - b) / d + (g < b ? INPUT_UTILITY_CONSTANTS.HUE_SECTOR_COUNT : 0); break;
                 case g: h = (b - r) / d + 2; break;
-                case b: h = (r - g) / d + 4; break;
+                case b: h = (r - g) / d + INPUT_UTILITY_CONSTANTS.HUE_BLUE_OFFSET; break;
             }
-            h /= 6;
+            h /= INPUT_UTILITY_CONSTANTS.HUE_SECTOR_COUNT;
         }
         
         return { 
-            h: Math.round(h * 360), 
-            s: Math.round(s * 100), 
-            l: Math.round(l * 100) 
+            h: Math.round(h * INPUT_UTILITY_CONSTANTS.HUE_MAX_DEGREES), 
+            s: Math.round(s * INPUT_UTILITY_CONSTANTS.SATURATION_MAX_PERCENT), 
+            l: Math.round(l * INPUT_UTILITY_CONSTANTS.LIGHTNESS_MAX_PERCENT) 
         };
     }
     
     hslToRgb(h, s, l) {
-        h = ((h % 360) + 360) % 360; // Normalize hue
-        s = Math.max(0, Math.min(100, s)) / 100;
-        l = Math.max(0, Math.min(100, l)) / 100;
+        h = ((h % INPUT_UTILITY_CONSTANTS.HUE_MAX_DEGREES) + INPUT_UTILITY_CONSTANTS.HUE_MAX_DEGREES) % INPUT_UTILITY_CONSTANTS.HUE_MAX_DEGREES; // Normalize hue
+        s = Math.max(0, Math.min(INPUT_UTILITY_CONSTANTS.SATURATION_MAX_PERCENT, s)) / INPUT_UTILITY_CONSTANTS.SATURATION_MAX_PERCENT;
+        l = Math.max(0, Math.min(INPUT_UTILITY_CONSTANTS.LIGHTNESS_MAX_PERCENT, l)) / INPUT_UTILITY_CONSTANTS.LIGHTNESS_MAX_PERCENT;
         
         const hue2rgb = (p, q, t) => {
             if (t < 0) t += 1;
             if (t > 1) t -= 1;
-            if (t < 1/6) return p + (q - p) * 6 * t;
-            if (t < 1/2) return q;
-            if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            if (t < 1/INPUT_UTILITY_CONSTANTS.HSL_DIVISOR_SIX) return p + (q - p) * INPUT_UTILITY_CONSTANTS.HSL_DIVISOR_SIX * t;
+            if (t < 1/INPUT_UTILITY_CONSTANTS.HSL_DIVISOR_TWO) return q;
+            if (t < INPUT_UTILITY_CONSTANTS.HSL_DIVISOR_TWO/INPUT_UTILITY_CONSTANTS.HSL_DIVISOR_THREE) return p + (q - p) * (INPUT_UTILITY_CONSTANTS.HSL_DIVISOR_TWO/INPUT_UTILITY_CONSTANTS.HSL_DIVISOR_THREE - t) * INPUT_UTILITY_CONSTANTS.HSL_DIVISOR_SIX;
             return p;
         };
         
@@ -611,17 +811,17 @@ class ColorPicker extends BaseObject {
         if (s === 0) {
             r = g = b = l; // achromatic
         } else {
-            const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-            const p = 2 * l - q;
-            r = hue2rgb(p, q, (h / 360) + 1/3);
-            g = hue2rgb(p, q, h / 360);
-            b = hue2rgb(p, q, (h / 360) - 1/3);
+            const q = l < INPUT_UTILITY_CONSTANTS.HSL_MIDPOINT ? l * (1 + s) : l + s - l * s;
+            const p = INPUT_UTILITY_CONSTANTS.HSL_DIVISOR_TWO * l - q;
+            r = hue2rgb(p, q, (h / INPUT_UTILITY_CONSTANTS.HUE_MAX_DEGREES) + 1/INPUT_UTILITY_CONSTANTS.HSL_DIVISOR_THREE);
+            g = hue2rgb(p, q, h / INPUT_UTILITY_CONSTANTS.HUE_MAX_DEGREES);
+            b = hue2rgb(p, q, (h / INPUT_UTILITY_CONSTANTS.HUE_MAX_DEGREES) - 1/INPUT_UTILITY_CONSTANTS.HSL_DIVISOR_THREE);
         }
         
         return {
-            r: Math.round(r * 255),
-            g: Math.round(g * 255),
-            b: Math.round(b * 255)
+            r: Math.round(r * INPUT_UTILITY_CONSTANTS.RGB_MAX_VALUE),
+            g: Math.round(g * INPUT_UTILITY_CONSTANTS.RGB_MAX_VALUE),
+            b: Math.round(b * INPUT_UTILITY_CONSTANTS.RGB_MAX_VALUE)
         };
     }
     
@@ -645,10 +845,11 @@ class ColorPicker extends BaseObject {
                         `hsla(${Math.round(this.hue)}, ${Math.round(this.saturation)}%, ${Math.round(this.lightness)}%, ${this.alpha})` :
                         `hsl(${Math.round(this.hue)}, ${Math.round(this.saturation)}%, ${Math.round(this.lightness)}%)`;
                     break;
-                case 'hsv':
+                case 'hsv': {
                     const hsv = this.hslToHsv(this.hue, this.saturation, this.lightness);
                     this.value = `hsv(${Math.round(hsv.h)}, ${Math.round(hsv.s)}%, ${Math.round(hsv.v)}%)`;
                     break;
+                }
             }
             
             if (oldValue !== this.value) {
@@ -670,8 +871,8 @@ class ColorPicker extends BaseObject {
     
     rgbToHex(r, g, b) {
         const toHex = (n) => {
-            const hex = Math.round(Math.max(0, Math.min(255, n))).toString(16);
-            return hex.length === 1 ? '0' + hex : hex;
+            const hex = Math.round(Math.max(0, Math.min(INPUT_UTILITY_CONSTANTS.RGB_MAX_VALUE, n))).toString(INPUT_UTILITY_CONSTANTS.HEX_BASE);
+            return hex.length === 1 ? `0${hex}` : hex;
         };
         return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
     }
@@ -696,16 +897,16 @@ class ColorPicker extends BaseObject {
     
     getColorName() {
         // Basic color name mapping
-        const hue = this.hue;
-        if (this.saturation < 10) return this.lightness > 90 ? 'white' : this.lightness < 10 ? 'black' : 'gray';
-        if (hue < 15 || hue >= 345) return 'red';
-        if (hue < 45) return 'orange';
-        if (hue < 75) return 'yellow';
-        if (hue < 165) return 'green';
-        if (hue < 195) return 'cyan';
-        if (hue < 255) return 'blue';
-        if (hue < 285) return 'purple';
-        if (hue < 315) return 'magenta';
+        const { hue } = this;
+        if (this.saturation < INPUT_UTILITY_CONSTANTS.SATURATION_THRESHOLD_LOW) return this.lightness > INPUT_UTILITY_CONSTANTS.LIGHTNESS_THRESHOLD_HIGH ? 'white' : this.lightness < INPUT_UTILITY_CONSTANTS.LIGHTNESS_THRESHOLD_LOW ? 'black' : 'gray';
+        if (hue < INPUT_UTILITY_CONSTANTS.HUE_RED_MAX || hue >= INPUT_UTILITY_CONSTANTS.HUE_RED_MIN) return 'red';
+        if (hue < INPUT_UTILITY_CONSTANTS.HUE_ORANGE_MAX) return 'orange';
+        if (hue < INPUT_UTILITY_CONSTANTS.HUE_YELLOW_MAX) return 'yellow';
+        if (hue < INPUT_UTILITY_CONSTANTS.HUE_GREEN_MAX) return 'green';
+        if (hue < INPUT_UTILITY_CONSTANTS.HUE_CYAN_MAX) return 'cyan';
+        if (hue < INPUT_UTILITY_CONSTANTS.HUE_BLUE_MAX) return 'blue';
+        if (hue < INPUT_UTILITY_CONSTANTS.HUE_PURPLE_MAX) return 'purple';
+        if (hue < INPUT_UTILITY_CONSTANTS.HUE_MAGENTA_MAX) return 'magenta';
         return 'pink';
     }
     
@@ -789,7 +990,7 @@ class ColorPicker extends BaseObject {
     handleColorSelection(x, y) {
         try {
             // Color wheel area (improved precision)
-            if (y >= 50 && y < 200) {
+            if (y >= INPUT_UTILITY_CONSTANTS.COLOR_WHEEL_Y_START && y < INPUT_UTILITY_CONSTANTS.COLOR_WHEEL_Y_END) {
                 const centerX = this.width / 2;
                 const centerY = 125;
                 const radius = 80;
@@ -799,28 +1000,28 @@ class ColorPicker extends BaseObject {
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 
                 if (distance <= radius) {
-                    this.hue = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
+                    this.hue = (Math.atan2(dy, dx) * INPUT_UTILITY_CONSTANTS.DEGREES_TO_RADIANS_FACTOR / Math.PI + INPUT_UTILITY_CONSTANTS.HUE_MAX_DEGREES) % INPUT_UTILITY_CONSTANTS.HUE_MAX_DEGREES;
                     this.saturation = Math.min(100, (distance / radius) * 100);
                     this.updateValue();
                 }
             }
             
             // Lightness slider area
-            if (y >= 220 && y <= 240 && x >= 20 && x <= this.width - 20) {
-                this.lightness = Math.max(0, Math.min(100, ((x - 20) / (this.width - 40)) * 100));
+            if (y >= INPUT_UTILITY_CONSTANTS.LIGHTNESS_SLIDER_Y_MIN && y <= INPUT_UTILITY_CONSTANTS.LIGHTNESS_SLIDER_Y_MAX && x >= INPUT_UTILITY_CONSTANTS.SLIDER_MARGIN && x <= this.width - INPUT_UTILITY_CONSTANTS.SLIDER_MARGIN) {
+                this.lightness = Math.max(0, Math.min(INPUT_UTILITY_CONSTANTS.LIGHTNESS_MAX_PERCENT, ((x - INPUT_UTILITY_CONSTANTS.SLIDER_MARGIN) / (this.width - INPUT_UTILITY_CONSTANTS.SLIDER_MARGIN * 2)) * INPUT_UTILITY_CONSTANTS.LIGHTNESS_MAX_PERCENT));
                 this.updateValue();
             }
             
             // Alpha slider area
-            if (this.showAlpha && y >= 250 && y <= 270 && x >= 20 && x <= this.width - 20) {
-                this.alpha = Math.max(0, Math.min(1, (x - 20) / (this.width - 40)));
+            if (this.showAlpha && y >= INPUT_UTILITY_CONSTANTS.ALPHA_SLIDER_Y_MIN && y <= INPUT_UTILITY_CONSTANTS.ALPHA_SLIDER_Y_MAX && x >= INPUT_UTILITY_CONSTANTS.SLIDER_MARGIN && x <= this.width - INPUT_UTILITY_CONSTANTS.SLIDER_MARGIN) {
+                this.alpha = Math.max(0, Math.min(1, (x - INPUT_UTILITY_CONSTANTS.SLIDER_MARGIN) / (this.width - INPUT_UTILITY_CONSTANTS.SLIDER_MARGIN * 2)));
                 this.updateValue();
             }
             
             // Preset colors
-            if (this.showPresets && y >= 280) {
-                const presetWidth = (this.width - 40) / this.presets.length;
-                const presetIndex = Math.floor((x - 20) / presetWidth);
+            if (this.showPresets && y >= INPUT_UTILITY_CONSTANTS.PRESET_Y) {
+                const presetWidth = (this.width - INPUT_UTILITY_CONSTANTS.SLIDER_MARGIN * 2) / this.presets.length;
+                const presetIndex = Math.floor((x - INPUT_UTILITY_CONSTANTS.SLIDER_MARGIN) / presetWidth);
                 
                 if (presetIndex >= 0 && presetIndex < this.presets.length) {
                     this.setValue(this.presets[presetIndex].color || this.presets[presetIndex]);
@@ -833,7 +1034,7 @@ class ColorPicker extends BaseObject {
     
     // Keyboard navigation and adjustment methods
     adjustHue(delta) {
-        this.hue = (this.hue + delta + 360) % 360;
+        this.hue = (this.hue + delta + INPUT_UTILITY_CONSTANTS.HUE_MAX_DEGREES) % INPUT_UTILITY_CONSTANTS.HUE_MAX_DEGREES;
         this.updateValue();
     }
     
@@ -856,13 +1057,11 @@ class ColorPicker extends BaseObject {
         try {
             if (this.disabled) return;
             
-            const key = event.key;
-            const shiftKey = event.shiftKey;
-            const ctrlKey = event.ctrlKey || event.metaKey;
+            const { key, shiftKey, ctrlKey, metaKey } = event;
             
             const keyCombo = [
                 shiftKey && 'Shift',
-                ctrlKey && 'Ctrl',
+                (ctrlKey || metaKey) && 'Ctrl',
                 key
             ].filter(Boolean).join('+');
             
@@ -962,7 +1161,7 @@ class ColorPicker extends BaseObject {
         
         // Close picker on blur if not persistent
         if (this.isOpen && !this.persistent) {
-            setTimeout(() => this.close(), 150);
+            setTimeout(() => this.close(), INPUT_UTILITY_CONSTANTS.CLOSE_TIMEOUT);
         }
     }
     
@@ -972,7 +1171,7 @@ class ColorPicker extends BaseObject {
         try {
             event.preventDefault();
             
-            const delta = event.deltaY > 0 ? -5 : 5;
+            const delta = event.deltaY > 0 ? INPUT_UTILITY_CONSTANTS.WHEEL_STEP_DELTA_NEGATIVE : INPUT_UTILITY_CONSTANTS.WHEEL_STEP_DELTA;
             
             if (event.shiftKey) {
                 this.adjustSaturation(delta);
@@ -1076,7 +1275,7 @@ class ColorPicker extends BaseObject {
         renderer.strokeStyle = ComponentTheme.getColor('focus', this.theme);
         renderer.lineWidth = 2;
         renderer.setLineDash([2, 2]);
-        renderer.strokeRect(2, 2, this.width - 4, this.height - 4);
+        renderer.strokeRect(INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_OFFSET, INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_OFFSET, this.width - INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_BORDER, this.height - INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_BORDER);
         renderer.setLineDash([]);
     }
     
@@ -1119,7 +1318,7 @@ class ColorPicker extends BaseObject {
         
         // Enhanced color wheel with better color accuracy
         const imageData = renderer.createImageData(radius * 2, radius * 2);
-        const data = imageData.data;
+        const { data } = imageData;
         
         for (let y = 0; y < radius * 2; y++) {
             for (let x = 0; x < radius * 2; x++) {
@@ -1129,16 +1328,16 @@ class ColorPicker extends BaseObject {
                 
                 if (distance <= radius) {
                     const angle = Math.atan2(dy, dx);
-                    const hue = (angle * 180 / Math.PI + 360) % 360;
+                    const hue = (angle * INPUT_UTILITY_CONSTANTS.DEGREES_TO_RADIANS_FACTOR / Math.PI + INPUT_UTILITY_CONSTANTS.HUE_MAX_DEGREES) % INPUT_UTILITY_CONSTANTS.HUE_MAX_DEGREES;
                     const saturation = Math.min(100, (distance / radius) * 100);
                     
-                    const rgb = this.hslToRgb(hue, saturation, 50);
-                    const index = (y * radius * 2 + x) * 4;
+                    const rgb = this.hslToRgb(hue, saturation, INPUT_UTILITY_CONSTANTS.COLOR_WHEEL_LIGHTNESS_DEFAULT);
+                    const index = (y * radius * 2 + x) * INPUT_UTILITY_CONSTANTS.RGBA_CHANNELS;
                     
                     data[index] = rgb.r;     // Red
                     data[index + 1] = rgb.g; // Green
                     data[index + 2] = rgb.b; // Blue
-                    data[index + 3] = 255;   // Alpha
+                    data[index + INPUT_UTILITY_CONSTANTS.ALPHA_CHANNEL_OFFSET] = INPUT_UTILITY_CONSTANTS.RGB_MAX_VALUE;   // Alpha
                 }
             }
         }
@@ -1150,7 +1349,7 @@ class ColorPicker extends BaseObject {
     }
     
     renderColorIndicator(renderer, centerX, centerY, radius) {
-        const currentAngle = this.hue * Math.PI / 180;
+        const currentAngle = this.hue * Math.PI / INPUT_UTILITY_CONSTANTS.DEGREES_TO_RADIANS_FACTOR;
         const currentDistance = (this.saturation / 100) * radius;
         const indicatorX = centerX + Math.cos(currentAngle) * currentDistance;
         const indicatorY = centerY + Math.sin(currentAngle) * currentDistance;
@@ -1159,26 +1358,26 @@ class ColorPicker extends BaseObject {
         renderer.strokeStyle = '#ffffff';
         renderer.lineWidth = 3;
         renderer.beginPath();
-        renderer.arc(indicatorX, indicatorY, 6, 0, Math.PI * 2);
+        renderer.arc(indicatorX, indicatorY, INPUT_UTILITY_CONSTANTS.COLOR_INDICATOR_RADIUS, 0, Math.PI * 2);
         renderer.stroke();
         
         renderer.strokeStyle = '#000000';
         renderer.lineWidth = 1;
         renderer.beginPath();
-        renderer.arc(indicatorX, indicatorY, 6, 0, Math.PI * 2);
+        renderer.arc(indicatorX, indicatorY, INPUT_UTILITY_CONSTANTS.COLOR_INDICATOR_RADIUS, 0, Math.PI * 2);
         renderer.stroke();
         
         // Center dot
         renderer.fillStyle = this.value;
         renderer.beginPath();
-        renderer.arc(indicatorX, indicatorY, 3, 0, Math.PI * 2);
+        renderer.arc(indicatorX, indicatorY, INPUT_UTILITY_CONSTANTS.COLOR_INDICATOR_CENTER_RADIUS, 0, Math.PI * 2);
         renderer.fill();
     }
       renderLightnessSlider(renderer) {
-        const y = 220;
-        const height = 20;
-        const startX = 20;
-        const endX = this.width - 20;
+        const y = INPUT_UTILITY_CONSTANTS.LIGHTNESS_SLIDER_Y;
+        const height = INPUT_UTILITY_CONSTANTS.SLIDER_HEIGHT;
+        const startX = INPUT_UTILITY_CONSTANTS.SLIDER_START_MARGIN;
+        const endX = this.width - INPUT_UTILITY_CONSTANTS.SLIDER_START_MARGIN;
         
         // Enhanced gradient with better color representation
         const steps = 50;
@@ -1203,10 +1402,10 @@ class ColorPicker extends BaseObject {
     }
     
     renderAlphaSlider(renderer) {
-        const y = 250;
-        const height = 20;
-        const startX = 20;
-        const endX = this.width - 20;
+        const y = INPUT_UTILITY_CONSTANTS.ALPHA_SLIDER_Y;
+        const height = INPUT_UTILITY_CONSTANTS.SLIDER_HEIGHT;
+        const startX = INPUT_UTILITY_CONSTANTS.SLIDER_START_MARGIN;
+        const endX = this.width - INPUT_UTILITY_CONSTANTS.SLIDER_START_MARGIN;
         
         // Checkerboard pattern for transparency visualization
         this.renderCheckerboard(renderer, startX, y, endX - startX, height);
@@ -1251,10 +1450,10 @@ class ColorPicker extends BaseObject {
     
     renderSliderIndicator(renderer, x, y, height) {
         // Enhanced slider indicator with better visibility
-        const indicatorWidth = 8;
-        const indicatorHeight = height + 8;
+        const indicatorWidth = INPUT_UTILITY_CONSTANTS.SLIDER_INDICATOR_WIDTH;
+        const indicatorHeight = height + INPUT_UTILITY_CONSTANTS.INDICATOR_HEIGHT_OFFSET;
         const indicatorX = x - indicatorWidth / 2;
-        const indicatorY = y - 4;
+        const indicatorY = y - INPUT_UTILITY_CONSTANTS.SLIDER_INDICATOR_OFFSET;
         
         // Shadow
         renderer.fillStyle = 'rgba(0, 0, 0, 0.2)';
@@ -1271,9 +1470,9 @@ class ColorPicker extends BaseObject {
         
         // Arrow pointer
         renderer.beginPath();
-        renderer.moveTo(x, y + height + 4);
-        renderer.lineTo(x - 4, y + height + 8);
-        renderer.lineTo(x + 4, y + height + 8);
+        renderer.moveTo(x, y + height + INPUT_UTILITY_CONSTANTS.SLIDER_INDICATOR_OFFSET);
+        renderer.lineTo(x - INPUT_UTILITY_CONSTANTS.SLIDER_INDICATOR_OFFSET, y + height + INPUT_UTILITY_CONSTANTS.INDICATOR_HEIGHT_OFFSET);
+        renderer.lineTo(x + INPUT_UTILITY_CONSTANTS.SLIDER_INDICATOR_OFFSET, y + height + INPUT_UTILITY_CONSTANTS.INDICATOR_HEIGHT_OFFSET);
         renderer.closePath();
         renderer.fill();
         renderer.stroke();
@@ -1283,7 +1482,7 @@ class ColorPicker extends BaseObject {
         const y = 280;
         const height = 20;
         const startX = 20;
-        const presetWidth = (this.width - 40) / this.presets.length;
+        const presetWidth = (this.width - INPUT_UTILITY_CONSTANTS.COLOR_DISPLAY_MARGIN) / this.presets.length;
         
         this.presets.forEach((preset, index) => {
             const x = startX + index * presetWidth;
@@ -1292,14 +1491,14 @@ class ColorPicker extends BaseObject {
             
             // Preset color
             renderer.fillStyle = color;
-            renderer.fillRect(x + 1, y + 1, presetWidth - 3, height - 2);
+            renderer.fillRect(x + INPUT_UTILITY_CONSTANTS.PRESET_BORDER_OFFSET, y + INPUT_UTILITY_CONSTANTS.PRESET_BORDER_OFFSET, presetWidth - INPUT_UTILITY_CONSTANTS.PRESET_BORDER_SIZE, height - INPUT_UTILITY_CONSTANTS.PRESET_BORDER_HEIGHT);
             
             // Border with selection highlight
             renderer.strokeStyle = isSelected ? 
                 ComponentTheme.getColor('focus', this.theme) : 
                 ComponentTheme.getColor('border', this.theme);
             renderer.lineWidth = isSelected ? 2 : 1;
-            renderer.strokeRect(x + 1, y + 1, presetWidth - 3, height - 2);
+            renderer.strokeRect(x + INPUT_UTILITY_CONSTANTS.PRESET_BORDER_OFFSET, y + INPUT_UTILITY_CONSTANTS.PRESET_BORDER_OFFSET, presetWidth - INPUT_UTILITY_CONSTANTS.PRESET_BORDER_SIZE, height - INPUT_UTILITY_CONSTANTS.PRESET_BORDER_HEIGHT);
             
             // Accessibility: Add preset name if available
             if (preset.name && this.isFocused) {
@@ -1308,7 +1507,7 @@ class ColorPicker extends BaseObject {
                 renderer.textAlign = 'center';
                 renderer.textBaseline = 'top';
                 renderer.fillText(
-                    preset.name.substring(0, 3), 
+                    preset.name.substring(0, INPUT_UTILITY_CONSTANTS.PRESET_NAME_LENGTH), 
                     x + presetWidth / 2, 
                     y + height + 2
                 );
@@ -1317,9 +1516,9 @@ class ColorPicker extends BaseObject {
     }
     
     renderCurrentColor(renderer) {
-        const x = 20;
-        const y = this.height - 40;
-        const width = this.width - 40;
+        const x = INPUT_UTILITY_CONSTANTS.SLIDER_START_MARGIN;
+        const y = this.height - INPUT_UTILITY_CONSTANTS.COLOR_DISPLAY_MARGIN;
+        const width = this.width - INPUT_UTILITY_CONSTANTS.COLOR_DISPLAY_MARGIN;
         const height = 20;
         
         // Background for alpha visualization
@@ -1357,7 +1556,7 @@ class ColorPicker extends BaseObject {
         renderer.textBaseline = 'top';
         
         instructions.forEach((instruction, index) => {
-            renderer.fillText(instruction, 5, 5 + index * 12);
+            renderer.fillText(instruction, INPUT_UTILITY_CONSTANTS.INSTRUCTION_MARGIN, INPUT_UTILITY_CONSTANTS.INSTRUCTION_MARGIN + index * INPUT_UTILITY_CONSTANTS.INSTRUCTION_LINE_HEIGHT);
         });
     }
     
@@ -1417,7 +1616,7 @@ class ColorPicker extends BaseObject {
     }
     
     setColorComponents({ hue, saturation, lightness, alpha }) {
-        if (hue !== undefined) this.hue = Math.max(0, Math.min(360, hue));
+        if (hue !== undefined) this.hue = Math.max(0, Math.min(INPUT_UTILITY_CONSTANTS.HUE_MAX_DEGREES, hue));
         if (saturation !== undefined) this.saturation = Math.max(0, Math.min(100, saturation));
         if (lightness !== undefined) this.lightness = Math.max(0, Math.min(100, lightness));
         if (alpha !== undefined) this.alpha = Math.max(0, Math.min(1, alpha));
@@ -1484,7 +1683,7 @@ class ColorPicker extends BaseObject {
             super.destroy?.();            
             this.emit('destroyed');
         } catch (error) {
-            console.error('Error during ColorPicker cleanup:', error);
+            ComponentDebug.componentError('ColorPicker', error, 'cleanup');
         }
     }
 }
@@ -1501,8 +1700,8 @@ class Accordion extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
-            width: options.width || 400,
-            height: options.height || 300,
+            width: options.width || INPUT_UTILITY_CONSTANTS.DEFAULT_ACCORDION_WIDTH,
+            height: options.height || INPUT_UTILITY_CONSTANTS.DEFAULT_ACCORDION_HEIGHT,
             ariaRole: 'region',
             ariaLabel: options.ariaLabel || 'Accordion'
         });
@@ -1514,12 +1713,12 @@ class Accordion extends BaseObject {
         this.items = options.items || [];
         this.allowMultiple = options.allowMultiple || false;
         this.expandedItems = new Set(options.expandedItems || []);
-        this.animationDuration = options.animationDuration || 300;
+        this.animationDuration = options.animationDuration || INPUT_UTILITY_CONSTANTS.DEFAULT_ANIMATION_DURATION;
         this.disabled = options.disabled || false;
         
         // Theme integration
         this.theme = options.theme || ComponentTheme.getCurrentTheme();
-        this.headerHeight = options.headerHeight || 40;
+        this.headerHeight = options.headerHeight || INPUT_UTILITY_CONSTANTS.DEFAULT_HEADER_HEIGHT;
         
         // Animation and performance
         this.animatingItems = new Map();
@@ -1590,7 +1789,7 @@ class Accordion extends BaseObject {
                     { context, originalError: error }
                 );
                 
-                console.error('Accordion Error:', componentError);
+                ComponentDebug.error('Accordion Error:', componentError);
                 this.emit('error', componentError);
                 
                 this.recoverFromError(context);
@@ -1626,7 +1825,7 @@ class Accordion extends BaseObject {
     
     setupResizeObserver() {
         if ('ResizeObserver' in window) {
-            this.resizeObserver = new ResizeObserver(entries => {
+            this.resizeObserver = new ResizeObserver(_entries => {
                 this.clearRenderCache();
                 this.throttledRender();
             });
@@ -1723,11 +1922,6 @@ class Accordion extends BaseObject {
     }
     
     async animateItem(itemId, type) {
-        const animationConfig = {
-            duration: this.animationDuration,
-            easing: type === 'expand' ? 'ease-out' : 'ease-in'
-        };
-        
         const animationData = {
             type,
             startTime: performance.now(),
@@ -1866,7 +2060,7 @@ class Accordion extends BaseObject {
         
         // Calculate wrapped lines for better height estimation
         let totalLines = 0;
-        const maxWidth = this.width - 24;
+        const maxWidth = this.width - INPUT_UTILITY_CONSTANTS.ACCORDION_PADDING;
         
         // Create temporary canvas for text measurement
         const tempCanvas = new OffscreenCanvas(1, 1);
@@ -1880,7 +2074,7 @@ class Accordion extends BaseObject {
         
         const estimatedHeight = totalLines * baseHeight + padding;
         
-        return Math.max(60, estimatedHeight);
+        return Math.max(INPUT_UTILITY_CONSTANTS.ACCORDION_MIN_HEIGHT, estimatedHeight);
     }
     
     // Enhanced keyboard navigation
@@ -1985,12 +2179,14 @@ class Accordion extends BaseObject {
             super.destroy?.();
             this.emit('destroyed');
         } catch (error) {
-            console.error('Error during Accordion cleanup:', error);
+            ComponentDebug.error('Error during Accordion cleanup:', error);
         }
     }
     
     easeInOut(t) {
-        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+        return t < INPUT_UTILITY_CONSTANTS.EASE_IN_OUT_THRESHOLD ? 
+            INPUT_UTILITY_CONSTANTS.EASE_MULTIPLIER * t * t : 
+            -1 + (INPUT_UTILITY_CONSTANTS.EASE_IN_OUT_MULTIPLIER - INPUT_UTILITY_CONSTANTS.EASE_MULTIPLIER * t) * t;
     }
     
     getItemBounds(itemIndex) {
@@ -2036,27 +2232,9 @@ class Accordion extends BaseObject {
         }
     }
     
-    handleKeyDown(event) {
-        // Implement keyboard navigation
-        switch (event.key) {
-            case 'ArrowUp':
-                // Navigate to previous item
-                break;
-            case 'ArrowDown':
-                // Navigate to next item
-                break;
-            case 'Enter':
-            case ' ':
-                // Toggle focused item
-                break;
-        }
-    }
-    
     // Rendering
     renderSelf(renderer) {
         if (renderer.type !== 'canvas') return;
-        
-        let currentY = 0;
         
         this.items.forEach((item, index) => {
             const bounds = this.getItemBounds(index);
@@ -2093,12 +2271,12 @@ class Accordion extends BaseObject {
             renderer.strokeStyle = ComponentTheme.getColor('focus', this.theme);
             renderer.lineWidth = 2;
             renderer.setLineDash([2, 2]);
-            renderer.strokeRect(bounds.x + 2, bounds.y + 2, bounds.width - 4, bounds.headerHeight - 4);
+            renderer.strokeRect(bounds.x + INPUT_UTILITY_CONSTANTS.ACCORDION_STROKE_OFFSET, bounds.y + INPUT_UTILITY_CONSTANTS.ACCORDION_STROKE_OFFSET, bounds.width - INPUT_UTILITY_CONSTANTS.ACCORDION_STROKE_BORDER, bounds.headerHeight - INPUT_UTILITY_CONSTANTS.ACCORDION_STROKE_BORDER);
             renderer.setLineDash([]);
         }
         
         // Expand/collapse icon
-        const iconX = bounds.x + 12;
+        const iconX = bounds.x + INPUT_UTILITY_CONSTANTS.ACCORDION_ICON_MARGIN;
         const iconY = bounds.y + bounds.headerHeight / 2;
         
         renderer.fillStyle = item.disabled ? 
@@ -2110,13 +2288,13 @@ class Accordion extends BaseObject {
         renderer.fillText(isExpanded ? '▼' : '▶', iconX, iconY);
         
         // Item icon
-        let textX = iconX + 20;
+        let textX = iconX + INPUT_UTILITY_CONSTANTS.ACCORDION_ICON_SIZE;
         if (item.icon) {
             renderer.fillStyle = item.disabled ? 
                 ComponentTheme.getColor('disabled', this.theme) : 
                 ComponentTheme.getColor('primary', this.theme);
             renderer.fillText(item.icon, textX, iconY);
-            textX += 20;
+            textX += INPUT_UTILITY_CONSTANTS.ACCORDION_ICON_SIZE;
         }
         
         // Title
@@ -2128,7 +2306,7 @@ class Accordion extends BaseObject {
         renderer.textBaseline = 'middle';
         
         // Truncate title if too long
-        const maxTitleWidth = bounds.width - textX - 12;
+        const maxTitleWidth = bounds.width - textX - INPUT_UTILITY_CONSTANTS.ACCORDION_ICON_MARGIN;
         const truncatedTitle = this.truncateText(renderer, item.title, maxTitleWidth);
         renderer.fillText(truncatedTitle, textX, iconY);
         
@@ -2146,7 +2324,6 @@ class Accordion extends BaseObject {
         }
         
         const ellipsis = '...';
-        const ellipsisWidth = renderer.measureText(ellipsis).width;
         
         let truncated = text;
         while (renderer.measureText(truncated + ellipsis).width > maxWidth && truncated.length > 0) {
@@ -2157,7 +2334,7 @@ class Accordion extends BaseObject {
     }
       renderItemContent(renderer, item, bounds) {
         const contentY = bounds.y + bounds.headerHeight;
-        const contentHeight = bounds.contentHeight;
+        const { contentHeight } = bounds;
         
         if (contentHeight <= 0) return;
         
@@ -2177,13 +2354,13 @@ class Accordion extends BaseObject {
         renderer.textBaseline = 'top';
         
         const lines = item.content.split('\n');
-        const maxWidth = bounds.width - 24; // Account for padding
+        const maxWidth = bounds.width - INPUT_UTILITY_CONSTANTS.ACCORDION_PADDING; // Account for padding
         
         lines.forEach((line, lineIndex) => {
             const wrappedLines = this.wrapText(renderer, line, maxWidth);
             wrappedLines.forEach((wrappedLine, wrapIndex) => {
                 const totalLineIndex = lineIndex + wrapIndex;
-                renderer.fillText(wrappedLine, bounds.x + 12, contentY + 12 + totalLineIndex * 16);
+                renderer.fillText(wrappedLine, bounds.x + INPUT_UTILITY_CONSTANTS.ACCORDION_ICON_MARGIN, contentY + INPUT_UTILITY_CONSTANTS.ACCORDION_ICON_MARGIN + totalLineIndex * INPUT_UTILITY_CONSTANTS.ACCORDION_LINE_HEIGHT);
             });
         });
     }
@@ -2272,20 +2449,6 @@ class Accordion extends BaseObject {
         }
     }
     
-    expandAll() {
-        this.items.forEach(item => {
-            if (!item.disabled) {
-                this.expandedItems.add(item.id);
-            }
-        });
-        this.emit('allExpanded');
-    }
-    
-    collapseAll() {
-        this.expandedItems.clear();
-        this.animatingItems.clear();
-        this.emit('allCollapsed');
-    }
 }
 
 // =============================================================================
@@ -2296,8 +2459,8 @@ class DateTimePicker extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
-            width: options.width || 320,
-            height: options.height || 280,
+            width: options.width || INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_DEFAULT_WIDTH,
+            height: options.height || INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_DEFAULT_HEIGHT,
             ariaRole: 'application',
             ariaLabel: options.ariaLabel || 'Date Time Picker'
         });
@@ -2377,8 +2540,8 @@ class DateTimePicker extends BaseObject {
         return {
             'ArrowLeft': () => this.currentView === 'calendar' ? this.navigateDay(-1) : null,
             'ArrowRight': () => this.currentView === 'calendar' ? this.navigateDay(1) : null,
-            'ArrowUp': () => this.currentView === 'calendar' ? this.navigateDay(-7) : null,
-            'ArrowDown': () => this.currentView === 'calendar' ? this.navigateDay(7) : null,
+            'ArrowUp': () => this.currentView === 'calendar' ? this.navigateDay(-INPUT_UTILITY_CONSTANTS.DAYS_PER_WEEK) : null,
+            'ArrowDown': () => this.currentView === 'calendar' ? this.navigateDay(INPUT_UTILITY_CONSTANTS.DAYS_PER_WEEK) : null,
             'Enter': () => this.confirmSelection(),
             'Escape': () => this.close(),
             'Home': () => this.goToToday(),
@@ -2398,7 +2561,7 @@ class DateTimePicker extends BaseObject {
                     { context, originalError: error }
                 );
                 
-                console.error('DateTimePicker Error:', componentError);
+                ComponentDebug.error('DateTimePicker Error:', componentError);
                 this.emit('error', componentError);
                 
                 this.recoverFromError(context);
@@ -2436,7 +2599,8 @@ class DateTimePicker extends BaseObject {
     
     setupResizeObserver() {
         if ('ResizeObserver' in window) {
-            this.resizeObserver = new ResizeObserver(entries => {                this.clearRenderCache();
+            this.resizeObserver = new ResizeObserver(_entries => {
+                this.clearRenderCache();
                 this.throttledRender();
             });
             
@@ -2556,8 +2720,8 @@ class DateTimePicker extends BaseObject {
             if (this.show24Hour) {
                 return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
             } else {
-                const ampm = hour >= 12 ? 'PM' : 'AM';
-                const displayHour = hour % 12 || 12;
+                const ampm = hour >= INPUT_UTILITY_CONSTANTS.HOURS_IN_12_FORMAT ? 'PM' : 'AM';
+                const displayHour = hour % INPUT_UTILITY_CONSTANTS.HOURS_IN_12_FORMAT || INPUT_UTILITY_CONSTANTS.HOURS_IN_12_FORMAT;
                 return `${displayHour}:${String(minute).padStart(2, '0')} ${ampm}`;
             }
         } catch (error) {
@@ -2612,7 +2776,7 @@ class DateTimePicker extends BaseObject {
             if (this.displayMonth < 0) {
                 this.displayMonth = 11;
                 this.displayYear--;
-            } else if (this.displayMonth > 11) {
+            } else if (this.displayMonth > INPUT_UTILITY_CONSTANTS.MONTHS_PER_YEAR - 1) {
                 this.displayMonth = 0;
                 this.displayYear++;
             }
@@ -2725,12 +2889,12 @@ class DateTimePicker extends BaseObject {
     handleCalendarClick(x, y) {
         try {
             // Header navigation
-            if (y < 40) {
-                if (x < 40) {
+            if (y < INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_HEADER_HEIGHT) {
+                if (x < INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_NAV_BUTTON_SIZE) {
                     this.navigateMonth(-1);
-                } else if (x > this.width - 40) {
+                } else if (x > this.width - INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_NAV_BUTTON_SIZE) {
                     this.navigateMonth(1);
-                } else if (this.showTime && x > this.width - 80) {
+                } else if (this.showTime && x > this.width - INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_TIME_BUTTON_WIDTH) {
                     this.currentView = 'time';
                     this.announceChange('Switched to time selection');
                 }
@@ -2738,8 +2902,8 @@ class DateTimePicker extends BaseObject {
             }
             
             // Calendar grid
-            const gridY = y - 70; // Account for header and day labels
-            const cellWidth = this.width / 7;
+            const gridY = y - INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_CALENDAR_TOP_OFFSET; // Account for header and day labels
+            const cellWidth = this.width / INPUT_UTILITY_CONSTANTS.DAYS_PER_WEEK;
             const cellHeight = 30;
             
             if (gridY >= 0) {
@@ -2747,7 +2911,7 @@ class DateTimePicker extends BaseObject {
                 const row = Math.floor(gridY / cellHeight);
                 
                 const firstDay = this.getFirstDayOfMonth(this.displayMonth, this.displayYear);
-                const dayNumber = row * 7 + col - firstDay + 1;
+                const dayNumber = row * INPUT_UTILITY_CONSTANTS.DAYS_PER_WEEK + col - firstDay + 1;
                 const daysInMonth = this.getDaysInMonth(this.displayMonth, this.displayYear);
                 
                 if (dayNumber >= 1 && dayNumber <= daysInMonth) {
@@ -2783,22 +2947,22 @@ class DateTimePicker extends BaseObject {
                 const angle = Math.atan2(dy, dx);
                 const normalizedAngle = (angle + Math.PI * 2) % (Math.PI * 2);
                 
-                if (distance < radius * 0.6) {
+                if (distance < radius * INPUT_UTILITY_CONSTANTS.TIME_SELECTOR_RADIUS_FACTOR) {
                     // Hour selection
-                    this.selectedHour = Math.floor((normalizedAngle / (Math.PI * 2)) * 12);
+                    this.selectedHour = Math.floor((normalizedAngle / (Math.PI * 2)) * INPUT_UTILITY_CONSTANTS.HOURS_IN_12_FORMAT);
                     if (!this.show24Hour && this.selectedHour === 0) {
                         this.selectedHour = 12;
                     }
                 } else {
                     // Minute selection
-                    this.selectedMinute = Math.floor((normalizedAngle / (Math.PI * 2)) * 60);
+                    this.selectedMinute = Math.floor((normalizedAngle / (Math.PI * 2)) * INPUT_UTILITY_CONSTANTS.MINUTES_PER_HOUR);
                 }
                 
                 this.updateDateTime();
             }
             
             // Back to calendar button
-            if (y < 40 && x < 80) {
+            if (y < INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_HEADER_HEIGHT && x < INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_TIME_BUTTON_WIDTH) {
                 this.currentView = 'calendar';
                 this.announceChange('Switched to calendar view');
             }
@@ -2864,7 +3028,7 @@ class DateTimePicker extends BaseObject {
         
         // Close picker on blur if not persistent
         if (this.isOpen && !this.persistent) {
-            setTimeout(() => this.close(), 150);
+            setTimeout(() => this.close(), INPUT_UTILITY_CONSTANTS.CLOSE_TIMEOUT);
         }
     }
     
@@ -2916,7 +3080,7 @@ class DateTimePicker extends BaseObject {
         }
         
         // Create off-screen canvas for caching
-        const offscreenCanvas = new OffscreenCanvas(this.width, 40);
+        const offscreenCanvas = new OffscreenCanvas(this.width, INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_HEADER_RENDER_HEIGHT);
         const offscreenRenderer = offscreenCanvas.getContext('2d');
         
         // Render input field to off-screen canvas
@@ -2932,7 +3096,7 @@ class DateTimePicker extends BaseObject {
         renderer.fillStyle = this.disabled ? 
             ComponentTheme.getColor('disabled', this.theme) : 
             ComponentTheme.getColor('background', this.theme);
-        renderer.fillRect(0, 0, this.width, 40);
+        renderer.fillRect(0, 0, this.width, INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_HEADER_RENDER_HEIGHT);
         
         // Border with theme support
         const borderColor = this.disabled ? 
@@ -2942,7 +3106,7 @@ class DateTimePicker extends BaseObject {
             
         renderer.strokeStyle = borderColor;
         renderer.lineWidth = this.isFocused ? 2 : 1;
-        renderer.strokeRect(0, 0, this.width, 40);
+        renderer.strokeRect(0, 0, this.width, INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_HEADER_RENDER_HEIGHT);
         
         // Date text
         renderer.fillStyle = this.disabled ? 
@@ -2954,16 +3118,16 @@ class DateTimePicker extends BaseObject {
         
         let displayText = this.formatDate(this.value);
         if (this.showTime) {
-            displayText += ' ' + this.formatTime(this.selectedHour, this.selectedMinute);
+            displayText += ` ${this.formatTime(this.selectedHour, this.selectedMinute)}`;
         }
         
-        renderer.fillText(displayText, 12, 20);
+        renderer.fillText(displayText, INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_TEXT_MARGIN, INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_ICON_MARGIN);
         
         // Calendar icon
         renderer.fillStyle = ComponentTheme.getColor('textSecondary', this.theme);
         renderer.font = '16px Arial';
         renderer.textAlign = 'right';
-        renderer.fillText('📅', this.width - 12, 20);
+        renderer.fillText('📅', this.width - INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_TEXT_MARGIN, INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_ICON_MARGIN);
         
         // Focus indicator
         if (this.isFocused) {
@@ -4171,7 +4335,7 @@ class Drawer extends BaseObject {
         this.theme = options.theme || ComponentTheme.getCurrentTheme();
         
         // Animation and performance
-        this.animationDuration = options.animationDuration || 300;
+        this.animationDuration = options.animationDuration || INPUT_UTILITY_CONSTANTS.DEFAULT_ANIMATION_DURATION;
         this.animationState = { 
             isAnimating: false, 
             progress: this.isOpen ? 1 : 0,
@@ -5635,9 +5799,9 @@ class SearchBox extends BaseObject {
             renderer.textAlign = 'left';
             renderer.textBaseline = 'middle';
             
-            const maxWidth = this.width - 24;
+            const maxWidth = this.width - INPUT_UTILITY_CONSTANTS.ACCORDION_PADDING;
             const truncatedSuggestion = this.truncateText(renderer, suggestion, maxWidth);
-            renderer.fillText(truncatedSuggestion, 12, y + height / 2);
+            renderer.fillText(truncatedSuggestion, INPUT_UTILITY_CONSTANTS.ACCORDION_ICON_MARGIN, y + height / 2);
         }
         
         // Selection indicator

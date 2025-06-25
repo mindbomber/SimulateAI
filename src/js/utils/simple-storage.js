@@ -249,10 +249,8 @@ class UserPreferences {
     // Accessibility preferences
     getAccessibilitySettings() {
         return this.storage.get('accessibility', {
-            highContrast: false,
-            largeText: false,
-            reducedMotion: false,
-            screenReader: false
+            // Note: undefined values mean user hasn't set them explicitly
+            // Boolean values mean user has made an explicit choice
         });
     }
     

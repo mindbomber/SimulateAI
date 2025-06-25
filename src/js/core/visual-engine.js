@@ -20,6 +20,24 @@ import { DataTable, NotificationToast, LoadingSpinner } from '../objects/priorit
 import { TabContainer, ProgressStepper, SplitPane, TreeView, FileUpload } from '../objects/layout-components.js';
 import { ColorPicker, Accordion, DateTimePicker, NumberInput, Drawer, SearchBox } from '../objects/input-utility-components.js';
 
+// Constants to avoid magic numbers
+const ENGINE_CONSTANTS = {
+    DEFAULT_MAX_FPS: 60,
+    DEFAULT_WIDTH: 800,
+    DEFAULT_HEIGHT: 600,
+    MIN_DEVICE_MEMORY: 2, // GB
+    MIN_CORES: 2,
+    FPS_UPDATE_INTERVAL: 1000, // ms
+    DEBUG_PANEL_MIN_WIDTH: 200,
+    DEBUG_PANEL_POSITION: {
+        TOP: 10,
+        RIGHT: 10,
+        PADDING: 10,
+        BORDER_RADIUS: 4,
+        Z_INDEX: 1000
+    }
+};
+
 export class VisualEngine {
     constructor(container, options = {}) {
         this.container = container;
@@ -27,10 +45,10 @@ export class VisualEngine {
             renderMode: options.renderMode || 'auto', // 'svg', 'canvas', 'webgl', 'auto'
             accessibility: options.accessibility !== false,
             highPerformance: options.highPerformance || false,
-            maxFPS: options.maxFPS || 60,
+            maxFPS: options.maxFPS || ENGINE_CONSTANTS.DEFAULT_MAX_FPS,
             debug: options.debug || false,
-            width: options.width || 800,
-            height: options.height || 600,
+            width: options.width || ENGINE_CONSTANTS.DEFAULT_WIDTH,
+            height: options.height || ENGINE_CONSTANTS.DEFAULT_HEIGHT,
             ...options
         };
         
@@ -61,15 +79,16 @@ export class VisualEngine {
     }
 
     init() {
-        console.log('VisualEngine: Initializing...');
-          this.setupRenderer();
+        this.logInfo('Initializing...');
+        
+        this.setupRenderer();
         this.setupInputManager();
         this.setupAccessibility();
         this.setupEventListeners();
         this.setupPerformanceMonitoring();
         this.setupComponentRegistry();
         
-        console.log(`VisualEngine: Initialized with ${this.renderer.type} renderer`);
+        this.logInfo(`Initialized with ${this.renderer.type} renderer`);
     }
 
     setupRenderer() {
@@ -80,7 +99,7 @@ export class VisualEngine {
                 try {
                     this.renderer = new WebGLRenderer(this.container, this.options);
                 } catch (error) {
-                    console.warn('WebGL renderer failed to initialize, falling back to Canvas:', error);
+                    this.logWarning('WebGL renderer failed to initialize, falling back to Canvas', error);
                     this.renderer = new CanvasRenderer(this.container, this.options);
                 }
                 break;
@@ -95,7 +114,7 @@ export class VisualEngine {
         }
         
         this.renderer.engine = this;
-        console.log(`VisualEngine: Using ${this.renderer.type} renderer`);
+        this.logInfo(`Using ${this.renderer.type} renderer`);
     }
 
     setupInputManager() {
@@ -177,7 +196,7 @@ export class VisualEngine {
         this.registerComponent('drawer', Drawer);
         this.registerComponent('search-box', SearchBox);
         
-        console.log('Component registry initialized with', this.componentRegistry.size, 'component types');
+        this.logInfo(`Component registry initialized with ${this.componentRegistry.size} component types`);
     }
 
     registerComponent(name, componentClass) {
@@ -186,7 +205,7 @@ export class VisualEngine {
     }    createComponent(type, options = {}) {
         const ComponentClass = this.componentRegistry.get(type);
         if (!ComponentClass) {
-            console.warn(`Component type "${type}" not found in registry`);
+            this.logWarning(`Component type "${type}" not found in registry`);
             return null;
         }
         
@@ -199,17 +218,17 @@ export class VisualEngine {
             
             return component;
         } catch (error) {
-            console.error(`Failed to create component of type "${type}":`, error);
+            this.logError(`Failed to create component of type "${type}"`, error);
             return null;
         }
-    }destroyComponent(component) {
+    }    destroyComponent(component) {
         if (!component) {
-            console.warn('Attempted to destroy null/undefined component');
+            this.logWarning('Attempted to destroy null/undefined component');
             return;
         }
         
         // Find component type and remove from instances
-        for (const [type, instances] of this.componentInstances) {
+        for (const [, instances] of this.componentInstances) {
             if (instances.has(component)) {
                 instances.delete(component);
                 break;
@@ -275,13 +294,13 @@ export class VisualEngine {
             const memory = navigator.deviceMemory;
             const cores = navigator.hardwareConcurrency;
             
-            if (memory && memory < 2) return true; // Less than 2GB RAM
-            if (cores && cores < 2) return true;   // Single core
+            if (memory && memory < ENGINE_CONSTANTS.MIN_DEVICE_MEMORY) return true; // Less than 2GB RAM
+            if (cores && cores < ENGINE_CONSTANTS.MIN_CORES) return true;   // Less than 2 cores
             
             return false;
         } catch (error) {
             // If device detection fails, assume it's not a low-end device
-            console.warn('Device detection failed:', error);
+            this.logWarning('Device detection failed', error);
             return false;
         }
     }
@@ -295,26 +314,26 @@ export class VisualEngine {
         this.lastFrameTime = performance.now();
         this.lastFPSUpdate = this.lastFrameTime;
         
-        console.log('VisualEngine: Starting animation loop');
+        this.logInfo('Starting animation loop');
         this.animate();
     }
 
     stop() {
         this.isRunning = false;
         this.isPaused = false;
-        console.log('VisualEngine: Stopped');
+        this.logInfo('Stopped');
     }
 
     pause() {
         this.isPaused = true;
-        console.log('VisualEngine: Paused');
+        this.logInfo('Paused');
     }
 
     resume() {
         if (this.isRunning && this.isPaused) {
             this.isPaused = false;
             this.lastFrameTime = performance.now();
-            console.log('VisualEngine: Resumed');
+            this.logInfo('Resumed');
         }
     }
 
@@ -371,8 +390,8 @@ export class VisualEngine {
         this.performanceStats.frameTime = performance.now() - currentTime;
         
         // Update FPS counter every second
-        if (currentTime - this.lastFPSUpdate >= 1000) {
-            this.performanceStats.fps = Math.round((this.frameCount * 1000) / (currentTime - this.lastFPSUpdate));
+        if (currentTime - this.lastFPSUpdate >= ENGINE_CONSTANTS.FPS_UPDATE_INTERVAL) {
+            this.performanceStats.fps = Math.round((this.frameCount * ENGINE_CONSTANTS.FPS_UPDATE_INTERVAL) / (currentTime - this.lastFPSUpdate));
             this.frameCount = 0;
             this.lastFPSUpdate = currentTime;
               if (this.options.debug) {
@@ -382,7 +401,7 @@ export class VisualEngine {
     }    // Object management
     addObject(object) {
         if (!object) {
-            console.warn('Attempted to add null/undefined object to scene');
+            this.logWarning('Attempted to add null/undefined object to scene');
             return null;
         }
         
@@ -397,7 +416,7 @@ export class VisualEngine {
 
     removeObject(object) {
         if (!object) {
-            console.warn('Attempted to remove null/undefined object from scene');
+            this.logWarning('Attempted to remove null/undefined object from scene');
             return;
         }
         
@@ -467,16 +486,16 @@ export class VisualEngine {
         this.debugPanel = document.createElement('div');
         this.debugPanel.style.cssText = `
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: ${ENGINE_CONSTANTS.DEBUG_PANEL_POSITION.TOP}px;
+            right: ${ENGINE_CONSTANTS.DEBUG_PANEL_POSITION.RIGHT}px;
             background: rgba(0, 0, 0, 0.8);
             color: white;
-            padding: 10px;
+            padding: ${ENGINE_CONSTANTS.DEBUG_PANEL_POSITION.PADDING}px;
             font-family: monospace;
             font-size: 12px;
-            border-radius: 4px;
-            z-index: 1000;
-            min-width: 200px;
+            border-radius: ${ENGINE_CONSTANTS.DEBUG_PANEL_POSITION.BORDER_RADIUS}px;
+            z-index: ${ENGINE_CONSTANTS.DEBUG_PANEL_POSITION.Z_INDEX};
+            min-width: ${ENGINE_CONSTANTS.DEBUG_PANEL_MIN_WIDTH}px;
         `;
         
         if (this.container.style.position !== 'absolute' && 
@@ -504,8 +523,53 @@ export class VisualEngine {
                 <div>Renderer: ${this.renderer ? this.renderer.type : 'None'}</div>
             `;
         } catch (error) {
-            console.error('Error updating debug panel:', error);
+            this.logError('Error updating debug panel', error);
         }
+    }
+
+    // Event system for external integration
+    emit(eventName, data = {}) {
+        // Simple event emission - can be enhanced with proper EventEmitter if needed
+        if (typeof this.options.onEvent === 'function') {
+            this.options.onEvent(eventName, data);
+        }
+        
+        // If there's a global event system, use it
+        if (typeof window !== 'undefined' && window.dispatchEvent) {
+            const customEvent = new CustomEvent(`visualengine:${eventName}`, {
+                detail: data
+            });
+            window.dispatchEvent(customEvent);
+        }
+    }
+
+    // Error handling and logging
+    logInfo(message, data = null) {
+        if (this.options.debug) {
+            // eslint-disable-next-line no-console
+            console.log(`VisualEngine: ${message}`, data || '');
+        }
+    }
+
+    logWarning(message, data = null) {
+        if (this.options.debug) {
+            // eslint-disable-next-line no-console
+            console.warn(`VisualEngine: ${message}`, data || '');
+        }
+    }
+
+    logError(message, error = null) {
+        if (this.options.debug) {
+            // eslint-disable-next-line no-console
+            console.error(`VisualEngine: ${message}`, error || '');
+        }
+        
+        // Emit error event for external handling
+        this.emit?.('error', {
+            message,
+            error: error?.message || error,
+            timestamp: Date.now()
+        });
     }
 
     // Utility methods
@@ -548,9 +612,9 @@ export class VisualEngine {
                 this.componentInstances.clear();
             }
             
-            console.log('VisualEngine: Destroyed');
+            this.logInfo('Destroyed');
         } catch (error) {
-            console.error('Error during VisualEngine destruction:', error);
+            this.logError('Error during VisualEngine destruction', error);
         }
     }
 }

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Preference Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            padding: 2rem;
+            background: #fff;
+            color: #333;
+        }
+        .test-section {
+            margin: 1rem 0;
+            padding: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .test-button {
+            padding: 0.5rem 1rem;
+            margin: 0.5rem;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+            cursor: pointer;
+        }
+        .test-button:hover {
+            background: #e9e9e9;
+        }
+        .status {
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        .warning {
+            color: #d32f2f;
+            background: #fff3e0;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+        .success {
+            color: #2e7d32;
+            background: #e8f5e8;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+        .info {
+            color: #1976d2;
+            background: #e3f2fd;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Theme Preference Bug Test</h1>
+    
+    <div class="info">
+        <h3>Test Instructions:</h3>
+        <ol>
+            <li><strong>Initial State:</strong> Check current system and app theme state</li>
+            <li><strong>Toggle App Dark Mode:</strong> Click dark mode button in app</li>
+            <li><strong>Change System Theme:</strong> Change your OS dark mode setting</li>
+            <li><strong>Verify Persistence:</strong> App should maintain your choice regardless of system changes</li>
+        </ol>
+    </div>
+    
+    <div class="test-section">
+        <h3>Current States</h3>
+        <div id="system-state" class="status">System Dark Mode: <span id="system-dark"></span></div>
+        <div id="app-state" class="status">App Storage Dark Mode: <span id="app-dark"></span></div>
+        <div id="media-state" class="status">Media Query Dark: <span id="media-dark"></span></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Quick Actions</h3>
+        <button class="test-button" onclick="clearAppStorage()">Clear App Storage</button>
+        <button class="test-button" onclick="checkStates()">Refresh States</button>
+        <button class="test-button" onclick="simulateSystemChange()">Simulate System Change</button>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test Results</h3>
+        <div id="test-results"></div>
+    </div>
+    
+    <div class="warning">
+        <h3>Expected Behavior After Fix:</h3>
+        <ul>
+            <li>When app loads: Uses system preference if no user setting saved</li>
+            <li>When user toggles: Saves user preference and maintains it</li>
+            <li>When system changes: Only affects preferences user hasn't set</li>
+            <li>User choices always take priority over system defaults</li>
+        </ul>
+    </div>
+
+    <script>
+        // Check if we can access the main app's storage
+        function checkStates() {
+            const systemDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+            document.getElementById('system-dark').textContent = systemDark ? 'Yes' : 'No';
+            document.getElementById('media-dark').textContent = systemDark ? 'Yes' : 'No';
+            
+            // Try to read app storage
+            try {
+                const appStorage = localStorage.getItem('ai_ethics_accessibility');
+                if (appStorage) {
+                    const parsed = JSON.parse(appStorage);
+                    document.getElementById('app-dark').textContent = 
+                        parsed.darkMode !== undefined ? (parsed.darkMode ? 'Yes' : 'No') : 'Not Set';
+                } else {
+                    document.getElementById('app-dark').textContent = 'No Storage';
+                }
+            } catch (e) {
+                document.getElementById('app-dark').textContent = 'Error: ' + e.message;
+            }
+        }
+        
+        function clearAppStorage() {
+            try {
+                localStorage.removeItem('ai_ethics_accessibility');
+                addTestResult('Cleared app storage', 'success');
+                checkStates();
+            } catch (e) {
+                addTestResult('Error clearing storage: ' + e.message, 'warning');
+            }
+        }
+        
+        function simulateSystemChange() {
+            addTestResult('System theme changes are automatic - change your OS settings to test', 'info');
+        }
+        
+        function addTestResult(message, type = 'info') {
+            const results = document.getElementById('test-results');
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            results.appendChild(div);
+        }
+        
+        // Monitor system theme changes
+        const darkModeQuery = window.matchMedia?.('(prefers-color-scheme: dark)');
+        darkModeQuery?.addEventListener?.('change', (e) => {
+            addTestResult(`System theme changed to: ${e.matches ? 'Dark' : 'Light'}`, 'info');
+            checkStates();
+        });
+        
+        // Initial check
+        checkStates();
+        addTestResult('Theme test page loaded', 'success');
+    </script>
+</body>
+</html>

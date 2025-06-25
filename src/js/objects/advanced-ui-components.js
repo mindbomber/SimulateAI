@@ -8,17 +8,116 @@
  */
 
 import { 
-    BaseObject, 
-    animationManager, 
-    EasingFunctions,
+    BaseObject,
     clamp,
-    lerp,
     validateNumber,
     validateString,
-    TOUCH_TARGET_SIZE,
-    FOCUS_RING_WIDTH,
-    DEFAULT_ANIMATION_DURATION
+    FOCUS_RING_WIDTH
 } from './enhanced-objects.js';
+
+// Constants to avoid magic numbers
+const COMPONENT_CONSTANTS = {
+    // Modal defaults
+    DEFAULT_MODAL_WIDTH: 400,
+    DEFAULT_MODAL_HEIGHT: 300,
+    MODAL_SHADOW_OFFSET: 4,
+    MODAL_CLOSE_BUTTON_SIZE: 24,
+    MODAL_CLOSE_BUTTON_PADDING: 6,
+    
+    // Button defaults
+    DEFAULT_BUTTON_WIDTH: 100,
+    DEFAULT_BUTTON_HEIGHT: 36,
+    CLOSE_BUTTON_X_PADDING: 6,
+    
+    // Navigation menu defaults
+    DEFAULT_NAV_WIDTH: 250,
+    DEFAULT_NAV_HEIGHT: 400,
+    ANIMATION_STAGGER_OFFSET: 50,
+    
+    // Text and layout
+    DEFAULT_LINE_HEIGHT: 20,
+    ICON_WIDTH: 25,
+    BADGE_WIDTH: 30,
+    BADGE_MIN_WIDTH: 20,
+    BADGE_CHAR_WIDTH: 8,
+    BADGE_PADDING: 5,
+    BADGE_HEIGHT: 16,
+    SUBMENU_INDICATOR_SIZE: 15,
+    SUBMENU_ARROW_SIZE: 6,
+    
+    // Animation values
+    SELECTION_SCALE: 1.05,
+    FOCUS_SCALE: 1.02,
+    ANIMATION_FAST: 100,
+    ANIMATION_NORMAL: 150,
+    PERFORMANCE_THRESHOLD: 16, // 1 frame at 60fps
+    
+    // Color calculations
+    RANDOM_BASE: 36,
+    RANDOM_LENGTH: 9,
+    COLOR_SUBSTR_START: 4,
+    COLOR_SUBSTR_LENGTH: 2,
+    RGB_MAX: 255,
+    LUMINANCE_THRESHOLD: 0.5,
+    LUMINANCE_RED: 0.299,
+    LUMINANCE_GREEN: 0.587,
+    LUMINANCE_BLUE: 0.114,
+    
+    // Chart defaults
+    DEFAULT_CHART_WIDTH: 400,
+    DEFAULT_CHART_HEIGHT: 300,
+    CHART_PADDING_RATIO: 0.1,
+    CHART_RADIUS_MARGIN: 20,
+    CHART_LEGEND_WIDTH: 150,
+    CHART_SUBTITLE_Y: 35,
+    CHART_POINT_RADIUS: 4,
+    CHART_OPACITY: 0.3,
+    CHART_BAR_WIDTH_RATIO: 0.8,
+    CHART_LABEL_RADIUS_RATIO: 0.7,
+    CHART_SCATTER_POINT_RADIUS: 5,
+    CHART_LEGEND_ITEM_HEIGHT: 20,
+    CHART_LEGEND_INDICATOR_SIZE: 15,
+    CHART_LEGEND_INDICATOR_HEIGHT: 10,
+    CHART_LEGEND_TEXT_OFFSET: 35,
+    CHART_TOOLTIP_HEIGHT: 20,
+    CHART_TOOLTIP_RADIUS: 4,
+    
+    // Form defaults
+    DEFAULT_FORM_WIDTH: 200,
+    DEFAULT_FORM_HEIGHT: 40,
+    VALIDATION_DEBOUNCE_TIME: 300,
+    FORM_LABEL_HEIGHT: 20,
+    FORM_HELP_HEIGHT: 20,
+    FORM_MESSAGE_Y_OFFSET: 15,
+    FORM_COUNT_Y_OFFSET: 30,
+    FORM_CURSOR_OFFSET: 4,
+    CHECKBOX_SIZE: 18,
+    CHECKBOX_CHECK_MARGIN: 4,
+    CHECKBOX_CHECK_OFFSET: 6,
+    RADIO_CHECK_RADIUS_DIVISOR: 4,
+    
+    // Tooltip defaults
+    TOOLTIP_SHOW_DELAY: 500,
+    TOOLTIP_HIDE_DELAY: 200,
+    TOOLTIP_MAX_WIDTH: 250,
+    TOOLTIP_BASELINE_SIZE: 16,
+    TOOLTIP_ANIMATION_IN: 200,
+    TOOLTIP_ANIMATION_OUT: 150,
+    TOOLTIP_SLIDE_OFFSET: 10,
+    
+    // Animation and alignment constants
+    ALIGNMENT_CENTER_BASE: 50,
+    ANIMATION_FADE_IN: 200,
+    ANIMATION_SCALE_IN: 200,
+    ANIMATION_SLIDE_IN: 200
+};
+
+// Easing functions for animations
+const EASING_FUNCTIONS = {
+    EASE_OUT_CUBIC: 'easeOutCubic',
+    EASE_OUT_QUAD: 'easeOutQuad',
+    EASE_OUT_BACK: 'easeOutBack'
+};
 
 // Enhanced constants for UI components
 const UI_CONSTANTS = {
@@ -68,12 +167,28 @@ const UI_CONSTANTS = {
 // Utility functions for UI components
 const UIUtils = {
     /**
+     * Debug-aware logging utility
+     * @param {string} level - 'info', 'warn', 'error'
+     * @param {string} message 
+     * @param {*} data 
+     */
+    debugLog(level, message, data = null) {
+        if (typeof window !== 'undefined' && window.DEBUG_MODE) {
+            if (data) {
+                console[level](`[UI] ${message}:`, data);
+            } else {
+                console[level](`[UI] ${message}`);
+            }
+        }
+    },
+
+    /**
      * Creates a unique ID for UI components
      * @param {string} prefix 
      * @returns {string}
      */
     generateId(prefix = 'ui') {
-        return `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        return `${prefix}_${Date.now()}_${Math.random().toString(COMPONENT_CONSTANTS.RANDOM_BASE).substr(2, COMPONENT_CONSTANTS.RANDOM_LENGTH)}`;
     },
 
     /**
@@ -86,9 +201,9 @@ const UIUtils = {
         const color = backgroundColor.replace('#', '');
         const r = parseInt(color.substr(0, 2), 16);
         const g = parseInt(color.substr(2, 2), 16);
-        const b = parseInt(color.substr(4, 2), 16);
-        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-        return luminance > 0.5 ? UI_CONSTANTS.COLORS.BLACK : UI_CONSTANTS.COLORS.WHITE;
+        const b = parseInt(color.substr(COMPONENT_CONSTANTS.COLOR_SUBSTR_START, COMPONENT_CONSTANTS.COLOR_SUBSTR_LENGTH), 16);
+        const luminance = (COMPONENT_CONSTANTS.LUMINANCE_RED * r + COMPONENT_CONSTANTS.LUMINANCE_GREEN * g + COMPONENT_CONSTANTS.LUMINANCE_BLUE * b) / COMPONENT_CONSTANTS.RGB_MAX;
+        return luminance > COMPONENT_CONSTANTS.LUMINANCE_THRESHOLD ? UI_CONSTANTS.COLORS.BLACK : UI_CONSTANTS.COLORS.WHITE;
     },
 
     /**
@@ -156,8 +271,8 @@ class ModalDialog extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
-            width: validateNumber(options.width, 400),
-            height: validateNumber(options.height, 300),
+            width: validateNumber(options.width, COMPONENT_CONSTANTS.DEFAULT_MODAL_WIDTH),
+            height: validateNumber(options.height, COMPONENT_CONSTANTS.DEFAULT_MODAL_HEIGHT),
             ariaRole: 'dialog',
             ariaModal: true,
             tabIndex: -1
@@ -247,8 +362,8 @@ class ModalDialog extends BaseObject {
             id: `modal-btn-${this.id}-${index}`,
             x: 0,
             y: 0,
-            width: 100,
-            height: 36,
+            width: COMPONENT_CONSTANTS.DEFAULT_BUTTON_WIDTH,
+            height: COMPONENT_CONSTANTS.DEFAULT_BUTTON_HEIGHT,
             isFocused: index === 0,
             isHovered: false,
             isPressed: false
@@ -415,13 +530,14 @@ class ModalDialog extends BaseObject {
                 break;
                 
             case 'Enter':
-            case ' ':
+            case ' ': {
                 const focusedButton = this.buttonElements[this.focusedButtonIndex];
                 if (focusedButton) {
                     event.preventDefault();
                     this.executeButtonAction(focusedButton);
                 }
                 break;
+            }
                 
             case 'ArrowLeft':
             case 'ArrowRight':
@@ -485,7 +601,6 @@ class ModalDialog extends BaseObject {
      */
     handleBackdropClick(event) {
         // Check if click is outside modal content area
-        const modalBounds = this.getBounds();
         if (!this.containsPoint(event.x, event.y) && this.closeOnBackdrop && this.closable) {
             this.close();
         }
@@ -590,7 +705,7 @@ class ModalDialog extends BaseObject {
     renderModalBackground(renderer) {
         // Shadow
         renderer.fillStyle = 'rgba(0, 0, 0, 0.2)';
-        renderer.fillRect(4, 4, this.width, this.height);
+        renderer.fillRect(COMPONENT_CONSTANTS.MODAL_SHADOW_OFFSET, COMPONENT_CONSTANTS.MODAL_SHADOW_OFFSET, this.width, this.height);
 
         // Background
         renderer.fillStyle = UI_CONSTANTS.COLORS.WHITE;
@@ -639,7 +754,7 @@ class ModalDialog extends BaseObject {
      * @param {CanvasRenderingContext2D} renderer 
      */
     renderCloseButton(renderer) {
-        const buttonSize = 24;
+        const buttonSize = COMPONENT_CONSTANTS.MODAL_CLOSE_BUTTON_SIZE;
         const buttonX = this.width - this.padding - buttonSize;
         const buttonY = (this.headerHeight - buttonSize) / 2;
 
@@ -651,10 +766,10 @@ class ModalDialog extends BaseObject {
         renderer.strokeStyle = UI_CONSTANTS.COLORS.GRAY_600;
         renderer.lineWidth = 2;
         renderer.beginPath();
-        renderer.moveTo(buttonX + 6, buttonY + 6);
-        renderer.lineTo(buttonX + buttonSize - 6, buttonY + buttonSize - 6);
-        renderer.moveTo(buttonX + buttonSize - 6, buttonY + 6);
-        renderer.lineTo(buttonX + 6, buttonY + buttonSize - 6);
+        renderer.moveTo(buttonX + COMPONENT_CONSTANTS.CLOSE_BUTTON_X_PADDING, buttonY + COMPONENT_CONSTANTS.CLOSE_BUTTON_X_PADDING);
+        renderer.lineTo(buttonX + buttonSize - COMPONENT_CONSTANTS.CLOSE_BUTTON_X_PADDING, buttonY + buttonSize - COMPONENT_CONSTANTS.CLOSE_BUTTON_X_PADDING);
+        renderer.moveTo(buttonX + buttonSize - COMPONENT_CONSTANTS.CLOSE_BUTTON_X_PADDING, buttonY + COMPONENT_CONSTANTS.CLOSE_BUTTON_X_PADDING);
+        renderer.lineTo(buttonX + COMPONENT_CONSTANTS.CLOSE_BUTTON_X_PADDING, buttonY + buttonSize - COMPONENT_CONSTANTS.CLOSE_BUTTON_X_PADDING);
         renderer.stroke();
     }
 
@@ -683,7 +798,7 @@ class ModalDialog extends BaseObject {
             let lineY = bodyY + this.padding;
             lines.forEach(line => {
                 renderer.fillText(line, this.padding, lineY);
-                lineY += 20;
+                lineY += COMPONENT_CONSTANTS.DEFAULT_LINE_HEIGHT;
             });
         }
     }
@@ -826,10 +941,10 @@ class ModalDialog extends BaseObject {
         // Handle close button if closable
         if (this.closable && eventType === 'mousedown') {
             const closeButtonBounds = {
-                x: this.x + this.width - this.padding - 24,
-                y: this.y + (this.headerHeight - 24) / 2,
-                width: 24,
-                height: 24
+                x: this.x + this.width - this.padding - COMPONENT_CONSTANTS.MODAL_CLOSE_BUTTON_SIZE,
+                y: this.y + (this.headerHeight - COMPONENT_CONSTANTS.MODAL_CLOSE_BUTTON_SIZE) / 2,
+                width: COMPONENT_CONSTANTS.MODAL_CLOSE_BUTTON_SIZE,
+                height: COMPONENT_CONSTANTS.MODAL_CLOSE_BUTTON_SIZE
             };
 
             if (eventData.x >= closeButtonBounds.x && 
@@ -865,8 +980,8 @@ class NavigationMenu extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
-            width: options.width || 250,
-            height: options.height || 400,
+            width: options.width || COMPONENT_CONSTANTS.DEFAULT_NAV_WIDTH,
+            height: options.height || COMPONENT_CONSTANTS.DEFAULT_NAV_HEIGHT,
             ariaRole: 'navigation'
         });
         
@@ -921,7 +1036,7 @@ class NavigationMenu extends BaseObject {
                 badge: item.badge || null,
                 submenu: item.submenu || null,
                 tooltip: item.tooltip || null,
-                animationOffset: index * 50 // Staggered animations
+                animationOffset: index * COMPONENT_CONSTANTS.ANIMATION_STAGGER_OFFSET // Staggered animations
             }));
             
             this.updateAccessibilityAttributes();
@@ -977,7 +1092,7 @@ class NavigationMenu extends BaseObject {
                 isHovered: false,
                 isFocused: false,
                 isDisabled: item.disabled || false,
-                animationOffset: index * 50
+                animationOffset: index * COMPONENT_CONSTANTS.ANIMATION_STAGGER_OFFSET
             };
             
             this.menuItems.push(menuItem);
@@ -1352,11 +1467,11 @@ class NavigationMenu extends BaseObject {
         });
     }
 
-    animateSelection(item) {
+    animateSelection(_item) {
         if (!this.animationsEnabled) return;
         
         // Pulse animation for selection
-        this.animate('scale', 1.05, 100, {
+        this.animate('scale', COMPONENT_CONSTANTS.SELECTION_SCALE, COMPONENT_CONSTANTS.ANIMATION_FAST, {
             from: 1,
             yoyo: true,
             easing: EASING_FUNCTIONS.EASE_OUT_QUAD
@@ -1368,7 +1483,7 @@ class NavigationMenu extends BaseObject {
         
         // Subtle scale animation for focus
         item.focusScale = item.focusScale || 1;
-        this.animate('focusScale', 1.02, 150, {
+        this.animate('focusScale', COMPONENT_CONSTANTS.FOCUS_SCALE, COMPONENT_CONSTANTS.ANIMATION_NORMAL, {
             from: 1,
             target: item,
             easing: EASING_FUNCTIONS.EASE_OUT_QUAD
@@ -1500,8 +1615,8 @@ class NavigationMenu extends BaseObject {
             this.lastRenderTime = renderTime;
             this.renderCount++;
             
-            if (renderTime > 16) { // Longer than 1 frame
-                console.warn(`NavigationMenu render took ${renderTime.toFixed(2)}ms`);
+            if (renderTime > COMPONENT_CONSTANTS.PERFORMANCE_THRESHOLD) { // Longer than 1 frame
+                UIUtils.debugLog('warn', `NavigationMenu render took ${renderTime.toFixed(2)}ms`);
             }
             
         } catch (error) {
@@ -1583,23 +1698,23 @@ class NavigationMenu extends BaseObject {
         // Icon
         if (this.showIcons && item.icon) {
             renderer.fillText(item.icon, textX, textY);
-            textX += 25;
+            textX += COMPONENT_CONSTANTS.ICON_WIDTH;
         }
         
         // Text with truncation
         const availableWidth = itemWidth - (textX - x) - UI_CONSTANTS.SPACING.SM - 
-                              (item.badge ? 30 : 0);
+                              (item.badge ? COMPONENT_CONSTANTS.BADGE_WIDTH : 0);
         const truncatedText = UIUtils.truncateText(item.text, availableWidth, renderer.font, renderer);
         renderer.fillText(truncatedText, textX, textY);
         
         // Badge
         if (item.badge) {
-            this.renderBadge(renderer, item.badge, x + itemWidth - 25, y + 5);
+            this.renderBadge(renderer, item.badge, x + itemWidth - COMPONENT_CONSTANTS.ICON_WIDTH, y + COMPONENT_CONSTANTS.BADGE_PADDING);
         }
         
         // Submenu indicator
         if (item.submenu) {
-            const indicatorX = x + itemWidth - 15;
+            const indicatorX = x + itemWidth - COMPONENT_CONSTANTS.SUBMENU_INDICATOR_SIZE;
             const indicatorY = y + itemHeight / 2;
             this.renderSubmenuIndicator(renderer, indicatorX, indicatorY, item.isSelected);
         }
@@ -1614,17 +1729,17 @@ class NavigationMenu extends BaseObject {
      */
     renderBadge(renderer, badge, x, y) {
         const badgeText = String(badge);
-        const badgeWidth = Math.max(20, badgeText.length * 8);
+        const badgeWidth = Math.max(COMPONENT_CONSTANTS.BADGE_MIN_WIDTH, badgeText.length * COMPONENT_CONSTANTS.BADGE_CHAR_WIDTH);
         
         // Badge background
         renderer.fillStyle = UI_CONSTANTS.COLORS.DANGER;
-        UIUtils.fillRoundedRect(renderer, x - badgeWidth/2, y, badgeWidth, 16, 8);
+        UIUtils.fillRoundedRect(renderer, x - badgeWidth/2, y, badgeWidth, COMPONENT_CONSTANTS.BADGE_HEIGHT, UI_CONSTANTS.BORDER_RADIUS.SM);
         
         // Badge text
         renderer.fillStyle = UI_CONSTANTS.COLORS.WHITE;
         renderer.font = 'bold 10px Arial';
         renderer.textAlign = 'center';
-        renderer.fillText(badgeText, x, y + 8);
+        renderer.fillText(badgeText, x, y + UI_CONSTANTS.SPACING.SM);
     }
 
     /**
@@ -1689,7 +1804,7 @@ class NavigationMenu extends BaseObject {
      * @param {string} context 
      */
     defaultErrorHandler(error, context) {
-        console.error(`NavigationMenu error in ${context}:`, error);
+        UIUtils.debugLog('error', `NavigationMenu error in ${context}`, error);
         this.emit('error', { error, context, component: 'NavigationMenu' });
     }
 
@@ -1721,8 +1836,8 @@ class Chart extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
-            width: options.width || 400,
-            height: options.height || 300,
+            width: options.width || COMPONENT_CONSTANTS.DEFAULT_CHART_WIDTH,
+            height: options.height || COMPONENT_CONSTANTS.DEFAULT_CHART_HEIGHT,
             ariaRole: 'img'
         });
         
@@ -1901,7 +2016,7 @@ class Chart extends BaseObject {
         
         // Add padding to min/max for better visualization
         const range = this.maxValue - this.minValue;
-        const padding = range * 0.1;
+        const padding = range * COMPONENT_CONSTANTS.CHART_PADDING_RATIO;
         this.minValue = Math.max(0, this.minValue - padding);
         this.maxValue = this.maxValue + padding;
         
@@ -1956,8 +2071,8 @@ class Chart extends BaseObject {
         // Add padding
         const xRange = this.maxX - this.minX;
         const yRange = this.maxY - this.minY;
-        const xPadding = xRange * 0.1;
-        const yPadding = yRange * 0.1;
+        const xPadding = xRange * COMPONENT_CONSTANTS.CHART_PADDING_RATIO;
+        const yPadding = yRange * COMPONENT_CONSTANTS.CHART_PADDING_RATIO;
         
         this.minX -= xPadding;
         this.maxX += xPadding;
@@ -1994,7 +2109,7 @@ class Chart extends BaseObject {
                     
                 case 'pie':
                     // Pie charts use radius calculation instead
-                    this.radius = Math.min(this.chartWidth, this.chartHeight) / 2 - 20;
+                    this.radius = Math.min(this.chartWidth, this.chartHeight) / 2 - COMPONENT_CONSTANTS.CHART_RADIUS_MARGIN;
                     break;
             }
             
@@ -2010,7 +2125,7 @@ class Chart extends BaseObject {
         if (!this.showLegend) return;
         
         this.legend = {
-            x: this.width - 150,
+            x: this.width - COMPONENT_CONSTANTS.CHART_LEGEND_WIDTH,
             y: this.margin.top,
             width: 140,
             itemHeight: 20,
@@ -2131,7 +2246,7 @@ class Chart extends BaseObject {
      * Handles mouse up events
      * @param {Object} event 
      */
-    handleMouseUp(event) {
+    handleMouseUp(_event) {
         // Placeholder for future drag interactions
     }
 
@@ -2246,7 +2361,7 @@ class Chart extends BaseObject {
                     return {
                         series: series.label,
                         index: barIndex,
-                        value: value,
+                        value,
                         x: barIndex * barWidth + barWidth / 2,
                         y: barY + barHeight / 2,
                         color: series.color
@@ -2423,8 +2538,8 @@ class Chart extends BaseObject {
             this.lastRenderTime = renderTime;
             this.renderCount++;
             
-            if (renderTime > 16) {
-                console.warn(`Chart render took ${renderTime.toFixed(2)}ms`);
+            if (renderTime > COMPONENT_CONSTANTS.PERFORMANCE_THRESHOLD) {
+                UIUtils.debugLog('warn', `Chart render took ${renderTime.toFixed(2)}ms`);
             }
             
         } catch (error) {
@@ -2452,7 +2567,7 @@ class Chart extends BaseObject {
             renderer.font = '14px Arial';
             renderer.textAlign = 'center';
             renderer.textBaseline = 'top';
-            renderer.fillText(this.subtitle, this.width / 2, 35);
+            renderer.fillText(this.subtitle, this.width / 2, COMPONENT_CONSTANTS.CHART_SUBTITLE_Y);
         }
     }
 
@@ -2544,7 +2659,7 @@ class Chart extends BaseObject {
      * @param {CanvasRenderingContext2D} renderer 
      */
     renderLineChart(renderer) {
-        this.processedData.forEach((series, seriesIndex) => {
+        this.processedData.forEach((series, _seriesIndex) => {
             if (!series.visible) return;
             
             renderer.strokeStyle = series.color;
@@ -2575,7 +2690,7 @@ class Chart extends BaseObject {
                 
                 renderer.fillStyle = series.color;
                 renderer.beginPath();
-                renderer.arc(x, y, 4, 0, 2 * Math.PI);
+                renderer.arc(x, y, COMPONENT_CONSTANTS.CHART_POINT_RADIUS, 0, 2 * Math.PI);
                 renderer.fill();
                 
                 // Highlight selected points
@@ -2603,12 +2718,12 @@ class Chart extends BaseObject {
      * @param {CanvasRenderingContext2D} renderer 
      */
     renderAreaChart(renderer) {
-        this.processedData.forEach((series, seriesIndex) => {
+        this.processedData.forEach((series, _seriesIndex) => {
             if (!series.visible) return;
             
             // Fill area
             renderer.fillStyle = series.color;
-            renderer.globalAlpha = 0.3 * series.opacity * (this.animated ? this.animationProgress : 1);
+            renderer.globalAlpha = COMPONENT_CONSTANTS.CHART_OPACITY * series.opacity * (this.animated ? this.animationProgress : 1);
             
             renderer.beginPath();
             
@@ -2641,7 +2756,7 @@ class Chart extends BaseObject {
      */
     renderBarChart(renderer) {
         const barWidth = this.chartWidth / this.processedData[0].values.length;
-        const seriesBarWidth = barWidth / this.processedData.length * 0.8;
+        const seriesBarWidth = barWidth / this.processedData.length * COMPONENT_CONSTANTS.CHART_BAR_WIDTH_RATIO;
         
         this.processedData.forEach((series, seriesIndex) => {
             if (!series.visible) return;
@@ -2684,7 +2799,7 @@ class Chart extends BaseObject {
         const centerX = this.margin.left + this.chartWidth / 2;
         const centerY = this.margin.top + this.chartHeight / 2;
         
-        this.processedData.forEach((slice, index) => {
+        this.processedData.forEach((slice, _index) => {
             if (!slice.visible) return;
             
             const animationRadius = this.radius * (this.animated ? this.animationProgress : 1);
@@ -2712,7 +2827,7 @@ class Chart extends BaseObject {
             
             // Labels
             const labelAngle = (slice.startAngle + slice.endAngle) / 2;
-            const labelRadius = animationRadius * 0.7;
+            const labelRadius = animationRadius * COMPONENT_CONSTANTS.CHART_LABEL_RADIUS_RATIO;
             const labelX = centerX + Math.cos(labelAngle) * labelRadius;
             const labelY = centerY + Math.sin(labelAngle) * labelRadius;
             
@@ -2731,7 +2846,7 @@ class Chart extends BaseObject {
      * @param {CanvasRenderingContext2D} renderer 
      */
     renderScatterPlot(renderer) {
-        this.processedData.forEach((point, index) => {
+        this.processedData.forEach((point, _index) => {
             if (!point.visible) return;
             
             const x = this.margin.left + (point.x - this.minX) * this.xScale;
@@ -2741,7 +2856,7 @@ class Chart extends BaseObject {
             renderer.globalAlpha = point.opacity * (this.animated ? this.animationProgress : 1);
             
             renderer.beginPath();
-            renderer.arc(x, y, 5, 0, 2 * Math.PI);
+            renderer.arc(x, y, COMPONENT_CONSTANTS.CHART_SCATTER_POINT_RADIUS, 0, 2 * Math.PI);
             renderer.fill();
             
             // Selection highlight
@@ -2766,11 +2881,11 @@ class Chart extends BaseObject {
         
         // Legend background
         renderer.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        renderer.fillRect(x, y, width, items.length * itemHeight + 20);
+        renderer.fillRect(x, y, width, items.length * itemHeight + COMPONENT_CONSTANTS.CHART_LEGEND_ITEM_HEIGHT);
         
         renderer.strokeStyle = UI_CONSTANTS.COLORS.GRAY_300;
         renderer.lineWidth = 1;
-        renderer.strokeRect(x, y, width, items.length * itemHeight + 20);
+        renderer.strokeRect(x, y, width, items.length * itemHeight + COMPONENT_CONSTANTS.CHART_LEGEND_ITEM_HEIGHT);
         
         // Legend items
         items.forEach((item, index) => {
@@ -2778,14 +2893,14 @@ class Chart extends BaseObject {
             
             // Color box
             renderer.fillStyle = item.color;
-            renderer.fillRect(x + 10, itemY + 5, 15, 10);
+            renderer.fillRect(x + UI_CONSTANTS.SPACING.MD / 2, itemY + UI_CONSTANTS.SPACING.XS, COMPONENT_CONSTANTS.CHART_LEGEND_INDICATOR_SIZE, COMPONENT_CONSTANTS.CHART_LEGEND_INDICATOR_HEIGHT);
             
             // Label
             renderer.fillStyle = item.visible ? UI_CONSTANTS.COLORS.GRAY_900 : UI_CONSTANTS.COLORS.GRAY_400;
             renderer.font = '12px Arial';
             renderer.textAlign = 'left';
             renderer.textBaseline = 'middle';
-            renderer.fillText(item.label, x + 35, itemY + 10);
+            renderer.fillText(item.label, x + COMPONENT_CONSTANTS.CHART_LEGEND_TEXT_OFFSET, itemY + UI_CONSTANTS.SPACING.MD / 2);
         });
     }
 
@@ -2803,11 +2918,11 @@ class Chart extends BaseObject {
         const textWidth = renderer.measureText(content).width;
         const padding = 8;
         const tooltipWidth = textWidth + padding * 2;
-        const tooltipHeight = 20 + padding * 2;
+        const tooltipHeight = COMPONENT_CONSTANTS.CHART_TOOLTIP_HEIGHT + padding * 2;
         
         // Tooltip background
         renderer.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        UIUtils.fillRoundedRect(renderer, x, y, tooltipWidth, tooltipHeight, 4);
+        UIUtils.fillRoundedRect(renderer, x, y, tooltipWidth, tooltipHeight, COMPONENT_CONSTANTS.CHART_TOOLTIP_RADIUS);
         
         // Tooltip text
         renderer.fillStyle = UI_CONSTANTS.COLORS.WHITE;
@@ -2833,7 +2948,7 @@ class Chart extends BaseObject {
             this.processedData.reduce((sum, series) => sum + series.values.length, 0);
             
         return `${this.type} chart titled "${this.title}" with ${dataCount} data points. ` +
-               `${this.subtitle ? this.subtitle + ' ' : ''}` +
+               `${this.subtitle ? `${this.subtitle} ` : ''}` +
                `Interactive: ${this.interactive ? 'yes' : 'no'}.`;
     }
 
@@ -2843,7 +2958,7 @@ class Chart extends BaseObject {
      * @param {string} context 
      */
     defaultErrorHandler(error, context) {
-        console.error(`Chart error in ${context}:`, error);
+        UIUtils.debugLog('error', `Chart error in ${context}`, error);
         this.emit('error', { error, context, component: 'Chart' });
     }
 
@@ -2873,8 +2988,8 @@ class FormField extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
-            width: options.width || 200,
-            height: options.height || 40,
+            width: options.width || COMPONENT_CONSTANTS.DEFAULT_FORM_WIDTH,
+            height: options.height || COMPONENT_CONSTANTS.DEFAULT_FORM_HEIGHT,
             ariaRole: 'group'
         });
         
@@ -2909,7 +3024,7 @@ class FormField extends BaseObject {
         // Enhanced validation
         this.validationRules = new Map();
         this.asyncValidation = options.asyncValidation || null;
-        this.validationDebounceTime = options.validationDebounceTime || 300;
+        this.validationDebounceTime = options.validationDebounceTime || COMPONENT_CONSTANTS.VALIDATION_DEBOUNCE_TIME;
         this.validationTimer = null;
         
         // Accessibility
@@ -3035,7 +3150,7 @@ class FormField extends BaseObject {
         try {
             this.on('focus', () => this.handleFocus());
             this.on('blur', () => this.handleBlur());
-            this.on('input', (event) => this.handleInput(event));
+            this.on('input', (event) => this.handleFieldInput(event));
             this.on('change', (event) => this.handleChange(event));
             this.on('keyDown', (event) => this.handleKeyDown(event));
             
@@ -3140,7 +3255,7 @@ class FormField extends BaseObject {
                         }
                     }
                 } catch (error) {
-                    console.warn(`Validation rule '${name}' failed:`, error);
+                    UIUtils.debugLog('warn', `Validation rule '${name}' failed`, error);
                 }
             }
             
@@ -3155,7 +3270,7 @@ class FormField extends BaseObject {
                         }
                     }
                 } catch (error) {
-                    console.warn('Custom validation failed:', error);
+                    UIUtils.debugLog('warn', 'Custom validation failed', error);
                     isValid = false;
                     if (!firstErrorMessage) {
                         firstErrorMessage = 'Validation error occurred';
@@ -3174,7 +3289,7 @@ class FormField extends BaseObject {
                         }
                     }
                 } catch (error) {
-                    console.warn('Async validation failed:', error);
+                    UIUtils.debugLog('warn', 'Async validation failed', error);
                     isValid = false;
                     if (!firstErrorMessage) {
                         firstErrorMessage = 'Async validation error occurred';
@@ -3285,16 +3400,16 @@ class FormField extends BaseObject {
     }
 
     /**
-     * Handles input events
+     * Handles field value input events (internal event handling)
      * @param {Object} event 
      */
-    handleInput(event) {
+    handleFieldInput(event) {
         try {
             const newValue = event.value;
             this.setValue(newValue);
             
         } catch (error) {
-            this.errorHandler(error, 'handleInput');
+            this.errorHandler(error, 'handleFieldInput');
         }
     }
 
@@ -3357,7 +3472,7 @@ class FormField extends BaseObject {
         switch (this.type) {
             case 'number':
                 // Only allow numeric input
-                if (!/[0-9\-\+\.\,]/.test(event.key) && 
+                if (!/[0-9\-+.,]/.test(event.key) && 
                     !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
                     event.preventDefault();
                 }
@@ -3430,8 +3545,8 @@ class FormField extends BaseObject {
         
         this.isAnimating = true;
         
-        const targetScale = focused ? 1.02 : 1;
-        this.animate('focusScale', targetScale, 150, {
+        const targetScale = focused ? COMPONENT_CONSTANTS.FOCUS_SCALE : 1;
+        this.animate('focusScale', targetScale, COMPONENT_CONSTANTS.ANIMATION_NORMAL, {
             from: this.focusScale || 1,
             easing: EASING_FUNCTIONS.EASE_OUT_QUAD,
             onComplete: () => {
@@ -3501,7 +3616,7 @@ class FormField extends BaseObject {
      * Updates hover state for options
      * @param {Object} eventData 
      */
-    updateOptionHover(eventData) {
+    updateOptionHover(_eventData) {
         // Implementation for hovering over select options
         // This would be used in dropdown rendering
     }
@@ -3563,8 +3678,8 @@ class FormField extends BaseObject {
             this.lastRenderTime = renderTime;
             this.renderCount++;
             
-            if (renderTime > 16) {
-                console.warn(`FormField render took ${renderTime.toFixed(2)}ms`);
+            if (renderTime > COMPONENT_CONSTANTS.PERFORMANCE_THRESHOLD) {
+                UIUtils.debugLog('warn', `FormField render took ${renderTime.toFixed(2)}ms`);
             }
             
         } catch (error) {
@@ -3577,8 +3692,8 @@ class FormField extends BaseObject {
      * @param {CanvasRenderingContext2D} renderer 
      */
     renderTextInput(renderer) {
-        const fieldY = this.label ? 20 : 0;
-        const fieldHeight = this.height - fieldY - (this.errorMessage || this.helpText ? 20 : 0);
+        const fieldY = this.label ? COMPONENT_CONSTANTS.FORM_LABEL_HEIGHT : 0;
+        const fieldHeight = this.height - fieldY - (this.errorMessage || this.helpText ? COMPONENT_CONSTANTS.FORM_HELP_HEIGHT : 0);
         
         // Field background
         let bgColor = this.disabled ? UI_CONSTANTS.COLORS.GRAY_100 : UI_CONSTANTS.COLORS.WHITE;
@@ -3653,9 +3768,6 @@ class FormField extends BaseObject {
      * @param {CanvasRenderingContext2D} renderer 
      */
     renderTextarea(renderer) {
-        const fieldY = this.label ? 20 : 0;
-        const fieldHeight = this.height - fieldY - (this.errorMessage || this.helpText ? 20 : 0);
-        
         // Similar to text input but with multi-line support
         this.renderTextInput(renderer);
         
@@ -3668,8 +3780,8 @@ class FormField extends BaseObject {
      * @param {CanvasRenderingContext2D} renderer 
      */
     renderSelect(renderer) {
-        const fieldY = this.label ? 20 : 0;
-        const fieldHeight = this.height - fieldY - (this.errorMessage || this.helpText ? 20 : 0);
+        const fieldY = this.label ? COMPONENT_CONSTANTS.FORM_LABEL_HEIGHT : 0;
+        const fieldHeight = this.height - fieldY - (this.errorMessage || this.helpText ? COMPONENT_CONSTANTS.FORM_HELP_HEIGHT : 0);
         
         // Render as text input first
         this.renderTextInput(renderer);
@@ -3696,8 +3808,8 @@ class FormField extends BaseObject {
      * @param {CanvasRenderingContext2D} renderer 
      */
     renderCheckbox(renderer) {
-        const checkboxSize = 18;
-        const checkboxY = this.label ? 20 : (this.height - checkboxSize) / 2;
+        const checkboxSize = COMPONENT_CONSTANTS.CHECKBOX_SIZE;
+        const checkboxY = this.label ? COMPONENT_CONSTANTS.FORM_LABEL_HEIGHT : (this.height - checkboxSize) / 2;
         
         // Checkbox background
         renderer.fillStyle = this.disabled ? 
@@ -3724,9 +3836,9 @@ class FormField extends BaseObject {
             renderer.lineCap = 'round';
             
             renderer.beginPath();
-            renderer.moveTo(4, checkboxY + checkboxSize / 2);
-            renderer.lineTo(checkboxSize / 2, checkboxY + checkboxSize - 6);
-            renderer.lineTo(checkboxSize - 4, checkboxY + 6);
+            renderer.moveTo(COMPONENT_CONSTANTS.CHECKBOX_CHECK_MARGIN, checkboxY + checkboxSize / 2);
+            renderer.lineTo(checkboxSize / 2, checkboxY + checkboxSize - COMPONENT_CONSTANTS.CHECKBOX_CHECK_OFFSET);
+            renderer.lineTo(checkboxSize - COMPONENT_CONSTANTS.CHECKBOX_CHECK_MARGIN, checkboxY + COMPONENT_CONSTANTS.CHECKBOX_CHECK_OFFSET);
             renderer.stroke();
         }
         
@@ -3751,7 +3863,7 @@ class FormField extends BaseObject {
         
         const radioSize = 18;
         const spacing = 25;
-        let currentY = this.label ? 20 : 0;
+        const currentY = this.label ? COMPONENT_CONSTANTS.FORM_LABEL_HEIGHT : 0;
         
         this.processedOptions.forEach((option, index) => {
             const radioY = currentY + index * spacing;
@@ -3781,7 +3893,7 @@ class FormField extends BaseObject {
             if (isSelected) {
                 renderer.fillStyle = UI_CONSTANTS.COLORS.PRIMARY;
                 renderer.beginPath();
-                renderer.arc(radioSize / 2, radioY + radioSize / 2, radioSize / 4, 0, 2 * Math.PI);
+                renderer.arc(radioSize / 2, radioY + radioSize / 2, radioSize / COMPONENT_CONSTANTS.RADIO_CHECK_RADIUS_DIVISOR, 0, 2 * Math.PI);
                 renderer.fill();
             }
             
@@ -3823,7 +3935,7 @@ class FormField extends BaseObject {
      * @param {CanvasRenderingContext2D} renderer 
      */
     renderMessages(renderer) {
-        const messageY = this.height - 15;
+        const messageY = this.height - COMPONENT_CONSTANTS.FORM_MESSAGE_Y_OFFSET;
         
         if (this.errorMessage) {
             renderer.fillStyle = UI_CONSTANTS.COLORS.DANGER;
@@ -3872,7 +3984,7 @@ class FormField extends BaseObject {
         renderer.font = '10px Arial';
         renderer.textAlign = 'right';
         renderer.textBaseline = 'top';
-        renderer.fillText(countText, this.width, this.height - 30);
+        renderer.fillText(countText, this.width, this.height - COMPONENT_CONSTANTS.FORM_COUNT_Y_OFFSET);
     }
 
     /**
@@ -3890,8 +4002,8 @@ class FormField extends BaseObject {
         renderer.strokeStyle = UI_CONSTANTS.COLORS.PRIMARY;
         renderer.lineWidth = 1;
         renderer.beginPath();
-        renderer.moveTo(cursorX, y + 4);
-        renderer.lineTo(cursorX, y + height - 4);
+        renderer.moveTo(cursorX, y + COMPONENT_CONSTANTS.FORM_CURSOR_OFFSET);
+        renderer.lineTo(cursorX, y + height - COMPONENT_CONSTANTS.FORM_CURSOR_OFFSET);
         renderer.stroke();
     }
 
@@ -3900,8 +4012,8 @@ class FormField extends BaseObject {
      * @param {CanvasRenderingContext2D} renderer 
      */
     renderFocusRing(renderer) {
-        const fieldY = this.label ? 20 : 0;
-        const fieldHeight = this.height - fieldY - (this.errorMessage || this.helpText ? 20 : 0);
+        const fieldY = this.label ? COMPONENT_CONSTANTS.FORM_LABEL_HEIGHT : 0;
+        const fieldHeight = this.height - fieldY - (this.errorMessage || this.helpText ? COMPONENT_CONSTANTS.FORM_HELP_HEIGHT : 0);
         
         renderer.strokeStyle = UI_CONSTANTS.COLORS.WARNING;
         renderer.lineWidth = FOCUS_RING_WIDTH;
@@ -3932,7 +4044,7 @@ class FormField extends BaseObject {
      * @param {string} context 
      */
     defaultErrorHandler(error, context) {
-        console.error(`FormField error in ${context}:`, error);
+        UIUtils.debugLog('error', `FormField error in ${context}`, error);
         this.emit('error', { error, context, component: 'FormField' });
     }
 
@@ -3973,10 +4085,10 @@ class Tooltip extends BaseObject {
         this.content = options.content || '';
         this.target = options.target || null;
         this.position = options.position || 'top'; // 'top', 'bottom', 'left', 'right', 'auto'
-        this.showDelay = options.showDelay || 500;
-        this.hideDelay = options.hideDelay || 200;
+        this.showDelay = options.showDelay || COMPONENT_CONSTANTS.TOOLTIP_SHOW_DELAY;
+        this.hideDelay = options.hideDelay || COMPONENT_CONSTANTS.TOOLTIP_HIDE_DELAY;
         this.offset = options.offset || 10;
-        this.maxWidth = options.maxWidth || 250;
+        this.maxWidth = options.maxWidth || COMPONENT_CONSTANTS.TOOLTIP_MAX_WIDTH;
         this.theme = options.theme || 'dark'; // 'dark', 'light', 'custom'
         this.allowHtml = options.allowHtml || false;
         this.interactive = options.interactive || false;
@@ -4161,7 +4273,7 @@ class Tooltip extends BaseObject {
             this.calculatedDimensions = {
                 width: Math.min(textWidth + padding.horizontal, this.maxWidth),
                 height: textHeight + padding.vertical,
-                lines: lines
+                lines
             };
             
             // Update actual dimensions
@@ -4217,7 +4329,7 @@ class Tooltip extends BaseObject {
      * @returns {number}
      */
     getLineHeight() {
-        return 16;
+        return COMPONENT_CONSTANTS.TOOLTIP_BASELINE_SIZE;
     }
 
     /**
@@ -4525,7 +4637,7 @@ class Tooltip extends BaseObject {
         const tooltipCenterX = position.x + this.calculatedDimensions.width / 2;
         const tooltipCenterY = position.y + this.calculatedDimensions.height / 2;
         
-        const alignmentScore = 50 - Math.min(50, 
+        const alignmentScore = COMPONENT_CONSTANTS.ALIGNMENT_CENTER_BASE - Math.min(COMPONENT_CONSTANTS.ALIGNMENT_CENTER_BASE, 
             Math.abs(targetCenterX - tooltipCenterX) + Math.abs(targetCenterY - tooltipCenterY)
         );
         score += alignmentScore;
@@ -4613,7 +4725,7 @@ class Tooltip extends BaseObject {
             switch (this.animation) {
                 case 'fade':
                     this.alpha = 0;
-                    this.animate('alpha', 1, 200, {
+                    this.animate('alpha', 1, COMPONENT_CONSTANTS.TOOLTIP_ANIMATION_IN, {
                         easing: EASING_FUNCTIONS.EASE_OUT_QUAD,
                         onComplete: () => {
                             this.isAnimating = false;
@@ -4624,7 +4736,7 @@ class Tooltip extends BaseObject {
                     
                 case 'scale':
                     this.scale = 0;
-                    this.animate('scale', 1, 200, {
+                    this.animate('scale', 1, COMPONENT_CONSTANTS.TOOLTIP_ANIMATION_IN, {
                         easing: EASING_FUNCTIONS.EASE_OUT_BACK,
                         onComplete: () => {
                             this.isAnimating = false;
@@ -4633,14 +4745,14 @@ class Tooltip extends BaseObject {
                     });
                     break;
                     
-                case 'slide':
+                case 'slide': {
                     const slideOffset = this.currentPosition === 'top' || this.currentPosition === 'bottom' ? 
-                        (this.currentPosition === 'top' ? -10 : 10) : 
-                        (this.currentPosition === 'left' ? -10 : 10);
+                        (this.currentPosition === 'top' ? -COMPONENT_CONSTANTS.TOOLTIP_SLIDE_OFFSET : COMPONENT_CONSTANTS.TOOLTIP_SLIDE_OFFSET) : 
+                        (this.currentPosition === 'left' ? -COMPONENT_CONSTANTS.TOOLTIP_SLIDE_OFFSET : COMPONENT_CONSTANTS.TOOLTIP_SLIDE_OFFSET);
                         
                     if (this.currentPosition === 'top' || this.currentPosition === 'bottom') {
                         this.y += slideOffset;
-                        this.animate('y', this.y - slideOffset, 200, {
+                        this.animate('y', this.y - slideOffset, COMPONENT_CONSTANTS.TOOLTIP_ANIMATION_IN, {
                             easing: EASING_FUNCTIONS.EASE_OUT_QUAD,
                             onComplete: () => {
                                 this.isAnimating = false;
@@ -4649,7 +4761,7 @@ class Tooltip extends BaseObject {
                         });
                     } else {
                         this.x += slideOffset;
-                        this.animate('x', this.x - slideOffset, 200, {
+                        this.animate('x', this.x - slideOffset, COMPONENT_CONSTANTS.TOOLTIP_ANIMATION_IN, {
                             easing: EASING_FUNCTIONS.EASE_OUT_QUAD,
                             onComplete: () => {
                                 this.isAnimating = false;
@@ -4658,6 +4770,7 @@ class Tooltip extends BaseObject {
                         });
                     }
                     break;
+                }
                     
                 default:
                     this.isAnimating = false;
@@ -4678,36 +4791,37 @@ class Tooltip extends BaseObject {
         return new Promise((resolve) => {
             switch (this.animation) {
                 case 'fade':
-                    this.animate('alpha', 0, 150, {
+                    this.animate('alpha', 0, COMPONENT_CONSTANTS.TOOLTIP_ANIMATION_OUT, {
                         easing: EASING_FUNCTIONS.EASE_IN_QUAD,
                         onComplete: resolve
                     });
                     break;
                     
                 case 'scale':
-                    this.animate('scale', 0, 150, {
+                    this.animate('scale', 0, COMPONENT_CONSTANTS.TOOLTIP_ANIMATION_OUT, {
                         easing: EASING_FUNCTIONS.EASE_IN_BACK,
                         onComplete: resolve
                     });
                     break;
                     
-                case 'slide':
+                case 'slide': {
                     const slideOffset = this.currentPosition === 'top' || this.currentPosition === 'bottom' ? 
-                        (this.currentPosition === 'top' ? -10 : 10) : 
-                        (this.currentPosition === 'left' ? -10 : 10);
+                        (this.currentPosition === 'top' ? -COMPONENT_CONSTANTS.TOOLTIP_SLIDE_OFFSET : COMPONENT_CONSTANTS.TOOLTIP_SLIDE_OFFSET) : 
+                        (this.currentPosition === 'left' ? -COMPONENT_CONSTANTS.TOOLTIP_SLIDE_OFFSET : COMPONENT_CONSTANTS.TOOLTIP_SLIDE_OFFSET);
                         
                     if (this.currentPosition === 'top' || this.currentPosition === 'bottom') {
-                        this.animate('y', this.y + slideOffset, 150, {
+                        this.animate('y', this.y + slideOffset, COMPONENT_CONSTANTS.TOOLTIP_ANIMATION_OUT, {
                             easing: EASING_FUNCTIONS.EASE_IN_QUAD,
                             onComplete: resolve
                         });
                     } else {
-                        this.animate('x', this.x + slideOffset, 150, {
+                        this.animate('x', this.x + slideOffset, COMPONENT_CONSTANTS.TOOLTIP_ANIMATION_OUT, {
                             easing: EASING_FUNCTIONS.EASE_IN_QUAD,
                             onComplete: resolve
                         });
                     }
                     break;
+                }
                     
                 default:
                     resolve();
@@ -4721,7 +4835,7 @@ class Tooltip extends BaseObject {
         this.scheduleShow(event);
     }
 
-    handleTargetMouseLeave(event) {
+    handleTargetMouseLeave(_event) {
         if (!this.interactive) {
             this.scheduleHide();
         }
@@ -4750,7 +4864,7 @@ class Tooltip extends BaseObject {
         }
     }
 
-    handleTargetTouchCancel(event) {
+    handleTargetTouchCancel(_event) {
         this.clearTimers();
         this.scheduleHide();
     }
@@ -4818,8 +4932,8 @@ class Tooltip extends BaseObject {
             this.lastRenderTime = renderTime;
             this.renderCount++;
             
-            if (renderTime > 16) {
-                console.warn(`Tooltip render took ${renderTime.toFixed(2)}ms`);
+            if (renderTime > COMPONENT_CONSTANTS.PERFORMANCE_THRESHOLD) {
+                UIUtils.debugLog('warn', `Tooltip render took ${renderTime.toFixed(2)}ms`);
             }
             
         } catch (error) {
@@ -4984,7 +5098,7 @@ class Tooltip extends BaseObject {
      * @param {string} context 
      */
     defaultErrorHandler(error, context) {
-        console.error(`Tooltip error in ${context}:`, error);
+        UIUtils.debugLog('error', `Tooltip error in ${context}`, error);
         this.emit('error', { error, context, component: 'Tooltip' });
     }
 

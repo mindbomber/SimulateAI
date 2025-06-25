@@ -207,12 +207,23 @@ class AIEthicsApp {
         const highContrastQuery = window.matchMedia?.('(prefers-contrast: high)');
 
         const handleThemeChange = () => {
-            const newPreferences = {
-                reducedMotion: reducedMotionQuery?.matches || false,
-                darkMode: darkModeQuery?.matches || false,
-                highContrast: highContrastQuery?.matches || false,
-                largeText: this.preferences.largeText // Preserve user setting
-            };
+            // Get current saved preferences to check which ones are user-set
+            const savedPreferences = userPreferences.getAccessibilitySettings();
+            
+            // Only update preferences that haven't been explicitly set by the user
+            const newPreferences = { ...this.preferences };
+            
+            // Update system-based preferences only if user hasn't overridden them
+            if (savedPreferences.reducedMotion === undefined) {
+                newPreferences.reducedMotion = reducedMotionQuery?.matches || false;
+            }
+            if (savedPreferences.darkMode === undefined) {
+                newPreferences.darkMode = darkModeQuery?.matches || false;
+            }
+            if (savedPreferences.highContrast === undefined) {
+                newPreferences.highContrast = highContrastQuery?.matches || false;
+            }
+            // largeText is always user-controlled, so never auto-update it
             
             if (JSON.stringify(newPreferences) !== JSON.stringify(this.preferences)) {
                 this.preferences = newPreferences;
@@ -220,6 +231,8 @@ class AIEthicsApp {
                                  (newPreferences.darkMode ? 'dark' : 'light');
                 this.applyTheme();
                 this.announceThemeChange();
+                
+                console.log('System theme changed, updated non-user-set preferences:', newPreferences);
             }
         };
 
