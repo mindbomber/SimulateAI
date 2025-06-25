@@ -12,10 +12,10 @@ import AccessibilityManager from './core/accessibility.js';
 import AnimationManager from './core/animation-manager.js';
 
 // Import utilities
-import StorageManager from './utils/storage.js';
-import AnalyticsManager from './utils/analytics.js';
+import { simpleStorage, userPreferences, userProgress } from './utils/simple-storage.js';
+import { simpleAnalytics } from './utils/simple-analytics.js';
 import Helpers from './utils/helpers.js';
-import CanvasManager from './utils/canvas-manager.js';
+import canvasManager from './utils/canvas-manager.js';
 
 // Import renderers
 import CanvasRenderer from './renderers/canvas-renderer.js';
@@ -28,9 +28,9 @@ import SVGRenderer from './renderers/svg-renderer.js';
 import { BaseObject, EthicsMeter, InteractiveButton, InteractiveSlider } from './objects/enhanced-objects.js';
 
 // Import layout and UI components
-import { LayoutManager, ResponsiveGrid, FlexContainer } from './objects/layout-components.js';
-import { AdvancedButton, TabContainer, Modal, Tooltip } from './objects/advanced-ui-components.js';
-import { InputField, FormValidator, SearchBox } from './objects/input-utility-components.js';
+import { TabContainer } from './objects/layout-components.js';
+import { ModalDialog, Tooltip } from './objects/advanced-ui-components.js';
+import { SearchBox } from './objects/input-utility-components.js';
 
 class AIEthicsApp {
     constructor() {
@@ -44,7 +44,6 @@ class AIEthicsApp {
         // Modernized managers
         this.accessibilityManager = null;
         this.animationManager = null;
-        this.layoutManager = null;
         
         // Enhanced objects for UI
         this.ethicsMeters = new Map();
@@ -154,7 +153,7 @@ class AIEthicsApp {
             console.log('AI Ethics App initialized successfully with modernized infrastructure');
             
             // Track initialization
-            AnalyticsManager.trackEvent('app_initialized', {
+            simpleAnalytics.trackEvent('app_initialized', {
                 simulations_available: this.availableSimulations.length,
                 browser: Helpers.getBrowserInfo().browser,
                 device: Helpers.getDeviceType(),
@@ -177,14 +176,18 @@ class AIEthicsApp {
         const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
         const prefersHighContrast = window.matchMedia?.('(prefers-contrast: high)').matches;
         
+        // Get saved user preferences (they override system preferences)
+        const savedPreferences = userPreferences.getAccessibilitySettings();
+        
+        // Use saved preferences if they exist, otherwise use system preferences
         this.preferences = {
-            reducedMotion: prefersReducedMotion,
-            darkMode: prefersDark,
-            highContrast: prefersHighContrast,
-            largeText: false // User preference only
+            reducedMotion: savedPreferences.reducedMotion !== undefined ? savedPreferences.reducedMotion : prefersReducedMotion,
+            darkMode: savedPreferences.darkMode !== undefined ? savedPreferences.darkMode : prefersDark,
+            highContrast: savedPreferences.highContrast !== undefined ? savedPreferences.highContrast : prefersHighContrast,
+            largeText: savedPreferences.largeText || false // Default to false
         };
         
-        this.currentTheme = prefersHighContrast ? 'high-contrast' : (prefersDark ? 'dark' : 'light');
+        this.currentTheme = this.preferences.highContrast ? 'high-contrast' : (this.preferences.darkMode ? 'dark' : 'light');
         
         // Apply initial theme
         this.applyTheme();
@@ -240,6 +243,9 @@ class AIEthicsApp {
         if (this.preferences.reducedMotion) body.classList.add('reduced-motion');
         if (this.preferences.largeText) body.classList.add('large-text');
         
+        // Update button states (aria-pressed attributes)
+        this.updateButtonStates();
+        
         // Update theme color meta tag
         const themeColorMeta = document.querySelector('meta[name="theme-color"]');
         if (themeColorMeta) {
@@ -257,6 +263,29 @@ class AIEthicsApp {
         
         if (this.accessibilityManager) {
             this.accessibilityManager.updateTheme(this.preferences);
+        }
+    }
+
+    /**
+     * Update accessibility button states
+     */
+    updateButtonStates() {
+        const darkModeBtn = document.getElementById('toggle-dark-mode');
+        const highContrastBtn = document.getElementById('toggle-high-contrast');
+        const largeTextBtn = document.getElementById('toggle-large-text');
+        const reducedMotionBtn = document.getElementById('toggle-reduced-motion');
+        
+        if (darkModeBtn) {
+            darkModeBtn.setAttribute('aria-pressed', this.preferences.darkMode.toString());
+        }
+        if (highContrastBtn) {
+            highContrastBtn.setAttribute('aria-pressed', this.preferences.highContrast.toString());
+        }
+        if (largeTextBtn) {
+            largeTextBtn.setAttribute('aria-pressed', this.preferences.largeText.toString());
+        }
+        if (reducedMotionBtn) {
+            reducedMotionBtn.setAttribute('aria-pressed', this.preferences.reducedMotion.toString());
         }
     }
     
@@ -304,7 +333,7 @@ class AIEthicsApp {
         console.error('App Error:', error);
         
         // Track error for analytics
-        AnalyticsManager.trackEvent('app_error', {
+        simpleAnalytics.trackEvent('app_error', {
             error_message: error.message || String(error),
             error_stack: error.stack,
             user_agent: navigator.userAgent,
@@ -393,7 +422,7 @@ class AIEthicsApp {
             };
             
             // Send to analytics
-            AnalyticsManager.trackEvent('error_reported', errorReport);
+            simpleAnalytics.trackEvent('error_reported', errorReport);
             
             // Show confirmation
             alert('Error report sent. Thank you for helping us improve the application.');
@@ -402,13 +431,6 @@ class AIEthicsApp {
 
     async initializeSystems() {
         try {
-            // Initialize layout manager with theme support
-            this.layoutManager = new LayoutManager({
-                responsive: true,
-                theme: this.currentTheme,
-                reducedMotion: this.preferences.reducedMotion
-            });
-            
             // Initialize animation manager with theme preferences
             this.animationManager = new AnimationManager({
                 enableAnimations: !this.preferences.reducedMotion,
@@ -435,7 +457,7 @@ class AIEthicsApp {
             };
 
             // Systems are already initialized via their modules
-            // StorageManager and AnalyticsManager auto-initialize
+            // Simple analytics auto-initializes
             console.log('Core systems initialized with modernized infrastructure');
             
         } catch (error) {
@@ -533,6 +555,8 @@ class AIEthicsApp {
         // Accessibility controls
         const highContrastBtn = document.getElementById('toggle-high-contrast');
         const largeTextBtn = document.getElementById('toggle-large-text');
+        const darkModeBtn = document.getElementById('toggle-dark-mode');
+        const reducedMotionBtn = document.getElementById('toggle-reduced-motion');
         
         if (highContrastBtn) {
             highContrastBtn.addEventListener('click', () => {
@@ -542,6 +566,18 @@ class AIEthicsApp {
           if (largeTextBtn) {
             largeTextBtn.addEventListener('click', () => {
                 this.toggleLargeText();
+            });
+        }
+
+        if (darkModeBtn) {
+            darkModeBtn.addEventListener('click', () => {
+                this.toggleDarkMode();
+            });
+        }
+
+        if (reducedMotionBtn) {
+            reducedMotionBtn.addEventListener('click', () => {
+                this.toggleReducedMotion();
             });
         }
 
@@ -590,15 +626,9 @@ class AIEthicsApp {
     }
 
     setupAccessibility() {
-        // Apply saved accessibility preferences
-        const preferences = StorageManager.getUserPreferences();
-        
-        if (preferences.accessibility?.highContrast) {
-            document.body.classList.add('high-contrast');
-        }
-        
-        if (preferences.accessibility?.largeText) {
-            document.body.classList.add('large-text');        }
+        // Preferences are now loaded in initializeTheme(), so we just need to ensure
+        // the theme is applied (which was already done in initializeTheme)
+        // This method is kept for future accessibility setup if needed
     }
 
     render() {
@@ -624,9 +654,9 @@ class AIEthicsApp {
             'aria-label': `${simulation.title} simulation`
         });
 
-        const progress = StorageManager.getUserProgress(simulation.id);
-        const isCompleted = progress?.completed || false;
-        const score = progress?.score || 0;
+        const progress = userProgress.getSimulationProgress(simulation.id);
+        const isCompleted = progress.completed || false;
+        const score = progress.score || 0;
 
         card.innerHTML = `
             <div class="card-thumbnail">
@@ -694,13 +724,13 @@ class AIEthicsApp {
 
             // Cleanup any existing simulation canvas
             if (this.currentSimulationCanvasId) {
-                CanvasManager.removeCanvas(this.currentSimulationCanvasId);
+                canvasManager.removeCanvas(this.currentSimulationCanvasId);
                 this.currentSimulationCanvasId = null;
             }
 
             // Cleanup hero demo canvas if running
             if (this.heroDemoCanvasId) {
-                CanvasManager.removeCanvas(this.heroDemoCanvasId);
+                canvasManager.removeCanvas(this.heroDemoCanvasId);
                 this.heroDemoCanvasId = null;
             }
             
@@ -710,7 +740,7 @@ class AIEthicsApp {
             }
 
             // Track simulation start
-            AnalyticsManager.trackSimulationStart(simulationId, simConfig.title);            // Get simulation container
+            simpleAnalytics.trackSimulationStart(simulationId, simConfig.title);            // Get simulation container
             const simulationContainer = document.getElementById('simulation-container');
             if (!simulationContainer) {
                 throw new Error('Simulation container not found');
@@ -725,7 +755,7 @@ class AIEthicsApp {
             simulationContainer.innerHTML = '';
             simulationContainer.classList.remove('error');
               // Create managed canvas for the simulation
-            const { canvas, id } = CanvasManager.createCanvas({
+            const { canvas, id } = await canvasManager.createCanvas({
                 width: 600,
                 height: 400,
                 container: simulationContainer,
@@ -746,7 +776,7 @@ class AIEthicsApp {
                 border-radius: 8px;
                 background: #fff;
             `;            // Create visual engine using canvas manager
-            this.engine = await CanvasManager.createVisualEngine(id, {
+            this.engine = await canvasManager.createVisualEngine(id, {
                 renderMode: 'canvas',
                 accessibility: true,
                 debug: false,
@@ -964,7 +994,7 @@ class AIEthicsApp {
 
         canvasesToCleanup.forEach(canvasId => {
             if (canvasId) {
-                CanvasManager.removeCanvas(canvasId);
+                canvasManager.removeCanvas(canvasId);
             }
         });
 
@@ -1006,7 +1036,7 @@ class AIEthicsApp {
     resetCurrentSimulation() {
         if (this.currentSimulation) {
             this.currentSimulation.reset();
-            AnalyticsManager.trackUserInteraction('reset_simulation', this.currentSimulation.id);
+            simpleAnalytics.trackInteraction('reset_simulation', this.currentSimulation.id);
         }
     }
 
@@ -1018,10 +1048,17 @@ class AIEthicsApp {
 
     onSimulationCompleted(data) {
         // Save completion data
-        StorageManager.markSimulationComplete(this.currentSimulation.id, data.report);
+        const progress = userProgress.getSimulationProgress(this.currentSimulation.id);
+        userProgress.setSimulationProgress(this.currentSimulation.id, {
+            ...progress,
+            completed: true,
+            score: data.report.score || 0,
+            scenarios: data.report.scenarios || [],
+            timeSpent: (progress.timeSpent || 0) + (data.report.timeSpent || 0)
+        });
         
         // Track completion
-        AnalyticsManager.trackSimulationComplete(this.currentSimulation.id, data.report);
+        simpleAnalytics.trackSimulationComplete(this.currentSimulation.id, data.report);
         
         // Show completion feedback
         this.showCompletionFeedback(data);
@@ -1136,7 +1173,7 @@ class AIEthicsApp {
             }
 
             // Create managed canvas for ethics meters
-            const { canvas, id } = CanvasManager.createCanvas({
+            const { canvas, id } = await canvasManager.createCanvas({
                 width: 800,
                 height: 200,
                 container: meterContainer,
@@ -1157,7 +1194,7 @@ class AIEthicsApp {
 
             // Initialize visual engine with managed canvas
             if (!this.visualEngine) {
-                this.visualEngine = await CanvasManager.createVisualEngine(id, this.visualEngineConfig);
+                this.visualEngine = await canvasManager.createVisualEngine(id, this.visualEngineConfig);
             } else {
                 // If visual engine already exists, just reinitialize with new canvas
                 this.visualEngine.container = canvas;
@@ -1257,29 +1294,66 @@ class AIEthicsApp {
                 btn.style.display = 'none';
             }
         });        // Create managed canvas for buttons
-        const { canvas: buttonCanvas, id: buttonCanvasId } = CanvasManager.createCanvas({
-            width: 600,
-            height: 100,
-            container: actionsContainer,
-            className: 'interactive-buttons-canvas',
-            id: `interactive-buttons-${Date.now()}`
-        });
+        let buttonCanvas, buttonCanvasId;
+        try {
+            const canvasResult = await canvasManager.createCanvas({
+                width: 600,
+                height: 100,
+                container: actionsContainer,
+                className: 'interactive-buttons-canvas',
+                id: `interactive-buttons-${Date.now()}`
+            });
+            
+            if (!canvasResult || !canvasResult.canvas) {
+                throw new Error('canvasManager.createCanvas returned invalid result');
+            }
+            
+            buttonCanvas = canvasResult.canvas;
+            buttonCanvasId = canvasResult.id;
+            
+        } catch (canvasError) {
+            console.warn('Failed to create canvas for interactive buttons:', canvasError);
+            // Create a simple fallback div instead
+            buttonCanvas = document.createElement('div');
+            buttonCanvas.className = 'interactive-buttons-fallback';
+            buttonCanvas.innerHTML = `
+                <button class="btn btn-secondary enhanced-button" id="reset-simulation-fallback">Reset</button>
+                <button class="btn btn-primary enhanced-button" id="next-scenario-fallback">Next</button>
+            `;
+            actionsContainer.appendChild(buttonCanvas);
+            console.log('Using fallback buttons instead of canvas');
+            return; // Exit early with fallback
+        }
 
         // Store canvas ID for cleanup
         this.interactiveButtonsCanvasId = buttonCanvasId;
 
-        buttonCanvas.style.cssText = `
-            max-width: 100%;
-            height: auto;
-            margin: 10px 0;
-        `;
+        if (buttonCanvas && buttonCanvas.style) {
+            buttonCanvas.style.cssText = `
+                max-width: 100%;
+                height: auto;
+                margin: 10px 0;
+            `;
+        }
 
         // Initialize button visual engine using canvas manager
-        const buttonEngine = await CanvasManager.createVisualEngine(buttonCanvasId, {
-            renderMode: 'canvas',
-            accessibility: true,
-            debug: false
-        });// Create interactive buttons
+        let buttonEngine;
+        try {
+            buttonEngine = await canvasManager.createVisualEngine(buttonCanvasId, {
+                renderMode: 'canvas',
+                accessibility: true,
+                debug: false
+            });
+            
+            if (!buttonEngine) {
+                throw new Error('canvasManager.createVisualEngine returned null');
+            }
+        } catch (engineError) {
+            console.warn('Failed to create visual engine for buttons:', engineError);
+            // Use a simple fallback without visual engine
+            console.log('Interactive buttons will use standard DOM elements');
+            return;
+        }// Create interactive buttons
         const resetButton = new InteractiveButton({
             id: 'reset-button',
             x: 100,
@@ -1341,7 +1415,7 @@ class AIEthicsApp {
                 controls.appendChild(sliderContainer);
             }
         }        // Create managed canvas for sliders
-        const { canvas: sliderCanvas, id: sliderCanvasId } = CanvasManager.createCanvas({
+        const { canvas: sliderCanvas, id: sliderCanvasId } = await canvasManager.createCanvas({
             width: 700,
             height: 200,
             container: sliderContainer,
@@ -1358,7 +1432,7 @@ class AIEthicsApp {
         `;
 
         // Initialize slider visual engine using canvas manager
-        const sliderEngine = await CanvasManager.createVisualEngine(sliderCanvasId, {
+        const sliderEngine = await canvasManager.createVisualEngine(sliderCanvasId, {
             renderMode: 'canvas',
             accessibility: true,
             debug: false
@@ -1494,7 +1568,7 @@ class AIEthicsApp {
 
         uiCanvasesToCleanup.forEach(canvasId => {
             if (canvasId) {
-                CanvasManager.removeCanvas(canvasId);
+                canvasManager.removeCanvas(canvasId);
             }
         });
 
@@ -2035,7 +2109,7 @@ class AIEthicsApp {
             }
             
             // Track navigation
-            AnalyticsManager.trackUserInteraction('scroll_to_simulations', 'hero_button');
+            simpleAnalytics.trackInteraction('scroll_to_simulations', 'hero_button');
         }
     }
 
@@ -2062,7 +2136,7 @@ class AIEthicsApp {
         this.showInfoModal('Educator Tools', educatorContent);
         
         // Track educator interest
-        AnalyticsManager.trackUserInteraction('educator_tools_clicked', 'hero_button');
+        simpleAnalytics.trackInteraction('educator_tools_clicked', 'hero_button');
     }
 
     /**
@@ -2075,10 +2149,9 @@ class AIEthicsApp {
         this.applyTheme();
         
         // Save preference
-        const userPrefs = StorageManager.getUserPreferences();
-        userPrefs.accessibility = userPrefs.accessibility || {};
-        userPrefs.accessibility.highContrast = this.preferences.highContrast;
-        StorageManager.setUserPreferences(userPrefs);
+        const currentSettings = userPreferences.getAccessibilitySettings();
+        currentSettings.highContrast = this.preferences.highContrast;
+        userPreferences.setAccessibilitySettings(currentSettings);
         
         // Announce change
         const status = this.preferences.highContrast ? 'enabled' : 'disabled';
@@ -2087,7 +2160,7 @@ class AIEthicsApp {
         }
         
         // Track usage
-        AnalyticsManager.trackUserInteraction('toggle_high_contrast', status);
+        simpleAnalytics.trackInteraction('toggle_high_contrast', status);
         
         console.log(`High contrast mode ${status}`);
     }
@@ -2102,10 +2175,9 @@ class AIEthicsApp {
         this.applyTheme();
         
         // Save preference
-        const userPrefs = StorageManager.getUserPreferences();
-        userPrefs.accessibility = userPrefs.accessibility || {};
-        userPrefs.accessibility.largeText = this.preferences.largeText;
-        StorageManager.setUserPreferences(userPrefs);
+        const currentSettings = userPreferences.getAccessibilitySettings();
+        currentSettings.largeText = this.preferences.largeText;
+        userPreferences.setAccessibilitySettings(currentSettings);
         
         // Announce change
         const status = this.preferences.largeText ? 'enabled' : 'disabled';
@@ -2114,9 +2186,61 @@ class AIEthicsApp {
         }
         
         // Track usage
-        AnalyticsManager.trackUserInteraction('toggle_large_text', status);
+        simpleAnalytics.trackInteraction('toggle_large_text', status);
         
         console.log(`Large text mode ${status}`);
+    }
+
+    /**
+     * Toggle dark mode
+     */
+    toggleDarkMode() {
+        this.preferences.darkMode = !this.preferences.darkMode;
+        
+        // Apply theme changes
+        this.applyTheme();
+        
+        // Save preference
+        const currentSettings = userPreferences.getAccessibilitySettings();
+        currentSettings.darkMode = this.preferences.darkMode;
+        userPreferences.setAccessibilitySettings(currentSettings);
+        
+        // Announce change
+        const status = this.preferences.darkMode ? 'enabled' : 'disabled';
+        if (this.accessibilityManager) {
+            this.accessibilityManager.announce(`Dark mode ${status}`);
+        }
+        
+        // Track usage
+        simpleAnalytics.trackInteraction('toggle_dark_mode', status);
+        
+        console.log(`Dark mode ${status}`);
+    }
+
+    /**
+     * Toggle reduced motion mode
+     */
+    toggleReducedMotion() {
+        this.preferences.reducedMotion = !this.preferences.reducedMotion;
+        
+        // Apply theme changes
+        this.applyTheme();
+        
+        // Save preference
+        const currentSettings = userPreferences.getAccessibilitySettings();
+        currentSettings.reducedMotion = this.preferences.reducedMotion;
+        userPreferences.setAccessibilitySettings(currentSettings);
+        
+        // Announce change
+        const status = this.preferences.reducedMotion ? 'enabled' : 'disabled';
+        if (this.accessibilityManager) {
+            this.accessibilityManager.announce(`Reduced motion mode ${status}`);
+        }
+        
+        // Track usage
+        simpleAnalytics.trackInteraction('toggle_reduced_motion', status);
+        
+        console.log(`Reduced motion mode ${status}`);
     }
 
     /**
@@ -2150,7 +2274,7 @@ class AIEthicsApp {
             const closeBtn = infoModal.querySelector('.modal-close');
             closeBtn.addEventListener('click', () => {
                 infoModal.style.display = 'none';
-                infoModal.setAttribute('aria-hidden', 'true');
+                               infoModal.setAttribute('aria-hidden', 'true');
             });
         }
         

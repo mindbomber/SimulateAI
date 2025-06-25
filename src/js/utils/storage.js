@@ -203,20 +203,20 @@ class StorageManager {
                 await StorageEncryption.generateKey();
             }
             
-            // Setup storage references
-            this.storage = window.localStorage;
-            this.sessionStorage = window.sessionStorage;
-            
-            // Check storage availability
-            if (!this.isStorageAvailable()) {
+            // Check storage availability first
+            if (!this.isStorageAvailable() || !window.localStorage || !window.sessionStorage) {
                 console.warn('Local storage not available, using in-memory storage');
                 this.storage = new Map();
                 this.sessionStorage = new Map();
                 this.setupMemoryStorage();
+            } else {
+                // Setup storage references only if available
+                this.storage = window.localStorage;
+                this.sessionStorage = window.sessionStorage;
             }
             
-            // Setup cross-tab synchronization
-            if (this.syncEnabled) {
+            // Setup cross-tab synchronization only if real storage is available
+            if (this.syncEnabled && this.storage !== this.memoryFallback) {
                 this.setupCrossTabSync();
             }
             
@@ -331,6 +331,11 @@ class StorageManager {
      */
     static isStorageAvailable() {
         try {
+            // First check if localStorage exists and is not null
+            if (!window.localStorage || !window.sessionStorage) {
+                return false;
+            }
+            
             const test = '__storage_test__';
             localStorage.setItem(test, test);
             localStorage.removeItem(test);
@@ -555,6 +560,11 @@ class StorageManager {
                 return defaultValue;
             }
             
+            // Check if storage is available
+            if (!this.storage) {
+                return defaultValue;
+            }
+            
             // Get raw data
             let item;
             if (this.storage instanceof Map) {
@@ -678,6 +688,11 @@ class StorageManager {
         const fullKey = this.STORAGE_PREFIX + key;
         
         try {
+            // Check if sessionStorage is available
+            if (!this.sessionStorage) {
+                return;
+            }
+            
             if (this.sessionStorage instanceof Map) {
                 this.sessionStorage.set(fullKey, JSON.stringify(value));
             } else {
@@ -692,6 +707,11 @@ class StorageManager {
         const fullKey = this.STORAGE_PREFIX + key;
         
         try {
+            // Check if sessionStorage is available
+            if (!this.sessionStorage) {
+                return defaultValue;
+            }
+            
             let item;
             if (this.sessionStorage instanceof Map) {
                 item = this.sessionStorage.get(fullKey);

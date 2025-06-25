@@ -279,7 +279,11 @@ class CanvasRenderer {
     // Enhanced features
     this.performanceMonitor = new CanvasPerformanceMonitor();
     this.accessibilityManager = null;
-    this.currentTheme = CANVAS_CONSTANTS.THEMES[this.options.theme.toUpperCase()] || CANVAS_CONSTANTS.THEMES.LIGHT;
+    
+    // Safely handle theme selection with proper type checking
+    const themeKey = (typeof this.options.theme === 'string' ? this.options.theme : 'light').toUpperCase();
+    this.currentTheme = CANVAS_CONSTANTS.THEMES[themeKey] || CANVAS_CONSTANTS.THEMES.LIGHT;
+    
     this.imageCache = new Map();
     this.drawCallCount = 0;
     
@@ -448,14 +452,20 @@ class CanvasRenderer {
    * Handle container resize
    */
   handleResize(entries) {
+    let width, height;
+    
     if (entries && entries[0]) {
-      const { width, height } = entries[0].contentRect;
-      this.resize(width, height);
+      ({ width, height } = entries[0].contentRect);
     } else {
       // Fallback for non-ResizeObserver browsers
-      const rect = this.container.getBoundingClientRect();
-      this.resize(rect.width, rect.height);
+      ({ width, height } = this.container.getBoundingClientRect());
     }
+    
+    // Validate dimensions before resizing
+    if (width > 0 && height > 0) {
+      this.resize(width, height);
+    }
+    // Skip resize silently if dimensions are invalid (container might be hidden)
   }
   
   /**
@@ -463,7 +473,9 @@ class CanvasRenderer {
    * @param {string} themeName - Theme name ('light', 'dark', 'high_contrast')
    */
   setTheme(themeName) {
-    const theme = CANVAS_CONSTANTS.THEMES[themeName.toUpperCase()];
+    // Safely handle theme name with proper type checking
+    const themeKey = (typeof themeName === 'string' ? themeName : 'light').toUpperCase();
+    const theme = CANVAS_CONSTANTS.THEMES[themeKey];
     if (theme && theme !== this.currentTheme) {
       this.currentTheme = theme;
       this.options.theme = themeName;

@@ -148,7 +148,7 @@ const UIUtils = {
 };
 
 // ===== ENHANCED MODAL DIALOG SYSTEM =====
-export class ModalDialog extends BaseObject {
+class ModalDialog extends BaseObject {
     /**
      * Creates a new modal dialog
      * @param {Object} options - Configuration options
@@ -861,7 +861,7 @@ export class ModalDialog extends BaseObject {
 }
 
 // ===== NAVIGATION MENU SYSTEM =====
-export class NavigationMenu extends BaseObject {
+class NavigationMenu extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
@@ -1717,7 +1717,7 @@ export class NavigationMenu extends BaseObject {
 }
 
 // ===== DATA VISUALIZATION COMPONENTS =====
-export class Chart extends BaseObject {
+class Chart extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
@@ -2869,7 +2869,7 @@ export class Chart extends BaseObject {
 }
 
 // ===== FORM COMPONENTS =====
-export class FormField extends BaseObject {
+class FormField extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
@@ -3961,7 +3961,7 @@ export class FormField extends BaseObject {
 }
 
 // ===== TOOLTIP SYSTEM =====
-export class Tooltip extends BaseObject {
+class Tooltip extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,

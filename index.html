@@ -258,6 +258,8 @@
     </div>
     
     <!-- Scripts -->
+    <script type="module" src="src/js/utils/simple-storage.js"></script>
+    <script type="module" src="src/js/utils/simple-analytics.js"></script>
     <script type="module" src="src/js/components/notification-toast.js"></script>
     <script type="module" src="src/js/app.js"></script>
     <script type="module" src="src/js/components/reusable-modal.js"></script>
@@ -277,8 +279,8 @@
                 
                 // Report to our analytics system
                 const measure = performance.getEntriesByName('page-load-time')[0];
-                if (measure && window.AnalyticsManager) {
-                    window.AnalyticsManager.trackPerformance('page-load', measure.duration);
+                if (measure && window.SimpleAnalytics) {
+                    window.SimpleAnalytics.trackPerformance('page-load', measure.duration);
                 }
             });
         }

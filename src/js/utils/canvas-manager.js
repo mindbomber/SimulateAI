@@ -108,9 +108,20 @@ class CanvasPerformanceMonitor {
         
         this.operations.delete(operationId);
         
-        // Warn if operation is slow
-        if (duration > 16) { // 60fps threshold
-            console.warn(`Slow canvas operation: ${operationId} took ${duration.toFixed(2)}ms`);
+        // Use different thresholds for different operation types
+        const getThreshold = (opId) => {
+            if (opId.includes('engine-creation') || opId.includes('canvas-creation')) {
+                return 50; // Engine/canvas creation can take longer
+            }
+            if (opId.includes('render') || opId.includes('draw')) {
+                return 16; // Rendering operations should be fast (60fps)
+            }
+            return 25; // Default threshold for other operations
+        };
+        
+        const threshold = getThreshold(operationId);
+        if (duration > threshold) {
+            console.warn(`Slow canvas operation: ${operationId} took ${duration.toFixed(2)}ms (threshold: ${threshold}ms)`);
         }
         
         return duration;
@@ -229,7 +240,7 @@ class CanvasManager {    constructor() {
                 // Notify visual engine of theme change
                 const engine = this.visualEngines.get(canvasId);
                 if (engine && engine.updateTheme) {
-                    engine.updateTheme(this.theme);
+                    engine.updateTheme(this.theme.theme); // Pass the theme string, not the theme object
                 }
             } catch (error) {
                 this.handleError(new CanvasError('Failed to update canvas theme', {
@@ -478,7 +489,7 @@ class CanvasManager {    constructor() {
                 renderMode: 'canvas',
                 accessibility: this.accessibilityEnabled,
                 debug: false,
-                theme: this.theme,
+                theme: this.theme.theme, // Extract the theme string from the theme object
                 performance: {
                     monitoring: true,
                     targetFPS: 60,
@@ -494,7 +505,7 @@ class CanvasManager {    constructor() {
 
             // Enhanced engine integration
             if (engine.setTheme) {
-                engine.setTheme(this.theme);
+                engine.setTheme(this.theme.theme); // Pass the theme string, not the theme object
             }
             
             if (engine.setPerformanceMonitor) {

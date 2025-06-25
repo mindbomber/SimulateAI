@@ -3,8 +3,8 @@
  * Provides common functionality for ethics tracking, UI management, and educational features
  */
 
-import StorageManager from '../utils/storage.js';
-import AnalyticsManager from '../utils/analytics.js';
+import { simpleStorage, userProgress } from '../utils/simple-storage.js';
+import { simpleAnalytics } from '../utils/simple-analytics.js';
 import { UIComponent, UIPanel, EthicsDisplay, FeedbackSystem } from './ui.js';
 
 class EthicsSimulation {
@@ -258,13 +258,13 @@ class EthicsSimulation {
         
         // Store in local storage and analytics with error handling
         try {
-            StorageManager.logDecision(decision);
+            simpleStorage.set(`decision_${this.id}_${Date.now()}`, decision);
         } catch (error) {
             console.error('Failed to log decision to storage:', error);
         }
         
         try {
-            AnalyticsManager.trackEthicsDecision(decision);
+            simpleAnalytics.trackEvent('ethics_decision', decision);
         } catch (error) {
             console.error('Failed to track decision in analytics:', error);
         }

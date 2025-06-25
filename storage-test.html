@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Storage Test</title>
+    <style>
+        body { 
+            font-family: system-ui, -apple-system, sans-serif; 
+            max-width: 800px; 
+            margin: 40px auto; 
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section { 
+            margin: 20px 0; 
+            padding: 20px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        button { 
+            margin: 5px; 
+            padding: 10px 15px; 
+            border: none; 
+            border-radius: 4px; 
+            background: #007bff; 
+            color: white; 
+            cursor: pointer;
+        }
+        button:hover { background: #0056b3; }
+        .output { 
+            background: #e9ecef; 
+            padding: 10px; 
+            border-radius: 4px; 
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Simple Storage System Test</h1>
+    <p>This page tests the new simplified storage system for the AI Ethics Simulations app.</p>
+    
+    <div class="test-section">
+        <h2>Storage Status</h2>
+        <div id="storage-status"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Basic Storage Operations</h2>
+        <button onclick="testBasicStorage()">Test Basic Storage</button>
+        <button onclick="clearAll()">Clear All Data</button>
+        <div id="basic-output" class="output"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>User Preferences</h2>
+        <button onclick="testPreferences()">Test Preferences</button>
+        <button onclick="setDarkTheme()">Set Dark Theme</button>
+        <button onclick="toggleAccessibility()">Toggle High Contrast</button>
+        <div id="prefs-output" class="output"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>User Progress</h2>
+        <button onclick="testProgress()">Test Progress Tracking</button>
+        <button onclick="completeSimulation()">Complete Demo Simulation</button>
+        <div id="progress-output" class="output"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Storage Info</h2>
+        <button onclick="showStorageInfo()">Show Storage Info</button>
+        <div id="info-output" class="output"></div>
+    </div>
+
+    <script type="module">
+        import { simpleStorage, userPreferences, userProgress } from './src/js/utils/simple-storage.js';
+        
+        // Make available globally for testing
+        window.storage = simpleStorage;
+        window.preferences = userPreferences;
+        window.progress = userProgress;
+        
+        // Initialize display
+        document.addEventListener('DOMContentLoaded', () => {
+            showStorageStatus();
+        });
+        
+        function showStorageStatus() {
+            const info = window.storage.getStorageInfo();
+            document.getElementById('storage-status').innerHTML = `
+                <strong>Storage Availability:</strong><br>
+                • localStorage: ${info.localStorageAvailable ? '✅ Available' : '❌ Not available'}<br>
+                • sessionStorage: ${info.sessionStorageAvailable ? '✅ Available' : '❌ Not available'}<br>
+                • Memory fallback: ✅ Always available<br>
+                • Stored keys: ${info.allKeys.length}
+            `;
+        }
+        
+        window.testBasicStorage = function() {
+            const output = document.getElementById('basic-output');
+            let result = 'Testing basic storage operations:\n\n';
+            
+            // Test set/get
+            window.storage.set('test_key', 'Hello, World!');
+            const value = window.storage.get('test_key');
+            result += `✅ Set/Get: "${value}"\n`;
+            
+            // Test objects
+            const testObj = { name: 'Test User', score: 100, active: true };
+            window.storage.set('test_object', testObj);
+            const retrievedObj = window.storage.get('test_object');
+            result += `✅ Object storage: ${JSON.stringify(retrievedObj)}\n`;
+            
+            // Test default values
+            const defaultTest = window.storage.get('nonexistent_key', 'default value');
+            result += `✅ Default value: "${defaultTest}"\n`;
+            
+            // Show all keys
+            const keys = window.storage.getAllKeys();
+            result += `✅ All keys: [${keys.join(', ')}]\n`;
+            
+            output.textContent = result;
+            showStorageStatus();
+        };
+        
+        window.clearAll = function() {
+            window.storage.clear();
+            document.getElementById('basic-output').textContent = '🗑️ All storage cleared';
+            showStorageStatus();
+        };
+        
+        window.testPreferences = function() {
+            const output = document.getElementById('prefs-output');
+            let result = 'Testing user preferences:\n\n';
+            
+            const theme = window.preferences.getTheme();
+            result += `Current theme: ${theme}\n`;
+            
+            const language = window.preferences.getLanguage();
+            result += `Current language: ${language}\n`;
+            
+            const accessibility = window.preferences.getAccessibilitySettings();
+            result += `Accessibility settings: ${JSON.stringify(accessibility, null, 2)}\n`;
+            
+            const allPrefs = window.preferences.getAllPreferences();
+            result += `\nAll preferences: ${JSON.stringify(allPrefs, null, 2)}`;
+            
+            output.textContent = result;
+        };
+        
+        window.setDarkTheme = function() {
+            window.preferences.setTheme('dark');
+            document.getElementById('prefs-output').textContent = '🌙 Theme set to dark';
+        };
+        
+        window.toggleAccessibility = function() {
+            const current = window.preferences.getAccessibilitySettings();
+            current.highContrast = !current.highContrast;
+            window.preferences.setAccessibilitySettings(current);
+            document.getElementById('prefs-output').textContent = 
+                `🎨 High contrast: ${current.highContrast ? 'enabled' : 'disabled'}`;
+        };
+        
+        window.testProgress = function() {
+            const output = document.getElementById('progress-output');
+            let result = 'Testing progress tracking:\n\n';
+            
+            // Get progress for a demo simulation
+            const progress = window.progress.getSimulationProgress('bias-detection-sim');
+            result += `Bias Detection progress: ${JSON.stringify(progress, null, 2)}\n\n`;
+            
+            const overallStats = window.progress.getOverallStats();
+            result += `Overall stats: ${JSON.stringify(overallStats, null, 2)}\n\n`;
+            
+            const allProgress = window.progress.getAllProgress();
+            result += `All progress data: ${JSON.stringify(allProgress, null, 2)}`;
+            
+            output.textContent = result;
+        };
+        
+        window.completeSimulation = function() {
+            const simulationId = 'bias-detection-sim';
+            const progress = {
+                completed: true,
+                score: 85,
+                scenarios: ['intro', 'hiring', 'lending', 'conclusion'],
+                timeSpent: 1200 // 20 minutes
+            };
+            
+            window.progress.setSimulationProgress(simulationId, progress);
+            
+            // Update overall stats
+            const stats = window.progress.getOverallStats();
+            stats.totalSimulations += 1;
+            stats.totalTimeSpent += progress.timeSpent;
+            stats.completedSimulations.push(simulationId);
+            stats.averageScore = (stats.averageScore + progress.score) / 2;
+            window.progress.setOverallStats(stats);
+            
+            document.getElementById('progress-output').textContent = 
+                '🎉 Demo simulation completed with score 85!';
+        };
+        
+        window.showStorageInfo = function() {
+            const info = window.storage.getStorageInfo();
+            const output = document.getElementById('info-output');
+            output.textContent = JSON.stringify(info, null, 2);
+        };
+    </script>
+</body>
+</html>

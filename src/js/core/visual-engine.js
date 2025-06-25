@@ -110,8 +110,8 @@ export class VisualEngine {
     }    setupEventListeners() {
         // Handle container resize
         if (typeof ResizeObserver !== 'undefined') {
-            const resizeObserver = new ResizeObserver(() => {
-                this.handleResize();
+            const resizeObserver = new ResizeObserver((entries) => {
+                this.handleResize(entries);
             });
             resizeObserver.observe(this.container);
         } else {
@@ -441,9 +441,21 @@ export class VisualEngine {
     }
 
     // Event handling
-    handleResize() {
+    handleResize(entries = null) {
         if (this.renderer && this.renderer.resize) {
-            this.renderer.resize();
+            let width, height;
+            
+            // Use ResizeObserver data if available, otherwise get container dimensions
+            if (entries && entries[0]) {
+                ({ width, height } = entries[0].contentRect);
+            } else {
+                ({ width, height } = this.container.getBoundingClientRect());
+            }
+            
+            // Only resize if dimensions are valid
+            if (width > 0 && height > 0) {
+                this.renderer.resize(width, height);
+            }
         }
         
         // Notify scene objects of resize

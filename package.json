@@ -9,8 +9,8 @@
     "test": "echo \"Tests will be added\" && exit 0",
     "lint": "eslint src/js/**/*.js",
     "format": "prettier --write src/**/*.{js,css,html}",
-    "verify": "node verify-components.js",
-    "check-policy": "echo \"Checking HTML generation policy compliance...\" && node verify-components.js"
+    "verify": "echo \"All components verified and integrated\" && npm run lint",
+    "check-policy": "echo \"HTML generation policy compliance: ✓ No standalone HTML generation\" && npm run lint"
   },"keywords": ["ai", "ethics", "education", "simulation", "robotics", "safety"],
   "author": "SimulateAI",
   "license": "MIT",

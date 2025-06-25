@@ -9,7 +9,7 @@ import { BaseObject } from './enhanced-objects.js';
 // PRIORITY 1: DATA TABLE COMPONENT
 // =============================================================================
 
-export class DataTable extends BaseObject {
+class DataTable extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
@@ -400,7 +400,7 @@ export class DataTable extends BaseObject {
 // PRIORITY 2: NOTIFICATION TOAST COMPONENT
 // =============================================================================
 
-export class NotificationToast extends BaseObject {
+class NotificationToast extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
@@ -546,7 +546,7 @@ export class NotificationToast extends BaseObject {
 // PRIORITY 3: LOADING SPINNER COMPONENT
 // =============================================================================
 
-export class LoadingSpinner extends BaseObject {
+class LoadingSpinner extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,

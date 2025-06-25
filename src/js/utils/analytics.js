@@ -19,7 +19,7 @@
  * @license Apache-2.0
  */
 
-import StorageManager from './storage.js';
+import { simpleStorage, userPreferences } from './simple-storage.js';
 
 // Enhanced constants and configuration
 const ANALYTICS_CONSTANTS = {

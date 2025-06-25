@@ -408,7 +408,7 @@ const PERFORMANCE_THRESHOLDS = {
  * Advanced TabContainer component with accessibility, drag-and-drop,
  * theme support, and modern interaction patterns.
  */
-export class TabContainer extends BaseObject {
+class TabContainer extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
@@ -1280,7 +1280,7 @@ export class TabContainer extends BaseObject {
  * Advanced ProgressStepper component with accessibility, animations,
  * theme support, and modern interaction patterns.
  */
-export class ProgressStepper extends BaseObject {
+class ProgressStepper extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
@@ -2259,7 +2259,7 @@ export class ProgressStepper extends BaseObject {
  * Advanced SplitPane component with accessibility, animations,
  * theme support, and modern interaction patterns.
  */
-export class SplitPane extends BaseObject {
+class SplitPane extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
@@ -3207,7 +3207,7 @@ export class SplitPane extends BaseObject {
  * Advanced TreeView component with accessibility, animations,
  * theme support, and modern interaction patterns.
  */
-export class TreeView extends BaseObject {
+class TreeView extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
@@ -4373,7 +4373,7 @@ export class TreeView extends BaseObject {
  * Advanced FileUpload component with accessibility, animations,
  * theme support, and modern interaction patterns.
  */
-export class FileUpload extends BaseObject {
+class FileUpload extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,

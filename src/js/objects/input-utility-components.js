@@ -279,7 +279,7 @@ class AnimationManager {
  * Advanced ColorPicker component with accessibility, performance optimization,
  * and modern features including alpha support, color spaces, and presets.
  */
-export class ColorPicker extends BaseObject {
+class ColorPicker extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
@@ -1497,7 +1497,7 @@ export class ColorPicker extends BaseObject {
  * Advanced Accordion component with accessibility, smooth animations,
  * and modern interaction patterns.
  */
-export class Accordion extends BaseObject {
+class Accordion extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
@@ -2292,7 +2292,7 @@ export class Accordion extends BaseObject {
 // DATE TIME PICKER COMPONENT
 // =============================================================================
 
-export class DateTimePicker extends BaseObject {
+class DateTimePicker extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
@@ -3463,7 +3463,7 @@ export class DateTimePicker extends BaseObject {
 // NUMBER INPUT COMPONENT
 // =============================================================================
 
-export class NumberInput extends BaseObject {
+class NumberInput extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
@@ -4145,7 +4145,7 @@ export class NumberInput extends BaseObject {
  * Advanced Drawer component with accessibility, smooth animations,
  * theme support, and modern interaction patterns.
  */
-export class Drawer extends BaseObject {
+class Drawer extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
@@ -4972,7 +4972,7 @@ export class Drawer extends BaseObject {
  * Advanced SearchBox component with accessibility, autocomplete,
  * theme support, and modern interaction patterns.
  */
-export class SearchBox extends BaseObject {
+class SearchBox extends BaseObject {
     constructor(options = {}) {
         super({
             ...options,
