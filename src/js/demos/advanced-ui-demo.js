@@ -4,6 +4,7 @@
  */
 
 import VisualEngine from '../core/visual-engine.js';
+import logger from '../utils/logger.js';
 // Commented out unused imports for now
 // import { Button, Slider, Meter, Label } from '../objects/interactive-objects.js';
 // import { ModalDialog, NavigationMenu, Chart, FormField, Tooltip } from '../objects/advanced-ui-components.js';
@@ -26,7 +27,7 @@ export class AdvancedUIDemo {
     }
 
     async init() {
-        console.log('AdvancedUIDemo: Initializing...');
+        logger.info('AdvancedUIDemo: Initializing...');
         
         this.setupEngine();
         this.createDemoLayout();
@@ -37,7 +38,7 @@ export class AdvancedUIDemo {
         this.createTooltipSystem();
         this.setupInteractivity();
         
-        console.log('AdvancedUIDemo: Ready - Showcasing all advanced UI components');
+        logger.info('AdvancedUIDemo: Ready - Showcasing all advanced UI components');
     }
 
     setupEngine() {
@@ -528,7 +529,7 @@ export class AdvancedUIDemo {
         const newPieData = Array.from({length: 5}, () => Math.floor(Math.random() * 25) + 10);
 
         // Update chart data (this would be implemented in the Chart component)
-        console.log('Updating chart data:', { newLineData, newBarData, newPieData });
+        logger.debug('Updating chart data:', { newLineData, newBarData, newPieData });
         
         // Update status
         this.updateStatus('Charts updated with new data');
@@ -536,7 +537,7 @@ export class AdvancedUIDemo {
 
     resetChartData() {
         // Reset to original demo data
-        console.log('Resetting chart data to defaults');
+        logger.debug('Resetting chart data to defaults');
         this.updateStatus('Charts reset to default data');
     }
 
@@ -560,7 +561,7 @@ export class AdvancedUIDemo {
             // Would collect actual form field values in real implementation
         };
         
-        console.log('Form submitted:', formData);
+        logger.info('Form submitted:', formData);
         this.updateStatus('Form submitted successfully');
         
         // Show confirmation
@@ -569,7 +570,7 @@ export class AdvancedUIDemo {
 
     submitEthicsAssessment(modal) {
         // In a real implementation, this would collect and validate form data
-        console.log('Ethics assessment submitted');
+        logger.info('Ethics assessment submitted');
         this.updateStatus('Ethics assessment submitted');
         modal.close();
     }
@@ -592,12 +593,12 @@ export class AdvancedUIDemo {
     // Navigation Methods
     showDashboard() {
         this.updateStatus('Navigated to Dashboard');
-        console.log('Showing Dashboard view');
+        logger.debug('Showing Dashboard view');
     }
 
     showAnalytics() {
         this.updateStatus('Navigated to Analytics');
-        console.log('Showing Analytics view');
+        logger.debug('Showing Analytics view');
     }
 
     showSettings() {
@@ -616,7 +617,7 @@ export class AdvancedUIDemo {
         if (statusLabel) {
             statusLabel.setText(`Demo Status: ${message} | Keyboard: Ctrl+H (Help), Ctrl+R (Reset), Esc (Close)`);
         }
-        console.log('Demo Status:', message);
+        logger.info('Demo Status:', message);
     }
 
     resetDemo() {
@@ -660,7 +661,7 @@ export class AdvancedUIDemo {
         if (this.engine) {
             this.engine.destroy();
         }
-        console.log('AdvancedUIDemo: Destroyed');
+        logger.info('AdvancedUIDemo: Destroyed');
     }
 }
 

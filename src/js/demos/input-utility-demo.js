@@ -4,6 +4,7 @@
  */
 
 import { VisualEngine } from '../core/visual-engine.js';
+import logger from '../utils/logger.js';
 
 export class InputUtilityComponentsDemo {
     constructor(container) {
@@ -19,7 +20,7 @@ export class InputUtilityComponentsDemo {
     }
     
     setupDemo() {
-        console.log('Setting up Input/Utility Components Demo...');
+        logger.info('Setting up Input/Utility Components Demo...');
         
         // Create demo sections
         this.createColorPickerDemo();
@@ -35,7 +36,7 @@ export class InputUtilityComponentsDemo {
         // Start the engine
         this.engine.start();
         
-        console.log('Input/Utility Components Demo initialized');
+        logger.info('Input/Utility Components Demo initialized');
     }
     
     createColorPickerDemo() {
@@ -69,11 +70,11 @@ export class InputUtilityComponentsDemo {
         
         // Event listeners
         colorPicker1.on('colorChanged', (event) => {
-            console.log('Color 1 changed:', event.value);
+            logger.debug('Color 1 changed:', event.value);
         });
         
         colorPicker2.on('colorChanged', (event) => {
-            console.log('Color 2 changed (RGB):', event.value);
+            logger.debug('Color 2 changed (RGB):', event.value);
         });
     }
     
@@ -108,11 +109,11 @@ export class InputUtilityComponentsDemo {
         
         // Event listeners
         datePicker1.on('dateChanged', (event) => {
-            console.log('Date 1 changed:', event.value);
+            logger.debug('Date 1 changed:', event.value);
         });
         
         dateTimePicker.on('dateChanged', (event) => {
-            console.log('DateTime changed:', event.value);
+            logger.debug('DateTime changed:', event.value);
         });
     }
     
@@ -161,15 +162,15 @@ export class InputUtilityComponentsDemo {
         
         // Event listeners
         numberInput1.on('valueChanged', (event) => {
-            console.log('Number 1 changed:', event.value);
+            logger.debug('Number 1 changed:', event.value);
         });
         
         numberInput2.on('valueChanged', (event) => {
-            console.log('Decimal changed:', event.value);
+            logger.debug('Decimal changed:', event.value);
         });
         
         currencyInput.on('valueChanged', (event) => {
-            console.log('Currency changed:', event.value);
+            logger.debug('Currency changed:', event.value);
         });
     }
     
@@ -235,15 +236,15 @@ export class InputUtilityComponentsDemo {
         
         // Event listeners
         accordion1.on('itemExpanded', (event) => {
-            console.log('Accordion 1 expanded:', event.itemId);
+            logger.debug('Accordion 1 expanded:', event.itemId);
         });
         
         accordion1.on('itemCollapsed', (event) => {
-            console.log('Accordion 1 collapsed:', event.itemId);
+            logger.debug('Accordion 1 collapsed:', event.itemId);
         });
         
         accordion2.on('itemExpanded', (event) => {
-            console.log('Accordion 2 expanded:', event.itemId);
+            logger.debug('Accordion 2 expanded:', event.itemId);
         });
     }
     
@@ -277,11 +278,11 @@ export class InputUtilityComponentsDemo {
         
         // Event listeners
         leftDrawer.on('drawerOpened', () => {
-            console.log('Left drawer opened');
+            logger.debug('Left drawer opened');
         });
         
         rightDrawer.on('drawerOpened', () => {
-            console.log('Right drawer opened');
+            logger.debug('Right drawer opened');
         });
     }
     
@@ -368,19 +369,19 @@ export class InputUtilityComponentsDemo {
         
         // Event listeners
         searchBox1.on('search', (event) => {
-            console.log('Search 1:', event.query);
+            logger.debug('Search 1:', event.query);
         });
         
         searchBox1.on('valueChanged', (event) => {
-            console.log('Search 1 value changed:', event.value);
+            logger.debug('Search 1 value changed:', event.value);
         });
         
         searchBox2.on('search', (event) => {
-            console.log('Search 2:', event.query);
+            logger.debug('Search 2:', event.query);
         });
         
         searchBox3.on('search', (event) => {
-            console.log('Search 3:', event.query);
+            logger.debug('Search 3:', event.query);
         });
     }
     

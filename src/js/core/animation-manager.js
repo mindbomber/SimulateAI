@@ -15,6 +15,9 @@
  * @author SimulateAI Team
  */
 
+import logger from '../utils/logger.js';
+import { COMMON, EASING } from '../utils/constants.js';
+
 // Enhanced constants and configuration
 const ANIMATION_CONSTANTS = {
     DEFAULT_DURATION: 300,
@@ -89,7 +92,7 @@ class AnimationPerformanceMonitor {
             
             // Performance warning for slow animations
             if (duration > ANIMATION_CONSTANTS.PERFORMANCE_WARNING_THRESHOLD) {
-                console.warn(`Slow animation operation: ${operationName} took ${duration.toFixed(2)}ms`);
+                logger.warn(`Slow animation operation: ${operationName} took ${duration.toFixed(2)}ms`);
             }
         }
     }
@@ -179,7 +182,7 @@ export class AnimationManager {    constructor(engine) {
             this.setupMemoryManagement();
             this.setupEventListeners();
             
-            console.log('Enhanced AnimationManager initialized with accessibility and performance features');
+            logger.info('Enhanced AnimationManager initialized with accessibility and performance features');
         } catch (error) {
             this.handleError(new AnimationError('Failed to initialize AnimationManager', { engine: this.engine }, error));
         } finally {
@@ -248,7 +251,7 @@ export class AnimationManager {    constructor(engine) {
             trackRenderTime: true,
             trackMemoryUsage: true,
             enableWarnings: true,
-            maxAnimationDuration: this.reducedMotionMode ? 100 : 2000
+            maxAnimationDuration: this.reducedMotionMode ? COMMON.MILLISECONDS_100 : COMMON.MILLISECONDS_2000
         };
     }
     
@@ -518,7 +521,7 @@ export class AnimationManager {    constructor(engine) {
             // Performance warnings
             const frameTime = performance.now() - frameStart.startTime;
             if (frameTime > this.frameTimeLimit * 2) {
-                console.warn(`Animation frame took ${frameTime.toFixed(2)}ms (processed ${processedCount} animations)`);
+                logger.warn(`Animation frame took ${frameTime.toFixed(2)}ms (processed ${processedCount} animations)`);
             }
             
         } catch (error) {
@@ -681,7 +684,7 @@ export class AnimationManager {    constructor(engine) {
         this.errorCount++;
         this.lastError = error;
         
-        console.error('AnimationManager Error:', error);
+        logger.error('AnimationManager Error:', error);
         
         // Emit error event for application-level handling
         if (this.engine && this.engine.emit) {
@@ -709,7 +712,7 @@ export class AnimationManager {    constructor(engine) {
     }
     
     handleTimelineError(timeline, error) {
-        console.warn('Timeline error:', error);
+        logger.warn('Timeline error:', error);
         timeline.completed = true;
     }
     
@@ -834,7 +837,7 @@ export class AnimationManager {    constructor(engine) {
                 };
             }
         } catch (error) {
-            console.warn('Failed to load animation settings:', error);
+            logger.warn('Failed to load animation settings:', error);
         }
         
         return {
@@ -855,7 +858,7 @@ export class AnimationManager {    constructor(engine) {
                 this.settings = newSettings;
             }
         } catch (error) {
-            console.warn('Failed to save animation settings:', error);
+            logger.warn('Failed to save animation settings:', error);
         }
     }
 
@@ -944,26 +947,26 @@ export class AnimationManager {    constructor(engine) {
             linear: t => t,
             easeIn: t => t * t,
             easeOut: t => t * (2 - t),
-            easeInOut: t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
+            easeInOut: t => t < COMMON.HALF ? COMMON.TWO * t * t : -1 + (COMMON.FOUR - COMMON.TWO * t) * t,
             easeInCubic: t => t * t * t,
             easeOutCubic: t => (--t) * t * t + 1,
-            easeInOutCubic: t => t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1,
+            easeInOutCubic: t => t < COMMON.HALF ? COMMON.FOUR * t * t * t : (t - 1) * (COMMON.TWO * t - COMMON.TWO) * (COMMON.TWO * t - COMMON.TWO) + 1,
             easeInQuart: t => t * t * t * t,
             easeOutQuart: t => 1 - (--t) * t * t * t,
-            easeInOutQuart: t => t < 0.5 ? 8 * t * t * t * t : 1 - 8 * (--t) * t * t * t,
+            easeInOutQuart: t => t < COMMON.HALF ? COMMON.EIGHT * t * t * t * t : 1 - COMMON.EIGHT * (--t) * t * t * t,
             easeInSine: t => 1 - Math.cos(t * Math.PI / 2),
             easeOutSine: t => Math.sin(t * Math.PI / 2),
             easeInOutSine: t => -(Math.cos(Math.PI * t) - 1) / 2,
             bounce: t => {
-                if (t < 1 / 2.75) return 7.5625 * t * t;
-                if (t < 2 / 2.75) return 7.5625 * (t -= 1.5 / 2.75) * t + 0.75;
-                if (t < 2.5 / 2.75) return 7.5625 * (t -= 2.25 / 2.75) * t + 0.9375;
-                return 7.5625 * (t -= 2.625 / 2.75) * t + 0.984375;
+                if (t < 1 / EASING.BOUNCE_C4) return EASING.BOUNCE_C5 * t * t;
+                if (t < COMMON.TWO / EASING.BOUNCE_C4) return EASING.BOUNCE_C5 * (t -= COMMON.ONE_AND_HALF / EASING.BOUNCE_C4) * t + COMMON.THREE_QUARTERS;
+                if (t < COMMON.TWO_AND_HALF / EASING.BOUNCE_C4) return EASING.BOUNCE_C5 * (t -= COMMON.TWO_AND_QUARTER / EASING.BOUNCE_C4) * t + COMMON.FIFTEEN_SIXTEENTHS;
+                return EASING.BOUNCE_C5 * (t -= COMMON.TWO_AND_FIVE_EIGHTHS / EASING.BOUNCE_C4) * t + COMMON.SIXTYTHREE_SIXTYFOURTHS;
             },
             elastic: t => {
                 if (t === 0) return 0;
                 if (t === 1) return 1;
-                return Math.pow(2, -10 * t) * Math.sin((t - 0.1) * (2 * Math.PI) / 0.4) + 1;
+                return Math.pow(COMMON.TWO, -COMMON.TEN * t) * Math.sin((t - COMMON.ONE_TENTH) * (COMMON.TWO * Math.PI) / COMMON.OPACITY_40) + 1;
             }
         };
 
@@ -1276,10 +1279,10 @@ export class AnimationManager {    constructor(engine) {
             // Save final settings
             this.saveSettings(this.settings);
             
-            console.log('Enhanced AnimationManager destroyed successfully');
+            logger.info('Enhanced AnimationManager destroyed successfully');
             
         } catch (error) {
-            console.error('Error during AnimationManager cleanup:', error);
+            logger.error('Error during AnimationManager cleanup:', error);
         } finally {
             this.performanceMonitor.endOperation('animation-cleanup', startTime);
         }
@@ -1301,7 +1304,7 @@ export class AnimationManager {    constructor(engine) {
                 document.removeEventListener('visibilitychange', this.handleVisibilityChange);
             }
         } catch (error) {
-            console.warn('Event listener cleanup failed:', error);
+            logger.warn('Event listener cleanup failed:', error);
         }
     }
     
@@ -1312,7 +1315,7 @@ export class AnimationManager {    constructor(engine) {
                 this.accessibilityRegion.parentNode.removeChild(this.accessibilityRegion);
             }
         } catch (error) {
-            console.warn('Accessibility cleanup failed:', error);
+            logger.warn('Accessibility cleanup failed:', error);
         }
     }
 }

@@ -14,8 +14,9 @@
  * 
  * @version 2.0.0
  * @author SimulateAI Team
- * @license Apache-2.0
  */
+
+import logger from '../utils/logger.js';
 
 // Enhanced constants and configuration
 const CANVAS_CONSTANTS = {
@@ -499,7 +500,7 @@ class CanvasRenderer {
    * Default error handler
    */
   defaultErrorHandler(message, error) {
-    console.error(`CanvasRenderer Error: ${message}`, error);
+    logger.error(`CanvasRenderer Error: ${message}`, error);
     
     if (this.options.enableAccessibility && this.accessibilityManager) {
       this.accessibilityManager.announceToScreenReader(`Rendering error: ${message}`);
@@ -549,7 +550,7 @@ class CanvasRenderer {
       // Accessibility: Ensure minimum size for interactive elements
       if (options.interactive && (width < CANVAS_CONSTANTS.ACCESSIBILITY.MIN_TOUCH_TARGET || 
                                   height < CANVAS_CONSTANTS.ACCESSIBILITY.MIN_TOUCH_TARGET)) {
-        console.warn('Interactive element below minimum touch target size');
+        logger.warn('Interactive element below minimum touch target size');
       }
       
       if (fill) {
@@ -1703,7 +1704,7 @@ class CanvasRenderer {
           stroke: '#e55555',
           strokeWidth: 1
         });
-        console.warn(`Unknown object type: ${object.type}`);
+        logger.warn(`Unknown object type: ${object.type}`);
     }
   }
   // Advanced utility and image methods

@@ -7,6 +7,8 @@
  * @license Apache-2.0
  */
 
+import logger from './logger.js';
+
 /**
  * Simple, robust storage manager with fallbacks
  */
@@ -25,12 +27,12 @@ class SimpleStorageManager {
      * Initialize storage and log status
      */
     init() {
-        console.log('Storage Status:');
-        console.log('- localStorage:', this.isLocalStorageAvailable ? '✅ Available' : '❌ Not available');
-        console.log('- sessionStorage:', this.isSessionStorageAvailable ? '✅ Available' : '❌ Not available');
+        logger.info('Storage Status:');
+        logger.info('- localStorage:', this.isLocalStorageAvailable ? '✅ Available' : '❌ Not available');
+        logger.info('- sessionStorage:', this.isSessionStorageAvailable ? '✅ Available' : '❌ Not available');
         
         if (!this.isLocalStorageAvailable && !this.isSessionStorageAvailable) {
-            console.warn('⚠️  Browser storage not available. Using memory storage (data will not persist).');
+            logger.warn('⚠️  Browser storage not available. Using memory storage (data will not persist).');
         }
     }
     
@@ -80,7 +82,7 @@ class SimpleStorageManager {
             }
             
         } catch (e) {
-            console.warn(`Error reading storage key "${key}":`, e);
+            logger.warn(`Error reading storage key "${key}":`, e);
         }
         
         return defaultValue;
@@ -109,7 +111,7 @@ class SimpleStorageManager {
             this.memoryStorage.set(fullKey, value);
             
         } catch (e) {
-            console.warn(`Error saving storage key "${key}":`, e);
+            logger.warn(`Error saving storage key "${key}":`, e);
             // Fallback to memory storage
             this.memoryStorage.set(fullKey, value);
         }
@@ -132,7 +134,7 @@ class SimpleStorageManager {
             }
             this.memoryStorage.delete(fullKey);
         } catch (e) {
-            console.warn(`Error removing storage key "${key}":`, e);
+            logger.warn(`Error removing storage key "${key}":`, e);
         }
     }
     
@@ -165,7 +167,7 @@ class SimpleStorageManager {
             this.memoryStorage.clear();
             
         } catch (e) {
-            console.warn('Error clearing storage:', e);
+            logger.warn('Error clearing storage:', e);
         }
     }
     
@@ -202,7 +204,7 @@ class SimpleStorageManager {
             });
             
         } catch (e) {
-            console.warn('Error getting storage keys:', e);
+            logger.warn('Error getting storage keys:', e);
         }
         
         return Array.from(keys);
@@ -382,4 +384,4 @@ window.SimpleStorage = {
     progress: userProgress
 };
 
-console.log('✅ Simple Storage Manager initialized');
+logger.info('✅ Simple Storage Manager initialized');

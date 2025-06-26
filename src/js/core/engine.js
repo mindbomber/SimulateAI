@@ -18,6 +18,8 @@
 
 import { InputManager } from './input-manager.js';
 import AccessibilityManager from './accessibility.js';
+import logger from '../utils/logger.js';
+import { TIMING, LIMITS } from '../utils/constants.js';
 import AnimationManager from './animation-manager.js';
 import { Scene } from './scene.js';
 import CanvasRenderer from '../renderers/canvas-renderer.js';
@@ -91,7 +93,7 @@ class EnginePerformanceMonitor {
             
             // Performance warning for slow operations
             if (duration > ENGINE_CONSTANTS.PERFORMANCE_WARNING_THRESHOLD) {
-                console.warn(`Slow engine operation: ${operationName} took ${duration.toFixed(2)}ms`);
+                logger.warn('Engine', `Slow engine operation: ${operationName} took ${duration.toFixed(2)}ms`);
             }
         }
     }
@@ -220,7 +222,7 @@ class SimulationEngine {
             this.init();
 
         } catch (error) {
-            console.error('Engine initialization failed:', error);
+            logger.error('Engine', 'Engine initialization failed:', error);
             throw new EngineError('Failed to initialize SimulationEngine', 
                 { containerId, config }, error);
         }
@@ -253,7 +255,7 @@ class SimulationEngine {
             }
 
             EnginePerformanceMonitor.endOperation('engine_init');
-            console.log(`SimulationEngine initialized with ${this.config.renderMode} renderer`);
+            logger.info('Engine', `SimulationEngine initialized with ${this.config.renderMode} renderer`);
             
         } catch (error) {
             this.handleError(new EngineError('Engine initialization failed', 
@@ -291,7 +293,7 @@ class SimulationEngine {
                     if (this.isWebGLSupported()) {
                         this.renderer = new WebGLRenderer(this.container, rendererConfig);
                     } else {
-                        console.warn('WebGL not supported, falling back to Canvas');
+                        logger.warn('Engine', 'WebGL not supported, falling back to Canvas');
                         this.renderer = new CanvasRenderer(this.container, rendererConfig);
                         renderMode = RENDER_MODES.CANVAS;
                     }
@@ -312,7 +314,7 @@ class SimulationEngine {
             EnginePerformanceMonitor.endOperation('renderer_setup');
             
         } catch (error) {
-            console.error('Failed to initialize renderer:', error);
+            logger.error('Engine', 'Failed to initialize renderer:', error);
             // Enhanced fallback with error tracking
             try {
                 this.renderer = new CanvasRenderer(this.container, this.config);
@@ -367,13 +369,13 @@ class SimulationEngine {
             if (performance.memory) {
                 setInterval(() => {
                     this.performanceData.memoryUsage = performance.memory.usedJSHeapSize;
-                }, 5000);
+                }, TIMING.POLLING_INTERVAL);
             }
 
             EnginePerformanceMonitor.endOperation('performance_setup');
             
         } catch (error) {
-            console.warn('Performance monitoring setup failed:', error);
+            logger.warn('Engine', 'Performance monitoring setup failed:', error);
         }
     }
 
@@ -418,7 +420,7 @@ class SimulationEngine {
             this.animationManager.setEngine(this);
             
         } catch (error) {
-            console.warn('Failed to initialize animation manager:', error);
+            logger.warn('Engine', 'Failed to initialize animation manager:', error);
             this.animationManager = null;
         }
     }
@@ -521,7 +523,7 @@ class SimulationEngine {
             const saved = localStorage.getItem('simulationEngine_settings');
             return saved ? JSON.parse(saved) : {};
         } catch (error) {
-            console.warn('Failed to load engine settings:', error);
+            logger.warn('Engine', 'Failed to load engine settings:', error);
             return {};
         }
     }
@@ -547,7 +549,7 @@ class SimulationEngine {
             }, 1000);
 
         } catch (error) {
-            console.warn('Failed to save engine settings:', error);
+            logger.warn('Engine', 'Failed to save engine settings:', error);
         }
     }
 
@@ -557,7 +559,7 @@ class SimulationEngine {
 
             // Clean up performance data
             if (this.performanceData.frameTimeHistory.length > 100) {
-                this.performanceData.frameTimeHistory = this.performanceData.frameTimeHistory.slice(-50);
+                this.performanceData.frameTimeHistory = this.performanceData.frameTimeHistory.slice(-LIMITS.BATCH_SIZE);
             }
 
             // Clean up component pool
@@ -588,7 +590,7 @@ class SimulationEngine {
         this.errorCount++;
         this.lastError = error;
 
-        console.error('Engine Error:', error);
+        logger.error('Engine', 'Engine Error:', error);
 
         // Announce error to accessibility manager
         if (this.accessibilityManager && error.name === 'EngineError') {
@@ -598,7 +600,7 @@ class SimulationEngine {
         // Recovery attempts for critical errors
         if (this.recoveryAttempts < this.maxRecoveryAttempts) {
             this.recoveryAttempts++;
-            console.log(`Attempting recovery ${this.recoveryAttempts}/${this.maxRecoveryAttempts}`);
+            logger.info(`Attempting recovery ${this.recoveryAttempts}/${this.maxRecoveryAttempts}`);
             
             // Attempt recovery based on error type
             if (error.context?.renderMode && error.context.renderMode !== RENDER_MODES.CANVAS) {
@@ -609,7 +611,7 @@ class SimulationEngine {
 
     attemptRendererRecovery() {
         try {
-            console.log('Attempting renderer recovery...');
+            logger.info('Attempting renderer recovery...');
             
             // Try to reinitialize with canvas renderer
             if (this.renderer) {
@@ -620,10 +622,10 @@ class SimulationEngine {
             this.setupRenderer();
             
             this.recoveryAttempts = 0; // Reset on successful recovery
-            console.log('Renderer recovery successful');
+            logger.info('Renderer recovery successful');
             
         } catch (recoveryError) {
-            console.error('Renderer recovery failed:', recoveryError);
+            logger.error('Renderer recovery failed:', recoveryError);
         }
     }
 
@@ -835,7 +837,7 @@ class SimulationEngine {
 
             // Performance warning
             if (this.performanceWarnings && frameTime > ENGINE_CONSTANTS.PERFORMANCE_WARNING_THRESHOLD) {
-                console.warn(`Slow frame: ${frameTime.toFixed(2)}ms`);
+                logger.warn(`Slow frame: ${frameTime.toFixed(2)}ms`);
             }
 
             this.animationId = requestAnimationFrame(() => this.animate());
@@ -965,7 +967,7 @@ class SimulationEngine {
                 sceneY: screenY - rect.top
             };
         } catch (error) {
-            console.warn('Screen to scene coordinate transformation failed:', error);
+            logger.warn('Screen to scene coordinate transformation failed:', error);
             return { sceneX: screenX, sceneY: screenY };
         }
     }
@@ -1013,7 +1015,7 @@ class SimulationEngine {
                 Avg Frame: ${this.performanceData.averageFrameTime?.toFixed(2) || 'N/A'}ms
             `;
         } catch (error) {
-            console.warn('Debug info update failed:', error);
+            logger.warn('Debug info update failed:', error);
         }
     }
 
@@ -1024,9 +1026,9 @@ class SimulationEngine {
             this.useFrustumCulling = true;
             this.useLevelOfDetail = true;
             
-            console.log('Performance optimizations enabled');
+            logger.info('Performance optimizations enabled');
         } catch (error) {
-            console.warn('Failed to enable performance optimizations:', error);
+            logger.warn('Failed to enable performance optimizations:', error);
         }
     }
 
@@ -1079,10 +1081,10 @@ class SimulationEngine {
             // Save final settings
             this.saveSettings();
             
-            console.log('SimulationEngine destroyed');
+            logger.info('SimulationEngine destroyed');
             
         } catch (error) {
-            console.error('Engine destruction error:', error);
+            logger.error('Engine destruction error:', error);
         }
     }
 
@@ -1155,7 +1157,7 @@ class SimulationEngine {
             this.setupDebugKeyboard();
             
         } catch (error) {
-            console.warn('Debug tools setup failed:', error);
+            logger.warn('Debug tools setup failed:', error);
         }
     }
 
@@ -1176,7 +1178,7 @@ class SimulationEngine {
             // Ctrl/Cmd + Shift + P: Performance snapshot
             if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'P') {
                 event.preventDefault();
-                console.log('Engine Performance Snapshot:', this.getMetrics());
+                logger.debug('Engine Performance Snapshot:', this.getMetrics());
             }
         };
         

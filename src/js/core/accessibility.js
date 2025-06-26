@@ -15,6 +15,8 @@
  * @author SimulateAI Team
  */
 
+import logger from '../utils/logger.js';
+
 // Enhanced constants and configuration
 const ACCESSIBILITY_CONSTANTS = {
     ANNOUNCEMENT_DELAY: 100,
@@ -91,7 +93,7 @@ class AccessibilityPerformanceMonitor {
             
             // Performance warning for slow accessibility operations
             if (duration > ACCESSIBILITY_CONSTANTS.FOCUS_DELAY * 2) {
-                console.warn(`Slow accessibility operation: ${operationName} took ${duration.toFixed(2)}ms`);
+                logger.warn(`Slow accessibility operation: ${operationName} took ${duration.toFixed(2)}ms`);
             }
         }
     }
@@ -169,7 +171,7 @@ class AccessibilityManager {
             // Setup voice commands if supported
             this.setupVoiceCommands();
             
-            console.log('Enhanced AccessibilityManager initialized with advanced features');
+            logger.info('Enhanced AccessibilityManager initialized with advanced features');
         } catch (error) {
             this.handleError(new AccessibilityError('Failed to initialize AccessibilityManager', { container: this.container.id }, error));
         } finally {
@@ -374,10 +376,10 @@ class AccessibilityManager {
             };
             
             this.speechRecognition.onerror = (event) => {
-                console.warn('Speech recognition error:', event.error);
+                logger.warn('Speech recognition error:', event.error);
             };
         } catch (error) {
-            console.warn('Voice commands setup failed:', error);
+            logger.warn('Voice commands setup failed:', error);
         }
     }
     
@@ -415,7 +417,7 @@ class AccessibilityManager {
             
             focusOperations++;
             if (focusOperations % 100 === 0) {
-                console.log('Accessibility Performance:', this.performanceMonitor.getMetrics());
+                logger.info('Accessibility Performance:', this.performanceMonitor.getMetrics());
             }
             
             return result;        };
@@ -479,7 +481,7 @@ class AccessibilityManager {
         `;
         
         this.announce(report, true);
-        console.log('Accessibility Report:', { metrics, theme: this.theme, components: componentCount });
+        logger.info('Accessibility Report:', { metrics, theme: this.theme, components: componentCount });
     }
     
     resetAccessibilitySettings() {
@@ -594,7 +596,7 @@ class AccessibilityManager {
                 this.verboseMode = false;
         }
         
-        console.log(`Accessibility optimized for ${screenReaderType} screen reader`);
+        logger.info(`Accessibility optimized for ${screenReaderType} screen reader`);
     }
 
     setupFocusManagement() {
@@ -953,7 +955,7 @@ class AccessibilityManager {
         this.errorCount++;
         this.lastError = error;
         
-        console.error('Accessibility Error:', error);
+        logger.error('Accessibility Error:', error);
         
         // Emit error event for application-level handling
         if (this.engine && this.engine.emit) {
@@ -965,7 +967,7 @@ class AccessibilityManager {
         
         // Rate limiting: if too many errors, temporarily disable features
         if (this.errorCount > 10) {
-            console.warn('High error rate detected, temporarily reducing accessibility features');
+            logger.warn('High error rate detected, temporarily reducing accessibility features');
             this.reduceFeatures();
         }
     }
@@ -1403,7 +1405,7 @@ class AccessibilityManager {
         
         // Log announcement for debugging
         if (this.verboseMode) {
-            console.log('Accessibility Announcement:', announcement);
+            logger.info('Accessibility Announcement:', announcement);
         }
     }
 
@@ -1522,7 +1524,7 @@ class AccessibilityManager {
                 localStorage.setItem('accessibilitySettings', JSON.stringify(settings));
             }
         } catch (error) {
-            console.warn('Failed to save accessibility setting:', error);
+            logger.warn('Failed to save accessibility setting:', error);
         }
     }
     
@@ -1544,7 +1546,7 @@ class AccessibilityManager {
                 }
             }
         } catch (error) {
-            console.warn('Failed to load accessibility settings:', error);
+            logger.warn('Failed to load accessibility settings:', error);
         }
     }
 
@@ -1662,7 +1664,7 @@ class AccessibilityManager {
         try {
             return this.detectScreenReaderType() !== null;
         } catch (error) {
-            console.warn('Screen reader detection failed:', error);
+            logger.warn('Screen reader detection failed:', error);
             return false;
         }
     }
@@ -1749,7 +1751,7 @@ class AccessibilityManager {
                     this.speechRecognition.stop();
                     this.speechRecognition = null;
                 } catch (error) {
-                    console.warn('Speech recognition cleanup failed:', error);
+                    logger.warn('Speech recognition cleanup failed:', error);
                 }
             }
             
@@ -1765,16 +1767,16 @@ class AccessibilityManager {
             // Save final settings
             this.saveFinalSettings();
             
-            console.log('AccessibilityManager destroyed successfully');
+            logger.info('AccessibilityManager destroyed successfully');
             
         } catch (error) {
-            console.error('Error during AccessibilityManager cleanup:', error);
+            logger.error('Error during AccessibilityManager cleanup:', error);
         } finally {
             this.performanceMonitor.endOperation('cleanup', startTime);
             
             // Final performance report
             if (this.verboseMode) {
-                console.log('Final Accessibility Performance Report:', this.performanceMonitor.getMetrics());
+                logger.info('Final Accessibility Performance Report:', this.performanceMonitor.getMetrics());
             }
         }
     }
@@ -1800,7 +1802,7 @@ class AccessibilityManager {
                 motionQuery.removeEventListener('change', this.updateTheme);
             }
         } catch (error) {
-            console.warn('Event listener cleanup failed:', error);
+            logger.warn('Event listener cleanup failed:', error);
         }
     }
     
@@ -1822,7 +1824,7 @@ class AccessibilityManager {
                     element.parentNode.removeChild(element);
                 }
             } catch (error) {
-                console.warn('Failed to remove DOM element:', error);
+                logger.warn('Failed to remove DOM element:', error);
             }
         });
     }
@@ -1836,7 +1838,7 @@ class AccessibilityManager {
                     try {
                         element.removeEventListener(event, listener);
                     } catch (error) {
-                        console.warn(`Failed to remove listener for component ${id}:`, error);
+                        logger.warn(`Failed to remove listener for component ${id}:`, error);
                     }
                 });
                 
@@ -1871,7 +1873,7 @@ class AccessibilityManager {
                 localStorage.setItem('accessibilitySessionReport', JSON.stringify(finalReport));
             }
         } catch (error) {
-            console.warn('Failed to save session report:', error);
+            logger.warn('Failed to save session report:', error);
         }
     }
 

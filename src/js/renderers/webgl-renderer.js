@@ -3,6 +3,8 @@
  * Provides hardware-accelerated 2D graphics using WebGL
  */
 
+import logger from '../utils/logger.js';
+
 export class WebGLRenderer {
     constructor(container, options = {}) {
         this.container = container;
@@ -71,15 +73,15 @@ export class WebGLRenderer {
             // Append to container
             this.container.appendChild(this.canvas);
             
-            console.log('WebGLRenderer: Initialized successfully');
+            logger.info('WebGLRenderer: Initialized successfully');
         } catch (error) {
-            console.error('WebGLRenderer: Failed to initialize:', error);
+            logger.error('WebGLRenderer: Failed to initialize:', error);
             throw error;
         }
     }
 
     setupWebGL() {
-        const gl = this.gl;
+        const { gl } = this;
         
         // Set viewport
         gl.viewport(0, 0, this.canvas.width, this.canvas.height);
@@ -153,7 +155,7 @@ export class WebGLRenderer {
     }
 
     createShaderProgram(vertexSource, fragmentSource) {
-        const gl = this.gl;
+        const { gl } = this;
         
         const vertexShader = this.createShader(gl.VERTEX_SHADER, vertexSource);
         const fragmentShader = this.createShader(gl.FRAGMENT_SHADER, fragmentSource);
@@ -166,14 +168,14 @@ export class WebGLRenderer {
         if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
             const error = gl.getProgramInfoLog(program);
             gl.deleteProgram(program);
-            throw new Error('Failed to link shader program: ' + error);
+            throw new Error(`Failed to link shader program: ${error}`);
         }
         
         return program;
     }
 
     createShader(type, source) {
-        const gl = this.gl;
+        const { gl } = this;
         const shader = gl.createShader(type);
         
         gl.shaderSource(shader, source);
@@ -182,14 +184,14 @@ export class WebGLRenderer {
         if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
             const error = gl.getShaderInfoLog(shader);
             gl.deleteShader(shader);
-            throw new Error('Failed to compile shader: ' + error);
+            throw new Error(`Failed to compile shader: ${error}`);
         }
         
         return shader;
     }
 
     createBuffers() {
-        const gl = this.gl;
+        const { gl } = this;
         
         // Create vertex buffer
         this.buffers.set('vertex', gl.createBuffer());
@@ -307,8 +309,8 @@ export class WebGLRenderer {
     flushBatch() {
         if (this.batchBuffer.length === 0) return;
         
-        const gl = this.gl;
-        const program = this.activeProgram;
+        const { gl } = this;
+        const { activeProgram: program } = this;
         
         if (!program) return;
         
@@ -317,8 +319,8 @@ export class WebGLRenderer {
         const indices = [];
         let vertexIndex = 0;
         
-        this.batchBuffer.forEach((item, i) => {
-            const { x, y, width, height, color, alpha, rotation, scale } = item;
+        this.batchBuffer.forEach((item, _i) => {
+            const { x, y, width, height, color, alpha } = item;
             
             // Create quad vertices
             const x1 = x;
@@ -423,7 +425,7 @@ export class WebGLRenderer {
 
     // Texture management
     createTexture(image) {
-        const gl = this.gl;
+        const { gl } = this;
         const texture = gl.createTexture();
         
         gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -440,7 +442,7 @@ export class WebGLRenderer {
 
     // Performance monitoring
     getInfo() {
-        const gl = this.gl;
+        const { gl } = this;
         return {
             vendor: gl.getParameter(gl.VENDOR),
             renderer: gl.getParameter(gl.RENDERER),
@@ -464,7 +466,7 @@ export class WebGLRenderer {
             this.canvas.parentNode.removeChild(this.canvas);
         }
         
-        console.log('WebGLRenderer: Destroyed');
+        logger.info('WebGLRenderer: Destroyed');
     }
 }
 

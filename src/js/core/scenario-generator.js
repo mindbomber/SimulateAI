@@ -3,6 +3,8 @@
  * Creates diverse, real-world scenarios for all age groups
  */
 
+import logger from '../utils/logger.js';
+
 class ScenarioGenerator {
   constructor() {
     this.scenarioTemplates = new Map();
@@ -667,7 +669,7 @@ class ScenarioGenerator {
       
       return scenarios;
     } catch (error) {
-      console.error('Error generating scenarios:', error);
+      logger.error('Error generating scenarios:', error);
       return this.createFallbackScenarios(domain, difficulty, count);
     }
   }

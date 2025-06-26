@@ -1,3 +1,5 @@
+import logger from '../utils/logger.js';
+
 /**
  * Modern Layout Components
  * Implementation of TabContainer, ProgressStepper, SplitPane, TreeView, and FileUpload
@@ -247,7 +249,7 @@ class PerformanceMonitor {
             
             // Log performance warnings
             if (measurement.duration > PERFORMANCE_THRESHOLDS.renderTime) {
-                console.warn(`Performance warning: ${operation} took ${measurement.duration.toFixed(2)}ms in ${componentId}`);
+                logger.warn(`Performance warning: ${operation} took ${measurement.duration.toFixed(2)}ms in ${componentId}`);
             }
             
             return measurement;
@@ -515,7 +517,7 @@ class TabContainer extends BaseObject {
                     { context, originalError: error }
                 );
                 
-                console.error('TabContainer Error:', componentError);
+                logger.error('TabContainer Error:', componentError);
                 this.emit('error', componentError);
                 
                 this.recoverFromError(context);
@@ -1385,7 +1387,7 @@ class ProgressStepper extends BaseObject {
                     { context, originalError: error }
                 );
                 
-                console.error('ProgressStepper Error:', componentError);
+                logger.error('ProgressStepper Error:', componentError);
                 this.emit('error', componentError);
                 
                 this.recoverFromError(context);
@@ -2369,7 +2371,7 @@ class SplitPane extends BaseObject {
                     { context, originalError: error }
                 );
                 
-                console.error('SplitPane Error:', componentError);
+                logger.error('SplitPane Error:', componentError);
                 this.emit('error', componentError);
                 
                 this.recoverFromError(context);
@@ -3151,7 +3153,7 @@ class TreeView extends BaseObject {
                     { context, originalError: error }
                 );
                 
-                console.error('TreeView Error:', componentError);
+                logger.error('TreeView Error:', componentError);
                 this.emit('error', componentError);
                 
                 this.recoverFromError(context);
@@ -3298,17 +3300,7 @@ class TreeView extends BaseObject {
                { node: this.visibleNodes[nodeIndex], index: nodeIndex } : null;
     }
     
-    expandNode(nodeId) {
-        this.expandedNodes.add(nodeId);
-        this.buildVisibleNodes();
-        this.emit('nodeExpanded', { nodeId });
-    }
-    
-    collapseNode(nodeId) {
-        this.expandedNodes.delete(nodeId);
-        this.buildVisibleNodes();
-        this.emit('nodeCollapsed', { nodeId });
-    }
+
     
     toggleNode(nodeId) {
         if (this.expandedNodes.has(nodeId)) {
@@ -3372,188 +3364,14 @@ class TreeView extends BaseObject {
         this.hoveredNode = result ? result.node.id : null;
     }
     
-    handleKeyDown(event) {
-        if (!this.selectedNode) return;
-        
-        const selectedIndex = this.visibleNodes.findIndex(n => n.id === this.selectedNode);
-        if (selectedIndex === -1) return;
-        
-        switch (event.key) {
-            case 'ArrowUp':
-                if (selectedIndex > 0) {
-                    this.selectNode(this.visibleNodes[selectedIndex - 1].id);
-                }
-                break;
-            case 'ArrowDown':
-                if (selectedIndex < this.visibleNodes.length - 1) {
-                    this.selectNode(this.visibleNodes[selectedIndex + 1].id);
-                }
-                break;
-            case 'ArrowRight': {
-                const node = this.visibleNodes[selectedIndex];
-                if (node.children && !this.expandedNodes.has(node.id)) {
-                    this.expandNode(node.id);
-                }
-                break;
-            }
-            case 'ArrowLeft': {
-                const currentNode = this.visibleNodes[selectedIndex];
-                if (currentNode.children && this.expandedNodes.has(currentNode.id)) {
-                    this.collapseNode(currentNode.id);
-                }
-                break;
-            }
-            case 'Enter':
-            case ' ':
-                this.emit('nodeActivated', { nodeId: this.selectedNode });
-                break;
-        }
-    }
+
     
     handleWheel(event) {
         const maxScroll = Math.max(0, this.visibleNodes.length * this.nodeHeight - this.height);
         this.scrollY = Math.max(0, Math.min(maxScroll, this.scrollY + event.deltaY));
     }
     
-    // Rendering
-    renderSelf(renderer) {
-        if (renderer.type !== 'canvas') return;
-        
-        // Background
-        renderer.fillStyle = this.backgroundColor;
-        renderer.fillRect(0, 0, this.width, this.height);
-        
-        // Visible area clipping
-        renderer.save();
-        renderer.beginPath();
-        renderer.rect(0, 0, this.width, this.height);
-        renderer.clip();
-        
-        // Render visible nodes
-        const startY = -this.scrollY;
-        
-        this.visibleNodes.forEach((node, index) => {
-            const y = startY + index * this.nodeHeight;
-            
-            // Skip nodes that are outside visible area
-            if (y + this.nodeHeight < 0 || y > this.height) return;
-            
-            this.renderNode(renderer, node, y);
-        });
-        
-        renderer.restore();
-        
-        // Scrollbar
-        if (this.visibleNodes.length * this.nodeHeight > this.height) {
-            this.renderScrollbar(renderer);
-        }
-    }
-    
-    renderNode(renderer, node, y) {
-        const x = node.level * this.indentSize;
-        const isSelected = this.selectedNodes.has(node.id);
-        const isHovered = this.hoveredNode === node.id;
-        
-        // Node background
-        if (isSelected) {
-            renderer.fillStyle = this.selectedColor;
-            renderer.fillRect(0, y, this.width, this.nodeHeight);
-        } else if (isHovered) {
-            renderer.fillStyle = this.hoverColor;
-            renderer.fillRect(0, y, this.width, this.nodeHeight);
-        }
-        
-        // Expand/collapse icon
-        if (node.children) {
-            const iconX = x + 4;
-            const iconY = y + this.nodeHeight / 2;
-            const isExpanded = this.expandedNodes.has(node.id);
-            
-            renderer.fillStyle = this.iconColor;
-            renderer.font = '12px Arial';
-            renderer.textAlign = 'center';
-            renderer.textBaseline = 'middle';
-            renderer.fillText(isExpanded ? '▼' : '▶', iconX, iconY);
-        }
-        
-        // Node icon
-        let textX = x + 20;
-        if (this.showIcons && node.icon) {
-            renderer.fillStyle = this.iconColor;
-            renderer.font = '14px Arial';
-            renderer.textAlign = 'left';
-            renderer.textBaseline = 'middle';
-            renderer.fillText(node.icon, textX, y + this.nodeHeight / 2);
-            textX += 20;
-        }
-        
-        // Checkbox
-        if (this.showCheckboxes) {
-            const checkboxX = textX;
-            const checkboxY = y + (this.nodeHeight - 12) / 2;
-            
-            renderer.strokeStyle = '#999999';
-            renderer.lineWidth = 1;
-            renderer.strokeRect(checkboxX, checkboxY, 12, 12);
-            
-            if (isSelected) {
-                renderer.fillStyle = '#007bff';
-                renderer.fillRect(checkboxX + 2, checkboxY + 2, 8, 8);
-            }
-            
-            textX += 20;
-        }
-        
-        // Node text
-        renderer.fillStyle = this.textColor;
-        renderer.font = `${isSelected ? 'bold ' : ''}13px Arial`;
-        renderer.textAlign = 'left';
-        renderer.textBaseline = 'middle';
-        renderer.fillText(node.label || node.title || node.name || node.id,                         textX, y + this.nodeHeight / 2);
-    }
-    
-    renderScrollbar(renderer) {
-        const scrollbarWidth = 8;
-        const scrollbarX = this.width - scrollbarWidth;
-        
-        // Scrollbar track
-        renderer.fillStyle = '#f0f0f0';
-        renderer.fillRect(scrollbarX, 0, scrollbarWidth, this.height);
-        
-        // Scrollbar thumb
-        const totalHeight = this.visibleNodes.length * this.nodeHeight;
-        const thumbHeight = Math.max(20, (this.height / totalHeight) * this.height);
-        const scrollRange = totalHeight - this.height;
-        const thumbY = scrollRange > 0 ? (this.scrollY / scrollRange) * (this.height - thumbHeight) : 0;
-        
-        renderer.fillStyle = '#c0c0c0';
-        renderer.fillRect(scrollbarX + 1, thumbY, scrollbarWidth - 2, thumbHeight);
-    }
-    
-    // Public API
-    setData(data) {
-        this.data = data;
-        this.buildVisibleNodes();
-        this.emit('dataChanged');
-    }
-    
-    getSelectedNodes() {
-        return Array.from(this.selectedNodes);
-    }
-    
-    expandAll() {
-        const expandAllRecursive = (nodes) => {
-            for (const node of nodes) {
-                if (node.children) {
-                    this.expandedNodes.add(node.id);
-                    expandAllRecursive(node.children);
-                }
-            }
-        };
-        
-        expandAllRecursive(this.data);
-        this.buildVisibleNodes();
-        this.emit('allExpanded');    }
+
     
     // Navigation and accessibility methods
     navigateNode(direction) {
@@ -4312,7 +4130,7 @@ class FileUpload extends BaseObject {
                     { context, originalError: error }
                 );
                 
-                console.error('FileUpload Error:', componentError);
+                logger.error('FileUpload Error:', componentError);
                 this.emit('error', componentError);
                 
                 this.recoverFromError(context);
@@ -4643,541 +4461,7 @@ class FileUpload extends BaseObject {
         const sizes = ['B', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-    }
-    
-    // Public API
-    getFiles() {
-        return [...this.files];
-    }
-      
-    setupEventHandlers() {
-        const eventHandlers = {
-            'click': this.handleClick.bind(this),
-            'dragenter': this.handleDragEnter.bind(this),
-            'dragover': this.handleDragOver.bind(this),
-            'dragleave': this.handleDragLeave.bind(this),
-            'drop': this.handleDrop.bind(this),
-            'keydown': this.handleKeyDown.bind(this),
-            'focus': this.handleFocus.bind(this),
-            'blur': this.handleBlur.bind(this)
-        };
-        
-        Object.entries(eventHandlers).forEach(([event, handler]) => {
-            this.on(event, handler);
-        });
-    }
-    
-    // Enhanced file management
-    async addFiles(fileList) {
-        try {
-            const newFiles = Array.from(fileList);
-            const validFiles = [];
-            
-            for (const file of newFiles) {
-                if (this.validateFile(file)) {
-                    validFiles.push({
-                        file,
-                        id: `file-${Date.now()}-${Math.random()}`,
-                        name: file.name,
-                        size: file.size,
-                        type: file.type,
-                        status: 'pending',
-                        progress: 0,
-                        error: null
-                    });
-                }
-            }
-            
-            if (!this.multiple) {
-                this.files = validFiles.slice(0, 1);
-            } else {
-                this.files = [...this.files, ...validFiles].slice(0, this.maxFiles);
-            }
-            
-            this.clearRenderCache();
-            this.announceChange(`${validFiles.length} file(s) added`);
-            this.emit('filesAdded', { files: validFiles });
-            
-            return validFiles;
-        } catch (error) {
-            this.errorHandler.handle(error, 'addFiles');
-            return [];
-        }
-    }
-    
-    validateFile(file) {
-        try {
-            // Size validation
-            if (file.size > this.maxFileSize) {
-                this.errors.set(file.name, this.errorMessages.fileSize);
-                return false;
-            }
-            
-            // Type validation
-            if (this.accept !== '*/*') {
-                const acceptTypes = this.accept.split(',').map(type => type.trim());
-                const isValid = acceptTypes.some(acceptType => {
-                    if (acceptType.startsWith('.')) {
-                        return file.name.toLowerCase().endsWith(acceptType.toLowerCase());
-                    } else {
-                        return file.type.match(acceptType.replace('*', '.*'));
-                    }
-                });
-                
-                if (!isValid) {
-                    this.errors.set(file.name, this.errorMessages.fileType);
-                    return false;
-                }
-            }
-            
-            return true;
-        } catch (error) {
-            this.errorHandler.handle(error, 'validateFile');
-            return false;
-        }
-    }
-    
-    async removeFile(fileId) {
-        try {
-            const index = this.files.findIndex(f => f.id === fileId);
-            if (index >= 0) {
-                const removedFile = this.files.splice(index, 1)[0];
-                this.uploadProgress.delete(fileId);
-                this.errors.delete(removedFile.name);
-                
-                this.clearRenderCache();
-                this.announceChange(`${removedFile.name} removed`);
-                this.emit('fileRemoved', { file: removedFile });
-                
-                return true;
-            }
-            return false;
-        } catch (error) {
-            this.errorHandler.handle(error, 'removeFile');
-            return false;
-        }
-    }
-    
-    clearFiles() {
-        this.files = [];
-        this.uploadProgress.clear();
-        this.errors.clear();
-        this.completedUploads.clear();
-        this.clearRenderCache();
-        this.announceChange('All files cleared');
-        this.emit('filesCleared');
-    }
-    
-    // Event handlers
-    handleClick(_event) {
-        if (!this.disabled) {
-            this.triggerFileSelect();
-        }
-    }
-    
-    handleDragEnter(event) {
-        if (!this.disabled) {
-            event.preventDefault();
-            this.isDragOver = true;
-            this.animateDragState(true);
-            this.invalidate();
-        }
-    }
-    
-    handleDragOver(event) {
-        if (!this.disabled) {
-            event.preventDefault();
-            this.isDragOver = true;
-        }
-    }
-    
-    handleDragLeave(_event) {
-        if (!this.disabled) {
-            this.isDragOver = false;
-            this.animateDragState(false);
-            this.invalidate();
-        }
-    }
-    
-    handleDrop(event) {
-        if (!this.disabled) {
-            event.preventDefault();
-            this.isDragOver = false;
-            this.animateDragState(false);
-            
-            const { files } = event.dataTransfer;
-            if (files.length > 0) {
-                this.addFiles(files);
-            }
-            
-            this.invalidate();
-        }
-    }
-    
-    handleKeyDown(event) {
-        if (this.disabled) return;
-        
-        const handler = this.keyboardHandler[event.key];
-        if (handler) {
-            event.preventDefault();
-            handler();
-        }
-    }
-    
-    handleFileInputChange(event) {
-        const { files } = event.target;
-        if (files && files.length > 0) {
-            this.addFiles(files);
-        }
-        // Reset input
-        event.target.value = '';
-    }
-    
-    handleFocus() {
-        this.invalidate();
-    }
-    
-    handleBlur() {
-        this.invalidate();
-    }
-    
-    handleFocusIn() {
-        this.invalidate();
-    }
-    
-    handleFocusOut() {
-        this.invalidate();
-    }
-    
-    handleEscape() {
-        if (this.isUploading) {
-            this.cancelUpload();
-        }
-    }
-    
-    // Animation methods
-    async animateDragState(isDragOver) {
-        if (this.prefersReducedMotion()) return Promise.resolve();
-        
-        const duration = 200;
-        const startScale = isDragOver ? 1 : 1.02;
-        const endScale = isDragOver ? 1.02 : 1;
-        
-        if (this.animationState.dragAnimation) {
-            AnimationManager.cancelAnimation(this.animationState.dragAnimation);
-        }
-        
-        this.animationState.dragAnimation = AnimationManager.createAnimation({
-            duration,
-            easing: 'easeOutCubic',
-            onUpdate: (progress) => {
-                const scale = startScale + (endScale - startScale) * progress;
-                this.animationScale = scale;
-                this.invalidate();
-            },
-            onComplete: () => {
-                this.animationScale = endScale;
-                this.animationState.dragAnimation = null;
-                this.invalidate();
-            }
-        });
-        
-        return this.animationState.dragAnimation.start();
-    }
-    
-    // File operations
-    triggerFileSelect() {
-        if (!this.disabled && this.fileInput) {
-            this.fileInput.click();
-        }
-    }
-    
-    async startUpload(uploadFunction) {
-        if (this.isUploading || this.files.length === 0) return;
-        
-        try {
-            this.isUploading = true;
-            this.totalProgress = 0;
-            
-            this.announceChange('Upload started');
-            this.emit('uploadStart', { files: this.files });
-            
-            for (const fileData of this.files) {
-                if (fileData.status === 'pending') {
-                    fileData.status = 'uploading';
-                    
-                    try {
-                        const result = await uploadFunction(fileData.file, (progress) => {
-                            this.uploadProgress.set(fileData.id, progress);
-                            this.updateTotalProgress();
-                            this.invalidate();
-                        });
-                        
-                        fileData.status = 'completed';
-                        this.completedUploads.add(fileData.id);
-                        this.emit('fileUploaded', { file: fileData, result });
-                        
-                    } catch (error) {
-                        fileData.status = 'error';
-                        fileData.error = error.message;
-                        this.errors.set(fileData.name, error.message);
-                        this.emit('fileError', { file: fileData, error });
-                    }
-                }
-            }
-            
-            this.isUploading = false;
-            this.announceChange('Upload completed');
-            this.emit('uploadComplete', { files: this.files });
-            
-        } catch (error) {
-            this.isUploading = false;
-            this.errorHandler.handle(error, 'upload');
-        }
-    }
-    
-    cancelUpload() {
-        this.isUploading = false;
-        this.uploadProgress.clear();
-        
-        this.files.forEach(fileData => {
-            if (fileData.status === 'uploading') {
-                fileData.status = 'cancelled';
-            }
-        });
-        
-        this.announceChange('Upload cancelled');
-        this.emit('uploadCancelled');
-    }
-    
-    updateTotalProgress() {
-        if (this.files.length === 0) {
-            this.totalProgress = 0;
-            return;
-        }
-        
-        const totalProgress = Array.from(this.uploadProgress.values())
-            .reduce((sum, progress) => sum + progress, 0);
-        
-        this.totalProgress = totalProgress / this.files.length;
-    }
-    
-    // Enhanced rendering with theme support
-    renderSelf(renderer) {
-        if (renderer.type !== 'canvas') return;
-        
-        try {
-            const theme = ComponentTheme.themes[this.theme];
-            
-            this.renderUploadArea(renderer, theme);
-            this.renderFiles(renderer, theme);
-            
-            if (this.isUploading) {
-                this.renderProgress(renderer, theme);
-            }
-        } catch (error) {
-            this.errorHandler.handle(error, 'render');
-        }
-    }
-    
-    renderUploadArea(renderer, theme) {
-        const scale = this.animationScale || 1;
-        const centerX = this.width / 2;
-        const centerY = this.height / 2;
-        
-        renderer.save();
-        renderer.translate(centerX, centerY);
-        renderer.scale(scale, scale);
-        renderer.translate(-centerX, -centerY);
-        
-        // Background
-        let backgroundColor = theme.background;
-        if (this.isDragOver) {
-            backgroundColor = theme.uploadHover;
-        } else if (this.disabled) {
-            backgroundColor = theme.backgroundDisabled;
-        }
-        
-        renderer.fillStyle = backgroundColor;
-        renderer.fillRect(0, 0, this.width, this.height);
-        
-        // Border
-        const borderColor = this.isDragOver ? theme.uploadBorder : theme.border;
-        renderer.strokeStyle = borderColor;
-        renderer.lineWidth = this.isDragOver ? 3 : 2;
-        renderer.setLineDash(this.isDragOver ? [10, 5] : []);
-        renderer.strokeRect(0, 0, this.width, this.height);
-        renderer.setLineDash([]);
-        
-        // Upload icon and text
-        if (this.files.length === 0) {
-            renderer.fillStyle = theme.textSecondary;
-            renderer.font = '48px Arial';
-            renderer.textAlign = 'center';
-            renderer.textBaseline = 'middle';
-            renderer.fillText('📁', centerX, centerY - 20);
-            
-            renderer.fillStyle = theme.text;
-            renderer.font = '14px Arial';
-            renderer.fillText(this.uploadText, centerX, centerY + 20);
-            
-            renderer.fillStyle = theme.primary;
-            renderer.font = 'bold 12px Arial';
-            renderer.fillText(this.browseText, centerX, centerY + 40);
-        }
-        
-        renderer.restore();
-    }
-    
-    renderFiles(renderer, theme) {
-        if (this.files.length === 0) return;
-        
-        const fileHeight = 30;
-        const startY = 10;
-        
-        this.files.forEach((fileData, index) => {
-            const y = startY + index * fileHeight;
-            
-            // File background
-            let bgColor = theme.backgroundSecondary;
-            if (fileData.status === 'error') {
-                bgColor = theme.uploadError;
-            } else if (fileData.status === 'completed') {
-                bgColor = theme.success;
-            }
-            
-            renderer.fillStyle = bgColor;
-            renderer.fillRect(5, y, this.width - 10, fileHeight - 2);
-            
-            // File name
-            renderer.fillStyle = theme.text;
-            renderer.font = '12px Arial';
-            renderer.textAlign = 'left';
-            renderer.textBaseline = 'middle';
-            renderer.fillText(fileData.name, 15, y + fileHeight / 2);
-            
-            // File size
-            const sizeText = this.formatFileSize(fileData.size);
-            renderer.fillStyle = theme.textSecondary;
-            renderer.font = '10px Arial';
-            renderer.textAlign = 'right';
-            renderer.fillText(sizeText, this.width - 15, y + fileHeight / 2);
-            
-            // Progress bar
-            if (fileData.status === 'uploading') {
-                const progress = this.uploadProgress.get(fileData.id) || 0;
-                const progressWidth = (this.width - 30) * (progress / 100);
-                
-                renderer.fillStyle = theme.progressTrack;
-                renderer.fillRect(10, y + fileHeight - 8, this.width - 20, 4);
-                
-                renderer.fillStyle = theme.progressFill;
-                renderer.fillRect(10, y + fileHeight - 8, progressWidth, 4);
-            }
-        });
-    }
-    
-    renderProgress(renderer, theme) {
-        if (!this.isUploading) return;
-        
-        const progressHeight = 20;
-        const y = this.height - progressHeight - 10;
-        const progressWidth = (this.width - 20) * (this.totalProgress / 100);
-        
-        // Progress background
-        renderer.fillStyle = theme.progressTrack;
-        renderer.fillRect(10, y, this.width - 20, progressHeight);
-        
-        // Progress fill
-        renderer.fillStyle = theme.progressFill;
-        renderer.fillRect(10, y, progressWidth, progressHeight);
-        
-        // Progress text
-        renderer.fillStyle = theme.text;
-        renderer.font = '12px Arial';
-        renderer.textAlign = 'center';
-        renderer.textBaseline = 'middle';
-        renderer.fillText(
-            `${Math.round(this.totalProgress)}%`,
-            this.width / 2,
-            y + progressHeight / 2
-        );
-    }
-    
-    // Utility methods
-    formatFileSize(bytes) {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    }
-    
-    clearErrors() {
-        this.errors.clear();
-        this.clearRenderCache();
-    }
-    
-    announceChange(message) {
-        if (this.announcer) {
-            this.announcer.textContent = message;
-        }
-    }
-    
-    prefersReducedMotion() {
-        return window.matchMedia && 
-               window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    }
-    
-    clearRenderCache() {
-        this.renderCache.clear();
-        this.invalidate();
-    }
-    
-    throttle(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-    
-    reset() {
-        this.clearFiles();
-        this.isUploading = false;
-        this.isDragOver = false;
-        this.totalProgress = 0;
-        this.animationScale = 1;
-        
-        this.animationState.dragAnimation = null;
-        this.animationState.progressAnimations.clear();
-        AnimationManager.cancelAllAnimations();
-        
-        this.announceChange('File upload reset');
-        this.emit('reset');
-    }
-    
-    destroy() {
-        // Clean up resources
-        if (this.fileInput && this.fileInput.parentNode) {
-            this.fileInput.parentNode.removeChild(this.fileInput);
-        }
-        
-        if (this.announcer && this.announcer.parentNode) {
-            this.announcer.parentNode.removeChild(this.announcer);
-        }
-        
-        this.animationState.dragAnimation = null;
-        this.animationState.progressAnimations.clear();
-        AnimationManager.cancelAllAnimations();
-        this.renderCache.clear();
-        
-        super.destroy();
+        return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
     }
     
     // Public API

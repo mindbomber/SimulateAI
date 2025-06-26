@@ -20,6 +20,7 @@
  */
 
 import { BaseObject } from './enhanced-objects.js';
+import logger from '../utils/logger.js';
 
 // Constants to eliminate magic numbers
 const INPUT_UTILITY_CONSTANTS = {
@@ -3617,7 +3618,7 @@ class DateTimePicker extends BaseObject {
             super.destroy?.();
             this.emit('destroyed');
         } catch (error) {
-            console.error('Error during DateTimePicker cleanup:', error);
+            logger.error('Error during DateTimePicker cleanup:', error);
         }
     }
 }
@@ -3733,7 +3734,7 @@ class NumberInput extends BaseObject {
                     { context, originalError: error }
                 );
                 
-                console.error('NumberInput Error:', componentError);
+                logger.error('NumberInput Error:', componentError);
                 this.emit('error', componentError);
                 
                 this.recoverFromError(context);
@@ -4294,7 +4295,7 @@ class NumberInput extends BaseObject {
             super.destroy?.();
             this.emit('destroyed');
         } catch (error) {
-            console.error('Error during NumberInput cleanup:', error);
+            logger.error('Error during NumberInput cleanup:', error);
         }
     }
 }
@@ -4411,7 +4412,7 @@ class Drawer extends BaseObject {
                     { context, originalError: error }
                 );
                 
-                console.error('Drawer Error:', componentError);
+                logger.error('Drawer Error:', componentError);
                 this.emit('error', componentError);
                 
                 this.recoverFromError(context);
@@ -5122,7 +5123,7 @@ class Drawer extends BaseObject {
             super.destroy?.();
             this.emit('destroyed');
         } catch (error) {
-            console.error('Error during Drawer cleanup:', error);
+            logger.error('Error during Drawer cleanup:', error);
         }    }
 }
 
@@ -5250,7 +5251,7 @@ class SearchBox extends BaseObject {
                     { context, originalError: error }
                 );
                 
-                console.error('SearchBox Error:', componentError);
+                logger.error('SearchBox Error:', componentError);
                 this.emit('error', componentError);
                 
                 this.recoverFromError(context);
@@ -6006,7 +6007,7 @@ class SearchBox extends BaseObject {
             super.destroy?.();
             this.emit('destroyed');
         } catch (error) {
-            console.error('Error during SearchBox cleanup:', error);
+            logger.error('Error during SearchBox cleanup:', error);
         }
     }
 }

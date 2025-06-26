@@ -7,6 +7,8 @@
  * @license Apache-2.0
  */
 
+import logger from '../utils/logger.js';
+
 // Constants for performance and consistency
 const DEFAULT_ANIMATION_DURATION = 300;
 const DEFAULT_EASING = 'easeInOut';
@@ -58,7 +60,7 @@ class AnimationManager {
                     this.animations.delete(id);
                 }
             } catch (error) {
-                console.error(`Animation error for ${id}:`, error);
+                logger.error(`Animation error for ${id}:`, error);
                 this.animations.delete(id);
             }
         }
@@ -221,7 +223,7 @@ export class BaseObject {
      * @param {string} context 
      */
     defaultErrorHandler(error, context) {
-        console.error(`Error in ${this.constructor.name} (${this.id}) - ${context}:`, error);
+        logger.error(`Error in ${this.constructor.name} (${this.id}) - ${context}:`, error);
     }
 
     /**

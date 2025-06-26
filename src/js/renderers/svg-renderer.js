@@ -18,6 +18,8 @@
  * @license Apache-2.0
  */
 
+import logger from '../utils/logger.js';
+
 // Enhanced constants and configuration
 const SVG_CONSTANTS = {
     VERSION: '2.0.0',
@@ -584,7 +586,7 @@ class SVGRenderer {
    * Default error handler
    */
   defaultErrorHandler(message, error) {
-    console.error(`SVGRenderer Error: ${message}`, error);
+    logger.error(`SVGRenderer Error: ${message}`, error);
     
     if (this.options.enableAccessibility && this.accessibilityManager) {
       this.accessibilityManager.announceToScreenReader(`Rendering error: ${message}`);
@@ -788,7 +790,7 @@ class SVGRenderer {
       // Accessibility: Ensure minimum size for interactive elements
       if (options.interactive && (width < SVG_CONSTANTS.ACCESSIBILITY.MIN_TOUCH_TARGET || 
                                   height < SVG_CONSTANTS.ACCESSIBILITY.MIN_TOUCH_TARGET)) {
-        console.warn('Interactive element below minimum touch target size');
+        logger.warn('Interactive element below minimum touch target size');
       }
 
       const rect = this.createSVGElement('rect', {
@@ -855,7 +857,7 @@ class SVGRenderer {
       // Accessibility: Ensure minimum size for interactive elements
       const diameter = radius * 2;
       if (options.interactive && diameter < SVG_CONSTANTS.ACCESSIBILITY.MIN_TOUCH_TARGET) {
-        console.warn('Interactive circle below minimum touch target size');
+        logger.warn('Interactive circle below minimum touch target size');
       }
 
       const circle = this.createSVGElement('circle', {
@@ -1406,37 +1408,40 @@ class SVGRenderer {
           break;
         }
 
-        case 'lines':
+        case 'lines': {
           const line = this.createLine(0, 0, 0, 10, {
             stroke: color,
-            strokeWidth: strokeWidth
+            strokeWidth
           });
           if (line) pattern.appendChild(line);
           break;
+        }
 
-        case 'grid':
+        case 'grid': {
           const vLine = this.createLine(0, 0, 0, 10, {
             stroke: color,
-            strokeWidth: strokeWidth
+            strokeWidth
           });
           const hLine = this.createLine(0, 0, 10, 0, {
             stroke: color,
-            strokeWidth: strokeWidth
+            strokeWidth
           });
           if (vLine) pattern.appendChild(vLine);
           if (hLine) pattern.appendChild(hLine);
           break;
+        }
 
-        case 'diagonal':
+        case 'diagonal': {
           const diagLine = this.createLine(0, 10, 10, 0, {
             stroke: color,
-            strokeWidth: strokeWidth
+            strokeWidth
           });
           if (diagLine) pattern.appendChild(diagLine);
           break;
+        }
 
         default:
-          console.warn(`Unknown pattern type: ${type}`);
+          logger.warn(`Unknown pattern type: ${type}`);
       }
 
       this.defs.appendChild(pattern);
@@ -1503,7 +1508,7 @@ class SVGRenderer {
           animation.startValues[prop] = parseFloat(element.getAttribute(prop)) || 0;
         }
       } catch (error) {
-        console.warn(`Failed to get starting value for property: ${prop}`, error);
+        logger.warn(`Failed to get starting value for property: ${prop}`, error);
         animation.startValues[prop] = 0;
       }
     });
@@ -1618,13 +1623,14 @@ class SVGRenderer {
         } else {
           return 7.5625 * (t -= 2.625 / 2.75) * t + 0.984375;
         }
-      case 'elastic':
+      case 'elastic': {
         const c4 = (2 * Math.PI) / 3;
         return t === 0
           ? 0
           : t === 1
           ? 1
           : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
+      }
       default:
         return t;
     }
@@ -1701,7 +1707,6 @@ class SVGRenderer {
    * @returns {string} Animation ID
    */
   slideAnimation(element, targetX, targetY, duration = 500, options = {}) {
-    const currentTransform = element.getAttribute('transform') || '';
     const newTransform = `translate(${targetX}, ${targetY})`;
     
     return this.animate(element, { transform: newTransform }, duration, options.easing || 'ease-out', options);
@@ -2022,7 +2027,7 @@ class SVGRenderer {
           
         default:
           // Draw a placeholder for unknown types
-          console.warn(`Unknown object type: ${object.type}`);
+          logger.warn(`Unknown object type: ${object.type}`);
           return this.createRect(-5, -5, 10, 10, {
             fill: '#ff6b6b',
             stroke: '#e55555',
@@ -2150,7 +2155,7 @@ class SVGRenderer {
       
       if (options.standalone) {
         // Add XML declaration and DOCTYPE for standalone SVG
-        svgString = '<?xml version="1.0" encoding="UTF-8"?>\n' + svgString;
+        svgString = `<?xml version="1.0" encoding="UTF-8"?>\n${svgString}`;
       }
       
       return svgString;

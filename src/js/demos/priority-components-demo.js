@@ -4,6 +4,7 @@
  */
 
 import VisualEngine from '../core/visual-engine.js';
+import logger from '../utils/logger.js';
 
 export class PriorityComponentsDemo {
     constructor() {
@@ -29,7 +30,7 @@ export class PriorityComponentsDemo {
         this.setupDemo();
         this.engine.start();
         
-        console.log('Priority Components Demo initialized');
+        logger.info('Priority Components Demo initialized');
     }
 
     createDemoContainer() {
@@ -59,7 +60,7 @@ export class PriorityComponentsDemo {
     // =============================================================================
 
     createDataTableDemo() {
-        console.log('Creating DataTable demo...');
+        logger.debug('Creating DataTable demo...');
         
         const dataTable = this.engine.createComponent('data-table', {
             x: 20,
@@ -111,19 +112,19 @@ export class PriorityComponentsDemo {
 
         // Event handlers
         dataTable.on('sort', (event) => {
-            console.log('Table sorted by:', event.column, event.direction);
+            logger.debug('Table sorted by:', event.column, event.direction);
             this.showNotification(`Sorted by ${event.column} (${event.direction})`, 'info');
         });
 
         dataTable.on('selectionChange', (event) => {
-            console.log('Selection changed:', event.selectedRows);
+            logger.debug('Selection changed:', event.selectedRows);
             if (event.selectedRows.length > 0) {
                 this.showNotification(`${event.selectedRows.length} model(s) selected`, 'success');
             }
         });
 
         dataTable.on('pageChange', (event) => {
-            console.log('Page changed to:', event.page);
+            logger.debug('Page changed to:', event.page);
         });
 
         this.components.set('dataTable', dataTable);
@@ -163,7 +164,7 @@ export class PriorityComponentsDemo {
     // =============================================================================
 
     createNotificationDemo() {
-        console.log('Setting up notification system...');
+        logger.debug('Setting up notification system...');
         
         // Notification area (invisible container for positioning)
         this.notificationContainer = {
@@ -213,7 +214,7 @@ export class PriorityComponentsDemo {
     // =============================================================================
 
     createLoadingSpinnerDemo() {
-        console.log('Setting up loading spinner demos...');
+        logger.debug('Setting up loading spinner demos...');
         
         // Static spinner examples
         const smallSpinner = this.engine.createComponent('loading-spinner', {
@@ -275,7 +276,7 @@ export class PriorityComponentsDemo {
     // =============================================================================
 
     createControlButtons() {
-        console.log('Creating control buttons...');
+        logger.debug('Creating control buttons...');
 
         // Notification test buttons
         const successBtn = this.engine.createComponent('button', {
@@ -482,7 +483,7 @@ export class PriorityComponentsDemo {
         }
         this.components.clear();
         this.notifications = [];
-        console.log('Priority Components Demo destroyed');
+        logger.info('Priority Components Demo destroyed');
     }
 
     // Public API for external control

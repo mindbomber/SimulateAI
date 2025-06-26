@@ -5,6 +5,8 @@
  */
 
 import EthicsSimulation from '../core/simulation.js';
+import logger from '../utils/logger.js';
+import { TIME } from '../utils/constants.js';
 
 class BiasExplorerSimulation extends EthicsSimulation {
   constructor(id) {
@@ -70,13 +72,13 @@ class BiasExplorerSimulation extends EthicsSimulation {
   }
 
   init(engineInstance) {
-    console.log('BiasExplorerSimulation.init() called');
+    logger.debug('BiasExplorerSimulation.init() called');
     
     this.engine = engineInstance;
     this.container = this.engine?.container || document.querySelector('.simulation-container');
     
     if (!this.container) {
-      console.error('No container found for simulation');
+      logger.error('No container found for simulation');
       return;
     }
 
@@ -86,28 +88,28 @@ class BiasExplorerSimulation extends EthicsSimulation {
     this.setupUI();
     this.emit('simulation:initialized');
     
-    console.log('BiasExplorerSimulation initialization complete');
+    logger.debug('BiasExplorerSimulation initialization complete');
   }
 
   setupUI() {
-    console.log('BiasExplorerSimulation.setupUI() called');
-    console.log('Container:', this.container);
-    console.log('Container classes before:', this.container?.className);
+    logger.debug('BiasExplorerSimulation.setupUI() called');
+    logger.debug('Container:', this.container);
+    logger.debug('Container classes before:', this.container?.className);
     
     // Clear container
     this.container.innerHTML = '';
     this.container.className = 'simulation-container ethics-explorer';
     
-    console.log('Container classes after:', this.container?.className);
-    console.log('Container bounding rect:', this.container?.getBoundingClientRect());
+    logger.debug('Container classes after:', this.container?.className);
+    logger.debug('Container bounding rect:', this.container?.getBoundingClientRect());
     
     // Create main layout
     const layout = this.createMainLayout();
-    console.log('Created layout element:', layout);
+    logger.debug('Created layout element:', layout);
     
     this.container.appendChild(layout);
-    console.log('Appended layout to container');
-    console.log('Container innerHTML length after setup:', this.container.innerHTML.length);
+    logger.debug('Appended layout to container');
+    logger.debug('Container innerHTML length after setup:', this.container.innerHTML.length);
     
     // Force modal body to scroll to top and ensure visibility
     setTimeout(() => {
@@ -119,50 +121,50 @@ class BiasExplorerSimulation extends EthicsSimulation {
         modalBody.style.height = 'auto';
         modalBody.style.maxHeight = 'none';
       }
-    }, 50);
+    }, TIME.DOM_READY_DELAY);
     
     // Debug: Check if our elements are visible
     setTimeout(() => {
-      console.log('=== POST-APPEND DEBUG ===');
-      console.log('Container computed style display:', getComputedStyle(this.container).display);
-      console.log('Container computed style visibility:', getComputedStyle(this.container).visibility);
-      console.log('Container computed style opacity:', getComputedStyle(this.container).opacity);
-      console.log('Container computed style height:', getComputedStyle(this.container).height);
-      console.log('Container computed style maxHeight:', getComputedStyle(this.container).maxHeight);
-      console.log('Container computed style overflow:', getComputedStyle(this.container).overflow);
-      console.log('Container computed style position:', getComputedStyle(this.container).position);
-      console.log('Container computed style zIndex:', getComputedStyle(this.container).zIndex);
+      logger.debug('=== POST-APPEND DEBUG ===');
+      logger.debug('Container computed style display:', getComputedStyle(this.container).display);
+      logger.debug('Container computed style visibility:', getComputedStyle(this.container).visibility);
+      logger.debug('Container computed style opacity:', getComputedStyle(this.container).opacity);
+      logger.debug('Container computed style height:', getComputedStyle(this.container).height);
+      logger.debug('Container computed style maxHeight:', getComputedStyle(this.container).maxHeight);
+      logger.debug('Container computed style overflow:', getComputedStyle(this.container).overflow);
+      logger.debug('Container computed style position:', getComputedStyle(this.container).position);
+      logger.debug('Container computed style zIndex:', getComputedStyle(this.container).zIndex);
       
       const layoutEl = this.container.querySelector('.ethics-explorer-layout');
       if (layoutEl) {
-        console.log('Layout element found');
-        console.log('Layout computed style display:', getComputedStyle(layoutEl).display);
-        console.log('Layout computed style visibility:', getComputedStyle(layoutEl).visibility);
-        console.log('Layout computed style opacity:', getComputedStyle(layoutEl).opacity);
-        console.log('Layout computed style height:', getComputedStyle(layoutEl).height);
-        console.log('Layout bounding rect:', layoutEl.getBoundingClientRect());
+        logger.debug('Layout element found');
+        logger.debug('Layout computed style display:', getComputedStyle(layoutEl).display);
+        logger.debug('Layout computed style visibility:', getComputedStyle(layoutEl).visibility);
+        logger.debug('Layout computed style opacity:', getComputedStyle(layoutEl).opacity);
+        logger.debug('Layout computed style height:', getComputedStyle(layoutEl).height);
+        logger.debug('Layout bounding rect:', layoutEl.getBoundingClientRect());
         
         // Check modal context
         const modal = document.getElementById('simulation-modal');
         const modalBody = modal?.querySelector('.modal-body');
         if (modal) {
-          console.log('=== MODAL DEBUG ===');
-          console.log('Modal display:', getComputedStyle(modal).display);
-          console.log('Modal visibility:', getComputedStyle(modal).visibility);
-          console.log('Modal bounding rect:', modal.getBoundingClientRect());
+          logger.debug('=== MODAL DEBUG ===');
+          logger.debug('Modal display:', getComputedStyle(modal).display);
+          logger.debug('Modal visibility:', getComputedStyle(modal).visibility);
+          logger.debug('Modal bounding rect:', modal.getBoundingClientRect());
         }
         if (modalBody) {
-          console.log('=== MODAL BODY DEBUG ===');
-          console.log('Modal body display:', getComputedStyle(modalBody).display);
-          console.log('Modal body height:', getComputedStyle(modalBody).height);
-          console.log('Modal body maxHeight:', getComputedStyle(modalBody).maxHeight);
-          console.log('Modal body overflow:', getComputedStyle(modalBody).overflow);
-          console.log('Modal body bounding rect:', modalBody.getBoundingClientRect());
-          console.log('Modal body scroll height:', modalBody.scrollHeight);
-          console.log('Modal body scroll top:', modalBody.scrollTop);
+          logger.debug('=== MODAL BODY DEBUG ===');
+          logger.debug('Modal body display:', getComputedStyle(modalBody).display);
+          logger.debug('Modal body height:', getComputedStyle(modalBody).height);
+          logger.debug('Modal body maxHeight:', getComputedStyle(modalBody).maxHeight);
+          logger.debug('Modal body overflow:', getComputedStyle(modalBody).overflow);
+          logger.debug('Modal body bounding rect:', modalBody.getBoundingClientRect());
+          logger.debug('Modal body scroll height:', modalBody.scrollHeight);
+          logger.debug('Modal body scroll top:', modalBody.scrollTop);
         }
       } else {
-        console.log('Layout element NOT found!');
+        logger.debug('Layout element NOT found!');
       }
     }, 100);
     
@@ -171,7 +173,7 @@ class BiasExplorerSimulation extends EthicsSimulation {
   }
 
   createMainLayout() {
-    console.log('Creating main layout...');
+    logger.debug('Creating main layout...');
     
     const layout = document.createElement('div');
     layout.className = 'ethics-explorer-layout';
@@ -223,9 +225,9 @@ class BiasExplorerSimulation extends EthicsSimulation {
       </main>
     `;
     
-    console.log('Main layout HTML created, innerHTML length:', layout.innerHTML.length);
-    console.log('Layout element:', layout);
-    console.log('Layout classes:', layout.className);
+    logger.debug('Main layout HTML created, innerHTML length:', layout.innerHTML.length);
+    logger.debug('Layout element:', layout);
+    logger.debug('Layout classes:', layout.className);
     
     return layout;
   }
@@ -273,7 +275,7 @@ class BiasExplorerSimulation extends EthicsSimulation {
     this.currentScenario = this.scenarios.find(s => s.id === scenarioId);
     if (!this.currentScenario) return;
     
-    console.log(`Selected scenario: ${this.currentScenario.title}`);
+    logger.info(`Selected scenario: ${this.currentScenario.title}`);
     this.showScenarioExploration();
     this.updateEducatorResources();
   }
@@ -513,7 +515,7 @@ class BiasExplorerSimulation extends EthicsSimulation {
 
   recordChoice(category, value, label) {
     this.currentChoices[category] = { value, label };
-    console.log(`Choice recorded: ${category} = ${label}`);
+    logger.debug(`Choice recorded: ${category} = ${label}`);
     
     // Enable the "See What Happens" button when choices are made
     const exploreBtn = document.querySelector('.action-btn.primary');
@@ -767,7 +769,7 @@ class BiasExplorerSimulation extends EthicsSimulation {
 
   updateEducatorResources() {
     // This would be expanded with actual educator resources
-    console.log('Educator resources updated for scenario:', this.currentScenario?.title);
+    logger.debug('Educator resources updated for scenario:', this.currentScenario?.title);
   }
 
   showGuide(guideType) {
@@ -849,10 +851,10 @@ class BiasExplorerSimulation extends EthicsSimulation {
         if (generatedScenarios && generatedScenarios.length > 0) {
           // Add generated scenarios to existing ones
           this.scenarios.push(...generatedScenarios);
-          console.log('Added generated scenarios:', generatedScenarios.length);
+          logger.info('Added generated scenarios:', generatedScenarios.length);
         }
       } catch (error) {
-        console.error('Error generating scenarios:', error);
+        logger.error('Error generating scenarios:', error);
       }
     }
 
@@ -884,7 +886,7 @@ class BiasExplorerSimulation extends EthicsSimulation {
       })
     };
 
-    console.log('Educator toolkit integrated with simulation');
+    logger.info('Educator toolkit integrated with simulation');
   }
 
   /**
@@ -901,12 +903,12 @@ class BiasExplorerSimulation extends EthicsSimulation {
       experiments: station.experiments
     }));
 
-    console.log('Digital science lab integrated with simulation');
+    logger.info('Digital science lab integrated with simulation');
   }
 
   // Required methods from parent class
   cleanup() {
-    console.log('BiasExplorerSimulation cleanup');
+    logger.debug('BiasExplorerSimulation cleanup');
     if (this.container) {
       this.container.innerHTML = '';
     }
@@ -925,7 +927,7 @@ class BiasExplorerSimulation extends EthicsSimulation {
   }
 
   emit(eventName, data = {}) {
-    console.log(`Event: ${eventName}`, data);
+    logger.debug(`Event: ${eventName}`, data);
   }
 }
 

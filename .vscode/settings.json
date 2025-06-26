@@ -1,0 +1,12 @@
+{
+    "mcp": {
+        "inputs": [],
+        "servers": {
+            "disabled": {
+                "command": "echo",
+                "args": ["MCP disabled"],
+                "env": {}
+            }
+        }
+    }
+}

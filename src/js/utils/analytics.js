@@ -19,6 +19,8 @@
  * @license Apache-2.0
  */
 
+import logger from './logger.js';
+
 // Enhanced constants and configuration
 const ANALYTICS_CONSTANTS = {
     VERSION: '2.0.0',
@@ -141,7 +143,7 @@ class AnalyticsPerformance {
             this.setupNavigationTracking();
             this.setupResourceTracking();
         } catch (error) {
-            console.warn('Performance tracking setup failed:', error);
+            logger.warn('Performance tracking setup failed:', error);
         }
     }
     
@@ -163,7 +165,7 @@ class AnalyticsPerformance {
             paintObserver.observe({ entryTypes: ['paint'] });
             this.observers.set('paint', paintObserver);
         } catch (e) {
-            console.warn('Paint observer not supported:', e);
+            logger.warn('Paint observer not supported:', e);
         }
         
         // Track layout shifts
@@ -183,7 +185,7 @@ class AnalyticsPerformance {
             layoutObserver.observe({ entryTypes: ['layout-shift'] });
             this.observers.set('layout-shift', layoutObserver);
         } catch (e) {
-            console.warn('Layout shift observer not supported:', e);
+            logger.warn('Layout shift observer not supported:', e);
         }
     }
     
@@ -221,7 +223,7 @@ class AnalyticsPerformance {
             resourceObserver.observe({ entryTypes: ['resource'] });
             this.observers.set('resource', resourceObserver);
         } catch (e) {
-            console.warn('Resource observer not supported:', e);
+            logger.warn('Resource observer not supported:', e);
         }
     }
     
@@ -318,7 +320,7 @@ class AnalyticsManager {
             });
             
             if (this.config.debug) {
-                console.log('Enhanced AnalyticsManager initialized', { 
+                logger.debug('Enhanced AnalyticsManager initialized', { 
                     enabled: this.config.enabled,
                     version: ANALYTICS_CONSTANTS.VERSION,
                     features: {
@@ -330,7 +332,7 @@ class AnalyticsManager {
                 });
             }
         } catch (error) {
-            console.error('AnalyticsManager initialization failed:', error);
+            logger.error('AnalyticsManager initialization failed:', error);
             this.trackError(error, { context: 'initialization' });
         }
     }
@@ -427,7 +429,7 @@ class AnalyticsManager {
             this.applyRegionalPrivacyRules();
             
         } catch (error) {
-            console.warn('Privacy consent validation failed:', error);
+            logger.warn('Privacy consent validation failed:', error);
             // Err on the side of privacy
             this.config.enabled = false;
             this.config.anonymizeData = true;
@@ -581,7 +583,7 @@ class AnalyticsManager {
             window.dispatchEvent(event);
         } catch (error) {
             if (this.config.debug) {
-                console.warn('Failed to dispatch analytics event:', error);
+                logger.warn('Failed to dispatch analytics event:', error);
             }
         }
     }    /**
@@ -707,7 +709,7 @@ class AnalyticsManager {
                 longTaskObserver.observe({ entryTypes: ['longtask'] });
             } catch (e) {
                 if (this.config.debug) {
-                    console.warn('Long task observer not supported:', e);
+                    logger.warn('Long task observer not supported:', e);
                 }
             }
         }
@@ -815,7 +817,7 @@ class AnalyticsManager {
             }
 
             if (this.config.debug) {
-                console.log('Analytics Event:', event);
+                logger.debug('Analytics Event:', event);
             }
 
             // Queue management
@@ -839,7 +841,7 @@ class AnalyticsManager {
             }
         } catch (error) {
             if (this.config.debug) {
-                console.error('Failed to track event:', error);
+                logger.error('Failed to track event:', error);
             }
             this.trackError(error, { context: 'event_tracking', eventName });
         }
@@ -912,7 +914,7 @@ class AnalyticsManager {
             await StorageManager.logAnalyticsEvent(event);
         } catch (error) {
             if (this.config.debug) {
-                console.warn('Failed to store event locally:', error);
+                logger.warn('Failed to store event locally:', error);
             }
         }
     }
@@ -931,7 +933,7 @@ class AnalyticsManager {
             urlObj.hash = '';
             
             // Replace specific segments that might contain IDs
-            let pathname = urlObj.pathname;
+            let { pathname } = urlObj;
             pathname = pathname.replace(/\/\d+/g, '/:id');
             pathname = pathname.replace(/\/[a-f0-9]{8,}/g, '/:hash');
             
@@ -1070,7 +1072,7 @@ class AnalyticsManager {
     static trackError(error, context = {}) {
         if (!error || !this.config.trackErrors) {
             if (this.config.debug && !error) {
-                console.warn('Analytics: Attempted to track null/undefined error');
+                logger.warn('Analytics: Attempted to track null/undefined error');
             }
             return;
         }
@@ -1447,7 +1449,7 @@ class AnalyticsManager {
             this.addToRetryQueue(events);
             
             if (this.config.debug) {
-                console.error('Failed to flush analytics events:', error);
+                logger.error('Failed to flush analytics events:', error);
             }
             
             this.trackError(error, { context: 'analytics_flush', eventCount: events.length });
@@ -1479,14 +1481,14 @@ class AnalyticsManager {
             await this.sendToEndpoint(events);
             
             if (this.config.debug) {
-                console.log(`Successfully sent ${events.length} queued events`);
+                logger.debug(`Successfully sent ${events.length} queued events`);
             }
         } catch (error) {
             // Re-queue failed events
             this.retryQueue.unshift(...events);
             
             if (this.config.debug) {
-                console.warn('Failed to send queued events:', error);
+                logger.warn('Failed to send queued events:', error);
             }
         }
     }
@@ -1552,7 +1554,7 @@ class AnalyticsManager {
             }
 
             if (this.config.debug) {
-                console.log(`Sent ${events.length} events to analytics endpoint`);
+                logger.debug(`Sent ${events.length} events to analytics endpoint`);
             }
             
         } catch (error) {
@@ -1627,12 +1629,12 @@ class AnalyticsManager {
             await StorageManager.set('analytics_batch', cleanedEvents);
             
             if (this.config.debug) {
-                console.log(`Stored ${events.length} events locally (total: ${cleanedEvents.length})`);
+                logger.debug(`Stored ${events.length} events locally (total: ${cleanedEvents.length})`);
             }
             
         } catch (error) {
             if (this.config.debug) {
-                console.warn('Failed to store events locally:', error);
+                logger.warn('Failed to store events locally:', error);
             }
             throw error;
         }
@@ -1710,7 +1712,7 @@ class AnalyticsManager {
             return insights;
         } catch (error) {
             if (this.config.debug) {
-                console.error('Failed to generate insights:', error);
+                logger.error('Failed to generate insights:', error);
             }
             return { error: 'Failed to generate insights', timestamp: Date.now() };
         }
@@ -2204,7 +2206,7 @@ class AnalyticsManager {
             
         } catch (error) {
             if (this.config.debug) {
-                console.error('Failed to end session:', error);
+                logger.error('Failed to end session:', error);
             }
         }
     }
@@ -2258,7 +2260,7 @@ class AnalyticsManager {
             
         } catch (error) {
             if (this.config.debug) {
-                console.error('Failed to update analytics state:', error);
+                logger.error('Failed to update analytics state:', error);
             }
         }
     }
@@ -2296,12 +2298,12 @@ class AnalyticsManager {
             }
             
             if (this.config.debug) {
-                console.log('Analytics data cleared successfully');
+                logger.debug('Analytics data cleared successfully');
             }
             
         } catch (error) {
             if (this.config.debug) {
-                console.error('Failed to clear analytics data:', error);
+                logger.error('Failed to clear analytics data:', error);
             }
         }
     }
@@ -2338,7 +2340,7 @@ class AnalyticsManager {
             
         } catch (error) {
             if (this.config.debug) {
-                console.error('Failed to export analytics:', error);
+                logger.error('Failed to export analytics:', error);
             }
             return {
                 error: 'Export failed',
@@ -2391,7 +2393,7 @@ class AnalyticsManager {
         }
         
         if (this.config.debug) {
-            console.log('Analytics configuration updated:', newConfig);
+            logger.debug('Analytics configuration updated:', newConfig);
         }
     }
     
@@ -2406,7 +2408,7 @@ class AnalyticsManager {
             }
         } catch (error) {
             if (this.config.debug) {
-                console.error('Force flush failed:', error);
+                logger.error('Force flush failed:', error);
             }
         }
     }
@@ -2440,33 +2442,33 @@ class AnalyticsManager {
     }
     
     // Helper methods for complex analytics (simplified implementations)
-    static analyzeThemeDistribution(data) { return {}; }
-    static calculateAccessibilityUsage(data) { return 0; }
-    static calculateMasteryDistribution(data) { return {}; }
-    static analyzeKnowledgeGaps(data) { return []; }
-    static analyzeLearningPaths(data) { return {}; }
-    static calculateTimeToMastery(data) { return 0; }
-    static calculateRetentionRate(data) { return 0; }
-    static calculateAverageLoadTime(data) { return 0; }
-    static analyzeMemoryUsage(data) { return {}; }
-    static analyzeNetworkPerformance(data) { return {}; }
-    static calculatePerformanceScore(data1, data2) { return 0; }
-    static generatePerformanceRecommendations(data1, data2) { return []; }
-    static findRecurringErrors(data) { return []; }
-    static calculateErrorTrend(data) { return 'stable'; }
-    static analyzeErrorResolution(data) { return {}; }
-    static predictLearningTrajectory(data) { return {}; }
-    static identifyRiskFactors(data) { return []; }
-    static generateRecommendations(data1, data2) { return []; }
-    static suggestNextBestAction(data) { return null; }
-    static calculateCompletionProbability(data) { return 0; }
-    static calculateAveragePerformance(data) { return 0; }
-    static analyzeTopicPerformance(data) { return {}; }
-    static identifyImprovementAreas(data) { return []; }
-    static identifyStrengths(data) { return []; }
-    static analyzeInteractionPatterns(data) { return {}; }
-    static analyzeFeatureUsage(data) { return {}; }
-    static analyzeContentPreferences(data) { return {}; }
+    static analyzeThemeDistribution(_data) { return {}; }
+    static calculateAccessibilityUsage(_data) { return 0; }
+    static calculateMasteryDistribution(_data) { return {}; }
+    static analyzeKnowledgeGaps(_data) { return []; }
+    static analyzeLearningPaths(_data) { return {}; }
+    static calculateTimeToMastery(_data) { return 0; }
+    static calculateRetentionRate(_data) { return 0; }
+    static calculateAverageLoadTime(_data) { return 0; }
+    static analyzeMemoryUsage(_data) { return {}; }
+    static analyzeNetworkPerformance(_data) { return {}; }
+    static calculatePerformanceScore(_data1, _data2) { return 0; }
+    static generatePerformanceRecommendations(_data1, _data2) { return []; }
+    static findRecurringErrors(_data) { return []; }
+    static calculateErrorTrend(_data) { return 'stable'; }
+    static analyzeErrorResolution(_data) { return {}; }
+    static predictLearningTrajectory(_data) { return {}; }
+    static identifyRiskFactors(_data) { return []; }
+    static generateRecommendations(_data1, _data2) { return []; }
+    static suggestNextBestAction(_data) { return null; }
+    static calculateCompletionProbability(_data) { return 0; }
+    static calculateAveragePerformance(_data) { return 0; }
+    static analyzeTopicPerformance(_data) { return {}; }
+    static identifyImprovementAreas(_data) { return []; }
+    static identifyStrengths(_data) { return []; }
+    static analyzeInteractionPatterns(_data) { return {}; }
+    static analyzeFeatureUsage(_data) { return {}; }
+    static analyzeContentPreferences(_data) { return {}; }
 }
 
 // Enhanced initialization with error handling
@@ -2475,20 +2477,20 @@ if (typeof window !== 'undefined') {
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
             AnalyticsManager.init().catch(error => {
-                console.warn('Analytics initialization failed:', error);
+                logger.warn('Analytics initialization failed:', error);
             });
         });
     } else {
         // Initialize immediately if DOM is ready
         AnalyticsManager.init().catch(error => {
-            console.warn('Analytics initialization failed:', error);
+            logger.warn('Analytics initialization failed:', error);
         });
     }
     
     // Global error handler for unhandled analytics errors
     window.addEventListener('error', (event) => {
         if (event.filename && event.filename.includes('analytics')) {
-            console.warn('Analytics module error:', event.error);
+            logger.warn('Analytics module error:', event.error);
         }
     });
 }

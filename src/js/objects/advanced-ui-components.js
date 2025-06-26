@@ -14,6 +14,7 @@ import {
     validateString,
     FOCUS_RING_WIDTH
 } from './enhanced-objects.js';
+import logger from '../utils/logger.js';
 
 // Constants to avoid magic numbers
 const COMPONENT_CONSTANTS = {
@@ -175,9 +176,9 @@ const UIUtils = {
     debugLog(level, message, data = null) {
         if (typeof window !== 'undefined' && window.DEBUG_MODE) {
             if (data) {
-                console[level](`[UI] ${message}:`, data);
+                logger[level](`[UI] ${message}:`, data);
             } else {
-                console[level](`[UI] ${message}`);
+                logger[level](`[UI] ${message}`);
             }
         }
     },

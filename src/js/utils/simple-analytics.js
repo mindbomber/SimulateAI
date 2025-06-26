@@ -8,6 +8,7 @@
  */
 
 import { simpleStorage, userPreferences } from './simple-storage.js';
+import logger from './logger.js';
 
 /**
  * Simple analytics manager for educational platforms
@@ -20,14 +21,14 @@ class SimpleAnalyticsManager {
         this.sessionId = this.generateSessionId();
         this.startTime = Date.now();
         
-        console.log('📊 Simple Analytics Manager initialized');
+        logger.info('📊 Simple Analytics Manager initialized');
     }
     
     /**
      * Generate a simple session ID
      */
     generateSessionId() {
-        return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     }
     
     /**
@@ -51,7 +52,7 @@ class SimpleAnalyticsManager {
         try {
             const event = {
                 name: eventName,
-                data: data,
+                data,
                 timestamp: Date.now(),
                 sessionId: this.sessionId,
                 url: window.location.href
@@ -64,10 +65,10 @@ class SimpleAnalyticsManager {
                 this.events = this.events.slice(-this.maxEvents);
             }
             
-            console.log('📊 Event tracked:', eventName, data);
+            logger.info('📊 Event tracked:', eventName, data);
             
         } catch (error) {
-            console.warn('Error tracking event:', error);
+            logger.warn('Error tracking event:', error);
         }
     }
     
@@ -174,7 +175,7 @@ class SimpleAnalyticsManager {
      */
     clearEvents() {
         this.events = [];
-        console.log('📊 Analytics events cleared');
+        logger.info('📊 Analytics events cleared');
     }
     
     /**
@@ -186,7 +187,7 @@ class SimpleAnalyticsManager {
             simpleStorage.set('analytics_session', summary);
             simpleStorage.set('analytics_events', this.events);
         } catch (error) {
-            console.warn('Error saving analytics events:', error);
+            logger.warn('Error saving analytics events:', error);
         }
     }
     
@@ -200,15 +201,15 @@ class SimpleAnalyticsManager {
             
             if (savedEvents.length > 0) {
                 this.events = savedEvents;
-                console.log('📊 Loaded', savedEvents.length, 'analytics events');
+                logger.info('📊 Loaded', savedEvents.length, 'analytics events');
             }
             
             if (savedSession) {
-                console.log('📊 Previous session:', savedSession);
+                logger.info('📊 Previous session:', savedSession);
             }
             
         } catch (error) {
-            console.warn('Error loading analytics events:', error);
+            logger.warn('Error loading analytics events:', error);
         }
     }
     
@@ -230,10 +231,10 @@ class SimpleAnalyticsManager {
                 this.saveEvents();
             });
             
-            console.log('📊 Simple Analytics Manager ready');
+            logger.info('📊 Simple Analytics Manager ready');
             
         } catch (error) {
-            console.warn('Error initializing analytics:', error);
+            logger.warn('Error initializing analytics:', error);
         }
     }
     
@@ -242,7 +243,7 @@ class SimpleAnalyticsManager {
      */
     setEnabled(enabled) {
         this.enabled = enabled;
-        console.log('📊 Analytics', enabled ? 'enabled' : 'disabled');
+        logger.info('📊 Analytics', enabled ? 'enabled' : 'disabled');
         
         // Save preference
         try {
@@ -250,7 +251,7 @@ class SimpleAnalyticsManager {
             prefs.analytics = enabled;
             // Note: We're not saving this back as it would require updating the preference structure
         } catch (error) {
-            console.warn('Error saving analytics preference:', error);
+            logger.warn('Error saving analytics preference:', error);
         }
     }
 }
@@ -268,4 +269,4 @@ window.SimpleAnalytics = simpleAnalytics;
 // Auto-initialize
 simpleAnalytics.init();
 
-console.log('✅ Simple Analytics Manager loaded');
+logger.info('✅ Simple Analytics Manager loaded');

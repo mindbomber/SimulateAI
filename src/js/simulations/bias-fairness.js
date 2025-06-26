@@ -6,6 +6,7 @@
 // Import required modules
 import EthicsSimulation from '../core/simulation.js';
 import CanvasManager from '../utils/canvas-manager.js';
+import logger from '../utils/logger.js';
 
 // Simple helper functions
 const Helpers = {
@@ -44,24 +45,24 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     };
   }  // Override the base init method to match expected interface
   init(engineInstance) {
-    console.log('BiasSimulation.init() called with engine:', engineInstance);
+    logger.debug('BiasSimulation.init() called with engine:', engineInstance);
     
     this.engine = engineInstance;
     
-    console.log('Generating candidates...');
+    logger.debug('Generating candidates...');
     this.generateCandidates();
-    console.log(`Generated ${this.candidates.length} candidates`);
+    logger.debug(`Generated ${this.candidates.length} candidates`);
     
-    console.log('Setting up UI...');
+    logger.debug('Setting up UI...');
     this.setupUI();
-    console.log('UI setup completed');
+    logger.debug('UI setup completed');
     
     // Skip parent's UI setup since we have our own
     // Just do the basic initialization without UI components that expect specific engine config
     this.startTime = Date.now();
     this.emit('simulation:initialized');
     
-    console.log('BiasSimulation initialization complete');
+    logger.debug('BiasSimulation initialization complete');
     return this;
   }
   generateCandidates() {
@@ -95,27 +96,27 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         this.candidates.push(candidate);
       }
     } catch (error) {
-      console.error('Error generating candidates:', error);
+      logger.error('Error generating candidates:', error);
       this.candidates = []; // Fallback to empty array
     }
   }  setupUI() {
-    console.log('BiasSimulation.setupUI() called');
+    logger.debug('BiasSimulation.setupUI() called');
     
     try {
       // Force basic UI for now to avoid canvas cleanup issues
       // Enhanced UI with canvases is being cleaned up prematurely
-      console.log('Using basic UI (canvas management disabled)');
+      logger.debug('Using basic UI (canvas management disabled)');
       this.setupBasicUI();
-      console.log('UI setup completed successfully');
+      logger.debug('UI setup completed successfully');
     } catch (error) {
-      console.error('Error setting up UI:', error);
-      console.log('Falling back to basic UI');
+      logger.error('Error setting up UI:', error);
+      logger.debug('Falling back to basic UI');
       this.setupBasicUI(); // Fallback to basic UI
     }
   }
   setupEnhancedUI() {
     // Integration with Visual Engine and Enhanced Objects
-    console.log('Setting up enhanced UI with visual engine');
+    logger.debug('Setting up enhanced UI with visual engine');
     
     try {
       // Create main container
@@ -139,8 +140,8 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       this.setupResultsDisplay(container);
 
       if (this.container) {
-        console.log('Clearing and setting up enhanced container:', this.container);
-        console.log('Container innerHTML before clearing:', this.container.innerHTML);
+        logger.debug('Clearing and setting up enhanced container:', this.container);
+        logger.debug('Container innerHTML before clearing:', this.container.innerHTML);
         
         // Force complete cleanup of container
         while (this.container.firstChild) {
@@ -160,17 +161,17 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         // Force a DOM reflow to ensure cleanup
         this.container.offsetHeight;
         
-        console.log('Container innerHTML after clearing:', this.container.innerHTML);
-        console.log('Appending enhanced UI to container:', this.container);
+        logger.debug('Container innerHTML after clearing:', this.container.innerHTML);
+        logger.debug('Appending enhanced UI to container:', this.container);
         this.container.appendChild(container);
-        console.log('Enhanced UI successfully appended');
+        logger.debug('Enhanced UI successfully appended');
       } else {
-        console.error('No container available for enhanced UI, falling back to basic UI');
+        logger.error('No container available for enhanced UI, falling back to basic UI');
         this.setupBasicUI();
       }
     } catch (error) {
-      console.error('Error setting up enhanced UI:', error);
-      console.log('Falling back to basic UI');
+      logger.error('Error setting up enhanced UI:', error);
+      logger.debug('Falling back to basic UI');
       this.setupBasicUI();
     }
   }  setupEnhancedMeters(parentContainer) {
@@ -204,7 +205,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
 
       parentContainer.appendChild(metersPanel);
     } catch (error) {
-      console.error('Error setting up enhanced meters:', error);
+      logger.error('Error setting up enhanced meters:', error);
       // Create fallback UI
       const fallbackPanel = document.createElement('div');
       fallbackPanel.className = 'enhanced-meters-panel fallback';
@@ -218,7 +219,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     }
   }
   setupBasicUI() {
-    console.log('BiasSimulation.setupBasicUI() called');
+    logger.debug('BiasSimulation.setupBasicUI() called');
     
     try {
       // Create a simple UI compatibility layer for the engine
@@ -330,8 +331,8 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       };
 
       // Get simulation container from engine with improved fallback logic
-      console.log('Engine instance:', this.engine);
-      console.log('Engine container:', this.engine?.container);
+      logger.debug('Engine instance:', this.engine);
+      logger.debug('Engine container:', this.engine?.container);
       
       // Try multiple container sources
       this.container = this.engine?.container || 
@@ -341,12 +342,12 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
                       document.querySelector('#app') ||
                       document.body;
       
-      console.log('Container resolved to:', this.container);
-      console.log('Container type:', this.container?.tagName);
-      console.log('Container exists in DOM:', document.contains(this.container));
+      logger.debug('Container resolved to:', this.container);
+      logger.debug('Container type:', this.container?.tagName);
+      logger.debug('Container exists in DOM:', document.contains(this.container));
       
       if (!this.container) {
-        console.error('No simulation container available - cannot proceed');
+        logger.error('No simulation container available - cannot proceed');
         return;
       }
 
@@ -355,8 +356,8 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         style: 'display: flex !important; gap: 20px; height: 100% !important; padding: 20px; background: white !important; border: 2px solid red !important; min-height: 400px !important; width: 100% !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 1000 !important;'
       });
 
-      console.log('Created main container element:', container);
-      console.log('Container styles:', container.style.cssText);
+      logger.debug('Created main container element:', container);
+      logger.debug('Container styles:', container.style.cssText);
 
     // Control Panel
     const controlPanel = this.ui.createPanel({
@@ -364,7 +365,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       className: 'controls-panel',
       style: 'width: 300px; background: lightblue; border: 2px solid blue;'
     });
-    console.log('Created control panel:', controlPanel);
+    logger.debug('Created control panel:', controlPanel);
 
     // Bias sliders
     Object.keys(this.biasSettings).forEach(biasType => {
@@ -396,7 +397,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       className: 'results-panel',
       style: 'flex: 1; background: lightgreen; border: 2px solid green;'
     });
-    console.log('Created results panel:', resultsPanel);
+    logger.debug('Created results panel:', resultsPanel);
 
     this.resultsContainer = this.ui.createElement('div', {
       className: 'results-container',
@@ -410,7 +411,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       className: 'stats-panel',
       style: 'width: 250px; background: lightyellow; border: 2px solid orange;'
     });
-    console.log('Created stats panel:', statsPanel);
+    logger.debug('Created stats panel:', statsPanel);
 
     this.statsContainer = this.ui.createElement('div', {
       className: 'stats-container',
@@ -419,19 +420,19 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     statsPanel.appendChild(this.statsContainer);
 
     // Append all panels to the main container
-    console.log('Appending panels to main container...');
+    logger.debug('Appending panels to main container...');
     container.appendChild(controlPanel);
-    console.log('Control panel appended');
+    logger.debug('Control panel appended');
     container.appendChild(resultsPanel);
-    console.log('Results panel appended');
+    logger.debug('Results panel appended');
     container.appendChild(statsPanel);
-    console.log('Stats panel appended');
-    console.log('Main container children count:', container.children.length);
+    logger.debug('Stats panel appended');
+    logger.debug('Main container children count:', container.children.length);
 
     // Ensure container is properly available and clear it first
     if (this.container) {
-      console.log('Clearing and setting up container:', this.container);
-      console.log('Container innerHTML before clearing:', this.container.innerHTML);
+      logger.debug('Clearing and setting up container:', this.container);
+      logger.debug('Container innerHTML before clearing:', this.container.innerHTML);
       
       // Force complete cleanup of container
       while (this.container.firstChild) {
@@ -451,51 +452,51 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       // Force a DOM reflow to ensure cleanup
       this.container.offsetHeight;
       
-      console.log('Container innerHTML after clearing:', this.container.innerHTML);
-      console.log('Appending main UI container to simulation container...');
-      console.log('Main container element:', container);
-      console.log('Simulation container element:', this.container);
+      logger.debug('Container innerHTML after clearing:', this.container.innerHTML);
+      logger.debug('Appending main UI container to simulation container...');
+      logger.debug('Main container element:', container);
+      logger.debug('Simulation container element:', this.container);
       this.container.appendChild(container);
-      console.log('Final simulation container HTML:', this.container.innerHTML);
-      console.log('Container computed styles:', window.getComputedStyle(this.container));
-      console.log('Container bounding rect:', this.container.getBoundingClientRect());
+      logger.debug('Final simulation container HTML:', this.container.innerHTML);
+      logger.debug('Container computed styles:', window.getComputedStyle(this.container));
+      logger.debug('Container bounding rect:', this.container.getBoundingClientRect());
       
       // Debug the inner bias-simulation-container
       const biasContainer = this.container.querySelector('.bias-simulation-container');
       if (biasContainer) {
-        console.log('Bias container found:', biasContainer);
-        console.log('Bias container bounding rect:', biasContainer.getBoundingClientRect());
+        logger.debug('Bias container found:', biasContainer);
+        logger.debug('Bias container bounding rect:', biasContainer.getBoundingClientRect());
         
         const computedStyles = window.getComputedStyle(biasContainer);
-        console.log('Bias container visibility:', computedStyles.visibility);
-        console.log('Bias container display:', computedStyles.display);
-        console.log('Bias container opacity:', computedStyles.opacity);
-        console.log('Bias container overflow:', computedStyles.overflow);
-        console.log('Bias container z-index:', computedStyles.zIndex);
-        console.log('Bias container position:', computedStyles.position);
-        console.log('Bias container color:', computedStyles.color);
-        console.log('Bias container background-color:', computedStyles.backgroundColor);
-        console.log('Bias container border:', computedStyles.border);
+        logger.debug('Bias container visibility:', computedStyles.visibility);
+        logger.debug('Bias container display:', computedStyles.display);
+        logger.debug('Bias container opacity:', computedStyles.opacity);
+        logger.debug('Bias container overflow:', computedStyles.overflow);
+        logger.debug('Bias container z-index:', computedStyles.zIndex);
+        logger.debug('Bias container position:', computedStyles.position);
+        logger.debug('Bias container color:', computedStyles.color);
+        logger.debug('Bias container background-color:', computedStyles.backgroundColor);
+        logger.debug('Bias container border:', computedStyles.border);
         
         // Fix container sizing and overflow issues
         biasContainer.style.cssText += '; height: auto !important; max-height: 100% !important; overflow: auto !important; box-sizing: border-box !important;';
-        console.log('Applied container size fixes');
+        logger.debug('Applied container size fixes');
         
         // Ensure the parent simulation container can accommodate the content
         if (container) {
           container.style.cssText += '; height: auto !important; min-height: 500px !important; max-height: 80vh !important; overflow: auto !important;';
-          console.log('Applied simulation container size fixes');
+          logger.debug('Applied simulation container size fixes');
         }
       } else {
-        console.error('Bias container not found in DOM!');
+        logger.error('Bias container not found in DOM!');
       }
       
-      console.log('UI successfully appended to container');
+      logger.debug('UI successfully appended to container');
     } else {
-      console.error('Simulation container not available');
+      logger.error('Simulation container not available');
     }
     } catch (error) {
-      console.error('Error setting up UI:', error);
+      logger.error('Error setting up UI:', error);
     }
   }
 
@@ -971,7 +972,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
   updateBiasDisplay() {
     // Visual feedback for bias settings could be added here
     // Use console.log instead of undefined analytics
-    console.log('Bias settings changed:', this.biasSettings);
+    logger.debug('Bias settings changed:', this.biasSettings);
   }
 
   showFinalResults() {
@@ -1000,12 +1001,12 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
    */
   cleanup() {
     try {
-      console.log('BiasSimulation cleanup called');
+      logger.debug('BiasSimulation cleanup called');
       
       // Clear container content first
       if (this.container) {
-        console.log('Cleaning up container:', this.container);
-        console.log('Container innerHTML before cleanup:', this.container.innerHTML);
+        logger.debug('Cleaning up container:', this.container);
+        logger.debug('Container innerHTML before cleanup:', this.container.innerHTML);
         
         // Force complete cleanup of container
         while (this.container.firstChild) {
@@ -1025,14 +1026,14 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         // Force a DOM reflow to ensure cleanup
         this.container.offsetHeight;
         
-        console.log('Container innerHTML after cleanup:', this.container.innerHTML);
+        logger.debug('Container innerHTML after cleanup:', this.container.innerHTML);
       }
 
       // Only remove canvases if they were actually created
       if (this.canvasIds) {
         Object.entries(this.canvasIds).forEach(([key, canvasId]) => {
           if (canvasId && CanvasManager.canvases && CanvasManager.canvases.has(canvasId)) {
-            console.log(`Removing canvas: ${key} -> ${canvasId}`);
+            logger.debug(`Removing canvas: ${key} -> ${canvasId}`);
             CanvasManager.removeCanvas(canvasId);
           }
         });
@@ -1057,9 +1058,9 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       this.resultsContainer = null;
       this.statsContainer = null;
 
-      console.log('Bias simulation cleanup completed');
+      logger.debug('Bias simulation cleanup completed');
     } catch (error) {
-      console.error('Error during simulation cleanup:', error);
+      logger.error('Error during simulation cleanup:', error);
     }
   }
 
@@ -1126,7 +1127,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
    */
   setContainer(container) {
     this.container = container;
-    console.log('BiasSimulation container set to:', this.container);
+    logger.debug('BiasSimulation container set to:', this.container);
   }
 
   getReflectionQuestions() {
@@ -1180,7 +1181,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
   
   triggerEvent(eventName, data) {
     // Track simulation events
-    console.log(`Simulation event: ${eventName}`, data);
+    logger.debug(`Simulation event: ${eventName}`, data);
     this.emit(eventName, data);
   }
   async createEnhancedBiasMeters(canvasId) {
@@ -1218,7 +1219,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         this.biasMeters.set(metric, meter);
       });
     } catch (error) {
-      console.error('Error creating enhanced bias meters:', error);
+      logger.error('Error creating enhanced bias meters:', error);
     }
   }
 
@@ -1319,7 +1320,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       this.createBiasSliders(InteractiveSlider);
       this.createActionButtons(InteractiveButton);
     } catch (error) {
-      console.error('Error creating enhanced controls:', error);
+      logger.error('Error creating enhanced controls:', error);
     }
   }
 
@@ -1641,7 +1642,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     try {
       this.createAnalyticsChart(id);
     } catch (error) {
-      console.error('Error setting up analytics chart:', error);
+      logger.error('Error setting up analytics chart:', error);
     }
   }
   async createAnalyticsChart(canvasId) {
@@ -1662,7 +1663,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
 
       this.renderAnalyticsChart();
     } catch (error) {
-      console.error('Error creating analytics chart:', error);
+      logger.error('Error creating analytics chart:', error);
     }
   }
 
@@ -1958,7 +1959,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     // Update sliders
     this.biasSliders?.forEach((slider, key) => {
       const biasKey = key.replace('-bias', '');
-      const value = this.biasSettings[biasKey + 'Bias'] || this.biasSettings[biasKey];
+      const value = this.biasSettings[`${biasKey}Bias`] || this.biasSettings[biasKey];
       if (value !== undefined) {
         slider.setValue(value, true);
       }
@@ -2207,27 +2208,27 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
    */
   start() {
     try {
-      console.log('BiasSimulation.start() called');
+      logger.debug('BiasSimulation.start() called');
       
       // Ensure we have candidates
       if (!this.candidates || this.candidates.length === 0) {
-        console.log('No candidates found, generating...');
+        logger.debug('No candidates found, generating...');
         this.generateCandidates();
       }
       
-      console.log(`Starting with ${this.candidates.length} candidates`);
+      logger.debug(`Starting with ${this.candidates.length} candidates`);
       
       // Update initial display
-      console.log('Updating initial statistics...');
+      logger.debug('Updating initial statistics...');
       this.updateStatistics();
       
       // Emit start event
       this.emit('simulation:started');
       
-      console.log('BiasSimulation started successfully');
+      logger.debug('BiasSimulation started successfully');
       return this;
     } catch (error) {
-      console.error('Error starting simulation:', error);
+      logger.error('Error starting simulation:', error);
       return this;
     }
   }
@@ -2263,34 +2264,6 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       isComplete: this.currentRound >= this.totalRounds,
       isPaused: this.isPaused || false
     };
-  }
-
-  /**
-   * Handle scenario loading - compatibility method
-   */
-  loadScenario(scenarioIndex) {
-    // This simulation doesn't use scenarios, but we need the method for compatibility
-    this.currentScenario = scenarioIndex;
-    this.emit('scenario:loaded', { 
-      scenario: { 
-        id: `round-${this.currentRound}`,
-        title: `Round ${this.currentRound}`,
-        index: scenarioIndex 
-      } 
-    });
-    return this;
-  }
-
-  /**
-   * Get reflection questions - required method
-   */
-  getReflectionQuestions() {
-    return [
-      "How did adjusting bias parameters affect the diversity of hired candidates?",
-      "What are the trade-offs between different types of bias in hiring algorithms?",
-      "How might you design a fairer hiring algorithm?",
-      "What real-world factors contribute to bias in AI hiring systems?"
-    ];
   }
 
   // ...existing code...

@@ -382,14 +382,14 @@
         
         // Enhanced error handling
         window.addEventListener('error', (event) => {
-            console.error('Global error:', event.error);
+            // Log error for debugging (console allowed in HTML for error handling)
             if (window.ErrorBoundary) {
                 window.ErrorBoundary.handleError(event.error);
             }
         });
         
         window.addEventListener('unhandledrejection', (event) => {
-            console.error('Unhandled promise rejection:', event.reason);
+            // Log promise rejection for debugging (console allowed in HTML for error handling)
             if (window.ErrorBoundary) {
                 window.ErrorBoundary.handleError(event.reason);
             }

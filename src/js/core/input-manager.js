@@ -6,6 +6,8 @@
  * @since 2025
  */
 
+import logger from '../utils/logger.js';
+
 // Configuration Constants
 const INPUT_CONFIG = {
     // Performance settings
@@ -268,16 +270,16 @@ export class InputManager {
         
         switch (level) {
             case 'error':
-                console.error(`[InputManager Error] ${message}`, context);
+                logger.error(`[InputManager Error] ${message}`, context);
                 break;
             case 'warn':
-                console.warn(`[InputManager Warning] ${message}`, context);
+                logger.warn(`[InputManager Warning] ${message}`, context);
                 break;
             case 'debug':
-                console.debug(`[InputManager Debug] ${message}`, context);
+                logger.debug(`[InputManager Debug] ${message}`, context);
                 break;
             default:
-                console.log(`[InputManager] ${message}`, context);
+                logger.info(`[InputManager] ${message}`, context);
         }
         
         this.performanceMonitor.logEvent(logEntry);
@@ -1589,9 +1591,9 @@ class InputErrorHandler {
         }
         
         if (type === INPUT_ERRORS.INVALID_EVENT) {
-            console.warn('[InputManager] Invalid event:', errorEntry);
+            logger.warn('[InputManager] Invalid event:', errorEntry);
         } else {
-            console.error('[InputManager] Error:', errorEntry);
+            logger.error('[InputManager] Error:', errorEntry);
         }
     }
 

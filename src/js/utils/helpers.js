@@ -1,3 +1,6 @@
+import logger from './logger.js';
+import { COMMON } from './constants.js';
+
 /**
  * Enhanced Helper Utilities for SimulateAI Platform
  * Comprehensive utility functions for modern web applications
@@ -670,23 +673,23 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
         } = options;
         
         const seconds = Math.floor(milliseconds / 1000);
-        const minutes = Math.floor(seconds / 60);
-        const hours = Math.floor(minutes / 60);
-        const days = Math.floor(hours / 24);
+        const minutes = Math.floor(seconds / COMMON.MINUTES_60);
+        const hours = Math.floor(minutes / COMMON.MINUTES_60);
+        const days = Math.floor(hours / COMMON.HOURS_24);
         
         if (verbose || screenReader) {
             const parts = [];
             if (days > 0) parts.push(`${days} day${days > 1 ? 's' : ''}`);
-            if (hours % 24 > 0) parts.push(`${hours % 24} hour${hours % 24 > 1 ? 's' : ''}`);
+            if (hours % COMMON.HOURS_24 > 0) parts.push(`${hours % COMMON.HOURS_24} hour${hours % COMMON.HOURS_24 > 1 ? 's' : ''}`);
             if (minutes % 60 > 0) parts.push(`${minutes % 60} minute${minutes % 60 > 1 ? 's' : ''}`);
-            if (seconds % 60 > 0) parts.push(`${seconds % 60} second${seconds % 60 > 1 ? 's' : ''}`);
+            if (seconds % COMMON.MINUTES_60 > 0) parts.push(`${seconds % COMMON.MINUTES_60} second${seconds % COMMON.MINUTES_60 > 1 ? 's' : ''}`);
             
             if (parts.length === 0) return screenReader ? '0 seconds' : '0s';
             return parts.join(screenReader ? ', ' : ' ');
         }
         
         if (days > 0) {
-            return `${days}d ${hours % 24}h ${minutes % 60}m`;
+            return `${days}d ${hours % COMMON.HOURS_24}h ${minutes % COMMON.MINUTES_60}m`;
         } else if (hours > 0) {
             return `${hours}:${(minutes % 60).toString().padStart(2, '0')}:${(seconds % 60).toString().padStart(2, '0')}`;
         } else if (minutes > 0) {
@@ -770,8 +773,6 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
         
         const {
             precise = false,
-            maxUnit = 'year',
-            minUnit = 'second',
             shortForm = false
         } = options;
         
@@ -1045,8 +1046,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
     static generateAccessiblePalette(baseColor, options = {}) {
         const {
             steps = 5,
-            lightBackground = '#ffffff',
-            highContrast = false
+            lightBackground = '#ffffff'
         } = options;
         
         const rgb = this.hexToRgb(baseColor);
@@ -1095,17 +1095,22 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
         if (!rgb) return null;
         
         switch (outputFormat.toLowerCase()) {
-            case 'hex':
+            case 'hex': {
                 return this.rgbToHex(rgb.r, rgb.g, rgb.b);
-            case 'rgb':
+            }
+            case 'rgb': {
                 return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
-            case 'hsl':
+            }
+            case 'hsl': {
                 const hsl = this.rgbToHsl(rgb);
                 return `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
-            case 'object':
+            }
+            case 'object': {
                 return rgb;
-            default:
+            }
+            default: {
                 return color;
+            }
         }
     }
     
@@ -1165,7 +1170,9 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
         
         const max = Math.max(r, g, b);
         const min = Math.min(r, g, b);
-        let h, s, l = (max + min) / 2;
+        let h;
+        let s;
+        const l = (max + min) / 2;
         
         if (max === min) {
             h = s = 0; // achromatic
@@ -1261,7 +1268,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
         const rect = element.getBoundingClientRect();
         const styles = window.getComputedStyle(element);
         
-        let position = {
+        const position = {
             x: rect.left + window.scrollX,
             y: rect.top + window.scrollY,
             width: rect.width,
@@ -1572,12 +1579,13 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
                         const start = performance.now();
                         const result = func.apply(ctx, args);
                         const duration = performance.now() - start;
-                        console.debug(`Debounced function executed in ${duration.toFixed(2)}ms`);
+                        logger.debug(`Debounced function executed in ${duration.toFixed(2)}ms`);
                         return result;
                     } else {
                         return func.apply(ctx, args);
                     }
                 }
+                return undefined;
             };
             
             const callNow = immediate && !timeout;
@@ -1599,6 +1607,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
                 lastCallTime = currentTime;
                 return func.apply(ctx, args);
             }
+            return undefined;
         };
         
         debounced.cancel = () => {
@@ -1607,12 +1616,13 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
             timeout = maxTimeout = null;
         };
         
-        debounced.flush = () => {
+        debounced.flush = (...args) => {
             if (timeout) {
                 clearTimeout(timeout);
                 timeout = null;
-                return func.apply(context, arguments);
+                return func.apply(context, args);
             }
+            return undefined;
         };
         
         return debounced;
@@ -1633,7 +1643,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
             trackPerformance = false
         } = options;
         
-        let inThrottle, lastFunc, lastRan;
+        let lastFunc, lastRan;
         
         return function executedFunction(...args) {
             // Respect user's motion preferences for visual updates
@@ -1650,7 +1660,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
                     const start = performance.now();
                     func.apply(context, args);
                     const duration = performance.now() - start;
-                    console.debug(`Throttled function (leading) executed in ${duration.toFixed(2)}ms`);
+                    logger.debug(`Throttled function (leading) executed in ${duration.toFixed(2)}ms`);
                 } else {
                     func.apply(context, args);
                 }
@@ -1663,7 +1673,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
                             const start = performance.now();
                             func.apply(context, args);
                             const duration = performance.now() - start;
-                            console.debug(`Throttled function (trailing) executed in ${duration.toFixed(2)}ms`);
+                            logger.debug(`Throttled function (trailing) executed in ${duration.toFixed(2)}ms`);
                         } else {
                             func.apply(context, args);
                         }
@@ -1694,7 +1704,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
             callCount++;
             
             if (trackCalls && called) {
-                console.warn(`Function called ${callCount} times, but can only execute once`);
+                logger.warn(`Function called ${callCount} times, but can only execute once`);
             }
             
             if (!called) {
@@ -1754,7 +1764,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
                 const start = performance.now();
                 const result = originalHandler.apply(this, args);
                 const duration = performance.now() - start;
-                console.debug(`Event handler for ${event} executed in ${duration.toFixed(2)}ms`);
+                logger.debug(`Event handler for ${event} executed in ${duration.toFixed(2)}ms`);
                 return result;
             };
         }
@@ -1876,7 +1886,6 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
         const {
             allowInternational = true,
             maxLength = 254,
-            checkMxRecord = false,
             blockedDomains = [],
             requireTld = true
         } = options;
@@ -2232,7 +2241,6 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
         
         // Check for error handling
         const hasAriaInvalid = input.hasAttribute('aria-invalid');
-        const hasAriaDescribedBy = input.getAttribute('aria-describedby');
         
         if (input.checkValidity && !input.checkValidity() && !hasAriaInvalid) {
             issues.push('Invalid input lacks aria-invalid attribute');
@@ -2269,7 +2277,6 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
     static getBrowserInfo(options = {}) {
         const {
             includeVersion = false,
-            includeEngine = false,
             includeFeatureSupport = false,
             respectPrivacy = true
         } = options;
@@ -2567,7 +2574,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
         
         // Performance timing
         if (performance && performance.timing) {
-            const timing = performance.timing;
+            const { timing } = performance;
             metrics.pageLoadTime = timing.loadEventEnd - timing.navigationStart;
             metrics.domContentLoaded = timing.domContentLoadedEventEnd - timing.navigationStart;
             metrics.domInteractive = timing.domInteractive - timing.navigationStart;
@@ -2584,7 +2591,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
         
         // Connection information (if available)
         if (includeConnection && 'connection' in navigator) {
-            const connection = navigator.connection;
+            const { connection } = navigator;
             metrics.connection = {
                 effectiveType: connection.effectiveType,
                 downlink: connection.downlink,
@@ -2628,7 +2635,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
         let totalWeight = 0;
         let validMetrics = 0;
         
-        const processMetric = (metric, key) => {
+        const processMetric = (metric, _key) => {
             if (typeof metric === 'object' && metric !== null) {
                 const value = typeof metric.value === 'number' ? metric.value : 0;
                 const weight = typeof metric.weight === 'number' ? metric.weight : defaultWeight;
@@ -2665,7 +2672,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
             case 'average':
                 finalScore = totalScore / validMetrics;
                 break;
-            case 'harmonic':
+            case 'harmonic': {
                 // Harmonic mean - more sensitive to low scores
                 const harmonicSum = Array.from(metrics instanceof Map ? metrics.values() : Object.values(metrics))
                     .filter(m => typeof m === 'number' || (typeof m === 'object' && typeof m.value === 'number'))
@@ -2675,6 +2682,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
                     }, 0);
                 finalScore = harmonicSum > 0 ? validMetrics / harmonicSum : 0;
                 break;
+            }
             default:
                 finalScore = totalWeight > 0 ? totalScore / totalWeight : 0;
         }
@@ -2691,8 +2699,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
     static getEthicsGrade(score, options = {}) {
         const {
             includeAdvice = true,
-            includeAccessibility = true,
-            language = 'en'
+            includeAccessibility = true
         } = options;
         
         if (typeof score !== 'number' || score < 0 || score > 100) {
@@ -3053,8 +3060,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
             includeMetrics = true,
             includeInsights = true,
             includeRecommendations = true,
-            includeAccessibility = true,
-            format = 'detailed'
+            includeAccessibility = true
         } = options;
         
         if (!simulation || typeof simulation !== 'object') {
@@ -3469,8 +3475,10 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
         }
         
         // Check for dangerous characters
-        const dangerousChars = /[<>:"|?*\\/\x00-\x1f]/;
-        if (dangerousChars.test(filename)) {
+        const dangerousChars = /[<>:"|?*\\/]/;
+        // Check for control characters (0-31)
+        const hasControlChars = filename.split('').some(char => char.charCodeAt(0) < 32);
+        if (dangerousChars.test(filename) || hasControlChars) {
             return { valid: false, error: 'Filename contains invalid characters' };
         }
         
@@ -3499,7 +3507,8 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
         }
         
         if (!allowUnicode) {
-            sanitized = sanitized.replace(/[^\x00-\x7F]/g, '');
+            // Remove non-ASCII characters (keep only printable ASCII)
+            sanitized = sanitized.replace(/[^\u0020-\u007F]/g, '');
         }
         
         // Remove leading/trailing dots and spaces
@@ -3970,7 +3979,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
                 try {
                     updateCallback(easedProgress, progress, elapsed);
                 } catch (error) {
-                    console.error('Animation update callback error:', error);
+                    logger.error('Animation update callback error:', error);
                     controller.cancel();
                     return;
                 }
@@ -3983,7 +3992,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
                     try {
                         completeCallback(performance);
                     } catch (error) {
-                        console.error('Animation complete callback error:', error);
+                        logger.error('Animation complete callback error:', error);
                     }
                 }
             }
@@ -4195,7 +4204,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
             }
         };
         
-        const createAnimation = (config, index) => {
+        const createAnimation = (config, _index) => {
             const animationConfig = {
                 ...config,
                 completeCallback: () => {

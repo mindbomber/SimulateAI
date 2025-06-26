@@ -17,6 +17,9 @@
  * @license Apache-2.0
  */
 
+import logger from '../utils/logger.js';
+import { COMMON, TIMING } from '../utils/constants.js';
+
 // Enhanced constants and configuration
 const UI_CONSTANTS = {
     ANIMATION_DURATION: 300,
@@ -101,7 +104,7 @@ class UIPerformanceMonitor {
             const duration = performance.now() - start;
             this.measurements.delete(id);
             if (duration > 16) { // Flag slow operations (> 1 frame)
-                console.warn(`UI operation '${id}' took ${duration.toFixed(2)}ms`);
+                logger.warn(`UI operation '${id}' took ${duration.toFixed(2)}ms`);
             }
             return duration;
         }
@@ -506,7 +509,7 @@ class UIComponent {
                 setTimeout(() => {
                     this.element.style.display = 'none';
                     this.element.setAttribute('aria-hidden', 'true');
-                }, 300);
+                }, TIMING.FAST);
             } else {
                 this.element.style.display = 'none';
                 this.element.setAttribute('aria-hidden', 'true');
@@ -581,7 +584,7 @@ class UIComponent {
      * Default error handler
      */
     defaultErrorHandler(error, context) {
-        console.error(`UI Component Error (${context}):`, error);
+        logger.error(`UI Component Error (${context}):`, error);
         
         // Emit error event for external handling
         this.emit('error', { error, context });
@@ -988,7 +991,7 @@ class UIPanel extends UIComponent {
             setTimeout(() => {
                 this.hide();
                 this.emit('closed');
-            }, 300);
+            }, TIMING.FAST);
         } else {
             this.hide();
             this.emit('closed');
@@ -1642,14 +1645,14 @@ class EthicsDisplay extends UIComponent {
         const normalized = Math.max(0, Math.min(100, value)) / 100;
         
         if (this.colorMode === 'threshold') {
-            if (normalized < 0.3) return this.colorSchemes.threshold.poor;
-            if (normalized < 0.5) return this.colorSchemes.threshold.fair;
-            if (normalized < 0.8) return this.colorSchemes.threshold.good;
+            if (normalized < COMMON.OPACITY_30) return this.colorSchemes.threshold.poor;
+            if (normalized < COMMON.HALF) return this.colorSchemes.threshold.fair;
+            if (normalized < COMMON.OPACITY_80) return this.colorSchemes.threshold.good;
             return this.colorSchemes.threshold.excellent;
         }
         
         // Gradient mode
-        if (normalized < 0.5) {
+        if (normalized < COMMON.HALF) {
             return this.interpolateColor(
                 this.colorSchemes.gradient.low,
                 this.colorSchemes.gradient.medium,
@@ -1659,7 +1662,7 @@ class EthicsDisplay extends UIComponent {
             return this.interpolateColor(
                 this.colorSchemes.gradient.medium,
                 this.colorSchemes.gradient.high,
-                (normalized - 0.5) * 2
+                (normalized - COMMON.HALF) * COMMON.TWO
             );
         }
     }

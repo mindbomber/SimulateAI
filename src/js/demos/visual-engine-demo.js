@@ -5,6 +5,7 @@
 
 import VisualEngine from '../core/visual-engine.js';
 import { Button, Slider, Meter, Label } from '../objects/interactive-objects.js';
+import logger from '../utils/logger.js';
 
 export class VisualEngineDemo {
     constructor(container, options = {}) {
@@ -29,14 +30,14 @@ export class VisualEngineDemo {
     }
 
     async init() {
-        console.log('VisualEngineDemo: Initializing...');
+        logger.info('VisualEngineDemo: Initializing...');
         
         this.setupEngine();
         this.createUI();
         this.setupEventListeners();
         this.startDemo();
         
-        console.log('VisualEngineDemo: Ready');
+        logger.info('VisualEngineDemo: Ready');
     }
 
     setupEngine() {
@@ -265,7 +266,7 @@ export class VisualEngineDemo {
         if (this.options.debug) {
             setInterval(() => {
                 const stats = this.engine.getStats();
-                console.log('Engine Stats:', stats);
+                logger.debug('Engine Stats:', stats);
             }, 5000);
         }
     }
@@ -396,7 +397,7 @@ export class VisualEngineDemo {
         }
         
         this.objects.clear();
-        console.log('VisualEngineDemo: Destroyed');
+        logger.info('VisualEngineDemo: Destroyed');
     }
 }
 

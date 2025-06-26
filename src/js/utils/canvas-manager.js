@@ -116,7 +116,7 @@ class CanvasPerformanceMonitor {
         
         const threshold = getThreshold(operationId);
         if (duration > threshold) {
-            console.warn(`Slow canvas operation: ${operationId} took ${duration.toFixed(2)}ms (threshold: ${threshold}ms)`);
+            logger.warn(`Slow canvas operation: ${operationId} took ${duration.toFixed(2)}ms (threshold: ${threshold}ms)`);
         }
         
         return duration;
@@ -150,6 +150,8 @@ class CanvasError extends Error {
 /**
  * Enhanced Canvas Manager with modern features and accessibility
  */
+import logger from './logger.js';
+
 class CanvasManager {    constructor() {
         this.canvases = new Map();
         this.visualEngines = new Map();
@@ -173,7 +175,7 @@ class CanvasManager {    constructor() {
         // Setup global error handling
         this.setupErrorHandling();
         
-        console.log('Enhanced CanvasManager initialized with advanced features');
+        logger.debug('Enhanced CanvasManager initialized with advanced features');
     }
     
     /**
@@ -286,7 +288,7 @@ class CanvasManager {    constructor() {
             
             // Check if canvas already exists
             if (this.canvases.has(canvasId)) {
-                console.warn(`Canvas with ID ${canvasId} already exists. Returning existing canvas.`);
+                logger.warn(`Canvas with ID ${canvasId} already exists. Returning existing canvas.`);
                 const existingCanvasData = this.canvases.get(canvasId);
                 return { canvas: existingCanvasData.element, id: canvasId };
             }
@@ -350,7 +352,7 @@ class CanvasManager {    constructor() {
                 timestamp: Date.now()
             });
 
-            console.log(`Created enhanced canvas: ${canvasId} (${validatedWidth}x${validatedHeight})`);
+            logger.debug(`Created enhanced canvas: ${canvasId} (${validatedWidth}x${validatedHeight})`);
             return { canvas, id: canvasId };
             
         } catch (error) {
@@ -472,7 +474,7 @@ class CanvasManager {    constructor() {
 
             // Check if engine already exists for this canvas
             if (this.visualEngines.has(canvasId)) {
-                console.warn(`Visual engine for ${canvasId} already exists. Returning existing engine.`);
+                logger.warn(`Visual engine for ${canvasId} already exists. Returning existing engine.`);
                 return this.visualEngines.get(canvasId);
             }
 
@@ -527,7 +529,7 @@ class CanvasManager {    constructor() {
                 timestamp: Date.now()
             });
 
-            console.log(`Created enhanced visual engine for canvas: ${canvasId}`);
+            logger.debug(`Created enhanced visual engine for canvas: ${canvasId}`);
             return engine;
             
         } catch (error) {
@@ -652,7 +654,7 @@ class CanvasManager {    constructor() {
                     timestamp: Date.now()
                 });
                 
-                console.log(`Removed canvas: ${canvasId}`);
+                logger.debug(`Removed canvas: ${canvasId}`);
             }
         } catch (error) {
             this.handleError(new CanvasError('Failed to remove canvas', {
@@ -706,7 +708,7 @@ class CanvasManager {    constructor() {
                     }
                     
                 } catch (cleanupError) {
-                    console.warn(`Error during engine cleanup for ${canvasId}:`, cleanupError);
+                    logger.warn(`Error during engine cleanup for ${canvasId}:`, cleanupError);
                 }
 
                 this.visualEngines.delete(canvasId);
@@ -718,7 +720,7 @@ class CanvasManager {    constructor() {
                     timestamp: Date.now()
                 });
                 
-                console.log(`Removed visual engine: ${canvasId}`);
+                logger.debug(`Removed visual engine: ${canvasId}`);
             }
         } catch (error) {
             this.handleError(new CanvasError('Failed to remove visual engine', {
@@ -736,7 +738,7 @@ class CanvasManager {    constructor() {
         const startTime = this.performanceMonitor.startOperation('full-cleanup');
         
         try {
-            console.log('Starting enhanced canvas manager cleanup...');
+            logger.debug('Starting enhanced canvas manager cleanup...');
             
             // Stop periodic cleanup
             if (this.cleanupInterval) {
@@ -778,7 +780,7 @@ class CanvasManager {    constructor() {
             // Reset performance monitoring
             this.performanceMonitor.reset();
 
-            console.log('Enhanced canvas manager cleanup complete');
+            logger.debug('Enhanced canvas manager cleanup complete');
         } catch (error) {
             this.handleError(new CanvasError('Failed to complete cleanup', {}, error));
         } finally {
@@ -799,12 +801,12 @@ class CanvasManager {    constructor() {
                     try {
                         engine.pause();
                     } catch (error) {
-                        console.warn(`Failed to pause engine ${canvasId}:`, error);
+                        logger.warn(`Failed to pause engine ${canvasId}:`, error);
                     }
                 }
             });
             
-            console.log(`Paused ${this.activeEngines.size} active engines`);
+            logger.debug(`Paused ${this.activeEngines.size} active engines`);
         } catch (error) {
             this.handleError(new CanvasError('Failed to pause all engines', {}, error));
         } finally {
@@ -825,12 +827,12 @@ class CanvasManager {    constructor() {
                     try {
                         engine.resume();
                     } catch (error) {
-                        console.warn(`Failed to resume engine ${canvasId}:`, error);
+                        logger.warn(`Failed to resume engine ${canvasId}:`, error);
                     }
                 }
             });
             
-            console.log(`Resumed ${this.activeEngines.size} active engines`);
+            logger.debug(`Resumed ${this.activeEngines.size} active engines`);
         } catch (error) {
             this.handleError(new CanvasError('Failed to resume all engines', {}, error));
         } finally {
@@ -861,7 +863,7 @@ class CanvasManager {    constructor() {
     getMemoryUsage() {
         let totalMemory = 0;
         
-        for (const [canvasId, canvasData] of this.canvases) {
+        for (const [, canvasData] of this.canvases) {
             const canvas = canvasData.element;
             // Estimate memory usage based on canvas size and pixel data
             const pixelData = canvas.width * canvas.height * 4; // RGBA
@@ -910,7 +912,7 @@ class CanvasManager {    constructor() {
                     try {
                         await engine.resize(validatedWidth, validatedHeight);
                     } catch (engineError) {
-                        console.warn(`Engine resize failed for ${canvasId}:`, engineError);
+                        logger.warn(`Engine resize failed for ${canvasId}:`, engineError);
                     }
                 }
                 
@@ -922,7 +924,7 @@ class CanvasManager {    constructor() {
                     timestamp: Date.now()
                 });
 
-                console.log(`Resized canvas ${canvasId} to ${validatedWidth}x${validatedHeight}`);
+                logger.debug(`Resized canvas ${canvasId} to ${validatedWidth}x${validatedHeight}`);
                 
                 // Announce resize to screen readers if significant change
                 const sizeChange = Math.abs(validatedWidth - oldWidth) + Math.abs(validatedHeight - oldHeight);
@@ -968,7 +970,7 @@ class CanvasManager {    constructor() {
                 }
                 
                 resizeTimeout = setTimeout(() => {
-                    for (let entry of entries) {
+                    for (const entry of entries) {
                         const { width, height } = entry.contentRect;
                         
                         // Only resize if dimensions changed significantly
@@ -989,7 +991,7 @@ class CanvasManager {    constructor() {
             canvasData.resizeObserver = resizeObserver;
             this.resizeObservers.set(canvasId, resizeObserver);
             
-            console.log(`Made canvas ${canvasId} responsive`);
+            logger.debug(`Made canvas ${canvasId} responsive`);
         } catch (error) {
             this.handleError(new CanvasError('Failed to make canvas responsive', {
                 canvasId
@@ -1012,20 +1014,20 @@ class CanvasManager {    constructor() {
                 
                 // Check if canvas is still in DOM
                 if (!document.contains(canvasData.element)) {
-                    console.log(`Cleaning up orphaned canvas: ${canvasId}`);
+                    logger.debug(`Cleaning up orphaned canvas: ${canvasId}`);
                     this.removeCanvas(canvasId);
                     cleanedCount++;
                 }
                 // Check if canvas is very old and inactive
                 else if (age > maxAge && !this.activeEngines.has(canvasId)) {
-                    console.log(`Cleaning up old inactive canvas: ${canvasId}`);
+                    logger.debug(`Cleaning up old inactive canvas: ${canvasId}`);
                     this.removeCanvas(canvasId);
                     cleanedCount++;
                 }
             }
             
             if (cleanedCount > 0) {
-                console.log(`Maintenance cleanup: removed ${cleanedCount} canvases`);
+                logger.debug(`Maintenance cleanup: removed ${cleanedCount} canvases`);
             }
             
             // Reset performance metrics periodically
@@ -1034,7 +1036,7 @@ class CanvasManager {    constructor() {
             }
             
         } catch (error) {
-            console.warn('Maintenance cleanup error:', error);
+            logger.warn('Maintenance cleanup error:', error);
         }
     }
     
@@ -1044,7 +1046,7 @@ class CanvasManager {    constructor() {
     handleError(error) {
         this.errorCount++;
         
-        console.error('Canvas Manager Error:', error);
+        logger.error('Canvas Manager Error:', error);
         
         // Emit error event for application-level handling
         this.emit(CANVAS_EVENTS.ERROR_OCCURRED, {
@@ -1065,7 +1067,7 @@ class CanvasManager {    constructor() {
      */
     async attemptEngineRecovery(canvasId) {
         try {
-            console.log(`Attempting engine recovery for canvas: ${canvasId}`);
+            logger.debug(`Attempting engine recovery for canvas: ${canvasId}`);
             
             const canvasData = this.canvases.get(canvasId);
             if (!canvasData) return;
@@ -1083,14 +1085,14 @@ class CanvasManager {    constructor() {
                         errorRecovery: true
                     });
                     
-                    console.log(`Engine recovery successful for canvas: ${canvasId}`);
+                    logger.debug(`Engine recovery successful for canvas: ${canvasId}`);
                 } catch (recoveryError) {
-                    console.error(`Engine recovery failed for canvas: ${canvasId}`, recoveryError);
+                    logger.error(`Engine recovery failed for canvas: ${canvasId}`, recoveryError);
                 }
             }, 1000);
             
         } catch (error) {
-            console.error('Engine recovery attempt failed:', error);
+            logger.error('Engine recovery attempt failed:', error);
         }
     }
     
@@ -1121,7 +1123,7 @@ class CanvasManager {    constructor() {
                 try {
                     callback(data);
                 } catch (error) {
-                    console.error('Canvas event listener error:', error);
+                    logger.error('Canvas event listener error:', error);
                 }
             });
         }
@@ -1136,7 +1138,7 @@ window.addEventListener('beforeunload', async () => {
     try {
         await canvasManager.cleanup();
     } catch (error) {
-        console.error('Error during canvas manager cleanup:', error);
+        logger.error('Error during canvas manager cleanup:', error);
     }
 });
 

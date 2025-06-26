@@ -1,3 +1,5 @@
+import logger from './logger.js';
+
 /**
  * Enhanced StorageManager - Modern data persistence system for SimulateAI
  * Provides secure, performant, and accessible data storage with advanced features
@@ -29,7 +31,7 @@ const STORAGE_CONSTANTS = {
     SESSION_TIMEOUT: 30 * 60 * 1000, // 30 minutes
     SYNC_INTERVAL: 5000, // 5 seconds
     VALIDATION_PATTERNS: {
-        SIMULATION_ID: /^[a-z0-9\-]+$/,
+        SIMULATION_ID: /^[a-z0-9-]+$/,
         USER_ID: /^[a-zA-Z0-9\-_]+$/,
         EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     }
@@ -51,7 +53,7 @@ class StorageEncryption {
     
     static async generateKey() {
         if (!window.crypto?.subtle) {
-            console.warn('Web Crypto API not available, using base64 encoding');
+            logger.warn('Web Crypto API not available, using base64 encoding');
             return null;
         }
         
@@ -63,7 +65,7 @@ class StorageEncryption {
             );
             return this.key;
         } catch (error) {
-            console.warn('Failed to generate encryption key:', error);
+            logger.warn('Failed to generate encryption key:', error);
             return null;
         }
     }
@@ -92,7 +94,7 @@ class StorageEncryption {
             
             return btoa(JSON.stringify(result));
         } catch (error) {
-            console.warn('Encryption failed, using fallback:', error);
+            logger.warn('Encryption failed, using fallback:', error);
             return btoa(JSON.stringify(data));
         }
     }
@@ -127,7 +129,7 @@ class StorageEncryption {
             const jsonString = decoder.decode(decrypted);
             return JSON.parse(jsonString);
         } catch (error) {
-            console.warn('Decryption failed, trying fallback:', error);
+            logger.warn('Decryption failed, trying fallback:', error);
             try {
                 return JSON.parse(atob(encryptedData));
             } catch {
@@ -205,7 +207,7 @@ class StorageManager {
             
             // Check storage availability first
             if (!this.isStorageAvailable() || !window.localStorage || !window.sessionStorage) {
-                console.warn('Local storage not available, using in-memory storage');
+                logger.warn('Local storage not available, using in-memory storage');
                 this.storage = new Map();
                 this.sessionStorage = new Map();
                 this.setupMemoryStorage();
@@ -229,11 +231,11 @@ class StorageManager {
             // Cleanup old data
             this.cleanupOldData();
             
-            console.log('Enhanced StorageManager initialized successfully');
+            logger.debug('Enhanced StorageManager initialized successfully');
             this.emit(STORAGE_EVENTS.DATA_UPDATED, { action: 'initialized' });
             
         } catch (error) {
-            console.error('Failed to initialize StorageManager:', error);
+            logger.error('Failed to initialize StorageManager:', error);
             this.handleError(error, 'initialization');
         }
     }
@@ -304,7 +306,7 @@ class StorageManager {
                 const usageRatio = estimate.usage / estimate.quota;
                 
                 if (usageRatio > this.quotaWarningThreshold) {
-                    console.warn(`Storage quota ${(usageRatio * 100).toFixed(1)}% full`);
+                    logger.warn(`Storage quota ${(usageRatio * 100).toFixed(1)}% full`);
                     this.emit(STORAGE_EVENTS.QUOTA_EXCEEDED, {
                         usage: estimate.usage,
                         quota: estimate.quota,
@@ -313,7 +315,7 @@ class StorageManager {
                 }
             }
         } catch (error) {
-            console.warn('Failed to check storage quota:', error);
+            logger.warn('Failed to check storage quota:', error);
         }
     }
     
@@ -361,10 +363,10 @@ class StorageManager {
             
             if (!currentVersion) {
                 // First time initialization
-                console.log('Initializing storage for first time');
+                logger.debug('Initializing storage for first time');
                 await this.performFirstTimeSetup();
             } else if (currentVersion !== this.VERSION) {
-                console.log(`Migrating data from ${currentVersion} to ${this.VERSION}`);
+                logger.debug(`Migrating data from ${currentVersion} to ${this.VERSION}`);
                 await this.performMigration(currentVersion, this.VERSION);
             }
             
@@ -375,7 +377,7 @@ class StorageManager {
             });
             
         } catch (error) {
-            console.error('Data migration failed:', error);
+            logger.error('Data migration failed:', error);
             this.handleError(error, 'migration');
         }
     }
@@ -391,7 +393,7 @@ class StorageManager {
         // Create initial backup
         await this.createBackup('initial_setup');
         
-        console.log('First time setup completed');
+        logger.debug('First time setup completed');
     }
     
     /**
@@ -408,7 +410,7 @@ class StorageManager {
             await this.createBackup(`migration_${fromVersion}_to_${toVersion}`);
             
         } catch (error) {
-            console.error('Migration failed:', error);
+            logger.error('Migration failed:', error);
             throw error;
         }
     }
@@ -433,7 +435,7 @@ class StorageManager {
         }));
         
         this.set('decisions', migratedDecisions);
-        console.log('Migration from 1.0 to 2.0 completed');
+        logger.debug('Migration from 1.0 to 2.0 completed');
     }
     
     /**
@@ -498,7 +500,7 @@ class StorageManager {
                     processedValue = await this.compress(value);
                     metadata.compressed = true;
                 } catch (compressError) {
-                    console.warn('Compression failed, using uncompressed data:', compressError);
+                    logger.warn('Compression failed, using uncompressed data:', compressError);
                     processedValue = value;
                 }
             }
@@ -509,7 +511,7 @@ class StorageManager {
                     processedValue = await StorageEncryption.encrypt(processedValue);
                     metadata.encrypted = true;
                 } catch (encryptError) {
-                    console.warn('Encryption failed, using unencrypted data:', encryptError);
+                    logger.warn('Encryption failed, using unencrypted data:', encryptError);
                 }
             }
             
@@ -523,7 +525,7 @@ class StorageManager {
             
             // Check size limits
             if (dataString.length > STORAGE_CONSTANTS.MAX_STORAGE_SIZE / 100) {
-                console.warn(`Large data detected for key '${key}': ${dataString.length} bytes`);
+                logger.warn(`Large data detected for key '${key}': ${dataString.length} bytes`);
             }
             
             // Store data
@@ -542,7 +544,7 @@ class StorageManager {
             });
             
         } catch (error) {
-            console.error('Error saving to storage:', error);
+            logger.error('Error saving to storage:', error);
             this.handleError(error, 'set', { key, value });
             throw error;
         }
@@ -582,7 +584,7 @@ class StorageManager {
             try {
                 parsedData = JSON.parse(item);
             } catch (parseError) {
-                console.warn(`Invalid JSON data for key '${key}', returning default value`);
+                logger.warn(`Invalid JSON data for key '${key}', returning default value`);
                 return defaultValue;
             }
             
@@ -607,7 +609,7 @@ class StorageManager {
                 try {
                     finalValue = await StorageEncryption.decrypt(finalValue);
                 } catch (decryptError) {
-                    console.error(`Failed to decrypt data for key '${key}':`, decryptError);
+                    logger.error(`Failed to decrypt data for key '${key}':`, decryptError);
                     return defaultValue;
                 }
             }
@@ -617,7 +619,7 @@ class StorageManager {
                 try {
                     finalValue = await this.decompress(finalValue);
                 } catch (decompressError) {
-                    console.error(`Failed to decompress data for key '${key}':`, decompressError);
+                    logger.error(`Failed to decompress data for key '${key}':`, decompressError);
                     return defaultValue;
                 }
             }
@@ -625,7 +627,7 @@ class StorageManager {
             return finalValue;
             
         } catch (error) {
-            console.error('Error reading from storage:', error);
+            logger.error('Error reading from storage:', error);
             this.handleError(error, 'get', { key });
             return defaultValue;
         }
@@ -661,7 +663,7 @@ class StorageManager {
             }
             
         } catch (error) {
-            console.error('Error removing from storage:', error);
+            logger.error('Error removing from storage:', error);
             this.handleError(error, 'remove', { key });
         }
     }
@@ -679,7 +681,7 @@ class StorageManager {
                 });
             }
         } catch (e) {
-            console.error('Error clearing storage:', e);
+            logger.error('Error clearing storage:', e);
         }
     }
 
@@ -699,7 +701,7 @@ class StorageManager {
                 this.sessionStorage.setItem(fullKey, JSON.stringify(value));
             }
         } catch (e) {
-            console.error('Error saving to session storage:', e);
+            logger.error('Error saving to session storage:', e);
         }
     }
 
@@ -723,7 +725,7 @@ class StorageManager {
                 return JSON.parse(item);
             }
         } catch (e) {
-            console.error('Error reading from session storage:', e);
+            logger.error('Error reading from session storage:', e);
         }
         
         return defaultValue;
@@ -758,7 +760,7 @@ class StorageManager {
             });
             
         } catch (error) {
-            console.error('Failed to save user preferences:', error);
+            logger.error('Failed to save user preferences:', error);
             this.handleError(error, 'saveUserPreferences', { preferences });
             throw error;
         }
@@ -771,7 +773,7 @@ class StorageManager {
             if (preferences) {
                 // Validate and migrate if necessary
                 if (!StorageValidator.validatePreferences(preferences)) {
-                    console.warn('Invalid preferences found, using defaults');
+                    logger.warn('Invalid preferences found, using defaults');
                     return this.getDefaultPreferences();
                 }
                 
@@ -782,7 +784,7 @@ class StorageManager {
             return this.getDefaultPreferences();
             
         } catch (error) {
-            console.error('Failed to get user preferences:', error);
+            logger.error('Failed to get user preferences:', error);
             this.handleError(error, 'getUserPreferences');
             return this.getDefaultPreferences();
         }
@@ -850,7 +852,7 @@ class StorageManager {
         const result = { ...target };
         
         for (const key in source) {
-            if (source.hasOwnProperty(key)) {
+            if (Object.prototype.hasOwnProperty.call(source, key)) {
                 if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
                     result[key] = this.deepMerge(result[key] || {}, source[key]);
                 } else {
@@ -878,7 +880,7 @@ class StorageManager {
             
             return true;
         } catch (error) {
-            console.error('Failed to update preference:', error);
+            logger.error('Failed to update preference:', error);
             return false;
         }
     }
@@ -891,7 +893,7 @@ class StorageManager {
             const preferences = await this.getUserPreferences();
             return preferences[category]?.[key] ?? defaultValue;
         } catch (error) {
-            console.error('Failed to get preference:', error);
+            logger.error('Failed to get preference:', error);
             return defaultValue;
         }
     }
@@ -927,7 +929,7 @@ class StorageManager {
                 timestamp: Date.now()
             });
 
-            console.log(`User progress saved for simulation: ${simulationId}`);
+            logger.debug(`User progress saved for simulation: ${simulationId}`);
         } catch (error) {
             this.handleError(error, 'saveUserProgress', { simulationId });
             throw error;
@@ -972,7 +974,7 @@ class StorageManager {
                 });
             }
 
-            console.log(`User progress reset${simulationId ? ` for ${simulationId}` : ' (all)'}`);
+            logger.debug(`User progress reset${simulationId ? ` for ${simulationId}` : ' (all)'}`);
         } catch (error) {
             this.handleError(error, 'resetUserProgress', { simulationId });
             throw error;
@@ -1187,7 +1189,7 @@ class StorageManager {
                 timestamp: Date.now()
             });
 
-            console.log(`Simulation ${simulationId} marked as complete`);
+            logger.debug(`Simulation ${simulationId} marked as complete`);
         } catch (error) {
             this.handleError(error, 'markSimulationComplete', { simulationId });
             throw error;
@@ -1226,7 +1228,7 @@ class StorageManager {
 
             const event = {
                 type: eventType,
-                data: data,
+                data,
                 timestamp: Date.now(),
                 sessionId: this.getSessionId(),
                 userAgent: navigator.userAgent,
@@ -1247,13 +1249,13 @@ class StorageManager {
             // Also store persistent analytics summary
             await this.updateAnalyticsSummary(eventType, data);
 
-            console.log(`Analytics event tracked: ${eventType}`);
+            logger.debug(`Analytics event tracked: ${eventType}`);
         } catch (error) {
             this.handleError(error, 'trackAnalyticsEvent', { eventType, data });
         }
     }
 
-    static async updateAnalyticsSummary(eventType, data) {
+    static async updateAnalyticsSummary(eventType, _data) {
         try {
             const summary = await this.get('analytics_summary', {
                 totalEvents: 0,
@@ -1270,7 +1272,7 @@ class StorageManager {
                 compress: true
             });
         } catch (error) {
-            console.warn('Failed to update analytics summary:', error);
+            logger.warn('Failed to update analytics summary:', error);
         }
     }
 
@@ -1330,7 +1332,7 @@ class StorageManager {
                 timestamp: Date.now()
             });
 
-            console.log(`Backup created: ${label} (${backupData.id})`);
+            logger.debug(`Backup created: ${label} (${backupData.id})`);
             return backupData.id;
         } catch (error) {
             this.handleError(error, 'createBackup', { label });
@@ -1400,7 +1402,7 @@ class StorageManager {
                 timestamp: Date.now()
             });
 
-            console.log(`Data restored from backup: ${backupId}`);
+            logger.debug(`Data restored from backup: ${backupId}`);
             return true;
         } catch (error) {
             this.handleError(error, 'restoreFromBackup', { backupId });
@@ -1424,7 +1426,7 @@ class StorageManager {
             backups.splice(index, 1);
             await this.set('system_backups', backups);
 
-            console.log(`Backup deleted: ${backupId}`);
+            logger.debug(`Backup deleted: ${backupId}`);
             return true;
         } catch (error) {
             this.handleError(error, 'deleteBackup', { backupId });
@@ -1435,7 +1437,7 @@ class StorageManager {
     static async clearBackups() {
         try {
             this.remove('system_backups');
-            console.log('All backups cleared');
+            logger.debug('All backups cleared');
             return true;
         } catch (error) {
             this.handleError(error, 'clearBackups');
@@ -1531,7 +1533,7 @@ class StorageManager {
                 timestamp: Date.now()
             });
 
-            console.log(`Data imported successfully. Items imported: ${importedItems}`);
+            logger.debug(`Data imported successfully. Items imported: ${importedItems}`);
             return { success: true, importedItems };
         } catch (error) {
             this.handleError(error, 'importData', { options });
@@ -1546,21 +1548,21 @@ class StorageManager {
         try {
             if (this.storage === localStorage) {
                 // Real localStorage
-                for (let key in localStorage) {
+                for (const key in localStorage) {
                     if (key.startsWith(this.STORAGE_PREFIX)) {
                         totalSize += localStorage[key].length + key.length;
                     }
                 }
             } else if (this.storage instanceof Map) {
                 // Memory fallback
-                for (let [key, value] of this.storage) {
+                for (const [key, value] of this.storage) {
                     if (key.startsWith(this.STORAGE_PREFIX)) {
                         totalSize += JSON.stringify(value).length + key.length;
                     }
                 }
             }
         } catch (error) {
-            console.error('Error calculating storage size:', error);
+            logger.error('Error calculating storage size:', error);
         }
         
         return totalSize;
@@ -1589,7 +1591,7 @@ class StorageManager {
                         cleanedItems += analyticsEvents.length - recentEvents.length;
                     }
                 } catch (error) {
-                    console.warn('Failed to clean session analytics:', error);
+                    logger.warn('Failed to clean session analytics:', error);
                 }
             }
 
@@ -1609,7 +1611,7 @@ class StorageManager {
                 cutoffTime
             });
 
-            console.log(`Cleaned ${cleanedItems} old data items (older than ${olderThanDays} days)`);
+            logger.debug(`Cleaned ${cleanedItems} old data items (older than ${olderThanDays} days)`);
             return cleanedItems;
         } catch (error) {
             this.handleError(error, 'cleanupOldData', { olderThanDays });
@@ -1664,7 +1666,7 @@ class StorageManager {
             
             return Array.from(compressed);
         } catch (error) {
-            console.warn('Native compression failed, using fallback:', error);
+            logger.warn('Native compression failed, using fallback:', error);
             return this.simpleCompress(JSON.stringify(data));
         }
     }
@@ -1705,7 +1707,7 @@ class StorageManager {
             const jsonString = new TextDecoder().decode(decompressed);
             return JSON.parse(jsonString);
         } catch (error) {
-            console.warn('Native decompression failed, using fallback:', error);
+            logger.warn('Native decompression failed, using fallback:', error);
             return JSON.parse(this.simpleDecompress(compressedData));
         }
     }
@@ -1765,7 +1767,7 @@ class StorageManager {
         };
         
         // Log error
-        console.error(`StorageManager ${operation} error:`, errorInfo);
+        logger.error(`StorageManager ${operation} error:`, errorInfo);
         
         // Emit error event
         this.emit(STORAGE_EVENTS.ERROR_OCCURRED, errorInfo);
@@ -1782,7 +1784,7 @@ class StorageManager {
             
             this.setSession('storage_errors', errors);
         } catch (logError) {
-            console.warn('Failed to log storage error:', logError);
+            logger.warn('Failed to log storage error:', logError);
         }
     }
     
@@ -1813,7 +1815,7 @@ class StorageManager {
                 try {
                     callback(data);
                 } catch (error) {
-                    console.error('Event listener error:', error);
+                    logger.error('Event listener error:', error);
                 }
             });
         }

@@ -4,6 +4,7 @@
  */
 
 import { VisualEngine } from '../core/visual-engine.js';
+import logger from '../utils/logger.js';
 
 export class LayoutComponentsDemo {
     constructor(container) {
@@ -110,17 +111,17 @@ export class LayoutComponentsDemo {
         
         // Tab event handlers
         tabContainer.on('tabChanged', (event) => {
-            console.log('Tab changed:', event);
+            logger.debug('Tab changed:', event);
             this.updateDescription(`Active tab: ${event.tab.title}`);
         });
         
         tabContainer.on('tabAdded', (event) => {
-            console.log('Tab added:', event);
+            logger.debug('Tab added:', event);
             this.updateDescription(`Tab "${event.tab.title}" added`);
         });
         
         tabContainer.on('tabRemoved', (event) => {
-            console.log('Tab removed:', event);
+            logger.debug('Tab removed:', event);
             this.updateDescription(`Tab "${event.tab.title}" removed`);
         });
         
@@ -211,7 +212,7 @@ export class LayoutComponentsDemo {
         
         // Stepper event handlers
         const handleStepChange = (event) => {
-            console.log('Step changed:', event);
+            logger.debug('Step changed:', event);
             this.updateDescription(`Current step: ${event.step.title}`);
         };
         
@@ -370,7 +371,7 @@ export class LayoutComponentsDemo {
         
         // Tree view event handlers
         const handleNodeSelection = (event) => {
-            console.log('Node selected:', event);
+            logger.debug('Node selected:', event);
             this.updateDescription(`Selected: ${event.nodeId} (${event.selectedNodes.length} total)`);
         };
         
@@ -378,7 +379,7 @@ export class LayoutComponentsDemo {
         treeViewWithCheckboxes.on('nodeSelected', handleNodeSelection);
         
         treeView.on('nodeExpanded', (event) => {
-            console.log('Node expanded:', event.nodeId);
+            logger.debug('Node expanded:', event.nodeId);
         });
         
         treeView.on('nodeActivated', (event) => {
@@ -430,13 +431,13 @@ export class LayoutComponentsDemo {
         
         // File upload event handlers
         fileUpload.on('filesAdded', (event) => {
-            console.log('Files added:', event.files);
+            logger.debug('Files added:', event.files);
             const fileNames = event.files.map(f => f.name).join(', ');
             this.updateDescription(`Added files: ${fileNames}`);
         });
         
         fileUpload.on('filesRejected', (event) => {
-            console.log('Files rejected:', event.rejected);
+            logger.debug('Files rejected:', event.rejected);
             this.updateDescription(`${event.rejected.length} files rejected due to validation`);
         });
         
