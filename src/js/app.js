@@ -16,6 +16,7 @@ import { userPreferences, userProgress } from './utils/simple-storage.js';
 import { simpleAnalytics } from './utils/simple-analytics.js';
 import Helpers from './utils/helpers.js';
 import canvasManager from './utils/canvas-manager.js';
+import logger from './utils/logger.js';
 
 // Import enhanced objects (loaded dynamically as needed)
 // import { EthicsMeter, InteractiveButton, InteractiveSlider } from './objects/enhanced-objects.js';
@@ -24,6 +25,7 @@ import canvasManager from './utils/canvas-manager.js';
 import { PreLaunchModal } from './components/pre-launch-modal.js';
 import { EnhancedSimulationModal } from './components/enhanced-simulation-modal.js';
 import { PostSimulationModal } from './components/post-simulation-modal.js';
+import HeroDemo from './components/hero-demo.js';
 
 // Constants for app configuration
 const APP_CONSTANTS = {
@@ -634,6 +636,38 @@ class AIEthicsApp {
         this.availableSimulations.forEach(simConfig => {
             this.simulations.set(simConfig.id, simConfig);
         });
+    }
+
+    /**
+     * Initialize hero demo component
+     */
+    async initializeHeroDemo() {
+        try {
+            const heroContainer = document.getElementById('hero-demo');
+            if (heroContainer) {
+                this.heroDemo = new HeroDemo();
+                logger.info('Hero demo initialized successfully');
+            } else {
+                logger.warn('Hero demo container not found, skipping initialization');
+            }
+        } catch (error) {
+            logger.error('Failed to initialize hero demo:', error);
+            // Non-critical error - app can continue without hero demo
+        }
+    }
+
+    /**
+     * Initialize enhanced objects (visual components)
+     */
+    async initializeEnhancedObjects() {
+        try {
+            // Enhanced objects are loaded dynamically when needed
+            // This method is kept for future initialization if needed
+            logger.info('Enhanced objects system ready for dynamic loading');
+        } catch (error) {
+            logger.error('Failed to initialize enhanced objects:', error);
+            // Non-critical error - app can continue with basic functionality
+        }
     }
 
     setupEventListeners() {
@@ -1310,6 +1344,26 @@ class AIEthicsApp {
     resetCurrentSimulation() {
         if (this.currentSimulation && this.currentSimulation.reset) {
             this.currentSimulation.reset();
+        }
+    }
+
+    /**
+     * Shows the loading indicator
+     */
+    showLoading() {
+        if (this.loading) {
+            this.loading.style.display = 'flex';
+            this.loading.setAttribute('aria-hidden', 'false');
+        }
+    }
+
+    /**
+     * Hides the loading indicator
+     */
+    hideLoading() {
+        if (this.loading) {
+            this.loading.style.display = 'none';
+            this.loading.setAttribute('aria-hidden', 'true');
         }
     }
     

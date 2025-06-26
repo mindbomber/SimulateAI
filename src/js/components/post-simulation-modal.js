@@ -15,7 +15,7 @@
  * @version 3.0.0
  */
 
-import { ModalUtility } from './modal-utility.js';
+import ModalUtility from './modal-utility.js';
 import { simulationInfo } from '../data/simulation-info.js';
 import { userProgress } from '../utils/simple-storage.js';
 import { simpleAnalytics } from '../utils/simple-analytics.js';

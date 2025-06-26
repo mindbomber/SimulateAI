@@ -6,6 +6,7 @@
 import { getSimulationInfo } from '../data/simulation-info.js';
 import ModalUtility from './modal-utility.js';
 import { userPreferences } from '../utils/simple-storage.js';
+import { simpleAnalytics } from '../utils/simple-analytics.js';
 
 export class PreLaunchModal {
     constructor(simulationId, options = {}) {
@@ -510,8 +511,8 @@ export class PreLaunchModal {
     }
     
     trackAnalytics(event, data = {}) {
-        if (window.SimpleAnalytics) {
-            window.SimpleAnalytics.track('pre_launch', {
+        if (simpleAnalytics) {
+            simpleAnalytics.trackEvent('pre_launch', {
                 event,
                 simulation: this.simulationId,
                 tab: this.currentTab,

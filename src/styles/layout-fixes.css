@@ -2,32 +2,36 @@
 /* Updated to use advanced-ui-components.css modal system */
 
 /* Enhanced modal body with higher specificity - updated for new modal system */
+/* Fixed modal body CSS conflicts - consolidated rules to ensure simulation visibility */
 .modal-backdrop .modal-dialog .modal-body,
 #simulation-modal .modal-dialog .modal-body {
-    display: flex;
-    flex-direction: column;
-    padding: var(--spacing-6);
-    overflow: auto;
-    height: auto;
-    flex: none;
-    max-height: 70vh;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 20px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    min-height: 400px !important;
+    max-height: 80vh !important;
+    flex: 1 !important;
+    background: var(--modal-background, #ffffff) !important;
 }
 
 /* Enhanced simulation container with higher specificity - updated for new modal system */
+/* Fixed simulation container visibility issues */
 .modal-backdrop .simulation-container,
 .modal-dialog .simulation-container,
 #simulation-modal .simulation-container,
 .simulation-preview .simulation-container {
-    background: var(--color-gray-50);
-    border-radius: var(--spacing-2);
-    padding: var(--spacing-4);
-    min-height: 300px;
-    max-height: 400px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: var(--spacing-4);
-    overflow: auto;
+    background: var(--color-gray-50, #f8f9fa) !important;
+    border-radius: 8px !important;
+    padding: 16px !important;
+    min-height: 300px !important;
+    width: 100% !important;
+    display: block !important;
+    margin-bottom: 20px !important;
+    overflow: visible !important;
+    border: 1px solid var(--color-gray-200, #e5e7eb) !important;
     flex: none;
     position: relative;
 }
@@ -51,6 +55,22 @@
     flex-shrink: 0;
     max-height: 200px;
     overflow: auto;
+}
+
+/* Enhanced simulation controls visibility - fix for modal display issues */
+#simulation-modal .modal-body .simulation-controls {
+    display: block !important;
+    margin-top: 20px !important;
+    width: 100% !important;
+}
+
+#simulation-modal .modal-body .ethics-meters {
+    display: block !important;
+    margin-bottom: 20px !important;
+}
+
+#simulation-modal .modal-body .simulation-actions {
+    display: block !important;
 }
 
 /* Enhanced hero section with higher specificity */
@@ -589,4 +609,36 @@
     #app .hero-demo-feedback-popover::after {
         display: none;
     }
+}
+
+/* FINAL OVERRIDE: Ensure simulation modal visibility - highest specificity */
+/* This rule must come last to override all other modal-body conflicts */
+html body #simulation-modal.modal-backdrop .modal-dialog .modal-body,
+html body #simulation-modal .modal-dialog .modal-body {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 20px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    min-height: 400px !important;
+    max-height: 80vh !important;
+    flex: 1 !important;
+    background: var(--modal-background, #ffffff) !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* FINAL OVERRIDE: Ensure simulation container is visible */
+html body #simulation-modal .modal-body .simulation-container {
+    display: block !important;
+    min-height: 300px !important;
+    width: 100% !important;
+    background: var(--color-gray-50, #f8f9fa) !important;
+    border-radius: 8px !important;
+    padding: 16px !important;
+    overflow: visible !important;
+    border: 1px solid var(--color-gray-200, #e5e7eb) !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }

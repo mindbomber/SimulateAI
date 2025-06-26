@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Consolidated Modal CSS</title>
+    
+    <!-- Load only the consolidated modal CSS -->
+    <link rel="stylesheet" href="src/styles/simulation-modal-consolidated.css">
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .test-controls {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 0 8px 8px 0;
+        }
+        
+        button:hover {
+            background: #2563eb;
+        }
+        
+        .debug-info {
+            background: #1f2937;
+            color: #f3f4f6;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-controls">
+        <h1>Consolidated Modal CSS Test</h1>
+        <p>Testing the new consolidated modal CSS architecture</p>
+        
+        <button onclick="showTestModal()">Show Test Modal</button>
+        <button onclick="showPreLaunchModal()">Show Pre-Launch Modal</button>
+        <button onclick="showEthicsModal()">Show Ethics Modal</button>
+        <button onclick="showBiasModal()">Show Bias & Fairness Modal</button>
+    </div>
+
+    <!-- Test Modal HTML Structure -->
+    <div id="simulation-modal" class="modal-backdrop" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h2 class="modal-title">Test Simulation Modal</h2>
+                <button class="modal-close" onclick="hideModal()" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body-content">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <div class="debug-info">
+        <div><strong>Debug Info:</strong></div>
+        <div id="debug-output">Modal CSS loaded and ready for testing</div>
+    </div>
+
+    <script>
+        function showTestModal() {
+            const modal = document.getElementById('simulation-modal');
+            const modalBody = document.getElementById('modal-body-content');
+            
+            // Reset classes
+            modal.className = 'modal-backdrop';
+            
+            modalBody.innerHTML = `
+                <div class="simulation-container">
+                    <h3>Basic Simulation Container</h3>
+                    <p>This is a test of the basic modal structure with simulation container.</p>
+                    <div style="background: #e5e7eb; padding: 16px; border-radius: 4px; margin: 16px 0;">
+                        <strong>Test Canvas Area</strong><br>
+                        Canvas or simulation content would go here
+                    </div>
+                </div>
+                
+                <div class="simulation-controls">
+                    <div class="ethics-meters">
+                        <div class="ethics-meters-header">
+                            <h3>Ethics Meters</h3>
+                            <p>Test ethics meters section</p>
+                        </div>
+                        <div style="background: #ddd; height: 20px; border-radius: 10px; margin: 8px 0;"></div>
+                        <div style="background: #ddd; height: 20px; border-radius: 10px; margin: 8px 0;"></div>
+                    </div>
+                    
+                    <div class="simulation-actions">
+                        <div class="actions-header">
+                            <h3>Simulation Actions</h3>
+                        </div>
+                        <div class="actions-container">
+                            <button>Action 1</button>
+                            <button>Action 2</button>
+                            <button>Action 3</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            showModal('Basic Modal Test');
+        }
+        
+        function showPreLaunchModal() {
+            const modal = document.getElementById('simulation-modal');
+            const modalBody = document.getElementById('modal-body-content');
+            
+            modal.className = 'modal-backdrop pre-launch-modal';
+            
+            modalBody.innerHTML = `
+                <div class="pre-launch-content">
+                    <h3>Pre-Launch Modal Test</h3>
+                    <p>This modal uses pre-launch-modal modifier class.</p>
+                    <div class="simulation-container">
+                        <div style="padding: 20px; text-align: center; background: #f3f4f6; border-radius: 8px;">
+                            Pre-launch simulation setup area
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            showModal('Pre-Launch Modal Test');
+        }
+        
+        function showEthicsModal() {
+            const modal = document.getElementById('simulation-modal');
+            const modalBody = document.getElementById('modal-body-content');
+            
+            modal.className = 'modal-backdrop ethics-explorer-modal';
+            
+            modalBody.innerHTML = `
+                <div class="ethics-explorer-content">
+                    <h3>Ethics Explorer Modal Test</h3>
+                    <p>This modal uses ethics-explorer-modal modifier class.</p>
+                    <div class="simulation-container">
+                        <div style="padding: 40px; text-align: center; background: transparent; border: 2px dashed #6b7280;">
+                            Ethics explorer simulation area (transparent background)
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            showModal('Ethics Explorer Modal Test');
+        }
+        
+        function showBiasModal() {
+            const modal = document.getElementById('simulation-modal');
+            const modalBody = document.getElementById('modal-body-content');
+            
+            modal.className = 'modal-backdrop bias-fairness-modal';
+            
+            modalBody.innerHTML = `
+                <div class="bias-fairness-content">
+                    <h3>Bias & Fairness Modal Test</h3>
+                    <p>This modal uses bias-fairness-modal modifier class with extra padding.</p>
+                    <div class="simulation-container">
+                        <div style="padding: 20px; text-align: center; background: #fef3c7; border-radius: 8px;">
+                            Bias & fairness simulation area
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            showModal('Bias & Fairness Modal Test');
+        }
+        
+        function showModal(testType) {
+            const modal = document.getElementById('simulation-modal');
+            const debugOutput = document.getElementById('debug-output');
+            
+            modal.style.display = 'flex';
+            modal.setAttribute('aria-hidden', 'false');
+            
+            debugOutput.innerHTML = `
+                Modal displayed: ${testType}<br>
+                Modal classes: ${modal.className}<br>
+                Display style: ${modal.style.display}<br>
+                Aria-hidden: ${modal.getAttribute('aria-hidden')}<br>
+                Timestamp: ${new Date().toLocaleTimeString()}
+            `;
+        }
+        
+        function hideModal() {
+            const modal = document.getElementById('simulation-modal');
+            const debugOutput = document.getElementById('debug-output');
+            
+            modal.style.display = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+            
+            debugOutput.innerHTML = `
+                Modal hidden<br>
+                Display style: ${modal.style.display}<br>
+                Aria-hidden: ${modal.getAttribute('aria-hidden')}<br>
+                Timestamp: ${new Date().toLocaleTimeString()}
+            `;
+        }
+        
+        // ESC key handler
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                hideModal();
+            }
+        });
+        
+        // Click backdrop to close
+        document.getElementById('simulation-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideModal();
+            }
+        });
+    </script>
+</body>
+</html>

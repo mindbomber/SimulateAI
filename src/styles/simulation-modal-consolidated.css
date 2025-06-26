@@ -1,0 +1,214 @@
+/**
+ * Simulation Modal - Consolidated CSS Architecture
+ * Single source of truth for all simulation modal styling
+ * Replaces fragmented styles across multiple files
+ */
+
+/* ===== SIMULATION MODAL BASE SYSTEM ===== */
+
+/* Override generic modal-dialog overflow hidden from advanced-ui-components.css */
+#simulation-modal.modal-backdrop .modal-dialog {
+    overflow: visible !important;
+}
+
+/* Modal backdrop and positioning */
+#simulation-modal.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Modal dialog container */
+#simulation-modal .modal-dialog {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    max-width: 90vw;
+    max-height: 90vh;
+    width: 1000px;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+}
+
+/* Modal header */
+#simulation-modal .modal-header {
+    padding: 20px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    flex-shrink: 0;
+}
+
+#simulation-modal .modal-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+#simulation-modal .modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    color: #6b7280;
+}
+
+#simulation-modal .modal-close:hover {
+    background: #f3f4f6;
+    color: #1f2937;
+}
+
+/* ===== MODAL BODY - SINGLE SOURCE OF TRUTH ===== */
+#simulation-modal .modal-body {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 20px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    min-height: 400px !important;
+    max-height: 70vh !important;
+    flex: 1 !important;
+    background: white !important;
+    gap: 20px !important;
+}
+
+/* ===== SIMULATION CONTAINER ===== */
+#simulation-modal .simulation-container {
+    background: #f8f9fa !important;
+    border-radius: 8px !important;
+    padding: 16px !important;
+    min-height: 300px !important;
+    width: 100% !important;
+    display: block !important;
+    overflow: visible !important;
+    border: 1px solid #e5e7eb !important;
+    position: relative !important;
+}
+
+/* ===== SIMULATION CONTROLS ===== */
+#simulation-modal .simulation-controls {
+    display: block !important;
+    width: 100% !important;
+}
+
+#simulation-modal .ethics-meters {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+#simulation-modal .ethics-meters-header h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+#simulation-modal .ethics-meters-header p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+#simulation-modal .simulation-actions {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+#simulation-modal .actions-header h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+#simulation-modal .actions-container {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* ===== SIMULATION TYPE MODIFIERS ===== */
+
+/* Pre-launch modal specific styles */
+#simulation-modal.pre-launch-modal .modal-body {
+    padding: 0 !important;
+}
+
+#simulation-modal.pre-launch-modal .modal-dialog {
+    max-width: 800px;
+}
+
+/* Ethics explorer specific styles */
+#simulation-modal.ethics-explorer-modal .modal-body {
+    max-height: 80vh !important;
+}
+
+#simulation-modal.ethics-explorer-modal .simulation-container {
+    background: transparent !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+/* Bias fairness specific styles */
+#simulation-modal.bias-fairness-modal .modal-body {
+    padding: 30px !important;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    #simulation-modal .modal-dialog {
+        width: 95vw;
+        max-height: 95vh;
+    }
+    
+    #simulation-modal .modal-body {
+        padding: 16px !important;
+        max-height: 80vh !important;
+    }
+    
+    #simulation-modal .actions-container {
+        flex-direction: column;
+    }
+}
+
+/* ===== ACCESSIBILITY ===== */
+#simulation-modal[aria-hidden="true"] {
+    display: none !important;
+}
+
+#simulation-modal:focus {
+    outline: none;
+}
+
+#simulation-modal .modal-close:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* ===== DEBUG HELPERS (remove in production) ===== */
+/*
+#simulation-modal * {
+    border: 1px solid red !important;
+}
+*/

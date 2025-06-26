@@ -59,9 +59,10 @@
   margin: 2.5vh auto !important;
 }
 
-/* Override ALL modal-body constraints for the static modal */
-#simulation-modal.modal-backdrop .modal-body,
-#simulation-modal .modal-body {
+/* Commented out broad modal overrides that were causing conflicts */
+/*
+.simulation-container.ethics-explorer ~ .modal-body,
+body.ethics-explorer-active #simulation-modal .modal-body {
   max-height: 80vh !important;
   height: 80vh !important;
   overflow-y: auto !important;
@@ -70,6 +71,7 @@
   flex: 1 !important;
   display: block !important;
 }
+*/
 
 /* Override layout-fixes.css and advanced-ui-components.css for static modal */
 #simulation-modal .simulation-container.ethics-explorer,
@@ -729,9 +731,12 @@
   color: #2d3748;
 }
 
+/* Generic modal-body rule commented out to prevent conflicts with layout-fixes.css */
+/* 
 .modal-body {
   padding: 1.5rem;
 }
+*/
 
 .modal-body h4 {
   color: #2d3748;

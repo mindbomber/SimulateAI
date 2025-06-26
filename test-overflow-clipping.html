@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overflow Clipping Test</title>
+    
+    <!-- Load the exact same CSS as the main app -->
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/accessibility.css">
+    <link rel="stylesheet" href="src/styles/simulations.css">
+    <link rel="stylesheet" href="src/styles/layout-components.css">
+    <link rel="stylesheet" href="src/styles/advanced-ui-components.css">
+    <link rel="stylesheet" href="src/styles/enhanced-objects.css">
+    <link rel="stylesheet" href="src/styles/input-utility-components.css">
+    <link rel="stylesheet" href="src/styles/form-input-components.css">
+    <link rel="stylesheet" href="src/styles/notification-toast.css">
+    <link rel="stylesheet" href="src/styles/card-component.css">
+    <link rel="stylesheet" href="src/styles/loader-spinner.css">
+    <link rel="stylesheet" href="src/styles/hero-demo.css">
+    <link rel="stylesheet" href="src/styles/bias-fairness.css">
+    <link rel="stylesheet" href="src/styles/layout-fixes.css">
+    <link rel="stylesheet" href="src/styles/simulation-modal-consolidated.css">
+    <link rel="stylesheet" href="src/styles/ethics-explorer.css">
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .test-button {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .test-button:hover {
+            background: #b91c1c;
+        }
+        
+        .overflow-test-element {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            background: #fbbf24;
+            color: #92400e;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+            border: 2px solid #f59e0b;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .large-content {
+            height: 120vh;
+            background: linear-gradient(45deg, #f3f4f6, #e5e7eb);
+            border: 2px dashed #9ca3af;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .wide-content {
+            width: 150vw;
+            background: linear-gradient(90deg, #ddd6fe, #c4b5fd);
+            border: 2px dashed #8b5cf6;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .debug-indicators {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 2000;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-indicators">
+        <div>Modal Dialog Overflow: <span id="dialog-overflow">Checking...</span></div>
+        <div>Modal Body Overflow: <span id="body-overflow">Checking...</span></div>
+        <div>Content Clipping: <span id="clipping-status">Checking...</span></div>
+    </div>
+
+    <div class="test-container">
+        <h1>🔍 Overflow Clipping Test</h1>
+        <p>Testing for overflow: hidden issues that might clip modal content or push sibling elements</p>
+        
+        <button class="test-button" onclick="testOverflowIssues()">🚨 Test Overflow Clipping</button>
+        <button class="test-button" onclick="testLargeContent()">📏 Test Large Content</button>
+        <button class="test-button" onclick="testWideContent()">↔️ Test Wide Content</button>
+    </div>
+
+    <!-- Modal with overflow test content -->
+    <div id="simulation-modal" class="modal-backdrop" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog">
+            <!-- Test element that extends beyond modal bounds -->
+            <div class="overflow-test-element">
+                SHOULD BE VISIBLE!
+            </div>
+            
+            <div class="modal-header">
+                <h2 class="modal-title">Overflow Clipping Test</h2>
+                <button class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-test-content">
+                <!-- Content will be populated by tests -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateDebugInfo() {
+            const modal = document.getElementById('simulation-modal');
+            const modalDialog = modal.querySelector('.modal-dialog');
+            const modalBody = modal.querySelector('.modal-body');
+            
+            if (modal.style.display !== 'none') {
+                const dialogOverflow = window.getComputedStyle(modalDialog).overflow;
+                const bodyOverflow = window.getComputedStyle(modalBody).overflowY;
+                
+                document.getElementById('dialog-overflow').textContent = dialogOverflow;
+                document.getElementById('body-overflow').textContent = bodyOverflow;
+                
+                // Check if the overflow test element is visible
+                const testElement = modal.querySelector('.overflow-test-element');
+                const rect = testElement.getBoundingClientRect();
+                const isVisible = rect.top >= 0 && rect.left >= 0 && 
+                                rect.bottom <= window.innerHeight && 
+                                rect.right <= window.innerWidth;
+                
+                document.getElementById('clipping-status').textContent = 
+                    isVisible ? '✅ Test element visible' : '❌ Test element clipped';
+            }
+        }
+        
+        function testOverflowIssues() {
+            const modalContent = document.getElementById('modal-test-content');
+            
+            modalContent.innerHTML = `
+                <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 16px; margin: 16px 0;">
+                    <h3 style="color: #92400e; margin: 0 0 8px 0;">🚨 Overflow Test</h3>
+                    <p style="margin: 0; color: #78350f;">This test checks if overflow: hidden is clipping content.</p>
+                </div>
+                
+                <div class="simulation-container">
+                    <h3>Modal Content Area</h3>
+                    <p>Normal modal content should be visible.</p>
+                    
+                    <div style="position: relative; background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 16px 0;">
+                        <h4>Relative Positioned Content</h4>
+                        <p>This content has normal positioning.</p>
+                        
+                        <!-- Element that extends beyond container -->
+                        <div style="position: absolute; top: -10px; right: -10px; background: #ef4444; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">
+                            EXTENDS OUTSIDE
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="simulation-controls">
+                    <div class="ethics-meters">
+                        <div class="ethics-meters-header">
+                            <h3>Clipping Test Results</h3>
+                            <p>Check if all elements are visible</p>
+                        </div>
+                        <div style="background: ${getComputedStyle(document.querySelector('.modal-dialog')).overflow === 'hidden' ? '#fecaca' : '#dcfce7'}; padding: 12px; border-radius: 4px; margin: 8px 0;">
+                            Modal Dialog Overflow: <strong>${getComputedStyle(document.querySelector('.modal-dialog')).overflow}</strong>
+                        </div>
+                        <div style="background: #e0e7ff; padding: 12px; border-radius: 4px; margin: 8px 0;">
+                            Modal Body Overflow Y: <strong>${getComputedStyle(document.querySelector('.modal-body')).overflowY}</strong>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            showModal('Overflow Clipping Test');
+            setTimeout(updateDebugInfo, 100);
+        }
+        
+        function testLargeContent() {
+            const modalContent = document.getElementById('modal-test-content');
+            
+            modalContent.innerHTML = `
+                <div style="background: #ddd6fe; border: 2px solid #8b5cf6; border-radius: 8px; padding: 16px; margin: 16px 0;">
+                    <h3 style="color: #5b21b6; margin: 0 0 8px 0;">📏 Large Content Test</h3>
+                    <p style="margin: 0; color: #6b21a8;">Testing if very tall content is handled properly.</p>
+                </div>
+                
+                <div class="large-content">
+                    <h3>Very Tall Content</h3>
+                    <p>This content is intentionally very tall (120vh) to test scrolling behavior.</p>
+                    <div style="height: 50vh; background: rgba(255,255,255,0.5); margin: 20px 0; padding: 20px; border-radius: 8px;">
+                        <h4>Middle Section</h4>
+                        <p>This is in the middle of the tall content.</p>
+                    </div>
+                    <div style="position: sticky; bottom: 20px; background: #fbbf24; padding: 10px; border-radius: 4px;">
+                        <strong>Bottom of tall content - should be scrollable</strong>
+                    </div>
+                </div>
+            `;
+            
+            showModal('Large Content Test');
+            setTimeout(updateDebugInfo, 100);
+        }
+        
+        function testWideContent() {
+            const modalContent = document.getElementById('modal-test-content');
+            
+            modalContent.innerHTML = `
+                <div style="background: #fecaca; border: 2px solid #dc2626; border-radius: 8px; padding: 16px; margin: 16px 0;">
+                    <h3 style="color: #991b1b; margin: 0 0 8px 0;">↔️ Wide Content Test</h3>
+                    <p style="margin: 0; color: #7f1d1d;">Testing if very wide content causes horizontal clipping.</p>
+                </div>
+                
+                <div class="wide-content">
+                    <h3>Very Wide Content</h3>
+                    <p>This content is intentionally very wide (150vw) to test horizontal overflow behavior.</p>
+                    <div style="background: rgba(255,255,255,0.5); padding: 20px; border-radius: 8px; margin: 20px 0;">
+                        <strong>This wide content should be scrollable horizontally if needed.</strong>
+                    </div>
+                </div>
+            `;
+            
+            showModal('Wide Content Test');
+            setTimeout(updateDebugInfo, 100);
+        }
+        
+        function showModal(testType) {
+            const modal = document.getElementById('simulation-modal');
+            modal.style.display = 'flex';
+            modal.setAttribute('aria-hidden', 'false');
+        }
+        
+        function closeModal() {
+            const modal = document.getElementById('simulation-modal');
+            modal.style.display = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+        }
+        
+        // ESC key handler
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+        
+        // Click backdrop to close
+        document.getElementById('simulation-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+        
+        // Auto-test overflow issues
+        setTimeout(() => {
+            console.log('🔍 Auto-running overflow test...');
+            testOverflowIssues();
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -180,3 +180,6 @@ export function findSimulations(criteria) {
     return true;
   });
 }
+
+// Export for backward compatibility
+export const simulationInfo = SIMULATION_INFO;

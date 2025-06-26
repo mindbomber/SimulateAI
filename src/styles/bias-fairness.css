@@ -979,7 +979,9 @@
   color: var(--color-error);
 }
 
-.modal-body {
+/* Specific to bias-fairness simulation modal content only */
+.simulation-container.bias-fairness .modal-body,
+.bias-fairness-modal .modal-body {
   padding: 30px;
 }
 
