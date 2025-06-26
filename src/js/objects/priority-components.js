@@ -389,7 +389,7 @@ class DataTable extends BaseObject {
             const rows = data.map(row => 
                 this.columns.map(col => row[col.key]).join(',')
             ).join('\n');
-            return headers + '\n' + rows;
+            return `${headers}\n${rows}`;
         }
         
         return JSON.stringify(data, null, 2);
@@ -631,7 +631,7 @@ class LoadingSpinner extends BaseObject {
         
         // Progress percentage
         if (this.progress !== null) {
-            const percentage = Math.round(this.progress * 100) + '%';
+            const percentage = `${Math.round(this.progress * 100)}%`;
             renderer.fillStyle = '#333333';
             renderer.font = this.font;
             renderer.textAlign = 'center';

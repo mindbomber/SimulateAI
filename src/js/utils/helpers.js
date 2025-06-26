@@ -242,7 +242,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
      */
     static roundTo(number, decimals) {
         if (typeof number !== 'number' || isNaN(number)) return 0;
-        return Number(Math.round(number + 'e' + decimals) + 'e-' + decimals);
+        return Number(`${Math.round(`${number}e${decimals}`)}e-${decimals}`);
     }
     
     /**
@@ -712,7 +712,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
                 case 'short':
                     return date.toLocaleDateString();
                 case 'long':
-                    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+                    return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
                 case 'time':
                     return date.toLocaleTimeString();
                 case 'iso':
@@ -909,7 +909,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
         g = this.clamp(Math.round(g), 0, 255);
         b = this.clamp(Math.round(b), 0, 255);
         
-        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
     }
 
     /**
@@ -2333,7 +2333,7 @@ class Helpers {    // Enhanced Math utilities with performance optimization and 
         if (respectPrivacy) {
             // Avoid fingerprinting by limiting detailed version info
             if (info.version && info.version.length > 2) {
-                info.version = info.version.substring(0, 2) + 'x';
+                info.version = `${info.version.substring(0, 2)}x`;
             }
         }
         

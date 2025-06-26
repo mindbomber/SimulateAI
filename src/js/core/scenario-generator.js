@@ -461,7 +461,7 @@ class ScenarioGenerator {
   /**
    * Adapt base scenario for specific age group
    */
-  adaptScenarioForAge(baseScenario, adaptations, options) {
+  adaptScenarioForAge(baseScenario, adaptations, _options) {
     return {
       ...baseScenario,
       
@@ -583,37 +583,37 @@ class ScenarioGenerator {
   }
 
   // Additional helper methods for choice generation...
-  generateDataChoices(scenario, adaptations) {
+  generateDataChoices(_scenario, _adaptations) {
     // Implementation for data usage choices
     return [];
   }
 
-  generateFairnessChoices(scenario, adaptations) {
+  generateFairnessChoices(_scenario, _adaptations) {
     // Implementation for fairness approach choices
     return [];
   }
 
-  generateOversightChoices(scenario, adaptations) {
+  generateOversightChoices(_scenario, _adaptations) {
     // Implementation for human oversight choices
     return [];
   }
 
-  adaptStakeholders(stakeholders, adaptationLevel) {
+  adaptStakeholders(stakeholders, _adaptationLevel) {
     // Simplify or expand stakeholder list based on age group
     return stakeholders;
   }
 
-  adaptDilemmas(dilemmas, complexityLevel) {
+  adaptDilemmas(dilemmas, _complexityLevel) {
     // Adjust ethical dilemma complexity
     return dilemmas;
   }
 
-  generateDiscussionPrompts(scenario, adaptations) {
+  generateDiscussionPrompts(_scenario, _adaptations) {
     // Create age-appropriate discussion questions
     return [];
   }
 
-  generateReflectionQuestions(scenario, adaptations) {
+  generateReflectionQuestions(_scenario, _adaptations) {
     // Create reflection questions for learning consolidation
     return [];
   }
@@ -636,11 +636,11 @@ class ScenarioGenerator {
   }
 
   // Placeholder methods for educator resource generation
-  generateLessonPlan(scenario, ageGroup) { return {}; }
-  generateTeachingActivities(scenario, ageGroup) { return []; }
-  generateAssessmentTools(scenario, ageGroup) { return {}; }
-  generateBackgroundInfo(scenario) { return {}; }
-  generateExtensionActivities(scenario, ageGroup) { return []; }
+  generateLessonPlan(_scenario, _ageGroup) { return {}; }
+  generateTeachingActivities(_scenario, _ageGroup) { return []; }
+  generateAssessmentTools(_scenario, _ageGroup) { return {}; }
+  generateBackgroundInfo(_scenario) { return {}; }
+  generateExtensionActivities(_scenario, _ageGroup) { return []; }
 
   /**
    * Generate scenarios for a simulation with specified difficulty

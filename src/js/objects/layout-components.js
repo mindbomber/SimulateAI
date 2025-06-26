@@ -384,10 +384,11 @@ const ANIMATION_DEFAULTS = {
     easing: 'easeOutCubic'
 };
 
-const ACCESSIBILITY_DEFAULTS = {
-    announceDelay: 150,
-    focusDelay: 100
-};
+// Accessibility defaults (currently unused)
+// const ACCESSIBILITY_DEFAULTS = {
+//     announceDelay: 150,
+//     focusDelay: 100
+// };
 
 const PERFORMANCE_THRESHOLDS = {
     renderTime: 16, // 60fps target
@@ -555,7 +556,7 @@ class TabContainer extends BaseObject {
     
     setupResizeObserver() {
         if ('ResizeObserver' in window) {
-            this.resizeObserver = new ResizeObserver(entries => {
+            this.resizeObserver = new ResizeObserver(_entries => {
                 this.clearRenderCache();
                 this.throttledRender();
             });
@@ -839,7 +840,7 @@ class TabContainer extends BaseObject {
         }
     }
     
-    handleMouseUp(event) {
+    handleMouseUp(_event) {
         this.draggedTabIndex = -1;
         this.dragOffset = { x: 0, y: 0 };
     }
@@ -913,8 +914,6 @@ class TabContainer extends BaseObject {
     }
     
     renderTabHeaders(renderer) {
-        const tabWidth = this.width / this.tabs.length;
-        
         this.tabs.forEach((tab, index) => {
             const bounds = this.getTabBounds(index);
             const isActive = index === this.activeTabIndex;
@@ -961,7 +960,7 @@ class TabContainer extends BaseObject {
             renderer.textAlign = 'left';
             renderer.textBaseline = 'middle';
               const maxTextWidth = bounds.width - (textX - bounds.x) - 30;
-            let title = tab.title;
+            let { title } = tab;
             const titleWidth = renderer.measureText(title).width;
             if (titleWidth > maxTextWidth) {
                 const ellipsis = '...';
@@ -1087,7 +1086,7 @@ class TabContainer extends BaseObject {
         return animation.start();
     }
     
-    async animateContentTransition(fromIndex, toIndex) {
+    async animateContentTransition(_fromIndex, _toIndex) {
         const duration = 250;
         this.animationState.contentFade = 1;
         
@@ -1857,10 +1856,9 @@ class ProgressStepper extends BaseObject {
             
             // Animation effects
             let scale = 1;
-            let opacity = 1;
             const completionAnim = this.animationState.stepTransitions.get(`completion-${index}`);
             if (completionAnim) {
-                scale = completionAnim.scale;
+                ({ scale } = completionAnim);
             }
             
             const currentRadius = circleRadius * scale;
@@ -1941,12 +1939,12 @@ class ProgressStepper extends BaseObject {
                 
                 // Truncate long titles
                 const maxWidth = stepWidth - 10;
-                let title = step.title;
+                let { title } = step;
                 if (renderer.measureText(title).width > maxWidth) {
-                    while (renderer.measureText(title + '...').width > maxWidth && title.length > 0) {
+                    while (renderer.measureText(`${title}...`).width > maxWidth && title.length > 0) {
                         title = title.slice(0, -1);
                     }
-                    title += '...';
+                    title = `${title}...`;
                 }
                 
                 renderer.fillText(title, centerX, centerY + currentRadius + 10);
@@ -2610,54 +2608,6 @@ class SplitPane extends BaseObject {
     }
     
     getLeftPaneBounds() {
-        const split = this.animatedSplit || this.split;
-        const splitterBounds = this.getSplitterBounds();
-        
-        if (this.orientation === 'horizontal') {
-            return {
-                x: 0,
-                y: 0,
-                width: splitterBounds.x,
-                height: this.height
-            };
-        } else {
-            return {
-                x: 0,
-                y: 0,
-                width: this.width,
-                height: splitterBounds.y
-            };
-        }
-    }
-    
-    getRightPaneBounds() {
-        const split = this.animatedSplit || this.split;
-        const splitterBounds = this.getSplitterBounds();
-        
-        if (this.orientation === 'horizontal') {
-            return {
-                x: splitterBounds.x + splitterBounds.width,
-                y: 0,
-                width: this.width - (splitterBounds.x + splitterBounds.width),
-                height: this.height
-            };
-        } else {
-            return {
-                x: 0,
-                y: splitterBounds.y + splitterBounds.height,
-                width: this.width,
-                height: this.height - (splitterBounds.y + splitterBounds.height)
-            };
-        }
-    }
-    
-    isPointInSplitter(x, y) {
-        const bounds = this.getSplitterBounds();
-        return x >= bounds.x && x <= bounds.x + bounds.width &&
-               y >= bounds.y && y <= bounds.y + bounds.height;
-    }
-    
-    getLeftPaneBounds() {
         if (this.collapsed === 'left') {
             return { x: 0, y: 0, width: 0, height: 0 };
         }
@@ -2717,127 +2667,7 @@ class SplitPane extends BaseObject {
                y >= bounds.y && y <= bounds.y + bounds.height;
     }
     
-    setSplit(ratio) {
-        const maxDimension = this.orientation === 'horizontal' ? this.width : this.height;
-        const minRatio = this.minSize / maxDimension;
-        const maxRatio = 1 - (this.minSize + this.splitterSize) / maxDimension;
-        
-        this.split = Math.max(minRatio, Math.min(maxRatio, ratio));
-        this.emit('splitChanged', { split: this.split });
-    }
-      collapse(pane) {
-        if (!this.collapsible) return;
-        
-        if (pane === 'left' || pane === 'right') {
-            this.collapsed = this.collapsed === pane ? null : pane;
-            this.emit('paneCollapsed', { collapsed: this.collapsed });
-        }
-    }
-    
     // Event Handlers
-    handleMouseDown(event) {
-        if (!this.resizable) return;
-        
-        const { localX, localY } = event;
-        if (this.isPointInSplitter(localX, localY)) {
-            this.isResizing = true;
-            this.startMousePos = this.orientation === 'horizontal' ? localX : localY;
-            this.startSplit = this.split;
-            event.preventDefault?.();
-        }
-    }
-    
-    handleMouseMove(event) {
-        const { localX, localY } = event;
-        
-        if (this.isResizing) {
-            const currentPos = this.orientation === 'horizontal' ? localX : localY;
-            const delta = currentPos - this.startMousePos;
-            const maxDimension = this.orientation === 'horizontal' ? this.width : this.height;
-            const deltaRatio = delta / maxDimension;
-            
-            this.setSplit(this.startSplit + deltaRatio);
-        } else {
-            this.isHovering = this.isPointInSplitter(localX, localY);
-        }
-    }
-    
-    handleMouseUp(event) {
-        this.isResizing = false;
-    }
-    
-    handleDoubleClick(event) {
-        if (!this.collapsible) return;
-        
-        const { localX, localY } = event;
-        if (this.isPointInSplitter(localX, localY)) {
-            // Toggle collapse based on which side is smaller
-            const leftBounds = this.getLeftPaneBounds();
-            const rightBounds = this.getRightPaneBounds();
-            
-            if (this.orientation === 'horizontal') {
-                this.collapse(leftBounds.width < rightBounds.width ? 'left' : 'right');
-            } else {
-                this.collapse(leftBounds.height < rightBounds.height ? 'left' : 'right');
-            }
-        }
-    }
-    
-    // Rendering
-    renderSelf(renderer) {
-        if (renderer.type !== 'canvas') return;
-        
-        this.renderPanes(renderer);
-        this.renderSplitter(renderer);
-    }
-    
-    renderPanes(renderer) {
-        const leftBounds = this.getLeftPaneBounds();
-        const rightBounds = this.getRightPaneBounds();
-        
-        // Left/Top pane
-        if (leftBounds.width > 0 && leftBounds.height > 0) {
-            renderer.fillStyle = this.paneBackgroundColor;
-            renderer.fillRect(leftBounds.x, leftBounds.y, leftBounds.width, leftBounds.height);
-            
-            renderer.strokeStyle = '#e9ecef';
-            renderer.lineWidth = 1;
-            renderer.strokeRect(leftBounds.x, leftBounds.y, leftBounds.width, leftBounds.height);
-            
-            // Render left pane content
-            if (this.leftPane) {
-                if (typeof this.leftPane === 'string') {
-                    renderer.fillStyle = '#333333';
-                    renderer.font = '14px Arial';
-                    renderer.textAlign = 'left';
-                    renderer.textBaseline = 'top';
-                    renderer.fillText(this.leftPane, leftBounds.x + 10, leftBounds.y + 10);
-                }
-                // If leftPane is a component, it should handle its own rendering
-            }
-        }
-        
-        // Right/Bottom pane
-        if (rightBounds.width > 0 && rightBounds.height > 0) {
-            renderer.fillStyle = this.paneBackgroundColor;
-            renderer.fillRect(rightBounds.x, rightBounds.y, rightBounds.width, rightBounds.height);
-            
-            renderer.strokeStyle = '#e9ecef';
-            renderer.lineWidth = 1;
-            renderer.strokeRect(rightBounds.x, rightBounds.y, rightBounds.width, rightBounds.height);
-            
-            // Render right pane content
-            if (this.rightPane) {
-                if (typeof this.rightPane === 'string') {
-                    renderer.fillStyle = '#333333';
-                    renderer.font = '14px Arial';
-                    renderer.textAlign = 'left';                    renderer.textBaseline = 'top';
-                    renderer.fillText(this.rightPane, rightBounds.x + 10, rightBounds.y + 10);
-                }
-            }
-        }
-    }
-    
     // Event handlers
     handleMouseDown(event) {
         try {
@@ -2907,7 +2737,7 @@ class SplitPane extends BaseObject {
         }
     }
     
-    handleMouseUp(event) {
+    handleMouseUp(_event) {
         try {
             if (this.isResizing) {
                 this.isResizing = false;
@@ -3559,18 +3389,20 @@ class TreeView extends BaseObject {
                     this.selectNode(this.visibleNodes[selectedIndex + 1].id);
                 }
                 break;
-            case 'ArrowRight':
+            case 'ArrowRight': {
                 const node = this.visibleNodes[selectedIndex];
                 if (node.children && !this.expandedNodes.has(node.id)) {
                     this.expandNode(node.id);
                 }
                 break;
-            case 'ArrowLeft':
+            }
+            case 'ArrowLeft': {
                 const currentNode = this.visibleNodes[selectedIndex];
                 if (currentNode.children && this.expandedNodes.has(currentNode.id)) {
                     this.collapseNode(currentNode.id);
                 }
                 break;
+            }
             case 'Enter':
             case ' ':
                 this.emit('nodeActivated', { nodeId: this.selectedNode });
@@ -3896,9 +3728,9 @@ class TreeView extends BaseObject {
         this.animatingNodes.add(nodeId);
         
         const animation = AnimationManager.animate({
-            duration: ANIMATION_DURATIONS.medium,
+            duration: 300,
             easing: 'easeOutCubic',
-            onUpdate: (progress) => {
+            onUpdate: (_progress) => {
                 // Visual expansion effect
                 this.invalidate();
             },
@@ -3918,9 +3750,9 @@ class TreeView extends BaseObject {
         this.animatingNodes.add(nodeId);
         
         const animation = AnimationManager.animate({
-            duration: ANIMATION_DURATIONS.medium,
+            duration: 300,
             easing: 'easeInCubic',
-            onUpdate: (progress) => {
+            onUpdate: (_progress) => {
                 // Visual collapse effect
                 this.invalidate();
             },
@@ -4148,7 +3980,7 @@ class TreeView extends BaseObject {
         let text = node.label || node.title || node.name || node.id;
         
         if (renderer.measureText(text).width > maxWidth) {
-            while (text.length > 0 && renderer.measureText(text + '...').width > maxWidth) {
+            while (text.length > 0 && renderer.measureText(`${text}...`).width > maxWidth) {
                 text = text.slice(0, -1);
             }
             text += '...';
@@ -4638,10 +4470,10 @@ class FileUpload extends BaseObject {
     }
     
     // Event Handlers
-    handleClick(event) {
+    handleClick(_event) {
         if (this.disabled) return;
         
-        // In a real implementation, this would trigger a file picker dialog
+        // In a real implementatio, this would trigger a file picker dialog
         this.emit('browseRequested');
     }
     
@@ -4659,7 +4491,7 @@ class FileUpload extends BaseObject {
         this.isDragOver = true;
     }
     
-    handleDragLeave(event) {
+    handleDragLeave(_event) {
         if (this.disabled) return;
         
         this.isDragOver = false;
@@ -4681,7 +4513,7 @@ class FileUpload extends BaseObject {
         if (renderer.type !== 'canvas') return;
         
         // Background
-        let backgroundColor = this.backgroundColor;
+        let { backgroundColor } = this;
         if (this.isDragOver) {
             backgroundColor = this.dragOverColor;
         } else if (this.disabled) {
@@ -4938,7 +4770,7 @@ class FileUpload extends BaseObject {
     }
     
     // Event handlers
-    handleClick(event) {
+    handleClick(_event) {
         if (!this.disabled) {
             this.triggerFileSelect();
         }
@@ -4960,7 +4792,7 @@ class FileUpload extends BaseObject {
         }
     }
     
-    handleDragLeave(event) {
+    handleDragLeave(_event) {
         if (!this.disabled) {
             this.isDragOver = false;
             this.animateDragState(false);
@@ -4974,7 +4806,7 @@ class FileUpload extends BaseObject {
             this.isDragOver = false;
             this.animateDragState(false);
             
-            const files = event.dataTransfer.files;
+            const { files } = event.dataTransfer;
             if (files.length > 0) {
                 this.addFiles(files);
             }
@@ -4994,7 +4826,7 @@ class FileUpload extends BaseObject {
     }
     
     handleFileInputChange(event) {
-        const files = event.target.files;
+        const { files } = event.target;
         if (files && files.length > 0) {
             this.addFiles(files);
         }
@@ -5026,7 +4858,7 @@ class FileUpload extends BaseObject {
     
     // Animation methods
     async animateDragState(isDragOver) {
-        if (this.prefersReducedMotion()) return;
+        if (this.prefersReducedMotion()) return Promise.resolve();
         
         const duration = 200;
         const startScale = isDragOver ? 1 : 1.02;

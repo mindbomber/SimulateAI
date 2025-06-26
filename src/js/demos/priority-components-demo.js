@@ -183,9 +183,9 @@ export class PriorityComponentsDemo {
             y: notificationY,
             width: 320,
             height: 80,
-            message: message,
-            type: type,
-            duration: duration,
+            message,
+            type,
+            duration,
             dismissible: true
         });
 

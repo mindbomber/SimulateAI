@@ -51,7 +51,7 @@ export class InteractiveObject {
     }
 
     generateId() {
-        return 'obj_' + Math.random().toString(36).substr(2, 9);
+        return `obj_${Math.random().toString(36).substr(2, 9)}`;
     }
 
     getDefaultAccessibilityConfig() {
@@ -108,7 +108,7 @@ export class InteractiveObject {
                 }
                 break;
 
-            case 'mousemove':
+            case 'mousemove': {
                 const wasHovered = this.hovered;
                 this.hovered = this.containsPoint(eventData.x, eventData.y);
                 
@@ -122,6 +122,7 @@ export class InteractiveObject {
                     this.onMouseMove(eventData);
                 }
                 break;
+            }
 
             case 'keydown':
                 if (this.focused && this.accessibilityConfig.keyboardActions) {
@@ -159,7 +160,7 @@ export class InteractiveObject {
     }
 
     // Update method (called by scene)
-    update(deltaTime) {
+    update(_deltaTime) {
         // Override in subclasses for animation or state updates
     }
 
@@ -239,6 +240,7 @@ export class Button extends InteractiveObject {
                     align: 'center',
                     baseline: 'middle'
                 });
+            return true;
         } else if (renderer.type === 'svg') {
             const group = renderer.createSVGElement('g');
             
@@ -270,6 +272,7 @@ export class Button extends InteractiveObject {
             
             return group;
         }
+        return false;
     }
 }
 
@@ -333,7 +336,7 @@ export class Slider extends InteractiveObject {
         if (!this.enabled || !this.visible) return false;
 
         switch (eventType) {
-            case 'mousedown':
+            case 'mousedown': {
                 const handleX = this.getHandlePosition();
                 const handleBounds = {
                     x: handleX,
@@ -355,6 +358,7 @@ export class Slider extends InteractiveObject {
                     return true;
                 }
                 break;
+            }
 
             case 'mousemove':
                 if (this.isDragging) {
@@ -426,6 +430,8 @@ export class Slider extends InteractiveObject {
                 strokeWidth: 2,
                 borderRadius: 2
             });
+            
+            return renderer;
         } else if (renderer.type === 'svg') {
             const group = renderer.createSVGElement('g');
             
@@ -467,6 +473,8 @@ export class Slider extends InteractiveObject {
             
             return group;
         }
+        
+        return null;
     }
 }
 
@@ -537,6 +545,8 @@ export class Meter extends InteractiveObject {
                         baseline: 'middle'
                     });
             }
+            
+            return renderer;
         } else if (renderer.type === 'svg') {
             const group = renderer.createSVGElement('g');
             
@@ -582,6 +592,8 @@ export class Meter extends InteractiveObject {
             
             return group;
         }
+        
+        return null;
     }
 }
 
@@ -622,6 +634,8 @@ export class Label extends InteractiveObject {
                 fill: this.textColor,
                 align: this.align
             });
+            
+            return renderer;
         } else if (renderer.type === 'svg') {
             return renderer.createSVGElement('text', {
                 x: this.x,
@@ -632,6 +646,8 @@ export class Label extends InteractiveObject {
                 'text-anchor': this.align === 'center' ? 'middle' : this.align
             }, this.text);
         }
+        
+        return null;
     }
 }
 

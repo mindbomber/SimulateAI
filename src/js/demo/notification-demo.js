@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Example: Error handling integration
-    window.addEventListener('error', (event) => {
+    window.addEventListener('error', (_event) => {
         window.NotificationToast.error(
             'Application Error',
             'An unexpected error occurred. The development team has been notified.'

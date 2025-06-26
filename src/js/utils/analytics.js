@@ -19,8 +19,6 @@
  * @license Apache-2.0
  */
 
-import { simpleStorage, userPreferences } from './simple-storage.js';
-
 // Enhanced constants and configuration
 const ANALYTICS_CONSTANTS = {
     VERSION: '2.0.0',
@@ -244,8 +242,6 @@ class AnalyticsPerformance {
             const oldestKey = this.metrics.keys().next().value;
             this.metrics.delete(oldestKey);
         }
-        
-        return metric;
     }
     
     static getMetrics() {
@@ -442,8 +438,7 @@ class AnalyticsManager {
      * Apply regional privacy rules based on user location
      */
     static applyRegionalPrivacyRules() {
-        const timezone = this.sessionData.timezone;
-        const language = this.sessionData.language;
+        const { timezone, language } = this.sessionData;
         
         // EU/GDPR regions
         const gdprRegions = ['Europe', 'EU'];
@@ -692,7 +687,7 @@ class AnalyticsManager {
         // Memory pressure detection
         if (performance.memory) {
             setInterval(() => {
-                const memory = performance.memory;
+                const { memory } = performance;
                 const usage = memory.usedJSHeapSize / memory.jsHeapSizeLimit;
                 
                 if (usage > 0.8) { // 80% memory usage
@@ -1387,7 +1382,7 @@ class AnalyticsManager {
     static generalizeResolution(resolution) {
         if (!resolution || typeof resolution !== 'string') return 'unknown';
         
-        const [width, height] = resolution.split('x').map(Number);
+        const [width] = resolution.split('x').map(Number);
         
         if (width >= 3840) return '4K+';
         if (width >= 2560) return '2K+';
@@ -1814,7 +1809,6 @@ class AnalyticsManager {
      */
     static analyzeEngagement(events) {
         const interactions = events.filter(e => e.name === 'user_interaction');
-        const simulations = events.filter(e => e.name.includes('simulation'));
         
         return {
             totalInteractions: interactions.length,
@@ -1921,9 +1915,8 @@ class AnalyticsManager {
     }    /**
      * Analyze learning progress with advanced educational metrics
      */
-    static analyzeLearningProgress(events, decisions) {
+    static analyzeLearningProgress(events, _decisions) {
         const completions = events.filter(e => e.name === 'simulation_complete');
-        const learningEvents = events.filter(e => e.name.includes('learning') || e.name.includes('knowledge'));
         
         return {
             totalCompletions: completions.length,
@@ -2071,7 +2064,7 @@ class AnalyticsManager {
     /**
      * Analyze performance metrics
      */
-    static analyzePerformanceMetrics(events, performanceMetrics) {
+    static analyzePerformanceMetrics(events, _performanceMetrics) {
         const performanceEvents = events.filter(e => e.name.startsWith('performance'));
         const errorEvents = events.filter(e => e.name === 'error');
         

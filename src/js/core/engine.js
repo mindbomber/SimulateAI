@@ -265,7 +265,8 @@ class SimulationEngine {
         try {
             EnginePerformanceMonitor.startOperation('renderer_setup');
 
-            let renderMode = this.config.renderMode;
+            const { renderMode: configRenderMode } = this.config;
+            let renderMode = configRenderMode;
             
             // Auto-detect best renderer based on device capabilities
             if (renderMode === RENDER_MODES.AUTO) {
@@ -479,9 +480,9 @@ class SimulationEngine {
         if (this.config.highContrast) themeClasses.push('high-contrast');
         if (this.themeConfig.reducedMotion) themeClasses.push('reduced-motion');
 
-        this.container.className = this.container.className
+        this.container.className = `${this.container.className
             .replace(/\b(high-contrast|reduced-motion)\b/g, '')
-            .trim() + ' ' + themeClasses.join(' ');
+            .trim()} ${themeClasses.join(' ')}`;
     }
 
     handleThemeChange() {
@@ -994,7 +995,8 @@ class SimulationEngine {
         try {
             if (!this.debugOverlay) return;
             
-            const metrics = EnginePerformanceMonitor.getMetrics();
+            // Remove unused metrics assignment
+            EnginePerformanceMonitor.getMetrics();
             const memoryInfo = performance.memory ? 
                 `Memory: ${(performance.memory.usedJSHeapSize / 1048576).toFixed(2)}MB` : 
                 'Memory: N/A';

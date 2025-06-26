@@ -45,7 +45,7 @@ class CardComponent {
             actionsEl.className = 'card-actions';
             actions.forEach(action => {
                 const btn = document.createElement('button');
-                btn.className = 'card-action-btn' + (action.className ? ' ' + action.className : '');
+                btn.className = `card-action-btn${action.className ? ` ${action.className}` : ''}`;
                 btn.type = 'button';
                 btn.textContent = action.label;
                 btn.addEventListener('click', action.onClick);

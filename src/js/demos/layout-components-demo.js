@@ -46,7 +46,7 @@ export class LayoutComponentsDemo {
         // Add event listeners for demo buttons
         controlPanel.addEventListener('click', (event) => {
             if (event.target.classList.contains('demo-btn')) {
-                const demo = event.target.dataset.demo;
+                const { demo } = event.target.dataset;
                 this.switchDemo(demo);
                 
                 // Update active button

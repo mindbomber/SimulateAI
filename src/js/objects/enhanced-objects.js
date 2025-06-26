@@ -12,7 +12,6 @@ const DEFAULT_ANIMATION_DURATION = 300;
 const DEFAULT_EASING = 'easeInOut';
 const TOUCH_TARGET_SIZE = 44;
 const FOCUS_RING_WIDTH = 2;
-const RIPPLE_DURATION = 600;
 
 // Animation frame management
 class AnimationManager {
@@ -481,7 +480,7 @@ export class BaseObject {
      * @returns {boolean}
      */
     intersects(other) {
-        if (!other instanceof BaseObject) return false;
+        if (!(other instanceof BaseObject)) return false;
         
         const bounds1 = this.getBounds();
         const bounds2 = other.getBounds();
@@ -813,7 +812,7 @@ export class BaseObject {
      * Override in subclasses for custom update logic
      * @param {number} deltaTime 
      */
-    onUpdate(deltaTime) {
+    onUpdate(_deltaTime) {
         // Override in subclasses
     }
 
@@ -891,7 +890,7 @@ export class BaseObject {
      * Override in subclasses to implement custom rendering
      * @param {Object} renderer 
      */
-    renderSelf(renderer) {
+    renderSelf(_renderer) {
         // Override in subclasses
     }
 
@@ -1581,7 +1580,7 @@ export class Scene extends BaseObject {
         renderer.scale(this.camera.zoom, this.camera.zoom);
 
         // Render layers in order
-        for (const [layerName, objects] of this.layers) {
+        for (const [, objects] of this.layers) {
             objects.forEach(object => {
                 if (object.render) {
                     object.render(renderer);

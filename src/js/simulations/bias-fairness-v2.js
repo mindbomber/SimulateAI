@@ -87,7 +87,6 @@ class BiasExplorerSimulation extends EthicsSimulation {
     this.emit('simulation:initialized');
     
     console.log('BiasExplorerSimulation initialization complete');
-    return this;
   }
 
   setupUI() {
@@ -663,7 +662,7 @@ class BiasExplorerSimulation extends EthicsSimulation {
     
     historyElement.innerHTML = `
       <div class="history-entries">
-        ${this.explorationHistory.map((entry, index) => `
+        ${this.explorationHistory.map((entry, _index) => `
           <div class="history-entry">
             <div class="entry-header">
               <strong>${entry.scenario}</strong>

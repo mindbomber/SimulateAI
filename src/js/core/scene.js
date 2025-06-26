@@ -45,8 +45,6 @@ export class Scene {
         if (object.onAdded) {
             object.onAdded(this);
         }
-        
-        return object;
     }
 
     remove(object) {
@@ -79,8 +77,6 @@ export class Scene {
         if (object.onRemoved) {
             object.onRemoved();
         }
-        
-        return object;
     }
 
     addToLayer(object, layerIndex) {

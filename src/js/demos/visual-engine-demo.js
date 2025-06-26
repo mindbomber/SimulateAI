@@ -218,13 +218,13 @@ export class VisualEngineDemo {
                 animationOffset: i * 0.5,
                 animationSpeed: 1,
                 
-                update: function(deltaTime) {
+                update(_deltaTime) {
                     // Simple bounce animation
                     const time = (performance.now() + this.animationOffset * 1000) / 1000;
                     this.y = this.originalY + Math.sin(time * this.animationSpeed) * 20;
                 },
                 
-                render: function(renderer) {
+                render(renderer) {
                     renderer.renderObject(this);
                 }
             };

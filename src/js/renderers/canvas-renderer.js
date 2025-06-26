@@ -816,7 +816,7 @@ class CanvasRenderer {
           x, y: y - fontSize/2,
           width: metrics.width,
           height: fontSize,
-          text: text,
+          text,
           label: options.label || text,
           ariaLabel: options.ariaLabel || text
         });
@@ -1119,7 +1119,7 @@ class CanvasRenderer {
    * @param {Object} options - Grid options
    */
   drawGrid(x, y, width, height, options = {}) {
-    const gridColor = options.gridColor || this.currentTheme.accent + '40'; // Semi-transparent
+    const gridColor = options.gridColor || `${this.currentTheme.accent}40`; // Semi-transparent
     const gridLines = options.gridLines || 5;
     
     this.ctx.save();
@@ -1259,7 +1259,7 @@ class CanvasRenderer {
    * @param {number} y - Legend Y coordinate
    * @param {Object} options - Legend options
    */
-  drawPieChartLegend(data, x, y, options = {}) {
+  drawPieChartLegend(data, x, y, _options = {}) {
     const itemHeight = 25;
     const colorBoxSize = 15;
     
@@ -1846,9 +1846,6 @@ class CanvasRenderer {
       
       this.options.width = maxWidth;
       this.options.height = maxHeight;
-      
-      // Store current transform
-      const transform = this.ctx.getTransform();
       
       // Resize canvas
       this.canvas.width = maxWidth * this.options.pixelRatio;

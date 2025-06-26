@@ -551,7 +551,7 @@ class AccessibilityManager {
     }
     
     detectScreenReaderType() {
-        const userAgent = navigator.userAgent;
+        const { userAgent } = navigator;
         
         for (const [type, pattern] of Object.entries(SCREEN_READER_PATTERNS)) {
             if (pattern.test(userAgent)) {
@@ -639,7 +639,6 @@ class AccessibilityManager {
     updateFocusIndicatorTheme() {
         if (!this.focusIndicator) return;
         
-        const focusStyle = AccessibilityTheme.getFocusStyle(this.theme);
         this.focusIndicator.style.cssText = `
             position: absolute;
             border: 3px solid ${this.theme.highContrast ? '#ffff00' : '#007bff'};
@@ -740,7 +739,7 @@ class AccessibilityManager {
         const text = component.text || component.label || component.title || '';
         const value = component.value !== undefined ? ` with value ${component.value}` : '';
         
-        return `${type}${text ? ': ' + text : ''}${value}`;
+        return `${type}${text ? `: ${text}` : ''}${value}`;
     }
     
     registerComponentInRegion(component, config) {
@@ -846,7 +845,7 @@ class AccessibilityManager {
     applyAccessibilityAttributes(component, config) {
         if (!component.element) return;
 
-        const element = component.element;
+        const { element } = component;
         
         try {
             // Set ARIA attributes with enhanced support
@@ -1649,7 +1648,7 @@ class AccessibilityManager {
     }
 
     findComponentByElement(element) {
-        for (let [id, data] of this.components) {
+        for (const [, data] of this.components) {
             if (data.component.element === element || 
                 data.component.element?.contains(element)) {
                 return data.component;
@@ -1830,7 +1829,7 @@ class AccessibilityManager {
     
     cleanupComponentListeners() {
         for (const [id, componentData] of this.components) {
-            const component = componentData.component;
+            const { component } = componentData;
             
             if (component._accessibilityListeners) {
                 component._accessibilityListeners.forEach(({ element, event, listener }) => {
@@ -1921,7 +1920,7 @@ class AccessibilityManager {
 
 // Static methods for global accessibility utilities
 AccessibilityManager.detectScreenReaderType = function() {
-    const userAgent = navigator.userAgent;
+    const { userAgent } = navigator;
     
     for (const [type, pattern] of Object.entries(SCREEN_READER_PATTERNS)) {
         if (pattern.test(userAgent)) {

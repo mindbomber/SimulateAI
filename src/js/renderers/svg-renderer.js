@@ -260,7 +260,7 @@ class SVGAccessibilityManager {
     
     handleClick(event) {
         // Find clicked element
-        const target = event.target;
+        const { target } = event;
         const elementId = this.findElementIdByTarget(target);
         
         if (elementId) {
@@ -1065,7 +1065,7 @@ class SVGRenderer {
           x, y,
           width: textElement.getBBox ? textElement.getBBox().width : 0,
           height: fontSize,
-          text: text,
+          text,
           label: options.label || text,
           ariaLabel: options.ariaLabel || text,
           description: options.description
@@ -1284,11 +1284,11 @@ class SVGRenderer {
           x, y,
           width: adjustedWidth,
           height: adjustedHeight,
-          text: text,
+          text,
           label: options.label || text,
           ariaLabel: options.ariaLabel || text,
           description: options.description,
-          onClick: onClick,
+          onClick,
           focusable: !options.disabled,
           role: 'button'
         });
@@ -1398,12 +1398,13 @@ class SVGRenderer {
       const strokeWidth = options.strokeWidth || 1;
 
       switch (type) {
-        case 'dots':
+        case 'dots': {
           const dot = this.createCircle(5, 5, 1, {
             fill: color
           });
           if (dot) pattern.appendChild(dot);
           break;
+        }
 
         case 'lines':
           const line = this.createLine(0, 0, 0, 10, {

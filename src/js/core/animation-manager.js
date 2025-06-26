@@ -528,7 +528,7 @@ export class AnimationManager {    constructor(engine) {
         }
     }
 
-    updateAnimation(animation, deltaTime) {
+    updateAnimation(animation, _deltaTime) {
         const now = performance.now();
         
         try {
@@ -584,7 +584,7 @@ export class AnimationManager {    constructor(engine) {
         }
     }
 
-    updateTimeline(timeline, deltaTime) {
+    updateTimeline(timeline, _deltaTime) {
         const now = performance.now();
         timeline.elapsed = now - timeline.startTime;
         timeline.progress = Math.min(timeline.elapsed / timeline.duration, 1);

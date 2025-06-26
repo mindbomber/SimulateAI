@@ -4,8 +4,9 @@
  */
 
 import VisualEngine from '../core/visual-engine.js';
-import { Button, Slider, Meter, Label } from '../objects/interactive-objects.js';
-import { ModalDialog, NavigationMenu, Chart, FormField, Tooltip } from '../objects/advanced-ui-components.js';
+// Commented out unused imports for now
+// import { Button, Slider, Meter, Label } from '../objects/interactive-objects.js';
+// import { ModalDialog, NavigationMenu, Chart, FormField, Tooltip } from '../objects/advanced-ui-components.js';
 
 export class AdvancedUIDemo {
     constructor(container, options = {}) {
@@ -103,7 +104,7 @@ export class AdvancedUIDemo {
     createSectionDivider(title, y) {
         const label = this.engine.createComponent('label', {
             x: 20,
-            y: y,
+            y,
             text: title,
             font: 'bold 18px Arial',
             textColor: '#34495e'

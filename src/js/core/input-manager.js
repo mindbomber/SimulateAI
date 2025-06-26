@@ -467,7 +467,7 @@ export class InputManager {
      * @param {Gamepad} gamepad - Gamepad object
      */
     processGamepadState(gamepad) {
-        const id = gamepad.id;
+        const { id } = gamepad;
         const prevState = this.gamepad.controllers.get(id) || {};
         
         // Process buttons
@@ -785,7 +785,7 @@ export class InputManager {
             
             const inputEvent = {
                 type: 'touchstart',
-                touches: touches,
+                touches,
                 touchCount: this.touch.touches.size,
                 timestamp: now,
                 originalEvent: event
@@ -829,7 +829,7 @@ export class InputManager {
             
             const inputEvent = {
                 type: 'touchmove',
-                touches: touches,
+                touches,
                 gestures: { ...this.touch.gestures },
                 touchCount: this.touch.touches.size,
                 timestamp: now,
@@ -866,7 +866,7 @@ export class InputManager {
             
             const inputEvent = {
                 type: 'touchend',
-                touches: touches,
+                touches,
                 gestures: { ...this.touch.gestures },
                 touchCount: this.touch.touches.size,
                 timestamp: now,
@@ -987,7 +987,7 @@ export class InputManager {
      */
     handleGamepadConnected(event) {
         try {
-            const gamepad = event.gamepad;
+            const { gamepad } = event;
             this.gamepad.controllers.set(gamepad.id, {
                 buttons: gamepad.buttons.map(b => ({ pressed: b.pressed, value: b.value })),
                 axes: [...gamepad.axes]
@@ -998,7 +998,7 @@ export class InputManager {
             const inputEvent = {
                 type: 'gamepadconnected',
                 gamepadId: gamepad.id,
-                gamepad: gamepad,
+                gamepad,
                 timestamp: performance.now(),
                 originalEvent: event
             };
@@ -1016,7 +1016,7 @@ export class InputManager {
      */
     handleGamepadDisconnected(event) {
         try {
-            const gamepad = event.gamepad;
+            const { gamepad } = event;
             this.gamepad.controllers.delete(gamepad.id);
             
             this.log(`Gamepad disconnected: ${gamepad.id}`, 'info');
@@ -1141,7 +1141,7 @@ export class InputManager {
             
             // Emit pinch event
             this.emit('pinch', {
-                scale: scale,
+                scale,
                 centerX: this.touch.gestures.pinch.centerX,
                 centerY: this.touch.gestures.pinch.centerY
             });
@@ -1157,15 +1157,15 @@ export class InputManager {
                 this.touch.gestures.tap.active = false;
                 this.touch.gestures.pan = {
                     active: true,
-                    deltaX: deltaX,
-                    deltaY: deltaY
+                    deltaX,
+                    deltaY
                 };
                 
                 this.emit('panstart', {
                     x: touches[0].x,
                     y: touches[0].y,
-                    deltaX: deltaX,
-                    deltaY: deltaY
+                    deltaX,
+                    deltaY
                 });
             }
         }
@@ -1173,9 +1173,9 @@ export class InputManager {
 
     /**
      * Finalize gestures when touch ends
-     * @param {Array} touches - Touch objects
+     * @param {Array} _touches - Touch objects (unused)
      */
-    finalizeGestures(touches) {
+    finalizeGestures(_touches) {
         // Check for tap completion
         if (this.touch.gestures.tap.active) {
             const elapsed = performance.now() - this.touch.gestures.tap.startTime;
@@ -1321,9 +1321,9 @@ export class InputManager {
 
     /**
      * Update method (called by engine)
-     * @param {number} deltaTime - Time since last update
+     * @param {number} _deltaTime - Time since last update (unused)
      */
-    update(deltaTime) {
+    update(_deltaTime) {
         // Update any time-based input processing
         // Currently used for gesture timeouts and key repeat handling
         
@@ -1447,7 +1447,7 @@ class InputPerformanceMonitor {
         const now = performance.now();
         const recentEvents = [];
         
-        for (const [eventType, timestamps] of this.events) {
+        for (const [, timestamps] of this.events) {
             const recent = timestamps.filter(t => now - t < 1000);
             recentEvents.push(...recent);
         }
@@ -1536,7 +1536,7 @@ class InputAccessibilityManager {
         });
     }
 
-    getEventAccessibilityData(event) {
+    getEventAccessibilityData(_event) {
         return {
             focusVisible: this.focusVisible,
             reducedMotion: this.reducedMotion,

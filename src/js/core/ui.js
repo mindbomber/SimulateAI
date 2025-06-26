@@ -615,7 +615,7 @@ class UIComponent {
         this.emit('update', { deltaTime });
     }
 
-    render(renderer) {
+    render(_renderer) {
         // UI components render to DOM, not canvas/svg
         // Override in subclasses if needed
     }
@@ -1504,7 +1504,6 @@ class EthicsDisplay extends UIComponent {
         meterContainer.setAttribute('data-metric', name);
         
         // Generate unique IDs for accessibility
-        const meterId = `meter-${this.id}-${name}`;
         const labelId = `label-${this.id}-${name}`;
         const valueId = `value-${this.id}-${name}`;
         
@@ -1548,7 +1547,7 @@ class EthicsDisplay extends UIComponent {
     /**
      * Style individual meter
      */
-    styleMeter(container, metric) {
+    styleMeter(container, _metric) {
         Object.assign(container.style, {
             marginBottom: '16px',
             position: 'relative'
@@ -1735,7 +1734,7 @@ class EthicsDisplay extends UIComponent {
     /**
      * Update specific metric with animation
      */
-    updateMetric(metricName, newValue, options = {}) {
+    updateMetric(metricName, newValue, _options = {}) {
         const metric = this.metrics.get(metricName);
         if (!metric) return;
 
@@ -2919,7 +2918,7 @@ class Slider extends UIComponent {
     /**
      * Handle mouse up to end drag
      */
-    handleMouseUp(event) {
+    handleMouseUp(_event) {
         if (!this.isDragging) return;
         
         this.isDragging = false;
@@ -2963,7 +2962,7 @@ class Slider extends UIComponent {
     /**
      * Handle touch end
      */
-    handleTouchEnd(event) {
+    handleTouchEnd(_event) {
         if (!this.isDragging) return;
         
         this.isDragging = false;

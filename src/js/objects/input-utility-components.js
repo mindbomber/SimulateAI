@@ -3778,7 +3778,7 @@ class NumberInput extends BaseObject {
     
     setupResizeObserver() {
         if ('ResizeObserver' in window) {
-            this.resizeObserver = new ResizeObserver(entries => {
+            this.resizeObserver = new ResizeObserver(_entries => {
                 this.clearRenderCache();
                 this.throttledRender();
             });
@@ -4453,7 +4453,7 @@ class Drawer extends BaseObject {
     
     setupResizeObserver() {
         if ('ResizeObserver' in window) {
-            this.resizeObserver = new ResizeObserver(entries => {
+            this.resizeObserver = new ResizeObserver(_entries => {
                 this.clearRenderCache();
                 this.throttledRender();
             });
@@ -4613,7 +4613,7 @@ class Drawer extends BaseObject {
     }
       
     getDrawerBounds() {
-        const progress = this.animationState.progress;
+        const { progress } = this.animationState;
         
         switch (this.position) {
             case 'left':
@@ -4763,7 +4763,7 @@ class Drawer extends BaseObject {
         }
     }
     
-    handleTouchEnd(event) {
+    handleTouchEnd(_event) {
         if (this.disabled || !this.isOpen || !this.touchState.isDragging) return;
         
         const deltaX = this.touchState.currentX - this.touchState.startX;
@@ -5008,7 +5008,6 @@ class Drawer extends BaseObject {
         }
         
         const ellipsis = '...';
-        const ellipsisWidth = renderer.measureText(ellipsis).width;
         
         let truncated = text;
         while (renderer.measureText(truncated + ellipsis).width > maxWidth && truncated.length > 0) {
@@ -5289,7 +5288,7 @@ class SearchBox extends BaseObject {
     
     setupResizeObserver() {
         if ('ResizeObserver' in window) {
-            this.resizeObserver = new ResizeObserver(entries => {
+            this.resizeObserver = new ResizeObserver(_entries => {
                 this.clearRenderCache();
                 this.throttledRender();
             });
@@ -5881,7 +5880,6 @@ class SearchBox extends BaseObject {
         }
         
         const ellipsis = '...';
-        const ellipsisWidth = renderer.measureText(ellipsis).width;
         
         let truncated = text;
         while (renderer.measureText(truncated + ellipsis).width > maxWidth && truncated.length > 0) {

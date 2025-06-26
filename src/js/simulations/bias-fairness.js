@@ -190,7 +190,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         throw new Error('Metrics container not found');
       }
 
-      const { canvas, id } = CanvasManager.createCanvas({
+      const { id } = CanvasManager.createCanvas({
         width: 240,
         height: 300,
         container: metricsContainer,
@@ -1291,7 +1291,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
 
     // Create managed canvas for controls
     const controlsContainer = controlsPanel.querySelector('#controls-container');
-    const { canvas, id } = CanvasManager.createCanvas({
+    const { id } = CanvasManager.createCanvas({
       width: 260,
       height: 400,
       container: controlsContainer,
@@ -1629,7 +1629,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     if (!chartContainer) return;
 
     // Create managed canvas for analytics
-    const { canvas, id } = CanvasManager.createCanvas({
+    const { id } = CanvasManager.createCanvas({
       width: 400,
       height: 300,
       container: chartContainer,
@@ -1672,7 +1672,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     // Clear previous chart
     this.analyticsEngine.scene.clear();
 
-    const canvas = this.analyticsEngine.canvas;
+    const { canvas } = this.analyticsEngine;
     const ctx = canvas.getContext('2d');
     
     // Chart dimensions
@@ -1726,10 +1726,10 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     ctx.restore();
   }
 
-  drawDataLine(ctx, data, color, label) {
+  drawDataLine(ctx, data, color, _label) {
     if (data.length < 2) return;
 
-    const canvas = this.analyticsEngine.canvas;
+    const { canvas } = this.analyticsEngine;
     const padding = 40;
     const chartWidth = canvas.width - (padding * 2);
     const chartHeight = canvas.height - (padding * 2);
@@ -1914,7 +1914,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         </button>
       </div>
       <div class="configurations-grid">
-        ${this.savedConfigurations.map((config, index) => `
+        ${this.savedConfigurations.map((config, _index) => `
           <div class="config-card" data-config-id="${config.id}">
             <div class="config-header">
               <h6>${config.name}</h6>
