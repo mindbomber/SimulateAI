@@ -9,7 +9,7 @@ import { userPreferences } from '../utils/simple-storage.js';
 import { simpleAnalytics } from '../utils/simple-analytics.js';
 import logger from '../utils/logger.js';
 
-export class PreLaunchModal {
+export default class PreLaunchModal {
     constructor(simulationId, options = {}) {
         this.simulationId = simulationId;
         this.simulationInfo = getSimulationInfo(simulationId);
@@ -425,13 +425,27 @@ export class PreLaunchModal {
             
             if (startButton) {
                 startButton.addEventListener('click', () => {
+                    logger.debug('Start Exploration button clicked', {
+                        simulationId: this.simulationId,
+                        onLaunch: typeof this.options.onLaunch
+                    });
+                    
                     // Check skip preferences before launching
                     this.handleSkipPreferences();
                     
                     this.trackAnalytics('simulation_launched');
                     this.close();
-                    this.options.onLaunch(this.simulationId);
+                    
+                    // Call the onLaunch callback
+                    if (typeof this.options.onLaunch === 'function') {
+                        logger.debug('Calling onLaunch callback');
+                        this.options.onLaunch(this.simulationId);
+                    } else {
+                        logger.error('onLaunch is not a function:', this.options.onLaunch);
+                    }
                 });
+            } else {
+                logger.error('Start button not found in modal');
             }
             
             if (cancelButton) {
@@ -577,5 +591,3 @@ export class PreLaunchModal {
         }
     }
 }
-
-export default PreLaunchModal;

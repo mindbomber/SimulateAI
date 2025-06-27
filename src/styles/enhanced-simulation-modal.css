@@ -41,7 +41,7 @@
     height: 85vh;
     max-width: 1400px;
     max-height: 900px;
-    background: var(--color-background);
+    background: var(--modal-background, #ffffff);
     border-radius: 12px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     display: flex;
@@ -49,6 +49,7 @@
     overflow: hidden;
     transform: scale(0.95);
     transition: transform 0.3s ease;
+    opacity: 1; /* Ensure the container itself is fully opaque */
 }
 
 .enhanced-simulation-modal.visible .enhanced-modal-container {
@@ -91,8 +92,8 @@
     align-items: center;
     justify-content: space-between;
     padding: 20px 24px;
-    border-bottom: 1px solid var(--color-border);
-    background: linear-gradient(135deg, var(--color-primary-light), var(--color-primary));
+    border-bottom: 1px solid var(--modal-border, #e5e7eb);
+    background: linear-gradient(135deg, var(--color-primary-light, #3b82f6), var(--color-primary, #2563eb));
     color: white;
 }
 
@@ -130,8 +131,8 @@
 /* Tab navigation */
 .enhanced-modal-tabs {
     display: flex;
-    background: var(--color-background-secondary);
-    border-bottom: 1px solid var(--color-border);
+    background: var(--form-disabled-bg, #f9fafb);
+    border-bottom: 1px solid var(--modal-border, #e5e7eb);
     padding: 0 24px;
 }
 
@@ -142,7 +143,7 @@
     padding: 12px 20px;
     border: none;
     background: none;
-    color: var(--color-text-secondary);
+    color: var(--color-gray-600, #6b7280);
     cursor: pointer;
     transition: all 0.2s ease;
     border-bottom: 3px solid transparent;
@@ -151,14 +152,14 @@
 }
 
 .enhanced-tab:hover {
-    color: var(--color-text);
-    background: rgba(var(--color-primary-rgb), 0.05);
+    color: var(--color-gray-900, #111827);
+    background: rgba(59, 130, 246, 0.05);
 }
 
 .enhanced-tab.active {
-    color: var(--color-primary);
-    border-bottom-color: var(--color-primary);
-    background: rgba(var(--color-primary-rgb), 0.1);
+    color: var(--color-primary, #2563eb);
+    border-bottom-color: var(--color-primary, #2563eb);
+    background: rgba(59, 130, 246, 0.1);
 }
 
 .tab-icon {
@@ -180,30 +181,38 @@
 .simulation-main-area {
     flex: 1;
     display: flex;
-    overflow: hidden;
+    overflow: visible; /* Changed from hidden to visible */
+    min-height: 0; /* Ensure flex child can shrink */
 }
 
 .simulation-content-wrapper {
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: visible; /* Changed from hidden to visible */
+    min-height: 0; /* Ensure flex child can shrink */
 }
 
-/* Enhanced simulation container */
+/* Enhanced simulation container - simplified */
 .enhanced-simulation-container {
     flex: 1;
-    padding: 20px;
+    padding: 0; /* Removed padding to give more space */
     overflow: auto;
-    background: var(--color-background);
+    background: var(--modal-background, #ffffff);
+    min-height: 0; /* Allow container to shrink with flexbox */
 }
 
-/* Ethics meters panel */
+/* Ethics meters panel - hidden by default for bias simulation */
 .ethics-meters-panel {
-    background: var(--color-background-secondary);
-    border-top: 1px solid var(--color-border);
+    background: var(--form-disabled-bg, #f9fafb);
+    border-top: 1px solid var(--modal-border, #e5e7eb);
     padding: 16px 20px;
     transition: all 0.3s ease;
+    display: none; /* Hidden by default - can be shown if needed */
+}
+
+.ethics-meters-panel.visible {
+    display: block; /* Show when explicitly needed */
 }
 
 .ethics-meters-panel.collapsed {
@@ -225,7 +234,7 @@
     margin: 0;
     font-size: 1rem;
     font-weight: 600;
-    color: var(--color-text);
+    color: var(--color-gray-900, #111827);
 }
 
 .ethics-meters-panel.collapsed .ethics-meters-header {
@@ -235,7 +244,7 @@
 .ethics-description {
     margin: 0 0 16px 0;
     font-size: 0.9rem;
-    color: var(--color-text-secondary);
+    color: var(--color-gray-600, #6b7280);
 }
 
 .meters-container {
@@ -244,19 +253,28 @@
     flex-wrap: wrap;
 }
 
-/* Resource panel */
+/* Resource panel - made smaller and collapsible */
 .resource-panel {
-    width: 300px;
-    background: var(--color-background-secondary);
-    border-left: 1px solid var(--color-border);
+    width: 250px; /* Reduced from 300px */
+    background: var(--form-disabled-bg, #f9fafb);
+    border-left: 1px solid var(--modal-border, #e5e7eb);
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    transition: width 0.3s ease; /* Add smooth transition */
+}
+
+.resource-panel.collapsed {
+    width: 60px; /* Collapsed state shows just icons */
+}
+
+.resource-panel.collapsed .resource-panel-content {
+    display: none;
 }
 
 .resource-panel-header {
     padding: 16px 20px;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--modal-border, #e5e7eb);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -266,7 +284,7 @@
     margin: 0;
     font-size: 1rem;
     font-weight: 600;
-    color: var(--color-text);
+    color: var(--color-gray-900, #111827);
 }
 
 .resource-panel-content {
@@ -463,8 +481,8 @@
     align-items: center;
     justify-content: space-between;
     padding: 16px 24px;
-    border-top: 1px solid var(--color-border);
-    background: var(--color-background-secondary);
+    border-top: 1px solid var(--modal-border, #e5e7eb);
+    background: var(--form-disabled-bg, #f9fafb);
 }
 
 .simulation-status {
@@ -476,7 +494,7 @@
 .status-indicator {
     font-size: 0.9rem;
     font-weight: 500;
-    color: var(--color-text-secondary);
+    color: var(--color-gray-600, #6b7280);
 }
 
 .simulation-actions {

@@ -22,7 +22,7 @@ import logger from './utils/logger.js';
 // import { EthicsMeter, InteractiveButton, InteractiveSlider } from './objects/enhanced-objects.js';
 
 // Import new modal components
-import { PreLaunchModal } from './components/pre-launch-modal.js';
+import PreLaunchModal from './components/pre-launch-modal.js';
 import { EnhancedSimulationModal } from './components/enhanced-simulation-modal.js';
 import { PostSimulationModal } from './components/post-simulation-modal.js';
 import HeroDemo from './components/hero-demo.js';
@@ -108,6 +108,7 @@ class AIEthicsApp {
         
         // UI elements
         this.modal = null;
+        this.enhancedModal = null;
         this.simulationContainer = null;
         this.simulationsGrid = null;
         this.lastFocusedElement = null; // For focus restoration
@@ -923,12 +924,16 @@ class AIEthicsApp {
      * Shows the pre-launch information modal
      */
     showPreLaunchModal(simulationId) {
+        logger.debug('Showing pre-launch modal for:', simulationId);
+        
         const prelaunchModal = new PreLaunchModal(simulationId, {
-            onLaunch: () => {
+            onLaunch: (id) => {
+                logger.debug('Pre-launch modal onLaunch called with:', id);
                 // User clicked "Start Exploration" - proceed with simulation
-                this.launchSimulationDirect(simulationId);
+                this.launchSimulationDirect(id || simulationId);
             },
             onCancel: () => {
+                logger.debug('Pre-launch modal cancelled');
                 // User clicked "Maybe Later" - just close modal
                 this.hideLoading();
             },
@@ -1070,11 +1075,7 @@ class AIEthicsApp {
                 simulationContainer.setAttribute('aria-label', `${simConfig.title} simulation`);
             }
             
-            // Re-initialize enhanced UI objects for this simulation
-            await this.refreshEnhancedObjects();
-            
-            // Update ethics meters with initial values
-            this.updateEthicsMeters();
+            logger.debug('Simulation launched successfully');
               } catch (error) {
             AppDebug.error('Failed to start simulation:', error);
             this.hideLoading();
@@ -1249,19 +1250,63 @@ class AIEthicsApp {
         AppDebug.log('Showing enhanced simulation modal for:', simulationId);
         
         try {
-            const enhancedModal = new EnhancedSimulationModal(simulationId, {
+            // Configure modal options based on simulation type
+            const modalOptions = {
                 simulation: this.currentSimulation,
                 onClose: () => {
                     AppDebug.log('Enhanced modal closed');
+                    this.enhancedModal = null;
                     this.hideModal();
                 },
                 onMinimize: () => {
                     AppDebug.log('Enhanced modal minimized');
                     // Keep simulation running but minimize UI
                 }
-            });
+            };
+
+            // For bias-fairness simulation, optimize for content space
+            if (simulationId === 'bias-fairness') {
+                modalOptions.showResourcePanel = false; // Hide resource panel by default
+                modalOptions.collapseEthicsMeters = true; // Hide ethics meters
+                modalOptions.showTabs = false; // Hide tabs for cleaner interface
+                modalOptions.size = 'large'; // Use large size for more space
+            }
             
-            enhancedModal.show();
+            this.enhancedModal = new EnhancedSimulationModal(simulationId, modalOptions);
+            
+            this.enhancedModal.show();
+            
+            // CRITICAL: Connect the simulation to the enhanced modal's container
+            setTimeout(() => {
+                const enhancedContainer = this.enhancedModal.getSimulationContainer();
+                if (enhancedContainer && this.currentSimulation) {
+                    AppDebug.log('Moving simulation to enhanced modal container');
+                    
+                    // Get the original simulation container content
+                    const originalContainer = document.getElementById('simulation-container');
+                    if (originalContainer) {
+                        // Move all content from original container to enhanced container
+                        while (originalContainer.firstChild) {
+                            enhancedContainer.appendChild(originalContainer.firstChild);
+                        }
+                        
+                        // Update the simulation's container reference
+                        if (this.engine) {
+                            this.engine.container = enhancedContainer;
+                        }
+                        
+                        // If the simulation has a container property, update it
+                        if (this.currentSimulation.container) {
+                            this.currentSimulation.container = enhancedContainer;
+                        }
+                        
+                        // Re-setup the simulation UI in the new container
+                        if (this.currentSimulation.setupUI) {
+                            this.currentSimulation.setupUI();
+                        }
+                    }
+                }
+            }, 100); // Small delay to ensure modal is fully created
             
         } catch (error) {
             AppDebug.error('Failed to show enhanced simulation modal:', error);

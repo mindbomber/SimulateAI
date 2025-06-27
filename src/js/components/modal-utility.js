@@ -33,9 +33,10 @@ class ModalUtility {
         this.element.className = 'modal-backdrop';
         this.element.setAttribute('role', 'dialog');
         this.element.setAttribute('aria-modal', 'true');
-        this.element.setAttribute('aria-hidden', 'true');
         this.element.setAttribute('aria-labelledby', `${this.id}-title`);
         this.element.style.display = 'none';
+        // Use inert instead of aria-hidden for better accessibility
+        this.element.inert = true;
 
         this.element.innerHTML = `
             <div class="modal-dialog">
@@ -90,23 +91,30 @@ class ModalUtility {
         if (this.isOpen) return;
 
         this.isOpen = true;
-        this.element.style.display = 'flex';
-        this.element.setAttribute('aria-hidden', 'false');
         
-        // Add visible class for CSS animation and opacity
+        // Make modal interactable first
+        this.element.inert = false;
+        
+        // Show the modal
+        this.element.style.display = 'flex';
+        
+        // Make the rest of the page non-interactable while modal is open
+        this._setPageInert(true);
+        
+        // Add visible class in next frame for CSS transition
         requestAnimationFrame(() => {
             this.element.classList.add('visible');
         });
         
-        // Focus management
-        requestAnimationFrame(() => {
+        // Focus management - delay to ensure modal is visible and transition started
+        setTimeout(() => {
             const firstFocusable = this.element.querySelector(
                 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
             );
             if (firstFocusable) {
                 firstFocusable.focus();
             }
-        });
+        }, 100);
 
         // Add body class to prevent scrolling
         document.body.style.overflow = 'hidden';
@@ -116,8 +124,21 @@ class ModalUtility {
         if (!this.isOpen) return;
 
         this.isOpen = false;
-        this.element.style.display = 'none';
-        this.element.setAttribute('aria-hidden', 'true');
+        this.element.classList.remove('visible');
+        
+        // Make modal non-interactable
+        this.element.inert = true;
+        
+        // Restore page interactability
+        this._setPageInert(false);
+        
+        // Wait for animation before hiding
+        const animationDuration = 300; // ms
+        setTimeout(() => {
+            if (!this.isOpen) { // Double check in case modal was reopened
+                this.element.style.display = 'none';
+            }
+        }, animationDuration);
         
         // Restore body scrolling
         document.body.style.overflow = '';
@@ -126,6 +147,16 @@ class ModalUtility {
         if (this.onClose && typeof this.onClose === 'function') {
             this.onClose();
         }
+    }
+
+    _setPageInert(inert) {
+        // Get all direct children of body except our modal
+        const bodyChildren = Array.from(document.body.children);
+        bodyChildren.forEach(child => {
+            if (child !== this.element) {
+                child.inert = inert;
+            }
+        });
     }
 
     destroy() {

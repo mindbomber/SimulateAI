@@ -6,7 +6,7 @@
 
 import EthicsSimulation from '../core/simulation.js';
 import logger from '../utils/logger.js';
-import { TIME } from '../utils/constants.js';
+import { TIMING } from '../utils/constants.js';
 
 class BiasExplorerSimulation extends EthicsSimulation {
   constructor(id) {
@@ -121,7 +121,7 @@ class BiasExplorerSimulation extends EthicsSimulation {
         modalBody.style.height = 'auto';
         modalBody.style.maxHeight = 'none';
       }
-    }, TIME.DOM_READY_DELAY);
+    }, TIMING.DOM_READY_DELAY);
     
     // Debug: Check if our elements are visible
     setTimeout(() => {
@@ -178,10 +178,6 @@ class BiasExplorerSimulation extends EthicsSimulation {
     const layout = document.createElement('div');
     layout.className = 'ethics-explorer-layout';
     layout.innerHTML = `
-      <div style="background: red; color: white; padding: 20px; margin: 10px; font-size: 24px; font-weight: bold; border: 5px solid yellow;">
-        🚨 TEST: If you can see this red box, the simulation is working! The UI extends below - scroll down in the modal.
-      </div>
-      
       <header class="explorer-header">
         <h1>AI Ethics Explorer</h1>
         <p class="explorer-subtitle">Explore real-world AI scenarios and see the impact of your choices</p>
