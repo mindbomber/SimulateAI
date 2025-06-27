@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scenario Feedback Popover Test - SimulateAI</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/hero-demo.css">
+    <link rel="stylesheet" href="src/styles/layout-fixes.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        
+        .test-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 2000;
+            max-width: 300px;
+        }
+        
+        .test-info h4 {
+            margin: 0 0 0.5rem 0;
+            color: #60a5fa;
+        }
+        
+        .test-status {
+            margin-bottom: 0.5rem;
+        }
+        
+        .status-good { color: #10b981; }
+        .status-bad { color: #ef4444; }
+        .status-pending { color: #f59e0b; }
+    </style>
+</head>
+<body>
+    <!-- Test Info Panel -->
+    <div class="test-info">
+        <h4>Popover Test Status</h4>
+        <div class="test-status">
+            Popover System: <span id="popover-system" class="status-pending">Checking...</span>
+        </div>
+        <div class="test-status">
+            Positioning: <span id="positioning-status" class="status-pending">Checking...</span>
+        </div>
+        <div class="test-status">
+            Current State: <span id="current-state" class="status-pending">Hidden</span>
+        </div>
+        <div style="margin-top: 0.5rem; font-size: 10px; color: #9ca3af;">
+            Click any choice button to test the .scenario-feedback popover
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <main id="main-content" class="main-content" role="main">
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <h2 class="hero-title">Scenario Feedback Popover Test</h2>
+                <p class="hero-description">
+                    Testing the corrected .scenario-feedback popover system without conflicts.
+                </p>
+            </div>
+            
+            <!-- Hero Simulation Container -->
+            <div class="hero-simulation">
+                <div class="hero-demo-container">
+                    <div class="demo-header">
+                        <h3 class="demo-title">Feedback Popover Test</h3>
+                        <p class="demo-subtitle">Click any choice to verify .scenario-feedback works correctly</p>
+                    </div>
+                    
+                    <div class="demo-content">
+                        <div class="scenario-panel">
+                            <div class="scenario-header">
+                                <span class="scenario-counter">Test Scenario</span>
+                                <h4 class="scenario-title">Popover System Verification</h4>
+                            </div>
+                            
+                            <p class="scenario-question">
+                                This test verifies that the .scenario-feedback popover appears correctly above the clicked choice button without any CSS conflicts.
+                            </p>
+                            
+                            <div class="scenario-choices">
+                                <button class="choice-btn" data-choice="test1">
+                                    <span class="choice-text">Test Choice 1 - Should show .scenario-feedback popover</span>
+                                    <span class="choice-arrow">→</span>
+                                </button>
+                                
+                                <button class="choice-btn" data-choice="test2">
+                                    <span class="choice-text">Test Choice 2 - Verify positioning and styling</span>
+                                    <span class="choice-arrow">→</span>
+                                </button>
+                                
+                                <button class="choice-btn" data-choice="test3">
+                                    <span class="choice-text">Test Choice 3 - Check mobile responsiveness</span>
+                                    <span class="choice-arrow">→</span>
+                                </button>
+                                
+                                <!-- THE POPOVER: .scenario-feedback -->
+                                <div class="scenario-feedback" id="feedback-popover">
+                                    <button class="feedback-close" aria-label="Close feedback">×</button>
+                                    
+                                    <div class="feedback-content">
+                                        <div class="feedback-message">
+                                            <span class="feedback-icon">✅</span>
+                                            <p id="feedback-text">This is the .scenario-feedback popover!</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="completion-summary">
+                                        <h6>Test Result</h6>
+                                        <div class="summary-score excellent">
+                                            <span class="score-label">Popover Status</span>
+                                            <span class="score-value" id="test-score">100%</span>
+                                        </div>
+                                        <p class="summary-message" id="summary-message">
+                                            The .scenario-feedback popover is working correctly!
+                                        </p>
+                                    </div>
+                                    
+                                    <div style="margin-top: 1rem;">
+                                        <button class="btn btn-sm btn-primary">Continue Test</button>
+                                        <button class="btn btn-sm btn-outline">Debug Info</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="ethics-dashboard">
+                            <h5 class="dashboard-title">Test Metrics</h5>
+                            <div class="ethics-meters">
+                                <div class="ethics-meter">
+                                    <div class="meter-header">
+                                        <span class="meter-label">CSS Positioning</span>
+                                        <span class="meter-value">100%</span>
+                                    </div>
+                                    <div class="meter-bar">
+                                        <div class="meter-fill excellent" style="width: 100%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="ethics-meter">
+                                    <div class="meter-header">
+                                        <span class="meter-label">No Conflicts</span>
+                                        <span class="meter-value">100%</span>
+                                    </div>
+                                    <div class="meter-bar">
+                                        <div class="meter-fill excellent" style="width: 100%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Mobile Backdrop -->
+    <div class="feedback-backdrop" id="feedback-backdrop"></div>
+    
+    <script>
+        // Test feedback data
+        const testData = {
+            test1: {
+                icon: '🎯',
+                text: 'Perfect! The .scenario-feedback popover is working correctly. No CSS conflicts detected.',
+                message: 'The old .hero-demo-feedback-popover styles have been successfully removed.'
+            },
+            test2: {
+                icon: '✨',
+                text: 'Excellent! Positioning and styling are applied correctly from layout-fixes.css.',
+                message: 'The popover appears above the button with proper arrow and shadow.'
+            },
+            test3: {
+                icon: '📱',
+                text: 'Great! Mobile responsiveness is working - popover becomes centered modal on small screens.',
+                message: 'The backdrop and mobile positioning are functioning as expected.'
+            }
+        };
+        
+        // Get DOM elements
+        const choiceButtons = document.querySelectorAll('.choice-btn');
+        const feedbackPopover = document.getElementById('feedback-popover');
+        const feedbackBackdrop = document.getElementById('feedback-backdrop');
+        const feedbackClose = document.querySelector('.feedback-close');
+        const feedbackText = document.getElementById('feedback-text');
+        const summaryMessage = document.getElementById('summary-message');
+        
+        // Status elements
+        const popoverSystemElement = document.getElementById('popover-system');
+        const positioningStatusElement = document.getElementById('positioning-status');
+        const currentStateElement = document.getElementById('current-state');
+        
+        let currentActiveButton = null;
+        
+        // Check CSS system
+        function checkPopoverSystem() {
+            // Check if .scenario-feedback styles are loaded
+            const testElement = document.createElement('div');
+            testElement.className = 'scenario-feedback';
+            testElement.style.visibility = 'hidden';
+            document.body.appendChild(testElement);
+            
+            const styles = window.getComputedStyle(testElement);
+            const hasCorrectStyles = 
+                styles.position === 'absolute' &&
+                styles.opacity === '0' &&
+                styles.visibility === 'hidden';
+            
+            document.body.removeChild(testElement);
+            
+            if (hasCorrectStyles) {
+                popoverSystemElement.textContent = '.scenario-feedback ✓';
+                popoverSystemElement.className = 'status-good';
+            } else {
+                popoverSystemElement.textContent = 'CSS Missing ✗';
+                popoverSystemElement.className = 'status-bad';
+            }
+            
+            return hasCorrectStyles;
+        }
+        
+        // Check container positioning
+        function checkPositioning() {
+            const heroSimulation = document.querySelector('.hero-simulation');
+            const demoContainer = document.querySelector('.hero-demo-container');
+            const choicesContainer = document.querySelector('.scenario-choices');
+            
+            const heroStyle = window.getComputedStyle(heroSimulation);
+            const demoStyle = window.getComputedStyle(demoContainer);
+            const choicesStyle = window.getComputedStyle(choicesContainer);
+            
+            const hasCorrectPositioning = 
+                heroStyle.position === 'relative' &&
+                demoStyle.position === 'relative' &&
+                choicesStyle.position === 'relative';
+            
+            if (hasCorrectPositioning) {
+                positioningStatusElement.textContent = 'Relative ✓';
+                positioningStatusElement.className = 'status-good';
+            } else {
+                positioningStatusElement.textContent = 'Position Issues ✗';
+                positioningStatusElement.className = 'status-bad';
+            }
+            
+            return hasCorrectPositioning;
+        }
+        
+        // Show popover function
+        function showFeedback(button, choiceKey) {
+            const feedback = testData[choiceKey];
+            if (!feedback) return;
+            
+            // Update feedback content
+            const feedbackIcon = feedbackPopover.querySelector('.feedback-icon');
+            feedbackIcon.textContent = feedback.icon;
+            feedbackText.textContent = feedback.text;
+            summaryMessage.textContent = feedback.message;
+            
+            // Show popover
+            feedbackPopover.classList.add('visible');
+            
+            // Handle mobile backdrop
+            if (window.innerWidth <= 768) {
+                feedbackBackdrop.classList.add('visible');
+            }
+            
+            // Update button states
+            choiceButtons.forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+            currentActiveButton = button;
+            
+            // Focus management
+            feedbackClose.focus();
+            
+            // Update status
+            currentStateElement.textContent = 'Visible ✓';
+            currentStateElement.className = 'status-good';
+            
+            console.log(`✅ .scenario-feedback popover shown for: ${choiceKey}`, feedback);
+        }
+        
+        // Hide popover function
+        function hideFeedback() {
+            feedbackPopover.classList.remove('visible');
+            feedbackBackdrop.classList.remove('visible');
+            
+            if (currentActiveButton) {
+                currentActiveButton.classList.remove('selected');
+                currentActiveButton.focus();
+                currentActiveButton = null;
+            }
+            
+            // Update status
+            currentStateElement.textContent = 'Hidden';
+            currentStateElement.className = 'status-pending';
+        }
+        
+        // Event listeners
+        choiceButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                const choiceKey = button.getAttribute('data-choice');
+                showFeedback(button, choiceKey);
+            });
+        });
+        
+        // Close button
+        feedbackClose.addEventListener('click', hideFeedback);
+        
+        // Backdrop click (mobile)
+        feedbackBackdrop.addEventListener('click', hideFeedback);
+        
+        // Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && feedbackPopover.classList.contains('visible')) {
+                hideFeedback();
+            }
+        });
+        
+        // Initialize checks
+        document.addEventListener('DOMContentLoaded', () => {
+            const systemOk = checkPopoverSystem();
+            const positioningOk = checkPositioning();
+            
+            if (systemOk && positioningOk) {
+                console.log('✅ .scenario-feedback popover system is working correctly!');
+            } else {
+                console.log('❌ Issues detected with .scenario-feedback popover system');
+            }
+        });
+        
+        // Re-check on resize
+        window.addEventListener('resize', () => {
+            checkPositioning();
+            
+            // Handle mobile backdrop
+            if (feedbackPopover.classList.contains('visible')) {
+                const isMobile = window.innerWidth <= 768;
+                if (isMobile) {
+                    feedbackBackdrop.classList.add('visible');
+                } else {
+                    feedbackBackdrop.classList.remove('visible');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

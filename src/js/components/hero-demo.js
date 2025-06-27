@@ -91,16 +91,9 @@ class HeroDemo {    constructor() {
                         
                         <div class="scenario-choices" id="demo-choices">
                             ${this.renderChoices(0)}
-                        </div>
-                        
-                        <div class="scenario-feedback" id="demo-feedback" style="display: none;">
-                            <div class="feedback-content" id="feedback-content"></div>
-                            <button class="btn btn-primary btn-sm" id="next-scenario-btn" style="display: none;">
-                                Next Scenario →
-                            </button>
-                            <button class="btn btn-secondary btn-sm" id="try-full-simulation" style="display: none;">
-                                Try Full Simulation
-                            </button>
+                            <div class="scenario-feedback" id="demo-feedback" style="display: none;">
+                                <button class="feedback-close" id="feedback-close-btn" aria-label="Close feedback">×</button>
+                            </div>
                         </div>
                     </div>
                     
@@ -115,6 +108,16 @@ class HeroDemo {    constructor() {
                         </div>
                     </div>
                 </div>
+                
+                <!-- Action buttons positioned in bottom right corner -->
+                <div class="demo-actions">
+                    <button class="btn btn-secondary btn-sm" id="next-scenario-btn" style="display: none;">
+                        Next Scenario →
+                    </button>
+                    <button class="btn btn-primary btn-sm" id="try-full-simulation" style="display: none;">
+                        Try Full Simulation
+                    </button>
+                </div>
             </div>
         `;
           this.attachEventListeners();
@@ -123,12 +126,20 @@ class HeroDemo {    constructor() {
     }
 
     renderChoices(scenarioIndex) {
-        return this.scenarios[scenarioIndex].choices.map((choice, index) => `
-            <button class="choice-btn" data-choice="${index}" data-scenario="${scenarioIndex}">
-                <span class="choice-text">${choice.text}</span>
-                <span class="choice-arrow">→</span>
-            </button>
-        `).join('');
+        // Check if there's already a selection for this scenario
+        const existingChoice = this.userChoices.find(c => c.scenario === scenarioIndex);
+        
+        return this.scenarios[scenarioIndex].choices.map((choice, index) => {
+            const isSelected = existingChoice && existingChoice.choice === index;
+            const selectedClass = isSelected ? ' selected' : '';
+            
+            return `
+                <button class="choice-btn${selectedClass}" data-choice="${index}" data-scenario="${scenarioIndex}">
+                    <span class="choice-text">${choice.text}</span>
+                    <span class="choice-arrow">→</span>
+                </button>
+            `;
+        }).join('');
     }
 
     renderEthicsMeters() {
@@ -162,6 +173,8 @@ class HeroDemo {    constructor() {
                 this.nextScenario();
             } else if (e.target.id === 'try-full-simulation') {
                 this.launchFullSimulation();
+            } else if (e.target.id === 'feedback-close-btn' || e.target.closest('#feedback-close-btn')) {
+                this.closeFeedback();
             }
         });
 
@@ -181,28 +194,34 @@ class HeroDemo {    constructor() {
         const scenarioIndex = parseInt(choiceBtn.dataset.scenario);
         const choice = this.scenarios[scenarioIndex].choices[choiceIndex];
         
-        // Store user choice
-        this.userChoices.push({
+        // Remove previous selection styling
+        const allChoices = this.container.querySelectorAll('.choice-btn');
+        allChoices.forEach(btn => {
+            btn.classList.remove('selected');
+        });
+        
+        // Highlight current selection
+        choiceBtn.classList.add('selected');
+        
+        // Store current choice for this scenario (replace if exists)
+        const existingChoiceIndex = this.userChoices.findIndex(c => c.scenario === scenarioIndex);
+        const choiceData = {
             scenario: scenarioIndex,
             choice: choiceIndex,
             text: choice.text
-        });
+        };
+        
+        if (existingChoiceIndex >= 0) {
+            this.userChoices[existingChoiceIndex] = choiceData;
+        } else {
+            this.userChoices.push(choiceData);
+        }
 
-        // Update ethics scores with animation
-        this.updateEthicsScores(choice.impact);
+        // Update ethics scores to reflect current choice (not additive)
+        this.updateEthicsScoresForChoice(choice.impact, scenarioIndex);
         
         // Show feedback
         this.showFeedback(choice.feedback, scenarioIndex);
-        
-        // Disable all choice buttons
-        const allChoices = this.container.querySelectorAll('.choice-btn');
-        allChoices.forEach(btn => {
-            btn.disabled = true;
-            btn.classList.add('disabled');
-        });
-        
-        // Highlight selected choice
-        choiceBtn.classList.add('selected');
         
         // Track analytics
         if (window.AnalyticsManager) {
@@ -223,6 +242,38 @@ class HeroDemo {    constructor() {
             
             // Animate the change
             this.animateScoreChange(category, oldScore, newScore, change);
+        });
+    }
+
+    updateEthicsScoresForChoice(_impact, _scenarioIndex) {
+        // Calculate ethics scores based on all current user choices
+        // Start with base scores of 50 for each category
+        const baseScores = {
+            fairness: 50,
+            transparency: 50,
+            accountability: 50
+        };
+        
+        // Apply impact from all current choices
+        const calculatedScores = { ...baseScores };
+        this.userChoices.forEach(userChoice => {
+            const scenario = this.scenarios[userChoice.scenario];
+            const choice = scenario.choices[userChoice.choice];
+            
+            Object.entries(choice.impact).forEach(([category, change]) => {
+                calculatedScores[category] = Math.max(0, Math.min(100, calculatedScores[category] + change));
+            });
+        });
+        
+        // Animate changes to the new calculated scores
+        Object.entries(calculatedScores).forEach(([category, newScore]) => {
+            const oldScore = this.ethicsScores[category];
+            this.ethicsScores[category] = newScore;
+            
+            if (oldScore !== newScore) {
+                const change = newScore - oldScore;
+                this.animateScoreChange(category, oldScore, newScore, change);
+            }
         });
     }
 
@@ -275,44 +326,59 @@ class HeroDemo {    constructor() {
 
     showFeedback(message, scenarioIndex) {
         const feedbackEl = document.getElementById('demo-feedback');
-        const contentEl = document.getElementById('feedback-content');
         const nextBtn = document.getElementById('next-scenario-btn');
         const tryFullBtn = document.getElementById('try-full-simulation');
         
-        contentEl.innerHTML = `
+        feedbackEl.innerHTML = `
+            <button class="feedback-close" id="feedback-close-btn" aria-label="Close feedback">×</button>
             <div class="feedback-message">
                 <span class="feedback-icon">💭</span>
                 <p>${message}</p>
             </div>
         `;
         
+        // Show popover with proper animation
         feedbackEl.style.display = 'block';
+        feedbackEl.classList.add('visible');
         
         // Show appropriate next action button
-        if (scenarioIndex < this.scenarios.length - 1) {
-            nextBtn.style.display = 'inline-block';
-            tryFullBtn.style.display = 'none';
-        } else {
-            nextBtn.style.display = 'none';
-            tryFullBtn.style.display = 'inline-block';
-            
-            // Show completion summary
-            this.showCompletionSummary();
+        if (nextBtn && tryFullBtn) {
+            if (scenarioIndex < this.scenarios.length - 1) {
+                nextBtn.style.display = 'inline-block';
+                tryFullBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'none';
+                tryFullBtn.style.display = 'inline-block';
+                
+                // Show completion summary
+                this.showCompletionSummary();
+            }
         }
         
         // Scroll feedback into view
         feedbackEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
+    closeFeedback() {
+        const feedbackEl = document.getElementById('demo-feedback');
+        if (feedbackEl) {
+            feedbackEl.classList.remove('visible');
+            // Hide after animation completes
+            setTimeout(() => {
+                feedbackEl.style.display = 'none';
+            }, 400); // Match the CSS transition duration
+        }
+    }
+
     showCompletionSummary() {
-        const contentEl = document.getElementById('feedback-content');
+        const feedbackEl = document.getElementById('demo-feedback');
         const avgScore = Math.round(
             Object.values(this.ethicsScores).reduce((a, b) => a + b, 0) / 3
         );
         
         const summaryClass = avgScore >= 70 ? 'excellent' : avgScore >= 50 ? 'good' : 'needs-improvement';
         
-        contentEl.innerHTML += `
+        feedbackEl.innerHTML += `
             <div class="completion-summary">
                 <h6>Demo Complete!</h6>
                 <div class="summary-score ${summaryClass}">
@@ -339,8 +405,34 @@ class HeroDemo {    constructor() {
             document.getElementById('demo-question').textContent = scenario.question;
             document.getElementById('demo-choices').innerHTML = this.renderChoices(this.currentScenario);
             
-            // Hide feedback
-            document.getElementById('demo-feedback').style.display = 'none';
+            // Re-add the feedback container since innerHTML replaced it
+            const choicesContainer = document.getElementById('demo-choices');
+            if (!document.getElementById('demo-feedback')) {
+                const feedbackEl = document.createElement('div');
+                feedbackEl.className = 'scenario-feedback';
+                feedbackEl.id = 'demo-feedback';
+                feedbackEl.style.display = 'none';
+                feedbackEl.innerHTML = '<button class="feedback-close" id="feedback-close-btn" aria-label="Close feedback">×</button>';
+                choicesContainer.appendChild(feedbackEl);
+            }
+            
+            // Hide feedback initially
+            const feedbackEl = document.getElementById('demo-feedback');
+            if (feedbackEl) {
+                feedbackEl.style.display = 'none';
+                feedbackEl.classList.remove('visible');
+            }
+            
+            // Check if user has already made a choice for this scenario
+            const existingChoice = this.userChoices.find(c => c.scenario === this.currentScenario);
+            if (existingChoice) {
+                // Show the feedback for the existing choice
+                const choice = scenario.choices[existingChoice.choice];
+                this.showFeedback(choice.feedback, this.currentScenario);
+            }
+            
+            // Re-attach event listeners for the new buttons
+            this.attachEventListeners();
         }
     }
 

@@ -122,12 +122,17 @@
     width: 100%;
     min-height: 400px;
     height: auto;
+    position: relative; /* Required for popover positioning */
+    overflow: visible; /* Allow popovers to extend outside */
+    z-index: 1; /* Ensure proper stacking context */
 }
 
 @media (max-width: 767px) {
     .main-content .hero .hero-simulation {
         padding: var(--spacing-2);
         min-height: 350px;
+        position: relative; /* Maintain positioning for popover */
+        overflow: visible; /* Allow popovers to extend outside */
     }
 }
 
@@ -135,6 +140,8 @@
     .main-content .hero .hero-simulation {
         padding: var(--spacing-4);
         min-height: 450px;
+        position: relative; /* Maintain positioning for popover */
+        overflow: visible; /* Allow popovers to extend outside */
     }
 }
 
@@ -142,6 +149,8 @@
     .main-content .hero .hero-simulation {
         padding: var(--spacing-6);
         min-height: 500px;
+        position: relative; /* Maintain positioning for popover */
+        overflow: visible; /* Allow popovers to extend outside */
     }
 }
 
@@ -168,6 +177,9 @@
     margin: 0 auto;
     height: 100%;
     min-height: 380px;
+    position: relative; /* Required for popover positioning */
+    overflow: visible; /* Allow popovers to extend outside */
+    z-index: 2; /* Higher than hero-simulation for proper stacking */
 }
 
 /* Enhanced demo header with higher specificity */
@@ -254,6 +266,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
+    position: relative; /* Required for popover positioning */
 }
 
 /* Choice buttons with enhanced specificity */
@@ -406,208 +419,88 @@
     transform: translateY(-1px);
 }
 
-/* Hero Demo Feedback Popover Styles with enhanced specificity */
-.main-content .hero-demo-feedback-popover,
-#app .hero-demo-feedback-popover {
-    font-family: var(--font-family-primary, 'Segoe UI', sans-serif);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
+/* Demo Actions positioned in bottom right corner - Enhanced specificity */
+.main-content .demo-actions,
+#app .demo-actions {
     position: absolute;
-    z-index: 1000;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    z-index: 100;
 }
 
-/* Enhanced popover styling for better visual appeal */
-.main-content .hero-demo-feedback-popover,
-#app .hero-demo-feedback-popover {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    box-shadow: 
-        0 8px 25px rgba(0, 0, 0, 0.15),
-        0 3px 10px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    transition: all 0.3s ease;
+.main-content .demo-actions .btn,
+#app .demo-actions .btn {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
 }
 
-.main-content .hero-demo-feedback-popover:hover,
-#app .hero-demo-feedback-popover:hover {
-    box-shadow: 
-        0 12px 35px rgba(0, 0, 0, 0.2),
-        0 5px 15px rgba(0, 0, 0, 0.15);
-    transform: translateX(-50%) translateY(-2px);
+.main-content .demo-actions .btn:hover,
+#app .demo-actions .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Popover text styling */
-.main-content .hero-demo-feedback-popover p,
-#app .hero-demo-feedback-popover p {
-    color: #4a5568;
-    font-weight: 400;
-    margin: 0;
+.main-content .demo-actions .btn-primary,
+#app .demo-actions .btn-primary {
+    background: var(--color-primary, #3b82f6);
+    color: white;
+    border: none;
 }
 
-.main-content .hero-demo-feedback-popover .feedback-icon,
-#app .hero-demo-feedback-popover .feedback-icon {
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+.main-content .demo-actions .btn-primary:hover,
+#app .demo-actions .btn-primary:hover {
+    background: var(--color-primary-dark, #2563eb);
 }
 
-/* Responsive popover adjustments */
-@media (max-width: 480px) {
-    .main-content .hero-demo-feedback-popover,
-    #app .hero-demo-feedback-popover {
-        width: 95%;
-        max-width: 280px;
-        padding: 12px;
-        font-size: 0.8rem;
-        left: 50%;
-        transform: translateX(-50%);
-        margin-top: 8px;
-    }
+.main-content .demo-actions .btn-secondary,
+#app .demo-actions .btn-secondary {
+    background: white;
+    color: var(--color-gray-700, #374151);
+    border: 1px solid var(--color-gray-300, #d1d5db);
 }
 
-@media (min-width: 481px) and (max-width: 768px) {
-    .main-content .hero-demo-feedback-popover,
-    #app .hero-demo-feedback-popover {
-        max-width: 320px;
-        padding: 14px;
-        font-size: 0.85rem;
-    }
+.main-content .demo-actions .btn-secondary:hover,
+#app .demo-actions .btn-secondary:hover {
+    background: var(--color-gray-50, #f9fafb);
+    border-color: var(--color-gray-400, #9ca3af);
 }
 
-/* Ensure popover is positioned correctly */
-.main-content .ethics-panel,
-#app .ethics-panel {
-    position: relative;
-}
-
-/* Popover arrow styling with enhanced specificity */
-.main-content .hero-demo-feedback-popover::before,
-#app .hero-demo-feedback-popover::before {
-    content: '';
-    position: absolute;
-    top: -9px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 9px solid transparent;
-    border-right: 9px solid transparent;
-    border-bottom: 9px solid rgba(0, 0, 0, 0.1);
-}
-
-.main-content .hero-demo-feedback-popover::after,
-#app .hero-demo-feedback-popover::after {
-    content: '';
-    position: absolute;
-    top: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-bottom: 8px solid white;
-}
-
-/* Responsive adjustments for smaller screens */
-@media (max-width: 767px) {
-    .main-content .hero-demo-container,
-    #app .hero-demo-container {
-        padding: 0.75rem;
-        min-height: 320px;
-    }
-    
-    .main-content .demo-content,
-    #app .demo-content {
-        gap: 0.75rem;
-    }
-    
-    .main-content .scenario-panel,
-    .main-content .ethics-panel,
-    #app .scenario-panel,
-    #app .ethics-panel {
-        padding: 0.75rem;
-    }
-    
-    .main-content .demo-title,
-    #app .demo-title {
-        font-size: 1rem;
-    }
-    
-    .main-content .demo-subtitle,
-    #app .demo-subtitle {
-        font-size: 0.75rem;
-    }
-    
-    .main-content .scenario-title,
-    #app .scenario-title {
-        font-size: 0.9rem;
-    }
-    
-    .main-content .scenario-question,
-    #app .scenario-question {
-        font-size: 0.8rem;
-    }
-    
-    .main-content .choice-btn,
-    #app .choice-btn {
-        padding: 0.4rem 0.6rem;
-        font-size: 0.7rem;
-    }
-    
-    .main-content .choice-text,
-    #app .choice-text {
-        margin-bottom: 0.1rem;
-    }
-    
-    .main-content .choice-impact,
-    #app .choice-impact {
-        font-size: 0.6rem;
-    }
-    
-    .main-content .ethics-title,
-    #app .ethics-title {
-        font-size: 0.9rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    .main-content .ethics-meters,
-    #app .ethics-meters {
+/* Responsive adjustments for demo actions */
+@media (max-width: 768px) {
+    .main-content .demo-actions,
+    #app .demo-actions {
+        bottom: 1rem;
+        right: 1rem;
         gap: 0.5rem;
-        margin-bottom: 0.75rem;
     }
     
-    .main-content .meter-label,
-    .main-content .meter-value,
-    #app .meter-label,
-    #app .meter-value {
-        font-size: 0.7rem;
-    }
-    
-    .main-content .demo-cta,
-    #app .demo-cta {
-        padding: 0.4rem 0.6rem;
-        font-size: 0.75rem;
+    .main-content .demo-actions .btn,
+    #app .demo-actions .btn {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.75rem;
     }
 }
 
-/* Ensure proper stacking for mobile */
-@media (max-width: 767px) {
-    .main-content .hero-demo-feedback-popover,
-    #app .hero-demo-feedback-popover {
-        position: fixed;
-        top: auto;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        margin-top: 0;
-        z-index: 2000;
-        max-width: calc(100vw - 40px);
+@media (max-width: 480px) {
+    .main-content .demo-actions,
+    #app .demo-actions {
+        bottom: 0.75rem;
+        right: 0.75rem;
+        flex-direction: column;
+        gap: 0.4rem;
     }
     
-    /* Hide arrow on mobile and use bottom positioning */
-    .main-content .hero-demo-feedback-popover::before,
-    .main-content .hero-demo-feedback-popover::after,
-    #app .hero-demo-feedback-popover::before,
-    #app .hero-demo-feedback-popover::after {
-        display: none;
+    .main-content .demo-actions .btn,
+    #app .demo-actions .btn {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.6rem;
     }
 }
 
