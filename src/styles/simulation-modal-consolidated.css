@@ -153,10 +153,12 @@
 /* Pre-launch modal specific styles */
 #simulation-modal.pre-launch-modal .modal-body {
     padding: 0 !important;
+    overflow: visible !important; /* Ensure content is not clipped */
 }
 
 #simulation-modal.pre-launch-modal .modal-dialog {
     max-width: 800px;
+    overflow: visible !important; /* Prevent dialog content clipping */
 }
 
 /* Ethics explorer specific styles */
@@ -212,3 +214,43 @@
     border: 1px solid red !important;
 }
 */
+
+/* ===== RENDERER-SPECIFIC MODAL FIXES ===== */
+/* Prevent renderer CSS conflicts with modal visibility */
+
+/* SVG Renderer: Override injected overflow hidden */
+#simulation-modal .simulation-container .svg-renderer {
+    overflow: visible !important;
+}
+
+/* Canvas/WebGL Renderer: Ensure proper sizing within modals */
+#simulation-modal .simulation-container canvas {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+}
+
+/* WebGL-specific context fixes */
+#simulation-modal .simulation-container canvas[data-engine="webgl"] {
+    display: block !important;
+    touch-action: manipulation !important;
+}
+
+/* Renderer accessibility elements within modals */
+#simulation-modal .screen-reader-only {
+    position: absolute !important;
+    left: -10000px !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+}
+
+/* Ensure renderer focus indicators work in modals */
+#simulation-modal .svg-renderer:focus,
+#simulation-modal canvas:focus {
+    outline: 2px solid var(--color-primary, #007acc) !important;
+    outline-offset: 2px !important;
+}

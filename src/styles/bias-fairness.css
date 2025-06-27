@@ -349,12 +349,21 @@
   background: rgba(0, 124, 186, 0.05);
 }
 
-.tab-content {
-  display: none;
+/* Bias simulation specific tab content - properly show active tabs by default */
+.bias-simulation-container .tab-content {
+  display: block; /* Show by default */
 }
 
-.tab-content.active {
-  display: block;
+.bias-simulation-container .tab-content:not(.active) {
+  display: none; /* Only hide non-active tabs */
+}
+
+.bias-fairness-modal .tab-content {
+  display: block; /* Show by default */
+}
+
+.bias-fairness-modal .tab-content:not(.active) {
+  display: none; /* Only hide non-active tabs */
 }
 
 /* Enhanced Controls */

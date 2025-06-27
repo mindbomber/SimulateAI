@@ -136,7 +136,8 @@
     line-height: 1;
 }
 
-.modal-body {
+/* Modal body - scoped to avoid conflicts with pre-launch and other specific modals */
+.modal-backdrop:not(.pre-launch-modal) .modal-body {
     padding: var(--spacing-5, 20px);
     overflow-y: auto;
     max-height: 60vh;

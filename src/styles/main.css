@@ -588,18 +588,7 @@ body {
     object-fit: contain;
 }
 
-.simulation-container {
-    flex: 1;
-    overflow: auto;
-    position: relative;
-    background: var(--color-gray-50);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 400px;
-}
-
-/* Consolidate simulation container styles */
+/* Consolidated simulation container styles */
 .simulation-container {
     flex: 1;
     overflow: auto;

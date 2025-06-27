@@ -93,6 +93,11 @@ class ModalUtility {
         this.element.style.display = 'flex';
         this.element.setAttribute('aria-hidden', 'false');
         
+        // Add visible class for CSS animation and opacity
+        requestAnimationFrame(() => {
+            this.element.classList.add('visible');
+        });
+        
         // Focus management
         requestAnimationFrame(() => {
             const firstFocusable = this.element.querySelector(

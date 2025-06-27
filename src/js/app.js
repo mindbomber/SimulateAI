@@ -1236,6 +1236,11 @@ class AIEthicsApp {
         this.modal.setAttribute('aria-hidden', 'false');
         this.modal.style.display = 'flex';
         
+        // Add visible class for CSS opacity transition
+        requestAnimationFrame(() => {
+            this.modal.classList.add('visible');
+        });
+        
         // Make background content inert
         const mainContent = document.getElementById('main-content');
         if (mainContent) {
@@ -1322,6 +1327,7 @@ class AIEthicsApp {
             // Make modal inert and hide it
             this.modal.setAttribute('inert', '');
             this.modal.setAttribute('aria-hidden', 'true');
+            this.modal.classList.remove('visible');
             this.modal.style.display = 'none';
             
             // Remove inert from main content
