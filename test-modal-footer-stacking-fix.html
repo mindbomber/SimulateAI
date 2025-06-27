@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Footer Stacking Fix Test</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <style>
+        .test-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .test-controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .debug-info {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            border: 1px solid #b6d7ff;
+        }
+        /* Test modal styles to visualize structure */
+        .debug-modal .modal-dialog {
+            border: 3px solid #ff6b6b !important;
+        }
+        .debug-modal .modal-header {
+            border: 2px solid #4ecdc4 !important;
+            background: #e8fffe !important;
+        }
+        .debug-modal .modal-body {
+            border: 2px solid #45b7d1 !important;
+            background: #f0f9ff !important;
+        }
+        .debug-modal .modal-footer {
+            border: 2px solid #f7b801 !important;
+            background: #fffbf0 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Modal Footer Stacking Fix Test</h1>
+        <p>Testing the flexbox layout fixes for proper modal header/body/footer stacking</p>
+        
+        <div class="test-section">
+            <h2>Modal Layout Tests</h2>
+            <div class="test-controls">
+                <button id="test-short-content" class="btn btn-primary">Short Content Modal</button>
+                <button id="test-long-content" class="btn btn-primary">Long Content Modal</button>
+                <button id="test-many-buttons" class="btn btn-primary">Many Buttons Modal</button>
+                <button id="test-debug-modal" class="btn btn-secondary">Debug Modal (Colored Borders)</button>
+            </div>
+            
+            <div class="debug-info">
+                <strong>Expected Modal Structure:</strong><br>
+                📦 .modal-backdrop (flex container)<br>
+                &nbsp;&nbsp;└── 📦 .modal-dialog (flex column)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── 📋 .modal-header (flex-shrink: 0)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── 📄 .modal-body (flex: 1, overflow-y: auto)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── 🔘 .modal-footer (flex-shrink: 0)
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Layout Verification Points</h2>
+            <ul>
+                <li>✅ Modal header should never be clipped</li>
+                <li>✅ Modal footer should always be visible and stuck to bottom</li>
+                <li>✅ Modal body should scroll when content overflows</li>
+                <li>✅ Footer buttons should be accessible even with overflow</li>
+                <li>✅ Modal should not exceed viewport height</li>
+            </ul>
+        </div>
+    </div>
+
+    <script type="module">
+        import ModalUtility from './src/js/components/modal-utility.js';
+
+        function createTestModal(title, content, footerContent, debugMode = false) {
+            const modal = new ModalUtility({
+                title,
+                content,
+                footer: footerContent,
+                closeOnBackdrop: true,
+                closeOnEscape: true
+            });
+
+            if (debugMode) {
+                modal.element.classList.add('debug-modal');
+            }
+
+            modal.open();
+            
+            // Log modal structure for debugging
+            console.log('Modal Structure:', {
+                backdrop: modal.element,
+                dialog: modal.element.querySelector('.modal-dialog'),
+                header: modal.element.querySelector('.modal-header'),
+                body: modal.element.querySelector('.modal-body'),
+                footer: modal.element.querySelector('.modal-footer')
+            });
+
+            return modal;
+        }
+
+        // Short content modal
+        document.getElementById('test-short-content').addEventListener('click', () => {
+            createTestModal(
+                'Short Content Test',
+                '<p>This is a modal with minimal content to test footer positioning.</p>',
+                '<button class="btn btn-secondary modal-button">Cancel</button><button class="btn btn-primary modal-button">OK</button>'
+            );
+        });
+
+        // Long content modal
+        document.getElementById('test-long-content').addEventListener('click', () => {
+            const longContent = Array(50).fill('<p>This is a long paragraph to test scrolling behavior in the modal body. The footer should remain visible and sticky at the bottom even when the body content overflows.</p>').join('\\n');
+            
+            createTestModal(
+                'Long Content Test - Body Should Scroll',
+                longContent,
+                '<button class="btn btn-secondary modal-button">Cancel</button><button class="btn btn-primary modal-button">Save</button>'
+            );
+        });
+
+        // Many buttons modal
+        document.getElementById('test-many-buttons').addEventListener('click', () => {
+            const manyButtons = Array(10).fill(0).map((_, i) => 
+                `<button class="btn btn-outline modal-button">Button ${i + 1}</button>`
+            ).join('');
+            
+            createTestModal(
+                'Many Buttons Test - Footer Should Handle Overflow',
+                '<p>This modal tests footer overflow behavior with many buttons.</p><p>The footer should scroll horizontally if needed while remaining stuck to the bottom.</p>',
+                manyButtons
+            );
+        });
+
+        // Debug modal with colored borders
+        document.getElementById('test-debug-modal').addEventListener('click', () => {
+            const debugContent = `
+                <p>This modal has colored borders to visualize the layout structure:</p>
+                <ul>
+                    <li>🔴 Red: .modal-dialog container</li>
+                    <li>🟢 Teal: .modal-header</li>
+                    <li>🔵 Blue: .modal-body</li>
+                    <li>🟡 Yellow: .modal-footer</li>
+                </ul>
+                <p>Check that each section is properly contained and the footer doesn't overlap or get clipped.</p>
+            `;
+            
+            createTestModal(
+                'Debug Modal - Visual Structure',
+                debugContent,
+                '<button class="btn btn-info modal-button">Inspect</button><button class="btn btn-success modal-button">Looks Good</button>',
+                true // Enable debug mode
+            );
+        });
+
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            console.log('Modal Footer Stacking Fix Test loaded. Click buttons to test different scenarios.');
+        });
+    </script>
+</body>
+</html>

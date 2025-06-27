@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Launch Modal Tab Fix Test</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/advanced-ui-components.css">
+    <link rel="stylesheet" href="src/styles/pre-launch-modal.css">
+    <style>
+        body {
+            padding: 20px;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        
+        .test-button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .test-button:hover {
+            background: #0b7dda;
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pre-Launch Modal Tab Fix Test</h1>
+    
+    <div class="test-section">
+        <h2>Tab Switching Test</h2>
+        <p>Testing the fixed tab switching functionality in the pre-launch modal.</p>
+        <div id="tab-test-status" class="status info">Ready to test...</div>
+        <button class="test-button" onclick="testTabSwitching()">Test Tab Switching</button>
+        <button class="test-button" onclick="testErrorHandling()">Test Error Handling</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Modal Integration Test</h2>
+        <p>Testing the complete pre-launch modal functionality.</p>
+        <div id="modal-test-status" class="status info">Ready to test...</div>
+        <button class="test-button" onclick="testModalIntegration()">Test Modal Integration</button>
+    </div>
+    
+    <!-- Test Pre-Launch Modal Structure -->
+    <div id="test-pre-launch-modal" class="modal-backdrop pre-launch-modal" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">Pre-Launch Test Modal</h3>
+                <button class="modal-close" onclick="closeTestModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <!-- Tab Navigation -->
+                <div class="pre-launch-tabs">
+                    <button class="tab-button active" data-tab="overview" aria-selected="true">Overview</button>
+                    <button class="tab-button" data-tab="objectives" aria-selected="false">Objectives</button>
+                    <button class="tab-button" data-tab="preparation" aria-selected="false">Preparation</button>
+                </div>
+                
+                <!-- Tab Content -->
+                <div class="pre-launch-content">
+                    <div id="tab-overview" class="tab-content active">
+                        <h4>Overview Tab</h4>
+                        <p>This is the overview tab content.</p>
+                    </div>
+                    <div id="tab-objectives" class="tab-content">
+                        <h4>Objectives Tab</h4>
+                        <p>This is the objectives tab content.</p>
+                    </div>
+                    <div id="tab-preparation" class="tab-content">
+                        <h4>Preparation Tab</h4>
+                        <p>This is the preparation tab content.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="footer-left">
+                    <button class="modal-button">Back</button>
+                </div>
+                <div class="footer-right">
+                    <button class="modal-button">Skip</button>
+                    <button class="modal-button primary">Start Simulation</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { PreLaunchModal } from './src/js/components/pre-launch-modal.js';
+        
+        let testPreLaunchModal = null;
+        
+        async function testTabSwitching() {
+            const statusEl = document.getElementById('tab-test-status');
+            
+            try {
+                // Show the test modal
+                const modal = document.getElementById('test-pre-launch-modal');
+                modal.style.display = 'block';
+                
+                // Create a PreLaunchModal instance
+                testPreLaunchModal = new PreLaunchModal('bias-fairness-exploration');
+                
+                // Test tab switching
+                const tests = [
+                    { tab: 'objectives', expected: 'tab-objectives' },
+                    { tab: 'preparation', expected: 'tab-preparation' },
+                    { tab: 'overview', expected: 'tab-overview' }
+                ];
+                
+                let results = [];
+                
+                for (const test of tests) {
+                    // Switch to tab
+                    testPreLaunchModal.switchTab(test.tab);
+                    
+                    // Check if correct content is active
+                    const activeContent = document.querySelector('.tab-content.active');
+                    const expectedContent = document.getElementById(test.expected);
+                    
+                    if (activeContent && activeContent.id === test.expected) {
+                        results.push(`✅ ${test.tab} tab switch: SUCCESS`);
+                    } else {
+                        results.push(`❌ ${test.tab} tab switch: FAILED`);
+                    }
+                }
+                
+                statusEl.innerHTML = results.join('<br>');
+                statusEl.className = results.every(r => r.includes('SUCCESS')) ? 'status success' : 'status error';
+                
+                // Auto-close after 3 seconds
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 3000);
+                
+            } catch (error) {
+                statusEl.textContent = `❌ ERROR: ${error.message}`;
+                statusEl.className = 'status error';
+            }
+        }
+        
+        async function testErrorHandling() {
+            const statusEl = document.getElementById('tab-test-status');
+            
+            try {
+                if (!testPreLaunchModal) {
+                    testPreLaunchModal = new PreLaunchModal('bias-fairness-exploration');
+                }
+                
+                // Test error scenarios
+                const errorTests = [
+                    { name: 'Null tabId', action: () => testPreLaunchModal.switchTab(null) },
+                    { name: 'Undefined tabId', action: () => testPreLaunchModal.switchTab(undefined) },
+                    { name: 'Invalid tabId', action: () => testPreLaunchModal.switchTab('nonexistent-tab') }
+                ];
+                
+                let results = [];
+                
+                for (const test of errorTests) {
+                    try {
+                        test.action();
+                        results.push(`✅ ${test.name}: Handled gracefully`);
+                    } catch (error) {
+                        results.push(`❌ ${test.name}: Threw error - ${error.message}`);
+                    }
+                }
+                
+                statusEl.innerHTML = results.join('<br>');
+                statusEl.className = results.every(r => r.includes('✅')) ? 'status success' : 'status error';
+                
+            } catch (error) {
+                statusEl.textContent = `❌ ERROR: ${error.message}`;
+                statusEl.className = 'status error';
+            }
+        }
+        
+        async function testModalIntegration() {
+            const statusEl = document.getElementById('modal-test-status');
+            
+            try {
+                // Test full modal creation and interaction
+                const modal = new PreLaunchModal('bias-fairness-exploration', {
+                    onLaunch: () => {
+                        statusEl.textContent = '✅ SUCCESS: Modal integration working correctly!';
+                        statusEl.className = 'status success';
+                    },
+                    onCancel: () => {
+                        statusEl.textContent = '✅ SUCCESS: Cancel functionality working!';
+                        statusEl.className = 'status success';
+                    }
+                });
+                
+                // Show the modal
+                modal.show();
+                
+                statusEl.textContent = 'ℹ️ Modal shown - try interacting with tabs and buttons';
+                statusEl.className = 'status info';
+                
+            } catch (error) {
+                statusEl.textContent = `❌ ERROR: ${error.message}`;
+                statusEl.className = 'status error';
+            }
+        }
+        
+        function closeTestModal() {
+            document.getElementById('test-pre-launch-modal').style.display = 'none';
+        }
+        
+        // Make functions available globally
+        window.testTabSwitching = testTabSwitching;
+        window.testErrorHandling = testErrorHandling;
+        window.testModalIntegration = testModalIntegration;
+        window.closeTestModal = closeTestModal;
+    </script>
+</body>
+</html>

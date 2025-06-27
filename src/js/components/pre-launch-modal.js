@@ -7,6 +7,7 @@ import { getSimulationInfo } from '../data/simulation-info.js';
 import ModalUtility from './modal-utility.js';
 import { userPreferences } from '../utils/simple-storage.js';
 import { simpleAnalytics } from '../utils/simple-analytics.js';
+import logger from '../utils/logger.js';
 
 export class PreLaunchModal {
     constructor(simulationId, options = {}) {
@@ -388,82 +389,137 @@ export class PreLaunchModal {
      * Sets up event listeners for modal interactions
      */
     setupEventListeners() {
-        // Tab switching
-        const tabButtons = document.querySelectorAll('.tab-button');
-        tabButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                this.switchTab(e.target.dataset.tab);
-            });
-        });
-        
-        // Action buttons
-        const startButton = document.getElementById('start-exploration');
-        const cancelButton = document.getElementById('cancel-launch');
-        
-        if (startButton) {
-            startButton.addEventListener('click', () => {
-                // Check skip preferences before launching
-                this.handleSkipPreferences();
-                
-                this.trackAnalytics('simulation_launched');
-                this.close();
-                this.options.onLaunch(this.simulationId);
-            });
+        // Ensure modal container exists and has the expected structure
+        if (!this.modal) {
+            logger.error('Modal instance not available for event listener setup');
+            return;
         }
         
-        if (cancelButton) {
-            cancelButton.addEventListener('click', () => {
-                // Check skip preferences even when cancelling
-                this.handleSkipPreferences();
-                
-                this.trackAnalytics('launch_cancelled');
-                this.close();
-                this.options.onCancel();
-            });
+        if (!this.modal.element) {
+            logger.error('Modal element not available. Modal structure:', this.modal);
+            return;
         }
         
-        // Connected simulation buttons
-        const connectedButtons = document.querySelectorAll('.connected-sim-button');
-        connectedButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                const targetSimId = e.target.dataset.simulation;
-                this.trackAnalytics('connected_simulation_clicked', { target: targetSimId });
-                // Could trigger loading of connected simulation
-            });
-        });
-        
-        // Resource link tracking
-        const resourceLinks = document.querySelectorAll('.resource-link');
-        resourceLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                this.trackAnalytics('resource_accessed', { 
-                    url: e.target.href,
-                    type: e.target.closest('.resource-card').querySelector('.resource-type').textContent
+        if (typeof this.modal.element.querySelectorAll !== 'function') {
+            logger.error('Modal element does not have querySelectorAll method. Element type:', typeof this.modal.element, this.modal.element);
+            return;
+        }
+
+        try {
+            // Tab switching (scoped to this modal)
+            const tabButtons = this.modal.element.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const tabId = e.target.dataset.tab || e.currentTarget.dataset.tab;
+                    if (tabId) {
+                        this.switchTab(tabId);
+                    } else {
+                        logger.warn('Tab button clicked but no data-tab attribute found', e.target);
+                    }
                 });
             });
-        });
+        
+            // Action buttons (scoped to this modal)
+            const startButton = this.modal.element.querySelector('#start-exploration');
+            const cancelButton = this.modal.element.querySelector('#cancel-launch');
+            
+            if (startButton) {
+                startButton.addEventListener('click', () => {
+                    // Check skip preferences before launching
+                    this.handleSkipPreferences();
+                    
+                    this.trackAnalytics('simulation_launched');
+                    this.close();
+                    this.options.onLaunch(this.simulationId);
+                });
+            }
+            
+            if (cancelButton) {
+                cancelButton.addEventListener('click', () => {
+                    // Check skip preferences even when cancelling
+                    this.handleSkipPreferences();
+                    
+                    this.trackAnalytics('launch_cancelled');
+                    this.close();
+                    this.options.onCancel();
+                });
+            }
+            
+            // Connected simulation buttons
+            const connectedButtons = document.querySelectorAll('.connected-sim-button');
+            connectedButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const targetSimId = e.target.dataset.simulation;
+                    this.trackAnalytics('connected_simulation_clicked', { target: targetSimId });
+                    // Could trigger loading of connected simulation
+                });
+            });
+            
+            // Resource link tracking
+            const resourceLinks = document.querySelectorAll('.resource-link');
+            resourceLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    this.trackAnalytics('resource_accessed', { 
+                        url: e.target.href,
+                        type: e.target.closest('.resource-card').querySelector('.resource-type').textContent
+                    });
+                });
+            });
+        } catch (error) {
+            logger.error('Error setting up PreLaunchModal event listeners:', error);
+        }
     }
     
     /**
      * Switches to a different tab
      */
     switchTab(tabId) {
-        // Update buttons
-        document.querySelectorAll('.tab-button').forEach(btn => {
-            btn.classList.remove('active');
-            btn.setAttribute('aria-selected', 'false');
-        });
-        document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
-        document.querySelector(`[data-tab="${tabId}"]`).setAttribute('aria-selected', 'true');
-        
-        // Update content
-        document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.remove('active');
-        });
-        document.getElementById(`tab-${tabId}`).classList.add('active');
-        
-        this.currentTab = tabId;
-        this.trackAnalytics('tab_switched', { tab: tabId });
+        if (!tabId) {
+            logger.warn('switchTab called with null or undefined tabId');
+            return;
+        }
+
+        try {
+            // Find the modal container to scope our searches
+            const modalContainer = (this.modal && this.modal.element) || document.querySelector('.pre-launch-modal');
+            if (!modalContainer) {
+                logger.warn('Pre-launch modal container not found');
+                return;
+            }
+
+            // Update buttons (scoped to the modal)
+            const allTabButtons = modalContainer.querySelectorAll('.tab-button');
+            allTabButtons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-selected', 'false');
+            });
+            
+            const targetButton = modalContainer.querySelector(`[data-tab="${tabId}"]`);
+            if (targetButton) {
+                targetButton.classList.add('active');
+                targetButton.setAttribute('aria-selected', 'true');
+            } else {
+                logger.warn(`Tab button with data-tab="${tabId}" not found in modal`);
+            }
+            
+            // Update content (scoped to the modal)
+            const allTabContent = modalContainer.querySelectorAll('.tab-content');
+            allTabContent.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            const targetContent = modalContainer.querySelector(`#tab-${tabId}`);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            } else {
+                logger.warn(`Tab content with id="tab-${tabId}" not found in modal`);
+            }
+            
+            this.currentTab = tabId;
+            this.trackAnalytics('tab_switched', { tab: tabId });
+        } catch (error) {
+            logger.error('Error in switchTab:', error);
+        }
     }
     
     /**

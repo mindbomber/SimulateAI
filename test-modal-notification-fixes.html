@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal and Notification Fix Test</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/advanced-ui-components.css">
+    <link rel="stylesheet" href="src/styles/notification-toast.css">
+    <style>
+        body {
+            padding: 20px;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        
+        .test-button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .test-button:hover {
+            background: #0b7dda;
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <h1>Modal and Notification Fix Test</h1>
+    
+    <div class="test-section">
+        <h2>Modal Element Access Test</h2>
+        <p>Testing that modal.element is properly accessed in PreLaunchModal.</p>
+        <div id="modal-test-status" class="status info">Ready to test...</div>
+        <button class="test-button" onclick="testModalElementAccess()">Test Modal Element Access</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Notification System Test</h2>
+        <p>Testing that showNotification method works correctly.</p>
+        <div id="notification-test-status" class="status info">Ready to test...</div>
+        <button class="test-button" onclick="testNotificationSystem()">Test Notification System</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Integration Test</h2>
+        <p>Testing the complete flow with both fixes.</p>
+        <div id="integration-test-status" class="status info">Ready to test...</div>
+        <button class="test-button" onclick="testCompleteIntegration()">Test Complete Integration</button>
+    </div>
+
+    <script type="module">
+        import { PreLaunchModal } from './src/js/components/pre-launch-modal.js';
+        import './src/js/components/notification-toast.js';
+        
+        window.testModalElementAccess = async function() {
+            const statusEl = document.getElementById('modal-test-status');
+            
+            try {
+                // Create a PreLaunchModal instance
+                const modal = new PreLaunchModal('bias-fairness-exploration');
+                
+                // Check if modal is created correctly
+                if (modal.modal && modal.modal.element) {
+                    statusEl.textContent = '✅ SUCCESS: Modal element is accessible via modal.element';
+                    statusEl.className = 'status success';
+                    
+                    // Test DOM queries
+                    const tabButtons = modal.modal.element.querySelectorAll('.tab-button');
+                    if (tabButtons.length > 0) {
+                        statusEl.textContent += ` (Found ${tabButtons.length} tab buttons)`;
+                    }
+                    
+                    // Clean up
+                    modal.close();
+                } else {
+                    statusEl.textContent = '❌ ERROR: Modal element not accessible';
+                    statusEl.className = 'status error';
+                }
+            } catch (error) {
+                statusEl.textContent = `❌ ERROR: ${error.message}`;
+                statusEl.className = 'status error';
+            }
+        };
+        
+        window.testNotificationSystem = function() {
+            const statusEl = document.getElementById('notification-test-status');
+            
+            try {
+                // Test if NotificationToast is available
+                if (window.NotificationToast) {
+                    statusEl.textContent = '✅ SUCCESS: NotificationToast system available';
+                    statusEl.className = 'status success';
+                    
+                    // Test different notification types
+                    window.NotificationToast.info('Test Info', 'This is a test info notification');
+                    setTimeout(() => {
+                        window.NotificationToast.success('Test Success', 'This is a test success notification');
+                    }, 1000);
+                    setTimeout(() => {
+                        window.NotificationToast.warning('Test Warning', 'This is a test warning notification');
+                    }, 2000);
+                    setTimeout(() => {
+                        window.NotificationToast.error('Test Error', 'This is a test error notification');
+                    }, 3000);
+                    
+                } else {
+                    statusEl.textContent = '❌ ERROR: NotificationToast not available';
+                    statusEl.className = 'status error';
+                }
+            } catch (error) {
+                statusEl.textContent = `❌ ERROR: ${error.message}`;
+                statusEl.className = 'status error';
+            }
+        };
+        
+        window.testCompleteIntegration = async function() {
+            const statusEl = document.getElementById('integration-test-status');
+            
+            try {
+                // Simulate what happens in the app
+                statusEl.textContent = 'ℹ️ Testing complete integration...';
+                statusEl.className = 'status info';
+                
+                // Create PreLaunchModal (this was causing the first error)
+                const modal = new PreLaunchModal('bias-fairness-exploration', {
+                    onLaunch: (simulationId) => {
+                        // Simulate showNotification call (this was causing the second error)
+                        if (window.NotificationToast) {
+                            window.NotificationToast.success('Success!', `Simulation ${simulationId} launched successfully`);
+                            statusEl.textContent = '✅ SUCCESS: Complete integration working - modal and notifications!';
+                            statusEl.className = 'status success';
+                        }
+                    },
+                    onCancel: () => {
+                        window.NotificationToast.info('Cancelled', 'Simulation launch cancelled');
+                    }
+                });
+                
+                // Show the modal
+                modal.show();
+                
+                statusEl.textContent = '✅ SUCCESS: Modal shown without errors! Try interacting with it.';
+                statusEl.className = 'status success';
+                
+            } catch (error) {
+                statusEl.textContent = `❌ ERROR: ${error.message}`;
+                statusEl.className = 'status error';
+            }
+        };
+    </script>
+</body>
+</html>

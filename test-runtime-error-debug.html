@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Runtime Error Debug Test</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+</head>
+<body>
+    <div class="app-container">
+        <h1>Runtime Error Debug Test</h1>
+        <button id="test-simulation" class="btn btn-primary">Start Simulation (Trigger Errors)</button>
+        <div id="debug-output" style="margin-top: 20px; padding: 20px; background: #f5f5f5; font-family: monospace;"></div>
+    </div>
+
+    <script type="module">
+        // Import and test the exact components causing issues
+        import { AIEthicsApp } from './src/js/app.js';
+        import { PreLaunchModal } from './src/js/components/pre-launch-modal.js';
+
+        const debugOutput = document.getElementById('debug-output');
+        
+        function log(message) {
+            console.log(message);
+            debugOutput.innerHTML += message + '<br>';
+        }
+
+        async function testErrors() {
+            try {
+                log('=== DEBUGGING RUNTIME ERRORS ===');
+                
+                // Test 1: Check if app instance has showNotification method
+                log('1. Testing app initialization...');
+                const app = new AIEthicsApp();
+                
+                log(`App instance created: ${!!app}`);
+                log(`showNotification method exists: ${typeof app.showNotification}`);
+                log(`App prototype has showNotification: ${typeof AIEthicsApp.prototype.showNotification}`);
+                
+                // Test 2: Check modal structure
+                log('2. Testing PreLaunchModal structure...');
+                const modal = new PreLaunchModal('bias-fairness');
+                log(`PreLaunchModal instance created: ${!!modal}`);
+                
+                // Test 3: Try to show modal and see what happens
+                log('3. Testing modal.show() method...');
+                modal.show();
+                
+                // Check the modal structure after creation
+                setTimeout(() => {
+                    log(`Modal object type: ${typeof modal.modal}`);
+                    log(`Modal has element property: ${modal.modal && typeof modal.modal.element}`);
+                    
+                    if (modal.modal && modal.modal.element) {
+                        log(`Modal element querySelectorAll: ${typeof modal.modal.element.querySelectorAll}`);
+                        const tabs = modal.modal.element.querySelectorAll('.tab-button');
+                        log(`Found ${tabs.length} tab buttons`);
+                    }
+                }, 100);
+                
+            } catch (error) {
+                log(`ERROR: ${error.message}`);
+                log(`Stack: ${error.stack}`);
+            }
+        }
+
+        // Test 4: Check what happens when trying to start simulation
+        async function testSimulationStart() {
+            try {
+                log('4. Testing simulation start...');
+                const app = new AIEthicsApp();
+                
+                // Bind context properly
+                const boundStartSimulation = app.startSimulation.bind(app);
+                await boundStartSimulation('bias-fairness');
+                
+            } catch (error) {
+                log(`SIMULATION START ERROR: ${error.message}`);
+                log(`Stack: ${error.stack}`);
+            }
+        }
+
+        document.getElementById('test-simulation').addEventListener('click', async () => {
+            debugOutput.innerHTML = '';
+            await testErrors();
+            await testSimulationStart();
+        });
+
+        // Auto-run tests
+        window.addEventListener('load', () => {
+            document.getElementById('test-simulation').click();
+        });
+    </script>
+</body>
+</html>

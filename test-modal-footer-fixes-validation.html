@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Footer Fix Validation Test</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/advanced-ui-components.css">
+    <link rel="stylesheet" href="src/styles/pre-launch-modal.css">
+    <link rel="stylesheet" href="src/styles/post-simulation-modal.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .test-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 2000;
+            min-width: 200px;
+        }
+        
+        .test-button {
+            display: block;
+            width: 100%;
+            margin: 5px 0;
+            padding: 8px 12px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .test-button:hover {
+            background: #0b7dda;
+        }
+        
+        .test-results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-line;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+            backdrop-filter: blur(2px);
+        }
+        
+        .modal-backdrop.visible {
+            opacity: 1;
+        }
+        
+        .modal-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            z-index: 1000;
+            min-width: 400px;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-body {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .long-content {
+            height: 800px;
+            background: linear-gradient(to bottom, #e3f2fd, #bbdefb);
+            padding: 20px;
+            margin: -20px;
+        }
+        
+        .test-scenario {
+            margin: 20px 0;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .scenario-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .status-pass {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .status-fail {
+            background: #f44336;
+            color: white;
+        }
+        
+        .status-warning {
+            background: #ff9800;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Modal Footer Fix Validation Test</h1>
+    <p>This test validates all the modal footer overflow, sizing, and positioning fixes.</p>
+    
+    <div class="test-controls">
+        <h3>Test Controls</h3>
+        <button class="test-button" onclick="runBasicFooterTest()">Basic Footer Test</button>
+        <button class="test-button" onclick="runOverflowTest()">Overflow Test</button>
+        <button class="test-button" onclick="runResponsiveTest()">Responsive Test</button>
+        <button class="test-button" onclick="runPositioningTest()">Positioning Test</button>
+        <button class="test-button" onclick="runAllTests()">Run All Tests</button>
+        <div class="test-results" id="testResults">Ready to test...</div>
+    </div>
+
+    <!-- Test Scenario 1: Basic Modal Footer -->
+    <div class="test-scenario">
+        <div class="scenario-title">Scenario 1: Basic Modal Footer</div>
+        <button class="test-button" onclick="showBasicModal()">Show Basic Modal</button>
+    </div>
+
+    <!-- Test Scenario 2: Many Buttons Overflow -->
+    <div class="test-scenario">
+        <div class="scenario-title">Scenario 2: Many Buttons (Overflow Test)</div>
+        <button class="test-button" onclick="showManyButtonsModal()">Show Many Buttons Modal</button>
+    </div>
+
+    <!-- Test Scenario 3: Pre-launch Modal Style -->
+    <div class="test-scenario">
+        <div class="scenario-title">Scenario 3: Pre-launch Modal Footer</div>
+        <button class="test-button" onclick="showPreLaunchModal()">Show Pre-launch Modal</button>
+    </div>
+
+    <!-- Test Scenario 4: Long Content Scroll -->
+    <div class="test-scenario">
+        <div class="scenario-title">Scenario 4: Long Content (Scroll Test)</div>
+        <button class="test-button" onclick="showLongContentModal()">Show Long Content Modal</button>
+    </div>
+
+    <!-- Test Scenario 5: Narrow Viewport -->
+    <div class="test-scenario">
+        <div class="scenario-title">Scenario 5: Narrow Viewport (Mobile Test)</div>
+        <button class="test-button" onclick="simulateMobileViewport()">Simulate Mobile</button>
+        <button class="test-button" onclick="resetViewport()">Reset Viewport</button>
+    </div>
+
+    <script type="module">
+        // Import the modal footer manager
+        import('./src/js/components/modal-footer-manager.js').then(() => {
+            console.log('Modal footer manager loaded');
+        }).catch(error => {
+            console.warn('Could not load modal footer manager:', error);
+        });
+    </script>
+
+    <script>
+        let currentModal = null;
+        let testResults = [];
+
+        function showModal(config) {
+            if (currentModal) closeModal();
+
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop';
+            backdrop.innerHTML = `
+                <div class="modal-dialog">
+                    <div class="modal-header">
+                        <h3 class="modal-title">${config.title}</h3>
+                        <button class="modal-close" onclick="closeModal()">×</button>
+                    </div>
+                    <div class="modal-body">
+                        ${config.body}
+                    </div>
+                    <div class="modal-footer ${config.footerClass || ''}">
+                        ${config.footer}
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(backdrop);
+            currentModal = backdrop;
+
+            // Trigger the visible state
+            setTimeout(() => backdrop.classList.add('visible'), 10);
+
+            // Close on backdrop click
+            backdrop.addEventListener('click', (e) => {
+                if (e.target === backdrop) closeModal();
+            });
+
+            // Trigger modal footer manager if available
+            if (window.modalFooterManager) {
+                window.modalFooterManager.scanForModalFooters();
+            }
+
+            return backdrop;
+        }
+
+        function closeModal() {
+            if (currentModal) {
+                currentModal.classList.remove('visible');
+                setTimeout(() => {
+                    document.body.removeChild(currentModal);
+                    currentModal = null;
+                }, 300);
+            }
+        }
+
+        function showBasicModal() {
+            showModal({
+                title: 'Basic Modal Footer Test',
+                body: '<p>This tests the basic modal footer functionality with standard button layout.</p>',
+                footer: `
+                    <button class="modal-button">Cancel</button>
+                    <button class="modal-button primary">Save</button>
+                `
+            });
+        }
+
+        function showManyButtonsModal() {
+            showModal({
+                title: 'Many Buttons Overflow Test',
+                body: '<p>This modal has many buttons to test overflow behavior and responsive wrapping.</p>',
+                footerClass: 'many-buttons',
+                footer: `
+                    <button class="modal-button">Button 1</button>
+                    <button class="modal-button">Button 2</button>
+                    <button class="modal-button">Button 3</button>
+                    <button class="modal-button">Button 4</button>
+                    <button class="modal-button">Button 5</button>
+                    <button class="modal-button">Button 6</button>
+                    <button class="modal-button primary">Primary Action</button>
+                `
+            });
+        }
+
+        function showPreLaunchModal() {
+            const modal = showModal({
+                title: 'Pre-launch Modal Footer Test',
+                body: '<p>This tests the pre-launch modal footer styling and layout behavior.</p>',
+                footer: `
+                    <div class="footer-left">
+                        <button class="modal-button">Back</button>
+                    </div>
+                    <div class="footer-right">
+                        <button class="modal-button">Skip</button>
+                        <button class="modal-button primary">Continue</button>
+                    </div>
+                `
+            });
+            
+            // Add pre-launch modal class
+            modal.querySelector('.modal-dialog').classList.add('pre-launch-modal');
+        }
+
+        function showLongContentModal() {
+            showModal({
+                title: 'Long Content Scroll Test',
+                body: `
+                    <div class="long-content">
+                        <h3>Very Long Content</h3>
+                        <p>This content is intentionally very long to test how the modal footer behaves when the modal body has scrollable content.</p>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                        <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                        <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                        <p>More content here to test scrolling...</p>
+                        <p>Even more content...</p>
+                        <p>Keep scrolling...</p>
+                        <p>Almost there...</p>
+                        <p>This should test if the footer remains properly positioned and visible.</p>
+                    </div>
+                `,
+                footer: `
+                    <button class="modal-button">Cancel</button>
+                    <button class="modal-button primary">Save</button>
+                `
+            });
+        }
+
+        function simulateMobileViewport() {
+            document.body.style.maxWidth = '375px';
+            document.body.style.margin = '0 auto';
+            document.body.style.border = '2px solid red';
+            
+            // Show a modal to test mobile behavior
+            showManyButtonsModal();
+        }
+
+        function resetViewport() {
+            document.body.style.maxWidth = '';
+            document.body.style.margin = '';
+            document.body.style.border = '';
+        }
+
+        function runBasicFooterTest() {
+            testResults = [];
+            addTestResult('Basic Footer Test', 'Starting basic footer functionality test...');
+            
+            showBasicModal();
+            
+            setTimeout(() => {
+                const footer = document.querySelector('.modal-footer');
+                if (!footer) {
+                    addTestResult('Basic Footer Test', 'FAIL: Modal footer not found', 'fail');
+                    return;
+                }
+                
+                const styles = window.getComputedStyle(footer);
+                const tests = [
+                    { name: 'Display', expected: 'flex', actual: styles.display },
+                    { name: 'Align Items', expected: 'center', actual: styles.alignItems },
+                    { name: 'Justify Content', expected: 'flex-end', actual: styles.justifyContent },
+                    { name: 'Flex Wrap', expected: 'wrap', actual: styles.flexWrap },
+                    { name: 'Gap', expected: '12px', actual: styles.gap },
+                    { name: 'Position', expected: 'relative', actual: styles.position },
+                    { name: 'Z-Index', expected: '10', actual: styles.zIndex }
+                ];
+                
+                tests.forEach(test => {
+                    const status = test.actual === test.expected ? 'pass' : 'warning';
+                    addTestResult('Basic Footer Test', 
+                        `${test.name}: Expected "${test.expected}", Got "${test.actual}"`, 
+                        status);
+                });
+                
+                closeModal();
+            }, 500);
+        }
+
+        function runOverflowTest() {
+            addTestResult('Overflow Test', 'Starting overflow behavior test...');
+            
+            showManyButtonsModal();
+            
+            setTimeout(() => {
+                const footer = document.querySelector('.modal-footer');
+                if (!footer) {
+                    addTestResult('Overflow Test', 'FAIL: Modal footer not found', 'fail');
+                    return;
+                }
+                
+                const hasOverflow = footer.scrollWidth > footer.clientWidth;
+                const styles = window.getComputedStyle(footer);
+                
+                addTestResult('Overflow Test', `Has horizontal overflow: ${hasOverflow}`, 
+                    hasOverflow ? 'warning' : 'pass');
+                addTestResult('Overflow Test', `Overflow-X: ${styles.overflowX}`, 
+                    styles.overflowX === 'auto' ? 'pass' : 'fail');
+                
+                // Check if many-buttons class was applied
+                const hasManyButtonsClass = footer.classList.contains('many-buttons');
+                addTestResult('Overflow Test', `Many-buttons class applied: ${hasManyButtonsClass}`, 
+                    hasManyButtonsClass ? 'pass' : 'warning');
+                
+                closeModal();
+            }, 500);
+        }
+
+        function runResponsiveTest() {
+            addTestResult('Responsive Test', 'Starting responsive behavior test...');
+            
+            // Test mobile simulation
+            simulateMobileViewport();
+            
+            setTimeout(() => {
+                const footer = document.querySelector('.modal-footer');
+                if (!footer) {
+                    addTestResult('Responsive Test', 'FAIL: Modal footer not found', 'fail');
+                    resetViewport();
+                    return;
+                }
+                
+                const styles = window.getComputedStyle(footer);
+                const isMobile = window.innerWidth <= 768;
+                
+                addTestResult('Responsive Test', `Mobile viewport detected: ${isMobile}`, 
+                    isMobile ? 'pass' : 'warning');
+                addTestResult('Responsive Test', `Footer flex-direction: ${styles.flexDirection}`, 
+                    isMobile && styles.flexDirection === 'column' ? 'pass' : 'warning');
+                
+                resetViewport();
+                closeModal();
+            }, 1000);
+        }
+
+        function runPositioningTest() {
+            addTestResult('Positioning Test', 'Starting positioning test...');
+            
+            showLongContentModal();
+            
+            setTimeout(() => {
+                const modal = document.querySelector('.modal-dialog');
+                const footer = document.querySelector('.modal-footer');
+                const body = document.querySelector('.modal-body');
+                
+                if (!modal || !footer || !body) {
+                    addTestResult('Positioning Test', 'FAIL: Modal components not found', 'fail');
+                    return;
+                }
+                
+                const modalRect = modal.getBoundingClientRect();
+                const footerRect = footer.getBoundingClientRect();
+                const bodyRect = body.getBoundingClientRect();
+                
+                // Check if footer is at the bottom of modal
+                const footerAtBottom = Math.abs(footerRect.bottom - modalRect.bottom) <= 2;
+                addTestResult('Positioning Test', `Footer positioned at modal bottom: ${footerAtBottom}`, 
+                    footerAtBottom ? 'pass' : 'fail');
+                
+                // Check if footer is visible when body content overflows
+                const footerVisible = footerRect.height > 0 && footerRect.width > 0;
+                addTestResult('Positioning Test', `Footer visible with long content: ${footerVisible}`, 
+                    footerVisible ? 'pass' : 'fail');
+                
+                // Check z-index
+                const styles = window.getComputedStyle(footer);
+                const hasProperZIndex = parseInt(styles.zIndex) >= 10;
+                addTestResult('Positioning Test', `Footer z-index (${styles.zIndex}) >= 10: ${hasProperZIndex}`, 
+                    hasProperZIndex ? 'pass' : 'fail');
+                
+                closeModal();
+            }, 500);
+        }
+
+        function runAllTests() {
+            testResults = [];
+            addTestResult('All Tests', 'Starting comprehensive test suite...');
+            
+            runBasicFooterTest();
+            setTimeout(() => runOverflowTest(), 1500);
+            setTimeout(() => runResponsiveTest(), 3000);
+            setTimeout(() => runPositioningTest(), 5000);
+            setTimeout(() => addTestResult('All Tests', 'All tests completed!', 'pass'), 6500);
+        }
+
+        function addTestResult(category, message, status = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            testResults.push({ timestamp, category, message, status });
+            updateTestDisplay();
+        }
+
+        function updateTestDisplay() {
+            const display = document.getElementById('testResults');
+            const content = testResults.map(result => {
+                const statusIndicator = result.status === 'pass' ? '✅' : 
+                                      result.status === 'fail' ? '❌' : 
+                                      result.status === 'warning' ? '⚠️' : 'ℹ️';
+                return `${result.timestamp} ${statusIndicator} [${result.category}] ${result.message}`;
+            }).join('\n');
+            
+            display.textContent = content;
+            display.scrollTop = display.scrollHeight;
+        }
+
+        // Auto-run basic test on load
+        setTimeout(() => {
+            addTestResult('System', 'Modal footer test page loaded successfully');
+        }, 500);
+    </script>
+</body>
+</html>

@@ -26,6 +26,7 @@ import { PreLaunchModal } from './components/pre-launch-modal.js';
 import { EnhancedSimulationModal } from './components/enhanced-simulation-modal.js';
 import { PostSimulationModal } from './components/post-simulation-modal.js';
 import HeroDemo from './components/hero-demo.js';
+import ModalFooterManager from './components/modal-footer-manager.js';
 
 // Constants for app configuration
 const APP_CONSTANTS = {
@@ -73,6 +74,10 @@ const AppDebug = {
 
 class AIEthicsApp {
     constructor() {
+        // Version identifier for debugging
+        this.version = 'v2.0.1-context-fixes';
+        logger.info(`[App] Initializing AIEthicsApp ${this.version}`);
+        
         this.currentSimulation = null;
         this.engine = null;
         this.visualEngine = null;
@@ -193,6 +198,9 @@ class AIEthicsApp {
             
             // Initialize enhanced objects (after visual engine is set up)
             await this.initializeEnhancedObjects();
+            
+            // Initialize modal footer management
+            this.initializeModalFooterManager();
             
             this.isInitialized = true;
             AppDebug.log('AI Ethics App initialized successfully with modernized infrastructure');
@@ -670,7 +678,28 @@ class AIEthicsApp {
         }
     }
 
+    /**
+     * Initialize modal footer management system
+     */
+    initializeModalFooterManager() {
+        try {
+            // Initialize the modal footer manager
+            this.modalFooterManager = new ModalFooterManager();
+            
+            // Store reference for cleanup
+            this.modalFooterManager.app = this;
+            
+            logger.info('Modal footer manager initialized successfully');
+        } catch (error) {
+            logger.error('Failed to initialize modal footer manager:', error);
+            // Non-critical error - modals will still work with basic functionality
+        }
+    }
+
     setupEventListeners() {
+        // Mobile navigation functionality
+        this.setupMobileNavigation();
+        
         // Hero section buttons
         const startLearningBtn = document.getElementById('start-learning');
         const educatorGuideBtn = document.getElementById('educator-guide');
@@ -755,7 +784,8 @@ class AIEthicsApp {
                 e.preventDefault();
                 const simulationId = e.target.getAttribute('data-simulation');
                 if (simulationId) {
-                    this.startSimulation(simulationId);
+                    // Explicitly bind context to ensure 'this' refers to the app instance
+                    this.startSimulation.call(this, simulationId);
                 }
             }
         });
@@ -851,6 +881,11 @@ class AIEthicsApp {
      */
     async startSimulation(simulationId) {
         try {
+            // Verify 'this' context is correct
+            if (!this || typeof this.showNotification !== 'function') {
+                throw new Error('App context not properly bound. startSimulation called with wrong context.');
+            }
+
             // Check if we should show the pre-launch modal first
             const shouldShowPreLaunch = !userPreferences.shouldSkipPreLaunch(simulationId);
             
@@ -865,7 +900,22 @@ class AIEthicsApp {
         } catch (error) {
             AppDebug.error('Failed to start simulation:', error);
             this.hideLoading();
-            this.showNotification('Failed to start simulation. Please try again.', 'error');
+            
+            // Use fallback notification if this.showNotification is not available
+            if (typeof this.showNotification === 'function') {
+                this.showNotification('Failed to start simulation. Please try again.', 'error');
+            } else {
+                // Fallback to logger and direct notification system
+                logger.error('Failed to start simulation:', error.message);
+                if (window.NotificationToast) {
+                    window.NotificationToast.show({
+                        type: 'error',
+                        message: 'Failed to start simulation. Please try again.',
+                        duration: 5000,
+                        closable: true
+                    });
+                }
+            }
         }
     }
     
@@ -1516,6 +1566,174 @@ class AIEthicsApp {
         const NOTIFICATION_DURATION = 5000;
         this.showNotification(`${term}: ${definition}`, 'info', NOTIFICATION_DURATION);
     }
+
+    /**
+     * Shows a notification toast message
+     * @param {string} message - The notification message
+     * @param {string} type - The notification type ('success', 'error', 'warning', 'info')
+     * @param {number} duration - Auto-dismiss duration in ms (optional)
+     * @returns {string|null} - Toast ID or null if failed
+     */
+    showNotification(message, type = 'info', duration = 5000) {
+        if (window.NotificationToast) {
+            // Use the global notification toast instance
+            return window.NotificationToast.show({
+                type,
+                message,
+                duration,
+                closable: true
+            });
+        } else {
+            // Fallback to logger if notification system not available
+            logger.info(`[${type.toUpperCase()}] ${message}`);
+            return null;
+        }
+    }
+
+    /**
+     * Sets up mobile navigation hamburger menu functionality
+     */
+    setupMobileNavigation() {
+        const navToggle = document.querySelector('.nav-toggle');
+        const navClose = document.querySelector('.nav-close');
+        const mainNav = document.querySelector('.main-nav');
+        const navBackdrop = document.querySelector('.nav-backdrop');
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        if (!navToggle || !mainNav) {
+            logger.warn('Mobile navigation elements not found');
+            return;
+        }
+        
+        // Toggle mobile navigation
+        const toggleNav = (isOpen) => {
+            const isCurrentlyOpen = mainNav.classList.contains('open');
+            const shouldOpen = isOpen !== undefined ? isOpen : !isCurrentlyOpen;
+            
+            // Update classes
+            mainNav.classList.toggle('open', shouldOpen);
+            navToggle.classList.toggle('active', shouldOpen);
+            if (navBackdrop) {
+                navBackdrop.classList.toggle('open', shouldOpen);
+            }
+            
+            // Update ARIA attributes
+            navToggle.setAttribute('aria-expanded', shouldOpen.toString());
+            mainNav.setAttribute('aria-hidden', (!shouldOpen).toString());
+            
+            // Prevent body scroll when nav is open
+            document.body.style.overflow = shouldOpen ? 'hidden' : '';
+            
+            // Focus management
+            if (shouldOpen) {
+                // Focus first nav link when opening
+                const firstNavLink = mainNav.querySelector('.nav-link');
+                if (firstNavLink) {
+                    setTimeout(() => firstNavLink.focus(), 100);
+                }
+            } else {
+                // Return focus to toggle button when closing
+                navToggle.focus();
+            }
+            
+            // Analytics
+            this.trackEvent('mobile_nav_toggled', { isOpen: shouldOpen });
+        };
+        
+        // Hamburger button click
+        navToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleNav();
+        });
+        
+        // Close button click
+        if (navClose) {
+            navClose.addEventListener('click', (e) => {
+                e.preventDefault();
+                toggleNav(false);
+            });
+        }
+        
+        // Backdrop click
+        if (navBackdrop) {
+            navBackdrop.addEventListener('click', () => {
+                toggleNav(false);
+            });
+        }
+        
+        // Close nav when clicking on nav links
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                // Close mobile nav after a short delay to allow navigation
+                const NAV_CLOSE_DELAY = 150;
+                setTimeout(() => toggleNav(false), NAV_CLOSE_DELAY);
+            });
+        });
+        
+        // Handle escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && mainNav.classList.contains('open')) {
+                toggleNav(false);
+            }
+        });
+        
+        // Handle window resize - close mobile nav on desktop breakpoint
+        let resizeTimeout;
+        const DESKTOP_BREAKPOINT = 768;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            const RESIZE_DEBOUNCE = 100;
+            resizeTimeout = setTimeout(() => {
+                if (window.innerWidth >= DESKTOP_BREAKPOINT && mainNav.classList.contains('open')) {
+                    toggleNav(false);
+                    document.body.style.overflow = ''; // Reset body scroll
+                }
+            }, RESIZE_DEBOUNCE);
+        });
+        
+        // Handle focus trap for accessibility
+        this.setupNavFocusTrap(mainNav, navToggle);
+    }
+    
+    /**
+     * Sets up focus trap for mobile navigation
+     */
+    setupNavFocusTrap(navElement, _toggleButton) {
+        const focusableSelectors = [
+            'a[href]',
+            'button:not([disabled])',
+            'textarea:not([disabled])',
+            'input:not([disabled])',
+            'select:not([disabled])',
+            '[tabindex]:not([tabindex="-1"])'
+        ].join(',');
+        
+        navElement.addEventListener('keydown', (e) => {
+            if (!navElement.classList.contains('open') || e.key !== 'Tab') {
+                return;
+            }
+            
+            const focusableElements = navElement.querySelectorAll(focusableSelectors);
+            const firstFocusable = focusableElements[0];
+            const lastFocusable = focusableElements[focusableElements.length - 1];
+            
+            if (e.shiftKey) {
+                // Shift + Tab - going backwards
+                if (document.activeElement === firstFocusable) {
+                    e.preventDefault();
+                    lastFocusable.focus();
+                }
+            } else {
+                // Tab - going forwards
+                if (document.activeElement === lastFocusable) {
+                    e.preventDefault();
+                    firstFocusable.focus();
+                }
+            }
+        });
+    }
+
+    // ...existing methods...
 }
 
 /**

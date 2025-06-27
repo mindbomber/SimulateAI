@@ -33,13 +33,20 @@
 }
 
 .pre-launch-modal .modal-footer {
-  padding: 1.5rem 2rem;
+  padding: var(--spacing-4, 16px) var(--spacing-5, 20px);
   border-top: 1px solid #e5e5e5;
   background: #f8f9fa;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  gap: var(--spacing-3, 12px);
+  
+  /* Inherit responsive behavior from base */
+  flex-wrap: wrap;
+  overflow-x: auto;
+  min-height: var(--touch-target-min, 44px);
+  position: relative;
+  z-index: 10;
 }
 
 /* Tab Navigation */
@@ -47,7 +54,7 @@
   display: flex;
   background: #f8f9fa;
   border-bottom: 1px solid #e5e5e5;
-  overflow-x: auto;
+  /* overflow-x: auto; - REMOVED: This was hiding the tabs */
 }
 
 .pre-launch-tab,
@@ -429,7 +436,18 @@
   
   .pre-launch-modal .modal-header,
   .pre-launch-modal .modal-footer {
-    padding: 1rem;
+    padding: var(--spacing-3, 12px) var(--spacing-4, 16px);
+  }
+  
+  .pre-launch-modal .modal-footer {
+    flex-direction: column;
+    gap: var(--spacing-2, 8px);
+  }
+  
+  .pre-launch-modal .modal-footer .footer-left,
+  .pre-launch-modal .modal-footer .footer-right {
+    width: 100%;
+    justify-content: center;
   }
   
   .pre-launch-content {

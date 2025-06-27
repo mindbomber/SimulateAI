@@ -58,6 +58,9 @@
     opacity: 0;
     transition: opacity var(--transition-modal);
     backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .modal-backdrop.visible {
@@ -75,8 +78,15 @@
     z-index: var(--z-modal);
     min-width: 300px;
     max-width: 90vw;
-    max-height: 90vh;
-    overflow: hidden;
+    max-height: 95vh; /* Increased for better usability */
+    
+    /* Flexbox layout for proper header/body/footer stacking */
+    display: flex;
+    flex-direction: column;
+    
+    /* Remove overflow: hidden that was clipping content */
+    overflow: visible;
+    
     animation: modalSlideIn var(--transition-modal);
     border: 1px solid var(--modal-border);
     contain: layout style;
@@ -93,6 +103,11 @@
     justify-content: space-between;
     align-items: center;
     background: var(--modal-background);
+    
+    /* Flex item properties */
+    flex-shrink: 0; /* Don't shrink the header */
+    border-top-left-radius: var(--modal-border-radius);
+    border-top-right-radius: var(--modal-border-radius);
 }
 
 .modal-title {
@@ -136,106 +151,142 @@
     line-height: 1;
 }
 
-/* Modal body - scoped to avoid conflicts with pre-launch and other specific modals */
-.modal-backdrop:not(.pre-launch-modal) .modal-body {
+/* Modal body - updated for proper flexbox layout */
+.modal-body {
     padding: var(--spacing-5, 20px);
-    overflow-y: auto;
-    max-height: 60vh;
     background: var(--modal-background);
+    
+    /* Flex item properties for proper layout */
+    flex: 1; /* Take up available space */
+    overflow-y: auto; /* Allow vertical scrolling when content overflows */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    min-height: 0; /* Important for flex items with overflow */
+    
+    /* Add some maximum height constraints */
+    max-height: calc(90vh - 140px); /* Account for header and footer space */
+}
+
+/* Legacy scoped styles - keep for backward compatibility but make less specific */
+.modal-backdrop:not(.pre-launch-modal) .modal-body {
+    /* Override with flexbox layout styles above */
+    max-height: none; /* Remove the 60vh constraint */
 }
 
 .modal-footer {
-    padding: var(--spacing-5, 20px);
+    padding: var(--spacing-4, 16px) var(--spacing-5, 20px);
     border-top: 1px solid var(--modal-border);
     display: flex;
+    align-items: center;
     justify-content: flex-end;
-    gap: var(--spacing-2, 10px);
+    gap: var(--spacing-3, 12px);
     background: var(--modal-background);
+    
+    /* Flex item properties for proper stacking */
+    flex-shrink: 0; /* Don't shrink the footer */
+    
+    /* Positioning */
+    position: relative;
+    z-index: 10;
+    
+    /* Responsive behavior */
+    flex-wrap: wrap;
+    
+    /* Overflow handling - horizontal scroll for many buttons */
+    overflow-x: auto;
+    overflow-y: visible;
+    
+    /* Minimum usability */
+    min-height: var(--touch-target-min, 44px);
+    
+    /* Smooth scrolling for overflow */
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    
+    /* Border radius for bottom corners */
+    border-bottom-left-radius: var(--modal-border-radius);
+    border-bottom-right-radius: var(--modal-border-radius);
+}
+
+.scroll-indicator {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background: var(--modal-background);
+    border: 1px solid var(--modal-border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: opacity var(--transition-fast);
+    z-index: 20;
+    pointer-events: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.scroll-indicator-left {
+    left: 4px;
+}
+
+.scroll-indicator-right {
+    right: 4px;
+}
+
+.scroll-indicator:hover {
+    background: var(--color-background-hover, #f3f4f6);
+}
+
+/* Modal Footer States */
+.modal-footer.has-overflow-x {
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+.modal-footer.needs-stacking {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.modal-footer.needs-stacking .modal-button {
+    width: 100%;
+    justify-content: center;
+}
+
+.modal-footer.mobile-layout {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-2, 8px);
+}
+
+.modal-footer.mobile-layout .modal-button {
+    width: 100%;
+    justify-content: center;
+}
+
+.modal-footer.small-mobile-layout {
+    padding: var(--spacing-2, 8px);
+}
+
+/* Button spacing improvements */
+.modal-footer > .modal-button:not(:last-child) {
+    margin-right: 0; /* Use gap instead */
+}
+
+/* Many buttons layout optimization */
+.modal-footer.many-buttons {
+    justify-content: center;
     flex-wrap: wrap;
 }
 
-.modal-button {
-    padding: var(--spacing-2, 8px) var(--spacing-4, 16px);
-    border: none;
-    border-radius: var(--button-border-radius);
-    cursor: pointer;
-    font-size: var(--font-size-sm, 14px);
-    font-weight: var(--font-weight-medium, 500);
-    transition: all var(--transition-fast);
-    min-height: var(--touch-target-min);
-    min-width: 80px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
-
-.modal-button:focus-visible {
-    outline: var(--focus-ring-width) solid var(--form-border-focus);
-    outline-offset: var(--focus-ring-offset);
-}
-
-.modal-button.primary {
-    background: var(--nav-item-selected);
-    color: var(--color-white, white);
-    border: 1px solid transparent;
-}
-
-.modal-button.primary:hover:not(:disabled) {
-    background: var(--color-primary-dark, #1976d2);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md, 0 4px 6px rgba(0, 0, 0, 0.1));
-}
-
-.modal-button.secondary {
-    background: var(--nav-item-hover);
-    color: var(--color-gray-900, #333);
-    border: 1px solid var(--modal-border);
-}
-
-.modal-button.secondary:hover:not(:disabled) {
-    background: var(--color-gray-200, #e0e0e0);
-    border-color: var(--color-gray-400, #ccc);
-}
-
-.modal-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none !important;
-    box-shadow: none !important;
-}
-
-.modal-button.loading {
-    pointer-events: none;
-}
-
-.modal-button.loading::after {
-    content: '';
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    border: 2px solid transparent;
-    border-top: 2px solid currentColor;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin-left: var(--spacing-2, 8px);
-}
-
-@keyframes modalSlideIn {
-    from {
-        opacity: 0;
-        transform: translate(-50%, -60%) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-    }
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
+.modal-footer.many-buttons .modal-button {
+    min-width: 60px;
+    padding: var(--spacing-2, 8px) var(--spacing-3, 12px);
+    font-size: var(--font-size-xs, 12px);
 }
 
 /* ===== NAVIGATION MENU STYLES ===== */
@@ -514,7 +565,6 @@
     background-color: var(--form-disabled-bg);
     color: var(--color-gray-500, #999);
     cursor: not-allowed;
-    opacity: 0.7;
 }
 
 .form-input::placeholder,
@@ -747,12 +797,6 @@
     border-radius: 50%;
     animation: componentSpin 0.8s linear infinite;
     z-index: 10;
-}
-
-@keyframes componentSpin {
-    to {
-        transform: translate(-50%, -50%) rotate(360deg);
-    }
 }
 
 /* Error States */
@@ -1188,4 +1232,142 @@
         border: 1px solid #000 !important;
         box-shadow: none !important;
     }
+}
+
+/* Modal Footer Responsive & Overflow Styles */
+.modal-footer::-webkit-scrollbar {
+    height: 4px;
+}
+
+.modal-footer::-webkit-scrollbar-track {
+    background: var(--color-background-secondary, #f8fafc);
+}
+
+.modal-footer::-webkit-scrollbar-thumb {
+    background: var(--color-border-light, #e5e7eb);
+    border-radius: 2px;
+}
+
+.modal-footer::-webkit-scrollbar-thumb:hover {
+    background: var(--color-border, #d1d5db);
+}
+
+/* Overflow indicator shadows */
+.modal-footer.has-overflow::before {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    background: linear-gradient(to left, var(--modal-background), transparent);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+    .modal-footer {
+        padding: var(--spacing-3, 12px) var(--spacing-4, 16px);
+        gap: var(--spacing-2, 8px);
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .modal-footer .modal-button {
+        width: 100%;
+        justify-content: center;
+        margin: 0;
+    }
+    
+    .modal-footer .modal-button + .modal-button {
+        margin-top: var(--spacing-2, 8px);
+    }
+}
+
+/* Small mobile adjustments */
+@media (max-width: 480px) {
+    .modal-footer {
+        padding: var(--spacing-2, 8px) var(--spacing-3, 12px);
+    }
+}
+
+/* Focus improvements */
+.modal-footer .modal-button:focus-visible {
+    outline: var(--focus-ring-width, 2px) solid var(--form-border-focus);
+    outline-offset: var(--focus-ring-offset, 2px);
+    z-index: 21;
+}
+
+/* Animation for layout changes */
+.modal-footer {
+    transition: all var(--transition-normal, 0.2s) ease-in-out;
+}
+
+.modal-footer .modal-button {
+    transition: all var(--transition-fast, 0.15s) ease-in-out;
+}
+
+/* ===== MODAL LAYOUT SAFETY & EDGE CASES ===== */
+
+/* Ensure modal backdrop uses flexbox for centering */
+.modal-backdrop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Reset modal-dialog positioning when inside flexbox backdrop */
+.modal-backdrop .modal-dialog {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    margin: auto;
+}
+
+/* Handle very tall content */
+.modal-dialog {
+    max-height: 95vh; /* Increase from 90vh for better usability */
+}
+
+/* Ensure modal parts have proper border radius inheritance */
+.modal-header:first-child {
+    border-top-left-radius: var(--modal-border-radius);
+    border-top-right-radius: var(--modal-border-radius);
+}
+
+.modal-footer:last-child {
+    border-bottom-left-radius: var(--modal-border-radius);
+    border-bottom-right-radius: var(--modal-border-radius);
+}
+
+/* Handle single-section modals (no header or footer) */
+.modal-body:first-child {
+    border-top-left-radius: var(--modal-border-radius);
+    border-top-right-radius: var(--modal-border-radius);
+}
+
+.modal-body:last-child {
+    border-bottom-left-radius: var(--modal-border-radius);
+    border-bottom-right-radius: var(--modal-border-radius);
+}
+
+/* Prevent modal parts from creating their own stacking context issues */
+.modal-header,
+.modal-body,
+.modal-footer {
+    isolation: isolate;
+}
+
+/* Fix for modals with very little content */
+.modal-dialog:has(.modal-body:empty),
+.modal-dialog:has(.modal-body:not(:has(*))) {
+    min-height: 200px;
+    justify-content: center;
+}
+
+/* Ensure footer always appears at bottom even with little content */
+.modal-dialog:has(.modal-footer) {
+    min-height: 150px;
 }
