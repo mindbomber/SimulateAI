@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Navigation Link Behavior Test</title>
+    <style>
+        /* Minimal CSS for debugging mobile nav behavior */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+        
+        /* Header styling */
+        .header {
+            background: #1a73e8;
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+        
+        /* Desktop navigation */
+        .main-nav {
+            display: none;
+        }
+        
+        .nav-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        
+        .nav-link:hover,
+        .nav-link:focus {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Hamburger button */
+        .nav-toggle {
+            display: flex;
+            flex-direction: column;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            width: 40px;
+            height: 40px;
+            justify-content: space-around;
+            align-items: center;
+        }
+        
+        .nav-toggle span {
+            display: block;
+            width: 24px;
+            height: 3px;
+            background: white;
+            transition: all 0.3s ease;
+            transform-origin: center;
+        }
+        
+        .nav-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        
+        .nav-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .nav-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+        
+        /* Mobile navigation styles */
+        @media (max-width: 767px) {
+            .main-nav {
+                display: block;
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 280px;
+                height: 100vh;
+                background: white;
+                box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+                transition: right 0.3s ease;
+                z-index: 1001;
+                overflow-y: auto;
+            }
+            
+            .main-nav.open {
+                right: 0;
+            }
+            
+            .nav-close {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                cursor: pointer;
+                color: #333;
+                padding: 0.5rem;
+                line-height: 1;
+            }
+            
+            .nav-list {
+                flex-direction: column;
+                gap: 0;
+                padding: 4rem 1rem 1rem;
+            }
+            
+            .nav-link {
+                color: #333;
+                display: block;
+                padding: 1rem;
+                border-bottom: 1px solid #eee;
+                font-size: 1.1rem;
+            }
+            
+            .nav-link:hover,
+            .nav-link:focus {
+                background-color: #f8f9fa;
+            }
+            
+            .nav-backdrop {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+            }
+            
+            .nav-backdrop.open {
+                display: block;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .nav-toggle {
+                display: none;
+            }
+            
+            .main-nav {
+                display: block !important;
+                position: static;
+                width: auto;
+                height: auto;
+                background: none;
+                box-shadow: none;
+                overflow: visible;
+            }
+            
+            .nav-close {
+                display: none;
+            }
+            
+            .nav-backdrop {
+                display: none !important;
+            }
+        }
+        
+        /* Content sections */
+        section {
+            padding: 2rem;
+            min-height: 500px;
+        }
+        
+        #home { background: #f8f9fa; }
+        #simulations { background: #e3f2fd; }
+        #educator-tools { background: #f3e5f5; }
+        #about { background: #e8f5e8; }
+        
+        /* Debug styles */
+        .debug {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: #333;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            max-width: 300px;
+            z-index: 2000;
+        }
+        
+        .debug h4 {
+            margin: 0 0 5px 0;
+            font-size: 14px;
+        }
+        
+        .debug-log {
+            max-height: 150px;
+            overflow-y: auto;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">SimulateAI Test</div>
+            
+            <!-- Mobile hamburger button -->
+            <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
+            <nav class="main-nav" role="navigation">
+                <button class="nav-close" aria-label="Close navigation menu">×</button>
+                <ul class="nav-list">
+                    <li><a href="#home" class="nav-link active">Home</a></li>
+                    <li><a href="#simulations" class="nav-link">Simulations</a></li>
+                    <li><a href="#educator-tools" class="nav-link">Educator Tools</a></li>
+                    <li><a href="#about" class="nav-link">About</a></li>
+                </ul>
+            </nav>
+        </div>
+        
+        <!-- Mobile navigation backdrop -->
+        <div class="nav-backdrop" aria-hidden="true"></div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <section id="home">
+            <h2>Home Section</h2>
+            <p>This is the home section. The navigation should smoothly scroll to different sections and close the mobile menu when clicked.</p>
+        </section>
+        
+        <section id="simulations">
+            <h2>Simulations Section</h2>
+            <p>This is the simulations section. Test clicking the navigation links from mobile view.</p>
+        </section>
+        
+        <section id="educator-tools">
+            <h2>Educator Tools Section</h2>
+            <p>This is the educator tools section. Check if the mobile menu closes properly after navigation.</p>
+        </section>
+        
+        <section id="about">
+            <h2>About Section</h2>
+            <p>This is the about section. Verify that all navigation behaviors work as expected.</p>
+        </section>
+    </main>
+
+    <!-- Debug panel -->
+    <div class="debug">
+        <h4>Navigation Debug Log</h4>
+        <div class="debug-log" id="debug-log"></div>
+    </div>
+
+    <script>
+        // Debug logging
+        function debugLog(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logElement = document.getElementById('debug-log');
+            logElement.innerHTML += `[${timestamp}] ${message}<br>`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(`[Nav Debug] ${message}`);
+        }
+
+        // Mobile navigation setup
+        function setupMobileNavigation() {
+            const navToggle = document.querySelector('.nav-toggle');
+            const navClose = document.querySelector('.nav-close');
+            const mainNav = document.querySelector('.main-nav');
+            const navBackdrop = document.querySelector('.nav-backdrop');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            debugLog('Setting up mobile navigation...');
+            
+            if (!navToggle || !mainNav) {
+                debugLog('ERROR: Navigation elements not found');
+                return;
+            }
+            
+            // Toggle mobile navigation
+            const toggleNav = (isOpen) => {
+                const isCurrentlyOpen = mainNav.classList.contains('open');
+                const shouldOpen = isOpen !== undefined ? isOpen : !isCurrentlyOpen;
+                
+                debugLog(`Toggling nav: ${isCurrentlyOpen} -> ${shouldOpen}`);
+                
+                // Update classes
+                mainNav.classList.toggle('open', shouldOpen);
+                navToggle.classList.toggle('active', shouldOpen);
+                if (navBackdrop) {
+                    navBackdrop.classList.toggle('open', shouldOpen);
+                }
+                
+                // Update ARIA attributes
+                navToggle.setAttribute('aria-expanded', shouldOpen.toString());
+                mainNav.setAttribute('aria-hidden', (!shouldOpen).toString());
+                
+                // Prevent body scroll when nav is open
+                document.body.style.overflow = shouldOpen ? 'hidden' : '';
+                
+                debugLog(`Nav state updated. Classes: ${mainNav.className}`);
+            };
+            
+            // Hamburger button click
+            navToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                debugLog('Hamburger button clicked');
+                toggleNav();
+            });
+            
+            // Close button click
+            if (navClose) {
+                navClose.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    debugLog('Close button clicked');
+                    toggleNav(false);
+                });
+            }
+            
+            // Backdrop click
+            if (navBackdrop) {
+                navBackdrop.addEventListener('click', () => {
+                    debugLog('Backdrop clicked');
+                    toggleNav(false);
+                });
+            }
+            
+            // Handle nav link clicks
+            navLinks.forEach((link, index) => {
+                link.addEventListener('click', (e) => {
+                    const href = link.getAttribute('href');
+                    const text = link.textContent.trim();
+                    
+                    debugLog(`Nav link clicked: "${text}" (${href}) - Index: ${index}`);
+                    debugLog(`Event details: target=${e.target.tagName}, currentTarget=${e.currentTarget.tagName}`);
+                    debugLog(`Default prevented: ${e.defaultPrevented}`);
+                    
+                    // Check if this is a hash link (internal navigation)
+                    if (href && href.startsWith('#')) {
+                        const targetElement = document.querySelector(href);
+                        if (targetElement) {
+                            debugLog(`Found target element: ${href}`);
+                            
+                            // Close mobile nav after a short delay to allow navigation
+                            const NAV_CLOSE_DELAY = 150;
+                            setTimeout(() => {
+                                debugLog(`Closing nav after ${NAV_CLOSE_DELAY}ms delay`);
+                                toggleNav(false);
+                            }, NAV_CLOSE_DELAY);
+                            
+                            // Smooth scroll to target (optional - browser handles this by default)
+                            targetElement.scrollIntoView({ behavior: 'smooth' });
+                        } else {
+                            debugLog(`WARNING: Target element not found for ${href}`);
+                        }
+                    } else {
+                        debugLog(`External link or non-hash href: ${href}`);
+                        // For external links, close nav immediately
+                        toggleNav(false);
+                    }
+                });
+            });
+            
+            // Handle escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && mainNav.classList.contains('open')) {
+                    debugLog('Escape key pressed - closing nav');
+                    toggleNav(false);
+                }
+            });
+            
+            // Handle window resize
+            let resizeTimeout;
+            const DESKTOP_BREAKPOINT = 768;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                const RESIZE_DEBOUNCE = 100;
+                resizeTimeout = setTimeout(() => {
+                    if (window.innerWidth >= DESKTOP_BREAKPOINT && mainNav.classList.contains('open')) {
+                        debugLog('Resize to desktop - closing mobile nav');
+                        toggleNav(false);
+                        document.body.style.overflow = '';
+                    }
+                }, RESIZE_DEBOUNCE);
+            });
+            
+            debugLog('Mobile navigation setup complete');
+        }
+        
+        // Check for any global click handlers that might interfere
+        function checkGlobalHandlers() {
+            debugLog('Checking for global event handlers...');
+            
+            // Override console.log to catch any other script logging
+            const originalLog = console.log;
+            console.log = function(...args) {
+                if (args[0] && args[0].includes && (args[0].includes('click') || args[0].includes('nav'))) {
+                    debugLog(`Console: ${args.join(' ')}`);
+                }
+                originalLog.apply(console, args);
+            };
+            
+            // Listen for all clicks to see what else might be happening
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.debug')) return; // Ignore debug panel clicks
+                
+                debugLog(`Global click: ${e.target.tagName}.${e.target.className} at (${e.clientX}, ${e.clientY})`);
+                
+                // Check if there are multiple listeners
+                const listeners = getEventListeners ? getEventListeners(e.target) : 'unavailable';
+                if (listeners !== 'unavailable' && listeners.click && listeners.click.length > 1) {
+                    debugLog(`Multiple click listeners detected: ${listeners.click.length}`);
+                }
+            }, true); // Use capture phase to catch early
+        }
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            debugLog('DOM loaded - initializing...');
+            setupMobileNavigation();
+            checkGlobalHandlers();
+            debugLog('Initialization complete');
+        });
+        
+        // Track any errors
+        window.addEventListener('error', (e) => {
+            debugLog(`JavaScript error: ${e.message} at ${e.filename}:${e.lineno}`);
+        });
+        
+        debugLog('Script loaded');
+    </script>
+</body>
+</html>

@@ -1637,7 +1637,7 @@ class AIEthicsApp {
             }
             
             // Analytics
-            this.trackEvent('mobile_nav_toggled', { isOpen: shouldOpen });
+            simpleAnalytics.trackEvent('mobile_nav_toggled', { isOpen: shouldOpen });
         };
         
         // Hamburger button click
@@ -1663,10 +1663,78 @@ class AIEthicsApp {
         
         // Close nav when clicking on nav links
         navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                // Close mobile nav after a short delay to allow navigation
-                const NAV_CLOSE_DELAY = 150;
-                setTimeout(() => toggleNav(false), NAV_CLOSE_DELAY);
+            link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href');
+                const text = link.textContent.trim();
+                
+                logger.info(`Navigation link clicked: "${text}" -> ${href}`);
+                
+                // Handle hash-based navigation
+                if (href && href.startsWith('#')) {
+                    // Prevent default browser jump behavior
+                    e.preventDefault();
+                    
+                    const targetElement = document.querySelector(href);
+                    
+                    if (targetElement) {
+                        logger.info(`Navigating to section: ${href}`);
+                        
+                        // Close mobile nav first
+                        toggleNav(false);
+                        
+                        // Then smoothly scroll to target after a brief delay
+                        const SCROLL_DELAY = 100;
+                        setTimeout(() => {
+                            targetElement.scrollIntoView({ 
+                                behavior: 'smooth', 
+                                block: 'start' 
+                            });
+                            logger.info(`Scrolled to section: ${href}`);
+                        }, SCROLL_DELAY);
+                        
+                        // Track successful navigation
+                        simpleAnalytics.trackEvent('navigation_link_clicked', { 
+                            target: href,
+                            text,
+                            success: true 
+                        });
+                    } else {
+                        logger.warn(`Navigation target not found: ${href}`);
+                        
+                        // Close menu immediately for missing targets
+                        toggleNav(false);
+                        
+                        // Show user feedback for missing sections
+                        const NOTIFICATION_DURATION = 3000;
+                        if (this.showNotification) {
+                            this.showNotification(
+                                `Section "${text}" is not available on this page.`, 
+                                'warning', 
+                                NOTIFICATION_DURATION
+                            );
+                        }
+                        
+                        // Track failed navigation
+                        simpleAnalytics.trackEvent('navigation_link_clicked', { 
+                            target: href,
+                            text,
+                            success: false,
+                            error: 'target_not_found'
+                        });
+                    }
+                } else {
+                    logger.info(`External link or non-hash navigation: ${href}`);
+                    
+                    // For external links, close nav immediately
+                    toggleNav(false);
+                    
+                    // Track external navigation
+                    simpleAnalytics.trackEvent('navigation_link_clicked', { 
+                        target: href,
+                        text,
+                        type: 'external'
+                    });
+                }
             });
         });
         

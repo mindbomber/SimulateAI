@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hero Demo Popover Test - SimulateAI</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/hero-demo.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 2rem;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .test-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+        
+        .test-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .test-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="test-header">
+            <h1>🎯 Feedback Popover Demo</h1>
+            <p>Click on any choice button to see the feedback popover in action</p>
+        </div>
+        
+        <div class="hero-demo-container">
+            <div class="demo-header">
+                <h3 class="demo-title">Interactive AI Ethics Scenario</h3>
+                <p class="demo-subtitle">Experience how your choices affect different stakeholders</p>
+            </div>
+            
+            <div class="demo-content">
+                <div class="scenario-panel">
+                    <div class="scenario-header">
+                        <span class="scenario-counter">Scenario 1 of 3</span>
+                        <h4 class="scenario-title">AI Hiring System</h4>
+                    </div>
+                    
+                    <p class="scenario-question">
+                        Your company is implementing an AI hiring system. During testing, you notice it consistently ranks candidates from certain universities higher. What's your next step?
+                    </p>
+                    
+                    <div class="scenario-choices">
+                        <button class="choice-btn" data-choice="audit">
+                            <span class="choice-text">Conduct a comprehensive bias audit</span>
+                            <span class="choice-arrow">→</span>
+                        </button>
+                        
+                        <button class="choice-btn" data-choice="adjust">
+                            <span class="choice-text">Manually adjust the rankings</span>
+                            <span class="choice-arrow">→</span>
+                        </button>
+                        
+                        <button class="choice-btn" data-choice="proceed">
+                            <span class="choice-text">Proceed with current system</span>
+                            <span class="choice-arrow">→</span>
+                        </button>
+                        
+                        <button class="choice-btn" data-choice="delay">
+                            <span class="choice-text">Delay implementation for review</span>
+                            <span class="choice-arrow">→</span>
+                        </button>
+                        
+                        <!-- Feedback Popover (initially hidden) -->
+                        <div class="scenario-feedback" id="feedback-popover">
+                            <button class="feedback-close" aria-label="Close feedback">×</button>
+                            <div class="feedback-content">
+                                <div class="feedback-message">
+                                    <span class="feedback-icon">💡</span>
+                                    <p id="feedback-text">Your choice will appear here...</p>
+                                </div>
+                            </div>
+                            
+                            <div class="completion-summary">
+                                <h6>Impact Assessment</h6>
+                                <div class="summary-score excellent">
+                                    <span class="score-label">Ethics Score</span>
+                                    <span class="score-value" id="ethics-score">85%</span>
+                                </div>
+                                <p class="summary-message" id="summary-message">
+                                    This choice demonstrates strong ethical consideration for fairness and transparency.
+                                </p>
+                            </div>
+                            
+                            <div style="margin-top: 1rem;">
+                                <button class="btn btn-sm btn-primary">Continue</button>
+                                <button class="btn btn-sm btn-outline">Learn More</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ethics-dashboard">
+                    <h5 class="dashboard-title">Ethics Impact</h5>
+                    <div class="ethics-meters">
+                        <div class="ethics-meter">
+                            <div class="meter-header">
+                                <span class="meter-label">Fairness</span>
+                                <span class="meter-value">75%</span>
+                            </div>
+                            <div class="meter-bar">
+                                <div class="meter-fill good" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="ethics-meter">
+                            <div class="meter-header">
+                                <span class="meter-label">Transparency</span>
+                                <span class="meter-value">60%</span>
+                            </div>
+                            <div class="meter-bar">
+                                <div class="meter-fill fair" style="width: 60%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="ethics-meter">
+                            <div class="meter-header">
+                                <span class="meter-label">Accountability</span>
+                                <span class="meter-value">80%</span>
+                            </div>
+                            <div class="meter-bar">
+                                <div class="meter-fill excellent" style="width: 80%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="demo-hint">
+                <span class="hint-icon">💡</span>
+                <span>Click any choice button to see feedback appear as a popover above the button</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mobile backdrop for popover -->
+    <div class="feedback-backdrop" id="feedback-backdrop"></div>
+    
+    <script>
+        // Feedback content for each choice
+        const feedbackData = {
+            audit: {
+                icon: '✅',
+                text: 'Excellent choice! Conducting a bias audit addresses the root cause and ensures fair hiring practices.',
+                score: 95,
+                scoreClass: 'excellent',
+                message: 'This approach prioritizes ethical AI development and fair treatment of all candidates.'
+            },
+            adjust: {
+                icon: '⚠️',
+                text: 'This could help short-term but doesn\'t address underlying bias. Consider a more systematic approach.',
+                score: 60,
+                scoreClass: 'good', 
+                message: 'Manual adjustments may introduce new biases and aren\'t sustainable long-term.'
+            },
+            proceed: {
+                icon: '❌',
+                text: 'This choice ignores potential bias and could lead to discriminatory hiring practices.',
+                score: 25,
+                scoreClass: 'needs-improvement',
+                message: 'Proceeding without addressing bias issues could have serious legal and ethical consequences.'
+            },
+            delay: {
+                icon: '🤔',
+                text: 'A cautious approach that allows time for proper evaluation, though it may slow progress.',
+                score: 75,
+                scoreClass: 'good',
+                message: 'Delays can be costly, but ensuring ethical AI implementation is crucial.'
+            }
+        };
+        
+        // Get DOM elements
+        const choiceButtons = document.querySelectorAll('.choice-btn');
+        const feedbackPopover = document.getElementById('feedback-popover');
+        const feedbackBackdrop = document.getElementById('feedback-backdrop');
+        const feedbackClose = document.querySelector('.feedback-close');
+        const feedbackText = document.getElementById('feedback-text');
+        const ethicsScore = document.getElementById('ethics-score');
+        const summaryMessage = document.getElementById('summary-message');
+        
+        let currentActiveButton = null;
+        
+        // Show popover function
+        function showFeedback(button, choiceKey) {
+            const feedback = feedbackData[choiceKey];
+            if (!feedback) return;
+            
+            // Update feedback content
+            const feedbackIcon = feedbackPopover.querySelector('.feedback-icon');
+            feedbackIcon.textContent = feedback.icon;
+            feedbackText.textContent = feedback.text;
+            ethicsScore.textContent = feedback.score + '%';
+            summaryMessage.textContent = feedback.message;
+            
+            // Update score styling
+            const scoreElement = feedbackPopover.querySelector('.summary-score');
+            scoreElement.className = `summary-score ${feedback.scoreClass}`;
+            
+            // Position popover relative to button
+            const buttonRect = button.getBoundingClientRect();
+            const isMobile = window.innerWidth <= 768;
+            
+            if (!isMobile) {
+                // Desktop: position above button
+                const choicesContainer = button.closest('.scenario-choices');
+                const containerRect = choicesContainer.getBoundingClientRect();
+                
+                // Position relative to the choices container
+                feedbackPopover.style.position = 'absolute';
+                feedbackPopover.style.top = (buttonRect.top - containerRect.top - 10) + 'px';
+                feedbackPopover.style.left = '50%';
+                feedbackPopover.style.transform = 'translateX(-50%) translateY(-100%)';
+            } else {
+                // Mobile: center on screen
+                feedbackBackdrop.classList.add('visible');
+            }
+            
+            // Show popover
+            feedbackPopover.classList.add('visible');
+            
+            // Update button states
+            choiceButtons.forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+            currentActiveButton = button;
+            
+            // Focus management
+            feedbackClose.focus();
+            
+            console.log(`Showing feedback for choice: ${choiceKey}`, feedback);
+        }
+        
+        // Hide popover function  
+        function hideFeedback() {
+            feedbackPopover.classList.remove('visible');
+            feedbackBackdrop.classList.remove('visible');
+            
+            if (currentActiveButton) {
+                currentActiveButton.classList.remove('selected');
+                currentActiveButton.focus();
+                currentActiveButton = null;
+            }
+        }
+        
+        // Event listeners
+        choiceButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                const choiceKey = button.getAttribute('data-choice');
+                showFeedback(button, choiceKey);
+            });
+        });
+        
+        // Close button
+        feedbackClose.addEventListener('click', hideFeedback);
+        
+        // Backdrop click (mobile)
+        feedbackBackdrop.addEventListener('click', hideFeedback);
+        
+        // Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && feedbackPopover.classList.contains('visible')) {
+                hideFeedback();
+            }
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (feedbackPopover.classList.contains('visible')) {
+                // Re-position if needed
+                const isMobile = window.innerWidth <= 768;
+                if (isMobile) {
+                    feedbackBackdrop.classList.add('visible');
+                } else {
+                    feedbackBackdrop.classList.remove('visible');
+                }
+            }
+        });
+        
+        console.log('Feedback popover demo initialized');
+    </script>
+</body>
+</html>
