@@ -8,6 +8,20 @@ import EthicsSimulation from '../core/simulation.js';
 import logger from '../utils/logger.js';
 import { TIMING } from '../utils/constants.js';
 
+// Gamification constants
+const GAME_CONSTANTS = {
+  CONFETTI_COUNT: 20,
+  CELEBRATION_CONFETTI_COUNT: 50,
+  CONFETTI_ANIMATION_DURATION: 3000,
+  CELEBRATION_ANIMATION_DURATION: 4000,
+  LEVEL_UP_NOTIFICATION_DURATION: 3000,
+  CONFETTI_DELAY: 100,
+  CELEBRATION_CONFETTI_DELAY: 50,
+  MIN_CONFETTI_SIZE: 5,
+  MAX_CONFETTI_SIZE: 15,
+  PROGRESS_STATS_COUNT: 3
+};
+
 class BiasExplorerSimulation extends EthicsSimulation {
   constructor(id) {
     super(id, {
@@ -24,47 +38,100 @@ class BiasExplorerSimulation extends EthicsSimulation {
       openEnded: true
     });
 
-    // Real-world scenarios for exploration
+    // Real-world scenarios for exploration - reduced to 4 focused scenarios
     this.scenarios = [
       {
         id: 'hiring',
         title: 'AI Hiring Assistant',
+        icon: '💼',
+        difficulty: 'beginner',
         context: 'A company uses AI to screen job applications',
         description: 'Help TechCorp design their AI hiring system. Your choices will affect who gets interviewed.',
         setting: 'Corporate recruiting department',
-        stakeholders: ['Job applicants', 'HR managers', 'Company shareholders', 'Society']
+        stakeholders: ['Job applicants', 'HR managers', 'Company shareholders', 'Society'],
+        gameElements: {
+          challenge: 'Balance fairness with efficiency',
+          reward: 'Unlock insights about hiring bias',
+          progress: 0
+        }
       },
       {
         id: 'lending',
         title: 'Smart Loan Approval',
+        icon: '🏦',
+        difficulty: 'intermediate',
         context: 'A bank uses AI to approve or deny loans',
         description: 'Design an AI system for CommunityBank that decides who gets loans for homes and businesses.',
         setting: 'Community bank serving diverse neighborhoods',
-        stakeholders: ['Loan applicants', 'Bank customers', 'Local community', 'Bank investors']
+        stakeholders: ['Loan applicants', 'Bank customers', 'Local community', 'Bank investors'],
+        gameElements: {
+          challenge: 'Ensure fair access to financial services',
+          reward: 'Discover financial inclusion strategies',
+          progress: 0
+        }
       },
       {
         id: 'healthcare',
         title: 'Medical AI Assistant',
+        icon: '🏥',
+        difficulty: 'intermediate',
         context: 'An AI helps doctors prioritize patient care',
         description: 'Create an AI system that helps doctors decide which patients need immediate attention.',
         setting: 'Busy urban hospital emergency room',
-        stakeholders: ['Patients', 'Medical staff', 'Hospital administration', 'Insurance companies']
+        stakeholders: ['Patients', 'Medical staff', 'Hospital administration', 'Insurance companies'],
+        gameElements: {
+          challenge: 'Save lives while ensuring equity',
+          reward: 'Learn about healthcare disparities',
+          progress: 0
+        }
       },
       {
         id: 'education',
         title: 'Personalized Learning AI',
+        icon: '🎓',
+        difficulty: 'beginner',
         context: 'An AI system personalizes education for students',
         description: 'Design an AI tutor that adapts to different learning styles and backgrounds.',
         setting: 'Public school with diverse student population',
-        stakeholders: ['Students', 'Teachers', 'Parents', 'School administrators']
+        stakeholders: ['Students', 'Teachers', 'Parents', 'School administrators'],
+        gameElements: {
+          challenge: 'Help every student succeed',
+          reward: 'Unlock personalized learning secrets',
+          progress: 0
+        }
       }
     ];
+
+    // Ensure all scenarios have proper gameElements structure
+    this.scenarios.forEach(scenario => {
+      if (!scenario.gameElements) {
+        scenario.gameElements = {
+          challenge: 'Explore AI ethics concepts',
+          reward: 'Gain insights about fairness',
+          progress: 0
+        };
+      }
+      // Ensure progress is always a number
+      if (typeof scenario.gameElements.progress !== 'number') {
+        scenario.gameElements.progress = 0;
+      }
+    });
 
     // Current exploration state
     this.currentScenario = null;
     this.explorationHistory = [];
     this.currentChoices = {};
     this.consequences = [];
+    
+    // Game elements
+    this.gameState = {
+      totalScenarios: 4,
+      completedScenarios: 0,
+      totalChoices: 0,
+      insightsUnlocked: 0,
+      badges: [],
+      level: 1
+    };
     
     // UI elements
     this.ui = null;
@@ -179,8 +246,29 @@ class BiasExplorerSimulation extends EthicsSimulation {
     layout.className = 'ethics-explorer-layout';
     layout.innerHTML = `
       <header class="explorer-header">
-        <h1>AI Ethics Explorer</h1>
-        <p class="explorer-subtitle">Explore real-world AI scenarios and see the impact of your choices</p>
+        <div class="header-content">
+          <h1>🎯 AI Ethics Explorer</h1>
+          <p class="explorer-subtitle">Explore real-world AI scenarios and see the impact of your choices</p>
+        </div>
+        <div class="game-progress">
+          <div class="progress-stats">
+            <div class="stat-item">
+              <span class="stat-value">${this.gameState.completedScenarios}</span>
+              <span class="stat-label">Scenarios</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">${this.gameState.insightsUnlocked}</span>
+              <span class="stat-label">Insights</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">Level ${this.gameState.level}</span>
+              <span class="stat-label">Explorer</span>
+            </div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${(this.gameState.completedScenarios / this.gameState.totalScenarios) * 100}%"></div>
+          </div>
+        </div>
       </header>
       
       <main class="explorer-main">
@@ -189,32 +277,29 @@ class BiasExplorerSimulation extends EthicsSimulation {
         </div>
         
         <aside class="explorer-sidebar">
-          <div class="educator-panel">
-            <h3>🎓 For Educators</h3>
-            <div class="educator-resources">
-              <button class="resource-btn" onclick="this.showGuide('discussion')">
-                Discussion Guide
-              </button>
-              <button class="resource-btn" onclick="this.showGuide('classroom')">
-                Classroom Activities
-              </button>
-              <button class="resource-btn" onclick="this.showGuide('assessment')">
-                Assessment Ideas
-              </button>
+          <div class="achievements-panel">
+            <h3>🏆 Your Progress</h3>
+            <div class="badges-container" id="badges-container">
+              <div class="badge-placeholder">Complete scenarios to earn badges!</div>
             </div>
           </div>
           
           <div class="exploration-history" id="exploration-history">
-            <h3>🔍 Your Exploration</h3>
+            <h3>🔍 Your Journey</h3>
             <div class="history-content">
-              <p>Your choices and their consequences will appear here as you explore.</p>
+              <p>Your exploration path will appear here as you make choices.</p>
             </div>
           </div>
           
-          <div class="perspective-panel" id="perspective-panel">
-            <h3>👥 Multiple Perspectives</h3>
-            <div class="perspectives-content">
-              <p>Consider how different groups might be affected by AI decisions.</p>
+          <div class="educator-panel">
+            <h3>🎓 For Educators</h3>
+            <div class="educator-resources">
+              <button class="resource-btn" onclick="window.currentSimulation.showGuide('discussion')">
+                💬 Discussion Guide
+              </button>
+              <button class="resource-btn" onclick="window.currentSimulation.showGuide('classroom')">
+                📚 Activities
+              </button>
             </div>
           </div>
         </aside>
@@ -233,38 +318,116 @@ class BiasExplorerSimulation extends EthicsSimulation {
     
     scenarioArea.innerHTML = `
       <div class="scenario-selection">
-        <h2>Choose a Real-World AI Scenario to Explore</h2>
-        <p class="selection-subtitle">Each scenario presents real challenges faced by organizations using AI. There are no "right" answers - just explore and learn!</p>
+        <div class="selection-header">
+          <h2>🚀 Choose Your AI Ethics Challenge</h2>
+          <p class="selection-subtitle">Each scenario teaches you about real AI bias issues. Complete all 4 to become an Ethics Expert!</p>
+        </div>
         
         <div class="scenarios-grid">
-          ${this.scenarios.map(scenario => `
-            <div class="scenario-card" onclick="window.currentSimulation.selectScenario('${scenario.id}')">
-              <h3>${scenario.title}</h3>
-              <p class="scenario-context">${scenario.context}</p>
-              <p class="scenario-description">${scenario.description}</p>
-              <div class="scenario-meta">
-                <span class="setting">📍 ${scenario.setting}</span>
-                <span class="stakeholders">👥 ${scenario.stakeholders.length} stakeholder groups</span>
+          ${this.scenarios.map(scenario => {
+            // Ensure gameElements exists with default values
+            if (!scenario.gameElements) {
+              scenario.gameElements = {
+                challenge: 'Explore AI ethics concepts',
+                reward: 'Gain insights about fairness',
+                progress: 0
+              };
+            }
+            
+            const isCompleted = scenario.gameElements.progress >= 100;
+            const difficultyColor = scenario.difficulty === 'beginner' ? '#10b981' : '#f59e0b';
+            
+            return `
+              <div class="scenario-card ${isCompleted ? 'completed' : ''}" 
+                   onclick="window.currentSimulation.selectScenario('${scenario.id}')">
+                <div class="card-header">
+                  <div class="scenario-icon">${scenario.icon}</div>
+                  <div class="difficulty-badge" style="background-color: ${difficultyColor}">
+                    ${scenario.difficulty}
+                  </div>
+                  ${isCompleted ? '<div class="completion-badge">✅</div>' : ''}
+                </div>
+                
+                <div class="card-content">
+                  <h3>${scenario.title}</h3>
+                  <p class="scenario-context">${scenario.context}</p>
+                  <p class="scenario-description">${scenario.description}</p>
+                  
+                  <div class="challenge-info">
+                    <div class="challenge-text">
+                      <span class="challenge-label">🎯 Challenge:</span>
+                      <span>${scenario.gameElements.challenge}</span>
+                    </div>
+                    <div class="reward-text">
+                      <span class="reward-label">🎁 Reward:</span>
+                      <span>${scenario.gameElements.reward}</span>
+                    </div>
+                  </div>
+                  
+                  <div class="scenario-progress">
+                    <div class="progress-bar-small">
+                      <div class="progress-fill-small" style="width: ${scenario.gameElements.progress}%"></div>
+                    </div>
+                    <span class="progress-text">${Math.round(scenario.gameElements.progress)}% Complete</span>
+                  </div>
+                </div>
+                
+                <div class="scenario-meta">
+                  <span class="setting">📍 ${scenario.setting}</span>
+                  <span class="stakeholders">👥 ${scenario.stakeholders.length} groups affected</span>
+                </div>
+                
+                <div class="card-action">
+                  <span class="action-text">${isCompleted ? '🔄 Explore Again' : '▶️ Start Challenge'}</span>
+                </div>
               </div>
-            </div>
-          `).join('')}
+            `;
+          }).join('')}
         </div>
         
         <div class="exploration-tips">
-          <h3>💡 How to Explore</h3>
-          <ul>
-            <li>Choose a scenario that interests you</li>
-            <li>Make decisions about how the AI system should work</li>
-            <li>See how your choices affect different groups</li>
-            <li>Try different approaches and compare outcomes</li>
-            <li>Discuss with others - there's no single "correct" solution</li>
-          </ul>
+          <div class="tips-header">
+            <h3>💡 How to Excel</h3>
+          </div>
+          <div class="tips-grid">
+            <div class="tip-item">
+              <span class="tip-icon">🎯</span>
+              <div class="tip-content">
+                <strong>Choose Thoughtfully</strong>
+                <p>Each decision affects real people</p>
+              </div>
+            </div>
+            <div class="tip-item">
+              <span class="tip-icon">⚖️</span>
+              <div class="tip-content">
+                <strong>Consider Trade-offs</strong>
+                <p>Perfect solutions rarely exist</p>
+              </div>
+            </div>
+            <div class="tip-item">
+              <span class="tip-icon">👥</span>
+              <div class="tip-content">
+                <strong>Think About Impact</strong>
+                <p>Who benefits? Who might be harmed?</p>
+              </div>
+            </div>
+            <div class="tip-item">
+              <span class="tip-icon">🔄</span>
+              <div class="tip-content">
+                <strong>Try Different Approaches</strong>
+                <p>Experiment with various solutions</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     `;
     
     // Make simulation globally accessible for onclick handlers
     window.currentSimulation = this;
+    
+    // Update progress display
+    this.updateProgressDisplay();
   }
 
   selectScenario(scenarioId) {
@@ -280,25 +443,69 @@ class BiasExplorerSimulation extends EthicsSimulation {
     const scenarioArea = document.getElementById('scenario-area');
     const scenario = this.currentScenario;
     
+    // Calculate scenario progress
+    const totalSteps = 4; // Context, Stakeholders, Choices, Consequences
+    let currentStep = 1;
+    if (Object.keys(this.currentChoices).length > 0) currentStep = 3;
+    if (this.consequences.length > 0) currentStep = 4;
+    
     scenarioArea.innerHTML = `
       <div class="scenario-exploration">
         <div class="scenario-header">
           <button class="back-btn" onclick="window.currentSimulation.showScenarioSelection()">← Back to Scenarios</button>
-          <h2>${scenario.title}</h2>
-          <p class="scenario-setting">📍 ${scenario.setting}</p>
+          <div class="scenario-title-section">
+            <h2>${scenario.icon} ${scenario.title}</h2>
+            <p class="scenario-setting">📍 ${scenario.setting}</p>
+          </div>
+          <div class="scenario-progress-indicator">
+            <div class="progress-steps">
+              <div class="step ${currentStep >= 1 ? 'completed' : ''}">
+                <span class="step-number">1</span>
+                <span class="step-label">Context</span>
+              </div>
+              <div class="step ${currentStep >= 2 ? 'completed' : ''}">
+                <span class="step-number">2</span>
+                <span class="step-label">Stakeholders</span>
+              </div>
+              <div class="step ${currentStep >= 3 ? 'completed' : ''} ${currentStep === 3 ? 'active' : ''}">
+                <span class="step-number">3</span>
+                <span class="step-label">Choices</span>
+              </div>
+              <div class="step ${currentStep >= 4 ? 'completed' : ''} ${currentStep === 4 ? 'active' : ''}">
+                <span class="step-number">4</span>
+                <span class="step-label">Results</span>
+              </div>
+            </div>
+            <div class="progress-bar-header">
+              <div class="progress-fill-header" style="width: ${(currentStep / totalSteps) * 100}%"></div>
+            </div>
+          </div>
         </div>
         
         <div class="scenario-context">
-          <h3>The Situation</h3>
+          <h3>📋 The Situation</h3>
           <p>${scenario.description}</p>
+          <div class="context-metadata">
+            <span class="difficulty-indicator ${scenario.difficulty}">
+              ${scenario.difficulty === 'beginner' ? '🟢 Beginner' : '🟡 Intermediate'}
+            </span>
+            <span class="challenge-indicator">
+              🎯 ${scenario.gameElements.challenge}
+            </span>
+          </div>
         </div>
         
         <div class="stakeholders-overview">
-          <h3>Who's Affected?</h3>
+          <h3>👥 Who's Affected?</h3>
           <div class="stakeholders-list">
-            ${scenario.stakeholders.map(stakeholder => `
-              <span class="stakeholder-tag">${stakeholder}</span>
+            ${scenario.stakeholders.map((stakeholder, index) => `
+              <span class="stakeholder-tag" style="animation-delay: ${index * 0.1}s">
+                ${stakeholder}
+              </span>
             `).join('')}
+          </div>
+          <div class="stakeholder-count">
+            <strong>${scenario.stakeholders.length}</strong> different groups will be impacted by your decisions
           </div>
         </div>
         
@@ -311,14 +518,14 @@ class BiasExplorerSimulation extends EthicsSimulation {
         </div>
         
         <div class="exploration-actions">
-          <button class="action-btn primary" onclick="window.currentSimulation.exploreConsequences()">
-            See What Happens
+          <button class="action-btn primary" onclick="window.currentSimulation.exploreConsequences()" ${Object.keys(this.currentChoices).length === 0 ? 'disabled' : ''}>
+            🔍 See What Happens
           </button>
           <button class="action-btn secondary" onclick="window.currentSimulation.resetChoices()">
-            Try Different Choices
+            🔄 Try Different Choices
           </button>
           <button class="action-btn tertiary" onclick="window.currentSimulation.compareApproaches()">
-            Compare Approaches
+            📊 Compare Approaches
           </button>
         </div>
       </div>
@@ -643,6 +850,12 @@ class BiasExplorerSimulation extends EthicsSimulation {
             <p>• What would you do differently and why?</p>
           </div>
         </div>
+        
+        <div class="scenario-completion">
+          <button class="action-btn success" onclick="window.currentSimulation.completeScenario()">
+            ✨ Complete This Challenge
+          </button>
+        </div>
       </div>
     `;
   }
@@ -845,6 +1058,20 @@ class BiasExplorerSimulation extends EthicsSimulation {
       try {
         const generatedScenarios = this.scenarioGenerator.generateScenarios('ethics', 'beginner', 2);
         if (generatedScenarios && generatedScenarios.length > 0) {
+          // Ensure generated scenarios have proper gameElements structure
+          generatedScenarios.forEach(scenario => {
+            if (!scenario.gameElements) {
+              scenario.gameElements = {
+                challenge: scenario.challenge || 'Explore AI ethics concepts',
+                reward: scenario.reward || 'Gain insights about fairness',
+                progress: 0
+              };
+            }
+            // Add missing properties for consistency
+            if (!scenario.icon) scenario.icon = '🤖';
+            if (!scenario.difficulty) scenario.difficulty = 'beginner';
+          });
+          
           // Add generated scenarios to existing ones
           this.scenarios.push(...generatedScenarios);
           logger.info('Added generated scenarios:', generatedScenarios.length);
@@ -883,6 +1110,646 @@ class BiasExplorerSimulation extends EthicsSimulation {
     };
 
     logger.info('Educator toolkit integrated with simulation');
+  }
+
+  /**
+   * Complete the current scenario and update game progress
+   */
+  completeScenario() {
+    if (!this.currentScenario) return;
+    
+    const scenario = this.currentScenario;
+    
+    // Mark scenario as completed
+    scenario.gameElements.progress = 100;
+    
+    // Update game state
+    const wasCompleted = this.gameState.completedScenarios;
+    const uniqueCompletedScenarios = new Set(this.scenarios.filter(s => s.gameElements.progress >= 100).map(s => s.id));
+    this.gameState.completedScenarios = uniqueCompletedScenarios.size;
+    this.gameState.totalChoices += Object.keys(this.currentChoices).length;
+    this.gameState.insightsUnlocked += 1;
+    
+    // Award badge for completing scenario
+    const badge = this.createBadge(scenario);
+    if (badge && !this.gameState.badges.find(b => b.id === badge.id)) {
+      this.gameState.badges.push(badge);
+    }
+    
+    // Level up logic
+    if (this.gameState.completedScenarios > wasCompleted) {
+      this.checkLevelUp();
+    }
+    
+    // Show completion feedback with visual effects
+    this.showCompletionFeedback(scenario, badge);
+    
+    // Update progress display
+    this.updateProgressDisplay();
+    
+    logger.info(`Scenario completed: ${scenario.title}`, {
+      gameState: this.gameState,
+      badge
+    });
+  }
+
+  /**
+   * Create a badge for completing a scenario
+   */
+  createBadge(scenario) {
+    const badges = {
+      'hiring': {
+        id: 'hiring-explorer',
+        title: 'Hiring Expert',
+        icon: '🎯',
+        description: 'Explored the complexities of fair AI hiring practices',
+        color: '#10b981'
+      },
+      'lending': {
+        id: 'lending-explorer',
+        title: 'Financial Fairness Advocate',
+        icon: '⚖️',
+        description: 'Examined bias in AI lending decisions',
+        color: '#3b82f6'
+      },
+      'healthcare': {
+        id: 'healthcare-explorer',
+        title: 'Healthcare Equity Champion',
+        icon: '🏥',
+        description: 'Investigated fairness in medical AI systems',
+        color: '#ef4444'
+      },
+      'education': {
+        id: 'education-explorer',
+        title: 'Learning Advocate',
+        icon: '🎓',
+        description: 'Explored personalized AI in education',
+        color: '#8b5cf6'
+      }
+    };
+    
+    return badges[scenario.id] || null;
+  }
+
+  /**
+   * Check if the user should level up
+   */
+  checkLevelUp() {
+    const newLevel = Math.floor(this.gameState.completedScenarios / 2) + 1;
+    if (newLevel > this.gameState.level) {
+      this.gameState.level = newLevel;
+      this.showLevelUpFeedback(newLevel);
+    }
+  }
+
+  /**
+   * Show visual feedback for scenario completion
+   */
+  showCompletionFeedback(scenario, badge) {
+    const feedbackHtml = `
+      <div class="completion-feedback" id="completion-feedback">
+        <div class="feedback-content">
+          <div class="feedback-header">
+            <h2>🎉 Challenge Complete!</h2>
+            <div class="scenario-icon-large">${scenario.icon}</div>
+          </div>
+          
+          <div class="feedback-body">
+            <h3>${scenario.title}</h3>
+            <p class="completion-message">You've successfully explored this AI ethics scenario!</p>
+            
+            ${badge ? `
+              <div class="badge-earned">
+                <div class="badge-display">
+                  <span class="badge-icon" style="background-color: ${badge.color}">${badge.icon}</span>
+                  <div class="badge-info">
+                    <strong>${badge.title}</strong>
+                    <p>${badge.description}</p>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+            
+            <div class="progress-summary">
+              <div class="progress-stat">
+                <span class="stat-number">${this.gameState.completedScenarios}</span>
+                <span class="stat-label">of ${this.gameState.totalScenarios} scenarios</span>
+              </div>
+              <div class="progress-stat">
+                <span class="stat-number">${this.gameState.insightsUnlocked}</span>
+                <span class="stat-label">insights unlocked</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="feedback-actions">
+            ${this.gameState.completedScenarios < this.gameState.totalScenarios ? `
+              <button class="action-btn primary" onclick="window.currentSimulation.dismissFeedback(); window.currentSimulation.showScenarioSelection();">
+                🚀 Next Challenge
+              </button>
+            ` : `
+              <button class="action-btn success" onclick="window.currentSimulation.showFinalCelebration();">
+                🏆 View Final Results
+              </button>
+            `}
+            <button class="action-btn secondary" onclick="window.currentSimulation.dismissFeedback();">
+              📊 View Progress
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Add feedback to the page
+    const { body } = document;
+    const feedbackElement = document.createElement('div');
+    feedbackElement.innerHTML = feedbackHtml;
+    body.appendChild(feedbackElement.firstElementChild);
+    
+    // Add visual effects
+    this.addCompletionEffects();
+  }
+
+  /**
+   * Show level up feedback
+   */
+  showLevelUpFeedback(newLevel) {
+    const levelTitles = {
+      1: 'Ethics Beginner',
+      2: 'Bias Detective',
+      3: 'Fairness Expert',
+      4: 'Ethics Master'
+    };
+    
+    const levelFeedback = `
+      <div class="level-up-notification" id="level-up-notification">
+        <div class="level-up-content">
+          <h3>🎊 Level Up!</h3>
+          <div class="level-display">
+            <span class="level-number">Level ${newLevel}</span>
+            <span class="level-title">${levelTitles[newLevel] || 'Ethics Expert'}</span>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    const { body } = document;
+    const levelElement = document.createElement('div');
+    levelElement.innerHTML = levelFeedback;
+    body.appendChild(levelElement.firstElementChild);
+    
+    // Auto-remove after animation
+    setTimeout(() => {
+      const notification = document.getElementById('level-up-notification');
+      if (notification) {
+        notification.remove();
+      }
+    }, GAME_CONSTANTS.LEVEL_UP_NOTIFICATION_DURATION);
+  }
+
+  /**
+   * Add visual effects for completion
+   */
+  addCompletionEffects() {
+    // Simple confetti-like effect
+    const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4'];
+    
+    for (let i = 0; i < GAME_CONSTANTS.CONFETTI_COUNT; i++) {
+      setTimeout(() => {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti-piece';
+        confetti.style.cssText = `
+          position: fixed;
+          width: 10px;
+          height: 10px;
+          background-color: ${colors[Math.floor(Math.random() * colors.length)]};
+          left: ${Math.random() * window.innerWidth}px;
+          top: -10px;
+          z-index: 10000;
+          pointer-events: none;
+          animation: confetti-fall ${GAME_CONSTANTS.CONFETTI_ANIMATION_DURATION}ms ease-out forwards;
+        `;
+        
+        document.body.appendChild(confetti);
+        
+        setTimeout(() => confetti.remove(), GAME_CONSTANTS.CONFETTI_ANIMATION_DURATION);
+      }, i * GAME_CONSTANTS.CONFETTI_DELAY);
+    }
+    
+    // Add confetti CSS if not already present
+    if (!document.getElementById('confetti-styles')) {
+      const style = document.createElement('style');
+      style.id = 'confetti-styles';
+      style.textContent = `
+        @keyframes confetti-fall {
+          to {
+            transform: translateY(100vh) rotate(360deg);
+            opacity: 0;
+          }
+        }
+        
+        .completion-feedback {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.8);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+          animation: feedback-appear 0.3s ease-out;
+        }
+        
+        @keyframes feedback-appear {
+          from { opacity: 0; transform: scale(0.9); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        
+        .feedback-content {
+          background: white;
+          border-radius: 20px;
+          padding: 2rem;
+          max-width: 500px;
+          text-align: center;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .scenario-icon-large {
+          font-size: 4rem;
+          margin: 1rem 0;
+        }
+        
+        .badge-earned {
+          margin: 1.5rem 0;
+          padding: 1rem;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border-radius: 15px;
+          color: white;
+        }
+        
+        .badge-display {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+        
+        .badge-icon {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.5rem;
+          color: white;
+        }
+        
+        .progress-summary {
+          display: flex;
+          justify-content: center;
+          gap: 2rem;
+          margin: 1.5rem 0;
+        }
+        
+        .progress-stat {
+          text-align: center;
+        }
+        
+        .stat-number {
+          display: block;
+          font-size: 2rem;
+          font-weight: bold;
+          color: #667eea;
+        }
+        
+        .feedback-actions {
+          display: flex;
+          gap: 1rem;
+          justify-content: center;
+          margin-top: 2rem;
+        }
+        
+        .level-up-notification {
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: linear-gradient(135deg, #ffd700, #ffed4e);
+          color: #333;
+          padding: 1rem 2rem;
+          border-radius: 15px;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+          z-index: 10001;
+          animation: level-up-slide 0.5s ease-out;
+        }
+        
+        @keyframes level-up-slide {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .level-display {
+          text-align: center;
+        }
+        
+        .level-number {
+          display: block;
+          font-size: 1.5rem;
+          font-weight: bold;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }
+
+  /**
+   * Dismiss completion feedback
+   */
+  dismissFeedback() {
+    const feedback = document.getElementById('completion-feedback');
+    if (feedback) {
+      feedback.remove();
+    }
+  }
+
+  /**
+   * Show final celebration when all scenarios are complete
+   */
+  showFinalCelebration() {
+    this.dismissFeedback();
+    
+    const scenarioArea = document.getElementById('scenario-area');
+    scenarioArea.innerHTML = `
+      <div class="final-celebration">
+        <div class="celebration-header">
+          <h1>🏆 Congratulations, Ethics Expert!</h1>
+          <p class="celebration-subtitle">You've completed all AI Ethics Explorer challenges!</p>
+        </div>
+        
+        <div class="achievement-summary">
+          <div class="achievement-stats">
+            <div class="big-stat">
+              <span class="big-number">${this.gameState.totalScenarios}</span>
+              <span class="big-label">Scenarios Mastered</span>
+            </div>
+            <div class="big-stat">
+              <span class="big-number">${this.gameState.badges.length}</span>
+              <span class="big-label">Badges Earned</span>
+            </div>
+            <div class="big-stat">
+              <span class="big-number">Level ${this.gameState.level}</span>
+              <span class="big-label">Expert Level</span>
+            </div>
+          </div>
+          
+          <div class="badges-showcase">
+            <h3>Your Badges</h3>
+            <div class="badges-grid">
+              ${this.gameState.badges.map(badge => `
+                <div class="badge-showcase">
+                  <div class="badge-icon-large" style="background-color: ${badge.color}">
+                    ${badge.icon}
+                  </div>
+                  <h4>${badge.title}</h4>
+                  <p>${badge.description}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          
+          <div class="next-steps">
+            <h3>What's Next?</h3>
+            <div class="next-actions">
+              <button class="action-btn primary" onclick="window.currentSimulation.showScenarioSelection()">
+                🔄 Explore Again
+              </button>
+              <button class="action-btn secondary" onclick="window.currentSimulation.showGuide('certificate')">
+                📜 Get Certificate
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Add celebration effects
+    this.addCelebrationEffects();
+  }
+
+  /**
+   * Add celebration effects for final completion
+   */
+  addCelebrationEffects() {
+    // More intense confetti for final celebration
+    const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#f7b801', '#fc5c65'];
+    
+    for (let i = 0; i < GAME_CONSTANTS.CELEBRATION_CONFETTI_COUNT; i++) {
+      setTimeout(() => {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti-piece celebration';
+        const size = GAME_CONSTANTS.MIN_CONFETTI_SIZE + Math.random() * GAME_CONSTANTS.MAX_CONFETTI_SIZE;
+        confetti.style.cssText = `
+          position: fixed;
+          width: ${size}px;
+          height: ${size}px;
+          background-color: ${colors[Math.floor(Math.random() * colors.length)]};
+          left: ${Math.random() * window.innerWidth}px;
+          top: -20px;
+          z-index: 10000;
+          pointer-events: none;
+          border-radius: 50%;
+          animation: celebration-confetti ${GAME_CONSTANTS.CELEBRATION_ANIMATION_DURATION}ms ease-out forwards;
+        `;
+        
+        document.body.appendChild(confetti);
+        
+        setTimeout(() => confetti.remove(), GAME_CONSTANTS.CELEBRATION_ANIMATION_DURATION);
+      }, i * GAME_CONSTANTS.CELEBRATION_CONFETTI_DELAY);
+    }
+    
+    // Add celebration CSS
+    if (!document.getElementById('celebration-styles')) {
+      const style = document.createElement('style');
+      style.id = 'celebration-styles';
+      style.textContent = `
+        @keyframes celebration-confetti {
+          to {
+            transform: translateY(100vh) rotate(720deg);
+            opacity: 0;
+          }
+        }
+        
+        .final-celebration {
+          text-align: center;
+          padding: 2rem;
+          animation: celebration-entrance 0.8s ease-out;
+        }
+        
+        @keyframes celebration-entrance {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .celebration-header h1 {
+          font-size: 2.5rem;
+          margin-bottom: 1rem;
+          background: linear-gradient(45deg, #667eea, #764ba2);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        
+        .achievement-stats {
+          display: flex;
+          justify-content: center;
+          gap: 3rem;
+          margin: 2rem 0;
+        }
+        
+        .big-stat {
+          text-align: center;
+        }
+        
+        .big-number {
+          display: block;
+          font-size: 3rem;
+          font-weight: bold;
+          color: #667eea;
+        }
+        
+        .big-label {
+          font-size: 1.1rem;
+          color: #666;
+        }
+        
+        .badges-showcase {
+          margin: 3rem 0;
+        }
+        
+        .badges-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 2rem;
+          margin: 2rem 0;
+        }
+        
+        .badge-showcase {
+          padding: 1.5rem;
+          border-radius: 15px;
+          background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+          color: white;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .badge-icon-large {
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 2.5rem;
+          margin: 0 auto 1rem;
+          color: white;
+          box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .next-actions {
+          display: flex;
+          gap: 1rem;
+          justify-content: center;
+          margin-top: 2rem;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }
+
+  /**
+   * Update the progress display throughout the UI
+   */
+  updateProgressDisplay() {
+    // Update header progress
+    const progressStats = document.querySelectorAll('.progress-stats .stat-value');
+    if (progressStats.length >= GAME_CONSTANTS.PROGRESS_STATS_COUNT) {
+      progressStats[0].textContent = this.gameState.completedScenarios;
+      progressStats[1].textContent = this.gameState.insightsUnlocked;
+      progressStats[2].textContent = `Level ${this.gameState.level}`;
+    }
+    
+    // Update progress bar
+    const progressFill = document.querySelector('.progress-fill');
+    if (progressFill) {
+      const percentage = (this.gameState.completedScenarios / this.gameState.totalScenarios) * 100;
+      progressFill.style.width = `${percentage}%`;
+    }
+    
+    // Update badges display
+    this.updateBadgesDisplay();
+    
+    // Update scenario cards completion status
+    this.updateScenarioCardsDisplay();
+  }
+
+  /**
+   * Update the badges display in the sidebar
+   */
+  updateBadgesDisplay() {
+    const badgesContainer = document.getElementById('badges-container');
+    if (!badgesContainer) return;
+    
+    if (this.gameState.badges.length === 0) {
+      badgesContainer.innerHTML = '<div class="badge-placeholder">Complete scenarios to earn badges!</div>';
+      return;
+    }
+    
+    badgesContainer.innerHTML = `
+      <div class="earned-badges">
+        ${this.gameState.badges.map(badge => `
+          <div class="earned-badge" title="${badge.description}">
+            <div class="badge-icon-small" style="background-color: ${badge.color}">
+              ${badge.icon}
+            </div>
+            <span class="badge-title">${badge.title}</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  /**
+   * Update scenario cards to show completion status
+   */
+  updateScenarioCardsDisplay() {
+    const scenarioCards = document.querySelectorAll('.scenario-card');
+    scenarioCards.forEach(card => {
+      const scenarioId = card.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+      if (scenarioId) {
+        const scenario = this.scenarios.find(s => s.id === scenarioId);
+        if (scenario && scenario.gameElements.progress >= 100) {
+          card.classList.add('completed');
+          
+          // Update progress bar
+          const progressFill = card.querySelector('.progress-fill-small');
+          if (progressFill) {
+            progressFill.style.width = '100%';
+          }
+          
+          // Update progress text
+          const progressText = card.querySelector('.progress-text');
+          if (progressText) {
+            progressText.textContent = '100% Complete';
+          }
+          
+          // Update action text
+          const actionText = card.querySelector('.action-text');
+          if (actionText) {
+            actionText.textContent = '🔄 Explore Again';
+          }
+        }
+      }
+    });
   }
 
   /**

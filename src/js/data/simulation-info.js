@@ -158,6 +158,285 @@ export const SIMULATION_INFO = {
       'ai-safety-basics',
       'data-privacy-ethics'
     ]
+  },
+
+  'autonomy-oversight': {
+    id: 'autonomy-oversight',
+    title: 'AI Autonomy & Human Oversight',
+    subtitle: 'Balance AI autonomy with human oversight in critical decision-making',
+    
+    // Educational Context
+    learningObjectives: [
+      'Understand the balance between AI autonomy and human oversight',
+      'Explore when human intervention is necessary in AI systems',
+      'Discover different levels of AI independence and control',
+      'Practice decision-making about AI oversight in various scenarios'
+    ],
+    
+    isteCriteria: [
+      'Empowered Learner 1.1.4: Understand fundamental concepts of technology operations',
+      'Digital Citizen 1.2.3: Cultivate and manage digital identity and reputation',
+      'Critical Thinker 1.4.3: Curate information from digital resources',
+      'Computational Thinker 1.5.1: Formulate problem definitions suited for technology'
+    ],
+    
+    duration: '12-15 minutes',
+    difficulty: 'intermediate',
+    recommendedAge: '14+',
+    prerequisites: [
+      'Basic understanding of AI and automation',
+      'Awareness of human decision-making processes',
+      'Understanding of responsibility and accountability'
+    ],
+    
+    // Pre-Launch Information
+    beforeYouStart: {
+      briefing: `In this simulation, you'll explore the critical balance between AI autonomy and human oversight. You'll face scenarios where you must decide how much independence to give AI systems and when human intervention is necessary.
+      
+      You'll discover the complexities of maintaining control while leveraging AI capabilities, and see how different levels of oversight affect outcomes, efficiency, and responsibility.`,
+      
+      vocabulary: [
+        { term: 'Autonomy', definition: 'The ability of a system to operate independently without human intervention' },
+        { term: 'Oversight', definition: 'Human supervision and monitoring of AI system operations' },
+        { term: 'Human-in-the-loop', definition: 'AI systems that require human input for certain decisions' },
+        { term: 'Accountability', definition: 'Responsibility for the consequences of AI system actions' },
+        { term: 'Fail-safe', definition: 'Mechanisms that prevent harmful outcomes when systems malfunction' }
+      ],
+      
+      preparationTips: [
+        'Consider different types of decisions and their consequences',
+        'Think about when you would want a human to be involved',
+        'Reflect on responsibility and who should be accountable',
+        'Keep an open mind about different oversight approaches'
+      ]
+    },
+    
+    // Learning Outcomes
+    afterCompletion: {
+      keyTakeaways: [
+        'AI autonomy exists on a spectrum from fully manual to fully automated',
+        'Different scenarios require different levels of human oversight',
+        'Balancing efficiency with safety and accountability is crucial',
+        'Human judgment remains important even in advanced AI systems'
+      ],
+      
+      reflectionQuestions: [
+        'When should humans maintain control over AI decisions?',
+        'How do you balance AI efficiency with human oversight?',
+        'What are the risks of too much or too little AI autonomy?',
+        'How do cultural and social factors influence oversight preferences?'
+      ]
+    },
+    
+    // Educational Resources
+    educatorResources: {
+      discussionGuide: [
+        'Debate the pros and cons of AI autonomy in different contexts',
+        'Role-play scenarios with different oversight approaches',
+        'Compare human vs. AI decision-making capabilities',
+        'Discuss real-world examples of AI oversight challenges'
+      ],
+      
+      classroomActivities: [
+        'Design oversight protocols for different AI applications',
+        'Create decision trees for when human intervention is needed',
+        'Research case studies of AI oversight successes and failures',
+        'Debate the future of human-AI collaboration'
+      ],
+      
+      assessmentIdeas: [
+        'Analyze oversight scenarios and justify recommendations',
+        'Create presentations on AI autonomy best practices',
+        'Write reflection essays on human-AI responsibility',
+        'Design ethical guidelines for AI oversight'
+      ]
+    }
+  },
+
+  'consent-transparency': {
+    id: 'consent-transparency',
+    title: 'AI Consent & Transparency',
+    subtitle: 'Explore informed consent and transparency in AI systems',
+    
+    // Educational Context
+    learningObjectives: [
+      'Understand the importance of informed consent in AI systems',
+      'Explore transparency requirements for AI decision-making',
+      'Discover challenges in communicating AI capabilities and limitations',
+      'Practice designing user-friendly consent and disclosure processes'
+    ],
+    
+    isteCriteria: [
+      'Empowered Learner 1.1.3: Use technology to seek feedback',
+      'Digital Citizen 1.2.1: Cultivate and manage digital identity',
+      'Knowledge Constructor 1.3.4: Build knowledge through exploration',
+      'Creative Communicator 1.6.2: Create original works as a means of expression'
+    ],
+    
+    duration: '8-12 minutes',
+    difficulty: 'beginner',
+    recommendedAge: '12+',
+    prerequisites: [
+      'Basic understanding of privacy and consent',
+      'Awareness of AI use in everyday applications',
+      'Understanding of communication and transparency'
+    ],
+    
+    // Pre-Launch Information
+    beforeYouStart: {
+      briefing: `In this simulation, you'll explore how to make AI systems transparent and obtain meaningful consent from users. You'll face challenges in explaining complex AI systems in understandable ways and ensuring users can make informed decisions.
+      
+      You'll discover the balance between technical accuracy and user comprehension, and see how different approaches to transparency affect user trust and decision-making.`,
+      
+      vocabulary: [
+        { term: 'Informed Consent', definition: 'Agreement based on understanding of what is being consented to' },
+        { term: 'Transparency', definition: 'Openness about how AI systems work and make decisions' },
+        { term: 'Explainable AI', definition: 'AI systems that can provide understandable explanations of their decisions' },
+        { term: 'Privacy Policy', definition: 'Document explaining how personal data is collected and used' },
+        { term: 'User Agency', definition: 'The ability of users to control their interaction with AI systems' }
+      ],
+      
+      preparationTips: [
+        'Think about your own experiences with consent forms and privacy policies',
+        'Consider what information users really need to make good decisions',
+        'Reflect on the balance between detail and simplicity',
+        'Keep user perspectives and capabilities in mind'
+      ]
+    },
+    
+    // Learning Outcomes
+    afterCompletion: {
+      keyTakeaways: [
+        'Effective consent requires both transparency and user understanding',
+        'Different users need different levels of detail and explanation',
+        'Transparency must be balanced with usability and simplicity',
+        'Building trust requires ongoing communication, not just initial consent'
+      ],
+      
+      reflectionQuestions: [
+        'How can complex AI systems be explained in simple terms?',
+        'What information do users really need to give meaningful consent?',
+        'How do we balance transparency with user experience?',
+        'What are the limits of user understanding in AI systems?'
+      ]
+    },
+    
+    // Educational Resources
+    educatorResources: {
+      discussionGuide: [
+        'Compare consent practices across different platforms and services',
+        'Analyze examples of good and bad AI transparency',
+        'Discuss the ethics of informed consent in AI',
+        'Explore cultural differences in transparency expectations'
+      ],
+      
+      classroomActivities: [
+        'Design user-friendly consent interfaces for AI systems',
+        'Create plain-language explanations of complex AI concepts',
+        'Audit existing privacy policies and consent forms',
+        'Role-play consent conversations between AI developers and users'
+      ],
+      
+      assessmentIdeas: [
+        'Evaluate consent and transparency practices of real AI systems',
+        'Design consent processes for hypothetical AI applications',
+        'Write user-friendly explanations of AI technologies',
+        'Create presentations on transparency best practices'
+      ]
+    }
+  },
+
+  'misinformation-trust': {
+    id: 'misinformation-trust',
+    title: 'AI, Misinformation & Trust',
+    subtitle: 'Combat misinformation and build trustworthy AI communication',
+    
+    // Educational Context
+    learningObjectives: [
+      'Understand how AI can both combat and create misinformation',
+      'Explore trust-building in AI communication systems',
+      'Discover challenges in verifying AI-generated content',
+      'Practice designing systems that promote information integrity'
+    ],
+    
+    isteCriteria: [
+      'Empowered Learner 1.1.1: Articulate goals and define learning pathways',
+      'Digital Citizen 1.2.4: Manage personal data to maintain privacy and security',
+      'Knowledge Constructor 1.3.2: Evaluate accuracy and perspective of sources',
+      'Critical Thinker 1.4.4: Use technology to deepen critical thinking'
+    ],
+    
+    duration: '15-20 minutes',
+    difficulty: 'advanced',
+    recommendedAge: '15+',
+    prerequisites: [
+      'Understanding of information literacy and media bias',
+      'Awareness of AI capabilities in content generation',
+      'Knowledge of verification and fact-checking processes'
+    ],
+    
+    // Pre-Launch Information
+    beforeYouStart: {
+      briefing: `In this simulation, you'll tackle the complex challenge of building trustworthy AI systems that can help combat misinformation while avoiding the creation of false information themselves.
+      
+      You'll explore the balance between AI automation and human verification, discover the challenges of detecting AI-generated content, and see how different approaches affect public trust and information integrity.`,
+      
+      vocabulary: [
+        { term: 'Misinformation', definition: 'False or inaccurate information, regardless of intent' },
+        { term: 'Disinformation', definition: 'Deliberately false information intended to deceive' },
+        { term: 'Deepfakes', definition: 'AI-generated fake audio, video, or images that appear real' },
+        { term: 'Fact-checking', definition: 'Process of verifying the accuracy of information' },
+        { term: 'Information Integrity', definition: 'Ensuring information is accurate, authentic, and trustworthy' }
+      ],
+      
+      preparationTips: [
+        'Consider your own information consumption and verification habits',
+        'Think about how you determine what sources to trust',
+        'Reflect on the role of technology in information spread',
+        'Keep in mind different perspectives on truth and trust'
+      ]
+    },
+    
+    // Learning Outcomes
+    afterCompletion: {
+      keyTakeaways: [
+        'AI can be both a tool for fighting misinformation and a source of it',
+        'Building trust requires transparency, consistency, and accountability',
+        'Human judgment remains crucial in information verification',
+        'Different communities may have different trust relationships with AI'
+      ],
+      
+      reflectionQuestions: [
+        'How can AI systems earn and maintain public trust?',
+        'What are the trade-offs between automation and human oversight in fact-checking?',
+        'How do we balance free expression with misinformation prevention?',
+        'What responsibility do AI developers have for information integrity?'
+      ]
+    },
+    
+    // Educational Resources
+    educatorResources: {
+      discussionGuide: [
+        'Analyze real examples of AI-generated misinformation',
+        'Debate the role of platforms in content moderation',
+        'Discuss the impact of misinformation on democratic processes',
+        'Explore cultural and political factors in trust and verification'
+      ],
+      
+      classroomActivities: [
+        'Design fact-checking protocols that incorporate AI',
+        'Create media literacy curricula for the AI age',
+        'Research case studies of misinformation campaigns',
+        'Develop trust metrics for AI information systems'
+      ],
+      
+      assessmentIdeas: [
+        'Evaluate the effectiveness of different misinformation detection approaches',
+        'Create proposals for trustworthy AI communication systems',
+        'Analyze the ethics of AI content moderation',
+        'Design public education campaigns about AI and information integrity'
+      ]
+    }
   }
 };
 
