@@ -350,8 +350,8 @@ class BiasExplorerSimulation extends EthicsSimulation {
                 
                 <div class="card-content">
                   <h3>${scenario.title}</h3>
-                  <p class="scenario-context">${scenario.context}</p>
                   <p class="scenario-description">${scenario.description}</p>
+                  <p class="scenario-context">${scenario.context}</p>
                   
                   <div class="challenge-info">
                     <div class="challenge-text">

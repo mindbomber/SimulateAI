@@ -188,7 +188,8 @@
 }
 
 /* Scenario Cards */
-.scenario-card {
+.category-section .scenario-card,
+.simulations-grid .scenario-card {
     background: var(--color-white);
     border: 1px solid var(--color-gray-200);
     border-radius: var(--radius-lg);
@@ -202,20 +203,24 @@
     box-shadow: var(--shadow-sm);
 }
 
-.scenario-card:hover,
-.scenario-card:focus {
+.category-section .scenario-card:hover,
+.category-section .scenario-card:focus,
+.simulations-grid .scenario-card:hover,
+.simulations-grid .scenario-card:focus {
     box-shadow: var(--shadow-md);
     border-color: var(--color-primary);
     outline: none;
     transform: translateY(-2px);
 }
 
-.scenario-card:focus-visible {
+.category-section .scenario-card:focus-visible,
+.simulations-grid .scenario-card:focus-visible {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
 }
 
-.scenario-card.completed {
+.category-section .scenario-card.completed,
+.simulations-grid .scenario-card.completed {
     border-color: var(--color-green-300);
     background: var(--color-green-50);
 }
@@ -263,7 +268,8 @@
 }
 
 /* Scenario Content */
-.scenario-content {
+.category-section .scenario-content,
+.simulations-grid .scenario-content {
     flex: 1;
     padding: 0 var(--spacing-5) var(--spacing-4);
     display: flex;
@@ -271,7 +277,8 @@
     gap: var(--spacing-3);
 }
 
-.scenario-title {
+.category-section .scenario-title,
+.simulations-grid .scenario-title {
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-bold);
     color: var(--color-gray-900);
@@ -279,11 +286,13 @@
     line-height: var(--line-height-tight);
 }
 
-[data-theme="dark"] .scenario-title {
+[data-theme="dark"] .category-section .scenario-title,
+[data-theme="dark"] .simulations-grid .scenario-title {
     color: var(--color-gray-100);
 }
 
-.scenario-description {
+.category-section .scenario-description,
+.simulations-grid .scenario-description {
     font-size: var(--font-size-sm);
     color: var(--color-gray-600);
     line-height: var(--line-height-relaxed);
@@ -291,7 +300,8 @@
     flex: 1;
 }
 
-[data-theme="dark"] .scenario-description {
+[data-theme="dark"] .category-section .scenario-description,
+[data-theme="dark"] .simulations-grid .scenario-description {
     color: var(--color-gray-300);
 }
 

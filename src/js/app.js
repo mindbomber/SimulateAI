@@ -28,6 +28,7 @@ import { PostSimulationModal } from './components/post-simulation-modal.js';
 import HeroDemo from './components/hero-demo.js';
 import ModalFooterManager from './components/modal-footer-manager.js';
 import CategoryGrid from './components/category-grid.js';
+import RadarChart from './components/radar-chart.js';
 
 // Constants for app configuration
 const APP_CONSTANTS = {
@@ -203,6 +204,9 @@ class AIEthicsApp {
             
             // Initialize modal footer management
             this.initializeModalFooterManager();
+            
+            // Initialize ethics radar demo
+            await this.initializeEthicsRadarDemo();
             
             this.isInitialized = true;
             AppDebug.log('AI Ethics App initialized successfully with modernized infrastructure');
@@ -725,6 +729,25 @@ class AIEthicsApp {
         }
     }
 
+    /**
+     * Initialize ethics radar demo system
+     */
+    async initializeEthicsRadarDemo() {
+        try {
+            // Only initialize if the demo container exists
+            const demoContainer = document.getElementById('ethics-demo-chart');
+            if (demoContainer) {
+                // Initialize the ethics radar demo
+                ethicsDemo = new EthicsRadarDemo();
+                
+                logger.info('Ethics radar demo initialized successfully');
+            }
+        } catch (error) {
+            logger.error('Failed to initialize ethics radar demo:', error);
+            // Non-critical error - the demo is optional
+        }
+    }
+
     setupEventListeners() {
         // Mobile navigation functionality
         this.setupMobileNavigation();
@@ -956,6 +979,186 @@ class AIEthicsApp {
                     });
                 }
             }
+        }
+    }
+    
+    /**
+     * Shows the pre-launch information modal
+     */
+    showPreLaunchModal(simulationId) {
+        logger.debug('Showing pre-launch modal for:', simulationId);
+        
+        const prelaunchModal = new PreLaunchModal(simulationId, {
+            onLaunch: (id) => {
+                logger.debug('Pre-launch modal onLaunch called with:', id);
+                // User clicked "Start Exploration" - proceed with simulation
+                this.launchSimulationDirect(id || simulationId);
+            },
+            onCancel: () => {
+                logger.debug('Pre-launch modal cancelled');
+                // User clicked "Maybe Later" - just close modal
+                this.hideLoading();
+            },
+            showEducatorResources: true // Always show educator resources
+        });
+        
+        prelaunchModal.show();
+    }
+    
+    /**
+     * Direct simulation launch (bypasses pre-launch modal)
+     */
+    async launchSimulationDirect(simulationId) {
+        try {
+            this.showLoading();
+
+            // Cleanup previous simulation canvases and engines
+            if (this.currentSimulation && this.currentSimulation.cleanup) {
+                this.currentSimulation.cleanup();
+            }
+
+            // Cleanup any existing simulation canvas
+            if (this.currentSimulationCanvasId) {
+                canvasManager.removeCanvas(this.currentSimulationCanvasId);
+                this.currentSimulationCanvasId = null;
+            }
+
+            // Cleanup hero demo canvas if running
+            if (this.heroDemoCanvasId) {
+                canvasManager.removeCanvas(this.heroDemoCanvasId);
+                this.heroDemoCanvasId = null;
+            }
+            
+            const simConfig = this.simulations.get(simulationId);
+            if (!simConfig) {
+                throw new Error(`Simulation ${simulationId} not found`);
+            }
+
+            // Track simulation start
+            simpleAnalytics.trackSimulationStart(simulationId, simConfig.title);            // Get simulation container
+            const simulationContainer = document.getElementById('simulation-container');
+            if (!simulationContainer) {
+                throw new Error('Simulation container not found');
+            }
+            
+            // Add loading state to container
+            simulationContainer.classList.add('loading');
+            simulationContainer.setAttribute('aria-busy', 'true');
+            simulationContainer.setAttribute('aria-label', `Loading ${simConfig.title} simulation`);
+            
+            // Clear previous content and remove any error states
+            simulationContainer.innerHTML = '';
+            simulationContainer.classList.remove('error');
+              // Create managed canvas for the simulation
+            const { canvas, id } = await canvasManager.createCanvas({
+                width: 600,
+                height: 400,
+                container: simulationContainer,
+                className: 'simulation-canvas',
+                id: `simulation-${simulationId}`
+            });
+
+            // Store canvas ID for cleanup
+            this.currentSimulationCanvasId = id;
+
+            // Check if simulation needs canvas or is HTML-only
+            if (simConfig.useCanvas !== false && simConfig.renderMode !== 'html') {
+                // Apply responsive styling to canvas
+                canvas.style.cssText = `
+                    max-width: 100%;
+                    max-height: 100%;
+                    width: auto;
+                    height: auto;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    background: #fff;
+                `;
+
+                // Create visual engine using canvas manager
+                this.engine = await canvasManager.createVisualEngine(id, {
+                    renderMode: 'canvas',
+                    accessibility: true,
+                    debug: false,
+                    width: 600,
+                    height: 400
+                });
+
+                // Set the container reference on the engine for simulation compatibility
+                this.engine.container = simulationContainer;
+            } else {
+                // For HTML-only simulations, create a simple mock engine with just the container
+                this.engine = {
+                    container: simulationContainer,
+                    type: 'html',
+                    renderMode: 'html',
+                    start: () => {
+                        // Mock engine started for HTML simulation
+                    },
+                    stop: () => {
+                        // Mock engine stopped for HTML simulation  
+                    },
+                    destroy: () => {
+                        // Mock engine destroyed for HTML simulation
+                    }
+                };
+                
+                // Remove the canvas element since it's not needed
+                if (canvas && canvas.parentNode) {
+                    canvas.parentNode.removeChild(canvas);
+                }
+            }
+
+            // Create the specific simulation instance
+            this.currentSimulation = await this.createSimulationInstance(simulationId, simConfig);
+            
+            if (!this.currentSimulation) {
+                throw new Error('Failed to create simulation instance');
+            }
+
+            // Initialize the simulation
+            this.currentSimulation.init(this.engine);
+            
+            // Setup simulation event listeners
+            this.setupSimulationEventListeners();
+            
+            // Show the enhanced simulation modal instead of the basic modal
+            this.showEnhancedSimulationModal(simulationId, simConfig);
+            
+            // Start the engine
+            this.engine.start();
+              // Start the simulation
+            this.currentSimulation.start();
+            
+            this.hideLoading();
+              // Remove loading state from container
+            if (simulationContainer) {
+                simulationContainer.classList.remove('loading');
+                simulationContainer.removeAttribute('aria-busy');
+                simulationContainer.setAttribute('aria-label', `${simConfig.title} simulation`);
+            }
+            
+            logger.debug('Simulation launched successfully');
+              } catch (error) {
+            AppDebug.error('Failed to start simulation:', error);
+            this.hideLoading();
+            
+            // Add error state to container
+            const simulationContainer = document.getElementById('simulation-container');
+            if (simulationContainer) {
+                simulationContainer.classList.remove('loading');
+                simulationContainer.classList.add('error');
+                simulationContainer.removeAttribute('aria-busy');
+                simulationContainer.setAttribute('aria-label', 'Simulation failed to load');
+                simulationContainer.innerHTML = `
+                    <div style="text-align: center; padding: 2rem;">
+                        <h3>Simulation Failed to Load</h3>
+                        <p>There was an error loading the simulation. Please try again.</p>
+                        <button class="btn btn-primary" onclick="this.closest('.modal').querySelector('.modal-close').click()">Close</button>
+                    </div>
+                `;
+            }
+            
+            this.showError('Failed to start the simulation. Please try again.');
         }
     }
     
@@ -1908,6 +2111,188 @@ class AIEthicsApp {
 
     // ...existing methods...
 }
+
+/**
+ * Ethics Radar Chart Demo
+ * Interactive demonstration of ethical decision patterns
+ */
+class EthicsRadarDemo {
+    constructor() {
+        this.demoChart = null;
+        this.ANIMATION_DELAY = 200; // Animation delay in milliseconds
+        this.RESET_DELAY = 300; // Reset animation delay in milliseconds
+        this.initializeDemo();
+    }
+    
+    async initializeDemo() {
+        try {
+            // Initialize the demo radar chart
+            this.demoChart = new RadarChart('ethics-demo-chart', {
+                title: 'Ethical Impact Analysis',
+                width: 580,
+                height: 580,
+                realTime: false,
+                showLabels: true,
+                animated: true,
+                isDemo: true // Use minimal container styling
+            });
+            
+            logger.info('Ethics radar demo initialized successfully');
+        } catch (error) {
+            logger.error('Failed to initialize ethics radar demo:', error);
+        }
+    }
+    
+    simulatePattern(pattern) {
+        const patterns = {
+            utilitarian: {
+                fairness: 3,
+                sustainability: 4,
+                autonomy: 2,
+                beneficence: 5,
+                transparency: 3,
+                accountability: 3,
+                privacy: 2,
+                proportionality: 4
+            },
+            deontological: {
+                fairness: 5,
+                sustainability: 3,
+                autonomy: 5,
+                beneficence: 3,
+                transparency: 4,
+                accountability: 5,
+                privacy: 4,
+                proportionality: 3
+            },
+            virtue: {
+                fairness: 4,
+                sustainability: 3,
+                autonomy: 4,
+                beneficence: 4,
+                transparency: 4,
+                accountability: 4,
+                privacy: 3,
+                proportionality: 4
+            },
+            balanced: {
+                fairness: 4,
+                sustainability: 4,
+                autonomy: 4,
+                beneficence: 4,
+                transparency: 4,
+                accountability: 4,
+                privacy: 4,
+                proportionality: 4
+            }
+        };
+        
+        const descriptions = {
+            utilitarian: {
+                title: 'Utilitarian Approach',
+                description: 'Focuses on maximizing overall well-being and positive outcomes. Notice the high scores in Beneficence and Sustainability, while individual rights (Autonomy, Privacy) may score lower as they could conflict with the "greatest good for the greatest number."'
+            },
+            deontological: {
+                title: 'Rights-Based Approach',
+                description: 'Emphasizes individual rights and moral duties. See the high scores in Fairness, Autonomy, and Accountability, reflecting a commitment to treating people as ends in themselves rather than means to an end.'
+            },
+            virtue: {
+                title: 'Virtue Ethics Approach',
+                description: 'Seeks balanced excellence across all dimensions. This approach emphasizes character and moral virtues, leading to more evenly distributed scores that reflect holistic ethical consideration.'
+            },
+            balanced: {
+                title: 'Balanced Approach',
+                description: 'A well-rounded ethical approach that gives equal high consideration to all dimensions. This represents an ideal where decision-makers actively consider all ethical principles equally, creating a comprehensive ethical framework that doesn\'t sacrifice any important values.'
+            }
+        };
+        
+        if (this.demoChart && patterns[pattern]) {
+            // Add visual feedback during update
+            const demoContainer = document.querySelector('.demo-radar-container');
+            if (demoContainer) {
+                demoContainer.style.opacity = '0.7';
+                demoContainer.style.transform = 'scale(0.98)';
+            }
+            
+            setTimeout(() => {
+                this.demoChart.setScores(patterns[pattern]);
+                
+                // Show feedback
+                this.showFeedback(descriptions[pattern]);
+                
+                // Restore visual state
+                if (demoContainer) {
+                    demoContainer.style.opacity = '1';
+                    demoContainer.style.transform = 'scale(1)';
+                }
+            }, this.ANIMATION_DELAY);
+        }
+    }
+    
+    reset() {
+        if (this.demoChart) {
+            // Add visual feedback during reset
+            const demoContainer = document.querySelector('.demo-radar-container');
+            if (demoContainer) {
+                demoContainer.style.opacity = '0.7';
+                demoContainer.style.transform = 'scale(0.98)';
+            }
+            
+            setTimeout(() => {
+                this.demoChart.resetScores();
+                
+                // Show reset-specific feedback
+                this.showFeedback({
+                    title: 'Reset to Neutral',
+                    description: 'All ethical dimensions have been reset to their baseline neutral state. This represents a starting point where no ethical considerations have been applied yet. Use this as a reference point to compare against the different ethical approaches above.'
+                });
+                
+                // Restore container appearance
+                if (demoContainer) {
+                    demoContainer.style.opacity = '1';
+                    demoContainer.style.transform = 'scale(1)';
+                }
+            }, this.ANIMATION_DELAY);
+        }
+    }
+    
+    showFeedback(content) {
+        const feedbackElement = document.getElementById('demo-feedback');
+        if (feedbackElement) {
+            feedbackElement.innerHTML = `
+                <h5>${content.title}</h5>
+                <p>${content.description}</p>
+            `;
+            feedbackElement.classList.add('show');
+        }
+    }
+    
+    hideFeedback() {
+        const feedbackElement = document.getElementById('demo-feedback');
+        if (feedbackElement) {
+            feedbackElement.classList.remove('show');
+            setTimeout(() => {
+                feedbackElement.innerHTML = '';
+            }, this.RESET_DELAY);
+        }
+    }
+}
+
+// Initialize the ethics radar demo when DOM is ready
+let ethicsDemo = null;
+
+// Global functions for demo controls
+window.simulateEthicsDemo = function(pattern) {
+    if (ethicsDemo) {
+        ethicsDemo.simulatePattern(pattern);
+    }
+};
+
+window.resetEthicsDemo = function() {
+    if (ethicsDemo) {
+        ethicsDemo.reset();
+    }
+};
 
 /**
  * Fallback for script loading issues

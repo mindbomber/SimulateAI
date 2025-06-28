@@ -211,6 +211,39 @@
                 
                 <div class="ethics-glossary">
                     <h3>Ethical Dimensions Glossary</h3>
+                    
+                    <!-- Interactive Radar Chart Demo -->
+                    <div class="radar-demo-section">
+                        <h4>Interactive Demo: Try the Radar Chart</h4>
+                        <p>Experience how ethical decisions affect multiple dimensions simultaneously. Click the buttons to see different decision patterns:</p>
+                        
+                        <div class="demo-controls">
+                            <button class="demo-btn" onclick="simulateEthicsDemo('utilitarian')">Utilitarian Approach</button>
+                            <button class="demo-btn" onclick="simulateEthicsDemo('deontological')">Rights-Based Approach</button>
+                            <button class="demo-btn" onclick="simulateEthicsDemo('virtue')">Virtue Ethics</button>
+                            <button class="demo-btn balanced-btn" onclick="simulateEthicsDemo('balanced')">Balanced Approach</button>
+                            <button class="demo-btn reset-btn" onclick="resetEthicsDemo()">Reset to Neutral</button>
+                        </div>
+                        
+                        <div class="demo-radar-container">
+                            <div id="ethics-demo-chart" class="radar-chart-wrapper"></div>
+                        </div>
+                        
+                        <div class="radar-instructions">
+                            <h5>💡 How to Read the Chart</h5>
+                            <p><strong>Hover over any point</strong> on the radar chart to see detailed information about that ethical dimension. Each point shows:</p>
+                            <ul>
+                                <li><strong>Axis Name:</strong> The specific ethical principle (e.g., Fairness, Sustainability)</li>
+                                <li><strong>Score Value:</strong> How strongly this approach emphasizes that principle (1-5 scale)</li>
+                                <li><strong>Description:</strong> What this principle means and why it matters</li>
+                                <li><strong>Impact Level:</strong> Whether the emphasis is low, moderate, or high</li>
+                            </ul>
+                            <p>The <strong>shape and size</strong> of the radar pattern shows the overall ethical "signature" of each approach. A larger, more balanced shape indicates consideration of multiple principles, while a smaller or skewed shape shows focused emphasis on specific values.</p>
+                        </div>
+                        
+                        <div id="demo-feedback" class="demo-feedback"></div>
+                    </div>
+                    
                     <div class="glossary-grid">
                         <div class="glossary-item">
                             <h4>Fairness</h4>

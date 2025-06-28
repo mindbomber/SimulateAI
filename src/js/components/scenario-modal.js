@@ -349,7 +349,37 @@ class ScenarioModal {
     selectOption(card) {
         logger.info('Option selection started');
         
-        // Remove previous selection
+        const optionId = card.getAttribute('data-option-id');
+        const isCurrentlySelected = card.classList.contains('selected');
+        
+        // If the clicked option is already selected, deselect it
+        if (isCurrentlySelected) {
+            logger.info('Deselecting currently selected option:', optionId);
+            
+            // Remove selection
+            card.classList.remove('selected');
+            const details = card.querySelector('.option-details');
+            if (details) details.style.display = 'none';
+            
+            // Clear selected option
+            this.selectedOption = null;
+            
+            // Reset radar chart to neutral state
+            if (this.radarChart && this.radarChart.isInitialized) {
+                this.radarChart.resetScores();
+                logger.info('Radar chart reset to neutral state');
+            }
+            
+            // Disable confirm button
+            const confirmButton = this.modal.querySelector('#confirm-choice');
+            if (confirmButton) {
+                confirmButton.disabled = true;
+            }
+            
+            return;
+        }
+        
+        // Remove previous selection from all cards
         this.modal.querySelectorAll('.option-card').forEach(c => {
             c.classList.remove('selected');
             const details = c.querySelector('.option-details');
@@ -362,7 +392,6 @@ class ScenarioModal {
         if (details) details.style.display = 'block';
 
         // Store selected option
-        const optionId = card.getAttribute('data-option-id');
         this.selectedOption = this.currentScenario.options.find(opt => opt.id === optionId);
 
         logger.info('Option selected:', {

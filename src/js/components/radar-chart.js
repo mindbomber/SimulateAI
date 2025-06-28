@@ -88,6 +88,7 @@ export default class RadarChart {
             animated: options.animated !== false,
             realTime: options.realTime || false, // For scenario real-time updates
             title: options.title || 'Ethical Impact Analysis',
+            isDemo: options.isDemo || false, // For demo charts that need minimal styling
             ...options
         };
         
@@ -136,8 +137,13 @@ export default class RadarChart {
             logger.info('Canvas element created and appended to container');
             
             // Apply visual enhancements classes BEFORE creating chart
-            this.container.classList.add('radar-chart-container');
-            logger.info('Applied radar-chart-container class');
+            if (this.options.isDemo) {
+                this.container.classList.add('radar-demo-container');
+                logger.info('Applied radar-demo-container class for demo chart');
+            } else {
+                this.container.classList.add('radar-chart-container');
+                logger.info('Applied radar-chart-container class');
+            }
             
             // Initialize Chart.js radar chart
             const ctx = canvas.getContext('2d');
@@ -228,8 +234,8 @@ export default class RadarChart {
                         }
                     },
                     title: {
-                        display: !!this.options.title,
-                        text: this.options.title,
+                        display: false,
+                        text: '',
                         font: {
                             size: 18,
                             weight: 'bold'

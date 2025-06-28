@@ -3,6 +3,29 @@
  * Styling for ethical impact visualization charts
  */
 
+/* Minimal container for demo radar charts - gives more room */
+.radar-demo-container {
+    position: relative;
+    width: 100%;
+    max-width: 700px; /* Even larger for better label visibility */
+    margin: 0 auto;
+    padding: 1.5rem; /* Slightly more padding for breathing room */
+    background: transparent; /* No background to blend with parent */
+    border-radius: 0; /* No border radius */
+    box-shadow: none; /* No shadow */
+    transition: none; /* No transitions */
+    border: none; /* No border */
+}
+
+.radar-demo-container canvas {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 0; /* No border radius for cleaner look */
+    background: transparent;
+}
+
 /* Main radar chart container */
 .radar-chart-container {
     position: relative;
@@ -11,38 +34,32 @@
     margin: 0 auto;
     padding: 2rem;
     background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.95) 0%, 
-        rgba(248, 250, 252, 0.95) 100%);
-    border-radius: 20px;
+        #ffffff 0%, 
+        #f8fafc 100%);
+    border-radius: 16px;
     box-shadow: 
-        0 20px 25px -5px rgba(0, 0, 0, 0.15),
-        0 10px 10px -5px rgba(0, 0, 0, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.6);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(20px);
+        0 4px 12px rgba(0, 0, 0, 0.08),
+        0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .radar-chart-container:hover {
     box-shadow: 
-        0 25px 50px -12px rgba(0, 0, 0, 0.25),
-        0 20px 25px -5px rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    transform: translateY(-4px) scale(1.02);
+        0 8px 20px rgba(0, 0, 0, 0.12),
+        0 2px 6px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+    border-color: rgba(156, 163, 175, 0.6);
 }
 
-/* Chart canvas styling with enhanced background */
+/* Chart canvas styling with clean background */
 .radar-chart-container canvas {
     max-width: 100%;
     height: auto;
     display: block;
     margin: 0 auto;
-    border-radius: 16px;
-    background: linear-gradient(135deg, 
-        rgba(102, 126, 234, 0.03) 0%, 
-        rgba(118, 75, 162, 0.05) 50%,
-        rgba(240, 171, 252, 0.03) 100%);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    background: transparent;
 }
 
 /* Fallback chart when Chart.js fails to load */
@@ -314,6 +331,11 @@
         min-width: 35px;
         font-size: 0.8rem;
     }
+
+    .radar-demo-container {
+        max-width: 100%;
+        padding: 1rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -343,15 +365,23 @@
     .score-bar {
         width: 100%;
     }
+
+    .radar-demo-container {
+        padding: 0.5rem;
+    }
 }
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
-    .radar-chart-container,
     .scenario-radar,
     .results-radar {
         background: var(--card-bg-dark, #2d3748);
         border-color: var(--border-color-dark, #4a5568);
+    }
+    
+    .radar-chart-container {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+        border-color: rgba(226, 232, 240, 0.8) !important;
     }
     
     .radar-chart-fallback {
@@ -392,18 +422,9 @@
     position: relative;
 }
 
+/* Removed loading spinner to eliminate gray dot */
 .radar-updating::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 20px;
-    height: 20px;
-    margin: -10px 0 0 -10px;
-    border: 2px solid #f3f3f3;
-    border-top: 2px solid #667eea;
-    border-radius: 50%;
-    animation: radar-spin 1s linear infinite;
+    display: none;
 }
 
 @keyframes radar-spin {
@@ -422,25 +443,9 @@
     100% { transform: scale(1); }
 }
 
-/* Radar chart value indicators */
+/* Radar chart value indicators - removed to eliminate gray dot */
 .radar-chart-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 16px;
-    background: linear-gradient(135deg, 
-        rgba(102, 126, 234, 0.03) 0%, 
-        rgba(118, 75, 162, 0.03) 100%);
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.radar-chart-container:hover::before {
-    opacity: 1;
+    display: none;
 }
 
 /* Floating action button style for radar interactions */

@@ -185,29 +185,52 @@
 }
 
 .scenario-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  color: #2d3748;
   padding: 0;
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(203, 213, 225, 0.3);
   overflow: hidden;
   position: relative;
+  border: 1px solid #e2e8f0;
 }
 
 .scenario-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(102, 126, 234, 0.2);
+  border-color: #667eea;
 }
 
 .scenario-card.completed {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 0 20px rgba(16, 185, 129, 0.3);
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  border-color: #10b981;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(16, 185, 129, 0.3);
 }
 
-.scenario-card.completed:hover {
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25), 0 0 30px rgba(16, 185, 129, 0.4);
+.scenario-card.completed::after {
+  content: '✔️';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 1.5rem;
+  z-index: 10;
+  animation: checkmark-bounce 0.6s ease-out;
+}
+
+@keyframes checkmark-bounce {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .card-header {
@@ -220,6 +243,7 @@
 .scenario-icon {
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
+  filter: grayscale(0.2);
 }
 
 .difficulty-badge {
@@ -228,8 +252,9 @@
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
-  color: white;
-  opacity: 0.9;
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.2);
 }
 
 .completion-badge {
@@ -247,30 +272,33 @@
 }
 
 .scenario-card h3 {
-  margin: 0 0 1rem 0;
+  margin: 0 0 0.75rem 0;
   font-size: 1.4rem;
   font-weight: 700;
-}
-
-.scenario-context {
-  font-style: italic;
-  opacity: 0.9;
-  margin-bottom: 0.75rem;
-  font-size: 0.95rem;
+  color: #2d3748;
 }
 
 .scenario-description {
   margin-bottom: 1rem;
   line-height: 1.5;
   font-size: 0.95rem;
+  color: #4a5568;
+}
+
+.scenario-context {
+  font-style: italic;
+  opacity: 0.8;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  color: #718096;
 }
 
 .challenge-info {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(102, 126, 234, 0.05);
+  border: 1px solid rgba(102, 126, 234, 0.1);
   border-radius: 8px;
   padding: 1rem;
   margin: 1rem 0;
-  backdrop-filter: blur(10px);
 }
 
 .challenge-text, .reward-text {
@@ -279,6 +307,7 @@
   gap: 0.5rem;
   margin-bottom: 0.5rem;
   font-size: 0.9rem;
+  color: #4a5568;
 }
 
 .challenge-text:last-child, .reward-text:last-child {
@@ -288,6 +317,7 @@
 .challenge-label, .reward-label {
   font-weight: 600;
   white-space: nowrap;
+  color: #667eea;
 }
 
 .scenario-progress {
@@ -299,37 +329,35 @@
 
 .progress-bar-small {
   flex: 1;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(203, 213, 225, 0.3);
   height: 6px;
   border-radius: 3px;
   overflow: hidden;
 }
 
 .progress-fill-small {
-  background: linear-gradient(90deg, #fbbf24, #f59e0b);
+  background: linear-gradient(90deg, #667eea, #764ba2);
   height: 100%;
   border-radius: 3px;
   transition: width 0.5s ease;
-  box-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
 }
 
 .scenario-card.completed .progress-fill-small {
-  background: linear-gradient(90deg, #34d399, #10b981);
-  box-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
+  background: linear-gradient(90deg, #10b981, #059669);
 }
 
 .progress-text {
   font-size: 0.8rem;
   font-weight: 600;
   white-space: nowrap;
-  opacity: 0.9;
+  color: #4a5568;
 }
 
 .scenario-meta {
   display: flex;
   justify-content: space-between;
   font-size: 0.85rem;
-  opacity: 0.8;
+  color: #718096;
   margin: 1rem 0;
   gap: 1rem;
 }
@@ -341,16 +369,17 @@
 }
 
 .card-action {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(102, 126, 234, 0.05);
   padding: 1rem 1.5rem;
   text-align: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(203, 213, 225, 0.3);
   margin-top: auto;
 }
 
 .action-text {
   font-weight: 600;
   font-size: 0.95rem;
+  color: #667eea;
 }
 
 .exploration-tips {
@@ -433,7 +462,7 @@
 }
 
 .scenario-header::before {
-  content: '🎯';
+  content: '';
   position: absolute;
   top: -10px;
   right: 1rem;
@@ -442,6 +471,28 @@
   padding: 0.5rem;
   border-radius: 50%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.scenario-header.completed::before {
+  content: '✅';
+  opacity: 1;
+  animation: checkmark-bounce 0.6s ease-out;
+}
+
+@keyframes checkmark-bounce {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .scenario-header h2 {

@@ -139,8 +139,10 @@
     outline-offset: 2px;
 }
 
-/* Scenario Content - this is the main body area */
-.scenario-content {
+/* Scenario Content - this is the main body area within scenario modals */
+.scenario-modal .scenario-content,
+.modal-dialog .scenario-content,
+.scenario-modal-dialog .scenario-content {
     display: grid !important;
     grid-template-columns: 2fr 1fr !important;
     grid-template-areas: "main sidebar" !important;
@@ -155,7 +157,9 @@
 }
 
 @media (max-width: 968px) {
-    .scenario-content {
+    .scenario-modal .scenario-content,
+    .modal-dialog .scenario-content,
+    .scenario-modal-dialog .scenario-content {
         grid-template-columns: 1fr !important;
         grid-template-areas: 
             "main"
@@ -211,18 +215,47 @@
     font-weight: 600;
     color: #374151;
     margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dilemma-section h3::before {
+    content: '⚠️';
+    font-size: 1.25rem;
+    opacity: 0.8;
+}
+
+.ethical-question-section h3::before {
+    content: '❓';
+    font-size: 1.25rem;
+    opacity: 0.8;
+}
+
+.options-section h3::before {
+    content: '🎯';
+    font-size: 1.25rem;
+    opacity: 0.8;
 }
 
 .dilemma-text {
-    font-size: 1.1rem;
-    color: #4a5568;
-    line-height: 1.7;
+    font-size: 1.2rem;
+    color: #1a202c;
+    line-height: 1.8;
     margin: 0;
-    font-weight: 500;
-    background: rgba(102, 126, 234, 0.05);
-    padding: 1.5rem;
-    border-radius: 12px;
-    border-left: 4px solid #667eea;
+    font-weight: 600;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%);
+    padding: 2rem;
+    border-radius: 16px;
+    border-left: 6px solid #f59e0b;
+    border-top: 1px solid rgba(245, 158, 11, 0.2);
+    border-right: 1px solid rgba(245, 158, 11, 0.2);
+    border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+    box-shadow: 
+        0 4px 12px rgba(245, 158, 11, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    position: relative;
+    font-style: italic;
 }
 
 .ethical-question {
@@ -231,10 +264,12 @@
     line-height: 1.6;
     margin: 0;
     font-weight: 600;
-    background: rgba(255, 255, 255, 0.8);
-    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.04) 100%);
+    padding: 1.75rem;
     border-radius: 12px;
-    border: 2px solid rgba(102, 126, 234, 0.1);
+    border: 2px solid rgba(102, 126, 234, 0.15);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+    position: relative;
 }
 
 /* Options Container */
@@ -280,6 +315,66 @@
     background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%);
     transform: none;
     box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+}
+
+/* Enhanced hover state for selected option cards to indicate deselection */
+.option-card.selected:hover {
+    border-color: #ef4444;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.2);
+    cursor: pointer;
+}
+
+.option-card.selected:hover .option-title {
+    color: #dc2626;
+    transition: color 0.2s ease;
+}
+
+.option-card.selected:hover .option-description {
+    color: #991b1b;
+    transition: color 0.2s ease;
+}
+
+/* Add a subtle visual indicator for deselection */
+.option-card.selected::after {
+    content: '';
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    opacity: 0.8;
+    transition: all 0.2s ease;
+}
+
+.option-card.selected:hover::after {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+.option-card.selected::before {
+    content: '✓';
+    position: absolute;
+    top: 0.85rem;
+    right: 0.85rem;
+    width: 10px;
+    height: 10px;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    z-index: 1;
+    transition: all 0.2s ease;
+}
+
+.option-card.selected:hover::before {
+    content: '×';
+    font-size: 0.8rem;
+    top: 0.8rem;
+    right: 0.8rem;
 }
 
 .option-header {
@@ -661,7 +756,9 @@
         height: 36px;
     }
     
-    .scenario-content {
+    .scenario-modal .scenario-content,
+    .modal-dialog .scenario-content,
+    .scenario-modal-dialog .scenario-content {
         padding: 1.5rem;
     }
     
