@@ -59,8 +59,11 @@
     transition: opacity var(--transition-modal);
     backdrop-filter: blur(2px);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    padding: 1rem;
+    padding-top: 2rem;
+    overflow-y: auto;
 }
 
 .modal-backdrop.visible {
@@ -78,7 +81,7 @@
     z-index: var(--z-modal);
     min-width: 300px;
     max-width: 90vw;
-    max-height: 95vh; /* Increased for better usability */
+    max-height: calc(100vh - 4rem); /* Updated for better usability */
     
     /* Flexbox layout for proper header/body/footer stacking */
     display: flex;
@@ -167,12 +170,12 @@
 }
 
 .modal-footer {
-    padding: var(--spacing-4, 16px) var(--spacing-5, 20px);
+    padding: var(--spacing-3, 12px) var(--spacing-4, 16px);
     border-top: 1px solid var(--modal-border);
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: var(--spacing-3, 12px);
+    gap: var(--spacing-2, 8px);
     background: var(--modal-background);
     
     /* Flex item properties for proper stacking */
@@ -1261,8 +1264,17 @@
 
 /* Mobile responsive styles */
 @media (max-width: 768px) {
+    .modal-backdrop {
+        padding: 0.5rem;
+        padding-top: 1rem;
+    }
+    
+    .modal-backdrop .modal-dialog {
+        max-height: calc(100vh - 2rem);
+    }
+    
     .modal-footer {
-        padding: var(--spacing-3, 12px) var(--spacing-4, 16px);
+        padding: var(--spacing-2, 8px) var(--spacing-3, 12px);
         gap: var(--spacing-2, 8px);
         flex-direction: column;
         align-items: stretch;
@@ -1281,8 +1293,18 @@
 
 /* Small mobile adjustments */
 @media (max-width: 480px) {
+    .modal-backdrop {
+        padding: 0.25rem;
+        padding-top: 0.5rem;
+    }
+    
+    .modal-backdrop .modal-dialog,
+    .modal-dialog {
+        max-height: calc(100vh - 1rem);
+    }
+    
     .modal-footer {
-        padding: var(--spacing-2, 8px) var(--spacing-3, 12px);
+        padding: var(--spacing-1, 4px) var(--spacing-2, 8px);
     }
 }
 
@@ -1307,8 +1329,11 @@
 /* Ensure modal backdrop uses flexbox for centering */
 .modal-backdrop {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    padding: 1rem;
+    padding-top: 2rem;
+    overflow-y: auto;
 }
 
 /* Reset modal-dialog positioning when inside flexbox backdrop */
@@ -1318,6 +1343,7 @@
     left: auto;
     transform: none;
     margin: auto;
+    max-height: calc(100vh - 4rem);
 }
 
 /* Handle very tall content */

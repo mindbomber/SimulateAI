@@ -592,10 +592,10 @@ export default class PreLaunchModal {
                     </label>
                 </div>
                 <div class="action-buttons">
-                    <button type="button" class="btn btn-secondary" id="cancel-launch">
+                    <button type="button" class="btn-cancel" id="cancel-launch">
                         Maybe Later
                     </button>
-                    <button type="button" class="btn btn-primary" id="start-exploration">
+                    <button type="button" class="btn-launch" id="start-exploration">
                         <span class="button-icon">🚀</span>
                         Start Exploration
                     </button>
