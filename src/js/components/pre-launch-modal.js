@@ -7,10 +7,12 @@ import { getSimulationInfo } from '../data/simulation-info.js';
 import ModalUtility from './modal-utility.js';
 import { userPreferences } from '../utils/simple-storage.js';
 import { simpleAnalytics } from '../utils/simple-analytics.js';
+import { getRadarChartExplanation, getEthicsGlossary } from '../utils/ethics-glossary.js';
 import logger from '../utils/logger.js';
 
 // Constants
 const DEFAULT_SCENARIO_DURATION = 15;
+const MOBILE_BREAKPOINT = 768;
 
 export default class PreLaunchModal {
     constructor(simulationId, options = {}) {
@@ -211,36 +213,54 @@ export default class PreLaunchModal {
         // Generate the tabbed content for the pre-launch modal
         return `
             <div class="pre-launch-modal">
-                <!-- Tab Navigation -->
+                <!-- Tab Navigation with Hamburger Menu -->
                 <nav class="pre-launch-tabs" role="tablist" aria-label="Pre-launch information tabs">
-                    <button class="tab-button active" data-tab="overview" role="tab" aria-selected="true" aria-controls="tab-overview">
-                        <span class="tab-icon">🎯</span>
-                        Overview
-                    </button>
-                    <button class="tab-button" data-tab="objectives" role="tab" aria-selected="false" aria-controls="tab-objectives">
-                        <span class="tab-icon">📚</span>
-                        Learning Goals
-                    </button>
-                    <button class="tab-button" data-tab="preparation" role="tab" aria-selected="false" aria-controls="tab-preparation">
-                        <span class="tab-icon">🚀</span>
-                        Get Ready
-                    </button>
-                    <button class="tab-button" data-tab="resources" role="tab" aria-selected="false" aria-controls="tab-resources">
-                        <span class="tab-icon">📖</span>
-                        Resources
-                    </button>
-                    ${this.options.showEducatorResources ? `
-                        <button class="tab-button" data-tab="educator" role="tab" aria-selected="false" aria-controls="tab-educator">
-                            <span class="tab-icon">👨‍🏫</span>
-                            For Educators
+                    <!-- Mobile Hamburger Menu -->
+                    <div class="tab-mobile-menu">
+                        <button class="tab-hamburger" aria-label="Toggle navigation menu" aria-expanded="false">
+                            <span class="hamburger-line"></span>
+                            <span class="hamburger-line"></span>
+                            <span class="hamburger-line"></span>
                         </button>
-                    ` : ''}
+                        <span class="tab-current-label">Overview</span>
+                    </div>
+                    
+                    <!-- Tab Buttons Container -->
+                    <div class="tab-buttons-container">
+                        <button class="tab-button active" data-tab="overview" role="tab" aria-selected="true" aria-controls="tab-overview">
+                            <span class="tab-icon">🎯</span>
+                            Overview
+                        </button>
+                        <button class="tab-button" data-tab="objectives" role="tab" aria-selected="false" aria-controls="tab-objectives">
+                            <span class="tab-icon">📚</span>
+                            Learning Goals
+                        </button>
+                        <button class="tab-button" data-tab="ethics" role="tab" aria-selected="false" aria-controls="tab-ethics">
+                            <span class="tab-icon">⚖️</span>
+                            Ethics Guide
+                        </button>
+                        <button class="tab-button" data-tab="preparation" role="tab" aria-selected="false" aria-controls="tab-preparation">
+                            <span class="tab-icon">🚀</span>
+                            Get Ready
+                        </button>
+                        <button class="tab-button" data-tab="resources" role="tab" aria-selected="false" aria-controls="tab-resources">
+                            <span class="tab-icon">📖</span>
+                            Resources
+                        </button>
+                        ${this.options.showEducatorResources ? `
+                            <button class="tab-button" data-tab="educator" role="tab" aria-selected="false" aria-controls="tab-educator">
+                                <span class="tab-icon">👨‍🏫</span>
+                                For Educators
+                            </button>
+                        ` : ''}
+                    </div>
                 </nav>
                 
                 <!-- Tab Content -->
                 <div class="pre-launch-content">
                     ${this.generateOverviewTab()}
                     ${this.generateObjectivesTab()}
+                    ${this.generateEthicsTab()}
                     ${this.generatePreparationTab()}
                     ${this.generateResourcesTab()}
                     ${this.options.showEducatorResources ? this.generateEducatorTab() : ''}
@@ -352,6 +372,60 @@ export default class PreLaunchModal {
                             </ul>
                         </div>
                     ` : ''}
+                </div>
+            </div>
+        `;
+    }
+    
+    /**
+     * Generates the ethics guide tab
+     */
+    generateEthicsTab() {
+        const radarInfo = getRadarChartExplanation();
+        const glossary = getEthicsGlossary();
+        
+        return `
+            <div class="tab-content" id="tab-ethics" role="tabpanel" aria-labelledby="tab-ethics">
+                <div class="ethics-guide">
+                    <div class="radar-explanation">
+                        <h4>${radarInfo.title}</h4>
+                        <p class="section-description">${radarInfo.overview}</p>
+                        
+                        <div class="ethics-features">
+                            ${radarInfo.features.map(feature => `
+                                <div class="feature-item">
+                                    <h5>${feature.title}</h5>
+                                    <p>${feature.description}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div class="interpretation-guide">
+                            <h5>How to Interpret the Chart</h5>
+                            <p>${radarInfo.interpretation}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="ethics-dimensions">
+                        <h4>Ethical Dimensions Explained</h4>
+                        <p class="section-description">Each point on the radar chart represents one of these ethical considerations:</p>
+                        
+                        <div class="dimensions-grid">
+                            ${glossary.map(dimension => `
+                                <div class="dimension-item">
+                                    <div class="dimension-header">
+                                        <span class="dimension-color" style="background-color: ${dimension.color}"></span>
+                                        <h5>${dimension.label}</h5>
+                                    </div>
+                                    <p>${dimension.description}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div class="ethics-reminder">
+                            <p><strong>Remember:</strong> These dimensions often interact and sometimes conflict. Real ethical decision-making involves thoughtfully balancing these competing values based on context and consequences.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
@@ -551,13 +625,71 @@ export default class PreLaunchModal {
         }
 
         try {
+            // Hamburger menu toggle (mobile navigation)
+            const hamburgerButton = this.modal.element.querySelector('.tab-hamburger');
+            const tabButtonsContainer = this.modal.element.querySelector('.tab-buttons-container');
+            
+            if (hamburgerButton && tabButtonsContainer) {
+                hamburgerButton.addEventListener('click', () => {
+                    const isExpanded = hamburgerButton.getAttribute('aria-expanded') === 'true';
+                    hamburgerButton.setAttribute('aria-expanded', !isExpanded);
+                    tabButtonsContainer.classList.toggle('expanded', !isExpanded);
+                });
+                
+                // Close menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.pre-launch-tabs')) {
+                        hamburgerButton.setAttribute('aria-expanded', 'false');
+                        tabButtonsContainer.classList.remove('expanded');
+                    }
+                });
+                
+                // Close menu when pressing Escape key
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && hamburgerButton.getAttribute('aria-expanded') === 'true') {
+                        hamburgerButton.setAttribute('aria-expanded', 'false');
+                        tabButtonsContainer.classList.remove('expanded');
+                        hamburgerButton.focus(); // Return focus to hamburger button
+                    }
+                });
+            }
+            
             // Tab switching (scoped to this modal)
             const tabButtons = this.modal.element.querySelectorAll('.tab-button');
+            const tabContainer = this.modal.element.querySelector('.tab-buttons-container');
+            const tabNavigation = this.modal.element.querySelector('.pre-launch-tabs');
+            
+            // Handle scroll indicators for desktop tab overflow
+            const updateScrollIndicators = () => {
+                if (tabContainer && tabNavigation) {
+                    const { scrollLeft, scrollWidth, clientWidth } = tabContainer;
+                    const canScrollLeft = scrollLeft > 0;
+                    const canScrollRight = scrollLeft < (scrollWidth - clientWidth - 1);
+                    
+                    tabNavigation.classList.toggle('scrollable-left', canScrollLeft);
+                    tabNavigation.classList.toggle('scrollable-right', canScrollRight);
+                }
+            };
+            
+            // Update scroll indicators on container scroll and resize
+            if (tabContainer) {
+                tabContainer.addEventListener('scroll', updateScrollIndicators);
+                window.addEventListener('resize', updateScrollIndicators);
+                // Initial check
+                setTimeout(updateScrollIndicators, 100);
+            }
+            
             tabButtons.forEach(button => {
                 button.addEventListener('click', (e) => {
                     const tabId = e.target.dataset.tab || e.currentTarget.dataset.tab;
                     if (tabId) {
                         this.switchTab(tabId);
+                        
+                        // Close mobile menu after tab selection
+                        if (hamburgerButton && tabButtonsContainer) {
+                            hamburgerButton.setAttribute('aria-expanded', 'false');
+                            tabButtonsContainer.classList.remove('expanded');
+                        }
                     } else {
                         logger.warn('Tab button clicked but no data-tab attribute found', e.target);
                     }
@@ -657,6 +789,23 @@ export default class PreLaunchModal {
             if (targetButton) {
                 targetButton.classList.add('active');
                 targetButton.setAttribute('aria-selected', 'true');
+                
+                // Scroll tab into view if needed (desktop only)
+                const tabContainer = modalContainer.querySelector('.tab-buttons-container');
+                if (tabContainer && window.innerWidth > MOBILE_BREAKPOINT) {
+                    targetButton.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest',
+                        inline: 'center'
+                    });
+                }
+                
+                // Update mobile menu current label
+                const currentLabel = modalContainer.querySelector('.tab-current-label');
+                if (currentLabel) {
+                    const buttonText = targetButton.textContent.trim();
+                    currentLabel.textContent = buttonText;
+                }
             } else {
                 logger.warn(`Tab button with data-tab="${tabId}" not found in modal`);
             }

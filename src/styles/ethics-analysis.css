@@ -1,0 +1,231 @@
+/**
+ * Ethics Analysis Section Styles
+ * Styling for the radar chart explanation and glossary section
+ */
+
+/* Ethics Analysis Section */
+.ethics-analysis-section {
+    padding: 6rem 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    position: relative;
+}
+
+.ethics-analysis-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, 
+        #667eea 0%, 
+        #764ba2 25%, 
+        #f093fb 50%, 
+        #f5576c 75%, 
+        #4facfe 100%);
+}
+
+.ethics-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.ethics-explanation {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+
+.ethics-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+}
+
+.ethics-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+}
+
+.ethics-card h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 1rem 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.ethics-card p {
+    color: #4a5568;
+    line-height: 1.6;
+    margin: 0;
+    font-size: 1rem;
+}
+
+/* Ethics Glossary */
+.ethics-glossary {
+    background: white;
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.ethics-glossary h3 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1a202c;
+    margin: 0 0 2rem 0;
+    text-align: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.glossary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.glossary-item {
+    padding: 1.5rem;
+    background: rgba(102, 126, 234, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    transition: all 0.3s ease;
+}
+
+.glossary-item:hover {
+    background: rgba(102, 126, 234, 0.06);
+    border-color: rgba(102, 126, 234, 0.2);
+    transform: translateY(-2px);
+}
+
+.glossary-item h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 0.75rem 0;
+}
+
+.glossary-item p {
+    color: #4a5568;
+    line-height: 1.5;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.glossary-note {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+.glossary-note p {
+    color: #92400e;
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.glossary-note strong {
+    color: #78350f;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .ethics-analysis-section {
+        padding: 4rem 0;
+    }
+    
+    .ethics-content {
+        padding: 0 1rem;
+    }
+    
+    .ethics-explanation {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+    
+    .ethics-card {
+        padding: 1.5rem;
+    }
+    
+    .ethics-glossary {
+        padding: 2rem;
+    }
+    
+    .glossary-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .ethics-analysis-section {
+        padding: 3rem 0;
+    }
+    
+    .ethics-card {
+        padding: 1.25rem;
+    }
+    
+    .ethics-card h3 {
+        font-size: 1.1rem;
+    }
+    
+    .ethics-glossary {
+        padding: 1.5rem;
+    }
+    
+    .ethics-glossary h3 {
+        font-size: 1.5rem;
+    }
+    
+    .glossary-item {
+        padding: 1.25rem;
+    }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    .ethics-card {
+        border-width: 2px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .glossary-item {
+        border-width: 2px;
+    }
+    
+    .glossary-note {
+        border-width: 2px;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    .ethics-card,
+    .glossary-item {
+        transition: none;
+    }
+    
+    .ethics-card:hover,
+    .glossary-item:hover {
+        transform: none;
+    }
+}

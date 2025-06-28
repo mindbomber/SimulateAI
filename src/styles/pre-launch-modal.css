@@ -54,11 +54,130 @@
   display: flex;
   background: #f8f9fa;
   border-bottom: 1px solid #e5e5e5;
-  /* overflow-x: auto; - REMOVED: This was hiding the tabs */
+  position: relative;
 }
 
-.pre-launch-tab,
-.tab-button {
+/* Scroll indicators for desktop tab overflow */
+.pre-launch-tabs::before,
+.pre-launch-tabs::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.pre-launch-tabs::before {
+  left: 0;
+  background: linear-gradient(to right, #f8f9fa 0%, transparent 100%);
+}
+
+.pre-launch-tabs::after {
+  right: 0;
+  background: linear-gradient(to left, #f8f9fa 0%, transparent 100%);
+}
+
+/* Show scroll indicators when tabs overflow */
+.pre-launch-tabs.scrollable-left::before {
+  opacity: 1;
+}
+
+.pre-launch-tabs.scrollable-right::after {
+  opacity: 1;
+}
+
+/* Mobile Menu Toggle */
+.tab-mobile-menu {
+  display: none; /* Hidden on desktop */
+  align-items: center;
+  padding: 1rem 1.5rem;
+  width: 100%;
+  justify-content: space-between;
+  background: #f8f9fa;
+}
+
+.tab-hamburger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  transition: all 0.3s ease;
+}
+
+.tab-hamburger:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.hamburger-line {
+  width: 20px;
+  height: 2px;
+  background: #666;
+  margin: 2px 0;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+
+.tab-hamburger[aria-expanded="true"] .hamburger-line:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.tab-hamburger[aria-expanded="true"] .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.tab-hamburger[aria-expanded="true"] .hamburger-line:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+.tab-current-label {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+}
+
+/* Tab Buttons Container */
+.tab-buttons-container {
+  display: flex; /* Always flex on desktop */
+  width: 100%;
+  overflow-x: auto; /* Add horizontal scroll for desktop */
+  overflow-y: hidden;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #ccc transparent; /* Firefox */
+  scroll-behavior: smooth; /* Smooth scrolling for tab container */
+}
+
+/* Webkit scrollbar styling for tab container */
+.tab-buttons-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+.tab-buttons-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tab-buttons-container::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 2px;
+}
+
+.tab-buttons-container::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* Desktop Tab Buttons */
+.tab-buttons-container .tab-button {
   background: none;
   border: none;
   padding: 1rem 1.5rem;
@@ -69,25 +188,28 @@
   font-size: 0.9rem;
   font-weight: 500;
   color: #666;
+  flex-shrink: 0; /* Prevent tabs from shrinking */
+  min-width: fit-content; /* Ensure tabs maintain their content width */
 }
 
-.pre-launch-tab:hover,
-.tab-button:hover {
+.tab-buttons-container .tab-button:hover {
   background: #e9ecef;
   color: #333;
 }
 
-.pre-launch-tab.active,
-.tab-button.active {
+.tab-buttons-container .tab-button.active {
   color: #667eea;
   border-bottom-color: #667eea;
   background: white;
+  position: relative;
+  z-index: 1;
 }
 
-.pre-launch-tab:focus,
-.tab-button:focus {
+.tab-buttons-container .tab-button:focus {
   outline: 2px solid #667eea;
   outline-offset: -2px;
+  z-index: 1;
+  position: relative;
 }
 
 /* Tab Content */
@@ -445,7 +567,7 @@
   }
   
   .pre-launch-modal .modal-footer .footer-left,
-  .pre-launch-modal .modal-footer .footer-right {
+  .pre-launch_modal .modal-footer .footer-right {
     width: 100%;
     justify-content: center;
   }
@@ -454,17 +576,63 @@
     padding: 1rem;
   }
   
-  .pre-launch-tabs {
-    flex-wrap: wrap;
+  /* Mobile Tab Navigation */
+  .tab-mobile-menu {
+    display: flex; /* Show hamburger menu on mobile */
   }
   
-  .pre-launch-tab,
-  .tab-button {
-    flex: 1;
-    min-width: 120px;
-    text-align: center;
-    padding: 0.75rem 1rem;
-    font-size: 0.85rem;
+  .tab-buttons-container {
+    display: none; /* Hide by default on mobile */
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-top: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    flex-direction: column;
+    overflow: visible; /* Reset scroll on mobile */
+  }
+  
+  /* Hide scroll indicators on mobile */
+  .pre-launch-tabs::before,
+  .pre-launch-tabs::after {
+    display: none;
+  }
+  
+  .tab-buttons-container.expanded {
+    display: flex; /* Show when expanded */
+  }
+  
+  .tab-buttons-container .tab-button {
+    width: 100%;
+    text-align: left;
+    padding: 1rem 1.5rem;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #e5e5e5;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+  }
+  
+  .tab-buttons-container .tab-button:last-child {
+    border-bottom: none;
+  }
+  
+  .tab-buttons-container .tab-button:hover {
+    background: #f0f2ff;
+  }
+  
+  .tab-buttons-container .tab-button.active {
+    background: #667eea;
+    color: white;
+    border-bottom-color: transparent;
+  }
+  
+  .tab-buttons-container .tab-button.active:hover {
+    background: #5a6fd8;
   }
   
   .simulation-meta {
@@ -490,15 +658,181 @@
     font-size: 1.25rem;
   }
   
-  .pre-launch-tab,
+  .tab-current-label {
+    font-size: 0.9rem;
+  }
+  
   .tab-button {
-    font-size: 0.8rem;
-    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    padding: 0.875rem 1.25rem;
   }
   
   .vocabulary-list,
   .resource-list {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Ethics Guide Tab Styles */
+.ethics-guide {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.radar-explanation {
+  background: rgba(102, 126, 234, 0.05);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.ethics-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.feature-item {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(229, 231, 235, 0.6);
+}
+
+.feature-item h5 {
+  color: #2d3748;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+.feature-item p {
+  color: #4a5568;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.interpretation-guide {
+  background: rgba(245, 158, 11, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  margin-top: 1rem;
+}
+
+.interpretation-guide h5 {
+  color: #92400e;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+.interpretation-guide p {
+  color: #78350f;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.ethics-dimensions {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(229, 231, 235, 0.6);
+}
+
+.dimensions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.dimension-item {
+  background: rgba(248, 250, 252, 0.8);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(229, 231, 235, 0.4);
+  transition: all 0.2s ease;
+}
+
+.dimension-item:hover {
+  background: rgba(248, 250, 252, 1);
+  border-color: rgba(102, 126, 234, 0.2);
+  transform: translateY(-1px);
+}
+
+.dimension-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.dimension-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dimension-item h5 {
+  color: #1a202c;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.dimension-item p {
+  color: #4a5568;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.ethics-reminder {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1.5rem;
+}
+
+.ethics-reminder p {
+  color: #065f46;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.ethics-reminder strong {
+  color: #047857;
+  font-weight: 600;
+}
+
+/* Mobile responsiveness for ethics tab */
+@media (max-width: 768px) {
+  .ethics-features {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .dimensions-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .radar-explanation,
+  .ethics-dimensions {
+    padding: 1rem;
+  }
+  
+  .feature-item,
+  .dimension-item {
+    padding: 0.75rem;
   }
 }
 
@@ -519,12 +853,21 @@
     background: #000;
     color: #fff;
   }
+  
+  .dimension-item {
+    border-width: 2px;
+  }
+  
+  .feature-item {
+    border-width: 2px;
+  }
 }
 
 /* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
-  .pre-launch-tab,
-  .tab-button,
+  .tab-buttons-container .tab-button,
+  .tab-hamburger,
+  .hamburger-line,
   .resource-item,
   .btn-launch,
   .btn-cancel {
@@ -532,6 +875,10 @@
   }
   
   .btn-launch:hover {
+    transform: none;
+  }
+  
+  .dimension-item:hover {
     transform: none;
   }
 }
