@@ -27,6 +27,7 @@ import { EnhancedSimulationModal } from './components/enhanced-simulation-modal.
 import { PostSimulationModal } from './components/post-simulation-modal.js';
 import HeroDemo from './components/hero-demo.js';
 import ModalFooterManager from './components/modal-footer-manager.js';
+import CategoryGrid from './components/category-grid.js';
 
 // Constants for app configuration
 const APP_CONSTANTS = {
@@ -636,7 +637,34 @@ class AIEthicsApp {
         
         if (!this.simulationsGrid) {
             AppDebug.error('Simulations grid not found');
-            return;        }
+            return;
+        }
+
+        // Initialize CategoryGrid
+        this.initializeCategoryGrid();
+    }
+
+    /**
+     * Initialize the new category grid system
+     */
+    initializeCategoryGrid() {
+        try {
+            this.categoryGrid = new CategoryGrid();
+            AppDebug.log('Category grid initialized successfully');
+        } catch (error) {
+            AppDebug.error('Failed to initialize category grid:', error);
+            // Fallback to legacy simulation loading if category grid fails
+            this.loadLegacySimulations();
+        }
+    }
+
+    /**
+     * Fallback method for legacy simulation loading
+     */
+    loadLegacySimulations() {
+        AppDebug.log('Loading legacy simulation cards as fallback');
+        // This will be populated with existing simulation loading logic if needed
+        // For now, just log that we're in fallback mode
     }
 
     async loadSimulations() {
@@ -799,7 +827,10 @@ class AIEthicsApp {
     }
 
     render() {
-        this.renderSimulationsGrid();
+        // Skip rendering the old simulations grid if CategoryGrid is active
+        if (!this.categoryGrid) {
+            this.renderSimulationsGrid();
+        }
         // Hero demo is now handled by the HeroDemo class
     }
 
