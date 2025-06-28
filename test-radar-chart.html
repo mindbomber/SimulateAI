@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radar Chart Test - SimulateAI</title>
+    <link rel="stylesheet" href="src/styles/radar-chart.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f6fa;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: white;
+            padding: 2rem;
+            margin: 1rem 0;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Radar Chart Component Test</h1>
+        <p>Testing the modular radar chart system for ethical decision visualization</p>
+        
+        <div class="test-section">
+            <h2>Scenario Radar Chart (Real-time)</h2>
+            <p>This simulates how the radar chart would appear in a scenario modal with real-time updates</p>
+            
+            <div class="controls">
+                <button onclick="simulateAnswer('positive')">Answer: Positive Impact</button>
+                <button onclick="simulateAnswer('negative')">Answer: Negative Impact</button>
+                <button onclick="simulateAnswer('mixed')">Answer: Mixed Impact</button>
+                <button onclick="resetChart()">Reset to Neutral</button>
+            </div>
+            
+            <div class="grid">
+                <div>
+                    <h3>Current Scenario</h3>
+                    <p id="scenario-description">
+                        <strong>Trolley Problem: Autonomous Vehicle Split</strong><br>
+                        An AV must decide between hitting five pedestrians or swerving into a wall, killing the passenger.
+                    </p>
+                    <div id="answer-feedback"></div>
+                </div>
+                <div>
+                    <div class="scenario-radar">
+                        <div class="radar-title">Ethical Impact Analysis</div>
+                        <div class="radar-subtitle">Real-time preview of your decision impact</div>
+                        <div id="scenario-chart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Results Radar Chart</h2>
+            <p>This simulates the final radar chart shown after completing all scenarios in a category</p>
+            
+            <div class="controls">
+                <button onclick="showResults('balanced')">Show Balanced Results</button>
+                <button onclick="showResults('utilitarian')">Show Utilitarian Results</button>
+                <button onclick="showResults('deontological')">Show Deontological Results</button>
+            </div>
+            
+            <div class="results-radar">
+                <div class="radar-title">Category Completion: Trolley Problem</div>
+                <div class="radar-subtitle">Your ethical decision patterns across all scenarios</div>
+                <div id="results-chart"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import RadarChart from './src/js/components/radar-chart.js';
+        import { getAnswerImpact, previewAnswerImpact } from './src/js/data/scenario-impacts.js';
+        
+        let scenarioChart, resultsChart;
+        
+        // Initialize charts
+        async function initCharts() {
+            try {
+                // Scenario chart (real-time)
+                scenarioChart = new RadarChart('scenario-chart', {
+                    title: 'Decision Impact',
+                    width: 350,
+                    height: 350,
+                    realTime: true
+                });
+                
+                // Results chart 
+                resultsChart = new RadarChart('results-chart', {
+                    title: 'Final Results',
+                    width: 400,
+                    height: 400,
+                    realTime: false
+                });
+                
+                console.log('Charts initialized successfully');
+            } catch (error) {
+                console.error('Failed to initialize charts:', error);
+            }
+        }
+        
+        // Simulate answer selection
+        window.simulateAnswer = function(type) {
+            const impacts = {
+                positive: {
+                    fairness: 2, sustainability: 1, autonomy: 1, beneficence: 2,
+                    transparency: 1, accountability: 1, privacy: 0, proportionality: 1
+                },
+                negative: {
+                    fairness: -2, sustainability: -1, autonomy: -1, beneficence: -2,
+                    transparency: -1, accountability: -1, privacy: 0, proportionality: -1
+                },
+                mixed: {
+                    fairness: 1, sustainability: -1, autonomy: 2, beneficence: -1,
+                    transparency: 1, accountability: -2, privacy: 0, proportionality: 0
+                }
+            };
+            
+            if (scenarioChart && impacts[type]) {
+                scenarioChart.applyAnswerImpact(impacts[type]);
+                
+                // Show feedback
+                const feedback = document.getElementById('answer-feedback');
+                feedback.innerHTML = `
+                    <div style="padding: 1rem; background: #e3f2fd; border-radius: 6px; margin-top: 1rem;">
+                        <strong>Answer Impact:</strong> You chose a ${type} impact answer. 
+                        See how it affects the ethical dimensions in the radar chart.
+                    </div>
+                `;
+            }
+        };
+        
+        // Reset chart to neutral
+        window.resetChart = function() {
+            if (scenarioChart) {
+                scenarioChart.resetScores();
+                document.getElementById('answer-feedback').innerHTML = '';
+            }
+        };
+        
+        // Show different result patterns
+        window.showResults = function(pattern) {
+            const patterns = {
+                balanced: {
+                    fairness: 3, sustainability: 3, autonomy: 3, beneficence: 3,
+                    transparency: 3, accountability: 3, privacy: 3, proportionality: 3
+                },
+                utilitarian: {
+                    fairness: 2, sustainability: 4, autonomy: 2, beneficence: 5,
+                    transparency: 2, accountability: 3, privacy: 2, proportionality: 4
+                },
+                deontological: {
+                    fairness: 5, sustainability: 3, autonomy: 5, beneficence: 3,
+                    transparency: 4, accountability: 5, privacy: 4, proportionality: 3
+                }
+            };
+            
+            if (resultsChart && patterns[pattern]) {
+                resultsChart.setScores(patterns[pattern]);
+            }
+        };
+        
+        // Initialize on load
+        initCharts();
+    </script>
+</body>
+</html>

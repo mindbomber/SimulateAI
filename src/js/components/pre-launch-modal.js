@@ -9,10 +9,12 @@ import { userPreferences } from '../utils/simple-storage.js';
 import { simpleAnalytics } from '../utils/simple-analytics.js';
 import logger from '../utils/logger.js';
 
+// Constants
+const DEFAULT_SCENARIO_DURATION = 15;
+
 export default class PreLaunchModal {
     constructor(simulationId, options = {}) {
         this.simulationId = simulationId;
-        this.simulationInfo = getSimulationInfo(simulationId);
         this.options = {
             onLaunch: options.onLaunch || (() => {}),
             onCancel: options.onCancel || (() => {}),
@@ -20,12 +22,155 @@ export default class PreLaunchModal {
             ...options
         };
         
-        if (!this.simulationInfo) {
-            throw new Error(`Simulation info not found for: ${simulationId}`);
+        // Check if category data is provided directly (for category-based premodals)
+        if (options.categoryData && options.scenarioData) {
+            this.simulationInfo = this.convertCategoryToSimulationInfo(options.categoryData, options.scenarioData);
+            this.isCategory = true;
+        } else {
+            // Traditional simulation-based premodal
+            this.simulationInfo = getSimulationInfo(simulationId);
+            this.isCategory = false;
+            
+            if (!this.simulationInfo) {
+                throw new Error(`Simulation info not found for: ${simulationId}`);
+            }
         }
         
         this.modal = null;
         this.currentTab = 'overview';
+    }
+    
+    /**
+     * Converts category and scenario data to simulation info format
+     * This allows the PreLaunchModal to work with both simulations and categories
+     */
+    convertCategoryToSimulationInfo(category, scenario) {
+        return {
+            id: category.id,
+            title: scenario.title,
+            subtitle: `${category.title} - ${scenario.description}`,
+            
+            // Educational Context
+            learningObjectives: category.learningObjectives || [
+                'Explore ethical decision-making scenarios',
+                'Understand different perspectives on moral choices',
+                'Practice reasoning through complex dilemmas',
+                'Develop critical thinking about AI ethics'
+            ],
+            
+            isteCriteria: [
+                'Empowered Learner 1.1.5: Use technology to seek feedback and make improvements',
+                'Digital Citizen 1.2.2: Engage in positive, safe, legal and ethical behavior',
+                'Knowledge Constructor 1.3.1: Plan and employ effective research strategies',
+                'Computational Thinker 1.5.3: Collect data and identify patterns'
+            ],
+            
+            duration: `${category.estimatedTime || DEFAULT_SCENARIO_DURATION} minutes`,
+            difficulty: category.difficulty || 'intermediate',
+            recommendedAge: '13+',
+            prerequisites: [
+                'Basic understanding of ethics and moral reasoning',
+                'Awareness of AI and automated systems',
+                'Open mind for exploring different perspectives'
+            ],
+            
+            // Pre-Launch Information
+            beforeYouStart: {
+                briefing: `In this scenario, you'll explore "${scenario.title}" as part of the ${category.title} category. ${scenario.description}
+                
+                You'll be presented with ethical dilemmas and asked to make decisions while considering multiple perspectives. There are no single "correct" answers - instead, you'll discover the complexity of moral reasoning in AI systems.`,
+                
+                vocabulary: [
+                    { term: 'Ethics', definition: 'The study of what is morally right and wrong' },
+                    { term: 'Dilemma', definition: 'A situation requiring a choice between equally undesirable alternatives' },
+                    { term: 'Stakeholder', definition: 'A person or group affected by the decisions being made' },
+                    { term: 'Autonomy', definition: 'The ability of a system to make decisions independently' },
+                    { term: 'Moral Agency', definition: 'The capacity to make moral judgments and be held responsible for actions' }
+                ],
+                
+                preparationTips: [
+                    'Consider multiple perspectives before making decisions',
+                    'Think about both immediate and long-term consequences',
+                    'Remember that ethical reasoning often involves trade-offs',
+                    'Stay open to challenging your initial assumptions',
+                    'Consider who might be affected by each decision'
+                ],
+                
+                scenarioOverview: scenario.description
+            },
+            
+            contentNotes: [
+                'This scenario deals with complex ethical questions that may not have clear answers',
+                'Different cultural and philosophical backgrounds may lead to different conclusions',
+                'The goal is to develop reasoning skills, not find the "right" answer'
+            ],
+            
+            // Resources and connections
+            relatedResources: [
+                {
+                    type: 'article',
+                    title: 'Introduction to AI Ethics',
+                    description: 'A comprehensive overview of ethical considerations in artificial intelligence',
+                    url: '#',
+                    audience: 'general'
+                },
+                {
+                    type: 'video',
+                    title: 'Moral Decision-Making in AI Systems',
+                    description: 'Video explanation of how AI systems make moral choices',
+                    url: '#',
+                    audience: 'students'
+                },
+                {
+                    type: 'activity',
+                    title: 'Ethics Discussion Guide',
+                    description: 'Structured questions for group discussion about AI ethics',
+                    url: '#',
+                    audience: 'educators'
+                }
+            ],
+            
+            connectedSimulations: [],
+            
+            // Educator resources
+            educatorResources: {
+                discussionQuestions: [
+                    `What ethical considerations are most important in the "${category.title}" category?`,
+                    'How might different stakeholders view these scenarios differently?',
+                    'What real-world applications of these ethical dilemmas can you think of?',
+                    'How can we prepare for ethical challenges in AI and automation?',
+                    'What role should humans play in automated decision-making?'
+                ],
+                
+                extensionActivities: [
+                    'Research real-world examples related to this category',
+                    'Debate different ethical approaches to these scenarios',
+                    'Create your own ethical dilemma scenarios',
+                    'Interview experts about AI ethics in this domain',
+                    'Design guidelines for ethical AI in this area'
+                ],
+                
+                classroomTips: [
+                    'Encourage students to consider multiple perspectives',
+                    'Emphasize that there may not be single "correct" answers',
+                    'Connect scenarios to current events and real-world examples',
+                    'Allow time for reflection and discussion after each scenario',
+                    'Consider having students work in small groups to discuss choices'
+                ],
+                
+                relatedStandards: [
+                    'CSTA K-12 Computer Science Standards: 3A-IC-24, 3A-IC-25, 3A-IC-26',
+                    'ISTE Standards: Digital Citizen 1.2.2, Knowledge Constructor 1.3.1'
+                ]
+            },
+            
+            // Additional data for category-specific features
+            categoryInfo: {
+                icon: category.icon,
+                color: category.color,
+                tags: category.tags || []
+            }
+        };
     }
     
     /**

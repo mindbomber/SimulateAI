@@ -6,6 +6,7 @@
 
 import { getAllCategories, getCategoryProgress, getCategoryScenarios } from '../../data/categories.js';
 import logger from '../utils/logger.js';
+import PreLaunchModal from './pre-launch-modal.js';
 
 // Constants
 const PROGRESS_CIRCLE_CIRCUMFERENCE = 163; // 2 * π * 26 (radius)
@@ -182,9 +183,7 @@ class CategoryGrid {
             return;
         }
 
-        // For now, we'll just log and show an alert
-        // In Phase 3, this will open the scenario modal with radar chart
-        logger.info('Opening scenario:', scenario, 'in category:', category);
+        logger.info('Opening premodal for category:', category);
         
         // Dispatch custom event for other components to listen to
         const event = new CustomEvent('scenario-selected', {
@@ -192,8 +191,33 @@ class CategoryGrid {
         });
         document.dispatchEvent(event);
 
-        // Temporary feedback until we implement the scenario modal system
-        alert(`Opening "${scenario.title}" from ${category.title} - This will be implemented in Phase 3!`);
+        // Open the PreLaunchModal configured for this category
+        this.openCategoryPremodal(category, scenario);
+    }
+
+    openCategoryPremodal(category, scenario) {
+        try {
+            // Use the category ID as the "simulation ID" and pass category/scenario data
+            const preModal = new PreLaunchModal(category.id, {
+                categoryData: category,
+                scenarioData: scenario,
+                onLaunch: () => {
+                    logger.info('Starting scenario:', scenario.title);
+                    // TODO: In Phase 3, this will open the scenario modal with radar chart
+                    alert(`Starting "${scenario.title}" from ${category.title} - Scenario modal will be implemented in Phase 3!`);
+                },
+                onCancel: () => {
+                    logger.info('Category premodal cancelled');
+                },
+                showEducatorResources: true
+            });
+            
+            preModal.show();
+        } catch (error) {
+            logger.error('Failed to open category premodal:', error);
+            // Fallback to simple alert
+            alert(`Opening "${scenario.title}" from ${category.title} - Premodal setup needed for categories!`);
+        }
     }
 
     updateProgress(categoryId, scenarioId, completed = true) {
