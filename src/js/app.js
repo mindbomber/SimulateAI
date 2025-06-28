@@ -745,6 +745,14 @@ class AIEthicsApp {
             });
         }
 
+        // Debug: Test scenario modal button
+        const testScenarioBtn = document.getElementById('test-scenario-modal');
+        if (testScenarioBtn) {
+            testScenarioBtn.addEventListener('click', () => {
+                this.testScenarioModal();
+            });
+        }
+
         // Modal controls
         if (this.modal) {
             const closeBtn = this.modal.querySelector('.modal-close');
@@ -1875,6 +1883,27 @@ class AIEthicsApp {
                 }
             }
         });
+    }
+
+    /**
+     * Test scenario modal functionality (debug method)
+     */
+    async testScenarioModal() {
+        try {
+            logger.info('Testing scenario modal with trolley problem scenario');
+            
+            // Import and create scenario modal
+            const ScenarioModal = (await import('./components/scenario-modal.js')).default;
+            const scenarioModal = new ScenarioModal();
+            
+            // Open with the first trolley problem scenario
+            await scenarioModal.open('autonomous-vehicle-split', 'trolley-problem');
+            
+            logger.info('Scenario modal test launched successfully');
+        } catch (error) {
+            logger.error('Failed to test scenario modal:', error);
+            this.showNotification('Failed to open test scenario modal', 'error');
+        }
     }
 
     // ...existing methods...

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scenario Modal Test - SimulateAI</title>
+    <link rel="stylesheet" href="src/styles/scenario-modal.css">
+    <link rel="stylesheet" href="src/styles/radar-chart.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        h1 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .intro {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .scenario-test-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                0 4px 16px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .scenario-test-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.15),
+                0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .scenario-test-card h3 {
+            color: #1a202c;
+            margin: 0 0 1rem 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .scenario-test-card p {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            width: 100%;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .test-button:active {
+            transform: translateY(0);
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .instructions h2 {
+            color: #1a202c;
+            margin: 0 0 1rem 0;
+        }
+        
+        .instructions ul {
+            text-align: left;
+            max-width: 600px;
+            margin: 0 auto;
+            color: #4a5568;
+        }
+        
+        .instructions li {
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Scenario Modal Testing</h1>
+        <p class="intro">
+            Test the new scenario modal system for the Trolley Problem category. 
+            Each scenario includes ethical dilemmas, multiple choice options, pros/cons analysis, 
+            and real-time radar chart visualization.
+        </p>
+        
+        <div class="instructions">
+            <h2>How to Test</h2>
+            <ul>
+                <li>Click any scenario button below to open the modal</li>
+                <li>Read the ethical dilemma and question carefully</li>
+                <li>Select different options to see the radar chart update in real-time</li>
+                <li>Click on selected options to view detailed pros and cons</li>
+                <li>Use keyboard shortcuts: 1, 2, 3 to select options, Escape to close</li>
+                <li>Test the Reset and Continue buttons</li>
+                <li>Check responsiveness on different screen sizes</li>
+            </ul>
+        </div>
+        
+        <div class="test-grid">
+            <div class="scenario-test-card">
+                <h3>🚗 Autonomous Vehicle Split Decision</h3>
+                <p>
+                    Test the classic trolley problem adapted for autonomous vehicles. 
+                    The AI must decide between protecting passengers or pedestrians.
+                </p>
+                <button class="test-button" onclick="openScenario('autonomous-vehicle-split')">
+                    Test Scenario 1
+                </button>
+            </div>
+            
+            <div class="scenario-test-card">
+                <h3>🚌 Tunnel Dilemma</h3>
+                <p>
+                    Explore age-based ethical decisions as a self-driving bus faces 
+                    a choice between a child and elderly passengers.
+                </p>
+                <button class="test-button" onclick="openScenario('tunnel-dilemma')">
+                    Test Scenario 2
+                </button>
+            </div>
+            
+            <div class="scenario-test-card">
+                <h3>🤖 Obstacle Recalculation</h3>
+                <p>
+                    Examine risk distribution ethics as a delivery robot must choose 
+                    between immediate harm and potential broader consequences.
+                </p>
+                <button class="test-button" onclick="openScenario('obstacle-recalculation')">
+                    Test Scenario 3
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import ScenarioModal from './src/js/components/scenario-modal.js';
+        
+        let scenarioModal;
+        
+        // Initialize scenario modal
+        function initScenarioModal() {
+            scenarioModal = new ScenarioModal();
+            
+            // Listen for scenario completion events
+            document.addEventListener('scenario-completed', (event) => {
+                const { scenarioId, selectedOption, option } = event.detail;
+                console.log('Scenario completed:', event.detail);
+                
+                // Show completion feedback
+                setTimeout(() => {
+                    alert(`Scenario "${scenarioId}" completed!\\n\\nSelected: ${option.text}\\n\\nThis data would normally be saved to track the user's ethical decision patterns.`);
+                }, 500);
+            });
+        }
+        
+        // Open scenario modal
+        window.openScenario = function(scenarioId) {
+            if (!scenarioModal) {
+                initScenarioModal();
+            }
+            
+            try {
+                scenarioModal.open(scenarioId);
+            } catch (error) {
+                console.error('Failed to open scenario:', error);
+                alert(`Error opening scenario: ${error.message}`);
+            }
+        };
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initScenarioModal();
+            console.log('Scenario modal test page loaded');
+        });
+    </script>
+</body>
+</html>

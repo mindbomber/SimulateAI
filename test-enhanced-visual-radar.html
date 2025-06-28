@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Radar Chart Test - SimulateAI</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .enhanced-radar-container {
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.95) 0%, 
+                rgba(248, 250, 252, 0.95) 100%);
+            border-radius: 24px;
+            padding: 3rem;
+            margin: 2rem 0;
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.25),
+                0 8px 32px rgba(0, 0, 0, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .enhanced-radar-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                #667eea 0%, 
+                #764ba2 25%, 
+                #f093fb 50%, 
+                #f5576c 75%, 
+                #4facfe 100%);
+            border-radius: 24px 24px 0 0;
+        }
+        
+        .enhanced-radar-container:hover {
+            box-shadow: 
+                0 35px 70px -12px rgba(102, 126, 234, 0.4),
+                0 12px 48px rgba(0, 0, 0, 0.18),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            transform: translateY(-2px) scale(1.01);
+        }
+        
+        .radar-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            text-align: center;
+            color: #1a202c;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.025em;
+        }
+        
+        .radar-subtitle {
+            font-size: 1.1rem;
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            margin: 2rem 0;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Enhanced Radar Chart Visualization</h1>
+        
+        <div class="enhanced-radar-container">
+            <div class="radar-title">Ethical Impact Analysis</div>
+            <div class="radar-subtitle">Interactive radar chart with enhanced visuals and prominent axis labels</div>
+            
+            <div class="controls">
+                <button onclick="updateChart('balanced')">Balanced Profile</button>
+                <button onclick="updateChart('utilitarian')">Utilitarian Profile</button>
+                <button onclick="updateChart('deontological')">Deontological Profile</button>
+                <button onclick="updateChart('random')">Random Values</button>
+                <button onclick="resetChart()">Reset to Neutral</button>
+            </div>
+            
+            <div class="chart-wrapper">
+                <canvas id="enhancedRadar"></canvas>
+            </div>
+        </div>
+        
+        <div class="grid">
+            <div class="enhanced-radar-container">
+                <div class="radar-title">Scenario Impact</div>
+                <div class="radar-subtitle">Real-time decision preview</div>
+                <div class="chart-wrapper">
+                    <canvas id="scenarioRadar"></canvas>
+                </div>
+                <div class="controls">
+                    <button onclick="simulateAnswer('positive')">Positive Answer</button>
+                    <button onclick="simulateAnswer('negative')">Negative Answer</button>
+                    <button onclick="simulateAnswer('mixed')">Mixed Answer</button>
+                </div>
+            </div>
+            
+            <div class="enhanced-radar-container">
+                <div class="radar-title">Category Results</div>
+                <div class="radar-subtitle">Final ethical profile</div>
+                <div class="chart-wrapper">
+                    <canvas id="resultsRadar"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Ethical axes configuration
+        const ethicalAxes = [
+            'Fairness',
+            'Sustainability', 
+            'Autonomy',
+            'Beneficence',
+            'Transparency',
+            'Accountability',
+            'Privacy',
+            'Proportionality'
+        ];
+        
+        let mainChart, scenarioChart, resultsChart;
+        
+        // Enhanced chart configuration with prominent axis labels
+        function createEnhancedChartConfig(title, data, color = '#667eea') {
+            return {
+                type: 'radar',
+                data: {
+                    labels: ethicalAxes,
+                    datasets: [{
+                        label: title,
+                        data: data,
+                        backgroundColor: `${color}20`,
+                        borderColor: color,
+                        borderWidth: 3,
+                        pointBackgroundColor: color,
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 3,
+                        pointRadius: 8,
+                        pointHoverRadius: 12,
+                        tension: 0.2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 750,
+                        easing: 'easeInOutQuart'
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 16,
+                                    weight: 'bold'
+                                },
+                                color: '#2d3748',
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(45, 55, 72, 0.95)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#e2e8f0',
+                            borderColor: '#4a5568',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            titleFont: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 14
+                            },
+                            padding: 16
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            min: 0,
+                            max: 5,
+                            ticks: {
+                                stepSize: 1,
+                                display: true,
+                                backdropColor: 'rgba(255, 255, 255, 0.9)',
+                                backdropPadding: 6,
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                color: '#2d3748'
+                            },
+                            grid: {
+                                color: (context) => {
+                                    const alpha = 0.15;
+                                    if (context.index === 0) return `rgba(239, 68, 68, ${alpha})`; // Red
+                                    if (context.index === 1) return `rgba(245, 101, 101, ${alpha})`; // Light red
+                                    if (context.index === 2) return `rgba(251, 191, 36, ${alpha})`; // Yellow
+                                    if (context.index === 3) return `rgba(156, 163, 175, ${alpha})`; // Gray (neutral)
+                                    if (context.index === 4) return `rgba(34, 197, 94, ${alpha})`; // Light green
+                                    if (context.index === 5) return `rgba(22, 163, 74, ${alpha})`; // Green
+                                    return `rgba(156, 163, 175, ${alpha * 0.5})`;
+                                },
+                                lineWidth: 2
+                            },
+                            angleLines: {
+                                color: 'rgba(156, 163, 175, 0.3)',
+                                lineWidth: 2
+                            },
+                            pointLabels: {
+                                display: true,
+                                font: {
+                                    size: 16,
+                                    weight: 'bold',
+                                    family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+                                },
+                                color: '#1a202c',
+                                padding: 20,
+                                backdropColor: 'rgba(255, 255, 255, 0.95)',
+                                backdropPadding: {
+                                    x: 10,
+                                    y: 6
+                                },
+                                borderRadius: 6
+                            }
+                        }
+                    }
+                }
+            };
+        }
+        
+        // Initialize charts
+        function initCharts() {
+            console.log('Initializing enhanced charts...');
+            
+            // Main chart
+            const mainCtx = document.getElementById('enhancedRadar').getContext('2d');
+            mainChart = new Chart(mainCtx, createEnhancedChartConfig(
+                'Main Ethical Profile', 
+                [3, 3, 3, 3, 3, 3, 3, 3], 
+                '#667eea'
+            ));
+            
+            // Scenario chart
+            const scenarioCtx = document.getElementById('scenarioRadar').getContext('2d');
+            scenarioChart = new Chart(scenarioCtx, createEnhancedChartConfig(
+                'Scenario Impact', 
+                [3, 3, 3, 3, 3, 3, 3, 3], 
+                '#f5576c'
+            ));
+            
+            // Results chart
+            const resultsCtx = document.getElementById('resultsRadar').getContext('2d');
+            resultsChart = new Chart(resultsCtx, createEnhancedChartConfig(
+                'Category Results', 
+                [4, 2, 5, 3, 4, 5, 3, 4], 
+                '#22c55e'
+            ));
+            
+            console.log('All charts initialized successfully!');
+        }
+        
+        // Update main chart with different profiles
+        function updateChart(type) {
+            if (!mainChart) return;
+            
+            const profiles = {
+                balanced: [3, 3, 3, 3, 3, 3, 3, 3],
+                utilitarian: [2, 4, 2, 5, 2, 3, 2, 4],
+                deontological: [5, 3, 5, 3, 4, 5, 4, 3],
+                random: Array.from({length: 8}, () => Math.floor(Math.random() * 6))
+            };
+            
+            mainChart.data.datasets[0].data = profiles[type] || profiles.balanced;
+            mainChart.update();
+            
+            console.log(`Updated chart with ${type} profile:`, profiles[type]);
+        }
+        
+        // Simulate answer impact
+        function simulateAnswer(type) {
+            if (!scenarioChart) return;
+            
+            const impacts = {
+                positive: [4, 4, 4, 4, 4, 4, 3, 4],
+                negative: [1, 2, 1, 1, 2, 1, 3, 2],
+                mixed: [4, 1, 5, 2, 4, 2, 3, 3]
+            };
+            
+            scenarioChart.data.datasets[0].data = impacts[type] || impacts.positive;
+            scenarioChart.update();
+            
+            console.log(`Simulated ${type} answer impact:`, impacts[type]);
+        }
+        
+        // Reset main chart
+        function resetChart() {
+            if (mainChart) {
+                mainChart.data.datasets[0].data = [3, 3, 3, 3, 3, 3, 3, 3];
+                mainChart.update();
+                console.log('Chart reset to neutral values');
+            }
+        }
+        
+        // Initialize when page loads
+        window.addEventListener('load', () => {
+            setTimeout(initCharts, 100);
+        });
+    </script>
+</body>
+</html>

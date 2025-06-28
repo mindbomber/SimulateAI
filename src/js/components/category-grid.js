@@ -7,6 +7,7 @@
 import { getAllCategories, getCategoryProgress, getCategoryScenarios } from '../../data/categories.js';
 import logger from '../utils/logger.js';
 import PreLaunchModal from './pre-launch-modal.js';
+import ScenarioModal from './scenario-modal.js';
 
 // Constants
 const PROGRESS_CIRCLE_CIRCUMFERENCE = 163; // 2 * π * 26 (radius)
@@ -203,8 +204,8 @@ class CategoryGrid {
                 scenarioData: scenario,
                 onLaunch: () => {
                     logger.info('Starting scenario:', scenario.title);
-                    // TODO: In Phase 3, this will open the scenario modal with radar chart
-                    alert(`Starting "${scenario.title}" from ${category.title} - Scenario modal will be implemented in Phase 3!`);
+                    // Launch the scenario modal with both category and scenario IDs
+                    this.openScenarioModal(scenario.id, category.id);
                 },
                 onCancel: () => {
                     logger.info('Category premodal cancelled');
@@ -217,6 +218,59 @@ class CategoryGrid {
             logger.error('Failed to open category premodal:', error);
             // Fallback to simple alert
             alert(`Opening "${scenario.title}" from ${category.title} - Premodal setup needed for categories!`);
+        }
+    }
+
+    /**
+     * Open scenario modal for a specific scenario
+     */
+    openScenarioModal(scenarioId, categoryId = null) {
+        try {
+            const scenarioModal = new ScenarioModal();
+            scenarioModal.open(scenarioId, categoryId);
+            
+            // Listen for scenario completion
+            document.addEventListener('scenario-completed', this.handleScenarioCompleted.bind(this), { once: true });
+            
+        } catch (error) {
+            logger.error('Failed to open scenario modal:', error);
+            // Fallback to alert
+            alert(`Failed to open scenario modal for: ${scenarioId}`);
+        }
+    }
+
+    /**
+     * Handle scenario completion event
+     */
+    handleScenarioCompleted(event) {
+        const { scenarioId, selectedOption, option } = event.detail;
+        
+        logger.info('Scenario completed:', {
+            scenarioId,
+            selectedOption,
+            optionText: option.text
+        });
+        
+        // Find the category that contains this scenario
+        const category = this.categories.find(cat => {
+            const scenarios = getCategoryScenarios(cat.id);
+            return scenarios.some(scenario => scenario.id === scenarioId);
+        });
+        
+        if (category) {
+            // Update progress
+            this.updateProgress(category.id, scenarioId, true);
+            
+            // Track analytics if available
+            if (window.AnalyticsManager) {
+                window.AnalyticsManager.trackEvent('scenario_completed', {
+                    categoryId: category.id,
+                    scenarioId,
+                    selectedOption,
+                    optionText: option.text,
+                    impact: option.impact
+                });
+            }
         }
     }
 
