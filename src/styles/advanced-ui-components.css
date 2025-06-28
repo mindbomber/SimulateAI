@@ -145,12 +145,6 @@
     outline-offset: var(--focus-ring-offset);
 }
 
-.modal-close::before {
-    content: '×';
-    font-weight: bold;
-    line-height: 1;
-}
-
 /* Modal body - updated for proper flexbox layout */
 .modal-body {
     padding: var(--spacing-5, 20px);

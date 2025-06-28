@@ -292,21 +292,21 @@
   padding: 0;
 }
 
-.learning-objectives li {
+.objective-item {
   padding: 0.75rem 0;
   border-bottom: 1px solid #f0f0f0;
   position: relative;
-  padding-left: 2rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
 }
 
-.learning-objectives li:before {
-  content: "🎯";
-  position: absolute;
-  left: 0;
-  top: 0.75rem;
+.objective-icon {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
 }
 
-.learning-objectives li:last-child {
+.objective-item:last-child {
   border-bottom: none;
 }
 
@@ -329,18 +329,18 @@
   padding: 0;
 }
 
-.preparation-tips li {
+.tip-item {
   padding: 0.5rem 0;
   position: relative;
-  padding-left: 2rem;
   color: #666;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
 }
 
-.preparation-tips li:before {
-  content: "💡";
-  position: absolute;
-  left: 0;
-  top: 0.5rem;
+.tip-icon {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
 }
 
 /* Vocabulary Section */
