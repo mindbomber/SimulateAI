@@ -191,6 +191,7 @@
   display: flex;
   overflow-x: auto;
   overflow-y: hidden;
+  /* Only apply scroll snap on horizontal axis and prevent it from affecting page */
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   scroll-padding-left: 0; /* Ensures scroll snap starts at left edge */
@@ -198,6 +199,8 @@
   margin-bottom: 2rem;
   padding: 1rem;
   -webkit-overflow-scrolling: touch;
+  /* Prevent this element from interfering with page scrolling */
+  contain: layout style;
   
   /* Custom scrollbar styling */
   scrollbar-width: thin;

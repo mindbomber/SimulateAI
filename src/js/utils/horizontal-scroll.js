@@ -7,23 +7,44 @@
 const SCROLL_END_DELAY = 150;
 const DEFAULT_CARD_WIDTH = 350;
 const LEFT_EDGE_THRESHOLD = 50; // Distance from left edge to consider as "at start"
+const SCROLL_SNAP_INIT_DELAY = 200; // Delay before re-enabling scroll snap
+const PAGE_SCROLL_SNAP_DELAY = 300; // Delay before ensuring page scroll snap is disabled
 
 /**
  * Initialize horizontal scroll enhancements for all scenarios grids
  */
 export function initializeHorizontalScroll() {
+  // Temporarily disable scroll snap on page to prevent interference
+  document.documentElement.style.scrollSnapType = 'none';
+  document.body.style.scrollSnapType = 'none';
+  
   const scenariosGrids = document.querySelectorAll('.scenarios-grid');
   
   scenariosGrids.forEach(grid => {
+    // Temporarily disable scroll snap during initialization
+    const originalScrollSnapType = grid.style.scrollSnapType;
+    grid.style.scrollSnapType = 'none';
+    
     // Ensure scroll starts at the leftmost position
     resetScrollPosition(grid);
     enhanceScrolling(grid);
     addKeyboardNavigation(grid);
     addTouchEnhancements(grid);
     
+    // Re-enable scroll snap after initialization
+    setTimeout(() => {
+      grid.style.scrollSnapType = originalScrollSnapType || 'x mandatory';
+    }, SCROLL_SNAP_INIT_DELAY);
+    
     // Prevent initial snap behavior on page load
     grid.setAttribute('data-initialized', 'true');
   });
+  
+  // Re-enable page scroll snap after initialization (should remain none)
+  setTimeout(() => {
+    document.documentElement.style.scrollSnapType = 'none';
+    document.body.style.scrollSnapType = 'none';
+  }, PAGE_SCROLL_SNAP_DELAY);
 }
 
 /**
@@ -265,6 +286,31 @@ export function addScrollButtons(grid) {
   
   container.appendChild(prevButton);
   container.appendChild(nextButton);
+}
+
+/**
+ * Add defensive measures to prevent scroll snap from affecting page scrolling
+ */
+export function preventPageScrollSnap() {
+  // Ensure page-level scroll snap is always disabled
+  const ensurePageScrollSnapDisabled = () => {
+    document.documentElement.style.scrollSnapType = 'none';
+    document.body.style.scrollSnapType = 'none';
+  };
+  
+  // Run immediately
+  ensurePageScrollSnapDisabled();
+  
+  // Run after DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', ensurePageScrollSnapDisabled);
+  }
+  
+  // Run after window load
+  window.addEventListener('load', ensurePageScrollSnapDisabled);
+  
+  // Run periodically to ensure it stays disabled
+  setInterval(ensurePageScrollSnapDisabled, 1000);
 }
 
 // Auto-initialize when DOM is ready

@@ -335,26 +335,26 @@
   box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
 }
 
-/* Enhanced hover state for selected option cards to indicate deselection */
+/* Enhanced hover state for selected option cards */
 .option-card.selected:hover {
-  border-color: #ef4444;
+  border-color: #5a67d8;
   background: linear-gradient(
     135deg,
-    rgba(239, 68, 68, 0.1) 0%,
-    rgba(220, 38, 38, 0.05) 100%
+    rgba(90, 103, 216, 0.15) 0%,
+    rgba(107, 70, 193, 0.08) 100%
   );
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.2);
+  box-shadow: 0 6px 20px rgba(90, 103, 216, 0.25);
   cursor: pointer;
 }
 
 .option-card.selected:hover .option-title {
-  color: #dc2626;
+  color: #5a67d8;
   transition: color 0.2s ease;
 }
 
 .option-card.selected:hover .option-description {
-  color: #991b1b;
+  color: #6b46c1;
   transition: color 0.2s ease;
 }
 
@@ -373,11 +373,12 @@
 }
 
 .option-card.selected:hover::after {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
   transform: scale(1.1);
   opacity: 1;
 }
 
+/* Add a subtle visual indicator for deselection */
 .option-card.selected::before {
   content: '✓';
   position: absolute;
@@ -393,7 +394,7 @@
 }
 
 .option-card.selected:hover::before {
-  content: '×';
+  content: '✓';
   font-size: 0.8rem;
   top: 0.8rem;
   right: 0.8rem;

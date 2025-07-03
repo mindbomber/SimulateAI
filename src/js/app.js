@@ -17,7 +17,7 @@ import { simpleAnalytics } from './utils/simple-analytics.js';
 import Helpers from './utils/helpers.js';
 import canvasManager from './utils/canvas-manager.js';
 import logger from './utils/logger.js';
-import { initializeHorizontalScroll } from './utils/horizontal-scroll.js';
+import { initializeHorizontalScroll, preventPageScrollSnap } from './utils/horizontal-scroll.js';
 
 // Import enhanced objects (loaded dynamically as needed)
 // import { EthicsMeter, InteractiveButton, InteractiveSlider } from './objects/enhanced-objects.js';
@@ -213,6 +213,9 @@ class AIEthicsApp {
 
       // Initialize ethics radar demo
       await this.initializeEthicsRadarDemo();
+
+      // Prevent page scroll snap issues
+      preventPageScrollSnap();
 
       // Initialize horizontal scroll functionality
       initializeHorizontalScroll();
@@ -1279,8 +1282,7 @@ class AIEthicsApp {
             {
               id: 'intro',
               title: 'Introduction',
-              description:
-                'Welcome to this open-ended exploration of AI ethics',
+              description: 'Welcome to this open-ended exploration of AI ethics',
               objective:
                 'Explore different perspectives and discover consequences of choices',
             },
@@ -2072,6 +2074,28 @@ class AIEthicsApp {
   }
 
   /**
+   * Scroll to the simulations section
+   */
+  scrollToSimulations() {
+    const simulationsSection = document.getElementById('simulations');
+    if (simulationsSection) {
+      simulationsSection.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+      
+      logger.info('Scrolled to simulations section');
+      
+      // Track the navigation
+      simpleAnalytics.trackEvent('navigation_to_simulations', {
+        source: 'start_learning_button'
+      });
+    } else {
+      logger.error('Simulations section not found');
+    }
+  }
+
+  /**
    * Test scenario modal functionality (debug method)
    */
   async testScenarioModal() {
@@ -2091,6 +2115,23 @@ class AIEthicsApp {
       logger.error('Failed to test scenario modal:', error);
       this.showNotification('Failed to open test scenario modal', 'error');
     }
+  }
+
+  /**
+   * Open educator tools or guide
+   */
+  openEducatorTools() {
+    // For now, we can scroll to simulations or open a modal with educator resources
+    // This can be enhanced later with dedicated educator functionality
+    logger.info('Opening educator tools');
+    
+    // Track the event
+    simpleAnalytics.trackEvent('educator_tools_accessed', {
+      source: 'educator_guide_button'
+    });
+    
+    // For now, scroll to simulations as a placeholder
+    this.scrollToSimulations();
   }
 }
 

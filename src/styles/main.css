@@ -118,6 +118,8 @@
 
 html {
   scroll-behavior: smooth;
+  /* Explicitly prevent scroll snap on the page level */
+  scroll-snap-type: none;
 }
 
 body {
@@ -128,6 +130,8 @@ body {
   background-color: #ffffff;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Explicitly prevent scroll snap on the page level */
+  scroll-snap-type: none;
 }
 
 /* Skip Link for Accessibility */
