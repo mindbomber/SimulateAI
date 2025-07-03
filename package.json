@@ -13,8 +13,8 @@
     "verify": "echo \"All components verified and integrated\" && npm run lint",
     "check-policy": "echo \"HTML generation policy compliance: ✓ No standalone HTML generation\" && npm run lint"
   },  "keywords": ["ai-ethics-education", "interactive-simulations", "iste-standards", "educator-resources", "robotics-ethics", "consequence-driven-learning", "open-ended-exploration", "educational-technology"],
-  "author": "SimulateAI Educational Platform",
-  "license": "MIT",
+  "author": "Armando Sori",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/mindbomber/SimulateAI.git"
