@@ -72,6 +72,36 @@
     <link rel="prefetch" href="src/js/core/accessibility.js">
     <link rel="prefetch" href="src/js/core/animation-manager.js">
     
+    <!-- Immediate scroll reset to prevent page restoration scrolling -->
+    <script>
+        // Prevent scroll restoration and force scroll to top immediately
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        
+        // Force scroll to top immediately when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+            
+            // Re-enable smooth scrolling after ensuring we're at top
+            setTimeout(function() {
+                document.documentElement.classList.add('loaded');
+            }, 100);
+        });
+        
+        // Also force scroll to top on page show (handles back/forward navigation)
+        window.addEventListener('pageshow', function() {
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+        });
+        
+        // Force scroll to top immediately (synchronous)
+        window.scrollTo(0, 0);
+    </script>
+    
     <!-- Inert polyfill for older browsers -->
     <script>
         // Check if inert is supported, if not load polyfill
@@ -181,9 +211,7 @@
                     </div>
                 </div>
                 
-                <div class="hero-radar-container">
-                    <div id="hero-ethics-chart" class="radar-chart-wrapper"></div>
-                </div>
+                <div id="hero-ethics-chart" class="radar-chart-wrapper"></div>
                 
                 <!-- Accordion for instructions -->
                 <div class="radar-instructions-accordion">

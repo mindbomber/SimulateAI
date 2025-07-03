@@ -541,18 +541,13 @@
 /* Responsive Design for Hero Radar Demo */
 @media (max-width: 768px) {
   .hero-radar-demo {
-    padding: 1.5rem;
+    padding: 1rem; /* Reduced padding for more chart space */
     margin: 1.5rem 0 0 0;
   }
 
   .demo-controls-grid {
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 0.75rem;
-  }
-
-  .hero-radar-container {
-    max-width: 100%;
-    padding: 0.75rem;
   }
 
   .radar-instructions-accordion .accordion-header {
@@ -565,6 +560,10 @@
 }
 
 @media (max-width: 480px) {
+  .hero-radar-demo {
+    padding: 0.75rem; /* Minimal padding on small screens */
+  }
+
   .hero-radar-demo h3 {
     font-size: 1.25rem;
   }

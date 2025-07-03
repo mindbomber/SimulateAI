@@ -26,7 +26,6 @@ import { initializeHorizontalScroll, preventPageScrollSnap } from './utils/horiz
 import PreLaunchModal from './components/pre-launch-modal.js';
 import { EnhancedSimulationModal } from './components/enhanced-simulation-modal.js';
 import { PostSimulationModal } from './components/post-simulation-modal.js';
-import HeroDemo from './components/hero-demo.js';
 import ModalFooterManager from './components/modal-footer-manager.js';
 import CategoryGrid from './components/category-grid.js';
 import RadarChart from './components/radar-chart.js';
@@ -178,6 +177,23 @@ class AIEthicsApp {
     if (this.isInitialized) return;
 
     try {
+      // IMMEDIATE scroll reset - before any other operations
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      
+      // Prevent automatic scroll restoration on page refresh
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+      }
+      
+      // Force scroll to top again after a short delay to override any browser restoration
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      }, 10);
+
       // Initialize theme detection first
       this.initializeTheme();
 
@@ -738,20 +754,12 @@ class AIEthicsApp {
 
   /**
    * Initialize hero demo component
+   * Currently using radar chart demo instead of HeroDemo class
    */
   async initializeHeroDemo() {
-    try {
-      const heroContainer = document.getElementById('hero-demo');
-      if (heroContainer) {
-        this.heroDemo = new HeroDemo();
-        logger.info('Hero demo initialized successfully');
-      } else {
-        logger.warn('Hero demo container not found, skipping initialization');
-      }
-    } catch (error) {
-      logger.error('Failed to initialize hero demo:', error);
-      // Non-critical error - app can continue without hero demo
-    }
+    // The HeroDemo class is designed for a different hero layout
+    // that's not currently implemented. The radar chart demo is working fine.
+    logger.info('Hero demo: Using radar chart demo instead of HeroDemo class');
   }
 
   /**

@@ -9,7 +9,7 @@
   width: 100%;
   max-width: 700px; /* Even larger for better label visibility */
   margin: 0 auto;
-  padding: 1.5rem; /* Slightly more padding for breathing room */
+  padding: 1rem; /* Reduced padding for more space */
   background: transparent; /* No background to blend with parent */
   border-radius: 0; /* No border radius */
   box-shadow: none; /* No shadow */
@@ -24,6 +24,20 @@
   margin: 0 auto;
   border-radius: 0; /* No border radius for cleaner look */
   background: transparent;
+}
+
+/* Mobile optimization for radar demo */
+@media (max-width: 768px) {
+  .radar-demo-container {
+    padding: 0.5rem; /* Minimal padding on mobile */
+    max-width: 100%; /* Use full width on mobile */
+  }
+  
+  .radar-demo-container canvas {
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+  }
 }
 
 /* Main radar chart container */

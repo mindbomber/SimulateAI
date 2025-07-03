@@ -16,9 +16,11 @@
 }
 
 .container {
-  max-width: var(--container-xl);
+  max-width: min(var(--container-xl), 100vw);
+  width: 100%;
   margin: 0 auto;
   padding: 0 var(--spacing-6);
+  box-sizing: border-box;
 }
 
 /* Category Header - reuse existing styles but adjust for page context */
