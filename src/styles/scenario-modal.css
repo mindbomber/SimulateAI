@@ -572,12 +572,13 @@
 }
 
 /* Radar Chart Container - matching actual HTML structure - override radar-chart.css */
-.scenario-modal .radar-chart-container {
+/* Radar Chart - Direct styling without redundant container */
+.scenario-modal #scenario-radar-chart {
   text-align: center;
   position: static !important;
   width: 100% !important;
-  max-width: none !important;
-  margin: 0 !important;
+  max-width: 420px !important; /* Increased max-width for larger chart */
+  margin: 1rem auto !important;
   padding: 0.5rem !important; /* Reduce padding to give more space to chart */
   background: none !important;
   border-radius: 0 !important;
@@ -590,12 +591,17 @@
   min-height: 450px;
   overflow: visible !important;
   /* Ensure container can accommodate chart labels */
-  display: flex;
+  display: flex !important;
   flex-direction: column;
   justify-content: center;
+  /* Ensure visibility and proper sizing */
+  visibility: visible !important;
+  /* Prevent any text content from showing */
+  position: relative;
 }
 
-.scenario-modal .radar-chart-container h3 {
+/* Remove the old radar-chart-container h3 styling and apply directly if needed */
+.scenario-modal .chart-legend h3 {
   font-size: 1.25rem;
   font-weight: 700;
   color: #1a202c;
@@ -607,23 +613,7 @@
   background-clip: text;
 }
 
-.scenario-modal #scenario-radar-chart {
-  margin: 1rem 0;
-  min-height: 380px;
-  width: 100%;
-  max-width: 380px; /* Constrain width to ensure labels have space */
-  position: relative;
-  /* Ensure visibility and proper sizing */
-  display: block !important;
-  visibility: visible !important;
-  /* Prevent clipping - add space for labels */
-  overflow: visible !important;
-  /* Center the chart */
-  margin-left: auto;
-  margin-right: auto;
-  /* Prevent any text content from showing */
-  text-align: center;
-}
+
 
 /* Ensure no unwanted text content displays in the radar chart */
 .scenario-modal #scenario-radar-chart:empty::before {
@@ -636,11 +626,11 @@
   display: none;
 }
 
-/* Fix canvas sizing and clipping - Give Chart.js more space for pointLabels */
-.scenario-modal .radar-chart-container canvas {
+/* Canvas specific styling for the radar chart */
+.scenario-modal #scenario-radar-chart canvas {
   max-width: 100% !important;
-  width: 380px !important; /* Fixed width for chart */
-  height: 380px !important; /* Fixed height for chart */
+  width: 400px !important; /* Increased width for chart */
+  height: 400px !important; /* Increased height for chart */
   display: block !important;
   margin: 0 auto !important;
   /* Prevent clipping - ensure Chart.js has space for labels */
@@ -846,20 +836,16 @@
   }
 
   /* Mobile radar chart adjustments */
-  .scenario-modal .radar-chart-container {
+  .scenario-modal #scenario-radar-chart {
     min-height: 350px;
     padding: 0.25rem !important;
+    max-width: 320px !important; /* Increased from 300px */
   }
 
-  .scenario-modal #scenario-radar-chart {
-    min-height: 300px;
-    max-width: 300px;
-  }
-
-  .scenario-modal .radar-chart-container canvas {
-    width: 300px !important;
-    height: 300px !important;
-    padding: 15px;
+  .scenario-modal #scenario-radar-chart canvas {
+    width: 320px !important; /* Increased from 300px */
+    height: 320px !important; /* Increased from 300px */
+    padding: 10px; /* Reduced padding */
   }
 
   .pros-cons-grid {

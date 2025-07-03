@@ -187,11 +187,9 @@ class ScenarioModal {
                     </div>
 
                     <div class="scenario-sidebar">
-                        <div class="radar-chart-container">
-                            <div id="scenario-radar-chart" style="min-height: 380px; position: relative;"></div>
-                            <div class="chart-legend">
-                                <p>This chart shows how your choice affects different ethical dimensions. Select an option to see its impact.</p>
-                            </div>
+                        <div id="scenario-radar-chart" style="min-height: 380px; position: relative;"></div>
+                        <div class="chart-legend">
+                            <p>This chart shows how your choice affects different ethical dimensions. Select an option to see its impact.</p>
                         </div>
                     </div>
                 </div>

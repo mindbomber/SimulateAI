@@ -59,17 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Example: Show info toast when educator guide is clicked
-  const educatorGuideBtn = document.getElementById('educator-guide');
-  if (educatorGuideBtn) {
-    educatorGuideBtn.addEventListener('click', () => {
-      window.NotificationToast.info(
-        'Educator Resources',
-        'Access comprehensive teaching materials and assessment tools.'
-      );
-    });
-  }
-
   // Example: Error handling integration
   window.addEventListener('error', _event => {
     window.NotificationToast.error(

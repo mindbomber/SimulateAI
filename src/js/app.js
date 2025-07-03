@@ -815,17 +815,10 @@ class AIEthicsApp {
 
     // Hero section buttons
     const startLearningBtn = document.getElementById('start-learning');
-    const educatorGuideBtn = document.getElementById('educator-guide');
 
     if (startLearningBtn) {
       startLearningBtn.addEventListener('click', () => {
         this.scrollToSimulations();
-      });
-    }
-
-    if (educatorGuideBtn) {
-      educatorGuideBtn.addEventListener('click', () => {
-        this.openEducatorTools();
       });
     }
 
