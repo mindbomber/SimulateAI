@@ -91,9 +91,12 @@ class CategoryGrid {
                         <h3 class="category-title">${category.title}</h3>
                         <p class="category-description">${category.description}</p>
                         <div class="category-meta">
-                            <span class="category-difficulty difficulty-${category.difficulty}">${category.difficulty}</span>
-                            <span class="category-time">${category.estimatedTime} min</span>
-                            <span class="category-progress-text">${progress.completed}/${progress.total} completed</span>
+                            <div class="category-meta-items">
+                                <span class="category-difficulty difficulty-${category.difficulty}">${category.difficulty}</span>
+                                <span class="category-time">${category.estimatedTime} min</span>
+                                <span class="category-progress-text">${progress.completed}/${progress.total} completed</span>
+                            </div>
+                            <a href="category.html?category=${category.id}" class="category-see-all">See All</a>
                         </div>
                     </div>
                 </div>
