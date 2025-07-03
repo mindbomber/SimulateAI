@@ -16,14 +16,14 @@ class EthicsScale {
       showValue: options.showValue !== false,
       onChange: options.onChange || (() => {}),
       disabled: options.disabled || false,
-      ...options
+      ...options,
     };
 
     this.value = this.options.value;
     this.element = null;
     this.slider = null;
     this.valueDisplay = null;
-    
+
     this.initialize();
   }
 
@@ -81,24 +81,26 @@ class EthicsScale {
     this.slider = this.element.querySelector('.ethics-scale-slider');
     this.valueDisplay = this.element.querySelector('.ethics-scale-value');
     this.thumb = this.element.querySelector('.ethics-scale-thumb');
-    this.description = this.element.querySelector('.ethics-scale-description p');
+    this.description = this.element.querySelector(
+      '.ethics-scale-description p'
+    );
 
     this.container.appendChild(this.element);
   }
 
   attachEvents() {
-    this.slider.addEventListener('input', (e) => {
+    this.slider.addEventListener('input', e => {
       this.setValue(parseInt(e.target.value), true);
     });
 
-    this.slider.addEventListener('change', (e) => {
+    this.slider.addEventListener('change', e => {
       this.options.onChange(parseInt(e.target.value));
     });
 
     // Keyboard accessibility
-    this.slider.addEventListener('keydown', (e) => {
+    this.slider.addEventListener('keydown', e => {
       let newValue = this.value;
-      
+
       switch (e.key) {
         case 'ArrowLeft':
         case 'ArrowDown':
@@ -121,7 +123,7 @@ class EthicsScale {
           newValue = Math.min(this.options.max, this.value + 10);
           break;
       }
-      
+
       if (newValue !== this.value) {
         e.preventDefault();
         this.setValue(newValue, true);
@@ -132,11 +134,11 @@ class EthicsScale {
 
   setValue(value, updateSlider = false) {
     this.value = Math.max(this.options.min, Math.min(this.options.max, value));
-    
+
     if (updateSlider && this.slider) {
       this.slider.value = this.value;
     }
-    
+
     this.updateDisplay();
   }
 
@@ -148,12 +150,12 @@ class EthicsScale {
     if (this.valueDisplay) {
       this.valueDisplay.textContent = this.value;
     }
-    
+
     if (this.thumb) {
       this.thumb.style.left = `${this.getThumbPosition()}%`;
       this.thumb.style.backgroundColor = this.getThumbColor();
     }
-    
+
     if (this.description) {
       this.description.textContent = this.getEthicalDescription();
     }
@@ -169,7 +171,7 @@ class EthicsScale {
 
   getThumbColor() {
     const percentage = this.getThumbPosition() / 100;
-    
+
     if (percentage < 0.33) {
       return '#e74c3c'; // Red for low ethical rating
     } else if (percentage < 0.67) {
@@ -181,7 +183,7 @@ class EthicsScale {
 
   getEthicalDescription() {
     const percentage = this.getThumbPosition() / 100;
-    
+
     if (percentage < 0.2) {
       return 'This choice may have significant negative ethical implications.';
     } else if (percentage < 0.4) {
@@ -198,11 +200,11 @@ class EthicsScale {
   updateSegmentHighlights() {
     const segments = this.element.querySelectorAll('.segment');
     const percentage = this.getThumbPosition() / 100;
-    
+
     segments.forEach((segment, index) => {
       const segmentStart = index / 3;
       const segmentEnd = (index + 1) / 3;
-      
+
       if (percentage >= segmentStart && percentage <= segmentEnd) {
         segment.classList.add('active');
       } else {
@@ -392,7 +394,10 @@ const ethicsScaleStyles = `
 `;
 
 // Inject styles if not already present
-if (typeof document !== 'undefined' && !document.getElementById('ethics-scale-styles')) {
+if (
+  typeof document !== 'undefined' &&
+  !document.getElementById('ethics-scale-styles')
+) {
   const styleSheet = document.createElement('style');
   styleSheet.id = 'ethics-scale-styles';
   styleSheet.textContent = ethicsScaleStyles;

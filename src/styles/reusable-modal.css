@@ -3,7 +3,7 @@
 .reusable-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.45);
   z-index: 10000;
   opacity: 0;
   pointer-events: none;
@@ -22,7 +22,7 @@
   background: var(--background-secondary, #fff);
   color: var(--text-primary, #1f2937);
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
   z-index: 10001;
   min-width: 320px;
   max-width: 90vw;
@@ -32,7 +32,9 @@
   flex-direction: column;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s, transform 0.2s;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
 }
 .reusable-modal.show {
   opacity: 1;
@@ -99,5 +101,3 @@
     padding-right: 10px;
   }
 }
-
-

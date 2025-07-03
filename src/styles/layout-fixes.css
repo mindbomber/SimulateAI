@@ -5,16 +5,16 @@
 /* Fixed modal body CSS conflicts - consolidated rules to ensure simulation visibility */
 .modal-backdrop .modal-dialog .modal-body,
 #simulation-modal .modal-dialog .modal-body {
-    display: flex !important;
-    flex-direction: column !important;
-    padding: 20px !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    height: auto !important;
-    min-height: 400px !important;
-    max-height: 80vh !important;
-    flex: 1 !important;
-    background: var(--modal-background, #ffffff) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 20px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  height: auto !important;
+  min-height: 400px !important;
+  max-height: 80vh !important;
+  flex: 1 !important;
+  background: var(--modal-background, #ffffff) !important;
 }
 
 /* Enhanced simulation container with higher specificity - updated for new modal system */
@@ -23,17 +23,17 @@
 .modal-dialog .simulation-container,
 #simulation-modal .simulation-container,
 .simulation-preview .simulation-container {
-    background: var(--color-gray-50, #f8f9fa) !important;
-    border-radius: 8px !important;
-    padding: 16px !important;
-    min-height: 300px !important;
-    width: 100% !important;
-    display: block !important;
-    margin-bottom: 20px !important;
-    overflow: visible !important;
-    border: 1px solid var(--color-gray-200, #e5e7eb) !important;
-    flex: none;
-    position: relative;
+  background: var(--color-gray-50, #f8f9fa) !important;
+  border-radius: 8px !important;
+  padding: 16px !important;
+  min-height: 300px !important;
+  width: 100% !important;
+  display: block !important;
+  margin-bottom: 20px !important;
+  overflow: visible !important;
+  border: 1px solid var(--color-gray-200, #e5e7eb) !important;
+  flex: none;
+  position: relative;
 }
 
 /* Enhanced canvas sizing with higher specificity - updated for new modal system */
@@ -41,497 +41,505 @@
 .modal-dialog .simulation-container canvas,
 #simulation-modal .simulation-container canvas,
 .simulation-preview .simulation-container canvas {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    object-fit: contain;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
 }
 
 /* Enhanced simulation controls with higher specificity - updated for new modal system */
 .modal-backdrop .simulation-controls,
 .modal-dialog .simulation-controls,
 #simulation-modal .simulation-controls {
-    flex-shrink: 0;
-    max-height: 200px;
-    overflow: auto;
+  flex-shrink: 0;
+  max-height: 200px;
+  overflow: auto;
 }
 
 /* Enhanced simulation controls visibility - fix for modal display issues */
 #simulation-modal .modal-body .simulation-controls {
-    display: block !important;
-    margin-top: 20px !important;
-    width: 100% !important;
+  display: block !important;
+  margin-top: 20px !important;
+  width: 100% !important;
 }
 
 #simulation-modal .modal-body .ethics-meters {
-    display: block !important;
-    margin-bottom: 20px !important;
+  display: block !important;
+  margin-bottom: 20px !important;
 }
 
 #simulation-modal .modal-body .simulation-actions {
-    display: block !important;
+  display: block !important;
 }
 
 /* Enhanced hero section with higher specificity */
 .main-content .hero {
-    background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
-    color: var(--color-white);
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--spacing-12);
-    align-items: center;
-    padding: var(--spacing-12) var(--spacing-6);
-    min-height: 600px;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-light) 0%,
+    var(--color-primary) 100%
+  );
+  color: var(--color-white);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-12);
+  align-items: center;
+  padding: var(--spacing-12) var(--spacing-6);
+  min-height: 600px;
 }
 
 /* Enhanced responsive hero layout with higher specificity */
 @media (min-width: 768px) {
-    .main-content .hero {
-        grid-template-columns: 1fr 1fr;
-        padding: var(--spacing-16) var(--spacing-8);
-        min-height: 700px;
-    }
+  .main-content .hero {
+    grid-template-columns: 1fr 1fr;
+    padding: var(--spacing-16) var(--spacing-8);
+    min-height: 700px;
+  }
 }
 
 @media (min-width: 1024px) {
-    .main-content .hero {
-        padding: var(--spacing-20) var(--spacing-12);
-        gap: var(--spacing-16);
-    }
+  .main-content .hero {
+    padding: var(--spacing-20) var(--spacing-12);
+    gap: var(--spacing-16);
+  }
 }
 
 /* Enhanced hero content alignment with higher specificity */
 .main-content .hero .hero-content {
-    text-align: center;
+  text-align: center;
 }
 
 @media (min-width: 768px) {
-    .main-content .hero .hero-content {
-        text-align: left;
-    }
+  .main-content .hero .hero-content {
+    text-align: left;
+  }
 }
 
 /* Enhanced hero demo sizing with higher specificity */
 .main-content .hero .hero-simulation {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-3);
-    backdrop-filter: blur(10px);
-    max-width: none;
-    width: 100%;
-    min-height: 400px;
-    height: auto;
-    position: relative; /* Required for popover positioning */
-    overflow: visible; /* Allow popovers to extend outside */
-    z-index: 1; /* Ensure proper stacking context */
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-3);
+  backdrop-filter: blur(10px);
+  max-width: none;
+  width: 100%;
+  min-height: 400px;
+  height: auto;
+  position: relative; /* Required for popover positioning */
+  overflow: visible; /* Allow popovers to extend outside */
+  z-index: 1; /* Ensure proper stacking context */
 }
 
 @media (max-width: 767px) {
-    .main-content .hero .hero-simulation {
-        padding: var(--spacing-2);
-        min-height: 350px;
-        position: relative; /* Maintain positioning for popover */
-        overflow: visible; /* Allow popovers to extend outside */
-    }
+  .main-content .hero .hero-simulation {
+    padding: var(--spacing-2);
+    min-height: 350px;
+    position: relative; /* Maintain positioning for popover */
+    overflow: visible; /* Allow popovers to extend outside */
+  }
 }
 
 @media (min-width: 768px) {
-    .main-content .hero .hero-simulation {
-        padding: var(--spacing-4);
-        min-height: 450px;
-        position: relative; /* Maintain positioning for popover */
-        overflow: visible; /* Allow popovers to extend outside */
-    }
+  .main-content .hero .hero-simulation {
+    padding: var(--spacing-4);
+    min-height: 450px;
+    position: relative; /* Maintain positioning for popover */
+    overflow: visible; /* Allow popovers to extend outside */
+  }
 }
 
 @media (min-width: 1024px) {
-    .main-content .hero .hero-simulation {
-        padding: var(--spacing-6);
-        min-height: 500px;
-        position: relative; /* Maintain positioning for popover */
-        overflow: visible; /* Allow popovers to extend outside */
-    }
+  .main-content .hero .hero-simulation {
+    padding: var(--spacing-6);
+    min-height: 500px;
+    position: relative; /* Maintain positioning for popover */
+    overflow: visible; /* Allow popovers to extend outside */
+  }
 }
 
 /* Enhanced simulation preview with higher specificity */
 .main-content .simulation-preview,
 #app .simulation-preview {
-    min-height: 400px;
-    max-height: none;
-    overflow: visible;
-    display: block;
-    padding: 0;
+  min-height: 400px;
+  max-height: none;
+  overflow: visible;
+  display: block;
+  padding: 0;
 }
 
 /* Enhanced hero demo container with higher specificity */
 .main-content .hero .hero-demo-container,
 #app .hero-demo-container {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
-    border-radius: 16px;
-    padding: 1.25rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(10px);
-    max-width: 100%;
-    margin: 0 auto;
-    height: 100%;
-    min-height: 380px;
-    position: relative; /* Required for popover positioning */
-    overflow: visible; /* Allow popovers to extend outside */
-    z-index: 2; /* Higher than hero-simulation for proper stacking */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(248, 250, 252, 0.95) 100%
+  );
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  max-width: 100%;
+  margin: 0 auto;
+  height: 100%;
+  min-height: 380px;
+  position: relative; /* Required for popover positioning */
+  overflow: visible; /* Allow popovers to extend outside */
+  z-index: 2; /* Higher than hero-simulation for proper stacking */
 }
 
 /* Enhanced demo header with higher specificity */
 .main-content .demo-header,
 #app .demo-header {
-    text-align: center;
-    margin-bottom: 1rem;
+  text-align: center;
+  margin-bottom: 1rem;
 }
 
 /* Enhanced demo title with higher specificity */
 .main-content .demo-title,
 #app .demo-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--color-gray-900, #1a202c);
-    margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-gray-900, #1a202c);
+  margin: 0 0 0.25rem 0;
 }
 
 /* Enhanced demo subtitle with higher specificity */
 .main-content .demo-subtitle,
 #app .demo-subtitle {
-    color: var(--color-gray-600, #718096);
-    margin: 0;
-    font-size: 0.8rem;
+  color: var(--color-gray-600, #718096);
+  margin: 0;
+  font-size: 0.8rem;
 }
 
 /* Demo Content Layout with enhanced specificity */
 .main-content .demo-content,
 #app .demo-content {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    align-items: start;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  align-items: start;
 }
 
 @media (min-width: 768px) {
-    .main-content .demo-content,
-    #app .demo-content {
-        grid-template-columns: 1.3fr 1fr;
-        gap: 1.25rem;
-    }
+  .main-content .demo-content,
+  #app .demo-content {
+    grid-template-columns: 1.3fr 1fr;
+    gap: 1.25rem;
+  }
 }
 
 @media (min-width: 1024px) {
-    .main-content .demo-content,
-    #app .demo-content {
-        grid-template-columns: 1.5fr 1fr;
-        gap: 1.5rem;
-    }
+  .main-content .demo-content,
+  #app .demo-content {
+    grid-template-columns: 1.5fr 1fr;
+    gap: 1.5rem;
+  }
 }
 
 /* Scenario Panel with enhanced specificity */
 .main-content .scenario-panel,
 #app .scenario-panel {
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 12px;
-    padding: 1rem;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .main-content .scenario-header,
 #app .scenario-header {
-    margin-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
 }
 
 .main-content .scenario-title,
 #app .scenario-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--color-gray-800, #2d3748);
-    margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-gray-800, #2d3748);
+  margin: 0 0 0.25rem 0;
 }
 
 .main-content .scenario-question,
 #app .scenario-question {
-    font-size: 0.85rem;
-    color: var(--color-gray-700, #4a5568);
-    margin-bottom: 0.75rem;
-    line-height: 1.4;
+  font-size: 0.85rem;
+  color: var(--color-gray-700, #4a5568);
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
 }
 
 .main-content .scenario-choices,
 #app .scenario-choices {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    position: relative; /* Required for popover positioning */
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  position: relative; /* Required for popover positioning */
 }
 
 /* Choice buttons with enhanced specificity */
 .main-content .choice-btn,
 #app .choice-btn {
-    background: rgba(255, 255, 255, 0.9);
-    border: 2px solid rgba(59, 130, 246, 0.2);
-    border-radius: 8px;
-    padding: 0.5rem 0.75rem;
-    text-align: left;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.75rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(59, 130, 246, 0.2);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.75rem;
 }
 
 .main-content .choice-btn:hover,
 #app .choice-btn:hover {
-    border-color: rgba(59, 130, 246, 0.4);
-    background: rgba(59, 130, 246, 0.05);
-    transform: translateY(-1px);
+  border-color: rgba(59, 130, 246, 0.4);
+  background: rgba(59, 130, 246, 0.05);
+  transform: translateY(-1px);
 }
 
 .main-content .choice-btn.active,
 #app .choice-btn.active {
-    border-color: var(--color-primary, #3b82f6);
-    background: rgba(59, 130, 246, 0.1);
+  border-color: var(--color-primary, #3b82f6);
+  background: rgba(59, 130, 246, 0.1);
 }
 
 .main-content .choice-text,
 #app .choice-text {
-    display: block;
-    font-weight: 500;
-    color: var(--color-gray-800, #2d3748);
-    margin-bottom: 0.15rem;
+  display: block;
+  font-weight: 500;
+  color: var(--color-gray-800, #2d3748);
+  margin-bottom: 0.15rem;
 }
 
 .main-content .choice-impact,
 #app .choice-impact {
-    display: block;
-    font-size: 0.65rem;
-    color: var(--color-gray-600, #718096);
-    font-style: italic;
+  display: block;
+  font-size: 0.65rem;
+  color: var(--color-gray-600, #718096);
+  font-style: italic;
 }
 
 /* Ethics Panel with enhanced specificity */
 .main-content .ethics-panel,
 #app .ethics-panel {
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 12px;
-    padding: 1rem;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .main-content .ethics-title,
 #app .ethics-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--color-gray-800, #2d3748);
-    margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-gray-800, #2d3748);
+  margin: 0 0 0.75rem 0;
 }
 
 .main-content .ethics-meters,
 #app .ethics-meters {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .main-content .ethics-meter,
 #app .ethics-meter {
-    background: rgba(255, 255, 255, 0.6);
-    border-radius: 8px;
-    padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  padding: 0.5rem;
 }
 
 .main-content .meter-header,
 #app .meter-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.35rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.35rem;
 }
 
 .main-content .meter-label,
 #app .meter-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--color-gray-700, #4a5568);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-gray-700, #4a5568);
 }
 
 .main-content .meter-value,
 #app .meter-value {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--color-gray-600, #718096);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-gray-600, #718096);
 }
 
 .main-content .meter-bar,
 #app .meter-bar {
-    height: 6px;
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 3px;
-    overflow: hidden;
-    position: relative;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
 }
 
 .main-content .meter-fill,
 #app .meter-fill {
-    height: 100%;
-    border-radius: 3px;
-    transition: width 0.8s ease-out;
-    background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s ease-out;
+  background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
 }
 
 /* Meter fill variations with enhanced specificity */
 .main-content .fairness-fill,
 #app .fairness-fill {
-    background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+  background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
 }
 
 .main-content .transparency-fill,
 #app .transparency-fill {
-    background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+  background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
 }
 
 .main-content .accountability-fill,
 #app .accountability-fill {
-    background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
+  background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
 }
 
 /* Demo CTA with enhanced specificity */
 .main-content .demo-cta,
 #app .demo-cta {
-    width: 100%;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    background: var(--color-primary, #3b82f6);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: var(--color-primary, #3b82f6);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .main-content .demo-cta:hover,
 #app .demo-cta:hover {
-    background: var(--color-primary-dark, #2563eb);
-    transform: translateY(-1px);
+  background: var(--color-primary-dark, #2563eb);
+  transform: translateY(-1px);
 }
 
 /* Demo Actions positioned in bottom right corner - Enhanced specificity */
 .main-content .demo-actions,
 #app .demo-actions {
-    position: absolute;
-    bottom: 1.5rem;
-    right: 1.5rem;
-    display: flex;
-    gap: 0.75rem;
-    z-index: 100;
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  z-index: 100;
 }
 
 .main-content .demo-actions .btn,
 #app .demo-actions .btn {
-    font-size: 0.875rem;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    font-weight: 600;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
 }
 
 .main-content .demo-actions .btn:hover,
 #app .demo-actions .btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .main-content .demo-actions .btn-primary,
 #app .demo-actions .btn-primary {
-    background: var(--color-primary, #3b82f6);
-    color: white;
-    border: none;
+  background: var(--color-primary, #3b82f6);
+  color: white;
+  border: none;
 }
 
 .main-content .demo-actions .btn-primary:hover,
 #app .demo-actions .btn-primary:hover {
-    background: var(--color-primary-dark, #2563eb);
+  background: var(--color-primary-dark, #2563eb);
 }
 
 .main-content .demo-actions .btn-secondary,
 #app .demo-actions .btn-secondary {
-    background: white;
-    color: var(--color-gray-700, #374151);
-    border: 1px solid var(--color-gray-300, #d1d5db);
+  background: white;
+  color: var(--color-gray-700, #374151);
+  border: 1px solid var(--color-gray-300, #d1d5db);
 }
 
 .main-content .demo-actions .btn-secondary:hover,
 #app .demo-actions .btn-secondary:hover {
-    background: var(--color-gray-50, #f9fafb);
-    border-color: var(--color-gray-400, #9ca3af);
+  background: var(--color-gray-50, #f9fafb);
+  border-color: var(--color-gray-400, #9ca3af);
 }
 
 /* Responsive adjustments for demo actions */
 @media (max-width: 768px) {
-    .main-content .demo-actions,
-    #app .demo-actions {
-        bottom: 1rem;
-        right: 1rem;
-        gap: 0.5rem;
-    }
-    
-    .main-content .demo-actions .btn,
-    #app .demo-actions .btn {
-        font-size: 0.8rem;
-        padding: 0.4rem 0.75rem;
-    }
+  .main-content .demo-actions,
+  #app .demo-actions {
+    bottom: 1rem;
+    right: 1rem;
+    gap: 0.5rem;
+  }
+
+  .main-content .demo-actions .btn,
+  #app .demo-actions .btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.75rem;
+  }
 }
 
 @media (max-width: 480px) {
-    .main-content .demo-actions,
-    #app .demo-actions {
-        bottom: 0.75rem;
-        right: 0.75rem;
-        flex-direction: column;
-        gap: 0.4rem;
-    }
-    
-    .main-content .demo-actions .btn,
-    #app .demo-actions .btn {
-        font-size: 0.75rem;
-        padding: 0.35rem 0.6rem;
-    }
+  .main-content .demo-actions,
+  #app .demo-actions {
+    bottom: 0.75rem;
+    right: 0.75rem;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .main-content .demo-actions .btn,
+  #app .demo-actions .btn {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.6rem;
+  }
 }
 
 /* FINAL OVERRIDE: Ensure simulation modal visibility - highest specificity */
 /* This rule must come last to override all other modal-body conflicts */
 html body #simulation-modal.modal-backdrop .modal-dialog .modal-body,
 html body #simulation-modal .modal-dialog .modal-body {
-    display: flex !important;
-    flex-direction: column !important;
-    padding: 20px !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    height: auto !important;
-    min-height: 400px !important;
-    max-height: 80vh !important;
-    flex: 1 !important;
-    background: var(--modal-background, #ffffff) !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 20px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  height: auto !important;
+  min-height: 400px !important;
+  max-height: 80vh !important;
+  flex: 1 !important;
+  background: var(--modal-background, #ffffff) !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* FINAL OVERRIDE: Ensure simulation container is visible */
 html body #simulation-modal .modal-body .simulation-container {
-    display: block !important;
-    min-height: 300px !important;
-    width: 100% !important;
-    background: var(--color-gray-50, #f8f9fa) !important;
-    border-radius: 8px !important;
-    padding: 16px !important;
-    overflow: visible !important;
-    border: 1px solid var(--color-gray-200, #e5e7eb) !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+  display: block !important;
+  min-height: 300px !important;
+  width: 100% !important;
+  background: var(--color-gray-50, #f8f9fa) !important;
+  border-radius: 8px !important;
+  padding: 16px !important;
+  overflow: visible !important;
+  border: 1px solid var(--color-gray-200, #e5e7eb) !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }

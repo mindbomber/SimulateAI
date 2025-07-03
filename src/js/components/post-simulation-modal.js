@@ -1,16 +1,16 @@
 /**
  * PostSimulationModal - Phase 3 Implementation
- * 
+ *
  * A comprehensive post-simulation reflection modal that provides structured
  * reflection, learning reinforcement, and progress tracking after simulation completion.
- * 
+ *
  * Features:
  * - Guided reflection questionnaire system
  * - Progress visualization and decision journey
  * - Learning reinforcement and concept connections
  * - Personalized recommendations and next steps
  * - Export and sharing capabilities
- * 
+ *
  * @author SimulateAI Development Team
  * @version 3.0.0
  */
@@ -24,106 +24,110 @@ import { PERFORMANCE } from '../utils/constants.js';
 
 // Reflection step constants
 const REFLECTION_STEPS = {
-    SUMMARY: 0,
-    FEELINGS: 1,
-    INSIGHTS: 2,
-    LEARNING: 3,
-    NEXT_STEPS: 4
+  SUMMARY: 0,
+  FEELINGS: 1,
+  INSIGHTS: 2,
+  LEARNING: 3,
+  NEXT_STEPS: 4,
 };
 
 export class PostSimulationModal {
-    constructor(options = {}) {
-        this.options = {
-            simulationId: options.simulationId || 'bias-fairness',
-            simulationData: options.simulationData || {},
-            sessionData: options.sessionData || {},
-            onComplete: options.onComplete || (() => {}),
-            onSkip: options.onSkip || (() => {}),
-            onRetry: options.onRetry || (() => {}),
-            showExpertMode: options.showExpertMode || false,
-            ...options
-        };
+  constructor(options = {}) {
+    this.options = {
+      simulationId: options.simulationId || 'bias-fairness',
+      simulationData: options.simulationData || {},
+      sessionData: options.sessionData || {},
+      onComplete: options.onComplete || (() => {}),
+      onSkip: options.onSkip || (() => {}),
+      onRetry: options.onRetry || (() => {}),
+      showExpertMode: options.showExpertMode || false,
+      ...options,
+    };
 
-        this.simulationInfo = simulationInfo[this.options.simulationId] || simulationInfo['bias-fairness'];
-        this.sessionData = this.options.sessionData;
-        this.reflectionData = {};
-        this.currentStep = 0;
-        this.totalSteps = 5;
-        this.modal = null;
-        
-        // Initialize and show the modal
-        this.init();
-    }
+    this.simulationInfo =
+      simulationInfo[this.options.simulationId] ||
+      simulationInfo['bias-fairness'];
+    this.sessionData = this.options.sessionData;
+    this.reflectionData = {};
+    this.currentStep = 0;
+    this.totalSteps = 5;
+    this.modal = null;
 
-    /**
-     * Initialize the post-simulation modal
-     */
-    init() {
-        // Track analytics
-        simpleAnalytics.trackEvent('post_simulation_modal', 'opened', {
-            simulation_id: this.options.simulationId,
-            session_duration: this.sessionData.duration || 0,
-            decisions_made: this.sessionData.decisions?.length || 0
-        });
+    // Initialize and show the modal
+    this.init();
+  }
 
-        // Generate modal content
-        const content = this.generateModalContent();
-        const footer = this.generateModalFooter();
-        
-        // Create modal
-        this.modal = new ModalUtility({
-            title: this.generateModalTitle(),
-            content,
-            footer,
-            onClose: this.handleClose.bind(this),
-            closeOnBackdrop: false,
-            closeOnEscape: false,
-            size: 'large',
-            className: 'post-simulation-modal'
-        });
-        
-        this.modal.open();
-        this.setupEventHandlers();
-        this.initializeReflectionSystem();
-    }
+  /**
+   * Initialize the post-simulation modal
+   */
+  init() {
+    // Track analytics
+    simpleAnalytics.trackEvent('post_simulation_modal', 'opened', {
+      simulation_id: this.options.simulationId,
+      session_duration: this.sessionData.duration || 0,
+      decisions_made: this.sessionData.decisions?.length || 0,
+    });
 
-    /**
-     * Generate dynamic modal title based on simulation and performance
-     */
-    generateModalTitle() {
-        const performance = this.calculatePerformance();
-        const titles = {
-            excellent: `🎉 Excellent Work: ${this.simulationInfo.title} Complete`,
-            good: `✅ Well Done: ${this.simulationInfo.title} Complete`,
-            average: `📋 Simulation Complete: ${this.simulationInfo.title}`,
-            needs_improvement: `🔄 Learning Opportunity: ${this.simulationInfo.title}`
-        };
-        
-        return titles[performance] || titles.average;
-    }
+    // Generate modal content
+    const content = this.generateModalContent();
+    const footer = this.generateModalFooter();
 
-    /**
-     * Calculate performance level based on session data
-     */
-    calculatePerformance() {
-        if (!this.sessionData.decisions) return 'average';
-        
-        const { decisions } = this.sessionData;
-        const ethicalChoices = decisions.filter(d => d.ethicalScore > PERFORMANCE.ETHICAL_GOOD).length;
-        const totalChoices = decisions.length;
-        const ratio = ethicalChoices / totalChoices;
-        
-        if (ratio >= PERFORMANCE.ETHICAL_EXCELLENT) return 'excellent';
-        if (ratio >= PERFORMANCE.ETHICAL_GOOD) return 'good';
-        if (ratio >= PERFORMANCE.ETHICAL_AVERAGE) return 'average';
-        return 'needs_improvement';
-    }
+    // Create modal
+    this.modal = new ModalUtility({
+      title: this.generateModalTitle(),
+      content,
+      footer,
+      onClose: this.handleClose.bind(this),
+      closeOnBackdrop: false,
+      closeOnEscape: false,
+      size: 'large',
+      className: 'post-simulation-modal',
+    });
 
-    /**
-     * Generate the main modal content with reflection steps
-     */
-    generateModalContent() {
-        return `
+    this.modal.open();
+    this.setupEventHandlers();
+    this.initializeReflectionSystem();
+  }
+
+  /**
+   * Generate dynamic modal title based on simulation and performance
+   */
+  generateModalTitle() {
+    const performance = this.calculatePerformance();
+    const titles = {
+      excellent: `🎉 Excellent Work: ${this.simulationInfo.title} Complete`,
+      good: `✅ Well Done: ${this.simulationInfo.title} Complete`,
+      average: `📋 Simulation Complete: ${this.simulationInfo.title}`,
+      needs_improvement: `🔄 Learning Opportunity: ${this.simulationInfo.title}`,
+    };
+
+    return titles[performance] || titles.average;
+  }
+
+  /**
+   * Calculate performance level based on session data
+   */
+  calculatePerformance() {
+    if (!this.sessionData.decisions) return 'average';
+
+    const { decisions } = this.sessionData;
+    const ethicalChoices = decisions.filter(
+      d => d.ethicalScore > PERFORMANCE.ETHICAL_GOOD
+    ).length;
+    const totalChoices = decisions.length;
+    const ratio = ethicalChoices / totalChoices;
+
+    if (ratio >= PERFORMANCE.ETHICAL_EXCELLENT) return 'excellent';
+    if (ratio >= PERFORMANCE.ETHICAL_GOOD) return 'good';
+    if (ratio >= PERFORMANCE.ETHICAL_AVERAGE) return 'average';
+    return 'needs_improvement';
+  }
+
+  /**
+   * Generate the main modal content with reflection steps
+   */
+  generateModalContent() {
+    return `
             <div class="post-simulation-modal-content">
                 <!-- Progress Indicator -->
                 <div class="reflection-progress">
@@ -149,52 +153,62 @@ export class PostSimulationModal {
                 </div>
             </div>
         `;
-    }
+  }
 
-    /**
-     * Generate progress steps visualization
-     */
-    generateProgressSteps() {
-        const steps = [
-            { id: 0, title: 'Summary', icon: '📊' },
-            { id: 1, title: 'Reflection', icon: '🤔' },
-            { id: 2, title: 'Analysis', icon: '🔍' },
-            { id: 3, title: 'Learning', icon: '💡' },
-            { id: 4, title: 'Next Steps', icon: '🚀' }
-        ];
+  /**
+   * Generate progress steps visualization
+   */
+  generateProgressSteps() {
+    const steps = [
+      { id: 0, title: 'Summary', icon: '📊' },
+      { id: 1, title: 'Reflection', icon: '🤔' },
+      { id: 2, title: 'Analysis', icon: '🔍' },
+      { id: 3, title: 'Learning', icon: '💡' },
+      { id: 4, title: 'Next Steps', icon: '🚀' },
+    ];
 
-        return steps.map(step => `
+    return steps
+      .map(
+        step => `
             <div class="progress-step ${step.id <= this.currentStep ? 'completed' : ''} ${step.id === this.currentStep ? 'active' : ''}"
                  data-step="${step.id}">
                 <div class="step-icon">${step.icon}</div>
                 <div class="step-title">${step.title}</div>
             </div>
-        `).join('');
-    }
+        `
+      )
+      .join('');
+  }
 
-    /**
-     * Generate content for each reflection step
-     */
-    generateStepContent(step) {
-        switch (step) {
-            case REFLECTION_STEPS.SUMMARY: return this.generateSummaryStep();
-            case REFLECTION_STEPS.FEELINGS: return this.generateReflectionStep();
-            case REFLECTION_STEPS.INSIGHTS: return this.generateAnalysisStep();
-            case REFLECTION_STEPS.LEARNING: return this.generateLearningStep();
-            case REFLECTION_STEPS.NEXT_STEPS: return this.generateNextStepsStep();
-            default: return this.generateSummaryStep();
-        }
+  /**
+   * Generate content for each reflection step
+   */
+  generateStepContent(step) {
+    switch (step) {
+      case REFLECTION_STEPS.SUMMARY:
+        return this.generateSummaryStep();
+      case REFLECTION_STEPS.FEELINGS:
+        return this.generateReflectionStep();
+      case REFLECTION_STEPS.INSIGHTS:
+        return this.generateAnalysisStep();
+      case REFLECTION_STEPS.LEARNING:
+        return this.generateLearningStep();
+      case REFLECTION_STEPS.NEXT_STEPS:
+        return this.generateNextStepsStep();
+      default:
+        return this.generateSummaryStep();
     }
+  }
 
-    /**
-     * Step 0: Session Summary and Overview
-     */
-    generateSummaryStep() {
-        const performance = this.calculatePerformance();
-        const duration = this.sessionData.duration || 0;
-        const decisions = this.sessionData.decisions || [];
-        
-        return `
+  /**
+   * Step 0: Session Summary and Overview
+   */
+  generateSummaryStep() {
+    const performance = this.calculatePerformance();
+    const duration = this.sessionData.duration || 0;
+    const decisions = this.sessionData.decisions || [];
+
+    return `
             <div class="step-content summary-step">
                 <h3>🎯 Your Simulation Journey</h3>
                 
@@ -245,13 +259,13 @@ export class PostSimulationModal {
                 </div>
             </div>
         `;
-    }
+  }
 
-    /**
-     * Step 1: Guided Reflection Questions
-     */
-    generateReflectionStep() {
-        return `
+  /**
+   * Step 1: Guided Reflection Questions
+   */
+  generateReflectionStep() {
+    return `
             <div class="step-content reflection-step">
                 <h3>🤔 Reflection Time</h3>
                 <p class="step-description">
@@ -263,13 +277,13 @@ export class PostSimulationModal {
                 </div>
             </div>
         `;
-    }
+  }
 
-    /**
-     * Step 2: Analysis and Patterns
-     */
-    generateAnalysisStep() {
-        return `
+  /**
+   * Step 2: Analysis and Patterns
+   */
+  generateAnalysisStep() {
+    return `
             <div class="step-content analysis-step">
                 <h3>🔍 Pattern Analysis</h3>
                 <p class="step-description">
@@ -283,13 +297,13 @@ export class PostSimulationModal {
                 </div>
             </div>
         `;
-    }
+  }
 
-    /**
-     * Step 3: Learning Connections
-     */
-    generateLearningStep() {
-        return `
+  /**
+   * Step 3: Learning Connections
+   */
+  generateLearningStep() {
+    return `
             <div class="step-content learning-step">
                 <h3>💡 Connect the Dots</h3>
                 <p class="step-description">
@@ -303,13 +317,13 @@ export class PostSimulationModal {
                 </div>
             </div>
         `;
-    }
+  }
 
-    /**
-     * Step 4: Next Steps and Recommendations
-     */
-    generateNextStepsStep() {
-        return `
+  /**
+   * Step 4: Next Steps and Recommendations
+   */
+  generateNextStepsStep() {
+    return `
             <div class="step-content next-steps-step">
                 <h3>🚀 Your Learning Journey Continues</h3>
                 <p class="step-description">
@@ -328,13 +342,13 @@ export class PostSimulationModal {
                 </div>
             </div>
         `;
-    }
+  }
 
-    /**
-     * Generate session summary sidebar
-     */
-    generateSessionSummary() {
-        return `
+  /**
+   * Generate session summary sidebar
+   */
+  generateSessionSummary() {
+    return `
             <div class="summary-panel">
                 <h4>📋 Session Overview</h4>
                 
@@ -371,13 +385,13 @@ export class PostSimulationModal {
                 </div>
             </div>
         `;
-    }
+  }
 
-    /**
-     * Generate modal footer with navigation controls
-     */
-    generateModalFooter() {
-        return `
+  /**
+   * Generate modal footer with navigation controls
+   */
+  generateModalFooter() {
+    return `
             <div class="modal-footer-content">
                 <div class="footer-left">
                     <button class="btn btn-outline" data-action="skip-reflection">
@@ -402,15 +416,17 @@ export class PostSimulationModal {
                 </div>
             </div>
         `;
-    }
+  }
 
-    /**
-     * Generate reflection questions based on simulation and performance
-     */
-    generateReflectionQuestions() {
-        const questions = this.getReflectionQuestions();
-        
-        return questions.map(question => `
+  /**
+   * Generate reflection questions based on simulation and performance
+   */
+  generateReflectionQuestions() {
+    const questions = this.getReflectionQuestions();
+
+    return questions
+      .map(
+        question => `
             <div class="reflection-question" data-question-id="${question.id}">
                 <div class="question-header">
                     <span class="question-number">${question.id}</span>
@@ -426,88 +442,111 @@ export class PostSimulationModal {
                     </div>
                 </div>
             </div>
-        `).join('');
+        `
+      )
+      .join('');
+  }
+
+  /**
+   * Get reflection questions based on simulation type and performance
+   */
+  getReflectionQuestions() {
+    const baseQuestions = [
+      {
+        id: 1,
+        type: 'open-ended',
+        question:
+          'What was the most challenging decision you faced during the simulation?',
+        context: 'Think about moments when you felt uncertain or conflicted.',
+        inputType: 'textarea',
+      },
+      {
+        id: 2,
+        type: 'multiple-choice',
+        question: 'Which ethical principle most influenced your decisions?',
+        options: [
+          'Fairness',
+          'Transparency',
+          'Accountability',
+          'Privacy',
+          'Beneficence',
+        ],
+        inputType: 'radio',
+      },
+      {
+        id: 3,
+        type: 'scale',
+        question:
+          'How confident are you in the ethical soundness of your decisions?',
+        scale: { min: 1, max: 5, labels: ['Not confident', 'Very confident'] },
+        inputType: 'range',
+      },
+      {
+        id: 4,
+        type: 'open-ended',
+        question: 'If you could go back, what would you do differently?',
+        context: 'Consider both specific decisions and your overall approach.',
+        inputType: 'textarea',
+      },
+      {
+        id: 5,
+        type: 'ranking',
+        question:
+          'Rank these factors by how much they influenced your decisions:',
+        options: [
+          'Personal values',
+          'Potential consequences',
+          'Stakeholder impact',
+          'Technical feasibility',
+          'Organizational policy',
+        ],
+        inputType: 'ranking',
+      },
+    ];
+
+    // Add simulation-specific questions
+    if (this.options.simulationId === 'bias-fairness') {
+      baseQuestions.push({
+        id: 6,
+        type: 'open-ended',
+        question:
+          'What biases did you notice in yourself during the simulation?',
+        context:
+          'Bias recognition is a crucial step in developing ethical AI systems.',
+        inputType: 'textarea',
+      });
     }
 
-    /**
-     * Get reflection questions based on simulation type and performance
-     */
-    getReflectionQuestions() {
-        const baseQuestions = [
-            {
-                id: 1,
-                type: 'open-ended',
-                question: 'What was the most challenging decision you faced during the simulation?',
-                context: 'Think about moments when you felt uncertain or conflicted.',
-                inputType: 'textarea'
-            },
-            {
-                id: 2,
-                type: 'multiple-choice',
-                question: 'Which ethical principle most influenced your decisions?',
-                options: ['Fairness', 'Transparency', 'Accountability', 'Privacy', 'Beneficence'],
-                inputType: 'radio'
-            },
-            {
-                id: 3,
-                type: 'scale',
-                question: 'How confident are you in the ethical soundness of your decisions?',
-                scale: { min: 1, max: 5, labels: ['Not confident', 'Very confident'] },
-                inputType: 'range'
-            },
-            {
-                id: 4,
-                type: 'open-ended',
-                question: 'If you could go back, what would you do differently?',
-                context: 'Consider both specific decisions and your overall approach.',
-                inputType: 'textarea'
-            },
-            {
-                id: 5,
-                type: 'ranking',
-                question: 'Rank these factors by how much they influenced your decisions:',
-                options: ['Personal values', 'Potential consequences', 'Stakeholder impact', 'Technical feasibility', 'Organizational policy'],
-                inputType: 'ranking'
-            }
-        ];
+    return baseQuestions;
+  }
 
-        // Add simulation-specific questions
-        if (this.options.simulationId === 'bias-fairness') {
-            baseQuestions.push({
-                id: 6,
-                type: 'open-ended',
-                question: 'What biases did you notice in yourself during the simulation?',
-                context: 'Bias recognition is a crucial step in developing ethical AI systems.',
-                inputType: 'textarea'
-            });
-        }
-
-        return baseQuestions;
-    }
-
-    /**
-     * Generate input elements for different question types
-     */
-    generateQuestionInput(question) {
-        switch (question.inputType) {
-            case 'textarea':
-                return `
+  /**
+   * Generate input elements for different question types
+   */
+  generateQuestionInput(question) {
+    switch (question.inputType) {
+      case 'textarea':
+        return `
                     <textarea class="form-control" 
                               rows="4" 
                               placeholder="Share your thoughts..."
                               data-question="${question.id}"></textarea>
                 `;
-                
-            case 'radio':
-                return question.options.map(option => `
+
+      case 'radio':
+        return question.options
+          .map(
+            option => `
                     <label class="radio-option">
                         <input type="radio" name="question_${question.id}" value="${option}">
                         <span class="radio-label">${option}</span>
                     </label>
-                `).join('');
-                
-            case 'range':
-                return `
+                `
+          )
+          .join('');
+
+      case 'range':
+        return `
                     <div class="range-input">
                         <input type="range" 
                                min="${question.scale.min}" 
@@ -521,151 +560,167 @@ export class PostSimulationModal {
                         </div>
                     </div>
                 `;
-                
-            case 'ranking':
-                return `
+
+      case 'ranking':
+        return `
                     <div class="ranking-container" data-question="${question.id}">
                         <div class="ranking-items">
-                            ${question.options.map((option, index) => `
+                            ${question.options
+                              .map(
+                                (option, index) => `
                                 <div class="ranking-item" draggable="true" data-value="${option}">
                                     <span class="rank-number">${index + 1}</span>
                                     <span class="rank-text">${option}</span>
                                     <span class="drag-handle">⋮⋮</span>
                                 </div>
-                            `).join('')}
+                            `
+                              )
+                              .join('')}
                         </div>
                         <p class="ranking-instruction">Drag items to reorder by importance</p>
                     </div>
                 `;
-                
-            default:
-                return `<input type="text" class="form-control" data-question="${question.id}">`;
-        }
+
+      default:
+        return `<input type="text" class="form-control" data-question="${question.id}">`;
+    }
+  }
+
+  /**
+   * Setup event handlers for modal interactions
+   */
+  setupEventHandlers() {
+    if (!this.modal?.modalElement) return;
+
+    const { modalElement } = this.modal;
+
+    // Navigation buttons
+    modalElement.addEventListener('click', e => {
+      if (e.target.matches('[data-action="next"]')) {
+        this.handleNext();
+      } else if (e.target.matches('[data-action="previous"]')) {
+        this.handlePrevious();
+      } else if (e.target.matches('[data-action="skip-reflection"]')) {
+        this.handleSkip();
+      } else if (e.target.matches('[data-action="save-reflection"]')) {
+        this.handleSaveReflection();
+      } else if (e.target.matches('[data-action="share-insights"]')) {
+        this.handleShareInsights();
+      } else if (e.target.matches('[data-action="print-summary"]')) {
+        this.handlePrintSummary();
+      }
+    });
+
+    // Form inputs
+    modalElement.addEventListener('input', e => {
+      if (e.target.matches('[data-question]')) {
+        this.handleInputChange(e);
+      }
+    });
+
+    // Drag and drop for ranking questions
+    this.setupRankingHandlers(modalElement);
+  }
+
+  /**
+   * Handle navigation to next step
+   */
+  handleNext() {
+    if (this.currentStep < this.totalSteps - 1) {
+      // Validate current step if needed
+      if (this.validateCurrentStep()) {
+        this.currentStep++;
+        this.updateModalContent();
+        this.trackStepCompletion();
+      }
+    } else {
+      // Complete reflection
+      this.handleComplete();
+    }
+  }
+
+  /**
+   * Handle navigation to previous step
+   */
+  handlePrevious() {
+    if (this.currentStep > 0) {
+      this.currentStep--;
+      this.updateModalContent();
+    }
+  }
+
+  /**
+   * Update modal content for current step
+   */
+  updateModalContent() {
+    if (!this.modal?.modalElement) return;
+
+    const contentElement = this.modal.modalElement.querySelector(
+      '.reflection-content'
+    );
+    const footerElement = this.modal.modalElement.querySelector(
+      '.modal-footer-content'
+    );
+    const progressElement = this.modal.modalElement.querySelector(
+      '.reflection-progress'
+    );
+
+    if (contentElement) {
+      contentElement.innerHTML = this.generateStepContent(this.currentStep);
     }
 
-    /**
-     * Setup event handlers for modal interactions
-     */
-    setupEventHandlers() {
-        if (!this.modal?.modalElement) return;
-
-        const { modalElement } = this.modal;
-
-        // Navigation buttons
-        modalElement.addEventListener('click', (e) => {
-            if (e.target.matches('[data-action="next"]')) {
-                this.handleNext();
-            } else if (e.target.matches('[data-action="previous"]')) {
-                this.handlePrevious();
-            } else if (e.target.matches('[data-action="skip-reflection"]')) {
-                this.handleSkip();
-            } else if (e.target.matches('[data-action="save-reflection"]')) {
-                this.handleSaveReflection();
-            } else if (e.target.matches('[data-action="share-insights"]')) {
-                this.handleShareInsights();
-            } else if (e.target.matches('[data-action="print-summary"]')) {
-                this.handlePrintSummary();
-            }
-        });
-
-        // Form inputs
-        modalElement.addEventListener('input', (e) => {
-            if (e.target.matches('[data-question]')) {
-                this.handleInputChange(e);
-            }
-        });
-
-        // Drag and drop for ranking questions
-        this.setupRankingHandlers(modalElement);
+    if (footerElement) {
+      footerElement.innerHTML = this.generateModalFooter();
     }
 
-    /**
-     * Handle navigation to next step
-     */
-    handleNext() {
-        if (this.currentStep < this.totalSteps - 1) {
-            // Validate current step if needed
-            if (this.validateCurrentStep()) {
-                this.currentStep++;
-                this.updateModalContent();
-                this.trackStepCompletion();
-            }
-        } else {
-            // Complete reflection
-            this.handleComplete();
-        }
+    if (progressElement) {
+      // Update progress bar
+      const progressBar = progressElement.querySelector('.progress-fill');
+      const progressSteps = progressElement.querySelector('.progress-steps');
+
+      if (progressBar) {
+        progressBar.style.width = `${(this.currentStep / this.totalSteps) * 100}%`;
+      }
+
+      if (progressSteps) {
+        progressSteps.innerHTML = this.generateProgressSteps();
+      }
     }
 
-    /**
-     * Handle navigation to previous step
-     */
-    handlePrevious() {
-        if (this.currentStep > 0) {
-            this.currentStep--;
-            this.updateModalContent();
-        }
-    }
+    // Re-setup event handlers for new content
+    this.setupEventHandlers();
+  }
 
-    /**
-     * Update modal content for current step
-     */
-    updateModalContent() {
-        if (!this.modal?.modalElement) return;
+  /**
+   * Calculate ethical score from session data
+   */
+  calculateEthicalScore() {
+    if (!this.sessionData.decisions) return 'N/A';
 
-        const contentElement = this.modal.modalElement.querySelector('.reflection-content');
-        const footerElement = this.modal.modalElement.querySelector('.modal-footer-content');
-        const progressElement = this.modal.modalElement.querySelector('.reflection-progress');
+    const { decisions } = this.sessionData;
+    const totalScore = decisions.reduce(
+      (sum, decision) => sum + (decision.ethicalScore || 0),
+      0
+    );
+    const averageScore = totalScore / decisions.length;
 
-        if (contentElement) {
-            contentElement.innerHTML = this.generateStepContent(this.currentStep);
-        }
+    return `${Math.round(averageScore * 100)}%`;
+  }
 
-        if (footerElement) {
-            footerElement.innerHTML = this.generateModalFooter();
-        }
+  /**
+   * Generate decision journey visualization
+   */
+  generateDecisionJourney() {
+    if (!this.sessionData.decisions)
+      return '<p>No decision data available.</p>';
 
-        if (progressElement) {
-            // Update progress bar
-            const progressBar = progressElement.querySelector('.progress-fill');
-            const progressSteps = progressElement.querySelector('.progress-steps');
-            
-            if (progressBar) {
-                progressBar.style.width = `${(this.currentStep / this.totalSteps) * 100}%`;
-            }
-            
-            if (progressSteps) {
-                progressSteps.innerHTML = this.generateProgressSteps();
-            }
-        }
+    const { decisions } = this.sessionData;
 
-        // Re-setup event handlers for new content
-        this.setupEventHandlers();
-    }
-
-    /**
-     * Calculate ethical score from session data
-     */
-    calculateEthicalScore() {
-        if (!this.sessionData.decisions) return 'N/A';
-        
-        const { decisions } = this.sessionData;
-        const totalScore = decisions.reduce((sum, decision) => sum + (decision.ethicalScore || 0), 0);
-        const averageScore = totalScore / decisions.length;
-        
-        return `${Math.round(averageScore * 100)}%`;
-    }
-
-    /**
-     * Generate decision journey visualization
-     */
-    generateDecisionJourney() {
-        if (!this.sessionData.decisions) return '<p>No decision data available.</p>';
-
-        const { decisions } = this.sessionData;
-        
-        return `
+    return `
             <div class="journey-timeline">
-                ${decisions.map((decision, index) => `
+                ${decisions
+                  .map(
+                    (decision, index) => `
                     <div class="journey-point ${this.getDecisionClass(decision)}">
                         <div class="point-marker">${index + 1}</div>
                         <div class="point-content">
@@ -673,130 +728,177 @@ export class PostSimulationModal {
                             <div class="point-score">Score: ${Math.round((decision.ethicalScore || 0) * 100)}%</div>
                         </div>
                     </div>
-                `).join('')}
+                `
+                  )
+                  .join('')}
             </div>
         `;
+  }
+
+  /**
+   * Get CSS class for decision based on ethical score
+   */
+  getDecisionClass(decision) {
+    const score = decision.ethicalScore || 0;
+    if (score >= PERFORMANCE.SCORE_EXCELLENT) return 'excellent';
+    if (score >= PERFORMANCE.SCORE_GOOD) return 'good';
+    if (score >= PERFORMANCE.SCORE_AVERAGE) return 'average';
+    return 'needs-improvement';
+  }
+
+  /**
+   * Initialize reflection system
+   */
+  initializeReflectionSystem() {
+    // Initialize any complex components like charts or interactive elements
+    // This would be called after modal is fully rendered
+    setTimeout(() => {
+      this.initializeCharts();
+      this.setupRankingDragAndDrop();
+    }, 100);
+  }
+
+  /**
+   * Initialize charts and visualizations
+   */
+  initializeCharts() {
+    // Placeholder for chart initialization
+    // Would integrate with a charting library like Chart.js or D3.js
+  }
+
+  /**
+   * Validate current step completion
+   */
+  validateCurrentStep() {
+    // Add validation logic for each step
+    return true; // For now, allow all steps to proceed
+  }
+
+  /**
+   * Handle modal close
+   */
+  handleClose() {
+    this.options.onComplete(this.reflectionData);
+  }
+
+  /**
+   * Handle skip reflection
+   */
+  handleSkip() {
+    if (
+      confirm(
+        'Are you sure you want to skip the reflection? This is valuable for your learning.'
+      )
+    ) {
+      this.options.onSkip();
+      this.modal.close();
     }
+  }
 
-    /**
-     * Get CSS class for decision based on ethical score
-     */
-    getDecisionClass(decision) {
-        const score = decision.ethicalScore || 0;
-        if (score >= PERFORMANCE.SCORE_EXCELLENT) return 'excellent';
-        if (score >= PERFORMANCE.SCORE_GOOD) return 'good';
-        if (score >= PERFORMANCE.SCORE_AVERAGE) return 'average';
-        return 'needs-improvement';
-    }
+  /**
+   * Handle complete reflection
+   */
+  handleComplete() {
+    // Save reflection data
+    this.saveReflectionData();
 
-    /**
-     * Initialize reflection system
-     */
-    initializeReflectionSystem() {
-        // Initialize any complex components like charts or interactive elements
-        // This would be called after modal is fully rendered
-        setTimeout(() => {
-            this.initializeCharts();
-            this.setupRankingDragAndDrop();
-        }, 100);
-    }
+    // Track completion
+    simpleAnalytics.trackEvent('post_simulation_reflection', 'completed', {
+      simulation_id: this.options.simulationId,
+      steps_completed: this.currentStep + 1,
+      reflection_depth: this.calculateReflectionDepth(),
+    });
 
-    /**
-     * Initialize charts and visualizations
-     */
-    initializeCharts() {
-        // Placeholder for chart initialization
-        // Would integrate with a charting library like Chart.js or D3.js
-    }
+    // Close modal and trigger completion callback
+    this.options.onComplete(this.reflectionData);
+    this.modal.close();
+  }
 
-    /**
-     * Validate current step completion
-     */
-    validateCurrentStep() {
-        // Add validation logic for each step
-        return true; // For now, allow all steps to proceed
-    }
+  /**
+   * Save reflection data to storage
+   */
+  saveReflectionData() {
+    const reflectionRecord = {
+      simulationId: this.options.simulationId,
+      timestamp: new Date().toISOString(),
+      sessionData: this.sessionData,
+      reflectionData: this.reflectionData,
+      performance: this.calculatePerformance(),
+      completionRate: (this.currentStep + 1) / this.totalSteps,
+    };
 
-    /**
-     * Handle modal close
-     */
-    handleClose() {
-        this.options.onComplete(this.reflectionData);
-    }
+    userProgress.addReflection(reflectionRecord);
+  }
 
-    /**
-     * Handle skip reflection
-     */
-    handleSkip() {
-        if (confirm('Are you sure you want to skip the reflection? This is valuable for your learning.')) {
-            this.options.onSkip();
-            this.modal.close();
-        }
-    }
+  /**
+   * Calculate reflection depth based on responses
+   */
+  calculateReflectionDepth() {
+    // Analyze reflection responses to determine depth
+    // This could look at text length, thoughtfulness, etc.
+    return (
+      Object.keys(this.reflectionData).length /
+      this.getReflectionQuestions().length
+    );
+  }
 
-    /**
-     * Handle complete reflection
-     */
-    handleComplete() {
-        // Save reflection data
-        this.saveReflectionData();
-        
-        // Track completion
-        simpleAnalytics.trackEvent('post_simulation_reflection', 'completed', {
-            simulation_id: this.options.simulationId,
-            steps_completed: this.currentStep + 1,
-            reflection_depth: this.calculateReflectionDepth()
-        });
+  // Placeholder methods for additional functionality
+  generateKeyMoments() {
+    return '<p>Key moments analysis coming soon...</p>';
+  }
+  generateDecisionPatterns() {
+    return '<p>Decision pattern analysis coming soon...</p>';
+  }
+  generateEthicalFrameworks() {
+    return '<p>Ethical frameworks analysis coming soon...</p>';
+  }
+  generateBiasRecognition() {
+    return '<p>Bias recognition insights coming soon...</p>';
+  }
+  generateConceptConnections() {
+    return '<p>Concept connections coming soon...</p>';
+  }
+  generateAlternativeScenarios() {
+    return '<p>Alternative scenarios coming soon...</p>';
+  }
+  generateExpertInsights() {
+    return '<p>Expert insights coming soon...</p>';
+  }
+  generatePersonalizedRecommendations() {
+    return '<p>Personalized recommendations coming soon...</p>';
+  }
+  generateSkillDevelopment() {
+    return '<p>Skill development suggestions coming soon...</p>';
+  }
+  generateResourceSuggestions() {
+    return '<p>Resource suggestions coming soon...</p>';
+  }
+  generateGoalSetting() {
+    return '<p>Goal setting tools coming soon...</p>';
+  }
+  generateEthicsMetersSummary() {
+    return '<p>Ethics meters summary coming soon...</p>';
+  }
 
-        // Close modal and trigger completion callback
-        this.options.onComplete(this.reflectionData);
-        this.modal.close();
-    }
-
-    /**
-     * Save reflection data to storage
-     */
-    saveReflectionData() {
-        const reflectionRecord = {
-            simulationId: this.options.simulationId,
-            timestamp: new Date().toISOString(),
-            sessionData: this.sessionData,
-            reflectionData: this.reflectionData,
-            performance: this.calculatePerformance(),
-            completionRate: (this.currentStep + 1) / this.totalSteps
-        };
-
-        userProgress.addReflection(reflectionRecord);
-    }
-
-    /**
-     * Calculate reflection depth based on responses
-     */
-    calculateReflectionDepth() {
-        // Analyze reflection responses to determine depth
-        // This could look at text length, thoughtfulness, etc.
-        return Object.keys(this.reflectionData).length / this.getReflectionQuestions().length;
-    }
-
-    // Placeholder methods for additional functionality
-    generateKeyMoments() { return '<p>Key moments analysis coming soon...</p>'; }
-    generateDecisionPatterns() { return '<p>Decision pattern analysis coming soon...</p>'; }
-    generateEthicalFrameworks() { return '<p>Ethical frameworks analysis coming soon...</p>'; }
-    generateBiasRecognition() { return '<p>Bias recognition insights coming soon...</p>'; }
-    generateConceptConnections() { return '<p>Concept connections coming soon...</p>'; }
-    generateAlternativeScenarios() { return '<p>Alternative scenarios coming soon...</p>'; }
-    generateExpertInsights() { return '<p>Expert insights coming soon...</p>'; }
-    generatePersonalizedRecommendations() { return '<p>Personalized recommendations coming soon...</p>'; }
-    generateSkillDevelopment() { return '<p>Skill development suggestions coming soon...</p>'; }
-    generateResourceSuggestions() { return '<p>Resource suggestions coming soon...</p>'; }
-    generateGoalSetting() { return '<p>Goal setting tools coming soon...</p>'; }
-    generateEthicsMetersSummary() { return '<p>Ethics meters summary coming soon...</p>'; }
-    
-    setupRankingHandlers() { /* Ranking drag-and-drop setup */ }
-    setupRankingDragAndDrop() { /* Additional ranking setup */ }
-    handleInputChange() { /* Input change handling */ }
-    handleSaveReflection() { /* Save reflection handling */ }
-    handleShareInsights() { /* Share insights handling */ }
-    handlePrintSummary() { /* Print summary handling */ }
-    trackStepCompletion() { /* Step completion tracking */ }
+  setupRankingHandlers() {
+    /* Ranking drag-and-drop setup */
+  }
+  setupRankingDragAndDrop() {
+    /* Additional ranking setup */
+  }
+  handleInputChange() {
+    /* Input change handling */
+  }
+  handleSaveReflection() {
+    /* Save reflection handling */
+  }
+  handleShareInsights() {
+    /* Share insights handling */
+  }
+  handlePrintSummary() {
+    /* Print summary handling */
+  }
+  trackStepCompletion() {
+    /* Step completion tracking */
+  }
 }

@@ -5,505 +5,525 @@
 
 /* Minimal container for demo radar charts - gives more room */
 .radar-demo-container {
-    position: relative;
-    width: 100%;
-    max-width: 700px; /* Even larger for better label visibility */
-    margin: 0 auto;
-    padding: 1.5rem; /* Slightly more padding for breathing room */
-    background: transparent; /* No background to blend with parent */
-    border-radius: 0; /* No border radius */
-    box-shadow: none; /* No shadow */
-    transition: none; /* No transitions */
-    border: none; /* No border */
+  position: relative;
+  width: 100%;
+  max-width: 700px; /* Even larger for better label visibility */
+  margin: 0 auto;
+  padding: 1.5rem; /* Slightly more padding for breathing room */
+  background: transparent; /* No background to blend with parent */
+  border-radius: 0; /* No border radius */
+  box-shadow: none; /* No shadow */
+  transition: none; /* No transitions */
+  border: none; /* No border */
 }
 
 .radar-demo-container canvas {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin: 0 auto;
-    border-radius: 0; /* No border radius for cleaner look */
-    background: transparent;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  border-radius: 0; /* No border radius for cleaner look */
+  background: transparent;
 }
 
 /* Main radar chart container */
 .radar-chart-container {
-    position: relative;
-    width: 100%;
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 2rem;
-    background: linear-gradient(135deg, 
-        #ffffff 0%, 
-        #f8fafc 100%);
-    border-radius: 16px;
-    box-shadow: 
-        0 4px 12px rgba(0, 0, 0, 0.08),
-        0 1px 3px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-    border: 1px solid rgba(226, 232, 240, 0.8);
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 16px;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .radar-chart-container:hover {
-    box-shadow: 
-        0 8px 20px rgba(0, 0, 0, 0.12),
-        0 2px 6px rgba(0, 0, 0, 0.08);
-    transform: translateY(-2px);
-    border-color: rgba(156, 163, 175, 0.6);
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.12),
+    0 2px 6px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+  border-color: rgba(156, 163, 175, 0.6);
 }
 
 /* Chart canvas styling with clean background */
 .radar-chart-container canvas {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin: 0 auto;
-    border-radius: 12px;
-    background: transparent;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  border-radius: 12px;
+  background: transparent;
 }
 
 /* Fallback chart when Chart.js fails to load */
 .radar-chart-fallback {
-    padding: 1.5rem;
-    text-align: center;
-    background: var(--card-bg, #ffffff);
-    border-radius: 12px;
-    border: 2px dashed var(--border-color, #e0e0e0);
+  padding: 1.5rem;
+  text-align: center;
+  background: var(--card-bg, #ffffff);
+  border-radius: 12px;
+  border: 2px dashed var(--border-color, #e0e0e0);
 }
 
 .radar-chart-fallback h4 {
-    margin: 0 0 1.5rem 0;
-    color: var(--text-primary, #333);
-    font-size: 1.2rem;
-    font-weight: 600;
+  margin: 0 0 1.5rem 0;
+  color: var(--text-primary, #333);
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
 .fallback-scores {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    max-width: 400px;
-    margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .score-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.75rem;
-    background: var(--bg-secondary, #f8f9fa);
-    border-radius: 8px;
-    transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: var(--bg-secondary, #f8f9fa);
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
 }
 
 .score-item:hover {
-    background: var(--bg-hover, #e9ecef);
+  background: var(--bg-hover, #e9ecef);
 }
 
 .axis-label {
-    font-weight: 500;
-    color: var(--text-primary, #333);
-    min-width: 100px;
-    text-align: left;
-    font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary, #333);
+  min-width: 100px;
+  text-align: left;
+  font-size: 0.9rem;
 }
 
 .score-value {
-    font-weight: 600;
-    color: var(--accent-color, #007bff);
-    min-width: 40px;
-    text-align: center;
-    font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent-color, #007bff);
+  min-width: 40px;
+  text-align: center;
+  font-size: 0.9rem;
 }
 
 .score-bar {
-    flex: 1;
-    height: 8px;
-    background: var(--border-color, #e0e0e0);
-    border-radius: 4px;
-    overflow: hidden;
-    position: relative;
+  flex: 1;
+  height: 8px;
+  background: var(--border-color, #e0e0e0);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
 }
 
 .score-fill {
-    height: 100%;
-    background: linear-gradient(90deg, 
-        var(--danger-color, #dc3545) 0%, 
-        var(--warning-color, #ffc107) 50%, 
-        var(--success-color, #28a745) 100%);
-    border-radius: 4px;
-    transition: width 0.3s ease;
-    min-width: 2px;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--danger-color, #dc3545) 0%,
+    var(--warning-color, #ffc107) 50%,
+    var(--success-color, #28a745) 100%
+  );
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  min-width: 2px;
 }
 
 /* Real-time radar chart for scenarios */
 .scenario-radar {
-    position: sticky;
-    top: 2rem;
-    background: linear-gradient(135deg, 
-        rgba(102, 126, 234, 0.1) 0%, 
-        rgba(118, 75, 162, 0.08) 50%,
-        rgba(240, 171, 252, 0.1) 100%);
-    border: 2px solid transparent;
-    border-radius: 24px;
-    padding: 2rem;
-    margin-bottom: 1rem;
-    backdrop-filter: blur(20px);
-    box-shadow: 
-        0 25px 50px -12px rgba(102, 126, 234, 0.25),
-        0 8px 32px rgba(0, 0, 0, 0.12),
-        inset 0 1px 0 rgba(255, 255, 255, 0.6);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
+  position: sticky;
+  top: 2rem;
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.1) 0%,
+    rgba(118, 75, 162, 0.08) 50%,
+    rgba(240, 171, 252, 0.1) 100%
+  );
+  border: 2px solid transparent;
+  border-radius: 24px;
+  padding: 2rem;
+  margin-bottom: 1rem;
+  backdrop-filter: blur(20px);
+  box-shadow:
+    0 25px 50px -12px rgba(102, 126, 234, 0.25),
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
 
 .scenario-radar::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, 
-        rgba(102, 126, 234, 0.1) 0%, 
-        rgba(118, 75, 162, 0.05) 100%);
-    border-radius: 24px;
-    z-index: -1;
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.1) 0%,
+    rgba(118, 75, 162, 0.05) 100%
+  );
+  border-radius: 24px;
+  z-index: -1;
 }
 
 .scenario-radar::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, 
-        #667eea 0%, 
-        #764ba2 25%, 
-        #f093fb 50%, 
-        #f5576c 75%, 
-        #4facfe 100%);
-    border-radius: 24px 24px 0 0;
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    #667eea 0%,
+    #764ba2 25%,
+    #f093fb 50%,
+    #f5576c 75%,
+    #4facfe 100%
+  );
+  border-radius: 24px 24px 0 0;
 }
 
 .scenario-radar:hover {
-    box-shadow: 
-        0 35px 70px -12px rgba(102, 126, 234, 0.4),
-        0 12px 48px rgba(0, 0, 0, 0.18),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    transform: translateY(-2px) scale(1.01);
-    border-color: rgba(102, 126, 234, 0.3);
+  box-shadow:
+    0 35px 70px -12px rgba(102, 126, 234, 0.4),
+    0 12px 48px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transform: translateY(-2px) scale(1.01);
+  border-color: rgba(102, 126, 234, 0.3);
 }
 
 .scenario-radar .radar-title {
-    font-size: 1.25rem;
-    font-weight: 800;
-    margin-bottom: 0.75rem;
-    text-align: center;
-    color: #1a202c;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -0.025em;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+  text-align: center;
+  color: #1a202c;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.025em;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .scenario-radar .radar-subtitle {
-    font-size: 0.95rem;
-    color: #4a5568;
-    text-align: center;
-    margin-bottom: 1.5rem;
-    opacity: 0.9;
-    font-weight: 500;
+  font-size: 0.95rem;
+  color: #4a5568;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  opacity: 0.9;
+  font-weight: 500;
 }
 
 /* Results radar chart for category completion */
 .results-radar {
-    background: linear-gradient(135deg, 
-        var(--card-bg, #ffffff) 0%, 
-        rgba(248, 250, 252, 0.9) 100%);
-    border-radius: 20px;
-    padding: 2.5rem;
-    margin: 2rem 0;
-    box-shadow: 
-        0 20px 25px -5px rgba(0, 0, 0, 0.1),
-        0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    position: relative;
-    overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    var(--card-bg, #ffffff) 0%,
+    rgba(248, 250, 252, 0.9) 100%
+  );
+  border-radius: 20px;
+  padding: 2.5rem;
+  margin: 2rem 0;
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  position: relative;
+  overflow: hidden;
 }
 
 .results-radar::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, 
-        #667eea 0%, 
-        #764ba2 25%, 
-        #f093fb 50%, 
-        #f5576c 75%, 
-        #4facfe 100%);
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    #667eea 0%,
+    #764ba2 25%,
+    #f093fb 50%,
+    #f5576c 75%,
+    #4facfe 100%
+  );
 }
 
 .results-radar .radar-title {
-    font-size: 1.75rem;
-    font-weight: 800;
-    margin-bottom: 0.75rem;
-    text-align: center;
-    color: var(--text-primary, #1a202c);
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -0.025em;
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+  text-align: center;
+  color: var(--text-primary, #1a202c);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.025em;
 }
 
 .results-radar .radar-subtitle {
-    font-size: 1.1rem;
-    color: var(--text-secondary, #4a5568);
-    text-align: center;
-    margin-bottom: 2.5rem;
-    font-weight: 500;
+  font-size: 1.1rem;
+  color: var(--text-secondary, #4a5568);
+  text-align: center;
+  margin-bottom: 2.5rem;
+  font-weight: 500;
 }
 
 /* Radar chart legend customization */
 .radar-legend {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border-color, #e0e0e0);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color, #e0e0e0);
 }
 
 .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    color: var(--text-secondary, #666);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #666);
 }
 
 .legend-color {
-    width: 12px;
-    height: 12px;
-    border-radius: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
 }
 
 /* Responsive design */
 @media (max-width: 768px) {
-    .radar-chart-container {
-        padding: 0.75rem;
-        margin: 0.5rem;
-    }
-    
-    .scenario-radar {
-        position: static;
-        margin: 1rem 0;
-    }
-    
-    .results-radar {
-        padding: 1.5rem;
-        margin: 1rem 0;
-    }
-    
-    .fallback-scores {
-        gap: 0.75rem;
-    }
-    
-    .score-item {
-        padding: 0.5rem;
-        gap: 0.75rem;
-    }
-    
-    .axis-label {
-        min-width: 80px;
-        font-size: 0.8rem;
-    }
-    
-    .score-value {
-        min-width: 35px;
-        font-size: 0.8rem;
-    }
+  .radar-chart-container {
+    padding: 0.75rem;
+    margin: 0.5rem;
+  }
 
-    .radar-demo-container {
-        max-width: 100%;
-        padding: 1rem;
-    }
+  .scenario-radar {
+    position: static;
+    margin: 1rem 0;
+  }
+
+  .results-radar {
+    padding: 1.5rem;
+    margin: 1rem 0;
+  }
+
+  .fallback-scores {
+    gap: 0.75rem;
+  }
+
+  .score-item {
+    padding: 0.5rem;
+    gap: 0.75rem;
+  }
+
+  .axis-label {
+    min-width: 80px;
+    font-size: 0.8rem;
+  }
+
+  .score-value {
+    min-width: 35px;
+    font-size: 0.8rem;
+  }
+
+  .radar-demo-container {
+    max-width: 100%;
+    padding: 1rem;
+  }
 }
 
 @media (max-width: 480px) {
-    .radar-chart-container {
-        padding: 0.5rem;
-    }
-    
-    .results-radar .radar-title {
-        font-size: 1.25rem;
-    }
-    
-    .scenario-radar .radar-title {
-        font-size: 0.9rem;
-    }
-    
-    .score-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
-    
-    .axis-label,
-    .score-value {
-        min-width: auto;
-    }
-    
-    .score-bar {
-        width: 100%;
-    }
+  .radar-chart-container {
+    padding: 0.5rem;
+  }
 
-    .radar-demo-container {
-        padding: 0.5rem;
-    }
+  .results-radar .radar-title {
+    font-size: 1.25rem;
+  }
+
+  .scenario-radar .radar-title {
+    font-size: 0.9rem;
+  }
+
+  .score-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .axis-label,
+  .score-value {
+    min-width: auto;
+  }
+
+  .score-bar {
+    width: 100%;
+  }
+
+  .radar-demo-container {
+    padding: 0.5rem;
+  }
 }
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
-    .scenario-radar,
-    .results-radar {
-        background: var(--card-bg-dark, #2d3748);
-        border-color: var(--border-color-dark, #4a5568);
-    }
-    
-    .radar-chart-container {
-        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
-        border-color: rgba(226, 232, 240, 0.8) !important;
-    }
-    
-    .radar-chart-fallback {
-        background: var(--card-bg-dark, #2d3748);
-        border-color: var(--border-color-dark, #4a5568);
-    }
-    
-    .radar-chart-fallback h4,
-    .radar-title {
-        color: var(--text-primary-dark, #f7fafc);
-    }
-    
-    .radar-subtitle {
-        color: var(--text-secondary-dark, #a0aec0);
-    }
-    
-    .score-item {
-        background: var(--bg-secondary-dark, #4a5568);
-    }
-    
-    .score-item:hover {
-        background: var(--bg-hover-dark, #2d3748);
-    }
-    
-    .axis-label {
-        color: var(--text-primary-dark, #f7fafc);
-    }
-    
-    .score-bar {
-        background: var(--border-color-dark, #4a5568);
-    }
+  .scenario-radar,
+  .results-radar {
+    background: var(--card-bg-dark, #2d3748);
+    border-color: var(--border-color-dark, #4a5568);
+  }
+
+  .radar-chart-container {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+    border-color: rgba(226, 232, 240, 0.8) !important;
+  }
+
+  .radar-chart-fallback {
+    background: var(--card-bg-dark, #2d3748);
+    border-color: var(--border-color-dark, #4a5568);
+  }
+
+  .radar-chart-fallback h4,
+  .radar-title {
+    color: var(--text-primary-dark, #f7fafc);
+  }
+
+  .radar-subtitle {
+    color: var(--text-secondary-dark, #a0aec0);
+  }
+
+  .score-item {
+    background: var(--bg-secondary-dark, #4a5568);
+  }
+
+  .score-item:hover {
+    background: var(--bg-hover-dark, #2d3748);
+  }
+
+  .axis-label {
+    color: var(--text-primary-dark, #f7fafc);
+  }
+
+  .score-bar {
+    background: var(--border-color-dark, #4a5568);
+  }
 }
 
 /* Animation classes for dynamic updates */
 .radar-updating {
-    opacity: 0.8;
-    transition: opacity 0.3s ease;
-    position: relative;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+  position: relative;
 }
 
 /* Removed loading spinner to eliminate gray dot */
 .radar-updating::after {
-    display: none;
+  display: none;
 }
 
 @keyframes radar-spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .radar-updated {
-    opacity: 1;
-    animation: radar-pulse 0.6s ease-out;
+  opacity: 1;
+  animation: radar-pulse 0.6s ease-out;
 }
 
 @keyframes radar-pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.02); }
-    100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* Radar chart value indicators - removed to eliminate gray dot */
 .radar-chart-container::before {
-    display: none;
+  display: none;
 }
 
 /* Floating action button style for radar interactions */
 .radar-action-button {
-    position: absolute;
-    bottom: 1rem;
-    right: 1rem;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
 }
 
 .radar-action-button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
 }
 
 .radar-action-button:active {
-    transform: scale(0.95);
+  transform: scale(0.95);
 }
 
 /* Accessibility improvements */
 .radar-chart-container:focus-within {
-    outline: 2px solid var(--focus-color, #007bff);
-    outline-offset: 2px;
+  outline: 2px solid var(--focus-color, #007bff);
+  outline-offset: 2px;
 }
 
 .score-item:focus-within {
-    outline: 1px solid var(--focus-color, #007bff);
-    outline-offset: 1px;
+  outline: 1px solid var(--focus-color, #007bff);
+  outline-offset: 1px;
 }
 
 /* Print styles */
 @media print {
-    .radar-chart-container,
-    .scenario-radar,
-    .results-radar {
-        background: white !important;
-        border: 1px solid #000 !important;
-        box-shadow: none !important;
-    }
-    
-    .radar-title,
-    .axis-label {
-        color: #000 !important;
-    }
-    
-    .score-fill {
-        background: #666 !important;
-    }
+  .radar-chart-container,
+  .scenario-radar,
+  .results-radar {
+    background: white !important;
+    border: 1px solid #000 !important;
+    box-shadow: none !important;
+  }
+
+  .radar-title,
+  .axis-label {
+    color: #000 !important;
+  }
+
+  .score-fill {
+    background: #666 !important;
+  }
 }

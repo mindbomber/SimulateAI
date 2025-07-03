@@ -8,6 +8,7 @@ import logger from '../utils/logger.js';
 import RadarChart from './radar-chart.js';
 import scenarioDataManager from '../data/scenario-data-manager.js';
 import { getAllCategories } from '../../data/categories.js';
+import { typewriterSequence } from '../utils/typewriter.js';
 
 // Constants
 const ANIMATION_DURATION = 300;
@@ -15,119 +16,143 @@ const RADAR_CHART_MAX_SCORE = 5;
 const RADAR_CHART_NEUTRAL_SCORE = 3;
 
 class ScenarioModal {
-    constructor() {
-        this.modal = null;
-        this.backdrop = null;
-        this.radarChart = null;
-        this.currentScenario = null;
-        this.selectedOption = null;
-        this.currentCategoryId = null;
-        this.currentScenarioId = null;
-        
-        // Cache for categories and scenarios
-        this.categories = getAllCategories();
-        this.scenarioData = null;
-    }
+  constructor() {
+    this.modal = null;
+    this.backdrop = null;
+    this.radarChart = null;
+    this.currentScenario = null;
+    this.selectedOption = null;
+    this.currentCategoryId = null;
+    this.currentScenarioId = null;
 
-    /**
-     * Open the modal with a specific scenario
-     * @param {string} scenarioId - The scenario ID to display
-     * @param {string} categoryId - The category ID (optional, will be detected if not provided)
-     */
-    async open(scenarioId, categoryId = null) {
-        try {
-            // Find the category if not provided
-            if (!categoryId) {
-                categoryId = this.findCategoryForScenario(scenarioId);
-                if (!categoryId) {
-                    throw new Error(`Could not find category for scenario: ${scenarioId}`);
-                }
-            }
+    // Cache for categories and scenarios
+    this.categories = getAllCategories();
+    this.scenarioData = null;
+  }
 
-            // Load scenario data
-            this.currentCategoryId = categoryId;
-            this.currentScenarioId = scenarioId;
-            this.scenarioData = await scenarioDataManager.getScenario(categoryId, scenarioId);
-            
-            if (!this.scenarioData) {
-                throw new Error(`Could not load scenario data for: ${categoryId}:${scenarioId}`);
-            }
-
-            this.currentScenario = this.scenarioData;
-            
-            // Create and show modal
-            await this.createModal();
-            await this.show();
-            
-            // Initialize radar chart after modal is visible
-            await this.initializeRadarChart();
-            
-            logger.info(`Opened scenario modal for: ${categoryId}:${scenarioId}`);
-            
-        } catch (error) {
-            logger.error('Failed to open scenario modal:', error);
-            alert(`Failed to load scenario: ${scenarioId}. Please try again.`);
+  /**
+   * Open the modal with a specific scenario
+   * @param {string} scenarioId - The scenario ID to display
+   * @param {string} categoryId - The category ID (optional, will be detected if not provided)
+   */
+  async open(scenarioId, categoryId = null) {
+    try {
+      // Find the category if not provided
+      if (!categoryId) {
+        categoryId = this.findCategoryForScenario(scenarioId);
+        if (!categoryId) {
+          throw new Error(
+            `Could not find category for scenario: ${scenarioId}`
+          );
         }
+      }
+
+      // Load scenario data
+      this.currentCategoryId = categoryId;
+      this.currentScenarioId = scenarioId;
+      this.scenarioData = await scenarioDataManager.getScenario(
+        categoryId,
+        scenarioId
+      );
+
+      if (!this.scenarioData) {
+        throw new Error(
+          `Could not load scenario data for: ${categoryId}:${scenarioId}`
+        );
+      }
+
+      this.currentScenario = this.scenarioData;
+
+      // Create and show modal
+      await this.createModal();
+      await this.show();
+
+      // Initialize radar chart after modal is visible
+      await this.initializeRadarChart();
+
+      logger.info(`Opened scenario modal for: ${categoryId}:${scenarioId}`);
+    } catch (error) {
+      logger.error('Failed to open scenario modal:', error);
+      alert(`Failed to load scenario: ${scenarioId}. Please try again.`);
+    }
+  }
+
+  /**
+   * Find which category contains a specific scenario
+   */
+  findCategoryForScenario(scenarioId) {
+    for (const category of this.categories) {
+      if (
+        category.scenarios &&
+        category.scenarios.some(s => s.id === scenarioId)
+      ) {
+        return category.id;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Create modal DOM structure
+   */
+  async createModal() {
+    // Remove existing modal if present and wait for it to be fully closed
+    await this.closeAndWait();
+
+    logger.info('Creating scenario modal DOM structure');
+    logger.info(
+      'Current scenario data:',
+      this.currentScenario ? 'LOADED' : 'NULL'
+    );
+
+    // Create modal elements
+    this.backdrop = document.createElement('div');
+    this.backdrop.className = 'scenario-modal-backdrop';
+
+    this.modal = document.createElement('div');
+    this.modal.className = 'scenario-modal';
+    this.modal.innerHTML = this.getModalHTML();
+
+    // Add to DOM
+    document.body.appendChild(this.backdrop);
+    document.body.appendChild(this.modal);
+
+    logger.info('Scenario modal DOM structure created and appended to body');
+    logger.info(
+      'Modal HTML contains radar chart container:',
+      this.modal.innerHTML.includes('scenario-radar-chart')
+    );
+
+    // Attach event listeners
+    this.attachEventListeners();
+  }
+
+  /**
+   * Generate modal HTML content
+   */
+  getModalHTML() {
+    logger.info(
+      'getModalHTML called - currentScenario status:',
+      this.currentScenario ? 'LOADED' : 'NULL'
+    );
+
+    if (!this.currentScenario) {
+      logger.warn('No current scenario data - returning loading message');
+      return '<div class="scenario-content"><p>Loading scenario...</p></div>';
     }
 
-    /**
-     * Find which category contains a specific scenario
-     */
-    findCategoryForScenario(scenarioId) {
-        for (const category of this.categories) {
-            if (category.scenarios && category.scenarios.some(s => s.id === scenarioId)) {
-                return category.id;
-            }
-        }
-        return null;
-    }
+    const categoryInfo = this.categories.find(
+      c => c.id === this.currentCategoryId
+    );
+    const categoryTitle = categoryInfo
+      ? categoryInfo.title
+      : 'Unknown Category';
 
-    /**
-     * Create modal DOM structure
-     */
-    async createModal() {
-        // Remove existing modal if present and wait for it to be fully closed
-        await this.closeAndWait();
+    logger.info(
+      `Generating HTML for scenario: ${this.currentScenario.title} in category: ${categoryTitle}`
+    );
 
-        logger.info('Creating scenario modal DOM structure');
-        logger.info('Current scenario data:', this.currentScenario ? 'LOADED' : 'NULL');
-
-        // Create modal elements
-        this.backdrop = document.createElement('div');
-        this.backdrop.className = 'scenario-modal-backdrop';
-        
-        this.modal = document.createElement('div');
-        this.modal.className = 'scenario-modal';
-        this.modal.innerHTML = this.getModalHTML();
-
-        // Add to DOM
-        document.body.appendChild(this.backdrop);
-        document.body.appendChild(this.modal);
-
-        logger.info('Scenario modal DOM structure created and appended to body');
-        logger.info('Modal HTML contains radar chart container:', this.modal.innerHTML.includes('scenario-radar-chart'));
-
-        // Attach event listeners
-        this.attachEventListeners();
-    }
-
-    /**
-     * Generate modal HTML content
-     */
-    getModalHTML() {
-        logger.info('getModalHTML called - currentScenario status:', this.currentScenario ? 'LOADED' : 'NULL');
-        
-        if (!this.currentScenario) {
-            logger.warn('No current scenario data - returning loading message');
-            return '<div class="scenario-content"><p>Loading scenario...</p></div>';
-        }
-
-        const categoryInfo = this.categories.find(c => c.id === this.currentCategoryId);
-        const categoryTitle = categoryInfo ? categoryInfo.title : 'Unknown Category';
-
-        logger.info(`Generating HTML for scenario: ${this.currentScenario.title} in category: ${categoryTitle}`);
-
-        const html = `
+    const html = `
             <div class="scenario-modal-dialog">
                 <div class="scenario-modal-header">
                     <div class="scenario-title-section">
@@ -139,17 +164,17 @@ class ScenarioModal {
                     </button>
                 </div>
 
-                <div class="scenario-content">
+                <div class="scenario-content typewriter-ready">
                     <div class="scenario-main">
                         <div class="scenario-description">
                             <div class="dilemma-section">
                                 <h3>The Dilemma</h3>
-                                <p class="dilemma-text">${this.currentScenario.dilemma}</p>
+                                <p class="dilemma-text"></p>
                             </div>
 
                             <div class="ethical-question-section">
                                 <h3>Ethical Question</h3>
-                                <p class="ethical-question">${this.currentScenario.ethicalQuestion}</p>
+                                <p class="ethical-question"></p>
                             </div>
                         </div>
 
@@ -163,7 +188,6 @@ class ScenarioModal {
 
                     <div class="scenario-sidebar">
                         <div class="radar-chart-container">
-                            <h3>Ethical Impact Analysis</h3>
                             <div id="scenario-radar-chart" style="min-height: 380px; position: relative;"></div>
                             <div class="chart-legend">
                                 <p>This chart shows how your choice affects different ethical dimensions. Select an option to see its impact.</p>
@@ -183,21 +207,28 @@ class ScenarioModal {
             </div>
         `;
 
-        logger.info('Generated scenario modal HTML, checking for radar chart container...');
-        logger.info('HTML contains scenario-radar-chart:', html.includes('scenario-radar-chart'));
-        
-        return html;
+    logger.info(
+      'Generated scenario modal HTML, checking for radar chart container...'
+    );
+    logger.info(
+      'HTML contains scenario-radar-chart:',
+      html.includes('scenario-radar-chart')
+    );
+
+    return html;
+  }
+
+  /**
+   * Render option buttons
+   */
+  renderOptions() {
+    if (!this.currentScenario.options) {
+      return '<p>No options available</p>';
     }
 
-    /**
-     * Render option buttons
-     */
-    renderOptions() {
-        if (!this.currentScenario.options) {
-            return '<p>No options available</p>';
-        }
-
-        return this.currentScenario.options.map(option => `
+    return this.currentScenario.options
+      .map(
+        option => `
             <div class="option-card" data-option-id="${option.id}">
                 <div class="option-header">
                     <h4 class="option-title">${option.text}</h4>
@@ -206,79 +237,92 @@ class ScenarioModal {
                     <p>${option.description}</p>
                 </div>
                 <div class="option-details" style="display: none;">
-                    ${option.pros ? `
+                    ${
+                      option.pros
+                        ? `
                         <div class="pros-section">
                             <h5>Pros</h5>
                             <ul>${option.pros.map(pro => `<li>${pro}</li>`).join('')}</ul>
                         </div>
-                    ` : ''}
-                    ${option.cons ? `
+                    `
+                        : ''
+                    }
+                    ${
+                      option.cons
+                        ? `
                         <div class="cons-section">
                             <h5>Cons</h5>
                             <ul>${option.cons.map(con => `<li>${con}</li>`).join('')}</ul>
                         </div>
-                    ` : ''}
+                    `
+                        : ''
+                    }
                 </div>
             </div>
-        `).join('');
-    }
+        `
+      )
+      .join('');
+  }
 
-    /**
-     * Initialize radar chart
-     */
-    async initializeRadarChart() {
-        try {
-            const chartContainer = document.getElementById('scenario-radar-chart');
-            logger.info(`Radar chart initialization: container found = ${!!chartContainer}`);
-            
-            if (!chartContainer) {
-                logger.error('Radar chart container not found even after modal is visible');
-                return;
-            }
-            
-            // Clear any existing content to prevent "null" display
-            chartContainer.innerHTML = '';
-            chartContainer.textContent = '';
-            
-            logger.info(`Container cleared, initializing radar chart`);
-            
-            // Pass the container ID (string), not the element itself
-            this.radarChart = new RadarChart('scenario-radar-chart', {
-                width: 380,
-                height: 380,
-                showLabels: true,
-                showLegend: false,
-                animated: true,
-                realTime: true,
-                title: null // Disable chart title to avoid duplication with h3
-            });
+  /**
+   * Initialize radar chart
+   */
+  async initializeRadarChart() {
+    try {
+      const chartContainer = document.getElementById('scenario-radar-chart');
+      logger.info(
+        `Radar chart initialization: container found = ${!!chartContainer}`
+      );
 
-            // Wait for the RadarChart to be fully initialized
-            await this.radarChart.initializationPromise;
-            logger.info('Radar chart async initialization completed');
+      if (!chartContainer) {
+        logger.error(
+          'Radar chart container not found even after modal is visible'
+        );
+        return;
+      }
 
-            // Set initial neutral scores (using the correct method)
-            const neutralScores = {
-                fairness: RADAR_CHART_NEUTRAL_SCORE,
-                sustainability: RADAR_CHART_NEUTRAL_SCORE,
-                autonomy: RADAR_CHART_NEUTRAL_SCORE,
-                beneficence: RADAR_CHART_NEUTRAL_SCORE,
-                transparency: RADAR_CHART_NEUTRAL_SCORE,
-                accountability: RADAR_CHART_NEUTRAL_SCORE,
-                privacy: RADAR_CHART_NEUTRAL_SCORE,
-                proportionality: RADAR_CHART_NEUTRAL_SCORE
-            };
+      // Clear any existing content to prevent "null" display
+      chartContainer.innerHTML = '';
+      chartContainer.textContent = '';
 
-            this.radarChart.setScores(neutralScores);
-            logger.info('Radar chart initialized successfully with neutral scores');
-            
-        } catch (error) {
-            logger.error('Radar chart initialization failed:', error);
-            
-            // Clear container and show fallback message instead of null
-            const chartContainer = document.getElementById('scenario-radar-chart');
-            if (chartContainer) {
-                chartContainer.innerHTML = `
+      logger.info(`Container cleared, initializing radar chart`);
+
+      // Pass the container ID (string), not the element itself
+      this.radarChart = new RadarChart('scenario-radar-chart', {
+        width: 380,
+        height: 380,
+        showLabels: true,
+        showLegend: false,
+        animated: true,
+        realTime: true,
+        title: null, // Disable chart title to avoid duplication with h3
+      });
+
+      // Wait for the RadarChart to be fully initialized
+      await this.radarChart.initializationPromise;
+      logger.info('Radar chart async initialization completed');
+
+      // Set initial neutral scores (using the correct method)
+      const neutralScores = {
+        fairness: RADAR_CHART_NEUTRAL_SCORE,
+        sustainability: RADAR_CHART_NEUTRAL_SCORE,
+        autonomy: RADAR_CHART_NEUTRAL_SCORE,
+        beneficence: RADAR_CHART_NEUTRAL_SCORE,
+        transparency: RADAR_CHART_NEUTRAL_SCORE,
+        accountability: RADAR_CHART_NEUTRAL_SCORE,
+        privacy: RADAR_CHART_NEUTRAL_SCORE,
+        proportionality: RADAR_CHART_NEUTRAL_SCORE,
+      };
+
+      this.radarChart.setScores(neutralScores);
+      logger.info('Radar chart initialized successfully with neutral scores');
+    } catch (error) {
+      logger.error('Radar chart initialization failed:', error);
+
+      // Clear container and show fallback message instead of null
+      const chartContainer = document.getElementById('scenario-radar-chart');
+      if (chartContainer) {
+        chartContainer.innerHTML = `
                     <div style="
                         display: flex; 
                         align-items: center; 
@@ -297,290 +341,365 @@ class ScenarioModal {
                         </div>
                     </div>
                 `;
-            }
-        }
+      }
+    }
+  }
+
+  /**
+   * Attach event listeners
+   */
+  attachEventListeners() {
+    // Close button
+    const closeButton = this.modal.querySelector('.close-button');
+    if (closeButton) {
+      closeButton.addEventListener('click', () => this.close());
     }
 
-    /**
-     * Attach event listeners
-     */
-    attachEventListeners() {
-        // Close button
-        const closeButton = this.modal.querySelector('.close-button');
-        if (closeButton) {
-            closeButton.addEventListener('click', () => this.close());
-        }
-
-        // Backdrop click to close
-        if (this.backdrop) {
-            this.backdrop.addEventListener('click', () => this.close());
-        }
-
-        // Option selection
-        const optionCards = this.modal.querySelectorAll('.option-card');
-        optionCards.forEach(card => {
-            card.addEventListener('click', () => this.selectOption(card));
-        });
-
-        // Cancel button
-        const cancelButton = this.modal.querySelector('#cancel-scenario');
-        if (cancelButton) {
-            cancelButton.addEventListener('click', () => this.close());
-        }
-
-        // Confirm button
-        const confirmButton = this.modal.querySelector('#confirm-choice');
-        if (confirmButton) {
-            confirmButton.addEventListener('click', () => this.confirmChoice());
-        }
-
-        // Escape key to close
-        this.escapeHandler = (e) => {
-            if (e.key === 'Escape') {
-                this.close();
-            }
-        };
-        document.addEventListener('keydown', this.escapeHandler);
+    // Backdrop click to close
+    if (this.backdrop) {
+      this.backdrop.addEventListener('click', () => this.close());
     }
 
-    /**
-     * Select an option
-     */
-    selectOption(card) {
-        logger.info('Option selection started');
-        
-        const optionId = card.getAttribute('data-option-id');
-        const isCurrentlySelected = card.classList.contains('selected');
-        
-        // If the clicked option is already selected, deselect it
-        if (isCurrentlySelected) {
-            logger.info('Deselecting currently selected option:', optionId);
-            
-            // Remove selection
-            card.classList.remove('selected');
-            const details = card.querySelector('.option-details');
-            if (details) details.style.display = 'none';
-            
-            // Clear selected option
-            this.selectedOption = null;
-            
-            // Reset radar chart to neutral state
-            if (this.radarChart && this.radarChart.isInitialized) {
-                this.radarChart.resetScores();
-                logger.info('Radar chart reset to neutral state');
-            }
-            
-            // Disable confirm button
-            const confirmButton = this.modal.querySelector('#confirm-choice');
-            if (confirmButton) {
-                confirmButton.disabled = true;
-            }
-            
-            return;
-        }
-        
-        // Remove previous selection from all cards
-        this.modal.querySelectorAll('.option-card').forEach(c => {
-            c.classList.remove('selected');
-            const details = c.querySelector('.option-details');
-            if (details) details.style.display = 'none';
-        });
+    // Option selection
+    const optionCards = this.modal.querySelectorAll('.option-card');
+    optionCards.forEach(card => {
+      card.addEventListener('click', () => this.selectOption(card));
+    });
 
-        // Select new option
-        card.classList.add('selected');
-        const details = card.querySelector('.option-details');
-        if (details) details.style.display = 'block';
-
-        // Store selected option
-        this.selectedOption = this.currentScenario.options.find(opt => opt.id === optionId);
-
-        logger.info('Option selected:', {
-            optionId,
-            hasSelectedOption: !!this.selectedOption,
-            hasImpact: !!this.selectedOption?.impact,
-            impact: this.selectedOption?.impact
-        });
-
-        // Update radar chart
-        this.updateRadarChart();
-
-        // Enable confirm button
-        const confirmButton = this.modal.querySelector('#confirm-choice');
-        if (confirmButton) {
-            confirmButton.disabled = false;
-        }
-
-        logger.info('Option selection completed');
+    // Cancel button
+    const cancelButton = this.modal.querySelector('#cancel-scenario');
+    if (cancelButton) {
+      cancelButton.addEventListener('click', () => this.close());
     }
 
-    /**
-     * Update radar chart with selected option impact
-     */
-    updateRadarChart() {
-        if (!this.radarChart || !this.selectedOption || !this.selectedOption.impact) {
-            logger.warn('Cannot update radar chart - missing components:', {
-                hasRadarChart: !!this.radarChart,
-                hasSelectedOption: !!this.selectedOption,
-                hasImpact: !!this.selectedOption?.impact
-            });
-            return;
-        }
-
-        try {
-            // Check if radar chart is initialized
-            if (!this.radarChart.isInitialized) {
-                logger.warn('Radar chart not yet initialized, skipping update');
-                return;
-            }
-
-            // Convert impact data from (-2 to +2) to radar chart scale (0 to 5)
-            // -2 becomes 1, -1 becomes 2, 0 becomes 3, +1 becomes 4, +2 becomes 5
-            const impactScores = {};
-            const neutralScore = RADAR_CHART_NEUTRAL_SCORE; // Middle of 0-5 scale
-            
-            Object.keys(this.selectedOption.impact).forEach(axis => {
-                const impactValue = this.selectedOption.impact[axis] || 0;
-                impactScores[axis] = neutralScore + impactValue;
-                
-                // Clamp to valid range (0-5)
-                impactScores[axis] = Math.max(0, Math.min(RADAR_CHART_MAX_SCORE, impactScores[axis]));
-            });
-
-            logger.info('Updating radar chart with converted scores:', impactScores);
-            this.radarChart.setScores(impactScores);
-            logger.info('Radar chart updated successfully');
-            
-        } catch (error) {
-            logger.error('Failed to update radar chart:', error);
-        }
+    // Confirm button
+    const confirmButton = this.modal.querySelector('#confirm-choice');
+    if (confirmButton) {
+      confirmButton.addEventListener('click', () => this.confirmChoice());
     }
 
-    /**
-     * Confirm the selected choice
-     */
-    confirmChoice() {
-        if (!this.selectedOption) {
-            logger.warn('No option selected for confirmation');
-            return;
-        }
+    // Escape key to close
+    this.escapeHandler = e => {
+      if (e.key === 'Escape') {
+        this.close();
+      }
+    };
+    document.addEventListener('keydown', this.escapeHandler);
+  }
 
-        // Dispatch scenario completion event
-        const event = new CustomEvent('scenario-completed', {
-            detail: {
-                categoryId: this.currentCategoryId,
-                scenarioId: this.currentScenarioId,
-                selectedOption: this.selectedOption,
-                option: this.selectedOption // Legacy compatibility
-            }
-        });
-        document.dispatchEvent(event);
+  /**
+   * Select an option
+   */
+  selectOption(card) {
+    logger.info('Option selection started');
 
-        logger.info('Scenario completed:', {
-            categoryId: this.currentCategoryId,
-            scenarioId: this.currentScenarioId,
-            selectedOption: this.selectedOption.id
-        });
+    const optionId = card.getAttribute('data-option-id');
+    const isCurrentlySelected = card.classList.contains('selected');
 
-        // Close modal with delay to show completion
+    // If the clicked option is already selected, deselect it
+    if (isCurrentlySelected) {
+      logger.info('Deselecting currently selected option:', optionId);
+
+      // Remove selection
+      card.classList.remove('selected');
+      const details = card.querySelector('.option-details');
+      if (details) details.style.display = 'none';
+
+      // Clear selected option
+      this.selectedOption = null;
+
+      // Reset radar chart to neutral state
+      if (this.radarChart && this.radarChart.isInitialized) {
+        this.radarChart.resetScores();
+        logger.info('Radar chart reset to neutral state');
+      }
+
+      // Disable confirm button
+      const confirmButton = this.modal.querySelector('#confirm-choice');
+      if (confirmButton) {
+        confirmButton.disabled = true;
+      }
+
+      return;
+    }
+
+    // Remove previous selection from all cards
+    this.modal.querySelectorAll('.option-card').forEach(c => {
+      c.classList.remove('selected');
+      const details = c.querySelector('.option-details');
+      if (details) details.style.display = 'none';
+    });
+
+    // Select new option
+    card.classList.add('selected');
+    const details = card.querySelector('.option-details');
+    if (details) details.style.display = 'block';
+
+    // Store selected option
+    this.selectedOption = this.currentScenario.options.find(
+      opt => opt.id === optionId
+    );
+
+    logger.info('Option selected:', {
+      optionId,
+      hasSelectedOption: !!this.selectedOption,
+      hasImpact: !!this.selectedOption?.impact,
+      impact: this.selectedOption?.impact,
+    });
+
+    // Update radar chart
+    this.updateRadarChart();
+
+    // Enable confirm button
+    const confirmButton = this.modal.querySelector('#confirm-choice');
+    if (confirmButton) {
+      confirmButton.disabled = false;
+    }
+
+    logger.info('Option selection completed');
+  }
+
+  /**
+   * Update radar chart with selected option impact
+   */
+  updateRadarChart() {
+    if (
+      !this.radarChart ||
+      !this.selectedOption ||
+      !this.selectedOption.impact
+    ) {
+      logger.warn('Cannot update radar chart - missing components:', {
+        hasRadarChart: !!this.radarChart,
+        hasSelectedOption: !!this.selectedOption,
+        hasImpact: !!this.selectedOption?.impact,
+      });
+      return;
+    }
+
+    try {
+      // Check if radar chart is initialized
+      if (!this.radarChart.isInitialized) {
+        logger.warn('Radar chart not yet initialized, skipping update');
+        return;
+      }
+
+      // Convert impact data from (-2 to +2) to radar chart scale (0 to 5)
+      // -2 becomes 1, -1 becomes 2, 0 becomes 3, +1 becomes 4, +2 becomes 5
+      const impactScores = {};
+      const neutralScore = RADAR_CHART_NEUTRAL_SCORE; // Middle of 0-5 scale
+
+      Object.keys(this.selectedOption.impact).forEach(axis => {
+        const impactValue = this.selectedOption.impact[axis] || 0;
+        impactScores[axis] = neutralScore + impactValue;
+
+        // Clamp to valid range (0-5)
+        impactScores[axis] = Math.max(
+          0,
+          Math.min(RADAR_CHART_MAX_SCORE, impactScores[axis])
+        );
+      });
+
+      logger.info('Updating radar chart with converted scores:', impactScores);
+      this.radarChart.setScores(impactScores);
+      logger.info('Radar chart updated successfully');
+    } catch (error) {
+      logger.error('Failed to update radar chart:', error);
+    }
+  }
+
+  /**
+   * Confirm the selected choice
+   */
+  confirmChoice() {
+    if (!this.selectedOption) {
+      logger.warn('No option selected for confirmation');
+      return;
+    }
+
+    // Dispatch scenario completion event
+    const event = new CustomEvent('scenario-completed', {
+      detail: {
+        categoryId: this.currentCategoryId,
+        scenarioId: this.currentScenarioId,
+        selectedOption: this.selectedOption,
+        option: this.selectedOption, // Legacy compatibility
+      },
+    });
+    document.dispatchEvent(event);
+
+    logger.info('Scenario completed:', {
+      categoryId: this.currentCategoryId,
+      scenarioId: this.currentScenarioId,
+      selectedOption: this.selectedOption.id,
+    });
+
+    // Close modal with delay to show completion
+    setTimeout(() => {
+      this.close();
+    }, 1000);
+  }
+
+  /**
+   * Show the modal
+   */
+  async show() {
+    if (!this.modal || !this.backdrop) {
+      logger.error('Modal elements not created');
+      return;
+    }
+
+    // Focus management
+    this.previousFocusedElement = document.activeElement;
+
+    // Prevent body scrolling
+    document.body.style.overflow = 'hidden';
+
+    // Add show class for animation and wait for it to complete
+    await new Promise(resolve => {
+      requestAnimationFrame(() => {
+        this.backdrop.classList.add('show');
+        this.modal.classList.add('show');
+
+        // Wait for CSS transition to complete
         setTimeout(() => {
-            this.close();
-        }, 1000);
+          // Focus close button after animation
+          const closeButton = this.modal.querySelector('.close-button');
+          if (closeButton) {
+            closeButton.focus();
+          }
+          resolve();
+        }, ANIMATION_DURATION);
+      });
+    });
+
+    // Start typewriter effect for the dilemma and ethical question
+    await this.startTypewriterEffect();
+  }
+
+  /**
+   * Close the modal and wait for it to be fully removed
+   */
+  async closeAndWait() {
+    if (this.modal || this.backdrop) {
+      this.close();
+      // Wait for the animation to complete plus small buffer
+      const CLOSE_BUFFER = 50; // ms
+      await new Promise(resolve =>
+        setTimeout(resolve, ANIMATION_DURATION + CLOSE_BUFFER)
+      );
     }
+  }
 
-    /**
-     * Show the modal
-     */
-    async show() {
-        if (!this.modal || !this.backdrop) {
-            logger.error('Modal elements not created');
-            return;
-        }
-
-        // Focus management
-        this.previousFocusedElement = document.activeElement;
-        
-        // Prevent body scrolling
-        document.body.style.overflow = 'hidden';
-
-        // Add show class for animation and wait for it to complete
-        await new Promise((resolve) => {
-            requestAnimationFrame(() => {
-                this.backdrop.classList.add('show');
-                this.modal.classList.add('show');
-                
-                // Wait for CSS transition to complete
-                setTimeout(() => {
-                    // Focus close button after animation
-                    const closeButton = this.modal.querySelector('.close-button');
-                    if (closeButton) {
-                        closeButton.focus();
-                    }
-                    resolve();
-                }, ANIMATION_DURATION);
-            });
-        });
-    }
-
-    /**
-     * Close the modal and wait for it to be fully removed
-     */
-    async closeAndWait() {
-        if (this.modal || this.backdrop) {
-            this.close();
-            // Wait for the animation to complete plus small buffer
-            const CLOSE_BUFFER = 50; // ms
-            await new Promise(resolve => setTimeout(resolve, ANIMATION_DURATION + CLOSE_BUFFER));
-        }
-    }
-
-    /**
-     * Close the modal
-     */
-    close() {
+  /**
+   * Close the modal
+   */
+  close() {
+    if (this.modal) {
+      this.modal.classList.add('closing');
+      setTimeout(() => {
         if (this.modal) {
-            this.modal.classList.add('closing');
-            setTimeout(() => {
-                if (this.modal) {
-                    this.modal.remove();
-                    this.modal = null;
-                }
-            }, ANIMATION_DURATION);
+          this.modal.remove();
+          this.modal = null;
         }
-
-        if (this.backdrop) {
-            this.backdrop.classList.add('closing');
-            setTimeout(() => {
-                if (this.backdrop) {
-                    this.backdrop.remove();
-                    this.backdrop = null;
-                }
-            }, ANIMATION_DURATION);
-        }
-
-        // Restore focus
-        if (this.previousFocusedElement) {
-            this.previousFocusedElement.focus();
-        }
-
-        // Restore body scrolling
-        document.body.style.overflow = '';
-
-        // Remove event listeners
-        if (this.escapeHandler) {
-            document.removeEventListener('keydown', this.escapeHandler);
-            this.escapeHandler = null;
-        }
-
-        // Reset state
-        this.currentScenario = null;
-        this.selectedOption = null;
-        this.currentCategoryId = null;
-        this.currentScenarioId = null;
-        this.scenarioData = null;
-        this.radarChart = null;
-
-        logger.info('Scenario modal closed');
+      }, ANIMATION_DURATION);
     }
+
+    if (this.backdrop) {
+      this.backdrop.classList.add('closing');
+      setTimeout(() => {
+        if (this.backdrop) {
+          this.backdrop.remove();
+          this.backdrop = null;
+        }
+      }, ANIMATION_DURATION);
+    }
+
+    // Restore focus
+    if (this.previousFocusedElement) {
+      this.previousFocusedElement.focus();
+    }
+
+    // Restore body scrolling
+    document.body.style.overflow = '';
+
+    // Remove event listeners
+    if (this.escapeHandler) {
+      document.removeEventListener('keydown', this.escapeHandler);
+      this.escapeHandler = null;
+    }
+
+    // Reset state
+    this.currentScenario = null;
+    this.selectedOption = null;
+    this.currentCategoryId = null;
+    this.currentScenarioId = null;
+    this.scenarioData = null;
+    this.radarChart = null;
+
+    logger.info('Scenario modal closed');
+  }
+
+  /**
+   * Start typewriter effect for dilemma and ethical question text
+   */
+  async startTypewriterEffect() {
+    try {
+      const dilemmaElement = this.modal.querySelector('.dilemma-text');
+      const ethicalQuestionElement = this.modal.querySelector('.ethical-question');
+      const scenarioContent = this.modal.querySelector('.scenario-content');
+      
+      if (!dilemmaElement || !ethicalQuestionElement) {
+        logger.warn('Could not find text elements for typewriter effect');
+        return;
+      }
+
+      // Add active class to start typewriter styling
+      if (scenarioContent) {
+        scenarioContent.classList.add('typewriter-active');
+      }
+
+      // Get the original text content
+      const dilemmaText = this.currentScenario.dilemma;
+      const ethicalQuestionText = this.currentScenario.ethicalQuestion;
+
+      // Apply typewriter effect sequentially
+      await typewriterSequence([
+        {
+          element: dilemmaElement,
+          text: dilemmaText,
+          options: {
+            speed: 15, // Faster typing
+            delay: 200, // Small delay before starting
+            cursor: true
+          }
+        },
+        {
+          element: ethicalQuestionElement,
+          text: ethicalQuestionText,
+          options: {
+            speed: 20, // Faster typing for emphasis
+            delay: 200, // Shorter delay after first text completes
+            cursor: true
+          }
+        }
+      ]);
+
+      logger.info('Typewriter effect completed');
+    } catch (error) {
+      logger.error('Failed to apply typewriter effect:', error);
+      
+      // Fallback - show text immediately if typewriter fails
+      const dilemmaElement = this.modal.querySelector('.dilemma-text');
+      const ethicalQuestionElement = this.modal.querySelector('.ethical-question');
+      
+      if (dilemmaElement) {
+        dilemmaElement.textContent = this.currentScenario.dilemma;
+      }
+      if (ethicalQuestionElement) {
+        ethicalQuestionElement.textContent = this.currentScenario.ethicalQuestion;
+      }
+    }
+  }
 }
 
 export default ScenarioModal;

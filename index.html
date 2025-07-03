@@ -159,10 +159,102 @@
                 </div>
             </div>
             
-            <!-- Demo simulation preview -->
-            <div class="hero-simulation">
-                <div id="hero-demo" class="simulation-preview" aria-label="Interactive demo simulation">
-                    <!-- Dynamic content will be loaded here -->
+            <!-- Interactive Radar Chart Demo moved to hero -->
+            <div class="hero-radar-demo">
+                <h3>Interactive Ethics Radar Chart</h3>
+                <p>Experience how ethical decisions affect multiple dimensions simultaneously. Click the buttons to see different decision patterns:</p>
+                
+                <div class="hero-demo-controls">
+                    <!-- Feedback popover positioned above controls -->
+                    <div id="hero-demo-feedback" class="demo-feedback-popover">
+                        <div class="popover-content"></div>
+                        <div class="popover-arrow"></div>
+                    </div>
+                    
+                    <div class="demo-controls-grid">
+                        <button class="demo-btn" data-pattern="utilitarian" onclick="simulateEthicsPattern('utilitarian', this)">Utilitarian</button>
+                        <button class="demo-btn" data-pattern="deontological" onclick="simulateEthicsPattern('deontological', this)">Rights-Based</button>
+                        <button class="demo-btn" data-pattern="virtue" onclick="simulateEthicsPattern('virtue', this)">Virtue Ethics</button>
+                        <button class="demo-btn balanced-btn" data-pattern="balanced" onclick="simulateEthicsPattern('balanced', this)">Balanced</button>
+                    </div>
+                </div>
+                
+                <div class="hero-radar-container">
+                    <div id="hero-ethics-chart" class="radar-chart-wrapper"></div>
+                </div>
+                
+                <!-- Accordion for instructions -->
+                <div class="radar-instructions-accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header" role="button" tabindex="0" aria-expanded="false" onclick="toggleRadarInstructions()">
+                            <span class="accordion-icon">▶</span>
+                            <span class="accordion-title">💡 How to Read the Chart</span>
+                        </div>
+                        <div class="accordion-content collapsed">
+                            <div class="accordion-content-inner">
+                                <p><strong>Hover over any point</strong> on the radar chart to see detailed information about that ethical dimension. Each point shows:</p>
+                                <ul>
+                                    <li><strong>Axis Name:</strong> The specific ethical principle (e.g., Fairness, Sustainability)</li>
+                                    <li><strong>Score Value:</strong> How strongly this approach emphasizes that principle (1-5 scale)</li>
+                                    <li><strong>Description:</strong> What this principle means and why it matters</li>
+                                    <li><strong>Impact Level:</strong> Whether the emphasis is low, moderate, or high</li>
+                                </ul>
+                                <p>The <strong>shape and size</strong> of the radar pattern shows the overall ethical "signature" of each approach. A larger, more balanced shape indicates consideration of multiple principles, while a smaller or skewed shape shows focused emphasis on specific values.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Accordion for ethics glossary -->
+                <div class="ethics-glossary-accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header" role="button" tabindex="0" aria-expanded="false" onclick="toggleEthicsGlossary()">
+                            <span class="accordion-icon">▶</span>
+                            <span class="accordion-title">📚 Ethical Dimensions Glossary</span>
+                        </div>
+                        <div class="accordion-content collapsed">
+                            <div class="accordion-content-inner">
+                                <div class="glossary-grid">
+                                    <div class="glossary-item">
+                                        <h4>Fairness</h4>
+                                        <p>Treats all individuals and groups equitably, ensuring unbiased and just outcomes for everyone involved.</p>
+                                    </div>
+                                    <div class="glossary-item">
+                                        <h4>Sustainability</h4>
+                                        <p>Supports long-term ecological and social well-being, considering environmental and societal impacts.</p>
+                                    </div>
+                                    <div class="glossary-item">
+                                        <h4>Autonomy</h4>
+                                        <p>Respects individual control and self-determination, preserving people's ability to make their own choices.</p>
+                                    </div>
+                                    <div class="glossary-item">
+                                        <h4>Beneficence</h4>
+                                        <p>Promotes well-being and prevents harm, actively working to benefit individuals and communities.</p>
+                                    </div>
+                                    <div class="glossary-item">
+                                        <h4>Transparency</h4>
+                                        <p>Provides openness in decision-making processes, ensuring clarity about how and why decisions are made.</p>
+                                    </div>
+                                    <div class="glossary-item">
+                                        <h4>Accountability</h4>
+                                        <p>Ensures clear responsibility for decisions, with mechanisms for oversight and consequences for actions.</p>
+                                    </div>
+                                    <div class="glossary-item">
+                                        <h4>Privacy</h4>
+                                        <p>Protects personal information and data rights, safeguarding individual confidentiality and control over personal data.</p>
+                                    </div>
+                                    <div class="glossary-item">
+                                        <h4>Proportionality</h4>
+                                        <p>Balances benefits against severity of impact, ensuring responses are appropriate to the situation's scale and context.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="glossary-note">
+                                    <p><strong>Remember:</strong> These dimensions often interact and sometimes conflict with each other. Real ethical decision-making involves thoughtfully balancing these competing values based on context, stakeholder needs, and long-term consequences.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -206,81 +298,6 @@
                     <div class="ethics-card">
                         <h3>🔍 Educational Discovery</h3>
                         <p>The radar chart serves as a learning tool, not a judgment system. There are no "perfect" scores—instead, explore how different ethical frameworks prioritize different values and consider the context-dependent nature of ethical reasoning.</p>
-                    </div>
-                </div>
-                
-                <div class="ethics-glossary">
-                    <h3>Ethical Dimensions Glossary</h3>
-                    
-                    <!-- Interactive Radar Chart Demo -->
-                    <div class="radar-demo-section">
-                        <h4>Interactive Demo: Try the Radar Chart</h4>
-                        <p>Experience how ethical decisions affect multiple dimensions simultaneously. Click the buttons to see different decision patterns:</p>
-                        
-                        <div class="demo-controls">
-                            <button class="demo-btn" onclick="simulateEthicsDemo('utilitarian')">Utilitarian Approach</button>
-                            <button class="demo-btn" onclick="simulateEthicsDemo('deontological')">Rights-Based Approach</button>
-                            <button class="demo-btn" onclick="simulateEthicsDemo('virtue')">Virtue Ethics</button>
-                            <button class="demo-btn balanced-btn" onclick="simulateEthicsDemo('balanced')">Balanced Approach</button>
-                            <button class="demo-btn reset-btn" onclick="resetEthicsDemo()">Reset to Neutral</button>
-                        </div>
-                        
-                        <div class="demo-radar-container">
-                            <div id="ethics-demo-chart" class="radar-chart-wrapper"></div>
-                        </div>
-                        
-                        <div class="radar-instructions">
-                            <h5>💡 How to Read the Chart</h5>
-                            <p><strong>Hover over any point</strong> on the radar chart to see detailed information about that ethical dimension. Each point shows:</p>
-                            <ul>
-                                <li><strong>Axis Name:</strong> The specific ethical principle (e.g., Fairness, Sustainability)</li>
-                                <li><strong>Score Value:</strong> How strongly this approach emphasizes that principle (1-5 scale)</li>
-                                <li><strong>Description:</strong> What this principle means and why it matters</li>
-                                <li><strong>Impact Level:</strong> Whether the emphasis is low, moderate, or high</li>
-                            </ul>
-                            <p>The <strong>shape and size</strong> of the radar pattern shows the overall ethical "signature" of each approach. A larger, more balanced shape indicates consideration of multiple principles, while a smaller or skewed shape shows focused emphasis on specific values.</p>
-                        </div>
-                        
-                        <div id="demo-feedback" class="demo-feedback"></div>
-                    </div>
-                    
-                    <div class="glossary-grid">
-                        <div class="glossary-item">
-                            <h4>Fairness</h4>
-                            <p>Treats all individuals and groups equitably, ensuring unbiased and just outcomes for everyone involved.</p>
-                        </div>
-                        <div class="glossary-item">
-                            <h4>Sustainability</h4>
-                            <p>Supports long-term ecological and social well-being, considering environmental and societal impacts.</p>
-                        </div>
-                        <div class="glossary-item">
-                            <h4>Autonomy</h4>
-                            <p>Respects individual control and self-determination, preserving people's ability to make their own choices.</p>
-                        </div>
-                        <div class="glossary-item">
-                            <h4>Beneficence</h4>
-                            <p>Promotes well-being and prevents harm, actively working to benefit individuals and communities.</p>
-                        </div>
-                        <div class="glossary-item">
-                            <h4>Transparency</h4>
-                            <p>Provides openness in decision-making processes, ensuring clarity about how and why decisions are made.</p>
-                        </div>
-                        <div class="glossary-item">
-                            <h4>Accountability</h4>
-                            <p>Ensures clear responsibility for decisions, with mechanisms for oversight and consequences for actions.</p>
-                        </div>
-                        <div class="glossary-item">
-                            <h4>Privacy</h4>
-                            <p>Protects personal information and data rights, safeguarding individual confidentiality and control over personal data.</p>
-                        </div>
-                        <div class="glossary-item">
-                            <h4>Proportionality</h4>
-                            <p>Balances benefits against severity of impact, ensuring responses are appropriate to the situation's scale and context.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="glossary-note">
-                        <p><strong>Remember:</strong> These dimensions often interact and sometimes conflict with each other. Real ethical decision-making involves thoughtfully balancing these competing values based on context, stakeholder needs, and long-term consequences.</p>
                     </div>
                 </div>
             </div>

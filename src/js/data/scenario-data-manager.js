@@ -6,160 +6,183 @@
 import logger from '../utils/logger.js';
 
 class ScenarioDataManager {
-    constructor() {
-        this.scenarioCache = new Map();
-        this.categoryCache = new Map();
+  constructor() {
+    this.scenarioCache = new Map();
+    this.categoryCache = new Map();
+  }
+
+  /**
+   * Map category IDs to scenario file names
+   */
+  getCategoryFileName(categoryId) {
+    const categoryFileMap = {
+      'trolley-problem': 'trolley-problem-scenarios',
+      'ai-black-box': 'ai-black-box-scenarios',
+      'automation-oversight': 'automation-oversight-scenarios',
+      'consent-surveillance': 'consent-surveillance-scenarios',
+      'responsibility-blame': 'responsibility-blame-scenarios',
+      'ship-of-theseus': 'ship-of-theseus-scenarios',
+      'simulation-hypothesis': 'simulation-hypothesis-scenarios',
+      'experience-machine': 'experience-machine-scenarios',
+      'sorites-paradox': 'sorites-paradox-scenarios',
+      'moral-luck': 'moral-luck-scenarios',
+    };
+
+    return categoryFileMap[categoryId] || `${categoryId}-scenarios`;
+  }
+
+  /**
+   * Load scenario data for a specific category
+   */
+  async loadCategoryScenarios(categoryId) {
+    if (this.categoryCache.has(categoryId)) {
+      return this.categoryCache.get(categoryId);
     }
 
-    /**
-     * Map category IDs to scenario file names
-     */
-    getCategoryFileName(categoryId) {
-        const categoryFileMap = {
-            'trolley-problem': 'trolley-problem-scenarios',
-            'ai-black-box': 'ai-black-box-scenarios',
-            'automation-oversight': 'automation-oversight-scenarios',
-            'consent-surveillance': 'consent-surveillance-scenarios',
-            'responsibility-blame': 'responsibility-blame-scenarios',
-            'ship-of-theseus': 'ship-of-theseus-scenarios',
-            'simulation-hypothesis': 'simulation-hypothesis-scenarios',
-            'experience-machine': 'experience-machine-scenarios',
-            'sorites-paradox': 'sorites-paradox-scenarios',
-            'moral-luck': 'moral-luck-scenarios'
-        };
-        
-        return categoryFileMap[categoryId] || `${categoryId}-scenarios`;
+    try {
+      const fileName = this.getCategoryFileName(categoryId);
+      // Dynamic import based on category ID
+      const module = await import(`./scenarios/${fileName}.js`);
+      const scenarios = module.default || module.scenarios;
+
+      // Validate scenario data
+      this.validateScenarios(scenarios, categoryId);
+
+      // Cache the result
+      this.categoryCache.set(categoryId, scenarios);
+
+      logger.info(
+        `Loaded ${Object.keys(scenarios).length} scenarios for category: ${categoryId}`
+      );
+      return scenarios;
+    } catch (error) {
+      logger.error(
+        `Failed to load scenarios for category ${categoryId}:`,
+        error
+      );
+
+      // Return empty scenarios object as fallback
+      return {};
+    }
+  }
+
+  /**
+   * Get a specific scenario by category and scenario ID
+   */
+  async getScenario(categoryId, scenarioId) {
+    const cacheKey = `${categoryId}:${scenarioId}`;
+
+    if (this.scenarioCache.has(cacheKey)) {
+      return this.scenarioCache.get(cacheKey);
     }
 
-    /**
-     * Load scenario data for a specific category
-     */
-    async loadCategoryScenarios(categoryId) {
-        if (this.categoryCache.has(categoryId)) {
-            return this.categoryCache.get(categoryId);
-        }
+    try {
+      const categoryScenarios = await this.loadCategoryScenarios(categoryId);
+      const scenario = categoryScenarios[scenarioId];
 
-        try {
-            const fileName = this.getCategoryFileName(categoryId);
-            // Dynamic import based on category ID
-            const module = await import(`./scenarios/${fileName}.js`);
-            const scenarios = module.default || module.scenarios;
-            
-            // Validate scenario data
-            this.validateScenarios(scenarios, categoryId);
-            
-            // Cache the result
-            this.categoryCache.set(categoryId, scenarios);
-            
-            logger.info(`Loaded ${Object.keys(scenarios).length} scenarios for category: ${categoryId}`);
-            return scenarios;
-            
-        } catch (error) {
-            logger.error(`Failed to load scenarios for category ${categoryId}:`, error);
-            
-            // Return empty scenarios object as fallback
-            return {};
-        }
+      if (scenario) {
+        this.scenarioCache.set(cacheKey, scenario);
+        return scenario;
+      } else {
+        logger.warn(
+          `Scenario ${scenarioId} not found in category ${categoryId}`
+        );
+        return null;
+      }
+    } catch (error) {
+      logger.error(
+        `Failed to get scenario ${categoryId}:${scenarioId}:`,
+        error
+      );
+      return null;
+    }
+  }
+
+  /**
+   * Validate scenario data structure
+   */
+  validateScenarios(scenarios, categoryId) {
+    if (!scenarios || typeof scenarios !== 'object') {
+      throw new Error(`Invalid scenarios object for category ${categoryId}`);
     }
 
-    /**
-     * Get a specific scenario by category and scenario ID
-     */
-    async getScenario(categoryId, scenarioId) {
-        const cacheKey = `${categoryId}:${scenarioId}`;
-        
-        if (this.scenarioCache.has(cacheKey)) {
-            return this.scenarioCache.get(cacheKey);
+    for (const [scenarioId, scenario] of Object.entries(scenarios)) {
+      this.validateScenario(scenario, scenarioId, categoryId);
+    }
+  }
+
+  /**
+   * Validate individual scenario structure
+   */
+  validateScenario(scenario, scenarioId, categoryId) {
+    const required = ['title', 'dilemma', 'ethicalQuestion', 'options'];
+
+    for (const field of required) {
+      if (!scenario[field]) {
+        logger.warn(
+          `Missing required field '${field}' in scenario ${categoryId}:${scenarioId}`
+        );
+      }
+    }
+
+    // Validate options structure
+    if (scenario.options && Array.isArray(scenario.options)) {
+      scenario.options.forEach((option, index) => {
+        const optionRequired = ['id', 'text', 'description', 'impact'];
+        for (const field of optionRequired) {
+          if (!option[field]) {
+            logger.warn(
+              `Missing '${field}' in option ${index} of scenario ${categoryId}:${scenarioId}`
+            );
+          }
         }
 
-        try {
-            const categoryScenarios = await this.loadCategoryScenarios(categoryId);
-            const scenario = categoryScenarios[scenarioId];
-            
-            if (scenario) {
-                this.scenarioCache.set(cacheKey, scenario);
-                return scenario;
-            } else {
-                logger.warn(`Scenario ${scenarioId} not found in category ${categoryId}`);
-                return null;
+        // Validate impact object
+        if (option.impact && typeof option.impact === 'object') {
+          const expectedMetrics = [
+            'fairness',
+            'sustainability',
+            'autonomy',
+            'beneficence',
+            'transparency',
+            'accountability',
+            'privacy',
+            'proportionality',
+          ];
+          expectedMetrics.forEach(metric => {
+            if (typeof option.impact[metric] !== 'number') {
+              logger.warn(
+                `Missing or invalid impact metric '${metric}' in ${categoryId}:${scenarioId} option ${index}`
+              );
             }
-            
-        } catch (error) {
-            logger.error(`Failed to get scenario ${categoryId}:${scenarioId}:`, error);
-            return null;
+          });
         }
+      });
     }
+  }
 
-    /**
-     * Validate scenario data structure
-     */
-    validateScenarios(scenarios, categoryId) {
-        if (!scenarios || typeof scenarios !== 'object') {
-            throw new Error(`Invalid scenarios object for category ${categoryId}`);
-        }
+  /**
+   * Clear cache (useful for development/testing)
+   */
+  clearCache() {
+    this.scenarioCache.clear();
+    this.categoryCache.clear();
+    logger.info('Scenario data cache cleared');
+  }
 
-        for (const [scenarioId, scenario] of Object.entries(scenarios)) {
-            this.validateScenario(scenario, scenarioId, categoryId);
-        }
-    }
+  /**
+   * Get all cached categories
+   */
+  getCachedCategories() {
+    return Array.from(this.categoryCache.keys());
+  }
 
-    /**
-     * Validate individual scenario structure
-     */
-    validateScenario(scenario, scenarioId, categoryId) {
-        const required = ['title', 'dilemma', 'ethicalQuestion', 'options'];
-        
-        for (const field of required) {
-            if (!scenario[field]) {
-                logger.warn(`Missing required field '${field}' in scenario ${categoryId}:${scenarioId}`);
-            }
-        }
-
-        // Validate options structure
-        if (scenario.options && Array.isArray(scenario.options)) {
-            scenario.options.forEach((option, index) => {
-                const optionRequired = ['id', 'text', 'description', 'impact'];
-                for (const field of optionRequired) {
-                    if (!option[field]) {
-                        logger.warn(`Missing '${field}' in option ${index} of scenario ${categoryId}:${scenarioId}`);
-                    }
-                }
-
-                // Validate impact object
-                if (option.impact && typeof option.impact === 'object') {
-                    const expectedMetrics = ['fairness', 'sustainability', 'autonomy', 'beneficence', 'transparency', 'accountability', 'privacy', 'proportionality'];
-                    expectedMetrics.forEach(metric => {
-                        if (typeof option.impact[metric] !== 'number') {
-                            logger.warn(`Missing or invalid impact metric '${metric}' in ${categoryId}:${scenarioId} option ${index}`);
-                        }
-                    });
-                }
-            });
-        }
-    }
-
-    /**
-     * Clear cache (useful for development/testing)
-     */
-    clearCache() {
-        this.scenarioCache.clear();
-        this.categoryCache.clear();
-        logger.info('Scenario data cache cleared');
-    }
-
-    /**
-     * Get all cached categories
-     */
-    getCachedCategories() {
-        return Array.from(this.categoryCache.keys());
-    }
-
-    /**
-     * Get all cached scenarios
-     */
-    getCachedScenarios() {
-        return Array.from(this.scenarioCache.keys());
-    }
+  /**
+   * Get all cached scenarios
+   */
+  getCachedScenarios() {
+    return Array.from(this.scenarioCache.keys());
+  }
 }
 
 // Export singleton instance

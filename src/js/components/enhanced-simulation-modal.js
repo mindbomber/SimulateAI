@@ -6,76 +6,76 @@
 import { TIMING, BREAKPOINTS } from '../utils/constants.js';
 
 export class EnhancedSimulationModal {
-    constructor(simulationId, options = {}) {
-        this.simulationId = simulationId;
-        this.options = {
-            onClose: options.onClose || (() => {}),
-            showTabs: options.showTabs !== false,
-            showResourcePanel: options.showResourcePanel !== false,
-            collapseEthicsMeters: options.collapseEthicsMeters || false,
-            size: options.size || 'large', // small, medium, large, fullscreen
-            ...options
-        };
-        
-        this.currentTab = 'simulation';
-        this.isEthicsMetersCollapsed = this.options.collapseEthicsMeters;
-        this.modal = null;
-        this.resizeObserver = null;
-    }
-    
-    /**
-     * Shows the enhanced simulation modal
-     */
-    show() {
-        this.createModal();
-        this.setupEventListeners();
-        this.setupResizeObserver();
-        document.body.appendChild(this.modal);
-        
-        // Force reflow and then show
-        this.modal.offsetHeight;
-        this.modal.classList.add('visible');
-        
-        // Focus management
-        this.trapFocus();
-        
-        // Track analytics
-        this.trackAnalytics('enhanced_modal_opened', {
-            simulationId: this.simulationId,
-            size: this.options.size,
-            tabsEnabled: this.options.showTabs
-        });
-    }
-    
-    /**
-     * Closes the modal
-     */
-    close() {
-        if (this.modal) {
-            this.modal.classList.remove('visible');
-            setTimeout(() => {
-                if (this.modal && this.modal.parentNode) {
-                    this.modal.parentNode.removeChild(this.modal);
-                }
-                this.cleanup();
-            }, TIMING.FAST);
+  constructor(simulationId, options = {}) {
+    this.simulationId = simulationId;
+    this.options = {
+      onClose: options.onClose || (() => {}),
+      showTabs: options.showTabs !== false,
+      showResourcePanel: options.showResourcePanel !== false,
+      collapseEthicsMeters: options.collapseEthicsMeters || false,
+      size: options.size || 'large', // small, medium, large, fullscreen
+      ...options,
+    };
+
+    this.currentTab = 'simulation';
+    this.isEthicsMetersCollapsed = this.options.collapseEthicsMeters;
+    this.modal = null;
+    this.resizeObserver = null;
+  }
+
+  /**
+   * Shows the enhanced simulation modal
+   */
+  show() {
+    this.createModal();
+    this.setupEventListeners();
+    this.setupResizeObserver();
+    document.body.appendChild(this.modal);
+
+    // Force reflow and then show
+    this.modal.offsetHeight;
+    this.modal.classList.add('visible');
+
+    // Focus management
+    this.trapFocus();
+
+    // Track analytics
+    this.trackAnalytics('enhanced_modal_opened', {
+      simulationId: this.simulationId,
+      size: this.options.size,
+      tabsEnabled: this.options.showTabs,
+    });
+  }
+
+  /**
+   * Closes the modal
+   */
+  close() {
+    if (this.modal) {
+      this.modal.classList.remove('visible');
+      setTimeout(() => {
+        if (this.modal && this.modal.parentNode) {
+          this.modal.parentNode.removeChild(this.modal);
         }
-        
-        this.options.onClose();
-        this.trackAnalytics('enhanced_modal_closed');
+        this.cleanup();
+      }, TIMING.FAST);
     }
-    
-    /**
-     * Creates the modal structure
-     */
-    createModal() {
-        this.modal = document.createElement('div');
-        this.modal.className = `enhanced-simulation-modal modal-size-${this.options.size}`;
-        this.modal.setAttribute('role', 'dialog');
-        this.modal.setAttribute('aria-modal', 'true');
-        this.modal.setAttribute('aria-labelledby', 'enhanced-modal-title');
-        
-        this.modal.innerHTML = `
+
+    this.options.onClose();
+    this.trackAnalytics('enhanced_modal_closed');
+  }
+
+  /**
+   * Creates the modal structure
+   */
+  createModal() {
+    this.modal = document.createElement('div');
+    this.modal.className = `enhanced-simulation-modal modal-size-${this.options.size}`;
+    this.modal.setAttribute('role', 'dialog');
+    this.modal.setAttribute('aria-modal', 'true');
+    this.modal.setAttribute('aria-labelledby', 'enhanced-modal-title');
+
+    this.modal.innerHTML = `
             <div class="enhanced-modal-backdrop" aria-hidden="true"></div>
             <div class="enhanced-modal-container">
                 <div class="enhanced-modal-header">
@@ -119,13 +119,13 @@ export class EnhancedSimulationModal {
                 </div>
             </div>
         `;
-    }
-    
-    /**
-     * Generates tab navigation
-     */
-    generateTabNavigation() {
-        return `
+  }
+
+  /**
+   * Generates tab navigation
+   */
+  generateTabNavigation() {
+    return `
             <div class="enhanced-modal-tabs" role="tablist">
                 <button class="enhanced-tab active" role="tab" data-tab="simulation" aria-selected="true" aria-controls="tab-simulation">
                     <span class="tab-icon">🎮</span>
@@ -145,13 +145,13 @@ export class EnhancedSimulationModal {
                 </button>
             </div>
         `;
-    }
-    
-    /**
-     * Generates ethics meters panel
-     */
-    generateEthicsMetersPanel() {
-        return `
+  }
+
+  /**
+   * Generates ethics meters panel
+   */
+  generateEthicsMetersPanel() {
+    return `
             <div class="ethics-meters-panel ${this.isEthicsMetersCollapsed ? 'collapsed' : ''}" id="ethics-meters-panel">
                 <div class="ethics-meters-header">
                     <h3>Ethics Monitoring</h3>
@@ -167,13 +167,13 @@ export class EnhancedSimulationModal {
                 </div>
             </div>
         `;
-    }
-    
-    /**
-     * Generates resource panel
-     */
-    generateResourcePanel() {
-        return `
+  }
+
+  /**
+   * Generates resource panel
+   */
+  generateResourcePanel() {
+    return `
             <div class="resource-panel" id="resource-panel">
                 <div class="resource-panel-header">
                     <h3>Quick Resources</h3>
@@ -199,15 +199,15 @@ export class EnhancedSimulationModal {
                 </div>
             </div>
         `;
-    }
-    
-    /**
-     * Generates tab content panels
-     */
-    generateTabContent() {
-        if (!this.options.showTabs) return '';
-        
-        return `
+  }
+
+  /**
+   * Generates tab content panels
+   */
+  generateTabContent() {
+    if (!this.options.showTabs) return '';
+
+    return `
             <div class="enhanced-tab-content">
                 <div class="tab-panel" id="tab-simulation" role="tabpanel" aria-labelledby="tab-simulation" style="display: none;">
                     <!-- Simulation tab content is handled by main area -->
@@ -303,337 +303,345 @@ export class EnhancedSimulationModal {
                 </div>
             </div>
         `;
+  }
+
+  /**
+   * Sets up event listeners
+   */
+  setupEventListeners() {
+    // Close button
+    const closeBtn = this.modal.querySelector('.btn-close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => this.close());
     }
-    
-    /**
-     * Sets up event listeners
-     */
-    setupEventListeners() {
-        // Close button
-        const closeBtn = this.modal.querySelector('.btn-close');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => this.close());
-        }
-        
-        // Backdrop click
-        const backdrop = this.modal.querySelector('.enhanced-modal-backdrop');
-        if (backdrop) {
-            backdrop.addEventListener('click', () => this.close());
-        }
-        
-        // Escape key
-        document.addEventListener('keydown', this.handleKeyDown.bind(this));
-        
-        // Tab switching
-        if (this.options.showTabs) {
-            const tabButtons = this.modal.querySelectorAll('.enhanced-tab');
-            tabButtons.forEach(button => {
-                button.addEventListener('click', (e) => {
-                    this.switchTab(e.target.closest('.enhanced-tab').dataset.tab);
-                });
-            });
-        }
-        
-        // Collapsible panels
-        this.setupCollapsiblePanels();
-        
-        // Fullscreen toggle
-        const expandBtn = this.modal.querySelector('.btn-expand');
-        if (expandBtn) {
-            expandBtn.addEventListener('click', () => this.toggleFullscreen());
-        }
-        
-        // Simulation controls
-        this.setupSimulationControls();
+
+    // Backdrop click
+    const backdrop = this.modal.querySelector('.enhanced-modal-backdrop');
+    if (backdrop) {
+      backdrop.addEventListener('click', () => this.close());
     }
-    
-    /**
-     * Sets up collapsible panels
-     */
-    setupCollapsiblePanels() {
-        const collapseButtons = this.modal.querySelectorAll('.btn-collapse');
-        collapseButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                const panel = e.target.closest('.ethics-meters-panel, .resource-panel');
-                if (panel) {
-                    panel.classList.toggle('collapsed');
-                    const icon = button.querySelector('.icon');
-                    if (panel.classList.contains('ethics-meters-panel')) {
-                        icon.textContent = panel.classList.contains('collapsed') ? '▶' : '▼';
-                    } else {
-                        icon.textContent = panel.classList.contains('collapsed') ? '▶' : '◀';
-                    }
-                }
-            });
+
+    // Escape key
+    document.addEventListener('keydown', this.handleKeyDown.bind(this));
+
+    // Tab switching
+    if (this.options.showTabs) {
+      const tabButtons = this.modal.querySelectorAll('.enhanced-tab');
+      tabButtons.forEach(button => {
+        button.addEventListener('click', e => {
+          this.switchTab(e.target.closest('.enhanced-tab').dataset.tab);
         });
+      });
     }
-    
-    /**
-     * Sets up simulation controls
-     */
-    setupSimulationControls() {
-        const resetBtn = this.modal.querySelector('#reset-enhanced-simulation');
-        const pauseBtn = this.modal.querySelector('#pause-enhanced-simulation');
-        
-        if (resetBtn) {
-            resetBtn.addEventListener('click', () => {
-                this.resetSimulation();
-            });
-        }
-        
-        if (pauseBtn) {
-            pauseBtn.addEventListener('click', () => {
-                this.togglePause();
-            });
-        }
+
+    // Collapsible panels
+    this.setupCollapsiblePanels();
+
+    // Fullscreen toggle
+    const expandBtn = this.modal.querySelector('.btn-expand');
+    if (expandBtn) {
+      expandBtn.addEventListener('click', () => this.toggleFullscreen());
     }
-    
-    /**
-     * Switches to a different tab
-     */
-    switchTab(tabName) {
-        // Update tab buttons
-        const tabButtons = this.modal.querySelectorAll('.enhanced-tab');
-        tabButtons.forEach(button => {
-            const isActive = button.dataset.tab === tabName;
-            button.classList.toggle('active', isActive);
-            button.setAttribute('aria-selected', isActive);
-        });
-        
-        // Show/hide tab content
-        const tabPanels = this.modal.querySelectorAll('.tab-panel');
-        tabPanels.forEach(panel => {
-            panel.style.display = panel.id === `tab-${tabName}` ? 'block' : 'none';
-        });
-        
-        // Update main area visibility
-        const simulationArea = this.modal.querySelector('.simulation-main-area');
-        if (simulationArea) {
-            simulationArea.style.display = tabName === 'simulation' ? 'flex' : 'none';
+
+    // Simulation controls
+    this.setupSimulationControls();
+  }
+
+  /**
+   * Sets up collapsible panels
+   */
+  setupCollapsiblePanels() {
+    const collapseButtons = this.modal.querySelectorAll('.btn-collapse');
+    collapseButtons.forEach(button => {
+      button.addEventListener('click', e => {
+        const panel = e.target.closest('.ethics-meters-panel, .resource-panel');
+        if (panel) {
+          panel.classList.toggle('collapsed');
+          const icon = button.querySelector('.icon');
+          if (panel.classList.contains('ethics-meters-panel')) {
+            icon.textContent = panel.classList.contains('collapsed')
+              ? '▶'
+              : '▼';
+          } else {
+            icon.textContent = panel.classList.contains('collapsed')
+              ? '▶'
+              : '◀';
+          }
         }
-        
-        this.currentTab = tabName;
-        this.trackAnalytics('tab_switched', { tab: tabName });
+      });
+    });
+  }
+
+  /**
+   * Sets up simulation controls
+   */
+  setupSimulationControls() {
+    const resetBtn = this.modal.querySelector('#reset-enhanced-simulation');
+    const pauseBtn = this.modal.querySelector('#pause-enhanced-simulation');
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        this.resetSimulation();
+      });
     }
-    
-    /**
-     * Toggles fullscreen mode
-     */
-    toggleFullscreen() {
-        this.modal.classList.toggle('fullscreen-mode');
-        const expandBtn = this.modal.querySelector('.btn-expand .icon');
-        if (expandBtn) {
-            expandBtn.textContent = this.modal.classList.contains('fullscreen-mode') ? '⛶' : '⛶';
-        }
-        
-        this.trackAnalytics('fullscreen_toggled', { 
-            isFullscreen: this.modal.classList.contains('fullscreen-mode') 
-        });
+
+    if (pauseBtn) {
+      pauseBtn.addEventListener('click', () => {
+        this.togglePause();
+      });
     }
-    
-    /**
-     * Resets the simulation
-     */
-    resetSimulation() {
-        // This will be called by the parent application
-        if (this.options.onReset) {
-            this.options.onReset();
-        }
-        this.trackAnalytics('simulation_reset');
+  }
+
+  /**
+   * Switches to a different tab
+   */
+  switchTab(tabName) {
+    // Update tab buttons
+    const tabButtons = this.modal.querySelectorAll('.enhanced-tab');
+    tabButtons.forEach(button => {
+      const isActive = button.dataset.tab === tabName;
+      button.classList.toggle('active', isActive);
+      button.setAttribute('aria-selected', isActive);
+    });
+
+    // Show/hide tab content
+    const tabPanels = this.modal.querySelectorAll('.tab-panel');
+    tabPanels.forEach(panel => {
+      panel.style.display = panel.id === `tab-${tabName}` ? 'block' : 'none';
+    });
+
+    // Update main area visibility
+    const simulationArea = this.modal.querySelector('.simulation-main-area');
+    if (simulationArea) {
+      simulationArea.style.display = tabName === 'simulation' ? 'flex' : 'none';
     }
-    
-    /**
-     * Toggles simulation pause
-     */
-    togglePause() {
-        const pauseBtn = this.modal.querySelector('#pause-enhanced-simulation');
-        const isPaused = pauseBtn.textContent === 'Resume';
-        
-        pauseBtn.textContent = isPaused ? 'Pause' : 'Resume';
-        
-        if (this.options.onPause) {
-            this.options.onPause(!isPaused);
-        }
-        
-        this.trackAnalytics('simulation_pause_toggled', { isPaused: !isPaused });
+
+    this.currentTab = tabName;
+    this.trackAnalytics('tab_switched', { tab: tabName });
+  }
+
+  /**
+   * Toggles fullscreen mode
+   */
+  toggleFullscreen() {
+    this.modal.classList.toggle('fullscreen-mode');
+    const expandBtn = this.modal.querySelector('.btn-expand .icon');
+    if (expandBtn) {
+      expandBtn.textContent = this.modal.classList.contains('fullscreen-mode')
+        ? '⛶'
+        : '⛶';
     }
-    
-    /**
-     * Updates simulation status
-     */
-    updateStatus(status) {
-        const statusIndicator = this.modal.querySelector('#simulation-status');
-        if (statusIndicator) {
-            statusIndicator.textContent = status;
-        }
+
+    this.trackAnalytics('fullscreen_toggled', {
+      isFullscreen: this.modal.classList.contains('fullscreen-mode'),
+    });
+  }
+
+  /**
+   * Resets the simulation
+   */
+  resetSimulation() {
+    // This will be called by the parent application
+    if (this.options.onReset) {
+      this.options.onReset();
     }
-    
-    /**
-     * Updates progress tracking
-     */
-    updateProgress(progress) {
-        const decisionsElement = this.modal.querySelector('#decisions-made');
-        const timeElement = this.modal.querySelector('#time-spent');
-        const conceptsElement = this.modal.querySelector('#concepts-explored');
-        
-        if (decisionsElement && progress.decisions !== undefined) {
-            decisionsElement.textContent = progress.decisions;
-        }
-        
-        if (timeElement && progress.timeSpent !== undefined) {
-            timeElement.textContent = this.formatTime(progress.timeSpent);
-        }
-        
-        if (conceptsElement && progress.concepts !== undefined) {
-            conceptsElement.textContent = progress.concepts;
-        }
+    this.trackAnalytics('simulation_reset');
+  }
+
+  /**
+   * Toggles simulation pause
+   */
+  togglePause() {
+    const pauseBtn = this.modal.querySelector('#pause-enhanced-simulation');
+    const isPaused = pauseBtn.textContent === 'Resume';
+
+    pauseBtn.textContent = isPaused ? 'Pause' : 'Resume';
+
+    if (this.options.onPause) {
+      this.options.onPause(!isPaused);
     }
-    
-    /**
-     * Adds a decision to the timeline
-     */
-    addDecisionToTimeline(decision) {
-        const timeline = this.modal.querySelector('#decisions-timeline');
-        if (timeline) {
-            const decisionElement = document.createElement('div');
-            decisionElement.className = 'decision-item';
-            decisionElement.innerHTML = `
+
+    this.trackAnalytics('simulation_pause_toggled', { isPaused: !isPaused });
+  }
+
+  /**
+   * Updates simulation status
+   */
+  updateStatus(status) {
+    const statusIndicator = this.modal.querySelector('#simulation-status');
+    if (statusIndicator) {
+      statusIndicator.textContent = status;
+    }
+  }
+
+  /**
+   * Updates progress tracking
+   */
+  updateProgress(progress) {
+    const decisionsElement = this.modal.querySelector('#decisions-made');
+    const timeElement = this.modal.querySelector('#time-spent');
+    const conceptsElement = this.modal.querySelector('#concepts-explored');
+
+    if (decisionsElement && progress.decisions !== undefined) {
+      decisionsElement.textContent = progress.decisions;
+    }
+
+    if (timeElement && progress.timeSpent !== undefined) {
+      timeElement.textContent = this.formatTime(progress.timeSpent);
+    }
+
+    if (conceptsElement && progress.concepts !== undefined) {
+      conceptsElement.textContent = progress.concepts;
+    }
+  }
+
+  /**
+   * Adds a decision to the timeline
+   */
+  addDecisionToTimeline(decision) {
+    const timeline = this.modal.querySelector('#decisions-timeline');
+    if (timeline) {
+      const decisionElement = document.createElement('div');
+      decisionElement.className = 'decision-item';
+      decisionElement.innerHTML = `
                 <div class="decision-time">${new Date().toLocaleTimeString()}</div>
                 <div class="decision-description">${decision.description}</div>
                 <div class="decision-impact">${decision.impact}</div>
             `;
-            timeline.appendChild(decisionElement);
-            
-            // Scroll to bottom
-            timeline.scrollTop = timeline.scrollHeight;
+      timeline.appendChild(decisionElement);
+
+      // Scroll to bottom
+      timeline.scrollTop = timeline.scrollHeight;
+    }
+  }
+
+  /**
+   * Gets the simulation container for injecting content
+   */
+  getSimulationContainer() {
+    return this.modal.querySelector('#enhanced-simulation-container');
+  }
+
+  /**
+   * Gets the ethics meters container
+   */
+  getEthicsMetersContainer() {
+    return this.modal.querySelector('.meters-container');
+  }
+
+  /**
+   * Sets up resize observer for responsive behavior
+   */
+  setupResizeObserver() {
+    if (window.ResizeObserver) {
+      this.resizeObserver = new ResizeObserver(entries => {
+        for (const entry of entries) {
+          this.handleResize(entry.contentRect);
         }
+      });
+
+      this.resizeObserver.observe(this.modal);
     }
-    
-    /**
-     * Gets the simulation container for injecting content
-     */
-    getSimulationContainer() {
-        return this.modal.querySelector('#enhanced-simulation-container');
+  }
+
+  /**
+   * Handles resize events
+   */
+  handleResize(rect) {
+    // Adjust layout based on size
+    if (rect.width < BREAKPOINTS.MOBILE) {
+      this.modal.classList.add('mobile-layout');
+    } else {
+      this.modal.classList.remove('mobile-layout');
     }
-    
-    /**
-     * Gets the ethics meters container
-     */
-    getEthicsMetersContainer() {
-        return this.modal.querySelector('.meters-container');
+
+    // Auto-collapse panels on small screens
+    if (rect.width < BREAKPOINTS.TABLET) {
+      const resourcePanel = this.modal.querySelector('.resource-panel');
+      if (resourcePanel && !resourcePanel.classList.contains('collapsed')) {
+        resourcePanel.classList.add('collapsed');
+      }
     }
-    
-    /**
-     * Sets up resize observer for responsive behavior
-     */
-    setupResizeObserver() {
-        if (window.ResizeObserver) {
-            this.resizeObserver = new ResizeObserver(entries => {
-                for (const entry of entries) {
-                    this.handleResize(entry.contentRect);
-                }
-            });
-            
-            this.resizeObserver.observe(this.modal);
-        }
+  }
+
+  /**
+   * Handles keyboard navigation
+   */
+  handleKeyDown(event) {
+    if (event.key === 'Escape') {
+      this.close();
+    } else if (event.key === 'Tab') {
+      this.handleTabNavigation(event);
     }
-    
-    /**
-     * Handles resize events
-     */
-    handleResize(rect) {
-        // Adjust layout based on size
-        if (rect.width < BREAKPOINTS.MOBILE) {
-            this.modal.classList.add('mobile-layout');
-        } else {
-            this.modal.classList.remove('mobile-layout');
-        }
-        
-        // Auto-collapse panels on small screens
-        if (rect.width < BREAKPOINTS.TABLET) {
-            const resourcePanel = this.modal.querySelector('.resource-panel');
-            if (resourcePanel && !resourcePanel.classList.contains('collapsed')) {
-                resourcePanel.classList.add('collapsed');
-            }
-        }
+  }
+
+  /**
+   * Handles tab navigation for accessibility
+   */
+  handleTabNavigation(event) {
+    const focusableElements = this.modal.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+
+    const firstFocusable = focusableElements[0];
+    const lastFocusable = focusableElements[focusableElements.length - 1];
+
+    if (event.shiftKey) {
+      if (document.activeElement === firstFocusable) {
+        lastFocusable.focus();
+        event.preventDefault();
+      }
+    } else {
+      if (document.activeElement === lastFocusable) {
+        firstFocusable.focus();
+        event.preventDefault();
+      }
     }
-    
-    /**
-     * Handles keyboard navigation
-     */
-    handleKeyDown(event) {
-        if (event.key === 'Escape') {
-            this.close();
-        } else if (event.key === 'Tab') {
-            this.handleTabNavigation(event);
-        }
+  }
+
+  /**
+   * Sets up focus trapping
+   */
+  trapFocus() {
+    const firstFocusableElement = this.modal.querySelector(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    if (firstFocusableElement) {
+      firstFocusableElement.focus();
     }
-    
-    /**
-     * Handles tab navigation for accessibility
-     */
-    handleTabNavigation(event) {
-        const focusableElements = this.modal.querySelectorAll(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        
-        const firstFocusable = focusableElements[0];
-        const lastFocusable = focusableElements[focusableElements.length - 1];
-        
-        if (event.shiftKey) {
-            if (document.activeElement === firstFocusable) {
-                lastFocusable.focus();
-                event.preventDefault();
-            }
-        } else {
-            if (document.activeElement === lastFocusable) {
-                firstFocusable.focus();
-                event.preventDefault();
-            }
-        }
+  }
+
+  /**
+   * Formats time in MM:SS format
+   */
+  formatTime(seconds) {
+    const mins = Math.floor(seconds / TIMING.SECONDS_PER_MINUTE);
+    const secs = seconds % TIMING.SECONDS_PER_MINUTE;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  /**
+   * Tracks analytics events
+   */
+  trackAnalytics(eventName, data = {}) {
+    if (window.simpleAnalytics) {
+      window.simpleAnalytics.trackEvent(eventName, {
+        simulationId: this.simulationId,
+        modalType: 'enhanced',
+        ...data,
+      });
     }
-    
-    /**
-     * Sets up focus trapping
-     */
-    trapFocus() {
-        const firstFocusableElement = this.modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-        if (firstFocusableElement) {
-            firstFocusableElement.focus();
-        }
+  }
+
+  /**
+   * Cleanup when modal is closed
+   */
+  cleanup() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
     }
-    
-    /**
-     * Formats time in MM:SS format
-     */
-    formatTime(seconds) {
-        const mins = Math.floor(seconds / TIMING.SECONDS_PER_MINUTE);
-        const secs = seconds % TIMING.SECONDS_PER_MINUTE;
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
-    }
-    
-    /**
-     * Tracks analytics events
-     */
-    trackAnalytics(eventName, data = {}) {
-        if (window.simpleAnalytics) {
-            window.simpleAnalytics.trackEvent(eventName, {
-                simulationId: this.simulationId,
-                modalType: 'enhanced',
-                ...data
-            });
-        }
-    }
-    
-    /**
-     * Cleanup when modal is closed
-     */
-    cleanup() {
-        if (this.resizeObserver) {
-            this.resizeObserver.disconnect();
-        }
-        
-        document.removeEventListener('keydown', this.handleKeyDown.bind(this));
-        this.modal = null;
-    }
+
+    document.removeEventListener('keydown', this.handleKeyDown.bind(this));
+    this.modal = null;
+  }
 }

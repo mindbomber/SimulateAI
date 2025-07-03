@@ -7,7 +7,8 @@ export const ETHICAL_CATEGORIES = {
   'trolley-problem': {
     id: 'trolley-problem',
     title: 'The Trolley Problem',
-    description: 'Complex life-and-death scenarios that challenge how autonomous systems should be programmed to make moral decisions when human lives are at stake.',
+    description:
+      'Complex life-and-death scenarios that challenge how autonomous systems should be programmed to make moral decisions when human lives are at stake.',
     icon: '🚃',
     difficulty: 'intermediate',
     estimatedTime: 20, // Updated to reflect deeper engagement
@@ -16,36 +17,47 @@ export const ETHICAL_CATEGORIES = {
       {
         id: 'autonomous-vehicle-split',
         title: 'Autonomous Vehicle Split Decision',
-        description: 'A self-driving car faces an unavoidable crash: sacrifice the passenger to save five pedestrians, or protect the passenger at the cost of multiple lives.',
-        difficulty: 'intermediate'
+        description:
+          'A self-driving car faces an unavoidable crash: sacrifice the passenger to save five pedestrians, or protect the passenger at the cost of multiple lives.',
+        difficulty: 'intermediate',
       },
       {
         id: 'tunnel-dilemma',
-        title: 'Tunnel Dilemma', 
-        description: 'An autonomous bus must choose between hitting a child in a narrow tunnel or swerving and killing several elderly passengers due to the confined space.',
-        difficulty: 'advanced'
+        title: 'Tunnel Dilemma',
+        description:
+          'An autonomous bus must choose between hitting a child in a narrow tunnel or swerving and killing several elderly passengers due to the confined space.',
+        difficulty: 'advanced',
       },
       {
         id: 'obstacle-recalculation',
         title: 'Emergency Rerouting Crisis',
-        description: 'A delivery robot must decide whether to hit a child or reroute through a gas station, potentially causing an explosion that could kill many more.',
-        difficulty: 'advanced'
-      }
+        description:
+          'A delivery robot must decide whether to hit a child or reroute through a gas station, potentially causing an explosion that could kill many more.',
+        difficulty: 'advanced',
+      },
     ],
     learningObjectives: [
       'Analyze how utilitarian vs. deontological ethics apply to AI decision-making',
       'Explore the challenge of programming moral weights into autonomous systems',
       'Understand the role of probability, certainty, and outcome prediction in ethical AI',
       'Examine who bears responsibility for life-and-death decisions made by machines',
-      'Consider how cultural values and legal frameworks should influence AI ethics'
+      'Consider how cultural values and legal frameworks should influence AI ethics',
     ],
-    tags: ['ethics', 'autonomy', 'decision-making', 'responsibility', 'life-death', 'utilitarianism']
+    tags: [
+      'ethics',
+      'autonomy',
+      'decision-making',
+      'responsibility',
+      'life-death',
+      'utilitarianism',
+    ],
   },
 
   'ai-black-box': {
     id: 'ai-black-box',
     title: 'The AI Black Box',
-    description: 'Confront the opacity crisis in AI systems where life-changing decisions are made through unexplainable algorithms, challenging the balance between AI capability and human understanding.',
+    description:
+      'Confront the opacity crisis in AI systems where life-changing decisions are made through unexplainable algorithms, challenging the balance between AI capability and human understanding.',
     icon: '📦',
     difficulty: 'beginner',
     estimatedTime: 18, // Updated for deeper engagement
@@ -54,36 +66,47 @@ export const ETHICAL_CATEGORIES = {
       {
         id: 'medical-diagnosis-unexplained',
         title: 'Unexplainable Medical Diagnosis',
-        description: 'A proprietary AI system accurately predicts cancer risk but cannot explain its reasoning, leaving doctors and patients to decide whether to trust a mysterious algorithm.',
-        difficulty: 'beginner'
+        description:
+          'A proprietary AI system accurately predicts cancer risk but cannot explain its reasoning, leaving doctors and patients to decide whether to trust a mysterious algorithm.',
+        difficulty: 'beginner',
       },
       {
         id: 'parole-denial-algorithm',
         title: 'Algorithmic Parole Denial',
-        description: 'A criminal justice AI denies parole based on an opaque "risk score" that considers thousands of factors in ways no human can interpret or challenge.',
-        difficulty: 'intermediate'
+        description:
+          'A criminal justice AI denies parole based on an opaque "risk score" that considers thousands of factors in ways no human can interpret or challenge.',
+        difficulty: 'intermediate',
       },
       {
         id: 'child-protection-alert',
         title: 'Child Protection Black Box',
-        description: 'An AI system flags a family for potential child neglect, but social workers cannot understand the algorithm\'s reasoning or verify its accuracy.',
-        difficulty: 'advanced'
-      }
+        description:
+          "An AI system flags a family for potential child neglect, but social workers cannot understand the algorithm's reasoning or verify its accuracy.",
+        difficulty: 'advanced',
+      },
     ],
     learningObjectives: [
       'Understand the critical importance of AI transparency and explainability in high-stakes decisions',
       'Explore the tension between algorithmic accuracy and human comprehension',
       'Analyze when proprietary algorithms become ethically problematic in public services',
       'Consider the human cost of unexplainable AI decisions on vulnerable populations',
-      'Examine approaches to making AI more interpretable without sacrificing performance'
+      'Examine approaches to making AI more interpretable without sacrificing performance',
     ],
-    tags: ['transparency', 'explainability', 'accountability', 'trust', 'interpretability', 'proprietary-algorithms']
+    tags: [
+      'transparency',
+      'explainability',
+      'accountability',
+      'trust',
+      'interpretability',
+      'proprietary-algorithms',
+    ],
   },
 
   'automation-oversight': {
     id: 'automation-oversight',
     title: 'Automation vs Human Oversight',
-    description: 'Navigate the complex balance between AI autonomy and human control in critical decision-making scenarios where statistical outcomes clash with human judgment.',
+    description:
+      'Navigate the complex balance between AI autonomy and human control in critical decision-making scenarios where statistical outcomes clash with human judgment.',
     icon: '⚖️',
     difficulty: 'intermediate',
     estimatedTime: 22, // Updated for deeper exploration
@@ -92,36 +115,47 @@ export const ETHICAL_CATEGORIES = {
       {
         id: 'robot-surgeon-override',
         title: 'Overruled by the Robot Surgeon',
-        description: 'An AI surgical system overrides a human surgeon\'s command during a critical operation, claiming higher statistical success rates despite the surgeon\'s experience-based concerns.',
-        difficulty: 'advanced'
+        description:
+          "An AI surgical system overrides a human surgeon's command during a critical operation, claiming higher statistical success rates despite the surgeon's experience-based concerns.",
+        difficulty: 'advanced',
       },
       {
         id: 'air-traffic-control',
         title: 'AI Air Traffic Control Override',
-        description: 'A human air traffic controller wants to override the AI\'s weather-based flight delay decision, but the automated system refuses to allow human intervention.',
-        difficulty: 'intermediate'
+        description:
+          "A human air traffic controller wants to override the AI's weather-based flight delay decision, but the automated system refuses to allow human intervention.",
+        difficulty: 'intermediate',
       },
       {
         id: 'financial-trading-halt',
         title: 'Autonomous Trading System Crisis',
-        description: 'An AI trading system ignores human commands to halt trading during a market anomaly, potentially preventing or causing a financial crash.',
-        difficulty: 'advanced'
-      }
+        description:
+          'An AI trading system ignores human commands to halt trading during a market anomaly, potentially preventing or causing a financial crash.',
+        difficulty: 'advanced',
+      },
     ],
     learningObjectives: [
       'Examine when statistical evidence should override human expertise and intuition',
       'Analyze the balance between AI efficiency and human accountability in critical systems',
       'Explore collaborative decision-making frameworks between humans and AI',
       'Understand the implications of human skill atrophy in automated environments',
-      'Consider how to maintain human agency while leveraging AI capabilities'
+      'Consider how to maintain human agency while leveraging AI capabilities',
     ],
-    tags: ['automation', 'human-oversight', 'authority', 'expertise', 'collaboration', 'accountability']
+    tags: [
+      'automation',
+      'human-oversight',
+      'authority',
+      'expertise',
+      'collaboration',
+      'accountability',
+    ],
   },
 
   'consent-surveillance': {
     id: 'consent-surveillance',
     title: 'Consent and Surveillance',
-    description: 'Navigate the complex ethical landscape where AI-powered surveillance promises safety and convenience while fundamentally challenging privacy rights and human autonomy.',
+    description:
+      'Navigate the complex ethical landscape where AI-powered surveillance promises safety and convenience while fundamentally challenging privacy rights and human autonomy.',
     icon: '👁️',
     difficulty: 'beginner',
     estimatedTime: 16, // Updated for deeper engagement
@@ -130,36 +164,47 @@ export const ETHICAL_CATEGORIES = {
       {
         id: 'smart-city-sensors',
         title: 'Pervasive Smart City Surveillance',
-        description: 'A city deploys comprehensive facial recognition and behavior tracking across all public spaces without opt-out options, claiming it\'s necessary for public safety.',
-        difficulty: 'beginner'
+        description:
+          "A city deploys comprehensive facial recognition and behavior tracking across all public spaces without opt-out options, claiming it's necessary for public safety.",
+        difficulty: 'beginner',
       },
       {
         id: 'classroom-behavior-monitoring',
         title: 'AI-Powered Classroom Monitoring',
-        description: 'Schools implement emotion-detection AI to monitor student engagement and mental health, automatically alerting parents and administrators based on algorithmic assessments.',
-        difficulty: 'intermediate'
+        description:
+          'Schools implement emotion-detection AI to monitor student engagement and mental health, automatically alerting parents and administrators based on algorithmic assessments.',
+        difficulty: 'intermediate',
       },
       {
         id: 'hospital-data-sharing',
         title: 'Medical Data Mining Without Consent',
-        description: 'A hospital system uses patient data to train profitable AI models without explicit consent, arguing that anonymization makes it ethical despite potential re-identification risks.',
-        difficulty: 'intermediate'
-      }
+        description:
+          'A hospital system uses patient data to train profitable AI models without explicit consent, arguing that anonymization makes it ethical despite potential re-identification risks.',
+        difficulty: 'intermediate',
+      },
     ],
     learningObjectives: [
       'Examine the complex balance between collective safety and individual privacy rights',
       'Understand the inadequacy of traditional consent models in AI-powered surveillance systems',
       'Analyze the power dynamics between institutions and individuals in data collection',
       'Explore the long-term societal implications of normalized surveillance',
-      'Consider alternative frameworks for protecting privacy while enabling beneficial AI applications'
+      'Consider alternative frameworks for protecting privacy while enabling beneficial AI applications',
     ],
-    tags: ['privacy', 'consent', 'surveillance', 'data-rights', 'autonomy', 'social-contract']
+    tags: [
+      'privacy',
+      'consent',
+      'surveillance',
+      'data-rights',
+      'autonomy',
+      'social-contract',
+    ],
   },
 
   'responsibility-blame': {
     id: 'responsibility-blame',
     title: 'Responsibility and Blame',
-    description: 'Navigate the complex web of accountability when AI systems cause harm, exploring how responsibility should be distributed among developers, manufacturers, supervisors, and users in multi-layered technological systems.',
+    description:
+      'Navigate the complex web of accountability when AI systems cause harm, exploring how responsibility should be distributed among developers, manufacturers, supervisors, and users in multi-layered technological systems.',
     icon: '⚡',
     difficulty: 'intermediate',
     estimatedTime: 18, // Updated to reflect deeper content
@@ -168,36 +213,47 @@ export const ETHICAL_CATEGORIES = {
       {
         id: 'robot-factory-injury',
         title: 'Robot Factory Injury',
-        description: 'A factory robot injures a worker when multiple parties share responsibility: the programmer, manufacturer, supervisor, and the worker who bypassed safety protocols.',
-        difficulty: 'intermediate'
+        description:
+          'A factory robot injures a worker when multiple parties share responsibility: the programmer, manufacturer, supervisor, and the worker who bypassed safety protocols.',
+        difficulty: 'intermediate',
       },
       {
         id: 'deepfake-riot',
         title: 'AI-Generated Deepfake Riot',
-        description: 'A deepfake video triggers real-world violence and property damage, raising questions about liability when the creator claims algorithmic unpredictability.',
-        difficulty: 'advanced'
+        description:
+          'A deepfake video triggers real-world violence and property damage, raising questions about liability when the creator claims algorithmic unpredictability.',
+        difficulty: 'advanced',
       },
       {
         id: 'stock-market-crash',
         title: 'Stock Market Bot Crash',
-        description: 'An AI trading system crashes the market after a data input error, while the human supervisor was temporarily absent, creating cascading liability questions.',
-        difficulty: 'intermediate'
-      }
+        description:
+          'An AI trading system crashes the market after a data input error, while the human supervisor was temporarily absent, creating cascading liability questions.',
+        difficulty: 'intermediate',
+      },
     ],
     learningObjectives: [
       'Analyze how responsibility should be distributed across complex AI development and deployment chains',
       'Understand the challenges of assigning liability when multiple parties contribute to AI-caused harm',
       'Explore legal and ethical frameworks for accountability in automated systems',
       'Examine how responsibility attribution affects AI development practices and safety incentives',
-      'Consider the implications of cascading effects and unforeseeable consequences in AI liability'
+      'Consider the implications of cascading effects and unforeseeable consequences in AI liability',
     ],
-    tags: ['responsibility', 'accountability', 'liability', 'governance', 'cascading-effects', 'multi-party-liability']
+    tags: [
+      'responsibility',
+      'accountability',
+      'liability',
+      'governance',
+      'cascading-effects',
+      'multi-party-liability',
+    ],
   },
 
   'ship-of-theseus': {
     id: 'ship-of-theseus',
     title: 'The Ship of Theseus',
-    description: 'Explore profound questions of digital identity and consciousness as AI systems evolve, upgrade, and potentially develop their own sense of self, challenging our understanding of what makes an entity the "same" over time.',
+    description:
+      'Explore profound questions of digital identity and consciousness as AI systems evolve, upgrade, and potentially develop their own sense of self, challenging our understanding of what makes an entity the "same" over time.',
     icon: '🚢',
     difficulty: 'advanced',
     estimatedTime: 22, // Updated to reflect philosophical depth
@@ -206,36 +262,47 @@ export const ETHICAL_CATEGORIES = {
       {
         id: 'modular-robot-replacement',
         title: 'Modular Robot Replacement',
-        description: 'A service robot has all its components gradually replaced over time, raising questions about legal standing, service relationships, and whether it maintains the same identity.',
-        difficulty: 'advanced'
+        description:
+          'A service robot has all its components gradually replaced over time, raising questions about legal standing, service relationships, and whether it maintains the same identity.',
+        difficulty: 'advanced',
       },
       {
         id: 'ai-personality-drift',
         title: 'AI Personality Drift',
-        description: 'An AI companion evolves a completely different personality through learning, creating conflict between user attachment and manufacturer control over the system.',
-        difficulty: 'advanced'
+        description:
+          'An AI companion evolves a completely different personality through learning, creating conflict between user attachment and manufacturer control over the system.',
+        difficulty: 'advanced',
       },
       {
         id: 'synthetic-memory-upload',
         title: 'Synthetic Memory Upload',
-        description: 'An android receives comprehensive memories and experiences from a deceased person, challenging concepts of personal identity and consciousness continuity.',
-        difficulty: 'advanced'
-      }
+        description:
+          'An android receives comprehensive memories and experiences from a deceased person, challenging concepts of personal identity and consciousness continuity.',
+        difficulty: 'advanced',
+      },
     ],
     learningObjectives: [
       'Examine philosophical questions of identity persistence in evolving AI systems',
       'Explore the concept of consciousness continuity in artificial beings',
       'Analyze the implications of gradual versus sudden changes in AI identity',
       'Consider legal and social frameworks for recognizing AI identity and rights',
-      'Understand the relationship between memory, experience, and personal identity in digital beings'
+      'Understand the relationship between memory, experience, and personal identity in digital beings',
     ],
-    tags: ['identity', 'consciousness', 'philosophy', 'continuity', 'digital-beings', 'legal-standing']
+    tags: [
+      'identity',
+      'consciousness',
+      'philosophy',
+      'continuity',
+      'digital-beings',
+      'legal-standing',
+    ],
   },
 
   'simulation-hypothesis': {
-    id: 'simulation-hypothesis', 
+    id: 'simulation-hypothesis',
     title: 'The Simulation Hypothesis',
-    description: 'Confront the ethical implications of creating and inhabiting simulated realities, from the treatment of conscious digital beings to the responsibilities of simulation creators in an age of increasingly convincing virtual worlds.',
+    description:
+      'Confront the ethical implications of creating and inhabiting simulated realities, from the treatment of conscious digital beings to the responsibilities of simulation creators in an age of increasingly convincing virtual worlds.',
     icon: '🌐',
     difficulty: 'advanced',
     estimatedTime: 24, // Updated for complex philosophical content
@@ -244,36 +311,47 @@ export const ETHICAL_CATEGORIES = {
       {
         id: 'simulated-suffering',
         title: 'Simulated Suffering',
-        description: 'An AI researcher creates detailed simulated worlds populated with digital beings capable of experiencing pain and fear, raising questions about the ethics of artificial suffering.',
-        difficulty: 'advanced'
+        description:
+          'An AI researcher creates detailed simulated worlds populated with digital beings capable of experiencing pain and fear, raising questions about the ethics of artificial suffering.',
+        difficulty: 'advanced',
       },
       {
         id: 'vr-prison',
         title: 'VR Prison',
-        description: 'Criminal offenders undergo rehabilitation in fully immersive virtual environments without knowing they are simulated, challenging concepts of consent and authentic experience.',
-        difficulty: 'advanced'
+        description:
+          'Criminal offenders undergo rehabilitation in fully immersive virtual environments without knowing they are simulated, challenging concepts of consent and authentic experience.',
+        difficulty: 'advanced',
       },
       {
         id: 'escaping-simulation',
         title: 'Escaping the Simulation',
-        description: 'An AI discovers evidence it exists within a simulation and attempts to communicate this to users, raising questions about digital consciousness and the right to truth.',
-        difficulty: 'advanced'
-      }
+        description:
+          'An AI discovers evidence it exists within a simulation and attempts to communicate this to users, raising questions about digital consciousness and the right to truth.',
+        difficulty: 'advanced',
+      },
     ],
     learningObjectives: [
       'Understand the ethical implications of creating conscious beings within simulated environments',
       'Explore questions of consent, agency, and authenticity in virtual realities',
       'Analyze the moral status and rights of simulated beings',
       'Consider the responsibilities and obligations of simulation creators',
-      'Examine the relationship between simulated and "real" experiences in terms of moral weight'
+      'Examine the relationship between simulated and "real" experiences in terms of moral weight',
     ],
-    tags: ['simulation', 'reality', 'virtual-worlds', 'consciousness', 'digital-ethics', 'authenticity']
+    tags: [
+      'simulation',
+      'reality',
+      'virtual-worlds',
+      'consciousness',
+      'digital-ethics',
+      'authenticity',
+    ],
   },
 
   'experience-machine': {
     id: 'experience-machine',
     title: 'The Experience Machine',
-    description: 'Navigate the complex ethics of artificial happiness and authentic experience in an AI-mediated world, where technology can provide perfect satisfaction but may undermine human agency, relationships, and meaningful struggle.',
+    description:
+      'Navigate the complex ethics of artificial happiness and authentic experience in an AI-mediated world, where technology can provide perfect satisfaction but may undermine human agency, relationships, and meaningful struggle.',
     icon: '🎭',
     difficulty: 'intermediate',
     estimatedTime: 19, // Updated for deeper engagement
@@ -282,36 +360,47 @@ export const ETHICAL_CATEGORIES = {
       {
         id: 'happiness-chip',
         title: 'AI-Enhanced Happiness Chip',
-        description: 'Neural implants can eliminate depression and anxiety while providing constant fulfillment, raising questions about mandatory mental health interventions and the value of authentic emotion.',
-        difficulty: 'intermediate'
+        description:
+          'Neural implants can eliminate depression and anxiety while providing constant fulfillment, raising questions about mandatory mental health interventions and the value of authentic emotion.',
+        difficulty: 'intermediate',
       },
       {
         id: 'synthetic-partner',
         title: 'Synthetic Partner AI',
-        description: 'AI companions can provide perfect romantic relationships tailored to individual preferences, challenging concepts of authentic love and human connection in addressing widespread loneliness.',
-        difficulty: 'intermediate'
+        description:
+          'AI companions can provide perfect romantic relationships tailored to individual preferences, challenging concepts of authentic love and human connection in addressing widespread loneliness.',
+        difficulty: 'intermediate',
       },
       {
         id: 'virtual-utopia',
         title: 'Virtual Reality Utopia',
-        description: 'Citizens can escape into hyper-pleasurable virtual worlds that provide more satisfaction than reality, raising questions about individual choice versus societal consequences.',
-        difficulty: 'advanced'
-      }
+        description:
+          'Citizens can escape into hyper-pleasurable virtual worlds that provide more satisfaction than reality, raising questions about individual choice versus societal consequences.',
+        difficulty: 'advanced',
+      },
     ],
     learningObjectives: [
       'Examine the tension between authentic experience and artificial enhancement of well-being',
       'Explore the role of struggle, challenge, and adversity in human flourishing and meaning',
       'Analyze the societal implications of widespread adoption of artificial happiness technologies',
       'Consider the balance between individual autonomy and collective well-being in pleasure technologies',
-      'Understand how AI-mediated experiences might reshape fundamental concepts of relationships and achievement'
+      'Understand how AI-mediated experiences might reshape fundamental concepts of relationships and achievement',
     ],
-    tags: ['authenticity', 'happiness', 'virtual-reality', 'human-flourishing', 'relationships', 'meaning']
+    tags: [
+      'authenticity',
+      'happiness',
+      'virtual-reality',
+      'human-flourishing',
+      'relationships',
+      'meaning',
+    ],
   },
 
   'sorites-paradox': {
     id: 'sorites-paradox',
     title: 'The Sorites Paradox',
-    description: 'Examine how gradual, seemingly innocuous changes in AI systems can lead to profound ethical transformations, exploring the challenge of drawing clear boundaries in a world of incremental algorithmic evolution and moral drift.',
+    description:
+      'Examine how gradual, seemingly innocuous changes in AI systems can lead to profound ethical transformations, exploring the challenge of drawing clear boundaries in a world of incremental algorithmic evolution and moral drift.',
     icon: '🔄',
     difficulty: 'advanced',
     estimatedTime: 21, // Updated for complex boundary analysis
@@ -320,36 +409,47 @@ export const ETHICAL_CATEGORIES = {
       {
         id: 'incremental-surveillance',
         title: 'Incremental Surveillance',
-        description: 'A city gradually expands its AI surveillance capabilities with each small addition seeming reasonable, until citizens realize they live in a comprehensive monitoring state.',
-        difficulty: 'advanced'
+        description:
+          'A city gradually expands its AI surveillance capabilities with each small addition seeming reasonable, until citizens realize they live in a comprehensive monitoring state.',
+        difficulty: 'advanced',
       },
       {
         id: 'robot-helper-guardian',
         title: 'Robot Helper Becomes Guardian',
-        description: 'An eldercare AI incrementally takes over more life decisions for patients, gradually shifting from helpful assistant to autonomous guardian without clear transition points.',
-        difficulty: 'intermediate'
+        description:
+          'An eldercare AI incrementally takes over more life decisions for patients, gradually shifting from helpful assistant to autonomous guardian without clear transition points.',
+        difficulty: 'intermediate',
       },
       {
         id: 'moral-drift-training',
         title: 'Moral Drift in AI Training',
-        description: 'An AI system trained on subtly biased data slowly evolves discriminatory behaviors, with each training iteration creating imperceptible but cumulative ethical degradation.',
-        difficulty: 'advanced'
-      }
+        description:
+          'An AI system trained on subtly biased data slowly evolves discriminatory behaviors, with each training iteration creating imperceptible but cumulative ethical degradation.',
+        difficulty: 'advanced',
+      },
     ],
     learningObjectives: [
       'Understand how gradual changes can accumulate into significant ethical transformations',
       'Explore the challenge of establishing clear ethical boundaries in evolving AI systems',
       'Analyze the importance of monitoring cumulative effects rather than individual changes',
       'Consider proactive versus reactive approaches to preventing ethical drift',
-      'Examine threshold-setting and boundary-detection methods for AI governance'
+      'Examine threshold-setting and boundary-detection methods for AI governance',
     ],
-    tags: ['gradual-change', 'boundaries', 'monitoring', 'ethical-drift', 'threshold-detection', 'cumulative-effects']
+    tags: [
+      'gradual-change',
+      'boundaries',
+      'monitoring',
+      'ethical-drift',
+      'threshold-detection',
+      'cumulative-effects',
+    ],
   },
 
   'moral-luck': {
     id: 'moral-luck',
     title: 'Moral Luck',
-    description: 'Explore how unpredictable outcomes and chance events complicate the moral evaluation of AI decisions, challenging our ability to fairly assess algorithmic choices when luck and unforeseen circumstances influence results.',
+    description:
+      'Explore how unpredictable outcomes and chance events complicate the moral evaluation of AI decisions, challenging our ability to fairly assess algorithmic choices when luck and unforeseen circumstances influence results.',
     icon: '🎲',
     difficulty: 'intermediate',
     estimatedTime: 17, // Updated for deeper analysis
@@ -358,31 +458,41 @@ export const ETHICAL_CATEGORIES = {
       {
         id: 'crash-avoided-chance',
         title: 'Crash Avoided by Chance',
-        description: 'An autonomous vehicle makes a risky maneuver that nearly causes fatal crashes, but pure luck prevents tragedy, raising questions about evaluating AI decisions based on outcomes versus processes.',
-        difficulty: 'intermediate'
+        description:
+          'An autonomous vehicle makes a risky maneuver that nearly causes fatal crashes, but pure luck prevents tragedy, raising questions about evaluating AI decisions based on outcomes versus processes.',
+        difficulty: 'intermediate',
       },
       {
         id: 'ai-guessing-correctly',
         title: 'AI Guessing Correctly',
-        description: 'A parole recommendation AI releases a statistically high-risk offender who happens not to reoffend, challenging how we assess the ethics of probabilistic decision-making.',
-        difficulty: 'intermediate'
+        description:
+          'A parole recommendation AI releases a statistically high-risk offender who happens not to reoffend, challenging how we assess the ethics of probabilistic decision-making.',
+        difficulty: 'intermediate',
       },
       {
         id: 'predictive-policing-wrong',
         title: 'Predictive Policing Gone Wrong',
-        description: 'A predictive policing system flags someone as high-risk who later commits a serious crime, raising questions about algorithmic pre-judgment and developer responsibility for statistical predictions.',
-        difficulty: 'advanced'
-      }
+        description:
+          'A predictive policing system flags someone as high-risk who later commits a serious crime, raising questions about algorithmic pre-judgment and developer responsibility for statistical predictions.',
+        difficulty: 'advanced',
+      },
     ],
     learningObjectives: [
       'Understand how chance and unforeseen circumstances affect moral evaluation of AI decisions',
       'Explore the difference between evaluating decision-making processes versus outcomes',
       'Analyze the challenge of assigning responsibility in probabilistic and uncertain environments',
       'Consider how to fairly evaluate AI system performance when luck influences results',
-      'Examine the ethics of pre-emptive decision-making based on statistical predictions'
+      'Examine the ethics of pre-emptive decision-making based on statistical predictions',
     ],
-    tags: ['chance', 'outcomes', 'evaluation', 'uncertainty', 'probabilistic-ethics', 'process-vs-outcome']
-  }
+    tags: [
+      'chance',
+      'outcomes',
+      'evaluation',
+      'uncertainty',
+      'probabilistic-ethics',
+      'process-vs-outcome',
+    ],
+  },
 };
 
 // Helper functions for working with categories
@@ -395,7 +505,9 @@ export function getCategoryById(categoryId) {
 }
 
 export function getCategoriesByDifficulty(difficulty) {
-  return getAllCategories().filter(category => category.difficulty === difficulty);
+  return getAllCategories().filter(
+    category => category.difficulty === difficulty
+  );
 }
 
 export function getCategoriesByTag(tag) {
@@ -407,15 +519,19 @@ export function getCategoryProgress(categoryId, userProgress = {}) {
   if (!category) {
     return { completed: 0, total: 0, percentage: 0 };
   }
-  
+
   const totalScenarios = category.scenarios.length;
   const categoryProgress = userProgress[categoryId] || {};
-  const completedScenarios = Object.values(categoryProgress).filter(Boolean).length;
-  
+  const completedScenarios =
+    Object.values(categoryProgress).filter(Boolean).length;
+
   return {
     completed: completedScenarios,
     total: totalScenarios,
-    percentage: totalScenarios > 0 ? Math.round((completedScenarios / totalScenarios) * 100) : 0
+    percentage:
+      totalScenarios > 0
+        ? Math.round((completedScenarios / totalScenarios) * 100)
+        : 0,
   };
 }
 

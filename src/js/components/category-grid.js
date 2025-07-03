@@ -4,7 +4,11 @@
  * Part of the SimulateAI Ethics Platform Revamp - Phase 1.1
  */
 
-import { getAllCategories, getCategoryProgress, getCategoryScenarios } from '../../data/categories.js';
+import {
+  getAllCategories,
+  getCategoryProgress,
+  getCategoryScenarios,
+} from '../../data/categories.js';
 import logger from '../utils/logger.js';
 import PreLaunchModal from './pre-launch-modal.js';
 import ScenarioModal from './scenario-modal.js';
@@ -14,67 +18,70 @@ const PROGRESS_CIRCLE_CIRCUMFERENCE = 163; // 2 * π * 26 (radius)
 const HIGHLIGHT_DURATION = 2000;
 
 class CategoryGrid {
-    constructor() {
-        this.container = null;
-        this.categories = getAllCategories();
-        this.userProgress = this.loadUserProgress();
-        
-        this.init();
+  constructor() {
+    this.container = null;
+    this.categories = getAllCategories();
+    this.userProgress = this.loadUserProgress();
+
+    this.init();
+  }
+
+  init() {
+    this.container = document.querySelector('.simulations-grid');
+    if (!this.container) {
+      logger.error('Category grid container not found');
+      return;
     }
 
-    init() {
-        this.container = document.querySelector('.simulations-grid');
-        if (!this.container) {
-            logger.error('Category grid container not found');
-            return;
-        }
+    this.render();
+    this.attachEventListeners();
+  }
 
-        this.render();
-        this.attachEventListeners();
+  loadUserProgress() {
+    // Load user progress from localStorage
+    try {
+      const stored = localStorage.getItem('simulateai_category_progress');
+      return stored ? JSON.parse(stored) : {};
+    } catch (error) {
+      logger.error('Failed to load user progress:', error);
+      return {};
     }
+  }
 
-    loadUserProgress() {
-        // Load user progress from localStorage
-        try {
-            const stored = localStorage.getItem('simulateai_category_progress');
-            return stored ? JSON.parse(stored) : {};
-        } catch (error) {
-            logger.error('Failed to load user progress:', error);
-            return {};
-        }
+  saveUserProgress() {
+    try {
+      localStorage.setItem(
+        'simulateai_category_progress',
+        JSON.stringify(this.userProgress)
+      );
+    } catch (error) {
+      logger.error('Failed to save user progress:', error);
     }
+  }
 
-    saveUserProgress() {
-        try {
-            localStorage.setItem('simulateai_category_progress', JSON.stringify(this.userProgress));
-        } catch (error) {
-            logger.error('Failed to save user progress:', error);
-        }
-    }
+  getCategoryProgress(categoryId) {
+    return getCategoryProgress(categoryId, this.userProgress);
+  }
 
-    getCategoryProgress(categoryId) {
-        return getCategoryProgress(categoryId, this.userProgress);
-    }
+  render() {
+    this.container.innerHTML = '';
 
-    render() {
-        this.container.innerHTML = '';
-        
-        // Create the complete category-based layout
-        this.categories.forEach(category => {
-            const categorySection = this.createCategorySection(category);
-            this.container.appendChild(categorySection);
-        });
-    }
+    // Create the complete category-based layout
+    this.categories.forEach(category => {
+      const categorySection = this.createCategorySection(category);
+      this.container.appendChild(categorySection);
+    });
+  }
 
-    createCategorySection(category) {
-        const section = document.createElement('section');
-        section.className = 'category-section';
-        section.setAttribute('data-category-id', category.id);
+  createCategorySection(category) {
+    const section = document.createElement('section');
+    section.className = 'category-section';
+    section.setAttribute('data-category-id', category.id);
 
-        const progress = this.getCategoryProgress(category.id);
-        const scenarios = getCategoryScenarios(category.id);
-        
-        section.innerHTML = `
+    const progress = this.getCategoryProgress(category.id);
+    const scenarios = getCategoryScenarios(category.id);
+
+    section.innerHTML = `
             <div class="category-header">
                 <div class="category-title-group">
                     <div class="category-icon-large" style="background-color: ${category.color}20; color: ${category.color}">
@@ -107,13 +114,13 @@ class CategoryGrid {
             </div>
         `;
 
-        return section;
-    }
+    return section;
+  }
 
-    createScenarioCard(scenario, category) {
-        const isCompleted = this.userProgress[category.id]?.[scenario.id] || false;
-        
-        return `
+  createScenarioCard(scenario, category) {
+    const isCompleted = this.userProgress[category.id]?.[scenario.id] || false;
+
+    return `
             <article class="scenario-card ${isCompleted ? 'completed' : ''}" 
                      data-scenario-id="${scenario.id}" 
                      data-category-id="${category.id}"
@@ -147,191 +154,214 @@ class CategoryGrid {
                 ${isCompleted ? '<div class="scenario-completed-badge">✓</div>' : ''}
             </article>
         `;
-    }
+  }
 
-    attachEventListeners() {
-        this.container.addEventListener('click', this.handleScenarioClick.bind(this));
-        this.container.addEventListener('keydown', this.handleScenarioKeydown.bind(this));
-    }
+  attachEventListeners() {
+    this.container.addEventListener(
+      'click',
+      this.handleScenarioClick.bind(this)
+    );
+    this.container.addEventListener(
+      'keydown',
+      this.handleScenarioKeydown.bind(this)
+    );
+  }
 
-    handleScenarioClick(event) {
-        const scenarioCard = event.target.closest('.scenario-card');
-        if (!scenarioCard) return;
+  handleScenarioClick(event) {
+    const scenarioCard = event.target.closest('.scenario-card');
+    if (!scenarioCard) return;
 
+    const scenarioId = scenarioCard.getAttribute('data-scenario-id');
+    const categoryId = scenarioCard.getAttribute('data-category-id');
+    this.openScenario(categoryId, scenarioId);
+  }
+
+  handleScenarioKeydown(event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      const scenarioCard = event.target.closest('.scenario-card');
+      if (scenarioCard) {
         const scenarioId = scenarioCard.getAttribute('data-scenario-id');
         const categoryId = scenarioCard.getAttribute('data-category-id');
         this.openScenario(categoryId, scenarioId);
+      }
+    }
+  }
+
+  openScenario(categoryId, scenarioId) {
+    const category = this.categories.find(c => c.id === categoryId);
+    const scenario = category?.scenarios.find(s => s.id === scenarioId);
+
+    if (!category || !scenario) {
+      logger.error('Category or scenario not found:', categoryId, scenarioId);
+      return;
     }
 
-    handleScenarioKeydown(event) {
-        if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            const scenarioCard = event.target.closest('.scenario-card');
-            if (scenarioCard) {
-                const scenarioId = scenarioCard.getAttribute('data-scenario-id');
-                const categoryId = scenarioCard.getAttribute('data-category-id');
-                this.openScenario(categoryId, scenarioId);
-            }
-        }
+    logger.info('Opening premodal for category:', category);
+
+    // Dispatch custom event for other components to listen to
+    const event = new CustomEvent('scenario-selected', {
+      detail: { category, scenario, categoryId, scenarioId },
+    });
+    document.dispatchEvent(event);
+
+    // Open the PreLaunchModal configured for this category
+    this.openCategoryPremodal(category, scenario);
+  }
+
+  openCategoryPremodal(category, scenario) {
+    try {
+      // Use the category ID as the "simulation ID" and pass category/scenario data
+      const preModal = new PreLaunchModal(category.id, {
+        categoryData: category,
+        scenarioData: scenario,
+        onLaunch: () => {
+          logger.info('Starting scenario:', scenario.title);
+          // Launch the scenario modal with both category and scenario IDs
+          this.openScenarioModal(scenario.id, category.id);
+        },
+        onCancel: () => {
+          logger.info('Category premodal cancelled');
+        },
+        showEducatorResources: true,
+      });
+
+      preModal.show();
+    } catch (error) {
+      logger.error('Failed to open category premodal:', error);
+      // Fallback to simple alert
+      alert(
+        `Opening "${scenario.title}" from ${category.title} - Premodal setup needed for categories!`
+      );
     }
+  }
 
-    openScenario(categoryId, scenarioId) {
-        const category = this.categories.find(c => c.id === categoryId);
-        const scenario = category?.scenarios.find(s => s.id === scenarioId);
-        
-        if (!category || !scenario) {
-            logger.error('Category or scenario not found:', categoryId, scenarioId);
-            return;
-        }
+  /**
+   * Open scenario modal for a specific scenario
+   */
+  openScenarioModal(scenarioId, categoryId = null) {
+    try {
+      const scenarioModal = new ScenarioModal();
+      scenarioModal.open(scenarioId, categoryId);
 
-        logger.info('Opening premodal for category:', category);
-        
-        // Dispatch custom event for other components to listen to
-        const event = new CustomEvent('scenario-selected', {
-            detail: { category, scenario, categoryId, scenarioId }
+      // Listen for scenario completion
+      document.addEventListener(
+        'scenario-completed',
+        this.handleScenarioCompleted.bind(this),
+        { once: true }
+      );
+    } catch (error) {
+      logger.error('Failed to open scenario modal:', error);
+      // Fallback to alert
+      alert(`Failed to open scenario modal for: ${scenarioId}`);
+    }
+  }
+
+  /**
+   * Handle scenario completion event
+   */
+  handleScenarioCompleted(event) {
+    const { scenarioId, selectedOption, option } = event.detail;
+
+    logger.info('Scenario completed:', {
+      scenarioId,
+      selectedOption,
+      optionText: option.text,
+    });
+
+    // Find the category that contains this scenario
+    const category = this.categories.find(cat => {
+      const scenarios = getCategoryScenarios(cat.id);
+      return scenarios.some(scenario => scenario.id === scenarioId);
+    });
+
+    if (category) {
+      // Update progress
+      this.updateProgress(category.id, scenarioId, true);
+
+      // Track analytics if available
+      if (window.AnalyticsManager) {
+        window.AnalyticsManager.trackEvent('scenario_completed', {
+          categoryId: category.id,
+          scenarioId,
+          selectedOption,
+          optionText: option.text,
+          impact: option.impact,
         });
-        document.dispatchEvent(event);
+      }
+    }
+  }
 
-        // Open the PreLaunchModal configured for this category
-        this.openCategoryPremodal(category, scenario);
+  updateProgress(categoryId, scenarioId, completed = true) {
+    if (!this.userProgress[categoryId]) {
+      this.userProgress[categoryId] = {};
     }
 
-    openCategoryPremodal(category, scenario) {
-        try {
-            // Use the category ID as the "simulation ID" and pass category/scenario data
-            const preModal = new PreLaunchModal(category.id, {
-                categoryData: category,
-                scenarioData: scenario,
-                onLaunch: () => {
-                    logger.info('Starting scenario:', scenario.title);
-                    // Launch the scenario modal with both category and scenario IDs
-                    this.openScenarioModal(scenario.id, category.id);
-                },
-                onCancel: () => {
-                    logger.info('Category premodal cancelled');
-                },
-                showEducatorResources: true
-            });
-            
-            preModal.show();
-        } catch (error) {
-            logger.error('Failed to open category premodal:', error);
-            // Fallback to simple alert
-            alert(`Opening "${scenario.title}" from ${category.title} - Premodal setup needed for categories!`);
-        }
+    this.userProgress[categoryId][scenarioId] = completed;
+    this.saveUserProgress();
+
+    // Re-render to update progress indicators
+    this.render();
+  }
+
+  getFilteredCategories(filter = {}) {
+    let filtered = [...this.categories];
+
+    if (filter.difficulty) {
+      filtered = filtered.filter(c => c.difficulty === filter.difficulty);
     }
 
-    /**
-     * Open scenario modal for a specific scenario
-     */
-    openScenarioModal(scenarioId, categoryId = null) {
-        try {
-            const scenarioModal = new ScenarioModal();
-            scenarioModal.open(scenarioId, categoryId);
-            
-            // Listen for scenario completion
-            document.addEventListener('scenario-completed', this.handleScenarioCompleted.bind(this), { once: true });
-            
-        } catch (error) {
-            logger.error('Failed to open scenario modal:', error);
-            // Fallback to alert
-            alert(`Failed to open scenario modal for: ${scenarioId}`);
-        }
+    if (filter.tags) {
+      filtered = filtered.filter(c =>
+        filter.tags.some(tag => c.tags.includes(tag))
+      );
     }
 
-    /**
-     * Handle scenario completion event
-     */
-    handleScenarioCompleted(event) {
-        const { scenarioId, selectedOption, option } = event.detail;
-        
-        logger.info('Scenario completed:', {
-            scenarioId,
-            selectedOption,
-            optionText: option.text
-        });
-        
-        // Find the category that contains this scenario
-        const category = this.categories.find(cat => {
-            const scenarios = getCategoryScenarios(cat.id);
-            return scenarios.some(scenario => scenario.id === scenarioId);
-        });
-        
-        if (category) {
-            // Update progress
-            this.updateProgress(category.id, scenarioId, true);
-            
-            // Track analytics if available
-            if (window.AnalyticsManager) {
-                window.AnalyticsManager.trackEvent('scenario_completed', {
-                    categoryId: category.id,
-                    scenarioId,
-                    selectedOption,
-                    optionText: option.text,
-                    impact: option.impact
-                });
-            }
-        }
+    if (filter.completed !== undefined) {
+      filtered = filtered.filter(c => {
+        const progress = this.getCategoryProgress(c.id);
+        return filter.completed
+          ? progress.completed === progress.total
+          : progress.completed < progress.total;
+      });
     }
 
-    updateProgress(categoryId, scenarioId, completed = true) {
-        if (!this.userProgress[categoryId]) {
-            this.userProgress[categoryId] = {};
-        }
-        
-        this.userProgress[categoryId][scenarioId] = completed;
-        this.saveUserProgress();
-        
-        // Re-render to update progress indicators
-        this.render();
+    return filtered;
+  }
+
+  // Public API for external components
+  refreshProgress() {
+    this.userProgress = this.loadUserProgress();
+    this.render();
+  }
+
+  highlightScenario(categoryId, scenarioId) {
+    const card = this.container.querySelector(
+      `[data-category-id="${categoryId}"][data-scenario-id="${scenarioId}"]`
+    );
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.classList.add('scenario-card-highlighted');
+      setTimeout(
+        () => card.classList.remove('scenario-card-highlighted'),
+        HIGHLIGHT_DURATION
+      );
     }
+  }
 
-    getFilteredCategories(filter = {}) {
-        let filtered = [...this.categories];
-
-        if (filter.difficulty) {
-            filtered = filtered.filter(c => c.difficulty === filter.difficulty);
-        }
-
-        if (filter.tags) {
-            filtered = filtered.filter(c => 
-                filter.tags.some(tag => c.tags.includes(tag))
-            );
-        }
-
-        if (filter.completed !== undefined) {
-            filtered = filtered.filter(c => {
-                const progress = this.getCategoryProgress(c.id);
-                return filter.completed ? progress.completed === progress.total : progress.completed < progress.total;
-            });
-        }
-
-        return filtered;
+  highlightCategory(categoryId) {
+    const section = this.container.querySelector(
+      `[data-category-id="${categoryId}"]`
+    );
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      section.classList.add('category-section-highlighted');
+      setTimeout(
+        () => section.classList.remove('category-section-highlighted'),
+        HIGHLIGHT_DURATION
+      );
     }
-
-    // Public API for external components
-    refreshProgress() {
-        this.userProgress = this.loadUserProgress();
-        this.render();
-    }
-
-    highlightScenario(categoryId, scenarioId) {
-        const card = this.container.querySelector(`[data-category-id="${categoryId}"][data-scenario-id="${scenarioId}"]`);
-        if (card) {
-            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            card.classList.add('scenario-card-highlighted');
-            setTimeout(() => card.classList.remove('scenario-card-highlighted'), HIGHLIGHT_DURATION);
-        }
-    }
-
-    highlightCategory(categoryId) {
-        const section = this.container.querySelector(`[data-category-id="${categoryId}"]`);
-        if (section) {
-            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            section.classList.add('category-section-highlighted');
-            setTimeout(() => section.classList.remove('category-section-highlighted'), HIGHLIGHT_DURATION);
-        }
-    }
+  }
 }
 
 export default CategoryGrid;

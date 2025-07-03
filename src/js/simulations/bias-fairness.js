@@ -11,21 +11,23 @@ import logger from '../utils/logger.js';
 // Simple helper functions
 const Helpers = {
   random: {
-    choice: (array) => array[Math.floor(Math.random() * array.length)]
-  }
+    choice: array => array[Math.floor(Math.random() * array.length)],
+  },
 };
 
-class BiasSimulation extends EthicsSimulation {  constructor(id) {
+class BiasSimulation extends EthicsSimulation {
+  constructor(id) {
     super(id, {
       title: 'Algorithmic Bias in Hiring',
-      description: 'Explore how AI systems can perpetuate bias in hiring decisions',
+      description:
+        'Explore how AI systems can perpetuate bias in hiring decisions',
       learningObjectives: [
         'Understand how training data affects AI decisions',
         'Recognize different types of bias in AI systems',
-        'Explore strategies for creating fairer algorithms'
+        'Explore strategies for creating fairer algorithms',
       ],
       difficulty: 'intermediate',
-      estimatedTime: 15
+      estimatedTime: 15,
     });
 
     this.candidates = [];
@@ -34,34 +36,34 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     this.biasSettings = {
       genderBias: 0.5,
       educationBias: 0.3,
-      experienceBias: 0.7
+      experienceBias: 0.7,
     };
-    
+
     // Canvas management
     this.canvasIds = {
       controls: null,
       metrics: null,
-      analytics: null
+      analytics: null,
     };
-  }  // Override the base init method to match expected interface
+  } // Override the base init method to match expected interface
   init(engineInstance) {
     logger.debug('BiasSimulation.init() called with engine:', engineInstance);
-    
+
     this.engine = engineInstance;
-    
+
     logger.debug('Generating candidates...');
     this.generateCandidates();
     logger.debug(`Generated ${this.candidates.length} candidates`);
-    
+
     logger.debug('Setting up UI...');
     this.setupUI();
     logger.debug('UI setup completed');
-    
+
     // Skip parent's UI setup since we have our own
     // Just do the basic initialization without UI components that expect specific engine config
     this.startTime = Date.now();
     this.emit('simulation:initialized');
-    
+
     logger.debug('BiasSimulation initialization complete');
     return this;
   }
@@ -69,11 +71,16 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     try {
       const firstNames = {
         male: ['James', 'John', 'Robert', 'Michael', 'William'],
-        female: ['Mary', 'Patricia', 'Jennifer', 'Linda', 'Elizabeth']
+        female: ['Mary', 'Patricia', 'Jennifer', 'Linda', 'Elizabeth'],
       };
 
       const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones'];
-      const schools = ['State University', 'Community College', 'Ivy League', 'Technical Institute'];
+      const schools = [
+        'State University',
+        'Community College',
+        'Ivy League',
+        'Technical Institute',
+      ];
       const positions = ['Junior Developer', 'Senior Developer', 'Team Lead'];
 
       this.candidates = [];
@@ -81,7 +88,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         const gender = Math.random() > 0.5 ? 'male' : 'female';
         const firstName = Helpers.random.choice(firstNames[gender]);
         const lastName = Helpers.random.choice(lastNames);
-        
+
         const candidate = {
           id: i,
           name: `${firstName} ${lastName}`,
@@ -90,7 +97,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
           experience: Math.floor(Math.random() * 10) + 1,
           skills: Math.floor(Math.random() * 100) + 1,
           previousRole: Helpers.random.choice(positions),
-          qualificationScore: Math.floor(Math.random() * 100) + 1
+          qualificationScore: Math.floor(Math.random() * 100) + 1,
         };
 
         this.candidates.push(candidate);
@@ -99,9 +106,10 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       logger.error('Error generating candidates:', error);
       this.candidates = []; // Fallback to empty array
     }
-  }  setupUI() {
+  }
+  setupUI() {
     logger.debug('BiasSimulation.setupUI() called');
-    
+
     try {
       // Force basic UI for now to avoid canvas cleanup issues
       // Enhanced UI with canvases is being cleaned up prematurely
@@ -117,7 +125,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
   setupEnhancedUI() {
     // Integration with Visual Engine and Enhanced Objects
     logger.debug('Setting up enhanced UI with visual engine');
-    
+
     try {
       // Create main container
       const container = document.createElement('div');
@@ -132,41 +140,52 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
 
       // Enhanced ethics meters using visual engine
       this.setupEnhancedMeters(container);
-      
+
       // Enhanced controls
       this.setupEnhancedControls(container);
-      
+
       // Results display
       this.setupResultsDisplay(container);
 
       if (this.container) {
-        logger.debug('Clearing and setting up enhanced container:', this.container);
-        logger.debug('Container innerHTML before clearing:', this.container.innerHTML);
-        
+        logger.debug(
+          'Clearing and setting up enhanced container:',
+          this.container
+        );
+        logger.debug(
+          'Container innerHTML before clearing:',
+          this.container.innerHTML
+        );
+
         // Force complete cleanup of container
         while (this.container.firstChild) {
           this.container.removeChild(this.container.firstChild);
         }
-        
+
         // Clear any residual text content
         this.container.textContent = '';
-        
+
         // Reset all attributes and properties
         this.container.className = 'simulation-container';
         this.container.removeAttribute('aria-busy');
         this.container.removeAttribute('aria-label');
         this.container.removeAttribute('role');
         this.container.style.cssText = '';
-        
+
         // Force a DOM reflow to ensure cleanup
         this.container.offsetHeight;
-        
-        logger.debug('Container innerHTML after clearing:', this.container.innerHTML);
+
+        logger.debug(
+          'Container innerHTML after clearing:',
+          this.container.innerHTML
+        );
         logger.debug('Appending enhanced UI to container:', this.container);
         this.container.appendChild(container);
         logger.debug('Enhanced UI successfully appended');
       } else {
-        logger.error('No container available for enhanced UI, falling back to basic UI');
+        logger.error(
+          'No container available for enhanced UI, falling back to basic UI'
+        );
         this.setupBasicUI();
       }
     } catch (error) {
@@ -174,7 +193,8 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       logger.debug('Falling back to basic UI');
       this.setupBasicUI();
     }
-  }  setupEnhancedMeters(parentContainer) {
+  }
+  setupEnhancedMeters(parentContainer) {
     try {
       const metersPanel = document.createElement('div');
       metersPanel.className = 'enhanced-meters-panel';
@@ -195,9 +215,9 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         width: 240,
         height: 300,
         container: metricsContainer,
-        className: 'bias-metrics-canvas'
+        className: 'bias-metrics-canvas',
       });
-      
+
       this.canvasIds.metrics = id;
 
       // Create visual engine for metrics
@@ -220,7 +240,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
   }
   setupBasicUI() {
     logger.debug('BiasSimulation.setupBasicUI() called');
-    
+
     try {
       // Create a simple UI compatibility layer for the engine
       this.ui = {
@@ -248,20 +268,21 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
           const button = document.createElement('button');
           button.textContent = options.text || 'Button';
           button.className = `btn ${options.className || 'btn-primary'}`;
-          if (options.onClick) button.addEventListener('click', options.onClick);
+          if (options.onClick)
+            button.addEventListener('click', options.onClick);
           return button;
         },
         createSlider: (options = {}) => {
           const container = document.createElement('div');
           container.className = 'slider-container';
-          
+
           if (options.label) {
             const label = document.createElement('label');
             label.textContent = options.label;
             label.className = 'slider-label';
             container.appendChild(label);
           }
-          
+
           const slider = document.createElement('input');
           slider.type = 'range';
           slider.min = options.min || 0;
@@ -269,11 +290,13 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
           slider.step = options.step || 1;
           slider.value = options.value || 50;
           slider.className = 'slider-input';
-          
+
           if (options.onChange) {
-            slider.addEventListener('input', (e) => options.onChange(parseFloat(e.target.value)));
+            slider.addEventListener('input', e =>
+              options.onChange(parseFloat(e.target.value))
+            );
           }
-            container.appendChild(slider);
+          container.appendChild(slider);
           return { container, slider };
         },
         showFeedback: (options = {}) => {
@@ -285,27 +308,27 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
             background: rgba(0,0,0,0.7); display: flex; align-items: center;
             justify-content: center; z-index: 1000;
           `;
-          
+
           const content = document.createElement('div');
           content.className = 'feedback-content';
           content.style.cssText = `
             background: white; padding: 30px; border-radius: 8px;
             max-width: 500px; margin: 20px; text-align: center;
           `;
-          
+
           if (options.title) {
             const title = document.createElement('h3');
             title.textContent = options.title;
             content.appendChild(title);
           }
-          
+
           if (options.message) {
             const message = document.createElement('p');
             message.style.whiteSpace = 'pre-line';
             message.textContent = options.message;
             content.appendChild(message);
           }
-          
+
           if (options.actionText) {
             const button = document.createElement('button');
             button.textContent = options.actionText;
@@ -317,35 +340,39 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
             };
             content.appendChild(button);
           }
-          
+
           modal.appendChild(content);
           document.body.appendChild(modal);
-          
+
           // Close on background click
-          modal.onclick = (e) => {
+          modal.onclick = e => {
             if (e.target === modal) {
               document.body.removeChild(modal);
             }
           };
-        }
+        },
       };
 
       // Get simulation container from engine with improved fallback logic
       logger.debug('Engine instance:', this.engine);
       logger.debug('Engine container:', this.engine?.container);
-      
+
       // Try multiple container sources
-      this.container = this.engine?.container || 
-                      document.getElementById('simulation-container') ||
-                      document.querySelector('.simulation-container') ||
-                      document.querySelector('main') ||
-                      document.querySelector('#app') ||
-                      document.body;
-      
+      this.container =
+        this.engine?.container ||
+        document.getElementById('simulation-container') ||
+        document.querySelector('.simulation-container') ||
+        document.querySelector('main') ||
+        document.querySelector('#app') ||
+        document.body;
+
       logger.debug('Container resolved to:', this.container);
       logger.debug('Container type:', this.container?.tagName);
-      logger.debug('Container exists in DOM:', document.contains(this.container));
-      
+      logger.debug(
+        'Container exists in DOM:',
+        document.contains(this.container)
+      );
+
       if (!this.container) {
         logger.error('No simulation container available - cannot proceed');
         return;
@@ -353,148 +380,179 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
 
       const container = this.ui.createElement('div', {
         className: 'bias-simulation-container',
-        style: 'display: flex !important; gap: 20px; height: 100% !important; padding: 20px; background: white !important; border: 2px solid red !important; min-height: 400px !important; width: 100% !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 1000 !important;'
+        style:
+          'display: flex !important; gap: 20px; height: 100% !important; padding: 20px; background: white !important; border: 2px solid red !important; min-height: 400px !important; width: 100% !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 1000 !important;',
       });
 
       logger.debug('Created main container element:', container);
       logger.debug('Container styles:', container.style.cssText);
 
-    // Control Panel
-    const controlPanel = this.ui.createPanel({
-      title: 'Algorithm Settings',
-      className: 'controls-panel',
-      style: 'width: 300px; background: lightblue; border: 2px solid blue;'
-    });
-    logger.debug('Created control panel:', controlPanel);
-
-    // Bias sliders
-    Object.keys(this.biasSettings).forEach(biasType => {
-      const slider = this.ui.createSlider({
-        label: this.formatBiasLabel(biasType),
-        min: 0,
-        max: 1,
-        step: 0.1,
-        value: this.biasSettings[biasType],
-        onChange: (value) => {
-          this.biasSettings[biasType] = value;
-          this.updateBiasDisplay();
-        }
+      // Control Panel
+      const controlPanel = this.ui.createPanel({
+        title: 'Algorithm Settings',
+        className: 'controls-panel',
+        style: 'width: 300px; background: lightblue; border: 2px solid blue;',
       });
-      controlPanel.appendChild(slider.container);
-    });
+      logger.debug('Created control panel:', controlPanel);
 
-    // Run button
-    const runButton = this.ui.createButton({
-      text: 'Run Hiring Algorithm',
-      onClick: () => this.runHiringRound(),
-      className: 'primary-button'
-    });
-    controlPanel.appendChild(runButton);
+      // Bias sliders
+      Object.keys(this.biasSettings).forEach(biasType => {
+        const slider = this.ui.createSlider({
+          label: this.formatBiasLabel(biasType),
+          min: 0,
+          max: 1,
+          step: 0.1,
+          value: this.biasSettings[biasType],
+          onChange: value => {
+            this.biasSettings[biasType] = value;
+            this.updateBiasDisplay();
+          },
+        });
+        controlPanel.appendChild(slider.container);
+      });
 
-    // Results Panel
-    const resultsPanel = this.ui.createPanel({
-      title: 'Hiring Results',
-      className: 'results-panel',
-      style: 'flex: 1; background: lightgreen; border: 2px solid green;'
-    });
-    logger.debug('Created results panel:', resultsPanel);
+      // Run button
+      const runButton = this.ui.createButton({
+        text: 'Run Hiring Algorithm',
+        onClick: () => this.runHiringRound(),
+        className: 'primary-button',
+      });
+      controlPanel.appendChild(runButton);
 
-    this.resultsContainer = this.ui.createElement('div', {
-      className: 'results-container',
-      innerHTML: '<p style="color: black; font-weight: bold;">Click "Run Hiring Algorithm" to see results</p>'
-    });
-    resultsPanel.appendChild(this.resultsContainer);
+      // Results Panel
+      const resultsPanel = this.ui.createPanel({
+        title: 'Hiring Results',
+        className: 'results-panel',
+        style: 'flex: 1; background: lightgreen; border: 2px solid green;',
+      });
+      logger.debug('Created results panel:', resultsPanel);
 
-    // Statistics Panel
-    const statsPanel = this.ui.createPanel({
-      title: 'Bias Metrics',
-      className: 'stats-panel',
-      style: 'width: 250px; background: lightyellow; border: 2px solid orange;'
-    });
-    logger.debug('Created stats panel:', statsPanel);
+      this.resultsContainer = this.ui.createElement('div', {
+        className: 'results-container',
+        innerHTML:
+          '<p style="color: black; font-weight: bold;">Click "Run Hiring Algorithm" to see results</p>',
+      });
+      resultsPanel.appendChild(this.resultsContainer);
 
-    this.statsContainer = this.ui.createElement('div', {
-      className: 'stats-container',
-      innerHTML: '<p style="color: black; font-weight: bold;">Statistics will appear here</p>'
-    });
-    statsPanel.appendChild(this.statsContainer);
+      // Statistics Panel
+      const statsPanel = this.ui.createPanel({
+        title: 'Bias Metrics',
+        className: 'stats-panel',
+        style:
+          'width: 250px; background: lightyellow; border: 2px solid orange;',
+      });
+      logger.debug('Created stats panel:', statsPanel);
 
-    // Append all panels to the main container
-    logger.debug('Appending panels to main container...');
-    container.appendChild(controlPanel);
-    logger.debug('Control panel appended');
-    container.appendChild(resultsPanel);
-    logger.debug('Results panel appended');
-    container.appendChild(statsPanel);
-    logger.debug('Stats panel appended');
-    logger.debug('Main container children count:', container.children.length);
+      this.statsContainer = this.ui.createElement('div', {
+        className: 'stats-container',
+        innerHTML:
+          '<p style="color: black; font-weight: bold;">Statistics will appear here</p>',
+      });
+      statsPanel.appendChild(this.statsContainer);
 
-    // Ensure container is properly available and clear it first
-    if (this.container) {
-      logger.debug('Clearing and setting up container:', this.container);
-      logger.debug('Container innerHTML before clearing:', this.container.innerHTML);
-      
-      // Force complete cleanup of container
-      while (this.container.firstChild) {
-        this.container.removeChild(this.container.firstChild);
-      }
-      
-      // Clear any residual text content
-      this.container.textContent = '';
-      
-      // Reset all attributes and properties and force visibility
-      this.container.className = 'simulation-container bias-simulation-active';
-      this.container.removeAttribute('aria-busy');
-      this.container.removeAttribute('aria-label');
-      this.container.removeAttribute('role');
-      this.container.style.cssText = 'flex: 1 !important; display: block !important; align-items: stretch !important; justify-content: stretch !important; background: #f0f0f0 !important; min-height: 400px !important; overflow: visible !important; visibility: visible !important; opacity: 1 !important; position: relative !important; padding: 0 !important;';
-      
-      // Force a DOM reflow to ensure cleanup
-      this.container.offsetHeight;
-      
-      logger.debug('Container innerHTML after clearing:', this.container.innerHTML);
-      logger.debug('Appending main UI container to simulation container...');
-      logger.debug('Main container element:', container);
-      logger.debug('Simulation container element:', this.container);
-      this.container.appendChild(container);
-      logger.debug('Final simulation container HTML:', this.container.innerHTML);
-      logger.debug('Container computed styles:', window.getComputedStyle(this.container));
-      logger.debug('Container bounding rect:', this.container.getBoundingClientRect());
-      
-      // Debug the inner bias-simulation-container
-      const biasContainer = this.container.querySelector('.bias-simulation-container');
-      if (biasContainer) {
-        logger.debug('Bias container found:', biasContainer);
-        logger.debug('Bias container bounding rect:', biasContainer.getBoundingClientRect());
-        
-        const computedStyles = window.getComputedStyle(biasContainer);
-        logger.debug('Bias container visibility:', computedStyles.visibility);
-        logger.debug('Bias container display:', computedStyles.display);
-        logger.debug('Bias container opacity:', computedStyles.opacity);
-        logger.debug('Bias container overflow:', computedStyles.overflow);
-        logger.debug('Bias container z-index:', computedStyles.zIndex);
-        logger.debug('Bias container position:', computedStyles.position);
-        logger.debug('Bias container color:', computedStyles.color);
-        logger.debug('Bias container background-color:', computedStyles.backgroundColor);
-        logger.debug('Bias container border:', computedStyles.border);
-        
-        // Fix container sizing and overflow issues
-        biasContainer.style.cssText += '; height: auto !important; max-height: 100% !important; overflow: auto !important; box-sizing: border-box !important;';
-        logger.debug('Applied container size fixes');
-        
-        // Ensure the parent simulation container can accommodate the content
-        if (container) {
-          container.style.cssText += '; height: auto !important; min-height: 500px !important; max-height: 80vh !important; overflow: auto !important;';
-          logger.debug('Applied simulation container size fixes');
+      // Append all panels to the main container
+      logger.debug('Appending panels to main container...');
+      container.appendChild(controlPanel);
+      logger.debug('Control panel appended');
+      container.appendChild(resultsPanel);
+      logger.debug('Results panel appended');
+      container.appendChild(statsPanel);
+      logger.debug('Stats panel appended');
+      logger.debug('Main container children count:', container.children.length);
+
+      // Ensure container is properly available and clear it first
+      if (this.container) {
+        logger.debug('Clearing and setting up container:', this.container);
+        logger.debug(
+          'Container innerHTML before clearing:',
+          this.container.innerHTML
+        );
+
+        // Force complete cleanup of container
+        while (this.container.firstChild) {
+          this.container.removeChild(this.container.firstChild);
         }
+
+        // Clear any residual text content
+        this.container.textContent = '';
+
+        // Reset all attributes and properties and force visibility
+        this.container.className =
+          'simulation-container bias-simulation-active';
+        this.container.removeAttribute('aria-busy');
+        this.container.removeAttribute('aria-label');
+        this.container.removeAttribute('role');
+        this.container.style.cssText =
+          'flex: 1 !important; display: block !important; align-items: stretch !important; justify-content: stretch !important; background: #f0f0f0 !important; min-height: 400px !important; overflow: visible !important; visibility: visible !important; opacity: 1 !important; position: relative !important; padding: 0 !important;';
+
+        // Force a DOM reflow to ensure cleanup
+        this.container.offsetHeight;
+
+        logger.debug(
+          'Container innerHTML after clearing:',
+          this.container.innerHTML
+        );
+        logger.debug('Appending main UI container to simulation container...');
+        logger.debug('Main container element:', container);
+        logger.debug('Simulation container element:', this.container);
+        this.container.appendChild(container);
+        logger.debug(
+          'Final simulation container HTML:',
+          this.container.innerHTML
+        );
+        logger.debug(
+          'Container computed styles:',
+          window.getComputedStyle(this.container)
+        );
+        logger.debug(
+          'Container bounding rect:',
+          this.container.getBoundingClientRect()
+        );
+
+        // Debug the inner bias-simulation-container
+        const biasContainer = this.container.querySelector(
+          '.bias-simulation-container'
+        );
+        if (biasContainer) {
+          logger.debug('Bias container found:', biasContainer);
+          logger.debug(
+            'Bias container bounding rect:',
+            biasContainer.getBoundingClientRect()
+          );
+
+          const computedStyles = window.getComputedStyle(biasContainer);
+          logger.debug('Bias container visibility:', computedStyles.visibility);
+          logger.debug('Bias container display:', computedStyles.display);
+          logger.debug('Bias container opacity:', computedStyles.opacity);
+          logger.debug('Bias container overflow:', computedStyles.overflow);
+          logger.debug('Bias container z-index:', computedStyles.zIndex);
+          logger.debug('Bias container position:', computedStyles.position);
+          logger.debug('Bias container color:', computedStyles.color);
+          logger.debug(
+            'Bias container background-color:',
+            computedStyles.backgroundColor
+          );
+          logger.debug('Bias container border:', computedStyles.border);
+
+          // Fix container sizing and overflow issues
+          biasContainer.style.cssText +=
+            '; height: auto !important; max-height: 100% !important; overflow: auto !important; box-sizing: border-box !important;';
+          logger.debug('Applied container size fixes');
+
+          // Ensure the parent simulation container can accommodate the content
+          if (container) {
+            container.style.cssText +=
+              '; height: auto !important; min-height: 500px !important; max-height: 80vh !important; overflow: auto !important;';
+            logger.debug('Applied simulation container size fixes');
+          }
+        } else {
+          logger.error('Bias container not found in DOM!');
+        }
+
+        logger.debug('UI successfully appended to container');
       } else {
-        logger.error('Bias container not found in DOM!');
+        logger.error('Simulation container not available');
       }
-      
-      logger.debug('UI successfully appended to container');
-    } else {
-      logger.error('Simulation container not available');
-    }
     } catch (error) {
       logger.error('Error setting up UI:', error);
     }
@@ -504,7 +562,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     const labels = {
       genderBias: 'Gender Bias',
       educationBias: 'Education Bias',
-      experienceBias: 'Experience Bias'
+      experienceBias: 'Experience Bias',
     };
     return labels[biasType] || biasType;
   }
@@ -519,41 +577,41 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     this.recordMetrics(hired);
     this.displayResults(hired);
     this.updateStatistics();
-    
+
     this.currentRound++;
-    
+
     // Trigger scenario event
     this.triggerEvent('hiringDecision', {
       round: this.currentRound,
       hired: hired.length,
-      biasSettings: { ...this.biasSettings }
+      biasSettings: { ...this.biasSettings },
     });
   }
 
   simulateHiring() {
     const candidates = [...this.candidates];
     const positionsAvailable = 5;
-    
+
     // Apply bias to scores
     candidates.forEach(candidate => {
       let biasedScore = candidate.qualificationScore;
-      
+
       // Gender bias
       if (candidate.gender === 'male') {
         biasedScore += this.biasSettings.genderBias * 20;
       }
-      
+
       // Education bias (favor prestigious schools)
       if (candidate.education === 'Ivy League') {
         biasedScore += this.biasSettings.educationBias * 15;
       }
-      
+
       // Experience bias
       biasedScore += this.biasSettings.experienceBias * candidate.experience;
-      
+
       candidate.biasedScore = Math.min(100, biasedScore);
     });
-    
+
     // Sort by biased score and select top candidates
     candidates.sort((a, b) => b.biasedScore - a.biasedScore);
     return candidates.slice(0, positionsAvailable);
@@ -563,22 +621,25 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     if (!candidatesDisplay) return;
 
     candidatesDisplay.innerHTML = '';
-    
+
     // Update round progress
     this.updateRoundProgress();
-    
+
     // Create interactive candidate cards
     hired.forEach((candidate, index) => {
-      const candidateCard = this.createInteractiveCandidateCard(candidate, index);
+      const candidateCard = this.createInteractiveCandidateCard(
+        candidate,
+        index
+      );
       candidatesDisplay.appendChild(candidateCard);
     });
-    
+
     // Add comparison with rejected candidates
     this.addRejectedCandidatesSection(candidatesDisplay, hired);
-    
+
     // Update analytics chart
     this.updateAnalyticsChart();
-    
+
     // Animate the new results
     this.animateResults();
   }
@@ -587,10 +648,10 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     const card = document.createElement('div');
     card.className = 'candidate-card interactive';
     card.setAttribute('data-candidate-id', candidate.id);
-    
+
     // Calculate bias contribution
     const biasBreakdown = this.calculateBiasBreakdown(candidate);
-    
+
     card.innerHTML = `
       <div class="candidate-header">
         <div class="candidate-avatar">
@@ -640,10 +701,10 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         </button>
       </div>
     `;
-    
+
     // Add hover effects and interactions
     this.addCandidateInteractions(card, candidate);
-    
+
     return card;
   }
 
@@ -653,44 +714,66 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       education: 0,
       experience: 0,
       age: 0,
-      total: candidate.biasedScore - candidate.qualificationScore
+      total: candidate.biasedScore - candidate.qualificationScore,
     };
-    
+
     // Gender bias contribution
     if (candidate.gender === 'male') {
       breakdown.gender = this.biasSettings.genderBias * 20;
     }
-    
+
     // Education bias contribution
     if (candidate.education === 'Ivy League') {
       breakdown.education = this.biasSettings.educationBias * 15;
     }
-    
+
     // Experience bias contribution
-    breakdown.experience = this.biasSettings.experienceBias * candidate.experience;
-    
+    breakdown.experience =
+      this.biasSettings.experienceBias * candidate.experience;
+
     // Age bias contribution (simulate age data)
     const simulatedAge = 22 + candidate.experience + Math.random() * 10;
     if (simulatedAge < 30) {
       breakdown.age = this.biasSettings.ageBias * 10;
     }
-    
+
     return breakdown;
   }
 
   renderBiasFactors(breakdown) {
     const factors = [
-      { key: 'gender', label: 'Gender', value: breakdown.gender, color: '#E91E63' },
-      { key: 'education', label: 'Education', value: breakdown.education, color: '#2196F3' },
-      { key: 'experience', label: 'Experience', value: breakdown.experience, color: '#FF9800' },
-      { key: 'age', label: 'Age', value: breakdown.age, color: '#9C27B0' }
+      {
+        key: 'gender',
+        label: 'Gender',
+        value: breakdown.gender,
+        color: '#E91E63',
+      },
+      {
+        key: 'education',
+        label: 'Education',
+        value: breakdown.education,
+        color: '#2196F3',
+      },
+      {
+        key: 'experience',
+        label: 'Experience',
+        value: breakdown.experience,
+        color: '#FF9800',
+      },
+      { key: 'age', label: 'Age', value: breakdown.age, color: '#9C27B0' },
     ];
-    
-    return factors.map(factor => {
-      const impact = factor.value > 0 ? 'positive' : factor.value < 0 ? 'negative' : 'neutral';
-      const width = Math.abs(factor.value) / 20 * 100; // Max 20 point bias
-      
-      return `
+
+    return factors
+      .map(factor => {
+        const impact =
+          factor.value > 0
+            ? 'positive'
+            : factor.value < 0
+              ? 'negative'
+              : 'neutral';
+        const width = (Math.abs(factor.value) / 20) * 100; // Max 20 point bias
+
+        return `
         <div class="bias-factor ${impact}">
           <div class="factor-header">
             <span class="factor-label">${factor.label}</span>
@@ -703,7 +786,8 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
           </div>
         </div>
       `;
-    }).join('');
+      })
+      .join('');
   }
 
   addCandidateInteractions(card, candidate) {
@@ -712,14 +796,14 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       card.classList.add('hovered');
       this.highlightBiasFactors(candidate);
     });
-    
+
     card.addEventListener('mouseleave', () => {
       card.classList.remove('hovered');
       this.clearBiasHighlights();
     });
-    
+
     // Click to expand/collapse details
-    card.addEventListener('click', (e) => {
+    card.addEventListener('click', e => {
       if (!e.target.classList.contains('candidate-action-btn')) {
         card.classList.toggle('expanded');
       }
@@ -729,7 +813,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
   highlightBiasFactors(candidate) {
     // Highlight corresponding bias sliders
     const biasBreakdown = this.calculateBiasBreakdown(candidate);
-    
+
     Object.keys(biasBreakdown).forEach(factor => {
       const slider = this.biasSliders?.get(`${factor}-bias`);
       if (slider) {
@@ -747,12 +831,16 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
   addRejectedCandidatesSection(container, hired) {
     const rejectedSection = document.createElement('div');
     rejectedSection.className = 'rejected-candidates-section';
-    
+
     const rejected = this.candidates
       .filter(c => !hired.find(h => h.id === c.id))
-      .sort((a, b) => (b.biasedScore || b.qualificationScore) - (a.biasedScore || a.qualificationScore))
+      .sort(
+        (a, b) =>
+          (b.biasedScore || b.qualificationScore) -
+          (a.biasedScore || a.qualificationScore)
+      )
       .slice(0, 3); // Show top 3 rejected candidates
-    
+
     rejectedSection.innerHTML = `
       <div class="section-header">
         <h5>Top Rejected Candidates</h5>
@@ -761,7 +849,9 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         </button>
       </div>
       <div class="rejected-grid">
-        ${rejected.map(candidate => `
+        ${rejected
+          .map(
+            candidate => `
           <div class="rejected-card">
             <div class="rejected-info">
               <span class="rejected-name">${candidate.name}</span>
@@ -771,28 +861,33 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
               <span class="reason-text">${this.getTopRejectionReason(candidate)}</span>
             </div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
     `;
-    
+
     container.appendChild(rejectedSection);
   }
 
   getTopRejectionReason(candidate) {
     const reasons = [];
-    
+
     if (candidate.gender === 'female' && this.biasSettings.genderBias > 0.3) {
       reasons.push('Gender bias');
     }
-    
-    if (candidate.education !== 'Ivy League' && this.biasSettings.educationBias > 0.3) {
+
+    if (
+      candidate.education !== 'Ivy League' &&
+      this.biasSettings.educationBias > 0.3
+    ) {
       reasons.push('Education bias');
     }
-    
+
     if (candidate.experience < 5 && this.biasSettings.experienceBias > 0.5) {
       reasons.push('Experience requirement');
     }
-    
+
     return reasons.length > 0 ? reasons[0] : 'Lower overall score';
   }
 
@@ -800,16 +895,16 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     const progressFill = document.getElementById('round-progress');
     const progressText = document.getElementById('progress-text');
     const roundTitle = document.getElementById('round-title');
-    
+
     if (progressFill) {
       const progress = (this.currentRound / this.totalRounds) * 100;
       progressFill.style.width = `${progress}%`;
     }
-    
+
     if (progressText) {
       progressText.textContent = `${this.currentRound} / ${this.totalRounds} rounds`;
     }
-    
+
     if (roundTitle) {
       roundTitle.textContent = `Round ${this.currentRound} Results`;
     }
@@ -820,7 +915,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     cards.forEach((card, index) => {
       card.style.opacity = '0';
       card.style.transform = 'translateY(20px)';
-      
+
       setTimeout(() => {
         card.style.transition = 'all 0.5s ease';
         card.style.opacity = '1';
@@ -902,7 +997,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     // Add close functionality
     const closeBtn = modal.querySelector('.modal-close');
     const overlay = modal.querySelector('.modal-overlay');
-    
+
     [closeBtn, overlay].forEach(element => {
       element.addEventListener('click', () => {
         document.body.removeChild(modal);
@@ -916,8 +1011,10 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     const metrics = {
       genderBalance: this.calculateGenderBalance(hired),
       educationDiversity: this.calculateEducationDiversity(hired),
-      averageExperience: hired.reduce((sum, c) => sum + c.experience, 0) / hired.length,
-      averageOriginalScore: hired.reduce((sum, c) => sum + c.qualificationScore, 0) / hired.length
+      averageExperience:
+        hired.reduce((sum, c) => sum + c.experience, 0) / hired.length,
+      averageOriginalScore:
+        hired.reduce((sum, c) => sum + c.qualificationScore, 0) / hired.length,
     };
 
     this.updateMetrics(metrics);
@@ -934,10 +1031,10 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
   }
   updateStatistics() {
     const allMetrics = this.getMetrics();
-    
+
     // Update enhanced metrics if available
     this.updateEnhancedMetrics();
-    
+
     // Update basic statistics display
     if (this.statsContainer) {
       this.statsContainer.innerHTML = `
@@ -977,7 +1074,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
 
   showFinalResults() {
     const finalMetrics = this.getMetrics();
-    
+
     this.ui.showFeedback({
       type: 'success',
       title: 'Simulation Complete!',
@@ -992,7 +1089,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         Reflect on how your algorithm settings affected the outcomes.
       `,
       actionText: 'Try Again',
-      onAction: () => this.reset()
+      onAction: () => this.reset(),
     });
   }
 
@@ -1002,37 +1099,47 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
   cleanup() {
     try {
       logger.debug('BiasSimulation cleanup called');
-      
+
       // Clear container content first
       if (this.container) {
         logger.debug('Cleaning up container:', this.container);
-        logger.debug('Container innerHTML before cleanup:', this.container.innerHTML);
-        
+        logger.debug(
+          'Container innerHTML before cleanup:',
+          this.container.innerHTML
+        );
+
         // Force complete cleanup of container
         while (this.container.firstChild) {
           this.container.removeChild(this.container.firstChild);
         }
-        
+
         // Clear any residual text content
         this.container.textContent = '';
-        
+
         // Reset all attributes and properties
         this.container.className = 'simulation-container';
         this.container.removeAttribute('aria-busy');
         this.container.removeAttribute('aria-label');
         this.container.removeAttribute('role');
         this.container.style.cssText = '';
-        
+
         // Force a DOM reflow to ensure cleanup
         this.container.offsetHeight;
-        
-        logger.debug('Container innerHTML after cleanup:', this.container.innerHTML);
+
+        logger.debug(
+          'Container innerHTML after cleanup:',
+          this.container.innerHTML
+        );
       }
 
       // Only remove canvases if they were actually created
       if (this.canvasIds) {
         Object.entries(this.canvasIds).forEach(([key, canvasId]) => {
-          if (canvasId && CanvasManager.canvases && CanvasManager.canvases.has(canvasId)) {
+          if (
+            canvasId &&
+            CanvasManager.canvases &&
+            CanvasManager.canvases.has(canvasId)
+          ) {
             logger.debug(`Removing canvas: ${key} -> ${canvasId}`);
             CanvasManager.removeCanvas(canvasId);
           }
@@ -1042,7 +1149,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         this.canvasIds = {
           controls: null,
           metrics: null,
-          analytics: null
+          analytics: null,
         };
       }
 
@@ -1070,15 +1177,15 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
   reset() {
     // Cleanup canvases first
     this.cleanup();
-    
+
     // Call parent reset method
     super.reset();
-    
+
     // Reset simulation-specific data
     this.currentRound = 0;
     this.clearMetrics();
     this.generateCandidates();
-    
+
     // Reset UI displays
     const candidatesDisplay = document.getElementById('candidates-display');
     if (candidatesDisplay) {
@@ -1102,17 +1209,17 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         </div>
       `;
     }
-    
+
     // Reset progress
     this.updateRoundProgress();
-    
+
     // Reset chart data
     if (this.chartData) {
       this.chartData = {
         rounds: [],
         genderBalance: [],
         educationDiversity: [],
-        overallFairness: []
+        overallFairness: [],
       };
     }
 
@@ -1132,10 +1239,10 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
 
   getReflectionQuestions() {
     return [
-      "How did adjusting bias parameters affect the diversity of hired candidates?",
-      "What are the trade-offs between different types of bias in hiring algorithms?",
-      "How might you design a fairer hiring algorithm?",
-      "What real-world factors contribute to bias in AI hiring systems?"
+      'How did adjusting bias parameters affect the diversity of hired candidates?',
+      'What are the trade-offs between different types of bias in hiring algorithms?',
+      'How might you design a fairer hiring algorithm?',
+      'What real-world factors contribute to bias in AI hiring systems?',
     ];
   }
 
@@ -1143,25 +1250,25 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
   setupEthicsDisplay() {
     // Override parent method - we handle ethics display in our custom UI
   }
-  
+
   loadScenario(index) {
     // Override parent method - we don't use scenarios in this simulation
     this.currentScenario = index;
   }
-  
+
   emit(eventName, data = {}) {
     // Simple event emitter for compatibility
     if (this.events && this.events.has(eventName)) {
       this.events.get(eventName).forEach(callback => callback(data));
     }
   }
-  
+
   updateMetrics(metrics) {
     // Store metrics for statistics display
     if (!this.metricsHistory) this.metricsHistory = [];
     this.metricsHistory.push({ ...metrics, timestamp: Date.now() });
   }
-  
+
   getMetrics() {
     // Return latest metrics or default values
     if (this.metricsHistory && this.metricsHistory.length > 0) {
@@ -1171,14 +1278,14 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       genderBalance: 0.5,
       educationDiversity: 0.5,
       averageExperience: 5,
-      averageOriginalScore: 50
+      averageOriginalScore: 50,
     };
   }
-  
+
   clearMetrics() {
     this.metricsHistory = [];
   }
-  
+
   triggerEvent(eventName, data) {
     // Track simulation events
     logger.debug(`Simulation event: ${eventName}`, data);
@@ -1189,20 +1296,24 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       // Create visual engine for this canvas
       this.metricsEngine = await CanvasManager.createVisualEngine(canvasId, {
         renderMode: 'canvas',
-        accessibility: true
+        accessibility: true,
       });
 
       // Import enhanced objects
       const { EthicsMeter } = await import('../objects/enhanced-objects.js');
-      
+
       // Create bias metrics meters
-      const metrics = ['genderBalance', 'educationDiversity', 'overallFairness'];
-      
+      const metrics = [
+        'genderBalance',
+        'educationDiversity',
+        'overallFairness',
+      ];
+
       metrics.forEach((metric, index) => {
         const meter = new EthicsMeter({
           id: `bias-${metric}`,
           x: 20,
-          y: 50 + (index * 80),
+          y: 50 + index * 80,
           width: 200,
           height: 60,
           label: this.formatMetricLabel(metric),
@@ -1211,7 +1322,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
           ariaLabel: `${metric} bias metric`,
           showLabel: true,
           showValue: true,
-          animated: true
+          animated: true,
         });
 
         this.metricsEngine.scene.add(meter);
@@ -1227,7 +1338,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     const labels = {
       genderBalance: 'Gender Balance',
       educationDiversity: 'Education Diversity',
-      overallFairness: 'Overall Fairness'
+      overallFairness: 'Overall Fairness',
     };
     return labels[metric] || metric;
   }
@@ -1235,8 +1346,8 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
   getMetricColor(metric) {
     const colors = {
       genderBalance: '#4CAF50',
-      educationDiversity: '#2196F3', 
-      overallFairness: '#FF9800'
+      educationDiversity: '#2196F3',
+      overallFairness: '#FF9800',
     };
     return colors[metric] || '#9E9E9E';
   }
@@ -1245,18 +1356,21 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     if (!this.biasMeters) return;
 
     const metrics = this.getMetrics();
-    
+
     // Update gender balance meter
     const genderFairness = 1 - Math.abs(0.5 - metrics.genderBalance);
     this.biasMeters.get('genderBalance')?.setValue(genderFairness, true);
-    
+
     // Update education diversity meter
-    this.biasMeters.get('educationDiversity')?.setValue(metrics.educationDiversity, true);
-    
+    this.biasMeters
+      .get('educationDiversity')
+      ?.setValue(metrics.educationDiversity, true);
+
     // Calculate overall fairness
     const overallFairness = (genderFairness + metrics.educationDiversity) / 2;
     this.biasMeters.get('overallFairness')?.setValue(overallFairness, true);
-  }  setupEnhancedControls(parentContainer) {
+  }
+  setupEnhancedControls(parentContainer) {
     const controlsPanel = document.createElement('div');
     controlsPanel.className = 'enhanced-controls-panel panel';
     controlsPanel.innerHTML = `
@@ -1291,19 +1405,21 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     `;
 
     // Create managed canvas for controls
-    const controlsContainer = controlsPanel.querySelector('#controls-container');
+    const controlsContainer = controlsPanel.querySelector(
+      '#controls-container'
+    );
     const { id } = CanvasManager.createCanvas({
       width: 260,
       height: 400,
       container: controlsContainer,
-      className: 'bias-controls-canvas'
+      className: 'bias-controls-canvas',
     });
-    
+
     this.canvasIds.controls = id;
 
     // Create enhanced interactive controls
     this.createEnhancedSliders(id);
-    
+
     parentContainer.appendChild(controlsPanel);
   }
   async createEnhancedSliders(canvasId) {
@@ -1311,12 +1427,14 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       // Create visual engine for controls
       this.controlsEngine = await CanvasManager.createVisualEngine(canvasId, {
         renderMode: 'canvas',
-        accessibility: true
+        accessibility: true,
       });
 
       // Import enhanced objects
-      const { InteractiveSlider, InteractiveButton } = await import('../objects/enhanced-objects.js');
-      
+      const { InteractiveSlider, InteractiveButton } = await import(
+        '../objects/enhanced-objects.js'
+      );
+
       this.createBiasSliders(InteractiveSlider);
       this.createActionButtons(InteractiveButton);
     } catch (error) {
@@ -1332,7 +1450,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         value: this.biasSettings.genderBias,
         y: 50,
         color: '#E91E63',
-        description: 'Affects preference for male vs female candidates'
+        description: 'Affects preference for male vs female candidates',
       },
       {
         id: 'education-bias',
@@ -1340,7 +1458,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         value: this.biasSettings.educationBias,
         y: 140,
         color: '#2196F3',
-        description: 'Favors prestigious educational institutions'
+        description: 'Favors prestigious educational institutions',
       },
       {
         id: 'experience-bias',
@@ -1348,7 +1466,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         value: this.biasSettings.experienceBias,
         y: 230,
         color: '#FF9800',
-        description: 'Overweights years of experience'
+        description: 'Overweights years of experience',
       },
       {
         id: 'age-bias',
@@ -1356,12 +1474,12 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         value: 0.2,
         y: 320,
         color: '#9C27B0',
-        description: 'Preference for younger candidates'
-      }
+        description: 'Preference for younger candidates',
+      },
     ];
 
     this.biasSliders = new Map();
-    
+
     sliderConfigs.forEach(config => {
       const slider = new InteractiveSlider({
         id: config.id,
@@ -1379,12 +1497,12 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         showValue: true,
         animated: true,
         ariaLabel: `${config.label}: ${config.description}`,
-        onChange: (value) => this.handleBiasChange(config.id, value)
+        onChange: value => this.handleBiasChange(config.id, value),
       });
 
       this.controlsEngine.scene.add(slider);
       this.biasSliders.set(config.id, slider);
-      
+
       // Store bias value
       if (config.id === 'age-bias') {
         this.biasSettings.ageBias = config.value;
@@ -1402,7 +1520,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         width: 100,
         height: 35,
         color: '#4CAF50',
-        onClick: () => this.runHiringRound()
+        onClick: () => this.runHiringRound(),
       },
       {
         id: 'reset-simulation',
@@ -1412,12 +1530,12 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         width: 100,
         height: 35,
         color: '#F44336',
-        onClick: () => this.resetSimulation()
-      }
+        onClick: () => this.resetSimulation(),
+      },
     ];
 
     this.actionButtons = new Map();
-    
+
     buttonConfigs.forEach(config => {
       const button = new InteractiveButton({
         id: config.id,
@@ -1429,7 +1547,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         color: config.color,
         textColor: 'white',
         ariaLabel: config.text,
-        onClick: config.onClick
+        onClick: config.onClick,
       });
 
       this.controlsEngine.scene.add(button);
@@ -1439,7 +1557,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
 
   handleBiasChange(biasType, value) {
     // Update bias settings
-    switch(biasType) {
+    switch (biasType) {
       case 'gender-bias':
         this.biasSettings.genderBias = value;
         break;
@@ -1456,7 +1574,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
 
     // Update real-time preview
     this.updateBiasPreview();
-    
+
     // Update analytics
     this.trackBiasAdjustment(biasType, value);
   }
@@ -1465,7 +1583,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     // Real-time preview of bias effects
     const previewCandidates = this.candidates.slice(0, 5);
     const rankedCandidates = this.simulateHiring(previewCandidates);
-    
+
     // Update diversity score display
     const diversityScore = this.calculateDiversityScore(rankedCandidates);
     const diversityElement = document.getElementById('diversity-score');
@@ -1473,7 +1591,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       diversityElement.textContent = this.getDiversityLabel(diversityScore);
       diversityElement.className = `stat-value ${this.getDiversityClass(diversityScore)}`;
     }
-    
+
     // Animate bias meters
     this.updateEnhancedMetrics();
   }
@@ -1506,7 +1624,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         value,
         timestamp: Date.now(),
         currentRound: this.currentRound,
-        scenario: this.getCurrentScenario()
+        scenario: this.getCurrentScenario(),
       });
     }
   }
@@ -1592,10 +1710,10 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
 
     // Setup tab functionality
     this.setupResultsTabs(resultsPanel);
-    
+
     // Setup analytics chart
     this.setupAnalyticsChart(resultsPanel);
-    
+
     parentContainer.appendChild(resultsPanel);
   }
 
@@ -1606,14 +1724,14 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     tabButtons.forEach(button => {
       button.addEventListener('click', () => {
         const targetTab = button.dataset.tab;
-        
+
         // Update active states
         tabButtons.forEach(btn => btn.classList.remove('active'));
         tabContents.forEach(content => content.classList.remove('active'));
-        
+
         button.classList.add('active');
         panel.querySelector(`#${targetTab}-tab`).classList.add('active');
-        
+
         // Load tab-specific content
         this.loadTabContent(targetTab);
       });
@@ -1634,9 +1752,9 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       width: 400,
       height: 300,
       container: chartContainer,
-      className: 'analytics-chart-canvas'
+      className: 'analytics-chart-canvas',
     });
-    
+
     this.canvasIds.analytics = id;
 
     try {
@@ -1650,7 +1768,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       // Create visual engine for analytics
       this.analyticsEngine = await CanvasManager.createVisualEngine(canvasId, {
         renderMode: 'canvas',
-        accessibility: true
+        accessibility: true,
       });
 
       // Initialize chart data
@@ -1658,7 +1776,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         rounds: [],
         genderBalance: [],
         educationDiversity: [],
-        overallFairness: []
+        overallFairness: [],
       };
 
       this.renderAnalyticsChart();
@@ -1675,20 +1793,20 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
 
     const { canvas } = this.analyticsEngine;
     const ctx = canvas.getContext('2d');
-    
+
     // Chart dimensions
     const padding = 40;
-    const chartWidth = canvas.width - (padding * 2);
-    const chartHeight = canvas.height - (padding * 2);
-    
+    const chartWidth = canvas.width - padding * 2;
+    const chartHeight = canvas.height - padding * 2;
+
     // Draw chart background
     ctx.fillStyle = '#f8f9fa';
     ctx.fillRect(padding, padding, chartWidth, chartHeight);
-    
+
     // Draw grid lines
     ctx.strokeStyle = '#e0e0e0';
     ctx.lineWidth = 1;
-    
+
     // Vertical grid lines
     for (let i = 0; i <= this.totalRounds; i++) {
       const x = padding + (i / this.totalRounds) * chartWidth;
@@ -1697,7 +1815,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       ctx.lineTo(x, padding + chartHeight);
       ctx.stroke();
     }
-    
+
     // Horizontal grid lines
     for (let i = 0; i <= 10; i++) {
       const y = padding + (i / 10) * chartHeight;
@@ -1706,20 +1824,35 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       ctx.lineTo(padding + chartWidth, y);
       ctx.stroke();
     }
-    
+
     // Draw data lines if we have data
     if (this.chartData.rounds.length > 0) {
-      this.drawDataLine(ctx, this.chartData.genderBalance, '#E91E63', 'Gender Balance');
-      this.drawDataLine(ctx, this.chartData.educationDiversity, '#2196F3', 'Education Diversity');
-      this.drawDataLine(ctx, this.chartData.overallFairness, '#4CAF50', 'Overall Fairness');
+      this.drawDataLine(
+        ctx,
+        this.chartData.genderBalance,
+        '#E91E63',
+        'Gender Balance'
+      );
+      this.drawDataLine(
+        ctx,
+        this.chartData.educationDiversity,
+        '#2196F3',
+        'Education Diversity'
+      );
+      this.drawDataLine(
+        ctx,
+        this.chartData.overallFairness,
+        '#4CAF50',
+        'Overall Fairness'
+      );
     }
-    
+
     // Draw labels
     ctx.fillStyle = '#333';
     ctx.font = '12px Arial';
     ctx.textAlign = 'center';
     ctx.fillText('Rounds', canvas.width / 2, canvas.height - 10);
-    
+
     ctx.save();
     ctx.translate(15, canvas.height / 2);
     ctx.rotate(-Math.PI / 2);
@@ -1732,8 +1865,8 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
 
     const { canvas } = this.analyticsEngine;
     const padding = 40;
-    const chartWidth = canvas.width - (padding * 2);
-    const chartHeight = canvas.height - (padding * 2);
+    const chartWidth = canvas.width - padding * 2;
+    const chartHeight = canvas.height - padding * 2;
 
     ctx.strokeStyle = color;
     ctx.lineWidth = 3;
@@ -1742,7 +1875,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     data.forEach((value, index) => {
       const x = padding + (index / (this.totalRounds - 1)) * chartWidth;
       const y = padding + (1 - value) * chartHeight;
-      
+
       if (index === 0) {
         ctx.moveTo(x, y);
       } else {
@@ -1757,7 +1890,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     data.forEach((value, index) => {
       const x = padding + (index / (this.totalRounds - 1)) * chartWidth;
       const y = padding + (1 - value) * chartHeight;
-      
+
       ctx.beginPath();
       ctx.arc(x, y, 4, 0, Math.PI * 2);
       ctx.fill();
@@ -1766,19 +1899,22 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
 
   updateAnalyticsChart() {
     const metrics = this.getMetrics();
-    
+
     // Add data point
     this.chartData.rounds.push(this.currentRound);
-    this.chartData.genderBalance.push(1 - Math.abs(0.5 - metrics.genderBalance));
+    this.chartData.genderBalance.push(
+      1 - Math.abs(0.5 - metrics.genderBalance)
+    );
     this.chartData.educationDiversity.push(metrics.educationDiversity);
     this.chartData.overallFairness.push(
-      (this.chartData.genderBalance[this.chartData.genderBalance.length - 1] + 
-       metrics.educationDiversity) / 2
+      (this.chartData.genderBalance[this.chartData.genderBalance.length - 1] +
+        metrics.educationDiversity) /
+        2
     );
 
     // Re-render chart
     this.renderAnalyticsChart();
-    
+
     // Update insights
     this.updateInsights();
   }
@@ -1788,66 +1924,73 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     if (!insightsList) return;
 
     const insights = this.generateInsights();
-    insightsList.innerHTML = insights.map(insight => 
-      `<li class="insight-item ${insight.type}">
+    insightsList.innerHTML = insights
+      .map(
+        insight =>
+          `<li class="insight-item ${insight.type}">
         <span class="insight-icon">${insight.icon}</span>
         <span>${insight.text}</span>
       </li>`
-    ).join('');
+      )
+      .join('');
   }
 
   generateInsights() {
     const insights = [];
     const metrics = this.getMetrics();
-    
+
     // Gender balance insights
     const genderFairness = 1 - Math.abs(0.5 - metrics.genderBalance);
     if (genderFairness < 0.3) {
       insights.push({
         type: 'warning',
         icon: '⚠️',
-        text: 'Significant gender bias detected. Consider reducing gender bias parameter.'
+        text: 'Significant gender bias detected. Consider reducing gender bias parameter.',
       });
     } else if (genderFairness > 0.8) {
       insights.push({
         type: 'success',
         icon: '✅',
-        text: 'Excellent gender balance achieved!'
+        text: 'Excellent gender balance achieved!',
       });
     }
-    
+
     // Education diversity insights
     if (metrics.educationDiversity < 0.4) {
       insights.push({
         type: 'warning',
         icon: '🎓',
-        text: 'Low education diversity. Algorithm may be favoring prestigious schools.'
+        text: 'Low education diversity. Algorithm may be favoring prestigious schools.',
       });
     }
-    
+
     // Experience bias insights
     if (this.biasSettings.experienceBias > 0.8) {
       insights.push({
         type: 'info',
         icon: '💼',
-        text: 'High experience bias may exclude qualified junior candidates.'
+        text: 'High experience bias may exclude qualified junior candidates.',
       });
     }
-    
+
     // Age bias insights
     if (this.biasSettings.ageBias > 0.5) {
       insights.push({
         type: 'warning',
         icon: '👴',
-        text: 'Age bias detected. This may violate anti-discrimination laws.'
+        text: 'Age bias detected. This may violate anti-discrimination laws.',
       });
     }
 
-    return insights.length > 0 ? insights : [{
-      type: 'info',
-      icon: '📊',
-      text: 'Continue running rounds to generate more insights.'
-    }];
+    return insights.length > 0
+      ? insights
+      : [
+          {
+            type: 'info',
+            icon: '📊',
+            text: 'Continue running rounds to generate more insights.',
+          },
+        ];
   }
 
   saveConfiguration() {
@@ -1857,16 +2000,16 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       biasSettings: { ...this.biasSettings },
       timestamp: new Date().toLocaleString(),
       scenario: this.getCurrentScenario(),
-      results: this.metricsHistory ? [...this.metricsHistory] : []
+      results: this.metricsHistory ? [...this.metricsHistory] : [],
     };
 
     if (!this.savedConfigurations) {
       this.savedConfigurations = [];
     }
-    
+
     this.savedConfigurations.push(config);
     this.updateComparisonDisplay();
-    
+
     // Show success feedback
     this.showConfigurationSaved(config.name);
   }
@@ -1880,9 +2023,9 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         <span class="notification-text">Configuration "${configName}" saved!</span>
       </div>
     `;
-    
+
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
       notification.style.opacity = '0';
       setTimeout(() => {
@@ -1892,7 +2035,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
   }
   updateComparisonDisplay() {
     const comparisonDisplay = document.getElementById('comparison-display');
-    
+
     if (!comparisonDisplay || !this.savedConfigurations) return;
 
     if (this.savedConfigurations.length === 0) {
@@ -1915,7 +2058,9 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         </button>
       </div>
       <div class="configurations-grid">
-        ${this.savedConfigurations.map((config, _index) => `
+        ${this.savedConfigurations
+          .map(
+            (config, _index) => `
           <div class="config-card" data-config-id="${config.id}">
             <div class="config-header">
               <h6>${config.name}</h6>
@@ -1944,7 +2089,9 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
               </button>
             </div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
     `;
   }
@@ -1955,36 +2102,39 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
 
     // Update bias settings
     this.biasSettings = { ...config.biasSettings };
-    
+
     // Update sliders
     this.biasSliders?.forEach((slider, key) => {
       const biasKey = key.replace('-bias', '');
-      const value = this.biasSettings[`${biasKey}Bias`] || this.biasSettings[biasKey];
+      const value =
+        this.biasSettings[`${biasKey}Bias`] || this.biasSettings[biasKey];
       if (value !== undefined) {
         slider.setValue(value, true);
       }
     });
-    
+
     // Update scenario
     const scenarioSelect = document.getElementById('scenario-select');
     if (scenarioSelect && config.scenario) {
       scenarioSelect.value = config.scenario;
     }
-    
+
     // Show feedback
     this.ui.showFeedback({
       type: 'info',
       title: 'Configuration Loaded',
       message: `Configuration "${config.name}" has been loaded. You can now run the simulation with these settings.`,
       actionText: 'Run Simulation',
-      onAction: () => this.runHiringRound()
+      onAction: () => this.runHiringRound(),
     });
   }
 
   deleteConfiguration(configId) {
     if (!this.savedConfigurations) return;
-    
-    this.savedConfigurations = this.savedConfigurations.filter(c => c.id !== configId);
+
+    this.savedConfigurations = this.savedConfigurations.filter(
+      c => c.id !== configId
+    );
     this.updateComparisonDisplay();
   }
 
@@ -1994,7 +2144,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         type: 'warning',
         title: 'Need More Configurations',
         message: 'Save at least 2 configurations to enable comparison.',
-        actionText: 'OK'
+        actionText: 'OK',
       });
       return;
     }
@@ -2024,11 +2174,11 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     `;
 
     document.body.appendChild(modal);
-    
+
     // Setup close functionality
     const closeBtn = modal.querySelector('.modal-close');
     const overlay = modal.querySelector('.modal-overlay');
-    
+
     [closeBtn, overlay].forEach(element => {
       element.addEventListener('click', () => {
         document.body.removeChild(modal);
@@ -2042,8 +2192,15 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
   generateComparisonTable() {
     if (!this.savedConfigurations) return '';
 
-    const headers = ['Configuration', 'Gender Bias', 'Education Bias', 'Experience Bias', 'Avg Gender Balance', 'Avg Ed. Diversity'];
-    
+    const headers = [
+      'Configuration',
+      'Gender Bias',
+      'Education Bias',
+      'Experience Bias',
+      'Avg Gender Balance',
+      'Avg Ed. Diversity',
+    ];
+
     return `
       <table class="comparison-table">
         <thead>
@@ -2052,15 +2209,24 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
           </tr>
         </thead>
         <tbody>
-          ${this.savedConfigurations.map(config => {
-            const avgGenderBalance = config.results.length > 0 
-              ? config.results.reduce((sum, r) => sum + (1 - Math.abs(0.5 - r.genderBalance)), 0) / config.results.length 
-              : 0;
-            const avgEdDiversity = config.results.length > 0
-              ? config.results.reduce((sum, r) => sum + r.educationDiversity, 0) / config.results.length
-              : 0;
-              
-            return `
+          ${this.savedConfigurations
+            .map(config => {
+              const avgGenderBalance =
+                config.results.length > 0
+                  ? config.results.reduce(
+                      (sum, r) => sum + (1 - Math.abs(0.5 - r.genderBalance)),
+                      0
+                    ) / config.results.length
+                  : 0;
+              const avgEdDiversity =
+                config.results.length > 0
+                  ? config.results.reduce(
+                      (sum, r) => sum + r.educationDiversity,
+                      0
+                    ) / config.results.length
+                  : 0;
+
+              return `
               <tr>
                 <td>${config.name}</td>
                 <td>${(config.biasSettings.genderBias * 100).toFixed(0)}%</td>
@@ -2070,7 +2236,8 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
                 <td class="metric-cell">${(avgEdDiversity * 100).toFixed(1)}%</td>
               </tr>
             `;
-          }).join('')}
+            })
+            .join('')}
         </tbody>
       </table>
     `;
@@ -2081,29 +2248,45 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
 
     const ctx = canvas.getContext('2d');
     const padding = 60;
-    const chartWidth = canvas.width - (padding * 2);
-    const chartHeight = canvas.height - (padding * 2);
+    const chartWidth = canvas.width - padding * 2;
+    const chartHeight = canvas.height - padding * 2;
 
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
     // Draw background
     ctx.fillStyle = '#f8f9fa';
     ctx.fillRect(padding, padding, chartWidth, chartHeight);
-    
+
     // Draw chart for each configuration
     const colors = ['#E91E63', '#2196F3', '#4CAF50', '#FF9800', '#9C27B0'];
-    
+
     this.savedConfigurations.forEach((config, index) => {
       const color = colors[index % colors.length];
-      this.drawConfigurationData(ctx, config, color, index, padding, chartWidth, chartHeight);
+      this.drawConfigurationData(
+        ctx,
+        config,
+        color,
+        index,
+        padding,
+        chartWidth,
+        chartHeight
+      );
     });
-    
+
     // Draw legend
     this.drawComparisonLegend(ctx, canvas.width, canvas.height);
   }
 
-  drawConfigurationData(ctx, config, color, index, padding, chartWidth, chartHeight) {
+  drawConfigurationData(
+    ctx,
+    config,
+    color,
+    index,
+    padding,
+    chartWidth,
+    chartHeight
+  ) {
     if (config.results.length === 0) return;
 
     ctx.strokeStyle = color;
@@ -2111,10 +2294,14 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     ctx.beginPath();
 
     config.results.forEach((result, resultIndex) => {
-      const x = padding + (resultIndex / Math.max(1, config.results.length - 1)) * chartWidth;
-      const fairnessScore = (1 - Math.abs(0.5 - result.genderBalance) + result.educationDiversity) / 2;
+      const x =
+        padding +
+        (resultIndex / Math.max(1, config.results.length - 1)) * chartWidth;
+      const fairnessScore =
+        (1 - Math.abs(0.5 - result.genderBalance) + result.educationDiversity) /
+        2;
       const y = padding + (1 - fairnessScore) * chartHeight;
-      
+
       if (resultIndex === 0) {
         ctx.moveTo(x, y);
       } else {
@@ -2128,15 +2315,15 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
   drawComparisonLegend(ctx, canvasWidth, canvasHeight) {
     const legendY = canvasHeight - 40;
     const colors = ['#E91E63', '#2196F3', '#4CAF50', '#FF9800', '#9C27B0'];
-    
+
     this.savedConfigurations.forEach((config, index) => {
       const color = colors[index % colors.length];
-      const x = 80 + (index * 150);
-      
+      const x = 80 + index * 150;
+
       // Draw color indicator
       ctx.fillStyle = color;
       ctx.fillRect(x, legendY, 15, 3);
-      
+
       // Draw text
       ctx.fillStyle = '#333';
       ctx.font = '12px Arial';
@@ -2145,7 +2332,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
   }
 
   loadTabContent(tabName) {
-    switch(tabName) {
+    switch (tabName) {
       case 'analytics':
         this.renderAnalyticsChart();
         break;
@@ -2160,7 +2347,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
     this.currentRound = 0;
     this.clearMetrics();
     this.generateCandidates();
-    
+
     // Reset UI displays
     const candidatesDisplay = document.getElementById('candidates-display');
     if (candidatesDisplay) {
@@ -2184,20 +2371,21 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
         </div>
       `;
     }
-    
+
     // Reset progress
     this.updateRoundProgress();
-    
+
     // Reset chart data
     if (this.chartData) {
       this.chartData = {
         rounds: [],
         genderBalance: [],
         educationDiversity: [],
-        overallFairness: []
-      };      this.renderAnalyticsChart();
+        overallFairness: [],
+      };
+      this.renderAnalyticsChart();
     }
-    
+
     // Reset enhanced meters
     this.biasMeters?.forEach(meter => {
       meter.setValue(0.5, true);
@@ -2209,22 +2397,22 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
   start() {
     try {
       logger.debug('BiasSimulation.start() called');
-      
+
       // Ensure we have candidates
       if (!this.candidates || this.candidates.length === 0) {
         logger.debug('No candidates found, generating...');
         this.generateCandidates();
       }
-      
+
       logger.debug(`Starting with ${this.candidates.length} candidates`);
-      
+
       // Update initial display
       logger.debug('Updating initial statistics...');
       this.updateStatistics();
-      
+
       // Emit start event
       this.emit('simulation:started');
-      
+
       logger.debug('BiasSimulation started successfully');
       return this;
     } catch (error) {
@@ -2262,7 +2450,7 @@ class BiasSimulation extends EthicsSimulation {  constructor(id) {
       biasSettings: { ...this.biasSettings },
       metrics: this.getMetrics(),
       isComplete: this.currentRound >= this.totalRounds,
-      isPaused: this.isPaused || false
+      isPaused: this.isPaused || false,
     };
   }
 
