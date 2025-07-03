@@ -249,42 +249,6 @@
   width: var(--modal-width-xl);
 }
 
-/* ===== SKIP OPTIONS (HORIZONTAL LAYOUT) ===== */
-.skip-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-2);
-  margin-top: var(--spacing-4);
-  padding: var(--spacing-3);
-  background: var(--color-gray-50);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-gray-200);
-}
-
-.skip-option {
-  flex: 0 0 auto;
-  padding: var(--spacing-2) var(--spacing-3);
-  background: var(--color-white);
-  border: 1px solid var(--color-gray-300);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  font-size: var(--font-size-sm);
-  color: var(--color-gray-700);
-  transition: all var(--transition-base);
-}
-
-.skip-option:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  background: var(--color-primary-light);
-}
-
-.skip-option.selected {
-  background: var(--color-primary);
-  color: var(--color-white);
-  border-color: var(--color-primary);
-}
-
 /* ===== SCENARIO SELECTION GRID ===== */
 .scenario-grid {
   display: grid;
@@ -426,7 +390,6 @@
 
 .modal-header button:focus,
 .modal-tab:focus,
-.skip-option:focus,
 .scenario-card:focus {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
@@ -437,7 +400,6 @@
   .modal-dialog,
   .modal-backdrop,
   .modal-tab,
-  .skip-option,
   .scenario-card {
     transition: none;
     animation: none;

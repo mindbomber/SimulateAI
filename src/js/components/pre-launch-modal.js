@@ -5,7 +5,6 @@
 
 import { getSimulationInfo } from '../data/simulation-info.js';
 import ModalUtility from './modal-utility.js';
-import { userPreferences } from '../utils/simple-storage.js';
 import { simpleAnalytics } from '../utils/simple-analytics.js';
 import {
   getRadarChartExplanation,
@@ -676,16 +675,6 @@ export default class PreLaunchModal {
   generateModalFooter() {
     return `
             <div class="pre-launch-footer">
-                <div class="skip-options">
-                    <label class="skip-option">
-                        <input type="checkbox" id="skip-for-this-sim" class="skip-checkbox">
-                        Don't show this for "${this.simulationInfo.title}" again
-                    </label>
-                    <label class="skip-option">
-                        <input type="checkbox" id="skip-all-prelaunches" class="skip-checkbox">
-                        Don't show pre-launch info for any simulation
-                    </label>
-                </div>
                 <div class="action-buttons">
                     <button type="button" class="btn-cancel" id="cancel-launch">
                         Maybe Later
@@ -820,9 +809,6 @@ export default class PreLaunchModal {
             onLaunch: typeof this.options.onLaunch,
           });
 
-          // Check skip preferences before launching
-          this.handleSkipPreferences();
-
           this.trackAnalytics('simulation_launched');
           this.close();
 
@@ -840,9 +826,6 @@ export default class PreLaunchModal {
 
       if (cancelButton) {
         cancelButton.addEventListener('click', () => {
-          // Check skip preferences even when cancelling
-          this.handleSkipPreferences();
-
           this.trackAnalytics('launch_cancelled');
           this.close();
           this.options.onCancel();
@@ -952,26 +935,6 @@ export default class PreLaunchModal {
       this.trackAnalytics('tab_switched', { tab: tabId });
     } catch (error) {
       logger.error('Error in switchTab:', error);
-    }
-  }
-
-  /**
-   * Handles skip preference checkboxes
-   */
-  handleSkipPreferences() {
-    const skipForThis = document.getElementById('skip-for-this-sim');
-    const skipAll = document.getElementById('skip-all-prelaunches');
-
-    if (skipForThis && skipForThis.checked) {
-      userPreferences.setSkipPreLaunchFor(this.simulationId, true);
-      this.trackAnalytics('skip_prelaunch_for_simulation', {
-        simulationId: this.simulationId,
-      });
-    }
-
-    if (skipAll && skipAll.checked) {
-      userPreferences.setSkipPreLaunchGlobally(true);
-      this.trackAnalytics('skip_prelaunch_globally');
     }
   }
 

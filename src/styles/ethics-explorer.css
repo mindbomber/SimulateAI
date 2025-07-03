@@ -188,10 +188,38 @@
 }
 
 .scenarios-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scroll-padding-left: 0; /* Ensures scroll snap starts at left edge */
   gap: 1.5rem;
   margin-bottom: 2rem;
+  padding: 1rem;
+  -webkit-overflow-scrolling: touch;
+  
+  /* Custom scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 transparent;
+}
+
+.scenarios-grid::-webkit-scrollbar {
+  height: 8px;
+}
+
+.scenarios-grid::-webkit-scrollbar-track {
+  background: #f7fafc;
+  border-radius: 4px;
+}
+
+.scenarios-grid::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 4px;
+}
+
+.scenarios-grid::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
 }
 
 .scenario-card {
@@ -207,6 +235,11 @@
   overflow: hidden;
   position: relative;
   border: 1px solid #e2e8f0;
+  
+  /* Horizontal scroll properties */
+  flex: 0 0 320px; /* Fixed width for horizontal scroll */
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 .scenario-card:hover {

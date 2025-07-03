@@ -21,6 +21,7 @@
   overflow: hidden;
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-base);
+  position: relative;
 }
 
 .category-section:hover {
@@ -30,6 +31,25 @@
 [data-theme='dark'] .category-section {
   background: var(--color-gray-800);
   border-color: var(--color-gray-700);
+}
+
+.category-section::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 60px;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.8));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  z-index: 1;
+}
+
+.category-section:hover::after {
+  opacity: 1;
 }
 
 /* Category Header */
@@ -181,10 +201,61 @@
 
 /* Scenarios Grid */
 .scenarios-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scroll-padding-left: 0; /* Ensures scroll snap starts at left edge */
   gap: var(--spacing-6);
   padding: var(--spacing-8);
+  padding-bottom: var(--spacing-10); /* Extra padding for scrollbar */
+  position: relative;
+  
+  /* Custom scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-gray-300) transparent;
+}
+
+.scenarios-grid::-webkit-scrollbar {
+  height: 8px;
+}
+
+.scenarios-grid::-webkit-scrollbar-track {
+  background: var(--color-gray-100);
+  border-radius: 4px;
+  margin: 0 var(--spacing-8);
+}
+
+.scenarios-grid::-webkit-scrollbar-thumb {
+  background: var(--color-gray-300);
+  border-radius: 4px;
+}
+
+.scenarios-grid::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-400);
+}
+
+.scenarios-grid::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  background: linear-gradient(to right, transparent, var(--color-white));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.scenarios-grid:hover::after {
+  opacity: 1;
+}
+
+/* Enhanced scroll behavior */
+.scenarios-grid {
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Scenario Cards */
@@ -201,6 +272,11 @@
   flex-direction: column;
   min-height: 280px;
   box-shadow: var(--shadow-sm);
+  
+  /* Horizontal scroll properties */
+  flex: 0 0 350px; /* Fixed width, don't grow or shrink */
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 .category-section .scenario-card:hover,
@@ -307,16 +383,51 @@
 
 /* Scenario Footer */
 .scenario-footer {
-  padding: var(--spacing-4) var(--spacing-5) var(--spacing-5);
-  border-top: 1px solid var(--color-gray-100);
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  border-top: 1px solid var(--color-gray-200);
+  background: var(--color-gray-50);
 }
 
-[data-theme='dark'] .scenario-footer {
-  border-top-color: var(--color-gray-600);
+/* Quick Start Button */
+.scenario-quick-start-btn {
+  background: var(--color-secondary);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  flex-shrink: 0;
 }
 
+.scenario-quick-start-btn:hover {
+  background: var(--color-secondary-dark);
+  transform: translateX(2px);
+}
+
+.scenario-quick-start-btn:focus {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+.scenario-quick-start-btn svg {
+  transition: transform var(--transition-base);
+}
+
+.scenario-quick-start-btn:hover svg {
+  transform: translateX(2px);
+}
+
+/* Adjust Learning Lab button for two-button layout */
 .scenario-start-btn {
   background: var(--color-primary);
   color: var(--color-white);
@@ -330,6 +441,8 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-2);
+  flex: 1;
+  min-width: 0;
 }
 
 .scenario-start-btn:hover {
@@ -366,6 +479,54 @@
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
   z-index: 10;
+}
+
+/* Optional scroll navigation buttons */
+.scroll-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--color-gray-300);
+  background: var(--color-white);
+  color: var(--color-gray-600);
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+  z-index: 2;
+}
+
+.scroll-nav-btn:hover {
+  background: var(--color-gray-50);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.scroll-nav-btn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.scroll-prev {
+  left: 10px;
+}
+
+.scroll-next {
+  right: 10px;
+}
+
+/* Hide scroll buttons on very small screens */
+@media (max-width: 480px) {
+  .scroll-nav-btn {
+    display: none;
+  }
 }
 
 /* Highlighted States */
@@ -444,9 +605,14 @@
   }
 
   .scenarios-grid {
-    grid-template-columns: 1fr;
     gap: var(--spacing-4);
-    padding: var(--spacing-6);
+    padding: var(--spacing-4);
+  }
+  
+  .category-section .scenario-card,
+  .simulations-grid .scenario-card {
+    flex: 0 0 280px; /* Smaller cards on mobile */
+    min-height: 260px;
   }
 
   .scenario-card {
@@ -483,6 +649,26 @@
 
   .scenario-footer {
     padding: var(--spacing-3) var(--spacing-4) var(--spacing-4);
+  }
+}
+
+/* Desktop responsive adjustments for scenarios grid */
+@media (min-width: 1200px) {
+  .scenarios-grid {
+    padding: var(--spacing-8) var(--spacing-12);
+  }
+  
+  .category-section .scenario-card,
+  .simulations-grid .scenario-card {
+    flex: 0 0 380px; /* Larger cards on large screens */
+    min-height: 300px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .category-section .scenario-card,
+  .simulations-grid .scenario-card {
+    flex: 0 0 400px; /* Even larger cards on extra large screens */
   }
 }
 

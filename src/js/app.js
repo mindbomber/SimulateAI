@@ -17,6 +17,7 @@ import { simpleAnalytics } from './utils/simple-analytics.js';
 import Helpers from './utils/helpers.js';
 import canvasManager from './utils/canvas-manager.js';
 import logger from './utils/logger.js';
+import { initializeHorizontalScroll } from './utils/horizontal-scroll.js';
 
 // Import enhanced objects (loaded dynamically as needed)
 // import { EthicsMeter, InteractiveButton, InteractiveSlider } from './objects/enhanced-objects.js';
@@ -212,6 +213,9 @@ class AIEthicsApp {
 
       // Initialize ethics radar demo
       await this.initializeEthicsRadarDemo();
+
+      // Initialize horizontal scroll functionality
+      initializeHorizontalScroll();
 
       this.isInitialized = true;
       AppDebug.log(
@@ -898,8 +902,15 @@ class AIEthicsApp {
         e.preventDefault();
         const simulationId = e.target.getAttribute('data-simulation');
         if (simulationId) {
-          // Explicitly bind context to ensure 'this' refers to the app instance
+          // Learning Lab button - go through pre-launch modal
           this.startSimulation.call(this, simulationId);
+        }
+      } else if (e.target.classList.contains('simulation-quick-start-btn')) {
+        e.preventDefault();
+        const simulationId = e.target.getAttribute('data-simulation');
+        if (simulationId) {
+          // Quick start button - skip pre-launch modal
+          this.launchSimulationDirect.call(this, simulationId);
         }
       }
     });
@@ -972,6 +983,9 @@ class AIEthicsApp {
                 }
                   <div class="card-actions">
                     <button class="btn btn-primary enhanced-sim-button" data-simulation="${simulation.id}">
+                        Learning Lab Simulation
+                    </button>
+                    <button class="btn btn-secondary simulation-quick-start-btn" data-simulation="${simulation.id}">
                         ${isCompleted ? 'Retry' : 'Start'} Simulation
                     </button>
                 </div>

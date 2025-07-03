@@ -143,10 +143,16 @@ class CategoryGrid {
                 </div>
 
                 <div class="scenario-footer">
-                    <button class="scenario-start-btn" aria-label="Start ${scenario.title} scenario">
-                        ${isCompleted ? 'Replay' : 'Start'}
+                    <button class="scenario-start-btn" aria-label="Learning Lab for ${scenario.title} scenario">
+                        Learning Lab
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                             <path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <button class="scenario-quick-start-btn" aria-label="${isCompleted ? 'Replay' : 'Start'} ${scenario.title} scenario">
+                        ${isCompleted ? 'Replay' : 'Start'}
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M5 3L12 8L5 13V3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </button>
                 </div>
@@ -173,7 +179,15 @@ class CategoryGrid {
 
     const scenarioId = scenarioCard.getAttribute('data-scenario-id');
     const categoryId = scenarioCard.getAttribute('data-category-id');
-    this.openScenario(categoryId, scenarioId);
+    
+    // Check if the clicked element is the quick start button
+    if (event.target.classList.contains('scenario-quick-start-btn') || 
+        event.target.closest('.scenario-quick-start-btn')) {
+      this.openScenarioModalDirect(categoryId, scenarioId);
+    } else {
+      // Regular Learning Lab button - go through pre-launch modal
+      this.openScenario(categoryId, scenarioId);
+    }
   }
 
   handleScenarioKeydown(event) {
@@ -183,7 +197,14 @@ class CategoryGrid {
       if (scenarioCard) {
         const scenarioId = scenarioCard.getAttribute('data-scenario-id');
         const categoryId = scenarioCard.getAttribute('data-category-id');
-        this.openScenario(categoryId, scenarioId);
+        
+        // Check if focus is on the quick start button
+        if (event.target.classList.contains('scenario-quick-start-btn')) {
+          this.openScenarioModalDirect(categoryId, scenarioId);
+        } else {
+          // Regular Learning Lab button behavior
+          this.openScenario(categoryId, scenarioId);
+        }
       }
     }
   }
@@ -255,6 +276,30 @@ class CategoryGrid {
       // Fallback to alert
       alert(`Failed to open scenario modal for: ${scenarioId}`);
     }
+  }
+
+  /**
+   * Open scenario modal directly, skipping pre-launch modal
+   */
+  openScenarioModalDirect(categoryId, scenarioId) {
+    const category = this.categories.find(c => c.id === categoryId);
+    const scenario = category?.scenarios.find(s => s.id === scenarioId);
+
+    if (!category || !scenario) {
+      logger.error('Category or scenario not found:', categoryId, scenarioId);
+      return;
+    }
+
+    logger.info('Opening scenario modal directly for:', scenario.title);
+
+    // Dispatch custom event for other components to listen to
+    const event = new CustomEvent('scenario-selected', {
+      detail: { category, scenario, categoryId, scenarioId },
+    });
+    document.dispatchEvent(event);
+
+    // Open the scenario modal directly
+    this.openScenarioModal(scenarioId, categoryId);
   }
 
   /**

@@ -34,6 +34,12 @@
   display: flex;
   gap: 8px;
   margin-top: 8px;
+  align-items: center;
+}
+
+/* Make Learning Lab button take more space */
+.card-actions .btn-primary {
+  flex: 1;
 }
 .card-action-btn {
   background: #3b82f6;
@@ -49,6 +55,30 @@
 .card-action-btn:focus {
   background: #2563eb;
   outline: 2px solid #2563eb;
+}
+
+/* Simulation Quick Start Button */
+.simulation-quick-start-btn {
+  background: var(--color-secondary) !important;
+  color: var(--color-white) !important;
+  border: none !important;
+  border-radius: var(--radius-md) !important;
+  padding: var(--spacing-2) var(--spacing-3) !important;
+  font-size: var(--font-size-sm) !important;
+  font-weight: var(--font-weight-medium) !important;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  flex-shrink: 0;
+}
+
+.simulation-quick-start-btn:hover {
+  background: var(--color-secondary-dark) !important;
+  transform: translateY(-1px);
+}
+
+.simulation-quick-start-btn:focus {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
 }
 
 @media (max-width: 600px) {
