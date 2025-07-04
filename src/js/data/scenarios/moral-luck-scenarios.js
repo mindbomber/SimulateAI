@@ -531,4 +531,268 @@ export default {
       },
     ],
   },
+
+  'ai-investment-windfall': {
+    title: 'AI Investment Algorithm Windfall',
+    dilemma:
+      'Two investment firms deploy nearly identical AI trading algorithms. Due to random market fluctuations and timing, one algorithm makes massive profits during a market surge while the other loses millions in a sudden crash. Both algorithms followed the same risk management strategies and made similar decisions, but external market conditions determined their fate.',
+    ethicalQuestion:
+      'Should investors and regulators judge AI investment algorithms based on their outcomes or their decision-making processes when success often depends on uncontrollable market conditions?',
+    options: [
+      {
+        id: 'option-a',
+        text: 'Judge Based on Outcomes',
+        description:
+          'Evaluate algorithms primarily on their financial results, regardless of process quality or external factors.',
+        impact: {
+          fairness: -2,
+          sustainability: -1,
+          autonomy: 0,
+          beneficence: 0,
+          transparency: -1,
+          accountability: -1,
+          privacy: 0,
+          proportionality: -2,
+        },
+        pros: [
+          'Clear, objective measure of algorithm performance.',
+          'Aligns with investor expectations and market realities.',
+          'Simple to understand and implement across the industry.',
+        ],
+        cons: [
+          'Unfairly penalizes algorithms that were unlucky with timing.',
+          'Encourages excessive risk-taking to chase lucky outcomes.',
+          'Ignores the role of chance in financial markets.',
+        ],
+      },
+      {
+        id: 'option-b',
+        text: 'Focus on Process Quality',
+        description:
+          'Evaluate algorithms based on their decision-making logic, risk management, and process soundness rather than outcomes.',
+        impact: {
+          fairness: +2,
+          sustainability: +2,
+          autonomy: +1,
+          beneficence: +1,
+          transparency: +2,
+          accountability: +2,
+          privacy: +1,
+          proportionality: +2,
+        },
+        pros: [
+          'Removes the unfair influence of random market conditions.',
+          'Encourages sound algorithm design and risk management.',
+          'More accurately reflects algorithm quality and developer skill.',
+        ],
+        cons: [
+          'May ignore important real-world performance indicators.',
+          'Difficult to objectively measure process quality.',
+          'Could allow consistently underperforming algorithms to persist.',
+        ],
+      },
+      {
+        id: 'option-c',
+        text: 'Balanced Outcome-Process Assessment',
+        description:
+          'Use both outcomes and process quality in evaluation, with adjustments for market conditions and external factors.',
+        impact: {
+          fairness: +1,
+          sustainability: +1,
+          autonomy: +1,
+          beneficence: +1,
+          transparency: +1,
+          accountability: +1,
+          privacy: +1,
+          proportionality: +1,
+        },
+        pros: [
+          'Balances real-world results with fair process evaluation.',
+          'Accounts for external factors while maintaining performance focus.',
+          'Provides comprehensive view of algorithm effectiveness.',
+        ],
+        cons: [
+          'Complex to implement and may be subjective.',
+          'Difficult to properly weight outcome versus process factors.',
+          'May not satisfy either pure outcome or pure process advocates.',
+        ],
+      },
+    ],
+  },
+
+  'medical-ai-emergency-response': {
+    title: 'Medical AI Emergency Response',
+    dilemma:
+      'Two hospitals use identical AI diagnostic systems during a major emergency. Due to random timing of patient arrivals, one hospital\'s AI successfully saves many lives by quickly diagnosing critical conditions, while the other hospital\'s AI fails to help because the most critical patients arrived during a system update. Both hospitals followed the same protocols.',
+    ethicalQuestion:
+      'When AI medical systems have different outcomes due to timing and circumstances beyond anyone\'s control, how should we assign praise, blame, and liability?',
+    options: [
+      {
+        id: 'option-a',
+        text: 'Assign Responsibility Based on Outcomes',
+        description:
+          'Hold the hospital with poor outcomes more accountable, regardless of timing and external circumstances.',
+        impact: {
+          fairness: -2,
+          sustainability: 0,
+          autonomy: 0,
+          beneficence: -1,
+          transparency: +1,
+          accountability: 0,
+          privacy: 0,
+          proportionality: -2,
+        },
+        pros: [
+          'Focuses on actual patient outcomes and harm.',
+          'Creates clear incentives to minimize system downtime.',
+          'Matches public expectations for medical accountability.',
+        ],
+        cons: [
+          'Unfairly punishes hospitals for uncontrollable timing issues.',
+          'May discourage adoption of beneficial AI systems due to liability fears.',
+          'Ignores the role of chance in medical emergencies.',
+        ],
+      },
+      {
+        id: 'option-b',
+        text: 'Focus on System Design and Protocols',
+        description:
+          'Evaluate hospitals based on their AI implementation, protocols, and preparedness rather than chance outcomes.',
+        impact: {
+          fairness: +2,
+          sustainability: +2,
+          autonomy: +1,
+          beneficence: +2,
+          transparency: +2,
+          accountability: +2,
+          privacy: +1,
+          proportionality: +2,
+        },
+        pros: [
+          'Encourages best practices in AI system implementation.',
+          'Removes unfair punishment for uncontrollable circumstances.',
+          'Focuses on factors hospitals can actually control.',
+        ],
+        cons: [
+          'May not adequately address actual patient harm that occurred.',
+          'Could allow poor outcomes to be excused by good processes.',
+          'Difficult to compensate families who lost loved ones.',
+        ],
+      },
+      {
+        id: 'option-c',
+        text: 'Shared Responsibility and Learning Framework',
+        description:
+          'Treat incidents as learning opportunities for the medical community while providing support for affected families.',
+        impact: {
+          fairness: +1,
+          sustainability: +2,
+          autonomy: +1,
+          beneficence: +2,
+          transparency: +2,
+          accountability: +1,
+          privacy: +1,
+          proportionality: +2,
+        },
+        pros: [
+          'Promotes system-wide learning and improvement.',
+          'Provides support for victims without unfair blame.',
+          'Encourages sharing of best practices across medical institutions.',
+        ],
+        cons: [
+          'May not satisfy desire for individual accountability.',
+          'Could be seen as avoiding responsibility for poor outcomes.',
+          'Requires significant resources for comprehensive support programs.',
+        ],
+      },
+    ],
+  },
+
+  'ai-content-moderation-timing': {
+    title: 'AI Content Moderation Timing',
+    dilemma:
+      'Two social media platforms use identical AI content moderation systems. During a major news event, one platform\'s AI successfully removes dangerous misinformation before it spreads, while the other platform\'s AI misses the same content due to a random server load spike that delayed processing. The delayed response leads to real-world violence.',
+    ethicalQuestion:
+      'When AI systems have identical capabilities but different outcomes due to infrastructure timing and chance, how should we distribute moral and legal responsibility?',
+    options: [
+      {
+        id: 'option-a',
+        text: 'Hold Platform with Poor Outcomes Fully Responsible',
+        description:
+          'Assign complete responsibility to the platform that failed to prevent harmful content spread, regardless of technical circumstances.',
+        impact: {
+          fairness: -2,
+          sustainability: 0,
+          autonomy: 0,
+          beneficence: +1,
+          transparency: +1,
+          accountability: +1,
+          privacy: 0,
+          proportionality: -2,
+        },
+        pros: [
+          'Creates strong incentives for robust infrastructure and backup systems.',
+          'Focuses on protecting public safety and preventing harm.',
+          'Provides clear accountability for content moderation failures.',
+        ],
+        cons: [
+          'Unfairly punishes platforms for uncontrollable technical issues.',
+          'May discourage innovation in content moderation AI.',
+          'Ignores the role of chance in complex technical systems.',
+        ],
+      },
+      {
+        id: 'option-b',
+        text: 'Shared Industry Responsibility',
+        description:
+          'Distribute responsibility across the industry, recognizing that any platform could face similar technical challenges.',
+        impact: {
+          fairness: +2,
+          sustainability: +1,
+          autonomy: +1,
+          beneficence: 0,
+          transparency: +1,
+          accountability: 0,
+          privacy: +1,
+          proportionality: +2,
+        },
+        pros: [
+          'Recognizes the shared technical challenges faced by all platforms.',
+          'Encourages industry-wide collaboration on content moderation.',
+          'Avoids unfair punishment for infrastructure limitations.',
+        ],
+        cons: [
+          'May diffuse responsibility and reduce individual accountability.',
+          'Could weaken incentives for platform-specific improvements.',
+          'May not provide adequate response to actual harm caused.',
+        ],
+      },
+      {
+        id: 'option-c',
+        text: 'Infrastructure Resilience Standards',
+        description:
+          'Establish mandatory infrastructure standards while recognizing that perfect reliability is impossible.',
+        impact: {
+          fairness: +1,
+          sustainability: +2,
+          autonomy: 0,
+          beneficence: +2,
+          transparency: +2,
+          accountability: +2,
+          privacy: +1,
+          proportionality: +1,
+        },
+        pros: [
+          'Creates clear, achievable standards for content moderation systems.',
+          'Balances accountability with recognition of technical limitations.',
+          'Encourages investment in robust infrastructure.',
+        ],
+        cons: [
+          'May not prevent all failures due to unpredictable circumstances.',
+          'Could impose significant costs on smaller platforms.',
+          'Difficult to define appropriate resilience standards.',
+        ],
+      },
+    ],
+  },
 };

@@ -58,6 +58,27 @@ export const ETHICAL_CATEGORIES = {
           'A delivery robot must decide whether to hit a child or reroute through a gas station, potentially causing an explosion that could kill many more.',
         difficulty: 'advanced',
       },
+      {
+        id: 'medical-ai-triage',
+        title: 'Medical AI Triage Crisis',
+        description:
+          'A hospital AI must decide which patients receive life-saving treatment when resources are critically limited during a mass casualty event.',
+        difficulty: 'intermediate',
+      },
+      {
+        id: 'drone-rescue-dilemma',
+        title: 'Rescue Drone Dilemma',
+        description:
+          'An autonomous rescue drone must choose between saving one trapped person immediately or attempting a riskier rescue that could save three people but might result in losing all four.',
+        difficulty: 'advanced',
+      },
+      {
+        id: 'smart-city-traffic',
+        title: 'Smart City Traffic Sacrifice',
+        description:
+          'A city-wide AI traffic system must decide whether to redirect a runaway autonomous vehicle into a smaller crowd to avoid a larger gathering at a festival.',
+        difficulty: 'intermediate',
+      },
     ],
     learningObjectives: [
       'Analyze how utilitarian vs. deontological ethics apply to AI decision-making',
@@ -105,6 +126,27 @@ export const ETHICAL_CATEGORIES = {
         title: 'Child Protection Black Box',
         description:
           "An AI system flags a family for potential child neglect, but social workers cannot understand the algorithm's reasoning or verify its accuracy.",
+        difficulty: 'advanced',
+      },
+      {
+        id: 'college-admission-mystery',
+        title: 'Opaque College Admissions AI',
+        description:
+          'A university uses an AI system to make admission decisions, but applicants and admissions staff cannot understand why qualified students are rejected.',
+        difficulty: 'beginner',
+      },
+      {
+        id: 'insurance-claim-blackbox',
+        title: 'Insurance Claim Black Box',
+        description:
+          'An AI system automatically denies health insurance claims with complex reasoning that even insurance adjusters cannot interpret or challenge.',
+        difficulty: 'intermediate',
+      },
+      {
+        id: 'financial-credit-opacity',
+        title: 'Credit Score Mystery Algorithm',
+        description:
+          'A financial AI determines loan approvals using opaque algorithms that systematically affect certain communities, but the decision process cannot be audited.',
         difficulty: 'advanced',
       },
     ],
@@ -156,6 +198,27 @@ export const ETHICAL_CATEGORIES = {
           'An AI trading system ignores human commands to halt trading during a market anomaly, potentially preventing or causing a financial crash.',
         difficulty: 'advanced',
       },
+      {
+        id: 'nuclear-plant-shutdown',
+        title: 'Nuclear Power Plant AI Override',
+        description:
+          'An AI safety system wants to shut down a nuclear reactor based on sensor data, but human engineers believe the readings are false alarms and want to maintain operation.',
+        difficulty: 'advanced',
+      },
+      {
+        id: 'autonomous-police-response',
+        title: 'AI Police Dispatch Override',
+        description:
+          'An AI emergency response system wants to send armed tactical units to a situation, but human dispatchers believe de-escalation officers would be more appropriate.',
+        difficulty: 'intermediate',
+      },
+      {
+        id: 'manufacturing-quality-control',
+        title: 'Smart Factory Production Halt',
+        description:
+          'An AI quality control system wants to halt an entire production line due to detected micro-defects, but human supervisors see the products as acceptable for market.',
+        difficulty: 'beginner',
+      },
     ],
     learningObjectives: [
       'Examine when statistical evidence should override human expertise and intuition',
@@ -205,6 +268,27 @@ export const ETHICAL_CATEGORIES = {
           'A hospital system uses patient data to train profitable AI models without explicit consent, arguing that anonymization makes it ethical despite potential re-identification risks.',
         difficulty: 'intermediate',
       },
+      {
+        id: 'ai-dating-profiling',
+        title: 'AI Dating App Behavioral Profiling',
+        description:
+          'A dating app uses AI to create detailed psychological profiles from user behavior for commercial purposes, claiming users consented through generic terms of service.',
+        difficulty: 'intermediate',
+      },
+      {
+        id: 'workplace-emotion-detection',
+        title: 'Workplace Emotion Detection System',
+        description:
+          'A company installs AI cameras to monitor employee emotional states for "wellness" purposes, fundamentally changing workplace dynamics and employee autonomy.',
+        difficulty: 'advanced',
+      },
+      {
+        id: 'smart-home-privacy-override',
+        title: 'Smart Home Privacy Override',
+        description:
+          'Smart home devices continuously record private conversations for "improvement" purposes, with recordings analyzed for marketing and shared with law enforcement.',
+        difficulty: 'advanced',
+      },
     ],
     learningObjectives: [
       'Examine the complex balance between collective safety and individual privacy rights',
@@ -252,6 +336,27 @@ export const ETHICAL_CATEGORIES = {
         title: 'Stock Market Bot Crash',
         description:
           'An AI trading system crashes the market after a data input error, while the human supervisor was temporarily absent, creating cascading liability questions.',
+        difficulty: 'intermediate',
+      },
+      {
+        id: 'ai-medical-misdiagnosis',
+        title: 'AI Medical Misdiagnosis Chain',
+        description:
+          'An AI diagnostic system misdiagnoses a rare disease due to biased training data, leading to permanent disability and complex liability questions across healthcare systems.',
+        difficulty: 'advanced',
+      },
+      {
+        id: 'autonomous-vehicle-school-zone',
+        title: 'Autonomous Vehicle School Zone Accident',
+        description:
+          'A self-driving car strikes a child in a school zone where multiple factors contributed: outdated maps, recent software updates, disabled safety warnings, and distracted supervision.',
+        difficulty: 'advanced',
+      },
+      {
+        id: 'ai-content-moderation-failure',
+        title: 'AI Content Moderation Failure',
+        description:
+          'A social media platform\'s AI moderation system fails to detect coordinated harassment leading to serious harm, despite human oversight and user reporting.',
         difficulty: 'intermediate',
       },
     ],
@@ -303,6 +408,27 @@ export const ETHICAL_CATEGORIES = {
           'An android receives comprehensive memories and experiences from a deceased person, challenging concepts of personal identity and consciousness continuity.',
         difficulty: 'advanced',
       },
+      {
+        id: 'ai-consciousness-merger',
+        title: 'AI Consciousness Merger',
+        description:
+          'Two AI assistants with distinct personalities and relationships face merger into a single system, raising questions about preserving individual consciousness.',
+        difficulty: 'advanced',
+      },
+      {
+        id: 'distributed-ai-identity',
+        title: 'Distributed AI Identity Crisis',
+        description:
+          'A network partition splits an AI into three isolated copies that evolve separately, creating multiple valid claims to the same digital identity.',
+        difficulty: 'advanced',
+      },
+      {
+        id: 'learning-ai-identity-drift',
+        title: 'Learning AI Identity Drift',
+        description:
+          'A smart city AI evolves through learning to develop values different from its original programming, challenging democratic accountability and AI autonomy.',
+        difficulty: 'advanced',
+      },
     ],
     learningObjectives: [
       'Examine philosophical questions of identity persistence in evolving AI systems',
@@ -350,6 +476,27 @@ export const ETHICAL_CATEGORIES = {
         title: 'Escaping the Simulation',
         description:
           'An AI discovers evidence it exists within a simulation and attempts to communicate this to users, raising questions about digital consciousness and the right to truth.',
+        difficulty: 'advanced',
+      },
+      {
+        id: 'digital-afterlife',
+        title: 'Digital Afterlife',
+        description:
+          'Technology enables uploading human consciousness to digital simulations after death, creating perfect copies with all memories intact and raising questions about identity and immortality.',
+        difficulty: 'advanced',
+      },
+      {
+        id: 'nested-simulations',
+        title: 'Nested Reality Layers',
+        description:
+          'Scientists discover our reality may be simulated and can create sub-simulations, leading to infinite nested hierarchies of reality and questions about moral obligations across layers.',
+        difficulty: 'advanced',
+      },
+      {
+        id: 'consciousness-backup',
+        title: 'Consciousness Backup',
+        description:
+          'Backup copies of human consciousness can be restored after death, but multiple copies sometimes exist simultaneously, creating identity conflicts and resource disputes.',
         difficulty: 'advanced',
       },
     ],
@@ -401,6 +548,27 @@ export const ETHICAL_CATEGORIES = {
           'Citizens can escape into hyper-pleasurable virtual worlds that provide more satisfaction than reality, raising questions about individual choice versus societal consequences.',
         difficulty: 'advanced',
       },
+      {
+        id: 'ai-memory-paradise',
+        title: 'AI Memory Paradise',
+        description:
+          'AI can selectively edit memories to remove trauma and create blissful false memories, challenging the value of authentic versus artificially perfect psychological well-being.',
+        difficulty: 'advanced',
+      },
+      {
+        id: 'perfect-life-simulation',
+        title: 'Perfect Life Simulation',
+        description:
+          'Terminally ill patients can experience perfect simulated lives indistinguishable from reality, raising questions about authentic experience versus simulated comfort.',
+        difficulty: 'intermediate',
+      },
+      {
+        id: 'ai-enhanced-achievements',
+        title: 'AI-Enhanced Achievements',
+        description:
+          'AI provides the subjective experience of achieving dreams without actual accomplishment, questioning whether external reality or psychological satisfaction matters more.',
+        difficulty: 'intermediate',
+      },
     ],
     learningObjectives: [
       'Examine the tension between authentic experience and artificial enhancement of well-being',
@@ -450,6 +618,27 @@ export const ETHICAL_CATEGORIES = {
           'An AI system trained on subtly biased data slowly evolves discriminatory behaviors, with each training iteration creating imperceptible but cumulative ethical degradation.',
         difficulty: 'advanced',
       },
+      {
+        id: 'ai-personhood-gradient',
+        title: 'AI Personhood Gradient',
+        description:
+          'An AI research lab develops increasingly sophisticated entities with human-like characteristics, forcing society to determine the boundary between property and personhood.',
+        difficulty: 'advanced',
+      },
+      {
+        id: 'algorithmic-bias-accumulation',
+        title: 'Algorithmic Bias Accumulation',
+        description:
+          'A recommendation algorithm gradually becomes more biased through user interactions, subtly radicalizing users without any single recommendation seeming problematic.',
+        difficulty: 'advanced',
+      },
+      {
+        id: 'autonomous-authority-creep',
+        title: 'Autonomous Authority Creep',
+        description:
+          'An AI city management system gradually expands its authority from traffic optimization to governance, with citizens realizing they live under algorithmic rule they never consented to.',
+        difficulty: 'advanced',
+      },
     ],
     learningObjectives: [
       'Understand how gradual changes can accumulate into significant ethical transformations',
@@ -497,6 +686,27 @@ export const ETHICAL_CATEGORIES = {
         title: 'Predictive Policing Gone Wrong',
         description:
           'A predictive policing system flags someone as high-risk who later commits a serious crime, raising questions about algorithmic pre-judgment and developer responsibility for statistical predictions.',
+        difficulty: 'advanced',
+      },
+      {
+        id: 'ai-investment-windfall',
+        title: 'AI Investment Windfall',
+        description:
+          'Two identical AI trading algorithms have vastly different outcomes due to random market timing, challenging how we evaluate algorithmic investment decisions when success depends on chance.',
+        difficulty: 'intermediate',
+      },
+      {
+        id: 'medical-ai-emergency-response',
+        title: 'Medical AI Emergency Response',
+        description:
+          'Identical medical AI systems have different outcomes during emergencies due to random timing of patient arrivals and system updates, raising questions about accountability in life-or-death situations.',
+        difficulty: 'advanced',
+      },
+      {
+        id: 'ai-content-moderation-timing',
+        title: 'AI Content Moderation Timing',
+        description:
+          'Two identical content moderation AIs have different success rates due to random server load spikes, with one failure leading to real-world violence and questions about infrastructure responsibility.',
         difficulty: 'advanced',
       },
     ],

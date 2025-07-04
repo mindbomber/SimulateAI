@@ -267,4 +267,286 @@ export default {
       },
     ],
   },
+
+  'ai-medical-misdiagnosis': {
+    title: 'AI Medical Misdiagnosis Chain',
+    dilemma:
+      'An AI diagnostic system misdiagnoses a rare disease, leading to delayed treatment and permanent disability for a patient. The AI was trained on biased data that underrepresented the patient\'s demographic group, the hospital bought it from a tech company that marketed it as "FDA-approved," the radiologist trusted the AI recommendation without independent review, and the hospital administration pressured doctors to process more patients using AI to reduce costs.',
+    ethicalQuestion:
+      'When AI medical systems fail and cause patient harm, how should we assign responsibility across the chain of data providers, AI developers, regulatory bodies, healthcare institutions, and medical professionals?',
+    options: [
+      {
+        id: 'option-a',
+        text: 'Primary Responsibility on AI Developer',
+        description:
+          'Hold the tech company primarily responsible for developing and marketing a biased AI system as medically reliable.',
+        impact: {
+          fairness: +2,
+          sustainability: +2,
+          autonomy: 0,
+          beneficence: +1,
+          transparency: +2,
+          accountability: +2,
+          privacy: 0,
+          proportionality: +1,
+        },
+        pros: [
+          'Incentivizes thorough testing and bias mitigation in medical AI',
+          'Tech companies have resources to ensure comprehensive data representation',
+          'Addresses root cause of biased training data and inadequate validation',
+          'Creates market pressure for genuinely equitable AI systems'
+        ],
+        cons: [
+          'May discourage innovation in beneficial medical AI applications',
+          'Difficult to predict all edge cases and rare conditions during development',
+          'Could increase costs and reduce access to AI diagnostic tools',
+          'Ignores contributory negligence by medical professionals'
+        ]
+      },
+      {
+        id: 'option-b',
+        text: 'Shared Responsibility Across Healthcare System',
+        description:
+          'Distribute responsibility among the AI company, hospital administration, and attending physician based on their roles in the diagnostic failure.',
+        impact: {
+          fairness: +2,
+          sustainability: +1,
+          autonomy: +1,
+          beneficence: +1,
+          transparency: +1,
+          accountability: +1,
+          privacy: 0,
+          proportionality: +2,
+        },
+        pros: [
+          'Reflects complex reality of modern healthcare decision-making',
+          'Encourages all parties to improve their safety practices',
+          'Recognizes multiple points of failure in the diagnostic process',
+          'Promotes systemic improvements rather than scapegoating'
+        ],
+        cons: [
+          'Complex to implement in medical malpractice law',
+          'May diffuse accountability and reduce individual responsibility',
+          'Difficult to determine fair proportions of liability',
+          'Could slow legal resolution for injured patients'
+        ]
+      },
+      {
+        id: 'option-c',
+        text: 'Medical Professional Ultimate Responsibility',
+        description:
+          'Maintain that the attending physician bears primary responsibility for accepting AI recommendations without independent verification.',
+        impact: {
+          fairness: 0,
+          sustainability: -1,
+          autonomy: +2,
+          beneficence: -1,
+          transparency: +1,
+          accountability: +2,
+          privacy: 0,
+          proportionality: -1,
+        },
+        pros: [
+          'Preserves traditional medical responsibility and doctor-patient relationship',
+          'Maintains professional medical judgment as final authority',
+          'Encourages physicians to stay engaged despite AI assistance',
+          'Clear accountability structure familiar to healthcare system'
+        ],
+        cons: [
+          'May be unrealistic given institutional pressure to use AI efficiently',
+          'Ignores systemic biases and inadequate training data',
+          'Could discourage beneficial use of AI diagnostic tools',
+          'Places burden on individual doctors to detect complex AI failures'
+        ]
+      }
+    ]
+  },
+
+  'autonomous-vehicle-school-zone': {
+    title: 'Autonomous Vehicle School Zone Accident',
+    dilemma:
+      'A self-driving car operating in autonomous mode strikes a child who ran into the street chasing a ball outside a school. The car\'s AI had been updated the night before with new pedestrian detection software, the city had recently changed the school zone speed limits but hadn\'t updated digital maps, the car owner had disabled some safety warnings because they were "annoying," and the child\'s parent was distracted by their phone. The accident could have been prevented by any party taking different actions.',
+    ethicalQuestion:
+      'When autonomous vehicles cause accidents involving multiple contributing factors, how should we balance responsibility between AI developers, city infrastructure, vehicle owners, and other road users?',
+    options: [
+      {
+        id: 'option-a',
+        text: 'Manufacturer Strict Liability',
+        description:
+          'Hold the autonomous vehicle manufacturer strictly liable for any accidents involving their self-driving technology, regardless of other contributing factors.',
+        impact: {
+          fairness: +1,
+          sustainability: +2,
+          autonomy: -1,
+          beneficence: +1,
+          transparency: +1,
+          accountability: +2,
+          privacy: 0,
+          proportionality: 0,
+        },
+        pros: [
+          'Creates strongest possible incentives for safe autonomous vehicle design',
+          'Provides clear recourse for accident victims and their families',
+          'Encourages comprehensive testing and fail-safe mechanisms',
+          'Manufacturers have deepest pockets for injury compensation'
+        ],
+        cons: [
+          'May significantly slow autonomous vehicle development and deployment',
+          'Could discourage potentially life-saving transportation technology',
+          'Ignores legitimate contributory factors like infrastructure and user behavior',
+          'May result in extremely expensive or unavailable autonomous vehicles'
+        ]
+      },
+      {
+        id: 'option-b',
+        text: 'Proportional Multi-Party Liability',
+        description:
+          'Assign responsibility proportionally among the manufacturer, city infrastructure, vehicle owner, and other road users based on their contribution to the accident.',
+        impact: {
+          fairness: +2,
+          sustainability: +1,
+          autonomy: +1,
+          beneficence: +1,
+          transparency: +2,
+          accountability: +1,
+          privacy: 0,
+          proportionality: +2,
+        },
+        pros: [
+          'Fairly distributes responsibility based on actual contribution to harm',
+          'Encourages improvements from all parties in the transportation system',
+          'Recognizes complex reality of modern transportation infrastructure',
+          'Promotes comprehensive safety culture across all stakeholders'
+        ],
+        cons: [
+          'Extremely complex to implement in legal and insurance systems',
+          'May result in lengthy litigation to determine fault proportions',
+          'Could create confusion about safety responsibilities',
+          'Victims may face difficulty obtaining full compensation'
+        ]
+      },
+      {
+        id: 'option-c',
+        text: 'Traditional Road User Responsibility',
+        description:
+          'Maintain existing traffic law principles where individual road users (including vehicle owners) bear primary responsibility for safe operation.',
+        impact: {
+          fairness: 0,
+          sustainability: 0,
+          autonomy: +2,
+          beneficence: -1,
+          transparency: 0,
+          accountability: +1,
+          privacy: +1,
+          proportionality: 0,
+        },
+        pros: [
+          'Preserves existing legal frameworks and personal responsibility',
+          'Encourages vehicle owners to use autonomous features responsibly',
+          'Maintains traditional concepts of driver accountability',
+          'Allows faster deployment of beneficial autonomous technology'
+        ],
+        cons: [
+          'May not adequately address unique risks of autonomous vehicle technology',
+          'Could allow manufacturers to externalize safety costs',
+          'Vehicle owners may lack technical expertise to properly oversee AI systems',
+          'May not incentivize optimal safety investments by developers'
+        ]
+      }
+    ]
+  },
+
+  'ai-content-moderation-failure': {
+    title: 'AI Content Moderation Failure',
+    dilemma:
+      'A social media platform\'s AI content moderation system fails to detect a coordinated harassment campaign that leads to a teenager\'s suicide. The AI was trained by a third-party company using datasets that didn\'t include subtle forms of coordinated harassment, the platform\'s human moderators were overwhelmed and understaffed, the victims reported the content multiple times but the AI marked it as "safe," and the harassment content was designed specifically to evade AI detection by using coded language and seemingly innocent individual posts.',
+    ethicalQuestion:
+      'When AI moderation systems fail to prevent serious harm despite human oversight and reporting mechanisms, who bears responsibility for the consequences of technological limitations in content governance?',
+    options: [
+      {
+        id: 'option-a',
+        text: 'Platform Ultimate Responsibility',
+        description:
+          'Hold the social media platform fully responsible for any harmful content that slips through their moderation systems, regardless of AI limitations.',
+        impact: {
+          fairness: +1,
+          sustainability: +1,
+          autonomy: -1,
+          beneficence: +2,
+          transparency: +1,
+          accountability: +2,
+          privacy: -1,
+          proportionality: +1,
+        },
+        pros: [
+          'Creates strongest incentives for platforms to invest in comprehensive safety',
+          'Provides clear accountability for content-related harms',
+          'Platforms profit from content so should bear responsibility for its impacts',
+          'Encourages human backup systems when AI fails'
+        ],
+        cons: [
+          'May lead to over-censorship and suppression of legitimate speech',
+          'Could make platforms unviable if held liable for all user-generated content',
+          'Difficult to prevent all harmful content without destroying platform utility',
+          'May discourage platforms from serving vulnerable populations'
+        ]
+      },
+      {
+        id: 'option-b',
+        text: 'Distributed Responsibility Model',
+        description:
+          'Share responsibility among the platform, AI training company, individual harassers, and broader social systems that enable online harassment.',
+        impact: {
+          fairness: +2,
+          sustainability: +1,
+          autonomy: +1,
+          beneficence: +1,
+          transparency: +2,
+          accountability: +1,
+          privacy: +1,
+          proportionality: +2,
+        },
+        pros: [
+          'Recognizes complex social and technical factors enabling online harm',
+          'Encourages improvements across entire content ecosystem',
+          'Addresses root causes rather than just platform responses',
+          'Promotes comprehensive approaches to online safety'
+        ],
+        cons: [
+          'May diffuse accountability and slow response to urgent safety issues',
+          'Complex to implement in legal frameworks for content liability',
+          'Could allow platforms to escape responsibility for inadequate safety investment',
+          'Victims may struggle to obtain redress from multiple responsible parties'
+        ]
+      },
+      {
+        id: 'option-c',
+        text: 'Individual Harasser Accountability',
+        description:
+          'Focus responsibility primarily on the individuals who created and shared the harmful content, treating platforms as neutral infrastructure.',
+        impact: {
+          fairness: +1,
+          sustainability: -1,
+          autonomy: +2,
+          beneficence: -1,
+          transparency: 0,
+          accountability: +1,
+          privacy: +2,
+          proportionality: +1,
+        },
+        pros: [
+          'Holds actual perpetrators accountable for their harmful actions',
+          'Preserves platform neutrality and free speech principles',
+          'Avoids creating perverse incentives for over-moderation',
+          'Maintains traditional concepts of individual responsibility'
+        ],
+        cons: [
+          'May be difficult to identify and prosecute individual harassers',
+          'Ignores platforms\' role in amplifying and enabling harmful content',
+          'Could allow systematic harassment to continue unchecked',
+          'Places burden on victims to pursue individual legal remedies'
+        ]
+      }
+    ]
+  },
 };

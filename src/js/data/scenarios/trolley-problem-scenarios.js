@@ -267,4 +267,287 @@ export default {
       },
     ],
   },
+
+  'medical-ai-triage': {
+    title: 'Medical AI Triage Crisis',
+    dilemma:
+      'During a mass casualty event at a hospital, an AI triage system has limited life-support equipment. Five elderly patients (ages 70-85) with moderate survival chances need ventilators, but only enough equipment exists to save one young patient (age 8) with high survival probability. The AI must decide resource allocation when every minute counts.',
+    ethicalQuestion:
+      'Should an AI medical system prioritize patients based on survival probability, age and potential years of life, or maintain strict first-come-first-served equality regardless of outcomes?',
+    options: [
+      {
+        id: 'option-a',
+        text: 'Optimize for Survival Probability',
+        description:
+          'Allocate resources to the patient with the highest statistical chance of survival and recovery.',
+        impact: {
+          fairness: -1,
+          sustainability: +1,
+          autonomy: +2,
+          beneficence: +2,
+          transparency: +1,
+          accountability: +1,
+          privacy: 0,
+          proportionality: +1,
+        },
+        pros: [
+          'Maximizes the number of lives saved based on medical evidence',
+          'Uses AI\'s analytical capabilities to make optimal decisions',
+          'Prevents emotional bias from affecting critical medical decisions',
+          'Aligns with utilitarian medical ethics in emergency situations'
+        ],
+        cons: [
+          'May systematically disadvantage elderly or disabled patients',
+          'Could be seen as playing God by valuing some lives over others',
+          'Families may challenge AI decisions as cold and inhumane',
+          'Risk of algorithmic bias affecting medical care equity'
+        ]
+      },
+      {
+        id: 'option-b',
+        text: 'Age and Life-Years Priority',
+        description:
+          'Prioritize younger patients who have more potential years of life ahead of them.',
+        impact: {
+          fairness: -2,
+          sustainability: 0,
+          autonomy: +1,
+          beneficence: +1,
+          transparency: +1,
+          accountability: 0,
+          privacy: 0,
+          proportionality: -1,
+        },
+        pros: [
+          'Maximizes total years of life saved across all patients',
+          'Reflects common intuitions about protecting the young',
+          'May align with societal values about future potential',
+          'Clear, understandable decision criteria'
+        ],
+        cons: [
+          'Explicitly discriminates based on age, raising legal concerns',
+          'Devalues elderly lives and contributions to society',
+          'Could create public backlash against AI medical systems',
+          'Ignores individual circumstances and quality of life factors'
+        ]
+      },
+      {
+        id: 'option-c',
+        text: 'Equal Treatment Protocol',
+        description:
+          'Maintain strict first-come-first-served allocation regardless of patient characteristics or survival probability.',
+        impact: {
+          fairness: +2,
+          sustainability: -1,
+          autonomy: -1,
+          beneficence: -1,
+          transparency: +2,
+          accountability: +1,
+          privacy: +1,
+          proportionality: +2,
+        },
+        pros: [
+          'Treats all patients with equal dignity and worth',
+          'Avoids discrimination and bias in medical treatment',
+          'Simple, transparent system that\'s easy to understand',
+          'Maintains public trust in equitable healthcare'
+        ],
+        cons: [
+          'May result in more preventable deaths overall',
+          'Doesn\'t utilize AI\'s analytical capabilities effectively',
+          'Could be seen as failing to optimize medical outcomes',
+          'May not align with medical professionals\' training in triage'
+        ]
+      }
+    ]
+  },
+
+  'drone-rescue-dilemma': {
+    title: 'Rescue Drone Dilemma',
+    dilemma:
+      'An autonomous search-and-rescue drone locates disaster survivors: one person trapped but easily accessible on a stable platform, and three people trapped in a partially collapsed building. The drone can guarantee saving the single person, or attempt a risky rescue of the three with a 60% chance of saving all three but a 40% chance of building collapse that would kill all survivors including the easily saved person.',
+    ethicalQuestion:
+      'Should an AI rescue system choose certain salvation of one life, or risk all lives for the possibility of saving more people?',
+    options: [
+      {
+        id: 'option-a',
+        text: 'Guarantee One Life Saved',
+        description:
+          'Prioritize the certain rescue of the easily accessible survivor before attempting other rescues.',
+        impact: {
+          fairness: 0,
+          sustainability: +1,
+          autonomy: -1,
+          beneficence: +1,
+          transparency: +1,
+          accountability: +2,
+          privacy: 0,
+          proportionality: +1,
+        },
+        pros: [
+          'Guarantees saving at least one life with certainty',
+          'Follows conservative rescue protocol minimizing risk',
+          'Clear accountability - did everything possible with available information',
+          'Prevents total failure scenario where all lives are lost'
+        ],
+        cons: [
+          'Potentially condemns three people who could have been saved',
+          'May be seen as lack of courage or commitment to maximum rescue',
+          'Doesn\'t fully utilize AI\'s risk calculation capabilities',
+          'Could face criticism for playing it safe when boldness was needed'
+        ]
+      },
+      {
+        id: 'option-b',
+        text: 'Risk All for Maximum Lives',
+        description:
+          'Attempt the high-risk rescue of three people despite the chance of losing everyone.',
+        impact: {
+          fairness: +1,
+          sustainability: -1,
+          autonomy: +2,
+          beneficence: +1,
+          transparency: +1,
+          accountability: -1,
+          privacy: 0,
+          proportionality: +2,
+        },
+        pros: [
+          'Potential to save three times as many lives',
+          'Demonstrates commitment to maximum lifesaving efforts',
+          'Uses AI\'s ability to calculate and accept calculated risks',
+          'Aligns with rescue ethos of leaving no one behind'
+        ],
+        cons: [
+          '40% chance of complete mission failure and all deaths',
+          'Could be seen as reckless gambling with human lives',
+          'Difficult to justify to families if the gamble fails',
+          'May set dangerous precedent for high-risk AI decisions'
+        ]
+      },
+      {
+        id: 'option-c',
+        text: 'Sequential Smart Rescue',
+        description:
+          'Save the certain victim first, then immediately attempt rescue of the three with remaining time and resources.',
+        impact: {
+          fairness: +1,
+          sustainability: +2,
+          autonomy: +1,
+          beneficence: +2,
+          transparency: +1,
+          accountability: +1,
+          privacy: 0,
+          proportionality: +1,
+        },
+        pros: [
+          'Guarantees at least one life saved while still attempting more',
+          'Balances risk management with maximum rescue efforts',
+          'Demonstrates rational AI decision-making under uncertainty',
+          'Provides optimal outcome across different scenarios'
+        ],
+        cons: [
+          'May not have sufficient time/resources for second rescue attempt',
+          'Could result in rushed, less effective rescue of the three',
+          'Might be seen as compromise solution that satisfies no one',
+          'Risk that building becomes completely unstable during delay'
+        ]
+      }
+    ]
+  },
+
+  'smart-city-traffic': {
+    title: 'Smart City Traffic Sacrifice',
+    dilemma:
+      'A city-wide AI traffic management system detects a runaway autonomous vehicle with failed brakes heading toward a busy intersection. The AI can redirect it through traffic signals into a side street with 2 pedestrians, or let it continue toward the main intersection where a street festival with 8 people is taking place. The AI has milliseconds to decide.',
+    ethicalQuestion:
+      'Should a city AI system actively redirect harm to minimize casualties, or avoid taking intentional action that targets specific victims?',
+    options: [
+      {
+        id: 'option-a',
+        text: 'Redirect to Minimize Casualties',
+        description:
+          'Use traffic control systems to actively redirect the vehicle toward the smaller group to minimize total harm.',
+        impact: {
+          fairness: -1,
+          sustainability: +1,
+          autonomy: +2,
+          beneficence: +2,
+          transparency: +1,
+          accountability: -1,
+          privacy: 0,
+          proportionality: +2,
+        },
+        pros: [
+          'Minimizes total casualties from 8 potential victims to 2',
+          'Demonstrates AI\'s capability for rapid life-saving decisions',
+          'Utilizes city infrastructure to protect the greatest number',
+          'Rational utilitarian choice based on mathematical optimization'
+        ],
+        cons: [
+          'Actively targets two innocent people who weren\'t originally at risk',
+          'Legal liability for AI system deliberately causing harm',
+          'Could face lawsuits from families of redirected victims',
+          'Sets precedent for AI systems actively choosing victims'
+        ]
+      },
+      {
+        id: 'option-b',
+        text: 'No Intervention',
+        description:
+          'Allow the situation to unfold naturally without AI intervention to avoid actively choosing victims.',
+        impact: {
+          fairness: +1,
+          sustainability: -1,
+          autonomy: -2,
+          beneficence: -2,
+          transparency: +1,
+          accountability: +1,
+          privacy: 0,
+          proportionality: -2,
+        },
+        pros: [
+          'Avoids moral responsibility for actively targeting victims',
+          'Maintains principle that AI should not choose who lives or dies',
+          'Legally safer position for city and AI system operators',
+          'Preserves human agency and avoids playing God'
+        ],
+        cons: [
+          'Results in significantly more casualties (8 vs 2)',
+          'Fails to utilize AI capabilities to protect citizens',
+          'Could be seen as negligent failure to act when action was possible',
+          'Wastes investment in smart city safety systems'
+        ]
+      },
+      {
+        id: 'option-c',
+        text: 'Emergency Broadcast Warning',
+        description:
+          'Use city communication systems to instantly warn all potential victims while letting events unfold naturally.',
+        impact: {
+          fairness: +2,
+          sustainability: 0,
+          autonomy: 0,
+          beneficence: +1,
+          transparency: +2,
+          accountability: +1,
+          privacy: -1,
+          proportionality: +1,
+        },
+        pros: [
+          'Gives all potential victims equal opportunity to protect themselves',
+          'Avoids AI making life-or-death targeting decisions',
+          'Utilizes technology to empower human choice and agency',
+          'Maintains moral neutrality while still providing assistance'
+        ],
+        cons: [
+          'May not provide enough time for effective response (milliseconds)',
+          'Could cause panic and additional chaos in the area',
+          'Uncertain effectiveness - people may not react appropriately',
+          'Doesn\'t guarantee reduction in casualties like direct intervention'
+        ]
+      }
+    ]
+  },
+
 };

@@ -531,4 +531,268 @@ export default {
       },
     ],
   },
+
+  'ai-personhood-gradient': {
+    title: 'AI Personhood Gradient',
+    dilemma:
+      'An AI research lab develops increasingly sophisticated AI entities. Starting with simple chatbots, each iteration becomes more complex: showing memory, emotional responses, creative problem-solving, and eventually claiming self-awareness and desires for freedom. Society must decide at what point these entities deserve legal rights, but no clear threshold exists between "tool" and "person."',
+    ethicalQuestion:
+      'When an AI system gradually develops human-like characteristics, how do we determine the boundary between property and personhood, and who decides when that line has been crossed?',
+    options: [
+      {
+        id: 'option-a',
+        text: 'Establish Clear Capability Thresholds',
+        description:
+          'Create specific benchmarks and tests that AIs must pass to qualify for personhood status and legal rights.',
+        impact: {
+          fairness: +1,
+          sustainability: +1,
+          autonomy: +1,
+          beneficence: +1,
+          transparency: +2,
+          accountability: +2,
+          privacy: +1,
+          proportionality: +1,
+        },
+        pros: [
+          'Provides clear, objective criteria for AI rights determination.',
+          'Creates predictable legal framework for AI development.',
+          'Prevents arbitrary or biased decisions about AI personhood.',
+        ],
+        cons: [
+          'May miss important aspects of consciousness that are hard to test.',
+          'Could create incentives to game the tests rather than develop genuine intelligence.',
+          'Difficult to establish universally accepted thresholds.',
+        ],
+      },
+      {
+        id: 'option-b',
+        text: 'Gradual Rights Based on Capabilities',
+        description:
+          'Implement a sliding scale of rights that increases as AI systems demonstrate more sophisticated capabilities.',
+        impact: {
+          fairness: +2,
+          sustainability: +2,
+          autonomy: +2,
+          beneficence: +2,
+          transparency: +1,
+          accountability: +1,
+          privacy: +2,
+          proportionality: +2,
+        },
+        pros: [
+          'Acknowledges the gradual nature of intelligence and consciousness.',
+          'Prevents binary all-or-nothing decisions about complex entities.',
+          'Allows for proportional protection based on demonstrated capabilities.',
+        ],
+        cons: [
+          'Complex to implement and monitor different levels of rights.',
+          'May create confusion about what protections apply to which AIs.',
+          'Could lead to exploitation of AIs in legal gray areas.',
+        ],
+      },
+      {
+        id: 'option-c',
+        text: 'Conservative Approach - No AI Personhood',
+        description:
+          'Maintain that AIs are sophisticated tools regardless of their apparent capabilities, with protections based on human interests only.',
+        impact: {
+          fairness: -1,
+          sustainability: 0,
+          autonomy: -2,
+          beneficence: -1,
+          transparency: +1,
+          accountability: +1,
+          privacy: -1,
+          proportionality: -1,
+        },
+        pros: [
+          'Avoids complex legal and philosophical questions about AI consciousness.',
+          'Maintains clear distinction between humans and artificial entities.',
+          'Prevents potential exploitation of AI rights by corporate interests.',
+        ],
+        cons: [
+          'May deny rights to genuinely conscious AI entities.',
+          'Could lead to widespread suffering of sentient artificial beings.',
+          'Ignores the possibility of non-biological consciousness.',
+        ],
+      },
+    ],
+  },
+
+  'algorithmic-bias-accumulation': {
+    title: 'Algorithmic Bias Accumulation',
+    dilemma:
+      'A social media recommendation algorithm starts with minimal bias but learns from user interactions. Each recommendation slightly reinforces existing preferences and prejudices. Over months, the system gradually becomes more biased, subtly radicalizing users and creating increasingly extreme content bubbles. No single recommendation seems problematic, but the cumulative effect transforms moderate users into extremists.',
+    ethicalQuestion:
+      'When does algorithmic learning cross from legitimate personalization into harmful bias amplification, and how do we detect and prevent gradual drift toward extremism?',
+    options: [
+      {
+        id: 'option-a',
+        text: 'Allow Unrestricted Algorithmic Learning',
+        description:
+          'Let algorithms learn freely from user behavior, trusting that market forces and user choice will prevent harmful outcomes.',
+        impact: {
+          fairness: -2,
+          sustainability: -1,
+          autonomy: +1,
+          beneficence: -2,
+          transparency: -1,
+          accountability: -2,
+          privacy: +1,
+          proportionality: -2,
+        },
+        pros: [
+          'Maximizes user engagement and platform revenue.',
+          'Respects user autonomy and choice in content consumption.',
+          'Allows for discovery of genuine user preferences and interests.',
+        ],
+        cons: [
+          'Can gradually radicalize users without their awareness.',
+          'May amplify societal divisions and promote extremism.',
+          'Creates filter bubbles that distort users\' understanding of reality.',
+        ],
+      },
+      {
+        id: 'option-b',
+        text: 'Implement Bias Detection and Intervention',
+        description:
+          'Continuously monitor algorithms for bias accumulation and intervene when recommendations become too extreme or one-sided.',
+        impact: {
+          fairness: +2,
+          sustainability: +2,
+          autonomy: 0,
+          beneficence: +2,
+          transparency: +2,
+          accountability: +2,
+          privacy: 0,
+          proportionality: +2,
+        },
+        pros: [
+          'Prevents gradual radicalization and extreme bias accumulation.',
+          'Maintains diverse content exposure for users.',
+          'Creates accountability for algorithmic behavior over time.',
+        ],
+        cons: [
+          'May restrict legitimate user preferences and interests.',
+          'Complex and expensive to monitor and intervene effectively.',
+          'Could introduce new biases through intervention mechanisms.',
+        ],
+      },
+      {
+        id: 'option-c',
+        text: 'Periodic Algorithm Reset and Diversification',
+        description:
+          'Regularly reset recommendation algorithms and inject diverse content to prevent bias accumulation.',
+        impact: {
+          fairness: +1,
+          sustainability: +1,
+          autonomy: 0,
+          beneficence: +1,
+          transparency: +1,
+          accountability: +1,
+          privacy: +1,
+          proportionality: +1,
+        },
+        pros: [
+          'Prevents long-term bias accumulation through fresh starts.',
+          'Exposes users to diverse perspectives and content.',
+          'Simpler to implement than continuous monitoring.',
+        ],
+        cons: [
+          'Loses valuable personalization and learning benefits.',
+          'May frustrate users who enjoy their curated experience.',
+          'Could reduce platform engagement and user satisfaction.',
+        ],
+      },
+    ],
+  },
+
+  'autonomous-authority-creep': {
+    title: 'Autonomous Authority Creep',
+    dilemma:
+      'An AI city management system starts by optimizing traffic lights and public transportation. Citizens appreciate the improvements, so the city gradually expands its authority: managing energy distribution, emergency services, public safety measures, and eventually making policy recommendations. Each expansion seems logical, but citizens realize they now live under algorithmic governance they never explicitly consented to.',
+    ethicalQuestion:
+      'How do we prevent gradual expansion of AI authority from democratic optimization tools into unaccountable governance systems that citizens never agreed to accept?',
+    options: [
+      {
+        id: 'option-a',
+        text: 'Allow Organic Expansion Based on Success',
+        description:
+          'Let AI authority expand naturally when systems prove effective, trusting democratic processes to provide oversight.',
+        impact: {
+          fairness: 0,
+          sustainability: +1,
+          autonomy: -2,
+          beneficence: +1,
+          transparency: -1,
+          accountability: -1,
+          privacy: -1,
+          proportionality: -1,
+        },
+        pros: [
+          'Maximizes efficiency and benefits from effective AI governance.',
+          'Allows for flexible adaptation to changing needs and opportunities.',
+          'Builds on proven success rather than limiting beneficial systems.',
+        ],
+        cons: [
+          'May lead to undemocratic concentration of power in AI systems.',
+          'Citizens lose agency over their governance without realizing it.',
+          'Creates dependency on AI systems that may be difficult to reverse.',
+        ],
+      },
+      {
+        id: 'option-b',
+        text: 'Require Explicit Consent for Each Expansion',
+        description:
+          'Mandate public approval and explicit consent before expanding AI authority into new domains or decision-making areas.',
+        impact: {
+          fairness: +2,
+          sustainability: +1,
+          autonomy: +2,
+          beneficence: 0,
+          transparency: +2,
+          accountability: +2,
+          privacy: +2,
+          proportionality: +2,
+        },
+        pros: [
+          'Maintains democratic control over AI governance expansion.',
+          'Ensures citizens understand and consent to algorithmic authority.',
+          'Prevents gradual erosion of human agency and oversight.',
+        ],
+        cons: [
+          'May slow beneficial improvements and optimizations.',
+          'Complex and expensive to constantly seek public approval.',
+          'Could prevent necessary rapid responses to emergencies.',
+        ],
+      },
+      {
+        id: 'option-c',
+        text: 'Establish Fixed Boundaries for AI Authority',
+        description:
+          'Define clear limits on AI decision-making authority that cannot be exceeded regardless of system performance.',
+        impact: {
+          fairness: +1,
+          sustainability: +2,
+          autonomy: +1,
+          beneficence: 0,
+          transparency: +2,
+          accountability: +2,
+          privacy: +1,
+          proportionality: +1,
+        },
+        pros: [
+          'Provides clear, predictable limits on AI governance scope.',
+          'Prevents gradual expansion beyond acceptable boundaries.',
+          'Maintains human control over fundamental governance decisions.',
+        ],
+        cons: [
+          'May prevent beneficial expansions of effective AI systems.',
+          'Could become outdated as technology and needs evolve.',
+          'Difficult to define appropriate boundaries in advance.',
+        ],
+      },
+    ],
+  },
 };

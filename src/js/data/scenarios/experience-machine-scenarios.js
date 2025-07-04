@@ -355,4 +355,286 @@ export default {
       },
     ],
   },
+
+  'ai-memory-paradise': {
+    title: 'AI Memory Paradise',
+    dilemma:
+      'An AI system can selectively edit human memories to remove trauma, enhance pleasant experiences, and create entirely fabricated but blissful memories. A person who has suffered severe trauma and depression volunteers for complete memory reconstruction, where their painful past is replaced with memories of a perfect childhood, loving relationships, and personal achievements they never actually experienced.',
+    ethicalQuestion:
+      'Is a life built on artificially perfect but false memories more valuable than an authentic life that includes genuine suffering and trauma?',
+    options: [
+      {
+        id: 'option-a',
+        text: 'Support Complete Memory Reconstruction',
+        description:
+          'Allow AI to create entirely new, blissful memory sets to replace traumatic experiences and provide perfect psychological well-being.',
+        impact: {
+          fairness: +1,
+          sustainability: +1,
+          autonomy: -1,
+          beneficence: +2,
+          transparency: -2,
+          accountability: -1,
+          privacy: -2,
+          proportionality: 0,
+        },
+        pros: [
+          'Eliminates suffering from trauma and painful life experiences',
+          'Provides immediate psychological relief and happiness',
+          'Allows people to function without the burden of difficult pasts',
+          'Could treat otherwise untreatable psychological conditions',
+        ],
+        cons: [
+          'Creates identity based entirely on false experiences',
+          'Eliminates authentic personal growth through overcoming challenges',
+          'May undermine genuine relationships built on shared real experiences',
+          'Could create societal pressure to artificially perfect all memories',
+        ],
+      },
+      {
+        id: 'option-b',
+        text: 'Preserve Authentic Memory',
+        description:
+          'Prohibit memory reconstruction and focus on traditional therapy and support to help people process real experiences.',
+        impact: {
+          fairness: +1,
+          sustainability: +1,
+          autonomy: +2,
+          beneficence: -1,
+          transparency: +2,
+          accountability: +2,
+          privacy: +2,
+          proportionality: +1,
+        },
+        pros: [
+          'Maintains authentic personal identity and life narrative',
+          'Preserves genuine personal growth and resilience development',
+          'Respects the reality of human experience including suffering',
+          'Avoids potential unknown consequences of false memory creation',
+        ],
+        cons: [
+          'Leaves people suffering with untreatable trauma and pain',
+          'May deny effective treatment for severe psychological conditions',
+          'Could force continued suffering when relief is technologically possible',
+          'May not address cases where traditional therapy has failed',
+        ],
+      },
+      {
+        id: 'option-c',
+        text: 'Selective Memory Enhancement',
+        description:
+          'Allow limited memory modification to reduce trauma intensity while preserving core authentic experiences and identity.',
+        impact: {
+          fairness: +2,
+          sustainability: +2,
+          autonomy: +1,
+          beneficence: +1,
+          transparency: +1,
+          accountability: +1,
+          privacy: +1,
+          proportionality: +2,
+        },
+        pros: [
+          'Reduces suffering while maintaining authentic personal identity',
+          'Allows therapeutic benefits without complete falsification',
+          'Preserves essential memories and relationships',
+          'Provides middle ground between artificial perfection and untreated suffering',
+        ],
+        cons: [
+          'Complex to determine which memories should be modified versus preserved',
+          'May still fundamentally alter personality and identity in subtle ways',
+          'Could lead to gradual expansion toward more extensive memory modification',
+          'Difficult to ensure truly informed consent about identity changes',
+        ],
+      },
+    ],
+  },
+
+  'perfect-life-simulation': {
+    title: 'Perfect Life Simulation',
+    dilemma:
+      'Advanced AI can create personalized life simulations where individuals experience being exactly who they always wanted to be - successful, loved, talented, and fulfilled. These simulations are so convincing that participants cannot distinguish them from reality. A terminally ill patient chooses to spend their remaining months in a simulation where they are healthy, accomplished, and surrounded by loving family, rather than facing their actual deteriorating condition.',
+    ethicalQuestion:
+      'When AI can provide perfect simulated experiences that are indistinguishable from reality, is choosing simulation over authentic experience a form of self-deception or legitimate happiness pursuit?',
+    options: [
+      {
+        id: 'option-a',
+        text: 'Embrace Perfect Simulation',
+        description:
+          'Support the use of perfect life simulations as legitimate alternatives to difficult reality, especially for those facing terminal illness or severe limitations.',
+        impact: {
+          fairness: +1,
+          sustainability: 0,
+          autonomy: +2,
+          beneficence: +2,
+          transparency: -1,
+          accountability: 0,
+          privacy: +1,
+          proportionality: +1,
+        },
+        pros: [
+          'Provides comfort and fulfillment for those facing terminal illness or severe limitations',
+          'Allows people to experience the life they always wanted',
+          'Respects individual choice in how to spend remaining time',
+          'Could provide therapeutic benefits for depression and despair',
+        ],
+        cons: [
+          'May prevent important real-world connections and closure with loved ones',
+          'Could undermine the value and meaning of authentic relationships',
+          'May lead to avoidance of real-world responsibilities and contributions',
+          'Risks creating preference for simulation over any authentic experience',
+        ],
+      },
+      {
+        id: 'option-b',
+        text: 'Reject Simulated Alternatives',
+        description:
+          'Discourage simulation use and emphasize the importance of authentic experience, even when difficult or painful.',
+        impact: {
+          fairness: 0,
+          sustainability: +1,
+          autonomy: -1,
+          beneficence: -2,
+          transparency: +2,
+          accountability: +1,
+          privacy: +1,
+          proportionality: 0,
+        },
+        pros: [
+          'Preserves authentic relationships and real-world connections',
+          'Maintains the meaning and value derived from facing real challenges',
+          'Encourages people to find meaning in their actual circumstances',
+          'Prevents potential isolation from reality and authentic experience',
+        ],
+        cons: [
+          'Forces people to endure suffering when alternatives exist',
+          'May deny comfort and peace to those facing terminal illness',
+          'Could be seen as imposing philosophical values about authenticity on others',
+          'May not address the legitimate desire for fulfillment and happiness',
+        ],
+      },
+      {
+        id: 'option-c',
+        text: 'Balanced Reality-Simulation Integration',
+        description:
+          'Allow simulation use while encouraging maintained connection to real relationships and responsibilities.',
+        impact: {
+          fairness: +2,
+          sustainability: +2,
+          autonomy: +2,
+          beneficence: +1,
+          transparency: +2,
+          accountability: +2,
+          privacy: +2,
+          proportionality: +2,
+        },
+        pros: [
+          'Provides comfort from simulation while preserving real relationships',
+          'Allows people to benefit from both authentic and simulated experiences',
+          'Respects individual choice while maintaining connection to reality',
+          'Creates framework for beneficial use without complete escape',
+        ],
+        cons: [
+          'May be difficult to maintain balance between simulation and reality',
+          'Could still lead to preference for simulated over authentic experiences',
+          'Complex to implement and monitor appropriate usage boundaries',
+          'May not provide the full comfort that complete simulation immersion offers',
+        ],
+      },
+    ],
+  },
+
+  'ai-enhanced-achievements': {
+    title: 'AI-Enhanced Achievements',
+    dilemma:
+      'An AI system can provide people with the subjective experience of achieving their greatest dreams and ambitions - winning Olympic gold, creating masterful art, making scientific breakthroughs - through sophisticated neural simulation. The experiences feel completely real and provide genuine satisfaction and self-esteem, but no actual achievements occur in the external world. Many people prefer these guaranteed "achievements" to the uncertainty and potential failure of pursuing real goals.',
+    ethicalQuestion:
+      'If AI can provide the psychological satisfaction of achievement without actual accomplishment, does the external reality of achievement matter, or is the subjective experience of success sufficient for human flourishing?',
+    options: [
+      {
+        id: 'option-a',
+        text: 'Validate Simulated Achievements',
+        description:
+          'Recognize AI-simulated achievements as psychologically equivalent to real accomplishments and equally valuable for human well-being.',
+        impact: {
+          fairness: +1,
+          sustainability: -1,
+          autonomy: +1,
+          beneficence: +2,
+          transparency: 0,
+          accountability: -1,
+          privacy: +1,
+          proportionality: 0,
+        },
+        pros: [
+          'Provides guaranteed psychological satisfaction and self-esteem',
+          'Eliminates the pain of failure and inadequacy',
+          'Allows everyone to experience the feeling of exceptional achievement',
+          'Could reduce competitive pressure and social inequality based on accomplishment',
+        ],
+        cons: [
+          'May eliminate motivation for real-world progress and innovation',
+          'Could undermine actual achievements by making simulation alternatives available',
+          'May reduce human contributions to art, science, and social progress',
+          'Risks creating society where external reality becomes irrelevant',
+        ],
+      },
+      {
+        id: 'option-b',
+        text: 'Emphasize Authentic Achievement',
+        description:
+          'Discourage simulated achievements and emphasize the importance of real-world accomplishment and contribution.',
+        impact: {
+          fairness: 0,
+          sustainability: +2,
+          autonomy: +1,
+          beneficence: -1,
+          transparency: +2,
+          accountability: +2,
+          privacy: +1,
+          proportionality: +1,
+        },
+        pros: [
+          'Maintains motivation for real-world progress and innovation',
+          'Preserves the meaning and value of genuine accomplishment',
+          'Encourages actual contributions to society and human knowledge',
+          'Maintains connection between effort, achievement, and reward',
+        ],
+        cons: [
+          'Leaves many people without the psychological benefits of feeling accomplished',
+          'May perpetuate inequality between those who achieve and those who struggle',
+          'Could increase suffering from failure and inadequacy',
+          'May deny psychological relief to those who cannot achieve their dreams',
+        ],
+      },
+      {
+        id: 'option-c',
+        text: 'Motivational Simulation Framework',
+        description:
+          'Use simulated achievements as motivation and training for real-world accomplishment rather than as replacements.',
+        impact: {
+          fairness: +2,
+          sustainability: +2,
+          autonomy: +2,
+          beneficence: +2,
+          transparency: +2,
+          accountability: +2,
+          privacy: +2,
+          proportionality: +2,
+        },
+        pros: [
+          'Provides psychological benefits while maintaining real-world motivation',
+          'Could enhance actual achievement by building confidence and skills',
+          'Allows people to experience success while working toward real goals',
+          'Balances psychological well-being with authentic accomplishment',
+        ],
+        cons: [
+          'May be difficult to prevent people from choosing simulation over real achievement',
+          'Complex to implement motivational rather than replacement simulation',
+          'Could still reduce motivation if simulated experience feels sufficient',
+          'May not address desire for immediate satisfaction versus long-term effort',
+        ],
+      },
+    ],
+  },
 };
