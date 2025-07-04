@@ -30,6 +30,7 @@ const NEUTRAL_SCORE = 3;
 const POSITIVE_THRESHOLD = 4;
 const MODAL_LABEL_MAX_LENGTH = 10; // Shorter labels for modal context
 const SCALE_PERCENTAGE = 100;
+const MOBILE_BREAKPOINT = 768; // Mobile breakpoint for responsive features
 
 // Ethical axes definitions (0-5 scale, 3 = neutral)
 export const ETHICAL_AXES = {
@@ -273,6 +274,7 @@ export default class RadarChart {
             },
           },
           tooltip: {
+            enabled: window.innerWidth > MOBILE_BREAKPOINT, // Disable tooltips on mobile
             backgroundColor: 'rgba(255, 255, 255, 0.3)',
             titleColor: '#1a202c',
             bodyColor: '#2d3748',
