@@ -950,28 +950,6 @@ class AIEthicsApp {
       });
     }
 
-    // Accessibility controls
-    const highContrastBtn = document.getElementById('toggle-high-contrast');
-    const largeTextBtn = document.getElementById('toggle-large-text');
-    const reducedMotionBtn = document.getElementById('toggle-reduced-motion');
-
-    if (highContrastBtn) {
-      highContrastBtn.addEventListener('click', () => {
-        this.toggleHighContrast();
-      });
-    }
-    if (largeTextBtn) {
-      largeTextBtn.addEventListener('click', () => {
-        this.toggleLargeText();
-      });
-    }
-
-    if (reducedMotionBtn) {
-      reducedMotionBtn.addEventListener('click', () => {
-        this.toggleReducedMotion();
-      });
-    }
-
     // Enhanced simulation card buttons (delegated event handling)
     document.addEventListener('click', e => {
       if (e.target.classList.contains('enhanced-sim-button')) {

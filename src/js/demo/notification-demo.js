@@ -66,20 +66,4 @@ document.addEventListener('DOMContentLoaded', () => {
       'An unexpected error occurred. The development team has been notified.'
     );
   });
-
-  // Example: Accessibility toggle feedback
-  const accessibilityButtons = document.querySelectorAll(
-    '.accessibility-controls button'
-  );
-  accessibilityButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      const label = button.getAttribute('aria-label');
-      const isPressed = button.getAttribute('aria-pressed') === 'true';
-
-      window.NotificationToast.info(
-        'Accessibility Setting',
-        `${label} ${isPressed ? 'disabled' : 'enabled'}.`
-      );
-    });
-  });
 });

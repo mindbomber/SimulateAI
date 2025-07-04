@@ -285,12 +285,6 @@
     grid-column: 1 / -1;
     grid-row: 3;
   }
-  
-  .accessibility-controls {
-    grid-column: 1 / -1;
-    grid-row: 4;
-    justify-self: start;
-  }
 }
 
 /* Error page styles */

@@ -792,20 +792,6 @@ body {
   }
 }
 
-/* Accessibility Improvements */
-.accessibility-controls {
-  display: flex;
-  gap: var(--spacing-2);
-  align-items: center;
-}
-
-/* Hide accessibility controls on very small screens to save space */
-@media (max-width: 480px) {
-  .accessibility-controls {
-    display: none;
-  }
-}
-
 .btn-icon {
   background: none;
   border: 1px solid var(--color-gray-300);
@@ -1775,7 +1761,6 @@ th {
 
   .header,
   .footer,
-  .accessibility-controls,
   .btn-icon,
   .modal-backdrop {
     display: none !important;
