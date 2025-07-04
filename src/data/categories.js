@@ -16,7 +16,14 @@
 
 /**
  * Category Data Structure for Ethical Dilemma Categories
- * Each category contains 3 scenarios with ethical decision points
+ * 
+ * HIERARCHY CLARIFICATION:
+ * - CATEGORY: A thematic group of related ethical scenarios (e.g., "The Trolley Problem")
+ * - SCENARIO: Individual ethical dilemmas within a category (e.g., "Autonomous Vehicle Split Decision")  
+ * - SIMULATION: The interactive experience where users engage with scenarios
+ * 
+ * Each category contains 3 scenarios with ethical decision points.
+ * Each scenario becomes an interactive simulation when launched.
  */
 
 export const ETHICAL_CATEGORIES = {

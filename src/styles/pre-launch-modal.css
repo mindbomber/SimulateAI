@@ -72,10 +72,12 @@
   display: flex;
   background: #f8f9fa;
   border-bottom: 1px solid #e5e5e5;
-  position: relative;
+  position: sticky;
+  top: 0;
   flex-shrink: 0;
   min-height: 60px;
   width: 100%;
+  z-index: 20;
 }
 
 /* Scroll indicators for desktop tab overflow */

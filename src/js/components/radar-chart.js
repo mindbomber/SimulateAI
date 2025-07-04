@@ -169,6 +169,11 @@ export default class RadarChart {
       this.chart = new window.Chart(ctx, config);
       logger.info('Chart created successfully');
 
+      // Add mobile tooltip dismissal for demo charts and scenario charts
+      if (this.options.isDemo || this.options.realTime) {
+        this.setupMobileTooltipDismissal();
+      }
+
       // Force redraw to ensure labels are visible
       setTimeout(() => {
         if (this.chart) {
@@ -236,6 +241,10 @@ export default class RadarChart {
           intersect: false,
           mode: 'nearest',
         },
+        onClick: (event, activeElements) => {
+          // Handle click events for mobile tooltip toggle
+          this.handleChartClick(event, activeElements);
+        },
         plugins: {
           legend: {
             display: false, // Disable clickable legend to prevent chart toggle
@@ -264,7 +273,7 @@ export default class RadarChart {
             },
           },
           tooltip: {
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            backgroundColor: 'rgba(255, 255, 255, 0.3)',
             titleColor: '#1a202c',
             bodyColor: '#2d3748',
             borderColor: '#4a5568',
@@ -558,6 +567,21 @@ export default class RadarChart {
       this.chart.destroy();
       this.chart = null;
     }
+    
+    // Clean up mobile event listeners
+    if (this.documentTouchHandler) {
+      document.removeEventListener('touchstart', this.documentTouchHandler);
+      this.documentTouchHandler = null;
+    }
+    
+    // Clean up canvas click handler
+    if (this.canvasClickHandler) {
+      const canvas = this.container.querySelector('canvas');
+      if (canvas) {
+        canvas.removeEventListener('click', this.canvasClickHandler);
+      }
+      this.canvasClickHandler = null;
+    }
   }
 
   /**
@@ -568,5 +592,123 @@ export default class RadarChart {
       return this.chart.toBase64Image();
     }
     return null;
+  }
+
+  /**
+   * Handle chart click events for mobile tooltip toggle
+   * Allows users to click nodes to show/hide tooltips on mobile
+   */
+  handleChartClick(event, activeElements) {
+    // Only handle clicks on mobile/touch devices
+    if (!('ontouchstart' in window) && !navigator.maxTouchPoints) {
+      return;
+    }
+
+    if (!this.chart || !this.chart.tooltip) {
+      return;
+    }
+
+    // If clicking on a node/point
+    if (activeElements && activeElements.length > 0) {
+      const activeElement = activeElements[0];
+      const currentActiveElements = this.chart.tooltip.getActiveElements();
+      
+      // Check if the same element is already active
+      const isSameElement = currentActiveElements.length > 0 && 
+                           currentActiveElements[0].datasetIndex === activeElement.datasetIndex &&
+                           currentActiveElements[0].index === activeElement.index;
+      
+      if (isSameElement) {
+        // If the same node is clicked again, hide the tooltip (deselect)
+        this.chart.tooltip.setActiveElements([], {x: 0, y: 0});
+      } else {
+        // Show tooltip for the clicked node (select)
+        this.chart.tooltip.setActiveElements([activeElement], {
+          x: event.native.offsetX,
+          y: event.native.offsetY
+        });
+      }
+      
+      this.chart.update('none');
+      
+      // Prevent event from bubbling to avoid triggering document touch handler
+      if (event.native) {
+        event.native.stopPropagation();
+      }
+    } else {
+      // If clicking on empty area, hide tooltips
+      this.chart.tooltip.setActiveElements([], {x: 0, y: 0});
+      this.chart.update('none');
+    }
+  }
+
+  /**
+   * Setup mobile tooltip dismissal for demo and scenario charts
+   * Allows users to tap anywhere to dismiss tooltips on mobile
+   */
+  setupMobileTooltipDismissal() {
+    // Only add this functionality on mobile/touch devices
+    if (!('ontouchstart' in window) && !navigator.maxTouchPoints) {
+      return;
+    }
+
+    // Add direct canvas click handler for empty area clicks
+    const canvas = this.container.querySelector('canvas');
+    if (canvas) {
+      this.canvasClickHandler = (event) => {
+        // Get chart elements at the click position
+        const points = this.chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, false);
+        
+        // If no elements were clicked (empty area), hide tooltips
+        if (points.length === 0) {
+          if (this.chart && this.chart.tooltip) {
+            this.chart.tooltip.setActiveElements([], {x: 0, y: 0});
+            this.chart.update('none');
+          }
+        }
+      };
+      
+      canvas.addEventListener('click', this.canvasClickHandler);
+    }
+
+    // Add touch event listener to the container for touches outside canvas
+    this.container.addEventListener('touchstart', (event) => {
+      // Check if the touch is outside the canvas area
+      const canvas = this.container.querySelector('canvas');
+      if (!canvas) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const touch = event.touches[0];
+      
+      // If touch is outside the canvas, hide tooltips
+      if (touch.clientX < rect.left || 
+          touch.clientX > rect.right || 
+          touch.clientY < rect.top || 
+          touch.clientY > rect.bottom) {
+        
+        // Hide any active tooltips
+        if (this.chart && this.chart.tooltip) {
+          this.chart.tooltip.setActiveElements([], {x: 0, y: 0});
+          this.chart.update('none');
+        }
+      }
+    }, { passive: true });
+
+    // Also add a general document touch listener for clicking outside the entire container
+    this.documentTouchHandler = (event) => {
+      // Only dismiss if the touch is completely outside the radar chart container
+      if (!this.container.contains(event.target)) {
+        // Hide tooltips when touching outside the entire container
+        if (this.chart && this.chart.tooltip) {
+          this.chart.tooltip.setActiveElements([], {x: 0, y: 0});
+          this.chart.update('none');
+        }
+      }
+    };
+
+    document.addEventListener('touchstart', this.documentTouchHandler, { passive: true });
+    
+    const chartType = this.options.isDemo ? 'demo' : 'scenario';
+    logger.info(`Mobile tooltip dismissal setup complete for ${chartType} radar chart`);
   }
 }

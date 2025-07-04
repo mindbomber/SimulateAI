@@ -9,6 +9,7 @@ const DEFAULT_CARD_WIDTH = 350;
 const LEFT_EDGE_THRESHOLD = 50; // Distance from left edge to consider as "at start"
 const SCROLL_SNAP_INIT_DELAY = 200; // Delay before re-enabling scroll snap
 const PAGE_SCROLL_SNAP_DELAY = 300; // Delay before ensuring page scroll snap is disabled
+const MOBILE_BREAKPOINT = 768; // Mobile breakpoint for device detection
 
 /**
  * Initialize horizontal scroll enhancements for all scenarios grids
@@ -29,7 +30,11 @@ export function initializeHorizontalScroll() {
     resetScrollPosition(grid);
     enhanceScrolling(grid);
     addKeyboardNavigation(grid);
-    addTouchEnhancements(grid);
+    
+    // Only add touch enhancements on desktop to avoid interfering with native mobile scroll
+    if (!isMobileDevice()) {
+      addTouchEnhancements(grid);
+    }
     
     // Re-enable scroll snap after initialization
     setTimeout(() => {
@@ -311,6 +316,15 @@ export function preventPageScrollSnap() {
   
   // Run periodically to ensure it stays disabled
   setInterval(ensurePageScrollSnapDisabled, 1000);
+}
+
+/**
+ * Check if the current device is mobile
+ */
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+    || window.innerWidth <= MOBILE_BREAKPOINT 
+    || ('ontouchstart' in window);
 }
 
 // Auto-initialize when DOM is ready

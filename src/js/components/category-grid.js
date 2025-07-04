@@ -93,6 +93,7 @@ class CategoryGrid {
     const section = document.createElement('section');
     section.className = 'category-section';
     section.setAttribute('data-category-id', category.id);
+    section.id = `category-${category.id}`;
 
     const progress = this.getCategoryProgress(category.id);
     const scenarios = getCategoryScenarios(category.id);

@@ -1,6 +1,12 @@
 /**
  * Enhanced Scenario Generator for Open-Ended AI Ethics Exploration
  * Creates diverse, real-world scenarios for all age groups
+ * 
+ * DATA MODEL CLARIFICATION:
+ * - DOMAIN: Template area (e.g., "healthcare", "education")  
+ * - CATEGORY: Thematic grouping of scenarios (e.g., "The Trolley Problem")
+ * - SCENARIO: Individual ethical dilemma (e.g., "Autonomous Vehicle Split Decision")
+ * - SIMULATION: Interactive experience when user engages with a scenario
  */
 
 import logger from '../utils/logger.js';

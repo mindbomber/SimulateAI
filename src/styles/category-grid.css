@@ -676,6 +676,7 @@
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-4);
+    position: relative; /* Allow absolute positioning of progress ring */
   }
 
   .category-meta {
@@ -713,6 +714,15 @@
 
   .scenario-card {
     min-height: 250px;
+  }
+
+  .category-progress-ring {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50px;
+    height: 50px;
+    display: flex; /* Show on mobile */
   }
 }
 
@@ -755,21 +765,18 @@
   .scenarios-grid {
     padding: var(--spacing-6) var(--spacing-4) var(--spacing-8) var(--spacing-4);
     scroll-padding-left: var(--spacing-4);
-    /* Use exact viewport width minus all container padding */
-    width: calc(100vw - var(--spacing-3) * 2 - var(--spacing-4) * 2);
-    max-width: calc(100vw - var(--spacing-3) * 2 - var(--spacing-4) * 2);
-    margin: 0 auto;
+    /* Simplified width - let flexbox handle the sizing */
+    width: 100%;
+    max-width: none;
+    margin: 0;
     box-sizing: border-box;
-    /* Targeted overflow prevention - only for the scrolling element */
+    /* Simplified overflow and containment */
     overflow-x: auto;
     overflow-y: hidden;
-    contain: layout; /* Less restrictive containment */
-    transform: translateZ(0);
-    /* Prevent scroll from affecting parent layout */
-    overscroll-behavior-x: contain;
-    overscroll-behavior-y: none;
-    /* Only allow horizontal touch scrolling */
-    touch-action: pan-x;
+    /* Allow natural touch scrolling */
+    -webkit-overflow-scrolling: touch;
+    /* Allow all touch actions for better mobile scrolling */
+    touch-action: auto;
   }
 }
 
@@ -782,21 +789,18 @@
     padding: var(--spacing-4) var(--spacing-3) var(--spacing-6) var(--spacing-3);
     scroll-padding-left: var(--spacing-3);
     gap: var(--spacing-4);
-    /* Use exact viewport width minus all container padding */
-    width: calc(100vw - var(--spacing-2) * 2 - var(--spacing-3) * 2);
-    max-width: calc(100vw - var(--spacing-2) * 2 - var(--spacing-3) * 2);
-    margin: 0 auto;
+    /* Simplified width - let flexbox handle the sizing */
+    width: 100%;
+    max-width: none;
+    margin: 0;
     box-sizing: border-box;
-    /* Targeted overflow prevention - only for the scrolling element */
+    /* Simplified overflow and containment */
     overflow-x: auto;
     overflow-y: hidden;
-    contain: layout; /* Less restrictive containment */
-    transform: translateZ(0);
-    /* Prevent scroll from affecting parent layout */
-    overscroll-behavior-x: contain;
-    overscroll-behavior-y: none;
-    /* Only allow horizontal touch scrolling */
-    touch-action: pan-x;
+    /* Allow natural touch scrolling */
+    -webkit-overflow-scrolling: touch;
+    /* Allow all touch actions for better mobile scrolling */
+    touch-action: auto;
   }
 }
 

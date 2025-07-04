@@ -12,7 +12,7 @@
   padding: 1rem; /* Reduced padding for more space */
   background: transparent; /* No background to blend with parent */
   border-radius: 0; /* No border radius */
-  box-shadow: none; /* No shadow */
+  box-shadow: -4px 4px 8px rgba(0, 0, 0, 0.12); /* Subtle bottom-left shadow */
   transition: none; /* No transitions */
   border: none; /* No border */
 }
@@ -72,6 +72,7 @@
   margin: 0 auto;
   border-radius: 12px;
   background: transparent;
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.12); /* Subtle bottom-right shadow similar to demo */
 }
 
 /* Fallback chart when Chart.js fails to load */

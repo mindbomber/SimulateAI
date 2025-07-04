@@ -143,7 +143,8 @@ class AIEthicsApp {
     this.errorBoundary = null;
     this.lastError = null;
 
-    // Available simulations
+    // Available simulation categories (each containing multiple scenarios)
+    // NOTE: These are thematic categories, not individual scenarios
     this.availableSimulations = [
       {
         id: 'bias-fairness',
@@ -252,6 +253,9 @@ class AIEthicsApp {
       // Initialize horizontal scroll functionality
       initializeHorizontalScroll();
 
+      // Initialize scroll reveal header
+      this.initializeScrollRevealHeader();
+
       this.isInitialized = true;
       AppDebug.log(
         'AI Ethics App initialized successfully with modernized infrastructure'
@@ -314,6 +318,58 @@ class AIEthicsApp {
     this.setupThemeMonitoring();
 
     AppDebug.log('Theme initialized:', this.currentTheme, this.preferences);
+  }
+
+  /**
+   * Initialize scroll reveal header functionality
+   */
+  initializeScrollRevealHeader() {
+    const header = document.querySelector('.header');
+    if (!header) return;
+
+    let lastScrollY = window.scrollY;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Don't hide header at the very top of the page
+      if (currentScrollY <= 10) {
+        header.classList.remove('header-hidden');
+        header.classList.add('header-visible');
+      } else {
+        // Hide header when scrolling down, show when scrolling up
+        if (currentScrollY > lastScrollY && currentScrollY > 100) {
+          // Scrolling down - hide header
+          header.classList.add('header-hidden');
+          header.classList.remove('header-visible');
+        } else if (currentScrollY < lastScrollY) {
+          // Scrolling up - show header
+          header.classList.remove('header-hidden');
+          header.classList.add('header-visible');
+        }
+      }
+      
+      lastScrollY = currentScrollY;
+    };
+
+    // Throttle scroll events for better performance
+    let ticking = false;
+    const throttledHandleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', throttledHandleScroll, { passive: true });
+
+    // Initialize header as visible
+    header.classList.add('header-visible');
+    
+    AppDebug.log('Scroll reveal header initialized');
   }
 
   /**
@@ -1881,7 +1937,6 @@ class AIEthicsApp {
    */
   setupMobileNavigation() {
     const navToggle = document.querySelector('.nav-toggle');
-    const navClose = document.querySelector('.nav-close');
     const mainNav = document.querySelector('.main-nav');
     const navBackdrop = document.querySelector('.nav-backdrop');
     const navLinks = document.querySelectorAll('.nav-link');
@@ -1932,14 +1987,6 @@ class AIEthicsApp {
       toggleNav();
     });
 
-    // Close button click
-    if (navClose) {
-      navClose.addEventListener('click', e => {
-        e.preventDefault();
-        toggleNav(false);
-      });
-    }
-
     // Backdrop click
     if (navBackdrop) {
       navBackdrop.addEventListener('click', () => {
@@ -1947,11 +1994,43 @@ class AIEthicsApp {
       });
     }
 
+    // Click outside to close navigation (comprehensive handler)
+    document.addEventListener('click', e => {
+      // Only handle if navigation is open
+      if (!mainNav.classList.contains('open')) {
+        return;
+      }
+
+      // Don't close if clicking on the nav toggle button (it has its own handler)
+      if (navToggle.contains(e.target)) {
+        return;
+      }
+
+      // Don't close if clicking inside the navigation panel
+      if (mainNav.contains(e.target)) {
+        return;
+      }
+
+      // Don't close if clicking on the backdrop (it has its own handler)
+      if (navBackdrop && navBackdrop.contains(e.target)) {
+        return;
+      }
+
+      // Click was outside navigation - close it
+      toggleNav(false);
+    });
+
     // Close nav when clicking on nav links
     navLinks.forEach(link => {
       link.addEventListener('click', e => {
         const href = link.getAttribute('href');
         const text = link.textContent.trim();
+
+        // Skip handling for mega menu trigger on mobile
+        const MOBILE_BREAKPOINT = 768;
+        if (link.closest('.nav-item-dropdown') && window.innerWidth <= MOBILE_BREAKPOINT) {
+          return; // Let mega menu handle this
+        }
 
         logger.info(`Navigation link clicked: "${text}" -> ${href}`);
 
@@ -2050,6 +2129,244 @@ class AIEthicsApp {
 
     // Handle focus trap for accessibility
     this.setupNavFocusTrap(mainNav, navToggle);
+
+    /**
+     * Initialize mega menu functionality
+     */
+    function initializeMegaMenu() {
+      const megaMenuTrigger = document.querySelector('.nav-item-dropdown .nav-link');
+      const megaMenuDropdown = document.querySelector('.nav-item-dropdown');
+      const megaMenu = document.querySelector('.mega-menu');
+      
+      if (!megaMenuTrigger || !megaMenuDropdown || !megaMenu) return;
+
+      // Mobile detection
+      const MOBILE_BREAKPOINT = 768;
+      const isMobile = () => window.innerWidth <= MOBILE_BREAKPOINT;
+
+      // Mobile doesn't need close button for simple dropdown
+
+      // Initialize search filter (desktop only)
+      const searchInput = document.querySelector('.mega-menu-search');
+      if (searchInput && !isMobile()) {
+        searchInput.addEventListener('input', (e) => {
+          const searchTerm = e.target.value.toLowerCase();
+          const menuItems = document.querySelectorAll('.mega-menu-item');
+          let visibleCount = 0;
+          
+          menuItems.forEach(item => {
+            const title = item.querySelector('h4').textContent.toLowerCase();
+            const description = item.querySelector('p').textContent.toLowerCase();
+            
+            if (title.includes(searchTerm) || description.includes(searchTerm)) {
+              item.style.display = 'flex';
+              visibleCount++;
+            } else {
+              item.style.display = 'none';
+            }
+          });
+
+          // Show/hide "no results" message
+          let noResultsMsg = document.querySelector('.mega-menu-no-results');
+          if (visibleCount === 0 && searchTerm.length > 0) {
+            if (!noResultsMsg) {
+              noResultsMsg = document.createElement('div');
+              noResultsMsg.className = 'mega-menu-no-results';
+              noResultsMsg.innerHTML = `
+                <div style="text-align: center; padding: var(--spacing-6); color: var(--color-gray-600);">
+                  <p>No categories match "${searchTerm}"</p>
+                  <small>Try searching for terms like "privacy", "decision", or "robot"</small>
+                </div>
+              `;
+              document.querySelector('.mega-menu-grid').appendChild(noResultsMsg);
+            }
+            noResultsMsg.style.display = 'block';
+          } else if (noResultsMsg) {
+            noResultsMsg.style.display = 'none';
+          }
+        });
+
+        // Clear search when menu closes
+        const clearSearch = () => {
+          searchInput.value = '';
+          const menuItems = document.querySelectorAll('.mega-menu-item');
+          menuItems.forEach(item => {
+            item.style.display = 'flex';
+          });
+          const noResultsMsg = document.querySelector('.mega-menu-no-results');
+          if (noResultsMsg) {
+            noResultsMsg.style.display = 'none';
+          }
+        };
+
+        // Clear search on menu close (desktop only)
+        if (!isMobile()) {
+          megaMenuTrigger.addEventListener('click', clearSearch);
+        }
+      }
+
+      // Handle mega menu trigger click
+      megaMenuTrigger.addEventListener('click', (e) => {
+        if (isMobile()) {
+          e.preventDefault();
+          e.stopPropagation();
+          const isExpanded = megaMenuDropdown.getAttribute('aria-expanded') === 'true';
+          megaMenuDropdown.setAttribute('aria-expanded', !isExpanded);
+          
+          // Simple dropdown - no body scroll prevention needed
+        }
+      });
+
+      // Handle mega menu item clicks
+      const megaMenuItems = document.querySelectorAll('.mega-menu-item');
+      megaMenuItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.preventDefault();
+          const href = item.getAttribute('href');
+          
+          // Close mega menu
+          megaMenuDropdown.setAttribute('aria-expanded', 'false');
+          
+          // On mobile, also close the main navigation
+          const MOBILE_BREAKPOINT = 768;
+          if (window.innerWidth <= MOBILE_BREAKPOINT) {
+            const mainNav = document.querySelector('.main-nav');
+            const navToggle = document.querySelector('.nav-toggle');
+            const navBackdrop = document.querySelector('.nav-backdrop');
+            
+            if (mainNav && navToggle) {
+              mainNav.classList.remove('open');
+              navToggle.classList.remove('active');
+              navToggle.setAttribute('aria-expanded', 'false');
+              mainNav.setAttribute('aria-hidden', 'true');
+              
+              if (navBackdrop) {
+                navBackdrop.classList.remove('open');
+              }
+              
+              // Restore body scroll
+              document.body.style.overflow = '';
+            }
+          }
+          
+          // Scroll to category section
+          if (href.startsWith('#category-')) {
+            const categoryId = href.replace('#category-', '');
+            let categoryElement = document.querySelector(`[data-category-id="${categoryId}"]`);
+            
+            // Fallback to ID selector if data attribute doesn't work
+            if (!categoryElement) {
+              categoryElement = document.querySelector(`#category-${categoryId}`);
+            }
+            
+            if (categoryElement) {
+              // Add a small delay to ensure the menu is closed before scrolling
+              setTimeout(() => {
+                categoryElement.scrollIntoView({ 
+                  behavior: 'smooth', 
+                  block: 'start' 
+                });
+              }, 100);
+            } else {
+              // Fallback to simulations section
+              const simulationsSection = document.querySelector('#simulations');
+              if (simulationsSection) {
+                setTimeout(() => {
+                  simulationsSection.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                  });
+                }, 100);
+              }
+            }
+          }
+        });
+      });
+
+      // Handle view all link
+      const viewAllLink = document.querySelector('.mega-menu-view-all');
+      if (viewAllLink) {
+        viewAllLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          megaMenuDropdown.setAttribute('aria-expanded', 'false');
+          
+          // On mobile, also close the main navigation
+          const MOBILE_BREAKPOINT = 768;
+          if (window.innerWidth <= MOBILE_BREAKPOINT) {
+            const mainNav = document.querySelector('.main-nav');
+            const navToggle = document.querySelector('.nav-toggle');
+            const navBackdrop = document.querySelector('.nav-backdrop');
+            
+            if (mainNav && navToggle) {
+              mainNav.classList.remove('open');
+              navToggle.classList.remove('active');
+              navToggle.setAttribute('aria-expanded', 'false');
+              mainNav.setAttribute('aria-hidden', 'true');
+              
+              if (navBackdrop) {
+                navBackdrop.classList.remove('open');
+              }
+              
+              // Restore body scroll
+              document.body.style.overflow = '';
+            }
+          }
+          
+          const simulationsSection = document.querySelector('#simulations');
+          if (simulationsSection) {
+            setTimeout(() => {
+              simulationsSection.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+              });
+            }, 100);
+          }
+        });
+      }
+
+      // Close mega menu when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!megaMenuDropdown.contains(e.target)) {
+          megaMenuDropdown.setAttribute('aria-expanded', 'false');
+          // Simple dropdown - no body scroll management needed
+        }
+      });
+
+      // Handle keyboard navigation
+      megaMenuTrigger.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          const isExpanded = megaMenuDropdown.getAttribute('aria-expanded') === 'true';
+          megaMenuDropdown.setAttribute('aria-expanded', !isExpanded);
+          
+          // Simple dropdown - no body scroll management needed
+        }
+        if (e.key === 'Escape') {
+          megaMenuDropdown.setAttribute('aria-expanded', 'false');
+          // Simple dropdown - no body scroll management needed
+        }
+      });
+
+      // Handle escape key for mobile mega menu
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isMobile()) {
+          const isExpanded = megaMenuDropdown.getAttribute('aria-expanded') === 'true';
+          if (isExpanded) {
+            megaMenuDropdown.setAttribute('aria-expanded', 'false');
+            // Simple dropdown - no body scroll management needed
+          }
+        }
+      });
+
+      // Handle window resize
+      window.addEventListener('resize', () => {
+        // Close mega menu on resize to avoid layout issues
+        megaMenuDropdown.setAttribute('aria-expanded', 'false');
+      });
+    }
+
+    // Initialize mega menu when DOM is ready
+    document.addEventListener('DOMContentLoaded', initializeMegaMenu);
   }
 
   /**
