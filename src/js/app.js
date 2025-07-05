@@ -45,6 +45,7 @@ import { PostSimulationModal } from './components/post-simulation-modal.js';
 import ModalFooterManager from './components/modal-footer-manager.js';
 import CategoryGrid from './components/category-grid.js';
 import RadarChart from './components/radar-chart.js';
+import { getAllCategories, getCategoryScenarios } from '../data/categories.js';
 
 // Constants for app configuration
 const APP_CONSTANTS = {
@@ -892,6 +893,9 @@ class AIEthicsApp {
   setupEventListeners() {
     // Mobile navigation functionality
     this.setupMobileNavigation();
+
+    // Surprise Me functionality
+    this.setupSurpriseMe();
 
     // Hero section buttons
     const startLearningBtn = document.getElementById('start-learning');
@@ -1911,6 +1915,106 @@ class AIEthicsApp {
   }
 
   /**
+   * Sets up Surprise Me functionality
+   */
+  setupSurpriseMe() {
+    const surpriseMeBtn = document.getElementById('surprise-me-nav');
+    if (surpriseMeBtn) {
+      surpriseMeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.launchRandomScenario();
+      });
+    }
+  }
+
+  /**
+   * Launches a random uncompleted scenario
+   */
+  launchRandomScenario() {
+    const randomScenario = this.getRandomUncompletedScenario();
+    
+    if (!randomScenario) {
+      this.showNotification(
+        '🎉 Congratulations! You\'ve completed all scenarios! Try replaying your favorites.',
+        'success',
+        APP_CONSTANTS.TIMING.NOTIFICATION_DURATION
+      );
+      return;
+    }
+
+    // Close mobile navigation if open
+    const mainNav = document.querySelector('.main-nav');
+    if (mainNav && mainNav.classList.contains('open')) {
+      mainNav.classList.remove('open');
+      const navToggle = document.querySelector('.nav-toggle');
+      if (navToggle) {
+        navToggle.classList.remove('active');
+        navToggle.setAttribute('aria-expanded', 'false');
+      }
+      document.body.style.overflow = '';
+    }
+
+    // Show notification about the selected scenario
+    this.showNotification(
+      `🎉 Surprise! Opening "${randomScenario.scenario.title}" from ${randomScenario.category.title}`,
+      'info',
+      APP_CONSTANTS.TIMING.NOTIFICATION_DURATION
+    );
+
+    // Launch the scenario directly (skip pre-launch modal for surprise factor)
+    if (this.categoryGrid) {
+      this.categoryGrid.openScenarioModalDirect(randomScenario.category.id, randomScenario.scenario.id);
+    } else {
+      // Fallback if categoryGrid is not available
+      logger.warn('CategoryGrid not available, redirecting to scenario');
+      window.location.href = `#scenario-${randomScenario.scenario.id}`;
+    }
+  }
+
+  /**
+   * Gets a random uncompleted scenario from all categories
+   * @returns {Object|null} Object with category and scenario, or null if all completed
+   */
+  getRandomUncompletedScenario() {
+    try {
+      // Get all categories and their scenarios
+      const allCategories = getAllCategories();
+      
+      // Load user progress
+      const stored = localStorage.getItem('simulateai_category_progress');
+      const userProgress = stored ? JSON.parse(stored) : {};
+
+      // Collect all uncompleted scenarios
+      const uncompletedScenarios = [];
+
+      allCategories.forEach(category => {
+        const scenarios = getCategoryScenarios(category.id);
+        scenarios.forEach(scenario => {
+          const isCompleted = userProgress[category.id]?.[scenario.id] || false;
+          if (!isCompleted) {
+            uncompletedScenarios.push({
+              category,
+              scenario
+            });
+          }
+        });
+      });
+
+      // Return random uncompleted scenario
+      if (uncompletedScenarios.length === 0) {
+        return null; // All scenarios completed
+      }
+
+      const randomIndex = Math.floor(Math.random() * uncompletedScenarios.length);
+      return uncompletedScenarios[randomIndex];
+
+    } catch (error) {
+      logger.error('Failed to get random uncompleted scenario:', error);
+      return null;
+    }
+  }
+
+  /**
    * Sets up mobile navigation hamburger menu functionality
    */
   setupMobileNavigation() {
@@ -2012,8 +2116,13 @@ class AIEthicsApp {
 
         logger.info(`Navigation link clicked: "${text}" -> ${href}`);
 
+        // Skip surprise me button - it has its own handler
+        if (link.id === 'surprise-me-nav') {
+          return;
+        }
+
         // Handle hash-based navigation
-        if (href && href.startsWith('#')) {
+        if (href && href.startsWith('#') && href !== '#') {
           // Prevent default browser jump behavior
           e.preventDefault();
 

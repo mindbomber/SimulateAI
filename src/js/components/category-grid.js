@@ -197,6 +197,9 @@ class CategoryGrid {
     const scenarioCard = event.target.closest('.scenario-card');
     if (!scenarioCard) return;
 
+    // Prevent default navigation behavior
+    event.preventDefault();
+
     const scenarioId = scenarioCard.getAttribute('data-scenario-id');
     const categoryId = scenarioCard.getAttribute('data-category-id');
     

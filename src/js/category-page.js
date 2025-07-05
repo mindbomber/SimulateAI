@@ -20,6 +20,9 @@
  */
 
 import { getAllCategories, getCategoryScenarios, getCategoryProgress } from '../data/categories.js';
+import PreLaunchModal from './components/pre-launch-modal.js';
+import ScenarioModal from './components/scenario-modal.js';
+import logger from './utils/logger.js';
 
 class CategoryPage {
   constructor() {
@@ -53,6 +56,9 @@ class CategoryPage {
     
     // Set up event listeners
     this.setupEventListeners();
+    
+    // Set up Surprise Me functionality
+    this.setupSurpriseMe();
     
     // Update page metadata
     this.updatePageMetadata();
@@ -201,9 +207,19 @@ class CategoryPage {
     document.addEventListener('click', (e) => {
       const scenarioCard = e.target.closest('.scenario-card');
       if (scenarioCard) {
-        const { scenarioId } = scenarioCard.dataset;
-        if (scenarioId) {
-          this.launchScenario(scenarioId);
+        // Prevent default navigation behavior
+        e.preventDefault();
+        
+        const scenarioId = scenarioCard.getAttribute('data-scenario-id');
+        const categoryId = scenarioCard.getAttribute('data-category-id');
+        
+        // Check if the clicked element is the quick start button
+        if (e.target.classList.contains('scenario-quick-start-btn') || 
+            e.target.closest('.scenario-quick-start-btn')) {
+          this.openScenarioModalDirect(categoryId, scenarioId);
+        } else {
+          // Regular Learning Lab button - go through pre-launch modal
+          this.openScenario(categoryId, scenarioId);
         }
       }
     });
@@ -214,21 +230,258 @@ class CategoryPage {
         const scenarioCard = e.target.closest('.scenario-card');
         if (scenarioCard) {
           e.preventDefault();
-          const { scenarioId } = scenarioCard.dataset;
-          if (scenarioId) {
-            this.launchScenario(scenarioId);
+          
+          const scenarioId = scenarioCard.getAttribute('data-scenario-id');
+          const categoryId = scenarioCard.getAttribute('data-category-id');
+          
+          // Check if focus is on the quick start button
+          if (e.target.classList.contains('scenario-quick-start-btn')) {
+            this.openScenarioModalDirect(categoryId, scenarioId);
+          } else {
+            // Regular Learning Lab button behavior
+            this.openScenario(categoryId, scenarioId);
           }
         }
       }
     });
   }
 
-  launchScenario(scenarioId) {
+  openScenario(categoryId, scenarioId) {
     const scenario = this.scenarios.find(s => s.id === scenarioId);
-    if (scenario) {
-      // For now, redirect to main page with scenario parameter
-      // This ensures compatibility with existing simulation system
-      window.location.href = `index.html?scenario=${scenarioId}&category=${this.categoryId}`;
+
+    if (!this.category || !scenario) {
+      logger.error('Category or scenario not found:', categoryId, scenarioId);
+      return;
+    }
+
+    logger.info('Opening premodal for category:', this.category);
+
+    // Dispatch custom event for other components to listen to
+    const event = new CustomEvent('scenario-selected', {
+      detail: { category: this.category, scenario, categoryId, scenarioId },
+    });
+    document.dispatchEvent(event);
+
+    // Open the PreLaunchModal configured for this category
+    this.openCategoryPremodal(this.category, scenario);
+  }
+
+  openCategoryPremodal(category, scenario) {
+    try {
+      // Use the category ID as the "simulation ID" and pass category/scenario data
+      const preModal = new PreLaunchModal(category.id, {
+        categoryData: category,
+        scenarioData: scenario,
+        onLaunch: () => {
+          logger.info('Starting scenario:', scenario.title);
+          // Launch the scenario modal with both category and scenario IDs
+          this.openScenarioModal(scenario.id, category.id);
+        },
+        onCancel: () => {
+          logger.info('Category premodal cancelled');
+        },
+        showEducatorResources: true,
+      });
+
+      preModal.show();
+    } catch (error) {
+      logger.error('Failed to open category premodal:', error);
+      // Fallback to simple alert
+      alert(
+        `Opening "${scenario.title}" from ${category.title} - Premodal setup needed for categories!`
+      );
+    }
+  }
+
+  /**
+   * Open scenario modal for a specific scenario
+   */
+  openScenarioModal(scenarioId, categoryId = null) {
+    try {
+      const scenarioModal = new ScenarioModal();
+      scenarioModal.open(scenarioId, categoryId);
+
+      // Listen for scenario completion
+      document.addEventListener(
+        'scenario-completed',
+        this.handleScenarioCompleted.bind(this),
+        { once: true }
+      );
+    } catch (error) {
+      logger.error('Failed to open scenario modal:', error);
+      // Fallback to alert
+      alert(`Failed to open scenario modal for: ${scenarioId}`);
+    }
+  }
+
+  /**
+   * Open scenario modal directly, skipping pre-launch modal
+   */
+  openScenarioModalDirect(categoryId, scenarioId) {
+    const scenario = this.scenarios.find(s => s.id === scenarioId);
+
+    if (!this.category || !scenario) {
+      logger.error('Category or scenario not found:', categoryId, scenarioId);
+      return;
+    }
+
+    logger.info('Opening scenario modal directly for:', scenario.title);
+
+    // Dispatch custom event for other components to listen to
+    const event = new CustomEvent('scenario-selected', {
+      detail: { category: this.category, scenario, categoryId, scenarioId },
+    });
+    document.dispatchEvent(event);
+
+    // Open the scenario modal directly
+    this.openScenarioModal(scenarioId, categoryId);
+  }
+
+  /**
+   * Handle scenario completion event
+   */
+  handleScenarioCompleted(event) {
+    const { scenarioId, selectedOption, option } = event.detail;
+
+    logger.info('Scenario completed:', {
+      scenarioId,
+      selectedOption,
+      optionText: option.text,
+    });
+
+    // Update progress
+    this.updateProgress(this.categoryId, scenarioId, true);
+
+    // Track analytics if available
+    if (window.AnalyticsManager) {
+      window.AnalyticsManager.trackEvent('scenario_completed', {
+        categoryId: this.categoryId,
+        scenarioId,
+        selectedOption,
+        optionText: option.text,
+        impact: option.impact,
+      });
+    }
+  }
+
+  updateProgress(categoryId, scenarioId, completed = true) {
+    const userProgress = this.loadUserProgress();
+    
+    if (!userProgress[categoryId]) {
+      userProgress[categoryId] = {};
+    }
+
+    userProgress[categoryId][scenarioId] = completed;
+    
+    // Save progress
+    try {
+      localStorage.setItem('simulateai_category_progress', JSON.stringify(userProgress));
+    } catch (error) {
+      logger.error('Failed to save user progress:', error);
+    }
+
+    // Re-render to update progress indicators
+    this.renderCategoryHeader();
+    this.renderScenariosGrid();
+  }
+
+  /**
+   * Sets up Surprise Me functionality
+   */
+  setupSurpriseMe() {
+    const surpriseMeBtn = document.getElementById('surprise-me-nav');
+    if (surpriseMeBtn) {
+      surpriseMeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.launchRandomScenario();
+      });
+    }
+  }
+
+  /**
+   * Launches a random uncompleted scenario
+   */
+  launchRandomScenario() {
+    const randomScenario = this.getRandomUncompletedScenario();
+    
+    if (!randomScenario) {
+      this.showNotification(
+        '🎉 Congratulations! You\'ve completed all scenarios! Try replaying your favorites.',
+        'success'
+      );
+      return;
+    }
+
+    // Show notification about the selected scenario
+    this.showNotification(
+      `🎉 Surprise! Opening "${randomScenario.scenario.title}" from ${randomScenario.category.title}`,
+      'info'
+    );
+
+    // Launch the scenario directly (skip pre-launch modal for surprise factor)
+    this.openScenarioModalDirect(randomScenario.category.id, randomScenario.scenario.id);
+  }
+
+  /**
+   * Gets a random uncompleted scenario from all categories
+   * @returns {Object|null} Object with category and scenario, or null if all completed
+   */
+  getRandomUncompletedScenario() {
+    try {
+      // Get all categories and their scenarios
+      const allCategories = getAllCategories();
+      
+      // Load user progress
+      const userProgress = this.loadUserProgress();
+
+      // Collect all uncompleted scenarios
+      const uncompletedScenarios = [];
+
+      allCategories.forEach(category => {
+        const scenarios = getCategoryScenarios(category.id);
+        scenarios.forEach(scenario => {
+          const isCompleted = userProgress[category.id]?.[scenario.id] || false;
+          if (!isCompleted) {
+            uncompletedScenarios.push({
+              category,
+              scenario
+            });
+          }
+        });
+      });
+
+      // Return random uncompleted scenario
+      if (uncompletedScenarios.length === 0) {
+        return null; // All scenarios completed
+      }
+
+      const randomIndex = Math.floor(Math.random() * uncompletedScenarios.length);
+      return uncompletedScenarios[randomIndex];
+
+    } catch (error) {
+      logger.error('Failed to get random uncompleted scenario:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Shows a notification message
+   * @param {string} message - The notification message
+   * @param {string} type - The notification type ('success', 'error', 'warning', 'info')
+   */
+  showNotification(message, type = 'info') {
+    if (window.NotificationToast) {
+      // Use the global notification toast instance
+      return window.NotificationToast.show({
+        type,
+        message,
+        duration: 4000,
+        closable: true,
+      });
+    } else {
+      // Fallback to logger if notification system not available
+      logger.info(`[${type.toUpperCase()}] ${message}`);
+      return null;
     }
   }
 

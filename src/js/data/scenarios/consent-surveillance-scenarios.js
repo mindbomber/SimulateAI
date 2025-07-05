@@ -1,4 +1,4 @@
-/**
+/*
  * Consent and Surveillance Scenarios
  * Scenarios dealing with privacy, data collection, and surveillance ethics
  */
