@@ -401,19 +401,13 @@ ${this.createProgressRing(category, progress)}
    * Clean up any existing modal instances to prevent multiple modals
    */
   cleanupExistingModals() {
-    // Close any existing pre-launch modals
+    // Close any existing pre-launch modals by backdrop
     const existingModalBackdrops = document.querySelectorAll('.modal-backdrop');
     existingModalBackdrops.forEach(backdrop => {
       const modalDialog = backdrop.querySelector('.modal-dialog');
       if (modalDialog && modalDialog.querySelector('.pre-launch-modal')) {
-        // Found a pre-launch modal, close it
-        const closeButton = backdrop.querySelector('.modal-close');
-        if (closeButton) {
-          closeButton.click();
-        } else {
-          // Force remove if no close button found
-          backdrop.remove();
-        }
+        // Found a pre-launch modal, remove it immediately
+        backdrop.remove();
       }
     });
 
@@ -430,6 +424,16 @@ ${this.createProgressRing(category, progress)}
 
     // Clean up body styles that might be left behind
     document.body.style.overflow = '';
+    
+    // Remove any modal-related classes from body
+    document.body.classList.remove('modal-open');
+    
+    // Remove any lingering inert states from other elements
+    document.querySelectorAll('[inert]').forEach(el => {
+      if (!el.classList.contains('modal-backdrop')) {
+        el.removeAttribute('inert');
+      }
+    });
   }
 
   openCategoryPremodal(category, scenario) {

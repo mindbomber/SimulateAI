@@ -21,6 +21,7 @@
  * for the SimulateAI badge achievement system.
  */
 
+// Import js-confetti using package name - let Vite resolve it
 import JSConfetti from 'js-confetti';
 import { GLOW_INTENSITY_CLASSES } from '../data/badge-config.js';
 
