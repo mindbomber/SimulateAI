@@ -43,6 +43,8 @@ class CategoryGrid {
     this.container = null;
     this.categories = getAllCategories();
     this.userProgress = this.loadUserProgress();
+    this.lastModalOpenTime = 0; // Debounce tracking
+    this.modalOpenCooldown = 500; // Minimum time between modal opens (ms)
 
     this.init();
   }
@@ -432,6 +434,14 @@ ${this.createProgressRing(category, progress)}
    * Open scenario modal directly, skipping pre-launch modal
    */
   openScenarioModalDirect(categoryId, scenarioId) {
+    // Debounce to prevent rapid successive calls
+    const now = Date.now();
+    if (now - this.lastModalOpenTime < this.modalOpenCooldown) {
+      logger.warn('Modal opening too rapidly, ignoring duplicate request');
+      return;
+    }
+    this.lastModalOpenTime = now;
+
     const category = this.categories.find(c => c.id === categoryId);
     const scenario = category?.scenarios.find(s => s.id === scenarioId);
 

@@ -24,6 +24,7 @@ class ScenarioModal {
     this.selectedOption = null;
     this.currentCategoryId = null;
     this.currentScenarioId = null;
+    this.isOpening = false; // Flag to prevent duplicate openings
 
     // Cache for categories and scenarios
     this.categories = getAllCategories();
@@ -37,6 +38,14 @@ class ScenarioModal {
    */
   async open(scenarioId, categoryId = null) {
     try {
+      // Prevent duplicate openings
+      if (this.isOpening || this.modal) {
+        logger.warn('Modal is already opening or open, ignoring duplicate request');
+        return;
+      }
+
+      this.isOpening = true;
+
       // Find the category if not provided
       if (!categoryId) {
         categoryId = this.findCategoryForScenario(scenarioId);
@@ -74,6 +83,9 @@ class ScenarioModal {
     } catch (error) {
       logger.error('Failed to open scenario modal:', error);
       alert(`Failed to load scenario: ${scenarioId}. Please try again.`);
+    } finally {
+      // Reset the opening flag
+      this.isOpening = false;
     }
   }
 
@@ -98,6 +110,29 @@ class ScenarioModal {
   async createModal() {
     // Remove existing modal if present and wait for it to be fully closed
     await this.closeAndWait();
+
+    // Clean up any orphaned modals or radar chart containers from previous instances
+    const existingModals = document.querySelectorAll('.scenario-modal, .scenario-modal-backdrop');
+    existingModals.forEach(modal => {
+      logger.info('Removing orphaned modal element');
+      modal.remove();
+    });
+
+    // Clean up any orphaned radar chart containers with Chart.js instances
+    const orphanedChartContainers = document.querySelectorAll('#scenario-radar-chart');
+    orphanedChartContainers.forEach(container => {
+      const canvases = container.querySelectorAll('canvas');
+      canvases.forEach(canvas => {
+        if (window.Chart && window.Chart.getChart) {
+          const chartInstance = window.Chart.getChart(canvas);
+          if (chartInstance) {
+            logger.info('Destroying orphaned Chart.js instance');
+            chartInstance.destroy();
+          }
+        }
+      });
+      container.remove();
+    });
 
     logger.info('Creating scenario modal DOM structure');
     logger.info(
@@ -267,6 +302,16 @@ class ScenarioModal {
    */
   async initializeRadarChart() {
     try {
+      // Clean up any existing radar chart instance
+      if (this.radarChart) {
+        try {
+          this.radarChart.destroy();
+        } catch (e) {
+          logger.warn('Failed to destroy existing radar chart:', e);
+        }
+        this.radarChart = null;
+      }
+
       const chartContainer = document.getElementById('scenario-radar-chart');
       logger.info(
         `Radar chart initialization: container found = ${!!chartContainer}`
@@ -278,6 +323,20 @@ class ScenarioModal {
         );
         return;
       }
+
+      // Clean up any existing Chart.js instances in the container
+      const existingCanvases = chartContainer.querySelectorAll('canvas');
+      existingCanvases.forEach(canvas => {
+        // Check if there's a Chart.js instance attached to this canvas
+        if (window.Chart && window.Chart.getChart) {
+          const chartInstance = window.Chart.getChart(canvas);
+          if (chartInstance) {
+            logger.info('Destroying existing Chart.js instance before creating new one');
+            chartInstance.destroy();
+          }
+        }
+        canvas.remove();
+      });
 
       // Clear any existing content to prevent "null" display
       chartContainer.innerHTML = '';
@@ -644,6 +703,7 @@ class ScenarioModal {
     this.currentScenarioId = null;
     this.scenarioData = null;
     this.radarChart = null;
+    this.isOpening = false; // Reset opening flag
 
     logger.info('Scenario modal closed');
   }

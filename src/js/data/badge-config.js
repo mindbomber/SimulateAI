@@ -122,7 +122,7 @@ export const BADGE_CONFIGURATIONS = {
     badges: {
       tier1: {
         title: 'Privacy Guardian',
-        sidekickEmoji: '�️',
+        sidekickEmoji: '🛡️',
         quote: 'In a watched world, you chose to watch the watchers.',
         glowIntensity: 'low'
       },
