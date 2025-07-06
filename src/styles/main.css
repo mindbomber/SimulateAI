@@ -1041,6 +1041,11 @@ body {
 
 /* Mobile-specific section padding adjustments */
 @media (max-width: 768px) {
+  /* Adjust body padding for smaller header on tablets */
+  body {
+    padding-top: 95px !important; /* Increased padding with !important for tablet header */
+  }
+  
   .simulations-section,
   .educator-section,
   .about-section,
@@ -1053,6 +1058,11 @@ body {
 }
 
 @media (max-width: 480px) {
+  /* Adjust body padding for smaller header on mobile */
+  body {
+    padding-top: 90px !important; /* Ensure adequate clearance for mobile header with !important */
+  }
+  
   .simulations-section,
   .educator-section,
   .about-section,

@@ -1102,11 +1102,37 @@
     text-align: center;
   }
 
+  .category-header {
+    padding: var(--spacing-6);
+    flex-direction: column;
+    gap: var(--spacing-4);
+    text-align: center;
+    position: relative; /* Ensure absolute positioning context */
+  }
+
   .category-title-group {
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-4);
-    position: relative; /* Allow absolute positioning of progress ring */
+    position: static; /* Remove relative positioning from title group */
+  }
+
+  .category-icon-large {
+    width: 60px;
+    height: 60px;
+    font-size: 30px;
+    margin: 0 auto; /* Center the icon */
+  }
+
+  /* Position progress ring to the right of the centered emoji */
+  .category-progress-ring {
+    position: absolute;
+    left: 80%;
+    transform: translateX(calc(30px + var(--spacing-3))); /* Center + half icon width + spacing */
+    width: 50px;
+    height: 50px;
+    display: flex;
+    z-index: 10; /* Ensure it appears above other content */
   }
 
   .category-meta {
@@ -1144,15 +1170,6 @@
 
   .scenario-card {
     min-height: 250px;
-  }
-
-  .category-progress-ring {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 50px;
-    height: 50px;
-    display: flex; /* Show on mobile */
   }
 }
 

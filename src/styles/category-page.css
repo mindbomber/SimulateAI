@@ -8,6 +8,8 @@
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   padding: var(--spacing-8) 0;
   border-bottom: 1px solid var(--color-gray-200);
+  /* Add extra top margin to account for fixed header */
+  margin-top: 30px;
 }
 
 [data-theme='dark'] .category-page-header {
@@ -136,10 +138,39 @@
   margin-top: auto;
 }
 
+/* Category page specific main content spacing */
+.main-content {
+  /* Ensure proper spacing from fixed header on all pages */
+  margin-top: 0;
+}
+
+/* Category page specific: add extra margin for main content */
+.category-page-header ~ * .main-content,
+main.main-content {
+  /* Add top margin specifically for category pages */
+  padding-top: 0; /* Reset any padding */
+}
+
+/* Mobile-specific main content adjustments for category pages */
+@media (max-width: 768px) {
+  main.main-content {
+    /* Additional top spacing on mobile */
+    padding-top: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  main.main-content {
+    /* More top spacing on small mobile */
+    padding-top: 15px;
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .category-page-header {
-    padding: var(--spacing-6) 0;
+    /* Ensure adequate top margin on mobile to prevent header overlap */
+    margin-top: 50px !important; /* Significantly increased margin with !important */
   }
   
   .container {
@@ -175,7 +206,8 @@
 
 @media (max-width: 480px) {
   .category-page-header {
-    padding: var(--spacing-4) 0;
+    /* Additional safety margin on small mobile screens */
+    margin-top: 60px !important; /* Very large margin for mobile with !important */
   }
   
   .category-scenarios-grid {
