@@ -129,7 +129,7 @@ class AIEthicsApp {
     this.modal = null;
     this.enhancedModal = null;
     this.simulationContainer = null;
-    this.simulationsGrid = null;
+    this.categoriesGrid = null;
     this.lastFocusedElement = null; // For focus restoration
 
     // Theme and preferences
@@ -144,7 +144,7 @@ class AIEthicsApp {
     this.errorBoundary = null;
     this.lastError = null;
 
-    // Available simulation categories (each containing multiple scenarios)
+    // Available ethics categories (each containing multiple scenarios)
     // NOTE: These are thematic categories, not individual scenarios
     this.availableSimulations = [
       {
@@ -782,11 +782,11 @@ class AIEthicsApp {
     // Get key UI elements
     this.modal = document.getElementById('simulation-modal');
     this.simulationContainer = document.getElementById('simulation-container');
-    this.simulationsGrid = document.querySelector('.simulations-grid');
+    this.categoriesGrid = document.querySelector('.categories-grid, .simulations-grid');
     this.loading = document.getElementById('loading');
 
-    if (!this.simulationsGrid) {
-      AppDebug.error('Simulations grid not found');
+    if (!this.categoriesGrid) {
+      AppDebug.error('Categories grid not found');
       return;
     }
 
@@ -983,19 +983,19 @@ class AIEthicsApp {
   render() {
     // Skip rendering the old simulations grid if CategoryGrid is active
     if (!this.categoryGrid) {
-      this.renderSimulationsGrid();
+      this.renderCategoriesGrid();
     }
     // Hero demo is now handled by the HeroDemo class
   }
 
-  renderSimulationsGrid() {
-    if (!this.simulationsGrid) return;
+  renderCategoriesGrid() {
+    if (!this.categoriesGrid) return;
 
-    this.simulationsGrid.innerHTML = '';
+    this.categoriesGrid.innerHTML = '';
 
     this.availableSimulations.forEach(sim => {
       const card = this.createSimulationCard(sim);
-      this.simulationsGrid.appendChild(card);
+      this.categoriesGrid.appendChild(card);
     });
   }
 

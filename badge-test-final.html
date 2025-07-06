@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Badge Alert Test - Final</title>
+</head>
+<body>
+    <h1>Badge Alert Test - Final Verification</h1>
+    
+    <div style="margin: 20px 0;">
+        <h2>Test Scenarios:</h2>
+        <button onclick="test0Completed()">0 Completed (Should PULSE - 1 more for 1st badge)</button><br><br>
+        <button onclick="test1Completed()">1 Completed (Should NOT pulse - 2 more for 2nd badge)</button><br><br>
+        <button onclick="test2Completed()">2 Completed (Should PULSE - 1 more for 2nd badge)</button><br><br>
+        <button onclick="test3Completed()">3 Completed (Should NOT pulse - 3 more for 3rd badge)</button><br><br>
+        <button onclick="test5Completed()">5 Completed (Should PULSE - 1 more for 3rd badge)</button><br><br>
+        <button onclick="test6Completed()">6 Completed (Should NOT pulse - all badges earned)</button><br><br>
+    </div>
+    
+    <p><strong>After clicking a test button, go to the <a href="index.html" target="_blank">main page</a> to see the result.</strong></p>
+    <p>Look for the trolley-problem category's progress ring. It should have a pulsing animation when the test expects it.</p>
+    
+    <div style="background: #f0f0f0; padding: 15px; margin: 20px 0;">
+        <h3>Expected Results:</h3>
+        <ul>
+            <li><strong>Badge Requirements:</strong> 1st badge at 1 scenario, 2nd badge at 3 scenarios, 3rd badge at 6 scenarios</li>
+            <li><strong>Pulse Animation:</strong> Should appear when user is exactly 1 scenario away from earning a badge</li>
+            <li><strong>Tooltip:</strong> Should show badge name and emoji when user is close to earning one</li>
+        </ul>
+    </div>
+
+    <script>
+        const CATEGORY_ID = 'trolley-problem';
+        
+        function setBadgeAlertTest(categoryId, completedCount) {
+            const progress = {};
+            if (completedCount > 0) {
+                progress[categoryId] = {};
+                for (let i = 1; i <= completedCount; i++) {
+                    progress[categoryId][`scenario${i}`] = true;
+                }
+            }
+            localStorage.setItem('simulateai_category_progress', JSON.stringify(progress));
+            console.log(`Set ${completedCount} completed scenarios for ${categoryId}`, progress);
+        }
+        
+        function test0Completed() {
+            localStorage.removeItem('simulateai_category_progress');
+            console.log('✅ Test: 0 completed - Should show badge alert (1 more for 1st badge)');
+        }
+        
+        function test1Completed() {
+            setBadgeAlertTest(CATEGORY_ID, 1);
+            console.log('❌ Test: 1 completed - Should NOT show badge alert (2 more for 2nd badge)');
+        }
+        
+        function test2Completed() {
+            setBadgeAlertTest(CATEGORY_ID, 2);
+            console.log('✅ Test: 2 completed - Should show badge alert (1 more for 2nd badge)');
+        }
+        
+        function test3Completed() {
+            setBadgeAlertTest(CATEGORY_ID, 3);
+            console.log('❌ Test: 3 completed - Should NOT show badge alert (3 more for 3rd badge)');
+        }
+        
+        function test5Completed() {
+            setBadgeAlertTest(CATEGORY_ID, 5);
+            console.log('✅ Test: 5 completed - Should show badge alert (1 more for 3rd badge)');
+        }
+        
+        function test6Completed() {
+            setBadgeAlertTest(CATEGORY_ID, 6);
+            console.log('❌ Test: 6 completed - Should NOT show badge alert (all badges earned)');
+        }
+    </script>
+</body>
+</html>

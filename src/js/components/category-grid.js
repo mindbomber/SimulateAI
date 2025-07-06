@@ -50,7 +50,7 @@ class CategoryGrid {
   }
 
   init() {
-    this.container = document.querySelector('.simulations-grid');
+    this.container = document.querySelector('.categories-grid, .simulations-grid');
     if (!this.container) {
       logger.error('Category grid container not found');
       return;
@@ -238,15 +238,30 @@ ${this.createProgressRing(category, progress)}
     tooltipEl.textContent = tooltip;
     tooltipEl.setAttribute('role', 'tooltip');
     
-    // Position tooltip
+    // Position tooltip above the progress ring
     const rect = ring.getBoundingClientRect();
     tooltipEl.style.position = 'fixed';
-    tooltipEl.style.top = `${rect.bottom + TOOLTIP_OFFSET}px`;
     tooltipEl.style.left = `${rect.left + rect.width / 2}px`;
     tooltipEl.style.transform = 'translateX(-50%)';
     tooltipEl.style.zIndex = '1000';
     
     document.body.appendChild(tooltipEl);
+    
+    // Calculate position after adding to DOM so we can get tooltip height
+    const tooltipRect = tooltipEl.getBoundingClientRect();
+    const topPosition = rect.top - tooltipRect.height - TOOLTIP_OFFSET;
+    
+    // If tooltip would go off-screen at top, show it below instead
+    if (topPosition < 0) {
+      tooltipEl.style.top = `${rect.bottom + TOOLTIP_OFFSET}px`;
+    } else {
+      tooltipEl.style.top = `${topPosition}px`;
+    }
+    
+    // Trigger the visible state with a small delay to ensure CSS transition works
+    requestAnimationFrame(() => {
+      tooltipEl.classList.add('visible');
+    });
     
     // Store reference for cleanup
     ring._tooltip = tooltipEl;
@@ -656,18 +671,29 @@ ${this.createProgressRing(category, progress)}
    * @returns {string} Progress ring HTML
    */
   createProgressRing(category, progress) {
-    const badgeInfo = this.isOneScenarioFromNextBadge(category.id);
-    const isPulsingForBadge = badgeInfo !== null;
+    // Get badge progress information
+    const badgeProgress = badgeManager.getBadgeProgress(category.id);
+    const isOneScenarioAwayFromBadge = badgeProgress.nextBadge && badgeProgress.progress.remaining === 1;
     
-    // Generate tooltip content if one scenario away from badge
-    const tooltipContent = badgeInfo ? 
-      `${badgeInfo.current} of ${badgeInfo.required} scenarios completed. 1 more to unlock next badge: '${badgeInfo.badgeTitle}' ${badgeInfo.sidekickEmoji}` :
-      `${progress.completed} of ${progress.total} scenarios completed`;
+    // Create enhanced tooltip content
+    let tooltipContent = `${progress.completed} of ${progress.total} scenarios completed`;
+    
+    if (badgeProgress.nextBadge) {
+      if (isOneScenarioAwayFromBadge) {
+        tooltipContent += `. 1 more to unlock next badge: '${badgeProgress.nextBadge.title}' ${badgeProgress.nextBadge.sidekickEmoji}`;
+      } else {
+        const { remaining } = badgeProgress.progress;
+        tooltipContent += `. ${remaining} more to unlock next badge: '${badgeProgress.nextBadge.title}' ${badgeProgress.nextBadge.sidekickEmoji}`;
+      }
+    } else {
+      tooltipContent += ` (${progress.percentage}%)`;
+    }
 
-    const pulseClass = isPulsingForBadge ? 'pulse-for-badge' : '';
-    
+    // Add badge alert class if one scenario away from earning a badge
+    const badgeAlertClass = isOneScenarioAwayFromBadge ? ' badge-alert' : '';
+
     return `
-      <div class="category-progress-ring ${pulseClass}" 
+      <div class="category-progress-ring${badgeAlertClass}" 
            data-tooltip="${tooltipContent}"
            role="button"
            tabindex="0"

@@ -33,6 +33,10 @@
   --color-secondary: #00aa00;
   --color-secondary-dark: #008800;
   --color-accent: #ff6b35;
+  --color-accent-300: #ff9766;
+  --color-accent-400: #ff8150;
+  --color-accent-600: #e55a2b;
+  --color-accent-700: #cc4f24;
   --color-warning: #ffaa00;
   --color-error: #ff4444;
   --color-success: #4caf50;
@@ -1016,6 +1020,7 @@ body {
 
 .section-header {
   text-align: center;
+  margin-top: var(--spacing-20);
   margin-bottom: var(--spacing-16);
 }
 

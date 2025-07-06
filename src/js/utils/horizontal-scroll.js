@@ -1,6 +1,6 @@
 /**
  * Horizontal Scroll Enhancement
- * Adds smooth scrolling and navigation features to scenarios grids
+ * Adds smooth scrolling and navigation features to category grids
  */
 
 // Constants
@@ -20,16 +20,16 @@ const FINE_SCROLL_THRESHOLD = 30;
 const MIN_SCROLL_DISTANCE = 0.5;
 
 /**
- * Initialize horizontal scroll enhancements for all scenarios grids
+ * Initialize horizontal scroll enhancements for all category grids
  */
 export function initializeHorizontalScroll() {
   // Temporarily disable scroll snap on page to prevent interference
   document.documentElement.style.scrollSnapType = 'none';
   document.body.style.scrollSnapType = 'none';
   
-  const scenariosGrids = document.querySelectorAll('.scenarios-grid');
+  const categoryGrids = document.querySelectorAll('.categories-grid, .simulations-grid, .scenarios-grid');
   
-  scenariosGrids.forEach(grid => {
+  categoryGrids.forEach(grid => {
     // Temporarily disable scroll snap during initialization
     const originalScrollSnapType = grid.style.scrollSnapType;
     grid.style.scrollSnapType = 'none';
@@ -62,7 +62,7 @@ export function initializeHorizontalScroll() {
 
 /**
  * Reset scroll position to show the first card
- * @param {HTMLElement} grid - The scenarios grid element
+ * @param {HTMLElement} grid - The category grid element
  */
 function resetScrollPosition(grid) {
   // Set scroll position to 0 (leftmost)
@@ -80,8 +80,8 @@ function resetScrollPosition(grid) {
 }
 
 /**
- * Enhance scrolling behavior for a scenarios grid
- * @param {HTMLElement} grid - The scenarios grid element
+ * Enhance scrolling behavior for a category grid
+ * @param {HTMLElement} grid - The category grid element
  */
 function enhanceScrolling(grid) {
   let isScrolling = false;
@@ -160,7 +160,7 @@ function enhanceScrolling(grid) {
 
 /**
  * Snap to the nearest card after scrolling ends
- * @param {HTMLElement} grid - The scenarios grid element
+ * @param {HTMLElement} grid - The category/scenario grid element
  */
 function snapToNearestCard(grid) {
   const cards = Array.from(grid.children);
@@ -203,7 +203,7 @@ function snapToNearestCard(grid) {
 
 /**
  * Add keyboard navigation support
- * @param {HTMLElement} grid - The scenarios grid element
+ * @param {HTMLElement} grid - The category/scenario grid element
  */
 function addKeyboardNavigation(grid) {
   grid.addEventListener('keydown', (e) => {
@@ -261,7 +261,7 @@ function addKeyboardNavigation(grid) {
 
 /**
  * Add touch enhancements for mobile devices
- * @param {HTMLElement} grid - The scenarios grid element
+ * @param {HTMLElement} grid - The category/scenario grid element
  */
 function addTouchEnhancements(grid) {
   let startX = 0;
@@ -291,7 +291,7 @@ function addTouchEnhancements(grid) {
 
 /**
  * Add scroll navigation buttons (optional enhancement)
- * @param {HTMLElement} grid - The scenarios grid element
+ * @param {HTMLElement} grid - The category/scenario grid element
  */
 export function addScrollButtons(grid) {
   const container = grid.parentElement;

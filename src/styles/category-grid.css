@@ -20,7 +20,8 @@
  * Part of the SimulateAI Ethics Platform Revamp - Phase 1.1
  */
 
-/* Main Container - Updates existing simulations-grid */
+/* Main Container - Category grid styles (supports both legacy and new class names) */
+.categories-grid,
 .simulations-grid {
   display: flex;
   flex-direction: column;
@@ -32,6 +33,43 @@
   box-sizing: border-box;
   /* CRITICAL: Prevent horizontal overflow from escaping */
   overflow-x: hidden;
+}
+
+/* Desktop layout improvements */
+@media (min-width: 769px) {
+  .categories-grid,
+  .simulations-grid {
+    padding: 0 var(--spacing-8);
+    margin: 0 auto var(--spacing-12);
+    max-width: 1200px; /* Reduced max width for better scrolling experience */
+  }
+}
+
+@media (min-width: 1024px) {
+  .categories-grid,
+  .simulations-grid {
+    padding: 0 var(--spacing-12);
+    margin: 0 var(--spacing-16) var(--spacing-12); /* Added horizontal margins */
+    max-width: 1300px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .categories-grid,
+  .simulations-grid {
+    padding: 0 var(--spacing-16);
+    margin: 0 var(--spacing-20) var(--spacing-12); /* Larger horizontal margins */
+    max-width: 1400px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .categories-grid,
+  .simulations-grid {
+    padding: 0 var(--spacing-20);
+    margin: 0 var(--spacing-20) var(--spacing-12); /* Use available spacing variable */
+    max-width: 1500px;
+  }
 }
 
 /* Category Section */
@@ -259,7 +297,7 @@
 
 .category-progress-ring.pulse-for-badge:hover {
   transform: scale(1.25);
-  filter: drop-shadow(0 0 16px var(--color-accent-400)) brightness(1.1);
+  filter: drop-shadow(0 0 16px var(--progress-pulse-color, var(--color-accent-400))) brightness(1.1);
 }
 
 .category-progress-ring:focus {
@@ -269,9 +307,9 @@
 }
 
 .category-progress-ring.pulse-for-badge:focus {
-  outline: 3px solid var(--color-accent-400);
+  outline: 3px solid var(--progress-pulse-color, var(--color-accent-400));
   outline-offset: 4px;
-  box-shadow: 0 0 20px var(--color-accent-400);
+  box-shadow: 0 0 20px var(--progress-pulse-color, var(--color-accent-400));
 }
 
 .category-progress-ring svg {
@@ -292,20 +330,20 @@
 }
 
 .category-progress-ring.pulse-for-badge .progress-percentage {
-  color: var(--color-accent-600);
+  color: var(--progress-pulse-color, var(--color-accent-600));
   font-weight: var(--font-weight-black);
-  text-shadow: 0 0 4px var(--color-accent-300);
+  text-shadow: 0 0 4px var(--progress-pulse-light, var(--color-accent-300));
   animation: text-glow-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @keyframes text-glow-fluid {
   0%, 100% {
-    text-shadow: 0 0 4px var(--color-accent-300);
-    color: var(--color-accent-600);
+    text-shadow: 0 0 4px var(--progress-pulse-light, var(--color-accent-300));
+    color: var(--progress-pulse-color, var(--color-accent-600));
   }
   50% {
-    text-shadow: 0 0 8px var(--color-accent-400), 0 0 12px var(--color-accent-300);
-    color: var(--color-accent-700);
+    text-shadow: 0 0 8px var(--progress-pulse-color, var(--color-accent-400)), 0 0 12px var(--progress-pulse-light, var(--color-accent-300));
+    color: var(--progress-pulse-dark, var(--color-accent-700));
   }
 }
 
@@ -314,26 +352,26 @@
 }
 
 [data-theme='dark'] .category-progress-ring.pulse-for-badge .progress-percentage {
-  color: var(--color-accent-400);
-  text-shadow: 0 0 6px var(--color-accent-400);
+  color: var(--progress-pulse-color, var(--color-accent-400));
+  text-shadow: 0 0 6px var(--progress-pulse-color, var(--color-accent-400));
   animation: text-glow-dark-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @keyframes text-glow-dark-fluid {
   0%, 100% {
-    text-shadow: 0 0 6px var(--color-accent-400);
-    color: var(--color-accent-400);
+    text-shadow: 0 0 6px var(--progress-pulse-color, var(--color-accent-400));
+    color: var(--progress-pulse-color, var(--color-accent-400));
   }
   50% {
-    text-shadow: 0 0 10px var(--color-accent-300), 0 0 16px var(--color-accent-400);
-    color: var(--color-accent-300);
+    text-shadow: 0 0 10px var(--progress-pulse-light, var(--color-accent-300)), 0 0 16px var(--progress-pulse-color, var(--color-accent-400));
+    color: var(--progress-pulse-light, var(--color-accent-300));
   }
 }
 
 /* Badge Progress Pulse Animation - FLUID VERSION */
 .category-progress-ring.pulse-for-badge {
   animation: badge-pulse-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  filter: drop-shadow(0 0 8px var(--color-accent-400));
+  filter: drop-shadow(0 0 8px var(--progress-pulse-color, var(--color-accent-400)));
 }
 
 .category-progress-ring.pulse-for-badge::before {
@@ -343,11 +381,11 @@
   left: -8px;
   right: -8px;
   bottom: -8px;
-  border: 3px solid var(--color-accent-400);
+  border: 3px solid var(--progress-pulse-color, var(--color-accent-400));
   border-radius: 50%;
   animation: badge-pulse-ring-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite 0.2s;
   z-index: 0;
-  box-shadow: 0 0 12px var(--color-accent-400);
+  box-shadow: 0 0 12px var(--progress-pulse-color, var(--color-accent-400));
 }
 
 .category-progress-ring.pulse-for-badge::after {
@@ -357,7 +395,7 @@
   left: -12px;
   right: -12px;
   bottom: -12px;
-  border: 2px solid var(--color-accent-300);
+  border: 2px solid var(--progress-pulse-light, var(--color-accent-300));
   border-radius: 50%;
   animation: badge-pulse-outer-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite 0.4s;
   z-index: -1;
@@ -471,11 +509,19 @@
   line-height: 1.5;
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--color-gray-700);
-  animation: tooltip-appear 0.2s ease-out;
   pointer-events: none;
   white-space: normal;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  /* Initial hidden state */
+  opacity: 0;
+  transform: translateX(-50%) translateY(4px);
+  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+
+.progress-ring-tooltip.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 .progress-ring-tooltip::before {
@@ -520,6 +566,10 @@
     transform: translateX(-50%) !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
+  }
+  
+  .progress-ring-tooltip.visible {
+    transform: translateX(-50%) translateY(0) !important;
   }
 }
 
@@ -617,6 +667,11 @@
   .scenarios-grid {
     /* Enhanced scroll performance on desktop */
     scroll-behavior: auto; /* Override smooth for wheel events */
+    /* Better padding for desktop - reduced to work with new margins */
+    padding: var(--spacing-6) var(--spacing-8) var(--spacing-8) var(--spacing-8);
+    /* Visual indicator of scroll area */
+    border-radius: var(--radius-md);
+    margin: 0 calc(-1 * var(--spacing-2)); /* Reduced negative margin */
   }
   
   .scenarios-grid:hover {
@@ -639,6 +694,43 @@
   /* Smoother transitions on desktop */
   .scenarios-grid {
     transition: box-shadow 0.3s ease, background 0.3s ease;
+  }
+  
+  /* Add scroll indicators for better UX */
+  .scenarios-grid::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.8) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .scenarios-grid:hover::before {
+    opacity: 1;
+  }
+  
+  .scenarios-grid::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    background: linear-gradient(270deg, rgba(255,255,255,0.8) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .scenarios-grid:hover::after {
+    opacity: 1;
   }
   
   /* Subtle pulse animation to indicate scrollability */
@@ -681,6 +773,7 @@
 
 /* Scenario Cards */
 .category-section .scenario-card,
+.categories-grid .scenario-card,
 .simulations-grid .scenario-card {
   background: var(--color-white);
   border: 1px solid var(--color-gray-200);
@@ -1218,5 +1311,49 @@
 
   .category-progress-ring {
     display: none;
+  }
+}
+
+/* Progress Ring Badge Alert Animation */
+.category-progress-ring.badge-alert {
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+.category-progress-ring.badge-alert::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: badge-pulse-ring 2s ease-in-out infinite;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+@keyframes badge-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes badge-pulse-ring {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.4);
+    opacity: 0;
   }
 }

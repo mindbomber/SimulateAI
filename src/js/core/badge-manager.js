@@ -216,7 +216,9 @@ export class BadgeManager {
    * @returns {number} Number of completed scenarios
    */
   getCategoryCompletionCount(categoryId) {
-    const categoryProgress = this.categoryProgress[categoryId] || {};
+    // Always load fresh category progress to account for recent changes
+    const freshCategoryProgress = this.loadCategoryProgress();
+    const categoryProgress = freshCategoryProgress[categoryId] || {};
     return Object.keys(categoryProgress).filter(
       scenarioKey => categoryProgress[scenarioKey] === true
     ).length;
