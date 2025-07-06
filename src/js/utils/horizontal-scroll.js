@@ -11,6 +11,14 @@ const SCROLL_SNAP_INIT_DELAY = 200; // Delay before re-enabling scroll snap
 const PAGE_SCROLL_SNAP_DELAY = 300; // Delay before ensuring page scroll snap is disabled
 const MOBILE_BREAKPOINT = 768; // Mobile breakpoint for device detection
 
+// Scroll enhancement constants
+const BASE_SCROLL_MULTIPLIER = 1.5;
+const FAST_SCROLL_MULTIPLIER = 2.0;
+const FINE_SCROLL_MULTIPLIER = 1.0;
+const FAST_SCROLL_THRESHOLD = 100;
+const FINE_SCROLL_THRESHOLD = 30;
+const MIN_SCROLL_DISTANCE = 0.5;
+
 /**
  * Initialize horizontal scroll enhancements for all scenarios grids
  */
@@ -106,13 +114,47 @@ function enhanceScrolling(grid) {
 
   // Add wheel event for horizontal scrolling with mouse wheel
   grid.addEventListener('wheel', (e) => {
+    // Check if user is already scrolling horizontally (trackpad horizontal gesture)
     if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-      return; // Already scrolling horizontally
+      return; // Already scrolling horizontally, let it handle naturally
     }
     
-    e.preventDefault();
-    grid.scrollLeft += e.deltaY;
-    isInitialLoad = false; // User interaction, no longer initial load
+    // Only intercept vertical scroll when hovering over the grid
+    if (e.target.closest('.scenarios-grid') === grid) {
+      e.preventDefault();
+      
+      // Enhanced scrolling with dynamic speed based on scroll intensity
+      let scrollMultiplier = BASE_SCROLL_MULTIPLIER; // Base multiplier for smoother feel
+      
+      // Apply dynamic acceleration for faster scrolling on larger deltas
+      if (Math.abs(e.deltaY) > FAST_SCROLL_THRESHOLD) {
+        scrollMultiplier = FAST_SCROLL_MULTIPLIER; // Faster for big wheel movements
+      } else if (Math.abs(e.deltaY) < FINE_SCROLL_THRESHOLD) {
+        scrollMultiplier = FINE_SCROLL_MULTIPLIER; // Slower for fine control
+      }
+      
+      const deltaY = e.deltaY * scrollMultiplier;
+      
+      // Use smooth scrolling for better UX
+      const targetScrollLeft = grid.scrollLeft + deltaY;
+      
+      // Clamp the scroll position to valid bounds
+      const maxScrollLeft = grid.scrollWidth - grid.clientWidth;
+      const clampedScrollLeft = Math.max(0, Math.min(targetScrollLeft, maxScrollLeft));
+      
+      // Apply smooth scrolling with requestAnimationFrame for better performance
+      const startScrollLeft = grid.scrollLeft;
+      const distance = clampedScrollLeft - startScrollLeft;
+      
+      if (Math.abs(distance) > MIN_SCROLL_DISTANCE) {
+        grid.scrollTo({
+          left: clampedScrollLeft,
+          behavior: 'auto' // Use 'auto' for immediate response to wheel events
+        });
+      }
+      
+      isInitialLoad = false; // User interaction, no longer initial load
+    }
   }, { passive: false });
 }
 

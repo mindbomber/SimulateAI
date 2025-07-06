@@ -508,20 +508,23 @@ class ScenarioModal {
   /**
    * Confirm the selected choice
    */
-  confirmChoice() {
+  async confirmChoice() {
     if (!this.selectedOption) {
       logger.warn('No option selected for confirmation');
       return;
     }
 
-    // Dispatch scenario completion event
+    // Store completion data for after modal closes
+    const completionData = {
+      categoryId: this.currentCategoryId,
+      scenarioId: this.currentScenarioId,
+      selectedOption: this.selectedOption,
+      option: this.selectedOption, // Legacy compatibility
+    };
+
+    // Dispatch initial scenario completion event (for immediate progress tracking)
     const event = new CustomEvent('scenario-completed', {
-      detail: {
-        categoryId: this.currentCategoryId,
-        scenarioId: this.currentScenarioId,
-        selectedOption: this.selectedOption,
-        option: this.selectedOption, // Legacy compatibility
-      },
+      detail: completionData,
     });
     document.dispatchEvent(event);
 
@@ -531,9 +534,17 @@ class ScenarioModal {
       selectedOption: this.selectedOption.id,
     });
 
-    // Close modal with delay to show completion
-    setTimeout(() => {
-      this.close();
+    // Close modal with delay to show completion, then dispatch final event
+    setTimeout(async () => {
+      await this.closeAndWait();
+      
+      // Dispatch event after modal is fully closed (for badge display)
+      const closedEvent = new CustomEvent('scenario-modal-closed', {
+        detail: completionData,
+      });
+      document.dispatchEvent(closedEvent);
+      
+      logger.info('Scenario modal fully closed, badges can now be displayed');
     }, 1000);
   }
 

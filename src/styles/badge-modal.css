@@ -1,0 +1,760 @@
+/**
+ * Copyright 2025 Armando Sori
+ * Badge Modal Styles
+ * 
+ * Responsive styles for badge achievement modals with tier-based glow effects,
+ * animations, and mobile optimization.
+ */
+
+/* ========================================
+   Badge Modal Base Styles
+   ======================================== */
+
+.badge-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 300ms ease-out;
+}
+
+.badge-modal {
+  background: linear-gradient(135deg, #2c5aa0 0%, #1e3a5f 100%);
+  border-radius: 20px;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.2);
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: hidden;
+  position: relative;
+  transform-origin: center;
+}
+
+.badge-modal-content {
+  padding: 2.5rem 2rem 2rem;
+  text-align: center;
+  color: #ffffff;
+  position: relative;
+  z-index: 10;
+}
+
+/* ========================================
+   Badge Visual Container
+   ======================================== */
+
+.badge-visual-container {
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 10;
+}
+
+.badge-shield {
+  position: relative;
+  display: inline-block;
+  font-size: 4rem;
+  line-height: 1;
+  border-radius: 50%;
+  padding: 1rem;
+  transition: all 0.3s ease;
+  transform: scale(0);
+  animation: badge-entrance 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s forwards;
+}
+
+.badge-shield::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  right: -15px;
+  bottom: -15px;
+  background: radial-gradient(circle, rgba(74, 144, 226, 0.4) 0%, rgba(74, 144, 226, 0.1) 50%, transparent 70%);
+  border-radius: 50%;
+  animation: pulse-glow 2s ease-in-out infinite;
+  z-index: -1;
+}
+
+.badge-shield-emoji {
+  display: block;
+  position: relative;
+  z-index: 3;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  animation: shield-glow 3s ease-in-out infinite;
+}
+
+.badge-category-emoji {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  font-size: 2.2rem;
+  z-index: 4;
+  animation: category-entrance 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.8s forwards;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
+}
+
+.badge-sidekick-emoji {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+  font-size: 1.4rem;
+  z-index: 5;
+  transform: scale(0) rotate(-180deg);
+  animation: sidekick-bounce 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1.2s forwards;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+/* ========================================
+   Glow Effects by Tier
+   ======================================== */
+
+.badge-glow-low {
+  box-shadow: 
+    0 0 20px rgba(74, 144, 226, 0.4),
+    0 0 40px rgba(74, 144, 226, 0.2);
+  animation: pulseGentleGlow 3s ease-in-out infinite;
+}
+
+.badge-glow-medium {
+  box-shadow: 
+    0 0 30px rgba(231, 76, 60, 0.5),
+    0 0 60px rgba(231, 76, 60, 0.3),
+    0 0 90px rgba(231, 76, 60, 0.1);
+  animation: pulseMediumGlow 2.5s ease-in-out infinite;
+}
+
+.badge-glow-high {
+  box-shadow: 
+    0 0 40px rgba(241, 196, 15, 0.6),
+    0 0 80px rgba(241, 196, 15, 0.4),
+    0 0 120px rgba(241, 196, 15, 0.2);
+  animation: pulseIntenseGlow 2s ease-in-out infinite, shimmerEffect 4s linear infinite;
+}
+
+/* ========================================
+   Animation Keyframes
+   ======================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulseGentleGlow {
+  0%, 100% {
+    box-shadow: 
+      0 0 20px rgba(74, 144, 226, 0.4),
+      0 0 40px rgba(74, 144, 226, 0.2);
+  }
+  50% {
+    box-shadow: 
+      0 0 25px rgba(74, 144, 226, 0.5),
+      0 0 50px rgba(74, 144, 226, 0.3);
+  }
+}
+
+@keyframes pulseMediumGlow {
+  0%, 100% {
+    box-shadow: 
+      0 0 30px rgba(231, 76, 60, 0.5),
+      0 0 60px rgba(231, 76, 60, 0.3),
+      0 0 90px rgba(231, 76, 60, 0.1);
+  }
+  50% {
+    box-shadow: 
+      0 0 35px rgba(231, 76, 60, 0.6),
+      0 0 70px rgba(231, 76, 60, 0.4),
+      0 0 105px rgba(231, 76, 60, 0.2);
+  }
+}
+
+@keyframes pulseIntenseGlow {
+  0%, 100% {
+    box-shadow: 
+      0 0 40px rgba(241, 196, 15, 0.6),
+      0 0 80px rgba(241, 196, 15, 0.4),
+      0 0 120px rgba(241, 196, 15, 0.2);
+  }
+  50% {
+    box-shadow: 
+      0 0 50px rgba(241, 196, 15, 0.8),
+      0 0 100px rgba(241, 196, 15, 0.6),
+      0 0 150px rgba(241, 196, 15, 0.3);
+  }
+}
+
+@keyframes shimmerEffect {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
+}
+
+.badge-glow-high::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(241, 196, 15, 0.3),
+    transparent
+  );
+  background-size: 200% 200%;
+  border-radius: inherit;
+  z-index: -1;
+  animation: shimmerEffect 4s linear infinite;
+}
+
+/* ========================================
+   Enhanced Visual Effects
+   ======================================== */
+
+/* Floating particles background atmosphere */
+.particles-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.floating-particle {
+  position: absolute;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.2) 100%);
+  border-radius: 50%;
+  animation: float-up linear infinite;
+}
+
+@keyframes float-up {
+  0% {
+    transform: translateY(100vh) translateX(0) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(90vh) translateX(0) scale(1);
+  }
+  90% {
+    opacity: 0.8;
+    transform: translateY(10vh) translateX(var(--drift)) scale(0.5);
+  }
+  100% {
+    transform: translateY(-10vh) translateX(var(--drift)) scale(0);
+    opacity: 0;
+  }
+}
+
+/* Enhanced badge visual container */
+.badge-visual-container {
+  position: relative;
+  margin-bottom: 2rem;
+  z-index: 10;
+}
+
+/* Layered shield design with pulsing glow */
+.badge-shield {
+  position: relative;
+  display: inline-block;
+  font-size: 4rem;
+  padding: 1rem;
+  transform: scale(0);
+  animation: badge-entrance 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s forwards;
+}
+
+/* Removed pulse-glow effect for better performance */
+
+/* Enhanced badge entrance animation */
+@keyframes badge-entrance {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15) rotate(20deg);
+  }
+  80% {
+    transform: scale(0.95) rotate(-10deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Layered shield elements */
+.badge-shield-emoji {
+  display: block;
+  position: relative;
+  z-index: 3;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  animation: shield-glow 3s ease-in-out infinite;
+}
+
+@keyframes shield-glow {
+  0%, 100% {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 2px 8px rgba(74, 144, 226, 0.6)) drop-shadow(0 0 15px rgba(74, 144, 226, 0.4));
+  }
+}
+
+/* Enhanced category emoji with layered effect */
+.badge-category-emoji {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  font-size: 2.2rem;
+  z-index: 4;
+  animation: category-entrance 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.8s forwards;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
+}
+
+@keyframes category-entrance {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(90deg);
+    opacity: 0;
+  }
+  60% {
+    transform: translate(-50%, -50%) scale(1.1) rotate(-10deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Enhanced sidekick emoji with bouncy entrance */
+.badge-sidekick-emoji {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+  font-size: 1.4rem;
+  z-index: 5;
+  transform: scale(0) rotate(-180deg);
+  animation: sidekick-bounce 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1.2s forwards;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+@keyframes sidekick-bounce {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.3) rotate(10deg);
+  }
+  70% {
+    transform: scale(0.9) rotate(-5deg);
+  }
+  85% {
+    transform: scale(1.1) rotate(2deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Typewriter effect for quote */
+.badge-quote {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+  max-width: 100%;
+  animation: typewriter 1.5s steps(30) 1.2s forwards, blink-cursor 0.6s step-end 1.2s 2;
+  border-right: 2px solid rgba(255, 255, 255, 0.8);
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+@keyframes typewriter {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+@keyframes blink-cursor {
+  0%, 50% {
+    border-right-color: rgba(255, 255, 255, 0.8);
+  }
+  51%, 100% {
+    border-right-color: transparent;
+  }
+}
+
+/* Enhanced text entrance animations */
+.badge-title {
+  transform: translateY(30px);
+  opacity: 0;
+  animation: text-slide-up 0.5s ease-out 0.8s forwards;
+}
+
+.badge-reason {
+  transform: translateY(20px);
+  opacity: 0;
+  animation: text-slide-up 0.5s ease-out 2.8s forwards;
+}
+
+.badge-timestamp {
+  transform: translateY(20px);
+  opacity: 0;
+  animation: text-slide-up 0.5s ease-out 3s forwards;
+}
+
+@keyframes text-slide-up {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Enhanced modal content container */
+.badge-modal-content {
+  position: relative;
+  z-index: 10;
+}
+
+/* ========================================
+   End Enhanced Visual Effects
+   ======================================== */
+
+/* ========================================
+   Text Content Styles
+   ======================================== */
+
+.badge-text-content {
+  margin-bottom: 2rem;
+}
+
+.badge-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+  background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.badge-quote {
+  font-size: 1.1rem;
+  font-style: italic;
+  line-height: 1.6;
+  margin: 0 0 1.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  min-height: 3rem; /* Increased to prevent layout shift */
+  display: block;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* ========================================
+   Modal Footer
+   ======================================== */
+
+.badge-modal-footer {
+  margin-top: 2rem;
+}
+
+.badge-close-btn {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  color: #4a90e2;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 0.75rem 2rem;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  min-width: 160px;
+}
+
+.badge-close-btn:hover {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  color: #357abd;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.badge-close-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.4);
+}
+
+/* ========================================
+   Mobile Responsiveness
+   ======================================== */
+
+@media (max-width: 768px) {
+  .badge-modal {
+    width: 95%;
+    margin: 1rem;
+    border-radius: 15px;
+  }
+
+  .badge-modal-content {
+    padding: 2rem 1.5rem 1.5rem;
+  }
+
+  .badge-shield {
+    font-size: 3.5rem;
+    padding: 0.75rem;
+  }
+
+  .badge-category-emoji {
+    font-size: 2rem;
+  }
+
+  .badge-sidekick-emoji {
+    font-size: 1.25rem;
+    top: -0.25rem;
+    right: -0.25rem;
+  }
+
+  .badge-title {
+    font-size: 1.75rem;
+  }
+
+  .badge-quote {
+    font-size: 1rem;
+    max-width: 100%;
+    margin: 0 0 1rem;
+    padding: 0 0.5rem;
+    min-height: 2.5rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
+  .badge-close-btn {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.95rem;
+    min-width: 140px;
+  }
+}
+
+@media (max-width: 480px) {
+  .badge-modal {
+    width: 90%;
+    max-width: none;
+    border-radius: 15px;
+    max-height: 85vh;
+    margin: 2rem auto;
+  }
+
+  .badge-modal-content {
+    padding: 1.5rem 1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .badge-shield {
+    font-size: 3rem;
+  }
+
+  .badge-category-emoji {
+    font-size: 1.75rem;
+  }
+
+  .badge-title {
+    font-size: 1.5rem;
+  }
+
+  .badge-quote {
+    font-size: 0.95rem;
+    padding: 0 0.25rem;
+    min-height: 2.25rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+}
+
+@media (max-width: 360px) {
+  .badge-modal {
+    width: 85%;
+    margin: 1.5rem auto;
+    max-height: 80vh;
+  }
+
+  .badge-modal-content {
+    padding: 1.25rem 0.75rem 0.75rem;
+  }
+
+  .badge-shield {
+    font-size: 2.5rem;
+  }
+
+  .badge-title {
+    font-size: 1.35rem;
+  }
+
+  .badge-quote {
+    font-size: 0.9rem;
+    padding: 0 0.25rem;
+    min-height: 2rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
+  .badge-close-btn {
+    padding: 0.5rem 1.25rem;
+    font-size: 0.9rem;
+    min-width: 120px;
+  }
+}
+
+/* ========================================
+   Accessibility Enhancements
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .badge-modal-backdrop,
+  .badge-shield,
+  .badge-close-btn {
+    animation: none;
+    transition: none;
+  }
+  
+  .badge-glow-low,
+  .badge-glow-medium,
+  .badge-glow-high {
+    animation: none;
+  }
+  
+  .badge-glow-high::before {
+    animation: none;
+  }
+}
+
+/* Focus styles for accessibility */
+.badge-close-btn:focus {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .badge-modal {
+    border: 2px solid #ffffff;
+    background: #000000;
+  }
+  
+  .badge-title {
+    color: #ffffff;
+    -webkit-text-fill-color: #ffffff;
+  }
+  
+  .badge-quote {
+    color: #cccccc;
+  }
+}
+
+/* ========================================
+   Bubbling Emoji Background Effect
+   ======================================== */
+
+/* Bubbling emoji containers */
+.emoji-bubbles-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+  border-radius: 20px; /* Match modal border radius */
+}
+
+.bubbling-emoji {
+  position: absolute;
+  font-size: 1.5rem;
+  opacity: 0;
+  z-index: 1;
+  animation: bubble-up linear;
+  filter: blur(0.5px);
+}
+
+.bubbling-emoji.category {
+  animation-duration: 8s;
+}
+
+.bubbling-emoji.sidekick {
+  animation-duration: 10s;
+  font-size: 1.2rem;
+}
+
+@keyframes bubble-up {
+  0% {
+    transform: translateY(100vh) translateX(0) scale(0.3) rotate(0deg);
+    opacity: 0;
+  }
+  5% {
+    opacity: 0.6;
+    transform: translateY(95vh) translateX(0) scale(0.5) rotate(10deg);
+  }
+  15% {
+    opacity: 0.8;
+    transform: translateY(85vh) translateX(var(--drift-x)) scale(0.7) rotate(-5deg);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translateY(50vh) translateX(var(--drift-x)) scale(1) rotate(15deg);
+  }
+  85% {
+    opacity: 0.4;
+    transform: translateY(15vh) translateX(var(--drift-x)) scale(0.8) rotate(-10deg);
+  }
+  95% {
+    opacity: 0.2;
+    transform: translateY(5vh) translateX(var(--drift-x)) scale(0.4) rotate(5deg);
+  }
+  100% {
+    transform: translateY(-10vh) translateX(var(--drift-x)) scale(0.2) rotate(0deg);
+    opacity: 0;
+  }
+}
+
+/* ========================================
+   End Bubbling Emoji Background Effect
+   ======================================== */

@@ -249,6 +249,29 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.category-progress-ring:hover {
+  transform: scale(1.05);
+}
+
+.category-progress-ring.pulse-for-badge:hover {
+  transform: scale(1.25);
+  filter: drop-shadow(0 0 16px var(--color-accent-400)) brightness(1.1);
+}
+
+.category-progress-ring:focus {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+  border-radius: var(--radius-full);
+}
+
+.category-progress-ring.pulse-for-badge:focus {
+  outline: 3px solid var(--color-accent-400);
+  outline-offset: 4px;
+  box-shadow: 0 0 20px var(--color-accent-400);
 }
 
 .category-progress-ring svg {
@@ -265,10 +288,251 @@
   color: var(--color-gray-700);
   z-index: 1;
   position: relative;
+  transition: all var(--transition-base);
+}
+
+.category-progress-ring.pulse-for-badge .progress-percentage {
+  color: var(--color-accent-600);
+  font-weight: var(--font-weight-black);
+  text-shadow: 0 0 4px var(--color-accent-300);
+  animation: text-glow-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes text-glow-fluid {
+  0%, 100% {
+    text-shadow: 0 0 4px var(--color-accent-300);
+    color: var(--color-accent-600);
+  }
+  50% {
+    text-shadow: 0 0 8px var(--color-accent-400), 0 0 12px var(--color-accent-300);
+    color: var(--color-accent-700);
+  }
 }
 
 [data-theme='dark'] .progress-percentage {
   color: var(--color-gray-300);
+}
+
+[data-theme='dark'] .category-progress-ring.pulse-for-badge .progress-percentage {
+  color: var(--color-accent-400);
+  text-shadow: 0 0 6px var(--color-accent-400);
+  animation: text-glow-dark-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes text-glow-dark-fluid {
+  0%, 100% {
+    text-shadow: 0 0 6px var(--color-accent-400);
+    color: var(--color-accent-400);
+  }
+  50% {
+    text-shadow: 0 0 10px var(--color-accent-300), 0 0 16px var(--color-accent-400);
+    color: var(--color-accent-300);
+  }
+}
+
+/* Badge Progress Pulse Animation - FLUID VERSION */
+.category-progress-ring.pulse-for-badge {
+  animation: badge-pulse-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  filter: drop-shadow(0 0 8px var(--color-accent-400));
+}
+
+.category-progress-ring.pulse-for-badge::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  border: 3px solid var(--color-accent-400);
+  border-radius: 50%;
+  animation: badge-pulse-ring-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite 0.2s;
+  z-index: 0;
+  box-shadow: 0 0 12px var(--color-accent-400);
+}
+
+.category-progress-ring.pulse-for-badge::after {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  right: -12px;
+  bottom: -12px;
+  border: 2px solid var(--color-accent-300);
+  border-radius: 50%;
+  animation: badge-pulse-outer-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite 0.4s;
+  z-index: -1;
+  opacity: 0.4;
+}
+
+@keyframes badge-pulse-fluid {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 0.92;
+  }
+}
+
+@keyframes badge-pulse-ring-fluid {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 0.3;
+  }
+}
+
+@keyframes badge-pulse-outer-fluid {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0.1;
+  }
+}
+
+/* Badge Pulse Indicator - DRAMATIC VERSION */
+.badge-pulse-indicator {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(135deg, var(--color-accent-400), var(--color-accent-600));
+  border: 3px solid var(--color-white);
+  border-radius: 50%;
+  z-index: 2;
+  animation: pulse-indicator-dramatic 1.2s ease-in-out infinite;
+  box-shadow: 
+    0 0 8px var(--color-accent-400),
+    0 0 16px var(--color-accent-300);
+}
+
+.badge-pulse-indicator::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  border: 2px solid var(--color-accent-300);
+  border-radius: 50%;
+  animation: pulse-indicator-ring 1.2s ease-in-out infinite;
+  opacity: 0.6;
+}
+
+@keyframes pulse-indicator-dramatic {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(1.3);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.8;
+  }
+  75% {
+    transform: scale(1.2);
+    opacity: 0.95;
+  }
+}
+
+@keyframes pulse-indicator-ring {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.8);
+    opacity: 0.1;
+  }
+}
+
+/* Progress Ring Tooltip */
+.progress-ring-tooltip {
+  background: var(--color-gray-900);
+  color: var(--color-white);
+  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  max-width: 300px;
+  min-width: 200px;
+  text-align: center;
+  line-height: 1.5;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-gray-700);
+  animation: tooltip-appear 0.2s ease-out;
+  pointer-events: none;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.progress-ring-tooltip::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-bottom-color: var(--color-gray-900);
+}
+
+@keyframes tooltip-appear {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+[data-theme='dark'] .progress-ring-tooltip {
+  background: var(--color-gray-800);
+  border-color: var(--color-gray-600);
+}
+
+[data-theme='dark'] .progress-ring-tooltip::before {
+  border-bottom-color: var(--color-gray-800);
+}
+
+/* Mobile-specific tooltip adjustments */
+@media (max-width: 768px) {
+  .progress-ring-tooltip {
+    max-width: 250px;
+    min-width: 180px;
+    font-size: var(--font-size-xs);
+    padding: var(--spacing-2) var(--spacing-3);
+    /* Ensure tooltip doesn't go off-screen on mobile */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .progress-ring-tooltip {
+    max-width: 200px;
+    min-width: 150px;
+    font-size: var(--font-size-xs);
+    padding: var(--spacing-2);
+    /* Further constrain on very small screens */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
 }
 
 /* Scenarios Grid */
@@ -296,28 +560,101 @@
   transform: translateZ(0); /* Force hardware acceleration and containment */
   will-change: scroll-position;
   
+  /* Enhanced cursor behavior for horizontal scrolling */
+  cursor: grab;
+  
   /* Custom scrollbar styling */
   scrollbar-width: thin;
   scrollbar-color: var(--color-gray-300) transparent;
 }
 
+/* Enhanced states for scenarios grid */
+.scenarios-grid:hover {
+  cursor: grab;
+}
+
+.scenarios-grid:active {
+  cursor: grabbing;
+}
+
+/* Enhanced scrollbar styles with better hover feedback */
 .scenarios-grid::-webkit-scrollbar {
   height: 8px;
+  transition: height 0.2s ease;
+}
+
+.scenarios-grid:hover::-webkit-scrollbar {
+  height: 10px;
 }
 
 .scenarios-grid::-webkit-scrollbar-track {
   background: var(--color-gray-100);
   border-radius: 4px;
   margin: 0 var(--spacing-4);
+  transition: background-color 0.2s ease;
+}
+
+.scenarios-grid:hover::-webkit-scrollbar-track {
+  background: var(--color-gray-150);
 }
 
 .scenarios-grid::-webkit-scrollbar-thumb {
   background: var(--color-gray-300);
   border-radius: 4px;
+  transition: background-color 0.2s ease;
 }
 
 .scenarios-grid::-webkit-scrollbar-thumb:hover {
   background: var(--color-gray-400);
+}
+
+.scenarios-grid:hover::-webkit-scrollbar-thumb {
+  background: var(--color-gray-400);
+}
+
+/* Desktop-specific enhancements */
+@media (min-width: 769px) {
+  .scenarios-grid {
+    /* Enhanced scroll performance on desktop */
+    scroll-behavior: auto; /* Override smooth for wheel events */
+  }
+  
+  .scenarios-grid:hover {
+    /* Subtle indication that horizontal scrolling is available */
+    box-shadow: inset 0 0 0 1px rgba(74, 144, 226, 0.15);
+    /* Add a subtle gradient overlay to indicate scrollability */
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(74, 144, 226, 0.02) 5%, 
+      rgba(74, 144, 226, 0.02) 95%, 
+      transparent 100%);
+  }
+  
+  /* Enhanced visual feedback when actively scrolling */
+  .scenarios-grid:active {
+    cursor: grabbing;
+    box-shadow: inset 0 0 0 2px rgba(74, 144, 226, 0.2);
+  }
+  
+  /* Smoother transitions on desktop */
+  .scenarios-grid {
+    transition: box-shadow 0.3s ease, background 0.3s ease;
+  }
+  
+  /* Subtle pulse animation to indicate scrollability */
+  .scenarios-grid:hover {
+    animation: scroll-hint-pulse 2s ease-in-out infinite;
+  }
+}
+
+/* Keyframe animation for scroll hint */
+@keyframes scroll-hint-pulse {
+  0%, 100% { 
+    box-shadow: inset 0 0 0 1px rgba(74, 144, 226, 0.15);
+  }
+  50% { 
+    box-shadow: inset 0 0 0 1px rgba(74, 144, 226, 0.25);
+  }
 }
 
 .scenarios-grid::after {

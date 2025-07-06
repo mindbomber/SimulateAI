@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "description": "SimulateAI: AI Ethics Education Through Interactive Simulations - Empowering educators and learners through open-ended, consequence-driven explorations",
-  "main": "index.html",  "scripts": {
+  "main": "index.html",
+  "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
@@ -12,7 +13,17 @@
     "format": "prettier --write src/**/*.{js,css,html}",
     "verify": "echo \"All components verified and integrated\" && npm run lint",
     "check-policy": "echo \"HTML generation policy compliance: ✓ No standalone HTML generation\" && npm run lint"
-  },  "keywords": ["ai-ethics-education", "interactive-simulations", "iste-standards", "educator-resources", "robotics-ethics", "consequence-driven-learning", "open-ended-exploration", "educational-technology"],
+  },
+  "keywords": [
+    "ai-ethics-education",
+    "interactive-simulations",
+    "iste-standards",
+    "educator-resources",
+    "robotics-ethics",
+    "consequence-driven-learning",
+    "open-ended-exploration",
+    "educational-technology"
+  ],
   "author": "Armando Sori",
   "license": "Apache-2.0",
   "repository": {
@@ -22,12 +33,15 @@
   "homepage": "https://github.com/mindbomber/SimulateAI#readme",
   "bugs": {
     "url": "https://github.com/mindbomber/SimulateAI/issues"
-  },"devDependencies": {
-    "vite": "^5.0.0",
-    "csso-cli": "^4.0.2",
-    "terser": "^5.43.1",
-    "eslint": "^8.0.0",
-    "prettier": "^3.0.0"
   },
-  "dependencies": {}
+  "devDependencies": {
+    "csso-cli": "^4.0.2",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0",
+    "terser": "^5.43.1",
+    "vite": "^5.0.0"
+  },
+  "dependencies": {
+    "js-confetti": "^0.12.0"
+  }
 }

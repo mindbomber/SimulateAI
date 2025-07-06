@@ -1,5 +1,15 @@
 /**
- * Copyright 2025 Armando Sori
+ * Copyright 2025 Armanclass CategoryPage {
+  constructor() {
+    this.categoryId = null;
+    this.category = null;
+    this.scenarios = [];
+    
+    // Badge system constants
+    this.BADGE_DELAY_MS = 2000; // Delay between multiple badge reveals
+    
+    this.initializePage();
+  }
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +32,8 @@
 import { getAllCategories, getCategoryScenarios, getCategoryProgress } from '../data/categories.js';
 import PreLaunchModal from './components/pre-launch-modal.js';
 import ScenarioModal from './components/scenario-modal.js';
+import badgeManager from './core/badge-manager.js';
+import badgeModal from './components/badge-modal.js';
 import logger from './utils/logger.js';
 
 class CategoryPage {
@@ -244,6 +256,9 @@ class CategoryPage {
         }
       }
     });
+
+    // Listen for scenario modal fully closed (for badge display)
+    document.addEventListener('scenario-modal-closed', this.handleScenarioModalClosed.bind(this));
   }
 
   openScenario(categoryId, scenarioId) {
@@ -338,7 +353,7 @@ class CategoryPage {
   }
 
   /**
-   * Handle scenario completion event
+   * Handle scenario completion event (immediate progress tracking)
    */
   handleScenarioCompleted(event) {
     const { scenarioId, selectedOption, option } = event.detail;
@@ -349,8 +364,8 @@ class CategoryPage {
       optionText: option.text,
     });
 
-    // Update progress
-    this.updateProgress(this.categoryId, scenarioId, true);
+    // Update progress (without badge checking)
+    this.updateProgress(this.categoryId, scenarioId, true, false);
 
     // Track analytics if available
     if (window.AnalyticsManager) {
@@ -364,7 +379,22 @@ class CategoryPage {
     }
   }
 
-  updateProgress(categoryId, scenarioId, completed = true) {
+  /**
+   * Handle scenario modal fully closed event (for badge display)
+   */
+  handleScenarioModalClosed(event) {
+    const { categoryId, scenarioId } = event.detail;
+
+    logger.info('Scenario modal fully closed, checking for badges:', {
+      categoryId,
+      scenarioId,
+    });
+
+    // Now check for newly earned badges
+    this.checkForNewBadges(categoryId, scenarioId);
+  }
+
+  updateProgress(categoryId, scenarioId, completed = true, checkBadges = true) {
     const userProgress = this.loadUserProgress();
     
     if (!userProgress[categoryId]) {
@@ -380,9 +410,73 @@ class CategoryPage {
       logger.error('Failed to save user progress:', error);
     }
 
+    // Check for newly earned badges only if explicitly requested
+    if (completed && checkBadges) {
+      this.checkForNewBadges(categoryId, scenarioId);
+    }
+
     // Re-render to update progress indicators
     this.renderCategoryHeader();
     this.renderScenariosGrid();
+  }
+
+  /**
+   * Checks for newly earned badges and displays them
+   * @param {string} categoryId - Category identifier
+   * @param {string} scenarioId - Scenario identifier
+   */
+  async checkForNewBadges(categoryId, scenarioId) {
+    try {
+      // Refresh badge manager's category progress
+      badgeManager.refreshCategoryProgress();
+      
+      // Check for newly earned badges
+      const newBadges = badgeManager.updateScenarioCompletion(categoryId, scenarioId);
+      
+      if (newBadges && newBadges.length > 0) {
+        // Display each new badge with a delay between multiple badges
+        for (let i = 0; i < newBadges.length; i++) {
+          const badge = newBadges[i];
+          
+          // Add small delay between multiple badges
+          if (i > 0) {
+            await this.delay(this.BADGE_DELAY_MS);
+          }
+          
+          // Show badge modal with category context
+          await badgeModal.showBadgeModal(badge, 'category');
+          
+          // Track badge achievement
+          logger.info('Badge earned:', {
+            categoryId: badge.categoryId,
+            badgeTitle: badge.title,
+            tier: badge.tier,
+            timestamp: badge.timestamp
+          });
+          
+          // Track analytics if available
+          if (window.AnalyticsManager) {
+            window.AnalyticsManager.trackEvent('badge_earned', {
+              categoryId: badge.categoryId,
+              badgeTitle: badge.title,
+              tier: badge.tier,
+              scenarioId
+            });
+          }
+        }
+      }
+    } catch (error) {
+      logger.error('Error checking for new badges:', error);
+    }
+  }
+
+  /**
+   * Utility function to create delays
+   * @param {number} ms - Milliseconds to delay
+   * @returns {Promise} Promise that resolves after delay
+   */
+  delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   /**

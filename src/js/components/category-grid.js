@@ -28,10 +28,15 @@ import {
 import logger from '../utils/logger.js';
 import PreLaunchModal from './pre-launch-modal.js';
 import ScenarioModal from './scenario-modal.js';
+import badgeManager from '../core/badge-manager.js';
+import badgeModal from './badge-modal.js';
 
 // Constants
 const PROGRESS_CIRCLE_CIRCUMFERENCE = 163; // 2 * π * 26 (radius)
 const HIGHLIGHT_DURATION = 2000;
+const BADGE_DELAY_MS = 2000; // Delay between multiple badge reveals
+const TOOLTIP_OFFSET = 8; // Tooltip offset from progress ring
+const MOBILE_TOOLTIP_DURATION = 3000; // Mobile tooltip display duration
 
 class CategoryGrid {
   constructor() {
@@ -50,7 +55,6 @@ class CategoryGrid {
     }
 
     this.render();
-    this.attachEventListeners();
   }
 
   loadUserProgress() {
@@ -87,6 +91,9 @@ class CategoryGrid {
       const categorySection = this.createCategorySection(category);
       this.container.appendChild(categorySection);
     });
+
+    // Attach event listeners after rendering
+    this.attachEventListeners();
   }
 
   createCategorySection(category) {
@@ -117,16 +124,7 @@ class CategoryGrid {
                         </div>
                     </div>
                 </div>
-                <div class="category-progress-ring">
-                    <svg width="60" height="60" viewBox="0 0 60 60">
-                        <circle cx="30" cy="30" r="26" fill="none" stroke="#e5e7eb" stroke-width="4"/>
-                        <circle cx="30" cy="30" r="26" fill="none" stroke="${category.color}" stroke-width="4"
-                                stroke-linecap="round" stroke-dasharray="${PROGRESS_CIRCLE_CIRCUMFERENCE}" 
-                                stroke-dashoffset="${PROGRESS_CIRCLE_CIRCUMFERENCE - (progress.percentage / 100) * PROGRESS_CIRCLE_CIRCUMFERENCE}"
-                                style="transform: rotate(-90deg); transform-origin: 30px 30px;"/>
-                    </svg>
-                    <span class="progress-percentage">${progress.percentage}%</span>
-                </div>
+${this.createProgressRing(category, progress)}
             </div>
 
             <div class="scenarios-grid">
@@ -191,6 +189,135 @@ class CategoryGrid {
       'keydown',
       this.handleScenarioKeydown.bind(this)
     );
+
+    // Listen for scenario modal fully closed (for badge display)
+    document.addEventListener('scenario-modal-closed', this.handleScenarioModalClosed.bind(this));
+    
+    // Add tooltip functionality for progress rings
+    this.attachProgressRingTooltips();
+  }
+
+  /**
+   * Attaches tooltip functionality to progress rings
+   */
+  attachProgressRingTooltips() {
+    const progressRings = this.container.querySelectorAll('.category-progress-ring[data-tooltip]');
+    
+    progressRings.forEach(ring => {
+      // Desktop: hover events
+      ring.addEventListener('mouseenter', this.showTooltip.bind(this));
+      ring.addEventListener('mouseleave', this.hideTooltip.bind(this));
+      
+      // Mobile: touch/tap events  
+      ring.addEventListener('touchstart', this.handleProgressRingTouch.bind(this));
+      ring.addEventListener('click', this.handleProgressRingClick.bind(this));
+      
+      // Keyboard accessibility
+      ring.addEventListener('keydown', this.handleProgressRingKeydown.bind(this));
+    });
+  }
+
+  /**
+   * Shows tooltip for progress ring
+   * @param {Event} event - Mouse or touch event
+   */
+  showTooltip(event) {
+    const ring = event.currentTarget;
+    const tooltip = ring.getAttribute('data-tooltip');
+    
+    if (!tooltip) return;
+
+    // Remove any existing tooltips
+    this.hideTooltip();
+
+    // Create tooltip element
+    const tooltipEl = document.createElement('div');
+    tooltipEl.className = 'progress-ring-tooltip';
+    tooltipEl.textContent = tooltip;
+    tooltipEl.setAttribute('role', 'tooltip');
+    
+    // Position tooltip
+    const rect = ring.getBoundingClientRect();
+    tooltipEl.style.position = 'fixed';
+    tooltipEl.style.top = `${rect.bottom + TOOLTIP_OFFSET}px`;
+    tooltipEl.style.left = `${rect.left + rect.width / 2}px`;
+    tooltipEl.style.transform = 'translateX(-50%)';
+    tooltipEl.style.zIndex = '1000';
+    
+    document.body.appendChild(tooltipEl);
+    
+    // Store reference for cleanup
+    ring._tooltip = tooltipEl;
+  }
+
+  /**
+   * Hides tooltip for progress ring
+   */
+  hideTooltip() {
+    const existingTooltips = document.querySelectorAll('.progress-ring-tooltip');
+    existingTooltips.forEach(tooltip => {
+      tooltip.remove();
+    });
+    
+    // Clear tooltip references
+    const rings = this.container.querySelectorAll('.category-progress-ring');
+    rings.forEach(ring => {
+      if (ring._tooltip) {
+        ring._tooltip = null;
+      }
+    });
+  }
+
+  /**
+   * Handles touch events for mobile tooltip
+   * @param {Event} event - Touch event
+   */
+  handleProgressRingTouch(event) {
+    event.preventDefault();
+    this.showTooltip(event);
+    
+    // Hide tooltip after delay on mobile
+    setTimeout(() => {
+      this.hideTooltip();
+    }, MOBILE_TOOLTIP_DURATION);
+  }
+
+  /**
+   * Handles click events for progress ring
+   * @param {Event} event - Click event
+   */
+  handleProgressRingClick(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    // On mobile, toggle tooltip
+    if ('ontouchstart' in window) {
+      const ring = event.currentTarget;
+      if (ring._tooltip) {
+        this.hideTooltip();
+      } else {
+        this.showTooltip(event);
+        setTimeout(() => this.hideTooltip(), MOBILE_TOOLTIP_DURATION);
+      }
+    }
+  }
+
+  /**
+   * Handles keyboard events for progress ring accessibility
+   * @param {Event} event - Keyboard event
+   */
+  handleProgressRingKeydown(event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this.showTooltip(event);
+      
+      // Hide tooltip after delay
+      setTimeout(() => {
+        this.hideTooltip();
+      }, MOBILE_TOOLTIP_DURATION);
+    } else if (event.key === 'Escape') {
+      this.hideTooltip();
+    }
   }
 
   handleScenarioClick(event) {
@@ -326,7 +453,7 @@ class CategoryGrid {
   }
 
   /**
-   * Handle scenario completion event
+   * Handle scenario completion event (immediate progress tracking)
    */
   handleScenarioCompleted(event) {
     const { scenarioId, selectedOption, option } = event.detail;
@@ -344,8 +471,8 @@ class CategoryGrid {
     });
 
     if (category) {
-      // Update progress
-      this.updateProgress(category.id, scenarioId, true);
+      // Update progress (without badge checking)
+      this.updateProgress(category.id, scenarioId, true, false);
 
       // Track analytics if available
       if (window.AnalyticsManager) {
@@ -360,7 +487,22 @@ class CategoryGrid {
     }
   }
 
-  updateProgress(categoryId, scenarioId, completed = true) {
+  /**
+   * Handle scenario modal fully closed event (for badge display)
+   */
+  handleScenarioModalClosed(event) {
+    const { categoryId, scenarioId } = event.detail;
+
+    logger.info('Scenario modal fully closed, checking for badges:', {
+      categoryId,
+      scenarioId,
+    });
+
+    // Now check for newly earned badges
+    this.checkForNewBadges(categoryId, scenarioId);
+  }
+
+  updateProgress(categoryId, scenarioId, completed = true, checkBadges = true) {
     if (!this.userProgress[categoryId]) {
       this.userProgress[categoryId] = {};
     }
@@ -368,8 +510,72 @@ class CategoryGrid {
     this.userProgress[categoryId][scenarioId] = completed;
     this.saveUserProgress();
 
+    // Check for newly earned badges only if explicitly requested
+    if (completed && checkBadges) {
+      this.checkForNewBadges(categoryId, scenarioId);
+    }
+
     // Re-render to update progress indicators
     this.render();
+  }
+
+  /**
+   * Checks for newly earned badges and displays them
+   * @param {string} categoryId - Category identifier
+   * @param {string} scenarioId - Scenario identifier
+   */
+  async checkForNewBadges(categoryId, scenarioId) {
+    try {
+      // Refresh badge manager's category progress
+      badgeManager.refreshCategoryProgress();
+      
+      // Check for newly earned badges
+      const newBadges = badgeManager.updateScenarioCompletion(categoryId, scenarioId);
+      
+      if (newBadges && newBadges.length > 0) {
+        // Display each new badge with a delay between multiple badges
+        for (let i = 0; i < newBadges.length; i++) {
+          const badge = newBadges[i];
+          
+          // Add small delay between multiple badges
+          if (i > 0) {
+            await this.delay(BADGE_DELAY_MS);
+          }
+          
+          // Show badge modal with main context (from home page)
+          await badgeModal.showBadgeModal(badge, 'main');
+          
+          // Track badge achievement
+          logger.info('Badge earned:', {
+            categoryId: badge.categoryId,
+            badgeTitle: badge.title,
+            tier: badge.tier,
+            timestamp: badge.timestamp
+          });
+          
+          // Track analytics if available
+          if (window.AnalyticsManager) {
+            window.AnalyticsManager.trackEvent('badge_earned', {
+              categoryId: badge.categoryId,
+              badgeTitle: badge.title,
+              tier: badge.tier,
+              scenarioId
+            });
+          }
+        }
+      }
+    } catch (error) {
+      logger.error('Error checking for new badges:', error);
+    }
+  }
+
+  /**
+   * Utility function to create delays
+   * @param {number} ms - Milliseconds to delay
+   * @returns {Promise} Promise that resolves after delay
+   */
+  delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   getFilteredCategories(filter = {}) {
@@ -395,6 +601,77 @@ class CategoryGrid {
     }
 
     return filtered;
+  }
+
+  /**
+   * Checks if user is one scenario away from earning the next badge
+   * @param {string} categoryId - Category identifier
+   * @returns {Object|null} Next badge info if one scenario away, null otherwise
+   */
+  isOneScenarioFromNextBadge(categoryId) {
+    try {
+      // Ensure badge manager has latest progress data
+      badgeManager.refreshCategoryProgress();
+      
+      const progress = badgeManager.getBadgeProgress(categoryId);
+      
+      if (!progress || !progress.nextBadge || !progress.progress) {
+        return null;
+      }
+
+      const { remaining } = progress.progress;
+      
+      // Check if exactly one scenario away from next badge
+      if (remaining === 1) {
+        return {
+          nextBadge: progress.nextBadge,
+          current: progress.progress.current,
+          required: progress.progress.required,
+          badgeTitle: progress.nextBadge.title,
+          sidekickEmoji: progress.nextBadge.sidekickEmoji
+        };
+      }
+
+      return null;
+    } catch (error) {
+      logger.error('Error checking badge progress:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Creates the progress ring with pulse animation and tooltip for badges
+   * @param {Object} category - Category object
+   * @param {Object} progress - Progress object
+   * @returns {string} Progress ring HTML
+   */
+  createProgressRing(category, progress) {
+    const badgeInfo = this.isOneScenarioFromNextBadge(category.id);
+    const isPulsingForBadge = badgeInfo !== null;
+    
+    // Generate tooltip content if one scenario away from badge
+    const tooltipContent = badgeInfo ? 
+      `${badgeInfo.current} of ${badgeInfo.required} scenarios completed. 1 more to unlock next badge: '${badgeInfo.badgeTitle}' ${badgeInfo.sidekickEmoji}` :
+      `${progress.completed} of ${progress.total} scenarios completed`;
+
+    const pulseClass = isPulsingForBadge ? 'pulse-for-badge' : '';
+    
+    return `
+      <div class="category-progress-ring ${pulseClass}" 
+           data-tooltip="${tooltipContent}"
+           role="button"
+           tabindex="0"
+           aria-label="Category progress: ${tooltipContent}">
+        <svg width="60" height="60" viewBox="0 0 60 60">
+          <circle cx="30" cy="30" r="26" fill="none" stroke="#e5e7eb" stroke-width="4"/>
+          <circle cx="30" cy="30" r="26" fill="none" stroke="${category.color}" stroke-width="4"
+                  stroke-linecap="round" stroke-dasharray="${PROGRESS_CIRCLE_CIRCUMFERENCE}" 
+                  stroke-dashoffset="${PROGRESS_CIRCLE_CIRCUMFERENCE - (progress.percentage / 100) * PROGRESS_CIRCLE_CIRCUMFERENCE}"
+                  style="transform: rotate(-90deg); transform-origin: 30px 30px;"/>
+        </svg>
+        <span class="progress-percentage">${progress.percentage}%</span>
+      </div>
+    `;
   }
 
   // Public API for external components

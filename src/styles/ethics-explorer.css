@@ -202,27 +202,100 @@
   /* Prevent this element from interfering with page scrolling */
   contain: layout style;
   
+  /* Enhanced cursor behavior for horizontal scrolling */
+  cursor: grab;
+  
   /* Custom scrollbar styling */
   scrollbar-width: thin;
   scrollbar-color: #cbd5e0 transparent;
 }
 
+/* Enhanced states for scenarios grid */
+.scenarios-grid:hover {
+  cursor: grab;
+}
+
+.scenarios-grid:active {
+  cursor: grabbing;
+}
+
+/* Enhanced scrollbar styles with better hover feedback */
 .scenarios-grid::-webkit-scrollbar {
   height: 8px;
+  transition: height 0.2s ease;
+}
+
+.scenarios-grid:hover::-webkit-scrollbar {
+  height: 10px;
 }
 
 .scenarios-grid::-webkit-scrollbar-track {
   background: #f7fafc;
   border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.scenarios-grid:hover::-webkit-scrollbar-track {
+  background: #edf2f7;
 }
 
 .scenarios-grid::-webkit-scrollbar-thumb {
   background: #cbd5e0;
   border-radius: 4px;
+  transition: background-color 0.2s ease;
 }
 
 .scenarios-grid::-webkit-scrollbar-thumb:hover {
   background: #a0aec0;
+}
+
+.scenarios-grid:hover::-webkit-scrollbar-thumb {
+  background: #a0aec0;
+}
+
+/* Desktop-specific enhancements */
+@media (min-width: 769px) {
+  .scenarios-grid {
+    /* Enhanced scroll performance on desktop */
+    scroll-behavior: auto; /* Override smooth for wheel events */
+  }
+  
+  .scenarios-grid:hover {
+    /* Subtle indication that horizontal scrolling is available */
+    box-shadow: inset 0 0 0 1px rgba(74, 144, 226, 0.15);
+    /* Add a subtle gradient overlay to indicate scrollability */
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(74, 144, 226, 0.02) 5%, 
+      rgba(74, 144, 226, 0.02) 95%, 
+      transparent 100%);
+  }
+  
+  /* Enhanced visual feedback when actively scrolling */
+  .scenarios-grid:active {
+    cursor: grabbing;
+    box-shadow: inset 0 0 0 2px rgba(74, 144, 226, 0.2);
+  }
+  
+  /* Smoother transitions on desktop */
+  .scenarios-grid {
+    transition: box-shadow 0.3s ease, background 0.3s ease;
+  }
+  
+  /* Subtle pulse animation to indicate scrollability */
+  .scenarios-grid:hover {
+    animation: scroll-hint-pulse 2s ease-in-out infinite;
+  }
+}
+
+/* Keyframe animation for scroll hint */
+@keyframes scroll-hint-pulse {
+  0%, 100% { 
+    box-shadow: inset 0 0 0 1px rgba(74, 144, 226, 0.15);
+  }
+  50% { 
+    box-shadow: inset 0 0 0 1px rgba(74, 144, 226, 0.25);
+  }
 }
 
 .scenario-card {
