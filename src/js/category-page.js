@@ -416,8 +416,46 @@ class CategoryPage {
     this.openCategoryPremodal(this.category, scenario);
   }
 
+  /**
+   * Clean up any existing modal instances to prevent multiple modals
+   */
+  cleanupExistingModals() {
+    // Close any existing pre-launch modals
+    const existingModalBackdrops = document.querySelectorAll('.modal-backdrop');
+    existingModalBackdrops.forEach(backdrop => {
+      const modalDialog = backdrop.querySelector('.modal-dialog');
+      if (modalDialog && modalDialog.querySelector('.pre-launch-modal')) {
+        // Found a pre-launch modal, close it
+        const closeButton = backdrop.querySelector('.modal-close');
+        if (closeButton) {
+          closeButton.click();
+        } else {
+          // Force remove if no close button found
+          backdrop.remove();
+        }
+      }
+    });
+
+    // Also clean up any orphaned modal elements
+    const orphanedPreLaunchModals = document.querySelectorAll('.pre-launch-modal');
+    orphanedPreLaunchModals.forEach(modal => {
+      const parentBackdrop = modal.closest('.modal-backdrop');
+      if (parentBackdrop) {
+        parentBackdrop.remove();
+      } else {
+        modal.remove();
+      }
+    });
+
+    // Clean up body styles that might be left behind
+    document.body.style.overflow = '';
+  }
+
   openCategoryPremodal(category, scenario) {
     try {
+      // Clean up any existing modals first
+      this.cleanupExistingModals();
+
       // Use the category ID as the "simulation ID" and pass category/scenario data
       const preModal = new PreLaunchModal(category.id, {
         categoryData: category,
