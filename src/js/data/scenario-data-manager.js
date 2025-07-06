@@ -68,6 +68,7 @@ class ScenarioDataManager {
       this.categoryCache.set(categoryId, scenarios);
 
       logger.info(
+        'ScenarioDataManager',
         `Loaded ${Object.keys(scenarios).length} scenarios for category: ${categoryId}`
       );
       return scenarios;

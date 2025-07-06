@@ -48,11 +48,11 @@ class CategoryPage {
   }
 
   init() {
-    logger.info('CategoryPage init called');
+    logger.info('CategoryPage', 'Init called');
     // Get category ID from URL parameters
     this.categoryId = this.getCategoryIdFromUrl();
     
-    logger.info('Extracted category ID:', this.categoryId);
+    logger.info('CategoryPage', 'Extracted category ID', this.categoryId);
     
     if (!this.categoryId) {
       this.handleError('No category specified');
@@ -350,6 +350,9 @@ class CategoryPage {
   }
 
   setupEventListeners() {
+    // Set up mobile navigation
+    this.setupMobileNavigation();
+    
     // Add click handlers for scenario cards
     document.addEventListener('click', (e) => {
       const scenarioCard = e.target.closest('.scenario-card');
@@ -400,11 +403,11 @@ class CategoryPage {
     const scenario = this.scenarios.find(s => s.id === scenarioId);
 
     if (!this.category || !scenario) {
-      logger.error('Category or scenario not found:', categoryId, scenarioId);
+      logger.error('CategoryPage', 'Category or scenario not found', { categoryId, scenarioId });
       return;
     }
 
-    logger.info('Opening premodal for category:', this.category);
+    logger.info('CategoryPage', 'Opening premodal for category', this.category);
 
     // Dispatch custom event for other components to listen to
     const event = new CustomEvent('scenario-selected', {
@@ -517,7 +520,7 @@ class CategoryPage {
       return;
     }
 
-    logger.info('Opening scenario modal directly for:', scenario.title);
+    logger.info('CategoryPage', 'Opening scenario modal directly for:', { title: scenario.title });
 
     // Dispatch custom event for other components to listen to
     const event = new CustomEvent('scenario-selected', {
@@ -758,11 +761,189 @@ class CategoryPage {
       `;
     }
   }
+
+  /**
+   * Sets up mobile navigation hamburger menu functionality
+   */
+  setupMobileNavigation() {
+    const navToggle = document.querySelector('.nav-toggle');
+    const mainNav = document.querySelector('.main-nav');
+    const navBackdrop = document.querySelector('.nav-backdrop');
+    const navClose = document.querySelector('.nav-close');
+
+    if (!navToggle || !mainNav) {
+      logger.warn('CategoryPage', 'Mobile navigation elements not found', {
+        navToggle: !!navToggle,
+        mainNav: !!mainNav,
+        navBackdrop: !!navBackdrop
+      });
+      return;
+    }
+
+    logger.info('CategoryPage', 'Found navigation elements', {
+      navToggle: !!navToggle,
+      mainNav: !!mainNav,
+      navBackdrop: !!navBackdrop,
+      navClose: !!navClose
+    });
+
+    // Toggle mobile navigation
+    const toggleNav = isOpen => {
+      const isCurrentlyOpen = mainNav.classList.contains('open');
+      const shouldOpen = isOpen !== undefined ? isOpen : !isCurrentlyOpen;
+
+      // Update classes
+      mainNav.classList.toggle('open', shouldOpen);
+      navToggle.classList.toggle('active', shouldOpen);
+      if (navBackdrop) {
+        navBackdrop.classList.toggle('open', shouldOpen);
+      }
+
+      // Focus management - handle before aria-hidden to avoid accessibility violations
+      if (shouldOpen) {
+        // Focus first nav link when opening
+        const firstNavLink = mainNav.querySelector('.nav-link');
+        if (firstNavLink) {
+          setTimeout(() => firstNavLink.focus(), 100);
+        }
+      } else {
+        // Move focus away from nav before hiding it
+        const { activeElement } = document;
+        if (activeElement && mainNav.contains(activeElement)) {
+          navToggle.focus(); // Move focus to the nav toggle button
+        }
+      }
+
+      // Update ARIA attributes after focus management
+      navToggle.setAttribute('aria-expanded', shouldOpen.toString());
+      mainNav.setAttribute('aria-hidden', (!shouldOpen).toString());
+
+      // Prevent body scroll when nav is open
+      document.body.style.overflow = shouldOpen ? 'hidden' : '';
+
+      logger.info('CategoryPage', 'Mobile navigation toggled', { isOpen: shouldOpen });
+    };
+
+    // Hamburger button click
+    navToggle.addEventListener('click', e => {
+      e.preventDefault();
+      logger.info('CategoryPage', 'Nav toggle button clicked');
+      toggleNav();
+    });
+
+    // Close button click (X in mobile nav)
+    if (navClose) {
+      navClose.addEventListener('click', e => {
+        e.preventDefault();
+        logger.info('CategoryPage', 'Nav close button clicked');
+        toggleNav(false);
+      });
+    }
+
+    // Backdrop click
+    if (navBackdrop) {
+      navBackdrop.addEventListener('click', () => {
+        logger.info('CategoryPage', 'Nav backdrop clicked');
+        toggleNav(false);
+      });
+    }
+
+    // Nav links click (close mobile nav when clicking a link)
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        // Handle Surprise Me button
+        if (link.id === 'surprise-me-nav') {
+          e.preventDefault();
+          logger.info('CategoryPage', 'Surprise Me button clicked');
+          this.launchRandomScenario();
+        }
+        
+        logger.info('CategoryPage', 'Nav link clicked, closing mobile nav');
+        toggleNav(false);
+      });
+    });
+
+    // Escape key to close navigation
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && mainNav.classList.contains('open')) {
+        logger.info('CategoryPage', 'Escape key pressed, closing mobile nav');
+        toggleNav(false);
+      }
+    });
+
+    logger.info('CategoryPage', 'Mobile navigation setup completed');
+  }
+
+  /**
+   * Launches a random scenario from any category
+   */
+  launchRandomScenario() {
+    // Import category data to get all scenarios
+    import('../data/categories.js').then(({ categories }) => {
+      // Get all available scenarios from all categories
+      const allScenarios = [];
+      
+      categories.forEach(category => {
+        category.scenarios.forEach(scenario => {
+          allScenarios.push({
+            categoryId: category.id,
+            categoryTitle: category.title,
+            scenario
+          });
+        });
+      });
+
+      if (allScenarios.length === 0) {
+        this.showNotification('No scenarios available!', 'warning');
+        return;
+      }
+
+      // Select a random scenario
+      const randomIndex = Math.floor(Math.random() * allScenarios.length);
+      const randomScenario = allScenarios[randomIndex];
+
+      // Show notification about the selected scenario
+      this.showNotification(
+        `🎉 Surprise! Opening "${randomScenario.scenario.title}" from ${randomScenario.categoryTitle}`,
+        'info'
+      );
+
+      // If we're already on the right category page, open directly
+      if (randomScenario.categoryId === this.categoryId) {
+        this.openScenarioModalDirect(randomScenario.categoryId, randomScenario.scenario.id);
+      } else {
+        // Navigate to the category page and open the scenario
+        window.location.href = `category.html?category=${randomScenario.categoryId}#scenario=${randomScenario.scenario.id}`;
+      }
+    }).catch(error => {
+      logger.error('CategoryPage', 'Failed to load categories for surprise me', error);
+      this.showNotification('Failed to load random scenario', 'error');
+    });
+  }
+
+  /**
+   * Show a notification message
+   */
+  showNotification(message, type = 'info') {
+    // Check if notification system is available
+    if (window.NotificationToast) {
+      return window.NotificationToast.show(message, {
+        type,
+        duration: 4000,
+        closable: true,
+      });
+    } else {
+      // Fallback to logger if notification system not available
+      logger.info('CategoryPage', `[${type.toUpperCase()}] ${message}`);
+      return null;
+    }
+  }
 }
 
 // Initialize the category page when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  logger.info('DOMContentLoaded event fired, creating CategoryPage...');
+  logger.info('CategoryPage', 'DOMContentLoaded event fired, creating CategoryPage');
   new CategoryPage();
 });
 

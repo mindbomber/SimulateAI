@@ -507,7 +507,7 @@ ${this.createProgressRing(category, progress)}
       return;
     }
 
-    logger.info('Opening scenario modal directly for:', scenario.title);
+    logger.info('CategoryGrid', 'Opening scenario modal directly for:', { title: scenario.title });
 
     // Dispatch custom event for other components to listen to
     const event = new CustomEvent('scenario-selected', {

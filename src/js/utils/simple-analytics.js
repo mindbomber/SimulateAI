@@ -37,7 +37,7 @@ class SimpleAnalyticsManager {
     this.sessionId = this.generateSessionId();
     this.startTime = Date.now();
 
-    logger.info('📊 Simple Analytics Manager initialized');
+    logger.info('Analytics', '📊 Simple Analytics Manager initialized');
   }
 
   /**
@@ -247,7 +247,7 @@ class SimpleAnalyticsManager {
         this.saveEvents();
       });
 
-      logger.info('📊 Simple Analytics Manager ready');
+      logger.info('Analytics', '📊 Simple Analytics Manager ready');
     } catch (error) {
       logger.warn('Error initializing analytics:', error);
     }
@@ -284,4 +284,4 @@ window.SimpleAnalytics = simpleAnalytics;
 // Auto-initialize
 simpleAnalytics.init();
 
-logger.info('✅ Simple Analytics Manager loaded');
+logger.info('Analytics', '✅ Simple Analytics Manager loaded');

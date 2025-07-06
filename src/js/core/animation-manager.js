@@ -215,7 +215,7 @@ export class AnimationManager {
       this.setupMemoryManagement();
       this.setupEventListeners();
 
-      logger.info(
+      logger.info('Animation', 
         'Enhanced AnimationManager initialized with accessibility and performance features'
       );
     } catch (error) {

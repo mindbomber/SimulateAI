@@ -196,7 +196,7 @@ class AccessibilityManager {
       // Setup voice commands if supported
       this.setupVoiceCommands();
 
-      logger.info(
+      logger.info('Accessibility', 
         'Enhanced AccessibilityManager initialized with advanced features'
       );
     } catch (error) {

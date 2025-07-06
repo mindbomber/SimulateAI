@@ -122,15 +122,15 @@ export default class RadarChart {
    */
   async initializeChart() {
     try {
-      logger.info('Initializing radar chart...');
+      logger.info('RadarChart', 'Initializing radar chart');
 
       // Ensure Chart.js is loaded
       if (typeof window.Chart === 'undefined') {
-        logger.info('Chart.js not found, loading...');
+        logger.info('RadarChart', 'Chart.js not found, loading');
         await this.loadChartJS();
-        logger.info('Chart.js loaded successfully');
+        logger.info('RadarChart', 'Chart.js loaded successfully');
       } else {
-        logger.info('Chart.js already available');
+        logger.info('RadarChart', 'Chart.js already available');
       }
 
       // Create canvas element
@@ -151,24 +151,24 @@ export default class RadarChart {
       this.container.style.overflow = 'visible';
 
       this.container.appendChild(canvas);
-      logger.info('Canvas element created and appended to container');
+      logger.info('RadarChart', 'Canvas element created and appended to container');
 
       // Apply visual enhancements classes BEFORE creating chart
       if (this.options.isDemo) {
         this.container.classList.add('radar-demo-container');
-        logger.info('Applied radar-demo-container class for demo chart');
+        logger.info('RadarChart', 'Applied radar-demo-container class for demo chart');
       } else {
         this.container.classList.add('radar-chart-container');
-        logger.info('Applied radar-chart-container class');
+        logger.info('RadarChart', 'Applied radar-chart-container class');
       }
 
       // Initialize Chart.js radar chart
       const ctx = canvas.getContext('2d');
       const config = this.getChartConfig();
-      logger.info('Creating chart with config', config);
+      logger.info('RadarChart', 'Creating chart with config', config);
 
       this.chart = new window.Chart(ctx, config);
-      logger.info('Chart created successfully');
+      logger.info('RadarChart', 'Chart created successfully');
 
       // Add mobile tooltip dismissal for demo charts and scenario charts
       if (this.options.isDemo || this.options.realTime) {
@@ -179,12 +179,12 @@ export default class RadarChart {
       setTimeout(() => {
         if (this.chart) {
           this.chart.update();
-          logger.info('Chart updated/redrawn');
+          logger.info('RadarChart', 'Chart updated/redrawn');
         }
       }, 100);
 
       this.isInitialized = true;
-      logger.info('Radar chart initialized successfully');
+      logger.info('RadarChart', 'Radar chart initialized successfully');
     } catch (error) {
       logger.error('Failed to initialize radar chart:', error);
       this.showFallbackChart();

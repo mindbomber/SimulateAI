@@ -45,13 +45,11 @@ class SimpleStorageManager {
    * Initialize storage and log status
    */
   init() {
-    logger.info('Storage Status:');
-    logger.info(
-      '- localStorage:',
+    logger.info('Storage', 'Storage Status');
+    logger.info('Storage', '- localStorage', 
       this.isLocalStorageAvailable ? '✅ Available' : '❌ Not available'
     );
-    logger.info(
-      '- sessionStorage:',
+    logger.info('Storage', '- sessionStorage',
       this.isSessionStorageAvailable ? '✅ Available' : '❌ Not available'
     );
 
@@ -401,4 +399,4 @@ window.SimpleStorage = {
   progress: userProgress,
 };
 
-logger.info('✅ Simple Storage Manager initialized');
+logger.info('Storage', '✅ Simple Storage Manager initialized');
