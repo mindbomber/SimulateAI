@@ -45,6 +45,7 @@ import { PostSimulationModal } from './components/post-simulation-modal.js';
 import ModalFooterManager from './components/modal-footer-manager.js';
 import CategoryGrid from './components/category-grid.js';
 import RadarChart from './components/radar-chart.js';
+import OnboardingTour from './components/onboarding-tour.js';
 import { getAllCategories, getCategoryScenarios } from '../data/categories.js';
 
 // Constants for app configuration
@@ -95,7 +96,7 @@ class AIEthicsApp {
   constructor() {
     // Version identifier for debugging
     this.version = 'v2.0.1-context-fixes';
-    logger.info('App', `Initializing AIEthicsApp ${this.version}`);
+    logger.info(`[App] Initializing AIEthicsApp ${this.version}`);
 
     this.currentSimulation = null;
     this.engine = null;
@@ -144,7 +145,10 @@ class AIEthicsApp {
     this.errorBoundary = null;
     this.lastError = null;
 
-    // Available ethics categories (each containing multiple scenarios)
+    // Onboarding tour
+    this.onboardingTour = null;
+
+    // Available simulation categories (each containing multiple scenarios)
     // NOTE: These are thematic categories, not individual scenarios
     this.availableSimulations = [
       {
@@ -247,6 +251,12 @@ class AIEthicsApp {
 
       // Initialize ethics radar demo
       await this.initializeEthicsRadarDemo();
+
+      // Initialize onboarding tour for first-time users
+      this.onboardingTour = new OnboardingTour();
+      
+      // Check and start onboarding tour for first-time users
+      this.checkAndStartOnboardingTour();
 
       // Prevent page scroll snap issues
       preventPageScrollSnap();
@@ -782,7 +792,7 @@ class AIEthicsApp {
     // Get key UI elements
     this.modal = document.getElementById('simulation-modal');
     this.simulationContainer = document.getElementById('simulation-container');
-    this.categoriesGrid = document.querySelector('.categories-grid, .simulations-grid');
+    this.categoriesGrid = document.querySelector('.categories-grid');
     this.loading = document.getElementById('loading');
 
     if (!this.categoriesGrid) {
@@ -799,6 +809,7 @@ class AIEthicsApp {
    */
   initializeCategoryGrid() {
     try {
+      AppDebug.log('Attempting to initialize CategoryGrid...');
       this.categoryGrid = new CategoryGrid();
       AppDebug.log('Category grid initialized successfully');
     } catch (error) {
@@ -832,7 +843,7 @@ class AIEthicsApp {
   async initializeHeroDemo() {
     // The HeroDemo class is designed for a different hero layout
     // that's not currently implemented. The radar chart demo is working fine.
-    logger.info('App', 'Hero demo: Using radar chart demo instead of HeroDemo class');
+    logger.info('Hero demo: Using radar chart demo instead of HeroDemo class');
   }
 
   /**
@@ -842,7 +853,7 @@ class AIEthicsApp {
     try {
       // Enhanced objects are loaded dynamically when needed
       // This method is kept for future initialization if needed
-      logger.info('App', 'Enhanced objects system ready for dynamic loading');
+      logger.info('Enhanced objects system ready for dynamic loading');
     } catch (error) {
       logger.error('Failed to initialize enhanced objects:', error);
       // Non-critical error - app can continue with basic functionality
@@ -860,7 +871,7 @@ class AIEthicsApp {
       // Store reference for cleanup
       this.modalFooterManager.app = this;
 
-      logger.info('App', 'Modal footer manager initialized successfully');
+      logger.info('Modal footer manager initialized successfully');
     } catch (error) {
       logger.error('Failed to initialize modal footer manager:', error);
       // Non-critical error - modals will still work with basic functionality
@@ -878,7 +889,7 @@ class AIEthicsApp {
         // Initialize the ethics radar demo
         ethicsDemo = new EthicsRadarDemo();
 
-        logger.info('App', 'Ethics radar demo initialized successfully');
+        logger.info('Ethics radar demo initialized successfully');
       } else {
         logger.warn(
           'Hero ethics chart container not found, skipping radar demo initialization'
@@ -911,6 +922,24 @@ class AIEthicsApp {
     if (testScenarioBtn) {
       testScenarioBtn.addEventListener('click', () => {
         this.testScenarioModal();
+      });
+    }
+
+    // Take Tour button in navigation
+    const tourBtn = document.getElementById('start-tour-nav');
+    if (tourBtn) {
+      tourBtn.addEventListener('click', (e) => {
+        e.preventDefault(); // Prevent default link behavior
+        this.startOnboardingTour();
+        
+        // Close mobile navigation if open
+        const navToggle = document.querySelector('.nav-toggle');
+        const nav = document.querySelector('.nav');
+        if (nav && nav.classList.contains('active')) {
+          nav.classList.remove('active');
+          navToggle?.setAttribute('aria-expanded', 'false');
+          document.body.classList.remove('nav-open');
+        }
       });
     }
 
@@ -974,6 +1003,47 @@ class AIEthicsApp {
     });
   }
 
+  /**
+   * Check if this is a first-time visit and start onboarding tour
+   */
+  checkAndStartOnboardingTour() {
+    if (!this.onboardingTour) {
+      return;
+    }
+    
+    // Check if user has completed the tour
+    if (this.onboardingTour.hasCompletedTour()) {
+      AppDebug.log('User has already completed onboarding tour');
+      return;
+    }
+
+    // Check if this is a first-time visit
+    if (this.onboardingTour.isFirstTimeVisit()) {
+      AppDebug.log('First-time visit detected, starting onboarding tour');
+      // Small delay to ensure all UI is ready
+      const UI_READY_DELAY = 500; // ms
+      setTimeout(() => {
+        this.onboardingTour.startTour(1);
+      }, UI_READY_DELAY);
+    }
+  }
+
+  /**
+   * Manually start the onboarding tour (for testing)
+   */
+  startOnboardingTour() {
+    if (!this.onboardingTour) {
+      this.onboardingTour = new OnboardingTour();
+    }
+    
+    // Clear localStorage to force tour to start
+    localStorage.removeItem('has_visited');
+    localStorage.removeItem('tour_completed');
+    
+    AppDebug.log('Manually starting onboarding tour');
+    this.onboardingTour.startTour(1);
+  }
+
   setupAccessibility() {
     // Preferences are now loaded in initializeTheme(), so we just need to ensure
     // the theme is applied (which was already done in initializeTheme)
@@ -983,12 +1053,12 @@ class AIEthicsApp {
   render() {
     // Skip rendering the old simulations grid if CategoryGrid is active
     if (!this.categoryGrid) {
-      this.renderCategoriesGrid();
+      this.renderSimulationsGrid();
     }
     // Hero demo is now handled by the HeroDemo class
   }
 
-  renderCategoriesGrid() {
+  renderSimulationsGrid() {
     if (!this.categoriesGrid) return;
 
     this.categoriesGrid.innerHTML = '';
@@ -1118,52 +1188,10 @@ class AIEthicsApp {
   }
 
   /**
-   * Clean up any existing modal instances to prevent multiple modals
-   */
-  cleanupExistingModals() {
-    // Close any existing pre-launch modals by backdrop
-    const existingModalBackdrops = document.querySelectorAll('.modal-backdrop');
-    existingModalBackdrops.forEach(backdrop => {
-      const modalDialog = backdrop.querySelector('.modal-dialog');
-      if (modalDialog && modalDialog.querySelector('.pre-launch-modal')) {
-        // Found a pre-launch modal, remove it immediately
-        backdrop.remove();
-      }
-    });
-
-    // Also clean up any orphaned modal elements
-    const orphanedPreLaunchModals = document.querySelectorAll('.pre-launch-modal');
-    orphanedPreLaunchModals.forEach(modal => {
-      const parentBackdrop = modal.closest('.modal-backdrop');
-      if (parentBackdrop) {
-        parentBackdrop.remove();
-      } else {
-        modal.remove();
-      }
-    });
-
-    // Clean up body styles that might be left behind
-    document.body.style.overflow = '';
-    
-    // Remove any modal-related classes from body
-    document.body.classList.remove('modal-open');
-    
-    // Remove any lingering inert states from other elements
-    document.querySelectorAll('[inert]').forEach(el => {
-      if (!el.classList.contains('modal-backdrop')) {
-        el.removeAttribute('inert');
-      }
-    });
-  }
-
-  /**
    * Shows the pre-launch information modal
    */
   showPreLaunchModal(simulationId) {
     logger.debug('Showing pre-launch modal for:', simulationId);
-
-    // Clean up any existing modals first
-    this.cleanupExistingModals();
 
     const prelaunchModal = new PreLaunchModal(simulationId, {
       onLaunch: id => {
@@ -2082,7 +2110,14 @@ class AIEthicsApp {
         navBackdrop.classList.toggle('open', shouldOpen);
       }
 
-      // Focus management - handle before aria-hidden to avoid accessibility violations
+      // Update ARIA attributes
+      navToggle.setAttribute('aria-expanded', shouldOpen.toString());
+      mainNav.setAttribute('aria-hidden', (!shouldOpen).toString());
+
+      // Prevent body scroll when nav is open
+      document.body.style.overflow = shouldOpen ? 'hidden' : '';
+
+      // Focus management
       if (shouldOpen) {
         // Focus first nav link when opening
         const firstNavLink = mainNav.querySelector('.nav-link');
@@ -2090,19 +2125,9 @@ class AIEthicsApp {
           setTimeout(() => firstNavLink.focus(), 100);
         }
       } else {
-        // Move focus away from nav before hiding it
-        const { activeElement } = document;
-        if (activeElement && mainNav.contains(activeElement)) {
-          navToggle.focus(); // Move focus to the nav toggle button
-        }
+        // Return focus to toggle button when closing
+        navToggle.focus();
       }
-
-      // Update ARIA attributes after focus management
-      navToggle.setAttribute('aria-expanded', shouldOpen.toString());
-      mainNav.setAttribute('aria-hidden', (!shouldOpen).toString());
-
-      // Prevent body scroll when nav is open
-      document.body.style.overflow = shouldOpen ? 'hidden' : '';
 
       // Analytics
       simpleAnalytics.trackEvent('mobile_nav_toggled', { isOpen: shouldOpen });
@@ -2159,7 +2184,7 @@ class AIEthicsApp {
           return; // Let mega menu handle this
         }
 
-        logger.info('Navigation', `Link clicked: "${text}" -> ${href}`);
+        logger.info(`Navigation link clicked: "${text}" -> ${href}`);
 
         // Skip surprise me button - it has its own handler
         if (link.id === 'surprise-me-nav') {
@@ -2174,7 +2199,7 @@ class AIEthicsApp {
           const targetElement = document.querySelector(href);
 
           if (targetElement) {
-            logger.info('Navigation', `Navigating to section: ${href}`);
+            logger.info(`Navigating to section: ${href}`);
 
             // Close mobile nav first
             toggleNav(false);
@@ -2186,7 +2211,7 @@ class AIEthicsApp {
                 behavior: 'smooth',
                 block: 'start',
               });
-              logger.info('Navigation', `Scrolled to section: ${href}`);
+              logger.info(`Scrolled to section: ${href}`);
             }, SCROLL_DELAY);
 
             // Track successful navigation
@@ -2543,25 +2568,21 @@ class AIEthicsApp {
    * Scroll to the simulations section
    */
   scrollToSimulations() {
-    // Try multiple possible section IDs
-    const simulationsSection = document.getElementById('categories') || 
-                               document.getElementById('simulations') ||
-                               document.querySelector('.categories-section');
-    
+    const simulationsSection = document.getElementById('simulations');
     if (simulationsSection) {
       simulationsSection.scrollIntoView({
         behavior: 'smooth',
         block: 'start'
       });
       
-      logger.info('App', 'Scrolled to simulations section');
+      logger.info('Scrolled to simulations section');
       
       // Track the navigation
       simpleAnalytics.trackEvent('navigation_to_simulations', {
         source: 'start_learning_button'
       });
     } else {
-      logger.error('App', 'Simulations section not found');
+      logger.error('Simulations section not found');
     }
   }
 
@@ -2570,7 +2591,7 @@ class AIEthicsApp {
    */
   async testScenarioModal() {
     try {
-      logger.info('App', 'Testing scenario modal with trolley problem scenario');
+      logger.info('Testing scenario modal with trolley problem scenario');
 
       // Import and create scenario modal
       const ScenarioModal = (await import('./components/scenario-modal.js'))
@@ -2630,7 +2651,7 @@ class EthicsRadarDemo {
         isDemo: true, // Use minimal container styling
       });
 
-      logger.info('App', 'Ethics radar demo initialized successfully');
+      logger.info('Ethics radar demo initialized successfully');
     } catch (error) {
       logger.error('Failed to initialize ethics radar demo:', error);
     }

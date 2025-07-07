@@ -101,6 +101,18 @@ class ModalUtility {
 
     // Show the modal
     this.element.style.display = 'flex';
+    
+    // Check if onboarding is active and adjust modal behavior accordingly
+    const isOnboardingActive = document.body.classList.contains('onboarding-active');
+    if (isOnboardingActive) {
+      // Allow onboarding interactions by making modal backdrop less intrusive
+      this.element.style.pointerEvents = 'none';
+      // But keep the modal dialog interactive
+      const modalDialog = this.element.querySelector('.modal-dialog');
+      if (modalDialog) {
+        modalDialog.style.pointerEvents = 'auto';
+      }
+    }
 
     // Make the rest of the page non-interactable while modal is open
     this._setPageInert(true);
@@ -132,6 +144,13 @@ class ModalUtility {
 
     // Make modal non-interactable
     this.element.inert = true;
+    
+    // Restore normal pointer events for modal
+    this.element.style.pointerEvents = '';
+    const modalDialog = this.element.querySelector('.modal-dialog');
+    if (modalDialog) {
+      modalDialog.style.pointerEvents = '';
+    }
 
     // Restore page interactability
     this._setPageInert(false);
@@ -155,10 +174,13 @@ class ModalUtility {
   }
 
   _setPageInert(inert) {
-    // Get all direct children of body except our modal
+    // Get all direct children of body except our modal and onboarding elements
     const bodyChildren = Array.from(document.body.children);
     bodyChildren.forEach(child => {
-      if (child !== this.element) {
+      if (child !== this.element && 
+          !child.classList.contains('onboarding-overlay') &&
+          !child.classList.contains('onboarding-spotlight') &&
+          !child.classList.contains('onboarding-coach-mark')) {
         child.inert = inert;
       }
     });

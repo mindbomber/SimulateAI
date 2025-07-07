@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Tutorial</title>
+</head>
+<body>
+    <h1>Tutorial Reset Tool</h1>
+    <button onclick="resetTutorial()">Reset Tutorial Progress</button>
+    <p id="status"></p>
+
+    <script>
+        function resetTutorial() {
+            try {
+                localStorage.removeItem('tour_completed');
+                localStorage.removeItem('has_visited');
+                localStorage.removeItem('tour_progress');
+                sessionStorage.clear();
+                document.getElementById('status').innerHTML = '✅ Tutorial progress reset! You can now close this page and refresh the main application to start the tour from the beginning.';
+            } catch (error) {
+                document.getElementById('status').innerHTML = '❌ Error resetting tutorial: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

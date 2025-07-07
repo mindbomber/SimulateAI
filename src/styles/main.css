@@ -20,6 +20,9 @@
  */
 
 /* Import additional stylesheets */
+@import './category-grid.css';
+@import './scenario-modal.css';
+@import './onboarding-tour.css';
 @import './pre-launch-modal.css';
 @import './enhanced-simulation-modal.css';
 @import './post-simulation-modal.css';

@@ -1,0 +1,810 @@
+/**
+ * Onboarding Coach Marks System Styles
+ * Spotlight-based guided tour with auto-scroll functionality
+ */
+
+/* Body state when tour is active */
+body.onboarding-active {
+  overflow: hidden;
+}
+
+/* Main overlay - lightly darkens everything except spotlight */
+.onboarding-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  z-index: 10010;
+  opacity: 0;
+  animation: onboarding-fade-in 0.3s ease-out forwards;
+  pointer-events: none;
+}
+
+/* Spotlight - highlighted area */
+.onboarding-spotlight {
+  position: absolute;
+  background: transparent;
+  border: 3px solid #1a73e8;
+  border-radius: 8px;
+  box-shadow: 
+    0 0 0 4px rgba(26, 115, 232, 0.3),
+    0 0 0 9999px rgba(0, 0, 0, 0.25),
+    inset 0 0 20px rgba(26, 115, 232, 0.2);
+  z-index: 10011;
+  display: none;
+  animation: onboarding-spotlight-pulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Coach mark popup */
+.onboarding-coach-mark {
+  position: absolute;
+  background: white;
+  border: 2px solid #1a73e8;
+  border-radius: 12px;
+  box-shadow: 
+    0 12px 48px rgba(0, 0, 0, 0.4),
+    0 6px 24px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(26, 115, 232, 0.1);
+  z-index: 10014;
+  max-width: 400px;
+  min-width: 300px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  opacity: 0;
+  transform: scale(0.9) translateY(-10px);
+  animation: onboarding-coach-mark-in 0.3s ease-out 0.1s forwards;
+  pointer-events: auto;
+}
+
+/* Coach mark header */
+.coach-mark-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 20px 0 20px;
+  gap: 16px;
+}
+
+.coach-mark-progress {
+  flex: 1;
+}
+
+.tutorial-indicator {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.step-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.step-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  transition: all 0.2s ease;
+}
+
+.step-dot.active {
+  background: #1a73e8;
+  transform: scale(1.2);
+}
+
+.step-dot.completed {
+  background: #34a853;
+}
+
+.step-counter {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.coach-mark-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  pointer-events: auto;
+  position: relative;
+  z-index: 10015;
+}
+
+.coach-mark-close:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+/* Coach mark body */
+.coach-mark-body {
+  padding: 0 20px 20px 20px;
+}
+
+.coach-mark-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 12px 0;
+  line-height: 1.3;
+}
+
+.coach-mark-content {
+  font-size: 16px;
+  color: #555;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Coach mark footer */
+.coach-mark-footer {
+  display: flex;
+  gap: 12px;
+  padding: 0 20px 20px 20px;
+  justify-content: flex-end;
+}
+
+.coach-mark-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+  pointer-events: auto;
+  position: relative;
+  z-index: 10015;
+}
+
+.coach-mark-btn.primary {
+  background: #1a73e8;
+  color: white;
+}
+
+.coach-mark-btn.primary:hover {
+  background: #1557b0;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(26, 115, 232, 0.4);
+}
+
+.coach-mark-btn.secondary {
+  background: #f8f9fa;
+  color: #5f6368;
+  border: 1px solid #dadce0;
+}
+
+.coach-mark-btn.secondary:hover {
+  background: #f1f3f4;
+  border-color: #c4c7ca;
+}
+
+/* Click highlight for interactive elements */
+.onboarding-click-highlight {
+  animation: onboarding-click-pulse 1.5s ease-in-out infinite;
+  cursor: pointer !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .onboarding-coach-mark {
+    max-width: calc(100vw - 32px);
+    min-width: calc(100vw - 32px);
+    margin: 0 16px;
+  }
+
+  .coach-mark-header {
+    padding: 16px 16px 0 16px;
+  }
+
+  .coach-mark-body {
+    padding: 0 16px 16px 16px;
+  }
+
+  .coach-mark-footer {
+    padding: 0 16px 16px 16px;
+    flex-direction: column;
+  }
+
+  .coach-mark-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .coach-mark-title {
+    font-size: 18px;
+  }
+
+  .coach-mark-content {
+    font-size: 15px;
+  }
+}
+
+/* Animations */
+@keyframes onboarding-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes onboarding-coach-mark-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes onboarding-spotlight-pulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 0 4px rgba(26, 115, 232, 0.3),
+      0 0 0 9999px rgba(0, 0, 0, 0.7),
+      inset 0 0 20px rgba(26, 115, 232, 0.2);
+  }
+  50% {
+    box-shadow: 
+      0 0 0 4px rgba(26, 115, 232, 0.5),
+      0 0 0 9999px rgba(0, 0, 0, 0.7),
+      inset 0 0 20px rgba(26, 115, 232, 0.4);
+  }
+}
+
+@keyframes onboarding-click-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(26, 115, 232, 0.4);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 8px rgba(26, 115, 232, 0.2);
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-overlay,
+  .onboarding-coach-mark,
+  .onboarding-spotlight,
+  .onboarding-click-highlight,
+  .step-dot,
+  .coach-mark-btn {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .onboarding-spotlight {
+    border-color: #000;
+    box-shadow: 
+      0 0 0 4px rgba(0, 0, 0, 0.8),
+      0 0 0 9999px rgba(0, 0, 0, 0.9);
+  }
+
+  .onboarding-coach-mark {
+    border: 2px solid #000;
+  }
+
+  .coach-mark-btn.primary {
+    background: #000;
+    color: #fff;
+  }
+
+  .coach-mark-btn.secondary {
+    background: #fff;
+    color: #000;
+    border: 2px solid #000;
+  }
+}
+
+/* Tour Modal */
+.tour-modal {
+  position: fixed;
+  z-index: 10013;
+  max-width: 400px;
+  background: var(--color-white, #ffffff);
+  border-radius: 12px;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.15),
+    0 8px 24px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transform: scale(0.9) translateY(20px);
+  animation: tour-modal-in 0.4s ease-out forwards;
+  font-family: var(--font-primary, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+}
+
+.tour-modal.center {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  animation: tour-modal-center-in 0.4s ease-out forwards;
+}
+
+.tour-modal.positioned {
+  animation: tour-modal-positioned-in 0.4s ease-out forwards;
+}
+
+/* Tour Modal Content */
+.tour-modal-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tour-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--color-gray-200, #e5e7eb);
+}
+
+.tour-progress {
+  width: 100%;
+  height: 4px;
+  background: var(--color-gray-200, #e5e7eb);
+  border-radius: 2px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.tour-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary, #1a73e8), var(--color-secondary, #4285f4));
+  border-radius: 2px;
+  transition: width 0.3s ease-out;
+}
+
+.tour-tutorial-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.tour-tutorial-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-primary, #1a73e8);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tour-step-counter {
+  font-size: 12px;
+  color: var(--color-gray-600, #6b7280);
+  font-weight: 500;
+}
+
+.tour-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  font-size: 24px;
+  color: var(--color-gray-400, #9ca3af);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.tour-close-btn:hover {
+  background: var(--color-gray-100, #f3f4f6);
+  color: var(--color-gray-600, #6b7280);
+}
+
+.tour-close-btn:focus {
+  outline: 2px solid var(--color-primary, #1a73e8);
+  outline-offset: 2px;
+}
+
+/* Tour Body */
+.tour-body {
+  padding: 0 20px 20px;
+  flex: 1;
+}
+
+.tour-title {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-gray-900, #111827);
+  line-height: 1.3;
+}
+
+.tour-content {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-gray-700, #374151);
+}
+
+/* Tour Footer */
+.tour-footer {
+  padding: 16px 20px 20px;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+/* Tour Buttons */
+.tour-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.tour-btn-primary {
+  background: var(--color-primary, #1a73e8);
+  color: white;
+}
+
+.tour-btn-primary:hover {
+  background: var(--color-primary-dark, #1557b0);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+}
+
+.tour-btn-primary:focus {
+  outline: 2px solid var(--color-primary, #1a73e8);
+  outline-offset: 2px;
+}
+
+.tour-btn-secondary {
+  background: var(--color-gray-100, #f3f4f6);
+  color: var(--color-gray-700, #374151);
+  border: 1px solid var(--color-gray-300, #d1d5db);
+}
+
+.tour-btn-secondary:hover {
+  background: var(--color-gray-200, #e5e7eb);
+  border-color: var(--color-gray-400, #9ca3af);
+}
+
+.tour-btn-secondary:focus {
+  outline: 2px solid var(--color-primary, #1a73e8);
+  outline-offset: 2px;
+}
+
+/* Animations */
+@keyframes tour-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes tour-modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes tour-modal-center-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes tour-modal-positioned-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes tour-highlight-pulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 0 4px rgba(26, 115, 232, 0.2),
+      0 0 30px rgba(26, 115, 232, 0.4);
+  }
+  50% {
+    box-shadow: 
+      0 0 0 8px rgba(26, 115, 232, 0.3),
+      0 0 40px rgba(26, 115, 232, 0.6);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tour-modal {
+    max-width: calc(100vw - 32px);
+    margin: 16px;
+  }
+
+  .tour-modal.center {
+    position: fixed;
+    top: 50%;
+    left: 16px;
+    right: 16px;
+    width: auto;
+    transform: translateY(-50%) scale(0.9);
+  }
+
+  .tour-modal.positioned {
+    position: fixed !important;
+    top: 50% !important;
+    left: 16px !important;
+    right: 16px !important;
+    width: auto !important;
+    transform: translateY(-50%) scale(0.9) !important;
+    animation: tour-modal-mobile-in 0.4s ease-out forwards !important;
+  }
+
+  .tour-footer {
+    flex-direction: column;
+  }
+
+  .tour-btn {
+    width: 100%;
+  }
+}
+
+@keyframes tour-modal-mobile-in {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .tour-backdrop,
+  .tour-modal,
+  .tour-highlight-overlay,
+  .tour-progress-bar,
+  .tour-btn {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .tour-highlight-overlay.active::before {
+    animation: none !important;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .tour-modal {
+    border: 2px solid var(--color-gray-900, #000);
+  }
+
+  .tour-btn-primary {
+    border: 2px solid var(--color-primary-dark, #1557b0);
+  }
+
+  .tour-btn-secondary {
+    border: 2px solid var(--color-gray-600, #6b7280);
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .tour-modal {
+    background: var(--color-gray-800, #1f2937);
+    color: var(--color-gray-100, #f3f4f6);
+  }
+
+  .tour-header {
+    border-bottom-color: var(--color-gray-700, #374151);
+  }
+
+  .tour-title {
+    color: var(--color-gray-100, #f3f4f6);
+  }
+
+  .tour-content {
+    color: var(--color-gray-300, #d1d5db);
+  }
+
+  .tour-close-btn {
+    color: var(--color-gray-400, #9ca3af);
+  }
+
+  .tour-close-btn:hover {
+    background: var(--color-gray-700, #374151);
+    color: var(--color-gray-200, #e5e7eb);
+  }
+
+  .tour-btn-secondary {
+    background: var(--color-gray-700, #374151);
+    color: var(--color-gray-200, #e5e7eb);
+    border-color: var(--color-gray-600, #6b7280);
+  }
+
+  .tour-btn-secondary:hover {
+    background: var(--color-gray-600, #6b7280);
+  }
+}
+
+/* Text Selection Styling for Coach Marks */
+.onboarding-coach-mark ::selection {
+  background-color: #1a73e8;
+  color: white;
+}
+
+.onboarding-coach-mark ::-moz-selection {
+  background-color: #1a73e8;
+  color: white;
+}
+
+/* Button text selection - ensure good contrast */
+.coach-mark-btn ::selection {
+  background-color: rgba(26, 115, 232, 0.2);
+  color: #1a73e8;
+}
+
+.coach-mark-btn ::-moz-selection {
+  background-color: rgba(26, 115, 232, 0.2);
+  color: #1a73e8;
+}
+
+/* Primary button text selection */
+.coach-mark-btn.primary ::selection {
+  background-color: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.coach-mark-btn.primary ::-moz-selection {
+  background-color: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+/* Ensure all onboarding tour elements have proper selection colors */
+.onboarding-active ::selection {
+  background-color: #1a73e8;
+  color: white;
+}
+
+.onboarding-active ::-moz-selection {
+  background-color: #1a73e8;
+  color: white;
+}
+
+/* Additional isolation and stacking fixes for modal contexts */
+.onboarding-coach-mark * {
+  position: relative;
+}
+
+.onboarding-coach-mark .coach-mark-footer {
+  isolation: isolate;
+  z-index: 10016;
+}
+
+.onboarding-coach-mark .coach-mark-header {
+  isolation: isolate;
+  z-index: 10016;
+}
+
+/* Force proper stacking for all interactive elements */
+.onboarding-coach-mark button,
+.onboarding-coach-mark .coach-mark-btn,
+.onboarding-coach-mark .coach-mark-close {
+  isolation: isolate;
+  z-index: 10015 !important;
+  pointer-events: auto !important;
+  position: relative !important;
+}
+
+/* Ensure coach mark is properly positioned above modal content */
+.onboarding-coach-mark {
+  isolation: isolate;
+}
+
+/* Prevent any modal backdrop from interfering */
+.scenario-modal .modal-backdrop,
+.pre-launch-modal .modal-backdrop {
+  pointer-events: none;
+}
+
+/* Ensure onboarding elements are always clickable */
+.onboarding-active .onboarding-coach-mark,
+.onboarding-active .onboarding-coach-mark *,
+.onboarding-active .coach-mark-btn,
+.onboarding-active .coach-mark-close {
+  pointer-events: auto !important;
+}
+
+/* Force onboarding elements above everything in modals */
+.modal .onboarding-coach-mark,
+.reusable-modal .onboarding-coach-mark,
+.pre-launch-modal ~ .onboarding-coach-mark,
+.scenario-modal ~ .onboarding-coach-mark {
+  z-index: 10020 !important;
+}
+
+.modal .onboarding-coach-mark button,
+.reusable-modal .onboarding-coach-mark button,
+.pre-launch-modal ~ .onboarding-coach-mark button,
+.scenario-modal ~ .onboarding-coach-mark button {
+  z-index: 10021 !important;
+  pointer-events: auto !important;
+  position: relative !important;
+}
+
+/* Allow onboarding elements to be interactive even when modal backdrop is present */
+.modal-backdrop .onboarding-coach-mark,
+.modal-backdrop ~ .onboarding-coach-mark {
+  z-index: 10020 !important;
+  pointer-events: auto !important;
+  position: fixed !important;
+}
+
+.modal-backdrop .onboarding-coach-mark *,
+.modal-backdrop ~ .onboarding-coach-mark * {
+  pointer-events: auto !important;
+}
+
+/* Ensure modal backdrop doesn't block onboarding interactions */
+.modal-backdrop:has(~ .onboarding-coach-mark) {
+  pointer-events: none !important;
+}
+
+.modal-backdrop:has(~ .onboarding-coach-mark) .modal-dialog {
+  pointer-events: auto !important;
+}

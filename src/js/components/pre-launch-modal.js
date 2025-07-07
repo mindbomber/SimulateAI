@@ -746,6 +746,11 @@ export default class PreLaunchModal {
 
         // Close menu when clicking outside
         document.addEventListener('click', e => {
+          // Don't interfere with onboarding coach marks
+          if (e.target.closest('.onboarding-coach-mark')) {
+            return;
+          }
+          
           if (!e.target.closest('.pre-launch-tabs')) {
             hamburgerButton.setAttribute('aria-expanded', 'false');
             tabButtonsContainer.classList.remove('expanded');

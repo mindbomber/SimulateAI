@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Onboarding Tour</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #28a745;
+        }
+        .error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🤖 SimulateAI Onboarding Tour Test</h1>
+        <p>This page helps test the onboarding tour bugs and verify that all steps are visible.</p>
+        
+        <h2>Test Actions</h2>
+        <button class="test-button" onclick="openMainApp()">Open Main App</button>
+        <button class="test-button" onclick="testTourInConsole()">Test in Console</button>
+        <button class="test-button" onclick="clearLogs()">Clear Logs</button>
+        
+        <h2>Instructions</h2>
+        <ol>
+            <li><strong>Open Main App:</strong> Opens the main application in a new window</li>
+            <li><strong>Test in Console:</strong> In the browser console, run these commands:
+                <ul>
+                    <li><code>localStorage.clear()</code> - Clear storage to force first-time visit</li>
+                    <li><code>window.debugStartTour()</code> - Start the onboarding tour</li>
+                    <li><code>window.debugShowTourState()</code> - Check tour state</li>
+                </ul>
+            </li>
+        </ol>
+        
+        <h2>What to Check</h2>
+        <ul>
+            <li>✅ Step 1 (Welcome) appears immediately</li>
+            <li>✅ Step 2 (Launch Test) appears and coach mark is visible</li>
+            <li>✅ Coach marks are always positioned within the viewport</li>
+            <li>✅ Auto-scroll brings target elements into view</li>
+            <li>✅ No steps are skipped</li>
+            <li>✅ Step transitions work smoothly</li>
+        </ul>
+        
+        <div id="results" class="test-results" style="display: none;">
+            <h3>Test Results</h3>
+            <div id="log-container"></div>
+        </div>
+    </div>
+
+    <script>
+        function openMainApp() {
+            const mainUrl = 'http://localhost:5173';
+            window.open(mainUrl, '_blank', 'width=1200,height=800');
+            showLog('Opened main app in new window: ' + mainUrl);
+        }
+        
+        function testTourInConsole() {
+            showLog('Testing onboarding tour...');
+            showLog('1. Open browser console (F12)');
+            showLog('2. Run: localStorage.clear()');
+            showLog('3. Run: window.debugStartTour()');
+            showLog('4. Verify all steps appear correctly');
+            showLog('5. Check that step 2 coach mark is visible');
+            
+            const instructions = `
+// Copy and paste these commands in the browser console:
+
+// 1. Clear storage to simulate first-time visit
+localStorage.clear();
+
+// 2. Start the onboarding tour
+window.debugStartTour();
+
+// 3. Check tour state anytime
+window.debugShowTourState();
+
+// 4. If you need to restart
+localStorage.clear();
+location.reload();
+            `;
+            
+            showLog('Console commands:', 'code');
+            showLog(instructions, 'code');
+        }
+        
+        function clearLogs() {
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('log-container').innerHTML = '';
+        }
+        
+        function showLog(message, type = 'info') {
+            const results = document.getElementById('results');
+            const container = document.getElementById('log-container');
+            
+            results.style.display = 'block';
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            if (type === 'code') {
+                logEntry.style.whiteSpace = 'pre-wrap';
+                logEntry.style.fontFamily = 'monospace';
+                logEntry.style.background = '#f1f3f4';
+            }
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            
+            container.appendChild(logEntry);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        // Auto-show instructions
+        showLog('Onboarding Tour Test Ready');
+        showLog('Click "Open Main App" to test the tour');
+    </script>
+</body>
+</html>
