@@ -249,6 +249,30 @@ export default class PreLaunchModal {
   }
 
   /**
+   * Closes the modal with optional force destroy (for onboarding completion)
+   */
+  closeWithCleanup(forceDestroy = false) {
+    if (this.modal) {
+      if (forceDestroy) {
+        this.modal.destroy();
+      } else {
+        this.modal.close();
+      }
+      this.modal = null;
+    }
+  }
+
+  /**
+   * Destroys the modal completely (removes from DOM)
+   */
+  destroy() {
+    if (this.modal) {
+      this.modal.destroy();
+      this.modal = null;
+    }
+  }
+
+  /**
    * Generates the main modal content with tabs
    */
   generateModalContent() {

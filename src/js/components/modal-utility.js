@@ -3,6 +3,8 @@
  * Replacement for ReusableModal to consolidate modal implementations
  */
 
+import logger from '../utils/logger.js';
+
 class ModalUtility {
   constructor({
     title = '',
@@ -20,7 +22,11 @@ class ModalUtility {
     this.closeOnEscape = closeOnEscape;
     this.isOpen = false;
     this.element = null;
-    this.id = `modal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Generate unique ID using timestamp and random string
+    const BASE_36 = 36;
+    const RANDOM_STRING_LENGTH = 9;
+    this.id = `modal-${Date.now()}-${Math.random().toString(BASE_36).substr(2, RANDOM_STRING_LENGTH)}`;
 
     this._build();
     this._setupEventListeners();
@@ -198,6 +204,156 @@ class ModalUtility {
     }
 
     this.element = null;
+  }
+
+  /**
+   * Check if modal element exists in DOM and clean up if orphaned
+   */
+  static cleanupOrphanedModals() {
+    // Clean up modals with generated IDs
+    const orphanedModals = document.querySelectorAll('[id^="modal-"]:not([style*="display: flex"])');
+    orphanedModals.forEach(modal => {
+      // Check if modal is hidden or has no active class
+      if (modal.style.display === 'none' || !modal.classList.contains('visible')) {
+        modal.remove();
+        logger.info('ModalUtility', 'Cleaned up orphaned modal:', modal.id);
+      }
+    });
+
+    // Clean up generic modal structure elements that may be orphaned
+    const modalBackdrops = document.querySelectorAll('.modal-backdrop');
+    modalBackdrops.forEach(backdrop => {
+      // Check if backdrop has no visible content or is empty
+      const hasVisibleContent = backdrop.querySelector('.modal-dialog .modal-body *:not(:empty)');
+      const hasActiveModal = backdrop.closest('[id^="modal-"]') || backdrop.querySelector('[id^="modal-"]');
+      
+      if (!hasVisibleContent && !hasActiveModal) {
+        backdrop.remove();
+        logger.info('ModalUtility', 'Cleaned up orphaned modal backdrop');
+      }
+    });
+
+    // Clean up simulation modal specifically
+    const simulationModal = document.getElementById('simulation-modal');
+    if (simulationModal) {
+      // Check if it's actually being used
+      const isVisible = simulationModal.style.display === 'flex' || 
+                       simulationModal.classList.contains('show') ||
+                       simulationModal.classList.contains('visible');
+      
+      if (!isVisible) {
+        simulationModal.remove();
+        logger.info('ModalUtility', 'Cleaned up orphaned simulation modal');
+      }
+    }
+
+    // Clean up any standalone modal-dialog or modal-body elements
+    const orphanedDialogs = document.querySelectorAll('.modal-dialog:not(.modal-backdrop .modal-dialog)');
+    orphanedDialogs.forEach(dialog => {
+      if (!dialog.closest('.modal-backdrop') && !dialog.closest('[id^="modal-"]')) {
+        dialog.remove();
+        logger.info('ModalUtility', 'Cleaned up orphaned modal dialog');
+      }
+    });
+
+    const orphanedBodies = document.querySelectorAll('.modal-body:not(.modal-dialog .modal-body)');
+    orphanedBodies.forEach(body => {
+      if (!body.closest('.modal-dialog') && !body.closest('[id^="modal-"]')) {
+        body.remove();
+        logger.info('ModalUtility', 'Cleaned up orphaned modal body');
+      }
+    });
+  }
+
+  /**
+   * Force destroy a specific modal by ID
+   */
+  static destroyModalById(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.remove();
+      logger.info('ModalUtility', 'Force destroyed modal:', modalId);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Aggressive cleanup of all modal-related elements - use with caution
+   * This removes ALL modal elements that are not actively displayed
+   */
+  static aggressiveModalCleanup() {
+    logger.info('ModalUtility', 'Starting aggressive modal cleanup');
+    
+    // Clean up all modal backdrops that are not actively showing content
+    const allBackdrops = document.querySelectorAll('.modal-backdrop');
+    allBackdrops.forEach(backdrop => {
+      const isVisible = backdrop.style.display === 'flex' || 
+                       backdrop.classList.contains('show') ||
+                       backdrop.classList.contains('visible');
+      
+      if (!isVisible) {
+        backdrop.remove();
+        logger.info('ModalUtility', 'Aggressively removed modal backdrop');
+      }
+    });
+
+    // Clean up simulation modal if not active
+    const simulationModal = document.getElementById('simulation-modal');
+    if (simulationModal) {
+      const isActive = simulationModal.style.display === 'flex' || 
+                      simulationModal.classList.contains('show') ||
+                      simulationModal.classList.contains('visible');
+      
+      if (!isActive) {
+        simulationModal.remove();
+        logger.info('ModalUtility', 'Aggressively removed simulation modal');
+      }
+    }
+
+    // Clean up all orphaned modal dialogs
+    const allDialogs = document.querySelectorAll('.modal-dialog');
+    allDialogs.forEach(dialog => {
+      const hasActiveParent = dialog.closest('.modal-backdrop[style*="display: flex"]') ||
+                             dialog.closest('[id^="modal-"][style*="display: flex"]') ||
+                             dialog.closest('.show') ||
+                             dialog.closest('.visible');
+      
+      if (!hasActiveParent) {
+        dialog.remove();
+        logger.info('ModalUtility', 'Aggressively removed modal dialog');
+      }
+    });
+
+    // Clean up all orphaned modal bodies
+    const allBodies = document.querySelectorAll('.modal-body');
+    allBodies.forEach(body => {
+      const hasActiveParent = body.closest('.modal-dialog') ||
+                             body.closest('.modal-backdrop[style*="display: flex"]') ||
+                             body.closest('[id^="modal-"][style*="display: flex"]') ||
+                             body.closest('.show') ||
+                             body.closest('.visible');
+      
+      if (!hasActiveParent) {
+        body.remove();
+        logger.info('ModalUtility', 'Aggressively removed modal body');
+      }
+    });
+
+    // Clean up any remaining modal elements with generated IDs
+    const allGeneratedModals = document.querySelectorAll('[id^="modal-"]');
+    allGeneratedModals.forEach(modal => {
+      const isVisible = modal.style.display === 'flex' || 
+                       modal.classList.contains('show') ||
+                       modal.classList.contains('visible');
+      
+      if (!isVisible) {
+        modal.remove();
+        logger.info('ModalUtility', 'Aggressively removed generated modal:', modal.id);
+      }
+    });
+
+    logger.info('ModalUtility', 'Aggressive modal cleanup completed');
   }
 
   // Update content methods

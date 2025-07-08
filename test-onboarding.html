@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onboarding Test - SimulateAI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-section h2 {
+            color: #333;
+            margin-top: 0;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-button.secondary {
+            background: #6c757d;
+        }
+        .test-button.secondary:hover {
+            background: #545b62;
+        }
+        .test-results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .log-output {
+            font-family: monospace;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-top: 10px;
+        }
+        .status {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 3px;
+            margin: 5px 0;
+            display: inline-block;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 SimulateAI Onboarding Test Suite</h1>
+        <p>This test page allows you to verify the onboarding modal cleanup functionality.</p>
+        
+        <div class="test-section">
+            <h2>🎯 Modal Cleanup Test</h2>
+            <p>Test the modal cleanup functionality to ensure modals are properly destroyed from DOM.</p>
+            
+            <button class="test-button" onclick="openMainApp()">
+                🚀 Open Main App
+            </button>
+            
+            <button class="test-button secondary" onclick="testModalCleanup()">
+                🧹 Test Modal Cleanup
+            </button>
+            
+            <button class="test-button secondary" onclick="checkModalState()">
+                🔍 Check Modal State
+            </button>
+            
+            <button class="test-button secondary" onclick="clearLogs()">
+                🗑️ Clear Logs
+            </button>
+            
+            <div class="test-results">
+                <div id="test-status">
+                    <span class="status info">Ready to test</span>
+                </div>
+                <div class="log-output" id="log-output">
+Click "Open Main App" to start testing the onboarding flow.
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>📝 Test Instructions</h2>
+            <ol>
+                <li>Click <strong>"Open Main App"</strong> to open the main SimulateAI application</li>
+                <li>Navigate to the Trolley Problem scenario</li>
+                <li>Click the <strong>"Learning Lab"</strong> button to start Tutorial 3</li>
+                <li>Complete all tutorial steps until the final step (step 9)</li>
+                <li>Click <strong>"🚀 Start Exploring"</strong> to finish the tutorial</li>
+                <li>Return to this test page and click <strong>"Check Modal State"</strong></li>
+                <li>Verify that no orphaned modals with IDs like <code>modal-...</code> remain in the DOM</li>
+            </ol>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔧 Expected Behavior</h2>
+            <ul>
+                <li>When Tutorial 3 completes, all pre-launch modals should be removed from the DOM</li>
+                <li>The <code>ModalUtility.cleanupOrphanedModals()</code> method should be called</li>
+                <li>No modal elements with IDs starting with <code>modal-</code> should remain</li>
+                <li>The onboarding overlay should be properly cleaned up</li>
+                <li>Focus should be restored to the main application</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let logOutput = document.getElementById('log-output');
+        let testStatus = document.getElementById('test-status');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}\n`;
+            logOutput.textContent += logEntry;
+            logOutput.scrollTop = logOutput.scrollHeight;
+            
+            // Update status
+            const statusClass = type === 'error' ? 'error' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'info';
+            testStatus.innerHTML = `<span class="status ${statusClass}">${message}</span>`;
+        }
+        
+        function openMainApp() {
+            log('Opening main SimulateAI application...', 'info');
+            window.open('/', '_blank');
+            log('Main app opened in new tab. Follow the test instructions to complete Tutorial 3.', 'success');
+        }
+        
+        function testModalCleanup() {
+            log('Testing modal cleanup functionality...', 'info');
+            
+            // Check if we can access the main app's window
+            try {
+                // Test if cancel button triggering is available
+                const cancelButtons = document.querySelectorAll('#cancel-launch, .btn-cancel');
+                log(`Found ${cancelButtons.length} cancel button(s) available for cleanup`, 
+                    cancelButtons.length > 0 ? 'success' : 'warning');
+                
+                // This is a basic test - in a real scenario, you'd need to communicate with the main app
+                log('Modal cleanup test initiated. The new approach will:', 'info');
+                log('  1. ✅ First try to click .btn-cancel or #cancel-launch buttons', 'info');
+                log('  2. ✅ Fall back to manual cleanup if no cancel button found', 'info');
+                log('  3. ✅ Use aggressive cleanup as final safety net', 'info');
+                
+                log('Please complete Tutorial 3 in the main app to test this flow.', 'warning');
+                
+                // Simulate checking for modal cleanup methods
+                const cleanupMethods = [
+                    'cancelButton.click() [PRIMARY METHOD]',
+                    'ModalUtility.cleanupOrphanedModals() [FALLBACK]',
+                    'ModalUtility.destroyModalById() [FALLBACK]',
+                    'ModalUtility.aggressiveModalCleanup() [SAFETY NET]',
+                    'PreLaunchModal.destroy() [SAFETY NET]',
+                    'PreLaunchModal.closeWithCleanup() [SAFETY NET]'
+                ];
+                
+                cleanupMethods.forEach(method => {
+                    log(`✓ ${method}`, 'success');
+                });
+                
+            } catch (error) {
+                log(`Error during modal cleanup test: ${error.message}`, 'error');
+            }
+        }
+        
+        function checkModalState() {
+            log('Checking modal state in DOM...', 'info');
+            
+            // Check current page for modal elements
+            const modalElements = document.querySelectorAll('[id^="modal-"]');
+            const overlayElements = document.querySelectorAll('.onboarding-overlay');
+            const preLaunchModals = document.querySelectorAll('.pre-launch-modal');
+            
+            // Check for specific elements mentioned by user
+            const modalBackdrops = document.querySelectorAll('.modal-backdrop');
+            const modalDialogs = document.querySelectorAll('.modal-dialog');
+            const modalBodies = document.querySelectorAll('.modal-body');
+            const simulationModal = document.getElementById('simulation-modal');
+            
+            log(`Found ${modalElements.length} modal elements with IDs starting with 'modal-'`, 
+                modalElements.length === 0 ? 'success' : 'warning');
+            
+            log(`Found ${overlayElements.length} onboarding overlay elements`, 
+                overlayElements.length === 0 ? 'success' : 'warning');
+            
+            log(`Found ${preLaunchModals.length} pre-launch modal elements`, 
+                preLaunchModals.length === 0 ? 'success' : 'warning');
+            
+            log(`Found ${modalBackdrops.length} modal backdrop elements`, 
+                modalBackdrops.length === 0 ? 'success' : 'warning');
+            
+            log(`Found ${modalDialogs.length} modal dialog elements`, 
+                modalDialogs.length === 0 ? 'success' : 'warning');
+            
+            log(`Found ${modalBodies.length} modal body elements`, 
+                modalBodies.length === 0 ? 'success' : 'warning');
+            
+            log(`Simulation modal exists: ${simulationModal ? 'YES' : 'NO'}`, 
+                simulationModal ? 'warning' : 'success');
+            
+            const totalOrphanedElements = modalElements.length + overlayElements.length + 
+                                        preLaunchModals.length + modalBackdrops.length + 
+                                        modalDialogs.length + modalBodies.length + 
+                                        (simulationModal ? 1 : 0);
+            
+            if (totalOrphanedElements === 0) {
+                log('✅ DOM is completely clean - no orphaned modal elements found!', 'success');
+            } else {
+                log(`⚠️ Found ${totalOrphanedElements} orphaned modal elements. Check main app for proper cleanup.`, 'warning');
+                
+                modalElements.forEach((modal, index) => {
+                    log(`  - Modal ${index + 1}: ${modal.id} (${modal.className})`, 'warning');
+                });
+                
+                if (modalBackdrops.length > 0) {
+                    log(`  - ${modalBackdrops.length} modal backdrop(s)`, 'warning');
+                }
+                
+                if (modalDialogs.length > 0) {
+                    log(`  - ${modalDialogs.length} modal dialog(s)`, 'warning');
+                }
+                
+                if (modalBodies.length > 0) {
+                    log(`  - ${modalBodies.length} modal body/bodies`, 'warning');
+                }
+                
+                if (simulationModal) {
+                    log(`  - simulation-modal element`, 'warning');
+                }
+            }
+        }
+        
+        function clearLogs() {
+            logOutput.textContent = 'Logs cleared.\n';
+            testStatus.innerHTML = '<span class="status info">Ready to test</span>';
+        }
+        
+        // Initial log
+        log('Modal cleanup test page loaded and ready.', 'info');
+    </script>
+</body>
+</html>

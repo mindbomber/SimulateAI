@@ -22,6 +22,7 @@
 import logger from '../utils/logger.js';
 import focusManager from '../utils/focus-manager.js';
 import scrollManager from '../utils/scroll-manager.js';
+import ModalUtility from './modal-utility.js';
 import { simpleStorage } from '../utils/simple-storage.js';
 import { simpleAnalytics } from '../utils/simple-analytics.js';
 
@@ -74,12 +75,15 @@ class OnboardingTour {
     this.DEBOUNCE_DURATION = 300; // ms for preventing rapid clicks
     this.MANUAL_SCROLL_RESET_DELAY = 2000; // ms to reset manual scroll flag
     this.LEARNING_LAB_TUTORIAL = 3; // Tutorial number for Learning Lab
+    this.TUTORIAL_3_STEP_3_INDEX = 2; // 0-indexed step number for step 3
+    this.TUTORIAL_3_BOTTOM_POSITION_START = 2; // 0-indexed: step 3
+    this.TUTORIAL_3_BOTTOM_POSITION_END = 7; // 0-indexed: step 8
     this.ACCORDION_CHECK_DELAY = 200; // ms to wait before checking accordion state
     this.MODAL_CHECK_DELAY = 200; // ms between modal closure checks
     this.DEBUG_TEXT_LENGTH = 20; // chars to show in debug logs
-    this.TUTORIAL_3_STEP_3_INDEX = 2; // 0-indexed step number for step 3
     this.CLICK_TIMEOUT = 10000; // ms to wait for user click before fallback
     this.OPTION_TEXT_LENGTH = 50; // chars to show in option logs
+    this.CONTENT_UPDATE_DELAY = 100; // ms to debounce content observer updates
     
     // Keyboard navigation tracking
     this.wasKeyboardNavigation = false;
@@ -655,8 +659,15 @@ class OnboardingTour {
     this.spotlight.style.display = 'block';
   }
 
-  positionCoachMark(targetElement, position = 'bottom', step = null) {
+  positionCoachMark(targetElement, position = 'bottom', step = null, retryCount = 0) {
     if (!this.coachMark) return;
+
+    // Prevent infinite recursion - max 3 retries
+    const MAX_POSITION_RETRIES = 3;
+    if (retryCount > MAX_POSITION_RETRIES) {
+      logger.warn('OnboardingTour', `⚠️ Max positioning retries reached for step ${step?.id || 'unknown'}`);
+      return;
+    }
 
     // SIMPLIFIED AND ROBUST POSITIONING LOGIC
     // Always position relative to viewport to ensure visibility
@@ -681,20 +692,34 @@ class OnboardingTour {
       // Ensure target is visible in viewport before positioning
       if (targetRect.bottom < 0 || targetRect.top > viewportHeight || 
           targetRect.right < 0 || targetRect.left > viewportWidth) {
-        // Target is outside viewport, scroll it into view
-        targetElement.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center', 
-          inline: 'center' 
-        });
-        // Wait for scroll to complete
-        setTimeout(() => {
-          this.positionCoachMark(targetElement, position, step);
-        }, this.ANIMATION_DURATION);
-        return;
+        // Target is outside viewport, scroll it into view (only if we haven't exceeded retries)
+        if (retryCount < MAX_POSITION_RETRIES) {
+          logger.debug('OnboardingTour', `Target outside viewport, scrolling into view (retry ${retryCount + 1}/${MAX_POSITION_RETRIES})`);
+          targetElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center', 
+            inline: 'center' 
+          });
+          // Wait for scroll to complete and retry with incremented count
+          setTimeout(() => {
+            this.positionCoachMark(targetElement, position, step, retryCount + 1);
+          }, this.ANIMATION_DURATION);
+          return;
+        } else {
+          // Exceeded retries, position anyway (might be partially visible)
+          logger.warn('OnboardingTour', `Target still outside viewport after ${MAX_POSITION_RETRIES} retries, positioning anyway`);
+        }
       }
       
       // Calculate initial position based on preferred direction
+      // Special handling for Tutorial 3 steps 3-8: force bottom positioning
+      if (this.currentTutorial === this.LEARNING_LAB_TUTORIAL && 
+          this.currentStep >= this.TUTORIAL_3_BOTTOM_POSITION_START && 
+          this.currentStep <= this.TUTORIAL_3_BOTTOM_POSITION_END) {
+        logger.info('OnboardingTour', `Forcing bottom position for Tutorial 3 step ${this.currentStep + 1}`);
+        position = 'bottom';
+      }
+      
       switch (position) {
         case 'top':
           left = targetRect.left + (targetRect.width / 2) - (coachMarkRect.width / 2);
@@ -1594,25 +1619,132 @@ class OnboardingTour {
 
     // Close pre-launch modal if we're finishing Tutorial 3 (Learning Lab)
     if (this.currentTutorial === this.LEARNING_LAB_TUTORIAL) {
-      const preLaunchModal = document.querySelector('.pre-launch-modal');
-      if (preLaunchModal) {
-        // Find the modal instance through the modal-utility close button
-        const closeButton = preLaunchModal.querySelector('[data-modal-close], .modal-close, .close-btn');
-        if (closeButton) {
-          closeButton.click();
-          logger.info('OnboardingTour', 'Closed pre-launch modal after Tutorial 3 completion');
-        } else {
-          // Fallback: remove the modal manually
-          const modalContainer = preLaunchModal.closest('.modal-container, .modal-overlay');
-          if (modalContainer) {
-            modalContainer.remove();
-            logger.info('OnboardingTour', 'Manually removed pre-launch modal container after Tutorial 3 completion');
+      logger.info('OnboardingTour', 'Closing pre-launch modal after Tutorial 3 completion');
+      
+      // Strategy 1: Look specifically for the pre-launch modal's cancel button
+      let modalClosed = false;
+      
+      // First try to find a visible pre-launch modal and trigger its cancel button
+      const visibleModals = document.querySelectorAll('.modal-backdrop[style*="flex"], [id^="modal-"][style*="flex"], .modal-backdrop.show, .modal-backdrop.visible');
+      logger.info('OnboardingTour', `Found ${visibleModals.length} potentially visible modals`);
+      
+      for (const modal of visibleModals) {
+        const modalTitle = modal.querySelector('.modal-title');
+        const isPreLaunchModal = modalTitle && modalTitle.textContent.includes('Prepare to Explore');
+        
+        logger.info('OnboardingTour', `Checking modal: ${modal.id || 'no-id'}, title: ${modalTitle?.textContent || 'no-title'}, isPreLaunch: ${isPreLaunchModal}`);
+        
+        if (isPreLaunchModal) {
+          const cancelButton = modal.querySelector('#cancel-launch, .btn-cancel');
+          if (cancelButton) {
+            logger.info('OnboardingTour', 'Found pre-launch modal, triggering cancel button for proper cleanup');
+            try {
+              cancelButton.click();
+              modalClosed = true;
+              logger.info('OnboardingTour', 'Successfully triggered cancel button');
+              break;
+            } catch (error) {
+              logger.error('OnboardingTour', 'Error clicking cancel button:', error);
+            }
           } else {
-            preLaunchModal.remove();
-            logger.info('OnboardingTour', 'Manually removed pre-launch modal after Tutorial 3 completion');
+            logger.warn('OnboardingTour', 'Pre-launch modal found but no cancel button');
           }
         }
       }
+      
+      // Strategy 2: If no pre-launch modal found, try any visible cancel button
+      if (!modalClosed) {
+        logger.info('OnboardingTour', 'No pre-launch modal cancel button found, trying fallback approach');
+        const cancelButtons = document.querySelectorAll('#cancel-launch, .btn-cancel');
+        logger.info('OnboardingTour', `Found ${cancelButtons.length} cancel buttons in DOM`);
+        
+        cancelButtons.forEach((cancelButton, index) => {
+          if (cancelButton && !modalClosed) {
+            // Check if this button is in a visible modal
+            const modal = cancelButton.closest('.modal-backdrop, [id^="modal-"], #simulation-modal');
+            const isVisible = modal && (modal.style.display === 'flex' || modal.classList.contains('show') || modal.classList.contains('visible'));
+            
+            logger.info('OnboardingTour', `Cancel button ${index}: modal=${modal?.id || 'no-modal'}, visible=${isVisible}`);
+            
+            if (isVisible) {
+              logger.info('OnboardingTour', 'Triggering fallback cancel button click for modal cleanup');
+              try {
+                cancelButton.click();
+                modalClosed = true;
+                logger.info('OnboardingTour', 'Successfully triggered fallback cancel button');
+              } catch (error) {
+                logger.error('OnboardingTour', 'Error clicking fallback cancel button:', error);
+              }
+            }
+          }
+        });
+      }
+      
+      // Strategy 3: If no cancel button found, fall back to manual cleanup
+      if (!modalClosed) {
+        logger.info('OnboardingTour', 'No accessible cancel button found, using manual cleanup');
+        
+        // Use the new ModalUtility cleanup methods to handle orphaned modals
+        ModalUtility.cleanupOrphanedModals();
+        
+        // First, try to find the modal instance through any available method
+        const preLaunchModalElements = document.querySelectorAll('[id^="modal-"]');
+        
+        preLaunchModalElements.forEach(modalElement => {
+          // Check if this looks like a pre-launch modal by checking content
+          const modalTitle = modalElement.querySelector('.modal-title');
+          if (modalTitle && modalTitle.textContent.includes('Prepare to Explore')) {
+            // Try to find the close button and click it
+            const closeButton = modalElement.querySelector('[data-modal-close], .modal-close, .close-btn');
+            if (closeButton) {
+              closeButton.click();
+              logger.info('OnboardingTour', 'Closed pre-launch modal via close button after Tutorial 3 completion');
+            } else {
+              // Use ModalUtility to force destroy
+              ModalUtility.destroyModalById(modalElement.id);
+              logger.info('OnboardingTour', 'Force destroyed pre-launch modal after Tutorial 3 completion');
+            }
+          }
+        });
+
+        // Also try the legacy selector approach as fallback
+        const preLaunchModal = document.querySelector('.pre-launch-modal');
+        if (preLaunchModal) {
+          const closeButton = preLaunchModal.querySelector('[data-modal-close], .modal-close, .close-btn');
+          if (closeButton) {
+            closeButton.click();
+            logger.info('OnboardingTour', 'Closed legacy pre-launch modal after Tutorial 3 completion');
+          } else {
+            preLaunchModal.remove();
+            logger.info('OnboardingTour', 'Manually removed legacy pre-launch modal after Tutorial 3 completion');
+          }
+        }
+      }
+
+      // Final cleanup using ModalUtility - use aggressive cleanup for Tutorial 3
+      // Add a small delay to ensure all DOM operations are complete
+      setTimeout(() => {
+        logger.info('OnboardingTour', 'Running final cleanup after tutorial 3 completion');
+        
+        // Count modals before cleanup for comparison
+        const modalsBefore = document.querySelectorAll('[id^="modal-"], .modal-backdrop, .modal-dialog, .modal-body, #simulation-modal').length;
+        logger.info('OnboardingTour', `Modal elements before cleanup: ${modalsBefore}`);
+        
+        ModalUtility.aggressiveModalCleanup();
+        
+        // Also run the standard cleanup as a safety net
+        ModalUtility.cleanupOrphanedModals();
+        
+        // Count modals after cleanup
+        const modalsAfter = document.querySelectorAll('[id^="modal-"], .modal-backdrop, .modal-dialog, .modal-body, #simulation-modal').length;
+        logger.info('OnboardingTour', `Modal elements after cleanup: ${modalsAfter} (removed ${modalsBefore - modalsAfter})`);
+        
+        if (modalsAfter === 0) {
+          logger.info('OnboardingTour', '✅ All modal elements successfully cleaned up');
+        } else {
+          logger.warn('OnboardingTour', `⚠️ ${modalsAfter} modal elements still remain in DOM`);
+        }
+      }, 100);
     }
 
     // Track completion
@@ -1823,6 +1955,11 @@ class OnboardingTour {
     }
 
     this.contentObserver = new MutationObserver((mutations) => {
+      // Skip updates during transitions to prevent excessive repositioning
+      if (this.isTransitioning) {
+        return;
+      }
+      
       let shouldUpdate = false;
       
       mutations.forEach((mutation) => {
@@ -1840,7 +1977,7 @@ class OnboardingTour {
         // Debounce the updates to avoid excessive repositioning
         clearTimeout(this.contentUpdateTimeout);
         this.contentUpdateTimeout = setTimeout(() => {
-          if (this.coachMark && targetElement) {
+          if (this.coachMark && targetElement && !this.isTransitioning) {
             logger.debug('OnboardingTour', `Updating coach mark position due to content change in step ${step.id}`);
             this.positionCoachMark(targetElement, step.position, step);
             this.positionSpotlight(targetElement);
