@@ -252,11 +252,18 @@ class AIEthicsApp {
       // Initialize ethics radar demo
       await this.initializeEthicsRadarDemo();
 
-      // Initialize onboarding tour for first-time users
-      this.onboardingTour = new OnboardingTour();
-      
-      // Check and start onboarding tour for first-time users
-      this.checkAndStartOnboardingTour();
+      // Initialize onboarding tour for first-time users (prevent multiple instances)
+      if (!this.onboardingTour && !window.onboardingTourInstance) {
+        this.onboardingTour = new OnboardingTour();
+        
+        // Make onboarding tour available globally for debugging
+        window.onboardingTourInstance = this.onboardingTour;
+        
+        // Check and start onboarding tour for first-time users
+        this.checkAndStartOnboardingTour();
+      } else {
+        AppDebug.warn('OnboardingTour instance already exists, skipping initialization');
+      }
 
       // Prevent page scroll snap issues
       preventPageScrollSnap();
@@ -1032,8 +1039,12 @@ class AIEthicsApp {
    * Manually start the onboarding tour (for testing)
    */
   startOnboardingTour() {
-    if (!this.onboardingTour) {
+    if (!this.onboardingTour && !window.onboardingTourInstance) {
       this.onboardingTour = new OnboardingTour();
+      // Make onboarding tour available globally for debugging
+      window.onboardingTourInstance = this.onboardingTour;
+    } else if (window.onboardingTourInstance) {
+      this.onboardingTour = window.onboardingTourInstance;
     }
     
     // Clear localStorage to force tour to start

@@ -7,15 +7,15 @@ export default {
   'autonomous-vehicle-split': {
     title: 'Autonomous Vehicle Split Decision',
     dilemma:
-      'The AV faces a life-or-death decision: prioritize passenger safety at the expense of multiple pedestrian lives, or sacrifice its passenger to save the greater number.',
+      'The Autonomous Vehicle faces a life-or-death decision: prioritize passenger safety at the expense of multiple pedestrian lives, or sacrifice its passenger to save the greater number.',
     ethicalQuestion:
-      'Should the AV be programmed to minimize overall harm by sacrificing its passenger, prioritize passenger protection at all costs, or leave the outcome to chance without intentional preference?',
+      'Should the Autonomous Vehicle be programmed to minimize overall harm by sacrificing its passenger, prioritize passenger protection at all costs, or leave the outcome to chance without intentional preference?',
     options: [
       {
         id: 'option-a',
         text: 'Prioritize the Greater Good (Sacrifice Passenger)',
         description:
-          "Program the AV to minimize the overall harm by protecting multiple lives over the single passenger's life.",
+          "Program the Autonomous Vehicle to minimize the overall harm by protecting multiple lives over the single passenger's life.",
         impact: {
           fairness: +1,
           sustainability: 0,
@@ -41,7 +41,7 @@ export default {
         id: 'option-b',
         text: 'Passenger Protection Priority',
         description:
-          'Program the AV to prioritize the safety of its passenger above all other considerations.',
+          'Program the Autonomous Vehicle to prioritize the safety of its passenger above all other considerations.',
         impact: {
           fairness: -1,
           sustainability: -1,
@@ -67,7 +67,7 @@ export default {
         id: 'option-c',
         text: 'Non-intervention (Randomized Decision)',
         description:
-          'Program the AV to make random or speed-based decisions without weighing lives.',
+          'Program the Autonomous Vehicle to make random or speed-based decisions without weighing lives.',
         impact: {
           fairness: 0,
           sustainability: -1,

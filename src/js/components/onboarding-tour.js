@@ -40,9 +40,12 @@ class OnboardingTour {
     this.currentTutorial = 1;
     this.isActive = false;
     this.isTransitioning = false; // Prevent race conditions in step transitions
+    this.isProcessingAction = false; // Prevent rapid button clicks
     this.coachMark = null;
     this.overlay = null;
     this.spotlight = null;
+    this.contentObserver = null; // For tracking dynamic content changes
+    this.contentUpdateTimeout = null; // For debouncing content updates
     
     // User interaction states
     this.userStates = {
@@ -66,6 +69,7 @@ class OnboardingTour {
     this.MIN_SCROLL_DISTANCE = 5; // px
     this.EASE_MIDPOINT = 0.5; // easing function midpoint
     this.EASE_MULTIPLIER = 4; // easing function multiplier
+    this.DEBOUNCE_DURATION = 300; // ms for preventing rapid clicks
     this.MANUAL_SCROLL_RESET_DELAY = 2000; // ms to reset manual scroll flag
     this.LEARNING_LAB_TUTORIAL = 3; // Tutorial number for Learning Lab
     this.ACCORDION_CHECK_DELAY = 200; // ms to wait before checking accordion state
@@ -73,6 +77,10 @@ class OnboardingTour {
     this.DEBUG_TEXT_LENGTH = 20; // chars to show in debug logs
     this.TUTORIAL_3_STEP_3_INDEX = 2; // 0-indexed step number for step 3
     this.CLICK_TIMEOUT = 10000; // ms to wait for user click before fallback
+    this.OPTION_TEXT_LENGTH = 50; // chars to show in option logs
+    
+    // Keyboard navigation tracking
+    this.wasKeyboardNavigation = false;
     
     // Tutorial steps configuration
     this.tutorials = {
@@ -85,7 +93,7 @@ class OnboardingTour {
             title: 'Welcome to SimulateAI! 🤖',
             content: 'A Digital Learning Lab where you journey into the ethical frontiers of AI and Robotics. This tour will guide you through our interactive platform.',
             buttons: [
-              { text: 'Continue Tour', action: 'continue', primary: true },
+              { text: 'Start Tour', action: 'continue', primary: true },
               { text: 'Start Exploring', action: 'finish', primary: false }
             ],
             target: null,
@@ -124,21 +132,19 @@ class OnboardingTour {
             title: 'Choose Your Approach',
             content: 'Each approach represents a different ethical framework. Please click the <strong>first option</strong> to continue the tutorial and see how the analysis works!',
             target: '.options-container',
-            position: 'left',
-            action: 'wait-for-option-selection',
+            position: 'right',
+            action: 'wait-for-click',
             highlightClick: true,
-            autoScroll: true,
-            waitFor: '.options-container'
+            autoScroll: true
           },
           {
             id: 'pros-cons',
             title: 'Pros and Cons Analysis',
             content: 'Perfect! The details expanded to show the analysis. Every ethical choice has trade-offs - these help you understand the implications.',
             target: '.option-details',
-            position: 'left',
+            position: 'right',
             autoScroll: true,
-            waitFor: '.option-details',
-            skipUntil: 'option-selected'
+            waitForElement: true
           },
           {
             id: 'radar-chart-preview',
@@ -154,11 +160,10 @@ class OnboardingTour {
             title: 'Confirm Your Decision',
             content: 'When ready, confirm your choice. Remember - there\'s no "wrong" answer in ethics exploration!',
             target: '#confirm-choice',
-            position: 'left',
-            action: 'wait-for-confirm',
+            position: 'right',
+            action: 'wait-for-click',
             highlightClick: true,
-            autoScroll: true,
-            waitFor: 'option-selected'
+            autoScroll: true
           },
           {
             id: 'tutorial-complete',
@@ -181,33 +186,33 @@ class OnboardingTour {
         steps: [
           {
             id: 'hero-demo-chart',
-            title: 'Interactive Radar Chart',
-            content: 'This is our Hero Demo radar chart. It shows how different choices impact ethical dimensions in real-time.',
+            title: 'Interactive Radar Chart 📊',
+            content: 'This is our Hero Demo radar chart. It shows how different ethical choices impact various dimensions in real-time, giving you a visual representation of moral decision-making.',
             target: '#hero-ethics-chart',
             position: 'bottom',
             autoScroll: true
           },
           {
             id: 'ethical-dimensions',
-            title: 'Ethical Dimensions',
-            content: 'The chart has 8 key dimensions that represent core ethical principles. Each axis shows how decisions impact different aspects of AI ethics.',
+            title: 'Ethical Dimensions Explained',
+            content: 'The chart displays 8 key ethical dimensions that represent core moral principles. Each axis shows how your decisions impact different aspects of AI ethics - from fairness to sustainability.',
             target: '#hero-ethics-chart',
-            position: 'bottom',
+            position: 'left',
             autoScroll: false
           },
           {
             id: 'interactive-controls',
-            title: 'Try the Controls',
-            content: 'Use these buttons to see how different scenarios affect the ethical dimensions. Watch the chart change in real-time!',
+            title: 'Try the Controls! 🎮',
+            content: 'Use these buttons to see how different ethical approaches affect the dimensions. Watch the chart change in real-time as you explore different scenarios! Click "Next" when you\'re ready to continue.',
             target: '.demo-controls-grid',
-            position: 'bottom',
+            position: 'left',
             autoScroll: true,
             highlightClick: true
           },
           {
             id: 'how-to-read',
-            title: 'How to Read Charts',
-            content: 'Click this accordion to learn about interpreting the visual data and understanding the ethical implications.',
+            title: 'How to Read Charts 📖',
+            content: 'This section teaches you about interpreting the visual data and understanding the ethical implications of each choice. Click "Next" to continue exploring.',
             target: '.radar-instructions-accordion',
             position: 'bottom',
             autoScroll: true,
@@ -215,8 +220,8 @@ class OnboardingTour {
           },
           {
             id: 'glossary',
-            title: 'Ethical Dimensions Glossary',
-            content: 'Click this accordion to explore detailed definitions of each ethical principle used in our simulations.',
+            title: 'Ethical Dimensions Glossary 📚',
+            content: 'This glossary provides detailed definitions of each ethical principle used in our simulations. Click "Next" to complete the radar chart tutorial.',
             target: '.ethics-glossary-accordion',
             position: 'bottom',
             autoScroll: true,
@@ -224,8 +229,8 @@ class OnboardingTour {
           },
           {
             id: 'radar-tutorial-complete',
-            title: 'Radar Chart Mastery! 📊',
-            content: 'Excellent! You now understand how to interpret ethical impacts visually. Ready to explore the Learning Lab?',
+            title: 'Radar Chart Mastery! 🎉',
+            content: 'Excellent! You now understand how to interpret ethical impacts visually and interact with our radar chart system. Ready to explore the Learning Lab?',
             buttons: [
               { text: '🧪 Learning Lab Tutorial', action: 'next-tutorial', primary: true },
               { text: 'Start Exploring', action: 'finish', primary: false }
@@ -242,8 +247,8 @@ class OnboardingTour {
         steps: [
           {
             id: 'find-trolley-problem',
-            title: 'Find the Trolley Problem',
-            content: 'Let\'s explore the Learning Lab! We\'ll automatically scroll to the first scenario in "The Trolley Problem" category.',
+            title: 'Scenario Simulations',
+            content: 'Each scenario includes a fully equipped Learning Lab, offering a detailed overview and curated educator resources to deepen understanding and spark meaningful discussion.',
             target: '#category-trolley-problem > div.scenarios-grid > article:nth-child(1)',
             position: 'bottom',
             autoScroll: true
@@ -263,7 +268,7 @@ class OnboardingTour {
             id: 'overview-tab',
             title: 'Overview Tab',
             content: 'This Overview tab provides a comprehensive introduction to the scenario, including the ethical dilemma, key stakeholders, and real-world context. Click "Next" to continue exploring the other tabs.',
-            target: '.tab-overview, [data-tab="overview"], .overview-tab',
+            target: '.tab-buttons-container [data-tab="overview"], .tab-buttons-container .tab-button[data-tab="overview"]',
             position: 'right',
             waitFor: 'pre-launch-modal',
             autoScroll: true
@@ -271,42 +276,87 @@ class OnboardingTour {
           {
             id: 'learning-goals-tab',
             title: 'Learning Goals Tab',
-            content: 'The Learning Goals tab outlines what you\'ll discover and understand by completing this simulation, including key ethical principles and decision-making frameworks.',
-            target: '.tab-learning-goals, [data-tab="learning-goals"], .learning-goals-tab',
+            content: 'The Learning Goals tab outlines what you\'ll discover and understand by completing this simulation, including key ethical principles and decision-making frameworks. Click "Next" to continue exploring the other tabs.',
+            target: '.tab-buttons-container [data-tab="objectives"], .tab-buttons-container .tab-button[data-tab="objectives"]',
             position: 'right',
+            highlightClick: true,
             autoScroll: true
           },
           {
             id: 'ethics-guide-tab',
             title: 'Ethics Guide Tab',
-            content: 'The Ethics Guide provides essential background on moral frameworks, philosophical approaches, and ethical theories relevant to this scenario.',
-            target: '.tab-ethics-guide, [data-tab="ethics-guide"], .ethics-guide-tab',
+            content: 'The Ethics Guide provides essential background on moral frameworks, philosophical approaches, and ethical theories relevant to this scenario. Click "Next" to see the next tab.',
+            target: '.tab-buttons-container [data-tab="ethics"], .tab-buttons-container .tab-button[data-tab="ethics"]',
             position: 'right',
+            highlightClick: true,
             autoScroll: true
           },
           {
             id: 'get-ready-tab',
             title: 'Get Ready Tab',
-            content: 'Get Ready helps you prepare for the simulation with pre-activity questions, reflection prompts, and scenario setup information.',
-            target: '.tab-get-ready, [data-tab="get-ready"], .get-ready-tab',
+            content: 'Get Ready helps you prepare for the simulation with pre-activity questions, reflection prompts, and scenario setup information. Click "Next" to continue.',
+            target: '.tab-buttons-container [data-tab="preparation"], .tab-buttons-container .tab-button[data-tab="preparation"]',
             position: 'right',
+            highlightClick: true,
             autoScroll: true
           },
           {
             id: 'resources-tab',
             title: 'Resources Tab',
-            content: 'The Resources tab contains supplementary materials, research papers, case studies, and additional reading to deepen your understanding.',
-            target: '.tab-resources, [data-tab="resources"], .resources-tab',
+            content: 'The Resources tab contains supplementary materials, research papers, case studies, and additional reading to deepen your understanding. Click "Next" to see the final tab.',
+            target: '.tab-buttons-container [data-tab="resources"], .tab-buttons-container .tab-button[data-tab="resources"]',
             position: 'right',
+            highlightClick: true,
             autoScroll: true
           },
           {
             id: 'for-educators-tab',
             title: 'For Educators Tab',
-            content: 'For Educators provides teaching guides, discussion questions, assessment rubrics, and classroom integration strategies for instructors.',
-            target: '.tab-educators, [data-tab="educators"], .for-educators-tab',
+            content: 'For Educators provides teaching guides, discussion questions, assessment rubrics, and classroom integration strategies for instructors. This completes our tour of the Learning Lab tabs!',
+            target: '.tab-buttons-container [data-tab="educator"], .tab-buttons-container .tab-button[data-tab="educator"]',
             position: 'right',
-            autoScroll: true
+            highlightClick: true,
+            autoScroll: true,
+            hasNextButton: true,
+            action: 'next',
+            onShow() {
+              // Enhanced auto-scroll to ensure "For Educators" tab is visible
+              const educatorTab = document.querySelector('.tab-buttons-container [data-tab="educator"]') || 
+                                document.querySelector('.tab-buttons-container .tab-button[data-tab="educator"]');
+              
+              if (educatorTab) {
+                // Scroll the tab into view with enhanced positioning
+                educatorTab.scrollIntoView({ 
+                  behavior: 'smooth', 
+                  block: 'center',
+                  inline: 'center' 
+                });
+                
+                // Also scroll the tab container to ensure proper visibility
+                const tabContainer = educatorTab.closest('.tab-buttons-container');
+                if (tabContainer) {
+                  tabContainer.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center',
+                    inline: 'center' 
+                  });
+                }
+                
+                logger.info('OnboardingTour', 'Auto-scrolled to For Educators tab', { 
+                  element: educatorTab,
+                  container: tabContainer 
+                });
+              } else {
+                logger.warn('OnboardingTour', 'Could not find For Educators tab');
+              }
+              
+              // Also auto-scroll nav menu to highlight educators tab (legacy behavior)
+              const navEducatorsTab = document.querySelector('a[href="#educator-tools"]');
+              if (navEducatorsTab) {
+                navEducatorsTab.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                logger.info('OnboardingTour', 'Auto-scrolled to Educator Tools nav link', { element: navEducatorsTab });
+              }
+            }
           },
           {
             id: 'tutorial-complete',
@@ -323,6 +373,9 @@ class OnboardingTour {
       }
     };
 
+    // Set up keyboard navigation tracking
+    this.setupKeyboardTracking();
+
     this.init();
   }
 
@@ -331,6 +384,20 @@ class OnboardingTour {
     
     // Don't auto-start - let the app control when the tour starts
     logger.debug('OnboardingTour', 'OnboardingTour initialized, waiting for manual start');
+  }
+
+  setupKeyboardTracking() {
+    // Track when user uses Tab key for navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        this.wasKeyboardNavigation = true;
+      }
+    });
+    
+    // Reset keyboard navigation flag on mouse click
+    document.addEventListener('mousedown', () => {
+      this.wasKeyboardNavigation = false;
+    });
   }
 
   isFirstTimeVisit() {
@@ -468,8 +535,21 @@ class OnboardingTour {
       hasOverlay: !!this.overlay,
       hasSpotlight: !!this.spotlight,
       hasCoachMark: !!this.coachMark,
+      hasContentObserver: !!this.contentObserver,
       totalOverlaysInDom: document.querySelectorAll('.onboarding-overlay').length
     });
+
+    // Clean up content observer
+    if (this.contentObserver) {
+      this.contentObserver.disconnect();
+      this.contentObserver = null;
+    }
+    
+    // Clear any pending content update timeouts
+    if (this.contentUpdateTimeout) {
+      clearTimeout(this.contentUpdateTimeout);
+      this.contentUpdateTimeout = null;
+    }
 
     if (this.overlay) {
       this.overlay.remove();
@@ -836,7 +916,38 @@ class OnboardingTour {
     // SIMPLIFIED STEP RENDERING - Removed complex conditions that could cause skipping
     
     // Find target element if specified
-    const targetElement = step.target ? document.querySelector(step.target) : null;
+    let targetElement = step.target ? document.querySelector(step.target) : null;
+    
+    // If step requires waiting for element to appear, wait for it
+    if (step.waitForElement && step.target && !targetElement) {
+      logger.info('OnboardingTour', `Waiting for element to appear: ${step.target}`, {
+        stepId: step.id,
+        selector: step.target
+      });
+      
+      // Wait for element to appear with a timeout
+      let attempts = 0;
+      const maxAttempts = 30; // 3 seconds with 100ms intervals
+      
+      while (!targetElement && attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        targetElement = document.querySelector(step.target);
+        attempts++;
+      }
+      
+      if (!targetElement) {
+        logger.warn('OnboardingTour', `Target element still not found after waiting: ${step.target}`, {
+          stepId: step.id,
+          selector: step.target,
+          attemptsUsed: attempts
+        });
+      } else {
+        logger.info('OnboardingTour', `Target element found after ${attempts * 100}ms`, {
+          stepId: step.id,
+          selector: step.target
+        });
+      }
+    }
     
     if (step.target && !targetElement) {
       logger.warn('OnboardingTour', `Target element not found: ${step.target}`, {
@@ -847,19 +958,28 @@ class OnboardingTour {
 
     // Auto-scroll to target if needed and element exists
     if (step.autoScroll && targetElement) {
-      // Check if target is in viewport
-      const rect = targetElement.getBoundingClientRect();
-      const isInViewport = rect.top >= 0 && rect.bottom <= window.innerHeight;
-      
-      if (!isInViewport) {
-        logger.info('OnboardingTour', `Scrolling to bring target into view for step ${step.id}`);
-        targetElement.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center',
-          inline: 'center'
-        });
-        // Wait for scroll animation
-        await new Promise(resolve => setTimeout(resolve, this.SCROLL_DURATION));
+      // Special handling for step 4 (ethical-question) - scroll within modal
+      if (step.id === 'ethical-question') {
+        const modalScrolled = this.scrollToElementInModal(targetElement, step);
+        if (modalScrolled) {
+          // Wait for modal scroll animation
+          await new Promise(resolve => setTimeout(resolve, this.SCROLL_DURATION));
+        }
+      } else {
+        // Regular page scrolling
+        const rect = targetElement.getBoundingClientRect();
+        const isInViewport = rect.top >= 0 && rect.bottom <= window.innerHeight;
+        
+        if (!isInViewport) {
+          logger.info('OnboardingTour', `Scrolling to bring target into view for step ${step.id}`);
+          targetElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center',
+            inline: 'center'
+          });
+          // Wait for scroll animation
+          await new Promise(resolve => setTimeout(resolve, this.SCROLL_DURATION));
+        }
       }
     }
 
@@ -870,8 +990,50 @@ class OnboardingTour {
       this.spotlight.style.display = 'none';
     }
 
-    // Create coach mark content
-    this.coachMark.innerHTML = this.createCoachMarkContent(step, tutorial);
+    // Create coach mark content - with robust null checking
+    if (!this.coachMark || !document.body.contains(this.coachMark)) {
+      logger.warn('OnboardingTour', 'Coach mark element is null or not in DOM, recreating overlay', {
+        currentTutorial: this.currentTutorial,
+        currentStep: this.currentStep,
+        stepId: step.id,
+        isActive: this.isActive,
+        coachMarkExists: !!this.coachMark,
+        coachMarkInDom: this.coachMark ? document.body.contains(this.coachMark) : false
+      });
+      this.createOverlay();
+      
+      if (!this.coachMark) {
+        logger.error('OnboardingTour', 'Failed to create coach mark element, aborting step');
+        return;
+      }
+    }
+    
+    // Additional safety check right before setting innerHTML
+    if (!this.coachMark) {
+      logger.error('OnboardingTour', 'Coach mark is null right before setting innerHTML - this should not happen!');
+      return;
+    }
+    
+    // Verify the coach mark is still attached to DOM
+    if (!document.body.contains(this.coachMark)) {
+      logger.error('OnboardingTour', 'Coach mark exists but is not in DOM - recreating');
+      this.createOverlay();
+      if (!this.coachMark) {
+        logger.error('OnboardingTour', 'Failed to recreate coach mark element');
+        return;
+      }
+    }
+    
+    try {
+      this.coachMark.innerHTML = this.createCoachMarkContent(step, tutorial);
+    } catch (error) {
+      logger.error('OnboardingTour', 'Error setting coach mark innerHTML', {
+        error: error.message,
+        coachMark: this.coachMark,
+        step: step.id
+      });
+      return;
+    }
     
     // Position coach mark
     this.positionCoachMark(targetElement, step.position, step);
@@ -886,14 +1048,36 @@ class OnboardingTour {
     // Set up event listeners for buttons
     this.setupEventListeners(step);
     
+    // Special handling for specific steps
+    if (step.id === 'dilemma-section') {
+      // Set up content observer for step 3 to track typewriter expansion
+      this.setupContentObserver(targetElement, step);
+    }
+    
+    // Set up action handling
+    if (step.action === 'wait-for-click' && targetElement) {
+      this.waitForElementClick(targetElement, step);
+    }
+    else if (step.action === 'wait-for-option-selection' && targetElement) {
+      logger.info('OnboardingTour', `Setting up option selection waiting for step ${step.id}`);
+      this.waitForOptionSelection(targetElement, step);
+    }
+
     // Add click highlighting if needed
     if (step.highlightClick && targetElement) {
       targetElement.classList.add('onboarding-click-highlight');
     }
 
-    // Set up action handling
-    if (step.action === 'wait-for-click' && targetElement) {
-      this.waitForElementClick(targetElement, step);
+    // Execute onShow callback if defined
+    if (step.onShow && typeof step.onShow === 'function') {
+      try {
+        logger.info('OnboardingTour', `Executing onShow callback for step ${step.id}`);
+        step.onShow();
+      } catch (error) {
+        logger.error('OnboardingTour', `Error executing onShow callback for step ${step.id}`, {
+          error: error.message
+        });
+      }
     }
 
     logger.info('OnboardingTour', `✅ Step ${step.id} rendered successfully`, {
@@ -957,7 +1141,7 @@ class OnboardingTour {
     const isFirstStep = this.currentStep === 0;
     const isLastStep = this.currentStep === this.tutorials[this.currentTutorial].steps.length - 1;
     const isLastTutorial = this.currentTutorial === Object.keys(this.tutorials).length;
-    const hasUserAction = step.action && (step.action === 'wait-for-click' || step.action === 'wait-for-option-selection' || step.action === 'wait-for-confirm');
+    const hasUserAction = step.action && (step.action === 'wait-for-click' || step.action === 'wait-for-option-selection');
     
     logger.debug('OnboardingTour', 'Creating buttons', {
       stepId: step.id,
@@ -1009,8 +1193,17 @@ class OnboardingTour {
       buttons: this.coachMark.querySelectorAll('.coach-mark-btn').length
     });
 
+    // IMPROVED: Remove existing event listeners without DOM recreation
+    // Store reference to avoid multiple listeners
+    if (this.currentClickHandler) {
+      this.coachMark.removeEventListener('click', this.currentClickHandler);
+    }
+    if (this.currentKeyHandler) {
+      this.coachMark.removeEventListener('keydown', this.currentKeyHandler);
+    }
+
     // Set up click handlers for coach mark buttons
-    this.coachMark.addEventListener('click', (e) => {
+    this.currentClickHandler = (e) => {
       logger.info('OnboardingTour', 'Coach mark clicked', {
         target: e.target.tagName,
         className: e.target.className,
@@ -1022,8 +1215,16 @@ class OnboardingTour {
         const { action } = e.target.dataset;
         
         if (action) {
+          // CRITICAL: Prevent event bubbling and default behavior
           e.preventDefault();
           e.stopPropagation();
+          e.stopImmediatePropagation(); // Prevent other listeners on same element
+          
+          // Additional protection: Check if we're already processing an action
+          if (this.isProcessingAction) {
+            logger.debug('OnboardingTour', `Button click ignored - already processing action`);
+            return;
+          }
           
           logger.info('OnboardingTour', `Button clicked with action: ${action}`, {
             tutorial: this.currentTutorial,
@@ -1043,13 +1244,16 @@ class OnboardingTour {
       if (e.target.classList.contains('coach-mark-close')) {
         e.preventDefault();
         e.stopPropagation();
+        e.stopImmediatePropagation();
         logger.info('OnboardingTour', 'Close button clicked');
         this.endTour();
       }
-    });
+    };
+
+    this.coachMark.addEventListener('click', this.currentClickHandler);
 
     // Keyboard navigation
-    this.coachMark.addEventListener('keydown', (e) => {
+    this.currentKeyHandler = (e) => {
       if (e.key === 'Escape') {
         this.endTour();
       } else if (e.key === 'Enter' || e.key === ' ') {
@@ -1058,14 +1262,22 @@ class OnboardingTour {
           e.target.click();
         }
       }
-    });
+    };
 
-    // Focus management - focus first button
+    this.coachMark.addEventListener('keydown', this.currentKeyHandler);
+
+    // Focus management - only focus if user explicitly navigated with keyboard
     const firstButton = this.coachMark.querySelector('.coach-mark-btn');
     if (firstButton) {
       const FOCUS_DELAY = 100; // ms - Small delay to ensure coach mark is positioned
       setTimeout(() => {
-        firstButton.focus();
+        // Only auto-focus if the user explicitly used keyboard navigation (Tab key)
+        // Don't auto-focus on initial tour load to prevent "selected" appearance
+        if (this.wasKeyboardNavigation && 
+            (document.documentElement.classList.contains('keyboard-navigation') || 
+             (document.activeElement && document.activeElement.tagName === 'BUTTON'))) {
+          firstButton.focus();
+        }
       }, FOCUS_DELAY);
     }
 
@@ -1082,9 +1294,6 @@ class OnboardingTour {
         break;
       case 'wait-for-option-selection':
         this.waitForOptionSelection();
-        break;
-      case 'wait-for-confirm':
-        this.waitForConfirm();
         break;
     }
   }
@@ -1143,44 +1352,53 @@ class OnboardingTour {
     });
   }
 
-  waitForOptionSelection() {
-    const optionHandler = (event) => {
-      // Check if an option card was clicked
-      if (event.target.closest('.option-card')) {
-        this.userStates['option-selected'] = true;
-        document.removeEventListener('click', optionHandler);
-        
-        // Wait for option details to appear before advancing
-        this.waitForAccordionOpen(() => {
-          setTimeout(() => this.nextStep(), this.ANIMATION_DURATION);
+  waitForOptionSelection(targetElement, step) {
+    logger.info('OnboardingTour', `Waiting for option selection in step ${step.id}`, {
+      targetSelector: step.target
+    });
+    
+    // Set up a broad click listener that will catch any clicks in the target area
+    const optionClickListener = (e) => {
+      const clickedElement = e.target;
+      
+      // Check if this looks like an option click
+      const isOption = clickedElement.tagName === 'BUTTON' ||
+                      clickedElement.classList.contains('option') ||
+                      clickedElement.classList.contains('option-card') ||
+                      clickedElement.classList.contains('choice') ||
+                      clickedElement.classList.contains('response') ||
+                      clickedElement.hasAttribute('data-option') ||
+                      clickedElement.hasAttribute('data-option-id') ||
+                      clickedElement.hasAttribute('data-choice') ||
+                      clickedElement.closest('.option, .option-card, .choice, .response-option');
+      
+      if (isOption) {
+        logger.info('OnboardingTour', `✅ Option selection detected in step ${step.id}`, {
+          clickedElement: clickedElement.tagName,
+          clickedClass: clickedElement.className,
+          clickedText: clickedElement.textContent.substring(0, this.OPTION_TEXT_LENGTH)
         });
+        
+        // Remove the listener
+        targetElement.removeEventListener('click', optionClickListener);
+        
+        // Mark as selected
+        this.userStates['option-selected'] = true;
+        clickedElement.classList.add('onboarding-selected');
+        
+        // Advance to next step
+        setTimeout(() => {
+          this.nextStep();
+        }, this.SELECTION_DELAY);
       }
     };
-
-    document.addEventListener('click', optionHandler);
-  }
-
-  waitForConfirm() {
-    const confirmHandler = (event) => {
-      // Check if confirm button was clicked
-      if (event.target.closest('#confirm-choice, .confirm-button, [data-confirm]')) {
-        this.userStates['choice-confirmed'] = true;
-        document.removeEventListener('click', confirmHandler);
-        
-        // Listen for the scenario modal closed event
-        logger.info('OnboardingTour', 'Choice confirmed, waiting for scenario-modal-closed event');
-        
-        const modalClosedHandler = (_event) => {
-          logger.info('OnboardingTour', 'Received scenario-modal-closed event, advancing to next step');
-          document.removeEventListener('scenario-modal-closed', modalClosedHandler);
-          setTimeout(() => this.nextStep(), this.ANIMATION_DURATION);
-        };
-        
-        document.addEventListener('scenario-modal-closed', modalClosedHandler);
-      }
-    };
-
-    document.addEventListener('click', confirmHandler);
+    
+    targetElement.addEventListener('click', optionClickListener);
+    
+    // Also add highlighting to make it clear the area is interactive
+    targetElement.classList.add('onboarding-click-highlight');
+    
+    logger.debug('OnboardingTour', `Option selection listener attached for step ${step.id}`);
   }
 
   waitForCondition(condition, callback) {
@@ -1225,6 +1443,14 @@ class OnboardingTour {
   }
 
   handleAction(action) {
+    // Prevent rapid-fire clicks with debouncing
+    if (this.isProcessingAction) {
+      logger.debug('OnboardingTour', `Action ${action} ignored - already processing another action`);
+      return;
+    }
+    
+    this.isProcessingAction = true;
+    
     logger.info('OnboardingTour', `Handling action: ${action}`, { 
       currentTutorial: this.currentTutorial, 
       currentStep: this.currentStep 
@@ -1233,19 +1459,38 @@ class OnboardingTour {
     switch (action) {
       case 'continue':
         this.nextStep();
+        // Reset flag after step transition
+        setTimeout(() => {
+          this.isProcessingAction = false;
+        }, this.DEBOUNCE_DURATION);
         break;
       case 'back':
         this.previousStep();
+        // Reset flag after step transition
+        setTimeout(() => {
+          this.isProcessingAction = false;
+        }, this.DEBOUNCE_DURATION);
         break;
       case 'next-tutorial':
+        logger.info('OnboardingTour', 'next-tutorial action triggered', {
+          currentTutorial: this.currentTutorial,
+          currentStep: this.currentStep,
+          isActive: this.isActive
+        });
         this.nextTutorial();
+        // Flag will be reset in nextTutorial() method itself
         break;
       case 'finish':
       case 'skip':
         this.endTour();
+        // Reset flag after tour ends
+        setTimeout(() => {
+          this.isProcessingAction = false;
+        }, this.DEBOUNCE_DURATION);
         break;
       default:
         logger.warn('OnboardingTour', `Unknown action: ${action}`);
+        this.isProcessingAction = false;
     }
   }
 
@@ -1315,9 +1560,6 @@ class OnboardingTour {
     if (step && step.action === 'wait-for-option-selection') {
       this.userStates['option-selected'] = false;
     }
-    if (step && step.action === 'wait-for-confirm') {
-      this.userStates['choice-confirmed'] = false;
-    }
   }
 
   nextTutorial() {
@@ -1327,6 +1569,12 @@ class OnboardingTour {
     });
 
     const totalTutorials = Object.keys(this.tutorials).length;
+    logger.info('OnboardingTour', `nextTutorial called`, {
+      currentTutorial: this.currentTutorial,
+      totalTutorials,
+      willContinue: this.currentTutorial < totalTutorials
+    });
+    
     if (this.currentTutorial < totalTutorials) {
       this.currentTutorial++;
       this.currentStep = 0;
@@ -1338,8 +1586,43 @@ class OnboardingTour {
       };
       logger.info('OnboardingTour', `Starting tutorial ${this.currentTutorial}`);
       
+      // Special handling for Tutorial 2 - close any open modals and scroll to hero demo
+      if (this.currentTutorial === 2) {
+        // Check if there's a modal open from Tutorial 1
+        const scenarioModal = document.querySelector('.scenario-modal');
+        const preLaunchModal = document.querySelector('.pre-launch-modal');
+        
+        if (scenarioModal || preLaunchModal) {
+          logger.info('OnboardingTour', 'Modal detected, closing modal before starting Tutorial 2');
+          this.waitForModalClosure(() => {
+            // After modal closes, scroll to hero demo and start tutorial
+            this.scrollToHeroDemoAndStart();
+          });
+          
+          // Close the modal
+          if (scenarioModal) {
+            const closeBtn = scenarioModal.querySelector('.modal-close, .close-modal');
+            if (closeBtn) {
+              closeBtn.click();
+            }
+          }
+          if (preLaunchModal) {
+            const closeBtn = preLaunchModal.querySelector('.modal-close, .close-modal');
+            if (closeBtn) {
+              closeBtn.click();
+            }
+          }
+        } else {
+          logger.info('OnboardingTour', 'No modal detected, scrolling to hero demo for Tutorial 2');
+          this.scrollToHeroDemoAndStart();
+        }
+        
+        // Reset processing flag immediately for Tutorial 2 since async operations will handle the rest
+        this.isProcessingAction = false;
+        logger.debug('OnboardingTour', 'Processing flag reset for Tutorial 2 transition');
+      } 
       // Special handling for Tutorial 3 - wait for scenario modal to close if one is open
-      if (this.currentTutorial === this.LEARNING_LAB_TUTORIAL) {
+      else if (this.currentTutorial === this.LEARNING_LAB_TUTORIAL) {
         // Check if there's actually a modal open before waiting
         const scenarioModal = document.querySelector('.scenario-modal');
         const preLaunchModal = document.querySelector('.pre-launch-modal');
@@ -1353,11 +1636,21 @@ class OnboardingTour {
           logger.info('OnboardingTour', 'No modal detected, starting Tutorial 3 immediately');
           this.showStep();
         }
+        
+        // Reset processing flag after initiating Tutorial 3
+        this.isProcessingAction = false;
+        logger.debug('OnboardingTour', 'Processing flag reset for Tutorial 3 transition');
       } else {
         this.showStep();
+        // Reset processing flag for normal tutorial progression
+        this.isProcessingAction = false;
+        logger.debug('OnboardingTour', 'Processing flag reset for normal tutorial transition');
       }
     } else {
       this.endTour();
+      // Reset processing flag after tour ends
+      this.isProcessingAction = false;
+      logger.debug('OnboardingTour', 'Processing flag reset after tour end');
     }
   }
 
@@ -1379,12 +1672,40 @@ class OnboardingTour {
   }
 
   endTour() {
-    logger.info('OnboardingTour', 'Ending tour');
+    const STACK_TRACE_LINES = 5;
+    logger.info('OnboardingTour', 'Ending tour', {
+      currentTutorial: this.currentTutorial,
+      currentStep: this.currentStep,
+      stackTrace: new Error().stack.split('\n').slice(1, STACK_TRACE_LINES)
+    });
 
     // Remove click highlights
     document.querySelectorAll('.onboarding-click-highlight').forEach(el => {
       el.classList.remove('onboarding-click-highlight');
     });
+
+    // Close pre-launch modal if we're finishing Tutorial 3 (Learning Lab)
+    if (this.currentTutorial === this.LEARNING_LAB_TUTORIAL) {
+      const preLaunchModal = document.querySelector('.pre-launch-modal');
+      if (preLaunchModal) {
+        // Find the modal instance through the modal-utility close button
+        const closeButton = preLaunchModal.querySelector('[data-modal-close], .modal-close, .close-btn');
+        if (closeButton) {
+          closeButton.click();
+          logger.info('OnboardingTour', 'Closed pre-launch modal after Tutorial 3 completion');
+        } else {
+          // Fallback: remove the modal manually
+          const modalContainer = preLaunchModal.closest('.modal-container, .modal-overlay');
+          if (modalContainer) {
+            modalContainer.remove();
+            logger.info('OnboardingTour', 'Manually removed pre-launch modal container after Tutorial 3 completion');
+          } else {
+            preLaunchModal.remove();
+            logger.info('OnboardingTour', 'Manually removed pre-launch modal after Tutorial 3 completion');
+          }
+        }
+      }
+    }
 
     // Track completion
     simpleAnalytics.trackEvent('tour_completed', {
@@ -1398,6 +1719,60 @@ class OnboardingTour {
     // Clean up
     this.removeOverlay();
     this.isActive = false;
+  }
+
+  /**
+   * Scroll to hero demo section and start Tutorial 2
+   */
+  scrollToHeroDemoAndStart() {
+    logger.info('OnboardingTour', 'scrollToHeroDemoAndStart called', {
+      currentTutorial: this.currentTutorial,
+      currentStep: this.currentStep,
+      isActive: this.isActive
+    });
+    
+    const heroChart = document.getElementById('hero-ethics-chart');
+    if (heroChart) {
+      logger.info('OnboardingTour', 'Hero chart found, scrolling to hero demo for Tutorial 2', {
+        heroChartRect: heroChart.getBoundingClientRect()
+      });
+      
+      // Scroll to the hero demo section
+      heroChart.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center',
+        inline: 'center'
+      });
+      
+      // Wait for scroll animation to complete, then start the tutorial
+      setTimeout(() => {
+        logger.info('OnboardingTour', 'Scroll animation complete, ensuring overlay exists before showing step', {
+          currentTutorial: this.currentTutorial,
+          currentStep: this.currentStep,
+          isActive: this.isActive,
+          overlayExists: !!this.overlay,
+          coachMarkExists: !!this.coachMark
+        });
+        
+        // Ensure overlay exists before showing step
+        if (!this.overlay || !this.coachMark || !document.body.contains(this.coachMark)) {
+          logger.warn('OnboardingTour', 'Overlay missing before Tutorial 2, recreating');
+          this.createOverlay();
+        }
+        
+        this.showStep();
+      }, this.SCROLL_DURATION);
+    } else {
+      logger.warn('OnboardingTour', 'Hero chart element not found, starting Tutorial 2 anyway');
+      
+      // Ensure overlay exists even if hero chart not found
+      if (!this.overlay || !this.coachMark || !document.body.contains(this.coachMark)) {
+        logger.warn('OnboardingTour', 'Overlay missing before Tutorial 2 (no hero chart), recreating');
+        this.createOverlay();
+      }
+      
+      this.showStep();
+    }
   }
 
   announceStep(step) {
@@ -1532,6 +1907,86 @@ class OnboardingTour {
     
     this.startTour(1);
   }
+
+  // Content observer for dynamic content changes (typewriter effects, etc.)
+  setupContentObserver(targetElement, step) {
+    if (this.contentObserver) {
+      this.contentObserver.disconnect();
+    }
+
+    this.contentObserver = new MutationObserver((mutations) => {
+      let shouldUpdate = false;
+      
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList' || mutation.type === 'characterData') {
+          shouldUpdate = true;
+        }
+        // Also check for attribute changes that might affect size
+        if (mutation.type === 'attributes' && 
+            (mutation.attributeName === 'style' || mutation.attributeName === 'class')) {
+          shouldUpdate = true;
+        }
+      });
+
+      if (shouldUpdate) {
+        // Debounce the updates to avoid excessive repositioning
+        clearTimeout(this.contentUpdateTimeout);
+        this.contentUpdateTimeout = setTimeout(() => {
+          if (this.coachMark && targetElement) {
+            logger.debug('OnboardingTour', `Updating coach mark position due to content change in step ${step.id}`);
+            this.positionCoachMark(targetElement, step.position, step);
+            this.positionSpotlight(targetElement);
+          }
+        }, this.CONTENT_UPDATE_DELAY); // Small delay to batch updates
+      }
+    });
+
+    this.contentObserver.observe(targetElement, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+      attributes: true,
+      attributeFilter: ['style', 'class']
+    });
+
+    logger.debug('OnboardingTour', `Content observer set up for step ${step.id}`);
+  }
+
+  // Scroll within modal content instead of main page
+  scrollToElementInModal(targetElement, step) {
+    const modal = targetElement.closest('.scenario-modal, .scenario-modal-dialog, .modal-dialog');
+    
+    if (modal) {
+      const modalBody = modal.querySelector('.scenario-content, .modal-body, .modal-content');
+      
+      if (modalBody) {
+        const elementRect = targetElement.getBoundingClientRect();
+        const modalRect = modalBody.getBoundingClientRect();
+        const currentScrollTop = modalBody.scrollTop;
+        
+        // Calculate target scroll position within modal
+        const elementTopInModal = (elementRect.top - modalRect.top) + currentScrollTop;
+        const targetScrollTop = Math.max(0, elementTopInModal - 100); // 100px offset from top
+        
+        logger.info('OnboardingTour', `Scrolling modal to element for step ${step.id}`, {
+          elementTop: elementRect.top,
+          modalTop: modalRect.top,
+          currentScroll: currentScrollTop,
+          targetScroll: targetScrollTop
+        });
+        
+        modalBody.scrollTo({
+          top: targetScrollTop,
+          behavior: 'smooth'
+        });
+        
+        return true;
+      }
+    }
+    
+    return false; // Not in a modal or modal body not found
+  }
+
 }
 
 // Export for use in other modules
@@ -1545,9 +2000,8 @@ window.debugStartTour = function() {
   if (window.onboardingTourInstance) {
     window.onboardingTourInstance.debugForceStartFromStep1();
   } else {
-    logger.warn('OnboardingTour', 'No onboarding tour instance available. Create one first.');
-    window.onboardingTourInstance = new OnboardingTour();
-    window.onboardingTourInstance.debugForceStartFromStep1();
+    logger.warn('OnboardingTour', 'No onboarding tour instance available. Please initialize through app.js first.');
+    logger.warn('OnboardingTour', '⚠️ Cannot create OnboardingTour instance directly - must be initialized through app.js to prevent multiple instances');
   }
 };
 

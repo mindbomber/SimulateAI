@@ -183,6 +183,9 @@ body.onboarding-active {
 .coach-mark-btn.primary {
   background: #1a73e8;
   color: white;
+  /* Prevent default button states that might look "selected" */
+  border: none;
+  outline: none;
 }
 
 .coach-mark-btn.primary:hover {
@@ -200,6 +203,29 @@ body.onboarding-active {
 .coach-mark-btn.secondary:hover {
   background: #f1f3f4;
   border-color: #c4c7ca;
+}
+
+/* Prevent focus styling unless explicitly focused by keyboard navigation */
+.coach-mark-btn:not(:focus-visible) {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Ensure no default browser focus ring on mouse click */
+.coach-mark-btn:focus:not(:focus-visible) {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Focus styles for coach mark buttons
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.coach-mark-btn.secondary:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
 }
 
 /* Click highlight for interactive elements */
