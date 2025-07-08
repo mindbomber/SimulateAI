@@ -21,8 +21,23 @@
  * for the SimulateAI badge achievement system.
  */
 
-// Import js-confetti using package name - let Vite resolve it
-import JSConfetti from 'js-confetti';
+import logger from '../utils/logger.js';
+
+// Import js-confetti from CDN for GitHub Pages compatibility  
+let JSConfetti;
+
+// Dynamically import js-confetti
+async function loadConfetti() {
+  if (!JSConfetti) {
+    try {
+      const module = await import('https://cdn.skypack.dev/js-confetti@0.12.0');
+      JSConfetti = module.default;
+    } catch (error) {
+      logger.warn('Failed to load js-confetti, confetti effects will be disabled:', error);
+    }
+  }
+  return JSConfetti;
+}
 import { GLOW_INTENSITY_CLASSES } from '../data/badge-config.js';
 
 /**
@@ -33,7 +48,7 @@ export class BadgeModal {
   constructor() {
     this.isVisible = false;
     this.currentModal = null;
-    this.confetti = new JSConfetti();
+    this.confetti = null; // Will be initialized when needed
     this.ANIMATION_DURATION = {
       CONFETTI: 3000,
       CONFETTI_SECOND_DELAY: 500,
@@ -137,6 +152,17 @@ export class BadgeModal {
    * @param {string} categoryEmoji - Category emoji for confetti
    */
   async triggerConfetti(categoryEmoji, badgeTier = 1) {
+    // Initialize confetti if not already loaded
+    if (!this.confetti) {
+      const ConfettiClass = await loadConfetti();
+      if (ConfettiClass) {
+        this.confetti = new ConfettiClass();
+      } else {
+        logger.warn('Confetti disabled - failed to load js-confetti library');
+        return;
+      }
+    }
+
     // Wave 1 - Large confetti (immediate)
     this.confetti.addConfetti({
       emojis: [categoryEmoji],

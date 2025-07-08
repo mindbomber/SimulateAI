@@ -73,6 +73,12 @@
   border-radius: 12px;
   background: transparent;
   box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.12); /* Subtle bottom-right shadow similar to demo */
+  overflow: hidden !important; /* Fix deprecation warning: override Chart.js overflow: visible */
+}
+
+/* Additional canvas overflow fix for all chart canvases */
+canvas[role="img"] {
+  overflow: hidden !important; /* Prevent deprecated overflow: visible on canvas elements */
 }
 
 /* Fallback chart when Chart.js fails to load */

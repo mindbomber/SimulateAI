@@ -20,6 +20,7 @@
  */
 
 import { TIMING, BREAKPOINTS } from '../utils/constants.js';
+import focusManager from '../utils/focus-manager.js';
 
 export class EnhancedSimulationModal {
   constructor(simulationId, options = {}) {
@@ -52,8 +53,11 @@ export class EnhancedSimulationModal {
     this.modal.offsetHeight;
     this.modal.classList.add('visible');
 
-    // Focus management
-    this.trapFocus();
+    // Focus management - create focus trap
+    this.focusTrap = focusManager.createTrap(this.modal, {
+      autoFocus: true,
+      restoreFocus: true
+    });
 
     // Track analytics
     this.trackAnalytics('enhanced_modal_opened', {
@@ -68,6 +72,12 @@ export class EnhancedSimulationModal {
    */
   close() {
     if (this.modal) {
+      // Clean up focus trap
+      if (this.focusTrap) {
+        this.focusTrap.destroy();
+        this.focusTrap = null;
+      }
+
       this.modal.classList.remove('visible');
       setTimeout(() => {
         if (this.modal && this.modal.parentNode) {
@@ -616,15 +626,12 @@ export class EnhancedSimulationModal {
   }
 
   /**
-   * Sets up focus trapping
+   * Sets up focus trapping (now handled by focus manager)
+   * @deprecated Use focusManager.createTrap() instead
    */
   trapFocus() {
-    const firstFocusableElement = this.modal.querySelector(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-    if (firstFocusableElement) {
-      firstFocusableElement.focus();
-    }
+    // This method is deprecated and focus is now managed by the centralized focus manager
+    // Kept for backward compatibility but focus trap is set up in open() method
   }
 
   /**

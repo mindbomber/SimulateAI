@@ -3,6 +3,8 @@
  * Adds smooth scrolling and navigation features to category grids
  */
 
+import focusManager from './focus-manager.js';
+
 // Constants
 const SCROLL_END_DELAY = 150;
 const DEFAULT_CARD_WIDTH = 350;
@@ -202,61 +204,16 @@ function snapToNearestCard(grid) {
 }
 
 /**
- * Add keyboard navigation support
+ * Add keyboard navigation support using centralized focus manager
  * @param {HTMLElement} grid - The category/scenario grid element
  */
 function addKeyboardNavigation(grid) {
-  grid.addEventListener('keydown', (e) => {
-    const cards = Array.from(grid.children);
-    const focusedCard = document.activeElement;
-    const currentIndex = cards.indexOf(focusedCard);
-
-    switch (e.key) {
-      case 'ArrowLeft':
-        e.preventDefault();
-        if (currentIndex > 0) {
-          cards[currentIndex - 1].focus();
-          cards[currentIndex - 1].scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-            inline: 'start'
-          });
-        }
-        break;
-
-      case 'ArrowRight':
-        e.preventDefault();
-        if (currentIndex < cards.length - 1) {
-          cards[currentIndex + 1].focus();
-          cards[currentIndex + 1].scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-            inline: 'start'
-          });
-        }
-        break;
-
-      case 'Home':
-        e.preventDefault();
-        cards[0].focus();
-        cards[0].scrollIntoView({
-          behavior: 'smooth',
-          block: 'nearest',
-          inline: 'start'
-        });
-        break;
-
-      case 'End':
-        e.preventDefault();
-        cards[cards.length - 1].focus();
-        cards[cards.length - 1].scrollIntoView({
-          behavior: 'smooth',
-          block: 'nearest',
-          inline: 'start'
-        });
-        break;
-    }
+  const keyboardHandler = focusManager.createKeyboardNavigator(grid, {
+    orientation: 'horizontal',
+    wrap: false
   });
+  
+  grid.addEventListener('keydown', keyboardHandler);
 }
 
 /**

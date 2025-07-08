@@ -93,29 +93,10 @@ limitations under the License.
     
     <!-- Immediate scroll reset to prevent page restoration scrolling -->
     <script>
-        // Prevent scroll restoration and force scroll to top immediately
+        // Simple scroll restoration prevention
         if ('scrollRestoration' in history) {
             history.scrollRestoration = 'manual';
         }
-        
-        // Force scroll to top immediately when page loads
-        window.addEventListener('DOMContentLoaded', function() {
-            window.scrollTo(0, 0);
-            document.documentElement.scrollTop = 0;
-            document.body.scrollTop = 0;
-            
-            // Re-enable smooth scrolling after ensuring we're at top
-            setTimeout(function() {
-                document.documentElement.classList.add('loaded');
-            }, 100);
-        });
-        
-        // Also force scroll to top on page show (handles back/forward navigation)
-        window.addEventListener('pageshow', function() {
-            window.scrollTo(0, 0);
-            document.documentElement.scrollTop = 0;
-            document.body.scrollTop = 0;
-        });
         
         // Force scroll to top immediately (synchronous)
         window.scrollTo(0, 0);
@@ -170,7 +151,13 @@ limitations under the License.
                                     <h3>Explore AI Ethics Categories</h3>
                                     <p>Navigate 10 compelling categories of ethical dilemmas in AI and technology</p>
                                     <div class="mega-menu-filter">
-                                        <input type="text" placeholder="Search categories..." class="mega-menu-search" aria-label="Search categories">
+                                        <input type="text" 
+                                               id="category-search" 
+                                               name="category-search"
+                                               placeholder="Search categories..." 
+                                               class="mega-menu-search" 
+                                               aria-label="Search categories"
+                                               autocomplete="off">
                                     </div>
                                 </div>
                                 <div class="mega-menu-grid">

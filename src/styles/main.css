@@ -1325,6 +1325,12 @@ body {
   height: auto;
   display: block;
   margin: 0 auto;
+  overflow: hidden !important; /* Fix CSS deprecation warning for Chart.js canvas elements */
+}
+
+/* Global fix for deprecated overflow: visible on media elements */
+canvas, img, video {
+  overflow: hidden !important; /* Prevent deprecated overflow: visible behavior */
 }
 
 /* Fix potential z-index issues */

@@ -1,5 +1,10 @@
+// Add timing constant
+const CLOSE_ANIMATION_DELAY = 200;
+
 // Reusable Modal/Dialog Component
 // Usage: const modal = new ReusableModal({ title, content, footer, onClose }); modal.open();
+
+import focusManager from '../utils/focus-manager.js';
 
 class ReusableModal {
   constructor({
@@ -85,7 +90,13 @@ class ReusableModal {
       this.modal.classList.add('show');
       this.modal.focus();
     }, 10);
-    this._trapFocus();
+    
+    // Create focus trap using centralized manager
+    this.focusTrap = focusManager.createTrap(this.modal, {
+      autoFocus: true,
+      restoreFocus: true
+    });
+    
     if (this.closeOnEscape) {
       this._escHandler = e => {
         if (e.key === 'Escape') this.close();
@@ -97,6 +108,13 @@ class ReusableModal {
 
   close() {
     if (!this.isOpen) return;
+    
+    // Clean up focus trap
+    if (this.focusTrap) {
+      this.focusTrap.destroy();
+      this.focusTrap = null;
+    }
+    
     this.backdrop.classList.remove('show');
     this.modal.classList.remove('show');
     setTimeout(() => {
@@ -104,7 +122,7 @@ class ReusableModal {
         this.backdrop.parentNode.removeChild(this.backdrop);
       if (this.modal.parentNode) this.modal.parentNode.removeChild(this.modal);
       if (typeof this.onClose === 'function') this.onClose();
-    }, 200);
+    }, CLOSE_ANIMATION_DELAY);
     if (this._escHandler) {
       document.removeEventListener('keydown', this._escHandler);
       this._escHandler = null;
@@ -138,15 +156,9 @@ class ReusableModal {
   }
 
   _trapFocus() {
-    // Simple focus trap for modal
-    const focusable = this.modal.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-    if (focusable.length) {
-      focusable[0].focus();
-    } else {
-      this.modal.focus();
-    }
+    // Focus trap is now handled by the centralized focus manager
+    // This method is kept for backward compatibility but does nothing
+    // Focus trap is set up in the open() method using focusManager.createTrap()
   }
 }
 

@@ -54,12 +54,15 @@ class EthicsScale {
           
           <input 
             type="range" 
+            id="ethics-scale-${this.id}"
+            name="ethics-scale-${this.id}"
             class="ethics-scale-slider"
             min="${this.options.min}"
             max="${this.options.max}"
             value="${this.value}"
             step="1"
             aria-label="Ethical rating scale"
+            autocomplete="off"
             ${this.options.disabled ? 'disabled' : ''}
           />
           

@@ -543,10 +543,13 @@ export class PostSimulationModal {
     switch (question.inputType) {
       case 'textarea':
         return `
-                    <textarea class="form-control" 
+                    <textarea id="question-${question.id}"
+                              name="question-${question.id}"
+                              class="form-control" 
                               rows="4" 
                               placeholder="Share your thoughts..."
-                              data-question="${question.id}"></textarea>
+                              data-question="${question.id}"
+                              autocomplete="off"></textarea>
                 `;
 
       case 'radio':
@@ -565,12 +568,15 @@ export class PostSimulationModal {
         return `
                     <div class="range-input">
                         <input type="range" 
+                               id="question-${question.id}"
+                               name="question-${question.id}"
                                min="${question.scale.min}" 
                                max="${question.scale.max}" 
                                value="${Math.ceil((question.scale.min + question.scale.max) / 2)}"
                                class="form-range"
-                               data-question="${question.id}">
-                        <div class="range-labels">
+                               data-question="${question.id}"
+                               aria-describedby="range-labels-${question.id}">
+                        <div class="range-labels" id="range-labels-${question.id}">
                             <span>${question.scale.labels[0]}</span>
                             <span>${question.scale.labels[1]}</span>
                         </div>
@@ -598,7 +604,12 @@ export class PostSimulationModal {
                 `;
 
       default:
-        return `<input type="text" class="form-control" data-question="${question.id}">`;
+        return `<input type="text" 
+                       id="question-${question.id}" 
+                       name="question-${question.id}"
+                       class="form-control" 
+                       data-question="${question.id}"
+                       autocomplete="off">`;
     }
   }
 

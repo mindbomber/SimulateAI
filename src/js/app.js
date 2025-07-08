@@ -33,7 +33,8 @@ import { simpleAnalytics } from './utils/simple-analytics.js';
 import Helpers from './utils/helpers.js';
 import canvasManager from './utils/canvas-manager.js';
 import logger from './utils/logger.js';
-import { initializeHorizontalScroll, preventPageScrollSnap } from './utils/horizontal-scroll.js';
+import focusManager from './utils/focus-manager.js';
+import scrollManager from './utils/scroll-manager.js';
 
 // Import enhanced objects (loaded dynamically as needed)
 // import { EthicsMeter, InteractiveButton, InteractiveSlider } from './objects/enhanced-objects.js';
@@ -158,7 +159,7 @@ class AIEthicsApp {
           'Explore real-world AI scenarios and see how different choices affect various groups in society. No right answers - just learning through cause and effect.',
         difficulty: 'beginner',
         duration: 1200, // 20 minutes
-        thumbnail: 'src/assets/images/bias-fairness-thumb.svg',
+        thumbnail: null, // Placeholder - will use default thumbnail
         tags: ['ethics', 'fairness', 'education', 'scenarios', 'open-ended'],
         useCanvas: false, // HTML-only simulation, no canvas needed
         renderMode: 'html',
@@ -199,22 +200,8 @@ class AIEthicsApp {
     if (this.isInitialized) return;
 
     try {
-      // IMMEDIATE scroll reset - before any other operations
-      window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-      
-      // Prevent automatic scroll restoration on page refresh
-      if ('scrollRestoration' in history) {
-        history.scrollRestoration = 'manual';
-      }
-      
-      // Force scroll to top again after a short delay to override any browser restoration
-      setTimeout(() => {
-        window.scrollTo(0, 0);
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
-      }, 10);
+      // Initialize scroll manager first (handles all scroll behavior)
+      scrollManager.init();
 
       // Initialize theme detection first
       this.initializeTheme();
@@ -264,12 +251,6 @@ class AIEthicsApp {
       } else {
         AppDebug.warn('OnboardingTour instance already exists, skipping initialization');
       }
-
-      // Prevent page scroll snap issues
-      preventPageScrollSnap();
-
-      // Initialize horizontal scroll functionality
-      initializeHorizontalScroll();
 
       // Initialize scroll reveal header
       this.initializeScrollRevealHeader();
@@ -1400,18 +1381,6 @@ class AIEthicsApp {
 
       // Load the specific simulation class based on ID
       switch (simulationId) {
-        case 'bias-fairness': {
-          const { default: BiasExplorerSimulation } = await import(
-            './simulations/bias-fairness-v2.js'
-          );
-          simulation = new BiasExplorerSimulation(simulationId);
-          // Set container reference
-          simulation.container = document.getElementById(
-            'simulation-container'
-          );
-          break;
-        }
-
         default: {
           // Fallback to basic simulation for unimplemented simulations
           const basicScenarios = [
@@ -1587,13 +1556,7 @@ class AIEthicsApp {
         },
       };
 
-      // For bias-fairness simulation, optimize for content space
-      if (simulationId === 'bias-fairness') {
-        modalOptions.showResourcePanel = false; // Hide resource panel by default
-        modalOptions.collapseEthicsMeters = true; // Hide ethics meters
-        modalOptions.showTabs = false; // Hide tabs for cleaner interface
-        modalOptions.size = 'large'; // Use large size for more space
-      }
+      // No specific simulation optimizations needed - all use default configuration
 
       this.enhancedModal = new EnhancedSimulationModal(
         simulationId,
@@ -1669,38 +1632,22 @@ class AIEthicsApp {
       mainContent.setAttribute('inert', '');
     }
 
-    // Focus management - focus the close button initially
-    const closeButton = this.modal.querySelector('.modal-close');
-    if (closeButton) {
-      closeButton.focus();
-    }
+    // Focus management - create focus trap for modal
+    this.modalFocusTrap = focusManager.createTrap(this.modal, {
+      autoFocus: true,
+      restoreFocus: true
+    });
   }
 
   /**
-   * Trap focus within modal for accessibility
+   * Handle keyboard navigation in modal (delegated to focus manager)
    */
   trapFocusInModal(event) {
-    if (!this.modal || this.modal.hasAttribute('aria-hidden')) return;
-
-    const focusableElements = this.modal.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-
-    const firstFocusable = focusableElements[0];
-    const lastFocusable = focusableElements[focusableElements.length - 1];
-
-    if (event.shiftKey) {
-      // Shift + Tab
-      if (document.activeElement === firstFocusable) {
-        lastFocusable.focus();
-        event.preventDefault();
-      }
-    } else {
-      // Tab
-      if (document.activeElement === lastFocusable) {
-        firstFocusable.focus();
-        event.preventDefault();
-      }
+    // This is now handled by the focus manager
+    // Keep method for backward compatibility but delegate to focus manager
+    if (this.modalFocusTrap && event.key === 'Tab') {
+      // Focus manager handles this automatically
+      return;
     }
   }
 
@@ -1735,19 +1682,12 @@ class AIEthicsApp {
     this.ethicsMetersCanvasId = null;
     this.interactiveButtonsCanvasId = null;
     this.simulationSlidersCanvasId = null;
+    
     if (this.modal) {
-      // Remove focus from any focused elements inside the modal first
-      const focusedElement = this.modal.querySelector(':focus');
-      if (focusedElement) {
-        focusedElement.blur();
-      }
-
-      // Restore focus to the element that was focused before the modal opened
-      if (
-        this.lastFocusedElement &&
-        document.contains(this.lastFocusedElement)
-      ) {
-        this.lastFocusedElement.focus();
+      // Clean up focus trap
+      if (this.modalFocusTrap) {
+        this.modalFocusTrap.destroy();
+        this.modalFocusTrap = null;
       }
 
       // Make modal inert and hide it
@@ -2578,12 +2518,14 @@ class AIEthicsApp {
   /**
    * Scroll to the simulations section
    */
-  scrollToSimulations() {
-    const simulationsSection = document.getElementById('simulations');
-    if (simulationsSection) {
-      simulationsSection.scrollIntoView({
+  /**
+   * Scroll to simulations section using unified scroll manager
+   */
+  async scrollToSimulations() {
+    try {
+      await scrollManager.scrollToElement('#simulations', {
         behavior: 'smooth',
-        block: 'start'
+        offset: 80
       });
       
       logger.info('Scrolled to simulations section');
@@ -2592,8 +2534,8 @@ class AIEthicsApp {
       simpleAnalytics.trackEvent('navigation_to_simulations', {
         source: 'start_learning_button'
       });
-    } else {
-      logger.error('Simulations section not found');
+    } catch (error) {
+      logger.error('Failed to scroll to simulations:', error);
     }
   }
 

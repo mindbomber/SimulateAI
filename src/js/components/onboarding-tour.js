@@ -20,6 +20,8 @@
  */
 
 import logger from '../utils/logger.js';
+import focusManager from '../utils/focus-manager.js';
+import scrollManager from '../utils/scroll-manager.js';
 import { simpleStorage } from '../utils/simple-storage.js';
 import { simpleAnalytics } from '../utils/simple-analytics.js';
 
@@ -624,108 +626,19 @@ class OnboardingTour {
     }
   }
 
-  scrollToElement(element, offset = this.SCROLL_OFFSET) {
-    if (!element) return Promise.resolve();
-
-    // Check if element is inside a modal
-    const modalContainer = element.closest('.scenario-modal, .pre-launch-modal, .modal, [role="dialog"]');
+  /**
+   * Scroll to element using unified scroll manager
+   * @param {HTMLElement} element - Element to scroll to
+   * @param {number} offset - Scroll offset
+   * @returns {Promise<void>} Promise that resolves when scrolling is complete
+   */
+  async scrollToElement(element, offset = this.SCROLL_OFFSET) {
+    if (!element) return;
     
-    if (modalContainer) {
-      // Scroll within the modal container
-      return this.scrollWithinModal(element, modalContainer, offset);
-    } else {
-      // Scroll the main window
-      return this.scrollMainWindow(element, offset);
-    }
-  }
-
-  scrollWithinModal(element, modalContainer, offset = this.SCROLL_OFFSET) {
-    const modalScrollContainer = modalContainer.querySelector('.modal-content, .scenario-content, .modal-body') || modalContainer;
-    
-    const elementRect = element.getBoundingClientRect();
-    const containerRect = modalScrollContainer.getBoundingClientRect();
-    const currentScrollTop = modalScrollContainer.scrollTop;
-    
-    // Calculate relative position within the modal
-    const elementTopInModal = (elementRect.top - containerRect.top) + currentScrollTop;
-    const targetScrollTop = Math.max(0, elementTopInModal - offset);
-
-    return new Promise((resolve) => {
-      const startScrollTop = currentScrollTop;
-      const distance = targetScrollTop - startScrollTop;
-      const duration = this.SCROLL_DURATION;
-      let startTime = null;
-
-      if (Math.abs(distance) < this.MIN_SCROLL_DISTANCE) {
-        resolve();
-        return;
-      }
-
-      this.isAutoScrolling = true; // Set flag before animation starts
-
-      const animation = (currentTime) => {
-        if (startTime === null) startTime = currentTime;
-        const timeElapsed = currentTime - startTime;
-        const progress = Math.min(timeElapsed / duration, 1);
-
-        // Ease-in-out function
-        const ease = progress < this.EASE_MIDPOINT 
-          ? 2 * progress * progress 
-          : -1 + (this.EASE_MULTIPLIER - 2 * progress) * progress;
-
-        modalScrollContainer.scrollTop = startScrollTop + distance * ease;
-
-        if (progress < 1) {
-          requestAnimationFrame(animation);
-        } else {
-          this.isAutoScrolling = false; // Clear flag when animation completes
-          resolve();
-        }
-      };
-
-      requestAnimationFrame(animation);
-    });
-  }
-
-  scrollMainWindow(element, offset = this.SCROLL_OFFSET) {
-    const elementRect = element.getBoundingClientRect();
-    const absoluteElementTop = elementRect.top + window.pageYOffset;
-    const targetScrollTop = Math.max(0, absoluteElementTop - offset);
-
-    return new Promise((resolve) => {
-      const startScrollTop = window.pageYOffset;
-      const distance = targetScrollTop - startScrollTop;
-      const duration = this.SCROLL_DURATION;
-      let startTime = null;
-
-      if (Math.abs(distance) < this.MIN_SCROLL_DISTANCE) {
-        resolve();
-        return;
-      }
-
-      this.isAutoScrolling = true; // Set flag before animation starts
-
-      const animation = (currentTime) => {
-        if (startTime === null) startTime = currentTime;
-        const timeElapsed = currentTime - startTime;
-        const progress = Math.min(timeElapsed / duration, 1);
-
-        // Ease-in-out function
-        const ease = progress < this.EASE_MIDPOINT 
-          ? 2 * progress * progress 
-          : -1 + (this.EASE_MULTIPLIER - 2 * progress) * progress;
-
-        window.scrollTo(0, startScrollTop + distance * ease);
-
-        if (progress < 1) {
-          requestAnimationFrame(animation);
-        } else {
-          this.isAutoScrolling = false; // Clear flag when animation completes
-          resolve();
-        }
-      };
-
-      requestAnimationFrame(animation);
+    // Use the unified scroll manager
+    await scrollManager.scrollToElement(element, {
+      behavior: 'smooth',
+      offset
     });
   }
 
@@ -1266,19 +1179,14 @@ class OnboardingTour {
 
     this.coachMark.addEventListener('keydown', this.currentKeyHandler);
 
-    // Focus management - only focus if user explicitly navigated with keyboard
+    // Focus management - use centralized focus manager for cleaner implementation
     const firstButton = this.coachMark.querySelector('.coach-mark-btn');
     if (firstButton) {
-      const FOCUS_DELAY = 100; // ms - Small delay to ensure coach mark is positioned
-      setTimeout(() => {
-        // Only auto-focus if the user explicitly used keyboard navigation (Tab key)
-        // Don't auto-focus on initial tour load to prevent "selected" appearance
-        if (this.wasKeyboardNavigation && 
-            (document.documentElement.classList.contains('keyboard-navigation') || 
-             (document.activeElement && document.activeElement.tagName === 'BUTTON'))) {
-          firstButton.focus();
-        }
-      }, FOCUS_DELAY);
+      // Auto-focus using focus manager which respects keyboard navigation preferences
+      focusManager.autoFocus(this.coachMark, {
+        keyboardOnly: true,
+        delay: 100 // Small delay to ensure coach mark is positioned
+      });
     }
 
     logger.debug('OnboardingTour', 'Event listeners set up successfully', {
