@@ -26,6 +26,15 @@
 import { simpleStorage, userPreferences } from './simple-storage.js';
 import logger from './logger.js';
 
+// Constants to avoid magic numbers
+const ANALYTICS_CONSTANTS = {
+  MAX_EVENTS: 100,
+  SESSION_ID_RADIX: 36,
+  SESSION_ID_SUFFIX_START: 2,
+  SESSION_ID_SUFFIX_LENGTH: 11,
+  AUTO_SAVE_INTERVAL: 30000, // 30 seconds
+};
+
 /**
  * Simple analytics manager for educational platforms
  */
@@ -33,7 +42,7 @@ class SimpleAnalyticsManager {
   constructor() {
     this.enabled = true;
     this.events = [];
-    this.maxEvents = 100;
+    this.maxEvents = ANALYTICS_CONSTANTS.MAX_EVENTS;
     this.sessionId = this.generateSessionId();
     this.startTime = Date.now();
 
@@ -44,7 +53,7 @@ class SimpleAnalyticsManager {
    * Generate a simple session ID
    */
   generateSessionId() {
-    return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `session_${Date.now()}_${Math.random().toString(ANALYTICS_CONSTANTS.SESSION_ID_RADIX).substring(ANALYTICS_CONSTANTS.SESSION_ID_SUFFIX_START, ANALYTICS_CONSTANTS.SESSION_ID_SUFFIX_LENGTH)}`;
   }
 
   /**
@@ -240,7 +249,7 @@ class SimpleAnalyticsManager {
       // Auto-save events periodically
       setInterval(() => {
         this.saveEvents();
-      }, 30000); // Every 30 seconds
+      }, ANALYTICS_CONSTANTS.AUTO_SAVE_INTERVAL); // Every 30 seconds
 
       // Save events when page unloads
       window.addEventListener('beforeunload', () => {

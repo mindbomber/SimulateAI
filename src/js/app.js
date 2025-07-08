@@ -35,6 +35,7 @@ import canvasManager from './utils/canvas-manager.js';
 import logger from './utils/logger.js';
 import focusManager from './utils/focus-manager.js';
 import scrollManager from './utils/scroll-manager.js';
+import { loopDetector } from './utils/infinite-loop-detector.js';
 
 // Import enhanced objects (loaded dynamically as needed)
 // import { EthicsMeter, InteractiveButton, InteractiveSlider } from './objects/enhanced-objects.js';
@@ -209,6 +210,9 @@ class AIEthicsApp {
       // Initialize error handling
       this.initializeErrorHandling();
 
+      // Initialize infinite loop detection (development mode only)
+      this.initializeLoopDetection();
+
       // Initialize core systems
       await this.initializeSystems();
 
@@ -245,6 +249,9 @@ class AIEthicsApp {
         
         // Make onboarding tour available globally for debugging
         window.onboardingTourInstance = this.onboardingTour;
+        
+        // Instrument onboarding tour for loop detection (development mode)
+        this.instrumentOnboardingTour(this.onboardingTour);
         
         // Check and start onboarding tour for first-time users
         this.checkAndStartOnboardingTour();
@@ -920,13 +927,29 @@ class AIEthicsApp {
         e.preventDefault(); // Prevent default link behavior
         this.startOnboardingTour();
         
-        // Close mobile navigation if open
+        // Close mobile navigation if open, with proper focus management
         const navToggle = document.querySelector('.nav-toggle');
-        const nav = document.querySelector('.nav');
-        if (nav && nav.classList.contains('active')) {
-          nav.classList.remove('active');
-          navToggle?.setAttribute('aria-expanded', 'false');
-          document.body.classList.remove('nav-open');
+        const mainNav = document.querySelector('.main-nav');
+        if (mainNav && mainNav.classList.contains('open')) {
+          // Move focus away from the clicked tour button before hiding navigation
+          if (navToggle) {
+            navToggle.focus();
+          } else {
+            document.body.focus();
+          }
+          
+          // Close navigation after focus has moved
+          setTimeout(() => {
+            mainNav.classList.remove('open');
+            navToggle?.setAttribute('aria-expanded', 'false');
+            mainNav.setAttribute('aria-hidden', 'true');
+            
+            // Also handle nav backdrop if present
+            const navBackdrop = document.querySelector('.nav-backdrop');
+            if (navBackdrop) {
+              navBackdrop.classList.remove('open');
+            }
+          }, 0);
         }
       });
     }
@@ -2061,23 +2084,25 @@ class AIEthicsApp {
         navBackdrop.classList.toggle('open', shouldOpen);
       }
 
-      // Update ARIA attributes
-      navToggle.setAttribute('aria-expanded', shouldOpen.toString());
-      mainNav.setAttribute('aria-hidden', (!shouldOpen).toString());
-
-      // Prevent body scroll when nav is open
-      document.body.style.overflow = shouldOpen ? 'hidden' : '';
-
-      // Focus management
+      // Update ARIA attributes and focus management
       if (shouldOpen) {
+        navToggle.setAttribute('aria-expanded', 'true');
+        mainNav.setAttribute('aria-hidden', 'false');
+        
         // Focus first nav link when opening
         const firstNavLink = mainNav.querySelector('.nav-link');
         if (firstNavLink) {
           setTimeout(() => firstNavLink.focus(), 100);
         }
       } else {
-        // Return focus to toggle button when closing
+        // Move focus away from navigation before hiding it
         navToggle.focus();
+        
+        // Set aria attributes after focus has moved
+        setTimeout(() => {
+          navToggle.setAttribute('aria-expanded', 'false');
+          mainNav.setAttribute('aria-hidden', 'true');
+        }, 0);
       }
 
       // Analytics
@@ -2142,6 +2167,20 @@ class AIEthicsApp {
           return;
         }
 
+        // Move focus away from the clicked link before closing navigation
+        // This prevents accessibility issues with aria-hidden on focused elements
+        const moveFocusAndCloseNav = () => {
+          // Move focus to a safe element (nav toggle button or document body)
+          if (navToggle) {
+            navToggle.focus();
+          } else {
+            document.body.focus();
+          }
+          
+          // Close navigation after focus has moved
+          setTimeout(() => toggleNav(false), 0);
+        };
+
         // Handle hash-based navigation
         if (href && href.startsWith('#') && href !== '#') {
           // Prevent default browser jump behavior
@@ -2152,8 +2191,8 @@ class AIEthicsApp {
           if (targetElement) {
             logger.info(`Navigating to section: ${href}`);
 
-            // Close mobile nav first
-            toggleNav(false);
+            // Move focus and close mobile nav first
+            moveFocusAndCloseNav();
 
             // Then smoothly scroll to target after a brief delay
             const SCROLL_DELAY = 100;
@@ -2174,8 +2213,8 @@ class AIEthicsApp {
           } else {
             logger.warn(`Navigation target not found: ${href}`);
 
-            // Close menu immediately for missing targets
-            toggleNav(false);
+            // Move focus and close menu for missing targets
+            moveFocusAndCloseNav();
 
             // Show user feedback for missing sections
             const NOTIFICATION_DURATION = 3000;
@@ -2198,8 +2237,8 @@ class AIEthicsApp {
         } else {
           logger.info(`External link or non-hash navigation: ${href}`);
 
-          // For external links, close nav immediately
-          toggleNav(false);
+          // For external links, move focus and close nav before navigation
+          moveFocusAndCloseNav();
 
           // Track external navigation
           simpleAnalytics.trackEvent('navigation_link_clicked', {
@@ -2343,17 +2382,23 @@ class AIEthicsApp {
             const navBackdrop = document.querySelector('.nav-backdrop');
             
             if (mainNav && navToggle) {
-              mainNav.classList.remove('open');
-              navToggle.classList.remove('active');
-              navToggle.setAttribute('aria-expanded', 'false');
-              mainNav.setAttribute('aria-hidden', 'true');
+              // Move focus away from the clicked mega menu item before hiding navigation
+              navToggle.focus();
               
-              if (navBackdrop) {
-                navBackdrop.classList.remove('open');
-              }
-              
-              // Restore body scroll
-              document.body.style.overflow = '';
+              // Close navigation after focus has moved
+              setTimeout(() => {
+                mainNav.classList.remove('open');
+                navToggle.classList.remove('active');
+                navToggle.setAttribute('aria-expanded', 'false');
+                mainNav.setAttribute('aria-hidden', 'true');
+                
+                if (navBackdrop) {
+                  navBackdrop.classList.remove('open');
+                }
+                
+                // Restore body scroll
+                document.body.style.overflow = '';
+              }, 0);
             }
           }
           
@@ -2406,17 +2451,23 @@ class AIEthicsApp {
             const navBackdrop = document.querySelector('.nav-backdrop');
             
             if (mainNav && navToggle) {
-              mainNav.classList.remove('open');
-              navToggle.classList.remove('active');
-              navToggle.setAttribute('aria-expanded', 'false');
-              mainNav.setAttribute('aria-hidden', 'true');
+              // Move focus away from the clicked view all link before hiding navigation
+              navToggle.focus();
               
-              if (navBackdrop) {
-                navBackdrop.classList.remove('open');
-              }
-              
-              // Restore body scroll
-              document.body.style.overflow = '';
+              // Close navigation after focus has moved
+              setTimeout(() => {
+                mainNav.classList.remove('open');
+                navToggle.classList.remove('active');
+                navToggle.setAttribute('aria-expanded', 'false');
+                mainNav.setAttribute('aria-hidden', 'true');
+                
+                if (navBackdrop) {
+                  navBackdrop.classList.remove('open');
+                }
+                
+                // Restore body scroll
+                document.body.style.overflow = '';
+              }, 0);
             }
           }
           
@@ -2477,7 +2528,7 @@ class AIEthicsApp {
     document.addEventListener('DOMContentLoaded', initializeMegaMenu);
   }
 
-  /**
+ /**
    * Sets up focus trap for mobile navigation
    */
   setupNavFocusTrap(navElement, _toggleButton) {
@@ -2577,6 +2628,56 @@ class AIEthicsApp {
     // For now, scroll to simulations as a placeholder
     this.scrollToSimulations();
   }
+
+  /**
+   * Initialize infinite loop detection for development
+   */
+  initializeLoopDetection() {
+    // Only enable in development mode or when explicitly requested
+    const isDevelopment = process.env.NODE_ENV === 'development' || 
+                         window.location.hostname === 'localhost' ||
+                         window.location.search.includes('debug=true');
+    
+    if (isDevelopment) {
+      // Enable the loop detector
+      loopDetector.setEnabled(true);
+      
+      // Add to window for easy access in development
+      window.loopDetector = loopDetector;
+      
+      // Track critical onboarding methods that previously had loops
+      if (window.onboardingTourInstance) {
+        this.instrumentOnboardingTour(window.onboardingTourInstance);
+      }
+      
+      logger.info('InfiniteLoopDetector', '🔧 Loop detection enabled for development');
+    } else {
+      // Disable in production
+      loopDetector.setEnabled(false);
+      logger.info('InfiniteLoopDetector', '🔒 Loop detection disabled for production');
+    }
+  }
+
+  /**
+   * Instrument onboarding tour methods for loop detection
+   */
+  instrumentOnboardingTour(tour) {
+    const criticalMethods = ['positionCoachMark', 'showStep', 'nextStep', 'handleAction'];
+    
+    criticalMethods.forEach(methodName => {
+      if (tour[methodName]) {
+        const original = tour[methodName];
+        tour[methodName] = function(...args) {
+          loopDetector.trackExecution(`OnboardingTour.${methodName}`);
+          return original.apply(this, args);
+        };
+      }
+    });
+    
+    logger.info('InfiniteLoopDetector', '📊 Instrumented OnboardingTour methods for monitoring');
+  }
+
+  // ...existing methods...
 }
 
 /**
@@ -2678,6 +2779,12 @@ class EthicsRadarDemo {
     const popoverContent = feedbackContainer.querySelector('.popover-content');
     if (!popoverContent) return;
 
+    // Clear any existing auto-hide timer
+    if (popoverHideTimeout) {
+      clearTimeout(popoverHideTimeout);
+      popoverHideTimeout = null;
+    }
+
     const feedbackMessages = {
       utilitarian: {
         title: 'Utilitarian Ethics',
@@ -2708,10 +2815,23 @@ class EthicsRadarDemo {
                 <p>${feedback.message}</p>
             `;
       feedbackContainer.classList.add('show');
+      
+      // Set auto-hide timer for 5 seconds
+      const AUTO_HIDE_DELAY = 5000; // 5 seconds
+      popoverHideTimeout = setTimeout(() => {
+        this.hideFeedback();
+        popoverHideTimeout = null;
+      }, AUTO_HIDE_DELAY);
     }
   }
 
   hideFeedback() {
+    // Clear any existing auto-hide timer
+    if (popoverHideTimeout) {
+      clearTimeout(popoverHideTimeout);
+      popoverHideTimeout = null;
+    }
+    
     const feedbackContainer = document.getElementById('hero-demo-feedback');
     if (!feedbackContainer) return;
     
@@ -2730,6 +2850,7 @@ class EthicsRadarDemo {
 // Initialize the ethics radar demo when DOM is ready
 let ethicsDemo = null;
 let currentActivePattern = null; // Track currently active pattern
+let popoverHideTimeout = null; // Track auto-hide timer for popover
 
 // Global functions for radar demo controls with toggle functionality
 window.simulateEthicsPattern = function (pattern, buttonElement) {

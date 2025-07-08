@@ -17,6 +17,8 @@
  * @license Apache-2.0
  */
 
+import logger from './logger.js';
+
 // Enhanced constants and configuration
 const CANVAS_CONSTANTS = {
   DEFAULT_WIDTH: 400,
@@ -29,6 +31,38 @@ const CANVAS_CONSTANTS = {
   CLEANUP_INTERVAL: 300000, // 5 minutes
   TOUCH_TARGET_SIZE: 44,
   FOCUS_RING_WIDTH: 3,
+};
+
+// Performance thresholds
+const PERFORMANCE_THRESHOLDS = {
+  ENGINE_CREATION: 50, // ms - Engine/canvas creation can take longer
+  RENDER_TARGET: 16, // ms - Rendering operations should be fast (60fps)
+  DEFAULT_OPERATION: 25, // ms - Default threshold for other operations
+  SIGNIFICANT_SIZE_CHANGE: 50, // px - Significant canvas size change
+  DIMENSION_TOLERANCE: 5, // px - Tolerance for dimension changes
+};
+
+// Memory and time constants
+const KB_SIZE = 1024;
+const MEMORY_CONSTANTS = {
+  BYTES_PER_PIXEL: 4, // RGBA
+  KB_SIZE,
+  BYTES_PER_KB: KB_SIZE,
+  BYTES_PER_MB: KB_SIZE * KB_SIZE,
+  DEFAULT_MAX_MEMORY_MB: 100, // 100MB
+  CLEANUP_MAX_AGE_MINUTES: 30, // 30 minutes
+  SECONDS_PER_MINUTE: 60,
+  MS_PER_SECOND: 1000,
+};
+
+// Computed constants
+const COMPUTED_CONSTANTS = {
+  get DEFAULT_MAX_MEMORY() {
+    return MEMORY_CONSTANTS.DEFAULT_MAX_MEMORY_MB * MEMORY_CONSTANTS.BYTES_PER_MB;
+  },
+  get CLEANUP_MAX_AGE() {
+    return MEMORY_CONSTANTS.CLEANUP_MAX_AGE_MINUTES * MEMORY_CONSTANTS.SECONDS_PER_MINUTE * MEMORY_CONSTANTS.MS_PER_SECOND;
+  }
 };
 
 const CANVAS_EVENTS = {
@@ -113,12 +147,12 @@ class CanvasPerformanceMonitor {
         opId.includes('engine-creation') ||
         opId.includes('canvas-creation')
       ) {
-        return 50; // Engine/canvas creation can take longer
+        return PERFORMANCE_THRESHOLDS.ENGINE_CREATION; // Engine/canvas creation can take longer
       }
       if (opId.includes('render') || opId.includes('draw')) {
-        return 16; // Rendering operations should be fast (60fps)
+        return PERFORMANCE_THRESHOLDS.RENDER_TARGET; // Rendering operations should be fast (60fps)
       }
-      return 25; // Default threshold for other operations
+      return PERFORMANCE_THRESHOLDS.DEFAULT_OPERATION; // Default threshold for other operations
     };
 
     const threshold = getThreshold(operationId);
@@ -159,7 +193,6 @@ class CanvasError extends Error {
 /**
  * Enhanced Canvas Manager with modern features and accessibility
  */
-import logger from './logger.js';
 
 class CanvasManager {
   constructor() {
@@ -535,7 +568,7 @@ class CanvasManager {
         performance: {
           monitoring: true,
           targetFPS: 60,
-          maxMemoryUsage: 100 * 1024 * 1024, // 100MB
+          maxMemoryUsage: COMPUTED_CONSTANTS.DEFAULT_MAX_MEMORY, // 100MB
         },
         ...engineOptions,
       };
@@ -621,7 +654,7 @@ class CanvasManager {
             canvasData.performanceMetrics.renderCount;
 
           // Warn about slow renders
-          if (renderTime > 16) {
+          if (renderTime > PERFORMANCE_THRESHOLDS.RENDER_TARGET) {
             this.emit(CANVAS_EVENTS.PERFORMANCE_WARNING, {
               canvasId,
               renderTime,
@@ -955,13 +988,13 @@ class CanvasManager {
     for (const [, canvasData] of this.canvases) {
       const canvas = canvasData.element;
       // Estimate memory usage based on canvas size and pixel data
-      const pixelData = canvas.width * canvas.height * 4; // RGBA
+      const pixelData = canvas.width * canvas.height * MEMORY_CONSTANTS.BYTES_PER_PIXEL; // RGBA
       totalMemory += pixelData;
     }
 
     return {
       estimatedBytes: totalMemory,
-      estimatedMB: (totalMemory / (1024 * 1024)).toFixed(2),
+      estimatedMB: (totalMemory / MEMORY_CONSTANTS.BYTES_PER_MB).toFixed(2),
       canvasCount: this.canvases.size,
     };
   }
@@ -1025,7 +1058,7 @@ class CanvasManager {
         const sizeChange =
           Math.abs(validatedWidth - oldWidth) +
           Math.abs(validatedHeight - oldHeight);
-        if (sizeChange > 50) {
+        if (sizeChange > PERFORMANCE_THRESHOLDS.SIGNIFICANT_SIZE_CHANGE) {
           this.announceToScreenReader(
             `Canvas resized to ${validatedWidth} by ${validatedHeight} pixels`
           );
@@ -1080,8 +1113,8 @@ class CanvasManager {
 
             // Only resize if dimensions changed significantly
             if (
-              Math.abs(width - canvas.width) > 5 ||
-              Math.abs(height - canvas.height) > 5
+              Math.abs(width - canvas.width) > PERFORMANCE_THRESHOLDS.DIMENSION_TOLERANCE ||
+              Math.abs(height - canvas.height) > PERFORMANCE_THRESHOLDS.DIMENSION_TOLERANCE
             ) {
               this.resizeCanvas(canvasId, width, height);
             }
@@ -1119,7 +1152,7 @@ class CanvasManager {
   performMaintenanceCleanup() {
     try {
       const now = Date.now();
-      const maxAge = 30 * 60 * 1000; // 30 minutes
+      const maxAge = MEMORY_CONSTANTS.CLEANUP_MAX_AGE_MINUTES * MEMORY_CONSTANTS.SECONDS_PER_MINUTE * MEMORY_CONSTANTS.MS_PER_SECOND;
       let cleanedCount = 0;
 
       // Clean up old canvases that might be orphaned

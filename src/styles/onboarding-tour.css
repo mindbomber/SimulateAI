@@ -242,6 +242,21 @@ body.onboarding-active {
     margin: 0 16px;
   }
 
+  /* Mobile overlay mode - full width at bottom when space is constrained */
+  .onboarding-coach-mark.mobile-overlay {
+    position: fixed !important;
+    bottom: 60px; /* Space for navigation */
+    left: 16px !important;
+    right: 16px !important;
+    width: calc(100vw - 32px) !important;
+    max-width: calc(100vw - 32px) !important;
+    min-width: calc(100vw - 32px) !important;
+    max-height: 50vh;
+    overflow-y: auto;
+    transform: none;
+    animation: onboarding-mobile-slide-up 0.3s ease-out forwards;
+  }
+
   .coach-mark-header {
     padding: 16px 16px 0 16px;
   }
@@ -287,6 +302,17 @@ body.onboarding-active {
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes onboarding-mobile-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

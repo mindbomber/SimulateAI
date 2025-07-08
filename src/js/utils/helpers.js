@@ -43,6 +43,47 @@ const HELPERS_CONSTANTS = {
   MAX_CACHE_SIZE: 1000,
   CACHE_EXPIRY: 300000, // 5 minutes
   PERFORMANCE_SAMPLE_RATE: 0.1,
+  
+  // Text analysis constants
+  TEXT_ANALYSIS: {
+    EXCESSIVE_CAPS_PENALTY: 50,
+    EXCESSIVE_PUNCTUATION_PENALTY: 20,
+    PUNCTUATION_THRESHOLD: 0.1,
+    PUNCTUATION_PENALTY: 15,
+    MAX_WORDS_PER_SENTENCE: 20,
+  },
+  
+  // Time constants
+  TIME: {
+    SECONDS_PER_MINUTE: 60,
+    MINUTES_PER_HOUR: 60,
+    HOURS_PER_DAY: 24,
+    DAYS_PER_WEEK: 7,
+    DAYS_PER_MONTH: 30,
+    DAYS_PER_YEAR: 365,
+    MILLISECONDS_PER_SECOND: 1000,
+    WEEKEND_DAYS: [0, 6], // Sunday and Saturday
+  },
+  
+  // Color constants
+  COLOR: {
+    RGB_MAX: 255,
+    HEX_SHORT_LENGTH: 3,
+    HEX_SHIFT_ALPHA: 24,
+    HEX_SHIFT_RED: 16,
+    HEX_SHIFT_GREEN: 8,
+    HEX_BASE: 16,
+    THRESHOLD_LOW: 30,
+    THRESHOLD_MEDIUM: 60,
+    THRESHOLD_HIGH: 50,
+    LUMINANCE_OFFSET: 0.05,
+    LUMINANCE_THRESHOLD: 0.03928,
+    LUMINANCE_DIVISOR: 12.92,
+    LUMINANCE_OFFSET_2: 0.055,
+    LUMINANCE_DIVISOR_2: 1.055,
+    LUMINANCE_EXPONENT: 2.4,
+  },
+  
   VALIDATION_PATTERNS: {
     EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     URL: /^https?:\/\/[^\s/$.?#].[^\s]*$/i,
@@ -669,21 +710,21 @@ class Helpers {
     // Check length
     if (text.length === 0) {
       issues.push('Text is empty');
-      score -= 50;
+      score -= HELPERS_CONSTANTS.TEXT_ANALYSIS.EXCESSIVE_CAPS_PENALTY;
     }
 
     // Check for all caps (poor for screen readers)
     if (text.length > 10 && text === text.toUpperCase()) {
       issues.push('Text is all uppercase');
-      score -= 20;
+      score -= HELPERS_CONSTANTS.TEXT_ANALYSIS.EXCESSIVE_PUNCTUATION_PENALTY;
     }
 
     // Check for excessive punctuation
     const punctuationRatio =
       (text.match(/[!?]{2,}/g) || []).length / text.length;
-    if (punctuationRatio > 0.1) {
+    if (punctuationRatio > HELPERS_CONSTANTS.TEXT_ANALYSIS.PUNCTUATION_THRESHOLD) {
       issues.push('Excessive punctuation detected');
-      score -= 15;
+      score -= HELPERS_CONSTANTS.TEXT_ANALYSIS.PUNCTUATION_PENALTY;
     }
 
     // Check reading level (simplified)
@@ -691,7 +732,7 @@ class Helpers {
     const words = text.split(/\s+/).filter(w => w.length > 0);
     const avgWordsPerSentence = words.length / Math.max(sentences.length, 1);
 
-    if (avgWordsPerSentence > 20) {
+    if (avgWordsPerSentence > HELPERS_CONSTANTS.TEXT_ANALYSIS.MAX_WORDS_PER_SENTENCE) {
       issues.push('Sentences may be too long');
       score -= 10;
     }
@@ -731,8 +772,8 @@ class Helpers {
         parts.push(
           `${hours % COMMON.HOURS_24} hour${hours % COMMON.HOURS_24 > 1 ? 's' : ''}`
         );
-      if (minutes % 60 > 0)
-        parts.push(`${minutes % 60} minute${minutes % 60 > 1 ? 's' : ''}`);
+      if (minutes % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE > 0)
+        parts.push(`${minutes % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE} minute${minutes % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE > 1 ? 's' : ''}`);
       if (seconds % COMMON.MINUTES_60 > 0)
         parts.push(
           `${seconds % COMMON.MINUTES_60} second${seconds % COMMON.MINUTES_60 > 1 ? 's' : ''}`
@@ -745,12 +786,12 @@ class Helpers {
     if (days > 0) {
       return `${days}d ${hours % COMMON.HOURS_24}h ${minutes % COMMON.MINUTES_60}m`;
     } else if (hours > 0) {
-      return `${hours}:${(minutes % 60).toString().padStart(2, '0')}:${(seconds % 60).toString().padStart(2, '0')}`;
+      return `${hours}:${(minutes % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE).toString().padStart(2, '0')}:${(seconds % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE).toString().padStart(2, '0')}`;
     } else if (minutes > 0) {
-      return `${minutes}:${(seconds % 60).toString().padStart(2, '0')}`;
+      return `${minutes}:${(seconds % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE).toString().padStart(2, '0')}`;
     } else {
       return includeMilliseconds
-        ? `${seconds}.${Math.floor((milliseconds % 1000) / 100)}s`
+        ? `${seconds}.${Math.floor((milliseconds % HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND) / 100)}s`
         : `${seconds}s`;
     }
   }
@@ -837,13 +878,41 @@ class Helpers {
     if (diff < 0) return 'In the future';
 
     const units = [
-      { name: 'year', short: 'y', ms: 365 * 24 * 60 * 60 * 1000 },
-      { name: 'month', short: 'mo', ms: 30 * 24 * 60 * 60 * 1000 },
-      { name: 'week', short: 'w', ms: 7 * 24 * 60 * 60 * 1000 },
-      { name: 'day', short: 'd', ms: 24 * 60 * 60 * 1000 },
-      { name: 'hour', short: 'h', ms: 60 * 60 * 1000 },
-      { name: 'minute', short: 'm', ms: 60 * 1000 },
-      { name: 'second', short: 's', ms: 1000 },
+      { 
+        name: 'year', 
+        short: 'y', 
+        ms: HELPERS_CONSTANTS.TIME.DAYS_PER_YEAR * HELPERS_CONSTANTS.TIME.HOURS_PER_DAY * HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND 
+      },
+      { 
+        name: 'month', 
+        short: 'mo', 
+        ms: HELPERS_CONSTANTS.TIME.DAYS_PER_MONTH * HELPERS_CONSTANTS.TIME.HOURS_PER_DAY * HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND 
+      },
+      { 
+        name: 'week', 
+        short: 'w', 
+        ms: HELPERS_CONSTANTS.TIME.DAYS_PER_WEEK * HELPERS_CONSTANTS.TIME.HOURS_PER_DAY * HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND 
+      },
+      { 
+        name: 'day', 
+        short: 'd', 
+        ms: HELPERS_CONSTANTS.TIME.HOURS_PER_DAY * HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND 
+      },
+      { 
+        name: 'hour', 
+        short: 'h', 
+        ms: HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND 
+      },
+      { 
+        name: 'minute', 
+        short: 'm', 
+        ms: HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND 
+      },
+      { 
+        name: 'second', 
+        short: 's', 
+        ms: HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND 
+      },
     ];
 
     // Find the appropriate unit
@@ -915,7 +984,7 @@ class Helpers {
    * @param {number[]} excludedDays - Days to exclude (0=Sunday, 6=Saturday)
    * @returns {number} Number of business days
    */
-  static calculateBusinessDays(startDate, endDate, excludedDays = [0, 6]) {
+  static calculateBusinessDays(startDate, endDate, excludedDays = HELPERS_CONSTANTS.TIME.WEEKEND_DAYS) {
     if (!(startDate instanceof Date) || !(endDate instanceof Date)) return 0;
 
     let count = 0;
@@ -944,7 +1013,7 @@ class Helpers {
       return null;
 
     // Expand 3-digit hex to 6-digit
-    if (hex.length === 3) {
+    if (hex.length === HELPERS_CONSTANTS.COLOR.HEX_SHORT_LENGTH) {
       hex = hex
         .split('')
         .map(char => char + char)
@@ -969,11 +1038,11 @@ class Helpers {
    * @returns {string} Hex color string
    */
   static rgbToHex(r, g, b) {
-    r = this.clamp(Math.round(r), 0, 255);
-    g = this.clamp(Math.round(g), 0, 255);
-    b = this.clamp(Math.round(b), 0, 255);
+    r = this.clamp(Math.round(r), 0, HELPERS_CONSTANTS.COLOR.RGB_MAX);
+    g = this.clamp(Math.round(g), 0, HELPERS_CONSTANTS.COLOR.RGB_MAX);
+    b = this.clamp(Math.round(b), 0, HELPERS_CONSTANTS.COLOR.RGB_MAX);
 
-    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+    return `#${((1 << HELPERS_CONSTANTS.COLOR.HEX_SHIFT_ALPHA) + (r << HELPERS_CONSTANTS.COLOR.HEX_SHIFT_RED) + (g << HELPERS_CONSTANTS.COLOR.HEX_SHIFT_GREEN) + b).toString(HELPERS_CONSTANTS.COLOR.HEX_BASE).slice(1)}`;
   }
 
   /**
@@ -1011,23 +1080,23 @@ class Helpers {
 
     if (highContrast) {
       // High contrast colors for accessibility
-      if (value < 30) return '#ff0000'; // Red
-      if (value < 60) return '#ffff00'; // Yellow
+      if (value < HELPERS_CONSTANTS.COLOR.THRESHOLD_LOW) return '#ff0000'; // Red
+      if (value < HELPERS_CONSTANTS.COLOR.THRESHOLD_MEDIUM) return '#ffff00'; // Yellow
       return '#00ff00'; // Green
     }
 
     if (colorBlindSafe) {
       // Color-blind friendly palette
-      if (value < 30) return '#d73027'; // Red-orange
-      if (value < 60) return '#fee08b'; // Yellow-orange
+      if (value < HELPERS_CONSTANTS.COLOR.THRESHOLD_LOW) return '#d73027'; // Red-orange
+      if (value < HELPERS_CONSTANTS.COLOR.THRESHOLD_MEDIUM) return '#fee08b'; // Yellow-orange
       return '#4575b4'; // Blue
     }
 
     // Default light theme
-    if (value < 50) {
-      return this.interpolateColor('#ff4444', '#ffaa00', value / 50);
+    if (value < HELPERS_CONSTANTS.COLOR.THRESHOLD_HIGH) {
+      return this.interpolateColor('#ff4444', '#ffaa00', value / HELPERS_CONSTANTS.COLOR.THRESHOLD_HIGH);
     } else {
-      return this.interpolateColor('#ffaa00', '#00aa00', (value - 50) / 50);
+      return this.interpolateColor('#ffaa00', '#00aa00', (value - HELPERS_CONSTANTS.COLOR.THRESHOLD_HIGH) / HELPERS_CONSTANTS.COLOR.THRESHOLD_HIGH);
     }
   }
 
@@ -1049,7 +1118,7 @@ class Helpers {
     const lighter = Math.max(luminance1, luminance2);
     const darker = Math.min(luminance1, luminance2);
 
-    return (lighter + 0.05) / (darker + 0.05);
+    return (lighter + HELPERS_CONSTANTS.COLOR.LUMINANCE_OFFSET) / (darker + HELPERS_CONSTANTS.COLOR.LUMINANCE_OFFSET);
   }
 
   /**
@@ -1061,8 +1130,10 @@ class Helpers {
     const { r, g, b } = rgb;
 
     const [rs, gs, bs] = [r, g, b].map(c => {
-      c = c / 255;
-      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      c = c / HELPERS_CONSTANTS.COLOR.RGB_MAX;
+      return c <= HELPERS_CONSTANTS.COLOR.LUMINANCE_THRESHOLD ? 
+        c / HELPERS_CONSTANTS.COLOR.LUMINANCE_DIVISOR : 
+        Math.pow((c + HELPERS_CONSTANTS.COLOR.LUMINANCE_OFFSET_2) / HELPERS_CONSTANTS.COLOR.LUMINANCE_DIVISOR_2, HELPERS_CONSTANTS.COLOR.LUMINANCE_EXPONENT);
     });
 
     return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
@@ -3164,7 +3235,7 @@ class Helpers {
     }
 
     if (includeRandom) {
-      parts.push(Math.random().toString(36).substr(2, 9));
+      parts.push(Math.random().toString(36).substring(2, 11));
     }
 
     if (includeVersion) {

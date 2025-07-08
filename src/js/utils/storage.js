@@ -22,13 +22,32 @@ import logger from './logger.js';
  */
 
 // Enhanced constants and configuration
+const KB_SIZE = 1024;
+const MB_SIZE = 1024;
+const BASE_TEN = 10;
+const MINUTES_PER_HOUR = 60;
+const SECONDS_PER_MINUTE = 60;
+const MS_PER_SECOND = 1000;
+const HOURS_PER_DAY = 24;
+const DECIMAL_RADIX = 36;
+const IV_SIZE = 12;
+const DEFAULT_STRING_LIMIT = 500;
+const LABEL_STRING_LIMIT = 50;
+const DECISION_LIMIT = 1000;
+const ERROR_LOG_LIMIT = 50;
+const ID_SUFFIX_LENGTH = 9;
+const SUBSTRING_START = 2;
+const QUOTA_WARNING_THRESHOLD = 0.8;
+const QUOTA_CHECK_INTERVAL = 60000; // 1 minute
+const SESSION_TIMEOUT_MINUTES = 30;
+
 const STORAGE_CONSTANTS = {
   PREFIX: 'simAI_',
   VERSION: '2.0.0',
-  MAX_STORAGE_SIZE: 10 * 1024 * 1024, // 10MB
-  COMPRESSION_THRESHOLD: 1024, // 1KB
+  MAX_STORAGE_SIZE: BASE_TEN * KB_SIZE * MB_SIZE, // 10MB
+  COMPRESSION_THRESHOLD: KB_SIZE, // 1KB
   BACKUP_RETENTION_DAYS: 90,
-  SESSION_TIMEOUT: 30 * 60 * 1000, // 30 minutes
+  SESSION_TIMEOUT: SESSION_TIMEOUT_MINUTES * MINUTES_PER_HOUR * MS_PER_SECOND, // 30 minutes
   SYNC_INTERVAL: 5000, // 5 seconds
   VALIDATION_PATTERNS: {
     SIMULATION_ID: /^[a-z0-9-]+$/,
@@ -80,7 +99,7 @@ class StorageEncryption {
       const encoder = new TextEncoder();
       const dataBuffer = encoder.encode(jsonData);
 
-      const iv = window.crypto.getRandomValues(new Uint8Array(12));
+      const iv = window.crypto.getRandomValues(new Uint8Array(IV_SIZE));
       const encrypted = await window.crypto.subtle.encrypt(
         { name: 'AES-GCM', iv },
         this.key,
@@ -203,7 +222,7 @@ class StorageManager {
   static encryptionEnabled = true;
   static syncEnabled = true;
   static lastSyncTime = 0;
-  static quotaWarningThreshold = 0.8; // 80% of quota
+  static quotaWarningThreshold = QUOTA_WARNING_THRESHOLD; // 80% of quota
 
   /**
    * Initialize the enhanced storage system
@@ -307,7 +326,7 @@ class StorageManager {
     // Check quota on storage operations
     setInterval(() => {
       this.checkStorageQuota();
-    }, 60000); // Check every minute
+    }, QUOTA_CHECK_INTERVAL); // Check every minute
   }
 
   /**
@@ -1040,20 +1059,20 @@ class StorageManager {
       const decisions = await this.get('decisions', []);
       const enrichedDecision = {
         ...decision,
-        id: `decision_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: `decision_${Date.now()}_${Math.random().toString(DECIMAL_RADIX).substr(SUBSTRING_START, ID_SUFFIX_LENGTH)}`,
         timestamp: Date.now(),
         sessionId: this.getSessionId(),
         version: this.VERSION,
         sanitizedContext: StorageValidator.sanitizeString(
           decision.context || '',
-          500
+          DEFAULT_STRING_LIMIT
         ),
       };
 
       decisions.push(enrichedDecision);
 
       // Keep only last 1000 decisions for performance
-      if (decisions.length > 1000) {
+      if (decisions.length > DECISION_LIMIT) {
         decisions.splice(0, decisions.length - 1000);
       }
 
@@ -1350,7 +1369,7 @@ class StorageManager {
     try {
       const backupData = {
         version: this.VERSION,
-        label: StorageValidator.sanitizeString(label, 50),
+        label: StorageValidator.sanitizeString(label, LABEL_STRING_LIMIT),
         createdAt: Date.now(),
         data: {
           preferences: await this.getUserPreferences(),
@@ -1364,7 +1383,7 @@ class StorageManager {
       const backups = await this.get('system_backups', []);
 
       // Add backup ID
-      backupData.id = `backup_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      backupData.id = `backup_${Date.now()}_${Math.random().toString(DECIMAL_RADIX).substr(SUBSTRING_START, ID_SUFFIX_LENGTH)}`;
 
       backups.push(backupData);
 
@@ -1627,7 +1646,7 @@ class StorageManager {
 
   static async cleanupOldData(olderThanDays = 30) {
     try {
-      const cutoffTime = Date.now() - olderThanDays * 24 * 60 * 60 * 1000;
+      const cutoffTime = Date.now() - olderThanDays * HOURS_PER_DAY * MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MS_PER_SECOND;
       let cleanedItems = 0;
 
       // Clean old decisions
@@ -1657,7 +1676,7 @@ class StorageManager {
       // Clean old backups (keep only recent ones)
       const backupCutoff =
         Date.now() -
-        STORAGE_CONSTANTS.BACKUP_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+        STORAGE_CONSTANTS.BACKUP_RETENTION_DAYS * HOURS_PER_DAY * MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MS_PER_SECOND;
       const backups = await this.get('system_backups', []);
       const recentBackups = backups.filter(b => b.createdAt > backupCutoff);
       if (recentBackups.length !== backups.length) {
@@ -1680,6 +1699,22 @@ class StorageManager {
       this.handleError(error, 'cleanupOldData', { olderThanDays });
       return 0;
     }
+  }
+
+  /**
+   * Get or generate a session identifier
+   */
+  static getSessionId() {
+    // Try to get existing session ID from session storage
+    let sessionId = this.getSession('session_id');
+    
+    if (!sessionId) {
+      // Generate new session ID
+      sessionId = `session_${Date.now()}_${Math.random().toString(DECIMAL_RADIX).substr(SUBSTRING_START, ID_SUFFIX_LENGTH)}`;
+      this.setSession('session_id', sessionId);
+    }
+    
+    return sessionId;
   }
 
   /**
@@ -1849,8 +1884,8 @@ class StorageManager {
       errors.push(errorInfo);
 
       // Keep only last 50 errors
-      if (errors.length > 50) {
-        errors.splice(0, errors.length - 50);
+      if (errors.length > ERROR_LOG_LIMIT) {
+        errors.splice(0, errors.length - ERROR_LOG_LIMIT);
       }
 
       this.setSession('storage_errors', errors);

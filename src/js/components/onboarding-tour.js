@@ -73,6 +73,14 @@ class OnboardingTour {
     this.EASE_MIDPOINT = 0.5; // easing function midpoint
     this.EASE_MULTIPLIER = 4; // easing function multiplier
     this.DEBOUNCE_DURATION = 300; // ms for preventing rapid clicks
+    this.MOBILE_NAVIGATION_SPACE = 60; // px space for mobile navigation
+    this.MOBILE_MAX_HEIGHT_RATIO = 0.5; // max height as fraction of viewport
+    this.MOBILE_POSITION_RATIO = 0.3; // mobile positioning ratio
+    this.MOBILE_COACH_MARK_HEIGHT_RATIO = 0.4; // mobile coach mark max height ratio
+    this.MOBILE_BREAKPOINT = 768; // px - mobile breakpoint
+    this.SMALL_MOBILE_BREAKPOINT = 480; // px - very small screens
+    this.MOBILE_SPACING = 10; // px - reduced spacing on mobile
+    this.DESKTOP_SPACING = 20; // px - desktop spacing
     this.MANUAL_SCROLL_RESET_DELAY = 2000; // ms to reset manual scroll flag
     this.LEARNING_LAB_TUTORIAL = 3; // Tutorial number for Learning Lab
     this.TUTORIAL_3_STEP_3_INDEX = 2; // 0-indexed step number for step 3
@@ -669,8 +677,8 @@ class OnboardingTour {
       return;
     }
 
-    // SIMPLIFIED AND ROBUST POSITIONING LOGIC
-    // Always position relative to viewport to ensure visibility
+    // MOBILE-AWARE POSITIONING LOGIC
+    const isMobile = window.innerWidth <= this.MOBILE_BREAKPOINT; // Mobile breakpoint
     
     // Get coach mark dimensions after content is set
     this.coachMark.style.visibility = 'hidden';
@@ -678,10 +686,16 @@ class OnboardingTour {
     this.coachMark.style.position = 'fixed'; // Use fixed positioning for consistent behavior
     this.coachMark.style.zIndex = '10014';
     
+    // Reset mobile overlay class in case it was previously set
+    this.coachMark.classList.remove('mobile-overlay');
+    this.coachMark.style.width = ''; // Reset width
+    this.coachMark.style.maxHeight = ''; // Reset max height
+    this.coachMark.style.overflow = ''; // Reset overflow
+    
     const coachMarkRect = this.coachMark.getBoundingClientRect();
     const viewportHeight = window.innerHeight;
     const viewportWidth = window.innerWidth;
-    const spacing = 20; // Fixed spacing
+    const spacing = isMobile ? this.MOBILE_SPACING : this.DESKTOP_SPACING;
     
     let left, top;
 
@@ -711,72 +725,131 @@ class OnboardingTour {
         }
       }
       
-      // Calculate initial position based on preferred direction
-      // Special handling for Tutorial 3 steps 3-8: force bottom positioning
-      if (this.currentTutorial === this.LEARNING_LAB_TUTORIAL && 
-          this.currentStep >= this.TUTORIAL_3_BOTTOM_POSITION_START && 
-          this.currentStep <= this.TUTORIAL_3_BOTTOM_POSITION_END) {
-        logger.info('OnboardingTour', `Forcing bottom position for Tutorial 3 step ${this.currentStep + 1}`);
-        position = 'bottom';
-      }
-      
-      switch (position) {
-        case 'top':
-          left = targetRect.left + (targetRect.width / 2) - (coachMarkRect.width / 2);
+      // MOBILE POSITIONING STRATEGY
+      if (isMobile) {
+        // On mobile, use a more intelligent positioning strategy that avoids covering the target
+        const mobileCoachMarkHeight = Math.min(coachMarkRect.height, viewportHeight * this.MOBILE_COACH_MARK_HEIGHT_RATIO); // Max 40% of screen
+        
+        // Calculate available space in each direction
+        const spaceAbove = targetRect.top - spacing;
+        const spaceBelow = viewportHeight - targetRect.bottom - spacing;
+        
+        logger.debug('OnboardingTour', 'Mobile positioning analysis', {
+          targetRect: { x: targetRect.left, y: targetRect.top, w: targetRect.width, h: targetRect.height },
+          spaceAbove,
+          spaceBelow,
+          coachMarkHeight: coachMarkRect.height,
+          mobileCoachMarkHeight
+        });
+        
+        // Priority order for mobile: below target, above target, full-width overlay at bottom
+        if (spaceBelow >= mobileCoachMarkHeight) {
+          // Enough space below - position there (preferred)
+          position = 'bottom';
+          left = Math.max(spacing, Math.min(
+            targetRect.left + (targetRect.width / 2) - (coachMarkRect.width / 2),
+            viewportWidth - coachMarkRect.width - spacing
+          ));
+          top = targetRect.bottom + spacing;
+          logger.debug('OnboardingTour', 'Mobile: Positioning below target');
+        } else if (spaceAbove >= mobileCoachMarkHeight) {
+          // Enough space above - position there
+          position = 'top';
+          left = Math.max(spacing, Math.min(
+            targetRect.left + (targetRect.width / 2) - (coachMarkRect.width / 2),
+            viewportWidth - coachMarkRect.width - spacing
+          ));
           top = targetRect.top - coachMarkRect.height - spacing;
-          break;
-        case 'bottom':
-          left = targetRect.left + (targetRect.width / 2) - (coachMarkRect.width / 2);
-          top = targetRect.bottom + spacing;
-          break;
-        case 'left':
-          left = targetRect.left - coachMarkRect.width - spacing;
-          top = targetRect.top + (targetRect.height / 2) - (coachMarkRect.height / 2);
-          break;
-        case 'right':
-          left = targetRect.right + spacing;
-          top = targetRect.top + (targetRect.height / 2) - (coachMarkRect.height / 2);
-          break;
-        default: // Default to bottom
-          left = targetRect.left + (targetRect.width / 2) - (coachMarkRect.width / 2);
-          top = targetRect.bottom + spacing;
+          logger.debug('OnboardingTour', 'Mobile: Positioning above target');
+        } else {
+          // Not enough space above or below - use full-width overlay at bottom
+          this.coachMark.classList.add('mobile-overlay');
+          left = spacing;
+          top = viewportHeight - coachMarkRect.height - spacing - this.MOBILE_NAVIGATION_SPACE; // Leave space for navigation
+          this.coachMark.style.width = `${viewportWidth - (spacing * 2)}px`;
+          this.coachMark.style.maxHeight = `${viewportHeight * this.MOBILE_MAX_HEIGHT_RATIO}px`;
+          this.coachMark.style.overflow = 'auto';
+          
+          logger.debug('OnboardingTour', 'Mobile: Using full-width overlay mode to avoid covering content');
+        }
+      } else {
+        // Desktop positioning (existing logic)
+        // Calculate initial position based on preferred direction
+        // Special handling for Tutorial 3 steps 3-8: force bottom positioning
+        if (this.currentTutorial === this.LEARNING_LAB_TUTORIAL && 
+            this.currentStep >= this.TUTORIAL_3_BOTTOM_POSITION_START && 
+            this.currentStep <= this.TUTORIAL_3_BOTTOM_POSITION_END) {
+          logger.info('OnboardingTour', `Forcing bottom position for Tutorial 3 step ${this.currentStep + 1}`);
+          position = 'bottom';
+        }
+        
+        switch (position) {
+          case 'top':
+            left = targetRect.left + (targetRect.width / 2) - (coachMarkRect.width / 2);
+            top = targetRect.top - coachMarkRect.height - spacing;
+            break;
+          case 'bottom':
+            left = targetRect.left + (targetRect.width / 2) - (coachMarkRect.width / 2);
+            top = targetRect.bottom + spacing;
+            break;
+          case 'left':
+            left = targetRect.left - coachMarkRect.width - spacing;
+            top = targetRect.top + (targetRect.height / 2) - (coachMarkRect.height / 2);
+            break;
+          case 'right':
+            left = targetRect.right + spacing;
+            top = targetRect.top + (targetRect.height / 2) - (coachMarkRect.height / 2);
+            break;
+          default: // Default to bottom
+            left = targetRect.left + (targetRect.width / 2) - (coachMarkRect.width / 2);
+            top = targetRect.bottom + spacing;
+        }
+        
+        // VIEWPORT BOUNDS CHECKING - Always keep within viewport
+        const minLeft = spacing;
+        const maxLeft = viewportWidth - coachMarkRect.width - spacing;
+        const minTop = spacing;
+        const maxTop = viewportHeight - coachMarkRect.height - spacing;
+        
+        // Clamp to viewport bounds
+        left = Math.max(minLeft, Math.min(left, maxLeft));
+        top = Math.max(minTop, Math.min(top, maxTop));
       }
       
-      // VIEWPORT BOUNDS CHECKING - Always keep within viewport
-      const minLeft = spacing;
-      const maxLeft = viewportWidth - coachMarkRect.width - spacing;
-      const minTop = spacing;
-      const maxTop = viewportHeight - coachMarkRect.height - spacing;
-      
-      // Clamp to viewport bounds
-      left = Math.max(minLeft, Math.min(left, maxLeft));
-      top = Math.max(minTop, Math.min(top, maxTop));
-      
-      // Special handling for interactive elements - avoid covering target
-      if (step && step.highlightClick) {
+      // Special handling for interactive elements - avoid covering target (both mobile and desktop)
+      if (step && step.highlightClick && !this.coachMark.classList.contains('mobile-overlay')) {
         // If positioned over target, try alternative positions
         if (left < targetRect.right && left + coachMarkRect.width > targetRect.left &&
             top < targetRect.bottom && top + coachMarkRect.height > targetRect.top) {
           
-          // Try positioning to the right
-          if (targetRect.right + coachMarkRect.width + spacing <= viewportWidth) {
-            left = targetRect.right + spacing;
-            top = Math.max(minTop, Math.min(targetRect.top, maxTop));
-          }
-          // Try positioning to the left
-          else if (targetRect.left - coachMarkRect.width - spacing >= 0) {
-            left = targetRect.left - coachMarkRect.width - spacing;
-            top = Math.max(minTop, Math.min(targetRect.top, maxTop));
-          }
-          // Try positioning below
-          else if (targetRect.bottom + coachMarkRect.height + spacing <= viewportHeight) {
-            left = Math.max(minLeft, Math.min(targetRect.left, maxLeft));
-            top = targetRect.bottom + spacing;
-          }
-          // Try positioning above
-          else if (targetRect.top - coachMarkRect.height - spacing >= 0) {
-            left = Math.max(minLeft, Math.min(targetRect.left, maxLeft));
-            top = targetRect.top - coachMarkRect.height - spacing;
+          if (isMobile) {
+            // On mobile, prefer overlay mode when covering target
+            this.coachMark.classList.add('mobile-overlay');
+            left = spacing;
+            top = viewportHeight - coachMarkRect.height - spacing - this.MOBILE_NAVIGATION_SPACE;
+            this.coachMark.style.width = `${viewportWidth - (spacing * 2)}px`;
+          } else {
+            // Desktop fallback positioning
+            // Try positioning to the right
+            if (targetRect.right + coachMarkRect.width + spacing <= viewportWidth) {
+              left = targetRect.right + spacing;
+              top = Math.max(spacing, Math.min(targetRect.top, viewportHeight - coachMarkRect.height - spacing));
+            }
+            // Try positioning to the left
+            else if (targetRect.left - coachMarkRect.width - spacing >= 0) {
+              left = targetRect.left - coachMarkRect.width - spacing;
+              top = Math.max(spacing, Math.min(targetRect.top, viewportHeight - coachMarkRect.height - spacing));
+            }
+            // Try positioning below
+            else if (targetRect.bottom + coachMarkRect.height + spacing <= viewportHeight) {
+              left = Math.max(spacing, Math.min(targetRect.left, viewportWidth - coachMarkRect.width - spacing));
+              top = targetRect.bottom + spacing;
+            }
+            // Try positioning above
+            else if (targetRect.top - coachMarkRect.height - spacing >= 0) {
+              left = Math.max(spacing, Math.min(targetRect.left, viewportWidth - coachMarkRect.width - spacing));
+              top = targetRect.top - coachMarkRect.height - spacing;
+            }
           }
         }
       }
@@ -785,17 +858,27 @@ class OnboardingTour {
         stepId: step?.id,
         targetRect: { x: targetRect.left, y: targetRect.top, w: targetRect.width, h: targetRect.height },
         coachMarkPos: { left, top },
-        position
+        position,
+        isMobile,
+        isOverlay: this.coachMark.classList.contains('mobile-overlay')
       });
       
     } else {
       // Center on viewport for steps without targets
-      left = (viewportWidth / 2) - (coachMarkRect.width / 2);
-      top = (viewportHeight / 2) - (coachMarkRect.height / 2);
+      if (isMobile) {
+        // On mobile, position towards bottom to avoid header overlap
+        left = spacing;
+        top = Math.max(viewportHeight * this.MOBILE_POSITION_RATIO, viewportHeight - coachMarkRect.height - spacing - this.MOBILE_NAVIGATION_SPACE);
+        this.coachMark.style.width = `${viewportWidth - (spacing * 2)}px`;
+      } else {
+        left = (viewportWidth / 2) - (coachMarkRect.width / 2);
+        top = (viewportHeight / 2) - (coachMarkRect.height / 2);
+      }
       
       logger.debug('OnboardingTour', 'Coach mark centered in viewport', {
         stepId: step?.id,
-        coachMarkPos: { left, top }
+        coachMarkPos: { left, top },
+        isMobile
       });
     }
     

@@ -19,12 +19,6 @@ class ScrollManager {
     // Debounced scroll handlers
     this.debouncedHandlers = new Map();
     this.DEBOUNCE_DELAY = 16; // ~60fps
-    
-    // Constants for magic numbers
-    this.WHEEL_SCROLL_MULTIPLIER = 1.5;
-    this.DEFAULT_CARD_WIDTH = 350;
-    this.SNAP_DELAY = 150;
-    this.LEFT_EDGE_THRESHOLD = 50;
   }
 
   /**
@@ -215,138 +209,13 @@ class ScrollManager {
 
   /**
    * Initialize horizontal scrolling for category grids
+   * Delegates to the enhanced horizontal-scroll.js system
    */
   initializeHorizontalScrolling() {
-    const categoryGrids = document.querySelectorAll('.categories-grid, .simulations-grid, .scenarios-grid');
-    
-    categoryGrids.forEach(grid => {
-      this.setupHorizontalGrid(grid);
-    });
-  }
-
-  /**
-   * Setup horizontal scrolling for a grid
-   */
-  setupHorizontalGrid(grid) {
-    // Reset scroll position
-    grid.scrollLeft = 0;
-    
-    // Add wheel event for horizontal scrolling
-    this.addWheelScrolling(grid);
-    
-    // Add keyboard navigation
-    this.addKeyboardNavigation(grid);
-    
-    // Add snap behavior
-    this.addSnapBehavior(grid);
-  }
-
-  /**
-   * Add wheel scrolling to grid
-   */
-  addWheelScrolling(grid) {
-    const wheelHandler = (e) => {
-      // Only intercept vertical scroll when directly over the grid
-      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-        return; // Already scrolling horizontally
-      }
-      
-      if (e.target.closest('.scenarios-grid, .categories-grid, .simulations-grid') === grid) {
-        e.preventDefault();
-        
-        const scrollAmount = e.deltaY * this.WHEEL_SCROLL_MULTIPLIER;
-        const targetScrollLeft = Math.max(0, 
-          Math.min(grid.scrollLeft + scrollAmount, grid.scrollWidth - grid.clientWidth)
-        );
-        
-        grid.scrollTo({
-          left: targetScrollLeft,
-          behavior: 'auto'
-        });
-      }
-    };
-
-    grid.addEventListener('wheel', wheelHandler, { passive: false });
-  }
-
-  /**
-   * Add keyboard navigation to grid
-   */
-  addKeyboardNavigation(grid) {
-    const keyHandler = (e) => {
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        e.preventDefault();
-        
-        const cards = Array.from(grid.children);
-        const cardWidth = cards[0]?.offsetWidth || this.DEFAULT_CARD_WIDTH;
-        const scrollAmount = e.key === 'ArrowLeft' ? -cardWidth : cardWidth;
-        
-        grid.scrollBy({
-          left: scrollAmount,
-          behavior: 'smooth'
-        });
-      }
-    };
-
-    grid.addEventListener('keydown', keyHandler);
-  }
-
-  /**
-   * Add snap behavior to grid
-   */
-  addSnapBehavior(grid) {
-    let scrollTimeout;
-    
-    const snapHandler = () => {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        this.snapToNearestCard(grid);
-      }, this.SNAP_DELAY);
-    };
-
-    grid.addEventListener('scroll', snapHandler);
-  }
-
-  /**
-   * Snap to nearest card
-   */
-  snapToNearestCard(grid) {
-    const cards = Array.from(grid.children);
-    if (cards.length === 0) return;
-
-    // If close to left edge, snap to first card
-    if (grid.scrollLeft <= this.LEFT_EDGE_THRESHOLD) {
-      cards[0].scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-        inline: 'start'
-      });
-      return;
-    }
-
-    // Find closest card to viewport center
-    const gridRect = grid.getBoundingClientRect();
-    const gridCenter = gridRect.left + gridRect.width / 2;
-
-    let closestCard = cards[0];
-    let closestDistance = Infinity;
-
-    cards.forEach(card => {
-      const cardRect = card.getBoundingClientRect();
-      const cardCenter = cardRect.left + cardRect.width / 2;
-      const distance = Math.abs(cardCenter - gridCenter);
-
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestCard = card;
-      }
-    });
-
-    closestCard.scrollIntoView({
-      behavior: 'smooth',
-      block: 'nearest',
-      inline: 'center'
-    });
+    // Horizontal scrolling is now handled by the enhanced horizontal-scroll.js
+    // which provides modern momentum-based physics and better UX
+    // This method is kept for API compatibility but does nothing
+    logger.info('ScrollManager: Horizontal scrolling delegated to enhanced system');
   }
 
   /**
@@ -369,9 +238,17 @@ class ScrollManager {
 
   /**
    * Reinitialize horizontal scrolling after dynamic content changes
+   * Delegates to the enhanced horizontal scroll system
    */
   reinitializeHorizontalScrolling() {
-    this.initializeHorizontalScrolling();
+    // Import and call the enhanced horizontal scroll reinitializer
+    import('./horizontal-scroll.js').then(module => {
+      if (module.reinitializeHorizontalScroll) {
+        module.reinitializeHorizontalScroll();
+      }
+    }).catch(error => {
+      logger.warn('ScrollManager: Could not reinitialize horizontal scrolling', error);
+    });
   }
 
   /**
