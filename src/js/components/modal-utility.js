@@ -26,7 +26,7 @@ class ModalUtility {
     // Generate unique ID using timestamp and random string
     const BASE_36 = 36;
     const RANDOM_STRING_LENGTH = 9;
-    this.id = `modal-${Date.now()}-${Math.random().toString(BASE_36).substr(2, RANDOM_STRING_LENGTH)}`;
+    this.id = `modal-${Date.now()}-${Math.random().toString(BASE_36).substring(2, RANDOM_STRING_LENGTH + 2)}`;
 
     this._build();
     this._setupEventListeners();
