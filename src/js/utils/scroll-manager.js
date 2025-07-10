@@ -15,7 +15,7 @@ class ScrollManager {
     this.MIN_SCROLL_DISTANCE = 5;
     this.EASE_MIDPOINT = 0.5;
     this.EASE_MULTIPLIER = 4;
-    
+
     // Debounced scroll handlers
     this.debouncedHandlers = new Map();
     this.DEBOUNCE_DELAY = 16; // ~60fps
@@ -46,12 +46,14 @@ class ScrollManager {
   setupGlobalScrollBehavior() {
     // Single method to reset scroll position
     this.resetScrollPosition();
-    
+
     // Setup event listeners for scroll reset
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => this.resetScrollPosition());
+      document.addEventListener('DOMContentLoaded', () =>
+        this.resetScrollPosition()
+      );
     }
-    
+
     window.addEventListener('pageshow', () => this.resetScrollPosition());
   }
 
@@ -61,7 +63,7 @@ class ScrollManager {
   resetScrollPosition() {
     // Use the most reliable method for all browsers
     window.scrollTo(0, 0);
-    
+
     // Ensure smooth scrolling is enabled after reset
     setTimeout(() => {
       document.documentElement.classList.add('loaded');
@@ -75,7 +77,8 @@ class ScrollManager {
    * @returns {Promise<void>} Promise that resolves when scrolling is complete
    */
   async scrollToElement(target, options = {}) {
-    const element = typeof target === 'string' ? document.querySelector(target) : target;
+    const element =
+      typeof target === 'string' ? document.querySelector(target) : target;
     if (!element) {
       logger.warn('ScrollManager: Element not found for scrolling', target);
       return;
@@ -88,12 +91,19 @@ class ScrollManager {
     } = options;
 
     // Check if element is inside a modal
-    const modalContainer = element.closest('.scenario-modal, .pre-launch-modal, .modal, [role="dialog"]');
-    
+    const modalContainer = element.closest(
+      '.scenario-modal, .pre-launch-modal, .modal, [role="dialog"]'
+    );
+
     if (modalContainer) {
       await this.scrollWithinModal(element, modalContainer, offset, behavior);
     } else {
-      await this.scrollMainWindow(element, offset, behavior, respectReducedMotion);
+      await this.scrollMainWindow(
+        element,
+        offset,
+        behavior,
+        respectReducedMotion
+      );
     }
   }
 
@@ -106,14 +116,17 @@ class ScrollManager {
    * @returns {Promise<void>} Promise that resolves when scrolling is complete
    */
   async scrollWithinModal(element, modalContainer, offset, behavior) {
-    const modalScrollContainer = modalContainer.querySelector('.modal-content, .scenario-content, .modal-body') || modalContainer;
-    
+    const modalScrollContainer =
+      modalContainer.querySelector(
+        '.modal-content, .scenario-content, .modal-body'
+      ) || modalContainer;
+
     if (behavior === 'auto' || this.shouldUseInstantScroll()) {
       // Use native scrollIntoView for instant scrolling
       element.scrollIntoView({
         behavior: 'auto',
         block: 'center',
-        inline: 'nearest'
+        inline: 'nearest',
       });
       return;
     }
@@ -122,11 +135,16 @@ class ScrollManager {
     const elementRect = element.getBoundingClientRect();
     const containerRect = modalScrollContainer.getBoundingClientRect();
     const currentScrollTop = modalScrollContainer.scrollTop;
-    
-    const elementTopInModal = (elementRect.top - containerRect.top) + currentScrollTop;
+
+    const elementTopInModal =
+      elementRect.top - containerRect.top + currentScrollTop;
     const targetScrollTop = Math.max(0, elementTopInModal - offset);
 
-    await this.animateScroll(modalScrollContainer, targetScrollTop, 'scrollTop');
+    await this.animateScroll(
+      modalScrollContainer,
+      targetScrollTop,
+      'scrollTop'
+    );
   }
 
   /**
@@ -138,22 +156,28 @@ class ScrollManager {
    * @returns {Promise<void>} Promise that resolves when scrolling is complete
    */
   async scrollMainWindow(element, offset, behavior, respectReducedMotion) {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const actualBehavior = respectReducedMotion && prefersReducedMotion ? 'auto' : behavior;
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
+    const actualBehavior =
+      respectReducedMotion && prefersReducedMotion ? 'auto' : behavior;
 
     if (actualBehavior === 'auto' || this.shouldUseInstantScroll()) {
       // Use native scrollIntoView for instant scrolling
       element.scrollIntoView({
         behavior: 'auto',
         block: 'center',
-        inline: 'nearest'
+        inline: 'nearest',
       });
       return;
     }
 
     // Custom smooth scrolling for main window
     const elementRect = element.getBoundingClientRect();
-    const targetScrollTop = Math.max(0, elementRect.top + window.pageYOffset - offset);
+    const targetScrollTop = Math.max(
+      0,
+      elementRect.top + window.pageYOffset - offset
+    );
 
     await this.animateScroll(window, targetScrollTop, 'pageYOffset');
   }
@@ -162,13 +186,14 @@ class ScrollManager {
    * Animate scroll with easing
    */
   async animateScroll(scrollContainer, targetPosition, propertyName) {
-    return new Promise((resolve) => {
-      const startPosition = propertyName === 'scrollTop' 
-        ? scrollContainer.scrollTop 
-        : window.pageYOffset;
-      
+    return new Promise(resolve => {
+      const startPosition =
+        propertyName === 'scrollTop'
+          ? scrollContainer.scrollTop
+          : window.pageYOffset;
+
       const distance = targetPosition - startPosition;
-      
+
       if (Math.abs(distance) < this.MIN_SCROLL_DISTANCE) {
         resolve();
         return;
@@ -177,15 +202,16 @@ class ScrollManager {
       this.isAutoScrolling = true;
       let startTime = null;
 
-      const animation = (currentTime) => {
+      const animation = currentTime => {
         if (startTime === null) startTime = currentTime;
         const timeElapsed = currentTime - startTime;
         const progress = Math.min(timeElapsed / this.SCROLL_DURATION, 1);
 
         // Ease-in-out function
-        const ease = progress < this.EASE_MIDPOINT 
-          ? 2 * progress * progress 
-          : -1 + (this.EASE_MULTIPLIER - 2 * progress) * progress;
+        const ease =
+          progress < this.EASE_MIDPOINT
+            ? 2 * progress * progress
+            : -1 + (this.EASE_MULTIPLIER - 2 * progress) * progress;
 
         const currentPosition = startPosition + distance * ease;
 
@@ -209,13 +235,12 @@ class ScrollManager {
 
   /**
    * Initialize horizontal scrolling for category grids
-   * Delegates to the enhanced horizontal-scroll.js system
+   * NOTE: Horizontal scroll enhancement has been completely removed
    */
   initializeHorizontalScrolling() {
-    // Horizontal scrolling is now handled by the enhanced horizontal-scroll.js
-    // which provides modern momentum-based physics and better UX
+    // Horizontal scroll enhancement removed - using native browser scrolling
     // This method is kept for API compatibility but does nothing
-    logger.info('ScrollManager: Horizontal scrolling delegated to enhanced system');
+    logger.info('ScrollManager: Using native horizontal scrolling');
   }
 
   /**
@@ -238,17 +263,11 @@ class ScrollManager {
 
   /**
    * Reinitialize horizontal scrolling after dynamic content changes
-   * Delegates to the enhanced horizontal scroll system
+   * NOTE: Horizontal scroll enhancement has been completely removed
    */
   reinitializeHorizontalScrolling() {
-    // Import and call the enhanced horizontal scroll reinitializer
-    import('./horizontal-scroll.js').then(module => {
-      if (module.reinitializeHorizontalScroll) {
-        module.reinitializeHorizontalScroll();
-      }
-    }).catch(error => {
-      logger.warn('ScrollManager: Could not reinitialize horizontal scrolling', error);
-    });
+    // Horizontal scroll enhancement removed - no action needed
+    // Native browser scrolling is used instead
   }
 
   /**
@@ -258,7 +277,7 @@ class ScrollManager {
     this.observers.forEach(observer => observer.disconnect());
     this.observers.clear();
     this.debouncedHandlers.clear();
-    
+
     if (this.scrollTimeout) {
       clearTimeout(this.scrollTimeout);
     }

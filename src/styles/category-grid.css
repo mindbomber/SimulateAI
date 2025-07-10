@@ -276,8 +276,6 @@
   color: var(--color-white);
 }
 
-
-
 /* Progress Ring */
 .category-progress-ring {
   position: relative;
@@ -297,7 +295,10 @@
 
 .category-progress-ring.pulse-for-badge:hover {
   transform: scale(1.25);
-  filter: drop-shadow(0 0 16px var(--progress-pulse-color, var(--color-accent-400))) brightness(1.1);
+  filter: drop-shadow(
+      0 0 16px var(--progress-pulse-color, var(--color-accent-400))
+    )
+    brightness(1.1);
 }
 
 .category-progress-ring:focus {
@@ -337,12 +338,15 @@
 }
 
 @keyframes text-glow-fluid {
-  0%, 100% {
+  0%,
+  100% {
     text-shadow: 0 0 4px var(--progress-pulse-light, var(--color-accent-300));
     color: var(--progress-pulse-color, var(--color-accent-600));
   }
   50% {
-    text-shadow: 0 0 8px var(--progress-pulse-color, var(--color-accent-400)), 0 0 12px var(--progress-pulse-light, var(--color-accent-300));
+    text-shadow:
+      0 0 8px var(--progress-pulse-color, var(--color-accent-400)),
+      0 0 12px var(--progress-pulse-light, var(--color-accent-300));
     color: var(--progress-pulse-dark, var(--color-accent-700));
   }
 }
@@ -351,19 +355,24 @@
   color: var(--color-gray-300);
 }
 
-[data-theme='dark'] .category-progress-ring.pulse-for-badge .progress-percentage {
+[data-theme='dark']
+  .category-progress-ring.pulse-for-badge
+  .progress-percentage {
   color: var(--progress-pulse-color, var(--color-accent-400));
   text-shadow: 0 0 6px var(--progress-pulse-color, var(--color-accent-400));
   animation: text-glow-dark-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @keyframes text-glow-dark-fluid {
-  0%, 100% {
+  0%,
+  100% {
     text-shadow: 0 0 6px var(--progress-pulse-color, var(--color-accent-400));
     color: var(--progress-pulse-color, var(--color-accent-400));
   }
   50% {
-    text-shadow: 0 0 10px var(--progress-pulse-light, var(--color-accent-300)), 0 0 16px var(--progress-pulse-color, var(--color-accent-400));
+    text-shadow:
+      0 0 10px var(--progress-pulse-light, var(--color-accent-300)),
+      0 0 16px var(--progress-pulse-color, var(--color-accent-400));
     color: var(--progress-pulse-light, var(--color-accent-300));
   }
 }
@@ -371,7 +380,9 @@
 /* Badge Progress Pulse Animation - FLUID VERSION */
 .category-progress-ring.pulse-for-badge {
   animation: badge-pulse-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  filter: drop-shadow(0 0 8px var(--progress-pulse-color, var(--color-accent-400)));
+  filter: drop-shadow(
+    0 0 8px var(--progress-pulse-color, var(--color-accent-400))
+  );
 }
 
 .category-progress-ring.pulse-for-badge::before {
@@ -383,7 +394,8 @@
   bottom: -8px;
   border: 3px solid var(--progress-pulse-color, var(--color-accent-400));
   border-radius: 50%;
-  animation: badge-pulse-ring-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite 0.2s;
+  animation: badge-pulse-ring-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite
+    0.2s;
   z-index: 0;
   box-shadow: 0 0 12px var(--progress-pulse-color, var(--color-accent-400));
 }
@@ -397,13 +409,15 @@
   bottom: -12px;
   border: 2px solid var(--progress-pulse-light, var(--color-accent-300));
   border-radius: 50%;
-  animation: badge-pulse-outer-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite 0.4s;
+  animation: badge-pulse-outer-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite
+    0.4s;
   z-index: -1;
   opacity: 0.4;
 }
 
 @keyframes badge-pulse-fluid {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }
@@ -414,7 +428,8 @@
 }
 
 @keyframes badge-pulse-ring-fluid {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.7;
   }
@@ -425,7 +440,8 @@
 }
 
 @keyframes badge-pulse-outer-fluid {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.3;
   }
@@ -442,12 +458,16 @@
   right: -4px;
   width: 16px;
   height: 16px;
-  background: linear-gradient(135deg, var(--color-accent-400), var(--color-accent-600));
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-400),
+    var(--color-accent-600)
+  );
   border: 3px solid var(--color-white);
   border-radius: 50%;
   z-index: 2;
   animation: pulse-indicator-dramatic 1.2s ease-in-out infinite;
-  box-shadow: 
+  box-shadow:
     0 0 8px var(--color-accent-400),
     0 0 16px var(--color-accent-300);
 }
@@ -466,7 +486,8 @@
 }
 
 @keyframes pulse-indicator-dramatic {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }
@@ -485,7 +506,8 @@
 }
 
 @keyframes pulse-indicator-ring {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.4;
   }
@@ -516,7 +538,9 @@
   /* Initial hidden state */
   opacity: 0;
   transform: translateX(-50%) translateY(4px);
-  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.2s ease-out;
 }
 
 .progress-ring-tooltip.visible {
@@ -567,7 +591,7 @@
     margin-left: 0 !important;
     margin-right: 0 !important;
   }
-  
+
   .progress-ring-tooltip.visible {
     transform: translateX(-50%) translateY(0) !important;
   }
@@ -593,7 +617,9 @@
   /* Only apply scroll snap on horizontal axis and prevent it from affecting page */
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  scroll-padding-left: var(--spacing-8); /* Ensures scroll snap starts with proper spacing */
+  scroll-padding-left: var(
+    --spacing-8
+  ); /* Ensures scroll snap starts with proper spacing */
   gap: var(--spacing-6);
   padding: var(--spacing-8) var(--spacing-8) var(--spacing-10) var(--spacing-8);
   margin: 0;
@@ -609,10 +635,10 @@
   isolation: isolate;
   transform: translateZ(0); /* Force hardware acceleration and containment */
   will-change: scroll-position;
-  
+
   /* Enhanced cursor behavior for horizontal scrolling */
   cursor: grab;
-  
+
   /* Custom scrollbar styling */
   scrollbar-width: thin;
   scrollbar-color: var(--color-gray-300) transparent;
@@ -673,29 +699,33 @@
     border-radius: var(--radius-md);
     margin: 0 calc(-1 * var(--spacing-2)); /* Reduced negative margin */
   }
-  
+
   .scenarios-grid:hover {
     /* Subtle indication that horizontal scrolling is available */
     box-shadow: inset 0 0 0 1px rgba(74, 144, 226, 0.15);
     /* Add a subtle gradient overlay to indicate scrollability */
-    background: linear-gradient(90deg, 
-      transparent 0%, 
-      rgba(74, 144, 226, 0.02) 5%, 
-      rgba(74, 144, 226, 0.02) 95%, 
-      transparent 100%);
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(74, 144, 226, 0.02) 5%,
+      rgba(74, 144, 226, 0.02) 95%,
+      transparent 100%
+    );
   }
-  
+
   /* Enhanced visual feedback when actively scrolling */
   .scenarios-grid:active {
     cursor: grabbing;
     box-shadow: inset 0 0 0 2px rgba(74, 144, 226, 0.2);
   }
-  
+
   /* Smoother transitions on desktop */
   .scenarios-grid {
-    transition: box-shadow 0.3s ease, background 0.3s ease;
+    transition:
+      box-shadow 0.3s ease,
+      background 0.3s ease;
   }
-  
+
   /* Add scroll indicators for better UX */
   .scenarios-grid::before {
     content: '';
@@ -704,17 +734,21 @@
     top: 0;
     bottom: 0;
     width: 20px;
-    background: linear-gradient(90deg, rgba(255,255,255,0.8) 0%, transparent 100%);
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.8) 0%,
+      transparent 100%
+    );
     pointer-events: none;
     z-index: 1;
     opacity: 0;
     transition: opacity 0.3s ease;
   }
-  
+
   .scenarios-grid:hover::before {
     opacity: 1;
   }
-  
+
   .scenarios-grid::after {
     content: '';
     position: absolute;
@@ -722,17 +756,21 @@
     top: 0;
     bottom: 0;
     width: 20px;
-    background: linear-gradient(270deg, rgba(255,255,255,0.8) 0%, transparent 100%);
+    background: linear-gradient(
+      270deg,
+      rgba(255, 255, 255, 0.8) 0%,
+      transparent 100%
+    );
     pointer-events: none;
     z-index: 1;
     opacity: 0;
     transition: opacity 0.3s ease;
   }
-  
+
   .scenarios-grid:hover::after {
     opacity: 1;
   }
-  
+
   /* Subtle pulse animation to indicate scrollability */
   .scenarios-grid:hover {
     animation: scroll-hint-pulse 2s ease-in-out infinite;
@@ -741,10 +779,11 @@
 
 /* Keyframe animation for scroll hint */
 @keyframes scroll-hint-pulse {
-  0%, 100% { 
+  0%,
+  100% {
     box-shadow: inset 0 0 0 1px rgba(74, 144, 226, 0.15);
   }
-  50% { 
+  50% {
     box-shadow: inset 0 0 0 1px rgba(74, 144, 226, 0.25);
   }
 }
@@ -786,7 +825,7 @@
   flex-direction: column;
   min-height: 280px;
   box-shadow: var(--shadow-sm);
-  
+
   /* Horizontal scroll properties */
   flex: 0 0 350px; /* Fixed width, don't grow or shrink */
   scroll-snap-align: start;
@@ -995,54 +1034,6 @@
   z-index: 10;
 }
 
-/* Optional scroll navigation buttons */
-.scroll-nav-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 1px solid var(--color-gray-300);
-  background: var(--color-white);
-  color: var(--color-gray-600);
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: var(--shadow-sm);
-  transition: all var(--transition-base);
-  z-index: 2;
-}
-
-.scroll-nav-btn:hover {
-  background: var(--color-gray-50);
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  box-shadow: var(--shadow-md);
-}
-
-.scroll-nav-btn:active {
-  transform: translateY(-50%) scale(0.95);
-}
-
-.scroll-prev {
-  left: 10px;
-}
-
-.scroll-next {
-  right: 10px;
-}
-
-/* Hide scroll buttons on very small screens */
-@media (max-width: 480px) {
-  .scroll-nav-btn {
-    display: none;
-  }
-}
-
 /* Highlighted States */
 .category-section-highlighted {
   animation: section-highlight-pulse 2s ease-in-out;
@@ -1128,7 +1119,9 @@
   .category-progress-ring {
     position: absolute;
     left: 80%;
-    transform: translateX(calc(30px + var(--spacing-3))); /* Center + half icon width + spacing */
+    transform: translateX(
+      calc(30px + var(--spacing-3))
+    ); /* Center + half icon width + spacing */
     width: 50px;
     height: 50px;
     display: flex;
@@ -1256,7 +1249,7 @@
   .scenarios-grid {
     padding: var(--spacing-8) var(--spacing-12);
   }
-  
+
   .category-section .scenario-card,
   .simulations-grid .scenario-card {
     flex: 0 0 380px; /* Larger cards on large screens */
@@ -1352,7 +1345,8 @@
 }
 
 @keyframes badge-pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
