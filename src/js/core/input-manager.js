@@ -14,6 +14,7 @@ const INPUT_CONFIG = {
   PERFORMANCE_MONITOR_INTERVAL: 1000,
   MAX_EVENT_HISTORY: 100,
   THROTTLE_INTERVAL: 16, // ~60fps
+  MAX_LOG_ENTRIES: 50,
 
   // Gesture thresholds
   GESTURE_THRESHOLDS: {
@@ -1515,8 +1516,8 @@ class InputPerformanceMonitor {
   logEvent(logEntry) {
     this.logEntries.push(logEntry);
 
-    if (this.logEntries.length > 100) {
-      this.logEntries = this.logEntries.slice(-50);
+    if (this.logEntries.length > INPUT_CONFIG.MAX_EVENT_HISTORY) {
+      this.logEntries = this.logEntries.slice(-INPUT_CONFIG.MAX_LOG_ENTRIES);
     }
   }
 

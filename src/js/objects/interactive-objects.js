@@ -3,14 +3,48 @@
  * Provides buttons, sliders, meters, and other interactive elements
  */
 
+// Constants to eliminate magic numbers
+const INTERACTIVE_OBJECT_CONSTANTS = {
+  // Default dimensions
+  DEFAULT_WIDTH: 100,
+  DEFAULT_HEIGHT: 30,
+
+  // Button defaults
+  BUTTON_DEFAULT_WIDTH: 120,
+  BUTTON_DEFAULT_HEIGHT: 40,
+  BUTTON_DEFAULT_BORDER_RADIUS: 4,
+
+  // Slider defaults
+  SLIDER_DEFAULT_WIDTH: 200,
+  SLIDER_DEFAULT_HEIGHT: 20,
+  SLIDER_DEFAULT_VALUE: 50,
+  SLIDER_DEFAULT_HANDLE_WIDTH: 20,
+  SLIDER_HANDLE_HEIGHT_OFFSET: 4,
+  SLIDER_TRACK_QUARTER_DIVISOR: 4,
+  SLIDER_HANDLE_Y_OFFSET: 2,
+
+  // Meter defaults
+  METER_DEFAULT_WIDTH: 200,
+  METER_DEFAULT_HEIGHT: 30,
+
+  // Label defaults
+  LABEL_DEFAULT_WIDTH: 100,
+  LABEL_DEFAULT_HEIGHT: 20,
+
+  // ID generation
+  RANDOM_BASE: 36,
+  ID_SUBSTRING_START: 2,
+  ID_LENGTH: 9,
+};
+
 // Base class for all interactive objects
 export class InteractiveObject {
   constructor(options = {}) {
     this.id = options.id || this.generateId();
     this.x = options.x || 0;
     this.y = options.y || 0;
-    this.width = options.width || 100;
-    this.height = options.height || 30;
+    this.width = options.width || INTERACTIVE_OBJECT_CONSTANTS.DEFAULT_WIDTH;
+    this.height = options.height || INTERACTIVE_OBJECT_CONSTANTS.DEFAULT_HEIGHT;
     this.visible = options.visible !== false;
     this.interactive = options.interactive !== false;
     this.zIndex = options.zIndex || 0;
@@ -51,7 +85,7 @@ export class InteractiveObject {
   }
 
   generateId() {
-    return `obj_${Math.random().toString(36).substr(2, 9)}`;
+    return `obj_${Math.random().toString(INTERACTIVE_OBJECT_CONSTANTS.RANDOM_BASE).substr(INTERACTIVE_OBJECT_CONSTANTS.ID_SUBSTRING_START, INTERACTIVE_OBJECT_CONSTANTS.ID_LENGTH)}`;
   }
 
   getDefaultAccessibilityConfig() {
@@ -184,8 +218,8 @@ export class InteractiveObject {
 export class Button extends InteractiveObject {
   constructor(options = {}) {
     super({
-      width: 120,
-      height: 40,
+      width: INTERACTIVE_OBJECT_CONSTANTS.BUTTON_DEFAULT_WIDTH,
+      height: INTERACTIVE_OBJECT_CONSTANTS.BUTTON_DEFAULT_HEIGHT,
       fill: '#007cba',
       stroke: '#005a87',
       ...options,
@@ -195,7 +229,9 @@ export class Button extends InteractiveObject {
     this.text = options.text || 'Button';
     this.textColor = options.textColor || '#ffffff';
     this.font = options.font || '14px Arial';
-    this.borderRadius = options.borderRadius || 4;
+    this.borderRadius =
+      options.borderRadius ||
+      INTERACTIVE_OBJECT_CONSTANTS.BUTTON_DEFAULT_BORDER_RADIUS;
 
     // Button states
     this.colors = {
@@ -288,8 +324,8 @@ export class Button extends InteractiveObject {
 export class Slider extends InteractiveObject {
   constructor(options = {}) {
     super({
-      width: 200,
-      height: 20,
+      width: INTERACTIVE_OBJECT_CONSTANTS.SLIDER_DEFAULT_WIDTH,
+      height: INTERACTIVE_OBJECT_CONSTANTS.SLIDER_DEFAULT_HEIGHT,
       fill: '#e0e0e0',
       stroke: '#cccccc',
       ...options,
@@ -298,12 +334,19 @@ export class Slider extends InteractiveObject {
     this.type = 'slider';
     this.min = options.min || 0;
     this.max = options.max || 100;
-    this.value = options.value !== undefined ? options.value : 50;
+    this.value =
+      options.value !== undefined
+        ? options.value
+        : INTERACTIVE_OBJECT_CONSTANTS.SLIDER_DEFAULT_VALUE;
     this.step = options.step || 1;
 
     // Handle styling
-    this.handleWidth = options.handleWidth || 20;
-    this.handleHeight = options.handleHeight || this.height + 4;
+    this.handleWidth =
+      options.handleWidth ||
+      INTERACTIVE_OBJECT_CONSTANTS.SLIDER_DEFAULT_HANDLE_WIDTH;
+    this.handleHeight =
+      options.handleHeight ||
+      this.height + INTERACTIVE_OBJECT_CONSTANTS.SLIDER_HANDLE_HEIGHT_OFFSET;
     this.handleColor = options.handleColor || '#007cba';
     this.trackColor = options.trackColor || '#f0f0f0';
     this.fillColor = options.fillColor || '#007cba';
@@ -348,7 +391,7 @@ export class Slider extends InteractiveObject {
         const handleX = this.getHandlePosition();
         const handleBounds = {
           x: handleX,
-          y: this.y - 2,
+          y: this.y - INTERACTIVE_OBJECT_CONSTANTS.SLIDER_HANDLE_Y_OFFSET,
           width: this.handleWidth,
           height: this.handleHeight,
         };
@@ -426,7 +469,9 @@ export class Slider extends InteractiveObject {
       // Draw track
       renderer.drawRect(
         this.x,
-        this.y + this.height / 4,
+        this.y +
+          this.height /
+            INTERACTIVE_OBJECT_CONSTANTS.SLIDER_TRACK_QUARTER_DIVISOR,
         this.width,
         this.height / 2,
         {
@@ -441,7 +486,9 @@ export class Slider extends InteractiveObject {
       if (fillWidth > 0) {
         renderer.drawRect(
           this.x,
-          this.y + this.height / 4,
+          this.y +
+            this.height /
+              INTERACTIVE_OBJECT_CONSTANTS.SLIDER_TRACK_QUARTER_DIVISOR,
           fillWidth,
           this.height / 2,
           {
@@ -453,7 +500,7 @@ export class Slider extends InteractiveObject {
       // Draw handle
       renderer.drawRect(
         handleX,
-        this.y - 2,
+        this.y - INTERACTIVE_OBJECT_CONSTANTS.SLIDER_HANDLE_Y_OFFSET,
         this.handleWidth,
         this.handleHeight,
         {
@@ -471,7 +518,10 @@ export class Slider extends InteractiveObject {
       // Track
       const track = renderer.createSVGElement('rect', {
         x: this.x,
-        y: this.y + this.height / 4,
+        y:
+          this.y +
+          this.height /
+            INTERACTIVE_OBJECT_CONSTANTS.SLIDER_TRACK_QUARTER_DIVISOR,
         width: this.width,
         height: this.height / 2,
         fill: this.trackColor,
@@ -483,7 +533,10 @@ export class Slider extends InteractiveObject {
       if (progress > 0) {
         const fill = renderer.createSVGElement('rect', {
           x: this.x,
-          y: this.y + this.height / 4,
+          y:
+            this.y +
+            this.height /
+              INTERACTIVE_OBJECT_CONSTANTS.SLIDER_TRACK_QUARTER_DIVISOR,
           width: this.width * progress,
           height: this.height / 2,
           fill: this.fillColor,
@@ -494,7 +547,7 @@ export class Slider extends InteractiveObject {
       // Handle
       const handle = renderer.createSVGElement('rect', {
         x: handleX,
-        y: this.y - 2,
+        y: this.y - INTERACTIVE_OBJECT_CONSTANTS.SLIDER_HANDLE_Y_OFFSET,
         width: this.handleWidth,
         height: this.handleHeight,
         fill: this.handleColor,
@@ -515,8 +568,8 @@ export class Slider extends InteractiveObject {
 export class Meter extends InteractiveObject {
   constructor(options = {}) {
     super({
-      width: 200,
-      height: 30,
+      width: INTERACTIVE_OBJECT_CONSTANTS.METER_DEFAULT_WIDTH,
+      height: INTERACTIVE_OBJECT_CONSTANTS.METER_DEFAULT_HEIGHT,
       fill: '#f0f0f0',
       stroke: '#cccccc',
       interactive: false,
@@ -637,8 +690,8 @@ export class Meter extends InteractiveObject {
 export class Label extends InteractiveObject {
   constructor(options = {}) {
     super({
-      width: 100,
-      height: 20,
+      width: INTERACTIVE_OBJECT_CONSTANTS.LABEL_DEFAULT_WIDTH,
+      height: INTERACTIVE_OBJECT_CONSTANTS.LABEL_DEFAULT_HEIGHT,
       interactive: false,
       fill: 'transparent',
       stroke: 'none',

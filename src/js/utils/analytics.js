@@ -28,11 +28,113 @@ const ANALYTICS_CONSTANTS = {
   MAX_BATCH_SIZE: 50,
   MIN_FLUSH_INTERVAL: 10000, // 10 seconds
   MAX_FLUSH_INTERVAL: 300000, // 5 minutes
-  SESSION_TIMEOUT: 30 * 60 * 1000, // 30 minutes
+  SESSION_TIMEOUT: 30 * ANALYTICS_CONSTANTS.TIME.MINUTES_PER_HOUR * 1000, // 30 minutes
   ERROR_SAMPLING_RATE: 1.0, // 100% for educational platform
   PERFORMANCE_SAMPLING_RATE: 0.1, // 10%
   MAX_STORED_EVENTS: 1000,
   ANONYMIZATION_SALT: 'SimulateAI_Analytics_2024',
+
+  // Time constants
+  TIME: {
+    MINUTES_PER_HOUR: 60,
+    SECONDS_PER_MINUTE: 60,
+    HOURS_PER_DAY: 24,
+    DAYS_PER_YEAR: 365,
+    MILLISECONDS_PER_HOUR: 3600000,
+    MEMORY_CHECK_INTERVAL: 30000, // 30 seconds
+    DEBOUNCE_DELAY: 500, // 500ms
+  },
+
+  // Performance monitoring thresholds
+  PERFORMANCE: {
+    LAYOUT_SHIFT_THRESHOLD: 0.1,
+    LARGE_RESOURCE_SIZE: 100000, // 100KB
+    MEMORY_PRESSURE_THRESHOLD: 0.8, // 80%
+    QUEUE_SIZE_URGENT: 50,
+    QUEUE_SIZE_NORMAL: 20,
+    BREADCRUMB_COUNT: 10,
+  },
+
+  // ID generation constants
+  ID_GENERATION: {
+    RADIX: 36,
+    SUBSTRING_LENGTH: 9,
+    SUBSTRING_START: 2,
+    SESSION_ID_SUFFIX_LENGTH: 8,
+  },
+
+  // Memory and storage constants
+  MEMORY: {
+    BYTES_PER_KB: 1024,
+    KB_PER_MB: 1024,
+    LARGE_PAYLOAD_THRESHOLD: 10000,
+    REQUEST_TIMEOUT: 30000, // 30 seconds
+  },
+
+  // Privacy and retention constants
+  PRIVACY: {
+    GDPR_RETENTION_DAYS: 90,
+    CONSENT_REFRESH_DAYS: 365,
+  },
+
+  // Educational assessment thresholds
+  EDUCATION: {
+    MASTERY_THRESHOLD_HIGH: 0.8, // 80%
+    CONFIDENCE_LOW: 30,
+    CONFIDENCE_MEDIUM: 50,
+    CONFIDENCE_HIGH: 70,
+    ATTEMPTS_HIGH: 5,
+    ATTEMPTS_MEDIUM: 3,
+    EXPERT_THRESHOLD: 90,
+    PROFICIENT_THRESHOLD: 80,
+    DEVELOPING_THRESHOLD: 70,
+    BEGINNING_THRESHOLD: 60,
+    REVIEW_CONFIDENCE_THRESHOLD: 70,
+  },
+
+  // Screen resolution ranges (for privacy generalization)
+  SCREEN: {
+    RESOLUTION_4K: 3840,
+    RESOLUTION_2K: 2560,
+    RESOLUTION_FHD: 1920,
+    RESOLUTION_HD_PLUS: 1366,
+    RESOLUTION_HD: 1024,
+  },
+
+  // Session analysis thresholds
+  SESSION: {
+    SHORT_SESSION_THRESHOLD: 60000, // 1 minute
+    LONG_SESSION_THRESHOLD: 1800000, // 30 minutes
+    BOUNCE_EVENT_THRESHOLD: 2,
+  },
+
+  // Hash and encoding constants
+  HASH: {
+    HEX_RADIX: 16,
+    HEX_PAD_LENGTH: 2,
+    HEX_PAD_CHAR: '0',
+    HASH_SUBSTRING_LENGTH: 16,
+    HASH_SHIFT_BITS: 5,
+    FALLBACK_RADIX: 36,
+  },
+
+  // Network and compression constants
+  NETWORK: {
+    COMPRESSION_THRESHOLD: 10000,
+    REQUEST_TIMEOUT: 30000, // 30 seconds
+  },
+
+  // Analytics scoring and trend analysis
+  ANALYTICS: {
+    TIME_SCORE_DIVISOR: 60000, // 1 minute
+    CONFIDENCE_HIGH_THRESHOLD: 10,
+    CONFIDENCE_MEDIUM_THRESHOLD: 5,
+    MIN_DATA_POINTS: 3,
+    TREND_IMPROVEMENT_THRESHOLD: 5,
+    TREND_DECLINE_THRESHOLD: -5,
+    ENGAGEMENT_FEATURE_MULTIPLIER: 20,
+    RECENT_SESSIONS_COUNT: 50,
+  },
 };
 
 const ANALYTICS_EVENTS = {
@@ -176,7 +278,9 @@ class AnalyticsPerformance {
     // Track layout shifts
     const layoutObserver = new PerformanceObserver(list => {
       list.getEntries().forEach(entry => {
-        if (entry.value > 0.1) {
+        if (
+          entry.value > ANALYTICS_CONSTANTS.PERFORMANCE.LAYOUT_SHIFT_THRESHOLD
+        ) {
           // Only track significant shifts
           this.trackMetric('layout-shift', {
             value: entry.value,
@@ -216,7 +320,10 @@ class AnalyticsPerformance {
   static setupResourceTracking() {
     const resourceObserver = new PerformanceObserver(list => {
       list.getEntries().forEach(entry => {
-        if (entry.transferSize > 100000) {
+        if (
+          entry.transferSize >
+          ANALYTICS_CONSTANTS.PERFORMANCE.LARGE_RESOURCE_SIZE
+        ) {
           // Track large resources (>100KB)
           this.trackMetric('large-resource', {
             name: entry.name.split('/').pop(),
@@ -376,10 +483,15 @@ class AnalyticsManager {
    */
   static async generateSessionId() {
     const timestamp = Date.now();
-    const random = Math.random().toString(36).substr(2, 9);
+    const random = Math.random()
+      .toString(ANALYTICS_CONSTANTS.ID_GENERATION.RADIX)
+      .substr(
+        ANALYTICS_CONSTANTS.ID_GENERATION.SUBSTRING_START,
+        ANALYTICS_CONSTANTS.ID_GENERATION.SUBSTRING_LENGTH
+      );
     const stored = StorageManager.getSessionId?.() || '';
 
-    return `${timestamp}_${random}_${stored.substr(-8)}`;
+    return `${timestamp}_${random}_${stored.substr(-ANALYTICS_CONSTANTS.ID_GENERATION.SESSION_ID_SUFFIX_LENGTH)}`;
   }
 
   /**
@@ -427,7 +539,12 @@ class AnalyticsManager {
       if (this.config.gdprCompliant) {
         const lastConsentCheck = analytics.lastConsentCheck || 0;
         const needsConsentRefresh =
-          Date.now() - lastConsentCheck > 365 * 24 * 60 * 60 * 1000; // 1 year
+          Date.now() - lastConsentCheck >
+          ANALYTICS_CONSTANTS.PRIVACY.CONSENT_REFRESH_DAYS *
+            ANALYTICS_CONSTANTS.TIME.HOURS_PER_DAY *
+            ANALYTICS_CONSTANTS.TIME.MINUTES_PER_HOUR *
+            ANALYTICS_CONSTANTS.TIME.SECONDS_PER_MINUTE *
+            1000; // 1 year
 
         if (needsConsentRefresh && !analytics.explicitConsent) {
           this.config.enabled = false;
@@ -463,7 +580,10 @@ class AnalyticsManager {
     if (isGDPRRegion) {
       this.config.gdprCompliant = true;
       this.config.anonymizeData = true;
-      this.config.retentionDays = Math.min(this.config.retentionDays, 90);
+      this.config.retentionDays = Math.min(
+        this.config.retentionDays,
+        ANALYTICS_CONSTANTS.PRIVACY.GDPR_RETENTION_DAYS
+      );
     }
 
     // California/CCPA
@@ -704,7 +824,7 @@ class AnalyticsManager {
           newSize: `${window.innerWidth}x${window.innerHeight}`,
           orientation: window.orientation || 0,
         });
-      }, 500)
+      }, ANALYTICS_CONSTANTS.TIME.DEBOUNCE_DELAY)
     );
 
     // Input method tracking
@@ -721,11 +841,11 @@ class AnalyticsManager {
         const { memory } = performance;
         const usage = memory.usedJSHeapSize / memory.jsHeapSizeLimit;
 
-        if (usage > 0.8) {
+        if (usage > ANALYTICS_CONSTANTS.PERFORMANCE.MEMORY_PRESSURE_THRESHOLD) {
           // 80% memory usage
           this.trackPerformanceMetric('memory_pressure', usage * 100, '%');
         }
-      }, 30000); // Check every 30 seconds
+      }, ANALYTICS_CONSTANTS.TIME.MEMORY_CHECK_INTERVAL); // Check every 30 seconds
     }
 
     // Long task detection
@@ -811,8 +931,10 @@ class AnalyticsManager {
     // Adaptive flush interval based on queue size
     const getFlushInterval = () => {
       const queueSize = this.eventQueue.length;
-      if (queueSize > 50) return ANALYTICS_CONSTANTS.MIN_FLUSH_INTERVAL;
-      if (queueSize > 20) return this.config.flushInterval;
+      if (queueSize > ANALYTICS_CONSTANTS.PERFORMANCE.QUEUE_SIZE_URGENT)
+        return ANALYTICS_CONSTANTS.MIN_FLUSH_INTERVAL;
+      if (queueSize > ANALYTICS_CONSTANTS.PERFORMANCE.QUEUE_SIZE_NORMAL)
+        return this.config.flushInterval;
       return Math.min(
         this.config.flushInterval * 2,
         ANALYTICS_CONSTANTS.MAX_FLUSH_INTERVAL
@@ -910,7 +1032,7 @@ class AnalyticsManager {
    * Generate unique event ID
    */
   static generateEventId() {
-    return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `${Date.now()}_${Math.random().toString(ANALYTICS_CONSTANTS.ID_GENERATION.RADIX).substr(ANALYTICS_CONSTANTS.ID_GENERATION.SUBSTRING_START, ANALYTICS_CONSTANTS.ID_GENERATION.SUBSTRING_LENGTH)}`;
   }
 
   /**
@@ -928,7 +1050,9 @@ class AnalyticsManager {
     // Add memory info if available
     if (performance.memory) {
       enhanced._memoryUsage = Math.round(
-        performance.memory.usedJSHeapSize / 1024 / 1024
+        performance.memory.usedJSHeapSize /
+          ANALYTICS_CONSTANTS.MEMORY.BYTES_PER_KB /
+          ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB
       ); // MB
     }
 
@@ -952,8 +1076,16 @@ class AnalyticsManager {
       now: performance.now(),
       memory: performance.memory
         ? {
-            used: Math.round(performance.memory.usedJSHeapSize / 1024 / 1024),
-            total: Math.round(performance.memory.totalJSHeapSize / 1024 / 1024),
+            used: Math.round(
+              performance.memory.usedJSHeapSize /
+                ANALYTICS_CONSTANTS.MEMORY.BYTES_PER_KB /
+                ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB
+            ),
+            total: Math.round(
+              performance.memory.totalJSHeapSize /
+                ANALYTICS_CONSTANTS.MEMORY.BYTES_PER_KB /
+                ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB
+            ),
           }
         : null,
     };
@@ -1171,11 +1303,13 @@ class AnalyticsManager {
    */
   static getErrorBreadcrumbs() {
     // Return last 10 events as breadcrumbs
-    return this.eventQueue.slice(-10).map(event => ({
-      name: event.name,
-      timestamp: event.timestamp,
-      url: event.url,
-    }));
+    return this.eventQueue
+      .slice(-ANALYTICS_CONSTANTS.PERFORMANCE.BREADCRUMB_COUNT)
+      .map(event => ({
+        name: event.name,
+        timestamp: event.timestamp,
+        url: event.url,
+      }));
   }
 
   /**
@@ -1192,8 +1326,16 @@ class AnalyticsManager {
       userAgent: navigator.userAgent.substring(0, 100),
       memory: performance.memory
         ? {
-            used: Math.round(performance.memory.usedJSHeapSize / 1024 / 1024),
-            limit: Math.round(performance.memory.jsHeapSizeLimit / 1024 / 1024),
+            used: Math.round(
+              performance.memory.usedJSHeapSize /
+                ANALYTICS_CONSTANTS.MEMORY.BYTES_PER_KB /
+                ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB
+            ),
+            limit: Math.round(
+              performance.memory.jsHeapSizeLimit /
+                ANALYTICS_CONSTANTS.MEMORY.BYTES_PER_KB /
+                ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB
+            ),
           }
         : null,
       connection: navigator.connection
@@ -1260,9 +1402,9 @@ class AnalyticsManager {
     const masteryPercentage =
       path.length > 0 ? (correctAnswers / path.length) * 100 : 0;
     const masteryLevel =
-      masteryPercentage >= 80
+      masteryPercentage >= ANALYTICS_CONSTANTS.EDUCATION.PROFICIENT_THRESHOLD
         ? 'high'
-        : masteryPercentage >= 60
+        : masteryPercentage >= ANALYTICS_CONSTANTS.EDUCATION.BEGINNING_THRESHOLD
           ? 'medium'
           : 'low';
 
@@ -1308,7 +1450,10 @@ class AnalyticsManager {
       completion[objective.id] = {
         percentage: total > 0 ? (completed / total) * 100 : 0,
         attempts: total,
-        mastered: total > 0 && completed / total >= 0.8,
+        mastered:
+          total > 0 &&
+          completed / total >=
+            ANALYTICS_CONSTANTS.EDUCATION.MASTERY_THRESHOLD_HIGH,
       };
     });
 
@@ -1323,7 +1468,8 @@ class AnalyticsManager {
       topic,
       confidence,
       attempts,
-      needsReview: confidence < 70,
+      needsReview:
+        confidence < ANALYTICS_CONSTANTS.EDUCATION.REVIEW_CONFIDENCE_THRESHOLD,
       severityLevel: this.calculateGapSeverity(confidence, attempts),
       recommendedActions: this.getRecommendedActions(confidence, attempts),
       relatedTopics: additionalData.relatedTopics || [],
@@ -1339,9 +1485,18 @@ class AnalyticsManager {
    * Calculate knowledge gap severity
    */
   static calculateGapSeverity(confidence, attempts) {
-    if (confidence < 30 && attempts > 5) return 'critical';
-    if (confidence < 50 && attempts > 3) return 'high';
-    if (confidence < 70) return 'medium';
+    if (
+      confidence < ANALYTICS_CONSTANTS.EDUCATION.CONFIDENCE_LOW &&
+      attempts > ANALYTICS_CONSTANTS.EDUCATION.ATTEMPTS_HIGH
+    )
+      return 'critical';
+    if (
+      confidence < ANALYTICS_CONSTANTS.EDUCATION.CONFIDENCE_MEDIUM &&
+      attempts > ANALYTICS_CONSTANTS.EDUCATION.ATTEMPTS_MEDIUM
+    )
+      return 'high';
+    if (confidence < ANALYTICS_CONSTANTS.EDUCATION.CONFIDENCE_HIGH)
+      return 'medium';
     return 'low';
   }
 
@@ -1351,19 +1506,19 @@ class AnalyticsManager {
   static getRecommendedActions(confidence, attempts) {
     const actions = [];
 
-    if (confidence < 30) {
+    if (confidence < ANALYTICS_CONSTANTS.EDUCATION.CONFIDENCE_LOW) {
       actions.push(
         'review_fundamentals',
         'additional_practice',
         'tutor_assistance'
       );
-    } else if (confidence < 50) {
+    } else if (confidence < ANALYTICS_CONSTANTS.EDUCATION.CONFIDENCE_MEDIUM) {
       actions.push('practice_exercises', 'peer_discussion');
-    } else if (confidence < 70) {
+    } else if (confidence < ANALYTICS_CONSTANTS.EDUCATION.CONFIDENCE_HIGH) {
       actions.push('light_review', 'confidence_building');
     }
 
-    if (attempts > 5) {
+    if (attempts > ANALYTICS_CONSTANTS.EDUCATION.ATTEMPTS_HIGH) {
       actions.push('alternative_approach', 'break_session');
     }
 
@@ -1426,10 +1581,14 @@ class AnalyticsManager {
 
     const percentage = (assessment.score / assessment.maxScore) * 100;
 
-    if (percentage >= 90) return 'expert';
-    if (percentage >= 80) return 'proficient';
-    if (percentage >= 70) return 'developing';
-    if (percentage >= 60) return 'beginning';
+    if (percentage >= ANALYTICS_CONSTANTS.EDUCATION.EXPERT_THRESHOLD)
+      return 'expert';
+    if (percentage >= ANALYTICS_CONSTANTS.EDUCATION.PROFICIENT_THRESHOLD)
+      return 'proficient';
+    if (percentage >= ANALYTICS_CONSTANTS.EDUCATION.DEVELOPING_THRESHOLD)
+      return 'developing';
+    if (percentage >= ANALYTICS_CONSTANTS.EDUCATION.BEGINNING_THRESHOLD)
+      return 'beginning';
     return 'needs_support';
   } // Enhanced data processing methods
   /**
@@ -1458,7 +1617,9 @@ class AnalyticsManager {
     // Generalize timestamps to hour precision for privacy
     if (anonymized.timestamp) {
       anonymized.timestamp =
-        Math.floor(anonymized.timestamp / 3600000) * 3600000;
+        Math.floor(
+          anonymized.timestamp / ANALYTICS_CONSTANTS.TIME.MILLISECONDS_PER_HOUR
+        ) * ANALYTICS_CONSTANTS.TIME.MILLISECONDS_PER_HOUR;
     }
 
     // Anonymize nested objects
@@ -1491,11 +1652,11 @@ class AnalyticsManager {
 
     const [width] = resolution.split('x').map(Number);
 
-    if (width >= 3840) return '4K+';
-    if (width >= 2560) return '2K+';
-    if (width >= 1920) return 'FHD';
-    if (width >= 1366) return 'HD+';
-    if (width >= 1024) return 'HD';
+    if (width >= ANALYTICS_CONSTANTS.SCREEN.RESOLUTION_4K) return '4K+';
+    if (width >= ANALYTICS_CONSTANTS.SCREEN.RESOLUTION_2K) return '2K+';
+    if (width >= ANALYTICS_CONSTANTS.SCREEN.RESOLUTION_FHD) return 'FHD';
+    if (width >= ANALYTICS_CONSTANTS.SCREEN.RESOLUTION_HD_PLUS) return 'HD+';
+    if (width >= ANALYTICS_CONSTANTS.SCREEN.RESOLUTION_HD) return 'HD';
     return 'SD';
   }
 
@@ -1513,19 +1674,28 @@ class AnalyticsManager {
       const hashBuffer = await crypto.subtle.digest('SHA-256', data);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       return hashArray
-        .map(b => b.toString(16).padStart(2, '0'))
+        .map(b =>
+          b
+            .toString(ANALYTICS_CONSTANTS.HASH.HEX_RADIX)
+            .padStart(
+              ANALYTICS_CONSTANTS.HASH.HEX_PAD_LENGTH,
+              ANALYTICS_CONSTANTS.HASH.HEX_PAD_CHAR
+            )
+        )
         .join('')
-        .substring(0, 16);
+        .substring(0, ANALYTICS_CONSTANTS.HASH.HASH_SUBSTRING_LENGTH);
     } catch (error) {
       // Fallback to simple hash for older browsers
       let hash = 0;
       const str = String(value) + ANALYTICS_CONSTANTS.ANONYMIZATION_SALT;
       for (let i = 0; i < str.length; i++) {
         const char = str.charCodeAt(i);
-        hash = (hash << 5) - hash + char;
+        hash = (hash << ANALYTICS_CONSTANTS.HASH.HASH_SHIFT_BITS) - hash + char;
         hash = hash & hash; // Convert to 32-bit integer
       }
-      return Math.abs(hash).toString(36).substring(0, 16);
+      return Math.abs(hash)
+        .toString(ANALYTICS_CONSTANTS.HASH.FALLBACK_RADIX)
+        .substring(0, ANALYTICS_CONSTANTS.HASH.HASH_SUBSTRING_LENGTH);
     }
   } // Enhanced data transmission with retry logic and optimization
   /**
@@ -1630,7 +1800,10 @@ class AnalyticsManager {
 
       // Compress large payloads
       let body = JSON.stringify(payload);
-      if (body.length > 10000 && 'CompressionStream' in window) {
+      if (
+        body.length > ANALYTICS_CONSTANTS.NETWORK.COMPRESSION_THRESHOLD &&
+        'CompressionStream' in window
+      ) {
         body = await this.compressData(body);
         payload.metadata.compressed = true;
       }
@@ -1647,7 +1820,10 @@ class AnalyticsManager {
       }
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      const timeoutId = setTimeout(
+        () => controller.abort(),
+        ANALYTICS_CONSTANTS.NETWORK.REQUEST_TIMEOUT
+      ); // 30 second timeout
 
       const response = await fetch(this.config.endpoint, {
         method: 'POST',
@@ -1886,9 +2062,17 @@ class AnalyticsManager {
           ? durations.reduce((a, b) => a + b, 0) / durations.length
           : 0,
       medianDuration: this.calculateMedian(durations),
-      shortSessions: durations.filter(d => d < 60000).length, // < 1 minute
-      mediumSessions: durations.filter(d => d >= 60000 && d < 1800000).length, // 1-30 minutes
-      longSessions: durations.filter(d => d >= 1800000).length, // > 30 minutes
+      shortSessions: durations.filter(
+        d => d < ANALYTICS_CONSTANTS.SESSION.SHORT_SESSION_THRESHOLD
+      ).length, // < 1 minute
+      mediumSessions: durations.filter(
+        d =>
+          d >= ANALYTICS_CONSTANTS.SESSION.SHORT_SESSION_THRESHOLD &&
+          d < ANALYTICS_CONSTANTS.SESSION.LONG_SESSION_THRESHOLD
+      ).length, // 1-30 minutes
+      longSessions: durations.filter(
+        d => d >= ANALYTICS_CONSTANTS.SESSION.LONG_SESSION_THRESHOLD
+      ).length, // > 30 minutes
       bounceRate: this.calculateBounceRate(sessionArray),
       returningUserRate: this.calculateReturningUserRate(events),
       themeDistribution: this.analyzeThemeDistribution(sessionArray),
@@ -2053,7 +2237,9 @@ class AnalyticsManager {
       0
     );
 
-    score += Math.floor(totalTime / 60000); // 1 point per minute
+    score += Math.floor(
+      totalTime / ANALYTICS_CONSTANTS.ANALYTICS.TIME_SCORE_DIVISOR
+    ); // 1 point per minute
 
     return Math.min(score, 1000); // Cap at 1000
   } /**
@@ -2083,7 +2269,12 @@ class AnalyticsManager {
     const scores = completions.map(c => c.data?.score || 0).filter(s => s > 0);
     const average = scores.reduce((a, b) => a + b, 0) / scores.length;
     const confidence =
-      scores.length >= 10 ? 'high' : scores.length >= 5 ? 'medium' : 'low';
+      scores.length >= ANALYTICS_CONSTANTS.ANALYTICS.CONFIDENCE_HIGH_THRESHOLD
+        ? 'high'
+        : scores.length >=
+            ANALYTICS_CONSTANTS.ANALYTICS.CONFIDENCE_MEDIUM_THRESHOLD
+          ? 'medium'
+          : 'low';
 
     return { average, confidence, sampleSize: scores.length };
   }
@@ -2092,7 +2283,8 @@ class AnalyticsManager {
    * Enhanced improvement trend analysis
    */
   static calculateImprovementTrend(completions) {
-    if (completions.length < 3) return { trend: 'insufficient_data', slope: 0 };
+    if (completions.length < ANALYTICS_CONSTANTS.ANALYTICS.MIN_DATA_POINTS)
+      return { trend: 'insufficient_data', slope: 0 };
 
     const scores = completions
       .map(c => ({ score: c.data?.score || 0, timestamp: c.timestamp }))

@@ -267,7 +267,14 @@ limitations under the License.
                     one thoughtful decision at a time.
                 </p>
                 <div class="hero-actions">
-                    <button class="btn btn-primary" id="start-learning">Start Exploring</button>
+                    <button class="btn btn-primary" id="start-learning" 
+                            aria-describedby="start-learning-description"
+                            title="Navigate to Ethics Categories section">
+                        Start Exploring
+                    </button>
+                    <span id="start-learning-description" class="sr-only">
+                        Navigate to the Ethics Categories section to explore thematic categories of ethical dilemmas
+                    </span>
                     <!-- Debug: Test scenario modal button -->
                     <button id="test-scenario-modal">Test Scenario</button>
                 </div>

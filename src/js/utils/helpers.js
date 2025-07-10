@@ -43,7 +43,22 @@ const HELPERS_CONSTANTS = {
   MAX_CACHE_SIZE: 1000,
   CACHE_EXPIRY: 300000, // 5 minutes
   PERFORMANCE_SAMPLE_RATE: 0.1,
-  
+
+  // UI and spacing constants
+  UI: {
+    TOOLTIP_SPACING: 8,
+    SMOOTH_SCROLL_DURATION: 500,
+    TOOLTIP_ID_LENGTH: 8,
+    DEFAULT_SPACING: 8,
+  },
+
+  // Scoring constants
+  SCORING: {
+    PASSWORD_BASE_SCORE: 20,
+    PASSWORD_LENGTH_BONUS: 10,
+    PASSWORD_MIN_SECURE_LENGTH: 12,
+  },
+
   // Text analysis constants
   TEXT_ANALYSIS: {
     EXCESSIVE_CAPS_PENALTY: 50,
@@ -52,7 +67,7 @@ const HELPERS_CONSTANTS = {
     PUNCTUATION_PENALTY: 15,
     MAX_WORDS_PER_SENTENCE: 20,
   },
-  
+
   // Time constants
   TIME: {
     SECONDS_PER_MINUTE: 60,
@@ -63,8 +78,9 @@ const HELPERS_CONSTANTS = {
     DAYS_PER_YEAR: 365,
     MILLISECONDS_PER_SECOND: 1000,
     WEEKEND_DAYS: [0, 6], // Sunday and Saturday
+    URL_CLEANUP_DELAY: 1000, // 1 second for URL cleanup
   },
-  
+
   // Color constants
   COLOR: {
     RGB_MAX: 255,
@@ -82,8 +98,18 @@ const HELPERS_CONSTANTS = {
     LUMINANCE_OFFSET_2: 0.055,
     LUMINANCE_DIVISOR_2: 1.055,
     LUMINANCE_EXPONENT: 2.4,
+    // Color science constants for luminance calculation
+    LUMINANCE_RED_WEIGHT: 0.2126,
+    LUMINANCE_GREEN_WEIGHT: 0.7152,
+    LUMINANCE_BLUE_WEIGHT: 0.0722,
+    // HSL conversion constants
+    HSL_HUE_CIRCLE: 360,
+    HSL_HUE_SECTIONS: 6,
+    HSL_HUE_RED_OFFSET: 4,
+    HSL_LIGHTNESS_THRESHOLD: 0.5,
+    FACTOR_LIGHTEN: 0.8,
   },
-  
+
   VALIDATION_PATTERNS: {
     EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     URL: /^https?:\/\/[^\s/$.?#].[^\s]*$/i,
@@ -722,7 +748,9 @@ class Helpers {
     // Check for excessive punctuation
     const punctuationRatio =
       (text.match(/[!?]{2,}/g) || []).length / text.length;
-    if (punctuationRatio > HELPERS_CONSTANTS.TEXT_ANALYSIS.PUNCTUATION_THRESHOLD) {
+    if (
+      punctuationRatio > HELPERS_CONSTANTS.TEXT_ANALYSIS.PUNCTUATION_THRESHOLD
+    ) {
       issues.push('Excessive punctuation detected');
       score -= HELPERS_CONSTANTS.TEXT_ANALYSIS.PUNCTUATION_PENALTY;
     }
@@ -732,7 +760,10 @@ class Helpers {
     const words = text.split(/\s+/).filter(w => w.length > 0);
     const avgWordsPerSentence = words.length / Math.max(sentences.length, 1);
 
-    if (avgWordsPerSentence > HELPERS_CONSTANTS.TEXT_ANALYSIS.MAX_WORDS_PER_SENTENCE) {
+    if (
+      avgWordsPerSentence >
+      HELPERS_CONSTANTS.TEXT_ANALYSIS.MAX_WORDS_PER_SENTENCE
+    ) {
       issues.push('Sentences may be too long');
       score -= 10;
     }
@@ -773,7 +804,9 @@ class Helpers {
           `${hours % COMMON.HOURS_24} hour${hours % COMMON.HOURS_24 > 1 ? 's' : ''}`
         );
       if (minutes % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE > 0)
-        parts.push(`${minutes % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE} minute${minutes % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE > 1 ? 's' : ''}`);
+        parts.push(
+          `${minutes % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE} minute${minutes % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE > 1 ? 's' : ''}`
+        );
       if (seconds % COMMON.MINUTES_60 > 0)
         parts.push(
           `${seconds % COMMON.MINUTES_60} second${seconds % COMMON.MINUTES_60 > 1 ? 's' : ''}`
@@ -878,40 +911,64 @@ class Helpers {
     if (diff < 0) return 'In the future';
 
     const units = [
-      { 
-        name: 'year', 
-        short: 'y', 
-        ms: HELPERS_CONSTANTS.TIME.DAYS_PER_YEAR * HELPERS_CONSTANTS.TIME.HOURS_PER_DAY * HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND 
+      {
+        name: 'year',
+        short: 'y',
+        ms:
+          HELPERS_CONSTANTS.TIME.DAYS_PER_YEAR *
+          HELPERS_CONSTANTS.TIME.HOURS_PER_DAY *
+          HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE *
+          HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE *
+          HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND,
       },
-      { 
-        name: 'month', 
-        short: 'mo', 
-        ms: HELPERS_CONSTANTS.TIME.DAYS_PER_MONTH * HELPERS_CONSTANTS.TIME.HOURS_PER_DAY * HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND 
+      {
+        name: 'month',
+        short: 'mo',
+        ms:
+          HELPERS_CONSTANTS.TIME.DAYS_PER_MONTH *
+          HELPERS_CONSTANTS.TIME.HOURS_PER_DAY *
+          HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE *
+          HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE *
+          HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND,
       },
-      { 
-        name: 'week', 
-        short: 'w', 
-        ms: HELPERS_CONSTANTS.TIME.DAYS_PER_WEEK * HELPERS_CONSTANTS.TIME.HOURS_PER_DAY * HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND 
+      {
+        name: 'week',
+        short: 'w',
+        ms:
+          HELPERS_CONSTANTS.TIME.DAYS_PER_WEEK *
+          HELPERS_CONSTANTS.TIME.HOURS_PER_DAY *
+          HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE *
+          HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE *
+          HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND,
       },
-      { 
-        name: 'day', 
-        short: 'd', 
-        ms: HELPERS_CONSTANTS.TIME.HOURS_PER_DAY * HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND 
+      {
+        name: 'day',
+        short: 'd',
+        ms:
+          HELPERS_CONSTANTS.TIME.HOURS_PER_DAY *
+          HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE *
+          HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE *
+          HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND,
       },
-      { 
-        name: 'hour', 
-        short: 'h', 
-        ms: HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND 
+      {
+        name: 'hour',
+        short: 'h',
+        ms:
+          HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE *
+          HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE *
+          HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND,
       },
-      { 
-        name: 'minute', 
-        short: 'm', 
-        ms: HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE * HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND 
+      {
+        name: 'minute',
+        short: 'm',
+        ms:
+          HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE *
+          HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND,
       },
-      { 
-        name: 'second', 
-        short: 's', 
-        ms: HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND 
+      {
+        name: 'second',
+        short: 's',
+        ms: HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND,
       },
     ];
 
@@ -984,7 +1041,11 @@ class Helpers {
    * @param {number[]} excludedDays - Days to exclude (0=Sunday, 6=Saturday)
    * @returns {number} Number of business days
    */
-  static calculateBusinessDays(startDate, endDate, excludedDays = HELPERS_CONSTANTS.TIME.WEEKEND_DAYS) {
+  static calculateBusinessDays(
+    startDate,
+    endDate,
+    excludedDays = HELPERS_CONSTANTS.TIME.WEEKEND_DAYS
+  ) {
     if (!(startDate instanceof Date) || !(endDate instanceof Date)) return 0;
 
     let count = 0;
@@ -1094,9 +1155,18 @@ class Helpers {
 
     // Default light theme
     if (value < HELPERS_CONSTANTS.COLOR.THRESHOLD_HIGH) {
-      return this.interpolateColor('#ff4444', '#ffaa00', value / HELPERS_CONSTANTS.COLOR.THRESHOLD_HIGH);
+      return this.interpolateColor(
+        '#ff4444',
+        '#ffaa00',
+        value / HELPERS_CONSTANTS.COLOR.THRESHOLD_HIGH
+      );
     } else {
-      return this.interpolateColor('#ffaa00', '#00aa00', (value - HELPERS_CONSTANTS.COLOR.THRESHOLD_HIGH) / HELPERS_CONSTANTS.COLOR.THRESHOLD_HIGH);
+      return this.interpolateColor(
+        '#ffaa00',
+        '#00aa00',
+        (value - HELPERS_CONSTANTS.COLOR.THRESHOLD_HIGH) /
+          HELPERS_CONSTANTS.COLOR.THRESHOLD_HIGH
+      );
     }
   }
 
@@ -1118,7 +1188,10 @@ class Helpers {
     const lighter = Math.max(luminance1, luminance2);
     const darker = Math.min(luminance1, luminance2);
 
-    return (lighter + HELPERS_CONSTANTS.COLOR.LUMINANCE_OFFSET) / (darker + HELPERS_CONSTANTS.COLOR.LUMINANCE_OFFSET);
+    return (
+      (lighter + HELPERS_CONSTANTS.COLOR.LUMINANCE_OFFSET) /
+      (darker + HELPERS_CONSTANTS.COLOR.LUMINANCE_OFFSET)
+    );
   }
 
   /**
@@ -1131,12 +1204,20 @@ class Helpers {
 
     const [rs, gs, bs] = [r, g, b].map(c => {
       c = c / HELPERS_CONSTANTS.COLOR.RGB_MAX;
-      return c <= HELPERS_CONSTANTS.COLOR.LUMINANCE_THRESHOLD ? 
-        c / HELPERS_CONSTANTS.COLOR.LUMINANCE_DIVISOR : 
-        Math.pow((c + HELPERS_CONSTANTS.COLOR.LUMINANCE_OFFSET_2) / HELPERS_CONSTANTS.COLOR.LUMINANCE_DIVISOR_2, HELPERS_CONSTANTS.COLOR.LUMINANCE_EXPONENT);
+      return c <= HELPERS_CONSTANTS.COLOR.LUMINANCE_THRESHOLD
+        ? c / HELPERS_CONSTANTS.COLOR.LUMINANCE_DIVISOR
+        : Math.pow(
+            (c + HELPERS_CONSTANTS.COLOR.LUMINANCE_OFFSET_2) /
+              HELPERS_CONSTANTS.COLOR.LUMINANCE_DIVISOR_2,
+            HELPERS_CONSTANTS.COLOR.LUMINANCE_EXPONENT
+          );
     });
 
-    return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+    return (
+      HELPERS_CONSTANTS.COLOR.LUMINANCE_RED_WEIGHT * rs +
+      HELPERS_CONSTANTS.COLOR.LUMINANCE_GREEN_WEIGHT * gs +
+      HELPERS_CONSTANTS.COLOR.LUMINANCE_BLUE_WEIGHT * bs
+    );
   }
 
   /**
@@ -1195,7 +1276,7 @@ class Helpers {
       const lightVariation = this.interpolateColor(
         baseColor,
         '#ffffff',
-        factor * 0.8
+        factor * HELPERS_CONSTANTS.COLOR.FACTOR_LIGHTEN
       );
 
       palette.variations.push({
@@ -1300,9 +1381,9 @@ class Helpers {
    */
   static rgbToHsl(rgb) {
     let { r, g, b } = rgb;
-    r /= 255;
-    g /= 255;
-    b /= 255;
+    r /= HELPERS_CONSTANTS.COLOR.RGB_MAX;
+    g /= HELPERS_CONSTANTS.COLOR.RGB_MAX;
+    b /= HELPERS_CONSTANTS.COLOR.RGB_MAX;
 
     const max = Math.max(r, g, b);
     const min = Math.min(r, g, b);
@@ -3757,7 +3838,10 @@ class Helpers {
       }
     } finally {
       // Clean up object URL
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setTimeout(
+        () => URL.revokeObjectURL(url),
+        HELPERS_CONSTANTS.TIME.URL_CLEANUP_DELAY
+      );
     }
   }
 

@@ -52,6 +52,9 @@ const ENGINE_CONSTANTS = {
   MEMORY_CLEANUP_INTERVAL: 30000, // 30 seconds
   MAX_DELTA_TIME: 100, // Prevent spiral of death
   DEBUG_UPDATE_INTERVAL: 250, // Debug info update frequency
+  DEFAULT_COMPONENT_MEMORY_SIZE: 1024, // Default component memory size in bytes
+  DEBUG_FRAME_INTERVAL: 15, // Update debug info every N frames
+  BYTES_TO_MEGABYTES: 1048576, // Conversion factor from bytes to megabytes
 };
 
 const RENDER_MODES = {
@@ -712,7 +715,7 @@ class SimulationEngine {
 
       EnginePerformanceMonitor.trackMemory(
         `component_${component.id || Date.now()}`,
-        component.memorySize || 1024
+        component.memorySize || ENGINE_CONSTANTS.DEFAULT_COMPONENT_MEMORY_SIZE
       );
 
       component.setEngine?.(this);
@@ -905,8 +908,11 @@ class SimulationEngine {
       this.trackFrameTime(frameTime);
 
       // Update debug info
-      if (this.config.debug && this.frameCount % 15 === 0) {
-        // Update every 15 frames
+      if (
+        this.config.debug &&
+        this.frameCount % ENGINE_CONSTANTS.DEBUG_FRAME_INTERVAL === 0
+      ) {
+        // Update every N frames
         this.updateDebugInfo();
       }
 
@@ -1101,7 +1107,7 @@ class SimulationEngine {
       // Remove unused metrics assignment
       EnginePerformanceMonitor.getMetrics();
       const memoryInfo = performance.memory
-        ? `Memory: ${(performance.memory.usedJSHeapSize / 1048576).toFixed(2)}MB`
+        ? `Memory: ${(performance.memory.usedJSHeapSize / ENGINE_CONSTANTS.BYTES_TO_MEGABYTES).toFixed(2)}MB`
         : 'Memory: N/A';
 
       this.debugOverlay.innerHTML = `

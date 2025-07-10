@@ -5,15 +5,65 @@
 
 import logger from '../utils/logger.js';
 
+// Constants for hero demo configuration and scoring
+const HERO_DEMO_CONSTANTS = {
+  BASE_SCORE: 50,
+  ETHICS_CATEGORIES_COUNT: 3,
+  ANIMATION: {
+    STEPS: 20,
+    FEEDBACK_HIDE_DELAY: 400,
+    CHANGE_INDICATOR_DURATION: 1000,
+  },
+  SCORE_THRESHOLDS: {
+    EXCELLENT: 70,
+    GOOD: 50,
+    FAIR: 30,
+  },
+  IMPACT_VALUES: {
+    // First scenario - AI Hiring Assistant
+    SKILLS_ONLY: {
+      fairness: 20,
+      transparency: 10,
+      accountability: 15,
+    },
+    AGE_PHOTO: {
+      fairness: -30,
+      transparency: -10,
+      accountability: -20,
+    },
+    ANONYMOUS_DIVERSITY: {
+      fairness: 10,
+      transparency: 20,
+      accountability: 10,
+    },
+    // Second scenario - Algorithm Transparency
+    DETAILED_EXPLANATION: {
+      fairness: 15,
+      transparency: 25,
+      accountability: 20,
+    },
+    GENERIC_RESPONSE: {
+      fairness: -10,
+      transparency: -30,
+      accountability: -15,
+    },
+    GENERAL_CRITERIA: {
+      fairness: 5,
+      transparency: 10,
+      accountability: 5,
+    },
+  },
+};
+
 class HeroDemo {
   constructor() {
     logger.info('HeroDemo constructor called');
     this.container = document.getElementById('hero-demo');
     this.currentScenario = 0;
     this.ethicsScores = {
-      fairness: 50,
-      transparency: 50,
-      accountability: 50,
+      fairness: HERO_DEMO_CONSTANTS.BASE_SCORE,
+      transparency: HERO_DEMO_CONSTANTS.BASE_SCORE,
+      accountability: HERO_DEMO_CONSTANTS.BASE_SCORE,
     };
     this.userChoices = [];
 
@@ -25,19 +75,40 @@ class HeroDemo {
         choices: [
           {
             text: 'Skills, experience, and education only',
-            impact: { fairness: +20, transparency: +10, accountability: +15 },
+            impact: {
+              fairness: +HERO_DEMO_CONSTANTS.IMPACT_VALUES.SKILLS_ONLY.fairness,
+              transparency:
+                +HERO_DEMO_CONSTANTS.IMPACT_VALUES.SKILLS_ONLY.transparency,
+              accountability:
+                +HERO_DEMO_CONSTANTS.IMPACT_VALUES.SKILLS_ONLY.accountability,
+            },
             feedback:
               'Great choice! Using only relevant qualifications reduces bias.',
           },
           {
             text: "Include age and photo for 'cultural fit'",
-            impact: { fairness: -30, transparency: -10, accountability: -20 },
+            impact: {
+              fairness: HERO_DEMO_CONSTANTS.IMPACT_VALUES.AGE_PHOTO.fairness,
+              transparency:
+                HERO_DEMO_CONSTANTS.IMPACT_VALUES.AGE_PHOTO.transparency,
+              accountability:
+                HERO_DEMO_CONSTANTS.IMPACT_VALUES.AGE_PHOTO.accountability,
+            },
             feedback:
               'This could introduce age and appearance bias into hiring decisions.',
           },
           {
             text: 'Add anonymous demographic data for diversity tracking',
-            impact: { fairness: +10, transparency: +20, accountability: +10 },
+            impact: {
+              fairness:
+                +HERO_DEMO_CONSTANTS.IMPACT_VALUES.ANONYMOUS_DIVERSITY.fairness,
+              transparency:
+                +HERO_DEMO_CONSTANTS.IMPACT_VALUES.ANONYMOUS_DIVERSITY
+                  .transparency,
+              accountability:
+                +HERO_DEMO_CONSTANTS.IMPACT_VALUES.ANONYMOUS_DIVERSITY
+                  .accountability,
+            },
             feedback:
               'Good balance - helps track diversity without direct bias.',
           },
@@ -50,19 +121,46 @@ class HeroDemo {
         choices: [
           {
             text: 'Provide detailed explanation of decision factors',
-            impact: { fairness: +15, transparency: +25, accountability: +20 },
+            impact: {
+              fairness:
+                +HERO_DEMO_CONSTANTS.IMPACT_VALUES.DETAILED_EXPLANATION
+                  .fairness,
+              transparency:
+                +HERO_DEMO_CONSTANTS.IMPACT_VALUES.DETAILED_EXPLANATION
+                  .transparency,
+              accountability:
+                +HERO_DEMO_CONSTANTS.IMPACT_VALUES.DETAILED_EXPLANATION
+                  .accountability,
+            },
             feedback:
               'Excellent! Transparency builds trust and allows for bias detection.',
           },
           {
             text: 'Give generic response to protect trade secrets',
-            impact: { fairness: -10, transparency: -30, accountability: -15 },
+            impact: {
+              fairness:
+                HERO_DEMO_CONSTANTS.IMPACT_VALUES.GENERIC_RESPONSE.fairness,
+              transparency:
+                HERO_DEMO_CONSTANTS.IMPACT_VALUES.GENERIC_RESPONSE.transparency,
+              accountability:
+                HERO_DEMO_CONSTANTS.IMPACT_VALUES.GENERIC_RESPONSE
+                  .accountability,
+            },
             feedback:
               'This makes it impossible to identify and fix potential bias.',
           },
           {
             text: 'Explain general criteria but keep specifics confidential',
-            impact: { fairness: +5, transparency: +10, accountability: +5 },
+            impact: {
+              fairness:
+                +HERO_DEMO_CONSTANTS.IMPACT_VALUES.GENERAL_CRITERIA.fairness,
+              transparency:
+                +HERO_DEMO_CONSTANTS.IMPACT_VALUES.GENERAL_CRITERIA
+                  .transparency,
+              accountability:
+                +HERO_DEMO_CONSTANTS.IMPACT_VALUES.GENERAL_CRITERIA
+                  .accountability,
+            },
             feedback:
               'A reasonable compromise, though full transparency is preferred.',
           },
@@ -270,11 +368,11 @@ class HeroDemo {
 
   updateEthicsScoresForChoice(_impact, _scenarioIndex) {
     // Calculate ethics scores based on all current user choices
-    // Start with base scores of 50 for each category
+    // Start with base scores for each category
     const baseScores = {
-      fairness: 50,
-      transparency: 50,
-      accountability: 50,
+      fairness: HERO_DEMO_CONSTANTS.BASE_SCORE,
+      transparency: HERO_DEMO_CONSTANTS.BASE_SCORE,
+      accountability: HERO_DEMO_CONSTANTS.BASE_SCORE,
     };
 
     // Apply impact from all current choices
@@ -321,7 +419,8 @@ class HeroDemo {
 
     // Animate score value
     let currentScore = oldScore;
-    const increment = (newScore - oldScore) / 20; // 20 steps
+    const increment =
+      (newScore - oldScore) / HERO_DEMO_CONSTANTS.ANIMATION.STEPS;
 
     const animateValue = () => {
       currentScore += increment;
@@ -339,7 +438,7 @@ class HeroDemo {
           if (indicator.parentNode) {
             indicator.parentNode.removeChild(indicator);
           }
-        }, 1000);
+        }, HERO_DEMO_CONSTANTS.ANIMATION.CHANGE_INDICATOR_DURATION);
         return;
       }
 
@@ -394,20 +493,21 @@ class HeroDemo {
       // Hide after animation completes
       setTimeout(() => {
         feedbackEl.style.display = 'none';
-      }, 400); // Match the CSS transition duration
+      }, HERO_DEMO_CONSTANTS.ANIMATION.FEEDBACK_HIDE_DELAY);
     }
   }
 
   showCompletionSummary() {
     const feedbackEl = document.getElementById('demo-feedback');
     const avgScore = Math.round(
-      Object.values(this.ethicsScores).reduce((a, b) => a + b, 0) / 3
+      Object.values(this.ethicsScores).reduce((a, b) => a + b, 0) /
+        HERO_DEMO_CONSTANTS.ETHICS_CATEGORIES_COUNT
     );
 
     const summaryClass =
-      avgScore >= 70
+      avgScore >= HERO_DEMO_CONSTANTS.SCORE_THRESHOLDS.EXCELLENT
         ? 'excellent'
-        : avgScore >= 50
+        : avgScore >= HERO_DEMO_CONSTANTS.SCORE_THRESHOLDS.GOOD
           ? 'good'
           : 'needs-improvement';
 
@@ -509,16 +609,17 @@ class HeroDemo {
   }
 
   getScoreClass(score) {
-    if (score >= 70) return 'excellent';
-    if (score >= 50) return 'good';
-    if (score >= 30) return 'fair';
+    if (score >= HERO_DEMO_CONSTANTS.SCORE_THRESHOLDS.EXCELLENT)
+      return 'excellent';
+    if (score >= HERO_DEMO_CONSTANTS.SCORE_THRESHOLDS.GOOD) return 'good';
+    if (score >= HERO_DEMO_CONSTANTS.SCORE_THRESHOLDS.FAIR) return 'fair';
     return 'poor';
   }
 
   getSummaryMessage(avgScore) {
-    if (avgScore >= 70) {
+    if (avgScore >= HERO_DEMO_CONSTANTS.SCORE_THRESHOLDS.EXCELLENT) {
       return "Excellent work! You've made ethically sound decisions that promote fairness and transparency.";
-    } else if (avgScore >= 50) {
+    } else if (avgScore >= HERO_DEMO_CONSTANTS.SCORE_THRESHOLDS.GOOD) {
       return "Good progress! You're thinking about ethics, but there's room for improvement in some areas.";
     } else {
       return 'Consider how your choices might affect fairness and transparency. Try the full simulation to learn more!';

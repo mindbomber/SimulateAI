@@ -70,6 +70,8 @@ const APP_CONSTANTS = {
     NOTIFICATION_DURATION: 4000,
     STAGGER_DELAY: 300,
     QUICK_DELAY: 50,
+    FOCUS_DELAY: 100,
+    NAV_CLOSE_DELAY: 0,
   },
 };
 
@@ -246,17 +248,19 @@ class AIEthicsApp {
       // Initialize onboarding tour for first-time users (prevent multiple instances)
       if (!this.onboardingTour && !window.onboardingTourInstance) {
         this.onboardingTour = new OnboardingTour();
-        
+
         // Make onboarding tour available globally for debugging
         window.onboardingTourInstance = this.onboardingTour;
-        
+
         // Instrument onboarding tour for loop detection (development mode)
         this.instrumentOnboardingTour(this.onboardingTour);
-        
+
         // Check and start onboarding tour for first-time users
         this.checkAndStartOnboardingTour();
       } else {
-        AppDebug.warn('OnboardingTour instance already exists, skipping initialization');
+        AppDebug.warn(
+          'OnboardingTour instance already exists, skipping initialization'
+        );
       }
 
       // Initialize scroll reveal header
@@ -337,7 +341,7 @@ class AIEthicsApp {
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      
+
       // Don't hide header at the very top of the page
       if (currentScrollY <= 10) {
         header.classList.remove('header-hidden');
@@ -354,7 +358,7 @@ class AIEthicsApp {
           header.classList.add('header-visible');
         }
       }
-      
+
       lastScrollY = currentScrollY;
     };
 
@@ -374,7 +378,7 @@ class AIEthicsApp {
 
     // Initialize header as visible
     header.classList.add('header-visible');
-    
+
     AppDebug.log('Scroll reveal header initialized');
   }
 
@@ -923,10 +927,10 @@ class AIEthicsApp {
     // Take Tour button in navigation
     const tourBtn = document.getElementById('start-tour-nav');
     if (tourBtn) {
-      tourBtn.addEventListener('click', (e) => {
+      tourBtn.addEventListener('click', e => {
         e.preventDefault(); // Prevent default link behavior
         this.startOnboardingTour();
-        
+
         // Close mobile navigation if open, with proper focus management
         const navToggle = document.querySelector('.nav-toggle');
         const mainNav = document.querySelector('.main-nav');
@@ -937,13 +941,13 @@ class AIEthicsApp {
           } else {
             document.body.focus();
           }
-          
+
           // Close navigation after focus has moved
           setTimeout(() => {
             mainNav.classList.remove('open');
             navToggle?.setAttribute('aria-expanded', 'false');
             mainNav.setAttribute('aria-hidden', 'true');
-            
+
             // Also handle nav backdrop if present
             const navBackdrop = document.querySelector('.nav-backdrop');
             if (navBackdrop) {
@@ -1021,7 +1025,7 @@ class AIEthicsApp {
     if (!this.onboardingTour) {
       return;
     }
-    
+
     // Check if user has completed the tour
     if (this.onboardingTour.hasCompletedTour()) {
       AppDebug.log('User has already completed onboarding tour');
@@ -1050,11 +1054,11 @@ class AIEthicsApp {
     } else if (window.onboardingTourInstance) {
       this.onboardingTour = window.onboardingTourInstance;
     }
-    
+
     // Clear localStorage to force tour to start
     localStorage.removeItem('has_visited');
     localStorage.removeItem('tour_completed');
-    
+
     AppDebug.log('Manually starting onboarding tour');
     this.onboardingTour.startTour(1);
   }
@@ -1410,7 +1414,8 @@ class AIEthicsApp {
             {
               id: 'intro',
               title: 'Introduction',
-              description: 'Welcome to this open-ended exploration of AI ethics',
+              description:
+                'Welcome to this open-ended exploration of AI ethics',
               objective:
                 'Explore different perspectives and discover consequences of choices',
             },
@@ -1658,7 +1663,7 @@ class AIEthicsApp {
     // Focus management - create focus trap for modal
     this.modalFocusTrap = focusManager.createTrap(this.modal, {
       autoFocus: true,
-      restoreFocus: true
+      restoreFocus: true,
     });
   }
 
@@ -1705,7 +1710,7 @@ class AIEthicsApp {
     this.ethicsMetersCanvasId = null;
     this.interactiveButtonsCanvasId = null;
     this.simulationSlidersCanvasId = null;
-    
+
     if (this.modal) {
       // Clean up focus trap
       if (this.modalFocusTrap) {
@@ -1964,7 +1969,7 @@ class AIEthicsApp {
   setupSurpriseMe() {
     const surpriseMeBtn = document.getElementById('surprise-me-nav');
     if (surpriseMeBtn) {
-      surpriseMeBtn.addEventListener('click', (e) => {
+      surpriseMeBtn.addEventListener('click', e => {
         e.preventDefault();
         this.launchRandomScenario();
       });
@@ -1976,10 +1981,10 @@ class AIEthicsApp {
    */
   launchRandomScenario() {
     const randomScenario = this.getRandomUncompletedScenario();
-    
+
     if (!randomScenario) {
       this.showNotification(
-        '🎉 Congratulations! You\'ve completed all scenarios! Try replaying your favorites.',
+        "🎉 Congratulations! You've completed all scenarios! Try replaying your favorites.",
         'success',
         APP_CONSTANTS.TIMING.NOTIFICATION_DURATION
       );
@@ -2007,7 +2012,10 @@ class AIEthicsApp {
 
     // Launch the scenario directly (skip pre-launch modal for surprise factor)
     if (this.categoryGrid) {
-      this.categoryGrid.openScenarioModalDirect(randomScenario.category.id, randomScenario.scenario.id);
+      this.categoryGrid.openScenarioModalDirect(
+        randomScenario.category.id,
+        randomScenario.scenario.id
+      );
     } else {
       // Fallback if categoryGrid is not available
       logger.warn('CategoryGrid not available, redirecting to scenario');
@@ -2023,7 +2031,7 @@ class AIEthicsApp {
     try {
       // Get all categories and their scenarios
       const allCategories = getAllCategories();
-      
+
       // Load user progress
       const stored = localStorage.getItem('simulateai_category_progress');
       const userProgress = stored ? JSON.parse(stored) : {};
@@ -2038,7 +2046,7 @@ class AIEthicsApp {
           if (!isCompleted) {
             uncompletedScenarios.push({
               category,
-              scenario
+              scenario,
             });
           }
         });
@@ -2049,9 +2057,10 @@ class AIEthicsApp {
         return null; // All scenarios completed
       }
 
-      const randomIndex = Math.floor(Math.random() * uncompletedScenarios.length);
+      const randomIndex = Math.floor(
+        Math.random() * uncompletedScenarios.length
+      );
       return uncompletedScenarios[randomIndex];
-
     } catch (error) {
       logger.error('Failed to get random uncompleted scenario:', error);
       return null;
@@ -2088,16 +2097,19 @@ class AIEthicsApp {
       if (shouldOpen) {
         navToggle.setAttribute('aria-expanded', 'true');
         mainNav.setAttribute('aria-hidden', 'false');
-        
+
         // Focus first nav link when opening
         const firstNavLink = mainNav.querySelector('.nav-link');
         if (firstNavLink) {
-          setTimeout(() => firstNavLink.focus(), 100);
+          setTimeout(
+            () => firstNavLink.focus(),
+            APP_CONSTANTS.TIMING.FOCUS_DELAY
+          );
         }
       } else {
         // Move focus away from navigation before hiding it
         navToggle.focus();
-        
+
         // Set aria attributes after focus has moved
         setTimeout(() => {
           navToggle.setAttribute('aria-expanded', 'false');
@@ -2156,7 +2168,10 @@ class AIEthicsApp {
 
         // Skip handling for mega menu trigger on mobile
         const MOBILE_BREAKPOINT = 768;
-        if (link.closest('.nav-item-dropdown') && window.innerWidth <= MOBILE_BREAKPOINT) {
+        if (
+          link.closest('.nav-item-dropdown') &&
+          window.innerWidth <= MOBILE_BREAKPOINT
+        ) {
           return; // Let mega menu handle this
         }
 
@@ -2176,9 +2191,12 @@ class AIEthicsApp {
           } else {
             document.body.focus();
           }
-          
+
           // Close navigation after focus has moved
-          setTimeout(() => toggleNav(false), 0);
+          setTimeout(
+            () => toggleNav(false),
+            APP_CONSTANTS.TIMING.NAV_CLOSE_DELAY
+          );
         };
 
         // Handle hash-based navigation
@@ -2281,10 +2299,12 @@ class AIEthicsApp {
      * Initialize mega menu functionality
      */
     function initializeMegaMenu() {
-      const megaMenuTrigger = document.querySelector('.nav-item-dropdown .nav-link');
+      const megaMenuTrigger = document.querySelector(
+        '.nav-item-dropdown .nav-link'
+      );
       const megaMenuDropdown = document.querySelector('.nav-item-dropdown');
       const megaMenu = document.querySelector('.mega-menu');
-      
+
       if (!megaMenuTrigger || !megaMenuDropdown || !megaMenu) return;
 
       // Mobile detection
@@ -2296,16 +2316,21 @@ class AIEthicsApp {
       // Initialize search filter (desktop only)
       const searchInput = document.querySelector('.mega-menu-search');
       if (searchInput && !isMobile()) {
-        searchInput.addEventListener('input', (e) => {
+        searchInput.addEventListener('input', e => {
           const searchTerm = e.target.value.toLowerCase();
           const menuItems = document.querySelectorAll('.mega-menu-item');
           let visibleCount = 0;
-          
+
           menuItems.forEach(item => {
             const title = item.querySelector('h4').textContent.toLowerCase();
-            const description = item.querySelector('p').textContent.toLowerCase();
-            
-            if (title.includes(searchTerm) || description.includes(searchTerm)) {
+            const description = item
+              .querySelector('p')
+              .textContent.toLowerCase();
+
+            if (
+              title.includes(searchTerm) ||
+              description.includes(searchTerm)
+            ) {
               item.style.display = 'flex';
               visibleCount++;
             } else {
@@ -2325,7 +2350,9 @@ class AIEthicsApp {
                   <small>Try searching for terms like "privacy", "decision", or "robot"</small>
                 </div>
               `;
-              document.querySelector('.mega-menu-grid').appendChild(noResultsMsg);
+              document
+                .querySelector('.mega-menu-grid')
+                .appendChild(noResultsMsg);
             }
             noResultsMsg.style.display = 'block';
           } else if (noResultsMsg) {
@@ -2353,13 +2380,14 @@ class AIEthicsApp {
       }
 
       // Handle mega menu trigger click
-      megaMenuTrigger.addEventListener('click', (e) => {
+      megaMenuTrigger.addEventListener('click', e => {
         if (isMobile()) {
           e.preventDefault();
           e.stopPropagation();
-          const isExpanded = megaMenuDropdown.getAttribute('aria-expanded') === 'true';
+          const isExpanded =
+            megaMenuDropdown.getAttribute('aria-expanded') === 'true';
           megaMenuDropdown.setAttribute('aria-expanded', !isExpanded);
-          
+
           // Simple dropdown - no body scroll prevention needed
         }
       });
@@ -2367,57 +2395,61 @@ class AIEthicsApp {
       // Handle mega menu item clicks
       const megaMenuItems = document.querySelectorAll('.mega-menu-item');
       megaMenuItems.forEach(item => {
-        item.addEventListener('click', (e) => {
+        item.addEventListener('click', e => {
           e.preventDefault();
           const href = item.getAttribute('href');
-          
+
           // Close mega menu
           megaMenuDropdown.setAttribute('aria-expanded', 'false');
-          
+
           // On mobile, also close the main navigation
           const MOBILE_BREAKPOINT = 768;
           if (window.innerWidth <= MOBILE_BREAKPOINT) {
             const mainNav = document.querySelector('.main-nav');
             const navToggle = document.querySelector('.nav-toggle');
             const navBackdrop = document.querySelector('.nav-backdrop');
-            
+
             if (mainNav && navToggle) {
               // Move focus away from the clicked mega menu item before hiding navigation
               navToggle.focus();
-              
+
               // Close navigation after focus has moved
               setTimeout(() => {
                 mainNav.classList.remove('open');
                 navToggle.classList.remove('active');
                 navToggle.setAttribute('aria-expanded', 'false');
                 mainNav.setAttribute('aria-hidden', 'true');
-                
+
                 if (navBackdrop) {
                   navBackdrop.classList.remove('open');
                 }
-                
+
                 // Restore body scroll
                 document.body.style.overflow = '';
               }, 0);
             }
           }
-          
+
           // Scroll to category section
           if (href.startsWith('#category-')) {
             const categoryId = href.replace('#category-', '');
-            let categoryElement = document.querySelector(`[data-category-id="${categoryId}"]`);
-            
+            let categoryElement = document.querySelector(
+              `[data-category-id="${categoryId}"]`
+            );
+
             // Fallback to ID selector if data attribute doesn't work
             if (!categoryElement) {
-              categoryElement = document.querySelector(`#category-${categoryId}`);
+              categoryElement = document.querySelector(
+                `#category-${categoryId}`
+              );
             }
-            
+
             if (categoryElement) {
               // Add a small delay to ensure the menu is closed before scrolling
               setTimeout(() => {
-                categoryElement.scrollIntoView({ 
-                  behavior: 'smooth', 
-                  block: 'start' 
+                categoryElement.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start',
                 });
               }, 100);
             } else {
@@ -2425,9 +2457,9 @@ class AIEthicsApp {
               const simulationsSection = document.querySelector('#simulations');
               if (simulationsSection) {
                 setTimeout(() => {
-                  simulationsSection.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
+                  simulationsSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
                   });
                 }, 100);
               }
@@ -2439,44 +2471,44 @@ class AIEthicsApp {
       // Handle view all link
       const viewAllLink = document.querySelector('.mega-menu-view-all');
       if (viewAllLink) {
-        viewAllLink.addEventListener('click', (e) => {
+        viewAllLink.addEventListener('click', e => {
           e.preventDefault();
           megaMenuDropdown.setAttribute('aria-expanded', 'false');
-          
+
           // On mobile, also close the main navigation
           const MOBILE_BREAKPOINT = 768;
           if (window.innerWidth <= MOBILE_BREAKPOINT) {
             const mainNav = document.querySelector('.main-nav');
             const navToggle = document.querySelector('.nav-toggle');
             const navBackdrop = document.querySelector('.nav-backdrop');
-            
+
             if (mainNav && navToggle) {
               // Move focus away from the clicked view all link before hiding navigation
               navToggle.focus();
-              
+
               // Close navigation after focus has moved
               setTimeout(() => {
                 mainNav.classList.remove('open');
                 navToggle.classList.remove('active');
                 navToggle.setAttribute('aria-expanded', 'false');
                 mainNav.setAttribute('aria-hidden', 'true');
-                
+
                 if (navBackdrop) {
                   navBackdrop.classList.remove('open');
                 }
-                
+
                 // Restore body scroll
                 document.body.style.overflow = '';
               }, 0);
             }
           }
-          
+
           const simulationsSection = document.querySelector('#simulations');
           if (simulationsSection) {
             setTimeout(() => {
-              simulationsSection.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'start' 
+              simulationsSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
               });
             }, 100);
           }
@@ -2484,7 +2516,7 @@ class AIEthicsApp {
       }
 
       // Close mega menu when clicking outside
-      document.addEventListener('click', (e) => {
+      document.addEventListener('click', e => {
         if (!megaMenuDropdown.contains(e.target)) {
           megaMenuDropdown.setAttribute('aria-expanded', 'false');
           // Simple dropdown - no body scroll management needed
@@ -2492,12 +2524,13 @@ class AIEthicsApp {
       });
 
       // Handle keyboard navigation
-      megaMenuTrigger.addEventListener('keydown', (e) => {
+      megaMenuTrigger.addEventListener('keydown', e => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          const isExpanded = megaMenuDropdown.getAttribute('aria-expanded') === 'true';
+          const isExpanded =
+            megaMenuDropdown.getAttribute('aria-expanded') === 'true';
           megaMenuDropdown.setAttribute('aria-expanded', !isExpanded);
-          
+
           // Simple dropdown - no body scroll management needed
         }
         if (e.key === 'Escape') {
@@ -2507,9 +2540,10 @@ class AIEthicsApp {
       });
 
       // Handle escape key for mobile mega menu
-      document.addEventListener('keydown', (e) => {
+      document.addEventListener('keydown', e => {
         if (e.key === 'Escape' && isMobile()) {
-          const isExpanded = megaMenuDropdown.getAttribute('aria-expanded') === 'true';
+          const isExpanded =
+            megaMenuDropdown.getAttribute('aria-expanded') === 'true';
           if (isExpanded) {
             megaMenuDropdown.setAttribute('aria-expanded', 'false');
             // Simple dropdown - no body scroll management needed
@@ -2528,7 +2562,7 @@ class AIEthicsApp {
     document.addEventListener('DOMContentLoaded', initializeMegaMenu);
   }
 
- /**
+  /**
    * Sets up focus trap for mobile navigation
    */
   setupNavFocusTrap(navElement, _toggleButton) {
@@ -2570,23 +2604,52 @@ class AIEthicsApp {
    * Scroll to the simulations section
    */
   /**
-   * Scroll to simulations section using unified scroll manager
+   * Scroll to Ethics Categories section using unified scroll manager
    */
   async scrollToSimulations() {
     try {
-      await scrollManager.scrollToElement('#simulations', {
+      // Ensure the target element exists before scrolling
+      const categoriesSection = document.getElementById('categories');
+      if (!categoriesSection) {
+        logger.warn('Categories section not found, cannot scroll');
+        return;
+      }
+
+      await scrollManager.scrollToElement('#categories', {
         behavior: 'smooth',
-        offset: 80
+        offset: 80,
+        respectReducedMotion: true,
       });
-      
-      logger.info('Scrolled to simulations section');
-      
+
+      logger.info('Scrolled to Ethics Categories section');
+
       // Track the navigation
-      simpleAnalytics.trackEvent('navigation_to_simulations', {
-        source: 'start_learning_button'
+      simpleAnalytics.trackEvent('navigation_to_categories', {
+        source: 'start_learning_button',
+        target: 'ethics_categories',
+        method: 'smooth_scroll',
       });
+
+      // Announce to screen readers for accessibility
+      if (this.accessibilityManager) {
+        this.accessibilityManager.announceToScreenReader(
+          'Navigated to Ethics Categories section',
+          'polite'
+        );
+      }
     } catch (error) {
-      logger.error('Failed to scroll to simulations:', error);
+      logger.error('Failed to scroll to Ethics Categories:', error);
+
+      // Fallback: try basic scroll without smooth animation
+      try {
+        const categoriesSection = document.getElementById('categories');
+        if (categoriesSection) {
+          categoriesSection.scrollIntoView({ block: 'start' });
+          logger.info('Used fallback scroll to Ethics Categories');
+        }
+      } catch (fallbackError) {
+        logger.error('Fallback scroll also failed:', fallbackError);
+      }
     }
   }
 
@@ -2619,12 +2682,12 @@ class AIEthicsApp {
     // For now, we can scroll to simulations or open a modal with educator resources
     // This can be enhanced later with dedicated educator functionality
     logger.info('Opening educator tools');
-    
+
     // Track the event
     simpleAnalytics.trackEvent('educator_tools_accessed', {
-      source: 'educator_guide_button'
+      source: 'educator_guide_button',
     });
-    
+
     // For now, scroll to simulations as a placeholder
     this.scrollToSimulations();
   }
@@ -2634,27 +2697,34 @@ class AIEthicsApp {
    */
   initializeLoopDetection() {
     // Only enable in development mode or when explicitly requested
-    const isDevelopment = process.env.NODE_ENV === 'development' || 
-                         window.location.hostname === 'localhost' ||
-                         window.location.search.includes('debug=true');
-    
+    const isDevelopment =
+      process.env.NODE_ENV === 'development' ||
+      window.location.hostname === 'localhost' ||
+      window.location.search.includes('debug=true');
+
     if (isDevelopment) {
       // Enable the loop detector
       loopDetector.setEnabled(true);
-      
+
       // Add to window for easy access in development
       window.loopDetector = loopDetector;
-      
+
       // Track critical onboarding methods that previously had loops
       if (window.onboardingTourInstance) {
         this.instrumentOnboardingTour(window.onboardingTourInstance);
       }
-      
-      logger.info('InfiniteLoopDetector', '🔧 Loop detection enabled for development');
+
+      logger.info(
+        'InfiniteLoopDetector',
+        '🔧 Loop detection enabled for development'
+      );
     } else {
       // Disable in production
       loopDetector.setEnabled(false);
-      logger.info('InfiniteLoopDetector', '🔒 Loop detection disabled for production');
+      logger.info(
+        'InfiniteLoopDetector',
+        '🔒 Loop detection disabled for production'
+      );
     }
   }
 
@@ -2662,19 +2732,27 @@ class AIEthicsApp {
    * Instrument onboarding tour methods for loop detection
    */
   instrumentOnboardingTour(tour) {
-    const criticalMethods = ['positionCoachMark', 'showStep', 'nextStep', 'handleAction'];
-    
+    const criticalMethods = [
+      'positionCoachMark',
+      'showStep',
+      'nextStep',
+      'handleAction',
+    ];
+
     criticalMethods.forEach(methodName => {
       if (tour[methodName]) {
         const original = tour[methodName];
-        tour[methodName] = function(...args) {
+        tour[methodName] = function (...args) {
           loopDetector.trackExecution(`OnboardingTour.${methodName}`);
           return original.apply(this, args);
         };
       }
     });
-    
-    logger.info('InfiniteLoopDetector', '📊 Instrumented OnboardingTour methods for monitoring');
+
+    logger.info(
+      'InfiniteLoopDetector',
+      '📊 Instrumented OnboardingTour methods for monitoring'
+    );
   }
 
   // ...existing methods...
@@ -2775,7 +2853,7 @@ class EthicsRadarDemo {
   showFeedback(pattern) {
     const feedbackContainer = document.getElementById('hero-demo-feedback');
     if (!feedbackContainer) return;
-    
+
     const popoverContent = feedbackContainer.querySelector('.popover-content');
     if (!popoverContent) return;
 
@@ -2815,7 +2893,7 @@ class EthicsRadarDemo {
                 <p>${feedback.message}</p>
             `;
       feedbackContainer.classList.add('show');
-      
+
       // Set auto-hide timer for 5 seconds
       const AUTO_HIDE_DELAY = 5000; // 5 seconds
       popoverHideTimeout = setTimeout(() => {
@@ -2831,12 +2909,12 @@ class EthicsRadarDemo {
       clearTimeout(popoverHideTimeout);
       popoverHideTimeout = null;
     }
-    
+
     const feedbackContainer = document.getElementById('hero-demo-feedback');
     if (!feedbackContainer) return;
-    
+
     const popoverContent = feedbackContainer.querySelector('.popover-content');
-    
+
     feedbackContainer.classList.remove('show');
     const FADE_OUT_DELAY = 300; // ms delay for fade out animation
     setTimeout(() => {
@@ -2865,7 +2943,7 @@ window.simulateEthicsPattern = function (pattern, buttonElement) {
       ethicsDemo.simulatePattern(pattern);
       currentActivePattern = pattern;
       updateButtonStates(pattern);
-      
+
       // Position and show popover above the clicked button
       if (buttonElement) {
         positionPopoverAboveButton(buttonElement);
@@ -2886,15 +2964,15 @@ window.resetEthicsDemo = function () {
 function positionPopoverAboveButton(button) {
   const feedbackContainer = document.getElementById('hero-demo-feedback');
   if (!feedbackContainer || !button) return;
-  
+
   // Get button position and dimensions
   const buttonRect = button.getBoundingClientRect();
   const controlsContainer = button.closest('.demo-controls-grid');
   const controlsRect = controlsContainer.getBoundingClientRect();
-  
+
   // Calculate position relative to the controls container
-  const leftOffset = buttonRect.left - controlsRect.left + (buttonRect.width / 2);
-  
+  const leftOffset = buttonRect.left - controlsRect.left + buttonRect.width / 2;
+
   // Apply positioning
   feedbackContainer.style.left = `${leftOffset}px`;
   feedbackContainer.style.transform = 'translateX(-50%)';
@@ -2946,7 +3024,9 @@ window.toggleRadarInstructions = function () {
 
 window.toggleEthicsGlossary = function () {
   const accordion = document.querySelector('.ethics-glossary-accordion');
-  const content = document.querySelector('.ethics-glossary-accordion .accordion-content');
+  const content = document.querySelector(
+    '.ethics-glossary-accordion .accordion-content'
+  );
 
   if (accordion && content) {
     const isOpen = accordion.classList.contains('open');
@@ -2969,20 +3049,28 @@ window.toggleEthicsGlossary = function () {
 document.addEventListener('DOMContentLoaded', () => {
   // Add click listener for radar instructions accordion content
   document.addEventListener('click', event => {
-    const radarContent = document.querySelector('.radar-instructions-accordion.open .accordion-content');
+    const radarContent = document.querySelector(
+      '.radar-instructions-accordion.open .accordion-content'
+    );
     if (radarContent && radarContent.contains(event.target)) {
       // Check if click is within the content area but not on the header
-      const header = document.querySelector('.radar-instructions-accordion .accordion-header');
+      const header = document.querySelector(
+        '.radar-instructions-accordion .accordion-header'
+      );
       if (!header || !header.contains(event.target)) {
         window.toggleRadarInstructions();
       }
     }
 
     // Add click listener for ethics glossary accordion content
-    const glossaryContent = document.querySelector('.ethics-glossary-accordion.open .accordion-content');
+    const glossaryContent = document.querySelector(
+      '.ethics-glossary-accordion.open .accordion-content'
+    );
     if (glossaryContent && glossaryContent.contains(event.target)) {
       // Check if click is within the content area but not on the header
-      const header = document.querySelector('.ethics-glossary-accordion .accordion-header');
+      const header = document.querySelector(
+        '.ethics-glossary-accordion .accordion-header'
+      );
       if (!header || !header.contains(event.target)) {
         window.toggleEthicsGlossary();
       }

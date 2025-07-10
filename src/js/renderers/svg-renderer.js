@@ -30,6 +30,57 @@ const SVG_CONSTANTS = {
   ANIMATION_FPS: 60,
   PERFORMANCE_SAMPLE_RATE: 0.1,
   MAX_ELEMENTS: 10000,
+
+  // Performance monitoring constants
+  PERFORMANCE: {
+    TARGET_FRAME_TIME: 16.67, // 60fps threshold
+    ANIMATION_DURATION_MULTIPLIER: 0.2,
+    MAX_ANIMATION_DURATION: 300,
+  },
+
+  // UI and styling constants
+  UI: {
+    DEFAULT_FONT_SIZE: 14,
+    DEFAULT_PADDING: 4,
+    DEFAULT_BORDER_RADIUS: 4,
+    DEFAULT_SHADOW_OPACITY: 0.5,
+    TITLE_OFFSET: -10,
+    DEFAULT_OBJECT_SIZE: 50,
+    DEFAULT_RADIUS: 25,
+  },
+
+  // ID generation constants
+  ID_GENERATION: {
+    RADIX: 36,
+    SUBSTRING_LENGTH: 9,
+    SUBSTRING_START: 2,
+  },
+
+  // Math and conversion constants
+  MATH: {
+    DEGREES_PER_PI: 180,
+    HALF: 0.5,
+    EASING_THRESHOLD_1: 0.5,
+    EASING_MULTIPLIER: 4,
+    BOUNCE_DIVISOR: 2.75,
+    BOUNCE_COEFFICIENT: 7.5625,
+    BOUNCE_OFFSET_1: 1.5,
+    BOUNCE_OFFSET_2: 2.25,
+    BOUNCE_OFFSET_3: 2.625,
+    BOUNCE_THRESHOLD_1: 0.75,
+    BOUNCE_THRESHOLD_2: 0.9375,
+    BOUNCE_THRESHOLD_3: 0.984375,
+    BOUNCE_MIDPOINT: 2.5,
+    ELASTIC_DIVISOR: 3,
+    ELASTIC_POWER: -10,
+    ELASTIC_OFFSET: 0.75,
+    ELASTIC_MULTIPLIER: 10,
+    PATTERN_SIZE: 5,
+    PATTERN_DOT_RADIUS: 1,
+    PLACEHOLDER_OFFSET: -5,
+    PLACEHOLDER_SIZE: 10,
+  },
+
   ACCESSIBILITY: {
     MIN_CONTRAST_RATIO: 4.5,
     MIN_FONT_SIZE: 12,
@@ -96,7 +147,7 @@ class SVGPerformanceMonitor {
     this.metrics.averageFrameTime =
       this.metrics.renderTime / this.metrics.frameCount;
 
-    if (frameTime > 16.67) {
+    if (frameTime > SVG_CONSTANTS.PERFORMANCE.TARGET_FRAME_TIME) {
       // > 60fps threshold
       this.metrics.droppedFrames++;
     }
@@ -322,8 +373,14 @@ class SVGAccessibilityManager {
       indicator.setAttribute('class', 'focus-indicator');
       indicator.setAttribute('x', bbox.x - 2);
       indicator.setAttribute('y', bbox.y - 2);
-      indicator.setAttribute('width', bbox.width + 4);
-      indicator.setAttribute('height', bbox.height + 4);
+      indicator.setAttribute(
+        'width',
+        bbox.width + SVG_CONSTANTS.UI.DEFAULT_PADDING
+      );
+      indicator.setAttribute(
+        'height',
+        bbox.height + SVG_CONSTANTS.UI.DEFAULT_PADDING
+      );
       indicator.setAttribute('fill', 'none');
       indicator.setAttribute('stroke', '#007acc');
       indicator.setAttribute('stroke-width', '2');
@@ -700,7 +757,7 @@ class SVGRenderer {
       .text-element {
         user-select: none;
         pointer-events: none;
-        font-size: ${Math.max(14, SVG_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE)}px;
+        font-size: ${Math.max(SVG_CONSTANTS.UI.DEFAULT_FONT_SIZE, SVG_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE)}px;
       }
       
       .interactive {
@@ -1110,7 +1167,7 @@ class SVGRenderer {
     try {
       // Accessibility: Ensure minimum font size
       const fontSize = Math.max(
-        parseFloat(options.fontSize) || 14,
+        parseFloat(options.fontSize) || SVG_CONSTANTS.UI.DEFAULT_FONT_SIZE,
         SVG_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE
       );
 
@@ -1212,7 +1269,7 @@ class SVGRenderer {
    */
   createTextShadowFilter(shadow) {
     try {
-      const filterId = `text-shadow-${Math.random().toString(36).substr(2, 9)}`;
+      const filterId = `text-shadow-${Math.random().toString(SVG_CONSTANTS.ID_GENERATION.RADIX).substr(SVG_CONSTANTS.ID_GENERATION.SUBSTRING_START, SVG_CONSTANTS.ID_GENERATION.SUBSTRING_LENGTH)}`;
       const filter = this.createSVGElement('filter', {
         id: filterId,
         x: '-50%',
@@ -1226,7 +1283,8 @@ class SVGRenderer {
         dy: shadow.offsetY || 1,
         'std-deviation': shadow.blur || 1,
         'flood-color': shadow.color || 'rgba(0,0,0,0.5)',
-        'flood-opacity': shadow.opacity || 0.5,
+        'flood-opacity':
+          shadow.opacity || SVG_CONSTANTS.UI.DEFAULT_SHADOW_OPACITY,
       });
 
       filter.appendChild(dropShadow);
@@ -1249,7 +1307,8 @@ class SVGRenderer {
   createGradient(type, colorStops, coordinates, id) {
     try {
       const gradientId =
-        id || `gradient-${Math.random().toString(36).substr(2, 9)}`;
+        id ||
+        `gradient-${Math.random().toString(SVG_CONSTANTS.ID_GENERATION.RADIX).substr(SVG_CONSTANTS.ID_GENERATION.SUBSTRING_START, SVG_CONSTANTS.ID_GENERATION.SUBSTRING_LENGTH)}`;
 
       // Check cache first
       if (this.gradientCache.has(gradientId)) {
@@ -1339,7 +1398,8 @@ class SVGRenderer {
         fill: options.backgroundColor || this.currentTheme.primary,
         stroke: options.borderColor || this.currentTheme.border,
         strokeWidth: 1,
-        borderRadius: options.borderRadius || 4,
+        borderRadius:
+          options.borderRadius || SVG_CONSTANTS.UI.DEFAULT_BORDER_RADIUS,
         themeColor: 'primary',
         className: 'button-background',
       });
@@ -1354,7 +1414,7 @@ class SVGRenderer {
           dominantBaseline: 'middle',
           fill: options.textColor || '#ffffff',
           fontSize: Math.max(
-            options.fontSize || 14,
+            options.fontSize || SVG_CONSTANTS.UI.DEFAULT_FONT_SIZE,
             SVG_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE
           ),
           fontWeight: options.fontWeight || '500',
@@ -1452,14 +1512,19 @@ class SVGRenderer {
 
       // Add chart title if provided
       if (options.title) {
-        const title = this.createText(width / 2, -10, options.title, {
-          textAnchor: 'middle',
-          fill: this.currentTheme.foreground,
-          fontSize: 16,
-          fontWeight: 'bold',
-          className: 'chart-title',
-          accessible: true,
-        });
+        const title = this.createText(
+          width / 2,
+          SVG_CONSTANTS.UI.TITLE_OFFSET,
+          options.title,
+          {
+            textAnchor: 'middle',
+            fill: this.currentTheme.foreground,
+            fontSize: 16,
+            fontWeight: 'bold',
+            className: 'chart-title',
+            accessible: true,
+          }
+        );
 
         if (title) chart.appendChild(title);
       }
@@ -1502,7 +1567,8 @@ class SVGRenderer {
   createPattern(type, options = {}, id) {
     try {
       const patternId =
-        id || `pattern-${type}-${Math.random().toString(36).substr(2, 9)}`;
+        id ||
+        `pattern-${type}-${Math.random().toString(SVG_CONSTANTS.ID_GENERATION.RADIX).substr(SVG_CONSTANTS.ID_GENERATION.SUBSTRING_START, SVG_CONSTANTS.ID_GENERATION.SUBSTRING_LENGTH)}`;
 
       // Check cache first
       if (this.patternCache.has(patternId)) {
@@ -1523,9 +1589,14 @@ class SVGRenderer {
 
       switch (type) {
         case 'dots': {
-          const dot = this.createCircle(5, 5, 1, {
-            fill: color,
-          });
+          const dot = this.createCircle(
+            SVG_CONSTANTS.MATH.PATTERN_SIZE,
+            SVG_CONSTANTS.MATH.PATTERN_SIZE,
+            SVG_CONSTANTS.MATH.PATTERN_DOT_RADIUS,
+            {
+              fill: color,
+            }
+          );
           if (dot) pattern.appendChild(dot);
           break;
         }
@@ -1607,7 +1678,10 @@ class SVGRenderer {
       }
 
       // Reduce animation duration for motion-sensitive users
-      duration = Math.min(duration * 0.2, 300);
+      duration = Math.min(
+        duration * SVG_CONSTANTS.PERFORMANCE.ANIMATION_DURATION_MULTIPLIER,
+        SVG_CONSTANTS.PERFORMANCE.MAX_ANIMATION_DURATION
+      );
     }
 
     const animation = {
@@ -1617,7 +1691,12 @@ class SVGRenderer {
       easing,
       startTime: performance.now(),
       startValues: {},
-      id: Math.random().toString(36).substr(2, 9),
+      id: Math.random()
+        .toString(SVG_CONSTANTS.ID_GENERATION.RADIX)
+        .substr(
+          SVG_CONSTANTS.ID_GENERATION.SUBSTRING_START,
+          SVG_CONSTANTS.ID_GENERATION.SUBSTRING_LENGTH
+        ),
       onComplete: options.onComplete,
       onProgress: options.onProgress,
       paused: false,
@@ -1739,32 +1818,64 @@ class SVGRenderer {
       case 'ease-out':
         return t * (2 - t);
       case 'ease-in-out':
-        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+        return t < SVG_CONSTANTS.MATH.EASING_THRESHOLD_1
+          ? 2 * t * t
+          : -1 + (SVG_CONSTANTS.MATH.EASING_MULTIPLIER - 2 * t) * t;
       case 'ease-in-cubic':
         return t * t * t;
       case 'ease-out-cubic':
         return --t * t * t + 1;
       case 'ease-in-out-cubic':
-        return t < 0.5
-          ? 4 * t * t * t
+        return t < SVG_CONSTANTS.MATH.EASING_THRESHOLD_1
+          ? SVG_CONSTANTS.MATH.EASING_MULTIPLIER * t * t * t
           : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
       case 'bounce':
-        if (t < 1 / 2.75) {
-          return 7.5625 * t * t;
-        } else if (t < 2 / 2.75) {
-          return 7.5625 * (t -= 1.5 / 2.75) * t + 0.75;
-        } else if (t < 2.5 / 2.75) {
-          return 7.5625 * (t -= 2.25 / 2.75) * t + 0.9375;
+        if (t < 1 / SVG_CONSTANTS.MATH.BOUNCE_DIVISOR) {
+          return SVG_CONSTANTS.MATH.BOUNCE_COEFFICIENT * t * t;
+        } else if (t < 2 / SVG_CONSTANTS.MATH.BOUNCE_DIVISOR) {
+          return (
+            SVG_CONSTANTS.MATH.BOUNCE_COEFFICIENT *
+              (t -=
+                SVG_CONSTANTS.MATH.BOUNCE_OFFSET_1 /
+                SVG_CONSTANTS.MATH.BOUNCE_DIVISOR) *
+              t +
+            SVG_CONSTANTS.MATH.BOUNCE_THRESHOLD_1
+          );
+        } else if (
+          t <
+          SVG_CONSTANTS.MATH.BOUNCE_MIDPOINT / SVG_CONSTANTS.MATH.BOUNCE_DIVISOR
+        ) {
+          return (
+            SVG_CONSTANTS.MATH.BOUNCE_COEFFICIENT *
+              (t -=
+                SVG_CONSTANTS.MATH.BOUNCE_OFFSET_2 /
+                SVG_CONSTANTS.MATH.BOUNCE_DIVISOR) *
+              t +
+            SVG_CONSTANTS.MATH.BOUNCE_THRESHOLD_2
+          );
         } else {
-          return 7.5625 * (t -= 2.625 / 2.75) * t + 0.984375;
+          return (
+            SVG_CONSTANTS.MATH.BOUNCE_COEFFICIENT *
+              (t -=
+                SVG_CONSTANTS.MATH.BOUNCE_OFFSET_3 /
+                SVG_CONSTANTS.MATH.BOUNCE_DIVISOR) *
+              t +
+            SVG_CONSTANTS.MATH.BOUNCE_THRESHOLD_3
+          );
         }
       case 'elastic': {
-        const c4 = (2 * Math.PI) / 3;
+        const c4 = (2 * Math.PI) / SVG_CONSTANTS.MATH.ELASTIC_DIVISOR;
         return t === 0
           ? 0
           : t === 1
             ? 1
-            : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
+            : Math.pow(2, SVG_CONSTANTS.MATH.ELASTIC_POWER * t) *
+                Math.sin(
+                  (t * SVG_CONSTANTS.MATH.ELASTIC_MULTIPLIER -
+                    SVG_CONSTANTS.MATH.ELASTIC_OFFSET) *
+                    c4
+                ) +
+              1;
       }
       default:
         return t;
@@ -1997,7 +2108,8 @@ class SVGRenderer {
       }
 
       if (object.rotation) {
-        const rotationDeg = (object.rotation * 180) / Math.PI;
+        const rotationDeg =
+          (object.rotation * SVG_CONSTANTS.MATH.DEGREES_PER_PI) / Math.PI;
         transforms.push(`rotate(${rotationDeg})`);
       }
 
@@ -2072,8 +2184,8 @@ class SVGRenderer {
           return this.createRect(
             0,
             0,
-            object.width || 50,
-            object.height || 50,
+            object.width || SVG_CONSTANTS.UI.DEFAULT_OBJECT_SIZE,
+            object.height || SVG_CONSTANTS.UI.DEFAULT_OBJECT_SIZE,
             {
               ...commonOptions,
               borderRadius: object.borderRadius,
@@ -2081,14 +2193,25 @@ class SVGRenderer {
           );
 
         case 'circle':
-          return this.createCircle(0, 0, object.radius || 25, commonOptions);
+          return this.createCircle(
+            0,
+            0,
+            object.radius || SVG_CONSTANTS.UI.DEFAULT_RADIUS,
+            commonOptions
+          );
 
         case 'ellipse':
           return this.createSVGElement('ellipse', {
             cx: 0,
             cy: 0,
-            rx: object.radiusX || object.radius || 25,
-            ry: object.radiusY || object.radius || 25,
+            rx:
+              object.radiusX ||
+              object.radius ||
+              SVG_CONSTANTS.UI.DEFAULT_RADIUS,
+            ry:
+              object.radiusY ||
+              object.radius ||
+              SVG_CONSTANTS.UI.DEFAULT_RADIUS,
             fill: commonOptions.fill || 'transparent',
             stroke: commonOptions.stroke || 'none',
             'stroke-width':
@@ -2118,8 +2241,8 @@ class SVGRenderer {
           return this.createLine(
             object.x1 || 0,
             object.y1 || 0,
-            object.x2 || 50,
-            object.y2 || 50,
+            object.x2 || SVG_CONSTANTS.UI.DEFAULT_OBJECT_SIZE,
+            object.y2 || SVG_CONSTANTS.UI.DEFAULT_OBJECT_SIZE,
             {
               stroke: commonOptions.stroke,
               strokeWidth: commonOptions.strokeWidth,
@@ -2184,8 +2307,8 @@ class SVGRenderer {
             return this.createSVGElement('image', {
               x: 0,
               y: 0,
-              width: object.width || 50,
-              height: object.height || 50,
+              width: object.width || SVG_CONSTANTS.UI.DEFAULT_OBJECT_SIZE,
+              height: object.height || SVG_CONSTANTS.UI.DEFAULT_OBJECT_SIZE,
               href: object.href || object.src,
               preserveAspectRatio:
                 object.preserveAspectRatio || 'xMidYMid meet',
@@ -2197,12 +2320,18 @@ class SVGRenderer {
         default:
           // Draw a placeholder for unknown types
           logger.warn(`Unknown object type: ${object.type}`);
-          return this.createRect(-5, -5, 10, 10, {
-            fill: '#ff6b6b',
-            stroke: '#e55555',
-            strokeWidth: 1,
-            className: 'unknown-object-placeholder',
-          });
+          return this.createRect(
+            SVG_CONSTANTS.MATH.PLACEHOLDER_OFFSET,
+            SVG_CONSTANTS.MATH.PLACEHOLDER_OFFSET,
+            SVG_CONSTANTS.MATH.PLACEHOLDER_SIZE,
+            SVG_CONSTANTS.MATH.PLACEHOLDER_SIZE,
+            {
+              fill: '#ff6b6b',
+              stroke: '#e55555',
+              strokeWidth: 1,
+              className: 'unknown-object-placeholder',
+            }
+          );
       }
     } catch (error) {
       this.errorHandler(`Failed to render object type: ${object.type}`, error);

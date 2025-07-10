@@ -3,6 +3,23 @@
  * Handles overflow detection, responsive behavior, and accessibility for modal footers
  */
 
+// Constants for modal footer management
+const MODAL_FOOTER_CONSTANTS = {
+  BREAKPOINTS: {
+    MOBILE: 768,
+    SMALL_MOBILE: 480,
+  },
+  LAYOUT: {
+    MANY_BUTTONS_THRESHOLD: 4,
+    DEFAULT_GAP: 12,
+    TOTAL_PADDING: 40,
+  },
+  SCROLL: {
+    OPACITY_VISIBLE: '1',
+    OPACITY_HIDDEN: '0',
+  },
+};
+
 class ModalFooterManager {
   constructor() {
     this.observedFooters = new Set();
@@ -86,15 +103,17 @@ class ModalFooterManager {
     const buttons = footer.querySelectorAll('.modal-button');
 
     // Add many-buttons class if there are many buttons
-    if (buttons.length > 4) {
+    if (buttons.length > MODAL_FOOTER_CONSTANTS.LAYOUT.MANY_BUTTONS_THRESHOLD) {
       footer.classList.add('many-buttons');
     }
 
     // Handle responsive button layout
     const handleResponsiveLayout = () => {
       const footerWidth = footer.clientWidth;
-      const isMobile = window.innerWidth <= 768;
-      const isSmallMobile = window.innerWidth <= 480;
+      const isMobile =
+        window.innerWidth <= MODAL_FOOTER_CONSTANTS.BREAKPOINTS.MOBILE;
+      const isSmallMobile =
+        window.innerWidth <= MODAL_FOOTER_CONSTANTS.BREAKPOINTS.SMALL_MOBILE;
 
       footer.classList.toggle('mobile-layout', isMobile);
       footer.classList.toggle('small-mobile-layout', isSmallMobile);
@@ -106,8 +125,9 @@ class ModalFooterManager {
           totalButtonWidth += button.offsetWidth;
         });
 
-        const gapWidth = (buttons.length - 1) * 12; // Default gap
-        const padding = 40; // Total horizontal padding
+        const gapWidth =
+          (buttons.length - 1) * MODAL_FOOTER_CONSTANTS.LAYOUT.DEFAULT_GAP;
+        const padding = MODAL_FOOTER_CONSTANTS.LAYOUT.TOTAL_PADDING;
         const needsStacking =
           totalButtonWidth + gapWidth + padding > footerWidth;
 
@@ -185,8 +205,12 @@ class ModalFooterManager {
     const isAtEnd =
       footer.scrollLeft >= footer.scrollWidth - footer.clientWidth;
 
-    leftIndicator.style.opacity = isAtStart ? '0' : '1';
-    rightIndicator.style.opacity = isAtEnd ? '0' : '1';
+    leftIndicator.style.opacity = isAtStart
+      ? MODAL_FOOTER_CONSTANTS.SCROLL.OPACITY_HIDDEN
+      : MODAL_FOOTER_CONSTANTS.SCROLL.OPACITY_VISIBLE;
+    rightIndicator.style.opacity = isAtEnd
+      ? MODAL_FOOTER_CONSTANTS.SCROLL.OPACITY_HIDDEN
+      : MODAL_FOOTER_CONSTANTS.SCROLL.OPACITY_VISIBLE;
   }
 
   removeScrollIndicators(footer) {

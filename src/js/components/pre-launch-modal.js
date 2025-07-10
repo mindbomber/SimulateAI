@@ -31,6 +31,7 @@ import logger from '../utils/logger.js';
 // Constants
 const DEFAULT_SCENARIO_DURATION = 15;
 const MOBILE_BREAKPOINT = 768;
+const UPDATE_DELAY = 100; // ms for UI update timing
 
 export default class PreLaunchModal {
   constructor(simulationId, options = {}) {
@@ -774,7 +775,7 @@ export default class PreLaunchModal {
           if (e.target.closest('.onboarding-coach-mark')) {
             return;
           }
-          
+
           if (!e.target.closest('.pre-launch-tabs')) {
             hamburgerButton.setAttribute('aria-expanded', 'false');
             tabButtonsContainer.classList.remove('expanded');
@@ -819,7 +820,7 @@ export default class PreLaunchModal {
         tabContainer.addEventListener('scroll', updateScrollIndicators);
         window.addEventListener('resize', updateScrollIndicators);
         // Initial check
-        setTimeout(updateScrollIndicators, 100);
+        setTimeout(updateScrollIndicators, UPDATE_DELAY);
       }
 
       tabButtons.forEach(button => {

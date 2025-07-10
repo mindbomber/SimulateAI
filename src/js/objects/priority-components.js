@@ -5,6 +5,63 @@
 
 import { BaseObject } from './enhanced-objects.js';
 
+// Constants to eliminate magic numbers
+const PRIORITY_COMPONENT_CONSTANTS = {
+  // DataTable constants
+  DATA_TABLE_DEFAULT_WIDTH: 600,
+  DATA_TABLE_DEFAULT_HEIGHT: 400,
+  DATA_TABLE_DEFAULT_PAGE_SIZE: 25,
+  DATA_TABLE_DEFAULT_HEADER_HEIGHT: 40,
+  DATA_TABLE_DEFAULT_ROW_HEIGHT: 30,
+  DATA_TABLE_SORT_INDICATOR_OFFSET: 20,
+  DATA_TABLE_PAGINATION_HEIGHT: 30,
+  DATA_TABLE_PAGINATION_TEXT_OFFSET: 10,
+  DATA_TABLE_PAGINATION_TEXT_Y_OFFSET: 15,
+  DATA_TABLE_PAGINATION_BUTTON_Y_OFFSET: 5,
+  DATA_TABLE_PAGINATION_PREV_X_OFFSET: 140,
+  DATA_TABLE_PAGINATION_NEXT_X_OFFSET: 70,
+  DATA_TABLE_PAGINATION_BUTTON_HEIGHT: 20,
+  DATA_TABLE_PAGINATION_BUTTON_WIDTH: 60,
+  DATA_TABLE_PAGINATION_BUTTON_TEXT_X_OFFSET: 30,
+  DATA_TABLE_PAGINATION_BUTTON_TEXT_Y_OFFSET: 10,
+
+  // NotificationToast constants
+  NOTIFICATION_TOAST_DEFAULT_WIDTH: 320,
+  NOTIFICATION_TOAST_DEFAULT_HEIGHT: 80,
+  NOTIFICATION_TOAST_DEFAULT_DURATION: 5000,
+  NOTIFICATION_TOAST_DEFAULT_Y: 20,
+  NOTIFICATION_TOAST_DEFAULT_X_OFFSET: 20,
+  NOTIFICATION_TOAST_REMOVE_DELAY: 300,
+  NOTIFICATION_TOAST_BORDER_WIDTH: 4,
+  NOTIFICATION_TOAST_ICON_X: 25,
+  NOTIFICATION_TOAST_MESSAGE_X: 50,
+  NOTIFICATION_TOAST_DISMISS_X_OFFSET: 15,
+  NOTIFICATION_TOAST_PROGRESS_HEIGHT: 2,
+  NOTIFICATION_TOAST_PROGRESS_ALPHA: 0.3,
+
+  // LoadingSpinner constants
+  LOADING_SPINNER_DEFAULT_WIDTH: 100,
+  LOADING_SPINNER_DEFAULT_HEIGHT: 100,
+  LOADING_SPINNER_DEFAULT_ANIMATION_SPEED: 2,
+  LOADING_SPINNER_FRAME_TIME: 16.67,
+  LOADING_SPINNER_FRAME_TIME_DIVISOR: 1000,
+  LOADING_SPINNER_MESSAGE_Y_OFFSET: 15,
+  LOADING_SPINNER_CANCEL_Y_OFFSET: 40,
+  LOADING_SPINNER_CANCEL_BUTTON_WIDTH: 60,
+  LOADING_SPINNER_CANCEL_BUTTON_HEIGHT: 25,
+  LOADING_SPINNER_CANCEL_BUTTON_X_OFFSET: 30,
+  LOADING_SPINNER_CANCEL_BUTTON_TEXT_Y_OFFSET: 12,
+  LOADING_SPINNER_LINE_WIDTH: 3,
+  LOADING_SPINNER_PROGRESS_LINE_WIDTH: 4,
+  LOADING_SPINNER_ARC_END_MULTIPLIER: 1.5,
+  LOADING_SPINNER_OVERLAY_ALPHA: 0.8,
+
+  // Size configurations
+  SPINNER_SIZE_SMALL: 20,
+  SPINNER_SIZE_MEDIUM: 40,
+  SPINNER_SIZE_LARGE: 60,
+};
+
 // =============================================================================
 // PRIORITY 1: DATA TABLE COMPONENT
 // =============================================================================
@@ -13,8 +70,11 @@ class DataTable extends BaseObject {
   constructor(options = {}) {
     super({
       ...options,
-      width: options.width || 600,
-      height: options.height || 400,
+      width:
+        options.width || PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_DEFAULT_WIDTH,
+      height:
+        options.height ||
+        PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_DEFAULT_HEIGHT,
       ariaRole: 'table',
     });
 
@@ -24,14 +84,20 @@ class DataTable extends BaseObject {
     this.sortDirection = options.sortDirection || 'asc'; // 'asc' or 'desc'
     this.selectedRows = new Set(options.selectedRows || []);
     this.currentPage = options.currentPage || 1;
-    this.pageSize = options.pageSize || 25;
+    this.pageSize =
+      options.pageSize ||
+      PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_DEFAULT_PAGE_SIZE;
     this.pagination = options.pagination !== false;
     this.selectable = options.selectable !== false;
     this.filterable = options.filterable !== false;
 
     // Styling
-    this.headerHeight = options.headerHeight || 40;
-    this.rowHeight = options.rowHeight || 30;
+    this.headerHeight =
+      options.headerHeight ||
+      PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_DEFAULT_HEADER_HEIGHT;
+    this.rowHeight =
+      options.rowHeight ||
+      PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_DEFAULT_ROW_HEIGHT;
     this.borderColor = options.borderColor || '#CCCCCC';
     this.headerBackground = options.headerBackground || '#F5F5F5';
     this.alternateRowColor = options.alternateRowColor || '#FAFAFA';
@@ -264,7 +330,10 @@ class DataTable extends BaseObject {
 
       // Sort indicator
       if (this.sortColumn === column.key) {
-        const sortX = x + columnWidth - 20;
+        const sortX =
+          x +
+          columnWidth -
+          PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_SORT_INDICATOR_OFFSET;
         const sortY = this.headerHeight / 2;
         const arrow = this.sortDirection === 'asc' ? '▲' : '▼';
 
@@ -340,12 +409,18 @@ class DataTable extends BaseObject {
   }
 
   renderPagination(renderer) {
-    const paginationY = this.height - 30;
+    const paginationY =
+      this.height - PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_HEIGHT;
     const totalData = this.getFilteredData().length;
 
     // Pagination background
     renderer.fillStyle = '#F9F9F9';
-    renderer.fillRect(0, paginationY, this.width, 30);
+    renderer.fillRect(
+      0,
+      paginationY,
+      this.width,
+      PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_HEIGHT
+    );
 
     // Pagination info
     const startItem = (this.currentPage - 1) * this.pageSize + 1;
@@ -355,27 +430,61 @@ class DataTable extends BaseObject {
     renderer.fillStyle = '#666666';
     renderer.font = '11px Arial';
     renderer.textAlign = 'left';
-    renderer.fillText(infoText, 10, paginationY + 15);
+    renderer.fillText(
+      infoText,
+      PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_TEXT_OFFSET,
+      paginationY +
+        PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_TEXT_Y_OFFSET
+    );
 
     // Page controls
-    const buttonWidth = 60;
-    const buttonY = paginationY + 5;
-    const prevX = this.width - 140;
-    const nextX = this.width - 70;
+    const buttonWidth =
+      PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_BUTTON_WIDTH;
+    const buttonY =
+      paginationY +
+      PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_BUTTON_Y_OFFSET;
+    const prevX =
+      this.width -
+      PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_PREV_X_OFFSET;
+    const nextX =
+      this.width -
+      PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_NEXT_X_OFFSET;
 
     // Previous button
     renderer.fillStyle = this.currentPage > 1 ? '#2196F3' : '#CCCCCC';
-    renderer.fillRect(prevX, buttonY, buttonWidth, 20);
+    renderer.fillRect(
+      prevX,
+      buttonY,
+      buttonWidth,
+      PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_BUTTON_HEIGHT
+    );
     renderer.fillStyle = '#FFFFFF';
     renderer.textAlign = 'center';
-    renderer.fillText('Previous', prevX + 30, buttonY + 10);
+    renderer.fillText(
+      'Previous',
+      prevX +
+        PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_BUTTON_TEXT_X_OFFSET,
+      buttonY +
+        PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_BUTTON_TEXT_Y_OFFSET
+    );
 
     // Next button
     renderer.fillStyle =
       this.currentPage < this.totalPages ? '#2196F3' : '#CCCCCC';
-    renderer.fillRect(nextX, buttonY, buttonWidth, 20);
+    renderer.fillRect(
+      nextX,
+      buttonY,
+      buttonWidth,
+      PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_BUTTON_HEIGHT
+    );
     renderer.fillStyle = '#FFFFFF';
-    renderer.fillText('Next', nextX + 30, buttonY + 10);
+    renderer.fillText(
+      'Next',
+      nextX +
+        PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_BUTTON_TEXT_X_OFFSET,
+      buttonY +
+        PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_BUTTON_TEXT_Y_OFFSET
+    );
   }
 
   // Public API Methods
@@ -417,14 +526,20 @@ class NotificationToast extends BaseObject {
   constructor(options = {}) {
     super({
       ...options,
-      width: options.width || 320,
-      height: options.height || 80,
+      width:
+        options.width ||
+        PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_DEFAULT_WIDTH,
+      height:
+        options.height ||
+        PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_DEFAULT_HEIGHT,
       ariaRole: 'alert',
     });
 
     this.message = options.message || 'Notification';
     this.type = options.type || 'info'; // 'success', 'error', 'warning', 'info'
-    this.duration = options.duration || 5000; // Auto-dismiss time
+    this.duration =
+      options.duration ||
+      PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_DEFAULT_DURATION; // Auto-dismiss time
     this.dismissible = options.dismissible !== false;
     this.actions = options.actions || [];
     this.icon = options.icon || this.getDefaultIcon();
@@ -449,8 +564,13 @@ class NotificationToast extends BaseObject {
 
   setupToast() {
     // Position toast (typically managed by a ToastManager)
-    this.y = this.y || 20;
-    this.x = this.x || window.innerWidth - this.width - 20;
+    this.y =
+      this.y || PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_DEFAULT_Y;
+    this.x =
+      this.x ||
+      window.innerWidth -
+        this.width -
+        PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_DEFAULT_X_OFFSET;
 
     this.show();
   }
@@ -475,7 +595,7 @@ class NotificationToast extends BaseObject {
     // Remove from parent/engine after animation
     setTimeout(() => {
       this.emit('remove', this);
-    }, 300);
+    }, PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_REMOVE_DELAY);
   }
 
   renderSelf(renderer) {
@@ -494,35 +614,60 @@ class NotificationToast extends BaseObject {
 
     // Left border accent
     renderer.fillStyle = colors.accent;
-    renderer.fillRect(0, 0, 4, this.height);
+    renderer.fillRect(
+      0,
+      0,
+      PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_BORDER_WIDTH,
+      this.height
+    );
 
     // Icon
     renderer.fillStyle = colors.accent;
     renderer.font = '16px Arial';
     renderer.textAlign = 'center';
-    renderer.fillText(this.icon, 25, this.height / 2);
+    renderer.fillText(
+      this.icon,
+      PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_ICON_X,
+      this.height / 2
+    );
 
     // Message
     renderer.fillStyle = colors.text;
     renderer.font = '13px Arial';
     renderer.textAlign = 'left';
     renderer.textBaseline = 'middle';
-    renderer.fillText(this.message, 50, this.height / 2);
+    renderer.fillText(
+      this.message,
+      PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_MESSAGE_X,
+      this.height / 2
+    );
 
     // Dismiss button
     if (this.dismissible) {
       renderer.fillStyle = colors.text;
       renderer.font = '14px Arial';
       renderer.textAlign = 'center';
-      renderer.fillText('×', this.width - 15, this.height / 2);
+      renderer.fillText(
+        '×',
+        this.width -
+          PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_DISMISS_X_OFFSET,
+        this.height / 2
+      );
     }
 
     // Progress bar
     if (this.duration > 0) {
       const progressWidth = this.width * this.progress;
       renderer.fillStyle = colors.accent;
-      renderer.globalAlpha = 0.3;
-      renderer.fillRect(0, this.height - 2, progressWidth, 2);
+      renderer.globalAlpha =
+        PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_PROGRESS_ALPHA;
+      renderer.fillRect(
+        0,
+        this.height -
+          PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_PROGRESS_HEIGHT,
+        progressWidth,
+        PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_PROGRESS_HEIGHT
+      );
       renderer.globalAlpha = 1;
     }
   }
@@ -563,8 +708,12 @@ class LoadingSpinner extends BaseObject {
   constructor(options = {}) {
     super({
       ...options,
-      width: options.width || 100,
-      height: options.height || 100,
+      width:
+        options.width ||
+        PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_DEFAULT_WIDTH,
+      height:
+        options.height ||
+        PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_DEFAULT_HEIGHT,
       ariaRole: 'progressbar',
     });
 
@@ -576,7 +725,9 @@ class LoadingSpinner extends BaseObject {
 
     // Animation state
     this.rotation = 0;
-    this.animationSpeed = options.animationSpeed || 2; // rotations per second
+    this.animationSpeed =
+      options.animationSpeed ||
+      PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_DEFAULT_ANIMATION_SPEED; // rotations per second
 
     this.setupSpinner();
   }
@@ -584,9 +735,18 @@ class LoadingSpinner extends BaseObject {
   setupSpinner() {
     // Size-based dimensions
     const sizes = {
-      small: { spinner: 20, font: '11px Arial' },
-      medium: { spinner: 40, font: '13px Arial' },
-      large: { spinner: 60, font: '15px Arial' },
+      small: {
+        spinner: PRIORITY_COMPONENT_CONSTANTS.SPINNER_SIZE_SMALL,
+        font: '11px Arial',
+      },
+      medium: {
+        spinner: PRIORITY_COMPONENT_CONSTANTS.SPINNER_SIZE_MEDIUM,
+        font: '13px Arial',
+      },
+      large: {
+        spinner: PRIORITY_COMPONENT_CONSTANTS.SPINNER_SIZE_LARGE,
+        font: '15px Arial',
+      },
     };
 
     const sizeConfig = sizes[this.size] || sizes.medium;
@@ -600,7 +760,12 @@ class LoadingSpinner extends BaseObject {
   startAnimation() {
     const animate = () => {
       if (this.visible) {
-        this.rotation += this.animationSpeed * (16.67 / 1000) * Math.PI * 2; // Assuming 60fps
+        this.rotation +=
+          this.animationSpeed *
+          (PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_FRAME_TIME /
+            PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_FRAME_TIME_DIVISOR) *
+          Math.PI *
+          2; // Assuming 60fps
         requestAnimationFrame(animate);
       }
     };
@@ -617,7 +782,7 @@ class LoadingSpinner extends BaseObject {
 
     // Overlay background
     if (this.overlay) {
-      renderer.fillStyle = 'rgba(255, 255, 255, 0.8)';
+      renderer.fillStyle = `rgba(255, 255, 255, ${PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_OVERLAY_ALPHA})`;
       renderer.fillRect(0, 0, this.width, this.height);
     }
 
@@ -642,7 +807,9 @@ class LoadingSpinner extends BaseObject {
       renderer.fillText(
         this.message,
         centerX,
-        centerY + this.spinnerSize / 2 + 15
+        centerY +
+          this.spinnerSize / 2 +
+          PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_MESSAGE_Y_OFFSET
       );
     }
 
@@ -658,14 +825,28 @@ class LoadingSpinner extends BaseObject {
 
     // Cancel button
     if (this.cancellable) {
-      const cancelY = centerY + this.spinnerSize / 2 + 40;
+      const cancelY =
+        centerY +
+        this.spinnerSize / 2 +
+        PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_CANCEL_Y_OFFSET;
       renderer.fillStyle = '#F44336';
-      renderer.fillRect(centerX - 30, cancelY, 60, 25);
+      renderer.fillRect(
+        centerX -
+          PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_CANCEL_BUTTON_X_OFFSET,
+        cancelY,
+        PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_CANCEL_BUTTON_WIDTH,
+        PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_CANCEL_BUTTON_HEIGHT
+      );
 
       renderer.fillStyle = '#FFFFFF';
       renderer.font = '11px Arial';
       renderer.textAlign = 'center';
-      renderer.fillText('Cancel', centerX, cancelY + 12);
+      renderer.fillText(
+        'Cancel',
+        centerX,
+        cancelY +
+          PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_CANCEL_BUTTON_TEXT_Y_OFFSET
+      );
     }
   }
 
@@ -678,9 +859,16 @@ class LoadingSpinner extends BaseObject {
 
     // Spinner arc
     renderer.strokeStyle = '#2196F3';
-    renderer.lineWidth = 3;
+    renderer.lineWidth =
+      PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_LINE_WIDTH;
     renderer.beginPath();
-    renderer.arc(0, 0, radius, 0, Math.PI * 1.5);
+    renderer.arc(
+      0,
+      0,
+      radius,
+      0,
+      Math.PI * PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_ARC_END_MULTIPLIER
+    );
     renderer.stroke();
 
     renderer.restore();
@@ -691,7 +879,8 @@ class LoadingSpinner extends BaseObject {
 
     // Background circle
     renderer.strokeStyle = '#E0E0E0';
-    renderer.lineWidth = 4;
+    renderer.lineWidth =
+      PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_PROGRESS_LINE_WIDTH;
     renderer.beginPath();
     renderer.arc(centerX, centerY, radius, 0, Math.PI * 2);
     renderer.stroke();
@@ -701,7 +890,8 @@ class LoadingSpinner extends BaseObject {
       const progressAngle = this.progress * Math.PI * 2;
 
       renderer.strokeStyle = '#2196F3';
-      renderer.lineWidth = 4;
+      renderer.lineWidth =
+        PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_PROGRESS_LINE_WIDTH;
       renderer.beginPath();
       renderer.arc(
         centerX,

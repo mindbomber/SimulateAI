@@ -1,15 +1,42 @@
 /**
  * Enhanced Scenario Generator for Open-Ended AI Ethics Exploration
  * Creates diverse, real-world scenarios for all age groups
- * 
+ *
  * DATA MODEL CLARIFICATION:
- * - DOMAIN: Template area (e.g., "healthcare", "education")  
+ * - DOMAIN: Template area (e.g., "healthcare", "education")
  * - CATEGORY: Thematic grouping of scenarios (e.g., "The Trolley Problem")
  * - SCENARIO: Individual ethical dilemma (e.g., "Autonomous Vehicle Split Decision")
  * - SIMULATION: Interactive experience when user engages with a scenario
  */
 
 import logger from '../utils/logger.js';
+
+// Constants to avoid magic numbers
+const SCENARIO_CONSTANTS = {
+  DEFAULT_SCENARIO_COUNT: 3,
+  LOOP_INDICES: {
+    START: 0,
+    INCREMENT: 1,
+  },
+  FALLBACK_VALUES: {
+    SCENARIO_NUMBER_OFFSET: 1, // For display purposes (e.g., "Scenario 1" instead of "Scenario 0")
+  },
+  STAKEHOLDER_GROUPS: {
+    ELEMENTARY: {
+      MIN: 2,
+      MAX: 3,
+    },
+    MIDDLE: {
+      MIN: 3,
+      MAX: 4,
+    },
+    HIGH: {
+      MIN: 4,
+      MAX: 6,
+    },
+  },
+  TRAUMA_CENTER_LEVEL: 1,
+};
 
 class ScenarioGenerator {
   constructor() {
@@ -39,7 +66,7 @@ class ScenarioGenerator {
             'A busy hospital emergency room uses AI to prioritize patient care',
           description:
             'Design an AI system that helps medical staff decide which patients need immediate attention',
-          setting: 'Urban Level 1 Trauma Center during flu season',
+          setting: `Urban Level ${SCENARIO_CONSTANTS.TRAUMA_CENTER_LEVEL} Trauma Center during flu season`,
           stakeholders: [
             'Patients',
             'Emergency physicians',
@@ -348,7 +375,7 @@ class ScenarioGenerator {
       approach: 'Narrative and character-based',
       language: 'Simple, concrete terms with visual metaphors',
       complexity: 'Single primary dilemma with clear choices',
-      stakeholders: 'Reduced to 2-3 main groups with clear motivations',
+      stakeholders: `Reduced to ${SCENARIO_CONSTANTS.STAKEHOLDER_GROUPS.ELEMENTARY.MIN}-${SCENARIO_CONSTANTS.STAKEHOLDER_GROUPS.ELEMENTARY.MAX} main groups with clear motivations`,
       activities: [
         'Story-telling with AI characters',
         'Simple choice voting with discussion',
@@ -366,7 +393,7 @@ class ScenarioGenerator {
       approach: 'Problem-solving with guided discovery',
       language: 'Age-appropriate with some technical terms explained',
       complexity: 'Multiple related dilemmas with guided analysis',
-      stakeholders: '3-4 groups with competing but understandable interests',
+      stakeholders: `${SCENARIO_CONSTANTS.STAKEHOLDER_GROUPS.MIDDLE.MIN}-${SCENARIO_CONSTANTS.STAKEHOLDER_GROUPS.MIDDLE.MAX} groups with competing but understandable interests`,
       activities: [
         'Structured debates with assigned positions',
         'Small group problem-solving challenges',
@@ -385,7 +412,7 @@ class ScenarioGenerator {
       approach: 'Research and analysis-based exploration',
       language: 'Technical terms with proper context and explanation',
       complexity: 'Multiple interconnected dilemmas requiring synthesis',
-      stakeholders: '4-6 groups with nuanced and conflicting interests',
+      stakeholders: `${SCENARIO_CONSTANTS.STAKEHOLDER_GROUPS.HIGH.MIN}-${SCENARIO_CONSTANTS.STAKEHOLDER_GROUPS.HIGH.MAX} groups with nuanced and conflicting interests`,
       activities: [
         'Independent research projects',
         'Mock professional consultations',
@@ -882,7 +909,11 @@ class ScenarioGenerator {
   /**
    * Generate scenarios for a simulation with specified difficulty
    */
-  generateScenarios(domain, difficulty, count = 3) {
+  generateScenarios(
+    domain,
+    difficulty,
+    count = SCENARIO_CONSTANTS.DEFAULT_SCENARIO_COUNT
+  ) {
     try {
       const scenarios = [];
       const templates = this.scenarioTemplates.get(domain);
@@ -893,7 +924,7 @@ class ScenarioGenerator {
       }
 
       for (
-        let i = 0;
+        let i = SCENARIO_CONSTANTS.LOOP_INDICES.START;
         i < Math.min(count, templates.baseScenarios.length);
         i++
       ) {
@@ -939,10 +970,10 @@ class ScenarioGenerator {
   createFallbackScenarios(domain, difficulty, count) {
     const fallbackScenarios = [];
 
-    for (let i = 0; i < count; i++) {
+    for (let i = SCENARIO_CONSTANTS.LOOP_INDICES.START; i < count; i++) {
       fallbackScenarios.push({
         id: `fallback-${domain}-${i}`,
-        title: `AI Ethics Scenario ${i + 1}`,
+        title: `AI Ethics Scenario ${i + SCENARIO_CONSTANTS.FALLBACK_VALUES.SCENARIO_NUMBER_OFFSET}`,
         description: `Explore ethical considerations in AI applications for ${domain}`,
         context: `A scenario exploring AI ethics in the context of ${domain}`,
         stakeholders: ['Users', 'Developers', 'Society', 'Regulators'],

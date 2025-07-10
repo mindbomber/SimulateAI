@@ -3,15 +3,21 @@
 ## 🎯 Development Philosophy
 
 ### Mission-Driven Development
-Every technical decision in SimulateAI serves our educational mission: **empowering learners of all ages to explore AI ethics through open-ended, consequence-driven simulations**. Our development follows the digital science laboratory approach—no "correct" answers, just cause-and-effect exploration.
+
+Every technical decision in SimulateAI serves our educational mission: **empowering learners of all
+ages to explore AI ethics through open-ended, consequence-driven simulations**. Our development
+follows the digital science laboratory approach—no "correct" answers, just cause-and-effect
+exploration.
 
 ### Educational Excellence Standards
+
 - **Accessibility First**: All components must meet WCAG guidelines
 - **Research-Based Design**: Following PhET Interactive Simulations principles
 - **ISTE Standards Alignment**: Building toward educational technology certification
 - **Universal Design**: Scalable for elementary through professional development
 
 ### Technical Principles
+
 - **Modular Architecture**: Reusable components enable diverse simulation creation
 - **Open-Ended Systems**: Support multiple perspectives and solutions
 - **Real-World Scenarios**: Mirror actual AI ethics challenges and consequences
@@ -19,13 +25,15 @@ Every technical decision in SimulateAI serves our educational mission: **empower
 
 ## 🚀 Component Development Workflow
 
-This guide outlines the development process for creating new educational components, following our **No HTML Generation Policy** and mission-driven approach.
+This guide outlines the development process for creating new educational components, following our
+**No HTML Generation Policy** and mission-driven approach.
 
 ## 📋 Step-by-Step Workflow
 
 ### 1. Plan Your Component
 
 Before coding, define:
+
 - Component purpose and functionality
 - Target component category (UI, Layout, Input/Utility, etc.)
 - Required properties and methods
@@ -37,27 +45,27 @@ Before coding, define:
 ```javascript
 // Example: src/js/objects/your-category-components.js
 export class YourNewComponent extends InteractiveObject {
-    constructor(options = {}) {
-        super({
-            type: 'your-component',
-            ...options
-        });
-        
-        // Component-specific initialization
-        this.initialize();
-    }
-    
-    initialize() {
-        // Setup component state and properties
-    }
-    
-    render(renderer) {
-        // Implement rendering logic
-    }
-    
-    handleEvent(event) {
-        // Handle user interactions
-    }
+  constructor(options = {}) {
+    super({
+      type: 'your-component',
+      ...options,
+    });
+
+    // Component-specific initialization
+    this.initialize();
+  }
+
+  initialize() {
+    // Setup component state and properties
+  }
+
+  render(renderer) {
+    // Implement rendering logic
+  }
+
+  handleEvent(event) {
+    // Handle user interactions
+  }
 }
 ```
 
@@ -78,19 +86,19 @@ this.registerComponent('your-component', YourNewComponent);
 ```css
 /* src/styles/your-category-components.css */
 .your-component {
-    /* Component styles */
+  /* Component styles */
 }
 
 .your-component:hover {
-    /* Hover states */
+  /* Hover states */
 }
 
 .your-component:focus {
-    /* Focus states for accessibility */
+  /* Focus states for accessibility */
 }
 
 .your-component[disabled] {
-    /* Disabled states */
+  /* Disabled states */
 }
 ```
 
@@ -101,111 +109,126 @@ this.registerComponent('your-component', YourNewComponent);
 import { YourNewComponent } from '../src/js/objects/your-category-components.js';
 
 class YourComponentTestSuite {
-    async runTests() {
-        console.log('Testing YourNewComponent...');
-        
-        this.testComponentCreation();
-        this.testComponentMethods();
-        this.testAccessibility();
-        this.testPerformance();
-        
-        console.log('All tests passed!');
-    }
-    
-    testComponentCreation() {
-        const component = new YourNewComponent({
-            x: 0, y: 0, width: 100, height: 50
-        });
-        
-        assert(component instanceof YourNewComponent, 'Should create component instance');
-        assert(component.type === 'your-component', 'Should set correct type');
-    }
-    
-    // Additional test methods...
+  async runTests() {
+    console.log('Testing YourNewComponent...');
+
+    this.testComponentCreation();
+    this.testComponentMethods();
+    this.testAccessibility();
+    this.testPerformance();
+
+    console.log('All tests passed!');
+  }
+
+  testComponentCreation() {
+    const component = new YourNewComponent({
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 50,
+    });
+
+    assert(component instanceof YourNewComponent, 'Should create component instance');
+    assert(component.type === 'your-component', 'Should set correct type');
+  }
+
+  // Additional test methods...
 }
 ```
 
 ### 6. Integrate with Demo System
 
-**Add to existing demo class** (don't create new HTML files):
+**Add to the main application** (demo files have been removed):
 
 ```javascript
-// In appropriate demo file (e.g., src/js/demos/input-utility-demo.js)
-export class InputUtilityComponentsDemo {
-    initializeComponents() {
-        // Existing components...
-        this.createYourNewComponentDemo();
-    }
-    
-    createYourNewComponentDemo() {
-        const yourComponent = this.engine.createComponent('your-component', {
-            x: 50, y: 300,
-            width: 200, height: 100,
-            // Component-specific options
-        });
-        
-        // Demo interactions and event handlers
-        yourComponent.on('someEvent', (event) => {
-            this.updateDescription(`Component event: ${event.type}`);
-        });
-        
-        this.components.yourComponent = yourComponent;
-    }
+// In the main application (e.g., src/js/app.js or appropriate component file)
+export class MainApplication {
+  initializeComponents() {
+    // Existing components...
+    this.createYourNewComponent();
+  }
+
+  createYourNewComponent() {
+    const yourComponent = this.engine.createComponent('your-component', {
+      x: 50,
+      y: 300,
+      width: 200,
+      height: 100,
+      // Component-specific options
+    });
+
+    // Demo interactions and event handlers
+    yourComponent.on('someEvent', event => {
+      this.updateDescription(`Component event: ${event.type}`);
+    });
+
+    this.components.yourComponent = yourComponent;
+  }
 }
 ```
 
 ### 7. Write Documentation
 
-```markdown
+````markdown
 <!-- docs/your-category-components.md -->
+
 # Your Category Components
 
 ## YourNewComponent
 
 ### Purpose
+
 Brief description of what the component does and when to use it.
 
 ### Usage
+
 ```javascript
 const component = engine.createComponent('your-component', {
-    x: 50, y: 50,
-    width: 200, height: 100,
-    // Component options
+  x: 50,
+  y: 50,
+  width: 200,
+  height: 100,
+  // Component options
 });
 ```
+````
 
 ### Properties
+
 - `property1`: Description of property
 - `property2`: Description of property
 
 ### Events
+
 - `event1`: When this event fires
 - `event2`: When this event fires
 
 ### Accessibility
+
 - Keyboard navigation support
 - Screen reader compatibility
 - ARIA attributes
-```
 
-### 8. Update Existing Demo HTML (If Needed)
+````
 
-Only update existing HTML files to showcase new components:
+### 8. Integrate with Main Application
 
-```html
-<!-- In existing demo file like input-utility-demo.html -->
-<div class="demo-section">
-    <h2>🎯 Your New Component</h2>
-    <p>Description of your new component functionality.</p>
-    
-    <div class="component-showcase">
-        <div class="showcase-item">
-            <h4>Basic Usage</h4>
-            <div id="yourComponentDemo1"></div>
-        </div>
+Components should be integrated into the main SimulateAI application interface:
+
+```javascript
+// In the main application files (e.g., src/js/app.js)
+import { YourNewComponent } from './components/your-new-component.js';
+
+class SimulateAI {
+    initializeUI() {
+        // Existing UI initialization...
+        this.setupYourNewComponent();
+    }
+
+    setupYourNewComponent() {
     </div>
 </div>
-```
+````
 
 ### 9. Update Project Documentation
 
@@ -216,6 +239,7 @@ Only update existing HTML files to showcase new components:
 ## ❌ What NOT to Do
 
 Don't create these files anymore:
+
 - `your-component-demo.html`
 - `your-component-test.html`
 - Individual HTML files for each component
@@ -243,12 +267,12 @@ Test your component works with the entire system:
 ```javascript
 // Integration test example
 const engine = new VisualEngine(container, {
-    renderMode: 'auto',
-    accessibility: true
+  renderMode: 'auto',
+  accessibility: true,
 });
 
 const yourComponent = engine.createComponent('your-component', {
-    // Test options
+  // Test options
 });
 
 // Verify component is created and functional
@@ -267,19 +291,27 @@ assert(engine.getComponentsByType('your-component').length === 1);
 ## 🎯 Example Component Categories
 
 ### UI Components
+
 Place in `src/js/objects/advanced-ui-components.js`
+
 - Dialogs, menus, tooltips, notifications
 
-### Layout Components  
+### Layout Components
+
 Place in `src/js/objects/layout-components.js`
+
 - Containers, grids, panels, dividers
 
 ### Input Components
+
 Place in `src/js/objects/input-utility-components.js`
+
 - Form inputs, pickers, selectors, validators
 
 ### Specialized Components
+
 Create new category file if needed
+
 - Domain-specific components, integrations
 
 ## 🚀 Getting Started
@@ -294,4 +326,5 @@ Create new category file if needed
 
 ---
 
-For questions about this workflow, refer to the `NO_HTML_GENERATION_POLICY.md` or existing component implementations as examples.
+For questions about this workflow, refer to the `NO_HTML_GENERATION_POLICY.md` or existing component
+implementations as examples.

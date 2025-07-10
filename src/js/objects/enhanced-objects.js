@@ -15,6 +15,106 @@ const DEFAULT_EASING = 'easeInOut';
 const TOUCH_TARGET_SIZE = 44;
 const FOCUS_RING_WIDTH = 2;
 
+// Enhanced Object System Constants
+const OBJECT_CONSTANTS = {
+  // Base object defaults
+  DEFAULT_WIDTH: 100,
+  DEFAULT_HEIGHT: 50,
+
+  // ID generation
+  ID_BASE: 36,
+  ID_LENGTH: 9,
+  ID_SUBSTRING_START: 2,
+
+  // Animation and timing
+  DOUBLE_CLICK_THRESHOLD: 500,
+  RIPPLE_DURATION: 600,
+  ANIMATION_PRECISION: 0.1,
+  LOADING_SPINNER_SPEED: 2, // Math.PI * 2
+  LOADING_SPINNER_ARC: 1.5, // Math.PI * 1.5
+  SPINNER_RADIUS: 8,
+  SPINNER_LINE_WIDTH: 2,
+  BUTTON_TEXT_OFFSET: 10,
+  BUTTON_SPINNER_OFFSET: 30,
+  FPS_UPDATE_INTERVAL: 1000,
+
+  // UI dimensions and scaling
+  BUTTON_HOVER_SCALE: 1.02,
+  BUTTON_SCALE_DURATION: 150,
+  FOCUS_RING_OFFSET: 2,
+  FOCUS_RING_EXTRA: 3,
+  FOCUS_RING_BUTTON_OFFSET: 4,
+  BORDER_WIDTH: 2,
+  THICK_BORDER_WIDTH: 3,
+
+  // Positioning ratios
+  METER_TRACK_Y_RATIO: 0.4,
+  METER_TRACK_HEIGHT_RATIO: 0.3,
+  METER_LABEL_Y_RATIO: 0.3,
+  METER_VALUE_LABEL_Y_RATIO: 0.9,
+  SLIDER_VALUE_Y_OFFSET: 15,
+  SLIDER_LABEL_Y_OFFSET: -5,
+
+  // Default component dimensions
+  METER_DEFAULT_WIDTH: 200,
+  METER_DEFAULT_HEIGHT: 60,
+  METER_DEFAULT_VALUE: 50,
+  METER_DEFAULT_MAX: 100,
+
+  BUTTON_DEFAULT_WIDTH: 120,
+  BUTTON_DEFAULT_HEIGHT: 40,
+
+  SLIDER_DEFAULT_WIDTH: 200,
+  SLIDER_DEFAULT_HEIGHT: 40,
+  SLIDER_DEFAULT_VALUE: 50,
+  SLIDER_DEFAULT_MAX: 100,
+  SLIDER_DEFAULT_STEP: 1,
+  SLIDER_DEFAULT_TRACK_HEIGHT: 6,
+  SLIDER_DEFAULT_HANDLE_SIZE: 20,
+
+  // Scoring thresholds
+  SCORE_THRESHOLD_EXCELLENT: 90,
+  SCORE_THRESHOLD_GOOD: 70,
+  SCORE_THRESHOLD_FAIR: 50,
+  SCORE_THRESHOLD_POOR: 30,
+
+  // Ripple effect
+  RIPPLE_ALPHA: 0.3,
+};
+
+// Easing function constants
+const EASING_CONSTANTS = {
+  // Bezier curve control points
+  HALF: 0.5,
+  QUARTER: 0.25,
+  THREE_QUARTERS: 0.75,
+
+  // Cubic easing powers
+  CUBIC_POWER: 3,
+  QUARTIC_POWER: 4,
+
+  // Bounce easing constants
+  BOUNCE_N1: 7.5625,
+  BOUNCE_D1: 2.75,
+  BOUNCE_THRESHOLD_1: 1, // 1 / d1
+  BOUNCE_THRESHOLD_2: 2, // 2 / d1
+  BOUNCE_THRESHOLD_3: 2.5, // 2.5 / d1
+  BOUNCE_OFFSET_1: 1.5, // 1.5 / d1
+  BOUNCE_OFFSET_2: 2.25, // 2.25 / d1
+  BOUNCE_OFFSET_3: 2.625, // 2.625 / d1
+  BOUNCE_VALUE_1: 0.75,
+  BOUNCE_VALUE_2: 0.9375,
+  BOUNCE_VALUE_3: 0.984375,
+
+  // Ease multipliers
+  EASE_IN_OUT_MULTIPLIER: 2,
+  EASE_IN_OUT_CUBIC_MULTIPLIER: 4,
+  EASE_IN_OUT_QUART_MULTIPLIER: 8,
+  EASE_NEGATIVE_MULTIPLIER: -2,
+  EASE_ADDEND: 2,
+  EASE_DIVISOR: 2,
+};
+
 // Animation frame management
 class AnimationManager {
   constructor() {
@@ -94,22 +194,52 @@ const EasingFunctions = {
   linear: t => t,
   easeIn: t => t * t,
   easeOut: t => 1 - (1 - t) * (1 - t),
-  easeInOut: t => (t < 0.5 ? 2 * t * t : 1 - 2 * (1 - t) * (1 - t)),
+  easeInOut: t =>
+    t < EASING_CONSTANTS.HALF
+      ? EASING_CONSTANTS.EASE_IN_OUT_MULTIPLIER * t * t
+      : 1 - EASING_CONSTANTS.EASE_IN_OUT_MULTIPLIER * (1 - t) * (1 - t),
   easeInCubic: t => t * t * t,
-  easeOutCubic: t => 1 - Math.pow(1 - t, 3),
+  easeOutCubic: t => 1 - Math.pow(1 - t, EASING_CONSTANTS.CUBIC_POWER),
   easeInOutCubic: t =>
-    t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
+    t < EASING_CONSTANTS.HALF
+      ? EASING_CONSTANTS.EASE_IN_OUT_CUBIC_MULTIPLIER * t * t * t
+      : 1 -
+        Math.pow(
+          EASING_CONSTANTS.EASE_NEGATIVE_MULTIPLIER * t +
+            EASING_CONSTANTS.EASE_ADDEND,
+          EASING_CONSTANTS.CUBIC_POWER
+        ) /
+          EASING_CONSTANTS.EASE_DIVISOR,
   easeInQuart: t => t * t * t * t,
-  easeOutQuart: t => 1 - Math.pow(1 - t, 4),
+  easeOutQuart: t => 1 - Math.pow(1 - t, EASING_CONSTANTS.QUARTIC_POWER),
   easeInOutQuart: t =>
-    t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2,
+    t < EASING_CONSTANTS.HALF
+      ? EASING_CONSTANTS.EASE_IN_OUT_QUART_MULTIPLIER * t * t * t * t
+      : 1 -
+        Math.pow(
+          EASING_CONSTANTS.EASE_NEGATIVE_MULTIPLIER * t +
+            EASING_CONSTANTS.EASE_ADDEND,
+          EASING_CONSTANTS.QUARTIC_POWER
+        ) /
+          EASING_CONSTANTS.EASE_DIVISOR,
   bounce: t => {
-    const n1 = 7.5625;
-    const d1 = 2.75;
-    if (t < 1 / d1) return n1 * t * t;
-    if (t < 2 / d1) return n1 * (t -= 1.5 / d1) * t + 0.75;
-    if (t < 2.5 / d1) return n1 * (t -= 2.25 / d1) * t + 0.9375;
-    return n1 * (t -= 2.625 / d1) * t + 0.984375;
+    const n1 = EASING_CONSTANTS.BOUNCE_N1;
+    const d1 = EASING_CONSTANTS.BOUNCE_D1;
+    if (t < EASING_CONSTANTS.BOUNCE_THRESHOLD_1 / d1) return n1 * t * t;
+    if (t < EASING_CONSTANTS.BOUNCE_THRESHOLD_2 / d1)
+      return (
+        n1 * (t -= EASING_CONSTANTS.BOUNCE_OFFSET_1 / d1) * t +
+        EASING_CONSTANTS.BOUNCE_VALUE_1
+      );
+    if (t < EASING_CONSTANTS.BOUNCE_THRESHOLD_3 / d1)
+      return (
+        n1 * (t -= EASING_CONSTANTS.BOUNCE_OFFSET_2 / d1) * t +
+        EASING_CONSTANTS.BOUNCE_VALUE_2
+      );
+    return (
+      n1 * (t -= EASING_CONSTANTS.BOUNCE_OFFSET_3 / d1) * t +
+      EASING_CONSTANTS.BOUNCE_VALUE_3
+    );
   },
 };
 
@@ -125,8 +255,11 @@ export class BaseObject {
     this.x = validateNumber(options.x, 0);
     this.y = validateNumber(options.y, 0);
     this.z = validateNumber(options.z, 0);
-    this.width = validateNumber(options.width, 100);
-    this.height = validateNumber(options.height, 50);
+    this.width = validateNumber(options.width, OBJECT_CONSTANTS.DEFAULT_WIDTH);
+    this.height = validateNumber(
+      options.height,
+      OBJECT_CONSTANTS.DEFAULT_HEIGHT
+    );
     this.rotation = validateNumber(options.rotation, 0);
     this.scaleX = validateNumber(options.scaleX, 1);
     this.scaleY = validateNumber(options.scaleY, 1);
@@ -241,7 +374,7 @@ export class BaseObject {
    * @returns {string}
    */
   generateId() {
-    return `obj_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `obj_${Date.now()}_${Math.random().toString(OBJECT_CONSTANTS.ID_BASE).substr(OBJECT_CONSTANTS.ID_SUBSTRING_START, OBJECT_CONSTANTS.ID_LENGTH)}`;
   } /**
    * Sets up default event handlers from options
    * @param {Object} options
@@ -609,7 +742,10 @@ export class BaseObject {
 
         // Double click detection
         const now = performance.now();
-        if (this.lastClickTime && now - this.lastClickTime < 500) {
+        if (
+          this.lastClickTime &&
+          now - this.lastClickTime < OBJECT_CONSTANTS.DOUBLE_CLICK_THRESHOLD
+        ) {
           this.emit('doubleClick', eventData);
           this.lastClickTime = 0;
         } else {
@@ -1021,16 +1157,16 @@ export class EthicsMeter extends BaseObject {
   constructor(options = {}) {
     super({
       ...options,
-      width: options.width || 200,
-      height: options.height || 60,
+      width: options.width || OBJECT_CONSTANTS.METER_DEFAULT_WIDTH,
+      height: options.height || OBJECT_CONSTANTS.METER_DEFAULT_HEIGHT,
       ariaRole: 'progressbar',
       interactive: false,
     });
 
     this.category = options.category || 'ethics';
-    this.value = options.value || 50;
+    this.value = options.value || OBJECT_CONSTANTS.METER_DEFAULT_VALUE;
     this.minValue = options.minValue || 0;
-    this.maxValue = options.maxValue || 100;
+    this.maxValue = options.maxValue || OBJECT_CONSTANTS.METER_DEFAULT_MAX;
     this.label =
       options.label ||
       this.category.charAt(0).toUpperCase() + this.category.slice(1);
@@ -1050,10 +1186,12 @@ export class EthicsMeter extends BaseObject {
     };
 
     this.thresholds = {
-      excellent: options.thresholds?.excellent || 90,
-      good: options.thresholds?.good || 70,
-      fair: options.thresholds?.fair || 50,
-      poor: options.thresholds?.poor || 30,
+      excellent:
+        options.thresholds?.excellent ||
+        OBJECT_CONSTANTS.SCORE_THRESHOLD_EXCELLENT,
+      good: options.thresholds?.good || OBJECT_CONSTANTS.SCORE_THRESHOLD_GOOD,
+      fair: options.thresholds?.fair || OBJECT_CONSTANTS.SCORE_THRESHOLD_FAIR,
+      poor: options.thresholds?.poor || OBJECT_CONSTANTS.SCORE_THRESHOLD_POOR,
     };
 
     // Animation state
@@ -1092,13 +1230,16 @@ export class EthicsMeter extends BaseObject {
   }
 
   animateToTarget() {
-    if (Math.abs(this.displayValue - this.targetValue) < 0.1) {
+    if (
+      Math.abs(this.displayValue - this.targetValue) <
+      OBJECT_CONSTANTS.ANIMATION_PRECISION
+    ) {
       this.setValue(this.targetValue);
       return;
     }
 
     const diff = this.targetValue - this.displayValue;
-    this.displayValue += diff * 0.1;
+    this.displayValue += diff * OBJECT_CONSTANTS.ANIMATION_PRECISION;
 
     requestAnimationFrame(() => this.animateToTarget());
   }
@@ -1133,21 +1274,33 @@ export class EthicsMeter extends BaseObject {
     if (renderer.type === 'canvas') {
       // Background track
       renderer.fillStyle = this.colors.background;
-      renderer.fillRect(0, this.height * 0.4, this.width, this.height * 0.3);
+      renderer.fillRect(
+        0,
+        this.height * OBJECT_CONSTANTS.METER_TRACK_Y_RATIO,
+        this.width,
+        this.height * OBJECT_CONSTANTS.METER_TRACK_HEIGHT_RATIO
+      );
 
       // Progress fill
       renderer.fillStyle = this.getScoreColor();
-      renderer.fillRect(0, this.height * 0.4, fillWidth, this.height * 0.3);
+      renderer.fillRect(
+        0,
+        this.height * OBJECT_CONSTANTS.METER_TRACK_Y_RATIO,
+        fillWidth,
+        this.height * OBJECT_CONSTANTS.METER_TRACK_HEIGHT_RATIO
+      );
 
       // Focus ring
       if (this.isFocused) {
         renderer.strokeStyle = '#2196F3';
-        renderer.lineWidth = 2;
+        renderer.lineWidth = OBJECT_CONSTANTS.BORDER_WIDTH;
         renderer.strokeRect(
-          -2,
-          this.height * 0.4 - 2,
-          this.width + 4,
-          this.height * 0.3 + 4
+          -OBJECT_CONSTANTS.FOCUS_RING_OFFSET,
+          this.height * OBJECT_CONSTANTS.METER_TRACK_Y_RATIO -
+            OBJECT_CONSTANTS.FOCUS_RING_OFFSET,
+          this.width + OBJECT_CONSTANTS.FOCUS_RING_BUTTON_OFFSET,
+          this.height * OBJECT_CONSTANTS.METER_TRACK_HEIGHT_RATIO +
+            OBJECT_CONSTANTS.FOCUS_RING_BUTTON_OFFSET
         );
       }
 
@@ -1156,7 +1309,11 @@ export class EthicsMeter extends BaseObject {
         renderer.fillStyle = this.colors.text;
         renderer.font = '14px Arial';
         renderer.textAlign = 'left';
-        renderer.fillText(this.label, 0, this.height * 0.3);
+        renderer.fillText(
+          this.label,
+          0,
+          this.height * OBJECT_CONSTANTS.METER_LABEL_Y_RATIO
+        );
       }
 
       // Value display
@@ -1165,11 +1322,19 @@ export class EthicsMeter extends BaseObject {
         renderer.font = '12px Arial';
         renderer.textAlign = 'right';
         const valueText = `${Math.round(this.displayValue)}/${this.maxValue}`;
-        renderer.fillText(valueText, this.width, this.height * 0.3);
+        renderer.fillText(
+          valueText,
+          this.width,
+          this.height * OBJECT_CONSTANTS.METER_LABEL_Y_RATIO
+        );
 
         // Score label
         renderer.font = '10px Arial';
-        renderer.fillText(this.getScoreLabel(), this.width, this.height * 0.9);
+        renderer.fillText(
+          this.getScoreLabel(),
+          this.width,
+          this.height * OBJECT_CONSTANTS.METER_VALUE_LABEL_Y_RATIO
+        );
       }
     }
   }
@@ -1180,8 +1345,8 @@ export class InteractiveButton extends BaseObject {
   constructor(options = {}) {
     super({
       ...options,
-      width: options.width || 120,
-      height: options.height || 40,
+      width: options.width || OBJECT_CONSTANTS.BUTTON_DEFAULT_WIDTH,
+      height: options.height || OBJECT_CONSTANTS.BUTTON_DEFAULT_HEIGHT,
       ariaRole: 'button',
     });
 
@@ -1233,16 +1398,24 @@ export class InteractiveButton extends BaseObject {
     this.on('hover', () => {
       if (!this.isDisabled && !this.isPressed) {
         this.currentColor = this.colors.hover;
-        this.animate('scaleX', 1.02, 150);
-        this.animate('scaleY', 1.02, 150);
+        this.animate(
+          'scaleX',
+          OBJECT_CONSTANTS.BUTTON_HOVER_SCALE,
+          OBJECT_CONSTANTS.BUTTON_SCALE_DURATION
+        );
+        this.animate(
+          'scaleY',
+          OBJECT_CONSTANTS.BUTTON_HOVER_SCALE,
+          OBJECT_CONSTANTS.BUTTON_SCALE_DURATION
+        );
       }
     });
 
     this.on('hoverEnd', () => {
       if (!this.isDisabled && !this.isPressed) {
         this.currentColor = this.colors.normal;
-        this.animate('scaleX', 1, 150);
-        this.animate('scaleY', 1, 150);
+        this.animate('scaleX', 1, OBJECT_CONSTANTS.BUTTON_SCALE_DURATION);
+        this.animate('scaleY', 1, OBJECT_CONSTANTS.BUTTON_SCALE_DURATION);
       }
     });
 
@@ -1277,7 +1450,7 @@ export class InteractiveButton extends BaseObject {
       y: y || this.height / 2,
       radius: 0,
       maxRadius: Math.max(this.width, this.height),
-      alpha: 0.3,
+      alpha: OBJECT_CONSTANTS.RIPPLE_ALPHA,
       startTime: performance.now(),
     };
 
@@ -1288,7 +1461,7 @@ export class InteractiveButton extends BaseObject {
       if (index > -1) {
         this.ripples.splice(index, 1);
       }
-    }, 600);
+    }, OBJECT_CONSTANTS.RIPPLE_DURATION);
   }
 
   handleClick() {
@@ -1307,10 +1480,10 @@ export class InteractiveButton extends BaseObject {
     const currentTime = performance.now();
     this.ripples.forEach(ripple => {
       const elapsed = currentTime - ripple.startTime;
-      const progress = Math.min(elapsed / 600, 1);
+      const progress = Math.min(elapsed / OBJECT_CONSTANTS.RIPPLE_DURATION, 1);
 
       ripple.radius = ripple.maxRadius * progress;
-      ripple.alpha = 0.3 * (1 - progress);
+      ripple.alpha = OBJECT_CONSTANTS.RIPPLE_ALPHA * (1 - progress);
     });
   }
 
@@ -1330,7 +1503,7 @@ export class InteractiveButton extends BaseObject {
     // Button border
     if (color.border) {
       renderer.strokeStyle = color.border;
-      renderer.lineWidth = 2;
+      renderer.lineWidth = OBJECT_CONSTANTS.BORDER_WIDTH;
       renderer.strokeRect(0, 0, this.width, this.height);
     }
 
@@ -1340,7 +1513,13 @@ export class InteractiveButton extends BaseObject {
       renderer.globalAlpha = ripple.alpha;
       renderer.fillStyle = '#FFFFFF';
       renderer.beginPath();
-      renderer.arc(ripple.x, ripple.y, ripple.radius, 0, Math.PI * 2);
+      renderer.arc(
+        ripple.x,
+        ripple.y,
+        ripple.radius,
+        0,
+        Math.PI * OBJECT_CONSTANTS.LOADING_SPINNER_SPEED
+      );
       renderer.fill();
       renderer.restore();
     });
@@ -1348,8 +1527,13 @@ export class InteractiveButton extends BaseObject {
     // Focus ring
     if (this.isFocused) {
       renderer.strokeStyle = '#FF9800';
-      renderer.lineWidth = 3;
-      renderer.strokeRect(-2, -2, this.width + 4, this.height + 4);
+      renderer.lineWidth = OBJECT_CONSTANTS.THICK_BORDER_WIDTH;
+      renderer.strokeRect(
+        -OBJECT_CONSTANTS.FOCUS_RING_OFFSET,
+        -OBJECT_CONSTANTS.FOCUS_RING_OFFSET,
+        this.width + OBJECT_CONSTANTS.FOCUS_RING_BUTTON_OFFSET,
+        this.height + OBJECT_CONSTANTS.FOCUS_RING_BUTTON_OFFSET
+      );
     }
 
     // Button text
@@ -1364,8 +1548,16 @@ export class InteractiveButton extends BaseObject {
 
     // Loading spinner
     if (this.isLoading) {
-      this.renderLoadingSpinner(renderer, textX - 30, textY);
-      renderer.fillText(displayText, textX + 10, textY);
+      this.renderLoadingSpinner(
+        renderer,
+        textX - OBJECT_CONSTANTS.BUTTON_SPINNER_OFFSET,
+        textY
+      );
+      renderer.fillText(
+        displayText,
+        textX + OBJECT_CONSTANTS.BUTTON_TEXT_OFFSET,
+        textY
+      );
     } else {
       renderer.fillText(displayText, textX, textY);
     }
@@ -1382,16 +1574,22 @@ export class InteractiveButton extends BaseObject {
 
   renderLoadingSpinner(renderer, x, y) {
     const time = performance.now() / 1000;
-    const rotation = time * Math.PI * 2;
+    const rotation = time * Math.PI * OBJECT_CONSTANTS.LOADING_SPINNER_SPEED;
 
     renderer.save();
     renderer.translate(x, y);
     renderer.rotate(rotation);
 
     renderer.strokeStyle = this.currentColor.text;
-    renderer.lineWidth = 2;
+    renderer.lineWidth = OBJECT_CONSTANTS.SPINNER_LINE_WIDTH;
     renderer.beginPath();
-    renderer.arc(0, 0, 8, 0, Math.PI * 1.5);
+    renderer.arc(
+      0,
+      0,
+      OBJECT_CONSTANTS.SPINNER_RADIUS,
+      0,
+      Math.PI * OBJECT_CONSTANTS.LOADING_SPINNER_ARC
+    );
     renderer.stroke();
 
     renderer.restore();
@@ -1403,22 +1601,27 @@ export class InteractiveSlider extends BaseObject {
   constructor(options = {}) {
     super({
       ...options,
-      width: options.width || 200,
-      height: options.height || 40,
+      width: options.width || OBJECT_CONSTANTS.SLIDER_DEFAULT_WIDTH,
+      height: options.height || OBJECT_CONSTANTS.SLIDER_DEFAULT_HEIGHT,
       ariaRole: 'slider',
       draggable: true,
     });
 
     this.min = options.min || 0;
-    this.max = options.max || 100;
-    this.value = Math.max(this.min, Math.min(this.max, options.value || 50));
-    this.step = options.step || 1;
+    this.max = options.max || OBJECT_CONSTANTS.SLIDER_DEFAULT_MAX;
+    this.value = Math.max(
+      this.min,
+      Math.min(this.max, options.value || OBJECT_CONSTANTS.SLIDER_DEFAULT_VALUE)
+    );
+    this.step = options.step || OBJECT_CONSTANTS.SLIDER_DEFAULT_STEP;
     this.label = options.label || '';
     this.unit = options.unit || '';
 
     // Visual properties
-    this.trackHeight = options.trackHeight || 6;
-    this.handleSize = options.handleSize || 20;
+    this.trackHeight =
+      options.trackHeight || OBJECT_CONSTANTS.SLIDER_DEFAULT_TRACK_HEIGHT;
+    this.handleSize =
+      options.handleSize || OBJECT_CONSTANTS.SLIDER_DEFAULT_HANDLE_SIZE;
     this.showValue = options.showValue !== false;
     this.showLabel = options.showLabel !== false;
 
@@ -1543,7 +1746,7 @@ export class InteractiveSlider extends BaseObject {
       renderer.fillStyle = this.colors.text;
       renderer.font = '12px Arial';
       renderer.textAlign = 'left';
-      renderer.fillText(this.label, 0, -5);
+      renderer.fillText(this.label, 0, OBJECT_CONSTANTS.SLIDER_LABEL_Y_OFFSET);
     }
 
     // Track background
@@ -1568,15 +1771,24 @@ export class InteractiveSlider extends BaseObject {
 
     // Handle border
     renderer.strokeStyle = this.colors.handleBorder;
-    renderer.lineWidth = this.hoverHandle || this.isDraggingHandle ? 3 : 2;
+    renderer.lineWidth =
+      this.hoverHandle || this.isDraggingHandle
+        ? OBJECT_CONSTANTS.THICK_BORDER_WIDTH
+        : OBJECT_CONSTANTS.BORDER_WIDTH;
     renderer.stroke();
 
     // Focus ring
     if (this.isFocused) {
       renderer.strokeStyle = '#FF9800';
-      renderer.lineWidth = 2;
+      renderer.lineWidth = OBJECT_CONSTANTS.BORDER_WIDTH;
       renderer.beginPath();
-      renderer.arc(handleX, handleY, this.handleSize / 2 + 3, 0, Math.PI * 2);
+      renderer.arc(
+        handleX,
+        handleY,
+        this.handleSize / 2 + OBJECT_CONSTANTS.FOCUS_RING_EXTRA,
+        0,
+        Math.PI * OBJECT_CONSTANTS.LOADING_SPINNER_SPEED
+      );
       renderer.stroke();
     }
 
@@ -1586,7 +1798,11 @@ export class InteractiveSlider extends BaseObject {
       renderer.font = '11px Arial';
       renderer.textAlign = 'center';
       const valueText = `${Math.round(this.value)}${this.unit}`;
-      renderer.fillText(valueText, handleX, this.height + 15);
+      renderer.fillText(
+        valueText,
+        handleX,
+        this.height + OBJECT_CONSTANTS.SLIDER_VALUE_Y_OFFSET
+      );
     }
   }
 }
@@ -1612,7 +1828,7 @@ export class Scene extends BaseObject {
     this.frameCount = 0;
     this.lastFrameTime = 0;
     this.fps = 0;
-    this.fpsUpdateInterval = 1000;
+    this.fpsUpdateInterval = OBJECT_CONSTANTS.FPS_UPDATE_INTERVAL;
     this.lastFpsUpdate = 0;
   }
 

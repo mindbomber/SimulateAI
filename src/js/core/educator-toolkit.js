@@ -1,7 +1,32 @@
 /**
+ * Copyright 2025 Armando Sori
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
  * Educator Toolkit - Comprehensive educational support system
  * Transforms SimulateAI into a complete digital science lab for AI ethics
  */
+
+// Lesson timing and structure constants
+const LESSON_TIMING = {
+  WARMUP_DURATION: 5, // minutes
+  INTRODUCTION_DURATION: 10, // minutes
+  CLOSURE_DURATION: 10, // minutes
+  DEFAULT_LESSON_DURATION: 50, // minutes
+  OVERHEAD_TIME: 25, // total time for non-main activities (warmup + intro + closure + transitions)
+};
 
 class EducatorToolkit {
   constructor() {
@@ -294,7 +319,7 @@ class EducatorToolkit {
     const {
       subject = 'Computer Science',
       gradeLevel = '9-12',
-      duration = 50,
+      duration = LESSON_TIMING.DEFAULT_LESSON_DURATION,
       scenario = 'bias-fairness',
       activity = 'scenario-explorer',
       standards = ['csta'],
@@ -314,10 +339,19 @@ class EducatorToolkit {
 
       // Lesson Structure
       structure: {
-        warmUp: this.getWarmUpActivity(scenario, 5),
-        introduction: this.getIntroduction(scenario, 10),
-        mainActivity: this.getMainActivity(activity, duration - 25),
-        closure: this.getClosureActivity(scenario, 10),
+        warmUp: this.getWarmUpActivity(scenario, LESSON_TIMING.WARMUP_DURATION),
+        introduction: this.getIntroduction(
+          scenario,
+          LESSON_TIMING.INTRODUCTION_DURATION
+        ),
+        mainActivity: this.getMainActivity(
+          activity,
+          duration - LESSON_TIMING.OVERHEAD_TIME
+        ),
+        closure: this.getClosureActivity(
+          scenario,
+          LESSON_TIMING.CLOSURE_DURATION
+        ),
       },
 
       // Materials and Resources

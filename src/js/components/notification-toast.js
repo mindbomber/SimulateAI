@@ -3,6 +3,33 @@
  * Provides accessible, customizable toast notifications
  */
 
+// Constants for notification toast management
+const NOTIFICATION_TOAST_CONSTANTS = {
+  DURATIONS: {
+    DEFAULT: 5000,
+    ERROR: 8000,
+    ANNOUNCEMENT_CLEAR: 1000,
+  },
+  ANIMATION: {
+    HIDE_DELAY: 300,
+  },
+  ID_GENERATION: {
+    BASE: 36,
+    SUBSTRING_START: 2,
+    SUBSTRING_LENGTH: 9,
+  },
+  TYPES: {
+    SUCCESS: 'success',
+    ERROR: 'error',
+    WARNING: 'warning',
+    INFO: 'info',
+  },
+  PROGRESS: {
+    FULL_WIDTH: '100%',
+    EMPTY_WIDTH: '0%',
+  },
+};
+
 class NotificationToast {
   constructor() {
     this.container = null;
@@ -32,10 +59,10 @@ class NotificationToast {
    */
   show(options = {}) {
     const {
-      type = 'info',
+      type = NOTIFICATION_TOAST_CONSTANTS.TYPES.INFO,
       title = '',
       message = '',
-      duration = 5000,
+      duration = NOTIFICATION_TOAST_CONSTANTS.DURATIONS.DEFAULT,
       closable = true,
       onClose = null,
     } = options;
@@ -93,7 +120,7 @@ class NotificationToast {
                 : ''
             }
             <div class="toast-progress">
-                <div class="toast-progress-bar" style="width: 100%"></div>
+                <div class="toast-progress-bar" style="width: ${NOTIFICATION_TOAST_CONSTANTS.PROGRESS.FULL_WIDTH}"></div>
             </div>
         `;
 
@@ -108,12 +135,12 @@ class NotificationToast {
 
   getIcon(type) {
     const icons = {
-      success: '✓',
-      error: '!',
-      warning: '⚠',
-      info: 'i',
+      [NOTIFICATION_TOAST_CONSTANTS.TYPES.SUCCESS]: '✓',
+      [NOTIFICATION_TOAST_CONSTANTS.TYPES.ERROR]: '!',
+      [NOTIFICATION_TOAST_CONSTANTS.TYPES.WARNING]: '⚠',
+      [NOTIFICATION_TOAST_CONSTANTS.TYPES.INFO]: 'i',
     };
-    return icons[type] || icons.info;
+    return icons[type] || icons[NOTIFICATION_TOAST_CONSTANTS.TYPES.INFO];
   }
 
   setAutoDismiss(id, duration) {
@@ -125,7 +152,8 @@ class NotificationToast {
     // Animate progress bar
     if (progressBar) {
       progressBar.style.transition = `width ${duration}ms linear`;
-      progressBar.style.width = '0%';
+      progressBar.style.width =
+        NOTIFICATION_TOAST_CONSTANTS.PROGRESS.EMPTY_WIDTH;
     }
 
     toastData.timeoutId = setTimeout(() => {
@@ -163,7 +191,7 @@ class NotificationToast {
       if (onClose && typeof onClose === 'function') {
         onClose(id);
       }
-    }, 300);
+    }, NOTIFICATION_TOAST_CONSTANTS.ANIMATION.HIDE_DELAY);
   }
 
   /**
@@ -225,8 +253,13 @@ class NotificationToast {
     const classes = element.className.split(' ');
     return (
       classes.find(cls =>
-        ['success', 'error', 'warning', 'info'].includes(cls)
-      ) || 'info'
+        [
+          NOTIFICATION_TOAST_CONSTANTS.TYPES.SUCCESS,
+          NOTIFICATION_TOAST_CONSTANTS.TYPES.ERROR,
+          NOTIFICATION_TOAST_CONSTANTS.TYPES.WARNING,
+          NOTIFICATION_TOAST_CONSTANTS.TYPES.INFO,
+        ].includes(cls)
+      ) || NOTIFICATION_TOAST_CONSTANTS.TYPES.INFO
     );
   }
 
@@ -240,13 +273,13 @@ class NotificationToast {
         // Clear after announcement
         setTimeout(() => {
           liveRegion.textContent = '';
-        }, 1000);
+        }, NOTIFICATION_TOAST_CONSTANTS.DURATIONS.ANNOUNCEMENT_CLEAR);
       }
     }
   }
 
   generateId() {
-    return `toast-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `toast-${Date.now()}-${Math.random().toString(NOTIFICATION_TOAST_CONSTANTS.ID_GENERATION.BASE).substr(NOTIFICATION_TOAST_CONSTANTS.ID_GENERATION.SUBSTRING_START, NOTIFICATION_TOAST_CONSTANTS.ID_GENERATION.SUBSTRING_LENGTH)}`;
   }
 
   escapeHtml(text) {
@@ -259,25 +292,41 @@ class NotificationToast {
    * Convenience methods
    */
   success(title, message, options = {}) {
-    return this.show({ ...options, type: 'success', title, message });
+    return this.show({
+      ...options,
+      type: NOTIFICATION_TOAST_CONSTANTS.TYPES.SUCCESS,
+      title,
+      message,
+    });
   }
 
   error(title, message, options = {}) {
     return this.show({
       ...options,
-      type: 'error',
+      type: NOTIFICATION_TOAST_CONSTANTS.TYPES.ERROR,
       title,
       message,
-      duration: options.duration || 8000,
+      duration:
+        options.duration || NOTIFICATION_TOAST_CONSTANTS.DURATIONS.ERROR,
     });
   }
 
   warning(title, message, options = {}) {
-    return this.show({ ...options, type: 'warning', title, message });
+    return this.show({
+      ...options,
+      type: NOTIFICATION_TOAST_CONSTANTS.TYPES.WARNING,
+      title,
+      message,
+    });
   }
 
   info(title, message, options = {}) {
-    return this.show({ ...options, type: 'info', title, message });
+    return this.show({
+      ...options,
+      type: NOTIFICATION_TOAST_CONSTANTS.TYPES.INFO,
+      title,
+      message,
+    });
   }
 }
 

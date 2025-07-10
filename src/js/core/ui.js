@@ -41,6 +41,7 @@ const UI_CONSTANTS = {
   ANIMATION_DURATION: 300,
   DEBOUNCE_DELAY: 150,
   FOCUS_DELAY: 16,
+  FOCUS_TRANSITION_DELAY: 100, // Delay for focus transitions in modals
   TOUCH_TARGET_SIZE: 44,
   FOCUS_RING_WIDTH: 2,
   RIPPLE_DURATION: 600,
@@ -49,6 +50,32 @@ const UI_CONSTANTS = {
     tablet: 1024,
     desktop: 1200,
   },
+
+  // Performance monitoring
+  FRAME_TIME_LIMIT: 16, // 1 frame at 60fps
+
+  // ID generation
+  RANDOM_BASE: 36,
+  RANDOM_ID_LENGTH: 9,
+
+  // Panel constraints
+  MIN_PANEL_WIDTH: 200,
+  MIN_PANEL_HEIGHT: 150,
+
+  // Feedback system
+  DEFAULT_HIDE_DELAY: 5000,
+  MAX_FEEDBACK_ITEMS: 5,
+
+  // Ethics grading thresholds
+  ETHICS_GRADES: {
+    EXCELLENT: 90,
+    GOOD: 80,
+    FAIR: 70,
+    NEEDS_IMPROVEMENT: 60,
+  },
+
+  // Animation delays
+  CLEANUP_DELAY: 300,
 };
 
 const THEME_COLORS = {
@@ -123,7 +150,7 @@ class UIPerformanceMonitor {
     if (start) {
       const duration = performance.now() - start;
       this.measurements.delete(id);
-      if (duration > 16) {
+      if (duration > UI_CONSTANTS.FRAME_TIME_LIMIT) {
         // Flag slow operations (> 1 frame)
         logger.warn(`UI operation '${id}' took ${duration.toFixed(2)}ms`);
       }
@@ -147,7 +174,7 @@ class UIComponent {
     // Core properties
     this.id =
       config.id ||
-      `ui-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      `ui-${Date.now()}-${Math.random().toString(UI_CONSTANTS.RANDOM_BASE).substr(2, UI_CONSTANTS.RANDOM_ID_LENGTH)}`;
     this.position = config.position || { x: 0, y: 0 };
     this.size = config.size || { width: 100, height: 100 };
     this.visible = config.visible !== false;
@@ -1000,8 +1027,8 @@ class UIPanel extends UIComponent {
       }
 
       // Apply constraints
-      newWidth = Math.max(200, newWidth);
-      newHeight = Math.max(150, newHeight);
+      newWidth = Math.max(UI_CONSTANTS.MIN_PANEL_WIDTH, newWidth);
+      newHeight = Math.max(UI_CONSTANTS.MIN_PANEL_HEIGHT, newHeight);
 
       this.setSize(newWidth, newHeight);
       this.setPosition(newLeft, newTop);
@@ -1069,7 +1096,10 @@ class UIPanel extends UIComponent {
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
     if (firstFocusable) {
-      setTimeout(() => firstFocusable.focus(), 100);
+      setTimeout(
+        () => firstFocusable.focus(),
+        UI_CONSTANTS.FOCUS_TRANSITION_DELAY
+      );
     }
   }
 
@@ -1305,7 +1335,10 @@ class UIPanel extends UIComponent {
     };
 
     // Debounce for performance
-    const debouncedHandler = this.debounce(handleInput, 16); // ~60fps
+    const debouncedHandler = this.debounce(
+      handleInput,
+      UI_CONSTANTS.FOCUS_DELAY
+    ); // ~60fps
     slider.addEventListener('input', debouncedHandler);
 
     // Immediate feedback for accessibility
@@ -1793,10 +1826,11 @@ class EthicsDisplay extends UIComponent {
    * Get ethics grade based on average score
    */
   getEthicsGrade(score) {
-    if (score >= 90) return 'Excellent';
-    if (score >= 80) return 'Good';
-    if (score >= 70) return 'Fair';
-    if (score >= 60) return 'Needs Improvement';
+    if (score >= UI_CONSTANTS.ETHICS_GRADES.EXCELLENT) return 'Excellent';
+    if (score >= UI_CONSTANTS.ETHICS_GRADES.GOOD) return 'Good';
+    if (score >= UI_CONSTANTS.ETHICS_GRADES.FAIR) return 'Fair';
+    if (score >= UI_CONSTANTS.ETHICS_GRADES.NEEDS_IMPROVEMENT)
+      return 'Needs Improvement';
     return 'Critical Issues';
   }
 
@@ -1944,8 +1978,8 @@ class FeedbackSystem extends UIComponent {
     this.feedbackQueue = [];
     this.currentFeedback = null;
     this.autoHide = config.autoHide !== false;
-    this.hideDelay = config.hideDelay || 5000;
-    this.maxItems = config.maxItems || 5;
+    this.hideDelay = config.hideDelay || UI_CONSTANTS.DEFAULT_HIDE_DELAY;
+    this.maxItems = config.maxItems || UI_CONSTANTS.MAX_FEEDBACK_ITEMS;
     this.position = config.position || 'top-right'; // top-right, top-left, bottom-right, bottom-left
 
     this.createFeedbackContainer();
@@ -2033,7 +2067,7 @@ class FeedbackSystem extends UIComponent {
   showFeedback(message, type = 'info', options = {}) {
     try {
       const feedback = {
-        id: `feedback-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `feedback-${Date.now()}-${Math.random().toString(UI_CONSTANTS.RANDOM_BASE).substr(2, UI_CONSTANTS.RANDOM_ID_LENGTH)}`,
         message,
         type,
         timestamp: new Date(),
@@ -2338,7 +2372,7 @@ class FeedbackSystem extends UIComponent {
           element.parentNode.removeChild(element);
         }
         this.updateHeader();
-      }, 300);
+      }, UI_CONSTANTS.CLEANUP_DELAY);
     } else {
       element.parentNode?.removeChild(element);
       this.updateHeader();

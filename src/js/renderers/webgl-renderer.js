@@ -5,12 +5,46 @@
 
 import logger from '../utils/logger.js';
 
+// WebGL renderer constants
+const WEBGL_CONSTANTS = {
+  // Default dimensions
+  DEFAULT_WIDTH: 800,
+  DEFAULT_HEIGHT: 600,
+
+  // Matrix dimensions
+  MATRIX_SIZE: 16,
+
+  // WebGL math constants
+  DEPTH_PROJECTION: -2,
+
+  // Geometry constants
+  VERTICES_PER_QUAD: 4,
+  TRIANGLE_VERTEX_COUNT: 3,
+  FLOATS_PER_VERTEX: 8, // x, y, u, v, r, g, b, a
+  BYTES_PER_FLOAT: 4,
+
+  // Default object dimensions
+  DEFAULT_OBJECT_SIZE: 50,
+
+  // Color parsing constants
+  HEX_SHORT_LENGTH: 3,
+  HEX_LONG_LENGTH: 6,
+  HEX_RADIX: 16,
+  COLOR_COMPONENT_MAX: 255,
+  HEX_SLICE_START: 2,
+  HEX_SLICE_MID: 4,
+  HEX_SLICE_END: 6,
+
+  // Default colors
+  DEFAULT_COLOR: [1, 1, 1], // White
+};
+
 export class WebGLRenderer {
   constructor(container, options = {}) {
     this.container = container;
     this.options = {
-      width: options.width || 800,
-      height: options.height || 600,
+      width: options.width || WEBGL_CONSTANTS.DEFAULT_WIDTH,
+      height: options.height || WEBGL_CONSTANTS.DEFAULT_HEIGHT,
       pixelRatio: options.pixelRatio || window.devicePixelRatio || 1,
       alpha: options.alpha !== false,
       antialias: options.antialias !== false,
@@ -26,9 +60,9 @@ export class WebGLRenderer {
     this.activeProgram = null;
 
     // Transformation matrix
-    this.projectionMatrix = new Float32Array(16);
-    this.modelMatrix = new Float32Array(16);
-    this.viewMatrix = new Float32Array(16);
+    this.projectionMatrix = new Float32Array(WEBGL_CONSTANTS.MATRIX_SIZE);
+    this.modelMatrix = new Float32Array(WEBGL_CONSTANTS.MATRIX_SIZE);
+    this.viewMatrix = new Float32Array(WEBGL_CONSTANTS.MATRIX_SIZE);
 
     // Object batching
     this.batchBuffer = [];
@@ -241,7 +275,7 @@ export class WebGLRenderer {
 
     matrix[8] = 0;
     matrix[9] = 0;
-    matrix[10] = -2 / (far - near);
+    matrix[10] = WEBGL_CONSTANTS.DEPTH_PROJECTION / (far - near);
     matrix[11] = 0;
 
     matrix[12] = -(right + left) / (right - left);
@@ -324,8 +358,8 @@ export class WebGLRenderer {
       type: object.type || 'rect',
       x: object.x || 0,
       y: object.y || 0,
-      width: object.width || 50,
-      height: object.height || 50,
+      width: object.width || WEBGL_CONSTANTS.DEFAULT_OBJECT_SIZE,
+      height: object.height || WEBGL_CONSTANTS.DEFAULT_OBJECT_SIZE,
       color: this.parseColor(object.fill || '#ffffff'),
       alpha: object.alpha !== undefined ? object.alpha : 1,
       rotation: object.rotation || 0,
@@ -406,10 +440,10 @@ export class WebGLRenderer {
         baseIndex + 2,
         baseIndex,
         baseIndex + 2,
-        baseIndex + 3
+        baseIndex + WEBGL_CONSTANTS.TRIANGLE_VERTEX_COUNT
       );
 
-      vertexIndex += 4;
+      vertexIndex += WEBGL_CONSTANTS.VERTICES_PER_QUAD;
     });
 
     // Upload vertex data
@@ -425,7 +459,8 @@ export class WebGLRenderer {
     );
 
     // Setup vertex attributes
-    const stride = 8 * 4; // 8 floats per vertex
+    const stride =
+      WEBGL_CONSTANTS.FLOATS_PER_VERTEX * WEBGL_CONSTANTS.BYTES_PER_FLOAT; // 8 floats per vertex
 
     gl.enableVertexAttribArray(program.locations.attributes.position);
     gl.vertexAttribPointer(
@@ -444,17 +479,17 @@ export class WebGLRenderer {
       gl.FLOAT,
       false,
       stride,
-      2 * 4
+      WEBGL_CONSTANTS.HEX_SLICE_START * WEBGL_CONSTANTS.BYTES_PER_FLOAT
     );
 
     gl.enableVertexAttribArray(program.locations.attributes.color);
     gl.vertexAttribPointer(
       program.locations.attributes.color,
-      4,
+      WEBGL_CONSTANTS.VERTICES_PER_QUAD,
       gl.FLOAT,
       false,
       stride,
-      4 * 4
+      WEBGL_CONSTANTS.VERTICES_PER_QUAD * WEBGL_CONSTANTS.BYTES_PER_FLOAT
     );
 
     // Set uniforms
@@ -471,23 +506,41 @@ export class WebGLRenderer {
     // Simple color parsing - just handle hex colors for now
     if (typeof colorString === 'string' && colorString.startsWith('#')) {
       const hex = colorString.slice(1);
-      if (hex.length === 3) {
+      if (hex.length === WEBGL_CONSTANTS.HEX_SHORT_LENGTH) {
         return [
-          parseInt(hex[0] + hex[0], 16) / 255,
-          parseInt(hex[1] + hex[1], 16) / 255,
-          parseInt(hex[2] + hex[2], 16) / 255,
+          parseInt(hex[0] + hex[0], WEBGL_CONSTANTS.HEX_RADIX) /
+            WEBGL_CONSTANTS.COLOR_COMPONENT_MAX,
+          parseInt(hex[1] + hex[1], WEBGL_CONSTANTS.HEX_RADIX) /
+            WEBGL_CONSTANTS.COLOR_COMPONENT_MAX,
+          parseInt(hex[2] + hex[2], WEBGL_CONSTANTS.HEX_RADIX) /
+            WEBGL_CONSTANTS.COLOR_COMPONENT_MAX,
         ];
-      } else if (hex.length === 6) {
+      } else if (hex.length === WEBGL_CONSTANTS.HEX_LONG_LENGTH) {
         return [
-          parseInt(hex.slice(0, 2), 16) / 255,
-          parseInt(hex.slice(2, 4), 16) / 255,
-          parseInt(hex.slice(4, 6), 16) / 255,
+          parseInt(
+            hex.slice(0, WEBGL_CONSTANTS.HEX_SLICE_START),
+            WEBGL_CONSTANTS.HEX_RADIX
+          ) / WEBGL_CONSTANTS.COLOR_COMPONENT_MAX,
+          parseInt(
+            hex.slice(
+              WEBGL_CONSTANTS.HEX_SLICE_START,
+              WEBGL_CONSTANTS.HEX_SLICE_MID
+            ),
+            WEBGL_CONSTANTS.HEX_RADIX
+          ) / WEBGL_CONSTANTS.COLOR_COMPONENT_MAX,
+          parseInt(
+            hex.slice(
+              WEBGL_CONSTANTS.HEX_SLICE_MID,
+              WEBGL_CONSTANTS.HEX_SLICE_END
+            ),
+            WEBGL_CONSTANTS.HEX_RADIX
+          ) / WEBGL_CONSTANTS.COLOR_COMPONENT_MAX,
         ];
       }
     }
 
     // Default to white
-    return [1, 1, 1];
+    return WEBGL_CONSTANTS.DEFAULT_COLOR;
   }
 
   renderByType(object) {

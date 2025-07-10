@@ -3,13 +3,40 @@
  * A reusable component for displaying ethical dilemma scales
  */
 
+// Constants for ethics scale thresholds and styling
+const ETHICS_SCALE_CONSTANTS = {
+  DEFAULT_VALUE: 50,
+  SEGMENT_COUNT: 3,
+  COLOR_THRESHOLDS: {
+    LOW_HIGH: 0.33,
+    MEDIUM_HIGH: 0.67,
+  },
+  DESCRIPTION_THRESHOLDS: {
+    VERY_LOW: 0.2,
+    LOW: 0.4,
+    MEDIUM: 0.6,
+    HIGH: 0.8,
+  },
+  ID_GENERATION: {
+    BASE: 36,
+    LENGTH: 9,
+    START: 2,
+  },
+};
+
 class EthicsScale {
   constructor(container, options = {}) {
     this.container = container;
+    this.id = Math.random()
+      .toString(ETHICS_SCALE_CONSTANTS.ID_GENERATION.BASE)
+      .substr(
+        ETHICS_SCALE_CONSTANTS.ID_GENERATION.START,
+        ETHICS_SCALE_CONSTANTS.ID_GENERATION.LENGTH
+      ); // Generate unique ID
     this.options = {
       min: options.min || 0,
       max: options.max || 100,
-      value: options.value || 50,
+      value: options.value || ETHICS_SCALE_CONSTANTS.DEFAULT_VALUE,
       leftLabel: options.leftLabel || 'Less Ethical',
       rightLabel: options.rightLabel || 'More Ethical',
       centerLabel: options.centerLabel || 'Neutral',
@@ -175,9 +202,11 @@ class EthicsScale {
   getThumbColor() {
     const percentage = this.getThumbPosition() / 100;
 
-    if (percentage < 0.33) {
+    if (percentage < ETHICS_SCALE_CONSTANTS.COLOR_THRESHOLDS.LOW_HIGH) {
       return '#e74c3c'; // Red for low ethical rating
-    } else if (percentage < 0.67) {
+    } else if (
+      percentage < ETHICS_SCALE_CONSTANTS.COLOR_THRESHOLDS.MEDIUM_HIGH
+    ) {
       return '#f39c12'; // Orange for medium ethical rating
     } else {
       return '#27ae60'; // Green for high ethical rating
@@ -187,13 +216,17 @@ class EthicsScale {
   getEthicalDescription() {
     const percentage = this.getThumbPosition() / 100;
 
-    if (percentage < 0.2) {
+    if (percentage < ETHICS_SCALE_CONSTANTS.DESCRIPTION_THRESHOLDS.VERY_LOW) {
       return 'This choice may have significant negative ethical implications.';
-    } else if (percentage < 0.4) {
+    } else if (percentage < ETHICS_SCALE_CONSTANTS.DESCRIPTION_THRESHOLDS.LOW) {
       return 'This choice has some ethical concerns that should be considered.';
-    } else if (percentage < 0.6) {
+    } else if (
+      percentage < ETHICS_SCALE_CONSTANTS.DESCRIPTION_THRESHOLDS.MEDIUM
+    ) {
       return 'This choice is ethically neutral with balanced considerations.';
-    } else if (percentage < 0.8) {
+    } else if (
+      percentage < ETHICS_SCALE_CONSTANTS.DESCRIPTION_THRESHOLDS.HIGH
+    ) {
       return 'This choice generally aligns with ethical principles.';
     } else {
       return 'This choice strongly upholds ethical values and principles.';
@@ -205,8 +238,8 @@ class EthicsScale {
     const percentage = this.getThumbPosition() / 100;
 
     segments.forEach((segment, index) => {
-      const segmentStart = index / 3;
-      const segmentEnd = (index + 1) / 3;
+      const segmentStart = index / ETHICS_SCALE_CONSTANTS.SEGMENT_COUNT;
+      const segmentEnd = (index + 1) / ETHICS_SCALE_CONSTANTS.SEGMENT_COUNT;
 
       if (percentage >= segmentStart && percentage <= segmentEnd) {
         segment.classList.add('active');

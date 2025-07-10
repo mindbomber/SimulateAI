@@ -33,6 +33,24 @@ const SIMULATION_CONSTANTS = {
   ETHICS_PANEL_HEIGHT: 150,
   ETHICS_PANEL_Y_OFFSET: 420,
   ETHICS_PANEL_WIDTH_OFFSET: 240,
+  // UI positioning and sizing constants
+  UI_POSITIONS: {
+    CONTROL_PANEL: { x: 10, y: 10 },
+    INFO_PANEL: { x: 10, y: 170 },
+  },
+  UI_SIZES: {
+    CONTROL_PANEL: { width: 200, height: 150 },
+    INFO_PANEL: { width: 200, height: 300 },
+  },
+  // Default values for initialization
+  INITIAL_VALUES: {
+    SCENARIO_INDEX: 0,
+    SCORE: 0,
+    TIME_ELAPSED: 0,
+    METRIC_MIN: 0,
+    METRIC_MAX: 100,
+    DEFAULT_WEIGHT: 1,
+  },
 };
 
 class EthicsSimulation {
@@ -47,7 +65,7 @@ class EthicsSimulation {
     // Ethics tracking
     this.ethicsMetrics = new Map();
     this.ethicsHistory = [];
-    this.currentScenario = 0;
+    this.currentScenario = SIMULATION_CONSTANTS.INITIAL_VALUES.SCENARIO_INDEX;
     this.scenarios = config.scenarios || [];
 
     // Simulation state
@@ -55,9 +73,9 @@ class EthicsSimulation {
       started: false,
       completed: false,
       paused: false,
-      score: 0,
+      score: SIMULATION_CONSTANTS.INITIAL_VALUES.SCORE,
       decisions: [],
-      timeElapsed: 0,
+      timeElapsed: SIMULATION_CONSTANTS.INITIAL_VALUES.TIME_ELAPSED,
     };
 
     // Engine reference
@@ -76,25 +94,25 @@ class EthicsSimulation {
         name: 'fairness',
         label: 'Fairness',
         value: SIMULATION_CONSTANTS.DEFAULT_METRIC_VALUE,
-        weight: 1,
+        weight: SIMULATION_CONSTANTS.INITIAL_VALUES.DEFAULT_WEIGHT,
       },
       {
         name: 'transparency',
         label: 'Transparency',
         value: SIMULATION_CONSTANTS.DEFAULT_METRIC_VALUE,
-        weight: 1,
+        weight: SIMULATION_CONSTANTS.INITIAL_VALUES.DEFAULT_WEIGHT,
       },
       {
         name: 'privacy',
         label: 'Privacy',
         value: SIMULATION_CONSTANTS.DEFAULT_METRIC_VALUE,
-        weight: 1,
+        weight: SIMULATION_CONSTANTS.INITIAL_VALUES.DEFAULT_WEIGHT,
       },
       {
         name: 'accountability',
         label: 'Accountability',
         value: SIMULATION_CONSTANTS.DEFAULT_METRIC_VALUE,
-        weight: 1,
+        weight: SIMULATION_CONSTANTS.INITIAL_VALUES.DEFAULT_WEIGHT,
       },
     ];
 
@@ -104,9 +122,10 @@ class EthicsSimulation {
       this.ethicsMetrics.set(metric.name, {
         label: metric.label,
         value: metric.value || SIMULATION_CONSTANTS.DEFAULT_METRIC_VALUE,
-        min: metric.min || 0,
-        max: metric.max || 100,
-        weight: metric.weight || 1,
+        min: metric.min || SIMULATION_CONSTANTS.INITIAL_VALUES.METRIC_MIN,
+        max: metric.max || SIMULATION_CONSTANTS.INITIAL_VALUES.METRIC_MAX,
+        weight:
+          metric.weight || SIMULATION_CONSTANTS.INITIAL_VALUES.DEFAULT_WEIGHT,
         description: metric.description || '',
       });
     });
@@ -117,7 +136,7 @@ class EthicsSimulation {
     this.engine = engineInstance;
     this.setupUI();
     this.setupEthicsDisplay();
-    this.loadScenario(0);
+    this.loadScenario(SIMULATION_CONSTANTS.INITIAL_VALUES.SCENARIO_INDEX);
 
     // Start tracking time
     this.startTime = Date.now();
@@ -135,8 +154,8 @@ class EthicsSimulation {
   createControlPanel() {
     const panel = new UIPanel({
       id: 'control-panel',
-      position: { x: 10, y: 10 },
-      size: { width: 200, height: 150 },
+      position: SIMULATION_CONSTANTS.UI_POSITIONS.CONTROL_PANEL,
+      size: SIMULATION_CONSTANTS.UI_SIZES.CONTROL_PANEL,
       title: 'Controls',
     });
 
@@ -152,8 +171,8 @@ class EthicsSimulation {
   createInformationPanel() {
     const panel = new UIPanel({
       id: 'info-panel',
-      position: { x: 10, y: 170 },
-      size: { width: 200, height: 300 },
+      position: SIMULATION_CONSTANTS.UI_POSITIONS.INFO_PANEL,
+      size: SIMULATION_CONSTANTS.UI_SIZES.INFO_PANEL,
       title: 'Information',
     });
 

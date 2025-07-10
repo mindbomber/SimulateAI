@@ -84,6 +84,22 @@ const ENGINE_CONSTANTS = {
     BORDER_RADIUS: 4,
     Z_INDEX: 1000,
   },
+  // Animation timing constants
+  MILLISECONDS_PER_SECOND: 1000,
+  RGBA_ZERO_VALUES: {
+    RED: 0,
+    GREEN: 0,
+    BLUE: 0,
+    ALPHA: 0.8,
+  },
+  DEBUG_STYLES: {
+    FONT_SIZE: 12,
+    ZERO_THRESHOLD: 0,
+    DECIMAL_PLACES: 2,
+  },
+  RESIZE_OBSERVER: {
+    FIRST_ENTRY_INDEX: 0,
+  },
 };
 
 export class VisualEngine {
@@ -410,7 +426,7 @@ export class VisualEngine {
     // Calculate delta time with frame rate limiting
     this.deltaTime = Math.min(
       currentTime - this.lastFrameTime,
-      1000 / this.options.maxFPS
+      ENGINE_CONSTANTS.MILLISECONDS_PER_SECOND / this.options.maxFPS
     );
     this.lastFrameTime = currentTime;
 
@@ -545,14 +561,23 @@ export class VisualEngine {
       let width, height;
 
       // Use ResizeObserver data if available, otherwise get container dimensions
-      if (entries && entries[0]) {
-        ({ width, height } = entries[0].contentRect);
+      if (
+        entries &&
+        entries[ENGINE_CONSTANTS.RESIZE_OBSERVER.FIRST_ENTRY_INDEX]
+      ) {
+        ({ width, height } =
+          entries[
+            ENGINE_CONSTANTS.RESIZE_OBSERVER.FIRST_ENTRY_INDEX
+          ].contentRect);
       } else {
         ({ width, height } = this.container.getBoundingClientRect());
       }
 
       // Only resize if dimensions are valid
-      if (width > 0 && height > 0) {
+      if (
+        width > ENGINE_CONSTANTS.DEBUG_STYLES.ZERO_THRESHOLD &&
+        height > ENGINE_CONSTANTS.DEBUG_STYLES.ZERO_THRESHOLD
+      ) {
         this.renderer.resize(width, height);
       }
     }
@@ -568,11 +593,11 @@ export class VisualEngine {
             position: absolute;
             top: ${ENGINE_CONSTANTS.DEBUG_PANEL_POSITION.TOP}px;
             right: ${ENGINE_CONSTANTS.DEBUG_PANEL_POSITION.RIGHT}px;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(${ENGINE_CONSTANTS.RGBA_ZERO_VALUES.RED}, ${ENGINE_CONSTANTS.RGBA_ZERO_VALUES.GREEN}, ${ENGINE_CONSTANTS.RGBA_ZERO_VALUES.BLUE}, ${ENGINE_CONSTANTS.RGBA_ZERO_VALUES.ALPHA});
             color: white;
             padding: ${ENGINE_CONSTANTS.DEBUG_PANEL_POSITION.PADDING}px;
             font-family: monospace;
-            font-size: 12px;
+            font-size: ${ENGINE_CONSTANTS.DEBUG_STYLES.FONT_SIZE}px;
             border-radius: ${ENGINE_CONSTANTS.DEBUG_PANEL_POSITION.BORDER_RADIUS}px;
             z-index: ${ENGINE_CONSTANTS.DEBUG_PANEL_POSITION.Z_INDEX};
             min-width: ${ENGINE_CONSTANTS.DEBUG_PANEL_MIN_WIDTH}px;
@@ -593,17 +618,19 @@ export class VisualEngine {
 
     try {
       const stats = this.performanceStats;
-      const objects = this.scene.objects ? this.scene.objects.length : 0;
+      const objects = this.scene.objects
+        ? this.scene.objects.length
+        : ENGINE_CONSTANTS.DEBUG_STYLES.ZERO_THRESHOLD;
       const interactiveObjects = this.scene.interactiveObjects
         ? this.scene.interactiveObjects.length
-        : 0;
+        : ENGINE_CONSTANTS.DEBUG_STYLES.ZERO_THRESHOLD;
 
       this.debugPanel.innerHTML = `
                 <div><strong>Visual Engine Debug</strong></div>
                 <div>FPS: ${stats.fps}</div>
-                <div>Frame Time: ${stats.frameTime.toFixed(2)}ms</div>
-                <div>Update Time: ${stats.updateTime.toFixed(2)}ms</div>
-                <div>Render Time: ${stats.renderTime.toFixed(2)}ms</div>
+                <div>Frame Time: ${stats.frameTime.toFixed(ENGINE_CONSTANTS.DEBUG_STYLES.DECIMAL_PLACES)}ms</div>
+                <div>Update Time: ${stats.updateTime.toFixed(ENGINE_CONSTANTS.DEBUG_STYLES.DECIMAL_PLACES)}ms</div>
+                <div>Render Time: ${stats.renderTime.toFixed(ENGINE_CONSTANTS.DEBUG_STYLES.DECIMAL_PLACES)}ms</div>
                 <div>Objects: ${objects}</div>
                 <div>Interactive: ${interactiveObjects}</div>
                 <div>Renderer: ${this.renderer ? this.renderer.type : 'None'}</div>

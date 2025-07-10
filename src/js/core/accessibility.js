@@ -41,6 +41,29 @@ const ACCESSIBILITY_CONSTANTS = {
   ANIMATION_DURATION: 250,
   HIGH_CONTRAST_THRESHOLD: 4.5,
   TOUCH_TARGET_MIN_SIZE: 44,
+
+  // Screen reader adaptation
+  SCREEN_READER_DELAY_MULTIPLIER: 1.5,
+
+  // Performance and timing
+  FEATURE_DISABLE_TIMEOUT: 30000,
+  FOCUS_HISTORY_LIMIT: 50,
+  ANNOUNCEMENT_TIMEOUT: 2000,
+  ANNOUNCEMENT_CLEAR_DELAY: 1500,
+  ANNOUNCEMENT_MIN_DURATION: 1000,
+  ANNOUNCEMENT_CHAR_MULTIPLIER: 50,
+  GESTURE_TIMEOUT: 5000,
+
+  // Focus indicator dimensions
+  FOCUS_BORDER_OFFSET: 3,
+  FOCUS_BORDER_PADDING: 6,
+
+  // Ethics and performance thresholds
+  ETHICS_SIGNIFICANT_CHANGE: 20,
+  ETHICS_HIGH_PRIORITY: 15,
+  PERFORMANCE_EXCELLENT: 90,
+  PERFORMANCE_GOOD: 75,
+  PERFORMANCE_SATISFACTORY: 60,
 };
 
 const SCREEN_READER_PATTERNS = {
@@ -196,7 +219,8 @@ class AccessibilityManager {
       // Setup voice commands if supported
       this.setupVoiceCommands();
 
-      logger.info('Accessibility', 
+      logger.info(
+        'Accessibility',
         'Enhanced AccessibilityManager initialized with advanced features'
       );
     } catch (error) {
@@ -688,7 +712,8 @@ class AccessibilityManager {
       case 'jaws':
         // Optimize for Windows screen readers
         this.announcementDelay =
-          ACCESSIBILITY_CONSTANTS.ANNOUNCEMENT_DELAY * 1.5;
+          ACCESSIBILITY_CONSTANTS.ANNOUNCEMENT_DELAY *
+          ACCESSIBILITY_CONSTANTS.SCREEN_READER_DELAY_MULTIPLIER;
         this.verboseMode = true;
         break;
       case 'voiceover':
@@ -1191,7 +1216,7 @@ class AccessibilityManager {
       this.errorCount = 0;
       this.verboseMode = this.screenReaderType !== null;
       this.announcementDelay = ACCESSIBILITY_CONSTANTS.ANNOUNCEMENT_DELAY;
-    }, 30000);
+    }, ACCESSIBILITY_CONSTANTS.FEATURE_DISABLE_TIMEOUT);
   }
 
   findComponentById(id) {
@@ -1463,7 +1488,9 @@ class AccessibilityManager {
       });
 
       // Limit history size
-      if (this.focusHistory.length > 50) {
+      if (
+        this.focusHistory.length > ACCESSIBILITY_CONSTANTS.FOCUS_HISTORY_LIMIT
+      ) {
         this.focusHistory.shift();
       }
 
@@ -1502,10 +1529,16 @@ class AccessibilityManager {
       const rect = component.element.getBoundingClientRect();
       const containerRect = this.container.getBoundingClientRect();
 
-      const left = rect.left - containerRect.left - 3;
-      const top = rect.top - containerRect.top - 3;
-      const width = rect.width + 6;
-      const height = rect.height + 6;
+      const left =
+        rect.left -
+        containerRect.left -
+        ACCESSIBILITY_CONSTANTS.FOCUS_BORDER_OFFSET;
+      const top =
+        rect.top -
+        containerRect.top -
+        ACCESSIBILITY_CONSTANTS.FOCUS_BORDER_OFFSET;
+      const width = rect.width + ACCESSIBILITY_CONSTANTS.FOCUS_BORDER_PADDING;
+      const height = rect.height + ACCESSIBILITY_CONSTANTS.FOCUS_BORDER_PADDING;
 
       this.focusIndicator.style.cssText += `
                 display: block;
@@ -1571,7 +1604,8 @@ class AccessibilityManager {
 
   isDuplicateAnnouncement(newAnnouncement) {
     const recentAnnouncements = this.announcements.filter(
-      a => Date.now() - a.timestamp < 2000
+      a =>
+        Date.now() - a.timestamp < ACCESSIBILITY_CONSTANTS.ANNOUNCEMENT_TIMEOUT
     );
 
     return recentAnnouncements.some(
@@ -1589,7 +1623,7 @@ class AccessibilityManager {
         if (this.urgentRegion) {
           this.urgentRegion.textContent = '';
         }
-      }, 1500);
+      }, ACCESSIBILITY_CONSTANTS.ANNOUNCEMENT_CLEAR_DELAY);
     }
   }
 
@@ -1620,8 +1654,12 @@ class AccessibilityManager {
 
       // Clear after announcement with variable timing based on content length
       const clearDelay = Math.min(
-        5000,
-        Math.max(1000, announcement.message.length * 50)
+        ACCESSIBILITY_CONSTANTS.GESTURE_TIMEOUT,
+        Math.max(
+          ACCESSIBILITY_CONSTANTS.ANNOUNCEMENT_MIN_DURATION,
+          announcement.message.length *
+            ACCESSIBILITY_CONSTANTS.ANNOUNCEMENT_CHAR_MULTIPLIER
+        )
       );
       setTimeout(() => {
         if (region && region.textContent === announcement.message) {
@@ -1842,14 +1880,18 @@ class AccessibilityManager {
     const magnitude = Math.abs(change);
 
     let description = 'slightly';
-    if (magnitude > 20) description = 'significantly';
+    if (magnitude > ACCESSIBILITY_CONSTANTS.ETHICS_SIGNIFICANT_CHANGE)
+      description = 'significantly';
     else if (magnitude > 10) description = 'moderately';
 
     const message = `${metric} ${description} ${direction} from ${oldValue} to ${newValue}. ${reasoning}`;
 
     this.announce(message, false, {
       category: 'ethics',
-      priority: magnitude > 15 ? 'high' : 'normal',
+      priority:
+        magnitude > ACCESSIBILITY_CONSTANTS.ETHICS_HIGH_PRIORITY
+          ? 'high'
+          : 'normal',
     });
   }
 
@@ -1862,9 +1904,12 @@ class AccessibilityManager {
     const percentage = Math.round((score / totalMetrics) * 100);
     let performance = 'needs improvement';
 
-    if (percentage >= 90) performance = 'excellent';
-    else if (percentage >= 75) performance = 'good';
-    else if (percentage >= 60) performance = 'satisfactory';
+    if (percentage >= ACCESSIBILITY_CONSTANTS.PERFORMANCE_EXCELLENT)
+      performance = 'excellent';
+    else if (percentage >= ACCESSIBILITY_CONSTANTS.PERFORMANCE_GOOD)
+      performance = 'good';
+    else if (percentage >= ACCESSIBILITY_CONSTANTS.PERFORMANCE_SATISFACTORY)
+      performance = 'satisfactory';
 
     const message = `Simulation complete. Final score: ${score} out of ${totalMetrics} (${percentage}%). Performance: ${performance}.`;
     this.announce(message, true, { category: 'completion' });

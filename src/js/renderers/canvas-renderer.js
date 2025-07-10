@@ -26,6 +26,68 @@ const CANVAS_CONSTANTS = {
   MAX_CANVAS_SIZE: 32767, // Browser limitation
   ANIMATION_FPS: 60,
   PERFORMANCE_SAMPLE_RATE: 0.1,
+
+  // Performance constants
+  FRAME_TIME_THRESHOLD: 16.67, // 60fps threshold in milliseconds
+  MAX_DRAW_CALLS: 10000,
+
+  // Font and text constants
+  DEFAULT_FONT_SIZE: 14,
+  LABEL_FONT_SIZE: 12,
+
+  // Drawing constants
+  DEFAULT_BORDER_RADIUS: 4,
+  FOCUSED_BORDER_WIDTH: 3,
+  DEFAULT_STROKE_WIDTH: 1,
+  CHART_TITLE_Y_OFFSET: 20,
+  CHART_AREA_RATIO: 0.8,
+  CHART_BAR_PADDING_RATIO: 0.1,
+  CHART_BAR_PADDING_MIN: 2,
+  CHART_BAR_BOTTOM_MARGIN: 20,
+  CHART_LABEL_Y_OFFSET: 5,
+  CHART_POINT_RADIUS: 4,
+  CHART_POINT_LABEL_Y_OFFSET: 15,
+  CHART_GRID_LINES: 5,
+  CHART_PIE_RADIUS_RATIO: 0.8,
+  CHART_PIE_LABEL_RADIUS_RATIO: 0.7,
+  CHART_PIE_MIN_SLICE_ANGLE: 0.2,
+  CHART_LEGEND_OFFSET: 20,
+
+  // Color constants
+  COLOR_HUE_FULL_CIRCLE: 360,
+  COLOR_SATURATION: 70,
+  COLOR_LIGHTNESS: 50,
+
+  // Animation constants
+  REDUCED_MOTION_DURATION_FACTOR: 0.2,
+  REDUCED_MOTION_MAX_DURATION: 300,
+  ANIMATION_ID_BASE: 36,
+  ANIMATION_ID_LENGTH: 9,
+
+  // Easing constants
+  EASING_HALF_POINT: 0.5,
+  EASING_QUADRATIC_FACTOR: 2,
+  EASING_CUBIC_FACTOR: 4,
+  EASING_BOUNCE_DIVISOR: 2.75,
+  EASING_BOUNCE_MULTIPLIER: 7.5625,
+  EASING_BOUNCE_THRESHOLD_1: 1.5,
+  EASING_BOUNCE_THRESHOLD_2: 2.5,
+  EASING_BOUNCE_THRESHOLD_3: 2.25,
+  EASING_BOUNCE_THRESHOLD_4: 2.625,
+  EASING_BOUNCE_OFFSET_1: 0.75,
+  EASING_BOUNCE_OFFSET_2: 0.9375,
+  EASING_BOUNCE_OFFSET_3: 0.984375,
+
+  // Default object sizes
+  DEFAULT_OBJECT_WIDTH: 50,
+  DEFAULT_OBJECT_HEIGHT: 50,
+  DEFAULT_CIRCLE_RADIUS: 25,
+  DEFAULT_LINE_LENGTH: 50,
+
+  // Placeholder constants
+  PLACEHOLDER_OFFSET: -5,
+  PLACEHOLDER_SIZE: 10,
+
   ACCESSIBILITY: {
     MIN_CONTRAST_RATIO: 4.5,
     MIN_FONT_SIZE: 12,
@@ -86,7 +148,7 @@ class CanvasPerformanceMonitor {
     this.metrics.averageFrameTime =
       this.metrics.renderTime / this.metrics.frameCount;
 
-    if (frameTime > 16.67) {
+    if (frameTime > CANVAS_CONSTANTS.FRAME_TIME_THRESHOLD) {
       // > 60fps threshold
       this.metrics.droppedFrames++;
     }
@@ -274,7 +336,7 @@ class CanvasRenderer {
       enablePerformanceMonitoring:
         options.enablePerformanceMonitoring !== false,
       respectReducedMotion: options.respectReducedMotion !== false,
-      maxDrawCalls: options.maxDrawCalls || 10000,
+      maxDrawCalls: options.maxDrawCalls || CANVAS_CONSTANTS.MAX_DRAW_CALLS,
       ...options,
     };
 
@@ -848,7 +910,7 @@ class CanvasRenderer {
     try {
       // Accessibility: Ensure minimum font size
       const fontSize = Math.max(
-        options.fontSize || 14,
+        options.fontSize || CANVAS_CONSTANTS.DEFAULT_FONT_SIZE,
         CANVAS_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE
       );
 
@@ -950,8 +1012,11 @@ class CanvasRenderer {
       this.drawRect(x, y, adjustedWidth, adjustedHeight, {
         fill: backgroundColor,
         stroke: isFocused ? this.currentTheme.accent : borderColor,
-        strokeWidth: isFocused ? 3 : 1,
-        borderRadius: options.borderRadius || 4,
+        strokeWidth: isFocused
+          ? CANVAS_CONSTANTS.FOCUSED_BORDER_WIDTH
+          : CANVAS_CONSTANTS.DEFAULT_STROKE_WIDTH,
+        borderRadius:
+          options.borderRadius || CANVAS_CONSTANTS.DEFAULT_BORDER_RADIUS,
         interactive: true,
         id: options.id,
         label: options.label || text,
@@ -964,7 +1029,7 @@ class CanvasRenderer {
       this.drawText(text, x + adjustedWidth / 2, y + adjustedHeight / 2, {
         fill: textColor,
         fontSize: Math.max(
-          options.fontSize || 14,
+          options.fontSize || CANVAS_CONSTANTS.DEFAULT_FONT_SIZE,
           CANVAS_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE
         ),
         fontWeight: options.fontWeight || '500',
@@ -1018,14 +1083,19 @@ class CanvasRenderer {
 
       // Add chart title if provided
       if (options.title) {
-        this.drawText(options.title, x + width / 2, y - 20, {
-          fill: this.currentTheme.foreground,
-          fontSize: 16,
-          fontWeight: 'bold',
-          textAlign: 'center',
-          accessible: true,
-          ariaLabel: `Chart title: ${options.title}`,
-        });
+        this.drawText(
+          options.title,
+          x + width / 2,
+          y - CANVAS_CONSTANTS.CHART_TITLE_Y_OFFSET,
+          {
+            fill: this.currentTheme.foreground,
+            fontSize: 16,
+            fontWeight: 'bold',
+            textAlign: 'center',
+            accessible: true,
+            ariaLabel: `Chart title: ${options.title}`,
+          }
+        );
       }
 
       // Render chart based on type
@@ -1103,13 +1173,17 @@ class CanvasRenderer {
       if (maxValue === 0) return;
 
       const barWidth = width / data.length;
-      const padding = Math.max(barWidth * 0.1, 2);
-      const chartArea = height * 0.8;
+      const padding = Math.max(
+        barWidth * CANVAS_CONSTANTS.CHART_BAR_PADDING_RATIO,
+        CANVAS_CONSTANTS.CHART_BAR_PADDING_MIN
+      );
+      const chartArea = height * CANVAS_CONSTANTS.CHART_AREA_RATIO;
 
       data.forEach((item, index) => {
         const barHeight = (item.value / maxValue) * chartArea;
         const barX = x + index * barWidth + padding;
-        const barY = y + height - barHeight - 20;
+        const barY =
+          y + height - barHeight - CANVAS_CONSTANTS.CHART_BAR_BOTTOM_MARGIN;
         const actualBarWidth = barWidth - padding * 2;
 
         // Use theme-aware colors with contrast checking
@@ -1145,15 +1219,20 @@ class CanvasRenderer {
 
         // Draw category label
         if (item.label) {
-          this.drawText(item.label, barX + actualBarWidth / 2, y + height - 5, {
-            fill: this.currentTheme.foreground,
-            fontSize: Math.max(
-              12,
-              CANVAS_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE
-            ),
-            textAlign: 'center',
-            textBaseline: 'bottom',
-          });
+          this.drawText(
+            item.label,
+            barX + actualBarWidth / 2,
+            y + height - CANVAS_CONSTANTS.CHART_LABEL_Y_OFFSET,
+            {
+              fill: this.currentTheme.foreground,
+              fontSize: Math.max(
+                CANVAS_CONSTANTS.LABEL_FONT_SIZE,
+                CANVAS_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE
+              ),
+              textAlign: 'center',
+              textBaseline: 'bottom',
+            }
+          );
         }
       });
     } catch (error) {
@@ -1184,17 +1263,27 @@ class CanvasRenderer {
       const minValue = Math.min(...values);
       const range = maxValue - minValue || 1; // Avoid division by zero
 
-      const chartArea = height * 0.8;
+      const chartArea = height * CANVAS_CONSTANTS.CHART_AREA_RATIO;
       const points = data.map((item, index) => ({
         x: x + (index / (data.length - 1)) * width,
-        y: y + chartArea - ((item.value - minValue) / range) * chartArea + 20,
+        y:
+          y +
+          chartArea -
+          ((item.value - minValue) / range) * chartArea +
+          CANVAS_CONSTANTS.CHART_BAR_BOTTOM_MARGIN,
         value: item.value,
         label: item.label,
       }));
 
       // Draw grid lines for better readability
       if (options.showGrid !== false) {
-        this.drawGrid(x, y + 20, width, chartArea, options);
+        this.drawGrid(
+          x,
+          y + CANVAS_CONSTANTS.CHART_BAR_BOTTOM_MARGIN,
+          width,
+          chartArea,
+          options
+        );
       }
 
       // Draw line with theme-aware styling
@@ -1206,25 +1295,35 @@ class CanvasRenderer {
 
       // Draw data points with accessibility features
       points.forEach((point, index) => {
-        this.drawCircle(point.x, point.y, options.pointRadius || 4, {
-          fill: options.pointColor || this.currentTheme.primary,
-          stroke: this.currentTheme.background,
-          strokeWidth: 2,
-          interactive: options.interactive,
-          id: `point_${index}`,
-          label: `${point.label || `Point ${index + 1}`}: ${point.value}`,
-          ariaLabel: `Data point ${index + 1} of ${points.length}: ${point.label || 'Unnamed'} with value ${point.value}`,
-          onClick: () => options.onPointClick?.(data[index], index),
-        });
+        this.drawCircle(
+          point.x,
+          point.y,
+          options.pointRadius || CANVAS_CONSTANTS.CHART_POINT_RADIUS,
+          {
+            fill: options.pointColor || this.currentTheme.primary,
+            stroke: this.currentTheme.background,
+            strokeWidth: 2,
+            interactive: options.interactive,
+            id: `point_${index}`,
+            label: `${point.label || `Point ${index + 1}`}: ${point.value}`,
+            ariaLabel: `Data point ${index + 1} of ${points.length}: ${point.label || 'Unnamed'} with value ${point.value}`,
+            onClick: () => options.onPointClick?.(data[index], index),
+          }
+        );
 
         // Show value labels if requested
         if (options.showValues) {
-          this.drawText(point.value.toString(), point.x, point.y - 15, {
-            fill: this.currentTheme.foreground,
-            fontSize: 10,
-            textAlign: 'center',
-            textBaseline: 'bottom',
-          });
+          this.drawText(
+            point.value.toString(),
+            point.x,
+            point.y - CANVAS_CONSTANTS.CHART_POINT_LABEL_Y_OFFSET,
+            {
+              fill: this.currentTheme.foreground,
+              fontSize: 10,
+              textAlign: 'center',
+              textBaseline: 'bottom',
+            }
+          );
         }
       });
     } catch (error) {
@@ -1242,7 +1341,7 @@ class CanvasRenderer {
    */
   drawGrid(x, y, width, height, options = {}) {
     const gridColor = options.gridColor || `${this.currentTheme.accent}40`; // Semi-transparent
-    const gridLines = options.gridLines || 5;
+    const gridLines = options.gridLines || CANVAS_CONSTANTS.CHART_GRID_LINES;
 
     this.ctx.save();
     this.ctx.strokeStyle = gridColor;
@@ -1283,7 +1382,7 @@ class CanvasRenderer {
     try {
       const centerX = x + size / 2;
       const centerY = y + size / 2;
-      const radius = (size / 2) * 0.8;
+      const radius = (size / 2) * CANVAS_CONSTANTS.CHART_PIE_RADIUS_RATIO;
 
       const total = data.reduce((sum, item) => sum + (item.value || 0), 0);
       if (total === 0) return;
@@ -1296,7 +1395,8 @@ class CanvasRenderer {
 
         // Calculate slice center for label positioning
         const labelAngle = currentAngle + sliceAngle / 2;
-        const labelRadius = radius * 0.7;
+        const labelRadius =
+          radius * CANVAS_CONSTANTS.CHART_PIE_LABEL_RADIUS_RATIO;
         const labelX = centerX + Math.cos(labelAngle) * labelRadius;
         const labelY = centerY + Math.sin(labelAngle) * labelRadius;
 
@@ -1338,7 +1438,10 @@ class CanvasRenderer {
         }
 
         // Draw label if there's enough space
-        if (sliceAngle > 0.2 && options.showLabels !== false) {
+        if (
+          sliceAngle > CANVAS_CONSTANTS.CHART_PIE_MIN_SLICE_ANGLE &&
+          options.showLabels !== false
+        ) {
           const percentage = ((item.value / total) * 100).toFixed(1);
           const labelText = options.showPercentages
             ? `${percentage}%`
@@ -1363,7 +1466,12 @@ class CanvasRenderer {
 
       // Draw legend if requested
       if (options.showLegend !== false) {
-        this.drawPieChartLegend(data, x + size + 20, y, options);
+        this.drawPieChartLegend(
+          data,
+          x + size + CANVAS_CONSTANTS.CHART_LEGEND_OFFSET,
+          y,
+          options
+        );
       }
     } catch (error) {
       this.errorHandler('Failed to draw pie chart', error);
@@ -1377,9 +1485,9 @@ class CanvasRenderer {
    * @returns {string} Color value
    */
   generateSliceColor(index, total) {
-    const hue = (index / total) * 360;
-    const saturation = 70;
-    const lightness = 50;
+    const hue = (index / total) * CANVAS_CONSTANTS.COLOR_HUE_FULL_CIRCLE;
+    const saturation = CANVAS_CONSTANTS.COLOR_SATURATION;
+    const lightness = CANVAS_CONSTANTS.COLOR_LIGHTNESS;
     return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
   }
 
@@ -1441,14 +1549,19 @@ class CanvasRenderer {
       }
 
       // Reduce animation duration for motion-sensitive users
-      duration = Math.min(duration * 0.2, 300);
+      duration = Math.min(
+        duration * CANVAS_CONSTANTS.REDUCED_MOTION_DURATION_FACTOR,
+        CANVAS_CONSTANTS.REDUCED_MOTION_MAX_DURATION
+      );
     }
 
     const animation = {
       callback,
       duration,
       startTime: performance.now(),
-      id: Math.random().toString(36).substr(2, 9),
+      id: Math.random()
+        .toString(CANVAS_CONSTANTS.ANIMATION_ID_BASE)
+        .substr(2, CANVAS_CONSTANTS.ANIMATION_ID_LENGTH),
       easing: options.easing || 'easeInOut',
       onComplete: options.onComplete,
       onProgress: options.onProgress,
@@ -1523,24 +1636,58 @@ class CanvasRenderer {
       case 'easeOut':
         return t * (2 - t);
       case 'easeInOut':
-        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+        return t < CANVAS_CONSTANTS.EASING_HALF_POINT
+          ? CANVAS_CONSTANTS.EASING_QUADRATIC_FACTOR * t * t
+          : -1 +
+              (CANVAS_CONSTANTS.EASING_CUBIC_FACTOR -
+                CANVAS_CONSTANTS.EASING_QUADRATIC_FACTOR * t) *
+                t;
       case 'easeInCubic':
         return t * t * t;
       case 'easeOutCubic':
         return --t * t * t + 1;
       case 'easeInOutCubic':
-        return t < 0.5
-          ? 4 * t * t * t
+        return t < CANVAS_CONSTANTS.EASING_HALF_POINT
+          ? CANVAS_CONSTANTS.EASING_CUBIC_FACTOR * t * t * t
           : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
       case 'bounce':
-        if (t < 1 / 2.75) {
-          return 7.5625 * t * t;
-        } else if (t < 2 / 2.75) {
-          return 7.5625 * (t -= 1.5 / 2.75) * t + 0.75;
-        } else if (t < 2.5 / 2.75) {
-          return 7.5625 * (t -= 2.25 / 2.75) * t + 0.9375;
+        if (t < 1 / CANVAS_CONSTANTS.EASING_BOUNCE_DIVISOR) {
+          return CANVAS_CONSTANTS.EASING_BOUNCE_MULTIPLIER * t * t;
+        } else if (
+          t <
+          CANVAS_CONSTANTS.EASING_QUADRATIC_FACTOR /
+            CANVAS_CONSTANTS.EASING_BOUNCE_DIVISOR
+        ) {
+          return (
+            CANVAS_CONSTANTS.EASING_BOUNCE_MULTIPLIER *
+              (t -=
+                CANVAS_CONSTANTS.EASING_BOUNCE_THRESHOLD_1 /
+                CANVAS_CONSTANTS.EASING_BOUNCE_DIVISOR) *
+              t +
+            CANVAS_CONSTANTS.EASING_BOUNCE_OFFSET_1
+          );
+        } else if (
+          t <
+          CANVAS_CONSTANTS.EASING_BOUNCE_THRESHOLD_2 /
+            CANVAS_CONSTANTS.EASING_BOUNCE_DIVISOR
+        ) {
+          return (
+            CANVAS_CONSTANTS.EASING_BOUNCE_MULTIPLIER *
+              (t -=
+                CANVAS_CONSTANTS.EASING_BOUNCE_THRESHOLD_3 /
+                CANVAS_CONSTANTS.EASING_BOUNCE_DIVISOR) *
+              t +
+            CANVAS_CONSTANTS.EASING_BOUNCE_OFFSET_2
+          );
         } else {
-          return 7.5625 * (t -= 2.625 / 2.75) * t + 0.984375;
+          return (
+            CANVAS_CONSTANTS.EASING_BOUNCE_MULTIPLIER *
+              (t -=
+                CANVAS_CONSTANTS.EASING_BOUNCE_THRESHOLD_4 /
+                CANVAS_CONSTANTS.EASING_BOUNCE_DIVISOR) *
+              t +
+            CANVAS_CONSTANTS.EASING_BOUNCE_OFFSET_3
+          );
         }
       default:
         return t;
@@ -1792,14 +1939,25 @@ class CanvasRenderer {
     switch (object.type) {
       case 'rect':
       case 'rectangle':
-        this.drawRect(0, 0, object.width || 50, object.height || 50, {
-          ...commonOptions,
-          borderRadius: object.borderRadius,
-        });
+        this.drawRect(
+          0,
+          0,
+          object.width || CANVAS_CONSTANTS.DEFAULT_OBJECT_WIDTH,
+          object.height || CANVAS_CONSTANTS.DEFAULT_OBJECT_HEIGHT,
+          {
+            ...commonOptions,
+            borderRadius: object.borderRadius,
+          }
+        );
         break;
 
       case 'circle':
-        this.drawCircle(0, 0, object.radius || 25, commonOptions);
+        this.drawCircle(
+          0,
+          0,
+          object.radius || CANVAS_CONSTANTS.DEFAULT_CIRCLE_RADIUS,
+          commonOptions
+        );
         break;
 
       case 'text':
@@ -1821,8 +1979,8 @@ class CanvasRenderer {
         this.drawLine(
           object.x1 || 0,
           object.y1 || 0,
-          object.x2 || 50,
-          object.y2 || 50,
+          object.x2 || CANVAS_CONSTANTS.DEFAULT_LINE_LENGTH,
+          object.y2 || CANVAS_CONSTANTS.DEFAULT_LINE_LENGTH,
           {
             stroke: commonOptions.stroke,
             strokeWidth: commonOptions.strokeWidth,
@@ -1854,11 +2012,17 @@ class CanvasRenderer {
 
       default:
         // Draw a placeholder for unknown types
-        this.drawRect(-5, -5, 10, 10, {
-          fill: '#ff6b6b',
-          stroke: '#e55555',
-          strokeWidth: 1,
-        });
+        this.drawRect(
+          CANVAS_CONSTANTS.PLACEHOLDER_OFFSET,
+          CANVAS_CONSTANTS.PLACEHOLDER_OFFSET,
+          CANVAS_CONSTANTS.PLACEHOLDER_SIZE,
+          CANVAS_CONSTANTS.PLACEHOLDER_SIZE,
+          {
+            fill: '#ff6b6b',
+            stroke: '#e55555',
+            strokeWidth: 1,
+          }
+        );
         logger.warn(`Unknown object type: ${object.type}`);
     }
   }

@@ -185,6 +185,112 @@ const INPUT_UTILITY_CONSTANTS = {
   DATETIMEPICKER_DEGREES_TO_RADIANS: 180,
   DATETIMEPICKER_HOUR_TICK_OUTER: 15,
   DATETIMEPICKER_HOUR_TICK_INNER: 8,
+
+  // Additional missing constants for datetime picker
+  DATETIMEPICKER_DISABLED_OVERLAY_HEIGHT: 40,
+  DATETIMEPICKER_FOCUS_STROKE_WIDTH: 2,
+  DATETIMEPICKER_FOCUS_STROKE_OFFSET: 2,
+  DATETIMEPICKER_FOCUS_STROKE_BORDER: 4,
+  DATETIMEPICKER_FOCUS_STROKE_HEIGHT: 36,
+
+  // Calendar rendering constants
+  CALENDAR_GRID_COLUMNS: 7,
+  CALENDAR_CELL_PADDING: 2,
+  CALENDAR_CELL_BORDER: 4,
+  CALENDAR_INSTRUCTION_Y_OFFSET: 5,
+  CALENDAR_INSTRUCTION_Y_BASE: 45,
+  CALENDAR_INSTRUCTION_LINE_SPACING: 12,
+
+  // Time picker clock constants
+  CLOCK_HOURS_COUNT: 12,
+  CLOCK_MINUTES_COUNT: 60,
+  CLOCK_MINUTE_STEP: 5,
+  CLOCK_HOUR_ANGLE_STEP: 30,
+  CLOCK_START_ANGLE_OFFSET: 90,
+  CLOCK_ANGLE_TO_RADIANS: 180,
+  CLOCK_MAJOR_TICK_OUTER: 15,
+  CLOCK_MAJOR_TICK_INNER: 8,
+  CLOCK_HOUR_TEXT_RADIUS: 25,
+  CLOCK_MAJOR_TICK_MODULO: 3,
+  CLOCK_MAJOR_TICK_WIDTH: 3,
+  CLOCK_MINOR_TICK_WIDTH: 1,
+  CLOCK_TWELVE_HOUR_DISPLAY: 12,
+
+  // Additional clock and time picker constants
+  CLOCK_QUARTER_HOUR_MINUTES: 15,
+  CLOCK_MINUTE_ANGLE_STEP: 6,
+  CLOCK_MINOR_TICK_OUTER: 10,
+  CLOCK_MINOR_TICK_INNER: 5,
+  CLOCK_HOUR_HAND_RADIUS_FACTOR: 0.5,
+  CLOCK_MINUTE_HAND_RADIUS_FACTOR: 0.8,
+  CLOCK_HOUR_INDICATOR_RADIUS: 8,
+  CLOCK_MINUTE_INDICATOR_RADIUS: 6,
+  CLOCK_CENTER_DOT_RADIUS: 4,
+
+  // Digital time display constants
+  DIGITAL_TIME_WIDTH: 120,
+  DIGITAL_TIME_HEIGHT: 30,
+  DIGITAL_TIME_OFFSET_X: 60,
+  DIGITAL_TIME_OFFSET_Y: 50,
+  DIGITAL_TIME_TEXT_Y: 35,
+
+  // Time instructions constants
+  TIME_INSTRUCTION_MARGIN: 5,
+  TIME_INSTRUCTION_LINE_HEIGHT: 12,
+
+  // NumberInput constants
+  NUMBER_INPUT_DEFAULT_WIDTH: 150,
+  NUMBER_INPUT_DEFAULT_HEIGHT: 40,
+  NUMBER_INPUT_CONTROL_WIDTH: 20,
+  NUMBER_INPUT_TEXT_MARGIN: 8,
+  NUMBER_INPUT_CURSOR_OFFSET: 2,
+  NUMBER_INPUT_CURSOR_MARGIN: 8,
+  NUMBER_INPUT_BLINK_INTERVAL: 500,
+  NUMBER_INPUT_QUARTER_HEIGHT: 4,
+  NUMBER_INPUT_THREE_QUARTER_HEIGHT: 3,
+  NUMBER_INPUT_REPEAT_INITIAL_DELAY: 500,
+  NUMBER_INPUT_REPEAT_INTERVAL: 150,
+  NUMBER_INPUT_FOCUS_BORDER: 4,
+
+  // Accordion constants
+  ACCORDION_DEFAULT_WIDTH: 300,
+  ACCORDION_DEFAULT_HEIGHT: 600,
+
+  // Animation and timing constants
+  TOOLTIP_OFFSET_DISTANCE: 3,
+  CLOSE_BUTTON_SIZE: 30,
+  CLOSE_BUTTON_RADIUS: 12,
+  TOOLTIP_HEADER_HEIGHT: 50,
+  TOOLTIP_CONTENT_LINE_HEIGHT: 20,
+  TOOLTIP_BORDER_DASH: 3,
+  TOOLTIP_ANIMATION_ALPHA: 0.5,
+  TOOLTIP_SHADOW_OFFSET: 60,
+  TOOLTIP_SHADOW_WIDTH: 40,
+  TOOLTIP_PADDING: 16,
+  EASING_CUBIC_POWER: 3,
+  CONTENT_PARTS_RGB: 3,
+
+  // SearchBox constants
+  SEARCHBOX_DEFAULT_WIDTH: 300,
+  SEARCHBOX_DEFAULT_HEIGHT: 40,
+  SEARCHBOX_DEBOUNCE_DELAY: 300,
+  SEARCHBOX_MAX_SUGGESTIONS: 5,
+  SEARCHBOX_CLEAR_BUTTON_WIDTH: 70,
+  SEARCHBOX_CLEAR_BUTTON_OFFSET: 45,
+  SEARCHBOX_SEARCH_BUTTON_WIDTH: 40,
+  SEARCHBOX_SUGGESTION_HEIGHT: 30,
+  SEARCHBOX_SUGGESTION_ANIMATION_DELAY: 150,
+  SEARCHBOX_BUTTON_SPACING: 80,
+  SEARCHBOX_BUTTON_POSITION: 55,
+  SEARCHBOX_SEARCH_ICON_OFFSET: 30,
+  SEARCHBOX_CURSOR_MARGIN: 8,
+  SEARCHBOX_BUTTON_HEIGHT_OFFSET: 4,
+  SEARCHBOX_CURSOR_BLINK_FREQUENCY: 0.005,
+  SEARCHBOX_CURSOR_OPACITY_FACTOR: 0.5,
+  SEARCHBOX_CURSOR_OPACITY_BASE: 0.5,
+  SEARCHBOX_SUGGESTION_ICON_OFFSET: 12,
+  SEARCHBOX_HIGHLIGHT_Y_OFFSET: 8,
+  SEARCHBOX_HIGHLIGHT_HEIGHT: 16,
 };
 
 const PERFORMANCE_THRESHOLDS = {
@@ -3560,15 +3666,29 @@ class DateTimePicker extends BaseObject {
     // Disabled overlay
     if (this.disabled) {
       renderer.fillStyle = 'rgba(255, 255, 255, 0.5)';
-      renderer.fillRect(0, 0, this.width, 40);
+      renderer.fillRect(
+        0,
+        0,
+        this.width,
+        INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_DISABLED_OVERLAY_HEIGHT
+      );
     }
   }
 
   drawFocusIndicator(renderer) {
     renderer.strokeStyle = ComponentTheme.getColor('focus', this.theme);
-    renderer.lineWidth = 2;
-    renderer.setLineDash([2, 2]);
-    renderer.strokeRect(2, 2, this.width - 4, 36);
+    renderer.lineWidth =
+      INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_FOCUS_STROKE_WIDTH;
+    renderer.setLineDash([
+      INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_FOCUS_STROKE_OFFSET,
+      INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_FOCUS_STROKE_OFFSET,
+    ]);
+    renderer.strokeRect(
+      INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_FOCUS_STROKE_OFFSET,
+      INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_FOCUS_STROKE_OFFSET,
+      this.width - INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_FOCUS_STROKE_BORDER,
+      INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_FOCUS_STROKE_HEIGHT
+    );
     renderer.setLineDash([]);
   }
 
@@ -3623,7 +3743,12 @@ class DateTimePicker extends BaseObject {
   renderCalendarHeader(renderer) {
     // Header background
     renderer.fillStyle = ComponentTheme.getColor('primary', this.theme);
-    renderer.fillRect(0, 0, this.width, 40);
+    renderer.fillRect(
+      0,
+      0,
+      this.width,
+      INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_HEADER_RENDER_HEIGHT
+    );
 
     // Month/Year text
     const monthNames = this.getMonthNames();
@@ -3635,26 +3760,40 @@ class DateTimePicker extends BaseObject {
     renderer.fillText(
       `${monthNames[this.displayMonth]} ${this.displayYear}`,
       this.width / 2,
-      20
+      INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_ICON_MARGIN
     );
 
     // Navigation arrows with hover states
     renderer.font = '16px Arial';
     renderer.textAlign = 'center';
-    renderer.fillText('‹', 20, 20); // Previous month
-    renderer.fillText('›', this.width - 20, 20); // Next month
+    renderer.fillText(
+      '‹',
+      INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_ICON_MARGIN,
+      INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_ICON_MARGIN
+    ); // Previous month
+    renderer.fillText(
+      '›',
+      this.width - INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_ICON_MARGIN,
+      INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_ICON_MARGIN
+    ); // Next month
 
     // Time button
     if (this.showTime) {
       renderer.font = '12px Arial';
       renderer.textAlign = 'right';
-      renderer.fillText('Time', this.width - 50, 20);
+      renderer.fillText(
+        'Time',
+        this.width -
+          INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_TIME_BUTTON_LABEL_OFFSET,
+        INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_ICON_MARGIN
+      );
     }
   }
 
   renderDayLabels(renderer) {
     const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const cellWidth = this.width / 7;
+    const cellWidth =
+      this.width / INPUT_UTILITY_CONSTANTS.CALENDAR_GRID_COLUMNS;
 
     renderer.fillStyle = ComponentTheme.getColor('textSecondary', this.theme);
     renderer.font = 'bold 12px Arial';
@@ -3663,20 +3802,25 @@ class DateTimePicker extends BaseObject {
 
     dayLabels.forEach((label, index) => {
       const x = index * cellWidth + cellWidth / 2;
-      renderer.fillText(label, x, 55);
+      renderer.fillText(
+        label,
+        x,
+        INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_DAY_LABEL_Y
+      );
     });
 
     // Separator line
     renderer.strokeStyle = ComponentTheme.getColor('border', this.theme);
     renderer.lineWidth = 1;
     renderer.beginPath();
-    renderer.moveTo(0, 65);
-    renderer.lineTo(this.width, 65);
+    renderer.moveTo(0, INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_LINE_Y);
+    renderer.lineTo(this.width, INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_LINE_Y);
     renderer.stroke();
   }
 
   renderCalendarGrid(renderer) {
-    const cellWidth = this.width / 7;
+    const cellWidth =
+      this.width / INPUT_UTILITY_CONSTANTS.CALENDAR_GRID_COLUMNS;
     const cellHeight = 30;
     const startY = 70;
 
@@ -3691,8 +3835,10 @@ class DateTimePicker extends BaseObject {
 
     for (let day = 1; day <= daysInMonth; day++) {
       const dayIndex = firstDay + day - 1;
-      const row = Math.floor(dayIndex / 7);
-      const col = dayIndex % 7;
+      const row = Math.floor(
+        dayIndex / INPUT_UTILITY_CONSTANTS.CALENDAR_GRID_COLUMNS
+      );
+      const col = dayIndex % INPUT_UTILITY_CONSTANTS.CALENDAR_GRID_COLUMNS;
 
       const x = col * cellWidth;
       const y = startY + row * cellHeight;
@@ -3706,16 +3852,31 @@ class DateTimePicker extends BaseObject {
       // Cell background
       if (isSelected) {
         renderer.fillStyle = ComponentTheme.getColor('primary', this.theme);
-        renderer.fillRect(x + 2, y + 2, cellWidth - 4, cellHeight - 4);
+        renderer.fillRect(
+          x + INPUT_UTILITY_CONSTANTS.CALENDAR_CELL_PADDING,
+          y + INPUT_UTILITY_CONSTANTS.CALENDAR_CELL_PADDING,
+          cellWidth - INPUT_UTILITY_CONSTANTS.CALENDAR_CELL_BORDER,
+          cellHeight - INPUT_UTILITY_CONSTANTS.CALENDAR_CELL_BORDER
+        );
       } else if (isFocused) {
         renderer.fillStyle = ComponentTheme.getColor(
           'primaryLight',
           this.theme
         );
-        renderer.fillRect(x + 2, y + 2, cellWidth - 4, cellHeight - 4);
+        renderer.fillRect(
+          x + INPUT_UTILITY_CONSTANTS.CALENDAR_CELL_PADDING,
+          y + INPUT_UTILITY_CONSTANTS.CALENDAR_CELL_PADDING,
+          cellWidth - INPUT_UTILITY_CONSTANTS.CALENDAR_CELL_BORDER,
+          cellHeight - INPUT_UTILITY_CONSTANTS.CALENDAR_CELL_BORDER
+        );
       } else if (isToday) {
         renderer.fillStyle = ComponentTheme.getColor('warning', this.theme);
-        renderer.fillRect(x + 2, y + 2, cellWidth - 4, cellHeight - 4);
+        renderer.fillRect(
+          x + INPUT_UTILITY_CONSTANTS.CALENDAR_CELL_PADDING,
+          y + INPUT_UTILITY_CONSTANTS.CALENDAR_CELL_PADDING,
+          cellWidth - INPUT_UTILITY_CONSTANTS.CALENDAR_CELL_BORDER,
+          cellHeight - INPUT_UTILITY_CONSTANTS.CALENDAR_CELL_BORDER
+        );
       }
 
       // Focus indicator
@@ -3744,7 +3905,12 @@ class DateTimePicker extends BaseObject {
       // Disabled overlay
       if (isDisabled) {
         renderer.fillStyle = 'rgba(128, 128, 128, 0.5)';
-        renderer.fillRect(x + 2, y + 2, cellWidth - 4, cellHeight - 4);
+        renderer.fillRect(
+          x + INPUT_UTILITY_CONSTANTS.CALENDAR_CELL_PADDING,
+          y + INPUT_UTILITY_CONSTANTS.CALENDAR_CELL_PADDING,
+          cellWidth - INPUT_UTILITY_CONSTANTS.CALENDAR_CELL_BORDER,
+          cellHeight - INPUT_UTILITY_CONSTANTS.CALENDAR_CELL_BORDER
+        );
       }
     }
   }
@@ -3762,7 +3928,13 @@ class DateTimePicker extends BaseObject {
     renderer.textBaseline = 'top';
 
     instructions.forEach((instruction, index) => {
-      renderer.fillText(instruction, 5, this.height - 45 + index * 12);
+      renderer.fillText(
+        instruction,
+        INPUT_UTILITY_CONSTANTS.CALENDAR_INSTRUCTION_Y_OFFSET,
+        this.height -
+          INPUT_UTILITY_CONSTANTS.CALENDAR_INSTRUCTION_Y_BASE +
+          index * INPUT_UTILITY_CONSTANTS.CALENDAR_INSTRUCTION_LINE_SPACING
+      );
     });
   }
   renderTimePicker(renderer) {
@@ -3784,25 +3956,39 @@ class DateTimePicker extends BaseObject {
   renderTimeHeader(renderer) {
     // Header background
     renderer.fillStyle = ComponentTheme.getColor('primary', this.theme);
-    renderer.fillRect(0, 0, this.width, 40);
+    renderer.fillRect(
+      0,
+      0,
+      this.width,
+      INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_HEADER_RENDER_HEIGHT
+    );
 
     // Back button
     renderer.fillStyle = ComponentTheme.getColor('onPrimary', this.theme);
     renderer.font = '14px Arial';
     renderer.textAlign = 'left';
     renderer.textBaseline = 'middle';
-    renderer.fillText('← Calendar', 12, 20);
+    renderer.fillText(
+      '← Calendar',
+      INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_TEXT_MARGIN,
+      INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_ICON_MARGIN
+    );
 
     // Time display
     const timeText = this.formatTime(this.selectedHour, this.selectedMinute);
     renderer.textAlign = 'center';
     renderer.font = 'bold 16px Arial';
-    renderer.fillText(timeText, this.width / 2, 20);
+    renderer.fillText(
+      timeText,
+      this.width / 2,
+      INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_ICON_MARGIN
+    );
   }
 
   renderClockFace(renderer) {
     const centerX = this.width / 2;
-    const centerY = this.height / 2 + 20;
+    const centerY =
+      this.height / 2 + INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_CENTER_OFFSET;
     const radius = 80;
 
     // Clock circle background
@@ -3822,45 +4008,94 @@ class DateTimePicker extends BaseObject {
     renderer.stroke();
 
     // Hour markers and numbers
-    for (let i = 0; i < 12; i++) {
-      const angle = ((i * 30 - 90) * Math.PI) / 180;
-      const x1 = centerX + Math.cos(angle) * (radius - 15);
-      const y1 = centerY + Math.sin(angle) * (radius - 15);
-      const x2 = centerX + Math.cos(angle) * (radius - 8);
-      const y2 = centerY + Math.sin(angle) * (radius - 8);
+    for (let i = 0; i < INPUT_UTILITY_CONSTANTS.CLOCK_HOURS_COUNT; i++) {
+      const angle =
+        ((i * INPUT_UTILITY_CONSTANTS.CLOCK_HOUR_ANGLE_STEP -
+          INPUT_UTILITY_CONSTANTS.CLOCK_START_ANGLE_OFFSET) *
+          Math.PI) /
+        INPUT_UTILITY_CONSTANTS.CLOCK_ANGLE_TO_RADIANS;
+      const x1 =
+        centerX +
+        Math.cos(angle) *
+          (radius - INPUT_UTILITY_CONSTANTS.CLOCK_MAJOR_TICK_OUTER);
+      const y1 =
+        centerY +
+        Math.sin(angle) *
+          (radius - INPUT_UTILITY_CONSTANTS.CLOCK_MAJOR_TICK_OUTER);
+      const x2 =
+        centerX +
+        Math.cos(angle) *
+          (radius - INPUT_UTILITY_CONSTANTS.CLOCK_MAJOR_TICK_INNER);
+      const y2 =
+        centerY +
+        Math.sin(angle) *
+          (radius - INPUT_UTILITY_CONSTANTS.CLOCK_MAJOR_TICK_INNER);
 
       // Hour marker lines
       renderer.strokeStyle = ComponentTheme.getColor(
         'textSecondary',
         this.theme
       );
-      renderer.lineWidth = i % 3 === 0 ? 3 : 1;
+      renderer.lineWidth =
+        i % INPUT_UTILITY_CONSTANTS.CLOCK_MAJOR_TICK_MODULO === 0
+          ? INPUT_UTILITY_CONSTANTS.CLOCK_MAJOR_TICK_WIDTH
+          : INPUT_UTILITY_CONSTANTS.CLOCK_MINOR_TICK_WIDTH;
       renderer.beginPath();
       renderer.moveTo(x1, y1);
       renderer.lineTo(x2, y2);
       renderer.stroke();
 
       // Hour numbers
-      const hour = i === 0 ? 12 : i;
-      const textX = centerX + Math.cos(angle) * (radius - 25);
-      const textY = centerY + Math.sin(angle) * (radius - 25);
+      const hour =
+        i === 0 ? INPUT_UTILITY_CONSTANTS.CLOCK_TWELVE_HOUR_DISPLAY : i;
+      const textX =
+        centerX +
+        Math.cos(angle) *
+          (radius - INPUT_UTILITY_CONSTANTS.CLOCK_HOUR_TEXT_RADIUS);
+      const textY =
+        centerY +
+        Math.sin(angle) *
+          (radius - INPUT_UTILITY_CONSTANTS.CLOCK_HOUR_TEXT_RADIUS);
 
       renderer.fillStyle = ComponentTheme.getColor('text', this.theme);
-      renderer.font = i % 3 === 0 ? 'bold 14px Arial' : '12px Arial';
+      renderer.font =
+        i % INPUT_UTILITY_CONSTANTS.CLOCK_MAJOR_TICK_MODULO === 0
+          ? 'bold 14px Arial'
+          : '12px Arial';
       renderer.textAlign = 'center';
       renderer.textBaseline = 'middle';
       renderer.fillText(hour.toString(), textX, textY);
     }
 
     // Minute markers (every 5 minutes)
-    for (let i = 0; i < 60; i += 5) {
-      if (i % 15 !== 0) {
+    for (
+      let i = 0;
+      i < INPUT_UTILITY_CONSTANTS.CLOCK_MINUTES_COUNT;
+      i += INPUT_UTILITY_CONSTANTS.CLOCK_MINUTE_STEP
+    ) {
+      if (i % INPUT_UTILITY_CONSTANTS.CLOCK_QUARTER_HOUR_MINUTES !== 0) {
         // Skip quarter hours
-        const angle = ((i * 6 - 90) * Math.PI) / 180;
-        const x1 = centerX + Math.cos(angle) * (radius - 10);
-        const y1 = centerY + Math.sin(angle) * (radius - 10);
-        const x2 = centerX + Math.cos(angle) * (radius - 5);
-        const y2 = centerY + Math.sin(angle) * (radius - 5);
+        const angle =
+          ((i * INPUT_UTILITY_CONSTANTS.CLOCK_MINUTE_ANGLE_STEP -
+            INPUT_UTILITY_CONSTANTS.CLOCK_START_ANGLE_OFFSET) *
+            Math.PI) /
+          INPUT_UTILITY_CONSTANTS.CLOCK_ANGLE_TO_RADIANS;
+        const x1 =
+          centerX +
+          Math.cos(angle) *
+            (radius - INPUT_UTILITY_CONSTANTS.CLOCK_MINOR_TICK_OUTER);
+        const y1 =
+          centerY +
+          Math.sin(angle) *
+            (radius - INPUT_UTILITY_CONSTANTS.CLOCK_MINOR_TICK_OUTER);
+        const x2 =
+          centerX +
+          Math.cos(angle) *
+            (radius - INPUT_UTILITY_CONSTANTS.CLOCK_MINOR_TICK_INNER);
+        const y2 =
+          centerY +
+          Math.sin(angle) *
+            (radius - INPUT_UTILITY_CONSTANTS.CLOCK_MINOR_TICK_INNER);
 
         renderer.strokeStyle = ComponentTheme.getColor(
           'textSecondary',
@@ -3875,13 +4110,30 @@ class DateTimePicker extends BaseObject {
     }
 
     // Selected hour indicator
-    const hourAngle = (((this.selectedHour % 12) * 30 - 90) * Math.PI) / 180;
-    const hourX = centerX + Math.cos(hourAngle) * (radius * 0.5);
-    const hourY = centerY + Math.sin(hourAngle) * (radius * 0.5);
+    const hourAngle =
+      (((this.selectedHour % INPUT_UTILITY_CONSTANTS.CLOCK_HOURS_COUNT) *
+        INPUT_UTILITY_CONSTANTS.CLOCK_HOUR_ANGLE_STEP -
+        INPUT_UTILITY_CONSTANTS.CLOCK_START_ANGLE_OFFSET) *
+        Math.PI) /
+      INPUT_UTILITY_CONSTANTS.CLOCK_ANGLE_TO_RADIANS;
+    const hourX =
+      centerX +
+      Math.cos(hourAngle) *
+        (radius * INPUT_UTILITY_CONSTANTS.CLOCK_HOUR_HAND_RADIUS_FACTOR);
+    const hourY =
+      centerY +
+      Math.sin(hourAngle) *
+        (radius * INPUT_UTILITY_CONSTANTS.CLOCK_HOUR_HAND_RADIUS_FACTOR);
 
     renderer.fillStyle = ComponentTheme.getColor('primary', this.theme);
     renderer.beginPath();
-    renderer.arc(hourX, hourY, 8, 0, Math.PI * 2);
+    renderer.arc(
+      hourX,
+      hourY,
+      INPUT_UTILITY_CONSTANTS.CLOCK_HOUR_INDICATOR_RADIUS,
+      0,
+      Math.PI * 2
+    );
     renderer.fill();
 
     // Hour hand
@@ -3893,13 +4145,29 @@ class DateTimePicker extends BaseObject {
     renderer.stroke();
 
     // Selected minute indicator
-    const minuteAngle = ((this.selectedMinute * 6 - 90) * Math.PI) / 180;
-    const minuteX = centerX + Math.cos(minuteAngle) * (radius * 0.8);
-    const minuteY = centerY + Math.sin(minuteAngle) * (radius * 0.8);
+    const minuteAngle =
+      ((this.selectedMinute * INPUT_UTILITY_CONSTANTS.CLOCK_MINUTE_ANGLE_STEP -
+        INPUT_UTILITY_CONSTANTS.CLOCK_START_ANGLE_OFFSET) *
+        Math.PI) /
+      INPUT_UTILITY_CONSTANTS.CLOCK_ANGLE_TO_RADIANS;
+    const minuteX =
+      centerX +
+      Math.cos(minuteAngle) *
+        (radius * INPUT_UTILITY_CONSTANTS.CLOCK_MINUTE_HAND_RADIUS_FACTOR);
+    const minuteY =
+      centerY +
+      Math.sin(minuteAngle) *
+        (radius * INPUT_UTILITY_CONSTANTS.CLOCK_MINUTE_HAND_RADIUS_FACTOR);
 
     renderer.fillStyle = ComponentTheme.getColor('secondary', this.theme);
     renderer.beginPath();
-    renderer.arc(minuteX, minuteY, 6, 0, Math.PI * 2);
+    renderer.arc(
+      minuteX,
+      minuteY,
+      INPUT_UTILITY_CONSTANTS.CLOCK_MINUTE_INDICATOR_RADIUS,
+      0,
+      Math.PI * 2
+    );
     renderer.fill();
 
     // Minute hand
@@ -3913,7 +4181,13 @@ class DateTimePicker extends BaseObject {
     // Center dot
     renderer.fillStyle = ComponentTheme.getColor('text', this.theme);
     renderer.beginPath();
-    renderer.arc(centerX, centerY, 4, 0, Math.PI * 2);
+    renderer.arc(
+      centerX,
+      centerY,
+      INPUT_UTILITY_CONSTANTS.CLOCK_CENTER_DOT_RADIUS,
+      0,
+      Math.PI * 2
+    );
     renderer.fill();
   }
 
@@ -3921,17 +4195,31 @@ class DateTimePicker extends BaseObject {
     const timeText = this.formatTime(this.selectedHour, this.selectedMinute);
 
     renderer.fillStyle = ComponentTheme.getColor('background', this.theme);
-    renderer.fillRect(this.width / 2 - 60, this.height - 50, 120, 30);
+    renderer.fillRect(
+      this.width / 2 - INPUT_UTILITY_CONSTANTS.DIGITAL_TIME_OFFSET_X,
+      this.height - INPUT_UTILITY_CONSTANTS.DIGITAL_TIME_OFFSET_Y,
+      INPUT_UTILITY_CONSTANTS.DIGITAL_TIME_WIDTH,
+      INPUT_UTILITY_CONSTANTS.DIGITAL_TIME_HEIGHT
+    );
 
     renderer.strokeStyle = ComponentTheme.getColor('border', this.theme);
     renderer.lineWidth = 1;
-    renderer.strokeRect(this.width / 2 - 60, this.height - 50, 120, 30);
+    renderer.strokeRect(
+      this.width / 2 - INPUT_UTILITY_CONSTANTS.DIGITAL_TIME_OFFSET_X,
+      this.height - INPUT_UTILITY_CONSTANTS.DIGITAL_TIME_OFFSET_Y,
+      INPUT_UTILITY_CONSTANTS.DIGITAL_TIME_WIDTH,
+      INPUT_UTILITY_CONSTANTS.DIGITAL_TIME_HEIGHT
+    );
 
     renderer.fillStyle = ComponentTheme.getColor('text', this.theme);
     renderer.font = 'bold 18px monospace';
     renderer.textAlign = 'center';
     renderer.textBaseline = 'middle';
-    renderer.fillText(timeText, this.width / 2, this.height - 35);
+    renderer.fillText(
+      timeText,
+      this.width / 2,
+      this.height - INPUT_UTILITY_CONSTANTS.DIGITAL_TIME_TEXT_Y
+    );
   }
 
   renderTimeInstructions(renderer) {
@@ -3946,7 +4234,12 @@ class DateTimePicker extends BaseObject {
     renderer.textBaseline = 'top';
 
     instructions.forEach((instruction, index) => {
-      renderer.fillText(instruction, 5, 5 + index * 12);
+      renderer.fillText(
+        instruction,
+        INPUT_UTILITY_CONSTANTS.TIME_INSTRUCTION_MARGIN,
+        INPUT_UTILITY_CONSTANTS.TIME_INSTRUCTION_MARGIN +
+          index * INPUT_UTILITY_CONSTANTS.TIME_INSTRUCTION_LINE_HEIGHT
+      );
     });
   }
 
@@ -4082,8 +4375,10 @@ class NumberInput extends BaseObject {
   constructor(options = {}) {
     super({
       ...options,
-      width: options.width || 150,
-      height: options.height || 40,
+      width:
+        options.width || INPUT_UTILITY_CONSTANTS.NUMBER_INPUT_DEFAULT_WIDTH,
+      height:
+        options.height || INPUT_UTILITY_CONSTANTS.NUMBER_INPUT_DEFAULT_HEIGHT,
       ariaRole: 'spinbutton',
       ariaLabel: options.ariaLabel || 'Number Input',
     });
@@ -4384,11 +4679,17 @@ class NumberInput extends BaseObject {
         this.decrement();
       }
 
-      this.repeatInterval = setTimeout(repeat, 150);
+      this.repeatInterval = setTimeout(
+        repeat,
+        INPUT_UTILITY_CONSTANTS.NUMBER_INPUT_REPEAT_INTERVAL
+      );
     };
 
     // Initial delay before repeating
-    this.repeatInterval = setTimeout(repeat, 500);
+    this.repeatInterval = setTimeout(
+      repeat,
+      INPUT_UTILITY_CONSTANTS.NUMBER_INPUT_REPEAT_INITIAL_DELAY
+    );
   }
 
   stopRepeating() {
@@ -4410,7 +4711,10 @@ class NumberInput extends BaseObject {
     try {
       const { localX, localY } = event;
 
-      if (this.showControls && localX > this.width - 20) {
+      if (
+        this.showControls &&
+        localX > this.width - INPUT_UTILITY_CONSTANTS.NUMBER_INPUT_CONTROL_WIDTH
+      ) {
         // Spinner controls
         if (localY < this.height / 2) {
           this.increment();
@@ -4432,7 +4736,10 @@ class NumberInput extends BaseObject {
     try {
       const { localX, localY } = event;
 
-      if (this.showControls && localX > this.width - 20) {
+      if (
+        this.showControls &&
+        localX > this.width - INPUT_UTILITY_CONSTANTS.NUMBER_INPUT_CONTROL_WIDTH
+      ) {
         this.isMouseDownOnControl = true;
 
         // Start repeating after a delay
@@ -4623,7 +4930,11 @@ class NumberInput extends BaseObject {
         renderer.font = 'italic 14px Arial';
       }
 
-      renderer.fillText(placeholderText, 8, this.height / 2);
+      renderer.fillText(
+        placeholderText,
+        INPUT_UTILITY_CONSTANTS.NUMBER_INPUT_TEXT_MARGIN,
+        this.height / 2
+      );
 
       // Spinner controls
       if (this.showControls) {
@@ -4656,7 +4967,12 @@ class NumberInput extends BaseObject {
     renderer.strokeStyle = ComponentTheme.getColor('focus', this.theme);
     renderer.lineWidth = 2;
     renderer.setLineDash([2, 2]);
-    renderer.strokeRect(2, 2, this.width - 4, this.height - 4);
+    renderer.strokeRect(
+      INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_OFFSET,
+      INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_OFFSET,
+      this.width - INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_BORDER,
+      this.height - INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_BORDER
+    );
     renderer.setLineDash([]);
   }
 
@@ -4685,25 +5001,49 @@ class NumberInput extends BaseObject {
     renderer.font = '10px Arial';
     renderer.textAlign = 'center';
     renderer.textBaseline = 'middle';
-    renderer.fillText('▲', controlX + controlWidth / 2, this.height / 4);
+    renderer.fillText(
+      '▲',
+      controlX + controlWidth / 2,
+      this.height / INPUT_UTILITY_CONSTANTS.NUMBER_INPUT_QUARTER_HEIGHT
+    );
 
     // Down arrow
-    renderer.fillText('▼', controlX + controlWidth / 2, (this.height * 3) / 4);
+    renderer.fillText(
+      '▼',
+      controlX + controlWidth / 2,
+      (this.height *
+        INPUT_UTILITY_CONSTANTS.NUMBER_INPUT_THREE_QUARTER_HEIGHT) /
+        INPUT_UTILITY_CONSTANTS.NUMBER_INPUT_QUARTER_HEIGHT
+    );
   }
 
   renderCursor(renderer, text) {
     const textWidth = renderer.measureText(text).width;
-    const cursorX = 8 + textWidth + 2;
+    const cursorX =
+      INPUT_UTILITY_CONSTANTS.NUMBER_INPUT_TEXT_MARGIN +
+      textWidth +
+      INPUT_UTILITY_CONSTANTS.NUMBER_INPUT_CURSOR_OFFSET;
 
     // Blinking cursor effect
-    const shouldShow = Math.floor(Date.now() / 500) % 2 === 0;
+    const shouldShow =
+      Math.floor(
+        Date.now() / INPUT_UTILITY_CONSTANTS.NUMBER_INPUT_BLINK_INTERVAL
+      ) %
+        2 ===
+      0;
     if (!shouldShow) return;
 
     renderer.strokeStyle = ComponentTheme.getColor('text', this.theme);
     renderer.lineWidth = 1;
     renderer.beginPath();
-    renderer.moveTo(cursorX, 8);
-    renderer.lineTo(cursorX, this.height - 8);
+    renderer.moveTo(
+      cursorX,
+      INPUT_UTILITY_CONSTANTS.NUMBER_INPUT_CURSOR_MARGIN
+    );
+    renderer.lineTo(
+      cursorX,
+      this.height - INPUT_UTILITY_CONSTANTS.NUMBER_INPUT_CURSOR_MARGIN
+    );
     renderer.stroke();
   }
 
@@ -4801,8 +5141,9 @@ class Drawer extends BaseObject {
   constructor(options = {}) {
     super({
       ...options,
-      width: options.width || 300,
-      height: options.height || 600,
+      width: options.width || INPUT_UTILITY_CONSTANTS.ACCORDION_DEFAULT_WIDTH,
+      height:
+        options.height || INPUT_UTILITY_CONSTANTS.ACCORDION_DEFAULT_HEIGHT,
       ariaRole: 'dialog',
       ariaLabel: options.ariaLabel || 'Drawer',
     });
@@ -5115,7 +5456,7 @@ class Drawer extends BaseObject {
   }
 
   easeOutCubic(t) {
-    return 1 - Math.pow(1 - t, 3);
+    return 1 - Math.pow(1 - t, INPUT_UTILITY_CONSTANTS.EASING_CUBIC_POWER);
   }
 
   getDrawerBounds() {
@@ -5167,8 +5508,11 @@ class Drawer extends BaseObject {
       if (
         this.title &&
         localY >= bounds.y &&
-        localY < bounds.y + 50 &&
-        localX >= bounds.x + bounds.width - 40 &&
+        localY < bounds.y + INPUT_UTILITY_CONSTANTS.TOOLTIP_HEADER_HEIGHT &&
+        localX >=
+          bounds.x +
+            bounds.width -
+            INPUT_UTILITY_CONSTANTS.TOOLTIP_SHADOW_WIDTH &&
         localX < bounds.x + bounds.width
       ) {
         this.close();
@@ -5346,7 +5690,9 @@ class Drawer extends BaseObject {
   }
 
   renderOverlay(renderer) {
-    const alpha = this.animationState.progress * 0.5;
+    const alpha =
+      this.animationState.progress *
+      INPUT_UTILITY_CONSTANTS.TOOLTIP_ANIMATION_ALPHA;
     const overlayColor = ComponentTheme.getColor('overlay', this.theme);
 
     // Parse overlay color or use default
@@ -5355,7 +5701,7 @@ class Drawer extends BaseObject {
       const rgbaMatch = overlayColor.match(/rgba\(([^)]+)\)/);
       if (rgbaMatch) {
         const parts = rgbaMatch[1].split(',');
-        if (parts.length >= 3) {
+        if (parts.length >= INPUT_UTILITY_CONSTANTS.CONTENT_PARTS_RGB) {
           baseColor = `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${alpha})`;
         }
       }
@@ -5382,9 +5728,17 @@ class Drawer extends BaseObject {
     renderer.shadowColor = shadowColor;
     renderer.shadowBlur = 12;
     renderer.shadowOffsetX =
-      this.position === 'left' ? 3 : this.position === 'right' ? -3 : 0;
+      this.position === 'left'
+        ? INPUT_UTILITY_CONSTANTS.TOOLTIP_OFFSET_DISTANCE
+        : this.position === 'right'
+          ? -INPUT_UTILITY_CONSTANTS.TOOLTIP_OFFSET_DISTANCE
+          : 0;
     renderer.shadowOffsetY =
-      this.position === 'top' ? 3 : this.position === 'bottom' ? -3 : 0;
+      this.position === 'top'
+        ? INPUT_UTILITY_CONSTANTS.TOOLTIP_OFFSET_DISTANCE
+        : this.position === 'bottom'
+          ? -INPUT_UTILITY_CONSTANTS.TOOLTIP_OFFSET_DISTANCE
+          : 0;
 
     // Drawer background with theme support
     renderer.fillStyle = ComponentTheme.getColor('background', this.theme);
@@ -5439,7 +5793,8 @@ class Drawer extends BaseObject {
     renderer.textAlign = 'left';
     renderer.textBaseline = 'middle';
 
-    const maxTitleWidth = bounds.width - 60; // Account for close button
+    const maxTitleWidth =
+      bounds.width - INPUT_UTILITY_CONSTANTS.TOOLTIP_SHADOW_OFFSET; // Account for close button
     const truncatedTitle = this.truncateText(
       renderer,
       this.title,
@@ -5447,19 +5802,26 @@ class Drawer extends BaseObject {
     );
     renderer.fillText(
       truncatedTitle,
-      bounds.x + 16,
+      bounds.x + INPUT_UTILITY_CONSTANTS.TOOLTIP_PADDING,
       bounds.y + headerHeight / 2
     );
 
     // Enhanced close button with hover state
-    const closeButtonX = bounds.x + bounds.width - 30;
+    const closeButtonX =
+      bounds.x + bounds.width - INPUT_UTILITY_CONSTANTS.CLOSE_BUTTON_SIZE;
     const closeButtonY = bounds.y + headerHeight / 2;
 
     // Close button background (optional hover effect)
     if (this.isCloseButtonHovered) {
       renderer.fillStyle = ComponentTheme.getColor('dangerHover', this.theme);
       renderer.beginPath();
-      renderer.arc(closeButtonX, closeButtonY, 12, 0, Math.PI * 2);
+      renderer.arc(
+        closeButtonX,
+        closeButtonY,
+        INPUT_UTILITY_CONSTANTS.CLOSE_BUTTON_RADIUS,
+        0,
+        Math.PI * 2
+      );
       renderer.fill();
     }
 
@@ -5472,9 +5834,13 @@ class Drawer extends BaseObject {
   }
 
   renderContent(renderer, bounds) {
-    const contentY = bounds.y + (this.title ? 50 : 0);
-    const contentHeight = bounds.height - (this.title ? 50 : 0);
-    const padding = 16;
+    const contentY =
+      bounds.y +
+      (this.title ? INPUT_UTILITY_CONSTANTS.TOOLTIP_HEADER_HEIGHT : 0);
+    const contentHeight =
+      bounds.height -
+      (this.title ? INPUT_UTILITY_CONSTANTS.TOOLTIP_HEADER_HEIGHT : 0);
+    const padding = INPUT_UTILITY_CONSTANTS.TOOLTIP_PADDING;
 
     // Content area with theme support
     renderer.fillStyle = ComponentTheme.getColor('text', this.theme);
@@ -5490,9 +5856,12 @@ class Drawer extends BaseObject {
     lines.forEach(line => {
       const wrappedLines = this.wrapText(renderer, line, maxWidth);
       wrappedLines.forEach(wrappedLine => {
-        if (currentY + 20 <= contentY + contentHeight - padding) {
+        if (
+          currentY + INPUT_UTILITY_CONSTANTS.TOOLTIP_CONTENT_LINE_HEIGHT <=
+          contentY + contentHeight - padding
+        ) {
           renderer.fillText(wrappedLine, bounds.x + padding, currentY);
-          currentY += 20;
+          currentY += INPUT_UTILITY_CONSTANTS.TOOLTIP_CONTENT_LINE_HEIGHT;
         }
       });
     });
@@ -5501,12 +5870,15 @@ class Drawer extends BaseObject {
   renderFocusIndicator(renderer, bounds) {
     renderer.strokeStyle = ComponentTheme.getColor('focus', this.theme);
     renderer.lineWidth = 2;
-    renderer.setLineDash([3, 3]);
+    renderer.setLineDash([
+      INPUT_UTILITY_CONSTANTS.TOOLTIP_BORDER_DASH,
+      INPUT_UTILITY_CONSTANTS.TOOLTIP_BORDER_DASH,
+    ]);
     renderer.strokeRect(
-      bounds.x + 2,
-      bounds.y + 2,
-      bounds.width - 4,
-      bounds.height - 4
+      bounds.x + INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_OFFSET,
+      bounds.y + INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_OFFSET,
+      bounds.width - INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_BORDER,
+      bounds.height - INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_BORDER
     );
     renderer.setLineDash([]);
   }
@@ -5676,8 +6048,9 @@ class SearchBox extends BaseObject {
   constructor(options = {}) {
     super({
       ...options,
-      width: options.width || 300,
-      height: options.height || 40,
+      width: options.width || INPUT_UTILITY_CONSTANTS.SEARCHBOX_DEFAULT_WIDTH,
+      height:
+        options.height || INPUT_UTILITY_CONSTANTS.SEARCHBOX_DEFAULT_HEIGHT,
       ariaRole: 'searchbox',
       ariaLabel: options.ariaLabel || 'Search',
     });
@@ -5691,14 +6064,17 @@ class SearchBox extends BaseObject {
     this.disabled = options.disabled || false;
     this.showClearButton = options.showClearButton !== false;
     this.showSearchButton = options.showSearchButton !== false;
-    this.debounceDelay = options.debounceDelay || 300;
+    this.debounceDelay =
+      options.debounceDelay || INPUT_UTILITY_CONSTANTS.SEARCHBOX_DEBOUNCE_DELAY;
 
     // Search behavior
     this.searchOnType = options.searchOnType !== false;
     this.minSearchLength = options.minSearchLength || 1;
     this.suggestions = options.suggestions || [];
     this.showSuggestions = options.showSuggestions !== false;
-    this.maxSuggestions = options.maxSuggestions || 5;
+    this.maxSuggestions =
+      options.maxSuggestions ||
+      INPUT_UTILITY_CONSTANTS.SEARCHBOX_MAX_SUGGESTIONS;
     this.caseSensitive = options.caseSensitive || false;
     this.highlightMatches = options.highlightMatches !== false;
 
@@ -6058,22 +6434,31 @@ class SearchBox extends BaseObject {
       if (
         this.showClearButton &&
         this.value &&
-        localX >= this.width - 70 &&
-        localX < this.width - 45
+        localX >=
+          this.width - INPUT_UTILITY_CONSTANTS.SEARCHBOX_CLEAR_BUTTON_WIDTH &&
+        localX <
+          this.width - INPUT_UTILITY_CONSTANTS.SEARCHBOX_CLEAR_BUTTON_OFFSET
       ) {
         this.clear();
         return;
       }
 
       // Search button
-      if (this.showSearchButton && localX >= this.width - 40) {
+      if (
+        this.showSearchButton &&
+        localX >=
+          this.width - INPUT_UTILITY_CONSTANTS.SEARCHBOX_SEARCH_BUTTON_WIDTH
+      ) {
         this.performSearch();
         return;
       }
 
       // Suggestion selection
       if (this.showingSuggestions && localY > this.height) {
-        const suggestionIndex = Math.floor((localY - this.height) / 30);
+        const suggestionIndex = Math.floor(
+          (localY - this.height) /
+            INPUT_UTILITY_CONSTANTS.SEARCHBOX_SUGGESTION_HEIGHT
+        );
         if (
           suggestionIndex >= 0 &&
           suggestionIndex < this.filteredSuggestions.length
@@ -6168,7 +6553,7 @@ class SearchBox extends BaseObject {
       this.isFocused = false;
       this.clearSuggestions();
       this.emit('blur');
-    }, 150);
+    }, INPUT_UTILITY_CONSTANTS.SEARCHBOX_SUGGESTION_ANIMATION_DELAY);
   }
 
   handleFocusIn() {
@@ -6271,7 +6656,8 @@ class SearchBox extends BaseObject {
     renderer.textBaseline = 'middle';
 
     const textX = 30; // Account for search icon
-    const maxTextWidth = this.width - 80; // Account for buttons and padding
+    const maxTextWidth =
+      this.width - INPUT_UTILITY_CONSTANTS.SEARCHBOX_BUTTON_SPACING; // Account for buttons and padding
     const truncatedText = this.truncateText(
       renderer,
       displayText,
@@ -6282,7 +6668,8 @@ class SearchBox extends BaseObject {
   }
 
   renderClearButton(renderer) {
-    const buttonX = this.width - 55;
+    const buttonX =
+      this.width - INPUT_UTILITY_CONSTANTS.SEARCHBOX_BUTTON_POSITION;
     const buttonY = this.height / 2;
     const buttonRadius = 8;
 
@@ -6304,7 +6691,8 @@ class SearchBox extends BaseObject {
 
   renderSearchButton(renderer) {
     const buttonWidth = 35;
-    const buttonHeight = this.height - 4;
+    const buttonHeight =
+      this.height - INPUT_UTILITY_CONSTANTS.SEARCHBOX_BUTTON_HEIGHT_OFFSET;
     const buttonX = this.width - buttonWidth - 2;
     const buttonY = 2;
 
@@ -6333,23 +6721,37 @@ class SearchBox extends BaseObject {
     renderer.strokeStyle = ComponentTheme.getColor('focus', this.theme);
     renderer.lineWidth = 2;
     renderer.setLineDash([2, 2]);
-    renderer.strokeRect(2, 2, this.width - 4, this.height - 4);
+    renderer.strokeRect(
+      INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_OFFSET,
+      INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_OFFSET,
+      this.width - INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_BORDER,
+      this.height - INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_BORDER
+    );
     renderer.setLineDash([]);
   }
 
   renderCursor(renderer) {
     const textWidth = renderer.measureText(this.value).width;
-    const cursorX = 30 + textWidth; // Account for search icon
+    const cursorX =
+      INPUT_UTILITY_CONSTANTS.SEARCHBOX_SEARCH_ICON_OFFSET + textWidth; // Account for search icon
 
     // Animated cursor
     const time = Date.now();
-    const opacity = Math.sin(time * 0.005) * 0.5 + 0.5;
+    const opacity =
+      Math.sin(
+        time * INPUT_UTILITY_CONSTANTS.SEARCHBOX_CURSOR_BLINK_FREQUENCY
+      ) *
+        INPUT_UTILITY_CONSTANTS.SEARCHBOX_CURSOR_OPACITY_FACTOR +
+      INPUT_UTILITY_CONSTANTS.SEARCHBOX_CURSOR_OPACITY_BASE;
 
     renderer.strokeStyle = `rgba(${this.theme === 'dark' ? '255,255,255' : '0,0,0'}, ${opacity})`;
     renderer.lineWidth = 1;
     renderer.beginPath();
-    renderer.moveTo(cursorX, 8);
-    renderer.lineTo(cursorX, this.height - 8);
+    renderer.moveTo(cursorX, INPUT_UTILITY_CONSTANTS.SEARCHBOX_CURSOR_MARGIN);
+    renderer.lineTo(
+      cursorX,
+      this.height - INPUT_UTILITY_CONSTANTS.SEARCHBOX_CURSOR_MARGIN
+    );
     renderer.stroke();
   }
 
@@ -6394,7 +6796,7 @@ class SearchBox extends BaseObject {
         renderer,
         suggestion,
         this.value,
-        12,
+        INPUT_UTILITY_CONSTANTS.SEARCHBOX_SUGGESTION_ICON_OFFSET,
         y + height / 2
       );
     } else {
@@ -6422,7 +6824,11 @@ class SearchBox extends BaseObject {
       renderer.font = '12px Arial';
       renderer.textAlign = 'right';
       renderer.textBaseline = 'middle';
-      renderer.fillText('↩', this.width - 12, y + height / 2);
+      renderer.fillText(
+        '↩',
+        this.width - INPUT_UTILITY_CONSTANTS.SEARCHBOX_SUGGESTION_ICON_OFFSET,
+        y + height / 2
+      );
     }
 
     // Separator line
@@ -6471,7 +6877,12 @@ class SearchBox extends BaseObject {
 
         // Highlight background
         renderer.fillStyle = ComponentTheme.getColor('primary', this.theme);
-        renderer.fillRect(currentX, y - 8, matchWidth, 16);
+        renderer.fillRect(
+          currentX,
+          y - INPUT_UTILITY_CONSTANTS.SEARCHBOX_HIGHLIGHT_Y_OFFSET,
+          matchWidth,
+          INPUT_UTILITY_CONSTANTS.SEARCHBOX_HIGHLIGHT_HEIGHT
+        );
 
         // Match text
         renderer.fillStyle = ComponentTheme.getColor('primaryText', this.theme);

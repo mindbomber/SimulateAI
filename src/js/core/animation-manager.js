@@ -44,6 +44,22 @@ const ANIMATION_CONSTANTS = {
   MEMORY_CLEANUP_INTERVAL: 30000, // 30 seconds
   THROTTLE_DELAY: 16,
   TOUCH_GESTURE_THRESHOLD: 50,
+  PERFORMANCE_WARNING_LIMIT: 5, // Maximum performance warnings before throttling
+  PERFORMANCE_RESET_DELAY: 5000, // 5 seconds delay for performance reset
+  CLEANUP_DELAY: 1500, // 1.5 seconds delay for cleanup operations
+  PROPERTY_SIZE_MULTIPLIER: 128, // Multiplier for calculating property memory size
+  HISTORY_CUTOFF_TIME: 60000, // 1 minute in milliseconds for history cleanup
+  HEX_SHORT_LENGTH: 3, // Length of short hex color codes
+  HEX_LONG_LENGTH: 6, // Length of long hex color codes
+  HEX_SLICE_END_SHORT: 4, // End index for hex color slicing
+  TRANSITION_MIDPOINT: 0.5, // Midpoint for transitions and easings
+  SCALE_DURATION_MULTIPLIER: 0.8, // Multiplier for scale animation duration
+  REDUCED_SHAKE_COUNT: 3, // Number of shakes for reduced motion
+  NORMAL_SHAKE_COUNT: 10, // Number of shakes for normal motion
+  FADE_DURATION_MULTIPLIER: 0.5, // Multiplier for fade animation duration
+  SWIPE_DISTANCE: 50, // Distance for swipe animations
+  PINCH_IN_SCALE: 0.8, // Scale factor for pinch in gesture
+  PINCH_OUT_SCALE: 1.2, // Scale factor for pinch out gesture
 };
 
 const EASING_PRESETS = {
@@ -215,7 +231,8 @@ export class AnimationManager {
       this.setupMemoryManagement();
       this.setupEventListeners();
 
-      logger.info('Animation', 
+      logger.info(
+        'Animation',
         'Enhanced AnimationManager initialized with accessibility and performance features'
       );
     } catch (error) {
@@ -816,7 +833,10 @@ export class AnimationManager {
     }
 
     // Stop problematic animation if too many errors
-    if (animation.performanceWarnings > 5) {
+    if (
+      animation.performanceWarnings >
+      ANIMATION_CONSTANTS.PERFORMANCE_WARNING_LIMIT
+    ) {
       this.stop(animation.id);
       this.announce(
         `Animation stopped due to errors: ${animation.description || 'Unknown animation'}`
@@ -846,7 +866,7 @@ export class AnimationManager {
         setTimeout(() => {
           this.maxAnimationsPerFrame =
             ANIMATION_CONSTANTS.MAX_ANIMATIONS_PER_FRAME;
-        }, 5000);
+        }, ANIMATION_CONSTANTS.PERFORMANCE_RESET_DELAY);
         break;
     }
   }
@@ -879,20 +899,22 @@ export class AnimationManager {
       ) {
         this.accessibilityRegion.textContent = '';
       }
-    }, 1500);
+    }, ANIMATION_CONSTANTS.CLEANUP_DELAY);
   }
 
   // Memory management methods
   estimateAnimationMemory(animation) {
     // Rough estimate of animation memory usage
     const baseSize = 1024; // Base animation object
-    const propertySize = Object.keys(animation.properties).length * 128;
+    const propertySize =
+      Object.keys(animation.properties).length *
+      ANIMATION_CONSTANTS.PROPERTY_SIZE_MULTIPLIER;
     return baseSize + propertySize;
   }
 
   performMemoryCleanup() {
     // Remove old completed animations from memory
-    const cutoffTime = Date.now() - 60000; // 1 minute ago
+    const cutoffTime = Date.now() - ANIMATION_CONSTANTS.HISTORY_CUTOFF_TIME; // 1 minute ago
 
     this.animations.forEach((animation, id) => {
       if (animation.completed && animation.createdAt < cutoffTime) {
@@ -1166,18 +1188,27 @@ export class AnimationManager {
     // Simple hex color parsing
     if (color.startsWith('#')) {
       const hex = color.slice(1);
-      if (hex.length === 3) {
+      if (hex.length === ANIMATION_CONSTANTS.HEX_SHORT_LENGTH) {
         return {
           r: parseInt(hex[0] + hex[0], 16),
           g: parseInt(hex[1] + hex[1], 16),
           b: parseInt(hex[2] + hex[2], 16),
           a: 1,
         };
-      } else if (hex.length === 6) {
+      } else if (hex.length === ANIMATION_CONSTANTS.HEX_LONG_LENGTH) {
         return {
           r: parseInt(hex.slice(0, 2), 16),
-          g: parseInt(hex.slice(2, 4), 16),
-          b: parseInt(hex.slice(4, 6), 16),
+          g: parseInt(
+            hex.slice(2, ANIMATION_CONSTANTS.HEX_SLICE_END_SHORT),
+            16
+          ),
+          b: parseInt(
+            hex.slice(
+              ANIMATION_CONSTANTS.HEX_SLICE_END_SHORT,
+              ANIMATION_CONSTANTS.HEX_LONG_LENGTH
+            ),
+            16
+          ),
           a: 1,
         };
       }
@@ -1199,7 +1230,7 @@ export class AnimationManager {
   interpolateTransform(start, end, progress) {
     // Basic transform interpolation
     // In a real implementation, this would parse and interpolate transform strings
-    return progress < 0.5 ? start : end;
+    return progress < ANIMATION_CONSTANTS.TRANSITION_MIDPOINT ? start : end;
   }
 
   // Utility methods
@@ -1290,7 +1321,9 @@ export class AnimationManager {
   }
 
   scale(target, scale = 1.2, duration = null, options = {}) {
-    const actualDuration = duration || this.defaultDuration * 0.8; // Slightly faster for scale
+    const actualDuration =
+      duration ||
+      this.defaultDuration * ANIMATION_CONSTANTS.SCALE_DURATION_MULTIPLIER; // Slightly faster for scale
     const originalScale = target.scale || 1;
 
     return this.to(target, { scale }, actualDuration, {
@@ -1307,7 +1340,9 @@ export class AnimationManager {
   shake(target, intensity = 5, duration = null, options = {}) {
     const actualDuration = duration || this.defaultDuration;
     const originalX = target.x || 0;
-    const shakeCount = this.reducedMotionMode ? 3 : 10; // Fewer shakes for reduced motion
+    const shakeCount = this.reducedMotionMode
+      ? ANIMATION_CONSTANTS.REDUCED_SHAKE_COUNT
+      : ANIMATION_CONSTANTS.NORMAL_SHAKE_COUNT; // Fewer shakes for reduced motion
     const shakeDistance = this.reducedMotionMode
       ? Math.min(intensity, 2)
       : intensity;
@@ -1345,7 +1380,9 @@ export class AnimationManager {
 
   // New accessibility-focused animations
   focusHighlight(target, duration = null, options = {}) {
-    const actualDuration = duration || this.defaultDuration * 0.5;
+    const actualDuration =
+      duration ||
+      this.defaultDuration * ANIMATION_CONSTANTS.FADE_DURATION_MULTIPLIER;
 
     if (this.theme.highContrast) {
       // High contrast focus animation
@@ -1410,12 +1447,42 @@ export class AnimationManager {
   // Touch/gesture animation support
   createGestureAnimation(target, gestureType, options = {}) {
     const gestureAnimations = {
-      swipeLeft: () => this.slideIn(target, 'left', 50, null, options),
-      swipeRight: () => this.slideIn(target, 'right', 50, null, options),
-      swipeUp: () => this.slideIn(target, 'up', 50, null, options),
-      swipeDown: () => this.slideIn(target, 'down', 50, null, options),
-      pinchIn: () => this.scale(target, 0.8, null, options),
-      pinchOut: () => this.scale(target, 1.2, null, options),
+      swipeLeft: () =>
+        this.slideIn(
+          target,
+          'left',
+          ANIMATION_CONSTANTS.SWIPE_DISTANCE,
+          null,
+          options
+        ),
+      swipeRight: () =>
+        this.slideIn(
+          target,
+          'right',
+          ANIMATION_CONSTANTS.SWIPE_DISTANCE,
+          null,
+          options
+        ),
+      swipeUp: () =>
+        this.slideIn(
+          target,
+          'up',
+          ANIMATION_CONSTANTS.SWIPE_DISTANCE,
+          null,
+          options
+        ),
+      swipeDown: () =>
+        this.slideIn(
+          target,
+          'down',
+          ANIMATION_CONSTANTS.SWIPE_DISTANCE,
+          null,
+          options
+        ),
+      pinchIn: () =>
+        this.scale(target, ANIMATION_CONSTANTS.PINCH_IN_SCALE, null, options),
+      pinchOut: () =>
+        this.scale(target, ANIMATION_CONSTANTS.PINCH_OUT_SCALE, null, options),
       tap: () => this.focusHighlight(target, null, options),
     };
 

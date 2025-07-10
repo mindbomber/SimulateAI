@@ -3,6 +3,26 @@
  * Handles object hierarchy, updates, and spatial queries
  */
 
+// Animation easing constants
+const EASING_CONSTANTS = {
+  // General easing constants
+  HALF: 0.5,
+  TWO: 2,
+
+  // Bounce easing constants
+  BOUNCE_DIVISOR: 2.75,
+  BOUNCE_MULTIPLIER: 7.5625,
+  BOUNCE_THRESHOLD_1: 1,
+  BOUNCE_THRESHOLD_2: 2,
+  BOUNCE_THRESHOLD_3: 2.5,
+  BOUNCE_OFFSET_1: 1.5,
+  BOUNCE_OFFSET_2: 2.25,
+  BOUNCE_OFFSET_3: 2.625,
+  BOUNCE_VALUE_1: 0.75,
+  BOUNCE_VALUE_2: 0.9375,
+  BOUNCE_VALUE_3: 0.984375,
+};
+
 export class Scene {
   constructor() {
     this.objects = [];
@@ -423,16 +443,53 @@ export class Scene {
       case 'easeOut':
         return 1 - (1 - t) * (1 - t);
       case 'easeInOut':
-        return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        return t < EASING_CONSTANTS.HALF
+          ? EASING_CONSTANTS.TWO * t * t
+          : 1 -
+              Math.pow(
+                -EASING_CONSTANTS.TWO * t + EASING_CONSTANTS.TWO,
+                EASING_CONSTANTS.TWO
+              ) /
+                EASING_CONSTANTS.TWO;
       case 'bounce':
-        if (t < 1 / 2.75) {
-          return 7.5625 * t * t;
-        } else if (t < 2 / 2.75) {
-          return 7.5625 * (t -= 1.5 / 2.75) * t + 0.75;
-        } else if (t < 2.5 / 2.75) {
-          return 7.5625 * (t -= 2.25 / 2.75) * t + 0.9375;
+        if (
+          t <
+          EASING_CONSTANTS.BOUNCE_THRESHOLD_1 / EASING_CONSTANTS.BOUNCE_DIVISOR
+        ) {
+          return EASING_CONSTANTS.BOUNCE_MULTIPLIER * t * t;
+        } else if (
+          t <
+          EASING_CONSTANTS.BOUNCE_THRESHOLD_2 / EASING_CONSTANTS.BOUNCE_DIVISOR
+        ) {
+          return (
+            EASING_CONSTANTS.BOUNCE_MULTIPLIER *
+              (t -=
+                EASING_CONSTANTS.BOUNCE_OFFSET_1 /
+                EASING_CONSTANTS.BOUNCE_DIVISOR) *
+              t +
+            EASING_CONSTANTS.BOUNCE_VALUE_1
+          );
+        } else if (
+          t <
+          EASING_CONSTANTS.BOUNCE_THRESHOLD_3 / EASING_CONSTANTS.BOUNCE_DIVISOR
+        ) {
+          return (
+            EASING_CONSTANTS.BOUNCE_MULTIPLIER *
+              (t -=
+                EASING_CONSTANTS.BOUNCE_OFFSET_2 /
+                EASING_CONSTANTS.BOUNCE_DIVISOR) *
+              t +
+            EASING_CONSTANTS.BOUNCE_VALUE_2
+          );
         } else {
-          return 7.5625 * (t -= 2.625 / 2.75) * t + 0.984375;
+          return (
+            EASING_CONSTANTS.BOUNCE_MULTIPLIER *
+              (t -=
+                EASING_CONSTANTS.BOUNCE_OFFSET_3 /
+                EASING_CONSTANTS.BOUNCE_DIVISOR) *
+              t +
+            EASING_CONSTANTS.BOUNCE_VALUE_3
+          );
         }
       default:
         return t;

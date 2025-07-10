@@ -3,6 +3,36 @@
  * Extends existing platform with comprehensive educational infrastructure
  */
 
+// Constants to avoid magic numbers
+const LAB_CONSTANTS = {
+  DURATIONS: {
+    SHORT_SESSION: '20 minutes',
+    MEDIUM_SESSION: '30 minutes',
+    LONG_SESSION: '40 minutes',
+    EXTENDED_SESSION: '45-60 minutes',
+    FULL_LAB_SESSION: '90-120 minutes',
+    PRESENTATION_TIME: '10-minute presentation',
+  },
+  EXPERIMENT_STEPS: {
+    STEP_1: 1,
+    STEP_2: 2,
+    STEP_3: 3,
+    STEP_4: 4,
+  },
+  ASSESSMENT_WEIGHTS: {
+    UNDERSTANDING: 0.3,
+    CRITICAL_THINKING: 0.25,
+    COLLABORATION: 0.25,
+    COMMUNICATION: 0.2,
+  },
+  PROJECT_TIMELINE: {
+    WEEK_DURATION: '1 week',
+  },
+  ARRAY_THRESHOLDS: {
+    EMPTY_LENGTH: 0,
+  },
+};
+
 class DigitalScienceLab {
   constructor() {
     this.labStations = new Map();
@@ -124,7 +154,7 @@ class DigitalScienceLab {
     this.experiments.set('dataset-bias-detection', {
       title: 'Uncovering Hidden Bias in Training Data',
       difficulty: 'intermediate',
-      duration: '45-60 minutes',
+      duration: LAB_CONSTANTS.DURATIONS.EXTENDED_SESSION,
       materials: [
         'Simulated datasets',
         'Analysis tools',
@@ -133,7 +163,7 @@ class DigitalScienceLab {
 
       procedure: [
         {
-          step: 1,
+          step: LAB_CONSTANTS.EXPERIMENT_STEPS.STEP_1,
           title: 'Data Exploration',
           description: 'Examine the composition of different datasets',
           activity:
@@ -145,7 +175,7 @@ class DigitalScienceLab {
           ],
         },
         {
-          step: 2,
+          step: LAB_CONSTANTS.EXPERIMENT_STEPS.STEP_2,
           title: 'Bias Identification',
           description: 'Apply bias detection techniques',
           activity: 'Run automated bias detection algorithms',
@@ -156,7 +186,7 @@ class DigitalScienceLab {
           ],
         },
         {
-          step: 3,
+          step: LAB_CONSTANTS.EXPERIMENT_STEPS.STEP_3,
           title: 'Impact Analysis',
           description: 'Predict real-world consequences',
           activity: 'Model outcomes for different groups',
@@ -167,7 +197,7 @@ class DigitalScienceLab {
           ],
         },
         {
-          step: 4,
+          step: LAB_CONSTANTS.EXPERIMENT_STEPS.STEP_4,
           title: 'Mitigation Strategies',
           description: 'Develop approaches to reduce bias',
           activity: 'Test different bias reduction techniques',
@@ -203,7 +233,7 @@ class DigitalScienceLab {
     this.experiments.set('stakeholder-impact-simulation', {
       title: 'Multi-Stakeholder AI Impact Simulation',
       difficulty: 'advanced',
-      duration: '90-120 minutes',
+      duration: LAB_CONSTANTS.DURATIONS.FULL_LAB_SESSION,
       materials: [
         'Role-playing cards',
         'Impact simulation software',
@@ -251,26 +281,26 @@ class DigitalScienceLab {
       phases: [
         {
           phase: 'Stakeholder Research',
-          duration: '20 minutes',
+          duration: LAB_CONSTANTS.DURATIONS.SHORT_SESSION,
           activity: 'Each group researches their stakeholder perspective',
           deliverable: 'Stakeholder profile and key concerns',
         },
         {
           phase: 'System Design Proposals',
-          duration: '30 minutes',
+          duration: LAB_CONSTANTS.DURATIONS.MEDIUM_SESSION,
           activity:
             'Groups propose AI system designs that benefit their stakeholder',
           deliverable: 'Design proposal with justification',
         },
         {
           phase: 'Cross-Stakeholder Negotiation',
-          duration: '40 minutes',
+          duration: LAB_CONSTANTS.DURATIONS.LONG_SESSION,
           activity: 'Facilitated negotiation to find acceptable compromise',
           deliverable: 'Negotiated system design',
         },
         {
           phase: 'Impact Evaluation',
-          duration: '20 minutes',
+          duration: LAB_CONSTANTS.DURATIONS.SHORT_SESSION,
           activity: 'Evaluate final design against all stakeholder needs',
           deliverable: 'Impact assessment matrix',
         },
@@ -336,7 +366,7 @@ class DigitalScienceLab {
         {
           name: 'Scenario Analysis Collection',
           description: 'Student responses to various ethical scenarios',
-          weight: 0.3,
+          weight: LAB_CONSTANTS.ASSESSMENT_WEIGHTS.UNDERSTANDING,
           criteria: [
             'Depth of analysis',
             'Stakeholder consideration',
@@ -346,7 +376,7 @@ class DigitalScienceLab {
         {
           name: 'Bias Investigation Project',
           description: 'In-depth study of bias in a chosen AI application',
-          weight: 0.25,
+          weight: LAB_CONSTANTS.ASSESSMENT_WEIGHTS.CRITICAL_THINKING,
           criteria: [
             'Research quality',
             'Analysis rigor',
@@ -356,7 +386,7 @@ class DigitalScienceLab {
         {
           name: 'Collaborative Design Challenge',
           description: 'Group project to design ethical AI system',
-          weight: 0.25,
+          weight: LAB_CONSTANTS.ASSESSMENT_WEIGHTS.COLLABORATION,
           criteria: [
             'Technical feasibility',
             'Ethical integration',
@@ -366,7 +396,7 @@ class DigitalScienceLab {
         {
           name: 'Reflection Essays',
           description: 'Personal growth and learning reflections',
-          weight: 0.2,
+          weight: LAB_CONSTANTS.ASSESSMENT_WEIGHTS.COMMUNICATION,
           criteria: [
             'Self-awareness',
             'Growth documentation',
@@ -395,7 +425,7 @@ class DigitalScienceLab {
             'Stakeholder presentation',
             'Policy recommendations',
           ],
-          timeframe: '1 week',
+          timeframe: LAB_CONSTANTS.PROJECT_TIMELINE.WEEK_DURATION,
           evaluation:
             'Expert panel review (teachers, industry professionals, ethicists)',
         },
@@ -404,7 +434,7 @@ class DigitalScienceLab {
           description:
             'Student presents testimony on AI ethics to mock legislative committee',
           preparation: 'Research current AI regulation proposals',
-          performance: '10-minute presentation followed by Q&A',
+          performance: `${LAB_CONSTANTS.DURATIONS.PRESENTATION_TIME} followed by Q&A`,
           audience:
             'Peers role-playing legislators, advocacy groups, industry representatives',
         },
@@ -585,7 +615,9 @@ class DigitalScienceLab {
       }
     }
 
-    return relevantStations.length > 0 ? relevantStations : null;
+    return relevantStations.length > LAB_CONSTANTS.ARRAY_THRESHOLDS.EMPTY_LENGTH
+      ? relevantStations
+      : null;
   }
 
   /**

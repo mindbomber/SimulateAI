@@ -8,6 +8,116 @@ import logger from '../utils/logger.js';
 
 import { BaseObject } from './enhanced-objects.js';
 
+// Constants to eliminate magic numbers
+const LAYOUT_COMPONENT_CONSTANTS = {
+  // Animation easing constants
+  EASING_HALF_POINT: 0.5,
+  EASING_CURVE_FACTOR: 4,
+  EASING_CUBIC_POWER: 3,
+
+  // Bounce animation constants
+  BOUNCE_DIVISOR: 2.75,
+  BOUNCE_MULTIPLIER: 7.5625,
+  BOUNCE_THRESHOLD_1: 1.5,
+  BOUNCE_THRESHOLD_2: 2.25,
+  BOUNCE_THRESHOLD_3: 2.625,
+  BOUNCE_OFFSET_1: 0.75,
+  BOUNCE_OFFSET_2: 0.9375,
+  BOUNCE_OFFSET_3: 0.984375,
+  BOUNCE_RANGE_1: 2.5,
+
+  // Memory and performance constants
+  MEMORY_WARNING_MB: 50,
+  BYTES_PER_KB: 1024,
+
+  // TabContainer constants
+  TAB_CONTAINER_DEFAULT_WIDTH: 600,
+  TAB_CONTAINER_DEFAULT_HEIGHT: 400,
+  TAB_DEFAULT_HEIGHT: 40,
+  TAB_MAX_DEFAULT: 20,
+  TAB_MIN_HEIGHT: 20,
+  TAB_CLOSE_BUTTON_SIZE: 20,
+  TAB_CLOSE_BUTTON_OFFSET: 15,
+  TAB_BADGE_OFFSET: 35,
+  TAB_BADGE_Y_OFFSET: 5,
+  TAB_BADGE_RADIUS: 8,
+  TAB_ICON_OFFSET: 20,
+  TAB_TEXT_PADDING: 30,
+  TAB_CONTENT_PADDING: 20,
+  TAB_BORDER_OFFSET: 3,
+  TAB_BORDER_WIDTH: 3,
+
+  // Animation scale constants
+  ANIMATION_SCALE_MIN: 0.8,
+  ANIMATION_SCALE_RANGE: 0.2,
+  ANIMATION_FADE_DIVISOR: 2,
+  ANIMATION_FADE_OFFSET: 0.5,
+
+  // ProgressStepper constants
+  PROGRESS_STEPPER_DEFAULT_WIDTH: 600,
+  PROGRESS_STEPPER_DEFAULT_HEIGHT: 80,
+  PROGRESS_STEP_CENTER_OFFSET: 0.5,
+  PROGRESS_LIGHTEN_FACTOR: 0.1,
+  PROGRESS_RADIUS_OFFSET: 4,
+  PROGRESS_SCALE_FACTOR: 0.2,
+  PROGRESS_RADIUS_PADDING: 25,
+  PROGRESS_CIRCLE_BORDER: 3,
+  PROGRESS_TEXT_OFFSET_X: 15,
+  PROGRESS_TEXT_OFFSET_Y: 5,
+  PROGRESS_DESCRIPTION_Y_OFFSET: 20,
+
+  // Color manipulation constants
+  COLOR_MAX_VALUE: 255,
+  COLOR_RED_SHIFT: 16,
+  COLOR_GREEN_SHIFT: 8,
+  COLOR_GREEN_MASK: 0x00ff,
+  COLOR_BLUE_MASK: 0x0000ff,
+
+  // SplitPane constants
+  SPLIT_PANE_DEFAULT_WIDTH: 600,
+  SPLIT_PANE_DEFAULT_HEIGHT: 400,
+  SPLIT_MIN_RATIO: 0.1,
+  SPLIT_MAX_RATIO: 0.9,
+  SPLIT_DEFAULT_RATIO: 0.5,
+  SPLIT_MIN_SIZE: 50,
+  SPLIT_SPLITTER_SIZE: 6,
+  SPLIT_KEYBOARD_ADJUSTMENT: 0.05,
+  SPLIT_COLLAPSED_RATIO: 0.05,
+  SPLIT_EXPANDED_RATIO: 0.95,
+  SPLIT_CENTER_THRESHOLD: 0.5,
+
+  // TreeView constants
+  TREE_VIEW_DEFAULT_WIDTH: 300,
+  TREE_VIEW_DEFAULT_HEIGHT: 400,
+  TREE_INDENT_SIZE: 20,
+  TREE_GRIP_SPACING: 4,
+  TREE_GRIP_SIZE: 3,
+  TREE_DASH_SIZE: 3,
+  TREE_SELECTION_PADDING: 4,
+  TREE_NODE_HEIGHT: 24,
+  TREE_MIN_NODE_HEIGHT: 16,
+  TREE_EXPAND_AREA_SIZE: 16,
+  TREE_TEXT_OFFSET: 20,
+  TREE_ICON_OFFSET: 4,
+  TREE_FOCUS_BORDER_OFFSET: 4,
+  TREE_SCROLLBAR_MIN_HEIGHT: 20,
+
+  // FileUpload constants
+  FILE_UPLOAD_DEFAULT_WIDTH: 400,
+  FILE_UPLOAD_DEFAULT_HEIGHT: 200,
+  FILE_UPLOAD_MAX_SIZE_MB: 10,
+  FILE_UPLOAD_BYTES_PER_KB: 1024,
+  FILE_UPLOAD_PROGRESS_INCREMENT: 0.1,
+  FILE_UPLOAD_DASH_SIZE: 5,
+  FILE_UPLOAD_ICON_Y_OFFSET: 30,
+  FILE_UPLOAD_BUTTON_Y_OFFSET: 30,
+  FILE_UPLOAD_FILE_NAME_X: 35,
+  FILE_UPLOAD_SIZE_TEXT_OFFSET: 50,
+  FILE_UPLOAD_REMOVE_BUTTON_OFFSET: 20,
+  FILE_UPLOAD_PROGRESS_MARGIN: 20,
+  FILE_UPLOAD_PROGRESS_TEXT_Y_OFFSET: 5,
+};
+
 // =============================================================================
 // MODERN INFRASTRUCTURE FOR LAYOUT COMPONENTS
 // =============================================================================
@@ -368,13 +478,45 @@ class AnimationManager {
       linear: t => t,
       easeIn: t => t * t,
       easeOut: t => 1 - Math.pow(1 - t, 2),
-      easeInOut: t => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
-      easeOutCubic: t => 1 - Math.pow(1 - t, 3),
+      easeInOut: t =>
+        t < LAYOUT_COMPONENT_CONSTANTS.EASING_HALF_POINT
+          ? 2 * t * t
+          : -1 + (LAYOUT_COMPONENT_CONSTANTS.EASING_CURVE_FACTOR - 2 * t) * t,
+      easeOutCubic: t =>
+        1 - Math.pow(1 - t, LAYOUT_COMPONENT_CONSTANTS.EASING_CUBIC_POWER),
       bounce: t => {
-        if (t < 1 / 2.75) return 7.5625 * t * t;
-        if (t < 2 / 2.75) return 7.5625 * (t -= 1.5 / 2.75) * t + 0.75;
-        if (t < 2.5 / 2.75) return 7.5625 * (t -= 2.25 / 2.75) * t + 0.9375;
-        return 7.5625 * (t -= 2.625 / 2.75) * t + 0.984375;
+        if (t < 1 / LAYOUT_COMPONENT_CONSTANTS.BOUNCE_DIVISOR)
+          return LAYOUT_COMPONENT_CONSTANTS.BOUNCE_MULTIPLIER * t * t;
+        if (t < 2 / LAYOUT_COMPONENT_CONSTANTS.BOUNCE_DIVISOR)
+          return (
+            LAYOUT_COMPONENT_CONSTANTS.BOUNCE_MULTIPLIER *
+              (t -=
+                LAYOUT_COMPONENT_CONSTANTS.BOUNCE_THRESHOLD_1 /
+                LAYOUT_COMPONENT_CONSTANTS.BOUNCE_DIVISOR) *
+              t +
+            LAYOUT_COMPONENT_CONSTANTS.BOUNCE_OFFSET_1
+          );
+        if (
+          t <
+          LAYOUT_COMPONENT_CONSTANTS.BOUNCE_RANGE_1 /
+            LAYOUT_COMPONENT_CONSTANTS.BOUNCE_DIVISOR
+        )
+          return (
+            LAYOUT_COMPONENT_CONSTANTS.BOUNCE_MULTIPLIER *
+              (t -=
+                LAYOUT_COMPONENT_CONSTANTS.BOUNCE_THRESHOLD_2 /
+                LAYOUT_COMPONENT_CONSTANTS.BOUNCE_DIVISOR) *
+              t +
+            LAYOUT_COMPONENT_CONSTANTS.BOUNCE_OFFSET_2
+          );
+        return (
+          LAYOUT_COMPONENT_CONSTANTS.BOUNCE_MULTIPLIER *
+            (t -=
+              LAYOUT_COMPONENT_CONSTANTS.BOUNCE_THRESHOLD_3 /
+              LAYOUT_COMPONENT_CONSTANTS.BOUNCE_DIVISOR) *
+            t +
+          LAYOUT_COMPONENT_CONSTANTS.BOUNCE_OFFSET_3
+        );
       },
     };
 
@@ -405,7 +547,10 @@ const ANIMATION_DEFAULTS = {
 const PERFORMANCE_THRESHOLDS = {
   renderTime: 16, // 60fps target
   eventThrottle: 16,
-  memoryWarning: 50 * 1024 * 1024, // 50MB
+  memoryWarning:
+    LAYOUT_COMPONENT_CONSTANTS.MEMORY_WARNING_MB *
+    LAYOUT_COMPONENT_CONSTANTS.BYTES_PER_KB *
+    LAYOUT_COMPONENT_CONSTANTS.BYTES_PER_KB, // 50MB
 };
 
 // =============================================================================
@@ -420,8 +565,11 @@ class TabContainer extends BaseObject {
   constructor(options = {}) {
     super({
       ...options,
-      width: options.width || 600,
-      height: options.height || 400,
+      width:
+        options.width || LAYOUT_COMPONENT_CONSTANTS.TAB_CONTAINER_DEFAULT_WIDTH,
+      height:
+        options.height ||
+        LAYOUT_COMPONENT_CONSTANTS.TAB_CONTAINER_DEFAULT_HEIGHT,
       ariaRole: 'tablist',
       ariaLabel: options.ariaLabel || 'Tab Container',
     });
@@ -432,10 +580,12 @@ class TabContainer extends BaseObject {
     // Core properties
     this.tabs = options.tabs || [];
     this.activeTabIndex = options.activeTab || 0;
-    this.tabHeight = options.tabHeight || 40;
+    this.tabHeight =
+      options.tabHeight || LAYOUT_COMPONENT_CONSTANTS.TAB_DEFAULT_HEIGHT;
     this.closeable = options.closeable !== false;
     this.reorderable = options.reorderable !== false;
-    this.maxTabs = options.maxTabs || 20;
+    this.maxTabs =
+      options.maxTabs || LAYOUT_COMPONENT_CONSTANTS.TAB_MAX_DEFAULT;
     this.disabled = options.disabled || false;
 
     // Theme integration
@@ -492,10 +642,11 @@ class TabContainer extends BaseObject {
 
     if (
       options.tabHeight &&
-      (typeof options.tabHeight !== 'number' || options.tabHeight < 20)
+      (typeof options.tabHeight !== 'number' ||
+        options.tabHeight < LAYOUT_COMPONENT_CONSTANTS.TAB_MIN_HEIGHT)
     ) {
       throw new ComponentError(
-        'tabHeight must be at least 20 pixels',
+        `tabHeight must be at least ${LAYOUT_COMPONENT_CONSTANTS.TAB_MIN_HEIGHT} pixels`,
         'TabContainer'
       );
     }
@@ -841,7 +992,13 @@ class TabContainer extends BaseObject {
         const tabBounds = this.getTabBounds(tabIndex);
 
         // Check if clicking close button
-        if (tab.closeable && localX >= tabBounds.x + tabBounds.width - 20) {
+        if (
+          tab.closeable &&
+          localX >=
+            tabBounds.x +
+              tabBounds.width -
+              LAYOUT_COMPONENT_CONSTANTS.TAB_CLOSE_BUTTON_SIZE
+        ) {
           this.removeTab(tabIndex);
         } else if (!tab.disabled) {
           this.setActiveTab(tabIndex);
@@ -987,9 +1144,11 @@ class TabContainer extends BaseObject {
         renderer.fillStyle = '#007bff';
         renderer.fillRect(
           bounds.x,
-          bounds.y + bounds.height - 3,
+          bounds.y +
+            bounds.height -
+            LAYOUT_COMPONENT_CONSTANTS.TAB_BORDER_OFFSET,
           bounds.width,
-          3
+          LAYOUT_COMPONENT_CONSTANTS.TAB_BORDER_WIDTH
         );
       }
 
@@ -1003,7 +1162,7 @@ class TabContainer extends BaseObject {
         renderer.font = '14px Arial';
         renderer.textAlign = 'left';
         renderer.fillText(tab.icon, textX, bounds.y + bounds.height / 2 + 2);
-        textX += 20;
+        textX += LAYOUT_COMPONENT_CONSTANTS.TAB_ICON_OFFSET;
       }
 
       // Title
@@ -1011,7 +1170,10 @@ class TabContainer extends BaseObject {
       renderer.font = isActive ? 'bold 12px Arial' : '12px Arial';
       renderer.textAlign = 'left';
       renderer.textBaseline = 'middle';
-      const maxTextWidth = bounds.width - (textX - bounds.x) - 30;
+      const maxTextWidth =
+        bounds.width -
+        (textX - bounds.x) -
+        LAYOUT_COMPONENT_CONSTANTS.TAB_TEXT_PADDING;
       let { title } = tab;
       const titleWidth = renderer.measureText(title).width;
       if (titleWidth > maxTextWidth) {
@@ -1040,12 +1202,19 @@ class TabContainer extends BaseObject {
 
       // Badge
       if (tab.badge) {
-        const badgeX = bounds.x + bounds.width - 35;
-        const badgeY = bounds.y + 5;
+        const badgeX =
+          bounds.x + bounds.width - LAYOUT_COMPONENT_CONSTANTS.TAB_BADGE_OFFSET;
+        const badgeY = bounds.y + LAYOUT_COMPONENT_CONSTANTS.TAB_BADGE_Y_OFFSET;
 
         renderer.fillStyle = '#dc3545';
         renderer.beginPath();
-        renderer.arc(badgeX, badgeY, 8, 0, Math.PI * 2);
+        renderer.arc(
+          badgeX,
+          badgeY,
+          LAYOUT_COMPONENT_CONSTANTS.TAB_BADGE_RADIUS,
+          0,
+          Math.PI * 2
+        );
         renderer.fill();
 
         renderer.fillStyle = '#ffffff';
@@ -1056,7 +1225,10 @@ class TabContainer extends BaseObject {
 
       // Close button
       if (tab.closeable) {
-        const closeX = bounds.x + bounds.width - 15;
+        const closeX =
+          bounds.x +
+          bounds.width -
+          LAYOUT_COMPONENT_CONSTANTS.TAB_CLOSE_BUTTON_OFFSET;
         const closeY = bounds.y + bounds.height / 2;
 
         renderer.fillStyle = isHovered ? '#dc3545' : '#666666';
@@ -1089,7 +1261,11 @@ class TabContainer extends BaseObject {
         renderer.font = '14px Arial';
         renderer.textAlign = 'left';
         renderer.textBaseline = 'top';
-        renderer.fillText(activeTab.content, 20, contentY + 20);
+        renderer.fillText(
+          activeTab.content,
+          LAYOUT_COMPONENT_CONSTANTS.TAB_CONTENT_PADDING,
+          contentY + LAYOUT_COMPONENT_CONSTANTS.TAB_CONTENT_PADDING
+        );
       }
       // If content is a component/object, it should render itself
     }
@@ -1104,7 +1280,9 @@ class TabContainer extends BaseObject {
         this.animationState.tabTransitions.set(index, {
           type: 'insert',
           progress,
-          scale: 0.8 + 0.2 * progress,
+          scale:
+            LAYOUT_COMPONENT_CONSTANTS.ANIMATION_SCALE_MIN +
+            LAYOUT_COMPONENT_CONSTANTS.ANIMATION_SCALE_RANGE * progress,
           opacity: progress,
         });
         this.invalidate();
@@ -1127,7 +1305,8 @@ class TabContainer extends BaseObject {
         this.animationState.tabTransitions.set(index, {
           type: 'remove',
           progress: 1 - progress,
-          scale: 1 - 0.2 * progress,
+          scale:
+            1 - LAYOUT_COMPONENT_CONSTANTS.ANIMATION_SCALE_RANGE * progress,
           opacity: 1 - progress,
         });
         this.invalidate();
@@ -1150,7 +1329,10 @@ class TabContainer extends BaseObject {
       easing: 'easeInOutCubic',
       onUpdate: progress => {
         this.animationState.contentFade =
-          progress < 0.5 ? 1 - progress * 2 : (progress - 0.5) * 2;
+          progress < LAYOUT_COMPONENT_CONSTANTS.ANIMATION_FADE_OFFSET
+            ? 1 - progress * LAYOUT_COMPONENT_CONSTANTS.ANIMATION_FADE_DIVISOR
+            : (progress - LAYOUT_COMPONENT_CONSTANTS.ANIMATION_FADE_OFFSET) *
+              LAYOUT_COMPONENT_CONSTANTS.ANIMATION_FADE_DIVISOR;
         this.invalidate();
       },
       onComplete: () => {
@@ -1335,8 +1517,12 @@ class ProgressStepper extends BaseObject {
   constructor(options = {}) {
     super({
       ...options,
-      width: options.width || 600,
-      height: options.height || 80,
+      width:
+        options.width ||
+        LAYOUT_COMPONENT_CONSTANTS.PROGRESS_STEPPER_DEFAULT_WIDTH,
+      height:
+        options.height ||
+        LAYOUT_COMPONENT_CONSTANTS.PROGRESS_STEPPER_DEFAULT_HEIGHT,
       ariaRole: 'progressbar',
       ariaLabel: options.ariaLabel || 'Progress Steps',
     });
@@ -1727,7 +1913,10 @@ class ProgressStepper extends BaseObject {
           type: 'complete',
           index,
           progress,
-          scale: 1 + 0.2 * Math.sin(progress * Math.PI),
+          scale:
+            1 +
+            LAYOUT_COMPONENT_CONSTANTS.PROGRESS_SCALE_FACTOR *
+              Math.sin(progress * Math.PI),
         });
         this.invalidate();
       },
@@ -1957,7 +2146,9 @@ class ProgressStepper extends BaseObject {
 
     // Draw steps with enhanced visual effects
     this.steps.forEach((step, index) => {
-      const centerX = (index + 0.5) * stepWidth;
+      const centerX =
+        (index + LAYOUT_COMPONENT_CONSTANTS.PROGRESS_STEP_CENTER_OFFSET) *
+        stepWidth;
       const status = this.getStepStatus(index);
       const isHovered = index === this.hoveredStepIndex;
       const isFocused = index === this.focusedStepIndex;
@@ -1998,7 +2189,10 @@ class ProgressStepper extends BaseObject {
 
       // Hover and focus effects
       if (isHovered && !step.disabled) {
-        fillColor = this.lightenColor(fillColor, 0.1);
+        fillColor = this.lightenColor(
+          fillColor,
+          LAYOUT_COMPONENT_CONSTANTS.PROGRESS_LIGHTEN_FACTOR
+        );
       }
 
       // Focus ring
@@ -2006,7 +2200,13 @@ class ProgressStepper extends BaseObject {
         renderer.strokeStyle = theme.focus;
         renderer.lineWidth = 3;
         renderer.beginPath();
-        renderer.arc(centerX, centerY, currentRadius + 4, 0, Math.PI * 2);
+        renderer.arc(
+          centerX,
+          centerY,
+          currentRadius + LAYOUT_COMPONENT_CONSTANTS.PROGRESS_RADIUS_OFFSET,
+          0,
+          Math.PI * 2
+        );
         renderer.stroke();
       }
 
@@ -2070,7 +2270,9 @@ class ProgressStepper extends BaseObject {
           renderer.fillText(
             '(optional)',
             centerX,
-            centerY + currentRadius + 25
+            centerY +
+              currentRadius +
+              LAYOUT_COMPONENT_CONSTANTS.PROGRESS_RADIUS_PADDING
           );
         }
       }
@@ -2103,7 +2305,9 @@ class ProgressStepper extends BaseObject {
 
     // Draw steps
     this.steps.forEach((step, index) => {
-      const centerY = (index + 0.5) * stepHeight;
+      const centerY =
+        (index + LAYOUT_COMPONENT_CONSTANTS.PROGRESS_STEP_CENTER_OFFSET) *
+        stepHeight;
       const status = this.getStepStatus(index);
       const isHovered = index === this.hoveredStepIndex;
       const isFocused = index === this.focusedStepIndex;
@@ -2132,7 +2336,10 @@ class ProgressStepper extends BaseObject {
       }
 
       if (isHovered && !step.disabled) {
-        fillColor = this.lightenColor(fillColor, 0.1);
+        fillColor = this.lightenColor(
+          fillColor,
+          LAYOUT_COMPONENT_CONSTANTS.PROGRESS_LIGHTEN_FACTOR
+        );
       }
 
       // Focus ring
@@ -2140,7 +2347,13 @@ class ProgressStepper extends BaseObject {
         renderer.strokeStyle = theme.focus;
         renderer.lineWidth = 3;
         renderer.beginPath();
-        renderer.arc(centerX, centerY, circleRadius + 3, 0, Math.PI * 2);
+        renderer.arc(
+          centerX,
+          centerY,
+          circleRadius + LAYOUT_COMPONENT_CONSTANTS.PROGRESS_CIRCLE_BORDER,
+          0,
+          Math.PI * 2
+        );
         renderer.stroke();
       }
 
@@ -2175,14 +2388,22 @@ class ProgressStepper extends BaseObject {
         renderer.font = status === 'active' ? 'bold 12px Arial' : '12px Arial';
         renderer.textAlign = 'left';
         renderer.textBaseline = 'middle';
-        renderer.fillText(step.title, centerX + circleRadius + 15, centerY - 5);
+        renderer.fillText(
+          step.title,
+          centerX +
+            circleRadius +
+            LAYOUT_COMPONENT_CONSTANTS.PROGRESS_TEXT_OFFSET_X,
+          centerY - LAYOUT_COMPONENT_CONSTANTS.PROGRESS_TEXT_OFFSET_Y
+        );
 
         if (step.description) {
           renderer.fillStyle = theme.textSecondary;
           renderer.font = '10px Arial';
           renderer.fillText(
             step.description,
-            centerX + circleRadius + 15,
+            centerX +
+              circleRadius +
+              LAYOUT_COMPONENT_CONSTANTS.PROGRESS_TEXT_OFFSET_X,
             centerY + 10
           );
         }
@@ -2192,8 +2413,10 @@ class ProgressStepper extends BaseObject {
           renderer.font = 'italic 9px Arial';
           renderer.fillText(
             '(optional)',
-            centerX + circleRadius + 15,
-            centerY + 20
+            centerX +
+              circleRadius +
+              LAYOUT_COMPONENT_CONSTANTS.PROGRESS_TEXT_OFFSET_X,
+            centerY + LAYOUT_COMPONENT_CONSTANTS.PROGRESS_DESCRIPTION_Y_OFFSET
           );
         }
       }
@@ -2203,9 +2426,28 @@ class ProgressStepper extends BaseObject {
   // Utility methods
   lightenColor(color, amount) {
     const num = parseInt(color.replace('#', ''), 16);
-    const r = Math.min(255, Math.floor((num >> 16) + amount * 255));
-    const g = Math.min(255, Math.floor(((num >> 8) & 0x00ff) + amount * 255));
-    const b = Math.min(255, Math.floor((num & 0x0000ff) + amount * 255));
+    const r = Math.min(
+      LAYOUT_COMPONENT_CONSTANTS.COLOR_MAX_VALUE,
+      Math.floor(
+        (num >> LAYOUT_COMPONENT_CONSTANTS.COLOR_RED_SHIFT) +
+          amount * LAYOUT_COMPONENT_CONSTANTS.COLOR_MAX_VALUE
+      )
+    );
+    const g = Math.min(
+      LAYOUT_COMPONENT_CONSTANTS.COLOR_MAX_VALUE,
+      Math.floor(
+        ((num >> LAYOUT_COMPONENT_CONSTANTS.COLOR_GREEN_SHIFT) &
+          LAYOUT_COMPONENT_CONSTANTS.COLOR_GREEN_MASK) +
+          amount * LAYOUT_COMPONENT_CONSTANTS.COLOR_MAX_VALUE
+      )
+    );
+    const b = Math.min(
+      LAYOUT_COMPONENT_CONSTANTS.COLOR_MAX_VALUE,
+      Math.floor(
+        (num & LAYOUT_COMPONENT_CONSTANTS.COLOR_BLUE_MASK) +
+          amount * LAYOUT_COMPONENT_CONSTANTS.COLOR_MAX_VALUE
+      )
+    );
     return `rgb(${r}, ${g}, ${b})`;
   }
 
@@ -2400,8 +2642,10 @@ class SplitPane extends BaseObject {
   constructor(options = {}) {
     super({
       ...options,
-      width: options.width || 600,
-      height: options.height || 400,
+      width:
+        options.width || LAYOUT_COMPONENT_CONSTANTS.SPLIT_PANE_DEFAULT_WIDTH,
+      height:
+        options.height || LAYOUT_COMPONENT_CONSTANTS.SPLIT_PANE_DEFAULT_HEIGHT,
       ariaRole: 'separator',
       ariaLabel: options.ariaLabel || 'Split Pane',
     });
@@ -2411,9 +2655,16 @@ class SplitPane extends BaseObject {
 
     // Core properties
     this.orientation = options.orientation || 'horizontal';
-    this.split = Math.max(0.1, Math.min(0.9, options.split || 0.5));
-    this.minSize = options.minSize || 50;
-    this.splitterSize = options.splitterSize || 6;
+    this.split = Math.max(
+      LAYOUT_COMPONENT_CONSTANTS.SPLIT_MIN_RATIO,
+      Math.min(
+        LAYOUT_COMPONENT_CONSTANTS.SPLIT_MAX_RATIO,
+        options.split || LAYOUT_COMPONENT_CONSTANTS.SPLIT_DEFAULT_RATIO
+      )
+    );
+    this.minSize = options.minSize || LAYOUT_COMPONENT_CONSTANTS.SPLIT_MIN_SIZE;
+    this.splitterSize =
+      options.splitterSize || LAYOUT_COMPONENT_CONSTANTS.SPLIT_SPLITTER_SIZE;
     this.resizable = options.resizable !== false;
     this.collapsible = options.collapsible || false;
     this.disabled = options.disabled || false;
@@ -2515,12 +2766,16 @@ class SplitPane extends BaseObject {
 
   createKeyboardHandler() {
     return {
-      ArrowLeft: () => this.adjustSplit(-0.05),
-      ArrowRight: () => this.adjustSplit(0.05),
-      ArrowUp: () => this.adjustSplit(-0.05),
-      ArrowDown: () => this.adjustSplit(0.05),
-      Home: () => this.setSplit(0.1),
-      End: () => this.setSplit(0.9),
+      ArrowLeft: () =>
+        this.adjustSplit(-LAYOUT_COMPONENT_CONSTANTS.SPLIT_KEYBOARD_ADJUSTMENT),
+      ArrowRight: () =>
+        this.adjustSplit(LAYOUT_COMPONENT_CONSTANTS.SPLIT_KEYBOARD_ADJUSTMENT),
+      ArrowUp: () =>
+        this.adjustSplit(-LAYOUT_COMPONENT_CONSTANTS.SPLIT_KEYBOARD_ADJUSTMENT),
+      ArrowDown: () =>
+        this.adjustSplit(LAYOUT_COMPONENT_CONSTANTS.SPLIT_KEYBOARD_ADJUSTMENT),
+      Home: () => this.setSplit(LAYOUT_COMPONENT_CONSTANTS.SPLIT_MIN_RATIO),
+      End: () => this.setSplit(LAYOUT_COMPONENT_CONSTANTS.SPLIT_MAX_RATIO),
       Enter: () => this.toggleCollapse(),
       Space: () => this.toggleCollapse(),
       Escape: () => this.handleEscape(),
@@ -2548,7 +2803,10 @@ class SplitPane extends BaseObject {
     switch (context) {
       case 'resize':
         this.isResizing = false;
-        this.split = Math.max(0.1, Math.min(0.9, this.split));
+        this.split = Math.max(
+          LAYOUT_COMPONENT_CONSTANTS.SPLIT_MIN_RATIO,
+          Math.min(LAYOUT_COMPONENT_CONSTANTS.SPLIT_MAX_RATIO, this.split)
+        );
         break;
       case 'animation':
         this.animationState.splitTransition = null;
@@ -2610,7 +2868,10 @@ class SplitPane extends BaseObject {
   // Enhanced split management with animations
   async setSplit(newSplit, animate = true) {
     try {
-      const clampedSplit = Math.max(0.1, Math.min(0.9, newSplit));
+      const clampedSplit = Math.max(
+        LAYOUT_COMPONENT_CONSTANTS.SPLIT_MIN_RATIO,
+        Math.min(LAYOUT_COMPONENT_CONSTANTS.SPLIT_MAX_RATIO, newSplit)
+      );
 
       if (clampedSplit === this.split) return;
 
@@ -2648,7 +2909,8 @@ class SplitPane extends BaseObject {
         await this.expand();
       } else {
         // Default to collapsing the smaller pane
-        const collapseLeft = this.split > 0.5;
+        const collapseLeft =
+          this.split > LAYOUT_COMPONENT_CONSTANTS.SPLIT_CENTER_THRESHOLD;
         await this.collapse(collapseLeft ? 'left' : 'right');
       }
     } catch (error) {
@@ -2660,7 +2922,10 @@ class SplitPane extends BaseObject {
     if (!this.collapsible || this.collapsed === side) return;
 
     try {
-      const targetSplit = side === 'left' ? 0.05 : 0.95;
+      const targetSplit =
+        side === 'left'
+          ? LAYOUT_COMPONENT_CONSTANTS.SPLIT_COLLAPSED_RATIO
+          : LAYOUT_COMPONENT_CONSTANTS.SPLIT_EXPANDED_RATIO;
 
       if (!this.prefersReducedMotion()) {
         await this.animateCollapse(this.split, targetSplit);
@@ -3084,10 +3349,15 @@ class SplitPane extends BaseObject {
 
       // Vertical grip lines
       for (let i = -2; i <= 2; i++) {
-        const y = centerY + i * 4;
+        const y = centerY + i * LAYOUT_COMPONENT_CONSTANTS.TREE_GRIP_SPACING;
         renderer.fillRect(centerX - 1, y - 1, 2, 2);
         if (this.isHovering || this.isResizing) {
-          renderer.fillRect(centerX - 3, y - 1, 1, 2);
+          renderer.fillRect(
+            centerX - LAYOUT_COMPONENT_CONSTANTS.TREE_GRIP_SIZE,
+            y - 1,
+            1,
+            2
+          );
           renderer.fillRect(centerX + 2, y - 1, 1, 2);
         }
       }
@@ -3097,10 +3367,15 @@ class SplitPane extends BaseObject {
 
       // Horizontal grip lines
       for (let i = -2; i <= 2; i++) {
-        const x = centerX + i * 4;
+        const x = centerX + i * LAYOUT_COMPONENT_CONSTANTS.TREE_GRIP_SPACING;
         renderer.fillRect(x - 1, centerY - 1, 2, 2);
         if (this.isHovering || this.isResizing) {
-          renderer.fillRect(x - 1, centerY - 3, 2, 1);
+          renderer.fillRect(
+            x - 1,
+            centerY - LAYOUT_COMPONENT_CONSTANTS.TREE_GRIP_SIZE,
+            2,
+            1
+          );
           renderer.fillRect(x - 1, centerY + 2, 2, 1);
         }
       }
@@ -3112,12 +3387,15 @@ class SplitPane extends BaseObject {
 
     renderer.strokeStyle = theme.focus;
     renderer.lineWidth = 2;
-    renderer.setLineDash([3, 3]);
+    renderer.setLineDash([
+      LAYOUT_COMPONENT_CONSTANTS.TREE_DASH_SIZE,
+      LAYOUT_COMPONENT_CONSTANTS.TREE_DASH_SIZE,
+    ]);
     renderer.strokeRect(
       bounds.x - 2,
       bounds.y - 2,
-      bounds.width + 4,
-      bounds.height + 4
+      bounds.width + LAYOUT_COMPONENT_CONSTANTS.TREE_SELECTION_PADDING,
+      bounds.height + LAYOUT_COMPONENT_CONSTANTS.TREE_SELECTION_PADDING
     );
     renderer.setLineDash([]);
   }
@@ -3240,8 +3518,10 @@ class TreeView extends BaseObject {
   constructor(options = {}) {
     super({
       ...options,
-      width: options.width || 300,
-      height: options.height || 400,
+      width:
+        options.width || LAYOUT_COMPONENT_CONSTANTS.TREE_VIEW_DEFAULT_WIDTH,
+      height:
+        options.height || LAYOUT_COMPONENT_CONSTANTS.TREE_VIEW_DEFAULT_HEIGHT,
       ariaRole: 'tree',
       ariaLabel: options.ariaLabel || 'Tree View',
     });
@@ -3258,8 +3538,10 @@ class TreeView extends BaseObject {
     this.disabled = options.disabled || false;
     this.showLines = options.showLines !== false;
     this.showIcons = options.showIcons !== false;
-    this.indentSize = options.indentSize || 20;
-    this.nodeHeight = options.nodeHeight || 24;
+    this.indentSize =
+      options.indentSize || LAYOUT_COMPONENT_CONSTANTS.TREE_INDENT_SIZE;
+    this.nodeHeight =
+      options.nodeHeight || LAYOUT_COMPONENT_CONSTANTS.TREE_NODE_HEIGHT;
 
     // Theme integration
     this.theme = options.theme || ComponentTheme.getCurrentTheme();
@@ -3322,7 +3604,8 @@ class TreeView extends BaseObject {
 
     if (
       options.nodeHeight &&
-      (typeof options.nodeHeight !== 'number' || options.nodeHeight < 16)
+      (typeof options.nodeHeight !== 'number' ||
+        options.nodeHeight < LAYOUT_COMPONENT_CONSTANTS.TREE_MIN_NODE_HEIGHT)
     ) {
       throw new ComponentError(
         'nodeHeight must be at least 16 pixels',
@@ -3567,7 +3850,11 @@ class TreeView extends BaseObject {
       const x = node.level * this.indentSize;
 
       // Check if clicking on expand/collapse icon
-      if (node.children && event.localX >= x && event.localX <= x + 16) {
+      if (
+        node.children &&
+        event.localX >= x &&
+        event.localX <= x + LAYOUT_COMPONENT_CONSTANTS.TREE_EXPAND_AREA_SIZE
+      ) {
         this.toggleNode(node.id);
       } else {
         this.selectNode(node.id, event.ctrlKey || event.metaKey);
@@ -3952,7 +4239,7 @@ class TreeView extends BaseObject {
     }
 
     // Node icon
-    let textX = x + 20;
+    let textX = x + LAYOUT_COMPONENT_CONSTANTS.TREE_TEXT_OFFSET;
     if (this.showIcons && node.icon) {
       textX = this.renderNodeIcon(renderer, node, textX, y, colors);
     }
@@ -3992,7 +4279,7 @@ class TreeView extends BaseObject {
   }
 
   renderExpandIcon(renderer, node, x, y, colors) {
-    const iconX = x + 4;
+    const iconX = x + LAYOUT_COMPONENT_CONSTANTS.TREE_ICON_OFFSET;
     const iconY = y + this.nodeHeight / 2;
     const isExpanded = this.expandedNodes.has(node.id);
 
@@ -4012,7 +4299,7 @@ class TreeView extends BaseObject {
     renderer.textAlign = 'left';
     renderer.textBaseline = 'middle';
     renderer.fillText(node.icon, x, y + this.nodeHeight / 2);
-    return x + 20;
+    return x + LAYOUT_COMPONENT_CONSTANTS.TREE_TEXT_OFFSET;
   }
 
   renderNodeText(renderer, node, x, y, colors, isSelected) {
@@ -4042,7 +4329,12 @@ class TreeView extends BaseObject {
     renderer.strokeStyle = colors.focus;
     renderer.lineWidth = 2;
     renderer.setLineDash([2, 2]);
-    renderer.strokeRect(2, y + 1, this.width - 4, this.nodeHeight - 2);
+    renderer.strokeRect(
+      2,
+      y + 1,
+      this.width - LAYOUT_COMPONENT_CONSTANTS.TREE_FOCUS_BORDER_OFFSET,
+      this.nodeHeight - 2
+    );
     renderer.setLineDash([]);
   }
 
@@ -4072,7 +4364,10 @@ class TreeView extends BaseObject {
 
     // Scrollbar thumb
     const totalHeight = this.visibleNodes.length * this.nodeHeight;
-    const thumbHeight = Math.max(20, (this.height / totalHeight) * this.height);
+    const thumbHeight = Math.max(
+      LAYOUT_COMPONENT_CONSTANTS.TREE_SCROLLBAR_MIN_HEIGHT,
+      (this.height / totalHeight) * this.height
+    );
     const scrollRange = totalHeight - this.height;
     const thumbY =
       scrollRange > 0
@@ -4263,8 +4558,10 @@ class FileUpload extends BaseObject {
   constructor(options = {}) {
     super({
       ...options,
-      width: options.width || 400,
-      height: options.height || 200,
+      width:
+        options.width || LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_DEFAULT_WIDTH,
+      height:
+        options.height || LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_DEFAULT_HEIGHT,
       ariaRole: 'button',
       ariaLabel: options.ariaLabel || 'File Upload Area',
     });
@@ -4275,7 +4572,11 @@ class FileUpload extends BaseObject {
     // Core properties
     this.multiple = options.multiple || false;
     this.accept = options.accept || '*/*';
-    this.maxFileSize = options.maxFileSize || 10 * 1024 * 1024; // 10MB
+    this.maxFileSize =
+      options.maxFileSize ||
+      LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_MAX_SIZE_MB *
+        LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_BYTES_PER_KB *
+        LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_BYTES_PER_KB; // 10MB
     this.maxFiles = options.maxFiles || (this.multiple ? 10 : 1);
     this.disabled = options.disabled || false;
     this.allowDirectories = options.allowDirectories || false;
@@ -4533,7 +4834,9 @@ class FileUpload extends BaseObject {
 
   simulateUpload() {
     const interval = setInterval(() => {
-      this.uploadProgress += Math.random() * 0.1;
+      this.uploadProgress +=
+        Math.random() *
+        LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_PROGRESS_INCREMENT;
 
       if (this.uploadProgress >= 1) {
         this.uploadProgress = 1;
@@ -4603,7 +4906,14 @@ class FileUpload extends BaseObject {
     // Border
     renderer.strokeStyle = this.isDragOver ? '#007bff' : this.borderColor;
     renderer.lineWidth = this.isDragOver ? 2 : 1;
-    renderer.setLineDash(this.isDragOver ? [5, 5] : []);
+    renderer.setLineDash(
+      this.isDragOver
+        ? [
+            LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_DASH_SIZE,
+            LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_DASH_SIZE,
+          ]
+        : []
+    );
     renderer.strokeRect(0, 0, this.width, this.height);
     renderer.setLineDash([]);
 
@@ -4627,7 +4937,11 @@ class FileUpload extends BaseObject {
     renderer.font = '48px Arial';
     renderer.textAlign = 'center';
     renderer.textBaseline = 'middle';
-    renderer.fillText('📁', centerX, centerY - 30);
+    renderer.fillText(
+      '📁',
+      centerX,
+      centerY - LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_ICON_Y_OFFSET
+    );
 
     // Upload text
     renderer.fillStyle = this.disabled ? '#999999' : this.textColor;
@@ -4641,7 +4955,8 @@ class FileUpload extends BaseObject {
       const buttonWidth = 120;
       const buttonHeight = 32;
       const buttonX = centerX - buttonWidth / 2;
-      const buttonY = centerY + 30;
+      const buttonY =
+        centerY + LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_BUTTON_Y_OFFSET;
 
       renderer.fillStyle = '#007bff';
       renderer.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
@@ -4670,18 +4985,31 @@ class FileUpload extends BaseObject {
       renderer.fillText('📄', 10, y + itemHeight / 2);
 
       // File name
-      renderer.fillText(file.name, 35, y + itemHeight / 2);
+      renderer.fillText(
+        file.name,
+        LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_FILE_NAME_X,
+        y + itemHeight / 2
+      );
 
       // File size
       const sizeText = this.formatFileSize(file.size);
       renderer.fillStyle = '#666666';
       renderer.textAlign = 'right';
-      renderer.fillText(sizeText, this.width - 50, y + itemHeight / 2);
+      renderer.fillText(
+        sizeText,
+        this.width - LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_SIZE_TEXT_OFFSET,
+        y + itemHeight / 2
+      );
 
       // Remove button
       renderer.fillStyle = '#dc3545';
       renderer.textAlign = 'center';
-      renderer.fillText('×', this.width - 20, y + itemHeight / 2);
+      renderer.fillText(
+        '×',
+        this.width -
+          LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_REMOVE_BUTTON_OFFSET,
+        y + itemHeight / 2
+      );
 
       renderer.fillStyle = this.textColor;
       renderer.textAlign = 'left';
@@ -4694,14 +5022,20 @@ class FileUpload extends BaseObject {
 
     // Progress background
     renderer.fillStyle = '#e9ecef';
-    renderer.fillRect(10, progressY, this.width - 20, progressHeight);
+    renderer.fillRect(
+      10,
+      progressY,
+      this.width - LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_PROGRESS_MARGIN,
+      progressHeight
+    );
 
     // Progress bar
     renderer.fillStyle = '#007bff';
     renderer.fillRect(
       10,
       progressY,
-      (this.width - 20) * this.uploadProgress,
+      (this.width - LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_PROGRESS_MARGIN) *
+        this.uploadProgress,
       progressHeight
     );
 
@@ -4713,7 +5047,7 @@ class FileUpload extends BaseObject {
     renderer.fillText(
       `Uploading... ${Math.round(this.uploadProgress * 100)}%`,
       this.width / 2,
-      progressY - 5
+      progressY - LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_PROGRESS_TEXT_Y_OFFSET
     );
   }
 

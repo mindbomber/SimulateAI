@@ -1,6 +1,6 @@
 /**
  * Badge Modal Demo/Test
- * 
+ *
  * Example usage of the badge modal system
  * This file can be used for testing and demonstration
  */
@@ -8,14 +8,20 @@
 import badgeModal from '../components/badge-modal.js';
 import { getBadgeConfig } from '../data/badge-config.js';
 
+// Demo configuration constants
+const DEMO_CONFIG = {
+  MAX_TIER: 3,
+  DEMO_INTERVAL_MS: 4000, // 4 second intervals between badge displays
+};
+
 // Example: Show a Tier 1 Trolley Problem badge
 function testBadgeModal() {
   const badgeConfig = getBadgeConfig('trolley-problem', 1);
-  
+
   if (badgeConfig) {
     // Add timestamp (normally from badge manager)
     badgeConfig.timestamp = Date.now();
-    
+
     // Show the badge modal
     badgeModal.showBadgeModal(badgeConfig, 'main');
   }
@@ -24,10 +30,10 @@ function testBadgeModal() {
 // Example: Show different tier badges
 function testAllTiers() {
   const categories = ['trolley-problem', 'ai-black-box', 'bias-fairness'];
-  const tiers = [1, 2, 3];
-  
+  const tiers = [1, 2, DEMO_CONFIG.MAX_TIER];
+
   let delay = 0;
-  
+
   categories.forEach(categoryId => {
     tiers.forEach(tier => {
       setTimeout(() => {
@@ -37,7 +43,7 @@ function testAllTiers() {
           badgeModal.showBadgeModal(badgeConfig, 'category');
         }
       }, delay);
-      delay += 4000; // 4 second intervals
+      delay += DEMO_CONFIG.DEMO_INTERVAL_MS; // 4 second intervals
     });
   });
 }
