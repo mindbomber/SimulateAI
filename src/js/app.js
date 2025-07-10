@@ -2698,8 +2698,9 @@ class AIEthicsApp {
   initializeLoopDetection() {
     // Only enable in development mode or when explicitly requested
     const isDevelopment =
-      process.env.NODE_ENV === 'development' ||
       window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.protocol === 'file:' ||
       window.location.search.includes('debug=true');
 
     if (isDevelopment) {
