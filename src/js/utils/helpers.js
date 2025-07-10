@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-import logger from './logger.js';
-import { COMMON } from './constants.js';
-
 /**
  * Enhanced Helper Utilities for SimulateAI Platform
  * Comprehensive utility functions for modern web applications
@@ -36,6 +33,9 @@ import { COMMON } from './constants.js';
  * @author SimulateAI Team
  * @license Apache-2.0
  */
+
+import logger from './logger.js';
+import { COMMON } from './constants.js';
 
 // Enhanced constants and configuration
 const HELPERS_CONSTANTS = {
@@ -57,6 +57,26 @@ const HELPERS_CONSTANTS = {
     PASSWORD_BASE_SCORE: 20,
     PASSWORD_LENGTH_BONUS: 10,
     PASSWORD_MIN_SECURE_LENGTH: 12,
+    PASSWORD_VARIETY_BONUS: 15,
+    PASSWORD_REPETITION_PENALTY: 20,
+    PASSWORD_STRENGTH_VERY_STRONG: 80,
+    PASSWORD_STRENGTH_STRONG: 60,
+    PASSWORD_STRENGTH_MODERATE: 40,
+    PASSWORD_STRENGTH_WEAK_THRESHOLD: 60,
+    ACCESSIBILITY_SCORE_PENALTY: 25,
+    NEUTRAL_SCORE: 50,
+    EXCELLENT_THRESHOLD: 90,
+    GOOD_THRESHOLD: 80,
+    SATISFACTORY_THRESHOLD: 70,
+    NEEDS_IMPROVEMENT_THRESHOLD: 60,
+    POOR_THRESHOLD: 50,
+    PASSING_THRESHOLD: 60,
+    SIGNIFICANT_CHANGE_THRESHOLD: 20,
+    POOR_PERFORMANCE_THRESHOLD: 50,
+    AVERAGE_PERFORMANCE_THRESHOLD: 70,
+    EXCELLENT_PERFORMANCE_THRESHOLD: 90,
+    DECLINING_TREND_THRESHOLD: -10,
+    MAX_RECOMMENDATIONS: 5,
   },
 
   // Text analysis constants
@@ -66,9 +86,7 @@ const HELPERS_CONSTANTS = {
     PUNCTUATION_THRESHOLD: 0.1,
     PUNCTUATION_PENALTY: 15,
     MAX_WORDS_PER_SENTENCE: 20,
-  },
-
-  // Time constants
+  }, // Time constants
   TIME: {
     SECONDS_PER_MINUTE: 60,
     MINUTES_PER_HOUR: 60,
@@ -77,8 +95,77 @@ const HELPERS_CONSTANTS = {
     DAYS_PER_MONTH: 30,
     DAYS_PER_YEAR: 365,
     MILLISECONDS_PER_SECOND: 1000,
-    WEEKEND_DAYS: [0, 6], // Sunday and Saturday
+    SUNDAY: 0,
+    SATURDAY: 6,
     URL_CLEANUP_DELAY: 1000, // 1 second for URL cleanup
+    GOOD_DECISION_TIME: 30000, // 30 seconds
+    QUICK_DECISION_TIME: 10000, // 10 seconds
+    SLOW_DECISION_TIME: 60000, // 60 seconds
+    QUICK_DECISION_RATIO: 0.5, // 50% threshold
+    SLOW_DECISION_RATIO: 0.3, // 30% threshold
+    FRAME_RATE_TARGET: 16.67, // Target 60fps
+  },
+
+  // Weekend days (derived from TIME constants)
+  get WEEKEND_DAYS() {
+    return [this.TIME.SUNDAY, this.TIME.SATURDAY];
+  },
+
+  // Device and responsiveness constants
+  DEVICE: {
+    MOBILE_BREAKPOINT: 576,
+    TABLET_BREAKPOINT: 768,
+    DESKTOP_BREAKPOINT: 992,
+    LARGE_DESKTOP_BREAKPOINT: 1200,
+    HIGH_DPI_THRESHOLD: 1.5,
+    LOW_BATTERY_THRESHOLD: 0.2, // 20%
+  },
+
+  // ID and string generation constants
+  GENERATION: {
+    ID_RADIX: 36,
+    ID_START_INDEX: 2,
+    ID_END_INDEX: 11,
+  },
+
+  // File size constants (in bytes)
+  FILE_SIZE: {
+    BYTES_PER_KB: 1024,
+    KB_PER_MB: 1024,
+    DEFAULT_TEXT_LIMIT_MB: 100,
+    DEFAULT_BINARY_LIMIT_MB: 50,
+    SMALL_BINARY_LIMIT_MB: 10,
+    CONTROL_CHAR_THRESHOLD: 32, // ASCII control characters
+  },
+
+  // Performance and animation constants
+  ANIMATION: {
+    EASING_THRESHOLD: 0.5,
+    EASING_FACTOR_4: 4,
+    EASING_FACTOR_2: 2,
+    BOUNCE_DIVISOR: 2.75,
+    BOUNCE_MULTIPLIER: 7.5625,
+    BOUNCE_OFFSET_1_5: 1.5,
+    BOUNCE_OFFSET_2: 2,
+    BOUNCE_OFFSET_2_25: 2.25,
+    BOUNCE_OFFSET_2_5: 2.5,
+    BOUNCE_OFFSET_2_625: 2.625,
+    BOUNCE_RETURN_0_75: 0.75,
+    BOUNCE_RETURN_0_9375: 0.9375,
+    BOUNCE_RETURN_0_984375: 0.984375,
+    ELASTIC_PERIOD_DIVISOR: 4,
+    FRAME_DELTA_TARGET: 0.016, // 60fps target
+  },
+
+  // Additional scoring thresholds
+  ANALYSIS: {
+    SLOW_DECISION_RATIO: 0.3,
+    HIGH_PERFORMANCE_THRESHOLD: 80,
+    LOW_PERFORMANCE_THRESHOLD: 40,
+    ETHICS_WARNING_THRESHOLD: 70,
+    COMPLETION_WARNING_THRESHOLD: 80,
+    CRITICAL_VALUE_THRESHOLD: 50,
+    EXTENDED_RECOMMENDATIONS: 8,
   },
 
   // Color constants
@@ -107,6 +194,7 @@ const HELPERS_CONSTANTS = {
     HSL_HUE_SECTIONS: 6,
     HSL_HUE_RED_OFFSET: 4,
     HSL_LIGHTNESS_THRESHOLD: 0.5,
+    HSL_SATURATION_DIVISOR: 2,
     FACTOR_LIGHTEN: 0.8,
   },
 
@@ -1044,7 +1132,7 @@ class Helpers {
   static calculateBusinessDays(
     startDate,
     endDate,
-    excludedDays = HELPERS_CONSTANTS.TIME.WEEKEND_DAYS
+    excludedDays = HELPERS_CONSTANTS.WEEKEND_DAYS
   ) {
     if (!(startDate instanceof Date) || !(endDate instanceof Date)) return 0;
 
@@ -1395,24 +1483,29 @@ class Helpers {
       h = s = 0; // achromatic
     } else {
       const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      s =
+        l > HELPERS_CONSTANTS.COLOR.HSL_LIGHTNESS_THRESHOLD
+          ? d / (HELPERS_CONSTANTS.COLOR.HSL_SATURATION_DIVISOR - max - min)
+          : d / (max + min);
 
       switch (max) {
         case r:
-          h = (g - b) / d + (g < b ? 6 : 0);
+          h =
+            (g - b) / d +
+            (g < b ? HELPERS_CONSTANTS.COLOR.HSL_HUE_SECTIONS : 0);
           break;
         case g:
           h = (b - r) / d + 2;
           break;
         case b:
-          h = (r - g) / d + 4;
+          h = (r - g) / d + HELPERS_CONSTANTS.COLOR.HSL_HUE_RED_OFFSET;
           break;
       }
-      h /= 6;
+      h /= HELPERS_CONSTANTS.COLOR.HSL_HUE_SECTIONS;
     }
 
     return {
-      h: Math.round(h * 360),
+      h: Math.round(h * HELPERS_CONSTANTS.COLOR.HSL_HUE_CIRCLE),
       s: Math.round(s * 100),
       l: Math.round(l * 100),
     };
@@ -1671,7 +1764,9 @@ class Helpers {
             element.removeAttribute('tabindex');
           }
         },
-        actualBehavior === 'smooth' ? 500 : 0
+        actualBehavior === 'smooth'
+          ? HELPERS_CONSTANTS.UI.SMOOTH_SCROLL_DURATION
+          : 0
       );
     }
 
@@ -1718,7 +1813,7 @@ class Helpers {
       delay = 500,
       hideDelay = 100,
       className = 'tooltip',
-      id = `tooltip-${this.generateRandomString(8)}`,
+      id = `tooltip-${this.generateRandomString(HELPERS_CONSTANTS.UI.TOOLTIP_ID_LENGTH)}`,
     } = options;
 
     const tooltip = this.createElement('div', {
@@ -1753,24 +1848,30 @@ class Helpers {
 
         switch (position) {
           case 'top':
-            top = triggerRect.top - tooltipRect.height - 8;
+            top =
+              triggerRect.top -
+              tooltipRect.height -
+              HELPERS_CONSTANTS.UI.TOOLTIP_SPACING;
             left =
               triggerRect.left + (triggerRect.width - tooltipRect.width) / 2;
             break;
           case 'bottom':
-            top = triggerRect.bottom + 8;
+            top = triggerRect.bottom + HELPERS_CONSTANTS.UI.TOOLTIP_SPACING;
             left =
               triggerRect.left + (triggerRect.width - tooltipRect.width) / 2;
             break;
           case 'left':
             top =
               triggerRect.top + (triggerRect.height - tooltipRect.height) / 2;
-            left = triggerRect.left - tooltipRect.width - 8;
+            left =
+              triggerRect.left -
+              tooltipRect.width -
+              HELPERS_CONSTANTS.UI.TOOLTIP_SPACING;
             break;
           case 'right':
             top =
               triggerRect.top + (triggerRect.height - tooltipRect.height) / 2;
-            left = triggerRect.right + 8;
+            left = triggerRect.right + HELPERS_CONSTANTS.UI.TOOLTIP_SPACING;
             break;
         }
 
@@ -2333,8 +2434,11 @@ class Helpers {
     if (password.length < minLength) {
       errors.push(`Password must be at least ${minLength} characters long`);
     } else if (password.length >= minLength) {
-      score += 20;
-      if (password.length >= 12) score += 10;
+      score += HELPERS_CONSTANTS.SCORING.PASSWORD_BASE_SCORE;
+      if (
+        password.length >= HELPERS_CONSTANTS.SCORING.PASSWORD_MIN_SECURE_LENGTH
+      )
+        score += HELPERS_CONSTANTS.SCORING.PASSWORD_LENGTH_BONUS;
     }
 
     if (password.length > maxLength) {
@@ -2350,32 +2454,32 @@ class Helpers {
     if (requireUppercase && !hasUppercase) {
       errors.push('Password must contain at least one uppercase letter');
     } else if (hasUppercase) {
-      score += 15;
+      score += HELPERS_CONSTANTS.SCORING.PASSWORD_VARIETY_BONUS;
     }
 
     if (requireLowercase && !hasLowercase) {
       errors.push('Password must contain at least one lowercase letter');
     } else if (hasLowercase) {
-      score += 15;
+      score += HELPERS_CONSTANTS.SCORING.PASSWORD_VARIETY_BONUS;
     }
 
     if (requireNumbers && !hasNumbers) {
       errors.push('Password must contain at least one number');
     } else if (hasNumbers) {
-      score += 15;
+      score += HELPERS_CONSTANTS.SCORING.PASSWORD_VARIETY_BONUS;
     }
 
     if (requireSymbols && !hasSymbols) {
       errors.push('Password must contain at least one special character');
     } else if (hasSymbols) {
-      score += 15;
+      score += HELPERS_CONSTANTS.SCORING.PASSWORD_VARIETY_BONUS;
     }
 
     // Pattern validation
     for (const pattern of blockedPatterns) {
       if (pattern.test(password)) {
         errors.push('Password contains blocked pattern');
-        score -= 20;
+        score -= HELPERS_CONSTANTS.SCORING.PASSWORD_REPETITION_PENALTY;
       }
     }
 
@@ -2400,12 +2504,15 @@ class Helpers {
 
     // Generate strength feedback
     let strength = 'weak';
-    if (score >= 80) strength = 'very strong';
-    else if (score >= 60) strength = 'strong';
-    else if (score >= 40) strength = 'moderate';
+    if (score >= HELPERS_CONSTANTS.SCORING.PASSWORD_STRENGTH_VERY_STRONG)
+      strength = 'very strong';
+    else if (score >= HELPERS_CONSTANTS.SCORING.PASSWORD_STRENGTH_STRONG)
+      strength = 'strong';
+    else if (score >= HELPERS_CONSTANTS.SCORING.PASSWORD_STRENGTH_MODERATE)
+      strength = 'moderate';
 
     if (provideFeedback) {
-      if (score < 60) {
+      if (score < HELPERS_CONSTANTS.SCORING.PASSWORD_STRENGTH_WEAK_THRESHOLD) {
         feedback.push(
           'Consider using a longer password with mixed character types'
         );
@@ -2555,7 +2662,11 @@ class Helpers {
       accessible: issues.length === 0,
       issues,
       recommendations,
-      score: Math.max(0, 100 - issues.length * 25),
+      score: Math.max(
+        0,
+        100 -
+          issues.length * HELPERS_CONSTANTS.SCORING.ACCESSIBILITY_SCORE_PENALTY
+      ),
     };
   } // Enhanced Browser detection with privacy and feature support
   /**
@@ -2782,16 +2893,16 @@ class Helpers {
     let deviceType = 'desktop';
     let breakpoint = 'xl';
 
-    if (width < 576) {
+    if (width < HELPERS_CONSTANTS.DEVICE.MOBILE_BREAKPOINT) {
       deviceType = 'mobile';
       breakpoint = 'xs';
-    } else if (width < 768) {
+    } else if (width < HELPERS_CONSTANTS.DEVICE.TABLET_BREAKPOINT) {
       deviceType = 'mobile';
       breakpoint = 'sm';
-    } else if (width < 992) {
+    } else if (width < HELPERS_CONSTANTS.DEVICE.DESKTOP_BREAKPOINT) {
       deviceType = 'tablet';
       breakpoint = 'md';
-    } else if (width < 1200) {
+    } else if (width < HELPERS_CONSTANTS.DEVICE.LARGE_DESKTOP_BREAKPOINT) {
       deviceType = 'desktop';
       breakpoint = 'lg';
     }
@@ -2812,7 +2923,8 @@ class Helpers {
 
     if (includePixelRatio) {
       deviceInfo.pixelRatio = window.devicePixelRatio || 1;
-      deviceInfo.highDPI = deviceInfo.pixelRatio > 1.5;
+      deviceInfo.highDPI =
+        deviceInfo.pixelRatio > HELPERS_CONSTANTS.DEVICE.HIGH_DPI_THRESHOLD;
     }
 
     if (includeTouchPoints && 'maxTouchPoints' in navigator) {
@@ -2918,7 +3030,7 @@ class Helpers {
       navigator
         .getBattery()
         .then(battery => {
-          if (battery.level < 0.2) {
+          if (battery.level < HELPERS_CONSTANTS.DEVICE.LOW_BATTERY_THRESHOLD) {
             metrics.lowBattery = true;
           }
         })
@@ -2950,7 +3062,7 @@ class Helpers {
         ? metrics.size === 0
         : Object.keys(metrics).length === 0)
     ) {
-      return penalizeIncomplete ? 0 : 50; // Neutral score for incomplete data
+      return penalizeIncomplete ? 0 : HELPERS_CONSTANTS.SCORING.NEUTRAL_SCORE; // Neutral score for incomplete data
     }
 
     let totalScore = 0;
@@ -2986,7 +3098,7 @@ class Helpers {
     }
 
     if (validMetrics === 0) {
-      return penalizeIncomplete ? 0 : 50;
+      return penalizeIncomplete ? 0 : HELPERS_CONSTANTS.SCORING.NEUTRAL_SCORE;
     }
 
     let finalScore;
@@ -3047,7 +3159,7 @@ class Helpers {
       color,
       advice = [];
 
-    if (score >= 90) {
+    if (score >= HELPERS_CONSTANTS.SCORING.EXCELLENT_THRESHOLD) {
       grade = 'A+';
       description = 'Excellent';
       level = 'excellent';
@@ -3059,7 +3171,7 @@ class Helpers {
           'Consider mentoring others in ethical practices',
         ];
       }
-    } else if (score >= 80) {
+    } else if (score >= HELPERS_CONSTANTS.SCORING.GOOD_THRESHOLD) {
       grade = 'A';
       description = 'Very Good';
       level = 'very-good';
@@ -3071,7 +3183,7 @@ class Helpers {
           'Review any areas that scored below 90',
         ];
       }
-    } else if (score >= 70) {
+    } else if (score >= HELPERS_CONSTANTS.SCORING.SATISFACTORY_THRESHOLD) {
       grade = 'B';
       description = 'Good';
       level = 'good';
@@ -3083,7 +3195,7 @@ class Helpers {
           'Consider additional ethical training',
         ];
       }
-    } else if (score >= 60) {
+    } else if (score >= HELPERS_CONSTANTS.SCORING.NEEDS_IMPROVEMENT_THRESHOLD) {
       grade = 'C';
       description = 'Fair';
       level = 'fair';
@@ -3095,7 +3207,7 @@ class Helpers {
           'Review ethical guidelines and principles',
         ];
       }
-    } else if (score >= 50) {
+    } else if (score >= HELPERS_CONSTANTS.SCORING.POOR_THRESHOLD) {
       grade = 'D';
       description = 'Needs Improvement';
       level = 'needs-improvement';
@@ -3128,7 +3240,7 @@ class Helpers {
       level,
       color,
       percentile: Math.round(score),
-      passed: score >= 60,
+      passed: score >= HELPERS_CONSTANTS.SCORING.PASSING_THRESHOLD,
     };
 
     if (includeAdvice) {
@@ -3174,7 +3286,7 @@ class Helpers {
     let intensity = 'slightly';
     let significance = 'minor';
 
-    if (absChange > 20) {
+    if (absChange > HELPERS_CONSTANTS.SCORING.SIGNIFICANT_CHANGE_THRESHOLD) {
       intensity = 'significantly';
       significance = 'major';
     } else if (absChange > 10) {
@@ -3235,16 +3347,20 @@ class Helpers {
     const recommendations = [];
 
     // Score-based recommendations
-    if (score < 50) {
+    if (score < HELPERS_CONSTANTS.SCORING.POOR_PERFORMANCE_THRESHOLD) {
       recommendations.push(
         `Critical: ${category} requires immediate attention and improvement`
       );
       recommendations.push('Consider consulting with ethics experts');
       recommendations.push('Review fundamental ethical principles');
-    } else if (score < 70) {
+    } else if (
+      score < HELPERS_CONSTANTS.SCORING.AVERAGE_PERFORMANCE_THRESHOLD
+    ) {
       recommendations.push(`${category} needs improvement to meet standards`);
       recommendations.push('Implement additional training or guidelines');
-    } else if (score < 90) {
+    } else if (
+      score < HELPERS_CONSTANTS.SCORING.EXCELLENT_PERFORMANCE_THRESHOLD
+    ) {
       recommendations.push(
         `${category} is performing well but has room for excellence`
       );
@@ -3256,7 +3372,7 @@ class Helpers {
     }
 
     // Change-based recommendations
-    if (change < -10) {
+    if (change < HELPERS_CONSTANTS.SCORING.DECLINING_TREND_THRESHOLD) {
       recommendations.push('Investigate causes of recent decline');
       recommendations.push('Implement corrective measures immediately');
     } else if (change > 10) {
@@ -3293,7 +3409,10 @@ class Helpers {
       recommendations.push(...categorySpecific[categoryKey].slice(0, 2));
     }
 
-    return recommendations.slice(0, 5); // Limit to 5 recommendations
+    return recommendations.slice(
+      0,
+      HELPERS_CONSTANTS.SCORING.MAX_RECOMMENDATIONS
+    ); // Limit to 5 recommendations
   } // Enhanced Simulation utilities with accessibility and performance
   /**
    * Generate unique scenario identifier with metadata
@@ -3316,7 +3435,14 @@ class Helpers {
     }
 
     if (includeRandom) {
-      parts.push(Math.random().toString(36).substring(2, 11));
+      parts.push(
+        Math.random()
+          .toString(HELPERS_CONSTANTS.GENERATION.ID_RADIX)
+          .substring(
+            HELPERS_CONSTANTS.GENERATION.ID_START_INDEX,
+            HELPERS_CONSTANTS.GENERATION.ID_END_INDEX
+          )
+      );
     }
 
     if (includeVersion) {
@@ -3569,18 +3695,24 @@ class Helpers {
         message: `Average decision time: ${this.formatDuration(avgDecisionTime)}`,
         value: avgDecisionTime,
         benchmark: 30000, // 30 seconds
-        status: avgDecisionTime <= 30000 ? 'good' : 'attention',
+        status:
+          avgDecisionTime <= HELPERS_CONSTANTS.TIME.GOOD_DECISION_TIME
+            ? 'good'
+            : 'attention',
       });
 
       // Decision pattern analysis
       const quickDecisions = decisions.filter(
-        d => (d.timeSpent || 0) < 10000
+        d => (d.timeSpent || 0) < HELPERS_CONSTANTS.TIME.QUICK_DECISION_TIME
       ).length;
       const slowDecisions = decisions.filter(
-        d => (d.timeSpent || 0) > 60000
+        d => (d.timeSpent || 0) > HELPERS_CONSTANTS.TIME.SLOW_DECISION_TIME
       ).length;
 
-      if (quickDecisions > decisions.length * 0.5) {
+      if (
+        quickDecisions >
+        decisions.length * HELPERS_CONSTANTS.TIME.QUICK_DECISION_RATIO
+      ) {
         insights.push({
           type: 'behavior',
           category: 'decision-speed',
@@ -3591,7 +3723,10 @@ class Helpers {
         });
       }
 
-      if (slowDecisions > decisions.length * 0.3) {
+      if (
+        slowDecisions >
+        decisions.length * HELPERS_CONSTANTS.ANALYSIS.SLOW_DECISION_RATIO
+      ) {
         insights.push({
           type: 'behavior',
           category: 'decision-speed',
@@ -3609,7 +3744,7 @@ class Helpers {
       const label = typeof metric === 'object' ? metric.label : name;
 
       if (typeof value === 'number') {
-        if (value >= 80) {
+        if (value >= HELPERS_CONSTANTS.ANALYSIS.HIGH_PERFORMANCE_THRESHOLD) {
           insights.push({
             type: 'ethics',
             category: name,
@@ -3617,7 +3752,9 @@ class Helpers {
             value,
             status: 'excellent',
           });
-        } else if (value <= 40) {
+        } else if (
+          value <= HELPERS_CONSTANTS.ANALYSIS.LOW_PERFORMANCE_THRESHOLD
+        ) {
           insights.push({
             type: 'ethics',
             category: name,
@@ -3653,7 +3790,7 @@ class Helpers {
     const completionRate = this.calculateCompletionRate(simulation);
 
     // Score-based recommendations
-    if (ethicsScore < 70) {
+    if (ethicsScore < HELPERS_CONSTANTS.ANALYSIS.ETHICS_WARNING_THRESHOLD) {
       recommendations.push({
         priority: 'high',
         category: 'ethics',
@@ -3676,7 +3813,9 @@ class Helpers {
     }
 
     // Completion-based recommendations
-    if (completionRate < 80) {
+    if (
+      completionRate < HELPERS_CONSTANTS.ANALYSIS.COMPLETION_WARNING_THRESHOLD
+    ) {
       recommendations.push({
         priority: 'medium',
         category: 'completion',
@@ -3693,7 +3832,10 @@ class Helpers {
       const value = typeof metric === 'object' ? metric.value : metric;
       const label = typeof metric === 'object' ? metric.label : name;
 
-      if (typeof value === 'number' && value < 50) {
+      if (
+        typeof value === 'number' &&
+        value < HELPERS_CONSTANTS.ANALYSIS.CRITICAL_VALUE_THRESHOLD
+      ) {
         recommendations.push({
           priority: 'medium',
           category: 'improvement',
@@ -3714,7 +3856,10 @@ class Helpers {
       );
     }
 
-    return recommendations.slice(0, 8); // Limit to 8 recommendations
+    return recommendations.slice(
+      0,
+      HELPERS_CONSTANTS.ANALYSIS.EXTENDED_RECOMMENDATIONS
+    ); // Limit to 8 recommendations
   }
 
   /**
@@ -3782,7 +3927,9 @@ class Helpers {
       charset = 'utf-8',
       validateFilename = true,
       announceDownload = true,
-      maxSizeBytes = 100 * 1024 * 1024, // 100MB default limit
+      maxSizeBytes = HELPERS_CONSTANTS.FILE_SIZE.DEFAULT_TEXT_LIMIT_MB *
+        HELPERS_CONSTANTS.FILE_SIZE.BYTES_PER_KB *
+        HELPERS_CONSTANTS.FILE_SIZE.KB_PER_MB, // 100MB default limit
       allowedExtensions = null,
     } = options;
 
@@ -3879,7 +4026,11 @@ class Helpers {
     // Check for control characters (0-31)
     const hasControlChars = filename
       .split('')
-      .some(char => char.charCodeAt(0) < 32);
+      .some(
+        char =>
+          char.charCodeAt(0) <
+          HELPERS_CONSTANTS.FILE_SIZE.CONTROL_CHAR_THRESHOLD
+      );
     if (dangerousChars.test(filename) || hasControlChars) {
       return { valid: false, error: 'Filename contains invalid characters' };
     }
@@ -3932,7 +4083,9 @@ class Helpers {
   static readFileAsText(file, options = {}) {
     const {
       encoding = 'UTF-8',
-      maxSizeBytes = 50 * 1024 * 1024, // 50MB default
+      maxSizeBytes = HELPERS_CONSTANTS.FILE_SIZE.DEFAULT_BINARY_LIMIT_MB *
+        HELPERS_CONSTANTS.FILE_SIZE.BYTES_PER_KB *
+        HELPERS_CONSTANTS.FILE_SIZE.KB_PER_MB, // 50MB default
       onProgress = null,
       validateType = true,
       allowedTypes = ['text/plain', 'text/csv', 'application/json', 'text/xml'],
@@ -4004,7 +4157,9 @@ class Helpers {
    */
   static readFileAsDataURL(file, options = {}) {
     const {
-      maxSizeBytes = 10 * 1024 * 1024, // 10MB for binary files
+      maxSizeBytes = HELPERS_CONSTANTS.FILE_SIZE.SMALL_BINARY_LIMIT_MB *
+        HELPERS_CONSTANTS.FILE_SIZE.BYTES_PER_KB *
+        HELPERS_CONSTANTS.FILE_SIZE.KB_PER_MB, // 10MB for binary files
       allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
       onProgress = null,
     } = options;
@@ -4260,9 +4415,12 @@ class Helpers {
     }
 
     const adjustedT = Math.pow(t, strength);
-    return adjustedT < 0.5
+    return adjustedT < HELPERS_CONSTANTS.ANIMATION.EASING_THRESHOLD
       ? 2 * adjustedT * adjustedT
-      : -1 + (4 - 2 * adjustedT) * adjustedT;
+      : -1 +
+          (HELPERS_CONSTANTS.ANIMATION.EASING_FACTOR_4 -
+            HELPERS_CONSTANTS.ANIMATION.EASING_FACTOR_2 * adjustedT) *
+            adjustedT;
   }
 
   static easeIn(t, options = {}) {
@@ -4307,14 +4465,43 @@ class Helpers {
       return t;
     }
 
-    if (t < 1 / 2.75) {
-      return 7.5625 * t * t;
-    } else if (t < 2 / 2.75) {
-      return 7.5625 * (t -= 1.5 / 2.75) * t + 0.75;
-    } else if (t < 2.5 / 2.75) {
-      return 7.5625 * (t -= 2.25 / 2.75) * t + 0.9375;
+    if (t < 1 / HELPERS_CONSTANTS.ANIMATION.BOUNCE_DIVISOR) {
+      return HELPERS_CONSTANTS.ANIMATION.BOUNCE_MULTIPLIER * t * t;
+    } else if (
+      t <
+      HELPERS_CONSTANTS.ANIMATION.BOUNCE_OFFSET_2 /
+        HELPERS_CONSTANTS.ANIMATION.BOUNCE_DIVISOR
+    ) {
+      return (
+        HELPERS_CONSTANTS.ANIMATION.BOUNCE_MULTIPLIER *
+          (t -=
+            HELPERS_CONSTANTS.ANIMATION.BOUNCE_OFFSET_1_5 /
+            HELPERS_CONSTANTS.ANIMATION.BOUNCE_DIVISOR) *
+          t +
+        HELPERS_CONSTANTS.ANIMATION.BOUNCE_RETURN_0_75
+      );
+    } else if (
+      t <
+      HELPERS_CONSTANTS.ANIMATION.BOUNCE_OFFSET_2_5 /
+        HELPERS_CONSTANTS.ANIMATION.BOUNCE_DIVISOR
+    ) {
+      return (
+        HELPERS_CONSTANTS.ANIMATION.BOUNCE_MULTIPLIER *
+          (t -=
+            HELPERS_CONSTANTS.ANIMATION.BOUNCE_OFFSET_2_25 /
+            HELPERS_CONSTANTS.ANIMATION.BOUNCE_DIVISOR) *
+          t +
+        HELPERS_CONSTANTS.ANIMATION.BOUNCE_RETURN_0_9375
+      );
     } else {
-      return 7.5625 * (t -= 2.625 / 2.75) * t + 0.984375;
+      return (
+        HELPERS_CONSTANTS.ANIMATION.BOUNCE_MULTIPLIER *
+          (t -=
+            HELPERS_CONSTANTS.ANIMATION.BOUNCE_OFFSET_2_625 /
+            HELPERS_CONSTANTS.ANIMATION.BOUNCE_DIVISOR) *
+          t +
+        HELPERS_CONSTANTS.ANIMATION.BOUNCE_RETURN_0_984375
+      );
     }
   }
 
@@ -4340,7 +4527,7 @@ class Helpers {
 
     if (t === 0 || t === 1) return t;
 
-    const s = period / 4;
+    const s = period / HELPERS_CONSTANTS.ANIMATION.ELASTIC_PERIOD_DIVISOR;
     return -(
       amplitude *
       Math.pow(2, 10 * (t -= 1)) *
@@ -4421,7 +4608,7 @@ class Helpers {
         performance.totalFrameTime += frameDuration;
         performance.frameCount++;
 
-        if (frameDuration > 16.67) {
+        if (frameDuration > HELPERS_CONSTANTS.TIME.FRAME_RATE_TARGET) {
           // > 60fps threshold
           performance.droppedFrames++;
         }
@@ -4588,7 +4775,7 @@ class Helpers {
 
       const deltaTime = Math.min(
         (currentTime - (startTime || currentTime)) / 1000,
-        0.016
+        HELPERS_CONSTANTS.ANIMATION.FRAME_DELTA_TARGET
       );
       startTime = currentTime;
 

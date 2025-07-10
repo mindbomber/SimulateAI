@@ -28,7 +28,7 @@ const ANALYTICS_CONSTANTS = {
   MAX_BATCH_SIZE: 50,
   MIN_FLUSH_INTERVAL: 10000, // 10 seconds
   MAX_FLUSH_INTERVAL: 300000, // 5 minutes
-  SESSION_TIMEOUT: 30 * ANALYTICS_CONSTANTS.TIME.MINUTES_PER_HOUR * 1000, // 30 minutes
+  SESSION_TIMEOUT_MINUTES: 30, // 30 minutes for session timeout
   ERROR_SAMPLING_RATE: 1.0, // 100% for educational platform
   PERFORMANCE_SAMPLING_RATE: 0.1, // 10%
   MAX_STORED_EVENTS: 1000,
@@ -40,9 +40,11 @@ const ANALYTICS_CONSTANTS = {
     SECONDS_PER_MINUTE: 60,
     HOURS_PER_DAY: 24,
     DAYS_PER_YEAR: 365,
+    MILLISECONDS_PER_SECOND: 1000,
     MILLISECONDS_PER_HOUR: 3600000,
     MEMORY_CHECK_INTERVAL: 30000, // 30 seconds
     DEBOUNCE_DELAY: 500, // 500ms
+    RETURNING_USER_THRESHOLD: 24, // 24 hours to consider returning user
   },
 
   // Performance monitoring thresholds
@@ -2291,7 +2293,8 @@ class AnalyticsManager {
       .filter(s => s.score > 0)
       .sort((a, b) => a.timestamp - b.timestamp);
 
-    if (scores.length < 3) return { trend: 'insufficient_data', slope: 0 };
+    if (scores.length < ANALYTICS_CONSTANTS.ANALYTICS.MIN_DATA_POINTS)
+      return { trend: 'insufficient_data', slope: 0 };
 
     // Simple linear regression for trend analysis
     const n = scores.length;
@@ -2303,8 +2306,10 @@ class AnalyticsManager {
     const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
 
     let trend = 'stable';
-    if (slope > 5) trend = 'improving';
-    else if (slope < -5) trend = 'declining';
+    if (slope > ANALYTICS_CONSTANTS.ANALYTICS.TREND_IMPROVEMENT_THRESHOLD)
+      trend = 'improving';
+    else if (slope < ANALYTICS_CONSTANTS.ANALYTICS.TREND_DECLINE_THRESHOLD)
+      trend = 'declining';
 
     return { trend, slope, correlation: this.calculateCorrelation(scores) };
   }
@@ -2410,7 +2415,9 @@ class AnalyticsManager {
     });
 
     // Bonus for feature diversity
-    score += features.size * 20;
+    score +=
+      features.size *
+      ANALYTICS_CONSTANTS.ANALYTICS.ENGAGEMENT_FEATURE_MULTIPLIER;
 
     return Math.min(score, 100); // Cap at 100
   }
@@ -2527,7 +2534,11 @@ class AnalyticsManager {
       const isReturning =
         completions.length > 0 ||
         previousSessions.length > 0 ||
-        Date.now() - lastVisit > 24 * 60 * 60 * 1000; // 24 hours
+        Date.now() - lastVisit >
+          ANALYTICS_CONSTANTS.TIME.HOURS_PER_DAY *
+            ANALYTICS_CONSTANTS.TIME.MINUTES_PER_HOUR *
+            ANALYTICS_CONSTANTS.TIME.SECONDS_PER_MINUTE *
+            ANALYTICS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND; // 24 hours
 
       // Update last visit
       await StorageManager.set('last_visit_timestamp', Date.now());
@@ -2567,7 +2578,9 @@ class AnalyticsManager {
       });
 
       // Keep only recent sessions
-      const recentSessions = sessions.slice(-50);
+      const recentSessions = sessions.slice(
+        -ANALYTICS_CONSTANTS.ANALYTICS.RECENT_SESSIONS_COUNT
+      );
       await StorageManager.set('analytics_sessions', recentSessions);
 
       await this.flush();
@@ -2802,9 +2815,21 @@ class AnalyticsManager {
       performanceMetrics: AnalyticsPerformance.metrics.size,
       jsHeapSize: performance.memory
         ? {
-            used: Math.round(performance.memory.usedJSHeapSize / 1024 / 1024),
-            total: Math.round(performance.memory.totalJSHeapSize / 1024 / 1024),
-            limit: Math.round(performance.memory.jsHeapSizeLimit / 1024 / 1024),
+            used: Math.round(
+              performance.memory.usedJSHeapSize /
+                ANALYTICS_CONSTANTS.MEMORY.BYTES_PER_KB /
+                ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB
+            ),
+            total: Math.round(
+              performance.memory.totalJSHeapSize /
+                ANALYTICS_CONSTANTS.MEMORY.BYTES_PER_KB /
+                ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB
+            ),
+            limit: Math.round(
+              performance.memory.jsHeapSizeLimit /
+                ANALYTICS_CONSTANTS.MEMORY.BYTES_PER_KB /
+                ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB
+            ),
           }
         : null,
     };
@@ -2818,7 +2843,9 @@ class AnalyticsManager {
     const queueMemory = this.eventQueue.length * eventSize;
     const retryMemory = this.retryQueue.length * eventSize;
 
-    return Math.round((queueMemory + retryMemory) / 1024); // KB
+    return Math.round(
+      (queueMemory + retryMemory) / ANALYTICS_CONSTANTS.MEMORY.BYTES_PER_KB
+    ); // KB
   }
 
   // Helper methods for complex analytics (simplified implementations)
