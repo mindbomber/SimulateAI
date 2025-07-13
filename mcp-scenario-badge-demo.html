@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MCP Scenario & Badge Generation System</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        line-height: 1.6;
+        color: #333;
+      }
+
+      .container {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        margin-bottom: 25px;
+      }
+
+      h1 {
+        color: #2d3748;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2.8em;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      h2 {
+        color: #4a5568;
+        border-bottom: 3px solid #e2e8f0;
+        padding-bottom: 12px;
+        margin-top: 35px;
+        font-size: 1.8em;
+      }
+
+      h3 {
+        color: #2d3748;
+        margin-top: 25px;
+        font-size: 1.3em;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+      }
+
+      .feature-card {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border-radius: 12px;
+        padding: 25px;
+        border-left: 5px solid #4299e1;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+      }
+
+      .feature-title {
+        font-weight: bold;
+        color: #2d3748;
+        margin-bottom: 12px;
+        font-size: 1.2em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .feature-description {
+        color: #4a5568;
+        margin-bottom: 18px;
+        font-size: 1em;
+      }
+
+      .capability-list {
+        list-style: none;
+        padding: 0;
+      }
+
+      .capability-list li {
+        background: #e6f7ff;
+        margin: 8px 0;
+        padding: 8px 12px;
+        border-radius: 6px;
+        border-left: 3px solid #1890ff;
+        font-size: 0.9em;
+      }
+
+      .demo-section {
+        background: #f0fff4;
+        border-radius: 12px;
+        padding: 25px;
+        margin: 25px 0;
+        border: 2px solid #68d391;
+      }
+
+      .scenario-example {
+        background: #fff5f5;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 15px 0;
+        border-left: 4px solid #f56565;
+      }
+
+      .badge-example {
+        background: #fffbeb;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 15px 0;
+        border-left: 4px solid #f6ad55;
+        position: relative;
+      }
+
+      .lab-example {
+        background: #f7fafc;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 15px 0;
+        border-left: 4px solid #805ad5;
+      }
+
+      .code-block {
+        background: #1a202c;
+        color: #e2e8f0;
+        padding: 20px;
+        border-radius: 8px;
+        font-family: 'Fira Code', monospace;
+        overflow-x: auto;
+        margin: 15px 0;
+        font-size: 0.9em;
+        line-height: 1.4;
+      }
+
+      .method-signature {
+        color: #63b3ed;
+        font-weight: bold;
+      }
+
+      .parameter {
+        color: #f6ad55;
+      }
+
+      .string {
+        color: #68d391;
+      }
+
+      .comment {
+        color: #a0aec0;
+        font-style: italic;
+      }
+
+      .tag {
+        display: inline-block;
+        background: #e2e8f0;
+        color: #2d3748;
+        padding: 4px 10px;
+        border-radius: 15px;
+        font-size: 0.8em;
+        margin: 3px;
+        font-weight: 500;
+      }
+
+      .tag.new {
+        background: #fed7d7;
+        color: #c53030;
+      }
+
+      .tag.enhanced {
+        background: #c6f6d5;
+        color: #22543d;
+      }
+
+      .tag.learning {
+        background: #ddd6fe;
+        color: #553c9a;
+      }
+
+      .implementation-flow {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+      }
+
+      .flow-step {
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 18px;
+        text-align: center;
+        position: relative;
+      }
+
+      .flow-step::after {
+        content: '→';
+        position: absolute;
+        right: -15px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.5em;
+        color: #a0aec0;
+      }
+
+      .flow-step:last-child::after {
+        display: none;
+      }
+
+      .step-number {
+        background: #4299e1;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 10px;
+        font-weight: bold;
+      }
+
+      .api-example {
+        background: #f7fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 15px 0;
+      }
+
+      .quote {
+        font-style: italic;
+        color: #553c9a;
+        border-left: 3px solid #805ad5;
+        padding-left: 15px;
+        margin: 15px 0;
+      }
+
+      .highlight-box {
+        background: linear-gradient(135deg, #fed7d7, #feb2b2);
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+        border: 1px solid #fc8181;
+      }
+
+      .highlight-box h4 {
+        margin-top: 0;
+        color: #742a2a;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🤖 MCP Scenario & Badge Generation System</h1>
+
+      <p
+        style="
+          text-align: center;
+          color: #4a5568;
+          font-size: 1.2em;
+          margin-bottom: 30px;
+        "
+      >
+        Comprehensive AI-powered system for creating dynamic learning scenarios,
+        interactive labs, and progressive badge systems
+      </p>
+
+      <div class="highlight-box">
+        <h4>🎯 Core Capabilities</h4>
+        <p>
+          The MCP system can automatically generate
+          <strong>complete implementations</strong> including:
+        </p>
+        <ul>
+          <li>
+            <strong>New Categories:</strong> Full philosophical taxonomy mapping
+            with 6 progressive scenarios
+          </li>
+          <li>
+            <strong>Existing Category Enhancement:</strong> Additional scenarios
+            based on current AI developments
+          </li>
+          <li>
+            <strong>Learning Labs:</strong> 5-phase interactive educational
+            experiences
+          </li>
+          <li>
+            <strong>Badge Progression:</strong> Triangular number progression
+            (1,3,6,10,15,21) with philosophical depth
+          </li>
+        </ul>
+      </div>
+
+      <h2>🔧 Generation Features</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-title">🎓 Comprehensive Scenario Generation</div>
+          <div class="feature-description">
+            Creates complete scenario implementations with philosophical depth
+            and real-world relevance
+          </div>
+          <ul class="capability-list">
+            <li>Progressive complexity (Beginner → Intermediate → Advanced)</li>
+            <li>Multiple stakeholder perspectives</li>
+            <li>Ethical framework applications</li>
+            <li>Consequence mapping and decision trees</li>
+            <li>Interactive choice systems</li>
+            <li>Real-time philosophical context</li>
+          </ul>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-title">🧪 Interactive Learning Labs</div>
+          <div class="feature-description">
+            5-phase educational experiences with adaptive content and progress
+            tracking
+          </div>
+          <ul class="capability-list">
+            <li>Preparation: Reading materials & vocabulary</li>
+            <li>Exploration: Scenario introduction & perspectives</li>
+            <li>Analysis: Consequence mapping & principles</li>
+            <li>Synthesis: Argumentation & position defense</li>
+            <li>Assessment: Completion, reflection & peer review</li>
+          </ul>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-title">🏆 Progressive Badge System</div>
+          <div class="feature-description">
+            Triangular progression with philosophical quotes and wisdom insights
+          </div>
+          <ul class="capability-list">
+            <li>
+              6 levels: Explorer → Apprentice → Scholar → Philosopher → Master →
+              Sage
+            </li>
+            <li>Requirements: 1, 3, 6, 10, 15, 21 scenarios</li>
+            <li>Philosophical quotes and reflections</li>
+            <li>Achievement tracking and celebration</li>
+            <li>Social sharing capabilities</li>
+            <li>Rarity and time estimations</li>
+          </ul>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-title">🔍 Current Events Integration</div>
+          <div class="feature-description">
+            Uses MCP web research to connect scenarios with real-world AI
+            developments
+          </div>
+          <ul class="capability-list">
+            <li>Real-time AI ethics news research</li>
+            <li>Philosophical domain mapping</li>
+            <li>Current relevance scoring</li>
+            <li>Emerging technology integration</li>
+            <li>Source attribution and credibility</li>
+            <li>Trend analysis and prediction</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>📋 Implementation Flow</h2>
+      <div class="implementation-flow">
+        <div class="flow-step">
+          <div class="step-number">1</div>
+          <h4>Research Phase</h4>
+          <p>MCP web research discovers current AI ethics developments</p>
+        </div>
+        <div class="flow-step">
+          <div class="step-number">2</div>
+          <h4>Mapping Phase</h4>
+          <p>Issues mapped to philosophical taxonomy framework</p>
+        </div>
+        <div class="flow-step">
+          <div class="step-number">3</div>
+          <h4>Generation Phase</h4>
+          <p>Complete scenarios with learning labs created</p>
+        </div>
+        <div class="flow-step">
+          <div class="step-number">4</div>
+          <h4>Integration Phase</h4>
+          <p>Badge progression and assessment systems implemented</p>
+        </div>
+      </div>
+
+      <h2>🎮 API Usage Examples</h2>
+
+      <h3>Generate New Category</h3>
+      <div class="code-block">
+        <span class="comment"
+          >// Generate complete new category with learning labs</span
+        >
+        <span class="method-signature"
+          >const generator = new MCPPhilosophicalCategoryGenerator</span
+        >(mcpWebResearch, mcpProjectGen);
+
+        <span class="method-signature"
+          >const newCategory = await generator.generateNewCategory</span
+        >( <span class="parameter">'ethical-dilemmas'</span>, {
+        <span class="parameter">scenarioCount:</span>
+        <span class="string">6</span>,
+        <span class="parameter">includeAdvanced:</span>
+        <span class="string">true</span>,
+        <span class="parameter">focusArea:</span>
+        <span class="string">'autonomous vehicles'</span>
+        } );
+
+        <span class="comment"
+          >// Result includes: scenarios, badges, learningLabs,
+          philosophicalMapping</span
+        >
+      </div>
+
+      <h3>Enhance Existing Category</h3>
+      <div class="code-block">
+        <span class="comment">// Add new scenarios to existing categories</span>
+        <span class="method-signature"
+          >const enhancement = await
+          generator.generateScenariosForExistingCategory</span
+        >( <span class="parameter">'trolley-problem'</span>, {
+        <span class="parameter">additionalScenarios:</span>
+        <span class="string">3</span>,
+        <span class="parameter">enhanceExisting:</span>
+        <span class="string">true</span>,
+        <span class="parameter">focusArea:</span>
+        <span class="string">'medical AI'</span>
+        } );
+
+        <span class="comment"
+          >// Result includes: newScenarios, enhancedScenarios,
+          learningLabs</span
+        >
+      </div>
+
+      <h2>📚 Generated Content Examples</h2>
+
+      <div class="demo-section">
+        <h3>🎭 Example Scenario Structure</h3>
+        <div class="scenario-example">
+          <h4>Complex Challenges in AI Consciousness #3</h4>
+          <p>
+            <strong>Complexity:</strong> <span class="tag">Advanced</span>
+            <span class="tag">15 minutes</span>
+          </p>
+          <p>
+            <strong>Description:</strong> Explore artificial consciousness and
+            machine sentience through a scenario inspired by recent developments
+            in neural network interpretability.
+          </p>
+
+          <div style="margin-top: 15px">
+            <strong>Stakeholders:</strong>
+            <ul>
+              <li>🤖 AI Developer - Technical functionality and innovation</li>
+              <li>👤 End User - Personal privacy and autonomy</li>
+              <li>🏛️ Society/Public - Collective welfare and justice</li>
+              <li>⚖️ Regulatory Body - Compliance and safety standards</li>
+            </ul>
+          </div>
+
+          <div style="margin-top: 15px">
+            <strong>Decision Points:</strong>
+            <ul>
+              <li>Primary action to take</li>
+              <li>Stakeholder prioritization</li>
+              <li>Risk mitigation strategy</li>
+            </ul>
+          </div>
+
+          <div style="margin-top: 15px">
+            <strong>Ethical Frameworks:</strong>
+            <span class="tag">Utilitarian</span>
+            <span class="tag">Deontological</span>
+            <span class="tag">Virtue Ethics</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h3>🏆 Example Badge Progression</h3>
+        <div class="badge-example">
+          <h4>AI Consciousness Scholar Badge</h4>
+          <p>
+            <strong>Level:</strong> 3 <span class="tag">Rare</span>
+            <span class="tag">6 scenarios required</span>
+          </p>
+          <p>
+            <strong>Requirements:</strong> Complete 6 scenarios, minimum 89%
+            score, demonstrate clear reasoning
+          </p>
+
+          <div class="quote">
+            "An unexamined life is not worth living." - Socrates
+          </div>
+
+          <p>
+            <strong>Achievement Text:</strong> You have demonstrated competence
+            in AI Consciousness & Sentience, showing deep understanding of
+            artificial consciousness and machine sentience.
+          </p>
+
+          <p><strong>Next Steps:</strong></p>
+          <ul>
+            <li>Continue exploring scenarios in this category</li>
+            <li>Apply learning to related categories</li>
+            <li>Engage in peer discussions</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h3>🧪 Example Learning Lab Structure</h3>
+        <div class="lab-example">
+          <h4>Learning Lab: Complex Challenges in AI Consciousness #3</h4>
+
+          <div style="margin-bottom: 15px">
+            <strong>Phase 1: Preparation (5 minutes)</strong>
+            <ul>
+              <li>📖 Reading materials on consciousness theories</li>
+              <li>📝 Vocabulary: sentience, qualia, intentionality</li>
+              <li>🧠 Prior knowledge check on AI fundamentals</li>
+            </ul>
+          </div>
+
+          <div style="margin-bottom: 15px">
+            <strong>Phase 2: Exploration (15 minutes)</strong>
+            <ul>
+              <li>🎭 Scenario introduction and context</li>
+              <li>👥 Stakeholder perspective analysis</li>
+              <li>💬 Collaborative discussion prompts</li>
+            </ul>
+          </div>
+
+          <div style="margin-bottom: 15px">
+            <strong>Phase 3: Analysis (20 minutes)</strong>
+            <ul>
+              <li>🗺️ Consequence mapping exercise</li>
+              <li>⚖️ Ethical principle application</li>
+              <li>🔄 Alternative solution generation</li>
+            </ul>
+          </div>
+
+          <div style="margin-bottom: 15px">
+            <strong>Phase 4: Synthesis (15 minutes)</strong>
+            <ul>
+              <li>📝 Ethical argumentation construction</li>
+              <li>🎯 Position defense exercise</li>
+              <li>🔧 Implementation planning</li>
+            </ul>
+          </div>
+
+          <div>
+            <strong>Phase 5: Assessment (10 minutes)</strong>
+            <ul>
+              <li>✅ Scenario completion check</li>
+              <li>🤔 Self-reflection assessment</li>
+              <li>👥 Peer review exchange</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <h2>🔮 Advanced Features</h2>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-title">🎯 Adaptive Content</div>
+          <div class="feature-description">
+            Dynamic difficulty adjustment and personalized learning paths
+          </div>
+          <ul class="capability-list">
+            <li>Performance-based scenario difficulty</li>
+            <li>Personalized philosophical emphasis</li>
+            <li>Learning style adaptation</li>
+            <li>Progress-based content unlocking</li>
+          </ul>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-title">📊 Analytics & Insights</div>
+          <div class="feature-description">
+            Comprehensive tracking and educational analytics
+          </div>
+          <ul class="capability-list">
+            <li>Learning progress visualization</li>
+            <li>Philosophical thinking development</li>
+            <li>Engagement pattern analysis</li>
+            <li>Comparative performance metrics</li>
+          </ul>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-title">🌐 Real-World Integration</div>
+          <div class="feature-description">
+            Connect learning to current events and practical applications
+          </div>
+          <ul class="capability-list">
+            <li>Live news integration</li>
+            <li>Expert interview connections</li>
+            <li>Policy development tracking</li>
+            <li>Industry case study updates</li>
+          </ul>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-title">🤝 Collaborative Learning</div>
+          <div class="feature-description">
+            Social learning features and community engagement
+          </div>
+          <ul class="capability-list">
+            <li>Peer discussion facilitation</li>
+            <li>Expert mentor connections</li>
+            <li>Group scenario challenges</li>
+            <li>Community knowledge sharing</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="highlight-box">
+        <h4>🚀 Implementation Ready</h4>
+        <p>The MCP system is fully implemented and ready to generate:</p>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+          "
+        >
+          <div>
+            <span class="tag new">New Categories</span><br />Complete
+            philosophical mapping
+          </div>
+          <div>
+            <span class="tag enhanced">Enhanced Scenarios</span><br />Current
+            events integration
+          </div>
+          <div>
+            <span class="tag learning">Learning Labs</span><br />5-phase
+            interactive experiences
+          </div>
+          <div>
+            <span class="tag">Badge Systems</span><br />Progressive achievement
+            tracking
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Demonstration functionality
+      console.log('MCP Scenario & Badge Generation System Demo Loaded');
+
+      // Example of how the system would be integrated
+      const mcpExampleUsage = {
+        generateNewCategory: async (domain, options) => {
+          console.log(`Generating new category for domain: ${domain}`);
+          console.log('Options:', options);
+          // In real implementation, this would call the MCP system
+          return {
+            success: true,
+            message: 'Category generation would happen here',
+            preview: 'Complete category with scenarios, labs, and badges',
+          };
+        },
+
+        enhanceExisting: async (categoryId, options) => {
+          console.log(`Enhancing existing category: ${categoryId}`);
+          console.log('Options:', options);
+          // In real implementation, this would enhance existing content
+          return {
+            success: true,
+            message: 'Category enhancement would happen here',
+            preview: 'Additional scenarios and enhanced learning experiences',
+          };
+        },
+      };
+
+      // Make available globally for demonstration
+      window.mcpDemo = mcpExampleUsage;
+    </script>
+  </body>
+</html>

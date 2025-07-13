@@ -28,7 +28,7 @@
 .badge-modal {
   background: linear-gradient(135deg, #2c5aa0 0%, #1e3a5f 100%);
   border-radius: 20px;
-  box-shadow: 
+  box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.25),
     0 0 0 1px rgba(255, 255, 255, 0.2);
   max-width: 500px;
@@ -66,7 +66,8 @@
   padding: 1rem;
   transition: all 0.3s ease;
   transform: scale(0);
-  animation: badge-entrance 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s forwards;
+  animation: badge-entrance 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s
+    forwards;
 }
 
 .badge-shield::before {
@@ -76,7 +77,12 @@
   left: -15px;
   right: -15px;
   bottom: -15px;
-  background: radial-gradient(circle, rgba(74, 144, 226, 0.4) 0%, rgba(74, 144, 226, 0.1) 50%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(74, 144, 226, 0.4) 0%,
+    rgba(74, 144, 226, 0.1) 50%,
+    transparent 70%
+  );
   border-radius: 50%;
   animation: pulse-glow 2s ease-in-out infinite;
   z-index: -1;
@@ -97,7 +103,8 @@
   transform: translate(-50%, -50%) scale(0);
   font-size: 2.2rem;
   z-index: 4;
-  animation: category-entrance 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.8s forwards;
+  animation: category-entrance 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.8s
+    forwards;
   filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
 }
 
@@ -108,7 +115,8 @@
   font-size: 1.4rem;
   z-index: 5;
   transform: scale(0) rotate(-180deg);
-  animation: sidekick-bounce 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1.2s forwards;
+  animation: sidekick-bounce 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1.2s
+    forwards;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
@@ -117,14 +125,14 @@
    ======================================== */
 
 .badge-glow-low {
-  box-shadow: 
+  box-shadow:
     0 0 20px rgba(74, 144, 226, 0.4),
     0 0 40px rgba(74, 144, 226, 0.2);
   animation: pulseGentleGlow 3s ease-in-out infinite;
 }
 
 .badge-glow-medium {
-  box-shadow: 
+  box-shadow:
     0 0 30px rgba(231, 76, 60, 0.5),
     0 0 60px rgba(231, 76, 60, 0.3),
     0 0 90px rgba(231, 76, 60, 0.1);
@@ -132,11 +140,89 @@
 }
 
 .badge-glow-high {
-  box-shadow: 
+  box-shadow:
     0 0 40px rgba(241, 196, 15, 0.6),
     0 0 80px rgba(241, 196, 15, 0.4),
     0 0 120px rgba(241, 196, 15, 0.2);
-  animation: pulseIntenseGlow 2s ease-in-out infinite, shimmerEffect 4s linear infinite;
+  animation:
+    pulseIntenseGlow 2s ease-in-out infinite,
+    shimmerEffect 4s linear infinite;
+}
+
+/* Extended Glow Effects for Higher Tiers (4-10) */
+
+.badge-glow-brilliant {
+  box-shadow:
+    0 0 50px rgba(138, 43, 226, 0.7),
+    0 0 100px rgba(138, 43, 226, 0.5),
+    0 0 150px rgba(138, 43, 226, 0.3);
+  animation:
+    pulseBrilliantGlow 1.8s ease-in-out infinite,
+    shimmerEffect 3s linear infinite;
+}
+
+.badge-glow-radiant {
+  box-shadow:
+    0 0 60px rgba(50, 205, 50, 0.8),
+    0 0 120px rgba(50, 205, 50, 0.6),
+    0 0 180px rgba(50, 205, 50, 0.4);
+  animation:
+    pulseRadiantGlow 1.6s ease-in-out infinite,
+    shimmerEffect 2.5s linear infinite;
+}
+
+.badge-glow-transcendent {
+  box-shadow:
+    0 0 70px rgba(255, 20, 147, 0.9),
+    0 0 140px rgba(255, 20, 147, 0.7),
+    0 0 210px rgba(255, 20, 147, 0.5);
+  animation:
+    pulseTranscendentGlow 1.4s ease-in-out infinite,
+    shimmerEffect 2s linear infinite;
+}
+
+.badge-glow-legendary {
+  box-shadow:
+    0 0 80px rgba(255, 140, 0, 1),
+    0 0 160px rgba(255, 140, 0, 0.8),
+    0 0 240px rgba(255, 140, 0, 0.6);
+  animation:
+    pulseLegendaryGlow 1.2s ease-in-out infinite,
+    shimmerEffect 1.8s linear infinite;
+}
+
+.badge-glow-mythic {
+  box-shadow:
+    0 0 90px rgba(75, 0, 130, 1),
+    0 0 180px rgba(75, 0, 130, 0.8),
+    0 0 270px rgba(75, 0, 130, 0.6),
+    0 0 360px rgba(75, 0, 130, 0.4);
+  animation:
+    pulseMythicGlow 1s ease-in-out infinite,
+    shimmerEffect 1.5s linear infinite;
+}
+
+.badge-glow-cosmic {
+  box-shadow:
+    0 0 100px rgba(0, 255, 255, 1),
+    0 0 200px rgba(0, 255, 255, 0.9),
+    0 0 300px rgba(0, 255, 255, 0.7),
+    0 0 400px rgba(0, 255, 255, 0.5);
+  animation:
+    pulseCosmicGlow 0.8s ease-in-out infinite,
+    shimmerEffect 1.2s linear infinite;
+}
+
+.badge-glow-divine {
+  box-shadow:
+    0 0 120px rgba(255, 215, 0, 1),
+    0 0 240px rgba(255, 215, 0, 0.9),
+    0 0 360px rgba(255, 215, 0, 0.8),
+    0 0 480px rgba(255, 215, 0, 0.6),
+    0 0 600px rgba(255, 215, 0, 0.4);
+  animation:
+    pulseDivineGlow 0.6s ease-in-out infinite,
+    shimmerEffect 1s linear infinite;
 }
 
 /* ========================================
@@ -153,27 +239,29 @@
 }
 
 @keyframes pulseGentleGlow {
-  0%, 100% {
-    box-shadow: 
+  0%,
+  100% {
+    box-shadow:
       0 0 20px rgba(74, 144, 226, 0.4),
       0 0 40px rgba(74, 144, 226, 0.2);
   }
   50% {
-    box-shadow: 
+    box-shadow:
       0 0 25px rgba(74, 144, 226, 0.5),
       0 0 50px rgba(74, 144, 226, 0.3);
   }
 }
 
 @keyframes pulseMediumGlow {
-  0%, 100% {
-    box-shadow: 
+  0%,
+  100% {
+    box-shadow:
       0 0 30px rgba(231, 76, 60, 0.5),
       0 0 60px rgba(231, 76, 60, 0.3),
       0 0 90px rgba(231, 76, 60, 0.1);
   }
   50% {
-    box-shadow: 
+    box-shadow:
       0 0 35px rgba(231, 76, 60, 0.6),
       0 0 70px rgba(231, 76, 60, 0.4),
       0 0 105px rgba(231, 76, 60, 0.2);
@@ -181,30 +269,149 @@
 }
 
 @keyframes pulseIntenseGlow {
-  0%, 100% {
-    box-shadow: 
+  0%,
+  100% {
+    box-shadow:
       0 0 40px rgba(241, 196, 15, 0.6),
       0 0 80px rgba(241, 196, 15, 0.4),
       0 0 120px rgba(241, 196, 15, 0.2);
   }
   50% {
-    box-shadow: 
+    box-shadow:
       0 0 50px rgba(241, 196, 15, 0.8),
       0 0 100px rgba(241, 196, 15, 0.6),
       0 0 150px rgba(241, 196, 15, 0.3);
   }
 }
 
-@keyframes shimmerEffect {
-  0% {
-    background-position: -100% 0;
-  }
+@keyframes pulseBrilliantGlow {
+  0%,
   100% {
-    background-position: 100% 0;
+    box-shadow:
+      0 0 50px rgba(138, 43, 226, 0.7),
+      0 0 100px rgba(138, 43, 226, 0.5),
+      0 0 150px rgba(138, 43, 226, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 60px rgba(138, 43, 226, 0.9),
+      0 0 120px rgba(138, 43, 226, 0.7),
+      0 0 180px rgba(138, 43, 226, 0.5);
   }
 }
 
-.badge-glow-high::before {
+@keyframes pulseRadiantGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 60px rgba(50, 205, 50, 0.8),
+      0 0 120px rgba(50, 205, 50, 0.6),
+      0 0 180px rgba(50, 205, 50, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 70px rgba(50, 205, 50, 1),
+      0 0 140px rgba(50, 205, 50, 0.8),
+      0 0 210px rgba(50, 205, 50, 0.6);
+  }
+}
+
+@keyframes pulseTranscendentGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 70px rgba(255, 20, 147, 0.9),
+      0 0 140px rgba(255, 20, 147, 0.7),
+      0 0 210px rgba(255, 20, 147, 0.5);
+  }
+  50% {
+    box-shadow:
+      0 0 80px rgba(255, 20, 147, 1),
+      0 0 160px rgba(255, 20, 147, 0.9),
+      0 0 240px rgba(255, 20, 147, 0.7);
+  }
+}
+
+@keyframes pulseLegendaryGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 80px rgba(255, 140, 0, 1),
+      0 0 160px rgba(255, 140, 0, 0.8),
+      0 0 240px rgba(255, 140, 0, 0.6);
+  }
+  50% {
+    box-shadow:
+      0 0 90px rgba(255, 140, 0, 1),
+      0 0 180px rgba(255, 140, 0, 1),
+      0 0 270px rgba(255, 140, 0, 0.8);
+  }
+}
+
+@keyframes pulseMythicGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 90px rgba(75, 0, 130, 1),
+      0 0 180px rgba(75, 0, 130, 0.8),
+      0 0 270px rgba(75, 0, 130, 0.6),
+      0 0 360px rgba(75, 0, 130, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 100px rgba(75, 0, 130, 1),
+      0 0 200px rgba(75, 0, 130, 1),
+      0 0 300px rgba(75, 0, 130, 0.8),
+      0 0 400px rgba(75, 0, 130, 0.6);
+  }
+}
+
+@keyframes pulseCosmicGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 100px rgba(0, 255, 255, 1),
+      0 0 200px rgba(0, 255, 255, 0.9),
+      0 0 300px rgba(0, 255, 255, 0.7),
+      0 0 400px rgba(0, 255, 255, 0.5);
+  }
+  50% {
+    box-shadow:
+      0 0 120px rgba(0, 255, 255, 1),
+      0 0 240px rgba(0, 255, 255, 1),
+      0 0 360px rgba(0, 255, 255, 0.9),
+      0 0 480px rgba(0, 255, 255, 0.7);
+  }
+}
+
+@keyframes pulseDivineGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 120px rgba(255, 215, 0, 1),
+      0 0 240px rgba(255, 215, 0, 0.9),
+      0 0 360px rgba(255, 215, 0, 0.8),
+      0 0 480px rgba(255, 215, 0, 0.6),
+      0 0 600px rgba(255, 215, 0, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 140px rgba(255, 215, 0, 1),
+      0 0 280px rgba(255, 215, 0, 1),
+      0 0 420px rgba(255, 215, 0, 1),
+      0 0 560px rgba(255, 215, 0, 0.8),
+      0 0 700px rgba(255, 215, 0, 0.6);
+  }
+}
+
+/* Shimmer effects for higher tiers */
+.badge-glow-brilliant::before,
+.badge-glow-radiant::before,
+.badge-glow-transcendent::before,
+.badge-glow-legendary::before,
+.badge-glow-mythic::before,
+.badge-glow-cosmic::before,
+.badge-glow-divine::before {
   content: '';
   position: absolute;
   top: -2px;
@@ -214,13 +421,13 @@
   background: linear-gradient(
     45deg,
     transparent,
-    rgba(241, 196, 15, 0.3),
+    rgba(255, 255, 255, 0.4),
     transparent
   );
   background-size: 200% 200%;
   border-radius: inherit;
   z-index: -1;
-  animation: shimmerEffect 4s linear infinite;
+  animation: shimmerEffect 1s linear infinite;
 }
 
 /* ========================================
@@ -241,7 +448,11 @@
 
 .floating-particle {
   position: absolute;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.2) 100%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.2) 100%
+  );
   border-radius: 50%;
   animation: float-up linear infinite;
 }
@@ -279,7 +490,8 @@
   font-size: 4rem;
   padding: 1rem;
   transform: scale(0);
-  animation: badge-entrance 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s forwards;
+  animation: badge-entrance 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s
+    forwards;
 }
 
 /* Removed pulse-glow effect for better performance */
@@ -312,11 +524,13 @@
 }
 
 @keyframes shield-glow {
-  0%, 100% {
+  0%,
+  100% {
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
   }
   50% {
-    filter: drop-shadow(0 2px 8px rgba(74, 144, 226, 0.6)) drop-shadow(0 0 15px rgba(74, 144, 226, 0.4));
+    filter: drop-shadow(0 2px 8px rgba(74, 144, 226, 0.6))
+      drop-shadow(0 0 15px rgba(74, 144, 226, 0.4));
   }
 }
 
@@ -328,7 +542,8 @@
   transform: translate(-50%, -50%) scale(0);
   font-size: 2.2rem;
   z-index: 4;
-  animation: category-entrance 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.8s forwards;
+  animation: category-entrance 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.8s
+    forwards;
   filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
 }
 
@@ -354,7 +569,8 @@
   font-size: 1.4rem;
   z-index: 5;
   transform: scale(0) rotate(-180deg);
-  animation: sidekick-bounce 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1.2s forwards;
+  animation: sidekick-bounce 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1.2s
+    forwards;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
@@ -384,7 +600,9 @@
   white-space: nowrap;
   width: 0;
   max-width: 100%;
-  animation: typewriter 1.5s steps(30) 1.2s forwards, blink-cursor 0.6s step-end 1.2s 2;
+  animation:
+    typewriter 1.5s steps(30) 1.2s forwards,
+    blink-cursor 0.6s step-end 1.2s 2;
   border-right: 2px solid rgba(255, 255, 255, 0.8);
   word-wrap: break-word;
   hyphens: auto;
@@ -400,10 +618,12 @@
 }
 
 @keyframes blink-cursor {
-  0%, 50% {
+  0%,
+  50% {
     border-right-color: rgba(255, 255, 255, 0.8);
   }
-  51%, 100% {
+  51%,
+  100% {
     border-right-color: transparent;
   }
 }
@@ -654,14 +874,28 @@
     animation: none;
     transition: none;
   }
-  
+
   .badge-glow-low,
   .badge-glow-medium,
-  .badge-glow-high {
+  .badge-glow-high,
+  .badge-glow-brilliant,
+  .badge-glow-radiant,
+  .badge-glow-transcendent,
+  .badge-glow-legendary,
+  .badge-glow-mythic,
+  .badge-glow-cosmic,
+  .badge-glow-divine {
     animation: none;
   }
-  
-  .badge-glow-high::before {
+
+  .badge-glow-high::before,
+  .badge-glow-brilliant::before,
+  .badge-glow-radiant::before,
+  .badge-glow-transcendent::before,
+  .badge-glow-legendary::before,
+  .badge-glow-mythic::before,
+  .badge-glow-cosmic::before,
+  .badge-glow-divine::before {
     animation: none;
   }
 }
@@ -678,12 +912,12 @@
     border: 2px solid #ffffff;
     background: #000000;
   }
-  
+
   .badge-title {
     color: #ffffff;
     -webkit-text-fill-color: #ffffff;
   }
-  
+
   .badge-quote {
     color: #cccccc;
   }
@@ -735,22 +969,27 @@
   }
   15% {
     opacity: 0.8;
-    transform: translateY(85vh) translateX(var(--drift-x)) scale(0.7) rotate(-5deg);
+    transform: translateY(85vh) translateX(var(--drift-x)) scale(0.7)
+      rotate(-5deg);
   }
   50% {
     opacity: 0.6;
-    transform: translateY(50vh) translateX(var(--drift-x)) scale(1) rotate(15deg);
+    transform: translateY(50vh) translateX(var(--drift-x)) scale(1)
+      rotate(15deg);
   }
   85% {
     opacity: 0.4;
-    transform: translateY(15vh) translateX(var(--drift-x)) scale(0.8) rotate(-10deg);
+    transform: translateY(15vh) translateX(var(--drift-x)) scale(0.8)
+      rotate(-10deg);
   }
   95% {
     opacity: 0.2;
-    transform: translateY(5vh) translateX(var(--drift-x)) scale(0.4) rotate(5deg);
+    transform: translateY(5vh) translateX(var(--drift-x)) scale(0.4)
+      rotate(5deg);
   }
   100% {
-    transform: translateY(-10vh) translateX(var(--drift-x)) scale(0.2) rotate(0deg);
+    transform: translateY(-10vh) translateX(var(--drift-x)) scale(0.2)
+      rotate(0deg);
     opacity: 0;
   }
 }

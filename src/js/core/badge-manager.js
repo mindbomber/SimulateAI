@@ -16,16 +16,16 @@
 
 /**
  * Badge Progress Manager
- * 
+ *
  * Handles badge state management, progress tracking, and achievement logic
  * for the SimulateAI badge system. Integrates with existing localStorage
  * progress tracking.
  */
 
-import { 
-  getBadgeConfig, 
+import {
+  getBadgeConfig,
   getNextBadgeTier,
-  ACTIVE_BADGE_TIERS 
+  ACTIVE_BADGE_TIERS,
 } from '../data/badge-config.js';
 
 /**
@@ -37,7 +37,8 @@ export class BadgeManager {
     this.STORAGE_KEY = 'simulateai_badge_progress';
     this.CATEGORY_PROGRESS_KEY = 'simulateai_category_progress';
     this.badgeState = this.loadBadgeState();
-    this.categoryProgress = this.loadCategoryProgress();
+    // Don't load category progress in constructor - always read fresh from localStorage
+    this.categoryProgress = {};
   }
 
   /**
@@ -50,20 +51,6 @@ export class BadgeManager {
       return stored ? JSON.parse(stored) : {};
     } catch (error) {
       // Silent error handling for badge state loading
-      return {};
-    }
-  }
-
-  /**
-   * Loads existing category progress from localStorage
-   * @returns {Object} Category progress object
-   */
-  loadCategoryProgress() {
-    try {
-      const stored = localStorage.getItem(this.CATEGORY_PROGRESS_KEY);
-      return stored ? JSON.parse(stored) : {};
-    } catch (error) {
-      // Silent error handling for category progress loading
       return {};
     }
   }
@@ -89,7 +76,7 @@ export class BadgeManager {
       this.badgeState[categoryId] = {
         badges: {},
         totalCompleted: 0,
-        lastUpdated: Date.now()
+        lastUpdated: Date.now(),
       };
 
       // Initialize all badge tiers as unearned
@@ -97,7 +84,7 @@ export class BadgeManager {
         this.badgeState[categoryId].badges[`tier${tier.tier}`] = {
           unlocked: false,
           timestamp: null,
-          requirement: tier.requirement
+          requirement: tier.requirement,
         };
       });
     }
@@ -105,16 +92,21 @@ export class BadgeManager {
 
   /**
    * Updates scenario completion and checks for new badge achievements
+   * Follows the same pattern as existing category-grid.js updateProgress method
    * @param {string} categoryId - Category identifier
-   * @param {string} _scenarioId - Scenario identifier (not used but part of API)
+   * @param {string} _scenarioId - Scenario identifier (for logging/analytics, not used in logic)
    * @returns {Array} Array of newly earned badges
    */
   updateScenarioCompletion(categoryId, _scenarioId) {
     // Initialize category if needed
     this.initializeCategoryBadges(categoryId);
 
-    // Get current completion count for this category
-    const categoryProgress = this.categoryProgress[categoryId] || {};
+    // Get current completion count for this category from localStorage
+    // This matches the existing pattern in category-grid.js and category-page.js
+    const stored = localStorage.getItem('simulateai_category_progress');
+    const userProgress = stored ? JSON.parse(stored) : {};
+    const categoryProgress = userProgress[categoryId] || {};
+
     const completedScenarios = Object.keys(categoryProgress).filter(
       scenarioKey => categoryProgress[scenarioKey] === true
     );
@@ -125,7 +117,10 @@ export class BadgeManager {
     this.badgeState[categoryId].lastUpdated = Date.now();
 
     // Check for newly earned badges
-    const newlyEarnedBadges = this.checkForNewBadges(categoryId, completionCount);
+    const newlyEarnedBadges = this.checkForNewBadges(
+      categoryId,
+      completionCount
+    );
 
     // Save updated state
     this.saveBadgeState();
@@ -159,7 +154,7 @@ export class BadgeManager {
           newlyEarned.push({
             ...badgeConfig,
             categoryId,
-            timestamp: badgeInfo.timestamp
+            timestamp: badgeInfo.timestamp,
           });
         }
       }
@@ -175,7 +170,7 @@ export class BadgeManager {
    */
   getEarnedBadges(categoryId) {
     this.initializeCategoryBadges(categoryId);
-    
+
     const categoryBadges = this.badgeState[categoryId].badges;
     const earnedBadges = [];
 
@@ -189,7 +184,7 @@ export class BadgeManager {
           earnedBadges.push({
             ...badgeConfig,
             categoryId,
-            timestamp: badgeInfo.timestamp
+            timestamp: badgeInfo.timestamp,
           });
         }
       }
@@ -206,19 +201,21 @@ export class BadgeManager {
   getNextBadge(categoryId) {
     const completionCount = this.getCategoryCompletionCount(categoryId);
     const nextTier = getNextBadgeTier(completionCount);
-    
+
     return nextTier ? getBadgeConfig(categoryId, nextTier.tier) : null;
   }
 
   /**
-   * Gets completion count for a category
+   * Gets completion count for a category using the same localStorage pattern as existing code
    * @param {string} categoryId - Category identifier
    * @returns {number} Number of completed scenarios
    */
   getCategoryCompletionCount(categoryId) {
-    // Always load fresh category progress to account for recent changes
-    const freshCategoryProgress = this.loadCategoryProgress();
-    const categoryProgress = freshCategoryProgress[categoryId] || {};
+    // Always load fresh category progress from localStorage to match existing pattern
+    const stored = localStorage.getItem('simulateai_category_progress');
+    const userProgress = stored ? JSON.parse(stored) : {};
+    const categoryProgress = userProgress[categoryId] || {};
+
     return Object.keys(categoryProgress).filter(
       scenarioKey => categoryProgress[scenarioKey] === true
     ).length;
@@ -238,12 +235,17 @@ export class BadgeManager {
       completed: completionCount,
       nextBadge,
       earnedBadges,
-      progress: nextBadge ? {
-        current: completionCount,
-        required: nextBadge.requirement,
-        remaining: Math.max(0, nextBadge.requirement - completionCount),
-        percentage: Math.min(100, (completionCount / nextBadge.requirement) * 100)
-      } : null
+      progress: nextBadge
+        ? {
+            current: completionCount,
+            required: nextBadge.requirement,
+            remaining: Math.max(0, nextBadge.requirement - completionCount),
+            percentage: Math.min(
+              100,
+              (completionCount / nextBadge.requirement) * 100
+            ),
+          }
+        : null,
     };
   }
 
@@ -254,10 +256,11 @@ export class BadgeManager {
   getAllBadgeStates() {
     const allStates = {};
 
-    // Reload category progress to get latest data
-    this.categoryProgress = this.loadCategoryProgress();
+    // Reload category progress to get latest data using consistent localStorage pattern
+    const stored = localStorage.getItem('simulateai_category_progress');
+    const userProgress = stored ? JSON.parse(stored) : {};
 
-    Object.keys(this.categoryProgress).forEach(categoryId => {
+    Object.keys(userProgress).forEach(categoryId => {
       allStates[categoryId] = this.getBadgeProgress(categoryId);
     });
 
@@ -282,10 +285,12 @@ export class BadgeManager {
    */
   getTotalEarnedBadges() {
     let total = 0;
-    
+
     Object.keys(this.badgeState).forEach(categoryId => {
       const categoryBadges = this.badgeState[categoryId].badges;
-      total += Object.values(categoryBadges).filter(badge => badge.unlocked).length;
+      total += Object.values(categoryBadges).filter(
+        badge => badge.unlocked
+      ).length;
     });
 
     return total;
@@ -302,9 +307,12 @@ export class BadgeManager {
 
   /**
    * Force updates category progress from current localStorage state
+   * Matches the pattern used in existing category-grid.js and category-page.js
    */
   refreshCategoryProgress() {
-    this.categoryProgress = this.loadCategoryProgress();
+    // Load fresh data from localStorage using the same key as existing code
+    const stored = localStorage.getItem('simulateai_category_progress');
+    this.categoryProgress = stored ? JSON.parse(stored) : {};
   }
 }
 

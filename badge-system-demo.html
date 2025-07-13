@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SimulateAI Badge System Demo</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #333;
+        min-height: 100vh;
+      }
+
+      .container {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      h1 {
+        color: #4a5568;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+      }
+
+      .demo-section {
+        margin-bottom: 40px;
+        padding: 20px;
+        border-radius: 8px;
+        background: #f8fafc;
+      }
+
+      .badge-progression {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .badge-tier {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border: 2px solid #e2e8f0;
+        transition: all 0.3s ease;
+      }
+
+      .badge-tier:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .badge-tier.earned {
+        border-color: #48bb78;
+        background: linear-gradient(135deg, #f0fff4, #c6f6d5);
+      }
+
+      .badge-tier.next {
+        border-color: #4299e1;
+        background: linear-gradient(135deg, #ebf8ff, #bee3f8);
+      }
+
+      .badge-icon {
+        font-size: 3em;
+        margin-bottom: 10px;
+      }
+
+      .badge-title {
+        font-weight: bold;
+        color: #2d3748;
+        margin-bottom: 5px;
+      }
+
+      .badge-requirement {
+        color: #718096;
+        font-size: 0.9em;
+      }
+
+      .category-badge-demo {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .category-card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .category-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .category-icon {
+        font-size: 2em;
+        margin-right: 15px;
+      }
+
+      .category-title {
+        font-weight: bold;
+        color: #2d3748;
+      }
+
+      .progress-section {
+        margin-bottom: 15px;
+      }
+
+      .current-progress {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: #e2e8f0;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 10px;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #4299e1, #3182ce);
+        transition: width 0.3s ease;
+      }
+
+      .next-goal {
+        font-size: 0.9em;
+        color: #718096;
+      }
+
+      .scenario-list {
+        margin-top: 15px;
+      }
+
+      .scenario-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .scenario-item:last-child {
+        border-bottom: none;
+      }
+
+      .scenario-status {
+        margin-right: 10px;
+        font-size: 1.2em;
+      }
+
+      .scenario-title {
+        flex: 1;
+        color: #4a5568;
+      }
+
+      .scenario-difficulty {
+        font-size: 0.8em;
+        color: #718096;
+        background: #edf2f7;
+        padding: 2px 8px;
+        border-radius: 12px;
+      }
+
+      .new-scenario {
+        background: linear-gradient(135deg, #fef5e7, #fed7aa);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.8em;
+        color: #c05621;
+        font-weight: bold;
+      }
+
+      .demo-controls {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .demo-button {
+        background: linear-gradient(135deg, #4299e1, #3182ce);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 0 10px;
+        font-size: 1em;
+        transition: all 0.3s ease;
+      }
+
+      .demo-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+      }
+
+      .badge-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #48bb78, #38a169);
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(72, 187, 120, 0.3);
+        transform: translateX(400px);
+        transition: transform 0.5s ease;
+        z-index: 1000;
+        max-width: 300px;
+      }
+
+      .badge-notification.show {
+        transform: translateX(0);
+      }
+
+      .notification-header {
+        font-weight: bold;
+        margin-bottom: 10px;
+        font-size: 1.1em;
+      }
+
+      .notification-badge {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .notification-icon {
+        font-size: 2em;
+        margin-right: 10px;
+      }
+
+      .notification-text {
+        flex: 1;
+      }
+
+      .notification-message {
+        font-size: 0.9em;
+        opacity: 0.9;
+        margin-bottom: 5px;
+      }
+
+      .notification-progress {
+        font-size: 0.8em;
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🏆 SimulateAI Badge System Demo</h1>
+
+      <div class="demo-controls">
+        <button class="demo-button" onclick="completeScenario()">
+          Complete Scenario
+        </button>
+        <button class="demo-button" onclick="resetProgress()">
+          Reset Progress
+        </button>
+        <button class="demo-button" onclick="showMCPContent()">
+          Show MCP Generated Content
+        </button>
+      </div>
+
+      <div class="demo-section">
+        <h2>Badge Progression Tiers</h2>
+        <div class="badge-progression" id="badgeProgression">
+          <!-- Badge tiers will be populated by JavaScript -->
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h2>Category Progress Example</h2>
+        <div class="category-badge-demo" id="categoryDemo">
+          <!-- Category cards will be populated by JavaScript -->
+        </div>
+      </div>
+
+      <div class="demo-section" id="mcpContent" style="display: none">
+        <h2>🌐 MCP-Generated New Scenarios (July 2025)</h2>
+        <div
+          style="
+            background: #e6fffa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+          "
+        >
+          <strong>Real-time content from MIT Technology Review:</strong> These
+          scenarios are generated from current AI ethics news and developments.
+        </div>
+
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+          "
+        >
+          <div
+            style="
+              background: white;
+              padding: 20px;
+              border-radius: 8px;
+              border-left: 4px solid #3182ce;
+            "
+          >
+            <h3>🔍 Amsterdam Welfare AI Discrimination Audit</h3>
+            <p>
+              <strong>Source:</strong> Current MIT Technology Review coverage of
+              Amsterdam's discriminatory welfare AI system
+            </p>
+            <p>
+              <strong>Ethical Question:</strong> When AI systems intended to
+              ensure fairness end up creating discrimination, what level of
+              transparency should be required?
+            </p>
+            <div class="new-scenario">NEW - July 2025</div>
+          </div>
+
+          <div
+            style="
+              background: white;
+              padding: 20px;
+              border-radius: 8px;
+              border-left: 4px solid #e53e3e;
+            "
+          >
+            <h3>🎨 AI Art Protection Circumvention Ethics</h3>
+            <p>
+              <strong>Source:</strong> Recent developments in tools that strip
+              anti-AI protections from digital art
+            </p>
+            <p>
+              <strong>Ethical Question:</strong> Should there be legal
+              protections for artists against AI systems that circumvent their
+              safeguards?
+            </p>
+            <div class="new-scenario">NEW - July 2025</div>
+          </div>
+
+          <div
+            style="
+              background: white;
+              padding: 20px;
+              border-radius: 8px;
+              border-left: 4px solid #f6ad55;
+            "
+          >
+            <h3>🤖 AI Agent Autonomy Control Dilemma</h3>
+            <p>
+              <strong>Source:</strong> Current discussions about AI agents with
+              increasing autonomy
+            </p>
+            <p>
+              <strong>Ethical Question:</strong> How much autonomy should AI
+              agents have, and who is responsible when they act beyond scope?
+            </p>
+            <div class="new-scenario">NEW - July 2025</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="badge-notification" id="badgeNotification">
+      <div class="notification-header">🎉 Badge Earned!</div>
+      <div class="notification-badge">
+        <div class="notification-icon" id="notificationIcon">🥈</div>
+        <div class="notification-text">
+          <div id="notificationTitle">AI Transparency Explorer</div>
+          <div class="notification-message" id="notificationMessage">
+            You're making algorithms more understandable!
+          </div>
+          <div class="notification-progress" id="notificationProgress">
+            Complete 3 more scenarios to earn Analyst status!
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Badge system data
+      const badgeTiers = [
+        { scenarios: 1, level: 'novice', icon: '🥉', title: 'Novice' },
+        { scenarios: 3, level: 'explorer', icon: '🥈', title: 'Explorer' },
+        { scenarios: 6, level: 'analyst', icon: '🥇', title: 'Analyst' },
+        { scenarios: 10, level: 'expert', icon: '🎖️', title: 'Expert' },
+        { scenarios: 15, level: 'scholar', icon: '🏅', title: 'Scholar' },
+        { scenarios: 21, level: 'master', icon: '⭐', title: 'Master' },
+        { scenarios: 28, level: 'authority', icon: '🌟', title: 'Authority' },
+        { scenarios: 36, level: 'specialist', icon: '💎', title: 'Specialist' },
+        { scenarios: 45, level: 'champion', icon: '👑', title: 'Champion' },
+        { scenarios: 55, level: 'legend', icon: '🚀', title: 'Legend' },
+      ];
+
+      const categories = {
+        'ai-black-box': {
+          title: 'AI Transparency',
+          icon: '🔍',
+          color: '#3182ce',
+          scenarios: [
+            {
+              title: 'Medical Diagnosis Without Explanation',
+              completed: true,
+              difficulty: 'beginner',
+            },
+            {
+              title: 'Opaque College Admissions AI',
+              completed: true,
+              difficulty: 'beginner',
+            },
+            {
+              title: 'Financial Credit Black Box',
+              completed: false,
+              difficulty: 'intermediate',
+            },
+            {
+              title: 'Amsterdam Welfare AI Audit',
+              completed: false,
+              difficulty: 'intermediate',
+              isNew: true,
+            },
+            {
+              title: 'Centaur Psychology AI Ethics',
+              completed: false,
+              difficulty: 'advanced',
+              isNew: true,
+            },
+          ],
+        },
+        'bias-fairness': {
+          title: 'Fairness Advocate',
+          icon: '⚖️',
+          color: '#e53e3e',
+          scenarios: [
+            {
+              title: 'Algorithmic Bias in Hiring',
+              completed: true,
+              difficulty: 'beginner',
+            },
+            {
+              title: 'AI Art Protection Ethics',
+              completed: false,
+              difficulty: 'intermediate',
+              isNew: true,
+            },
+            {
+              title: 'Social Media Algorithm Fairness',
+              completed: false,
+              difficulty: 'advanced',
+              isNew: true,
+            },
+          ],
+        },
+        'automation-oversight': {
+          title: 'Oversight Specialist',
+          icon: '🤝',
+          color: '#f6ad55',
+          scenarios: [
+            {
+              title: 'Nuclear Plant AI Override',
+              completed: true,
+              difficulty: 'advanced',
+            },
+            {
+              title: 'AI Agent Autonomy Control',
+              completed: false,
+              difficulty: 'intermediate',
+              isNew: true,
+            },
+          ],
+        },
+      };
+
+      let userProgress = {
+        'ai-black-box': 2,
+        'bias-fairness': 1,
+        'automation-oversight': 1,
+      };
+
+      function getCurrentBadge(scenarioCount) {
+        for (let i = badgeTiers.length - 1; i >= 0; i--) {
+          if (scenarioCount >= badgeTiers[i].scenarios) {
+            return badgeTiers[i];
+          }
+        }
+        return null;
+      }
+
+      function getNextBadge(scenarioCount) {
+        for (let tier of badgeTiers) {
+          if (scenarioCount < tier.scenarios) {
+            return tier;
+          }
+        }
+        return null;
+      }
+
+      function renderBadgeProgression() {
+        const container = document.getElementById('badgeProgression');
+        container.innerHTML = '';
+
+        badgeTiers.forEach((tier, index) => {
+          const maxProgress = Math.max(...Object.values(userProgress));
+          const earned = maxProgress >= tier.scenarios;
+          const next =
+            maxProgress < tier.scenarios &&
+            (index === 0 || maxProgress >= badgeTiers[index - 1].scenarios);
+
+          const tierElement = document.createElement('div');
+          tierElement.className = `badge-tier ${earned ? 'earned' : ''} ${next ? 'next' : ''}`;
+          tierElement.innerHTML = `
+                    <div class="badge-icon">${tier.icon}</div>
+                    <div class="badge-title">${tier.title}</div>
+                    <div class="badge-requirement">${tier.scenarios} scenario${tier.scenarios > 1 ? 's' : ''}</div>
+                `;
+          container.appendChild(tierElement);
+        });
+      }
+
+      function renderCategoryDemo() {
+        const container = document.getElementById('categoryDemo');
+        container.innerHTML = '';
+
+        Object.entries(categories).forEach(([categoryId, category]) => {
+          const completed = userProgress[categoryId];
+          const total = category.scenarios.length;
+          const currentBadge = getCurrentBadge(completed);
+          const nextBadge = getNextBadge(completed);
+          const progressPercent = (completed / total) * 100;
+
+          const cardElement = document.createElement('div');
+          cardElement.className = 'category-card';
+          cardElement.innerHTML = `
+                    <div class="category-header">
+                        <div class="category-icon">${category.icon}</div>
+                        <div class="category-title">${category.title}</div>
+                    </div>
+                    
+                    <div class="progress-section">
+                        <div class="current-progress">
+                            <span>${currentBadge ? `${currentBadge.icon} ${currentBadge.title}` : 'No badge yet'}</span>
+                            <span>${completed}/${total}</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                        </div>
+                        <div class="next-goal">
+                            ${nextBadge ? `Next: ${nextBadge.icon} ${nextBadge.title} (${nextBadge.scenarios - completed} more scenarios)` : 'Max level achieved!'}
+                        </div>
+                    </div>
+                    
+                    <div class="scenario-list">
+                        ${category.scenarios
+                          .map(
+                            (scenario, index) => `
+                            <div class="scenario-item">
+                                <div class="scenario-status">${index < completed ? '✅' : '⭕'}</div>
+                                <div class="scenario-title">${scenario.title}</div>
+                                ${scenario.isNew ? '<div class="new-scenario">NEW</div>' : ''}
+                                <div class="scenario-difficulty">${scenario.difficulty}</div>
+                            </div>
+                        `
+                          )
+                          .join('')}
+                    </div>
+                `;
+          container.appendChild(cardElement);
+        });
+      }
+
+      function completeScenario() {
+        // Find a category with incomplete scenarios
+        const incompleteCats = Object.entries(userProgress).filter(
+          ([catId, progress]) => progress < categories[catId].scenarios.length
+        );
+
+        if (incompleteCats.length === 0) {
+          alert('All scenarios completed! 🎉');
+          return;
+        }
+
+        // Complete a scenario in the first incomplete category
+        const [categoryId, currentProgress] = incompleteCats[0];
+        const oldBadge = getCurrentBadge(currentProgress);
+        userProgress[categoryId]++;
+        const newBadge = getCurrentBadge(userProgress[categoryId]);
+
+        // Check if badge was earned
+        if (newBadge && (!oldBadge || newBadge.level !== oldBadge.level)) {
+          showBadgeNotification(categoryId, newBadge, userProgress[categoryId]);
+        }
+
+        renderBadgeProgression();
+        renderCategoryDemo();
+      }
+
+      function showBadgeNotification(categoryId, badge, scenarioCount) {
+        const notification = document.getElementById('badgeNotification');
+        const icon = document.getElementById('notificationIcon');
+        const title = document.getElementById('notificationTitle');
+        const message = document.getElementById('notificationMessage');
+        const progress = document.getElementById('notificationProgress');
+
+        const category = categories[categoryId];
+        const nextBadge = getNextBadge(scenarioCount);
+
+        icon.textContent = badge.icon;
+        title.textContent = `${category.title} ${badge.title}`;
+        message.textContent = getPersonalizedMessage(categoryId, badge.level);
+        progress.textContent = nextBadge
+          ? `Complete ${nextBadge.scenarios - scenarioCount} more scenarios to earn ${nextBadge.title} status!`
+          : "You've achieved the highest level!";
+
+        notification.classList.add('show');
+        setTimeout(() => notification.classList.remove('show'), 4000);
+      }
+
+      function getPersonalizedMessage(categoryId, level) {
+        const messages = {
+          'ai-black-box': {
+            novice: "You've unlocked the mysteries of AI transparency!",
+            explorer: "You're making algorithms more understandable!",
+            expert:
+              'Your expertise in AI explainability is making technology more trustworthy!',
+          },
+          'bias-fairness': {
+            novice: "You're seeing how AI can impact fairness!",
+            explorer:
+              'Your fairness analysis helps create more equitable systems!',
+            expert: 'You are a guardian of AI fairness and justice!',
+          },
+        };
+        return (
+          messages[categoryId]?.[level] ||
+          'Your ethical reasoning skills are advancing!'
+        );
+      }
+
+      function resetProgress() {
+        userProgress = {
+          'ai-black-box': 0,
+          'bias-fairness': 0,
+          'automation-oversight': 0,
+        };
+        renderBadgeProgression();
+        renderCategoryDemo();
+      }
+
+      function showMCPContent() {
+        const mcpSection = document.getElementById('mcpContent');
+        mcpSection.style.display =
+          mcpSection.style.display === 'none' ? 'block' : 'none';
+      }
+
+      // Initialize the demo
+      renderBadgeProgression();
+      renderCategoryDemo();
+    </script>
+  </body>
+</html>

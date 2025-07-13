@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Badge System Integration Test</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f8fafc;
+      }
+
+      .test-container {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+
+      h1 {
+        color: #2d3748;
+        margin-bottom: 20px;
+      }
+
+      .current-status {
+        background: #e6f7ff;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+      }
+
+      .test-button {
+        background: linear-gradient(135deg, #4299e1, #3182ce);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 5px;
+        font-size: 1em;
+        transition: all 0.3s ease;
+      }
+
+      .test-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+      }
+
+      .status-item {
+        margin: 10px 0;
+        padding: 10px;
+        background: #f7fafc;
+        border-radius: 6px;
+        border-left: 4px solid #4299e1;
+      }
+
+      .badge-list {
+        margin-top: 15px;
+      }
+
+      .badge-item {
+        display: inline-block;
+        background: linear-gradient(135deg, #48bb78, #38a169);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 20px;
+        margin: 4px;
+        font-size: 0.9em;
+      }
+
+      .debug-info {
+        background: #f1f5f9;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 20px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9em;
+      }
+
+      .error {
+        color: #e53e3e;
+        background: #fed7d7;
+      }
+
+      .success {
+        color: #38a169;
+        background: #c6f6d5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🏆 Badge System Integration Test</h1>
+
+      <div class="current-status">
+        <h3>Current Status</h3>
+        <div id="currentStatus">Loading...</div>
+      </div>
+
+      <div>
+        <h3>Test Actions</h3>
+        <button
+          class="test-button"
+          onclick="simulateScenarioCompletion('trolley-problem', 'classic-trolley')"
+        >
+          Complete Trolley Problem Scenario
+        </button>
+        <button
+          class="test-button"
+          onclick="simulateScenarioCompletion('ai-black-box', 'medical-diagnosis')"
+        >
+          Complete AI Black Box Scenario
+        </button>
+        <button
+          class="test-button"
+          onclick="simulateScenarioCompletion('bias-fairness', 'hiring-algorithm')"
+        >
+          Complete Bias & Fairness Scenario
+        </button>
+        <button class="test-button" onclick="checkBadgeProgress()">
+          Check Badge Progress
+        </button>
+        <button class="test-button" onclick="resetProgress()">
+          Reset All Progress
+        </button>
+      </div>
+
+      <div class="debug-info">
+        <h3>Debug Information</h3>
+        <div id="debugInfo">
+          Click buttons above to test badge system integration...
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      // Test badge system integration
+      let BadgeManager;
+
+      async function loadBadgeSystem() {
+        try {
+          // Import badge manager
+          const badgeModule = await import('./src/js/core/badge-manager.js');
+          BadgeManager = badgeModule.default;
+
+          console.log('✅ Badge system loaded successfully');
+          updateStatus();
+          return true;
+        } catch (error) {
+          console.error('❌ Failed to load badge system:', error);
+          document.getElementById('debugInfo').innerHTML = `
+                    <div class="error">Error loading badge system: ${error.message}</div>
+                    <div>Make sure you're running this from the SimulateAI project directory.</div>
+                `;
+          return false;
+        }
+      }
+
+      function updateStatus() {
+        if (!BadgeManager) {
+          document.getElementById('currentStatus').innerHTML =
+            '<div class="error">Badge system not loaded</div>';
+          return;
+        }
+
+        try {
+          // Get current localStorage data (matches existing pattern)
+          const stored = localStorage.getItem('simulateai_category_progress');
+          const userProgress = stored ? JSON.parse(stored) : {};
+
+          const statusHtml = [];
+
+          // Check each category
+          ['trolley-problem', 'ai-black-box', 'bias-fairness'].forEach(
+            categoryId => {
+              const categoryProgress = userProgress[categoryId] || {};
+              const completedCount = Object.keys(categoryProgress).filter(
+                scenarioKey => categoryProgress[scenarioKey] === true
+              ).length;
+
+              const badgeProgress = BadgeManager.getBadgeProgress(categoryId);
+              const earnedBadges = badgeProgress.earnedBadges || [];
+
+              statusHtml.push(`
+                        <div class="status-item">
+                            <strong>${categoryId}:</strong> ${completedCount} scenarios completed
+                            ${
+                              earnedBadges.length > 0
+                                ? `<div class="badge-list">
+                                    ${earnedBadges
+                                      .map(badge => {
+                                        const timestamp = new Date(
+                                          badge.timestamp
+                                        ).toLocaleString('en-US', {
+                                          month: 'short',
+                                          day: 'numeric',
+                                          hour: 'numeric',
+                                          minute: '2-digit',
+                                          hour12: true,
+                                        });
+                                        return `<span class="badge-item" title="${badge.quote} (Earned: ${timestamp})">${badge.title}</span>`;
+                                      })
+                                      .join('')}
+                                </div>`
+                                : '<div>No badges earned yet</div>'
+                            }
+                        </div>
+                    `);
+            }
+          );
+
+          document.getElementById('currentStatus').innerHTML =
+            statusHtml.join('');
+
+          // Update debug info
+          document.getElementById('debugInfo').innerHTML = `
+                    <div class="success">Badge system working correctly!</div>
+                    <div>localStorage key: simulateai_category_progress</div>
+                    <div>Badge state key: simulateai_badge_progress</div>
+                    <div>Current data: ${JSON.stringify(userProgress, null, 2)}</div>
+                `;
+        } catch (error) {
+          document.getElementById('debugInfo').innerHTML = `
+                    <div class="error">Error checking status: ${error.message}</div>
+                `;
+        }
+      }
+
+      // Make functions available globally
+      window.simulateScenarioCompletion = function (categoryId, scenarioId) {
+        if (!BadgeManager) {
+          alert('Badge system not loaded!');
+          return;
+        }
+
+        try {
+          // Simulate scenario completion using existing localStorage pattern
+          const stored = localStorage.getItem('simulateai_category_progress');
+          const userProgress = stored ? JSON.parse(stored) : {};
+
+          if (!userProgress[categoryId]) {
+            userProgress[categoryId] = {};
+          }
+
+          userProgress[categoryId][scenarioId] = true;
+          localStorage.setItem(
+            'simulateai_category_progress',
+            JSON.stringify(userProgress)
+          );
+
+          console.log(`✅ Completed scenario: ${categoryId}/${scenarioId}`);
+
+          // Check for new badges (matches existing category-grid.js pattern)
+          const newBadges = BadgeManager.updateScenarioCompletion(
+            categoryId,
+            scenarioId
+          );
+
+          if (newBadges && newBadges.length > 0) {
+            // Show detailed badge information including philosophical text
+            const badgeDetails = newBadges
+              .map(badge => {
+                const timestamp = new Date(badge.timestamp).toLocaleString(
+                  'en-US',
+                  {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true,
+                  }
+                );
+
+                return (
+                  `🏆 ${badge.title}\n` +
+                  `💭 "${badge.quote}"\n` +
+                  `📅 Earned: ${timestamp}\n` +
+                  `✨ Reason: You completed scenarios in ${badge.categoryName}`
+                );
+              })
+              .join('\n\n');
+
+            alert(`🎉 New Badge(s) Earned!\n\n${badgeDetails}`);
+          }
+
+          updateStatus();
+        } catch (error) {
+          console.error('Error simulating scenario completion:', error);
+          alert(`Error: ${error.message}`);
+        }
+      };
+
+      window.checkBadgeProgress = function () {
+        if (!BadgeManager) {
+          alert('Badge system not loaded!');
+          return;
+        }
+
+        try {
+          const allStates = BadgeManager.getAllBadgeStates();
+          console.log('Badge progress:', allStates);
+
+          let summary = 'Badge Progress Summary:\n\n';
+          Object.entries(allStates).forEach(([categoryId, state]) => {
+            summary += `📚 ${categoryId}: ${state.completed} completed\n`;
+            if (state.earnedBadges.length > 0) {
+              summary += `🏆 Badges earned:\n`;
+              state.earnedBadges.forEach(badge => {
+                const timestamp = new Date(badge.timestamp).toLocaleString(
+                  'en-US',
+                  {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true,
+                  }
+                );
+                summary += `   • ${badge.title} (${timestamp})\n`;
+                summary += `     💭 "${badge.quote}"\n`;
+              });
+            } else {
+              summary += `   No badges earned yet\n`;
+            }
+            if (state.nextBadge) {
+              summary += `🎯 Next: ${state.nextBadge.title} (need ${state.progress.remaining} more)\n`;
+              summary += `   💭 Will earn: "${state.nextBadge.quote}"\n`;
+            }
+            summary += '\n';
+          });
+
+          alert(summary);
+        } catch (error) {
+          console.error('Error checking badge progress:', error);
+          alert(`Error: ${error.message}`);
+        }
+      };
+
+      window.resetProgress = function () {
+        if (confirm('Reset all progress and badges?')) {
+          localStorage.removeItem('simulateai_category_progress');
+          localStorage.removeItem('simulateai_badge_progress');
+          console.log('🔄 Progress reset');
+          updateStatus();
+        }
+      };
+
+      // Initialize
+      loadBadgeSystem();
+    </script>
+  </body>
+</html>

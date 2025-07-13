@@ -49,6 +49,7 @@ import CategoryGrid from './components/category-grid.js';
 import RadarChart from './components/radar-chart.js';
 import OnboardingTour from './components/onboarding-tour.js';
 import { getAllCategories, getCategoryScenarios } from '../data/categories.js';
+import MCPIntegrationManager from './integrations/mcp-integration-manager.js';
 
 // Constants for app configuration
 const APP_CONSTANTS = {
@@ -152,6 +153,10 @@ class AIEthicsApp {
     // Onboarding tour
     this.onboardingTour = null;
 
+    // MCP Integration Manager
+    this.mcpManager = null;
+    this.mcpCapabilities = new Set();
+
     // Available simulation categories (each containing multiple scenarios)
     // NOTE: These are thematic categories, not individual scenarios
     this.availableSimulations = [
@@ -203,6 +208,8 @@ class AIEthicsApp {
     if (this.isInitialized) return;
 
     try {
+      AppDebug.log('🚀 Starting AIEthicsApp initialization...');
+
       // Initialize scroll manager first (handles all scroll behavior)
       scrollManager.init();
 
@@ -265,6 +272,9 @@ class AIEthicsApp {
 
       // Initialize scroll reveal header
       this.initializeScrollRevealHeader();
+
+      // Initialize MCP integrations
+      await this.initializeMCPIntegrations();
 
       this.isInitialized = true;
       AppDebug.log(
@@ -2754,6 +2764,108 @@ class AIEthicsApp {
       'InfiniteLoopDetector',
       '📊 Instrumented OnboardingTour methods for monitoring'
     );
+  }
+
+  /**
+   * Initialize MCP (Model Context Protocol) integrations
+   */
+  async initializeMCPIntegrations() {
+    try {
+      AppDebug.log('Initializing MCP integrations...');
+
+      this.mcpManager = new MCPIntegrationManager(this);
+      const mcpResult = await this.mcpManager.initializeIntegrations();
+
+      if (mcpResult.success) {
+        this.mcpCapabilities = new Set(mcpResult.capabilities);
+        AppDebug.log('MCP integrations initialized:', mcpResult.capabilities);
+
+        // Enhance existing features with MCP capabilities
+        await this.enhanceWithMCPCapabilities();
+      } else {
+        AppDebug.warn('MCP integrations failed to initialize');
+      }
+    } catch (error) {
+      AppDebug.error('Failed to initialize MCP integrations:', error);
+      // Continue without MCP - app should still function
+    }
+  }
+
+  /**
+   * Enhance existing features with MCP capabilities
+   */
+  async enhanceWithMCPCapabilities() {
+    if (!this.mcpManager) return;
+
+    try {
+      // Enhance scenario creation
+      if (this.mcpCapabilities.has('scenario_generation')) {
+        this.enhanceScenarioCreation();
+      }
+
+      // Enhance analytics
+      if (this.mcpCapabilities.has('enhanced_analytics')) {
+        this.enhanceAnalytics();
+      }
+
+      // Enhance content with real-world examples
+      if (this.mcpCapabilities.has('real_time_content')) {
+        this.enhanceContentWithRealWorld();
+      }
+
+      AppDebug.log('Existing features enhanced with MCP capabilities');
+    } catch (error) {
+      AppDebug.error('Failed to enhance features with MCP:', error);
+    }
+  }
+
+  /**
+   * Enhanced scenario creation using MCP capabilities
+   */
+  enhanceScenarioCreation() {
+    // Add MCP-enhanced scenario creation to the platform
+    this.createEnhancedScenario = async scenarioConfig => {
+      return await this.mcpManager.createEnhancedScenario(scenarioConfig);
+    };
+  }
+
+  /**
+   * Enhanced analytics using MCP capabilities
+   */
+  enhanceAnalytics() {
+    // Extend existing analytics with MCP enhancements
+    if (this.analytics) {
+      this.getAnalyticsInsights = async () => {
+        return await this.mcpManager.generateAnalyticsInsights();
+      };
+    }
+  }
+
+  /**
+   * Enhanced content with real-world examples
+   */
+  enhanceContentWithRealWorld() {
+    // Add real-world context to scenarios
+    this.addRealWorldContext = async (scenarioId, category) => {
+      const webResearch = this.mcpManager.integrations.get('webResearch');
+      if (webResearch) {
+        return await webResearch.enrichScenarioWithRealExamples(
+          scenarioId,
+          category
+        );
+      }
+      return null;
+    };
+  }
+
+  /**
+   * Get MCP status and capabilities
+   */
+  getMCPStatus() {
+    if (!this.mcpManager) {
+      return { initialized: false, capabilities: [] };
+    }
+    return this.mcpManager.getMCPStatus();
   }
 
   // ...existing methods...
