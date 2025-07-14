@@ -24,7 +24,11 @@ const COLOR_LIGHTEN_AMOUNT = 20; // Amount to lighten colors for pulse effects
 const COLOR_DARKEN_AMOUNT = 20; // Amount to darken colors for pulse effects
 const TOOLTIP_TRANSITION_DURATION = 200; // Match CSS transition duration in ms
 const TOOLTIP_HOVER_DELAY = 300; // Delay before showing tooltip on hover in ms
-import { getCategoryScenarios, getCategoryProgress, getCategoryById } from '../data/categories.js';
+import {
+  getCategoryScenarios,
+  getCategoryProgress,
+  getCategoryById,
+} from '../data/categories.js';
 import PreLaunchModal from './components/pre-launch-modal.js';
 import ScenarioModal from './components/scenario-modal.js';
 import badgeManager from './core/badge-manager.js';
@@ -36,10 +40,10 @@ class CategoryPage {
     this.categoryId = null;
     this.category = null;
     this.scenarios = [];
-    
+
     // Badge system constants
     this.BADGE_DELAY_MS = 2000; // Delay between multiple badge reveals
-    
+
     this.initializePage();
   }
 
@@ -51,9 +55,9 @@ class CategoryPage {
     logger.info('CategoryPage', 'Init called');
     // Get category ID from URL parameters
     this.categoryId = this.getCategoryIdFromUrl();
-    
+
     logger.info('CategoryPage', 'Extracted category ID', this.categoryId);
-    
+
     if (!this.categoryId) {
       this.handleError('No category specified');
       return;
@@ -61,7 +65,7 @@ class CategoryPage {
 
     // Find the category using direct lookup
     this.category = getCategoryById(this.categoryId);
-    
+
     if (!this.category) {
       this.handleError(`Category '${this.categoryId}' not found`);
       return;
@@ -69,7 +73,7 @@ class CategoryPage {
 
     // Load category data
     this.loadCategoryData();
-    
+
     // Set up event listeners
     this.setupEventListeners();
   }
@@ -78,7 +82,7 @@ class CategoryPage {
     // Try multiple methods to get the category ID
     const urlParams = new URLSearchParams(window.location.search);
     let categoryId = urlParams.get('category') || urlParams.get('id');
-    
+
     // If URLSearchParams didn't work, try manual parsing for both parameter names
     if (!categoryId) {
       const url = window.location.href;
@@ -87,7 +91,7 @@ class CategoryPage {
         categoryId = decodeURIComponent(match[1]);
       }
     }
-    
+
     // Also try looking for the hash-based routing
     if (!categoryId) {
       const { hash } = window.location;
@@ -96,7 +100,7 @@ class CategoryPage {
         categoryId = hashMatch[1];
       }
     }
-    
+
     return categoryId;
   }
 
@@ -104,16 +108,15 @@ class CategoryPage {
     try {
       // Get scenarios for this category
       this.scenarios = getCategoryScenarios(this.categoryId);
-      
+
       // Render category header
       this.renderCategoryHeader();
-      
+
       // Render scenarios grid
       this.renderScenariosGrid();
-      
+
       // Setup tooltips
       this.setupProgressRingTooltips();
-      
     } catch (error) {
       this.handleError('Failed to load category data');
     }
@@ -125,16 +128,20 @@ class CategoryPage {
 
     const progress = getCategoryProgress(this.categoryId);
     const PROGRESS_CIRCLE_CIRCUMFERENCE = 163.36;
-    
+
     // Check for badge alert condition
     const badgeProgress = badgeManager.getBadgeProgress(this.categoryId);
-    const isOneScenarioAwayFromBadge = badgeProgress.nextBadge && badgeProgress.progress.remaining === 1;
+    const isOneScenarioAwayFromBadge =
+      badgeProgress.nextBadge && badgeProgress.progress.remaining === 1;
     const badgeAlertClass = isOneScenarioAwayFromBadge ? ' badge-alert' : '';
-    
+
     // Set CSS custom properties for progress ring pulse colors based on category color
     const progressRing = document.querySelector('.category-progress-ring');
     if (progressRing) {
-      progressRing.style.setProperty('--progress-pulse-color', this.category.color);
+      progressRing.style.setProperty(
+        '--progress-pulse-color',
+        this.category.color
+      );
       // Create lighter and darker variants for the pulse animation
       const hexColor = this.category.color;
       const lightColor = this.lightenColor(hexColor, COLOR_LIGHTEN_AMOUNT);
@@ -142,7 +149,7 @@ class CategoryPage {
       progressRing.style.setProperty('--progress-pulse-light', lightColor);
       progressRing.style.setProperty('--progress-pulse-dark', darkColor);
     }
-    
+
     headerContainer.innerHTML = `
       <div class="category-title-group">
         <div class="category-icon-large" style="background-color: ${this.category.color}20; color: ${this.category.color}">
@@ -194,9 +201,9 @@ class CategoryPage {
     }
 
     // Create scenario cards
-    const scenarioCards = this.scenarios.map(scenario => 
-      this.createScenarioCard(scenario, this.category)
-    ).join('');
+    const scenarioCards = this.scenarios
+      .map(scenario => this.createScenarioCard(scenario, this.category))
+      .join('');
 
     gridContainer.innerHTML = scenarioCards;
   }
@@ -265,10 +272,10 @@ class CategoryPage {
   getProgressTooltip() {
     const progress = getCategoryProgress(this.categoryId);
     const badgeProgress = badgeManager.getBadgeProgress(this.categoryId);
-    
+
     // Create enhanced tooltip content
     let tooltipContent = `${progress.completed} of ${progress.total} scenarios completed`;
-    
+
     if (badgeProgress.nextBadge) {
       if (badgeProgress.progress.remaining === 1) {
         tooltipContent += `. 1 more to unlock next badge: '${badgeProgress.nextBadge.title}' ${badgeProgress.nextBadge.sidekickEmoji}`;
@@ -279,7 +286,7 @@ class CategoryPage {
     } else {
       tooltipContent += ` (${progress.percentage}%)`;
     }
-    
+
     return tooltipContent;
   }
 
@@ -287,46 +294,48 @@ class CategoryPage {
    * Setup tooltip functionality for progress rings
    */
   setupProgressRingTooltips() {
-    const progressRings = document.querySelectorAll('.category-progress-ring[data-tooltip]');
-    
+    const progressRings = document.querySelectorAll(
+      '.category-progress-ring[data-tooltip]'
+    );
+
     progressRings.forEach(ring => {
       let tooltip = null;
       let hoverTimeout = null;
       let leaveTimeout = null;
-      
+
       const showTooltip = () => {
         if (leaveTimeout) {
           clearTimeout(leaveTimeout);
           leaveTimeout = null;
         }
-        
+
         if (!tooltip) {
           tooltip = document.createElement('div');
           tooltip.className = 'progress-ring-tooltip';
           tooltip.textContent = ring.getAttribute('data-tooltip');
           document.body.appendChild(tooltip);
         }
-        
+
         const ringRect = ring.getBoundingClientRect();
         const tooltipRect = tooltip.getBoundingClientRect();
-        
+
         tooltip.style.position = 'fixed';
         tooltip.style.left = `${ringRect.left + ringRect.width / 2}px`;
         tooltip.style.top = `${ringRect.top - tooltipRect.height - 10}px`;
         tooltip.style.zIndex = '10000';
-        
+
         // Add visible class for animation
         requestAnimationFrame(() => {
           tooltip.classList.add('visible');
         });
       };
-      
+
       const hideTooltip = () => {
         if (hoverTimeout) {
           clearTimeout(hoverTimeout);
           hoverTimeout = null;
         }
-        
+
         if (tooltip) {
           tooltip.classList.remove('visible');
           leaveTimeout = setTimeout(() => {
@@ -337,13 +346,13 @@ class CategoryPage {
           }, TOOLTIP_TRANSITION_DURATION); // Match CSS transition duration
         }
       };
-      
+
       ring.addEventListener('mouseenter', () => {
         hoverTimeout = setTimeout(showTooltip, TOOLTIP_HOVER_DELAY); // Small delay for better UX
       });
-      
+
       ring.addEventListener('mouseleave', hideTooltip);
-      
+
       ring.addEventListener('focus', showTooltip);
       ring.addEventListener('blur', hideTooltip);
     });
@@ -352,20 +361,22 @@ class CategoryPage {
   setupEventListeners() {
     // Set up mobile navigation
     this.setupMobileNavigation();
-    
+
     // Add click handlers for scenario cards
-    document.addEventListener('click', (e) => {
+    document.addEventListener('click', e => {
       const scenarioCard = e.target.closest('.scenario-card');
       if (scenarioCard) {
         // Prevent default navigation behavior
         e.preventDefault();
-        
+
         const scenarioId = scenarioCard.getAttribute('data-scenario-id');
         const categoryId = scenarioCard.getAttribute('data-category-id');
-        
+
         // Check if the clicked element is the quick start button
-        if (e.target.classList.contains('scenario-quick-start-btn') || 
-            e.target.closest('.scenario-quick-start-btn')) {
+        if (
+          e.target.classList.contains('scenario-quick-start-btn') ||
+          e.target.closest('.scenario-quick-start-btn')
+        ) {
           this.openScenarioModalDirect(categoryId, scenarioId);
         } else {
           // Regular Learning Lab button - go through pre-launch modal
@@ -375,15 +386,15 @@ class CategoryPage {
     });
 
     // Add keyboard navigation
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', e => {
       if (e.key === 'Enter' || e.key === ' ') {
         const scenarioCard = e.target.closest('.scenario-card');
         if (scenarioCard) {
           e.preventDefault();
-          
+
           const scenarioId = scenarioCard.getAttribute('data-scenario-id');
           const categoryId = scenarioCard.getAttribute('data-category-id');
-          
+
           // Check if focus is on the quick start button
           if (e.target.classList.contains('scenario-quick-start-btn')) {
             this.openScenarioModalDirect(categoryId, scenarioId);
@@ -396,14 +407,20 @@ class CategoryPage {
     });
 
     // Listen for scenario modal fully closed (for badge display)
-    document.addEventListener('scenario-modal-closed', this.handleScenarioModalClosed.bind(this));
+    document.addEventListener(
+      'scenario-modal-closed',
+      this.handleScenarioModalClosed.bind(this)
+    );
   }
 
   openScenario(categoryId, scenarioId) {
     const scenario = this.scenarios.find(s => s.id === scenarioId);
 
     if (!this.category || !scenario) {
-      logger.error('CategoryPage', 'Category or scenario not found', { categoryId, scenarioId });
+      logger.error('CategoryPage', 'Category or scenario not found', {
+        categoryId,
+        scenarioId,
+      });
       return;
     }
 
@@ -434,7 +451,8 @@ class CategoryPage {
     });
 
     // Also clean up any orphaned modal elements
-    const orphanedPreLaunchModals = document.querySelectorAll('.pre-launch-modal');
+    const orphanedPreLaunchModals =
+      document.querySelectorAll('.pre-launch-modal');
     orphanedPreLaunchModals.forEach(modal => {
       const parentBackdrop = modal.closest('.modal-backdrop');
       if (parentBackdrop) {
@@ -446,10 +464,10 @@ class CategoryPage {
 
     // Clean up body styles that might be left behind
     document.body.style.overflow = '';
-    
+
     // Remove any modal-related classes from body
     document.body.classList.remove('modal-open');
-    
+
     // Remove any lingering inert states from other elements
     document.querySelectorAll('[inert]').forEach(el => {
       if (!el.classList.contains('modal-backdrop')) {
@@ -520,7 +538,9 @@ class CategoryPage {
       return;
     }
 
-    logger.info('CategoryPage', 'Opening scenario modal directly for:', { title: scenario.title });
+    logger.info('CategoryPage', 'Opening scenario modal directly for:', {
+      title: scenario.title,
+    });
 
     // Dispatch custom event for other components to listen to
     const event = new CustomEvent('scenario-selected', {
@@ -557,6 +577,31 @@ class CategoryPage {
         impact: option.impact,
       });
     }
+
+    // Save to Firestore if user is authenticated
+    if (window.authService) {
+      window.authService
+        .saveScenarioCompletion({
+          scenarioId,
+          categoryId: this.categoryId,
+          selectedOption,
+          optionText: option.text,
+          impact: option.impact,
+        })
+        .then(result => {
+          if (result.success) {
+            logger.info('Scenario completion saved to Firestore:', result);
+          } else if (result.reason !== 'not_authenticated_or_no_firestore') {
+            logger.warn(
+              'Failed to save scenario completion to Firestore:',
+              result.error
+            );
+          }
+        })
+        .catch(error => {
+          logger.warn('Error saving scenario completion to Firestore:', error);
+        });
+    }
   }
 
   /**
@@ -576,16 +621,19 @@ class CategoryPage {
 
   updateProgress(categoryId, scenarioId, completed = true, checkBadges = true) {
     const userProgress = this.loadUserProgress();
-    
+
     if (!userProgress[categoryId]) {
       userProgress[categoryId] = {};
     }
 
     userProgress[categoryId][scenarioId] = completed;
-    
+
     // Save progress
     try {
-      localStorage.setItem('simulateai_category_progress', JSON.stringify(userProgress));
+      localStorage.setItem(
+        'simulateai_category_progress',
+        JSON.stringify(userProgress)
+      );
     } catch (error) {
       logger.error('Failed to save user progress:', error);
     }
@@ -609,38 +657,41 @@ class CategoryPage {
     try {
       // Refresh badge manager's category progress
       badgeManager.refreshCategoryProgress();
-      
+
       // Check for newly earned badges
-      const newBadges = badgeManager.updateScenarioCompletion(categoryId, scenarioId);
-      
+      const newBadges = badgeManager.updateScenarioCompletion(
+        categoryId,
+        scenarioId
+      );
+
       if (newBadges && newBadges.length > 0) {
         // Display each new badge with a delay between multiple badges
         for (let i = 0; i < newBadges.length; i++) {
           const badge = newBadges[i];
-          
+
           // Add small delay between multiple badges
           if (i > 0) {
             await this.delay(this.BADGE_DELAY_MS);
           }
-          
+
           // Show badge modal with category context
           await badgeModal.showBadgeModal(badge, 'category');
-          
+
           // Track badge achievement
           logger.info('Badge earned:', {
             categoryId: badge.categoryId,
             badgeTitle: badge.title,
             tier: badge.tier,
-            timestamp: badge.timestamp
+            timestamp: badge.timestamp,
           });
-          
+
           // Track analytics if available
           if (window.AnalyticsManager) {
             window.AnalyticsManager.trackEvent('badge_earned', {
               categoryId: badge.categoryId,
               badgeTitle: badge.title,
               tier: badge.tier,
-              scenarioId
+              scenarioId,
             });
           }
         }
@@ -672,23 +723,30 @@ class CategoryPage {
     const HEX_OFFSET = 0x1000000;
     const RED_SHIFT = 16;
     const GREEN_SHIFT = 8;
-    const GREEN_MASK = 0x00FF;
-    const BLUE_MASK = 0x0000FF;
+    const GREEN_MASK = 0x00ff;
+    const BLUE_MASK = 0x0000ff;
     const RED_MULTIPLIER = 0x10000;
     const GREEN_MULTIPLIER = 0x100;
     const HEX_SLICE_START = 1;
-    
-    const num = parseInt(color.replace("#", ""), HEX_BASE);
+
+    const num = parseInt(color.replace('#', ''), HEX_BASE);
     const amt = Math.round(PERCENT_TO_RGB * percent);
     const R = (num >> RED_SHIFT) + amt;
-    const G = (num >> GREEN_SHIFT & GREEN_MASK) + amt;
+    const G = ((num >> GREEN_SHIFT) & GREEN_MASK) + amt;
     const B = (num & BLUE_MASK) + amt;
-    
-    const clampedR = R < RGB_MAX ? R < 1 ? 0 : R : RGB_MAX;
-    const clampedG = G < RGB_MAX ? G < 1 ? 0 : G : RGB_MAX;
-    const clampedB = B < RGB_MAX ? B < 1 ? 0 : B : RGB_MAX;
-    
-    const hexResult = (HEX_OFFSET + clampedR * RED_MULTIPLIER + clampedG * GREEN_MULTIPLIER + clampedB).toString(HEX_BASE).slice(HEX_SLICE_START);
+
+    const clampedR = R < RGB_MAX ? (R < 1 ? 0 : R) : RGB_MAX;
+    const clampedG = G < RGB_MAX ? (G < 1 ? 0 : G) : RGB_MAX;
+    const clampedB = B < RGB_MAX ? (B < 1 ? 0 : B) : RGB_MAX;
+
+    const hexResult = (
+      HEX_OFFSET +
+      clampedR * RED_MULTIPLIER +
+      clampedG * GREEN_MULTIPLIER +
+      clampedB
+    )
+      .toString(HEX_BASE)
+      .slice(HEX_SLICE_START);
     return `#${hexResult}`;
   }
 
@@ -705,23 +763,30 @@ class CategoryPage {
     const HEX_OFFSET = 0x1000000;
     const RED_SHIFT = 16;
     const GREEN_SHIFT = 8;
-    const GREEN_MASK = 0x00FF;
-    const BLUE_MASK = 0x0000FF;
+    const GREEN_MASK = 0x00ff;
+    const BLUE_MASK = 0x0000ff;
     const RED_MULTIPLIER = 0x10000;
     const GREEN_MULTIPLIER = 0x100;
     const HEX_SLICE_START = 1;
-    
-    const num = parseInt(color.replace("#", ""), HEX_BASE);
+
+    const num = parseInt(color.replace('#', ''), HEX_BASE);
     const amt = Math.round(PERCENT_TO_RGB * percent);
     const R = (num >> RED_SHIFT) - amt;
-    const G = (num >> GREEN_SHIFT & GREEN_MASK) - amt;
+    const G = ((num >> GREEN_SHIFT) & GREEN_MASK) - amt;
     const B = (num & BLUE_MASK) - amt;
-    
+
     const clampedR = R > RGB_MAX ? RGB_MAX : R < 0 ? 0 : R;
     const clampedG = G > RGB_MAX ? RGB_MAX : G < 0 ? 0 : G;
     const clampedB = B > RGB_MAX ? RGB_MAX : B < 0 ? 0 : B;
-    
-    const hexResult = (HEX_OFFSET + clampedR * RED_MULTIPLIER + clampedG * GREEN_MULTIPLIER + clampedB).toString(HEX_BASE).slice(HEX_SLICE_START);
+
+    const hexResult = (
+      HEX_OFFSET +
+      clampedR * RED_MULTIPLIER +
+      clampedG * GREEN_MULTIPLIER +
+      clampedB
+    )
+      .toString(HEX_BASE)
+      .slice(HEX_SLICE_START);
     return `#${hexResult}`;
   }
 
@@ -775,7 +840,7 @@ class CategoryPage {
       logger.warn('CategoryPage', 'Mobile navigation elements not found', {
         navToggle: !!navToggle,
         mainNav: !!mainNav,
-        navBackdrop: !!navBackdrop
+        navBackdrop: !!navBackdrop,
       });
       return;
     }
@@ -784,7 +849,7 @@ class CategoryPage {
       navToggle: !!navToggle,
       mainNav: !!mainNav,
       navBackdrop: !!navBackdrop,
-      navClose: !!navClose
+      navClose: !!navClose,
     });
 
     // Toggle mobile navigation
@@ -821,7 +886,9 @@ class CategoryPage {
       // Prevent body scroll when nav is open
       document.body.style.overflow = shouldOpen ? 'hidden' : '';
 
-      logger.info('CategoryPage', 'Mobile navigation toggled', { isOpen: shouldOpen });
+      logger.info('CategoryPage', 'Mobile navigation toggled', {
+        isOpen: shouldOpen,
+      });
     };
 
     // Hamburger button click
@@ -851,14 +918,14 @@ class CategoryPage {
     // Nav links click (close mobile nav when clicking a link)
     const navLinks = document.querySelectorAll('.nav-link');
     navLinks.forEach(link => {
-      link.addEventListener('click', (e) => {
+      link.addEventListener('click', e => {
         // Handle Surprise Me button
         if (link.id === 'surprise-me-nav') {
           e.preventDefault();
           logger.info('CategoryPage', 'Surprise Me button clicked');
           this.launchRandomScenario();
         }
-        
+
         logger.info('CategoryPage', 'Nav link clicked, closing mobile nav');
         toggleNav(false);
       });
@@ -880,46 +947,55 @@ class CategoryPage {
    */
   launchRandomScenario() {
     // Import category data to get all scenarios
-    import('../data/categories.js').then(({ categories }) => {
-      // Get all available scenarios from all categories
-      const allScenarios = [];
-      
-      categories.forEach(category => {
-        category.scenarios.forEach(scenario => {
-          allScenarios.push({
-            categoryId: category.id,
-            categoryTitle: category.title,
-            scenario
+    import('../data/categories.js')
+      .then(({ categories }) => {
+        // Get all available scenarios from all categories
+        const allScenarios = [];
+
+        categories.forEach(category => {
+          category.scenarios.forEach(scenario => {
+            allScenarios.push({
+              categoryId: category.id,
+              categoryTitle: category.title,
+              scenario,
+            });
           });
         });
+
+        if (allScenarios.length === 0) {
+          this.showNotification('No scenarios available!', 'warning');
+          return;
+        }
+
+        // Select a random scenario
+        const randomIndex = Math.floor(Math.random() * allScenarios.length);
+        const randomScenario = allScenarios[randomIndex];
+
+        // Show notification about the selected scenario
+        this.showNotification(
+          `🎉 Surprise! Opening "${randomScenario.scenario.title}" from ${randomScenario.categoryTitle}`,
+          'info'
+        );
+
+        // If we're already on the right category page, open directly
+        if (randomScenario.categoryId === this.categoryId) {
+          this.openScenarioModalDirect(
+            randomScenario.categoryId,
+            randomScenario.scenario.id
+          );
+        } else {
+          // Navigate to the category page and open the scenario
+          window.location.href = `category.html?category=${randomScenario.categoryId}#scenario=${randomScenario.scenario.id}`;
+        }
+      })
+      .catch(error => {
+        logger.error(
+          'CategoryPage',
+          'Failed to load categories for surprise me',
+          error
+        );
+        this.showNotification('Failed to load random scenario', 'error');
       });
-
-      if (allScenarios.length === 0) {
-        this.showNotification('No scenarios available!', 'warning');
-        return;
-      }
-
-      // Select a random scenario
-      const randomIndex = Math.floor(Math.random() * allScenarios.length);
-      const randomScenario = allScenarios[randomIndex];
-
-      // Show notification about the selected scenario
-      this.showNotification(
-        `🎉 Surprise! Opening "${randomScenario.scenario.title}" from ${randomScenario.categoryTitle}`,
-        'info'
-      );
-
-      // If we're already on the right category page, open directly
-      if (randomScenario.categoryId === this.categoryId) {
-        this.openScenarioModalDirect(randomScenario.categoryId, randomScenario.scenario.id);
-      } else {
-        // Navigate to the category page and open the scenario
-        window.location.href = `category.html?category=${randomScenario.categoryId}#scenario=${randomScenario.scenario.id}`;
-      }
-    }).catch(error => {
-      logger.error('CategoryPage', 'Failed to load categories for surprise me', error);
-      this.showNotification('Failed to load random scenario', 'error');
-    });
   }
 
   /**
@@ -943,7 +1019,10 @@ class CategoryPage {
 
 // Initialize the category page when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  logger.info('CategoryPage', 'DOMContentLoaded event fired, creating CategoryPage');
+  logger.info(
+    'CategoryPage',
+    'DOMContentLoaded event fired, creating CategoryPage'
+  );
   new CategoryPage();
 });
 

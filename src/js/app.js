@@ -1540,6 +1540,40 @@ class AIEthicsApp {
           this.currentSimulation.id,
           data
         );
+
+        // Save simulation completion to Firestore
+        if (this.authService) {
+          this.authService
+            .saveScenarioCompletion({
+              scenarioId: this.currentSimulation.id,
+              categoryId: this.currentSimulation.category || 'unknown',
+              selectedOption: data.selectedOption || null,
+              optionText: data.optionText || '',
+              impact: data.impact || {},
+              simulationData: data,
+            })
+            .then(result => {
+              if (result.success) {
+                AppDebug.log(
+                  'Simulation completion saved to Firestore:',
+                  result
+                );
+              } else if (
+                result.reason !== 'not_authenticated_or_no_firestore'
+              ) {
+                AppDebug.warn(
+                  'Failed to save simulation completion to Firestore:',
+                  result.error
+                );
+              }
+            })
+            .catch(error => {
+              AppDebug.warn(
+                'Error saving simulation completion to Firestore:',
+                error
+              );
+            });
+        }
       }
 
       // Show post-simulation modal
@@ -2893,6 +2927,9 @@ class AIEthicsApp {
 
       if (authInitialized) {
         AppDebug.log('Authentication service initialized successfully');
+
+        // Make auth service globally accessible for Firestore logging
+        window.authService = this.authService;
 
         // Get Firebase service reference for other components
         this.firebaseService = this.authService.firebaseService;

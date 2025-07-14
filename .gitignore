@@ -102,3 +102,123 @@ pids
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# ============================================================================
+# SimulateAI Project Specific Ignores
+# ============================================================================
+
+# Development Documentation (keep only essential docs)
+*_IMPLEMENTATION.md
+*_SUMMARY.md
+*_GUIDE.md
+*_TROUBLESHOOTING.md
+*_TESTING.md
+*_ROLLBACK*.md
+*_CLEANUP*.md
+*_FIX*.md
+*_ENHANCEMENT*.md
+FIRESTORE_*.md
+ENHANCED_*.md
+MODAL_*.md
+CSS_*.md
+FOCUS_*.md
+INFINITE_*.md
+MOBILE_*.md
+ONBOARDING_*.md
+TUTORIAL_*.md
+CONFETTI_*.md
+BADGE_*.md
+
+# Test Files (keep only production tests)
+test-*.html
+test-*.js
+demo-*.html
+demo-*.js
+**/test/**
+**/demo/**
+**/testing/**
+
+# Backup Files
+*.backup
+*.bak
+*.orig
+*-backup.*
+*-bak.*
+*.corrupted-backup
+*.js.backup
+*.css.backup
+*.html.backup
+
+# Firebase Configuration (sensitive)
+firebase-config.js
+firebase-credentials.json
+.firebaserc
+firebase.json
+firestore.rules
+firestore.indexes.json
+
+# API Keys and Secrets
+**/config/secrets.*
+**/config/api-keys.*
+**/config/credentials.*
+.secrets
+.credentials
+
+# User Data and Analytics (sensitive)
+user-data/
+analytics-data/
+research-data/
+scenario-responses/
+*.user-data
+*.analytics-data
+
+# Development Scripts
+deploy.bat
+deploy.sh
+build-scripts/
+deployment/
+
+# Large Media Files (optimize for web)
+*.psd
+*.ai
+*.sketch
+*.fig
+*.xcf
+*.raw
+*.tiff
+*.bmp
+videos/
+audio/
+large-images/
+
+# Generated Documentation
+docs/generated/
+api-docs/
+jsdoc/
+
+# IDE and Editor Files
+*.swp
+*.swo
+*~
+.vimrc
+.nvimrc
+.editorconfig
+*.sublime-*
+
+# Database Files
+*.db
+*.sqlite
+*.sqlite3
+data/
+database/
+
+# Build Artifacts
+build/
+out/
+public/build/
+assets/build/
+
+# Package Manager Artifacts
+package-lock.json
+yarn.lock
+.pnpm-lock.yaml

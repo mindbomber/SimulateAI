@@ -22,11 +22,13 @@ class ModalUtility {
     this.closeOnEscape = closeOnEscape;
     this.isOpen = false;
     this.element = null;
-    
+
     // Generate unique ID using timestamp and random string
     const BASE_36 = 36;
     const RANDOM_STRING_LENGTH = 9;
-    this.id = `modal-${Date.now()}-${Math.random().toString(BASE_36).substring(2, RANDOM_STRING_LENGTH + 2)}`;
+    this.id = `modal-${Date.now()}-${Math.random()
+      .toString(BASE_36)
+      .substring(2, RANDOM_STRING_LENGTH + 2)}`;
 
     this._build();
     this._setupEventListeners();
@@ -107,9 +109,10 @@ class ModalUtility {
 
     // Show the modal
     this.element.style.display = 'flex';
-    
+
     // Check if onboarding is active and adjust modal behavior accordingly
-    const isOnboardingActive = document.body.classList.contains('onboarding-active');
+    const isOnboardingActive =
+      document.body.classList.contains('onboarding-active');
     if (isOnboardingActive) {
       // Allow onboarding interactions by making modal backdrop less intrusive
       this.element.style.pointerEvents = 'none';
@@ -150,7 +153,7 @@ class ModalUtility {
 
     // Make modal non-interactable
     this.element.inert = true;
-    
+
     // Restore normal pointer events for modal
     this.element.style.pointerEvents = '';
     const modalDialog = this.element.querySelector('.modal-dialog');
@@ -183,10 +186,12 @@ class ModalUtility {
     // Get all direct children of body except our modal and onboarding elements
     const bodyChildren = Array.from(document.body.children);
     bodyChildren.forEach(child => {
-      if (child !== this.element && 
-          !child.classList.contains('onboarding-overlay') &&
-          !child.classList.contains('onboarding-spotlight') &&
-          !child.classList.contains('onboarding-coach-mark')) {
+      if (
+        child !== this.element &&
+        !child.classList.contains('onboarding-overlay') &&
+        !child.classList.contains('onboarding-spotlight') &&
+        !child.classList.contains('onboarding-coach-mark')
+      ) {
         child.inert = inert;
       }
     });
@@ -211,10 +216,15 @@ class ModalUtility {
    */
   static cleanupOrphanedModals() {
     // Clean up modals with generated IDs
-    const orphanedModals = document.querySelectorAll('[id^="modal-"]:not([style*="display: flex"])');
+    const orphanedModals = document.querySelectorAll(
+      '[id^="modal-"]:not([style*="display: flex"])'
+    );
     orphanedModals.forEach(modal => {
       // Check if modal is hidden or has no active class
-      if (modal.style.display === 'none' || !modal.classList.contains('visible')) {
+      if (
+        modal.style.display === 'none' ||
+        !modal.classList.contains('visible')
+      ) {
         modal.remove();
         logger.info('ModalUtility', 'Cleaned up orphaned modal:', modal.id);
       }
@@ -224,9 +234,13 @@ class ModalUtility {
     const modalBackdrops = document.querySelectorAll('.modal-backdrop');
     modalBackdrops.forEach(backdrop => {
       // Check if backdrop has no visible content or is empty
-      const hasVisibleContent = backdrop.querySelector('.modal-dialog .modal-body *:not(:empty)');
-      const hasActiveModal = backdrop.closest('[id^="modal-"]') || backdrop.querySelector('[id^="modal-"]');
-      
+      const hasVisibleContent = backdrop.querySelector(
+        '.modal-dialog .modal-body *:not(:empty)'
+      );
+      const hasActiveModal =
+        backdrop.closest('[id^="modal-"]') ||
+        backdrop.querySelector('[id^="modal-"]');
+
       if (!hasVisibleContent && !hasActiveModal) {
         backdrop.remove();
         logger.info('ModalUtility', 'Cleaned up orphaned modal backdrop');
@@ -237,10 +251,11 @@ class ModalUtility {
     const simulationModal = document.getElementById('simulation-modal');
     if (simulationModal) {
       // Check if it's actually being used
-      const isVisible = simulationModal.style.display === 'flex' || 
-                       simulationModal.classList.contains('show') ||
-                       simulationModal.classList.contains('visible');
-      
+      const isVisible =
+        simulationModal.style.display === 'flex' ||
+        simulationModal.classList.contains('show') ||
+        simulationModal.classList.contains('visible');
+
       if (!isVisible) {
         simulationModal.remove();
         logger.info('ModalUtility', 'Cleaned up orphaned simulation modal');
@@ -248,15 +263,22 @@ class ModalUtility {
     }
 
     // Clean up any standalone modal-dialog or modal-body elements
-    const orphanedDialogs = document.querySelectorAll('.modal-dialog:not(.modal-backdrop .modal-dialog)');
+    const orphanedDialogs = document.querySelectorAll(
+      '.modal-dialog:not(.modal-backdrop .modal-dialog)'
+    );
     orphanedDialogs.forEach(dialog => {
-      if (!dialog.closest('.modal-backdrop') && !dialog.closest('[id^="modal-"]')) {
+      if (
+        !dialog.closest('.modal-backdrop') &&
+        !dialog.closest('[id^="modal-"]')
+      ) {
         dialog.remove();
         logger.info('ModalUtility', 'Cleaned up orphaned modal dialog');
       }
     });
 
-    const orphanedBodies = document.querySelectorAll('.modal-body:not(.modal-dialog .modal-body)');
+    const orphanedBodies = document.querySelectorAll(
+      '.modal-body:not(.modal-dialog .modal-body)'
+    );
     orphanedBodies.forEach(body => {
       if (!body.closest('.modal-dialog') && !body.closest('[id^="modal-"]')) {
         body.remove();
@@ -284,14 +306,15 @@ class ModalUtility {
    */
   static aggressiveModalCleanup() {
     logger.info('ModalUtility', 'Starting aggressive modal cleanup');
-    
+
     // Clean up all modal backdrops that are not actively showing content
     const allBackdrops = document.querySelectorAll('.modal-backdrop');
     allBackdrops.forEach(backdrop => {
-      const isVisible = backdrop.style.display === 'flex' || 
-                       backdrop.classList.contains('show') ||
-                       backdrop.classList.contains('visible');
-      
+      const isVisible =
+        backdrop.style.display === 'flex' ||
+        backdrop.classList.contains('show') ||
+        backdrop.classList.contains('visible');
+
       if (!isVisible) {
         backdrop.remove();
         logger.info('ModalUtility', 'Aggressively removed modal backdrop');
@@ -301,10 +324,11 @@ class ModalUtility {
     // Clean up simulation modal if not active
     const simulationModal = document.getElementById('simulation-modal');
     if (simulationModal) {
-      const isActive = simulationModal.style.display === 'flex' || 
-                      simulationModal.classList.contains('show') ||
-                      simulationModal.classList.contains('visible');
-      
+      const isActive =
+        simulationModal.style.display === 'flex' ||
+        simulationModal.classList.contains('show') ||
+        simulationModal.classList.contains('visible');
+
       if (!isActive) {
         simulationModal.remove();
         logger.info('ModalUtility', 'Aggressively removed simulation modal');
@@ -314,11 +338,12 @@ class ModalUtility {
     // Clean up all orphaned modal dialogs
     const allDialogs = document.querySelectorAll('.modal-dialog');
     allDialogs.forEach(dialog => {
-      const hasActiveParent = dialog.closest('.modal-backdrop[style*="display: flex"]') ||
-                             dialog.closest('[id^="modal-"][style*="display: flex"]') ||
-                             dialog.closest('.show') ||
-                             dialog.closest('.visible');
-      
+      const hasActiveParent =
+        dialog.closest('.modal-backdrop[style*="display: flex"]') ||
+        dialog.closest('[id^="modal-"][style*="display: flex"]') ||
+        dialog.closest('.show') ||
+        dialog.closest('.visible');
+
       if (!hasActiveParent) {
         dialog.remove();
         logger.info('ModalUtility', 'Aggressively removed modal dialog');
@@ -328,12 +353,13 @@ class ModalUtility {
     // Clean up all orphaned modal bodies
     const allBodies = document.querySelectorAll('.modal-body');
     allBodies.forEach(body => {
-      const hasActiveParent = body.closest('.modal-dialog') ||
-                             body.closest('.modal-backdrop[style*="display: flex"]') ||
-                             body.closest('[id^="modal-"][style*="display: flex"]') ||
-                             body.closest('.show') ||
-                             body.closest('.visible');
-      
+      const hasActiveParent =
+        body.closest('.modal-dialog') ||
+        body.closest('.modal-backdrop[style*="display: flex"]') ||
+        body.closest('[id^="modal-"][style*="display: flex"]') ||
+        body.closest('.show') ||
+        body.closest('.visible');
+
       if (!hasActiveParent) {
         body.remove();
         logger.info('ModalUtility', 'Aggressively removed modal body');
@@ -343,13 +369,18 @@ class ModalUtility {
     // Clean up any remaining modal elements with generated IDs
     const allGeneratedModals = document.querySelectorAll('[id^="modal-"]');
     allGeneratedModals.forEach(modal => {
-      const isVisible = modal.style.display === 'flex' || 
-                       modal.classList.contains('show') ||
-                       modal.classList.contains('visible');
-      
+      const isVisible =
+        modal.style.display === 'flex' ||
+        modal.classList.contains('show') ||
+        modal.classList.contains('visible');
+
       if (!isVisible) {
         modal.remove();
-        logger.info('ModalUtility', 'Aggressively removed generated modal:', modal.id);
+        logger.info(
+          'ModalUtility',
+          'Aggressively removed generated modal:',
+          modal.id
+        );
       }
     });
 
@@ -396,6 +427,8 @@ export default ModalUtility;
 // Make available globally for backward compatibility
 if (typeof window !== 'undefined') {
   window.ModalUtility = ModalUtility;
+  // Also provide as ModalDialog for auth service compatibility
+  window.ModalDialog = ModalUtility;
   // TEMPORARILY COMMENTED OUT - might be causing conflicts
   // Also provide as ReusableModal for drop-in replacement
   // window.ReusableModal = ModalUtility;

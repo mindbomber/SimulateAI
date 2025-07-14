@@ -470,6 +470,46 @@ export class FirestoreService {
   }
 
   /**
+   * Get learning progress for a category
+   */
+  async getCategoryProgress(categoryId, uid = null) {
+    try {
+      this.ensureReady();
+
+      const validUID = this.uidNormalizer.getValidatedUID(uid);
+      const progressPath = `users/${validUID}/progress/${categoryId}`;
+
+      const { doc, getDoc } = await import(
+        'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+      );
+
+      const docRef = doc(this.db, progressPath);
+      const docSnapshot = await getDoc(docRef);
+
+      if (docSnapshot.exists()) {
+        return {
+          success: true,
+          categoryId,
+          uid: validUID,
+          data: docSnapshot.data(),
+        };
+      } else {
+        return {
+          success: true,
+          categoryId,
+          uid: validUID,
+          data: null, // No progress yet
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
+  /**
    * Get all progress for a user
    */
   async getUserProgress(uid = null) {

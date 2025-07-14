@@ -297,11 +297,11 @@ export class AuthService {
       title: 'Welcome to SimulateAI',
       content: loginHTML,
       size: 'medium',
-      showClose: true,
-      buttons: [],
+      closeOnBackdrop: true,
+      closeOnEscape: true,
     });
 
-    modal.show();
+    modal.open();
 
     // Set up authentication event handlers
     this.setupAuthEventHandlers(modal);
@@ -457,7 +457,7 @@ export class AuthService {
           return;
         } else {
           // For desktop popup - normal flow
-          if (modal) modal.hide();
+          if (modal) modal.close();
           this.showSuccessMessage(
             'Welcome! You have been signed in successfully.'
           );
@@ -520,7 +520,7 @@ export class AuthService {
       );
 
       if (result.success) {
-        if (modal) modal.hide();
+        if (modal) modal.close();
         this.showSuccessMessage(
           'Welcome back! You have been signed in successfully.'
         );
@@ -584,7 +584,7 @@ export class AuthService {
           });
         }
 
-        if (modal) modal.hide();
+        if (modal) modal.close();
         this.showSuccessMessage(
           'Account created successfully! Welcome to SimulateAI.'
         );
@@ -956,6 +956,30 @@ export class AuthService {
         userNameElement.title = `Linked accounts: ${linkedProviders.map(p => p.providerId.replace('.com', '')).join(', ')}`;
       }
     }
+  }
+
+  /**
+   * Update UI elements when user is authenticated
+   */
+  updateUIForAuthenticatedUser() {
+    // Enable authenticated features
+    this.enableAuthenticatedFeatures();
+
+    // Update authentication UI
+    if (this.currentUser) {
+      this.updateAuthenticationUI(true, this.currentUser);
+    }
+  }
+
+  /**
+   * Update UI elements when user is not authenticated
+   */
+  updateUIForAnonymousUser() {
+    // Hide authenticated features
+    this.hideAuthenticatedFeatures();
+
+    // Update authentication UI
+    this.updateAuthenticationUI(false, null);
   }
 
   /**
@@ -1605,12 +1629,11 @@ export class AuthService {
     const modal = new window.ModalDialog({
       title: 'Profile Setup',
       content: modalContent,
-      size: 'medium',
-      showClose: true,
-      buttons: [],
+      closeOnBackdrop: true,
+      closeOnEscape: true,
     });
 
-    modal.show();
+    modal.open();
 
     // Set up live preview and event handlers
     this.setupProfileUpdateHandlers();
@@ -1954,6 +1977,56 @@ export class AuthService {
     return this.getCurrentUID();
   }
 
+  /**
+   * Handle authentication with rate limiting protection
+   */
+  async handleAuthWithRateLimit(authFunction) {
+    try {
+      // Check if rate limit status component is available
+      if (this.rateLimitStatus && this.rateLimitStatus.isRateLimited) {
+        const rateLimitInfo = this.rateLimitStatus.getRateLimitInfo();
+        return {
+          success: false,
+          rateLimited: true,
+          error: `Rate limited. Please wait ${rateLimitInfo.timeRemaining} seconds before trying again.`,
+          timeRemaining: rateLimitInfo.timeRemaining,
+        };
+      }
+
+      // Execute the authentication function
+      const result = await authFunction();
+
+      // Track successful auth attempt if rate limit status is available
+      if (this.rateLimitStatus && this.rateLimitStatus.trackAuthAttempt) {
+        this.rateLimitStatus.trackAuthAttempt(true);
+      }
+
+      return result;
+    } catch (error) {
+      // Track failed auth attempt if rate limit status is available
+      if (this.rateLimitStatus && this.rateLimitStatus.trackAuthAttempt) {
+        this.rateLimitStatus.trackAuthAttempt(false);
+      }
+
+      // Check if this is a network error
+      if (
+        error.code === 'auth/network-request-failed' ||
+        error.message.includes('network') ||
+        error.message.includes('fetch')
+      ) {
+        return {
+          success: false,
+          networkError: true,
+          error:
+            'Network connection error. Please check your internet connection.',
+        };
+      }
+
+      // Return the original error
+      throw error;
+    }
+  }
+
   // ============================================================================
   // FIRESTORE INTEGRATION METHODS
   // ============================================================================
@@ -2099,6 +2172,68 @@ export class AuthService {
   }
 
   /**
+   * Save scenario completion data to Firestore
+   */
+  async saveScenarioCompletion(scenarioData) {
+    if (!this.isAuthenticated() || !this.firestoreService) {
+      // If user not authenticated or Firestore not available, skip saving
+      return { success: false, reason: 'not_authenticated_or_no_firestore' };
+    }
+
+    try {
+      const completionData = {
+        type: 'scenario_completion',
+        scenarioId: scenarioData.scenarioId,
+        categoryId: scenarioData.categoryId,
+        selectedOption: scenarioData.selectedOption,
+        optionText: scenarioData.optionText,
+        impact: scenarioData.impact,
+        completedAt: new Date(),
+        timestamp: Date.now(),
+        sessionId: this.getSessionId?.() || `session_${Date.now()}`,
+      };
+
+      // Save to user's simulations subcollection
+      const result = await this.firestoreService.saveSimulationProgress(
+        `scenario_${scenarioData.scenarioId}`,
+        completionData
+      );
+
+      if (result.success) {
+        // Also track category progress using existing method
+        await this.updateCategoryProgress(scenarioData.categoryId, {
+          completedScenarios: {
+            [scenarioData.scenarioId]: {
+              completedAt: new Date(),
+              timestamp: Date.now(),
+            },
+          },
+        });
+      }
+
+      return result;
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
+  /**
+   * Get session ID for tracking
+   */
+  getSessionId() {
+    try {
+      return (
+        localStorage.getItem('session_start_time') || `session_${Date.now()}`
+      );
+    } catch (error) {
+      return `session_${Date.now()}`;
+    }
+  }
+
+  /**
    * Ensure user document exists (create if doesn't exist)
    */
   async ensureUserDocument(userData = {}) {
@@ -2107,6 +2242,67 @@ export class AuthService {
     }
 
     return await this.firestoreService.ensureUserDocument(userData);
+  }
+
+  /**
+   * Display success message to user
+   */
+  showSuccessMessage(message) {
+    if (window.NotificationToast) {
+      window.NotificationToast.show({
+        message,
+        type: 'success',
+        duration: 4000,
+      });
+    } else {
+      // Fallback if toast system not available
+      // Message will be visible in network dev tools
+    }
+  }
+
+  /**
+   * Display error message to user
+   */
+  showErrorMessage(message) {
+    if (window.NotificationToast) {
+      window.NotificationToast.show({
+        message,
+        type: 'error',
+        duration: 6000,
+      });
+    } else {
+      // Fallback if toast system not available
+      // Error will be tracked in analytics
+    }
+  }
+
+  /**
+   * Display info message to user
+   */
+  showInfoMessage(message) {
+    if (window.NotificationToast) {
+      window.NotificationToast.show({
+        message,
+        type: 'info',
+        duration: 4000,
+      });
+    } else {
+      // Fallback if toast system not available
+      // Message logged in analytics events
+    }
+  }
+
+  /**
+   * Show custom modal (used by some persistence settings methods)
+   */
+  showCustomModal(title, content) {
+    const modal = new window.ModalDialog({
+      title,
+      content,
+      closeOnBackdrop: true,
+      closeOnEscape: true,
+    });
+    modal.open();
   }
 }
 
