@@ -1753,7 +1753,34 @@ export class FirebaseService {
     );
   }
 
-  // ...existing code...
+  /**
+   * Delete current user account (GDPR compliant)
+   */
+  async deleteCurrentUser() {
+    try {
+      if (!this.auth.currentUser) {
+        throw new Error('No authenticated user found');
+      }
+
+      // Import deleteUser function
+      const { deleteUser } = await import(
+        'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js'
+      );
+
+      // Delete the user from Firebase Authentication
+      await deleteUser(this.auth.currentUser);
+
+      this.trackEvent('user_account_deleted', {
+        deletion_timestamp: new Date().toISOString(),
+        method: 'user_initiated',
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error('❌ Account deletion failed:', error);
+      return { success: false, error: error.message };
+    }
+  }
 }
 
 export default FirebaseService;

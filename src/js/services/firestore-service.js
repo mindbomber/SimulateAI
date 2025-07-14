@@ -630,6 +630,130 @@ export class FirestoreService {
   }
 
   // ============================================================================
+  // DATA DELETION OPERATIONS (GDPR COMPLIANCE)
+  // ============================================================================
+
+  /**
+   * Delete all user data across all subcollections (GDPR compliant)
+   */
+  async deleteAllUserData(uid = null) {
+    try {
+      this.ensureReady();
+
+      const validUID = this.uidNormalizer.getValidatedUID(uid);
+
+      // Collections to delete
+      const subcollections = ['simulations', 'badges', 'progress', 'sessions'];
+
+      // Delete all subcollections first
+      for (const subcollection of subcollections) {
+        await this.deleteSubcollection(validUID, subcollection);
+      }
+
+      // Finally delete the main user document
+      await this.deleteUserDocument(validUID);
+
+      return {
+        success: true,
+        uid: validUID,
+        deletedCollections: ['users', ...subcollections],
+        message: 'All user data has been permanently deleted',
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
+  /**
+   * Delete all documents in a user subcollection
+   */
+  async deleteSubcollection(uid, subcollectionName) {
+    try {
+      const subcollectionPath = `users/${uid}/${subcollectionName}`;
+
+      const { collection, getDocs, doc, deleteDoc } = await import(
+        'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+      );
+
+      const subcollectionRef = collection(this.db, subcollectionPath);
+      const snapshot = await getDocs(subcollectionRef);
+
+      // Delete all documents in batches to avoid hitting rate limits
+      const deletePromises = [];
+      snapshot.forEach(docSnapshot => {
+        const docRef = doc(this.db, subcollectionPath, docSnapshot.id);
+        deletePromises.push(deleteDoc(docRef));
+      });
+
+      await Promise.all(deletePromises);
+
+      return {
+        success: true,
+        collection: subcollectionName,
+        deletedCount: snapshot.size,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        collection: subcollectionName,
+      };
+    }
+  }
+
+  /**
+   * Export all user data for data portability (GDPR compliance)
+   */
+  async exportAllUserData(uid = null) {
+    try {
+      this.ensureReady();
+
+      const validUID = this.uidNormalizer.getValidatedUID(uid);
+
+      // Get user document
+      const userResult = await this.getUserDocument(validUID);
+
+      // Get all subcollection data
+      const simulationsResult = await this.getUserSimulations(validUID);
+      const badgesResult = await this.getUserBadges(validUID);
+      const progressResult = await this.getUserProgress(validUID);
+
+      const exportData = {
+        exportDate: new Date().toISOString(),
+        uid: validUID,
+        userData: userResult.success ? userResult.data : null,
+        simulations: simulationsResult.success
+          ? simulationsResult.simulations
+          : [],
+        badges: badgesResult.success ? badgesResult.badges : [],
+        progress: progressResult.success ? progressResult.progress : [],
+        metadata: {
+          exportedCollections: ['users', 'simulations', 'badges', 'progress'],
+          totalDocuments:
+            (simulationsResult.count || 0) +
+            (badgesResult.count || 0) +
+            (progressResult.count || 0) +
+            (userResult.data ? 1 : 0),
+        },
+      };
+
+      return {
+        success: true,
+        data: exportData,
+        downloadableJson: JSON.stringify(exportData, null, 2),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
+  // ============================================================================
   // UTILITY METHODS
   // ============================================================================
 

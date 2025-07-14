@@ -2245,6 +2245,88 @@ export class AuthService {
   }
 
   /**
+   * Delete user account and all associated data (GDPR compliant)
+   */
+  async deleteUserAccount() {
+    if (!this.currentUser) {
+      throw new Error('No authenticated user found');
+    }
+
+    try {
+      const uid = this.getCurrentUID();
+
+      // Step 1: Delete all Firestore data
+      if (this.firestoreService) {
+        await this.firestoreService.deleteAllUserData(uid);
+      }
+
+      // Step 2: Delete Firebase Authentication account
+      const deleteResult = await this.firebaseService.deleteCurrentUser();
+
+      if (deleteResult.success) {
+        // Step 3: Clear local data
+        this.clearLocalUserData();
+
+        // Step 4: Update UI for anonymous state
+        this.updateUIForAnonymousUser();
+
+        // Step 5: Track deletion (anonymized)
+        this.firebaseService.trackEvent('user_account_deleted', {
+          deletion_method: 'user_initiated',
+          had_firestore_data: !!this.firestoreService,
+          timestamp: new Date().toISOString(),
+        });
+
+        return {
+          success: true,
+          message:
+            'Your account and all associated data have been permanently deleted.',
+        };
+      } else {
+        throw new Error(deleteResult.error || 'Failed to delete account');
+      }
+    } catch (error) {
+      throw new Error(`Account deletion failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Clear all local user data (localStorage, sessionStorage, etc.)
+   */
+  clearLocalUserData() {
+    try {
+      // Clear auth-related localStorage items
+      const authKeys = [
+        'session_start_time',
+        'simulateai_auth_persistence',
+        'user_preferences',
+        'learning_progress',
+      ];
+
+      authKeys.forEach(key => {
+        try {
+          localStorage.removeItem(key);
+        } catch (error) {
+          // Ignore individual removal errors
+        }
+      });
+
+      // Clear any sessionStorage data
+      try {
+        sessionStorage.clear();
+      } catch (error) {
+        // Ignore sessionStorage errors
+      }
+
+      // Clear user properties
+      this.currentUser = null;
+      this.userProfile = null;
+    } catch (error) {
+      // Local data clearing is best effort
+    }
+  }
+
+  /**
    * Display success message to user
    */
   showSuccessMessage(message) {
