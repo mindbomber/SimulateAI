@@ -8,7 +8,7 @@
  * current real-world AI challenges.
  */
 
-import { PHILOSOPHICAL_DOMAINS } from './philosophical-taxonomy.js';
+import { PHILOSOPHICAL_DOMAINS } from '../data/philosophical-taxonomy.js';
 
 // Configuration constants
 const SCENARIO_CONFIG = {
@@ -1034,3 +1034,5 @@ export class MCPPhilosophicalCategoryGenerator {
     return badges;
   }
 }
+
+export default MCPPhilosophicalCategoryGenerator;

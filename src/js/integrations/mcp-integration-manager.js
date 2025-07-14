@@ -7,7 +7,7 @@ import MCPWebResearch from './mcp-web-research.js';
 import MCPProjectGenerator from './mcp-project-generator.js';
 import MCPGitHubIntegration from './mcp-github-integration.js';
 import MCPAnalyticsEnhancement from './mcp-analytics-enhancement.js';
-import MCPPhilosophicalGenerator from './mcp-philosophical-generator.js';
+import { MCPPhilosophicalCategoryGenerator } from './mcp-philosophical-generator.js';
 import logger from '../utils/logger.js';
 
 class MCPIntegrationManager {
@@ -27,13 +27,15 @@ class MCPIntegrationManager {
     try {
       logger.info('Initializing MCP integrations for SimulateAI...');
 
-      // Initialize web research capabilities
-      this.integrations.set('webResearch', new MCPWebResearch());
+      // Initialize web research capabilities first (dependency for others)
+      const webResearch = new MCPWebResearch();
+      this.integrations.set('webResearch', webResearch);
       this.mcpCapabilities.add('fetch_webpage');
       this.mcpCapabilities.add('real_time_content');
 
-      // Initialize project generation capabilities
-      this.integrations.set('projectGenerator', new MCPProjectGenerator());
+      // Initialize project generation capabilities (dependency for philosophical generator)
+      const projectGenerator = new MCPProjectGenerator();
+      this.integrations.set('projectGenerator', projectGenerator);
       this.mcpCapabilities.add('create_new_workspace');
       this.mcpCapabilities.add('scenario_generation');
 
@@ -42,10 +44,10 @@ class MCPIntegrationManager {
       this.mcpCapabilities.add('github_repo');
       this.mcpCapabilities.add('collaborative_development');
 
-      // Initialize philosophical generator
+      // Initialize philosophical generator with dependencies
       this.integrations.set(
         'philosophicalGenerator',
-        new MCPPhilosophicalGenerator()
+        new MCPPhilosophicalCategoryGenerator(webResearch, projectGenerator)
       );
       this.mcpCapabilities.add('philosophical_frameworks');
       this.mcpCapabilities.add('ethical_scenario_generation');
@@ -81,7 +83,6 @@ class MCPIntegrationManager {
    * Set up communication between different integrations
    */
   setupIntegrationCommunication() {
-    const webResearch = this.integrations.get('webResearch');
     const projectGenerator = this.integrations.get('projectGenerator');
     const githubIntegration = this.integrations.get('githubIntegration');
     const philosophicalGenerator = this.integrations.get(
@@ -89,25 +90,17 @@ class MCPIntegrationManager {
     );
     const analytics = this.integrations.get('analyticsEnhancement');
 
-    // Connect web research to project generation
-    if (webResearch && projectGenerator) {
-      projectGenerator.setWebResearch(webResearch);
-    }
-
     // Connect GitHub integration to project generation
     if (githubIntegration && projectGenerator) {
       projectGenerator.setGitHubIntegration(githubIntegration);
     }
 
-    // Connect philosophical generator to project generation
+    // Connect philosophical generator to project generation (bidirectional)
     if (philosophicalGenerator && projectGenerator) {
       projectGenerator.setPhilosophicalGenerator(philosophicalGenerator);
     }
 
-    // Connect web research to philosophical generator
-    if (webResearch && philosophicalGenerator) {
-      philosophicalGenerator.setWebResearch(webResearch);
-    }
+    // Note: webResearch and projectGenerator are already injected into philosophicalGenerator via constructor
 
     // Connect analytics to all other integrations
     if (analytics) {

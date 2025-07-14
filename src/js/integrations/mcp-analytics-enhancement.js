@@ -223,8 +223,9 @@ class MCPAnalyticsEnhancement {
     errorData.contexts.push({
       ...context,
       timestamp: new Date(),
-      userAgent: navigator.userAgent,
-      url: window.location.href,
+      userAgent:
+        typeof navigator !== 'undefined' ? navigator.userAgent : 'Node.js',
+      url: typeof window !== 'undefined' ? window.location.href : 'server-side',
       stackTrace: error.stack,
     });
 
@@ -344,21 +345,24 @@ class MCPAnalyticsEnhancement {
    * Set up error boundaries for component monitoring
    */
   setupErrorBoundaries() {
-    window.addEventListener('error', event => {
-      this.trackError(event.error, {
-        type: 'javascript_error',
-        filename: event.filename,
-        lineNumber: event.lineno,
-        columnNumber: event.colno,
+    // Only set up browser-specific error handling in browser environment
+    if (typeof window !== 'undefined') {
+      window.addEventListener('error', event => {
+        this.trackError(event.error, {
+          type: 'javascript_error',
+          filename: event.filename,
+          lineNumber: event.lineno,
+          columnNumber: event.colno,
+        });
       });
-    });
 
-    window.addEventListener('unhandledrejection', event => {
-      this.trackError(new Error(event.reason), {
-        type: 'promise_rejection',
-        reason: event.reason,
+      window.addEventListener('unhandledrejection', event => {
+        this.trackError(new Error(event.reason), {
+          type: 'promise_rejection',
+          reason: event.reason,
+        });
       });
-    });
+    }
   }
 
   // Utility methods
