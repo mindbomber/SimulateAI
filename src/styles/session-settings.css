@@ -1,0 +1,197 @@
+/* Session Security Settings Modal Styles */
+.persistence-settings {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.persistence-settings h3 {
+  color: var(--primary-color);
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.current-setting {
+  background: var(--card-background);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 4px solid var(--accent-color);
+}
+
+.persistence-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.persistence-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 15px;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.persistence-option:hover {
+  border-color: var(--primary-color);
+  background: var(--hover-background);
+}
+
+.persistence-option input[type='radio'] {
+  margin: 0;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-color);
+}
+
+.persistence-option input[type='radio']:checked + .option-content {
+  color: var(--primary-color);
+}
+
+.option-content {
+  flex: 1;
+}
+
+.option-content strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 16px;
+}
+
+.option-content p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.auto-signout-setting {
+  background: var(--highlight-background);
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.auto-signout-setting label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.auto-signout-setting input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary-color);
+}
+
+.auto-signout-setting select {
+  padding: 4px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--card-background);
+  color: var(--text-color);
+  font-size: 14px;
+}
+
+.recommendation {
+  background: linear-gradient(
+    135deg,
+    var(--success-color) 20,
+    var(--success-color) 30
+  );
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 4px solid var(--success-color);
+}
+
+.recommendation strong {
+  color: var(--success-color);
+}
+
+.security-tips {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.security-tips h3 {
+  color: var(--primary-color);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.tip {
+  background: var(--card-background);
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  border-left: 4px solid var(--accent-color);
+}
+
+.tip h4 {
+  margin: 0 0 8px 0;
+  color: var(--primary-color);
+  font-size: 16px;
+}
+
+.tip p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.modal-actions .btn {
+  min-width: 100px;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+  .persistence-settings,
+  .security-tips {
+    padding: 15px;
+  }
+
+  .persistence-option {
+    padding: 12px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .modal-actions .btn {
+    width: 100%;
+  }
+}
+
+/* Dark mode compatibility */
+[data-theme='dark'] .persistence-option {
+  border-color: var(--border-color-dark);
+}
+
+[data-theme='dark'] .persistence-option:hover {
+  border-color: var(--primary-color);
+  background: var(--hover-background-dark);
+}
+
+[data-theme='dark'] .auto-signout-setting select {
+  background: var(--card-background-dark);
+  border-color: var(--border-color-dark);
+  color: var(--text-color-dark);
+}

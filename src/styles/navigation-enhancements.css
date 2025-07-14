@@ -1,0 +1,66 @@
+/* Navigation Authentication Styles */
+.nav-auth-btn {
+  padding: 8px 16px;
+  margin-left: 8px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.nav-user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+}
+
+.user-greeting {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .nav-user-profile {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .nav-auth-btn {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+/* Authentication state indicators */
+[data-auth-required] {
+  position: relative;
+}
+
+[data-auth-required]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+[data-auth-required]::after {
+  content: '🔒';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* Community features styling */
+.community-feature {
+  border: 2px solid var(--accent-color);
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent-color) 10, transparent);
+}
+
+.community-feature[data-auth-required] {
+  border-color: var(--text-muted);
+  background: var(--surface-secondary);
+}

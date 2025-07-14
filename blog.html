@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#1a73e8" />
+    <meta name="color-scheme" content="light" />
+    <title>Blog - SimulateAI</title>
+    <meta
+      name="description"
+      content="Read and share insights about AI ethics, education, and simulation-based learning"
+    />
+
+    <!-- Same CSS includes as main app -->
+    <link rel="stylesheet" href="src/styles/main.css" />
+    <link rel="stylesheet" href="src/styles/accessibility.css" />
+    <link rel="stylesheet" href="src/styles/simulations.css" />
+    <link rel="stylesheet" href="src/styles/layout-components.css" />
+    <link rel="stylesheet" href="src/styles/advanced-ui-components.css" />
+    <link rel="stylesheet" href="src/styles/enhanced-objects.css" />
+    <link rel="stylesheet" href="src/styles/input-utility-components.css" />
+    <link rel="stylesheet" href="src/styles/form-input-components.css" />
+    <link rel="stylesheet" href="src/styles/notification-toast.css" />
+    <link rel="stylesheet" href="src/styles/onboarding-tour.css" />
+    <link rel="stylesheet" href="src/styles/radar-chart.css" />
+    <link rel="stylesheet" href="src/styles/scenario-modal.css" />
+    <link rel="stylesheet" href="src/styles/card-component.css" />
+    <link rel="stylesheet" href="src/styles/loader-spinner.css" />
+    <link rel="stylesheet" href="src/styles/hero-demo.css" />
+    <link rel="stylesheet" href="src/styles/bias-fairness.css" />
+    <link rel="stylesheet" href="src/styles/category-grid.css" />
+    <link rel="stylesheet" href="src/styles/ethics-analysis.css" />
+    <link rel="stylesheet" href="src/styles/layout-fixes.css" />
+    <link rel="stylesheet" href="src/styles/ethics-explorer.css" />
+    <link rel="stylesheet" href="src/styles/badge-modal.css" />
+    <link rel="stylesheet" href="src/styles/community-features.css" />
+    <link
+      rel="stylesheet"
+      href="src/styles/simulation-modal-consolidated.css"
+    />
+
+    <!-- Icons and Favicons -->
+    <link rel="icon" type="image/svg+xml" href="src/assets/icons/favicon.svg" />
+  </head>
+  <body>
+    <!-- Skip to content for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- ARIA live regions for announcements -->
+    <div
+      id="aria-live-polite"
+      aria-live="polite"
+      aria-atomic="true"
+      class="sr-only"
+    ></div>
+    <div
+      id="aria-live-assertive"
+      aria-live="assertive"
+      aria-atomic="true"
+      class="sr-only"
+    ></div>
+
+    <!-- Header (same as main app) -->
+    <header class="header" role="banner">
+      <div class="header-container">
+        <div class="logo">
+          <a href="index.html">
+            <img
+              src="src/assets/icons/logo.svg"
+              alt="SimulateAI Educational Platform"
+              class="logo-image"
+            />
+            <h1 class="site-title">SimulateAI</h1>
+          </a>
+        </div>
+
+        <!-- Mobile hamburger button -->
+        <button
+          class="nav-toggle"
+          aria-label="Toggle navigation menu"
+          aria-expanded="false"
+          aria-controls="main-navigation"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <nav
+          class="main-nav"
+          role="navigation"
+          aria-label="Main navigation"
+          id="main-navigation"
+        >
+          <ul class="nav-list">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li>
+              <a href="index.html#categories" class="nav-link">Categories</a>
+            </li>
+            <li>
+              <a href="#blog" class="nav-link active" aria-current="page"
+                >Blog</a
+              >
+            </li>
+            <li><a href="forum.html" class="nav-link">Forum</a></li>
+            <li><a href="profile.html" class="nav-link">Profile</a></li>
+            <!-- User auth buttons will be added by JavaScript -->
+          </ul>
+        </nav>
+      </div>
+      <div class="nav-backdrop" aria-hidden="true"></div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="main-content" role="main">
+      <!-- Blog Header -->
+      <section class="blog-header">
+        <div class="container">
+          <div class="blog-header-content">
+            <h1>📝 SimulateAI Blog</h1>
+            <p>
+              Insights, research, and discussions about AI ethics education and
+              simulation-based learning.
+            </p>
+
+            <!-- Blog Actions -->
+            <div class="blog-actions">
+              <button
+                id="write-post-btn"
+                class="btn btn-primary"
+                style="display: none"
+              >
+                ✍️ Write a Post
+              </button>
+              <div class="blog-filters">
+                <select id="category-filter" aria-label="Filter by category">
+                  <option value="">All Categories</option>
+                  <option value="research">🔬 Research</option>
+                  <option value="education">📚 Education</option>
+                  <option value="ethics">⚖️ Ethics</option>
+                  <option value="ai-bias">🎯 AI Bias</option>
+                  <option value="privacy">🔒 Privacy</option>
+                  <option value="community">🤝 Community</option>
+                </select>
+                <select id="author-filter" aria-label="Filter by author">
+                  <option value="">All Authors</option>
+                  <option value="team">SimulateAI Team</option>
+                  <option value="community">Community</option>
+                  <option value="research">Research Contributors</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Featured Posts -->
+      <section class="featured-posts">
+        <div class="container">
+          <h2>🌟 Featured Posts</h2>
+          <div id="featured-posts-grid" class="featured-posts-grid">
+            <!-- Featured posts will be populated by JavaScript -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Recent Posts -->
+      <section class="recent-posts">
+        <div class="container">
+          <h2>📰 Recent Posts</h2>
+          <div id="blog-posts-container" class="blog-posts-container">
+            <!-- Posts will be populated by JavaScript -->
+          </div>
+
+          <!-- Load More Button -->
+          <div class="load-more-container">
+            <button id="load-more-btn" class="btn btn-outline">
+              Load More Posts
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer (same as main app) -->
+    <footer class="footer" role="contentinfo">
+      <div class="footer-content">
+        <div class="footer-sections">
+          <div class="footer-section">
+            <h3>Join the Conversation</h3>
+            <p>
+              Research contributors and supporters can write blog posts to share
+              their insights with the community.
+            </p>
+          </div>
+          <div class="footer-section">
+            <h3>Research Focus</h3>
+            <p>
+              Our blog features evidence-based discussions about AI ethics
+              education and simulation methodology.
+            </p>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>
+            &copy; 2025 SimulateAI Educational Platform. Open source AI ethics
+            education.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Write Post Modal -->
+    <div
+      id="write-post-modal"
+      class="modal-overlay"
+      style="display: none"
+      role="dialog"
+      aria-labelledby="write-post-title"
+      aria-modal="true"
+    >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="write-post-title">✍️ Write a Blog Post</h2>
+          <button class="modal-close" aria-label="Close modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="write-post-form">
+            <div class="form-group">
+              <label for="post-title">Title *</label>
+              <input
+                type="text"
+                id="post-title"
+                required
+                maxlength="200"
+                placeholder="Enter post title..."
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="post-category">Category *</label>
+              <select id="post-category" required>
+                <option value="">Select a category...</option>
+                <option value="research">🔬 Research</option>
+                <option value="education">📚 Education</option>
+                <option value="ethics">⚖️ Ethics</option>
+                <option value="ai-bias">🎯 AI Bias</option>
+                <option value="privacy">🔒 Privacy</option>
+                <option value="community">🤝 Community</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="post-summary">Summary *</label>
+              <textarea
+                id="post-summary"
+                rows="3"
+                required
+                maxlength="500"
+                placeholder="Brief summary of your post (max 500 characters)..."
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="post-content">Content *</label>
+              <textarea
+                id="post-content"
+                rows="15"
+                required
+                placeholder="Write your blog post content here... You can use basic Markdown formatting."
+              ></textarea>
+              <small class="form-help"
+                >Supports basic Markdown: **bold**, *italic*, [links](url),
+                `code`, etc.</small
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="post-tags">Tags</label>
+              <input
+                type="text"
+                id="post-tags"
+                placeholder="ai-ethics, education, bias (comma-separated)"
+              />
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-outline" id="save-draft-btn">
+                💾 Save Draft
+              </button>
+              <button type="submit" class="btn btn-primary">
+                📤 Publish Post
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading indicator -->
+    <div id="loading" class="loading" aria-hidden="true" role="status">
+      <div class="loading-spinner" aria-hidden="true"></div>
+      <p class="loading-text">Loading blog posts...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="src/js/services/firebase-service.js"></script>
+    <script type="module" src="src/js/services/auth-service.js"></script>
+    <script
+      type="module"
+      src="src/js/components/notification-toast.js"
+    ></script>
+    <script type="module" src="src/js/components/modal-utility.js"></script>
+
+    <!-- Blog Page Script -->
+    <script type="module">
+      import AuthService from './src/js/services/auth-service.js';
+      import FirebaseService from './src/js/services/firebase-service.js';
+
+      class BlogPage {
+        constructor() {
+          this.authService = new AuthService();
+          this.firebaseService = new FirebaseService();
+          this.currentUser = null;
+          this.posts = [];
+          this.filteredPosts = [];
+          this.postsPerPage = 10;
+          this.currentPage = 0;
+        }
+
+        async init() {
+          await this.authService.initialize();
+          await this.firebaseService.initialize();
+
+          // Set up auth state listener
+          this.authService.firebaseService.addAuthStateListener(user => {
+            this.currentUser = user;
+            this.updateUIForAuth();
+          });
+
+          this.setupEventHandlers();
+          await this.loadBlogPosts();
+        }
+
+        updateUIForAuth() {
+          const writePostBtn = document.getElementById('write-post-btn');
+
+          if (this.currentUser && this.canWritePosts()) {
+            writePostBtn.style.display = 'inline-block';
+          } else {
+            writePostBtn.style.display = 'none';
+          }
+        }
+
+        canWritePosts() {
+          // Check if user has writing privileges (tier 1+ or team member)
+          return this.currentUser && this.authService.userProfile?.tier >= 1;
+        }
+
+        async loadBlogPosts() {
+          try {
+            this.showLoading(true);
+
+            // For now, create some sample posts since Firebase collection is empty
+            this.posts = await this.getSamplePosts();
+            this.filteredPosts = [...this.posts];
+
+            this.renderFeaturedPosts();
+            this.renderBlogPosts();
+          } catch (error) {
+            console.error('Error loading blog posts:', error);
+            this.showError('Failed to load blog posts');
+          } finally {
+            this.showLoading(false);
+          }
+        }
+
+        async getSamplePosts() {
+          // Sample posts for demonstration
+          return [
+            {
+              id: 'sample1',
+              title: 'The Importance of Bias Detection in AI Education',
+              summary:
+                'Exploring how simulation-based learning helps students understand and identify AI bias in real-world scenarios.',
+              content:
+                'AI bias is one of the most critical issues in modern artificial intelligence...',
+              category: 'ai-bias',
+              author: {
+                name: 'SimulateAI Team',
+                tier: 3,
+                avatar: '/assets/team-avatar.png',
+              },
+              tags: ['ai-bias', 'education', 'simulation'],
+              createdAt: new Date('2025-01-15'),
+              featured: true,
+              views: 1250,
+              likes: 89,
+            },
+            {
+              id: 'sample2',
+              title: 'Research Update: Student Learning Outcomes',
+              summary:
+                'Latest findings from our research study on simulation-based AI ethics education effectiveness.',
+              content:
+                'Our recent research study involving 500+ students shows significant improvements...',
+              category: 'research',
+              author: {
+                name: 'Dr. Sarah Chen',
+                tier: 1,
+                avatar: '/assets/researcher-avatar.png',
+              },
+              tags: ['research', 'education', 'outcomes'],
+              createdAt: new Date('2025-01-12'),
+              featured: false,
+              views: 834,
+              likes: 67,
+            },
+            {
+              id: 'sample3',
+              title: 'Privacy by Design in Educational Technology',
+              summary:
+                'How we protect student privacy while enabling meaningful AI ethics education.',
+              content:
+                'Privacy protection is fundamental to our educational approach...',
+              category: 'privacy',
+              author: {
+                name: 'Alex Rodriguez',
+                tier: 2,
+                avatar: '/assets/contributor-avatar.png',
+              },
+              tags: ['privacy', 'design', 'education'],
+              createdAt: new Date('2025-01-10'),
+              featured: true,
+              views: 945,
+              likes: 73,
+            },
+          ];
+        }
+
+        renderFeaturedPosts() {
+          const container = document.getElementById('featured-posts-grid');
+          const featuredPosts = this.posts
+            .filter(post => post.featured)
+            .slice(0, 3);
+
+          container.innerHTML = featuredPosts
+            .map(
+              post => `
+                    <article class="featured-post-card">
+                        <div class="post-category">${this.getCategoryEmoji(post.category)} ${this.getCategoryName(post.category)}</div>
+                        <h3><a href="#" onclick="window.blogPage.openPost('${post.id}')">${post.title}</a></h3>
+                        <p class="post-summary">${post.summary}</p>
+                        <div class="post-meta">
+                            <div class="post-author">
+                                <img src="${post.author.avatar}" alt="${post.author.name}" class="author-avatar">
+                                <span class="author-name">${post.author.name} ${this.getTierBadge(post.author.tier)}</span>
+                            </div>
+                            <div class="post-stats">
+                                <span>👁️ ${post.views}</span>
+                                <span>❤️ ${post.likes}</span>
+                            </div>
+                        </div>
+                    </article>
+                `
+            )
+            .join('');
+        }
+
+        renderBlogPosts() {
+          const container = document.getElementById('blog-posts-container');
+          const startIndex = this.currentPage * this.postsPerPage;
+          const endIndex = startIndex + this.postsPerPage;
+          const postsToShow = this.filteredPosts.slice(startIndex, endIndex);
+
+          if (this.currentPage === 0) {
+            container.innerHTML = '';
+          }
+
+          container.innerHTML += postsToShow
+            .map(
+              post => `
+                    <article class="blog-post-card">
+                        <div class="post-header">
+                            <div class="post-category">${this.getCategoryEmoji(post.category)} ${this.getCategoryName(post.category)}</div>
+                            <time class="post-date">${this.formatDate(post.createdAt)}</time>
+                        </div>
+                        <h2><a href="#" onclick="window.blogPage.openPost('${post.id}')">${post.title}</a></h2>
+                        <p class="post-summary">${post.summary}</p>
+                        <div class="post-tags">
+                            ${post.tags.map(tag => `<span class="tag">#${tag}</span>`).join('')}
+                        </div>
+                        <div class="post-footer">
+                            <div class="post-author">
+                                <img src="${post.author.avatar}" alt="${post.author.name}" class="author-avatar">
+                                <span class="author-name">${post.author.name} ${this.getTierBadge(post.author.tier)}</span>
+                            </div>
+                            <div class="post-stats">
+                                <span>👁️ ${post.views}</span>
+                                <span>❤️ ${post.likes}</span>
+                                <button class="btn-link" onclick="window.blogPage.openPost('${post.id}')">Read More →</button>
+                            </div>
+                        </div>
+                    </article>
+                `
+            )
+            .join('');
+
+          // Update load more button
+          const loadMoreBtn = document.getElementById('load-more-btn');
+          if (endIndex >= this.filteredPosts.length) {
+            loadMoreBtn.style.display = 'none';
+          } else {
+            loadMoreBtn.style.display = 'block';
+          }
+        }
+
+        getCategoryEmoji(category) {
+          const emojis = {
+            research: '🔬',
+            education: '📚',
+            ethics: '⚖️',
+            'ai-bias': '🎯',
+            privacy: '🔒',
+            community: '🤝',
+          };
+          return emojis[category] || '📝';
+        }
+
+        getCategoryName(category) {
+          const names = {
+            research: 'Research',
+            education: 'Education',
+            ethics: 'Ethics',
+            'ai-bias': 'AI Bias',
+            privacy: 'Privacy',
+            community: 'Community',
+          };
+          return names[category] || 'General';
+        }
+
+        getTierBadge(tier) {
+          const badges = {
+            0: '',
+            1: '🔬',
+            2: '⭐',
+            3: '👑',
+          };
+          return badges[tier] || '';
+        }
+
+        formatDate(date) {
+          return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          });
+        }
+
+        openPost(postId) {
+          // TODO: Navigate to individual post page
+          alert(`Opening post: ${postId}`);
+        }
+
+        setupEventHandlers() {
+          // Write post button
+          document
+            .getElementById('write-post-btn')
+            ?.addEventListener('click', () => {
+              this.showWritePostModal();
+            });
+
+          // Filters
+          document
+            .getElementById('category-filter')
+            .addEventListener('change', e => {
+              this.filterPosts();
+            });
+
+          document
+            .getElementById('author-filter')
+            .addEventListener('change', e => {
+              this.filterPosts();
+            });
+
+          // Load more button
+          document
+            .getElementById('load-more-btn')
+            .addEventListener('click', () => {
+              this.currentPage++;
+              this.renderBlogPosts();
+            });
+
+          // Write post form
+          document
+            .getElementById('write-post-form')
+            .addEventListener('submit', e => {
+              e.preventDefault();
+              this.handlePostSubmission();
+            });
+
+          // Modal close
+          document
+            .querySelector('#write-post-modal .modal-close')
+            .addEventListener('click', () => {
+              this.hideWritePostModal();
+            });
+        }
+
+        filterPosts() {
+          const categoryFilter =
+            document.getElementById('category-filter').value;
+          const authorFilter = document.getElementById('author-filter').value;
+
+          this.filteredPosts = this.posts.filter(post => {
+            const matchesCategory =
+              !categoryFilter || post.category === categoryFilter;
+            const matchesAuthor =
+              !authorFilter || this.matchesAuthorFilter(post, authorFilter);
+            return matchesCategory && matchesAuthor;
+          });
+
+          this.currentPage = 0;
+          this.renderBlogPosts();
+        }
+
+        matchesAuthorFilter(post, filter) {
+          switch (filter) {
+            case 'team':
+              return post.author.name.includes('SimulateAI Team');
+            case 'community':
+              return (
+                !post.author.name.includes('SimulateAI Team') &&
+                post.author.tier >= 1
+              );
+            case 'research':
+              return post.author.tier >= 1;
+            default:
+              return true;
+          }
+        }
+
+        showWritePostModal() {
+          if (!this.canWritePosts()) {
+            alert(
+              'You need to be a research contributor (tier 1+) to write blog posts.'
+            );
+            return;
+          }
+
+          document.getElementById('write-post-modal').style.display = 'block';
+          document.body.style.overflow = 'hidden';
+        }
+
+        hideWritePostModal() {
+          document.getElementById('write-post-modal').style.display = 'none';
+          document.body.style.overflow = 'auto';
+        }
+
+        async handlePostSubmission() {
+          // TODO: Implement post submission to Firebase
+          alert('Post submission - Firebase integration coming soon!');
+          this.hideWritePostModal();
+        }
+
+        showLoading(show) {
+          document.getElementById('loading').style.display = show
+            ? 'flex'
+            : 'none';
+        }
+
+        showError(message) {
+          // TODO: Use notification toast
+          console.error(message);
+        }
+      }
+
+      // Initialize blog page and make it globally available
+      window.blogPage = new BlogPage();
+      window.blogPage.init();
+    </script>
+  </body>
+</html>

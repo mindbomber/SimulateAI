@@ -51,6 +51,9 @@ import OnboardingTour from './components/onboarding-tour.js';
 import { getAllCategories, getCategoryScenarios } from '../data/categories.js';
 import MCPIntegrationManager from './integrations/mcp-integration-manager.js';
 
+// Community and Authentication Services
+import AuthService from './services/auth-service.js';
+
 // Constants for app configuration
 const APP_CONSTANTS = {
   VIEWPORT: {
@@ -156,6 +159,12 @@ class AIEthicsApp {
     // MCP Integration Manager
     this.mcpManager = null;
     this.mcpCapabilities = new Set();
+
+    // Community and Authentication Services
+    this.firebaseService = null;
+    this.authService = null;
+    this.currentUser = null;
+    this.userWelcomed = false; // Track if user has been welcomed this session
 
     // Available simulation categories (each containing multiple scenarios)
     // NOTE: These are thematic categories, not individual scenarios
@@ -275,6 +284,9 @@ class AIEthicsApp {
 
       // Initialize MCP integrations
       await this.initializeMCPIntegrations();
+
+      // Initialize Firebase and Authentication
+      await this.initializeFirebaseServices();
 
       this.isInitialized = true;
       AppDebug.log(
@@ -2866,6 +2878,266 @@ class AIEthicsApp {
       return { initialized: false, capabilities: [] };
     }
     return this.mcpManager.getMCPStatus();
+  }
+
+  /**
+   * Initialize Firebase and Authentication Services
+   */
+  async initializeFirebaseServices() {
+    try {
+      AppDebug.log('Initializing Firebase services...');
+
+      // Initialize Authentication Service
+      this.authService = new AuthService();
+      const authInitialized = await this.authService.initialize();
+
+      if (authInitialized) {
+        AppDebug.log('Authentication service initialized successfully');
+
+        // Get Firebase service reference for other components
+        this.firebaseService = this.authService.firebaseService;
+
+        // Set up authentication state listener (Firebase best practice)
+        this.setupAuthStateListener();
+
+        // Set up research data logging integration
+        this.setupResearchDataIntegration();
+
+        // Update UI for current auth state
+        this.updateUIForAuthState();
+      } else {
+        AppDebug.warn('Authentication service initialization failed');
+      }
+    } catch (error) {
+      AppDebug.error('Failed to initialize Firebase services:', error);
+      // Continue without Firebase - app should still function
+    }
+  }
+
+  /**
+   * Set up authentication state listener (Firebase best practice)
+   * This ensures reliable user state detection across page loads and sessions
+   */
+  setupAuthStateListener() {
+    if (!this.firebaseService) {
+      AppDebug.warn('Firebase service not available for auth state listener');
+      return;
+    }
+
+    try {
+      // Set up Firebase onAuthStateChanged listener early in app lifecycle
+      this.firebaseService.onAuthStateChanged(user => {
+        AppDebug.log(
+          'Authentication state changed:',
+          user ? 'User signed in' : 'User signed out'
+        );
+
+        // Update current user state
+        this.currentUser = user;
+
+        // Update UI to reflect auth state
+        this.updateUIForAuthState();
+
+        // Handle user-specific initialization
+        if (user) {
+          this.handleUserSignedIn(user);
+        } else {
+          this.handleUserSignedOut();
+        }
+      });
+
+      AppDebug.log('Authentication state listener set up successfully');
+    } catch (error) {
+      AppDebug.error('Failed to set up authentication state listener:', error);
+    }
+  }
+
+  /**
+   * Handle user signed in state
+   */
+  handleUserSignedIn(user) {
+    // Update user profile in auth service
+    if (this.authService) {
+      this.authService.setCurrentUser(user);
+    }
+
+    // Load user-specific data, preferences, etc.
+    this.loadUserData(user);
+
+    // Show welcome message for new sessions
+    if (!this.userWelcomed) {
+      this.showWelcomeMessage(user);
+      this.userWelcomed = true;
+    }
+  }
+
+  /**
+   * Handle user signed out state
+   */
+  handleUserSignedOut() {
+    // Clear user-specific data
+    this.currentUser = null;
+    this.userWelcomed = false;
+
+    // Reset auth service state
+    if (this.authService) {
+      this.authService.clearCurrentUser();
+    }
+
+    // Clear any cached user data
+    this.clearUserData();
+  }
+
+  /**
+   * Load user-specific data and preferences
+   */
+  async loadUserData(user) {
+    try {
+      if (!this.firebaseService) return;
+
+      // Load user profile and preferences
+      const userProfile = await this.firebaseService.getUserProfile(user.uid);
+      if (userProfile) {
+        AppDebug.log('User profile loaded successfully');
+        // Apply user preferences, load progress, etc.
+      }
+    } catch (error) {
+      AppDebug.error('Error loading user data:', error);
+    }
+  }
+
+  /**
+   * Clear user-specific data
+   */
+  clearUserData() {
+    // Clear any cached user data, preferences, progress, etc.
+    AppDebug.log('User data cleared');
+  }
+
+  /**
+   * Show welcome message for authenticated users
+   */
+  showWelcomeMessage(user) {
+    const displayName = user.displayName || user.email || 'User';
+    AppDebug.log(`Welcome back, ${displayName}!`);
+
+    // Could show a toast notification or other welcome UI
+    // Example: this.showToast(`Welcome back, ${displayName}!`);
+  }
+
+  /**
+   * Set up research data logging integration
+   */
+  setupResearchDataIntegration() {
+    // Override the existing simulation completion flow to include research logging
+    const originalHandleSimulationComplete =
+      this.handleSimulationComplete?.bind(this);
+
+    if (originalHandleSimulationComplete) {
+      this.handleSimulationComplete = async simulationData => {
+        // Call original completion handler
+        await originalHandleSimulationComplete(simulationData);
+
+        // Log research data if user is authenticated and opted in
+        if (
+          this.authService?.isAuthenticated() &&
+          this.authService?.canAccessResearch()
+        ) {
+          await this.logResearchData(simulationData);
+        }
+      };
+    }
+  }
+
+  /**
+   * Log research data for authenticated research participants
+   */
+  async logResearchData(simulationData) {
+    try {
+      const user = this.authService.getCurrentUser();
+      if (!user) return;
+
+      const researchData = {
+        scenarioId: simulationData.scenarioId,
+        responses: simulationData.userChoices || {},
+        ethicsScores: simulationData.ethicsScores || {},
+        reflectionAnswers: simulationData.reflectionAnswers || [],
+        completionTime: simulationData.completionTime || 0,
+        timestamp: new Date().toISOString(),
+      };
+
+      const result = await this.firebaseService.logResearchResponse(
+        user.uid,
+        researchData
+      );
+
+      if (result.success) {
+        AppDebug.log('Research data logged successfully');
+      } else {
+        AppDebug.warn(
+          'Research data logging failed:',
+          result.reason || 'Unknown error'
+        );
+      }
+    } catch (error) {
+      AppDebug.error('Error logging research data:', error);
+    }
+  }
+
+  /**
+   * Update UI based on current authentication state
+   */
+  updateUIForAuthState() {
+    const user = this.getCurrentUser();
+    const isAuthenticated = !!user;
+
+    // Update navigation authentication state
+    if (this.authService) {
+      this.authService.updateAuthenticationUI(isAuthenticated, user);
+    }
+
+    // Update any auth-dependent UI elements
+    const authButtons = document.querySelectorAll('[data-auth-required]');
+    authButtons.forEach(button => {
+      if (isAuthenticated) {
+        button.style.display = '';
+        button.disabled = false;
+      } else {
+        button.style.display = 'none';
+        button.disabled = true;
+      }
+    });
+
+    // Update user-specific content
+    const userContent = document.querySelectorAll('[data-user-content]');
+    userContent.forEach(element => {
+      element.style.display = isAuthenticated ? '' : 'none';
+    });
+
+    // Update guest content
+    const guestContent = document.querySelectorAll('[data-guest-content]');
+    guestContent.forEach(element => {
+      element.style.display = isAuthenticated ? 'none' : '';
+    });
+
+    AppDebug.log(
+      'UI updated for authentication state:',
+      isAuthenticated ? 'authenticated' : 'guest'
+    );
+  }
+
+  /**
+   * Get current user authentication status
+   */
+  getCurrentUser() {
+    return this.authService?.getCurrentUser() || null;
+  }
+
+  /**
+   * Get user profile information
+   */
+  getUserProfile() {
+    return this.authService?.getUserProfile() || null;
   }
 
   // ...existing methods...
