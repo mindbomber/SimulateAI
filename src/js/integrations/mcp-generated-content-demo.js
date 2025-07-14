@@ -1,6 +1,21 @@
 // MCP-Generated New Scenarios for SimulateAI
 // Based on current AI ethics developments from MIT Technology Review July 2025
 
+// Configuration constants
+const DEMO_CONFIG = {
+  ACHIEVEMENT_THRESHOLDS: {
+    EXPLORER: 5,
+    THINKER: 10,
+    REASONER: 20,
+    MASTER: 50,
+  },
+  RELEVANCE_THRESHOLDS: {
+    ETHICAL_COMPLEXITY: 0.7,
+    CURRENT_RELEVANCE: 0.8,
+    EDUCATIONAL_POTENTIAL: 0.6,
+  },
+};
+
 /**
  * NEW SCENARIOS GENERATED FROM CURRENT EVENTS
  * Source: MCP Web Research of MIT Technology Review July 2025
@@ -464,10 +479,14 @@ export const BADGE_SYSTEM = {
   getAchievements(categoryId, scenarioCount) {
     const achievements = [];
     if (scenarioCount >= 1) achievements.push('First Steps Taken');
-    if (scenarioCount >= 5) achievements.push('Ethics Explorer');
-    if (scenarioCount >= 10) achievements.push('Critical Thinker');
-    if (scenarioCount >= 20) achievements.push('Ethical Reasoner');
-    if (scenarioCount >= 50) achievements.push('AI Ethics Master');
+    if (scenarioCount >= DEMO_CONFIG.ACHIEVEMENT_THRESHOLDS.EXPLORER)
+      achievements.push('Ethics Explorer');
+    if (scenarioCount >= DEMO_CONFIG.ACHIEVEMENT_THRESHOLDS.THINKER)
+      achievements.push('Critical Thinker');
+    if (scenarioCount >= DEMO_CONFIG.ACHIEVEMENT_THRESHOLDS.REASONER)
+      achievements.push('Ethical Reasoner');
+    if (scenarioCount >= DEMO_CONFIG.ACHIEVEMENT_THRESHOLDS.MASTER)
+      achievements.push('AI Ethics Master');
     return achievements;
   },
 };
@@ -509,9 +528,12 @@ export class MCPScenarioCreator {
   filterForEducationalValue(events) {
     return events.filter(
       event =>
-        event.ethicalComplexity > 0.7 &&
-        event.currentRelevance > 0.8 &&
-        event.educationalPotential > 0.6
+        event.ethicalComplexity >
+          DEMO_CONFIG.RELEVANCE_THRESHOLDS.ETHICAL_COMPLEXITY &&
+        event.currentRelevance >
+          DEMO_CONFIG.RELEVANCE_THRESHOLDS.CURRENT_RELEVANCE &&
+        event.educationalPotential >
+          DEMO_CONFIG.RELEVANCE_THRESHOLDS.EDUCATIONAL_POTENTIAL
     );
   }
 
@@ -557,7 +579,7 @@ export class MCPScenarioCreator {
     ];
   }
 
-  generateAssessmentRubric(scenario) {
+  generateAssessmentRubric(_scenario) {
     return {
       'Ethical Reasoning': [
         'Novice: Limited understanding of ethical considerations',

@@ -2,9 +2,7 @@
 mode: 'agent'
 model: Claude Sonnet 4
 tools: ['githubRepo', 'codebase']
-description:
-  'Generate a new category for SimulateAI that aligns with our philosophical taxonomy and addresses
-  current AI ethics challenges.'
+description: 'Generate a new category for SimulateAI'
 ---
 
 # Category Creation Prompt for Copilot Agents

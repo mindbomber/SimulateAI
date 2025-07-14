@@ -5,6 +5,26 @@
 
 import logger from '../utils/logger.js';
 
+// Configuration constants
+const BYTES_PER_KB = 1024; // Standard bytes per kilobyte
+
+const ANALYTICS_CONFIG = {
+  BYTES_PER_KB,
+  MAX_MEMORY_MB: 100,
+  MAX_LOAD_TIME_MS: 3000,
+  MAX_INTERACTION_DELAY_MS: 100,
+  HIGH_DIFFICULTY_COMPLETION_THRESHOLD: 0.6,
+  LOW_DIFFICULTY_COMPLETION_THRESHOLD: 0.9,
+  HIGH_DIFFICULTY_TIME_THRESHOLD_MS: 1800000, // 30 minutes
+  LOW_DIFFICULTY_TIME_THRESHOLD_MS: 300000, // 5 minutes
+  COMPLETION_RATE_THRESHOLD: 0.6,
+};
+
+// Computed constants
+const BYTES_PER_MB =
+  ANALYTICS_CONFIG.BYTES_PER_KB * ANALYTICS_CONFIG.BYTES_PER_KB;
+const MAX_MEMORY_BYTES = ANALYTICS_CONFIG.MAX_MEMORY_MB * BYTES_PER_MB;
+
 class MCPAnalyticsEnhancement {
   constructor(existingAnalytics) {
     this.analytics = existingAnalytics;
@@ -14,6 +34,15 @@ class MCPAnalyticsEnhancement {
     this.realTimeDebugger = null;
 
     this.initializeEnhancements();
+  }
+
+  /**
+   * Set analytics integration (no-op for this class as it IS the analytics enhancement)
+   * @param {Object} _analytics - Analytics integration instance (unused)
+   */
+  setAnalytics(_analytics) {
+    // This class is the analytics enhancement, so this is a no-op
+    // Included for interface consistency with other integrations
   }
 
   /**
@@ -74,9 +103,9 @@ class MCPAnalyticsEnhancement {
     this.realTimeDebugger = {
       errorHandlers: new Map(),
       performanceThresholds: {
-        maxLoadTime: 3000, // 3 seconds
-        maxInteractionDelay: 100, // 100ms
-        maxMemoryUsage: 100 * 1024 * 1024, // 100MB
+        maxLoadTime: ANALYTICS_CONFIG.MAX_LOAD_TIME_MS,
+        maxInteractionDelay: ANALYTICS_CONFIG.MAX_INTERACTION_DELAY_MS,
+        maxMemoryUsage: MAX_MEMORY_BYTES,
       },
       alertSubscribers: new Set(),
     };
@@ -361,7 +390,7 @@ class MCPAnalyticsEnhancement {
     return times.reduce((sum, time) => sum + time, 0) / times.length;
   }
 
-  calculateEngagementScore(scenarioId) {
+  calculateEngagementScore(_scenarioId) {
     // Implement engagement scoring algorithm
     return Math.random(); // Placeholder
   }
@@ -373,11 +402,17 @@ class MCPAnalyticsEnhancement {
       metrics.timeSpentPerScenario.get(scenarioId) || []
     );
 
-    if (rates.completed / rates.started < 0.6 || avgTime > 1800000) {
-      // 30 minutes
+    if (
+      rates.completed / rates.started <
+        ANALYTICS_CONFIG.HIGH_DIFFICULTY_COMPLETION_THRESHOLD ||
+      avgTime > ANALYTICS_CONFIG.HIGH_DIFFICULTY_TIME_THRESHOLD_MS
+    ) {
       return 'high';
-    } else if (rates.completed / rates.started > 0.9 && avgTime < 300000) {
-      // 5 minutes
+    } else if (
+      rates.completed / rates.started >
+        ANALYTICS_CONFIG.LOW_DIFFICULTY_COMPLETION_THRESHOLD &&
+      avgTime < ANALYTICS_CONFIG.LOW_DIFFICULTY_TIME_THRESHOLD_MS
+    ) {
       return 'low';
     }
     return 'medium';
@@ -386,14 +421,15 @@ class MCPAnalyticsEnhancement {
   generateScenarioRecommendations(scenarioId, metrics) {
     const recommendations = [];
 
-    if (metrics.completionRate < 0.6) {
+    if (metrics.completionRate < ANALYTICS_CONFIG.COMPLETION_RATE_THRESHOLD) {
       recommendations.push(
         'Consider simplifying scenario or adding more guidance'
       );
     }
 
-    if (metrics.avgTimeSpent > 1800000) {
-      // 30 minutes
+    if (
+      metrics.avgTimeSpent > ANALYTICS_CONFIG.HIGH_DIFFICULTY_TIME_THRESHOLD_MS
+    ) {
       recommendations.push(
         'Scenario may be too complex - consider breaking into smaller parts'
       );

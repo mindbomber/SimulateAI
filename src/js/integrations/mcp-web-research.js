@@ -1,18 +1,88 @@
 /**
  * MCP Web Research Integration for SimulateAI
  * Enhances scenarios with real-time web content and current events
+ *
+ * This class provides web research capabilities for SimulateAI, enabling:
+ * - Real-time content enrichment for ethics scenarios
+ * - Current events integration
+ * - Web-based case study discovery
+ * - Intelligent caching for performance
+ *
+ * Key Features:
+ * - Smart caching with configurable timeout
+ * - Category-specific search queries
+ * - Relevance scoring for content filtering
+ * - Analytics integration for research tracking
+ * - Fallback examples for offline scenarios
  */
+
+// Configuration constants
+const TIMEOUT_MINUTES = 30;
+const SECONDS_PER_MINUTE = 60;
+const MS_PER_SECOND = 1000;
+const MINUTES_TO_MS = SECONDS_PER_MINUTE * MS_PER_SECOND;
+
+const CACHE_CONFIG = {
+  TIMEOUT_MS: TIMEOUT_MINUTES * MINUTES_TO_MS,
+  RELEVANCE_THRESHOLD: 0.7,
+  DEFAULT_RELEVANCE: 0.5,
+};
+
+const SEARCH_QUERIES = {
+  'bias-fairness': [
+    'AI bias lawsuit 2024 2025',
+    'algorithmic discrimination news',
+    'AI fairness research latest',
+  ],
+  'consent-surveillance': [
+    'privacy violation AI surveillance',
+    'consent data collection ethics',
+    'AI monitoring controversy',
+  ],
+  'automation-oversight': [
+    'AI automation job displacement',
+    'human oversight AI systems',
+    'algorithmic decision making oversight',
+  ],
+  'misinformation-trust': [
+    'AI misinformation detection',
+    'deepfake detection technology',
+    'AI trustworthiness research',
+  ],
+  default: ['AI ethics news', 'artificial intelligence ethics'],
+};
 
 class MCPWebResearch {
   constructor() {
-    this.cacheTimeout = 1000 * 60 * 30; // 30 minutes
+    this.cacheTimeout = CACHE_CONFIG.TIMEOUT_MS;
     this.cache = new Map();
+    this.analytics = null;
+  }
+
+  /**
+   * Set the analytics integration for tracking research activities
+   * @param {Object} analytics - Analytics integration instance
+   */
+  setAnalytics(analytics) {
+    this.analytics = analytics;
   }
 
   /**
    * Fetch real-world examples for ethics scenarios
+   * @param {string} scenarioId - Unique identifier for the scenario
+   * @param {string} ethicsCategory - The ethics category to search for
+   * @returns {Promise<Object>} Object containing real-world examples and metadata
    */
   async enrichScenarioWithRealExamples(scenarioId, ethicsCategory) {
+    // Input validation
+    if (!scenarioId || typeof scenarioId !== 'string') {
+      throw new Error('Scenario ID is required and must be a string');
+    }
+
+    if (!ethicsCategory || typeof ethicsCategory !== 'string') {
+      throw new Error('Ethics category is required and must be a string');
+    }
+
     const cacheKey = `${scenarioId}-${ethicsCategory}`;
 
     if (this.cache.has(cacheKey)) {
@@ -48,48 +118,32 @@ class MCPWebResearch {
 
       return result;
     } catch (error) {
-      console.warn('Failed to fetch real-world examples:', error);
+      // TODO: Implement proper error logging/analytics tracking
+      if (this.analytics) {
+        this.analytics.track('web_research_error', {
+          scenarioId,
+          ethicsCategory,
+          error: error.message,
+        });
+      }
       return this.getFallbackExamples(ethicsCategory);
     }
   }
 
   /**
    * Generate targeted search queries for different ethics categories
+   * @param {string} ethicsCategory - The ethics category to generate queries for
+   * @returns {Array<string>} Array of search queries
    */
   generateSearchQueries(ethicsCategory) {
-    const queryMap = {
-      'bias-fairness': [
-        'AI bias lawsuit 2024 2025',
-        'algorithmic discrimination news',
-        'AI fairness research latest',
-      ],
-      'consent-surveillance': [
-        'privacy violation AI surveillance',
-        'consent data collection ethics',
-        'AI monitoring controversy',
-      ],
-      'automation-oversight': [
-        'AI automation job displacement',
-        'human oversight AI systems',
-        'algorithmic decision making oversight',
-      ],
-      'misinformation-trust': [
-        'AI misinformation detection',
-        'deepfake detection technology',
-        'AI trustworthiness research',
-      ],
-    };
-
-    return (
-      queryMap[ethicsCategory] || [
-        'AI ethics news',
-        'artificial intelligence ethics',
-      ]
-    );
+    return SEARCH_QUERIES[ethicsCategory] || SEARCH_QUERIES.default;
   }
 
   /**
    * Extract relevant examples from web content
+   * @param {string} webContent - The web content to analyze
+   * @param {string} category - The ethics category for filtering
+   * @returns {Array<Object>} Array of relevant examples with metadata
    */
   extractRelevantExamples(webContent, category) {
     // Parse web content and extract case studies, news articles, research findings
@@ -108,11 +162,15 @@ class MCPWebResearch {
       });
     });
 
-    return examples.filter(ex => ex.relevance > 0.7);
+    return examples.filter(
+      ex => ex.relevance > CACHE_CONFIG.RELEVANCE_THRESHOLD
+    );
   }
 
   /**
    * Update scenario data with current events
+   * @param {Object} scenario - The scenario object to enhance
+   * @returns {Promise<Object>} Enhanced scenario with real-world context
    */
   async updateScenarioWithCurrentEvents(scenario) {
     const realWorldData = await this.enrichScenarioWithRealExamples(
@@ -132,6 +190,8 @@ class MCPWebResearch {
 
   /**
    * Generate discussion prompts based on real-world examples
+   * @param {Object} realWorldData - The real-world data to base prompts on
+   * @returns {Array<Object>} Array of discussion prompts with context
    */
   generateDiscussionPrompts(realWorldData) {
     return realWorldData.realWorldExamples.map(example => ({
@@ -146,38 +206,55 @@ class MCPWebResearch {
   }
 
   // Placeholder methods for actual implementation
-  async fetchWebContent(query) {
+  async fetchWebContent(_query) {
     // This would use the MCP fetch_webpage function
+    // TODO: Implement with MCP fetch_webpage
     throw new Error('Implement with MCP fetch_webpage');
   }
 
-  findRelevantSections(content, category) {
+  findRelevantSections(_content, _category) {
     // Implement content analysis logic
+    // TODO: Implement content analysis with NLP or keyword matching
     return [];
   }
 
-  extractTitle(section) {
+  extractTitle(_section) {
+    // TODO: Implement title extraction from content section
     return '';
   }
-  extractSummary(section) {
+
+  extractSummary(_section) {
+    // TODO: Implement summary extraction from content section
     return '';
   }
-  extractSource(section) {
+
+  extractSource(_section) {
+    // TODO: Implement source URL/name extraction
     return '';
   }
-  extractDate(section) {
+
+  extractDate(_section) {
+    // TODO: Implement date extraction from content
     return new Date();
   }
-  calculateRelevance(section, category) {
-    return 0.5;
+
+  calculateRelevance(_section, _category) {
+    // TODO: Implement relevance scoring algorithm
+    return CACHE_CONFIG.DEFAULT_RELEVANCE;
   }
-  extractSources(examples) {
+
+  extractSources(_examples) {
+    // TODO: Implement source aggregation from examples
     return [];
   }
-  getFallbackExamples(category) {
+
+  getFallbackExamples(_category) {
+    // TODO: Implement fallback examples for offline scenarios
     return { realWorldExamples: [], sources: [] };
   }
-  findConnectionsToScenario(scenario, data) {
+
+  findConnectionsToScenario(_scenario, _data) {
+    // TODO: Implement scenario-data connection analysis
     return [];
   }
 }

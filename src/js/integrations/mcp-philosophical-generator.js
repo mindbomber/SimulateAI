@@ -8,35 +8,118 @@
  * current real-world AI challenges.
  */
 
-import {
-  PHILOSOPHICAL_DOMAINS,
-  CATEGORY_CREATION_GUIDELINES,
-  MCP_CATEGORY_GENERATION,
-} from './philosophical-taxonomy.js';
+import { PHILOSOPHICAL_DOMAINS } from './philosophical-taxonomy.js';
+
+// Configuration constants
+const SCENARIO_CONFIG = {
+  DEFAULT_MINUTES_PER_SCENARIO: 8,
+  MAX_RESULTS_PER_QUERY: 3,
+  DESCRIPTION_WORD_LIMIT: 3,
+  TEXT_SIMILARITY_THRESHOLD: 0.3,
+  ADVANCED_BADGE_THRESHOLD: 5,
+  BASE_REFLECTION_TIME: 10,
+};
+
+// Badge tier configuration following prompt.md specification
+// Using category-specific naming patterns instead of generic tier names
+const BADGE_TIER_THEMES = [
+  { type: 'discovery', examples: ['Explorer', 'Seeker', 'Finder', 'Guardian'] },
+  {
+    type: 'analysis',
+    examples: ['Strategist', 'Investigator', 'Advocate', 'Engineer'],
+  },
+  {
+    type: 'mastery',
+    examples: ['Architect', 'Champion', 'Ethicist', 'Virtuoso'],
+  },
+  {
+    type: 'wisdom',
+    examples: ['Philosopher', 'Sage', 'Synthesizer', 'Mentor'],
+  },
+  { type: 'teaching', examples: ['Master', 'Guide', 'Authority', 'Luminary'] },
+  {
+    type: 'transcendent',
+    examples: ['Transcendent', 'Weaver', 'Keeper', 'Oracle'],
+  },
+  {
+    type: 'artistic',
+    examples: ['Virtuoso', 'Artisan', 'Composer', 'Creator'],
+  },
+  {
+    type: 'legendary',
+    examples: ['Legend', 'Immortal', 'Eternal', 'Timeless'],
+  },
+  {
+    type: 'cosmic',
+    examples: ['Cosmic', 'Universal', 'Infinite', 'Omniscient'],
+  },
+  { type: 'divine', examples: ['Divine', 'Perfect', 'Absolute', 'Supreme'] },
+];
+
+// Triangular number progression (T(n) = n(n+1)/2) - generated programmatically
+const TRIANGULAR_REQUIREMENTS = Array.from({ length: 10 }, (_, i) => {
+  const n = i + 1;
+  return (n * (n + 1)) / 2;
+});
 
 /**
  * MCP-Powered Category Generator
  * Combines real-world AI developments with philosophical frameworks
+ *
+ * This class leverages the Model Context Protocol (MCP) integrations to generate
+ * comprehensive AI ethics categories that are both philosophically grounded and
+ * relevant to current technological developments.
+ *
+ * Key Features:
+ * - Real-time AI ethics issue research
+ * - Philosophical framework mapping
+ * - Comprehensive scenario generation
+ * - Badge progression systems
+ * - Learning lab creation
+ * - Multi-complexity level support
  */
 export class MCPPhilosophicalCategoryGenerator {
   constructor(mcpWebResearch, mcpProjectGenerator) {
+    // Input validation
+    if (!mcpWebResearch) {
+      throw new Error('MCP Web Research integration is required');
+    }
+    if (!mcpProjectGenerator) {
+      throw new Error('MCP Project Generator integration is required');
+    }
+
     this.webResearch = mcpWebResearch;
     this.projectGen = mcpProjectGenerator;
     this.philosophicalDomains = PHILOSOPHICAL_DOMAINS;
   }
 
   /**
+   * Set the web research integration for enhanced content generation
+   * @param {Object} webResearch - Web research integration instance
+   */
+  setWebResearch(webResearch) {
+    this.webResearch = webResearch;
+  }
+
+  /**
    * Generate new category based on current AI ethics developments
    * @param {string} targetDomain - Primary philosophical domain to focus on
    * @param {Object} options - Generation options
-   * @returns {Object} Complete category specification
+   * @param {number} [options.scenarioCount=6] - Number of scenarios to generate
+   * @param {string|null} [options.focusArea=null] - Specific focus area
+   * @returns {Promise<Object>} Complete category specification
    */
   async generateNewCategory(targetDomain, options = {}) {
-    const {
-      scenarioCount = 6,
-      includeAdvanced = true,
-      focusArea = null,
-    } = options;
+    // Input validation
+    if (!targetDomain || typeof targetDomain !== 'string') {
+      throw new Error('Target domain is required and must be a string');
+    }
+
+    if (!this.philosophicalDomains[targetDomain]) {
+      throw new Error(`Unknown philosophical domain: ${targetDomain}`);
+    }
+
+    const { scenarioCount = 6, focusArea = null } = options;
 
     // Step 1: Research current AI ethics issues
     const currentIssues = await this.researchCurrentAIIssues(
@@ -82,7 +165,9 @@ export class MCPPhilosophicalCategoryGenerator {
       icon: categoryStructure.icon,
       color: categoryStructure.color,
       difficulty: 'intermediate',
-      estimatedTime: Math.ceil(scenarioCount * 8), // 8 minutes per scenario
+      estimatedTime: Math.ceil(
+        scenarioCount * SCENARIO_CONFIG.DEFAULT_MINUTES_PER_SCENARIO
+      ),
       philosophicalMapping,
       scenarios,
       badges: badgeProgression,
@@ -111,9 +196,16 @@ export class MCPPhilosophicalCategoryGenerator {
     for (const query of searchQueries) {
       try {
         const results = await this.webResearch.searchAIEthicsNews(query);
-        issues.push(...results.slice(0, 3)); // Top 3 results per query
+        issues.push(...results.slice(0, SCENARIO_CONFIG.MAX_RESULTS_PER_QUERY));
       } catch (error) {
-        console.warn(`Failed to research ${query}:`, error);
+        // TODO: Implement proper error logging/analytics tracking
+        if (this.webResearch?.analytics) {
+          this.webResearch.analytics.track('research_query_error', {
+            query,
+            targetDomain,
+            error: error.message,
+          });
+        }
       }
     }
 
@@ -129,7 +221,7 @@ export class MCPPhilosophicalCategoryGenerator {
   buildSearchQueries(domain, focusArea) {
     const baseQueries = [
       `AI ethics ${domain.name.toLowerCase()} 2025`,
-      `artificial intelligence ${domain.description.split(' ').slice(0, 3).join(' ')}`,
+      `artificial intelligence ${domain.description.split(' ').slice(0, SCENARIO_CONFIG.DESCRIPTION_WORD_LIMIT).join(' ')}`,
       `robotics ethics ${domain.name.toLowerCase()}`,
     ];
 
@@ -190,7 +282,10 @@ export class MCPPhilosophicalCategoryGenerator {
       issues.forEach(issue => {
         // Check if issue keywords match domain applications
         domain.aiApplications.forEach(application => {
-          if (this.textSimilarity(issue.description, application) > 0.3) {
+          if (
+            this.textSimilarity(issue.description, application) >
+            SCENARIO_CONFIG.TEXT_SIMILARITY_THRESHOLD
+          ) {
             score += 1;
           }
         });
@@ -543,7 +638,7 @@ export class MCPPhilosophicalCategoryGenerator {
   /**
    * Generate scenario choices with consequences
    */
-  generateScenarioChoices(scenarioConfig) {
+  generateScenarioChoices(_scenarioConfig) {
     return [
       {
         id: 'choice-1',
@@ -587,48 +682,133 @@ export class MCPPhilosophicalCategoryGenerator {
       'Reflect on personal ethical reasoning and biases',
     ];
   }
-
   /**
-   * Generate badge-specific methods
+   * Generate category-specific badge title based on domain and tier
+   * @param {Object} categoryStructure - Category configuration
+   * @param {number} tierIndex - Tier index (0-9)
+   * @returns {string} Unique badge title
    */
-  generateBadgeDescription(categoryStructure, level) {
-    const descriptions = {
-      Explorer: `Beginning your journey in ${categoryStructure.name}`,
-      Apprentice: `Developing skills in ${categoryStructure.name}`,
-      Scholar: `Demonstrating competence in ${categoryStructure.name}`,
-      Philosopher: `Achieving wisdom in ${categoryStructure.name}`,
-      Master: `Mastering the complexities of ${categoryStructure.name}`,
-      Sage: `Transcending conventional thinking in ${categoryStructure.name}`,
-    };
-    return descriptions[level] || `Advancing in ${categoryStructure.name}`;
+  generateCategorySpecificBadgeTitle(categoryStructure, tierIndex) {
+    const tierTheme = BADGE_TIER_THEMES[tierIndex];
+    const categoryKeywords = this.extractCategoryKeywords(
+      categoryStructure.name
+    );
+
+    // Generate domain-specific prefix + theme role
+    const domainPrefix = categoryKeywords[0] || 'Ethics';
+    const themeRole = tierTheme.examples[0]; // Could be randomized or AI-selected
+
+    return `${domainPrefix} ${themeRole}`;
   }
 
   /**
-   * Generate philosophical quotes for badges
+   * Extract key concepts from category name for badge titles
+   * @param {string} categoryName - Category name
+   * @returns {Array} Key concepts
    */
-  generatePhilosophicalQuote(domainConfig, level) {
-    const quotes = {
-      Explorer:
-        'The journey of a thousand miles begins with a single step. - Lao Tzu',
-      Apprentice:
-        'The only true wisdom is in knowing you know nothing. - Socrates',
-      Scholar: 'An unexamined life is not worth living. - Socrates',
-      Philosopher:
-        'The function of education is to teach one to think intensively and to think critically. - Martin Luther King Jr.',
-      Master:
-        'Intelligence is not enough. Intelligence plus character - that is the goal. - Martin Luther King Jr.',
-      Sage: 'The real question is not whether machines think but whether men do. - B.F. Skinner',
-    };
-    return (
-      quotes[level] ||
-      'Wisdom is the reward for a lifetime of listening. - Doug Larson'
+  extractCategoryKeywords(categoryName) {
+    const keywords = categoryName.toLowerCase().split(' ');
+    const meaningfulWords = keywords.filter(
+      word => !['the', 'and', 'or', 'of', 'in', 'for', 'with'].includes(word)
     );
+    return meaningfulWords.map(
+      word => word.charAt(0).toUpperCase() + word.slice(1)
+    );
+  }
+
+  /**
+   * Generate badge-specific methods following prompt.md specification
+   */
+  generateBadgeDescription(categoryStructure, tierIndex) {
+    const tierTheme = BADGE_TIER_THEMES[tierIndex];
+
+    const descriptions = {
+      discovery: `Beginning your journey in ${categoryStructure.name}`,
+      analysis: `Developing analytical skills in ${categoryStructure.name}`,
+      mastery: `Demonstrating mastery in ${categoryStructure.name}`,
+      wisdom: `Achieving wisdom in ${categoryStructure.name}`,
+      teaching: `Guiding others in ${categoryStructure.name}`,
+      transcendent: `Transcending conventional thinking in ${categoryStructure.name}`,
+      artistic: `Achieving artistry in ${categoryStructure.name}`,
+      legendary: `Becoming legendary in ${categoryStructure.name}`,
+      cosmic: `Reaching cosmic understanding of ${categoryStructure.name}`,
+      divine: `Achieving divine mastery of ${categoryStructure.name}`,
+    };
+
+    return (
+      descriptions[tierTheme.type] || `Advancing in ${categoryStructure.name}`
+    );
+  }
+
+  /**
+   * Generate philosophical quotes for badges following prompt.md specification
+   * Creates category and tier-specific quotes that reflect the unique badge title
+   */
+  generatePhilosophicalQuote(categoryStructure, tierIndex) {
+    const tierTheme = BADGE_TIER_THEMES[tierIndex];
+
+    // Create tier-appropriate quotes that could relate to the category
+    const quotes = {
+      discovery: [
+        'The journey of a thousand miles begins with a single step. - Lao Tzu',
+        'The only true wisdom is in knowing you know nothing. - Socrates',
+        'Every expert was once a beginner. - Helen Hayes',
+      ],
+      analysis: [
+        'An unexamined life is not worth living. - Socrates',
+        'The function of education is to teach one to think intensively and to think critically. - Martin Luther King Jr.',
+        'Doubt is not a pleasant condition, but certainty is absurd. - Voltaire',
+      ],
+      mastery: [
+        'Intelligence plus character - that is the goal of true education. - Martin Luther King Jr.',
+        'The real question is not whether machines think but whether men do. - B.F. Skinner',
+        "You didn't find the answer. You became the question. - Anonymous",
+      ],
+      wisdom: [
+        'Excellence is never an accident. It is always the result of high intention. - Aristotle',
+        'We are what we repeatedly do. Excellence, then, is not an act, but a habit. - Aristotle',
+        'Wisdom is the reward for a lifetime of listening. - Doug Larson',
+      ],
+      teaching: [
+        "The best teachers are those who show you where to look but don't tell you what to see. - Alexandra Trenfor",
+        'Tell me and I forget, teach me and I may remember, involve me and I learn. - Benjamin Franklin',
+        'The art of teaching is the art of assisting discovery. - Mark Van Doren',
+      ],
+      transcendent: [
+        'The limits of my language mean the limits of my world. - Ludwig Wittgenstein',
+        "What we know is a drop, what we don't know is an ocean. - Isaac Newton",
+        'The further a society drifts from truth, the more it will hate those who speak it. - George Orwell',
+      ],
+      artistic: [
+        'Every act of creation is first an act of destruction. - Pablo Picasso',
+        'The purpose of art is washing the dust of daily life off our souls. - Pablo Picasso',
+        'Creativity takes courage. - Henri Matisse',
+      ],
+      legendary: [
+        'A society grows great when old men plant trees whose shade they know they shall never sit in. - Greek Proverb',
+        'The best time to plant a tree was 20 years ago. The second best time is now. - Chinese Proverb',
+        'Be yourself; everyone else is already taken. - Oscar Wilde',
+      ],
+      cosmic: [
+        'The cosmos is within us. We are made of star-stuff. - Carl Sagan',
+        "Two things are infinite: the universe and human stupidity; and I'm not sure about the universe. - Albert Einstein",
+        'Look up at the stars and not down at your feet. - Stephen Hawking',
+      ],
+      divine: [
+        'The divine is not something high above us. It is in heaven, it is in earth, it is inside us. - Morihei Ueshiba',
+        'What lies behind us and what lies before us are tiny matters compared to what lies within us. - Ralph Waldo Emerson',
+        'The eternal silence of these infinite spaces frightens me. - Blaise Pascal',
+      ],
+    };
+
+    const themeQuotes = quotes[tierTheme.type] || quotes.discovery;
+    return themeQuotes[0]; // Could be randomized or selected based on category
   }
 
   /**
    * Generate comprehensive lab interaction design
    */
-  generateLabInteractionDesign(scenario) {
+  generateLabInteractionDesign(_scenario) {
     return {
       phases: [
         {
@@ -787,7 +967,7 @@ export class MCPPhilosophicalCategoryGenerator {
   }
 
   generateNextSteps(categoryStructure, currentLevel) {
-    if (currentLevel < 5) {
+    if (currentLevel < SCENARIO_CONFIG.ADVANCED_BADGE_THRESHOLD) {
       return [
         'Continue exploring scenarios in this category',
         'Apply learning to related categories',
@@ -802,8 +982,9 @@ export class MCPPhilosophicalCategoryGenerator {
   }
 
   estimateBadgeTime(requiredScenarios, level) {
-    const baseTime = requiredScenarios * 8; // 8 minutes per scenario
-    const reflectionTime = (level + 1) * 10; // Increasing reflection time
+    const baseTime =
+      requiredScenarios * SCENARIO_CONFIG.DEFAULT_MINUTES_PER_SCENARIO;
+    const reflectionTime = (level + 1) * SCENARIO_CONFIG.BASE_REFLECTION_TIME;
     return baseTime + reflectionTime;
   }
 
@@ -817,5 +998,39 @@ export class MCPPhilosophicalCategoryGenerator {
       'Mythic',
     ];
     return rarityLevels[level] || 'Common';
+  }
+
+  /**
+   * Create badge progression system following prompt.md specification
+   * Uses triangular number progression with category-specific badge titles
+   */
+  createBadgeProgression(categoryStructure, targetDomain) {
+    const badges = [];
+
+    for (let i = 0; i < BADGE_TIER_THEMES.length; i++) {
+      const requiredScenarios = TRIANGULAR_REQUIREMENTS[i];
+      const badgeTitle = this.generateCategorySpecificBadgeTitle(
+        categoryStructure,
+        i
+      );
+
+      badges.push({
+        tier: i + 1,
+        title: badgeTitle,
+        requirement: requiredScenarios,
+        description: this.generateBadgeDescription(categoryStructure, i),
+        quote: this.generatePhilosophicalQuote(categoryStructure, i),
+        estimatedTime: this.estimateBadgeTime(requiredScenarios, i),
+        rarity: this.calculateBadgeRarity(i),
+        reflectionRequirements: this.getBadgeReflectionRequirements(i),
+        peerRequirements: this.getBadgePeerRequirements(i),
+        nextSteps: this.generateNextSteps(categoryStructure, i),
+        categoryName: categoryStructure.name,
+        domain: targetDomain,
+        tierTheme: BADGE_TIER_THEMES[i].type,
+      });
+    }
+
+    return badges;
   }
 }

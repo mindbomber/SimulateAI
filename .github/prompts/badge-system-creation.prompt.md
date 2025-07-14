@@ -1,10 +1,8 @@
 ---
 mode: 'agent'
-model: Claude Sonnet 4
+model: 'Claude Sonnet 4'
 tools: ['githubRepo', 'codebase']
-description:
-  'You are creating badge progression systems for SimulateAI categories. Badges recognize learning
-  achievements and provide philosophical depth through meaningful quotes and reflections.'
+description: 'You are creating badge progression systems for SimulateAI categories'
 ---
 
 # Badge System Creation Prompt for Copilot Agents
@@ -162,33 +160,41 @@ The badge system implements **triangular number progression** with configurable 
 **Tier 7: Virtuoso (28 scenarios)**
 
 - **Glow Intensity:** 7 (badge-glow-legendary)
-- **Sidekick Emoji Theme:** Artistry, perfection, mastery (�, �, �)
-- **Title Pattern:** "[Category] Virtuoso"
-- **Philosophical Focus:** Creative application of wisdom
+- **Sidekick Emoji Theme:** Category-specific symbols representing artistry/perfection
+- **Title Pattern:** "[Category-Unique] [Artistic-Theme]" (e.g., "Moral Virtuoso", "Logic Artisan",
+  "Justice Composer")
+- **Title Requirements:** Must represent artistic mastery within the domain
+- **Philosophical Focus:** Creative application of wisdom with domain artistry
 - **Celebration:** Legendary effects with enhanced visuals
 
 **Tier 8: Legend (36 scenarios)**
 
 - **Glow Intensity:** 8 (badge-glow-mythic)
-- **Sidekick Emoji Theme:** Legend, myth, immortality (⚡, 🌊, 🗲)
-- **Title Pattern:** "[Category] Legend"
-- **Philosophical Focus:** Mythic understanding
+- **Sidekick Emoji Theme:** Category-specific symbols representing legend/immortality
+- **Title Pattern:** "[Category-Unique] [Legendary-Theme]" (e.g., "Ethics Legend", "Truth Immortal",
+  "Harmony Eternal")
+- **Title Requirements:** Must represent legendary status within the domain
+- **Philosophical Focus:** Mythic understanding that inspires others
 - **Celebration:** Mythic glow with complex shimmer patterns
 
 **Tier 9: Cosmic (45 scenarios)**
 
 - **Glow Intensity:** 9 (badge-glow-cosmic)
-- **Sidekick Emoji Theme:** Cosmos, infinity, transcendence (🌌, ♾️, 🔮)
-- **Title Pattern:** "[Category] Cosmic"
-- **Philosophical Focus:** Universal principles
+- **Sidekick Emoji Theme:** Category-specific symbols representing cosmic/universal principles
+- **Title Pattern:** "[Category-Unique] [Cosmic-Theme]" (e.g., "Universal Ethicist", "Cosmic Truth
+  Keeper", "Infinite Balance")
+- **Title Requirements:** Must represent universal principles within the domain
+- **Philosophical Focus:** Universal principles that transcend individual domains
 - **Celebration:** Cosmic finale with multiple emoji types
 
 **Tier 10: Divine (55 scenarios)**
 
 - **Glow Intensity:** 10 (badge-glow-divine)
-- **Sidekick Emoji Theme:** Divinity, perfection, enlightenment (👁️, 🕊️, ☀️)
-- **Title Pattern:** "[Category] Divine"
-- **Philosophical Focus:** Ultimate understanding
+- **Sidekick Emoji Theme:** Category-specific symbols representing divinity/ultimate enlightenment
+- **Title Pattern:** "[Category-Unique] [Divine-Theme]" (e.g., "Divine Moral Authority", "Omniscient
+  Truth Bearer", "Perfect Harmony")
+- **Title Requirements:** Must represent ultimate enlightenment within the domain
+- **Philosophical Focus:** Ultimate understanding that approaches divine wisdom
 - **Celebration:** Maximum effects with golden shimmer
 
 ### 4. Philosophical Quote Selection
@@ -205,20 +211,24 @@ The badge system implements **triangular number progression** with configurable 
 
 #### Quote Requirements by Badge Type
 
-**Discovery Badges (Tier 1-3):** Focus on curiosity, first steps, and opening questions
+**Discovery Badges (Tier 1):** Focus on curiosity, first steps, and opening questions
 
 - Example: "The first step to wisdom is admitting what you cannot see." (Mystery Seeker)
 - Should relate to the specific metaphor used in the badge title
 
-**Analysis Badges (Tier 4-6):** Focus on investigation, understanding, and deeper insight
+**Analysis Badges (Tier 2-3):** Focus on investigation, understanding, and deeper insight
 
 - Example: "Truth hides in the shadows of complexity. You brought light." (Algorithm Investigator)
 - Should reflect the analytical nature of the badge title
 
-**Mastery Badges (Tier 7-10):** Focus on wisdom, synthesis, and transformative understanding
+**Mastery Badges (Tier 4-6):** Focus on wisdom, synthesis, and transformative understanding
 
 - Example: "You didn't find the answer. You became the question." (Consequence Architect)
-- Should capture the architectural/mastery nature of the badge title
+- Should capture the mastery nature of the badge title
+
+**Advanced Badges (Tier 7-10):** Focus on transcendence, artistry, and ultimate understanding
+
+- Should represent the highest levels of achievement and enlightenment within the domain
 
 #### Quote Sources by Domain
 
@@ -239,8 +249,6 @@ The badge system implements **triangular number progression** with configurable 
 - Cathy O'Neil, Safiya Noble, Virginia Dignum, Joanna Bryson
 
 ### 5. Badge Progression Design
-
-#### Difficulty Scaling (3-Tier System)
 
 #### Difficulty Scaling (Triangular Progression System)
 
@@ -277,7 +285,7 @@ The badge system implements **triangular number progression** with configurable 
 5. **Badge Award:** Celebration and recognition
 6. **Progress Update:** Unlock next level or related badges
 
-### 6. Implementation Requirements
+### 7. Implementation Requirements
 
 #### Badge Modal Integration
 
@@ -296,7 +304,7 @@ The badge system must work with the existing `badge-modal.js` implementation:
 - **Reflection Quality:** Assess depth of understanding at each tier
 - **Achievement Celebration:** Visual feedback through glow and confetti systems
 
-### 7. Quality Standards
+### 8. Quality Standards
 
 #### Philosophical Authenticity
 
@@ -342,8 +350,9 @@ When creating badge systems, provide:
       categoryName, timestamp)
 - [ ] GlowIntensity values 1-10 mapping to progressive visual tier effects (currently 1-3 active)
 - [ ] Clear categoryName matching the philosophical domain
-- [ ] Motivational titles following "[Category] + [Tier]" pattern with escalating significance
-- [ ] Sidekick emoji progression that reflects increasing mastery and achievement
+- [ ] Motivational titles following category-specific "[Domain-Concept] + [Tier-Theme]" pattern with
+      escalating significance
+- [ ] Sidekick emoji progression that reflects the specific badge title and achievement level
 - [ ] Future-proof design ready for content expansion
 - [ ] Integration with extended confetti and glow effect systems
 - [ ] Integration with existing badge modal and confetti systems

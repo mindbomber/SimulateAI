@@ -2,9 +2,7 @@
 mode: 'agent'
 model: Claude Sonnet 4
 tools: ['githubRepo', 'codebase']
-description:
-  'Master prompt for SimulateAI content creation, including categories, scenarios, learning labs,
-  and badge systems.'
+description: 'Master prompt for SimulateAI content creation'
 ---
 
 # Master Prompt for SimulateAI Content Creation

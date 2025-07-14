@@ -1,25 +1,88 @@
 /**
  * MCP-Enhanced Project Generator for SimulateAI
  * Creates new ethics scenarios and simulations using MCP workspace tools
+ *
+ * This class serves as a bridge between SimulateAI's content structure
+ * and MCP (Model Context Protocol) workspace tools for automated content generation.
+ *
+ * Key Features:
+ * - Generates scenario categories with proper SimulateAI structure
+ * - Integrates with web research for real-world examples
+ * - Supports GitHub integration for version control
+ * - Creates documentation and educational resources
+ * - Follows ISTE standards alignment
  */
 
 class MCPProjectGenerator {
   constructor() {
     this.templatePath = 'templates/scenarios/';
     this.generatedPath = 'src/js/data/scenarios/generated/';
+    this.webResearch = null;
+    this.githubIntegration = null;
+  }
+
+  /**
+   * Escape strings for safe inclusion in generated JavaScript code
+   * @param {string} str - String to escape
+   * @returns {string} Escaped string
+   */
+  escapeString(str) {
+    if (typeof str !== 'string') return str;
+    return str
+      .replace(/\\/g, '\\\\')
+      .replace(/'/g, "\\'")
+      .replace(/"/g, '\\"')
+      .replace(/\n/g, '\\n')
+      .replace(/\r/g, '\\r')
+      .replace(/\t/g, '\\t');
+  }
+
+  /**
+   * Set the web research integration for enhanced content generation
+   * @param {Object} webResearch - Web research integration instance
+   */
+  setWebResearch(webResearch) {
+    this.webResearch = webResearch;
+  }
+
+  /**
+   * Set the GitHub integration for repository management
+   * @param {Object} githubIntegration - GitHub integration instance
+   */
+  setGitHubIntegration(githubIntegration) {
+    this.githubIntegration = githubIntegration;
+  }
+
+  /**
+   * Set the philosophical generator integration for enhanced scenario creation
+   * @param {Object} philosophicalGenerator - Philosophical generator integration instance
+   */
+  setPhilosophicalGenerator(philosophicalGenerator) {
+    this.philosophicalGenerator = philosophicalGenerator;
   }
 
   /**
    * Generate a new ethics scenario category using MCP workspace tools
+   * @param {Object} categoryConfig - Configuration for the new category
+   * @param {string} categoryConfig.categoryId - Unique identifier for the category
+   * @param {string} categoryConfig.categoryName - Display name for the category
+   * @param {string} [categoryConfig.ethicsFramework] - Primary ethics framework
+   * @param {string} [categoryConfig.complexity] - Difficulty level
+   * @returns {Promise<Object>} Generation result with success status and details
    */
   async generateNewScenarioCategory(categoryConfig) {
-    const {
-      categoryId,
-      categoryName,
-      ethicsFramework,
-      targetAudience,
-      complexity,
-    } = categoryConfig;
+    // Input validation
+    if (!categoryConfig || typeof categoryConfig !== 'object') {
+      throw new Error(
+        'Category configuration is required and must be an object'
+      );
+    }
+
+    const { categoryId } = categoryConfig;
+
+    if (!categoryId || typeof categoryId !== 'string') {
+      throw new Error('categoryId is required and must be a string');
+    }
 
     try {
       // Create the new scenario category structure
@@ -114,10 +177,10 @@ export default ${categoryData.id}Scenarios;`;
    * Format individual scenario for the JavaScript file
    */
   formatScenarioForFile(scenario) {
-    return `  '${scenario.id}': {
-    title: '${scenario.title}',
-    dilemma: \`${scenario.dilemma}\`,
-    ethicalQuestion: '${scenario.ethicalQuestion}',
+    return `  '${this.escapeString(scenario.id)}': {
+    title: '${this.escapeString(scenario.title)}',
+    dilemma: \`${this.escapeString(scenario.dilemma)}\`,
+    ethicalQuestion: '${this.escapeString(scenario.ethicalQuestion)}',
     options: [
 ${scenario.options.map(option => this.formatOptionForFile(option)).join(',\n')}
     ]
@@ -129,9 +192,9 @@ ${scenario.options.map(option => this.formatOptionForFile(option)).join(',\n')}
    */
   formatOptionForFile(option) {
     return `      {
-        id: '${option.id}',
-        text: '${option.text}',
-        description: '${option.description}',
+        id: '${this.escapeString(option.id)}',
+        text: '${this.escapeString(option.text)}',
+        description: '${this.escapeString(option.description)}',
         impact: {
           fairness: ${option.impact.fairness},
           sustainability: ${option.impact.sustainability},
@@ -143,10 +206,10 @@ ${scenario.options.map(option => this.formatOptionForFile(option)).join(',\n')}
           proportionality: ${option.impact.proportionality}
         },
         pros: [
-${option.pros.map(pro => `          '${pro}'`).join(',\n')}
+${option.pros.map(pro => `          '${this.escapeString(pro)}'`).join(',\n')}
         ],
         cons: [
-${option.cons.map(con => `          '${con}'`).join(',\n')}
+${option.cons.map(con => `          '${this.escapeString(con)}'`).join(',\n')}
         ]
       }`;
   }
@@ -255,14 +318,20 @@ ${categoryData.scenarios.map(scenario => this.formatScenarioDocumentation(scenar
   }
 
   // Placeholder methods that would use MCP functions
-  async createFile(path, content) {
+  async createFile(_path, _content) {
     // Would use MCP create_file
-    console.log(`Creating file: ${path}`);
+    // TODO: Implement actual MCP file creation
+    if (this.webResearch) {
+      // Could enhance content with research data
+    }
   }
 
-  async updateFile(path, content) {
+  async updateFile(_path, _content) {
     // Would use MCP replace_string_in_file or insert_edit_into_file
-    console.log(`Updating file: ${path}`);
+    // TODO: Implement actual MCP file updates
+    if (this.githubIntegration) {
+      // Could integrate with GitHub for version control
+    }
   }
 
   async readCurrentCategories() {
@@ -276,51 +345,51 @@ ${categoryData.scenarios.map(scenario => this.formatScenarioDocumentation(scenar
     return colors[categoryId.length % colors.length];
   }
 
-  getScenarioTemplates(framework) {
+  getScenarioTemplates(_framework) {
     // Return appropriate templates based on ethics framework
     return [];
   }
 
-  adaptTemplateTitle(template, config) {
+  adaptTemplateTitle(_template, _config) {
     return '';
   }
-  adaptTemplateDilemma(template, config) {
+  adaptTemplateDilemma(_template, _config) {
     return '';
   }
-  adaptTemplateQuestion(template, config) {
+  adaptTemplateQuestion(_template, _config) {
     return '';
   }
-  generateScenarioOptions(template, config) {
+  generateScenarioOptions(_template, _config) {
     return [];
   }
-  getCategorySpecificStandards(config) {
+  getCategorySpecificStandards(_config) {
     return [];
   }
-  formatCategoriesFile(categories) {
+  formatCategoriesFile(_categories) {
     return '';
   }
-  formatScenarioDocumentation(scenario) {
+  formatScenarioDocumentation(_scenario) {
     return '';
   }
-  getCreatedFiles(categoryId) {
+  getCreatedFiles(_categoryId) {
     return [];
   }
-  getImplementationSteps(categoryId) {
+  getImplementationSteps(_categoryId) {
     return [];
   }
-  generateCategoryDescription(config) {
+  generateCategoryDescription(_config) {
     return '';
   }
-  generateEducatorResources(config) {
+  generateEducatorResources(_config) {
     return {};
   }
-  generateSimulationInfoContent(categoryData) {
+  generateSimulationInfoContent(_categoryData) {
     return '';
   }
-  updateSimulationInfo(categoryId, content) {
+  updateSimulationInfo(_categoryId, _content) {
     return Promise.resolve();
   }
-  generateCategoryCSS(categoryData) {
+  generateCategoryCSS(_categoryData) {
     return '';
   }
 }

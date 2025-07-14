@@ -2,9 +2,7 @@
 mode: 'agent'
 model: Claude Sonnet 4
 tools: ['githubRepo', 'codebase']
-description:
-  'Generate a new scenario within existing categories for SimulateAI. Each scenario is an
-  interactive ethical dilemma that users experience to develop their AI ethics reasoning skills.'
+description: 'Generate a new scenario within existing categories for SimulateAI'
 ---
 
 # Scenario Creation Prompt for Copilot Agents

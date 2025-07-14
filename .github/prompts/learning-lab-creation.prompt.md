@@ -2,9 +2,7 @@
 mode: 'agent'
 model: Claude Sonnet 4
 tools: ['githubRepo', 'codebase']
-description:
-  'Generate a new learning lab for SimulateAI scenarios. Learning labs are 5-phase interactive
-  educational experiences that guide users through deep exploration of AI ethics concepts.'
+description: 'Generate a new learning lab for SimulateAI scenarios'
 ---
 
 # Learning Lab Creation Prompt for Copilot Agents

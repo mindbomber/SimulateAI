@@ -7,6 +7,7 @@ import MCPWebResearch from './mcp-web-research.js';
 import MCPProjectGenerator from './mcp-project-generator.js';
 import MCPGitHubIntegration from './mcp-github-integration.js';
 import MCPAnalyticsEnhancement from './mcp-analytics-enhancement.js';
+import MCPPhilosophicalGenerator from './mcp-philosophical-generator.js';
 import logger from '../utils/logger.js';
 
 class MCPIntegrationManager {
@@ -40,6 +41,14 @@ class MCPIntegrationManager {
       this.integrations.set('githubIntegration', new MCPGitHubIntegration());
       this.mcpCapabilities.add('github_repo');
       this.mcpCapabilities.add('collaborative_development');
+
+      // Initialize philosophical generator
+      this.integrations.set(
+        'philosophicalGenerator',
+        new MCPPhilosophicalGenerator()
+      );
+      this.mcpCapabilities.add('philosophical_frameworks');
+      this.mcpCapabilities.add('ethical_scenario_generation');
 
       // Initialize analytics enhancement
       if (this.app.analytics) {
@@ -75,6 +84,9 @@ class MCPIntegrationManager {
     const webResearch = this.integrations.get('webResearch');
     const projectGenerator = this.integrations.get('projectGenerator');
     const githubIntegration = this.integrations.get('githubIntegration');
+    const philosophicalGenerator = this.integrations.get(
+      'philosophicalGenerator'
+    );
     const analytics = this.integrations.get('analyticsEnhancement');
 
     // Connect web research to project generation
@@ -85,6 +97,16 @@ class MCPIntegrationManager {
     // Connect GitHub integration to project generation
     if (githubIntegration && projectGenerator) {
       projectGenerator.setGitHubIntegration(githubIntegration);
+    }
+
+    // Connect philosophical generator to project generation
+    if (philosophicalGenerator && projectGenerator) {
+      projectGenerator.setPhilosophicalGenerator(philosophicalGenerator);
+    }
+
+    // Connect web research to philosophical generator
+    if (webResearch && philosophicalGenerator) {
+      philosophicalGenerator.setWebResearch(webResearch);
     }
 
     // Connect analytics to all other integrations
@@ -408,7 +430,7 @@ class MCPIntegrationManager {
     return status;
   }
 
-  async testIntegration(name, integration) {
+  async testIntegration(name, _integration) {
     // Implement basic integration testing
     switch (name) {
       case 'webResearch':
@@ -417,6 +439,8 @@ class MCPIntegrationManager {
         return { templateGeneration: true, fileCreation: true };
       case 'githubIntegration':
         return { repositoryAccess: true, patternAnalysis: true };
+      case 'philosophicalGenerator':
+        return { categoryGeneration: true, scenarioCreation: true };
       case 'analyticsEnhancement':
         return { tracking: true, insights: true };
       default:
