@@ -1,0 +1,308 @@
+<!-- Shared Navigation Component -->
+<header class="header" role="banner">
+  <div class="header-container">
+    <div class="logo">
+      <img
+        src="src/assets/icons/logo.svg"
+        alt="SimulateAI Educational Platform"
+        class="logo-image"
+      />
+      <h1 class="site-title">SimulateAI</h1>
+    </div>
+
+    <!-- Mobile hamburger button -->
+    <button
+      class="nav-toggle"
+      aria-label="Toggle navigation menu"
+      aria-expanded="false"
+      aria-controls="main-navigation"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <nav
+      class="main-nav"
+      role="navigation"
+      aria-label="Main navigation"
+      id="main-navigation"
+    >
+      <!-- Primary Navigation Group -->
+      <div class="nav-group nav-group-primary">
+        <ul class="nav-list">
+          <li>
+            <a href="index.html" class="nav-link" data-page="home">Home</a>
+          </li>
+          <li class="nav-item-dropdown">
+            <a
+              href="categories.html"
+              class="nav-link"
+              aria-expanded="false"
+              aria-haspopup="true"
+              data-page="categories"
+            >
+              Categories
+              <span class="dropdown-arrow" aria-hidden="true">▼</span>
+            </a>
+            <div class="mega-menu">
+              <div class="mega-menu-content">
+                <div class="mega-menu-header">
+                  <h3>AI Ethics Categories</h3>
+                  <p>
+                    Explore philosophical thought experiments through AI ethics
+                    simulations
+                  </p>
+                </div>
+                <div class="mega-menu-filter">
+                  <input
+                    type="text"
+                    class="mega-menu-search"
+                    placeholder="Search categories..."
+                    aria-label="Search categories"
+                  />
+                </div>
+                <div class="mega-menu-grid">
+                  <div class="mega-menu-item" data-category="trolley-problem">
+                    <div class="mega-menu-icon">🚃</div>
+                    <div class="mega-menu-text">
+                      <h4>The Trolley Problem</h4>
+                      <p>
+                        Classic ethical dilemma of utilitarian vs deontological
+                        ethics
+                      </p>
+                    </div>
+                  </div>
+                  <div class="mega-menu-item" data-category="ai-black-box">
+                    <div class="mega-menu-icon">📦</div>
+                    <div class="mega-menu-text">
+                      <h4>The AI Black Box</h4>
+                      <p>Epistemological challenges of opaque AI systems</p>
+                    </div>
+                  </div>
+                  <div
+                    class="mega-menu-item"
+                    data-category="automation-oversight"
+                  >
+                    <div class="mega-menu-icon">⚖️</div>
+                    <div class="mega-menu-text">
+                      <h4>Automation vs Human Oversight</h4>
+                      <p>Free will and determinism in automated systems</p>
+                    </div>
+                  </div>
+                  <div
+                    class="mega-menu-item"
+                    data-category="consent-surveillance"
+                  >
+                    <div class="mega-menu-icon">👁️</div>
+                    <div class="mega-menu-text">
+                      <h4>Consent and Surveillance</h4>
+                      <p>
+                        Privacy, autonomy, and social justice in AI monitoring
+                      </p>
+                    </div>
+                  </div>
+                  <div class="mega-menu-item" data-category="moral-luck">
+                    <div class="mega-menu-icon">🎲</div>
+                    <div class="mega-menu-text">
+                      <h4>Moral Luck</h4>
+                      <p>Responsibility and blame in uncertain AI outcomes</p>
+                    </div>
+                  </div>
+                  <div
+                    class="mega-menu-item"
+                    data-category="responsibility-blame"
+                  >
+                    <div class="mega-menu-icon">⚡</div>
+                    <div class="mega-menu-text">
+                      <h4>Responsibility & Blame</h4>
+                      <p>Accountability in AI decision-making systems</p>
+                    </div>
+                  </div>
+                  <div class="mega-menu-item" data-category="ship-of-theseus">
+                    <div class="mega-menu-icon">🚢</div>
+                    <div class="mega-menu-text">
+                      <h4>Ship of Theseus</h4>
+                      <p>Identity and continuity paradoxes in AI systems</p>
+                    </div>
+                  </div>
+                  <div
+                    class="mega-menu-item"
+                    data-category="simulation-hypothesis"
+                  >
+                    <div class="mega-menu-icon">🌐</div>
+                    <div class="mega-menu-text">
+                      <h4>Simulation Hypothesis</h4>
+                      <p>Reality and existence in computational worlds</p>
+                    </div>
+                  </div>
+                  <div
+                    class="mega-menu-item"
+                    data-category="experience-machine"
+                  >
+                    <div class="mega-menu-icon">🎭</div>
+                    <div class="mega-menu-text">
+                      <h4>Experience Machine</h4>
+                      <p>Philosophy of mind and the nature of well-being</p>
+                    </div>
+                  </div>
+                  <div class="mega-menu-item" data-category="sorites-paradox">
+                    <div class="mega-menu-icon">🔄</div>
+                    <div class="mega-menu-text">
+                      <h4>Sorites Paradox</h4>
+                      <p>
+                        Vagueness and logical reasoning in AI classifications
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="mega-menu-footer">
+                  <a href="categories.html" class="mega-menu-view-all"
+                    >View All Categories →</a
+                  >
+                </div>
+              </div>
+            </div>
+          </li>
+          <li>
+            <a
+              href="index.html#ethics-analysis"
+              class="nav-link"
+              data-page="ethics-guide"
+              >Ethics Guide</a
+            >
+          </li>
+          <li>
+            <a
+              href="index.html#educator-tools"
+              class="nav-link"
+              data-page="educator-tools"
+              >Educator Tools</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <!-- Community Navigation Group -->
+      <div class="nav-group nav-group-community">
+        <ul class="nav-list">
+          <li class="nav-item-dropdown">
+            <a
+              href="#"
+              class="nav-link"
+              aria-expanded="false"
+              aria-haspopup="true"
+            >
+              Community
+              <span class="dropdown-arrow" aria-hidden="true">▼</span>
+            </a>
+            <div class="dropdown-menu">
+              <a href="blog.html" class="dropdown-item" data-page="blog"
+                >📝 Blog</a
+              >
+              <a href="forum.html" class="dropdown-item" data-page="forum"
+                >💬 Forum</a
+              >
+              <a href="profile.html" class="dropdown-item" data-page="profile"
+                >👤 Profile</a
+              >
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- About Navigation Group -->
+      <div class="nav-group nav-group-about">
+        <ul class="nav-list">
+          <li class="nav-item-dropdown">
+            <a
+              href="#"
+              class="nav-link"
+              aria-expanded="false"
+              aria-haspopup="true"
+            >
+              About
+              <span class="dropdown-arrow" aria-hidden="true">▼</span>
+            </a>
+            <div class="dropdown-menu">
+              <a href="about.html" class="dropdown-item" data-page="about"
+                >ℹ️ About SimulateAI</a
+              >
+              <a
+                href="privacy-notice.html"
+                class="dropdown-item"
+                data-page="privacy"
+                >🔒 Privacy Notice</a
+              >
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Action Buttons Group -->
+      <div class="nav-group nav-group-actions">
+        <ul class="nav-list">
+          <li>
+            <a
+              href="#"
+              class="nav-link tour-btn"
+              id="start-tour-nav"
+              data-action="tour"
+              >📚 Take Tour</a
+            >
+          </li>
+          <li>
+            <a
+              href="#"
+              class="nav-link surprise-me-btn"
+              id="surprise-me-nav"
+              data-action="surprise"
+              >🎉 Surprise Me!</a
+            >
+          </li>
+          <li>
+            <a
+              href="donate.html"
+              class="nav-link donate-btn"
+              id="donate-nav"
+              data-page="donate"
+              >💖 Donate</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <!-- User Authentication Group -->
+      <div class="nav-group nav-group-auth">
+        <ul class="nav-list">
+          <!-- Guest Authentication (shown when not signed in) -->
+          <li data-guest-content>
+            <button class="btn btn-outline nav-auth-btn" id="sign-in-nav">
+              Sign In
+            </button>
+          </li>
+
+          <!-- User Profile (shown when signed in) -->
+          <li data-user-content style="display: none">
+            <div class="nav-user-profile">
+              <span class="user-greeting" id="nav-user-name">Welcome!</span>
+              <button
+                class="btn btn-outline nav-auth-btn"
+                id="link-accounts-nav"
+                title="Link additional sign-in methods"
+              >
+                🔗
+              </button>
+              <button class="btn btn-outline nav-auth-btn" id="sign-out-nav">
+                Sign Out
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Mobile navigation backdrop -->
+  <div class="nav-backdrop" aria-hidden="true"></div>
+</header>

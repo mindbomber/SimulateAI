@@ -90,12 +90,30 @@ const DEFAULT_SCORES = {
 
 export default class RadarChart {
   constructor(containerId, options = {}) {
+    console.log('🎯 RadarChart constructor called with:', {
+      containerId,
+      options,
+      chartAvailable: !!window.Chart,
+    });
+
     this.containerId = containerId;
     this.container = document.getElementById(containerId);
 
+    console.log('📦 Container search result:', {
+      containerId,
+      found: !!this.container,
+      element: this.container,
+    });
+
     if (!this.container) {
-      throw new Error(`Container with ID '${containerId}' not found`);
+      const error = `Container with ID '${containerId}' not found`;
+      console.error('❌ RadarChart error:', error);
+      throw new Error(error);
     }
+
+    console.log(
+      '✅ RadarChart container found, proceeding with initialization'
+    );
 
     this.options = {
       width: options.width || DEFAULT_CHART_SIZE,
@@ -151,12 +169,18 @@ export default class RadarChart {
       this.container.style.overflow = 'visible';
 
       this.container.appendChild(canvas);
-      logger.info('RadarChart', 'Canvas element created and appended to container');
+      logger.info(
+        'RadarChart',
+        'Canvas element created and appended to container'
+      );
 
       // Apply visual enhancements classes BEFORE creating chart
       if (this.options.isDemo) {
         this.container.classList.add('radar-demo-container');
-        logger.info('RadarChart', 'Applied radar-demo-container class for demo chart');
+        logger.info(
+          'RadarChart',
+          'Applied radar-demo-container class for demo chart'
+        );
       } else {
         this.container.classList.add('radar-chart-container');
         logger.info('RadarChart', 'Applied radar-chart-container class');
@@ -569,13 +593,13 @@ export default class RadarChart {
       this.chart.destroy();
       this.chart = null;
     }
-    
+
     // Clean up mobile event listeners
     if (this.documentTouchHandler) {
       document.removeEventListener('touchstart', this.documentTouchHandler);
       this.documentTouchHandler = null;
     }
-    
+
     // Clean up canvas click handler
     if (this.canvasClickHandler) {
       const canvas = this.container.querySelector('canvas');
@@ -614,32 +638,33 @@ export default class RadarChart {
     if (activeElements && activeElements.length > 0) {
       const activeElement = activeElements[0];
       const currentActiveElements = this.chart.tooltip.getActiveElements();
-      
+
       // Check if the same element is already active
-      const isSameElement = currentActiveElements.length > 0 && 
-                           currentActiveElements[0].datasetIndex === activeElement.datasetIndex &&
-                           currentActiveElements[0].index === activeElement.index;
-      
+      const isSameElement =
+        currentActiveElements.length > 0 &&
+        currentActiveElements[0].datasetIndex === activeElement.datasetIndex &&
+        currentActiveElements[0].index === activeElement.index;
+
       if (isSameElement) {
         // If the same node is clicked again, hide the tooltip (deselect)
-        this.chart.tooltip.setActiveElements([], {x: 0, y: 0});
+        this.chart.tooltip.setActiveElements([], { x: 0, y: 0 });
       } else {
         // Show tooltip for the clicked node (select)
         this.chart.tooltip.setActiveElements([activeElement], {
           x: event.native.offsetX,
-          y: event.native.offsetY
+          y: event.native.offsetY,
         });
       }
-      
+
       this.chart.update('none');
-      
+
       // Prevent event from bubbling to avoid triggering document touch handler
       if (event.native) {
         event.native.stopPropagation();
       }
     } else {
       // If clicking on empty area, hide tooltips
-      this.chart.tooltip.setActiveElements([], {x: 0, y: 0});
+      this.chart.tooltip.setActiveElements([], { x: 0, y: 0 });
       this.chart.update('none');
     }
   }
@@ -657,60 +682,74 @@ export default class RadarChart {
     // Add direct canvas click handler for empty area clicks
     const canvas = this.container.querySelector('canvas');
     if (canvas) {
-      this.canvasClickHandler = (event) => {
+      this.canvasClickHandler = event => {
         // Get chart elements at the click position
-        const points = this.chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, false);
-        
+        const points = this.chart.getElementsAtEventForMode(
+          event,
+          'nearest',
+          { intersect: true },
+          false
+        );
+
         // If no elements were clicked (empty area), hide tooltips
         if (points.length === 0) {
           if (this.chart && this.chart.tooltip) {
-            this.chart.tooltip.setActiveElements([], {x: 0, y: 0});
+            this.chart.tooltip.setActiveElements([], { x: 0, y: 0 });
             this.chart.update('none');
           }
         }
       };
-      
+
       canvas.addEventListener('click', this.canvasClickHandler);
     }
 
     // Add touch event listener to the container for touches outside canvas
-    this.container.addEventListener('touchstart', (event) => {
-      // Check if the touch is outside the canvas area
-      const canvas = this.container.querySelector('canvas');
-      if (!canvas) return;
+    this.container.addEventListener(
+      'touchstart',
+      event => {
+        // Check if the touch is outside the canvas area
+        const canvas = this.container.querySelector('canvas');
+        if (!canvas) return;
 
-      const rect = canvas.getBoundingClientRect();
-      const touch = event.touches[0];
-      
-      // If touch is outside the canvas, hide tooltips
-      if (touch.clientX < rect.left || 
-          touch.clientX > rect.right || 
-          touch.clientY < rect.top || 
-          touch.clientY > rect.bottom) {
-        
-        // Hide any active tooltips
-        if (this.chart && this.chart.tooltip) {
-          this.chart.tooltip.setActiveElements([], {x: 0, y: 0});
-          this.chart.update('none');
+        const rect = canvas.getBoundingClientRect();
+        const touch = event.touches[0];
+
+        // If touch is outside the canvas, hide tooltips
+        if (
+          touch.clientX < rect.left ||
+          touch.clientX > rect.right ||
+          touch.clientY < rect.top ||
+          touch.clientY > rect.bottom
+        ) {
+          // Hide any active tooltips
+          if (this.chart && this.chart.tooltip) {
+            this.chart.tooltip.setActiveElements([], { x: 0, y: 0 });
+            this.chart.update('none');
+          }
         }
-      }
-    }, { passive: true });
+      },
+      { passive: true }
+    );
 
     // Also add a general document touch listener for clicking outside the entire container
-    this.documentTouchHandler = (event) => {
+    this.documentTouchHandler = event => {
       // Only dismiss if the touch is completely outside the radar chart container
       if (!this.container.contains(event.target)) {
         // Hide tooltips when touching outside the entire container
         if (this.chart && this.chart.tooltip) {
-          this.chart.tooltip.setActiveElements([], {x: 0, y: 0});
+          this.chart.tooltip.setActiveElements([], { x: 0, y: 0 });
           this.chart.update('none');
         }
       }
     };
 
-    document.addEventListener('touchstart', this.documentTouchHandler, { passive: true });
-    
+    document.addEventListener('touchstart', this.documentTouchHandler, {
+      passive: true,
+    });
+
     const chartType = this.options.isDemo ? 'demo' : 'scenario';
-    logger.info(`Mobile tooltip dismissal setup complete for ${chartType} radar chart`);
+    logger.info(
+      `Mobile tooltip dismissal setup complete for ${chartType} radar chart`
+    );
   }
 }

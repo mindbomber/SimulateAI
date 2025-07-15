@@ -45,12 +45,15 @@ class CategoryGrid {
     this.userProgress = this.loadUserProgress();
     this.lastModalOpenTime = 0; // Debounce tracking
     this.modalOpenCooldown = 500; // Minimum time between modal opens (ms)
+    this.isModalOpen = false; // Track if modal is currently open
 
     this.init();
   }
 
   init() {
-    this.container = document.querySelector('.categories-grid, .simulations-grid');
+    this.container = document.querySelector(
+      '.categories-grid, .simulations-grid'
+    );
     if (!this.container) {
       logger.error('Category grid container not found');
       return;
@@ -193,8 +196,11 @@ ${this.createProgressRing(category, progress)}
     );
 
     // Listen for scenario modal fully closed (for badge display)
-    document.addEventListener('scenario-modal-closed', this.handleScenarioModalClosed.bind(this));
-    
+    document.addEventListener(
+      'scenario-modal-closed',
+      this.handleScenarioModalClosed.bind(this)
+    );
+
     // Add tooltip functionality for progress rings
     this.attachProgressRingTooltips();
   }
@@ -203,19 +209,27 @@ ${this.createProgressRing(category, progress)}
    * Attaches tooltip functionality to progress rings
    */
   attachProgressRingTooltips() {
-    const progressRings = this.container.querySelectorAll('.category-progress-ring[data-tooltip]');
-    
+    const progressRings = this.container.querySelectorAll(
+      '.category-progress-ring[data-tooltip]'
+    );
+
     progressRings.forEach(ring => {
       // Desktop: hover events
       ring.addEventListener('mouseenter', this.showTooltip.bind(this));
       ring.addEventListener('mouseleave', this.hideTooltip.bind(this));
-      
-      // Mobile: touch/tap events  
-      ring.addEventListener('touchstart', this.handleProgressRingTouch.bind(this));
+
+      // Mobile: touch/tap events
+      ring.addEventListener(
+        'touchstart',
+        this.handleProgressRingTouch.bind(this)
+      );
       ring.addEventListener('click', this.handleProgressRingClick.bind(this));
-      
+
       // Keyboard accessibility
-      ring.addEventListener('keydown', this.handleProgressRingKeydown.bind(this));
+      ring.addEventListener(
+        'keydown',
+        this.handleProgressRingKeydown.bind(this)
+      );
     });
   }
 
@@ -226,7 +240,7 @@ ${this.createProgressRing(category, progress)}
   showTooltip(event) {
     const ring = event.currentTarget;
     const tooltip = ring.getAttribute('data-tooltip');
-    
+
     if (!tooltip) return;
 
     // Remove any existing tooltips
@@ -237,32 +251,32 @@ ${this.createProgressRing(category, progress)}
     tooltipEl.className = 'progress-ring-tooltip';
     tooltipEl.textContent = tooltip;
     tooltipEl.setAttribute('role', 'tooltip');
-    
+
     // Position tooltip above the progress ring
     const rect = ring.getBoundingClientRect();
     tooltipEl.style.position = 'fixed';
     tooltipEl.style.left = `${rect.left + rect.width / 2}px`;
     tooltipEl.style.transform = 'translateX(-50%)';
     tooltipEl.style.zIndex = '1000';
-    
+
     document.body.appendChild(tooltipEl);
-    
+
     // Calculate position after adding to DOM so we can get tooltip height
     const tooltipRect = tooltipEl.getBoundingClientRect();
     const topPosition = rect.top - tooltipRect.height - TOOLTIP_OFFSET;
-    
+
     // If tooltip would go off-screen at top, show it below instead
     if (topPosition < 0) {
       tooltipEl.style.top = `${rect.bottom + TOOLTIP_OFFSET}px`;
     } else {
       tooltipEl.style.top = `${topPosition}px`;
     }
-    
+
     // Trigger the visible state with a small delay to ensure CSS transition works
     requestAnimationFrame(() => {
       tooltipEl.classList.add('visible');
     });
-    
+
     // Store reference for cleanup
     ring._tooltip = tooltipEl;
   }
@@ -271,11 +285,13 @@ ${this.createProgressRing(category, progress)}
    * Hides tooltip for progress ring
    */
   hideTooltip() {
-    const existingTooltips = document.querySelectorAll('.progress-ring-tooltip');
+    const existingTooltips = document.querySelectorAll(
+      '.progress-ring-tooltip'
+    );
     existingTooltips.forEach(tooltip => {
       tooltip.remove();
     });
-    
+
     // Clear tooltip references
     const rings = this.container.querySelectorAll('.category-progress-ring');
     rings.forEach(ring => {
@@ -292,7 +308,7 @@ ${this.createProgressRing(category, progress)}
   handleProgressRingTouch(event) {
     event.preventDefault();
     this.showTooltip(event);
-    
+
     // Hide tooltip after delay on mobile
     setTimeout(() => {
       this.hideTooltip();
@@ -306,7 +322,7 @@ ${this.createProgressRing(category, progress)}
   handleProgressRingClick(event) {
     event.preventDefault();
     event.stopPropagation();
-    
+
     // On mobile, toggle tooltip
     if ('ontouchstart' in window) {
       const ring = event.currentTarget;
@@ -327,7 +343,7 @@ ${this.createProgressRing(category, progress)}
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       this.showTooltip(event);
-      
+
       // Hide tooltip after delay
       setTimeout(() => {
         this.hideTooltip();
@@ -346,10 +362,12 @@ ${this.createProgressRing(category, progress)}
 
     const scenarioId = scenarioCard.getAttribute('data-scenario-id');
     const categoryId = scenarioCard.getAttribute('data-category-id');
-    
+
     // Check if the clicked element is the quick start button
-    if (event.target.classList.contains('scenario-quick-start-btn') || 
-        event.target.closest('.scenario-quick-start-btn')) {
+    if (
+      event.target.classList.contains('scenario-quick-start-btn') ||
+      event.target.closest('.scenario-quick-start-btn')
+    ) {
       this.openScenarioModalDirect(categoryId, scenarioId);
     } else {
       // Regular Learning Lab button - go through pre-launch modal
@@ -364,7 +382,7 @@ ${this.createProgressRing(category, progress)}
       if (scenarioCard) {
         const scenarioId = scenarioCard.getAttribute('data-scenario-id');
         const categoryId = scenarioCard.getAttribute('data-category-id');
-        
+
         // Check if focus is on the quick start button
         if (event.target.classList.contains('scenario-quick-start-btn')) {
           this.openScenarioModalDirect(categoryId, scenarioId);
@@ -412,7 +430,8 @@ ${this.createProgressRing(category, progress)}
     });
 
     // Also clean up any orphaned modal elements
-    const orphanedPreLaunchModals = document.querySelectorAll('.pre-launch-modal');
+    const orphanedPreLaunchModals =
+      document.querySelectorAll('.pre-launch-modal');
     orphanedPreLaunchModals.forEach(modal => {
       const parentBackdrop = modal.closest('.modal-backdrop');
       if (parentBackdrop) {
@@ -424,10 +443,10 @@ ${this.createProgressRing(category, progress)}
 
     // Clean up body styles that might be left behind
     document.body.style.overflow = '';
-    
+
     // Remove any modal-related classes from body
     document.body.classList.remove('modal-open');
-    
+
     // Remove any lingering inert states from other elements
     document.querySelectorAll('[inert]').forEach(el => {
       if (!el.classList.contains('modal-backdrop')) {
@@ -491,13 +510,36 @@ ${this.createProgressRing(category, progress)}
    * Open scenario modal directly, skipping pre-launch modal
    */
   openScenarioModalDirect(categoryId, scenarioId) {
-    // Debounce to prevent rapid successive calls
+    logger.debug('CategoryGrid: openScenarioModalDirect called', {
+      categoryId,
+      scenarioId,
+    });
+
+    // Enhanced debounce to prevent rapid successive calls
     const now = Date.now();
-    if (now - this.lastModalOpenTime < this.modalOpenCooldown) {
-      logger.warn('Modal opening too rapidly, ignoring duplicate request');
+    const cooldown = this.modalOpenCooldown || 1000; // Increase default cooldown to 1 second
+
+    if (now - this.lastModalOpenTime < cooldown) {
+      logger.debug('Modal request debounced - too soon after last request');
       return;
     }
+
+    // Check if a modal is already open
+    if (
+      this.isModalOpen ||
+      document.querySelector('.modal-backdrop:not([aria-hidden="true"])')
+    ) {
+      logger.debug('Modal already open, ignoring request', {
+        isModalOpenFlag: this.isModalOpen,
+        hasVisibleModalBackdrop: !!document.querySelector(
+          '.modal-backdrop:not([aria-hidden="true"])'
+        ),
+      });
+      return;
+    }
+
     this.lastModalOpenTime = now;
+    this.isModalOpen = true;
 
     const category = this.categories.find(c => c.id === categoryId);
     const scenario = category?.scenarios.find(s => s.id === scenarioId);
@@ -507,7 +549,9 @@ ${this.createProgressRing(category, progress)}
       return;
     }
 
-    logger.info('CategoryGrid', 'Opening scenario modal directly for:', { title: scenario.title });
+    logger.info('CategoryGrid', 'Opening scenario modal directly for:', {
+      title: scenario.title,
+    });
 
     // Dispatch custom event for other components to listen to
     const event = new CustomEvent('scenario-selected', {
@@ -558,15 +602,29 @@ ${this.createProgressRing(category, progress)}
    * Handle scenario modal fully closed event (for badge display)
    */
   handleScenarioModalClosed(event) {
-    const { categoryId, scenarioId } = event.detail;
+    const { categoryId, scenarioId, completed = true } = event.detail;
 
-    logger.info('Scenario modal fully closed, checking for badges:', {
+    logger.info('Scenario modal fully closed:', {
       categoryId,
       scenarioId,
+      completed,
     });
 
-    // Now check for newly earned badges
-    this.checkForNewBadges(categoryId, scenarioId);
+    // CRITICAL FIX: Always reset modal state to allow new modals to open
+    // This ensures subsequent Surprise Me clicks work regardless of how modal was closed
+    this.isModalOpen = false;
+    logger.debug(
+      'CategoryGrid: Modal state reset, subsequent modals can now open'
+    );
+
+    // Only check for newly earned badges if scenario was actually completed
+    if (completed && categoryId && scenarioId) {
+      this.checkForNewBadges(categoryId, scenarioId);
+    } else {
+      logger.debug(
+        'Scenario modal closed without completion - skipping badge check'
+      );
+    }
   }
 
   updateProgress(categoryId, scenarioId, completed = true, checkBadges = true) {
@@ -595,38 +653,41 @@ ${this.createProgressRing(category, progress)}
     try {
       // Refresh badge manager's category progress
       badgeManager.refreshCategoryProgress();
-      
+
       // Check for newly earned badges
-      const newBadges = badgeManager.updateScenarioCompletion(categoryId, scenarioId);
-      
+      const newBadges = badgeManager.updateScenarioCompletion(
+        categoryId,
+        scenarioId
+      );
+
       if (newBadges && newBadges.length > 0) {
         // Display each new badge with a delay between multiple badges
         for (let i = 0; i < newBadges.length; i++) {
           const badge = newBadges[i];
-          
+
           // Add small delay between multiple badges
           if (i > 0) {
             await this.delay(BADGE_DELAY_MS);
           }
-          
+
           // Show badge modal with main context (from home page)
           await badgeModal.showBadgeModal(badge, 'main');
-          
+
           // Track badge achievement
           logger.info('Badge earned:', {
             categoryId: badge.categoryId,
             badgeTitle: badge.title,
             tier: badge.tier,
-            timestamp: badge.timestamp
+            timestamp: badge.timestamp,
           });
-          
+
           // Track analytics if available
           if (window.AnalyticsManager) {
             window.AnalyticsManager.trackEvent('badge_earned', {
               categoryId: badge.categoryId,
               badgeTitle: badge.title,
               tier: badge.tier,
-              scenarioId
+              scenarioId,
             });
           }
         }
@@ -679,15 +740,15 @@ ${this.createProgressRing(category, progress)}
     try {
       // Ensure badge manager has latest progress data
       badgeManager.refreshCategoryProgress();
-      
+
       const progress = badgeManager.getBadgeProgress(categoryId);
-      
+
       if (!progress || !progress.nextBadge || !progress.progress) {
         return null;
       }
 
       const { remaining } = progress.progress;
-      
+
       // Check if exactly one scenario away from next badge
       if (remaining === 1) {
         return {
@@ -695,7 +756,7 @@ ${this.createProgressRing(category, progress)}
           current: progress.progress.current,
           required: progress.progress.required,
           badgeTitle: progress.nextBadge.title,
-          sidekickEmoji: progress.nextBadge.sidekickEmoji
+          sidekickEmoji: progress.nextBadge.sidekickEmoji,
         };
       }
 
@@ -715,11 +776,12 @@ ${this.createProgressRing(category, progress)}
   createProgressRing(category, progress) {
     // Get badge progress information
     const badgeProgress = badgeManager.getBadgeProgress(category.id);
-    const isOneScenarioAwayFromBadge = badgeProgress.nextBadge && badgeProgress.progress.remaining === 1;
-    
+    const isOneScenarioAwayFromBadge =
+      badgeProgress.nextBadge && badgeProgress.progress.remaining === 1;
+
     // Create enhanced tooltip content
     let tooltipContent = `${progress.completed} of ${progress.total} scenarios completed`;
-    
+
     if (badgeProgress.nextBadge) {
       if (isOneScenarioAwayFromBadge) {
         tooltipContent += `. 1 more to unlock next badge: '${badgeProgress.nextBadge.title}' ${badgeProgress.nextBadge.sidekickEmoji}`;

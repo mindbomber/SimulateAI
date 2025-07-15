@@ -14,32 +14,23 @@
       content="Manage your SimulateAI profile, research participation, and community contributions"
     />
 
-    <!-- Same CSS includes as main app -->
+    <!-- Enhanced CSS includes for modern profile design -->
     <link rel="stylesheet" href="src/styles/main.css" />
     <link rel="stylesheet" href="src/styles/accessibility.css" />
-    <link rel="stylesheet" href="src/styles/simulations.css" />
+    <link rel="stylesheet" href="src/styles/enhanced-profile.css" />
     <link rel="stylesheet" href="src/styles/layout-components.css" />
     <link rel="stylesheet" href="src/styles/advanced-ui-components.css" />
-    <link rel="stylesheet" href="src/styles/enhanced-objects.css" />
-    <link rel="stylesheet" href="src/styles/input-utility-components.css" />
-    <link rel="stylesheet" href="src/styles/form-input-components.css" />
-    <link rel="stylesheet" href="src/styles/notification-toast.css" />
-    <link rel="stylesheet" href="src/styles/onboarding-tour.css" />
-    <link rel="stylesheet" href="src/styles/radar-chart.css" />
-    <link rel="stylesheet" href="src/styles/scenario-modal.css" />
     <link rel="stylesheet" href="src/styles/card-component.css" />
+    <link rel="stylesheet" href="src/styles/notification-toast.css" />
     <link rel="stylesheet" href="src/styles/loader-spinner.css" />
-    <link rel="stylesheet" href="src/styles/hero-demo.css" />
-    <link rel="stylesheet" href="src/styles/bias-fairness.css" />
-    <link rel="stylesheet" href="src/styles/category-grid.css" />
-    <link rel="stylesheet" href="src/styles/ethics-analysis.css" />
-    <link rel="stylesheet" href="src/styles/layout-fixes.css" />
-    <link rel="stylesheet" href="src/styles/ethics-explorer.css" />
     <link rel="stylesheet" href="src/styles/badge-modal.css" />
-    <link rel="stylesheet" href="src/styles/community-features.css" />
+    <link rel="stylesheet" href="src/styles/form-input-components.css" />
+    <link rel="stylesheet" href="src/styles/blog-submission.css" />
+
+    <!-- Font Awesome for enhanced icons -->
     <link
       rel="stylesheet"
-      href="src/styles/simulation-modal-consolidated.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
 
     <!-- Icons and Favicons -->
@@ -63,61 +54,97 @@
       class="sr-only"
     ></div>
 
-    <!-- Header (same as main app) -->
-    <header class="header" role="banner">
+    <!-- Enhanced Header with Professional Design -->
+    <header class="enhanced-header" role="banner">
       <div class="header-container">
-        <div class="logo">
-          <a href="index.html">
-            <img
-              src="src/assets/icons/logo.svg"
-              alt="SimulateAI Educational Platform"
-              class="logo-image"
-            />
-            <h1 class="site-title">SimulateAI</h1>
-          </a>
+        <div class="header-content">
+          <div class="logo-section">
+            <a href="index.html" class="logo-link">
+              <div class="logo-icon">
+                <i class="fas fa-brain"></i>
+              </div>
+              <div class="logo-text">
+                <h1 class="logo-title">SimulateAI</h1>
+                <span class="logo-subtitle">AI Ethics Education</span>
+              </div>
+            </a>
+          </div>
+
+          <nav
+            class="header-nav"
+            role="navigation"
+            aria-label="Main navigation"
+          >
+            <ul class="nav-links">
+              <li>
+                <a href="index.html" class="nav-link"
+                  ><i class="nav-icon fas fa-home"></i>Home</a
+                >
+              </li>
+              <li>
+                <a href="index.html#categories" class="nav-link"
+                  ><i class="nav-icon fas fa-th-large"></i>Categories</a
+                >
+              </li>
+              <li>
+                <a href="blog.html" class="nav-link"
+                  ><i class="nav-icon fas fa-blog"></i>Blog</a
+                >
+              </li>
+              <li>
+                <a href="forum.html" class="nav-link"
+                  ><i class="nav-icon fas fa-comments"></i>Forum</a
+                >
+              </li>
+              <li>
+                <a href="#profile" class="nav-link active" aria-current="page"
+                  ><i class="nav-icon fas fa-user"></i>Profile</a
+                >
+              </li>
+            </ul>
+          </nav>
+
+          <div class="header-actions">
+            <button class="search-toggle" aria-label="Search">
+              <i class="fas fa-search"></i>
+            </button>
+            <div class="auth-section">
+              <!-- Auth content will be populated by JavaScript -->
+            </div>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+          </div>
         </div>
-
-        <!-- Mobile hamburger button -->
-        <button
-          class="nav-toggle"
-          aria-label="Toggle navigation menu"
-          aria-expanded="false"
-          aria-controls="main-navigation"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-
-        <nav
-          class="main-nav"
-          role="navigation"
-          aria-label="Main navigation"
-          id="main-navigation"
-        >
-          <ul class="nav-list">
-            <li><a href="index.html" class="nav-link">Home</a></li>
-            <li>
-              <a href="index.html#categories" class="nav-link">Categories</a>
-            </li>
-            <li><a href="blog.html" class="nav-link">Blog</a></li>
-            <li><a href="forum.html" class="nav-link">Forum</a></li>
-            <li>
-              <a href="#profile" class="nav-link active" aria-current="page"
-                >Profile</a
-              >
-            </li>
-            <!-- User auth buttons will be added by JavaScript -->
-          </ul>
-        </nav>
       </div>
-      <div class="nav-backdrop" aria-hidden="true"></div>
     </header>
 
-    <!-- Main Content -->
-    <main id="main-content" class="main-content" role="main">
-      <!-- Profile Section -->
-      <section class="profile-section">
+    <!-- Enhanced Main Content -->
+    <main id="main-content" class="enhanced-main-content" role="main">
+      <!-- Profile Hero Section -->
+      <section class="profile-hero-section">
+        <div class="hero-background">
+          <div class="hero-pattern"></div>
+        </div>
+        <div class="container">
+          <div class="hero-content">
+            <div class="hero-badge">
+              <i class="fas fa-user-graduate"></i>
+              <span>Member Dashboard</span>
+            </div>
+            <h1 class="hero-title">Your AI Ethics Journey</h1>
+            <p class="hero-description">
+              Manage your profile, track your progress, and contribute to
+              advancing AI ethics education
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Enhanced Profile Section -->
+      <section class="enhanced-profile-section">
         <div class="container">
           <!-- Auth Required Content -->
           <div
@@ -125,106 +152,471 @@
             class="auth-required"
             style="display: none"
           >
-            <div class="profile-header">
-              <div class="profile-avatar">
-                <img
-                  id="user-avatar"
-                  src="/assets/default-avatar.png"
-                  alt="User Avatar"
-                />
-              </div>
-              <div class="profile-info">
-                <h1 id="user-display-name" class="profile-name">User</h1>
-                <p id="user-tier-info" class="profile-tier">Free Member</p>
-                <p id="user-join-date" class="profile-date">Joined: --</p>
-              </div>
-              <div class="profile-actions">
-                <button id="edit-profile-btn" class="btn btn-secondary">
-                  Edit Profile
-                </button>
-                <button id="privacy-settings-btn" class="btn btn-outline">
-                  Privacy Settings
-                </button>
+            <!-- Enhanced Profile Header -->
+            <div class="enhanced-profile-header">
+              <div class="profile-header-card">
+                <div class="profile-main-info">
+                  <div class="profile-avatar-section">
+                    <div class="avatar-container">
+                      <img
+                        id="user-avatar"
+                        src="/assets/default-avatar.png"
+                        alt="User Avatar"
+                        class="profile-avatar-img"
+                      />
+                      <div class="avatar-status online"></div>
+                      <button class="avatar-edit-btn" title="Change Avatar">
+                        <i class="fas fa-camera"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="profile-details">
+                    <div class="profile-name-section">
+                      <h1 id="user-display-name" class="profile-name">User</h1>
+                      <div class="profile-badges">
+                        <span id="user-tier-badge" class="tier-badge"
+                          >Free Member</span
+                        >
+                        <span
+                          id="verification-badge"
+                          class="verification-badge"
+                          style="display: none"
+                        >
+                          <i class="fas fa-check-circle"></i> Verified
+                        </span>
+                      </div>
+                    </div>
+                    <div class="profile-metadata">
+                      <div class="metadata-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span id="user-join-date">Joined: --</span>
+                      </div>
+                      <div class="metadata-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span id="user-location">Location not set</span>
+                      </div>
+                      <div class="metadata-item">
+                        <i class="fas fa-clock"></i>
+                        <span id="last-active">Last active: Recently</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="profile-actions">
+                  <button id="edit-profile-btn" class="btn btn-primary">
+                    <i class="fas fa-edit"></i>
+                    Edit Profile
+                  </button>
+                  <button id="privacy-settings-btn" class="btn btn-outline">
+                    <i class="fas fa-shield-alt"></i>
+                    Privacy
+                  </button>
+                  <button id="share-profile-btn" class="btn btn-secondary">
+                    <i class="fas fa-share-alt"></i>
+                    Share
+                  </button>
+                </div>
               </div>
             </div>
 
-            <!-- Profile Stats -->
-            <div class="profile-stats">
-              <div class="stat-card">
-                <h3>Scenarios Completed</h3>
-                <span id="scenarios-completed" class="stat-number">0</span>
-                <p class="stat-description">Interactive simulations finished</p>
-              </div>
-              <div class="stat-card">
-                <h3>Research Contributions</h3>
-                <span id="research-contributions" class="stat-number">0</span>
-                <p class="stat-description">Responses shared for research</p>
-              </div>
-              <div class="stat-card">
-                <h3>Community Posts</h3>
-                <span id="community-posts" class="stat-number">0</span>
-                <p class="stat-description">Blog posts and forum discussions</p>
-              </div>
-              <div class="stat-card">
-                <h3>Total Donated</h3>
-                <span id="total-donated" class="stat-number">$0</span>
-                <p class="stat-description">Supporting AI ethics education</p>
+            <!-- Enhanced Profile Stats -->
+            <div class="enhanced-profile-stats">
+              <div class="stats-grid">
+                <div class="stat-card scenarios">
+                  <div class="stat-icon">
+                    <i class="fas fa-play-circle"></i>
+                  </div>
+                  <div class="stat-content">
+                    <h3>Scenarios Completed</h3>
+                    <span id="scenarios-completed" class="stat-number">0</span>
+                    <p class="stat-description">
+                      Interactive simulations finished
+                    </p>
+                    <div class="stat-progress">
+                      <div class="progress-bar" style="width: 65%"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="stat-card research">
+                  <div class="stat-icon">
+                    <i class="fas fa-microscope"></i>
+                  </div>
+                  <div class="stat-content">
+                    <h3>Research Contributions</h3>
+                    <span id="research-contributions" class="stat-number"
+                      >0</span
+                    >
+                    <p class="stat-description">
+                      Responses shared for research
+                    </p>
+                    <div class="stat-progress">
+                      <div class="progress-bar" style="width: 40%"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="stat-card community">
+                  <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                  </div>
+                  <div class="stat-content">
+                    <h3>Community Posts</h3>
+                    <span id="community-posts" class="stat-number">0</span>
+                    <p class="stat-description">
+                      Blog posts and forum discussions
+                    </p>
+                    <div class="stat-progress">
+                      <div class="progress-bar" style="width: 25%"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="stat-card donations">
+                  <div class="stat-icon">
+                    <i class="fas fa-heart"></i>
+                  </div>
+                  <div class="stat-content">
+                    <h3>Total Donated</h3>
+                    <span id="total-donated" class="stat-number">$0</span>
+                    <p class="stat-description">
+                      Supporting AI ethics education
+                    </p>
+                    <div class="stat-progress">
+                      <div class="progress-bar" style="width: 15%"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <!-- Research Participation Section -->
-            <div class="profile-section-card">
-              <h2>🔬 Research Participation</h2>
-              <div id="research-participant-status">
+            <!-- Enhanced Activity Timeline -->
+            <div class="activity-timeline-section">
+              <div class="section-header">
+                <h2 class="section-title">
+                  <i class="fas fa-history"></i>
+                  Recent Activity
+                </h2>
+                <button class="view-all-btn">
+                  <i class="fas fa-external-link-alt"></i>
+                  View All
+                </button>
+              </div>
+              <div class="timeline-container">
+                <div class="timeline-item">
+                  <div class="timeline-icon completed">
+                    <i class="fas fa-check"></i>
+                  </div>
+                  <div class="timeline-content">
+                    <h4>Completed Healthcare Bias Scenario</h4>
+                    <p>Explored ethical considerations in medical AI systems</p>
+                    <span class="timeline-date">2 hours ago</span>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-icon research">
+                    <i class="fas fa-flask"></i>
+                  </div>
+                  <div class="timeline-content">
+                    <h4>Joined Research Study</h4>
+                    <p>Became a research contributor to advance AI ethics</p>
+                    <span class="timeline-date">1 day ago</span>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-icon community">
+                    <i class="fas fa-comment"></i>
+                  </div>
+                  <div class="timeline-content">
+                    <h4>Posted in Forum</h4>
+                    <p>"Best practices for algorithmic fairness in hiring"</p>
+                    <span class="timeline-date">3 days ago</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Enhanced Research Participation Section -->
+            <div class="enhanced-section-card research-section">
+              <div class="card-header">
+                <div class="header-icon">
+                  <i class="fas fa-microscope"></i>
+                </div>
+                <div class="header-content">
+                  <h2>Research Participation</h2>
+                  <p>
+                    Contribute to advancing AI ethics education through research
+                  </p>
+                </div>
+                <div class="header-actions">
+                  <button class="info-btn" title="Learn more about research">
+                    <i class="fas fa-info-circle"></i>
+                  </button>
+                </div>
+              </div>
+              <div id="research-participant-status" class="card-content">
                 <!-- Content will be populated by JavaScript -->
               </div>
             </div>
 
-            <!-- Donation & Support Section -->
-            <div class="profile-section-card">
-              <h2>💖 Support SimulateAI</h2>
-              <div class="support-section">
-                <p>
-                  Help advance AI ethics education through research and
-                  development.
-                </p>
-                <div class="donation-tiers">
+            <!-- Contribution Management Section -->
+            <div class="enhanced-section-card contribution-section">
+              <div class="card-header">
+                <div class="header-icon">
+                  <i class="fas fa-pen-fancy"></i>
+                </div>
+                <div class="header-content">
+                  <h2>My Contributions</h2>
+                  <p>
+                    Manage your blog posts, forum discussions, and submissions
+                  </p>
+                </div>
+                <div class="header-actions">
+                  <button
+                    class="btn btn-primary btn-small"
+                    id="new-contribution-btn"
+                  >
+                    <i class="fas fa-plus"></i>
+                    New Contribution
+                  </button>
+                </div>
+              </div>
+              <div class="card-content">
+                <!-- Contribution Statistics -->
+                <div class="contribution-stats">
+                  <div class="stat-card">
+                    <div class="stat-icon published">
+                      <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                      <span class="stat-number" id="published-count">0</span>
+                      <span class="stat-label">Published</span>
+                    </div>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-icon pending">
+                      <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                      <span class="stat-number" id="pending-count">0</span>
+                      <span class="stat-label">Under Review</span>
+                    </div>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-icon draft">
+                      <i class="fas fa-edit"></i>
+                    </div>
+                    <div class="stat-content">
+                      <span class="stat-number" id="draft-count">0</span>
+                      <span class="stat-label">Drafts</span>
+                    </div>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-icon total-views">
+                      <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="stat-content">
+                      <span class="stat-number" id="total-views">0</span>
+                      <span class="stat-label">Total Views</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Contribution Filters and Actions -->
+                <div class="contribution-controls">
+                  <div class="filter-group">
+                    <label for="contribution-filter" class="filter-label"
+                      >Filter by:</label
+                    >
+                    <select id="contribution-filter" class="filter-select">
+                      <option value="all">All Contributions</option>
+                      <option value="blog">Blog Posts</option>
+                      <option value="forum">Forum Discussions</option>
+                      <option value="published">Published</option>
+                      <option value="pending">Under Review</option>
+                      <option value="draft">Drafts</option>
+                    </select>
+                  </div>
+                  <div class="sort-group">
+                    <label for="contribution-sort" class="filter-label"
+                      >Sort by:</label
+                    >
+                    <select id="contribution-sort" class="filter-select">
+                      <option value="newest">Newest First</option>
+                      <option value="oldest">Oldest First</option>
+                      <option value="views">Most Views</option>
+                      <option value="title">Title A-Z</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Contribution List -->
+                <div class="contribution-list" id="contribution-list">
+                  <!-- No contributions message -->
+                  <div
+                    class="empty-state"
+                    id="no-contributions"
+                    style="display: none"
+                  >
+                    <div class="empty-icon">
+                      <i class="fas fa-pen-alt"></i>
+                    </div>
+                    <h3>No contributions yet</h3>
+                    <p>
+                      Start contributing to the community by writing blog posts
+                      or starting forum discussions!
+                    </p>
+                    <div class="empty-actions">
+                      <a href="blog.html" class="btn btn-primary">
+                        <i class="fas fa-newspaper"></i>
+                        Write Blog Post
+                      </a>
+                      <a href="forum.html" class="btn btn-outline">
+                        <i class="fas fa-comments"></i>
+                        Start Discussion
+                      </a>
+                    </div>
+                  </div>
+
+                  <!-- Contribution items will be populated here -->
+                </div>
+
+                <!-- Load More Button -->
+                <div
+                  class="load-more-container"
+                  id="load-more-contributions"
+                  style="display: none"
+                >
+                  <button
+                    class="btn btn-outline"
+                    id="load-more-contributions-btn"
+                  >
+                    <i class="fas fa-chevron-down"></i>
+                    Load More Contributions
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Enhanced Support Section -->
+            <div class="enhanced-section-card support-section">
+              <div class="card-header">
+                <div class="header-icon">
+                  <i class="fas fa-heart"></i>
+                </div>
+                <div class="header-content">
+                  <h2>Support SimulateAI</h2>
+                  <p>
+                    Help advance AI ethics education through research and
+                    development
+                  </p>
+                </div>
+              </div>
+              <div class="card-content">
+                <div class="support-intro">
+                  <div class="support-stats">
+                    <div class="support-stat">
+                      <span class="stat-value">2,547</span>
+                      <span class="stat-label">Active Supporters</span>
+                    </div>
+                    <div class="support-stat">
+                      <span class="stat-value">$12,450</span>
+                      <span class="stat-label">Monthly Goal</span>
+                    </div>
+                    <div class="support-stat">
+                      <span class="stat-value">85%</span>
+                      <span class="stat-label">Goal Progress</span>
+                    </div>
+                  </div>
+                  <div class="funding-progress">
+                    <div class="progress-track">
+                      <div class="progress-fill" style="width: 85%"></div>
+                    </div>
+                    <span class="progress-text"
+                      >$10,582 raised of $12,450 goal</span
+                    >
+                  </div>
+                </div>
+
+                <div class="enhanced-donation-tiers">
                   <div class="tier-card tier-1">
-                    <h3>🔬 Research Contributor</h3>
-                    <p class="tier-price">$5+ monthly</p>
-                    <ul>
-                      <li>Research participation</li>
-                      <li>Contributor badge</li>
-                      <li>Research insights access</li>
-                      <li>Blog posting privileges</li>
+                    <div class="tier-badge">Popular</div>
+                    <div class="tier-icon">🔬</div>
+                    <h3>Research Contributor</h3>
+                    <div class="tier-price">
+                      <span class="price">$5</span>
+                      <span class="period">/month</span>
+                    </div>
+                    <ul class="tier-benefits">
+                      <li>
+                        <i class="fas fa-check"></i>Research participation
+                      </li>
+                      <li><i class="fas fa-check"></i>Contributor badge</li>
+                      <li>
+                        <i class="fas fa-check"></i>Research insights access
+                      </li>
+                      <li>
+                        <i class="fas fa-check"></i>Blog posting privileges
+                      </li>
                     </ul>
                     <button class="btn btn-primary donate-btn" data-tier="1">
+                      <i class="fas fa-rocket"></i>
                       Support Research
                     </button>
                   </div>
-                  <div class="tier-card tier-2">
-                    <h3>⭐ Community Supporter</h3>
-                    <p class="tier-price">$25+ monthly</p>
-                    <ul>
-                      <li>All Research Contributor benefits</li>
-                      <li>Gold supporter badge</li>
-                      <li>Early access to new features</li>
-                      <li>Direct feedback channel</li>
+
+                  <div class="tier-card tier-2 featured">
+                    <div class="tier-badge">Best Value</div>
+                    <div class="tier-icon">⭐</div>
+                    <h3>Community Supporter</h3>
+                    <div class="tier-price">
+                      <span class="price">$25</span>
+                      <span class="period">/month</span>
+                    </div>
+                    <ul class="tier-benefits">
+                      <li>
+                        <i class="fas fa-check"></i>All Research Contributor
+                        benefits
+                      </li>
+                      <li><i class="fas fa-check"></i>Gold supporter badge</li>
+                      <li>
+                        <i class="fas fa-check"></i>Early access to new features
+                      </li>
+                      <li>
+                        <i class="fas fa-check"></i>Direct feedback channel
+                      </li>
+                      <li>
+                        <i class="fas fa-check"></i>Monthly supporter webinars
+                      </li>
                     </ul>
                     <button class="btn btn-primary donate-btn" data-tier="2">
+                      <i class="fas fa-star"></i>
                       Become Supporter
                     </button>
                   </div>
+
                   <div class="tier-card tier-3">
-                    <h3>👑 Education Patron</h3>
-                    <p class="tier-price">$100+ monthly</p>
-                    <ul>
-                      <li>All Supporter benefits</li>
-                      <li>Patron crown badge</li>
-                      <li>Co-author credit opportunity</li>
-                      <li>Advisory board participation</li>
+                    <div class="tier-badge">Premium</div>
+                    <div class="tier-icon">👑</div>
+                    <h3>Education Patron</h3>
+                    <div class="tier-price">
+                      <span class="price">$100</span>
+                      <span class="period">/month</span>
+                    </div>
+                    <ul class="tier-benefits">
+                      <li>
+                        <i class="fas fa-check"></i>All Supporter benefits
+                      </li>
+                      <li><i class="fas fa-check"></i>Patron crown badge</li>
+                      <li>
+                        <i class="fas fa-check"></i>Co-author credit opportunity
+                      </li>
+                      <li>
+                        <i class="fas fa-check"></i>Advisory board participation
+                      </li>
+                      <li>
+                        <i class="fas fa-check"></i>Quarterly strategy sessions
+                      </li>
                     </ul>
                     <button class="btn btn-primary donate-btn" data-tier="3">
+                      <i class="fas fa-crown"></i>
                       Become Patron
                     </button>
                   </div>
@@ -232,65 +624,237 @@
               </div>
             </div>
 
-            <!-- Account Management -->
-            <div class="profile-section-card">
-              <h2>⚙️ Account Management</h2>
-              <div class="account-actions">
-                <button id="export-data-btn" class="btn btn-outline">
-                  📥 Export My Data
-                </button>
-                <button id="delete-data-btn" class="btn btn-outline">
-                  🗑️ Delete Research Data
-                </button>
-                <button id="sign-out-btn" class="btn btn-secondary">
-                  🚪 Sign Out
-                </button>
+            <!-- Enhanced Account Management -->
+            <div class="enhanced-section-card account-section">
+              <div class="card-header">
+                <div class="header-icon">
+                  <i class="fas fa-cog"></i>
+                </div>
+                <div class="header-content">
+                  <h2>Account Management</h2>
+                  <p>
+                    Manage your data, privacy settings, and account preferences
+                  </p>
+                </div>
+              </div>
+              <div class="card-content">
+                <div class="account-grid">
+                  <div class="account-action-card">
+                    <div class="action-icon">
+                      <i class="fas fa-download"></i>
+                    </div>
+                    <div class="action-content">
+                      <h4>Export Data</h4>
+                      <p>Download all your profile and research data</p>
+                      <button id="export-data-btn" class="btn btn-outline">
+                        <i class="fas fa-download"></i>
+                        Export Data
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="account-action-card">
+                    <div class="action-icon">
+                      <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="action-content">
+                      <h4>Privacy Settings</h4>
+                      <p>Control your data sharing and privacy preferences</p>
+                      <button id="privacy-settings-btn" class="btn btn-outline">
+                        <i class="fas fa-shield-alt"></i>
+                        Privacy Settings
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="account-action-card">
+                    <div class="action-icon">
+                      <i class="fas fa-trash-alt"></i>
+                    </div>
+                    <div class="action-content">
+                      <h4>Delete Research Data</h4>
+                      <p>Remove your research contributions if needed</p>
+                      <button
+                        id="delete-data-btn"
+                        class="btn btn-outline danger"
+                      >
+                        <i class="fas fa-trash-alt"></i>
+                        Delete Data
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="account-action-card">
+                    <div class="action-icon">
+                      <i class="fas fa-sign-out-alt"></i>
+                    </div>
+                    <div class="action-content">
+                      <h4>Sign Out</h4>
+                      <p>Securely sign out of your account</p>
+                      <button id="sign-out-btn" class="btn btn-secondary">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Sign Out
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Login Required Content -->
-          <div id="login-required-content" class="login-required">
-            <div class="login-prompt-card">
-              <div class="login-prompt-content">
-                <h1>👤 User Profile</h1>
-                <p>
-                  Sign in to access your profile, research participation, and
-                  community features.
-                </p>
-
-                <div class="login-benefits">
-                  <div class="benefit-item">
-                    <span class="benefit-icon">🔬</span>
-                    <div>
-                      <h3>Join Research Study</h3>
-                      <p>
-                        Contribute to AI ethics research and get exclusive
-                        insights
-                      </p>
-                    </div>
-                  </div>
-                  <div class="benefit-item">
-                    <span class="benefit-icon">📝</span>
-                    <div>
-                      <h3>Write Blog Posts</h3>
-                      <p>
-                        Share your thoughts and experiences with the community
-                      </p>
-                    </div>
-                  </div>
-                  <div class="benefit-item">
-                    <span class="benefit-icon">💬</span>
-                    <div>
-                      <h3>Join Discussions</h3>
-                      <p>Participate in forum discussions about AI ethics</p>
-                    </div>
+          <!-- Enhanced Login Required Content -->
+          <div id="login-required-content" class="enhanced-login-required">
+            <div class="login-hero-section">
+              <div class="login-hero-content">
+                <div class="hero-animation">
+                  <div class="floating-icons">
+                    <i class="fas fa-brain icon-1"></i>
+                    <i class="fas fa-microscope icon-2"></i>
+                    <i class="fas fa-users icon-3"></i>
+                    <i class="fas fa-heart icon-4"></i>
                   </div>
                 </div>
 
-                <button id="login-btn" class="btn btn-primary">
-                  🔐 Sign In with Google
-                </button>
+                <div class="login-content">
+                  <div class="login-badge">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Join Our Community</span>
+                  </div>
+
+                  <h1 class="login-title">Welcome to SimulateAI</h1>
+                  <p class="login-description">
+                    Sign in to unlock your personalized AI ethics learning
+                    journey, contribute to groundbreaking research, and connect
+                    with a global community of learners and educators.
+                  </p>
+
+                  <div class="login-benefits-grid">
+                    <div class="benefit-card research">
+                      <div class="benefit-icon">
+                        <i class="fas fa-flask"></i>
+                      </div>
+                      <div class="benefit-content">
+                        <h3>Research Impact</h3>
+                        <p>
+                          Contribute to cutting-edge AI ethics research and get
+                          exclusive insights
+                        </p>
+                        <ul class="benefit-features">
+                          <li>Academic publication credits</li>
+                          <li>Early research findings access</li>
+                          <li>Research contributor badge</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div class="benefit-card community">
+                      <div class="benefit-icon">
+                        <i class="fas fa-edit"></i>
+                      </div>
+                      <div class="benefit-content">
+                        <h3>Content Creation</h3>
+                        <p>
+                          Share your thoughts and experiences with our global
+                          community
+                        </p>
+                        <ul class="benefit-features">
+                          <li>Write blog posts</li>
+                          <li>Create discussion topics</li>
+                          <li>Share case studies</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div class="benefit-card discussions">
+                      <div class="benefit-icon">
+                        <i class="fas fa-comments"></i>
+                      </div>
+                      <div class="benefit-content">
+                        <h3>Expert Discussions</h3>
+                        <p>
+                          Engage in meaningful conversations about AI ethics and
+                          policy
+                        </p>
+                        <ul class="benefit-features">
+                          <li>Expert-moderated forums</li>
+                          <li>Weekly discussion themes</li>
+                          <li>Q&A with researchers</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div class="benefit-card progress">
+                      <div class="benefit-icon">
+                        <i class="fas fa-chart-line"></i>
+                      </div>
+                      <div class="benefit-content">
+                        <h3>Track Progress</h3>
+                        <p>
+                          Monitor your learning journey and earn achievement
+                          badges
+                        </p>
+                        <ul class="benefit-features">
+                          <li>Personal dashboard</li>
+                          <li>Achievement system</li>
+                          <li>Learning analytics</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="login-actions">
+                    <button id="login-btn" class="btn btn-primary login-btn">
+                      <i class="fab fa-google"></i>
+                      <span>Continue with Google</span>
+                      <div class="btn-shine"></div>
+                    </button>
+
+                    <div class="login-alternative">
+                      <span class="divider-text">or</span>
+                      <button class="btn btn-outline guest-btn">
+                        <i class="fas fa-eye"></i>
+                        Explore as Guest
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="login-trust-indicators">
+                    <div class="trust-item">
+                      <i class="fas fa-shield-alt"></i>
+                      <span>Privacy Protected</span>
+                    </div>
+                    <div class="trust-item">
+                      <i class="fas fa-university"></i>
+                      <span>University Research</span>
+                    </div>
+                    <div class="trust-item">
+                      <i class="fas fa-users"></i>
+                      <span>10,000+ Members</span>
+                    </div>
+                  </div>
+
+                  <div class="login-testimonial">
+                    <div class="testimonial-content">
+                      <p>
+                        "SimulateAI helped me understand the real-world
+                        implications of AI bias. The research opportunities are
+                        incredible!"
+                      </p>
+                      <div class="testimonial-author">
+                        <div class="author-avatar">
+                          <img
+                            src="https://images.unsplash.com/photo-1494790108755-2616b612b55c?w=150"
+                            alt="Dr. Sarah Chen"
+                          />
+                        </div>
+                        <div class="author-info">
+                          <span class="author-name">Dr. Sarah Chen</span>
+                          <span class="author-role">AI Ethics Researcher</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -298,41 +862,115 @@
       </section>
     </main>
 
-    <!-- Footer (same as main app) -->
-    <footer class="footer" role="contentinfo">
-      <div class="footer-content">
-        <div class="footer-sections">
-          <div class="footer-section">
-            <h3>Privacy & Research</h3>
-            <p>
-              Your privacy is important. All research data is anonymized and
-              used solely for educational advancement.
-            </p>
+    <!-- Enhanced Footer -->
+    <footer class="enhanced-footer" role="contentinfo">
+      <div class="footer-container">
+        <div class="footer-content">
+          <div class="footer-sections">
+            <div class="footer-section">
+              <div class="section-header">
+                <i class="fas fa-shield-alt section-icon"></i>
+                <h3>Privacy & Research</h3>
+              </div>
+              <p>
+                Your privacy is our priority. All research data is anonymized
+                and used solely for advancing AI ethics education and research.
+              </p>
+              <div class="footer-links">
+                <a href="#privacy" class="footer-link">
+                  <i class="fas fa-file-contract"></i>
+                  Privacy Policy
+                </a>
+                <a href="#research" class="footer-link">
+                  <i class="fas fa-microscope"></i>
+                  Research Ethics
+                </a>
+              </div>
+            </div>
+
+            <div class="footer-section">
+              <div class="section-header">
+                <i class="fas fa-headset section-icon"></i>
+                <h3>Support & Contact</h3>
+              </div>
+              <p>
+                Need help with your profile or have questions about research
+                participation? Our team is here to assist you.
+              </p>
+              <div class="footer-links">
+                <a href="mailto:support@simulateai.org" class="footer-link">
+                  <i class="fas fa-envelope"></i>
+                  support@simulateai.org
+                </a>
+                <a href="#help" class="footer-link">
+                  <i class="fas fa-question-circle"></i>
+                  Help Center
+                </a>
+              </div>
+            </div>
+
+            <div class="footer-section">
+              <div class="section-header">
+                <i class="fas fa-users section-icon"></i>
+                <h3>Community</h3>
+              </div>
+              <p>
+                Join our growing community of educators, researchers, and
+                students passionate about AI ethics.
+              </p>
+              <div class="footer-links">
+                <a href="forum.html" class="footer-link">
+                  <i class="fas fa-comments"></i>
+                  Discussion Forum
+                </a>
+                <a href="blog.html" class="footer-link">
+                  <i class="fas fa-blog"></i>
+                  Community Blog
+                </a>
+              </div>
+            </div>
           </div>
-          <div class="footer-section">
-            <h3>Contact</h3>
-            <p>
-              Questions about your profile or research participation?
-              <a href="mailto:support@simulateai.org">Contact us</a>
-            </p>
+
+          <div class="footer-bottom">
+            <div class="footer-meta">
+              <p class="footer-copyright">
+                &copy; 2025 SimulateAI Educational Platform. Open source AI
+                ethics education.
+              </p>
+              <p class="copyright-note">
+                Licensed under MIT. Contributing to open science and education.
+              </p>
+            </div>
+
+            <div class="footer-badges">
+              <span class="badge">🔬 Research-Backed</span>
+              <span class="badge">🎓 Educational</span>
+              <span class="badge">🌍 Open Source</span>
+            </div>
           </div>
-        </div>
-        <div class="footer-bottom">
-          <p>
-            &copy; 2025 SimulateAI Educational Platform. Open source AI ethics
-            education.
-          </p>
         </div>
       </div>
     </footer>
 
-    <!-- Loading indicator -->
-    <div id="loading" class="loading" aria-hidden="true" role="status">
-      <div class="loading-spinner" aria-hidden="true"></div>
-      <p class="loading-text">Loading profile...</p>
+    <!-- Enhanced Loading Indicator -->
+    <div id="loading" class="enhanced-loading" aria-hidden="true" role="status">
+      <div class="loading-container">
+        <div class="loading-spinner">
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+        </div>
+        <div class="loading-content">
+          <h3 class="loading-title">Loading your profile...</h3>
+          <p class="loading-subtitle">Preparing your personalized experience</p>
+        </div>
+        <div class="loading-progress">
+          <div class="progress-bar"></div>
+        </div>
+      </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- Enhanced Scripts -->
     <script type="module" src="src/js/services/firebase-service.js"></script>
     <script type="module" src="src/js/services/auth-service.js"></script>
     <script
@@ -340,6 +978,7 @@
       src="src/js/components/notification-toast.js"
     ></script>
     <script type="module" src="src/js/components/modal-utility.js"></script>
+    <script type="module" src="src/js/enhanced-profile.js"></script>
 
     <!-- Profile Page Script -->
     <script type="module">

@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Support AI Ethics Research - Anonymous Donation</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        padding: 40px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .header h1 {
+        color: #2c3e50;
+        margin-bottom: 16px;
+        font-size: 2.5em;
+      }
+
+      .header p {
+        color: #7f8c8d;
+        font-size: 1.2em;
+        margin-bottom: 0;
+      }
+
+      .content {
+        margin-bottom: 40px;
+      }
+
+      .content h2 {
+        color: #34495e;
+        margin-bottom: 16px;
+      }
+
+      .content p {
+        color: #5a6c7d;
+        margin-bottom: 16px;
+      }
+
+      .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin: 30px 0;
+      }
+
+      .feature {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid #3498db;
+      }
+
+      .feature h3 {
+        margin: 0 0 8px 0;
+        color: #2c3e50;
+      }
+
+      .feature p {
+        margin: 0;
+        color: #6c757d;
+      }
+
+      .thank-you {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 30px 0;
+        text-align: center;
+        display: none;
+      }
+
+      .thank-you.show {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div style="text-align: left; margin-bottom: 20px">
+          <a
+            href="/"
+            style="
+              display: inline-flex;
+              align-items: center;
+              gap: 8px;
+              color: #3498db;
+              text-decoration: none;
+              font-weight: 500;
+              padding: 8px 16px;
+              border: 2px solid #3498db;
+              border-radius: 6px;
+              transition: all 0.3s ease;
+              background: transparent;
+            "
+            onmouseover="this.style.background='#3498db'; this.style.color='white';"
+            onmouseout="this.style.background='transparent'; this.style.color='#3498db';"
+          >
+            ← Back to SimulateAI
+          </a>
+        </div>
+        <h1>🎓 Support AI Ethics Research</h1>
+        <p>
+          Help advance the understanding of ethical decision-making in
+          artificial intelligence
+        </p>
+      </div>
+
+      <div class="content">
+        <h2>About This Research</h2>
+        <p>
+          Our SimulateAI platform is advancing the field of AI ethics education
+          by providing interactive scenarios that help researchers, educators,
+          and students understand complex ethical dilemmas in artificial
+          intelligence.
+        </p>
+
+        <div class="features">
+          <div class="feature">
+            <h3>🔬 Research Impact</h3>
+            <p>
+              Your donation directly supports research into AI ethics education
+              and helps develop better training methods for ethical
+              decision-making.
+            </p>
+          </div>
+          <div class="feature">
+            <h3>🎯 Educational Tools</h3>
+            <p>
+              Funds help create interactive simulations and scenarios that make
+              AI ethics more accessible to learners worldwide.
+            </p>
+          </div>
+          <div class="feature">
+            <h3>🌍 Open Access</h3>
+            <p>
+              We're committed to making our research and tools freely available
+              to educators and researchers globally.
+            </p>
+          </div>
+        </div>
+
+        <h2>Quick & Secure Donation</h2>
+        <p>
+          Support our research with a secure one-time donation. No account
+          creation required - just choose your support level and donate in
+          seconds via Stripe.
+        </p>
+      </div>
+
+      <!-- Donation Widget Container -->
+      <div class="donation-widget-container"></div>
+
+      <!-- Thank you message -->
+      <div class="thank-you" id="thank-you-message">
+        <h3>🎉 Thank You for Your Support!</h3>
+        <p>
+          Your donation helps advance AI ethics research and education. You
+          should receive a receipt via email shortly.
+        </p>
+      </div>
+
+      <div
+        style="
+          text-align: center;
+          margin-top: 40px;
+          padding-top: 30px;
+          border-top: 1px solid #e9ecef;
+        "
+      >
+        <p style="color: #6c757d; margin: 0">
+          <strong>SimulateAI Research Platform</strong><br />
+          Advancing ethical AI through interactive education
+        </p>
+      </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+
+    <!-- Firebase Configuration -->
+    <script>
+      // Firebase configuration should use environment variables in production
+      // For development/demo purposes only - DO NOT use hardcoded keys in production
+      const firebaseConfig = {
+        apiKey: window.FIREBASE_CONFIG?.apiKey || 'PLACEHOLDER_API_KEY',
+        authDomain:
+          window.FIREBASE_CONFIG?.authDomain ||
+          'simulateai-research.firebaseapp.com',
+        projectId: window.FIREBASE_CONFIG?.projectId || 'simulateai-research',
+        storageBucket:
+          window.FIREBASE_CONFIG?.storageBucket ||
+          'simulateai-research.appspot.com',
+        messagingSenderId:
+          window.FIREBASE_CONFIG?.messagingSenderId || 'PLACEHOLDER_SENDER_ID',
+        appId: window.FIREBASE_CONFIG?.appId || 'PLACEHOLDER_APP_ID',
+        measurementId: 'G-XXXXXXXXXX',
+      };
+
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+
+      // Check for donation success in URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('donation_success') === 'true') {
+        document.getElementById('thank-you-message').classList.add('show');
+        // Scroll to thank you message
+        document
+          .getElementById('thank-you-message')
+          .scrollIntoView({ behavior: 'smooth' });
+      }
+    </script>
+
+    <!-- Anonymous Donation Component -->
+    <script src="src/js/components/anonymous-donation.js"></script>
+  </body>
+</html>

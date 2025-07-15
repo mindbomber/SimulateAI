@@ -1,3 +1,18 @@
+<!--
+Copyright 2025 Armando Sori
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
 <!doctype html>
 <html lang="en">
   <head>
@@ -8,44 +23,67 @@
     />
     <meta name="theme-color" content="#1a73e8" />
     <meta name="color-scheme" content="light" />
-    <title>Blog - SimulateAI</title>
+    <title>
+      Blog - SimulateAI | Insights & Research on AI Ethics Education
+    </title>
     <meta
       name="description"
-      content="Read and share insights about AI ethics, education, and simulation-based learning"
+      content="Discover cutting-edge research, educational insights, and community discussions about AI ethics, simulation-based learning, and responsible technology development"
+    />
+    <meta
+      name="keywords"
+      content="AI ethics blog, educational research, simulation learning, responsible AI, ethics education, research insights"
+    />
+    <meta name="author" content="SimulateAI Educational Platform" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Blog - SimulateAI | Insights & Research on AI Ethics Education"
+    />
+    <meta
+      property="og:description"
+      content="Discover cutting-edge research, educational insights, and community discussions about AI ethics and simulation-based learning"
+    />
+    <meta property="og:url" content="https://simulateai.org/blog.html" />
+    <meta
+      property="og:image"
+      content="https://simulateai.org/src/assets/images/blog-preview.jpg"
     />
 
-    <!-- Same CSS includes as main app -->
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Blog - SimulateAI" />
+    <meta
+      name="twitter:description"
+      content="Insights & Research on AI Ethics Education"
+    />
+
+    <!-- Accessibility -->
+    <meta
+      name="accessibility-features"
+      content="keyboard-navigation,skip-links,high-contrast,large-text,screen-reader-support"
+    />
+
+    <!-- Enhanced CSS Architecture for Blog -->
+    <link rel="stylesheet" href="src/styles/enhanced-blog.css" />
     <link rel="stylesheet" href="src/styles/main.css" />
     <link rel="stylesheet" href="src/styles/accessibility.css" />
-    <link rel="stylesheet" href="src/styles/simulations.css" />
     <link rel="stylesheet" href="src/styles/layout-components.css" />
     <link rel="stylesheet" href="src/styles/advanced-ui-components.css" />
-    <link rel="stylesheet" href="src/styles/enhanced-objects.css" />
-    <link rel="stylesheet" href="src/styles/input-utility-components.css" />
     <link rel="stylesheet" href="src/styles/form-input-components.css" />
     <link rel="stylesheet" href="src/styles/notification-toast.css" />
-    <link rel="stylesheet" href="src/styles/onboarding-tour.css" />
-    <link rel="stylesheet" href="src/styles/radar-chart.css" />
-    <link rel="stylesheet" href="src/styles/scenario-modal.css" />
     <link rel="stylesheet" href="src/styles/card-component.css" />
     <link rel="stylesheet" href="src/styles/loader-spinner.css" />
-    <link rel="stylesheet" href="src/styles/hero-demo.css" />
-    <link rel="stylesheet" href="src/styles/bias-fairness.css" />
-    <link rel="stylesheet" href="src/styles/category-grid.css" />
-    <link rel="stylesheet" href="src/styles/ethics-analysis.css" />
-    <link rel="stylesheet" href="src/styles/layout-fixes.css" />
-    <link rel="stylesheet" href="src/styles/ethics-explorer.css" />
-    <link rel="stylesheet" href="src/styles/badge-modal.css" />
-    <link rel="stylesheet" href="src/styles/community-features.css" />
-    <link
-      rel="stylesheet"
-      href="src/styles/simulation-modal-consolidated.css"
-    />
+    <link rel="stylesheet" href="src/styles/blog-submission.css" />
 
     <!-- Icons and Favicons -->
     <link rel="icon" type="image/svg+xml" href="src/assets/icons/favicon.svg" />
+    <link rel="icon" type="image/png" href="src/assets/icons/favicon.png" />
   </head>
-  <body>
+
+  <body class="blog-page">
     <!-- Skip to content for accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
@@ -63,17 +101,20 @@
       class="sr-only"
     ></div>
 
-    <!-- Header (same as main app) -->
-    <header class="header" role="banner">
+    <!-- Enhanced Header -->
+    <header class="blog-header" role="banner">
       <div class="header-container">
         <div class="logo">
-          <a href="index.html">
+          <a href="index.html" class="logo-link">
             <img
               src="src/assets/icons/logo.svg"
               alt="SimulateAI Educational Platform"
               class="logo-image"
             />
-            <h1 class="site-title">SimulateAI</h1>
+            <div class="logo-text">
+              <h1 class="site-title">SimulateAI</h1>
+              <span class="site-subtitle">Blog</span>
+            </div>
           </a>
         </div>
 
@@ -84,9 +125,9 @@
           aria-expanded="false"
           aria-controls="main-navigation"
         >
-          <span></span>
-          <span></span>
-          <span></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
         </button>
 
         <nav
@@ -96,124 +137,897 @@
           id="main-navigation"
         >
           <ul class="nav-list">
-            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="index.html" class="nav-link">🏠 Home</a></li>
             <li>
-              <a href="index.html#categories" class="nav-link">Categories</a>
+              <a href="index.html#categories" class="nav-link">📚 Categories</a>
             </li>
             <li>
-              <a href="#blog" class="nav-link active" aria-current="page"
-                >Blog</a
+              <a href="blog.html" class="nav-link active" aria-current="page"
+                >📝 Blog</a
               >
             </li>
-            <li><a href="forum.html" class="nav-link">Forum</a></li>
-            <li><a href="profile.html" class="nav-link">Profile</a></li>
-            <!-- User auth buttons will be added by JavaScript -->
+            <li><a href="forum.html" class="nav-link">💬 Forum</a></li>
+            <li><a href="profile.html" class="nav-link">👤 Profile</a></li>
+            <li>
+              <a href="privacy-notice.html" class="nav-link">🔒 Privacy</a>
+            </li>
+
+            <!-- Guest Authentication (shown when not signed in) -->
+            <li data-guest-content>
+              <button class="btn btn-outline nav-auth-btn" id="sign-in-nav">
+                Sign In
+              </button>
+            </li>
+
+            <!-- User Profile (shown when signed in) -->
+            <li data-user-content style="display: none">
+              <div class="nav-user-profile">
+                <span class="user-greeting" id="nav-user-name">Welcome!</span>
+                <button class="btn btn-outline nav-auth-btn" id="sign-out-nav">
+                  Sign Out
+                </button>
+              </div>
+            </li>
           </ul>
         </nav>
       </div>
       <div class="nav-backdrop" aria-hidden="true"></div>
     </header>
 
+    <!-- Hero Section -->
+    <section class="blog-hero">
+      <div class="hero-background">
+        <div class="hero-pattern"></div>
+      </div>
+      <div class="hero-content">
+        <div class="hero-text">
+          <h1 class="hero-title">
+            <span class="title-main">Insights & Research</span>
+            <span class="title-sub">Advancing AI Ethics Education</span>
+          </h1>
+          <p class="hero-description">
+            Discover cutting-edge research, educational methodologies, and
+            community insights that are shaping the future of AI ethics
+            education through simulation-based learning.
+          </p>
+          <div class="hero-stats">
+            <div class="stat-item">
+              <span class="stat-number" id="total-posts">50+</span>
+              <span class="stat-label">Research Articles</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number" id="total-authors">25+</span>
+              <span class="stat-label">Contributors</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number" id="total-reads">10K+</span>
+              <span class="stat-label">Monthly Reads</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <button
+            id="write-post-btn"
+            class="btn btn-primary hero-cta contribution-btn"
+          >
+            <span class="btn-icon">✍️</span>
+            <span class="btn-text">Share Your Research</span>
+            <span class="btn-subtitle" id="contribution-status"
+              >Join our community of contributors</span
+            >
+          </button>
+          <button id="subscribe-btn" class="btn btn-outline hero-cta">
+            <span class="btn-icon">🔔</span>
+            <span class="btn-text">Get Updates</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
     <!-- Main Content -->
     <main id="main-content" class="main-content" role="main">
-      <!-- Blog Header -->
-      <section class="blog-header">
+      <!-- Advanced Search & Filter Bar -->
+      <section class="search-filter-section">
         <div class="container">
-          <div class="blog-header-content">
-            <h1>📝 SimulateAI Blog</h1>
-            <p>
-              Insights, research, and discussions about AI ethics education and
-              simulation-based learning.
-            </p>
-
-            <!-- Blog Actions -->
-            <div class="blog-actions">
-              <button
-                id="write-post-btn"
-                class="btn btn-primary"
-                style="display: none"
-              >
-                ✍️ Write a Post
+          <div class="search-filter-container">
+            <div class="search-box">
+              <input
+                type="search"
+                id="blog-search"
+                placeholder="Search articles, research, authors..."
+                aria-label="Search blog posts"
+                autocomplete="off"
+              />
+              <button class="search-btn" aria-label="Search">
+                <span class="search-icon">🔍</span>
               </button>
-              <div class="blog-filters">
-                <select id="category-filter" aria-label="Filter by category">
-                  <option value="">All Categories</option>
-                  <option value="research">🔬 Research</option>
-                  <option value="education">📚 Education</option>
-                  <option value="ethics">⚖️ Ethics</option>
-                  <option value="ai-bias">🎯 AI Bias</option>
-                  <option value="privacy">🔒 Privacy</option>
-                  <option value="community">🤝 Community</option>
+            </div>
+
+            <div class="advanced-filters">
+              <div class="filter-group">
+                <label for="category-filter" class="filter-label"
+                  >Category</label
+                >
+                <select
+                  id="category-filter"
+                  class="filter-select"
+                  aria-label="Filter by category"
+                >
+                  <option value="">All Topics</option>
+                  <option value="research">🔬 Research & Studies</option>
+                  <option value="education">📚 Educational Methods</option>
+                  <option value="ethics">⚖️ Ethics & Philosophy</option>
+                  <option value="ai-bias">🎯 AI Bias & Fairness</option>
+                  <option value="privacy">🔒 Privacy & Security</option>
+                  <option value="community">🤝 Community Insights</option>
+                  <option value="technology">⚙️ Technology & Tools</option>
+                  <option value="policy">📋 Policy & Regulation</option>
                 </select>
-                <select id="author-filter" aria-label="Filter by author">
+              </div>
+
+              <div class="filter-group">
+                <label for="author-filter" class="filter-label"
+                  >Author Type</label
+                >
+                <select
+                  id="author-filter"
+                  class="filter-select"
+                  aria-label="Filter by author type"
+                >
                   <option value="">All Authors</option>
-                  <option value="team">SimulateAI Team</option>
-                  <option value="community">Community</option>
-                  <option value="research">Research Contributors</option>
+                  <option value="team">👑 SimulateAI Team</option>
+                  <option value="researchers">🔬 Research Contributors</option>
+                  <option value="educators">🎓 Educators</option>
+                  <option value="community">🤝 Community Members</option>
+                  <option value="guest">✨ Guest Writers</option>
                 </select>
+              </div>
+
+              <div class="filter-group">
+                <label for="sort-filter" class="filter-label">Sort By</label>
+                <select
+                  id="sort-filter"
+                  class="filter-select"
+                  aria-label="Sort articles"
+                >
+                  <option value="newest">📅 Newest First</option>
+                  <option value="popular">🔥 Most Popular</option>
+                  <option value="trending">📈 Trending</option>
+                  <option value="discussed">💬 Most Discussed</option>
+                  <option value="research">🔬 Research Impact</option>
+                </select>
+              </div>
+
+              <button id="clear-filters" class="btn btn-outline clear-filters">
+                <span class="btn-icon">🗑️</span>
+                Clear Filters
+              </button>
+            </div>
+          </div>
+
+          <!-- Active Filters Display -->
+          <div id="active-filters" class="active-filters" style="display: none">
+            <span class="active-filters-label">Active Filters:</span>
+            <div class="filter-tags" id="filter-tags-container"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Featured Articles Carousel -->
+      <section class="featured-section">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">
+              <span class="title-icon">⭐</span>
+              Featured Research & Insights
+            </h2>
+            <p class="section-description">
+              Groundbreaking research and thought-provoking insights from our
+              community of educators, researchers, and AI ethics experts.
+            </p>
+          </div>
+
+          <div class="featured-carousel">
+            <div class="carousel-container">
+              <div id="featured-posts-grid" class="featured-posts-grid">
+                <!-- Featured posts will be populated by JavaScript -->
+              </div>
+
+              <!-- Carousel Navigation -->
+              <button
+                class="carousel-nav carousel-prev"
+                aria-label="Previous featured posts"
+              >
+                <span class="nav-icon">←</span>
+              </button>
+              <button
+                class="carousel-nav carousel-next"
+                aria-label="Next featured posts"
+              >
+                <span class="nav-icon">→</span>
+              </button>
+            </div>
+
+            <!-- Carousel Indicators -->
+            <div class="carousel-indicators" id="carousel-indicators">
+              <!-- Indicators will be generated by JavaScript -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Research Categories Grid -->
+      <section class="categories-showcase">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">
+              <span class="title-icon">📊</span>
+              Research Categories
+            </h2>
+            <p class="section-description">
+              Explore our comprehensive collection of research and insights
+              organized by key areas in AI ethics education.
+            </p>
+          </div>
+
+          <div class="categories-grid">
+            <div class="category-card" data-category="research">
+              <div class="category-icon">🔬</div>
+              <h3 class="category-title">Research & Studies</h3>
+              <p class="category-description">
+                Peer-reviewed research, studies, and academic insights
+              </p>
+              <div class="category-stats">
+                <span class="stat-item">
+                  <span class="stat-number" id="research-count">15</span>
+                  <span class="stat-label">Articles</span>
+                </span>
+                <span class="stat-item">
+                  <span class="stat-number">2.4K</span>
+                  <span class="stat-label">Reads</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="category-card" data-category="education">
+              <div class="category-icon">📚</div>
+              <h3 class="category-title">Educational Methods</h3>
+              <p class="category-description">
+                Teaching strategies, curricula, and pedagogical approaches
+              </p>
+              <div class="category-stats">
+                <span class="stat-item">
+                  <span class="stat-number" id="education-count">12</span>
+                  <span class="stat-label">Articles</span>
+                </span>
+                <span class="stat-item">
+                  <span class="stat-number">3.1K</span>
+                  <span class="stat-label">Reads</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="category-card" data-category="ethics">
+              <div class="category-icon">⚖️</div>
+              <h3 class="category-title">Ethics & Philosophy</h3>
+              <p class="category-description">
+                Ethical frameworks, moral philosophy, and value systems
+              </p>
+              <div class="category-stats">
+                <span class="stat-item">
+                  <span class="stat-number" id="ethics-count">18</span>
+                  <span class="stat-label">Articles</span>
+                </span>
+                <span class="stat-item">
+                  <span class="stat-number">4.2K</span>
+                  <span class="stat-label">Reads</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="category-card" data-category="ai-bias">
+              <div class="category-icon">🎯</div>
+              <h3 class="category-title">AI Bias & Fairness</h3>
+              <p class="category-description">
+                Algorithmic bias, fairness metrics, and inclusive AI
+              </p>
+              <div class="category-stats">
+                <span class="stat-item">
+                  <span class="stat-number" id="bias-count">9</span>
+                  <span class="stat-label">Articles</span>
+                </span>
+                <span class="stat-item">
+                  <span class="stat-number">1.8K</span>
+                  <span class="stat-label">Reads</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="category-card" data-category="privacy">
+              <div class="category-icon">🔒</div>
+              <h3 class="category-title">Privacy & Security</h3>
+              <p class="category-description">
+                Data protection, privacy rights, and security practices
+              </p>
+              <div class="category-stats">
+                <span class="stat-item">
+                  <span class="stat-number" id="privacy-count">7</span>
+                  <span class="stat-label">Articles</span>
+                </span>
+                <span class="stat-item">
+                  <span class="stat-number">1.5K</span>
+                  <span class="stat-label">Reads</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="category-card" data-category="community">
+              <div class="category-icon">🤝</div>
+              <h3 class="category-title">Community Insights</h3>
+              <p class="category-description">
+                User experiences, case studies, and community discussions
+              </p>
+              <div class="category-stats">
+                <span class="stat-item">
+                  <span class="stat-number" id="community-count">23</span>
+                  <span class="stat-label">Articles</span>
+                </span>
+                <span class="stat-item">
+                  <span class="stat-number">5.7K</span>
+                  <span class="stat-label">Reads</span>
+                </span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Featured Posts -->
-      <section class="featured-posts">
+      <!-- Latest Articles -->
+      <section class="latest-posts-section">
         <div class="container">
-          <h2>🌟 Featured Posts</h2>
-          <div id="featured-posts-grid" class="featured-posts-grid">
-            <!-- Featured posts will be populated by JavaScript -->
+          <div class="section-header">
+            <h2 class="section-title">
+              <span class="title-icon">📰</span>
+              Latest Articles
+            </h2>
+            <div class="view-options">
+              <button
+                class="view-btn active"
+                data-view="grid"
+                aria-label="Grid view"
+              >
+                <span class="view-icon">▦</span>
+              </button>
+              <button class="view-btn" data-view="list" aria-label="List view">
+                <span class="view-icon">☰</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Results Summary -->
+          <div class="results-summary">
+            <span id="results-count" class="results-count"
+              >Showing all articles</span
+            >
+            <span class="results-meta" id="results-meta"></span>
+          </div>
+
+          <div id="blog-posts-container" class="blog-posts-container grid-view">
+            <!-- Posts will be populated by JavaScript -->
+          </div>
+
+          <!-- Enhanced Load More with Options -->
+          <div class="load-more-section">
+            <button id="load-more-btn" class="btn btn-primary load-more-btn">
+              <span class="btn-icon">⬇️</span>
+              <span class="btn-text">Load More Articles</span>
+              <span class="btn-meta" id="load-more-count">(10 more)</span>
+            </button>
+
+            <div class="pagination-info">
+              <span id="pagination-status">Showing 1-10 of 50+ articles</span>
+              <button id="jump-to-top" class="btn btn-outline btn-small">
+                <span class="btn-icon">↑</span>
+                Back to Top
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- Recent Posts -->
-      <section class="recent-posts">
+      <!-- Newsletter Subscription -->
+      <section class="newsletter-section">
         <div class="container">
-          <h2>📰 Recent Posts</h2>
-          <div id="blog-posts-container" class="blog-posts-container">
-            <!-- Posts will be populated by JavaScript -->
-          </div>
+          <div class="newsletter-card">
+            <div class="newsletter-content">
+              <h2 class="newsletter-title">
+                <span class="title-icon">📬</span>
+                Stay Updated with Latest Research
+              </h2>
+              <p class="newsletter-description">
+                Get weekly updates on new research publications, educational
+                insights, and community discussions delivered directly to your
+                inbox.
+              </p>
+              <div class="newsletter-benefits">
+                <div class="benefit-item">
+                  <span class="benefit-icon">🔬</span>
+                  <span class="benefit-text">Research Summaries</span>
+                </div>
+                <div class="benefit-item">
+                  <span class="benefit-icon">📊</span>
+                  <span class="benefit-text">Data Insights</span>
+                </div>
+                <div class="benefit-item">
+                  <span class="benefit-icon">🎓</span>
+                  <span class="benefit-text">Educational Resources</span>
+                </div>
+                <div class="benefit-item">
+                  <span class="benefit-icon">💡</span>
+                  <span class="benefit-text">Innovation Updates</span>
+                </div>
+              </div>
+            </div>
 
-          <!-- Load More Button -->
-          <div class="load-more-container">
-            <button id="load-more-btn" class="btn btn-outline">
-              Load More Posts
-            </button>
+            <div class="newsletter-form">
+              <form id="newsletter-form" class="subscription-form">
+                <div class="form-group">
+                  <input
+                    type="email"
+                    id="newsletter-email"
+                    placeholder="Enter your email address"
+                    required
+                    aria-label="Email address for newsletter"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="checkbox-container">
+                    <input type="checkbox" id="newsletter-research" checked />
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Research updates</span>
+                  </label>
+                  <label class="checkbox-container">
+                    <input type="checkbox" id="newsletter-community" />
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Community highlights</span>
+                  </label>
+                </div>
+                <button type="submit" class="btn btn-primary subscribe-btn">
+                  <span class="btn-icon">🚀</span>
+                  <span class="btn-text">Subscribe Now</span>
+                </button>
+              </form>
+              <p class="privacy-note">
+                <span class="privacy-icon">🔒</span>
+                No spam, unsubscribe anytime. Read our
+                <a href="privacy-notice.html">privacy policy</a>.
+              </p>
+            </div>
           </div>
         </div>
       </section>
     </main>
 
-    <!-- Footer (same as main app) -->
-    <footer class="footer" role="contentinfo">
+    <!-- Blog Submission Modal -->
+    <div
+      id="blog-submission-modal"
+      class="modal submission-modal"
+      style="display: none"
+    >
+      <div class="modal-content submission-form-container">
+        <div class="modal-header">
+          <h2 class="modal-title">
+            <span class="title-icon">✍️</span>
+            Submit Your Research Article
+          </h2>
+          <button
+            class="modal-close"
+            id="close-submission-modal"
+            aria-label="Close modal"
+          >
+            <span class="close-icon">×</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Submission Status Banner -->
+          <div
+            id="submission-status-banner"
+            class="status-banner"
+            style="display: none"
+          >
+            <div class="status-content">
+              <span class="status-icon" id="status-icon">ℹ️</span>
+              <span class="status-message" id="status-message"></span>
+            </div>
+          </div>
+
+          <!-- Donor Benefits Info -->
+          <div
+            id="donor-benefits-info"
+            class="info-card donor-benefits"
+            style="display: none"
+          >
+            <div class="info-header">
+              <span class="info-icon">👑</span>
+              <h3>Donor Benefits</h3>
+            </div>
+            <div class="info-content">
+              <p>
+                As a valued donor, your submissions are automatically approved
+                and published immediately.
+              </p>
+              <ul class="benefits-list">
+                <li>✅ Instant publication</li>
+                <li>✅ Priority placement</li>
+                <li>✅ Enhanced author profile</li>
+                <li>✅ Direct community engagement</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Submission Guidelines -->
+          <div class="info-card submission-guidelines">
+            <div class="info-header">
+              <span class="info-icon">📋</span>
+              <h3>Submission Guidelines</h3>
+            </div>
+            <div class="info-content">
+              <ul class="guidelines-list">
+                <li>
+                  📝 Articles should be well-researched and evidence-based
+                </li>
+                <li>🎯 Focus on AI ethics, education, or related topics</li>
+                <li>📚 Include relevant citations and references</li>
+                <li>🔍 Original content only - no plagiarism</li>
+                <li>💬 Maintain respectful and professional tone</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Submission Form -->
+          <form id="blog-submission-form" class="submission-form">
+            <div class="form-section">
+              <h3 class="section-title">Article Details</h3>
+
+              <div class="form-group">
+                <label for="article-title" class="form-label">
+                  Article Title <span class="required">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="article-title"
+                  name="title"
+                  class="form-input"
+                  placeholder="Enter a compelling title for your article"
+                  required
+                  maxlength="150"
+                />
+                <div class="input-feedback">
+                  <span class="char-count" id="title-char-count">0/150</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="article-subtitle" class="form-label">
+                  Subtitle/Summary
+                </label>
+                <input
+                  type="text"
+                  id="article-subtitle"
+                  name="subtitle"
+                  class="form-input"
+                  placeholder="Brief summary or subtitle (optional)"
+                  maxlength="200"
+                />
+                <div class="input-feedback">
+                  <span class="char-count" id="subtitle-char-count">0/200</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="article-category" class="form-label">
+                  Category <span class="required">*</span>
+                </label>
+                <select
+                  id="article-category"
+                  name="category"
+                  class="form-select"
+                  required
+                >
+                  <option value="">Select a category</option>
+                  <option value="research">🔬 Research & Studies</option>
+                  <option value="education">📚 Educational Methods</option>
+                  <option value="ethics">⚖️ Ethics & Philosophy</option>
+                  <option value="ai-bias">🎯 AI Bias & Fairness</option>
+                  <option value="privacy">🔒 Privacy & Security</option>
+                  <option value="community">🤝 Community Insights</option>
+                  <option value="technology">⚙️ Technology & Tools</option>
+                  <option value="policy">📋 Policy & Regulation</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="article-tags" class="form-label"> Tags </label>
+                <input
+                  type="text"
+                  id="article-tags"
+                  name="tags"
+                  class="form-input"
+                  placeholder="Add relevant tags (separate with commas)"
+                />
+                <div class="input-help">
+                  <span class="help-text"
+                    >Example: machine learning, bias detection, fairness</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3 class="section-title">Content</h3>
+
+              <div class="form-group">
+                <label for="article-excerpt" class="form-label">
+                  Excerpt <span class="required">*</span>
+                </label>
+                <textarea
+                  id="article-excerpt"
+                  name="excerpt"
+                  class="form-textarea"
+                  placeholder="Write a compelling excerpt that summarizes your article (2-3 sentences)"
+                  required
+                  rows="3"
+                  maxlength="300"
+                ></textarea>
+                <div class="input-feedback">
+                  <span class="char-count" id="excerpt-char-count">0/300</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="article-content" class="form-label">
+                  Article Content <span class="required">*</span>
+                </label>
+                <textarea
+                  id="article-content"
+                  name="content"
+                  class="form-textarea content-editor"
+                  placeholder="Write your article here. You can include markdown formatting for better presentation."
+                  required
+                  rows="15"
+                ></textarea>
+                <div class="input-help">
+                  <span class="help-text">
+                    💡 Tip: Use **bold**, *italic*, # headers, and [links](url)
+                    for formatting
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3 class="section-title">Author Information</h3>
+
+              <div class="form-group">
+                <label for="author-bio" class="form-label"> Author Bio </label>
+                <textarea
+                  id="author-bio"
+                  name="authorBio"
+                  class="form-textarea"
+                  placeholder="Brief professional bio or credentials (optional)"
+                  rows="3"
+                  maxlength="250"
+                ></textarea>
+                <div class="input-feedback">
+                  <span class="char-count" id="bio-char-count">0/250</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="author-affiliation" class="form-label">
+                  Institution/Affiliation
+                </label>
+                <input
+                  type="text"
+                  id="author-affiliation"
+                  name="affiliation"
+                  class="form-input"
+                  placeholder="University, organization, or company (optional)"
+                />
+              </div>
+            </div>
+
+            <!-- Terms and Submission -->
+            <div class="form-section">
+              <div class="form-group checkbox-group">
+                <label class="checkbox-label">
+                  <input
+                    type="checkbox"
+                    id="agree-terms"
+                    name="agreeTerms"
+                    required
+                  />
+                  <span class="checkbox-custom"></span>
+                  <span class="checkbox-text">
+                    I agree to the
+                    <a href="#submission-terms" class="link"
+                      >submission terms</a
+                    >
+                    and confirm this is original content
+                  </span>
+                </label>
+              </div>
+
+              <div class="form-group checkbox-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="agree-review" name="agreeReview" />
+                  <span class="checkbox-custom"></span>
+                  <span class="checkbox-text">
+                    I understand my submission may be reviewed before
+                    publication
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+              <button type="button" class="btn btn-outline" id="save-draft-btn">
+                <span class="btn-icon">💾</span>
+                Save Draft
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                id="submit-article-btn"
+              >
+                <span class="btn-icon">📤</span>
+                <span class="btn-text">Submit Article</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enhanced Footer -->
+    <footer class="blog-footer" role="contentinfo">
       <div class="footer-content">
         <div class="footer-sections">
+          <!-- Research & Academic Section -->
           <div class="footer-section">
-            <h3>Join the Conversation</h3>
-            <p>
-              Research contributors and supporters can write blog posts to share
-              their insights with the community.
-            </p>
+            <h3 class="footer-section-title">
+              <span class="section-icon">🔬</span>
+              Research & Academic
+            </h3>
+            <div class="footer-section-content">
+              <p>
+                Contributing to evidence-based AI ethics education through
+                rigorous research and peer collaboration.
+              </p>
+              <ul class="footer-links">
+                <li>
+                  <a href="#research-guidelines" class="footer-link"
+                    >Research Guidelines</a
+                  >
+                </li>
+                <li>
+                  <a href="#peer-review" class="footer-link"
+                    >Peer Review Process</a
+                  >
+                </li>
+                <li>
+                  <a href="#citation-guide" class="footer-link"
+                    >Citation Guide</a
+                  >
+                </li>
+                <li>
+                  <a href="#academic-partnerships" class="footer-link"
+                    >Academic Partnerships</a
+                  >
+                </li>
+              </ul>
+            </div>
           </div>
+
+          <!-- Community & Engagement Section -->
           <div class="footer-section">
-            <h3>Research Focus</h3>
-            <p>
-              Our blog features evidence-based discussions about AI ethics
-              education and simulation methodology.
-            </p>
+            <h3 class="footer-section-title">
+              <span class="section-icon">🤝</span>
+              Community & Engagement
+            </h3>
+            <div class="footer-section-content">
+              <p>
+                Join our global community of educators, researchers, and ethics
+                advocates.
+              </p>
+              <ul class="footer-links">
+                <li>
+                  <a href="#contributor-guidelines" class="footer-link"
+                    >Contributor Guidelines</a
+                  >
+                </li>
+                <li>
+                  <a href="forum.html" class="footer-link">Discussion Forum</a>
+                </li>
+                <li>
+                  <a href="#events" class="footer-link">Events & Webinars</a>
+                </li>
+                <li>
+                  <a href="#community-showcase" class="footer-link"
+                    >Community Showcase</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Resources & Support Section -->
+          <div class="footer-section">
+            <h3 class="footer-section-title">
+              <span class="section-icon">📚</span>
+              Resources & Support
+            </h3>
+            <div class="footer-section-content">
+              <p>
+                Comprehensive resources for educators, researchers, and learners
+                at all levels.
+              </p>
+              <ul class="footer-links">
+                <li>
+                  <a href="docs/EDUCATOR_GUIDE.md" class="footer-link"
+                    >Educator Resources</a
+                  >
+                </li>
+                <li>
+                  <a href="#writing-guide" class="footer-link"
+                    >Writing Guidelines</a
+                  >
+                </li>
+                <li>
+                  <a href="#technical-support" class="footer-link"
+                    >Technical Support</a
+                  >
+                </li>
+                <li>
+                  <a href="privacy-notice.html" class="footer-link"
+                    >Privacy Policy</a
+                  >
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
+
+        <!-- Footer Bottom -->
         <div class="footer-bottom">
-          <p>
-            &copy; 2025 SimulateAI Educational Platform. Open source AI ethics
-            education.
-          </p>
+          <div class="footer-meta">
+            <p class="footer-copyright">
+              &copy; 2025 SimulateAI Educational Platform.
+              <span class="copyright-note"
+                >Open source AI ethics education for all learners.</span
+              >
+            </p>
+            <div class="footer-badges">
+              <span class="badge">Open Source</span>
+              <span class="badge">GDPR Compliant</span>
+              <span class="badge">Educational Use</span>
+            </div>
+          </div>
+
+          <nav class="footer-nav" aria-label="Footer navigation">
+            <a href="index.html" class="footer-nav-link">Home</a>
+            <a href="privacy-notice.html" class="footer-nav-link">Privacy</a>
+            <a href="data-deletion.html" class="footer-nav-link">Data Rights</a>
+            <a href="#accessibility" class="footer-nav-link">Accessibility</a>
+            <a href="#contact" class="footer-nav-link">Contact</a>
+          </nav>
         </div>
       </div>
     </footer>
 
-    <!-- Write Post Modal -->
+    <!-- Enhanced Write Post Modal -->
     <div
       id="write-post-modal"
       class="modal-overlay"
@@ -222,88 +1036,343 @@
       aria-labelledby="write-post-title"
       aria-modal="true"
     >
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 id="write-post-title">✍️ Write a Blog Post</h2>
-          <button class="modal-close" aria-label="Close modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <form id="write-post-form">
-            <div class="form-group">
-              <label for="post-title">Title *</label>
-              <input
-                type="text"
-                id="post-title"
-                required
-                maxlength="200"
-                placeholder="Enter post title..."
-              />
+      <div class="modal-container">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 id="write-post-title" class="modal-title">
+              <span class="title-icon">✍️</span>
+              Share Your Research & Insights
+            </h2>
+            <button class="modal-close" aria-label="Close modal">
+              &times;
+            </button>
+          </div>
+
+          <div class="modal-body">
+            <div class="contribution-guidelines">
+              <div class="guideline-item">
+                <span class="guideline-icon">🔬</span>
+                <span class="guideline-text"
+                  >Evidence-based content encouraged</span
+                >
+              </div>
+              <div class="guideline-item">
+                <span class="guideline-icon">📊</span>
+                <span class="guideline-text"
+                  >Data and research citations welcome</span
+                >
+              </div>
+              <div class="guideline-item">
+                <span class="guideline-icon">🤝</span>
+                <span class="guideline-text"
+                  >Constructive and educational focus</span
+                >
+              </div>
             </div>
 
-            <div class="form-group">
-              <label for="post-category">Category *</label>
-              <select id="post-category" required>
-                <option value="">Select a category...</option>
-                <option value="research">🔬 Research</option>
-                <option value="education">📚 Education</option>
-                <option value="ethics">⚖️ Ethics</option>
-                <option value="ai-bias">🎯 AI Bias</option>
-                <option value="privacy">🔒 Privacy</option>
-                <option value="community">🤝 Community</option>
-              </select>
-            </div>
+            <form id="write-post-form" class="enhanced-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="post-title" class="form-label">
+                    <span class="label-icon">📝</span>
+                    Article Title *
+                  </label>
+                  <input
+                    type="text"
+                    id="post-title"
+                    class="form-input"
+                    required
+                    maxlength="200"
+                    placeholder="Enter a compelling and descriptive title..."
+                    aria-describedby="title-help"
+                  />
+                  <small id="title-help" class="form-help">
+                    Clear, specific titles perform better in search and
+                    engagement
+                  </small>
+                </div>
+              </div>
 
-            <div class="form-group">
-              <label for="post-summary">Summary *</label>
-              <textarea
-                id="post-summary"
-                rows="3"
-                required
-                maxlength="500"
-                placeholder="Brief summary of your post (max 500 characters)..."
-              ></textarea>
-            </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="post-category" class="form-label">
+                    <span class="label-icon">📂</span>
+                    Primary Category *
+                  </label>
+                  <select id="post-category" class="form-select" required>
+                    <option value="">Select primary research area...</option>
+                    <option value="research">🔬 Research & Studies</option>
+                    <option value="education">📚 Educational Methods</option>
+                    <option value="ethics">⚖️ Ethics & Philosophy</option>
+                    <option value="ai-bias">🎯 AI Bias & Fairness</option>
+                    <option value="privacy">🔒 Privacy & Security</option>
+                    <option value="community">🤝 Community Insights</option>
+                    <option value="technology">⚙️ Technology & Tools</option>
+                    <option value="policy">📋 Policy & Regulation</option>
+                  </select>
+                </div>
 
-            <div class="form-group">
-              <label for="post-content">Content *</label>
-              <textarea
-                id="post-content"
-                rows="15"
-                required
-                placeholder="Write your blog post content here... You can use basic Markdown formatting."
-              ></textarea>
-              <small class="form-help"
-                >Supports basic Markdown: **bold**, *italic*, [links](url),
-                `code`, etc.</small
-              >
-            </div>
+                <div class="form-group">
+                  <label for="post-type" class="form-label">
+                    <span class="label-icon">📋</span>
+                    Content Type
+                  </label>
+                  <select id="post-type" class="form-select">
+                    <option value="research">Research Article</option>
+                    <option value="tutorial">Tutorial/Guide</option>
+                    <option value="case-study">Case Study</option>
+                    <option value="opinion">Opinion/Commentary</option>
+                    <option value="review">Literature Review</option>
+                    <option value="news">News/Updates</option>
+                  </select>
+                </div>
+              </div>
 
-            <div class="form-group">
-              <label for="post-tags">Tags</label>
-              <input
-                type="text"
-                id="post-tags"
-                placeholder="ai-ethics, education, bias (comma-separated)"
-              />
-            </div>
+              <div class="form-group">
+                <label for="post-summary" class="form-label">
+                  <span class="label-icon">📋</span>
+                  Executive Summary *
+                </label>
+                <textarea
+                  id="post-summary"
+                  class="form-textarea"
+                  rows="4"
+                  required
+                  maxlength="500"
+                  placeholder="Provide a compelling summary that captures the key insights, findings, or contributions of your article..."
+                  aria-describedby="summary-help"
+                ></textarea>
+                <small id="summary-help" class="form-help">
+                  <span class="help-item"
+                    >✓ Highlight key findings or insights</span
+                  >
+                  <span class="help-item"
+                    >✓ Include your main contribution</span
+                  >
+                  <span class="help-item">✓ Make it engaging for readers</span>
+                </small>
+              </div>
 
-            <div class="form-actions">
-              <button type="button" class="btn btn-outline" id="save-draft-btn">
-                💾 Save Draft
-              </button>
-              <button type="submit" class="btn btn-primary">
-                📤 Publish Post
-              </button>
-            </div>
-          </form>
+              <div class="form-group">
+                <label for="post-content" class="form-label">
+                  <span class="label-icon">📄</span>
+                  Article Content *
+                </label>
+                <div class="content-editor">
+                  <div class="editor-toolbar">
+                    <div class="toolbar-group">
+                      <button
+                        type="button"
+                        class="toolbar-btn"
+                        data-action="bold"
+                        title="Bold"
+                      >
+                        <strong>B</strong>
+                      </button>
+                      <button
+                        type="button"
+                        class="toolbar-btn"
+                        data-action="italic"
+                        title="Italic"
+                      >
+                        <em>I</em>
+                      </button>
+                      <button
+                        type="button"
+                        class="toolbar-btn"
+                        data-action="link"
+                        title="Link"
+                      >
+                        🔗
+                      </button>
+                    </div>
+                    <div class="toolbar-group">
+                      <button
+                        type="button"
+                        class="toolbar-btn"
+                        data-action="heading"
+                        title="Heading"
+                      >
+                        H
+                      </button>
+                      <button
+                        type="button"
+                        class="toolbar-btn"
+                        data-action="list"
+                        title="List"
+                      >
+                        📋
+                      </button>
+                      <button
+                        type="button"
+                        class="toolbar-btn"
+                        data-action="quote"
+                        title="Quote"
+                      >
+                        💭
+                      </button>
+                    </div>
+                  </div>
+                  <textarea
+                    id="post-content"
+                    class="form-textarea content-textarea"
+                    rows="20"
+                    required
+                    placeholder="Write your article content here...
+
+You can use Markdown formatting:
+- **Bold text** and *italic text*
+- ## Headings and ### Subheadings
+- [Links](https://example.com)
+- > Blockquotes for important notes
+- `Code snippets` and code blocks
+- Lists and numbered lists
+
+For research articles, consider including:
+- Introduction and background
+- Methodology (if applicable)
+- Key findings or insights
+- Discussion and implications
+- Conclusion and future work
+- References and citations"
+                  ></textarea>
+                </div>
+                <div class="content-help">
+                  <div class="help-section">
+                    <h4>📊 Research Article Structure</h4>
+                    <ul>
+                      <li>Clear introduction with context</li>
+                      <li>Methodology or approach</li>
+                      <li>Results and key findings</li>
+                      <li>Discussion and implications</li>
+                      <li>Conclusion and future directions</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="post-tags" class="form-label">
+                    <span class="label-icon">🏷️</span>
+                    Tags & Keywords
+                  </label>
+                  <input
+                    type="text"
+                    id="post-tags"
+                    class="form-input"
+                    placeholder="ai-ethics, education, bias, fairness (comma-separated)"
+                    aria-describedby="tags-help"
+                  />
+                  <small id="tags-help" class="form-help">
+                    Use relevant keywords to help readers discover your content
+                  </small>
+                </div>
+
+                <div class="form-group">
+                  <label for="post-reading-time" class="form-label">
+                    <span class="label-icon">⏱️</span>
+                    Estimated Reading Time
+                  </label>
+                  <select id="post-reading-time" class="form-select">
+                    <option value="2">2-3 minutes (Quick Read)</option>
+                    <option value="5" selected>5-7 minutes (Standard)</option>
+                    <option value="10">10-15 minutes (In-depth)</option>
+                    <option value="20">20+ minutes (Comprehensive)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="author-options">
+                  <h4 class="options-title">
+                    <span class="title-icon">👤</span>
+                    Author Information
+                  </h4>
+                  <div class="checkbox-group">
+                    <label class="checkbox-container">
+                      <input type="checkbox" id="author-bio" checked />
+                      <span class="checkmark"></span>
+                      <span class="checkbox-label"
+                        >Include author bio and credentials</span
+                      >
+                    </label>
+                    <label class="checkbox-container">
+                      <input type="checkbox" id="allow-contact" />
+                      <span class="checkmark"></span>
+                      <span class="checkbox-label"
+                        >Allow readers to contact me about this article</span
+                      >
+                    </label>
+                    <label class="checkbox-container">
+                      <input type="checkbox" id="peer-review" />
+                      <span class="checkmark"></span>
+                      <span class="checkbox-label"
+                        >Submit for peer review (research articles)</span
+                      >
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <div class="primary-actions">
+                  <button
+                    type="button"
+                    class="btn btn-outline"
+                    id="save-draft-btn"
+                  >
+                    <span class="btn-icon">💾</span>
+                    <span class="btn-text">Save Draft</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    id="preview-btn"
+                  >
+                    <span class="btn-icon">👁️</span>
+                    <span class="btn-text">Preview</span>
+                  </button>
+                  <button type="submit" class="btn btn-primary">
+                    <span class="btn-icon">🚀</span>
+                    <span class="btn-text">Publish Article</span>
+                  </button>
+                </div>
+                <div class="secondary-actions">
+                  <button
+                    type="button"
+                    class="btn btn-link"
+                    id="guidelines-btn"
+                  >
+                    📋 View Contribution Guidelines
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Loading indicator -->
-    <div id="loading" class="loading" aria-hidden="true" role="status">
-      <div class="loading-spinner" aria-hidden="true"></div>
-      <p class="loading-text">Loading blog posts...</p>
+    <div id="loading" class="loading-enhanced" aria-hidden="true" role="status">
+      <div class="loading-container">
+        <div class="loading-spinner" aria-hidden="true"></div>
+        <div class="loading-content">
+          <p class="loading-text">Loading research articles...</p>
+          <p class="loading-subtext">Discovering insights from our community</p>
+        </div>
+        <div
+          class="loading-progress"
+          role="progressbar"
+          aria-label="Loading progress"
+          aria-valuenow="0"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        >
+          <div class="progress-bar"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Scripts -->
@@ -319,11 +1388,13 @@
     <script type="module">
       import AuthService from './src/js/services/auth-service.js';
       import FirebaseService from './src/js/services/firebase-service.js';
+      import ContributionService from './src/js/services/contribution-service.js';
 
       class BlogPage {
         constructor() {
           this.authService = new AuthService();
           this.firebaseService = new FirebaseService();
+          this.contributionService = new ContributionService();
           this.currentUser = null;
           this.posts = [];
           this.filteredPosts = [];
@@ -334,6 +1405,7 @@
         async init() {
           await this.authService.initialize();
           await this.firebaseService.initialize();
+          await this.contributionService.initialize();
 
           // Set up auth state listener
           this.authService.firebaseService.addAuthStateListener(user => {
@@ -345,19 +1417,39 @@
           await this.loadBlogPosts();
         }
 
-        updateUIForAuth() {
+        async updateUIForAuth() {
           const writePostBtn = document.getElementById('write-post-btn');
+          const contributionStatus = document.getElementById(
+            'contribution-status'
+          );
 
           if (this.currentUser && this.canWritePosts()) {
-            writePostBtn.style.display = 'inline-block';
+            writePostBtn.style.display = 'inline-flex';
+
+            // Update button text and status based on donor status
+            const guidelines =
+              await this.contributionService.getContributionGuidelines(
+                this.currentUser.uid
+              );
+
+            const btnText = guidelines.autoApproval
+              ? 'Share & Publish'
+              : 'Share Your Research';
+            writePostBtn.querySelector('.btn-text').textContent = btnText;
+
+            if (contributionStatus) {
+              contributionStatus.textContent = guidelines.autoApproval
+                ? 'Instant publication as a valued donor'
+                : 'Join our community of contributors';
+            }
           } else {
             writePostBtn.style.display = 'none';
           }
         }
 
         canWritePosts() {
-          // Check if user has writing privileges (tier 1+ or team member)
-          return this.currentUser && this.authService.userProfile?.tier >= 1;
+          // All authenticated users can write posts
+          return this.currentUser && this.contributionService.canContribute();
         }
 
         async loadBlogPosts() {
@@ -573,6 +1665,40 @@
               this.showWritePostModal();
             });
 
+          // New submission modal event handlers
+          document
+            .getElementById('close-submission-modal')
+            ?.addEventListener('click', () => {
+              this.hideWritePostModal();
+            });
+
+          // Close modal when clicking outside
+          document
+            .getElementById('blog-submission-modal')
+            ?.addEventListener('click', e => {
+              if (e.target.id === 'blog-submission-modal') {
+                this.hideWritePostModal();
+              }
+            });
+
+          // Character counters
+          this.setupCharacterCounters();
+
+          // Form submission
+          document
+            .getElementById('blog-submission-form')
+            ?.addEventListener('submit', e => {
+              e.preventDefault();
+              this.handleBlogSubmission();
+            });
+
+          // Save draft functionality
+          document
+            .getElementById('save-draft-btn')
+            ?.addEventListener('click', () => {
+              this.saveDraft();
+            });
+
           // Filters
           document
             .getElementById('category-filter')
@@ -594,20 +1720,57 @@
               this.renderBlogPosts();
             });
 
-          // Write post form
+          // Old modal handlers (kept for compatibility)
           document
             .getElementById('write-post-form')
-            .addEventListener('submit', e => {
+            ?.addEventListener('submit', e => {
               e.preventDefault();
               this.handlePostSubmission();
             });
 
-          // Modal close
           document
             .querySelector('#write-post-modal .modal-close')
-            .addEventListener('click', () => {
+            ?.addEventListener('click', () => {
               this.hideWritePostModal();
             });
+        }
+
+        setupCharacterCounters() {
+          const counters = [
+            { input: 'article-title', counter: 'title-char-count', max: 150 },
+            {
+              input: 'article-subtitle',
+              counter: 'subtitle-char-count',
+              max: 200,
+            },
+            {
+              input: 'article-excerpt',
+              counter: 'excerpt-char-count',
+              max: 300,
+            },
+            { input: 'author-bio', counter: 'bio-char-count', max: 250 },
+          ];
+
+          counters.forEach(({ input, counter, max }) => {
+            const inputElement = document.getElementById(input);
+            const counterElement = document.getElementById(counter);
+
+            if (inputElement && counterElement) {
+              inputElement.addEventListener('input', () => {
+                const length = inputElement.value.length;
+                counterElement.textContent = `${length}/${max}`;
+
+                // Add warning color when approaching limit
+                if (length > max * 0.9) {
+                  counterElement.style.color = 'var(--warning-color)';
+                } else if (length === max) {
+                  counterElement.style.color = 'var(--error-color)';
+                } else {
+                  counterElement.style.color = 'var(--text-muted)';
+                }
+              });
+            }
+          });
         }
 
         filterPosts() {
@@ -643,7 +1806,7 @@
           }
         }
 
-        showWritePostModal() {
+        async showWritePostModal() {
           if (!this.canWritePosts()) {
             alert(
               'You need to be a research contributor (tier 1+) to write blog posts.'
@@ -651,19 +1814,277 @@
             return;
           }
 
-          document.getElementById('write-post-modal').style.display = 'block';
+          // Show our new enhanced modal
+          const modal = document.getElementById('blog-submission-modal');
+          modal.classList.add('show');
           document.body.style.overflow = 'hidden';
+
+          // Update UI based on donor status
+          await this.updateSubmissionModalForUser();
         }
 
         hideWritePostModal() {
-          document.getElementById('write-post-modal').style.display = 'none';
+          const modal = document.getElementById('blog-submission-modal');
+          modal.classList.remove('show');
           document.body.style.overflow = 'auto';
+          this.resetSubmissionForm();
+        }
+
+        async updateSubmissionModalForUser() {
+          const donorBenefits = document.getElementById('donor-benefits-info');
+          const statusBanner = document.getElementById(
+            'submission-status-banner'
+          );
+          const statusIcon = document.getElementById('status-icon');
+          const statusMessage = document.getElementById('status-message');
+          const contributionStatus = document.getElementById(
+            'contribution-status'
+          );
+
+          if (this.currentUser) {
+            const guidelines =
+              await this.contributionService.getContributionGuidelines(
+                this.currentUser.uid
+              );
+
+            if (guidelines.autoApproval) {
+              // Show donor benefits
+              donorBenefits.style.display = 'block';
+              statusBanner.style.display = 'flex';
+              statusBanner.className = 'status-banner success';
+              statusIcon.textContent = '👑';
+              statusMessage.textContent =
+                'Your article will be published immediately upon submission!';
+              contributionStatus.textContent =
+                'Instant publication as a valued donor';
+            } else {
+              // Show regular submission process
+              donorBenefits.style.display = 'none';
+              statusBanner.style.display = 'flex';
+              statusBanner.className = 'status-banner';
+              statusIcon.textContent = 'ℹ️';
+              statusMessage.textContent =
+                'Your submission will be reviewed before publication (typically within 24 hours).';
+              contributionStatus.textContent =
+                'Share your expertise with the community';
+            }
+          }
+        }
+
+        resetSubmissionForm() {
+          const form = document.getElementById('blog-submission-form');
+          form.reset();
+
+          // Reset character counters
+          document.getElementById('title-char-count').textContent = '0/150';
+          document.getElementById('subtitle-char-count').textContent = '0/200';
+          document.getElementById('excerpt-char-count').textContent = '0/300';
+          document.getElementById('bio-char-count').textContent = '0/250';
+
+          // Hide status banners
+          document.getElementById('submission-status-banner').style.display =
+            'none';
+        }
+
+        async handleBlogSubmission() {
+          try {
+            const submitBtn = document.getElementById('submit-article-btn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const originalText = btnText.textContent;
+
+            // Show loading state
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+
+            // Collect form data
+            const formData = {
+              title: document.getElementById('article-title').value.trim(),
+              subtitle: document
+                .getElementById('article-subtitle')
+                .value.trim(),
+              category: document.getElementById('article-category').value,
+              tags: document.getElementById('article-tags').value.trim(),
+              excerpt: document.getElementById('article-excerpt').value.trim(),
+              content: document.getElementById('article-content').value.trim(),
+              authorBio: document.getElementById('author-bio').value.trim(),
+              affiliation: document
+                .getElementById('author-affiliation')
+                .value.trim(),
+              agreeTerms: document.getElementById('agree-terms').checked,
+              agreeReview: document.getElementById('agree-review').checked,
+            };
+
+            // Validate required fields
+            if (
+              !formData.title ||
+              !formData.category ||
+              !formData.excerpt ||
+              !formData.content ||
+              !formData.agreeTerms
+            ) {
+              throw new Error(
+                'Please fill in all required fields and agree to the terms.'
+              );
+            }
+
+            // Process tags
+            const tagsArray = formData.tags
+              ? formData.tags
+                  .split(',')
+                  .map(tag => tag.trim())
+                  .filter(tag => tag)
+              : [];
+
+            // Create submission object
+            const submission = {
+              type: 'blog',
+              title: formData.title,
+              subtitle: formData.subtitle,
+              excerpt: formData.excerpt,
+              content: formData.content,
+              category: formData.category,
+              tags: tagsArray,
+              authorBio: formData.authorBio,
+              affiliation: formData.affiliation,
+              metadata: {
+                wordCount: formData.content.split(/\s+/).length,
+                estimatedReadTime: Math.ceil(
+                  formData.content.split(/\s+/).length / 200
+                ),
+                submissionSource: 'blog-page',
+              },
+            };
+
+            // Submit through ContributionService
+            const result =
+              await this.contributionService.submitBlogPost(submission);
+
+            // Show success message
+            this.showSubmissionSuccess(result);
+
+            // Close modal and refresh
+            this.hideWritePostModal();
+            await this.loadBlogPosts();
+          } catch (error) {
+            console.error('Blog submission error:', error);
+            this.showSubmissionError(error.message);
+          } finally {
+            // Reset button state
+            const submitBtn = document.getElementById('submit-article-btn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+            btnText.textContent = 'Submit Article';
+          }
+        }
+
+        showSubmissionSuccess(result) {
+          const message = result.autoApproved
+            ? '🎉 Your article has been published successfully!'
+            : "✅ Your article has been submitted for review. You'll receive an email when it's approved.";
+
+          // You could integrate with your notification system here
+          alert(message);
+        }
+
+        showSubmissionError(message) {
+          const errorMessage = `❌ Submission failed: ${message}`;
+          alert(errorMessage);
+        }
+
+        async saveDraft() {
+          try {
+            const formData = {
+              title: document.getElementById('article-title').value.trim(),
+              subtitle: document
+                .getElementById('article-subtitle')
+                .value.trim(),
+              category: document.getElementById('article-category').value,
+              tags: document.getElementById('article-tags').value.trim(),
+              excerpt: document.getElementById('article-excerpt').value.trim(),
+              content: document.getElementById('article-content').value.trim(),
+              authorBio: document.getElementById('author-bio').value.trim(),
+              affiliation: document
+                .getElementById('author-affiliation')
+                .value.trim(),
+            };
+
+            // Save to localStorage as draft
+            const draftKey = `blog-draft-${Date.now()}`;
+            localStorage.setItem(
+              draftKey,
+              JSON.stringify({
+                ...formData,
+                savedAt: new Date().toISOString(),
+                type: 'blog-draft',
+              })
+            );
+
+            alert('💾 Draft saved successfully!');
+          } catch (error) {
+            console.error('Error saving draft:', error);
+            alert('❌ Failed to save draft. Please try again.');
+          }
         }
 
         async handlePostSubmission() {
-          // TODO: Implement post submission to Firebase
-          alert('Post submission - Firebase integration coming soon!');
-          this.hideWritePostModal();
+          try {
+            // Get form data
+            const title = document.getElementById('post-title').value.trim();
+            const summary = document
+              .getElementById('post-summary')
+              .value.trim();
+            const content = document
+              .getElementById('post-content')
+              .value.trim();
+            const category = document.getElementById('post-category').value;
+            const tags = document
+              .getElementById('post-tags')
+              .value.split(',')
+              .map(tag => tag.trim())
+              .filter(Boolean);
+            const readingTime =
+              document.getElementById('post-reading-time').value;
+
+            // Validate required fields
+            if (!title || !summary || !content) {
+              this.showError('Please fill in all required fields');
+              return;
+            }
+
+            this.showLoading(true);
+
+            // Submit post through contribution service
+            const result = await this.contributionService.submitBlogPost({
+              title,
+              summary,
+              content,
+              category,
+              tags,
+              readingTime: parseInt(readingTime, 10),
+              submissionMethod: 'blog_form',
+            });
+
+            this.showLoading(false);
+            this.hideWritePostModal();
+
+            // Show success message based on approval status
+            if (result.autoApproved) {
+              this.showSuccess(`🎉 ${result.message} Your post is now live!`);
+              // Refresh posts to show the new one
+              await this.loadBlogPosts();
+            } else {
+              this.showSuccess(
+                `📋 ${result.message} We'll notify you when it's reviewed.`
+              );
+            }
+
+            // Clear form
+            document.getElementById('write-post-form').reset();
+          } catch (error) {
+            this.showLoading(false);
+            this.showError(`Failed to submit post: ${error.message}`);
+          }
         }
 
         showLoading(show) {
@@ -674,7 +2095,20 @@
 
         showError(message) {
           // TODO: Use notification toast
-          console.error(message);
+          if (window.NotificationToast) {
+            window.NotificationToast.show(message, 'error');
+          } else {
+            alert(`Error: ${message}`);
+          }
+        }
+
+        showSuccess(message) {
+          // TODO: Use notification toast
+          if (window.NotificationToast) {
+            window.NotificationToast.show(message, 'success');
+          } else {
+            alert(message);
+          }
         }
       }
 
@@ -682,5 +2116,8 @@
       window.blogPage = new BlogPage();
       window.blogPage.init();
     </script>
+
+    <!-- Enhanced Blog JavaScript -->
+    <script src="src/js/enhanced-blog.js" defer></script>
   </body>
 </html>

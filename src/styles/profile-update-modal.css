@@ -158,6 +158,60 @@
   color: #fff;
 }
 
+/* Emoji Avatar Section */
+.emoji-avatar-section,
+.traditional-avatar-section {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.emoji-avatar-section h4,
+.traditional-avatar-section h4 {
+  margin: 0 0 12px 0;
+  color: #374151;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.emoji-avatar-option {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #e5e7eb;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.emoji-avatar-option:hover {
+  border-color: #4f46e5;
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.15);
+}
+
+.emoji-avatar-option:active,
+.emoji-avatar-option.selected {
+  border-color: #4f46e5;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  transform: scale(1.05);
+}
+
 /* Benefits Section */
 .profile-benefits {
   margin-bottom: 24px;
@@ -306,5 +360,24 @@
   }
   100% {
     transform: translateX(100%);
+  }
+}
+
+/* Responsive emoji grid */
+@media (max-width: 640px) {
+  .emoji-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .emoji-avatar-option {
+    width: 35px;
+    height: 35px;
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .emoji-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }

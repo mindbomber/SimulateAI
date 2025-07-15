@@ -51,15 +51,33 @@ import {
 /**
  * Firebase configuration and initialization
  */
-const firebaseConfig = {
-  apiKey: 'AIzaSyAwoc3L-43aXyNjNB9ncGbFm7eE-yn5bFA',
-  authDomain: 'simulateai-research.firebaseapp.com',
-  projectId: 'simulateai-research',
-  storageBucket: 'simulateai-research.firebasestorage.app',
-  messagingSenderId: '52924445915',
-  appId: '1:52924445915:web:dadca1a93bc382403a08fe',
-  measurementId: 'G-XW8H062BMV',
+const getFirebaseConfig = () => {
+  // Try to get from environment config utility first
+  if (window.envConfig) {
+    return window.envConfig.getFirebaseConfig();
+  }
+
+  // Fallback to import.meta.env (Vite environment variables)
+  if (import.meta.env) {
+    return {
+      apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+      authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+      storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+      appId: import.meta.env.VITE_FIREBASE_APP_ID,
+      measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+    };
+  }
+
+  // Last resort fallback (for development only)
+  console.error('Firebase configuration not found in environment variables');
+  throw new Error(
+    'Firebase configuration missing - please set environment variables'
+  );
 };
+
+const firebaseConfig = getFirebaseConfig();
 
 /**
  * Main Firebase Service Class

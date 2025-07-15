@@ -8,45 +8,69 @@
     />
     <meta name="theme-color" content="#1a73e8" />
     <meta name="color-scheme" content="light" />
-    <title>Forum - SimulateAI</title>
+    <title>
+      Community Forum - SimulateAI | Discussions on AI Ethics & Education
+    </title>
     <meta
       name="description"
-      content="Join discussions about AI ethics, education, and simulation-based learning"
+      content="Join vibrant discussions about AI ethics, educational methodology, and simulation-based learning with our global community of researchers, educators, and learners"
+    />
+    <meta
+      name="keywords"
+      content="AI ethics forum, educational discussion, simulation learning, community forum, research collaboration, ethics education"
+    />
+    <meta name="author" content="SimulateAI Educational Platform" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Community Forum - SimulateAI | Discussions on AI Ethics & Education"
+    />
+    <meta
+      property="og:description"
+      content="Join vibrant discussions about AI ethics, educational methodology, and simulation-based learning with our global community"
+    />
+    <meta property="og:url" content="https://simulateai.org/forum.html" />
+    <meta
+      property="og:image"
+      content="https://simulateai.org/src/assets/images/forum-preview.jpg"
     />
 
-    <!-- Same CSS includes as main app -->
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Community Forum - SimulateAI" />
+    <meta
+      name="twitter:description"
+      content="Discussions on AI Ethics & Education"
+    />
+
+    <!-- Accessibility -->
+    <meta
+      name="accessibility-features"
+      content="keyboard-navigation,skip-links,high-contrast,large-text,screen-reader-support"
+    />
+
+    <!-- Enhanced CSS Architecture for Forum -->
+    <link rel="stylesheet" href="src/styles/enhanced-forum.css" />
     <link rel="stylesheet" href="src/styles/main.css" />
     <link rel="stylesheet" href="src/styles/accessibility.css" />
-    <link rel="stylesheet" href="src/styles/simulations.css" />
     <link rel="stylesheet" href="src/styles/layout-components.css" />
     <link rel="stylesheet" href="src/styles/advanced-ui-components.css" />
-    <link rel="stylesheet" href="src/styles/enhanced-objects.css" />
-    <link rel="stylesheet" href="src/styles/input-utility-components.css" />
     <link rel="stylesheet" href="src/styles/form-input-components.css" />
     <link rel="stylesheet" href="src/styles/notification-toast.css" />
-    <link rel="stylesheet" href="src/styles/onboarding-tour.css" />
-    <link rel="stylesheet" href="src/styles/radar-chart.css" />
-    <link rel="stylesheet" href="src/styles/scenario-modal.css" />
     <link rel="stylesheet" href="src/styles/card-component.css" />
     <link rel="stylesheet" href="src/styles/loader-spinner.css" />
-    <link rel="stylesheet" href="src/styles/hero-demo.css" />
-    <link rel="stylesheet" href="src/styles/bias-fairness.css" />
-    <link rel="stylesheet" href="src/styles/category-grid.css" />
-    <link rel="stylesheet" href="src/styles/ethics-analysis.css" />
-    <link rel="stylesheet" href="src/styles/layout-fixes.css" />
-    <link rel="stylesheet" href="src/styles/ethics-explorer.css" />
-    <link rel="stylesheet" href="src/styles/badge-modal.css" />
-    <link rel="stylesheet" href="src/styles/community-features.css" />
-    <link
-      rel="stylesheet"
-      href="src/styles/simulation-modal-consolidated.css"
-    />
+    <link rel="stylesheet" href="src/styles/blog-submission.css" />
 
     <!-- Icons and Favicons -->
     <link rel="icon" type="image/svg+xml" href="src/assets/icons/favicon.svg" />
+    <link rel="icon" type="image/png" href="src/assets/icons/favicon.png" />
   </head>
-  <body>
+
+  <body class="forum-page">
     <!-- Skip to content for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
     <!-- ARIA live regions for announcements -->
@@ -63,142 +87,396 @@
       class="sr-only"
     ></div>
 
-    <!-- Header (same as main app) -->
-    <header class="header" role="banner">
+    <!-- Enhanced Header -->
+    <header class="forum-header" role="banner">
       <div class="header-container">
-        <div class="logo">
-          <a href="index.html">
-            <img
-              src="src/assets/icons/logo.svg"
-              alt="SimulateAI Educational Platform"
-              class="logo-image"
-            />
-            <h1 class="site-title">SimulateAI</h1>
-          </a>
+        <div class="header-content">
+          <!-- Logo Section -->
+          <div class="logo-section">
+            <a href="index.html" class="logo-link" aria-label="SimulateAI Home">
+              <div class="logo-icon">🧠</div>
+              <div class="logo-text">
+                <span class="logo-title">SimulateAI</span>
+                <span class="logo-subtitle">Community Forum</span>
+              </div>
+            </a>
+          </div>
+
+          <!-- Navigation -->
+          <nav
+            class="header-nav"
+            role="navigation"
+            aria-label="Main navigation"
+          >
+            <ul class="nav-links">
+              <li>
+                <a href="index.html" class="nav-link">
+                  <span class="nav-icon">🏠</span>
+                  <span class="nav-text">Home</span>
+                </a>
+              </li>
+              <li>
+                <a href="index.html#categories" class="nav-link">
+                  <span class="nav-icon">📚</span>
+                  <span class="nav-text">Simulations</span>
+                </a>
+              </li>
+              <li>
+                <a href="blog.html" class="nav-link">
+                  <span class="nav-icon">📝</span>
+                  <span class="nav-text">Blog</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="forum.html"
+                  class="nav-link active"
+                  aria-current="page"
+                >
+                  <span class="nav-icon">💬</span>
+                  <span class="nav-text">Forum</span>
+                </a>
+              </li>
+              <li>
+                <a href="profile.html" class="nav-link">
+                  <span class="nav-icon">👤</span>
+                  <span class="nav-text">Profile</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+
+          <!-- Header Actions -->
+          <div class="header-actions">
+            <button
+              class="search-toggle"
+              aria-label="Toggle search"
+              id="header-search-toggle"
+            >
+              <span class="search-icon">🔍</span>
+            </button>
+
+            <!-- User Authentication Section -->
+            <div class="auth-section" id="auth-section">
+              <div class="user-menu" id="user-menu" style="display: none">
+                <div class="user-avatar" id="user-avatar">U</div>
+                <span class="user-name" id="user-name">User</span>
+              </div>
+              <div class="auth-buttons" id="auth-buttons">
+                <button class="btn btn-outline btn-small" id="login-btn">
+                  Sign In
+                </button>
+                <button class="btn btn-primary btn-small" id="signup-btn">
+                  Join Community
+                </button>
+              </div>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button
+              class="mobile-menu-toggle"
+              aria-label="Toggle navigation menu"
+              aria-expanded="false"
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+          </div>
         </div>
-
-        <!-- Mobile hamburger button -->
-        <button
-          class="nav-toggle"
-          aria-label="Toggle navigation menu"
-          aria-expanded="false"
-          aria-controls="main-navigation"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-
-        <nav
-          class="main-nav"
-          role="navigation"
-          aria-label="Main navigation"
-          id="main-navigation"
-        >
-          <ul class="nav-list">
-            <li><a href="index.html" class="nav-link">Home</a></li>
-            <li>
-              <a href="index.html#categories" class="nav-link">Categories</a>
-            </li>
-            <li><a href="blog.html" class="nav-link">Blog</a></li>
-            <li>
-              <a href="#forum" class="nav-link active" aria-current="page"
-                >Forum</a
-              >
-            </li>
-            <li><a href="profile.html" class="nav-link">Profile</a></li>
-            <!-- User auth buttons will be added by JavaScript -->
-          </ul>
-        </nav>
       </div>
-      <div class="nav-backdrop" aria-hidden="true"></div>
     </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-container">
+        <div class="hero-content">
+          <div class="hero-badge">
+            <span class="badge-icon">🌟</span>
+            <span class="badge-text">Community-Driven Learning</span>
+          </div>
+
+          <h1 class="hero-title">Join the Conversation on AI Ethics</h1>
+
+          <p class="hero-description">
+            Connect with researchers, educators, and learners from around the
+            world. Share insights, ask questions, and collaborate on advancing
+            responsible AI education.
+          </p>
+
+          <!-- Community Stats -->
+          <div class="hero-stats">
+            <div class="stat-item">
+              <span class="stat-number" id="total-discussions">500+</span>
+              <span class="stat-label">Active Discussions</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number" id="total-members">2.8K</span>
+              <span class="stat-label">Community Members</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number" id="total-replies">12K+</span>
+              <span class="stat-label">Helpful Replies</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number" id="expert-contributors">150+</span>
+              <span class="stat-label">Expert Contributors</span>
+            </div>
+          </div>
+
+          <!-- Call to Action -->
+          <div class="hero-actions">
+            <button
+              class="btn btn-primary btn-large contribution-btn"
+              id="start-discussion-btn"
+            >
+              <span class="btn-icon">💬</span>
+              <span class="btn-text">Start a Discussion</span>
+              <span class="btn-subtitle" id="forum-contribution-status"
+                >Share your thoughts with the community</span
+              >
+            </button>
+            <button
+              class="btn btn-outline btn-large"
+              id="browse-discussions-btn"
+            >
+              <span class="btn-icon">🔍</span>
+              <span class="btn-text">Browse Discussions</span>
+            </button>
+            <a href="blog.html" class="btn btn-secondary btn-large">
+              <span class="btn-icon">📚</span>
+              <span class="btn-text">Read Research</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- Main Content -->
     <main id="main-content" class="main-content" role="main">
-      <!-- Forum Header -->
-      <section class="forum-header">
+      <!-- Advanced Search & Filter Bar -->
+      <section class="search-filter-section">
         <div class="container">
-          <div class="forum-header-content">
-            <h1>💬 Community Forum</h1>
-            <p>
-              Join discussions about AI ethics, education, and simulation-based
-              learning with fellow learners and experts.
-            </p>
-
-            <!-- Forum Actions -->
-            <div class="forum-actions">
-              <button
-                id="start-discussion-btn"
-                class="btn btn-primary"
-                style="display: none"
-              >
-                💬 Start Discussion
+          <div class="search-filter-container">
+            <div class="search-box">
+              <input
+                type="search"
+                id="forum-search"
+                placeholder="Search discussions, topics, authors..."
+                aria-label="Search forum discussions"
+                autocomplete="off"
+              />
+              <button class="search-btn" aria-label="Search">
+                <span class="search-icon">🔍</span>
               </button>
-              <div class="forum-search">
-                <input
-                  type="search"
-                  id="forum-search"
-                  placeholder="Search discussions..."
-                  aria-label="Search forum discussions"
-                />
-                <button class="search-btn" aria-label="Search">🔍</button>
-              </div>
             </div>
+
+            <div class="advanced-filters">
+              <div class="filter-group">
+                <label for="category-filter" class="filter-label"
+                  >Category</label
+                >
+                <select
+                  id="category-filter"
+                  class="filter-select"
+                  aria-label="Filter by category"
+                >
+                  <option value="">All Categories</option>
+                  <option value="general">💭 General Discussion</option>
+                  <option value="scenarios">🎭 Scenario Analysis</option>
+                  <option value="research">🔬 Research & Methods</option>
+                  <option value="feedback">💡 Platform Feedback</option>
+                  <option value="ethics">⚖️ Ethics & Philosophy</option>
+                  <option value="education">📚 Educational Strategies</option>
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <label for="status-filter" class="filter-label">Status</label>
+                <select
+                  id="status-filter"
+                  class="filter-select"
+                  aria-label="Filter by discussion status"
+                >
+                  <option value="">All Discussions</option>
+                  <option value="active">🔥 Active</option>
+                  <option value="solved">✅ Solved</option>
+                  <option value="pinned">📌 Pinned</option>
+                  <option value="trending">📈 Trending</option>
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <label for="sort-filter" class="filter-label">Sort By</label>
+                <select
+                  id="sort-filter"
+                  class="filter-select"
+                  aria-label="Sort discussions"
+                >
+                  <option value="recent">📅 Most Recent</option>
+                  <option value="popular">🔥 Most Popular</option>
+                  <option value="active">💬 Most Active</option>
+                  <option value="solved">✅ Recently Solved</option>
+                  <option value="unanswered">❓ Unanswered</option>
+                </select>
+              </div>
+
+              <button id="clear-filters" class="btn btn-outline clear-filters">
+                <span class="btn-icon">🗑️</span>
+                Clear All
+              </button>
+            </div>
+          </div>
+
+          <!-- Active Filters Display -->
+          <div id="active-filters" class="active-filters" style="display: none">
+            <span class="active-filters-label">Active Filters:</span>
+            <div class="filter-tags" id="filter-tags-container"></div>
           </div>
         </div>
       </section>
 
-      <!-- Forum Categories -->
-      <section class="forum-categories">
+      <!-- Featured Discussions -->
+      <section class="featured-discussions-section">
         <div class="container">
-          <h2>📁 Discussion Categories</h2>
+          <div class="section-header">
+            <h2 class="section-title">
+              <span class="title-icon">⭐</span>
+              Featured Discussions
+            </h2>
+            <p class="section-description">
+              Highlighted conversations that showcase exceptional insights and
+              community collaboration.
+            </p>
+          </div>
+
+          <div class="featured-discussions-grid" id="featured-discussions-grid">
+            <!-- Featured discussions will be populated by JavaScript -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Discussion Categories -->
+      <section class="categories-showcase">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">
+              <span class="title-icon">📁</span>
+              Discussion Categories
+            </h2>
+            <p class="section-description">
+              Explore conversations organized by topic areas to find discussions
+              that interest you most.
+            </p>
+          </div>
+
           <div class="categories-grid">
             <div class="category-card" data-category="general">
-              <div class="category-header">
-                <span class="category-icon">💭</span>
-                <h3>General Discussion</h3>
-              </div>
-              <p>Open discussions about AI ethics and education</p>
+              <div class="category-icon">💭</div>
+              <h3 class="category-title">General Discussion</h3>
+              <p class="category-description">
+                Open conversations about AI ethics, education, and related
+                topics
+              </p>
               <div class="category-stats">
-                <span class="discussion-count">12 discussions</span>
-                <span class="recent-activity">Last activity: 2 hours ago</span>
+                <span class="stat-item">
+                  <span class="stat-number" id="general-count">48</span>
+                  <span class="stat-label">Discussions</span>
+                </span>
+                <span class="stat-item">
+                  <span class="stat-number">2 hours</span>
+                  <span class="stat-label">Last Activity</span>
+                </span>
               </div>
             </div>
 
             <div class="category-card" data-category="scenarios">
-              <div class="category-header">
-                <span class="category-icon">🎭</span>
-                <h3>Scenario Discussions</h3>
-              </div>
-              <p>Share insights about specific simulation scenarios</p>
+              <div class="category-icon">🎭</div>
+              <h3 class="category-title">Scenario Analysis</h3>
+              <p class="category-description">
+                Deep dives into specific simulation scenarios and case studies
+              </p>
               <div class="category-stats">
-                <span class="discussion-count">8 discussions</span>
-                <span class="recent-activity">Last activity: 1 day ago</span>
+                <span class="stat-item">
+                  <span class="stat-number" id="scenarios-count">32</span>
+                  <span class="stat-label">Discussions</span>
+                </span>
+                <span class="stat-item">
+                  <span class="stat-number">1 day</span>
+                  <span class="stat-label">Last Activity</span>
+                </span>
               </div>
             </div>
 
             <div class="category-card" data-category="research">
-              <div class="category-header">
-                <span class="category-icon">🔬</span>
-                <h3>Research & Methodology</h3>
-              </div>
-              <p>Academic discussions and research insights</p>
+              <div class="category-icon">🔬</div>
+              <h3 class="category-title">Research & Methods</h3>
+              <p class="category-description">
+                Academic discussions, methodology, and research insights
+              </p>
               <div class="category-stats">
-                <span class="discussion-count">5 discussions</span>
-                <span class="recent-activity">Last activity: 3 days ago</span>
+                <span class="stat-item">
+                  <span class="stat-number" id="research-count">28</span>
+                  <span class="stat-label">Discussions</span>
+                </span>
+                <span class="stat-item">
+                  <span class="stat-number">3 hours</span>
+                  <span class="stat-label">Last Activity</span>
+                </span>
               </div>
             </div>
 
             <div class="category-card" data-category="feedback">
-              <div class="category-header">
-                <span class="category-icon">💡</span>
-                <h3>Feature Feedback</h3>
-              </div>
-              <p>Suggestions and feedback for platform improvements</p>
+              <div class="category-icon">💡</div>
+              <h3 class="category-title">Platform Feedback</h3>
+              <p class="category-description">
+                Suggestions, feature requests, and platform improvements
+              </p>
               <div class="category-stats">
-                <span class="discussion-count">15 discussions</span>
-                <span class="recent-activity">Last activity: 5 hours ago</span>
+                <span class="stat-item">
+                  <span class="stat-number" id="feedback-count">56</span>
+                  <span class="stat-label">Discussions</span>
+                </span>
+                <span class="stat-item">
+                  <span class="stat-number">5 hours</span>
+                  <span class="stat-label">Last Activity</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="category-card" data-category="ethics">
+              <div class="category-icon">⚖️</div>
+              <h3 class="category-title">Ethics & Philosophy</h3>
+              <p class="category-description">
+                Philosophical discussions about AI ethics and moral frameworks
+              </p>
+              <div class="category-stats">
+                <span class="stat-item">
+                  <span class="stat-number" id="ethics-count">41</span>
+                  <span class="stat-label">Discussions</span>
+                </span>
+                <span class="stat-item">
+                  <span class="stat-number">4 hours</span>
+                  <span class="stat-label">Last Activity</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="category-card" data-category="education">
+              <div class="category-icon">📚</div>
+              <h3 class="category-title">Educational Strategies</h3>
+              <p class="category-description">
+                Teaching methods, curricula, and educational best practices
+              </p>
+              <div class="category-stats">
+                <span class="stat-item">
+                  <span class="stat-number" id="education-count">35</span>
+                  <span class="stat-label">Discussions</span>
+                </span>
+                <span class="stat-item">
+                  <span class="stat-number">6 hours</span>
+                  <span class="stat-label">Last Activity</span>
+                </span>
               </div>
             </div>
           </div>
@@ -206,70 +484,485 @@
       </section>
 
       <!-- Recent Discussions -->
-      <section class="recent-discussions">
+      <section class="recent-discussions-section">
         <div class="container">
-          <div class="discussions-header">
-            <h2>🔥 Recent Discussions</h2>
-            <div class="discussion-filters">
-              <select id="category-filter" aria-label="Filter by category">
-                <option value="">All Categories</option>
-                <option value="general">💭 General</option>
-                <option value="scenarios">🎭 Scenarios</option>
-                <option value="research">🔬 Research</option>
-                <option value="feedback">💡 Feedback</option>
-              </select>
-              <select id="sort-filter" aria-label="Sort discussions">
-                <option value="recent">Most Recent</option>
-                <option value="popular">Most Popular</option>
-                <option value="active">Most Active</option>
-              </select>
+          <div class="section-header">
+            <h2 class="section-title">
+              <span class="title-icon">�</span>
+              Recent Discussions
+            </h2>
+            <div class="view-options">
+              <button
+                class="view-btn active"
+                data-view="card"
+                aria-label="Card view"
+              >
+                <span class="view-icon">▦</span>
+              </button>
+              <button class="view-btn" data-view="list" aria-label="List view">
+                <span class="view-icon">☰</span>
+              </button>
             </div>
           </div>
 
-          <div id="discussions-container" class="discussions-container">
+          <!-- Results Summary -->
+          <div class="results-summary">
+            <span id="results-count" class="results-count"
+              >Showing all discussions</span
+            >
+            <span class="results-meta" id="results-meta"></span>
+          </div>
+
+          <div
+            id="discussions-container"
+            class="discussions-container card-view"
+          >
             <!-- Discussions will be populated by JavaScript -->
           </div>
 
-          <!-- Load More Button -->
-          <div class="load-more-container">
-            <button id="load-more-btn" class="btn btn-outline">
-              Load More Discussions
+          <!-- Enhanced Load More -->
+          <div class="load-more-section">
+            <button id="load-more-btn" class="btn btn-primary load-more-btn">
+              <span class="btn-icon">⬇️</span>
+              <span class="btn-text">Load More Discussions</span>
+              <span class="btn-meta" id="load-more-count">(10 more)</span>
             </button>
+
+            <div class="pagination-info">
+              <span id="pagination-status"
+                >Showing 1-10 of 50+ discussions</span
+              >
+              <button id="jump-to-top" class="btn btn-outline btn-small">
+                <span class="btn-icon">↑</span>
+                Back to Top
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Community Guidelines -->
+      <section class="guidelines-section">
+        <div class="container">
+          <div class="guidelines-card">
+            <div class="guidelines-content">
+              <h2 class="guidelines-title">
+                <span class="title-icon">📋</span>
+                Community Guidelines
+              </h2>
+              <div class="guidelines-grid">
+                <div class="guideline-item">
+                  <div class="guideline-icon">🤝</div>
+                  <h3>Be Respectful</h3>
+                  <p>Treat all community members with respect and kindness</p>
+                </div>
+                <div class="guideline-item">
+                  <div class="guideline-icon">🔍</div>
+                  <h3>Stay Evidence-Based</h3>
+                  <p>
+                    Support discussions with research, data, and credible
+                    sources
+                  </p>
+                </div>
+                <div class="guideline-item">
+                  <div class="guideline-icon">🎯</div>
+                  <h3>Keep it Relevant</h3>
+                  <p>
+                    Focus on AI ethics, education, and simulation-based learning
+                  </p>
+                </div>
+                <div class="guideline-item">
+                  <div class="guideline-icon">🌟</div>
+                  <h3>Be Constructive</h3>
+                  <p>
+                    Provide helpful feedback and contribute meaningful insights
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="guidelines-actions">
+              <a href="#full-guidelines" class="btn btn-outline">
+                <span class="btn-icon">📖</span>
+                <span class="btn-text">Read Full Guidelines</span>
+              </a>
+              <a href="#report" class="btn btn-secondary">
+                <span class="btn-icon">🚨</span>
+                <span class="btn-text">Report Content</span>
+              </a>
+            </div>
           </div>
         </div>
       </section>
     </main>
 
-    <!-- Footer (same as main app) -->
-    <footer class="footer" role="contentinfo">
-      <div class="footer-content">
-        <div class="footer-sections">
-          <div class="footer-section">
-            <h3>Community Guidelines</h3>
-            <p>
-              Please be respectful, constructive, and evidence-based in your
-              discussions. Personal attacks and off-topic content are not
-              allowed.
-            </p>
-          </div>
-          <div class="footer-section">
-            <h3>Moderation</h3>
-            <p>
-              Community supporters and education patrons help moderate
-              discussions. Report inappropriate content for review.
-            </p>
+    <!-- Discussion Thread Modal -->
+    <div
+      id="discussion-thread-modal"
+      class="modal submission-modal"
+      style="display: none"
+    >
+      <div class="modal-content thread-modal-container">
+        <div class="modal-header">
+          <h2 class="modal-title">
+            <span class="title-icon">💬</span>
+            <span id="thread-title">Discussion Thread</span>
+          </h2>
+          <button
+            class="modal-close"
+            id="close-thread-modal"
+            aria-label="Close modal"
+          >
+            <span class="close-icon">×</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Thread Content -->
+          <div class="thread-content">
+            <!-- Original Post -->
+            <div class="original-post" id="original-post">
+              <div class="post-header">
+                <div class="author-info">
+                  <div class="author-avatar" id="op-avatar">👤</div>
+                  <div class="author-details">
+                    <div class="author-name" id="op-name">Author Name</div>
+                    <div class="author-meta">
+                      <span class="author-tier" id="op-tier"
+                        >Community Member</span
+                      >
+                      <span class="post-date" id="op-date">2 days ago</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="post-actions">
+                  <button
+                    class="btn btn-outline btn-small"
+                    id="share-thread-btn"
+                  >
+                    <i class="fas fa-share"></i>
+                    Share
+                  </button>
+                  <button
+                    class="btn btn-outline btn-small"
+                    id="bookmark-thread-btn"
+                  >
+                    <i class="fas fa-bookmark"></i>
+                    Save
+                  </button>
+                </div>
+              </div>
+              <div class="post-content" id="op-content">
+                <!-- Original post content will be populated here -->
+              </div>
+              <div class="post-meta">
+                <div class="post-tags" id="op-tags">
+                  <!-- Tags will be populated here -->
+                </div>
+                <div class="post-stats">
+                  <span class="stat-item">
+                    <i class="fas fa-eye"></i>
+                    <span id="thread-views">0</span> views
+                  </span>
+                  <span class="stat-item">
+                    <i class="fas fa-reply"></i>
+                    <span id="thread-replies">0</span> replies
+                  </span>
+                  <span class="stat-item">
+                    <i class="fas fa-thumbs-up"></i>
+                    <span id="thread-likes">0</span> likes
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Replies Section -->
+            <div class="replies-section">
+              <div class="replies-header">
+                <h3 class="replies-title">
+                  <i class="fas fa-comments"></i>
+                  <span id="replies-count">0</span> Replies
+                </h3>
+                <div class="replies-sort">
+                  <label for="replies-sort-select">Sort by:</label>
+                  <select id="replies-sort-select" class="form-select">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="helpful">Most Helpful</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Replies Container -->
+              <div class="replies-container" id="replies-container">
+                <!-- Replies will be populated here -->
+              </div>
+
+              <!-- Load More Replies -->
+              <div
+                class="load-more-replies"
+                id="load-more-replies"
+                style="display: none"
+              >
+                <button class="btn btn-outline" id="load-more-replies-btn">
+                  <i class="fas fa-chevron-down"></i>
+                  Load More Replies
+                </button>
+              </div>
+            </div>
+
+            <!-- Reply Form -->
+            <div class="reply-form-section" id="reply-form-section">
+              <div class="reply-form-header">
+                <h3 class="form-title">
+                  <i class="fas fa-reply"></i>
+                  Reply to Discussion
+                </h3>
+                <div class="user-info" id="reply-user-info">
+                  <div class="user-avatar" id="reply-user-avatar">👤</div>
+                  <span class="user-name" id="reply-user-name">Your Name</span>
+                </div>
+              </div>
+
+              <!-- Reply Status Banner -->
+              <div
+                id="reply-status-banner"
+                class="status-banner"
+                style="display: none"
+              >
+                <div class="status-content">
+                  <span class="status-icon" id="reply-status-icon">ℹ️</span>
+                  <span class="status-message" id="reply-status-message"></span>
+                </div>
+              </div>
+
+              <form id="reply-form" class="reply-form">
+                <div class="form-group">
+                  <label for="reply-content" class="form-label">
+                    Your Reply
+                  </label>
+                  <textarea
+                    id="reply-content"
+                    name="content"
+                    class="form-textarea"
+                    placeholder="Share your thoughts, insights, or questions..."
+                    required
+                    rows="6"
+                  ></textarea>
+                  <div class="form-help">
+                    <span class="help-text">
+                      💡 Tip: Be constructive and respectful. You can use basic
+                      formatting like **bold** and *italic*.
+                    </span>
+                  </div>
+                </div>
+
+                <div class="reply-options">
+                  <div class="checkbox-group">
+                    <label class="checkbox-label">
+                      <input type="checkbox" id="reply-notifications" checked />
+                      <span class="checkbox-custom"></span>
+                      <span class="checkbox-text">
+                        Notify me of responses to my reply
+                      </span>
+                    </label>
+                  </div>
+                  <div class="checkbox-group">
+                    <label class="checkbox-label">
+                      <input type="checkbox" id="reply-anonymous" />
+                      <span class="checkbox-custom"></span>
+                      <span class="checkbox-text">
+                        Post anonymously (requires moderation)
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button
+                    type="button"
+                    class="btn btn-outline"
+                    id="cancel-reply-btn"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    class="btn btn-primary"
+                    id="submit-reply-btn"
+                  >
+                    <span class="btn-icon">💬</span>
+                    <span class="btn-text">Post Reply</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Login Required Message -->
+            <div
+              class="login-required-message"
+              id="login-required-reply"
+              style="display: none"
+            >
+              <div class="message-content">
+                <i class="fas fa-sign-in-alt"></i>
+                <h3>Sign in to join the conversation</h3>
+                <p>
+                  Create an account or sign in to reply to this discussion and
+                  engage with the community.
+                </p>
+                <div class="message-actions">
+                  <button class="btn btn-primary" id="login-to-reply-btn">
+                    Sign In
+                  </button>
+                  <button class="btn btn-outline" id="signup-to-reply-btn">
+                    Create Account
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Enhanced Footer -->
+    <footer class="forum-footer" role="contentinfo">
+      <div class="footer-content">
+        <div class="footer-sections">
+          <!-- Community Section -->
+          <div class="footer-section">
+            <h3 class="footer-section-title">
+              <span class="section-icon">🤝</span>
+              Community
+            </h3>
+            <div class="footer-section-content">
+              <p>
+                Join a diverse community of educators, researchers, and learners
+                passionate about responsible AI.
+              </p>
+              <ul class="footer-links">
+                <li>
+                  <a href="#community-guidelines" class="footer-link"
+                    >Community Guidelines</a
+                  >
+                </li>
+                <li>
+                  <a href="#code-of-conduct" class="footer-link"
+                    >Code of Conduct</a
+                  >
+                </li>
+                <li>
+                  <a href="#moderator-team" class="footer-link"
+                    >Moderator Team</a
+                  >
+                </li>
+                <li>
+                  <a href="#community-events" class="footer-link"
+                    >Community Events</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Support & Help Section -->
+          <div class="footer-section">
+            <h3 class="footer-section-title">
+              <span class="section-icon">💡</span>
+              Support & Help
+            </h3>
+            <div class="footer-section-content">
+              <p>
+                Get help with forum features, report issues, and find answers to
+                common questions.
+              </p>
+              <ul class="footer-links">
+                <li>
+                  <a href="#forum-help" class="footer-link"
+                    >Forum Help Center</a
+                  >
+                </li>
+                <li>
+                  <a href="#report-content" class="footer-link"
+                    >Report Content</a
+                  >
+                </li>
+                <li>
+                  <a href="#contact-moderators" class="footer-link"
+                    >Contact Moderators</a
+                  >
+                </li>
+                <li>
+                  <a href="#technical-support" class="footer-link"
+                    >Technical Support</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Platform Links Section -->
+          <div class="footer-section">
+            <h3 class="footer-section-title">
+              <span class="section-icon">🔗</span>
+              Platform Links
+            </h3>
+            <div class="footer-section-content">
+              <p>
+                Explore other areas of the SimulateAI platform and educational
+                resources.
+              </p>
+              <ul class="footer-links">
+                <li>
+                  <a href="index.html" class="footer-link"
+                    >Simulation Platform</a
+                  >
+                </li>
+                <li>
+                  <a href="blog.html" class="footer-link">Research Blog</a>
+                </li>
+                <li>
+                  <a href="profile.html" class="footer-link">Your Profile</a>
+                </li>
+                <li>
+                  <a href="privacy-notice.html" class="footer-link"
+                    >Privacy Policy</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Bottom -->
         <div class="footer-bottom">
-          <p>
-            &copy; 2025 SimulateAI Educational Platform. Open source AI ethics
-            education.
-          </p>
+          <div class="footer-meta">
+            <p class="footer-copyright">
+              &copy; 2025 SimulateAI Educational Platform.
+              <span class="copyright-note"
+                >Fostering ethical AI education through community
+                collaboration.</span
+              >
+            </p>
+            <div class="footer-badges">
+              <span class="badge">Community Driven</span>
+              <span class="badge">Open Source</span>
+              <span class="badge">Educational Use</span>
+            </div>
+          </div>
+
+          <nav class="footer-nav" aria-label="Footer navigation">
+            <a href="index.html" class="footer-nav-link">Home</a>
+            <a href="blog.html" class="footer-nav-link">Blog</a>
+            <a href="privacy-notice.html" class="footer-nav-link">Privacy</a>
+            <a href="#accessibility" class="footer-nav-link">Accessibility</a>
+            <a href="#contact" class="footer-nav-link">Contact</a>
+          </nav>
         </div>
       </div>
     </footer>
 
-    <!-- Start Discussion Modal -->
+    <!-- Enhanced Start Discussion Modal -->
     <div
       id="start-discussion-modal"
       class="modal-overlay"
@@ -278,503 +971,317 @@
       aria-labelledby="start-discussion-title"
       aria-modal="true"
     >
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 id="start-discussion-title">💬 Start a Discussion</h2>
-          <button class="modal-close" aria-label="Close modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <form id="start-discussion-form">
-            <div class="form-group">
-              <label for="discussion-category">Category *</label>
-              <select id="discussion-category" required>
-                <option value="">Select a category...</option>
-                <option value="general">💭 General Discussion</option>
-                <option value="scenarios">🎭 Scenario Discussions</option>
-                <option value="research">🔬 Research & Methodology</option>
-                <option value="feedback">💡 Feature Feedback</option>
-              </select>
+      <div class="modal-container">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 id="start-discussion-title" class="modal-title">
+              <span class="title-icon">💬</span>
+              Start a New Discussion
+            </h2>
+            <button class="modal-close" aria-label="Close modal">
+              &times;
+            </button>
+          </div>
+
+          <div class="modal-body">
+            <div class="discussion-guidelines">
+              <div class="guideline-item">
+                <span class="guideline-icon">🤝</span>
+                <span class="guideline-text"
+                  >Be respectful and constructive</span
+                >
+              </div>
+              <div class="guideline-item">
+                <span class="guideline-icon">🔍</span>
+                <span class="guideline-text"
+                  >Search existing discussions first</span
+                >
+              </div>
+              <div class="guideline-item">
+                <span class="guideline-icon">📝</span>
+                <span class="guideline-text"
+                  >Use clear, descriptive titles</span
+                >
+              </div>
             </div>
 
-            <div class="form-group">
-              <label for="discussion-title">Title *</label>
-              <input
-                type="text"
-                id="discussion-title"
-                required
-                maxlength="200"
-                placeholder="What's your discussion about?"
-              />
-            </div>
+            <form id="start-discussion-form" class="enhanced-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="discussion-category" class="form-label">
+                    <span class="label-icon">📂</span>
+                    Category *
+                  </label>
+                  <select id="discussion-category" class="form-select" required>
+                    <option value="">Choose the best category...</option>
+                    <option value="general">💭 General Discussion</option>
+                    <option value="scenarios">🎭 Scenario Analysis</option>
+                    <option value="research">🔬 Research & Methods</option>
+                    <option value="feedback">💡 Platform Feedback</option>
+                    <option value="ethics">⚖️ Ethics & Philosophy</option>
+                    <option value="education">📚 Educational Strategies</option>
+                  </select>
+                </div>
 
-            <div class="form-group">
-              <label for="discussion-content">Content *</label>
-              <textarea
-                id="discussion-content"
-                rows="8"
-                required
-                placeholder="Share your thoughts, questions, or insights... Basic Markdown formatting is supported."
-              ></textarea>
-              <small class="form-help"
-                >Supports basic Markdown: **bold**, *italic*, [links](url),
-                `code`, etc.</small
-              >
-            </div>
+                <div class="form-group">
+                  <label for="discussion-priority" class="form-label">
+                    <span class="label-icon">⚡</span>
+                    Priority Level
+                  </label>
+                  <select id="discussion-priority" class="form-select">
+                    <option value="normal">📝 Normal Discussion</option>
+                    <option value="urgent">🚨 Urgent Help Needed</option>
+                    <option value="announcement">
+                      📢 Community Announcement
+                    </option>
+                    <option value="question">❓ Quick Question</option>
+                  </select>
+                </div>
+              </div>
 
-            <div class="form-group">
-              <label for="discussion-tags">Tags</label>
-              <input
-                type="text"
-                id="discussion-tags"
-                placeholder="ai-ethics, bias, privacy (comma-separated)"
-              />
-            </div>
+              <div class="form-group">
+                <label for="discussion-title" class="form-label">
+                  <span class="label-icon">📝</span>
+                  Discussion Title *
+                </label>
+                <input
+                  type="text"
+                  id="discussion-title"
+                  class="form-input"
+                  required
+                  maxlength="200"
+                  placeholder="What's your discussion about? Be specific and engaging..."
+                  aria-describedby="title-help"
+                />
+                <small id="title-help" class="form-help">
+                  Good titles help others find and understand your discussion
+                </small>
+              </div>
 
-            <div class="form-actions">
-              <button type="button" class="btn btn-outline" id="save-draft-btn">
-                💾 Save Draft
-              </button>
-              <button type="submit" class="btn btn-primary">
-                💬 Start Discussion
-              </button>
-            </div>
-          </form>
+              <div class="form-group">
+                <label for="discussion-content" class="form-label">
+                  <span class="label-icon">📄</span>
+                  Discussion Content *
+                </label>
+                <div class="content-editor">
+                  <div class="editor-toolbar">
+                    <div class="toolbar-group">
+                      <button
+                        type="button"
+                        class="toolbar-btn"
+                        data-action="bold"
+                        title="Bold"
+                      >
+                        <strong>B</strong>
+                      </button>
+                      <button
+                        type="button"
+                        class="toolbar-btn"
+                        data-action="italic"
+                        title="Italic"
+                      >
+                        <em>I</em>
+                      </button>
+                      <button
+                        type="button"
+                        class="toolbar-btn"
+                        data-action="link"
+                        title="Link"
+                      >
+                        🔗
+                      </button>
+                    </div>
+                    <div class="toolbar-group">
+                      <button
+                        type="button"
+                        class="toolbar-btn"
+                        data-action="quote"
+                        title="Quote"
+                      >
+                        💭
+                      </button>
+                      <button
+                        type="button"
+                        class="toolbar-btn"
+                        data-action="list"
+                        title="List"
+                      >
+                        📋
+                      </button>
+                      <button
+                        type="button"
+                        class="toolbar-btn"
+                        data-action="code"
+                        title="Code"
+                      >
+                        👨‍💻
+                      </button>
+                    </div>
+                  </div>
+                  <textarea
+                    id="discussion-content"
+                    class="form-textarea content-textarea"
+                    rows="12"
+                    required
+                    placeholder="Share your thoughts, questions, or insights...
+
+You can use Markdown formatting:
+- **Bold text** and *italic text*
+- [Links](https://example.com)
+- > Blockquotes for important notes
+- `Code snippets` for technical content
+- Lists and bullet points
+
+Consider including:
+- Context and background
+- Specific questions or goals
+- What you've already tried
+- Resources or references"
+                  ></textarea>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="discussion-tags" class="form-label">
+                    <span class="label-icon">🏷️</span>
+                    Tags & Keywords
+                  </label>
+                  <input
+                    type="text"
+                    id="discussion-tags"
+                    class="form-input"
+                    placeholder="bias, ethics, simulation, education (comma-separated)"
+                    aria-describedby="tags-help"
+                  />
+                  <small id="tags-help" class="form-help">
+                    Tags help others find and categorize your discussion
+                  </small>
+                </div>
+
+                <div class="form-group">
+                  <label for="discussion-type" class="form-label">
+                    <span class="label-icon">🎯</span>
+                    Discussion Type
+                  </label>
+                  <select id="discussion-type" class="form-select">
+                    <option value="discussion">💬 Open Discussion</option>
+                    <option value="question">❓ Question & Answer</option>
+                    <option value="sharing">📊 Sharing Insights</option>
+                    <option value="collaboration">
+                      🤝 Seeking Collaboration
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="discussion-options">
+                  <h4 class="options-title">
+                    <span class="title-icon">⚙️</span>
+                    Discussion Options
+                  </h4>
+                  <div class="checkbox-group">
+                    <label class="checkbox-container">
+                      <input type="checkbox" id="allow-notifications" checked />
+                      <span class="checkmark"></span>
+                      <span class="checkbox-label"
+                        >Notify me of replies and activity</span
+                      >
+                    </label>
+                    <label class="checkbox-container">
+                      <input type="checkbox" id="expert-input" />
+                      <span class="checkmark"></span>
+                      <span class="checkbox-label"
+                        >Request expert input from moderators</span
+                      >
+                    </label>
+                    <label class="checkbox-container">
+                      <input type="checkbox" id="anonymous-posting" />
+                      <span class="checkmark"></span>
+                      <span class="checkbox-label"
+                        >Post anonymously (moderator approval required)</span
+                      >
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <div class="primary-actions">
+                  <button
+                    type="button"
+                    class="btn btn-outline"
+                    id="save-draft-btn"
+                  >
+                    <span class="btn-icon">💾</span>
+                    <span class="btn-text">Save Draft</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    id="preview-discussion-btn"
+                  >
+                    <span class="btn-icon">👁️</span>
+                    <span class="btn-text">Preview</span>
+                  </button>
+                  <button type="submit" class="btn btn-primary">
+                    <span class="btn-icon">�</span>
+                    <span class="btn-text">Start Discussion</span>
+                  </button>
+                </div>
+                <div class="secondary-actions">
+                  <button
+                    type="button"
+                    class="btn btn-link"
+                    id="guidelines-btn"
+                  >
+                    📋 Review Community Guidelines
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Loading indicator -->
-    <div id="loading" class="loading" aria-hidden="true" role="status">
-      <div class="loading-spinner" aria-hidden="true"></div>
-      <p class="loading-text">Loading discussions...</p>
+    <div id="loading" class="loading-enhanced" aria-hidden="true" role="status">
+      <div class="loading-container">
+        <div class="loading-spinner" aria-hidden="true"></div>
+        <div class="loading-content">
+          <p class="loading-text">Loading forum discussions...</p>
+          <p class="loading-subtext">Connecting with the community</p>
+        </div>
+        <div
+          class="loading-progress"
+          role="progressbar"
+          aria-label="Loading progress"
+          aria-valuenow="0"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        >
+          <div class="progress-bar"></div>
+        </div>
+      </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- Enhanced Forum JavaScript -->
+    <script src="src/js/enhanced-forum.js" defer></script>
+
+    <!-- Existing Scripts -->
     <script type="module" src="src/js/services/firebase-service.js"></script>
     <script type="module" src="src/js/services/auth-service.js"></script>
+    <script
+      type="module"
+      src="src/js/services/contribution-service.js"
+    ></script>
     <script
       type="module"
       src="src/js/components/notification-toast.js"
     ></script>
     <script type="module" src="src/js/components/modal-utility.js"></script>
-
-    <!-- Forum Page Script -->
-    <script type="module">
-      import AuthService from './src/js/services/auth-service.js';
-      import FirebaseService from './src/js/services/firebase-service.js';
-
-      class ForumPage {
-        constructor() {
-          this.authService = new AuthService();
-          this.firebaseService = new FirebaseService();
-          this.currentUser = null;
-          this.discussions = [];
-          this.filteredDiscussions = [];
-          this.discussionsPerPage = 10;
-          this.currentPage = 0;
-          this.selectedCategory = '';
-        }
-
-        async init() {
-          await this.authService.initialize();
-          await this.firebaseService.initialize();
-
-          // Set up auth state listener
-          this.authService.firebaseService.addAuthStateListener(user => {
-            this.currentUser = user;
-            this.updateUIForAuth();
-          });
-
-          this.setupEventHandlers();
-          await this.loadDiscussions();
-        }
-
-        updateUIForAuth() {
-          const startDiscussionBtn = document.getElementById(
-            'start-discussion-btn'
-          );
-
-          if (this.currentUser) {
-            startDiscussionBtn.style.display = 'inline-block';
-          } else {
-            startDiscussionBtn.style.display = 'none';
-          }
-        }
-
-        async loadDiscussions() {
-          try {
-            this.showLoading(true);
-
-            // For now, create some sample discussions since Firebase collection is empty
-            this.discussions = await this.getSampleDiscussions();
-            this.filteredDiscussions = [...this.discussions];
-
-            this.renderDiscussions();
-          } catch (error) {
-            console.error('Error loading discussions:', error);
-            this.showError('Failed to load discussions');
-          } finally {
-            this.showLoading(false);
-          }
-        }
-
-        async getSampleDiscussions() {
-          // Sample discussions for demonstration
-          return [
-            {
-              id: 'disc1',
-              title:
-                'How to better detect algorithmic bias in hiring scenarios?',
-              content:
-                'I have been working through the hiring simulation and I am curious about best practices for detecting bias...',
-              category: 'scenarios',
-              author: {
-                name: 'Sarah M.',
-                tier: 1,
-                avatar: '/assets/user1-avatar.png',
-              },
-              tags: ['bias-detection', 'hiring', 'algorithms'],
-              createdAt: new Date('2025-01-14T10:30:00'),
-              lastActivity: new Date('2025-01-15T14:20:00'),
-              replies: 8,
-              views: 156,
-              likes: 12,
-              pinned: false,
-            },
-            {
-              id: 'disc2',
-              title:
-                'Research methodology for simulation-based learning effectiveness',
-              content:
-                'I am interested in the research methodology behind measuring learning outcomes...',
-              category: 'research',
-              author: {
-                name: 'Dr. Alex Chen',
-                tier: 3,
-                avatar: '/assets/researcher2-avatar.png',
-              },
-              tags: ['research', 'methodology', 'learning-outcomes'],
-              createdAt: new Date('2025-01-13T16:45:00'),
-              lastActivity: new Date('2025-01-15T09:15:00'),
-              replies: 15,
-              views: 289,
-              likes: 23,
-              pinned: true,
-            },
-            {
-              id: 'disc3',
-              title: 'Feature Request: More diverse scenario contexts',
-              content:
-                'It would be great to see scenarios from different cultural and industry contexts...',
-              category: 'feedback',
-              author: {
-                name: 'Maria Rodriguez',
-                tier: 2,
-                avatar: '/assets/user3-avatar.png',
-              },
-              tags: ['feature-request', 'diversity', 'scenarios'],
-              createdAt: new Date('2025-01-12T09:20:00'),
-              lastActivity: new Date('2025-01-14T18:30:00'),
-              replies: 6,
-              views: 234,
-              likes: 18,
-              pinned: false,
-            },
-            {
-              id: 'disc4',
-              title: 'Privacy considerations in educational AI tools',
-              content:
-                'Let us discuss the privacy implications of using AI in educational settings...',
-              category: 'general',
-              author: {
-                name: 'James Wilson',
-                tier: 1,
-                avatar: '/assets/user4-avatar.png',
-              },
-              tags: ['privacy', 'education', 'ai-tools'],
-              createdAt: new Date('2025-01-11T14:15:00'),
-              lastActivity: new Date('2025-01-14T11:45:00'),
-              replies: 11,
-              views: 178,
-              likes: 9,
-              pinned: false,
-            },
-          ];
-        }
-
-        renderDiscussions() {
-          const container = document.getElementById('discussions-container');
-          const startIndex = this.currentPage * this.discussionsPerPage;
-          const endIndex = startIndex + this.discussionsPerPage;
-          const discussionsToShow = this.filteredDiscussions.slice(
-            startIndex,
-            endIndex
-          );
-
-          if (this.currentPage === 0) {
-            container.innerHTML = '';
-          }
-
-          container.innerHTML += discussionsToShow
-            .map(
-              discussion => `
-                    <article class="discussion-card ${discussion.pinned ? 'pinned' : ''}">
-                        ${discussion.pinned ? '<div class="pinned-badge">📌 Pinned</div>' : ''}
-                        <div class="discussion-header">
-                            <div class="discussion-category">${this.getCategoryEmoji(discussion.category)} ${this.getCategoryName(discussion.category)}</div>
-                            <time class="discussion-date">${this.formatDate(discussion.createdAt)}</time>
-                        </div>
-                        <h2><a href="#" onclick="window.forumPage.openDiscussion('${discussion.id}')">${discussion.title}</a></h2>
-                        <p class="discussion-preview">${discussion.content.substring(0, 200)}${discussion.content.length > 200 ? '...' : ''}</p>
-                        <div class="discussion-tags">
-                            ${discussion.tags.map(tag => `<span class="tag">#${tag}</span>`).join('')}
-                        </div>
-                        <div class="discussion-footer">
-                            <div class="discussion-author">
-                                <img src="${discussion.author.avatar}" alt="${discussion.author.name}" class="author-avatar">
-                                <span class="author-name">${discussion.author.name} ${this.getTierBadge(discussion.author.tier)}</span>
-                            </div>
-                            <div class="discussion-stats">
-                                <span class="stat-item">💬 ${discussion.replies} replies</span>
-                                <span class="stat-item">👁️ ${discussion.views} views</span>
-                                <span class="stat-item">❤️ ${discussion.likes} likes</span>
-                                <span class="last-activity">Last: ${this.formatRelativeTime(discussion.lastActivity)}</span>
-                            </div>
-                        </div>
-                    </article>
-                `
-            )
-            .join('');
-
-          // Update load more button
-          const loadMoreBtn = document.getElementById('load-more-btn');
-          if (endIndex >= this.filteredDiscussions.length) {
-            loadMoreBtn.style.display = 'none';
-          } else {
-            loadMoreBtn.style.display = 'block';
-          }
-        }
-
-        getCategoryEmoji(category) {
-          const emojis = {
-            general: '💭',
-            scenarios: '🎭',
-            research: '🔬',
-            feedback: '💡',
-          };
-          return emojis[category] || '💬';
-        }
-
-        getCategoryName(category) {
-          const names = {
-            general: 'General Discussion',
-            scenarios: 'Scenario Discussions',
-            research: 'Research & Methodology',
-            feedback: 'Feature Feedback',
-          };
-          return names[category] || 'Discussion';
-        }
-
-        getTierBadge(tier) {
-          const badges = {
-            0: '',
-            1: '🔬',
-            2: '⭐',
-            3: '👑',
-          };
-          return badges[tier] || '';
-        }
-
-        formatDate(date) {
-          return date.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-          });
-        }
-
-        formatRelativeTime(date) {
-          const now = new Date();
-          const diff = now - date;
-          const minutes = Math.floor(diff / 60000);
-          const hours = Math.floor(minutes / 60);
-          const days = Math.floor(hours / 24);
-
-          if (days > 0) return `${days}d ago`;
-          if (hours > 0) return `${hours}h ago`;
-          if (minutes > 0) return `${minutes}m ago`;
-          return 'Just now';
-        }
-
-        openDiscussion(discussionId) {
-          // TODO: Navigate to individual discussion page
-          alert(`Opening discussion: ${discussionId}`);
-        }
-
-        setupEventHandlers() {
-          // Start discussion button
-          document
-            .getElementById('start-discussion-btn')
-            ?.addEventListener('click', () => {
-              this.showStartDiscussionModal();
-            });
-
-          // Category cards
-          document.querySelectorAll('.category-card').forEach(card => {
-            card.addEventListener('click', e => {
-              const category = e.currentTarget.dataset.category;
-              this.filterByCategory(category);
-            });
-          });
-
-          // Filters
-          document
-            .getElementById('category-filter')
-            .addEventListener('change', e => {
-              this.filterDiscussions();
-            });
-
-          document
-            .getElementById('sort-filter')
-            .addEventListener('change', e => {
-              this.sortDiscussions();
-            });
-
-          // Search
-          document
-            .getElementById('forum-search')
-            .addEventListener('input', e => {
-              this.searchDiscussions(e.target.value);
-            });
-
-          // Load more button
-          document
-            .getElementById('load-more-btn')
-            .addEventListener('click', () => {
-              this.currentPage++;
-              this.renderDiscussions();
-            });
-
-          // Start discussion form
-          document
-            .getElementById('start-discussion-form')
-            .addEventListener('submit', e => {
-              e.preventDefault();
-              this.handleDiscussionSubmission();
-            });
-
-          // Modal close
-          document
-            .querySelector('#start-discussion-modal .modal-close')
-            .addEventListener('click', () => {
-              this.hideStartDiscussionModal();
-            });
-        }
-
-        filterByCategory(category) {
-          this.selectedCategory = category;
-          document.getElementById('category-filter').value = category;
-          this.filterDiscussions();
-        }
-
-        filterDiscussions() {
-          const categoryFilter =
-            document.getElementById('category-filter').value;
-
-          this.filteredDiscussions = this.discussions.filter(discussion => {
-            return !categoryFilter || discussion.category === categoryFilter;
-          });
-
-          this.currentPage = 0;
-          this.sortDiscussions();
-        }
-
-        sortDiscussions() {
-          const sortBy = document.getElementById('sort-filter').value;
-
-          switch (sortBy) {
-            case 'recent':
-              this.filteredDiscussions.sort(
-                (a, b) => b.lastActivity - a.lastActivity
-              );
-              break;
-            case 'popular':
-              this.filteredDiscussions.sort((a, b) => b.likes - a.likes);
-              break;
-            case 'active':
-              this.filteredDiscussions.sort((a, b) => b.replies - a.replies);
-              break;
-          }
-
-          // Always keep pinned posts at the top
-          this.filteredDiscussions.sort((a, b) => {
-            if (a.pinned && !b.pinned) return -1;
-            if (!a.pinned && b.pinned) return 1;
-            return 0;
-          });
-
-          this.renderDiscussions();
-        }
-
-        searchDiscussions(query) {
-          if (!query.trim()) {
-            this.filterDiscussions();
-            return;
-          }
-
-          const lowercaseQuery = query.toLowerCase();
-          this.filteredDiscussions = this.discussions.filter(discussion => {
-            return (
-              discussion.title.toLowerCase().includes(lowercaseQuery) ||
-              discussion.content.toLowerCase().includes(lowercaseQuery) ||
-              discussion.tags.some(tag =>
-                tag.toLowerCase().includes(lowercaseQuery)
-              )
-            );
-          });
-
-          this.currentPage = 0;
-          this.renderDiscussions();
-        }
-
-        showStartDiscussionModal() {
-          if (!this.currentUser) {
-            this.authService.showLoginModal();
-            return;
-          }
-
-          document.getElementById('start-discussion-modal').style.display =
-            'block';
-          document.body.style.overflow = 'hidden';
-        }
-
-        hideStartDiscussionModal() {
-          document.getElementById('start-discussion-modal').style.display =
-            'none';
-          document.body.style.overflow = 'auto';
-        }
-
-        async handleDiscussionSubmission() {
-          // TODO: Implement discussion submission to Firebase
-          alert('Discussion submission - Firebase integration coming soon!');
-          this.hideStartDiscussionModal();
-        }
-
-        showLoading(show) {
-          document.getElementById('loading').style.display = show
-            ? 'flex'
-            : 'none';
-        }
-
-        showError(message) {
-          // TODO: Use notification toast
-          console.error(message);
-        }
-      }
-
-      // Initialize forum page and make it globally available
-      window.forumPage = new ForumPage();
-      window.forumPage.init();
-    </script>
+    <script type="module" src="src/js/components/forum-integration.js"></script>
   </body>
 </html>

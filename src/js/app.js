@@ -158,6 +158,7 @@ class AIEthicsApp {
 
     // MCP Integration Manager
     this.mcpManager = null;
+    this.mcpInitialized = false; // Track MCP initialization state
     this.mcpCapabilities = new Set();
 
     // Community and Authentication Services
@@ -165,6 +166,9 @@ class AIEthicsApp {
     this.authService = null;
     this.currentUser = null;
     this.userWelcomed = false; // Track if user has been welcomed this session
+
+    // Debouncing for user actions
+    this.lastSurpriseTime = 0; // Track last surprise me action for debouncing
 
     // Available simulation categories (each containing multiple scenarios)
     // NOTE: These are thematic categories, not individual scenarios
@@ -923,9 +927,6 @@ class AIEthicsApp {
   }
 
   setupEventListeners() {
-    // Mobile navigation functionality
-    this.setupMobileNavigation();
-
     // Surprise Me functionality
     this.setupSurpriseMe();
 
@@ -943,40 +944,6 @@ class AIEthicsApp {
     if (testScenarioBtn) {
       testScenarioBtn.addEventListener('click', () => {
         this.testScenarioModal();
-      });
-    }
-
-    // Take Tour button in navigation
-    const tourBtn = document.getElementById('start-tour-nav');
-    if (tourBtn) {
-      tourBtn.addEventListener('click', e => {
-        e.preventDefault(); // Prevent default link behavior
-        this.startOnboardingTour();
-
-        // Close mobile navigation if open, with proper focus management
-        const navToggle = document.querySelector('.nav-toggle');
-        const mainNav = document.querySelector('.main-nav');
-        if (mainNav && mainNav.classList.contains('open')) {
-          // Move focus away from the clicked tour button before hiding navigation
-          if (navToggle) {
-            navToggle.focus();
-          } else {
-            document.body.focus();
-          }
-
-          // Close navigation after focus has moved
-          setTimeout(() => {
-            mainNav.classList.remove('open');
-            navToggle?.setAttribute('aria-expanded', 'false');
-            mainNav.setAttribute('aria-hidden', 'true');
-
-            // Also handle nav backdrop if present
-            const navBackdrop = document.querySelector('.nav-backdrop');
-            if (navBackdrop) {
-              navBackdrop.classList.remove('open');
-            }
-          }, 0);
-        }
       });
     }
 
@@ -2023,12 +1990,18 @@ class AIEthicsApp {
    * Sets up Surprise Me functionality
    */
   setupSurpriseMe() {
+    // Surprise Me functionality is now handled by the shared navigation component
+    // The shared navigation component calls window.app.launchRandomScenario() when clicked
+    // No need to add duplicate event listeners here
+
     const surpriseMeBtn = document.getElementById('surprise-me-nav');
     if (surpriseMeBtn) {
-      surpriseMeBtn.addEventListener('click', e => {
-        e.preventDefault();
-        this.launchRandomScenario();
-      });
+      // Just verify the button exists for debugging
+      logger.debug(
+        'Surprise Me button found - handled by shared navigation component'
+      );
+    } else {
+      logger.warn('Surprise Me button not found in DOM');
     }
   }
 
@@ -2036,9 +2009,32 @@ class AIEthicsApp {
    * Launches a random uncompleted scenario
    */
   launchRandomScenario() {
+    logger.debug('Surprise Me: launchRandomScenario called');
+
+    // Debounce to prevent rapid successive calls
+    const now = Date.now();
+    if (!this.lastSurpriseTime) this.lastSurpriseTime = 0;
+
+    const SURPRISE_COOLDOWN = 2000; // 2 second cooldown between surprise actions
+    if (now - this.lastSurpriseTime < SURPRISE_COOLDOWN) {
+      logger.debug(
+        'Surprise Me action debounced - too soon after last request',
+        `Time since last: ${now - this.lastSurpriseTime}ms`
+      );
+      return;
+    }
+    this.lastSurpriseTime = now;
+
+    // Refresh category grid progress to ensure we have latest state
+    if (this.categoryGrid) {
+      this.categoryGrid.userProgress = this.categoryGrid.loadUserProgress();
+      logger.debug('Surprise Me: Refreshed category grid progress');
+    }
+
     const randomScenario = this.getRandomUncompletedScenario();
 
     if (!randomScenario) {
+      logger.debug('Surprise Me: No uncompleted scenarios found');
       this.showNotification(
         "🎉 Congratulations! You've completed all scenarios! Try replaying your favorites.",
         'success',
@@ -2047,19 +2043,11 @@ class AIEthicsApp {
       return;
     }
 
-    // Close mobile navigation if open
-    const mainNav = document.querySelector('.main-nav');
-    if (mainNav && mainNav.classList.contains('open')) {
-      mainNav.classList.remove('open');
-      const navToggle = document.querySelector('.nav-toggle');
-      if (navToggle) {
-        navToggle.classList.remove('active');
-        navToggle.setAttribute('aria-expanded', 'false');
-      }
-      document.body.style.overflow = '';
-    }
-
     // Show notification about the selected scenario
+    logger.debug(
+      'Surprise Me: Launching scenario:',
+      randomScenario.scenario.title
+    );
     this.showNotification(
       `🎉 Surprise! Opening "${randomScenario.scenario.title}" from ${randomScenario.category.title}`,
       'info',
@@ -2068,6 +2056,7 @@ class AIEthicsApp {
 
     // Launch the scenario directly (skip pre-launch modal for surprise factor)
     if (this.categoryGrid) {
+      logger.debug('Surprise Me: Opening via categoryGrid');
       this.categoryGrid.openScenarioModalDirect(
         randomScenario.category.id,
         randomScenario.scenario.id
@@ -2080,6 +2069,98 @@ class AIEthicsApp {
   }
 
   /**
+   * Debug utility: Clear all progress for testing Surprise Me functionality
+   */
+  clearAllProgress() {
+    localStorage.removeItem('simulateai_category_progress');
+    logger.info('All progress cleared for testing');
+    if (this.categoryGrid) {
+      this.categoryGrid.userProgress = {};
+      this.categoryGrid.render();
+    }
+  }
+
+  /**
+   * Debug utility: Mark a few scenarios as completed for testing
+   */
+  markSomeScenariosCompleted() {
+    const progress = {
+      'trolley-problem': {
+        'autonomous-vehicle-split': true,
+        // Leave tunnel-dilemma and bias-healthcare uncompleted
+      },
+      'bias-fairness': {
+        'hiring-algorithm-bias': true,
+        // Leave other scenarios uncompleted
+      },
+    };
+
+    localStorage.setItem(
+      'simulateai_category_progress',
+      JSON.stringify(progress)
+    );
+    logger.info('Some scenarios marked as completed for testing');
+
+    if (this.categoryGrid) {
+      this.categoryGrid.userProgress = progress;
+      this.categoryGrid.render();
+    }
+  }
+
+  /**
+   * Debug utility: Show all available categories and scenarios
+   */
+  debugShowAllContent() {
+    const categories = getAllCategories();
+    logger.info('=== DEBUG: All Available Content ===');
+    logger.info('Total categories:', categories.length);
+
+    categories.forEach(category => {
+      const scenarios = getCategoryScenarios(category.id);
+      logger.info(`Category: ${category.id} (${category.title})`);
+      logger.info(
+        `  Scenarios (${scenarios.length}):`,
+        scenarios.map(s => `${s.id} - ${s.title}`)
+      );
+    });
+
+    const progress = localStorage.getItem('simulateai_category_progress');
+    logger.info('Current progress:', progress ? JSON.parse(progress) : 'None');
+
+    return {
+      categories,
+      totalScenarios: categories.reduce(
+        (sum, cat) => sum + getCategoryScenarios(cat.id).length,
+        0
+      ),
+    };
+  }
+
+  /**
+   * Debug utility: Check current modal state
+   */
+  debugModalState() {
+    const modalState = {
+      categoryGridModalOpen: this.categoryGrid?.isModalOpen || false,
+      lastModalOpenTime: this.categoryGrid?.lastModalOpenTime || 0,
+      timeSinceLastModal: this.categoryGrid?.lastModalOpenTime
+        ? Date.now() - this.categoryGrid.lastModalOpenTime
+        : 'N/A',
+      modalCooldown: this.categoryGrid?.modalOpenCooldown || 1000,
+      visibleModalBackdrops: document.querySelectorAll(
+        '.modal-backdrop:not([aria-hidden="true"])'
+      ).length,
+      lastSurpriseTime: this.lastSurpriseTime || 0,
+      timeSinceLastSurprise: this.lastSurpriseTime
+        ? Date.now() - this.lastSurpriseTime
+        : 'N/A',
+    };
+
+    logger.info('=== DEBUG: Modal State ===', modalState);
+    return modalState;
+  }
+
+  /**
    * Gets a random uncompleted scenario from all categories
    * @returns {Object|null} Object with category and scenario, or null if all completed
    */
@@ -2087,18 +2168,28 @@ class AIEthicsApp {
     try {
       // Get all categories and their scenarios
       const allCategories = getAllCategories();
+      logger.debug('Surprise Me: Found categories:', allCategories.length);
 
-      // Load user progress
+      // Load user progress (fresh from localStorage each time)
       const stored = localStorage.getItem('simulateai_category_progress');
       const userProgress = stored ? JSON.parse(stored) : {};
+      logger.debug('Surprise Me: User progress:', userProgress);
 
       // Collect all uncompleted scenarios
       const uncompletedScenarios = [];
 
       allCategories.forEach(category => {
         const scenarios = getCategoryScenarios(category.id);
+        logger.debug(
+          `Surprise Me: Category ${category.id} has ${scenarios.length} scenarios`
+        );
+
         scenarios.forEach(scenario => {
           const isCompleted = userProgress[category.id]?.[scenario.id] || false;
+          logger.debug(
+            `Surprise Me: Scenario ${scenario.id} completed: ${isCompleted}`
+          );
+
           if (!isCompleted) {
             uncompletedScenarios.push({
               category,
@@ -2108,552 +2199,37 @@ class AIEthicsApp {
         });
       });
 
+      logger.debug(
+        'Surprise Me: Found uncompleted scenarios:',
+        uncompletedScenarios.length
+      );
+      logger.debug(
+        'Surprise Me: Uncompleted scenario list:',
+        uncompletedScenarios.map(s => `${s.category.id}/${s.scenario.id}`)
+      );
+
       // Return random uncompleted scenario
       if (uncompletedScenarios.length === 0) {
+        logger.debug('Surprise Me: All scenarios completed');
         return null; // All scenarios completed
       }
 
       const randomIndex = Math.floor(
         Math.random() * uncompletedScenarios.length
       );
-      return uncompletedScenarios[randomIndex];
+      const selectedScenario = uncompletedScenarios[randomIndex];
+      logger.debug(
+        'Surprise Me: Selected scenario:',
+        selectedScenario.scenario.id,
+        'from category:',
+        selectedScenario.category.id
+      );
+
+      return selectedScenario;
     } catch (error) {
       logger.error('Failed to get random uncompleted scenario:', error);
       return null;
     }
-  }
-
-  /**
-   * Sets up mobile navigation hamburger menu functionality
-   */
-  setupMobileNavigation() {
-    const navToggle = document.querySelector('.nav-toggle');
-    const mainNav = document.querySelector('.main-nav');
-    const navBackdrop = document.querySelector('.nav-backdrop');
-    const navLinks = document.querySelectorAll('.nav-link');
-
-    if (!navToggle || !mainNav) {
-      logger.warn('Mobile navigation elements not found');
-      return;
-    }
-
-    // Toggle mobile navigation
-    const toggleNav = isOpen => {
-      const isCurrentlyOpen = mainNav.classList.contains('open');
-      const shouldOpen = isOpen !== undefined ? isOpen : !isCurrentlyOpen;
-
-      // Update classes
-      mainNav.classList.toggle('open', shouldOpen);
-      navToggle.classList.toggle('active', shouldOpen);
-      if (navBackdrop) {
-        navBackdrop.classList.toggle('open', shouldOpen);
-      }
-
-      // Update ARIA attributes and focus management
-      if (shouldOpen) {
-        navToggle.setAttribute('aria-expanded', 'true');
-        mainNav.setAttribute('aria-hidden', 'false');
-
-        // Focus first nav link when opening
-        const firstNavLink = mainNav.querySelector('.nav-link');
-        if (firstNavLink) {
-          setTimeout(
-            () => firstNavLink.focus(),
-            APP_CONSTANTS.TIMING.FOCUS_DELAY
-          );
-        }
-      } else {
-        // Move focus away from navigation before hiding it
-        navToggle.focus();
-
-        // Set aria attributes after focus has moved
-        setTimeout(() => {
-          navToggle.setAttribute('aria-expanded', 'false');
-          mainNav.setAttribute('aria-hidden', 'true');
-        }, 0);
-      }
-
-      // Analytics
-      simpleAnalytics.trackEvent('mobile_nav_toggled', { isOpen: shouldOpen });
-    };
-
-    // Hamburger button click
-    navToggle.addEventListener('click', e => {
-      e.preventDefault();
-      toggleNav();
-    });
-
-    // Backdrop click
-    if (navBackdrop) {
-      navBackdrop.addEventListener('click', () => {
-        toggleNav(false);
-      });
-    }
-
-    // Click outside to close navigation (comprehensive handler)
-    document.addEventListener('click', e => {
-      // Only handle if navigation is open
-      if (!mainNav.classList.contains('open')) {
-        return;
-      }
-
-      // Don't close if clicking on the nav toggle button (it has its own handler)
-      if (navToggle.contains(e.target)) {
-        return;
-      }
-
-      // Don't close if clicking inside the navigation panel
-      if (mainNav.contains(e.target)) {
-        return;
-      }
-
-      // Don't close if clicking on the backdrop (it has its own handler)
-      if (navBackdrop && navBackdrop.contains(e.target)) {
-        return;
-      }
-
-      // Click was outside navigation - close it
-      toggleNav(false);
-    });
-
-    // Close nav when clicking on nav links
-    navLinks.forEach(link => {
-      link.addEventListener('click', e => {
-        const href = link.getAttribute('href');
-        const text = link.textContent.trim();
-
-        // Skip handling for mega menu trigger on mobile
-        const MOBILE_BREAKPOINT = 768;
-        if (
-          link.closest('.nav-item-dropdown') &&
-          window.innerWidth <= MOBILE_BREAKPOINT
-        ) {
-          return; // Let mega menu handle this
-        }
-
-        logger.info(`Navigation link clicked: "${text}" -> ${href}`);
-
-        // Skip surprise me button - it has its own handler
-        if (link.id === 'surprise-me-nav') {
-          return;
-        }
-
-        // Move focus away from the clicked link before closing navigation
-        // This prevents accessibility issues with aria-hidden on focused elements
-        const moveFocusAndCloseNav = () => {
-          // Move focus to a safe element (nav toggle button or document body)
-          if (navToggle) {
-            navToggle.focus();
-          } else {
-            document.body.focus();
-          }
-
-          // Close navigation after focus has moved
-          setTimeout(
-            () => toggleNav(false),
-            APP_CONSTANTS.TIMING.NAV_CLOSE_DELAY
-          );
-        };
-
-        // Handle hash-based navigation
-        if (href && href.startsWith('#') && href !== '#') {
-          // Prevent default browser jump behavior
-          e.preventDefault();
-
-          const targetElement = document.querySelector(href);
-
-          if (targetElement) {
-            logger.info(`Navigating to section: ${href}`);
-
-            // Move focus and close mobile nav first
-            moveFocusAndCloseNav();
-
-            // Then smoothly scroll to target after a brief delay
-            const SCROLL_DELAY = 100;
-            setTimeout(() => {
-              targetElement.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-              });
-              logger.info(`Scrolled to section: ${href}`);
-            }, SCROLL_DELAY);
-
-            // Track successful navigation
-            simpleAnalytics.trackEvent('navigation_link_clicked', {
-              target: href,
-              text,
-              success: true,
-            });
-          } else {
-            logger.warn(`Navigation target not found: ${href}`);
-
-            // Move focus and close menu for missing targets
-            moveFocusAndCloseNav();
-
-            // Show user feedback for missing sections
-            const NOTIFICATION_DURATION = 3000;
-            if (this.showNotification) {
-              this.showNotification(
-                `Section "${text}" is not available on this page.`,
-                'warning',
-                NOTIFICATION_DURATION
-              );
-            }
-
-            // Track failed navigation
-            simpleAnalytics.trackEvent('navigation_link_clicked', {
-              target: href,
-              text,
-              success: false,
-              error: 'target_not_found',
-            });
-          }
-        } else {
-          logger.info(`External link or non-hash navigation: ${href}`);
-
-          // For external links, move focus and close nav before navigation
-          moveFocusAndCloseNav();
-
-          // Track external navigation
-          simpleAnalytics.trackEvent('navigation_link_clicked', {
-            target: href,
-            text,
-            type: 'external',
-          });
-        }
-      });
-    });
-
-    // Handle escape key
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && mainNav.classList.contains('open')) {
-        toggleNav(false);
-      }
-    });
-
-    // Handle window resize - close mobile nav on desktop breakpoint
-    let resizeTimeout;
-    const DESKTOP_BREAKPOINT = 768;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimeout);
-      const RESIZE_DEBOUNCE = 100;
-      resizeTimeout = setTimeout(() => {
-        if (
-          window.innerWidth >= DESKTOP_BREAKPOINT &&
-          mainNav.classList.contains('open')
-        ) {
-          toggleNav(false);
-          document.body.style.overflow = ''; // Reset body scroll
-        }
-      }, RESIZE_DEBOUNCE);
-    });
-
-    // Handle focus trap for accessibility
-    this.setupNavFocusTrap(mainNav, navToggle);
-
-    /**
-     * Initialize mega menu functionality
-     */
-    function initializeMegaMenu() {
-      const megaMenuTrigger = document.querySelector(
-        '.nav-item-dropdown .nav-link'
-      );
-      const megaMenuDropdown = document.querySelector('.nav-item-dropdown');
-      const megaMenu = document.querySelector('.mega-menu');
-
-      if (!megaMenuTrigger || !megaMenuDropdown || !megaMenu) return;
-
-      // Mobile detection
-      const MOBILE_BREAKPOINT = 768;
-      const isMobile = () => window.innerWidth <= MOBILE_BREAKPOINT;
-
-      // Mobile doesn't need close button for simple dropdown
-
-      // Initialize search filter (desktop only)
-      const searchInput = document.querySelector('.mega-menu-search');
-      if (searchInput && !isMobile()) {
-        searchInput.addEventListener('input', e => {
-          const searchTerm = e.target.value.toLowerCase();
-          const menuItems = document.querySelectorAll('.mega-menu-item');
-          let visibleCount = 0;
-
-          menuItems.forEach(item => {
-            const title = item.querySelector('h4').textContent.toLowerCase();
-            const description = item
-              .querySelector('p')
-              .textContent.toLowerCase();
-
-            if (
-              title.includes(searchTerm) ||
-              description.includes(searchTerm)
-            ) {
-              item.style.display = 'flex';
-              visibleCount++;
-            } else {
-              item.style.display = 'none';
-            }
-          });
-
-          // Show/hide "no results" message
-          let noResultsMsg = document.querySelector('.mega-menu-no-results');
-          if (visibleCount === 0 && searchTerm.length > 0) {
-            if (!noResultsMsg) {
-              noResultsMsg = document.createElement('div');
-              noResultsMsg.className = 'mega-menu-no-results';
-              noResultsMsg.innerHTML = `
-                <div style="text-align: center; padding: var(--spacing-6); color: var(--color-gray-600);">
-                  <p>No categories match "${searchTerm}"</p>
-                  <small>Try searching for terms like "privacy", "decision", or "robot"</small>
-                </div>
-              `;
-              document
-                .querySelector('.mega-menu-grid')
-                .appendChild(noResultsMsg);
-            }
-            noResultsMsg.style.display = 'block';
-          } else if (noResultsMsg) {
-            noResultsMsg.style.display = 'none';
-          }
-        });
-
-        // Clear search when menu closes
-        const clearSearch = () => {
-          searchInput.value = '';
-          const menuItems = document.querySelectorAll('.mega-menu-item');
-          menuItems.forEach(item => {
-            item.style.display = 'flex';
-          });
-          const noResultsMsg = document.querySelector('.mega-menu-no-results');
-          if (noResultsMsg) {
-            noResultsMsg.style.display = 'none';
-          }
-        };
-
-        // Clear search on menu close (desktop only)
-        if (!isMobile()) {
-          megaMenuTrigger.addEventListener('click', clearSearch);
-        }
-      }
-
-      // Handle mega menu trigger click
-      megaMenuTrigger.addEventListener('click', e => {
-        if (isMobile()) {
-          e.preventDefault();
-          e.stopPropagation();
-          const isExpanded =
-            megaMenuDropdown.getAttribute('aria-expanded') === 'true';
-          megaMenuDropdown.setAttribute('aria-expanded', !isExpanded);
-
-          // Simple dropdown - no body scroll prevention needed
-        }
-      });
-
-      // Handle mega menu item clicks
-      const megaMenuItems = document.querySelectorAll('.mega-menu-item');
-      megaMenuItems.forEach(item => {
-        item.addEventListener('click', e => {
-          e.preventDefault();
-          const href = item.getAttribute('href');
-
-          // Close mega menu
-          megaMenuDropdown.setAttribute('aria-expanded', 'false');
-
-          // On mobile, also close the main navigation
-          const MOBILE_BREAKPOINT = 768;
-          if (window.innerWidth <= MOBILE_BREAKPOINT) {
-            const mainNav = document.querySelector('.main-nav');
-            const navToggle = document.querySelector('.nav-toggle');
-            const navBackdrop = document.querySelector('.nav-backdrop');
-
-            if (mainNav && navToggle) {
-              // Move focus away from the clicked mega menu item before hiding navigation
-              navToggle.focus();
-
-              // Close navigation after focus has moved
-              setTimeout(() => {
-                mainNav.classList.remove('open');
-                navToggle.classList.remove('active');
-                navToggle.setAttribute('aria-expanded', 'false');
-                mainNav.setAttribute('aria-hidden', 'true');
-
-                if (navBackdrop) {
-                  navBackdrop.classList.remove('open');
-                }
-
-                // Restore body scroll
-                document.body.style.overflow = '';
-              }, 0);
-            }
-          }
-
-          // Scroll to category section
-          if (href.startsWith('#category-')) {
-            const categoryId = href.replace('#category-', '');
-            let categoryElement = document.querySelector(
-              `[data-category-id="${categoryId}"]`
-            );
-
-            // Fallback to ID selector if data attribute doesn't work
-            if (!categoryElement) {
-              categoryElement = document.querySelector(
-                `#category-${categoryId}`
-              );
-            }
-
-            if (categoryElement) {
-              // Add a small delay to ensure the menu is closed before scrolling
-              setTimeout(() => {
-                categoryElement.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'start',
-                });
-              }, 100);
-            } else {
-              // Fallback to simulations section
-              const simulationsSection = document.querySelector('#simulations');
-              if (simulationsSection) {
-                setTimeout(() => {
-                  simulationsSection.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start',
-                  });
-                }, 100);
-              }
-            }
-          }
-        });
-      });
-
-      // Handle view all link
-      const viewAllLink = document.querySelector('.mega-menu-view-all');
-      if (viewAllLink) {
-        viewAllLink.addEventListener('click', e => {
-          e.preventDefault();
-          megaMenuDropdown.setAttribute('aria-expanded', 'false');
-
-          // On mobile, also close the main navigation
-          const MOBILE_BREAKPOINT = 768;
-          if (window.innerWidth <= MOBILE_BREAKPOINT) {
-            const mainNav = document.querySelector('.main-nav');
-            const navToggle = document.querySelector('.nav-toggle');
-            const navBackdrop = document.querySelector('.nav-backdrop');
-
-            if (mainNav && navToggle) {
-              // Move focus away from the clicked view all link before hiding navigation
-              navToggle.focus();
-
-              // Close navigation after focus has moved
-              setTimeout(() => {
-                mainNav.classList.remove('open');
-                navToggle.classList.remove('active');
-                navToggle.setAttribute('aria-expanded', 'false');
-                mainNav.setAttribute('aria-hidden', 'true');
-
-                if (navBackdrop) {
-                  navBackdrop.classList.remove('open');
-                }
-
-                // Restore body scroll
-                document.body.style.overflow = '';
-              }, 0);
-            }
-          }
-
-          const simulationsSection = document.querySelector('#simulations');
-          if (simulationsSection) {
-            setTimeout(() => {
-              simulationsSection.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-              });
-            }, 100);
-          }
-        });
-      }
-
-      // Close mega menu when clicking outside
-      document.addEventListener('click', e => {
-        if (!megaMenuDropdown.contains(e.target)) {
-          megaMenuDropdown.setAttribute('aria-expanded', 'false');
-          // Simple dropdown - no body scroll management needed
-        }
-      });
-
-      // Handle keyboard navigation
-      megaMenuTrigger.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          const isExpanded =
-            megaMenuDropdown.getAttribute('aria-expanded') === 'true';
-          megaMenuDropdown.setAttribute('aria-expanded', !isExpanded);
-
-          // Simple dropdown - no body scroll management needed
-        }
-        if (e.key === 'Escape') {
-          megaMenuDropdown.setAttribute('aria-expanded', 'false');
-          // Simple dropdown - no body scroll management needed
-        }
-      });
-
-      // Handle escape key for mobile mega menu
-      document.addEventListener('keydown', e => {
-        if (e.key === 'Escape' && isMobile()) {
-          const isExpanded =
-            megaMenuDropdown.getAttribute('aria-expanded') === 'true';
-          if (isExpanded) {
-            megaMenuDropdown.setAttribute('aria-expanded', 'false');
-            // Simple dropdown - no body scroll management needed
-          }
-        }
-      });
-
-      // Handle window resize
-      window.addEventListener('resize', () => {
-        // Close mega menu on resize to avoid layout issues
-        megaMenuDropdown.setAttribute('aria-expanded', 'false');
-      });
-    }
-
-    // Initialize mega menu when DOM is ready
-    document.addEventListener('DOMContentLoaded', initializeMegaMenu);
-  }
-
-  /**
-   * Sets up focus trap for mobile navigation
-   */
-  setupNavFocusTrap(navElement, _toggleButton) {
-    const focusableSelectors = [
-      'a[href]',
-      'button:not([disabled])',
-      'textarea:not([disabled])',
-      'input:not([disabled])',
-      'select:not([disabled])',
-      '[tabindex]:not([tabindex="-1"])',
-    ].join(',');
-
-    navElement.addEventListener('keydown', e => {
-      if (!navElement.classList.contains('open') || e.key !== 'Tab') {
-        return;
-      }
-
-      const focusableElements = navElement.querySelectorAll(focusableSelectors);
-      const firstFocusable = focusableElements[0];
-      const lastFocusable = focusableElements[focusableElements.length - 1];
-
-      if (e.shiftKey) {
-        // Shift + Tab - going backwards
-        if (document.activeElement === firstFocusable) {
-          e.preventDefault();
-          lastFocusable.focus();
-        }
-      } else {
-        // Tab - going forwards
-        if (document.activeElement === lastFocusable) {
-          e.preventDefault();
-          firstFocusable.focus();
-        }
-      }
-    });
   }
 
   /**
@@ -2816,6 +2392,12 @@ class AIEthicsApp {
    * Initialize MCP (Model Context Protocol) integrations
    */
   async initializeMCPIntegrations() {
+    // Prevent duplicate initialization
+    if (this.mcpInitialized) {
+      AppDebug.debug('MCP integrations already initialized, skipping');
+      return;
+    }
+
     try {
       AppDebug.log('Initializing MCP integrations...');
 
@@ -2824,6 +2406,7 @@ class AIEthicsApp {
 
       if (mcpResult.success) {
         this.mcpCapabilities = new Set(mcpResult.capabilities);
+        this.mcpInitialized = true; // Mark as initialized
         AppDebug.log('MCP integrations initialized:', mcpResult.capabilities);
 
         // Enhance existing features with MCP capabilities
@@ -3522,6 +3105,13 @@ if (document.readyState === 'loading') {
 
 // Make app globally available for inline event handlers
 window.app = app;
+
+// Add debug functions for testing Surprise Me functionality
+window.clearAllProgress = () => app.clearAllProgress();
+window.markSomeScenariosCompleted = () => app.markSomeScenariosCompleted();
+window.testSurpriseMe = () => app.launchRandomScenario();
+window.debugShowAllContent = () => app.debugShowAllContent();
+window.debugModalState = () => app.debugModalState();
 
 // Export the class for ES6 modules
 export default AIEthicsApp;

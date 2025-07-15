@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Donation Function Test</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-section {
+        background: white;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      .status {
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .warning {
+        background: #fff3cd;
+        color: #856404;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      .log {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 10px;
+        margin: 10px 0;
+        font-family: monospace;
+        white-space: pre-wrap;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🧪 Donation System Test</h1>
+
+    <div class="test-section">
+      <h2>System Status</h2>
+      <div id="system-status">
+        <p class="warning">Checking system status...</p>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>Firebase Functions Test</h2>
+      <p>Test if Firebase Functions are accessible and working:</p>
+      <button onclick="testCreateCheckoutSession()">
+        Test Authenticated Checkout
+      </button>
+      <button onclick="testAnonymousCheckout()">Test Anonymous Checkout</button>
+      <div id="function-results"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Stripe Integration Test</h2>
+      <p>Test if Stripe SDK is loaded and keys are working:</p>
+      <button onclick="testStripeKey()">Test Stripe Key</button>
+      <div id="stripe-results"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Test Log</h2>
+      <div id="test-log" class="log">Starting tests...\n</div>
+      <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-functions-compat.js"></script>
+
+    <!-- Stripe SDK -->
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <!-- Environment and services -->
+    <script type="module" src="src/js/utils/env-config.js"></script>
+    <script type="module" src="src/js/core/firebase-service.js"></script>
+
+    <script>
+      let testLog = '';
+
+      function log(message) {
+        const timestamp = new Date().toLocaleTimeString();
+        testLog += `[${timestamp}] ${message}\n`;
+        document.getElementById('test-log').textContent = testLog;
+      }
+
+      function clearLog() {
+        testLog = '';
+        document.getElementById('test-log').textContent = 'Log cleared.\n';
+      }
+
+      // Check system status
+      function checkSystemStatus() {
+        const statusDiv = document.getElementById('system-status');
+        const checks = [];
+
+        // Firebase
+        if (window.firebase) {
+          checks.push('✅ Firebase SDK loaded');
+          if (window.firebase.apps && window.firebase.apps.length > 0) {
+            checks.push('✅ Firebase app initialized');
+          } else {
+            checks.push('❌ Firebase app not initialized');
+          }
+        } else {
+          checks.push('❌ Firebase SDK not loaded');
+        }
+
+        // Stripe
+        if (window.Stripe) {
+          checks.push('✅ Stripe SDK loaded');
+        } else {
+          checks.push('❌ Stripe SDK not loaded');
+        }
+
+        // Environment config
+        if (window.envConfig) {
+          checks.push('✅ Environment config loaded');
+        } else {
+          checks.push('⚠️ Environment config not loaded');
+        }
+
+        statusDiv.innerHTML = checks.map(check => `<p>${check}</p>`).join('');
+      }
+
+      async function testCreateCheckoutSession() {
+        const resultsDiv = document.getElementById('function-results');
+        resultsDiv.innerHTML =
+          '<p class="warning">Testing authenticated checkout session...</p>';
+
+        try {
+          log('Testing createCheckoutSession function...');
+
+          const functions = window.firebase.functions();
+          const createCheckoutSession = functions.httpsCallable(
+            'createCheckoutSession'
+          );
+
+          const result = await createCheckoutSession({
+            priceId: 'price_1RkyADJDA3nPZHAFQJr2ySBR', // $5 Bronze tier
+            tier: '1',
+          });
+
+          log(`Success: ${JSON.stringify(result.data)}`);
+          resultsDiv.innerHTML = `<p class="success">✅ createCheckoutSession working! Session ID: ${result.data.sessionId}</p>`;
+        } catch (error) {
+          log(`Error: ${error.message}`);
+          resultsDiv.innerHTML = `<p class="error">❌ createCheckoutSession failed: ${error.message}</p>`;
+        }
+      }
+
+      async function testAnonymousCheckout() {
+        const resultsDiv = document.getElementById('function-results');
+        resultsDiv.innerHTML =
+          '<p class="warning">Testing anonymous checkout...</p>';
+
+        try {
+          log('Testing createAnonymousCheckout function...');
+
+          const functions = window.firebase.functions();
+          const createAnonymousCheckout = functions.httpsCallable(
+            'createAnonymousCheckout'
+          );
+
+          const result = await createAnonymousCheckout({
+            tier: '1',
+            email: 'test@example.com',
+          });
+
+          log(`Success: ${JSON.stringify(result.data)}`);
+          resultsDiv.innerHTML = `<p class="success">✅ createAnonymousCheckout working! URL: ${result.data.url}</p>`;
+        } catch (error) {
+          log(`Error: ${error.message}`);
+          resultsDiv.innerHTML = `<p class="error">❌ createAnonymousCheckout failed: ${error.message}</p>`;
+        }
+      }
+
+      async function testStripeKey() {
+        const resultsDiv = document.getElementById('stripe-results');
+        resultsDiv.innerHTML = '<p class="warning">Testing Stripe key...</p>';
+
+        try {
+          log('Testing Stripe key...');
+
+          // Try to get key from environment
+          let stripeKey = null;
+          if (window.envConfig && window.envConfig.getStripePublishableKey) {
+            stripeKey = window.envConfig.getStripePublishableKey();
+          }
+
+          if (!stripeKey && window.import && window.import.meta) {
+            stripeKey = window.import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+          }
+
+          // Check if key is properly configured
+          if (!stripeKey || stripeKey === 'PLACEHOLDER_KEY') {
+            log(
+              'ERROR: Stripe key not configured. Please set VITE_STRIPE_PUBLISHABLE_KEY environment variable.'
+            );
+            return;
+          }
+
+          if (stripeKey && stripeKey.startsWith('pk_')) {
+            const stripe = window.Stripe(stripeKey);
+            log(`Stripe key found: ${stripeKey.substring(0, 15)}...`);
+            resultsDiv.innerHTML = `<p class="success">✅ Stripe key valid and loaded!</p>`;
+          } else {
+            throw new Error('No valid Stripe key found');
+          }
+        } catch (error) {
+          log(`Error: ${error.message}`);
+          resultsDiv.innerHTML = `<p class="error">❌ Stripe key test failed: ${error.message}</p>`;
+        }
+      }
+
+      // Initialize tests when page loads
+      document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+          checkSystemStatus();
+          log('System status check completed');
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>

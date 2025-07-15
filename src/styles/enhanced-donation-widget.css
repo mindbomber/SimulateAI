@@ -1,0 +1,518 @@
+/* Enhanced Donation Widget Styles */
+.enhanced-donation-widget {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.enhanced-donation-widget.inline {
+  background: transparent;
+  box-shadow: none;
+  padding: 16px;
+}
+
+.enhanced-donation-widget.minimal {
+  padding: 16px;
+  max-width: 400px;
+}
+
+/* Header */
+.donation-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.donation-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 8px 0;
+}
+
+.donation-subtitle {
+  color: #6c757d;
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* Authentication Banner */
+.auth-status-banner {
+  margin-bottom: 20px;
+}
+
+.auth-banner {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.auth-banner.authenticated {
+  background: linear-gradient(135deg, #d4edda, #c3e6cb);
+  border: 1px solid #b6d7a8;
+  color: #155724;
+}
+
+.auth-banner.not-authenticated {
+  background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+  border: 1px solid #ffc107;
+  color: #856404;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.user-name {
+  font-weight: 600;
+}
+
+.auth-status {
+  font-size: 0.85rem;
+}
+
+.auth-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth-icon {
+  font-size: 1.2em;
+}
+
+.auth-link {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}
+
+/* Donation Type Selector */
+.donation-type-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.donation-type-btn {
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 16px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.donation-type-btn:hover {
+  border-color: #007bff;
+  background: #f8f9ff;
+}
+
+.donation-type-btn.active {
+  border-color: #007bff;
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  color: #1565c0;
+}
+
+.type-description {
+  font-size: 0.8rem;
+  color: #6c757d;
+  font-weight: normal;
+}
+
+.donation-type-btn.active .type-description {
+  color: #1976d2;
+}
+
+/* Tier Selection */
+.tier-selection {
+  margin-bottom: 24px;
+}
+
+.tier-option {
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.tier-option:hover {
+  border-color: #007bff;
+  background: #f8f9ff;
+}
+
+.tier-option.selected {
+  border-color: #007bff;
+  background: linear-gradient(135deg, #e3f2fd, #f8f9ff);
+}
+
+.tier-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.tier-flair {
+  font-size: 1.5rem;
+  margin-right: 12px;
+}
+
+.tier-name {
+  font-weight: 600;
+  color: #2c3e50;
+  flex: 1;
+}
+
+.tier-amount {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #007bff;
+}
+
+.tier-description {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* Benefits Section */
+.donation-benefits {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.donation-benefits h4 {
+  margin: 0 0 12px 0;
+  color: #2c3e50;
+  font-size: 1rem;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.benefit-icon {
+  font-size: 1.2rem;
+}
+
+.benefit-text {
+  color: #495057;
+}
+
+.benefit-item.authenticated-only {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.benefit-item.authenticated-only.hidden {
+  opacity: 0.5;
+}
+
+/* Donation Actions */
+.donation-actions {
+  text-align: center;
+}
+
+.donation-submit-btn {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 16px 32px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.donation-submit-btn:hover {
+  background: linear-gradient(135deg, #0056b3, #004085);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.donation-submit-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-icon {
+  font-size: 1.2rem;
+}
+
+.donation-security {
+  color: #6c757d;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* Recognition Prompt */
+.recognition-prompt {
+  background: linear-gradient(135deg, #d4edda, #c3e6cb);
+  border: 1px solid #b6d7a8;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.recognition-prompt.hidden {
+  display: none;
+}
+
+.recognition-content h4 {
+  color: #155724;
+  margin: 0 0 12px 0;
+}
+
+.recognition-content p {
+  color: #155724;
+  margin: 0 0 16px 0;
+}
+
+.recognition-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.recognition-actions .btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.btn-outline {
+  background: white;
+  border: 2px solid #007bff;
+  color: #007bff;
+}
+
+.btn-outline:hover {
+  background: #007bff;
+  color: white;
+}
+
+.btn-text {
+  background: transparent;
+  border: none;
+  color: #6c757d;
+  text-decoration: underline;
+}
+
+.btn-text:hover {
+  color: #495057;
+}
+
+/* Donation Accordion Styles */
+.donation-accordion {
+  max-width: 600px;
+  margin: 30px auto;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  background: white;
+}
+
+.donation-accordion .accordion-item {
+  border-bottom: none;
+}
+
+.donation-accordion .accordion-header {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+  color: white;
+  border: none;
+  outline: none;
+}
+
+.donation-accordion .accordion-header:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+}
+
+.donation-accordion .accordion-header:focus {
+  outline: 3px solid rgba(102, 126, 234, 0.3);
+  outline-offset: -3px;
+}
+
+.donation-accordion .accordion-icon {
+  margin-right: 12px;
+  font-size: 14px;
+  transition: transform 0.3s ease;
+  color: white;
+}
+
+.donation-accordion .accordion-header[aria-expanded='true'] .accordion-icon {
+  transform: rotate(90deg);
+}
+
+.donation-accordion .accordion-title {
+  flex: 1;
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: white;
+  margin: 0;
+}
+
+.donation-accordion .accordion-subtitle {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 400;
+  margin-left: 8px;
+}
+
+.donation-accordion .accordion-content {
+  padding: 0;
+  background: white;
+  overflow: hidden;
+  transition:
+    max-height 0.4s ease,
+    padding 0.4s ease;
+  max-height: 1000px; /* Large enough for content */
+}
+
+.donation-accordion .accordion-content.collapsed {
+  max-height: 0;
+  padding: 0;
+}
+
+.donation-accordion .accordion-content-inner {
+  padding: 20px;
+}
+
+/* Remove extra spacing from nested donation widget in accordion */
+.donation-accordion .enhanced-donation-widget {
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  margin: 0;
+}
+
+/* Compact header for accordion version */
+.donation-accordion .donation-header {
+  display: none; /* Header is now part of accordion header */
+}
+
+/* Enhance visual appeal in accordion */
+.donation-accordion .tier-option:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.donation-accordion .donation-submit-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  padding: 14px 28px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.donation-accordion .donation-submit-btn:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+/* Mobile responsiveness for accordion */
+@media (max-width: 768px) {
+  .donation-accordion {
+    margin: 20px 16px;
+    border-radius: 8px;
+  }
+
+  .donation-accordion .accordion-header {
+    padding: 12px 16px;
+  }
+
+  .donation-accordion .accordion-title {
+    font-size: 1.1rem;
+  }
+
+  .donation-accordion .accordion-subtitle {
+    font-size: 0.8rem;
+  }
+
+  .donation-accordion .accordion-content-inner {
+    padding: 16px;
+  }
+}
+
+/* Animation for opening/closing */
+@keyframes accordionExpand {
+  from {
+    max-height: 0;
+    opacity: 0;
+  }
+  to {
+    max-height: 1000px;
+    opacity: 1;
+  }
+}
+
+@keyframes accordionCollapse {
+  from {
+    max-height: 1000px;
+    opacity: 1;
+  }
+  to {
+    max-height: 0;
+    opacity: 0;
+  }
+}
+
+.donation-accordion .accordion-content:not(.collapsed) {
+  animation: accordionExpand 0.4s ease-out;
+}
+
+.donation-accordion .accordion-content.collapsed {
+  animation: accordionCollapse 0.4s ease-out;
+}

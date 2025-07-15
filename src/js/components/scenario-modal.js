@@ -40,7 +40,9 @@ class ScenarioModal {
     try {
       // Prevent duplicate openings
       if (this.isOpening || this.modal) {
-        logger.warn('Modal is already opening or open, ignoring duplicate request');
+        logger.warn(
+          'Modal is already opening or open, ignoring duplicate request'
+        );
         return;
       }
 
@@ -76,7 +78,10 @@ class ScenarioModal {
       await this.createModal();
       await this.show();
 
-      logger.info('ScenarioModal', `Opened scenario modal for: ${categoryId}:${scenarioId}`);
+      logger.info(
+        'ScenarioModal',
+        `Opened scenario modal for: ${categoryId}:${scenarioId}`
+      );
     } catch (error) {
       logger.error('Failed to open scenario modal:', error);
       alert(`Failed to load scenario: ${scenarioId}. Please try again.`);
@@ -109,21 +114,28 @@ class ScenarioModal {
     await this.closeAndWait();
 
     // Clean up any orphaned modals or radar chart containers from previous instances
-    const existingModals = document.querySelectorAll('.scenario-modal, .scenario-modal-backdrop');
+    const existingModals = document.querySelectorAll(
+      '.scenario-modal, .scenario-modal-backdrop'
+    );
     existingModals.forEach(modal => {
       logger.info('ScenarioModal', 'Removing orphaned modal element');
       modal.remove();
     });
 
     // Clean up any orphaned radar chart containers with Chart.js instances
-    const orphanedChartContainers = document.querySelectorAll('#scenario-radar-chart');
+    const orphanedChartContainers = document.querySelectorAll(
+      '#scenario-radar-chart'
+    );
     orphanedChartContainers.forEach(container => {
       const canvases = container.querySelectorAll('canvas');
       canvases.forEach(canvas => {
         if (window.Chart && window.Chart.getChart) {
           const chartInstance = window.Chart.getChart(canvas);
           if (chartInstance) {
-            logger.info('ScenarioModal', 'Destroying orphaned Chart.js instance');
+            logger.info(
+              'ScenarioModal',
+              'Destroying orphaned Chart.js instance'
+            );
             chartInstance.destroy();
           }
         }
@@ -149,7 +161,10 @@ class ScenarioModal {
     document.body.appendChild(this.backdrop);
     document.body.appendChild(this.modal);
 
-    logger.info('ScenarioModal', 'Scenario modal DOM structure created and appended to body');
+    logger.info(
+      'ScenarioModal',
+      'Scenario modal DOM structure created and appended to body'
+    );
     logger.info(
       'Modal HTML contains radar chart container:',
       this.modal.innerHTML.includes('scenario-radar-chart')
@@ -242,11 +257,9 @@ class ScenarioModal {
       'ScenarioModal',
       'Generated scenario modal HTML, checking for radar chart container...'
     );
-    logger.info(
-      'ScenarioModal',
-      'HTML contains scenario-radar-chart:',
-      { hasRadarChart: html.includes('scenario-radar-chart') }
-    );
+    logger.info('ScenarioModal', 'HTML contains scenario-radar-chart:', {
+      hasRadarChart: html.includes('scenario-radar-chart'),
+    });
 
     return html;
   }
@@ -302,10 +315,140 @@ class ScenarioModal {
    */
   async initializeRadarChart() {
     try {
-      // Check if modal is closing or already closed before initializing
-      if (this.isClosing || !this.modal || this.modal.style.display === 'none' || !document.body.contains(this.modal)) {
-        logger.info('RadarChart', 'Modal closing/closed, skipping radar chart initialization');
+      logger.info('RadarChart', 'Starting radar chart initialization...');
+
+      // Enhanced checks for modal state - WITH DETAILED DEBUGGING
+      console.log('🔍 Modal state debug:', {
+        isClosing: this.isClosing,
+        hasModal: !!this.modal,
+        modalInDOM: this.modal ? document.body.contains(this.modal) : false,
+        modalDisplay: this.modal ? this.modal.style.display : 'no modal',
+        modalAriaHidden: this.modal
+          ? this.modal.getAttribute('aria-hidden')
+          : 'no modal',
+        modalHasAriaHidden: this.modal
+          ? this.modal.hasAttribute('aria-hidden')
+          : false,
+      });
+
+      if (this.isClosing) {
+        logger.debug(
+          'RadarChart',
+          'Modal is closing, skipping radar chart initialization'
+        );
+        console.log('❌ Exit: Modal is closing');
         return;
+      }
+
+      if (!this.modal || !document.body.contains(this.modal)) {
+        logger.debug(
+          'RadarChart',
+          'Modal not in DOM, skipping radar chart initialization'
+        );
+        console.log('❌ Exit: Modal not in DOM');
+        return;
+      }
+
+      // Check if modal is visible - FIXED LOGIC
+      const isVisible =
+        this.modal.style.display !== 'none' &&
+        !this.modal.hasAttribute('aria-hidden') &&
+        this.modal.getAttribute('aria-hidden') !== 'true';
+
+      console.log('🔍 Visibility check:', {
+        displayNotNone: this.modal.style.display !== 'none',
+        noAriaHiddenAttr: !this.modal.hasAttribute('aria-hidden'),
+        ariaHiddenNotTrue: this.modal.getAttribute('aria-hidden') !== 'true',
+        finalIsVisible: isVisible,
+      });
+
+      if (!isVisible) {
+        logger.debug(
+          'RadarChart',
+          'Modal not visible, skipping radar chart initialization'
+        );
+        console.log('❌ Exit: Modal not visible');
+        return;
+      }
+
+      console.log('✅ All modal state checks passed!');
+
+      // Check if RadarChart class is available
+      if (!RadarChart) {
+        logger.error(
+          'RadarChart',
+          'RadarChart class not available - import failed'
+        );
+        return;
+      }
+
+      // Check if Chart.js is available
+      if (!window.Chart) {
+        logger.error(
+          'RadarChart',
+          'Chart.js not loaded - radar chart cannot be initialized'
+        );
+        return;
+      }
+
+      console.log(
+        '✅ All prerequisites met, proceeding with radar chart initialization'
+      );
+      logger.info(
+        'RadarChart',
+        'Prerequisites check passed - Chart.js and RadarChart class available'
+      );
+
+      // IMMEDIATE TEST: Skip complex container search and try direct creation
+      const directContainer = document.getElementById('scenario-radar-chart');
+      if (directContainer) {
+        console.log(
+          '📦 Direct container found, attempting immediate chart creation'
+        );
+        try {
+          directContainer.innerHTML =
+            '<div style="background: yellow; padding: 10px;">🔄 Creating radar chart...</div>';
+
+          // Try direct radar chart creation
+          this.radarChart = new RadarChart('scenario-radar-chart', {
+            width: 380,
+            height: 380,
+            showLabels: true,
+            showLegend: false,
+            animated: true,
+            realTime: true,
+            title: null,
+          });
+
+          // Set initial neutral scores
+          const neutralScores = {
+            fairness: RADAR_CHART_NEUTRAL_SCORE,
+            sustainability: RADAR_CHART_NEUTRAL_SCORE,
+            autonomy: RADAR_CHART_NEUTRAL_SCORE,
+            beneficence: RADAR_CHART_NEUTRAL_SCORE,
+            transparency: RADAR_CHART_NEUTRAL_SCORE,
+            accountability: RADAR_CHART_NEUTRAL_SCORE,
+            privacy: RADAR_CHART_NEUTRAL_SCORE,
+            proportionality: RADAR_CHART_NEUTRAL_SCORE,
+          };
+
+          if (this.radarChart.initializationPromise) {
+            await this.radarChart.initializationPromise;
+          }
+
+          this.radarChart.setScores(neutralScores);
+          console.log('✅ Direct radar chart creation successful!');
+          logger.info('RadarChart', 'Direct radar chart creation successful');
+          return; // Exit early on success
+        } catch (error) {
+          console.error('❌ Direct radar chart creation failed:', error);
+          logger.error('RadarChart', 'Direct creation failed:', error);
+          // Continue to complex search below
+        }
+      } else {
+        console.log(
+          '❌ Direct container not found, proceeding with complex search'
+        );
       }
 
       // Clean up any existing radar chart instance
@@ -313,7 +456,11 @@ class ScenarioModal {
         try {
           this.radarChart.destroy();
         } catch (e) {
-          logger.warn('RadarChart', 'Failed to destroy existing radar chart', e);
+          logger.warn(
+            'RadarChart',
+            'Failed to destroy existing radar chart',
+            e
+          );
         }
         this.radarChart = null;
       }
@@ -323,33 +470,49 @@ class ScenarioModal {
       let attempts = 0;
       const maxAttempts = 20; // Increased attempts
       const retryDelay = 150; // ms - delay between attempts
-      
+
       while (!chartContainer && attempts < maxAttempts) {
         // Check if modal is closing before each attempt
-        if (this.isClosing || !this.modal || !document.body.contains(this.modal)) {
-          logger.info('RadarChart', 'Modal closing during container search, aborting');
+        if (
+          this.isClosing ||
+          !this.modal ||
+          !document.body.contains(this.modal)
+        ) {
+          logger.info(
+            'RadarChart',
+            'Modal closing during container search, aborting'
+          );
           return;
         }
-        
+
         // Check if modal has been properly rendered
         if (this.modal.style.display === 'none') {
-          logger.debug('RadarChart', `Modal not visible yet (attempt ${attempts + 1}/${maxAttempts})`);
+          logger.debug(
+            'RadarChart',
+            `Modal not visible yet (attempt ${attempts + 1}/${maxAttempts})`
+          );
           await new Promise(resolve => setTimeout(resolve, retryDelay));
           attempts++;
           continue;
         }
-        
+
         // Double-check that modal contains the expected HTML
         if (!this.modal.innerHTML.includes('scenario-radar-chart')) {
-          logger.debug('RadarChart', `Modal HTML incomplete (attempt ${attempts + 1}/${maxAttempts})`);
+          logger.debug(
+            'RadarChart',
+            `Modal HTML incomplete (attempt ${attempts + 1}/${maxAttempts})`
+          );
           await new Promise(resolve => setTimeout(resolve, retryDelay));
           attempts++;
           continue;
         }
-        
+
         chartContainer = document.getElementById('scenario-radar-chart');
         if (!chartContainer) {
-          logger.debug('RadarChart', `Container not found in DOM (attempt ${attempts + 1}/${maxAttempts})`);
+          logger.debug(
+            'RadarChart',
+            `Container not found in DOM (attempt ${attempts + 1}/${maxAttempts})`
+          );
           await new Promise(resolve => setTimeout(resolve, retryDelay));
           attempts++;
         }
@@ -360,20 +523,25 @@ class ScenarioModal {
         attempts: attempts + 1,
         modalVisible: this.modal?.style.display !== 'none',
         modalInDOM: document.body.contains(this.modal),
-        modalHasHTML: this.modal?.innerHTML.includes('scenario-radar-chart')
+        modalHasHTML: this.modal?.innerHTML.includes('scenario-radar-chart'),
       });
 
       if (!chartContainer) {
         // If we still can't find the container, this might not be an error but normal behavior
         // (e.g., user closed modal quickly)
         if (this.isClosing || !document.body.contains(this.modal)) {
-          logger.info('RadarChart', 'Modal was closed during initialization, this is normal');
+          logger.info(
+            'RadarChart',
+            'Modal was closed during initialization, this is normal'
+          );
         } else {
           logger.error('RadarChart', 'Container not found after all attempts', {
             modalVisible: this.modal?.style.display !== 'none',
             modalHTML: this.modal?.innerHTML ? 'present' : 'missing',
             modalInDOM: document.body.contains(this.modal),
-            containerInHTML: this.modal?.innerHTML.includes('scenario-radar-chart')
+            containerInHTML: this.modal?.innerHTML.includes(
+              'scenario-radar-chart'
+            ),
           });
         }
         return;
@@ -386,7 +554,10 @@ class ScenarioModal {
         if (window.Chart && window.Chart.getChart) {
           const chartInstance = window.Chart.getChart(canvas);
           if (chartInstance) {
-            logger.info('RadarChart', 'Destroying existing Chart.js instance before creating new one');
+            logger.info(
+              'RadarChart',
+              'Destroying existing Chart.js instance before creating new one'
+            );
             chartInstance.destroy();
           }
         }
@@ -399,36 +570,89 @@ class ScenarioModal {
 
       logger.info('RadarChart', 'Container cleared, initializing radar chart');
 
-      // Pass the container ID (string), not the element itself
-      this.radarChart = new RadarChart('scenario-radar-chart', {
-        width: 380,
-        height: 380,
-        showLabels: true,
-        showLegend: false,
-        animated: true,
-        realTime: true,
-        title: null, // Disable chart title to avoid duplication with h3
-      });
+      try {
+        // Pass the container ID (string), not the element itself
+        logger.info('RadarChart', 'Creating new RadarChart instance...');
+        this.radarChart = new RadarChart('scenario-radar-chart', {
+          width: 380,
+          height: 380,
+          showLabels: true,
+          showLegend: false,
+          animated: true,
+          realTime: true,
+          title: null, // Disable chart title to avoid duplication with h3
+        });
+        logger.info('RadarChart', 'RadarChart constructor completed');
 
-      // Wait for the RadarChart to be fully initialized
-      await this.radarChart.initializationPromise;
-      logger.info('RadarChart', 'Radar chart async initialization completed');
+        // Wait for the RadarChart to be fully initialized
+        logger.info(
+          'RadarChart',
+          'Waiting for radar chart initialization promise...'
+        );
+        if (this.radarChart.initializationPromise) {
+          await this.radarChart.initializationPromise;
+          logger.info(
+            'RadarChart',
+            'Radar chart async initialization completed'
+          );
+        } else {
+          logger.warn(
+            'RadarChart',
+            'No initialization promise found on radar chart instance'
+          );
+        }
 
-      // Set initial neutral scores (using the correct method)
-      const neutralScores = {
-        fairness: RADAR_CHART_NEUTRAL_SCORE,
-        sustainability: RADAR_CHART_NEUTRAL_SCORE,
-        autonomy: RADAR_CHART_NEUTRAL_SCORE,
-        beneficence: RADAR_CHART_NEUTRAL_SCORE,
-        transparency: RADAR_CHART_NEUTRAL_SCORE,
-        accountability: RADAR_CHART_NEUTRAL_SCORE,
-        privacy: RADAR_CHART_NEUTRAL_SCORE,
-        proportionality: RADAR_CHART_NEUTRAL_SCORE,
-      };
+        // Verify the chart was created successfully
+        if (!this.radarChart) {
+          logger.error(
+            'RadarChart',
+            'Radar chart instance is null after initialization'
+          );
+          return;
+        }
 
-      this.radarChart.setScores(neutralScores);
-      logger.info('RadarChart', 'Radar chart initialized successfully with neutral scores');
-      
+        // Set initial neutral scores (using the correct method)
+        const neutralScores = {
+          fairness: RADAR_CHART_NEUTRAL_SCORE,
+          sustainability: RADAR_CHART_NEUTRAL_SCORE,
+          autonomy: RADAR_CHART_NEUTRAL_SCORE,
+          beneficence: RADAR_CHART_NEUTRAL_SCORE,
+          transparency: RADAR_CHART_NEUTRAL_SCORE,
+          accountability: RADAR_CHART_NEUTRAL_SCORE,
+          privacy: RADAR_CHART_NEUTRAL_SCORE,
+          proportionality: RADAR_CHART_NEUTRAL_SCORE,
+        };
+
+        logger.info(
+          'RadarChart',
+          'Setting initial neutral scores...',
+          neutralScores
+        );
+        this.radarChart.setScores(neutralScores);
+        logger.info(
+          'RadarChart',
+          'Radar chart initialized successfully with neutral scores'
+        );
+
+        // Verify chart is visible in DOM
+        const chartCanvas = chartContainer.querySelector('canvas');
+        if (chartCanvas) {
+          logger.info(
+            'RadarChart',
+            'Canvas element created successfully in container'
+          );
+        } else {
+          logger.warn(
+            'RadarChart',
+            'No canvas element found in container after initialization'
+          );
+        }
+      } catch (error) {
+        logger.error('RadarChart', 'Error during radar chart creation:', error);
+        this.radarChart = null;
+        return;
+      }
+
       // Process any pending radar chart updates
       if (this.pendingRadarUpdate && this.selectedOption) {
         logger.info('ScenarioModal', 'Processing pending radar chart update');
@@ -517,7 +741,9 @@ class ScenarioModal {
 
     // If the clicked option is already selected, deselect it
     if (isCurrentlySelected) {
-      logger.info('ScenarioModal', 'Deselecting currently selected option:', { optionId });
+      logger.info('ScenarioModal', 'Deselecting currently selected option:', {
+        optionId,
+      });
 
       // Remove selection
       card.classList.remove('selected');
@@ -593,18 +819,25 @@ class ScenarioModal {
       !this.selectedOption ||
       !this.selectedOption.impact
     ) {
-      logger.warn('RadarChart', 'Cannot update radar chart - missing components', {
-        hasRadarChart: !!this.radarChart,
-        hasSelectedOption: !!this.selectedOption,
-        hasImpact: !!this.selectedOption?.impact,
-      });
+      logger.warn(
+        'RadarChart',
+        'Cannot update radar chart - missing components',
+        {
+          hasRadarChart: !!this.radarChart,
+          hasSelectedOption: !!this.selectedOption,
+          hasImpact: !!this.selectedOption?.impact,
+        }
+      );
       return;
     }
 
     try {
       // Check if radar chart is initialized
       if (!this.radarChart.isInitialized) {
-        logger.warn('RadarChart', 'Radar chart not yet initialized, skipping update');
+        logger.warn(
+          'RadarChart',
+          'Radar chart not yet initialized, skipping update'
+        );
         return;
       }
 
@@ -624,7 +857,11 @@ class ScenarioModal {
         );
       });
 
-      logger.info('RadarChart', 'Updating radar chart with converted scores:', impactScores);
+      logger.info(
+        'RadarChart',
+        'Updating radar chart with converted scores:',
+        impactScores
+      );
       this.radarChart.setScores(impactScores);
       logger.info('RadarChart', 'Radar chart updated successfully');
     } catch (error) {
@@ -664,14 +901,17 @@ class ScenarioModal {
     // Close modal with delay to show completion, then dispatch final event
     setTimeout(async () => {
       await this.closeAndWait();
-      
+
       // Dispatch event after modal is fully closed (for badge display)
       const closedEvent = new CustomEvent('scenario-modal-closed', {
         detail: completionData,
       });
       document.dispatchEvent(closedEvent);
-      
-      logger.info('ScenarioModal', 'Scenario modal fully closed, badges can now be displayed');
+
+      logger.info(
+        'ScenarioModal',
+        'Scenario modal fully closed, badges can now be displayed'
+      );
     }, 1000);
   }
 
@@ -709,6 +949,21 @@ class ScenarioModal {
     });
 
     // Start typewriter effect for the dilemma and ethical question
+    // Initialize radar chart first, before typewriter effect - with additional delay
+    console.log('🎯 About to initialize radar chart');
+    console.log('DOM ready state:', document.readyState);
+    console.log('Chart.js available:', !!window.Chart);
+    console.log(
+      'Container exists:',
+      !!document.getElementById('scenario-radar-chart')
+    );
+
+    // Add a small delay to ensure DOM is fully settled
+    await new Promise(resolve => setTimeout(resolve, 200));
+
+    await this.initializeRadarChart();
+
+    // Then start typewriter effect
     await this.startTypewriterEffect();
   }
 
@@ -732,7 +987,7 @@ class ScenarioModal {
   close() {
     // Set closing flag to prevent radar chart initialization
     this.isClosing = true;
-    
+
     if (this.modal) {
       this.modal.classList.add('closing');
       setTimeout(() => {
@@ -767,6 +1022,26 @@ class ScenarioModal {
       this.escapeHandler = null;
     }
 
+    // CRITICAL FIX: Always dispatch modal closed event to reset CategoryGrid state
+    // This ensures that subsequent Surprise Me clicks work even if modal was closed without completion
+    const modalClosedEvent = new CustomEvent('scenario-modal-closed', {
+      detail: {
+        categoryId: this.currentCategoryId,
+        scenarioId: this.currentScenarioId,
+        completed: false, // Indicate this was closed without completion
+      },
+    });
+
+    // Dispatch after a short delay to ensure modal cleanup is complete
+    const CLOSE_EVENT_DELAY = 50; // ms - small buffer after animation
+    setTimeout(() => {
+      document.dispatchEvent(modalClosedEvent);
+      logger.info(
+        'ScenarioModal',
+        'Modal closed event dispatched (without completion)'
+      );
+    }, ANIMATION_DURATION + CLOSE_EVENT_DELAY);
+
     // Reset state
     this.currentScenario = null;
     this.selectedOption = null;
@@ -785,9 +1060,10 @@ class ScenarioModal {
   async startTypewriterEffect() {
     try {
       const dilemmaElement = this.modal.querySelector('.dilemma-text');
-      const ethicalQuestionElement = this.modal.querySelector('.ethical-question');
+      const ethicalQuestionElement =
+        this.modal.querySelector('.ethical-question');
       const scenarioContent = this.modal.querySelector('.scenario-content');
-      
+
       if (!dilemmaElement || !ethicalQuestionElement) {
         logger.warn('Could not find text elements for typewriter effect');
         return;
@@ -810,8 +1086,8 @@ class ScenarioModal {
           options: {
             speed: 15, // Faster typing
             delay: 200, // Small delay before starting
-            cursor: true
-          }
+            cursor: true,
+          },
         },
         {
           element: ethicalQuestionElement,
@@ -819,27 +1095,26 @@ class ScenarioModal {
           options: {
             speed: 20, // Faster typing for emphasis
             delay: 200, // Shorter delay after first text completes
-            cursor: true
-          }
-        }
+            cursor: true,
+          },
+        },
       ]);
 
       logger.info('ScenarioModal', 'Typewriter effect completed');
-      
-      // Initialize radar chart after all animations are complete
-      await this.initializeRadarChart();
     } catch (error) {
       logger.error('Failed to apply typewriter effect:', error);
-      
+
       // Fallback - show text immediately if typewriter fails
       const dilemmaElement = this.modal.querySelector('.dilemma-text');
-      const ethicalQuestionElement = this.modal.querySelector('.ethical-question');
-      
+      const ethicalQuestionElement =
+        this.modal.querySelector('.ethical-question');
+
       if (dilemmaElement) {
         dilemmaElement.textContent = this.currentScenario.dilemma;
       }
       if (ethicalQuestionElement) {
-        ethicalQuestionElement.textContent = this.currentScenario.ethicalQuestion;
+        ethicalQuestionElement.textContent =
+          this.currentScenario.ethicalQuestion;
       }
     }
   }

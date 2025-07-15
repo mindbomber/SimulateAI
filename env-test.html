@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Environment Config Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .config-section {
+        background: white;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .status {
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .warning {
+        background: #fff3cd;
+        color: #856404;
+      }
+      pre {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔧 Environment Configuration Test</h1>
+
+    <div class="config-section">
+      <h2>Environment Variables Status</h2>
+      <div id="env-status"></div>
+    </div>
+
+    <div class="config-section">
+      <h2>Firebase Configuration</h2>
+      <div id="firebase-config"></div>
+    </div>
+
+    <div class="config-section">
+      <h2>Stripe Configuration</h2>
+      <div id="stripe-config"></div>
+    </div>
+
+    <div class="config-section">
+      <h2>Security Check</h2>
+      <div id="security-check"></div>
+    </div>
+
+    <script type="module">
+      // Test environment configuration
+      function testEnvironmentConfig() {
+        const envStatus = document.getElementById('env-status');
+        const firebaseConfig = document.getElementById('firebase-config');
+        const stripeConfig = document.getElementById('stripe-config');
+        const securityCheck = document.getElementById('security-check');
+
+        // Check if import.meta.env is available
+        if (import.meta.env) {
+          envStatus.innerHTML = `
+                    <div class="status success">✅ Vite environment variables available</div>
+                    <h4>Available Environment Variables:</h4>
+                    <pre>${JSON.stringify(
+                      {
+                        VITE_FIREBASE_API_KEY: import.meta.env
+                          .VITE_FIREBASE_API_KEY
+                          ? '✅ Set'
+                          : '❌ Missing',
+                        VITE_FIREBASE_AUTH_DOMAIN: import.meta.env
+                          .VITE_FIREBASE_AUTH_DOMAIN
+                          ? '✅ Set'
+                          : '❌ Missing',
+                        VITE_FIREBASE_PROJECT_ID: import.meta.env
+                          .VITE_FIREBASE_PROJECT_ID
+                          ? '✅ Set'
+                          : '❌ Missing',
+                        VITE_FIREBASE_STORAGE_BUCKET: import.meta.env
+                          .VITE_FIREBASE_STORAGE_BUCKET
+                          ? '✅ Set'
+                          : '❌ Missing',
+                        VITE_FIREBASE_MESSAGING_SENDER_ID: import.meta.env
+                          .VITE_FIREBASE_MESSAGING_SENDER_ID
+                          ? '✅ Set'
+                          : '❌ Missing',
+                        VITE_FIREBASE_APP_ID: import.meta.env
+                          .VITE_FIREBASE_APP_ID
+                          ? '✅ Set'
+                          : '❌ Missing',
+                        VITE_FIREBASE_MEASUREMENT_ID: import.meta.env
+                          .VITE_FIREBASE_MEASUREMENT_ID
+                          ? '✅ Set'
+                          : '❌ Missing',
+                        VITE_STRIPE_PUBLISHABLE_KEY: import.meta.env
+                          .VITE_STRIPE_PUBLISHABLE_KEY
+                          ? '✅ Set'
+                          : '❌ Missing',
+                        VITE_ENVIRONMENT:
+                          import.meta.env.VITE_ENVIRONMENT || 'development',
+                      },
+                      null,
+                      2
+                    )}</pre>
+                `;
+        } else {
+          envStatus.innerHTML =
+            '<div class="status error">❌ Vite environment variables not available</div>';
+        }
+
+        // Test Firebase configuration
+        try {
+          const fbConfig = {
+            apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+            authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+            projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+            storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+            messagingSenderId: import.meta.env
+              .VITE_FIREBASE_MESSAGING_SENDER_ID,
+            appId: import.meta.env.VITE_FIREBASE_APP_ID,
+            measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+          };
+
+          const missingKeys = Object.entries(fbConfig)
+            .filter(([key, value]) => !value)
+            .map(([key]) => key);
+
+          if (missingKeys.length === 0) {
+            firebaseConfig.innerHTML = `
+                        <div class="status success">✅ All Firebase configuration keys present</div>
+                        <h4>Firebase Config (Keys Only):</h4>
+                        <pre>${JSON.stringify(Object.keys(fbConfig), null, 2)}</pre>
+                    `;
+          } else {
+            firebaseConfig.innerHTML = `
+                        <div class="status error">❌ Missing Firebase keys: ${missingKeys.join(', ')}</div>
+                    `;
+          }
+        } catch (error) {
+          firebaseConfig.innerHTML = `<div class="status error">❌ Error checking Firebase config: ${error.message}</div>`;
+        }
+
+        // Test Stripe configuration
+        const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+        if (stripeKey && stripeKey.startsWith('pk_')) {
+          stripeConfig.innerHTML = `
+                    <div class="status success">✅ Stripe publishable key configured</div>
+                    <p>Key format: ${stripeKey.substring(0, 10)}...${stripeKey.substring(stripeKey.length - 4)}</p>
+                `;
+        } else {
+          stripeConfig.innerHTML =
+            '<div class="status error">❌ Stripe publishable key missing or invalid</div>';
+        }
+
+        // Security check
+        const warnings = [];
+        const pageSource = document.documentElement.innerHTML;
+
+        if (pageSource.includes('sk_live_')) {
+          warnings.push('Stripe secret key found in page source (CRITICAL!)');
+        }
+        if (pageSource.includes('whsec_')) {
+          warnings.push('Webhook secret found in page source (CRITICAL!)');
+        }
+
+        if (warnings.length === 0) {
+          securityCheck.innerHTML =
+            '<div class="status success">✅ No obvious security issues detected</div>';
+        } else {
+          securityCheck.innerHTML = `
+                    <div class="status error">🚨 Security warnings:</div>
+                    <ul>${warnings.map(w => `<li>${w}</li>`).join('')}</ul>
+                `;
+        }
+      }
+
+      // Load environment config utility if available
+      import('./src/js/utils/env-config.js')
+        .then(module => {
+          const envConfigSection = document.createElement('div');
+          envConfigSection.className = 'config-section';
+          envConfigSection.innerHTML = `
+                <h2>Environment Config Utility</h2>
+                <div class="status success">✅ Environment config utility loaded successfully</div>
+                <p>The env-config.js utility is working and can be used throughout the application.</p>
+            `;
+          document.body.appendChild(envConfigSection);
+        })
+        .catch(error => {
+          const envConfigSection = document.createElement('div');
+          envConfigSection.className = 'config-section';
+          envConfigSection.innerHTML = `
+                <h2>Environment Config Utility</h2>
+                <div class="status error">❌ Failed to load env-config.js: ${error.message}</div>
+            `;
+          document.body.appendChild(envConfigSection);
+        });
+
+      // Run tests
+      testEnvironmentConfig();
+    </script>
+  </body>
+</html>

@@ -1586,15 +1586,42 @@ export class AuthService {
           <div class="avatar-suggestions">
             <p><strong>💡 Quick Avatar Options:</strong></p>
             <div class="avatar-options">
-              <button type="button" class="avatar-option" data-avatar="https://api.dicebear.com/7.x/avataaars/svg?seed=${userEmail}&backgroundColor=b6e3f4">
-                🎨 Generated Avatar
-              </button>
-              <button type="button" class="avatar-option" data-avatar="https://ui-avatars.com/api/?name=${encodeURIComponent(currentDisplayName || userEmail.split('@')[0])}&background=4f46e5&color=fff&size=200">
-                🔤 Initials Avatar
-              </button>
-              <button type="button" class="avatar-option" data-avatar="">
-                🚫 No Avatar
-              </button>
+              <!-- Emoji Avatar Options -->
+              <div class="emoji-avatar-section">
+                <h4>😊 Emoji Avatars</h4>
+                <div class="emoji-grid">
+                  <button type="button" class="emoji-avatar-option" data-avatar="😊">😊</button>
+                  <button type="button" class="emoji-avatar-option" data-avatar="🤓">🤓</button>
+                  <button type="button" class="emoji-avatar-option" data-avatar="🧠">🧠</button>
+                  <button type="button" class="emoji-avatar-option" data-avatar="🎓">🎓</button>
+                  <button type="button" class="emoji-avatar-option" data-avatar="🔬">🔬</button>
+                  <button type="button" class="emoji-avatar-option" data-avatar="⚖️">⚖️</button>
+                  <button type="button" class="emoji-avatar-option" data-avatar="🤖">🤖</button>
+                  <button type="button" class="emoji-avatar-option" data-avatar="💡">💡</button>
+                  <button type="button" class="emoji-avatar-option" data-avatar="🎯">🎯</button>
+                  <button type="button" class="emoji-avatar-option" data-avatar="🌟">🌟</button>
+                  <button type="button" class="emoji-avatar-option" data-avatar="🔍">🔍</button>
+                  <button type="button" class="emoji-avatar-option" data-avatar="📚">📚</button>
+                  <button type="button" class="emoji-avatar-option" data-avatar="🎭">🎭</button>
+                  <button type="button" class="emoji-avatar-option" data-avatar="💎">💎</button>
+                  <button type="button" class="emoji-avatar-option" data-avatar="🚀">🚀</button>
+                  <button type="button" class="emoji-avatar-option" data-avatar="🌈">🌈</button>
+                </div>
+              </div>
+
+              <!-- Traditional Avatar Options -->
+              <div class="traditional-avatar-section">
+                <h4>🖼️ Traditional Avatars</h4>
+                <button type="button" class="avatar-option" data-avatar="https://api.dicebear.com/7.x/avataaars/svg?seed=${userEmail}&backgroundColor=b6e3f4">
+                  🎨 Generated Avatar
+                </button>
+                <button type="button" class="avatar-option" data-avatar="https://ui-avatars.com/api/?name=${encodeURIComponent(currentDisplayName || userEmail.split('@')[0])}&background=4f46e5&color=fff&size=200">
+                  🔤 Initials Avatar
+                </button>
+                <button type="button" class="avatar-option" data-avatar="">
+                  🚫 No Avatar
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1678,7 +1705,7 @@ export class AuthService {
       });
     }
 
-    // Avatar option buttons
+    // Avatar option buttons (traditional)
     document.querySelectorAll('.avatar-option').forEach(button => {
       button.addEventListener('click', e => {
         const avatarURL = e.target.dataset.avatar;
@@ -1699,7 +1726,40 @@ export class AuthService {
 
         // Visual feedback
         document
-          .querySelectorAll('.avatar-option')
+          .querySelectorAll('.avatar-option, .emoji-avatar-option')
+          .forEach(btn => btn.classList.remove('selected'));
+        e.target.classList.add('selected');
+      });
+    });
+
+    // Emoji avatar option buttons
+    document.querySelectorAll('.emoji-avatar-option').forEach(button => {
+      button.addEventListener('click', e => {
+        const emoji = e.target.dataset.avatar;
+        const photoInput = document.getElementById('update-photo-url');
+        const preview = document.getElementById('current-avatar-preview');
+
+        // Create a data URL for the emoji
+        const emojiDataURL = this.createEmojiAvatar(emoji);
+
+        if (photoInput) {
+          photoInput.value = `emoji:${emoji}`;
+        }
+
+        if (preview) {
+          preview.src = emojiDataURL;
+          preview.style.fontSize = '2rem';
+          preview.style.textAlign = 'center';
+          preview.style.lineHeight = '60px';
+          preview.style.background =
+            'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+          preview.style.color = 'white';
+          preview.style.borderRadius = '50%';
+        }
+
+        // Visual feedback
+        document
+          .querySelectorAll('.avatar-option, .emoji-avatar-option')
           .forEach(btn => btn.classList.remove('selected'));
         e.target.classList.add('selected');
       });
@@ -2093,6 +2153,7 @@ export class AuthService {
 
   /**
    * Get user's simulation history
+  
    */
   async getUserSimulations() {
     if (!this.firestoreService) {
@@ -2385,6 +2446,81 @@ export class AuthService {
       closeOnEscape: true,
     });
     modal.open();
+  }
+
+  /**
+   * Create a data URL for emoji avatar
+   */
+  createEmojiAvatar(emoji, size = 80) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = size;
+    canvas.height = size;
+
+    // Create gradient background
+    const gradient = ctx.createLinearGradient(0, 0, size, size);
+    gradient.addColorStop(0, '#667eea');
+    gradient.addColorStop(1, '#764ba2');
+
+    // Draw circle background
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, size / 2, 0, 2 * Math.PI);
+    ctx.fill();
+
+    // Draw emoji
+    const EMOJI_SIZE_RATIO = 0.6;
+    ctx.font = `${size * EMOJI_SIZE_RATIO}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'white';
+    ctx.fillText(emoji, size / 2, size / 2);
+
+    return canvas.toDataURL();
+  }
+
+  /**
+   * Check if avatar is an emoji type
+   */
+  isEmojiAvatar(avatarURL) {
+    return avatarURL && avatarURL.startsWith('emoji:');
+  }
+
+  /**
+   * Get emoji from emoji avatar URL
+   */
+  getEmojiFromAvatar(avatarURL) {
+    if (this.isEmojiAvatar(avatarURL)) {
+      return avatarURL.replace('emoji:', '');
+    }
+    return null;
+  }
+
+  /**
+   * Render emoji avatar in UI
+   */
+  renderEmojiAvatar(element, avatarURL) {
+    if (this.isEmojiAvatar(avatarURL)) {
+      const emoji = this.getEmojiFromAvatar(avatarURL);
+      const dataURL = this.createEmojiAvatar(emoji);
+
+      if (element.tagName === 'IMG') {
+        element.src = dataURL;
+      } else {
+        element.innerHTML = emoji;
+        element.style.background =
+          'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        element.style.borderRadius = '50%';
+        element.style.display = 'flex';
+        element.style.alignItems = 'center';
+        element.style.justifyContent = 'center';
+        element.style.fontSize = '1.5rem';
+        element.style.color = 'white';
+      }
+      return true;
+    }
+    return false;
   }
 }
 
