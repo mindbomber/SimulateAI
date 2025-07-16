@@ -8,6 +8,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebas
 import appCheckService from './app-check-service.js';
 import HybridDataService from './hybrid-data-service.js';
 import FirebaseStorageService from './firebase-storage-service.js';
+import PWAService from './pwa-service.js';
 import FirebaseAnalyticsService from './firebase-analytics-service.js';
 import {
   getAuth,
@@ -59,9 +60,12 @@ import {
   getAnalytics,
   logEvent,
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js';
+import { getPerformance } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-performance.js';
 
 // Import messaging service
 import { MessagingService } from './messaging-service.js';
+// Import performance tracing service
+import { PerformanceTracing } from './performance-tracing.js';
 
 /**
  * Firebase configuration and initialization
@@ -129,6 +133,9 @@ export class FirebaseService {
         progressiveCooldown: true, // Increase cooldown with repeated violations
       },
     };
+
+    // PWA service
+    this.pwaService = null;
   }
 
   /**
@@ -270,10 +277,7 @@ export class FirebaseService {
   }
 
   /**
-   * Get recommended persistence mode based on environment
-   */
-  getRecommendedPersistence() {
-    // Detect if likely on a shared/public computer
+   * Get
     const isSharedComputer = this.detectSharedComputer();
 
     if (isSharedComputer) {
@@ -343,6 +347,7 @@ export class FirebaseService {
       this.db = getFirestore(this.app);
       this.storage = getStorage(this.app);
       this.analytics = getAnalytics(this.app);
+      this.performance = getPerformance(this.app);
 
       // Initialize messaging service
       this.messaging = new MessagingService(this.app);
@@ -362,6 +367,13 @@ export class FirebaseService {
         this.app,
         this.hybridData
       );
+
+      // Initialize performance tracing service
+      this.performanceTracing = new PerformanceTracing(this);
+
+      // Initialize PWA service
+      this.pwaService = new PWAService(this);
+      await this.pwaService.init();
 
       // Connect storage service to hybrid data service
       this.hybridData.setStorageService(this.storageService);
@@ -2103,6 +2115,79 @@ export class FirebaseService {
     return this.messaging?.isNotificationSupported() || false;
   }
 
+  /**
+   * PWA-specific methods
+   */
+
+  /**
+   * Handle connectivity changes for offline/online sync
+   */
+  handleConnectivityChange(isOnline) {
+    if (isOnline && this.pwaService) {
+      // Process any queued offline actions
+      this.pwaService.processSyncQueue();
+    }
+  }
+
+  /**
+   * Add action to offline queue for PWA sync
+   */
+  addToOfflineQueue(actionType, data, options = {}) {
+    if (this.pwaService) {
+      this.pwaService.addToSyncQueue({
+        type: actionType,
+        data,
+        options,
+        timestamp: Date.now(),
+      });
+    }
+  }
+
+  /**
+   * Get PWA installation status
+   */
+  getPWAStatus() {
+    return this.pwaService
+      ? this.pwaService.getStatus()
+      : {
+          isInstalled: false,
+          isOnline: navigator.onLine,
+          hasServiceWorker: false,
+          syncQueueLength: 0,
+          canInstall: false,
+        };
+  }
+
+  /**
+   * Trigger PWA installation prompt
+   */
+  async installPWA() {
+    if (this.pwaService) {
+      return await this.pwaService.triggerInstall();
+    }
+    return false;
+  }
+
+  /**
+   * Get cache usage information
+   */
+  async getCacheInfo() {
+    if (this.pwaService) {
+      return await this.pwaService.getCacheInfo();
+    }
+    return null;
+  }
+
+  /**
+   * Force refresh service worker cache
+   */
+  async refreshCache() {
+    if (this.pwaService) {
+      return await this.pwaService.refreshCache();
+    }
+    return false;
+  }
+
   // ====================================
   // SYSTEM ANALYTICS & METADATA METHODS
   // ====================================
@@ -2741,7 +2826,44 @@ export class FirebaseService {
     return this.analyticsService.stopTrace(traceName, customAttributes);
   }
 
-  // ...existing code...
+  /**
+   * Track user authentication flow
+   * @param {string} method - Sign-in method (google, email, etc.)
+   * @param {Object} data - Additional data
+   * @returns {string} Trace ID
+   */
+  trackAuthSignIn(method, data = {}) {
+    if (!this.performanceTracing) {
+      throw new Error('Performance tracing not initialized');
+    }
+    return this.performanceTracing.trackAuthSignIn(method, data);
+  }
+
+  /**
+   * Track simulation performance
+   * @param {string} scenarioId - Simulation scenario ID
+   * @param {Object} data - Additional data
+   * @returns {string} Trace ID
+   */
+  trackSimulationFlow(scenarioId, data = {}) {
+    if (!this.performanceTracing) {
+      throw new Error('Performance tracing not initialized');
+    }
+    return this.performanceTracing.trackSimulationFlow(scenarioId, data);
+  }
+
+  /**
+   * Track AI operation performance
+   * @param {string} operation - AI operation type
+   * @param {Object} data - Additional data
+   * @returns {string} Trace ID
+   */
+  trackAIOperation(operation, data = {}) {
+    if (!this.performanceTracing) {
+      throw new Error('Performance tracing not initialized');
+    }
+    return this.performanceTracing.trackAIOperation(operation, data);
+  }
 }
 
 export default FirebaseService;

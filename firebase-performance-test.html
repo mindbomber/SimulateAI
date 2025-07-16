@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Firebase Performance Testing - SimulateAI</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #667eea;
+        text-align: center;
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      button {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #5a6fd8;
+      }
+      .result {
+        margin: 10px 0;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 3px;
+        font-family: monospace;
+        font-size: 12px;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .info {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔥 Firebase Performance Testing</h1>
+      <p>
+        This page will generate traces that should appear in your Firebase
+        console.
+      </p>
+
+      <div class="test-section">
+        <h3>📊 Basic Performance Traces</h3>
+        <button onclick="testBasicTrace()">Start Basic Trace</button>
+        <button onclick="testSimulationTrace()">Test Simulation Load</button>
+        <button onclick="testAuthTrace()">Test Auth Sign-In</button>
+        <button onclick="testAITrace()">Test AI Analysis</button>
+        <div id="basicResults"></div>
+      </div>
+
+      <div class="test-section">
+        <h3>🤖 SimulateAI-Specific Traces</h3>
+        <button onclick="testEthicsAnalysis()">Ethics Analysis</button>
+        <button onclick="testScenarioGeneration()">Scenario Generation</button>
+        <button onclick="testContentRecommendation()">
+          Content Recommendation
+        </button>
+        <div id="simulateResults"></div>
+      </div>
+
+      <div class="test-section">
+        <h3>🌐 Network & Data Traces</h3>
+        <button onclick="testDataOperation()">Test Data Operations</button>
+        <button onclick="testFileUpload()">Test File Upload</button>
+        <button onclick="testCacheOperation()">Test Cache Operations</button>
+        <div id="networkResults"></div>
+      </div>
+
+      <div class="test-section">
+        <h3>📈 Results Summary</h3>
+        <p>Traces generated: <span id="traceCount">0</span></p>
+        <p>Total time tracked: <span id="totalTime">0ms</span></p>
+        <button onclick="clearResults()">Clear Results</button>
+      </div>
+    </div>
+
+    <!-- Firebase imports -->
+    <script type="module">
+      import { FirebaseService } from './src/js/services/firebase-service.js';
+      import { PerformanceTracing } from './src/js/services/performance-tracing.js';
+
+      let firebaseService;
+      let performanceTracing;
+      let traceCount = 0;
+      let totalTime = 0;
+
+      // Initialize Firebase
+      async function initFirebase() {
+        try {
+          firebaseService = new FirebaseService();
+          await firebaseService.initialize();
+          performanceTracing = firebaseService.performanceTracing;
+          addResult(
+            'success',
+            '✅ Firebase Performance initialized successfully'
+          );
+        } catch (error) {
+          addResult(
+            'error',
+            `❌ Firebase initialization failed: ${error.message}`
+          );
+        }
+      }
+
+      // Utility functions
+      function addResult(type, message) {
+        const allResultDivs = [
+          'basicResults',
+          'simulateResults',
+          'networkResults',
+        ];
+        allResultDivs.forEach(divId => {
+          const div = document.getElementById(divId);
+          if (div && div.children.length === 0) {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${type}`;
+            resultDiv.textContent = message;
+            div.appendChild(resultDiv);
+          }
+        });
+      }
+
+      function addResultToSection(sectionId, type, message) {
+        const div = document.getElementById(sectionId);
+        const resultDiv = document.createElement('div');
+        resultDiv.className = `result ${type}`;
+        resultDiv.textContent = message;
+        div.appendChild(resultDiv);
+
+        // Update counters
+        if (type === 'success') {
+          traceCount++;
+          const timeMatch = message.match(/(\d+)ms/);
+          if (timeMatch) {
+            totalTime += parseInt(timeMatch[1]);
+          }
+          updateCounters();
+        }
+      }
+
+      function updateCounters() {
+        document.getElementById('traceCount').textContent = traceCount;
+        document.getElementById('totalTime').textContent = totalTime + 'ms';
+      }
+
+      // Test functions
+      window.testBasicTrace = async function () {
+        try {
+          const traceId =
+            firebaseService.startPerformanceTrace('test_basic_trace');
+          await new Promise(resolve =>
+            setTimeout(resolve, Math.random() * 2000 + 500)
+          );
+          const duration = firebaseService.stopPerformanceTrace(traceId, {
+            test_type: 'basic',
+            user_agent: navigator.userAgent,
+            timestamp: Date.now(),
+          });
+          addResultToSection(
+            'basicResults',
+            'success',
+            `✅ Basic trace completed in ${duration}ms`
+          );
+        } catch (error) {
+          addResultToSection(
+            'basicResults',
+            'error',
+            `❌ Basic trace failed: ${error.message}`
+          );
+        }
+      };
+
+      window.testSimulationTrace = async function () {
+        try {
+          const traceId = firebaseService.trackSimulationFlow('scenario_001', {
+            scenario_type: 'healthcare_ethics',
+            user_level: 'intermediate',
+          });
+          await new Promise(resolve =>
+            setTimeout(resolve, Math.random() * 3000 + 1000)
+          );
+          const duration = performanceTracing.stopTrace(traceId, {
+            completion_status: 'success',
+            decisions_made: 3,
+            ethics_score: 85,
+          });
+          addResultToSection(
+            'basicResults',
+            'success',
+            `✅ Simulation trace completed in ${duration}ms`
+          );
+        } catch (error) {
+          addResultToSection(
+            'basicResults',
+            'error',
+            `❌ Simulation trace failed: ${error.message}`
+          );
+        }
+      };
+
+      window.testAuthTrace = async function () {
+        try {
+          const traceId = firebaseService.trackAuthSignIn('google', {
+            new_user: false,
+            provider: 'google.com',
+          });
+          await new Promise(resolve =>
+            setTimeout(resolve, Math.random() * 1500 + 500)
+          );
+          const duration = performanceTracing.stopTrace(traceId, {
+            auth_success: true,
+            redirect_needed: false,
+          });
+          addResultToSection(
+            'basicResults',
+            'success',
+            `✅ Auth trace completed in ${duration}ms`
+          );
+        } catch (error) {
+          addResultToSection(
+            'basicResults',
+            'error',
+            `❌ Auth trace failed: ${error.message}`
+          );
+        }
+      };
+
+      window.testAITrace = async function () {
+        try {
+          const traceId = firebaseService.trackAIOperation('content_analysis', {
+            content_type: 'text',
+            model_used: 'gpt-4',
+          });
+          await new Promise(resolve =>
+            setTimeout(resolve, Math.random() * 2500 + 1000)
+          );
+          const duration = performanceTracing.stopTrace(traceId, {
+            confidence_score: 0.92,
+            tokens_used: 150,
+            analysis_type: 'ethics_evaluation',
+          });
+          addResultToSection(
+            'basicResults',
+            'success',
+            `✅ AI trace completed in ${duration}ms`
+          );
+        } catch (error) {
+          addResultToSection(
+            'basicResults',
+            'error',
+            `❌ AI trace failed: ${error.message}`
+          );
+        }
+      };
+
+      window.testEthicsAnalysis = async function () {
+        try {
+          const traceId = performanceTracing.startTrace(
+            PerformanceTracing.TRACE_NAMES.ETHICS_ANALYSIS
+          );
+          await new Promise(resolve =>
+            setTimeout(resolve, Math.random() * 3000 + 1500)
+          );
+          const duration = performanceTracing.stopTrace(traceId, {
+            framework: 'utilitarian',
+            complexity: 'high',
+            confidence: 0.87,
+          });
+          addResultToSection(
+            'simulateResults',
+            'success',
+            `✅ Ethics analysis completed in ${duration}ms`
+          );
+        } catch (error) {
+          addResultToSection(
+            'simulateResults',
+            'error',
+            `❌ Ethics analysis failed: ${error.message}`
+          );
+        }
+      };
+
+      window.testScenarioGeneration = async function () {
+        try {
+          const traceId = performanceTracing.startTrace(
+            PerformanceTracing.TRACE_NAMES.SCENARIO_GENERATION
+          );
+          await new Promise(resolve =>
+            setTimeout(resolve, Math.random() * 4000 + 2000)
+          );
+          const duration = performanceTracing.stopTrace(traceId, {
+            scenario_type: 'medical_ethics',
+            complexity_level: 'advanced',
+            ai_generated: true,
+          });
+          addResultToSection(
+            'simulateResults',
+            'success',
+            `✅ Scenario generation completed in ${duration}ms`
+          );
+        } catch (error) {
+          addResultToSection(
+            'simulateResults',
+            'error',
+            `❌ Scenario generation failed: ${error.message}`
+          );
+        }
+      };
+
+      window.testContentRecommendation = async function () {
+        try {
+          const traceId = performanceTracing.startTrace(
+            PerformanceTracing.TRACE_NAMES.CONTENT_RECOMMENDATION
+          );
+          await new Promise(resolve =>
+            setTimeout(resolve, Math.random() * 2000 + 800)
+          );
+          const duration = performanceTracing.stopTrace(traceId, {
+            user_interests: ['healthcare', 'ai_ethics'],
+            recommendations_found: 5,
+            personalization_score: 0.78,
+          });
+          addResultToSection(
+            'simulateResults',
+            'success',
+            `✅ Content recommendation completed in ${duration}ms`
+          );
+        } catch (error) {
+          addResultToSection(
+            'simulateResults',
+            'error',
+            `❌ Content recommendation failed: ${error.message}`
+          );
+        }
+      };
+
+      window.testDataOperation = async function () {
+        try {
+          const traceId = performanceTracing.startTrace(
+            PerformanceTracing.TRACE_NAMES.FIRESTORE_DATA_SYNC
+          );
+          await new Promise(resolve =>
+            setTimeout(resolve, Math.random() * 1500 + 500)
+          );
+          const duration = performanceTracing.stopTrace(traceId, {
+            operation_type: 'user_progress_sync',
+            documents_synced: 12,
+            cache_hit_rate: 0.85,
+          });
+          addResultToSection(
+            'networkResults',
+            'success',
+            `✅ Data operation completed in ${duration}ms`
+          );
+        } catch (error) {
+          addResultToSection(
+            'networkResults',
+            'error',
+            `❌ Data operation failed: ${error.message}`
+          );
+        }
+      };
+
+      window.testFileUpload = async function () {
+        try {
+          const traceId = performanceTracing.startTrace(
+            PerformanceTracing.TRACE_NAMES.FILE_UPLOAD
+          );
+          await new Promise(resolve =>
+            setTimeout(resolve, Math.random() * 3000 + 1000)
+          );
+          const duration = performanceTracing.stopTrace(traceId, {
+            file_size: '2.5MB',
+            file_type: 'image/jpeg',
+            upload_method: 'firebase_storage',
+          });
+          addResultToSection(
+            'networkResults',
+            'success',
+            `✅ File upload completed in ${duration}ms`
+          );
+        } catch (error) {
+          addResultToSection(
+            'networkResults',
+            'error',
+            `❌ File upload failed: ${error.message}`
+          );
+        }
+      };
+
+      window.testCacheOperation = async function () {
+        try {
+          const traceId = performanceTracing.startTrace(
+            PerformanceTracing.TRACE_NAMES.CACHE_OPERATION
+          );
+          await new Promise(resolve =>
+            setTimeout(resolve, Math.random() * 500 + 100)
+          );
+          const duration = performanceTracing.stopTrace(traceId, {
+            cache_type: 'memory',
+            operation: 'read',
+            hit_rate: 0.92,
+          });
+          addResultToSection(
+            'networkResults',
+            'success',
+            `✅ Cache operation completed in ${duration}ms`
+          );
+        } catch (error) {
+          addResultToSection(
+            'networkResults',
+            'error',
+            `❌ Cache operation failed: ${error.message}`
+          );
+        }
+      };
+
+      window.clearResults = function () {
+        ['basicResults', 'simulateResults', 'networkResults'].forEach(id => {
+          document.getElementById(id).innerHTML = '';
+        });
+        traceCount = 0;
+        totalTime = 0;
+        updateCounters();
+      };
+
+      // Initialize when page loads
+      initFirebase();
+    </script>
+  </body>
+</html>

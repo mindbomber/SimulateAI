@@ -6,8 +6,17 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
-    <meta name="theme-color" content="#1a73e8" />
+    <meta name="theme-color" content="#667eea" />
     <meta name="color-scheme" content="light" />
+
+    <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="SimulateAI" />
+    <meta name="msapplication-TileColor" content="#667eea" />
+    <meta name="msapplication-config" content="./browserconfig.xml" />
+
     <title>
       SimulateAI - AI Ethics Education Through Interactive Simulations
     </title>
@@ -606,6 +615,36 @@
       }
     </style>
 
+    <!-- PWA Manifest and Icons -->
+    <link rel="manifest" href="./manifest.json" />
+
+    <!-- Favicons and App Icons -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="./src/assets/icons/favicon.svg"
+    />
+    <link rel="icon" type="image/png" href="./src/assets/icons/favicon.png" />
+    <link
+      rel="apple-touch-icon"
+      href="./src/assets/icons/Square Icon_192_x_192.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="512x512"
+      href="./src/assets/icons/Square Icon_512_x_512.png"
+    />
+
+    <!-- Windows Tiles -->
+    <meta
+      name="msapplication-TileImage"
+      content="./src/assets/icons/Square Icon_512_x_512.png"
+    />
+
+    <!-- Preload critical resources -->
+    <link rel="preload" href="./src/js/app.js" as="script" />
+    <link rel="preload" href="./src/styles/main.css" as="style" />
+
     <!-- Google reCAPTCHA v3 -->
     <script src="https://www.google.com/recaptcha/api.js"></script>
   </head>
@@ -1127,6 +1166,277 @@
           e.target.click();
         }
       });
+    </script>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', async () => {
+          try {
+            const registration = await navigator.serviceWorker.register(
+              './sw.js',
+              {
+                scope: '/SimulateAI/',
+              }
+            );
+
+            console.log(
+              '🔥 Service Worker registered successfully:',
+              registration.scope
+            );
+
+            // Handle service worker updates
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              if (newWorker) {
+                newWorker.addEventListener('statechange', () => {
+                  if (
+                    newWorker.state === 'installed' &&
+                    navigator.serviceWorker.controller
+                  ) {
+                    // New content is available, show update notification
+                    showUpdateNotification();
+                  }
+                });
+              }
+            });
+
+            // Check for waiting service worker
+            if (registration.waiting) {
+              showUpdateNotification();
+            }
+          } catch (error) {
+            console.warn('🚨 Service Worker registration failed:', error);
+          }
+        });
+
+        // Show update notification
+        function showUpdateNotification() {
+          const updateBanner = document.createElement('div');
+          updateBanner.innerHTML = `
+            <div style="
+              position: fixed;
+              top: 0;
+              left: 0;
+              right: 0;
+              background: linear-gradient(45deg, #667eea, #764ba2);
+              color: white;
+              padding: 15px;
+              text-align: center;
+              z-index: 10000;
+              box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            ">
+              🚀 New version available! 
+              <button onclick="location.reload()" style="
+                background: white;
+                color: #667eea;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 20px;
+                margin-left: 10px;
+                cursor: pointer;
+                font-weight: bold;
+              ">Update Now</button>
+              <button onclick="this.parentElement.parentElement.remove()" style="
+                background: transparent;
+                color: white;
+                border: 1px solid white;
+                padding: 8px 16px;
+                border-radius: 20px;
+                margin-left: 10px;
+                cursor: pointer;
+              ">Later</button>
+            </div>
+          `;
+          document.body.appendChild(updateBanner);
+        }
+      }
+
+      // PWA Install Prompt
+      let deferredPrompt;
+
+      window.addEventListener('beforeinstallprompt', e => {
+        // Prevent the mini-infobar from appearing on mobile
+        e.preventDefault();
+        deferredPrompt = e;
+
+        // Show custom install button
+        showInstallPrompt();
+      });
+
+      function showInstallPrompt() {
+        // Only show if not already installed
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+          return; // Already installed
+        }
+
+        const installBanner = document.createElement('div');
+        installBanner.innerHTML = `
+          <div id="pwa-install-banner" style="
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: white;
+            color: #333;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 9999;
+            text-align: center;
+            border: 2px solid #667eea;
+            max-width: 400px;
+            margin: 0 auto;
+          ">
+            <div style="font-size: 1.2em; margin-bottom: 10px;">📱 Install SimulateAI</div>
+            <div style="margin-bottom: 15px; color: #666;">Get the full app experience with offline access!</div>
+            <button id="install-app-btn" style="
+              background: linear-gradient(45deg, #667eea, #764ba2);
+              color: white;
+              border: none;
+              padding: 12px 24px;
+              border-radius: 25px;
+              margin: 5px;
+              cursor: pointer;
+              font-weight: bold;
+            ">Install App</button>
+            <button onclick="document.getElementById('pwa-install-banner').remove()" style="
+              background: transparent;
+              color: #666;
+              border: 1px solid #ddd;
+              padding: 12px 24px;
+              border-radius: 25px;
+              margin: 5px;
+              cursor: pointer;
+            ">Not Now</button>
+          </div>
+        `;
+
+        document.body.appendChild(installBanner);
+
+        // Handle install button click
+        document
+          .getElementById('install-app-btn')
+          .addEventListener('click', async () => {
+            if (deferredPrompt) {
+              deferredPrompt.prompt();
+              const { outcome } = await deferredPrompt.userChoice;
+
+              if (outcome === 'accepted') {
+                console.log('🎉 PWA installed successfully');
+                // Track installation
+                if (window.gtag) {
+                  gtag('event', 'pwa_install', {
+                    event_category: 'PWA',
+                    event_label: 'install_accepted',
+                  });
+                }
+              }
+
+              deferredPrompt = null;
+              document.getElementById('pwa-install-banner').remove();
+            }
+          });
+      }
+
+      // Track PWA usage
+      window.addEventListener('appinstalled', () => {
+        console.log('🎉 PWA was installed');
+        if (window.gtag) {
+          gtag('event', 'pwa_installed', {
+            event_category: 'PWA',
+            event_label: 'app_installed',
+          });
+        }
+      });
+
+      // Detect PWA launch
+      if (
+        window.matchMedia('(display-mode: standalone)').matches ||
+        window.navigator.standalone
+      ) {
+        console.log('📱 Running as PWA');
+        document.body.classList.add('pwa-mode');
+
+        if (window.gtag) {
+          gtag('event', 'pwa_launch', {
+            event_category: 'PWA',
+            event_label: 'standalone_launch',
+          });
+        }
+      }
+
+      // Handle offline/online status
+      function updateOnlineStatus() {
+        const statusIndicator =
+          document.getElementById('connection-status') ||
+          createStatusIndicator();
+
+        if (navigator.onLine) {
+          statusIndicator.style.display = 'none';
+        } else {
+          statusIndicator.style.display = 'block';
+          statusIndicator.innerHTML = `
+            <div style="
+              background: #dc3545;
+              color: white;
+              padding: 10px;
+              text-align: center;
+              font-size: 14px;
+            ">
+              📡 You're offline - Some features may be limited
+            </div>
+          `;
+        }
+      }
+
+      function createStatusIndicator() {
+        const indicator = document.createElement('div');
+        indicator.id = 'connection-status';
+        indicator.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          z-index: 9998;
+        `;
+        document.body.appendChild(indicator);
+        return indicator;
+      }
+
+      // Listen for online/offline events
+      window.addEventListener('online', updateOnlineStatus);
+      window.addEventListener('offline', updateOnlineStatus);
+
+      // Initial status check
+      updateOnlineStatus();
+
+      // PWA Performance monitoring
+      if ('performance' in window && 'PerformanceObserver' in window) {
+        // Monitor largest contentful paint
+        const perfObserver = new PerformanceObserver(entryList => {
+          for (const entry of entryList.getEntries()) {
+            if (entry.entryType === 'largest-contentful-paint') {
+              console.log('📊 LCP:', entry.startTime);
+
+              // Send to service worker for analytics
+              if (navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                  type: 'PERFORMANCE_MARK',
+                  name: 'LCP',
+                  duration: entry.startTime,
+                });
+              }
+            }
+          }
+        });
+
+        try {
+          perfObserver.observe({ entryTypes: ['largest-contentful-paint'] });
+        } catch (e) {
+          // LCP not supported in this browser
+        }
+      }
     </script>
   </body>
 </html>

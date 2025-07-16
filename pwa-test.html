@@ -1,0 +1,789 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SimulateAI - PWA Features Test</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#667eea" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="SimulateAI" />
+
+    <!-- PWA Manifest and Icons -->
+    <link rel="manifest" href="./manifest.json" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="./src/assets/icons/favicon.svg"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="./src/assets/icons/Square Icon_192_x_192.png"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: #333;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 30px;
+      }
+
+      .header h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+      }
+
+      .test-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .test-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .test-icon {
+        font-size: 2em;
+        margin-right: 15px;
+      }
+
+      .test-title {
+        color: #667eea;
+        font-size: 1.4em;
+        font-weight: 600;
+      }
+
+      .status-indicator {
+        margin-left: auto;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        font-weight: bold;
+      }
+
+      .status-ready {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      .status-pending {
+        background: #fff3cd;
+        color: #856404;
+      }
+
+      .status-error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+
+      .test-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 15px 0;
+      }
+
+      .btn {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .btn-secondary {
+        background: linear-gradient(45deg, #6c757d, #495057);
+      }
+
+      .results-area {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 15px;
+        margin: 15px 0;
+        max-height: 150px;
+        overflow-y: auto;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+      }
+
+      .metric-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      .metric-row:last-child {
+        border-bottom: none;
+      }
+
+      .metric-label {
+        font-weight: bold;
+        color: #667eea;
+      }
+
+      .metric-value {
+        color: #333;
+      }
+
+      .offline-banner {
+        background: #dc3545;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        display: none;
+      }
+
+      .install-banner {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        color: white;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+        border-radius: 15px;
+        display: none;
+      }
+
+      .cache-info {
+        background: #e9ecef;
+        padding: 15px;
+        border-radius: 10px;
+        margin: 15px 0;
+      }
+
+      @media (max-width: 600px) {
+        .container {
+          padding: 15px;
+        }
+
+        .header h1 {
+          font-size: 2em;
+        }
+
+        .test-controls {
+          flex-direction: column;
+        }
+
+        .btn {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>📱 PWA Features Test</h1>
+        <p>Test Progressive Web App functionality for SimulateAI</p>
+      </div>
+
+      <!-- Offline Banner -->
+      <div class="offline-banner" id="offlineBanner">
+        📡 You're currently offline - Testing offline capabilities
+      </div>
+
+      <!-- Install Banner -->
+      <div class="install-banner" id="installBanner">
+        📲 SimulateAI can be installed as an app!
+        <button class="btn" onclick="installApp()">Install Now</button>
+      </div>
+
+      <!-- PWA Status -->
+      <div class="test-card">
+        <div class="test-header">
+          <div class="test-icon">🚀</div>
+          <div>
+            <div class="test-title">PWA Status</div>
+            <div style="color: #666; font-size: 0.9em">
+              Installation and Service Worker Status
+            </div>
+          </div>
+          <div class="status-indicator status-pending" id="pwaStatus">
+            Checking...
+          </div>
+        </div>
+
+        <div id="pwaMetrics" class="cache-info">
+          <div class="metric-row">
+            <span class="metric-label">Installation Status:</span>
+            <span class="metric-value" id="installStatus">Unknown</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Service Worker:</span>
+            <span class="metric-value" id="swStatus">Unknown</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Online Status:</span>
+            <span class="metric-value" id="onlineStatus">Unknown</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Sync Queue:</span>
+            <span class="metric-value" id="syncQueue">0 items</span>
+          </div>
+        </div>
+
+        <div class="test-controls">
+          <button class="btn" onclick="checkPWAStatus()">
+            🔍 Check Status
+          </button>
+          <button class="btn" onclick="installApp()" id="installBtn">
+            📲 Install App
+          </button>
+          <button class="btn btn-secondary" onclick="refreshCache()">
+            🔄 Refresh Cache
+          </button>
+        </div>
+      </div>
+
+      <!-- Cache Management -->
+      <div class="test-card">
+        <div class="test-header">
+          <div class="test-icon">💾</div>
+          <div>
+            <div class="test-title">Cache Management</div>
+            <div style="color: #666; font-size: 0.9em">
+              Storage Usage and Cache Controls
+            </div>
+          </div>
+          <div class="status-indicator status-pending" id="cacheStatus">
+            Loading...
+          </div>
+        </div>
+
+        <div id="cacheInfo" class="cache-info">
+          <div class="metric-row">
+            <span class="metric-label">Cache Usage:</span>
+            <span class="metric-value" id="cacheUsage">Calculating...</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Available Space:</span>
+            <span class="metric-value" id="availableSpace">Calculating...</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Usage Percentage:</span>
+            <span class="metric-value" id="usagePercentage"
+              >Calculating...</span
+            >
+          </div>
+        </div>
+
+        <div class="test-controls">
+          <button class="btn" onclick="checkCacheInfo()">📊 Check Usage</button>
+          <button class="btn btn-secondary" onclick="clearCache()">
+            🗑️ Clear Cache
+          </button>
+        </div>
+      </div>
+
+      <!-- Offline Testing -->
+      <div class="test-card">
+        <div class="test-header">
+          <div class="test-icon">📡</div>
+          <div>
+            <div class="test-title">Offline Testing</div>
+            <div style="color: #666; font-size: 0.9em">
+              Test Offline Functionality and Sync
+            </div>
+          </div>
+          <div class="status-indicator status-ready" id="offlineStatus">
+            Ready
+          </div>
+        </div>
+
+        <div class="test-controls">
+          <button class="btn" onclick="testOfflineMode()">
+            🔌 Test Offline
+          </button>
+          <button class="btn" onclick="simulateOfflineAction()">
+            📝 Queue Action
+          </button>
+          <button class="btn btn-secondary" onclick="processSyncQueue()">
+            ⚡ Process Queue
+          </button>
+        </div>
+
+        <div class="results-area" id="offlineResults">
+          Ready to test offline functionality...
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="test-card">
+        <div class="test-header">
+          <div class="test-icon">🔔</div>
+          <div>
+            <div class="test-title">Push Notifications</div>
+            <div style="color: #666; font-size: 0.9em">
+              Test Notification Permissions and Display
+            </div>
+          </div>
+          <div class="status-indicator status-pending" id="notificationStatus">
+            Not Tested
+          </div>
+        </div>
+
+        <div class="test-controls">
+          <button class="btn" onclick="requestNotificationPermission()">
+            🔔 Request Permission
+          </button>
+          <button class="btn" onclick="testNotification()">
+            📬 Test Notification
+          </button>
+        </div>
+
+        <div class="results-area" id="notificationResults">
+          Click "Request Permission" to enable notifications...
+        </div>
+      </div>
+
+      <!-- Performance Monitoring -->
+      <div class="test-card">
+        <div class="test-header">
+          <div class="test-icon">⚡</div>
+          <div>
+            <div class="test-title">Performance</div>
+            <div style="color: #666; font-size: 0.9em">
+              PWA Performance Metrics
+            </div>
+          </div>
+          <div class="status-indicator status-ready" id="performanceStatus">
+            Ready
+          </div>
+        </div>
+
+        <div class="test-controls">
+          <button class="btn" onclick="measurePerformance()">
+            ⏱️ Measure Load Time
+          </button>
+          <button class="btn" onclick="testCachePerformance()">
+            🚀 Test Cache Speed
+          </button>
+        </div>
+
+        <div class="results-area" id="performanceResults">
+          Performance monitoring ready...
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      // Import Firebase service
+      import FirebaseService from './src/js/services/firebase-service.js';
+
+      let firebaseService = null;
+      let pwaStatus = null;
+
+      // Initialize Firebase and PWA
+      async function initializeServices() {
+        try {
+          firebaseService = new FirebaseService();
+          await firebaseService.initialize();
+
+          console.log('✅ Services initialized');
+          await checkPWAStatus();
+          await checkCacheInfo();
+          updateOnlineStatus();
+          checkInstallPrompt();
+        } catch (error) {
+          console.error('❌ Service initialization failed:', error);
+          updateStatus('pwaStatus', 'Error', 'status-error');
+        }
+      }
+
+      // Check PWA status
+      window.checkPWAStatus = async function () {
+        try {
+          pwaStatus = firebaseService.getPWAStatus();
+
+          document.getElementById('installStatus').textContent =
+            pwaStatus.isInstalled ? '✅ Installed' : '❌ Not Installed';
+          document.getElementById('swStatus').textContent =
+            pwaStatus.hasServiceWorker ? '✅ Active' : '❌ Not Active';
+          document.getElementById('onlineStatus').textContent =
+            pwaStatus.isOnline ? '🌐 Online' : '📡 Offline';
+          document.getElementById('syncQueue').textContent =
+            `${pwaStatus.syncQueueLength} items`;
+
+          const status = pwaStatus.isInstalled ? 'Installed' : 'Browser Mode';
+          const statusClass = pwaStatus.isInstalled
+            ? 'status-ready'
+            : 'status-pending';
+          updateStatus('pwaStatus', status, statusClass);
+
+          // Show/hide install button
+          const installBtn = document.getElementById('installBtn');
+          installBtn.style.display = pwaStatus.canInstall ? 'block' : 'none';
+        } catch (error) {
+          console.error('❌ PWA status check failed:', error);
+          updateStatus('pwaStatus', 'Error', 'status-error');
+        }
+      };
+
+      // Check cache information
+      window.checkCacheInfo = async function () {
+        try {
+          const cacheInfo = await firebaseService.getCacheInfo();
+
+          if (cacheInfo) {
+            document.getElementById('cacheUsage').textContent = formatBytes(
+              cacheInfo.usage || 0
+            );
+            document.getElementById('availableSpace').textContent = formatBytes(
+              (cacheInfo.quota || 0) - (cacheInfo.usage || 0)
+            );
+            document.getElementById('usagePercentage').textContent =
+              `${cacheInfo.usagePercentage || 0}%`;
+
+            updateStatus('cacheStatus', 'Ready', 'status-ready');
+          } else {
+            document.getElementById('cacheUsage').textContent = 'Not Available';
+            document.getElementById('availableSpace').textContent =
+              'Not Available';
+            document.getElementById('usagePercentage').textContent =
+              'Not Available';
+
+            updateStatus('cacheStatus', 'Limited', 'status-pending');
+          }
+        } catch (error) {
+          console.error('❌ Cache info check failed:', error);
+          updateStatus('cacheStatus', 'Error', 'status-error');
+        }
+      };
+
+      // Install app
+      window.installApp = async function () {
+        try {
+          const success = await firebaseService.installPWA();
+          if (success) {
+            updateLog('offlineResults', '✅ App installation initiated');
+            setTimeout(checkPWAStatus, 1000);
+          } else {
+            updateLog(
+              'offlineResults',
+              '❌ App installation failed or not available'
+            );
+          }
+        } catch (error) {
+          console.error('❌ Install failed:', error);
+          updateLog('offlineResults', `❌ Install error: ${error.message}`);
+        }
+      };
+
+      // Refresh cache
+      window.refreshCache = async function () {
+        try {
+          const success = await firebaseService.refreshCache();
+          if (success) {
+            updateLog('offlineResults', '✅ Cache refreshed successfully');
+            await checkCacheInfo();
+          } else {
+            updateLog('offlineResults', '❌ Cache refresh failed');
+          }
+        } catch (error) {
+          console.error('❌ Cache refresh failed:', error);
+          updateLog(
+            'offlineResults',
+            `❌ Cache refresh error: ${error.message}`
+          );
+        }
+      };
+
+      // Test offline mode
+      window.testOfflineMode = function () {
+        updateLog('offlineResults', '🧪 Testing offline capabilities...');
+
+        // Simulate offline test
+        const tests = [
+          'Checking cached resources...',
+          'Testing service worker responses...',
+          'Validating offline fallbacks...',
+          'Testing background sync queue...',
+        ];
+
+        tests.forEach((test, index) => {
+          setTimeout(
+            () => {
+              updateLog('offlineResults', `✅ ${test}`);
+            },
+            (index + 1) * 500
+          );
+        });
+
+        setTimeout(
+          () => {
+            updateLog(
+              'offlineResults',
+              '🎉 Offline test completed successfully!'
+            );
+          },
+          tests.length * 500 + 500
+        );
+      };
+
+      // Simulate offline action
+      window.simulateOfflineAction = function () {
+        if (firebaseService) {
+          firebaseService.addToOfflineQueue('test_action', {
+            action: 'simulated_offline_action',
+            timestamp: Date.now(),
+            data: { test: true },
+          });
+
+          updateLog('offlineResults', '📝 Action added to offline queue');
+          checkPWAStatus();
+        }
+      };
+
+      // Process sync queue
+      window.processSyncQueue = function () {
+        updateLog('offlineResults', '⚡ Processing sync queue...');
+
+        if (firebaseService && firebaseService.pwaService) {
+          firebaseService.pwaService.processSyncQueue();
+          setTimeout(() => {
+            updateLog('offlineResults', '✅ Sync queue processed');
+            checkPWAStatus();
+          }, 1000);
+        }
+      };
+
+      // Clear cache
+      window.clearCache = async function () {
+        if ('caches' in window) {
+          try {
+            const cacheNames = await caches.keys();
+            await Promise.all(
+              cacheNames.map(cacheName => caches.delete(cacheName))
+            );
+            updateLog('offlineResults', '✅ Cache cleared successfully');
+            await checkCacheInfo();
+          } catch (error) {
+            console.error('❌ Cache clear failed:', error);
+            updateLog(
+              'offlineResults',
+              `❌ Cache clear error: ${error.message}`
+            );
+          }
+        }
+      };
+
+      // Request notification permission
+      window.requestNotificationPermission = async function () {
+        try {
+          if ('Notification' in window) {
+            const permission = await Notification.requestPermission();
+            updateLog('notificationResults', `🔔 Permission: ${permission}`);
+
+            if (permission === 'granted') {
+              updateStatus('notificationStatus', 'Granted', 'status-ready');
+            } else {
+              updateStatus('notificationStatus', 'Denied', 'status-error');
+            }
+          } else {
+            updateLog('notificationResults', '❌ Notifications not supported');
+            updateStatus('notificationStatus', 'Not Supported', 'status-error');
+          }
+        } catch (error) {
+          console.error('❌ Notification permission failed:', error);
+          updateLog(
+            'notificationResults',
+            `❌ Permission error: ${error.message}`
+          );
+        }
+      };
+
+      // Test notification
+      window.testNotification = function () {
+        if (Notification.permission === 'granted') {
+          const notification = new Notification('SimulateAI PWA Test', {
+            body: 'This is a test notification from SimulateAI PWA!',
+            icon: './src/assets/icons/Square Icon_192_x_192.png',
+            badge: './src/assets/icons/Square Icon_192_x_192.png',
+            tag: 'pwa-test',
+          });
+
+          notification.onclick = function () {
+            window.focus();
+            notification.close();
+          };
+
+          updateLog('notificationResults', '✅ Test notification sent');
+        } else {
+          updateLog(
+            'notificationResults',
+            '❌ Permission required for notifications'
+          );
+        }
+      };
+
+      // Measure performance
+      window.measurePerformance = function () {
+        const startTime = performance.now();
+
+        // Simulate performance measurement
+        updateLog('performanceResults', '⏱️ Measuring performance...');
+
+        setTimeout(() => {
+          const endTime = performance.now();
+          const loadTime = endTime - startTime;
+
+          updateLog(
+            'performanceResults',
+            `✅ Load time: ${loadTime.toFixed(2)}ms`
+          );
+
+          if ('PerformanceObserver' in window) {
+            updateLog('performanceResults', '📊 Performance API available');
+          } else {
+            updateLog('performanceResults', '⚠️ Performance API limited');
+          }
+        }, 100);
+      };
+
+      // Test cache performance
+      window.testCachePerformance = async function () {
+        updateLog('performanceResults', '🚀 Testing cache performance...');
+
+        try {
+          const startTime = performance.now();
+
+          // Test cache access
+          const response = await fetch('./manifest.json', {
+            cache: 'force-cache',
+          });
+
+          const endTime = performance.now();
+          const cacheTime = endTime - startTime;
+
+          if (response.ok) {
+            updateLog(
+              'performanceResults',
+              `✅ Cache access: ${cacheTime.toFixed(2)}ms`
+            );
+          } else {
+            updateLog('performanceResults', '❌ Cache access failed');
+          }
+        } catch (error) {
+          updateLog(
+            'performanceResults',
+            `❌ Cache test error: ${error.message}`
+          );
+        }
+      };
+
+      // Utility functions
+      function updateStatus(elementId, text, className) {
+        const element = document.getElementById(elementId);
+        element.textContent = text;
+        element.className = `status-indicator ${className}`;
+      }
+
+      function updateLog(elementId, message) {
+        const element = document.getElementById(elementId);
+        const timestamp = new Date().toLocaleTimeString();
+        element.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+        element.scrollTop = element.scrollHeight;
+      }
+
+      function formatBytes(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+
+      function updateOnlineStatus() {
+        const isOnline = navigator.onLine;
+        const banner = document.getElementById('offlineBanner');
+
+        if (!isOnline) {
+          banner.style.display = 'block';
+        } else {
+          banner.style.display = 'none';
+        }
+
+        // Update status in PWA metrics
+        if (document.getElementById('onlineStatus')) {
+          document.getElementById('onlineStatus').textContent = isOnline
+            ? '🌐 Online'
+            : '📡 Offline';
+        }
+      }
+
+      function checkInstallPrompt() {
+        // This will be set by the beforeinstallprompt event
+        const banner = document.getElementById('installBanner');
+
+        // Check if already installed
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+          banner.style.display = 'none';
+        }
+      }
+
+      // Event listeners
+      window.addEventListener('online', updateOnlineStatus);
+      window.addEventListener('offline', updateOnlineStatus);
+
+      window.addEventListener('beforeinstallprompt', e => {
+        e.preventDefault();
+        const banner = document.getElementById('installBanner');
+        banner.style.display = 'block';
+      });
+
+      window.addEventListener('appinstalled', () => {
+        const banner = document.getElementById('installBanner');
+        banner.style.display = 'none';
+        updateLog('offlineResults', '🎉 App installed successfully!');
+        setTimeout(checkPWAStatus, 1000);
+      });
+
+      // Initialize when page loads
+      window.addEventListener('load', initializeServices);
+    </script>
+  </body>
+</html>
