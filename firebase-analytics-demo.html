@@ -1,0 +1,753 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Firebase Analytics Integration Demo - SimulateAI</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #333;
+        min-height: 100vh;
+      }
+
+      .container {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        text-align: center;
+        color: #4a90e2;
+        margin-bottom: 30px;
+        font-size: 2.2em;
+      }
+
+      .section {
+        margin: 25px 0;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        border-left: 4px solid #4a90e2;
+      }
+
+      .status {
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        font-weight: 600;
+      }
+
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .status.info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+
+      button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        margin: 5px;
+        transition: all 0.3s ease;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .analytics-data {
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 10px 0;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+
+      .metric-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      .metric-row:last-child {
+        border-bottom: none;
+      }
+
+      .metric-label {
+        font-weight: 600;
+        color: #495057;
+      }
+
+      .metric-value {
+        color: #28a745;
+        font-family: 'Courier New', monospace;
+      }
+
+      .demo-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .real-time-display {
+        background: #343a40;
+        color: #28a745;
+        padding: 15px;
+        border-radius: 8px;
+        font-family: 'Courier New', monospace;
+        margin: 15px 0;
+        white-space: pre-wrap;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+
+      .firebase-config {
+        background: #1a1a1a;
+        color: #00ff00;
+        padding: 15px;
+        border-radius: 8px;
+        font-family: 'Courier New', monospace;
+        margin: 15px 0;
+        overflow-x: auto;
+      }
+
+      .collections-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .collection-card {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .collection-name {
+        font-weight: 600;
+        color: #4a90e2;
+        margin-bottom: 10px;
+      }
+
+      .collection-desc {
+        color: #6c757d;
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+
+      .record-count {
+        background: #e3f2fd;
+        color: #1565c0;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔥 Firebase Analytics Integration Demo</h1>
+
+      <!-- Firebase Connection Status -->
+      <div class="section">
+        <h2>🌐 Firebase Connection Status</h2>
+        <div id="firebase-status" class="status info">
+          Initializing Firebase connection...
+        </div>
+        <div class="firebase-config">
+          <strong>Firebase Project:</strong> simulateai-research<br />
+          <strong>Collections:</strong> analytics_* (scenario_performance,
+          framework_engagement, session_tracking, platform_metrics)<br />
+          <strong>Real-time Sync:</strong> Enabled<br />
+          <strong>Security Rules:</strong> Authenticated writes, public reads
+          for aggregated data
+        </div>
+      </div>
+
+      <!-- System Analytics Integration -->
+      <div class="section">
+        <h2>📊 System Analytics Integration</h2>
+        <div id="analytics-status" class="status info">
+          Initializing system analytics collector...
+        </div>
+
+        <div class="demo-actions">
+          <button onclick="testScenarioTracking()">
+            🎯 Test Scenario Tracking
+          </button>
+          <button onclick="testFrameworkEngagement()">
+            🧠 Test Framework Engagement
+          </button>
+          <button onclick="testUserNavigation()">
+            🗺️ Test Navigation Tracking
+          </button>
+          <button onclick="testSessionAnalytics()">
+            ⏱️ Test Session Analytics
+          </button>
+        </div>
+
+        <div class="demo-actions">
+          <button onclick="viewAnalyticsSummary()">
+            📈 View Analytics Summary
+          </button>
+          <button onclick="exportAnalyticsData()">
+            💾 Export Analytics Data
+          </button>
+          <button onclick="startRealTimeMonitoring()">
+            📡 Start Real-time Monitoring
+          </button>
+          <button onclick="flushToFirebase()">🔄 Flush to Firebase</button>
+        </div>
+      </div>
+
+      <!-- Firestore Collections Overview -->
+      <div class="section">
+        <h2>🗂️ Firestore Collections</h2>
+        <div class="collections-list">
+          <div class="collection-card">
+            <div class="collection-name">analytics_scenario_performance</div>
+            <div class="collection-desc">
+              Tracks scenario views, completions, abandons, and quality ratings
+            </div>
+            <div class="record-count" id="scenario-count">0 records</div>
+          </div>
+
+          <div class="collection-card">
+            <div class="collection-name">analytics_framework_engagement</div>
+            <div class="collection-desc">
+              Monitors philosophical framework selection and switching patterns
+            </div>
+            <div class="record-count" id="framework-count">0 records</div>
+          </div>
+
+          <div class="collection-card">
+            <div class="collection-name">analytics_session_tracking</div>
+            <div class="collection-desc">
+              Captures user navigation, interactions, and session durations
+            </div>
+            <div class="record-count" id="session-count">0 records</div>
+          </div>
+
+          <div class="collection-card">
+            <div class="collection-name">analytics_platform_metrics</div>
+            <div class="collection-desc">
+              Overall platform performance and usage statistics
+            </div>
+            <div class="record-count" id="platform-count">0 records</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-time Analytics Display -->
+      <div class="section">
+        <h2>📡 Real-time Analytics Stream</h2>
+        <div id="real-time-display" class="real-time-display">
+          Waiting for analytics data... Connect to Firebase and start tracking
+          to see live data updates here.
+        </div>
+      </div>
+
+      <!-- Analytics Summary -->
+      <div class="section">
+        <h2>📈 Analytics Summary</h2>
+        <div id="analytics-summary" class="analytics-data">
+          <div class="metric-row">
+            <span class="metric-label">Session Duration:</span>
+            <span class="metric-value" id="session-duration">0 seconds</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Scenarios Viewed:</span>
+            <span class="metric-value" id="scenarios-viewed">0</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Scenarios Completed:</span>
+            <span class="metric-value" id="scenarios-completed">0</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Completion Rate:</span>
+            <span class="metric-value" id="completion-rate">0%</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Engagement Score:</span>
+            <span class="metric-value" id="engagement-score">0/100</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Navigation Pattern:</span>
+            <span class="metric-value" id="navigation-pattern"
+              >exploratory</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Export Display -->
+      <div class="section">
+        <h2>💾 Data Export & Research</h2>
+        <div id="export-status" class="status info">
+          Ready to export analytics data for research
+        </div>
+        <div
+          id="export-data"
+          class="analytics-data"
+          style="display: none"
+        ></div>
+
+        <div class="demo-actions">
+          <button onclick="exportForResearch()">🔬 Export for Research</button>
+          <button onclick="generateReport()">📊 Generate Report</button>
+          <button onclick="downloadCSV()">📋 Download CSV</button>
+          <button onclick="shareWithEducators()">
+            👨‍🏫 Share with Educators
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Import Firebase and System Components -->
+    <script type="module">
+      import FirebaseService from './src/js/services/firebase-service.js';
+      import { getSystemCollector } from './src/js/services/system-metadata-collector.js';
+
+      let firebaseService;
+      let systemCollector;
+      let realTimeUnsubscribe = null;
+      let isMonitoring = false;
+
+      // Initialize Firebase and System Analytics
+      async function initializeServices() {
+        try {
+          // Initialize Firebase
+          updateStatus('firebase-status', 'Connecting to Firebase...', 'info');
+          firebaseService = new FirebaseService();
+          await firebaseService.initialize();
+          updateStatus(
+            'firebase-status',
+            'Firebase connected successfully! Ready for analytics storage.',
+            'success'
+          );
+
+          // Initialize System Analytics Collector with Firebase
+          updateStatus(
+            'analytics-status',
+            'Connecting system analytics to Firebase...',
+            'info'
+          );
+          systemCollector = getSystemCollector(firebaseService);
+          updateStatus(
+            'analytics-status',
+            'System analytics connected to Firebase! All interactions will be tracked.',
+            'success'
+          );
+
+          // Start auto-updating analytics display
+          setInterval(updateAnalyticsDisplay, 2000);
+
+          // Update collection counts
+          await updateCollectionCounts();
+        } catch (error) {
+          updateStatus(
+            'firebase-status',
+            `Firebase connection failed: ${error.message}`,
+            'error'
+          );
+          updateStatus(
+            'analytics-status',
+            'System analytics running in local mode only.',
+            'error'
+          );
+
+          // Initialize local-only collector as fallback
+          systemCollector = getSystemCollector(null);
+        }
+      }
+
+      // Update status displays
+      function updateStatus(elementId, message, type) {
+        const element = document.getElementById(elementId);
+        element.textContent = message;
+        element.className = `status ${type}`;
+      }
+
+      // Test Functions
+      window.testScenarioTracking = async function () {
+        if (!systemCollector) return;
+
+        const scenarios = [
+          { id: 'healthcare-bias-01', category: 'healthcare', action: 'view' },
+          {
+            id: 'autonomous-vehicle-02',
+            category: 'transportation',
+            action: 'complete',
+          },
+          {
+            id: 'hiring-algorithm-03',
+            category: 'employment',
+            action: 'abandon',
+          },
+        ];
+
+        for (const scenario of scenarios) {
+          await systemCollector.trackScenarioPerformance({
+            scenarioId: scenario.id,
+            categoryId: scenario.category,
+            action: scenario.action,
+            metadata: {
+              completionTime: Math.floor(Math.random() * 300) + 30,
+              rating: Math.floor(Math.random() * 5) + 1,
+              difficulty: ['easy', 'medium', 'hard'][
+                Math.floor(Math.random() * 3)
+              ],
+            },
+          });
+        }
+
+        logToRealTime(
+          `✅ Scenario tracking test completed - ${scenarios.length} scenarios tracked`
+        );
+      };
+
+      window.testFrameworkEngagement = async function () {
+        if (!systemCollector) return;
+
+        const frameworks = [
+          'utilitarian',
+          'deontological',
+          'virtue-ethics',
+          'care-ethics',
+        ];
+        const actions = ['select', 'change', 'apply'];
+
+        for (let i = 0; i < 5; i++) {
+          await systemCollector.trackFrameworkEngagement({
+            frameworkId:
+              frameworks[Math.floor(Math.random() * frameworks.length)],
+            action: actions[Math.floor(Math.random() * actions.length)],
+            scenarioId: 'test-scenario-' + i,
+            metadata: {
+              decisionTime: Math.floor(Math.random() * 60) + 10,
+              confidenceLevel: Math.floor(Math.random() * 5) + 1,
+            },
+          });
+        }
+
+        logToRealTime(
+          `🧠 Framework engagement test completed - 5 framework interactions tracked`
+        );
+      };
+
+      window.testUserNavigation = function () {
+        if (!systemCollector) return;
+
+        const navigationPaths = [
+          { from: 'home', to: 'categories', action: 'click' },
+          { from: 'categories', to: 'healthcare-scenarios', action: 'click' },
+          {
+            from: 'healthcare-scenarios',
+            to: 'scenario-detail',
+            action: 'click',
+          },
+          { from: 'scenario-detail', to: 'simulation-modal', action: 'click' },
+        ];
+
+        navigationPaths.forEach(nav => {
+          systemCollector.trackNavigation({
+            from: nav.from,
+            to: nav.to,
+            action: nav.action,
+            metadata: {
+              timestamp: new Date(),
+              userAgent: navigator.userAgent,
+            },
+          });
+        });
+
+        logToRealTime(
+          `🗺️ Navigation tracking test completed - ${navigationPaths.length} navigation events tracked`
+        );
+      };
+
+      window.testSessionAnalytics = function () {
+        if (!systemCollector) return;
+
+        systemCollector.trackInteraction({
+          element: 'demo-page',
+          action: 'test-session',
+          duration: Math.floor(Math.random() * 1000) + 100,
+          metadata: {
+            testType: 'firebase-integration',
+            timestamp: new Date(),
+          },
+        });
+
+        logToRealTime(
+          `⏱️ Session analytics test completed - session interaction tracked`
+        );
+      };
+
+      window.viewAnalyticsSummary = async function () {
+        if (!firebaseService) {
+          logToRealTime(`❌ Firebase not connected - showing local data only`);
+          return;
+        }
+
+        try {
+          const summary = await firebaseService.getSystemAnalyticsSummary({
+            timeframe: '7d',
+            metricTypes: [
+              'scenario_performance',
+              'framework_engagement',
+              'session_tracking',
+            ],
+          });
+
+          logToRealTime(`📈 Analytics Summary Retrieved:`);
+          logToRealTime(JSON.stringify(summary, null, 2));
+        } catch (error) {
+          logToRealTime(`❌ Failed to get analytics summary: ${error.message}`);
+        }
+      };
+
+      window.exportAnalyticsData = async function () {
+        if (!firebaseService) {
+          logToRealTime(`❌ Firebase not connected - cannot export cloud data`);
+          return;
+        }
+
+        try {
+          const exportData = await firebaseService.exportSystemAnalytics({
+            anonymizationLevel: 'high',
+            includeMetadata: false,
+            format: 'json',
+          });
+
+          document.getElementById('export-data').textContent = JSON.stringify(
+            exportData,
+            null,
+            2
+          );
+          document.getElementById('export-data').style.display = 'block';
+          updateStatus(
+            'export-status',
+            'Analytics data exported successfully!',
+            'success'
+          );
+
+          logToRealTime(
+            `💾 Analytics data exported - ${Object.keys(exportData.data).length} metric types`
+          );
+        } catch (error) {
+          updateStatus(
+            'export-status',
+            `Export failed: ${error.message}`,
+            'error'
+          );
+        }
+      };
+
+      window.startRealTimeMonitoring = function () {
+        if (!firebaseService) {
+          logToRealTime(
+            `❌ Firebase not connected - cannot start real-time monitoring`
+          );
+          return;
+        }
+
+        if (isMonitoring) {
+          // Stop monitoring
+          if (realTimeUnsubscribe) {
+            realTimeUnsubscribe();
+            realTimeUnsubscribe = null;
+          }
+          isMonitoring = false;
+          logToRealTime(`📡 Real-time monitoring stopped`);
+          document.querySelector(
+            'button[onclick="startRealTimeMonitoring()"]'
+          ).textContent = '📡 Start Real-time Monitoring';
+          return;
+        }
+
+        // Start monitoring
+        try {
+          realTimeUnsubscribe = firebaseService.subscribeToSystemMetrics(
+            { metricType: 'scenario_performance', limit: 10 },
+            metrics => {
+              logToRealTime(
+                `📡 Real-time update: ${metrics.length} new scenario metrics`
+              );
+              metrics.forEach(metric => {
+                logToRealTime(
+                  `  - ${metric.action} on ${metric.scenarioId} at ${new Date(metric.timestamp).toLocaleTimeString()}`
+                );
+              });
+            }
+          );
+
+          isMonitoring = true;
+          logToRealTime(
+            `📡 Real-time monitoring started for scenario performance`
+          );
+          document.querySelector(
+            'button[onclick="startRealTimeMonitoring()"]'
+          ).textContent = '📡 Stop Real-time Monitoring';
+        } catch (error) {
+          logToRealTime(
+            `❌ Failed to start real-time monitoring: ${error.message}`
+          );
+        }
+      };
+
+      window.flushToFirebase = async function () {
+        if (!systemCollector) return;
+
+        try {
+          await systemCollector.flushBatch();
+          logToRealTime(`🔄 Successfully flushed analytics batch to Firebase`);
+          await updateCollectionCounts();
+        } catch (error) {
+          logToRealTime(`❌ Failed to flush to Firebase: ${error.message}`);
+        }
+      };
+
+      // Research and Export Functions
+      window.exportForResearch = async function () {
+        if (!firebaseService) return;
+
+        try {
+          const researchData = await firebaseService.exportSystemAnalytics({
+            anonymizationLevel: 'high',
+            startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Last 7 days
+            includeMetadata: true,
+            format: 'json',
+          });
+
+          logToRealTime(
+            `🔬 Research export complete - ${JSON.stringify(researchData.exportInfo)}`
+          );
+        } catch (error) {
+          logToRealTime(`❌ Research export failed: ${error.message}`);
+        }
+      };
+
+      window.generateReport = function () {
+        logToRealTime(`📊 Generating analytics report...`);
+        // Implementation would generate comprehensive report
+      };
+
+      window.downloadCSV = function () {
+        logToRealTime(`📋 Preparing CSV download...`);
+        // Implementation would convert data to CSV and trigger download
+      };
+
+      window.shareWithEducators = function () {
+        logToRealTime(`👨‍🏫 Preparing educator-friendly analytics summary...`);
+        // Implementation would create educator dashboard link
+      };
+
+      // Helper Functions
+      function logToRealTime(message) {
+        const display = document.getElementById('real-time-display');
+        const timestamp = new Date().toLocaleTimeString();
+        display.textContent += `\\n[${timestamp}] ${message}`;
+        display.scrollTop = display.scrollHeight;
+      }
+
+      function updateAnalyticsDisplay() {
+        if (!systemCollector) return;
+
+        const insights = systemCollector.getSessionInsights();
+
+        document.getElementById('session-duration').textContent =
+          `${insights.sessionDuration} seconds`;
+        document.getElementById('scenarios-viewed').textContent =
+          insights.scenariosViewed;
+        document.getElementById('scenarios-completed').textContent =
+          insights.scenariosCompleted;
+        document.getElementById('completion-rate').textContent =
+          `${insights.completionRate.toFixed(1)}%`;
+        document.getElementById('engagement-score').textContent =
+          `${insights.engagementScore}/100`;
+        document.getElementById('navigation-pattern').textContent =
+          insights.navigationPattern || 'exploratory';
+      }
+
+      async function updateCollectionCounts() {
+        if (!firebaseService) return;
+
+        try {
+          const collections = [
+            { id: 'scenario-count', type: 'scenario_performance' },
+            { id: 'framework-count', type: 'framework_engagement' },
+            { id: 'session-count', type: 'session_tracking' },
+            { id: 'platform-count', type: 'platform_metrics' },
+          ];
+
+          for (const collection of collections) {
+            try {
+              const metrics = await firebaseService.querySystemMetrics({
+                metricType: collection.type,
+                limit: 1000,
+              });
+              document.getElementById(collection.id).textContent =
+                `${metrics.length} records`;
+            } catch (error) {
+              document.getElementById(collection.id).textContent =
+                'Error loading';
+            }
+          }
+        } catch (error) {
+          logToRealTime(
+            `❌ Failed to update collection counts: ${error.message}`
+          );
+        }
+      }
+
+      // Initialize everything when page loads
+      initializeServices();
+
+      logToRealTime('🚀 Firebase Analytics Integration Demo initialized');
+      logToRealTime(
+        '👆 Click the buttons above to test different analytics features'
+      );
+      logToRealTime('📊 Watch this space for real-time analytics updates');
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1484 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SimulateAI - Enhanced Storage with AI & Security Demo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 30px;
+      }
+
+      .header h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header p {
+        font-size: 1.2em;
+        opacity: 0.9;
+      }
+
+      .demo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+      }
+
+      .demo-card {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .demo-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+      }
+
+      .demo-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+      }
+
+      .demo-title {
+        color: #667eea;
+        margin-bottom: 20px;
+        font-size: 1.4em;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .demo-icon {
+        font-size: 1.5em;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .feature-item {
+        background: #f8f9ff;
+        padding: 15px;
+        border-radius: 12px;
+        text-align: center;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+      }
+
+      .feature-item:hover {
+        border-color: #667eea;
+        transform: scale(1.05);
+      }
+
+      .feature-icon {
+        font-size: 2em;
+        margin-bottom: 8px;
+      }
+
+      .feature-title {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 5px;
+      }
+
+      .feature-desc {
+        font-size: 0.9em;
+        color: #666;
+      }
+
+      .button {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 30px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin: 15px 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+      }
+
+      .button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .button-secondary {
+        background: linear-gradient(45deg, #4caf50, #45a049);
+      }
+
+      .button-warning {
+        background: linear-gradient(45deg, #ff9800, #f57c00);
+      }
+
+      .file-input {
+        margin: 20px 0;
+        padding: 20px;
+        border: 3px dashed #667eea;
+        border-radius: 15px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #f8f9ff;
+      }
+
+      .file-input:hover {
+        background-color: #f0f4ff;
+        border-color: #764ba2;
+        transform: scale(1.02);
+      }
+
+      .file-input input {
+        display: none;
+      }
+
+      .analysis-display {
+        background: #f8f9ff;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+        border-left: 5px solid #667eea;
+      }
+
+      .analysis-section {
+        margin-bottom: 15px;
+      }
+
+      .analysis-title {
+        font-weight: 600;
+        color: #667eea;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .tag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 10px 0;
+      }
+
+      .tag {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.85em;
+        font-weight: 500;
+      }
+
+      .progress-container {
+        margin: 20px 0;
+        display: none;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 25px;
+        background-color: #f0f0f0;
+        border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(45deg, #4caf50, #45a049);
+        width: 0%;
+        transition: width 0.3s ease;
+        position: relative;
+      }
+
+      .progress-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-weight: 600;
+        color: #333;
+        font-size: 14px;
+      }
+
+      .result-display {
+        margin: 20px 0;
+        padding: 20px;
+        background-color: #f8f9ff;
+        border-radius: 15px;
+        border-left: 5px solid #667eea;
+        display: none;
+      }
+
+      .result-display.success {
+        background-color: #f0fff4;
+        border-left-color: #4caf50;
+      }
+
+      .result-display.error {
+        background-color: #fff5f5;
+        border-left-color: #f44336;
+      }
+
+      .result-display.warning {
+        background-color: #fff8f0;
+        border-left-color: #ff9800;
+      }
+
+      .security-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85em;
+        font-weight: 600;
+      }
+
+      .security-safe {
+        background: #e8f5e8;
+        color: #2e7d32;
+      }
+
+      .security-warning {
+        background: #fff3e0;
+        color: #f57c00;
+      }
+
+      .security-danger {
+        background: #ffebee;
+        color: #d32f2f;
+      }
+
+      .search-container {
+        display: flex;
+        gap: 10px;
+        margin: 20px 0;
+      }
+
+      .search-input {
+        flex: 1;
+        padding: 12px 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 25px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .search-results {
+        max-height: 300px;
+        overflow-y: auto;
+        margin: 15px 0;
+      }
+
+      .search-result-item {
+        background: white;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 10px;
+        border-left: 4px solid #667eea;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .result-title {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 5px;
+      }
+
+      .result-meta {
+        font-size: 0.9em;
+        color: #666;
+        margin-bottom: 8px;
+      }
+
+      .relevance-score {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.8em;
+        font-weight: 600;
+      }
+
+      .collections-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .collection-card {
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        border: 2px solid #e0e0e0;
+        transition: all 0.3s ease;
+      }
+
+      .collection-card:hover {
+        border-color: #667eea;
+        transform: translateY(-3px);
+      }
+
+      .collection-title {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+      }
+
+      .collection-desc {
+        font-size: 0.9em;
+        color: #666;
+        margin-bottom: 10px;
+      }
+
+      .collection-stats {
+        font-size: 0.8em;
+        color: #888;
+      }
+
+      .sharing-panel {
+        background: #f8f9ff;
+        padding: 20px;
+        border-radius: 15px;
+        margin: 20px 0;
+      }
+
+      .permission-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+        margin: 15px 0;
+      }
+
+      .permission-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .permission-checkbox {
+        accent-color: #667eea;
+      }
+
+      .share-link {
+        background: white;
+        padding: 12px;
+        border-radius: 8px;
+        border: 2px solid #667eea;
+        font-family: monospace;
+        font-size: 0.9em;
+        word-break: break-all;
+        margin: 10px 0;
+      }
+
+      .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .analytics-card {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+      }
+
+      .analytics-number {
+        font-size: 2.5em;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .analytics-label {
+        font-size: 0.9em;
+        opacity: 0.9;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🤖 Enhanced Storage with AI & Security</h1>
+        <p>Experience the future of intelligent file management</p>
+      </div>
+
+      <div class="demo-grid">
+        <!-- AI Content Analysis Demo -->
+        <div class="demo-card">
+          <h3 class="demo-title">
+            <span class="demo-icon">🧠</span>
+            AI Content Analysis
+          </h3>
+          <p>
+            Upload any file and watch our AI analyze its content, extract
+            insights, and generate smart tags.
+          </p>
+
+          <div class="feature-grid">
+            <div class="feature-item">
+              <div class="feature-icon">👁️</div>
+              <div class="feature-title">OCR Text</div>
+              <div class="feature-desc">Extract text from images</div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">🏷️</div>
+              <div class="feature-title">Auto Tags</div>
+              <div class="feature-desc">AI-generated categories</div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">📝</div>
+              <div class="feature-title">Summaries</div>
+              <div class="feature-desc">Document insights</div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">🔍</div>
+              <div class="feature-title">Objects</div>
+              <div class="feature-desc">Visual recognition</div>
+            </div>
+          </div>
+
+          <div
+            class="file-input"
+            onclick="document.getElementById('aiAnalysisInput').click()"
+          >
+            <input type="file" id="aiAnalysisInput" accept="*/*" />
+            🤖 Choose File for AI Analysis
+          </div>
+
+          <div class="progress-container" id="aiProgress">
+            <div class="progress-bar">
+              <div class="progress-fill" id="aiProgressFill"></div>
+              <div class="progress-text" id="aiProgressText">Analyzing...</div>
+            </div>
+          </div>
+
+          <button
+            class="button"
+            onclick="analyzeWithAI()"
+            id="analyzeBtn"
+            disabled
+          >
+            Analyze with AI
+          </button>
+
+          <div
+            class="analysis-display"
+            id="aiAnalysisResult"
+            style="display: none"
+          >
+            <div class="analysis-section">
+              <div class="analysis-title">🏷️ Generated Tags</div>
+              <div class="tag-list" id="aiTags"></div>
+            </div>
+            <div class="analysis-section">
+              <div class="analysis-title">📝 Extracted Text</div>
+              <div id="aiExtractedText"></div>
+            </div>
+            <div class="analysis-section">
+              <div class="analysis-title">🔍 Detected Objects</div>
+              <div id="aiObjects"></div>
+            </div>
+            <div class="analysis-section">
+              <div class="analysis-title">💬 AI Caption</div>
+              <div id="aiCaption"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Security Validation Demo -->
+        <div class="demo-card">
+          <h3 class="demo-title">
+            <span class="demo-icon">🛡️</span>
+            Advanced Security
+          </h3>
+          <p>
+            Multi-layer security validation with content moderation, malware
+            scanning, and encryption.
+          </p>
+
+          <div class="feature-grid">
+            <div class="feature-item">
+              <div class="feature-icon">🔒</div>
+              <div class="feature-title">Encryption</div>
+              <div class="feature-desc">AES-256 protection</div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">🛡️</div>
+              <div class="feature-title">Malware Scan</div>
+              <div class="feature-desc">Threat detection</div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">👮</div>
+              <div class="feature-title">Content Mod</div>
+              <div class="feature-desc">AI moderation</div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">📋</div>
+              <div class="feature-title">Audit Log</div>
+              <div class="feature-desc">Activity tracking</div>
+            </div>
+          </div>
+
+          <div
+            class="file-input"
+            onclick="document.getElementById('securityInput').click()"
+          >
+            <input type="file" id="securityInput" accept="*/*" />
+            🛡️ Upload for Security Check
+          </div>
+
+          <button
+            class="button button-secondary"
+            onclick="performSecurityCheck()"
+            id="securityBtn"
+            disabled
+          >
+            Run Security Validation
+          </button>
+
+          <div class="result-display" id="securityResult"></div>
+
+          <div id="securityReport" style="display: none">
+            <h4>Security Report</h4>
+            <div id="securityChecks"></div>
+            <div style="margin-top: 15px">
+              <span id="securityIndicator" class="security-indicator">
+                🔍 Analysis Complete
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Smart Search Demo -->
+        <div class="demo-card">
+          <h3 class="demo-title">
+            <span class="demo-icon">🔍</span>
+            Intelligent Search
+          </h3>
+          <p>
+            AI-powered search that understands context, meaning, and finds
+            relevant files using semantic analysis.
+          </p>
+
+          <div class="search-container">
+            <input
+              type="text"
+              class="search-input"
+              id="searchQuery"
+              placeholder="Search files intelligently..."
+            />
+            <button
+              class="button"
+              onclick="performIntelligentSearch()"
+              style="width: auto; padding: 12px 25px"
+            >
+              Search
+            </button>
+          </div>
+
+          <div class="feature-grid">
+            <div class="feature-item">
+              <div class="feature-icon">🧠</div>
+              <div class="feature-title">Semantic</div>
+              <div class="feature-desc">Meaning-based search</div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">📊</div>
+              <div class="feature-title">Relevance</div>
+              <div class="feature-desc">Smart scoring</div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">🔗</div>
+              <div class="feature-title">Synonyms</div>
+              <div class="feature-desc">Related terms</div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">⚡</div>
+              <div class="feature-title">Fast</div>
+              <div class="feature-desc">Instant results</div>
+            </div>
+          </div>
+
+          <button
+            class="button button-secondary"
+            onclick="generateSampleFiles()"
+          >
+            Generate Sample Files
+          </button>
+
+          <div class="search-results" id="searchResults"></div>
+        </div>
+
+        <!-- Smart Collections Demo -->
+        <div class="demo-card">
+          <h3 class="demo-title">
+            <span class="demo-icon">📂</span>
+            Smart Collections
+          </h3>
+          <p>
+            Automatically organize files into intelligent collections based on
+            content, usage patterns, and relationships.
+          </p>
+
+          <button class="button" onclick="createSmartCollections()">
+            Generate Smart Collections
+          </button>
+
+          <div class="collections-grid" id="collectionsGrid"></div>
+
+          <div class="feature-grid">
+            <div class="feature-item">
+              <div class="feature-icon">🎯</div>
+              <div class="feature-title">Auto-Group</div>
+              <div class="feature-desc">Content-based grouping</div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">🔄</div>
+              <div class="feature-title">Dynamic</div>
+              <div class="feature-desc">Updates automatically</div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">🏷️</div>
+              <div class="feature-title">Tag-Based</div>
+              <div class="feature-desc">Intelligent categorization</div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">📈</div>
+              <div class="feature-title">Analytics</div>
+              <div class="feature-desc">Usage insights</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Secure Sharing Demo -->
+        <div class="demo-card">
+          <h3 class="demo-title">
+            <span class="demo-icon">🔗</span>
+            Secure Sharing
+          </h3>
+          <p>
+            Share files with granular permissions, expiration dates, and
+            encrypted links with audit trails.
+          </p>
+
+          <div class="sharing-panel">
+            <h4>Share Configuration</h4>
+
+            <label>Share with (Email):</label>
+            <input
+              type="email"
+              id="shareEmail"
+              placeholder="user@example.com"
+              style="
+                width: 100%;
+                padding: 8px;
+                margin: 5px 0;
+                border-radius: 5px;
+                border: 1px solid #ddd;
+              "
+            />
+
+            <label>Permissions:</label>
+            <div class="permission-grid">
+              <label class="permission-item">
+                <input
+                  type="checkbox"
+                  class="permission-checkbox"
+                  value="read"
+                  checked
+                />
+                Read
+              </label>
+              <label class="permission-item">
+                <input
+                  type="checkbox"
+                  class="permission-checkbox"
+                  value="download"
+                />
+                Download
+              </label>
+              <label class="permission-item">
+                <input
+                  type="checkbox"
+                  class="permission-checkbox"
+                  value="share"
+                />
+                Share
+              </label>
+              <label class="permission-item">
+                <input
+                  type="checkbox"
+                  class="permission-checkbox"
+                  value="edit"
+                />
+                Edit
+              </label>
+            </div>
+
+            <label>Expires:</label>
+            <select
+              id="shareExpiry"
+              style="
+                width: 100%;
+                padding: 8px;
+                margin: 5px 0;
+                border-radius: 5px;
+                border: 1px solid #ddd;
+              "
+            >
+              <option value="1h">1 Hour</option>
+              <option value="1d">1 Day</option>
+              <option value="1w" selected>1 Week</option>
+              <option value="1m">1 Month</option>
+              <option value="never">Never</option>
+            </select>
+          </div>
+
+          <button class="button" onclick="createSecureShare()">
+            Create Secure Share Link
+          </button>
+
+          <div class="result-display" id="shareResult"></div>
+        </div>
+
+        <!-- Performance Analytics Demo -->
+        <div class="demo-card">
+          <h3 class="demo-title">
+            <span class="demo-icon">📊</span>
+            Performance Analytics
+          </h3>
+          <p>
+            Comprehensive insights into file usage, optimization results, and
+            system performance metrics.
+          </p>
+
+          <button class="button" onclick="loadPerformanceAnalytics()">
+            Load Performance Data
+          </button>
+
+          <div class="analytics-grid" id="performanceMetrics">
+            <!-- Metrics will be populated by JavaScript -->
+          </div>
+
+          <div class="feature-grid">
+            <div class="feature-item">
+              <div class="feature-icon">⚡</div>
+              <div class="feature-title">Speed</div>
+              <div class="feature-desc">Upload performance</div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">💾</div>
+              <div class="feature-title">Storage</div>
+              <div class="feature-desc">Space optimization</div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">🎯</div>
+              <div class="feature-title">Accuracy</div>
+              <div class="feature-desc">AI precision</div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">📈</div>
+              <div class="feature-title">Trends</div>
+              <div class="feature-desc">Usage patterns</div>
+            </div>
+          </div>
+
+          <div class="result-display" id="analyticsResult"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enhanced Storage Service Demo Script -->
+    <script type="module">
+      // Mock Enhanced Storage Service for demonstration
+      let selectedFile = null;
+      let securityFile = null;
+      let sampleFiles = [];
+
+      class MockEnhancedStorageService {
+        constructor() {
+          this.aiAnalyzer = new MockAIAnalyzer();
+          this.securityValidator = new MockSecurityValidator();
+        }
+
+        async uploadFileEnhanced(file, userId, category, options = {}) {
+          // Simulate enhanced upload with AI analysis
+          const aiAnalysis = await this.aiAnalyzer.analyzeContent(file);
+          const securityResult =
+            await this.securityValidator.validateFile(file);
+
+          return {
+            success: true,
+            fileId: `file_${Date.now()}`,
+            downloadURL: `https://storage.simulateai.com/${file.name}`,
+            aiInsights: aiAnalysis,
+            securityValidation: securityResult,
+          };
+        }
+
+        async searchFilesIntelligent(query, userId) {
+          const enhancedQuery = await this.aiAnalyzer.enhanceSearchQuery(query);
+
+          // Filter sample files based on enhanced query
+          const results = sampleFiles
+            .map(file => {
+              const relevanceScore = this.calculateRelevance(
+                enhancedQuery,
+                file
+              );
+              return {
+                ...file,
+                relevanceScore,
+                matchReasons: this.getMatchReasons(enhancedQuery, file),
+              };
+            })
+            .filter(file => file.relevanceScore > 0.2)
+            .sort((a, b) => b.relevanceScore - a.relevanceScore);
+
+          return {
+            success: true,
+            query: enhancedQuery,
+            results,
+            totalFound: results.length,
+          };
+        }
+
+        calculateRelevance(enhancedQuery, file) {
+          let score = 0;
+          for (const term of enhancedQuery.terms) {
+            if (file.name.toLowerCase().includes(term)) score += 0.4;
+            if (file.tags?.some(tag => tag.toLowerCase().includes(term)))
+              score += 0.3;
+            if (file.description?.toLowerCase().includes(term)) score += 0.2;
+          }
+          return Math.min(score, 1.0);
+        }
+
+        getMatchReasons(enhancedQuery, file) {
+          const reasons = [];
+          for (const term of enhancedQuery.terms) {
+            if (file.name.toLowerCase().includes(term)) {
+              reasons.push(`Name contains "${term}"`);
+            }
+            if (file.tags?.some(tag => tag.toLowerCase().includes(term))) {
+              reasons.push(`Tagged with "${term}"`);
+            }
+          }
+          return reasons;
+        }
+
+        async createSmartCollections(userId) {
+          return {
+            success: true,
+            collections: [
+              {
+                id: 'smart_images',
+                name: 'Smart Images Collection',
+                description:
+                  'Automatically organized image files with AI analysis',
+                fileCount: 24,
+                type: 'auto',
+                criteria: 'fileType:image',
+              },
+              {
+                id: 'smart_documents',
+                name: 'Research Documents',
+                description: 'AI-detected research and academic papers',
+                fileCount: 18,
+                type: 'auto',
+                criteria: 'tag:research',
+              },
+              {
+                id: 'smart_presentations',
+                name: 'Presentation Files',
+                description: 'Slides and presentation materials',
+                fileCount: 12,
+                type: 'auto',
+                criteria: 'tag:presentation',
+              },
+              {
+                id: 'smart_recent',
+                name: 'Recently Active',
+                description: 'Files accessed in the last week',
+                fileCount: 31,
+                type: 'dynamic',
+                criteria: 'lastAccessed:7days',
+              },
+            ],
+          };
+        }
+
+        async shareFileSecurely(fileId, sharedWith, permissions, expires) {
+          const shareId = `share_${Date.now()}`;
+          const shareLink = `https://secure.simulateai.com/s/${shareId}`;
+
+          return {
+            success: true,
+            shareId,
+            shareLink,
+            expiresAt: expires,
+            permissions,
+          };
+        }
+      }
+
+      class MockAIAnalyzer {
+        async analyzeContent(file) {
+          // Simulate AI processing time
+          await new Promise(resolve => setTimeout(resolve, 2000));
+
+          const analysis = {
+            fileType: file.type,
+            size: file.size,
+            confidence: 0.89,
+          };
+
+          if (file.type.startsWith('image/')) {
+            analysis.tags = [
+              'educational',
+              'diagram',
+              'technology',
+              'presentation',
+            ];
+            analysis.extractedText =
+              'AI Ethics Framework: A comprehensive guide to implementing ethical AI systems in educational environments.';
+            analysis.objects = ['text', 'diagram', 'computer', 'chart'];
+            analysis.caption =
+              'A detailed diagram showing AI ethics framework components and their relationships';
+          } else if (
+            file.type.includes('pdf') ||
+            file.type.includes('document')
+          ) {
+            analysis.tags = [
+              'research',
+              'academic',
+              'documentation',
+              'analysis',
+            ];
+            analysis.extractedText =
+              'This document provides insights into modern AI applications in education, covering ethics, implementation strategies, and best practices.';
+            analysis.summary =
+              'Academic paper discussing AI implementation in educational settings with focus on ethical considerations and practical applications.';
+            analysis.language = 'en';
+          } else {
+            analysis.tags = ['data', 'file', 'digital'];
+            analysis.extractedText = 'Binary file content detected.';
+          }
+
+          return analysis;
+        }
+
+        async enhanceSearchQuery(query) {
+          const synonymMap = {
+            ai: ['artificial intelligence', 'machine learning', 'ML', 'neural'],
+            document: ['file', 'paper', 'report', 'doc'],
+            image: ['photo', 'picture', 'graphic', 'visual'],
+            education: ['learning', 'teaching', 'academic', 'school'],
+          };
+
+          let enhancedTerms = query.toLowerCase().split(' ');
+
+          Object.entries(synonymMap).forEach(([term, synonyms]) => {
+            if (enhancedTerms.includes(term)) {
+              enhancedTerms.push(...synonyms);
+            }
+          });
+
+          return {
+            original: query,
+            enhanced: enhancedTerms.join(' '),
+            terms: [...new Set(enhancedTerms)],
+          };
+        }
+      }
+
+      class MockSecurityValidator {
+        async validateFile(file) {
+          // Simulate security validation time
+          await new Promise(resolve => setTimeout(resolve, 1500));
+
+          const checks = [
+            {
+              name: 'File Size Validation',
+              status: 'PASSED',
+              details: `${this.formatBytes(file.size)} within limits`,
+            },
+            {
+              name: 'MIME Type Check',
+              status: 'PASSED',
+              details: `${file.type} is allowed`,
+            },
+            {
+              name: 'File Header Validation',
+              status: 'PASSED',
+              details: 'Header matches MIME type',
+            },
+            {
+              name: 'Malware Scan',
+              status: 'PASSED',
+              details: 'No threats detected',
+            },
+            {
+              name: 'Content Moderation',
+              status: 'PASSED',
+              details: 'Content approved',
+            },
+          ];
+
+          // Simulate potential warning for large files
+          if (file.size > 50 * 1024 * 1024) {
+            checks.push({
+              name: 'Large File Warning',
+              status: 'WARNING',
+              details: 'File is unusually large',
+            });
+          }
+
+          const hasWarnings = checks.some(check => check.status === 'WARNING');
+          const hasErrors = checks.some(check => check.status === 'FAILED');
+
+          return {
+            safe: !hasErrors,
+            status: hasErrors ? 'FAILED' : hasWarnings ? 'WARNING' : 'PASSED',
+            checks,
+            reason: hasErrors ? 'Security validation failed' : 'File is secure',
+          };
+        }
+
+        formatBytes(bytes) {
+          if (bytes === 0) return '0 Bytes';
+          const k = 1024;
+          const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+          const i = Math.floor(Math.log(bytes) / Math.log(k));
+          return (
+            parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+          );
+        }
+      }
+
+      const enhancedStorage = new MockEnhancedStorageService();
+
+      // Event Listeners
+      document
+        .getElementById('aiAnalysisInput')
+        .addEventListener('change', function (e) {
+          selectedFile = e.target.files[0];
+          document.getElementById('analyzeBtn').disabled = false;
+        });
+
+      document
+        .getElementById('securityInput')
+        .addEventListener('change', function (e) {
+          securityFile = e.target.files[0];
+          document.getElementById('securityBtn').disabled = false;
+        });
+
+      // Demo Functions
+      window.analyzeWithAI = async function () {
+        if (!selectedFile) return;
+
+        const progressContainer = document.getElementById('aiProgress');
+        const progressFill = document.getElementById('aiProgressFill');
+        const progressText = document.getElementById('aiProgressText');
+        const resultContainer = document.getElementById('aiAnalysisResult');
+
+        progressContainer.style.display = 'block';
+        resultContainer.style.display = 'none';
+
+        // Simulate progress
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += 15;
+          progressFill.style.width = progress + '%';
+
+          if (progress <= 30) progressText.textContent = 'Processing file...';
+          else if (progress <= 60)
+            progressText.textContent = 'Extracting content...';
+          else if (progress <= 90)
+            progressText.textContent = 'Generating insights...';
+          else progressText.textContent = 'Finalizing analysis...';
+
+          if (progress >= 100) {
+            clearInterval(interval);
+            progressText.textContent = 'Complete!';
+          }
+        }, 150);
+
+        try {
+          const result = await enhancedStorage.uploadFileEnhanced(
+            selectedFile,
+            'demo-user',
+            'analysis'
+          );
+          const analysis = result.aiInsights;
+
+          // Display results
+          document.getElementById('aiTags').innerHTML = analysis.tags
+            .map(tag => `<span class="tag">${tag}</span>`)
+            .join('');
+
+          document.getElementById('aiExtractedText').textContent =
+            analysis.extractedText || 'No text content detected';
+          document.getElementById('aiObjects').textContent = analysis.objects
+            ? analysis.objects.join(', ')
+            : 'No objects detected';
+          document.getElementById('aiCaption').textContent =
+            analysis.caption || analysis.summary || 'No caption generated';
+
+          resultContainer.style.display = 'block';
+
+          setTimeout(() => {
+            progressContainer.style.display = 'none';
+          }, 1000);
+        } catch (error) {
+          progressText.textContent = 'Analysis failed';
+          setTimeout(() => (progressContainer.style.display = 'none'), 2000);
+        }
+      };
+
+      window.performSecurityCheck = async function () {
+        if (!securityFile) return;
+
+        const result = document.getElementById('securityResult');
+        const report = document.getElementById('securityReport');
+        const checks = document.getElementById('securityChecks');
+        const indicator = document.getElementById('securityIndicator');
+
+        result.style.display = 'none';
+        report.style.display = 'none';
+
+        try {
+          const securityResult =
+            await enhancedStorage.securityValidator.validateFile(securityFile);
+
+          // Display security checks
+          checks.innerHTML = securityResult.checks
+            .map(
+              check => `
+                    <div style="margin: 8px 0; padding: 8px; background: ${
+                      check.status === 'PASSED'
+                        ? '#e8f5e8'
+                        : check.status === 'WARNING'
+                          ? '#fff3e0'
+                          : '#ffebee'
+                    }; border-radius: 5px;">
+                        <strong>${check.name}:</strong> 
+                        <span style="color: ${
+                          check.status === 'PASSED'
+                            ? '#2e7d32'
+                            : check.status === 'WARNING'
+                              ? '#f57c00'
+                              : '#d32f2f'
+                        };">${check.status}</span>
+                        <br><small>${check.details}</small>
+                    </div>
+                `
+            )
+            .join('');
+
+          // Update security indicator
+          indicator.className = `security-indicator ${
+            securityResult.status === 'PASSED'
+              ? 'security-safe'
+              : securityResult.status === 'WARNING'
+                ? 'security-warning'
+                : 'security-danger'
+          }`;
+          indicator.innerHTML = `${
+            securityResult.status === 'PASSED'
+              ? '✅'
+              : securityResult.status === 'WARNING'
+                ? '⚠️'
+                : '❌'
+          } ${securityResult.reason}`;
+
+          report.style.display = 'block';
+
+          result.className = `result-display ${securityResult.safe ? 'success' : 'error'}`;
+          result.innerHTML = `Security validation ${securityResult.safe ? 'passed' : 'failed'}. ${securityResult.reason}`;
+          result.style.display = 'block';
+        } catch (error) {
+          result.className = 'result-display error';
+          result.innerHTML = `Security check failed: ${error.message}`;
+          result.style.display = 'block';
+        }
+      };
+
+      window.generateSampleFiles = function () {
+        sampleFiles = [
+          {
+            id: 'file1',
+            name: 'AI Ethics Research Paper.pdf',
+            tags: ['research', 'ai', 'ethics', 'academic'],
+            description: 'Comprehensive research on AI ethics in education',
+            type: 'document',
+            size: '2.4 MB',
+          },
+          {
+            id: 'file2',
+            name: 'Machine Learning Presentation.pptx',
+            tags: ['presentation', 'machine learning', 'education'],
+            description: 'Educational slides on ML fundamentals',
+            type: 'presentation',
+            size: '8.1 MB',
+          },
+          {
+            id: 'file3',
+            name: 'Neural Network Diagram.png',
+            tags: ['image', 'neural network', 'diagram', 'ai'],
+            description: 'Visual representation of neural network architecture',
+            type: 'image',
+            size: '1.2 MB',
+          },
+          {
+            id: 'file4',
+            name: 'Educational AI Framework.docx',
+            tags: ['framework', 'education', 'ai', 'documentation'],
+            description: 'Implementation guide for AI in education',
+            type: 'document',
+            size: '943 KB',
+          },
+          {
+            id: 'file5',
+            name: 'Data Science Tutorial.mp4',
+            tags: ['video', 'tutorial', 'data science', 'learning'],
+            description: 'Introduction to data science concepts',
+            type: 'video',
+            size: '45.2 MB',
+          },
+        ];
+
+        document.getElementById('searchResults').innerHTML = `
+                <div style="padding: 15px; background: #e8f5e8; border-radius: 10px; margin: 10px 0;">
+                    ✅ Generated ${sampleFiles.length} sample files for testing intelligent search
+                </div>
+            `;
+      };
+
+      window.performIntelligentSearch = async function () {
+        const query = document.getElementById('searchQuery').value.trim();
+        if (!query) return;
+
+        if (sampleFiles.length === 0) {
+          generateSampleFiles();
+        }
+
+        try {
+          const searchResult = await enhancedStorage.searchFilesIntelligent(
+            query,
+            'demo-user'
+          );
+          const resultsContainer = document.getElementById('searchResults');
+
+          if (searchResult.results.length === 0) {
+            resultsContainer.innerHTML = `
+                        <div style="padding: 20px; text-align: center; color: #666;">
+                            No files found matching "${query}". Try different keywords.
+                        </div>
+                    `;
+            return;
+          }
+
+          resultsContainer.innerHTML = searchResult.results
+            .map(
+              file => `
+                    <div class="search-result-item">
+                        <div class="result-title">${file.name}</div>
+                        <div class="result-meta">
+                            ${file.type} • ${file.size} • 
+                            <span class="relevance-score">${Math.round(file.relevanceScore * 100)}% match</span>
+                        </div>
+                        <div style="margin: 8px 0;">${file.description}</div>
+                        <div class="tag-list">
+                            ${file.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                        ${
+                          file.matchReasons.length > 0
+                            ? `
+                            <div style="margin-top: 8px; font-size: 0.9em; color: #666;">
+                                Matched: ${file.matchReasons.join(', ')}
+                            </div>
+                        `
+                            : ''
+                        }
+                    </div>
+                `
+            )
+            .join('');
+        } catch (error) {
+          document.getElementById('searchResults').innerHTML = `
+                    <div style="padding: 15px; background: #ffebee; border-radius: 10px; color: #d32f2f;">
+                        Search failed: ${error.message}
+                    </div>
+                `;
+        }
+      };
+
+      window.createSmartCollections = async function () {
+        try {
+          const result =
+            await enhancedStorage.createSmartCollections('demo-user');
+          const grid = document.getElementById('collectionsGrid');
+
+          grid.innerHTML = result.collections
+            .map(
+              collection => `
+                    <div class="collection-card">
+                        <div class="collection-title">${collection.name}</div>
+                        <div class="collection-desc">${collection.description}</div>
+                        <div class="collection-stats">
+                            ${collection.fileCount} files • Type: ${collection.type}
+                        </div>
+                    </div>
+                `
+            )
+            .join('');
+        } catch (error) {
+          document.getElementById('collectionsGrid').innerHTML = `
+                    <div style="padding: 15px; background: #ffebee; border-radius: 10px; color: #d32f2f;">
+                        Failed to create collections: ${error.message}
+                    </div>
+                `;
+        }
+      };
+
+      window.createSecureShare = async function () {
+        const email = document.getElementById('shareEmail').value;
+        const permissions = Array.from(
+          document.querySelectorAll('.permission-checkbox:checked')
+        ).map(cb => cb.value);
+        const expiry = document.getElementById('shareExpiry').value;
+
+        if (!email || permissions.length === 0) {
+          document.getElementById('shareResult').innerHTML =
+            'Please enter email and select permissions';
+          document.getElementById('shareResult').className =
+            'result-display error';
+          document.getElementById('shareResult').style.display = 'block';
+          return;
+        }
+
+        try {
+          const shareResult = await enhancedStorage.shareFileSecurely(
+            'demo-file',
+            email,
+            permissions,
+            expiry
+          );
+
+          document.getElementById('shareResult').innerHTML = `
+                    <h4>✅ Secure share link created!</h4>
+                    <p><strong>Share ID:</strong> ${shareResult.shareId}</p>
+                    <p><strong>Permissions:</strong> ${permissions.join(', ')}</p>
+                    <p><strong>Expires:</strong> ${expiry === 'never' ? 'Never' : expiry}</p>
+                    <div class="share-link">${shareResult.shareLink}</div>
+                    <small>⚠️ This link is encrypted and tracked for security.</small>
+                `;
+          document.getElementById('shareResult').className =
+            'result-display success';
+          document.getElementById('shareResult').style.display = 'block';
+        } catch (error) {
+          document.getElementById('shareResult').innerHTML =
+            `Failed to create share: ${error.message}`;
+          document.getElementById('shareResult').className =
+            'result-display error';
+          document.getElementById('shareResult').style.display = 'block';
+        }
+      };
+
+      window.loadPerformanceAnalytics = function () {
+        const metrics = [
+          { label: 'Files Processed', value: '1,247', icon: '📁' },
+          { label: 'AI Accuracy', value: '94.2%', icon: '🎯' },
+          { label: 'Avg Upload Speed', value: '15.3 MB/s', icon: '⚡' },
+          { label: 'Storage Saved', value: '23.8 GB', icon: '💾' },
+          { label: 'Security Scans', value: '2,104', icon: '🛡️' },
+          { label: 'Smart Collections', value: '156', icon: '📂' },
+        ];
+
+        document.getElementById('performanceMetrics').innerHTML = metrics
+          .map(
+            metric => `
+                <div class="analytics-card">
+                    <div style="font-size: 1.5em; margin-bottom: 10px;">${metric.icon}</div>
+                    <div class="analytics-number">${metric.value}</div>
+                    <div class="analytics-label">${metric.label}</div>
+                </div>
+            `
+          )
+          .join('');
+
+        document.getElementById('analyticsResult').innerHTML = `
+                📊 Performance analytics loaded successfully! 
+                System is operating at 98.7% efficiency with strong AI accuracy and fast processing speeds.
+            `;
+        document.getElementById('analyticsResult').className =
+          'result-display success';
+        document.getElementById('analyticsResult').style.display = 'block';
+      };
+
+      // Initialize demo with sample data
+      generateSampleFiles();
+    </script>
+  </body>
+</html>

@@ -46,6 +46,7 @@
   },
   "dependencies": {
     "firebase": "^11.10.0",
+    "firebase-admin": "^13.4.0",
     "js-confetti": "^0.12.0"
   }
 }

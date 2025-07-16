@@ -5,6 +5,10 @@
 
 // Firebase imports
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import appCheckService from './app-check-service.js';
+import HybridDataService from './hybrid-data-service.js';
+import FirebaseStorageService from './firebase-storage-service.js';
+import FirebaseAnalyticsService from './firebase-analytics-service.js';
 import {
   getAuth,
   signInWithPopup,
@@ -106,6 +110,9 @@ export class FirebaseService {
     this.storage = null;
     this.analytics = null;
     this.messaging = null;
+    this.hybridData = null;
+    this.storageService = null;
+    this.analyticsService = null;
     this.currentUser = null;
     this.authStateListeners = [];
     this.profileListeners = new Map(); // For real-time profile updates
@@ -327,6 +334,11 @@ export class FirebaseService {
     try {
       // Initialize Firebase
       this.app = initializeApp(firebaseConfig);
+
+      // Initialize App Check for enhanced security
+      await appCheckService.initialize(this.app);
+      this.appCheck = appCheckService;
+
       this.auth = getAuth(this.app);
       this.db = getFirestore(this.app);
       this.storage = getStorage(this.app);
@@ -334,6 +346,25 @@ export class FirebaseService {
 
       // Initialize messaging service
       this.messaging = new MessagingService(this.app);
+
+      // Initialize hybrid data service
+      this.hybridData = new HybridDataService(this.app);
+      await this.hybridData.initializeDataConnect();
+
+      // Initialize storage service
+      this.storageService = new FirebaseStorageService(
+        this.app,
+        this.hybridData
+      );
+
+      // Initialize analytics service
+      this.analyticsService = new FirebaseAnalyticsService(
+        this.app,
+        this.hybridData
+      );
+
+      // Connect storage service to hybrid data service
+      this.hybridData.setStorageService(this.storageService);
 
       // Set smart authentication persistence
       await this.initializeSmartPersistence();
@@ -349,6 +380,52 @@ export class FirebaseService {
     } catch (error) {
       console.error('❌ Firebase initialization failed:', error);
       return false;
+    }
+  }
+
+  /**
+   * Get App Check instance for token validation
+   * @returns {AppCheckService} App Check service instance
+   */
+  getAppCheck() {
+    if (!this.appCheck || !this.appCheck.isReady) {
+      throw new Error('App Check not initialized. Call initialize() first.');
+    }
+    return this.appCheck;
+  }
+
+  /**
+   * Check if App Check is initialized and working
+   * @returns {boolean} True if App Check is ready
+   */
+  isAppCheckReady() {
+    try {
+      return this.appCheck && this.appCheck.validateStatus();
+    } catch (error) {
+      console.warn('⚠️ App Check status check failed:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get App Check token for manual validation
+   * @param {string} action - Optional action for token context
+   * @returns {Promise<string>} App Check token
+   */
+  async getAppCheckToken(action = null) {
+    try {
+      if (!this.isAppCheckReady()) {
+        throw new Error('App Check not ready');
+      }
+
+      if (action) {
+        return await this.appCheck.getTokenForAction(action);
+      } else {
+        return await this.appCheck.getToken();
+      }
+    } catch (error) {
+      console.error('❌ Failed to get App Check token:', error);
+      throw error;
     }
   }
 
@@ -1910,7 +1987,9 @@ export class FirebaseService {
       'Try again in a few moments',
     ];
 
-    return `Network connection problem. Please try the following:\n• ${tips.join('\n• ')}`;
+    return `Network connection problem. Please try the following:\n• ${tips.join(
+      '\n• '
+    )}`;
   }
 
   /**
@@ -2023,6 +2102,646 @@ export class FirebaseService {
   isPushNotificationSupported() {
     return this.messaging?.isNotificationSupported() || false;
   }
+
+  // ====================================
+  // SYSTEM ANALYTICS & METADATA METHODS
+  // ====================================
+
+  /**
+   * Add a batch of system metrics to Firestore
+   * @param {Array} metricsBatch - Array of metric objects to store
+   * @returns {Promise<Object>} - Result of the batch operation
+   */
+  async addSystemMetricsBatch(metricsBatch) {
+    if (!this.db) {
+      throw new Error('Firestore not initialized');
+    }
+
+    if (!Array.isArray(metricsBatch) || metricsBatch.length === 0) {
+      return { success: true, stored: 0 };
+    }
+
+    try {
+      const batch = [];
+      const timestamp = new Date();
+
+      for (const metric of metricsBatch) {
+        // Sanitize and prepare metric data
+        const sanitizedMetric = this.sanitizeMetricData(metric);
+
+        // Add common fields
+        const enrichedMetric = {
+          ...sanitizedMetric,
+          storedAt: timestamp,
+          version: '1.0',
+          source: 'system-metadata-collector',
+          environment: this.getEnvironmentInfo(),
+        };
+
+        // Store in appropriate collection based on metric type
+        const collectionName = this.getCollectionNameForMetric(metric.type);
+        const docRef = collection(this.db, collectionName);
+
+        batch.push(addDoc(docRef, enrichedMetric));
+      }
+
+      // Execute all batch operations
+      const results = await Promise.allSettled(batch);
+
+      const successful = results.filter(r => r.status === 'fulfilled').length;
+      const failed = results.filter(r => r.status === 'rejected').length;
+
+      // Log analytics event for successful batch
+      if (successful > 0 && this.analytics) {
+        logEvent(this.analytics, 'system_metrics_batch_stored', {
+          metrics_count: successful,
+          batch_size: metricsBatch.length,
+          timestamp: timestamp.toISOString(),
+        });
+      }
+
+      return {
+        success: true,
+        stored: successful,
+        failed,
+        total: metricsBatch.length,
+      };
+    } catch (error) {
+      // Log error event
+      if (this.analytics) {
+        logEvent(this.analytics, 'system_metrics_batch_error', {
+          error_message: error.message,
+          batch_size: metricsBatch.length,
+        });
+      }
+
+      return {
+        success: false,
+        error: error.message,
+        stored: 0,
+        failed: metricsBatch.length,
+        total: metricsBatch.length,
+      };
+    }
+  }
+
+  /**
+   * Store individual system metric
+   * @param {Object} metric - Single metric object
+   * @returns {Promise<Object>} - Result of the operation
+   */
+  async addSystemMetric(metric) {
+    return this.addSystemMetricsBatch([metric]);
+  }
+
+  /**
+   * Query system metrics with filters
+   * @param {Object} options - Query options
+   * @returns {Promise<Array>} - Array of metrics matching criteria
+   */
+  async querySystemMetrics(options = {}) {
+    if (!this.db) {
+      throw new Error('Firestore not initialized');
+    }
+
+    try {
+      const {
+        metricType = 'scenario_performance',
+        startDate = null,
+        endDate = null,
+        limit = 100,
+        scenarioId = null,
+        categoryId = null,
+      } = options;
+
+      const collectionName = this.getCollectionNameForMetric(metricType);
+      let q = collection(this.db, collectionName);
+
+      // Apply filters
+      const constraints = [];
+
+      if (startDate) {
+        constraints.push(where('timestamp', '>=', new Date(startDate)));
+      }
+
+      if (endDate) {
+        constraints.push(where('timestamp', '<=', new Date(endDate)));
+      }
+
+      if (scenarioId) {
+        constraints.push(where('scenarioId', '==', scenarioId));
+      }
+
+      if (categoryId) {
+        constraints.push(where('categoryId', '==', categoryId));
+      }
+
+      // Add ordering and limit
+      constraints.push(orderBy('timestamp', 'desc'));
+
+      if (limit && limit > 0) {
+        constraints.push(limit(limit));
+      }
+
+      q = query(q, ...constraints);
+      const querySnapshot = await getDocs(q);
+
+      const metrics = [];
+      querySnapshot.forEach(doc => {
+        metrics.push({
+          id: doc.id,
+          ...doc.data(),
+        });
+      });
+
+      return metrics;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Get aggregated analytics for dashboard
+   * @param {Object} options - Aggregation options
+   * @returns {Promise<Object>} - Aggregated analytics data
+   */
+  async getSystemAnalyticsSummary(options = {}) {
+    try {
+      const {
+        timeframe = '7d', // '1d', '7d', '30d', '90d'
+        metricTypes = [
+          'scenario_performance',
+          'framework_engagement',
+          'session_tracking',
+        ],
+      } = options;
+
+      const endDate = new Date();
+      const startDate = new Date();
+
+      // Calculate start date based on timeframe
+      const DAYS_CONFIG = {
+        '1d': 1,
+        '7d': 7,
+        '30d': 30,
+        '90d': 90,
+      };
+
+      startDate.setDate(endDate.getDate() - DAYS_CONFIG[timeframe]);
+
+      const summary = {
+        timeframe,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        metrics: {},
+      };
+
+      // Get metrics for each type
+      for (const metricType of metricTypes) {
+        const metrics = await this.querySystemMetrics({
+          metricType,
+          startDate,
+          endDate,
+          limit: 1000, // Get more data for aggregation
+        });
+
+        summary.metrics[metricType] = this.aggregateMetrics(
+          metrics,
+          metricType
+        );
+      }
+
+      return summary;
+    } catch (error) {
+      console.error('Failed to get system analytics summary:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Export system analytics data for research
+   * @param {Object} options - Export options
+   * @returns {Promise<Object>} - Anonymized export data
+   */
+  async exportSystemAnalytics(options = {}) {
+    try {
+      const {
+        startDate = null,
+        endDate = null,
+        anonymizationLevel = 'high', // 'low', 'medium', 'high'
+        includeMetadata = false,
+        format = 'json', // 'json', 'csv'
+      } = options;
+
+      const exportData = {
+        exportInfo: {
+          timestamp: new Date().toISOString(),
+          anonymizationLevel,
+          includeMetadata,
+          format,
+          version: '1.0',
+        },
+        data: {},
+      };
+
+      // Export all metric types
+      const metricTypes = [
+        'scenario_performance',
+        'framework_engagement',
+        'session_tracking',
+        'platform_metrics',
+      ];
+
+      for (const metricType of metricTypes) {
+        const metrics = await this.querySystemMetrics({
+          metricType,
+          startDate,
+          endDate,
+          limit: null, // No limit for export
+        });
+
+        // Apply anonymization
+        const anonymizedMetrics = this.anonymizeMetricsForExport(
+          metrics,
+          anonymizationLevel
+        );
+
+        exportData.data[metricType] = anonymizedMetrics;
+      }
+
+      // Log export event
+      if (this.analytics) {
+        logEvent(this.analytics, 'system_analytics_export', {
+          anonymization_level: anonymizationLevel,
+          record_count: Object.values(exportData.data).reduce(
+            (sum, arr) => sum + arr.length,
+            0
+          ),
+          export_format: format,
+        });
+      }
+
+      return exportData;
+    } catch (error) {
+      console.error('Failed to export system analytics:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Real-time subscription to system metrics
+   * @param {Object} options - Subscription options
+   * @param {Function} callback - Callback for new data
+   * @returns {Function} - Unsubscribe function
+   */
+  subscribeToSystemMetrics(options = {}, callback) {
+    if (!this.db) {
+      throw new Error('Firestore not initialized');
+    }
+
+    const { metricType = 'scenario_performance', limit = 50 } = options;
+
+    const collectionName = this.getCollectionNameForMetric(metricType);
+    const q = query(
+      collection(this.db, collectionName),
+      orderBy('timestamp', 'desc'),
+      limit(limit)
+    );
+
+    return onSnapshot(q, querySnapshot => {
+      const metrics = [];
+      querySnapshot.forEach(doc => {
+        metrics.push({
+          id: doc.id,
+          ...doc.data(),
+        });
+      });
+
+      callback(metrics);
+    });
+  }
+
+  // ====================================
+  // HELPER METHODS FOR SYSTEM ANALYTICS
+  // ====================================
+
+  /**
+   * Sanitize metric data before storage
+   * @param {Object} metric - Raw metric data
+   * @returns {Object} - Sanitized metric data
+   */
+  sanitizeMetricData(metric) {
+    const sanitized = { ...metric };
+
+    // Remove any potentially sensitive data
+    delete sanitized.userAgent;
+    delete sanitized.ipAddress;
+    delete sanitized.deviceId;
+
+    // Ensure required fields
+    if (!sanitized.timestamp) {
+      sanitized.timestamp = new Date();
+    }
+
+    // Convert timestamp to Firestore timestamp
+    if (sanitized.timestamp instanceof Date) {
+      sanitized.timestamp = sanitized.timestamp;
+    }
+
+    // Limit string lengths to prevent storage abuse
+    Object.keys(sanitized).forEach(key => {
+      if (typeof sanitized[key] === 'string' && sanitized[key].length > 1000) {
+        sanitized[key] = `${sanitized[key].substring(0, 1000)}...`;
+      }
+    });
+
+    return sanitized;
+  }
+
+  /**
+   * Get appropriate Firestore collection name for metric type
+   * @param {string} metricType - Type of metric
+   * @returns {string} - Collection name
+   */
+  getCollectionNameForMetric(metricType) {
+    const collections = {
+      scenario_performance: 'analytics_scenario_performance',
+      framework_engagement: 'analytics_framework_engagement',
+      session_tracking: 'analytics_session_tracking',
+      platform_metrics: 'analytics_platform_metrics',
+      user_interactions: 'analytics_user_interactions',
+    };
+
+    return collections[metricType] || 'analytics_general';
+  }
+
+  /**
+   * Get current environment information
+   * @returns {Object} - Environment details
+   */
+  getEnvironmentInfo() {
+    return {
+      userAgent: navigator.userAgent,
+      platform: navigator.platform,
+      language: navigator.language,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      screenResolution: `${screen.width}x${screen.height}`,
+      viewportSize: `${window.innerWidth}x${window.innerHeight}`,
+      connectionType: navigator.connection?.effectiveType || 'unknown',
+    };
+  }
+
+  /**
+   * Aggregate metrics for summary reporting
+   * @param {Array} metrics - Array of metrics
+   * @param {string} metricType - Type of metrics being aggregated
+   * @returns {Object} - Aggregated data
+   */
+  aggregateMetrics(metrics, metricType) {
+    if (metrics.length === 0) {
+      return { count: 0, summary: 'No data available' };
+    }
+
+    const aggregation = {
+      count: metrics.length,
+      firstDate: new Date(Math.min(...metrics.map(m => new Date(m.timestamp)))),
+      lastDate: new Date(Math.max(...metrics.map(m => new Date(m.timestamp)))),
+    };
+
+    switch (metricType) {
+      case 'scenario_performance': {
+        const actions = metrics.reduce((acc, m) => {
+          acc[m.action] = (acc[m.action] || 0) + 1;
+          return acc;
+        }, {});
+
+        aggregation.completionRate =
+          actions.complete && actions.view
+            ? `${((actions.complete / actions.view) * 100).toFixed(2)}%`
+            : '0%';
+        aggregation.actionBreakdown = actions;
+        break;
+      }
+
+      case 'framework_engagement': {
+        const frameworks = metrics.reduce((acc, m) => {
+          acc[m.frameworkId] = (acc[m.frameworkId] || 0) + 1;
+          return acc;
+        }, {});
+
+        const TOP_FRAMEWORKS_COUNT = 5;
+        aggregation.popularFrameworks = Object.entries(frameworks)
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, TOP_FRAMEWORKS_COUNT);
+        break;
+      }
+
+      case 'session_tracking': {
+        const sessionDurations = metrics
+          .filter(m => m.metadata?.sessionDurationSeconds)
+          .map(m => m.metadata.sessionDurationSeconds);
+
+        if (sessionDurations.length > 0) {
+          aggregation.averageSessionDuration = Math.round(
+            sessionDurations.reduce((a, b) => a + b, 0) /
+              sessionDurations.length
+          );
+        }
+        break;
+      }
+    }
+
+    return aggregation;
+  }
+
+  /**
+   * Anonymize metrics for export while preserving analytical value
+   * @param {Array} metrics - Metrics to anonymize
+   * @param {string} level - Anonymization level
+   * @returns {Array} - Anonymized metrics
+   */
+  anonymizeMetricsForExport(metrics, level = 'high') {
+    return metrics.map(metric => {
+      const anonymized = { ...metric };
+
+      // Remove identifying fields based on anonymization level
+      if (level === 'high' || level === 'medium') {
+        delete anonymized.sessionId;
+        delete anonymized.userId;
+        delete anonymized.id; // Document ID
+      }
+      if (level === 'high') {
+        delete anonymized.environment;
+
+        // Add noise to numerical values
+        const NOISE_LEVEL = 0.1; // 10% noise
+        if (anonymized.metadata?.completionTime) {
+          anonymized.metadata.completionTime = this.addNoise(
+            anonymized.metadata.completionTime,
+
+            NOISE_LEVEL
+          );
+        }
+
+        if (anonymized.metadata?.sessionDurationSeconds) {
+          anonymized.metadata.sessionDurationSeconds = this.addNoise(
+            anonymized.metadata.sessionDurationSeconds,
+            NOISE_LEVEL
+          );
+        }
+      }
+
+      return anonymized;
+    });
+  }
+
+  /**
+   * Add statistical noise to numerical values for privacy
+   * @param {number} value - Original value
+   * @param {number} noiseLevel - Noise level (0.1 =  10%)
+   * @returns {number} - Value with added noise
+   */
+  addNoise(value, noiseLevel = 0.1) {
+    const RANDOM_OFFSET = 0.5;
+    const NOISE_MULTIPLIER = 2;
+    const noise =
+      (Math.random() - RANDOM_OFFSET) * NOISE_MULTIPLIER * noiseLevel * value;
+    return Math.max(0, Math.round(value + noise));
+  }
+
+  /**
+   * Get analytics service instance
+   * @returns {FirebaseAnalyticsService} Analytics service
+   */
+  getAnalyticsService() {
+    return this.analyticsService;
+  }
+
+  /**
+   * Track storage event for analytics
+   * @param {string} eventType - Type of storage event
+   * @param {Object} data - Event data
+   * @returns {Promise<Object>} Event tracking result
+   */
+  async trackStorageEvent(eventType, data = {}) {
+    if (!this.analyticsService) {
+      throw new Error('Analytics service not initialized');
+    }
+    return await this.analyticsService.trackStorageEvent(eventType, data);
+  }
+
+  /**
+   * Track AI analysis event
+   * @param {string} analysisType - Type of AI analysis
+   * @param {Object} data - Analysis data
+   * @returns {Promise<Object>} Event tracking result
+   */
+  async trackAIAnalysis(analysisType, data = {}) {
+    if (!this.analyticsService) {
+      throw new Error('Analytics service not initialized');
+    }
+    return await this.analyticsService.trackAIAnalysis(analysisType, data);
+  }
+
+  /**
+   * Track security event
+   * @param {string} eventType - Type of security event
+   * @param {Object} data - Security event data
+   * @returns {Promise<Object>} Event tracking result
+   */
+  async trackSecurityEvent(eventType, data = {}) {
+    if (!this.analyticsService) {
+      throw new Error('Analytics service not initialized');
+    }
+    return await this.analyticsService.trackSecurityEvent(eventType, data);
+  }
+
+  /**
+   * Track search event
+   * @param {string} query - Search query
+   * @param {Object} results - Search results
+   * @returns {Promise<Object>} Event tracking result
+   */
+  async trackSearchEvent(query, results = {}) {
+    if (!this.analyticsService) {
+      throw new Error('Analytics service not initialized');
+    }
+    return await this.analyticsService.trackSearchEvent(query, results);
+  }
+
+  /**
+   * Get real-time analytics dashboard data
+   * @returns {Promise<Object>} Real-time analytics data
+   */
+  async getRealTimeAnalytics() {
+    if (!this.analyticsService) {
+      throw new Error('Analytics service not initialized');
+    }
+    return await this.analyticsService.getRealTimeAnalytics();
+  }
+
+  /**
+   * Get historical analytics data
+   * @param {string} timeRange - Time range (1h, 24h, 7d, 30d, 90d)
+   * @returns {Promise<Object>} Historical analytics data
+   */
+  async getHistoricalAnalytics(timeRange = '7d') {
+    if (!this.analyticsService) {
+      throw new Error('Analytics service not initialized');
+    }
+    return await this.analyticsService.getHistoricalAnalytics(timeRange);
+  }
+
+  /**
+   * Generate daily summary report
+   * @param {Date} date - Date for summary (defaults to today)
+   * @returns {Promise<Object>} Daily summary data
+   */
+  async generateDailySummary(date = null) {
+    if (!this.analyticsService) {
+      throw new Error('Analytics service not initialized');
+    }
+    return await this.analyticsService.generateDailySummary(date);
+  }
+
+  /**
+   * Set up real-time analytics listeners
+   * @param {Function} callback - Callback for real-time updates
+   * @returns {Array} Array of listener unsubscribe functions
+   */
+  setupAnalyticsListeners(callback) {
+    if (!this.analyticsService) {
+      throw new Error('Analytics service not initialized');
+    }
+    return this.analyticsService.setupRealtimeListeners(callback);
+  }
+
+  /**
+   * Start Firebase Performance trace
+   * @param {string} traceName - Name of the trace
+   * @returns {string} Trace ID
+   */
+  startPerformanceTrace(traceName) {
+    if (!this.analyticsService) {
+      throw new Error('Analytics service not initialized');
+    }
+    return this.analyticsService.startTrace(traceName);
+  }
+
+  /**
+   * Stop Firebase Performance trace
+   * @param {string} traceName - Name of the trace
+   * @param {Object} customAttributes - Custom attributes to add
+   * @returns {number} Duration in milliseconds
+   */
+  stopPerformanceTrace(traceName, customAttributes = {}) {
+    if (!this.analyticsService) {
+      throw new Error('Analytics service not initialized');
+    }
+    return this.analyticsService.stopTrace(traceName, customAttributes);
+  }
+
+  // ...existing code...
 }
 
 export default FirebaseService;

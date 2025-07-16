@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Initialize Firebase Analytics Collections</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #333;
+        min-height: 100vh;
+      }
+
+      .container {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        text-align: center;
+        color: #4a90e2;
+        margin-bottom: 30px;
+      }
+
+      .status {
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        font-weight: 600;
+      }
+
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .status.info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+
+      button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        margin: 10px 0;
+        width: 100%;
+        transition: all 0.3s ease;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .progress {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 15px 0;
+        font-family: 'Courier New', monospace;
+        white-space: pre-wrap;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔥 Initialize Firebase Analytics Collections</h1>
+
+      <div id="status" class="status info">
+        Ready to initialize analytics collections...
+      </div>
+
+      <button onclick="initializeCollections()" id="initBtn">
+        🚀 Initialize Analytics Collections
+      </button>
+
+      <button onclick="testConnection()" id="testBtn">
+        🧪 Test Firebase Connection
+      </button>
+
+      <button
+        onclick="clearCollections()"
+        id="clearBtn"
+        style="background: #dc3545"
+      >
+        🗑️ Clear Test Data (Optional)
+      </button>
+
+      <div class="progress" id="progress">
+        Waiting for initialization... This will create the following
+        collections: • analytics_scenario_performance •
+        analytics_framework_engagement • analytics_session_tracking •
+        analytics_platform_metrics Each collection will have initial setup
+        documents and test data.
+      </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+      import {
+        getFirestore,
+        doc,
+        setDoc,
+        addDoc,
+        collection,
+        getDocs,
+        deleteDoc,
+        query,
+        where,
+        orderBy,
+        limit,
+      } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+      import {
+        getAuth,
+        signInAnonymously,
+        onAuthStateChanged,
+      } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: 'AIzaSyAwoc3L-43aXyNjNB9ncGbFm7eE-yn5bFA',
+        authDomain: 'simulateai-research.firebaseapp.com',
+        projectId: 'simulateai-research',
+        storageBucket: 'simulateai-research.firebasestorage.app',
+        messagingSenderId: '52924445915',
+        appId: '1:52924445915:web:dadca1a93bc382403a08fe',
+        measurementId: 'G-XW8H062BMV',
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const auth = getAuth(app);
+
+      // Global functions
+      window.initializeCollections = initializeCollections;
+      window.testConnection = testConnection;
+      window.clearCollections = clearCollections;
+
+      let isAuthenticated = false;
+
+      // Check authentication state
+      onAuthStateChanged(auth, user => {
+        if (user) {
+          isAuthenticated = true;
+          updateStatus('Firebase authenticated successfully!', 'success');
+          log(
+            '✅ User authenticated: ' +
+              (user.isAnonymous ? 'Anonymous' : user.email)
+          );
+        } else {
+          isAuthenticated = false;
+          updateStatus(
+            'No authentication. Will sign in anonymously when needed.',
+            'info'
+          );
+        }
+      });
+
+      async function ensureAuth() {
+        if (!isAuthenticated) {
+          log('🔐 Signing in anonymously...');
+          try {
+            await signInAnonymously(auth);
+            log('✅ Anonymous authentication successful');
+            return true;
+          } catch (error) {
+            log('❌ Authentication failed: ' + error.message);
+            updateStatus('Authentication failed: ' + error.message, 'error');
+            return false;
+          }
+        }
+        return true;
+      }
+
+      async function initializeCollections() {
+        if (!(await ensureAuth())) return;
+
+        const btn = document.getElementById('initBtn');
+        btn.disabled = true;
+        btn.textContent = '🔄 Initializing...';
+
+        try {
+          log('🔥 Starting Firebase Analytics Collections initialization...');
+          updateStatus('Initializing analytics collections...', 'info');
+
+          const collections = [
+            {
+              name: 'analytics_scenario_performance',
+              description:
+                'Tracks scenario views, completions, ratings, and user interactions',
+            },
+            {
+              name: 'analytics_framework_engagement',
+              description:
+                'Monitors philosophical framework selection and switching patterns',
+            },
+            {
+              name: 'analytics_session_tracking',
+              description:
+                'Captures user navigation, interactions, and session durations',
+            },
+            {
+              name: 'analytics_platform_metrics',
+              description: 'Overall platform performance and usage statistics',
+            },
+          ];
+
+          for (const coll of collections) {
+            log(`📊 Creating collection: ${coll.name}`);
+
+            // Create initialization document
+            await setDoc(doc(db, coll.name, '_init'), {
+              initialized: true,
+              created: new Date(),
+              description: coll.description,
+              version: '1.0',
+              platform: 'SimulateAI',
+              purpose: 'System analytics and research data collection',
+            });
+
+            log(`✅ Created init document for: ${coll.name}`);
+
+            // Add a test document
+            await addDoc(collection(db, coll.name), {
+              type: 'test_metric',
+              source: 'initialization-script',
+              timestamp: new Date(),
+              data: {
+                setupTest: true,
+                collectionName: coll.name,
+                testData: generateTestData(coll.name),
+              },
+            });
+
+            log(`✅ Added test document to: ${coll.name}`);
+          }
+
+          log('🎉 All analytics collections initialized successfully!');
+          updateStatus(
+            'Analytics collections initialized successfully!',
+            'success'
+          );
+
+          // Test reading from collections
+          await testCollectionAccess();
+        } catch (error) {
+          log('❌ Initialization failed: ' + error.message);
+          updateStatus('Initialization failed: ' + error.message, 'error');
+        }
+
+        btn.disabled = false;
+        btn.textContent = '🚀 Initialize Analytics Collections';
+      }
+
+      async function testConnection() {
+        if (!(await ensureAuth())) return;
+
+        const btn = document.getElementById('testBtn');
+        btn.disabled = true;
+        btn.textContent = '🔄 Testing...';
+
+        try {
+          log('🧪 Testing Firebase connection...');
+
+          // Try to write a test document
+          await addDoc(collection(db, 'analytics_platform_metrics'), {
+            type: 'connection_test',
+            timestamp: new Date(),
+            source: 'connection-test',
+            data: { test: true },
+          });
+
+          log('✅ Write test successful');
+
+          // Try to read documents
+          const snapshot = await getDocs(
+            query(
+              collection(db, 'analytics_platform_metrics'),
+              orderBy('timestamp', 'desc'),
+              limit(5)
+            )
+          );
+
+          log(`✅ Read test successful - found ${snapshot.size} documents`);
+
+          updateStatus('Firebase connection test successful!', 'success');
+        } catch (error) {
+          log('❌ Connection test failed: ' + error.message);
+          updateStatus('Connection test failed: ' + error.message, 'error');
+        }
+
+        btn.disabled = false;
+        btn.textContent = '🧪 Test Firebase Connection';
+      }
+
+      async function testCollectionAccess() {
+        log('🧪 Testing collection access...');
+
+        const collections = [
+          'analytics_scenario_performance',
+          'analytics_framework_engagement',
+          'analytics_session_tracking',
+          'analytics_platform_metrics',
+        ];
+
+        for (const collName of collections) {
+          try {
+            const snapshot = await getDocs(
+              query(collection(db, collName), limit(5))
+            );
+            log(`✅ ${collName}: ${snapshot.size} document(s) accessible`);
+          } catch (error) {
+            log(`❌ ${collName}: Access failed - ${error.message}`);
+          }
+        }
+      }
+
+      async function clearCollections() {
+        if (!(await ensureAuth())) return;
+
+        if (
+          !confirm(
+            'Are you sure you want to clear test data? This will only remove test documents.'
+          )
+        ) {
+          return;
+        }
+
+        const btn = document.getElementById('clearBtn');
+        btn.disabled = true;
+        btn.textContent = '🔄 Clearing...';
+
+        try {
+          log('🗑️ Clearing test data...');
+
+          const collections = [
+            'analytics_scenario_performance',
+            'analytics_framework_engagement',
+            'analytics_session_tracking',
+            'analytics_platform_metrics',
+          ];
+
+          for (const collName of collections) {
+            const snapshot = await getDocs(
+              query(
+                collection(db, collName),
+                where('type', '==', 'test_metric')
+              )
+            );
+
+            for (const docSnapshot of snapshot.docs) {
+              await deleteDoc(docSnapshot.ref);
+              log(`🗑️ Deleted test document from ${collName}`);
+            }
+          }
+
+          log('✅ Test data cleared successfully');
+          updateStatus('Test data cleared successfully', 'success');
+        } catch (error) {
+          log('❌ Clear operation failed: ' + error.message);
+          updateStatus('Clear operation failed: ' + error.message, 'error');
+        }
+
+        btn.disabled = false;
+        btn.textContent = '🗑️ Clear Test Data (Optional)';
+      }
+
+      function generateTestData(collectionName) {
+        switch (collectionName) {
+          case 'analytics_scenario_performance':
+            return {
+              scenarioId: 'test-scenario-01',
+              categoryId: 'healthcare',
+              action: 'view',
+              completionTime: 120,
+              rating: 4,
+            };
+          case 'analytics_framework_engagement':
+            return {
+              frameworkId: 'utilitarian',
+              action: 'select',
+              scenarioId: 'test-scenario-01',
+              decisionTime: 30,
+            };
+          case 'analytics_session_tracking':
+            return {
+              sessionId: 'test-session-' + Date.now(),
+              action: 'navigation',
+              from: 'home',
+              to: 'scenarios',
+            };
+          case 'analytics_platform_metrics':
+            return {
+              updateType: 'platform_initialization',
+              userCount: 1,
+              simulationsAvailable: 15,
+            };
+          default:
+            return { testData: true };
+        }
+      }
+
+      function updateStatus(message, type) {
+        const statusEl = document.getElementById('status');
+        statusEl.textContent = message;
+        statusEl.className = `status ${type}`;
+      }
+
+      function log(message) {
+        const progressEl = document.getElementById('progress');
+        const timestamp = new Date().toLocaleTimeString();
+        progressEl.textContent += `\\n[${timestamp}] ${message}`;
+        progressEl.scrollTop = progressEl.scrollHeight;
+      }
+
+      // Auto-test connection on load
+      setTimeout(() => {
+        log('🚀 Firebase Analytics Collection Initializer loaded');
+        log('👆 Click "Test Firebase Connection" to verify setup');
+        log(
+          '🔥 Click "Initialize Analytics Collections" to create collections'
+        );
+      }, 1000);
+    </script>
+  </body>
+</html>

@@ -17,6 +17,10 @@ const firebaseConfig = {
 // Import the functions you need from the SDKs you want to use
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import {
+  initializeAppCheck,
+  ReCaptchaV3Provider,
+} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js';
+import {
   getMessaging,
   getToken,
   onMessage,

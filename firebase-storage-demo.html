@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Firebase Storage Demo - SimulateAI</title>
+
+    <!-- Google reCAPTCHA v3 -->
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #333;
+        min-height: 100vh;
+      }
+
+      .container {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #4a90e2;
+        margin-bottom: 30px;
+      }
+
+      h2 {
+        color: #2c3e50;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+        margin-top: 40px;
+      }
+
+      .upload-section {
+        background: #f8f9fa;
+        border-left: 4px solid #28a745;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 0 8px 8px 0;
+      }
+
+      .upload-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+      }
+
+      .upload-card {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 20px;
+        transition: all 0.3s ease;
+      }
+
+      .upload-card:hover {
+        border-color: #3498db;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .upload-card.profile {
+        border-left: 4px solid #e74c3c;
+      }
+
+      .upload-card.blog {
+        border-left: 4px solid #f39c12;
+      }
+
+      .upload-card.forum {
+        border-left: 4px solid #9b59b6;
+      }
+
+      .file-input {
+        width: 100%;
+        padding: 10px;
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        margin: 15px 0;
+        transition: all 0.3s ease;
+      }
+
+      .file-input:hover {
+        border-color: #3498db;
+        background: #f8f9fa;
+      }
+
+      .file-input.dragover {
+        border-color: #28a745;
+        background: #d4edda;
+      }
+
+      .btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin: 10px 5px;
+        width: 100%;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .btn.profile {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      }
+
+      .btn.blog {
+        background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+      }
+
+      .btn.forum {
+        background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+      }
+
+      .progress-container {
+        width: 100%;
+        background: #e9ecef;
+        border-radius: 10px;
+        margin: 15px 0;
+        overflow: hidden;
+        display: none;
+      }
+
+      .progress-bar {
+        height: 20px;
+        background: linear-gradient(90deg, #28a745, #20c997);
+        border-radius: 10px;
+        transition: width 0.3s ease;
+        text-align: center;
+        line-height: 20px;
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .file-preview {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 8px;
+        margin: 15px 0;
+        display: none;
+      }
+
+      .file-list {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 15px 0;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+
+      .file-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #e9ecef;
+        transition: background 0.3s ease;
+      }
+
+      .file-item:hover {
+        background: #e9ecef;
+      }
+
+      .file-info {
+        flex: 1;
+      }
+
+      .file-name {
+        font-weight: 600;
+        color: #2c3e50;
+      }
+
+      .file-meta {
+        font-size: 12px;
+        color: #7f8c8d;
+      }
+
+      .file-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .btn-small {
+        padding: 5px 10px;
+        font-size: 12px;
+        margin: 0;
+        width: auto;
+      }
+
+      .status {
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        font-weight: 600;
+      }
+
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .status.info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+
+      .status.warning {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+
+      .storage-stats {
+        background: #e8f5e8;
+        border: 2px solid #28a745;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin: 15px 0;
+      }
+
+      .stat-card {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        border-left: 4px solid #3498db;
+      }
+
+      .stat-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: #2c3e50;
+        margin: 10px 0;
+      }
+
+      .demo-controls {
+        background: #fff3cd;
+        border: 2px solid #ffc107;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+
+      @media (max-width: 768px) {
+        .upload-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .container {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>📁 Firebase Storage Integration</h1>
+      <p style="text-align: center; font-size: 18px; color: #7f8c8d">
+        Upload and manage files for user profiles, blogs, and forums
+      </p>
+
+      <div class="status info">
+        <strong>🚀 Features:</strong> Profile images, blog assets, forum
+        attachments with progress tracking, drag & drop, and file validation
+        <br /><strong>📊 Integration:</strong> Seamlessly integrated with Hybrid
+        Data Service for metadata storage
+      </div>
+
+      <!-- Demo Controls -->
+      <div class="demo-controls">
+        <h2>🎮 Demo Controls</h2>
+        <p>Test user ID and content IDs for demo purposes:</p>
+        <div style="display: flex; gap: 15px; flex-wrap: wrap">
+          <input
+            type="text"
+            id="demoUserId"
+            placeholder="User ID (e.g., user123)"
+            value="demo_user_001"
+            style="
+              flex: 1;
+              padding: 10px;
+              border: 1px solid #ddd;
+              border-radius: 5px;
+            "
+          />
+          <input
+            type="text"
+            id="demoBlogId"
+            placeholder="Blog ID (e.g., blog456)"
+            value="demo_blog_001"
+            style="
+              flex: 1;
+              padding: 10px;
+              border: 1px solid #ddd;
+              border-radius: 5px;
+            "
+          />
+          <input
+            type="text"
+            id="demoPostId"
+            placeholder="Forum Post ID (e.g., post789)"
+            value="demo_post_001"
+            style="
+              flex: 1;
+              padding: 10px;
+              border: 1px solid #ddd;
+              border-radius: 5px;
+            "
+          />
+        </div>
+      </div>
+
+      <!-- Upload Sections -->
+      <div class="upload-section">
+        <h2>📁 File Upload Operations</h2>
+
+        <div class="upload-grid">
+          <!-- Profile Image Upload -->
+          <div class="upload-card profile">
+            <h3>👤 Profile Images</h3>
+            <p>Upload user profile pictures and avatars</p>
+
+            <div
+              class="file-input"
+              ondrop="handleFileDrop(event, 'profile')"
+              ondragover="handleDragOver(event)"
+              ondragleave="handleDragLeave(event)"
+              onclick="document.getElementById('profileInput').click()"
+            >
+              📷 Drag & drop profile image or click to select
+              <br /><small>Max 5MB - JPEG, PNG, GIF, WebP</small>
+            </div>
+
+            <input
+              type="file"
+              id="profileInput"
+              style="display: none"
+              accept="image/*"
+              onchange="handleFileSelect(event, 'profile')"
+            />
+
+            <div class="progress-container" id="profileProgress">
+              <div class="progress-bar" id="profileProgressBar">0%</div>
+            </div>
+
+            <img
+              class="file-preview"
+              id="profilePreview"
+              alt="Profile Preview"
+            />
+
+            <button
+              class="btn profile"
+              onclick="uploadProfileImage()"
+              id="profileUploadBtn"
+              disabled
+            >
+              Upload Profile Image
+            </button>
+          </div>
+
+          <!-- Blog Image Upload -->
+          <div class="upload-card blog">
+            <h3>📝 Blog Images</h3>
+            <p>Upload images for blog posts and articles</p>
+
+            <div
+              class="file-input"
+              ondrop="handleFileDrop(event, 'blog')"
+              ondragover="handleDragOver(event)"
+              ondragleave="handleDragLeave(event)"
+              onclick="document.getElementById('blogInput').click()"
+            >
+              🖼️ Drag & drop blog image or click to select
+              <br /><small>Max 10MB - JPEG, PNG, GIF, WebP</small>
+            </div>
+
+            <input
+              type="file"
+              id="blogInput"
+              style="display: none"
+              accept="image/*"
+              onchange="handleFileSelect(event, 'blog')"
+            />
+
+            <div class="progress-container" id="blogProgress">
+              <div class="progress-bar" id="blogProgressBar">0%</div>
+            </div>
+
+            <img class="file-preview" id="blogPreview" alt="Blog Preview" />
+
+            <button
+              class="btn blog"
+              onclick="uploadBlogImage()"
+              id="blogUploadBtn"
+              disabled
+            >
+              Upload Blog Image
+            </button>
+          </div>
+
+          <!-- Forum Attachment Upload -->
+          <div class="upload-card forum">
+            <h3>💬 Forum Attachments</h3>
+            <p>Upload files and images for forum discussions</p>
+
+            <div
+              class="file-input"
+              ondrop="handleFileDrop(event, 'forum')"
+              ondragover="handleDragOver(event)"
+              ondragleave="handleDragLeave(event)"
+              onclick="document.getElementById('forumInput').click()"
+            >
+              📎 Drag & drop attachment or click to select
+              <br /><small>Max 25MB - Images, Documents, PDFs</small>
+            </div>
+
+            <input
+              type="file"
+              id="forumInput"
+              style="display: none"
+              accept="image/*,.pdf,.doc,.docx,.txt"
+              onchange="handleFileSelect(event, 'forum')"
+            />
+
+            <div class="progress-container" id="forumProgress">
+              <div class="progress-bar" id="forumProgressBar">0%</div>
+            </div>
+
+            <img class="file-preview" id="forumPreview" alt="Forum Preview" />
+
+            <button
+              class="btn forum"
+              onclick="uploadForumAttachment()"
+              id="forumUploadBtn"
+              disabled
+            >
+              Upload Forum Attachment
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- File Management -->
+      <div class="upload-section">
+        <h2>📋 File Management</h2>
+
+        <div style="display: flex; gap: 10px; margin: 20px 0; flex-wrap: wrap">
+          <button onclick="loadUserFiles()" class="btn profile">
+            Load Profile Files
+          </button>
+          <button onclick="loadBlogFiles()" class="btn blog">
+            Load Blog Files
+          </button>
+          <button onclick="loadForumFiles()" class="btn forum">
+            Load Forum Files
+          </button>
+          <button onclick="getStorageStats()" class="btn">
+            📊 Storage Statistics
+          </button>
+          <button
+            onclick="cleanupTempFiles()"
+            class="btn"
+            style="background: #dc3545"
+          >
+            🗑️ Cleanup Temp Files
+          </button>
+        </div>
+
+        <div id="fileList" class="file-list" style="display: none">
+          <h3>📁 Files</h3>
+          <div id="fileItems"></div>
+        </div>
+      </div>
+
+      <!-- Storage Statistics -->
+      <div class="storage-stats" id="storageStats" style="display: none">
+        <h2>📊 Storage Statistics</h2>
+        <div id="statsContent" class="stats-grid">
+          <!-- Stats will be populated here -->
+        </div>
+      </div>
+
+      <!-- Status and Results -->
+      <div id="statusContainer">
+        <div class="status info">
+          <strong>ℹ️ Ready:</strong> Select files using the upload cards above
+          to get started.
+        </div>
+      </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script type="module">
+      // Import Firebase services
+      import FirebaseStorageService from './src/js/services/firebase-storage-service.js';
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+
+      // Firebase config
+      const firebaseConfig = {
+        apiKey: 'AIzaSyAwoc3L-43aXyNjNB9ncGbFm7eE-yn5bFA',
+        authDomain: 'simulateai-research.firebaseapp.com',
+        projectId: 'simulateai-research',
+        storageBucket: 'simulateai-research.firebasestorage.app',
+        messagingSenderId: '52924445915',
+        appId: '1:52924445915:web:dadca1a93bc382403a08fe',
+        measurementId: 'G-XW8H062BMV',
+      };
+
+      // Initialize Firebase and Storage Service
+      const app = initializeApp(firebaseConfig);
+      const storageService = new FirebaseStorageService(app);
+
+      // Store selected files
+      let selectedFiles = {
+        profile: null,
+        blog: null,
+        forum: null,
+      };
+
+      // Make functions globally available
+      window.handleFileDrop = handleFileDrop;
+      window.handleDragOver = handleDragOver;
+      window.handleDragLeave = handleDragLeave;
+      window.handleFileSelect = handleFileSelect;
+      window.uploadProfileImage = uploadProfileImage;
+      window.uploadBlogImage = uploadBlogImage;
+      window.uploadForumAttachment = uploadForumAttachment;
+      window.loadUserFiles = loadUserFiles;
+      window.loadBlogFiles = loadBlogFiles;
+      window.loadForumFiles = loadForumFiles;
+      window.getStorageStats = getStorageStats;
+      window.cleanupTempFiles = cleanupTempFiles;
+      window.deleteFile = deleteFile;
+      window.downloadFile = downloadFile;
+
+      // Drag and Drop Functions
+      function handleDragOver(event) {
+        event.preventDefault();
+        event.currentTarget.classList.add('dragover');
+      }
+
+      function handleDragLeave(event) {
+        event.currentTarget.classList.remove('dragover');
+      }
+
+      function handleFileDrop(event, type) {
+        event.preventDefault();
+        event.currentTarget.classList.remove('dragover');
+
+        const files = event.dataTransfer.files;
+        if (files.length > 0) {
+          processFile(files[0], type);
+        }
+      }
+
+      function handleFileSelect(event, type) {
+        const file = event.target.files[0];
+        if (file) {
+          processFile(file, type);
+        }
+      }
+
+      function processFile(file, type) {
+        selectedFiles[type] = file;
+
+        // Show preview for images
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = e => {
+            const preview = document.getElementById(`${type}Preview`);
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+          };
+          reader.readAsDataURL(file);
+        }
+
+        // Enable upload button
+        document.getElementById(`${type}UploadBtn`).disabled = false;
+
+        showStatus(
+          `Selected: ${file.name} (${formatFileSize(file.size)})`,
+          'info'
+        );
+      }
+
+      // Upload Functions
+      async function uploadProfileImage() {
+        const file = selectedFiles.profile;
+        const userId =
+          document.getElementById('demoUserId').value || 'demo_user';
+
+        if (!file) {
+          showStatus('Please select a profile image first', 'error');
+          return;
+        }
+
+        try {
+          showStatus('Uploading profile image...', 'info');
+          showProgress('profile', 0);
+
+          const result = await storageService.uploadUserProfileImage(
+            userId,
+            file,
+            progress => updateProgress('profile', progress.progress)
+          );
+
+          hideProgress('profile');
+          showStatus(
+            `✅ Profile image uploaded successfully! URL: ${result.downloadURL}`,
+            'success'
+          );
+
+          // Reset form
+          selectedFiles.profile = null;
+          document.getElementById('profileInput').value = '';
+          document.getElementById('profilePreview').style.display = 'none';
+          document.getElementById('profileUploadBtn').disabled = true;
+        } catch (error) {
+          hideProgress('profile');
+          showStatus(`❌ Upload failed: ${error.message}`, 'error');
+        }
+      }
+
+      async function uploadBlogImage() {
+        const file = selectedFiles.blog;
+        const blogId =
+          document.getElementById('demoBlogId').value || 'demo_blog';
+
+        if (!file) {
+          showStatus('Please select a blog image first', 'error');
+          return;
+        }
+
+        try {
+          showStatus('Uploading blog image...', 'info');
+          showProgress('blog', 0);
+
+          const result = await storageService.uploadBlogImage(
+            blogId,
+            file,
+            progress => updateProgress('blog', progress.progress)
+          );
+
+          hideProgress('blog');
+          showStatus(
+            `✅ Blog image uploaded successfully! URL: ${result.downloadURL}`,
+            'success'
+          );
+
+          // Reset form
+          selectedFiles.blog = null;
+          document.getElementById('blogInput').value = '';
+          document.getElementById('blogPreview').style.display = 'none';
+          document.getElementById('blogUploadBtn').disabled = true;
+        } catch (error) {
+          hideProgress('blog');
+          showStatus(`❌ Upload failed: ${error.message}`, 'error');
+        }
+      }
+
+      async function uploadForumAttachment() {
+        const file = selectedFiles.forum;
+        const postId =
+          document.getElementById('demoPostId').value || 'demo_post';
+
+        if (!file) {
+          showStatus('Please select a forum attachment first', 'error');
+          return;
+        }
+
+        try {
+          showStatus('Uploading forum attachment...', 'info');
+          showProgress('forum', 0);
+
+          const result = await storageService.uploadForumAttachment(
+            postId,
+            file,
+            progress => updateProgress('forum', progress.progress)
+          );
+
+          hideProgress('forum');
+          showStatus(
+            `✅ Forum attachment uploaded successfully! URL: ${result.downloadURL}`,
+            'success'
+          );
+
+          // Reset form
+          selectedFiles.forum = null;
+          document.getElementById('forumInput').value = '';
+          document.getElementById('forumPreview').style.display = 'none';
+          document.getElementById('forumUploadBtn').disabled = true;
+        } catch (error) {
+          hideProgress('forum');
+          showStatus(`❌ Upload failed: ${error.message}`, 'error');
+        }
+      }
+
+      // File Management Functions
+      async function loadUserFiles() {
+        const userId =
+          document.getElementById('demoUserId').value || 'demo_user';
+
+        try {
+          showStatus('Loading user profile files...', 'info');
+          const result = await storageService.getUserProfileImages(userId);
+
+          if (result.success) {
+            displayFiles(result.images, 'Profile Files');
+            showStatus(
+              `✅ Loaded ${result.images.length} profile files`,
+              'success'
+            );
+          } else {
+            showStatus('❌ Failed to load profile files', 'error');
+          }
+        } catch (error) {
+          showStatus(`❌ Error loading files: ${error.message}`, 'error');
+        }
+      }
+
+      async function loadBlogFiles() {
+        const blogId =
+          document.getElementById('demoBlogId').value || 'demo_blog';
+
+        try {
+          showStatus('Loading blog files...', 'info');
+          const result = await storageService.getBlogImages(blogId);
+
+          if (result.success) {
+            displayFiles(result.images, 'Blog Files');
+            showStatus(
+              `✅ Loaded ${result.images.length} blog files`,
+              'success'
+            );
+          } else {
+            showStatus('❌ Failed to load blog files', 'error');
+          }
+        } catch (error) {
+          showStatus(`❌ Error loading files: ${error.message}`, 'error');
+        }
+      }
+
+      async function loadForumFiles() {
+        const postId =
+          document.getElementById('demoPostId').value || 'demo_post';
+
+        try {
+          showStatus('Loading forum attachments...', 'info');
+          const result = await storageService.getForumAttachments(postId);
+
+          if (result.success) {
+            displayFiles(result.attachments, 'Forum Attachments');
+            showStatus(
+              `✅ Loaded ${result.attachments.length} forum files`,
+              'success'
+            );
+          } else {
+            showStatus('❌ Failed to load forum files', 'error');
+          }
+        } catch (error) {
+          showStatus(`❌ Error loading files: ${error.message}`, 'error');
+        }
+      }
+
+      async function getStorageStats() {
+        try {
+          showStatus('Calculating storage statistics...', 'info');
+          const result = await storageService.getStorageStats();
+
+          if (result.success) {
+            displayStorageStats(result.stats);
+            showStatus('✅ Storage statistics loaded', 'success');
+          } else {
+            showStatus('❌ Failed to get storage stats', 'error');
+          }
+        } catch (error) {
+          showStatus(`❌ Error getting stats: ${error.message}`, 'error');
+        }
+      }
+
+      async function cleanupTempFiles() {
+        try {
+          showStatus('Cleaning up temporary files...', 'info');
+          const result = await storageService.cleanupTempFiles(24);
+
+          if (result.success) {
+            showStatus(
+              `✅ Cleaned up ${result.cleaned} temporary files`,
+              'success'
+            );
+          } else {
+            showStatus('❌ Failed to cleanup temp files', 'error');
+          }
+        } catch (error) {
+          showStatus(`❌ Cleanup error: ${error.message}`, 'error');
+        }
+      }
+
+      async function deleteFile(filePath) {
+        if (
+          !confirm(`Are you sure you want to delete this file?\n${filePath}`)
+        ) {
+          return;
+        }
+
+        try {
+          showStatus('Deleting file...', 'info');
+          const result = await storageService.deleteFile(filePath);
+
+          if (result.success) {
+            showStatus('✅ File deleted successfully', 'success');
+            // Refresh the current file list
+            document.getElementById('fileList').style.display = 'none';
+          } else {
+            showStatus('❌ Failed to delete file', 'error');
+          }
+        } catch (error) {
+          showStatus(`❌ Delete error: ${error.message}`, 'error');
+        }
+      }
+
+      async function downloadFile(downloadURL, fileName) {
+        try {
+          const link = document.createElement('a');
+          link.href = downloadURL;
+          link.download = fileName;
+          link.target = '_blank';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          showStatus(`✅ Download started: ${fileName}`, 'success');
+        } catch (error) {
+          showStatus(`❌ Download error: ${error.message}`, 'error');
+        }
+      }
+
+      // UI Helper Functions
+      function showProgress(type, progress) {
+        const container = document.getElementById(`${type}Progress`);
+        const bar = document.getElementById(`${type}ProgressBar`);
+
+        container.style.display = 'block';
+        bar.style.width = `${progress}%`;
+        bar.textContent = `${Math.round(progress)}%`;
+      }
+
+      function updateProgress(type, progress) {
+        const bar = document.getElementById(`${type}ProgressBar`);
+        bar.style.width = `${progress}%`;
+        bar.textContent = `${Math.round(progress)}%`;
+      }
+
+      function hideProgress(type) {
+        const container = document.getElementById(`${type}Progress`);
+        container.style.display = 'none';
+      }
+
+      function showStatus(message, type = 'info') {
+        const statusContainer = document.getElementById('statusContainer');
+        statusContainer.innerHTML = `<div class="status ${type}">${message}</div>`;
+      }
+
+      function displayFiles(files, title) {
+        const fileList = document.getElementById('fileList');
+        const fileItems = document.getElementById('fileItems');
+
+        fileItems.innerHTML = `<h4>${title} (${files.length} files)</h4>`;
+
+        files.forEach(file => {
+          const fileItem = document.createElement('div');
+          fileItem.className = 'file-item';
+          fileItem.innerHTML = `
+                    <div class="file-info">
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-meta">
+                            ${formatFileSize(file.size)} • ${file.contentType} • ${new Date(file.timeCreated).toLocaleString()}
+                        </div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="btn btn-small" onclick="downloadFile('${file.downloadURL}', '${file.name}')">
+                            📥 Download
+                        </button>
+                        <button class="btn btn-small" onclick="deleteFile('${file.path}')" style="background: #dc3545;">
+                            🗑️ Delete
+                        </button>
+                    </div>
+                `;
+          fileItems.appendChild(fileItem);
+        });
+
+        fileList.style.display = 'block';
+      }
+
+      function displayStorageStats(stats) {
+        const statsContainer = document.getElementById('storageStats');
+        const statsContent = document.getElementById('statsContent');
+
+        statsContent.innerHTML = `
+                <div class="stat-card">
+                    <h4>Total Files</h4>
+                    <div class="stat-value">${stats.totalFiles}</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Total Size</h4>
+                    <div class="stat-value">${stats.totalSizeFormatted}</div>
+                </div>
+                <div class="stat-card">
+                    <h4>File Types</h4>
+                    <div class="stat-value">${Object.keys(stats.fileTypes).length}</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Folders</h4>
+                    <div class="stat-value">${Object.keys(stats.folders).length}</div>
+                </div>
+            `;
+
+        // Add file type breakdown
+        if (Object.keys(stats.fileTypes).length > 0) {
+          const typeBreakdown = document.createElement('div');
+          typeBreakdown.innerHTML = `
+                    <h4>File Type Breakdown:</h4>
+                    ${Object.entries(stats.fileTypes)
+                      .map(
+                        ([type, count]) => `<div>${type}: ${count} files</div>`
+                      )
+                      .join('')}
+                `;
+          statsContent.appendChild(typeBreakdown);
+        }
+
+        statsContainer.style.display = 'block';
+      }
+
+      function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+      }
+
+      // Initialize
+      showStatus('🚀 Firebase Storage Service loaded and ready!', 'success');
+    </script>
+  </body>
+</html>

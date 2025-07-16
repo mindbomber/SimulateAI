@@ -47,7 +47,7 @@ class CategoryGrid {
     this.lastModalOpenTime = 0; // Debounce tracking
     this.modalOpenCooldown = 500; // Minimum time between modal opens (ms)
     this.isModalOpen = false; // Track if modal is currently open
-    
+
     // Initialize system metadata collector for analytics
     this.systemCollector = getSystemCollector();
 

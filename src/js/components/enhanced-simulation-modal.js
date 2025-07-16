@@ -39,7 +39,7 @@ export class EnhancedSimulationModal {
     this.isEthicsMetersCollapsed = this.options.collapseEthicsMeters;
     this.modal = null;
     this.resizeObserver = null;
-    
+
     // Initialize system metadata collector for tracking
     this.systemCollector = getSystemCollector();
     this.modalStartTime = new Date();
@@ -61,7 +61,7 @@ export class EnhancedSimulationModal {
     // Focus management - create focus trap
     this.focusTrap = focusManager.createTrap(this.modal, {
       autoFocus: true,
-      restoreFocus: true
+      restoreFocus: true,
     });
 
     // Track analytics
@@ -79,7 +79,7 @@ export class EnhancedSimulationModal {
     if (this.modal) {
       // Calculate session duration for analytics
       const sessionDuration = new Date() - this.modalStartTime;
-      
+
       // Track modal session completion
       this.systemCollector.trackInteraction({
         element: 'enhanced-simulation-modal',
@@ -465,7 +465,7 @@ export class EnhancedSimulationModal {
     }
 
     this.currentTab = tabName;
-    
+
     // Track tab switching for system analytics
     this.systemCollector.trackInteraction({
       element: 'simulation-modal-tab',
@@ -478,7 +478,7 @@ export class EnhancedSimulationModal {
         timestamp: new Date().toISOString(),
       },
     });
-    
+
     // Track navigation within simulation for UX analysis
     this.systemCollector.trackNavigation({
       from: `simulation-tab-${this.currentTab}`,
@@ -489,7 +489,7 @@ export class EnhancedSimulationModal {
         simulationId: this.simulationId,
       },
     });
-    
+
     this.trackAnalytics('tab_switched', { tab: tabName });
   }
 

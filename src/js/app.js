@@ -310,7 +310,8 @@ class AIEthicsApp {
         browserInfo: Helpers.getBrowserInfo(),
         deviceType: Helpers.getDeviceType(),
         currentTheme: this.currentTheme,
-        accessibilityEnabled: this.preferences.highContrast || this.preferences.largeText,
+        accessibilityEnabled:
+          this.preferences.highContrast || this.preferences.largeText,
         timestamp: new Date().toISOString(),
       });
 
@@ -690,8 +691,11 @@ class AIEthicsApp {
   async initializeSystems() {
     try {
       // Initialize system metadata collector for analytics
+      // Note: Firebase service may not be available yet, will be updated after Firebase init
       this.systemCollector = getSystemCollector();
-      AppDebug.log('System metadata collector initialized');
+      AppDebug.log(
+        'System metadata collector initialized (will connect to Firebase when available)'
+      );
 
       // Initialize animation manager with theme preferences
       this.animationManager = new AnimationManager({
@@ -2550,6 +2554,14 @@ class AIEthicsApp {
 
         // Get Firebase service reference for other components
         this.firebaseService = this.authService.firebaseService;
+
+        // Connect system metadata collector to Firebase
+        if (this.systemCollector && this.firebaseService) {
+          this.systemCollector = getSystemCollector(this.firebaseService);
+          AppDebug.log(
+            'System metadata collector connected to Firebase for analytics storage'
+          );
+        }
 
         // Set up authentication state listener (Firebase best practice)
         this.setupAuthStateListener();
