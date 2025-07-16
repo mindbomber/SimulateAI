@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FCM Test - SimulateAI</title>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #1a73e8;
+        margin-bottom: 10px;
+      }
+      .status {
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        font-weight: 500;
+      }
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .status.warning {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+      .token-display {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        word-break: break-all;
+        font-family: monospace;
+        font-size: 12px;
+        margin: 10px 0;
+      }
+      button {
+        background: #1a73e8;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 10px 5px 10px 0;
+        font-size: 14px;
+      }
+      button:hover {
+        background: #1557b0;
+      }
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+      .info {
+        background: #e3f2fd;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+      }
+      .step {
+        margin: 20px 0;
+        padding: 15px;
+        border-left: 4px solid #1a73e8;
+        background: #f8f9fa;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🔥 Firebase Cloud Messaging Test</h1>
+      <p>Test FCM integration for SimulateAI</p>
+
+      <div class="info">
+        <strong>📱 To test FCM:</strong>
+        <ol>
+          <li>Grant notification permission when prompted</li>
+          <li>Copy the FCM token generated below</li>
+          <li>Go to Firebase Console > Cloud Messaging > Send test message</li>
+          <li>Paste the token and send a test notification</li>
+        </ol>
+      </div>
+
+      <div class="step">
+        <h3>1. Service Worker Registration</h3>
+        <div id="swStatus" class="status warning">
+          Checking service worker...
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>2. FCM Token Generation</h3>
+        <div id="tokenStatus" class="status warning">
+          Requesting notification permission...
+        </div>
+        <div
+          id="tokenDisplay"
+          class="token-display"
+          style="display: none"
+        ></div>
+        <button id="copyToken" style="display: none" onclick="copyToken()">
+          📋 Copy Token
+        </button>
+      </div>
+
+      <div class="step">
+        <h3>3. Test Foreground Notifications</h3>
+        <div id="messageStatus" class="status warning">
+          Waiting for messages...
+        </div>
+        <button onclick="testLocalNotification()">
+          🔔 Test Local Notification
+        </button>
+      </div>
+
+      <div class="step">
+        <h3>4. Firebase Console Test</h3>
+        <p>Use the token above to send a test message from:</p>
+        <a
+          href="https://console.firebase.google.com/project/simulateai-research/messaging"
+          target="_blank"
+          style="color: #1a73e8; text-decoration: none"
+        >
+          🚀 Firebase Console > Cloud Messaging
+        </a>
+      </div>
+    </div>
+
+    <script type="module">
+      // Import Firebase modules
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js';
+      import {
+        getMessaging,
+        getToken,
+        onMessage,
+      } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-messaging.js';
+
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: 'AIzaSyAwoc3L-43aXyNjNB9ncGbFm7eE-yn5bFA',
+        authDomain: 'simulateai-research.firebaseapp.com',
+        projectId: 'simulateai-research',
+        storageBucket: 'simulateai-research.firebasestorage.app',
+        messagingSenderId: '52924445915',
+        appId: '1:52924445915:web:dadca1a93bc382403a08fe',
+        measurementId: 'G-XW8H062BMV',
+      };
+
+      const VAPID_KEY =
+        'BHxifT5EzYByOc7gGI_Iq_W-DHTs4kM823Z38-942vfdX59LZW_0rdwXT6rzNeKC6knJkIJdLvDg0LTavQESnsc';
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const messaging = getMessaging(app);
+
+      let currentToken = null;
+
+      // Test service worker registration
+      async function testServiceWorker() {
+        const swStatus = document.getElementById('swStatus');
+
+        try {
+          if ('serviceWorker' in navigator) {
+            const registration = await navigator.serviceWorker.register(
+              '/firebase-messaging-sw.js'
+            );
+            swStatus.className = 'status success';
+            swStatus.textContent =
+              '✅ Service Worker registered successfully: ' +
+              registration.scope;
+          } else {
+            throw new Error('Service Worker not supported');
+          }
+        } catch (error) {
+          swStatus.className = 'status error';
+          swStatus.textContent =
+            '❌ Service Worker registration failed: ' + error.message;
+        }
+      }
+
+      // Test FCM token generation
+      async function testFCMToken() {
+        const tokenStatus = document.getElementById('tokenStatus');
+        const tokenDisplay = document.getElementById('tokenDisplay');
+        const copyButton = document.getElementById('copyToken');
+
+        try {
+          // Request notification permission
+          const permission = await Notification.requestPermission();
+
+          if (permission === 'granted') {
+            // Get FCM token
+            const token = await getToken(messaging, { vapidKey: VAPID_KEY });
+
+            if (token) {
+              currentToken = token;
+              tokenStatus.className = 'status success';
+              tokenStatus.textContent = '✅ FCM token generated successfully!';
+              tokenDisplay.textContent = token;
+              tokenDisplay.style.display = 'block';
+              copyButton.style.display = 'inline-block';
+            } else {
+              tokenStatus.className = 'status error';
+              tokenStatus.textContent =
+                '❌ No token generated. Check console for errors.';
+            }
+          } else {
+            tokenStatus.className = 'status error';
+            tokenStatus.textContent =
+              '❌ Notification permission denied. Please enable notifications and refresh.';
+          }
+        } catch (error) {
+          tokenStatus.className = 'status error';
+          tokenStatus.textContent =
+            '❌ FCM token generation failed: ' + error.message;
+          console.error('FCM Error:', error);
+        }
+      }
+
+      // Test foreground message handling
+      function testForegroundMessages() {
+        const messageStatus = document.getElementById('messageStatus');
+
+        onMessage(messaging, payload => {
+          messageStatus.className = 'status success';
+          messageStatus.textContent =
+            '✅ Foreground message received: ' +
+            (payload.notification?.title || 'No title');
+
+          // Show browser notification
+          if (Notification.permission === 'granted') {
+            new Notification(payload.notification?.title || 'FCM Test', {
+              body: payload.notification?.body || 'Test message received',
+              icon: '/src/assets/icons/logo.svg',
+            });
+          }
+
+          console.log('Foreground message:', payload);
+        });
+
+        messageStatus.textContent = '📡 Listening for foreground messages...';
+      }
+
+      // Copy token to clipboard
+      window.copyToken = function () {
+        if (currentToken) {
+          navigator.clipboard
+            .writeText(currentToken)
+            .then(() => {
+              alert('✅ Token copied to clipboard!');
+            })
+            .catch(() => {
+              // Fallback for older browsers
+              const textArea = document.createElement('textarea');
+              textArea.value = currentToken;
+              document.body.appendChild(textArea);
+              textArea.select();
+              document.execCommand('copy');
+              document.body.removeChild(textArea);
+              alert('✅ Token copied to clipboard!');
+            });
+        }
+      };
+
+      // Test local notification
+      window.testLocalNotification = function () {
+        if (Notification.permission === 'granted') {
+          new Notification('🧪 FCM Test Notification', {
+            body: 'This is a local test notification to verify the notification system is working.',
+            icon: '/src/assets/icons/logo.svg',
+            badge: '/src/assets/icons/favicon.png',
+            tag: 'fcm-test',
+          });
+        } else {
+          alert('❌ Please grant notification permission first');
+        }
+      };
+
+      // Run tests
+      async function runTests() {
+        await testServiceWorker();
+        await testFCMToken();
+        testForegroundMessages();
+      }
+
+      // Start tests when page loads
+      runTests();
+    </script>
+  </body>
+</html>

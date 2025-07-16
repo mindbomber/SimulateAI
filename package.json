@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "description": "SimulateAI: AI Ethics Education Through Interactive Simulations - Empowering educators and learners through open-ended, consequence-driven explorations",
-  "main": "index.html",
+  "main": "app.html",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

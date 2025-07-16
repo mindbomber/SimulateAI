@@ -97,7 +97,7 @@ src/
 
 Use these page IDs in the meta tag:
 
-- `home` - index.html
+- `home` - app.html
 - `categories` - categories.html
 - `blog` - blog.html
 - `forum` - forum.html

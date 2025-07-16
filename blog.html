@@ -1378,28 +1378,31 @@ For research articles, consider including:
     <!-- Scripts -->
     <script type="module" src="src/js/services/firebase-service.js"></script>
     <script type="module" src="src/js/services/auth-service.js"></script>
+    <script type="module" src="src/js/services/blog-service.js"></script>
     <script
       type="module"
       src="src/js/components/notification-toast.js"
     ></script>
     <script type="module" src="src/js/components/modal-utility.js"></script>
 
-    <!-- Blog Page Script -->
+    <!-- Enhanced Blog Page Script -->
     <script type="module">
       import AuthService from './src/js/services/auth-service.js';
-      import FirebaseService from './src/js/services/firebase-service.js';
+      import BlogService from './src/js/services/blog-service.js';
       import ContributionService from './src/js/services/contribution-service.js';
 
       class BlogPage {
         constructor() {
           this.authService = new AuthService();
-          this.firebaseService = new FirebaseService();
+          this.blogService = new BlogService();
           this.contributionService = new ContributionService();
           this.currentUser = null;
           this.posts = [];
           this.filteredPosts = [];
           this.postsPerPage = 10;
           this.currentPage = 0;
+          this.activeFilters = {};
+          this.searchQuery = '';
         }
 
         async init() {

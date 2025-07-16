@@ -27,6 +27,9 @@ import EducatorToolkit from './core/educator-toolkit.js';
 import DigitalScienceLab from './core/digital-science-lab.js';
 import ScenarioGenerator from './core/scenario-generator.js';
 
+// Import Firebase Cloud Messaging
+import './fcm-simple-init.js';
+
 // Import utilities
 import { userPreferences, userProgress } from './utils/simple-storage.js';
 import { simpleAnalytics } from './utils/simple-analytics.js';
@@ -36,6 +39,9 @@ import logger from './utils/logger.js';
 import focusManager from './utils/focus-manager.js';
 import scrollManager from './utils/scroll-manager.js';
 import { loopDetector } from './utils/infinite-loop-detector.js';
+
+// Import system metadata collection
+import { getSystemCollector } from './services/system-metadata-collector.js';
 
 // Import enhanced objects (loaded dynamically as needed)
 // import { EthicsMeter, InteractiveButton, InteractiveSlider } from './objects/enhanced-objects.js';
@@ -659,6 +665,10 @@ class AIEthicsApp {
 
   async initializeSystems() {
     try {
+      // Initialize system metadata collector for analytics
+      this.systemCollector = getSystemCollector();
+      AppDebug.log('System metadata collector initialized');
+
       // Initialize animation manager with theme preferences
       this.animationManager = new AnimationManager({
         enableAnimations: !this.preferences.reducedMotion,
@@ -3008,7 +3018,9 @@ function updateButtonStates(activePattern) {
 
 window.toggleRadarInstructions = function () {
   const accordion = document.querySelector('.radar-instructions-accordion');
-  const content = document.querySelector('.accordion-content');
+  const content = document.querySelector(
+    '.radar-instructions-accordion .accordion-content'
+  );
 
   if (accordion && content) {
     const isOpen = accordion.classList.contains('open');

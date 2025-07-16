@@ -16,12 +16,12 @@
 
 /**
  * Category Data Structure for Ethical Dilemma Categories
- * 
+ *
  * HIERARCHY CLARIFICATION:
  * - CATEGORY: A thematic group of related ethical scenarios (e.g., "The Trolley Problem")
- * - SCENARIO: Individual ethical dilemmas within a category (e.g., "Autonomous Vehicle Split Decision")  
+ * - SCENARIO: Individual ethical dilemmas within a category (e.g., "Autonomous Vehicle Split Decision")
  * - SIMULATION: The interactive experience where users engage with scenarios
- * 
+ *
  * Each category contains 3 scenarios with ethical decision points.
  * Each scenario becomes an interactive simulation when launched.
  */
@@ -36,6 +36,51 @@ export const ETHICAL_CATEGORIES = {
     difficulty: 'intermediate',
     estimatedTime: 20, // Updated to reflect deeper engagement
     color: '#e74c3c', // Red theme for life/death decisions
+
+    // Enhanced Metadata
+    philosophicalApproaches: ['utilitarian', 'deontological'],
+    primaryPhilosophy: 'utilitarian',
+    ethicalFrameworks: ['consequentialism', 'duty-ethics', 'moral-calculus'],
+    targetAudience: ['students', 'professionals', 'researchers'],
+    prerequisites: ['basic-ethics'],
+
+    // Enhanced Tags
+    tags: [
+      'ethics',
+      'autonomy',
+      'decision-making',
+      'responsibility',
+      'life-death',
+      'utilitarianism',
+      'deontology',
+      'moral-calculus',
+      'autonomous-vehicles',
+      'life-preservation',
+      'moral-weights',
+    ],
+
+    // Search Keywords
+    searchKeywords: [
+      'trolley problem',
+      'utilitarian',
+      'deontological',
+      'autonomous vehicles',
+      'moral decisions',
+      'life death',
+      'ethical AI',
+      'decision algorithms',
+      'moral calculus',
+      'bentham',
+      'kant',
+      'sacrifice',
+      'greater good',
+    ],
+
+    // Learning Metadata
+    complexity: 'moderate',
+    timeCommitment: 'medium',
+    interactionLevel: 'high',
+
     scenarios: [
       {
         id: 'autonomous-vehicle-split',
@@ -43,6 +88,29 @@ export const ETHICAL_CATEGORIES = {
         description:
           'A self-driving car faces an unavoidable crash: sacrifice the passenger to save five pedestrians, or protect the passenger at the cost of multiple lives.',
         difficulty: 'intermediate',
+
+        // Enhanced Scenario Metadata
+        philosophicalLeaning: 'utilitarian',
+        ethicalDimensions: ['autonomy', 'beneficence', 'justice'],
+        tags: [
+          'autonomous-vehicles',
+          'passenger-safety',
+          'pedestrian-protection',
+          'moral-calculus',
+          'utilitarian-ethics',
+          'risk-assessment',
+          'decision-algorithms',
+        ],
+        searchKeywords: [
+          'self-driving car',
+          'autonomous vehicle',
+          'crash decision',
+          'passenger vs pedestrian',
+          'moral programming',
+          'utilitarian choice',
+        ],
+        estimatedTime: 7,
+        complexity: 'moderate',
       },
       {
         id: 'tunnel-dilemma',
@@ -50,6 +118,28 @@ export const ETHICAL_CATEGORIES = {
         description:
           'An autonomous bus must choose between hitting a child in a narrow tunnel or swerving and killing several elderly passengers due to the confined space.',
         difficulty: 'advanced',
+
+        philosophicalLeaning: 'deontological',
+        ethicalDimensions: ['autonomy', 'justice', 'non-maleficence'],
+        tags: [
+          'autonomous-transport',
+          'age-discrimination',
+          'confined-spaces',
+          'deontological-ethics',
+          'protection-duty',
+          'vulnerable-populations',
+          'moral-absolutes',
+        ],
+        searchKeywords: [
+          'autonomous bus',
+          'tunnel crash',
+          'child vs elderly',
+          'age bias',
+          'moral duty',
+          'deontological choice',
+        ],
+        estimatedTime: 8,
+        complexity: 'high',
       },
       {
         id: 'obstacle-recalculation',
@@ -86,14 +176,6 @@ export const ETHICAL_CATEGORIES = {
       'Understand the role of probability, certainty, and outcome prediction in ethical AI',
       'Examine who bears responsibility for life-and-death decisions made by machines',
       'Consider how cultural values and legal frameworks should influence AI ethics',
-    ],
-    tags: [
-      'ethics',
-      'autonomy',
-      'decision-making',
-      'responsibility',
-      'life-death',
-      'utilitarianism',
     ],
   },
 
@@ -356,7 +438,7 @@ export const ETHICAL_CATEGORIES = {
         id: 'ai-content-moderation-failure',
         title: 'AI Content Moderation Failure',
         description:
-          'A social media platform\'s AI moderation system fails to detect coordinated harassment leading to serious harm, despite human oversight and user reporting.',
+          "A social media platform's AI moderation system fails to detect coordinated harassment leading to serious harm, despite human oversight and user reporting.",
         difficulty: 'intermediate',
       },
     ],

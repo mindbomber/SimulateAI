@@ -165,9 +165,19 @@
                         class="profile-avatar-img"
                       />
                       <div class="avatar-status online"></div>
-                      <button class="avatar-edit-btn" title="Change Avatar">
+                      <button
+                        class="avatar-edit-btn"
+                        title="Change Avatar"
+                        id="change-avatar-btn"
+                      >
                         <i class="fas fa-camera"></i>
                       </button>
+                      <input
+                        type="file"
+                        id="avatar-upload"
+                        accept="image/*"
+                        style="display: none"
+                      />
                     </div>
                   </div>
                   <div class="profile-details">
@@ -989,6 +999,7 @@
           this.authService = new AuthService();
           this.currentUser = null;
           this.userProfile = null;
+          this.profileUnsubscribe = null;
         }
 
         async init() {
@@ -999,19 +1010,50 @@
             this.handleAuthStateChange(user);
           });
 
+          // Listen for real-time profile updates
+          window.addEventListener('profileUpdated', event => {
+            this.handleProfileUpdate(event.detail.profile);
+          });
+
           this.setupEventHandlers();
         }
 
         async handleAuthStateChange(user) {
           this.currentUser = user;
 
+          // Clean up previous profile listener
+          if (this.profileUnsubscribe) {
+            this.profileUnsubscribe();
+          }
+
           if (user) {
-            this.userProfile =
-              await this.authService.firebaseService.getUserProfile(user.uid);
+            // Set up real-time profile listener
+            this.profileUnsubscribe =
+              await this.authService.firebaseService.getUserProfileRealtime(
+                user.uid,
+                (profile, error) => {
+                  if (error) {
+                    console.error('Profile update error:', error);
+                    return;
+                  }
+                  this.userProfile = profile;
+                  this.populateProfileData();
+                }
+              );
+
             this.showAuthenticatedContent();
-            this.populateProfileData();
           } else {
             this.showLoginContent();
+          }
+        }
+
+        handleProfileUpdate(profile) {
+          this.userProfile = profile;
+          this.populateProfileData();
+
+          // Show success notification
+          if (window.showNotification) {
+            window.showNotification('Profile updated successfully!', 'success');
           }
         }
 
@@ -1126,6 +1168,19 @@
               this.authService.signOut();
             });
 
+          // Avatar upload functionality
+          document
+            .getElementById('change-avatar-btn')
+            ?.addEventListener('click', () => {
+              document.getElementById('avatar-upload').click();
+            });
+
+          document
+            .getElementById('avatar-upload')
+            ?.addEventListener('change', e => {
+              this.handleAvatarUpload(e.target.files[0]);
+            });
+
           // Donation buttons
           document.querySelectorAll('.donate-btn').forEach(btn => {
             btn.addEventListener('click', e => {
@@ -1133,6 +1188,59 @@
               this.initiateDonation(tier);
             });
           });
+
+          // Profile edit button
+          document
+            .getElementById('edit-profile-btn')
+            ?.addEventListener('click', () => {
+              this.showProfileEditModal();
+            });
+        }
+
+        async handleAvatarUpload(file) {
+          if (!file || !this.currentUser) return;
+
+          try {
+            // Show loading state
+            const avatarBtn = document.getElementById('change-avatar-btn');
+            const originalHTML = avatarBtn.innerHTML;
+            avatarBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            avatarBtn.disabled = true;
+
+            // Upload to Firebase Storage
+            const result =
+              await this.authService.firebaseService.uploadProfilePicture(
+                file,
+                this.currentUser.uid
+              );
+
+            if (result.success) {
+              // Avatar will update automatically via real-time listener
+              if (window.showNotification) {
+                window.showNotification('Profile picture updated!', 'success');
+              }
+            } else {
+              throw new Error(result.error);
+            }
+          } catch (error) {
+            console.error('Avatar upload failed:', error);
+            if (window.showNotification) {
+              window.showNotification(
+                `Upload failed: ${error.message}`,
+                'error'
+              );
+            }
+          } finally {
+            // Restore button state
+            const avatarBtn = document.getElementById('change-avatar-btn');
+            avatarBtn.innerHTML = '<i class="fas fa-camera"></i>';
+            avatarBtn.disabled = false;
+          }
+        }
+
+        showProfileEditModal() {
+          // TODO: Implement profile edit modal
+          alert('Profile edit modal - Coming soon!');
         }
 
         async initiateDonation(tier) {

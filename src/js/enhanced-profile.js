@@ -317,7 +317,7 @@ class EnhancedProfile {
     this.showNotification('Guest mode functionality coming soon!', 'info');
     // Redirect to main page or show limited functionality
     setTimeout(() => {
-      window.location.href = 'index.html';
+      window.location.href = 'app.html';
     }, this.constants.TIMEOUT_GUEST);
   }
 

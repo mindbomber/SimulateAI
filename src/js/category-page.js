@@ -164,7 +164,7 @@ class CategoryPage {
               <span class="category-time">${this.category.estimatedTime} min</span>
               <span class="category-progress-text">${progress.completed}/${progress.total} completed</span>
             </div>
-            <a href="index.html#simulations" class="back-to-categories">Back to All Categories</a>
+            <a href="app.html#simulations" class="back-to-categories">Back to All Categories</a>
           </div>
         </div>
       </div>
@@ -817,8 +817,8 @@ class CategoryPage {
               <h1>Oops! Something went wrong</h1>
               <p>${message}</p>
               <div class="error-actions">
-                <a href="index.html" class="btn btn-primary">Back to Home</a>
-                <a href="index.html#simulations" class="btn btn-secondary">View All Categories</a>
+                <a href="app.html" class="btn btn-primary">Back to Home</a>
+                <a href="app.html#simulations" class="btn btn-secondary">View All Categories</a>
               </div>
             </div>
           </div>

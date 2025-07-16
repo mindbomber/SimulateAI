@@ -42,11 +42,22 @@ import {
   getDocs,
   updateDoc,
   deleteDoc,
+  onSnapshot,
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 import {
   getAnalytics,
   logEvent,
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js';
+
+// Import messaging service
+import { MessagingService } from './messaging-service.js';
 
 /**
  * Firebase configuration and initialization
@@ -70,11 +81,16 @@ const getFirebaseConfig = () => {
     };
   }
 
-  // Last resort fallback (for development only)
-  console.error('Firebase configuration not found in environment variables');
-  throw new Error(
-    'Firebase configuration missing - please set environment variables'
-  );
+  // Production Firebase configuration for SimulateAI
+  return {
+    apiKey: 'AIzaSyAwoc3L-43aXyNjNB9ncGbFm7eE-yn5bFA',
+    authDomain: 'simulateai-research.firebaseapp.com',
+    projectId: 'simulateai-research',
+    storageBucket: 'simulateai-research.firebasestorage.app',
+    messagingSenderId: '52924445915', // Crucial for FCM!
+    appId: '1:52924445915:web:dadca1a93bc382403a08fe',
+    measurementId: 'G-XW8H062BMV',
+  };
 };
 
 const firebaseConfig = getFirebaseConfig();
@@ -87,9 +103,12 @@ export class FirebaseService {
     this.app = null;
     this.auth = null;
     this.db = null;
+    this.storage = null;
     this.analytics = null;
+    this.messaging = null;
     this.currentUser = null;
     this.authStateListeners = [];
+    this.profileListeners = new Map(); // For real-time profile updates
     this.persistenceMode = 'local'; // Default to persistent sessions
 
     // Rate limiting system
@@ -310,7 +329,11 @@ export class FirebaseService {
       this.app = initializeApp(firebaseConfig);
       this.auth = getAuth(this.app);
       this.db = getFirestore(this.app);
+      this.storage = getStorage(this.app);
       this.analytics = getAnalytics(this.app);
+
+      // Initialize messaging service
+      this.messaging = new MessagingService(this.app);
 
       // Set smart authentication persistence
       await this.initializeSmartPersistence();
@@ -953,9 +976,138 @@ export class FirebaseService {
   }
 
   /**
-   * Award badge to user and update their collection
+   * Upload profile picture to Firebase Storage
+   * @param {File} file - Image file to upload
+   * @param {string} userId - User ID for the file path
+   * @returns {Promise<Object>} Upload result with download URL
    */
-  async awardBadge(userId, badgeData) {
+  async uploadProfilePicture(file, userId = null) {
+    try {
+      const uid = userId || this.currentUser?.uid;
+      if (!uid) {
+        return { success: false, error: 'No user ID provided' };
+      }
+
+      // Validate file type and size
+      const allowedTypes = [
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+        'image/gif',
+      ];
+      const maxSize = 5 * 1024 * 1024; // 5MB
+
+      if (!allowedTypes.includes(file.type)) {
+        return {
+          success: false,
+          error: 'Invalid file type. Please use JPEG, PNG, WebP, or GIF.',
+        };
+      }
+
+      if (file.size > maxSize) {
+        return {
+          success: false,
+          error: 'File too large. Maximum size is 5MB.',
+        };
+      }
+
+      // Create storage reference
+      const fileName = `profile-pictures/${uid}/${Date.now()}-${file.name}`;
+      const storageRef = ref(this.storage, fileName);
+
+      // Upload file
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+
+      // Update user profile with new photo URL
+      await this.updateUserProfile(uid, { photoURL: downloadURL });
+
+      // Delete old profile picture if it exists and is not default
+      const userProfile = await this.getUserProfile(uid);
+      const oldPhotoURL = userProfile?.photoURL;
+      if (oldPhotoURL && oldPhotoURL.includes('firebase')) {
+        try {
+          const oldRef = ref(this.storage, oldPhotoURL);
+          await deleteObject(oldRef);
+        } catch (error) {
+          // Old file might not exist, that's okay
+          console.warn('Could not delete old profile picture:', error);
+        }
+      }
+
+      this.trackEvent('profile_picture_uploaded', {
+        user_id: uid,
+        file_size: file.size,
+        file_type: file.type,
+      });
+
+      return {
+        success: true,
+        downloadURL,
+        fileName: snapshot.ref.name,
+      };
+    } catch (error) {
+      console.error('❌ Profile picture upload failed:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Get user profile with real-time updates
+   * @param {string} userId - User ID to get profile for
+   * @param {Function} callback - Callback function for real-time updates
+   * @returns {Function} Unsubscribe function
+   */
+  async getUserProfileRealtime(userId = null, callback = null) {
+    try {
+      const uid = userId || this.currentUser?.uid;
+      if (!uid) {
+        if (callback) callback(null, 'No user ID provided');
+        return () => {};
+      }
+
+      const userRef = doc(this.db, 'users', uid);
+
+      if (!callback) {
+        // One-time read
+        const userSnap = await getDoc(userRef);
+        return userSnap.exists() ? userSnap.data() : null;
+      }
+
+      // Real-time listener
+      const unsubscribe = onSnapshot(
+        userRef,
+        doc => {
+          if (doc.exists()) {
+            callback(doc.data(), null);
+          } else {
+            callback(null, 'User profile not found');
+          }
+        },
+        error => {
+          callback(null, error.message);
+        }
+      );
+
+      // Store listener for cleanup
+      this.profileListeners.set(uid, unsubscribe);
+
+      return unsubscribe;
+    } catch (error) {
+      console.error('❌ Failed to get user profile:', error);
+      if (callback) callback(null, error.message);
+      return () => {};
+    }
+  }
+
+  /**
+   * Enhanced user profile update with real-time sync
+   * @param {string} userId - User ID
+   * @param {Object} profileData - Profile data to update
+   * @param {boolean} realtime - Whether to enable real-time updates
+   * @returns {Promise<Object>} Update result
+   */
+  async updateUserProfileEnhanced(userId, profileData, realtime = false) {
     try {
       const uid = userId || this.currentUser?.uid;
       if (!uid) {
@@ -963,152 +1115,153 @@ export class FirebaseService {
       }
 
       const userRef = doc(this.db, 'users', uid);
-      const userProfile = await this.getUserProfile(uid);
-
-      if (!userProfile) {
-        return { success: false, error: 'User profile not found' };
-      }
-
-      // Check if badge already awarded
-      const existingBadges = userProfile.badges || [];
-      const badgeExists = existingBadges.some(
-        b => b.category === badgeData.category && b.tier === badgeData.tier
-      );
-
-      if (badgeExists) {
-        return { success: false, error: 'Badge already awarded' };
-      }
-
-      // Create badge record
-      const badge = {
-        id: `${badgeData.category}_${badgeData.tier}`,
-        category: badgeData.category,
-        tier: badgeData.tier,
-        title: badgeData.title,
-        description: badgeData.description,
-        icon: badgeData.icon,
-        color: badgeData.color,
-        awardedAt: new Date(),
-        ...badgeData,
-      };
-
-      // Update user profile with new badge
-      const updatedBadges = [...existingBadges, badge];
-
-      await updateDoc(userRef, {
-        badges: updatedBadges,
+      const updateData = {
+        ...profileData,
         updatedAt: new Date(),
-      });
-
-      this.trackEvent('badge_awarded', {
-        user_id: uid,
-        badge_category: badgeData.category,
-        badge_tier: badgeData.tier,
-        badge_title: badgeData.title,
-        total_badges: updatedBadges.length,
-      });
-
-      return {
-        success: true,
-        badge,
-        totalBadges: updatedBadges.length,
-        newlyUnlocked: true,
       };
+
+      // Handle special fields
+      if (profileData.preferences) {
+        updateData['preferences'] = {
+          ...profileData.preferences,
+          lastUpdated: new Date(),
+        };
+      }
+
+      if (profileData.theme) {
+        updateData['customization.profileTheme'] = profileData.theme;
+      }
+
+      if (profileData.notificationSettings) {
+        updateData['preferences.notifications'] =
+          profileData.notificationSettings;
+      }
+
+      // Update Firebase Auth profile if display name or photo changes
+      if (
+        this.currentUser &&
+        (profileData.displayName || profileData.photoURL)
+      ) {
+        const authUpdateData = {};
+
+        if (profileData.displayName) {
+          authUpdateData.displayName = profileData.displayName;
+          updateData['customization.displayName'] = profileData.displayName;
+        }
+
+        if (profileData.photoURL) {
+          authUpdateData.photoURL = profileData.photoURL;
+          updateData['customization.photoURL'] = profileData.photoURL;
+        }
+
+        await this.currentUser.updateProfile(authUpdateData);
+      }
+
+      // Update Firestore
+      await updateDoc(userRef, updateData);
+
+      // Set up real-time listener if requested
+      if (realtime && !this.profileListeners.has(uid)) {
+        this.getUserProfileRealtime(uid, (profile, error) => {
+          if (error) {
+            console.error('Profile update error:', error);
+            return;
+          }
+
+          // Emit custom event for profile updates
+          window.dispatchEvent(
+            new CustomEvent('profileUpdated', {
+              detail: { userId: uid, profile },
+            })
+          );
+        });
+      }
+
+      this.trackEvent('user_profile_updated_enhanced', {
+        user_id: uid,
+        updated_fields: Object.keys(profileData),
+        has_realtime: realtime,
+      });
+
+      return { success: true, updatedFields: Object.keys(profileData) };
     } catch (error) {
+      console.error('❌ Enhanced profile update failed:', error);
       return { success: false, error: error.message };
     }
   }
 
   /**
-   * Get user's badge collection with flair options
+   * Set up profile preferences with validation
+   * @param {string} userId - User ID
+   * @param {Object} preferences - User preferences object
    */
-  async getUserBadges(userId = null) {
+  async updateUserPreferences(userId, preferences) {
     try {
-      const profile = await this.getUserProfile(userId);
-      if (!profile) return { success: false, badges: [] };
+      const uid = userId || this.currentUser?.uid;
+      if (!uid) {
+        return { success: false, error: 'No user ID provided' };
+      }
 
-      const badges = profile.badges || [];
-      const selectedFlair = profile.customization?.selectedBadgeFlair;
-
-      // Enhance badges with selection status
-      const enhancedBadges = badges.map(badge => ({
-        ...badge,
-        isSelectedFlair: badge.id === selectedFlair,
-        canBeUsedAsFlair: true,
-        uniqueTitle: `${badge.title} ${badge.tier > 0 ? `(Tier ${badge.tier})` : ''}`,
-      }));
-
-      return {
-        success: true,
-        badges: enhancedBadges,
-        selectedFlair,
-        totalCount: badges.length,
+      // Validate preferences structure
+      const validPreferences = {
+        theme: preferences.theme || 'default',
+        language: preferences.language || 'en',
+        notifications: {
+          email: preferences.notifications?.email ?? true,
+          browser: preferences.notifications?.browser ?? true,
+          research: preferences.notifications?.research ?? true,
+          community: preferences.notifications?.community ?? true,
+        },
+        privacy: {
+          profileVisibility: preferences.privacy?.profileVisibility || 'public',
+          showBadges: preferences.privacy?.showBadges ?? true,
+          showActivity: preferences.privacy?.showActivity ?? true,
+        },
+        accessibility: {
+          highContrast: preferences.accessibility?.highContrast ?? false,
+          reducedMotion: preferences.accessibility?.reducedMotion ?? false,
+          fontSize: preferences.accessibility?.fontSize || 'medium',
+        },
+        lastUpdated: new Date(),
       };
+
+      const userRef = doc(this.db, 'users', uid);
+      await updateDoc(userRef, {
+        preferences: validPreferences,
+        updatedAt: new Date(),
+      });
+
+      this.trackEvent('user_preferences_updated', {
+        user_id: uid,
+        theme: validPreferences.theme,
+        notifications_enabled: validPreferences.notifications.email,
+      });
+
+      return { success: true, preferences: validPreferences };
     } catch (error) {
-      return { success: false, error: error.message, badges: [] };
+      console.error('❌ Failed to update preferences:', error);
+      return { success: false, error: error.message };
     }
   }
 
   /**
-   * Get badge by ID for flair display
+   * Clean up profile listeners
+   * @param {string} userId - User ID to clean up listeners for
    */
-  async getBadgeById(badgeId) {
-    try {
-      const currentUser = this.getCurrentUser();
-      if (!currentUser) return null;
-
-      const profile = await this.getUserProfile(currentUser.uid);
-      if (!profile || !profile.badges) return null;
-
-      return profile.badges.find(badge => badge.id === badgeId) || null;
-    } catch (error) {
-      return null;
+  cleanupProfileListeners(userId = null) {
+    if (userId) {
+      const unsubscribe = this.profileListeners.get(userId);
+      if (unsubscribe) {
+        unsubscribe();
+        this.profileListeners.delete(userId);
+      }
+    } else {
+      // Clean up all listeners
+      this.profileListeners.forEach(unsubscribe => {
+        unsubscribe();
+      });
+      this.profileListeners.clear();
     }
-  }
-
-  /**
-   * Get user's display name with badge flair
-   */
-  getDisplayNameWithFlair(userProfile) {
-    if (!userProfile) return 'Anonymous User';
-
-    const baseName =
-      userProfile.customization?.displayName ||
-      userProfile.displayName ||
-      'Anonymous User';
-
-    const { flair } = userProfile;
-    if (flair && flair.title && flair.badge) {
-      return `${flair.badge} ${baseName} [${flair.title}]`;
-    }
-
-    return baseName;
-  }
-
-  /**
-   * Generate suggested badge flairs for user
-   */
-  generateBadgeFlairSuggestions(userProfile) {
-    const badges = userProfile.badges || [];
-    if (badges.length === 0) return [];
-
-    // Sort badges by tier and recency for best suggestions
-    const sortedBadges = badges.sort((a, b) => {
-      // Prefer higher tier badges
-      if (a.tier !== b.tier) return b.tier - a.tier;
-      // Then prefer more recent badges
-      return new Date(b.awardedAt) - new Date(a.awardedAt);
-    });
-
-    return sortedBadges.slice(0, 5).map(badge => ({
-      id: badge.id,
-      title: badge.title,
-      icon: badge.icon,
-      color: badge.color,
-      previewName: `${badge.icon} ${userProfile.customization?.displayName || 'Your Name'} [${badge.title}]`,
-      tier: badge.tier,
-      category: badge.category,
-    }));
   }
 
   /**
@@ -1798,6 +1951,77 @@ export class FirebaseService {
       console.error('❌ Account deletion failed:', error);
       return { success: false, error: error.message };
     }
+  }
+
+  /**
+   * Initialize push notifications for current user
+   */
+  async initializePushNotifications() {
+    try {
+      if (!this.messaging || !this.currentUser) {
+        return {
+          success: false,
+          error: 'Messaging not available or user not authenticated',
+        };
+      }
+
+      const token = await this.messaging.getRegistrationToken(
+        this.currentUser.uid
+      );
+      if (token) {
+        return { success: true, token };
+      }
+
+      return { success: false, error: 'Failed to get FCM token' };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Subscribe to thread notifications
+   */
+  async subscribeToThreadNotifications(threadId) {
+    try {
+      if (!this.messaging || !this.currentUser) {
+        throw new Error('Messaging not available or user not authenticated');
+      }
+
+      await this.messaging.subscribeToThread(threadId, this.currentUser.uid);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Subscribe to new blog post notifications
+   */
+  async subscribeToNewPostNotifications() {
+    try {
+      if (!this.messaging || !this.currentUser) {
+        throw new Error('Messaging not available or user not authenticated');
+      }
+
+      await this.messaging.subscribeToNewPosts(this.currentUser.uid);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Get messaging service instance
+   */
+  getMessagingService() {
+    return this.messaging;
+  }
+
+  /**
+   * Check if push notifications are supported and enabled
+   */
+  isPushNotificationSupported() {
+    return this.messaging?.isNotificationSupported() || false;
   }
 }
 

@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>System Analytics Demo - SimulateAI</title>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="src/styles/main.css" />
+
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        margin: 0;
+        padding: 2rem;
+        background: #f8fafc;
+      }
+
+      .demo-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .demo-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e2e8f0;
+      }
+
+      .demo-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .demo-section {
+        background: #f7fafc;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+      }
+
+      .demo-section h3 {
+        margin-top: 0;
+        color: #2d3748;
+        font-size: 1.2rem;
+      }
+
+      .demo-button {
+        background: #4299e1;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin: 0.25rem;
+        display: inline-block;
+        text-decoration: none;
+      }
+
+      .demo-button:hover {
+        background: #3182ce;
+        transform: translateY(-1px);
+      }
+
+      .demo-button.secondary {
+        background: #718096;
+      }
+
+      .demo-button.secondary:hover {
+        background: #4a5568;
+      }
+
+      .demo-button.success {
+        background: #48bb78;
+      }
+
+      .demo-button.success:hover {
+        background: #38a169;
+      }
+
+      .metrics-display {
+        background: #1a202c;
+        color: #e2e8f0;
+        padding: 1rem;
+        border-radius: 6px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        max-height: 300px;
+        overflow-y: auto;
+        margin-top: 1rem;
+      }
+
+      .metric-item {
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 4px;
+        border-left: 3px solid #4299e1;
+      }
+
+      .metric-label {
+        font-weight: bold;
+        color: #90cdf4;
+      }
+
+      .metric-value {
+        color: #68d391;
+      }
+
+      .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-top: 2rem;
+      }
+
+      .analytics-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .analytics-card h4 {
+        margin-top: 0;
+        color: #2d3748;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .analytics-card .icon {
+        width: 24px;
+        height: 24px;
+        background: #4299e1;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.8rem;
+      }
+
+      .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #4299e1;
+        display: block;
+      }
+
+      .stat-label {
+        color: #718096;
+        font-size: 0.9rem;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: #e2e8f0;
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 0.5rem 0;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #4299e1, #48bb78);
+        transition: width 0.3s ease;
+      }
+
+      .data-export {
+        margin-top: 2rem;
+        padding: 1rem;
+        background: #f0fff4;
+        border: 1px solid #9ae6b4;
+        border-radius: 6px;
+      }
+
+      .scenario-simulator {
+        margin-top: 1rem;
+      }
+
+      .scenario-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1rem;
+      }
+
+      @media (max-width: 768px) {
+        .demo-grid {
+          grid-template-columns: 1fr;
+        }
+        
+        .analytics-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="demo-container">
+      <div class="demo-header">
+        <h1>🔬 System Analytics & Performance Tracking</h1>
+        <p>Real-time demonstration of system-level metadata collection for optimization and insights</p>
+        <div id="session-id" class="metric-item">
+          <span class="metric-label">Session ID:</span>
+          <span class="metric-value" id="current-session-id">Loading...</span>
+        </div>
+      </div>
+
+      <div class="demo-grid">
+        <div class="demo-section">
+          <h3>📊 Scenario Performance Tracking</h3>
+          <p>Simulate user interactions with scenarios to see performance metrics in action.</p>
+          
+          <div class="scenario-simulator">
+            <div class="scenario-buttons">
+              <button class="demo-button" onclick="simulateScenarioView('healthcare-bias')">
+                View Healthcare Scenario
+              </button>
+              <button class="demo-button" onclick="simulateScenarioComplete('algorithmic-fairness')">
+                Complete Fairness Scenario
+              </button>
+              <button class="demo-button secondary" onclick="simulateScenarioAbandon('privacy-ethics')">
+                Abandon Privacy Scenario
+              </button>
+              <button class="demo-button success" onclick="simulateScenarioRating('ai-transparency', 5)">
+                Rate Transparency Scenario
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="demo-section">
+          <h3>🧠 Framework Engagement</h3>
+          <p>Track how users engage with different philosophical frameworks.</p>
+          
+          <div class="scenario-buttons">
+            <button class="demo-button" onclick="simulateFrameworkSelection('utilitarian')">
+              Select Utilitarian
+            </button>
+            <button class="demo-button" onclick="simulateFrameworkSelection('deontological')">
+              Select Deontological
+            </button>
+            <button class="demo-button" onclick="simulateFrameworkConflict('virtue-ethics', 'care-ethics')">
+              Framework Conflict
+            </button>
+            <button class="demo-button secondary" onclick="simulateFrameworkChange('kantian')">
+              Change to Kantian
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-grid">
+        <div class="analytics-card">
+          <h4>
+            <span class="icon">📈</span>
+            Session Metrics
+          </h4>
+          <span class="stat-number" id="session-duration">0</span>
+          <span class="stat-label">seconds active</span>
+          <div class="progress-bar">
+            <div class="progress-fill" id="engagement-progress" style="width: 0%"></div>
+          </div>
+          <span class="stat-label">Engagement Score: <span id="engagement-score">0</span>/100</span>
+        </div>
+
+        <div class="analytics-card">
+          <h4>
+            <span class="icon">🎯</span>
+            Scenario Activity
+          </h4>
+          <span class="stat-number" id="scenarios-completed">0</span>
+          <span class="stat-label">scenarios completed</span>
+          <div style="margin-top: 0.5rem;">
+            <small>Viewed: <span id="scenarios-viewed">0</span> | Abandoned: <span id="scenarios-abandoned">0</span></small>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <h4>
+            <span class="icon">🧭</span>
+            Navigation Pattern
+          </h4>
+          <span class="stat-number" id="navigation-pattern">exploratory</span>
+          <span class="stat-label">user behavior</span>
+          <div style="margin-top: 0.5rem;">
+            <small>Page visits: <span id="page-visits">0</span></small>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <h4>
+            <span class="icon">⚡</span>
+            Performance
+          </h4>
+          <span class="stat-number" id="interaction-frequency">0</span>
+          <span class="stat-label">interactions/minute</span>
+          <div style="margin-top: 0.5rem;">
+            <small>Errors: <span id="error-count">0</span></small>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h3>📱 Interaction Tracking</h3>
+        <p>Every click, scroll, and interaction is tracked for UX optimization.</p>
+        
+        <div class="scenario-buttons">
+          <button class="demo-button" onclick="simulateNavigation('home', 'categories')">
+            Navigate to Categories
+          </button>
+          <button class="demo-button" onclick="simulateNavigation('categories', 'scenario')">
+            Enter Scenario
+          </button>
+          <button class="demo-button" onclick="simulateInteraction('decision-button', 'click', 2500)">
+            Thoughtful Decision (2.5s)
+          </button>
+          <button class="demo-button secondary" onclick="simulateInteraction('help-button', 'hover', 500)">
+            Quick Hover
+          </button>
+        </div>
+
+        <div class="metrics-display" id="live-metrics">
+          <div class="metric-item">
+            <span class="metric-label">Live Metrics:</span>
+            <span class="metric-value">Ready to track interactions...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="data-export">
+        <h3>📊 Data Export & Analysis</h3>
+        <p>Export collected analytics data for research and optimization analysis.</p>
+        
+        <button class="demo-button success" onclick="exportAnalyticsData()">
+          📥 Export Session Data
+        </button>
+        <button class="demo-button" onclick="showInsights()">
+          🔍 View Insights
+        </button>
+        <button class="demo-button secondary" onclick="clearLocalData()">
+          🗑️ Clear Local Data
+        </button>
+      </div>
+    </div>
+
+    <!-- Import the SystemMetadataCollector -->
+    <script type="module">
+      import { SystemMetadataCollector, getSystemCollector } from './src/js/services/system-metadata-collector.js';
+
+      // Initialize system collector
+      const systemCollector = getSystemCollector();
+      
+      // Display session ID
+      document.getElementById('current-session-id').textContent = systemCollector.sessionData.sessionId;
+
+      // Update real-time metrics every second
+      setInterval(updateMetricsDisplay, 1000);
+
+      function updateMetricsDisplay() {
+        const insights = systemCollector.getSessionInsights();
+        
+        document.getElementById('session-duration').textContent = insights.sessionDuration;
+        document.getElementById('scenarios-completed').textContent = insights.scenariosCompleted;
+        document.getElementById('scenarios-viewed').textContent = insights.scenariosViewed;
+        document.getElementById('scenarios-abandoned').textContent = 
+          systemCollector.sessionData.scenariosAbandoned.length;
+        document.getElementById('engagement-score').textContent = insights.engagementScore;
+        document.getElementById('engagement-progress').style.width = insights.engagementScore + '%';
+        document.getElementById('navigation-pattern').textContent = insights.navigationPattern;
+        document.getElementById('page-visits').textContent = systemCollector.sessionData.navigationPath.length;
+        document.getElementById('interaction-frequency').textContent = 
+          Math.round(systemCollector.sessionData.interactions.length / (insights.sessionDuration / 60) || 0);
+        document.getElementById('error-count').textContent = systemCollector.performanceMetrics.errors.length;
+      }
+
+      function addLiveMetric(action, details) {
+        const metricsContainer = document.getElementById('live-metrics');
+        const timestamp = new Date().toLocaleTimeString();
+        
+        const metricElement = document.createElement('div');
+        metricElement.className = 'metric-item';
+        metricElement.innerHTML = `
+          <span class="metric-label">[${timestamp}]</span>
+          <span class="metric-value">${action}: ${details}</span>
+        `;
+        
+        metricsContainer.appendChild(metricElement);
+        
+        // Keep only last 10 metrics visible
+        const metrics = metricsContainer.querySelectorAll('.metric-item');
+        if (metrics.length > 10) {
+          metrics[0].remove();
+        }
+        
+        // Auto-scroll to bottom
+        metricsContainer.scrollTop = metricsContainer.scrollHeight;
+      }
+
+      // Scenario simulation functions
+      window.simulateScenarioView = function(scenarioId) {
+        systemCollector.trackScenarioPerformance({
+          scenarioId,
+          categoryId: 'demo-category',
+          action: 'view',
+          metadata: { source: 'demo-simulation' }
+        });
+        addLiveMetric('Scenario View', `${scenarioId} viewed`);
+      };
+
+      window.simulateScenarioComplete = function(scenarioId) {
+        systemCollector.trackScenarioPerformance({
+          scenarioId,
+          categoryId: 'demo-category',
+          action: 'complete',
+          metadata: { 
+            completionTime: Math.random() * 300 + 60, // 1-5 minutes
+            source: 'demo-simulation' 
+          }
+        });
+        addLiveMetric('Scenario Complete', `${scenarioId} completed`);
+      };
+
+      window.simulateScenarioAbandon = function(scenarioId) {
+        systemCollector.trackScenarioPerformance({
+          scenarioId,
+          categoryId: 'demo-category',
+          action: 'abandon',
+          metadata: { 
+            timeSpent: Math.random() * 60 + 10, // 10-70 seconds
+            stage: 'decision-making',
+            source: 'demo-simulation' 
+          }
+        });
+        addLiveMetric('Scenario Abandon', `${scenarioId} abandoned`);
+      };
+
+      window.simulateScenarioRating = function(scenarioId, rating) {
+        systemCollector.trackScenarioPerformance({
+          scenarioId,
+          categoryId: 'demo-category',
+          action: 'rate',
+          metadata: { 
+            rating,
+            source: 'demo-simulation' 
+          }
+        });
+        addLiveMetric('Scenario Rating', `${scenarioId} rated ${rating} stars`);
+      };
+
+      // Framework simulation functions
+      window.simulateFrameworkSelection = function(frameworkId) {
+        systemCollector.trackFrameworkEngagement({
+          frameworkId,
+          action: 'select',
+          scenarioId: 'demo-scenario',
+          metadata: { 
+            decisionTime: Math.random() * 30 + 5, // 5-35 seconds
+            confidenceLevel: Math.random() * 3 + 2, // 2-5 scale
+            source: 'demo-simulation'
+          }
+        });
+        addLiveMetric('Framework Selection', `${frameworkId} selected`);
+      };
+
+      window.simulateFrameworkConflict = function(framework1, framework2) {
+        systemCollector.trackFrameworkEngagement({
+          frameworkId: framework1,
+          action: 'conflict',
+          scenarioId: 'demo-scenario',
+          metadata: { 
+            conflictWith: framework2,
+            resolutionTime: Math.random() * 60 + 20, // 20-80 seconds
+            conflictResolution: 'deliberation',
+            source: 'demo-simulation'
+          }
+        });
+        addLiveMetric('Framework Conflict', `${framework1} vs ${framework2}`);
+      };
+
+      window.simulateFrameworkChange = function(newFramework) {
+        systemCollector.trackFrameworkEngagement({
+          frameworkId: newFramework,
+          action: 'change',
+          scenarioId: 'demo-scenario',
+          metadata: { 
+            previousFramework: 'utilitarian',
+            changeReason: 'scenario-specific',
+            source: 'demo-simulation'
+          }
+        });
+        addLiveMetric('Framework Change', `Changed to ${newFramework}`);
+      };
+
+      // Interaction simulation functions
+      window.simulateNavigation = function(from, to) {
+        systemCollector.trackNavigation({
+          from,
+          to,
+          action: 'click',
+          metadata: { 
+            navigationTime: Date.now(),
+            source: 'demo-simulation'
+          }
+        });
+        addLiveMetric('Navigation', `${from} → ${to}`);
+      };
+
+      window.simulateInteraction = function(element, action, duration) {
+        systemCollector.trackInteraction({
+          element,
+          action,
+          duration,
+          metadata: { 
+            source: 'demo-simulation',
+            intentional: true
+          }
+        });
+        addLiveMetric('Interaction', `${action} on ${element} (${duration}ms)`);
+      };
+
+      // Data export functions
+      window.exportAnalyticsData = function() {
+        const data = systemCollector.exportLocalData();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { 
+          type: 'application/json' 
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `system-analytics-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        addLiveMetric('Data Export', 'Session data exported to JSON');
+      };
+
+      window.showInsights = function() {
+        const insights = systemCollector.generateAnonymizedInsights();
+        alert(`📊 Session Insights:\n\n${JSON.stringify(insights, null, 2)}`);
+        addLiveMetric('Insights', 'Anonymized insights generated');
+      };
+
+      window.clearLocalData = function() {
+        localStorage.removeItem('systemMetrics');
+        addLiveMetric('Data Clear', 'Local storage cleared');
+        alert('✅ Local analytics data cleared');
+      };
+
+      // Start with some demo activity
+      setTimeout(() => {
+        addLiveMetric('System Started', 'Analytics collection initialized');
+      }, 500);
+    </script>
+  </body>
+</html>

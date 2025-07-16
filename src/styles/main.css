@@ -1021,6 +1021,7 @@ body {
   display: flex;
   gap: var(--spacing-4);
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .hero-simulation {
