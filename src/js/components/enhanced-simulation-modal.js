@@ -21,6 +21,7 @@
 
 import { TIMING, BREAKPOINTS } from '../utils/constants.js';
 import focusManager from '../utils/focus-manager.js';
+import { getSystemCollector } from '../services/system-metadata-collector.js';
 
 export class EnhancedSimulationModal {
   constructor(simulationId, options = {}) {
@@ -38,6 +39,10 @@ export class EnhancedSimulationModal {
     this.isEthicsMetersCollapsed = this.options.collapseEthicsMeters;
     this.modal = null;
     this.resizeObserver = null;
+    
+    // Initialize system metadata collector for tracking
+    this.systemCollector = getSystemCollector();
+    this.modalStartTime = new Date();
   }
 
   /**
@@ -72,6 +77,23 @@ export class EnhancedSimulationModal {
    */
   close() {
     if (this.modal) {
+      // Calculate session duration for analytics
+      const sessionDuration = new Date() - this.modalStartTime;
+      
+      // Track modal session completion
+      this.systemCollector.trackInteraction({
+        element: 'enhanced-simulation-modal',
+        action: 'close',
+        duration: sessionDuration,
+        metadata: {
+          simulationId: this.simulationId,
+          sessionDurationSeconds: Math.round(sessionDuration / 1000),
+          finalTab: this.currentTab,
+          component: 'enhanced-simulation-modal',
+          timestamp: new Date().toISOString(),
+        },
+      });
+
       // Clean up focus trap
       if (this.focusTrap) {
         this.focusTrap.destroy();
@@ -443,6 +465,31 @@ export class EnhancedSimulationModal {
     }
 
     this.currentTab = tabName;
+    
+    // Track tab switching for system analytics
+    this.systemCollector.trackInteraction({
+      element: 'simulation-modal-tab',
+      action: 'click',
+      metadata: {
+        tabName,
+        simulationId: this.simulationId,
+        previousTab: this.currentTab,
+        component: 'enhanced-simulation-modal',
+        timestamp: new Date().toISOString(),
+      },
+    });
+    
+    // Track navigation within simulation for UX analysis
+    this.systemCollector.trackNavigation({
+      from: `simulation-tab-${this.currentTab}`,
+      to: `simulation-tab-${tabName}`,
+      action: 'tab-switch',
+      metadata: {
+        component: 'enhanced-simulation-modal',
+        simulationId: this.simulationId,
+      },
+    });
+    
     this.trackAnalytics('tab_switched', { tab: tabName });
   }
 

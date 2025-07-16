@@ -303,6 +303,30 @@ class AIEthicsApp {
         'AI Ethics App initialized successfully with modernized infrastructure'
       );
 
+      // Track platform initialization for system analytics
+      this.systemCollector.updatePlatformMetrics('platform_initialization', {
+        simulationsAvailable: this.availableSimulations.length,
+        categoriesAvailable: this.categories?.length || 0,
+        browserInfo: Helpers.getBrowserInfo(),
+        deviceType: Helpers.getDeviceType(),
+        currentTheme: this.currentTheme,
+        accessibilityEnabled: this.preferences.highContrast || this.preferences.largeText,
+        timestamp: new Date().toISOString(),
+      });
+
+      // Track user session start
+      this.systemCollector.trackNavigation({
+        from: 'external',
+        to: 'platform-home',
+        action: 'page-load',
+        metadata: {
+          component: 'main-app',
+          referrer: document.referrer,
+          userAgent: navigator.userAgent,
+          timestamp: new Date().toISOString(),
+        },
+      });
+
       // Track initialization
       simpleAnalytics.trackEvent('app_initialized', {
         simulations_available: this.availableSimulations.length,

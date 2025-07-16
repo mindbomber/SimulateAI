@@ -3,10 +3,10 @@
  * Collects and processes system-level analytics data for optimization and insights
  */
 
-import { 
-  METRIC_CALCULATIONS, 
+import {
+  METRIC_CALCULATIONS,
   METRIC_TYPES,
-  PRIVACY_RULES 
+  PRIVACY_RULES,
 } from '../data/system-metadata-schema.js';
 
 /**
@@ -44,20 +44,20 @@ export class SystemMetadataCollector {
       interactions: [],
       deviceInfo: this.getDeviceInfo(),
     };
-    
+
     // Performance tracking
     this.performanceMetrics = {
       loadTimes: [],
       errors: [],
       interactionTimes: [],
     };
-    
+
     // Batch processing for efficiency
     this.batchQueue = [];
     this.batchTimeout = null;
     this.BATCH_SIZE = SYSTEM_CONSTANTS.BATCH_SIZE;
     this.BATCH_TIMEOUT_MS = SYSTEM_CONSTANTS.BATCH_TIMEOUT_MS;
-    
+
     this.init();
   }
 
@@ -68,10 +68,10 @@ export class SystemMetadataCollector {
     this.startSession();
     this.setupEventListeners();
     this.startPerformanceMonitoring();
-    
+
     // Set up periodic data flushing
     setInterval(() => this.flushBatch(), this.BATCH_TIMEOUT_MS);
-    
+
     // Clean up on page unload
     window.addEventListener('beforeunload', () => this.endSession());
   }
@@ -84,7 +84,7 @@ export class SystemMetadataCollector {
       scenarioId,
       categoryId,
       action, // 'view', 'start', 'complete', 'abandon', 'rate'
-      metadata = {}
+      metadata = {},
     } = scenarioData;
 
     const performanceMetric = {
@@ -140,7 +140,7 @@ export class SystemMetadataCollector {
       frameworkId,
       action, // 'select', 'change', 'apply', 'conflict'
       scenarioId,
-      metadata = {}
+      metadata = {},
     } = frameworkData;
 
     const engagementMetric = {
@@ -170,7 +170,7 @@ export class SystemMetadataCollector {
       from,
       to,
       action, // 'click', 'scroll', 'search', 'filter'
-      metadata = {}
+      metadata = {},
     } = navigationData;
 
     this.sessionData.navigationPath.push({
@@ -203,7 +203,7 @@ export class SystemMetadataCollector {
       element,
       action, // 'click', 'hover', 'focus', 'scroll'
       duration = 0,
-      metadata = {}
+      metadata = {},
     } = interactionData;
 
     const interaction = {
@@ -253,13 +253,14 @@ export class SystemMetadataCollector {
   startPerformanceMonitoring() {
     // Monitor page load times
     if (window.performance && window.performance.timing) {
-      const loadTime = window.performance.timing.loadEventEnd - 
-                      window.performance.timing.navigationStart;
+      const loadTime =
+        window.performance.timing.loadEventEnd -
+        window.performance.timing.navigationStart;
       this.performanceMetrics.loadTimes.push(loadTime);
     }
 
     // Monitor errors
-    window.addEventListener('error', (event) => {
+    window.addEventListener('error', event => {
       this.performanceMetrics.errors.push({
         message: event.message,
         filename: event.filename,
@@ -269,7 +270,7 @@ export class SystemMetadataCollector {
     });
 
     // Monitor unhandled promise rejections
-    window.addEventListener('unhandledrejection', (event) => {
+    window.addEventListener('unhandledrejection', event => {
       this.performanceMetrics.errors.push({
         message: 'Unhandled Promise Rejection',
         reason: event.reason,
@@ -284,13 +285,17 @@ export class SystemMetadataCollector {
   calculateEngagementInsights() {
     const currentTime = new Date();
     const sessionDuration = currentTime - this.sessionData.startTime;
-    
+
     return {
       sessionDuration: Math.round(sessionDuration / 1000), // seconds
       scenariosViewed: this.sessionData.scenariosViewed.length,
       scenariosCompleted: this.sessionData.scenariosCompleted.length,
-      completionRate: this.sessionData.scenariosViewed.length > 0 ? 
-        (this.sessionData.scenariosCompleted.length / this.sessionData.scenariosViewed.length * 100) : 0,
+      completionRate:
+        this.sessionData.scenariosViewed.length > 0
+          ? (this.sessionData.scenariosCompleted.length /
+              this.sessionData.scenariosViewed.length) *
+            100
+          : 0,
       averageDecisionTime: this.calculateAverageDecisionTime(),
       engagementScore: this.calculateEngagementScore(),
       navigationPattern: this.analyzeNavigationPattern(),
@@ -302,7 +307,7 @@ export class SystemMetadataCollector {
    */
   generateAnonymizedInsights() {
     const insights = this.calculateEngagementInsights();
-    
+
     // Apply privacy protection
     return this.applyPrivacyProtection({
       sessionMetrics: {
@@ -326,17 +331,30 @@ export class SystemMetadataCollector {
    */
   applyPrivacyProtection(data) {
     // Add noise to prevent inference attacks
-    const addNoise = (value, noiseLevel = PRIVACY_RULES.anonymization.noiseAddition) => {
-      const noise = (Math.random() - SYSTEM_CONSTANTS.NOISE_RANDOM_OFFSET) * 
-                   SYSTEM_CONSTANTS.NOISE_MULTIPLIER * noiseLevel * value;
-      return Math.round((value + noise) * SYSTEM_CONSTANTS.DECIMAL_PRECISION) / SYSTEM_CONSTANTS.DECIMAL_PRECISION;
+    const addNoise = (
+      value,
+      noiseLevel = PRIVACY_RULES.anonymization.noiseAddition
+    ) => {
+      const noise =
+        (Math.random() - SYSTEM_CONSTANTS.NOISE_RANDOM_OFFSET) *
+        SYSTEM_CONSTANTS.NOISE_MULTIPLIER *
+        noiseLevel *
+        value;
+      return (
+        Math.round((value + noise) * SYSTEM_CONSTANTS.DECIMAL_PRECISION) /
+        SYSTEM_CONSTANTS.DECIMAL_PRECISION
+      );
     };
 
     // Apply noise to numeric values
     const protectedData = { ...data };
     if (protectedData.sessionMetrics) {
-      protectedData.sessionMetrics.duration = addNoise(protectedData.sessionMetrics.duration);
-      protectedData.sessionMetrics.engagementScore = addNoise(protectedData.sessionMetrics.engagementScore);
+      protectedData.sessionMetrics.duration = addNoise(
+        protectedData.sessionMetrics.duration
+      );
+      protectedData.sessionMetrics.engagementScore = addNoise(
+        protectedData.sessionMetrics.engagementScore
+      );
     }
 
     // Remove identifying information
@@ -352,11 +370,14 @@ export class SystemMetadataCollector {
    */
   addToBatch(metric) {
     this.batchQueue.push(metric);
-    
+
     if (this.batchQueue.length >= this.BATCH_SIZE) {
       this.flushBatch();
     } else if (!this.batchTimeout) {
-      this.batchTimeout = setTimeout(() => this.flushBatch(), this.BATCH_TIMEOUT_MS);
+      this.batchTimeout = setTimeout(
+        () => this.flushBatch(),
+        this.BATCH_TIMEOUT_MS
+      );
     }
   }
 
@@ -368,7 +389,7 @@ export class SystemMetadataCollector {
 
     const batch = [...this.batchQueue];
     this.batchQueue = [];
-    
+
     if (this.batchTimeout) {
       clearTimeout(this.batchTimeout);
       this.batchTimeout = null;
@@ -396,14 +417,19 @@ export class SystemMetadataCollector {
    * Store batch locally for development/testing
    */
   storeBatchLocally(batch) {
-    const existingData = JSON.parse(localStorage.getItem('systemMetrics') || '[]');
+    const existingData = JSON.parse(
+      localStorage.getItem('systemMetrics') || '[]'
+    );
     existingData.push(...batch);
-    
+
     // Keep only last entries to prevent storage overflow
     if (existingData.length > SYSTEM_CONSTANTS.MAX_LOCAL_ENTRIES) {
-      existingData.splice(0, existingData.length - SYSTEM_CONSTANTS.MAX_LOCAL_ENTRIES);
+      existingData.splice(
+        0,
+        existingData.length - SYSTEM_CONSTANTS.MAX_LOCAL_ENTRIES
+      );
     }
-    
+
     localStorage.setItem('systemMetrics', JSON.stringify(existingData));
   }
 
@@ -411,7 +437,9 @@ export class SystemMetadataCollector {
    * Helper methods
    */
   generateSessionId() {
-    const randomPart = Math.random().toString(SYSTEM_CONSTANTS.BASE36).substring(SYSTEM_CONSTANTS.SUBSTRING_START);
+    const randomPart = Math.random()
+      .toString(SYSTEM_CONSTANTS.BASE36)
+      .substring(SYSTEM_CONSTANTS.SUBSTRING_START);
     const timestampPart = Date.now().toString(SYSTEM_CONSTANTS.BASE36);
     return `sess_${randomPart}${timestampPart}`;
   }
@@ -419,7 +447,10 @@ export class SystemMetadataCollector {
   getAnonymizedUserId() {
     // Create a session-specific hash that can't be traced back to user
     const hashInput = this.sessionData.sessionId + new Date().toDateString();
-    const encodedHash = btoa(hashInput).substring(0, SYSTEM_CONSTANTS.HASH_LENGTH);
+    const encodedHash = btoa(hashInput).substring(
+      0,
+      SYSTEM_CONSTANTS.HASH_LENGTH
+    );
     return `anon_${encodedHash}`;
   }
 
@@ -441,11 +472,11 @@ export class SystemMetadataCollector {
   }
 
   calculateAverageDecisionTime() {
-    const decisions = this.sessionData.interactions.filter(i => 
-      i.action === 'click' && i.element.includes('decision')
+    const decisions = this.sessionData.interactions.filter(
+      i => i.action === 'click' && i.element.includes('decision')
     );
     if (decisions.length === 0) return 0;
-    
+
     const totalTime = decisions.reduce((sum, d) => sum + (d.duration || 0), 0);
     return Math.round(totalTime / decisions.length);
   }
@@ -460,25 +491,35 @@ export class SystemMetadataCollector {
 
   calculateAverageLoadTime() {
     if (this.performanceMetrics.loadTimes.length === 0) return 0;
-    const total = this.performanceMetrics.loadTimes.reduce((sum, time) => sum + time, 0);
+    const total = this.performanceMetrics.loadTimes.reduce(
+      (sum, time) => sum + time,
+      0
+    );
     return Math.round(total / this.performanceMetrics.loadTimes.length);
   }
 
   calculateInteractionFrequency() {
-    const sessionDurationMinutes = (new Date() - this.sessionData.startTime) / 
-                                   SYSTEM_CONSTANTS.MILLISECONDS_TO_SECONDS / 
-                                   SYSTEM_CONSTANTS.SECONDS_TO_MINUTES;
-    return sessionDurationMinutes > 0 ? Math.round(this.sessionData.interactions.length / sessionDurationMinutes) : 0;
+    const sessionDurationMinutes =
+      (new Date() - this.sessionData.startTime) /
+      SYSTEM_CONSTANTS.MILLISECONDS_TO_SECONDS /
+      SYSTEM_CONSTANTS.SECONDS_TO_MINUTES;
+    return sessionDurationMinutes > 0
+      ? Math.round(
+          this.sessionData.interactions.length / sessionDurationMinutes
+        )
+      : 0;
   }
 
   analyzeNavigationPattern() {
     const pathLength = this.sessionData.navigationPath.length;
     if (pathLength < SYSTEM_CONSTANTS.MIN_PATH_LENGTH) return 'exploratory';
-    
-    const uniquePages = new Set(this.sessionData.navigationPath.map(p => p.to)).size;
+
+    const uniquePages = new Set(this.sessionData.navigationPath.map(p => p.to))
+      .size;
     const explorationRatio = uniquePages / pathLength;
-    
-    if (explorationRatio > SYSTEM_CONSTANTS.EXPLORATORY_THRESHOLD) return 'exploratory';
+
+    if (explorationRatio > SYSTEM_CONSTANTS.EXPLORATORY_THRESHOLD)
+      return 'exploratory';
     if (explorationRatio > SYSTEM_CONSTANTS.MIXED_THRESHOLD) return 'mixed';
     return 'focused';
   }
@@ -489,9 +530,9 @@ export class SystemMetadataCollector {
       const category = scenario.categoryId || 'unknown';
       categoryViews[category] = (categoryViews[category] || 0) + 1;
     });
-    
+
     return Object.entries(categoryViews)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, SYSTEM_CONSTANTS.MAX_CONTENT_PREFERENCES)
       .map(([category]) => category);
   }
@@ -514,10 +555,13 @@ export class SystemMetadataCollector {
         this.trackInteraction({
           element: 'page',
           action: 'scroll',
-          metadata: { 
+          metadata: {
             scrollY: window.scrollY,
-            scrollPercent: Math.round((window.scrollY / 
-              (document.documentElement.scrollHeight - window.innerHeight)) * 100)
+            scrollPercent: Math.round(
+              (window.scrollY /
+                (document.documentElement.scrollHeight - window.innerHeight)) *
+                100
+            ),
           },
         });
       }, SYSTEM_CONSTANTS.SCROLL_DEBOUNCE_MS);
@@ -537,7 +581,7 @@ export class SystemMetadataCollector {
 
   endSession() {
     const sessionInsights = this.generateAnonymizedInsights();
-    
+
     this.trackInteraction({
       element: 'session',
       action: 'end',

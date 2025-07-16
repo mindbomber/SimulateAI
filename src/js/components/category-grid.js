@@ -30,6 +30,7 @@ import PreLaunchModal from './pre-launch-modal.js';
 import ScenarioModal from './scenario-modal.js';
 import badgeManager from '../core/badge-manager.js';
 import badgeModal from './badge-modal.js';
+import { getSystemCollector } from '../services/system-metadata-collector.js';
 
 // Constants
 const PROGRESS_CIRCLE_CIRCUMFERENCE = 163; // 2 * π * 26 (radius)
@@ -46,6 +47,9 @@ class CategoryGrid {
     this.lastModalOpenTime = 0; // Debounce tracking
     this.modalOpenCooldown = 500; // Minimum time between modal opens (ms)
     this.isModalOpen = false; // Track if modal is currently open
+    
+    // Initialize system metadata collector for analytics
+    this.systemCollector = getSystemCollector();
 
     this.init();
   }
@@ -405,6 +409,33 @@ ${this.createProgressRing(category, progress)}
 
     logger.info('Opening premodal for category:', category);
 
+    // Track scenario access via pre-launch modal
+    this.systemCollector.trackScenarioPerformance({
+      scenarioId,
+      categoryId,
+      action: 'view',
+      metadata: {
+        source: 'category-grid-prelaunch',
+        modalType: 'with-prelaunch',
+        scenarioTitle: scenario.title,
+        categoryTitle: category.title,
+        accessMethod: 'standard',
+        timestamp: new Date().toISOString(),
+      },
+    });
+
+    // Track user interaction with category content
+    this.systemCollector.trackInteraction({
+      element: 'scenario-card',
+      action: 'click',
+      metadata: {
+        scenarioId,
+        categoryId,
+        component: 'category-grid',
+        interactionType: 'scenario-selection',
+      },
+    });
+
     // Dispatch custom event for other components to listen to
     const event = new CustomEvent('scenario-selected', {
       detail: { category, scenario, categoryId, scenarioId },
@@ -490,6 +521,29 @@ ${this.createProgressRing(category, progress)}
    */
   openScenarioModal(scenarioId, categoryId = null) {
     try {
+      // Track scenario view for analytics
+      this.systemCollector.trackScenarioPerformance({
+        scenarioId,
+        categoryId: categoryId || 'unknown',
+        action: 'view',
+        metadata: {
+          source: 'category-grid',
+          modalType: 'with-prelaunch',
+          timestamp: new Date().toISOString(),
+        },
+      });
+
+      // Track navigation from category to scenario
+      this.systemCollector.trackNavigation({
+        from: `category-${categoryId}`,
+        to: `scenario-${scenarioId}`,
+        action: 'click',
+        metadata: {
+          component: 'category-grid',
+          modalFlow: 'standard',
+        },
+      });
+
       const scenarioModal = new ScenarioModal();
       scenarioModal.open(scenarioId, categoryId);
 
@@ -553,6 +607,32 @@ ${this.createProgressRing(category, progress)}
       title: scenario.title,
     });
 
+    // Track direct scenario access for analytics
+    this.systemCollector.trackScenarioPerformance({
+      scenarioId,
+      categoryId,
+      action: 'view',
+      metadata: {
+        source: 'category-grid-direct',
+        modalType: 'direct',
+        scenarioTitle: scenario.title,
+        categoryTitle: category.title,
+        timestamp: new Date().toISOString(),
+      },
+    });
+
+    // Track navigation pattern for direct access
+    this.systemCollector.trackNavigation({
+      from: `category-${categoryId}`,
+      to: `scenario-${scenarioId}`,
+      action: 'direct-access',
+      metadata: {
+        component: 'category-grid',
+        modalFlow: 'direct',
+        bypassPrelaunch: true,
+      },
+    });
+
     // Dispatch custom event for other components to listen to
     const event = new CustomEvent('scenario-selected', {
       detail: { category, scenario, categoryId, scenarioId },
@@ -582,6 +662,21 @@ ${this.createProgressRing(category, progress)}
     });
 
     if (category) {
+      // Track scenario completion for system analytics
+      this.systemCollector.trackScenarioPerformance({
+        scenarioId,
+        categoryId: category.id,
+        action: 'complete',
+        metadata: {
+          selectedOption,
+          optionText: option.text,
+          impact: option.impact,
+          completionTime: event.detail.completionTime || null,
+          source: 'category-grid-completion',
+          timestamp: new Date().toISOString(),
+        },
+      });
+
       // Update progress (without badge checking)
       this.updateProgress(category.id, scenarioId, true, false);
 
