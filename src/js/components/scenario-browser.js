@@ -4,9 +4,11 @@
  */
 
 import CategoryMetadataManager from '../utils/category-metadata-manager.js';
+import ScenarioModal from './scenario-modal.js';
+import PreLaunchModal from './pre-launch-modal.js';
+import ScenarioCard from './scenario-card.js';
 
 // Constants
-const DEFAULT_ESTIMATED_TIME = 5;
 const MAX_VISIBLE_TAGS = 4;
 const DEBOUNCE_DELAY = 300;
 const DIFFICULTY_ORDER = { beginner: 1, intermediate: 2, advanced: 3 };
@@ -49,6 +51,9 @@ class ScenarioBrowser {
       await this.loadScenariosEnhanced();
       this.renderTagChips();
       this.updateMetadataDisplay();
+
+      // Handle URL parameters for filtering
+      this.handleURLParameters();
     } catch (error) {
       console.error('Error initializing scenario browser:', error);
       this.showError('Failed to load scenarios. Please try again later.');
@@ -96,6 +101,9 @@ class ScenarioBrowser {
     document.getElementById('load-more-btn')?.addEventListener('click', () => {
       this.loadMoreScenarios();
     });
+
+    // Add scenario card event listeners
+    this.setupScenarioCardListeners();
   }
 
   /**
@@ -318,7 +326,7 @@ class ScenarioBrowser {
    */
   async loadScenariosEnhanced() {
     this.isLoading = true;
-    this.showLoadingState();
+    this.showLoading(true);
 
     try {
       // Use metadata manager to get all scenarios with enhanced data
@@ -330,7 +338,7 @@ class ScenarioBrowser {
       // Apply current filters
       this.applyFiltersEnhanced();
 
-      this.hideLoadingState();
+      this.hideLoading();
     } catch (error) {
       console.error('Error loading enhanced scenarios:', error);
       this.showError('Failed to load scenarios with metadata.');
@@ -372,8 +380,7 @@ class ScenarioBrowser {
       }
     );
 
-    this.sortScenarios();
-    this.renderScenarios();
+    this.sortAndRender();
     this.updateResultsCount();
     this.updateActiveFilters();
   }
@@ -387,9 +394,11 @@ class ScenarioBrowser {
       switch (this.sortBy) {
         case 'title':
           return a.title.localeCompare(b.title);
-        case 'difficulty':
-          const difficultyOrder = { beginner: 1, intermediate: 2, advanced: 3 };
-          return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
+        case 'difficulty': {
+          return (
+            DIFFICULTY_ORDER[a.difficulty] - DIFFICULTY_ORDER[b.difficulty]
+          );
+        }
         case 'category':
           return a.category.localeCompare(b.category);
         case 'recently-added':
@@ -406,7 +415,7 @@ class ScenarioBrowser {
    * Render scenario cards
    */
   renderScenarios() {
-    const grid = document.getElementById('scenario-grid');
+    const grid = document.getElementById('scenarios-grid');
     const noResults = document.getElementById('no-results');
 
     if (this.filteredScenarios.length === 0) {
@@ -436,79 +445,22 @@ class ScenarioBrowser {
   }
 
   /**
-   * Render scenario card with enhanced metadata
+   * Render scenario card with same structure as category-grid for consistency
+   */
+  /**
+   * Render scenario card using shared ScenarioCard component
    */
   renderScenarioCard(scenario) {
-    const estimatedTime =
-      scenario.metadata.estimatedTime || DEFAULT_ESTIMATED_TIME;
-    const complexity = scenario.metadata.complexity || 'moderate';
-    const philosophicalLeaning =
-      scenario.metadata.philosophicalLeaning || 'utilitarian';
+    // Resolve category data using ScenarioCard helper
+    const category = ScenarioCard.resolveCategory(
+      scenario,
+      this.enhancedCategories,
+      () => this.metadataManager.getAllCategories()
+    );
 
-    return `
-      <div class="scenario-card" data-scenario-id="${scenario.id}">
-        <!-- Color indicator from category -->
-        <div class="scenario-card-header">
-          <span class="scenario-category" style="background-color: ${scenario.category.color}20; color: ${scenario.category.color};">
-            ${scenario.category.icon} ${scenario.category.title}
-          </span>
-          <h3 class="scenario-title">${scenario.title}</h3>
-          <p class="scenario-description">${scenario.description}</p>
-        </div>
-        
-        <div class="scenario-card-body">
-          <!-- Enhanced metadata display -->
-          <div class="scenario-meta">
-            <span class="difficulty-badge difficulty-${scenario.difficulty}">
-              ${scenario.difficulty.charAt(0).toUpperCase() + scenario.difficulty.slice(1)}
-            </span>
-            <span class="philosophy-tag">
-              ${philosophicalLeaning.charAt(0).toUpperCase() + philosophicalLeaning.slice(1)}
-            </span>
-          </div>
-          
-          <!-- Time and complexity indicators -->
-          <div class="scenario-indicators">
-            <span class="time-indicator" title="Estimated completion time">
-              ⏱️ ${estimatedTime} min
-            </span>
-            <span class="complexity-indicator" title="Cognitive complexity">
-              🧠 ${complexity.charAt(0).toUpperCase() + complexity.slice(1)}
-            </span>
-          </div>
-          
-          <!-- Enhanced tags display -->
-          <div class="scenario-tags">
-            ${
-              scenario.metadata.tags
-                ?.slice(0, MAX_VISIBLE_TAGS)
-                .map(
-                  tag =>
-                    `<span class="scenario-tag" data-tag="${tag}">${tag}</span>`
-                )
-                .join('') || ''
-            }
-            ${
-              scenario.metadata.tags?.length > MAX_VISIBLE_TAGS
-                ? `<span class="tag-more">+${scenario.metadata.tags.length - MAX_VISIBLE_TAGS} more</span>`
-                : ''
-            }
-          </div>
-          
-          <!-- Action buttons -->
-          <div class="scenario-actions">
-            <button class="btn-scenario btn-scenario-primary" 
-                    onclick="window.location.href='category.html?category=${scenario.categoryId}'">
-              <span>🚀</span> Start Simulation
-            </button>
-            <button class="btn-scenario btn-scenario-secondary" 
-                    onclick="showScenarioPreview('${scenario.id}')">
-              <span>👁️</span> Preview
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
+    const isCompleted = false; // TODO: Integrate with user progress system
+
+    return ScenarioCard.render(scenario, category, isCompleted);
   }
 
   /**
@@ -760,6 +712,139 @@ class ScenarioBrowser {
   /**
    * Load more scenarios (pagination)
    */
+  setupScenarioCardListeners() {
+    const scenarioList = document.getElementById('scenarios-list');
+    if (!scenarioList) return;
+
+    scenarioList.addEventListener('click', event => {
+      const { target } = event;
+
+      // Handle Learning Lab button clicks (scenario-start-btn)
+      if (
+        target.classList.contains('scenario-start-btn') ||
+        target.closest('.scenario-start-btn')
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+        const scenarioCard = target.closest('.scenario-card');
+        if (scenarioCard) {
+          const { scenarioId, categoryId } = scenarioCard.dataset;
+          if (scenarioId) {
+            this.openScenario(categoryId, scenarioId);
+          }
+        }
+        return;
+      }
+
+      // Handle Start/Quick Start button clicks (scenario-quick-start-btn)
+      if (
+        target.classList.contains('scenario-quick-start-btn') ||
+        target.closest('.scenario-quick-start-btn')
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+        const scenarioCard = target.closest('.scenario-card');
+        if (scenarioCard) {
+          const { scenarioId, categoryId } = scenarioCard.dataset;
+          if (scenarioId) {
+            this.openScenarioModalDirect(categoryId, scenarioId);
+          }
+        }
+        return;
+      }
+
+      // Handle card clicks
+      const scenarioCard = target.closest('.scenario-card');
+      if (scenarioCard) {
+        const { scenarioId, categoryId } = scenarioCard.dataset;
+        if (scenarioId) {
+          this.openScenario(categoryId, scenarioId);
+        }
+      }
+    });
+  }
+
+  openScenario(categoryId, scenarioId) {
+    // Open with pre-launch modal (Learning Lab flow) - same as category-grid.js
+    try {
+      // Find the scenario and category data
+      const scenario = this.scenarios.find(s => s.id === scenarioId);
+      let category = {};
+
+      // Try to get category from enhanced categories first
+      if (categoryId && this.enhancedCategories[categoryId]) {
+        category = this.enhancedCategories[categoryId];
+      } else if (categoryId) {
+        // Fallback: try to find category by ID in metadataManager
+        const allCategories = this.metadataManager.getAllCategories();
+        category = allCategories.find(cat => cat.id === categoryId) || {};
+      }
+
+      if (!scenario) {
+        throw new Error(`Scenario not found: ${scenarioId}`);
+      }
+
+      // Open the PreLaunchModal configured for this scenario
+      this.openScenarioPremodal(category, scenario);
+    } catch (error) {
+      // Fallback navigation
+      window.location.href = `simulation.html?scenario=${scenarioId}`;
+    }
+  }
+
+  openScenarioPremodal(category, scenario) {
+    try {
+      // Use the category ID as the "simulation ID" and pass category/scenario data
+      const preModal = new PreLaunchModal(category.id || 'default', {
+        categoryData: category,
+        scenarioData: scenario,
+        onLaunch: () => {
+          // Launch the scenario modal with both category and scenario IDs
+          this.openScenarioModal(scenario.id, category.id);
+        },
+        onCancel: () => {
+          // Pre-launch modal cancelled
+        },
+        showEducatorResources: true,
+      });
+
+      preModal.show();
+    } catch (error) {
+      // Fallback to direct scenario modal
+      this.openScenarioModal(scenario.id, category.id);
+    }
+  }
+
+  openScenarioModal(scenarioId, categoryId) {
+    try {
+      const scenarioModal = new ScenarioModal();
+      scenarioModal.open(scenarioId, categoryId);
+    } catch (error) {
+      // Fallback navigation
+      window.location.href = `simulation.html?scenario=${scenarioId}`;
+    }
+  }
+
+  openScenarioModalDirect(categoryId, scenarioId) {
+    // Direct access to scenario modal (Start button flow) - skip pre-launch modal
+    this.openScenarioModal(scenarioId, categoryId);
+  }
+
+  openLearningLab(scenarioId) {
+    // Implementation for opening learning lab
+    window.location.href = `learning-lab.html?scenario=${scenarioId}`;
+  }
+
+  startScenario(scenarioId) {
+    // Implementation for starting scenario
+    window.location.href = `simulation.html?scenario=${scenarioId}`;
+  }
+
+  openScenarioDetails(scenarioId) {
+    // Implementation for scenario details or default action
+    window.location.href = `simulation.html?scenario=${scenarioId}`;
+  }
+
   loadMoreScenarios() {
     this.currentPage++;
     this.renderScenarios();
@@ -781,7 +866,7 @@ class ScenarioBrowser {
   showLoading(full = true) {
     if (full) {
       document.getElementById('loading-state').style.display = 'flex';
-      document.getElementById('scenario-grid').style.display = 'none';
+      document.getElementById('scenarios-grid').style.display = 'none';
     }
   }
 
@@ -790,14 +875,14 @@ class ScenarioBrowser {
    */
   hideLoading() {
     document.getElementById('loading-state').style.display = 'none';
-    document.getElementById('scenario-grid').style.display = 'grid';
+    document.getElementById('scenarios-grid').style.display = 'flex';
   }
 
   /**
    * Show error message
    */
   showError(message) {
-    const grid = document.getElementById('scenario-grid');
+    const grid = document.getElementById('scenarios-grid');
     grid.innerHTML = `
       <div class="error-state">
         <div class="error-icon">⚠️</div>
@@ -808,6 +893,44 @@ class ScenarioBrowser {
     `;
     this.hideLoading();
   }
+
+  /**
+   * Handle URL parameters for initial filtering
+   */
+  handleURLParameters() {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Check for category parameter
+    const categoryParam = urlParams.get('category');
+    if (categoryParam) {
+      // Set the category filter
+      const categorySelect = document.getElementById('category-filter');
+      if (categorySelect) {
+        categorySelect.value = categoryParam;
+        this.filters.category = categoryParam;
+        this.applyFiltersEnhanced();
+      }
+    }
+
+    // Check for other filter parameters
+    const difficultyParam = urlParams.get('difficulty');
+    if (difficultyParam) {
+      const difficultySelect = document.getElementById('difficulty-filter');
+      if (difficultySelect) {
+        difficultySelect.value = difficultyParam;
+        this.filters.difficulty = difficultyParam;
+      }
+    }
+
+    const searchParam = urlParams.get('search');
+    if (searchParam) {
+      const searchInput = document.getElementById('search-filter');
+      if (searchInput) {
+        searchInput.value = searchParam;
+        this.filters.search = searchParam;
+      }
+    }
+  }
 }
 
 // Global functions
@@ -817,7 +940,7 @@ window.clearAllFilters = function () {
 
 window.previewScenario = function (_scenarioId) {
   // TODO: Implement scenario preview modal
-  // Preview scenario functionality would go here
+  // Preview functionality will be added when modal system is integrated
 };
 
 // Initialize global instance
@@ -827,3 +950,6 @@ window.scenarioBrowser = null;
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = ScenarioBrowser;
 }
+
+// ES6 module export
+export default ScenarioBrowser;

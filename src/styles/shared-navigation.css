@@ -256,8 +256,8 @@
     opacity: 1 !important;
   }
 
-  /* Make categories link functional in mobile */
-  .nav-item-dropdown .nav-link[href='categories.html'] {
+  /* Make scenarios link functional in mobile */
+  .nav-item-dropdown .nav-link[href='scenarios.html'] {
     pointer-events: auto !important;
   }
 

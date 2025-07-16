@@ -590,9 +590,7 @@ class CanvasRenderer {
     logger.error(`CanvasRenderer Error: ${message}`, error);
 
     if (this.options.enableAccessibility && this.accessibilityManager) {
-      this.accessibilityManager.announceToScreenReader(
-        `Rendering error: ${message}`
-      );
+      this.accessibilityManager.announce(`Rendering error: ${message}`, true);
     }
   }
   // Enhanced drawing methods with accessibility and theme support

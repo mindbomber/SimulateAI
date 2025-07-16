@@ -984,8 +984,8 @@ class CategoryPage {
             randomScenario.scenario.id
           );
         } else {
-          // Navigate to the category page and open the scenario
-          window.location.href = `category.html?category=${randomScenario.categoryId}#scenario=${randomScenario.scenario.id}`;
+          // Navigate to the scenarios page with category filter
+          window.location.href = `scenarios.html?category=${randomScenario.categoryId}#scenario=${randomScenario.scenario.id}`;
         }
       })
       .catch(error => {

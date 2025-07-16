@@ -2315,9 +2315,9 @@ class AIEthicsApp {
 
       // Announce to screen readers for accessibility
       if (this.accessibilityManager) {
-        this.accessibilityManager.announceToScreenReader(
+        this.accessibilityManager.announce(
           'Navigated to Ethics Categories section',
-          'polite'
+          false
         );
       }
     } catch (error) {

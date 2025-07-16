@@ -12,9 +12,17 @@
 
     <!-- CSS Files -->
     <link rel="stylesheet" href="src/styles/main.css" />
-    <link rel="stylesheet" href="src/styles/scenario-browser.css" />
+    <link rel="stylesheet" href="src/styles/accessibility.css" />
+    <link rel="stylesheet" href="src/styles/simulations.css" />
+    <link rel="stylesheet" href="src/styles/layout-components.css" />
+    <link rel="stylesheet" href="src/styles/advanced-ui-components.css" />
+    <link rel="stylesheet" href="src/styles/enhanced-objects.css" />
     <link rel="stylesheet" href="src/styles/card-component.css" />
+    <link rel="stylesheet" href="src/styles/category-grid.css" />
+    <link rel="stylesheet" href="src/styles/scenario-browser.css" />
     <link rel="stylesheet" href="src/styles/input-utility-components.css" />
+    <link rel="stylesheet" href="src/styles/scenario-modal.css" />
+    <link rel="stylesheet" href="src/styles/loader-spinner.css" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="src/assets/icons/favicon.png" />
@@ -161,7 +169,7 @@
           </div>
 
           <!-- Scenario Grid -->
-          <div class="scenario-grid" id="scenario-grid">
+          <div class="scenarios-grid" id="scenarios-grid">
             <!-- Scenario cards will be populated here -->
           </div>
 
@@ -181,32 +189,44 @@
 
     <!-- Footer will be injected here -->
 
+    <!-- Firebase Configuration -->
+    <script>
+      // Firebase configuration for scenarios page
+      window.firebaseConfig = {
+        apiKey: 'AIzaSyBvOkBwagyLqMsXaQiQUF3lm5IshN_lT_Y',
+        authDomain: 'simulateai-research.firebaseapp.com',
+        projectId: 'simulateai-research',
+        storageBucket: 'simulateai-research.appspot.com',
+        messagingSenderId: '123456789012',
+        appId: '1:123456789012:web:abcdef123456',
+      };
+    </script>
+
     <!-- Firebase -->
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
       import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-      // Initialize Firebase (use your config)
-      const firebaseConfig = {
-        // Your Firebase config here
-      };
-
-      const app = initializeApp(firebaseConfig);
+      const app = initializeApp(window.firebaseConfig);
       window.db = getFirestore(app);
     </script>
-
-    <!-- JavaScript -->
+    <!-- Non-module JavaScript - Load first -->
     <script src="src/js/components/shared-navigation.js"></script>
-    <script src="src/js/components/scenario-browser.js"></script>
-    <script>
+
+    <!-- JavaScript Modules -->
+    <script type="module" src="src/js/components/scenario-browser.js"></script>
+    <script type="module">
+      import ScenarioBrowser from './src/js/components/scenario-browser.js';
+
       // Initialize the page
       document.addEventListener('DOMContentLoaded', async () => {
-        // Initialize shared navigation
+        // Initialize shared navigation first
         const nav = new SharedNavigation();
         await nav.init({ currentPage: 'scenarios' });
 
-        // Initialize scenario browser
+        // Then initialize scenario browser
         const browser = new ScenarioBrowser();
+        window.scenarioBrowser = browser; // Make available globally for onclick handlers
         await browser.init();
       });
     </script>

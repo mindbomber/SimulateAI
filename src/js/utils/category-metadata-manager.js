@@ -3,7 +3,7 @@
  * Integrates enhanced metadata with existing category system
  */
 
-import { ETHICAL_CATEGORIES } from '../data/categories.js';
+import { ETHICAL_CATEGORIES } from '../../data/categories.js';
 
 // Constants
 const DEFAULT_ESTIMATED_TIME = 5;

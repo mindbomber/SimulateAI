@@ -28,6 +28,7 @@ import {
 import logger from '../utils/logger.js';
 import PreLaunchModal from './pre-launch-modal.js';
 import ScenarioModal from './scenario-modal.js';
+import ScenarioCard from './scenario-card.js';
 import badgeManager from '../core/badge-manager.js';
 import badgeModal from './badge-modal.js';
 import { getSystemCollector } from '../services/system-metadata-collector.js';
@@ -129,7 +130,7 @@ class CategoryGrid {
                                 <span class="category-time">${category.estimatedTime} min</span>
                                 <span class="category-progress-text">${progress.completed}/${progress.total} completed</span>
                             </div>
-                            <a href="category.html?category=${category.id}" class="category-see-all">See All</a>
+                            <a href="scenarios.html?category=${category.id}" class="category-see-all">See All</a>
                         </div>
                     </div>
                 </div>
@@ -147,46 +148,7 @@ ${this.createProgressRing(category, progress)}
   createScenarioCard(scenario, category) {
     const isCompleted = this.userProgress[category.id]?.[scenario.id] || false;
 
-    return `
-            <article class="scenario-card ${isCompleted ? 'completed' : ''}" 
-                     data-scenario-id="${scenario.id}" 
-                     data-category-id="${category.id}"
-                     role="button" 
-                     tabindex="0"
-                     aria-label="Scenario: ${scenario.title} - ${scenario.difficulty} difficulty">
-                
-                <div class="scenario-header">
-                    <div class="scenario-icon" style="background-color: ${category.color}15; color: ${category.color}">
-                        ${category.icon}
-                    </div>
-                    <div class="scenario-difficulty difficulty-${scenario.difficulty}">
-                        ${scenario.difficulty}
-                    </div>
-                </div>
-
-                <div class="scenario-content">
-                    <h4 class="scenario-title">${scenario.title}</h4>
-                    <p class="scenario-description">${scenario.description}</p>
-                </div>
-
-                <div class="scenario-footer">
-                    <button class="scenario-start-btn" aria-label="Learning Lab for ${scenario.title} scenario">
-                        Learning Lab
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                    <button class="scenario-quick-start-btn" aria-label="${isCompleted ? 'Replay' : 'Start'} ${scenario.title} scenario">
-                        ${isCompleted ? 'Replay' : 'Start'}
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <path d="M5 3L12 8L5 13V3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                </div>
-
-                ${isCompleted ? '<div class="scenario-completed-badge">✓</div>' : ''}
-            </article>
-        `;
+    return ScenarioCard.render(scenario, category, isCompleted);
   }
 
   attachEventListeners() {

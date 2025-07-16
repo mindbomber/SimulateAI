@@ -9,7 +9,7 @@ const RUNTIME_CACHE = 'simulateai-runtime-v1.0';
 const CORE_FILES = [
   '/SimulateAI/',
   '/SimulateAI/index.html',
-  '/SimulateAI/category.html',
+  '/SimulateAI/scenarios.html',
   '/SimulateAI/manifest.json',
 
   // Core JavaScript

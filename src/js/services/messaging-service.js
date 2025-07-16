@@ -34,10 +34,6 @@ const firebaseConfig = {
 // Import the functions you need from the SDKs you want to use
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import {
-  initializeAppCheck,
-  ReCaptchaV3Provider,
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js';
-import {
   getMessaging,
   getToken,
   onMessage,
@@ -50,18 +46,6 @@ import {
   collection,
   addDoc,
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: 'YOUR_API_KEY', // Replace with your actual API key
-  authDomain: 'YOUR_AUTH_DOMAIN', // Replace with your actual auth domain
-  projectId: 'simulateai-research', // Your confirmed project ID
-  storageBucket: 'YOUR_STORAGE_BUCKET', // Replace with your actual storage bucket
-  messagingSenderId: '52924445915', // Your confirmed messaging sender ID - Crucial for FCM!
-  appId: 'YOUR_APP_ID', // Replace with your actual app ID
-  measurementId: 'YOUR_MEASUREMENT_ID', // Replace with your actual measurement ID
-};
 
 // Configuration constants
 const NOTIFICATION_CONFIG = {

@@ -156,7 +156,7 @@ class SharedNavigation {
     // Map filenames to page identifiers
     const pageMap = {
       'index.html': 'home',
-      'categories.html': 'categories',
+      'scenarios.html': 'scenarios',
       'about.html': 'about',
       'blog.html': 'blog',
       'forum.html': 'forum',
@@ -407,16 +407,16 @@ class SharedNavigation {
     const navToggle = document.querySelector('.nav-toggle');
     const mainNav = document.querySelector('.main-nav');
 
-    console.log('setupMobileNavigationListeners called');
-    console.log('navToggle found:', navToggle);
-    console.log('mainNav found:', mainNav);
+    // console.log('setupMobileNavigationListeners called');
+    // console.log('navToggle found:', navToggle);
+    // console.log('mainNav found:', mainNav);
 
     if (!navToggle || !mainNav) {
-      console.log('Mobile nav elements not found - skipping mobile nav setup');
+      // console.log('Mobile nav elements not found - skipping mobile nav setup');
       return;
     }
 
-    console.log('Setting up mobile nav click listener');
+    // console.log('Setting up mobile nav click listener');
 
     // Remove any existing listeners by cloning the button
     const newNavToggle = navToggle.cloneNode(true);
@@ -425,7 +425,7 @@ class SharedNavigation {
     // Add fresh listener to the new button
     newNavToggle.addEventListener('click', e => {
       e.preventDefault();
-      console.log('Hamburger menu clicked!');
+      // console.log('Hamburger menu clicked!');
       this.toggleMobileNav();
     });
 
@@ -449,31 +449,31 @@ class SharedNavigation {
 
     // Mark mobile listeners as set up
     this._mobileListenersSetup = true;
-    console.log('Mobile navigation listeners setup completed');
+    // console.log('Mobile navigation listeners setup completed');
   }
 
   /**
    * Setup mobile-specific dropdown listeners
    */
   setupMobileDropdownListeners() {
-    console.log('Setting up mobile dropdown listeners');
+    // console.log('Setting up mobile dropdown listeners');
 
     // Find ALL dropdown triggers, including those with href
     const allDropdownTriggers = document.querySelectorAll(
       '.nav-item-dropdown .nav-link[aria-haspopup="true"]'
     );
 
-    console.log('Found dropdown triggers:', allDropdownTriggers.length);
+    // console.log('Found dropdown triggers:', allDropdownTriggers.length);
 
     allDropdownTriggers.forEach(trigger => {
       const dropdown = trigger.nextElementSibling;
 
-      console.log(
+      /* console.log(
         'Processing trigger:',
         trigger.textContent.trim(),
         'has dropdown:',
         !!dropdown
-      );
+      ); */
 
       if (!dropdown) {
         return;
@@ -483,10 +483,10 @@ class SharedNavigation {
       const isMegaMenu = dropdown.classList.contains('mega-menu');
 
       if (isMegaMenu) {
-        console.log('Setting up categories mega menu for mobile');
+        // console.log('Setting up categories mega menu for mobile');
         trigger.addEventListener('click', e => {
           e.preventDefault(); // Prevent navigation in mobile
-          console.log('Categories mega menu clicked in mobile');
+          // console.log('Categories mega menu clicked in mobile');
 
           const isOpen = dropdown.classList.contains('open');
           if (isOpen) {
@@ -502,13 +502,13 @@ class SharedNavigation {
 
       // For regular dropdowns (Community, About)
       if (dropdown.classList.contains('dropdown-menu')) {
-        console.log(
+        /* console.log(
           'Setting up regular dropdown for:',
           trigger.textContent.trim()
-        );
+        ); */
         trigger.addEventListener('click', e => {
           e.preventDefault();
-          console.log('Dropdown clicked:', trigger.textContent.trim());
+          // console.log('Dropdown clicked:', trigger.textContent.trim());
 
           const isOpen = dropdown.classList.contains('open');
           console.log('Current state - isOpen:', isOpen);
@@ -987,8 +987,8 @@ class SharedNavigation {
       }
     }
 
-    // Otherwise navigate to categories page with hash
-    window.location.href = `categories.html#${category}`;
+    // Otherwise navigate to scenarios page with category filter
+    window.location.href = `scenarios.html?category=${category}`;
   }
 
   /**
@@ -1118,7 +1118,7 @@ class SharedNavigation {
                     <nav class="main-nav" role="navigation" aria-label="Main navigation">
                         <ul class="nav-list">
                             <li><a href="index.html" class="nav-link" data-page="home">Home</a></li>
-                            <li><a href="categories.html" class="nav-link" data-page="categories">Categories</a></li>
+                            <li><a href="scenarios.html" class="nav-link" data-page="scenarios">Scenarios</a></li>
                             <li><a href="blog.html" class="nav-link" data-page="blog">Blog</a></li>
                             <li><a href="profile.html" class="nav-link" data-page="profile">Profile</a></li>
                             <li><a href="donate.html" class="nav-link donate-btn" data-page="donate">💖 Donate</a></li>
@@ -1245,5 +1245,3 @@ if (document.readyState === 'loading') {
     );
   }
 }
-
-export default SharedNavigation;

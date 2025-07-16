@@ -673,9 +673,7 @@ class SVGRenderer {
     logger.error(`SVGRenderer Error: ${message}`, error);
 
     if (this.options.enableAccessibility && this.accessibilityManager) {
-      this.accessibilityManager.announceToScreenReader(
-        `Rendering error: ${message}`
-      );
+      this.accessibilityManager.announce(`Rendering error: ${message}`, true);
     }
   }
   // Enhanced SVG element creation and styling methods
