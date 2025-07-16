@@ -1,18 +1,35 @@
 /**
- * Firebase Cloud// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyAwoc3L-43aXyNjNB9ncGbFm7eE-yn5bFA",
-  authDomain: "simulateai-research.firebaseapp.com",
-  projectId: "simulateai-research",
-  storageBucket: "simulateai-research.firebasestorage.app",
-  messagingSenderId: "52924445915", // Crucial for FCM!
-  appId: "1:52924445915:web:dadca1a93bc382403a08fe",
-  measurementId: "G-XW8H062BMV"
-};Service
+ * Copyright 2025 Armando Sori
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Firebase Cloud Messaging Service
  * Handles push notifications for SimulateAI
  * Supports reply notifications, mentions, and new content alerts
  */
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: 'AIzaSyAwoc3L-43aXyNjNB9ncGbFm7eE-yn5bFA',
+  authDomain: 'simulateai-research.firebaseapp.com',
+  projectId: 'simulateai-research',
+  storageBucket: 'simulateai-research.firebasestorage.app',
+  messagingSenderId: '52924445915', // Crucial for FCM!
+  appId: '1:52924445915:web:dadca1a93bc382403a08fe',
+  measurementId: 'G-XW8H062BMV',
+};
 
 // Import the functions you need from the SDKs you want to use
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -123,7 +140,8 @@ class MessagingService {
     this.isSupported = false;
     this.currentUser = null;
 
-    this.init();
+    // Don't auto-initialize to prevent service duplication
+    // Call init() manually after construction
   }
 
   async init() {

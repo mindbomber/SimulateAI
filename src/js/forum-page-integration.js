@@ -4,8 +4,9 @@
  * Implements real-time threading, messaging, and community features
  */
 
-import { ForumService } from './services/forum-service.js';
-import { AuthService } from './services/auth-service.js';
+// Services loaded dynamically to prevent duplicate initializations
+// import { ForumService } from './services/forum-service.js';
+// import { AuthService } from './services/auth-service.js';
 import { showNotification } from './components/notification-toast.js';
 
 // Import Firebase service for messaging
@@ -35,8 +36,9 @@ const CONFIG = {
 
 class ForumPageIntegration {
   constructor() {
-    this.forumService = new ForumService();
-    this.authService = new AuthService();
+    // Services will be initialized lazily to prevent duplicates
+    this.forumService = null;
+    this.authService = null;
     this.currentUser = null;
     this.currentThreadId = null;
     this.listeners = new Map();

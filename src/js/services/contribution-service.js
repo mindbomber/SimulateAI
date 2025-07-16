@@ -1,10 +1,27 @@
 /**
+ * Copyright 2025 Armando Sori
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
  * Contribution Management Service
  * Handles blog and forum contributions with donation-based approval system
  */
 
-import FirebaseService from './firebase-service.js';
-import AuthService from './auth-service.js';
+import logger from '../utils/logger.js';
+
+// Services loaded dynamically to prevent circular dependencies
 
 class ContributionService {
   constructor() {
@@ -16,13 +33,34 @@ class ContributionService {
   async initialize() {
     if (this.initialized) return;
 
-    this.firebaseService = new FirebaseService();
-    this.authService = new AuthService();
+    // Use service manager to get existing service instances
+    try {
+      const { default: serviceManager } = await import('./service-manager.js');
 
-    await this.firebaseService.initialize();
-    await this.authService.initialize();
+      // Wait for services to be initialized
+      await serviceManager.initialize();
 
-    this.initialized = true;
+      // Get service references
+      this.firebaseService = serviceManager.getFirebaseService();
+      this.authService = serviceManager.getAuthService();
+
+      if (this.firebaseService && this.authService) {
+        this.initialized = true;
+      } else {
+        // Services not available - skip initialization
+        this.initialized = false;
+        logger.warn(
+          '⚠️ ContributionService: ServiceManager services not available, skipping initialization'
+        );
+      }
+    } catch (error) {
+      // ServiceManager failed - skip initialization to prevent duplicates
+      logger.warn(
+        '⚠️ ContributionService: ServiceManager failed, skipping initialization to prevent service duplication:',
+        error.message
+      );
+      this.initialized = false;
+    }
   }
 
   /**

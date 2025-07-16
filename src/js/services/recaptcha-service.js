@@ -42,7 +42,8 @@ export class RecaptchaService {
     this.siteKey = RECAPTCHA_CONFIG.SITE_KEY;
     this.loadingPromise = null;
 
-    this.init();
+    // Don't auto-initialize to prevent service duplication
+    // Call init() manually after construction
   }
 
   /**

@@ -3,15 +3,13 @@
  * Handles forum posts and replies with donation-based approval
  */
 
-import AuthService from '../services/auth-service.js';
-import FirebaseService from '../services/firebase-service.js';
-import ContributionService from '../services/contribution-service.js';
+// Services loaded dynamically to prevent circular dependencies
 
 class ForumIntegration {
   constructor() {
-    this.authService = new AuthService();
-    this.firebaseService = new FirebaseService();
-    this.contributionService = new ContributionService();
+    this.authService = null;
+    this.firebaseService = null;
+    this.contributionService = null;
     this.currentUser = null;
     this.discussions = [];
     this.initialized = false;
@@ -21,15 +19,45 @@ class ForumIntegration {
   async initialize() {
     if (this.initialized) return;
 
-    await this.authService.initialize();
-    await this.firebaseService.initialize();
-    await this.contributionService.initialize();
+    try {
+      // Use service manager to get existing service instances
+      const { default: serviceManager } = await import(
+        '../services/service-manager.js'
+      );
 
-    // Set up auth state listener
-    this.authService.firebaseService.addAuthStateListener(user => {
-      this.currentUser = user;
-      this.updateUIForAuth();
-    });
+      // Wait for services to be initialized
+      await serviceManager.initialize();
+
+      // Get service references
+      this.firebaseService = serviceManager.getFirebaseService();
+      this.authService = serviceManager.getAuthService();
+
+      // Get contribution service from ServiceManager
+      this.contributionService =
+        serviceManager.getService('contribution') || null;
+
+      // If not available, create but don't initialize to prevent duplication
+      if (!this.contributionService) {
+        const { default: ContributionService } = await import(
+          '../services/contribution-service.js'
+        );
+        this.contributionService = new ContributionService();
+        // Skip initialization - let ServiceManager handle it
+      }
+
+      if (!this.firebaseService || !this.authService) {
+        return; // Services not available
+      }
+
+      // Set up auth state listener
+      this.authService.firebaseService.addAuthStateListener(user => {
+        this.currentUser = user;
+        this.updateUIForAuth();
+      });
+    } catch (error) {
+      // Silent failure - forum integration not available
+      return;
+    }
 
     this.setupEventHandlers();
     await this.loadDiscussions();

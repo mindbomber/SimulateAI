@@ -58,7 +58,8 @@ export class SystemMetadataCollector {
     this.BATCH_SIZE = SYSTEM_CONSTANTS.BATCH_SIZE;
     this.BATCH_TIMEOUT_MS = SYSTEM_CONSTANTS.BATCH_TIMEOUT_MS;
 
-    this.init();
+    // Don't auto-initialize to prevent service duplication
+    // Call init() manually after construction
   }
 
   /**

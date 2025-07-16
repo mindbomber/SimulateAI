@@ -1,4 +1,20 @@
 /**
+ * Copyright 2025 Armando Sori
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
  * Firebase Service for SimulateAI Research Community
  * Handles authentication, database, and analytics
  */
@@ -277,7 +293,10 @@ export class FirebaseService {
   }
 
   /**
-   * Get
+   * Get recommended persistence mode based on device and environment
+   * @returns {Object} Recommendation with mode, reason, and optional autoSignOutMinutes
+   */
+  getRecommendedPersistence() {
     const isSharedComputer = this.detectSharedComputer();
 
     if (isSharedComputer) {
@@ -351,6 +370,7 @@ export class FirebaseService {
 
       // Initialize messaging service
       this.messaging = new MessagingService(this.app);
+      await this.messaging.init();
 
       // Initialize hybrid data service
       this.hybridData = new HybridDataService(this.app);

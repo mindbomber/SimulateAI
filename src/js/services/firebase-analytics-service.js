@@ -1,4 +1,20 @@
 /**
+ * Copyright 2025 Armando Sori
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
  * Firebase Analytics and Monitoring Service for SimulateAI
  * Real-time analytics, performance monitoring, and user insights
  */
@@ -105,6 +121,11 @@ export class FirebaseAnalyticsService {
     this.performance = getPerformance(firebaseApp);
     this.hybridData = hybridDataService;
 
+    // Check if we're in development mode
+    this.isDevelopmentMode =
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1';
+
     // Initialize internal state
     this.eventQueue = [];
     this.metricsCache = new Map();
@@ -116,10 +137,15 @@ export class FirebaseAnalyticsService {
       events: [],
     };
 
-    // Start background processes
+    // Start background processes only in production
     this.initializeMonitoring();
     this.startPerformanceTracking();
-    this.scheduleAnalyticsCollection();
+
+    // Only schedule analytics collection in production to prevent Firestore loops
+    if (!this.isDevelopmentMode) {
+      this.scheduleAnalyticsCollection();
+    }
+    // Analytics collection is disabled in development mode
   }
 
   /**
@@ -545,11 +571,13 @@ export class FirebaseAnalyticsService {
         },
       };
 
-      // Store daily summary
-      await setDoc(
-        doc(this.db, 'analytics_daily_summaries', summary.date),
-        summary
-      );
+      // Store daily summary only in production
+      if (!this.isDevelopmentMode) {
+        await setDoc(
+          doc(this.db, 'analytics_daily_summaries', summary.date),
+          summary
+        );
+      }
 
       return { success: true, summary };
     } catch (error) {
@@ -616,6 +644,11 @@ export class FirebaseAnalyticsService {
    */
 
   async storeEvent(event) {
+    // Skip Firestore writes in development mode
+    if (this.isDevelopmentMode) {
+      return;
+    }
+
     try {
       await addDoc(collection(this.db, 'analytics_events'), {
         ...event,
@@ -627,6 +660,11 @@ export class FirebaseAnalyticsService {
   }
 
   async storePerformanceMetric(metric) {
+    // Skip Firestore writes in development mode
+    if (this.isDevelopmentMode) {
+      return;
+    }
+
     try {
       await addDoc(collection(this.db, 'analytics_performance'), {
         ...metric,
@@ -638,6 +676,11 @@ export class FirebaseAnalyticsService {
   }
 
   async storeError(errorEvent) {
+    // Skip Firestore writes in development mode
+    if (this.isDevelopmentMode) {
+      return;
+    }
+
     try {
       await addDoc(collection(this.db, 'analytics_errors'), {
         ...errorEvent,
@@ -662,6 +705,12 @@ export class FirebaseAnalyticsService {
 
   async processEventQueue() {
     if (this.eventQueue.length === 0) return;
+
+    // Skip processing in development mode
+    if (this.isDevelopmentMode) {
+      this.eventQueue.length = 0; // Clear queue without processing
+      return;
+    }
 
     const eventsToProcess = this.eventQueue.splice(
       0,
@@ -862,7 +911,10 @@ export class FirebaseAnalyticsService {
       userAgent: navigator.userAgent,
     };
 
-    await addDoc(collection(this.db, 'analytics_usage_stats'), stats);
+    // Skip Firestore writes in development mode
+    if (!this.isDevelopmentMode) {
+      await addDoc(collection(this.db, 'analytics_usage_stats'), stats);
+    }
   }
 
   // Placeholder methods for aggregation calculations

@@ -58,7 +58,7 @@ import { getAllCategories, getCategoryScenarios } from '../data/categories.js';
 import MCPIntegrationManager from './integrations/mcp-integration-manager.js';
 
 // Community and Authentication Services
-import AuthService from './services/auth-service.js';
+// import AuthService from './services/auth-service.js'; // Now handled by ServiceManager
 
 // Constants for app configuration
 const APP_CONSTANTS = {
@@ -572,7 +572,8 @@ class AIEthicsApp {
 
     // Global error handlers
     window.addEventListener('error', event => {
-      this.handleError(event.error, 'A JavaScript error occurred');
+      const error = event.error || event.message || event;
+      this.handleError(error, 'A JavaScript error occurred');
     });
 
     window.addEventListener('unhandledrejection', event => {
@@ -589,10 +590,22 @@ class AIEthicsApp {
     this.lastError = error;
     AppDebug.error('App Error:', error);
 
+    // Safely extract error message
+    let errorMessage = 'Unknown error';
+    if (error && typeof error === 'object') {
+      errorMessage =
+        error.message || error.toString() || 'Error object without message';
+    } else if (typeof error === 'string') {
+      errorMessage = error;
+    } else if (error) {
+      errorMessage = String(error);
+    }
+
     // Track error for analytics
     simpleAnalytics.trackEvent('app_error', {
-      error_message: error.message || String(error),
-      error_stack: error.stack,
+      error_message: errorMessage,
+      error_stack:
+        error && error.stack ? error.stack : 'No stack trace available',
       user_agent: navigator.userAgent,
       timestamp: new Date().toISOString(),
     });
@@ -2035,11 +2048,11 @@ class AIEthicsApp {
     const surpriseMeBtn = document.getElementById('surprise-me-nav');
     if (surpriseMeBtn) {
       // Just verify the button exists for debugging
-      logger.debug(
+      AppDebug.log(
         'Surprise Me button found - handled by shared navigation component'
       );
     } else {
-      logger.warn('Surprise Me button not found in DOM');
+      AppDebug.warn('Surprise Me button not found in DOM');
     }
   }
 
@@ -2542,37 +2555,48 @@ class AIEthicsApp {
     try {
       AppDebug.log('Initializing Firebase services...');
 
-      // Initialize Authentication Service
-      this.authService = new AuthService();
-      const authInitialized = await this.authService.initialize();
+      // Import service manager to prevent duplicate initializations
+      const { default: serviceManager } = await import(
+        './services/service-manager.js'
+      );
 
-      if (authInitialized) {
-        AppDebug.log('Authentication service initialized successfully');
+      // Initialize services through service manager
+      const servicesInitialized = await serviceManager.initialize();
 
-        // Make auth service globally accessible for Firestore logging
-        window.authService = this.authService;
+      if (servicesInitialized) {
+        AppDebug.log(
+          'Services initialized successfully through ServiceManager'
+        );
 
-        // Get Firebase service reference for other components
-        this.firebaseService = this.authService.firebaseService;
+        // Get service references
+        this.authService = serviceManager.getAuthService();
+        this.firebaseService = serviceManager.getFirebaseService();
 
-        // Connect system metadata collector to Firebase
-        if (this.systemCollector && this.firebaseService) {
-          this.systemCollector = getSystemCollector(this.firebaseService);
-          AppDebug.log(
-            'System metadata collector connected to Firebase for analytics storage'
-          );
+        if (this.authService && this.firebaseService) {
+          // Make auth service globally accessible for Firestore logging
+          window.authService = this.authService;
+
+          // Connect system metadata collector to Firebase
+          if (this.systemCollector && this.firebaseService) {
+            this.systemCollector = getSystemCollector(this.firebaseService);
+            AppDebug.log(
+              'System metadata collector connected to Firebase for analytics storage'
+            );
+          }
+
+          // Set up authentication state listener (Firebase best practice)
+          this.setupAuthStateListener();
+
+          // Set up research data logging integration
+          this.setupResearchDataIntegration();
+
+          // Update UI for current auth state
+          this.updateUIForAuthState();
+        } else {
+          AppDebug.warn('Failed to get service references from ServiceManager');
         }
-
-        // Set up authentication state listener (Firebase best practice)
-        this.setupAuthStateListener();
-
-        // Set up research data logging integration
-        this.setupResearchDataIntegration();
-
-        // Update UI for current auth state
-        this.updateUIForAuthState();
       } else {
-        AppDebug.warn('Authentication service initialization failed');
+        AppDebug.warn('ServiceManager initialization failed');
       }
     } catch (error) {
       AppDebug.error('Failed to initialize Firebase services:', error);
@@ -3135,10 +3159,10 @@ document.addEventListener('DOMContentLoaded', () => {
  * Fallback for script loading issues
  */
 window.addEventListener('error', event => {
-  AppDebug.error('Error occurred:', event.message);
-  alert(
-    'An error occurred while loading the application. Please try again later.'
-  );
+  const errorMessage =
+    event.message || event.error?.message || 'Unknown error occurred';
+  AppDebug.error('Error occurred:', errorMessage);
+  AppDebug.error('Event details:', event);
 });
 
 // Initialize the application
