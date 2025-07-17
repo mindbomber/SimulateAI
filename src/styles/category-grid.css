@@ -20,7 +20,452 @@
  * Part of the SimulateAI Ethics Platform Revamp - Phase 1.1
  */
 
-/* Main Container - Category grid styles (supports both legacy and new class names) */
+/* View Toggle Controls */
+.view-toggle-controls {
+  display: flex;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-6);
+  justify-content: center;
+  align-items: center;
+  background: var(--color-gray-100);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-1);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.view-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-4);
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-base);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-600);
+  white-space: nowrap;
+}
+
+.view-toggle-btn:hover {
+  background: var(--color-white);
+  color: var(--color-gray-800);
+  box-shadow: var(--shadow-sm);
+}
+
+.view-toggle-btn.active {
+  background: var(--color-white);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.view-toggle-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.toggle-icon {
+  font-size: var(--font-size-base);
+  line-height: 1;
+}
+
+.toggle-text {
+  line-height: 1;
+}
+
+.keyboard-hint {
+  display: flex;
+  align-items: center;
+  margin-left: var(--spacing-4);
+  padding: var(--spacing-2) var(--spacing-3);
+  background: var(--color-gray-50);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-base);
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+  cursor: help;
+}
+
+.keyboard-hint .hint-text {
+  line-height: 1;
+}
+
+.keyboard-hint kbd {
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-300);
+  border-radius: 3px;
+  padding: 2px 6px;
+  margin: 0 2px;
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-gray-700);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile view toggle adjustments */
+@media (max-width: 768px) {
+  .view-toggle-controls {
+    margin-top: var(--spacing-4);
+  }
+
+  .view-toggle-btn {
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-xs);
+  }
+
+  .toggle-icon {
+    font-size: var(--font-size-sm);
+  }
+
+  .toggle-text {
+    display: none;
+  }
+
+  .keyboard-hint {
+    display: none;
+  }
+}
+
+/* View Content Container */
+.view-content {
+  transition: opacity var(--transition-base);
+}
+
+.view-content:not(.active) {
+  display: none;
+}
+
+/* Scenarios Grid View (Individual scenario cards) */
+.scenarios-grid[data-view='scenario'] {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--spacing-6);
+  padding: var(--spacing-6) var(--spacing-8);
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.scenario-count {
+  grid-column: 1 / -1;
+  text-align: center;
+  margin-bottom: var(--spacing-4);
+  padding: var(--spacing-3);
+  background: var(--color-gray-50);
+  border-radius: var(--radius-base);
+  border: 1px solid var(--color-gray-200);
+}
+
+.scenario-count .count-text {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+  font-weight: var(--font-weight-medium);
+}
+
+.scenario-count .count-number {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+@media (max-width: 768px) {
+  .scenarios-grid[data-view='scenario'] {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-4);
+    padding: var(--spacing-4) var(--spacing-6);
+  }
+
+  .scenario-count {
+    margin-bottom: var(--spacing-3);
+    padding: var(--spacing-2);
+  }
+}
+
+@media (min-width: 1200px) {
+  .scenarios-grid[data-view='scenario'] {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-8);
+    padding: var(--spacing-8) var(--spacing-10);
+  }
+}
+
+/* Ensure scenario cards in grid view have consistent styling */
+.scenarios-grid[data-view='scenario'] .scenario-card {
+  max-width: none;
+  width: 100%;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 0; /* Remove default padding, content will have its own padding */
+  cursor: pointer; /* Ensure clickable cards have pointer cursor */
+}
+
+/* Standardize scenario card content layout in scenario view */
+.scenarios-grid[data-view='scenario'] .scenario-card .scenario-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-4);
+  box-sizing: border-box;
+}
+
+.scenarios-grid[data-view='scenario'] .scenario-card .scenario-title {
+  margin-bottom: var(--spacing-3);
+  line-height: 1.3;
+  min-height: 2.6em; /* Ensure consistent title height for 2 lines */
+}
+
+.scenarios-grid[data-view='scenario'] .scenario-card .scenario-description {
+  flex: 1;
+  margin-bottom: var(--spacing-4);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+  min-height: 4.2em; /* Ensure consistent description height for 3 lines */
+}
+
+.scenarios-grid[data-view='scenario'] .scenario-card .scenario-footer {
+  margin-top: auto;
+  padding-top: var(--spacing-2);
+}
+
+/* Scenario Card Wrapper for Hover Category Headers */
+.scenario-card-wrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  cursor: pointer; /* Ensure proper cursor for clickable cards */
+}
+
+/* Hover Category Header */
+.scenario-hover-category-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--color-gray-200);
+  border-bottom: none;
+  transform: translateY(-100%);
+  opacity: 0;
+  transition:
+    transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    opacity 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+    box-shadow 0.3s ease-out;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* Show category header on hover */
+.scenario-card-wrapper:hover .scenario-hover-category-header,
+.scenario-card-wrapper:focus-within .scenario-hover-category-header {
+  transform: translateY(0);
+  opacity: 1;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  pointer-events: auto;
+}
+
+/* Touch device support - using media query for touch capability */
+@media (hover: none) and (pointer: coarse) {
+  /* For touch devices, show on tap and maintain visibility longer */
+  .scenario-card-wrapper:active .scenario-hover-category-header,
+  .scenario-card-wrapper:focus .scenario-hover-category-header {
+    transform: translateY(0);
+    opacity: 1;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    pointer-events: auto;
+  }
+}
+
+/* Add subtle scale effect on wrapper hover for enhanced feedback */
+.scenario-card-wrapper:hover {
+  transform: translateY(-2px);
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Smooth transition back when hover ends */
+.scenario-card-wrapper {
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Adjust category header content for hover overlay */
+.scenario-hover-category-header .category-header {
+  padding: var(--spacing-4) var(--spacing-5);
+  border-bottom: 1px solid var(--color-gray-200);
+  transform: translateY(10px);
+  opacity: 0;
+  transition:
+    transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) 0.1s,
+    opacity 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) 0.1s;
+}
+
+/* Animate content when header is visible */
+.scenario-card-wrapper:hover .scenario-hover-category-header .category-header,
+.scenario-card-wrapper:focus-within
+  .scenario-hover-category-header
+  .category-header {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Smaller header for hover overlay */
+.scenario-hover-category-header .category-title-group {
+  gap: var(--spacing-3);
+}
+
+.scenario-hover-category-header .category-icon-large {
+  width: 48px;
+  height: 48px;
+  font-size: 24px;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.scenario-hover-category-header .category-title {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-1);
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.scenario-hover-category-header .category-description {
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Subtle hover effects on individual elements */
+.scenario-card-wrapper:hover
+  .scenario-hover-category-header
+  .category-icon-large {
+  transform: scale(1.05);
+}
+
+/* Adjust progress ring for hover overlay */
+.scenario-hover-category-header .category-progress-container {
+  flex-shrink: 0;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.scenario-hover-category-header .progress-ring {
+  width: 56px;
+  height: 56px;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.scenario-hover-category-header .progress-text {
+  font-size: var(--font-size-xs);
+}
+
+/* Subtle scale effect on progress ring */
+.scenario-card-wrapper:hover .scenario-hover-category-header .progress-ring {
+  transform: scale(1.02);
+}
+
+/* Dark theme support for hover headers */
+[data-theme='dark'] .scenario-hover-category-header {
+  background: rgba(17, 24, 39, 0.98);
+  border-color: var(--color-gray-700);
+}
+
+[data-theme='dark'] .scenario-hover-category-header .category-header {
+  border-bottom-color: var(--color-gray-700);
+}
+
+/* Performance optimizations */
+.scenario-card-wrapper {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.scenario-hover-category-header {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+/* Mobile adjustments for hover headers */
+@media (max-width: 768px) {
+  /* On mobile, optimize for touch interactions */
+  .scenario-card-wrapper:hover {
+    transform: none; /* Remove lift effect on mobile for better touch experience */
+  }
+
+  .scenario-hover-category-header {
+    /* Faster animation on mobile */
+    transition:
+      transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+      opacity 0.2s cubic-bezier(0.25, 0.8, 0.25, 1),
+      box-shadow 0.2s ease-out;
+  }
+
+  .scenario-hover-category-header .category-header {
+    transition:
+      transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) 0.05s,
+      opacity 0.2s cubic-bezier(0.25, 0.8, 0.25, 1) 0.05s;
+  }
+
+  /* Show on hover AND touch/active state */
+  .scenario-card-wrapper:hover .scenario-hover-category-header,
+  .scenario-card-wrapper:active .scenario-hover-category-header,
+  .scenario-card-wrapper:focus-within .scenario-hover-category-header {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .scenario-card-wrapper:hover .scenario-hover-category-header .category-header,
+  .scenario-card-wrapper:active
+    .scenario-hover-category-header
+    .category-header,
+  .scenario-card-wrapper:focus-within
+    .scenario-hover-category-header
+    .category-header {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  /* Reduce padding on mobile */
+  .scenario-hover-category-header .category-header {
+    padding: var(--spacing-3) var(--spacing-4);
+  }
+
+  .scenario-hover-category-header .category-icon-large {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .scenario-hover-category-header .progress-ring {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .scenario-card-wrapper,
+  .scenario-hover-category-header,
+  .scenario-hover-category-header .category-header,
+  .scenario-hover-category-header .category-icon-large,
+  .scenario-hover-category-header .category-title,
+  .scenario-hover-category-header .category-description,
+  .scenario-hover-category-header .category-progress-container,
+  .scenario-hover-category-header .progress-ring {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+} /* Main Container - Category grid styles (supports both legacy and new class names) */
 .categories-grid,
 .simulations-grid {
   display: flex;
@@ -308,13 +753,13 @@
   0%,
   100% {
     text-shadow: 0 0 4px var(--progress-pulse-light, var(--color-accent-300));
-    color: var(--progress-pulse-color, var(--color-accent-600));
+    color: var(--progress-pulse-color, var, --color-accent-600);
   }
   50% {
     text-shadow:
-      0 0 8px var(--progress-pulse-color, var(--color-accent-400)),
-      0 0 12px var(--progress-pulse-light, var(--color-accent-300));
-    color: var(--progress-pulse-dark, var(--color-accent-700));
+      0 0 8px var(--progress-pulse-color, var, --color-accent-400),
+      0 0 12px var(--progress-pulse-light, var, --color-accent-300);
+    color: var(--progress-pulse-dark, var, --color-accent-700);
   }
 }
 
@@ -325,22 +770,22 @@
 [data-theme='dark']
   .category-progress-ring.pulse-for-badge
   .progress-percentage {
-  color: var(--progress-pulse-color, var(--color-accent-400));
-  text-shadow: 0 0 6px var(--progress-pulse-color, var(--color-accent-400));
+  color: var(--progress-pulse-color, var, --color-accent-400);
+  text-shadow: 0 0 6px var(--progress-pulse-color, var, --color-accent-400);
   animation: text-glow-dark-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @keyframes text-glow-dark-fluid {
   0%,
   100% {
-    text-shadow: 0 0 6px var(--progress-pulse-color, var(--color-accent-400));
-    color: var(--progress-pulse-color, var(--color-accent-400));
+    text-shadow: 0 0 6px var(--progress-pulse-color, var, --color-accent-400);
+    color: var(--progress-pulse-color, var, --color-accent-400);
   }
   50% {
     text-shadow:
-      0 0 10px var(--progress-pulse-light, var(--color-accent-300)),
-      0 0 16px var(--progress-pulse-color, var(--color-accent-400));
-    color: var(--progress-pulse-light, var(--color-accent-300));
+      0 0 10px var(--progress-pulse-light, var, --color-accent-300),
+      0 0 16px var(--progress-pulse-color, var, --color-accent-400);
+    color: var(--progress-pulse-light, var, --color-accent-300);
   }
 }
 
@@ -348,7 +793,7 @@
 .category-progress-ring.pulse-for-badge {
   animation: badge-pulse-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   filter: drop-shadow(
-    0 0 8px var(--progress-pulse-color, var(--color-accent-400))
+    0 0 8px var(--progress-pulse-color, var, --color-accent-400)
   );
 }
 
@@ -364,7 +809,7 @@
   animation: badge-pulse-ring-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite
     0.2s;
   z-index: 0;
-  box-shadow: 0 0 12px var(--progress-pulse-color, var(--color-accent-400));
+  box-shadow: 0 0 12px var(--progress-pulse-color, var, --color-accent-400);
 }
 
 .category-progress-ring.pulse-for-badge::after {
@@ -374,7 +819,7 @@
   left: -12px;
   right: -12px;
   bottom: -12px;
-  border: 2px solid var(--progress-pulse-light, var(--color-accent-300));
+  border: 2px solid var(--progress-pulse-light, var, --color-accent-300);
   border-radius: 50%;
   animation: badge-pulse-outer-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite
     0.4s;
@@ -604,18 +1049,30 @@
   will-change: scroll-position;
 
   /* Enhanced cursor behavior for horizontal scrolling */
-  cursor: grab;
+  cursor: default !important; /* Force default cursor to override any grab cursor */
 
   /* Custom scrollbar styling */
   scrollbar-width: thin;
   scrollbar-color: var(--color-gray-300) transparent;
 }
 
-/* Enhanced states for scenarios grid */
-.scenarios-grid:hover {
-  cursor: grab;
+/* Force cursor on all children as well */
+.scenarios-grid * {
+  cursor: inherit !important;
 }
 
+/* But allow scenario cards to have pointer cursor */
+.scenarios-grid .scenario-card,
+.scenarios-grid .scenario-card-wrapper {
+  cursor: pointer !important;
+}
+
+/* Enhanced states for scenarios grid */
+.scenarios-grid:hover {
+  cursor: default !important; /* Force default cursor on hover */
+}
+
+/* Remove grab cursor entirely - only show when actively scrolling */
 .scenarios-grid:active {
   cursor: grabbing;
 }
@@ -799,16 +1256,7 @@
   scroll-snap-stop: always;
 }
 
-.category-section .scenario-card:hover,
-.category-section .scenario-card:focus,
-.simulations-grid .scenario-card:hover,
-.simulations-grid .scenario-card:focus {
-  box-shadow: var(--shadow-md);
-  border-color: var(--color-primary);
-  outline: none;
-  transform: translateY(-2px);
-}
-
+/* Remove hover effects from entire scenario card since only buttons should be interactive */
 .category-section .scenario-card:focus-visible,
 .simulations-grid .scenario-card:focus-visible {
   outline: 2px solid var(--color-primary);
@@ -826,11 +1274,7 @@
   border-color: var(--color-gray-600);
 }
 
-[data-theme='dark'] .scenario-card:hover,
-[data-theme='dark'] .scenario-card:focus {
-  border-color: var(--color-primary);
-}
-
+/* Remove dark theme hover effects from entire scenario card */
 [data-theme='dark'] .scenario-card.completed {
   border-color: var(--color-green-600);
   background: var(--color-green-900);
@@ -1328,5 +1772,511 @@
   100% {
     transform: translate(-50%, -50%) scale(1.4);
     opacity: 0;
+  }
+}
+
+/* Scenario Controls Toolbar */
+.scenario-controls-toolbar {
+  display: none; /* Hidden by default, shown only in scenario view */
+  align-items: center;
+  gap: var(--spacing-4);
+  padding: var(--spacing-4) 0 var(--spacing-6) 0;
+  margin-bottom: var(--spacing-2);
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.scenarios-grid[data-view='scenario'] .scenario-controls-toolbar {
+  display: flex;
+}
+
+/* Search Container */
+.search-container {
+  position: relative; /* Required for autocomplete dropdown positioning */
+  flex: 1;
+  max-width: 100%; /* Full width by default on small screens */
+}
+
+/* COMPLETE OVERRIDE: Force search input to proper width on larger screens */
+@media (min-width: 769px) {
+  /* Override at the toolbar level */
+  .scenarios-grid[data-view='scenario'] .scenario-controls-toolbar {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  /* Force search container to expand */
+  .scenarios-grid[data-view='scenario']
+    .scenario-controls-toolbar
+    .search-container {
+    flex: 1 !important;
+    min-width: 250px !important;
+    max-width: 450px !important;
+    width: 100% !important;
+  }
+
+  /* Force input wrapper to expand */
+  .scenarios-grid[data-view='scenario']
+    .scenario-controls-toolbar
+    .search-input-wrapper {
+    width: 100% !important;
+    min-width: 250px !important;
+    flex: 1 !important;
+    flex-grow: 1 !important;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Force the actual input to expand */
+  .scenarios-grid[data-view='scenario']
+    .scenario-controls-toolbar
+    .search-input {
+    width: 100% !important;
+    min-width: 250px !important;
+    flex: 1 !important;
+    flex-grow: 1 !important;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
+    max-width: none !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .scenarios-grid[data-view='scenario']
+    .scenario-controls-toolbar
+    .search-container {
+    min-width: 300px !important;
+    max-width: 550px !important;
+  }
+
+  .scenarios-grid[data-view='scenario']
+    .scenario-controls-toolbar
+    .search-input-wrapper {
+    min-width: 300px !important;
+  }
+
+  .scenarios-grid[data-view='scenario']
+    .scenario-controls-toolbar
+    .search-input {
+    min-width: 300px !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .scenarios-grid[data-view='scenario']
+    .scenario-controls-toolbar
+    .search-container {
+    min-width: 350px !important;
+    max-width: 650px !important;
+  }
+
+  .scenarios-grid[data-view='scenario']
+    .scenario-controls-toolbar
+    .search-input-wrapper {
+    min-width: 350px !important;
+  }
+
+  .scenarios-grid[data-view='scenario']
+    .scenario-controls-toolbar
+    .search-input {
+    min-width: 350px !important;
+  }
+}
+
+/* Search Input Styles */
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: var(--spacing-3);
+  width: 18px;
+  height: 18px;
+  color: var(--color-gray-400);
+  z-index: 2;
+  pointer-events: none; /* Prevent icon from blocking text input */
+}
+
+.search-input {
+  width: 100%;
+  padding: var(--spacing-3) var(--spacing-10) var(--spacing-3) 2.75rem; /* Increased left padding to avoid icon overlap */
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  background: var(--color-white);
+  transition: all var(--transition-base);
+  box-sizing: border-box;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.search-input::placeholder {
+  color: var(--color-gray-500);
+}
+
+.search-clear {
+  position: absolute;
+  right: var(--spacing-3);
+  width: 18px;
+  height: 18px;
+  color: var(--color-gray-400);
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-base);
+  z-index: 2;
+}
+
+.search-clear:hover {
+  color: var(--color-gray-600);
+  background: var(--color-gray-100);
+}
+
+/* Controls Group */
+.controls-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+/* Filter and Sort Containers */
+.filter-container,
+.sort-container {
+  position: relative;
+}
+
+/* Filter and Sort Buttons */
+.filter-btn,
+.sort-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-4); /* Increased horizontal padding for wider buttons */
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  color: var(--color-gray-700);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+}
+
+.filter-btn:hover,
+.sort-btn:hover {
+  border-color: var(--color-gray-400);
+  background: var(--color-gray-50);
+}
+
+.filter-btn:focus,
+.sort-btn:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.filter-btn[aria-expanded='true'],
+.sort-btn[aria-expanded='true'] {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+/* Button Icons */
+.filter-icon,
+.sort-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--color-gray-500);
+  transition: color var(--transition-fast); /* Remove transform transition */
+}
+
+/* Remove rotation when expanded - icons should stay static */
+.filter-btn[aria-expanded='true'] .filter-icon,
+.sort-btn[aria-expanded='true'] .sort-icon {
+  color: var(--color-primary); /* Just change color instead of rotating */
+}
+
+/* Dropdown Menus */
+.filter-dropdown,
+.sort-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 200px;
+  z-index: 100;
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  max-height: 300px;
+  overflow-y: auto;
+  display: none;
+  animation: dropdownFadeIn var(--transition-fast) ease-out;
+}
+
+.filter-btn[aria-expanded='true'] + .filter-dropdown,
+.sort-btn[aria-expanded='true'] + .sort-dropdown {
+  display: block;
+}
+
+/* Dropdown Options */
+.filter-option,
+.sort-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-2) var(--spacing-3);
+  cursor: pointer;
+  border-bottom: 1px solid var(--color-gray-100);
+  transition: background-color var(--transition-fast);
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  width: 100%;
+  text-align: left;
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-700);
+}
+
+.filter-option:last-child,
+.sort-option:last-child {
+  border-bottom: none;
+}
+
+.filter-option:hover,
+.sort-option:hover {
+  background-color: var(--color-gray-50);
+}
+
+.filter-option.active,
+.sort-option.active {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary-dark);
+}
+
+.filter-option .option-text,
+.sort-option .option-text {
+  flex: 1;
+}
+
+.filter-option .check-icon,
+.sort-option .check-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--color-primary);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.filter-option.active .check-icon,
+.sort-option.active .check-icon {
+  opacity: 1;
+}
+
+/* Search Autocomplete Dropdown */
+.search-autocomplete-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  max-height: 320px;
+  overflow-y: auto;
+  animation: dropdownFadeIn var(--transition-fast) ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.autocomplete-section {
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.autocomplete-section:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-section-header {
+  padding: var(--spacing-2) var(--spacing-3);
+  background: var(--color-gray-50);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.autocomplete-item {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-2) var(--spacing-3);
+  cursor: pointer;
+  border-bottom: 1px solid var(--color-gray-100);
+  transition: background-color var(--transition-fast);
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.focused {
+  background-color: var(--color-primary-light);
+}
+
+.autocomplete-item-icon {
+  margin-right: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  width: 20px;
+  text-align: center;
+}
+
+.autocomplete-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.autocomplete-item-title {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-900);
+  margin-bottom: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.autocomplete-item-meta {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.autocomplete-item-tag {
+  background: var(--color-gray-100);
+  color: var(--color-gray-700);
+  padding: 2px var(--spacing-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  margin-right: var(--spacing-1);
+  display: inline-block;
+}
+
+.autocomplete-no-results {
+  padding: var(--spacing-4) var(--spacing-3);
+  text-align: center;
+  color: var(--color-gray-500);
+  font-size: var(--font-size-sm);
+}
+
+/* Highlight matching text */
+.autocomplete-highlight {
+  background-color: var(--color-yellow-200);
+  font-weight: var(--font-weight-semibold);
+  padding: 1px 2px;
+  border-radius: 2px;
+}
+
+/* Mobile responsive styles for search autocomplete */
+@media (max-width: 768px) {
+  .search-autocomplete-dropdown {
+    max-height: 250px; /* Reduce height on mobile */
+  }
+
+  .autocomplete-item {
+    padding: var(--spacing-3);
+  }
+
+  .autocomplete-item-title {
+    font-size: var(--font-size-sm);
+  }
+
+  .autocomplete-item-meta {
+    font-size: var(--font-size-xs);
+  }
+}
+
+/* Mobile responsive layout for search toolbar */
+@media (max-width: 768px) {
+  /* Stack search and controls vertically on mobile */
+  .scenarios-grid[data-view='scenario'] .scenario-controls-toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: var(--spacing-3) !important;
+    padding: var(--spacing-3) 0 var(--spacing-4) 0 !important;
+  }
+
+  /* Search container takes full width on mobile */
+  .scenarios-grid[data-view='scenario']
+    .scenario-controls-toolbar
+    .search-container {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    order: 1 !important; /* Search appears first */
+    margin-bottom: var(--spacing-2) !important;
+  }
+
+  /* Controls group appears below search */
+  .scenarios-grid[data-view='scenario']
+    .scenario-controls-toolbar
+    .controls-group {
+    width: 100% !important;
+    justify-content: center !important;
+    order: 2 !important; /* Controls appear second */
+    gap: var(--spacing-4) !important;
+  }
+
+  /* Mobile search input adjustments */
+  .scenarios-grid[data-view='scenario']
+    .scenario-controls-toolbar
+    .search-input-wrapper {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .scenarios-grid[data-view='scenario']
+    .scenario-controls-toolbar
+    .search-input {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 16px !important; /* Prevent zoom on iOS */
+  }
+}
+
+/* Extra small mobile adjustments */
+@media (max-width: 480px) {
+  .scenarios-grid[data-view='scenario'] .scenario-controls-toolbar {
+    padding: var(--spacing-2) 0 var(--spacing-3) 0 !important;
+  }
+
+  .scenarios-grid[data-view='scenario']
+    .scenario-controls-toolbar
+    .controls-group {
+    flex-wrap: wrap !important;
+    justify-content: space-around !important;
   }
 }

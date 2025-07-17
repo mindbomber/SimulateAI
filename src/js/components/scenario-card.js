@@ -41,8 +41,6 @@ class ScenarioCard {
       <article class="scenario-card ${isCompleted ? 'completed' : ''}" 
                data-scenario-id="${scenario.id}" 
                data-category-id="${safeCategory.id}"
-               role="button" 
-               tabindex="0"
                aria-label="Scenario: ${scenario.title} - ${scenario.difficulty} difficulty">
           
           <div class="scenario-header">
@@ -97,7 +95,7 @@ class ScenarioCard {
     if (scenario.categoryId && enhancedCategories?.[scenario.categoryId]) {
       category = enhancedCategories[scenario.categoryId];
     } else if (scenario.category && typeof scenario.category === 'object') {
-      category = scenario.category;
+      ({ category } = { category: scenario.category });
     } else if (scenario.categoryId && getCategoriesFunction) {
       // Fallback: try to find category by ID
       const allCategories = getCategoriesFunction();
