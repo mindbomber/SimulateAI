@@ -243,7 +243,7 @@
     <div class="container">
       <h1>🚀 Complete Firebase Integration</h1>
       <p style="text-align: center; font-size: 18px; color: #7f8c8d">
-        User Profiles + Blog Posts + Forum Posts with File Storage Integration
+        User Profiles + Blog Posts + Comments with File Storage Integration
       </p>
 
       <!-- Architecture Overview -->
@@ -301,14 +301,14 @@
         </div>
 
         <div class="flow-step">
-          <h3>3. 💬 Forum Post with Attachments</h3>
+          <h3>3. 💬 Blog Comments with Attachments</h3>
           <p>
-            <strong>Process:</strong> Forum content → File attachments → Storage
-            → Real-time forum features
+            <strong>Process:</strong> Comment content → File attachments →
+            Storage → Real-time comment features
           </p>
           <p>
-            <strong>Result:</strong> Forum post with file attachments, real-time
-            updates, and structured relationships
+            <strong>Result:</strong> Blog comments with file attachments,
+            real-time updates, and structured relationships
           </p>
         </div>
       </div>
@@ -411,33 +411,33 @@ As artificial intelligence becomes increasingly prevalent in medical diagnosis, 
           </button>
         </div>
 
-        <!-- Forum Creation Demo -->
+        <!-- Comment Creation Demo -->
         <div class="demo-card forum">
-          <h3>💬 Create Forum Post with Attachments</h3>
+          <h3>💬 Add Comment with Attachments</h3>
 
           <div class="form-group">
-            <label>Post Title:</label>
+            <label>Blog Post ID:</label>
             <input
               type="text"
               id="forumTitle"
-              placeholder="Discussion topic..."
-              value="Best Practices for AI Ethics Research"
+              placeholder="Post ID..."
+              value="ai-ethics-best-practices-2025"
             />
           </div>
 
           <div class="form-group">
-            <label>Content:</label>
-            <textarea id="forumContent" placeholder="Start a discussion...">
-I'm conducting research on AI ethics frameworks and would love to hear your thoughts on current best practices. What methodologies have you found most effective for evaluating ethical implications in AI systems? I've attached some relevant papers for reference.</textarea
+            <label>Comment:</label>
+            <textarea id="forumContent" placeholder="Share your thoughts...">
+Great article! I've been working on similar research and have found that incorporating diverse stakeholder perspectives early in the design process leads to more robust ethical frameworks. I've attached a case study that demonstrates this approach in practice.</textarea
             >
           </div>
 
           <div class="form-group">
-            <label>Category:</label>
+            <label>Comment Type:</label>
             <select id="forumCategory">
-              <option value="research_discussion">Research Discussion</option>
-              <option value="case_studies">Case Studies</option>
-              <option value="methodology">Methodology</option>
+              <option value="general_comment">General Comment</option>
+              <option value="question">Question</option>
+              <option value="additional_resource">Additional Resource</option>
             </select>
           </div>
 
@@ -452,8 +452,8 @@ I'm conducting research on AI ethics frameworks and would love to hear your thou
             />
           </div>
 
-          <button class="btn forum" onclick="createForumWithAttachments()">
-            Create Forum Post with Attachments
+          <button class="btn forum" onclick="createCommentWithAttachments()">
+            Add Comment with Attachments
           </button>
         </div>
       </div>
@@ -508,7 +508,7 @@ I'm conducting research on AI ethics frameworks and would love to hear your thou
       // Make functions globally available
       window.createUserWithProfile = createUserWithProfile;
       window.createBlogWithImages = createBlogWithImages;
-      window.createForumWithAttachments = createForumWithAttachments;
+      window.createCommentWithAttachments = createCommentWithAttachments;
 
       // Demo Functions
       async function createUserWithProfile() {
@@ -610,54 +610,51 @@ I'm conducting research on AI ethics frameworks and would love to hear your thou
         }
       }
 
-      async function createForumWithAttachments() {
-        const title = document.getElementById('forumTitle').value;
+      async function createCommentWithAttachments() {
+        const postId = document.getElementById('forumTitle').value;
         const content = document.getElementById('forumContent').value;
-        const category = document.getElementById('forumCategory').value;
+        const commentType = document.getElementById('forumCategory').value;
         const attachmentFiles = Array.from(
           document.getElementById('forumAttachments').files
         );
 
-        if (!title || !content) {
-          showStatus('Please fill in title and content', 'error');
+        if (!postId || !content) {
+          showStatus('Please fill in post ID and comment content', 'error');
           return;
         }
 
         try {
-          showStatus('Creating forum post with attachments...', 'info');
+          showStatus('Adding comment with attachments...', 'info');
 
-          const postData = {
-            id: `post_${Date.now()}`,
-            title: title,
+          const commentData = {
+            id: `comment_${Date.now()}`,
+            postId: postId,
             content: content,
             authorId: `user_${Math.floor(Date.now() / 1000)}`,
-            categoryId: category,
-            tags: ['discussion', 'research', 'ethics'],
+            commentType: commentType,
+            parentCommentId: null, // Top-level comment
             createdAt: new Date(),
           };
 
-          const result = await hybridData.createForumPostWithAttachments(
-            postData,
+          const result = await hybridData.createBlogCommentWithAttachments(
+            commentData,
             attachmentFiles
           );
 
           if (result.success) {
             showStatus(
-              `✅ Forum post created with ${result.uploadedAttachments.length} attachments!`,
+              `✅ Comment added with ${result.uploadedAttachments.length} attachments!`,
               'success'
             );
-            showResults('Forum Creation', {
-              postData,
+            showResults('Comment Creation', {
+              commentData,
               firestoreCreated: result.firestore,
               dataConnectCreated: result.dataConnect,
               attachmentsUploaded: result.uploadedAttachments.length,
               attachmentDetails: result.uploadedAttachments,
             });
           } else {
-            showStatus(
-              `❌ Forum post creation failed: ${result.error}`,
-              'error'
-            );
+            showStatus(`❌ Comment creation failed: ${result.error}`, 'error');
           }
         } catch (error) {
           showStatus(`❌ Error: ${error.message}`, 'error');
@@ -700,7 +697,7 @@ ${JSON.stringify(data, null, 2)}
                 • <strong>Security:</strong> reCAPTCHA v3 + App Check protection<br>
                 • <strong>Performance:</strong> Intelligent data routing (Firestore + Data Connect)<br>
                 • <strong>Scalability:</strong> Firebase Storage for files + metadata linking<br>
-                • <strong>Real-time:</strong> Live updates for forums and user activities<br>
+                • <strong>Real-time:</strong> Live updates for blog comments and user activities<br>
                 • <strong>Analytics:</strong> Built-in performance metrics and insights
             `,
           'info'

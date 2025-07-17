@@ -92,11 +92,6 @@
                 >
               </li>
               <li>
-                <a href="forum.html" class="nav-link"
-                  ><i class="nav-icon fas fa-comments"></i>Forum</a
-                >
-              </li>
-              <li>
                 <a href="#profile" class="nav-link active" aria-current="page"
                   ><i class="nav-icon fas fa-user"></i>Profile</a
                 >
@@ -272,7 +267,7 @@
                     <h3>Community Posts</h3>
                     <span id="community-posts" class="stat-number">0</span>
                     <p class="stat-description">
-                      Blog posts and forum discussions
+                      Blog posts and comments
                     </p>
                     <div class="stat-progress">
                       <div class="progress-bar" style="width: 25%"></div>
@@ -335,7 +330,7 @@
                     <i class="fas fa-comment"></i>
                   </div>
                   <div class="timeline-content">
-                    <h4>Posted in Forum</h4>
+                    <h4>Commented on Blog</h4>
                     <p>"Best practices for algorithmic fairness in hiring"</p>
                     <span class="timeline-date">3 days ago</span>
                   </div>
@@ -375,7 +370,7 @@
                 <div class="header-content">
                   <h2>My Contributions</h2>
                   <p>
-                    Manage your blog posts, forum discussions, and submissions
+                    Manage your blog posts, comments, and submissions
                   </p>
                 </div>
                 <div class="header-actions">
@@ -438,7 +433,7 @@
                     <select id="contribution-filter" class="filter-select">
                       <option value="all">All Contributions</option>
                       <option value="blog">Blog Posts</option>
-                      <option value="forum">Forum Discussions</option>
+                      <option value="comments">Comments</option>
                       <option value="published">Published</option>
                       <option value="pending">Under Review</option>
                       <option value="draft">Drafts</option>
@@ -471,16 +466,16 @@
                     <h3>No contributions yet</h3>
                     <p>
                       Start contributing to the community by writing blog posts
-                      or starting forum discussions!
+                      or commenting on existing posts!
                     </p>
                     <div class="empty-actions">
                       <a href="blog.html" class="btn btn-primary">
                         <i class="fas fa-newspaper"></i>
                         Write Blog Post
                       </a>
-                      <a href="forum.html" class="btn btn-outline">
+                      <a href="blog.html" class="btn btn-outline">
                         <i class="fas fa-comments"></i>
-                        Start Discussion
+                        Browse Blog Posts
                       </a>
                     </div>
                   </div>
@@ -786,7 +781,7 @@
                           policy
                         </p>
                         <ul class="benefit-features">
-                          <li>Expert-moderated forums</li>
+                          <li>Priority blog commenting</li>
                           <li>Weekly discussion themes</li>
                           <li>Q&A with researchers</li>
                         </ul>
@@ -872,8 +867,10 @@
       </section>
     </main>
 
-    <!-- Enhanced Footer -->
-    <footer class="enhanced-footer" role="contentinfo">
+    <!-- Footer will be inserted by professional-footer.js -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Profile Data Modal -->
       <div class="footer-container">
         <div class="footer-content">
           <div class="footer-sections">
@@ -929,10 +926,6 @@
                 students passionate about AI ethics.
               </p>
               <div class="footer-links">
-                <a href="forum.html" class="footer-link">
-                  <i class="fas fa-comments"></i>
-                  Discussion Forum
-                </a>
                 <a href="blog.html" class="footer-link">
                   <i class="fas fa-blog"></i>
                   Community Blog
@@ -1253,5 +1246,8 @@
       const profilePage = new ProfilePage();
       profilePage.init();
     </script>
+
+    <!-- Professional Footer Component -->
+    <script type="module" src="src/js/components/professional-footer.js"></script>
   </body>
 </html>

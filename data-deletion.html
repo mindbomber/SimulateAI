@@ -628,34 +628,17 @@ limitations under the License.
       </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="footer" role="contentinfo">
-      <div class="footer-content">
-        <div class="footer-bottom">
-          <p class="footer-copyright">
-            &copy; 2025 SimulateAI Educational Platform. Protecting your privacy
-            rights.
-          </p>
-          <nav class="footer-nav" aria-label="Footer navigation">
-            <a href="index.html" class="footer-nav-link">Home</a>
-            <a href="privacy-notice.html" class="footer-nav-link"
-              >Privacy Notice</a
-            >
-            <a
-              href="data-deletion.html"
-              class="footer-nav-link"
-              aria-current="page"
-              >Data Deletion</a
-            >
-            <a href="index.html#contact" class="footer-nav-link">Contact</a>
-          </nav>
-        </div>
-      </div>
-    </footer>
+    <!-- Footer will be inserted by professional-footer.js -->
+    <div id="footer-placeholder"></div>
 
     <!-- Scripts -->
     <script type="module" src="src/js/services/firebase-service.js"></script>
     <script type="module" src="src/js/services/auth-service.js"></script>
+    <!-- Professional Footer Component -->
+    <script
+      type="module"
+      src="src/js/components/professional-footer.js"
+    ></script>
     <script>
       // Show instant deletion option for signed-in users
       function showInstantDeleteOption() {

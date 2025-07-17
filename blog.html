@@ -77,6 +77,7 @@ limitations under the License.
     <link rel="stylesheet" href="src/styles/card-component.css" />
     <link rel="stylesheet" href="src/styles/loader-spinner.css" />
     <link rel="stylesheet" href="src/styles/blog-submission.css" />
+    <link rel="stylesheet" href="src/styles/blog-comment-system.css" />
 
     <!-- Icons and Favicons -->
     <link rel="icon" type="image/svg+xml" href="src/assets/icons/favicon.svg" />
@@ -146,7 +147,6 @@ limitations under the License.
                 >📝 Blog</a
               >
             </li>
-            <li><a href="forum.html" class="nav-link">💬 Forum</a></li>
             <li><a href="profile.html" class="nav-link">👤 Profile</a></li>
             <li>
               <a href="privacy-notice.html" class="nav-link">🔒 Privacy</a>
@@ -681,7 +681,26 @@ limitations under the License.
                 <li>📚 Include relevant citations and references</li>
                 <li>🔍 Original content only - no plagiarism</li>
                 <li>💬 Maintain respectful and professional tone</li>
+                <li>👤 Complete profile required for all submissions</li>
               </ul>
+              
+              <div class="submission-process-info">
+                <h4>📋 Review Process</h4>
+                <div class="process-steps">
+                  <div class="process-step">
+                    <span class="step-icon">📝</span>
+                    <div class="step-content">
+                      <strong>Regular Users:</strong> Submissions reviewed within 24 hours by our moderation team
+                    </div>
+                  </div>
+                  <div class="process-step donor-step">
+                    <span class="step-icon">👑</span>
+                    <div class="step-content">
+                      <strong>Donors:</strong> <a href="donate.html" style="color: #1a73e8;">Instant publication</a> without moderation delays
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -891,8 +910,10 @@ limitations under the License.
       </div>
     </div>
 
-    <!-- Enhanced Footer -->
-    <footer class="blog-footer" role="contentinfo">
+    <!-- Footer will be inserted by professional-footer.js -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Enhanced Write Post Modal -->
       <div class="footer-content">
         <div class="footer-sections">
           <!-- Research & Academic Section -->
@@ -947,9 +968,6 @@ limitations under the License.
                   <a href="#contributor-guidelines" class="footer-link"
                     >Contributor Guidelines</a
                   >
-                </li>
-                <li>
-                  <a href="forum.html" class="footer-link">Discussion Forum</a>
                 </li>
                 <li>
                   <a href="#events" class="footer-link">Events & Webinars</a>
@@ -1015,17 +1033,6 @@ limitations under the License.
               <span class="badge">Educational Use</span>
             </div>
           </div>
-
-          <nav class="footer-nav" aria-label="Footer navigation">
-            <a href="index.html" class="footer-nav-link">Home</a>
-            <a href="privacy-notice.html" class="footer-nav-link">Privacy</a>
-            <a href="data-deletion.html" class="footer-nav-link">Data Rights</a>
-            <a href="#accessibility" class="footer-nav-link">Accessibility</a>
-            <a href="#contact" class="footer-nav-link">Contact</a>
-          </nav>
-        </div>
-      </div>
-    </footer>
 
     <!-- Enhanced Write Post Modal -->
     <div
@@ -1354,6 +1361,83 @@ For research articles, consider including:
       </div>
     </div>
 
+    <!-- Post Detail Modal with Comments -->
+    <div
+      id="post-detail-modal"
+      class="modal-overlay"
+      style="display: none"
+      role="dialog"
+      aria-labelledby="post-detail-title"
+      aria-modal="true"
+    >
+      <div class="modal-container large-modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 id="post-detail-title" class="modal-title">
+              <span class="title-icon">📝</span>
+              <span id="modal-post-title">Blog Post</span>
+            </h2>
+            <button class="modal-close" aria-label="Close modal" id="close-post-modal">
+              &times;
+            </button>
+          </div>
+
+          <div class="modal-body post-detail-body">
+            <!-- Post Content -->
+            <article class="post-detail-content">
+              <div class="post-detail-header">
+                <div class="post-meta">
+                  <div class="post-category" id="modal-post-category">
+                    🔬 Research
+                  </div>
+                  <time class="post-date" id="modal-post-date">
+                    January 15, 2025
+                  </time>
+                </div>
+                
+                <div class="post-author-info">
+                  <img src="" alt="" class="author-avatar" id="modal-author-avatar">
+                  <div class="author-details">
+                    <span class="author-name" id="modal-author-name">Dr. Sarah Chen</span>
+                    <span class="author-title" id="modal-author-title">AI Ethics Researcher</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="post-content" id="modal-post-content">
+                <!-- Post content will be inserted here -->
+              </div>
+
+              <div class="post-tags" id="modal-post-tags">
+                <!-- Tags will be inserted here -->
+              </div>
+
+              <div class="post-actions">
+                <button class="action-btn like-btn" id="like-post-btn">
+                  <span class="action-icon">❤️</span>
+                  <span class="action-count" id="like-count">0</span>
+                  <span class="action-text">Like</span>
+                </button>
+                <button class="action-btn share-btn" id="share-post-btn">
+                  <span class="action-icon">🔗</span>
+                  <span class="action-text">Share</span>
+                </button>
+                <button class="action-btn bookmark-btn" id="bookmark-post-btn">
+                  <span class="action-icon">🔖</span>
+                  <span class="action-text">Bookmark</span>
+                </button>
+              </div>
+            </article>
+
+            <!-- Comment System -->
+            <div id="post-comments" class="post-comments-section" data-comment-system data-post-id="">
+              <!-- Comments will be inserted here by the BlogCommentSystem -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Loading indicator -->
     <div id="loading" class="loading-enhanced" aria-hidden="true" role="status">
       <div class="loading-container">
@@ -1426,33 +1510,67 @@ For research articles, consider including:
             'contribution-status'
           );
 
-          if (this.currentUser && this.canWritePosts()) {
-            writePostBtn.style.display = 'inline-flex';
+          if (this.currentUser) {
+            // Check if user has profile
+            if (!this.authService.userProfile) {
+              writePostBtn.style.display = 'inline-flex';
+              writePostBtn.querySelector('.btn-text').textContent = 'Complete Profile to Post';
+              if (contributionStatus) {
+                contributionStatus.textContent = 'Profile setup required to share content';
+              }
+              return;
+            }
 
-            // Update button text and status based on donor status
-            const guidelines =
-              await this.contributionService.getContributionGuidelines(
-                this.currentUser.uid
-              );
+            // Check if user can post
+            if (this.canWritePosts()) {
+              writePostBtn.style.display = 'inline-flex';
 
-            const btnText = guidelines.autoApproval
-              ? 'Share & Publish'
-              : 'Share Your Research';
-            writePostBtn.querySelector('.btn-text').textContent = btnText;
+              // Update button text and status based on donor status
+              const guidelines =
+                await this.contributionService.getContributionGuidelines(
+                  this.currentUser.uid
+                );
 
-            if (contributionStatus) {
-              contributionStatus.textContent = guidelines.autoApproval
-                ? 'Instant publication as a valued donor'
-                : 'Join our community of contributors';
+              const btnText = guidelines.autoApproval
+                ? 'Share & Publish Instantly'
+                : 'Share Your Research';
+              writePostBtn.querySelector('.btn-text').textContent = btnText;
+
+              if (contributionStatus) {
+                contributionStatus.textContent = guidelines.autoApproval
+                  ? 'Instant publication as a valued donor'
+                  : 'Join our community of contributors';
+              }
+            } else {
+              writePostBtn.style.display = 'inline-flex';
+              writePostBtn.querySelector('.btn-text').textContent = 'Setup Required';
+              if (contributionStatus) {
+                contributionStatus.textContent = 'Complete setup to share your expertise';
+              }
             }
           } else {
-            writePostBtn.style.display = 'none';
+            // User not signed in
+            writePostBtn.style.display = 'inline-flex';
+            writePostBtn.querySelector('.btn-text').textContent = 'Sign In to Post';
+            if (contributionStatus) {
+              contributionStatus.textContent = 'Sign in to share your research and insights';
+            }
           }
         }
 
         canWritePosts() {
-          // All authenticated users can write posts
-          return this.currentUser && this.contributionService.canContribute();
+          // Check if user is authenticated
+          if (!this.currentUser) {
+            return false;
+          }
+
+          // Check if user has a complete profile
+          if (!this.authService.userProfile) {
+            return false;
+          }
+
+          // Check if contribution service allows contributions
+          return this.contributionService.canContribute();
         }
 
         async loadBlogPosts() {
@@ -1656,8 +1774,85 @@ For research articles, consider including:
         }
 
         openPost(postId) {
-          // TODO: Navigate to individual post page
-          alert(`Opening post: ${postId}`);
+          const post = this.samplePosts.find(p => p.id === postId);
+          if (!post) {
+            console.error('Post not found:', postId);
+            return;
+          }
+
+          // Populate modal with post data
+          document.getElementById('modal-post-title').textContent = post.title;
+          document.getElementById('modal-post-category').textContent = 
+            `${this.getCategoryEmoji(post.category)} ${this.getCategoryName(post.category)}`;
+          document.getElementById('modal-post-date').textContent = this.formatDate(post.createdAt);
+          document.getElementById('modal-author-name').textContent = post.author.name;
+          document.getElementById('modal-author-title').textContent = post.author.title || 'Community Member';
+          document.getElementById('modal-author-avatar').src = post.author.avatar;
+          document.getElementById('modal-author-avatar').alt = post.author.name;
+          
+          // Generate full post content (in a real app, this would come from the server)
+          const fullContent = this.generateFullPostContent(post);
+          document.getElementById('modal-post-content').innerHTML = fullContent;
+          
+          // Add tags
+          const tagsContainer = document.getElementById('modal-post-tags');
+          tagsContainer.innerHTML = post.tags.map(tag => 
+            `<span class="post-tag">#${tag}</span>`
+          ).join('');
+
+          // Set up comment system
+          const commentsContainer = document.getElementById('post-comments');
+          commentsContainer.dataset.postId = postId;
+          
+          // Initialize comment system
+          import('./src/js/components/blog-comment-system.js').then(module => {
+            const BlogCommentSystem = module.default;
+            new BlogCommentSystem(postId, 'post-comments');
+          });
+
+          // Show modal
+          document.getElementById('post-detail-modal').style.display = 'flex';
+          document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        generateFullPostContent(post) {
+          // This would normally come from your backend
+          // For demo purposes, we'll generate some content based on the post
+          const content = `
+            <p>${post.summary}</p>
+            
+            <h2>Introduction</h2>
+            <p>In this comprehensive analysis, we explore the key concepts and methodologies that are shaping the future of AI ethics education. Our research demonstrates the importance of simulation-based learning in developing critical thinking skills.</p>
+            
+            <blockquote>
+              "Education is the most powerful weapon which you can use to change the world." - Nelson Mandela
+            </blockquote>
+            
+            <h2>Key Findings</h2>
+            <p>Our study reveals several important insights about the effectiveness of interactive learning approaches in AI ethics education:</p>
+            
+            <ul>
+              <li>Simulation-based scenarios improve decision-making skills by 40%</li>
+              <li>Interactive case studies enhance retention rates by 65%</li>
+              <li>Peer discussion forums increase engagement by 80%</li>
+            </ul>
+            
+            <h2>Methodology</h2>
+            <p>We employed a mixed-methods approach combining quantitative analysis with qualitative interviews. Our research framework incorporates both traditional academic assessment and innovative peer-review mechanisms.</p>
+            
+            <h2>Implications</h2>
+            <p>The findings suggest that integrating technology-enhanced learning tools with traditional educational approaches creates more effective learning environments. This hybrid model shows particular promise for complex topics like AI ethics.</p>
+            
+            <h2>Conclusion</h2>
+            <p>As we continue to advance our understanding of effective AI ethics education, it becomes clear that innovative pedagogical approaches are essential. We encourage educators and researchers to explore these methodologies in their own contexts.</p>
+          `;
+          
+          return content;
+        }
+
+        closeModal() {
+          document.getElementById('post-detail-modal').style.display = 'none';
+          document.body.style.overflow = 'auto'; // Restore scrolling
         }
 
         setupEventHandlers() {
@@ -1736,6 +1931,30 @@ For research articles, consider including:
             ?.addEventListener('click', () => {
               this.hideWritePostModal();
             });
+
+          // Post detail modal event handlers
+          document
+            .querySelector('.modal-close-btn')
+            ?.addEventListener('click', () => {
+              this.closeModal();
+            });
+
+          // Close modal when clicking outside content area
+          document
+            .getElementById('post-detail-modal')
+            ?.addEventListener('click', (e) => {
+              if (e.target.id === 'post-detail-modal') {
+                this.closeModal();
+              }
+            });
+
+          // Close modal with Escape key
+          document.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('post-detail-modal');
+            if (e.key === 'Escape' && modal && modal.style.display === 'flex') {
+              this.closeModal();
+            }
+          });
         }
 
         setupCharacterCounters() {
@@ -1810,10 +2029,21 @@ For research articles, consider including:
         }
 
         async showWritePostModal() {
-          if (!this.canWritePosts()) {
-            alert(
-              'You need to be a research contributor (tier 1+) to write blog posts.'
-            );
+          // Check authentication first
+          if (!this.currentUser) {
+            this.showAuthPrompt();
+            return;
+          }
+
+          // Check if user has a profile
+          if (!this.authService.userProfile) {
+            this.showProfilePrompt();
+            return;
+          }
+
+          // Check if user can contribute
+          if (!this.contributionService.canContribute()) {
+            this.showContributionError();
             return;
           }
 
@@ -1824,6 +2054,75 @@ For research articles, consider including:
 
           // Update UI based on donor status
           await this.updateSubmissionModalForUser();
+        }
+
+        showAuthPrompt() {
+          const message = `
+            🔐 Sign In Required
+            
+            To share your research and insights with our community, please sign in to your account.
+            
+            Don't have an account yet? Sign up to join our community of educators, researchers, and AI ethics enthusiasts.
+          `;
+          
+          if (confirm(message + '\n\nWould you like to sign in now?')) {
+            // Trigger authentication flow
+            if (this.authService && this.authService.signIn) {
+              this.authService.signIn();
+            } else {
+              window.location.href = 'index.html#auth';
+            }
+          }
+        }
+
+        showProfilePrompt() {
+          const message = `
+            👤 Complete Your Profile
+            
+            To submit blog posts and research articles, you need to complete your profile first. This helps us:
+            
+            • Properly attribute your contributions
+            • Connect you with other researchers
+            • Provide appropriate publishing permissions
+            • Build trust within our community
+            
+            Your profile includes basic information like your name, bio, research interests, and professional background.
+          `;
+          
+          if (confirm(message + '\n\nWould you like to complete your profile now?')) {
+            window.location.href = 'profile.html?setup=true';
+          }
+        }
+
+        async showContributionError() {
+          try {
+            const guidelines = await this.contributionService.getContributionGuidelines(this.currentUser.uid);
+            
+            let message = `
+              ❌ Unable to Submit Posts
+              
+              There seems to be an issue with your account that prevents you from submitting posts.
+            `;
+
+            if (!guidelines.canContribute) {
+              message += `
+              
+              This could be due to:
+              • Incomplete profile information
+              • Account verification pending
+              • Community guidelines violation
+              
+              Please check your profile and ensure all required fields are completed.
+              `;
+              
+              if (confirm(message + '\n\nWould you like to review your profile?')) {
+                window.location.href = 'profile.html';
+              }
+            }
+          } catch (error) {
+            console.error('Error getting contribution guidelines:', error);
+            alert('Sorry, there was an error checking your contribution status. Please try again later.');
+          }
         }
 
         hideWritePostModal() {
@@ -1851,25 +2150,39 @@ For research articles, consider including:
               );
 
             if (guidelines.autoApproval) {
-              // Show donor benefits
+              // Show donor benefits - immediate publication
               donorBenefits.style.display = 'block';
               statusBanner.style.display = 'flex';
               statusBanner.className = 'status-banner success';
               statusIcon.textContent = '👑';
               statusMessage.textContent =
-                'Your article will be published immediately upon submission!';
+                'As a valued donor, your article will be published immediately upon submission!';
               contributionStatus.textContent =
-                'Instant publication as a valued donor';
+                'Instant publication - no moderation required';
             } else {
-              // Show regular submission process
+              // Show regular submission process with donation encouragement
               donorBenefits.style.display = 'none';
               statusBanner.style.display = 'flex';
-              statusBanner.className = 'status-banner';
-              statusIcon.textContent = 'ℹ️';
-              statusMessage.textContent =
-                'Your submission will be reviewed before publication (typically within 24 hours).';
+              statusBanner.className = 'status-banner info';
+              statusIcon.textContent = '📝';
+              statusMessage.innerHTML = `
+                Your submission will be reviewed by our moderation team before publication (typically within 24 hours).
+                <br><br>
+                <strong>💡 Did you know?</strong> <a href="donate.html" style="color: #1a73e8; text-decoration: underline;">Donors</a> get instant publication without moderation delays!
+              `;
               contributionStatus.textContent =
-                'Share your expertise with the community';
+                'Share your expertise - moderation review required';
+            }
+
+            // Update form submit button text based on status
+            const submitBtn = document.querySelector('#blog-submission-form button[type="submit"]');
+            if (submitBtn) {
+              const btnText = submitBtn.querySelector('.btn-text');
+              if (btnText) {
+                btnText.textContent = guidelines.autoApproval 
+                  ? 'Publish Article Instantly' 
+                  : 'Submit for Review';
+              }
             }
           }
         }
@@ -2122,5 +2435,8 @@ For research articles, consider including:
 
     <!-- Enhanced Blog JavaScript -->
     <script src="src/js/enhanced-blog.js" defer></script>
+    
+    <!-- Professional Footer Component -->
+    <script type="module" src="src/js/components/professional-footer.js"></script>
   </body>
 </html>

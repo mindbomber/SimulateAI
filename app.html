@@ -606,125 +606,9 @@ limitations under the License.
       </section>
     </main>
 
-    <!-- Enhanced Footer -->
-    <footer class="footer" role="contentinfo">
-      <div class="footer-content">
-        <!-- Main footer sections -->
-        <div class="footer-sections">
-          <!-- Privacy Section -->
-          <div class="footer-section" id="privacy">
-            <h3 class="footer-section-title">Privacy Policy</h3>
-            <div class="footer-section-content">
-              <p>We are committed to protecting your privacy. This platform:</p>
-              <ul class="footer-list">
-                <li>Stores learning progress locally in your browser</li>
-                <li>
-                  Uses anonymized analytics to improve educational content
-                </li>
-                <li>Does not share personal information with third parties</li>
-                <li>
-                  Complies with educational privacy standards (FERPA, COPPA)
-                </li>
-              </ul>
-            </div>
-          </div>
+    <!-- Footer will be inserted by professional-footer.js -->
+    <div id="footer-placeholder"></div>
 
-          <!-- Accessibility Section -->
-          <div class="footer-section" id="accessibility">
-            <h3 class="footer-section-title">Accessibility Statement</h3>
-            <div class="footer-section-content">
-              <p>
-                This platform is designed to be accessible to all learners.
-                Features include:
-              </p>
-              <ul class="footer-list">
-                <li>Keyboard navigation support</li>
-                <li>Screen reader compatibility</li>
-                <li>High contrast and large text options</li>
-                <li>
-                  Reduced motion settings for users with vestibular disorders
-                </li>
-                <li>WCAG 2.1 AA compliance</li>
-              </ul>
-              <p>
-                If you encounter any accessibility barriers, please
-                <a href="#contact" class="footer-link">contact us</a>.
-              </p>
-            </div>
-          </div>
-
-          <!-- Contact Section -->
-          <div class="footer-section" id="contact">
-            <h3 class="footer-section-title">Connect With SimulateAI</h3>
-            <div class="footer-section-content">
-              <p>Join our educational community! Connect with us for:</p>
-              <ul class="footer-list">
-                <li>Educator support and professional development</li>
-                <li>Institutional partnerships and ISTE certification</li>
-                <li>Technical assistance and platform guidance</li>
-                <li>Curriculum integration and assessment support</li>
-                <li>Accessibility resources and accommodations</li>
-              </ul>
-              <div class="contact-info">
-                <p>
-                  <strong>Email:</strong>
-                  <a href="mailto:educators@simulateai.org" class="footer-link"
-                    >educators@simulateai.org</a
-                  >
-                </p>
-                <p>
-                  <strong>GitHub:</strong>
-                  <a
-                    href="https://github.com/simulateai"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="footer-link"
-                    >SimulateAI Open Source</a
-                  >
-                </p>
-                <p>
-                  <strong>Resources:</strong>
-                  <a href="docs/EDUCATOR_GUIDE.md" class="footer-link"
-                    >Educator Guide</a
-                  >
-                  |
-                  <a
-                    href="docs/ISTE_CERTIFICATION_ROADMAP.md"
-                    class="footer-link"
-                    >ISTE Certification</a
-                  >
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Footer bottom -->
-        <div class="footer-bottom">
-          <p class="footer-copyright">
-            &copy; 2025 SimulateAI Educational Platform. Open source AI ethics
-            education for all learners.
-          </p>
-          <nav class="footer-nav" aria-label="Footer navigation">
-            <a href="terms-of-use.html" class="footer-nav-link">Terms of Use</a>
-            <a href="privacy-notice.html" class="footer-nav-link"
-              >Privacy Notice</a
-            >
-            <a href="data-deletion.html" class="footer-nav-link"
-              >Data Deletion</a
-            >
-            <a href="research-consent.html" class="footer-nav-link"
-              >Research Participation</a
-            >
-            <a href="#accessibility" class="footer-nav-link">Accessibility</a>
-            <a href="#contact" class="footer-nav-link">Contact</a>
-            <a href="docs/EDUCATOR_GUIDE.md" class="footer-nav-link"
-              >Educators</a
-            >
-          </nav>
-        </div>
-      </div>
-    </footer>
     <!-- Simulation Modal - Updated to use advanced-ui-components.css modal system -->
     <div
       id="simulation-modal"
@@ -999,6 +883,12 @@ limitations under the License.
     <script
       type="module"
       src="src/js/components/donor-appreciation.js"
+    ></script>
+
+    <!-- Professional Footer Component -->
+    <script
+      type="module"
+      src="src/js/components/professional-footer.js"
     ></script>
   </body>
 </html>

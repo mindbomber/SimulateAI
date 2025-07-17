@@ -134,190 +134,27 @@
 
       @keyframes float-up-unique {
         0% {
-          transform: translateY(100vh)
-            translateX(
-              calc(
-                var(--drift-x, 0px) * 0 + var(--wiggle-intensity, 20px) *
-                  sin(360deg * 0 * var(--path-multiplier, 1))
-              )
-            )
-            rotate(
-              calc(
-                var(--start-rotation, 0deg) + 0deg * var(--rotation-speed, 1) *
-                  var(--rotation-direction, 1)
-              )
-            )
-            scale(var(--scale-variation, 1)) translateZ(0);
+          transform: translateY(100vh) translateX(var(--drift-x, 0px))
+            rotate(var(--start-rotation, 0deg)) scale(var(--scale-variation, 1));
           opacity: 0;
         }
-        5% {
-          opacity: calc(var(--max-opacity, 0.8) * 0.7);
-          transform: translateY(95vh)
-            translateX(
-              calc(
-                var(--drift-x, 0px) * 0.05 + var(--wiggle-intensity, 20px) *
-                  sin(360deg * 0.05 * var(--path-multiplier, 1))
-              )
-            )
-            rotate(
-              calc(
-                var(--start-rotation, 0deg) + 18deg * var(--rotation-speed, 1) *
-                  var(--rotation-direction, 1)
-              )
-            )
-            scale(calc(var(--scale-variation, 1) * 1.05)) translateZ(0);
-        }
-        15% {
+        10% {
           opacity: var(--max-opacity, 0.8);
-          transform: translateY(85vh)
-            translateX(
-              calc(
-                var(--drift-x, 0px) * 0.15 + var(--wiggle-intensity, 20px) *
-                  sin(360deg * 0.15 * var(--path-multiplier, 1))
-              )
-            )
-            rotate(
-              calc(
-                var(--start-rotation, 0deg) + 54deg * var(--rotation-speed, 1) *
-                  var(--rotation-direction, 1)
-              )
-            )
-            scale(calc(var(--scale-variation, 1) * 0.95)) translateZ(0);
         }
-        25% {
+        90% {
           opacity: var(--max-opacity, 0.8);
-          transform: translateY(75vh)
-            translateX(
-              calc(
-                var(--drift-x, 0px) * 0.25 + var(--wiggle-intensity, 20px) *
-                  sin(360deg * 0.25 * var(--path-multiplier, 1))
-              )
-            )
-            rotate(
-              calc(
-                var(--start-rotation, 0deg) + 90deg * var(--rotation-speed, 1) *
-                  var(--rotation-direction, 1)
-              )
-            )
-            scale(calc(var(--scale-variation, 1) * 1.1)) translateZ(0);
-        }
-        35% {
-          opacity: var(--max-opacity, 0.8);
-          transform: translateY(65vh)
-            translateX(
-              calc(
-                var(--drift-x, 0px) * 0.35 + var(--wiggle-intensity, 20px) *
-                  sin(360deg * 0.35 * var(--path-multiplier, 1))
-              )
-            )
-            rotate(
-              calc(
-                var(--start-rotation, 0deg) + 126deg *
-                  var(--rotation-speed, 1) * var(--rotation-direction, 1)
-              )
-            )
-            scale(calc(var(--scale-variation, 1) * 0.9)) translateZ(0);
-        }
-        50% {
-          opacity: var(--max-opacity, 0.8);
-          transform: translateY(50vh)
-            translateX(
-              calc(
-                var(--drift-x, 0px) * 0.5 + var(--wiggle-intensity, 20px) *
-                  sin(360deg * 0.5 * var(--path-multiplier, 1))
-              )
-            )
-            rotate(
-              calc(
-                var(--start-rotation, 0deg) + 180deg *
-                  var(--rotation-speed, 1) * var(--rotation-direction, 1)
-              )
-            )
-            scale(var(--scale-variation, 1)) translateZ(0);
-        }
-        65% {
-          opacity: var(--max-opacity, 0.8);
-          transform: translateY(35vh)
-            translateX(
-              calc(
-                var(--drift-x, 0px) * 0.65 + var(--wiggle-intensity, 20px) *
-                  sin(360deg * 0.65 * var(--path-multiplier, 1))
-              )
-            )
-            rotate(
-              calc(
-                var(--start-rotation, 0deg) + 234deg *
-                  var(--rotation-speed, 1) * var(--rotation-direction, 1)
-              )
-            )
-            scale(calc(var(--scale-variation, 1) * 1.05)) translateZ(0);
-        }
-        75% {
-          opacity: calc(var(--max-opacity, 0.8) * 0.9);
-          transform: translateY(25vh)
-            translateX(
-              calc(
-                var(--drift-x, 0px) * 0.75 + var(--wiggle-intensity, 20px) *
-                  sin(360deg * 0.75 * var(--path-multiplier, 1))
-              )
-            )
-            rotate(
-              calc(
-                var(--start-rotation, 0deg) + 270deg *
-                  var(--rotation-speed, 1) * var(--rotation-direction, 1)
-              )
-            )
-            scale(calc(var(--scale-variation, 1) * 0.95)) translateZ(0);
-        }
-        85% {
-          opacity: calc(var(--max-opacity, 0.8) * 0.7);
-          transform: translateY(15vh)
-            translateX(
-              calc(
-                var(--drift-x, 0px) * 0.85 + var(--wiggle-intensity, 20px) *
-                  sin(360deg * 0.85 * var(--path-multiplier, 1))
-              )
-            )
-            rotate(
-              calc(
-                var(--start-rotation, 0deg) + 306deg *
-                  var(--rotation-speed, 1) * var(--rotation-direction, 1)
-              )
-            )
-            scale(calc(var(--scale-variation, 1) * 1.02)) translateZ(0);
-        }
-        95% {
-          opacity: calc(var(--max-opacity, 0.8) * 0.4);
-          transform: translateY(5vh)
-            translateX(
-              calc(
-                var(--drift-x, 0px) * 0.95 + var(--wiggle-intensity, 20px) *
-                  sin(360deg * 0.95 * var(--path-multiplier, 1))
-              )
-            )
-            rotate(
-              calc(
-                var(--start-rotation, 0deg) + 342deg *
-                  var(--rotation-speed, 1) * var(--rotation-direction, 1)
-              )
-            )
-            scale(calc(var(--scale-variation, 1) * 0.9)) translateZ(0);
         }
         100% {
-          transform: translateY(-5vh)
+          transform: translateY(-10vh)
             translateX(
-              calc(
-                var(--drift-x, 0px) * 1 + var(--wiggle-intensity, 20px) *
-                  sin(360deg * 1 * var(--path-multiplier, 1))
-              )
+              calc(var(--drift-x, 0px) + var(--wiggle-intensity, 20px))
             )
             rotate(
               calc(
-                var(--start-rotation, 0deg) + 360deg *
-                  var(--rotation-speed, 1) * var(--rotation-direction, 1)
+                var(--start-rotation, 0deg) + var(--rotation-direction, 360deg)
               )
             )
-            scale(calc(var(--scale-variation, 1) * 0.8)) translateZ(0);
+            scale(calc(var(--scale-variation, 1) * 0.8));
           opacity: 0;
         }
       }
@@ -615,37 +452,6 @@
         transform: translateY(-2px);
       }
 
-      /* Footer */
-      .footer {
-        background: #2c3e50;
-        color: white;
-        padding: 40px 20px;
-        text-align: center;
-      }
-
-      .footer-content {
-        max-width: 1200px;
-        margin: 0 auto;
-      }
-
-      .footer-links {
-        display: flex;
-        gap: 30px;
-        justify-content: center;
-        flex-wrap: wrap;
-        margin-top: 20px;
-      }
-
-      .footer-links a {
-        color: #bdc3c7;
-        text-decoration: none;
-        transition: color 0.3s ease;
-      }
-
-      .footer-links a:hover {
-        color: white;
-      }
-
       /* Animations */
       @keyframes fadeInUp {
         from {
@@ -705,10 +511,53 @@
           height: 35px;
           font-size: 16px;
         }
+      }
 
-        .footer-links {
+      @media (max-width: 1024px) {
+        .footer-main {
+          grid-template-columns: 1fr;
+          gap: 40px;
+        }
+
+        .footer-sections {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 30px;
+        }
+
+        .footer-bottom-content {
+          grid-template-columns: 1fr;
+          gap: 25px;
+          text-align: center;
+        }
+
+        .brand-stats {
+          justify-content: center;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .footer-wave {
+          height: 30px;
+          top: -30px;
+        }
+
+        .brand-logo {
+          justify-content: center;
+          text-align: center;
+        }
+
+        .footer-brand {
+          text-align: center;
+        }
+
+        .social-links a {
+          padding: 6px 10px;
+          font-size: 0.85rem;
+        }
+
+        .brand-stats {
           flex-direction: column;
-          gap: 15px;
+          gap: 10px;
         }
       }
 
@@ -718,6 +567,19 @@
         .benefit-item,
         .privacy-item {
           border: 2px solid #333;
+        }
+
+        .professional-footer {
+          background: #000;
+          border-top: 2px solid #fff;
+        }
+
+        .section-title {
+          border-bottom-color: #fff;
+        }
+
+        .section-links a:hover {
+          background: rgba(255, 255, 255, 0.1);
         }
       }
 
@@ -741,6 +603,19 @@
 
         .floating-emojis {
           display: none;
+        }
+
+        .section-links a,
+        .social-links a {
+          transition: none;
+        }
+
+        .section-links a:hover {
+          transform: none;
+        }
+
+        .social-links a:hover {
+          transform: none;
         }
       }
     </style>
@@ -890,8 +765,9 @@
             research.
           </li>
           <li>
-            <strong>Blog & Forums</strong> – Join ongoing conversations, access
-            exclusive content, and connect with a global community of learners.
+            <strong>Blog & Comments</strong> – Join ongoing conversations,
+            access exclusive content, and connect with a global community of
+            learners.
           </li>
         </ol>
       </div>
@@ -1069,29 +945,30 @@
       </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <div class="footer-content">
-        <p>
-          <strong>SimulateAI © 2025</strong> | Created for educators,
-          researchers, and digital citizens of the future
-        </p>
-        <div class="footer-links">
-          <a href="research-consent.html">Research Consent</a>
-          <a href="privacy-notice.html">Privacy Policy</a>
-          <a href="terms-of-use.html">Terms of Use</a>
-          <a href="data-deletion.html">Data Deletion</a>
-          <a href="docs/EDUCATOR_GUIDE.md">Educator Guide</a>
-          <a href="mailto:support@simulateai.org">Contact</a>
-        </div>
-      </div>
-    </footer>
+    <!-- Footer will be inserted by professional-footer.js -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Professional Footer Component -->
+    <script
+      type="module"
+      src="src/js/components/professional-footer.js"
+    ></script>
 
     <script>
       // Floating Emojis Animation
       function createFloatingEmojis() {
         const container = document.getElementById('floatingEmojis');
         if (!container) return;
+
+        // Performance check - disable on low-end devices or reduced motion preference
+        if (
+          navigator.hardwareConcurrency < 4 ||
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+          navigator.deviceMemory < 4 // Less than 4GB RAM
+        ) {
+          console.log('🔧 Floating emojis disabled for performance');
+          return;
+        }
 
         // AI and tech-themed emojis
         const emojis = [
@@ -1141,70 +1018,52 @@
           const startX = 5 + Math.random() * 90; // 5% to 95%
           emoji.style.left = startX + '%';
 
-          // Enhanced randomness for unique animations
-          const driftAmount = (Math.random() - 0.5) * 80; // -40px to +40px drift (gentler)
-          const wiggleIntensity = 15 + Math.random() * 25; // 15px to 40px wiggle (reduced)
-          const rotationSpeed = 0.3 + Math.random() * 0.7; // 0.3x to 1.0x rotation speed (slower)
-          const rotationDirection = Math.random() < 0.5 ? -1 : 1; // Random left (-1) or right (1) rotation
-          const opacityVariation = 0.4 + Math.random() * 0.4; // 0.4 to 0.8 max opacity
-          const scaleVariation = 0.9 + Math.random() * 0.3; // 0.9x to 1.2x scale (gentler)
-          const speedMultiplier = 0.8 + Math.random() * 0.4; // 0.8x to 1.2x speed (more consistent)
+          // Simplified randomness for better performance
+          const driftAmount = (Math.random() - 0.5) * 60; // -30px to +30px drift
+          const wiggleIntensity = 10 + Math.random() * 15; // 10px to 25px wiggle
+          const opacityVariation = 0.5 + Math.random() * 0.3; // 0.5 to 0.8 max opacity
+          const scaleVariation = 0.9 + Math.random() * 0.2; // 0.9x to 1.1x scale
 
-          // Random curve path - different horizontal movement patterns (gentler)
-          const pathType = Math.floor(Math.random() * 4);
-          let pathMultiplier;
-          switch (pathType) {
-            case 0:
-              pathMultiplier = 0.8;
-              break; // Gentle sine wave
-            case 1:
-              pathMultiplier = -0.8;
-              break; // Gentle inverted sine wave
-            case 2:
-              pathMultiplier = 0.4;
-              break; // Very gentle curve
-            case 3:
-              pathMultiplier = 1.2;
-              break; // Moderate zigzag
-          }
+          // Random rotation direction - some rotate left, some right
+          const rotationDirection = Math.random() < 0.5 ? 360 : -360; // 50% chance each direction
 
-          // Set CSS custom properties for unique animation
+          // Set CSS custom properties for animation
           emoji.style.setProperty('--drift-x', `${driftAmount}px`);
           emoji.style.setProperty('--wiggle-intensity', `${wiggleIntensity}px`);
-          emoji.style.setProperty('--rotation-speed', rotationSpeed);
-          emoji.style.setProperty('--rotation-direction', rotationDirection);
           emoji.style.setProperty('--max-opacity', opacityVariation);
           emoji.style.setProperty('--scale-variation', scaleVariation);
-          emoji.style.setProperty('--path-multiplier', pathMultiplier);
+          emoji.style.setProperty(
+            '--rotation-direction',
+            `${rotationDirection}deg`
+          );
 
           // Random size for varied bubbling effect
           const sizeRandom = Math.random();
           let animationDuration;
-          if (sizeRandom < 0.15) {
+          if (sizeRandom < 0.2) {
             emoji.classList.add('tiny');
-            animationDuration = 10 + Math.random() * 4; // 10-14s
-          } else if (sizeRandom < 0.35) {
+            animationDuration = 12; // Fixed duration for performance
+          } else if (sizeRandom < 0.4) {
             emoji.classList.add('small');
-            animationDuration = 12 + Math.random() * 4; // 12-16s
-          } else if (sizeRandom < 0.65) {
+            animationDuration = 14;
+          } else if (sizeRandom < 0.6) {
             emoji.classList.add('medium');
-            animationDuration = 13 + Math.random() * 4; // 13-17s
-          } else if (sizeRandom < 0.85) {
+            animationDuration = 16;
+          } else if (sizeRandom < 0.8) {
             emoji.classList.add('large');
-            animationDuration = 14 + Math.random() * 5; // 14-19s
+            animationDuration = 18;
           } else {
             emoji.classList.add('big');
-            animationDuration = 15 + Math.random() * 6; // 15-21s
+            animationDuration = 20;
           }
 
-          // Apply speed multiplier to duration
-          animationDuration *= speedMultiplier;
+          // Set fixed animation duration
           emoji.style.animationDuration = animationDuration + 's';
 
           // Random animation delay for natural timing
-          emoji.style.animationDelay = Math.random() * 4 + 's';
+          emoji.style.animationDelay = Math.random() * 2 + 's'; // Reduced delay range
 
-          // Random starting rotation
+          // Random starting rotation (simplified)
           const startRotation = Math.random() * 360;
           emoji.style.setProperty('--start-rotation', `${startRotation}deg`);
 
@@ -1217,23 +1076,27 @@
                 emoji.parentNode.removeChild(emoji);
               }
             },
-            (animationDuration + 4) * 1000 // Duration + delay buffer
+            (animationDuration + 2) * 1000 // Duration + smaller delay buffer
           );
         }
 
-        // Initial burst of emojis with closer timing (increased amount)
-        for (let i = 0; i < 10; i++) {
-          setTimeout(spawnEmoji, i * 400);
-        }
-
-        // Continue spawning emojis at varied intervals
+        // Remove initial burst - start with consistent spawning immediately
+        // Begin regular emoji spawning with consistent intervals
         function scheduleNextEmoji() {
-          const nextDelay = 1800 + Math.random() * 1200; // 1.8s to 3s
+          const nextDelay = 1000 + Math.random() * 1000; // 1s to 2s (more frequent and consistent)
           setTimeout(() => {
-            spawnEmoji();
+            // Limit total number of active emojis to prevent resource overload
+            const activeEmojis = container.children.length;
+            if (activeEmojis < 8) {
+              // Increased from 8 to 15 active emojis at once
+              spawnEmoji();
+            }
             scheduleNextEmoji();
           }, nextDelay);
         }
+
+        // Start spawning immediately with first emoji
+        spawnEmoji();
         scheduleNextEmoji();
       }
 

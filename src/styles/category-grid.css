@@ -243,39 +243,6 @@
   color: var(--color-gray-400);
 }
 
-/* See All link */
-.category-see-all {
-  color: var(--color-primary);
-  text-decoration: none;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  padding: var(--spacing-1) var(--spacing-2);
-  border-radius: var(--radius-sm);
-  transition: all var(--transition-fast);
-  flex-shrink: 0;
-}
-
-.category-see-all:hover {
-  background: var(--color-primary-light);
-  color: var(--color-white);
-  text-decoration: none;
-  transform: translateY(-1px);
-}
-
-.category-see-all:focus {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
-[data-theme='dark'] .category-see-all {
-  color: var(--color-primary-light);
-}
-
-[data-theme='dark'] .category-see-all:hover {
-  background: var(--color-primary);
-  color: var(--color-white);
-}
-
 /* Progress Ring */
 .category-progress-ring {
   position: relative;
@@ -1138,11 +1105,6 @@
   .category-meta-items {
     align-self: center;
     justify-content: center;
-  }
-
-  .category-see-all {
-    align-self: flex-start;
-    margin-top: var(--spacing-1);
   }
 
   .category-icon-large {

@@ -253,7 +253,7 @@
         + Data Connect for structured, relational queries <br /><strong
           >📊 Your Schema:</strong
         >
-        User, Scenario, SimulationDecision, Donation, ForumPost, ForumComment
+        User, Scenario, SimulationDecision, Donation, BlogPost, BlogComment
       </div>
 
       <!-- Strategy Comparison -->
@@ -284,7 +284,7 @@
               <li><strong>Scenarios:</strong> Content management</li>
               <li><strong>Decisions:</strong> Relational tracking</li>
               <li><strong>Donations:</strong> Financial records</li>
-              <li><strong>Forum:</strong> Threaded discussions</li>
+              <li><strong>Blog:</strong> Structured posts & comments</li>
             </ul>
             <div class="code-block">
               // Complex relational queries SELECT u.displayName, COUNT(d.id) as
@@ -316,7 +316,7 @@
                 <span class="type-badge">email</span>
                 <span class="type-badge">researchParticipationStatus</span>
               </td>
-              <td>→ SimulationDecision, Donation, ForumPost</td>
+              <td>→ SimulationDecision, Donation, BlogPost</td>
               <td>Structured user profiles with research tracking</td>
             </tr>
             <tr>
@@ -350,23 +350,23 @@
               <td>Financial transaction records</td>
             </tr>
             <tr>
-              <td><strong>ForumPost</strong></td>
+              <td><strong>BlogPost</strong></td>
               <td>
                 <span class="type-badge">title</span>
                 <span class="type-badge">content</span>
                 <span class="type-badge">createdAt</span>
               </td>
-              <td>← User, → ForumComment</td>
-              <td>Community discussion threads</td>
+              <td>← User, → BlogComment</td>
+              <td>Blog posts and articles</td>
             </tr>
             <tr>
-              <td><strong>ForumComment</strong></td>
+              <td><strong>BlogComment</strong></td>
               <td>
                 <span class="type-badge">content</span>
                 <span class="type-badge">createdAt</span>
               </td>
-              <td>← User, ForumPost</td>
-              <td>Threaded comment system</td>
+              <td>← User, BlogPost</td>
+              <td>Blog comment system</td>
             </tr>
           </tbody>
         </table>
@@ -389,8 +389,8 @@
           <button onclick="testDecisionTracking()" class="btn hybrid">
             🎯 Record Decision
           </button>
-          <button onclick="testForumPost()" class="btn hybrid">
-            💬 Create Forum Post
+          <button onclick="testBlogPost()" class="btn hybrid">
+            💬 Create Blog Post
           </button>
           <button onclick="testAnalyticsQuery()" class="btn hybrid">
             📊 Run Analytics Query
