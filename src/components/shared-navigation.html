@@ -123,32 +123,100 @@
       <!-- Action Buttons Group -->
       <div class="nav-group nav-group-actions">
         <ul class="nav-list">
-          <li>
+          <li class="nav-item-dropdown">
             <a
               href="#"
-              class="nav-link tour-btn"
-              id="start-tour-nav"
-              data-action="tour"
-              >📚 Take Tour</a
+              class="nav-link"
+              aria-expanded="false"
+              aria-haspopup="true"
+              id="settings-nav"
             >
-          </li>
-          <li>
-            <a
-              href="#"
-              class="nav-link surprise-me-btn"
-              id="surprise-me-nav"
-              data-action="surprise"
-              >🎉 Surprise Me!</a
-            >
-          </li>
-          <li>
-            <a
-              href="donate.html"
-              class="nav-link donate-btn"
-              id="donate-nav"
-              data-page="donate"
-              >💖 Donate</a
-            >
+              ⚙️ Settings
+              <span class="dropdown-arrow" aria-hidden="true">▼</span>
+            </a>
+            <div class="dropdown-menu settings-menu">
+              <div class="settings-section">
+                <h4 class="settings-title">Floating Tabs</h4>
+                <div class="settings-item">
+                  <label class="settings-toggle" for="toggle-surprise-tab">
+                    <input type="checkbox" id="toggle-surprise-tab" checked />
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Surprise Me! Tab</span>
+                  </label>
+                </div>
+                <div class="settings-item">
+                  <label class="settings-toggle" for="toggle-tour-tab">
+                    <input type="checkbox" id="toggle-tour-tab" checked />
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Take Tour Tab</span>
+                  </label>
+                </div>
+                <div class="settings-item">
+                  <label class="settings-toggle" for="toggle-donate-tab">
+                    <input type="checkbox" id="toggle-donate-tab" checked />
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Donation Tab</span>
+                  </label>
+                  <div
+                    class="settings-note"
+                    id="donor-note"
+                    style="display: none"
+                  >
+                    <small>💎 Thank you for your support!</small>
+                  </div>
+                </div>
+              </div>
+
+              <div class="settings-section">
+                <h4 class="settings-title">Theme & Appearance</h4>
+                <div class="settings-item">
+                  <label class="settings-select-label" for="theme-select"
+                    >Theme</label
+                  >
+                  <select id="theme-select" class="settings-select">
+                    <option value="auto">Auto (System)</option>
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                  </select>
+                </div>
+                <div class="settings-item">
+                  <label class="settings-select-label" for="font-size-select"
+                    >Font Size</label
+                  >
+                  <select id="font-size-select" class="settings-select">
+                    <option value="small">Small</option>
+                    <option value="medium">Medium</option>
+                    <option value="large">Large</option>
+                    <option value="extra-large">Extra Large</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="settings-section">
+                <h4 class="settings-title">Accessibility</h4>
+                <div class="settings-item">
+                  <label class="settings-toggle" for="toggle-high-contrast">
+                    <input type="checkbox" id="toggle-high-contrast" />
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">High Contrast</span>
+                  </label>
+                </div>
+                <div class="settings-item">
+                  <label class="settings-toggle" for="toggle-reduced-motion">
+                    <input type="checkbox" id="toggle-reduced-motion" />
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Reduce Motion</span>
+                  </label>
+                </div>
+                <div class="settings-item">
+                  <label class="settings-toggle" for="toggle-large-targets">
+                    <input type="checkbox" id="toggle-large-targets" />
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Large Click Targets</span>
+                  </label>
+                </div>
+              </div>
+            </div>
           </li>
         </ul>
       </div>

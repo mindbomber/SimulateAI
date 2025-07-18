@@ -30,6 +30,8 @@
   color: inherit;
   display: block;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 280px;
+  pointer-events: none; /* Disable pointer events on the link */
 }
 
 .floating-action-tab {
@@ -40,7 +42,7 @@
     0 4px 20px rgba(238, 90, 82, 0.3),
     0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  transform: translateX(calc(100% - 60px));
+  transform: translateX(calc(100% - 90px));
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   min-width: 280px;
   height: 60px;
@@ -49,6 +51,7 @@
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-right: none;
+  pointer-events: auto; /* Enable pointer events only on the tab itself */
 }
 
 .floating-action-tab:hover {
@@ -217,7 +220,7 @@
   .floating-action-tab {
     min-width: 260px;
     height: 56px;
-    transform: translateX(calc(100% - 56px));
+    transform: translateX(calc(100% - 76px));
   }
 
   .floating-tab-content {
@@ -259,7 +262,7 @@
   .floating-action-tab {
     min-width: 270px;
     height: 58px;
-    transform: translateX(calc(100% - 58px));
+    transform: translateX(calc(100% - 78px));
   }
 }
 
@@ -268,7 +271,7 @@
   .floating-action-tab {
     min-width: 300px;
     height: 64px;
-    transform: translateX(calc(100% - 64px));
+    transform: translateX(calc(100% - 94px));
   }
 
   .floating-tab-content {
@@ -315,19 +318,17 @@
 }
 
 /* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .floating-action-tab {
-    background: linear-gradient(135deg, #ff5252 0%, #d32f2f 100%);
-    box-shadow:
-      0 4px 20px rgba(211, 47, 47, 0.4),
-      0 2px 8px rgba(0, 0, 0, 0.2);
-  }
+body.dark-mode .floating-action-tab {
+  background: linear-gradient(135deg, #ff5252 0%, #d32f2f 100%);
+  box-shadow:
+    0 4px 20px rgba(211, 47, 47, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+}
 
-  .floating-action-tab:hover {
-    box-shadow:
-      0 8px 30px rgba(211, 47, 47, 0.5),
-      0 4px 12px rgba(0, 0, 0, 0.25);
-  }
+body.dark-mode .floating-action-tab:hover {
+  box-shadow:
+    0 8px 30px rgba(211, 47, 47, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 /* Print styles */

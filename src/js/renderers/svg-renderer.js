@@ -2523,6 +2523,10 @@ class SVGRenderer {
    */
   getElementById(id) {
     try {
+      if (!id || typeof id !== 'string' || id.trim() === '') {
+        this.errorHandler('getElementById called with invalid ID', { id });
+        return null;
+      }
       return this.svg.querySelector(`#${CSS.escape(id)}`);
     } catch (error) {
       this.errorHandler('Failed to find element by ID', error);

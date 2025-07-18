@@ -2322,7 +2322,7 @@ class Accordion extends BaseObject {
 
   updateItemAccessibility(item, isExpanded) {
     // Update ARIA attributes for screen readers
-    if (this.element) {
+    if (this.element && item.headerId && item.panelId) {
       const header = this.element.querySelector(`#${item.headerId}`);
       const panel = this.element.querySelector(`#${item.panelId}`);
 

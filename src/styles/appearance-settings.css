@@ -1,0 +1,946 @@
+/**
+ * Copyright 2025 Armando Sori
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Theme & Appearance Settings Styles
+ * Handles dark mode, font sizes, and accessibility options
+ */
+
+/* Override any gradients that use color-primary-light and color-primary */
+body.dark-mode *[style*='linear-gradient'][style*='var(--color-primary-light)'],
+body.dark-mode .hero {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+}
+
+/* Radar chart and other components using light gray gradient */
+body.dark-mode .radar-chart-container,
+body.dark-mode .radar-chart-container[style*='background'],
+body.dark-mode *[style*='linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)'] {
+  background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%) !important;
+  border-color: #444444 !important;
+  color: #ffffff !important;
+}
+
+/* Override any elements using the light gray gradient pattern */
+body.dark-mode *[style*='linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'],
+body.dark-mode *[style*='linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)'],
+body.dark-mode .hero-section,
+body.dark-mode .radar-chart-container,
+body.dark-mode .radar-demo-container,
+body.dark-mode .hero-radar-demo {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+  color: #ffffff !important;
+  border-color: #444444 !important;
+}
+
+/* Dark mode styling for hero-radar-demo text elements */
+body.dark-mode .hero-radar-demo h3 {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #6bb4ff 0%, #9d4edd 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+body.dark-mode .hero-radar-demo p {
+  color: #cccccc !important;
+}
+
+/* Additional specific overrides for radar chart components */
+body.dark-mode .radar-chart-container,
+body.dark-mode .radar-chart-container.radar-chart-container {
+  background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%) !important;
+  border: 1px solid #444444 !important;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    0 1px 3px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-mode .radar-chart-container:hover,
+body.dark-mode .radar-chart-container.radar-chart-container:hover {
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.5),
+    0 2px 6px rgba(0, 0, 0, 0.4) !important;
+  border-color: #555555 !important;
+}
+
+body.dark-mode .hero::before {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23444444" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>') !important;
+  opacity: 0.3 !important;
+}
+
+/* Scenario Cards Dark Mode */
+body.dark-mode .scenario-card,
+body.dark-mode .scenarios-grid .scenario-card,
+body.dark-mode .category-section .scenario-card,
+body.dark-mode .categories-grid .scenario-card,
+body.dark-mode .simulations-grid .scenario-card {
+  background: #2d2d2d !important;
+  border: 1px solid #444444 !important;
+  color: #ffffff !important;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    0 1px 3px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-mode .scenario-card:hover,
+body.dark-mode .scenarios-grid .scenario-card:hover,
+body.dark-mode .category-section .scenario-card:hover,
+body.dark-mode .categories-grid .scenario-card:hover,
+body.dark-mode .simulations-grid .scenario-card:hover {
+  background: #3d3d3d !important;
+  border-color: #555555 !important;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.5),
+    0 2px 6px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Scenario Header and Content Dark Mode */
+body.dark-mode .scenario-header {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .scenario-content {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .scenario-title {
+  color: #ffffff !important;
+}
+
+body.dark-mode .scenario-description {
+  color: #cccccc !important;
+}
+
+body.dark-mode .scenario-footer {
+  color: #cccccc !important;
+}
+
+/* Scenario Icon and Difficulty Badge Dark Mode */
+body.dark-mode .scenario-icon {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+body.dark-mode .scenario-difficulty {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Scenario Buttons Dark Mode */
+body.dark-mode .scenario-start-btn,
+body.dark-mode .scenario-quick-start-btn {
+  background-color: #4a9eff !important;
+  color: #ffffff !important;
+  border: 1px solid #4a9eff !important;
+}
+
+body.dark-mode .scenario-start-btn:hover,
+body.dark-mode .scenario-quick-start-btn:hover {
+  background-color: #6bb4ff !important;
+  border-color: #6bb4ff !important;
+}
+
+/* View Toggle Controls Dark Mode */
+body.dark-mode .view-toggle-controls {
+  background: #2d2d2d !important;
+  border: 1px solid #444444 !important;
+}
+
+body.dark-mode .view-toggle-btn {
+  color: #cccccc !important;
+  background: transparent !important;
+}
+
+body.dark-mode .view-toggle-btn:hover {
+  background: #3d3d3d !important;
+  color: #ffffff !important;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    0 1px 3px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-mode .view-toggle-btn.active {
+  background: #3d3d3d !important;
+  color: #4a9eff !important;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    0 1px 3px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-mode .view-toggle-btn:focus-visible {
+  outline: 2px solid #4a9eff !important;
+}
+
+/* Keyboard Hint Dark Mode */
+body.dark-mode .keyboard-hint {
+  color: #cccccc !important;
+}
+
+body.dark-mode .keyboard-hint .hint-text {
+  color: #cccccc !important;
+}
+
+body.dark-mode kbd {
+  background: #3d3d3d !important;
+  color: #ffffff !important;
+  border: 1px solid #555555 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Font Size Settings */
+html.font-size-small {
+  font-size: 14px;
+}
+
+html.font-size-medium {
+  font-size: 16px;
+}
+
+html.font-size-large {
+  font-size: 18px;
+}
+
+html.font-size-extra-large {
+  font-size: 20px;
+}
+
+/* Dark Mode Theme - Apply to entire application */
+body.dark-mode {
+  --text-color: #ffffff;
+  --text-secondary: #cccccc;
+  --border-color: #444444;
+  --primary-color: #4a9eff;
+  --hover-bg: #3d3d3d;
+  --background-color: #2d2d2d;
+
+  /* Set overall page background and text color */
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+}
+
+/* Ensure html element also gets dark background */
+body.dark-mode html {
+  background-color: #1a1a1a !important;
+}
+
+/* Header Dark Mode */
+body.dark-mode .header {
+  background: #2d2d2d !important;
+  border-bottom-color: #444444 !important;
+}
+
+body.dark-mode .header-container {
+  background-color: #2d2d2d !important;
+  color: #ffffff !important;
+}
+
+/* Blog header (sticky) */
+body.dark-mode .blog-header {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+  border-bottom-color: #4a9eff !important;
+}
+
+body.dark-mode .header-content {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .header-nav {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .nav-links {
+  background: transparent !important;
+}
+
+body.dark-mode .nav-links .nav-link {
+  color: #ffffff !important;
+}
+
+/* Container elements */
+body.dark-mode .container,
+body.dark-mode .main-container,
+body.dark-mode .content-container,
+body.dark-mode .page-container {
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+}
+
+/* Navigation Bar Dark Mode */
+body.dark-mode .nav-container {
+  background-color: var(--background-color, #2d2d2d);
+  border-bottom-color: var(--border-color, #444);
+}
+body.dark-mode .nav-brand {
+  color: #ffffff !important;
+}
+
+body.dark-mode .nav-link {
+  color: #ffffff !important;
+}
+
+body.dark-mode .nav-link:hover {
+  color: var(--primary-color, #4a9eff) !important;
+  background-color: var(--hover-bg, #3d3d3d) !important;
+}
+
+/* Main Content Areas Dark Mode */
+body.dark-mode .hero-section {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+  color: #ffffff !important;
+  min-height: auto !important;
+  padding: 4rem 0 !important;
+}
+
+/* Override any gradients that use color-primary-light and color-primary */
+body.dark-mode *[style*='linear-gradient'][style*='var(--color-primary-light)'],
+body.dark-mode .hero {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+}
+
+body.dark-mode .hero::before {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23444444" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>') !important;
+  opacity: 0.3 !important;
+}
+
+body.dark-mode .hero-section::before {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23444444" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>') !important;
+  opacity: 0.3 !important;
+}
+
+body.dark-mode .hero-container {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .hero-content {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .hero-section h1 {
+  color: #ffffff !important;
+}
+
+body.dark-mode .hero-section h2 {
+  color: #ffffff !important;
+}
+
+body.dark-mode .hero-section p {
+  color: #cccccc !important;
+}
+
+/* Fix any potential overlay issues */
+body.dark-mode .hero-section::after {
+  display: none !important;
+}
+
+/* Make sure no dark overlays are interfering */
+body.dark-mode .hero-section > * {
+  background: transparent !important;
+  z-index: auto !important;
+}
+
+body.dark-mode .section {
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+}
+
+/* Hero section elements */
+body.dark-mode .hero-section * {
+  color: inherit !important;
+}
+
+body.dark-mode .hero-section .hero-container * {
+  background: transparent !important;
+}
+
+body.dark-mode .hero-section .hero-content * {
+  background: transparent !important;
+}
+
+/* Hero section specific elements */
+body.dark-mode .hero-badge {
+  background: linear-gradient(135deg, #4a9eff, #3a8eef) !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .hero-title {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #ffffff, #4a9eff) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+body.dark-mode .hero-description {
+  color: #cccccc !important;
+}
+
+body.dark-mode .stat-item {
+  background: #2d2d2d !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .stat-number {
+  color: #4a9eff !important;
+}
+
+body.dark-mode .stat-label {
+  color: #cccccc !important;
+}
+
+body.dark-mode .card {
+  background-color: var(--background-color, #2d2d2d) !important;
+  border-color: var(--border-color, #444) !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .card h2,
+body.dark-mode .card h3,
+body.dark-mode .card h4 {
+  color: #ffffff !important;
+}
+
+body.dark-mode .card p {
+  color: #cccccc !important;
+}
+
+/* Buttons Dark Mode */
+body.dark-mode .btn {
+  background-color: var(--primary-color, #4a9eff) !important;
+  color: #ffffff !important;
+  border-color: var(--primary-color, #4a9eff) !important;
+}
+
+body.dark-mode .btn:hover {
+  background-color: #3a8eef !important;
+  border-color: #3a8eef !important;
+}
+
+body.dark-mode .btn-secondary {
+  background-color: var(--background-color, #2d2d2d) !important;
+  color: #ffffff !important;
+  border-color: var(--border-color, #444) !important;
+}
+
+body.dark-mode .btn-secondary:hover {
+  background-color: var(--hover-bg, #3d3d3d) !important;
+}
+
+/* Forms Dark Mode */
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
+  background-color: var(--background-color, #2d2d2d) !important;
+  color: #ffffff !important;
+  border-color: var(--border-color, #444) !important;
+}
+
+body.dark-mode input:focus,
+body.dark-mode textarea:focus,
+body.dark-mode select:focus {
+  border-color: var(--primary-color, #4a9eff) !important;
+  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2) !important;
+}
+
+/* Footer Dark Mode */
+body.dark-mode .footer {
+  background-color: var(--background-color, #2d2d2d) !important;
+  color: #ffffff !important;
+  border-top-color: var(--border-color, #444) !important;
+}
+
+body.dark-mode .footer a {
+  color: var(--primary-color, #4a9eff) !important;
+}
+
+body.dark-mode .footer a:hover {
+  color: #ffffff !important;
+}
+
+/* Mobile Menu Dark Mode */
+body.dark-mode .nav-toggle {
+  color: #ffffff !important;
+}
+
+body.dark-mode .nav-toggle span {
+  background-color: #ffffff !important;
+}
+
+body.dark-mode .nav-toggle:hover {
+  color: var(--primary-color, #4a9eff) !important;
+}
+
+body.dark-mode .nav-toggle:hover span {
+  background-color: var(--primary-color, #4a9eff) !important;
+}
+
+body.dark-mode .main-nav {
+  background-color: #2d2d2d !important;
+}
+
+/* Tables Dark Mode */
+body.dark-mode table {
+  background-color: var(--background-color, #2d2d2d) !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode th {
+  background-color: #3d3d3d !important;
+  color: #ffffff !important;
+  border-color: var(--border-color, #444) !important;
+}
+
+body.dark-mode td {
+  border-color: var(--border-color, #444) !important;
+}
+
+body.dark-mode tr:hover {
+  background-color: var(--hover-bg, #3d3d3d) !important;
+}
+
+/* Modals Dark Mode */
+body.dark-mode .modal {
+  background-color: rgba(26, 26, 26, 0.8) !important;
+}
+
+body.dark-mode .modal-overlay {
+  background: rgba(0, 0, 0, 0.9) !important;
+}
+
+body.dark-mode .modal-container {
+  background: #2d2d2d !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .modal-content {
+  background-color: var(--background-color, #2d2d2d) !important;
+  color: #ffffff !important;
+  border-color: var(--border-color, #444) !important;
+}
+
+body.dark-mode .modal-header {
+  border-bottom-color: var(--border-color, #444) !important;
+}
+
+body.dark-mode .modal-footer {
+  border-top-color: var(--border-color, #444) !important;
+}
+
+/* Loading screens */
+body.dark-mode .loading-enhanced {
+  background: rgba(26, 26, 26, 0.95) !important;
+}
+
+body.dark-mode .loading-container {
+  background: #2d2d2d !important;
+  color: #ffffff !important;
+}
+
+/* Floating Action Tabs Dark Mode */
+body.dark-mode .floating-action-tab {
+  background-color: var(--background-color, #2d2d2d) !important;
+  color: #ffffff !important;
+  border-color: var(--border-color, #444) !important;
+}
+
+body.dark-mode .floating-action-tab:hover {
+  background-color: var(--hover-bg, #3d3d3d) !important;
+}
+
+body.dark-mode .floating-action-tab .icon {
+  color: var(--primary-color, #4a9eff) !important;
+}
+
+/* Scrollbar Dark Mode */
+body.dark-mode::-webkit-scrollbar {
+  background-color: #1a1a1a !important;
+}
+
+body.dark-mode::-webkit-scrollbar-thumb {
+  background-color: #555 !important;
+  border-radius: 4px;
+}
+
+body.dark-mode::-webkit-scrollbar-thumb:hover {
+  background-color: #666 !important;
+}
+
+body.dark-mode::-webkit-scrollbar-track {
+  background-color: #2d2d2d !important;
+}
+
+body.dark-mode .dropdown-menu {
+  background-color: #2d2d2d !important;
+  border-color: #444 !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .dropdown-item {
+  color: #ffffff !important;
+  background-color: transparent !important;
+}
+
+body.dark-mode .dropdown-item:hover {
+  background-color: #3d3d3d !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .settings-menu {
+  background-color: #2d2d2d !important;
+  border-color: #444 !important;
+}
+
+body.dark-mode .settings-title {
+  color: #ffffff !important;
+  border-bottom-color: #444 !important;
+}
+
+body.dark-mode .toggle-label,
+body.dark-mode .settings-select-label {
+  color: #ffffff !important;
+}
+
+body.dark-mode .settings-select {
+  background-color: #3d3d3d !important;
+  border-color: #555 !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .settings-select:focus {
+  border-color: #4a9eff !important;
+}
+
+body.dark-mode .toggle-slider {
+  background-color: #555;
+}
+
+body.dark-mode
+  .settings-toggle
+  input[type='checkbox']:checked
+  + .toggle-slider {
+  background: #4a9eff;
+}
+
+/* High Contrast Mode */
+body.high-contrast {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+body.high-contrast .nav-container {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+}
+
+body.high-contrast .nav-link {
+  color: #000000 !important;
+  text-decoration: underline;
+  background-color: transparent !important;
+}
+
+body.high-contrast .nav-link:hover,
+body.high-contrast .nav-link:focus {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+body.high-contrast .settings-menu {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+}
+
+body.high-contrast .settings-title {
+  color: #000000 !important;
+  border-bottom-color: #000000 !important;
+}
+
+body.high-contrast .toggle-label,
+body.high-contrast .settings-select-label {
+  color: #000000 !important;
+}
+
+body.high-contrast .settings-select {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+}
+
+body.high-contrast .toggle-slider {
+  background-color: #ffffff !important;
+  border: 2px solid #000000 !important;
+}
+
+body.high-contrast
+  .settings-toggle
+  input[type='checkbox']:checked
+  + .toggle-slider {
+  background-color: #000000 !important;
+}
+
+body.high-contrast
+  .settings-toggle
+  input[type='checkbox']:checked
+  + .toggle-slider::before {
+  background-color: #ffffff !important;
+}
+
+/* Reduced Motion */
+body.reduced-motion *,
+body.reduced-motion *::before,
+body.reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Large Click Targets */
+body.large-click-targets .nav-link {
+  min-height: 48px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+}
+
+body.large-click-targets .settings-toggle {
+  min-height: 48px;
+  padding: 12px 0;
+}
+
+body.large-click-targets .toggle-slider {
+  width: 56px;
+  height: 32px;
+}
+
+body.large-click-targets .toggle-slider::before {
+  width: 28px;
+  height: 28px;
+  top: 2px;
+  left: 2px;
+}
+
+body.large-click-targets
+  .settings-toggle
+  input[type='checkbox']:checked
+  + .toggle-slider::before {
+  transform: translateX(24px);
+}
+
+body.large-click-targets .settings-select {
+  min-height: 48px;
+  padding: 12px 16px;
+}
+
+body.large-click-targets .floating-tab-link {
+  min-width: 72px;
+  min-height: 72px;
+}
+
+/* System preference respecting */
+@media (prefers-color-scheme: dark) {
+  body.theme-auto {
+    background-color: #1a1a1a;
+    color: #ffffff;
+  }
+
+  body.theme-auto .nav-container {
+    background-color: #2d2d2d;
+    border-bottom-color: #444;
+  }
+
+  body.theme-auto .nav-link {
+    color: #ffffff;
+  }
+
+  body.theme-auto .nav-link:hover {
+    color: #4a9eff;
+  }
+
+  body.theme-auto .settings-menu {
+    background-color: #2d2d2d !important;
+    border-color: #444 !important;
+  }
+
+  body.theme-auto .settings-title {
+    color: #ffffff !important;
+    border-bottom-color: #444 !important;
+  }
+
+  body.theme-auto .toggle-label,
+  body.theme-auto .settings-select-label {
+    color: #ffffff !important;
+  }
+
+  body.theme-auto .settings-select {
+    background-color: #3d3d3d !important;
+    border-color: #555 !important;
+    color: #ffffff !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.theme-auto *,
+  body.theme-auto *::before,
+  body.theme-auto *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Focus indicators for accessibility */
+body.high-contrast *:focus {
+  outline: 3px solid #000000 !important;
+  outline-offset: 2px !important;
+}
+
+body.dark-mode *:focus {
+  outline: 2px solid #4a9eff !important;
+  outline-offset: 2px !important;
+}
+
+/* Ensure settings menu stays visible in all themes */
+body.dark-mode .settings-menu[style*='display: block'] {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+body.high-contrast .settings-menu[style*='display: block'] {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Light mode reset styles - ensures proper switching from dark to light mode */
+/* These styles apply when NOT in dark mode and must override dark mode styles */
+body:not(.dark-mode) {
+  background-color: #ffffff !important;
+  color: #333333 !important;
+}
+
+body:not(.dark-mode) #main-navigation,
+body:not(.dark-mode) .main-nav,
+body:not(.dark-mode) .nav-container {
+  background-color: #ffffff !important;
+  color: #333333 !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+body:not(.dark-mode) .nav-brand,
+body:not(.dark-mode) .nav-link {
+  color: #333333 !important;
+}
+
+body:not(.dark-mode) .nav-link:hover {
+  color: #4a9eff !important;
+  background-color: #f8fafc !important;
+}
+
+/* Hero radar demo light mode reset */
+body:not(.dark-mode) .hero-radar-demo h3 {
+  color: #333333 !important;
+  background: linear-gradient(135deg, #4a9eff 0%, #9d4edd 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+body:not(.dark-mode) .hero-radar-demo p {
+  color: #666666 !important;
+}
+
+/* Scenario headers light mode reset */
+body:not(.dark-mode) .scenario-header,
+body:not(.dark-mode) .scenario-card .scenario-header {
+  background: #ffffff !important;
+  color: #333333 !important;
+  border-color: #e2e8f0 !important;
+}
+
+body:not(.dark-mode) .scenario-header h3,
+body:not(.dark-mode) .scenario-header h4,
+body:not(.dark-mode) .scenario-card h3,
+body:not(.dark-mode) .scenario-card h4 {
+  color: #333333 !important;
+}
+
+/* Scenario cards light mode reset */
+body:not(.dark-mode) .scenario-card,
+body:not(.dark-mode) .scenarios-grid .scenario-card,
+body:not(.dark-mode) .category-section .scenario-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #333333 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* General light mode resets for common elements */
+body:not(.dark-mode) .hero-section {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+  color: #333333 !important;
+}
+
+body:not(.dark-mode) .hero-content {
+  background: transparent !important;
+  color: #333333 !important;
+}
+
+body:not(.dark-mode) .hero-content h2 {
+  color: #333333 !important;
+}
+
+body:not(.dark-mode) .hero-content p {
+  color: #666666 !important;
+}
+
+body:not(.dark-mode) .section {
+  background-color: #ffffff !important;
+  color: #333333 !important;
+}
+
+/* Container elements light mode reset */
+body:not(.dark-mode) .container,
+body:not(.dark-mode) .main-container,
+body:not(.dark-mode) .content-container,
+body:not(.dark-mode) .page-container {
+  background-color: #ffffff !important;
+  color: #333333 !important;
+}
+
+/* Basic text colors - must override dark mode with !important */
+body:not(.dark-mode) h1,
+body:not(.dark-mode) h2,
+body:not(.dark-mode) h3,
+body:not(.dark-mode) h4,
+body:not(.dark-mode) h5,
+body:not(.dark-mode) h6 {
+  color: #333333 !important;
+}
+
+body:not(.dark-mode) p {
+  color: #666666 !important;
+}

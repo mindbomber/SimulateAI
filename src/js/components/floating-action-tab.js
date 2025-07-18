@@ -33,6 +33,7 @@ class FloatingActionTab {
 
     this.init();
     this.bindEvents();
+    this.listenToSettings();
   }
 
   init() {
@@ -40,7 +41,44 @@ class FloatingActionTab {
 
     this.createElement();
     this.attachToDOM();
+    this.applyInitialSettings();
     this.isInitialized = true;
+  }
+
+  listenToSettings() {
+    // Listen for settings changes
+    window.addEventListener('settingsChanged', e => {
+      const { settings } = e.detail;
+      this.updateVisibility(settings.donateTabEnabled);
+    });
+
+    // Listen for settings manager ready
+    window.addEventListener('settingsManagerReady', e => {
+      const { settings } = e.detail;
+      this.updateVisibility(settings.donateTabEnabled);
+    });
+  }
+
+  applyInitialSettings() {
+    // Apply initial settings if available
+    const applySettings = () => {
+      if (window.settingsManager) {
+        const enabled = window.settingsManager.getSetting('donateTabEnabled');
+        this.updateVisibility(enabled);
+      }
+    };
+
+    // Try immediately
+    applySettings();
+
+    // Also try after a short delay in case settings manager isn't ready
+    setTimeout(applySettings, 100);
+  }
+
+  updateVisibility(enabled) {
+    if (this.link) {
+      this.link.style.display = enabled ? 'block' : 'none';
+    }
   }
 
   createElement() {
@@ -128,12 +166,23 @@ class FloatingActionTab {
 
   handleHover() {
     if (!this.isMobile) {
-      this.expand();
+      // Add a small delay to make hover more intentional
+      if (this.hoverTimeout) {
+        clearTimeout(this.hoverTimeout);
+      }
+      this.hoverTimeout = setTimeout(() => {
+        this.expand();
+      }, 100); // 100ms delay
     }
   }
 
   handleLeave() {
     if (!this.isMobile) {
+      // Clear hover timeout if user leaves before delay
+      if (this.hoverTimeout) {
+        clearTimeout(this.hoverTimeout);
+        this.hoverTimeout = null;
+      }
       this.collapse();
     }
   }
@@ -152,20 +201,25 @@ class FloatingActionTab {
 
   handleTouchStart(e) {
     if (this.isMobile) {
-      e.preventDefault();
-      this.toggle();
+      // Allow default behavior to ensure click events work
+      this.createRipple(e.touches[0]);
     }
   }
 
   handleMobileClick(e) {
-    if (this.isMobile && !this.isExpanded) {
-      e.preventDefault();
-      this.expand();
+    if (this.isMobile) {
+      if (!this.isExpanded) {
+        e.preventDefault();
+        this.expand();
 
-      // Auto-collapse after delay
-      setTimeout(() => {
-        this.collapse();
-      }, MOBILE_AUTO_COLLAPSE_DELAY);
+        // Auto-collapse after delay
+        setTimeout(() => {
+          this.collapse();
+        }, MOBILE_AUTO_COLLAPSE_DELAY);
+      } else {
+        // When expanded, navigate to donation page
+        window.location.href = this.link.href;
+      }
     }
   }
 
@@ -243,6 +297,23 @@ class FloatingActionTab {
       'visibilitychange',
       this.handleVisibilityChange.bind(this)
     );
+  }
+
+  createRipple(touch) {
+    if (!touch) return;
+
+    const ripple = document.createElement('span');
+    ripple.className = 'ripple';
+    ripple.style.left = `${touch.clientX - this.link.getBoundingClientRect().left}px`;
+    ripple.style.top = `${touch.clientY - this.link.getBoundingClientRect().top}px`;
+
+    this.link.appendChild(ripple);
+
+    setTimeout(() => {
+      if (ripple.parentNode) {
+        ripple.parentNode.removeChild(ripple);
+      }
+    }, RIPPLE_DURATION);
   }
 
   destroy() {

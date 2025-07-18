@@ -374,7 +374,12 @@ export class BaseObject {
    * @returns {string}
    */
   generateId() {
-    return `obj_${Date.now()}_${Math.random().toString(OBJECT_CONSTANTS.ID_BASE).substr(OBJECT_CONSTANTS.ID_SUBSTRING_START, OBJECT_CONSTANTS.ID_LENGTH)}`;
+    return `obj_${Date.now()}_${Math.random()
+      .toString(OBJECT_CONSTANTS.ID_BASE)
+      .substring(
+        OBJECT_CONSTANTS.ID_SUBSTRING_START,
+        OBJECT_CONSTANTS.ID_SUBSTRING_START + OBJECT_CONSTANTS.ID_LENGTH
+      )}`;
   } /**
    * Sets up default event handlers from options
    * @param {Object} options

@@ -10,20 +10,29 @@ class EnvironmentConfig {
 
   loadConfig() {
     // Check if running in development or production
-    const isDevelopment = import.meta.env.DEV;
-    const isProduction = import.meta.env.PROD;
+    // Add fallback for when import.meta.env is not available
+    const metaEnv = import.meta.env || {};
+    const isDevelopment =
+      metaEnv.DEV ||
+      (!metaEnv.PROD && window.location.hostname === 'localhost');
+    const isProduction =
+      metaEnv.PROD ||
+      (!metaEnv.DEV && window.location.hostname !== 'localhost');
 
     // Load environment variables
     const config = {
       // Firebase Configuration
       firebase: {
-        apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-        authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-        projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-        storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-        messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-        appId: import.meta.env.VITE_FIREBASE_APP_ID,
-        measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+        apiKey: metaEnv.VITE_FIREBASE_API_KEY || 'demo-api-key',
+        authDomain:
+          metaEnv.VITE_FIREBASE_AUTH_DOMAIN || 'demo-project.firebaseapp.com',
+        projectId: metaEnv.VITE_FIREBASE_PROJECT_ID || 'demo-project',
+        storageBucket:
+          metaEnv.VITE_FIREBASE_STORAGE_BUCKET || 'demo-project.appspot.com',
+        messagingSenderId:
+          metaEnv.VITE_FIREBASE_MESSAGING_SENDER_ID || '123456789',
+        appId: metaEnv.VITE_FIREBASE_APP_ID || '1:123456789:web:abcdef',
+        measurementId: metaEnv.VITE_FIREBASE_MEASUREMENT_ID || 'G-ABCDEF1234',
       },
 
       // Stripe Configuration

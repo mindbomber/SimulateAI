@@ -1952,6 +1952,65 @@
   position: relative;
 }
 
+/* Clear All Container */
+.clear-all-container {
+  position: relative;
+  margin-left: var(--spacing-2);
+}
+
+/* Clear All Button */
+.clear-all-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-4);
+  border: 1px solid var(--color-red-300);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  color: var(--color-red-600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+}
+
+.clear-all-btn:hover {
+  border-color: var(--color-red-400);
+  background: var(--color-red-50);
+  color: var(--color-red-700);
+}
+
+.clear-all-btn:focus {
+  outline: none;
+  border-color: var(--color-red-500);
+  box-shadow: 0 0 0 3px var(--color-red-100);
+}
+
+.clear-all-btn:active {
+  background: var(--color-red-100);
+  transform: translateY(1px);
+}
+
+/* Clear All Icon */
+.clear-all-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--color-red-500);
+  transition: color var(--transition-fast);
+}
+
+.clear-all-btn:hover .clear-all-icon {
+  color: var(--color-red-600);
+}
+
+/* Clear All Text */
+.clear-all-text {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+}
+
 /* Filter and Sort Buttons */
 .filter-btn,
 .sort-btn {
@@ -2250,6 +2309,13 @@
     gap: var(--spacing-4) !important;
   }
 
+  /* Clear all button responsive adjustments */
+  .scenarios-grid[data-view='scenario']
+    .scenario-controls-toolbar
+    .clear-all-container {
+    margin-left: 0 !important;
+  }
+
   /* Mobile search input adjustments */
   .scenarios-grid[data-view='scenario']
     .scenario-controls-toolbar
@@ -2278,5 +2344,20 @@
     .controls-group {
     flex-wrap: wrap !important;
     justify-content: space-around !important;
+  }
+
+  /* Clear all button on extra small screens */
+  .clear-all-btn {
+    padding: var(--spacing-2) var(--spacing-3) !important;
+    font-size: var(--font-size-xs) !important;
+  }
+
+  .clear-all-text {
+    display: none !important; /* Hide text on very small screens */
+  }
+
+  .clear-all-icon {
+    width: 14px !important;
+    height: 14px !important;
   }
 }

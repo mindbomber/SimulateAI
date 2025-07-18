@@ -1,0 +1,421 @@
+/**
+ * Copyright 2025 Armando Sori
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Floating Tour Tab Component Styles
+ * Professional floating "Take Tour" button with smooth animations
+ * Positioned above the surprise tab
+ */
+
+/* Main floating tour tab container */
+.floating-tour-tab-link {
+  position: fixed;
+  top: 22%; /* Positioned above surprise tab which is at 35% */
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 1000; /* Higher than surprise tab (999) to appear above it */
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 280px;
+  pointer-events: none; /* Disable pointer events on the link */
+}
+
+.floating-tour-tab {
+  position: relative;
+  background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+  border-radius: 8px 0 0 8px;
+  box-shadow:
+    0 4px 20px rgba(108, 92, 231, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transform: translateX(calc(100% - 90px));
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 280px;
+  height: 60px;
+  cursor: pointer;
+  user-select: none;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: none;
+  pointer-events: auto; /* Enable pointer events only on the tab itself */
+}
+
+.floating-tour-tab:hover {
+  box-shadow:
+    0 8px 30px rgba(108, 92, 231, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.floating-tour-tab.expanded {
+  transform: translateX(0);
+}
+
+/* Tab content layout */
+.floating-tour-tab-content {
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  height: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.floating-tour-tab-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  margin-right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  animation: learning-pulse 3.5s ease-in-out infinite alternate;
+}
+
+@keyframes learning-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+  }
+}
+
+.floating-tour-tab-text {
+  flex: 1;
+  min-width: 0;
+  color: white;
+}
+
+.tour-tab-title {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tour-tab-subtitle {
+  display: block;
+  font-size: 13px;
+  opacity: 0.9;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.floating-tour-tab-arrow {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  margin-left: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+  transition: all 0.2s ease;
+}
+
+.tour-arrow-icon {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s ease;
+}
+
+.floating-tour-tab:hover .tour-arrow-icon {
+  transform: translateX(2px);
+}
+
+/* Ripple effect */
+.floating-tour-tab-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  transform: scale(0);
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  margin-left: -10px;
+  margin-top: -10px;
+}
+
+@keyframes tour-ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Feedback states */
+.floating-tour-tab.tour-clicked {
+  animation: tour-feedback-pulse 0.6s ease-out;
+}
+
+.floating-tour-tab.tour-unavailable {
+  animation: tour-shake 0.5s ease-in-out;
+}
+
+@keyframes tour-feedback-pulse {
+  0% {
+    transform: translateX(calc(100% - 90px)) scale(1);
+  }
+  50% {
+    transform: translateX(calc(100% - 90px)) scale(1.05);
+  }
+  100% {
+    transform: translateX(calc(100% - 90px)) scale(1);
+  }
+}
+
+@keyframes tour-shake {
+  0%,
+  100% {
+    transform: translateX(calc(100% - 90px));
+  }
+  25% {
+    transform: translateX(calc(100% - 85px));
+  }
+  75% {
+    transform: translateX(calc(100% - 95px));
+  }
+}
+
+/* Expanded state animations */
+.floating-tour-tab.expanded.tour-clicked {
+  animation: tour-feedback-pulse-expanded 0.6s ease-out;
+}
+
+.floating-tour-tab.expanded.tour-unavailable {
+  animation: tour-shake-expanded 0.5s ease-in-out;
+}
+
+@keyframes tour-feedback-pulse-expanded {
+  0% {
+    transform: translateX(0) scale(1);
+  }
+  50% {
+    transform: translateX(0) scale(1.02);
+  }
+  100% {
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes tour-shake-expanded {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+}
+
+/* Focus styles for accessibility */
+.floating-tour-tab-link:focus {
+  outline: none;
+}
+
+.floating-tour-tab-link:focus .floating-tour-tab {
+  box-shadow:
+    0 8px 30px rgba(108, 92, 231, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    0 0 0 3px rgba(108, 92, 231, 0.5);
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .floating-tour-tab-link {
+    width: 240px;
+    top: 20%; /* Slightly adjusted for mobile */
+  }
+
+  .floating-tour-tab {
+    min-width: 240px;
+    height: 56px;
+    transform: translateX(calc(100% - 80px));
+  }
+
+  .floating-tour-tab-content {
+    padding: 0 16px;
+  }
+
+  .floating-tour-tab-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+    font-size: 18px;
+  }
+
+  .tour-tab-title {
+    font-size: 15px;
+  }
+
+  .tour-tab-subtitle {
+    font-size: 12px;
+  }
+
+  .floating-tour-tab-arrow {
+    width: 20px;
+    height: 20px;
+    margin-left: 8px;
+  }
+
+  .tour-arrow-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Mobile feedback animations */
+  @keyframes tour-feedback-pulse {
+    0% {
+      transform: translateX(calc(100% - 80px)) scale(1);
+    }
+    50% {
+      transform: translateX(calc(100% - 80px)) scale(1.05);
+    }
+    100% {
+      transform: translateX(calc(100% - 80px)) scale(1);
+    }
+  }
+
+  @keyframes tour-shake {
+    0%,
+    100% {
+      transform: translateX(calc(100% - 80px));
+    }
+    25% {
+      transform: translateX(calc(100% - 75px));
+    }
+    75% {
+      transform: translateX(calc(100% - 85px));
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .floating-tour-tab-link {
+    width: 200px;
+    top: 18%;
+  }
+
+  .floating-tour-tab {
+    min-width: 200px;
+    height: 52px;
+    transform: translateX(calc(100% - 70px));
+  }
+
+  .floating-tour-tab-content {
+    padding: 0 12px;
+  }
+
+  .floating-tour-tab-icon {
+    width: 22px;
+    height: 22px;
+    margin-right: 10px;
+    font-size: 16px;
+  }
+
+  .tour-tab-title {
+    font-size: 14px;
+  }
+
+  .tour-tab-subtitle {
+    font-size: 11px;
+  }
+
+  /* Small mobile feedback animations */
+  @keyframes tour-feedback-pulse {
+    0% {
+      transform: translateX(calc(100% - 70px)) scale(1);
+    }
+    50% {
+      transform: translateX(calc(100% - 70px)) scale(1.05);
+    }
+    100% {
+      transform: translateX(calc(100% - 70px)) scale(1);
+    }
+  }
+
+  @keyframes tour-shake {
+    0%,
+    100% {
+      transform: translateX(calc(100% - 70px));
+    }
+    25% {
+      transform: translateX(calc(100% - 65px));
+    }
+    75% {
+      transform: translateX(calc(100% - 75px));
+    }
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .floating-tour-tab {
+    background: linear-gradient(135deg, #4c3dc7 0%, #8288fe 100%);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+  }
+
+  .floating-tour-tab-link:focus .floating-tour-tab {
+    box-shadow:
+      0 8px 30px rgba(108, 92, 231, 0.6),
+      0 4px 12px rgba(0, 0, 0, 0.25),
+      0 0 0 4px rgba(255, 255, 255, 0.8);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .floating-tour-tab,
+  .floating-tour-tab-link,
+  .floating-tour-tab-content,
+  .floating-tour-tab-icon,
+  .floating-tour-tab-arrow,
+  .tour-arrow-icon {
+    animation: none;
+    transition: none;
+  }
+
+  .floating-tour-tab-ripple {
+    display: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .floating-tour-tab-link {
+    display: none;
+  }
+}

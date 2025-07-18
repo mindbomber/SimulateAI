@@ -15,9 +15,10 @@
  */
 
 /**
- * Category Grid Component
- * Displays the main grid of ethical dilemma categories on the home page
- * Part of the SimulateAI Ethics Platform Revamp - Phase 1.1
+ * Main Grid Component
+ * Displays the main content grid with category and scenario views
+ * Handles view toggling, search, filtering, and modal management
+ * Part of the SimulateAI Ethics Platform - Main Interface
  */
 
 import {
@@ -40,13 +41,14 @@ const HIGHLIGHT_DURATION = 2000;
 const BADGE_DELAY_MS = 2000; // Delay between multiple badge reveals
 const MOBILE_HEADER_SHOW_DURATION = 3000; // Duration to show header on mobile touch
 const MOBILE_HEADER_FADE_DELAY = 2000; // Delay before hiding header after touch end
+const PROGRESS_RING_RADIUS = 15.915; // SVG progress ring radius
 
 // Autocomplete constants
 const AUTOCOMPLETE_DEBOUNCE_MS = 150;
 const MAX_AUTOCOMPLETE_SCENARIOS = 5;
 const MAX_AUTOCOMPLETE_TAGS = 8;
 
-class CategoryGrid {
+class MainGrid {
   constructor() {
     this.container = null;
     this.categoryContainer = null;
@@ -58,6 +60,9 @@ class CategoryGrid {
     this.lastModalOpenTime = 0; // Debounce tracking
     this.modalOpenCooldown = 500; // Minimum time between modal opens (ms)
     this.isModalOpen = false; // Track if modal is currently open
+    this.scenarioModal = null; // Reusable modal instance
+    this.modalClosedHandler = null; // Store bound event handler
+    this.scenarioCompletedHandler = null; // Store bound event handler
 
     // Search, filter, and sort state
     this.searchQuery = '';
@@ -309,6 +314,14 @@ class CategoryGrid {
               </button>
             </div>
           </div>
+          <div class="clear-all-container">
+            <button class="clear-all-btn" aria-label="Clear all filters and sorting">
+              <svg class="clear-all-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd"/>
+              </svg>
+              <span class="clear-all-text">Clear All</span>
+            </button>
+          </div>
         </div>
       `;
     this.scenarioContainer.insertBefore(
@@ -377,7 +390,7 @@ class CategoryGrid {
       });
 
       logger.info(
-        'CategoryGrid',
+        'MainGrid',
         `Rendered ${allScenarios.length} scenarios in scenario view`
       );
 
@@ -449,7 +462,7 @@ class CategoryGrid {
     );
 
     logger.info(
-      'CategoryGrid',
+      'MainGrid',
       `Used fallback rendering for scenario view (${totalScenarios} scenarios)`
     );
   }
@@ -548,7 +561,7 @@ class CategoryGrid {
       });
     }
 
-    logger.info('CategoryGrid', `Switched to ${newView} view`);
+    logger.info('MainGrid', `Switched to ${newView} view`);
   }
 
   createCategorySection(category) {
@@ -634,22 +647,28 @@ class CategoryGrid {
       );
     }
 
-    // Listen for scenario modal fully closed (for badge display)
-    document.addEventListener(
-      'scenario-modal-closed',
-      this.handleScenarioModalClosed.bind(this)
-    );
+    // Listen for scenario modal fully closed (for badge display) - only add once
+    if (!this.modalClosedHandler) {
+      this.modalClosedHandler = this.handleScenarioModalClosed.bind(this);
+      document.addEventListener(
+        'scenario-modal-closed',
+        this.modalClosedHandler
+      );
+    }
 
     // Attach CategoryHeader event listeners for progress ring tooltips (category view only)
     if (this.currentView === 'category') {
       this.categoryHeader.attachEventListeners(this.categoryContainer);
     }
 
-    // Listen for scenario completion tracking
-    document.addEventListener(
-      'scenario-completed',
-      this.handleScenarioCompleted.bind(this)
-    );
+    // Listen for scenario completion tracking - only add once
+    if (!this.scenarioCompletedHandler) {
+      this.scenarioCompletedHandler = this.handleScenarioCompleted.bind(this);
+      document.addEventListener(
+        'scenario-completed',
+        this.scenarioCompletedHandler
+      );
+    }
   }
 
   removeEventListeners() {
@@ -668,6 +687,33 @@ class CategoryGrid {
         }
       }
     });
+
+    // Remove global event listeners to prevent accumulation
+    if (this.modalClosedHandler) {
+      document.removeEventListener(
+        'scenario-modal-closed',
+        this.modalClosedHandler
+      );
+      this.modalClosedHandler = null;
+    }
+
+    // Remove scenario completed event listener
+    if (this.scenarioCompletedHandler) {
+      document.removeEventListener(
+        'scenario-completed',
+        this.scenarioCompletedHandler
+      );
+      this.scenarioCompletedHandler = null;
+    }
+
+    // Clean up scenario modal instance
+    if (this.scenarioModal) {
+      // If modal is open, close it
+      if (this.scenarioModal.modal) {
+        this.scenarioModal.close();
+      }
+      this.scenarioModal = null;
+    }
   }
 
   addTouchEventListeners(container) {
@@ -950,7 +996,7 @@ class CategoryGrid {
         },
       });
 
-      const scenarioModal = new ScenarioModal();
+      const scenarioModal = this.getScenarioModal();
       scenarioModal.open(scenarioId, categoryId);
 
       // Listen for scenario completion
@@ -970,7 +1016,7 @@ class CategoryGrid {
    * Open scenario modal directly, skipping pre-launch modal
    */
   openScenarioModalDirect(categoryId, scenarioId) {
-    logger.debug('CategoryGrid: openScenarioModalDirect called', {
+    logger.debug('MainGrid: openScenarioModalDirect called', {
       categoryId,
       scenarioId,
     });
@@ -1009,7 +1055,7 @@ class CategoryGrid {
       return;
     }
 
-    logger.info('CategoryGrid', 'Opening scenario modal directly for:', {
+    logger.info('MainGrid', 'Opening scenario modal directly for:', {
       title: scenario.title,
     });
 
@@ -1047,6 +1093,16 @@ class CategoryGrid {
 
     // Open the scenario modal directly
     this.openScenarioModal(scenarioId, categoryId);
+  }
+
+  /**
+   * Get or create a reusable scenario modal instance
+   */
+  getScenarioModal() {
+    if (!this.scenarioModal) {
+      this.scenarioModal = new ScenarioModal();
+    }
+    return this.scenarioModal;
   }
 
   /**
@@ -1114,9 +1170,11 @@ class CategoryGrid {
     // CRITICAL FIX: Always reset modal state to allow new modals to open
     // This ensures subsequent Surprise Me clicks work regardless of how modal was closed
     this.isModalOpen = false;
-    logger.debug(
-      'CategoryGrid: Modal state reset, subsequent modals can now open'
-    );
+
+    // Reset the last modal open time to allow immediate new opens after proper close
+    this.lastModalOpenTime = 0;
+
+    logger.debug('MainGrid: Modal state reset, subsequent modals can now open');
 
     // Only check for newly earned badges if scenario was actually completed
     if (completed && categoryId && scenarioId) {
@@ -1149,8 +1207,82 @@ class CategoryGrid {
       this.checkForNewBadges(categoryId, scenarioId);
     }
 
-    // Re-render to update progress indicators
-    this.render();
+    // Update scenario completion status in DOM without full re-render
+    this.updateScenarioCompletionStatus(categoryId, scenarioId, completed);
+  }
+
+  /**
+   * Update scenario completion status in DOM without full re-render
+   * @param {string} categoryId - Category ID
+   * @param {string} scenarioId - Scenario ID
+   * @param {boolean} completed - Completion status
+   */
+  updateScenarioCompletionStatus(categoryId, scenarioId, completed) {
+    try {
+      // Update in both view containers
+      [this.categoryContainer, this.scenarioContainer].forEach(container => {
+        if (!container) return;
+
+        const scenarioCard = container.querySelector(
+          `[data-category-id="${categoryId}"][data-scenario-id="${scenarioId}"]`
+        );
+
+        if (scenarioCard) {
+          // Update completion status class
+          scenarioCard.classList.toggle('completed', completed);
+
+          // Update completion indicator if it exists
+          const completionIndicator = scenarioCard.querySelector(
+            '.completion-indicator'
+          );
+          if (completionIndicator) {
+            completionIndicator.style.display = completed ? 'block' : 'none';
+          }
+
+          // Update progress ring in category headers if in category view
+          if (container === this.categoryContainer) {
+            const categorySection = scenarioCard.closest('.category-section');
+            if (categorySection) {
+              const progressRing =
+                categorySection.querySelector('.progress-ring');
+              if (progressRing) {
+                const progress = this.getCategoryProgress(categoryId);
+                const percentage =
+                  progress.total > 0
+                    ? (progress.completed / progress.total) * 100
+                    : 0;
+                const circumference = 2 * Math.PI * PROGRESS_RING_RADIUS;
+                const offset =
+                  circumference - (percentage / 100) * circumference;
+
+                progressRing.style.strokeDashoffset = offset;
+
+                // Update aria-label for accessibility
+                const progressText =
+                  categorySection.querySelector('.progress-text');
+                if (progressText) {
+                  progressText.textContent = `${progress.completed}/${progress.total}`;
+                  progressRing.setAttribute(
+                    'aria-label',
+                    `${progress.completed} of ${progress.total} scenarios completed`
+                  );
+                }
+              }
+            }
+          }
+        }
+      });
+
+      logger.debug('Updated scenario completion status in DOM', {
+        categoryId,
+        scenarioId,
+        completed,
+      });
+    } catch (error) {
+      logger.error('Failed to update scenario completion status:', error);
+      // Fallback to full render only if DOM update fails
+      this.render();
+    }
   }
 
   /**
@@ -1369,7 +1501,7 @@ class CategoryGrid {
       '.scenario-controls-toolbar'
     );
     if (!toolbar) {
-      logger.error('CategoryGrid', 'Scenario controls toolbar not found!');
+      logger.error('MainGrid', 'Scenario controls toolbar not found!');
       return;
     }
 
@@ -1397,6 +1529,9 @@ class CategoryGrid {
 
       // Setup sort dropdown
       this.setupSortDropdown();
+
+      // Setup clear all button
+      this.setupClearAllButton();
     }, DROPDOWN_SETUP_DELAY);
 
     // Populate category filter options
@@ -2042,6 +2177,110 @@ class CategoryGrid {
   }
 
   /**
+   * Setup clear all button functionality
+   */
+  setupClearAllButton() {
+    const clearAllBtn = this.scenarioContainer.querySelector('.clear-all-btn');
+
+    if (!clearAllBtn) {
+      logger.warn('Clear all button not found');
+      return;
+    }
+
+    clearAllBtn.addEventListener('click', e => {
+      e.preventDefault();
+      this.clearAllFilters();
+    });
+  }
+
+  /**
+   * Clear all filters and reset to default state
+   */
+  clearAllFilters() {
+    // Reset all filter and sort states
+    this.searchQuery = '';
+    this.selectedCategory = null;
+    this.selectedDifficulty = null;
+    this.selectedCompleted = null;
+    this.sortBy = 'alphabetical';
+
+    // Reset search input
+    const searchInput = this.scenarioContainer.querySelector('.search-input');
+    if (searchInput) {
+      searchInput.value = '';
+    }
+
+    // Hide search clear button
+    const searchClearBtn =
+      this.scenarioContainer.querySelector('.search-clear');
+    if (searchClearBtn) {
+      searchClearBtn.style.display = 'none';
+    }
+
+    // Hide autocomplete dropdown
+    this.hideAutocomplete();
+
+    // Reset filter dropdown to "All Categories"
+    const filterBtn = this.scenarioContainer.querySelector('.filter-btn');
+    const filterOptions =
+      this.scenarioContainer.querySelectorAll('.filter-option');
+
+    if (filterBtn) {
+      const filterText = filterBtn.querySelector('.filter-text');
+      if (filterText) {
+        filterText.textContent = 'All Categories';
+      }
+    }
+
+    filterOptions.forEach(option => {
+      const isAllOption = option.getAttribute('data-category') === 'all';
+      option.classList.toggle('active', isAllOption);
+      option.setAttribute('aria-selected', isAllOption ? 'true' : 'false');
+    });
+
+    // Reset sort dropdown to "Alphabetical"
+    const sortBtn = this.scenarioContainer.querySelector('.sort-btn');
+    const sortOptions = this.scenarioContainer.querySelectorAll('.sort-option');
+
+    if (sortBtn) {
+      const sortText = sortBtn.querySelector('.sort-text');
+      if (sortText) {
+        sortText.textContent = 'Alphabetical';
+      }
+    }
+
+    sortOptions.forEach(option => {
+      const isAlphabetical =
+        option.getAttribute('data-sort') === 'alphabetical';
+      option.classList.toggle('active', isAlphabetical);
+      option.setAttribute('aria-selected', isAlphabetical ? 'true' : 'false');
+    });
+
+    // Close any open dropdowns
+    const filterDropdown =
+      this.scenarioContainer.querySelector('.filter-dropdown');
+    const sortDropdown = this.scenarioContainer.querySelector('.sort-dropdown');
+
+    if (filterDropdown) {
+      filterDropdown.style.display = 'none';
+    }
+    if (sortDropdown) {
+      sortDropdown.style.display = 'none';
+    }
+    if (filterBtn) {
+      filterBtn.setAttribute('aria-expanded', 'false');
+    }
+    if (sortBtn) {
+      sortBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    // Re-apply filters and sort (which will now be default)
+    this.applyFiltersAndSort();
+
+    logger.info('All filters and sort options cleared, reset to default');
+  }
+
+  /**
    * Populate category filter options
    */
   populateCategoryFilter() {
@@ -2316,4 +2555,4 @@ class CategoryGrid {
   }
 }
 
-export default CategoryGrid;
+export default MainGrid;

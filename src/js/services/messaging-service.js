@@ -294,7 +294,11 @@ class MessagingService {
   // Error handling and logging methods
   handleError(message, error = null) {
     // In production, send to logging service
-    if (process.env.NODE_ENV === 'development') {
+    // Use location check instead of process.env which is not available in browser
+    const isDevelopment =
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1';
+    if (isDevelopment) {
       // eslint-disable-next-line no-console
       console.error(`${message}${error ? ':' : ''}`, error || '');
     }
@@ -302,7 +306,11 @@ class MessagingService {
 
   logInfo(message, data = null) {
     // In production, send to analytics
-    if (process.env.NODE_ENV === 'development') {
+    // Use location check instead of process.env which is not available in browser
+    const isDevelopment =
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1';
+    if (isDevelopment) {
       // eslint-disable-next-line no-console
       console.log(message, data || '');
     }

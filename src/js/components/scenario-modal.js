@@ -16,7 +16,8 @@ const RADAR_CHART_MAX_SCORE = 5;
 const RADAR_CHART_NEUTRAL_SCORE = 3;
 
 class ScenarioModal {
-  constructor() {
+  constructor(options = {}) {
+    logger.info('ScenarioModal', 'Constructor called with options:', options);
     this.modal = null;
     this.backdrop = null;
     this.radarChart = null;
@@ -25,6 +26,8 @@ class ScenarioModal {
     this.currentCategoryId = null;
     this.currentScenarioId = null;
     this.isOpening = false; // Flag to prevent duplicate openings
+    this.wasCompleted = false; // Flag to track if scenario was completed
+    this.isTestMode = options.isTestMode || false; // Flag for test scenarios
 
     // Cache for categories and scenarios
     this.categories = getAllCategories();
@@ -35,8 +38,9 @@ class ScenarioModal {
    * Open the modal with a specific scenario
    * @param {string} scenarioId - The scenario ID to display
    * @param {string} categoryId - The category ID (optional, will be detected if not provided)
+   * @param {boolean} isTestMode - Whether this is a test scenario (optional, defaults to false)
    */
-  async open(scenarioId, categoryId = null) {
+  async open(scenarioId, categoryId = null, isTestMode = false) {
     try {
       // Prevent duplicate openings
       if (this.isOpening || this.modal) {
@@ -47,6 +51,8 @@ class ScenarioModal {
       }
 
       this.isOpening = true;
+      this.wasCompleted = false; // Reset completion flag for new scenario
+      this.isTestMode = isTestMode; // Set test mode for this session
 
       // Find the category if not provided
       if (!categoryId) {
@@ -80,14 +86,50 @@ class ScenarioModal {
 
       logger.info(
         'ScenarioModal',
-        `Opened scenario modal for: ${categoryId}:${scenarioId}`
+        `Opened scenario modal for: ${categoryId}:${scenarioId}${isTestMode ? ' (TEST MODE)' : ''}`
       );
     } catch (error) {
       logger.error('Failed to open scenario modal:', error);
       alert(`Failed to load scenario: ${scenarioId}. Please try again.`);
+
+      // Ensure cleanup on error to prevent modal from being stuck
+      this.cleanup();
     } finally {
       // Reset the opening flag
       this.isOpening = false;
+    }
+  }
+
+  /**
+   * Clean up modal state in case of errors
+   */
+  cleanup() {
+    if (this.modal) {
+      this.modal.remove();
+      this.modal = null;
+    }
+    if (this.backdrop) {
+      this.backdrop.remove();
+      this.backdrop = null;
+    }
+
+    // Reset all state flags
+    this.isOpening = false;
+    this.isClosing = false;
+    this.currentScenario = null;
+    this.selectedOption = null;
+    this.currentCategoryId = null;
+    this.currentScenarioId = null;
+    this.scenarioData = null;
+    this.radarChart = null;
+
+    // Restore body scrolling
+    document.body.style.overflow = '';
+
+    // Remove event listeners
+    if (this.escapeHandler) {
+      document.removeEventListener('keydown', this.escapeHandler);
+      this.escapeHandler = null;
     }
   }
 
@@ -243,11 +285,12 @@ class ScenarioModal {
                 </div>
 
                 <div class="scenario-modal-footer">
+                    ${this.isTestMode ? '<div class="test-mode-indicator">🧪 Test Mode - Choices not tracked</div>' : ''}
                     <button class="btn btn-secondary" id="cancel-scenario">
                         Cancel
                     </button>
                     <button class="btn btn-primary" id="confirm-choice" disabled>
-                        Confirm Choice
+                        ${this.isTestMode ? 'Close Test' : 'Confirm Choice'}
                     </button>
                 </div>
             </div>
@@ -318,7 +361,7 @@ class ScenarioModal {
       logger.info('RadarChart', 'Starting radar chart initialization...');
 
       // Enhanced checks for modal state - WITH DETAILED DEBUGGING
-      console.log('🔍 Modal state debug:', {
+      logger.debug('Modal state debug:', {
         isClosing: this.isClosing,
         hasModal: !!this.modal,
         modalInDOM: this.modal ? document.body.contains(this.modal) : false,
@@ -336,7 +379,7 @@ class ScenarioModal {
           'RadarChart',
           'Modal is closing, skipping radar chart initialization'
         );
-        console.log('❌ Exit: Modal is closing');
+        logger.debug('Exit: Modal is closing');
         return;
       }
 
@@ -345,7 +388,7 @@ class ScenarioModal {
           'RadarChart',
           'Modal not in DOM, skipping radar chart initialization'
         );
-        console.log('❌ Exit: Modal not in DOM');
+        logger.debug('Exit: Modal not in DOM');
         return;
       }
 
@@ -355,7 +398,7 @@ class ScenarioModal {
         !this.modal.hasAttribute('aria-hidden') &&
         this.modal.getAttribute('aria-hidden') !== 'true';
 
-      console.log('🔍 Visibility check:', {
+      logger.debug('Visibility check:', {
         displayNotNone: this.modal.style.display !== 'none',
         noAriaHiddenAttr: !this.modal.hasAttribute('aria-hidden'),
         ariaHiddenNotTrue: this.modal.getAttribute('aria-hidden') !== 'true',
@@ -367,11 +410,11 @@ class ScenarioModal {
           'RadarChart',
           'Modal not visible, skipping radar chart initialization'
         );
-        console.log('❌ Exit: Modal not visible');
+        logger.debug('Exit: Modal not visible');
         return;
       }
 
-      console.log('✅ All modal state checks passed!');
+      logger.debug('All modal state checks passed!');
 
       // Check if RadarChart class is available
       if (!RadarChart) {
@@ -391,8 +434,8 @@ class ScenarioModal {
         return;
       }
 
-      console.log(
-        '✅ All prerequisites met, proceeding with radar chart initialization'
+      logger.debug(
+        'All prerequisites met, proceeding with radar chart initialization'
       );
       logger.info(
         'RadarChart',
@@ -402,8 +445,8 @@ class ScenarioModal {
       // IMMEDIATE TEST: Skip complex container search and try direct creation
       const directContainer = document.getElementById('scenario-radar-chart');
       if (directContainer) {
-        console.log(
-          '📦 Direct container found, attempting immediate chart creation'
+        logger.debug(
+          'Direct container found, attempting immediate chart creation'
         );
         try {
           directContainer.innerHTML =
@@ -437,17 +480,17 @@ class ScenarioModal {
           }
 
           this.radarChart.setScores(neutralScores);
-          console.log('✅ Direct radar chart creation successful!');
+          logger.debug('Direct radar chart creation successful!');
           logger.info('RadarChart', 'Direct radar chart creation successful');
           return; // Exit early on success
         } catch (error) {
-          console.error('❌ Direct radar chart creation failed:', error);
+          logger.error('Direct radar chart creation failed:', error);
           logger.error('RadarChart', 'Direct creation failed:', error);
           // Continue to complex search below
         }
       } else {
-        console.log(
-          '❌ Direct container not found, proceeding with complex search'
+        logger.debug(
+          'Direct container not found, proceeding with complex search'
         );
       }
 
@@ -878,12 +921,30 @@ class ScenarioModal {
       return;
     }
 
+    // If this is a test scenario, just close the modal without tracking
+    if (this.isTestMode) {
+      logger.info('Test scenario completed, closing modal without tracking:', {
+        categoryId: this.currentCategoryId,
+        scenarioId: this.currentScenarioId,
+        selectedOption: this.selectedOption?.id || 'unknown',
+        testMode: true,
+      });
+
+      // Simply close the modal without any tracking or events
+      this.close();
+      return;
+    }
+
+    // Mark as completed for proper close event handling
+    this.wasCompleted = true;
+
     // Store completion data for after modal closes
     const completionData = {
       categoryId: this.currentCategoryId,
       scenarioId: this.currentScenarioId,
       selectedOption: this.selectedOption,
       option: this.selectedOption, // Legacy compatibility
+      completed: true, // Mark as completed
     };
 
     // Dispatch initial scenario completion event (for immediate progress tracking)
@@ -895,7 +956,7 @@ class ScenarioModal {
     logger.info('Scenario completed:', {
       categoryId: this.currentCategoryId,
       scenarioId: this.currentScenarioId,
-      selectedOption: this.selectedOption.id,
+      selectedOption: this.selectedOption?.id || 'unknown',
     });
 
     // Close modal with delay to show completion, then dispatch final event
@@ -950,16 +1011,17 @@ class ScenarioModal {
 
     // Start typewriter effect for the dilemma and ethical question
     // Initialize radar chart first, before typewriter effect - with additional delay
-    console.log('🎯 About to initialize radar chart');
-    console.log('DOM ready state:', document.readyState);
-    console.log('Chart.js available:', !!window.Chart);
-    console.log(
+    logger.debug('About to initialize radar chart');
+    logger.debug('DOM ready state:', document.readyState);
+    logger.debug('Chart.js available:', !!window.Chart);
+    logger.debug(
       'Container exists:',
       !!document.getElementById('scenario-radar-chart')
     );
 
     // Add a small delay to ensure DOM is fully settled
-    await new Promise(resolve => setTimeout(resolve, 200));
+    const DOM_SETTLE_DELAY = 200; // ms
+    await new Promise(resolve => setTimeout(resolve, DOM_SETTLE_DELAY));
 
     await this.initializeRadarChart();
 
@@ -1022,25 +1084,27 @@ class ScenarioModal {
       this.escapeHandler = null;
     }
 
-    // CRITICAL FIX: Always dispatch modal closed event to reset CategoryGrid state
-    // This ensures that subsequent Surprise Me clicks work even if modal was closed without completion
-    const modalClosedEvent = new CustomEvent('scenario-modal-closed', {
-      detail: {
-        categoryId: this.currentCategoryId,
-        scenarioId: this.currentScenarioId,
-        completed: false, // Indicate this was closed without completion
-      },
-    });
+    // CRITICAL FIX: Only dispatch uncompleted event if scenario wasn't actually completed
+    // This prevents overriding the completion event from confirmChoice
+    if (!this.wasCompleted) {
+      const modalClosedEvent = new CustomEvent('scenario-modal-closed', {
+        detail: {
+          categoryId: this.currentCategoryId,
+          scenarioId: this.currentScenarioId,
+          completed: false, // Indicate this was closed without completion
+        },
+      });
 
-    // Dispatch after a short delay to ensure modal cleanup is complete
-    const CLOSE_EVENT_DELAY = 50; // ms - small buffer after animation
-    setTimeout(() => {
-      document.dispatchEvent(modalClosedEvent);
-      logger.info(
-        'ScenarioModal',
-        'Modal closed event dispatched (without completion)'
-      );
-    }, ANIMATION_DURATION + CLOSE_EVENT_DELAY);
+      // Dispatch after a short delay to ensure modal cleanup is complete
+      const CLOSE_EVENT_DELAY = 50; // ms - small buffer after animation
+      setTimeout(() => {
+        document.dispatchEvent(modalClosedEvent);
+        logger.info(
+          'ScenarioModal',
+          'Modal closed event dispatched (without completion)'
+        );
+      }, ANIMATION_DURATION + CLOSE_EVENT_DELAY);
+    }
 
     // Reset state
     this.currentScenario = null;
@@ -1050,6 +1114,7 @@ class ScenarioModal {
     this.scenarioData = null;
     this.radarChart = null;
     this.isOpening = false; // Reset opening flag
+    this.isClosing = false; // Reset closing flag to allow reopening
 
     logger.info('ScenarioModal', 'Scenario modal closed');
   }

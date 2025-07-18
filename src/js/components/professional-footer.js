@@ -34,7 +34,7 @@ const FOOTER_CONFIG = {
       title: 'Platform',
       links: [
         { text: 'Start Simulating', href: 'app.html', icon: '🚀' },
-        { text: 'Browse Scenarios', href: 'scenarios.html', icon: '🎯' },
+        { text: 'Browse Scenarios', href: 'app.html', icon: '🎯' },
         { text: 'Learning Labs', href: 'app.html#learning-labs', icon: '🧪' },
         { text: 'Badge System', href: 'app.html#badges', icon: '🏆' },
       ],

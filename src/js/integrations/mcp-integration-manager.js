@@ -24,6 +24,16 @@ class MCPIntegrationManager {
    * Initialize all MCP integrations
    */
   async initializeIntegrations() {
+    // Prevent duplicate initialization
+    if (this.initialized) {
+      logger.debug('MCP integrations already initialized, skipping');
+      return {
+        success: true,
+        capabilities: Array.from(this.mcpCapabilities),
+        integrations: Array.from(this.integrations.keys()),
+      };
+    }
+
     try {
       logger.info('Initializing MCP integrations for SimulateAI...');
 

@@ -613,8 +613,6 @@
   background-clip: text;
 }
 
-
-
 /* Ensure no unwanted text content displays in the radar chart */
 .scenario-modal #scenario-radar-chart:empty::before {
   content: '';
@@ -668,6 +666,34 @@
   align-items: center;
   gap: 1rem;
   flex-shrink: 0;
+}
+
+/* Test Mode Indicator */
+.test-mode-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);
+  animation: subtle-pulse 2s ease-in-out infinite;
+}
+
+@keyframes subtle-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.02);
+  }
 }
 
 .scenario-modal-footer .btn {
@@ -754,8 +780,14 @@
 }
 
 @keyframes typewriter-blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
 }
 
 /* Ensure typewriter text elements have proper spacing */

@@ -156,7 +156,7 @@ class SharedNavigation {
     // Map filenames to page identifiers
     const pageMap = {
       'index.html': 'home',
-      'scenarios.html': 'scenarios',
+      'app.html': 'scenarios',
       'about.html': 'about',
       'blog.html': 'blog',
       'forum.html': 'forum',
@@ -285,6 +285,11 @@ class SharedNavigation {
         return;
       }
 
+      // Skip settings dropdown (handled by settings-manager)
+      if (trigger.id === 'settings-nav') {
+        return;
+      }
+
       const dropdown = trigger.nextElementSibling;
 
       if (!dropdown || !dropdown.classList.contains('dropdown-menu')) {
@@ -343,20 +348,8 @@ class SharedNavigation {
       return;
     }
 
-    // Take Tour button - remove existing listeners first
-    const tourBtn = document.getElementById('start-tour-nav');
-    if (tourBtn) {
-      // Remove any existing listeners by cloning the element
-      const newTourBtn = tourBtn.cloneNode(true);
-      tourBtn.parentNode.replaceChild(newTourBtn, tourBtn);
-
-      // Add fresh listener
-      newTourBtn.addEventListener('click', e => {
-        e.preventDefault();
-        console.log('SharedNavigation: Tour button clicked');
-        this.handleTourAction();
-      });
-    }
+    // Note: Take Tour button has been moved to floating tour tab component
+    // No longer setting up tour button listeners here
 
     // Surprise Me button - remove existing listeners first
     const surpriseBtn = document.getElementById('surprise-me-nav');
@@ -988,7 +981,7 @@ class SharedNavigation {
     }
 
     // Otherwise navigate to scenarios page with category filter
-    window.location.href = `scenarios.html?category=${category}`;
+    window.location.href = `app.html?category=${category}`;
   }
 
   /**
@@ -1118,7 +1111,7 @@ class SharedNavigation {
                     <nav class="main-nav" role="navigation" aria-label="Main navigation">
                         <ul class="nav-list">
                             <li><a href="index.html" class="nav-link" data-page="home">Home</a></li>
-                            <li><a href="scenarios.html" class="nav-link" data-page="scenarios">Scenarios</a></li>
+                            <li><a href="app.html" class="nav-link" data-page="scenarios">Scenarios</a></li>
                             <li><a href="blog.html" class="nav-link" data-page="blog">Blog</a></li>
                             <li><a href="profile.html" class="nav-link" data-page="profile">Profile</a></li>
                             <li><a href="donate.html" class="nav-link donate-btn" data-page="donate">💖 Donate</a></li>

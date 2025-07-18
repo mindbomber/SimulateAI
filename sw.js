@@ -9,12 +9,11 @@ const RUNTIME_CACHE = 'simulateai-runtime-v1.0';
 const CORE_FILES = [
   '/SimulateAI/',
   '/SimulateAI/index.html',
-  '/SimulateAI/scenarios.html',
+  '/SimulateAI/app.html',
   '/SimulateAI/manifest.json',
 
   // Core JavaScript
   '/SimulateAI/src/js/app.js',
-  '/SimulateAI/src/js/category-page.js',
   '/SimulateAI/src/js/config/firebase-config.js',
   '/SimulateAI/src/js/services/firebase-service.js',
   '/SimulateAI/src/js/services/firebase-analytics-service.js',
@@ -22,7 +21,6 @@ const CORE_FILES = [
 
   // Core CSS
   '/SimulateAI/src/styles/main.css',
-  '/SimulateAI/src/styles/category-page.css',
   '/SimulateAI/src/styles/priority-components.css',
   '/SimulateAI/src/styles/consolidated-components.css',
 
@@ -45,7 +43,7 @@ const EXTENDED_FILES = [
   // Component files
   '/SimulateAI/src/js/components/badge-modal.js',
   '/SimulateAI/src/js/components/card-component.js',
-  '/SimulateAI/src/js/components/category-grid.js',
+  '/SimulateAI/src/js/components/main-grid.js',
   '/SimulateAI/src/js/components/enhanced-simulation-modal.js',
   '/SimulateAI/src/js/components/ethics-explorer.js',
   '/SimulateAI/src/js/components/onboarding-tour.js',

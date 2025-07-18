@@ -223,12 +223,22 @@ class StorageManager {
   static syncEnabled = true;
   static lastSyncTime = 0;
   static quotaWarningThreshold = QUOTA_WARNING_THRESHOLD; // 80% of quota
+  static isInitializing = false; // Track initialization state to prevent loops
+
+  /**
+   * Get the full storage key with prefix
+   */
+  static getStorageKey(key) {
+    return this.STORAGE_PREFIX + key;
+  }
 
   /**
    * Initialize the enhanced storage system
    */
   static async init() {
     try {
+      this.isInitializing = true; // Set initialization flag
+
       // Initialize encryption
       if (this.encryptionEnabled) {
         await StorageEncryption.generateKey();
@@ -258,6 +268,43 @@ class StorageManager {
       // Setup quota monitoring
       this.setupQuotaMonitoring();
 
+      // Recover from any corrupted system data
+      try {
+        // Check if system_backups exists and is potentially corrupted
+        const rawData = this.storage.getItem(
+          this.getStorageKey('system_backups')
+        );
+        if (rawData) {
+          try {
+            const parsedData = JSON.parse(rawData);
+            // If it has compression metadata but the data looks corrupted, clear it
+            if (parsedData.metadata && parsedData.metadata.compressed) {
+              // Don't actually decompress during init - just check if the data looks valid
+              const compressedValue = parsedData.value;
+              if (
+                !compressedValue ||
+                typeof compressedValue !== 'string' ||
+                compressedValue.length < 10
+              ) {
+                logger.warn(
+                  'system_backups appears corrupted (invalid compressed data), clearing'
+                );
+                this.storage.removeItem(this.getStorageKey('system_backups'));
+              }
+            }
+          } catch (parseError) {
+            logger.warn(
+              'system_backups contains invalid JSON, clearing:',
+              parseError
+            );
+            this.storage.removeItem(this.getStorageKey('system_backups'));
+          }
+        }
+      } catch (error) {
+        logger.warn('Error checking system_backups, clearing:', error);
+        this.storage.removeItem(this.getStorageKey('system_backups'));
+      }
+
       // Perform data migration
       await this.migrateData();
 
@@ -266,9 +313,12 @@ class StorageManager {
 
       logger.debug('Enhanced StorageManager initialized successfully');
       this.emit(STORAGE_EVENTS.DATA_UPDATED, { action: 'initialized' });
+
+      this.isInitializing = false; // Clear initialization flag
     } catch (error) {
       logger.error('Failed to initialize StorageManager:', error);
       this.handleError(error, 'initialization');
+      this.isInitializing = false; // Clear flag even on error
     }
   }
 
@@ -514,6 +564,15 @@ class StorageManager {
         throw new Error('Invalid storage key');
       }
 
+      // Force safe options for system_backups to prevent corruption loops
+      if (key === 'system_backups') {
+        options = {
+          ...options,
+          encrypt: false,
+          compress: false,
+        };
+      }
+
       // Create metadata
       const metadata = {
         timestamp: Date.now(),
@@ -668,6 +727,15 @@ class StorageManager {
 
       // Decompress if needed
       if (parsedData.metadata.compressed) {
+        // Proactive corruption detection before attempting decompression
+        if (!this.isValidCompressedData(finalValue)) {
+          logger.warn(
+            `Proactively detected corruption in compressed data for key '${key}', clearing`
+          );
+          this.storage.removeItem(this.getStorageKey(key));
+          return defaultValue;
+        }
+
         try {
           finalValue = await this.decompress(finalValue);
         } catch (decompressError) {
@@ -675,6 +743,9 @@ class StorageManager {
             `Failed to decompress data for key '${key}':`,
             decompressError
           );
+          // Clear the corrupted data immediately to prevent further issues
+          logger.info(`Clearing corrupted data for key: ${key}`);
+          this.storage.removeItem(this.getStorageKey(key));
           return defaultValue;
         }
       }
@@ -1366,6 +1437,11 @@ class StorageManager {
 
   // Backup and restore functionality
   static async createBackup(label = 'manual_backup') {
+    // Skip backup creation during initialization to prevent loops
+    if (this.isInitializing) {
+      logger.debug('Skipping backup creation during initialization');
+      return null;
+    }
     try {
       const backupData = {
         version: this.VERSION,
@@ -1393,8 +1469,8 @@ class StorageManager {
       }
 
       await this.set('system_backups', backups, {
-        encrypt: true,
-        compress: true,
+        encrypt: false, // Temporarily disable to prevent corruption loop
+        compress: false, // Temporarily disable to prevent corruption loop
       });
 
       this.emit(STORAGE_EVENTS.BACKUP_CREATED, {
@@ -1495,7 +1571,10 @@ class StorageManager {
       }
 
       backups.splice(index, 1);
-      await this.set('system_backups', backups);
+      await this.set('system_backups', backups, {
+        encrypt: false,
+        compress: false,
+      });
 
       logger.debug(`Backup deleted: ${backupId}`);
       return true;
@@ -1646,7 +1725,13 @@ class StorageManager {
 
   static async cleanupOldData(olderThanDays = 30) {
     try {
-      const cutoffTime = Date.now() - olderThanDays * HOURS_PER_DAY * MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MS_PER_SECOND;
+      const cutoffTime =
+        Date.now() -
+        olderThanDays *
+          HOURS_PER_DAY *
+          MINUTES_PER_HOUR *
+          SECONDS_PER_MINUTE *
+          MS_PER_SECOND;
       let cleanedItems = 0;
 
       // Clean old decisions
@@ -1676,11 +1761,19 @@ class StorageManager {
       // Clean old backups (keep only recent ones)
       const backupCutoff =
         Date.now() -
-        STORAGE_CONSTANTS.BACKUP_RETENTION_DAYS * HOURS_PER_DAY * MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MS_PER_SECOND;
+        STORAGE_CONSTANTS.BACKUP_RETENTION_DAYS *
+          HOURS_PER_DAY *
+          MINUTES_PER_HOUR *
+          SECONDS_PER_MINUTE *
+          MS_PER_SECOND;
       const backups = await this.get('system_backups', []);
       const recentBackups = backups.filter(b => b.createdAt > backupCutoff);
       if (recentBackups.length !== backups.length) {
-        await this.set('system_backups', recentBackups);
+        // Use safe storage options to prevent corruption loop
+        await this.set('system_backups', recentBackups, {
+          encrypt: false,
+          compress: false,
+        });
         cleanedItems += backups.length - recentBackups.length;
       }
 
@@ -1707,13 +1800,13 @@ class StorageManager {
   static getSessionId() {
     // Try to get existing session ID from session storage
     let sessionId = this.getSession('session_id');
-    
+
     if (!sessionId) {
       // Generate new session ID
       sessionId = `session_${Date.now()}_${Math.random().toString(DECIMAL_RADIX).substr(SUBSTRING_START, ID_SUFFIX_LENGTH)}`;
       this.setSession('session_id', sessionId);
     }
-    
+
     return sessionId;
   }
 
@@ -1776,6 +1869,68 @@ class StorageManager {
   }
 
   /**
+   * Proactively validate compressed data before attempting decompression
+   * @param {string} compressedData - The compressed data to validate
+   * @returns {boolean} - True if data appears valid, false if corrupted
+   */
+  static isValidCompressedData(compressedData) {
+    try {
+      // Basic type and existence checks
+      if (!compressedData || typeof compressedData !== 'string') {
+        return false;
+      }
+
+      // Check minimum length (valid compressed data should be longer than 10 chars)
+      if (compressedData.length < 10) {
+        return false;
+      }
+
+      // Check for valid base64-like structure (compressed data is often base64 encoded)
+      // Allow alphanumeric, +, /, =, and some punctuation that might appear in compressed data
+      const base64Pattern = /^[A-Za-z0-9+/=\-_.~!*'();:@&$,?#[\]]*$/;
+      if (!base64Pattern.test(compressedData)) {
+        return false;
+      }
+
+      // Check for obvious corruption patterns
+      const corruptionPatterns = [/^null$/, /^undefined$/, /^NaN$/, /^\s*$/];
+
+      for (const pattern of corruptionPatterns) {
+        if (pattern.test(compressedData)) {
+          return false;
+        }
+      }
+
+      // Check for control characters (ASCII 0-31, excluding common whitespace)
+      const ASCII_CONTROL_MAX = 31;
+      const ASCII_TAB = 9;
+      const ASCII_NEWLINE = 10;
+      const ASCII_CARRIAGE_RETURN = 13;
+
+      for (let i = 0; i < compressedData.length; i++) {
+        const charCode = compressedData.charCodeAt(i);
+        if (
+          charCode >= 0 &&
+          charCode <= ASCII_CONTROL_MAX &&
+          charCode !== ASCII_TAB &&
+          charCode !== ASCII_NEWLINE &&
+          charCode !== ASCII_CARRIAGE_RETURN
+        ) {
+          // Found invalid control character
+          return false;
+        }
+      }
+
+      // All checks passed - data appears valid
+      return true;
+    } catch (error) {
+      // If validation itself fails, assume corruption
+      logger.warn('Error during compressed data validation:', error);
+      return false;
+    }
+  }
+
+  /**
    * Decompress data
    */
   static async decompress(compressedData) {
@@ -1814,7 +1969,15 @@ class StorageManager {
       return JSON.parse(jsonString);
     } catch (error) {
       logger.warn('Native decompression failed, using fallback:', error);
-      return JSON.parse(this.simpleDecompress(compressedData));
+      try {
+        return JSON.parse(this.simpleDecompress(compressedData));
+      } catch (fallbackError) {
+        logger.error(
+          'Both native and fallback decompression failed:',
+          fallbackError
+        );
+        throw new Error('Data corruption: Unable to decompress data');
+      }
     }
   }
 
@@ -1840,23 +2003,72 @@ class StorageManager {
    * Simple decompression fallback
    */
   static simpleDecompress(compressed) {
-    if (typeof compressed !== 'string') return compressed;
+    try {
+      if (typeof compressed !== 'string') return compressed;
 
-    let decompressed = '';
-    for (let i = 0; i < compressed.length; i++) {
-      if (/\d/.test(compressed[i])) {
-        const count = parseInt(compressed[i]);
-        if (count > 1 && i + 1 < compressed.length) {
-          decompressed += compressed[i + 1].repeat(count);
-          i++; // Skip the character we just repeated
+      let decompressed = '';
+      for (let i = 0; i < compressed.length; i++) {
+        if (/\d/.test(compressed[i])) {
+          const count = parseInt(compressed[i]);
+          if (count > 1 && i + 1 < compressed.length) {
+            decompressed += compressed[i + 1].repeat(count);
+            i++; // Skip the character we just repeated
+          } else {
+            decompressed += compressed[i];
+          }
         } else {
           decompressed += compressed[i];
         }
-      } else {
-        decompressed += compressed[i];
       }
+      return decompressed;
+    } catch (error) {
+      logger.error('Simple decompression failed:', error);
+      throw new Error('Fallback decompression failed: Data is corrupted');
     }
-    return decompressed;
+  }
+
+  /**
+   * Recovery mechanism for corrupted data
+   */
+  static async recoverFromCorruption(key, fallbackValue = null) {
+    try {
+      logger.warn(`Attempting to recover corrupted data for key: ${key}`);
+
+      // Remove the corrupted data
+      this.remove(key);
+
+      // If it's system_backups, clear it entirely
+      if (key === 'system_backups') {
+        logger.info('Clearing corrupted system_backups data');
+        return [];
+      }
+
+      // For other data, try to restore from a backup if available
+      try {
+        const backups = await this.get('system_backups', []);
+        if (backups.length > 0) {
+          const latestBackup = backups[backups.length - 1];
+          if (latestBackup.data && latestBackup.data[key]) {
+            logger.info(`Restoring ${key} from backup ${latestBackup.id}`);
+            await this.set(key, latestBackup.data[key]);
+            return latestBackup.data[key];
+          }
+        }
+      } catch (backupError) {
+        logger.warn('Could not restore from backup:', backupError);
+      }
+
+      // Return fallback value
+      if (fallbackValue !== null) {
+        await this.set(key, fallbackValue);
+        return fallbackValue;
+      }
+
+      return null;
+    } catch (error) {
+      logger.error('Recovery failed:', error);
+      return fallbackValue;
+    }
   }
 
   /**
@@ -1930,7 +2142,13 @@ class StorageManager {
 
 // Initialize when module loads
 if (typeof window !== 'undefined') {
-  StorageManager.init();
+  StorageManager.init().catch(error => {
+    logger.error(
+      'Storage initialization failed, continuing with limited functionality:',
+      error
+    );
+    // Don't re-throw the error to prevent app initialization failure
+  });
 }
 
 // Export for ES6 modules

@@ -124,7 +124,10 @@ export class UIDNormalizer {
   logUIDError(error, operation, uid = null) {
     const userUID = uid || this.getCurrentUID() || 'anonymous';
     // Log UID errors for debugging (development only)
-    if (process.env.NODE_ENV === 'development') {
+    const isDevelopment =
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1';
+    if (isDevelopment) {
       // eslint-disable-next-line no-console
       console.error(`[UID Error] ${operation}:`, {
         error: error.message,

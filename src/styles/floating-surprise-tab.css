@@ -1,0 +1,345 @@
+/**
+ * Copyright 2025 Armando Sori
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Floating Surprise Tab Component Styles
+ * Professional floating "Surprise Me!" button with smooth animations
+ */
+
+/* Main floating surprise tab container */
+.floating-surprise-tab-link {
+  position: fixed;
+  top: 35%;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 999;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 280px;
+  pointer-events: none; /* Disable pointer events on the link */
+}
+
+.floating-surprise-tab {
+  position: relative;
+  background: linear-gradient(135deg, #ff9500 0%, #ff7f00 100%);
+  border-radius: 8px 0 0 8px;
+  box-shadow:
+    0 4px 20px rgba(255, 149, 0, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transform: translateX(calc(100% - 90px));
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 280px;
+  height: 60px;
+  cursor: pointer;
+  user-select: none;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: none;
+  pointer-events: auto; /* Enable pointer events only on the tab itself */
+}
+
+.floating-surprise-tab:hover {
+  box-shadow:
+    0 8px 30px rgba(255, 149, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.floating-surprise-tab.expanded {
+  transform: translateX(0);
+}
+
+/* Tab content layout */
+.floating-surprise-tab-content {
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  height: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.floating-surprise-tab-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  margin-right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-6px);
+  }
+  60% {
+    transform: translateY(-3px);
+  }
+}
+
+.floating-surprise-tab:hover .floating-surprise-tab-icon {
+  animation: none;
+  transform: scale(1.1) rotate(10deg);
+}
+
+.floating-surprise-tab-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: white;
+  line-height: 1.2;
+}
+
+.surprise-tab-title {
+  font-weight: 600;
+  font-size: 16px;
+  margin: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.5px;
+}
+
+.surprise-tab-subtitle {
+  font-size: 12px;
+  opacity: 0.9;
+  margin: 2px 0 0 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.floating-surprise-tab-arrow {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-left: 12px;
+  transition: transform 0.3s ease;
+}
+
+.floating-surprise-tab:hover .floating-surprise-tab-arrow {
+  transform: translateX(4px);
+}
+
+.surprise-arrow-icon {
+  width: 100%;
+  height: 100%;
+  color: rgba(255, 255, 255, 0.8);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+/* Ripple effect */
+.floating-surprise-tab-ripple {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.3) 0%,
+    transparent 70%
+  );
+  border-radius: inherit;
+  transform: scale(0);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-surprise-tab.ripple-active .floating-surprise-tab-ripple {
+  transform: scale(2);
+  opacity: 1;
+}
+
+/* Hover state animations */
+.floating-surprise-tab:hover {
+  background: linear-gradient(135deg, #ff9500 0%, #ff6b00 100%);
+}
+
+.floating-surprise-tab:active {
+  transform: translateX(0) scale(0.98);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .floating-surprise-tab-link {
+    top: 30%;
+  }
+
+  .floating-surprise-tab {
+    min-width: 260px;
+    height: 56px;
+  }
+
+  .floating-surprise-tab-content {
+    padding: 0 16px;
+  }
+
+  .floating-surprise-tab-icon {
+    width: 24px;
+    height: 24px;
+    font-size: 18px;
+  }
+
+  .surprise-tab-title {
+    font-size: 15px;
+  }
+
+  .surprise-tab-subtitle {
+    font-size: 11px;
+  }
+
+  /* Mobile tap states */
+  .floating-surprise-tab:active {
+    transform: translateX(0) scale(0.95);
+  }
+}
+
+@media (max-width: 480px) {
+  .floating-surprise-tab {
+    min-width: 240px;
+    height: 52px;
+  }
+
+  .floating-surprise-tab-content {
+    padding: 0 14px;
+  }
+
+  .floating-surprise-tab-icon {
+    width: 22px;
+    height: 22px;
+    font-size: 16px;
+    margin-right: 12px;
+  }
+
+  .surprise-tab-title {
+    font-size: 14px;
+  }
+
+  .surprise-tab-subtitle {
+    font-size: 10px;
+  }
+
+  .floating-surprise-tab-arrow {
+    width: 18px;
+    height: 18px;
+    margin-left: 10px;
+  }
+}
+
+/* Tablet responsiveness */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .floating-surprise-tab-link {
+    top: 32%;
+  }
+
+  .floating-surprise-tab {
+    min-width: 270px;
+  }
+}
+
+/* Desktop large screens */
+@media (min-width: 1200px) {
+  .floating-surprise-tab {
+    min-width: 300px;
+    height: 64px;
+  }
+
+  .floating-surprise-tab-content {
+    padding: 0 24px;
+  }
+
+  .floating-surprise-tab-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 22px;
+    margin-right: 18px;
+  }
+
+  .surprise-tab-title {
+    font-size: 17px;
+  }
+
+  .surprise-tab-subtitle {
+    font-size: 13px;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .floating-surprise-tab-icon {
+    animation: none;
+  }
+
+  .floating-surprise-tab,
+  .floating-surprise-tab-arrow,
+  .floating-surprise-tab-ripple {
+    transition: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .floating-surprise-tab {
+    border: 2px solid #ffffff;
+    background: #ff9500;
+  }
+
+  .surprise-tab-title,
+  .surprise-tab-subtitle {
+    text-shadow: none;
+  }
+}
+
+/* Focus states for keyboard accessibility */
+.floating-surprise-tab-link:focus {
+  outline: none;
+}
+
+.floating-surprise-tab-link:focus-visible {
+  outline: 3px solid #ff9500;
+  outline-offset: 2px;
+}
+
+.floating-surprise-tab-link:focus-visible .floating-surprise-tab {
+  transform: translateX(0);
+}
+
+/* Remove focus outline after click */
+.floating-surprise-tab-link:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.floating-surprise-tab-link:active {
+  outline: none;
+}
+
+/* Print styles */
+@media print {
+  .floating-surprise-tab-link {
+    display: none;
+  }
+}

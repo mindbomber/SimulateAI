@@ -39,7 +39,10 @@
   },
   "devDependencies": {
     "csso-cli": "^4.0.2",
+    "depcheck": "^1.4.7",
     "eslint": "^8.0.0",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-unused-imports": "^4.1.4",
     "prettier": "^3.0.0",
     "terser": "^5.43.1",
     "vite": "^5.0.0"

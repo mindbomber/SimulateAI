@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Clear Storage</title>
+  </head>
+  <body>
+    <h1>Storage Cleanup</h1>
+    <button onclick="clearStorage()">Clear All Storage</button>
+    <div id="status"></div>
+
+    <script>
+      function clearStorage() {
+        try {
+          localStorage.clear();
+          sessionStorage.clear();
+          document.getElementById('status').innerHTML =
+            '<p style="color: green;">✅ Storage cleared successfully!</p>';
+          console.log('Storage cleared successfully');
+        } catch (error) {
+          document.getElementById('status').innerHTML =
+            '<p style="color: red;">❌ Error clearing storage: ' +
+            error.message +
+            '</p>';
+          console.error('Error clearing storage:', error);
+        }
+      }
+
+      // Auto-clear on load
+      window.onload = function () {
+        clearStorage();
+        setTimeout(() => {
+          window.location.href = '/index.html';
+        }, 2000);
+      };
+    </script>
+  </body>
+</html>

@@ -27,8 +27,12 @@ import EducatorToolkit from './core/educator-toolkit.js';
 import DigitalScienceLab from './core/digital-science-lab.js';
 import ScenarioGenerator from './core/scenario-generator.js';
 
-// Import Firebase Cloud Messaging
-import './fcm-simple-init.js';
+// Import user tracking system
+import './user-tracking-init.js';
+
+// Import Firebase Cloud Messaging - DISABLED to prevent duplicate initializations
+// Firebase is now handled through ServiceManager to avoid conflicts
+// import './fcm-simple-init.js';
 
 // Import utilities
 import { userPreferences, userProgress } from './utils/simple-storage.js';
@@ -51,7 +55,7 @@ import PreLaunchModal from './components/pre-launch-modal.js';
 import { EnhancedSimulationModal } from './components/enhanced-simulation-modal.js';
 import { PostSimulationModal } from './components/post-simulation-modal.js';
 import ModalFooterManager from './components/modal-footer-manager.js';
-import CategoryGrid from './components/category-grid.js';
+import MainGrid from './components/main-grid.js';
 import RadarChart from './components/radar-chart.js';
 import OnboardingTour from './components/onboarding-tour.js';
 import { getAllCategories, getCategoryScenarios } from '../data/categories.js';
@@ -865,6 +869,16 @@ class AIEthicsApp {
   }
 
   setupUI() {
+    // Check if we're on the main app page (not the landing page)
+    const isAppPage =
+      window.location.pathname.includes('app.html') ||
+      document.querySelector('.categories-grid') !== null;
+
+    if (!isAppPage) {
+      // We're on the landing page, skip UI setup
+      return;
+    }
+
     // Get key UI elements
     this.modal = document.getElementById('simulation-modal');
     this.simulationContainer = document.getElementById('simulation-container');
@@ -876,20 +890,20 @@ class AIEthicsApp {
       return;
     }
 
-    // Initialize CategoryGrid
-    this.initializeCategoryGrid();
+    // Initialize MainGrid
+    this.initializeMainGrid();
   }
 
   /**
-   * Initialize the new category grid system
+   * Initialize the main grid system
    */
-  initializeCategoryGrid() {
+  initializeMainGrid() {
     try {
-      AppDebug.log('Attempting to initialize CategoryGrid...');
-      this.categoryGrid = new CategoryGrid();
-      AppDebug.log('Category grid initialized successfully');
+      AppDebug.log('Attempting to initialize MainGrid...');
+      this.categoryGrid = new MainGrid();
+      AppDebug.log('Main grid initialized successfully');
     } catch (error) {
-      AppDebug.error('Failed to initialize category grid:', error);
+      AppDebug.error('Failed to initialize main grid:', error);
       // Fallback to legacy simulation loading if category grid fails
       this.loadLegacySimulations();
     }
@@ -1110,7 +1124,7 @@ class AIEthicsApp {
   }
 
   render() {
-    // Skip rendering the old simulations grid if CategoryGrid is active
+    // Skip rendering the old simulations grid if MainGrid is active
     if (!this.categoryGrid) {
       this.renderSimulationsGrid();
     }
@@ -2107,14 +2121,14 @@ class AIEthicsApp {
 
     // Launch the scenario directly (skip pre-launch modal for surprise factor)
     if (this.categoryGrid) {
-      logger.debug('Surprise Me: Opening via categoryGrid');
+      logger.debug('Surprise Me: Opening via mainGrid');
       this.categoryGrid.openScenarioModalDirect(
         randomScenario.category.id,
         randomScenario.scenario.id
       );
     } else {
-      // Fallback if categoryGrid is not available
-      logger.warn('CategoryGrid not available, redirecting to scenario');
+      // Fallback if mainGrid is not available
+      logger.warn('MainGrid not available, redirecting to scenario');
       window.location.href = `#scenario-${randomScenario.scenario.id}`;
     }
   }
@@ -2346,12 +2360,16 @@ class AIEthicsApp {
       // Import and create scenario modal
       const ScenarioModal = (await import('./components/scenario-modal.js'))
         .default;
-      const scenarioModal = new ScenarioModal();
+      const scenarioModal = new ScenarioModal({ isTestMode: true });
 
-      // Open with the first trolley problem scenario
-      await scenarioModal.open('autonomous-vehicle-split', 'trolley-problem');
+      // Open with the first trolley problem scenario in test mode
+      await scenarioModal.open(
+        'autonomous-vehicle-split',
+        'trolley-problem',
+        true
+      );
 
-      logger.info('Scenario modal test launched successfully');
+      logger.info('Scenario modal test launched successfully (TEST MODE)');
     } catch (error) {
       logger.error('Failed to test scenario modal:', error);
       this.showNotification('Failed to open test scenario modal', 'error');
