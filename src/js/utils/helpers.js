@@ -435,8 +435,9 @@ class Helpers {
    * @returns {number} Mean value
    */
   static mean(values) {
+    // Refactored: Use consolidated validation pattern
     if (!Array.isArray(values) || values.length === 0) return 0;
-    const validValues = values.filter(v => typeof v === 'number' && !isNaN(v));
+    const validValues = this.filterValidNumbers(values);
     return validValues.length > 0
       ? validValues.reduce((a, b) => a + b, 0) / validValues.length
       : 0;
@@ -448,10 +449,9 @@ class Helpers {
    * @returns {number} Median value
    */
   static median(values) {
+    // Refactored: Use consolidated validation pattern
     if (!Array.isArray(values) || values.length === 0) return 0;
-    const validValues = values
-      .filter(v => typeof v === 'number' && !isNaN(v))
-      .sort((a, b) => a - b);
+    const validValues = this.filterValidNumbers(values).sort((a, b) => a - b);
     const mid = Math.floor(validValues.length / 2);
     return validValues.length % 2 === 0
       ? (validValues[mid - 1] + validValues[mid]) / 2
@@ -4937,6 +4937,16 @@ class Helpers {
         return [...controllers];
       },
     };
+  }
+
+  /**
+   * Consolidated number validation pattern (refactored from duplicate code)
+   * Filters array to only include valid numbers
+   * @param {any[]} values - Array of values to filter
+   * @returns {number[]} Array of valid numbers
+   */
+  static filterValidNumbers(values) {
+    return values.filter(v => typeof v === 'number' && !isNaN(v));
   }
 }
 

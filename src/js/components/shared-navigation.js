@@ -795,9 +795,7 @@ class SharedNavigation {
     this.isScrolling = true;
     this.scrollTimeout = setTimeout(() => {
       this.isScrolling = false;
-      // Optionally show navbar when scrolling stops
-      // this.showNavbar();
-    }, 150);
+    }, 150); // Scroll detection timeout
   }
 
   /**

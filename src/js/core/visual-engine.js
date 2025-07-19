@@ -59,14 +59,12 @@ import {
   TreeView,
   FileUpload,
 } from '../objects/layout-components.js';
-import {
-  ColorPicker,
-  Accordion,
-  DateTimePicker,
-  NumberInput,
-  Drawer,
-  SearchBox,
-} from '../objects/input-utility-components.js';
+import { ColorPicker } from '../components/input-utilities/color-picker.js';
+import { Accordion } from '../components/input-utilities/accordion.js';
+import { DateTimePicker } from '../components/input-utilities/date-time-picker.js';
+import { NumberInput } from '../components/input-utilities/number-input.js';
+import { Drawer } from '../components/input-utilities/drawer.js';
+import { SearchBox } from '../components/input-utilities/search-box.js';
 
 // Constants to avoid magic numbers
 const ENGINE_CONSTANTS = {
@@ -660,7 +658,6 @@ export class VisualEngine {
   logInfo(message, data = null) {
     if (this.options.debug) {
       // eslint-disable-next-line no-console
-
     }
   }
 
