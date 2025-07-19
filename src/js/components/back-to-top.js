@@ -15,170 +15,179 @@
  */
 
 /**
- * Back to Top Component
- * A global back-to-top button that appears when the user scrolls down
- * and smoothly scrolls back to the top of the page when clicked.
+ * Back to Top Component - FIXED VERSION
+ * A simple, reliable back-to-top button that appears after scrolling
+ * three viewport heights and smoothly scrolls back to the top.
  */
 
-// Constants for responsive behavior - much higher thresholds
-const BACK_TO_TOP_DESKTOP_MIN_SCROLL = 1200; // Show after scrolling 1200px (much further down)
-const BACK_TO_TOP_DESKTOP_MAX_SCROLL = 1800; // Maximum scroll for desktop
-const BACK_TO_TOP_DESKTOP_VIEWPORT_MULTIPLIER = 3; // Desktop: 3+ viewport heights (increased from 2)
-const BACK_TO_TOP_MOBILE_VIEWPORT_MULTIPLIER = 5; // Mobile: 5+ screen lengths (increased from 4)
-const BACK_TO_TOP_MOBILE_BREAKPOINT = 768; // Mobile breakpoint in pixels
-const SCROLL_ANIMATION_DELAY = 500; // Delay before re-checking visibility after scroll
+console.log('🔝 BackToTop component loading...');
 
 class BackToTop {
   constructor() {
+    console.log('🔝 BackToTop constructor called');
     this.button = null;
     this.isVisible = false;
-    this.boundScrollHandler = null;
+    this.threshold = window.innerHeight * 3; // Exactly 3 viewport heights
+
+    console.log(
+      `🔝 Threshold set to: ${this.threshold}px (3x viewport height: ${window.innerHeight}px)`
+    );
+
     this.init();
   }
 
-  /**
-   * Initialize the back-to-top component
-   */
   init() {
-    // Create the button dynamically
+    console.log('🔝 BackToTop initializing...');
     this.createButton();
-
-    if (!this.button) {
-      return;
-    }
-
     this.setupEventListeners();
-    this.updateVisibility(); // Initial check
+    this.updateVisibility();
+    console.log('🔝 BackToTop initialized successfully');
   }
 
-  /**
-   * Create the back-to-top button dynamically
-   */
   createButton() {
-    // Check if button already exists
-    if (document.getElementById('back-to-top')) {
-      this.button = document.getElementById('back-to-top');
-      return;
+    console.log('🔝 Creating button...');
+
+    // Remove any existing button
+    const existing = document.getElementById('back-to-top');
+    if (existing) {
+      existing.remove();
+      console.log('🔝 Removed existing button');
     }
 
-    // Create button element
     this.button = document.createElement('button');
     this.button.id = 'back-to-top';
     this.button.className = 'back-to-top';
     this.button.setAttribute('aria-label', 'Back to top');
-    this.button.setAttribute('title', 'Back to top');
-    this.button.type = 'button';
     this.button.innerHTML = '↑';
 
-    // Add to page
+    // Apply inline styles for immediate visibility
+    Object.assign(this.button.style, {
+      position: 'fixed',
+      bottom: '2rem',
+      right: '2rem',
+      width: '3.5rem',
+      height: '3.5rem',
+      borderRadius: '50%',
+      border: '2px solid #007acc',
+      backgroundColor: 'transparent',
+      color: '#007acc',
+      fontSize: '1.8rem',
+      cursor: 'pointer',
+      zIndex: '99999',
+      opacity: '0',
+      visibility: 'hidden',
+      transition: 'all 0.3s ease',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      boxShadow: '0 4px 12px rgba(0, 122, 204, 0.2)',
+      fontWeight: 'bold',
+    });
+
     document.body.appendChild(this.button);
+    console.log('🔝 Button created and added to page');
   }
 
-  /**
-   * Set up event listeners for scroll and click events
-   */
   setupEventListeners() {
-    // Throttled scroll handler
-    let ticking = false;
-    this.boundScrollHandler = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          this.updateVisibility();
-          ticking = false;
-        });
-        ticking = true;
-      }
+    console.log('🔝 Setting up event listeners...');
+
+    let throttleTimer = null;
+
+    const throttledScroll = () => {
+      if (throttleTimer) return;
+
+      throttleTimer = setTimeout(() => {
+        this.updateVisibility();
+        throttleTimer = null;
+      }, 16); // ~60fps
     };
 
-    // Add scroll listener
-    window.addEventListener('scroll', this.boundScrollHandler, {
-      passive: true,
-    });
+    window.addEventListener('scroll', throttledScroll, { passive: true });
 
-    // Click handler for smooth scroll
     this.button.addEventListener('click', e => {
       e.preventDefault();
+      console.log('🔝 Button clicked!');
       this.scrollToTop();
     });
+
+    // Hover effects
+    this.button.addEventListener('mouseenter', () => {
+      this.button.style.backgroundColor = 'rgba(0, 122, 204, 0.1)';
+      this.button.style.borderColor = '#005a9e';
+      this.button.style.color = '#005a9e';
+      this.button.style.transform = 'scale(1.1)';
+    });
+
+    this.button.addEventListener('mouseleave', () => {
+      this.button.style.backgroundColor = 'transparent';
+      this.button.style.borderColor = '#007acc';
+      this.button.style.color = '#007acc';
+      this.button.style.transform = 'scale(1)';
+    });
+
+    console.log('🔝 Event listeners set up successfully');
   }
 
-  /**
-   * Update button visibility based on scroll position
-   */
   updateVisibility() {
-    const viewportHeight = window.innerHeight;
-    const viewportWidth = window.innerWidth;
-    const currentScroll =
-      window.pageYOffset || document.documentElement.scrollTop;
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+    const shouldShow = scrollY > this.threshold;
 
-    // Calculate scroll threshold based on device type
-    let scrollThreshold;
-    if (viewportWidth <= BACK_TO_TOP_MOBILE_BREAKPOINT) {
-      // Mobile: Wait until 4 screen lengths to avoid cluttering small screens
-      scrollThreshold = viewportHeight * BACK_TO_TOP_MOBILE_VIEWPORT_MULTIPLIER;
-    } else {
-      // Desktop: Show after scrolling 300-600px or 2+ viewport heights
-      const viewportBasedThreshold =
-        viewportHeight * BACK_TO_TOP_DESKTOP_VIEWPORT_MULTIPLIER;
-      scrollThreshold = Math.max(
-        BACK_TO_TOP_DESKTOP_MIN_SCROLL,
-        Math.min(BACK_TO_TOP_DESKTOP_MAX_SCROLL, viewportBasedThreshold)
-      );
-    }
+    console.log(
+      `🔝 Scroll: ${Math.round(scrollY)}px, Threshold: ${this.threshold}px, Should show: ${shouldShow}`
+    );
 
-    const shouldShow = currentScroll > scrollThreshold;
-
-    // Update visibility if changed
     if (shouldShow !== this.isVisible) {
       this.isVisible = shouldShow;
 
       if (shouldShow) {
-        this.button.classList.add('visible');
+        this.button.style.opacity = '1';
+        this.button.style.visibility = 'visible';
+        console.log('🔝 ✅ Button SHOWN');
       } else {
-        this.button.classList.remove('visible');
+        this.button.style.opacity = '0';
+        this.button.style.visibility = 'hidden';
+        console.log('🔝 ❌ Button HIDDEN');
       }
     }
   }
 
-  /**
-   * Smooth scroll to top of page
-   */
   scrollToTop() {
-    // Hide button immediately when clicked
-    this.button.classList.remove('visible');
+    console.log('🔝 Scrolling to top...');
+
+    // Hide immediately
+    this.button.style.opacity = '0';
     this.isVisible = false;
 
-    // Smooth scroll to top
     window.scrollTo({
       top: 0,
       behavior: 'smooth',
     });
 
-    // Keep button hidden until scroll position changes significantly
-    // This prevents it from flickering back on during the smooth scroll
+    // Recheck visibility after animation
     setTimeout(() => {
       this.updateVisibility();
-    }, SCROLL_ANIMATION_DELAY);
-  }
-
-  /**
-   * Clean up event listeners and remove button
-   */
-  destroy() {
-    if (this.boundScrollHandler) {
-      window.removeEventListener('scroll', this.boundScrollHandler);
-    }
-
-    if (this.button && this.button.parentNode) {
-      this.button.parentNode.removeChild(this.button);
-      this.button = null;
-    }
+    }, 600);
   }
 }
 
-// Initialize the back-to-top component when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  new BackToTop();
-});
+// Initialize immediately when script loads
+console.log('🔝 Creating BackToTop instance...');
+const backToTopInstance = new BackToTop();
+
+// Also make it globally accessible for debugging
+window.BackToTop = backToTopInstance;
+
+// Backup initialization on DOM ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('🔝 DOM ready, ensuring BackToTop is initialized');
+    if (!document.getElementById('back-to-top')) {
+      new BackToTop();
+    }
+  });
+} else {
+  console.log('🔝 DOM already ready');
+}
 
 export default BackToTop;
+
