@@ -1,8 +1,5 @@
 module.exports = {
-  content: [
-    './*.html',
-    './src/js/**/*.js'
-  ],
+  content: ['./*.html', './src/js/**/*.js'],
   css: ['./src/css/main.css'],
   output: './purged-css/',
   safelist: [
@@ -16,8 +13,8 @@ module.exports = {
     /^auth-/,
     /^user-/,
     /^dropdown-/,
-    /^mega-menu-/
+    /^mega-menu-/,
   ],
   rejected: true,
-  rejectedCss: true
+  rejectedCss: true,
 };

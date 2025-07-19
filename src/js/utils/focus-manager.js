@@ -16,22 +16,22 @@
 
 /**
  * Centralized Focus Management Utility
- * 
+ *
  * Provides consistent focus management across all components including:
  * - Focus trapping for modals and dialogs
  * - Focus restoration after modal close
  * - Keyboard navigation helpers
  * - Auto-focus with timing management
- * 
+ *
  * @version 1.0.0
  */
 
 // Centralized constants for consistent timing
 const FOCUS_CONSTANTS = {
-  FOCUS_DELAY: 100,           // Standard delay for focus operations
+  FOCUS_DELAY: 100, // Standard delay for focus operations
   KEYBOARD_REPEAT_DELAY: 200, // Delay for keyboard repeat prevention
-  ANIMATION_DELAY: 16,        // Frame-based delay for animation coordination
-  AUTO_FOCUS_TIMEOUT: 150     // Timeout for auto-focus operations
+  ANIMATION_DELAY: 16, // Frame-based delay for animation coordination
+  AUTO_FOCUS_TIMEOUT: 150, // Timeout for auto-focus operations
 };
 
 // Standard selectors for focusable elements
@@ -42,7 +42,7 @@ const FOCUSABLE_SELECTORS = [
   'select:not([disabled])',
   'textarea:not([disabled])',
   '[tabindex]:not([tabindex="-1"]):not([disabled])',
-  '[contenteditable="true"]'
+  '[contenteditable="true"]',
 ].join(', ');
 
 /**
@@ -89,7 +89,7 @@ class FocusManager {
     this.activeTrappers = new Set(); // Track active focus traps
     this.keyboardNavigationActive = false;
     this.lastFocusMethod = null; // 'mouse' | 'keyboard' | 'programmatic'
-    
+
     this.init();
   }
 
@@ -100,7 +100,7 @@ class FocusManager {
       document.documentElement.classList.remove('keyboard-navigation');
     });
 
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', e => {
       if (e.key === 'Tab') {
         this.lastFocusMethod = 'keyboard';
         this.keyboardNavigationActive = true;
@@ -109,7 +109,7 @@ class FocusManager {
     });
 
     // Global escape key handler for trapped focus
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', e => {
       if (e.key === 'Escape' && this.activeTrappers.size > 0) {
         this.handleEscapeKey(e);
       }
@@ -160,8 +160,12 @@ class FocusManager {
    */
   restoreFocus(fallbackToBody = true) {
     const element = this.focusStack.pop();
-    
-    if (element && document.contains(element) && typeof element.focus === 'function') {
+
+    if (
+      element &&
+      document.contains(element) &&
+      typeof element.focus === 'function'
+    ) {
       try {
         element.focus();
         return true;
@@ -176,7 +180,7 @@ class FocusManager {
     if (fallbackToBody) {
       document.body.focus();
     }
-    
+
     return false;
   }
 
@@ -193,7 +197,7 @@ class FocusManager {
     const {
       delay = 0,
       preventScroll = false,
-      method = 'programmatic'
+      method = 'programmatic',
     } = options;
 
     if (!element || typeof element.focus !== 'function') {
@@ -224,10 +228,8 @@ class FocusManager {
    * @returns {Promise<boolean>} Whether auto-focus was successful
    */
   async autoFocus(container, options = {}) {
-    const {
-      keyboardOnly = true,
-      delay = FOCUS_CONSTANTS.AUTO_FOCUS_TIMEOUT
-    } = options;
+    const { keyboardOnly = true, delay = FOCUS_CONSTANTS.AUTO_FOCUS_TIMEOUT } =
+      options;
 
     // Respect user preference for keyboard-only auto-focus
     if (keyboardOnly && !this.keyboardNavigationActive) {
@@ -239,9 +241,9 @@ class FocusManager {
       return false;
     }
 
-    return this.focusElement(firstFocusable, { 
-      delay, 
-      method: 'auto' 
+    return this.focusElement(firstFocusable, {
+      delay,
+      method: 'auto',
     });
   }
 
@@ -254,10 +256,7 @@ class FocusManager {
    * @returns {Object} Focus trap controller
    */
   createTrap(container, options = {}) {
-    const {
-      autoFocus = true,
-      restoreFocus = true
-    } = options;
+    const { autoFocus = true, restoreFocus = true } = options;
 
     // Store current focus for restoration
     if (restoreFocus) {
@@ -265,8 +264,8 @@ class FocusManager {
     }
 
     const trapId = Symbol('focus-trap');
-    
-    const trapHandler = (event) => {
+
+    const trapHandler = event => {
       if (event.key === 'Tab') {
         this.handleTabInTrap(event, container);
       }
@@ -274,7 +273,7 @@ class FocusManager {
 
     // Add trap to active set
     this.activeTrappers.add(trapId);
-    
+
     // Set up event listener
     document.addEventListener('keydown', trapHandler);
 
@@ -290,7 +289,7 @@ class FocusManager {
       destroy: () => {
         document.removeEventListener('keydown', trapHandler);
         this.activeTrappers.delete(trapId);
-        
+
         if (restoreFocus) {
           // Small delay to ensure any animations complete
           setTimeout(() => {
@@ -299,7 +298,7 @@ class FocusManager {
         }
       },
       focusFirst: () => this.focusElement(this.getFirstFocusable(container)),
-      focusLast: () => this.focusElement(this.getLastFocusable(container))
+      focusLast: () => this.focusElement(this.getLastFocusable(container)),
     };
   }
 
@@ -357,14 +356,16 @@ class FocusManager {
     const {
       selector = container.children,
       wrap = true,
-      orientation = 'both' // 'horizontal', 'vertical', 'both'
+      orientation = 'both', // 'horizontal', 'vertical', 'both'
     } = options;
 
-    return (event) => {
-      const items = Array.from(typeof selector === 'string' 
-        ? container.querySelectorAll(selector) 
-        : selector);
-      
+    return event => {
+      const items = Array.from(
+        typeof selector === 'string'
+          ? container.querySelectorAll(selector)
+          : selector
+      );
+
       const currentIndex = items.indexOf(document.activeElement);
       if (currentIndex === -1) return;
 
@@ -374,36 +375,40 @@ class FocusManager {
         case 'ArrowLeft':
           if (orientation === 'horizontal' || orientation === 'both') {
             event.preventDefault();
-            newIndex = wrap && currentIndex === 0 
-              ? items.length - 1 
-              : Math.max(0, currentIndex - 1);
+            newIndex =
+              wrap && currentIndex === 0
+                ? items.length - 1
+                : Math.max(0, currentIndex - 1);
           }
           break;
 
         case 'ArrowRight':
           if (orientation === 'horizontal' || orientation === 'both') {
             event.preventDefault();
-            newIndex = wrap && currentIndex === items.length - 1 
-              ? 0 
-              : Math.min(items.length - 1, currentIndex + 1);
+            newIndex =
+              wrap && currentIndex === items.length - 1
+                ? 0
+                : Math.min(items.length - 1, currentIndex + 1);
           }
           break;
 
         case 'ArrowUp':
           if (orientation === 'vertical' || orientation === 'both') {
             event.preventDefault();
-            newIndex = wrap && currentIndex === 0 
-              ? items.length - 1 
-              : Math.max(0, currentIndex - 1);
+            newIndex =
+              wrap && currentIndex === 0
+                ? items.length - 1
+                : Math.max(0, currentIndex - 1);
           }
           break;
 
         case 'ArrowDown':
           if (orientation === 'vertical' || orientation === 'both') {
             event.preventDefault();
-            newIndex = wrap && currentIndex === items.length - 1 
-              ? 0 
-              : Math.min(items.length - 1, currentIndex + 1);
+            newIndex =
+              wrap && currentIndex === items.length - 1
+                ? 0
+                : Math.min(items.length - 1, currentIndex + 1);
           }
           break;
 
@@ -423,12 +428,12 @@ class FocusManager {
 
       if (newIndex !== currentIndex && items[newIndex]) {
         this.focusElement(items[newIndex]);
-        
+
         // Scroll into view if needed
         items[newIndex].scrollIntoView({
           behavior: 'smooth',
           block: 'nearest',
-          inline: 'nearest'
+          inline: 'nearest',
         });
       }
     };

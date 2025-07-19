@@ -32,7 +32,7 @@
     padding: 0.5rem; /* Minimal padding on mobile */
     max-width: 100%; /* Use full width on mobile */
   }
-  
+
   .radar-demo-container canvas {
     max-width: 100%;
     width: 100%;
@@ -77,7 +77,7 @@
 }
 
 /* Additional canvas overflow fix for all chart canvases */
-canvas[role="img"] {
+canvas[role='img'] {
   overflow: hidden !important; /* Prevent deprecated overflow: visible on canvas elements */
 }
 

@@ -58,11 +58,17 @@ const MEMORY_CONSTANTS = {
 // Computed constants
 const COMPUTED_CONSTANTS = {
   get DEFAULT_MAX_MEMORY() {
-    return MEMORY_CONSTANTS.DEFAULT_MAX_MEMORY_MB * MEMORY_CONSTANTS.BYTES_PER_MB;
+    return (
+      MEMORY_CONSTANTS.DEFAULT_MAX_MEMORY_MB * MEMORY_CONSTANTS.BYTES_PER_MB
+    );
   },
   get CLEANUP_MAX_AGE() {
-    return MEMORY_CONSTANTS.CLEANUP_MAX_AGE_MINUTES * MEMORY_CONSTANTS.SECONDS_PER_MINUTE * MEMORY_CONSTANTS.MS_PER_SECOND;
-  }
+    return (
+      MEMORY_CONSTANTS.CLEANUP_MAX_AGE_MINUTES *
+      MEMORY_CONSTANTS.SECONDS_PER_MINUTE *
+      MEMORY_CONSTANTS.MS_PER_SECOND
+    );
+  },
 };
 
 const CANVAS_EVENTS = {
@@ -988,7 +994,8 @@ class CanvasManager {
     for (const [, canvasData] of this.canvases) {
       const canvas = canvasData.element;
       // Estimate memory usage based on canvas size and pixel data
-      const pixelData = canvas.width * canvas.height * MEMORY_CONSTANTS.BYTES_PER_PIXEL; // RGBA
+      const pixelData =
+        canvas.width * canvas.height * MEMORY_CONSTANTS.BYTES_PER_PIXEL; // RGBA
       totalMemory += pixelData;
     }
 
@@ -1113,8 +1120,10 @@ class CanvasManager {
 
             // Only resize if dimensions changed significantly
             if (
-              Math.abs(width - canvas.width) > PERFORMANCE_THRESHOLDS.DIMENSION_TOLERANCE ||
-              Math.abs(height - canvas.height) > PERFORMANCE_THRESHOLDS.DIMENSION_TOLERANCE
+              Math.abs(width - canvas.width) >
+                PERFORMANCE_THRESHOLDS.DIMENSION_TOLERANCE ||
+              Math.abs(height - canvas.height) >
+                PERFORMANCE_THRESHOLDS.DIMENSION_TOLERANCE
             ) {
               this.resizeCanvas(canvasId, width, height);
             }
@@ -1152,7 +1161,10 @@ class CanvasManager {
   performMaintenanceCleanup() {
     try {
       const now = Date.now();
-      const maxAge = MEMORY_CONSTANTS.CLEANUP_MAX_AGE_MINUTES * MEMORY_CONSTANTS.SECONDS_PER_MINUTE * MEMORY_CONSTANTS.MS_PER_SECOND;
+      const maxAge =
+        MEMORY_CONSTANTS.CLEANUP_MAX_AGE_MINUTES *
+        MEMORY_CONSTANTS.SECONDS_PER_MINUTE *
+        MEMORY_CONSTANTS.MS_PER_SECOND;
       let cleanedCount = 0;
 
       // Clean up old canvases that might be orphaned

@@ -172,33 +172,33 @@ main.main-content {
     /* Ensure adequate top margin on mobile to prevent header overlap */
     margin-top: 50px !important; /* Significantly increased margin with !important */
   }
-  
+
   .container {
     padding: 0 var(--spacing-4);
   }
-  
+
   .breadcrumb {
     margin-left: 0;
     margin-top: var(--spacing-2);
   }
-  
+
   .breadcrumb-list {
     flex-wrap: wrap;
   }
-  
+
   .category-scenarios-grid {
     grid-template-columns: 1fr;
     gap: var(--spacing-4);
   }
-  
+
   .category-scenarios-section {
     padding: var(--spacing-8) 0;
   }
-  
+
   .category-scenarios-section .section-title {
     font-size: var(--font-size-2xl);
   }
-  
+
   .category-scenarios-section .section-description {
     font-size: var(--font-size-base);
   }
@@ -209,12 +209,12 @@ main.main-content {
     /* Additional safety margin on small mobile screens */
     margin-top: 60px !important; /* Very large margin for mobile with !important */
   }
-  
+
   .category-scenarios-grid {
     grid-template-columns: 1fr;
     gap: var(--spacing-3);
   }
-  
+
   .category-scenarios-section {
     padding: var(--spacing-6) 0;
   }
@@ -296,23 +296,23 @@ main.main-content {
     gap: var(--spacing-2);
     align-items: center;
   }
-  
+
   .logo {
     grid-column: 1;
     grid-row: 1;
   }
-  
+
   .nav-toggle {
     grid-column: 2;
     grid-row: 1;
   }
-  
+
   .breadcrumb {
     grid-column: 1 / -1;
     grid-row: 2;
     margin-left: 0;
   }
-  
+
   .main-nav {
     grid-column: 1 / -1;
     grid-row: 3;

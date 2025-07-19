@@ -46,10 +46,14 @@ class SimpleStorageManager {
    */
   init() {
     logger.info('Storage', 'Storage Status');
-    logger.info('Storage', '- localStorage', 
+    logger.info(
+      'Storage',
+      '- localStorage',
       this.isLocalStorageAvailable ? '✅ Available' : '❌ Not available'
     );
-    logger.info('Storage', '- sessionStorage',
+    logger.info(
+      'Storage',
+      '- sessionStorage',
       this.isSessionStorageAvailable ? '✅ Available' : '❌ Not available'
     );
 

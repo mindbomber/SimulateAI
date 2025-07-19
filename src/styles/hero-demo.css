@@ -814,11 +814,11 @@
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .ethics-glossary-accordion .accordion-content-inner {
     padding: 1rem;
   }
-  
+
   .ethics-glossary-accordion .accordion-title {
     font-size: 0.9rem;
   }

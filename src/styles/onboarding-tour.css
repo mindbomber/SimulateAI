@@ -28,7 +28,7 @@ body.onboarding-active {
   background: transparent;
   border: 3px solid #1a73e8;
   border-radius: 8px;
-  box-shadow: 
+  box-shadow:
     0 0 0 4px rgba(26, 115, 232, 0.3),
     0 0 0 9999px rgba(0, 0, 0, 0.25),
     inset 0 0 20px rgba(26, 115, 232, 0.2);
@@ -44,14 +44,15 @@ body.onboarding-active {
   background: white;
   border: 2px solid #1a73e8;
   border-radius: 12px;
-  box-shadow: 
+  box-shadow:
     0 12px 48px rgba(0, 0, 0, 0.4),
     0 6px 24px rgba(0, 0, 0, 0.2),
     0 0 0 1px rgba(26, 115, 232, 0.1);
   z-index: 10014;
   max-width: 400px;
   min-width: 300px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   opacity: 0;
   transform: scale(0.9) translateY(-10px);
   animation: onboarding-coach-mark-in 0.3s ease-out 0.1s forwards;
@@ -317,14 +318,15 @@ body.onboarding-active {
 }
 
 @keyframes onboarding-spotlight-pulse {
-  0%, 100% {
-    box-shadow: 
+  0%,
+  100% {
+    box-shadow:
       0 0 0 4px rgba(26, 115, 232, 0.3),
       0 0 0 9999px rgba(0, 0, 0, 0.7),
       inset 0 0 20px rgba(26, 115, 232, 0.2);
   }
   50% {
-    box-shadow: 
+    box-shadow:
       0 0 0 4px rgba(26, 115, 232, 0.5),
       0 0 0 9999px rgba(0, 0, 0, 0.7),
       inset 0 0 20px rgba(26, 115, 232, 0.4);
@@ -332,7 +334,8 @@ body.onboarding-active {
 }
 
 @keyframes onboarding-click-pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     box-shadow: 0 0 0 0 rgba(26, 115, 232, 0.4);
   }
@@ -359,7 +362,7 @@ body.onboarding-active {
 @media (prefers-contrast: high) {
   .onboarding-spotlight {
     border-color: #000;
-    box-shadow: 
+    box-shadow:
       0 0 0 4px rgba(0, 0, 0, 0.8),
       0 0 0 9999px rgba(0, 0, 0, 0.9);
   }
@@ -387,13 +390,20 @@ body.onboarding-active {
   max-width: 400px;
   background: var(--color-white, #ffffff);
   border-radius: 12px;
-  box-shadow: 
+  box-shadow:
     0 20px 40px rgba(0, 0, 0, 0.15),
     0 8px 24px rgba(0, 0, 0, 0.1);
   opacity: 0;
   transform: scale(0.9) translateY(20px);
   animation: tour-modal-in 0.4s ease-out forwards;
-  font-family: var(--font-primary, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  font-family: var(
+    --font-primary,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif
+  );
 }
 
 .tour-modal.center {
@@ -430,7 +440,11 @@ body.onboarding-active {
 
 .tour-progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-primary, #1a73e8), var(--color-secondary, #4285f4));
+  background: linear-gradient(
+    90deg,
+    var(--color-primary, #1a73e8),
+    var(--color-secondary, #4285f4)
+  );
   border-radius: 2px;
   transition: width 0.3s ease-out;
 }
@@ -606,13 +620,14 @@ body.onboarding-active {
 }
 
 @keyframes tour-highlight-pulse {
-  0%, 100% {
-    box-shadow: 
+  0%,
+  100% {
+    box-shadow:
       0 0 0 4px rgba(26, 115, 232, 0.2),
       0 0 30px rgba(26, 115, 232, 0.4);
   }
   50% {
-    box-shadow: 
+    box-shadow:
       0 0 0 8px rgba(26, 115, 232, 0.3),
       0 0 40px rgba(26, 115, 232, 0.6);
   }

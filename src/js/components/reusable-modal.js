@@ -90,13 +90,13 @@ class ReusableModal {
       this.modal.classList.add('show');
       this.modal.focus();
     }, 10);
-    
+
     // Create focus trap using centralized manager
     this.focusTrap = focusManager.createTrap(this.modal, {
       autoFocus: true,
-      restoreFocus: true
+      restoreFocus: true,
     });
-    
+
     if (this.closeOnEscape) {
       this._escHandler = e => {
         if (e.key === 'Escape') this.close();
@@ -108,13 +108,13 @@ class ReusableModal {
 
   close() {
     if (!this.isOpen) return;
-    
+
     // Clean up focus trap
     if (this.focusTrap) {
       this.focusTrap.destroy();
       this.focusTrap = null;
     }
-    
+
     this.backdrop.classList.remove('show');
     this.modal.classList.remove('show');
     setTimeout(() => {

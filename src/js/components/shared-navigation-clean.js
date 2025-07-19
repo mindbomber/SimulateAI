@@ -681,7 +681,6 @@ class SharedNavigation {
         // If click is not on a dropdown trigger or dropdown content
         const clickedDropdown = e.target.closest('.nav-item-dropdown');
         if (!clickedDropdown) {
-          console.log('Clicked outside dropdowns, closing all');
           this.closeAllDropdowns();
           this.closeMegaMenu();
         }
@@ -1080,28 +1079,19 @@ class SharedNavigation {
    * Toggle mobile navigation
    */
   toggleMobileNav() {
-    console.log('toggleMobileNav called');
     const navToggle = document.querySelector('.nav-toggle');
     const mainNav = document.querySelector('.main-nav');
     const navBackdrop = document.querySelector('.nav-backdrop');
 
-    console.log('navToggle:', navToggle);
-    console.log('mainNav:', mainNav);
-    console.log('navBackdrop:', navBackdrop);
-
     if (!navToggle || !mainNav) {
-      console.log('Required elements not found for mobile nav toggle');
       return;
     }
 
     const isOpen = mainNav.classList.contains('open');
-    console.log('Current state - isOpen:', isOpen);
 
     if (isOpen) {
-      console.log('Closing mobile nav');
       this.closeMobileNav();
     } else {
-      console.log('Opening mobile nav');
       this.openMobileNav();
     }
   }
@@ -1110,13 +1100,11 @@ class SharedNavigation {
    * Open mobile navigation
    */
   openMobileNav() {
-    console.log('openMobileNav called');
     const navToggle = document.querySelector('.nav-toggle');
     const mainNav = document.querySelector('.main-nav');
     const navBackdrop = document.querySelector('.nav-backdrop');
 
     if (!navToggle || !mainNav) {
-      console.log('Elements not found in openMobileNav');
       return;
     }
 
@@ -1124,7 +1112,6 @@ class SharedNavigation {
     this.closeMegaMenu();
     this.closeAllDropdowns();
 
-    console.log('Before opening - mainNav classes:', mainNav.className);
     console.log(
       'Before opening - mainNav computed display:',
       window.getComputedStyle(mainNav).display
@@ -1159,7 +1146,6 @@ class SharedNavigation {
 
     // Wait a moment then check the result
     setTimeout(() => {
-      console.log('After opening - mainNav classes:', mainNav.className);
       console.log(
         'After opening - mainNav computed display:',
         window.getComputedStyle(mainNav).display
@@ -1322,8 +1308,6 @@ class SharedNavigation {
     setTimeout(() => {
       this._tourActionInProgress = false;
     }, 1000);
-
-    console.log('SharedNavigation: Tour action triggered');
 
     // Close mobile nav if open
     this.closeMobileNav();
@@ -1550,10 +1534,8 @@ window.SharedNavigation = SharedNavigation;
 window.debugMobileNav = function () {
   const nav = window.sharedNav;
   if (nav) {
-    console.log('Manual mobile nav toggle');
     nav.toggleMobileNav();
   } else {
-    console.log('SharedNavigation instance not found');
   }
 };
 
@@ -1561,7 +1543,6 @@ window.debugMobileNav = function () {
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     if (!window.sharedNav) {
-      console.log('SharedNavigation: Initializing on DOMContentLoaded');
       window.sharedNav = new SharedNavigation();
       window.sharedNav.init();
     } else {
@@ -1573,7 +1554,6 @@ if (document.readyState === 'loading') {
 } else {
   // DOM is already ready
   if (!window.sharedNav) {
-    console.log('SharedNavigation: Initializing immediately (DOM ready)');
     window.sharedNav = new SharedNavigation();
     window.sharedNav.init();
   } else {
