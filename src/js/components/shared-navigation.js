@@ -9,6 +9,13 @@ class SharedNavigation {
     this.currentPage = null;
     this.isInitialized = false;
     this.loadingPromise = null;
+
+    // Scroll-aware navbar properties
+    this.lastScrollY = 0;
+    this.scrollThreshold = 5; // Minimum scroll distance to trigger hide/show
+    this.headerHeight = 80; // Approximate header height
+    this.isScrolling = false;
+    this.scrollTimeout = null;
   }
 
   /**
@@ -49,10 +56,16 @@ class SharedNavigation {
       // Initialize dropdowns
       this.initializeDropdowns();
 
+      // Initialize scroll-aware navbar
+      this.initializeScrollAwareNavbar();
+
       // Add moderation link for privileged users (after a delay to allow auth to load)
       setTimeout(() => {
         this.addModerationLink();
       }, 1000);
+
+      // Handle hash navigation on page load
+      this.handleHashNavigation();
 
       this.isInitialized = true;
       // SharedNavigation initialized successfully
@@ -98,18 +111,21 @@ class SharedNavigation {
    */
   injectNavigation() {
     if (!this.navHTML) {
-      // No navigation HTML to inject
       return;
     }
 
-    // Find existing header or create injection point
-    const targetElement = document.querySelector('header.header');
+    // Priority order for injection targets
+    const navigationContainer = document.getElementById('navigation-container');
+    const existingHeader = document.querySelector('header.header');
 
-    if (targetElement) {
+    if (navigationContainer) {
+      // Inject into designated navigation container
+      navigationContainer.innerHTML = this.navHTML;
+    } else if (existingHeader) {
       // Replace existing header
-      targetElement.outerHTML = this.navHTML;
+      existingHeader.outerHTML = this.navHTML;
     } else {
-      // Find body or create at document start
+      // Fallback: inject at body start
       const { body } = document;
       if (body) {
         body.insertAdjacentHTML('afterbegin', this.navHTML);
@@ -174,19 +190,38 @@ class SharedNavigation {
    * @param {string} pageId - Page identifier
    */
   setActivePage(pageId) {
-    // Remove existing active states
+    // Remove existing active states with comprehensive clearing
     const navLinks = document.querySelectorAll('.nav-link');
     navLinks.forEach(link => {
       link.classList.remove('active');
       link.removeAttribute('aria-current');
+
+      // Add clearing class to force remove any residual styling
+      link.classList.add('nav-link-clear-active');
+
+      // Force clear inline styles
+      link.style.backgroundColor = '';
+      link.style.color = '';
+      link.style.fontWeight = '';
+      link.style.borderBottomColor = '';
     });
 
-    // Set new active state
-    const activeLink = document.querySelector(`[data-page="${pageId}"]`);
-    if (activeLink) {
-      activeLink.classList.add('active');
-      activeLink.setAttribute('aria-current', 'page');
-    }
+    // Force reflow to ensure clearing takes effect
+    document.body.offsetHeight;
+
+    // Remove clearing classes after a brief delay
+    setTimeout(() => {
+      navLinks.forEach(link => {
+        link.classList.remove('nav-link-clear-active');
+      });
+
+      // Set new active state
+      const activeLink = document.querySelector(`[data-page="${pageId}"]`);
+      if (activeLink) {
+        activeLink.classList.add('active');
+        activeLink.setAttribute('aria-current', 'page');
+      }
+    }, 20);
 
     this.currentPage = pageId;
   }
@@ -195,6 +230,12 @@ class SharedNavigation {
    * Setup event listeners for navigation functionality
    */
   setupEventListeners() {
+    // General navigation link handlers
+    this.setupNavigationLinkHandlers();
+
+    // Simulation Hub navigation
+    this.setupSimulationHubNavigation();
+
     // Mega menu toggle
     this.setupMegaMenuListeners();
 
@@ -209,6 +250,125 @@ class SharedNavigation {
 
     // Search functionality in mega menu
     this.setupMegaMenuSearch();
+  }
+
+  /**
+   * Setup general navigation link handlers for active state management
+   */
+  setupNavigationLinkHandlers() {
+    const navLinks = document.querySelectorAll('.nav-link[data-page]');
+
+    navLinks.forEach(link => {
+      // Skip simulation-hub as it has its own handler
+      if (link.getAttribute('data-page') === 'simulation-hub') {
+        return;
+      }
+
+      link.addEventListener('click', () => {
+        const pageId = link.getAttribute('data-page');
+        if (pageId) {
+          this.setActivePage(pageId);
+        }
+      });
+    });
+  }
+
+  /**
+   * Handle hash navigation on page load (e.g., app.html#categories)
+   */
+  handleHashNavigation() {
+    const { hash } = window.location;
+
+    if (hash === '#categories') {
+      // Set the active state for simulation-hub
+      this.setActivePage('simulation-hub');
+
+      // Small delay to ensure page is fully loaded
+      setTimeout(() => {
+        this.scrollToElement('#categories > div.section-header');
+      }, 1000);
+    }
+  }
+
+  /**
+   * Setup Simulation Hub navigation functionality
+   */
+  setupSimulationHubNavigation() {
+    const simulationHubLink = document.querySelector(
+      'a[data-page="simulation-hub"]'
+    );
+
+    if (!simulationHubLink) {
+      return;
+    }
+
+    simulationHubLink.addEventListener('click', e => {
+      e.preventDefault();
+      this.navigateToSimulationHub();
+    });
+  }
+
+  /**
+   * Navigate to the Simulation Hub section
+   */
+  navigateToSimulationHub() {
+    const currentPage =
+      window.location.pathname.split('/').pop() || 'index.html';
+    const targetSelector = '#categories > div.section-header';
+
+    // Update active state to simulation-hub
+    this.setActivePage('simulation-hub');
+
+    // If we're already on app.html, just scroll to the target
+    if (currentPage === 'app.html') {
+      this.scrollToElement(targetSelector);
+    } else {
+      // Navigate to app.html and then scroll to the target
+      window.location.href = `app.html#categories`;
+    }
+  }
+
+  /**
+   * Scroll to a specific element smoothly
+   * @param {string} selector - CSS selector for the target element
+   */
+  scrollToElement(selector) {
+    const targetElement = document.querySelector(selector);
+
+    if (targetElement) {
+      targetElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+        inline: 'nearest',
+      });
+
+      // Add a slight delay to ensure the element is visible
+      setTimeout(() => {
+        // Store original styles
+        const originalBg = targetElement.style.backgroundColor;
+        const originalTransition = targetElement.style.transition;
+
+        // Add highlight effect
+        targetElement.style.transition = 'background-color 0.5s ease';
+        targetElement.style.backgroundColor = 'rgba(108, 92, 231, 0.1)';
+
+        setTimeout(() => {
+          // Restore original background and remove transition
+          targetElement.style.backgroundColor = originalBg;
+          targetElement.style.transition = originalTransition;
+
+          // If original background was empty, remove the property completely
+          if (!originalBg) {
+            targetElement.style.removeProperty('background-color');
+          }
+
+          // If original transition was empty, remove the property completely
+          if (!originalTransition) {
+            targetElement.style.removeProperty('transition');
+          }
+        }, 1000);
+      }, 500);
+    }
   }
 
   /**
@@ -367,19 +527,18 @@ class SharedNavigation {
 
     // Authentication buttons
     const signInBtn = document.getElementById('sign-in-nav');
+    const profileBtn = document.getElementById('profile-nav');
     const signOutBtn = document.getElementById('sign-out-nav');
-    const linkAccountsBtn = document.getElementById('link-accounts-nav');
 
     if (signInBtn) {
       signInBtn.addEventListener('click', () => this.handleSignIn());
     }
+    if (profileBtn) {
+      // Profile button will be handled by the dropdown system
+      // Individual menu items handle their own navigation
+    }
     if (signOutBtn) {
       signOutBtn.addEventListener('click', () => this.handleSignOut());
-    }
-    if (linkAccountsBtn) {
-      linkAccountsBtn.addEventListener('click', () =>
-        this.handleLinkAccounts()
-      );
     }
 
     // Mark action listeners as set up to prevent duplicates
@@ -569,6 +728,172 @@ class SharedNavigation {
   initializeDropdowns() {
     // Dropdowns are handled by event listeners
     // This method can be used for additional dropdown setup
+  }
+
+  /**
+   * Initialize scroll-aware navbar functionality
+   */
+  initializeScrollAwareNavbar() {
+    // Store initial scroll position
+    this.lastScrollY = window.scrollY || window.pageYOffset || 0;
+
+    // Add scroll event listener with throttling
+    this.handleScroll = this.throttle(this.onScroll.bind(this), 16); // ~60fps
+    window.addEventListener('scroll', this.handleScroll, { passive: true });
+
+    // Set initial state based on current scroll position
+    this.updateNavbarVisibility();
+  }
+
+  /**
+   * Handle scroll events to show/hide navbar
+   */
+  onScroll() {
+    const currentScrollY = window.scrollY || window.pageYOffset || 0;
+    const scrollDelta = currentScrollY - this.lastScrollY;
+    const header = document.querySelector('.header');
+
+    if (!header) return;
+
+    // Add scrolled class for enhanced styling when past header height
+    if (currentScrollY > this.headerHeight) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+
+    // Don't hide navbar if we're at the top of the page
+    if (currentScrollY <= this.headerHeight) {
+      this.showNavbar();
+      this.lastScrollY = currentScrollY;
+      return;
+    }
+
+    // Don't hide navbar if mobile menu is open or dropdowns are active
+    if (this.shouldAlwaysShowNavbar()) {
+      this.showNavbar();
+      this.lastScrollY = currentScrollY;
+      return;
+    }
+
+    // Check if scroll movement is significant enough
+    if (Math.abs(scrollDelta) < this.scrollThreshold) {
+      return;
+    }
+
+    // Hide navbar when scrolling down, show when scrolling up
+    if (scrollDelta > 0 && !header.classList.contains('header-hidden')) {
+      // Scrolling down - hide navbar
+      this.hideNavbar();
+    } else if (
+      scrollDelta < 0 &&
+      !header.classList.contains('header-visible')
+    ) {
+      // Scrolling up - show navbar
+      this.showNavbar();
+    }
+
+    this.lastScrollY = currentScrollY;
+
+    // Clear any existing timeout and set a new one to detect scroll end
+    if (this.scrollTimeout) {
+      clearTimeout(this.scrollTimeout);
+    }
+
+    this.isScrolling = true;
+    this.scrollTimeout = setTimeout(() => {
+      this.isScrolling = false;
+      // Optionally show navbar when scrolling stops
+      // this.showNavbar();
+    }, 150);
+  }
+
+  /**
+   * Check if navbar should always be shown (e.g., when menus are open)
+   */
+  shouldAlwaysShowNavbar() {
+    // Check if mobile menu is open
+    const mobileNav = document.querySelector('.main-nav.open');
+    if (mobileNav) return true;
+
+    // Check if any dropdowns are open
+    const openDropdowns = document.querySelectorAll(
+      '.dropdown-menu.open, .mega-menu.open'
+    );
+    if (openDropdowns.length > 0) return true;
+
+    // Check if settings menu is open
+    const settingsMenu = document.querySelector(
+      '.settings-menu[style*="display: block"]'
+    );
+    if (settingsMenu) return true;
+
+    return false;
+  }
+
+  /**
+   * Hide the navbar with smooth animation
+   */
+  hideNavbar() {
+    const header = document.querySelector('.header');
+    if (!header) return;
+
+    header.classList.add('header-hidden');
+    header.classList.remove('header-visible');
+  }
+
+  /**
+   * Show the navbar with smooth animation
+   */
+  showNavbar() {
+    const header = document.querySelector('.header');
+    if (!header) return;
+
+    header.classList.add('header-visible');
+    header.classList.remove('header-hidden');
+  }
+
+  /**
+   * Update navbar visibility based on current state
+   */
+  updateNavbarVisibility() {
+    const currentScrollY = window.scrollY || window.pageYOffset || 0;
+    const header = document.querySelector('.header');
+
+    if (!header) return;
+
+    if (currentScrollY <= this.headerHeight) {
+      this.showNavbar();
+      header.classList.remove('scrolled');
+    } else {
+      header.classList.add('scrolled');
+    }
+  }
+
+  /**
+   * Throttle function to limit scroll event frequency
+   */
+  throttle(func, delay) {
+    let timeoutId;
+    let lastExecTime = 0;
+
+    return function (...args) {
+      const currentTime = Date.now();
+
+      if (currentTime - lastExecTime > delay) {
+        func.apply(this, args);
+        lastExecTime = currentTime;
+      } else {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(
+          () => {
+            func.apply(this, args);
+            lastExecTime = Date.now();
+          },
+          delay - (currentTime - lastExecTime)
+        );
+      }
+    };
   }
 
   /**
@@ -1048,6 +1373,14 @@ class SharedNavigation {
   }
 
   /**
+   * Handle profile button click - navigate to profile page
+   */
+  handleProfileClick() {
+    // Navigate to profile page
+    window.location.href = 'profile.html';
+  }
+
+  /**
    * Handle sign out action
    */
   handleSignOut() {
@@ -1081,17 +1414,22 @@ class SharedNavigation {
   updateUserDisplay(user) {
     const guestContent = document.querySelector('[data-guest-content]');
     const userContent = document.querySelector('[data-user-content]');
-    const userNameElement = document.getElementById('nav-user-name');
+    const profileBtn = document.getElementById('profile-nav');
 
     if (user) {
-      // User is signed in
+      // User is signed in - show profile dropdown, hide sign in
       if (guestContent) guestContent.style.display = 'none';
       if (userContent) userContent.style.display = 'block';
-      if (userNameElement) {
-        userNameElement.textContent = `Welcome, ${user.displayName || user.email || 'User'}!`;
+
+      // Update profile button text with user info
+      if (profileBtn) {
+        const displayName = user.displayName || user.email || 'User';
+        const firstName = displayName.split(' ')[0]; // Get first name
+        profileBtn.innerHTML = `👤 ${firstName} <span class="dropdown-arrow" aria-hidden="true">▼</span>`;
+        profileBtn.title = `${displayName}'s profile menu`;
       }
     } else {
-      // User is not signed in
+      // User is not signed in - show sign in button, hide profile
       if (guestContent) guestContent.style.display = 'block';
       if (userContent) userContent.style.display = 'none';
     }
@@ -1142,12 +1480,23 @@ class SharedNavigation {
    * Clean up event listeners and resources
    */
   destroy() {
+    // Remove scroll event listener
+    if (this.handleScroll) {
+      window.removeEventListener('scroll', this.handleScroll);
+    }
+
+    // Clear scroll timeout
+    if (this.scrollTimeout) {
+      clearTimeout(this.scrollTimeout);
+    }
+
     // Remove event listeners
     // (In a real implementation, you'd store references to listeners for removal)
 
     this.isInitialized = false;
     this.navHTML = null;
     this.loadingPromise = null;
+    this.handleScroll = null;
   }
 
   /**

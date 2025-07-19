@@ -14,7 +14,11 @@ import {
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js';
 
 // Import your Firebase configuration
-import { firebaseConfig, VAPID_KEY } from '../config/firebase-config.js';
+import { firebaseConfig, VAPID_KEY } from './config/firebase-config.js';
+
+// Constants
+const NOTIFICATION_AUTO_CLOSE_DELAY = 8000; // 8 seconds
+const UI_PROMPT_AUTO_REMOVE_DELAY = 10000; // 10 seconds
 
 /**
  * Initialize Firebase Cloud Messaging for the main application
@@ -190,7 +194,7 @@ export class FCMMainApp {
         // Auto-close notification after delay
         setTimeout(() => {
           notification.close();
-        }, 8000);
+        }, NOTIFICATION_AUTO_CLOSE_DELAY);
       }
     });
   }
@@ -262,7 +266,7 @@ export class FCMMainApp {
       if (notificationPrompt.parentElement) {
         notificationPrompt.remove();
       }
-    }, 10000);
+    }, UI_PROMPT_AUTO_REMOVE_DELAY);
   }
 
   /**

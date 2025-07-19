@@ -32,12 +32,20 @@
       <div class="nav-group nav-group-primary">
         <ul class="nav-list">
           <li class="nav-item">
-            <a href="app.html" class="nav-link" data-page="home">Home</a>
+            <a href="index.html" class="nav-link" data-page="home">Home</a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="app.html#categories"
+              class="nav-link"
+              data-page="simulation-hub"
+              >Simulation Hub</a
+            >
           </li>
           <!-- Navigation Categories dropdown removed to prevent filter-btn conflicts -->
           <li class="nav-item">
             <a
-              href="app.html#ethics-analysis"
+              href="ethics-guide.html"
               class="nav-link"
               data-page="ethics-guide"
               >Ethics Guide</a
@@ -46,7 +54,7 @@
           <!-- Browse Scenarios navigation link removed to prevent conflicts -->
           <li>
             <a
-              href="app.html#educator-tools"
+              href="educator-tools.html"
               class="nav-link"
               data-page="educator-tools"
               >Educator Tools</a
@@ -55,27 +63,11 @@
         </ul>
       </div>
 
-      <!-- Community Navigation Group -->
-      <div class="nav-group nav-group-community">
+      <!-- Blog Navigation Link -->
+      <div class="nav-group nav-group-blog">
         <ul class="nav-list">
-          <li class="nav-item-dropdown">
-            <a
-              href="#"
-              class="nav-link"
-              aria-expanded="false"
-              aria-haspopup="true"
-            >
-              Community
-              <span class="dropdown-arrow" aria-hidden="true">▼</span>
-            </a>
-            <div class="dropdown-menu">
-              <a href="blog.html" class="dropdown-item" data-page="blog"
-                >📝 Blog</a
-              >
-              <a href="profile.html" class="dropdown-item" data-page="profile"
-                >👤 Profile</a
-              >
-            </div>
+          <li class="nav-item">
+            <a href="blog.html" class="nav-link" data-page="blog">Blog</a>
           </li>
         </ul>
       </div>
@@ -96,6 +88,9 @@
             <div class="dropdown-menu">
               <a href="about.html" class="dropdown-item" data-page="about"
                 >ℹ️ About SimulateAI</a
+              >
+              <a href="help-faq.html" class="dropdown-item" data-page="help-faq"
+                >🆘 Help & FAQ</a
               >
               <a
                 href="privacy-notice.html"
@@ -193,6 +188,71 @@
               </div>
 
               <div class="settings-section">
+                <h4 class="settings-title">Notifications</h4>
+                <div class="settings-item">
+                  <label class="settings-toggle" for="toggle-notifications">
+                    <input type="checkbox" id="toggle-notifications" />
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Enable Notifications</span>
+                  </label>
+                </div>
+                <div
+                  class="settings-item"
+                  id="notification-types-section"
+                  style="display: none"
+                >
+                  <label
+                    class="settings-toggle"
+                    for="toggle-achievement-notifications"
+                  >
+                    <input
+                      type="checkbox"
+                      id="toggle-achievement-notifications"
+                      checked
+                    />
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Achievement Notifications</span>
+                  </label>
+                </div>
+                <div
+                  class="settings-item"
+                  id="notification-badges-section"
+                  style="display: none"
+                >
+                  <label
+                    class="settings-toggle"
+                    for="toggle-badge-notifications"
+                  >
+                    <input
+                      type="checkbox"
+                      id="toggle-badge-notifications"
+                      checked
+                    />
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Badge Notifications</span>
+                  </label>
+                </div>
+                <div
+                  class="settings-item"
+                  id="notification-progress-section"
+                  style="display: none"
+                >
+                  <label
+                    class="settings-toggle"
+                    for="toggle-progress-notifications"
+                  >
+                    <input
+                      type="checkbox"
+                      id="toggle-progress-notifications"
+                      checked
+                    />
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Progress Updates</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="settings-section">
                 <h4 class="settings-title">Accessibility</h4>
                 <div class="settings-item">
                   <label class="settings-toggle" for="toggle-high-contrast">
@@ -233,19 +293,13 @@
 
           <!-- User Profile (shown when signed in) -->
           <li data-user-content style="display: none">
-            <div class="nav-user-profile">
-              <span class="user-greeting" id="nav-user-name">Welcome!</span>
-              <button
-                class="btn btn-outline nav-auth-btn"
-                id="link-accounts-nav"
-                title="Link additional sign-in methods"
-              >
-                🔗
-              </button>
-              <button class="btn btn-outline nav-auth-btn" id="sign-out-nav">
-                Sign Out
-              </button>
-            </div>
+            <button
+              class="btn btn-outline nav-auth-btn"
+              id="profile-nav"
+              title="Go to Profile"
+            >
+              � Profile
+            </button>
           </li>
         </ul>
       </div>

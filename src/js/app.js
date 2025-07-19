@@ -97,6 +97,12 @@ const AppDebug = {
       console.log(`[App] ${message}`, data || '');
     }
   },
+  info: (message, data = null) => {
+    if (window.DEBUG_MODE || localStorage.getItem('debug') === 'true') {
+      // eslint-disable-next-line no-console
+      console.info(`[App] ${message}`, data || '');
+    }
+  },
   warn: (message, data = null) => {
     if (window.DEBUG_MODE || localStorage.getItem('debug') === 'true') {
       // eslint-disable-next-line no-console
@@ -276,7 +282,12 @@ class AIEthicsApp {
       await this.initializeEthicsRadarDemo();
 
       // Initialize onboarding tour for first-time users (prevent multiple instances)
-      if (!this.onboardingTour && !window.onboardingTourInstance) {
+      // Only initialize on app page, not on landing page
+      const isAppPage =
+        window.location.pathname.includes('app.html') ||
+        document.querySelector('.categories-grid') !== null;
+
+      if (isAppPage && !this.onboardingTour && !window.onboardingTourInstance) {
         this.onboardingTour = new OnboardingTour();
 
         // Make onboarding tour available globally for debugging
@@ -287,6 +298,10 @@ class AIEthicsApp {
 
         // Check and start onboarding tour for first-time users
         this.checkAndStartOnboardingTour();
+      } else if (!isAppPage) {
+        AppDebug.info(
+          'Skipping onboarding tour initialization - not on app page'
+        );
       } else {
         AppDebug.warn(
           'OnboardingTour instance already exists, skipping initialization'
@@ -1101,6 +1116,16 @@ class AIEthicsApp {
    * Manually start the onboarding tour (for testing)
    */
   startOnboardingTour() {
+    // Check if we're on the app page
+    const isAppPage =
+      window.location.pathname.includes('app.html') ||
+      document.querySelector('.categories-grid') !== null;
+
+    if (!isAppPage) {
+      AppDebug.warn('Cannot start onboarding tour - not on app page');
+      return;
+    }
+
     if (!this.onboardingTour && !window.onboardingTourInstance) {
       this.onboardingTour = new OnboardingTour();
       // Make onboarding tour available globally for debugging
@@ -2312,11 +2337,22 @@ class AIEthicsApp {
         return;
       }
 
-      await scrollManager.scrollToElement('#categories', {
+      // Start scrolling immediately (don't wait for navigation state)
+      const scrollPromise = scrollManager.scrollToElement('#categories', {
         behavior: 'smooth',
         offset: 80,
         respectReducedMotion: true,
       });
+
+      // Set navigation active state with a small delay to ensure DOM is ready
+      setTimeout(() => {
+        if (window.sharedNav) {
+          window.sharedNav.setActivePage('simulation-hub');
+        }
+      }, 100);
+
+      // Wait for scroll to complete
+      await scrollPromise;
 
       logger.info('Scrolled to Ethics Categories section');
 

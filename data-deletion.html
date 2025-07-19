@@ -64,7 +64,7 @@ limitations under the License.
     <link rel="icon" type="image/png" href="src/assets/icons/favicon.png" />
   </head>
 
-  <body>
+  <body data-page-id="data-deletion">
     <!-- Skip to content for accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
@@ -82,34 +82,7 @@ limitations under the License.
       class="sr-only"
     ></div>
 
-    <!-- Header -->
-    <header class="header" role="banner">
-      <div class="header-container">
-        <div class="logo">
-          <a href="index.html" class="logo-link">
-            <img
-              src="src/assets/icons/logo.svg"
-              alt="SimulateAI Educational Platform"
-              class="logo-image"
-            />
-            <h1 class="site-title">SimulateAI</h1>
-          </a>
-        </div>
-
-        <nav class="main-nav" role="navigation" aria-label="Main navigation">
-          <ul class="nav-list">
-            <li><a href="index.html" class="nav-link">Home</a></li>
-            <li>
-              <a href="index.html#categories" class="nav-link">Categories</a>
-            </li>
-            <li><a href="index.html#about" class="nav-link">About</a></li>
-            <li>
-              <a href="privacy-notice.html" class="nav-link">Privacy Notice</a>
-            </li>
-          </ul>
-        </nav>
-      </div>
-    </header>
+    <!-- Shared navigation will be injected here -->
 
     <!-- Main Content -->
     <main id="main-content" class="main-content" role="main">
@@ -1307,5 +1280,8 @@ limitations under the License.
         }
       }
     </style>
+
+    <!-- Shared Navigation Component -->
+    <script src="src/js/components/shared-navigation.js"></script>
   </body>
 </html>

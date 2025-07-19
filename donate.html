@@ -93,31 +93,11 @@
       }
     </style>
   </head>
-  <body>
+  <body data-page-id="donate">
+    <!-- Shared navigation will be injected here -->
+
     <div class="container">
       <div class="header">
-        <div style="text-align: left; margin-bottom: 20px">
-          <a
-            href="/"
-            style="
-              display: inline-flex;
-              align-items: center;
-              gap: 8px;
-              color: #3498db;
-              text-decoration: none;
-              font-weight: 500;
-              padding: 8px 16px;
-              border: 2px solid #3498db;
-              border-radius: 6px;
-              transition: all 0.3s ease;
-              background: transparent;
-            "
-            onmouseover="this.style.background='#3498db'; this.style.color='white';"
-            onmouseout="this.style.background='transparent'; this.style.color='#3498db';"
-          >
-            ← Back to SimulateAI
-          </a>
-        </div>
         <h1>🎓 Support AI Ethics Research</h1>
         <p>
           Help advance the understanding of ethical decision-making in
@@ -233,5 +213,8 @@
 
     <!-- Anonymous Donation Component -->
     <script src="src/js/components/anonymous-donation.js"></script>
+
+    <!-- Shared Navigation Component -->
+    <script src="src/js/components/shared-navigation.js"></script>
   </body>
 </html>

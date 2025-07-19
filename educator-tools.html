@@ -1,0 +1,1065 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="page-id" content="educator-tools" />
+    <title>SimulateAI Educator Tools - Complete Teaching Resources</title>
+    <meta
+      name="description"
+      content="Comprehensive educator resources including ISTE-aligned curriculum kits, assessment tools, and professional development for integrating AI ethics into your classroom."
+    />
+    <!-- SEO and Social Meta -->
+    <meta property="og:title" content="SimulateAI Educator Tools" />
+    <meta
+      property="og:description"
+      content="Everything you need to integrate AI ethics education into your classroom"
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://simulateai.com/educator-tools.html"
+    />
+
+    <!-- Accessibility -->
+    <meta
+      name="accessibility-features"
+      content="keyboard-navigation,skip-links,high-contrast,large-text,screen-reader-support"
+    />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="src/styles/main.css" />
+    <link rel="stylesheet" href="src/styles/shared-navigation.css" />
+    <link rel="stylesheet" href="src/styles/accessibility.css" />
+
+    <!-- Educator Tools Specific Styles -->
+    <style>
+      :root {
+        --educator-primary: #4c7fff;
+        --educator-dark: #0b0f19;
+        --educator-light: #f5f7fa;
+        --educator-card-bg: #ffffff;
+        --educator-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+        --educator-border-radius: 1rem;
+        --educator-success: #22c55e;
+        --educator-warning: #f59e0b;
+        --educator-info: #3b82f6;
+      }
+
+      .educator-wrapper {
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 2rem 1rem;
+        background: var(--educator-light);
+        border-radius: var(--educator-border-radius);
+      }
+
+      .educator-hero {
+        text-align: center;
+        margin-bottom: 3rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: var(--educator-border-radius);
+      }
+
+      .educator-hero h1 {
+        font-size: clamp(2.5rem, 5vw + 1rem, 4rem);
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .educator-hero p {
+        font-size: 1.3rem;
+        line-height: 1.6;
+        max-width: 700px;
+        margin: 0 auto;
+        opacity: 0.95;
+      }
+
+      .educator-nav {
+        background: var(--educator-card-bg);
+        border-radius: var(--educator-border-radius);
+        padding: 1.5rem;
+        margin-bottom: 3rem;
+        box-shadow: var(--educator-shadow);
+      }
+
+      .educator-nav ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .educator-nav li {
+        flex-shrink: 0;
+      }
+
+      .educator-nav a {
+        color: var(--educator-primary);
+        font-weight: 600;
+        text-decoration: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 2rem;
+        transition: all 0.3s ease;
+        border: 2px solid var(--educator-primary);
+        background: transparent;
+        white-space: nowrap;
+        display: inline-block;
+      }
+
+      .educator-nav a:hover,
+      .educator-nav a:focus {
+        background: var(--educator-primary);
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      .educator-section {
+        background: var(--educator-card-bg);
+        border-radius: var(--educator-border-radius);
+        padding: 2.5rem;
+        margin-bottom: 3rem;
+        box-shadow: var(--educator-shadow);
+      }
+
+      .educator-section h2 {
+        color: var(--educator-primary);
+        font-size: 2.2rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+      }
+
+      .educator-section p {
+        line-height: 1.7;
+        color: var(--educator-dark);
+        font-size: 1.1rem;
+      }
+
+      .educator-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+      }
+
+      .educator-card {
+        background: var(--educator-card-bg);
+        border-radius: var(--educator-border-radius);
+        padding: 2rem;
+        box-shadow: var(--educator-shadow);
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        min-height: 400px;
+      }
+
+      .educator-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(
+          90deg,
+          var(--educator-primary),
+          var(--educator-success)
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .educator-card:hover::before {
+        opacity: 1;
+      }
+
+      .educator-card:hover {
+        border-color: rgba(76, 127, 255, 0.2);
+        transform: translateY(-6px);
+        box-shadow: 0 12px 30px rgba(76, 127, 255, 0.15);
+      }
+
+      .educator-card h3 {
+        color: var(--educator-primary);
+        margin-top: 0;
+        margin-bottom: 1.2rem;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 2px solid rgba(76, 127, 255, 0.1);
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+
+      .educator-card p {
+        flex: 0 0 auto;
+        margin-bottom: 1rem;
+        line-height: 1.6;
+      }
+
+      .educator-card ul {
+        flex: 1;
+        padding-left: 0;
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 200px;
+      }
+
+      .educator-card .checklist {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+      }
+
+      .educator-card li {
+        margin-bottom: 0.5rem;
+        line-height: 1.5;
+      }
+
+      .grade-badge {
+        background: var(--educator-success);
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 1rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-left: auto;
+      }
+
+      .educator-button {
+        display: inline-block;
+        padding: 0.8rem 2rem;
+        background: var(--educator-primary);
+        color: white;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        text-align: center;
+        margin-top: auto;
+      }
+
+      .educator-button:hover,
+      .educator-button:focus {
+        background: #3a5acc;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(76, 127, 255, 0.3);
+      }
+
+      .educator-button.secondary {
+        background: var(--educator-info);
+      }
+
+      .educator-button.success {
+        background: var(--educator-success);
+      }
+
+      .educator-button.warning {
+        background: var(--educator-warning);
+      }
+
+      .highlight-box {
+        background: linear-gradient(
+          135deg,
+          rgba(76, 127, 255, 0.1),
+          rgba(76, 127, 255, 0.05)
+        );
+        border-left: 4px solid var(--educator-primary);
+        padding: 1.5rem 2rem;
+        margin: 2rem 0;
+        border-radius: 0 var(--educator-border-radius)
+          var(--educator-border-radius) 0;
+      }
+
+      .highlight-box h3 {
+        color: var(--educator-primary);
+        margin-top: 0;
+      }
+
+      .checklist {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .checklist li {
+        position: relative;
+        padding: 1rem 1rem 1rem 3rem;
+        margin-bottom: 0.8rem;
+        line-height: 1.6;
+        background: rgba(76, 127, 255, 0.03);
+        border-radius: 0.8rem;
+        border-left: 4px solid var(--educator-success);
+        transition: all 0.2s ease;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        min-height: 3rem;
+      }
+
+      .checklist li:last-child {
+        margin-bottom: 0;
+      }
+
+      .checklist li:hover {
+        background: rgba(76, 127, 255, 0.08);
+        transform: translateX(2px);
+      }
+
+      .checklist li::before {
+        content: '✓';
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--educator-success);
+        font-weight: bold;
+        background: rgba(34, 197, 94, 0.15);
+        width: 1.8rem;
+        height: 1.8rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        border: 2px solid var(--educator-success);
+      }
+
+      .checklist a {
+        color: var(--educator-primary);
+        text-decoration: none;
+        font-weight: 600;
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.2s ease;
+      }
+
+      .checklist a:hover {
+        border-bottom-color: var(--educator-primary);
+      }
+
+      .timeline {
+        border-left: 4px solid var(--educator-primary);
+        margin-left: 1rem;
+        padding-left: 2rem;
+        position: relative;
+      }
+
+      .timeline-item {
+        position: relative;
+        margin-bottom: 2rem;
+      }
+
+      .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -2.5rem;
+        top: 0.5rem;
+        width: 1rem;
+        height: 1rem;
+        background: var(--educator-primary);
+        border-radius: 50%;
+        box-shadow: 0 0 0 4px var(--educator-card-bg);
+      }
+
+      .timeline-item h3 {
+        color: var(--educator-primary);
+        margin-top: 0;
+        margin-bottom: 0.5rem;
+      }
+
+      .tip-callout {
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        border: 2px solid var(--educator-warning);
+        padding: 1.5rem;
+        border-radius: var(--educator-border-radius);
+        margin: 2rem 0;
+      }
+
+      .tip-callout h4 {
+        color: #92400e;
+        margin-top: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .educator-footer {
+        text-align: center;
+        margin-top: 4rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(76, 127, 255, 0.2);
+        color: #666;
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .educator-wrapper {
+          margin: 1rem;
+          padding: 1rem;
+        }
+
+        .educator-hero {
+          padding: 2rem 1rem;
+        }
+
+        .educator-nav ul {
+          flex-direction: column;
+          align-items: center;
+          gap: 0.8rem;
+        }
+
+        .educator-nav a {
+          padding: 0.7rem 1.2rem;
+          font-size: 0.9rem;
+        }
+
+        .educator-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+
+    <!-- Icons and Favicons -->
+    <link rel="icon" type="image/svg+xml" href="src/assets/icons/favicon.svg" />
+    <link rel="icon" type="image/png" href="src/assets/icons/favicon.png" />
+  </head>
+
+  <body class="educator-tools-page" data-page-id="educator-tools">
+    <!-- Skip to content for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- ARIA live regions for announcements -->
+    <div
+      id="aria-live-polite"
+      aria-live="polite"
+      aria-atomic="true"
+      class="sr-only"
+    ></div>
+    <div
+      id="aria-live-assertive"
+      aria-live="assertive"
+      aria-atomic="true"
+      class="sr-only"
+    ></div>
+
+    <!-- Enhanced Header -->
+    <div id="navigation-container">
+      <!-- Shared navigation will be injected here -->
+    </div>
+
+    <!-- Main Content -->
+    <main id="main-content" class="educator-wrapper">
+      <!-- Hero Section -->
+      <header class="educator-hero">
+        <h1>🎓 Educator Tools & Resources</h1>
+        <p>
+          Everything you need to integrate
+          <strong>AI ethics education</strong> into your classroom— ISTE-aligned
+          lesson plans, assessment frameworks, and professional development
+          opportunities.
+          <em>Transform how students think about technology and society.</em>
+        </p>
+      </header>
+
+      <!-- In-page Navigation -->
+      <nav class="educator-nav" aria-label="Educator Tools sections">
+        <ul>
+          <li><a href="#quickstart">Quick Start Guide</a></li>
+          <li><a href="#curriculum">Curriculum Kits</a></li>
+          <li><a href="#assessment">Assessment Tools</a></li>
+          <li>
+            <a href="#professional-development">Professional Development</a>
+          </li>
+          <li><a href="#community">Community & Support</a></li>
+        </ul>
+      </nav>
+
+      <!-- Quick Start Guide -->
+      <section id="quickstart" class="educator-section">
+        <h2>🚀 Quick Start Guide</h2>
+        <p>
+          Get up and running with SimulateAI in your classroom with this
+          step-by-step checklist. Perfect for first-time users who want to start
+          teaching AI ethics immediately.
+        </p>
+
+        <div class="educator-grid">
+          <div class="educator-card">
+            <h3>📋 Implementation Checklist</h3>
+            <ul class="checklist">
+              <li>Create your free Educator account (Google/Microsoft SSO)</li>
+              <li>
+                Download your first <a href="#curriculum">Curriculum Kit</a>
+              </li>
+              <li>
+                Review the <a href="ethics-guide.html">Ethics Guide</a> radar
+                chart section
+              </li>
+              <li>Run a test scenario with a pilot class</li>
+              <li>Use assessment rubrics for student reflection</li>
+            </ul>
+          </div>
+
+          <div class="educator-card">
+            <h3>⏱️ Implementation Timeline</h3>
+            <div class="timeline">
+              <div class="timeline-item">
+                <h4>Week 1: Explore</h4>
+                <p>
+                  Run one scenario as a class demo. Use think-pair-share to
+                  unpack decisions.
+                </p>
+              </div>
+              <div class="timeline-item">
+                <h4>Week 2-3: Apply</h4>
+                <p>
+                  Students work in pairs on subject-specific scenarios. Collect
+                  radar screenshots.
+                </p>
+              </div>
+              <div class="timeline-item">
+                <h4>Week 4+: Create</h4>
+                <p>
+                  Students design ethical dilemmas, swap with peers, evaluate
+                  using rubrics.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tip-callout">
+          <h4>🎯 Pro Tip</h4>
+          <p>
+            Keep your first implementation low-stakes! Let students explore
+            without grading outcomes. Focus discussions on <em>why</em> their
+            radar charts look different and what that teaches us about ethical
+            reasoning.
+          </p>
+        </div>
+      </section>
+
+      <!-- Curriculum Kits -->
+      <section id="curriculum" class="educator-section">
+        <h2>📚 Standards-Aligned Curriculum Kits</h2>
+        <p>
+          Ready-to-use lesson packages mapped to
+          <strong>ISTE Standards for Students</strong>, Common Core, and Next
+          Generation Science Standards. Each kit includes slide decks, teacher
+          guides, student worksheets, and extension activities.
+        </p>
+
+        <div class="educator-grid">
+          <div class="educator-card">
+            <h3>
+              🛡️ Digital Citizenship & AI Ethics
+              <span class="grade-badge">Grades 9-12</span>
+            </h3>
+            <ul>
+              <li>
+                <strong>3 x 50-minute lessons</strong> with scenario-based
+                debates
+              </li>
+              <li>
+                <strong>Cross-curricular links</strong> to ELA & Social Studies
+              </li>
+              <li>
+                <strong>ISTE Alignment:</strong> Digital Citizen (1.2),
+                Knowledge Constructor (3.3)
+              </li>
+              <li>
+                <strong>Includes:</strong> Slide deck, rubrics, extension
+                projects
+              </li>
+            </ul>
+            <a
+              href="src/assets/downloads/ai-ethics-citizenship-kit.zip"
+              class="educator-button"
+              download
+            >
+              📥 Download Pack
+            </a>
+          </div>
+
+          <div class="educator-card">
+            <h3>
+              📊 Data Literacy & Bias Detection
+              <span class="grade-badge">Grades 7-10</span>
+            </h3>
+            <ul>
+              <li><strong>Hands-on analysis</strong> of real-world datasets</li>
+              <li>
+                <strong>Infographic design</strong> and presentation tasks
+              </li>
+              <li><strong>DOK Level 3</strong> critical thinking prompts</li>
+              <li>
+                <strong>STEM Integration:</strong> Math, Science, Computer
+                Science
+              </li>
+            </ul>
+            <a
+              href="src/assets/downloads/data-bias-kit.zip"
+              class="educator-button"
+              download
+            >
+              📥 Download Pack
+            </a>
+          </div>
+
+          <div class="educator-card">
+            <h3>
+              💻 Creative Computing with Ethics
+              <span class="grade-badge">Grades 5-8</span>
+            </h3>
+            <ul>
+              <li>
+                <strong>Block-coding challenges</strong> with ethical
+                storytelling
+              </li>
+              <li>
+                <strong>Focus dimensions:</strong> Beneficence & Sustainability
+              </li>
+              <li>
+                <strong>Optional extensions:</strong> Micro:bit and Arduino
+                projects
+              </li>
+              <li>
+                <strong>Maker Space Integration:</strong> Design thinking
+                process
+              </li>
+            </ul>
+            <a
+              href="src/assets/downloads/creative-computing.zip"
+              class="educator-button"
+              download
+            >
+              📥 Download Pack
+            </a>
+          </div>
+
+          <div class="educator-card">
+            <h3>
+              🌍 Global Perspectives on AI
+              <span class="grade-badge">Grades 6-12</span>
+            </h3>
+            <ul>
+              <li>
+                <strong>International case studies</strong> from 5 different
+                countries
+              </li>
+              <li>
+                <strong>Cultural sensitivity</strong> in ethical reasoning
+              </li>
+              <li>
+                <strong>Language Arts integration</strong> with research
+                projects
+              </li>
+              <li><strong>Model UN simulation</strong> for advanced classes</li>
+            </ul>
+            <a
+              href="src/assets/downloads/educator_guide_resources.zip"
+              class="educator-button"
+              download
+            >
+              📥 Download Pack
+            </a>
+          </div>
+
+          <div class="educator-card">
+            <h3>
+              ⚖️ Ethics in Emerging Technologies
+              <span class="grade-badge">Grades 11-12</span>
+            </h3>
+            <ul>
+              <li>
+                <strong>Advanced scenarios:</strong> Gene editing, quantum
+                computing, space colonization
+              </li>
+              <li>
+                <strong>Philosophy connections:</strong> Kant, Mill, Aristotle
+                applications
+              </li>
+              <li>
+                <strong>College prep:</strong> Academic writing and citation
+                skills
+              </li>
+              <li>
+                <strong>Capstone project:</strong> Student-designed ethical
+                framework
+              </li>
+            </ul>
+            <a
+              href="src/assets/downloads/assessment_tools.zip"
+              class="educator-button"
+              download
+            >
+              📥 Download Pack
+            </a>
+          </div>
+
+          <div class="educator-card">
+            <h3>
+              🎨 Arts & Humanities Integration
+              <span class="grade-badge">Grades 4-8</span>
+            </h3>
+            <ul>
+              <li>
+                <strong>Creative expression:</strong> Art, music, drama, and
+                writing
+              </li>
+              <li>
+                <strong>Storytelling focus:</strong> Ethics through narrative
+              </li>
+              <li>
+                <strong>Multiple intelligences:</strong> Visual, auditory,
+                kinesthetic learning
+              </li>
+              <li>
+                <strong>Community connections:</strong> Local artist
+                collaborations
+              </li>
+            </ul>
+            <a
+              href="src/assets/downloads/creative-computing.zip"
+              class="educator-button"
+              download
+            >
+              📥 Download Pack
+            </a>
+          </div>
+        </div>
+
+        <div class="highlight-box">
+          <h3>📋 Quality Assurance</h3>
+          <p>
+            Every curriculum kit undergoes peer review by practicing K-12
+            educators and our ethics advisory board. We ensure alignment to ISTE
+            Standards, age-appropriate content, and practical classroom
+            implementation. All materials are tested in real classrooms before
+            release.
+          </p>
+        </div>
+      </section>
+
+      <!-- Assessment Tools -->
+      <section id="assessment" class="educator-section">
+        <h2>📝 Assessment & Evaluation Tools</h2>
+        <p>
+          Authentic assessment instruments that capture critical thinking,
+          collaboration, and ethical reasoning. Move beyond multiple-choice to
+          evaluate real understanding and growth.
+        </p>
+
+        <div class="educator-grid">
+          <div class="educator-card">
+            <h3>📊 Ethical Reasoning Rubric</h3>
+            <p>
+              Comprehensive 4-level analytic rubric aligned to all eight
+              SimulateAI dimensions. Includes both formative and summative
+              versions with clear performance indicators.
+            </p>
+            <a
+              href="src/assets/downloads/ethical-reasoning-rubric.pdf"
+              class="educator-button secondary"
+              download
+            >
+              📄 Download Rubric
+            </a>
+          </div>
+
+          <div class="educator-card">
+            <h3>🤔 Reflection Journal Prompts</h3>
+            <p>
+              15 scaffolded reflection prompts designed to guide metacognition
+              after each scenario. Supports different learning styles and
+              English language proficiency levels.
+            </p>
+            <a
+              href="src/assets/downloads/reflection-journal-prompts.pdf"
+              class="educator-button secondary"
+              download
+            >
+              📝 Download Prompts
+            </a>
+          </div>
+
+          <div class="educator-card">
+            <h3>👥 Peer Review Protocol</h3>
+            <p>
+              Transform simulations into structured Socratic seminars, gallery
+              walks, or collaborative discussions. Includes facilitation guides
+              and conversation starters.
+            </p>
+            <a
+              href="src/assets/downloads/peer-review-protocol.pdf"
+              class="educator-button secondary"
+              download
+            >
+              🗣️ Download Protocol
+            </a>
+          </div>
+
+          <div class="educator-card">
+            <h3>📈 Portfolio Assessment Guide</h3>
+            <p>
+              Framework for collecting and evaluating student work over time.
+              Includes digital portfolio templates and self-assessment tools for
+              student ownership of learning.
+            </p>
+            <a
+              href="src/assets/downloads/portfolio-assessment-guide.pdf"
+              class="educator-button secondary"
+              download
+            >
+              📁 Download Guide
+            </a>
+          </div>
+        </div>
+
+        <div class="tip-callout">
+          <h4>💡 Assessment Strategy</h4>
+          <p>
+            Use the rubric as a <strong>formative checkpoint</strong> after each
+            scenario, then combine journal prompts with portfolio assessment for
+            a comprehensive summative evaluation. This approach captures both
+            process and growth over time.
+          </p>
+        </div>
+      </section>
+
+      <!-- Professional Development -->
+      <section id="professional-development" class="educator-section">
+        <h2>🎓 Professional Development</h2>
+        <p>
+          Comprehensive training opportunities to build your confidence and
+          expertise in teaching AI ethics. Earn certificates, micro-credentials,
+          and connect with fellow educators.
+        </p>
+
+        <div class="educator-grid">
+          <div class="educator-card">
+            <h3>🎥 On-Demand Webinar Series</h3>
+            <p>
+              45-minute tutorials covering implementation strategies, classroom
+              management, and advanced pedagogical techniques. Certificate of
+              completion included.
+            </p>
+            <ul>
+              <li>
+                <strong>Webinar 1:</strong> Introduction to AI Ethics Education
+              </li>
+              <li>
+                <strong>Webinar 2:</strong> Facilitating Ethical Discussions
+              </li>
+              <li>
+                <strong>Webinar 3:</strong> Assessment & Evaluation Strategies
+              </li>
+              <li>
+                <strong>Webinar 4:</strong> Advanced Implementation Techniques
+              </li>
+            </ul>
+            <a href="#" class="educator-button warning">🎬 Watch Series</a>
+          </div>
+
+          <div class="educator-card">
+            <h3>🏆 Micro-Credential Badge</h3>
+            <p>
+              Showcase your expertise with a verifiable digital badge. Complete
+              our 8-hour course, submit a lesson artifact, and join our
+              certified educator network.
+            </p>
+            <ul>
+              <li>
+                <strong>Module 1:</strong> Foundations of AI Ethics (2 hours)
+              </li>
+              <li>
+                <strong>Module 2:</strong> Classroom Implementation (3 hours)
+              </li>
+              <li><strong>Module 3:</strong> Assessment & Growth (2 hours)</li>
+              <li><strong>Module 4:</strong> Capstone Project (1 hour)</li>
+            </ul>
+            <a href="#" class="educator-button warning">🎯 Start Badge Path</a>
+          </div>
+
+          <div class="educator-card">
+            <h3>👨‍🏫 Live Workshop Series</h3>
+            <p>
+              Monthly interactive workshops with SimulateAI experts and master
+              teachers. Small group sessions, Q&A, and hands-on practice with
+              immediate feedback.
+            </p>
+            <ul>
+              <li><strong>Format:</strong> 90 minutes, max 20 participants</li>
+              <li><strong>Schedule:</strong> 2nd Saturday of each month</li>
+              <li>
+                <strong>Focus:</strong> Practical implementation challenges
+              </li>
+              <li><strong>Bonus:</strong> Peer networking and collaboration</li>
+            </ul>
+            <a href="#" class="educator-button warning"
+              >📅 Register for Workshop</a
+            >
+          </div>
+
+          <div class="educator-card">
+            <h3>🎯 Custom District Training</h3>
+            <p>
+              Tailored professional development for your school or district. We
+              work with your team to create customized training that fits your
+              specific needs and timeline.
+            </p>
+            <ul>
+              <li><strong>On-site or virtual</strong> delivery options</li>
+              <li><strong>Flexible scheduling</strong> to fit your calendar</li>
+              <li><strong>Customized content</strong> for your grade levels</li>
+              <li><strong>Follow-up support</strong> and coaching included</li>
+            </ul>
+            <a
+              href="mailto:training@simulateai.org"
+              class="educator-button warning"
+              >✉️ Request Custom Training</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- Community & Support -->
+      <section id="community" class="educator-section">
+        <h2>🤝 Community & Support</h2>
+        <p>
+          Join our thriving educator community, access ongoing support, and help
+          shape the future of AI ethics education. Your voice and experience
+          matter in this important work.
+        </p>
+
+        <div class="educator-grid">
+          <div class="educator-card">
+            <h3>💬 Educator Slack Community</h3>
+            <p>
+              Connect with 500+ educators worldwide. Share lesson plans, get
+              implementation advice, and participate in monthly challenges.
+              Early access to new features and scenarios.
+            </p>
+            <a href="#" class="educator-button">🚀 Join Slack Community</a>
+          </div>
+
+          <div class="educator-card">
+            <h3>💡 Feature Request & Feedback</h3>
+            <p>
+              Help us improve SimulateAI with your classroom insights. Request
+              new scenarios, suggest features, and vote on our development
+              roadmap. We iterate based on educator needs.
+            </p>
+            <a href="#" class="educator-button">📝 Submit Feedback</a>
+          </div>
+
+          <div class="educator-card">
+            <h3>📚 Help Center & Documentation</h3>
+            <p>
+              Comprehensive guides, video tutorials, troubleshooting tips, and
+              FAQs. Everything you need to become a SimulateAI expert, available
+              24/7.
+            </p>
+            <a href="#" class="educator-button">🆘 Visit Help Center</a>
+          </div>
+
+          <div class="educator-card">
+            <h3>🏢 District Partnerships</h3>
+            <p>
+              Large-scale implementation support, volume pricing, LMS
+              integration, and dedicated account management for districts and
+              educational organizations.
+            </p>
+            <a href="mailto:partnerships@simulateai.org" class="educator-button"
+              >🤝 Explore Partnerships</a
+            >
+          </div>
+        </div>
+
+        <div class="highlight-box">
+          <h3>🌟 Educator Spotlight Program</h3>
+          <p>
+            Share your success stories, innovative implementations, and student
+            outcomes with our community. Featured educators receive recognition,
+            free professional development credits, and early access to new
+            resources.
+            <a href="mailto:spotlight@simulateai.org"
+              >Nominate yourself or a colleague!</a
+            >
+          </p>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="educator-footer">
+        <p>
+          © 2025 SimulateAI • <a href="#main-content">Back to top</a> •
+          <a href="ethics-guide.html">Ethics Guide</a> •
+          <a href="mailto:educators@simulateai.org">Contact Education Team</a>
+        </p>
+      </footer>
+    </main>
+
+    <!-- Professional Footer Component -->
+    <script
+      type="module"
+      src="src/js/components/professional-footer.js"
+    ></script>
+
+    <!-- Shared Navigation Component -->
+    <script type="module">
+      // Ensure the page is fully loaded before initializing navigation
+      setTimeout(() => {
+        import('./src/js/components/shared-navigation.js');
+      }, 100);
+    </script>
+
+    <!-- Smooth scrolling for anchor links -->
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+          anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (!href || href === '#') return;
+
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+              target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+              });
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

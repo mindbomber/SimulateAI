@@ -934,6 +934,24 @@
               decision-making in AI contexts.
             </p>
           </div>
+
+          <div class="feature-card">
+            <span class="feature-icon">🎯</span>
+            <h3>Adaptive Learning Paths</h3>
+            <p>
+              Personalized simulation experiences that adapt to your ethical
+              reasoning patterns and learning objectives.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <span class="feature-icon">🌐</span>
+            <h3>Global Community</h3>
+            <p>
+              Connect with learners, educators, and researchers worldwide to
+              discuss AI ethics and share insights.
+            </p>
+          </div>
         </div>
       </div>
     </section>
@@ -1057,11 +1075,48 @@
         </div>
 
         <div class="audience-card">
-          <div class="icon">🌍</div>
+          <div class="icon">🧭</div>
           <h3>Lifelong Learners</h3>
           <p>
             To stay informed, engage with emerging technology, and participate
             in shaping AI's future.
+          </p>
+        </div>
+
+        <div class="audience-card">
+          <div class="icon">📜</div>
+          <h3>Philosophy Enthusiasts</h3>
+          <p>
+            To engage with fundamental questions about consciousness, moral
+            reasoning, and the nature of intelligence through practical
+            scenarios.
+          </p>
+        </div>
+
+        <div class="audience-card">
+          <div class="icon">🏛️</div>
+          <h3>Policy Makers</h3>
+          <p>
+            To experience the real-world implications of AI governance decisions
+            and develop informed approaches to technology regulation.
+          </p>
+        </div>
+
+        <div class="audience-card">
+          <div class="icon">💻</div>
+          <h3>Tech Professionals</h3>
+          <p>
+            To understand the ethical implications of their development choices
+            and build more responsible technology solutions.
+          </p>
+        </div>
+
+        <div class="audience-card">
+          <div class="icon">🤝</div>
+          <h3>Community Builders</h3>
+          <p>
+            To foster ethical AI discussions and create inclusive spaces for
+            technology education and digital citizenship.
           </p>
         </div>
       </div>
@@ -1183,33 +1238,31 @@
           '💡',
           '🧬',
           '🔬',
-          '📊',
-          '🕹️',
           '🚀',
           '💻',
           '📱',
           '🔍',
-          '⚙️',
           '🎮',
-          '📈',
           '🌐',
           '📝',
-          '💾',
           '⭐',
           '🧪',
-          '🔋',
           '📡',
           '🛰️',
           '🌍',
           '⚖️',
-          '📘',
-          '🧩',
+          '📙',
           '🤔',
           '🧾',
           '🧭',
           '🎓',
           '🌟',
           '✨',
+          '🖋️',
+          '🖥️',
+          '💭',
+          '✏️',
+          '🌱',
         ];
 
         // Create floating emojis at intervals
@@ -1376,24 +1429,24 @@
         ripple.style.setProperty('--click-y', clickYPercent + '%');
         document.body.appendChild(ripple);
 
-        // Create portal loading indicator
-        const loading = document.createElement('div');
-        loading.className = 'portal-loading';
-        loading.innerHTML = `
-          <div style="
-            font-size: 2rem;
-            color: #1a73e8;
-            text-shadow: 0 0 10px rgba(26, 115, 232, 0.5);
-          ">🌊</div>
-          <div style="
-            margin-top: 10px;
-            font-size: 0.9rem;
-            color: #667eea;
-            font-weight: 600;
-            text-align: center;
-          ">Entering Simulation...</div>
-        `;
-        document.body.appendChild(loading);
+        // Portal loading indicator removed per user request
+        // const loading = document.createElement('div');
+        // loading.className = 'portal-loading';
+        // loading.innerHTML = `
+        //   <div style="
+        //     font-size: 2rem;
+        //     color: #1a73e8;
+        //     text-shadow: 0 0 10px rgba(26, 115, 232, 0.5);
+        //   ">🌊</div>
+        //   <div style="
+        //     margin-top: 10px;
+        //     font-size: 0.9rem;
+        //     color: #667eea;
+        //     font-weight: 600;
+        //     text-align: center;
+        //   ">Entering Simulation...</div>
+        // `;
+        // document.body.appendChild(loading);
 
         // Add subtle haptic feedback if supported
         if ('vibrate' in navigator) {
@@ -1403,10 +1456,10 @@
         // Sound effect removed per user request
         // playPortalSound();
 
-        // Activate loading animation after a short delay
-        setTimeout(() => {
-          loading.classList.add('active');
-        }, 300);
+        // Loading animation removed per user request
+        // setTimeout(() => {
+        //   loading.classList.add('active');
+        // }, 300);
 
         // Execute callback after transition completes
         setTimeout(() => {
@@ -1418,7 +1471,7 @@
           if (distortion.parentNode)
             distortion.parentNode.removeChild(distortion);
           if (ripple.parentNode) ripple.parentNode.removeChild(ripple);
-          if (loading.parentNode) loading.parentNode.removeChild(loading);
+          // Loading element cleanup removed since element no longer created
         }, 1500);
       }
 

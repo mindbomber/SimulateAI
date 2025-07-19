@@ -28,6 +28,7 @@ const DONOR_STATUS_KEY = 'simulateai_donor_status';
 const NOTIFICATION_DURATION = 5000;
 const ANIMATION_DURATION = 300;
 const DESKTOP_BREAKPOINT = 768;
+const TOAST_DELAY = 500;
 const SETTINGS_INIT_DELAY = 100;
 const SETTINGS_LATE_APPLY_DELAY = 200;
 
@@ -325,6 +326,11 @@ class SettingsManager {
       highContrast: false,
       reducedMotion: false,
       largeClickTargets: false,
+      // Notification settings
+      notificationsEnabled: false,
+      achievementNotifications: true,
+      badgeNotifications: true,
+      progressNotifications: true,
     };
 
     try {
@@ -540,6 +546,9 @@ class SettingsManager {
       });
     }
 
+    // Notification event listeners
+    this.setupNotificationEventListeners();
+
     // Settings dropdown toggle
     const settingsNav = document.getElementById('settings-nav');
     if (settingsNav) {
@@ -655,6 +664,9 @@ class SettingsManager {
     if (largeTargetsToggle) {
       largeTargetsToggle.checked = this.settings.largeClickTargets;
     }
+
+    // Update notification settings
+    this.updateNotificationUI();
   }
 
   applySettings() {
@@ -895,6 +907,427 @@ class SettingsManager {
         }
       });
     }
+  }
+
+  /**
+   * Setup notification event listeners
+   */
+  setupNotificationEventListeners() {
+    // Main notifications toggle
+    const notificationsToggle = document.getElementById('toggle-notifications');
+    if (notificationsToggle) {
+      notificationsToggle.addEventListener('change', e => {
+        this.handleNotificationToggle(e.target.checked);
+      });
+    }
+
+    // Achievement notifications toggle
+    const achievementToggle = document.getElementById(
+      'toggle-achievement-notifications'
+    );
+    if (achievementToggle) {
+      achievementToggle.addEventListener('change', e => {
+        const oldValue = this.settings.achievementNotifications;
+        this.settings.achievementNotifications = e.target.checked;
+
+        userEngagementTracker.trackUserEvent('settings_change', {
+          settingName: 'achievementNotifications',
+          oldValue,
+          newValue: e.target.checked,
+          settingType: 'toggle',
+          category: 'notifications',
+          context: 'settings_panel',
+        });
+
+        this.saveSettings();
+      });
+    }
+
+    // Badge notifications toggle
+    const badgeToggle = document.getElementById('toggle-badge-notifications');
+    if (badgeToggle) {
+      badgeToggle.addEventListener('change', e => {
+        const oldValue = this.settings.badgeNotifications;
+        this.settings.badgeNotifications = e.target.checked;
+
+        userEngagementTracker.trackUserEvent('settings_change', {
+          settingName: 'badgeNotifications',
+          oldValue,
+          newValue: e.target.checked,
+          settingType: 'toggle',
+          category: 'notifications',
+          context: 'settings_panel',
+        });
+
+        this.saveSettings();
+      });
+    }
+
+    // Progress notifications toggle
+    const progressToggle = document.getElementById(
+      'toggle-progress-notifications'
+    );
+    if (progressToggle) {
+      progressToggle.addEventListener('change', e => {
+        const oldValue = this.settings.progressNotifications;
+        this.settings.progressNotifications = e.target.checked;
+
+        userEngagementTracker.trackUserEvent('settings_change', {
+          settingName: 'progressNotifications',
+          oldValue,
+          newValue: e.target.checked,
+          settingType: 'toggle',
+          category: 'notifications',
+          context: 'settings_panel',
+        });
+
+        this.saveSettings();
+      });
+    }
+
+    // Initialize notification status
+    this.checkNotificationPermission();
+  }
+
+  /**
+   * Handle main notification toggle
+   */
+  async handleNotificationToggle(enabled) {
+    const oldValue = this.settings.notificationsEnabled;
+
+    if (enabled) {
+      // Check if notifications are already blocked/denied
+      if (Notification.permission === 'denied') {
+        // Don't try to request permission again - it's blocked
+        this.settings.notificationsEnabled = false;
+        const toggle = document.getElementById('toggle-notifications');
+        if (toggle) toggle.checked = false;
+        this.updateNotificationStatus('denied');
+        this.showHowToUnblockNotifications();
+        return;
+      }
+
+      // Request permission if enabling
+      const permission = await this.requestNotificationPermission();
+      this.settings.notificationsEnabled = permission === 'granted';
+
+      if (permission === 'granted') {
+        this.showNotificationSubOptions(true);
+        this.initializeFCM();
+      } else {
+        // Reset toggle if permission denied
+        const toggle = document.getElementById('toggle-notifications');
+        if (toggle) toggle.checked = false;
+        this.updateNotificationStatus(permission);
+        if (permission === 'denied') {
+          this.showHowToUnblockNotifications();
+        }
+      }
+    } else {
+      this.settings.notificationsEnabled = false;
+      this.showNotificationSubOptions(false);
+      this.updateNotificationStatus('disabled');
+    }
+
+    userEngagementTracker.trackUserEvent('settings_change', {
+      settingName: 'notificationsEnabled',
+      oldValue,
+      newValue: this.settings.notificationsEnabled,
+      settingType: 'toggle',
+      category: 'notifications',
+      permissionResult: Notification.permission,
+      context: 'settings_panel',
+    });
+
+    this.saveSettings();
+  }
+
+  /**
+   * Request notification permission
+   */
+  async requestNotificationPermission() {
+    if (!('Notification' in window)) {
+      this.updateNotificationStatus('unsupported');
+      return 'denied';
+    }
+
+    // Check if already denied/blocked
+    if (Notification.permission === 'denied') {
+      this.updateNotificationStatus('denied');
+      return 'denied';
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      this.updateNotificationStatus(permission);
+      return permission;
+    } catch (error) {
+      // Error requesting notification permission - this can happen when blocked
+      this.updateNotificationStatus('denied');
+      return 'denied';
+    }
+  }
+
+  /**
+   * Check current notification permission
+   */
+  checkNotificationPermission() {
+    if (!('Notification' in window)) {
+      this.updateNotificationStatus('unsupported');
+      return;
+    }
+
+    const { permission } = Notification;
+    this.updateNotificationStatus(permission);
+
+    // Update settings based on actual permission
+    if (permission === 'granted' && this.settings.notificationsEnabled) {
+      this.showNotificationSubOptions(true);
+    } else {
+      this.settings.notificationsEnabled = false;
+      this.showNotificationSubOptions(false);
+
+      // Update the toggle to reflect the correct state
+      const toggle = document.getElementById('toggle-notifications');
+      if (toggle) {
+        toggle.checked = false;
+      }
+
+      this.saveSettings();
+    }
+  }
+
+  /**
+   * Update notification status display
+   */
+  updateNotificationStatus(status) {
+    const toggle = document.getElementById('toggle-notifications');
+
+    if (!toggle) return;
+
+    // Update toggle state
+    if (status === 'granted' && this.settings.notificationsEnabled) {
+      toggle.checked = true;
+    } else {
+      toggle.checked = false;
+    }
+
+    // Show a toast for important status changes
+    if (status === 'denied' || status === 'error' || status === 'unsupported') {
+      // Auto-show toast for problematic states
+      setTimeout(() => {
+        this.showNotificationStatusToast(status);
+      }, TOAST_DELAY); // Small delay to ensure UI is ready
+    }
+  }
+
+  /**
+   * Show/hide notification sub-options
+   */
+  showNotificationSubOptions(show) {
+    const sections = [
+      'notification-types-section',
+      'notification-badges-section',
+      'notification-progress-section',
+    ];
+
+    sections.forEach(sectionId => {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.style.display = show ? 'block' : 'none';
+      }
+    });
+  }
+
+  /**
+   * Show notification status information as a toast popup
+   */
+  showNotificationStatusToast(status) {
+    if (!window.NotificationToast) {
+      // Fallback if toast system isn't available
+      this.showNotificationStatusFallback(status);
+      return;
+    }
+
+    const toastConfigs = {
+      granted: {
+        type: 'success',
+        title: '🔔 Notifications Enabled',
+        message:
+          'You will receive notifications for achievements, badges, and progress updates. You can customize these in the settings below.',
+        duration: 5000,
+      },
+      denied: {
+        type: 'warning',
+        title: '🚫 Notifications Blocked',
+        message: `To enable notifications:
+        1. Click the lock/info icon next to the URL
+        2. Change notifications from "Block" to "Allow"
+        3. Refresh the page and toggle notifications on`,
+        duration: 8000,
+      },
+      default: {
+        type: 'info',
+        title: '🔔 Enable Notifications?',
+        message:
+          "Toggle the switch above to enable notifications. You'll be asked for permission to show notifications from SimulateAI.",
+        duration: 5000,
+      },
+      unsupported: {
+        type: 'error',
+        title: '❌ Notifications Not Supported',
+        message:
+          "Your browser doesn't support notifications. Consider updating your browser or switching to a modern browser like Chrome, Firefox, or Safari.",
+        duration: 6000,
+      },
+      disabled: {
+        type: 'info',
+        title: '🔕 Notifications Disabled',
+        message:
+          'Notifications are currently turned off. Toggle the switch above to enable notifications for achievements and progress updates.',
+        duration: 4000,
+      },
+      error: {
+        type: 'error',
+        title: '⚠️ Notification Error',
+        message:
+          'There was an error with the notification system. Try refreshing the page or check your browser settings.',
+        duration: 6000,
+      },
+    };
+
+    const config = toastConfigs[status] || {
+      type: 'info',
+      title: 'Notification Status',
+      message: 'Click the toggle above to manage notification settings.',
+      duration: 4000,
+    };
+
+    window.NotificationToast.show({
+      ...config,
+      closable: true,
+    });
+  }
+
+  /**
+   * Fallback method for showing notification status without toast system
+   */
+  showNotificationStatusFallback(status) {
+    const messages = {
+      granted:
+        'Notifications are enabled! You will receive alerts for achievements, badges, and progress updates.',
+      denied:
+        'Notifications are blocked. To enable:\n1. Click the lock icon next to the URL\n2. Change notifications to "Allow"\n3. Refresh and try again',
+      default:
+        "Click the toggle above to enable notifications. You'll be asked for permission.",
+      unsupported:
+        "Your browser doesn't support notifications. Consider updating your browser.",
+      disabled:
+        'Notifications are currently disabled. Use the toggle above to enable them.',
+      error: 'There was an error with notifications. Try refreshing the page.',
+    };
+
+    alert(
+      messages[status] ||
+        'Click the toggle above to manage notification settings.'
+    );
+  }
+
+  /**
+   * Show instructions on how to unblock notifications
+   */
+  showHowToUnblockNotifications() {
+    // Use the new toast system for consistent messaging
+    this.showNotificationStatusToast('denied');
+  }
+
+  /**
+   * Initialize FCM if notifications are enabled
+   */
+  async initializeFCM() {
+    try {
+      // Check if FCM is available
+      if (
+        window.fcmMainApp &&
+        typeof window.fcmMainApp.initialize === 'function'
+      ) {
+        await window.fcmMainApp.initialize();
+      } else {
+        // Dynamically import FCM if not already loaded
+        const { default: fcmMainApp } = await import('../fcm-main-app.js');
+        await fcmMainApp.initialize();
+      }
+    } catch (error) {
+      // Failed to initialize FCM - notification system will continue to work without push notifications
+    }
+  }
+
+  /**
+   * Send a test notification (for debugging)
+   */
+  sendTestNotification() {
+    if (
+      !this.settings.notificationsEnabled ||
+      Notification.permission !== 'granted'
+    ) {
+      return;
+    }
+
+    new Notification('SimulateAI Test', {
+      body: 'Notifications are working correctly!',
+      icon: '/favicon.ico',
+      badge: '/favicon.ico',
+    });
+  }
+
+  /**
+   * Get notification settings for external use
+   */
+  getNotificationSettings() {
+    return {
+      enabled: this.settings.notificationsEnabled,
+      achievements: this.settings.achievementNotifications,
+      badges: this.settings.badgeNotifications,
+      progress: this.settings.progressNotifications,
+      permission: Notification.permission,
+    };
+  }
+
+  /**
+   * Update notification UI elements
+   */
+  updateNotificationUI() {
+    // Update notification toggles
+    const notificationsToggle = document.getElementById('toggle-notifications');
+    const achievementToggle = document.getElementById(
+      'toggle-achievement-notifications'
+    );
+    const badgeToggle = document.getElementById('toggle-badge-notifications');
+    const progressToggle = document.getElementById(
+      'toggle-progress-notifications'
+    );
+
+    if (notificationsToggle) {
+      notificationsToggle.checked = this.settings.notificationsEnabled;
+    }
+
+    if (achievementToggle) {
+      achievementToggle.checked = this.settings.achievementNotifications;
+    }
+
+    if (badgeToggle) {
+      badgeToggle.checked = this.settings.badgeNotifications;
+    }
+
+    if (progressToggle) {
+      progressToggle.checked = this.settings.progressNotifications;
+    }
+
+    // Show/hide sub-options based on main toggle
+    this.showNotificationSubOptions(this.settings.notificationsEnabled);
+
+    // Update status
+    this.checkNotificationPermission();
   }
 
   // Public API methods

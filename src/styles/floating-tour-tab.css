@@ -23,7 +23,7 @@
 /* Main floating tour tab container */
 .floating-tour-tab-link {
   position: fixed;
-  top: 22%; /* Positioned above surprise tab which is at 35% */
+  top: 22%; /* Top tab position - standardized vertical spacing */
   right: 0;
   transform: translateY(-50%);
   z-index: 1000; /* Higher than surprise tab (999) to appear above it */
@@ -43,7 +43,7 @@
     0 4px 20px rgba(108, 92, 231, 0.3),
     0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  transform: translateX(calc(100% - 90px));
+  transform: translateX(calc(100% - 90px)); /* Standardized 90px protrusion */
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   min-width: 280px;
   height: 60px;
@@ -257,13 +257,15 @@
 @media (max-width: 768px) {
   .floating-tour-tab-link {
     width: 240px;
-    top: 20%; /* Slightly adjusted for mobile */
+    top: 20%; /* Standardized mobile vertical spacing */
   }
 
   .floating-tour-tab {
     min-width: 240px;
     height: 56px;
-    transform: translateX(calc(100% - 80px));
+    transform: translateX(
+      calc(100% - 75px)
+    ); /* Standardized mobile protrusion */
   }
 
   .floating-tour-tab-content {
@@ -299,26 +301,26 @@
   /* Mobile feedback animations */
   @keyframes tour-feedback-pulse {
     0% {
-      transform: translateX(calc(100% - 80px)) scale(1);
+      transform: translateX(calc(100% - 75px)) scale(1);
     }
     50% {
-      transform: translateX(calc(100% - 80px)) scale(1.05);
+      transform: translateX(calc(100% - 75px)) scale(1.05);
     }
     100% {
-      transform: translateX(calc(100% - 80px)) scale(1);
+      transform: translateX(calc(100% - 75px)) scale(1);
     }
   }
 
   @keyframes tour-shake {
     0%,
     100% {
-      transform: translateX(calc(100% - 80px));
-    }
-    25% {
       transform: translateX(calc(100% - 75px));
     }
+    25% {
+      transform: translateX(calc(100% - 70px));
+    }
     75% {
-      transform: translateX(calc(100% - 85px));
+      transform: translateX(calc(100% - 80px));
     }
   }
 }
@@ -326,13 +328,15 @@
 @media (max-width: 480px) {
   .floating-tour-tab-link {
     width: 200px;
-    top: 18%;
+    top: 18%; /* Standardized small mobile vertical spacing */
   }
 
   .floating-tour-tab {
     min-width: 200px;
     height: 52px;
-    transform: translateX(calc(100% - 70px));
+    transform: translateX(
+      calc(100% - 65px)
+    ); /* Consistent small mobile protrusion */
   }
 
   .floating-tour-tab-content {
@@ -357,13 +361,13 @@
   /* Small mobile feedback animations */
   @keyframes tour-feedback-pulse {
     0% {
-      transform: translateX(calc(100% - 70px)) scale(1);
+      transform: translateX(calc(100% - 65px)) scale(1);
     }
     50% {
-      transform: translateX(calc(100% - 70px)) scale(1.05);
+      transform: translateX(calc(100% - 65px)) scale(1.05);
     }
     100% {
-      transform: translateX(calc(100% - 70px)) scale(1);
+      transform: translateX(calc(100% - 65px)) scale(1);
     }
   }
 

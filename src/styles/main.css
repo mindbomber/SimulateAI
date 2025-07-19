@@ -207,7 +207,11 @@ body {
   z-index: 1000;
   box-shadow: var(--shadow-sm);
   transform: translateY(0);
-  transition: transform 0.3s ease-in-out;
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s ease,
+    background-color 0.3s ease;
+  will-change: transform;
 }
 
 .header.header-hidden {
@@ -216,6 +220,37 @@ body {
 
 .header.header-visible {
   transform: translateY(0);
+}
+
+/* Enhanced scroll effects - add subtle shadow when scrolled */
+.header.scrolled {
+  box-shadow: var(--shadow-lg);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+/* Ensure scroll-aware navbar works properly on mobile */
+@media (max-width: 768px) {
+  .header {
+    transition:
+      transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.25s ease,
+      background-color 0.25s ease;
+  }
+
+  /* Don't hide header when mobile nav is open */
+  .header:has(.main-nav.open) {
+    transform: translateY(0) !important;
+  }
+
+  /* Faster transitions on mobile for better performance */
+  .header.header-hidden {
+    transform: translateY(-100%);
+  }
+
+  .header.header-visible {
+    transform: translateY(0);
+  }
 }
 
 .header-container {

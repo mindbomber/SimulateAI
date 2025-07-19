@@ -46,6 +46,15 @@ designed for universal accessibility and seamless classroom integration.
 - **Safety Scenarios**: Investigate consequences of AI deployment choices
 - **Real-World Applications**: Hiring, lending, healthcare, and education use cases
 
+### 🔔 Notification System
+
+- **User-Controlled Settings**: Toggle notifications on/off from the settings menu
+- **Achievement Notifications**: Get notified when you unlock new badges or complete milestones
+- **Progress Updates**: Stay informed about learning progress and scenario completion
+- **Firebase Cloud Messaging**: Robust push notification delivery with fallback support
+- **Browser Compatibility**: Works across modern browsers with graceful degradation
+- **Privacy-Focused**: All notification preferences stored locally and controlled by the user
+
 ### 🎓 Comprehensive Educator Resources
 
 - **Lesson Plans**: Standards-aligned activities for multiple grade levels
@@ -60,6 +69,13 @@ designed for universal accessibility and seamless classroom integration.
 - **Data Visualization**: Interactive charts (line, bar, pie) with responsive design
 - **Form Components**: Comprehensive form inputs with validation and accessibility
 - **Tooltip System**: Smart positioning tooltips with customizable delays
+- **Notification System**: Comprehensive push notification architecture with Firebase Cloud
+  Messaging
+  - Browser notification API integration with permission management
+  - Toast notification fallbacks for unsupported browsers
+  - User-configurable notification preferences in settings
+  - Achievement, badge, and progress notification types
+  - Robust error handling and system status reporting
 
 ### 🎯 Priority Components (NEW)
 
@@ -114,6 +130,11 @@ SimulateAI/
 │   ├── js/
 │   │   ├── core/
 │   │   │   └── visual-engine.js         # Enhanced with component registry
+│   │   ├── components/
+│   │   │   ├── settings-manager.js      # Settings system with notification controls
+│   │   │   └── notification-toast.js    # Toast notification fallback system
+│   │   ├── services/
+│   │   │   └── notification-service.js  # Centralized notification management
 │   │   ├── objects/
 │   │   │   ├── interactive-objects.js   # Base interactive components
 │   │   │   ├── enhanced-objects.js      # Enhanced object utilities
@@ -121,16 +142,23 @@ SimulateAI/
 │   │   │   ├── priority-components.js   # High-priority components
 │   │   │   ├── layout-components.js     # Layout management components
 │   │   │   └── input-utility-components.js # Input & utility components
+│   │   ├── fcm-main-app.js             # Firebase Cloud Messaging integration
 │   │   └── demos/
 │   │       └── (demo files removed - see main application)
+│   ├── components/
+│   │   └── shared-navigation.html      # Navigation with notification settings
 │   └── styles/
 │       ├── advanced-ui-components.css   # Advanced component styles
 │       ├── priority-components.css      # Priority component styles
-│       └── layout-components.css        # Layout component styles
+│       ├── layout-components.css        # Layout component styles
+│       ├── settings-menu.css           # Settings menu with notification controls
+│       └── notification-toast.css      # Toast notification styles
 ├── docs/
 │   └── enhanced-interactive-object-system.md  # Complete documentation
 ├── tests/
 │   └── ui-components-test.js           # Comprehensive test suite
+├── notification-test.html              # Notification system robustness testing
+├── firebase-messaging-sw.js           # Service worker for FCM
 ├── NO_HTML_GENERATION_POLICY.md       # Component development policy
 └── README.md                           # This file
 ```

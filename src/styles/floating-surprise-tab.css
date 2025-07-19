@@ -186,12 +186,15 @@
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .floating-surprise-tab-link {
-    top: 30%;
+    top: 32%; /* Standardized mobile vertical spacing */
   }
 
   .floating-surprise-tab {
     min-width: 260px;
     height: 56px;
+    transform: translateX(
+      calc(100% - 75px)
+    ); /* Standardized mobile protrusion */
   }
 
   .floating-surprise-tab-content {
@@ -219,9 +222,16 @@
 }
 
 @media (max-width: 480px) {
+  .floating-surprise-tab-link {
+    top: 30%; /* Standardized small mobile vertical spacing */
+  }
+
   .floating-surprise-tab {
     min-width: 240px;
     height: 52px;
+    transform: translateX(
+      calc(100% - 65px)
+    ); /* Standardized small mobile protrusion */
   }
 
   .floating-surprise-tab-content {

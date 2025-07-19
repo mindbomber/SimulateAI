@@ -42,7 +42,7 @@
     0 4px 20px rgba(238, 90, 82, 0.3),
     0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  transform: translateX(calc(100% - 90px));
+  transform: translateX(calc(100% - 90px)); /* Standardized 90px protrusion */
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   min-width: 280px;
   height: 60px;
@@ -217,10 +217,16 @@
 
 /* Mobile optimizations */
 @media (max-width: 768px) {
+  .floating-tab-link {
+    top: 44%; /* Standardized mobile vertical spacing */
+  }
+
   .floating-action-tab {
     min-width: 260px;
     height: 56px;
-    transform: translateX(calc(100% - 76px));
+    transform: translateX(
+      calc(100% - 75px)
+    ); /* Standardized mobile protrusion */
   }
 
   .floating-tab-content {
@@ -257,12 +263,45 @@
   }
 }
 
+/* Small mobile optimizations */
+@media (max-width: 480px) {
+  .floating-tab-link {
+    top: 42%; /* Standardized small mobile vertical spacing */
+  }
+
+  .floating-action-tab {
+    min-width: 220px;
+    height: 52px;
+    transform: translateX(
+      calc(100% - 65px)
+    ); /* Standardized small mobile protrusion */
+  }
+
+  .floating-tab-content {
+    padding: 0 14px;
+  }
+
+  .floating-tab-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 12px;
+  }
+
+  .tab-title {
+    font-size: 12px;
+  }
+
+  .tab-subtitle {
+    font-size: 9px;
+  }
+}
+
 /* Tablet optimizations */
 @media (min-width: 769px) and (max-width: 1024px) {
   .floating-action-tab {
     min-width: 270px;
     height: 58px;
-    transform: translateX(calc(100% - 78px));
+    transform: translateX(calc(100% - 85px)); /* Consistent tablet protrusion */
   }
 }
 
@@ -271,7 +310,9 @@
   .floating-action-tab {
     min-width: 300px;
     height: 64px;
-    transform: translateX(calc(100% - 94px));
+    transform: translateX(
+      calc(100% - 95px)
+    ); /* Slightly larger protrusion for large screens */
   }
 
   .floating-tab-content {
