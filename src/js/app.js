@@ -94,7 +94,7 @@ const AppDebug = {
   log: (message, data = null) => {
     if (window.DEBUG_MODE || localStorage.getItem('debug') === 'true') {
       // eslint-disable-next-line no-console
-      console.log(`[App] ${message}`, data || '');
+
     }
   },
   info: (message, data = null) => {

@@ -281,7 +281,6 @@ class ResearchConsentManager {
         })
       );
 
-      console.log('Consent data stored successfully');
     } catch (error) {
       console.error('Error storing consent data:', error);
       throw new Error('Failed to store consent data locally');
@@ -306,7 +305,7 @@ class ResearchConsentManager {
       }
 
       const result = await response.json();
-      console.log('Consent submitted to server:', result);
+
     } catch (error) {
       // For demo purposes, we'll not fail on server errors
       console.warn(
@@ -475,12 +474,12 @@ class ResearchConsentManager {
   }
 
   trackConsentInteraction(consentType, checked) {
-    console.log(`Consent interaction: ${consentType} = ${checked}`);
+
     // Here you could send analytics to your tracking service
   }
 
   trackSectionView(sectionTitle) {
-    console.log(`Section viewed: ${sectionTitle}`);
+
     // Here you could send analytics to your tracking service
   }
 

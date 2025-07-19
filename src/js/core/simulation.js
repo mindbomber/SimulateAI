@@ -267,7 +267,7 @@ class EthicsSimulation {
       process.env?.NODE_ENV === 'development'
     ) {
       // eslint-disable-next-line no-console
-      console.log('Setting up scenario:', scenario.title);
+
     }
   }
 
@@ -659,7 +659,7 @@ class EthicsSimulation {
         process.env?.NODE_ENV === 'development'
       ) {
         // eslint-disable-next-line no-console
-        console.log(`EthicsSimulation ${this.id}: Destroyed`);
+
       }
     } catch (error) {
       this.handleError('Error during simulation cleanup', error);

@@ -33,7 +33,7 @@ const messaging = getMessaging(app);
 navigator.serviceWorker
   .register('/firebase-messaging-sw.js')
   .then(registration => {
-    console.log('Service Worker registered with scope:', registration.scope);
+
     // You can optionally pass the service worker registration to getMessaging
     // const messaging = getMessaging(app, { serviceWorkerRegistration: registration });
   })
@@ -48,15 +48,13 @@ const VAPID_KEY =
 getToken(messaging, { vapidKey: VAPID_KEY })
   .then(currentToken => {
     if (currentToken) {
-      console.log('FCM registration token:', currentToken);
+
       // TODO: Send this token to your server!
       // You'll need to store this token in your database (e.g., Cloud Firestore, or a custom server)
       // so you can send messages to this specific user/device later.
     } else {
       // Show UI to ask user to enable notifications
-      console.log(
-        'No registration token available. Request permission to generate one.'
-      );
+
       // You might want to display a UI element that explains why you need notification permissions
       // and prompts the user to grant them.
     }
@@ -71,7 +69,7 @@ getToken(messaging, { vapidKey: VAPID_KEY })
 
 // 3. Handle foreground messages
 onMessage(messaging, payload => {
-  console.log('Foreground message received:', payload);
+
   // Customize how you want to display the message in the foreground
   // For example, you could show a custom in-app notification or a toast message.
   const notificationTitle = payload.notification.title;

@@ -985,7 +985,6 @@ class EnhancedBlogManager {
       await this.delay(2000);
 
       // In a real app, this would submit to your backend
-      console.log('Submitting post:', postData);
 
       this.showNotification('Article published successfully!', 'success');
       this.closeModal('write-post-modal');
@@ -1068,8 +1067,6 @@ class EnhancedBlogManager {
         community: document.getElementById('newsletter-community')?.checked,
         subscribedAt: new Date().toISOString(),
       };
-
-      console.log('Newsletter subscription:', subscriptionData);
 
       this.showNotification(
         'Successfully subscribed to newsletter!',

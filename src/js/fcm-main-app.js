@@ -302,13 +302,13 @@ export class FCMMainApp {
   /**
    * Log information (development helper)
    */
-  logInfo(message, ...args) {
+  logInfo(_message, ..._args) {
     if (
       typeof window !== 'undefined' &&
       window.console &&
       window.location.hostname === 'localhost'
     ) {
-      window.console.log(`[FCM] ${message}`, ...args);
+      // Debug logging removed for production
     }
   }
 

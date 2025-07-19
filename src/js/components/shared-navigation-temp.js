@@ -3,8 +3,6 @@
  * Loads and manages the shared navigation HTML across all pages
  */
 
-import { UI, TIMING } from '../utils/constants.js';
-
 class SharedNavigation {
   constructor() {
     this.navHTML = null;
@@ -15,7 +13,7 @@ class SharedNavigation {
     // Scroll-aware navbar properties
     this.lastScrollY = 0;
     this.scrollThreshold = 5; // Minimum scroll distance to trigger hide/show
-    this.headerHeight = UI.HEADER_HEIGHT; // Use constant instead of magic number
+    this.headerHeight = 80; // Approximate header height
     this.isScrolling = false;
     this.scrollTimeout = null;
   }
@@ -559,16 +557,9 @@ class SharedNavigation {
     const navToggle = document.querySelector('.nav-toggle');
     const mainNav = document.querySelector('.main-nav');
 
-    //
-    //
-    //
-
     if (!navToggle || !mainNav) {
-      //
       return;
     }
-
-    //
 
     // Remove any existing listeners by cloning the button
     const newNavToggle = navToggle.cloneNode(true);
@@ -577,7 +568,6 @@ class SharedNavigation {
     // Add fresh listener to the new button
     newNavToggle.addEventListener('click', e => {
       e.preventDefault();
-      //
       this.toggleMobileNav();
     });
 
@@ -601,21 +591,17 @@ class SharedNavigation {
 
     // Mark mobile listeners as set up
     this._mobileListenersSetup = true;
-    //
   }
 
   /**
    * Setup mobile-specific dropdown listeners
    */
   setupMobileDropdownListeners() {
-    //
 
     // Find ALL dropdown triggers, including those with href
     const allDropdownTriggers = document.querySelectorAll(
       '.nav-item-dropdown .nav-link[aria-haspopup="true"]'
     );
-
-    //
 
     allDropdownTriggers.forEach(trigger => {
       const dropdown = trigger.nextElementSibling;
@@ -633,10 +619,8 @@ class SharedNavigation {
       const isMegaMenu = dropdown.classList.contains('mega-menu');
 
       if (isMegaMenu) {
-        //
         trigger.addEventListener('click', e => {
           e.preventDefault(); // Prevent navigation in mobile
-          //
 
           const isOpen = dropdown.classList.contains('open');
           if (isOpen) {
@@ -656,7 +640,6 @@ class SharedNavigation {
         ); */
         trigger.addEventListener('click', e => {
           e.preventDefault();
-          // );
 
           const isOpen = dropdown.classList.contains('open');
 
@@ -1110,6 +1093,16 @@ class SharedNavigation {
     this.closeMegaMenu();
     this.closeAllDropdowns();
 
+      'Before opening - mainNav computed display:',
+      window.getComputedStyle(mainNav).display
+    );
+      'Before opening - mainNav computed right:',
+      window.getComputedStyle(mainNav).right
+    );
+      'Before opening - mainNav computed transform:',
+      window.getComputedStyle(mainNav).transform
+    );
+
     // Add class
     mainNav.classList.add('open');
     navToggle.setAttribute('aria-expanded', 'true');
@@ -1130,7 +1123,23 @@ class SharedNavigation {
     mainNav.style.setProperty('transform', 'translateX(0)', 'important');
 
     // Wait a moment then check the result
-    setTimeout(() => {}, 100);
+    setTimeout(() => {
+        'After opening - mainNav computed display:',
+        window.getComputedStyle(mainNav).display
+      );
+        'After opening - mainNav computed right:',
+        window.getComputedStyle(mainNav).right
+      );
+        'After opening - mainNav computed transform:',
+        window.getComputedStyle(mainNav).transform
+      );
+        'After opening - mainNav computed z-index:',
+        window.getComputedStyle(mainNav).zIndex
+      );
+        'After opening - mainNav bounding rect:',
+        mainNav.getBoundingClientRect()
+      );
+    }, 100);
 
     if (navBackdrop) {
       navBackdrop.classList.add('open');
@@ -1260,6 +1269,8 @@ class SharedNavigation {
   handleTourAction() {
     // Prevent rapid successive calls
     if (this._tourActionInProgress) {
+        'SharedNavigation: Tour action already in progress, ignoring duplicate call'
+      );
       return;
     }
 
@@ -1507,6 +1518,8 @@ if (document.readyState === 'loading') {
       window.sharedNav = new SharedNavigation();
       window.sharedNav.init();
     } else {
+        'SharedNavigation: Instance already exists, skipping DOMContentLoaded initialization'
+      );
     }
   });
 } else {
@@ -1515,5 +1528,7 @@ if (document.readyState === 'loading') {
     window.sharedNav = new SharedNavigation();
     window.sharedNav.init();
   } else {
+      'SharedNavigation: Instance already exists, skipping immediate initialization'
+    );
   }
 }

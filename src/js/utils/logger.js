@@ -104,18 +104,18 @@ class Logger {
           console.info(...args);
           break;
         case 'debug':
-          console.log(...args);
+
           break;
         case 'trace':
           console.trace(...args);
           break;
         default:
-          console.log(...args);
+
       }
     } catch (e) {
       // Fallback for environments without console methods
       try {
-        console.log(...args);
+
       } catch (fallbackError) {
         // Silent fail in restrictive environments
       }

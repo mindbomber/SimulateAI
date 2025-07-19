@@ -535,7 +535,6 @@ class ProfessionalBlog {
     if (!article) return;
 
     // For now, just log the article (in a real app, this would open a modal or navigate)
-    console.log('Opening article:', article);
 
     // You could implement a modal here or navigate to a dedicated article page
     alert(

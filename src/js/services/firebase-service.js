@@ -197,8 +197,6 @@ export class FirebaseService {
         this.setupAutoSignOut(options.autoSignOutMinutes);
       }
 
-      console.log(`✅ Auth persistence set to: ${mode}`);
-
       // Track persistence setting for analytics
       this.trackEvent('auth_persistence_set', {
         mode,
@@ -225,7 +223,7 @@ export class FirebaseService {
 
     this.autoSignOutTimer = setTimeout(async () => {
       if (this.isAuthenticated()) {
-        console.log(`🕐 Auto sign-out after ${minutes} minutes of inactivity`);
+
         await this.signOutUser();
 
         // Notify user about auto sign-out
@@ -407,7 +405,6 @@ export class FirebaseService {
       // Check for redirect result (for mobile auth)
       await this.handleAuthRedirectResult();
 
-      console.log('🔥 Firebase initialized successfully');
       return true;
     } catch (error) {
       console.error('❌ Firebase initialization failed:', error);
@@ -483,7 +480,6 @@ export class FirebaseService {
         autoSignOutMinutes: recommendation.autoSignOutMinutes,
       });
 
-      console.log('🤖 Smart persistence:', recommendation.reason);
     } catch (error) {
       console.warn('⚠️ Smart persistence setup failed, using default:', error);
       // Fallback to default persistence
@@ -562,10 +558,10 @@ export class FirebaseService {
       this.notifyAuthStateListeners(user);
 
       if (user) {
-        console.log('✅ User signed in:', user.displayName || user.email);
+
         this.trackEvent('user_sign_in', { method: 'google' });
       } else {
-        console.log('👋 User signed out');
+
       }
     });
   }

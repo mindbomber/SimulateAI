@@ -660,7 +660,7 @@ export class VisualEngine {
   logInfo(message, data = null) {
     if (this.options.debug) {
       // eslint-disable-next-line no-console
-      console.log(`VisualEngine: ${message}`, data || '');
+
     }
   }
 

@@ -312,7 +312,7 @@ class MessagingService {
       window.location.hostname === '127.0.0.1';
     if (isDevelopment) {
       // eslint-disable-next-line no-console
-      console.log(message, data || '');
+
     }
   }
 

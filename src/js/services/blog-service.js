@@ -787,7 +787,7 @@ class BlogService extends FirebaseService {
   logInfo(context, data) {
     if (window.location.hostname === 'localhost') {
       // eslint-disable-next-line no-console
-      console.log(`${context}:`, data);
+
     }
   }
 

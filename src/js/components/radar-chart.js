@@ -90,30 +90,15 @@ const DEFAULT_SCORES = {
 
 export default class RadarChart {
   constructor(containerId, options = {}) {
-    console.log('🎯 RadarChart constructor called with:', {
-      containerId,
-      options,
-      chartAvailable: !!window.Chart,
-    });
 
     this.containerId = containerId;
     this.container = document.getElementById(containerId);
-
-    console.log('📦 Container search result:', {
-      containerId,
-      found: !!this.container,
-      element: this.container,
-    });
 
     if (!this.container) {
       const error = `Container with ID '${containerId}' not found`;
       console.error('❌ RadarChart error:', error);
       throw new Error(error);
     }
-
-    console.log(
-      '✅ RadarChart container found, proceeding with initialization'
-    );
 
     this.options = {
       width: options.width || DEFAULT_CHART_SIZE,

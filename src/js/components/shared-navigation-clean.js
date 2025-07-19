@@ -557,16 +557,16 @@ class SharedNavigation {
     const navToggle = document.querySelector('.nav-toggle');
     const mainNav = document.querySelector('.main-nav');
 
-    // console.log('setupMobileNavigationListeners called');
-    // console.log('navToggle found:', navToggle);
-    // console.log('mainNav found:', mainNav);
+    // 
+    // 
+    // 
 
     if (!navToggle || !mainNav) {
-      // console.log('Mobile nav elements not found - skipping mobile nav setup');
+      // 
       return;
     }
 
-    // console.log('Setting up mobile nav click listener');
+    // 
 
     // Remove any existing listeners by cloning the button
     const newNavToggle = navToggle.cloneNode(true);
@@ -575,7 +575,7 @@ class SharedNavigation {
     // Add fresh listener to the new button
     newNavToggle.addEventListener('click', e => {
       e.preventDefault();
-      // console.log('Hamburger menu clicked!');
+      // 
       this.toggleMobileNav();
     });
 
@@ -599,28 +599,26 @@ class SharedNavigation {
 
     // Mark mobile listeners as set up
     this._mobileListenersSetup = true;
-    // console.log('Mobile navigation listeners setup completed');
+    // 
   }
 
   /**
    * Setup mobile-specific dropdown listeners
    */
   setupMobileDropdownListeners() {
-    // console.log('Setting up mobile dropdown listeners');
+    // 
 
     // Find ALL dropdown triggers, including those with href
     const allDropdownTriggers = document.querySelectorAll(
       '.nav-item-dropdown .nav-link[aria-haspopup="true"]'
     );
 
-    // console.log('Found dropdown triggers:', allDropdownTriggers.length);
+    // 
 
     allDropdownTriggers.forEach(trigger => {
       const dropdown = trigger.nextElementSibling;
 
-      /* console.log(
-        'Processing trigger:',
-        trigger.textContent.trim(),
+      /* ,
         'has dropdown:',
         !!dropdown
       ); */
@@ -633,10 +631,10 @@ class SharedNavigation {
       const isMegaMenu = dropdown.classList.contains('mega-menu');
 
       if (isMegaMenu) {
-        // console.log('Setting up categories mega menu for mobile');
+        // 
         trigger.addEventListener('click', e => {
           e.preventDefault(); // Prevent navigation in mobile
-          // console.log('Categories mega menu clicked in mobile');
+          // 
 
           const isOpen = dropdown.classList.contains('open');
           if (isOpen) {
@@ -652,13 +650,11 @@ class SharedNavigation {
 
       // For regular dropdowns (Community, About)
       if (dropdown.classList.contains('dropdown-menu')) {
-        /* console.log(
-          'Setting up regular dropdown for:',
-          trigger.textContent.trim()
+        /* 
         ); */
         trigger.addEventListener('click', e => {
           e.preventDefault();
-          // console.log('Dropdown clicked:', trigger.textContent.trim());
+          // );
 
           const isOpen = dropdown.classList.contains('open');
 
@@ -1112,19 +1108,6 @@ class SharedNavigation {
     this.closeMegaMenu();
     this.closeAllDropdowns();
 
-    console.log(
-      'Before opening - mainNav computed display:',
-      window.getComputedStyle(mainNav).display
-    );
-    console.log(
-      'Before opening - mainNav computed right:',
-      window.getComputedStyle(mainNav).right
-    );
-    console.log(
-      'Before opening - mainNav computed transform:',
-      window.getComputedStyle(mainNav).transform
-    );
-
     // Add class
     mainNav.classList.add('open');
     navToggle.setAttribute('aria-expanded', 'true');
@@ -1146,26 +1129,7 @@ class SharedNavigation {
 
     // Wait a moment then check the result
     setTimeout(() => {
-      console.log(
-        'After opening - mainNav computed display:',
-        window.getComputedStyle(mainNav).display
-      );
-      console.log(
-        'After opening - mainNav computed right:',
-        window.getComputedStyle(mainNav).right
-      );
-      console.log(
-        'After opening - mainNav computed transform:',
-        window.getComputedStyle(mainNav).transform
-      );
-      console.log(
-        'After opening - mainNav computed z-index:',
-        window.getComputedStyle(mainNav).zIndex
-      );
-      console.log(
-        'After opening - mainNav bounding rect:',
-        mainNav.getBoundingClientRect()
-      );
+
     }, 100);
 
     if (navBackdrop) {
@@ -1296,9 +1260,7 @@ class SharedNavigation {
   handleTourAction() {
     // Prevent rapid successive calls
     if (this._tourActionInProgress) {
-      console.log(
-        'SharedNavigation: Tour action already in progress, ignoring duplicate call'
-      );
+
       return;
     }
 
@@ -1546,9 +1508,7 @@ if (document.readyState === 'loading') {
       window.sharedNav = new SharedNavigation();
       window.sharedNav.init();
     } else {
-      console.log(
-        'SharedNavigation: Instance already exists, skipping DOMContentLoaded initialization'
-      );
+
     }
   });
 } else {
@@ -1557,8 +1517,6 @@ if (document.readyState === 'loading') {
     window.sharedNav = new SharedNavigation();
     window.sharedNav.init();
   } else {
-    console.log(
-      'SharedNavigation: Instance already exists, skipping immediate initialization'
-    );
+
   }
 }

@@ -391,9 +391,6 @@ class DonorFlairDisplay {
             flairUpdatedAt: new Date(),
           });
 
-          console.log(
-            `User flair updated to: ${newFlair} (total donated: $${totalDonated})`
-          );
         }
 
         return newFlair;

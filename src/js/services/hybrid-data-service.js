@@ -109,7 +109,7 @@ export class HybridDataService {
       // Data Connect initialization will be available soon
       // const { getDataConnect } = await import('firebase/data-connect');
       // this.dataConnect = getDataConnect(this.app);
-      console.log('🔗 Data Connect initialization pending Firebase SDK update');
+
       return false;
     } catch (error) {
       console.warn('⚠️ Data Connect not available yet:', error.message);

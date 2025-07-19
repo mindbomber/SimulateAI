@@ -353,35 +353,28 @@ class FloatingTourTab {
   }
 
   triggerTour() {
-    console.log('FloatingTourTab: Tour button clicked');
 
     // Provide visual feedback
     this.showFeedback();
 
     // Try multiple methods to trigger the tour
     if (typeof window.app !== 'undefined' && window.app.startOnboardingTour) {
-      console.log(
-        'FloatingTourTab: Triggering tour via app.startOnboardingTour'
-      );
+
       window.app.startOnboardingTour();
     } else if (
       typeof window.sharedNav !== 'undefined' &&
       window.sharedNav.handleTourAction
     ) {
-      console.log(
-        'FloatingTourTab: Triggering tour via sharedNav.handleTourAction'
-      );
+
       window.sharedNav.handleTourAction();
     } else {
       // Fallback: Try to find and click the tour button in navigation
       const tourBtn = document.getElementById('start-tour-nav');
       if (tourBtn) {
-        console.log(
-          'FloatingTourTab: Fallback - clicking navigation tour button'
-        );
+
         tourBtn.click();
       } else {
-        console.log('FloatingTourTab: No tour functionality found');
+
         this.showUnavailableFeedback();
       }
     }

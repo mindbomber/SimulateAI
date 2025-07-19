@@ -19,6 +19,8 @@
  * Integrates PWA functionality with Firebase services
  */
 
+import { UI, TIMING } from '../utils/constants.js';
+
 export class PWAService {
   constructor(firebaseService = null) {
     this.firebaseService = firebaseService;
@@ -49,8 +51,6 @@ export class PWAService {
       // Initialize background sync
       this.initializeBackgroundSync();
 
-      console.log('🚀 PWA Service initialized successfully');
-
       // Track PWA initialization
       this.trackPWAEvent('pwa_service_initialized', {
         is_installed: this.isInstalled,
@@ -71,8 +71,6 @@ export class PWAService {
         this.registration = await navigator.serviceWorker.register('./sw.js', {
           scope: '/SimulateAI/',
         });
-
-        console.log('✅ Service Worker registered:', this.registration.scope);
 
         // Handle updates
         this.registration.addEventListener('updatefound', () => {
@@ -123,7 +121,9 @@ export class PWAService {
         },
         {
           text: 'Later',
-          action: () => console.log('Update deferred'),
+          action: () => {
+            // User dismissed the update notification
+          },
         },
       ],
     };
@@ -176,8 +176,6 @@ export class PWAService {
    * Handle online/offline status changes
    */
   handleOnlineStatusChange(isOnline) {
-    console.log(isOnline ? '🌐 Back online' : '📡 Gone offline');
-
     if (isOnline) {
       this.processSyncQueue();
       this.hideOfflineIndicator();
@@ -215,7 +213,7 @@ export class PWAService {
                 padding: 10px;
                 text-align: center;
                 font-size: 14px;
-                z-index: 10001;
+                z-index: ${UI.Z_INDEX.PWA_NOTIFICATION};
                 animation: slideDown 0.3s ease-out;
             `;
       indicator.innerHTML = "📡 You're offline - Some features may be limited";
@@ -246,7 +244,6 @@ export class PWAService {
 
     if (this.isInstalled) {
       document.body.classList.add('pwa-installed');
-      console.log('📱 Running as installed PWA');
     }
 
     return this.isInstalled;
@@ -270,7 +267,9 @@ export class PWAService {
         },
         {
           text: 'Not Now',
-          action: () => console.log('Install deferred'),
+          action: () => {
+            /* action removed */
+          },
         },
       ],
     };
@@ -301,10 +300,8 @@ export class PWAService {
       });
 
       if (outcome === 'accepted') {
-        console.log('🎉 PWA installation accepted');
         return true;
       } else {
-        console.log('❌ PWA installation declined');
         return false;
       }
     } catch (error) {
@@ -319,8 +316,6 @@ export class PWAService {
    * Handle app installation
    */
   handleAppInstalled() {
-    console.log('🎉 PWA installed successfully');
-
     // Remove install prompts
     const installBanner = document.getElementById('pwa-install-banner');
     if (installBanner) {
@@ -345,7 +340,6 @@ export class PWAService {
       'serviceWorker' in navigator &&
       'sync' in window.ServiceWorkerRegistration.prototype
     ) {
-      console.log('✅ Background sync available');
     } else {
       console.warn('⚠️ Background sync not supported, using fallback');
     }
@@ -361,8 +355,6 @@ export class PWAService {
       id: this.generateId(),
     });
 
-    console.log('📝 Added to sync queue:', action.type);
-
     // Try to register background sync
     this.registerBackgroundSync();
   }
@@ -377,7 +369,6 @@ export class PWAService {
     ) {
       try {
         await this.registration.sync.register('background-sync');
-        console.log('🔄 Background sync registered');
       } catch (error) {
         console.warn('⚠️ Background sync registration failed:', error);
         // Fallback to manual sync when online
@@ -394,11 +385,11 @@ export class PWAService {
       if (navigator.onLine && this.syncQueue.length > 0) {
         this.processSyncQueue();
       } else if (this.syncQueue.length > 0) {
-        setTimeout(checkOnline, 5000); // Check again in 5 seconds
+        setTimeout(checkOnline, TIMING.POLLING_INTERVAL); // Check again in 5 seconds
       }
     };
 
-    setTimeout(checkOnline, 1000);
+    setTimeout(checkOnline, TIMING.SLOW);
   }
 
   /**
@@ -406,8 +397,6 @@ export class PWAService {
    */
   async processSyncQueue() {
     if (!this.isOnline || this.syncQueue.length === 0) return;
-
-    console.log(`🔄 Processing ${this.syncQueue.length} queued actions...`);
 
     const results = {
       success: 0,
@@ -422,7 +411,6 @@ export class PWAService {
       try {
         await this.processQueuedAction(action);
         results.success++;
-        console.log('✅ Sync action processed:', action.type);
       } catch (error) {
         console.error('❌ Sync action failed:', action.type, error);
         results.failed++;
@@ -524,7 +512,7 @@ export class PWAService {
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            z-index: 10002;
+            z-index: ${UI.Z_INDEX.CRITICAL_OVERLAY};
             max-width: 350px;
             border-left: 4px solid #667eea;
         `;
@@ -546,7 +534,7 @@ export class PWAService {
     document.body.appendChild(notificationEl);
 
     // Auto-remove after duration
-    const duration = notification.duration || 5000;
+    const duration = notification.duration || TIMING.NOTIFICATION_NORMAL;
     setTimeout(() => {
       if (notificationEl.parentNode) {
         notificationEl.remove();
@@ -606,7 +594,7 @@ export class PWAService {
     if (this.registration) {
       try {
         await this.registration.update();
-        console.log('🔄 Service worker cache refreshed');
+
         return true;
       } catch (error) {
         console.error('❌ Cache refresh failed:', error);

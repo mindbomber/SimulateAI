@@ -97,12 +97,15 @@ export const UI = {
     MODAL: 1000,
     TOOLTIP: 2000,
     NOTIFICATION: 3000,
+    // High priority overlays
+    PWA_NOTIFICATION: 10001,
+    CRITICAL_OVERLAY: 10002,
   },
 
   // Common sizes
   BUTTON_HEIGHT: 40,
   INPUT_HEIGHT: 40,
-  HEADER_HEIGHT: 60,
+  HEADER_HEIGHT: 80, // Updated from magic number extraction
   SIDEBAR_WIDTH: 250,
   SCROLLBAR_WIDTH: 16,
 

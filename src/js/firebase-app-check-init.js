@@ -42,7 +42,6 @@ if (typeof self !== 'undefined') {
     // isDebug: window.location.hostname === 'localhost'
   });
 
-  console.log('🛡️ Firebase App Check initialized with direct pattern');
 }
 
 // Export the initialized app and app check for use in other modules
@@ -82,6 +81,6 @@ export function isAppCheckReady() {
  *
  * // Check if App Check is working:
  * if (isAppCheckReady()) {
- *     console.log('App Check is protecting your app!');
+ *     
  * }
  */
