@@ -12,23 +12,23 @@ class EnhancedDonationWidget {
       {
         id: 1,
         amount: 5,
-        name: 'Bronze Supporter',
-        flair: '🥉',
-        priceId: 'price_1RkyADJDA3nPZHAFQJr2ySBR', // $5 Bronze tier
+        name: "Bronze Supporter",
+        flair: "🥉",
+        priceId: "price_1RkyADJDA3nPZHAFQJr2ySBR", // $5 Bronze tier
       },
       {
         id: 2,
         amount: 10,
-        name: 'Silver Patron',
-        flair: '🥈',
-        priceId: 'price_1RkyADJDA3nPZHAFXasv2dM0', // $10 Silver tier
+        name: "Silver Patron",
+        flair: "🥈",
+        priceId: "price_1RkyADJDA3nPZHAFXasv2dM0", // $10 Silver tier
       },
       {
         id: 3,
         amount: 20,
-        name: 'Gold Champion',
-        flair: '🏆',
-        priceId: 'price_1RkyADJDA3nPZHAFoyRLGmpQ', // $20 Gold tier
+        name: "Gold Champion",
+        flair: "🏆",
+        priceId: "price_1RkyADJDA3nPZHAFoyRLGmpQ", // $20 Gold tier
       },
     ];
 
@@ -43,9 +43,9 @@ class EnhancedDonationWidget {
       window.envConfig?.getStripePublishableKey() ||
       import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 
-    if (!key || key === 'PLACEHOLDER_KEY') {
+    if (!key || key === "PLACEHOLDER_KEY") {
       throw new Error(
-        'Stripe publishable key not configured. Please set VITE_STRIPE_PUBLISHABLE_KEY environment variable.'
+        "Stripe publishable key not configured. Please set VITE_STRIPE_PUBLISHABLE_KEY environment variable.",
       );
     }
 
@@ -55,7 +55,7 @@ class EnhancedDonationWidget {
   async init() {
     // Check authentication status
     if (window.firebase && window.firebase.auth) {
-      window.firebase.auth().onAuthStateChanged(user => {
+      window.firebase.auth().onAuthStateChanged((user) => {
         this.isAuthenticated = !!user;
         this.currentUser = user;
         this.updateUI();
@@ -68,15 +68,15 @@ class EnhancedDonationWidget {
     if (!container) return;
 
     const defaultOptions = {
-      title: '💖 Support SimulateAI Research',
-      subtitle: 'Help advance AI ethics education for everyone',
+      title: "💖 Support SimulateAI Research",
+      subtitle: "Help advance AI ethics education for everyone",
       showBenefits: true,
-      style: 'accordion', // 'card', 'inline', 'minimal', 'accordion'
+      style: "accordion", // 'card', 'inline', 'minimal', 'accordion'
     };
 
     const config = { ...defaultOptions, ...options };
 
-    if (config.style === 'accordion') {
+    if (config.style === "accordion") {
       container.innerHTML = this.renderAccordionVersion(config);
     } else {
       container.innerHTML = this.renderCardVersion(config);
@@ -122,7 +122,7 @@ class EnhancedDonationWidget {
                   </div>
 
                   <!-- Benefits Section -->
-                  ${config.showBenefits ? this.renderBenefits() : ''}
+                  ${config.showBenefits ? this.renderBenefits() : ""}
 
                   <!-- Instructions -->
                   <div class="donation-instructions">
@@ -179,7 +179,7 @@ class EnhancedDonationWidget {
           </div>
 
           <!-- Benefits Section -->
-          ${config.showBenefits ? this.renderBenefits() : ''}
+          ${config.showBenefits ? this.renderBenefits() : ""}
 
           <!-- Instructions -->
           <div class="donation-instructions">
@@ -189,6 +189,23 @@ class EnhancedDonationWidget {
             <div class="donation-security">
               🔒 Secured by Stripe
             </div>
+            <button class="donation-preferences-btn" style="
+              display: inline-flex;
+              align-items: center;
+              gap: 0.5rem;
+              padding: 0.5rem 0.75rem;
+              background: transparent;
+              border: 1px solid rgba(255, 255, 255, 0.3);
+              color: rgba(255, 255, 255, 0.9);
+              border-radius: 6px;
+              font-size: 0.875rem;
+              cursor: pointer;
+              transition: all 0.2s ease;
+              margin-top: 0.75rem;
+            ">
+              <span>⚙️</span>
+              <span>Privacy & Display Preferences</span>
+            </button>
           </div>
         </div>
 
@@ -204,7 +221,7 @@ class EnhancedDonationWidget {
     if (this.isAuthenticated) {
       const userFlair = this.getUserFlair();
       const userName =
-        this.currentUser?.displayName || this.currentUser?.email || 'User';
+        this.currentUser?.displayName || this.currentUser?.email || "User";
 
       return `
         <div class="auth-banner authenticated">
@@ -232,7 +249,7 @@ class EnhancedDonationWidget {
   renderTierOptions() {
     return this.donationTiers
       .map(
-        tier => `
+        (tier) => `
       <div class="tier-option" data-tier="${tier.id}">
         <div class="tier-header">
           <span class="tier-flair">${tier.flair}</span>
@@ -243,18 +260,18 @@ class EnhancedDonationWidget {
           ${this.getTierDescription(tier)}
         </div>
       </div>
-    `
+    `,
       )
-      .join('');
+      .join("");
   }
 
   getTierDescription(tier) {
     const descriptions = {
-      1: 'Support basic research and development',
-      2: 'Help fund new simulation scenarios',
-      3: 'Enable major platform enhancements',
+      1: "Support basic research and development",
+      2: "Help fund new simulation scenarios",
+      3: "Enable major platform enhancements",
     };
-    return descriptions[tier.id] || '';
+    return descriptions[tier.id] || "";
   }
 
   renderBenefits() {
@@ -274,7 +291,7 @@ class EnhancedDonationWidget {
             <span class="benefit-icon">🌍</span>
             <span class="benefit-text">Keep platform free & open</span>
           </div>
-          <div class="benefit-item authenticated-only ${this.isAuthenticated ? '' : 'hidden'}">
+          <div class="benefit-item authenticated-only ${this.isAuthenticated ? "" : "hidden"}">
             <span class="benefit-icon">🏆</span>
             <span class="benefit-text">Get supporter recognition</span>
           </div>
@@ -306,33 +323,33 @@ class EnhancedDonationWidget {
 
     // Remove any existing listeners to prevent duplicates
     if (this.handleDelegatedClick) {
-      container.removeEventListener('click', this.handleDelegatedClick);
+      container.removeEventListener("click", this.handleDelegatedClick);
     }
 
     // Bind the event handler to this instance
-    this.handleDelegatedClick = e => {
+    this.handleDelegatedClick = (e) => {
       // Donation type selector
-      if (e.target.classList.contains('donation-type-btn')) {
+      if (e.target.classList.contains("donation-type-btn")) {
         document
-          .querySelectorAll('.donation-type-btn')
-          .forEach(b => b.classList.remove('active'));
-        e.target.classList.add('active');
+          .querySelectorAll(".donation-type-btn")
+          .forEach((b) => b.classList.remove("active"));
+        e.target.classList.add("active");
         this.updateTierDisplay();
         return;
       }
 
       // Tier selection - directly process donation
-      if (e.target.closest('.tier-option')) {
-        const tierOption = e.target.closest('.tier-option');
+      if (e.target.closest(".tier-option")) {
+        const tierOption = e.target.closest(".tier-option");
 
         document
-          .querySelectorAll('.tier-option')
-          .forEach(o => o.classList.remove('selected'));
-        tierOption.classList.add('selected');
+          .querySelectorAll(".tier-option")
+          .forEach((o) => o.classList.remove("selected"));
+        tierOption.classList.add("selected");
 
         // Directly process the donation without needing submit button
         const tierId = tierOption.dataset.tier;
-        const tier = this.donationTiers.find(t => t.id == tierId);
+        const tier = this.donationTiers.find((t) => t.id == tierId);
         if (tier) {
           this.processTierSelection(tier);
         }
@@ -341,8 +358,8 @@ class EnhancedDonationWidget {
 
       // Submit donation (keeping for any legacy references)
       if (
-        e.target.id === 'submit-donation' ||
-        e.target.closest('#submit-donation')
+        e.target.id === "submit-donation" ||
+        e.target.closest("#submit-donation")
       ) {
         e.preventDefault();
         // Legacy fallback - shouldn't happen with new UI
@@ -350,25 +367,25 @@ class EnhancedDonationWidget {
       }
 
       // Sign in link
-      if (e.target.id === 'sign-in-link') {
+      if (e.target.id === "sign-in-link") {
         e.preventDefault();
         this.showSignInModal();
         return;
       }
 
       // Recognition prompt actions
-      if (e.target.id === 'create-account-btn') {
+      if (e.target.id === "create-account-btn") {
         this.showSignUpModal();
         return;
       }
 
-      if (e.target.id === 'skip-recognition-btn') {
+      if (e.target.id === "skip-recognition-btn") {
         this.hideRecognitionPrompt();
         return;
       }
     };
 
-    container.addEventListener('click', this.handleDelegatedClick);
+    container.addEventListener("click", this.handleDelegatedClick);
 
     // Also add direct listeners as a fallback after a short delay to ensure DOM is ready
     const DOM_READY_DELAY = 100;
@@ -379,45 +396,45 @@ class EnhancedDonationWidget {
 
   addDirectEventListeners() {
     // Direct event listeners as fallback
-    document.querySelectorAll('.tier-option').forEach(option => {
-      option.addEventListener('click', () => {
+    document.querySelectorAll(".tier-option").forEach((option) => {
+      option.addEventListener("click", () => {
         document
-          .querySelectorAll('.tier-option')
-          .forEach(o => o.classList.remove('selected'));
-        option.classList.add('selected');
+          .querySelectorAll(".tier-option")
+          .forEach((o) => o.classList.remove("selected"));
+        option.classList.add("selected");
 
         // Directly process the donation
         const tierId = option.dataset.tier;
-        const tier = this.donationTiers.find(t => t.id == tierId);
+        const tier = this.donationTiers.find((t) => t.id == tierId);
         if (tier) {
           this.processTierSelection(tier);
         }
       });
     });
 
-    document.querySelectorAll('.donation-type-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+    document.querySelectorAll(".donation-type-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
         document
-          .querySelectorAll('.donation-type-btn')
-          .forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+          .querySelectorAll(".donation-type-btn")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
         this.updateTierDisplay();
       });
     });
   }
 
   updateUI() {
-    const authBanner = document.getElementById('auth-status-banner');
+    const authBanner = document.getElementById("auth-status-banner");
     if (authBanner) {
       authBanner.innerHTML = this.renderAuthBanner();
     }
 
     // Update benefits section
     const authenticatedBenefits = document.querySelectorAll(
-      '.authenticated-only'
+      ".authenticated-only",
     );
-    authenticatedBenefits.forEach(element => {
-      element.classList.toggle('hidden', !this.isAuthenticated);
+    authenticatedBenefits.forEach((element) => {
+      element.classList.toggle("hidden", !this.isAuthenticated);
     });
 
     // Update donation type selection based on auth status
@@ -425,43 +442,43 @@ class EnhancedDonationWidget {
   }
 
   updateDonationTypeSelection() {
-    const quickBtn = document.getElementById('quick-donate-btn');
-    const recognizedBtn = document.getElementById('recognized-donate-btn');
+    const quickBtn = document.getElementById("quick-donate-btn");
+    const recognizedBtn = document.getElementById("recognized-donate-btn");
 
     if (this.isAuthenticated) {
       // If authenticated, default to recognized donation
-      if (quickBtn) quickBtn.classList.remove('active');
-      if (recognizedBtn) recognizedBtn.classList.add('active');
+      if (quickBtn) quickBtn.classList.remove("active");
+      if (recognizedBtn) recognizedBtn.classList.add("active");
     }
   }
 
   updateTierDisplay() {
-    const selectedType = document.querySelector('.donation-type-btn.active')
+    const selectedType = document.querySelector(".donation-type-btn.active")
       ?.dataset.type;
-    const tierOptions = document.querySelectorAll('.tier-option');
+    const tierOptions = document.querySelectorAll(".tier-option");
 
-    tierOptions.forEach(option => {
-      const tierHeader = option.querySelector('.tier-header');
+    tierOptions.forEach((option) => {
+      const tierHeader = option.querySelector(".tier-header");
 
-      if (selectedType === 'recognized' && this.isAuthenticated) {
+      if (selectedType === "recognized" && this.isAuthenticated) {
         // Show flair for recognized donations
         tierHeader.style.background =
-          'linear-gradient(135deg, #f8f9fa, #e3f2fd)';
-        option.style.border = '2px solid #2196f3';
+          "linear-gradient(135deg, #f8f9fa, #e3f2fd)";
+        option.style.border = "2px solid #2196f3";
       } else {
         // Standard styling for quick donations
-        tierHeader.style.background = '';
-        option.style.border = '';
+        tierHeader.style.background = "";
+        option.style.border = "";
       }
     });
   }
 
   async processTierSelection(tier) {
-    const selectedType = document.querySelector('.donation-type-btn.active')
+    const selectedType = document.querySelector(".donation-type-btn.active")
       ?.dataset.type;
 
     try {
-      if (selectedType === 'recognized' && this.isAuthenticated) {
+      if (selectedType === "recognized" && this.isAuthenticated) {
         // Authenticated donation with flair
         await this.processAuthenticatedDonation(tier);
       } else {
@@ -471,28 +488,28 @@ class EnhancedDonationWidget {
     } catch (error) {
       // Log error for debugging
       if (window.console && window.console.error) {
-        window.console.error('Donation processing error:', error);
+        window.console.error("Donation processing error:", error);
       }
-      alert('Error processing donation. Please try again.');
+      alert("Error processing donation. Please try again.");
     }
   }
 
   async processDonation() {
-    const selectedTier = document.querySelector('.tier-option.selected');
-    const selectedType = document.querySelector('.donation-type-btn.active')
+    const selectedTier = document.querySelector(".tier-option.selected");
+    const selectedType = document.querySelector(".donation-type-btn.active")
       ?.dataset.type;
 
     if (!selectedTier) {
-      alert('Please select a donation tier');
+      alert("Please select a donation tier");
       return;
     }
 
     const tier = this.donationTiers.find(
-      t => t.id == selectedTier.dataset.tier
+      (t) => t.id == selectedTier.dataset.tier,
     );
 
     try {
-      if (selectedType === 'recognized' && this.isAuthenticated) {
+      if (selectedType === "recognized" && this.isAuthenticated) {
         // Authenticated donation with flair
         await this.processAuthenticatedDonation(tier);
       } else {
@@ -502,9 +519,9 @@ class EnhancedDonationWidget {
     } catch (error) {
       // Log error for debugging
       if (window.console && window.console.error) {
-        window.console.error('Donation processing error:', error);
+        window.console.error("Donation processing error:", error);
       }
-      alert('Error processing donation. Please try again.');
+      alert("Error processing donation. Please try again.");
     }
   }
 
@@ -513,12 +530,15 @@ class EnhancedDonationWidget {
       // Try Firebase Functions first
       const functions = window.firebase.functions();
       const createCheckoutSession = functions.httpsCallable(
-        'createCheckoutSession'
+        "createCheckoutSession",
       );
 
       const result = await createCheckoutSession({
         priceId: tier.priceId,
         tier: tier.id.toString(),
+        userId: this.currentUser?.uid,
+        userEmail: this.currentUser?.email,
+        displayName: this.currentUser?.displayName || this.currentUser?.email,
       });
 
       // Redirect to Stripe Checkout
@@ -531,24 +551,30 @@ class EnhancedDonationWidget {
         throw error;
       }
     } catch (error) {
-      console.warn('Firebase Functions not available, using fallback:', error);
+      console.warn("Firebase Functions not available, using fallback:", error);
       // Fallback for local development
-      this.simulateStripeCheckout(tier, 'authenticated');
+      this.simulateStripeCheckout(tier, "authenticated");
+
+      // Simulate adding to donor wall in development
+      await this.simulateAddToDonorWall(tier, "authenticated");
     }
   }
 
   async processAnonymousDonation(tier) {
     const email = this.promptForEmail();
+    const message = this.promptForMessage();
 
     try {
       const functions = window.firebase.functions();
       const createAnonymousCheckout = functions.httpsCallable(
-        'createAnonymousCheckout'
+        "createAnonymousCheckout",
       );
 
       const result = await createAnonymousCheckout({
         tier: tier.id.toString(),
         email,
+        message,
+        amount: tier.amount,
       });
 
       // Redirect to Stripe Checkout
@@ -562,18 +588,141 @@ class EnhancedDonationWidget {
       }
     } catch (error) {
       // Fallback for local development
-      this.simulateStripeCheckout(tier, 'anonymous', email);
+      this.simulateStripeCheckout(tier, "anonymous", email);
+
+      // Simulate adding to donor wall in development
+      await this.simulateAddToDonorWall(tier, "anonymous", email, message);
     }
+  }
+
+  /**
+   * Simulate adding donation to Firebase for development
+   */
+  async simulateAddToDonorWall(tier, donationType, email = "", message = "") {
+    if (!window.firebase || !window.firebase.firestore) {
+      console.log(
+        "Firebase not available - donation would appear in production",
+      );
+      return;
+    }
+
+    try {
+      const db = window.firebase.firestore();
+      const donationData = {
+        amount: tier.amount,
+        tier: tier.id,
+        timestamp: window.firebase.firestore.FieldValue.serverTimestamp(),
+        visibility: this.getUserVisibilityPreference(),
+        message: message || null,
+        userId: donationType === "authenticated" ? this.currentUser?.uid : null,
+        userEmail:
+          donationType === "authenticated" ? this.currentUser?.email : email,
+        displayName:
+          donationType === "authenticated"
+            ? this.currentUser?.displayName || this.currentUser?.email
+            : "Anonymous Supporter",
+      };
+
+      // Add to donations collection
+      await db.collection("donations").add(donationData);
+
+      console.log(
+        "✅ Donation added to Firebase - donor wall will update automatically",
+      );
+
+      // Show success notification
+      this.showDonationSuccessNotification();
+    } catch (error) {
+      console.error("Error adding donation to Firebase:", error);
+    }
+  }
+
+  /**
+   * Show success notification for donation
+   */
+  showDonationSuccessNotification() {
+    const notification = document.createElement("div");
+    notification.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #4CAF50;
+        color: white;
+        padding: 16px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        z-index: 10000;
+        font-family: var(--font-family);
+        max-width: 300px;
+      ">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 1.2em;">🎉</span>
+          <div>
+            <div style="font-weight: 600; margin-bottom: 4px;">Thank you for your donation!</div>
+            <div style="font-size: 0.9em; opacity: 0.9;">Your support will appear in the donor wall shortly.</div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.style.animation = "fadeOut 0.3s ease";
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 300);
+      }
+    }, 5000);
   }
 
   promptForEmail() {
     // Simple email prompt - could be enhanced with a modal
-    return prompt('Email address for receipt (optional):') || '';
+    return prompt("Email address for receipt (optional):") || "";
+  }
+
+  /**
+   * Prompt for optional donation message
+   */
+  promptForMessage() {
+    // Check user preferences first
+    if (
+      window.donationPreferences &&
+      !window.donationPreferences.allowsMessages()
+    ) {
+      return "";
+    }
+
+    const wantMessage = confirm(
+      "Would you like to leave a message about why you support AI ethics research? (This will appear on your donor card)",
+    );
+
+    if (wantMessage) {
+      return prompt("Your message (will be displayed publicly):") || "";
+    }
+
+    return "";
+  }
+
+  /**
+   * Get user's preferred visibility setting
+   */
+  getUserVisibilityPreference() {
+    if (window.donationPreferences) {
+      return window.donationPreferences.getVisibilityForDonation();
+    }
+
+    // Default behavior
+    return this.isAuthenticated ? "username" : "anonymous";
   }
 
   getUserFlair() {
-    if (!this.currentUser || !window.enhancedProfile) return '';
-    return window.enhancedProfile.getUserFlair() || '';
+    if (!this.currentUser || !window.enhancedProfile) return "";
+    return window.enhancedProfile.getUserFlair() || "";
   }
 
   showSignInModal() {
@@ -591,44 +740,44 @@ class EnhancedDonationWidget {
   }
 
   showRecognitionPrompt() {
-    const prompt = document.getElementById('recognition-prompt');
+    const prompt = document.getElementById("recognition-prompt");
     if (prompt) {
-      prompt.classList.remove('hidden');
+      prompt.classList.remove("hidden");
     }
   }
 
   hideRecognitionPrompt() {
-    const prompt = document.getElementById('recognition-prompt');
+    const prompt = document.getElementById("recognition-prompt");
     if (prompt) {
-      prompt.classList.add('hidden');
+      prompt.classList.add("hidden");
     }
   }
 
   toggleDonationAccordion() {
     const accordionHeader = document.querySelector(
-      '.donation-accordion .accordion-header'
+      ".donation-accordion .accordion-header",
     );
     const accordionContent = document.querySelector(
-      '.donation-accordion .accordion-content'
+      ".donation-accordion .accordion-content",
     );
     const accordionIcon = document.querySelector(
-      '.donation-accordion .accordion-icon'
+      ".donation-accordion .accordion-icon",
     );
 
     if (!accordionHeader || !accordionContent || !accordionIcon) return;
 
-    const isExpanded = accordionHeader.getAttribute('aria-expanded') === 'true';
+    const isExpanded = accordionHeader.getAttribute("aria-expanded") === "true";
 
     if (isExpanded) {
       // Collapse
-      accordionHeader.setAttribute('aria-expanded', 'false');
-      accordionContent.classList.add('collapsed');
-      accordionIcon.textContent = '▶';
+      accordionHeader.setAttribute("aria-expanded", "false");
+      accordionContent.classList.add("collapsed");
+      accordionIcon.textContent = "▶";
     } else {
       // Expand
-      accordionHeader.setAttribute('aria-expanded', 'true');
-      accordionContent.classList.remove('collapsed');
-      accordionIcon.textContent = '▼';
+      accordionHeader.setAttribute("aria-expanded", "true");
+      accordionContent.classList.remove("collapsed");
+      accordionIcon.textContent = "▼";
 
       // Re-attach event listeners after expanding to ensure buttons work
       const ACCORDION_ANIMATION_DELAY = 50;
@@ -638,15 +787,15 @@ class EnhancedDonationWidget {
     }
   }
 
-  simulateStripeCheckout(tier, donationType, email = '') {
+  simulateStripeCheckout(tier, donationType, email = "") {
     const randomStr = Math.random().toString(36).substring(2, 11);
     const mockSessionId = `b1${randomStr}`;
 
     const flairText =
-      donationType === 'authenticated' && this.isAuthenticated
+      donationType === "authenticated" && this.isAuthenticated
         ? ` with flair: ${tier.flair}`
-        : '';
-    const emailText = email ? ` for ${email}` : '';
+        : "";
+    const emailText = email ? ` for ${email}` : "";
 
     const message = `🧪 Development Mode: This would redirect to Stripe checkout for ${
       tier.name
@@ -658,7 +807,7 @@ class EnhancedDonationWidget {
 
     if (window.confirm(confirmText)) {
       const tierDescription =
-        donationType === 'authenticated' ? ` - ${tier.flair}` : '';
+        donationType === "authenticated" ? ` - ${tier.flair}` : "";
 
       const htmlContent =
         `<!DOCTYPE html><html><head><title>Mock Stripe Checkout</title>` +
@@ -678,7 +827,7 @@ class EnhancedDonationWidget {
         `<button class="btn" style="background: #6c757d;" onclick="window.close()">Cancel</button></div></body></html>`;
 
       const dataUrl = `data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`;
-      window.open(dataUrl, '_blank');
+      window.open(dataUrl, "_blank");
     }
   }
 

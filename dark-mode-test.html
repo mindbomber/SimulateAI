@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dark Mode Test - SimulateAI</title>
+    <link rel="stylesheet" href="src/styles/main.css" />
+    <link rel="stylesheet" href="src/styles/appearance-settings.css" />
+    <link rel="stylesheet" href="src/styles/scenario-modal.css" />
+    <style>
+      .test-container {
+        padding: 2rem;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .test-section {
+        margin-bottom: 2rem;
+        padding: 1rem;
+        border: 1px solid var(--theme-border);
+        border-radius: 8px;
+        background: var(--theme-bg-secondary);
+      }
+
+      .test-section h3 {
+        color: var(--theme-text-primary);
+        margin-top: 0;
+      }
+
+      .test-section p {
+        color: var(--theme-text-secondary);
+      }
+
+      .theme-toggle {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.5rem 1rem;
+        background: var(--color-primary);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        z-index: 1000;
+      }
+
+      .theme-toggle:hover {
+        background: var(--color-primary-dark);
+      }
+
+      .scenario-modal-test {
+        background: var(--theme-bg-primary);
+        border: 1px solid var(--theme-border);
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+      }
+
+      .scenario-modal-test .scenario-title {
+        color: var(--theme-text-primary);
+        margin: 0 0 0.5rem 0;
+      }
+
+      .scenario-modal-test .scenario-description {
+        color: var(--theme-text-secondary);
+        margin: 0;
+      }
+
+      .option-card {
+        background: var(--theme-bg-secondary);
+        border: 1px solid var(--theme-border);
+        padding: 1rem;
+        margin: 0.5rem 0;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .option-card:hover {
+        border-color: var(--theme-border-hover);
+        box-shadow: 0 2px 8px var(--theme-shadow-hover);
+      }
+
+      .option-card .option-title {
+        color: var(--theme-text-primary);
+        margin: 0 0 0.5rem 0;
+        font-weight: 600;
+      }
+
+      .option-card .option-description {
+        color: var(--theme-text-secondary);
+        margin: 0;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <button class="theme-toggle" onclick="toggleDarkMode()">
+      🌙 Toggle Dark Mode
+    </button>
+
+    <div class="test-container">
+      <h1 style="color: var(--theme-text-primary)">Dark Mode Test Page</h1>
+      <p style="color: var(--theme-text-secondary)">
+        This page tests the new dark mode implementation without !important
+        overrides.
+      </p>
+
+      <div class="test-section">
+        <h3>Text Color Test</h3>
+        <p>
+          This paragraph should change color based on the theme using CSS custom
+          properties.
+        </p>
+        <p style="color: var(--theme-text-muted)">
+          This is muted text that should also adapt to the theme.
+        </p>
+      </div>
+
+      <div class="test-section">
+        <h3>Scenario Modal Simulation</h3>
+        <div class="scenario-modal-test">
+          <h4 class="scenario-title">Test Scenario: AI Ethics Dilemma</h4>
+          <p class="scenario-description">
+            This simulates how text would appear in the scenario modal with the
+            new theming system.
+          </p>
+
+          <div class="option-card">
+            <h5 class="option-title">Option A: Privacy First</h5>
+            <p class="option-description">
+              Prioritize user privacy over data collection efficiency.
+            </p>
+          </div>
+
+          <div class="option-card">
+            <h5 class="option-title">Option B: Balance Approach</h5>
+            <p class="option-description">
+              Find a balance between privacy and functionality.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h3>Badge Text Test</h3>
+        <div
+          style="
+            background: #4a9eff;
+            padding: 1rem;
+            border-radius: 8px;
+            color: white;
+          "
+        >
+          <p class="badge-quote">"Excellent ethical reasoning!"</p>
+          <p class="badge-reason">
+            You demonstrated strong consideration for stakeholder impacts.
+          </p>
+          <p class="badge-timestamp">Earned on January 19, 2025</p>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h3>Current Theme Status</h3>
+        <p id="theme-status">Theme: Loading...</p>
+        <p>CSS Variables Test:</p>
+        <ul>
+          <li>
+            Primary BG:
+            <span
+              style="
+                background: var(--theme-bg-primary);
+                padding: 2px 8px;
+                border: 1px solid var(--theme-border);
+              "
+              >Sample</span
+            >
+          </li>
+          <li>
+            Secondary BG:
+            <span
+              style="
+                background: var(--theme-bg-secondary);
+                padding: 2px 8px;
+                border: 1px solid var(--theme-border);
+              "
+              >Sample</span
+            >
+          </li>
+          <li>
+            Primary Text:
+            <span style="color: var(--theme-text-primary); font-weight: bold"
+              >Sample Text</span
+            >
+          </li>
+          <li>
+            Secondary Text:
+            <span style="color: var(--theme-text-secondary)">Sample Text</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      function toggleDarkMode() {
+        document.body.classList.toggle("dark-mode");
+        updateThemeStatus();
+      }
+
+      function updateThemeStatus() {
+        const isDark = document.body.classList.contains("dark-mode");
+        const status = document.getElementById("theme-status");
+        status.textContent = `Theme: ${isDark ? "Dark Mode" : "Light Mode"}`;
+
+        // Update button text
+        const button = document.querySelector(".theme-toggle");
+        button.textContent = isDark
+          ? "☀️ Switch to Light"
+          : "🌙 Switch to Dark";
+      }
+
+      // Initialize theme status
+      updateThemeStatus();
+
+      // Test if settings manager exists and apply its theme
+      if (window.settingsManager) {
+        window.settingsManager.applyTheme();
+        setTimeout(updateThemeStatus, 100);
+      }
+    </script>
+
+    <!-- Include settings manager if available -->
+    <script type="module">
+      try {
+        const { default: SettingsManager } = await import(
+          "./src/js/components/settings-manager.js"
+        );
+        window.settingsManager = new SettingsManager();
+        updateThemeStatus();
+      } catch (e) {
+        console.log("Settings manager not loaded:", e.message);
+      }
+    </script>
+  </body>
+</html>

@@ -24,64 +24,54 @@
  */
 const FOOTER_CONFIG = {
   brand: {
-    name: 'SimulateAI',
-    tagline: 'Ethical AI Education Through Interactive Simulations',
+    name: "SimulateAI",
+    tagline: "Ethical AI Education Through Interactive Simulations",
     year: new Date().getFullYear(),
   },
 
   sections: {
-    platform: {
-      title: 'Platform',
-      links: [
-        { text: 'Start Simulating', href: 'app.html', icon: '🚀' },
-        { text: 'Browse Scenarios', href: 'app.html', icon: '🎯' },
-        { text: 'Learning Labs', href: 'app.html#learning-labs', icon: '🧪' },
-        { text: 'Badge System', href: 'app.html#badges', icon: '🏆' },
-      ],
-    },
-
     community: {
-      title: 'Community',
+      title: "Community",
       links: [
-        { text: 'Research Study', href: 'research-consent.html', icon: '🔬' },
-        { text: 'Blog & Insights', href: 'blog.html', icon: '📝' },
+        { text: "Research Study", href: "research-consent.html", icon: "🔬" },
+        { text: "Blog & Insights", href: "blog.html", icon: "📝" },
         {
-          text: 'Educator Resources',
-          href: 'docs/EDUCATOR_GUIDE.md',
-          icon: '🎓',
+          text: "Educator Resources",
+          href: "educator-tools.html",
+          icon: "🎓",
         },
       ],
     },
 
     support: {
-      title: 'Support',
+      title: "Support",
       links: [
-        { text: 'Help & FAQ', href: 'help.html', icon: '❓' },
+        { text: "Help & FAQ", href: "help-faq.html", icon: "❓" },
         {
-          text: 'Contact Us',
-          href: 'mailto:support@simulateai.org',
-          icon: '📧',
+          text: "Contact Us",
+          href: "mailto:support@simulateai.org",
+          icon: "📧",
         },
         {
-          text: 'Report Issue',
-          href: 'mailto:support@simulateai.org?subject=Issue Report',
-          icon: '🐛',
+          text: "Report Issue",
+          href: "mailto:support@simulateai.org?subject=Issue Report",
+          icon: "🐛",
         },
         {
-          text: 'Feedback',
-          href: 'mailto:feedback@simulateai.org',
-          icon: '💭',
+          text: "Feedback",
+          href: "mailto:feedback@simulateai.org",
+          icon: "💭",
         },
       ],
     },
 
     legal: {
-      title: 'Legal & Privacy',
+      title: "Legal & Privacy",
       links: [
-        { text: 'Privacy Policy', href: 'privacy-notice.html', icon: '🔐' },
-        { text: 'Terms of Use', href: 'terms-of-use.html', icon: '📋' },
-        { text: 'Research Consent', href: 'research-consent.html', icon: '📝' },
-        { text: 'Data Deletion', href: 'data-deletion.html', icon: '🗑️' },
+        { text: "Privacy Policy", href: "privacy-notice.html", icon: "🔐" },
+        { text: "Terms of Use", href: "terms-of-use.html", icon: "📋" },
+        { text: "Research Consent", href: "research-consent.html", icon: "📝" },
+        { text: "Data Deletion", href: "data-deletion.html", icon: "🗑️" },
       ],
     },
   },
@@ -89,19 +79,27 @@ const FOOTER_CONFIG = {
   social: {
     links: [
       {
-        text: 'GitHub',
-        href: 'https://github.com/mindbomber/SimulateAI',
-        icon: '💻',
+        text: "GitHub",
+        href: "https://github.com/mindbomber/SimulateAI",
+        icon: "💻",
       },
-      { text: 'Academia', href: '#', icon: '🎓' },
-      { text: 'LinkedIn', href: '#', icon: '👔' },
+      {
+        text: "Academia",
+        href: "https://www.academia.edu/search?q=SimulateAI",
+        icon: "🎓",
+      },
+      {
+        text: "LinkedIn",
+        href: "https://www.linkedin.com/company/simulateai-ethics",
+        icon: "👔",
+      },
     ],
   },
 
   certifications: [
-    { text: 'ISTE Standards Aligned', icon: '✅' },
-    { text: 'GDPR Compliant', icon: '🇪🇺' },
-    { text: 'Educational Research', icon: '📊' },
+    { text: "ISTE Standards Aligned", icon: "✅" },
+    { text: "GDPR Compliant", icon: "🇪🇺" },
+    { text: "Educational Research", icon: "📊" },
   ],
 };
 
@@ -151,21 +149,21 @@ function generateFooterHTML() {
                 <ul class="section-links">
                   ${section.links
                     .map(
-                      link => `
+                      (link) => `
                     <li>
-                      <a href="${link.href}" ${link.href.includes('mailto:') ? '' : 'rel="noopener"'}>
+                      <a href="${link.href}" ${link.href.includes("mailto:") ? "" : 'rel="noopener"'}>
                         <span class="link-icon">${link.icon}</span>
                         <span class="link-text">${link.text}</span>
                       </a>
                     </li>
-                  `
+                  `,
                     )
-                    .join('')}
+                    .join("")}
                 </ul>
               </div>
-            `
+            `,
               )
-              .join('')}
+              .join("")}
           </div>
         </div>
         
@@ -190,14 +188,14 @@ function generateFooterHTML() {
                 <div class="social-links">
                   ${social.links
                     .map(
-                      link => `
+                      (link) => `
                     <a href="${link.href}" target="_blank" rel="noopener noreferrer" aria-label="${link.text}">
                       <span class="social-icon">${link.icon}</span>
                       <span class="social-text">${link.text}</span>
                     </a>
-                  `
+                  `,
                     )
-                    .join('')}
+                    .join("")}
                 </div>
               </div>
               
@@ -205,14 +203,14 @@ function generateFooterHTML() {
               <div class="footer-certifications">
                 ${certifications
                   .map(
-                    cert => `
+                    (cert) => `
                   <div class="certification-item">
                     <span class="cert-icon">${cert.icon}</span>
                     <span class="cert-text">${cert.text}</span>
                   </div>
-                `
+                `,
                   )
-                  .join('')}
+                  .join("")}
               </div>
             </div>
           </div>
@@ -229,10 +227,18 @@ function generateFooterCSS() {
   return `
     /* Professional Footer Styles */
     .professional-footer {
-      background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-      color: white;
+      background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%) !important;
+      color: white !important;
       position: relative;
       margin-top: 60px;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      padding: 0 !important;
+      border: none !important;
+      max-width: none !important;
+      min-width: 100% !important;
+      left: 0 !important;
+      right: 0 !important;
     }
     
     .footer-wave {
@@ -246,21 +252,26 @@ function generateFooterCSS() {
     }
     
     .footer-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 60px 20px 0;
+      max-width: 1200px !important;
+      margin: 0 auto !important;
+      padding: 60px var(--container-padding, 20px) 0 !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
     }
     
     .footer-main {
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 60px;
-      margin-bottom: 50px;
+      display: grid !important;
+      grid-template-columns: 1fr 2fr !important;
+      gap: var(--container-padding, 60px) !important;
+      margin-bottom: 0 !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
     }
     
     /* Brand Section */
     .footer-brand {
       max-width: 350px;
+      margin-bottom: 0 !important;
     }
     
     .brand-logo {
@@ -316,26 +327,24 @@ function generateFooterCSS() {
     
     /* Navigation Sections */
     .footer-sections {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 30px;
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: var(--container-padding, 30px) !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      margin-bottom: 0 !important;
     }
     
-    @media (max-width: 1200px) {
-      .footer-sections {
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 25px;
-      }
-    }
+    /* Responsive design handled by media.css variables */
     
     .footer-section {
-      margin-bottom: 30px;
+      margin-bottom: 0 !important;
     }
     
     .section-title {
-      font-size: 1.1rem;
+      font-size: calc(1.1rem * var(--font-scale, 1));
       font-weight: 600;
-      margin-bottom: 20px;
+      margin-bottom: var(--container-padding, 20px);
       color: #ecf0f1;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -382,19 +391,19 @@ function generateFooterCSS() {
     /* Footer Bottom */
     .footer-bottom {
       border-top: 1px solid #34495e;
-      padding: 30px 0;
+      padding: var(--container-padding, 30px) 0;
     }
     
     .footer-bottom-content {
       display: grid;
       grid-template-columns: 1fr auto;
-      gap: 40px;
+      gap: var(--container-padding, 40px);
       align-items: center;
     }
     
     .footer-social-cert-container {
       display: flex;
-      gap: 40px;
+      gap: var(--container-padding, 40px);
       align-items: center;
     }
     
@@ -470,153 +479,7 @@ function generateFooterCSS() {
       font-size: 0.9rem;
     }
     
-    /* Mobile Responsiveness */
-    @media (max-width: 1024px) {
-      .footer-main {
-        grid-template-columns: 1fr;
-        gap: 40px;
-      }
-      
-      .footer-sections {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 30px;
-      }
-      
-      .footer-bottom-content {
-        grid-template-columns: 1fr auto;
-        gap: 25px;
-      }
-      
-      .footer-social-cert-container {
-        text-align: center;
-      }
-      
-      .brand-stats {
-        justify-content: center;
-      }
-    }
-    
-    @media (max-width: 768px) {
-      .footer-content {
-        padding: 40px 15px 0;
-      }
-      
-      .footer-main {
-        grid-template-columns: 1fr;
-        gap: 40px;
-      }
-      
-      .footer-sections {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 30px;
-      }
-      
-      .brand-stats {
-        justify-content: center;
-      }
-      
-      /* Mobile Footer Bottom Grid Layout */
-      .footer-bottom-content {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        align-items: start;
-      }
-      
-      .footer-copyright {
-        grid-column: 1 / -1;
-        grid-row: 1 / 2;
-        text-align: center;
-        margin-bottom: 15px;
-      }
-      
-      .footer-social-cert-container {
-        grid-column: 1 / -1;
-        grid-row: 2 / 3;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-      }
-      
-      .footer-social {
-        grid-column: 1 / 2;
-        grid-row: 1 / 2;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-      }
-      
-      .footer-certifications {
-        grid-column: 2 / 3;
-        grid-row: 1 / 2;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        align-items: flex-start;
-      }
-      
-      .social-label {
-        font-size: 0.8rem;
-        margin-bottom: 4px;
-      }
-      
-      .social-links {
-        flex-direction: column;
-        gap: 8px;
-        width: 100%;
-      }
-      
-      .social-links a {
-        width: 100%;
-        justify-content: flex-start;
-        padding: 6px 10px;
-        font-size: 0.75rem;
-        white-space: nowrap;
-      }
-      
-      .social-text {
-        display: inline;
-      }
-      
-      .certification-item {
-        font-size: 0.75rem;
-        margin-bottom: 4px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-      
-      .cert-text {
-        display: inline;
-      }
-      
-      .brand-stats {
-        flex-direction: column;
-        gap: 10px;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .footer-wave {
-        height: 30px;
-        top: -30px;
-      }
-      
-      .brand-logo {
-        justify-content: center;
-        text-align: center;
-      }
-      
-      .footer-brand {
-        text-align: center;
-      }
-      
-      .social-links a {
-        padding: 6px 10px;
-        font-size: 0.85rem;
-      }
-    }
+    /* Responsive design handled by media.css variables */
     
     /* High contrast mode */
     @media (prefers-contrast: high) {
@@ -656,25 +519,34 @@ function generateFooterCSS() {
  * Initialize Footer Component
  */
 function initializeFooter() {
-  // Add CSS to head
-  const style = document.createElement('style');
+  // Remove any existing footer styles first
+  const existingStyles = document.querySelectorAll(
+    "style[data-footer-component]",
+  );
+  existingStyles.forEach((style) => style.remove());
+
+  // Add CSS to head with high specificity
+  const style = document.createElement("style");
+  style.setAttribute("data-footer-component", "true");
   style.textContent = generateFooterCSS();
+
+  // Insert at the end of head to ensure it overrides other styles
   document.head.appendChild(style);
 
   // Look for footer placeholder first
-  const placeholder = document.getElementById('footer-placeholder');
+  const placeholder = document.getElementById("footer-placeholder");
   if (placeholder) {
     placeholder.outerHTML = generateFooterHTML();
     return;
   }
 
   // Find existing footer and replace it
-  const existingFooter = document.querySelector('footer');
+  const existingFooter = document.querySelector("footer");
   if (existingFooter) {
     existingFooter.outerHTML = generateFooterHTML();
   } else {
     // If no footer exists, append to body
-    document.body.insertAdjacentHTML('beforeend', generateFooterHTML());
+    document.body.insertAdjacentHTML("beforeend", generateFooterHTML());
   }
 }
 
@@ -687,8 +559,8 @@ export {
 };
 
 // Auto-initialize if script is loaded directly
-if (typeof window !== 'undefined' && document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeFooter);
-} else if (typeof window !== 'undefined') {
+if (typeof window !== "undefined" && document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initializeFooter);
+} else if (typeof window !== "undefined") {
   initializeFooter();
 }

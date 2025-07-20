@@ -45,7 +45,7 @@
 }
 
 [data-auth-required]::after {
-  content: '🔒';
+  content: "🔒";
   position: absolute;
   top: -8px;
   right: -8px;
@@ -63,4 +63,52 @@
 .community-feature[data-auth-required] {
   border-color: var(--text-muted);
   background: var(--surface-secondary);
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+body.dark-mode .nav-auth-btn {
+  background: var(--theme-bg-secondary);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .nav-auth-btn:hover {
+  background: var(--theme-bg-primary);
+  border-color: var(--theme-border-hover);
+}
+
+body.dark-mode .nav-auth-btn.btn-primary {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+body.dark-mode .nav-auth-btn.btn-primary:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+body.dark-mode .nav-user-profile {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .user-greeting {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .community-feature {
+  border-color: var(--color-accent);
+  background: linear-gradient(135deg, rgba(74, 158, 255, 0.1) 10%, transparent);
+}
+
+body.dark-mode .community-feature[data-auth-required] {
+  border-color: var(--theme-text-muted);
+  background: var(--theme-bg-secondary);
+}
+
+body.dark-mode [data-auth-required]:disabled {
+  opacity: 0.5;
+  background: var(--theme-bg-primary);
+  color: var(--theme-text-muted);
 }

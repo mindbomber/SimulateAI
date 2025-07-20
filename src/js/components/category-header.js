@@ -20,8 +20,8 @@
  * Extracted from CategoryGrid for better modularity
  */
 
-import badgeManager from '../core/badge-manager.js';
-import logger from '../utils/logger.js';
+import badgeManager from "../core/badge-manager.js";
+import logger from "../utils/logger.js";
 
 // Constants
 const PROGRESS_CIRCLE_CIRCUMFERENCE = 163; // 2 * π * 26 (radius)
@@ -92,7 +92,7 @@ class CategoryHeader {
     }
 
     // Add badge alert class if one scenario away from earning a badge
-    const badgeAlertClass = isOneScenarioAwayFromBadge ? ' badge-alert' : '';
+    const badgeAlertClass = isOneScenarioAwayFromBadge ? " badge-alert" : "";
 
     return `
       <div class="category-progress-ring${badgeAlertClass}" 
@@ -130,10 +130,10 @@ class CategoryHeader {
    */
   attachProgressRingTooltips(container) {
     const progressRings = container.querySelectorAll(
-      '.category-progress-ring[data-tooltip]'
+      ".category-progress-ring[data-tooltip]",
     );
 
-    progressRings.forEach(ring => {
+    progressRings.forEach((ring) => {
       // Clean up existing listeners first
       this.removeEventListeners(ring);
 
@@ -150,15 +150,15 @@ class CategoryHeader {
       this.boundEvents.set(ring, boundHandlers);
 
       // Desktop: hover events
-      ring.addEventListener('mouseenter', boundHandlers.mouseenter);
-      ring.addEventListener('mouseleave', boundHandlers.mouseleave);
+      ring.addEventListener("mouseenter", boundHandlers.mouseenter);
+      ring.addEventListener("mouseleave", boundHandlers.mouseleave);
 
       // Mobile: touch/tap events
-      ring.addEventListener('touchstart', boundHandlers.touchstart);
-      ring.addEventListener('click', boundHandlers.click);
+      ring.addEventListener("touchstart", boundHandlers.touchstart);
+      ring.addEventListener("click", boundHandlers.click);
 
       // Keyboard accessibility
-      ring.addEventListener('keydown', boundHandlers.keydown);
+      ring.addEventListener("keydown", boundHandlers.keydown);
     });
   }
 
@@ -182,7 +182,7 @@ class CategoryHeader {
    */
   showTooltip(event) {
     const ring = event.currentTarget;
-    const tooltip = ring.getAttribute('data-tooltip');
+    const tooltip = ring.getAttribute("data-tooltip");
 
     if (!tooltip) return;
 
@@ -190,17 +190,17 @@ class CategoryHeader {
     this.hideTooltip();
 
     // Create tooltip element
-    const tooltipEl = document.createElement('div');
-    tooltipEl.className = 'progress-ring-tooltip';
+    const tooltipEl = document.createElement("div");
+    tooltipEl.className = "progress-ring-tooltip";
     tooltipEl.textContent = tooltip;
-    tooltipEl.setAttribute('role', 'tooltip');
+    tooltipEl.setAttribute("role", "tooltip");
 
     // Position tooltip above the progress ring
     const rect = ring.getBoundingClientRect();
-    tooltipEl.style.position = 'fixed';
+    tooltipEl.style.position = "fixed";
     tooltipEl.style.left = `${rect.left + rect.width / 2}px`;
-    tooltipEl.style.transform = 'translateX(-50%)';
-    tooltipEl.style.zIndex = '1000';
+    tooltipEl.style.transform = "translateX(-50%)";
+    tooltipEl.style.zIndex = "1000";
 
     document.body.appendChild(tooltipEl);
 
@@ -217,7 +217,7 @@ class CategoryHeader {
 
     // Trigger the visible state with a small delay to ensure CSS transition works
     requestAnimationFrame(() => {
-      tooltipEl.classList.add('visible');
+      tooltipEl.classList.add("visible");
     });
 
     // Store reference for cleanup
@@ -229,15 +229,15 @@ class CategoryHeader {
    */
   hideTooltip() {
     const existingTooltips = document.querySelectorAll(
-      '.progress-ring-tooltip'
+      ".progress-ring-tooltip",
     );
-    existingTooltips.forEach(tooltip => {
+    existingTooltips.forEach((tooltip) => {
       tooltip.remove();
     });
 
     // Clear tooltip references
-    const rings = document.querySelectorAll('.category-progress-ring');
-    rings.forEach(ring => {
+    const rings = document.querySelectorAll(".category-progress-ring");
+    rings.forEach((ring) => {
       if (ring._tooltip) {
         ring._tooltip = null;
       }
@@ -267,7 +267,7 @@ class CategoryHeader {
     event.stopPropagation();
 
     // On mobile, toggle tooltip
-    if ('ontouchstart' in window) {
+    if ("ontouchstart" in window) {
       const ring = event.currentTarget;
       if (ring._tooltip) {
         this.hideTooltip();
@@ -283,7 +283,7 @@ class CategoryHeader {
    * @param {Event} event - Keyboard event
    */
   handleProgressRingKeydown(event) {
-    if (event.key === 'Enter' || event.key === ' ') {
+    if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       this.showTooltip(event);
 
@@ -291,7 +291,7 @@ class CategoryHeader {
       setTimeout(() => {
         this.hideTooltip();
       }, MOBILE_TOOLTIP_DURATION);
-    } else if (event.key === 'Escape') {
+    } else if (event.key === "Escape") {
       this.hideTooltip();
     }
   }
@@ -309,6 +309,114 @@ class CategoryHeader {
     });
 
     this.boundEvents.clear();
+  }
+
+  /**
+   * Updates the progress ring for a specific category in real-time
+   * @param {string} categoryId - Category identifier
+   * @param {Object} category - Category data
+   * @param {Object} progress - Updated progress data
+   * @param {HTMLElement} container - Container element to search within
+   */
+  updateProgressRing(categoryId, category, progress, container) {
+    try {
+      if (!container || !categoryId || !category || !progress) {
+        logger.debug("updateProgressRing: Missing required parameters", {
+          hasContainer: !!container,
+          hasCategoryId: !!categoryId,
+          hasCategory: !!category,
+          hasProgress: !!progress,
+        });
+        return;
+      }
+
+      // Find the progress ring for this category
+      const progressRing = container.querySelector(
+        `.category-progress-ring[data-category-id="${categoryId}"]`,
+      );
+
+      if (!progressRing) {
+        logger.debug("updateProgressRing: Progress ring not found", {
+          categoryId,
+          containerSelector: container.tagName,
+          availableRings: container.querySelectorAll(".category-progress-ring")
+            .length,
+        });
+        return;
+      }
+
+      logger.debug("updateProgressRing: Found progress ring, updating...", {
+        categoryId,
+        currentPercentage: progress.percentage,
+        progressRingExists: !!progressRing,
+      });
+
+      // Update the progress circle stroke-dashoffset
+      const progressCircle = progressRing.querySelector(
+        "circle[stroke-dasharray]",
+      );
+      if (progressCircle) {
+        const newOffset =
+          PROGRESS_CIRCLE_CIRCUMFERENCE -
+          (progress.percentage / 100) * PROGRESS_CIRCLE_CIRCUMFERENCE;
+        progressCircle.style.strokeDashoffset = newOffset;
+      }
+
+      // Update the percentage text
+      const percentageSpan = progressRing.querySelector(".progress-percentage");
+      if (percentageSpan) {
+        percentageSpan.textContent = `${progress.percentage}%`;
+      }
+
+      // Update badge alert class and tooltip
+      badgeManager.refreshCategoryProgress();
+      const badgeProgress = badgeManager.getBadgeProgress(categoryId);
+      const isOneScenarioAwayFromBadge =
+        badgeProgress.nextBadge && badgeProgress.progress.remaining === 1;
+
+      // Update badge alert class
+      if (isOneScenarioAwayFromBadge) {
+        progressRing.classList.add("badge-alert");
+      } else {
+        progressRing.classList.remove("badge-alert");
+      }
+
+      // Update tooltip content
+      let tooltipContent = `${progress.completed} of ${progress.total} scenarios completed`;
+
+      if (badgeProgress.nextBadge) {
+        if (isOneScenarioAwayFromBadge) {
+          tooltipContent += `. 1 more to unlock next badge: '${badgeProgress.nextBadge.title}' ${badgeProgress.nextBadge.sidekickEmoji}`;
+        } else {
+          const { remaining } = badgeProgress.progress;
+          tooltipContent += `. ${remaining} more to unlock next badge: '${badgeProgress.nextBadge.title}' ${badgeProgress.nextBadge.sidekickEmoji}`;
+        }
+      } else {
+        tooltipContent += ` (${progress.percentage}%)`;
+      }
+
+      progressRing.setAttribute("data-tooltip", tooltipContent);
+      progressRing.setAttribute(
+        "aria-label",
+        `Category progress: ${tooltipContent}`,
+      );
+
+      // Update category progress text in meta section if present
+      const categoryProgressText = container.querySelector(
+        `.category-meta .category-progress-text`,
+      );
+      if (categoryProgressText) {
+        categoryProgressText.textContent = `${progress.completed}/${progress.total} completed`;
+      }
+
+      logger.debug("Progress ring updated successfully", {
+        categoryId,
+        percentage: progress.percentage,
+        badgeAlert: isOneScenarioAwayFromBadge,
+      });
+    } catch (error) {
+      logger.error("Error updating progress ring:", error);
+    }
   }
 
   /**
@@ -342,7 +450,7 @@ class CategoryHeader {
 
       return null;
     } catch (error) {
-      logger.error('Error checking badge progress:', error);
+      logger.error("Error checking badge progress:", error);
       return null;
     }
   }

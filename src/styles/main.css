@@ -20,12 +20,13 @@
  */
 
 /* Import additional stylesheets */
-@import './category-grid.css';
-@import './scenario-modal.css';
-@import './onboarding-tour.css';
-@import './pre-launch-modal.css';
-@import './enhanced-simulation-modal.css';
-@import './post-simulation-modal.css';
+@import "./media.css";
+@import "./category-grid.css";
+@import "./scenario-modal.css";
+@import "./onboarding-tour.css";
+@import "./pre-launch-modal.css";
+@import "./enhanced-simulation-modal.css";
+@import "./post-simulation-modal.css";
 
 /* CSS Custom Properties */
 :root {
@@ -58,9 +59,26 @@
   --color-gray-900: #212121;
   --color-black: #000000;
 
+  /* Text Colors */
+  --color-text-primary: #1f2937;
+  --color-text-secondary: #6b7280;
+  --color-text-tertiary: #9ca3af;
+  --color-text-inverse: #ffffff;
+
+  /* Background Colors */
+  --color-background: #ffffff;
+  --color-background-subtle: #f9fafb;
+  --color-background-elevation-1: #f3f4f6;
+  --color-background-elevation-2: #e5e7eb;
+
+  /* Border Colors */
+  --color-border: #d1d5db;
+  --color-border-subtle: #e5e7eb;
+  --color-border-focus: #3b82f6;
+
   /* Typography */
-  --font-family-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  --font-family-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+  --font-family-primary: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  --font-family-mono: "Consolas", "Monaco", "Courier New", monospace;
 
   --font-size-xs: 0.75rem; /* 12px */
   --font-size-sm: 0.875rem; /* 14px */
@@ -422,7 +440,7 @@ body {
 }
 
 .nav-link.active::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 50%;
@@ -460,7 +478,7 @@ body {
 }
 
 .nav-link.tour-btn::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
@@ -509,7 +527,7 @@ body {
   transform: rotate(180deg);
 }
 
-.nav-item-dropdown[aria-expanded='true'] .dropdown-arrow {
+.nav-item-dropdown[aria-expanded="true"] .dropdown-arrow {
   transform: rotate(180deg);
 }
 
@@ -703,7 +721,7 @@ body {
   }
 
   /* Mobile open state */
-  .nav-item-dropdown[aria-expanded='true'] .mega-menu {
+  .nav-item-dropdown[aria-expanded="true"] .mega-menu {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
@@ -837,7 +855,7 @@ body {
     transition: transform var(--transition-fast);
   }
 
-  .nav-item-dropdown[aria-expanded='true'] .dropdown-arrow {
+  .nav-item-dropdown[aria-expanded="true"] .dropdown-arrow {
     transform: rotate(180deg);
   }
 }
@@ -1361,7 +1379,7 @@ body {
 
 /* Handle empty simulation container */
 .simulation-container:empty::before {
-  content: 'Loading simulation...';
+  content: "Loading simulation...";
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1430,7 +1448,7 @@ video {
 }
 
 .simulation-container.loading::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -1806,7 +1824,7 @@ th {
 }
 
 .footer-list li::before {
-  content: '•';
+  content: "•";
   color: var(--color-primary);
   position: absolute;
   left: 0;
@@ -2274,8 +2292,8 @@ th {
     text-decoration: underline;
   }
 
-  a[href^='http']:after {
-    content: ' (' attr(href) ')';
+  a[href^="http"]:after {
+    content: " (" attr(href) ")";
     font-size: 0.8em;
     color: #666;
   }
@@ -2330,7 +2348,7 @@ th {
 }
 
 .simulation-container.error::before {
-  content: '⚠️ Error loading simulation. Please try again.';
+  content: "⚠️ Error loading simulation. Please try again.";
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2366,7 +2384,7 @@ th {
   visibility: visible;
 }
 
-.error-boundary[aria-hidden='true'] {
+.error-boundary[aria-hidden="true"] {
   display: none !important;
 }
 
@@ -2424,7 +2442,7 @@ th {
   visibility: visible;
 }
 
-.loading[aria-hidden='true'] {
+.loading[aria-hidden="true"] {
   display: none !important;
 }
 
@@ -2462,7 +2480,7 @@ th {
 
 /* Loading Spinner Enhancement */
 .simulation-container.loading::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -2489,7 +2507,7 @@ th {
 @media (prefers-reduced-motion: reduce) {
   .simulation-container.loading::after {
     animation: none;
-    content: 'Loading...';
+    content: "Loading...";
     border: none;
     border-radius: 0;
     width: auto;
@@ -2507,6 +2525,16 @@ th {
 *::after {
   /* Prevent any element from creating horizontal overflow */
   max-width: 100%;
+}
+
+/* Exclude floating tabs from max-width constraint to allow proper positioning */
+.floating-tour-tab-link,
+.floating-surprise-tab-link,
+.floating-action-tab-link,
+.floating-tour-tab,
+.floating-surprise-tab,
+.floating-action-tab {
+  max-width: none !important;
 }
 
 /* Specific overflow prevention for common culprits */
@@ -2548,3 +2576,126 @@ th {
 }
 
 /* Mobile dropdown mega menu - simple implementation */
+
+/* ===== DARK MODE SUPPORT ===== */
+body.dark-mode {
+  background: var(--theme-bg-primary);
+  color: var(--theme-text-primary);
+}
+
+/* General dark mode text styles */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode p {
+  color: var(--theme-text-secondary);
+}
+
+/* Navigation dark mode */
+body.dark-mode nav,
+body.dark-mode .main-nav,
+body.dark-mode .nav-container {
+  background: var(--theme-bg-secondary);
+  border-bottom: 1px solid var(--theme-border);
+}
+
+body.dark-mode .nav-brand,
+body.dark-mode .nav-link {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .nav-link:hover {
+  color: var(--color-primary);
+  background: rgba(74, 158, 255, 0.1);
+}
+
+/* Hero section dark mode */
+body.dark-mode .hero {
+  background: linear-gradient(
+    135deg,
+    var(--theme-bg-primary) 0%,
+    var(--theme-bg-secondary) 100%
+  );
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .hero-content h1,
+body.dark-mode .hero-content h2 {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .hero-content p {
+  color: var(--theme-text-secondary);
+}
+
+/* Main content sections */
+body.dark-mode .main-content,
+body.dark-mode .simulations-section,
+body.dark-mode section {
+  background: var(--theme-bg-primary);
+  color: var(--theme-text-primary);
+}
+
+/* Cards and containers */
+body.dark-mode .card,
+body.dark-mode .simulation-card,
+body.dark-mode .container {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .card:hover,
+body.dark-mode .simulation-card:hover {
+  border-color: var(--theme-border-hover);
+  box-shadow: 0 4px 12px var(--theme-shadow-hover);
+}
+
+/* Buttons dark mode */
+body.dark-mode .btn-secondary {
+  background: var(--theme-bg-secondary);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .btn-secondary:hover {
+  background: var(--theme-border);
+  border-color: var(--theme-border-hover);
+}
+
+/* Form elements */
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
+  background: var(--theme-bg-secondary);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode input:focus,
+body.dark-mode textarea:focus,
+body.dark-mode select:focus {
+  border-color: var(--color-primary);
+  background: var(--theme-bg-primary);
+}
+
+/* Footer */
+body.dark-mode footer {
+  background: var(--theme-bg-secondary);
+  border-top: 1px solid var(--theme-border);
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode footer a {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode footer a:hover {
+  color: var(--color-primary);
+}

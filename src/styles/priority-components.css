@@ -12,7 +12,7 @@
   border: 1px solid #cccccc;
   border-radius: 4px;
   font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   position: relative;
   overflow: hidden;
 }
@@ -144,7 +144,7 @@
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   z-index: 1000;
   animation: slideInRight 0.3s ease-out;
   cursor: pointer;
@@ -291,7 +291,7 @@
   align-items: center;
   justify-content: center;
   font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .loading-spinner.overlay {
@@ -484,4 +484,114 @@
     max-height: none;
     overflow: visible;
   }
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+
+/* Data Table Dark Mode */
+body.dark-mode .data-table {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .data-table-header {
+  background: var(--theme-bg-primary);
+  border-bottom: 1px solid var(--theme-border);
+}
+
+body.dark-mode .data-table-header-cell {
+  border-right: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .data-table-header-cell:hover {
+  background: var(--theme-bg-secondary);
+}
+
+body.dark-mode .data-table-row {
+  border-bottom: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .data-table-row:nth-child(even) {
+  background: var(--theme-bg-primary);
+}
+
+body.dark-mode .data-table-row:hover {
+  background: var(--theme-bg-secondary);
+}
+
+body.dark-mode .data-table-row.selected {
+  background: rgba(74, 158, 255, 0.1);
+  border-color: var(--color-primary);
+}
+
+body.dark-mode .data-table-cell {
+  border-right: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .data-table-pagination {
+  background: var(--theme-bg-primary);
+  border-top: 1px solid var(--theme-border);
+}
+
+body.dark-mode .data-table-pagination-info {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .data-table-pagination-button {
+  background: var(--theme-bg-secondary);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .data-table-pagination-button:hover:not(:disabled) {
+  background: var(--theme-bg-primary);
+  border-color: var(--theme-border-hover);
+}
+
+body.dark-mode .data-table-pagination-button:disabled {
+  background: var(--theme-bg-secondary);
+  color: var(--theme-text-muted);
+  border-color: var(--theme-border);
+}
+
+/* Loading Spinner Dark Mode */
+body.dark-mode .loading-spinner {
+  background: var(--theme-bg-secondary);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .loading-spinner-indeterminate {
+  border-color: var(--theme-border);
+  border-top-color: var(--color-primary);
+}
+
+body.dark-mode .loading-spinner-progress-bg {
+  stroke: var(--theme-border);
+}
+
+body.dark-mode .loading-spinner-progress-fill {
+  stroke: var(--color-primary);
+}
+
+body.dark-mode .loading-spinner-message {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .loading-spinner-percentage {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .loading-spinner-cancel {
+  background: var(--theme-bg-primary);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .loading-spinner-cancel:hover {
+  background: var(--theme-bg-secondary);
+  border-color: var(--theme-border-hover);
 }

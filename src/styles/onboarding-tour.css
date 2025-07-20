@@ -52,7 +52,7 @@ body.onboarding-active {
   max-width: 400px;
   min-width: 300px;
   font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   opacity: 0;
   transform: scale(0.9) translateY(-10px);
   animation: onboarding-coach-mark-in 0.3s ease-out 0.1s forwards;
@@ -64,7 +64,8 @@ body.onboarding-active {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 20px 20px 0 20px;
+  padding: var(--container-padding, 20px) var(--container-padding, 20px) 0
+    var(--container-padding, 20px);
   gap: 16px;
 }
 
@@ -400,7 +401,7 @@ body.onboarding-active {
     --font-primary,
     -apple-system,
     BlinkMacSystemFont,
-    'Segoe UI',
+    "Segoe UI",
     Roboto,
     sans-serif
   );
@@ -874,4 +875,214 @@ body.onboarding-active {
 
 .modal-backdrop:has(~ .onboarding-coach-mark) .modal-dialog {
   pointer-events: auto !important;
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+body.dark-mode .onboarding-overlay {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .onboarding-spotlight {
+  border-color: var(--color-primary);
+  box-shadow:
+    0 0 0 4px rgba(74, 158, 255, 0.3),
+    0 0 0 9999px rgba(0, 0, 0, 0.4),
+    inset 0 0 20px rgba(74, 158, 255, 0.2);
+}
+
+/* Coach mark popup */
+body.dark-mode .onboarding-coach-mark {
+  background: var(--theme-bg-secondary);
+  border: 2px solid var(--color-primary);
+  color: var(--theme-text-primary);
+  box-shadow:
+    0 12px 48px rgba(0, 0, 0, 0.6),
+    0 6px 24px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(74, 158, 255, 0.2);
+}
+
+body.dark-mode .onboarding-coach-mark::before {
+  border-color: var(--color-primary) transparent transparent transparent;
+}
+
+body.dark-mode .onboarding-coach-mark::after {
+  border-color: var(--theme-bg-secondary) transparent transparent transparent;
+}
+
+/* Different positions for arrow in dark mode */
+body.dark-mode .onboarding-coach-mark.position-bottom::before {
+  border-color: transparent transparent var(--color-primary) transparent;
+}
+
+body.dark-mode .onboarding-coach-mark.position-bottom::after {
+  border-color: transparent transparent var(--theme-bg-secondary) transparent;
+}
+
+body.dark-mode .onboarding-coach-mark.position-left::before {
+  border-color: transparent transparent transparent var(--color-primary);
+}
+
+body.dark-mode .onboarding-coach-mark.position-left::after {
+  border-color: transparent transparent transparent var(--theme-bg-secondary);
+}
+
+body.dark-mode .onboarding-coach-mark.position-right::before {
+  border-color: transparent var(--color-primary) transparent transparent;
+}
+
+body.dark-mode .onboarding-coach-mark.position-right::after {
+  border-color: transparent var(--theme-bg-secondary) transparent transparent;
+}
+
+/* Header and content */
+body.dark-mode .onboarding-header {
+  background: var(--theme-bg-primary);
+  border-bottom: 1px solid var(--theme-border);
+}
+
+body.dark-mode .onboarding-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .onboarding-step-indicator {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .onboarding-content {
+  background: var(--theme-bg-secondary);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .onboarding-description {
+  color: var(--theme-text-secondary);
+}
+
+/* Navigation buttons */
+body.dark-mode .onboarding-navigation {
+  background: var(--theme-bg-primary);
+  border-top: 1px solid var(--theme-border);
+}
+
+body.dark-mode .onboarding-btn {
+  background: var(--theme-bg-secondary);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .onboarding-btn:hover {
+  background: var(--theme-bg-primary);
+  border-color: var(--theme-border-hover);
+}
+
+body.dark-mode .onboarding-btn.btn-primary {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+body.dark-mode .onboarding-btn.btn-primary:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+body.dark-mode .onboarding-btn-skip {
+  color: var(--theme-text-secondary);
+  background: transparent;
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .onboarding-btn-skip:hover {
+  color: var(--theme-text-primary);
+  background: var(--theme-bg-secondary);
+  border-color: var(--theme-border-hover);
+}
+
+/* Progress indicators */
+body.dark-mode .onboarding-progress {
+  background: var(--theme-bg-primary);
+}
+
+body.dark-mode .progress-dot {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .progress-dot.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+body.dark-mode .progress-dot.completed {
+  background: var(--color-success);
+  border-color: var(--color-success);
+}
+
+/* Close button */
+body.dark-mode .onboarding-close {
+  color: var(--theme-text-secondary);
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .onboarding-close:hover {
+  color: var(--theme-text-primary);
+  background: var(--theme-bg-primary);
+  border-color: var(--theme-border-hover);
+}
+
+/* Features callouts */
+body.dark-mode .feature-callout {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .feature-icon {
+  color: var(--color-primary);
+}
+
+body.dark-mode .feature-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .feature-description {
+  color: var(--theme-text-secondary);
+}
+
+/* Tooltips and helpers */
+body.dark-mode .onboarding-tooltip {
+  background: var(--theme-bg-primary);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--theme-border);
+  box-shadow: 0 4px 12px var(--theme-shadow-hover);
+}
+
+body.dark-mode .onboarding-tooltip::after {
+  border-top-color: var(--theme-bg-primary);
+}
+
+/* Interactive elements */
+body.dark-mode .onboarding-highlight {
+  border: 2px solid var(--color-primary);
+  box-shadow: 0 0 8px rgba(74, 158, 255, 0.4);
+}
+
+body.dark-mode .onboarding-pulse {
+  background: rgba(74, 158, 255, 0.2);
+}
+
+/* Special states */
+body.dark-mode .onboarding-coach-mark.warning {
+  border-color: var(--color-warning);
+  background: var(--theme-bg-secondary);
+}
+
+body.dark-mode .onboarding-coach-mark.success {
+  border-color: var(--color-success);
+  background: var(--theme-bg-secondary);
+}
+
+body.dark-mode .onboarding-coach-mark.info {
+  border-color: var(--color-info);
+  background: var(--theme-bg-secondary);
 }

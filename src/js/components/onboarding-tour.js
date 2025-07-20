@@ -15,57 +15,216 @@
  */
 
 /**
+ * ⭐ ENTERPRISE-GRADE ONBOARDING TOUR SYSTEM ⭐
+ *
+ * Advanced onboarding system with comprehensive enterprise monitoring:
+ * - Real-time health monitoring and circuit breakers
+ * - Performance analytics for onboarding completion rates
+ * - User engagement tracking and behavioral analytics
+ * - Accessibility compliance monitoring
+ * - Error recovery and failsafe mechanisms
+ * - Telemetry batching and enterprise logging
+ *
  * Onboarding Coach Marks System
  * Creates a guided walkthrough using spotlight/coach marks with auto-scroll
  */
 
-import logger from '../utils/logger.js';
-import focusManager from '../utils/focus-manager.js';
-import scrollManager from '../utils/scroll-manager.js';
-import ModalUtility from './modal-utility.js';
-import { simpleStorage } from '../utils/simple-storage.js';
-import { simpleAnalytics } from '../utils/simple-analytics.js';
+import logger from "../utils/logger.js";
+import focusManager from "../utils/focus-manager.js";
+import scrollManager from "../utils/scroll-manager.js";
+import ModalUtility from "./modal-utility.js";
+import { simpleStorage } from "../utils/simple-storage.js";
+import { simpleAnalytics } from "../utils/simple-analytics.js";
+
+// === ENTERPRISE ONBOARDING CONSTANTS ===
+const ENTERPRISE_CONSTANTS = {
+  // Health monitoring
+  HEALTH_CHECK_INTERVAL: 30000, // 30 seconds
+  ERROR_THRESHOLD: 5,
+  MAX_RECOVERY_ATTEMPTS: 3,
+  HEARTBEAT_INTERVAL: 60000, // 1 minute
+
+  // Performance thresholds
+  STEP_TRANSITION_TIME: 1000, // Max time for step transition
+  ANIMATION_DURATION: 800, // Max animation time
+  SCROLL_TIMEOUT: 5000, // Max scroll operation time
+  ELEMENT_WAIT_TIMEOUT: 10000, // Max wait for element
+
+  // User engagement
+  USER_ENGAGEMENT_THRESHOLD: 5000, // Check every 5 seconds
+  MOUSE_MOVEMENT_THRESHOLD: 10, // Pixels for engagement
+  INACTIVITY_WARNING: 180000, // 3 minutes
+  ABANDONMENT_TIMEOUT: 300000, // 5 minutes
+
+  // Onboarding metrics
+  COMPLETION_RATE_TARGET: 0.8, // 80% completion rate
+  STEP_COMPLETION_THRESHOLD: 30000, // 30 seconds per step
+  TOUR_COMPLETION_THRESHOLD: 600000, // 10 minutes total
+
+  // Accessibility
+  ACCESSIBILITY_CHECK_INTERVAL: 2000,
+  KEYBOARD_NAVIGATION_TIMEOUT: 5000,
+  SCREEN_READER_DELAY: 1500,
+
+  // Telemetry
+  TELEMETRY_BATCH_SIZE: 50,
+  TELEMETRY_FLUSH_INTERVAL: 30000,
+
+  // Circuit breaker
+  CIRCUIT_BREAKER_RESET_TIMEOUT: 60000,
+  CIRCUIT_BREAKER_FAILURE_THRESHOLD: 3,
+  CIRCUIT_BREAKER_TIMEOUT: 60000,
+
+  // Additional missing constants
+  ENGAGEMENT_UPDATE_INTERVAL: 5000,
+  HEALTH_THRESHOLD: 70,
+  HESITATION_THRESHOLD: 30000,
+};
 
 class OnboardingTour {
   static instanceCount = 0;
 
   constructor() {
-    OnboardingTour.instanceCount++;
-    this.instanceId = OnboardingTour.instanceCount;
+    const startTime = performance.now();
 
-    const STACK_TRACE_LINES = 5;
-    logger.warn(
-      'OnboardingTour',
-      `🏗️ NEW INSTANCE CREATED #${this.instanceId}`,
-      {
-        totalInstances: OnboardingTour.instanceCount,
-        stackTrace: new Error().stack.split('\n').slice(1, STACK_TRACE_LINES),
+    try {
+      OnboardingTour.instanceCount++;
+      this.instanceId = OnboardingTour.instanceCount;
+
+      const STACK_TRACE_LINES = 5;
+      logger.warn(
+        "OnboardingTour",
+        `🏗️ NEW INSTANCE CREATED #${this.instanceId}`,
+        {
+          totalInstances: OnboardingTour.instanceCount,
+          stackTrace: new Error().stack.split("\n").slice(1, STACK_TRACE_LINES),
+        },
+      );
+
+      // === ENTERPRISE INITIALIZATION ===
+      this.instanceUuid = `onboarding_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      this.isHealthy = true;
+      this.errorCount = 0;
+      this.lastError = null;
+      this.recoveryAttempts = 0;
+      this.createdAt = Date.now();
+      this.lastHealthCheck = Date.now();
+
+      // Performance metrics tracking
+      this.performanceMetrics = {
+        tourStartCount: 0,
+        totalTourTime: 0,
+        averageTourTime: 0,
+        stepTransitionCount: 0,
+        totalStepTransitionTime: 0,
+        averageStepTransitionTime: 0,
+        scrollOperationCount: 0,
+        totalScrollTime: 0,
+        averageScrollTime: 0,
+        elementWaitCount: 0,
+        totalElementWaitTime: 0,
+        averageElementWaitTime: 0,
+        userInteractionCount: 0,
+        totalUserWaitTime: 0,
+        averageUserWaitTime: 0,
+        memoryUsage: 0,
+        errorRate: 0,
+        completionRate: 0,
+        abandonmentRate: 0,
+        lastTourStartTime: 0,
+        lastStepTransitionTime: 0,
+        tourCompletionCount: 0,
+        tourAbandonmentCount: 0,
+      };
+
+      // Circuit breaker for fault tolerance
+      this.circuitBreaker = {
+        state: "closed", // closed, open, half-open
+        failureCount: 0,
+        lastFailureTime: null,
+        nextAttemptTime: null,
+        successCount: 0,
+      };
+
+      // Enterprise telemetry batching
+      this.telemetryBatch = [];
+      this.telemetryBuffer = [];
+      this.lastTelemetryFlush = Date.now();
+
+      // Health monitoring intervals
+      this.healthCheckInterval = null;
+      this.telemetryFlushInterval = null;
+      this.heartbeatInterval = null;
+      this.engagementTrackingInterval = null;
+
+      // User analytics tracking
+      this.userJourney = {
+        sessionId: this.instanceUuid,
+        startTime: Date.now(),
+        steps: [],
+        interactions: [],
+        abandonmentReason: null,
+        completionTime: null,
+        deviceInfo: this._getDeviceInfo(),
+        engagement: {
+          mouseMovements: 0,
+          clicks: 0,
+          scrolls: 0,
+          keystrokes: 0,
+          timeOnStep: {},
+          hesitationPoints: [],
+        },
+      };
+
+      // Track all instances for enterprise monitoring
+      if (!OnboardingTour._instances) {
+        OnboardingTour._instances = new Set();
       }
-    );
+      OnboardingTour._instances.add(this);
 
-    this.currentStep = 0;
-    this.currentTutorial = 1;
-    this.isActive = false;
-    this.isTransitioning = false; // Prevent race conditions in step transitions
-    this.isProcessingAction = false; // Prevent rapid button clicks
-    this.coachMark = null;
-    this.overlay = null;
-    this.spotlight = null;
-    this.contentObserver = null; // For tracking dynamic content changes
-    this.contentUpdateTimeout = null; // For debouncing content updates
+      // Core tour properties
+      this.currentStep = 0;
+      this.currentTutorial = 1;
+      this.isActive = false;
+      this.isTransitioning = false; // Prevent race conditions in step transitions
+      this.isProcessingAction = false; // Prevent rapid button clicks
+      this.coachMark = null;
+      this.overlay = null;
+      this.spotlight = null;
+      this.contentObserver = null; // For tracking dynamic content changes
+      this.contentUpdateTimeout = null; // For debouncing content updates
 
-    // User interaction states
-    this.userStates = {
-      'option-selected': false,
-      'choice-confirmed': false,
-      'modal-opened': false,
-    };
+      // User interaction states
+      this.userStates = {
+        "option-selected": false,
+        "choice-confirmed": false,
+        "modal-opened": false,
+      };
 
-    // Scroll tracking
-    this.isAutoScrolling = false;
-    this.userHasManuallyScrolled = false;
-    this.lastScrollPosition = 0;
-    this.scrollTrackingTimer = null;
+      // Scroll tracking
+      this.isAutoScrolling = false;
+      this.userHasManuallyScrolled = false;
+      this.lastScrollPosition = 0;
+      this.scrollTrackingTimer = null;
+
+      // Initialize enterprise monitoring
+      this._initializeEnterpriseMonitoring();
+
+      // Track constructor performance
+      const constructorTime = performance.now() - startTime;
+      this._recordPerformanceMetric("constructor", constructorTime);
+
+      // Log successful initialization
+      this._logTelemetry("instance_created", {
+        instanceId: this.instanceId,
+        instanceUuid: this.instanceUuid,
+        constructorTime: Math.round(constructorTime * 100) / 100,
+        deviceInfo: this.userJourney.deviceInfo,
+      });
+    } catch (error) {
+      this._handleError(error, "constructor");
+      throw error;
+    }
 
     // Constants
     this.ANIMATION_DURATION = 300; // ms
@@ -105,354 +264,354 @@ class OnboardingTour {
     this.tutorials = {
       1: {
         // Test Scenario Tutorial
-        name: 'test-scenario',
-        title: 'Test Scenario Tutorial',
+        name: "test-scenario",
+        title: "Test Scenario Tutorial",
         steps: [
           {
-            id: 'welcome',
-            title: 'Welcome to SimulateAI! 🤖',
+            id: "welcome",
+            title: "Welcome to SimulateAI! 🤖",
             content:
-              'A Digital Learning Lab where you journey into the ethical frontiers of AI and Robotics. This tour will guide you through our interactive platform.',
+              "A Digital Learning Lab where you journey into the ethical frontiers of AI and Robotics. This tour will guide you through our interactive platform.",
             buttons: [
-              { text: 'Start Tour', action: 'continue', primary: true },
-              { text: 'Start Exploring', action: 'finish', primary: false },
+              { text: "Start Tour", action: "continue", primary: true },
+              { text: "Start Exploring", action: "finish", primary: false },
             ],
             target: null,
-            position: 'center',
+            position: "center",
             autoScroll: false,
           },
           {
-            id: 'launch-test',
-            title: 'Launch Test Scenario',
+            id: "launch-test",
+            title: "Launch Test Scenario",
             content:
-              'Click this button to open an interactive ethics simulation and see how moral dilemmas are presented.',
-            target: '#test-scenario-modal',
-            position: 'bottom',
-            action: 'wait-for-click',
+              "Click this button to open an interactive ethics simulation and see how moral dilemmas are presented.",
+            target: "#test-scenario-modal",
+            position: "bottom",
+            action: "wait-for-click",
             autoScroll: true,
             highlightClick: true,
           },
           {
-            id: 'dilemma-section',
-            title: 'The Dilemma Section',
+            id: "dilemma-section",
+            title: "The Dilemma Section",
             content:
-              'This section presents the ethical scenario. Read carefully to understand the situation and its complexities.',
-            target: '.dilemma-text',
-            position: 'right',
-            waitFor: 'scenario-modal',
+              "This section presents the ethical scenario. Read carefully to understand the situation and its complexities.",
+            target: ".dilemma-text",
+            position: "right",
+            waitFor: "scenario-modal",
             autoScroll: true,
           },
           {
-            id: 'ethical-question',
-            title: 'Ethical Question',
+            id: "ethical-question",
+            title: "Ethical Question",
             content:
-              'This highlights the core ethical consideration. What values are at stake in this scenario?',
-            target: '.ethical-question',
-            position: 'right',
+              "This highlights the core ethical consideration. What values are at stake in this scenario?",
+            target: ".ethical-question",
+            position: "right",
             autoScroll: true,
           },
           {
-            id: 'choose-approach',
-            title: 'Choose Your Approach',
+            id: "choose-approach",
+            title: "Choose Your Approach",
             content:
-              'Each approach represents a different ethical framework. Please click the <strong>first option</strong> to continue the tutorial and see how the analysis works!',
-            target: '.options-container',
-            position: 'right',
-            action: 'wait-for-click',
+              "Each approach represents a different ethical framework. Please click the <strong>first option</strong> to continue the tutorial and see how the analysis works!",
+            target: ".options-container",
+            position: "right",
+            action: "wait-for-click",
             highlightClick: true,
             autoScroll: true,
           },
           {
-            id: 'pros-cons',
-            title: 'Pros and Cons Analysis',
+            id: "pros-cons",
+            title: "Pros and Cons Analysis",
             content:
-              'Perfect! The details expanded to show the analysis. Every ethical choice has trade-offs - these help you understand the implications.',
-            target: '.option-details',
-            position: 'right',
+              "Perfect! The details expanded to show the analysis. Every ethical choice has trade-offs - these help you understand the implications.",
+            target: ".option-details",
+            position: "right",
             autoScroll: true,
             waitForElement: true,
           },
           {
-            id: 'radar-chart-preview',
-            title: 'Radar Chart Visualization',
+            id: "radar-chart-preview",
+            title: "Radar Chart Visualization",
             content:
               "This radar chart shows how your choice impacts different ethical dimensions. The chart updates based on your selection - we'll explore this in detail in Tutorial 2!",
-            target: '#scenario-radar-chart',
-            position: 'left',
+            target: "#scenario-radar-chart",
+            position: "left",
             autoScroll: true,
-            waitFor: 'option-selected',
+            waitFor: "option-selected",
           },
           {
-            id: 'confirm-choice',
-            title: 'Confirm Your Decision',
+            id: "confirm-choice",
+            title: "Confirm Your Decision",
             content:
               'When ready, confirm your choice. Remember - there\'s no "wrong" answer in ethics exploration!',
-            target: '#confirm-choice',
-            position: 'right',
-            action: 'wait-for-click',
+            target: "#confirm-choice",
+            position: "right",
+            action: "wait-for-click",
             highlightClick: true,
             autoScroll: true,
           },
           {
-            id: 'tutorial-complete',
-            title: 'Congratulations! 🎉',
+            id: "tutorial-complete",
+            title: "Congratulations! 🎉",
             content:
               "Excellent work! You've successfully completed your first ethical scenario exploration. You've learned how to navigate complex moral dilemmas, analyze different approaches, and understand the ethical implications through our interactive tools.<br><br>Would you like to continue with Tutorial 2 to explore the radar chart visualization in more detail?",
             buttons: [
               {
-                text: '📊 Continue to Tutorial 2',
-                action: 'next-tutorial',
+                text: "📊 Continue to Tutorial 2",
+                action: "next-tutorial",
                 primary: true,
               },
-              { text: 'Start Exploring', action: 'finish', primary: false },
+              { text: "Start Exploring", action: "finish", primary: false },
             ],
             target: null,
-            position: 'center',
+            position: "center",
             autoScroll: false,
-            skipUntil: 'choice-confirmed',
+            skipUntil: "choice-confirmed",
           },
         ],
       },
       2: {
         // Hero Demo Tutorial
-        name: 'hero-demo',
-        title: 'Hero Demo Tutorial',
+        name: "hero-demo",
+        title: "Hero Demo Tutorial",
         steps: [
           {
-            id: 'hero-demo-chart',
-            title: 'Interactive Radar Chart 📊',
+            id: "hero-demo-chart",
+            title: "Interactive Radar Chart 📊",
             content:
-              'This is our Hero Demo radar chart. It shows how different ethical choices impact various dimensions in real-time, giving you a visual representation of moral decision-making.',
-            target: '#hero-ethics-chart',
-            position: 'bottom',
+              "This is our Hero Demo radar chart. It shows how different ethical choices impact various dimensions in real-time, giving you a visual representation of moral decision-making.",
+            target: "#hero-ethics-chart",
+            position: "bottom",
             autoScroll: true,
           },
           {
-            id: 'ethical-dimensions',
-            title: 'Ethical Dimensions Explained',
+            id: "ethical-dimensions",
+            title: "Ethical Dimensions Explained",
             content:
-              'The chart displays 8 key ethical dimensions that represent core moral principles. Each axis shows how your decisions impact different aspects of AI ethics - from fairness to sustainability.',
-            target: '#hero-ethics-chart',
-            position: 'left',
+              "The chart displays 8 key ethical dimensions that represent core moral principles. Each axis shows how your decisions impact different aspects of AI ethics - from fairness to sustainability.",
+            target: "#hero-ethics-chart",
+            position: "left",
             autoScroll: false,
           },
           {
-            id: 'interactive-controls',
-            title: 'Try the Controls! 🎮',
+            id: "interactive-controls",
+            title: "Try the Controls! 🎮",
             content:
               'Use these buttons to see how different ethical approaches affect the dimensions. Watch the chart change in real-time as you explore different scenarios! Click "Next" when you\'re ready to continue.',
-            target: '.demo-controls-grid',
-            position: 'left',
+            target: ".demo-controls-grid",
+            position: "left",
             autoScroll: true,
             highlightClick: true,
           },
           {
-            id: 'how-to-read',
-            title: 'How to Read Charts 📖',
+            id: "how-to-read",
+            title: "How to Read Charts 📖",
             content:
               'This section teaches you about interpreting the visual data and understanding the ethical implications of each choice. Click "Next" to continue exploring.',
-            target: '.radar-instructions-accordion',
-            position: 'bottom',
+            target: ".radar-instructions-accordion",
+            position: "bottom",
             autoScroll: true,
             highlightClick: true,
           },
           {
-            id: 'glossary',
-            title: 'Ethical Dimensions Glossary 📚',
+            id: "glossary",
+            title: "Ethical Dimensions Glossary 📚",
             content:
               'This glossary provides detailed definitions of each ethical principle used in our simulations. Click "Next" to complete the radar chart tutorial.',
-            target: '.ethics-glossary-accordion',
-            position: 'bottom',
+            target: ".ethics-glossary-accordion",
+            position: "bottom",
             autoScroll: true,
             highlightClick: true,
           },
           {
-            id: 'radar-tutorial-complete',
-            title: 'Radar Chart Mastery! 🎉',
+            id: "radar-tutorial-complete",
+            title: "Radar Chart Mastery! 🎉",
             content:
-              'Excellent! You now understand how to interpret ethical impacts visually and interact with our radar chart system. Ready to explore the Learning Lab?',
+              "Excellent! You now understand how to interpret ethical impacts visually and interact with our radar chart system. Ready to explore the Learning Lab?",
             buttons: [
               {
-                text: '🧪 Learning Lab Tutorial',
-                action: 'next-tutorial',
+                text: "🧪 Learning Lab Tutorial",
+                action: "next-tutorial",
                 primary: true,
               },
-              { text: 'Start Exploring', action: 'finish', primary: false },
+              { text: "Start Exploring", action: "finish", primary: false },
             ],
             target: null,
-            position: 'center',
+            position: "center",
             autoScroll: false,
           },
         ],
       },
       3: {
         // Learning Lab Pre-Launch Modal Tutorial
-        name: 'learning-lab',
-        title: 'Learning Lab Tutorial',
+        name: "learning-lab",
+        title: "Learning Lab Tutorial",
         steps: [
           {
-            id: 'find-trolley-problem',
-            title: 'Scenario Simulations',
+            id: "find-trolley-problem",
+            title: "Scenario Simulations",
             content:
-              'Each scenario includes a fully equipped Learning Lab, offering a detailed overview and curated educator resources to deepen understanding and spark meaningful discussion.',
+              "Each scenario includes a fully equipped Learning Lab, offering a detailed overview and curated educator resources to deepen understanding and spark meaningful discussion.",
             target:
-              '#category-trolley-problem > div.scenarios-grid > article:nth-child(1)',
-            position: 'bottom',
+              "#category-trolley-problem > div.scenarios-grid > article:nth-child(1)",
+            position: "bottom",
             autoScroll: true,
           },
           {
-            id: 'click-learning-lab',
-            title: 'Open Learning Lab',
+            id: "click-learning-lab",
+            title: "Open Learning Lab",
             content:
               'Perfect! Now click the "Learning Lab" button on this Trolley Problem scenario card to open the pre-launch modal.',
             target:
-              '#category-trolley-problem > div.scenarios-grid > article:nth-child(1) > div.scenario-footer > button.scenario-start-btn',
-            position: 'bottom',
-            action: 'wait-for-click',
+              "#category-trolley-problem > div.scenarios-grid > article:nth-child(1) > div.scenario-footer > button.scenario-start-btn",
+            position: "bottom",
+            action: "wait-for-click",
             autoScroll: true,
             highlightClick: true,
             waitFor:
-              '#category-trolley-problem > div.scenarios-grid > article:nth-child(1)',
+              "#category-trolley-problem > div.scenarios-grid > article:nth-child(1)",
           },
           {
-            id: 'overview-tab',
-            title: 'Overview Tab',
+            id: "overview-tab",
+            title: "Overview Tab",
             content:
               'This Overview tab provides a comprehensive introduction to the scenario, including the ethical dilemma, key stakeholders, and real-world context. Click "Next" to continue exploring the other tabs.',
             target:
               '.tab-buttons-container [data-tab="overview"], .tab-buttons-container .tab-button[data-tab="overview"]',
-            position: 'right',
-            waitFor: 'pre-launch-modal',
+            position: "right",
+            waitFor: "pre-launch-modal",
             autoScroll: true,
           },
           {
-            id: 'learning-goals-tab',
-            title: 'Learning Goals Tab',
+            id: "learning-goals-tab",
+            title: "Learning Goals Tab",
             content:
               'The Learning Goals tab outlines what you\'ll discover and understand by completing this simulation, including key ethical principles and decision-making frameworks. Click "Next" to continue exploring the other tabs.',
             target:
               '.tab-buttons-container [data-tab="objectives"], .tab-buttons-container .tab-button[data-tab="objectives"]',
-            position: 'right',
+            position: "right",
             highlightClick: true,
             autoScroll: true,
           },
           {
-            id: 'ethics-guide-tab',
-            title: 'Ethics Guide Tab',
+            id: "ethics-guide-tab",
+            title: "Ethics Guide Tab",
             content:
               'The Ethics Guide provides essential background on moral frameworks, philosophical approaches, and ethical theories relevant to this scenario. Click "Next" to see the next tab.',
             target:
               '.tab-buttons-container [data-tab="ethics"], .tab-buttons-container .tab-button[data-tab="ethics"]',
-            position: 'right',
+            position: "right",
             highlightClick: true,
             autoScroll: true,
           },
           {
-            id: 'get-ready-tab',
-            title: 'Get Ready Tab',
+            id: "get-ready-tab",
+            title: "Get Ready Tab",
             content:
               'Get Ready helps you prepare for the simulation with pre-activity questions, reflection prompts, and scenario setup information. Click "Next" to continue.',
             target:
               '.tab-buttons-container [data-tab="preparation"], .tab-buttons-container .tab-button[data-tab="preparation"]',
-            position: 'right',
+            position: "right",
             highlightClick: true,
             autoScroll: true,
           },
           {
-            id: 'resources-tab',
-            title: 'Resources Tab',
+            id: "resources-tab",
+            title: "Resources Tab",
             content:
               'The Resources tab contains supplementary materials, research papers, case studies, and additional reading to deepen your understanding. Click "Next" to see the final tab.',
             target:
               '.tab-buttons-container [data-tab="resources"], .tab-buttons-container .tab-button[data-tab="resources"]',
-            position: 'right',
+            position: "right",
             highlightClick: true,
             autoScroll: true,
           },
           {
-            id: 'for-educators-tab',
-            title: 'For Educators Tab',
+            id: "for-educators-tab",
+            title: "For Educators Tab",
             content:
-              'For Educators provides teaching guides, discussion questions, assessment rubrics, and classroom integration strategies for instructors. This completes our tour of the Learning Lab tabs!',
+              "For Educators provides teaching guides, discussion questions, assessment rubrics, and classroom integration strategies for instructors. This completes our tour of the Learning Lab tabs!",
             target:
               '.tab-buttons-container [data-tab="educator"], .tab-buttons-container .tab-button[data-tab="educator"]',
-            position: 'right',
+            position: "right",
             highlightClick: true,
             autoScroll: true,
             hasNextButton: true,
-            action: 'next',
+            action: "next",
             onShow() {
               // Enhanced auto-scroll to ensure "For Educators" tab is visible
               const educatorTab =
                 document.querySelector(
-                  '.tab-buttons-container [data-tab="educator"]'
+                  '.tab-buttons-container [data-tab="educator"]',
                 ) ||
                 document.querySelector(
-                  '.tab-buttons-container .tab-button[data-tab="educator"]'
+                  '.tab-buttons-container .tab-button[data-tab="educator"]',
                 );
 
               if (educatorTab) {
                 // Scroll the tab into view with enhanced positioning
                 educatorTab.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'center',
-                  inline: 'center',
+                  behavior: "smooth",
+                  block: "center",
+                  inline: "center",
                 });
 
                 // Also scroll the tab container to ensure proper visibility
                 const tabContainer = educatorTab.closest(
-                  '.tab-buttons-container'
+                  ".tab-buttons-container",
                 );
                 if (tabContainer) {
                   tabContainer.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center',
-                    inline: 'center',
+                    behavior: "smooth",
+                    block: "center",
+                    inline: "center",
                   });
                 }
 
                 logger.info(
-                  'OnboardingTour',
-                  'Auto-scrolled to For Educators tab',
+                  "OnboardingTour",
+                  "Auto-scrolled to For Educators tab",
                   {
                     element: educatorTab,
                     container: tabContainer,
-                  }
+                  },
                 );
               } else {
                 logger.warn(
-                  'OnboardingTour',
-                  'Could not find For Educators tab'
+                  "OnboardingTour",
+                  "Could not find For Educators tab",
                 );
               }
 
               // Also auto-scroll nav menu to highlight educators tab (legacy behavior)
               const navEducatorsTab = document.querySelector(
-                'a[href="#educator-tools"]'
+                'a[href="#educator-tools"]',
               );
               if (navEducatorsTab) {
                 navEducatorsTab.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'center',
+                  behavior: "smooth",
+                  block: "center",
                 });
                 logger.info(
-                  'OnboardingTour',
-                  'Auto-scrolled to Educator Tools nav link',
-                  { element: navEducatorsTab }
+                  "OnboardingTour",
+                  "Auto-scrolled to Educator Tools nav link",
+                  { element: navEducatorsTab },
                 );
               }
             },
           },
           {
-            id: 'tutorial-complete',
-            title: 'Mission Accomplished! 🎉🤖',
+            id: "tutorial-complete",
+            title: "Mission Accomplished! 🎉🤖",
             content:
               "You've completed the tutorial and unlocked the tools to navigate the ethical terrain of intelligent machines. Ready to begin your journey?",
             buttons: [
-              { text: '🚀 Start Exploring', action: 'finish', primary: true },
+              { text: "🚀 Start Exploring", action: "finish", primary: true },
             ],
             target: null,
-            position: 'center',
+            position: "center",
             autoScroll: false,
           },
         ],
@@ -466,57 +625,57 @@ class OnboardingTour {
   }
 
   init() {
-    logger.info('OnboardingTour', 'Initializing onboarding coach marks system');
+    logger.info("OnboardingTour", "Initializing onboarding coach marks system");
 
     // Don't auto-start - let the app control when the tour starts
     logger.debug(
-      'OnboardingTour',
-      'OnboardingTour initialized, waiting for manual start'
+      "OnboardingTour",
+      "OnboardingTour initialized, waiting for manual start",
     );
   }
 
   setupKeyboardTracking() {
     // Track when user uses Tab key for navigation
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Tab') {
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Tab") {
         this.wasKeyboardNavigation = true;
       }
     });
 
     // Reset keyboard navigation flag on mouse click
-    document.addEventListener('mousedown', () => {
+    document.addEventListener("mousedown", () => {
       this.wasKeyboardNavigation = false;
     });
   }
 
   isFirstTimeVisit() {
-    const hasVisited = simpleStorage.get('has_visited', false);
+    const hasVisited = simpleStorage.get("has_visited", false);
     if (!hasVisited) {
-      simpleStorage.set('has_visited', true);
+      simpleStorage.set("has_visited", true);
       return true;
     }
     return false;
   }
 
   hasCompletedTour() {
-    return simpleStorage.get('tour_completed', false);
+    return simpleStorage.get("tour_completed", false);
   }
 
   startTour(tutorialNumber = 1) {
     logger.info(
-      'OnboardingTour',
+      "OnboardingTour",
       `🚀 Starting onboarding tour ${tutorialNumber}`,
       {
         instanceId: this.instanceId,
         tutorialNumber,
         isActive: this.isActive,
-      }
+      },
     );
 
     if (this.isActive) {
       logger.warn(
-        'OnboardingTour',
-        'Tour already active, ignoring start request'
+        "OnboardingTour",
+        "Tour already active, ignoring start request",
       );
       return;
     }
@@ -528,18 +687,18 @@ class OnboardingTour {
 
     // Reset user interaction states
     this.userStates = {
-      'option-selected': false,
-      'choice-confirmed': false,
-      'modal-opened': false,
+      "option-selected": false,
+      "choice-confirmed": false,
+      "modal-opened": false,
     };
 
-    logger.info('OnboardingTour', `Starting tutorial ${tutorialNumber}`, {
+    logger.info("OnboardingTour", `Starting tutorial ${tutorialNumber}`, {
       currentStep: this.currentStep,
       totalSteps: this.tutorials[tutorialNumber]?.steps?.length || 0,
     });
 
     // Track analytics
-    simpleAnalytics.trackEvent('tour_started', {
+    simpleAnalytics.trackEvent("tour_started", {
       tutorial: tutorialNumber,
     });
 
@@ -552,29 +711,29 @@ class OnboardingTour {
     // Remove existing overlay
     this.removeOverlay();
 
-    logger.debug('OnboardingTour', 'Creating overlay elements', {
+    logger.debug("OnboardingTour", "Creating overlay elements", {
       tutorial: this.currentTutorial,
       step: this.currentStep,
-      existingOverlays: document.querySelectorAll('.onboarding-overlay').length,
+      existingOverlays: document.querySelectorAll(".onboarding-overlay").length,
     });
 
     // Create main overlay (darkens everything except spotlight)
-    this.overlay = document.createElement('div');
-    this.overlay.className = 'onboarding-overlay';
-    this.overlay.setAttribute('role', 'presentation');
-    this.overlay.setAttribute('aria-hidden', 'true');
+    this.overlay = document.createElement("div");
+    this.overlay.className = "onboarding-overlay";
+    this.overlay.setAttribute("role", "presentation");
+    this.overlay.setAttribute("aria-hidden", "true");
 
     // Create spotlight (highlighted area)
-    this.spotlight = document.createElement('div');
-    this.spotlight.className = 'onboarding-spotlight';
+    this.spotlight = document.createElement("div");
+    this.spotlight.className = "onboarding-spotlight";
 
     // Create coach mark popup
-    this.coachMark = document.createElement('div');
-    this.coachMark.className = 'onboarding-coach-mark';
-    this.coachMark.setAttribute('role', 'dialog');
-    this.coachMark.setAttribute('aria-modal', 'true');
-    this.coachMark.setAttribute('aria-labelledby', 'coach-mark-title');
-    this.coachMark.setAttribute('aria-describedby', 'coach-mark-content');
+    this.coachMark = document.createElement("div");
+    this.coachMark.className = "onboarding-coach-mark";
+    this.coachMark.setAttribute("role", "dialog");
+    this.coachMark.setAttribute("aria-modal", "true");
+    this.coachMark.setAttribute("aria-labelledby", "coach-mark-title");
+    this.coachMark.setAttribute("aria-describedby", "coach-mark-content");
 
     // Add to DOM in correct order
     document.body.appendChild(this.overlay);
@@ -582,31 +741,31 @@ class OnboardingTour {
     document.body.appendChild(this.coachMark);
 
     // Add body class for styling
-    document.body.classList.add('onboarding-active');
+    document.body.classList.add("onboarding-active");
 
     // Special handling for Tutorial 3 Step 3 to ensure maximum visibility
     if (
       this.currentTutorial === this.TUTORIAL_3 &&
       this.currentStep === this.TUTORIAL_3_STEP_3_INDEX
     ) {
-      this.coachMark.style.zIndex = '10020';
-      this.coachMark.style.isolation = 'isolate';
-      this.coachMark.style.position = 'fixed';
+      this.coachMark.style.zIndex = "10020";
+      this.coachMark.style.isolation = "isolate";
+      this.coachMark.style.position = "fixed";
       logger.warn(
-        'OnboardingTour',
-        'TUTORIAL 3 STEP 3 - Applied aggressive stacking',
+        "OnboardingTour",
+        "TUTORIAL 3 STEP 3 - Applied aggressive stacking",
         {
           zIndex: this.coachMark.style.zIndex,
           position: getComputedStyle(this.coachMark).position,
           isolation: this.coachMark.style.isolation,
-        }
+        },
       );
     }
 
-    logger.debug('OnboardingTour', 'Overlay elements created and appended', {
-      overlayInDom: !!document.querySelector('.onboarding-overlay'),
-      totalOverlays: document.querySelectorAll('.onboarding-overlay').length,
-      coachMarkInDom: !!document.querySelector('.onboarding-coach-mark'),
+    logger.debug("OnboardingTour", "Overlay elements created and appended", {
+      overlayInDom: !!document.querySelector(".onboarding-overlay"),
+      totalOverlays: document.querySelectorAll(".onboarding-overlay").length,
+      coachMarkInDom: !!document.querySelector(".onboarding-coach-mark"),
     });
 
     // Setup scroll tracking
@@ -618,15 +777,15 @@ class OnboardingTour {
 
   makeModalsOnboardingFriendly() {
     // Find any active modal backdrops and make them onboarding-friendly
-    const modalBackdrops = document.querySelectorAll('.modal-backdrop');
-    modalBackdrops.forEach(backdrop => {
-      if (backdrop.style.display !== 'none') {
-        backdrop.style.pointerEvents = 'none';
-        const modalDialog = backdrop.querySelector('.modal-dialog');
+    const modalBackdrops = document.querySelectorAll(".modal-backdrop");
+    modalBackdrops.forEach((backdrop) => {
+      if (backdrop.style.display !== "none") {
+        backdrop.style.pointerEvents = "none";
+        const modalDialog = backdrop.querySelector(".modal-dialog");
         if (modalDialog) {
-          modalDialog.style.pointerEvents = 'auto';
+          modalDialog.style.pointerEvents = "auto";
         }
-        logger.debug('OnboardingTour', 'Made modal onboarding-friendly', {
+        logger.debug("OnboardingTour", "Made modal onboarding-friendly", {
           modalId: backdrop.id,
         });
       }
@@ -634,12 +793,12 @@ class OnboardingTour {
   }
 
   removeOverlay() {
-    logger.debug('OnboardingTour', 'Removing overlay elements', {
+    logger.debug("OnboardingTour", "Removing overlay elements", {
       hasOverlay: !!this.overlay,
       hasSpotlight: !!this.spotlight,
       hasCoachMark: !!this.coachMark,
       hasContentObserver: !!this.contentObserver,
-      totalOverlaysInDom: document.querySelectorAll('.onboarding-overlay')
+      totalOverlaysInDom: document.querySelectorAll(".onboarding-overlay")
         .length,
     });
 
@@ -669,12 +828,12 @@ class OnboardingTour {
     }
 
     // Also remove any orphaned overlay elements
-    const orphanedOverlays = document.querySelectorAll('.onboarding-overlay');
+    const orphanedOverlays = document.querySelectorAll(".onboarding-overlay");
     const orphanedSpotlights = document.querySelectorAll(
-      '.onboarding-spotlight'
+      ".onboarding-spotlight",
     );
     const orphanedCoachMarks = document.querySelectorAll(
-      '.onboarding-coach-mark'
+      ".onboarding-coach-mark",
     );
 
     if (
@@ -682,21 +841,21 @@ class OnboardingTour {
       orphanedSpotlights.length > 0 ||
       orphanedCoachMarks.length > 0
     ) {
-      logger.warn('OnboardingTour', 'Found orphaned elements, cleaning up', {
+      logger.warn("OnboardingTour", "Found orphaned elements, cleaning up", {
         overlays: orphanedOverlays.length,
         spotlights: orphanedSpotlights.length,
         coachMarks: orphanedCoachMarks.length,
       });
 
-      orphanedOverlays.forEach(el => el.remove());
-      orphanedSpotlights.forEach(el => el.remove());
-      orphanedCoachMarks.forEach(el => el.remove());
+      orphanedOverlays.forEach((el) => el.remove());
+      orphanedSpotlights.forEach((el) => el.remove());
+      orphanedCoachMarks.forEach((el) => el.remove());
     }
 
-    document.body.classList.remove('onboarding-active');
+    document.body.classList.remove("onboarding-active");
 
-    logger.debug('OnboardingTour', 'Overlay cleanup complete', {
-      totalOverlaysInDom: document.querySelectorAll('.onboarding-overlay')
+    logger.debug("OnboardingTour", "Overlay cleanup complete", {
+      totalOverlaysInDom: document.querySelectorAll(".onboarding-overlay")
         .length,
     });
 
@@ -723,12 +882,12 @@ class OnboardingTour {
       }
     };
 
-    window.addEventListener('scroll', this.scrollHandler, { passive: true });
+    window.addEventListener("scroll", this.scrollHandler, { passive: true });
   }
 
   removeScrollTracking() {
     if (this.scrollHandler) {
-      window.removeEventListener('scroll', this.scrollHandler);
+      window.removeEventListener("scroll", this.scrollHandler);
       this.scrollHandler = null;
     }
     if (this.scrollTrackingTimer) {
@@ -748,7 +907,7 @@ class OnboardingTour {
 
     // Use the unified scroll manager
     await scrollManager.scrollToElement(element, {
-      behavior: 'smooth',
+      behavior: "smooth",
       offset,
     });
   }
@@ -763,14 +922,14 @@ class OnboardingTour {
     this.spotlight.style.top = `${rect.top + window.pageYOffset - padding}px`;
     this.spotlight.style.width = `${rect.width + padding * 2}px`;
     this.spotlight.style.height = `${rect.height + padding * 2}px`;
-    this.spotlight.style.display = 'block';
+    this.spotlight.style.display = "block";
   }
 
   positionCoachMark(
     targetElement,
-    position = 'bottom',
+    position = "bottom",
     step = null,
-    retryCount = 0
+    retryCount = 0,
   ) {
     if (!this.coachMark) return;
 
@@ -778,8 +937,8 @@ class OnboardingTour {
     const MAX_POSITION_RETRIES = 3;
     if (retryCount > MAX_POSITION_RETRIES) {
       logger.warn(
-        'OnboardingTour',
-        `⚠️ Max positioning retries reached for step ${step?.id || 'unknown'}`
+        "OnboardingTour",
+        `⚠️ Max positioning retries reached for step ${step?.id || "unknown"}`,
       );
       return;
     }
@@ -788,16 +947,16 @@ class OnboardingTour {
     const isMobile = window.innerWidth <= this.MOBILE_BREAKPOINT; // Mobile breakpoint
 
     // Get coach mark dimensions after content is set
-    this.coachMark.style.visibility = 'hidden';
-    this.coachMark.style.display = 'block';
-    this.coachMark.style.position = 'fixed'; // Use fixed positioning for consistent behavior
-    this.coachMark.style.zIndex = '10014';
+    this.coachMark.style.visibility = "hidden";
+    this.coachMark.style.display = "block";
+    this.coachMark.style.position = "fixed"; // Use fixed positioning for consistent behavior
+    this.coachMark.style.zIndex = "10014";
 
     // Reset mobile overlay class in case it was previously set
-    this.coachMark.classList.remove('mobile-overlay');
-    this.coachMark.style.width = ''; // Reset width
-    this.coachMark.style.maxHeight = ''; // Reset max height
-    this.coachMark.style.overflow = ''; // Reset overflow
+    this.coachMark.classList.remove("mobile-overlay");
+    this.coachMark.style.width = ""; // Reset width
+    this.coachMark.style.maxHeight = ""; // Reset max height
+    this.coachMark.style.overflow = ""; // Reset overflow
 
     const coachMarkRect = this.coachMark.getBoundingClientRect();
     const viewportHeight = window.innerHeight;
@@ -820,13 +979,13 @@ class OnboardingTour {
         // Target is outside viewport, scroll it into view (only if we haven't exceeded retries)
         if (retryCount < MAX_POSITION_RETRIES) {
           logger.debug(
-            'OnboardingTour',
-            `Target outside viewport, scrolling into view (retry ${retryCount + 1}/${MAX_POSITION_RETRIES})`
+            "OnboardingTour",
+            `Target outside viewport, scrolling into view (retry ${retryCount + 1}/${MAX_POSITION_RETRIES})`,
           );
           targetElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-            inline: 'center',
+            behavior: "smooth",
+            block: "center",
+            inline: "center",
           });
           // Wait for scroll to complete and retry with incremented count
           setTimeout(() => {
@@ -834,15 +993,15 @@ class OnboardingTour {
               targetElement,
               position,
               step,
-              retryCount + 1
+              retryCount + 1,
             );
           }, this.ANIMATION_DURATION);
           return;
         } else {
           // Exceeded retries, position anyway (might be partially visible)
           logger.warn(
-            'OnboardingTour',
-            `Target still outside viewport after ${MAX_POSITION_RETRIES} retries, positioning anyway`
+            "OnboardingTour",
+            `Target still outside viewport after ${MAX_POSITION_RETRIES} retries, positioning anyway`,
           );
         }
       }
@@ -852,14 +1011,14 @@ class OnboardingTour {
         // On mobile, use a more intelligent positioning strategy that avoids covering the target
         const mobileCoachMarkHeight = Math.min(
           coachMarkRect.height,
-          viewportHeight * this.MOBILE_COACH_MARK_HEIGHT_RATIO
+          viewportHeight * this.MOBILE_COACH_MARK_HEIGHT_RATIO,
         ); // Max 40% of screen
 
         // Calculate available space in each direction
         const spaceAbove = targetRect.top - spacing;
         const spaceBelow = viewportHeight - targetRect.bottom - spacing;
 
-        logger.debug('OnboardingTour', 'Mobile positioning analysis', {
+        logger.debug("OnboardingTour", "Mobile positioning analysis", {
           targetRect: {
             x: targetRect.left,
             y: targetRect.top,
@@ -875,31 +1034,31 @@ class OnboardingTour {
         // Priority order for mobile: below target, above target, full-width overlay at bottom
         if (spaceBelow >= mobileCoachMarkHeight) {
           // Enough space below - position there (preferred)
-          position = 'bottom';
+          position = "bottom";
           left = Math.max(
             spacing,
             Math.min(
               targetRect.left + targetRect.width / 2 - coachMarkRect.width / 2,
-              viewportWidth - coachMarkRect.width - spacing
-            )
+              viewportWidth - coachMarkRect.width - spacing,
+            ),
           );
           top = targetRect.bottom + spacing;
-          logger.debug('OnboardingTour', 'Mobile: Positioning below target');
+          logger.debug("OnboardingTour", "Mobile: Positioning below target");
         } else if (spaceAbove >= mobileCoachMarkHeight) {
           // Enough space above - position there
-          position = 'top';
+          position = "top";
           left = Math.max(
             spacing,
             Math.min(
               targetRect.left + targetRect.width / 2 - coachMarkRect.width / 2,
-              viewportWidth - coachMarkRect.width - spacing
-            )
+              viewportWidth - coachMarkRect.width - spacing,
+            ),
           );
           top = targetRect.top - coachMarkRect.height - spacing;
-          logger.debug('OnboardingTour', 'Mobile: Positioning above target');
+          logger.debug("OnboardingTour", "Mobile: Positioning above target");
         } else {
           // Not enough space above or below - use full-width overlay at bottom
-          this.coachMark.classList.add('mobile-overlay');
+          this.coachMark.classList.add("mobile-overlay");
           left = spacing;
           top =
             viewportHeight -
@@ -908,11 +1067,11 @@ class OnboardingTour {
             this.MOBILE_NAVIGATION_SPACE; // Leave space for navigation
           this.coachMark.style.width = `${viewportWidth - spacing * 2}px`;
           this.coachMark.style.maxHeight = `${viewportHeight * this.MOBILE_MAX_HEIGHT_RATIO}px`;
-          this.coachMark.style.overflow = 'auto';
+          this.coachMark.style.overflow = "auto";
 
           logger.debug(
-            'OnboardingTour',
-            'Mobile: Using full-width overlay mode to avoid covering content'
+            "OnboardingTour",
+            "Mobile: Using full-width overlay mode to avoid covering content",
           );
         }
       } else {
@@ -925,29 +1084,29 @@ class OnboardingTour {
           this.currentStep <= this.TUTORIAL_3_BOTTOM_POSITION_END
         ) {
           logger.info(
-            'OnboardingTour',
-            `Forcing bottom position for Tutorial 3 step ${this.currentStep + 1}`
+            "OnboardingTour",
+            `Forcing bottom position for Tutorial 3 step ${this.currentStep + 1}`,
           );
-          position = 'bottom';
+          position = "bottom";
         }
 
         switch (position) {
-          case 'top':
+          case "top":
             left =
               targetRect.left + targetRect.width / 2 - coachMarkRect.width / 2;
             top = targetRect.top - coachMarkRect.height - spacing;
             break;
-          case 'bottom':
+          case "bottom":
             left =
               targetRect.left + targetRect.width / 2 - coachMarkRect.width / 2;
             top = targetRect.bottom + spacing;
             break;
-          case 'left':
+          case "left":
             left = targetRect.left - coachMarkRect.width - spacing;
             top =
               targetRect.top + targetRect.height / 2 - coachMarkRect.height / 2;
             break;
-          case 'right':
+          case "right":
             left = targetRect.right + spacing;
             top =
               targetRect.top + targetRect.height / 2 - coachMarkRect.height / 2;
@@ -973,7 +1132,7 @@ class OnboardingTour {
       if (
         step &&
         step.highlightClick &&
-        !this.coachMark.classList.contains('mobile-overlay')
+        !this.coachMark.classList.contains("mobile-overlay")
       ) {
         // If positioned over target, try alternative positions
         if (
@@ -984,7 +1143,7 @@ class OnboardingTour {
         ) {
           if (isMobile) {
             // On mobile, prefer overlay mode when covering target
-            this.coachMark.classList.add('mobile-overlay');
+            this.coachMark.classList.add("mobile-overlay");
             left = spacing;
             top =
               viewportHeight -
@@ -1004,8 +1163,8 @@ class OnboardingTour {
                 spacing,
                 Math.min(
                   targetRect.top,
-                  viewportHeight - coachMarkRect.height - spacing
-                )
+                  viewportHeight - coachMarkRect.height - spacing,
+                ),
               );
             }
             // Try positioning to the left
@@ -1015,8 +1174,8 @@ class OnboardingTour {
                 spacing,
                 Math.min(
                   targetRect.top,
-                  viewportHeight - coachMarkRect.height - spacing
-                )
+                  viewportHeight - coachMarkRect.height - spacing,
+                ),
               );
             }
             // Try positioning below
@@ -1028,8 +1187,8 @@ class OnboardingTour {
                 spacing,
                 Math.min(
                   targetRect.left,
-                  viewportWidth - coachMarkRect.width - spacing
-                )
+                  viewportWidth - coachMarkRect.width - spacing,
+                ),
               );
               top = targetRect.bottom + spacing;
             }
@@ -1039,8 +1198,8 @@ class OnboardingTour {
                 spacing,
                 Math.min(
                   targetRect.left,
-                  viewportWidth - coachMarkRect.width - spacing
-                )
+                  viewportWidth - coachMarkRect.width - spacing,
+                ),
               );
               top = targetRect.top - coachMarkRect.height - spacing;
             }
@@ -1049,8 +1208,8 @@ class OnboardingTour {
       }
 
       logger.debug(
-        'OnboardingTour',
-        'Coach mark positioned relative to target',
+        "OnboardingTour",
+        "Coach mark positioned relative to target",
         {
           stepId: step?.id,
           targetRect: {
@@ -1062,8 +1221,8 @@ class OnboardingTour {
           coachMarkPos: { left, top },
           position,
           isMobile,
-          isOverlay: this.coachMark.classList.contains('mobile-overlay'),
-        }
+          isOverlay: this.coachMark.classList.contains("mobile-overlay"),
+        },
       );
     } else {
       // Center on viewport for steps without targets
@@ -1075,7 +1234,7 @@ class OnboardingTour {
           viewportHeight -
             coachMarkRect.height -
             spacing -
-            this.MOBILE_NAVIGATION_SPACE
+            this.MOBILE_NAVIGATION_SPACE,
         );
         this.coachMark.style.width = `${viewportWidth - spacing * 2}px`;
       } else {
@@ -1083,7 +1242,7 @@ class OnboardingTour {
         top = viewportHeight / 2 - coachMarkRect.height / 2;
       }
 
-      logger.debug('OnboardingTour', 'Coach mark centered in viewport', {
+      logger.debug("OnboardingTour", "Coach mark centered in viewport", {
         stepId: step?.id,
         coachMarkPos: { left, top },
         isMobile,
@@ -1093,10 +1252,10 @@ class OnboardingTour {
     // Apply position
     this.coachMark.style.left = `${left}px`;
     this.coachMark.style.top = `${top}px`;
-    this.coachMark.style.visibility = 'visible';
-    this.coachMark.style.opacity = '1';
-    this.coachMark.style.pointerEvents = 'auto';
-    this.coachMark.style.display = 'block';
+    this.coachMark.style.visibility = "visible";
+    this.coachMark.style.opacity = "1";
+    this.coachMark.style.pointerEvents = "auto";
+    this.coachMark.style.display = "block";
 
     // Final verification that coach mark is visible
     const finalRect = this.coachMark.getBoundingClientRect();
@@ -1110,8 +1269,8 @@ class OnboardingTour {
 
     if (!isVisible) {
       logger.warn(
-        'OnboardingTour',
-        'Coach mark may not be fully visible, adjusting',
+        "OnboardingTour",
+        "Coach mark may not be fully visible, adjusting",
         {
           stepId: step?.id,
           finalRect: {
@@ -1121,7 +1280,7 @@ class OnboardingTour {
             h: finalRect.height,
           },
           viewport: { w: viewportWidth, h: viewportHeight },
-        }
+        },
       );
 
       // Emergency fallback: center in viewport
@@ -1130,15 +1289,15 @@ class OnboardingTour {
     }
 
     logger.info(
-      'OnboardingTour',
-      `Coach mark positioned for step ${step?.id || 'unknown'}`,
+      "OnboardingTour",
+      `Coach mark positioned for step ${step?.id || "unknown"}`,
       {
         finalPosition: {
           left: this.coachMark.style.left,
           top: this.coachMark.style.top,
         },
         isVisible,
-      }
+      },
     );
   }
 
@@ -1147,7 +1306,7 @@ class OnboardingTour {
     const step = tutorial.steps[this.currentStep];
 
     if (!step) {
-      logger.error('OnboardingTour', 'No step found', {
+      logger.error("OnboardingTour", "No step found", {
         currentTutorial: this.currentTutorial,
         currentStep: this.currentStep,
         totalSteps: tutorial?.steps?.length,
@@ -1156,14 +1315,14 @@ class OnboardingTour {
     }
 
     logger.info(
-      'OnboardingTour',
+      "OnboardingTour",
       `🚀 Starting step ${this.currentStep + 1}: ${step.id}`,
       {
         currentTutorial: this.currentTutorial,
         currentStep: this.currentStep,
         stepId: step.id,
         totalSteps: tutorial.steps.length,
-      }
+      },
     );
 
     // SIMPLIFIED STEP RENDERING - Removed complex conditions that could cause skipping
@@ -1176,12 +1335,12 @@ class OnboardingTour {
     // If step requires waiting for element to appear, wait for it
     if (step.waitForElement && step.target && !targetElement) {
       logger.info(
-        'OnboardingTour',
+        "OnboardingTour",
         `Waiting for element to appear: ${step.target}`,
         {
           stepId: step.id,
           selector: step.target,
-        }
+        },
       );
 
       // Wait for element to appear with a timeout
@@ -1189,53 +1348,53 @@ class OnboardingTour {
       const maxAttempts = 30; // 3 seconds with 100ms intervals
 
       while (!targetElement && attempts < maxAttempts) {
-        await new Promise(resolve => setTimeout(resolve, this.CHECK_DELAY));
+        await new Promise((resolve) => setTimeout(resolve, this.CHECK_DELAY));
         targetElement = document.querySelector(step.target);
         attempts++;
       }
 
       if (!targetElement) {
         logger.warn(
-          'OnboardingTour',
+          "OnboardingTour",
           `Target element still not found after waiting: ${step.target}`,
           {
             stepId: step.id,
             selector: step.target,
             attemptsUsed: attempts,
-          }
+          },
         );
       } else {
         logger.info(
-          'OnboardingTour',
+          "OnboardingTour",
           `Target element found after ${attempts * 100}ms`,
           {
             stepId: step.id,
             selector: step.target,
-          }
+          },
         );
       }
     }
 
     if (step.target && !targetElement) {
       logger.warn(
-        'OnboardingTour',
+        "OnboardingTour",
         `Target element not found: ${step.target}`,
         {
           stepId: step.id,
           selector: step.target,
-        }
+        },
       );
     }
 
     // Auto-scroll to target if needed and element exists
     if (step.autoScroll && targetElement) {
       // Special handling for step 4 (ethical-question) - scroll within modal
-      if (step.id === 'ethical-question') {
+      if (step.id === "ethical-question") {
         const modalScrolled = this.scrollToElementInModal(targetElement, step);
         if (modalScrolled) {
           // Wait for modal scroll animation
-          await new Promise(resolve =>
-            setTimeout(resolve, this.SCROLL_DURATION)
+          await new Promise((resolve) =>
+            setTimeout(resolve, this.SCROLL_DURATION),
           );
         }
       } else {
@@ -1245,17 +1404,17 @@ class OnboardingTour {
 
         if (!isInViewport) {
           logger.info(
-            'OnboardingTour',
-            `Scrolling to bring target into view for step ${step.id}`
+            "OnboardingTour",
+            `Scrolling to bring target into view for step ${step.id}`,
           );
           targetElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-            inline: 'center',
+            behavior: "smooth",
+            block: "center",
+            inline: "center",
           });
           // Wait for scroll animation
-          await new Promise(resolve =>
-            setTimeout(resolve, this.SCROLL_DURATION)
+          await new Promise((resolve) =>
+            setTimeout(resolve, this.SCROLL_DURATION),
           );
         }
       }
@@ -1265,14 +1424,14 @@ class OnboardingTour {
     if (targetElement) {
       this.positionSpotlight(targetElement);
     } else if (this.spotlight) {
-      this.spotlight.style.display = 'none';
+      this.spotlight.style.display = "none";
     }
 
     // Create coach mark content - with robust null checking
     if (!this.coachMark || !document.body.contains(this.coachMark)) {
       logger.warn(
-        'OnboardingTour',
-        'Coach mark element is null or not in DOM, recreating overlay',
+        "OnboardingTour",
+        "Coach mark element is null or not in DOM, recreating overlay",
         {
           currentTutorial: this.currentTutorial,
           currentStep: this.currentStep,
@@ -1282,14 +1441,14 @@ class OnboardingTour {
           coachMarkInDom: this.coachMark
             ? document.body.contains(this.coachMark)
             : false,
-        }
+        },
       );
       this.createOverlay();
 
       if (!this.coachMark) {
         logger.error(
-          'OnboardingTour',
-          'Failed to create coach mark element, aborting step'
+          "OnboardingTour",
+          "Failed to create coach mark element, aborting step",
         );
         return;
       }
@@ -1298,8 +1457,8 @@ class OnboardingTour {
     // Additional safety check right before setting innerHTML
     if (!this.coachMark) {
       logger.error(
-        'OnboardingTour',
-        'Coach mark is null right before setting innerHTML - this should not happen!'
+        "OnboardingTour",
+        "Coach mark is null right before setting innerHTML - this should not happen!",
       );
       return;
     }
@@ -1307,12 +1466,12 @@ class OnboardingTour {
     // Verify the coach mark is still attached to DOM
     if (!document.body.contains(this.coachMark)) {
       logger.error(
-        'OnboardingTour',
-        'Coach mark exists but is not in DOM - recreating'
+        "OnboardingTour",
+        "Coach mark exists but is not in DOM - recreating",
       );
       this.createOverlay();
       if (!this.coachMark) {
-        logger.error('OnboardingTour', 'Failed to recreate coach mark element');
+        logger.error("OnboardingTour", "Failed to recreate coach mark element");
         return;
       }
     }
@@ -1320,7 +1479,7 @@ class OnboardingTour {
     try {
       this.coachMark.innerHTML = this.createCoachMarkContent(step, tutorial);
     } catch (error) {
-      logger.error('OnboardingTour', 'Error setting coach mark innerHTML', {
+      logger.error("OnboardingTour", "Error setting coach mark innerHTML", {
         error: error.message,
         coachMark: this.coachMark,
         step: step.id,
@@ -1332,62 +1491,62 @@ class OnboardingTour {
     this.positionCoachMark(targetElement, step.position, step);
 
     // Ensure coach mark is visible and interactive
-    this.coachMark.style.display = 'block';
-    this.coachMark.style.visibility = 'visible';
-    this.coachMark.style.opacity = '1';
-    this.coachMark.style.pointerEvents = 'auto';
-    this.coachMark.style.zIndex = '10014';
+    this.coachMark.style.display = "block";
+    this.coachMark.style.visibility = "visible";
+    this.coachMark.style.opacity = "1";
+    this.coachMark.style.pointerEvents = "auto";
+    this.coachMark.style.zIndex = "10014";
 
     // Set up event listeners for buttons
     this.setupEventListeners(step);
 
     // Special handling for specific steps
-    if (step.id === 'dilemma-section') {
+    if (step.id === "dilemma-section") {
       // Set up content observer for step 3 to track typewriter expansion
       this.setupContentObserver(targetElement, step);
     }
 
     // Set up action handling
-    if (step.action === 'wait-for-click' && targetElement) {
+    if (step.action === "wait-for-click" && targetElement) {
       this.waitForElementClick(targetElement, step);
-    } else if (step.action === 'wait-for-option-selection' && targetElement) {
+    } else if (step.action === "wait-for-option-selection" && targetElement) {
       logger.info(
-        'OnboardingTour',
-        `Setting up option selection waiting for step ${step.id}`
+        "OnboardingTour",
+        `Setting up option selection waiting for step ${step.id}`,
       );
       this.waitForOptionSelection(targetElement, step);
     }
 
     // Add click highlighting if needed
     if (step.highlightClick && targetElement) {
-      targetElement.classList.add('onboarding-click-highlight');
+      targetElement.classList.add("onboarding-click-highlight");
     }
 
     // Execute onShow callback if defined
-    if (step.onShow && typeof step.onShow === 'function') {
+    if (step.onShow && typeof step.onShow === "function") {
       try {
         logger.info(
-          'OnboardingTour',
-          `Executing onShow callback for step ${step.id}`
+          "OnboardingTour",
+          `Executing onShow callback for step ${step.id}`,
         );
         step.onShow();
       } catch (error) {
         logger.error(
-          'OnboardingTour',
+          "OnboardingTour",
           `Error executing onShow callback for step ${step.id}`,
           {
             error: error.message,
-          }
+          },
         );
       }
     }
 
-    logger.info('OnboardingTour', `✅ Step ${step.id} rendered successfully`, {
+    logger.info("OnboardingTour", `✅ Step ${step.id} rendered successfully`, {
       hasTarget: !!targetElement,
       targetInViewport: targetElement
         ? this.isElementInViewport(targetElement)
         : false,
-      coachMarkVisible: this.coachMark.style.visibility === 'visible',
+      coachMarkVisible: this.coachMark.style.visibility === "visible",
       coachMarkPosition: {
         left: this.coachMark.style.left,
         top: this.coachMark.style.top,
@@ -1410,9 +1569,9 @@ class OnboardingTour {
               ${tutorial.steps
                 .map(
                   (_, index) =>
-                    `<div class="step-dot ${index === this.currentStep ? 'active' : index < this.currentStep ? 'completed' : ''}"></div>`
+                    `<div class="step-dot ${index === this.currentStep ? "active" : index < this.currentStep ? "completed" : ""}"></div>`,
                 )
-                .join('')}
+                .join("")}
             </div>
             <span class="step-counter">${stepNumber}/${totalSteps}</span>
           </div>
@@ -1437,14 +1596,14 @@ class OnboardingTour {
     if (step.buttons) {
       return step.buttons
         .map(
-          button =>
-            `<button class="coach-mark-btn ${button.primary ? 'primary' : 'secondary'}" 
+          (button) =>
+            `<button class="coach-mark-btn ${button.primary ? "primary" : "secondary"}" 
                  data-action="${button.action}" 
                  type="button">
           ${button.text}
-         </button>`
+         </button>`,
         )
-        .join('');
+        .join("");
     }
 
     // Default buttons for steps without custom buttons
@@ -1456,10 +1615,10 @@ class OnboardingTour {
       this.currentTutorial === Object.keys(this.tutorials).length;
     const hasUserAction =
       step.action &&
-      (step.action === 'wait-for-click' ||
-        step.action === 'wait-for-option-selection');
+      (step.action === "wait-for-click" ||
+        step.action === "wait-for-option-selection");
 
-    logger.debug('OnboardingTour', 'Creating buttons', {
+    logger.debug("OnboardingTour", "Creating buttons", {
       stepId: step.id,
       tutorial: this.currentTutorial,
       step: this.currentStep,
@@ -1470,7 +1629,7 @@ class OnboardingTour {
       stepAction: step.action,
     });
 
-    let buttons = '';
+    let buttons = "";
 
     // Back button (show for all steps except the first step of any tutorial)
     if (!isFirstStep) {
@@ -1493,8 +1652,8 @@ class OnboardingTour {
       }
     }
 
-    logger.debug('OnboardingTour', 'Buttons created', {
-      buttons: buttons.length > 0 ? 'yes' : 'no',
+    logger.debug("OnboardingTour", "Buttons created", {
+      buttons: buttons.length > 0 ? "yes" : "no",
     });
 
     return buttons;
@@ -1503,36 +1662,36 @@ class OnboardingTour {
   setupEventListeners(step) {
     if (!this.coachMark) {
       logger.warn(
-        'OnboardingTour',
-        'No coach mark element found for event listeners'
+        "OnboardingTour",
+        "No coach mark element found for event listeners",
       );
       return;
     }
 
-    logger.debug('OnboardingTour', 'Setting up event listeners for step', {
+    logger.debug("OnboardingTour", "Setting up event listeners for step", {
       stepId: step.id,
-      buttons: this.coachMark.querySelectorAll('.coach-mark-btn').length,
+      buttons: this.coachMark.querySelectorAll(".coach-mark-btn").length,
     });
 
     // IMPROVED: Remove existing event listeners without DOM recreation
     // Store reference to avoid multiple listeners
     if (this.currentClickHandler) {
-      this.coachMark.removeEventListener('click', this.currentClickHandler);
+      this.coachMark.removeEventListener("click", this.currentClickHandler);
     }
     if (this.currentKeyHandler) {
-      this.coachMark.removeEventListener('keydown', this.currentKeyHandler);
+      this.coachMark.removeEventListener("keydown", this.currentKeyHandler);
     }
 
     // Set up click handlers for coach mark buttons
-    this.currentClickHandler = e => {
-      logger.info('OnboardingTour', 'Coach mark clicked', {
+    this.currentClickHandler = (e) => {
+      logger.info("OnboardingTour", "Coach mark clicked", {
         target: e.target.tagName,
         className: e.target.className,
         textContent: e.target.textContent,
         dataset: e.target.dataset,
       });
 
-      if (e.target.classList.contains('coach-mark-btn')) {
+      if (e.target.classList.contains("coach-mark-btn")) {
         const { action } = e.target.dataset;
 
         if (action) {
@@ -1544,58 +1703,58 @@ class OnboardingTour {
           // Additional protection: Check if we're already processing an action
           if (this.isProcessingAction) {
             logger.debug(
-              'OnboardingTour',
-              `Button click ignored - already processing action`
+              "OnboardingTour",
+              `Button click ignored - already processing action`,
             );
             return;
           }
 
           logger.info(
-            'OnboardingTour',
+            "OnboardingTour",
             `Button clicked with action: ${action}`,
             {
               tutorial: this.currentTutorial,
               step: this.currentStep,
               stepId: step.id,
-            }
+            },
           );
 
           this.handleAction(action);
         } else {
-          logger.warn('OnboardingTour', 'Button clicked but no action found', {
+          logger.warn("OnboardingTour", "Button clicked but no action found", {
             target: e.target,
             dataset: e.target.dataset,
           });
         }
       }
 
-      if (e.target.classList.contains('coach-mark-close')) {
+      if (e.target.classList.contains("coach-mark-close")) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        logger.info('OnboardingTour', 'Close button clicked');
+        logger.info("OnboardingTour", "Close button clicked");
         this.endTour();
       }
     };
 
-    this.coachMark.addEventListener('click', this.currentClickHandler);
+    this.coachMark.addEventListener("click", this.currentClickHandler);
 
     // Keyboard navigation
-    this.currentKeyHandler = e => {
-      if (e.key === 'Escape') {
+    this.currentKeyHandler = (e) => {
+      if (e.key === "Escape") {
         this.endTour();
-      } else if (e.key === 'Enter' || e.key === ' ') {
-        if (e.target.classList.contains('coach-mark-btn')) {
+      } else if (e.key === "Enter" || e.key === " ") {
+        if (e.target.classList.contains("coach-mark-btn")) {
           e.preventDefault();
           e.target.click();
         }
       }
     };
 
-    this.coachMark.addEventListener('keydown', this.currentKeyHandler);
+    this.coachMark.addEventListener("keydown", this.currentKeyHandler);
 
     // Focus management - use centralized focus manager for cleaner implementation
-    const firstButton = this.coachMark.querySelector('.coach-mark-btn');
+    const firstButton = this.coachMark.querySelector(".coach-mark-btn");
     if (firstButton) {
       // Auto-focus using focus manager which respects keyboard navigation preferences
       focusManager.autoFocus(this.coachMark, {
@@ -1604,7 +1763,7 @@ class OnboardingTour {
       });
     }
 
-    logger.debug('OnboardingTour', 'Event listeners set up successfully', {
+    logger.debug("OnboardingTour", "Event listeners set up successfully", {
       stepId: step.id,
       hasFirstButton: !!firstButton,
     });
@@ -1612,10 +1771,10 @@ class OnboardingTour {
 
   handleStepAction(step, targetElement) {
     switch (step.action) {
-      case 'wait-for-click':
+      case "wait-for-click":
         this.waitForElementClick(targetElement);
         break;
-      case 'wait-for-option-selection':
+      case "wait-for-option-selection":
         this.waitForOptionSelection();
         break;
     }
@@ -1624,64 +1783,64 @@ class OnboardingTour {
   waitForElementClick(targetElement) {
     if (!targetElement) {
       logger.warn(
-        'OnboardingTour',
-        'waitForElementClick: No target element provided'
+        "OnboardingTour",
+        "waitForElementClick: No target element provided",
       );
       return;
     }
 
-    logger.debug('OnboardingTour', 'Setting up click listener', {
+    logger.debug("OnboardingTour", "Setting up click listener", {
       targetTag: targetElement.tagName,
       targetClass: targetElement.className,
       tutorial: this.currentTutorial,
       step: this.currentStep,
     });
 
-    const clickHandler = event => {
-      logger.info('OnboardingTour', 'Target element clicked, advancing step', {
+    const clickHandler = (event) => {
+      logger.info("OnboardingTour", "Target element clicked, advancing step", {
         tutorial: this.currentTutorial,
         step: this.currentStep,
         eventTarget: event.target.tagName,
       });
-      targetElement.removeEventListener('click', clickHandler);
+      targetElement.removeEventListener("click", clickHandler);
       clearTimeout(timeoutId);
       // Advance immediately when user clicks the suggested element
       setTimeout(() => this.nextStep(), this.ANIMATION_DURATION);
     };
 
-    targetElement.addEventListener('click', clickHandler);
+    targetElement.addEventListener("click", clickHandler);
 
     // Add a timeout fallback - if modal appears but user didn't click, advance anyway
     const timeoutId = setTimeout(() => {
       // Check if the expected modal is now open
       const modalAppeared = document.querySelector(
-        '.pre-launch-modal, .reusable-modal'
+        ".pre-launch-modal, .reusable-modal",
       );
       if (modalAppeared) {
         logger.info(
-          'OnboardingTour',
-          'Modal appeared without tracked click, advancing step',
+          "OnboardingTour",
+          "Modal appeared without tracked click, advancing step",
           {
             tutorial: this.currentTutorial,
             step: this.currentStep,
-          }
+          },
         );
-        targetElement.removeEventListener('click', clickHandler);
+        targetElement.removeEventListener("click", clickHandler);
         this.nextStep();
       } else {
         logger.warn(
-          'OnboardingTour',
-          'Timeout waiting for click, but no modal appeared',
+          "OnboardingTour",
+          "Timeout waiting for click, but no modal appeared",
           {
             tutorial: this.currentTutorial,
             step: this.currentStep,
-          }
+          },
         );
       }
     }, this.CLICK_TIMEOUT);
 
     // Also log if the target element exists and is visible
-    logger.debug('OnboardingTour', 'Click listener added to target', {
+    logger.debug("OnboardingTour", "Click listener added to target", {
       elementExists: !!targetElement,
       elementVisible: targetElement.offsetParent !== null,
       elementRect: targetElement.getBoundingClientRect(),
@@ -1690,51 +1849,51 @@ class OnboardingTour {
 
   waitForOptionSelection(targetElement, step) {
     logger.info(
-      'OnboardingTour',
+      "OnboardingTour",
       `Waiting for option selection in step ${step.id}`,
       {
         targetSelector: step.target,
-      }
+      },
     );
 
     // Set up a broad click listener that will catch any clicks in the target area
-    const optionClickListener = e => {
+    const optionClickListener = (e) => {
       const clickedElement = e.target;
 
       // Check if this looks like an option click
       const isOption =
-        clickedElement.tagName === 'BUTTON' ||
-        clickedElement.classList.contains('option') ||
-        clickedElement.classList.contains('option-card') ||
-        clickedElement.classList.contains('choice') ||
-        clickedElement.classList.contains('response') ||
-        clickedElement.hasAttribute('data-option') ||
-        clickedElement.hasAttribute('data-option-id') ||
-        clickedElement.hasAttribute('data-choice') ||
+        clickedElement.tagName === "BUTTON" ||
+        clickedElement.classList.contains("option") ||
+        clickedElement.classList.contains("option-card") ||
+        clickedElement.classList.contains("choice") ||
+        clickedElement.classList.contains("response") ||
+        clickedElement.hasAttribute("data-option") ||
+        clickedElement.hasAttribute("data-option-id") ||
+        clickedElement.hasAttribute("data-choice") ||
         clickedElement.closest(
-          '.option, .option-card, .choice, .response-option'
+          ".option, .option-card, .choice, .response-option",
         );
 
       if (isOption) {
         logger.info(
-          'OnboardingTour',
+          "OnboardingTour",
           `✅ Option selection detected in step ${step.id}`,
           {
             clickedElement: clickedElement.tagName,
             clickedClass: clickedElement.className,
             clickedText: clickedElement.textContent.substring(
               0,
-              this.OPTION_TEXT_LENGTH
+              this.OPTION_TEXT_LENGTH,
             ),
-          }
+          },
         );
 
         // Remove the listener
-        targetElement.removeEventListener('click', optionClickListener);
+        targetElement.removeEventListener("click", optionClickListener);
 
         // Mark as selected
-        this.userStates['option-selected'] = true;
-        clickedElement.classList.add('onboarding-selected');
+        this.userStates["option-selected"] = true;
+        clickedElement.classList.add("onboarding-selected");
 
         // Advance to next step
         setTimeout(() => {
@@ -1743,14 +1902,14 @@ class OnboardingTour {
       }
     };
 
-    targetElement.addEventListener('click', optionClickListener);
+    targetElement.addEventListener("click", optionClickListener);
 
     // Also add highlighting to make it clear the area is interactive
-    targetElement.classList.add('onboarding-click-highlight');
+    targetElement.classList.add("onboarding-click-highlight");
 
     logger.debug(
-      'OnboardingTour',
-      `Option selection listener attached for step ${step.id}`
+      "OnboardingTour",
+      `Option selection listener attached for step ${step.id}`,
     );
   }
 
@@ -1759,28 +1918,28 @@ class OnboardingTour {
       let conditionMet = false;
 
       switch (condition) {
-        case 'scenario-modal':
+        case "scenario-modal":
           conditionMet =
-            document.querySelector('.scenario-modal-dialog') !== null;
+            document.querySelector(".scenario-modal-dialog") !== null;
           // Add delay for modal animation to complete
           if (conditionMet) {
             setTimeout(callback, this.ANIMATION_DURATION);
             return;
           }
           break;
-        case 'pre-launch-modal':
-          conditionMet = document.querySelector('.pre-launch-modal') !== null;
+        case "pre-launch-modal":
+          conditionMet = document.querySelector(".pre-launch-modal") !== null;
           // Add delay for modal animation to complete
           if (conditionMet) {
             setTimeout(callback, this.ANIMATION_DURATION);
             return;
           }
           break;
-        case 'option-selected':
-          conditionMet = this.userStates['option-selected'];
+        case "option-selected":
+          conditionMet = this.userStates["option-selected"];
           break;
-        case 'choice-confirmed':
-          conditionMet = this.userStates['choice-confirmed'];
+        case "choice-confirmed":
+          conditionMet = this.userStates["choice-confirmed"];
           break;
         default:
           conditionMet = document.querySelector(condition) !== null;
@@ -1800,36 +1959,36 @@ class OnboardingTour {
     // Prevent rapid-fire clicks with debouncing
     if (this.isProcessingAction) {
       logger.debug(
-        'OnboardingTour',
-        `Action ${action} ignored - already processing another action`
+        "OnboardingTour",
+        `Action ${action} ignored - already processing another action`,
       );
       return;
     }
 
     this.isProcessingAction = true;
 
-    logger.info('OnboardingTour', `Handling action: ${action}`, {
+    logger.info("OnboardingTour", `Handling action: ${action}`, {
       currentTutorial: this.currentTutorial,
       currentStep: this.currentStep,
     });
 
     switch (action) {
-      case 'continue':
+      case "continue":
         this.nextStep();
         // Reset flag after step transition
         setTimeout(() => {
           this.isProcessingAction = false;
         }, this.DEBOUNCE_DURATION);
         break;
-      case 'back':
+      case "back":
         this.previousStep();
         // Reset flag after step transition
         setTimeout(() => {
           this.isProcessingAction = false;
         }, this.DEBOUNCE_DURATION);
         break;
-      case 'next-tutorial':
-        logger.info('OnboardingTour', 'next-tutorial action triggered', {
+      case "next-tutorial":
+        logger.info("OnboardingTour", "next-tutorial action triggered", {
           currentTutorial: this.currentTutorial,
           currentStep: this.currentStep,
           isActive: this.isActive,
@@ -1837,8 +1996,8 @@ class OnboardingTour {
         this.nextTutorial();
         // Flag will be reset in nextTutorial() method itself
         break;
-      case 'finish':
-      case 'skip':
+      case "finish":
+      case "skip":
         this.endTour();
         // Reset flag after tour ends
         setTimeout(() => {
@@ -1846,7 +2005,7 @@ class OnboardingTour {
         }, this.DEBOUNCE_DURATION);
         break;
       default:
-        logger.warn('OnboardingTour', `Unknown action: ${action}`);
+        logger.warn("OnboardingTour", `Unknown action: ${action}`);
         this.isProcessingAction = false;
     }
   }
@@ -1855,8 +2014,8 @@ class OnboardingTour {
     // Prevent race conditions - don't process if already transitioning
     if (this.isTransitioning) {
       logger.debug(
-        'OnboardingTour',
-        'Step transition already in progress, ignoring'
+        "OnboardingTour",
+        "Step transition already in progress, ignoring",
       );
       return;
     }
@@ -1864,13 +2023,13 @@ class OnboardingTour {
     this.isTransitioning = true;
 
     // Remove click highlights
-    document.querySelectorAll('.onboarding-click-highlight').forEach(el => {
-      el.classList.remove('onboarding-click-highlight');
+    document.querySelectorAll(".onboarding-click-highlight").forEach((el) => {
+      el.classList.remove("onboarding-click-highlight");
     });
 
     const tutorial = this.tutorials[this.currentTutorial];
 
-    logger.info('OnboardingTour', `Moving to next step`, {
+    logger.info("OnboardingTour", `Moving to next step`, {
       currentStep: this.currentStep,
       totalSteps: tutorial.steps.length,
       currentStepId: tutorial.steps[this.currentStep]?.id,
@@ -1879,11 +2038,11 @@ class OnboardingTour {
     if (this.currentStep < tutorial.steps.length - 1) {
       this.currentStep++;
       logger.info(
-        'OnboardingTour',
+        "OnboardingTour",
         `Advanced to step ${this.currentStep + 1}`,
         {
           newStepId: tutorial.steps[this.currentStep]?.id,
-        }
+        },
       );
 
       // Small delay to ensure clean transition
@@ -1894,8 +2053,8 @@ class OnboardingTour {
       }, TRANSITION_DELAY);
     } else {
       logger.info(
-        'OnboardingTour',
-        'Tutorial complete, moving to next tutorial'
+        "OnboardingTour",
+        "Tutorial complete, moving to next tutorial",
       );
       this.isTransitioning = false;
       this.nextTutorial();
@@ -1904,8 +2063,8 @@ class OnboardingTour {
 
   previousStep() {
     // Remove click highlights
-    document.querySelectorAll('.onboarding-click-highlight').forEach(el => {
-      el.classList.remove('onboarding-click-highlight');
+    document.querySelectorAll(".onboarding-click-highlight").forEach((el) => {
+      el.classList.remove("onboarding-click-highlight");
     });
 
     // Only go back within the current tutorial
@@ -1924,19 +2083,19 @@ class OnboardingTour {
     const step = tutorial.steps[this.currentStep];
 
     // If going back to a step that waits for user interaction, reset the relevant state
-    if (step && step.action === 'wait-for-option-selection') {
-      this.userStates['option-selected'] = false;
+    if (step && step.action === "wait-for-option-selection") {
+      this.userStates["option-selected"] = false;
     }
   }
 
   nextTutorial() {
     // Track tutorial completion
-    simpleAnalytics.trackEvent('tour_tutorial_completed', {
+    simpleAnalytics.trackEvent("tour_tutorial_completed", {
       tutorial: this.currentTutorial,
     });
 
     const totalTutorials = Object.keys(this.tutorials).length;
-    logger.info('OnboardingTour', `nextTutorial called`, {
+    logger.info("OnboardingTour", `nextTutorial called`, {
       currentTutorial: this.currentTutorial,
       totalTutorials,
       willContinue: this.currentTutorial < totalTutorials,
@@ -1947,25 +2106,25 @@ class OnboardingTour {
       this.currentStep = 0;
       // Reset user states for new tutorial
       this.userStates = {
-        'option-selected': false,
-        'choice-confirmed': false,
-        'modal-opened': false,
+        "option-selected": false,
+        "choice-confirmed": false,
+        "modal-opened": false,
       };
       logger.info(
-        'OnboardingTour',
-        `Starting tutorial ${this.currentTutorial}`
+        "OnboardingTour",
+        `Starting tutorial ${this.currentTutorial}`,
       );
 
       // Special handling for Tutorial 2 - close any open modals and scroll to hero demo
       if (this.currentTutorial === 2) {
         // Check if there's a modal open from Tutorial 1
-        const scenarioModal = document.querySelector('.scenario-modal');
-        const preLaunchModal = document.querySelector('.pre-launch-modal');
+        const scenarioModal = document.querySelector(".scenario-modal");
+        const preLaunchModal = document.querySelector(".pre-launch-modal");
 
         if (scenarioModal || preLaunchModal) {
           logger.info(
-            'OnboardingTour',
-            'Modal detected, closing modal before starting Tutorial 2'
+            "OnboardingTour",
+            "Modal detected, closing modal before starting Tutorial 2",
           );
           this.waitForModalClosure(() => {
             // After modal closes, scroll to hero demo and start tutorial
@@ -1975,7 +2134,7 @@ class OnboardingTour {
           // Close the modal
           if (scenarioModal) {
             const closeBtn = scenarioModal.querySelector(
-              '.modal-close, .close-modal'
+              ".modal-close, .close-modal",
             );
             if (closeBtn) {
               closeBtn.click();
@@ -1983,7 +2142,7 @@ class OnboardingTour {
           }
           if (preLaunchModal) {
             const closeBtn = preLaunchModal.querySelector(
-              '.modal-close, .close-modal'
+              ".modal-close, .close-modal",
             );
             if (closeBtn) {
               closeBtn.click();
@@ -1991,8 +2150,8 @@ class OnboardingTour {
           }
         } else {
           logger.info(
-            'OnboardingTour',
-            'No modal detected, scrolling to hero demo for Tutorial 2'
+            "OnboardingTour",
+            "No modal detected, scrolling to hero demo for Tutorial 2",
           );
           this.scrollToHeroDemoAndStart();
         }
@@ -2000,28 +2159,28 @@ class OnboardingTour {
         // Reset processing flag immediately for Tutorial 2 since async operations will handle the rest
         this.isProcessingAction = false;
         logger.debug(
-          'OnboardingTour',
-          'Processing flag reset for Tutorial 2 transition'
+          "OnboardingTour",
+          "Processing flag reset for Tutorial 2 transition",
         );
       }
       // Special handling for Tutorial 3 - wait for scenario modal to close if one is open
       else if (this.currentTutorial === this.LEARNING_LAB_TUTORIAL) {
         // Check if there's actually a modal open before waiting
-        const scenarioModal = document.querySelector('.scenario-modal');
-        const preLaunchModal = document.querySelector('.pre-launch-modal');
+        const scenarioModal = document.querySelector(".scenario-modal");
+        const preLaunchModal = document.querySelector(".pre-launch-modal");
 
         if (scenarioModal || preLaunchModal) {
           logger.info(
-            'OnboardingTour',
-            'Modal detected, waiting for closure before starting Tutorial 3'
+            "OnboardingTour",
+            "Modal detected, waiting for closure before starting Tutorial 3",
           );
           this.waitForModalClosure(() => {
             this.showStep();
           });
         } else {
           logger.info(
-            'OnboardingTour',
-            'No modal detected, starting Tutorial 3 immediately'
+            "OnboardingTour",
+            "No modal detected, starting Tutorial 3 immediately",
           );
           this.showStep();
         }
@@ -2029,23 +2188,23 @@ class OnboardingTour {
         // Reset processing flag after initiating Tutorial 3
         this.isProcessingAction = false;
         logger.debug(
-          'OnboardingTour',
-          'Processing flag reset for Tutorial 3 transition'
+          "OnboardingTour",
+          "Processing flag reset for Tutorial 3 transition",
         );
       } else {
         this.showStep();
         // Reset processing flag for normal tutorial progression
         this.isProcessingAction = false;
         logger.debug(
-          'OnboardingTour',
-          'Processing flag reset for normal tutorial transition'
+          "OnboardingTour",
+          "Processing flag reset for normal tutorial transition",
         );
       }
     } else {
       this.endTour();
       // Reset processing flag after tour ends
       this.isProcessingAction = false;
-      logger.debug('OnboardingTour', 'Processing flag reset after tour end');
+      logger.debug("OnboardingTour", "Processing flag reset after tour end");
     }
   }
 
@@ -2057,13 +2216,13 @@ class OnboardingTour {
       this.currentStep = previousTutorial.steps.length - 1;
       // Reset user states for previous tutorial
       this.userStates = {
-        'option-selected': false,
-        'choice-confirmed': false,
-        'modal-opened': false,
+        "option-selected": false,
+        "choice-confirmed": false,
+        "modal-opened": false,
       };
       logger.info(
-        'OnboardingTour',
-        `Going back to tutorial ${this.currentTutorial}`
+        "OnboardingTour",
+        `Going back to tutorial ${this.currentTutorial}`,
       );
       this.showStep();
     }
@@ -2071,22 +2230,22 @@ class OnboardingTour {
 
   endTour() {
     const STACK_TRACE_LINES = 5;
-    logger.info('OnboardingTour', 'Ending tour', {
+    logger.info("OnboardingTour", "Ending tour", {
       currentTutorial: this.currentTutorial,
       currentStep: this.currentStep,
-      stackTrace: new Error().stack.split('\n').slice(1, STACK_TRACE_LINES),
+      stackTrace: new Error().stack.split("\n").slice(1, STACK_TRACE_LINES),
     });
 
     // Remove click highlights
-    document.querySelectorAll('.onboarding-click-highlight').forEach(el => {
-      el.classList.remove('onboarding-click-highlight');
+    document.querySelectorAll(".onboarding-click-highlight").forEach((el) => {
+      el.classList.remove("onboarding-click-highlight");
     });
 
     // Close pre-launch modal if we're finishing Tutorial 3 (Learning Lab)
     if (this.currentTutorial === this.LEARNING_LAB_TUTORIAL) {
       logger.info(
-        'OnboardingTour',
-        'Closing pre-launch modal after Tutorial 3 completion'
+        "OnboardingTour",
+        "Closing pre-launch modal after Tutorial 3 completion",
       );
 
       // Strategy 1: Look specifically for the pre-launch modal's cancel button
@@ -2094,51 +2253,51 @@ class OnboardingTour {
 
       // First try to find a visible pre-launch modal and trigger its cancel button
       const visibleModals = document.querySelectorAll(
-        '.modal-backdrop[style*="flex"], [id^="modal-"][style*="flex"], .modal-backdrop.show, .modal-backdrop.visible'
+        '.modal-backdrop[style*="flex"], [id^="modal-"][style*="flex"], .modal-backdrop.show, .modal-backdrop.visible',
       );
       logger.info(
-        'OnboardingTour',
-        `Found ${visibleModals.length} potentially visible modals`
+        "OnboardingTour",
+        `Found ${visibleModals.length} potentially visible modals`,
       );
 
       for (const modal of visibleModals) {
-        const modalTitle = modal.querySelector('.modal-title');
+        const modalTitle = modal.querySelector(".modal-title");
         const isPreLaunchModal =
-          modalTitle && modalTitle.textContent.includes('Prepare to Explore');
+          modalTitle && modalTitle.textContent.includes("Prepare to Explore");
 
         logger.info(
-          'OnboardingTour',
-          `Checking modal: ${modal.id || 'no-id'}, title: ${modalTitle?.textContent || 'no-title'}, isPreLaunch: ${isPreLaunchModal}`
+          "OnboardingTour",
+          `Checking modal: ${modal.id || "no-id"}, title: ${modalTitle?.textContent || "no-title"}, isPreLaunch: ${isPreLaunchModal}`,
         );
 
         if (isPreLaunchModal) {
           const cancelButton = modal.querySelector(
-            '#cancel-launch, .btn-cancel'
+            "#cancel-launch, .btn-cancel",
           );
           if (cancelButton) {
             logger.info(
-              'OnboardingTour',
-              'Found pre-launch modal, triggering cancel button for proper cleanup'
+              "OnboardingTour",
+              "Found pre-launch modal, triggering cancel button for proper cleanup",
             );
             try {
               cancelButton.click();
               modalClosed = true;
               logger.info(
-                'OnboardingTour',
-                'Successfully triggered cancel button'
+                "OnboardingTour",
+                "Successfully triggered cancel button",
               );
               break;
             } catch (error) {
               logger.error(
-                'OnboardingTour',
-                'Error clicking cancel button:',
-                error
+                "OnboardingTour",
+                "Error clicking cancel button:",
+                error,
               );
             }
           } else {
             logger.warn(
-              'OnboardingTour',
-              'Pre-launch modal found but no cancel button'
+              "OnboardingTour",
+              "Pre-launch modal found but no cancel button",
             );
           }
         }
@@ -2147,51 +2306,51 @@ class OnboardingTour {
       // Strategy 2: If no pre-launch modal found, try any visible cancel button
       if (!modalClosed) {
         logger.info(
-          'OnboardingTour',
-          'No pre-launch modal cancel button found, trying fallback approach'
+          "OnboardingTour",
+          "No pre-launch modal cancel button found, trying fallback approach",
         );
         const cancelButtons = document.querySelectorAll(
-          '#cancel-launch, .btn-cancel'
+          "#cancel-launch, .btn-cancel",
         );
         logger.info(
-          'OnboardingTour',
-          `Found ${cancelButtons.length} cancel buttons in DOM`
+          "OnboardingTour",
+          `Found ${cancelButtons.length} cancel buttons in DOM`,
         );
 
         cancelButtons.forEach((cancelButton, index) => {
           if (cancelButton && !modalClosed) {
             // Check if this button is in a visible modal
             const modal = cancelButton.closest(
-              '.modal-backdrop, [id^="modal-"], #simulation-modal'
+              '.modal-backdrop, [id^="modal-"], #simulation-modal',
             );
             const isVisible =
               modal &&
-              (modal.style.display === 'flex' ||
-                modal.classList.contains('show') ||
-                modal.classList.contains('visible'));
+              (modal.style.display === "flex" ||
+                modal.classList.contains("show") ||
+                modal.classList.contains("visible"));
 
             logger.info(
-              'OnboardingTour',
-              `Cancel button ${index}: modal=${modal?.id || 'no-modal'}, visible=${isVisible}`
+              "OnboardingTour",
+              `Cancel button ${index}: modal=${modal?.id || "no-modal"}, visible=${isVisible}`,
             );
 
             if (isVisible) {
               logger.info(
-                'OnboardingTour',
-                'Triggering fallback cancel button click for modal cleanup'
+                "OnboardingTour",
+                "Triggering fallback cancel button click for modal cleanup",
               );
               try {
                 cancelButton.click();
                 modalClosed = true;
                 logger.info(
-                  'OnboardingTour',
-                  'Successfully triggered fallback cancel button'
+                  "OnboardingTour",
+                  "Successfully triggered fallback cancel button",
                 );
               } catch (error) {
                 logger.error(
-                  'OnboardingTour',
-                  'Error clicking fallback cancel button:',
-                  error
+                  "OnboardingTour",
+                  "Error clicking fallback cancel button:",
+                  error,
                 );
               }
             }
@@ -2202,8 +2361,8 @@ class OnboardingTour {
       // Strategy 3: If no cancel button found, fall back to manual cleanup
       if (!modalClosed) {
         logger.info(
-          'OnboardingTour',
-          'No accessible cancel button found, using manual cleanup'
+          "OnboardingTour",
+          "No accessible cancel button found, using manual cleanup",
         );
 
         // Use the new ModalUtility cleanup methods to handle orphaned modals
@@ -2213,51 +2372,51 @@ class OnboardingTour {
         const preLaunchModalElements =
           document.querySelectorAll('[id^="modal-"]');
 
-        preLaunchModalElements.forEach(modalElement => {
+        preLaunchModalElements.forEach((modalElement) => {
           // Check if this looks like a pre-launch modal by checking content
-          const modalTitle = modalElement.querySelector('.modal-title');
+          const modalTitle = modalElement.querySelector(".modal-title");
           if (
             modalTitle &&
-            modalTitle.textContent.includes('Prepare to Explore')
+            modalTitle.textContent.includes("Prepare to Explore")
           ) {
             // Try to find the close button and click it
             const closeButton = modalElement.querySelector(
-              '[data-modal-close], .modal-close, .close-btn'
+              "[data-modal-close], .modal-close, .close-btn",
             );
             if (closeButton) {
               closeButton.click();
               logger.info(
-                'OnboardingTour',
-                'Closed pre-launch modal via close button after Tutorial 3 completion'
+                "OnboardingTour",
+                "Closed pre-launch modal via close button after Tutorial 3 completion",
               );
             } else {
               // Use ModalUtility to force destroy
               ModalUtility.destroyModalById(modalElement.id);
               logger.info(
-                'OnboardingTour',
-                'Force destroyed pre-launch modal after Tutorial 3 completion'
+                "OnboardingTour",
+                "Force destroyed pre-launch modal after Tutorial 3 completion",
               );
             }
           }
         });
 
         // Also try the legacy selector approach as fallback
-        const preLaunchModal = document.querySelector('.pre-launch-modal');
+        const preLaunchModal = document.querySelector(".pre-launch-modal");
         if (preLaunchModal) {
           const closeButton = preLaunchModal.querySelector(
-            '[data-modal-close], .modal-close, .close-btn'
+            "[data-modal-close], .modal-close, .close-btn",
           );
           if (closeButton) {
             closeButton.click();
             logger.info(
-              'OnboardingTour',
-              'Closed legacy pre-launch modal after Tutorial 3 completion'
+              "OnboardingTour",
+              "Closed legacy pre-launch modal after Tutorial 3 completion",
             );
           } else {
             preLaunchModal.remove();
             logger.info(
-              'OnboardingTour',
-              'Manually removed legacy pre-launch modal after Tutorial 3 completion'
+              "OnboardingTour",
+              "Manually removed legacy pre-launch modal after Tutorial 3 completion",
             );
           }
         }
@@ -2267,17 +2426,17 @@ class OnboardingTour {
       // Add a small delay to ensure all DOM operations are complete
       setTimeout(() => {
         logger.info(
-          'OnboardingTour',
-          'Running final cleanup after tutorial 3 completion'
+          "OnboardingTour",
+          "Running final cleanup after tutorial 3 completion",
         );
 
         // Count modals before cleanup for comparison
         const modalsBefore = document.querySelectorAll(
-          '[id^="modal-"], .modal-backdrop, .modal-dialog, .modal-body, #simulation-modal'
+          '[id^="modal-"], .modal-backdrop, .modal-dialog, .modal-body, #simulation-modal',
         ).length;
         logger.info(
-          'OnboardingTour',
-          `Modal elements before cleanup: ${modalsBefore}`
+          "OnboardingTour",
+          `Modal elements before cleanup: ${modalsBefore}`,
         );
 
         ModalUtility.aggressiveModalCleanup();
@@ -2287,35 +2446,35 @@ class OnboardingTour {
 
         // Count modals after cleanup
         const modalsAfter = document.querySelectorAll(
-          '[id^="modal-"], .modal-backdrop, .modal-dialog, .modal-body, #simulation-modal'
+          '[id^="modal-"], .modal-backdrop, .modal-dialog, .modal-body, #simulation-modal',
         ).length;
         logger.info(
-          'OnboardingTour',
-          `Modal elements after cleanup: ${modalsAfter} (removed ${modalsBefore - modalsAfter})`
+          "OnboardingTour",
+          `Modal elements after cleanup: ${modalsAfter} (removed ${modalsBefore - modalsAfter})`,
         );
 
         if (modalsAfter === 0) {
           logger.info(
-            'OnboardingTour',
-            '✅ All modal elements successfully cleaned up'
+            "OnboardingTour",
+            "✅ All modal elements successfully cleaned up",
           );
         } else {
           logger.warn(
-            'OnboardingTour',
-            `⚠️ ${modalsAfter} modal elements still remain in DOM`
+            "OnboardingTour",
+            `⚠️ ${modalsAfter} modal elements still remain in DOM`,
           );
         }
       }, 100);
     }
 
     // Track completion
-    simpleAnalytics.trackEvent('tour_completed', {
+    simpleAnalytics.trackEvent("tour_completed", {
       tutorial: this.currentTutorial,
       step: this.currentStep,
     });
 
     // Mark as completed
-    simpleStorage.set('tour_completed', true);
+    simpleStorage.set("tour_completed", true);
 
     // Clean up
     this.removeOverlay();
@@ -2326,41 +2485,41 @@ class OnboardingTour {
    * Scroll to hero demo section and start Tutorial 2
    */
   scrollToHeroDemoAndStart() {
-    logger.info('OnboardingTour', 'scrollToHeroDemoAndStart called', {
+    logger.info("OnboardingTour", "scrollToHeroDemoAndStart called", {
       currentTutorial: this.currentTutorial,
       currentStep: this.currentStep,
       isActive: this.isActive,
     });
 
-    const heroChart = document.getElementById('hero-ethics-chart');
+    const heroChart = document.getElementById("hero-ethics-chart");
     if (heroChart) {
       logger.info(
-        'OnboardingTour',
-        'Hero chart found, scrolling to hero demo for Tutorial 2',
+        "OnboardingTour",
+        "Hero chart found, scrolling to hero demo for Tutorial 2",
         {
           heroChartRect: heroChart.getBoundingClientRect(),
-        }
+        },
       );
 
       // Scroll to the hero demo section
       heroChart.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'center',
+        behavior: "smooth",
+        block: "center",
+        inline: "center",
       });
 
       // Wait for scroll animation to complete, then start the tutorial
       setTimeout(() => {
         logger.info(
-          'OnboardingTour',
-          'Scroll animation complete, ensuring overlay exists before showing step',
+          "OnboardingTour",
+          "Scroll animation complete, ensuring overlay exists before showing step",
           {
             currentTutorial: this.currentTutorial,
             currentStep: this.currentStep,
             isActive: this.isActive,
             overlayExists: !!this.overlay,
             coachMarkExists: !!this.coachMark,
-          }
+          },
         );
 
         // Ensure overlay exists before showing step
@@ -2370,8 +2529,8 @@ class OnboardingTour {
           !document.body.contains(this.coachMark)
         ) {
           logger.warn(
-            'OnboardingTour',
-            'Overlay missing before Tutorial 2, recreating'
+            "OnboardingTour",
+            "Overlay missing before Tutorial 2, recreating",
           );
           this.createOverlay();
         }
@@ -2380,8 +2539,8 @@ class OnboardingTour {
       }, this.SCROLL_DURATION);
     } else {
       logger.warn(
-        'OnboardingTour',
-        'Hero chart element not found, starting Tutorial 2 anyway'
+        "OnboardingTour",
+        "Hero chart element not found, starting Tutorial 2 anyway",
       );
 
       // Ensure overlay exists even if hero chart not found
@@ -2391,8 +2550,8 @@ class OnboardingTour {
         !document.body.contains(this.coachMark)
       ) {
         logger.warn(
-          'OnboardingTour',
-          'Overlay missing before Tutorial 2 (no hero chart), recreating'
+          "OnboardingTour",
+          "Overlay missing before Tutorial 2 (no hero chart), recreating",
         );
         this.createOverlay();
       }
@@ -2403,10 +2562,10 @@ class OnboardingTour {
 
   announceStep(step) {
     // Create announcement for screen readers
-    const announcement = document.createElement('div');
-    announcement.setAttribute('aria-live', 'polite');
-    announcement.setAttribute('aria-atomic', 'true');
-    announcement.className = 'sr-only';
+    const announcement = document.createElement("div");
+    announcement.setAttribute("aria-live", "polite");
+    announcement.setAttribute("aria-atomic", "true");
+    announcement.className = "sr-only";
     announcement.textContent = `${step.title}. ${step.content}`;
 
     document.body.appendChild(announcement);
@@ -2418,29 +2577,29 @@ class OnboardingTour {
   }
 
   waitForModalClosure(callback) {
-    logger.info('OnboardingTour', 'Starting to wait for modal closure');
+    logger.info("OnboardingTour", "Starting to wait for modal closure");
 
     const checkModalClosed = () => {
       // Check for scenario modal and pre-launch modal specifically
-      const scenarioModal = document.querySelector('.scenario-modal');
-      const preLaunchModal = document.querySelector('.pre-launch-modal');
+      const scenarioModal = document.querySelector(".scenario-modal");
+      const preLaunchModal = document.querySelector(".pre-launch-modal");
 
       // Also check for any other modals that might be open
       const otherModals = document.querySelectorAll(
-        '.modal, [class*="modal"]:not(.scenario-modal):not(.pre-launch-modal)'
+        '.modal, [class*="modal"]:not(.scenario-modal):not(.pre-launch-modal)',
       );
-      const hasOpenModal = Array.from(otherModals).some(modal => {
+      const hasOpenModal = Array.from(otherModals).some((modal) => {
         const style = getComputedStyle(modal);
         const isVisible =
-          style.display !== 'none' && style.visibility !== 'hidden';
-        logger.debug('OnboardingTour', 'Other modal check', {
+          style.display !== "none" && style.visibility !== "hidden";
+        logger.debug("OnboardingTour", "Other modal check", {
           modal: modal.className,
           isVisible,
         });
         return isVisible;
       });
 
-      logger.info('OnboardingTour', 'Checking modal status', {
+      logger.info("OnboardingTour", "Checking modal status", {
         scenarioModal: !!scenarioModal,
         preLaunchModal: !!preLaunchModal,
         hasOtherOpenModal: hasOpenModal,
@@ -2451,15 +2610,15 @@ class OnboardingTour {
       if (!scenarioModal && !preLaunchModal && !hasOpenModal) {
         // All modals are closed, wait a bit for animations then proceed
         logger.info(
-          'OnboardingTour',
-          'All modals closed, proceeding with step after animation delay'
+          "OnboardingTour",
+          "All modals closed, proceeding with step after animation delay",
         );
         setTimeout(callback, this.ANIMATION_DURATION);
       } else {
         // Modal still exists, check again
         logger.debug(
-          'OnboardingTour',
-          `Modal still open, checking again in ${this.MODAL_CHECK_DELAY}ms`
+          "OnboardingTour",
+          `Modal still open, checking again in ${this.MODAL_CHECK_DELAY}ms`,
         );
         setTimeout(checkModalClosed, this.MODAL_CHECK_DELAY);
       }
@@ -2471,12 +2630,12 @@ class OnboardingTour {
   waitForAccordionOpen(callback) {
     const checkAccordionOpen = () => {
       // Check for the option details that are now visible (not display: none)
-      const optionDetails = document.querySelector('.option-details');
+      const optionDetails = document.querySelector(".option-details");
 
       if (
         optionDetails &&
         optionDetails.offsetHeight > 0 &&
-        getComputedStyle(optionDetails).display !== 'none'
+        getComputedStyle(optionDetails).display !== "none"
       ) {
         // Option details are visible
         callback();
@@ -2520,16 +2679,16 @@ class OnboardingTour {
   }
 
   static resetTour() {
-    simpleStorage.remove('tour_completed');
-    simpleStorage.remove('has_visited');
-    logger.info('OnboardingTour', 'Tour progress reset');
+    simpleStorage.remove("tour_completed");
+    simpleStorage.remove("has_visited");
+    logger.info("OnboardingTour", "Tour progress reset");
   }
 
   /**
    * Debug method to force start tour from step 1
    */
   debugForceStartFromStep1() {
-    logger.warn('OnboardingTour', '🐛 DEBUG: Force starting tour from step 1');
+    logger.warn("OnboardingTour", "🐛 DEBUG: Force starting tour from step 1");
 
     if (this.isActive) {
       this.finishTour();
@@ -2541,9 +2700,9 @@ class OnboardingTour {
 
     // Reset user states
     this.userStates = {
-      'option-selected': false,
-      'choice-confirmed': false,
-      'modal-opened': false,
+      "option-selected": false,
+      "choice-confirmed": false,
+      "modal-opened": false,
     };
 
     this.startTour(1);
@@ -2555,7 +2714,7 @@ class OnboardingTour {
       this.contentObserver.disconnect();
     }
 
-    this.contentObserver = new MutationObserver(mutations => {
+    this.contentObserver = new MutationObserver((mutations) => {
       // Skip updates during transitions to prevent excessive repositioning
       if (this.isTransitioning) {
         return;
@@ -2563,18 +2722,18 @@ class OnboardingTour {
 
       let shouldUpdate = false;
 
-      mutations.forEach(mutation => {
+      mutations.forEach((mutation) => {
         if (
-          mutation.type === 'childList' ||
-          mutation.type === 'characterData'
+          mutation.type === "childList" ||
+          mutation.type === "characterData"
         ) {
           shouldUpdate = true;
         }
         // Also check for attribute changes that might affect size
         if (
-          mutation.type === 'attributes' &&
-          (mutation.attributeName === 'style' ||
-            mutation.attributeName === 'class')
+          mutation.type === "attributes" &&
+          (mutation.attributeName === "style" ||
+            mutation.attributeName === "class")
         ) {
           shouldUpdate = true;
         }
@@ -2586,8 +2745,8 @@ class OnboardingTour {
         this.contentUpdateTimeout = setTimeout(() => {
           if (this.coachMark && targetElement && !this.isTransitioning) {
             logger.debug(
-              'OnboardingTour',
-              `Updating coach mark position due to content change in step ${step.id}`
+              "OnboardingTour",
+              `Updating coach mark position due to content change in step ${step.id}`,
             );
             this.positionCoachMark(targetElement, step.position, step);
             this.positionSpotlight(targetElement);
@@ -2601,24 +2760,24 @@ class OnboardingTour {
       subtree: true,
       characterData: true,
       attributes: true,
-      attributeFilter: ['style', 'class'],
+      attributeFilter: ["style", "class"],
     });
 
     logger.debug(
-      'OnboardingTour',
-      `Content observer set up for step ${step.id}`
+      "OnboardingTour",
+      `Content observer set up for step ${step.id}`,
     );
   }
 
   // Scroll within modal content instead of main page
   scrollToElementInModal(targetElement, step) {
     const modal = targetElement.closest(
-      '.scenario-modal, .scenario-modal-dialog, .modal-dialog'
+      ".scenario-modal, .scenario-modal-dialog, .modal-dialog",
     );
 
     if (modal) {
       const modalBody = modal.querySelector(
-        '.scenario-content, .modal-body, .modal-content'
+        ".scenario-content, .modal-body, .modal-content",
       );
 
       if (modalBody) {
@@ -2632,19 +2791,19 @@ class OnboardingTour {
         const targetScrollTop = Math.max(0, elementTopInModal - 100); // 100px offset from top
 
         logger.info(
-          'OnboardingTour',
+          "OnboardingTour",
           `Scrolling modal to element for step ${step.id}`,
           {
             elementTop: elementRect.top,
             modalTop: modalRect.top,
             currentScroll: currentScrollTop,
             targetScroll: targetScrollTop,
-          }
+          },
         );
 
         modalBody.scrollTo({
           top: targetScrollTop,
-          behavior: 'smooth',
+          behavior: "smooth",
         });
 
         return true;
@@ -2652,6 +2811,941 @@ class OnboardingTour {
     }
 
     return false; // Not in a modal or modal body not found
+  }
+
+  // === ENTERPRISE MONITORING METHODS ===
+
+  /**
+   * Initialize enterprise monitoring infrastructure
+   * @private
+   */
+  _initializeEnterpriseMonitoring() {
+    try {
+      // Set up health check interval
+      this.healthCheckInterval = setInterval(() => {
+        this._performHealthCheck();
+      }, ENTERPRISE_CONSTANTS.HEALTH_CHECK_INTERVAL);
+
+      // Set up telemetry flush interval
+      this.telemetryFlushInterval = setInterval(() => {
+        this._flushTelemetryBatch();
+      }, ENTERPRISE_CONSTANTS.TELEMETRY_FLUSH_INTERVAL);
+
+      // Set up heartbeat interval
+      this.heartbeatInterval = setInterval(() => {
+        this._sendHeartbeat();
+      }, ENTERPRISE_CONSTANTS.HEARTBEAT_INTERVAL);
+
+      // Initialize user engagement tracking
+      this._initializeEngagementTracking();
+
+      logger.info("OnboardingTour", "🏢 Enterprise monitoring initialized", {
+        instanceId: this.instanceId,
+        instanceUuid: this.instanceUuid,
+        healthCheckInterval: ENTERPRISE_CONSTANTS.HEALTH_CHECK_INTERVAL,
+        telemetryFlushInterval: ENTERPRISE_CONSTANTS.TELEMETRY_FLUSH_INTERVAL,
+        heartbeatInterval: ENTERPRISE_CONSTANTS.HEARTBEAT_INTERVAL,
+      });
+    } catch (error) {
+      this._handleError(error, "_initializeEnterpriseMonitoring");
+    }
+  }
+
+  /**
+   * Initialize user engagement tracking
+   * @private
+   */
+  _initializeEngagementTracking() {
+    try {
+      // Track mouse movements
+      document.addEventListener(
+        "mousemove",
+        (event) => this._onMouseMovement(event),
+        { passive: true },
+      );
+
+      // Track clicks
+      document.addEventListener("click", (event) => this._onUserClick(event), {
+        passive: true,
+      });
+
+      // Track scrolling
+      document.addEventListener(
+        "scroll",
+        (event) => this._onUserScroll(event),
+        { passive: true },
+      );
+
+      // Track keystrokes
+      document.addEventListener(
+        "keydown",
+        (event) => this._onUserKeydown(event),
+        { passive: true },
+      );
+
+      // Set up engagement metrics update interval
+      this.engagementTrackingInterval = setInterval(() => {
+        this._updateEngagementMetrics();
+      }, ENTERPRISE_CONSTANTS.ENGAGEMENT_UPDATE_INTERVAL);
+
+      logger.debug("OnboardingTour", "User engagement tracking initialized", {
+        instanceId: this.instanceId,
+      });
+    } catch (error) {
+      this._handleError(error, "_initializeEngagementTracking");
+    }
+  }
+
+  /**
+   * Get device information for analytics
+   * @private
+   * @returns {Object} Device information
+   */
+  _getDeviceInfo() {
+    try {
+      return {
+        userAgent: navigator.userAgent,
+        platform: navigator.platform,
+        language: navigator.language,
+        cookieEnabled: navigator.cookieEnabled,
+        onLine: navigator.onLine,
+        screenResolution: `${screen.width}x${screen.height}`,
+        colorDepth: screen.colorDepth,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        viewportSize: `${window.innerWidth}x${window.innerHeight}`,
+        pixelRatio: window.devicePixelRatio || 1,
+        touchSupport: "ontouchstart" in window || navigator.maxTouchPoints > 0,
+        connectionType: navigator.connection
+          ? navigator.connection.effectiveType
+          : "unknown",
+        memoryInfo: navigator.deviceMemory
+          ? `${navigator.deviceMemory}GB`
+          : "unknown",
+        hardwareConcurrency: navigator.hardwareConcurrency || "unknown",
+        doNotTrack: navigator.doNotTrack === "1",
+        storageQuota: "unknown", // Will be updated asynchronously if possible
+      };
+    } catch (error) {
+      this._handleError(error, "_getDeviceInfo");
+      return {
+        userAgent: "unknown",
+        platform: "unknown",
+        error: error.message,
+      };
+    }
+  }
+
+  /**
+   * Enterprise error handling with circuit breaker pattern
+   * @private
+   * @param {Error} error - The error that occurred
+   * @param {string} context - Context where the error occurred
+   */
+  _handleError(error, context) {
+    try {
+      this.errorCount++;
+      this.lastError = {
+        message: error.message,
+        stack: error.stack,
+        context,
+        timestamp: Date.now(),
+      };
+
+      // Update circuit breaker
+      this.circuitBreaker.failureCount++;
+      this.circuitBreaker.lastFailureTime = Date.now();
+
+      // Log error with appropriate level based on frequency
+      const logLevel =
+        this.errorCount > ENTERPRISE_CONSTANTS.ERROR_THRESHOLD
+          ? "error"
+          : "warn";
+
+      logger[logLevel]("OnboardingTour", `Enterprise error in ${context}`, {
+        instanceId: this.instanceId,
+        instanceUuid: this.instanceUuid,
+        error: error.message,
+        errorCount: this.errorCount,
+        circuitBreakerState: this.circuitBreaker.state,
+        context,
+      });
+
+      // Update performance metrics
+      this.performanceMetrics.errorRate =
+        (this.errorCount /
+          Math.max(1, this.performanceMetrics.tourStartCount || 1)) *
+        100;
+
+      // Circuit breaker logic
+      if (
+        this.circuitBreaker.failureCount >=
+        ENTERPRISE_CONSTANTS.CIRCUIT_BREAKER_THRESHOLD
+      ) {
+        this.circuitBreaker.state = "open";
+        this.circuitBreaker.nextAttemptTime =
+          Date.now() + ENTERPRISE_CONSTANTS.CIRCUIT_BREAKER_TIMEOUT;
+
+        logger.error(
+          "OnboardingTour",
+          "🔴 Circuit breaker opened - entering failsafe mode",
+          {
+            instanceId: this.instanceId,
+            failureCount: this.circuitBreaker.failureCount,
+            threshold: ENTERPRISE_CONSTANTS.CIRCUIT_BREAKER_THRESHOLD,
+          },
+        );
+
+        this._enterFailsafeMode();
+      }
+
+      // Log telemetry for error
+      this._logTelemetry("error_occurred", {
+        error: error.message,
+        context,
+        errorCount: this.errorCount,
+        circuitBreakerState: this.circuitBreaker.state,
+      });
+
+      // Attempt recovery if not in failsafe mode
+      if (this.circuitBreaker.state !== "open") {
+        this._attemptRecovery(context);
+      }
+    } catch (handleError) {
+      // Fallback error handling to prevent infinite loops
+      console.error("OnboardingTour: Error in error handler", handleError);
+    }
+  }
+
+  /**
+   * Record performance metrics for enterprise monitoring
+   * @private
+   * @param {string} operation - Operation being measured
+   * @param {number} duration - Duration in milliseconds
+   */
+  _recordPerformanceMetric(operation, duration) {
+    try {
+      const metrics = this.performanceMetrics;
+
+      switch (operation) {
+        case "constructor":
+          // Constructor timing is recorded but not aggregated
+          break;
+
+        case "tour_start":
+          metrics.tourStartCount++;
+          metrics.lastTourStartTime = Date.now();
+          break;
+
+        case "tour_complete":
+          metrics.tourCompletionCount++;
+          metrics.totalTourTime += duration;
+          metrics.averageTourTime =
+            metrics.totalTourTime / metrics.tourCompletionCount;
+          metrics.completionRate =
+            (metrics.tourCompletionCount /
+              Math.max(1, metrics.tourStartCount)) *
+            100;
+          break;
+
+        case "tour_abandon":
+          metrics.tourAbandonmentCount++;
+          metrics.abandonmentRate =
+            (metrics.tourAbandonmentCount /
+              Math.max(1, metrics.tourStartCount)) *
+            100;
+          break;
+
+        case "step_transition":
+          metrics.stepTransitionCount++;
+          metrics.totalStepTransitionTime += duration;
+          metrics.averageStepTransitionTime =
+            metrics.totalStepTransitionTime / metrics.stepTransitionCount;
+          metrics.lastStepTransitionTime = Date.now();
+          break;
+
+        case "scroll_operation":
+          metrics.scrollOperationCount++;
+          metrics.totalScrollTime += duration;
+          metrics.averageScrollTime =
+            metrics.totalScrollTime / metrics.scrollOperationCount;
+          break;
+
+        case "element_wait":
+          metrics.elementWaitCount++;
+          metrics.totalElementWaitTime += duration;
+          metrics.averageElementWaitTime =
+            metrics.totalElementWaitTime / metrics.elementWaitCount;
+          break;
+
+        case "user_interaction":
+          metrics.userInteractionCount++;
+          metrics.totalUserWaitTime += duration;
+          metrics.averageUserWaitTime =
+            metrics.totalUserWaitTime / metrics.userInteractionCount;
+          break;
+
+        default:
+          logger.debug(
+            "OnboardingTour",
+            `Unknown performance metric operation: ${operation}`,
+          );
+      }
+
+      // Update memory usage if available
+      if (performance.memory) {
+        metrics.memoryUsage =
+          Math.round((performance.memory.usedJSHeapSize / 1024 / 1024) * 100) /
+          100; // MB
+      }
+
+      logger.debug(
+        "OnboardingTour",
+        `Performance metric recorded: ${operation}`,
+        {
+          operation,
+          duration: Math.round(duration * 100) / 100,
+          instanceId: this.instanceId,
+        },
+      );
+    } catch (error) {
+      this._handleError(error, "_recordPerformanceMetric");
+    }
+  }
+
+  /**
+   * Log telemetry data for enterprise analytics
+   * @private
+   * @param {string} event - Event name
+   * @param {Object} data - Event data
+   */
+  _logTelemetry(event, data = {}) {
+    try {
+      const telemetryEntry = {
+        timestamp: Date.now(),
+        instanceId: this.instanceId,
+        instanceUuid: this.instanceUuid,
+        event,
+        data: {
+          ...data,
+          currentStep: this.currentStep,
+          currentTutorial: this.currentTutorial,
+          isActive: this.isActive,
+          sessionId: this.userJourney.sessionId,
+        },
+      };
+
+      // Add to buffer
+      this.telemetryBuffer.push(telemetryEntry);
+
+      // Also add to batch for enterprise processing
+      this.telemetryBatch.push(telemetryEntry);
+
+      // Auto-flush if buffer is getting large
+      if (
+        this.telemetryBuffer.length >=
+        ENTERPRISE_CONSTANTS.TELEMETRY_BUFFER_SIZE
+      ) {
+        this._flushTelemetryBatch();
+      }
+
+      logger.debug("OnboardingTour", `Telemetry logged: ${event}`, {
+        event,
+        bufferSize: this.telemetryBuffer.length,
+        batchSize: this.telemetryBatch.length,
+        instanceId: this.instanceId,
+      });
+    } catch (error) {
+      this._handleError(error, "_logTelemetry");
+    }
+  }
+
+  /**
+   * Flush telemetry batch to enterprise systems
+   * @private
+   */
+  _flushTelemetryBatch() {
+    try {
+      if (this.telemetryBatch.length === 0) {
+        return;
+      }
+
+      const batchToFlush = [...this.telemetryBatch];
+      this.telemetryBatch = [];
+      this.lastTelemetryFlush = Date.now();
+
+      // In a real enterprise environment, this would send to your analytics service
+      // For now, we'll use the existing analytics system
+      if (
+        window.simpleAnalytics &&
+        typeof window.simpleAnalytics.trackEvent === "function"
+      ) {
+        batchToFlush.forEach((entry) => {
+          window.simpleAnalytics.trackEvent(`onboarding_${entry.event}`, {
+            instanceId: entry.instanceId,
+            ...entry.data,
+          });
+        });
+      }
+
+      logger.info(
+        "OnboardingTour",
+        `Telemetry batch flushed: ${batchToFlush.length} entries`,
+        {
+          batchSize: batchToFlush.length,
+          instanceId: this.instanceId,
+          lastFlush: this.lastTelemetryFlush,
+        },
+      );
+    } catch (error) {
+      this._handleError(error, "_flushTelemetryBatch");
+    }
+  }
+
+  /**
+   * Perform health check for enterprise monitoring
+   * @private
+   */
+  _performHealthCheck() {
+    try {
+      const now = Date.now();
+      const uptime = now - this.createdAt;
+      const timeSinceLastError = this.lastError
+        ? now - this.lastError.timestamp
+        : uptime;
+
+      // Health score calculation (0-100)
+      let healthScore = 100;
+
+      // Reduce score based on error rate
+      if (this.performanceMetrics.errorRate > 0) {
+        healthScore -= Math.min(50, this.performanceMetrics.errorRate * 10);
+      }
+
+      // Reduce score based on memory usage if available
+      if (this.performanceMetrics.memoryUsage > 100) {
+        // MB
+        healthScore -= Math.min(
+          20,
+          (this.performanceMetrics.memoryUsage - 100) / 10,
+        );
+      }
+
+      // Reduce score if circuit breaker is open
+      if (this.circuitBreaker.state === "open") {
+        healthScore -= 30;
+      }
+
+      // Update health status
+      this.isHealthy = healthScore >= ENTERPRISE_CONSTANTS.HEALTH_THRESHOLD;
+      this.lastHealthCheck = now;
+
+      // Log health status
+      const logLevel = this.isHealthy ? "debug" : "warn";
+      logger[logLevel]("OnboardingTour", `Health check completed`, {
+        instanceId: this.instanceId,
+        instanceUuid: this.instanceUuid,
+        healthScore: Math.round(healthScore),
+        isHealthy: this.isHealthy,
+        uptime: Math.round(uptime / 1000), // seconds
+        errorCount: this.errorCount,
+        timeSinceLastError: Math.round(timeSinceLastError / 1000),
+        circuitBreakerState: this.circuitBreaker.state,
+        memoryUsage: this.performanceMetrics.memoryUsage,
+      });
+
+      // Log telemetry
+      this._logTelemetry("health_check", {
+        healthScore: Math.round(healthScore),
+        isHealthy: this.isHealthy,
+        uptime,
+        errorCount: this.errorCount,
+        circuitBreakerState: this.circuitBreaker.state,
+      });
+    } catch (error) {
+      this._handleError(error, "_performHealthCheck");
+    }
+  }
+
+  /**
+   * Send heartbeat for enterprise monitoring
+   * @private
+   */
+  _sendHeartbeat() {
+    try {
+      const heartbeatData = {
+        instanceId: this.instanceId,
+        instanceUuid: this.instanceUuid,
+        timestamp: Date.now(),
+        isActive: this.isActive,
+        isHealthy: this.isHealthy,
+        currentStep: this.currentStep,
+        currentTutorial: this.currentTutorial,
+        uptime: Date.now() - this.createdAt,
+        errorCount: this.errorCount,
+        circuitBreakerState: this.circuitBreaker.state,
+      };
+
+      this._logTelemetry("heartbeat", heartbeatData);
+
+      logger.debug("OnboardingTour", "Heartbeat sent", {
+        instanceId: this.instanceId,
+        isHealthy: this.isHealthy,
+      });
+    } catch (error) {
+      this._handleError(error, "_sendHeartbeat");
+    }
+  }
+
+  /**
+   * Handle mouse movement for engagement tracking
+   * @private
+   * @param {MouseEvent} _event - Mouse event
+   */
+  _onMouseMovement(_event) {
+    if (this.isActive) {
+      this.userJourney.engagement.mouseMovements++;
+    }
+  }
+
+  /**
+   * Handle user clicks for engagement tracking
+   * @private
+   * @param {MouseEvent} event - Click event
+   */
+  _onUserClick(event) {
+    if (this.isActive) {
+      this.userJourney.engagement.clicks++;
+
+      // Track interaction details
+      this.userJourney.interactions.push({
+        type: "click",
+        timestamp: Date.now(),
+        target: event.target.tagName,
+        className: event.target.className,
+        step: this.currentStep,
+        tutorial: this.currentTutorial,
+      });
+    }
+  }
+
+  /**
+   * Handle user scrolling for engagement tracking
+   * @private
+   * @param {Event} _event - Scroll event
+   */
+  _onUserScroll(_event) {
+    if (this.isActive) {
+      this.userJourney.engagement.scrolls++;
+    }
+  }
+
+  /**
+   * Handle user keystrokes for engagement tracking
+   * @private
+   * @param {KeyboardEvent} _event - Keyboard event
+   */
+  _onUserKeydown(_event) {
+    if (this.isActive) {
+      this.userJourney.engagement.keystrokes++;
+    }
+  }
+
+  /**
+   * Update engagement metrics calculations
+   * @private
+   */
+  _updateEngagementMetrics() {
+    try {
+      if (!this.isActive) return;
+
+      const currentStep = `${this.currentTutorial}-${this.currentStep}`;
+      const now = Date.now();
+
+      // Track time on current step
+      if (!this.userJourney.engagement.timeOnStep[currentStep]) {
+        this.userJourney.engagement.timeOnStep[currentStep] = {
+          startTime: now,
+          totalTime: 0,
+          visits: 1,
+        };
+      } else {
+        const stepData = this.userJourney.engagement.timeOnStep[currentStep];
+        stepData.totalTime = now - stepData.startTime;
+      }
+
+      // Check for hesitation points (user staying on step longer than expected)
+      const stepData = this.userJourney.engagement.timeOnStep[currentStep];
+      if (
+        stepData &&
+        stepData.totalTime > ENTERPRISE_CONSTANTS.HESITATION_THRESHOLD
+      ) {
+        const existingHesitation =
+          this.userJourney.engagement.hesitationPoints.find(
+            (h) => h.step === currentStep,
+          );
+
+        if (!existingHesitation) {
+          this.userJourney.engagement.hesitationPoints.push({
+            step: currentStep,
+            timestamp: now,
+            duration: stepData.totalTime,
+            tutorial: this.currentTutorial,
+            stepIndex: this.currentStep,
+          });
+
+          logger.info("OnboardingTour", "Hesitation point detected", {
+            step: currentStep,
+            duration: Math.round(stepData.totalTime / 1000), // seconds
+            instanceId: this.instanceId,
+          });
+
+          this._logTelemetry("hesitation_detected", {
+            step: currentStep,
+            duration: stepData.totalTime,
+            tutorial: this.currentTutorial,
+            stepIndex: this.currentStep,
+          });
+        }
+      }
+    } catch (error) {
+      this._handleError(error, "_updateEngagementMetrics");
+    }
+  }
+
+  /**
+   * Attempt recovery from errors
+   * @private
+   * @param {string} context - Context where recovery is needed
+   */
+  _attemptRecovery(context) {
+    try {
+      this.recoveryAttempts++;
+
+      logger.info("OnboardingTour", `Attempting recovery from ${context}`, {
+        instanceId: this.instanceId,
+        recoveryAttempts: this.recoveryAttempts,
+        context,
+      });
+
+      // Recovery strategies based on context
+      switch (context) {
+        case "constructor":
+          // Reinitialize core properties
+          this.isActive = false;
+          this.currentStep = 0;
+          this.currentTutorial = 1;
+          break;
+
+        case "showStep":
+          // Try to recreate overlay elements
+          this.removeOverlay();
+          setTimeout(() => {
+            if (this.isActive) {
+              this.createOverlay();
+            }
+          }, 1000);
+          break;
+
+        case "_initializeEnterpriseMonitoring":
+          // Clear intervals and reinitialize
+          if (this.healthCheckInterval) clearInterval(this.healthCheckInterval);
+          if (this.telemetryFlushInterval)
+            clearInterval(this.telemetryFlushInterval);
+          if (this.heartbeatInterval) clearInterval(this.heartbeatInterval);
+          if (this.engagementTrackingInterval)
+            clearInterval(this.engagementTrackingInterval);
+
+          setTimeout(() => {
+            this._initializeEnterpriseMonitoring();
+          }, 2000);
+          break;
+
+        case "positionCoachMark":
+          // Reset coach mark positioning
+          if (this.coachMark) {
+            this.coachMark.style.position = "fixed";
+            this.coachMark.style.left = "50%";
+            this.coachMark.style.top = "50%";
+            this.coachMark.style.transform = "translate(-50%, -50%)";
+          }
+          break;
+
+        default:
+          // Generic recovery: reset transition flags
+          this.isTransitioning = false;
+          this.isProcessingAction = false;
+      }
+
+      // Update circuit breaker on successful recovery
+      if (this.recoveryAttempts <= ENTERPRISE_CONSTANTS.MAX_RECOVERY_ATTEMPTS) {
+        this.circuitBreaker.successCount++;
+
+        // Reset circuit breaker if we have enough successes
+        if (this.circuitBreaker.successCount >= 3) {
+          this.circuitBreaker.state = "closed";
+          this.circuitBreaker.failureCount = 0;
+          this.circuitBreaker.successCount = 0;
+
+          logger.info(
+            "OnboardingTour",
+            "Circuit breaker reset after successful recovery",
+            {
+              instanceId: this.instanceId,
+              recoveryAttempts: this.recoveryAttempts,
+            },
+          );
+        }
+      }
+
+      this._logTelemetry("recovery_attempted", {
+        context,
+        recoveryAttempts: this.recoveryAttempts,
+        circuitBreakerState: this.circuitBreaker.state,
+      });
+    } catch (error) {
+      logger.error("OnboardingTour", "Recovery attempt failed", {
+        context,
+        error: error.message,
+        instanceId: this.instanceId,
+      });
+    }
+  }
+
+  /**
+   * Enter failsafe mode when circuit breaker opens
+   * @private
+   */
+  _enterFailsafeMode() {
+    try {
+      logger.warn("OnboardingTour", "🚨 Entering failsafe mode", {
+        instanceId: this.instanceId,
+        errorCount: this.errorCount,
+        failureCount: this.circuitBreaker.failureCount,
+      });
+
+      // Disable active tour
+      this.isActive = false;
+
+      // Clean up UI elements safely
+      try {
+        this.removeOverlay();
+      } catch (cleanupError) {
+        logger.error(
+          "OnboardingTour",
+          "Error during failsafe cleanup",
+          cleanupError,
+        );
+      }
+
+      // Clear all intervals to prevent further errors
+      if (this.healthCheckInterval) {
+        clearInterval(this.healthCheckInterval);
+        this.healthCheckInterval = null;
+      }
+      if (this.telemetryFlushInterval) {
+        clearInterval(this.telemetryFlushInterval);
+        this.telemetryFlushInterval = null;
+      }
+      if (this.heartbeatInterval) {
+        clearInterval(this.heartbeatInterval);
+        this.heartbeatInterval = null;
+      }
+      if (this.engagementTrackingInterval) {
+        clearInterval(this.engagementTrackingInterval);
+        this.engagementTrackingInterval = null;
+      }
+
+      // Mark as unhealthy
+      this.isHealthy = false;
+
+      // Final telemetry before going silent
+      this._logTelemetry("failsafe_mode_entered", {
+        errorCount: this.errorCount,
+        failureCount: this.circuitBreaker.failureCount,
+        uptime: Date.now() - this.createdAt,
+      });
+
+      // Flush any remaining telemetry
+      this._flushTelemetryBatch();
+    } catch (error) {
+      // Last resort error handling
+      console.error("OnboardingTour: Critical error in failsafe mode", error);
+    }
+  }
+
+  // === STATIC ENTERPRISE METHODS ===
+
+  /**
+   * Get all OnboardingTour instances for enterprise monitoring
+   * @static
+   * @returns {Set} Set of all OnboardingTour instances
+   */
+  static getAllInstances() {
+    return OnboardingTour._instances || new Set();
+  }
+
+  /**
+   * Generate enterprise health report for all instances
+   * @static
+   * @returns {Object} Comprehensive health report
+   */
+  static getEnterpriseHealthReport() {
+    const instances = OnboardingTour.getAllInstances();
+    const report = {
+      timestamp: Date.now(),
+      totalInstances: instances.size,
+      healthyInstances: 0,
+      unhealthyInstances: 0,
+      activeInstances: 0,
+      totalErrors: 0,
+      averageUptime: 0,
+      circuitBreakerStatus: {
+        closed: 0,
+        open: 0,
+        halfOpen: 0,
+      },
+      performanceMetrics: {
+        totalTourStarts: 0,
+        totalTourCompletions: 0,
+        averageCompletionRate: 0,
+        averageAbandonmentRate: 0,
+        totalEngagementPoints: 0,
+      },
+      memoryUsage: {
+        total: 0,
+        average: 0,
+        peak: 0,
+      },
+      instances: [],
+    };
+
+    let totalUptime = 0;
+    let totalCompletionRates = 0;
+    let totalAbandonmentRates = 0;
+    let validMetricsCount = 0;
+
+    instances.forEach((instance) => {
+      try {
+        const instanceReport = {
+          instanceId: instance.instanceId,
+          instanceUuid: instance.instanceUuid,
+          isHealthy: instance.isHealthy,
+          isActive: instance.isActive,
+          errorCount: instance.errorCount,
+          uptime: Date.now() - instance.createdAt,
+          circuitBreakerState: instance.circuitBreaker.state,
+          performanceMetrics: { ...instance.performanceMetrics },
+          lastHealthCheck: instance.lastHealthCheck,
+          recoveryAttempts: instance.recoveryAttempts,
+        };
+
+        report.instances.push(instanceReport);
+
+        // Aggregate data
+        if (instance.isHealthy) report.healthyInstances++;
+        else report.unhealthyInstances++;
+
+        if (instance.isActive) report.activeInstances++;
+
+        report.totalErrors += instance.errorCount;
+        totalUptime += instanceReport.uptime;
+
+        // Circuit breaker status
+        report.circuitBreakerStatus[instance.circuitBreaker.state]++;
+
+        // Performance metrics
+        const metrics = instance.performanceMetrics;
+        report.performanceMetrics.totalTourStarts +=
+          metrics.tourStartCount || 0;
+        report.performanceMetrics.totalTourCompletions +=
+          metrics.tourCompletionCount || 0;
+
+        if (metrics.completionRate >= 0) {
+          totalCompletionRates += metrics.completionRate;
+          validMetricsCount++;
+        }
+
+        if (metrics.abandonmentRate >= 0) {
+          totalAbandonmentRates += metrics.abandonmentRate;
+        }
+
+        // Engagement metrics
+        const engagement = instance.userJourney?.engagement;
+        if (engagement) {
+          report.performanceMetrics.totalEngagementPoints +=
+            (engagement.clicks || 0) +
+            (engagement.scrolls || 0) +
+            (engagement.keystrokes || 0);
+        }
+
+        // Memory usage
+        if (metrics.memoryUsage > 0) {
+          report.memoryUsage.total += metrics.memoryUsage;
+          report.memoryUsage.peak = Math.max(
+            report.memoryUsage.peak,
+            metrics.memoryUsage,
+          );
+        }
+      } catch (error) {
+        logger.error("OnboardingTour", "Error generating instance report", {
+          instanceId: instance.instanceId,
+          error: error.message,
+        });
+      }
+    });
+
+    // Calculate averages
+    if (instances.size > 0) {
+      report.averageUptime = Math.round(totalUptime / instances.size);
+      report.memoryUsage.average =
+        Math.round((report.memoryUsage.total / instances.size) * 100) / 100;
+    }
+
+    if (validMetricsCount > 0) {
+      report.performanceMetrics.averageCompletionRate =
+        Math.round((totalCompletionRates / validMetricsCount) * 100) / 100;
+      report.performanceMetrics.averageAbandonmentRate =
+        Math.round((totalAbandonmentRates / validMetricsCount) * 100) / 100;
+    }
+
+    logger.info("OnboardingTour", "📊 Enterprise health report generated", {
+      totalInstances: report.totalInstances,
+      healthyInstances: report.healthyInstances,
+      activeInstances: report.activeInstances,
+      totalErrors: report.totalErrors,
+    });
+
+    return report;
+  }
+
+  /**
+   * Debug enterprise status for instance
+   * @returns {Object} Debug information
+   */
+  debugEnterpriseStatus() {
+    return {
+      instanceUuid: this.instanceUuid,
+      instanceId: this.instanceId,
+      isHealthy: this.isHealthy,
+      errorCount: this.errorCount,
+      lastError: this.lastError,
+      circuitBreaker: this.circuitBreaker,
+      performanceMetrics: this.performanceMetrics,
+      userJourney: {
+        sessionId: this.userJourney.sessionId,
+        startTime: this.userJourney.startTime,
+        stepCount: this.userJourney.steps.length,
+        interactionCount: this.userJourney.interactions.length,
+        engagement: this.userJourney.engagement,
+      },
+      isActive: this.isActive,
+      currentStep: this.currentStep,
+      currentTutorial: this.currentTutorial,
+      uptime: Date.now() - this.createdAt,
+      telemetryBufferSize: this.telemetryBuffer.length,
+      lastHealthCheck: this.lastHealthCheck,
+      lastTelemetryFlush: this.lastTelemetryFlush,
+    };
   }
 }
 
@@ -2667,19 +3761,19 @@ window.debugStartTour = function () {
     window.onboardingTourInstance.debugForceStartFromStep1();
   } else {
     logger.warn(
-      'OnboardingTour',
-      'No onboarding tour instance available. Please initialize through app.js first.'
+      "OnboardingTour",
+      "No onboarding tour instance available. Please initialize through app.js first.",
     );
     logger.warn(
-      'OnboardingTour',
-      '⚠️ Cannot create OnboardingTour instance directly - must be initialized through app.js to prevent multiple instances'
+      "OnboardingTour",
+      "⚠️ Cannot create OnboardingTour instance directly - must be initialized through app.js to prevent multiple instances",
     );
   }
 };
 
 window.debugShowTourState = function () {
   if (window.onboardingTourInstance) {
-    logger.info('OnboardingTour', 'Tour State:', {
+    logger.info("OnboardingTour", "Tour State:", {
       instanceId: window.onboardingTourInstance.instanceId,
       isActive: window.onboardingTourInstance.isActive,
       currentTutorial: window.onboardingTourInstance.currentTutorial,
@@ -2687,6 +3781,6 @@ window.debugShowTourState = function () {
       userStates: window.onboardingTourInstance.userStates,
     });
   } else {
-    logger.warn('OnboardingTour', 'No onboarding tour instance available');
+    logger.warn("OnboardingTour", "No onboarding tour instance available");
   }
 };

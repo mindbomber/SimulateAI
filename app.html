@@ -22,7 +22,7 @@ limitations under the License.
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
     <meta name="theme-color" content="#1a73e8" />
-    <meta name="color-scheme" content="light" />
+    <meta name="color-scheme" content="light dark" />
     <meta name="page-id" content="home" />
     <title>
       SimulateAI - AI Ethics Education Through Interactive Simulations
@@ -144,8 +144,8 @@ limitations under the License.
     <!-- Immediate scroll reset to prevent page restoration scrolling -->
     <script>
       // Simple scroll restoration prevention
-      if ('scrollRestoration' in history) {
-        history.scrollRestoration = 'manual';
+      if ("scrollRestoration" in history) {
+        history.scrollRestoration = "manual";
       }
 
       // Force scroll to top immediately (synchronous)
@@ -155,9 +155,9 @@ limitations under the License.
     <!-- Inert polyfill for older browsers -->
     <script>
       // Check if inert is supported, if not load polyfill
-      if (!('inert' in HTMLElement.prototype)) {
-        const script = document.createElement('script');
-        script.src = 'https://unpkg.com/wicg-inert@3.1.2/dist/inert.min.js';
+      if (!("inert" in HTMLElement.prototype)) {
+        const script = document.createElement("script");
+        script.src = "https://unpkg.com/wicg-inert@3.1.2/dist/inert.min.js";
         document.head.appendChild(script);
       }
     </script>
@@ -767,46 +767,6 @@ limitations under the License.
         </div>
       </section>
 
-      <!-- Educator Tools Section -->
-      <section class="educator-section" id="educator-tools">
-        <div class="section-header">
-          <h2 class="section-title">Comprehensive Educator Support</h2>
-          <p class="section-description">
-            ISTE-aligned resources and professional development tools for
-            seamless classroom integration
-          </p>
-        </div>
-
-        <div class="educator-grid">
-          <div class="educator-card">
-            <h3>Standards-Aligned Curriculum</h3>
-            <p>
-              Ready-to-use lesson plans aligned with ISTE Standards and
-              educational best practices
-            </p>
-            <button class="btn btn-outline">Download Resources</button>
-          </div>
-
-          <div class="educator-card">
-            <h3>Open-Ended Assessment Tools</h3>
-            <p>
-              Rubrics and reflection frameworks for evaluating critical thinking
-              and ethical reasoning
-            </p>
-            <button class="btn btn-outline">View Assessment Tools</button>
-          </div>
-
-          <div class="educator-card">
-            <h3>Learning Analytics Dashboard</h3>
-            <p>
-              Track student exploration patterns and evidence-based learning
-              outcomes
-            </p>
-            <button class="btn btn-outline">Open Dashboard</button>
-          </div>
-        </div>
-      </section>
-
       <!-- Donor Appreciation Section -->
       <section class="donor-appreciation-section" id="donor-appreciation">
         <div class="section-header">
@@ -816,79 +776,187 @@ limitations under the License.
           </p>
         </div>
 
-        <div class="donor-content">
-          <div class="appreciation-message">
-            <h3>Building the Future Together</h3>
-            <p>
-              Thanks to the generous contributions of our community members, we
-              can continue developing cutting-edge AI ethics simulations and
-              providing them freely to educators, students, and researchers
-              worldwide. Every donation—no matter the size—helps us advance our
-              mission of democratizing ethical AI education.
+        <!-- Donor Wall -->
+        <div class="donor-wall-container">
+          <div class="donor-wall-header">
+            <h3 class="donor-wall-title">Our Amazing Community</h3>
+            <p class="donor-wall-subtitle">
+              Every contribution, big or small, helps us democratize ethical AI
+              education and reach learners worldwide. Meet the incredible people
+              who believe in our mission and make this work possible.
             </p>
-          </div>
 
-          <div class="donor-benefits">
-            <h3>Contributor Benefits</h3>
-            <div class="benefits-grid">
-              <div class="benefit-card">
-                <div class="benefit-icon">✨</div>
-                <h4>Community Recognition</h4>
-                <p>
-                  Special badges and visual flair to show your support for
-                  ethical AI education
-                </p>
-              </div>
-              <div class="benefit-card">
-                <div class="benefit-icon">🔬</div>
-                <h4>Research Access</h4>
-                <p>
-                  Full participation in our ongoing research study on AI ethics
-                  decision-making
-                </p>
-              </div>
-              <div class="benefit-card">
-                <div class="benefit-icon">📚</div>
-                <h4>Early Access</h4>
-                <p>
-                  First look at new simulations and educational resources as
-                  they're developed
-                </p>
-              </div>
-              <div class="benefit-card">
-                <div class="benefit-icon">🤝</div>
-                <h4>Direct Impact</h4>
-                <p>
-                  Help shape the future of AI ethics education and policy
-                  development
-                </p>
-              </div>
+            <!-- Donor Wall Filters -->
+            <div
+              class="donor-wall-filters"
+              role="tablist"
+              aria-label="Donor display filters"
+            >
+              <button
+                class="filter-btn active"
+                data-filter="recent"
+                role="tab"
+                aria-selected="true"
+                aria-controls="donor-carousel"
+              >
+                Most Recent
+              </button>
+              <button
+                class="filter-btn"
+                data-filter="top"
+                role="tab"
+                aria-selected="false"
+                aria-controls="donor-carousel"
+              >
+                Top Contributors
+              </button>
+              <button
+                class="filter-btn"
+                data-filter="messages"
+                role="tab"
+                aria-selected="false"
+                aria-controls="donor-carousel"
+              >
+                With Messages
+              </button>
             </div>
           </div>
 
-          <div class="support-cta">
-            <h3>Join Our Mission</h3>
-            <p>
-              Ready to support ethical AI education? Even a small contribution
-              of $5 demonstrates your commitment to building a more ethical
-              future with artificial intelligence.
-            </p>
-            <div class="cta-buttons">
-              <a href="donate.html" class="btn btn-primary"
-                >💖 Support Our Mission</a
+          <!-- Donor Carousel -->
+          <div
+            class="donor-carousel-container"
+            id="donor-carousel"
+            role="tabpanel"
+          >
+            <div class="donor-carousel">
+              <button
+                class="carousel-nav carousel-prev"
+                aria-label="Previous donors"
+                disabled
               >
-              <a href="about.html" class="btn btn-outline"
-                >Learn More About Us</a
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                </svg>
+              </button>
+
+              <div class="donor-cards-track">
+                <div class="donor-cards-container">
+                  <!-- Donor cards will be dynamically populated here -->
+
+                  <!-- Example donor card structure (will be generated by JS) -->
+                  <div class="donor-card" data-visibility="username">
+                    <div class="donor-avatar">
+                      <img
+                        src="src/assets/avatars/default-avatar.svg"
+                        alt="Donor avatar"
+                      />
+                      <div
+                        class="donor-badge gold-tier"
+                        aria-label="Gold tier contributor"
+                      ></div>
+                    </div>
+                    <div class="donor-info">
+                      <h4 class="donor-name">Alex Chen</h4>
+                      <p class="donor-since">Supporting since Nov 2024</p>
+                      <div class="donor-reflection">
+                        <p>
+                          "Ethical AI education is the foundation of our digital
+                          future."
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Anonymous donor card example -->
+                  <div class="donor-card" data-visibility="anonymous">
+                    <div class="donor-avatar">
+                      <div
+                        class="anonymous-avatar"
+                        aria-label="Anonymous contributor"
+                      ></div>
+                      <div
+                        class="donor-badge silver-tier"
+                        aria-label="Silver tier contributor"
+                      ></div>
+                    </div>
+                    <div class="donor-info">
+                      <h4 class="donor-name">Anonymous Supporter</h4>
+                      <p class="donor-since">Recent contributor</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                class="carousel-nav carousel-next"
+                aria-label="Next donors"
               >
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Carousel Indicators -->
+            <div
+              class="carousel-indicators"
+              role="tablist"
+              aria-label="Donor page indicators"
+            >
+              <button
+                class="indicator active"
+                data-slide="0"
+                role="tab"
+                aria-selected="true"
+                aria-label="Page 1"
+              ></button>
+              <button
+                class="indicator"
+                data-slide="1"
+                role="tab"
+                aria-selected="false"
+                aria-label="Page 2"
+              ></button>
+              <button
+                class="indicator"
+                data-slide="2"
+                role="tab"
+                aria-selected="false"
+                aria-label="Page 3"
+              ></button>
+            </div>
+          </div>
+
+          <!-- Donor Stats Summary -->
+          <div class="donor-stats-summary">
+            <div class="stat-item">
+              <span class="stat-number" data-stat="total-donors">127</span>
+              <span class="stat-label">Contributors</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number" data-stat="this-month">23</span>
+              <span class="stat-label">This Month</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number" data-stat="countries">12</span>
+              <span class="stat-label">Countries</span>
             </div>
           </div>
         </div>
 
-        <!-- Dynamic Donor Recognition - populated by JavaScript -->
-        <div id="donor-recognition-container" class="donor-recognition">
-          <h3>Recent Contributors</h3>
-          <div id="donor-list" class="donor-list">
-            <!-- Populated dynamically with donor information -->
+        <!-- Support CTA -->
+        <div class="support-cta">
+          <h3>Join Our Mission</h3>
+          <p>
+            Ready to support ethical AI education? Even a small contribution of
+            $5 demonstrates your commitment to building a more ethical future
+            with artificial intelligence.
+          </p>
+          <div class="cta-buttons">
+            <a href="donate.html" class="btn btn-primary"
+              >💖 Support Our Mission</a
+            >
+            <a href="about.html" class="btn btn-outline">Learn More About Us</a>
           </div>
         </div>
       </section>
@@ -1048,15 +1116,18 @@ limitations under the License.
     <link rel="stylesheet" href="src/styles/enhanced-donation-widget.css" />
     <link rel="stylesheet" href="src/styles/donor-flair-display.css" />
 
+    <!-- Professional Donor Wall -->
+    <link rel="stylesheet" href="src/styles/donor-wall.css" />
+
     <script type="module">
       // Initialize enhanced donation widget and donor flair after DOM is loaded
-      document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener("DOMContentLoaded", () => {
         if (window.EnhancedDonationWidget) {
-          window.EnhancedDonationWidget.init('homepage-donation-button', {
-            title: '💖 Support SimulateAI Research',
+          window.EnhancedDonationWidget.init("homepage-donation-button", {
+            title: "💖 Support SimulateAI Research",
             subtitle:
-              'Help us continue developing open-source AI ethics education resources',
-            style: 'accordion',
+              "Help us continue developing open-source AI ethics education resources",
+            style: "accordion",
             showBenefits: true,
           });
         }
@@ -1068,50 +1139,53 @@ limitations under the License.
           // Sample donors for demonstration - in production this would come from your backend
           const sampleDonors = [
             {
-              displayName: 'Alex Chen',
-              flair: 'gold',
-              supportSince: '2024-11-01',
+              displayName: "Alex Chen",
+              flair: "gold",
+              supportSince: "2024-11-01",
             },
             {
-              displayName: 'Dr. Sarah Williams',
-              flair: 'silver',
-              supportSince: '2024-12-15',
+              displayName: "Dr. Sarah Williams",
+              flair: "silver",
+              supportSince: "2024-12-15",
             },
             {
-              displayName: 'Mike Rodriguez',
-              flair: 'bronze',
-              supportSince: '2025-01-03',
+              displayName: "Mike Rodriguez",
+              flair: "bronze",
+              supportSince: "2025-01-03",
             },
             {
-              displayName: 'Emma Thompson',
-              flair: 'silver',
-              supportSince: '2024-10-20',
+              displayName: "Emma Thompson",
+              flair: "silver",
+              supportSince: "2024-10-20",
             },
             {
-              displayName: 'David Kim',
-              flair: 'bronze',
-              supportSince: '2025-01-10',
+              displayName: "David Kim",
+              flair: "bronze",
+              supportSince: "2025-01-10",
             },
           ];
 
           flairDisplay.createDonorAppreciationSection(
-            '#donor-appreciation-container',
-            sampleDonors
+            "#donor-appreciation-container",
+            sampleDonors,
           );
         }
       });
     </script>
 
+    <!-- Donation Preferences Component -->
+    <script src="src/js/components/donation-preferences.js"></script>
+
     <!-- Chart.js library for radar charts - UMD version -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     <script>
       // Test Chart.js availability immediately
-      console.log('Chart.js test - window.Chart available:', !!window.Chart);
+      console.log("Chart.js test - window.Chart available:", !!window.Chart);
       if (window.Chart) {
-        console.log('Chart.js version:', window.Chart.version);
-        console.log('Chart.js available methods:', Object.keys(window.Chart));
+        console.log("Chart.js version:", window.Chart.version);
+        console.log("Chart.js available methods:", Object.keys(window.Chart));
       } else {
-        console.error('Chart.js failed to load!');
+        console.error("Chart.js failed to load!");
       }
     </script>
 
@@ -1130,33 +1204,33 @@ limitations under the License.
     <!-- Performance monitoring -->
     <script>
       // Enhanced performance monitoring for our modernized engine
-      if ('performance' in window && 'mark' in performance) {
-        performance.mark('page-start');
+      if ("performance" in window && "mark" in performance) {
+        performance.mark("page-start");
 
-        window.addEventListener('load', () => {
-          performance.mark('page-loaded');
-          performance.measure('page-load-time', 'page-start', 'page-loaded');
+        window.addEventListener("load", () => {
+          performance.mark("page-loaded");
+          performance.measure("page-load-time", "page-start", "page-loaded");
 
           // Report to our analytics system
-          const measure = performance.getEntriesByName('page-load-time')[0];
+          const measure = performance.getEntriesByName("page-load-time")[0];
           if (measure && window.SimpleAnalytics) {
             window.SimpleAnalytics.trackPerformance(
-              'page-load',
-              measure.duration
+              "page-load",
+              measure.duration,
             );
           }
         });
       }
 
       // Enhanced error handling
-      window.addEventListener('error', event => {
+      window.addEventListener("error", (event) => {
         // Log error for debugging (console allowed in HTML for error handling)
         if (window.ErrorBoundary) {
           window.ErrorBoundary.handleError(event.error);
         }
       });
 
-      window.addEventListener('unhandledrejection', event => {
+      window.addEventListener("unhandledrejection", (event) => {
         // Log promise rejection for debugging (console allowed in HTML for error handling)
         if (window.ErrorBoundary) {
           window.ErrorBoundary.handleError(event.reason);
@@ -1193,6 +1267,12 @@ limitations under the License.
     <script
       type="module"
       src="src/js/components/donor-appreciation.js"
+    ></script>
+
+    <!-- Professional Donor Wall Component -->
+    <script
+      type="module"
+      src="src/js/components/professional-donor-wall.js"
     ></script>
 
     <!-- Professional Footer Component -->

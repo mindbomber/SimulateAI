@@ -87,47 +87,246 @@ const APP_CONSTANTS = {
     FOCUS_DELAY: 100,
     NAV_CLOSE_DELAY: 0,
   },
+  ENTERPRISE: {
+    HEALTH_CHECK_INTERVAL: 30000, // 30 seconds
+    PERFORMANCE_MONITORING_INTERVAL: 60000, // 1 minute
+    ERROR_REPORT_BATCH_SIZE: 10,
+    TELEMETRY_BATCH_SIZE: 20,
+    MAX_RETRY_ATTEMPTS: 3,
+    CIRCUIT_BREAKER_THRESHOLD: 5,
+    MEMORY_WARNING_THRESHOLD: 100 * 1024 * 1024, // 100MB
+    PERFORMANCE_WARNING_THRESHOLD: 3000, // 3 seconds
+  },
 };
 
-// Debug utility to replace console statements
+// Enterprise-grade debug and logging utility
 const AppDebug = {
+  logBuffer: [],
+  maxBufferSize: 1000,
+  errorQueue: [],
+  telemetryBatch: [],
+
   log: (message, data = null) => {
     if (window.DEBUG_MODE || localStorage.getItem('debug') === 'true') {
       // eslint-disable-next-line no-console
-
+      console.log(`[App] ${message}`, data || '');
+      AppDebug._bufferLog('log', message, data);
     }
   },
   info: (message, data = null) => {
     if (window.DEBUG_MODE || localStorage.getItem('debug') === 'true') {
       // eslint-disable-next-line no-console
       console.info(`[App] ${message}`, data || '');
+      AppDebug._bufferLog('info', message, data);
     }
   },
   warn: (message, data = null) => {
     if (window.DEBUG_MODE || localStorage.getItem('debug') === 'true') {
       // eslint-disable-next-line no-console
       console.warn(`[App] ${message}`, data || '');
+      AppDebug._bufferLog('warn', message, data);
     }
   },
   error: (message, error = null) => {
     // Always show errors
     // eslint-disable-next-line no-console
     console.error(`[App] ${message}`, error || '');
+    AppDebug._bufferLog('error', message, error);
+    AppDebug._queueError(message, error);
+  },
+
+  // Enterprise logging methods
+  _bufferLog: (level, message, data) => {
+    const logEntry = {
+      timestamp: new Date().toISOString(),
+      level,
+      message,
+      data,
+      sessionId: AppDebug._getSessionId(),
+      userAgent: navigator.userAgent,
+      url: window.location.href,
+    };
+
+    AppDebug.logBuffer.push(logEntry);
+
+    // Maintain buffer size
+    if (AppDebug.logBuffer.length > AppDebug.maxBufferSize) {
+      AppDebug.logBuffer.shift();
+    }
+
+    // Add to telemetry batch for enterprise monitoring
+    AppDebug.telemetryBatch.push(logEntry);
+    if (
+      AppDebug.telemetryBatch.length >=
+      APP_CONSTANTS.ENTERPRISE.TELEMETRY_BATCH_SIZE
+    ) {
+      AppDebug._flushTelemetry();
+    }
+  },
+
+  _queueError: (message, error) => {
+    const errorEntry = {
+      timestamp: new Date().toISOString(),
+      message,
+      error: error
+        ? {
+            message: error.message,
+            stack: error.stack,
+            name: error.name,
+          }
+        : null,
+      sessionId: AppDebug._getSessionId(),
+      userAgent: navigator.userAgent,
+      url: window.location.href,
+      memoryUsage: AppDebug._getMemoryUsage(),
+    };
+
+    AppDebug.errorQueue.push(errorEntry);
+
+    // Batch error reporting
+    if (
+      AppDebug.errorQueue.length >=
+      APP_CONSTANTS.ENTERPRISE.ERROR_REPORT_BATCH_SIZE
+    ) {
+      AppDebug._flushErrors();
+    }
+  },
+
+  _flushTelemetry: () => {
+    if (AppDebug.telemetryBatch.length === 0) return;
+
+    // Send to enterprise monitoring service
+    if (window.enterpriseMonitoring) {
+      window.enterpriseMonitoring.send(
+        'app_telemetry',
+        AppDebug.telemetryBatch
+      );
+    }
+
+    // Store locally as backup
+    try {
+      const existing = JSON.parse(
+        localStorage.getItem('app_telemetry') || '[]'
+      );
+      const combined = [...existing, ...AppDebug.telemetryBatch].slice(-500); // Keep last 500
+      localStorage.setItem('app_telemetry', JSON.stringify(combined));
+    } catch (e) {
+      // Storage error - continue without local backup
+    }
+
+    AppDebug.telemetryBatch = [];
+  },
+
+  _flushErrors: () => {
+    if (AppDebug.errorQueue.length === 0) return;
+
+    // Send to enterprise error tracking
+    if (window.enterpriseErrorTracking) {
+      window.enterpriseErrorTracking.reportBatch(AppDebug.errorQueue);
+    }
+
+    // Store locally as backup
+    try {
+      const existing = JSON.parse(localStorage.getItem('app_errors') || '[]');
+      const combined = [...existing, ...AppDebug.errorQueue].slice(-100); // Keep last 100
+      localStorage.setItem('app_errors', JSON.stringify(combined));
+    } catch (e) {
+      // Storage error - continue without local backup
+    }
+
+    AppDebug.errorQueue = [];
+  },
+
+  _getSessionId: () => {
+    if (!AppDebug.sessionId) {
+      AppDebug.sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+    return AppDebug.sessionId;
+  },
+
+  _getMemoryUsage: () => {
+    if ('memory' in performance) {
+      return {
+        used: performance.memory.usedJSHeapSize,
+        total: performance.memory.totalJSHeapSize,
+        limit: performance.memory.jsHeapSizeLimit,
+      };
+    }
+    return null;
+  },
+
+  // Enterprise diagnostic methods
+  getDiagnostics: () => {
+    return {
+      sessionId: AppDebug._getSessionId(),
+      logBufferSize: AppDebug.logBuffer.length,
+      errorQueueSize: AppDebug.errorQueue.length,
+      telemetryBatchSize: AppDebug.telemetryBatch.length,
+      memoryUsage: AppDebug._getMemoryUsage(),
+      timestamp: new Date().toISOString(),
+    };
+  },
+
+  exportLogs: () => {
+    return {
+      logs: AppDebug.logBuffer,
+      errors: AppDebug.errorQueue,
+      telemetry: AppDebug.telemetryBatch,
+      diagnostics: AppDebug.getDiagnostics(),
+    };
+  },
+
+  clearBuffers: () => {
+    AppDebug.logBuffer = [];
+    AppDebug.errorQueue = [];
+    AppDebug.telemetryBatch = [];
   },
 };
 
 class AIEthicsApp {
   constructor() {
     // Version identifier for debugging
-    this.version = 'v2.0.1-context-fixes';
-    logger.info(`[App] Initializing AIEthicsApp ${this.version}`);
+    this.version = 'v2.1.0-enterprise';
+    this.buildTimestamp = new Date().toISOString();
+    this.sessionId = AppDebug._getSessionId();
 
+    AppDebug.info(
+      `[App] Initializing AIEthicsApp ${this.version} (Build: ${this.buildTimestamp})`
+    );
+
+    // Core application state
     this.currentSimulation = null;
     this.engine = null;
     this.visualEngine = null;
     this.simulations = new Map();
     this.isInitialized = false;
     this.heroDemo = null;
+
+    // Enterprise monitoring and health
+    this.healthStatus = {
+      overall: 'healthy',
+      components: new Map(),
+      lastCheck: null,
+      issues: [],
+    };
+    this.performanceMetrics = {
+      initTime: 0,
+      memoryUsage: 0,
+      errorCount: 0,
+      simulationLoads: 0,
+      averageLoadTime: 0,
+      lastPerformanceCheck: null,
+    };
+    this.circuitBreakers = new Map();
+    this.retryCounters = new Map();
+    this.enterpriseConfig = {
+      monitoringEnabled: true,
+      telemetryEnabled: true,
+      errorReportingEnabled: true,
+      performanceTrackingEnabled: true,
+      healthChecksEnabled: true,
+      circuitBreakerEnabled: true,
+    };
 
     // Modernized managers
     this.accessibilityManager = null;
@@ -165,9 +364,12 @@ class AIEthicsApp {
       largeText: false,
     };
 
-    // Error handling
+    // Enhanced error handling and recovery
     this.errorBoundary = null;
     this.lastError = null;
+    this.errorRecoveryStrategies = new Map();
+    this.criticalErrorCount = 0;
+    this.errorPatterns = new Map();
 
     // Onboarding tour
     this.onboardingTour = null;
@@ -185,6 +387,11 @@ class AIEthicsApp {
 
     // Debouncing for user actions
     this.lastSurpriseTime = 0; // Track last surprise me action for debouncing
+
+    // Enterprise monitoring intervals
+    this.healthCheckInterval = null;
+    this.performanceMonitoringInterval = null;
+    this.telemetryFlushInterval = null;
 
     // Available simulation categories (each containing multiple scenarios)
     // NOTE: These are thematic categories, not individual scenarios
@@ -232,54 +439,407 @@ class AIEthicsApp {
         tags: ['misinformation', 'trust', 'communication', 'verification'],
       },
     ];
+
+    // Initialize enterprise monitoring
+    this._initializeEnterpriseMonitoring();
+  }
+
+  /**
+   * Initialize enterprise-grade monitoring and health systems
+   */
+  _initializeEnterpriseMonitoring() {
+    try {
+      // Set up error recovery strategies
+      this._setupErrorRecoveryStrategies();
+
+      // Initialize circuit breakers for critical components
+      this._initializeCircuitBreakers();
+
+      // Set up performance baseline
+      this._establishPerformanceBaseline();
+
+      AppDebug.info('Enterprise monitoring systems initialized');
+    } catch (error) {
+      AppDebug.error('Failed to initialize enterprise monitoring:', error);
+      // Continue initialization even if monitoring fails
+    }
+  }
+
+  /**
+   * Set up error recovery strategies for different types of failures
+   */
+  _setupErrorRecoveryStrategies() {
+    this.errorRecoveryStrategies.set('simulation_load_failure', {
+      strategy: 'retry_with_fallback',
+      maxRetries: 3,
+      fallbackAction: 'show_basic_simulation',
+      cooldownMs: 5000,
+    });
+
+    this.errorRecoveryStrategies.set('canvas_creation_failure', {
+      strategy: 'html_fallback',
+      maxRetries: 1,
+      fallbackAction: 'use_html_rendering',
+      cooldownMs: 1000,
+    });
+
+    this.errorRecoveryStrategies.set('firebase_connection_failure', {
+      strategy: 'offline_mode',
+      maxRetries: 5,
+      fallbackAction: 'enable_offline_features',
+      cooldownMs: 10000,
+    });
+
+    this.errorRecoveryStrategies.set('memory_exhaustion', {
+      strategy: 'cleanup_and_restart',
+      maxRetries: 1,
+      fallbackAction: 'force_cleanup_heavy_components',
+      cooldownMs: 2000,
+    });
+  }
+
+  /**
+   * Initialize circuit breakers for critical system components
+   */
+  _initializeCircuitBreakers() {
+    const criticalComponents = [
+      'simulation_engine',
+      'canvas_manager',
+      'firebase_service',
+      'analytics_service',
+      'authentication_service',
+    ];
+
+    criticalComponents.forEach(component => {
+      this.circuitBreakers.set(component, {
+        state: 'closed', // closed, open, half-open
+        failureCount: 0,
+        threshold: APP_CONSTANTS.ENTERPRISE.CIRCUIT_BREAKER_THRESHOLD,
+        timeout: 60000, // 1 minute
+        lastFailureTime: null,
+        successCount: 0,
+      });
+    });
+  }
+
+  /**
+   * Establish performance baseline metrics
+   */
+  _establishPerformanceBaseline() {
+    this.performanceMetrics = {
+      initTime: performance.now(),
+      memoryUsage: this._getCurrentMemoryUsage(),
+      errorCount: 0,
+      simulationLoads: 0,
+      averageLoadTime: 0,
+      loadTimes: [],
+      lastPerformanceCheck: Date.now(),
+      criticalMetrics: {
+        timeToInteractive: 0,
+        firstContentfulPaint: 0,
+        largestContentfulPaint: 0,
+        cumulativeLayoutShift: 0,
+      },
+    };
+  }
+
+  /**
+   * Get current memory usage if available
+   */
+  _getCurrentMemoryUsage() {
+    if ('memory' in performance) {
+      return performance.memory.usedJSHeapSize;
+    }
+    return 0;
+  }
+
+  /**
+   * Start enterprise monitoring intervals
+   */
+  _startEnterpriseMonitoring() {
+    if (!this.enterpriseConfig.monitoringEnabled) return;
+
+    // Health check interval
+    if (this.enterpriseConfig.healthChecksEnabled) {
+      this.healthCheckInterval = setInterval(() => {
+        this._performHealthCheck();
+      }, APP_CONSTANTS.ENTERPRISE.HEALTH_CHECK_INTERVAL);
+    }
+
+    // Performance monitoring interval
+    if (this.enterpriseConfig.performanceTrackingEnabled) {
+      this.performanceMonitoringInterval = setInterval(() => {
+        this._performPerformanceCheck();
+      }, APP_CONSTANTS.ENTERPRISE.PERFORMANCE_MONITORING_INTERVAL);
+    }
+
+    // Telemetry flush interval
+    if (this.enterpriseConfig.telemetryEnabled) {
+      this.telemetryFlushInterval = setInterval(() => {
+        AppDebug._flushTelemetry();
+      }, 30000); // Flush every 30 seconds
+    }
+
+    AppDebug.info('Enterprise monitoring intervals started');
+  }
+
+  /**
+   * Perform comprehensive health check
+   */
+  _performHealthCheck() {
+    const healthCheck = {
+      timestamp: new Date().toISOString(),
+      overall: 'healthy',
+      components: {},
+      memory: this._getCurrentMemoryUsage(),
+      errors: AppDebug.errorQueue.length,
+      warnings: [],
+    };
+
+    // Check memory usage
+    const memoryUsage = this._getCurrentMemoryUsage();
+    if (memoryUsage > APP_CONSTANTS.ENTERPRISE.MEMORY_WARNING_THRESHOLD) {
+      healthCheck.warnings.push(
+        `High memory usage: ${(memoryUsage / 1024 / 1024).toFixed(2)}MB`
+      );
+      healthCheck.overall = 'warning';
+    }
+
+    // Check error rate
+    if (this.performanceMetrics.errorCount > 10) {
+      healthCheck.warnings.push(
+        `High error count: ${this.performanceMetrics.errorCount}`
+      );
+      healthCheck.overall = 'warning';
+    }
+
+    // Check circuit breaker states
+    let hasOpenCircuits = false;
+    this.circuitBreakers.forEach((breaker, component) => {
+      healthCheck.components[component] = breaker.state;
+      if (breaker.state === 'open') {
+        hasOpenCircuits = true;
+        healthCheck.warnings.push(`Circuit breaker open for ${component}`);
+      }
+    });
+
+    if (hasOpenCircuits) {
+      healthCheck.overall = 'degraded';
+    }
+
+    // Store health status
+    this.healthStatus = {
+      ...healthCheck,
+      lastCheck: Date.now(),
+      issues: healthCheck.warnings,
+    };
+
+    // Send to enterprise monitoring
+    if (window.enterpriseMonitoring) {
+      window.enterpriseMonitoring.send('health_check', healthCheck);
+    }
+
+    AppDebug.info('Health check completed', {
+      status: healthCheck.overall,
+      warnings: healthCheck.warnings.length,
+    });
+  }
+
+  /**
+   * Perform performance monitoring check
+   */
+  _performPerformanceCheck() {
+    const performanceData = {
+      timestamp: new Date().toISOString(),
+      memory: this._getCurrentMemoryUsage(),
+      timing: this._getPerformanceTimings(),
+      userTiming: this._getUserTimingMetrics(),
+      resourceTiming: this._getResourceTimingMetrics(),
+    };
+
+    // Update performance metrics
+    this.performanceMetrics.lastPerformanceCheck = Date.now();
+    this.performanceMetrics.memoryUsage = performanceData.memory;
+
+    // Check for performance issues
+    const issues = [];
+    if (
+      performanceData.timing.loadTime >
+      APP_CONSTANTS.ENTERPRISE.PERFORMANCE_WARNING_THRESHOLD
+    ) {
+      issues.push(`Slow load time: ${performanceData.timing.loadTime}ms`);
+    }
+
+    if (
+      performanceData.memory > APP_CONSTANTS.ENTERPRISE.MEMORY_WARNING_THRESHOLD
+    ) {
+      issues.push(
+        `High memory usage: ${(performanceData.memory / 1024 / 1024).toFixed(2)}MB`
+      );
+    }
+
+    // Send to enterprise monitoring
+    if (window.enterpriseMonitoring) {
+      window.enterpriseMonitoring.send('performance_metrics', {
+        ...performanceData,
+        issues,
+      });
+    }
+
+    if (issues.length > 0) {
+      AppDebug.warn('Performance issues detected', issues);
+    }
+  }
+
+  /**
+   * Get performance timing metrics
+   */
+  _getPerformanceTimings() {
+    const navigation = performance.getEntriesByType('navigation')[0];
+    if (!navigation) return {};
+
+    return {
+      loadTime: navigation.loadEventEnd - navigation.navigationStart,
+      domContentLoaded:
+        navigation.domContentLoadedEventEnd - navigation.navigationStart,
+      firstPaint: this._getFirstPaint(),
+      firstContentfulPaint: this._getFirstContentfulPaint(),
+    };
+  }
+
+  /**
+   * Get First Paint timing
+   */
+  _getFirstPaint() {
+    const paintEntries = performance.getEntriesByType('paint');
+    const firstPaint = paintEntries.find(entry => entry.name === 'first-paint');
+    return firstPaint ? firstPaint.startTime : 0;
+  }
+
+  /**
+   * Get First Contentful Paint timing
+   */
+  _getFirstContentfulPaint() {
+    const paintEntries = performance.getEntriesByType('paint');
+    const fcp = paintEntries.find(
+      entry => entry.name === 'first-contentful-paint'
+    );
+    return fcp ? fcp.startTime : 0;
+  }
+
+  /**
+   * Get user timing metrics
+   */
+  _getUserTimingMetrics() {
+    const userTimings = performance.getEntriesByType('measure');
+    return userTimings.map(timing => ({
+      name: timing.name,
+      duration: timing.duration,
+      startTime: timing.startTime,
+    }));
+  }
+
+  /**
+   * Get resource timing metrics
+   */
+  _getResourceTimingMetrics() {
+    const resourceEntries = performance.getEntriesByType('resource');
+    return {
+      totalResources: resourceEntries.length,
+      slowResources: resourceEntries.filter(r => r.duration > 1000).length,
+      failedResources: resourceEntries.filter(r => r.responseEnd === 0).length,
+      averageLoadTime:
+        resourceEntries.reduce((sum, r) => sum + r.duration, 0) /
+        resourceEntries.length,
+    };
+  }
+
+  /**
+   * Stop enterprise monitoring intervals
+   */
+  _stopEnterpriseMonitoring() {
+    if (this.healthCheckInterval) {
+      clearInterval(this.healthCheckInterval);
+      this.healthCheckInterval = null;
+    }
+
+    if (this.performanceMonitoringInterval) {
+      clearInterval(this.performanceMonitoringInterval);
+      this.performanceMonitoringInterval = null;
+    }
+
+    if (this.telemetryFlushInterval) {
+      clearInterval(this.telemetryFlushInterval);
+      this.telemetryFlushInterval = null;
+    }
+
+    AppDebug.info('Enterprise monitoring intervals stopped');
   }
   async init() {
     if (this.isInitialized) return;
 
+    const initStartTime = performance.now();
+
     try {
-      AppDebug.log('🚀 Starting AIEthicsApp initialization...');
+      AppDebug.log('🚀 Starting AIEthicsApp enterprise initialization...');
+
+      // Mark initialization start for performance tracking
+      performance.mark('app-init-start');
 
       // Initialize scroll manager first (handles all scroll behavior)
       scrollManager.init();
+      this._updateComponentHealth('scroll_manager', 'healthy');
 
       // Initialize theme detection first
       this.initializeTheme();
+      this._updateComponentHealth('theme_system', 'healthy');
 
       // Initialize error handling
       this.initializeErrorHandling();
+      this._updateComponentHealth('error_handling', 'healthy');
 
       // Initialize infinite loop detection (development mode only)
       this.initializeLoopDetection();
 
-      // Initialize core systems
+      // Initialize core systems with enterprise monitoring
       await this.initializeSystems();
+      this._updateComponentHealth('core_systems', 'healthy');
 
       // Setup UI
       this.setupUI();
+      this._updateComponentHealth('ui_system', 'healthy');
 
       // Load simulations
       await this.loadSimulations();
+      this._updateComponentHealth('simulation_system', 'healthy');
 
       // Setup event listeners
       this.setupEventListeners();
+      this._updateComponentHealth('event_system', 'healthy');
 
       // Initialize accessibility
       this.setupAccessibility();
+      this._updateComponentHealth('accessibility_system', 'healthy');
 
       // Render initial state
       this.render();
+      this._updateComponentHealth('render_system', 'healthy');
 
       // Initialize hero demo
       await this.initializeHeroDemo();
+      this._updateComponentHealth('hero_demo', 'healthy');
 
       // Initialize enhanced objects (after visual engine is set up)
       await this.initializeEnhancedObjects();
+      this._updateComponentHealth('enhanced_objects', 'healthy');
 
       // Initialize modal footer management
       this.initializeModalFooterManager();
+      this._updateComponentHealth('modal_system', 'healthy');
 
       // Initialize ethics radar demo
       await this.initializeEthicsRadarDemo();
+      this._updateComponentHealth('ethics_radar', 'healthy');
 
       // Initialize onboarding tour for first-time users (prevent multiple instances)
       // Only initialize on app page, not on landing page
@@ -298,6 +858,7 @@ class AIEthicsApp {
 
         // Check and start onboarding tour for first-time users
         this.checkAndStartOnboardingTour();
+        this._updateComponentHealth('onboarding_system', 'healthy');
       } else if (!isAppPage) {
         AppDebug.info(
           'Skipping onboarding tour initialization - not on app page'
@@ -310,17 +871,37 @@ class AIEthicsApp {
 
       // Initialize scroll reveal header
       this.initializeScrollRevealHeader();
+      this._updateComponentHealth('scroll_reveal', 'healthy');
 
       // Initialize MCP integrations
       await this.initializeMCPIntegrations();
+      this._updateComponentHealth('mcp_system', 'healthy');
 
       // Initialize Firebase and Authentication
       await this.initializeFirebaseServices();
+      this._updateComponentHealth('firebase_system', 'healthy');
+
+      // Mark initialization end for performance tracking
+      performance.mark('app-init-end');
+      performance.measure(
+        'app-initialization',
+        'app-init-start',
+        'app-init-end'
+      );
+
+      const initTime = performance.now() - initStartTime;
+      this.performanceMetrics.initTime = initTime;
+
+      // Start enterprise monitoring
+      this._startEnterpriseMonitoring();
 
       this.isInitialized = true;
       AppDebug.log(
-        'AI Ethics App initialized successfully with modernized infrastructure'
+        `AI Ethics App initialized successfully with enterprise infrastructure (${initTime.toFixed(2)}ms)`
       );
+
+      // Perform initial health check
+      this._performHealthCheck();
 
       // Track platform initialization for system analytics
       this.systemCollector.updatePlatformMetrics('platform_initialization', {
@@ -332,6 +913,17 @@ class AIEthicsApp {
         accessibilityEnabled:
           this.preferences.highContrast || this.preferences.largeText,
         timestamp: new Date().toISOString(),
+        initTime,
+        version: this.version,
+        sessionId: this.sessionId,
+        enterpriseFeatures: {
+          monitoring: this.enterpriseConfig.monitoringEnabled,
+          telemetry: this.enterpriseConfig.telemetryEnabled,
+          errorReporting: this.enterpriseConfig.errorReportingEnabled,
+          performanceTracking: this.enterpriseConfig.performanceTrackingEnabled,
+          healthChecks: this.enterpriseConfig.healthChecksEnabled,
+          circuitBreaker: this.enterpriseConfig.circuitBreakerEnabled,
+        },
       });
 
       // Track user session start
@@ -344,10 +936,13 @@ class AIEthicsApp {
           referrer: document.referrer,
           userAgent: navigator.userAgent,
           timestamp: new Date().toISOString(),
+          sessionId: this.sessionId,
+          version: this.version,
+          initTime,
         },
       });
 
-      // Track initialization
+      // Track initialization with enhanced analytics
       simpleAnalytics.trackEvent('app_initialized', {
         simulations_available: this.availableSimulations.length,
         browser: Helpers.getBrowserInfo().browser,
@@ -355,19 +950,426 @@ class AIEthicsApp {
         theme: this.currentTheme,
         accessibility_enabled:
           this.preferences.highContrast || this.preferences.largeText,
+        version: this.version,
+        session_id: this.sessionId,
+        init_time: initTime,
+        enterprise_features_enabled: Object.values(
+          this.enterpriseConfig
+        ).filter(Boolean).length,
+        memory_usage: this._getCurrentMemoryUsage(),
+      });
+
+      // Set up enterprise error monitoring
+      window.addEventListener('beforeunload', () => {
+        this._handleApplicationShutdown();
       });
     } catch (error) {
+      this.criticalErrorCount++;
+      this._updateComponentHealth('application_core', 'critical');
+
       AppDebug.error('Failed to initialize app:', error);
-      this.handleError(
+      this.handleEnterpriseError(
         error,
-        'Failed to initialize the application. Please refresh the page.'
+        'Failed to initialize the application. Please refresh the page.',
+        'initialization_failure'
       );
     }
   }
 
   /**
-   * Initialize theme detection and monitoring
+   * Update component health status
    */
+  _updateComponentHealth(component, status) {
+    this.healthStatus.components.set(component, {
+      status,
+      lastUpdate: Date.now(),
+      timestamp: new Date().toISOString(),
+    });
+
+    // Update circuit breaker if it exists
+    if (this.circuitBreakers.has(component)) {
+      const breaker = this.circuitBreakers.get(component);
+      if (status === 'healthy') {
+        breaker.successCount++;
+        if (breaker.state === 'half-open' && breaker.successCount >= 3) {
+          breaker.state = 'closed';
+          breaker.failureCount = 0;
+          AppDebug.info(`Circuit breaker closed for ${component}`);
+        }
+      } else if (status === 'critical') {
+        breaker.failureCount++;
+        breaker.lastFailureTime = Date.now();
+        if (breaker.failureCount >= breaker.threshold) {
+          breaker.state = 'open';
+          AppDebug.warn(`Circuit breaker opened for ${component}`);
+        }
+      }
+    }
+  }
+
+  /**
+   * Handle enterprise-grade error with recovery strategies
+   */
+  handleEnterpriseError(
+    error,
+    userMessage = 'An unexpected error occurred',
+    errorType = 'general'
+  ) {
+    this.lastError = error;
+    this.performanceMetrics.errorCount++;
+
+    AppDebug.error(`Enterprise Error [${errorType}]:`, error);
+
+    // Track error pattern
+    if (!this.errorPatterns.has(errorType)) {
+      this.errorPatterns.set(errorType, { count: 0, lastOccurrence: null });
+    }
+    const pattern = this.errorPatterns.get(errorType);
+    pattern.count++;
+    pattern.lastOccurrence = Date.now();
+
+    // Update circuit breaker for error type
+    this._updateComponentHealth(errorType, 'critical');
+
+    // Check if we have a recovery strategy
+    const recoveryStrategy = this.errorRecoveryStrategies.get(errorType);
+    if (recoveryStrategy) {
+      this._executeRecoveryStrategy(errorType, recoveryStrategy, error);
+    }
+
+    // Safely extract error message
+    let errorMessage = 'Unknown error';
+    if (error && typeof error === 'object') {
+      errorMessage =
+        error.message || error.toString() || 'Error object without message';
+    } else if (typeof error === 'string') {
+      errorMessage = error;
+    } else if (error) {
+      errorMessage = String(error);
+    }
+
+    // Enhanced analytics tracking
+    simpleAnalytics.trackEvent('enterprise_error', {
+      error_type: errorType,
+      error_message: errorMessage,
+      error_stack:
+        error && error.stack ? error.stack : 'No stack trace available',
+      user_agent: navigator.userAgent,
+      timestamp: new Date().toISOString(),
+      session_id: this.sessionId,
+      version: this.version,
+      memory_usage: this._getCurrentMemoryUsage(),
+      component_health: Array.from(
+        this.healthStatus.components.entries()
+      ).reduce((acc, [key, value]) => {
+        acc[key] = value.status;
+        return acc;
+      }, {}),
+      retry_count: this.retryCounters.get(errorType) || 0,
+    });
+
+    // Send to enterprise error tracking
+    if (window.enterpriseErrorTracking) {
+      window.enterpriseErrorTracking.reportError({
+        type: errorType,
+        message: errorMessage,
+        stack: error.stack,
+        timestamp: new Date().toISOString(),
+        sessionId: this.sessionId,
+        version: this.version,
+        userAgent: navigator.userAgent,
+        url: window.location.href,
+        memoryUsage: this._getCurrentMemoryUsage(),
+        componentStates: Object.fromEntries(this.healthStatus.components),
+        recoveryAttempted: !!recoveryStrategy,
+      });
+    }
+
+    // Show error to user with recovery options
+    this.showEnterpriseError(userMessage, errorType, !!recoveryStrategy);
+
+    // Announce error for accessibility
+    if (this.accessibilityManager) {
+      this.accessibilityManager.announce(`Error: ${userMessage}`, 'assertive');
+    }
+  }
+
+  /**
+   * Execute recovery strategy for a specific error type
+   */
+  _executeRecoveryStrategy(errorType, strategy, originalError) {
+    const retryKey = errorType;
+    const currentRetries = this.retryCounters.get(retryKey) || 0;
+
+    if (currentRetries >= strategy.maxRetries) {
+      AppDebug.warn(
+        `Max retries exceeded for ${errorType}, executing fallback`
+      );
+      this._executeFallbackAction(strategy.fallbackAction);
+      return;
+    }
+
+    this.retryCounters.set(retryKey, currentRetries + 1);
+
+    AppDebug.info(
+      `Executing recovery strategy for ${errorType} (attempt ${currentRetries + 1}/${strategy.maxRetries})`
+    );
+
+    setTimeout(() => {
+      switch (strategy.strategy) {
+        case 'retry_with_fallback':
+          this._retryLastOperation(errorType, originalError);
+          break;
+        case 'html_fallback':
+          this._switchToHtmlRendering();
+          break;
+        case 'offline_mode':
+          this._enableOfflineMode();
+          break;
+        case 'cleanup_and_restart':
+          this._performEmergencyCleanup();
+          break;
+        default:
+          AppDebug.warn(`Unknown recovery strategy: ${strategy.strategy}`);
+      }
+    }, strategy.cooldownMs);
+  }
+
+  /**
+   * Execute fallback action when recovery fails
+   */
+  _executeFallbackAction(action) {
+    AppDebug.info(`Executing fallback action: ${action}`);
+
+    switch (action) {
+      case 'show_basic_simulation':
+        this._showBasicSimulationFallback();
+        break;
+      case 'use_html_rendering':
+        this._switchToHtmlRendering();
+        break;
+      case 'enable_offline_features':
+        this._enableOfflineMode();
+        break;
+      case 'force_cleanup_heavy_components':
+        this._performEmergencyCleanup();
+        break;
+      default:
+        AppDebug.warn(`Unknown fallback action: ${action}`);
+        this.showError(
+          'The application encountered an error and is running in degraded mode.'
+        );
+    }
+  }
+
+  /**
+   * Retry the last operation that failed
+   */
+  _retryLastOperation(errorType) {
+    // Implementation depends on the specific error type
+    AppDebug.info(`Retrying operation for error type: ${errorType}`);
+    // This would contain specific retry logic for different operations
+  }
+
+  /**
+   * Switch to HTML-only rendering mode
+   */
+  _switchToHtmlRendering() {
+    AppDebug.info('Switching to HTML-only rendering mode');
+    // Disable canvas-based features and use HTML fallbacks
+    this.visualEngineConfig.renderMode = 'html';
+    this.enterpriseConfig.performanceTrackingEnabled = false; // Reduce overhead
+  }
+
+  /**
+   * Enable offline mode features
+   */
+  _enableOfflineMode() {
+    AppDebug.info('Enabling offline mode');
+    // Disable features that require network connectivity
+    this.enterpriseConfig.telemetryEnabled = false;
+    this.enterpriseConfig.errorReportingEnabled = false;
+    // Show offline indicator to user
+    this.showNotification(
+      'Application is running in offline mode',
+      'info',
+      10000
+    );
+  }
+
+  /**
+   * Perform emergency cleanup of heavy components
+   */
+  _performEmergencyCleanup() {
+    AppDebug.warn('Performing emergency cleanup');
+
+    // Clean up canvases
+    if (this.currentSimulationCanvasId) {
+      canvasManager.removeCanvas(this.currentSimulationCanvasId);
+      this.currentSimulationCanvasId = null;
+    }
+
+    // Clear large data structures
+    this.ethicsMeters.clear();
+    this.interactiveButtons.clear();
+    this.simulationSliders.clear();
+
+    // Force garbage collection if available
+    if (window.gc) {
+      window.gc();
+    }
+
+    // Clear log buffers
+    AppDebug.clearBuffers();
+
+    AppDebug.info('Emergency cleanup completed');
+  }
+
+  /**
+   * Show basic simulation fallback
+   */
+  _showBasicSimulationFallback() {
+    AppDebug.info('Showing basic simulation fallback');
+    // Show a simple text-based version of the simulation
+    if (this.simulationContainer) {
+      this.simulationContainer.innerHTML = `
+        <div class="fallback-simulation">
+          <h3>AI Ethics Explorer - Basic Mode</h3>
+          <p>We're running in a simplified mode due to technical limitations.</p>
+          <p>You can still explore ethical scenarios through this basic interface.</p>
+          <button class="btn btn-primary" onclick="location.reload()">Try Full Version Again</button>
+        </div>
+      `;
+    }
+  }
+
+  /**
+   * Show enterprise error with recovery options
+   */
+  showEnterpriseError(message, errorType, hasRecovery = false) {
+    if (!this.errorBoundary) {
+      // Fallback to notification
+      this.showNotification(message, 'error');
+      return;
+    }
+
+    const errorContent = this.errorBoundary.querySelector('.error-content');
+    if (errorContent) {
+      const messageEl = errorContent.querySelector('.error-message');
+      const retryBtn = errorContent.querySelector('#retry-action');
+      const reportBtn = errorContent.querySelector('#report-error');
+      const fallbackBtn = errorContent.querySelector('#fallback-action');
+
+      if (messageEl) messageEl.textContent = message;
+
+      // Setup retry functionality
+      if (retryBtn && hasRecovery) {
+        retryBtn.style.display = 'inline-block';
+        retryBtn.onclick = () => {
+          this.hideError();
+          // Reset retry counter for this error type
+          this.retryCounters.set(errorType, 0);
+          // Attempt to recover
+          const strategy = this.errorRecoveryStrategies.get(errorType);
+          if (strategy) {
+            this._executeRecoveryStrategy(errorType, strategy, this.lastError);
+          }
+        };
+      } else if (retryBtn) {
+        retryBtn.style.display = 'none';
+      }
+
+      // Setup fallback action
+      if (fallbackBtn) {
+        fallbackBtn.style.display = 'inline-block';
+        fallbackBtn.onclick = () => {
+          this.hideError();
+          const strategy = this.errorRecoveryStrategies.get(errorType);
+          if (strategy) {
+            this._executeFallbackAction(strategy.fallbackAction);
+          }
+        };
+      }
+
+      // Setup error reporting
+      if (reportBtn) {
+        reportBtn.onclick = () => {
+          this.reportEnterpriseError(errorType);
+        };
+      }
+    }
+
+    this.errorBoundary.setAttribute('aria-hidden', 'false');
+    this.errorBoundary.style.display = 'flex';
+  }
+
+  /**
+   * Report error to enterprise systems
+   */
+  reportEnterpriseError(errorType) {
+    if (this.lastError) {
+      const errorReport = {
+        type: errorType,
+        message: this.lastError.message || String(this.lastError),
+        stack: this.lastError.stack,
+        userAgent: navigator.userAgent,
+        url: window.location.href,
+        timestamp: new Date().toISOString(),
+        sessionId: this.sessionId,
+        version: this.version,
+        appState: {
+          initialized: this.isInitialized,
+          currentSimulation: this.currentSimulation?.id,
+          theme: this.currentTheme,
+          memoryUsage: this._getCurrentMemoryUsage(),
+          componentHealth: Object.fromEntries(this.healthStatus.components),
+          circuitBreakerStates: Object.fromEntries(this.circuitBreakers),
+          errorPatterns: Object.fromEntries(this.errorPatterns),
+          performanceMetrics: this.performanceMetrics,
+        },
+      };
+
+      // Send to analytics
+      simpleAnalytics.trackEvent('error_reported', errorReport);
+
+      // Send to enterprise error tracking
+      if (window.enterpriseErrorTracking) {
+        window.enterpriseErrorTracking.reportUserFeedback(errorReport);
+      }
+
+      // Show confirmation
+      this.showNotification(
+        'Error report sent. Thank you for helping us improve the application.',
+        'success'
+      );
+    }
+  }
+
+  /**
+   * Handle application shutdown for cleanup
+   */
+  _handleApplicationShutdown() {
+    AppDebug.info('Application shutting down, performing cleanup');
+
+    // Stop monitoring intervals
+    this._stopEnterpriseMonitoring();
+
+    // Flush remaining telemetry and errors
+    AppDebug._flushTelemetry();
+    AppDebug._flushErrors();
+
+    // Send final health status
+    if (window.enterpriseMonitoring) {
+      window.enterpriseMonitoring.send('app_shutdown', {
+        sessionId: this.sessionId,
+        version: this.version,
+        timestamp: new Date().toISOString(),
+        finalHealthStatus: this.healthStatus,
+        finalPerformanceMetrics: this.performanceMetrics,
+        sessionDuration: Date.now() - this.performanceMetrics.initTime,
+      });
+    }
+  }
   initializeTheme() {
     // Detect system preferences
     const prefersReducedMotion = window.matchMedia?.(
@@ -3222,6 +4224,124 @@ window.addEventListener('error', event => {
 // Initialize the application
 const app = new AIEthicsApp();
 
+// ============================================================================
+// ENTERPRISE STATIC UTILITIES
+// ============================================================================
+
+/**
+ * Get enterprise application health report
+ */
+AIEthicsApp.getEnterpriseHealthReport = function () {
+  const app = window.aiEthicsApp;
+  if (!app) {
+    return { error: 'Application instance not found' };
+  }
+
+  return {
+    timestamp: new Date().toISOString(),
+    version: app.version,
+    sessionId: app.sessionId,
+    overallHealth: app.healthStatus.overall,
+    componentHealth: Object.fromEntries(app.healthStatus.components),
+    performanceMetrics: app.performanceMetrics,
+    circuitBreakerStates: Object.fromEntries(app.circuitBreakers),
+    errorPatterns: Object.fromEntries(app.errorPatterns),
+    memoryUsage: app._getCurrentMemoryUsage(),
+    recommendations: AIEthicsApp._generateHealthRecommendations(app),
+  };
+};
+
+/**
+ * Generate health recommendations based on current state
+ */
+AIEthicsApp._generateHealthRecommendations = function (app) {
+  const recommendations = [];
+
+  // Memory usage recommendations
+  const memoryUsage = app._getCurrentMemoryUsage();
+  if (memoryUsage > APP_CONSTANTS.ENTERPRISE.MEMORY_WARNING_THRESHOLD) {
+    recommendations.push({
+      type: 'memory',
+      severity: 'warning',
+      message: `High memory usage detected (${(memoryUsage / 1024 / 1024).toFixed(2)}MB)`,
+      action: 'Consider refreshing the page or closing unused simulations',
+    });
+  }
+
+  // Error rate recommendations
+  if (app.performanceMetrics.errorCount > 10) {
+    recommendations.push({
+      type: 'errors',
+      severity: 'warning',
+      message: `High error count (${app.performanceMetrics.errorCount})`,
+      action: 'Check console for error details and consider reporting issues',
+    });
+  }
+
+  // Circuit breaker recommendations
+  app.circuitBreakers.forEach((breaker, component) => {
+    if (breaker.state === 'open') {
+      recommendations.push({
+        type: 'circuit_breaker',
+        severity: 'critical',
+        message: `Service degraded: ${component}`,
+        action: 'Some features may be unavailable. Try refreshing the page.',
+      });
+    }
+  });
+
+  // Performance recommendations
+  if (
+    app.performanceMetrics.initTime >
+    APP_CONSTANTS.ENTERPRISE.PERFORMANCE_WARNING_THRESHOLD
+  ) {
+    recommendations.push({
+      type: 'performance',
+      severity: 'info',
+      message: `Slow initialization time (${app.performanceMetrics.initTime.toFixed(2)}ms)`,
+      action: 'Consider checking network connection or browser performance',
+    });
+  }
+
+  return recommendations;
+};
+
+/**
+ * Export enterprise diagnostics for support
+ */
+AIEthicsApp.exportDiagnostics = function () {
+  const app = window.aiEthicsApp;
+  if (!app) {
+    return { error: 'Application instance not found' };
+  }
+
+  return {
+    timestamp: new Date().toISOString(),
+    sessionInfo: {
+      sessionId: app.sessionId,
+      version: app.version,
+      buildTimestamp: app.buildTimestamp,
+      userAgent: navigator.userAgent,
+      url: window.location.href,
+    },
+    healthReport: AIEthicsApp.getEnterpriseHealthReport(),
+    applicationLogs: AppDebug.exportLogs(),
+    performanceData: {
+      navigation: performance.getEntriesByType('navigation'),
+      resources: performance.getEntriesByType('resource'),
+      measures: performance.getEntriesByType('measure'),
+      memory: 'memory' in performance ? performance.memory : null,
+    },
+    componentStates: {
+      initialized: app.isInitialized,
+      currentSimulation: app.currentSimulation?.id || null,
+      theme: app.currentTheme,
+      preferences: app.preferences,
+      enterpriseConfig: app.enterpriseConfig,
+    },
+  };
+};
+
 // Start the app when DOM is loaded
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => app.init());
@@ -3238,6 +4358,14 @@ window.markSomeScenariosCompleted = () => app.markSomeScenariosCompleted();
 window.testSurpriseMe = () => app.launchRandomScenario();
 window.debugShowAllContent = () => app.debugShowAllContent();
 window.debugModalState = () => app.debugModalState();
+
+// Enterprise debugging functions
+window.getEnterpriseHealth = () => AIEthicsApp.getEnterpriseHealthReport();
+window.exportDiagnostics = () => AIEthicsApp.exportDiagnostics();
+window.getAppLogs = () => AppDebug.exportLogs();
+window.getAppDiagnostics = () => AppDebug.getDiagnostics();
+window.flushTelemetry = () => AppDebug._flushTelemetry();
+window.clearAppBuffers = () => AppDebug.clearBuffers();
 
 // Export the class for ES6 modules
 export default AIEthicsApp;

@@ -71,7 +71,7 @@
 }
 
 .badge-shield::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -15px;
   left: -15px;
@@ -412,7 +412,7 @@
 .badge-glow-mythic::before,
 .badge-glow-cosmic::before,
 .badge-glow-divine::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -2px;
   left: -2px;
@@ -639,12 +639,19 @@
   transform: translateY(20px);
   opacity: 0;
   animation: text-slide-up 0.5s ease-out 2.8s forwards;
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
 }
 
 .badge-timestamp {
   transform: translateY(20px);
   opacity: 0;
   animation: text-slide-up 0.5s ease-out 3s forwards;
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 0.9rem;
+  line-height: 1.4;
 }
 
 @keyframes text-slide-up {
@@ -692,7 +699,7 @@
   font-style: italic;
   line-height: 1.6;
   margin: 0 0 1.5rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.9) !important;
   max-width: 400px;
   margin-left: auto;
   margin-right: auto;
@@ -919,7 +926,15 @@
   }
 
   .badge-quote {
-    color: #cccccc;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .badge-reason {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .badge-timestamp {
+    color: rgba(255, 255, 255, 0.9);
   }
 }
 
@@ -997,3 +1012,177 @@
 /* ========================================
    End Bubbling Emoji Background Effect
    ======================================== */
+
+/* ===== DARK MODE SUPPORT ===== */
+body.dark-mode .badge-modal-overlay {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+body.dark-mode .badge-modal {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .badge-modal-header {
+  background: var(--theme-bg-primary);
+  border-bottom: 1px solid var(--theme-border);
+}
+
+body.dark-mode .badge-modal-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .badge-modal-close {
+  color: var(--theme-text-secondary);
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .badge-modal-close:hover {
+  color: var(--theme-text-primary);
+  background: var(--theme-bg-primary);
+  border-color: var(--theme-border-hover);
+}
+
+body.dark-mode .badge-modal-content {
+  background: var(--theme-bg-secondary);
+}
+
+/* Badge display */
+body.dark-mode .badge-display {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .badge-name {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .badge-description {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .badge-tier {
+  color: var(--theme-text-muted);
+}
+
+body.dark-mode .badge-requirements {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .requirement-item {
+  color: var(--theme-text-secondary);
+  border-bottom: 1px solid var(--theme-border);
+}
+
+body.dark-mode .requirement-item.completed {
+  color: var(--color-success);
+}
+
+body.dark-mode .requirement-item.incomplete {
+  color: var(--theme-text-muted);
+}
+
+/* Badge collection grid */
+body.dark-mode .badge-collection {
+  background: var(--theme-bg-primary);
+}
+
+body.dark-mode .badge-item {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .badge-item:hover {
+  border-color: var(--theme-border-hover);
+  box-shadow: 0 4px 12px var(--theme-shadow-hover);
+}
+
+body.dark-mode .badge-item.earned {
+  border-color: var(--color-success);
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+}
+
+body.dark-mode .badge-item.locked {
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+
+/* Badge categories */
+body.dark-mode .badge-category-section {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .badge-category-header {
+  color: var(--theme-text-primary);
+  border-bottom: 1px solid var(--theme-border);
+}
+
+/* Progress indicators */
+body.dark-mode .badge-progress {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .progress-bar {
+  background: var(--theme-bg-secondary);
+}
+
+body.dark-mode .progress-fill {
+  background: var(--color-primary);
+}
+
+body.dark-mode .progress-text {
+  color: var(--theme-text-primary);
+}
+
+/* Filters and controls */
+body.dark-mode .badge-filters {
+  background: var(--theme-bg-primary);
+  border-bottom: 1px solid var(--theme-border);
+}
+
+body.dark-mode .filter-tab {
+  background: var(--theme-bg-secondary);
+  color: var(--theme-text-secondary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .filter-tab.active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+body.dark-mode .filter-tab:hover:not(.active) {
+  background: var(--theme-bg-primary);
+  color: var(--theme-text-primary);
+  border-color: var(--theme-border-hover);
+}
+
+/* Tooltips */
+body.dark-mode .badge-tooltip {
+  background: var(--theme-bg-primary);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--theme-border);
+  box-shadow: 0 4px 12px var(--theme-shadow-hover);
+}
+
+body.dark-mode .badge-tooltip::after {
+  border-top-color: var(--theme-bg-primary);
+}
+
+/* Special effects preserve but adjust backdrop */
+body.dark-mode .particles-container {
+  opacity: 0.7; /* Reduce particle intensity in dark mode */
+}
+
+body.dark-mode .floating-particle {
+  opacity: 0.5; /* Tone down floating particles */
+}
+
+/* Glow effects remain unchanged as they're intentional bright colors */

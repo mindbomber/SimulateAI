@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Badge Modal Text Color Test</title>
+    <link rel="stylesheet" href="./src/styles/badge-modal.css" />
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        margin: 2rem;
+        background: #1a1a1a;
+        color: white;
+      }
+
+      .test-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: #2a2a2a;
+        padding: 2rem;
+        border-radius: 12px;
+      }
+
+      .test-button {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1rem;
+        margin: 1rem;
+      }
+
+      .test-button:hover {
+        background: #2563eb;
+      }
+
+      .mock-badge-modal {
+        background: linear-gradient(
+          135deg,
+          #6366f1 0%,
+          #8b5cf6 50%,
+          #a855f7 100%
+        );
+        border-radius: 20px;
+        padding: 2rem;
+        margin: 2rem 0;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      .color-test {
+        margin: 1rem 0;
+        padding: 1rem;
+        border: 1px solid #444;
+        border-radius: 8px;
+      }
+
+      .expected-color {
+        color: rgba(255, 255, 255, 0.9);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>Badge Modal Text Color Test</h1>
+      <p>
+        This test verifies that badge modal text elements have the correct
+        color: <code>rgba(255, 255, 255, 0.9)</code>
+      </p>
+
+      <div class="mock-badge-modal">
+        <h2 class="badge-title">🏆 Test Badge Achievement</h2>
+
+        <p class="badge-quote">
+          "This is a test quote to verify the quote text color is properly
+          applied and readable."
+        </p>
+
+        <div class="badge-details">
+          <p class="badge-reason">
+            This is the badge reason text. It should be the same color as the
+            quote text for consistency.
+          </p>
+          <p class="badge-timestamp">Earned: Dec 19, 2024, 7:45 PM</p>
+        </div>
+
+        <button class="badge-close-btn">Close Badge</button>
+      </div>
+
+      <div class="color-test">
+        <h3>Color Comparison</h3>
+        <p class="expected-color">Expected color: rgba(255, 255, 255, 0.9)</p>
+        <p class="badge-quote">Badge Quote Test</p>
+        <p class="badge-reason">Badge Reason Test</p>
+        <p class="badge-timestamp">Badge Timestamp Test</p>
+      </div>
+
+      <div class="color-test">
+        <h3>High Contrast Simulation</h3>
+        <p>
+          Use browser dev tools to toggle high contrast mode and verify colors
+          remain readable.
+        </p>
+        <button class="test-button" onclick="toggleHighContrast()">
+          Toggle High Contrast Simulation
+        </button>
+      </div>
+
+      <div class="color-test">
+        <h3>Style Information</h3>
+        <button class="test-button" onclick="checkComputedStyles()">
+          Check Computed Styles
+        </button>
+        <div id="style-output"></div>
+      </div>
+    </div>
+
+    <script>
+      function toggleHighContrast() {
+        const style = document.createElement("style");
+        style.id = "high-contrast-sim";
+        const existingStyle = document.getElementById("high-contrast-sim");
+
+        if (existingStyle) {
+          existingStyle.remove();
+        } else {
+          style.textContent = `
+                    @media (prefers-contrast: high) {
+                        .badge-modal { border: 2px solid #ffffff; background: #000000; }
+                        .badge-title { color: #ffffff; -webkit-text-fill-color: #ffffff; }
+                        .badge-quote { color: rgba(255, 255, 255, 0.9); }
+                        .badge-reason { color: rgba(255, 255, 255, 0.9); }
+                        .badge-timestamp { color: rgba(255, 255, 255, 0.9); }
+                    }
+                `;
+          document.head.appendChild(style);
+
+          // Force high contrast media query for testing
+          document.body.style.filter = "contrast(2)";
+          setTimeout(() => {
+            document.body.style.filter = "";
+          }, 3000);
+        }
+      }
+
+      function checkComputedStyles() {
+        const elements = [
+          { selector: ".badge-quote", name: "Badge Quote" },
+          { selector: ".badge-reason", name: "Badge Reason" },
+          { selector: ".badge-timestamp", name: "Badge Timestamp" },
+        ];
+
+        let output = "<h4>Computed Styles:</h4>";
+
+        elements.forEach(({ selector, name }) => {
+          const element = document.querySelector(selector);
+          if (element) {
+            const computedStyle = window.getComputedStyle(element);
+            const color = computedStyle.color;
+            output += `<p><strong>${name}:</strong> ${color}</p>`;
+          }
+        });
+
+        document.getElementById("style-output").innerHTML = output;
+      }
+
+      // Check styles on page load
+      window.addEventListener("load", checkComputedStyles);
+    </script>
+  </body>
+</html>

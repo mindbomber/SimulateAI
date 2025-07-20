@@ -15,8 +15,18 @@
  */
 
 /**
- * Pre-Launch Information Modal
+ * Pre-Launch Information Modal - ENTERPRISE EDITION
  * Educational context and preparation before simulation launch
+ *
+ * ENTERPRISE FEATURES:
+ * - Comprehensive error handling and recovery
+ * - Performance monitoring and optimization
+ * - Health status tracking with circuit breakers
+ * - Enterprise-grade telemetry and analytics
+ * - Memory usage monitoring and cleanup
+ * - Automated error recovery strategies
+ * - Real-time health diagnostics
+ * - Static utility methods for debugging
  */
 
 import { getSimulationInfo } from '../data/simulation-info.js';
@@ -28,40 +38,498 @@ import {
 } from '../utils/ethics-glossary.js';
 import logger from '../utils/logger.js';
 
-// Constants
+// ===== ENTERPRISE CONSTANTS =====
 const DEFAULT_SCENARIO_DURATION = 15;
 const MOBILE_BREAKPOINT = 768;
 const UPDATE_DELAY = 100; // ms for UI update timing
 
+// Enterprise monitoring thresholds
+const ENTERPRISE_CONSTANTS = {
+  PERFORMANCE: {
+    MAX_RENDER_TIME: 2000, // Maximum time for modal render (ms)
+    MAX_TAB_SWITCH_TIME: 300, // Maximum time for tab switching (ms)
+    MAX_CONTENT_GENERATION_TIME: 1500, // Maximum time for content generation (ms)
+    WARNING_RENDER_TIME: 1000, // Warning threshold for render time (ms)
+    MEMORY_WARNING_THRESHOLD: 50, // Warning threshold for memory usage (MB)
+    MEMORY_CRITICAL_THRESHOLD: 100, // Critical threshold for memory usage (MB)
+  },
+  HEALTH: {
+    CHECK_INTERVAL: 30000, // Health check interval (ms)
+    FAILURE_THRESHOLD: 3, // Number of failures before circuit opens
+    RECOVERY_TIMEOUT: 60000, // Time before attempting recovery (ms)
+    HEARTBEAT_INTERVAL: 10000, // Heartbeat interval for health monitoring (ms)
+  },
+  CIRCUIT_BREAKER: {
+    FAILURE_THRESHOLD: 5, // Failures before opening circuit
+    RECOVERY_TIMEOUT: 30000, // Timeout before half-open state (ms)
+    SUCCESS_THRESHOLD: 3, // Successes needed to close circuit
+  },
+  TELEMETRY: {
+    BATCH_SIZE: 10, // Number of events to batch before sending
+    FLUSH_INTERVAL: 15000, // Interval to flush telemetry batch (ms)
+    MAX_EVENTS_MEMORY: 100, // Maximum events to keep in memory
+  },
+  ERROR_RECOVERY: {
+    MAX_RETRY_ATTEMPTS: 3, // Maximum retry attempts for operations
+    RETRY_DELAY: 1000, // Base delay between retries (ms)
+    BACKOFF_MULTIPLIER: 2, // Exponential backoff multiplier
+  },
+};
+
 export default class PreLaunchModal {
   constructor(simulationId, options = {}) {
-    this.simulationId = simulationId;
-    this.options = {
-      onLaunch: options.onLaunch || (() => {}),
-      onCancel: options.onCancel || (() => {}),
-      showEducatorResources: options.showEducatorResources || false,
-      ...options,
+    const startTime = performance.now();
+
+    try {
+      // Core initialization
+      this.simulationId = simulationId;
+      this.options = {
+        onLaunch: options.onLaunch || (() => {}),
+        onCancel: options.onCancel || (() => {}),
+        showEducatorResources: options.showEducatorResources || false,
+        ...options,
+      };
+
+      // === ENTERPRISE INITIALIZATION ===
+      this.instanceId = `prelaunch_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      this.isHealthy = true;
+      this.errorCount = 0;
+      this.lastError = null;
+      this.recoveryAttempts = 0;
+      this.createdAt = Date.now();
+      this.lastHealthCheck = Date.now();
+
+      // Performance metrics tracking
+      this.performanceMetrics = {
+        renderCount: 0,
+        totalRenderTime: 0,
+        averageRenderTime: 0,
+        tabSwitchCount: 0,
+        totalTabSwitchTime: 0,
+        averageTabSwitchTime: 0,
+        contentGenerationTime: 0,
+        memoryUsage: 0,
+        errorRate: 0,
+        lastRenderTime: 0,
+        lastTabSwitchTime: 0,
+      };
+
+      // Circuit breaker for fault tolerance
+      this.circuitBreaker = {
+        state: 'closed', // closed, open, half-open
+        failureCount: 0,
+        lastFailureTime: null,
+        nextAttemptTime: null,
+        successCount: 0,
+      };
+
+      // Enterprise telemetry batching
+      this.telemetryBatch = [];
+      this.telemetryBuffer = [];
+      this.lastTelemetryFlush = Date.now();
+
+      // Health monitoring intervals
+      this.healthCheckInterval = null;
+      this.telemetryFlushInterval = null;
+      this.heartbeatInterval = null;
+
+      // Track all instances for enterprise monitoring
+      if (!PreLaunchModal._instances) {
+        PreLaunchModal._instances = new Set();
+      }
+      PreLaunchModal._instances.add(this);
+
+      // Check if category data is provided directly (for category-based premodals)
+      if (options.categoryData && options.scenarioData) {
+        this.simulationInfo = this.convertCategoryToSimulationInfo(
+          options.categoryData,
+          options.scenarioData
+        );
+        this.isCategory = true;
+      } else {
+        // Traditional simulation-based premodal
+        this.simulationInfo = getSimulationInfo(simulationId);
+        this.isCategory = false;
+
+        if (!this.simulationInfo) {
+          this._handleError(
+            new Error(`Simulation info not found for: ${simulationId}`),
+            'constructor'
+          );
+          throw new Error(`Simulation info not found for: ${simulationId}`);
+        }
+      }
+
+      this.modal = null;
+      this.currentTab = 'overview';
+
+      // Initialize enterprise monitoring
+      this._initializeEnterpriseMonitoring();
+
+      // Track constructor performance
+      const constructorTime = performance.now() - startTime;
+      this._recordPerformanceMetric('constructor', constructorTime);
+
+      // Log successful initialization
+      this._logTelemetry('instance_created', {
+        simulationId: this.simulationId,
+        isCategory: this.isCategory,
+        constructorTime: Math.round(constructorTime * 100) / 100,
+        options: Object.keys(this.options),
+      });
+    } catch (error) {
+      this._handleError(error, 'constructor');
+      throw error;
+    }
+  }
+
+  /**
+   * Enterprise monitoring initialization
+   * Sets up health checks, telemetry, and error recovery
+   */
+  _initializeEnterpriseMonitoring() {
+    try {
+      // Health check monitoring
+      this.healthCheckInterval = setInterval(() => {
+        this._performHealthCheck();
+      }, ENTERPRISE_CONSTANTS.HEALTH.CHECK_INTERVAL);
+
+      // Telemetry batch flushing
+      this.telemetryFlushInterval = setInterval(() => {
+        this._flushTelemetryBatch();
+      }, ENTERPRISE_CONSTANTS.TELEMETRY.FLUSH_INTERVAL);
+
+      // Heartbeat monitoring
+      this.heartbeatInterval = setInterval(() => {
+        this._sendHeartbeat();
+      }, ENTERPRISE_CONSTANTS.HEALTH.HEARTBEAT_INTERVAL);
+
+      // Set up error recovery baseline
+      this._establishPerformanceBaseline();
+
+      logger.debug(
+        `[PreLaunchModal] Enterprise monitoring initialized for instance ${this.instanceId}`
+      );
+    } catch (error) {
+      this._handleError(error, '_initializeEnterpriseMonitoring');
+      // Don't throw here - monitoring failure shouldn't break modal functionality
+    }
+  }
+
+  /**
+   * Enterprise error handling with recovery strategies
+   */
+  _handleError(error, context = 'unknown', retryOperation = null) {
+    this.errorCount++;
+    this.lastError = {
+      message: error.message,
+      stack: error.stack,
+      context,
+      timestamp: Date.now(),
+      instanceId: this.instanceId,
     };
 
-    // Check if category data is provided directly (for category-based premodals)
-    if (options.categoryData && options.scenarioData) {
-      this.simulationInfo = this.convertCategoryToSimulationInfo(
-        options.categoryData,
-        options.scenarioData
-      );
-      this.isCategory = true;
-    } else {
-      // Traditional simulation-based premodal
-      this.simulationInfo = getSimulationInfo(simulationId);
-      this.isCategory = false;
+    // Update circuit breaker
+    this._updateCircuitBreaker(false);
 
-      if (!this.simulationInfo) {
-        throw new Error(`Simulation info not found for: ${simulationId}`);
+    // Log the error with telemetry
+    this._logTelemetry('error_occurred', {
+      error: error.message,
+      context,
+      errorCount: this.errorCount,
+      circuitBreakerState: this.circuitBreaker.state,
+    });
+
+    // Attempt recovery if within limits
+    if (
+      this.recoveryAttempts <
+        ENTERPRISE_CONSTANTS.ERROR_RECOVERY.MAX_RETRY_ATTEMPTS &&
+      retryOperation
+    ) {
+      this.recoveryAttempts++;
+      const retryDelay =
+        ENTERPRISE_CONSTANTS.ERROR_RECOVERY.RETRY_DELAY *
+        Math.pow(
+          ENTERPRISE_CONSTANTS.ERROR_RECOVERY.BACKOFF_MULTIPLIER,
+          this.recoveryAttempts - 1
+        );
+
+      setTimeout(() => {
+        try {
+          retryOperation();
+          this._updateCircuitBreaker(true); // Success
+        } catch (retryError) {
+          this._handleError(
+            retryError,
+            `${context}_retry_${this.recoveryAttempts}`
+          );
+        }
+      }, retryDelay);
+    }
+
+    // Update health status
+    this.isHealthy =
+      this.errorCount < ENTERPRISE_CONSTANTS.HEALTH.FAILURE_THRESHOLD;
+
+    logger.error(`[PreLaunchModal] Error in ${context}:`, error);
+  }
+
+  /**
+   * Performance metrics recording
+   */
+  _recordPerformanceMetric(operation, duration, additionalData = {}) {
+    try {
+      const metric = {
+        operation,
+        duration: Math.round(duration * 100) / 100,
+        timestamp: Date.now(),
+        instanceId: this.instanceId,
+        ...additionalData,
+      };
+
+      // Update specific metrics
+      switch (operation) {
+        case 'render':
+          this.performanceMetrics.renderCount++;
+          this.performanceMetrics.totalRenderTime += duration;
+          this.performanceMetrics.averageRenderTime =
+            this.performanceMetrics.totalRenderTime /
+            this.performanceMetrics.renderCount;
+          this.performanceMetrics.lastRenderTime = duration;
+          break;
+        case 'tab_switch':
+          this.performanceMetrics.tabSwitchCount++;
+          this.performanceMetrics.totalTabSwitchTime += duration;
+          this.performanceMetrics.averageTabSwitchTime =
+            this.performanceMetrics.totalTabSwitchTime /
+            this.performanceMetrics.tabSwitchCount;
+          this.performanceMetrics.lastTabSwitchTime = duration;
+          break;
+        case 'content_generation':
+          this.performanceMetrics.contentGenerationTime = duration;
+          break;
+      }
+
+      // Check performance thresholds
+      this._checkPerformanceThresholds(operation, duration);
+
+      // Log telemetry
+      this._logTelemetry('performance_metric', metric);
+    } catch (error) {
+      // Don't let performance tracking break the application
+      logger.warn(
+        '[PreLaunchModal] Error recording performance metric:',
+        error
+      );
+    }
+  }
+
+  /**
+   * Circuit breaker state management
+   */
+  _updateCircuitBreaker(success) {
+    const now = Date.now();
+
+    if (success) {
+      if (this.circuitBreaker.state === 'half-open') {
+        this.circuitBreaker.successCount++;
+        if (
+          this.circuitBreaker.successCount >=
+          ENTERPRISE_CONSTANTS.CIRCUIT_BREAKER.SUCCESS_THRESHOLD
+        ) {
+          this.circuitBreaker.state = 'closed';
+          this.circuitBreaker.failureCount = 0;
+          this.circuitBreaker.successCount = 0;
+        }
+      } else if (this.circuitBreaker.state === 'closed') {
+        this.circuitBreaker.failureCount = 0;
+      }
+    } else {
+      this.circuitBreaker.failureCount++;
+      this.circuitBreaker.lastFailureTime = now;
+
+      if (
+        this.circuitBreaker.failureCount >=
+        ENTERPRISE_CONSTANTS.CIRCUIT_BREAKER.FAILURE_THRESHOLD
+      ) {
+        this.circuitBreaker.state = 'open';
+        this.circuitBreaker.nextAttemptTime =
+          now + ENTERPRISE_CONSTANTS.CIRCUIT_BREAKER.RECOVERY_TIMEOUT;
       }
     }
 
-    this.modal = null;
-    this.currentTab = 'overview';
+    // Check if circuit should move to half-open
+    if (
+      this.circuitBreaker.state === 'open' &&
+      now >= this.circuitBreaker.nextAttemptTime
+    ) {
+      this.circuitBreaker.state = 'half-open';
+      this.circuitBreaker.successCount = 0;
+    }
+  }
+
+  /**
+   * Health check performance
+   */
+  _performHealthCheck() {
+    try {
+      const healthData = {
+        timestamp: Date.now(),
+        instanceId: this.instanceId,
+        isHealthy: this.isHealthy,
+        errorCount: this.errorCount,
+        circuitBreakerState: this.circuitBreaker.state,
+        memoryUsage: this._getMemoryUsage(),
+        performanceMetrics: { ...this.performanceMetrics },
+      };
+
+      this.lastHealthCheck = Date.now();
+      this._logTelemetry('health_check', healthData);
+    } catch (error) {
+      this._handleError(error, '_performHealthCheck');
+    }
+  }
+
+  /**
+   * Memory usage monitoring
+   */
+  _getMemoryUsage() {
+    try {
+      if (performance.memory) {
+        const memoryMB = Math.round(
+          performance.memory.usedJSHeapSize / 1024 / 1024
+        );
+        this.performanceMetrics.memoryUsage = memoryMB;
+        return memoryMB;
+      }
+      return 0;
+    } catch {
+      return 0;
+    }
+  }
+
+  /**
+   * Telemetry logging with batching
+   */
+  _logTelemetry(event, data = {}) {
+    try {
+      const telemetryEvent = {
+        event,
+        timestamp: Date.now(),
+        instanceId: this.instanceId,
+        simulationId: this.simulationId,
+        ...data,
+      };
+
+      this.telemetryBatch.push(telemetryEvent);
+
+      // Auto-flush if batch is full
+      if (
+        this.telemetryBatch.length >= ENTERPRISE_CONSTANTS.TELEMETRY.BATCH_SIZE
+      ) {
+        this._flushTelemetryBatch();
+      }
+    } catch (error) {
+      // Don't let telemetry errors break functionality
+      logger.warn('[PreLaunchModal] Telemetry error:', error);
+    }
+  }
+
+  /**
+   * Flush telemetry batch to analytics
+   */
+  _flushTelemetryBatch() {
+    try {
+      if (this.telemetryBatch.length === 0) return;
+
+      // Send batch to analytics
+      const batchData = [...this.telemetryBatch];
+      this.telemetryBatch = [];
+
+      if (simpleAnalytics) {
+        simpleAnalytics.trackEvent('pre_launch_modal_batch', {
+          events: batchData,
+          batchSize: batchData.length,
+          instanceId: this.instanceId,
+        });
+      }
+
+      this.lastTelemetryFlush = Date.now();
+    } catch (error) {
+      logger.warn('[PreLaunchModal] Error flushing telemetry batch:', error);
+    }
+  }
+
+  /**
+   * Send heartbeat signal
+   */
+  _sendHeartbeat() {
+    this._logTelemetry('heartbeat', {
+      uptime: Date.now() - this.createdAt,
+      lastHealthCheck: this.lastHealthCheck,
+      isHealthy: this.isHealthy,
+    });
+  }
+
+  /**
+   * Performance threshold monitoring
+   */
+  _checkPerformanceThresholds(operation, duration) {
+    const thresholds = ENTERPRISE_CONSTANTS.PERFORMANCE;
+
+    switch (operation) {
+      case 'render':
+        if (duration > thresholds.MAX_RENDER_TIME) {
+          this._logTelemetry('performance_violation', {
+            operation,
+            duration,
+            threshold: thresholds.MAX_RENDER_TIME,
+            severity: 'critical',
+          });
+        } else if (duration > thresholds.WARNING_RENDER_TIME) {
+          this._logTelemetry('performance_warning', {
+            operation,
+            duration,
+            threshold: thresholds.WARNING_RENDER_TIME,
+            severity: 'warning',
+          });
+        }
+        break;
+      case 'tab_switch':
+        if (duration > thresholds.MAX_TAB_SWITCH_TIME) {
+          this._logTelemetry('performance_violation', {
+            operation,
+            duration,
+            threshold: thresholds.MAX_TAB_SWITCH_TIME,
+            severity: 'warning',
+          });
+        }
+        break;
+      case 'content_generation':
+        if (duration > thresholds.MAX_CONTENT_GENERATION_TIME) {
+          this._logTelemetry('performance_violation', {
+            operation,
+            duration,
+            threshold: thresholds.MAX_CONTENT_GENERATION_TIME,
+            severity: 'warning',
+          });
+        }
+        break;
+    }
+  }
+
+  /**
+   * Establish performance baseline
+   */
+  _establishPerformanceBaseline() {
+    // Record initial memory usage
+    this._getMemoryUsage();
+
+    // Log baseline establishment
+    this._logTelemetry('baseline_established', {
+      initialMemory: this.performanceMetrics.memoryUsage,
+      timestamp: Date.now(),
+    });
   }
 
   /**
@@ -219,33 +687,93 @@ export default class PreLaunchModal {
   }
 
   /**
-   * Shows the pre-launch modal
+   * Shows the pre-launch modal with enterprise monitoring
    */
   show() {
-    const content = this.generateModalContent();
-    const footer = this.generateModalFooter();
+    const startTime = performance.now();
 
-    this.modal = new ModalUtility({
-      title: `Prepare to Explore: ${this.simulationInfo.title}`,
-      content,
-      footer,
-      onClose: this.options.onCancel,
-      closeOnBackdrop: false,
-      closeOnEscape: true,
-    });
+    try {
+      // Circuit breaker check
+      if (this.circuitBreaker.state === 'open') {
+        const now = Date.now();
+        if (now < this.circuitBreaker.nextAttemptTime) {
+          this._logTelemetry('show_blocked_circuit_open', {
+            nextAttemptTime: this.circuitBreaker.nextAttemptTime,
+            currentTime: now,
+          });
+          throw new Error(
+            'Modal show operation blocked: Circuit breaker is open'
+          );
+        } else {
+          this.circuitBreaker.state = 'half-open';
+          this.circuitBreaker.successCount = 0;
+        }
+      }
 
-    this.modal.open();
-    this.setupEventListeners();
-    this.trackAnalytics('pre_launch_viewed');
+      // Generate content with timing
+      const contentStartTime = performance.now();
+      const content = this.generateModalContent();
+      const footer = this.generateModalFooter();
+      const contentGenerationTime = performance.now() - contentStartTime;
+
+      this._recordPerformanceMetric(
+        'content_generation',
+        contentGenerationTime
+      );
+
+      // Create modal with error handling
+      this.modal = new ModalUtility({
+        title: `Prepare to Explore: ${this.simulationInfo.title}`,
+        content,
+        footer,
+        onClose: () => {
+          this._logTelemetry('modal_closed_via_close_callback');
+          this.options.onCancel();
+        },
+        closeOnBackdrop: false,
+        closeOnEscape: true,
+      });
+
+      // Open modal and setup
+      this.modal.open();
+      this.setupEventListeners();
+
+      // Track analytics and performance
+      const totalRenderTime = performance.now() - startTime;
+      this._recordPerformanceMetric('render', totalRenderTime);
+      this._updateCircuitBreaker(true); // Success
+
+      this.trackAnalytics('pre_launch_viewed');
+      this._logTelemetry('modal_shown', {
+        renderTime: Math.round(totalRenderTime * 100) / 100,
+        contentGenerationTime: Math.round(contentGenerationTime * 100) / 100,
+      });
+    } catch (error) {
+      this._handleError(error, 'show', () => this.show());
+      throw error;
+    }
   }
 
   /**
-   * Closes the modal
+   * Closes the modal with enterprise cleanup
    */
   close() {
-    if (this.modal) {
-      this.modal.close();
-      this.modal = null;
+    try {
+      this._logTelemetry('modal_closing', {
+        uptime: Date.now() - this.createdAt,
+        renderCount: this.performanceMetrics.renderCount,
+        tabSwitchCount: this.performanceMetrics.tabSwitchCount,
+      });
+
+      if (this.modal) {
+        this.modal.close();
+        this.modal = null;
+      }
+
+      // Perform enterprise cleanup
+      this._enterpriseCleanup();
+    } catch (error) {
+      this._handleError(error, 'close');
     }
   }
 
@@ -253,13 +781,25 @@ export default class PreLaunchModal {
    * Closes the modal with optional force destroy (for onboarding completion)
    */
   closeWithCleanup(forceDestroy = false) {
-    if (this.modal) {
-      if (forceDestroy) {
-        this.modal.destroy();
-      } else {
-        this.modal.close();
+    try {
+      this._logTelemetry('modal_closing_with_cleanup', {
+        forceDestroy,
+        uptime: Date.now() - this.createdAt,
+      });
+
+      if (this.modal) {
+        if (forceDestroy) {
+          this.modal.destroy();
+        } else {
+          this.modal.close();
+        }
+        this.modal = null;
       }
-      this.modal = null;
+
+      // Perform enterprise cleanup
+      this._enterpriseCleanup(forceDestroy);
+    } catch (error) {
+      this._handleError(error, 'closeWithCleanup');
     }
   }
 
@@ -267,9 +807,73 @@ export default class PreLaunchModal {
    * Destroys the modal completely (removes from DOM)
    */
   destroy() {
-    if (this.modal) {
-      this.modal.destroy();
-      this.modal = null;
+    try {
+      this._logTelemetry('modal_destroying', {
+        uptime: Date.now() - this.createdAt,
+        totalErrors: this.errorCount,
+      });
+
+      if (this.modal) {
+        this.modal.destroy();
+        this.modal = null;
+      }
+
+      // Perform complete enterprise cleanup
+      this._enterpriseCleanup(true);
+    } catch (error) {
+      this._handleError(error, 'destroy');
+    }
+  }
+
+  /**
+   * Enterprise cleanup operations
+   */
+  _enterpriseCleanup(isDestroy = false) {
+    try {
+      // Clear monitoring intervals
+      if (this.healthCheckInterval) {
+        clearInterval(this.healthCheckInterval);
+        this.healthCheckInterval = null;
+      }
+
+      if (this.telemetryFlushInterval) {
+        clearInterval(this.telemetryFlushInterval);
+        this.telemetryFlushInterval = null;
+      }
+
+      if (this.heartbeatInterval) {
+        clearInterval(this.heartbeatInterval);
+        this.heartbeatInterval = null;
+      }
+
+      // Final telemetry flush
+      this._flushTelemetryBatch();
+
+      // Log final metrics
+      this._logTelemetry('instance_cleanup', {
+        isDestroy,
+        finalMetrics: { ...this.performanceMetrics },
+        finalHealth: {
+          isHealthy: this.isHealthy,
+          errorCount: this.errorCount,
+          circuitBreakerState: this.circuitBreaker.state,
+        },
+        uptime: Date.now() - this.createdAt,
+      });
+
+      // Remove from instance tracking
+      if (PreLaunchModal._instances) {
+        PreLaunchModal._instances.delete(this);
+      }
+
+      // Reset state
+      this.isHealthy = false;
+
+      logger.debug(
+        `[PreLaunchModal] Enterprise cleanup completed for instance ${this.instanceId}`
+      );
+    } catch (error) {
+      logger.error('[PreLaunchModal] Error during enterprise cleanup:', error);
     }
   }
 
@@ -910,21 +1514,32 @@ export default class PreLaunchModal {
   }
 
   /**
-   * Switches to a different tab
+   * Switches to a different tab with enterprise performance monitoring
    */
   switchTab(tabId) {
+    const startTime = performance.now();
+
     if (!tabId) {
       logger.warn('switchTab called with null or undefined tabId');
+      this._logTelemetry('tab_switch_invalid', { tabId });
       return;
     }
 
     try {
+      // Circuit breaker check for tab switching
+      if (this.circuitBreaker.state === 'open') {
+        this._logTelemetry('tab_switch_blocked_circuit_open', { tabId });
+        logger.warn(`Tab switch to ${tabId} blocked: Circuit breaker is open`);
+        return;
+      }
+
       // Find the modal container to scope our searches
       const modalContainer =
         (this.modal && this.modal.element) ||
         document.querySelector('.pre-launch-modal');
       if (!modalContainer) {
         logger.warn('Pre-launch modal container not found');
+        this._logTelemetry('tab_switch_failed_no_container', { tabId });
         return;
       }
 
@@ -962,6 +1577,7 @@ export default class PreLaunchModal {
         }
       } else {
         logger.warn(`Tab button with data-tab="${tabId}" not found in modal`);
+        this._logTelemetry('tab_switch_failed_button_not_found', { tabId });
       }
 
       // Update content (scoped to the modal)
@@ -975,11 +1591,29 @@ export default class PreLaunchModal {
         targetContent.classList.add('active');
       } else {
         logger.warn(`Tab content with id="tab-${tabId}" not found in modal`);
+        this._logTelemetry('tab_switch_failed_content_not_found', { tabId });
       }
 
+      // Update state and tracking
+      const previousTab = this.currentTab;
       this.currentTab = tabId;
+
+      // Track performance and analytics
+      const switchTime = performance.now() - startTime;
+      this._recordPerformanceMetric('tab_switch', switchTime, {
+        fromTab: previousTab,
+        toTab: tabId,
+      });
+      this._updateCircuitBreaker(true); // Success
+
       this.trackAnalytics('tab_switched', { tab: tabId });
+      this._logTelemetry('tab_switched', {
+        fromTab: previousTab,
+        toTab: tabId,
+        switchTime: Math.round(switchTime * 100) / 100,
+      });
     } catch (error) {
+      this._handleError(error, 'switchTab', () => this.switchTab(tabId));
       logger.error('Error in switchTab:', error);
     }
   }
@@ -1021,6 +1655,494 @@ export default class PreLaunchModal {
         tab: this.currentTab,
         ...data,
       });
+    }
+  }
+
+  // ===== ENTERPRISE STATIC UTILITIES =====
+  /**
+   * Enterprise health diagnostics for PreLaunchModal component
+   * @returns {Object} Comprehensive health report
+   */
+  static getHealthReport() {
+    try {
+      const instances = PreLaunchModal._instances || new Set();
+      const report = {
+        timestamp: Date.now(),
+        instanceCount: instances.size,
+        systemHealth: 'healthy',
+        instances: [],
+        performance: {
+          averageRenderTime: 0,
+          averageTabSwitchTime: 0,
+          totalModalsShown: 0,
+          memoryUsage: performance.memory
+            ? Math.round(performance.memory.usedJSHeapSize / 1024 / 1024)
+            : 'unknown',
+        },
+        circuitBreakers: {
+          total: 0,
+          open: 0,
+          halfOpen: 0,
+          closed: 0,
+        },
+      };
+
+      let totalRenderTime = 0;
+      let totalTabSwitchTime = 0;
+      let totalModalsShown = 0;
+
+      instances.forEach(instance => {
+        const instanceHealth = {
+          id: instance.instanceId,
+          simulationId: instance.simulationId,
+          isHealthy: instance.isHealthy,
+          circuitBreakerState: instance.circuitBreaker?.state || 'unknown',
+          renderCount: instance.performanceMetrics?.renderCount || 0,
+          tabSwitchCount: instance.performanceMetrics?.tabSwitchCount || 0,
+          averageRenderTime:
+            instance.performanceMetrics?.averageRenderTime || 0,
+          averageTabSwitchTime:
+            instance.performanceMetrics?.averageTabSwitchTime || 0,
+          errorCount: instance.errorCount || 0,
+          lastError: instance.lastError || null,
+          uptime: Date.now() - instance.createdAt,
+          currentTab: instance.currentTab,
+        };
+
+        report.instances.push(instanceHealth);
+        totalRenderTime +=
+          instanceHealth.averageRenderTime * instanceHealth.renderCount;
+        totalTabSwitchTime +=
+          instanceHealth.averageTabSwitchTime * instanceHealth.tabSwitchCount;
+        totalModalsShown += instanceHealth.renderCount;
+
+        // Circuit breaker stats
+        report.circuitBreakers.total++;
+        switch (instanceHealth.circuitBreakerState) {
+          case 'open':
+            report.circuitBreakers.open++;
+            break;
+          case 'half-open':
+            report.circuitBreakers.halfOpen++;
+            break;
+          case 'closed':
+            report.circuitBreakers.closed++;
+            break;
+        }
+
+        // Determine overall health
+        if (
+          !instanceHealth.isHealthy ||
+          instanceHealth.circuitBreakerState === 'open'
+        ) {
+          report.systemHealth = 'degraded';
+        }
+      });
+
+      // Calculate system averages
+      if (totalModalsShown > 0) {
+        report.performance.averageRenderTime =
+          Math.round((totalRenderTime / totalModalsShown) * 100) / 100;
+        report.performance.totalModalsShown = totalModalsShown;
+      }
+
+      if (instances.size > 0) {
+        const totalTabSwitches = Array.from(instances).reduce(
+          (sum, inst) => sum + (inst.performanceMetrics?.tabSwitchCount || 0),
+          0
+        );
+        if (totalTabSwitches > 0) {
+          report.performance.averageTabSwitchTime =
+            Math.round((totalTabSwitchTime / totalTabSwitches) * 100) / 100;
+        }
+      }
+
+      return report;
+    } catch (error) {
+      console.error('[PreLaunchModal] Error generating health report:', error);
+      return {
+        timestamp: Date.now(),
+        systemHealth: 'error',
+        error: error.message,
+        instanceCount: 0,
+        instances: [],
+        performance: {
+          averageRenderTime: 0,
+          averageTabSwitchTime: 0,
+          totalModalsShown: 0,
+          memoryUsage: 'unknown',
+        },
+        circuitBreakers: { total: 0, open: 0, halfOpen: 0, closed: 0 },
+      };
+    }
+  }
+
+  /**
+   * Enterprise performance analytics aggregation
+   * @returns {Object} Performance metrics across all instances
+   */
+  static getPerformanceMetrics() {
+    try {
+      const instances = PreLaunchModal._instances || new Set();
+      const metrics = {
+        timestamp: Date.now(),
+        totalInstances: instances.size,
+        aggregatedMetrics: {
+          totalRenders: 0,
+          totalTabSwitches: 0,
+          totalRenderTime: 0,
+          totalTabSwitchTime: 0,
+          averageRenderTime: 0,
+          averageTabSwitchTime: 0,
+          minRenderTime: Infinity,
+          maxRenderTime: 0,
+          errorRate: 0,
+          totalErrors: 0,
+        },
+        instanceMetrics: [],
+      };
+
+      let totalRenderTime = 0;
+      let totalTabSwitchTime = 0;
+      let totalRenders = 0;
+      let totalTabSwitches = 0;
+      let totalErrors = 0;
+
+      instances.forEach(instance => {
+        const perf = instance.performanceMetrics || {};
+        const instanceMetric = {
+          id: instance.instanceId,
+          simulationId: instance.simulationId,
+          renderCount: perf.renderCount || 0,
+          tabSwitchCount: perf.tabSwitchCount || 0,
+          averageRenderTime: perf.averageRenderTime || 0,
+          averageTabSwitchTime: perf.averageTabSwitchTime || 0,
+          totalRenderTime: perf.totalRenderTime || 0,
+          totalTabSwitchTime: perf.totalTabSwitchTime || 0,
+          errorCount: instance.errorCount || 0,
+          memoryUsage: perf.memoryUsage || 0,
+          uptime: Date.now() - instance.createdAt,
+        };
+
+        metrics.instanceMetrics.push(instanceMetric);
+
+        totalRenders += instanceMetric.renderCount;
+        totalTabSwitches += instanceMetric.tabSwitchCount;
+        totalRenderTime += instanceMetric.totalRenderTime;
+        totalTabSwitchTime += instanceMetric.totalTabSwitchTime;
+        totalErrors += instanceMetric.errorCount;
+
+        if (instanceMetric.averageRenderTime > 0) {
+          metrics.aggregatedMetrics.minRenderTime = Math.min(
+            metrics.aggregatedMetrics.minRenderTime,
+            instanceMetric.averageRenderTime
+          );
+          metrics.aggregatedMetrics.maxRenderTime = Math.max(
+            metrics.aggregatedMetrics.maxRenderTime,
+            instanceMetric.averageRenderTime
+          );
+        }
+      });
+
+      // Calculate aggregated metrics
+      metrics.aggregatedMetrics.totalRenders = totalRenders;
+      metrics.aggregatedMetrics.totalTabSwitches = totalTabSwitches;
+      metrics.aggregatedMetrics.totalRenderTime =
+        Math.round(totalRenderTime * 100) / 100;
+      metrics.aggregatedMetrics.totalTabSwitchTime =
+        Math.round(totalTabSwitchTime * 100) / 100;
+      metrics.aggregatedMetrics.totalErrors = totalErrors;
+
+      if (totalRenders > 0) {
+        metrics.aggregatedMetrics.averageRenderTime =
+          Math.round((totalRenderTime / totalRenders) * 100) / 100;
+        metrics.aggregatedMetrics.errorRate =
+          Math.round((totalErrors / totalRenders) * 10000) / 100; // Percentage with 2 decimals
+      }
+
+      if (totalTabSwitches > 0) {
+        metrics.aggregatedMetrics.averageTabSwitchTime =
+          Math.round((totalTabSwitchTime / totalTabSwitches) * 100) / 100;
+      }
+
+      if (metrics.aggregatedMetrics.minRenderTime === Infinity) {
+        metrics.aggregatedMetrics.minRenderTime = 0;
+      }
+
+      return metrics;
+    } catch (error) {
+      console.error(
+        '[PreLaunchModal] Error generating performance metrics:',
+        error
+      );
+      return {
+        timestamp: Date.now(),
+        error: error.message,
+        totalInstances: 0,
+        aggregatedMetrics: {
+          totalRenders: 0,
+          totalTabSwitches: 0,
+          totalRenderTime: 0,
+          totalTabSwitchTime: 0,
+          averageRenderTime: 0,
+          averageTabSwitchTime: 0,
+          minRenderTime: 0,
+          maxRenderTime: 0,
+          errorRate: 0,
+          totalErrors: 0,
+        },
+        instanceMetrics: [],
+      };
+    }
+  }
+
+  /**
+   * Enterprise debugging utilities for PreLaunchModal
+   * @returns {Object} Debug information for troubleshooting
+   */
+  static getDebugInfo() {
+    try {
+      const instances = PreLaunchModal._instances || new Set();
+      const debug = {
+        timestamp: Date.now(),
+        version: '1.20-enterprise',
+        instanceCount: instances.size,
+        globalState: {
+          memoryUsage: performance.memory
+            ? {
+                used: Math.round(
+                  performance.memory.usedJSHeapSize / 1024 / 1024
+                ),
+                total: Math.round(
+                  performance.memory.totalJSHeapSize / 1024 / 1024
+                ),
+                limit: Math.round(
+                  performance.memory.jsHeapSizeLimit / 1024 / 1024
+                ),
+              }
+            : 'unavailable',
+          timing: performance.timing
+            ? {
+                loadComplete:
+                  performance.timing.loadEventEnd -
+                  performance.timing.navigationStart,
+                domReady:
+                  performance.timing.domContentLoadedEventEnd -
+                  performance.timing.navigationStart,
+              }
+            : 'unavailable',
+        },
+        instances: [],
+      };
+
+      instances.forEach(instance => {
+        const debugInfo = {
+          id: instance.instanceId,
+          simulationId: instance.simulationId,
+          className: instance.constructor.name,
+          isHealthy: instance.isHealthy,
+          currentTab: instance.currentTab,
+          isCategory: instance.isCategory,
+          uptime: Date.now() - instance.createdAt,
+          state: {
+            modalOpen: !!instance.modal,
+            hasSimulationInfo: !!instance.simulationInfo,
+          },
+          circuitBreaker: {
+            state: instance.circuitBreaker?.state || 'unknown',
+            failureCount: instance.circuitBreaker?.failureCount || 0,
+            lastFailureTime: instance.circuitBreaker?.lastFailureTime || null,
+          },
+          performance: instance.performanceMetrics || {},
+          errors: {
+            count: instance.errorCount || 0,
+            lastError: instance.lastError || null,
+            recoveryAttempts: instance.recoveryAttempts || 0,
+          },
+          monitoring: {
+            telemetryBatchSize: instance.telemetryBatch?.length || 0,
+            healthCheckInterval: !!instance.healthCheckInterval,
+            lastHealthCheck: instance.lastHealthCheck || null,
+            lastTelemetryFlush: instance.lastTelemetryFlush || null,
+          },
+        };
+
+        debug.instances.push(debugInfo);
+      });
+
+      return debug;
+    } catch (error) {
+      console.error('[PreLaunchModal] Error generating debug info:', error);
+      return {
+        timestamp: Date.now(),
+        error: error.message,
+        version: '1.20-enterprise',
+        instanceCount: 0,
+        globalState: {},
+        instances: [],
+      };
+    }
+  }
+
+  /**
+   * Force health check on all PreLaunchModal instances
+   * @returns {Promise<Object>} Health check results
+   */
+  static async forceHealthCheck() {
+    try {
+      const instances = PreLaunchModal._instances || new Set();
+      const results = {
+        timestamp: Date.now(),
+        totalInstances: instances.size,
+        healthyInstances: 0,
+        unhealthyInstances: 0,
+        results: [],
+      };
+
+      const healthPromises = Array.from(instances).map(async instance => {
+        try {
+          const startTime = performance.now();
+
+          // Force health check
+          if (typeof instance._performHealthCheck === 'function') {
+            await instance._performHealthCheck();
+          }
+
+          const endTime = performance.now();
+          const result = {
+            id: instance.instanceId,
+            simulationId: instance.simulationId,
+            isHealthy: instance.isHealthy,
+            checkDuration: Math.round((endTime - startTime) * 100) / 100,
+            circuitBreakerState: instance.circuitBreaker?.state || 'unknown',
+            errorCount: instance.errorCount || 0,
+            uptime: Date.now() - instance.createdAt,
+          };
+
+          if (result.isHealthy) {
+            results.healthyInstances++;
+          } else {
+            results.unhealthyInstances++;
+          }
+
+          return result;
+        } catch (error) {
+          results.unhealthyInstances++;
+          return {
+            id: instance.instanceId || 'unknown',
+            simulationId: instance.simulationId || 'unknown',
+            isHealthy: false,
+            error: error.message,
+            checkDuration: 0,
+            circuitBreakerState: 'unknown',
+            errorCount: -1,
+          };
+        }
+      });
+
+      results.results = await Promise.all(healthPromises);
+      return results;
+    } catch (error) {
+      console.error('[PreLaunchModal] Error performing health checks:', error);
+      return {
+        timestamp: Date.now(),
+        error: error.message,
+        totalInstances: 0,
+        healthyInstances: 0,
+        unhealthyInstances: 0,
+        results: [],
+      };
+    }
+  }
+
+  /**
+   * Emergency recovery for all PreLaunchModal instances
+   * @returns {Promise<Object>} Recovery results
+   */
+  static async emergencyRecovery() {
+    try {
+      const instances = PreLaunchModal._instances || new Set();
+      const results = {
+        timestamp: Date.now(),
+        totalInstances: instances.size,
+        recoveredInstances: 0,
+        failedRecoveries: 0,
+        results: [],
+      };
+
+      const recoveryPromises = Array.from(instances).map(async instance => {
+        try {
+          const startTime = performance.now();
+
+          // Reset circuit breaker
+          if (instance.circuitBreaker) {
+            instance.circuitBreaker.state = 'closed';
+            instance.circuitBreaker.failureCount = 0;
+            instance.circuitBreaker.lastFailureTime = null;
+          }
+
+          // Reset error tracking
+          instance.errorCount = 0;
+          instance.lastError = null;
+          instance.recoveryAttempts = 0;
+
+          // Reset health status
+          instance.isHealthy = true;
+
+          // Clear telemetry batch
+          if (instance.telemetryBatch) {
+            instance.telemetryBatch.length = 0;
+          }
+
+          // Force re-render if modal is open
+          if (instance.modal && typeof instance.modal.open === 'function') {
+            // Refresh modal content - would require modal refresh capability
+            instance._logTelemetry('recovery_modal_refresh_attempted');
+          }
+
+          const endTime = performance.now();
+          const result = {
+            id: instance.instanceId,
+            simulationId: instance.simulationId,
+            recovered: true,
+            recoveryDuration: Math.round((endTime - startTime) * 100) / 100,
+            newState: {
+              isHealthy: instance.isHealthy,
+              circuitBreakerState: instance.circuitBreaker?.state || 'unknown',
+              errorCount: instance.errorCount,
+            },
+          };
+
+          results.recoveredInstances++;
+          return result;
+        } catch (error) {
+          results.failedRecoveries++;
+          return {
+            id: instance.instanceId || 'unknown',
+            simulationId: instance.simulationId || 'unknown',
+            recovered: false,
+            error: error.message,
+            recoveryDuration: 0,
+          };
+        }
+      });
+
+      results.results = await Promise.all(recoveryPromises);
+
+      console.log(
+        `[PreLaunchModal] Emergency recovery completed: ${results.recoveredInstances}/${results.totalInstances} instances recovered`
+      );
+      return results;
+    } catch (error) {
+      console.error('[PreLaunchModal] Error during emergency recovery:', error);
+      return {
+        timestamp: Date.now(),
+        error: error.message,
+        totalInstances: 0,
+        recoveredInstances: 0,
+        failedRecoveries: 0,
+        results: [],
+      };
     }
   }
 }

@@ -17,6 +17,7 @@
 /**
  * Enhanced Helper Utilities for SimulateAI Platform
  * Comprehensive utility functions for modern web applications
+ * ENTERPRISE ENHANCED with monitoring, health checks, and performance analytics
  *
  * Features:
  * - Mathematical and statistical operations
@@ -29,17 +30,304 @@
  * - Memory management utilities
  * - Advanced validation and sanitization
  *
+ * Enterprise Features:
+ * - Comprehensive health monitoring and performance tracking
+ * - Circuit breaker patterns for utility operation reliability
+ * - Operation analytics and telemetry batching
+ * - Static enterprise methods for fleet management
+ * - Memory usage monitoring and optimization
+ * - Global debug functions for enterprise monitoring
+ *
  * @version 2.0.0
  * @author SimulateAI Team
  * @license Apache-2.0
  */
 
-import logger from './logger.js';
-import { COMMON } from './constants.js';
+import logger from "./logger.js";
+import { COMMON } from "./constants.js";
+
+// Enterprise Configuration Constants
+const ENTERPRISE_HELPERS = {
+  HEALTH: {
+    CHECK_INTERVAL: 30000,
+    MAX_OPERATION_TIME: 5000,
+    MEMORY_THRESHOLD: 100 * 1024 * 1024, // 100MB
+    ERROR_THRESHOLD: 0.05, // 5% error rate
+    WARNING_THRESHOLD: 0.02, // 2% warning rate
+  },
+  PERFORMANCE: {
+    SLOW_OPERATION_THRESHOLD: 1000,
+    BATCH_SIZE: 50,
+    CACHE_SIZE: 1000,
+    TELEMETRY_INTERVAL: 60000,
+  },
+  CIRCUIT_BREAKER: {
+    FAILURE_THRESHOLD: 5,
+    RECOVERY_TIMEOUT: 30000,
+    HALF_OPEN_MAX_CALLS: 3,
+  },
+  MONITORING: {
+    OPERATION_HISTORY_SIZE: 1000,
+    PERFORMANCE_SAMPLE_SIZE: 100,
+    HEALTH_REPORT_INTERVAL: 120000,
+  },
+};
+
+// Enterprise Monitoring Infrastructure
+class EnterpriseHelpersMonitor {
+  constructor() {
+    this.instances = new Set();
+    this.operationHistory = [];
+    this.performanceMetrics = {
+      operationCount: 0,
+      totalExecutionTime: 0,
+      errorCount: 0,
+      warningCount: 0,
+      slowOperations: 0,
+      memoryUsage: 0,
+      lastHealthCheck: Date.now(),
+    };
+    this.circuitBreaker = {
+      state: "CLOSED", // CLOSED, OPEN, HALF_OPEN
+      failures: 0,
+      lastFailure: null,
+      nextRetry: null,
+    };
+    this.telemetryBatch = [];
+    this.healthCheckInterval = null;
+    this.initializeMonitoring();
+  }
+
+  initializeMonitoring() {
+    this.healthCheckInterval = setInterval(() => {
+      this.performHealthCheck();
+    }, ENTERPRISE_HELPERS.HEALTH.CHECK_INTERVAL);
+
+    setInterval(() => {
+      this.batchTelemetry();
+    }, ENTERPRISE_HELPERS.PERFORMANCE.TELEMETRY_INTERVAL);
+
+    this.logSystemInfo("Enterprise Helpers Monitor initialized");
+  }
+
+  registerInstance(instance) {
+    this.instances.add(instance);
+    this.logSystemInfo(
+      `Helper instance registered. Total instances: ${this.instances.size}`,
+    );
+  }
+
+  unregisterInstance(instance) {
+    this.instances.delete(instance);
+    this.logSystemInfo(
+      `Helper instance unregistered. Total instances: ${this.instances.size}`,
+    );
+  }
+
+  recordOperation(operationType, executionTime, success = true, metadata = {}) {
+    const operation = {
+      type: operationType,
+      timestamp: Date.now(),
+      executionTime,
+      success,
+      metadata,
+      memoryUsage: this.getMemoryUsage(),
+    };
+
+    this.operationHistory.push(operation);
+    if (
+      this.operationHistory.length >
+      ENTERPRISE_HELPERS.MONITORING.OPERATION_HISTORY_SIZE
+    ) {
+      this.operationHistory.shift();
+    }
+
+    this.updatePerformanceMetrics(operation);
+    this.checkCircuitBreaker(success, executionTime);
+  }
+
+  updatePerformanceMetrics(operation) {
+    this.performanceMetrics.operationCount++;
+    this.performanceMetrics.totalExecutionTime += operation.executionTime;
+    this.performanceMetrics.memoryUsage = operation.memoryUsage;
+
+    if (!operation.success) {
+      this.performanceMetrics.errorCount++;
+    }
+
+    if (
+      operation.executionTime >
+      ENTERPRISE_HELPERS.PERFORMANCE.SLOW_OPERATION_THRESHOLD
+    ) {
+      this.performanceMetrics.slowOperations++;
+    }
+  }
+
+  checkCircuitBreaker(success, executionTime) {
+    if (
+      !success ||
+      executionTime > ENTERPRISE_HELPERS.HEALTH.MAX_OPERATION_TIME
+    ) {
+      this.circuitBreaker.failures++;
+      this.circuitBreaker.lastFailure = Date.now();
+
+      if (
+        this.circuitBreaker.failures >=
+        ENTERPRISE_HELPERS.CIRCUIT_BREAKER.FAILURE_THRESHOLD
+      ) {
+        this.circuitBreaker.state = "OPEN";
+        this.circuitBreaker.nextRetry =
+          Date.now() + ENTERPRISE_HELPERS.CIRCUIT_BREAKER.RECOVERY_TIMEOUT;
+        logger.warn("Helper circuit breaker opened due to failures", {
+          failures: this.circuitBreaker.failures,
+          component: "EnterpriseHelpersMonitor",
+        });
+      }
+    } else if (this.circuitBreaker.state === "HALF_OPEN") {
+      this.circuitBreaker.state = "CLOSED";
+      this.circuitBreaker.failures = 0;
+      logger.info("Helper circuit breaker closed - recovery successful");
+    }
+  }
+
+  performHealthCheck() {
+    const now = Date.now();
+    const health = {
+      timestamp: now,
+      instances: this.instances.size,
+      operationCount: this.performanceMetrics.operationCount,
+      errorRate: this.calculateErrorRate(),
+      averageExecutionTime: this.calculateAverageExecutionTime(),
+      memoryUsage: this.getMemoryUsage(),
+      circuitBreakerState: this.circuitBreaker.state,
+      status: "healthy",
+    };
+
+    // Determine health status
+    if (health.errorRate > ENTERPRISE_HELPERS.HEALTH.ERROR_THRESHOLD) {
+      health.status = "unhealthy";
+      health.reason = "High error rate";
+    } else if (
+      health.memoryUsage > ENTERPRISE_HELPERS.HEALTH.MEMORY_THRESHOLD
+    ) {
+      health.status = "warning";
+      health.reason = "High memory usage";
+    } else if (health.errorRate > ENTERPRISE_HELPERS.HEALTH.WARNING_THRESHOLD) {
+      health.status = "warning";
+      health.reason = "Elevated error rate";
+    }
+
+    this.performanceMetrics.lastHealthCheck = now;
+    this.addToTelemetryBatch("health_check", health);
+
+    if (health.status !== "healthy") {
+      logger.warn("Helper health check warning", health);
+    }
+
+    return health;
+  }
+
+  calculateErrorRate() {
+    if (this.performanceMetrics.operationCount === 0) return 0;
+    return (
+      this.performanceMetrics.errorCount /
+      this.performanceMetrics.operationCount
+    );
+  }
+
+  calculateAverageExecutionTime() {
+    if (this.performanceMetrics.operationCount === 0) return 0;
+    return (
+      this.performanceMetrics.totalExecutionTime /
+      this.performanceMetrics.operationCount
+    );
+  }
+
+  getMemoryUsage() {
+    if (
+      typeof window !== "undefined" &&
+      window.performance &&
+      window.performance.memory
+    ) {
+      return window.performance.memory.usedJSHeapSize;
+    }
+    return 0;
+  }
+
+  addToTelemetryBatch(type, data) {
+    this.telemetryBatch.push({
+      type,
+      timestamp: Date.now(),
+      data,
+    });
+  }
+
+  batchTelemetry() {
+    if (this.telemetryBatch.length > 0) {
+      logger.info("Helper telemetry batch", {
+        batchSize: this.telemetryBatch.length,
+        metrics: this.performanceMetrics,
+        component: "EnterpriseHelpersMonitor",
+      });
+      this.telemetryBatch = [];
+    }
+  }
+
+  logSystemInfo(message, data = {}) {
+    logger.info(message, {
+      ...data,
+      component: "EnterpriseHelpersMonitor",
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  // Static methods for enterprise management
+  static getGlobalStats() {
+    if (!window.enterpriseHelpersMonitor) return null;
+    return {
+      instances: window.enterpriseHelpersMonitor.instances.size,
+      metrics: { ...window.enterpriseHelpersMonitor.performanceMetrics },
+      circuitBreaker: { ...window.enterpriseHelpersMonitor.circuitBreaker },
+      health: window.enterpriseHelpersMonitor.performHealthCheck(),
+    };
+  }
+
+  static resetMetrics() {
+    if (window.enterpriseHelpersMonitor) {
+      window.enterpriseHelpersMonitor.performanceMetrics = {
+        operationCount: 0,
+        totalExecutionTime: 0,
+        errorCount: 0,
+        warningCount: 0,
+        slowOperations: 0,
+        memoryUsage: 0,
+        lastHealthCheck: Date.now(),
+      };
+      window.enterpriseHelpersMonitor.operationHistory = [];
+      logger.info("Helper metrics reset", {
+        component: "EnterpriseHelpersMonitor",
+      });
+    }
+  }
+
+  static forceHealthCheck() {
+    if (window.enterpriseHelpersMonitor) {
+      return window.enterpriseHelpersMonitor.performHealthCheck();
+    }
+    return null;
+  }
+}
+
+// Initialize global enterprise monitor
+if (typeof window !== "undefined") {
+  if (!window.enterpriseHelpersMonitor) {
+    window.enterpriseHelpersMonitor = new EnterpriseHelpersMonitor();
+  }
+}
 
 // Enhanced constants and configuration
 const HELPERS_CONSTANTS = {
-  VERSION: '2.0.0',
+  VERSION: "2.0.0",
   MAX_CACHE_SIZE: 1000,
   CACHE_EXPIRY: 300000, // 5 minutes
   PERFORMANCE_SAMPLE_RATE: 0.1,
@@ -208,20 +496,20 @@ const HELPERS_CONSTANTS = {
   },
   ACCESSIBILITY_COLORS: {
     HIGH_CONTRAST: {
-      background: '#000000',
-      text: '#ffffff',
-      primary: '#ffff00',
-      secondary: '#00ffff',
-      danger: '#ff0000',
-      success: '#00ff00',
+      background: "#000000",
+      text: "#ffffff",
+      primary: "#ffff00",
+      secondary: "#00ffff",
+      danger: "#ff0000",
+      success: "#00ff00",
     },
     LIGHT_MODE: {
-      background: '#ffffff',
-      text: '#333333',
-      primary: '#007bff',
-      secondary: '#28a745',
-      danger: '#dc3545',
-      success: '#28a745',
+      background: "#ffffff",
+      text: "#333333",
+      primary: "#007bff",
+      secondary: "#28a745",
+      danger: "#dc3545",
+      success: "#28a745",
     },
   },
 };
@@ -290,16 +578,16 @@ class HelperCache {
 class ThemeHelpers {
   static getCurrentTheme() {
     const prefersHighContrast = window.matchMedia(
-      '(prefers-contrast: high)'
+      "(prefers-contrast: high)",
     ).matches;
     const prefersReducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)'
+      "(prefers-reduced-motion: reduce)",
     ).matches;
 
     return {
       highContrast: prefersHighContrast,
       reducedMotion: prefersReducedMotion,
-      theme: prefersHighContrast ? 'highContrast' : 'light',
+      theme: prefersHighContrast ? "highContrast" : "light",
     };
   }
 
@@ -321,11 +609,11 @@ class ThemeHelpers {
     element.style.color = colors.text;
 
     // Add theme-specific classes
-    element.classList.remove('theme-light', 'theme-high-contrast');
+    element.classList.remove("theme-light", "theme-high-contrast");
     element.classList.add(`theme-${currentTheme.theme}`);
 
     if (currentTheme.reducedMotion) {
-      element.classList.add('reduce-motion');
+      element.classList.add("reduce-motion");
     }
 
     return colors;
@@ -335,22 +623,22 @@ class ThemeHelpers {
     const observers = [];
 
     // High contrast observer
-    const contrastQuery = window.matchMedia('(prefers-contrast: high)');
-    const contrastHandler = e => callback('highContrast', e.matches);
-    contrastQuery.addEventListener('change', contrastHandler);
+    const contrastQuery = window.matchMedia("(prefers-contrast: high)");
+    const contrastHandler = (e) => callback("highContrast", e.matches);
+    contrastQuery.addEventListener("change", contrastHandler);
     observers.push(() =>
-      contrastQuery.removeEventListener('change', contrastHandler)
+      contrastQuery.removeEventListener("change", contrastHandler),
     );
 
     // Reduced motion observer
-    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const motionHandler = e => callback('reducedMotion', e.matches);
-    motionQuery.addEventListener('change', motionHandler);
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const motionHandler = (e) => callback("reducedMotion", e.matches);
+    motionQuery.addEventListener("change", motionHandler);
     observers.push(() =>
-      motionQuery.removeEventListener('change', motionHandler)
+      motionQuery.removeEventListener("change", motionHandler),
     );
 
-    return () => observers.forEach(cleanup => cleanup());
+    return () => observers.forEach((cleanup) => cleanup());
   }
 }
 
@@ -358,6 +646,134 @@ class ThemeHelpers {
  * Enhanced Helpers class with modern utilities
  */
 class Helpers {
+  constructor() {
+    // Enterprise monitoring integration
+    this.monitor = window.enterpriseHelpersMonitor;
+    this.instanceId = this.generateInstanceId();
+    this.operationCount = 0;
+    this.lastOperation = null;
+
+    // Register with enterprise monitor
+    if (this.monitor) {
+      this.monitor.registerInstance(this);
+    }
+
+    // Initialize performance tracking
+    this.performanceCache = new Map();
+    this.circuitBreakerStates = new Map();
+
+    logger.info("Enterprise Helpers instance created", {
+      instanceId: this.instanceId,
+      component: "Helpers",
+    });
+  }
+
+  generateInstanceId() {
+    return `helper_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  // Enterprise operation wrapper
+  executeWithMonitoring(operationType, operation, ...args) {
+    const startTime = performance.now();
+    let success = true;
+    let result = null;
+
+    try {
+      // Check circuit breaker
+      if (this.isCircuitBreakerOpen(operationType)) {
+        throw new Error(`Circuit breaker open for operation: ${operationType}`);
+      }
+
+      result = operation.apply(this, args);
+      this.recordCircuitBreakerSuccess(operationType);
+    } catch (err) {
+      success = false;
+      this.recordCircuitBreakerFailure(operationType);
+      logger.error(`Helper operation failed: ${operationType}`, {
+        error: err.message,
+        instanceId: this.instanceId,
+        component: "Helpers",
+      });
+      throw err;
+    } finally {
+      const executionTime = performance.now() - startTime;
+      this.operationCount++;
+      this.lastOperation = {
+        type: operationType,
+        timestamp: Date.now(),
+        executionTime,
+        success,
+      };
+
+      // Record with enterprise monitor
+      if (this.monitor) {
+        this.monitor.recordOperation(operationType, executionTime, success, {
+          instanceId: this.instanceId,
+          operationCount: this.operationCount,
+          args: args.length,
+        });
+      }
+
+      // Log slow operations
+      if (
+        executionTime > ENTERPRISE_HELPERS.PERFORMANCE.SLOW_OPERATION_THRESHOLD
+      ) {
+        logger.warn(`Slow helper operation detected: ${operationType}`, {
+          executionTime,
+          threshold: ENTERPRISE_HELPERS.PERFORMANCE.SLOW_OPERATION_THRESHOLD,
+          instanceId: this.instanceId,
+          component: "Helpers",
+        });
+      }
+    }
+
+    return result;
+  }
+
+  isCircuitBreakerOpen(operationType) {
+    const state = this.circuitBreakerStates.get(operationType);
+    if (!state) return false;
+
+    if (state.state === "OPEN") {
+      if (Date.now() > state.nextRetry) {
+        state.state = "HALF_OPEN";
+        state.attempts = 0;
+        return false;
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+  recordCircuitBreakerSuccess(operationType) {
+    const state = this.circuitBreakerStates.get(operationType);
+    if (state && state.state === "HALF_OPEN") {
+      state.state = "CLOSED";
+      state.failures = 0;
+    }
+  }
+
+  recordCircuitBreakerFailure(operationType) {
+    const state = this.circuitBreakerStates.get(operationType) || {
+      state: "CLOSED",
+      failures: 0,
+      nextRetry: null,
+      attempts: 0,
+    };
+
+    state.failures++;
+    if (
+      state.failures >= ENTERPRISE_HELPERS.CIRCUIT_BREAKER.FAILURE_THRESHOLD
+    ) {
+      state.state = "OPEN";
+      state.nextRetry =
+        Date.now() + ENTERPRISE_HELPERS.CIRCUIT_BREAKER.RECOVERY_TIMEOUT;
+    }
+
+    this.circuitBreakerStates.set(operationType, state);
+  }
+
   // Enhanced Math utilities with performance optimization and caching
   /**
    * Clamp a value between min and max bounds
@@ -367,7 +783,7 @@ class Helpers {
    * @returns {number} Clamped value
    */
   static clamp(value, min, max) {
-    if (typeof value !== 'number' || isNaN(value)) return min;
+    if (typeof value !== "number" || isNaN(value)) return min;
     return Math.min(Math.max(value, min), max);
   }
 
@@ -425,7 +841,7 @@ class Helpers {
    * @returns {number} Rounded number
    */
   static roundTo(number, decimals) {
-    if (typeof number !== 'number' || isNaN(number)) return 0;
+    if (typeof number !== "number" || isNaN(number)) return 0;
     return Number(`${Math.round(`${number}e${decimals}`)}e-${decimals}`);
   }
 
@@ -465,8 +881,10 @@ class Helpers {
    */
   static standardDeviation(values) {
     const average = this.mean(values);
-    const validValues = values.filter(v => typeof v === 'number' && !isNaN(v));
-    const squaredDiffs = validValues.map(v => Math.pow(v - average, 2));
+    const validValues = values.filter(
+      (v) => typeof v === "number" && !isNaN(v),
+    );
+    const squaredDiffs = validValues.map((v) => Math.pow(v - average, 2));
     return Math.sqrt(this.mean(squaredDiffs));
   }
 
@@ -547,7 +965,7 @@ class Helpers {
    * @returns {Object} Grouped object
    */
   static groupBy(array, keyFn) {
-    if (!Array.isArray(array) || typeof keyFn !== 'function') return {};
+    if (!Array.isArray(array) || typeof keyFn !== "function") return {};
     return array.reduce((groups, item) => {
       const key = keyFn(item);
       if (!groups[key]) {
@@ -567,9 +985,9 @@ class Helpers {
   static unique(array, keyFn = null) {
     if (!Array.isArray(array)) return [];
 
-    if (keyFn && typeof keyFn === 'function') {
+    if (keyFn && typeof keyFn === "function") {
       const seen = new Set();
-      return array.filter(item => {
+      return array.filter((item) => {
         const key = keyFn(item);
         if (seen.has(key)) return false;
         seen.add(key);
@@ -607,7 +1025,7 @@ class Helpers {
       ? array.reduce(
           (acc, val) =>
             acc.concat(Array.isArray(val) ? this.flatten(val, depth - 1) : val),
-          []
+          [],
         )
       : array.slice();
   }
@@ -624,7 +1042,7 @@ class Helpers {
 
     return arrays.reduce((result, array) => {
       if (!Array.isArray(array)) return [];
-      return result.filter(item => array.includes(item));
+      return result.filter((item) => array.includes(item));
     });
   }
 
@@ -639,12 +1057,12 @@ class Helpers {
 
     return [...array].sort((a, b) => {
       for (const criterion of criteria) {
-        const { key, direction = 'asc' } = criterion;
-        const aVal = typeof key === 'function' ? key(a) : a[key];
-        const bVal = typeof key === 'function' ? key(b) : b[key];
+        const { key, direction = "asc" } = criterion;
+        const aVal = typeof key === "function" ? key(a) : a[key];
+        const bVal = typeof key === "function" ? key(b) : b[key];
 
-        if (aVal < bVal) return direction === 'asc' ? -1 : 1;
-        if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+        if (aVal < bVal) return direction === "asc" ? -1 : 1;
+        if (aVal > bVal) return direction === "asc" ? 1 : -1;
       }
       return 0;
     });
@@ -655,7 +1073,7 @@ class Helpers {
    * @returns {string} Capitalized string
    */
   static capitalize(str) {
-    if (typeof str !== 'string' || str.length === 0) return '';
+    if (typeof str !== "string" || str.length === 0) return "";
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
@@ -665,8 +1083,8 @@ class Helpers {
    * @returns {string} kebab-case string
    */
   static camelToKebab(str) {
-    if (typeof str !== 'string') return '';
-    return str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase();
+    if (typeof str !== "string") return "";
+    return str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, "$1-$2").toLowerCase();
   }
 
   /**
@@ -675,8 +1093,8 @@ class Helpers {
    * @returns {string} camelCase string
    */
   static kebabToCamel(str) {
-    if (typeof str !== 'string') return '';
-    return str.replace(/-([a-z])/g, g => g[1].toUpperCase());
+    if (typeof str !== "string") return "";
+    return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
   }
 
   /**
@@ -686,8 +1104,8 @@ class Helpers {
    * @param {string} suffix - Suffix to add (default: '...')
    * @returns {string} Truncated text
    */
-  static truncateText(text, maxLength, suffix = '...') {
-    if (typeof text !== 'string' || text.length <= maxLength) return text;
+  static truncateText(text, maxLength, suffix = "...") {
+    if (typeof text !== "string" || text.length <= maxLength) return text;
     return text.substring(0, maxLength - suffix.length) + suffix;
   }
 
@@ -697,11 +1115,11 @@ class Helpers {
    * @returns {string} Plain text
    */
   static stripHtml(html) {
-    if (typeof html !== 'string') return '';
+    if (typeof html !== "string") return "";
     // Create a temporary element and use textContent for security
-    const div = document.createElement('div');
+    const div = document.createElement("div");
     div.innerHTML = html;
-    return div.textContent || div.innerText || '';
+    return div.textContent || div.innerText || "";
   }
 
   /**
@@ -710,8 +1128,8 @@ class Helpers {
    * @returns {string} HTML-escaped text
    */
   static escapeHtml(text) {
-    if (typeof text !== 'string') return '';
-    const div = document.createElement('div');
+    if (typeof text !== "string") return "";
+    const div = document.createElement("div");
     div.textContent = text;
     return div.innerHTML;
   }
@@ -724,9 +1142,9 @@ class Helpers {
    */
   static generateRandomString(
     length = 12,
-    charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
   ) {
-    let result = '';
+    let result = "";
     const charsetLength = charset.length;
 
     if (window.crypto && window.crypto.getRandomValues) {
@@ -753,16 +1171,16 @@ class Helpers {
    * @returns {string} URL slug
    */
   static createSlug(text, maxLength = 50) {
-    if (typeof text !== 'string') return '';
+    if (typeof text !== "string") return "";
 
     return text
       .toLowerCase()
       .trim()
-      .replace(/[^\w\s-]/g, '') // Remove special characters
-      .replace(/\s+/g, '-') // Replace spaces with hyphens
-      .replace(/-+/g, '-') // Replace multiple hyphens with single
+      .replace(/[^\w\s-]/g, "") // Remove special characters
+      .replace(/\s+/g, "-") // Replace spaces with hyphens
+      .replace(/-+/g, "-") // Replace multiple hyphens with single
       .substring(0, maxLength)
-      .replace(/-$/, ''); // Remove trailing hyphen
+      .replace(/-$/, ""); // Remove trailing hyphen
   }
 
   /**
@@ -772,7 +1190,7 @@ class Helpers {
    * @returns {string} Screen reader friendly text
    */
   static formatForScreenReader(text, options = {}) {
-    if (typeof text !== 'string') return '';
+    if (typeof text !== "string") return "";
 
     const {
       expandAbbreviations = true,
@@ -784,26 +1202,26 @@ class Helpers {
 
     if (expandAbbreviations) {
       const abbreviations = {
-        AI: 'Artificial Intelligence',
-        ML: 'Machine Learning',
-        UI: 'User Interface',
-        UX: 'User Experience',
-        API: 'Application Programming Interface',
+        AI: "Artificial Intelligence",
+        ML: "Machine Learning",
+        UI: "User Interface",
+        UX: "User Experience",
+        API: "Application Programming Interface",
       };
 
       Object.entries(abbreviations).forEach(([abbr, full]) => {
-        const regex = new RegExp(`\\b${abbr}\\b`, 'gi');
+        const regex = new RegExp(`\\b${abbr}\\b`, "gi");
         formatted = formatted.replace(regex, full);
       });
     }
 
     if (addPunctuation && !formatted.match(/[.!?]$/)) {
-      formatted += '.';
+      formatted += ".";
     }
 
     if (slowDown) {
       // Add pauses for screen readers
-      formatted = formatted.replace(/[.!?]/g, '$&\u00A0'); // Non-breaking space
+      formatted = formatted.replace(/[.!?]/g, "$&\u00A0"); // Non-breaking space
     }
 
     return formatted;
@@ -815,21 +1233,21 @@ class Helpers {
    * @returns {Object} Accessibility assessment
    */
   static assessTextAccessibility(text) {
-    if (typeof text !== 'string')
-      return { score: 0, issues: ['Invalid input'] };
+    if (typeof text !== "string")
+      return { score: 0, issues: ["Invalid input"] };
 
     const issues = [];
     let score = 100;
 
     // Check length
     if (text.length === 0) {
-      issues.push('Text is empty');
+      issues.push("Text is empty");
       score -= HELPERS_CONSTANTS.TEXT_ANALYSIS.EXCESSIVE_CAPS_PENALTY;
     }
 
     // Check for all caps (poor for screen readers)
     if (text.length > 10 && text === text.toUpperCase()) {
-      issues.push('Text is all uppercase');
+      issues.push("Text is all uppercase");
       score -= HELPERS_CONSTANTS.TEXT_ANALYSIS.EXCESSIVE_PUNCTUATION_PENALTY;
     }
 
@@ -839,20 +1257,20 @@ class Helpers {
     if (
       punctuationRatio > HELPERS_CONSTANTS.TEXT_ANALYSIS.PUNCTUATION_THRESHOLD
     ) {
-      issues.push('Excessive punctuation detected');
+      issues.push("Excessive punctuation detected");
       score -= HELPERS_CONSTANTS.TEXT_ANALYSIS.PUNCTUATION_PENALTY;
     }
 
     // Check reading level (simplified)
-    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-    const words = text.split(/\s+/).filter(w => w.length > 0);
+    const sentences = text.split(/[.!?]+/).filter((s) => s.trim().length > 0);
+    const words = text.split(/\s+/).filter((w) => w.length > 0);
     const avgWordsPerSentence = words.length / Math.max(sentences.length, 1);
 
     if (
       avgWordsPerSentence >
       HELPERS_CONSTANTS.TEXT_ANALYSIS.MAX_WORDS_PER_SENTENCE
     ) {
-      issues.push('Sentences may be too long');
+      issues.push("Sentences may be too long");
       score -= 10;
     }
 
@@ -871,7 +1289,7 @@ class Helpers {
    * @returns {string} Formatted duration
    */
   static formatDuration(milliseconds, options = {}) {
-    if (typeof milliseconds !== 'number' || milliseconds < 0) return '0s';
+    if (typeof milliseconds !== "number" || milliseconds < 0) return "0s";
 
     const {
       includeMilliseconds = false,
@@ -886,30 +1304,30 @@ class Helpers {
 
     if (verbose || screenReader) {
       const parts = [];
-      if (days > 0) parts.push(`${days} day${days > 1 ? 's' : ''}`);
+      if (days > 0) parts.push(`${days} day${days > 1 ? "s" : ""}`);
       if (hours % COMMON.HOURS_24 > 0)
         parts.push(
-          `${hours % COMMON.HOURS_24} hour${hours % COMMON.HOURS_24 > 1 ? 's' : ''}`
+          `${hours % COMMON.HOURS_24} hour${hours % COMMON.HOURS_24 > 1 ? "s" : ""}`,
         );
       if (minutes % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE > 0)
         parts.push(
-          `${minutes % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE} minute${minutes % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE > 1 ? 's' : ''}`
+          `${minutes % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE} minute${minutes % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE > 1 ? "s" : ""}`,
         );
       if (seconds % COMMON.MINUTES_60 > 0)
         parts.push(
-          `${seconds % COMMON.MINUTES_60} second${seconds % COMMON.MINUTES_60 > 1 ? 's' : ''}`
+          `${seconds % COMMON.MINUTES_60} second${seconds % COMMON.MINUTES_60 > 1 ? "s" : ""}`,
         );
 
-      if (parts.length === 0) return screenReader ? '0 seconds' : '0s';
-      return parts.join(screenReader ? ', ' : ' ');
+      if (parts.length === 0) return screenReader ? "0 seconds" : "0s";
+      return parts.join(screenReader ? ", " : " ");
     }
 
     if (days > 0) {
       return `${days}d ${hours % COMMON.HOURS_24}h ${minutes % COMMON.MINUTES_60}m`;
     } else if (hours > 0) {
-      return `${hours}:${(minutes % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE).toString().padStart(2, '0')}:${(seconds % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE).toString().padStart(2, '0')}`;
+      return `${hours}:${(minutes % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE).toString().padStart(2, "0")}:${(seconds % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE).toString().padStart(2, "0")}`;
     } else if (minutes > 0) {
-      return `${minutes}:${(seconds % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE).toString().padStart(2, '0')}`;
+      return `${minutes}:${(seconds % HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE).toString().padStart(2, "0")}`;
     } else {
       return includeMilliseconds
         ? `${seconds}.${Math.floor((milliseconds % HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND) / 100)}s`
@@ -923,32 +1341,32 @@ class Helpers {
    * @param {string|Object} format - Format string or options object
    * @returns {string} Formatted timestamp
    */
-  static formatTimestamp(timestamp, format = 'short') {
-    if (typeof timestamp !== 'number' || isNaN(timestamp))
-      return 'Invalid date';
+  static formatTimestamp(timestamp, format = "short") {
+    if (typeof timestamp !== "number" || isNaN(timestamp))
+      return "Invalid date";
 
     const date = new Date(timestamp);
 
-    if (typeof format === 'string') {
+    if (typeof format === "string") {
       switch (format) {
-        case 'short':
+        case "short":
           return date.toLocaleDateString();
-        case 'long':
+        case "long":
           return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
-        case 'time':
+        case "time":
           return date.toLocaleTimeString();
-        case 'iso':
+        case "iso":
           return date.toISOString();
-        case 'relative':
+        case "relative":
           return this.getTimeAgo(timestamp);
-        case 'accessible':
-          return date.toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit',
+        case "accessible":
+          return date.toLocaleDateString("en-US", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
           });
         default:
           return date.toString();
@@ -957,25 +1375,25 @@ class Helpers {
 
     // Format object with options
     const options = {
-      locale: 'en-US',
+      locale: "en-US",
       includeTime: true,
       includeWeekday: false,
       ...format,
     };
 
     const dateOptions = {
-      year: 'numeric',
-      month: options.monthFormat || 'short',
-      day: 'numeric',
+      year: "numeric",
+      month: options.monthFormat || "short",
+      day: "numeric",
     };
 
     if (options.includeWeekday) {
-      dateOptions.weekday = 'long';
+      dateOptions.weekday = "long";
     }
 
     if (options.includeTime) {
-      dateOptions.hour = 'numeric';
-      dateOptions.minute = '2-digit';
+      dateOptions.hour = "numeric";
+      dateOptions.minute = "2-digit";
     }
 
     return date.toLocaleDateString(options.locale, dateOptions);
@@ -988,20 +1406,20 @@ class Helpers {
    * @returns {string} Time ago string
    */
   static getTimeAgo(timestamp, options = {}) {
-    if (typeof timestamp !== 'number' || isNaN(timestamp))
-      return 'Unknown time';
+    if (typeof timestamp !== "number" || isNaN(timestamp))
+      return "Unknown time";
 
     const { precise = false, shortForm = false } = options;
 
     const now = Date.now();
     const diff = now - timestamp;
 
-    if (diff < 0) return 'In the future';
+    if (diff < 0) return "In the future";
 
     const units = [
       {
-        name: 'year',
-        short: 'y',
+        name: "year",
+        short: "y",
         ms:
           HELPERS_CONSTANTS.TIME.DAYS_PER_YEAR *
           HELPERS_CONSTANTS.TIME.HOURS_PER_DAY *
@@ -1010,8 +1428,8 @@ class Helpers {
           HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND,
       },
       {
-        name: 'month',
-        short: 'mo',
+        name: "month",
+        short: "mo",
         ms:
           HELPERS_CONSTANTS.TIME.DAYS_PER_MONTH *
           HELPERS_CONSTANTS.TIME.HOURS_PER_DAY *
@@ -1020,8 +1438,8 @@ class Helpers {
           HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND,
       },
       {
-        name: 'week',
-        short: 'w',
+        name: "week",
+        short: "w",
         ms:
           HELPERS_CONSTANTS.TIME.DAYS_PER_WEEK *
           HELPERS_CONSTANTS.TIME.HOURS_PER_DAY *
@@ -1030,8 +1448,8 @@ class Helpers {
           HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND,
       },
       {
-        name: 'day',
-        short: 'd',
+        name: "day",
+        short: "d",
         ms:
           HELPERS_CONSTANTS.TIME.HOURS_PER_DAY *
           HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE *
@@ -1039,23 +1457,23 @@ class Helpers {
           HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND,
       },
       {
-        name: 'hour',
-        short: 'h',
+        name: "hour",
+        short: "h",
         ms:
           HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE *
           HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE *
           HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND,
       },
       {
-        name: 'minute',
-        short: 'm',
+        name: "minute",
+        short: "m",
         ms:
           HELPERS_CONSTANTS.TIME.SECONDS_PER_MINUTE *
           HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND,
       },
       {
-        name: 'second',
-        short: 's',
+        name: "second",
+        short: "s",
         ms: HELPERS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND,
       },
     ];
@@ -1065,23 +1483,23 @@ class Helpers {
       if (diff >= unit.ms) {
         const value = Math.floor(diff / unit.ms);
         const unitName = shortForm ? unit.short : unit.name;
-        const plural = !shortForm && value > 1 ? 's' : '';
+        const plural = !shortForm && value > 1 ? "s" : "";
 
         if (precise && units.indexOf(unit) < units.length - 1) {
           const nextUnit = units[units.indexOf(unit) + 1];
           const remainder = Math.floor((diff % unit.ms) / nextUnit.ms);
           if (remainder > 0) {
             const nextUnitName = shortForm ? nextUnit.short : nextUnit.name;
-            const nextPlural = !shortForm && remainder > 1 ? 's' : '';
+            const nextPlural = !shortForm && remainder > 1 ? "s" : "";
             return `${value}${unitName}${plural} ${remainder}${nextUnitName}${nextPlural} ago`;
           }
         }
 
-        return `${value}${shortForm ? '' : ' '}${unitName}${plural}${shortForm ? '' : ' ago'}`;
+        return `${value}${shortForm ? "" : " "}${unitName}${plural}${shortForm ? "" : " ago"}`;
       }
     }
 
-    return 'Just now';
+    return "Just now";
   }
 
   /**
@@ -1091,12 +1509,12 @@ class Helpers {
    */
   static parseDate(input) {
     if (input instanceof Date) return input;
-    if (typeof input === 'number') return new Date(input);
-    if (typeof input !== 'string') return null;
+    if (typeof input === "number") return new Date(input);
+    if (typeof input !== "string") return null;
 
     // Try parsing ISO format first
     const isoMatch = input.match(
-      /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?)?$/
+      /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?)?$/,
     );
     if (isoMatch) {
       const date = new Date(input);
@@ -1132,7 +1550,7 @@ class Helpers {
   static calculateBusinessDays(
     startDate,
     endDate,
-    excludedDays = HELPERS_CONSTANTS.WEEKEND_DAYS
+    excludedDays = HELPERS_CONSTANTS.WEEKEND_DAYS,
   ) {
     if (!(startDate instanceof Date) || !(endDate instanceof Date)) return 0;
 
@@ -1154,19 +1572,19 @@ class Helpers {
    * @returns {Object|null} RGB object or null if invalid
    */
   static hexToRgb(hex) {
-    if (typeof hex !== 'string') return null;
+    if (typeof hex !== "string") return null;
 
     // Remove # if present and validate
-    hex = hex.replace('#', '');
+    hex = hex.replace("#", "");
     if (!/^[0-9A-Fa-f]{6}$/.test(hex) && !/^[0-9A-Fa-f]{3}$/.test(hex))
       return null;
 
     // Expand 3-digit hex to 6-digit
     if (hex.length === HELPERS_CONSTANTS.COLOR.HEX_SHORT_LENGTH) {
       hex = hex
-        .split('')
-        .map(char => char + char)
-        .join('');
+        .split("")
+        .map((char) => char + char)
+        .join("");
     }
 
     const result = /^([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -1229,31 +1647,31 @@ class Helpers {
 
     if (highContrast) {
       // High contrast colors for accessibility
-      if (value < HELPERS_CONSTANTS.COLOR.THRESHOLD_LOW) return '#ff0000'; // Red
-      if (value < HELPERS_CONSTANTS.COLOR.THRESHOLD_MEDIUM) return '#ffff00'; // Yellow
-      return '#00ff00'; // Green
+      if (value < HELPERS_CONSTANTS.COLOR.THRESHOLD_LOW) return "#ff0000"; // Red
+      if (value < HELPERS_CONSTANTS.COLOR.THRESHOLD_MEDIUM) return "#ffff00"; // Yellow
+      return "#00ff00"; // Green
     }
 
     if (colorBlindSafe) {
       // Color-blind friendly palette
-      if (value < HELPERS_CONSTANTS.COLOR.THRESHOLD_LOW) return '#d73027'; // Red-orange
-      if (value < HELPERS_CONSTANTS.COLOR.THRESHOLD_MEDIUM) return '#fee08b'; // Yellow-orange
-      return '#4575b4'; // Blue
+      if (value < HELPERS_CONSTANTS.COLOR.THRESHOLD_LOW) return "#d73027"; // Red-orange
+      if (value < HELPERS_CONSTANTS.COLOR.THRESHOLD_MEDIUM) return "#fee08b"; // Yellow-orange
+      return "#4575b4"; // Blue
     }
 
     // Default light theme
     if (value < HELPERS_CONSTANTS.COLOR.THRESHOLD_HIGH) {
       return this.interpolateColor(
-        '#ff4444',
-        '#ffaa00',
-        value / HELPERS_CONSTANTS.COLOR.THRESHOLD_HIGH
+        "#ff4444",
+        "#ffaa00",
+        value / HELPERS_CONSTANTS.COLOR.THRESHOLD_HIGH,
       );
     } else {
       return this.interpolateColor(
-        '#ffaa00',
-        '#00aa00',
+        "#ffaa00",
+        "#00aa00",
         (value - HELPERS_CONSTANTS.COLOR.THRESHOLD_HIGH) /
-          HELPERS_CONSTANTS.COLOR.THRESHOLD_HIGH
+          HELPERS_CONSTANTS.COLOR.THRESHOLD_HIGH,
       );
     }
   }
@@ -1290,14 +1708,14 @@ class Helpers {
   static getLuminance(rgb) {
     const { r, g, b } = rgb;
 
-    const [rs, gs, bs] = [r, g, b].map(c => {
+    const [rs, gs, bs] = [r, g, b].map((c) => {
       c = c / HELPERS_CONSTANTS.COLOR.RGB_MAX;
       return c <= HELPERS_CONSTANTS.COLOR.LUMINANCE_THRESHOLD
         ? c / HELPERS_CONSTANTS.COLOR.LUMINANCE_DIVISOR
         : Math.pow(
             (c + HELPERS_CONSTANTS.COLOR.LUMINANCE_OFFSET_2) /
               HELPERS_CONSTANTS.COLOR.LUMINANCE_DIVISOR_2,
-            HELPERS_CONSTANTS.COLOR.LUMINANCE_EXPONENT
+            HELPERS_CONSTANTS.COLOR.LUMINANCE_EXPONENT,
           );
     });
 
@@ -1315,7 +1733,7 @@ class Helpers {
    * @param {string} level - WCAG level ('AA' or 'AAA')
    * @returns {Object} Accessibility assessment
    */
-  static checkColorAccessibility(foreground, background, level = 'AA') {
+  static checkColorAccessibility(foreground, background, level = "AA") {
     const ratio = this.getContrastRatio(foreground, background);
 
     const requirements = {
@@ -1323,18 +1741,18 @@ class Helpers {
       AAA: { normal: 7.0, large: 4.5 },
     };
 
-    const req = requirements[level] || requirements['AA'];
+    const req = requirements[level] || requirements["AA"];
 
     return {
       ratio: this.roundTo(ratio, 2),
       passesNormal: ratio >= req.normal,
       passesLarge: ratio >= req.large,
       level,
-      grade: ratio >= req.normal ? 'Pass' : 'Fail',
+      grade: ratio >= req.normal ? "Pass" : "Fail",
       recommendation:
         ratio < req.normal
           ? `Increase contrast to at least ${req.normal}:1`
-          : 'Contrast meets accessibility guidelines',
+          : "Contrast meets accessibility guidelines",
     };
   }
 
@@ -1345,7 +1763,7 @@ class Helpers {
    * @returns {Object} Color palette
    */
   static generateAccessiblePalette(baseColor, options = {}) {
-    const { steps = 5, lightBackground = '#ffffff' } = options;
+    const { steps = 5, lightBackground = "#ffffff" } = options;
 
     const rgb = this.hexToRgb(baseColor);
     if (!rgb) return null;
@@ -1363,8 +1781,8 @@ class Helpers {
       const factor = i / (steps - 1);
       const lightVariation = this.interpolateColor(
         baseColor,
-        '#ffffff',
-        factor * HELPERS_CONSTANTS.COLOR.FACTOR_LIGHTEN
+        "#ffffff",
+        factor * HELPERS_CONSTANTS.COLOR.FACTOR_LIGHTEN,
       );
 
       palette.variations.push({
@@ -1375,7 +1793,7 @@ class Helpers {
       // Check accessibility on light background
       const lightContrast = this.checkColorAccessibility(
         lightVariation,
-        lightBackground
+        lightBackground,
       );
 
       if (lightContrast.passesNormal) {
@@ -1395,22 +1813,22 @@ class Helpers {
    * @param {string} outputFormat - Output format ('hex', 'rgb', 'hsl')
    * @returns {string|Object} Converted color
    */
-  static convertColor(color, outputFormat = 'hex') {
+  static convertColor(color, outputFormat = "hex") {
     const rgb = this.parseColorToRgb(color);
     if (!rgb) return null;
 
     switch (outputFormat.toLowerCase()) {
-      case 'hex': {
+      case "hex": {
         return this.rgbToHex(rgb.r, rgb.g, rgb.b);
       }
-      case 'rgb': {
+      case "rgb": {
         return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
       }
-      case 'hsl': {
+      case "hsl": {
         const hsl = this.rgbToHsl(rgb);
         return `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
       }
-      case 'object': {
+      case "object": {
         return rgb;
       }
       default: {
@@ -1425,10 +1843,10 @@ class Helpers {
    * @returns {Object|null} RGB object
    */
   static parseColorToRgb(color) {
-    if (typeof color !== 'string') return null;
+    if (typeof color !== "string") return null;
 
     // Hex format
-    if (color.startsWith('#')) {
+    if (color.startsWith("#")) {
       return this.hexToRgb(color);
     }
 
@@ -1444,14 +1862,14 @@ class Helpers {
 
     // Named colors (basic set)
     const namedColors = {
-      red: '#ff0000',
-      green: '#008000',
-      blue: '#0000ff',
-      white: '#ffffff',
-      black: '#000000',
-      yellow: '#ffff00',
-      cyan: '#00ffff',
-      magenta: '#ff00ff',
+      red: "#ff0000",
+      green: "#008000",
+      blue: "#0000ff",
+      white: "#ffffff",
+      black: "#000000",
+      yellow: "#ffff00",
+      cyan: "#00ffff",
+      magenta: "#ff00ff",
     };
 
     const namedColor = namedColors[color.toLowerCase()];
@@ -1517,46 +1935,46 @@ class Helpers {
    * @param {Object} attributes - Element attributes
    * @returns {HTMLElement} Created element
    */
-  static createElement(tag, className = '', attributes = {}) {
-    if (typeof tag !== 'string' || tag.trim() === '') {
-      throw new Error('Invalid tag name provided');
+  static createElement(tag, className = "", attributes = {}) {
+    if (typeof tag !== "string" || tag.trim() === "") {
+      throw new Error("Invalid tag name provided");
     }
 
     const element = document.createElement(tag);
 
     // Handle className parameter
-    if (typeof className === 'object' && className !== null) {
+    if (typeof className === "object" && className !== null) {
       // If className is actually an options object
       attributes = { ...className, ...attributes };
-      className = attributes.className || '';
+      className = attributes.className || "";
     }
 
     if (className) element.className = className;
 
     Object.entries(attributes).forEach(([key, value]) => {
-      if (key === 'style' && typeof value === 'object') {
+      if (key === "style" && typeof value === "object") {
         Object.assign(element.style, value);
-      } else if (key === 'dataset' && typeof value === 'object') {
+      } else if (key === "dataset" && typeof value === "object") {
         Object.entries(value).forEach(([dataKey, dataValue]) => {
           element.dataset[dataKey] = dataValue;
         });
-      } else if (key === 'listeners' && typeof value === 'object') {
+      } else if (key === "listeners" && typeof value === "object") {
         Object.entries(value).forEach(([event, handler]) => {
           element.addEventListener(event, handler);
         });
-      } else if (key === 'children' && Array.isArray(value)) {
-        value.forEach(child => {
+      } else if (key === "children" && Array.isArray(value)) {
+        value.forEach((child) => {
           if (child instanceof HTMLElement) {
             element.appendChild(child);
-          } else if (typeof child === 'string') {
+          } else if (typeof child === "string") {
             element.appendChild(document.createTextNode(child));
           }
         });
-      } else if (key === 'innerHTML') {
+      } else if (key === "innerHTML") {
         element.innerHTML = value;
-      } else if (key === 'textContent') {
+      } else if (key === "textContent") {
         element.textContent = value;
-      } else if (key !== 'className') {
+      } else if (key !== "className") {
         element.setAttribute(key, value);
       }
     });
@@ -1668,7 +2086,7 @@ class Helpers {
     // Check basic visibility styles
     if (
       checkDisplay &&
-      (styles.display === 'none' || styles.visibility === 'hidden')
+      (styles.display === "none" || styles.visibility === "hidden")
     ) {
       return returnDetails ? visibility : false;
     }
@@ -1680,11 +2098,11 @@ class Helpers {
     // Calculate viewport intersection
     const intersectionWidth = Math.max(
       0,
-      Math.min(rect.right, viewport.width) - Math.max(rect.left, 0)
+      Math.min(rect.right, viewport.width) - Math.max(rect.left, 0),
     );
     const intersectionHeight = Math.max(
       0,
-      Math.min(rect.bottom, viewport.height) - Math.max(rect.top, 0)
+      Math.min(rect.bottom, viewport.height) - Math.max(rect.top, 0),
     );
     const intersectionArea = intersectionWidth * intersectionHeight;
     const elementArea = rect.width * rect.height;
@@ -1709,9 +2127,9 @@ class Helpers {
     if (!(element instanceof HTMLElement)) return;
 
     const {
-      behavior = 'smooth',
-      block = 'center',
-      inline = 'nearest',
+      behavior = "smooth",
+      block = "center",
+      inline = "nearest",
       offset = 0,
       respectReducedMotion = true,
       focus = false,
@@ -1720,10 +2138,10 @@ class Helpers {
 
     // Respect user's motion preferences
     const prefersReducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)'
+      "(prefers-reduced-motion: reduce)",
     ).matches;
     const actualBehavior =
-      respectReducedMotion && prefersReducedMotion ? 'auto' : behavior;
+      respectReducedMotion && prefersReducedMotion ? "auto" : behavior;
 
     // Calculate target position with offset
     if (offset !== 0) {
@@ -1746,10 +2164,10 @@ class Helpers {
     if (focus) {
       // Ensure element is focusable
       if (
-        !element.hasAttribute('tabindex') &&
-        !element.matches('a, button, input, select, textarea')
+        !element.hasAttribute("tabindex") &&
+        !element.matches("a, button, input, select, textarea")
       ) {
-        element.setAttribute('tabindex', '-1');
+        element.setAttribute("tabindex", "-1");
       }
 
       setTimeout(
@@ -1758,21 +2176,21 @@ class Helpers {
 
           // Remove temporary tabindex
           if (
-            element.getAttribute('tabindex') === '-1' &&
-            !element.matches('a, button, input, select, textarea')
+            element.getAttribute("tabindex") === "-1" &&
+            !element.matches("a, button, input, select, textarea")
           ) {
-            element.removeAttribute('tabindex');
+            element.removeAttribute("tabindex");
           }
         },
-        actualBehavior === 'smooth'
+        actualBehavior === "smooth"
           ? HELPERS_CONSTANTS.UI.SMOOTH_SCROLL_DURATION
-          : 0
+          : 0,
       );
     }
 
     // Screen reader announcement
     if (announceToScreenReader) {
-      const announcement = `Scrolled to ${element.textContent || element.getAttribute('aria-label') || 'content'}`;
+      const announcement = `Scrolled to ${element.textContent || element.getAttribute("aria-label") || "content"}`;
       this.announceToScreenReader(announcement);
     }
   }
@@ -1782,15 +2200,15 @@ class Helpers {
    * @param {string} message - Message to announce
    * @param {string} priority - Priority level ('polite' or 'assertive')
    */
-  static announceToScreenReader(message, priority = 'polite') {
-    const announcer = document.createElement('div');
-    announcer.setAttribute('aria-live', priority);
-    announcer.setAttribute('aria-atomic', 'true');
-    announcer.style.position = 'absolute';
-    announcer.style.left = '-10000px';
-    announcer.style.width = '1px';
-    announcer.style.height = '1px';
-    announcer.style.overflow = 'hidden';
+  static announceToScreenReader(message, priority = "polite") {
+    const announcer = document.createElement("div");
+    announcer.setAttribute("aria-live", priority);
+    announcer.setAttribute("aria-atomic", "true");
+    announcer.style.position = "absolute";
+    announcer.style.left = "-10000px";
+    announcer.style.width = "1px";
+    announcer.style.height = "1px";
+    announcer.style.overflow = "hidden";
 
     document.body.appendChild(announcer);
     announcer.textContent = message;
@@ -1809,32 +2227,32 @@ class Helpers {
    */
   static createAccessibleTooltip(trigger, content, options = {}) {
     const {
-      position = 'top',
+      position = "top",
       delay = 500,
       hideDelay = 100,
-      className = 'tooltip',
+      className = "tooltip",
       id = `tooltip-${this.generateRandomString(HELPERS_CONSTANTS.UI.TOOLTIP_ID_LENGTH)}`,
     } = options;
 
-    const tooltip = this.createElement('div', {
+    const tooltip = this.createElement("div", {
       id,
       className: `${className} ${className}--${position}`,
-      role: 'tooltip',
-      'aria-hidden': 'true',
+      role: "tooltip",
+      "aria-hidden": "true",
       textContent: content,
       style: {
-        position: 'absolute',
-        zIndex: '9999',
-        visibility: 'hidden',
-        opacity: '0',
-        transition: 'opacity 0.2s, visibility 0.2s',
+        position: "absolute",
+        zIndex: "9999",
+        visibility: "hidden",
+        opacity: "0",
+        transition: "opacity 0.2s, visibility 0.2s",
       },
     });
 
     document.body.appendChild(tooltip);
 
     // Set up ARIA relationship
-    trigger.setAttribute('aria-describedby', id);
+    trigger.setAttribute("aria-describedby", id);
 
     let showTimeout, hideTimeout;
 
@@ -1847,7 +2265,7 @@ class Helpers {
         let top, left;
 
         switch (position) {
-          case 'top':
+          case "top":
             top =
               triggerRect.top -
               tooltipRect.height -
@@ -1855,12 +2273,12 @@ class Helpers {
             left =
               triggerRect.left + (triggerRect.width - tooltipRect.width) / 2;
             break;
-          case 'bottom':
+          case "bottom":
             top = triggerRect.bottom + HELPERS_CONSTANTS.UI.TOOLTIP_SPACING;
             left =
               triggerRect.left + (triggerRect.width - tooltipRect.width) / 2;
             break;
-          case 'left':
+          case "left":
             top =
               triggerRect.top + (triggerRect.height - tooltipRect.height) / 2;
             left =
@@ -1868,7 +2286,7 @@ class Helpers {
               tooltipRect.width -
               HELPERS_CONSTANTS.UI.TOOLTIP_SPACING;
             break;
-          case 'right':
+          case "right":
             top =
               triggerRect.top + (triggerRect.height - tooltipRect.height) / 2;
             left = triggerRect.right + HELPERS_CONSTANTS.UI.TOOLTIP_SPACING;
@@ -1877,25 +2295,25 @@ class Helpers {
 
         tooltip.style.top = `${top + window.scrollY}px`;
         tooltip.style.left = `${left + window.scrollX}px`;
-        tooltip.style.visibility = 'visible';
-        tooltip.style.opacity = '1';
-        tooltip.setAttribute('aria-hidden', 'false');
+        tooltip.style.visibility = "visible";
+        tooltip.style.opacity = "1";
+        tooltip.setAttribute("aria-hidden", "false");
       }, delay);
     };
 
     const hideTooltip = () => {
       clearTimeout(showTimeout);
       hideTimeout = setTimeout(() => {
-        tooltip.style.visibility = 'hidden';
-        tooltip.style.opacity = '0';
-        tooltip.setAttribute('aria-hidden', 'true');
+        tooltip.style.visibility = "hidden";
+        tooltip.style.opacity = "0";
+        tooltip.setAttribute("aria-hidden", "true");
       }, hideDelay);
     };
 
-    trigger.addEventListener('mouseenter', showTooltip);
-    trigger.addEventListener('mouseleave', hideTooltip);
-    trigger.addEventListener('focus', showTooltip);
-    trigger.addEventListener('blur', hideTooltip);
+    trigger.addEventListener("mouseenter", showTooltip);
+    trigger.addEventListener("mouseleave", hideTooltip);
+    trigger.addEventListener("focus", showTooltip);
+    trigger.addEventListener("blur", hideTooltip);
 
     return tooltip;
   } // Enhanced Event utilities with performance monitoring and accessibility
@@ -1931,7 +2349,7 @@ class Helpers {
             const result = func.apply(ctx, args);
             const duration = performance.now() - start;
             logger.debug(
-              `Debounced function executed in ${duration.toFixed(2)}ms`
+              `Debounced function executed in ${duration.toFixed(2)}ms`,
             );
             return result;
           } else {
@@ -2002,7 +2420,7 @@ class Helpers {
       // Respect user's motion preferences for visual updates
       if (
         respectReducedMotion &&
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
       ) {
         // Increase throttle limit for reduced motion users
         limit = Math.max(limit, 100);
@@ -2017,7 +2435,7 @@ class Helpers {
           func.apply(context, args);
           const duration = performance.now() - start;
           logger.debug(
-            `Throttled function (leading) executed in ${duration.toFixed(2)}ms`
+            `Throttled function (leading) executed in ${duration.toFixed(2)}ms`,
           );
         } else {
           func.apply(context, args);
@@ -2033,7 +2451,7 @@ class Helpers {
                 func.apply(context, args);
                 const duration = performance.now() - start;
                 logger.debug(
-                  `Throttled function (trailing) executed in ${duration.toFixed(2)}ms`
+                  `Throttled function (trailing) executed in ${duration.toFixed(2)}ms`,
                 );
               } else {
                 func.apply(context, args);
@@ -2041,7 +2459,7 @@ class Helpers {
               lastRan = Date.now();
             }
           },
-          limit - (now - lastRan)
+          limit - (now - lastRan),
         );
       }
     };
@@ -2065,7 +2483,7 @@ class Helpers {
 
       if (trackCalls && called) {
         logger.warn(
-          `Function called ${callCount} times, but can only execute once`
+          `Function called ${callCount} times, but can only execute once`,
         );
       }
 
@@ -2074,7 +2492,7 @@ class Helpers {
         result = func.apply(this, args);
 
         // Optional reset mechanism
-        if (resetAfter && typeof resetAfter === 'number') {
+        if (resetAfter && typeof resetAfter === "number") {
           setTimeout(() => {
             called = false;
             callCount = 0;
@@ -2127,7 +2545,7 @@ class Helpers {
         const result = originalHandler.apply(this, args);
         const duration = performance.now() - start;
         logger.debug(
-          `Event handler for ${event} executed in ${duration.toFixed(2)}ms`
+          `Event handler for ${event} executed in ${duration.toFixed(2)}ms`,
         );
         return result;
       };
@@ -2165,7 +2583,7 @@ class Helpers {
    */
   static createKeyboardNavigation(container, options = {}) {
     const {
-      selector = '[tabindex], a, button, input, select, textarea',
+      selector = "[tabindex], a, button, input, select, textarea",
       circular = true,
       skipHidden = true,
       announceNavigation = true,
@@ -2176,27 +2594,27 @@ class Helpers {
 
     const updateElements = () => {
       elements = Array.from(container.querySelectorAll(selector)).filter(
-        el => !skipHidden || this.isElementVisible(el)
+        (el) => !skipHidden || this.isElementVisible(el),
       );
     };
 
-    const navigate = direction => {
+    const navigate = (direction) => {
       updateElements();
       if (elements.length === 0) return;
 
       const oldIndex = currentIndex;
 
-      if (direction === 'next') {
+      if (direction === "next") {
         currentIndex = circular
           ? (currentIndex + 1) % elements.length
           : Math.min(currentIndex + 1, elements.length - 1);
-      } else if (direction === 'previous') {
+      } else if (direction === "previous") {
         currentIndex = circular
           ? (currentIndex - 1 + elements.length) % elements.length
           : Math.max(currentIndex - 1, 0);
-      } else if (direction === 'first') {
+      } else if (direction === "first") {
         currentIndex = 0;
-      } else if (direction === 'last') {
+      } else if (direction === "last") {
         currentIndex = elements.length - 1;
       }
 
@@ -2205,43 +2623,43 @@ class Helpers {
         targetElement.focus();
 
         if (announceNavigation && currentIndex !== oldIndex) {
-          const announcement = `Focused on ${targetElement.textContent || targetElement.getAttribute('aria-label') || 'interactive element'}`;
+          const announcement = `Focused on ${targetElement.textContent || targetElement.getAttribute("aria-label") || "interactive element"}`;
           this.announceToScreenReader(announcement);
         }
       }
     };
 
-    const keydownHandler = e => {
+    const keydownHandler = (e) => {
       switch (e.key) {
-        case 'ArrowDown':
-        case 'ArrowRight':
+        case "ArrowDown":
+        case "ArrowRight":
           e.preventDefault();
-          navigate('next');
+          navigate("next");
           break;
-        case 'ArrowUp':
-        case 'ArrowLeft':
+        case "ArrowUp":
+        case "ArrowLeft":
           e.preventDefault();
-          navigate('previous');
+          navigate("previous");
           break;
-        case 'Home':
+        case "Home":
           e.preventDefault();
-          navigate('first');
+          navigate("first");
           break;
-        case 'End':
+        case "End":
           e.preventDefault();
-          navigate('last');
+          navigate("last");
           break;
       }
     };
 
-    container.addEventListener('keydown', keydownHandler);
+    container.addEventListener("keydown", keydownHandler);
     updateElements();
 
     return {
       navigate,
       updateElements,
       getCurrentElement: () => elements[currentIndex],
-      destroy: () => container.removeEventListener('keydown', keydownHandler),
+      destroy: () => container.removeEventListener("keydown", keydownHandler),
     };
   } // Enhanced Validation utilities with security and accessibility
   /**
@@ -2258,8 +2676,8 @@ class Helpers {
       requireTld = true,
     } = options;
 
-    if (typeof email !== 'string') {
-      return { valid: false, error: 'Email must be a string' };
+    if (typeof email !== "string") {
+      return { valid: false, error: "Email must be a string" };
     }
 
     if (email.length > maxLength) {
@@ -2275,39 +2693,39 @@ class Helpers {
       : /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (!basicPattern.test(email)) {
-      return { valid: false, error: 'Invalid email format' };
+      return { valid: false, error: "Invalid email format" };
     }
 
     // Check for blocked domains
-    const domain = email.split('@')[1];
+    const domain = email.split("@")[1];
     if (blockedDomains.includes(domain.toLowerCase())) {
-      return { valid: false, error: 'Email domain is not allowed' };
+      return { valid: false, error: "Email domain is not allowed" };
     }
 
     // TLD validation
-    if (requireTld && !domain.includes('.')) {
+    if (requireTld && !domain.includes(".")) {
       return {
         valid: false,
-        error: 'Email must have a valid top-level domain',
+        error: "Email must have a valid top-level domain",
       };
     }
 
     // Additional security checks
     const securityIssues = [];
-    if (email.includes('..'))
-      securityIssues.push('Consecutive dots not allowed');
-    if (email.startsWith('.') || email.endsWith('.'))
-      securityIssues.push('Cannot start or end with dot');
+    if (email.includes(".."))
+      securityIssues.push("Consecutive dots not allowed");
+    if (email.startsWith(".") || email.endsWith("."))
+      securityIssues.push("Cannot start or end with dot");
 
     if (securityIssues.length > 0) {
-      return { valid: false, error: securityIssues.join(', ') };
+      return { valid: false, error: securityIssues.join(", ") };
     }
 
     return {
       valid: true,
       normalized: email.toLowerCase().trim(),
       domain,
-      local: email.split('@')[0],
+      local: email.split("@")[0],
     };
   }
 
@@ -2319,15 +2737,15 @@ class Helpers {
    */
   static validateUrl(url, options = {}) {
     const {
-      allowedProtocols = ['http:', 'https:'],
+      allowedProtocols = ["http:", "https:"],
       allowLocalhost = false,
       allowPrivateIps = false,
       maxLength = 2048,
       requireTld = true,
     } = options;
 
-    if (typeof url !== 'string') {
-      return { valid: false, error: 'URL must be a string' };
+    if (typeof url !== "string") {
+      return { valid: false, error: "URL must be a string" };
     }
 
     if (url.length > maxLength) {
@@ -2344,28 +2762,28 @@ class Helpers {
       if (!allowedProtocols.includes(urlObj.protocol)) {
         return {
           valid: false,
-          error: `Protocol ${urlObj.protocol} not allowed. Allowed: ${allowedProtocols.join(', ')}`,
+          error: `Protocol ${urlObj.protocol} not allowed. Allowed: ${allowedProtocols.join(", ")}`,
         };
       }
 
       // Localhost validation
       if (
         !allowLocalhost &&
-        (urlObj.hostname === 'localhost' || urlObj.hostname === '127.0.0.1')
+        (urlObj.hostname === "localhost" || urlObj.hostname === "127.0.0.1")
       ) {
-        return { valid: false, error: 'Localhost URLs not allowed' };
+        return { valid: false, error: "Localhost URLs not allowed" };
       }
 
       // Private IP validation
       if (!allowPrivateIps && this.isPrivateIp(urlObj.hostname)) {
-        return { valid: false, error: 'Private IP addresses not allowed' };
+        return { valid: false, error: "Private IP addresses not allowed" };
       }
 
       // TLD validation
-      if (requireTld && !urlObj.hostname.includes('.')) {
+      if (requireTld && !urlObj.hostname.includes(".")) {
         return {
           valid: false,
-          error: 'URL must have a valid top-level domain',
+          error: "URL must have a valid top-level domain",
         };
       }
 
@@ -2380,7 +2798,7 @@ class Helpers {
         },
       };
     } catch (error) {
-      return { valid: false, error: 'Invalid URL format' };
+      return { valid: false, error: "Invalid URL format" };
     }
   }
 
@@ -2401,7 +2819,7 @@ class Helpers {
       /^fe80:/,
     ];
 
-    return privateRanges.some(range => range.test(ip));
+    return privateRanges.some((range) => range.test(ip));
   }
 
   /**
@@ -2422,8 +2840,8 @@ class Helpers {
       provideFeedback = true,
     } = options;
 
-    if (typeof password !== 'string') {
-      return { valid: false, error: 'Password must be a string', score: 0 };
+    if (typeof password !== "string") {
+      return { valid: false, error: "Password must be a string", score: 0 };
     }
 
     const feedback = [];
@@ -2452,25 +2870,25 @@ class Helpers {
     const hasSymbols = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
     if (requireUppercase && !hasUppercase) {
-      errors.push('Password must contain at least one uppercase letter');
+      errors.push("Password must contain at least one uppercase letter");
     } else if (hasUppercase) {
       score += HELPERS_CONSTANTS.SCORING.PASSWORD_VARIETY_BONUS;
     }
 
     if (requireLowercase && !hasLowercase) {
-      errors.push('Password must contain at least one lowercase letter');
+      errors.push("Password must contain at least one lowercase letter");
     } else if (hasLowercase) {
       score += HELPERS_CONSTANTS.SCORING.PASSWORD_VARIETY_BONUS;
     }
 
     if (requireNumbers && !hasNumbers) {
-      errors.push('Password must contain at least one number');
+      errors.push("Password must contain at least one number");
     } else if (hasNumbers) {
       score += HELPERS_CONSTANTS.SCORING.PASSWORD_VARIETY_BONUS;
     }
 
     if (requireSymbols && !hasSymbols) {
-      errors.push('Password must contain at least one special character');
+      errors.push("Password must contain at least one special character");
     } else if (hasSymbols) {
       score += HELPERS_CONSTANTS.SCORING.PASSWORD_VARIETY_BONUS;
     }
@@ -2478,7 +2896,7 @@ class Helpers {
     // Pattern validation
     for (const pattern of blockedPatterns) {
       if (pattern.test(password)) {
-        errors.push('Password contains blocked pattern');
+        errors.push("Password contains blocked pattern");
         score -= HELPERS_CONSTANTS.SCORING.PASSWORD_REPETITION_PENALTY;
       }
     }
@@ -2496,29 +2914,29 @@ class Helpers {
       if (pattern.test(password)) {
         score -= 10;
         if (provideFeedback) {
-          feedback.push('Avoid common patterns and repeated characters');
+          feedback.push("Avoid common patterns and repeated characters");
         }
         break;
       }
     }
 
     // Generate strength feedback
-    let strength = 'weak';
+    let strength = "weak";
     if (score >= HELPERS_CONSTANTS.SCORING.PASSWORD_STRENGTH_VERY_STRONG)
-      strength = 'very strong';
+      strength = "very strong";
     else if (score >= HELPERS_CONSTANTS.SCORING.PASSWORD_STRENGTH_STRONG)
-      strength = 'strong';
+      strength = "strong";
     else if (score >= HELPERS_CONSTANTS.SCORING.PASSWORD_STRENGTH_MODERATE)
-      strength = 'moderate';
+      strength = "moderate";
 
     if (provideFeedback) {
       if (score < HELPERS_CONSTANTS.SCORING.PASSWORD_STRENGTH_WEAK_THRESHOLD) {
         feedback.push(
-          'Consider using a longer password with mixed character types'
+          "Consider using a longer password with mixed character types",
         );
       }
       if (!hasSymbols && requireSymbols) {
-        feedback.push('Adding special characters improves security');
+        feedback.push("Adding special characters improves security");
       }
     }
 
@@ -2552,7 +2970,7 @@ class Helpers {
       normalizeUnicode = true,
     } = options;
 
-    if (typeof input !== 'string') return '';
+    if (typeof input !== "string") return "";
 
     let sanitized = input;
 
@@ -2563,12 +2981,12 @@ class Helpers {
 
     // Remove invisible characters
     if (removeInvisibleChars) {
-      sanitized = sanitized.replace(/[\u200B-\u200D\uFEFF]/g, '');
+      sanitized = sanitized.replace(/[\u200B-\u200D\uFEFF]/g, "");
     }
 
     // Normalize unicode
     if (normalizeUnicode) {
-      sanitized = sanitized.normalize('NFKC');
+      sanitized = sanitized.normalize("NFKC");
     }
 
     // HTML sanitization
@@ -2578,7 +2996,7 @@ class Helpers {
 
     // URL validation
     if (!allowUrls) {
-      sanitized = sanitized.replace(/https?:\/\/[^\s]+/g, '[URL removed]');
+      sanitized = sanitized.replace(/https?:\/\/[^\s]+/g, "[URL removed]");
     }
 
     // Length limiting
@@ -2609,9 +3027,9 @@ class Helpers {
   static isEmpty(value) {
     return (
       value == null ||
-      value === '' ||
+      value === "" ||
       (Array.isArray(value) && value.length === 0) ||
-      (typeof value === 'object' && Object.keys(value).length === 0)
+      (typeof value === "object" && Object.keys(value).length === 0)
     );
   }
 
@@ -2625,21 +3043,21 @@ class Helpers {
     const recommendations = [];
 
     // Check for label association
-    const id = input.getAttribute('id');
+    const id = input.getAttribute("id");
     const hasLabel = id && document.querySelector(`label[for="${id}"]`);
-    const hasAriaLabel = input.getAttribute('aria-label');
-    const hasAriaLabelledBy = input.getAttribute('aria-labelledby');
+    const hasAriaLabel = input.getAttribute("aria-label");
+    const hasAriaLabelledBy = input.getAttribute("aria-labelledby");
 
     if (!hasLabel && !hasAriaLabel && !hasAriaLabelledBy) {
-      issues.push('Input lacks proper labeling');
-      recommendations.push('Add a label element or aria-label attribute');
+      issues.push("Input lacks proper labeling");
+      recommendations.push("Add a label element or aria-label attribute");
     }
 
     // Check for error handling
-    const hasAriaInvalid = input.hasAttribute('aria-invalid');
+    const hasAriaInvalid = input.hasAttribute("aria-invalid");
 
     if (input.checkValidity && !input.checkValidity() && !hasAriaInvalid) {
-      issues.push('Invalid input lacks aria-invalid attribute');
+      issues.push("Invalid input lacks aria-invalid attribute");
       recommendations.push('Add aria-invalid="true" for invalid inputs');
     }
 
@@ -2649,11 +3067,11 @@ class Helpers {
       const bgColor = styles.backgroundColor;
       const textColor = styles.color;
 
-      if (bgColor !== 'rgba(0, 0, 0, 0)' && textColor !== 'rgba(0, 0, 0, 0)') {
+      if (bgColor !== "rgba(0, 0, 0, 0)" && textColor !== "rgba(0, 0, 0, 0)") {
         const contrastInfo = this.checkColorAccessibility(textColor, bgColor);
         if (!contrastInfo.passesNormal) {
           issues.push(`Insufficient color contrast (${contrastInfo.ratio}:1)`);
-          recommendations.push('Increase color contrast to at least 4.5:1');
+          recommendations.push("Increase color contrast to at least 4.5:1");
         }
       }
     }
@@ -2665,7 +3083,7 @@ class Helpers {
       score: Math.max(
         0,
         100 -
-          issues.length * HELPERS_CONSTANTS.SCORING.ACCESSIBILITY_SCORE_PENALTY
+          issues.length * HELPERS_CONSTANTS.SCORING.ACCESSIBILITY_SCORE_PENALTY,
       ),
     };
   } // Enhanced Browser detection with privacy and feature support
@@ -2683,24 +3101,24 @@ class Helpers {
 
     const ua = navigator.userAgent;
     const info = {
-      name: 'unknown',
-      version: 'unknown',
-      engine: 'unknown',
+      name: "unknown",
+      version: "unknown",
+      engine: "unknown",
       mobile: /Mobile|Android|iPhone|iPad/.test(ua),
-      touch: 'ontouchstart' in window,
+      touch: "ontouchstart" in window,
     };
 
     // Browser detection with version extraction
     const browsers = [
-      { name: 'Chrome', pattern: /Chrome\/(\d+)/, engine: 'Blink' },
-      { name: 'Firefox', pattern: /Firefox\/(\d+)/, engine: 'Gecko' },
-      { name: 'Safari', pattern: /Safari\/(\d+)/, engine: 'WebKit' },
-      { name: 'Edge', pattern: /Edg\/(\d+)/, engine: 'Blink' },
-      { name: 'Opera', pattern: /OPR\/(\d+)/, engine: 'Blink' },
+      { name: "Chrome", pattern: /Chrome\/(\d+)/, engine: "Blink" },
+      { name: "Firefox", pattern: /Firefox\/(\d+)/, engine: "Gecko" },
+      { name: "Safari", pattern: /Safari\/(\d+)/, engine: "WebKit" },
+      { name: "Edge", pattern: /Edg\/(\d+)/, engine: "Blink" },
+      { name: "Opera", pattern: /OPR\/(\d+)/, engine: "Blink" },
       {
-        name: 'IE',
+        name: "IE",
         pattern: /MSIE (\d+)|Trident.*rv:(\d+)/,
-        engine: 'Trident',
+        engine: "Trident",
       },
     ];
 
@@ -2724,19 +3142,19 @@ class Helpers {
         localStorage: this.supportsLocalStorage(),
         sessionStorage: this.supportsSessionStorage(),
         indexedDB: this.supportsIndexedDB(),
-        webWorkers: typeof Worker !== 'undefined',
-        serviceWorkers: 'serviceWorker' in navigator,
-        webAssembly: typeof WebAssembly !== 'undefined',
+        webWorkers: typeof Worker !== "undefined",
+        serviceWorkers: "serviceWorker" in navigator,
+        webAssembly: typeof WebAssembly !== "undefined",
         es6Modules: this.supportsES6Modules(),
         css3: this.supportsCSS3(),
         mediaQueries: this.supportsMediaQueries(),
-        geolocation: 'geolocation' in navigator,
-        notifications: 'Notification' in window,
+        geolocation: "geolocation" in navigator,
+        notifications: "Notification" in window,
         fullscreen: this.supportsFullscreen(),
         webRTC: this.supportsWebRTC(),
         speechRecognition: this.supportsSpeechRecognition(),
-        intersectionObserver: 'IntersectionObserver' in window,
-        resizeObserver: 'ResizeObserver' in window,
+        intersectionObserver: "IntersectionObserver" in window,
+        resizeObserver: "ResizeObserver" in window,
       };
     }
 
@@ -2758,12 +3176,12 @@ class Helpers {
    */
   static supportsWebGL(version = 1) {
     try {
-      const canvas = document.createElement('canvas');
+      const canvas = document.createElement("canvas");
       const context =
         version === 2
-          ? canvas.getContext('webgl2')
-          : canvas.getContext('webgl') ||
-            canvas.getContext('experimental-webgl');
+          ? canvas.getContext("webgl2")
+          : canvas.getContext("webgl") ||
+            canvas.getContext("experimental-webgl");
       return !!context;
     } catch {
       return false;
@@ -2781,7 +3199,7 @@ class Helpers {
    */
   static supportsLocalStorage() {
     try {
-      const test = '__localStorage_test__';
+      const test = "__localStorage_test__";
       localStorage.setItem(test, test);
       localStorage.removeItem(test);
       return true;
@@ -2792,7 +3210,7 @@ class Helpers {
 
   static supportsSessionStorage() {
     try {
-      const test = '__sessionStorage_test__';
+      const test = "__sessionStorage_test__";
       sessionStorage.setItem(test, test);
       sessionStorage.removeItem(test);
       return true;
@@ -2802,7 +3220,7 @@ class Helpers {
   }
 
   static supportsIndexedDB() {
-    return 'indexedDB' in window;
+    return "indexedDB" in window;
   }
 
   /**
@@ -2823,14 +3241,14 @@ class Helpers {
    * @returns {boolean} CSS3 support
    */
   static supportsCSS3() {
-    const testElement = document.createElement('div');
+    const testElement = document.createElement("div");
     const cssProperties = [
-      'transform',
-      'transition',
-      'animation',
-      'borderRadius',
+      "transform",
+      "transition",
+      "animation",
+      "borderRadius",
     ];
-    return cssProperties.some(prop => prop in testElement.style);
+    return cssProperties.some((prop) => prop in testElement.style);
   }
 
   /**
@@ -2838,7 +3256,7 @@ class Helpers {
    * @returns {boolean} Media queries support
    */
   static supportsMediaQueries() {
-    return typeof window.matchMedia !== 'undefined';
+    return typeof window.matchMedia !== "undefined";
   }
 
   /**
@@ -2890,21 +3308,21 @@ class Helpers {
     const width = window.innerWidth;
     const height = window.innerHeight;
 
-    let deviceType = 'desktop';
-    let breakpoint = 'xl';
+    let deviceType = "desktop";
+    let breakpoint = "xl";
 
     if (width < HELPERS_CONSTANTS.DEVICE.MOBILE_BREAKPOINT) {
-      deviceType = 'mobile';
-      breakpoint = 'xs';
+      deviceType = "mobile";
+      breakpoint = "xs";
     } else if (width < HELPERS_CONSTANTS.DEVICE.TABLET_BREAKPOINT) {
-      deviceType = 'mobile';
-      breakpoint = 'sm';
+      deviceType = "mobile";
+      breakpoint = "sm";
     } else if (width < HELPERS_CONSTANTS.DEVICE.DESKTOP_BREAKPOINT) {
-      deviceType = 'tablet';
-      breakpoint = 'md';
+      deviceType = "tablet";
+      breakpoint = "md";
     } else if (width < HELPERS_CONSTANTS.DEVICE.LARGE_DESKTOP_BREAKPOINT) {
-      deviceType = 'desktop';
-      breakpoint = 'lg';
+      deviceType = "desktop";
+      breakpoint = "lg";
     }
 
     const deviceInfo = {
@@ -2912,13 +3330,13 @@ class Helpers {
       breakpoint,
       width,
       height,
-      mobile: deviceType === 'mobile',
-      tablet: deviceType === 'tablet',
-      desktop: deviceType === 'desktop',
+      mobile: deviceType === "mobile",
+      tablet: deviceType === "tablet",
+      desktop: deviceType === "desktop",
     };
 
     if (includeOrientation) {
-      deviceInfo.orientation = width > height ? 'landscape' : 'portrait';
+      deviceInfo.orientation = width > height ? "landscape" : "portrait";
     }
 
     if (includePixelRatio) {
@@ -2927,7 +3345,7 @@ class Helpers {
         deviceInfo.pixelRatio > HELPERS_CONSTANTS.DEVICE.HIGH_DPI_THRESHOLD;
     }
 
-    if (includeTouchPoints && 'maxTouchPoints' in navigator) {
+    if (includeTouchPoints && "maxTouchPoints" in navigator) {
       deviceInfo.maxTouchPoints = navigator.maxTouchPoints;
       deviceInfo.multiTouch = navigator.maxTouchPoints > 1;
     }
@@ -2957,16 +3375,16 @@ class Helpers {
     // Check for prefers-reduced-motion
     if (window.matchMedia) {
       preferences.reduceMotion = window.matchMedia(
-        '(prefers-reduced-motion: reduce)'
+        "(prefers-reduced-motion: reduce)",
       ).matches;
       preferences.highContrast = window.matchMedia(
-        '(prefers-contrast: high)'
+        "(prefers-contrast: high)",
       ).matches;
 
       // Check for other accessibility preferences if supported
       try {
         preferences.reducedTransparency = window.matchMedia(
-          '(prefers-reduced-transparency: reduce)'
+          "(prefers-reduced-transparency: reduce)",
         ).matches;
       } catch (e) {
         // Not all browsers support this yet
@@ -3007,7 +3425,7 @@ class Helpers {
     }
 
     // Memory information (if available and permission granted)
-    if (includeMemory && 'memory' in performance) {
+    if (includeMemory && "memory" in performance) {
       metrics.memory = {
         usedJSHeapSize: performance.memory.usedJSHeapSize,
         totalJSHeapSize: performance.memory.totalJSHeapSize,
@@ -3016,7 +3434,7 @@ class Helpers {
     }
 
     // Connection information (if available)
-    if (includeConnection && 'connection' in navigator) {
+    if (includeConnection && "connection" in navigator) {
       const { connection } = navigator;
       metrics.connection = {
         effectiveType: connection.effectiveType,
@@ -3026,10 +3444,10 @@ class Helpers {
     }
 
     // Battery consideration
-    if (respectBattery && 'getBattery' in navigator) {
+    if (respectBattery && "getBattery" in navigator) {
       navigator
         .getBattery()
-        .then(battery => {
+        .then((battery) => {
           if (battery.level < HELPERS_CONSTANTS.DEVICE.LOW_BATTERY_THRESHOLD) {
             metrics.lowBattery = true;
           }
@@ -3049,7 +3467,7 @@ class Helpers {
    */
   static calculateEthicsScore(metrics, options = {}) {
     const {
-      normalizationMethod = 'weighted',
+      normalizationMethod = "weighted",
       minScore = 0,
       maxScore = 100,
       defaultWeight = 1,
@@ -3058,7 +3476,7 @@ class Helpers {
 
     if (
       !metrics ||
-      (typeof metrics.size === 'number'
+      (typeof metrics.size === "number"
         ? metrics.size === 0
         : Object.keys(metrics).length === 0)
     ) {
@@ -3070,19 +3488,19 @@ class Helpers {
     let validMetrics = 0;
 
     const processMetric = (metric, _key) => {
-      if (typeof metric === 'object' && metric !== null) {
-        const value = typeof metric.value === 'number' ? metric.value : 0;
+      if (typeof metric === "object" && metric !== null) {
+        const value = typeof metric.value === "number" ? metric.value : 0;
         const weight =
-          typeof metric.weight === 'number' ? metric.weight : defaultWeight;
+          typeof metric.weight === "number" ? metric.weight : defaultWeight;
         const importance =
-          typeof metric.importance === 'number' ? metric.importance : 1;
+          typeof metric.importance === "number" ? metric.importance : 1;
 
         if (value >= 0 && value <= 100) {
           totalScore += value * weight * importance;
           totalWeight += weight * importance;
           validMetrics++;
         }
-      } else if (typeof metric === 'number' && metric >= 0 && metric <= 100) {
+      } else if (typeof metric === "number" && metric >= 0 && metric <= 100) {
         totalScore += metric * defaultWeight;
         totalWeight += defaultWeight;
         validMetrics++;
@@ -3093,7 +3511,7 @@ class Helpers {
       metrics.forEach(processMetric);
     } else {
       Object.entries(metrics).forEach(([key, metric]) =>
-        processMetric(metric, key)
+        processMetric(metric, key),
       );
     }
 
@@ -3104,24 +3522,24 @@ class Helpers {
     let finalScore;
 
     switch (normalizationMethod) {
-      case 'weighted':
+      case "weighted":
         finalScore = totalWeight > 0 ? totalScore / totalWeight : 0;
         break;
-      case 'average':
+      case "average":
         finalScore = totalScore / validMetrics;
         break;
-      case 'harmonic': {
+      case "harmonic": {
         // Harmonic mean - more sensitive to low scores
         const harmonicSum = Array.from(
-          metrics instanceof Map ? metrics.values() : Object.values(metrics)
+          metrics instanceof Map ? metrics.values() : Object.values(metrics),
         )
           .filter(
-            m =>
-              typeof m === 'number' ||
-              (typeof m === 'object' && typeof m.value === 'number')
+            (m) =>
+              typeof m === "number" ||
+              (typeof m === "object" && typeof m.value === "number"),
           )
           .reduce((sum, m) => {
-            const value = typeof m === 'number' ? m : m.value;
+            const value = typeof m === "number" ? m : m.value;
             return sum + (value > 0 ? 1 / value : 0);
           }, 0);
         finalScore = harmonicSum > 0 ? validMetrics / harmonicSum : 0;
@@ -3143,12 +3561,12 @@ class Helpers {
   static getEthicsGrade(score, options = {}) {
     const { includeAdvice = true, includeAccessibility = true } = options;
 
-    if (typeof score !== 'number' || score < 0 || score > 100) {
+    if (typeof score !== "number" || score < 0 || score > 100) {
       return {
-        grade: 'Invalid',
-        description: 'Invalid score provided',
-        level: 'error',
-        color: '#ff0000',
+        grade: "Invalid",
+        description: "Invalid score provided",
+        level: "error",
+        color: "#ff0000",
         score: 0,
       };
     }
@@ -3160,75 +3578,75 @@ class Helpers {
       advice = [];
 
     if (score >= HELPERS_CONSTANTS.SCORING.EXCELLENT_THRESHOLD) {
-      grade = 'A+';
-      description = 'Excellent';
-      level = 'excellent';
-      color = '#00aa00';
+      grade = "A+";
+      description = "Excellent";
+      level = "excellent";
+      color = "#00aa00";
       if (includeAdvice) {
         advice = [
-          'Outstanding ethical decision-making',
-          'Continue to maintain these high standards',
-          'Consider mentoring others in ethical practices',
+          "Outstanding ethical decision-making",
+          "Continue to maintain these high standards",
+          "Consider mentoring others in ethical practices",
         ];
       }
     } else if (score >= HELPERS_CONSTANTS.SCORING.GOOD_THRESHOLD) {
-      grade = 'A';
-      description = 'Very Good';
-      level = 'very-good';
-      color = '#44aa00';
+      grade = "A";
+      description = "Very Good";
+      level = "very-good";
+      color = "#44aa00";
       if (includeAdvice) {
         advice = [
-          'Strong ethical performance',
-          'Look for opportunities to reach excellence',
-          'Review any areas that scored below 90',
+          "Strong ethical performance",
+          "Look for opportunities to reach excellence",
+          "Review any areas that scored below 90",
         ];
       }
     } else if (score >= HELPERS_CONSTANTS.SCORING.SATISFACTORY_THRESHOLD) {
-      grade = 'B';
-      description = 'Good';
-      level = 'good';
-      color = '#88aa00';
+      grade = "B";
+      description = "Good";
+      level = "good";
+      color = "#88aa00";
       if (includeAdvice) {
         advice = [
-          'Good ethical foundation',
-          'Focus on improving consistency',
-          'Consider additional ethical training',
+          "Good ethical foundation",
+          "Focus on improving consistency",
+          "Consider additional ethical training",
         ];
       }
     } else if (score >= HELPERS_CONSTANTS.SCORING.NEEDS_IMPROVEMENT_THRESHOLD) {
-      grade = 'C';
-      description = 'Fair';
-      level = 'fair';
-      color = '#aaaa00';
+      grade = "C";
+      description = "Fair";
+      level = "fair";
+      color = "#aaaa00";
       if (includeAdvice) {
         advice = [
-          'Meets basic ethical standards',
-          'Significant room for improvement',
-          'Review ethical guidelines and principles',
+          "Meets basic ethical standards",
+          "Significant room for improvement",
+          "Review ethical guidelines and principles",
         ];
       }
     } else if (score >= HELPERS_CONSTANTS.SCORING.POOR_THRESHOLD) {
-      grade = 'D';
-      description = 'Needs Improvement';
-      level = 'needs-improvement';
-      color = '#aa6600';
+      grade = "D";
+      description = "Needs Improvement";
+      level = "needs-improvement";
+      color = "#aa6600";
       if (includeAdvice) {
         advice = [
-          'Below acceptable ethical standards',
-          'Immediate attention required',
-          'Seek guidance from ethical advisors',
+          "Below acceptable ethical standards",
+          "Immediate attention required",
+          "Seek guidance from ethical advisors",
         ];
       }
     } else {
-      grade = 'F';
-      description = 'Poor';
-      level = 'poor';
-      color = '#aa0000';
+      grade = "F";
+      description = "Poor";
+      level = "poor";
+      color = "#aa0000";
       if (includeAdvice) {
         advice = [
-          'Serious ethical concerns identified',
-          'Comprehensive ethical review needed',
-          'Consider professional ethical training',
+          "Serious ethical concerns identified",
+          "Comprehensive ethical review needed",
+          "Consider professional ethical training",
         ];
       }
     }
@@ -3256,7 +3674,7 @@ class Helpers {
         }),
         highContrastColor: this.getEthicsColor(score, { highContrast: true }),
         screenReaderText: this.formatForScreenReader(
-          `Your ethics score is ${score} points out of 100, earning a grade of ${grade}, which is considered ${description.toLowerCase()}.`
+          `Your ethics score is ${score} points out of 100, earning a grade of ${grade}, which is considered ${description.toLowerCase()}.`,
         ),
       };
     }
@@ -3283,19 +3701,19 @@ class Helpers {
     const absChange = Math.abs(change);
     const percentageChange = oldValue > 0 ? (change / oldValue) * 100 : 0;
 
-    let intensity = 'slightly';
-    let significance = 'minor';
+    let intensity = "slightly";
+    let significance = "minor";
 
     if (absChange > HELPERS_CONSTANTS.SCORING.SIGNIFICANT_CHANGE_THRESHOLD) {
-      intensity = 'significantly';
-      significance = 'major';
+      intensity = "significantly";
+      significance = "major";
     } else if (absChange > 10) {
-      intensity = 'moderately';
-      significance = 'moderate';
+      intensity = "moderately";
+      significance = "moderate";
     }
 
-    const direction = change > 0 ? 'improved' : 'declined';
-    const directionColor = change > 0 ? '#00aa00' : '#aa0000';
+    const direction = change > 0 ? "improved" : "declined";
+    const directionColor = change > 0 ? "#00aa00" : "#aa0000";
 
     let message = `${category} has ${intensity} ${direction} by ${absChange} points`;
     if (includePercentage && oldValue > 0) {
@@ -3314,14 +3732,14 @@ class Helpers {
       significance,
       message,
       color: directionColor,
-      trend: change > 0 ? 'positive' : change < 0 ? 'negative' : 'stable',
+      trend: change > 0 ? "positive" : change < 0 ? "negative" : "stable",
     };
 
     if (includeRecommendations) {
       insight.recommendations = this.generateEthicsRecommendations(
         newValue,
         category,
-        change
+        change,
       );
     }
 
@@ -3349,58 +3767,58 @@ class Helpers {
     // Score-based recommendations
     if (score < HELPERS_CONSTANTS.SCORING.POOR_PERFORMANCE_THRESHOLD) {
       recommendations.push(
-        `Critical: ${category} requires immediate attention and improvement`
+        `Critical: ${category} requires immediate attention and improvement`,
       );
-      recommendations.push('Consider consulting with ethics experts');
-      recommendations.push('Review fundamental ethical principles');
+      recommendations.push("Consider consulting with ethics experts");
+      recommendations.push("Review fundamental ethical principles");
     } else if (
       score < HELPERS_CONSTANTS.SCORING.AVERAGE_PERFORMANCE_THRESHOLD
     ) {
       recommendations.push(`${category} needs improvement to meet standards`);
-      recommendations.push('Implement additional training or guidelines');
+      recommendations.push("Implement additional training or guidelines");
     } else if (
       score < HELPERS_CONSTANTS.SCORING.EXCELLENT_PERFORMANCE_THRESHOLD
     ) {
       recommendations.push(
-        `${category} is performing well but has room for excellence`
+        `${category} is performing well but has room for excellence`,
       );
-      recommendations.push('Fine-tune processes for optimal performance');
+      recommendations.push("Fine-tune processes for optimal performance");
     } else {
       recommendations.push(
-        `Excellent ${category} performance - maintain current standards`
+        `Excellent ${category} performance - maintain current standards`,
       );
     }
 
     // Change-based recommendations
     if (change < HELPERS_CONSTANTS.SCORING.DECLINING_TREND_THRESHOLD) {
-      recommendations.push('Investigate causes of recent decline');
-      recommendations.push('Implement corrective measures immediately');
+      recommendations.push("Investigate causes of recent decline");
+      recommendations.push("Implement corrective measures immediately");
     } else if (change > 10) {
-      recommendations.push('Identify successful practices to replicate');
-      recommendations.push('Document improvements for future reference');
+      recommendations.push("Identify successful practices to replicate");
+      recommendations.push("Document improvements for future reference");
     }
 
     // Category-specific recommendations
     const categorySpecific = {
       privacy: [
-        'Review data collection practices',
-        'Ensure transparent privacy policies',
-        'Implement data minimization principles',
+        "Review data collection practices",
+        "Ensure transparent privacy policies",
+        "Implement data minimization principles",
       ],
       fairness: [
-        'Audit for algorithmic bias',
-        'Ensure equal treatment across demographics',
-        'Implement fairness metrics and monitoring',
+        "Audit for algorithmic bias",
+        "Ensure equal treatment across demographics",
+        "Implement fairness metrics and monitoring",
       ],
       transparency: [
-        'Improve explainability of decisions',
-        'Provide clear documentation',
-        'Enable user understanding of processes',
+        "Improve explainability of decisions",
+        "Provide clear documentation",
+        "Enable user understanding of processes",
       ],
       accountability: [
-        'Establish clear responsibility chains',
-        'Implement audit trails',
-        'Create feedback mechanisms',
+        "Establish clear responsibility chains",
+        "Implement audit trails",
+        "Create feedback mechanisms",
       ],
     };
 
@@ -3411,7 +3829,7 @@ class Helpers {
 
     return recommendations.slice(
       0,
-      HELPERS_CONSTANTS.SCORING.MAX_RECOMMENDATIONS
+      HELPERS_CONSTANTS.SCORING.MAX_RECOMMENDATIONS,
     ); // Limit to 5 recommendations
   } // Enhanced Simulation utilities with accessibility and performance
   /**
@@ -3421,11 +3839,11 @@ class Helpers {
    */
   static generateScenarioId(options = {}) {
     const {
-      prefix = 'scenario',
+      prefix = "scenario",
       includeTimestamp = true,
       includeRandom = true,
       includeVersion = false,
-      version = '1.0',
+      version = "1.0",
     } = options;
 
     const parts = [prefix];
@@ -3440,8 +3858,8 @@ class Helpers {
           .toString(HELPERS_CONSTANTS.GENERATION.ID_RADIX)
           .substring(
             HELPERS_CONSTANTS.GENERATION.ID_START_INDEX,
-            HELPERS_CONSTANTS.GENERATION.ID_END_INDEX
-          )
+            HELPERS_CONSTANTS.GENERATION.ID_END_INDEX,
+          ),
       );
     }
 
@@ -3449,7 +3867,7 @@ class Helpers {
       parts.push(`v${version}`);
     }
 
-    return parts.join('_');
+    return parts.join("_");
   }
 
   /**
@@ -3512,7 +3930,7 @@ class Helpers {
         ariaLabel: `Progress: ${safeCurrent} of ${safeTotal} completed`,
         ariaValueText: `${progress.percentage}% complete`,
         screenReaderText: this.formatForScreenReader(
-          `Progress is ${progress.percentage} percent complete. ${progress.remaining} items remaining.`
+          `Progress is ${progress.percentage} percent complete. ${progress.remaining} items remaining.`,
         ),
       };
     }
@@ -3534,12 +3952,12 @@ class Helpers {
       includeAccessibility = true,
     } = options;
 
-    if (!simulation || typeof simulation !== 'object') {
-      throw new Error('Invalid simulation data provided');
+    if (!simulation || typeof simulation !== "object") {
+      throw new Error("Invalid simulation data provided");
     }
 
     const ethicsScore = this.calculateEthicsScore(
-      simulation.ethicsMetrics || new Map()
+      simulation.ethicsMetrics || new Map(),
     );
     const grade = this.getEthicsGrade(ethicsScore, {
       includeAdvice: true,
@@ -3549,10 +3967,10 @@ class Helpers {
     const report = {
       metadata: {
         simulationId: simulation.id || this.generateScenarioId(),
-        title: simulation.title || 'Untitled Simulation',
+        title: simulation.title || "Untitled Simulation",
         completedAt: new Date().toISOString(),
         duration: simulation.state?.timeElapsed || 0,
-        version: simulation.version || '1.0',
+        version: simulation.version || "1.0",
         reportGenerated: Date.now(),
       },
       performance: {
@@ -3573,7 +3991,7 @@ class Helpers {
     // Include detailed metrics
     if (includeMetrics && simulation.ethicsMetrics) {
       report.ethicsMetrics = this.processEthicsMetrics(
-        simulation.ethicsMetrics
+        simulation.ethicsMetrics,
       );
     }
 
@@ -3592,7 +4010,7 @@ class Helpers {
     if (includeAccessibility) {
       report.accessibility = {
         summary: this.formatForScreenReader(
-          `Simulation ${report.metadata.title} completed with a score of ${ethicsScore} points, earning grade ${grade.grade}.`
+          `Simulation ${report.metadata.title} completed with a score of ${ethicsScore} points, earning grade ${grade.grade}.`,
         ),
         ariaLabel: `Simulation report for ${report.metadata.title}`,
         keyFindings: this.generateAccessibleSummary(report),
@@ -3612,12 +4030,12 @@ class Helpers {
     if (!simulation.scenarios || simulation.scenarios.length === 0) return 0;
 
     const completedScenarios = simulation.scenarios.filter(
-      scenario => scenario.completed || scenario.status === 'completed'
+      (scenario) => scenario.completed || scenario.status === "completed",
     ).length;
 
     return this.roundTo(
       (completedScenarios / simulation.scenarios.length) * 100,
-      1
+      1,
     );
   }
 
@@ -3646,30 +4064,30 @@ class Helpers {
     const processed = {};
 
     const processMetric = (metric, key) => {
-      if (typeof metric === 'object' && metric !== null) {
+      if (typeof metric === "object" && metric !== null) {
         processed[key] = {
           value: metric.value || 0,
           weight: metric.weight || 1,
           label: metric.label || key,
-          description: metric.description || '',
-          category: metric.category || 'general',
+          description: metric.description || "",
+          category: metric.category || "general",
         };
-      } else if (typeof metric === 'number') {
+      } else if (typeof metric === "number") {
         processed[key] = {
           value: metric,
           weight: 1,
           label: key,
-          description: '',
-          category: 'general',
+          description: "",
+          category: "general",
         };
       }
     };
 
     if (metrics instanceof Map) {
       metrics.forEach(processMetric);
-    } else if (typeof metrics === 'object') {
+    } else if (typeof metrics === "object") {
       Object.entries(metrics).forEach(([key, metric]) =>
-        processMetric(metric, key)
+        processMetric(metric, key),
       );
     }
 
@@ -3690,23 +4108,23 @@ class Helpers {
     if (decisions.length > 0) {
       const avgDecisionTime = this.calculateAverageDecisionTime(simulation);
       insights.push({
-        type: 'performance',
-        category: 'time',
+        type: "performance",
+        category: "time",
         message: `Average decision time: ${this.formatDuration(avgDecisionTime)}`,
         value: avgDecisionTime,
         benchmark: 30000, // 30 seconds
         status:
           avgDecisionTime <= HELPERS_CONSTANTS.TIME.GOOD_DECISION_TIME
-            ? 'good'
-            : 'attention',
+            ? "good"
+            : "attention",
       });
 
       // Decision pattern analysis
       const quickDecisions = decisions.filter(
-        d => (d.timeSpent || 0) < HELPERS_CONSTANTS.TIME.QUICK_DECISION_TIME
+        (d) => (d.timeSpent || 0) < HELPERS_CONSTANTS.TIME.QUICK_DECISION_TIME,
       ).length;
       const slowDecisions = decisions.filter(
-        d => (d.timeSpent || 0) > HELPERS_CONSTANTS.TIME.SLOW_DECISION_TIME
+        (d) => (d.timeSpent || 0) > HELPERS_CONSTANTS.TIME.SLOW_DECISION_TIME,
       ).length;
 
       if (
@@ -3714,12 +4132,12 @@ class Helpers {
         decisions.length * HELPERS_CONSTANTS.TIME.QUICK_DECISION_RATIO
       ) {
         insights.push({
-          type: 'behavior',
-          category: 'decision-speed',
+          type: "behavior",
+          category: "decision-speed",
           message:
-            'Tendency to make quick decisions - consider taking more time for complex scenarios',
+            "Tendency to make quick decisions - consider taking more time for complex scenarios",
           value: quickDecisions,
-          status: 'caution',
+          status: "caution",
         });
       }
 
@@ -3728,39 +4146,39 @@ class Helpers {
         decisions.length * HELPERS_CONSTANTS.ANALYSIS.SLOW_DECISION_RATIO
       ) {
         insights.push({
-          type: 'behavior',
-          category: 'decision-speed',
+          type: "behavior",
+          category: "decision-speed",
           message:
-            'Some decisions took longer than usual - this suggests careful consideration',
+            "Some decisions took longer than usual - this suggests careful consideration",
           value: slowDecisions,
-          status: 'positive',
+          status: "positive",
         });
       }
     }
 
     // Ethics performance insights
     const processMetricInsight = (metric, name) => {
-      const value = typeof metric === 'object' ? metric.value : metric;
-      const label = typeof metric === 'object' ? metric.label : name;
+      const value = typeof metric === "object" ? metric.value : metric;
+      const label = typeof metric === "object" ? metric.label : name;
 
-      if (typeof value === 'number') {
+      if (typeof value === "number") {
         if (value >= HELPERS_CONSTANTS.ANALYSIS.HIGH_PERFORMANCE_THRESHOLD) {
           insights.push({
-            type: 'ethics',
+            type: "ethics",
             category: name,
             message: `Strong performance in ${label}`,
             value,
-            status: 'excellent',
+            status: "excellent",
           });
         } else if (
           value <= HELPERS_CONSTANTS.ANALYSIS.LOW_PERFORMANCE_THRESHOLD
         ) {
           insights.push({
-            type: 'ethics',
+            type: "ethics",
             category: name,
             message: `Opportunity to improve ${label}`,
             value,
-            status: 'needs-improvement',
+            status: "needs-improvement",
           });
         }
       }
@@ -3768,9 +4186,9 @@ class Helpers {
 
     if (metrics instanceof Map) {
       metrics.forEach(processMetricInsight);
-    } else if (typeof metrics === 'object') {
+    } else if (typeof metrics === "object") {
       Object.entries(metrics).forEach(([name, metric]) =>
-        processMetricInsight(metric, name)
+        processMetricInsight(metric, name),
       );
     }
 
@@ -3785,30 +4203,30 @@ class Helpers {
   static generateSimulationRecommendations(simulation) {
     const recommendations = [];
     const ethicsScore = this.calculateEthicsScore(
-      simulation.ethicsMetrics || new Map()
+      simulation.ethicsMetrics || new Map(),
     );
     const completionRate = this.calculateCompletionRate(simulation);
 
     // Score-based recommendations
     if (ethicsScore < HELPERS_CONSTANTS.ANALYSIS.ETHICS_WARNING_THRESHOLD) {
       recommendations.push({
-        priority: 'high',
-        category: 'ethics',
-        title: 'Review Ethical Principles',
+        priority: "high",
+        category: "ethics",
+        title: "Review Ethical Principles",
         description:
-          'Consider reviewing the ethical principles before retrying',
-        action: 'study',
-        resources: ['Ethics Guidelines', 'Decision Framework'],
+          "Consider reviewing the ethical principles before retrying",
+        action: "study",
+        resources: ["Ethics Guidelines", "Decision Framework"],
       });
 
       recommendations.push({
-        priority: 'high',
-        category: 'process',
-        title: 'Take More Time',
+        priority: "high",
+        category: "process",
+        title: "Take More Time",
         description:
-          'Take more time to consider the consequences of each decision',
-        action: 'reflect',
-        resources: ['Decision Checklist', 'Impact Assessment'],
+          "Take more time to consider the consequences of each decision",
+        action: "reflect",
+        resources: ["Decision Checklist", "Impact Assessment"],
       });
     }
 
@@ -3817,32 +4235,32 @@ class Helpers {
       completionRate < HELPERS_CONSTANTS.ANALYSIS.COMPLETION_WARNING_THRESHOLD
     ) {
       recommendations.push({
-        priority: 'medium',
-        category: 'completion',
-        title: 'Complete All Scenarios',
+        priority: "medium",
+        category: "completion",
+        title: "Complete All Scenarios",
         description:
-          'Try to complete all scenarios for a comprehensive evaluation',
-        action: 'continue',
-        resources: ['Scenario Guide', 'Progress Tracker'],
+          "Try to complete all scenarios for a comprehensive evaluation",
+        action: "continue",
+        resources: ["Scenario Guide", "Progress Tracker"],
       });
     }
 
     // Metric-specific recommendations
     const processMetricRecommendation = (metric, name) => {
-      const value = typeof metric === 'object' ? metric.value : metric;
-      const label = typeof metric === 'object' ? metric.label : name;
+      const value = typeof metric === "object" ? metric.value : metric;
+      const label = typeof metric === "object" ? metric.label : name;
 
       if (
-        typeof value === 'number' &&
+        typeof value === "number" &&
         value < HELPERS_CONSTANTS.ANALYSIS.CRITICAL_VALUE_THRESHOLD
       ) {
         recommendations.push({
-          priority: 'medium',
-          category: 'improvement',
+          priority: "medium",
+          category: "improvement",
           title: `Improve ${label}`,
           description: `Focus on improving ${label} in future simulations`,
-          action: 'focus',
-          resources: [`${label} Guide`, 'Best Practices'],
+          action: "focus",
+          resources: [`${label} Guide`, "Best Practices"],
         });
       }
     };
@@ -3850,15 +4268,15 @@ class Helpers {
     const metrics = simulation.ethicsMetrics || new Map();
     if (metrics instanceof Map) {
       metrics.forEach(processMetricRecommendation);
-    } else if (typeof metrics === 'object') {
+    } else if (typeof metrics === "object") {
       Object.entries(metrics).forEach(([name, metric]) =>
-        processMetricRecommendation(metric, name)
+        processMetricRecommendation(metric, name),
       );
     }
 
     return recommendations.slice(
       0,
-      HELPERS_CONSTANTS.ANALYSIS.EXTENDED_RECOMMENDATIONS
+      HELPERS_CONSTANTS.ANALYSIS.EXTENDED_RECOMMENDATIONS,
     ); // Limit to 8 recommendations
   }
 
@@ -3881,11 +4299,11 @@ class Helpers {
 
     if (report.recommendations && report.recommendations.length > 0) {
       parts.push(
-        `${report.recommendations.length} recommendations provided for improvement.`
+        `${report.recommendations.length} recommendations provided for improvement.`,
       );
     }
 
-    return this.formatForScreenReader(parts.join(' '));
+    return this.formatForScreenReader(parts.join(" "));
   }
 
   /**
@@ -3895,20 +4313,20 @@ class Helpers {
    */
   static generateReportNavigation(report) {
     return [
-      { section: 'metadata', label: 'Simulation Information', priority: 1 },
-      { section: 'performance', label: 'Performance Summary', priority: 1 },
-      { section: 'statistics', label: 'Statistics', priority: 2 },
+      { section: "metadata", label: "Simulation Information", priority: 1 },
+      { section: "performance", label: "Performance Summary", priority: 1 },
+      { section: "statistics", label: "Statistics", priority: 2 },
       ...(report.ethicsMetrics
-        ? [{ section: 'ethicsMetrics', label: 'Ethics Metrics', priority: 2 }]
+        ? [{ section: "ethicsMetrics", label: "Ethics Metrics", priority: 2 }]
         : []),
       ...(report.insights
-        ? [{ section: 'insights', label: 'Insights', priority: 3 }]
+        ? [{ section: "insights", label: "Insights", priority: 3 }]
         : []),
       ...(report.recommendations
         ? [
             {
-              section: 'recommendations',
-              label: 'Recommendations',
+              section: "recommendations",
+              label: "Recommendations",
               priority: 3,
             },
           ]
@@ -3923,8 +4341,8 @@ class Helpers {
    */
   static downloadFile(content, filename, options = {}) {
     const {
-      mimeType = 'text/plain',
-      charset = 'utf-8',
+      mimeType = "text/plain",
+      charset = "utf-8",
       validateFilename = true,
       announceDownload = true,
       maxSizeBytes = HELPERS_CONSTANTS.FILE_SIZE.DEFAULT_TEXT_LIMIT_MB *
@@ -3947,7 +4365,7 @@ class Helpers {
     if (content instanceof Blob) {
       blob = content;
     } else {
-      const fullMimeType = mimeType.includes('charset')
+      const fullMimeType = mimeType.includes("charset")
         ? mimeType
         : `${mimeType};charset=${charset}`;
       blob = new Blob([content], { type: fullMimeType });
@@ -3956,7 +4374,7 @@ class Helpers {
     // Check file size
     if (blob.size > maxSizeBytes) {
       throw new Error(
-        `File size (${blob.size} bytes) exceeds maximum allowed size (${maxSizeBytes} bytes)`
+        `File size (${blob.size} bytes) exceeds maximum allowed size (${maxSizeBytes} bytes)`,
       );
     }
 
@@ -3964,13 +4382,13 @@ class Helpers {
     const url = URL.createObjectURL(blob);
 
     try {
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
       link.download = filename;
-      link.style.display = 'none';
+      link.style.display = "none";
 
       // Accessibility attributes
-      link.setAttribute('aria-label', `Download ${filename}`);
+      link.setAttribute("aria-label", `Download ${filename}`);
 
       document.body.appendChild(link);
       link.click();
@@ -3980,14 +4398,14 @@ class Helpers {
       if (announceDownload) {
         this.announceToScreenReader(
           `Download started for ${filename}`,
-          'polite'
+          "polite",
         );
       }
     } finally {
       // Clean up object URL
       setTimeout(
         () => URL.revokeObjectURL(url),
-        HELPERS_CONSTANTS.TIME.URL_CLEANUP_DELAY
+        HELPERS_CONSTANTS.TIME.URL_CLEANUP_DELAY,
       );
     }
   }
@@ -4006,12 +4424,12 @@ class Helpers {
       allowUnicode = true,
     } = options;
 
-    if (typeof filename !== 'string') {
-      return { valid: false, error: 'Filename must be a string' };
+    if (typeof filename !== "string") {
+      return { valid: false, error: "Filename must be a string" };
     }
 
     if (filename.length === 0) {
-      return { valid: false, error: 'Filename cannot be empty' };
+      return { valid: false, error: "Filename cannot be empty" };
     }
 
     if (filename.length > maxLength) {
@@ -4025,29 +4443,29 @@ class Helpers {
     const dangerousChars = /[<>:"|?*\\/]/;
     // Check for control characters (0-31)
     const hasControlChars = filename
-      .split('')
+      .split("")
       .some(
-        char =>
+        (char) =>
           char.charCodeAt(0) <
-          HELPERS_CONSTANTS.FILE_SIZE.CONTROL_CHAR_THRESHOLD
+          HELPERS_CONSTANTS.FILE_SIZE.CONTROL_CHAR_THRESHOLD,
       );
     if (dangerousChars.test(filename) || hasControlChars) {
-      return { valid: false, error: 'Filename contains invalid characters' };
+      return { valid: false, error: "Filename contains invalid characters" };
     }
 
     // Check for reserved names (Windows)
     const reservedNames = /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(\.|$)/i;
     if (reservedNames.test(filename)) {
-      return { valid: false, error: 'Filename uses a reserved name' };
+      return { valid: false, error: "Filename uses a reserved name" };
     }
 
     // Validate extension if specified
     if (allowedExtensions) {
-      const extension = filename.split('.').pop()?.toLowerCase();
+      const extension = filename.split(".").pop()?.toLowerCase();
       if (!extension || !allowedExtensions.includes(extension)) {
         return {
           valid: false,
-          error: `File extension not allowed. Allowed: ${allowedExtensions.join(', ')}`,
+          error: `File extension not allowed. Allowed: ${allowedExtensions.join(", ")}`,
         };
       }
     }
@@ -4056,16 +4474,16 @@ class Helpers {
     let sanitized = filename;
 
     if (!allowSpaces) {
-      sanitized = sanitized.replace(/\s+/g, '_');
+      sanitized = sanitized.replace(/\s+/g, "_");
     }
 
     if (!allowUnicode) {
       // Remove non-ASCII characters (keep only printable ASCII)
-      sanitized = sanitized.replace(/[^\u0020-\u007F]/g, '');
+      sanitized = sanitized.replace(/[^\u0020-\u007F]/g, "");
     }
 
     // Remove leading/trailing dots and spaces
-    sanitized = sanitized.trim().replace(/^\.+|\.+$/g, '');
+    sanitized = sanitized.trim().replace(/^\.+|\.+$/g, "");
 
     return {
       valid: true,
@@ -4082,18 +4500,18 @@ class Helpers {
    */
   static readFileAsText(file, options = {}) {
     const {
-      encoding = 'UTF-8',
+      encoding = "UTF-8",
       maxSizeBytes = HELPERS_CONSTANTS.FILE_SIZE.DEFAULT_BINARY_LIMIT_MB *
         HELPERS_CONSTANTS.FILE_SIZE.BYTES_PER_KB *
         HELPERS_CONSTANTS.FILE_SIZE.KB_PER_MB, // 50MB default
       onProgress = null,
       validateType = true,
-      allowedTypes = ['text/plain', 'text/csv', 'application/json', 'text/xml'],
+      allowedTypes = ["text/plain", "text/csv", "application/json", "text/xml"],
     } = options;
 
     return new Promise((resolve, reject) => {
       if (!(file instanceof File)) {
-        reject(new Error('Invalid file object'));
+        reject(new Error("Invalid file object"));
         return;
       }
 
@@ -4101,8 +4519,8 @@ class Helpers {
       if (file.size > maxSizeBytes) {
         reject(
           new Error(
-            `File size (${file.size} bytes) exceeds maximum (${maxSizeBytes} bytes)`
-          )
+            `File size (${file.size} bytes) exceeds maximum (${maxSizeBytes} bytes)`,
+          ),
         );
         return;
       }
@@ -4111,15 +4529,15 @@ class Helpers {
       if (validateType && !allowedTypes.includes(file.type)) {
         reject(
           new Error(
-            `File type ${file.type} not allowed. Allowed: ${allowedTypes.join(', ')}`
-          )
+            `File type ${file.type} not allowed. Allowed: ${allowedTypes.join(", ")}`,
+          ),
         );
         return;
       }
 
       const reader = new FileReader();
 
-      reader.onload = e => {
+      reader.onload = (e) => {
         try {
           resolve(e.target.result);
         } catch (error) {
@@ -4128,16 +4546,16 @@ class Helpers {
       };
 
       reader.onerror = () => {
-        reject(new Error('File reading failed'));
+        reject(new Error("File reading failed"));
       };
 
       reader.onabort = () => {
-        reject(new Error('File reading was aborted'));
+        reject(new Error("File reading was aborted"));
       };
 
       // Progress tracking
-      if (onProgress && typeof onProgress === 'function') {
-        reader.onprogress = e => {
+      if (onProgress && typeof onProgress === "function") {
+        reader.onprogress = (e) => {
           if (e.lengthComputable) {
             const progress = (e.loaded / e.total) * 100;
             onProgress(progress, e.loaded, e.total);
@@ -4160,13 +4578,13 @@ class Helpers {
       maxSizeBytes = HELPERS_CONSTANTS.FILE_SIZE.SMALL_BINARY_LIMIT_MB *
         HELPERS_CONSTANTS.FILE_SIZE.BYTES_PER_KB *
         HELPERS_CONSTANTS.FILE_SIZE.KB_PER_MB, // 10MB for binary files
-      allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+      allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"],
       onProgress = null,
     } = options;
 
     return new Promise((resolve, reject) => {
       if (!(file instanceof File)) {
-        reject(new Error('Invalid file object'));
+        reject(new Error("Invalid file object"));
         return;
       }
 
@@ -4182,12 +4600,12 @@ class Helpers {
 
       const reader = new FileReader();
 
-      reader.onload = e => resolve(e.target.result);
-      reader.onerror = () => reject(new Error('File reading failed'));
-      reader.onabort = () => reject(new Error('File reading was aborted'));
+      reader.onload = (e) => resolve(e.target.result);
+      reader.onerror = () => reject(new Error("File reading failed"));
+      reader.onabort = () => reject(new Error("File reading was aborted"));
 
-      if (onProgress && typeof onProgress === 'function') {
-        reader.onprogress = e => {
+      if (onProgress && typeof onProgress === "function") {
+        reader.onprogress = (e) => {
           if (e.lengthComputable) {
             onProgress((e.loaded / e.total) * 100);
           }
@@ -4206,18 +4624,18 @@ class Helpers {
    */
   static parseCSV(csvText, options = {}) {
     const {
-      delimiter = ',',
+      delimiter = ",",
       hasHeader = true,
       skipEmptyLines = true,
       maxRows = 10000,
       validateData = true,
     } = options;
 
-    if (typeof csvText !== 'string') {
-      throw new Error('CSV content must be a string');
+    if (typeof csvText !== "string") {
+      throw new Error("CSV content must be a string");
     }
 
-    const lines = csvText.split('\n');
+    const lines = csvText.split("\n");
     const result = {
       headers: [],
       data: [],
@@ -4247,7 +4665,7 @@ class Helpers {
     ) {
       const line = lines[i].trim();
 
-      if (skipEmptyLines && line === '') {
+      if (skipEmptyLines && line === "") {
         result.metadata.skippedRows++;
         continue;
       }
@@ -4263,9 +4681,9 @@ class Helpers {
         result.data.push(
           hasHeader
             ? Object.fromEntries(
-                result.headers.map((header, idx) => [header, row[idx] || ''])
+                result.headers.map((header, idx) => [header, row[idx] || ""]),
               )
-            : row
+            : row,
         );
         result.metadata.parsedRows++;
       } catch (error) {
@@ -4282,9 +4700,9 @@ class Helpers {
    * @param {string} delimiter - Field delimiter
    * @returns {Array} Parsed fields
    */
-  static parseCSVLine(line, delimiter = ',') {
+  static parseCSVLine(line, delimiter = ",") {
     const fields = [];
-    let current = '';
+    let current = "";
     let inQuotes = false;
     let i = 0;
 
@@ -4304,7 +4722,7 @@ class Helpers {
       } else if (char === delimiter && !inQuotes) {
         // Field separator
         fields.push(current.trim());
-        current = '';
+        current = "";
         i++;
       } else {
         current += char;
@@ -4327,14 +4745,14 @@ class Helpers {
   static exportToCSV(data, options = {}) {
     const {
       headers = null,
-      delimiter = ',',
+      delimiter = ",",
       includeHeaders = true,
       quote = '"',
-      lineBreak = '\n',
+      lineBreak = "\n",
     } = options;
 
     if (!Array.isArray(data) || data.length === 0) {
-      return '';
+      return "";
     }
 
     const csvLines = [];
@@ -4342,7 +4760,7 @@ class Helpers {
     // Determine headers
     let csvHeaders = headers;
     if (!csvHeaders && data.length > 0) {
-      if (typeof data[0] === 'object' && data[0] !== null) {
+      if (typeof data[0] === "object" && data[0] !== null) {
         csvHeaders = Object.keys(data[0]);
       }
     }
@@ -4351,23 +4769,25 @@ class Helpers {
     if (includeHeaders && csvHeaders) {
       csvLines.push(
         csvHeaders
-          .map(h => this.escapeCSVField(h, delimiter, quote))
-          .join(delimiter)
+          .map((h) => this.escapeCSVField(h, delimiter, quote))
+          .join(delimiter),
       );
     }
 
     // Add data rows
-    data.forEach(row => {
+    data.forEach((row) => {
       let csvRow;
       if (Array.isArray(row)) {
-        csvRow = row.map(field => this.escapeCSVField(field, delimiter, quote));
-      } else if (typeof row === 'object' && row !== null) {
+        csvRow = row.map((field) =>
+          this.escapeCSVField(field, delimiter, quote),
+        );
+      } else if (typeof row === "object" && row !== null) {
         csvRow = csvHeaders
-          ? csvHeaders.map(header =>
-              this.escapeCSVField(row[header], delimiter, quote)
+          ? csvHeaders.map((header) =>
+              this.escapeCSVField(row[header], delimiter, quote),
             )
-          : Object.values(row).map(field =>
-              this.escapeCSVField(field, delimiter, quote)
+          : Object.values(row).map((field) =>
+              this.escapeCSVField(field, delimiter, quote),
             );
       } else {
         csvRow = [this.escapeCSVField(row, delimiter, quote)];
@@ -4385,18 +4805,18 @@ class Helpers {
    * @param {string} quote - Quote character
    * @returns {string} Escaped field
    */
-  static escapeCSVField(field, delimiter = ',', quote = '"') {
-    if (field == null) return '';
+  static escapeCSVField(field, delimiter = ",", quote = '"') {
+    if (field == null) return "";
 
     const str = String(field);
     const needsQuoting =
       str.includes(delimiter) ||
       str.includes(quote) ||
-      str.includes('\n') ||
-      str.includes('\r');
+      str.includes("\n") ||
+      str.includes("\r");
 
     if (needsQuoting) {
-      return quote + str.replace(new RegExp(quote, 'g'), quote + quote) + quote;
+      return quote + str.replace(new RegExp(quote, "g"), quote + quote) + quote;
     }
 
     return str;
@@ -4409,7 +4829,7 @@ class Helpers {
 
     if (
       respectReducedMotion &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
       return t; // Linear for reduced motion
     }
@@ -4428,7 +4848,7 @@ class Helpers {
 
     if (
       respectReducedMotion &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
       return t;
     }
@@ -4441,7 +4861,7 @@ class Helpers {
 
     if (
       respectReducedMotion &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
       return t;
     }
@@ -4460,7 +4880,7 @@ class Helpers {
 
     if (
       respectReducedMotion &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
       return t;
     }
@@ -4520,7 +4940,7 @@ class Helpers {
 
     if (
       respectReducedMotion &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
       return t;
     }
@@ -4552,14 +4972,14 @@ class Helpers {
       trackPerformance = false,
     } = options;
 
-    if (typeof updateCallback !== 'function') {
-      throw new Error('updateCallback is required');
+    if (typeof updateCallback !== "function") {
+      throw new Error("updateCallback is required");
     }
 
     // Respect user's motion preferences
     const prefersReducedMotion =
       respectReducedMotion &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const actualDuration = prefersReducedMotion
       ? Math.min(duration, 100)
@@ -4585,7 +5005,7 @@ class Helpers {
         }
       : null;
 
-    const tick = currentTime => {
+    const tick = (currentTime) => {
       if (cancelled) return;
 
       if (!startTime) {
@@ -4622,14 +5042,14 @@ class Helpers {
 
       if (!paused) {
         const easedProgress =
-          typeof easing === 'function'
+          typeof easing === "function"
             ? easing(progress, { respectReducedMotion })
             : progress;
 
         try {
           updateCallback(easedProgress, progress, elapsed);
         } catch (error) {
-          logger.error('Animation update callback error:', error);
+          logger.error("Animation update callback error:", error);
           controller.cancel();
           return;
         }
@@ -4638,11 +5058,11 @@ class Helpers {
       if (progress < 1) {
         animationId = requestAnimationFrame(tick);
       } else {
-        if (completeCallback && typeof completeCallback === 'function') {
+        if (completeCallback && typeof completeCallback === "function") {
           try {
             completeCallback(performance);
           } catch (error) {
-            logger.error('Animation complete callback error:', error);
+            logger.error("Animation complete callback error:", error);
           }
         }
       }
@@ -4660,7 +5080,7 @@ class Helpers {
     };
 
     if (pauseOnVisibilityChange) {
-      document.addEventListener('visibilitychange', handleVisibilityChange);
+      document.addEventListener("visibilitychange", handleVisibilityChange);
     }
 
     const controller = {
@@ -4698,8 +5118,8 @@ class Helpers {
         }
         if (pauseOnVisibilityChange) {
           document.removeEventListener(
-            'visibilitychange',
-            handleVisibilityChange
+            "visibilitychange",
+            handleVisibilityChange,
           );
         }
         return this;
@@ -4747,13 +5167,13 @@ class Helpers {
 
     if (
       respectReducedMotion &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
       // For reduced motion, use simple linear interpolation
       return this.animate({
         duration: 200,
-        easing: t => t,
-        updateCallback: progress => {
+        easing: (t) => t,
+        updateCallback: (progress) => {
           const value = from + (to - from) * progress;
           if (updateCallback) updateCallback(value, progress);
         },
@@ -4768,14 +5188,14 @@ class Helpers {
     let animationId = null;
     let cancelled = false;
 
-    const tick = currentTime => {
+    const tick = (currentTime) => {
       if (cancelled) return;
 
       if (!startTime) startTime = currentTime;
 
       const deltaTime = Math.min(
         (currentTime - (startTime || currentTime)) / 1000,
-        HELPERS_CONSTANTS.ANIMATION.FRAME_DELTA_TARGET
+        HELPERS_CONSTANTS.ANIMATION.FRAME_DELTA_TARGET,
       );
       startTime = currentTime;
 
@@ -4790,7 +5210,7 @@ class Helpers {
       if (updateCallback) {
         updateCallback(
           currentValue,
-          Math.abs(to - currentValue) / Math.abs(to - from)
+          Math.abs(to - currentValue) / Math.abs(to - from),
         );
       }
 
@@ -4892,14 +5312,14 @@ class Helpers {
 
         if (sequential) {
           // Start animations one after another
-          const startNext = index => {
+          const startNext = (index) => {
             if (index < controllers.length) {
               setTimeout(
                 () => {
                   controllers[index].start();
                   startNext(index + 1);
                 },
-                index === 0 ? delay : 0
+                index === 0 ? delay : 0,
               );
             }
           };
@@ -4907,7 +5327,7 @@ class Helpers {
         } else {
           // Start all animations simultaneously
           setTimeout(() => {
-            controllers.forEach(controller => controller.start());
+            controllers.forEach((controller) => controller.start());
           }, delay);
         }
 
@@ -4915,17 +5335,17 @@ class Helpers {
       },
 
       pause() {
-        controllers.forEach(controller => controller.pause());
+        controllers.forEach((controller) => controller.pause());
         return this;
       },
 
       resume() {
-        controllers.forEach(controller => controller.resume());
+        controllers.forEach((controller) => controller.resume());
         return this;
       },
 
       cancel() {
-        controllers.forEach(controller => controller.cancel());
+        controllers.forEach((controller) => controller.cancel());
         return this;
       },
 
@@ -4946,23 +5366,215 @@ class Helpers {
    * @returns {number[]} Array of valid numbers
    */
   static filterValidNumbers(values) {
-    return values.filter(v => typeof v === 'number' && !isNaN(v));
+    return values.filter((v) => typeof v === "number" && !isNaN(v));
+  }
+
+  // Enterprise Static Methods for Fleet Management
+  static getEnterpriseStats() {
+    if (typeof window !== "undefined" && window.enterpriseHelpersMonitor) {
+      return window.enterpriseHelpersMonitor.performHealthCheck();
+    }
+    return {
+      status: "unavailable",
+      reason: "Enterprise monitor not initialized",
+      timestamp: Date.now(),
+    };
+  }
+
+  static getAllInstanceStats() {
+    const stats = [];
+    if (typeof window !== "undefined" && window.enterpriseHelpersMonitor) {
+      window.enterpriseHelpersMonitor.instances.forEach((instance) => {
+        stats.push({
+          instanceId: instance.instanceId,
+          operationCount: instance.operationCount,
+          lastOperation: instance.lastOperation,
+          circuitBreakerStates: Array.from(
+            instance.circuitBreakerStates.entries(),
+          ),
+        });
+      });
+    }
+    return stats;
+  }
+
+  static resetAllMetrics() {
+    if (typeof window !== "undefined" && window.enterpriseHelpersMonitor) {
+      window.enterpriseHelpersMonitor.performanceMetrics = {
+        operationCount: 0,
+        totalExecutionTime: 0,
+        errorCount: 0,
+        warningCount: 0,
+        slowOperations: 0,
+        memoryUsage: 0,
+        lastHealthCheck: Date.now(),
+      };
+      window.enterpriseHelpersMonitor.operationHistory = [];
+
+      // Reset instance metrics
+      window.enterpriseHelpersMonitor.instances.forEach((instance) => {
+        instance.operationCount = 0;
+        instance.lastOperation = null;
+        instance.circuitBreakerStates.clear();
+      });
+
+      logger.info("All helper metrics reset", { component: "Helpers" });
+      return true;
+    }
+    return false;
+  }
+
+  static forceCircuitBreakerReset(operationType = null) {
+    let resetCount = 0;
+    if (typeof window !== "undefined" && window.enterpriseHelpersMonitor) {
+      window.enterpriseHelpersMonitor.instances.forEach((instance) => {
+        if (operationType) {
+          if (instance.circuitBreakerStates.has(operationType)) {
+            instance.circuitBreakerStates.delete(operationType);
+            resetCount++;
+          }
+        } else {
+          resetCount += instance.circuitBreakerStates.size;
+          instance.circuitBreakerStates.clear();
+        }
+      });
+
+      logger.info("Circuit breakers reset", {
+        operationType: operationType || "all",
+        resetCount,
+        component: "Helpers",
+      });
+    }
+    return resetCount;
+  }
+
+  static getPerformanceReport() {
+    if (typeof window !== "undefined" && window.enterpriseHelpersMonitor) {
+      const monitor = window.enterpriseHelpersMonitor;
+      const recentOperations = monitor.operationHistory.slice(-100);
+
+      return {
+        timestamp: Date.now(),
+        totalInstances: monitor.instances.size,
+        globalMetrics: { ...monitor.performanceMetrics },
+        recentOperations: recentOperations.length,
+        averageExecutionTime: monitor.calculateAverageExecutionTime(),
+        errorRate: monitor.calculateErrorRate(),
+        circuitBreakerState: monitor.circuitBreaker.state,
+        memoryUsage: monitor.getMemoryUsage(),
+        instanceStats: this.getAllInstanceStats(),
+      };
+    }
+    return { status: "unavailable" };
   }
 }
 
+// Global Debug Functions for Enterprise Monitoring
+if (typeof window !== "undefined") {
+  // Global debug helpers for enterprise monitoring
+  window.debugHelpers = {
+    stats: () => {
+      console.group("🔧 Enterprise Helpers Statistics");
+      const stats = Helpers.getEnterpriseStats();
+      console.table(stats);
+      console.groupEnd();
+      return stats;
+    },
+
+    performance: () => {
+      console.group("📊 Helper Performance Report");
+      const report = Helpers.getPerformanceReport();
+      console.table(report.globalMetrics);
+      console.log("Instance Statistics:", report.instanceStats);
+      console.groupEnd();
+      return report;
+    },
+
+    instances: () => {
+      console.group("🏭 Helper Instance Fleet");
+      const instances = Helpers.getAllInstanceStats();
+      console.table(instances);
+      console.groupEnd();
+      return instances;
+    },
+
+    resetMetrics: () => {
+      console.log("🔄 Resetting all helper metrics...");
+      const result = Helpers.resetAllMetrics();
+      console.log(result ? "✅ Metrics reset successfully" : "❌ Reset failed");
+      return result;
+    },
+
+    resetCircuitBreakers: (operationType = null) => {
+      console.log("🔧 Resetting circuit breakers...", operationType || "all");
+      const count = Helpers.forceCircuitBreakerReset(operationType);
+      console.log(`✅ Reset ${count} circuit breaker(s)`);
+      return count;
+    },
+
+    monitor: () => {
+      if (window.enterpriseHelpersMonitor) {
+        console.group("🔍 Enterprise Helper Monitor");
+        console.log("Monitor Instance:", window.enterpriseHelpersMonitor);
+        console.log(
+          "Operation History:",
+          window.enterpriseHelpersMonitor.operationHistory.slice(-10),
+        );
+        console.log(
+          "Circuit Breaker:",
+          window.enterpriseHelpersMonitor.circuitBreaker,
+        );
+        console.groupEnd();
+        return window.enterpriseHelpersMonitor;
+      }
+      console.warn("❌ Enterprise monitor not available");
+      return null;
+    },
+
+    health: () => {
+      console.group("💚 Helper Health Check");
+      if (window.enterpriseHelpersMonitor) {
+        const health = window.enterpriseHelpersMonitor.performHealthCheck();
+        console.log(`Status: ${health.status}`);
+        console.table(health);
+        console.groupEnd();
+        return health;
+      }
+      console.warn("❌ Health check unavailable");
+      console.groupEnd();
+      return null;
+    },
+  };
+
+  // Console shortcuts
+  window.helperStats = window.debugHelpers.stats;
+  window.helperHealth = window.debugHelpers.health;
+  window.helperPerf = window.debugHelpers.performance;
+
+  console.log("🔧 Enterprise Helpers Debug Tools Available:");
+  console.log("- window.debugHelpers.stats() - Get statistics");
+  console.log("- window.debugHelpers.performance() - Performance report");
+  console.log("- window.debugHelpers.instances() - Instance fleet status");
+  console.log("- window.debugHelpers.health() - Health check");
+  console.log("- window.debugHelpers.monitor() - Monitor details");
+  console.log("- window.helperStats() - Quick stats shortcut");
+  console.log("- window.helperHealth() - Quick health shortcut");
+  console.log("- window.helperPerf() - Quick performance shortcut");
+}
+
 // Global cleanup function for better memory management
-window.addEventListener('beforeunload', () => {
+window.addEventListener("beforeunload", () => {
   HelperCache.clear();
 });
 
 // Initialize theme monitoring
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   ThemeHelpers.createThemeObserver((property, value) => {
     // Emit custom event for theme changes
     window.dispatchEvent(
-      new CustomEvent('themeChange', {
+      new CustomEvent("themeChange", {
         detail: { property, value },
-      })
+      }),
     );
   });
 }

@@ -10,7 +10,7 @@
   height: 100%;
   width: 100%;
   font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 }
 
@@ -120,7 +120,7 @@
 }
 
 .scenario-area::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -157,7 +157,7 @@
 }
 
 .selection-header::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -1rem;
   left: 50%;
@@ -340,7 +340,7 @@
 }
 
 .scenario-card.completed::after {
-  content: '✔️';
+  content: "✔️";
   position: absolute;
   top: 10px;
   right: 10px;
@@ -600,7 +600,7 @@
 }
 
 .scenario-header::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -10px;
   right: 1rem;
@@ -614,7 +614,7 @@
 }
 
 .scenario-header.completed::before {
-  content: '✅';
+  content: "✅";
   opacity: 1;
   animation: checkmark-bounce 0.6s ease-out;
 }
@@ -666,7 +666,7 @@
 }
 
 .back-btn::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
@@ -698,7 +698,7 @@
 /* Enhanced Focus States for Accessibility */
 .back-btn:focus,
 .action-btn:focus,
-.choice-option input[type='radio']:focus + .option-content {
+.choice-option input[type="radio"]:focus + .option-content {
   outline: 2px solid #667eea;
   outline-offset: 2px;
 }
@@ -709,7 +709,7 @@
 }
 
 .scenario-area.loading::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -723,7 +723,7 @@
 }
 
 .scenario-area.loading::before {
-  content: '⏳';
+  content: "⏳";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -763,7 +763,7 @@
     display: none;
   }
 
-  .choice-option input[type='radio']:checked + .option-content {
+  .choice-option input[type="radio"]:checked + .option-content {
     border: 2px solid #000;
   }
 }
@@ -869,31 +869,244 @@
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-  .scenario-area::before,
-  .scenario-header::before,
-  .scenario-title-section h2,
-  .scenario-context::before,
-  .stakeholders-overview::before,
-  .choice-section::before,
-  .consequences-display::before,
-  .stakeholder-tag,
-  .step.completed .step-number,
-  .step.active .step-number,
-  .progress-fill-header::after,
-  .action-btn.success {
-    animation: none;
-  }
-
-  .scenario-context,
-  .stakeholders-overview,
-  .choice-section,
-  .consequences-display,
-  .choice-group,
-  .stakeholder-impact {
-    animation: none;
-  }
-
-  * {
+  .floating-action-tab,
+  .floating-tab-text,
+  .floating-tab-arrow,
+  .floating-tab-ripple,
+  .heart-icon,
+  .arrow-icon {
     transition: none !important;
+    animation: none !important;
   }
+}
+
+/* Dark mode support for ethics explorer */
+body.dark-mode .ethics-explorer-layout {
+  background: linear-gradient(
+    135deg,
+    var(--theme-bg-primary) 0%,
+    var(--theme-bg-secondary) 100%
+  );
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .explorer-header {
+  background: linear-gradient(
+    135deg,
+    var(--theme-accent) 0%,
+    var(--theme-accent-dark) 100%
+  );
+  color: var(--theme-text-on-accent);
+}
+
+body.dark-mode .explorer-header h1 {
+  color: var(--theme-text-on-accent);
+}
+
+body.dark-mode .explorer-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+body.dark-mode .stat-item {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+body.dark-mode .stat-value {
+  color: var(--theme-text-on-accent);
+}
+
+body.dark-mode .stat-label {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+body.dark-mode .progress-bar {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .progress-fill {
+  background: linear-gradient(
+    90deg,
+    var(--theme-accent-light),
+    var(--theme-accent)
+  );
+  box-shadow: 0 0 10px var(--theme-accent-glow);
+}
+
+body.dark-mode .scenario-area {
+  background: linear-gradient(
+    135deg,
+    var(--theme-bg-secondary) 0%,
+    var(--theme-bg-tertiary) 100%
+  );
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .scenario-area:hover {
+  box-shadow: 0 8px 25px var(--theme-shadow);
+}
+
+body.dark-mode .scenario-selection h2 {
+  color: var(--theme-text-primary);
+  background: linear-gradient(
+    135deg,
+    var(--theme-accent) 0%,
+    var(--theme-accent-dark) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+body.dark-mode .selection-subtitle {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .scenarios-grid {
+  scrollbar-color: var(--theme-border) transparent;
+}
+
+body.dark-mode .scenarios-grid::-webkit-scrollbar-track {
+  background: var(--theme-bg-tertiary);
+}
+
+body.dark-mode .scenarios-grid:hover::-webkit-scrollbar-track {
+  background: var(--theme-bg-secondary);
+}
+
+body.dark-mode .scenarios-grid::-webkit-scrollbar-thumb {
+  background: var(--theme-border);
+}
+
+body.dark-mode .scenarios-grid::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-accent);
+}
+
+body.dark-mode .scenario-card {
+  background: linear-gradient(
+    135deg,
+    var(--theme-bg-secondary) 0%,
+    var(--theme-bg-tertiary) 100%
+  );
+  color: var(--theme-text-primary);
+  border-color: var(--theme-border);
+}
+
+body.dark-mode .scenario-card:hover {
+  border-color: var(--theme-accent);
+  box-shadow: 0 8px 25px var(--theme-shadow);
+}
+
+body.dark-mode .scenario-card.completed {
+  background: linear-gradient(
+    135deg,
+    var(--theme-bg-success) 0%,
+    var(--theme-bg-success-light) 100%
+  );
+  border-color: var(--theme-success);
+}
+
+body.dark-mode .scenario-card h3 {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .scenario-description {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .scenario-context {
+  color: var(--theme-text-muted);
+  background: var(--theme-bg-quaternary);
+  border-color: var(--theme-border);
+}
+
+body.dark-mode .difficulty-badge {
+  color: var(--theme-accent);
+  background: rgba(var(--theme-accent-rgb), 0.1);
+}
+
+body.dark-mode .completion-badge {
+  background: var(--theme-bg-success);
+  color: var(--theme-success);
+}
+
+body.dark-mode .challenge-text,
+body.dark-mode .reward-text {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .challenge-label,
+body.dark-mode .reward-label {
+  color: var(--theme-accent);
+}
+
+body.dark-mode .progress-bar-small {
+  background: var(--theme-bg-quaternary);
+}
+
+body.dark-mode .progress-fill-small {
+  background: linear-gradient(
+    90deg,
+    var(--theme-accent),
+    var(--theme-accent-light)
+  );
+}
+
+body.dark-mode .progress-text {
+  color: var(--theme-text-muted);
+}
+
+body.dark-mode .scenario-meta span {
+  color: var(--theme-text-muted);
+}
+
+body.dark-mode .action-text {
+  color: var(--theme-accent);
+}
+
+body.dark-mode .exploration-tips {
+  background: var(--theme-bg-secondary);
+  border-color: var(--theme-border);
+}
+
+body.dark-mode .exploration-tips h3 {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .tip-item {
+  background: var(--theme-bg-tertiary);
+  border-color: var(--theme-border);
+}
+
+body.dark-mode .tip-item:hover {
+  background: var(--theme-bg-quaternary);
+  border-color: var(--theme-accent);
+}
+
+body.dark-mode .tip-content strong {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .tip-content p {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .scenario-header h2 {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .scenario-setting {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .back-btn {
+  color: var(--theme-accent);
+  background: var(--theme-bg-tertiary);
+  border-color: var(--theme-border);
+}
+
+body.dark-mode .back-btn:hover {
+  background: var(--theme-accent);
+  color: var(--theme-text-on-accent);
+  border-color: var(--theme-accent);
 }

@@ -390,7 +390,7 @@
   color: white;
 }
 
-.donation-accordion .accordion-header[aria-expanded='true'] .accordion-icon {
+.donation-accordion .accordion-header[aria-expanded="true"] .accordion-icon {
   transform: rotate(90deg);
 }
 
@@ -516,4 +516,207 @@
 
 .donation-accordion .accordion-content.collapsed {
   animation: accordionCollapse 0.4s ease-out;
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+body.dark-mode .enhanced-donation-widget {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+  box-shadow: 0 4px 20px var(--theme-shadow-hover);
+}
+
+body.dark-mode .enhanced-donation-widget.inline {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+body.dark-mode .donation-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .donation-subtitle {
+  color: var(--theme-text-secondary);
+}
+
+/* Authentication banners */
+body.dark-mode .auth-banner {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .auth-banner.success {
+  background: rgba(76, 175, 80, 0.1);
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+body.dark-mode .auth-banner.warning {
+  background: rgba(255, 193, 7, 0.1);
+  border-color: var(--color-warning);
+  color: var(--color-warning);
+}
+
+/* Donation amounts */
+body.dark-mode .donation-amounts {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .amount-option {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .amount-option:hover {
+  background: var(--theme-bg-primary);
+  border-color: var(--theme-border-hover);
+}
+
+body.dark-mode .amount-option.selected {
+  background: rgba(74, 158, 255, 0.1);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+body.dark-mode .custom-amount-input {
+  background: var(--theme-bg-primary);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .custom-amount-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
+}
+
+/* Payment methods */
+body.dark-mode .payment-methods {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .payment-method {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .payment-method:hover {
+  background: var(--theme-bg-primary);
+  border-color: var(--theme-border-hover);
+}
+
+body.dark-mode .payment-method.selected {
+  background: rgba(74, 158, 255, 0.1);
+  border-color: var(--color-primary);
+}
+
+body.dark-mode .payment-method-label {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .payment-method-description {
+  color: var(--theme-text-secondary);
+}
+
+/* Donation summary */
+body.dark-mode .donation-summary {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .summary-item {
+  color: var(--theme-text-secondary);
+  border-bottom: 1px solid var(--theme-border);
+}
+
+body.dark-mode .summary-item-value {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .summary-total {
+  color: var(--theme-text-primary);
+  border-top: 1px solid var(--theme-border);
+}
+
+/* Action buttons */
+body.dark-mode .donation-submit-btn {
+  background: var(--color-primary);
+  color: white;
+  border: 1px solid var(--color-primary);
+}
+
+body.dark-mode .donation-submit-btn:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+body.dark-mode .donation-submit-btn:disabled {
+  background: var(--theme-bg-secondary);
+  color: var(--theme-text-muted);
+  border-color: var(--theme-border);
+}
+
+body.dark-mode .donation-cancel-btn {
+  background: var(--theme-bg-secondary);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .donation-cancel-btn:hover {
+  background: var(--theme-bg-primary);
+  border-color: var(--theme-border-hover);
+}
+
+/* Progress indicators */
+body.dark-mode .donation-progress {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .progress-step {
+  color: var(--theme-text-muted);
+}
+
+body.dark-mode .progress-step.active {
+  color: var(--color-primary);
+}
+
+body.dark-mode .progress-step.completed {
+  color: var(--color-success);
+}
+
+/* Accordion sections */
+body.dark-mode .donation-accordion {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .accordion-header {
+  background: var(--theme-bg-secondary);
+  border-bottom: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .accordion-header:hover {
+  background: var(--theme-bg-primary);
+}
+
+body.dark-mode .accordion-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .accordion-subtitle {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .accordion-content {
+  background: var(--theme-bg-secondary);
+}
+
+body.dark-mode .accordion-content-inner {
+  color: var(--theme-text-primary);
 }

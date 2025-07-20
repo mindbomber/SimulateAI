@@ -145,7 +145,7 @@
 }
 
 .nav-link::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -2px;
   left: 50%;
@@ -313,7 +313,7 @@
 }
 
 .profile-header-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -615,10 +615,10 @@
 .section-title {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-primary);
+  gap: var(--spacing-3);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-gray-900);
   margin: 0;
 }
 
@@ -1205,7 +1205,7 @@
 }
 
 .benefit-features li::before {
-  content: '•';
+  content: "•";
   position: absolute;
   left: 0;
   color: var(--primary-color);
@@ -1261,7 +1261,7 @@
 }
 
 .login-alternative::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 0;
@@ -1828,4 +1828,172 @@
     box-shadow: none;
     border: 1px solid #ccc;
   }
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+body.dark-mode .enhanced-profile {
+  --background-color: var(--theme-bg-primary);
+  --surface-color: var(--theme-bg-secondary);
+  --border-color: var(--theme-border);
+  --text-primary: var(--theme-text-primary);
+  --text-secondary: var(--theme-text-secondary);
+  --text-muted: var(--theme-text-muted);
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.2);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+  --shadow-xl:
+    0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5);
+}
+
+/* Header adjustments */
+body.dark-mode .enhanced-header {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  border-bottom: 3px solid var(--color-primary);
+}
+
+body.dark-mode .header-nav .nav-link {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .header-nav .nav-link:hover {
+  color: var(--color-primary);
+}
+
+/* Profile content */
+body.dark-mode .enhanced-section-card {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .section-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .section-subtitle {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .stat-card {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .stat-value {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .stat-label {
+  color: var(--theme-text-secondary);
+}
+
+/* Tier cards */
+body.dark-mode .tier-card {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .tier-card.current-tier {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 20px rgba(74, 158, 255, 0.3);
+}
+
+body.dark-mode .tier-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .tier-description {
+  color: var(--theme-text-secondary);
+}
+
+/* Progress indicators */
+body.dark-mode .progress-bar {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .progress-fill {
+  background: var(--color-primary);
+}
+
+body.dark-mode .progress-text {
+  color: var(--theme-text-primary);
+}
+
+/* Achievement badges */
+body.dark-mode .achievement-badge {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .achievement-badge.earned {
+  border-color: var(--color-success);
+  box-shadow: 0 0 12px rgba(76, 175, 80, 0.3);
+}
+
+body.dark-mode .badge-icon {
+  color: var(--color-primary);
+}
+
+body.dark-mode .badge-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .badge-description {
+  color: var(--theme-text-secondary);
+}
+
+/* Activity timeline */
+body.dark-mode .timeline-item {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .timeline-date {
+  color: var(--theme-text-muted);
+}
+
+body.dark-mode .timeline-content {
+  color: var(--theme-text-primary);
+}
+
+/* Interactive elements */
+body.dark-mode .btn-primary {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+body.dark-mode .btn-primary:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+body.dark-mode .btn-secondary {
+  background: var(--theme-bg-secondary);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .btn-secondary:hover {
+  background: var(--theme-bg-primary);
+  border-color: var(--theme-border-hover);
+}
+
+/* Form elements */
+body.dark-mode .form-input {
+  background: var(--theme-bg-primary);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .form-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
+}
+
+/* Skip link */
+body.dark-mode .skip-link {
+  background: var(--color-primary);
+  color: white;
 }

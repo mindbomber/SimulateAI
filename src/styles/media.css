@@ -1,0 +1,383 @@
+/**
+ * Copyright 2025 Armando Sori
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Standardized Media Queries for SimulateAI
+ * Device-specific breakpoints based on popular viewport dimensions
+ * 
+ * Usage:
+ * Import this file and use the defined breakpoints consistently
+ * across all components for unified responsive behavior.
+ */
+
+/* ===== CSS CUSTOM PROPERTIES FOR BREAKPOINTS ===== */
+:root {
+  /* Mobile Breakpoints */
+  --breakpoint-xs: 360px; /* Samsung Galaxy S21 */
+  --breakpoint-sm: 375px; /* iPhone SE */
+  --breakpoint-md: 390px; /* iPhone 12/13/14 */
+  --breakpoint-lg: 393px; /* Google Pixel 5 */
+  --breakpoint-xl: 428px; /* iPhone 12 Pro Max */
+
+  /* Tablet Breakpoints */
+  --breakpoint-tablet-sm: 768px; /* iPad Mini */
+  --breakpoint-tablet-md: 800px; /* Galaxy Tab S7+ */
+  --breakpoint-tablet-lg: 820px; /* iPad Air 5th Gen */
+  --breakpoint-tablet-xl: 1024px; /* iPad Pro 12.9" */
+
+  /* Laptop/Desktop Breakpoints */
+  --breakpoint-laptop-sm: 1280px; /* MacBook Air 13" */
+  --breakpoint-laptop-md: 1366px; /* Standard HD Laptop */
+  --breakpoint-laptop-lg: 1500px; /* Microsoft Surface Book */
+  --breakpoint-laptop-xl: 1536px; /* MacBook Pro 16" */
+
+  /* Ultra-wide Desktop */
+  --breakpoint-desktop-xl: 1920px; /* Full HD Desktop */
+  --breakpoint-desktop-2k: 2560px; /* 2K Desktop */
+  --breakpoint-desktop-4k: 3840px; /* 4K Desktop */
+}
+
+/* ===== MOBILE DEVICES ===== */
+
+/* Samsung Galaxy S21 (360×800) - Extra small mobile */
+@media only screen and (min-width: 360px) and (max-width: 374px) {
+  :root {
+    --device-type: "mobile-xs";
+    --container-padding: 12px;
+    --font-scale: 0.85;
+    --touch-target-min: 44px;
+    --floating-tab-width: 200px;
+    --floating-tab-height: 48px;
+    --floating-tab-protrusion: 55px;
+  }
+}
+
+/* iPhone SE (375×667) - Small mobile */
+@media only screen and (min-width: 375px) and (max-width: 389px) {
+  :root {
+    --device-type: "mobile-sm";
+    --container-padding: 14px;
+    --font-scale: 0.9;
+    --touch-target-min: 44px;
+    --floating-tab-width: 210px;
+    --floating-tab-height: 50px;
+    --floating-tab-protrusion: 60px;
+  }
+}
+
+/* iPhone 12/13/14 & Google Pixel 5 (390-393×844-851) - Modern mobile */
+@media only screen and (min-width: 390px) and (max-width: 399px) {
+  :root {
+    --device-type: "mobile-md";
+    --container-padding: 16px;
+    --font-scale: 0.95;
+    --touch-target-min: 44px;
+    --floating-tab-width: 220px;
+    --floating-tab-height: 52px;
+    --floating-tab-protrusion: 65px;
+  }
+}
+
+/* iPhone 12 Pro Max (428×926) - Large mobile */
+@media only screen and (min-width: 400px) and (max-width: 479px) {
+  :root {
+    --device-type: "mobile-lg";
+    --container-padding: 18px;
+    --font-scale: 1;
+    --touch-target-min: 44px;
+    --floating-tab-width: 240px;
+    --floating-tab-height: 54px;
+    --floating-tab-protrusion: 70px;
+  }
+}
+
+/* General mobile fallback (up to 767px) */
+@media only screen and (max-width: 767px) {
+  :root {
+    --device-category: "mobile";
+    --layout-type: "single-column";
+    --nav-type: "bottom-nav";
+    --sidebar-behavior: "overlay";
+  }
+}
+
+/* ===== TABLET DEVICES ===== */
+
+/* iPad Mini & Samsung Galaxy Tab (768-820×1024-1280) - Small tablets */
+@media only screen and (min-width: 768px) and (max-width: 820px) {
+  :root {
+    --device-type: "tablet-sm";
+    --container-padding: 20px;
+    --font-scale: 1.05;
+    --touch-target-min: 44px;
+    --floating-tab-width: 260px;
+    --floating-tab-height: 58px;
+    --floating-tab-protrusion: 80px;
+  }
+}
+
+/* iPad Air 5th Gen & Large Tablets (821-1023×1180-1366) - Medium tablets */
+@media only screen and (min-width: 821px) and (max-width: 1023px) {
+  :root {
+    --device-type: "tablet-md";
+    --container-padding: 24px;
+    --font-scale: 1.1;
+    --touch-target-min: 44px;
+    --floating-tab-width: 270px;
+    --floating-tab-height: 59px;
+    --floating-tab-protrusion: 82px;
+  }
+}
+
+/* iPad Pro 12.9" (1024-1279×1366) - Large tablets */
+@media only screen and (min-width: 1024px) and (max-width: 1279px) {
+  :root {
+    --device-type: "tablet-lg";
+    --container-padding: 28px;
+    --font-scale: 1.15;
+    --touch-target-min: 44px;
+    --floating-tab-width: 280px;
+    --floating-tab-height: 60px;
+    --floating-tab-protrusion: 85px;
+  }
+}
+
+/* General tablet range */
+@media only screen and (min-width: 768px) and (max-width: 1279px) {
+  :root {
+    --device-category: "tablet";
+    --layout-type: "two-column";
+    --nav-type: "side-nav";
+    --sidebar-behavior: "collapse";
+  }
+}
+
+/* ===== LAPTOP DEVICES ===== */
+
+/* MacBook Air 13" & Standard HD (1280-1366×768-800) - Compact laptops */
+@media only screen and (min-width: 1280px) and (max-width: 1366px) {
+  :root {
+    --device-type: "laptop-sm";
+    --container-padding: 32px;
+    --font-scale: 1;
+    --touch-target-min: 40px;
+    --floating-tab-width: 300px;
+    --floating-tab-height: 62px;
+    --floating-tab-protrusion: 90px;
+  }
+}
+
+/* Microsoft Surface Book (1367-1535×1000) - Medium laptops */
+@media only screen and (min-width: 1367px) and (max-width: 1535px) {
+  :root {
+    --device-type: "laptop-md";
+    --container-padding: 36px;
+    --font-scale: 1.05;
+    --touch-target-min: 40px;
+    --floating-tab-width: 310px;
+    --floating-tab-height: 63px;
+    --floating-tab-protrusion: 90px;
+  }
+}
+
+/* MacBook Pro 16" (1536+×960+) - Large laptops */
+@media only screen and (min-width: 1536px) and (max-width: 1919px) {
+  :root {
+    --device-type: "laptop-lg";
+    --container-padding: 40px;
+    --font-scale: 1.1;
+    --touch-target-min: 40px;
+    --floating-tab-width: 320px;
+    --floating-tab-height: 64px;
+    --floating-tab-protrusion: 90px;
+  }
+}
+
+/* General laptop range */
+@media only screen and (min-width: 1280px) and (max-width: 1919px) {
+  :root {
+    --device-category: "laptop";
+    --layout-type: "multi-column";
+    --nav-type: "top-nav";
+    --sidebar-behavior: "persistent";
+  }
+}
+
+/* ===== DESKTOP DEVICES ===== */
+
+/* Full HD Desktop (1920-2559×1080+) */
+@media only screen and (min-width: 1920px) and (max-width: 2559px) {
+  :root {
+    --device-type: "desktop-fhd";
+    --container-padding: 48px;
+    --font-scale: 1.15;
+    --touch-target-min: 40px;
+    --floating-tab-width: 340px;
+    --floating-tab-height: 66px;
+    --floating-tab-protrusion: 95px;
+  }
+}
+
+/* 2K Desktop (2560-3839×1440+) */
+@media only screen and (min-width: 2560px) and (max-width: 3839px) {
+  :root {
+    --device-type: "desktop-2k";
+    --container-padding: 56px;
+    --font-scale: 1.25;
+    --touch-target-min: 40px;
+    --floating-tab-width: 360px;
+    --floating-tab-height: 68px;
+    --floating-tab-protrusion: 100px;
+  }
+}
+
+/* 4K Desktop (3840+×2160+) */
+@media only screen and (min-width: 3840px) {
+  :root {
+    --device-type: "desktop-4k";
+    --container-padding: 64px;
+    --font-scale: 1.4;
+    --touch-target-min: 44px;
+    --floating-tab-width: 400px;
+    --floating-tab-height: 72px;
+    --floating-tab-protrusion: 110px;
+  }
+}
+
+/* General desktop range */
+@media only screen and (min-width: 1920px) {
+  :root {
+    --device-category: "desktop";
+    --layout-type: "wide-multi-column";
+    --nav-type: "mega-nav";
+    --sidebar-behavior: "dual-sidebar";
+  }
+}
+
+/* ===== ORIENTATION-BASED ADJUSTMENTS ===== */
+
+/* Portrait orientation adjustments */
+@media only screen and (orientation: portrait) {
+  :root {
+    --orientation: "portrait";
+    --header-height: 64px;
+    --footer-height: 80px;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media only screen and (orientation: landscape) {
+  :root {
+    --orientation: "landscape";
+    --header-height: 56px;
+    --footer-height: 64px;
+  }
+}
+
+/* ===== ACCESSIBILITY & PREFERENCE OVERRIDES ===== */
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  :root {
+    --accessibility-mode: "high-contrast";
+    --border-width: 2px;
+    --focus-ring-width: 4px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --animation-duration: 0ms;
+    --transition-duration: 0ms;
+    --accessibility-mode: "reduced-motion";
+  }
+}
+
+/* Increased text size preference */
+@media (prefers-reduced-data: reduce) {
+  :root {
+    --data-saver-mode: "enabled";
+    --image-quality: "low";
+    --animation-enabled: "false";
+  }
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  :root {
+    --device-type: "print";
+    --color-scheme: "light";
+  }
+
+  /* Hide interactive elements in print */
+  .floating-tab-link,
+  .floating-tour-tab-link,
+  .floating-surprise-tab-link,
+  .floating-action-tab,
+  .floating-surprise-tab,
+  .floating-tour-tab,
+  nav,
+  .sidebar,
+  .modal,
+  .tooltip {
+    display: none !important;
+  }
+}
+
+/* ===== COMPONENT-SPECIFIC HELPER CLASSES ===== */
+
+/* Floating Tab Responsive Utilities */
+.floating-tab-responsive {
+  width: var(--floating-tab-width);
+  height: var(--floating-tab-height);
+  transform: translateX(calc(100% - var(--floating-tab-protrusion)));
+}
+
+/* Container Responsive Utilities */
+.container-responsive {
+  padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
+}
+
+/* Font Scale Utilities */
+.text-responsive {
+  font-size: calc(1rem * var(--font-scale));
+}
+
+/* Touch Target Utilities */
+.touch-target {
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+}
+
+/* ===== DEBUGGING UTILITIES (Remove in production) ===== */
+@media (min-width: 1px) {
+  .debug-viewport::before {
+    content: "Device: " var(--device-type, "unknown") " | Category: "
+      var(--device-category, "unknown");
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(255, 0, 0, 0.8);
+    color: white;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-family: monospace;
+    z-index: 9999;
+    pointer-events: none;
+  }
+}

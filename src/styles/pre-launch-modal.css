@@ -12,14 +12,14 @@
 }
 
 .pre-launch-modal .modal-header {
-  padding: 1.5rem 2rem 1rem;
+  padding: var(--container-padding, 1.5rem) var(--container-padding, 2rem) 1rem;
   border-bottom: 1px solid #e5e5e5;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
 
 .pre-launch-modal .modal-title {
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--font-scale, 1));
   font-weight: 600;
   margin: 0;
   color: white;
@@ -83,7 +83,7 @@
 /* Scroll indicators for desktop tab overflow */
 .pre-launch-tabs::before,
 .pre-launch-tabs::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   bottom: 0;
@@ -152,15 +152,15 @@
   border-radius: 1px;
 }
 
-.tab-hamburger[aria-expanded='true'] .hamburger-line:nth-child(1) {
+.tab-hamburger[aria-expanded="true"] .hamburger-line:nth-child(1) {
   transform: rotate(45deg) translate(5px, 5px);
 }
 
-.tab-hamburger[aria-expanded='true'] .hamburger-line:nth-child(2) {
+.tab-hamburger[aria-expanded="true"] .hamburger-line:nth-child(2) {
   opacity: 0;
 }
 
-.tab-hamburger[aria-expanded='true'] .hamburger-line:nth-child(3) {
+.tab-hamburger[aria-expanded="true"] .hamburger-line:nth-child(3) {
   transform: rotate(-45deg) translate(7px, -6px);
 }
 
@@ -678,26 +678,6 @@
   }
 }
 
-@media (max-width: 480px) {
-  .pre-launch-modal .modal-title {
-    font-size: 1.25rem;
-  }
-
-  .tab-current-label {
-    font-size: 0.9rem;
-  }
-
-  .tab-button {
-    font-size: 0.85rem;
-    padding: 0.875rem 1.25rem;
-  }
-
-  .vocabulary-list,
-  .resource-list {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* Ethics Guide Tab Styles */
 .ethics-guide {
   display: flex;
@@ -930,4 +910,216 @@
   align-items: center;
   justify-content: flex-end;
   flex-shrink: 0;
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+body.dark-mode .pre-launch-modal {
+  background: var(--theme-bg-secondary);
+}
+
+body.dark-mode .pre-launch-modal .modal-header {
+  background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+  border-bottom: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .pre-launch-modal .modal-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .pre-launch-modal .modal-body {
+  background: var(--theme-bg-secondary);
+}
+
+body.dark-mode .pre-launch-modal .modal-footer {
+  background: var(--theme-bg-primary);
+  border-top: 1px solid var(--theme-border);
+}
+
+/* Content sections */
+body.dark-mode .scenario-overview {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .scenario-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .scenario-description {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .scenario-details {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+}
+
+/* Learning objectives */
+body.dark-mode .learning-objectives {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .learning-objectives h3,
+body.dark-mode .learning-objectives h4 {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .objective-item {
+  color: var(--theme-text-secondary);
+  border-bottom: 1px solid var(--theme-border);
+}
+
+/* Context dimensions */
+body.dark-mode .context-dimensions {
+  background: var(--theme-bg-primary);
+}
+
+body.dark-mode .dimension-item {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .dimension-item:hover {
+  border-color: var(--theme-border-hover);
+  box-shadow: 0 4px 12px var(--theme-shadow-hover);
+}
+
+body.dark-mode .dimension-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .dimension-description {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .dimension-value {
+  color: var(--color-primary);
+}
+
+/* Educational content */
+body.dark-mode .educational-content {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .educational-section {
+  border-bottom: 1px solid var(--theme-border);
+}
+
+body.dark-mode .educational-section h3 {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .educational-section p,
+body.dark-mode .educational-section li {
+  color: var(--theme-text-secondary);
+}
+
+/* Key concepts */
+body.dark-mode .key-concepts {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .concept-item {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .concept-item:hover {
+  border-color: var(--theme-border-hover);
+}
+
+body.dark-mode .concept-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .concept-description {
+  color: var(--theme-text-secondary);
+}
+
+/* Action buttons */
+body.dark-mode .btn-launch {
+  background: var(--color-primary);
+  color: white;
+  border: 1px solid var(--color-primary);
+}
+
+body.dark-mode .btn-launch:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+body.dark-mode .btn-secondary {
+  background: var(--theme-bg-primary);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .btn-secondary:hover {
+  background: var(--theme-bg-secondary);
+  border-color: var(--theme-border-hover);
+}
+
+/* Progress indicators */
+body.dark-mode .progress-indicator {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .progress-bar {
+  background: var(--theme-bg-secondary);
+}
+
+body.dark-mode .progress-fill {
+  background: var(--color-primary);
+}
+
+body.dark-mode .progress-text {
+  color: var(--theme-text-primary);
+}
+
+/* Prerequisites */
+body.dark-mode .prerequisites {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .prerequisite-item {
+  color: var(--theme-text-secondary);
+  border-bottom: 1px solid var(--theme-border);
+}
+
+body.dark-mode .prerequisite-item.completed {
+  color: var(--color-success);
+}
+
+body.dark-mode .prerequisite-item.incomplete {
+  color: var(--color-warning);
+}
+
+/* Tabs and navigation */
+body.dark-mode .nav-tabs {
+  border-bottom: 1px solid var(--theme-border);
+}
+
+body.dark-mode .nav-tab {
+  background: var(--theme-bg-secondary);
+  color: var(--theme-text-secondary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .nav-tab.active {
+  background: var(--theme-bg-primary);
+  color: var(--theme-text-primary);
+  border-bottom-color: var(--theme-bg-primary);
+}
+
+body.dark-mode .nav-tab:hover:not(.active) {
+  background: var(--theme-bg-primary);
+  color: var(--theme-text-primary);
 }

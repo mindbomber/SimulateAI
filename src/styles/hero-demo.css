@@ -7,7 +7,7 @@
 .hero-demo-container {
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   border-radius: 16px;
-  padding: 2rem;
+  padding: var(--container-padding, 2rem);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   max-width: 100%;
@@ -17,11 +17,11 @@
 
 .demo-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: var(--container-padding, 2rem);
 }
 
 .demo-title {
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--font-scale, 1));
   font-weight: 700;
   color: var(--color-gray-900);
   margin: 0 0 0.5rem 0;
@@ -30,23 +30,18 @@
 .demo-subtitle {
   color: var(--color-gray-600);
   margin: 0;
-  font-size: 0.95rem;
+  font-size: calc(0.95rem * var(--font-scale, 1));
 }
 
 /* Demo Content Layout */
 .demo-content {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 2rem;
+  gap: var(--container-padding, 2rem);
   align-items: start;
 }
 
-@media (max-width: 768px) {
-  .demo-content {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-}
+/* Mobile layout handled by media.css device-specific variables */
 
 /* Scenario Panel */
 .scenario-panel {
@@ -249,7 +244,7 @@
 
 /* Arrow shadow effect */
 .demo-feedback-popover .popover-arrow::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -9px;
   left: -9px;
@@ -491,7 +486,7 @@
 }
 
 .radar-instructions-accordion .accordion-content-inner li::before {
-  content: '→';
+  content: "→";
   position: absolute;
   left: 0;
   color: #667eea;
@@ -538,45 +533,7 @@
   font-size: 0.95rem;
 }
 
-/* Responsive Design for Hero Radar Demo */
-@media (max-width: 768px) {
-  .hero-radar-demo {
-    padding: 1rem; /* Reduced padding for more chart space */
-    margin: 1.5rem 0 0 0;
-  }
-
-  .demo-controls-grid {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 0.75rem;
-  }
-
-  .radar-instructions-accordion .accordion-header {
-    padding: 0.875rem 1rem;
-  }
-
-  .radar-instructions-accordion .accordion-content-inner {
-    padding: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .hero-radar-demo {
-    padding: 0.75rem; /* Minimal padding on small screens */
-  }
-
-  .hero-radar-demo h3 {
-    font-size: 1.25rem;
-  }
-
-  .demo-controls-grid {
-    grid-template-columns: 1fr;
-    max-width: 300px;
-  }
-
-  .radar-instructions-accordion .accordion-title {
-    font-size: 0.9rem;
-  }
-}
+/* Responsive design handled by media.css variables */
 
 /* High Contrast Mode Support */
 @media (prefers-contrast: high) {
@@ -642,7 +599,7 @@
 }
 
 .hero-demo-controls .demo-btn::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
@@ -822,4 +779,206 @@
   .ethics-glossary-accordion .accordion-title {
     font-size: 0.9rem;
   }
+}
+
+/* Dark mode support for hero demo */
+body.dark-mode .hero-demo-container {
+  background: linear-gradient(
+    135deg,
+    var(--theme-bg-secondary) 0%,
+    var(--theme-bg-tertiary) 100%
+  );
+  border-color: var(--theme-border);
+  box-shadow: 0 10px 25px var(--theme-shadow);
+}
+
+body.dark-mode .demo-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .demo-subtitle {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .scenario-panel {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+  box-shadow: 0 4px 12px var(--theme-shadow);
+}
+
+body.dark-mode .scenario-counter {
+  color: var(--theme-accent);
+  background: rgba(var(--theme-accent-rgb), 0.1);
+}
+
+body.dark-mode .scenario-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .scenario-question {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .choice-btn {
+  background: var(--theme-bg-tertiary);
+  border-color: var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .choice-btn:hover {
+  border-color: var(--theme-accent);
+  background: rgba(var(--theme-accent-rgb), 0.1);
+  box-shadow: 0 4px 12px var(--theme-shadow);
+}
+
+body.dark-mode .choice-btn:focus {
+  border-color: var(--theme-accent);
+  box-shadow: 0 0 0 3px rgba(var(--theme-accent-rgb), 0.2);
+}
+
+body.dark-mode .choice-btn.selected {
+  border-color: var(--theme-accent);
+  background: rgba(var(--theme-accent-rgb), 0.2);
+}
+
+body.dark-mode .choice-text {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .choice-arrow {
+  color: var(--theme-accent);
+}
+
+body.dark-mode .scenario-feedback {
+  background: linear-gradient(
+    135deg,
+    var(--theme-bg-secondary) 0%,
+    var(--theme-bg-tertiary) 100%
+  );
+  border-color: var(--theme-border);
+  box-shadow: 0 8px 25px var(--theme-shadow);
+}
+
+body.dark-mode .demo-feedback-popover .popover-content {
+  background: var(--theme-bg-secondary);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .demo-feedback-popover .popover-content h5 {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .demo-feedback-popover .popover-content p {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .demo-actions .btn {
+  background: var(--theme-bg-tertiary);
+  border-color: var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .demo-actions .btn:hover {
+  background: var(--theme-bg-quaternary);
+  border-color: var(--theme-accent);
+}
+
+body.dark-mode .demo-actions .btn-primary {
+  background: var(--theme-accent);
+  border-color: var(--theme-accent);
+  color: var(--theme-text-on-accent);
+}
+
+body.dark-mode .demo-actions .btn-primary:hover {
+  background: var(--theme-accent-dark);
+  border-color: var(--theme-accent-dark);
+}
+
+body.dark-mode .hero-radar-demo {
+  background: var(--theme-bg-secondary);
+  border-color: var(--theme-border);
+}
+
+body.dark-mode .hero-radar-demo h3 {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .hero-radar-demo p {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .hero-radar-container {
+  background: var(--theme-bg-tertiary);
+  border-color: var(--theme-border);
+}
+
+body.dark-mode .radar-instructions-accordion .accordion-item {
+  background: var(--theme-bg-tertiary);
+  border-color: var(--theme-border);
+}
+
+body.dark-mode .radar-instructions-accordion .accordion-header {
+  background: var(--theme-bg-quaternary);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .radar-instructions-accordion .accordion-header:hover {
+  background: rgba(var(--theme-accent-rgb), 0.1);
+}
+
+body.dark-mode .radar-instructions-accordion .accordion-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .radar-instructions-accordion .accordion-content-inner p {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .radar-instructions-accordion .accordion-content-inner li {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode
+  .radar-instructions-accordion
+  .accordion-content-inner
+  li
+  strong {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .ethics-glossary-accordion .accordion-item {
+  background: var(--theme-bg-tertiary);
+  border-color: var(--theme-border);
+}
+
+body.dark-mode .ethics-glossary-accordion .accordion-header {
+  background: var(--theme-bg-quaternary);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .ethics-glossary-accordion .accordion-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .ethics-glossary-accordion .glossary-item {
+  background: var(--theme-bg-quaternary);
+  border-color: var(--theme-border);
+}
+
+body.dark-mode .ethics-glossary-accordion .glossary-item h4 {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .ethics-glossary-accordion .glossary-item p {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .ethics-glossary-accordion .glossary-note {
+  background: rgba(var(--theme-warning-rgb), 0.1);
+  border-color: var(--theme-warning);
+}
+
+body.dark-mode .ethics-glossary-accordion .glossary-note p {
+  color: var(--theme-warning);
 }

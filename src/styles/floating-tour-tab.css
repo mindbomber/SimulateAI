@@ -43,7 +43,9 @@
     0 4px 20px rgba(108, 92, 231, 0.3),
     0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  transform: translateX(calc(100% - 90px)); /* Standardized 90px protrusion */
+  transform: translateX(
+    calc(100% - 90px)
+  ); /* Standardized 90px protrusion - matches other floating tabs */
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   min-width: 280px;
   height: 60px;
@@ -257,7 +259,7 @@
 @media (max-width: 768px) {
   .floating-tour-tab-link {
     width: 240px;
-    top: 20%; /* Standardized mobile vertical spacing */
+    top: 22%; /* Maintain consistent relative positioning */
   }
 
   .floating-tour-tab {
@@ -328,7 +330,7 @@
 @media (max-width: 480px) {
   .floating-tour-tab-link {
     width: 200px;
-    top: 18%; /* Standardized small mobile vertical spacing */
+    top: 22%; /* Maintain consistent relative positioning */
   }
 
   .floating-tour-tab {
@@ -385,6 +387,278 @@
   }
 }
 
+/* ==== DEVICE-SPECIFIC OPTIMIZATIONS ==== */
+
+/* iPhone SE (375×667) - Compact mobile */
+@media only screen and (min-width: 375px) and (max-width: 389px) {
+  .floating-tour-tab-link {
+    width: 210px;
+    top: 22%; /* Maintain consistent relative positioning */
+  }
+
+  .floating-tour-tab {
+    min-width: 210px;
+    height: 50px;
+    transform: translateX(
+      calc(100% - 60px)
+    ); /* Compact protrusion for small screens */
+  }
+
+  .floating-tour-tab-content {
+    padding: 0 12px;
+  }
+
+  .floating-tour-tab-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    font-size: 15px;
+  }
+
+  .tour-tab-title {
+    font-size: 13px;
+  }
+
+  .tour-tab-subtitle {
+    font-size: 10px;
+  }
+}
+
+/* iPhone 12/13/14 & Google Pixel 5 (390-393×844-851) - Modern mobile */
+@media only screen and (min-width: 390px) and (max-width: 399px) {
+  .floating-tour-tab-link {
+    width: 220px;
+    top: 22%; /* Maintain consistent relative positioning */
+  }
+
+  .floating-tour-tab {
+    min-width: 220px;
+    height: 52px;
+    transform: translateX(calc(100% - 65px)); /* Standard mobile protrusion */
+  }
+
+  .floating-tour-tab-content {
+    padding: 0 14px;
+  }
+
+  .floating-tour-tab-icon {
+    width: 22px;
+    height: 22px;
+    margin-right: 12px;
+    font-size: 16px;
+  }
+
+  .tour-tab-title {
+    font-size: 14px;
+  }
+
+  .tour-tab-subtitle {
+    font-size: 11px;
+  }
+}
+
+/* iPhone 12 Pro Max (428×926) - Large mobile */
+@media only screen and (min-width: 400px) and (max-width: 480px) {
+  .floating-tour-tab-link {
+    width: 240px;
+    top: 22%; /* Maintain consistent relative positioning */
+  }
+
+  .floating-tour-tab {
+    min-width: 240px;
+    height: 54px;
+    transform: translateX(calc(100% - 70px)); /* Slightly larger protrusion */
+  }
+
+  .floating-tour-tab-content {
+    padding: 0 16px;
+  }
+
+  .floating-tour-tab-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 14px;
+    font-size: 18px;
+  }
+
+  .tour-tab-title {
+    font-size: 15px;
+  }
+
+  .tour-tab-subtitle {
+    font-size: 12px;
+  }
+}
+
+/* iPad Mini & Samsung Galaxy Tab (768-820×1024-1280) - Small tablets */
+@media only screen and (min-width: 768px) and (max-width: 820px) {
+  .floating-tour-tab-link {
+    width: 260px;
+    top: 22%; /* Maintain consistent relative positioning */
+  }
+
+  .floating-tour-tab {
+    min-width: 260px;
+    height: 58px;
+    transform: translateX(calc(100% - 80px)); /* Tablet-optimized protrusion */
+  }
+
+  .floating-tour-tab-content {
+    padding: 0 18px;
+  }
+
+  .floating-tour-tab-icon {
+    width: 26px;
+    height: 26px;
+    margin-right: 16px;
+    font-size: 20px;
+  }
+
+  .tour-tab-title {
+    font-size: 16px;
+  }
+
+  .tour-tab-subtitle {
+    font-size: 13px;
+  }
+}
+
+/* iPad Pro & Large Tablets (1024-1180×1366-1366) - Large tablets */
+@media only screen and (min-width: 1024px) and (max-width: 1279px) {
+  .floating-tour-tab-link {
+    width: 280px;
+    top: 22%; /* Maintain consistent relative positioning */
+  }
+
+  .floating-tour-tab {
+    min-width: 280px;
+    height: 60px;
+    transform: translateX(calc(100% - 85px)); /* Large tablet protrusion */
+  }
+
+  .floating-tour-tab-content {
+    padding: 0 20px;
+  }
+
+  .floating-tour-tab-icon {
+    width: 28px;
+    height: 28px;
+    margin-right: 16px;
+    font-size: 20px;
+  }
+
+  .tour-tab-title {
+    font-size: 16px;
+  }
+
+  .tour-tab-subtitle {
+    font-size: 13px;
+  }
+}
+
+/* MacBook Air & Standard HD Laptops (1280-1366×768-800) - Compact laptops */
+@media only screen and (min-width: 1280px) and (max-width: 1366px) {
+  .floating-tour-tab-link {
+    width: 300px;
+    top: 22%; /* Maintain consistent relative positioning */
+  }
+
+  .floating-tour-tab {
+    min-width: 300px;
+    height: 62px;
+    transform: translateX(calc(100% - 90px)); /* Standard desktop protrusion */
+  }
+
+  .floating-tour-tab-content {
+    padding: 0 22px;
+  }
+
+  .floating-tour-tab-icon {
+    width: 30px;
+    height: 30px;
+    margin-right: 17px;
+    font-size: 21px;
+  }
+
+  .tour-tab-title {
+    font-size: 16px;
+  }
+
+  .tour-tab-subtitle {
+    font-size: 13px;
+  }
+}
+
+/* MacBook Pro & Microsoft Surface (1500-1536×960-1000) - High-res laptops */
+@media only screen and (min-width: 1500px) {
+  .floating-tour-tab-link {
+    width: 320px;
+    top: 22%; /* Maintain consistent relative positioning */
+  }
+
+  .floating-tour-tab {
+    min-width: 320px;
+    height: 64px;
+    transform: translateX(calc(100% - 90px)); /* Premium desktop protrusion */
+  }
+
+  .floating-tour-tab-content {
+    padding: 0 24px;
+  }
+
+  .floating-tour-tab-icon {
+    width: 32px;
+    height: 32px;
+    margin-right: 18px;
+    font-size: 22px;
+  }
+
+  .tour-tab-title {
+    font-size: 17px;
+  }
+
+  .tour-tab-subtitle {
+    font-size: 14px;
+  }
+
+  .floating-tour-tab-arrow {
+    width: 26px;
+    height: 26px;
+    margin-left: 14px;
+  }
+
+  .tour-arrow-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* High-res laptop feedback animations */
+  @keyframes tour-feedback-pulse {
+    0% {
+      transform: translateX(calc(100% - 90px)) scale(1);
+    }
+    50% {
+      transform: translateX(calc(100% - 90px)) scale(1.05);
+    }
+    100% {
+      transform: translateX(calc(100% - 90px)) scale(1);
+    }
+  }
+
+  @keyframes tour-shake {
+    0%,
+    100% {
+      transform: translateX(calc(100% - 90px));
+    }
+    25% {
+      transform: translateX(calc(100% - 85px));
+    }
+    75% {
+      transform: translateX(calc(100% - 95px));
+    }
+  }
+}
+
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   .floating-tour-tab {
@@ -422,4 +696,37 @@
   .floating-tour-tab-link {
     display: none;
   }
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+body.dark-mode .floating-tour-tab {
+  background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+  border: 1px solid rgba(108, 92, 231, 0.3);
+  box-shadow:
+    0 4px 20px rgba(162, 155, 254, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .floating-tour-tab:hover {
+  box-shadow:
+    0 6px 30px rgba(162, 155, 254, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .floating-tour-tab-content,
+body.dark-mode .tour-tab-title,
+body.dark-mode .tour-tab-subtitle {
+  color: white;
+}
+
+body.dark-mode .floating-tour-tab-link:focus {
+  outline: 3px solid var(--color-primary);
+}
+
+body.dark-mode .floating-tour-tab.tour-clicked {
+  background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+}
+
+body.dark-mode .floating-tour-tab.tour-unavailable {
+  background: linear-gradient(135deg, #636e72 0%, #2d3436 100%);
 }

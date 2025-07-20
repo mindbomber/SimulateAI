@@ -21,7 +21,7 @@
  * for the SimulateAI badge achievement system.
  */
 
-import logger from '../utils/logger.js';
+import logger from "../utils/logger.js";
 
 // Import js-confetti from CDN for GitHub Pages compatibility
 let JSConfetti;
@@ -30,12 +30,12 @@ let JSConfetti;
 async function loadConfetti() {
   if (!JSConfetti) {
     try {
-      const module = await import('https://cdn.skypack.dev/js-confetti@0.12.0');
+      const module = await import("https://cdn.skypack.dev/js-confetti@0.12.0");
       JSConfetti = module.default;
     } catch (error) {
       logger.warn(
-        'Failed to load js-confetti, confetti effects will be disabled:',
-        error
+        "Failed to load js-confetti, confetti effects will be disabled:",
+        error,
       );
     }
   }
@@ -46,7 +46,7 @@ import {
   GLOW_INTENSITY_CLASSES,
   MAX_IMPLEMENTED_TIER,
   BADGE_TIERS,
-} from '../data/badge-config.js';
+} from "../data/badge-config.js";
 
 /**
  * Badge Modal Class
@@ -81,7 +81,7 @@ export class BadgeModal {
     };
 
     this.PARTICLE_CONFIG = {
-      COUNT: 15,
+      COUNT: 8, // Reduced from 15 for performance
       MIN_SIZE: 2,
       SIZE_RANGE: 3,
       MAX_DELAY: 8,
@@ -92,8 +92,8 @@ export class BadgeModal {
     };
 
     this.EMOJI_BUBBLE_CONFIG = {
-      CATEGORY_COUNT: 8,
-      SIDEKICK_COUNT: 6,
+      CATEGORY_COUNT: 4, // Reduced from 8 for performance
+      SIDEKICK_COUNT: 3, // Reduced from 6 for performance
       MAX_DELAY: 12,
       MIN_DURATION: 8,
       DURATION_RANGE: 4,
@@ -129,16 +129,16 @@ export class BadgeModal {
    */
   bindEvents() {
     // Close modal on escape key
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && this.isVisible) {
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && this.isVisible) {
         this.closeModal();
       }
     });
 
     // Close modal on backdrop click
-    document.addEventListener('click', e => {
+    document.addEventListener("click", (e) => {
       if (
-        e.target?.classList?.contains('badge-modal-backdrop') &&
+        e.target?.classList?.contains("badge-modal-backdrop") &&
         this.isVisible
       ) {
         this.closeModal();
@@ -151,7 +151,7 @@ export class BadgeModal {
    * @param {Object} badgeConfig - Badge configuration object
    * @param {string} returnContext - Context to return to ('main' or 'category')
    */
-  async showBadgeModal(badgeConfig, returnContext = 'main') {
+  async showBadgeModal(badgeConfig, returnContext = "main") {
     if (this.isVisible) {
       return; // Prevent multiple modals
     }
@@ -180,66 +180,66 @@ export class BadgeModal {
       if (ConfettiClass) {
         this.confetti = new ConfettiClass();
       } else {
-        logger.warn('Confetti disabled - failed to load js-confetti library');
+        logger.warn("Confetti disabled - failed to load js-confetti library");
         return;
       }
     }
 
-    // Wave 1 - Large confetti (immediate)
+    // Wave 1 - Large confetti (immediate) - Reduced for performance
     this.confetti.addConfetti({
       emojis: [categoryEmoji],
       emojiSize: 60,
-      confettiNumber: 15,
+      confettiNumber: 8, // Reduced from 15
     });
 
-    // Wave 2 - Medium confetti (virtually simultaneous with wave 1)
+    // Wave 2 - Medium confetti (virtually simultaneous with wave 1) - Reduced for performance
     setTimeout(() => {
       this.confetti.addConfetti({
         emojis: [categoryEmoji],
         emojiSize: 40,
-        confettiNumber: 20,
+        confettiNumber: 10, // Reduced from 20
       });
     }, this.ANIMATION_DURATION.CONFETTI_SIMULTANEOUS);
 
-    // Wave 3 - Small confetti (after 500ms gap, with modal appearance)
+    // Wave 3 - Small confetti (after 500ms gap, with modal appearance) - Reduced for performance
     setTimeout(() => {
       this.confetti.addConfetti({
         emojis: [categoryEmoji],
         emojiSize: 25,
-        confettiNumber: 10,
+        confettiNumber: 6, // Reduced from 10
       });
     }, this.ANIMATION_DURATION.CONFETTI_SECOND_DELAY);
 
-    // Wave 4 - Progressive finale effects based on tier
+    // Wave 4 - Progressive finale effects based on tier - Reduced for performance
     setTimeout(() => {
       // Special finale effects for higher tiers
       if (badgeTier >= this.BADGE_TIERS.FINALE_THRESHOLDS.LARGE) {
-        // Tier 3+: Large finale
+        // Tier 3+: Large finale - Reduced
         this.confetti.addConfetti({
           emojis: [categoryEmoji],
           emojiSize: 70,
-          confettiNumber: 25,
+          confettiNumber: 12, // Reduced from 25
         });
       }
 
       if (badgeTier >= this.BADGE_TIERS.FINALE_THRESHOLDS.EPIC) {
-        // Tier 6+: Epic finale with multiple waves
+        // Tier 6+: Epic finale with multiple waves - Reduced
         setTimeout(() => {
           this.confetti.addConfetti({
             emojis: [categoryEmoji],
             emojiSize: 80,
-            confettiNumber: 35,
+            confettiNumber: 15, // Reduced from 35
           });
         }, this.CONFETTI_FINALE_DELAYS.EPIC_SECOND_WAVE);
       }
 
       if (badgeTier >= this.BADGE_TIERS.FINALE_THRESHOLDS.LEGENDARY) {
-        // Tier 9+: Legendary finale
+        // Tier 9+: Legendary finale - Reduced
         setTimeout(() => {
           this.confetti.addConfetti({
-            emojis: [categoryEmoji, '✨', '🌟'],
+            emojis: [categoryEmoji, "✨", "🌟"],
             emojiSize: 90,
-            confettiNumber: 50,
+            confettiNumber: 20, // Reduced from 50
           });
         }, this.CONFETTI_FINALE_DELAYS.LEGENDARY_WAVE);
       }
@@ -252,8 +252,8 @@ export class BadgeModal {
    * @param {string} returnContext - Return context
    */
   createModal(badgeConfig, returnContext) {
-    const modal = document.createElement('div');
-    modal.className = 'badge-modal-backdrop';
+    const modal = document.createElement("div");
+    modal.className = "badge-modal-backdrop";
     modal.innerHTML = this.generateModalHTML(badgeConfig, returnContext);
 
     document.body.appendChild(modal);
@@ -265,13 +265,13 @@ export class BadgeModal {
     // Add bubbling emoji effect
     this.createBubblingEmojis(
       badgeConfig.categoryEmoji,
-      badgeConfig.sidekickEmoji
+      badgeConfig.sidekickEmoji,
     );
 
     // Bind close button
-    const closeBtn = modal.querySelector('.badge-close-btn');
+    const closeBtn = modal.querySelector(".badge-close-btn");
     if (closeBtn) {
-      closeBtn.addEventListener('click', () => this.closeModal());
+      closeBtn.addEventListener("click", () => this.closeModal());
     }
 
     // Initialize typewriter effect after modal is shown
@@ -287,17 +287,17 @@ export class BadgeModal {
    * @returns {string} Modal HTML
    */
   generateModalHTML(badgeConfig, returnContext) {
-    const timestamp = new Date(badgeConfig.timestamp).toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
+    const timestamp = new Date(badgeConfig.timestamp).toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
       hour12: true,
     });
 
     const glowClass =
-      GLOW_INTENSITY_CLASSES[badgeConfig.glowIntensity] || 'badge-glow-low';
+      GLOW_INTENSITY_CLASSES[badgeConfig.glowIntensity] || "badge-glow-low";
     const tierText = this.getTierText(badgeConfig.tier);
     const reasonText = this.getReasonText(badgeConfig, tierText);
 
@@ -323,7 +323,7 @@ export class BadgeModal {
           
           <div class="badge-modal-footer">
             <button class="badge-close-btn btn-primary">
-              Back to ${returnContext === 'category' ? 'Category' : 'Scenarios'}
+              Back to ${returnContext === "category" ? "Category" : "Scenarios"}
             </button>
           </div>
         </div>
@@ -339,15 +339,15 @@ export class BadgeModal {
   getTierText(tier) {
     // Find the requirement for this tier from BADGE_TIERS
     const tierConfig = this.BADGE_TIERS.FULL_PROGRESSION.find(
-      t => t.tier === tier
+      (t) => t.tier === tier,
     );
     const requirement = tierConfig ? tierConfig.requirement : tier;
 
     // Special cases for lower tiers
     const specialCases = {
-      1: 'your first scenario',
-      2: 'three scenarios',
-      3: 'all six scenarios',
+      1: "your first scenario",
+      2: "three scenarios",
+      3: "all six scenarios",
     };
 
     if (specialCases[tier]) {
@@ -374,50 +374,50 @@ export class BadgeModal {
   animateModalEntrance() {
     if (!this.currentModal) return;
 
-    const modal = this.currentModal.querySelector('.badge-modal');
-    const shield = this.currentModal.querySelector('.badge-shield');
-    const sidekick = this.currentModal.querySelector('.badge-sidekick-emoji');
-    const title = this.currentModal.querySelector('.badge-title');
-    const quote = this.currentModal.querySelector('.badge-quote');
-    const details = this.currentModal.querySelector('.badge-details');
-    const footer = this.currentModal.querySelector('.badge-modal-footer');
+    const modal = this.currentModal.querySelector(".badge-modal");
+    const shield = this.currentModal.querySelector(".badge-shield");
+    const sidekick = this.currentModal.querySelector(".badge-sidekick-emoji");
+    const title = this.currentModal.querySelector(".badge-title");
+    const quote = this.currentModal.querySelector(".badge-quote");
+    const details = this.currentModal.querySelector(".badge-details");
+    const footer = this.currentModal.querySelector(".badge-modal-footer");
 
     // Initial states
-    modal.style.transform = 'scale(0.8)';
-    modal.style.opacity = '0';
-    sidekick.style.transform = 'scale(0) rotate(-180deg)';
-    sidekick.style.opacity = '0';
-    title.style.transform = 'translateY(20px)';
-    title.style.opacity = '0';
-    quote.style.transform = 'translateY(20px)';
-    quote.style.opacity = '0';
-    details.style.transform = 'translateY(20px)';
-    details.style.opacity = '0';
-    footer.style.transform = 'translateY(20px)';
-    footer.style.opacity = '0';
+    modal.style.transform = "scale(0.8)";
+    modal.style.opacity = "0";
+    sidekick.style.transform = "scale(0) rotate(-180deg)";
+    sidekick.style.opacity = "0";
+    title.style.transform = "translateY(20px)";
+    title.style.opacity = "0";
+    quote.style.transform = "translateY(20px)";
+    quote.style.opacity = "0";
+    details.style.transform = "translateY(20px)";
+    details.style.opacity = "0";
+    footer.style.transform = "translateY(20px)";
+    footer.style.opacity = "0";
 
     // Animate modal entrance
     setTimeout(() => {
       modal.style.transition = `all ${this.ANIMATION_DURATION.MODAL_ENTER}ms cubic-bezier(0.68, -0.55, 0.265, 1.55)`;
-      modal.style.transform = 'scale(1)';
-      modal.style.opacity = '1';
+      modal.style.transform = "scale(1)";
+      modal.style.opacity = "1";
     }, this.ANIMATION_DURATION.ENTRANCE_DELAY);
 
     // Animate shield scale
     setTimeout(() => {
       shield.style.transition = `transform ${this.ANIMATION_DURATION.BADGE_SCALE}ms cubic-bezier(0.68, -0.55, 0.265, 1.55)`;
-      shield.style.transform = 'scale(1.1)';
+      shield.style.transform = "scale(1.1)";
 
       setTimeout(() => {
-        shield.style.transform = 'scale(1)';
+        shield.style.transform = "scale(1)";
       }, this.ANIMATION_DURATION.BADGE_SCALE);
     }, this.ANIMATION_DURATION.SHIELD_DELAY);
 
     // Animate sidekick emoji entrance
     setTimeout(() => {
       sidekick.style.transition = `all ${this.ANIMATION_DURATION.SIDEKICK_ENTRANCE}ms cubic-bezier(0.68, -0.55, 0.265, 1.55)`;
-      sidekick.style.transform = 'scale(1) rotate(0deg)';
-      sidekick.style.opacity = '1';
+      sidekick.style.transform = "scale(1) rotate(0deg)";
+      sidekick.style.opacity = "1";
     }, this.ANIMATION_DURATION.SIDEKICK_DELAY);
 
     // Animate text elements with stagger
@@ -425,12 +425,12 @@ export class BadgeModal {
     textElements.forEach((element, index) => {
       setTimeout(
         () => {
-          element.style.transition = 'all 400ms ease-out';
-          element.style.transform = 'translateY(0)';
-          element.style.opacity = '1';
+          element.style.transition = "all 400ms ease-out";
+          element.style.transform = "translateY(0)";
+          element.style.opacity = "1";
         },
         this.ANIMATION_DURATION.TEXT_START_DELAY +
-          index * this.ANIMATION_DURATION.TEXT_STAGGER_DELAY
+          index * this.ANIMATION_DURATION.TEXT_STAGGER_DELAY,
       );
     });
   }
@@ -441,12 +441,12 @@ export class BadgeModal {
   closeModal() {
     if (!this.isVisible || !this.currentModal) return;
 
-    const modal = this.currentModal.querySelector('.badge-modal');
+    const modal = this.currentModal.querySelector(".badge-modal");
 
     // Animate exit
     modal.style.transition = `all ${this.ANIMATION_DURATION.MODAL_EXIT}ms ease-in`;
-    modal.style.transform = 'scale(0.9)';
-    modal.style.opacity = '0';
+    modal.style.transform = "scale(0.9)";
+    modal.style.opacity = "0";
 
     // Remove from DOM
     setTimeout(() => {
@@ -483,13 +483,13 @@ export class BadgeModal {
   createFloatingParticles() {
     if (!this.currentModal) return;
 
-    const particlesContainer = document.createElement('div');
-    particlesContainer.className = 'particles-container';
+    const particlesContainer = document.createElement("div");
+    particlesContainer.className = "particles-container";
 
     const particleCount = this.PARTICLE_CONFIG.COUNT;
     for (let i = 0; i < particleCount; i++) {
-      const particle = document.createElement('div');
-      particle.className = 'floating-particle';
+      const particle = document.createElement("div");
+      particle.className = "floating-particle";
 
       // Random properties for each particle
       const size =
@@ -529,13 +529,13 @@ export class BadgeModal {
   createBubblingEmojis(categoryEmoji, sidekickEmoji) {
     if (!this.currentModal) return;
 
-    const bubblesContainer = document.createElement('div');
-    bubblesContainer.className = 'emoji-bubbles-container';
+    const bubblesContainer = document.createElement("div");
+    bubblesContainer.className = "emoji-bubbles-container";
 
     // Create category emoji bubbles
     for (let i = 0; i < this.EMOJI_BUBBLE_CONFIG.CATEGORY_COUNT; i++) {
-      const bubble = document.createElement('div');
-      bubble.className = 'bubbling-emoji category';
+      const bubble = document.createElement("div");
+      bubble.className = "bubbling-emoji category";
       bubble.textContent = categoryEmoji;
 
       // Random properties for each bubble
@@ -560,8 +560,8 @@ export class BadgeModal {
 
     // Create sidekick emoji bubbles
     for (let i = 0; i < this.EMOJI_BUBBLE_CONFIG.SIDEKICK_COUNT; i++) {
-      const bubble = document.createElement('div');
-      bubble.className = 'bubbling-emoji sidekick';
+      const bubble = document.createElement("div");
+      bubble.className = "bubbling-emoji sidekick";
       bubble.textContent = sidekickEmoji;
 
       // Random properties for each bubble
@@ -585,7 +585,7 @@ export class BadgeModal {
     }
 
     // Insert bubbles inside the modal as background
-    const modal = this.currentModal.querySelector('.badge-modal');
+    const modal = this.currentModal.querySelector(".badge-modal");
     if (modal) {
       modal.insertBefore(bubblesContainer, modal.firstChild);
     }
@@ -598,19 +598,19 @@ export class BadgeModal {
   initializeTypewriter(quote) {
     if (!this.currentModal) return;
 
-    const quoteElement = this.currentModal.querySelector('.badge-quote');
+    const quoteElement = this.currentModal.querySelector(".badge-quote");
     if (!quoteElement) return;
 
     // Reset quote content and prepare for typewriter
-    quoteElement.textContent = '';
+    quoteElement.textContent = "";
 
     // Set up typewriter styles with improved responsive handling
-    quoteElement.style.whiteSpace = 'nowrap';
-    quoteElement.style.overflow = 'hidden';
-    quoteElement.style.width = '0';
-    quoteElement.style.maxWidth = '100%';
-    quoteElement.style.borderRight = '2px solid rgba(255, 255, 255, 0.8)';
-    quoteElement.style.textOverflow = 'clip'; // Prevent ellipsis during animation
+    quoteElement.style.whiteSpace = "nowrap";
+    quoteElement.style.overflow = "hidden";
+    quoteElement.style.width = "0";
+    quoteElement.style.maxWidth = "100%";
+    quoteElement.style.borderRight = "2px solid rgba(255, 255, 255, 0.8)";
+    quoteElement.style.textOverflow = "clip"; // Prevent ellipsis during animation
 
     // Start typewriter animation
     let charIndex = 0;
@@ -624,20 +624,20 @@ export class BadgeModal {
       } else {
         // Remove cursor and allow proper text wrapping after typing is complete
         setTimeout(() => {
-          quoteElement.style.borderRight = 'none';
-          quoteElement.style.whiteSpace = 'normal';
-          quoteElement.style.width = 'auto';
-          quoteElement.style.overflow = 'visible';
-          quoteElement.style.textOverflow = 'unset';
-          quoteElement.style.wordWrap = 'break-word';
-          quoteElement.style.overflowWrap = 'break-word';
-          quoteElement.style.hyphens = 'auto';
+          quoteElement.style.borderRight = "none";
+          quoteElement.style.whiteSpace = "normal";
+          quoteElement.style.width = "auto";
+          quoteElement.style.overflow = "visible";
+          quoteElement.style.textOverflow = "unset";
+          quoteElement.style.wordWrap = "break-word";
+          quoteElement.style.overflowWrap = "break-word";
+          quoteElement.style.hyphens = "auto";
         }, this.TYPEWRITER_CONFIG.CURSOR_DELAY);
       }
     };
 
     // Start the animation with faster CSS width animation
-    quoteElement.style.animation = 'typewriter 1.5s steps(30) forwards';
+    quoteElement.style.animation = "typewriter 1.5s steps(30) forwards";
 
     // Start character typing
     setTimeout(typeCharacter, this.TYPEWRITER_CONFIG.START_DELAY);

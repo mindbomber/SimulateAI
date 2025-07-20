@@ -339,7 +339,7 @@
 }
 
 .btn-primary:disabled::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -380,4 +380,193 @@
   .emoji-grid {
     grid-template-columns: repeat(4, 1fr);
   }
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+body.dark-mode .profile-update-modal {
+  background: var(--theme-bg-secondary);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .profile-header h3 {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .profile-header p {
+  color: var(--theme-text-secondary);
+}
+
+/* Current profile preview */
+body.dark-mode .current-profile {
+  background: linear-gradient(
+    135deg,
+    var(--theme-bg-primary) 0%,
+    var(--theme-bg-secondary) 100%
+  );
+  border: 2px solid var(--theme-border);
+}
+
+body.dark-mode .current-avatar {
+  border: 3px solid var(--theme-border);
+  box-shadow: 0 4px 12px var(--theme-shadow-hover);
+}
+
+body.dark-mode .profile-info h4 {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .profile-info p {
+  color: var(--theme-text-secondary);
+}
+
+/* Form sections */
+body.dark-mode .form-section {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .form-section h4 {
+  color: var(--theme-text-primary);
+  border-bottom: 1px solid var(--theme-border);
+}
+
+body.dark-mode .form-group label {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .form-input {
+  background: var(--theme-bg-secondary);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .form-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
+}
+
+body.dark-mode .form-input::placeholder {
+  color: var(--theme-text-muted);
+}
+
+/* Avatar selection */
+body.dark-mode .avatar-selection {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .avatar-tabs {
+  border-bottom: 1px solid var(--theme-border);
+}
+
+body.dark-mode .avatar-tab {
+  background: var(--theme-bg-secondary);
+  color: var(--theme-text-secondary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .avatar-tab.active {
+  background: var(--theme-bg-primary);
+  color: var(--theme-text-primary);
+  border-bottom-color: var(--theme-bg-primary);
+}
+
+body.dark-mode .avatar-tab:hover:not(.active) {
+  background: var(--theme-bg-primary);
+  color: var(--theme-text-primary);
+}
+
+/* Emoji avatars */
+body.dark-mode .emoji-grid {
+  background: var(--theme-bg-secondary);
+}
+
+body.dark-mode .emoji-avatar-option {
+  background: var(--theme-bg-primary);
+  border: 2px solid var(--theme-border);
+}
+
+body.dark-mode .emoji-avatar-option:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px var(--theme-shadow-hover);
+}
+
+body.dark-mode .emoji-avatar-option.selected {
+  border-color: var(--color-primary);
+  background: rgba(74, 158, 255, 0.1);
+}
+
+/* Upload section */
+body.dark-mode .upload-section {
+  background: var(--theme-bg-primary);
+  border: 2px dashed var(--theme-border);
+}
+
+body.dark-mode .upload-section:hover {
+  border-color: var(--color-primary);
+  background: rgba(74, 158, 255, 0.05);
+}
+
+body.dark-mode .upload-icon {
+  color: var(--theme-text-muted);
+}
+
+body.dark-mode .upload-text {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .upload-hint {
+  color: var(--theme-text-muted);
+}
+
+/* Preview and actions */
+body.dark-mode .preview-section {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .preview-avatar {
+  border: 3px solid var(--theme-border);
+  box-shadow: 0 4px 12px var(--theme-shadow-hover);
+}
+
+body.dark-mode .preview-info h5 {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .preview-info p {
+  color: var(--theme-text-secondary);
+}
+
+/* Action buttons */
+body.dark-mode .modal-actions .btn {
+  background: var(--theme-bg-secondary);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .modal-actions .btn:hover {
+  background: var(--theme-bg-primary);
+  border-color: var(--theme-border-hover);
+}
+
+body.dark-mode .modal-actions .btn.btn-primary {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+body.dark-mode .modal-actions .btn.btn-primary:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+/* Loading states */
+body.dark-mode .loading-overlay {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+body.dark-mode .loading-spinner {
+  border-color: var(--theme-border);
+  border-top-color: var(--color-primary);
 }

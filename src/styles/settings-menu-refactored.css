@@ -1,0 +1,311 @@
+/**
+ * Copyright 2025 Armando Sori
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* Import responsive media query system */
+@import "./media.css";
+
+/**
+ * Settings Menu Component Styles
+ * Professional settings dropdown with toggle controls
+ */
+
+.nav-item-dropdown {
+  position: relative;
+}
+
+.settings-menu {
+  position: absolute !important;
+  top: 100% !important;
+  right: 0 !important;
+  min-width: var(--container-padding) !important;
+  padding: var(--container-padding) !important;
+  background: #ffffff !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+  z-index: 1000 !important;
+  display: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  transition: none !important;
+  max-height: 400px !important;
+  overflow-y: auto !important;
+}
+
+/* Device-specific sizing using CSS custom properties */
+.settings-menu {
+  min-width: calc(320px * var(--font-scale));
+}
+
+.settings-menu[style*="display: block"] {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.settings-section {
+  margin-bottom: 12px;
+}
+
+.settings-section:last-child {
+  margin-bottom: 0;
+}
+
+.settings-title {
+  font-size: calc(0.9rem * var(--font-scale)) !important;
+  font-weight: 600 !important;
+  color: #333333 !important;
+  margin: 0 0 12px 0 !important;
+  padding-bottom: 8px !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+}
+
+.settings-item {
+  margin-bottom: 12px;
+}
+
+.settings-item:last-child {
+  margin-bottom: 0;
+}
+
+.settings-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 8px 0;
+  transition: opacity 0.2s ease;
+  user-select: none;
+  position: relative;
+  /* Accessibility: Ensure proper touch target size */
+  min-height: var(--touch-target-min);
+}
+
+.settings-toggle * {
+  pointer-events: none;
+}
+
+.settings-toggle input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: auto;
+}
+
+.settings-toggle:hover {
+  opacity: 0.8;
+}
+
+.toggle-slider {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: #e0e0e0;
+  border-radius: 24px;
+  transition: background-color 0.3s ease;
+  flex-shrink: 0;
+}
+
+.toggle-slider::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.settings-toggle input[type="checkbox"]:checked + .toggle-slider {
+  background: #1a73e8;
+}
+
+.settings-toggle input[type="checkbox"]:checked + .toggle-slider::before {
+  transform: translateX(20px);
+}
+
+.toggle-label {
+  font-size: calc(0.9rem * var(--font-scale)) !important;
+  color: #333333 !important;
+  font-weight: 500 !important;
+}
+
+.settings-select-label {
+  font-size: calc(0.9rem * var(--font-scale)) !important;
+  color: #333333 !important;
+  font-weight: 500 !important;
+  margin-bottom: 6px !important;
+  display: block !important;
+}
+
+.settings-select {
+  width: 100% !important;
+  padding: 8px 12px !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 4px !important;
+  background: #ffffff !important;
+  font-size: calc(0.9rem * var(--font-scale)) !important;
+  color: #333333 !important;
+  cursor: pointer !important;
+  transition: border-color 0.2s ease !important;
+  /* Accessibility: Ensure proper touch target size */
+  min-height: var(--touch-target-min) !important;
+}
+
+.settings-select:focus {
+  outline: none !important;
+  border-color: #1a73e8 !important;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2) !important;
+}
+
+.settings-select:hover {
+  border-color: #ccc !important;
+}
+
+.settings-note {
+  margin-top: 4px;
+  padding: 4px 8px;
+  background: rgba(26, 115, 232, 0.1);
+  border-radius: 4px;
+  border-left: 3px solid #1a73e8;
+}
+
+.settings-note small {
+  color: #1a73e8 !important;
+  font-weight: 500 !important;
+}
+
+.settings-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.settings-disabled:hover {
+  opacity: 0.5;
+}
+
+.settings-disabled .toggle-slider {
+  background: #e0e0e0;
+  cursor: not-allowed;
+}
+
+.settings-disabled input[type="checkbox"]:checked + .toggle-slider {
+  background: #999999;
+}
+
+/* ===== ENHANCED DARK MODE SUPPORT ===== */
+body.dark-mode .settings-menu {
+  background: var(--theme-bg-secondary) !important;
+  border: 1px solid var(--theme-border) !important;
+  box-shadow: 0 8px 20px var(--theme-shadow-hover) !important;
+}
+
+body.dark-mode .settings-title {
+  color: var(--theme-text-primary);
+  border-bottom-color: var(--theme-border);
+}
+
+body.dark-mode .settings-section {
+  border-bottom-color: var(--theme-border);
+}
+
+body.dark-mode .toggle-label {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .settings-select-label {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .settings-select {
+  background: var(--theme-bg-primary) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text-primary) !important;
+}
+
+body.dark-mode .settings-select:focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2) !important;
+}
+
+body.dark-mode .settings-select:hover {
+  border-color: var(--theme-border-hover) !important;
+}
+
+body.dark-mode .toggle-description {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .toggle-slider {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode
+  .settings-toggle
+  input[type="checkbox"]:checked
+  + .toggle-slider {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+body.dark-mode .toggle-slider::before {
+  background: var(--theme-text-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode
+  .settings-toggle
+  input[type="checkbox"]:checked
+  + .toggle-slider::before {
+  background: white;
+  border-color: white;
+}
+
+body.dark-mode .settings-note {
+  background: rgba(74, 158, 255, 0.1);
+  border: 1px solid rgba(74, 158, 255, 0.3);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .settings-note small {
+  color: var(--color-primary) !important;
+}
+
+body.dark-mode .settings-divider {
+  border-color: var(--theme-border);
+}
+
+body.dark-mode .settings-disabled {
+  opacity: 0.6;
+}
+
+body.dark-mode .settings-disabled .toggle-slider {
+  background: var(--theme-bg-primary);
+  opacity: 0.5;
+}
+
+body.dark-mode
+  .settings-disabled
+  input[type="checkbox"]:checked
+  + .toggle-slider {
+  background: var(--theme-text-muted);
+}

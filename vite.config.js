@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-import { defineConfig } from 'vite';
+import { defineConfig } from "vite";
 
 export default defineConfig({
-  root: '.',
-  base: './',
+  root: ".",
+  base: "./",
   build: {
-    outDir: 'dist',
-    assetsDir: 'assets',
+    outDir: "dist",
+    assetsDir: "assets",
     sourcemap: true,
-    target: 'es2020',
+    target: "es2020",
     rollupOptions: {
       input: {
-        main: 'app.html',
+        main: "app.html",
       },
       output: {
         manualChunks: {
-          core: ['./src/js/core/engine.js', './src/js/core/simulation.js'],
-          ui: ['./src/js/core/ui.js', './src/js/core/accessibility.js'],
+          core: ["./src/js/core/engine.js", "./src/js/core/simulation.js"],
+          ui: ["./src/js/core/ui.js", "./src/js/core/accessibility.js"],
           utils: [
-            './src/js/utils/storage.js',
-            './src/js/utils/analytics.js',
-            './src/js/utils/helpers.js',
+            "./src/js/utils/storage.js",
+            "./src/js/utils/analytics.js",
+            "./src/js/utils/helpers.js",
           ],
         },
       },
@@ -43,23 +43,24 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    host: 'localhost',
+    host: "localhost",
     open: true,
   },
   preview: {
     port: 4173,
-    host: 'localhost',
+    host: "localhost",
     open: true,
   },
   css: {
     devSourcemap: true,
+    sourcemap: true, // Enable CSS source maps in production
   },
   assetsInclude: [
-    '**/*.svg',
-    '**/*.png',
-    '**/*.jpg',
-    '**/*.jpeg',
-    '**/*.gif',
-    '**/*.webp',
+    "**/*.svg",
+    "**/*.png",
+    "**/*.jpg",
+    "**/*.jpeg",
+    "**/*.gif",
+    "**/*.webp",
   ],
 });

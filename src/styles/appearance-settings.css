@@ -17,26 +17,89 @@
 /**
  * Theme & Appearance Settings Styles
  * Handles dark mode, font sizes, and accessibility options
+ * 
+ * ARCHITECTURE NOTES:
+ * - Light mode relies on :root CSS custom properties (no overrides needed)
+ * - Dark mode overrides CSS custom properties to change entire system
+ * - Removed body:not(.dark-mode) selectors to prevent specificity conflicts
+ * - Uses theme-* variables for consistent theming across components
+ * - Integrates with media.css responsive system through CSS custom properties
  */
 
+/* CSS Custom Properties for Theme System */
+:root {
+  /* Light mode theme variables */
+  --theme-bg-primary: #ffffff;
+  --theme-bg-secondary: #f8fafc;
+  --theme-text-primary: #333333;
+  --theme-text-secondary: #666666;
+  --theme-text-muted: #9ca3af;
+  --theme-border: rgba(229, 231, 235, 0.6);
+  --theme-border-hover: rgba(156, 163, 175, 0.4);
+  --theme-shadow: rgba(0, 0, 0, 0.1);
+  --theme-shadow-hover: rgba(0, 0, 0, 0.15);
+}
+
+/* Dark Mode Theme Variables - Override CSS Custom Properties */
+body.dark-mode {
+  /* Override theme system variables for dark mode */
+  --theme-bg-primary: #1a1a1a;
+  --theme-bg-secondary: #2d2d2d;
+  --theme-bg-tertiary: #3d3d3d;
+  --theme-text-primary: #ffffff;
+  --theme-text-secondary: #cccccc;
+  --theme-text-muted: #9ca3af;
+  --theme-border: #444444;
+  --theme-border-hover: #555555;
+  --theme-shadow: rgba(0, 0, 0, 0.4);
+  --theme-shadow-hover: rgba(0, 0, 0, 0.5);
+  --theme-accent: #4a9eff;
+  --theme-accent-dark: #3a8eef;
+  --theme-text-on-accent: #ffffff;
+
+  /* Override main color system variables */
+  --color-white: #1a1a1a;
+  --color-gray-50: #2d2d2d;
+  --color-gray-100: #3d3d3d;
+  --color-gray-200: #444444;
+  --color-gray-300: #555555;
+  --color-gray-600: #cccccc;
+  --color-gray-800: #cccccc;
+  --color-gray-900: #ffffff;
+  --color-primary: #4a9eff;
+  --color-primary-dark: #3a8eef;
+
+  /* Legacy support variables */
+  --text-color: #ffffff;
+  --text-secondary: #cccccc;
+  --border-color: #444444;
+  --primary-color: #4a9eff;
+  --hover-bg: #3d3d3d;
+  --background-color: #2d2d2d;
+
+  /* Set overall page background and text color */
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+}
+
 /* Override any gradients that use color-primary-light and color-primary */
-body.dark-mode *[style*='linear-gradient'][style*='var(--color-primary-light)'],
+body.dark-mode *[style*="linear-gradient"][style*="var(--color-primary-light)"],
 body.dark-mode .hero {
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
 }
 
 /* Radar chart and other components using light gray gradient */
 body.dark-mode .radar-chart-container,
-body.dark-mode .radar-chart-container[style*='background'],
-body.dark-mode *[style*='linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)'] {
+body.dark-mode .radar-chart-container[style*="background"],
+body.dark-mode *[style*="linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)"] {
   background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%) !important;
   border-color: #444444 !important;
   color: #ffffff !important;
 }
 
 /* Override any elements using the light gray gradient pattern */
-body.dark-mode *[style*='linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'],
-body.dark-mode *[style*='linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)'],
+body.dark-mode *[style*="linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)"],
+body.dark-mode *[style*="linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)"],
 body.dark-mode .hero-section,
 body.dark-mode .radar-chart-container,
 body.dark-mode .radar-demo-container,
@@ -82,18 +145,16 @@ body.dark-mode .hero::before {
   opacity: 0.3 !important;
 }
 
-/* Scenario Cards Dark Mode */
+/* Scenario Cards Dark Mode - Uses Theme Variables */
 body.dark-mode .scenario-card,
 body.dark-mode .scenarios-grid .scenario-card,
 body.dark-mode .category-section .scenario-card,
 body.dark-mode .categories-grid .scenario-card,
 body.dark-mode .simulations-grid .scenario-card {
-  background: #2d2d2d !important;
-  border: 1px solid #444444 !important;
-  color: #ffffff !important;
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.4),
-    0 1px 3px rgba(0, 0, 0, 0.3) !important;
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+  box-shadow: 0 4px 12px var(--theme-shadow);
 }
 
 body.dark-mode .scenario-card:hover,
@@ -101,91 +162,68 @@ body.dark-mode .scenarios-grid .scenario-card:hover,
 body.dark-mode .category-section .scenario-card:hover,
 body.dark-mode .categories-grid .scenario-card:hover,
 body.dark-mode .simulations-grid .scenario-card:hover {
-  background: #3d3d3d !important;
-  border-color: #555555 !important;
-  box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.5),
-    0 2px 6px rgba(0, 0, 0, 0.4) !important;
+  background: var(--theme-bg-tertiary);
+  border-color: var(--theme-border-hover);
+  box-shadow: 0 8px 20px var(--theme-shadow-hover);
 }
 
-/* Scenario Header and Content Dark Mode */
+/* Scenario Content Dark Mode */
 body.dark-mode .scenario-header {
-  background: transparent !important;
-  color: #ffffff !important;
-}
-
-body.dark-mode .scenario-content {
-  background: transparent !important;
-  color: #ffffff !important;
+  background: transparent;
+  color: var(--theme-text-primary);
 }
 
 body.dark-mode .scenario-title {
-  color: #ffffff !important;
+  color: var(--theme-text-primary);
 }
 
 body.dark-mode .scenario-description {
-  color: #cccccc !important;
+  color: var(--theme-text-secondary);
 }
 
 body.dark-mode .scenario-footer {
-  color: #cccccc !important;
-}
-
-/* Scenario Icon and Difficulty Badge Dark Mode */
-body.dark-mode .scenario-icon {
-  background-color: rgba(255, 255, 255, 0.1) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-}
-
-body.dark-mode .scenario-difficulty {
-  background-color: rgba(255, 255, 255, 0.1) !important;
-  color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: var(--theme-text-secondary);
 }
 
 /* Scenario Buttons Dark Mode */
 body.dark-mode .scenario-start-btn,
 body.dark-mode .scenario-quick-start-btn {
-  background-color: #4a9eff !important;
-  color: #ffffff !important;
-  border: 1px solid #4a9eff !important;
+  background-color: var(--theme-accent);
+  color: var(--theme-text-on-accent);
+  border: 1px solid var(--theme-accent);
 }
 
 body.dark-mode .scenario-start-btn:hover,
 body.dark-mode .scenario-quick-start-btn:hover {
-  background-color: #6bb4ff !important;
-  border-color: #6bb4ff !important;
+  background-color: var(--theme-accent-dark);
+  border-color: var(--theme-accent-dark);
 }
 
 /* View Toggle Controls Dark Mode */
 body.dark-mode .view-toggle-controls {
-  background: #2d2d2d !important;
-  border: 1px solid #444444 !important;
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
 }
 
 body.dark-mode .view-toggle-btn {
-  color: #cccccc !important;
-  background: transparent !important;
+  color: var(--theme-text-secondary);
+  background: transparent;
 }
 
 body.dark-mode .view-toggle-btn:hover {
-  background: #3d3d3d !important;
-  color: #ffffff !important;
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.4),
-    0 1px 3px rgba(0, 0, 0, 0.3) !important;
+  background: var(--theme-bg-tertiary);
+  color: var(--theme-text-primary);
+  box-shadow: 0 4px 12px var(--theme-shadow);
 }
 
 body.dark-mode .view-toggle-btn.active {
-  background: #3d3d3d !important;
-  color: #4a9eff !important;
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.4),
-    0 1px 3px rgba(0, 0, 0, 0.3) !important;
+  background: var(--theme-bg-tertiary);
+  color: var(--theme-accent);
+  box-shadow: 0 4px 12px var(--theme-shadow);
 }
 
 body.dark-mode .view-toggle-btn:focus-visible {
-  outline: 2px solid #4a9eff !important;
+  outline: 2px solid var(--theme-accent);
 }
 
 /* Keyboard Hint Dark Mode */
@@ -219,20 +257,6 @@ html.font-size-large {
 
 html.font-size-extra-large {
   font-size: 20px;
-}
-
-/* Dark Mode Theme - Apply to entire application */
-body.dark-mode {
-  --text-color: #ffffff;
-  --text-secondary: #cccccc;
-  --border-color: #444444;
-  --primary-color: #4a9eff;
-  --hover-bg: #3d3d3d;
-  --background-color: #2d2d2d;
-
-  /* Set overall page background and text color */
-  background-color: #1a1a1a !important;
-  color: #ffffff !important;
 }
 
 /* Ensure html element also gets dark background */
@@ -284,22 +308,23 @@ body.dark-mode .page-container {
   color: #ffffff !important;
 }
 
-/* Navigation Bar Dark Mode */
+/* Navigation Dark Mode - Uses Theme Variables */
 body.dark-mode .nav-container {
-  background-color: var(--background-color, #2d2d2d);
-  border-bottom-color: var(--border-color, #444);
+  background-color: var(--theme-bg-secondary);
+  border-bottom-color: var(--theme-border);
 }
+
 body.dark-mode .nav-brand {
-  color: #ffffff !important;
+  color: var(--theme-text-primary) !important;
 }
 
 body.dark-mode .nav-link {
-  color: #ffffff !important;
+  color: var(--theme-text-primary) !important;
 }
 
 body.dark-mode .nav-link:hover {
-  color: var(--primary-color, #4a9eff) !important;
-  background-color: var(--hover-bg, #3d3d3d) !important;
+  color: var(--theme-accent) !important;
+  background-color: var(--theme-bg-tertiary) !important;
 }
 
 /* Main Content Areas Dark Mode */
@@ -311,7 +336,7 @@ body.dark-mode .hero-section {
 }
 
 /* Override any gradients that use color-primary-light and color-primary */
-body.dark-mode *[style*='linear-gradient'][style*='var(--color-primary-light)'],
+body.dark-mode *[style*="linear-gradient"][style*="var(--color-primary-light)"],
 body.dark-mode .hero {
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
 }
@@ -408,57 +433,56 @@ body.dark-mode .stat-label {
   color: #cccccc !important;
 }
 
+/* Cards, Buttons, and Forms Dark Mode - Uses Theme Variables */
 body.dark-mode .card {
-  background-color: var(--background-color, #2d2d2d) !important;
-  border-color: var(--border-color, #444) !important;
-  color: #ffffff !important;
+  background-color: var(--theme-bg-secondary) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text-primary) !important;
 }
 
 body.dark-mode .card h2,
 body.dark-mode .card h3,
 body.dark-mode .card h4 {
-  color: #ffffff !important;
+  color: var(--theme-text-primary) !important;
 }
 
 body.dark-mode .card p {
-  color: #cccccc !important;
+  color: var(--theme-text-secondary) !important;
 }
 
-/* Buttons Dark Mode */
 body.dark-mode .btn {
-  background-color: var(--primary-color, #4a9eff) !important;
-  color: #ffffff !important;
-  border-color: var(--primary-color, #4a9eff) !important;
+  background-color: var(--theme-accent) !important;
+  color: var(--theme-text-on-accent) !important;
+  border-color: var(--theme-accent) !important;
 }
 
 body.dark-mode .btn:hover {
-  background-color: #3a8eef !important;
-  border-color: #3a8eef !important;
+  background-color: var(--theme-accent-dark) !important;
+  border-color: var(--theme-accent-dark) !important;
 }
 
 body.dark-mode .btn-secondary {
-  background-color: var(--background-color, #2d2d2d) !important;
-  color: #ffffff !important;
-  border-color: var(--border-color, #444) !important;
+  background-color: var(--theme-bg-secondary) !important;
+  color: var(--theme-text-primary) !important;
+  border-color: var(--theme-border) !important;
 }
 
 body.dark-mode .btn-secondary:hover {
-  background-color: var(--hover-bg, #3d3d3d) !important;
+  background-color: var(--theme-bg-tertiary) !important;
 }
 
-/* Forms Dark Mode */
 body.dark-mode input,
 body.dark-mode textarea,
 body.dark-mode select {
-  background-color: var(--background-color, #2d2d2d) !important;
-  color: #ffffff !important;
-  border-color: var(--border-color, #444) !important;
+  background-color: var(--theme-bg-secondary) !important;
+  color: var(--theme-text-primary) !important;
+  border-color: var(--theme-border) !important;
 }
 
 body.dark-mode input:focus,
 body.dark-mode textarea:focus,
 body.dark-mode select:focus {
-  border-color: var(--primary-color, #4a9eff) !important;
+  border-color: var(--theme-accent) !important;
   box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2) !important;
 }
 
@@ -636,7 +660,7 @@ body.dark-mode .toggle-slider {
 
 body.dark-mode
   .settings-toggle
-  input[type='checkbox']:checked
+  input[type="checkbox"]:checked
   + .toggle-slider {
   background: #4a9eff;
 }
@@ -694,14 +718,14 @@ body.high-contrast .toggle-slider {
 
 body.high-contrast
   .settings-toggle
-  input[type='checkbox']:checked
+  input[type="checkbox"]:checked
   + .toggle-slider {
   background-color: #000000 !important;
 }
 
 body.high-contrast
   .settings-toggle
-  input[type='checkbox']:checked
+  input[type="checkbox"]:checked
   + .toggle-slider::before {
   background-color: #ffffff !important;
 }
@@ -743,7 +767,7 @@ body.large-click-targets .toggle-slider::before {
 
 body.large-click-targets
   .settings-toggle
-  input[type='checkbox']:checked
+  input[type="checkbox"]:checked
   + .toggle-slider::before {
   transform: translateX(24px);
 }
@@ -823,124 +847,40 @@ body.dark-mode *:focus {
 }
 
 /* Ensure settings menu stays visible in all themes */
-body.dark-mode .settings-menu[style*='display: block'] {
+body.dark-mode .settings-menu[style*="display: block"] {
   display: block !important;
   opacity: 1 !important;
   visibility: visible !important;
 }
 
-body.high-contrast .settings-menu[style*='display: block'] {
+body.high-contrast .settings-menu[style*="display: block"] {
   display: block !important;
   opacity: 1 !important;
   visibility: visible !important;
 }
 
-/* Light mode reset styles - ensures proper switching from dark to light mode */
-/* These styles apply when NOT in dark mode and must override dark mode styles */
-body:not(.dark-mode) {
-  background-color: #ffffff !important;
-  color: #333333 !important;
+/* Theme System Integration - Relies on CSS Custom Properties Cascade */
+/* Light mode is the default - no overrides needed, rely on :root variables */
+/* This section intentionally removed to prevent CSS specificity conflicts */
+
+/* Light Mode Custom Properties Enhancement */
+:root {
+  /* Enhanced light mode integration with existing color system */
+  --theme-bg-primary: var(--color-white, #ffffff);
+  --theme-bg-secondary: var(--color-gray-50, #f8fafc);
+  --theme-bg-tertiary: var(--color-gray-100, #f1f5f9);
+  --theme-text-primary: var(--color-gray-900, #333333);
+  --theme-text-secondary: var(--color-gray-600, #666666);
+  --theme-border: var(--color-gray-200, #e2e8f0);
+  --theme-border-hover: var(--color-gray-300, #d1d5db);
+  --theme-accent: var(--color-primary, #4a9eff);
+  --theme-accent-dark: var(--color-primary-dark, #3a8eef);
+  --theme-text-on-accent: var(--color-white, #ffffff);
 }
 
-body:not(.dark-mode) #main-navigation,
-body:not(.dark-mode) .main-nav,
-body:not(.dark-mode) .nav-container {
-  background-color: #ffffff !important;
-  color: #333333 !important;
-  border-bottom-color: #e2e8f0 !important;
-}
-
-body:not(.dark-mode) .nav-brand,
-body:not(.dark-mode) .nav-link {
-  color: #333333 !important;
-}
-
-body:not(.dark-mode) .nav-link:hover {
-  color: #4a9eff !important;
-  background-color: #f8fafc !important;
-}
-
-/* Hero radar demo light mode reset */
-body:not(.dark-mode) .hero-radar-demo h3 {
-  color: #333333 !important;
-  background: linear-gradient(135deg, #4a9eff 0%, #9d4edd 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-}
-
-body:not(.dark-mode) .hero-radar-demo p {
-  color: #666666 !important;
-}
-
-/* Scenario headers light mode reset */
-body:not(.dark-mode) .scenario-header,
-body:not(.dark-mode) .scenario-card .scenario-header {
-  background: #ffffff !important;
-  color: #333333 !important;
-  border-color: #e2e8f0 !important;
-}
-
-body:not(.dark-mode) .scenario-header h3,
-body:not(.dark-mode) .scenario-header h4,
-body:not(.dark-mode) .scenario-card h3,
-body:not(.dark-mode) .scenario-card h4 {
-  color: #333333 !important;
-}
-
-/* Scenario cards light mode reset */
-body:not(.dark-mode) .scenario-card,
-body:not(.dark-mode) .scenarios-grid .scenario-card,
-body:not(.dark-mode) .category-section .scenario-card {
-  background: #ffffff !important;
-  border: 1px solid #e2e8f0 !important;
-  color: #333333 !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* General light mode resets for common elements */
-body:not(.dark-mode) .hero-section {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
-  color: #333333 !important;
-}
-
-body:not(.dark-mode) .hero-content {
-  background: transparent !important;
-  color: #333333 !important;
-}
-
-body:not(.dark-mode) .hero-content h2 {
-  color: #333333 !important;
-}
-
-body:not(.dark-mode) .hero-content p {
-  color: #666666 !important;
-}
-
-body:not(.dark-mode) .section {
-  background-color: #ffffff !important;
-  color: #333333 !important;
-}
-
-/* Container elements light mode reset */
-body:not(.dark-mode) .container,
-body:not(.dark-mode) .main-container,
-body:not(.dark-mode) .content-container,
-body:not(.dark-mode) .page-container {
-  background-color: #ffffff !important;
-  color: #333333 !important;
-}
-
-/* Basic text colors - must override dark mode with !important */
-body:not(.dark-mode) h1,
-body:not(.dark-mode) h2,
-body:not(.dark-mode) h3,
-body:not(.dark-mode) h4,
-body:not(.dark-mode) h5,
-body:not(.dark-mode) h6 {
-  color: #333333 !important;
-}
-
-body:not(.dark-mode) p {
-  color: #666666 !important;
+/* Badge Modal Preservation - These need specific handling */
+.badge-quote,
+.badge-reason,
+.badge-timestamp {
+  color: rgba(255, 255, 255, 0.9);
 }

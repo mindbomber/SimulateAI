@@ -218,7 +218,7 @@
 /* Mobile optimizations */
 @media (max-width: 768px) {
   .floating-tab-link {
-    top: 44%; /* Standardized mobile vertical spacing */
+    top: 50%; /* Maintain consistent relative positioning */
   }
 
   .floating-action-tab {
@@ -266,7 +266,7 @@
 /* Small mobile optimizations */
 @media (max-width: 480px) {
   .floating-tab-link {
-    top: 42%; /* Standardized small mobile vertical spacing */
+    top: 50%; /* Maintain consistent relative positioning */
   }
 
   .floating-action-tab {
@@ -296,33 +296,216 @@
   }
 }
 
-/* Tablet optimizations */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .floating-action-tab {
-    min-width: 270px;
-    height: 58px;
-    transform: translateX(calc(100% - 85px)); /* Consistent tablet protrusion */
-  }
-}
+/* ==== DEVICE-SPECIFIC OPTIMIZATIONS ==== */
 
-/* Large screen optimizations */
-@media (min-width: 1200px) {
+/* iPhone SE (375×667) - Compact mobile */
+@media only screen and (min-width: 375px) and (max-width: 389px) {
+  .floating-tab-link {
+    width: 210px;
+    top: 50%; /* Maintain consistent relative positioning */
+  }
+
   .floating-action-tab {
-    min-width: 300px;
-    height: 64px;
+    min-width: 210px;
+    height: 50px;
     transform: translateX(
-      calc(100% - 95px)
-    ); /* Slightly larger protrusion for large screens */
+      calc(100% - 60px)
+    ); /* Compact protrusion for small screens */
   }
 
   .floating-tab-content {
-    padding: 0 24px;
+    padding: 0 12px;
+  }
+
+  .floating-tab-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+  }
+
+  .heart-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .tab-title {
+    font-size: 12px;
+  }
+
+  .tab-subtitle {
+    font-size: 9px;
+  }
+}
+
+/* iPhone 12/13/14 & Google Pixel 5 (390-393×844-851) - Modern mobile */
+@media only screen and (min-width: 390px) and (max-width: 399px) {
+  .floating-tab-link {
+    width: 220px;
+    top: 50%; /* Maintain consistent relative positioning */
+  }
+
+  .floating-action-tab {
+    min-width: 220px;
+    height: 52px;
+    transform: translateX(calc(100% - 65px)); /* Standard mobile protrusion */
+  }
+
+  .floating-tab-content {
+    padding: 0 14px;
+  }
+
+  .floating-tab-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+  }
+
+  .heart-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .tab-title {
+    font-size: 13px;
+  }
+
+  .tab-subtitle {
+    font-size: 10px;
+  }
+}
+
+/* iPhone 12 Pro Max (428×926) - Large mobile */
+@media only screen and (min-width: 400px) and (max-width: 480px) {
+  .floating-tab-link {
+    width: 240px;
+    top: 50%; /* Maintain consistent relative positioning */
+  }
+
+  .floating-action-tab {
+    min-width: 240px;
+    height: 54px;
+    transform: translateX(calc(100% - 70px)); /* Slightly larger protrusion */
+  }
+
+  .floating-tab-content {
+    padding: 0 16px;
+  }
+
+  .floating-tab-icon {
+    width: 22px;
+    height: 22px;
+    margin-right: 14px;
+  }
+
+  .heart-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .tab-title {
+    font-size: 14px;
+  }
+
+  .tab-subtitle {
+    font-size: 11px;
+  }
+}
+
+/* iPad Mini & Samsung Galaxy Tab (768-820×1024-1280) - Small tablets */
+@media only screen and (min-width: 768px) and (max-width: 820px) {
+  .floating-tab-link {
+    width: 260px;
+    top: 50%; /* Maintain consistent relative positioning */
+  }
+
+  .floating-action-tab {
+    min-width: 260px;
+    height: 58px;
+    transform: translateX(calc(100% - 80px)); /* Tablet-optimized protrusion */
+  }
+
+  .floating-tab-content {
+    padding: 0 18px;
+  }
+
+  .floating-tab-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 16px;
+  }
+
+  .heart-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .tab-title {
+    font-size: 15px;
+  }
+
+  .tab-subtitle {
+    font-size: 12px;
+  }
+}
+
+/* iPad Pro & Large Tablets (1024-1180×1366-1366) - Large tablets */
+@media only screen and (min-width: 1024px) and (max-width: 1279px) {
+  .floating-tab-link {
+    width: 280px;
+    top: 50%; /* Maintain consistent relative positioning */
+  }
+
+  .floating-action-tab {
+    min-width: 280px;
+    height: 60px;
+    transform: translateX(calc(100% - 85px)); /* Large tablet protrusion */
+  }
+
+  .floating-tab-content {
+    padding: 0 20px;
+  }
+
+  .floating-tab-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 16px;
+  }
+
+  .heart-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .tab-title {
+    font-size: 14px;
+  }
+
+  .tab-subtitle {
+    font-size: 11px;
+  }
+}
+
+/* MacBook Air & Standard HD Laptops (1280-1366×768-800) - Compact laptops */
+@media only screen and (min-width: 1280px) and (max-width: 1366px) {
+  .floating-tab-link {
+    width: 300px;
+    top: 50%; /* Maintain consistent relative positioning */
+  }
+
+  .floating-action-tab {
+    min-width: 300px;
+    height: 62px;
+    transform: translateX(calc(100% - 90px)); /* Standard desktop protrusion */
+  }
+
+  .floating-tab-content {
+    padding: 0 22px;
   }
 
   .floating-tab-icon {
     width: 26px;
     height: 26px;
-    margin-right: 18px;
+    margin-right: 17px;
   }
 
   .heart-icon {
@@ -336,6 +519,53 @@
 
   .tab-subtitle {
     font-size: 12px;
+  }
+}
+
+/* MacBook Pro & Microsoft Surface (1500-1536×960-1000) - High-res laptops */
+@media only screen and (min-width: 1500px) {
+  .floating-tab-link {
+    width: 320px;
+    top: 50%; /* Maintain consistent relative positioning */
+  }
+
+  .floating-action-tab {
+    min-width: 320px;
+    height: 64px;
+    transform: translateX(calc(100% - 90px)); /* Premium desktop protrusion */
+  }
+
+  .floating-tab-content {
+    padding: 0 24px;
+  }
+
+  .floating-tab-icon {
+    width: 28px;
+    height: 28px;
+    margin-right: 18px;
+  }
+
+  .heart-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .tab-title {
+    font-size: 16px;
+  }
+
+  .tab-subtitle {
+    font-size: 13px;
+  }
+
+  .floating-tab-arrow {
+    width: 22px;
+    height: 22px;
+  }
+
+  .arrow-icon {
+    width: 18px;
+    height: 18px;
   }
 }
 
@@ -360,16 +590,52 @@
 
 /* Dark mode support */
 body.dark-mode .floating-action-tab {
-  background: linear-gradient(135deg, #ff5252 0%, #d32f2f 100%);
+  background: linear-gradient(
+    135deg,
+    var(--theme-accent) 0%,
+    var(--theme-accent-dark) 100%
+  );
+  border-color: var(--theme-border);
   box-shadow:
-    0 4px 20px rgba(211, 47, 47, 0.4),
+    0 4px 20px var(--theme-shadow),
     0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 body.dark-mode .floating-action-tab:hover {
   box-shadow:
-    0 8px 30px rgba(211, 47, 47, 0.5),
+    0 8px 30px var(--theme-shadow-heavy),
     0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+body.dark-mode .heart-icon {
+  color: var(--theme-text-on-accent);
+}
+
+body.dark-mode .floating-action-tab:hover .heart-icon {
+  color: var(--theme-text-on-accent);
+}
+
+body.dark-mode .tab-title {
+  color: var(--theme-text-on-accent);
+}
+
+body.dark-mode .tab-subtitle {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+body.dark-mode .arrow-icon {
+  color: var(--theme-text-on-accent);
+}
+
+body.dark-mode .floating-tab-ripple {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+body.dark-mode .floating-tab-link:focus .floating-action-tab {
+  box-shadow:
+    0 8px 30px var(--theme-shadow-heavy),
+    0 4px 12px rgba(0, 0, 0, 0.25),
+    0 0 0 3px var(--theme-accent-light);
 }
 
 /* Print styles */

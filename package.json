@@ -38,11 +38,13 @@
     "url": "https://github.com/mindbomber/SimulateAI/issues"
   },
   "devDependencies": {
+    "@eslint/js": "^9.31.0",
     "csso-cli": "^4.0.2",
     "depcheck": "^1.4.7",
-    "eslint": "^8.0.0",
+    "eslint": "^8.57.1",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-unused-imports": "^4.1.4",
+    "globals": "^16.3.0",
     "jscpd": "^4.0.5",
     "knip": "^5.62.0",
     "prettier": "^3.0.0",

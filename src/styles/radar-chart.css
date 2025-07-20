@@ -77,7 +77,7 @@
 }
 
 /* Additional canvas overflow fix for all chart canvases */
-canvas[role='img'] {
+canvas[role="img"] {
   overflow: hidden !important; /* Prevent deprecated overflow: visible on canvas elements */
 }
 
@@ -182,7 +182,7 @@ canvas[role='img'] {
 }
 
 .scenario-radar::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -198,7 +198,7 @@ canvas[role='img'] {
 }
 
 .scenario-radar::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -265,7 +265,7 @@ canvas[role='img'] {
 }
 
 .results-radar::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -547,4 +547,154 @@ canvas[role='img'] {
   .score-fill {
     background: #666 !important;
   }
+}
+
+/* Dark mode support for radar charts */
+body.dark-mode .radar-demo-container {
+  background: transparent;
+  box-shadow: -4px 4px 8px var(--theme-shadow);
+}
+
+body.dark-mode .radar-chart-container {
+  background: linear-gradient(
+    135deg,
+    var(--theme-bg-secondary) 0%,
+    var(--theme-bg-tertiary) 100%
+  );
+  border-color: var(--theme-border);
+  box-shadow: 0 1px 3px var(--theme-shadow);
+}
+
+body.dark-mode .radar-chart-container:hover {
+  box-shadow: 0 2px 6px var(--theme-shadow);
+  border-color: var(--theme-accent);
+}
+
+body.dark-mode .radar-chart-container canvas {
+  background: transparent;
+  box-shadow: 4px 4px 8px var(--theme-shadow);
+}
+
+body.dark-mode .radar-chart-fallback {
+  background: var(--theme-bg-secondary);
+  border-color: var(--theme-border);
+}
+
+body.dark-mode .radar-chart-fallback h4 {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .score-item {
+  background: var(--theme-bg-tertiary);
+}
+
+body.dark-mode .score-item:hover {
+  background: var(--theme-bg-quaternary);
+}
+
+body.dark-mode .axis-label {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .score-value {
+  color: var(--theme-accent);
+}
+
+body.dark-mode .score-bar {
+  background: var(--theme-bg-quaternary);
+}
+
+body.dark-mode .score-fill {
+  background: linear-gradient(
+    90deg,
+    var(--theme-accent),
+    var(--theme-accent-light)
+  );
+}
+
+body.dark-mode .scenario-radar {
+  background: linear-gradient(
+    135deg,
+    var(--theme-bg-secondary) 0%,
+    var(--theme-bg-tertiary) 100%
+  );
+  border-color: var(--theme-border);
+  box-shadow: 0 8px 25px var(--theme-shadow);
+}
+
+body.dark-mode .scenario-radar:hover {
+  box-shadow: 0 12px 30px var(--theme-shadow-heavy);
+  border-color: var(--theme-accent);
+}
+
+body.dark-mode .scenario-radar .radar-title {
+  color: var(--theme-text-primary);
+  background: linear-gradient(
+    135deg,
+    var(--theme-accent) 0%,
+    var(--theme-accent-dark) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+body.dark-mode .scenario-radar .radar-subtitle {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .results-radar {
+  background: linear-gradient(
+    135deg,
+    var(--theme-bg-secondary) 0%,
+    var(--theme-bg-tertiary) 100%
+  );
+  border: 1px solid var(--theme-border);
+  box-shadow: 0 10px 10px -5px var(--theme-shadow);
+}
+
+body.dark-mode .results-radar .radar-title {
+  color: var(--theme-text-primary);
+  background: linear-gradient(
+    135deg,
+    var(--theme-accent) 0%,
+    var(--theme-accent-dark) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+body.dark-mode .results-radar .radar-subtitle {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .radar-legend {
+  border-color: var(--theme-border);
+}
+
+body.dark-mode .legend-item {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .radar-action-button {
+  background: linear-gradient(
+    135deg,
+    var(--theme-accent) 0%,
+    var(--theme-accent-dark) 100%
+  );
+  box-shadow: 0 4px 12px var(--theme-shadow);
+  color: var(--theme-text-on-accent);
+}
+
+body.dark-mode .radar-action-button:hover {
+  box-shadow: 0 6px 16px var(--theme-shadow-heavy);
+}
+
+body.dark-mode .radar-chart-container:focus-within {
+  outline-color: var(--theme-accent);
+}
+
+body.dark-mode .score-item:focus-within {
+  outline-color: var(--theme-accent);
 }

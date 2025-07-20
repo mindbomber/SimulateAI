@@ -76,7 +76,7 @@
 }
 
 .scenario-modal-header::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -151,7 +151,7 @@
 .scenario-modal-dialog .scenario-content {
   display: grid !important;
   grid-template-columns: 2fr 1fr !important;
-  grid-template-areas: 'main sidebar' !important;
+  grid-template-areas: "main sidebar" !important;
   gap: 3rem;
   align-items: start;
   padding: 2.5rem;
@@ -168,8 +168,8 @@
   .scenario-modal-dialog .scenario-content {
     grid-template-columns: 1fr !important;
     grid-template-areas:
-      'main'
-      'sidebar' !important;
+      "main"
+      "sidebar" !important;
     gap: 2rem;
     padding: 1.5rem;
   }
@@ -227,19 +227,19 @@
 }
 
 .dilemma-section h3::before {
-  content: '⚠️';
+  content: "⚠️";
   font-size: 1.25rem;
   opacity: 0.8;
 }
 
 .ethical-question-section h3::before {
-  content: '❓';
+  content: "❓";
   font-size: 1.25rem;
   opacity: 0.8;
 }
 
 .options-section h3::before {
-  content: '🎯';
+  content: "🎯";
   font-size: 1.25rem;
   opacity: 0.8;
 }
@@ -360,7 +360,7 @@
 
 /* Add a subtle visual indicator for deselection */
 .option-card.selected::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
@@ -380,7 +380,7 @@
 
 /* Add a subtle visual indicator for deselection */
 .option-card.selected::before {
-  content: '✓';
+  content: "✓";
   position: absolute;
   top: 0.85rem;
   right: 0.85rem;
@@ -394,7 +394,7 @@
 }
 
 .option-card.selected:hover::before {
-  content: '✓';
+  content: "✓";
   font-size: 0.8rem;
   top: 0.8rem;
   right: 0.8rem;
@@ -457,7 +457,7 @@
 
 /* Popover Arrow */
 .pros-cons-popover::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 100%;
   left: 50%;
@@ -469,7 +469,7 @@
 }
 
 .pros-cons-popover::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 100%;
   left: 50%;
@@ -554,7 +554,7 @@
 }
 
 .pros-list li::before {
-  content: '•';
+  content: "•";
   position: absolute;
   left: 0;
   color: #059669;
@@ -563,7 +563,7 @@
 }
 
 .cons-list li::before {
-  content: '•';
+  content: "•";
   position: absolute;
   left: 0;
   color: #dc2626;
@@ -615,12 +615,12 @@
 
 /* Ensure no unwanted text content displays in the radar chart */
 .scenario-modal #scenario-radar-chart:empty::before {
-  content: '';
+  content: "";
   display: none;
 }
 
 .scenario-modal #scenario-radar-chart:empty::after {
-  content: '';
+  content: "";
   display: none;
 }
 
@@ -812,7 +812,7 @@
 /* Ensure smooth rendering during typewriter effect */
 .dilemma-text,
 .ethical-question {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   letter-spacing: 0.01em;
   word-spacing: 0.02em;
 }
@@ -991,4 +991,122 @@
       transform: translate(-50%, -50%);
     }
   }
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+body.dark-mode .scenario-modal-dialog {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+  box-shadow:
+    0 20px 25px -5px var(--theme-shadow),
+    0 10px 10px -5px var(--theme-shadow);
+}
+
+body.dark-mode .scenario-modal-header {
+  background: var(--theme-bg-secondary);
+  border-bottom: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .scenario-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .scenario-category {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .scenario-content {
+  background: var(--theme-bg-primary);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .scenario-main {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+  box-shadow: 0 8px 25px var(--theme-shadow);
+}
+
+body.dark-mode .scenario-sidebar {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+  box-shadow: 0 8px 25px var(--theme-shadow);
+}
+
+body.dark-mode .dilemma-text,
+body.dark-mode .ethical-question {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .option-card {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .option-card:hover {
+  border-color: var(--theme-border-hover);
+  box-shadow: 0 4px 12px var(--theme-shadow-hover);
+}
+
+body.dark-mode .option-card.selected {
+  background: linear-gradient(
+    135deg,
+    rgba(74, 158, 255, 0.1) 0%,
+    rgba(157, 78, 221, 0.1) 100%
+  );
+  border-color: #4a9eff;
+}
+
+body.dark-mode .option-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .option-description {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .option-details {
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid var(--theme-border);
+}
+
+body.dark-mode .pros-section,
+body.dark-mode .cons-section {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .pros-cons-popover {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+  box-shadow: 0 25px 50px var(--theme-shadow);
+}
+
+body.dark-mode .pros-section h5,
+body.dark-mode .cons-section h5 {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .pros-section li,
+body.dark-mode .cons-section li {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .scenario-modal-footer {
+  background: var(--theme-bg-secondary);
+  border-top: 1px solid var(--theme-border);
+}
+
+body.dark-mode .chart-legend {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .test-mode-indicator {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.3);
 }

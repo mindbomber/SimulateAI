@@ -257,7 +257,7 @@
   }
 
   /* Make scenarios link functional in mobile */
-  .nav-item-dropdown .nav-link[href='scenarios.html'] {
+  .nav-item-dropdown .nav-link[href="scenarios.html"] {
     pointer-events: auto !important;
   }
 
@@ -289,15 +289,15 @@
   transition: all 0.2s ease;
 }
 
-.nav-toggle[aria-expanded='true'] span:nth-child(1) {
+.nav-toggle[aria-expanded="true"] span:nth-child(1) {
   transform: rotate(45deg) translate(5px, 5px);
 }
 
-.nav-toggle[aria-expanded='true'] span:nth-child(2) {
+.nav-toggle[aria-expanded="true"] span:nth-child(2) {
   opacity: 0;
 }
 
-.nav-toggle[aria-expanded='true'] span:nth-child(3) {
+.nav-toggle[aria-expanded="true"] span:nth-child(3) {
   transform: rotate(-45deg) translate(7px, -6px);
 }
 
@@ -517,4 +517,164 @@
   .mega-menu-item:focus {
     transform: none;
   }
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+body.dark-mode .main-nav {
+  background: var(--theme-bg-primary);
+  border-bottom: 1px solid var(--theme-border);
+}
+
+body.dark-mode .nav-link {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .nav-link:hover {
+  color: var(--color-primary);
+  background: var(--theme-bg-secondary);
+}
+
+body.dark-mode .nav-link.active {
+  color: var(--color-primary);
+  background: rgba(74, 158, 255, 0.1);
+}
+
+/* Dropdown menus */
+body.dark-mode .dropdown-menu {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+  box-shadow: 0 8px 20px var(--theme-shadow-hover);
+}
+
+body.dark-mode .dropdown-item {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .dropdown-item:hover {
+  background: var(--theme-bg-primary);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .dropdown-divider {
+  border-color: var(--theme-border);
+}
+
+/* Mega menu */
+body.dark-mode .mega-menu {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+  box-shadow: 0 12px 28px var(--theme-shadow-hover);
+}
+
+body.dark-mode .mega-menu-section {
+  border-right: 1px solid var(--theme-border);
+}
+
+body.dark-mode .mega-menu-header {
+  color: var(--theme-text-primary);
+  border-bottom: 1px solid var(--theme-border);
+}
+
+body.dark-mode .mega-menu-item {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .mega-menu-item:hover {
+  background: var(--theme-bg-secondary);
+  border-color: var(--theme-border-hover);
+  box-shadow: 0 4px 12px var(--theme-shadow-hover);
+}
+
+body.dark-mode .mega-menu-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .mega-menu-description {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .mega-menu-icon {
+  color: var(--color-primary);
+}
+
+/* Mobile navigation */
+body.dark-mode .nav-toggle {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .nav-toggle:hover {
+  background: var(--theme-bg-primary);
+  border-color: var(--theme-border-hover);
+}
+
+body.dark-mode .nav-toggle span {
+  background: var(--theme-text-primary);
+}
+
+body.dark-mode .nav-backdrop {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+/* Mobile menu */
+body.dark-mode .mobile-nav {
+  background: var(--theme-bg-secondary);
+  border-right: 1px solid var(--theme-border);
+}
+
+body.dark-mode .mobile-nav .nav-link {
+  color: var(--theme-text-primary);
+  border-bottom: 1px solid var(--theme-border);
+}
+
+body.dark-mode .mobile-nav .nav-link:hover {
+  background: var(--theme-bg-primary);
+}
+
+/* Breadcrumbs */
+body.dark-mode .breadcrumb {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .breadcrumb-item {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .breadcrumb-item.active {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .breadcrumb-item a {
+  color: var(--color-primary);
+}
+
+body.dark-mode .breadcrumb-item a:hover {
+  color: var(--color-primary-dark);
+}
+
+/* Search in navigation */
+body.dark-mode .nav-search {
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .nav-search input {
+  background: transparent;
+  color: var(--theme-text-primary);
+  border: none;
+}
+
+body.dark-mode .nav-search input::placeholder {
+  color: var(--theme-text-muted);
+}
+
+body.dark-mode .nav-search-btn {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .nav-search-btn:hover {
+  color: var(--theme-text-primary);
 }
