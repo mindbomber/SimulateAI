@@ -184,8 +184,8 @@ class MainGrid {
     this._initializeEnterpriseMonitoring();
 
     // Initialize with performance tracking
-    this._trackOperation("initialization", () => {
-      this.init();
+    this._trackOperation("initialization", async () => {
+      await this.init();
     });
   }
 
@@ -500,11 +500,11 @@ class MainGrid {
   /**
    * Track performance of operations
    */
-  _trackOperation(operationType, operation) {
+  async _trackOperation(operationType, operation) {
     const startTime = performance.now();
 
     try {
-      const result = operation();
+      const result = await operation();
       const duration = performance.now() - startTime;
 
       // Update metrics
@@ -956,7 +956,7 @@ class MainGrid {
     }
   }
 
-  init() {
+  async init() {
     this.container = document.querySelector(".categories-section");
     if (!this.container) {
       logger.error("Categories section not found");
@@ -976,7 +976,13 @@ class MainGrid {
       return;
     }
 
-    this.render();
+    // Load CategoryHeader configuration before rendering
+    await CategoryHeader.loadConfiguration();
+
+    // Load ScenarioCard configuration before rendering
+    await ScenarioCard.loadConfiguration();
+
+    await this.render();
     this.setupViewToggle();
   }
 
@@ -1006,19 +1012,19 @@ class MainGrid {
     return getCategoryProgress(categoryId, this.userProgress);
   }
 
-  render() {
-    return this._trackOperation("renders", () => {
+  async render() {
+    return this._trackOperation("renders", async () => {
       try {
         const renderStartTime = performance.now();
 
         // Render category view with performance tracking
-        this._trackOperation("category_rendering", () => {
-          this.renderCategoryView();
+        await this._trackOperation("category_rendering", async () => {
+          await this.renderCategoryView();
         });
 
         // Render scenario view with performance tracking
-        this._trackOperation("scenario_rendering", () => {
-          this.renderScenarioView();
+        await this._trackOperation("scenario_rendering", async () => {
+          await this.renderScenarioView();
         });
 
         // Attach event listeners after rendering
@@ -1065,17 +1071,17 @@ class MainGrid {
     });
   }
 
-  renderCategoryView() {
+  async renderCategoryView() {
     this.categoryContainer.innerHTML = "";
 
     // Create the complete category-based layout
-    this.categories.forEach((category) => {
-      const categorySection = this.createCategorySection(category);
+    for (const category of this.categories) {
+      const categorySection = await this.createCategorySection(category);
       this.categoryContainer.appendChild(categorySection);
-    });
+    }
   }
 
-  renderScenarioView() {
+  async renderScenarioView() {
     // Clear existing content but preserve structure
     const existingCards = this.scenarioContainer.querySelectorAll(
       ".scenario-card-wrapper, .scenario-count, .no-scenarios",
@@ -1229,7 +1235,7 @@ class MainGrid {
       this.scenarioContainer.appendChild(countElement);
 
       // Create individual scenario cards with hover category headers
-      allScenarios.forEach((scenario) => {
+      for (const scenario of allScenarios) {
         const category = {
           id: scenario.categoryId,
           color: scenario.category?.color || "#667eea",
@@ -1239,7 +1245,7 @@ class MainGrid {
 
         const isCompleted =
           this.userProgress[scenario.categoryId]?.[scenario.id] || false;
-        const scenarioCardHtml = ScenarioCard.render(
+        const scenarioCardHtml = await ScenarioCard.render(
           scenario,
           category,
           isCompleted,
@@ -1252,7 +1258,7 @@ class MainGrid {
 
         // Add category header for hover effect
         const categoryProgress = this.getCategoryProgress(scenario.categoryId);
-        const categoryHeaderHtml = this.categoryHeader.render(
+        const categoryHeaderHtml = await this.categoryHeader.render(
           scenario.category || category,
           categoryProgress,
         );
@@ -1263,7 +1269,7 @@ class MainGrid {
 
         cardWrapper.appendChild(categoryHeaderElement);
         this.scenarioContainer.appendChild(cardWrapper);
-      });
+      }
 
       logger.info(
         "MainGrid",
@@ -1278,11 +1284,11 @@ class MainGrid {
       logger.error("Failed to render scenario view:", error);
 
       // Fallback: Use basic scenario data from categories
-      this.renderScenarioViewFallback();
+      await this.renderScenarioViewFallback();
     }
   }
 
-  renderScenarioViewFallback() {
+  async renderScenarioViewFallback() {
     // Clear only the scenario cards, preserve the toolbar
     const existingCards = this.scenarioContainer.querySelectorAll(
       ".scenario-card-wrapper, .scenario-count, .no-scenarios",
@@ -1292,14 +1298,14 @@ class MainGrid {
     let totalScenarios = 0;
 
     // Fallback approach using basic category data
-    this.categories.forEach((category) => {
+    for (const category of this.categories) {
       const scenarios = getCategoryScenarios(category.id);
       totalScenarios += scenarios.length;
 
-      scenarios.forEach((scenario) => {
+      for (const scenario of scenarios) {
         const isCompleted =
           this.userProgress[category.id]?.[scenario.id] || false;
-        const scenarioCardHtml = ScenarioCard.render(
+        const scenarioCardHtml = await ScenarioCard.render(
           scenario,
           category,
           isCompleted,
@@ -1312,7 +1318,7 @@ class MainGrid {
 
         // Add category header for hover effect
         const categoryProgress = this.getCategoryProgress(category.id);
-        const categoryHeaderHtml = this.categoryHeader.render(
+        const categoryHeaderHtml = await this.categoryHeader.render(
           category,
           categoryProgress,
         );
@@ -1323,8 +1329,8 @@ class MainGrid {
 
         cardWrapper.appendChild(categoryHeaderElement);
         this.scenarioContainer.appendChild(cardWrapper);
-      });
-    });
+      }
+    }
 
     // Add count element at the beginning
     const countElement = document.createElement("div");
@@ -1440,7 +1446,7 @@ class MainGrid {
     logger.info("MainGrid", `Switched to ${newView} view`);
   }
 
-  createCategorySection(category) {
+  async createCategorySection(category) {
     const section = document.createElement("section");
     section.className = "category-section";
     section.setAttribute("data-category-id", category.id);
@@ -1450,23 +1456,31 @@ class MainGrid {
     const scenarios = getCategoryScenarios(category.id);
 
     // Use CategoryHeader component to render the header
-    const categoryHeaderHtml = this.categoryHeader.render(category, progress);
+    const categoryHeaderHtml = await this.categoryHeader.render(
+      category,
+      progress,
+    );
+
+    // Generate scenario cards asynchronously
+    const scenarioCards = await Promise.all(
+      scenarios.map((scenario) => this.createScenarioCard(scenario, category)),
+    );
 
     section.innerHTML = `
             ${categoryHeaderHtml}
 
             <div class="scenarios-grid">
-                ${scenarios.map((scenario) => this.createScenarioCard(scenario, category)).join("")}
+                ${scenarioCards.join("")}
             </div>
         `;
 
     return section;
   }
 
-  createScenarioCard(scenario, category) {
+  async createScenarioCard(scenario, category) {
     const isCompleted = this.userProgress[category.id]?.[scenario.id] || false;
 
-    return ScenarioCard.render(scenario, category, isCompleted);
+    return await ScenarioCard.render(scenario, category, isCompleted);
   }
 
   attachEventListeners() {
@@ -2476,7 +2490,7 @@ class MainGrid {
   /**
    * Initialize scenario controls (search, filter, sort)
    */
-  initializeScenarioControls() {
+  async initializeScenarioControls() {
     const toolbar = this.scenarioContainer.querySelector(
       ".scenario-controls-toolbar",
     );
@@ -2518,7 +2532,7 @@ class MainGrid {
     this.populateCategoryFilter();
 
     // Initial render with current state
-    this.renderFilteredScenarios();
+    await this.renderFilteredScenarios();
   }
 
   /**
@@ -3333,7 +3347,7 @@ class MainGrid {
   /**
    * Apply filters and sorting to scenarios
    */
-  applyFiltersAndSort() {
+  async applyFiltersAndSort() {
     // Start with all scenarios
     let filtered = [...this.allScenarios];
 
@@ -3381,7 +3395,7 @@ class MainGrid {
     this.filteredScenarios = filtered;
 
     // Render the filtered results
-    this.renderFilteredScenarios();
+    await this.renderFilteredScenarios();
   }
 
   /**
@@ -3430,7 +3444,7 @@ class MainGrid {
   /**
    * Render filtered scenarios
    */
-  renderFilteredScenarios() {
+  async renderFilteredScenarios() {
     // Find the scenarios container - it's the scenario container itself, not a child .scenarios-grid
     const scenariosContainer = this.scenarioContainer;
     if (!scenariosContainer) return;
@@ -3463,10 +3477,10 @@ class MainGrid {
     scenariosContainer.appendChild(countElement);
 
     // Render scenarios
-    this.filteredScenarios.forEach((scenario) => {
-      const scenarioElement = this.createScenarioElement(scenario);
+    for (const scenario of this.filteredScenarios) {
+      const scenarioElement = await this.createScenarioElement(scenario);
       scenariosContainer.appendChild(scenarioElement);
-    });
+    }
 
     // Update results count
     this.updateResultsCount();
@@ -3475,7 +3489,7 @@ class MainGrid {
   /**
    * Create scenario element
    */
-  createScenarioElement(scenario) {
+  async createScenarioElement(scenario) {
     const category = {
       id: scenario.categoryId,
       color: scenario.category?.color || "#667eea",
@@ -3485,7 +3499,7 @@ class MainGrid {
 
     const isCompleted =
       this.userProgress[scenario.categoryId]?.[scenario.id] || false;
-    const scenarioCardHtml = ScenarioCard.render(
+    const scenarioCardHtml = await ScenarioCard.render(
       scenario,
       category,
       isCompleted,
@@ -3498,7 +3512,7 @@ class MainGrid {
 
     // Add category header for hover effect
     const categoryProgress = this.getCategoryProgress(scenario.categoryId);
-    const categoryHeaderHtml = this.categoryHeader.render(
+    const categoryHeaderHtml = await this.categoryHeader.render(
       scenario.category || category,
       categoryProgress,
     );

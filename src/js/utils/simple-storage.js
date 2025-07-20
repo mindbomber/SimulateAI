@@ -23,18 +23,18 @@
  * @license Apache-2.0
  */
 
-import logger from './logger.js';
+import logger from "./logger.js";
 
 /**
  * Simple, robust storage manager with fallbacks
  */
 class SimpleStorageManager {
   constructor() {
-    this.prefix = 'ai_ethics_';
+    this.prefix = "ai_ethics_";
     this.isLocalStorageAvailable =
-      this.checkStorageAvailability('localStorage');
+      this.checkStorageAvailability("localStorage");
     this.isSessionStorageAvailable =
-      this.checkStorageAvailability('sessionStorage');
+      this.checkStorageAvailability("sessionStorage");
     this.memoryStorage = new Map(); // Fallback storage
 
     // Initialize with a simple test
@@ -45,21 +45,22 @@ class SimpleStorageManager {
    * Initialize storage and log status
    */
   init() {
-    logger.info('Storage', 'Storage Status');
-    logger.info(
-      'Storage',
-      '- localStorage',
-      this.isLocalStorageAvailable ? '✅ Available' : '❌ Not available'
-    );
-    logger.info(
-      'Storage',
-      '- sessionStorage',
-      this.isSessionStorageAvailable ? '✅ Available' : '❌ Not available'
-    );
+    logger.info("Storage", "Storage Status");
+    // Storage availability logging disabled for cleaner console output
+    // logger.info(
+    //   'Storage',
+    //   '- localStorage',
+    //   this.isLocalStorageAvailable ? '✅ Available' : '❌ Not available'
+    // );
+    // logger.info(
+    //   'Storage',
+    //   '- sessionStorage',
+    //   this.isSessionStorageAvailable ? '✅ Available' : '❌ Not available'
+    // );
 
     if (!this.isLocalStorageAvailable && !this.isSessionStorageAvailable) {
       logger.warn(
-        '⚠️  Browser storage not available. Using memory storage (data will not persist).'
+        "⚠️  Browser storage not available. Using memory storage (data will not persist).",
       );
     }
   }
@@ -72,8 +73,8 @@ class SimpleStorageManager {
       const storage = window[storageType];
       if (!storage) return false;
 
-      const testKey = '__storage_test__';
-      storage.setItem(testKey, 'test');
+      const testKey = "__storage_test__";
+      storage.setItem(testKey, "test");
       storage.removeItem(testKey);
       return true;
     } catch (e) {
@@ -172,7 +173,7 @@ class SimpleStorageManager {
       // Clear from localStorage
       if (this.isLocalStorageAvailable) {
         const keys = Object.keys(localStorage);
-        keys.forEach(key => {
+        keys.forEach((key) => {
           if (key.startsWith(this.prefix)) {
             localStorage.removeItem(key);
           }
@@ -182,7 +183,7 @@ class SimpleStorageManager {
       // Clear from sessionStorage
       if (this.isSessionStorageAvailable) {
         const keys = Object.keys(sessionStorage);
-        keys.forEach(key => {
+        keys.forEach((key) => {
           if (key.startsWith(this.prefix)) {
             sessionStorage.removeItem(key);
           }
@@ -192,7 +193,7 @@ class SimpleStorageManager {
       // Clear memory storage
       this.memoryStorage.clear();
     } catch (e) {
-      logger.warn('Error clearing storage:', e);
+      logger.warn("Error clearing storage:", e);
     }
   }
 
@@ -205,18 +206,18 @@ class SimpleStorageManager {
     try {
       // From localStorage
       if (this.isLocalStorageAvailable) {
-        Object.keys(localStorage).forEach(key => {
+        Object.keys(localStorage).forEach((key) => {
           if (key.startsWith(this.prefix)) {
-            keys.add(key.replace(this.prefix, ''));
+            keys.add(key.replace(this.prefix, ""));
           }
         });
       }
 
       // From sessionStorage
       if (this.isSessionStorageAvailable) {
-        Object.keys(sessionStorage).forEach(key => {
+        Object.keys(sessionStorage).forEach((key) => {
           if (key.startsWith(this.prefix)) {
-            keys.add(key.replace(this.prefix, ''));
+            keys.add(key.replace(this.prefix, ""));
           }
         });
       }
@@ -224,11 +225,11 @@ class SimpleStorageManager {
       // From memory storage
       this.memoryStorage.forEach((value, key) => {
         if (key.startsWith(this.prefix)) {
-          keys.add(key.replace(this.prefix, ''));
+          keys.add(key.replace(this.prefix, ""));
         }
       });
     } catch (e) {
-      logger.warn('Error getting storage keys:', e);
+      logger.warn("Error getting storage keys:", e);
     }
 
     return Array.from(keys);
@@ -257,36 +258,36 @@ class UserPreferences {
 
   // User interface preferences
   getTheme() {
-    return this.storage.get('theme', 'light');
+    return this.storage.get("theme", "light");
   }
 
   setTheme(theme) {
-    this.storage.set('theme', theme);
+    this.storage.set("theme", theme);
   }
 
   getLanguage() {
-    return this.storage.get('language', 'en');
+    return this.storage.get("language", "en");
   }
 
   setLanguage(language) {
-    this.storage.set('language', language);
+    this.storage.set("language", language);
   }
 
   // Accessibility preferences
   getAccessibilitySettings() {
-    return this.storage.get('accessibility', {
+    return this.storage.get("accessibility", {
       // Note: undefined values mean user hasn't set them explicitly
       // Boolean values mean user has made an explicit choice
     });
   }
 
   setAccessibilitySettings(settings) {
-    this.storage.set('accessibility', settings);
+    this.storage.set("accessibility", settings);
   }
 
   // Pre-launch modal preferences
   getPreLaunchSettings() {
-    return this.storage.get('preLaunchSettings', {
+    return this.storage.get("preLaunchSettings", {
       skipPreLaunch: false,
       skipPreLaunchFor: {},
       alwaysShowEducatorResources: true,
@@ -294,7 +295,7 @@ class UserPreferences {
   }
 
   setPreLaunchSettings(settings) {
-    this.storage.set('preLaunchSettings', settings);
+    this.storage.set("preLaunchSettings", settings);
   }
 
   // Convenience methods for pre-launch modal
@@ -357,7 +358,7 @@ class UserProgress {
 
   // Overall user stats
   getOverallStats() {
-    return this.storage.get('overall_stats', {
+    return this.storage.get("overall_stats", {
       totalSimulations: 0,
       totalTimeSpent: 0,
       averageScore: 0,
@@ -367,17 +368,17 @@ class UserProgress {
   }
 
   setOverallStats(stats) {
-    this.storage.set('overall_stats', stats);
+    this.storage.set("overall_stats", stats);
   }
 
   // Get all progress data
   getAllProgress() {
     const keys = this.storage.getAllKeys();
-    const progressKeys = keys.filter(key => key.startsWith('progress_'));
+    const progressKeys = keys.filter((key) => key.startsWith("progress_"));
     const progress = {};
 
-    progressKeys.forEach(key => {
-      const simulationId = key.replace('progress_', '');
+    progressKeys.forEach((key) => {
+      const simulationId = key.replace("progress_", "");
       progress[simulationId] = this.getSimulationProgress(simulationId);
     });
 
@@ -403,4 +404,4 @@ window.SimpleStorage = {
   progress: userProgress,
 };
 
-logger.info('Storage', '✅ Simple Storage Manager initialized');
+logger.info("Storage", "✅ Simple Storage Manager initialized");

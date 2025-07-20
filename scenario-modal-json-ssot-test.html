@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scenario Modal JSON SSOT Test</title>
+    <link rel="stylesheet" href="src/styles/main.css" />
+    <style>
+      body {
+        font-family: "Segoe UI", system-ui, sans-serif;
+        background: #1a1a1a;
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+      .test-container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .test-button {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 10px;
+        transition: transform 0.2s ease;
+      }
+      .test-button:hover {
+        transform: scale(1.05);
+      }
+      .test-button.enterprise {
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+      }
+      .config-display {
+        background: #2a2a2a;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px auto;
+        max-width: 900px;
+        text-align: left;
+        overflow-x: auto;
+        max-height: 600px;
+      }
+      .config-display pre {
+        margin: 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-size: 14px;
+      }
+      .status {
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px auto;
+        max-width: 700px;
+        font-weight: 500;
+      }
+      .status.success {
+        background: #2d5a3d;
+        border-left: 4px solid #4caf50;
+      }
+      .status.error {
+        background: #5a2d2d;
+        border-left: 4px solid #f44336;
+      }
+      .status.loading {
+        background: #3d3d5a;
+        border-left: 4px solid #2196f3;
+      }
+      .status.warning {
+        background: #5a4a2d;
+        border-left: 4px solid #ff9800;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin: 30px 0;
+      }
+      .feature-card {
+        background: #2a2a2a;
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 4px solid #667eea;
+      }
+      .feature-card h3 {
+        margin: 0 0 10px 0;
+        color: #667eea;
+      }
+      .feature-card ul {
+        margin: 10px 0;
+        padding-left: 20px;
+      }
+      .feature-card li {
+        margin: 5px 0;
+        color: #ccc;
+      }
+
+      .enterprise-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-left: 10px;
+      }
+
+      .metrics-display {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+      .metric-card {
+        background: #2a2a2a;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+      }
+      .metric-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: #667eea;
+      }
+      .metric-label {
+        font-size: 14px;
+        color: #ccc;
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>
+        Scenario Modal JSON SSOT Test
+        <span class="enterprise-badge">ENTERPRISE EDITION</span>
+      </h1>
+      <p>
+        Testing the comprehensive Scenario Modal JSON Single Source of Truth
+        implementation with enterprise features
+      </p>
+
+      <div class="controls">
+        <button class="test-button" onclick="loadConfig()">
+          Load Configuration
+        </button>
+        <button class="test-button" onclick="showAnimationConfig()">
+          Animation Settings
+        </button>
+        <button class="test-button enterprise" onclick="showEnterpriseConfig()">
+          Enterprise Config
+        </button>
+        <button class="test-button" onclick="showRadarConfig()">
+          Radar Chart Config
+        </button>
+        <button class="test-button" onclick="testPerformanceMetrics()">
+          Performance Metrics
+        </button>
+        <button class="test-button enterprise" onclick="testCircuitBreaker()">
+          Circuit Breaker Test
+        </button>
+      </div>
+
+      <div id="status" class="status loading">
+        Initializing Scenario Modal JSON SSOT...
+      </div>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>🎯 Core Configuration</h3>
+          <ul>
+            <li>Animation durations and easings</li>
+            <li>Modal structure and components</li>
+            <li>Radar chart settings</li>
+            <li>Typewriter effects</li>
+            <li>Option rendering</li>
+          </ul>
+        </div>
+        <div class="feature-card">
+          <h3>🚀 Enterprise Features</h3>
+          <ul>
+            <li>Performance monitoring</li>
+            <li>Health diagnostics</li>
+            <li>Circuit breaker patterns</li>
+            <li>Telemetry & analytics</li>
+            <li>Error recovery strategies</li>
+          </ul>
+        </div>
+        <div class="feature-card">
+          <h3>♿ Accessibility & UX</h3>
+          <ul>
+            <li>Keyboard navigation</li>
+            <li>Screen reader support</li>
+            <li>Reduced motion preferences</li>
+            <li>Focus management</li>
+            <li>Test mode indicators</li>
+          </ul>
+        </div>
+        <div class="feature-card">
+          <h3>⚡ Performance</h3>
+          <ul>
+            <li>Lazy loading optimization</li>
+            <li>5-minute configuration caching</li>
+            <li>Batch DOM updates</li>
+            <li>Memory usage monitoring</li>
+            <li>Low-end device fallbacks</li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="metricsDisplay" class="metrics-display" style="display: none">
+        <div class="metric-card">
+          <div class="metric-value" id="configSize">-</div>
+          <div class="metric-label">Config Size (KB)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="loadTime">-</div>
+          <div class="metric-label">Load Time (ms)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="cacheHits">-</div>
+          <div class="metric-label">Cache Hits</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="enterpriseFeatures">-</div>
+          <div class="metric-label">Enterprise Features</div>
+        </div>
+      </div>
+
+      <div id="configDisplay" class="config-display" style="display: none">
+        <h3>Configuration Data:</h3>
+        <pre id="configContent"></pre>
+      </div>
+    </div>
+
+    <script type="module">
+      import {
+        loadScenarioModalConfig,
+        validateScenarioModalConfig,
+        clearScenarioModalConfigCache,
+      } from "./src/js/utils/scenario-modal-config-loader.js";
+
+      let currentConfig = null;
+      let loadTime = 0;
+      let cacheHits = 0;
+
+      // Make functions global for onclick handlers
+      window.loadConfig = async function () {
+        updateStatus("Loading Scenario Modal configuration...", "loading");
+        const startTime = performance.now();
+
+        try {
+          currentConfig = await loadScenarioModalConfig();
+          loadTime = Math.round(performance.now() - startTime);
+
+          // Validate configuration
+          const isValid = validateScenarioModalConfig(currentConfig);
+
+          if (isValid) {
+            updateStatus(
+              `✅ Configuration loaded successfully in ${loadTime}ms!`,
+              "success",
+            );
+            updateMetrics();
+            console.log("Scenario Modal Configuration:", currentConfig);
+          } else {
+            updateStatus(
+              "⚠️ Configuration loaded but validation failed",
+              "warning",
+            );
+          }
+        } catch (error) {
+          updateStatus(
+            `❌ Error loading configuration: ${error.message}`,
+            "error",
+          );
+          console.error("Configuration load error:", error);
+        }
+      };
+
+      window.showAnimationConfig = function () {
+        if (!currentConfig) {
+          updateStatus("❌ Please load configuration first", "error");
+          return;
+        }
+
+        const display = document.getElementById("configDisplay");
+        const content = document.getElementById("configContent");
+        content.textContent = JSON.stringify(
+          {
+            animations: currentConfig.animations,
+            typewriter: currentConfig.typewriter,
+            computed: {
+              animations: currentConfig.computed?.animations,
+            },
+          },
+          null,
+          2,
+        );
+        display.style.display = "block";
+        updateStatus("📊 Animation configuration displayed", "success");
+      };
+
+      window.showEnterpriseConfig = function () {
+        if (!currentConfig) {
+          updateStatus("❌ Please load configuration first", "error");
+          return;
+        }
+
+        const display = document.getElementById("configDisplay");
+        const content = document.getElementById("configContent");
+        content.textContent = JSON.stringify(
+          {
+            enterprise: currentConfig.enterprise,
+            computed: {
+              performance: currentConfig.computed?.performance,
+              health: currentConfig.computed?.health,
+              circuitBreaker: currentConfig.computed?.circuitBreaker,
+              optimizations: currentConfig.computed?.optimizations,
+            },
+          },
+          null,
+          2,
+        );
+        display.style.display = "block";
+        updateStatus("🚀 Enterprise configuration displayed", "success");
+      };
+
+      window.showRadarConfig = function () {
+        if (!currentConfig) {
+          updateStatus("❌ Please load configuration first", "error");
+          return;
+        }
+
+        const display = document.getElementById("configDisplay");
+        const content = document.getElementById("configContent");
+        content.textContent = JSON.stringify(
+          {
+            radarChart: currentConfig.radarChart,
+            accessibility: currentConfig.accessibility,
+            performance: currentConfig.performance,
+          },
+          null,
+          2,
+        );
+        display.style.display = "block";
+        updateStatus("📊 Radar chart configuration displayed", "success");
+      };
+
+      window.testPerformanceMetrics = function () {
+        if (!currentConfig) {
+          updateStatus("❌ Please load configuration first", "error");
+          return;
+        }
+
+        // Simulate performance checks
+        const mockDuration = Math.random() * 2000 + 500;
+        const performance = currentConfig.computed?.performance;
+
+        if (performance) {
+          const isSlowModal = performance.isSlowModalOpen(mockDuration);
+          const isCriticalModal = performance.isCriticalModalOpen(mockDuration);
+
+          let status = `⚡ Performance test: ${Math.round(mockDuration)}ms`;
+          if (isCriticalModal) {
+            status += " - CRITICAL";
+            updateStatus(status, "error");
+          } else if (isSlowModal) {
+            status += " - WARNING";
+            updateStatus(status, "warning");
+          } else {
+            status += " - GOOD";
+            updateStatus(status, "success");
+          }
+        }
+      };
+
+      window.testCircuitBreaker = function () {
+        if (!currentConfig) {
+          updateStatus("❌ Please load configuration first", "error");
+          return;
+        }
+
+        const circuitBreaker = currentConfig.computed?.circuitBreaker;
+        if (circuitBreaker) {
+          const isEnabled = circuitBreaker.isEnabled();
+          const shouldOpen = circuitBreaker.shouldOpenCircuit(5); // Mock 5 failures
+          const timeout = circuitBreaker.getRecoveryTimeout();
+
+          updateStatus(
+            `🔧 Circuit Breaker: ${isEnabled ? "ENABLED" : "DISABLED"} | Should Open: ${shouldOpen} | Recovery: ${timeout}ms`,
+            "success",
+          );
+        }
+      };
+
+      function updateMetrics() {
+        if (!currentConfig) return;
+
+        const configSize =
+          Math.round((JSON.stringify(currentConfig).length / 1024) * 100) / 100;
+        const enterpriseFeatures = Object.keys(
+          currentConfig.enterprise || {},
+        ).length;
+
+        document.getElementById("configSize").textContent = configSize;
+        document.getElementById("loadTime").textContent = loadTime;
+        document.getElementById("cacheHits").textContent = cacheHits;
+        document.getElementById("enterpriseFeatures").textContent =
+          enterpriseFeatures;
+        document.getElementById("metricsDisplay").style.display = "grid";
+      }
+
+      function updateStatus(message, type) {
+        const statusEl = document.getElementById("status");
+        statusEl.textContent = message;
+        statusEl.className = `status ${type}`;
+      }
+
+      // Initialize on page load
+      updateStatus(
+        "Ready to test Scenario Modal JSON SSOT with Enterprise features",
+        "success",
+      );
+    </script>
+  </body>
+</html>

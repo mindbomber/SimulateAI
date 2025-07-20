@@ -79,8 +79,8 @@ limitations under the License.
     <!-- 5. UI utility components -->
     <link rel="stylesheet" href="src/styles/notification-toast.css" />
     <link rel="stylesheet" href="src/styles/onboarding-tour.css" />
-    <link rel="stylesheet" href="src/styles/radar-chart.css" />
     <link rel="stylesheet" href="src/styles/scenario-modal.css" />
+    <link rel="stylesheet" href="src/styles/radar-chart.css" />
     <link rel="stylesheet" href="src/styles/session-settings.css" />
     <link rel="stylesheet" href="src/styles/profile-customization.css" />
 
@@ -1112,6 +1112,10 @@ limitations under the License.
       src="src/js/components/notification-toast.js"
     ></script>
     <script type="module" src="src/js/components/modal-utility.js"></script>
+
+    <!-- JSON SSOT Configuration System - Initialize before app.js -->
+    <script type="module" src="src/js/app-startup.js"></script>
+
     <script type="module" src="src/js/app.js"></script>
     <script type="module" src="src/js/utils/env-config.js"></script>
     <script

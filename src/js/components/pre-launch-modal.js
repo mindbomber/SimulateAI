@@ -29,52 +29,19 @@
  * - Static utility methods for debugging
  */
 
-import { getSimulationInfo } from '../data/simulation-info.js';
-import ModalUtility from './modal-utility.js';
-import { simpleAnalytics } from '../utils/simple-analytics.js';
+import { getSimulationInfo } from "../data/simulation-info.js";
+import ModalUtility from "./modal-utility.js";
+import { simpleAnalytics } from "../utils/simple-analytics.js";
 import {
   getRadarChartExplanation,
   getEthicsGlossary,
-} from '../utils/ethics-glossary.js';
-import logger from '../utils/logger.js';
+} from "../utils/ethics-glossary.js";
+import logger from "../utils/logger.js";
 
-// ===== ENTERPRISE CONSTANTS =====
+import { loadPreLaunchModalConfig } from "../utils/pre-launch-modal-config-loader.js";
+
+// Constants still needed for fallback values
 const DEFAULT_SCENARIO_DURATION = 15;
-const MOBILE_BREAKPOINT = 768;
-const UPDATE_DELAY = 100; // ms for UI update timing
-
-// Enterprise monitoring thresholds
-const ENTERPRISE_CONSTANTS = {
-  PERFORMANCE: {
-    MAX_RENDER_TIME: 2000, // Maximum time for modal render (ms)
-    MAX_TAB_SWITCH_TIME: 300, // Maximum time for tab switching (ms)
-    MAX_CONTENT_GENERATION_TIME: 1500, // Maximum time for content generation (ms)
-    WARNING_RENDER_TIME: 1000, // Warning threshold for render time (ms)
-    MEMORY_WARNING_THRESHOLD: 50, // Warning threshold for memory usage (MB)
-    MEMORY_CRITICAL_THRESHOLD: 100, // Critical threshold for memory usage (MB)
-  },
-  HEALTH: {
-    CHECK_INTERVAL: 30000, // Health check interval (ms)
-    FAILURE_THRESHOLD: 3, // Number of failures before circuit opens
-    RECOVERY_TIMEOUT: 60000, // Time before attempting recovery (ms)
-    HEARTBEAT_INTERVAL: 10000, // Heartbeat interval for health monitoring (ms)
-  },
-  CIRCUIT_BREAKER: {
-    FAILURE_THRESHOLD: 5, // Failures before opening circuit
-    RECOVERY_TIMEOUT: 30000, // Timeout before half-open state (ms)
-    SUCCESS_THRESHOLD: 3, // Successes needed to close circuit
-  },
-  TELEMETRY: {
-    BATCH_SIZE: 10, // Number of events to batch before sending
-    FLUSH_INTERVAL: 15000, // Interval to flush telemetry batch (ms)
-    MAX_EVENTS_MEMORY: 100, // Maximum events to keep in memory
-  },
-  ERROR_RECOVERY: {
-    MAX_RETRY_ATTEMPTS: 3, // Maximum retry attempts for operations
-    RETRY_DELAY: 1000, // Base delay between retries (ms)
-    BACKOFF_MULTIPLIER: 2, // Exponential backoff multiplier
-  },
-};
 
 export default class PreLaunchModal {
   constructor(simulationId, options = {}) {
@@ -89,6 +56,11 @@ export default class PreLaunchModal {
         showEducatorResources: options.showEducatorResources || false,
         ...options,
       };
+
+      // Load configuration asynchronously
+      this.config = null;
+      this.configLoaded = false;
+      this._loadConfigurationAsync();
 
       // === ENTERPRISE INITIALIZATION ===
       this.instanceId = `prelaunch_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -116,7 +88,7 @@ export default class PreLaunchModal {
 
       // Circuit breaker for fault tolerance
       this.circuitBreaker = {
-        state: 'closed', // closed, open, half-open
+        state: "closed", // closed, open, half-open
         failureCount: 0,
         lastFailureTime: null,
         nextAttemptTime: null,
@@ -143,7 +115,7 @@ export default class PreLaunchModal {
       if (options.categoryData && options.scenarioData) {
         this.simulationInfo = this.convertCategoryToSimulationInfo(
           options.categoryData,
-          options.scenarioData
+          options.scenarioData,
         );
         this.isCategory = true;
       } else {
@@ -154,32 +126,101 @@ export default class PreLaunchModal {
         if (!this.simulationInfo) {
           this._handleError(
             new Error(`Simulation info not found for: ${simulationId}`),
-            'constructor'
+            "constructor",
           );
           throw new Error(`Simulation info not found for: ${simulationId}`);
         }
       }
 
       this.modal = null;
-      this.currentTab = 'overview';
+      this.currentTab = "overview";
 
       // Initialize enterprise monitoring
       this._initializeEnterpriseMonitoring();
 
       // Track constructor performance
       const constructorTime = performance.now() - startTime;
-      this._recordPerformanceMetric('constructor', constructorTime);
+      this._recordPerformanceMetric("constructor", constructorTime);
 
       // Log successful initialization
-      this._logTelemetry('instance_created', {
+      this._logTelemetry("instance_created", {
         simulationId: this.simulationId,
         isCategory: this.isCategory,
         constructorTime: Math.round(constructorTime * 100) / 100,
         options: Object.keys(this.options),
       });
     } catch (error) {
-      this._handleError(error, 'constructor');
+      this._handleError(error, "constructor");
       throw error;
+    }
+  }
+
+  /**
+   * Load configuration asynchronously
+   * This runs in the background to avoid blocking constructor
+   */
+  async _loadConfigurationAsync() {
+    try {
+      this.config = await loadPreLaunchModalConfig();
+      this.configLoaded = true;
+
+      logger.debug("[PreLaunchModal] Configuration loaded successfully", {
+        instanceId: this.instanceId,
+        configVersion: this.config.metadata?.version,
+      });
+
+      // Re-initialize enterprise monitoring with actual config values
+      if (
+        this.healthCheckInterval ||
+        this.telemetryFlushInterval ||
+        this.heartbeatInterval
+      ) {
+        this._reinitializeEnterpriseMonitoring();
+      }
+    } catch (error) {
+      logger.error("[PreLaunchModal] Failed to load configuration:", error);
+      // Continue with default values - don't break functionality
+      this.configLoaded = false;
+    }
+  }
+
+  /**
+   * Get configuration value with fallback to hardcoded constants
+   */
+  _getConfigValue(path, fallback) {
+    if (this.config && this.config.utils) {
+      return this.config.utils.getValue(path, fallback);
+    }
+    return fallback;
+  }
+
+  /**
+   * Re-initialize enterprise monitoring with loaded configuration
+   */
+  _reinitializeEnterpriseMonitoring() {
+    try {
+      // Clear existing intervals
+      if (this.healthCheckInterval) {
+        clearInterval(this.healthCheckInterval);
+      }
+      if (this.telemetryFlushInterval) {
+        clearInterval(this.telemetryFlushInterval);
+      }
+      if (this.heartbeatInterval) {
+        clearInterval(this.heartbeatInterval);
+      }
+
+      // Re-initialize with config values
+      this._initializeEnterpriseMonitoring();
+
+      logger.debug(
+        "[PreLaunchModal] Enterprise monitoring re-initialized with configuration",
+      );
+    } catch (error) {
+      logger.error(
+        "[PreLaunchModal] Error re-initializing enterprise monitoring:",
+        error,
+      );
     }
   }
 
@@ -190,28 +231,40 @@ export default class PreLaunchModal {
   _initializeEnterpriseMonitoring() {
     try {
       // Health check monitoring
+      const healthCheckInterval = this._getConfigValue(
+        "enterprise.health.checkInterval",
+        30000,
+      );
       this.healthCheckInterval = setInterval(() => {
         this._performHealthCheck();
-      }, ENTERPRISE_CONSTANTS.HEALTH.CHECK_INTERVAL);
+      }, healthCheckInterval);
 
       // Telemetry batch flushing
+      const telemetryFlushInterval = this._getConfigValue(
+        "enterprise.telemetry.flushInterval",
+        60000,
+      );
       this.telemetryFlushInterval = setInterval(() => {
         this._flushTelemetryBatch();
-      }, ENTERPRISE_CONSTANTS.TELEMETRY.FLUSH_INTERVAL);
+      }, telemetryFlushInterval);
 
       // Heartbeat monitoring
+      const heartbeatInterval = this._getConfigValue(
+        "enterprise.health.heartbeatInterval",
+        60000,
+      );
       this.heartbeatInterval = setInterval(() => {
         this._sendHeartbeat();
-      }, ENTERPRISE_CONSTANTS.HEALTH.HEARTBEAT_INTERVAL);
+      }, heartbeatInterval);
 
       // Set up error recovery baseline
       this._establishPerformanceBaseline();
 
       logger.debug(
-        `[PreLaunchModal] Enterprise monitoring initialized for instance ${this.instanceId}`
+        `[PreLaunchModal] Enterprise monitoring initialized for instance ${this.instanceId}`,
       );
     } catch (error) {
-      this._handleError(error, '_initializeEnterpriseMonitoring');
+      this._handleError(error, "_initializeEnterpriseMonitoring");
       // Don't throw here - monitoring failure shouldn't break modal functionality
     }
   }
@@ -219,7 +272,7 @@ export default class PreLaunchModal {
   /**
    * Enterprise error handling with recovery strategies
    */
-  _handleError(error, context = 'unknown', retryOperation = null) {
+  _handleError(error, context = "unknown", retryOperation = null) {
     this.errorCount++;
     this.lastError = {
       message: error.message,
@@ -233,7 +286,7 @@ export default class PreLaunchModal {
     this._updateCircuitBreaker(false);
 
     // Log the error with telemetry
-    this._logTelemetry('error_occurred', {
+    this._logTelemetry("error_occurred", {
       error: error.message,
       context,
       errorCount: this.errorCount,
@@ -241,18 +294,27 @@ export default class PreLaunchModal {
     });
 
     // Attempt recovery if within limits
-    if (
-      this.recoveryAttempts <
-        ENTERPRISE_CONSTANTS.ERROR_RECOVERY.MAX_RETRY_ATTEMPTS &&
-      retryOperation
-    ) {
+    const maxRetryAttempts = this._getConfigValue(
+      "enterprise.errorRecovery.maxRetryAttempts",
+      3,
+    );
+    if (this.recoveryAttempts < maxRetryAttempts && retryOperation) {
       this.recoveryAttempts++;
+
+      const baseRetryDelay = this._getConfigValue(
+        "enterprise.errorRecovery.retryDelay",
+        1000,
+      );
+      const backoffMultiplier = this._getConfigValue(
+        "enterprise.errorRecovery.backoffMultiplier",
+        2,
+      );
+
       const retryDelay =
-        ENTERPRISE_CONSTANTS.ERROR_RECOVERY.RETRY_DELAY *
-        Math.pow(
-          ENTERPRISE_CONSTANTS.ERROR_RECOVERY.BACKOFF_MULTIPLIER,
-          this.recoveryAttempts - 1
-        );
+        this.config?.computed?.errorRecovery?.getRetryDelay(
+          this.recoveryAttempts,
+        ) ||
+        baseRetryDelay * Math.pow(backoffMultiplier, this.recoveryAttempts - 1);
 
       setTimeout(() => {
         try {
@@ -261,15 +323,18 @@ export default class PreLaunchModal {
         } catch (retryError) {
           this._handleError(
             retryError,
-            `${context}_retry_${this.recoveryAttempts}`
+            `${context}_retry_${this.recoveryAttempts}`,
           );
         }
       }, retryDelay);
     }
 
     // Update health status
-    this.isHealthy =
-      this.errorCount < ENTERPRISE_CONSTANTS.HEALTH.FAILURE_THRESHOLD;
+    const healthFailureThreshold = this._getConfigValue(
+      "enterprise.health.failureThreshold",
+      5,
+    );
+    this.isHealthy = this.errorCount < healthFailureThreshold;
 
     logger.error(`[PreLaunchModal] Error in ${context}:`, error);
   }
@@ -289,7 +354,7 @@ export default class PreLaunchModal {
 
       // Update specific metrics
       switch (operation) {
-        case 'render':
+        case "render":
           this.performanceMetrics.renderCount++;
           this.performanceMetrics.totalRenderTime += duration;
           this.performanceMetrics.averageRenderTime =
@@ -297,7 +362,7 @@ export default class PreLaunchModal {
             this.performanceMetrics.renderCount;
           this.performanceMetrics.lastRenderTime = duration;
           break;
-        case 'tab_switch':
+        case "tab_switch":
           this.performanceMetrics.tabSwitchCount++;
           this.performanceMetrics.totalTabSwitchTime += duration;
           this.performanceMetrics.averageTabSwitchTime =
@@ -305,7 +370,7 @@ export default class PreLaunchModal {
             this.performanceMetrics.tabSwitchCount;
           this.performanceMetrics.lastTabSwitchTime = duration;
           break;
-        case 'content_generation':
+        case "content_generation":
           this.performanceMetrics.contentGenerationTime = duration;
           break;
       }
@@ -314,12 +379,12 @@ export default class PreLaunchModal {
       this._checkPerformanceThresholds(operation, duration);
 
       // Log telemetry
-      this._logTelemetry('performance_metric', metric);
+      this._logTelemetry("performance_metric", metric);
     } catch (error) {
       // Don't let performance tracking break the application
       logger.warn(
-        '[PreLaunchModal] Error recording performance metric:',
-        error
+        "[PreLaunchModal] Error recording performance metric:",
+        error,
       );
     }
   }
@@ -330,40 +395,46 @@ export default class PreLaunchModal {
   _updateCircuitBreaker(success) {
     const now = Date.now();
 
+    const successThreshold = this._getConfigValue(
+      "enterprise.circuitBreaker.successThreshold",
+      3,
+    );
+    const failureThreshold = this._getConfigValue(
+      "enterprise.circuitBreaker.failureThreshold",
+      5,
+    );
+    const recoveryTimeout = this._getConfigValue(
+      "enterprise.circuitBreaker.recoveryTimeout",
+      30000,
+    );
+
     if (success) {
-      if (this.circuitBreaker.state === 'half-open') {
+      if (this.circuitBreaker.state === "half-open") {
         this.circuitBreaker.successCount++;
-        if (
-          this.circuitBreaker.successCount >=
-          ENTERPRISE_CONSTANTS.CIRCUIT_BREAKER.SUCCESS_THRESHOLD
-        ) {
-          this.circuitBreaker.state = 'closed';
+        if (this.circuitBreaker.successCount >= successThreshold) {
+          this.circuitBreaker.state = "closed";
           this.circuitBreaker.failureCount = 0;
           this.circuitBreaker.successCount = 0;
         }
-      } else if (this.circuitBreaker.state === 'closed') {
+      } else if (this.circuitBreaker.state === "closed") {
         this.circuitBreaker.failureCount = 0;
       }
     } else {
       this.circuitBreaker.failureCount++;
       this.circuitBreaker.lastFailureTime = now;
 
-      if (
-        this.circuitBreaker.failureCount >=
-        ENTERPRISE_CONSTANTS.CIRCUIT_BREAKER.FAILURE_THRESHOLD
-      ) {
-        this.circuitBreaker.state = 'open';
-        this.circuitBreaker.nextAttemptTime =
-          now + ENTERPRISE_CONSTANTS.CIRCUIT_BREAKER.RECOVERY_TIMEOUT;
+      if (this.circuitBreaker.failureCount >= failureThreshold) {
+        this.circuitBreaker.state = "open";
+        this.circuitBreaker.nextAttemptTime = now + recoveryTimeout;
       }
     }
 
     // Check if circuit should move to half-open
     if (
-      this.circuitBreaker.state === 'open' &&
+      this.circuitBreaker.state === "open" &&
       now >= this.circuitBreaker.nextAttemptTime
     ) {
-      this.circuitBreaker.state = 'half-open';
+      this.circuitBreaker.state = "half-open";
       this.circuitBreaker.successCount = 0;
     }
   }
@@ -384,9 +455,9 @@ export default class PreLaunchModal {
       };
 
       this.lastHealthCheck = Date.now();
-      this._logTelemetry('health_check', healthData);
+      this._logTelemetry("health_check", healthData);
     } catch (error) {
-      this._handleError(error, '_performHealthCheck');
+      this._handleError(error, "_performHealthCheck");
     }
   }
 
@@ -397,7 +468,7 @@ export default class PreLaunchModal {
     try {
       if (performance.memory) {
         const memoryMB = Math.round(
-          performance.memory.usedJSHeapSize / 1024 / 1024
+          performance.memory.usedJSHeapSize / 1024 / 1024,
         );
         this.performanceMetrics.memoryUsage = memoryMB;
         return memoryMB;
@@ -424,14 +495,16 @@ export default class PreLaunchModal {
       this.telemetryBatch.push(telemetryEvent);
 
       // Auto-flush if batch is full
-      if (
-        this.telemetryBatch.length >= ENTERPRISE_CONSTANTS.TELEMETRY.BATCH_SIZE
-      ) {
+      const batchSize = this._getConfigValue(
+        "enterprise.telemetry.batchSize",
+        50,
+      );
+      if (this.telemetryBatch.length >= batchSize) {
         this._flushTelemetryBatch();
       }
     } catch (error) {
       // Don't let telemetry errors break functionality
-      logger.warn('[PreLaunchModal] Telemetry error:', error);
+      logger.warn("[PreLaunchModal] Telemetry error:", error);
     }
   }
 
@@ -447,7 +520,7 @@ export default class PreLaunchModal {
       this.telemetryBatch = [];
 
       if (simpleAnalytics) {
-        simpleAnalytics.trackEvent('pre_launch_modal_batch', {
+        simpleAnalytics.trackEvent("pre_launch_modal_batch", {
           events: batchData,
           batchSize: batchData.length,
           instanceId: this.instanceId,
@@ -456,7 +529,7 @@ export default class PreLaunchModal {
 
       this.lastTelemetryFlush = Date.now();
     } catch (error) {
-      logger.warn('[PreLaunchModal] Error flushing telemetry batch:', error);
+      logger.warn("[PreLaunchModal] Error flushing telemetry batch:", error);
     }
   }
 
@@ -464,7 +537,7 @@ export default class PreLaunchModal {
    * Send heartbeat signal
    */
   _sendHeartbeat() {
-    this._logTelemetry('heartbeat', {
+    this._logTelemetry("heartbeat", {
       uptime: Date.now() - this.createdAt,
       lastHealthCheck: this.lastHealthCheck,
       isHealthy: this.isHealthy,
@@ -475,46 +548,93 @@ export default class PreLaunchModal {
    * Performance threshold monitoring
    */
   _checkPerformanceThresholds(operation, duration) {
-    const thresholds = ENTERPRISE_CONSTANTS.PERFORMANCE;
+    // Use computed performance helpers if available, otherwise fallback to direct config access
+    if (this.config?.computed?.performance) {
+      const computed = this.config.computed.performance;
+
+      if (computed.isPerformanceViolation(operation, duration)) {
+        const thresholds = this._getThresholdsForOperation(operation);
+        this._logTelemetry("performance_violation", {
+          operation,
+          duration,
+          threshold: thresholds.critical,
+          severity: "critical",
+        });
+      } else if (computed.isPerformanceWarning(operation, duration)) {
+        const thresholds = this._getThresholdsForOperation(operation);
+        this._logTelemetry("performance_warning", {
+          operation,
+          duration,
+          threshold: thresholds.warning,
+          severity: "warning",
+        });
+      }
+    } else {
+      // Fallback to hardcoded thresholds when config not loaded
+      this._checkPerformanceThresholdsFallback(operation, duration);
+    }
+  }
+
+  /**
+   * Get performance thresholds for a specific operation
+   */
+  _getThresholdsForOperation(operation) {
+    const performance = this._getConfigValue("enterprise.performance", {});
 
     switch (operation) {
-      case 'render':
-        if (duration > thresholds.MAX_RENDER_TIME) {
-          this._logTelemetry('performance_violation', {
-            operation,
-            duration,
-            threshold: thresholds.MAX_RENDER_TIME,
-            severity: 'critical',
-          });
-        } else if (duration > thresholds.WARNING_RENDER_TIME) {
-          this._logTelemetry('performance_warning', {
-            operation,
-            duration,
-            threshold: thresholds.WARNING_RENDER_TIME,
-            severity: 'warning',
-          });
-        }
-        break;
-      case 'tab_switch':
-        if (duration > thresholds.MAX_TAB_SWITCH_TIME) {
-          this._logTelemetry('performance_violation', {
-            operation,
-            duration,
-            threshold: thresholds.MAX_TAB_SWITCH_TIME,
-            severity: 'warning',
-          });
-        }
-        break;
-      case 'content_generation':
-        if (duration > thresholds.MAX_CONTENT_GENERATION_TIME) {
-          this._logTelemetry('performance_violation', {
-            operation,
-            duration,
-            threshold: thresholds.MAX_CONTENT_GENERATION_TIME,
-            severity: 'warning',
-          });
-        }
-        break;
+      case "render":
+        return {
+          warning: performance.warningRenderTime || 500,
+          critical: performance.maxRenderTime || 1000,
+        };
+      case "tab_switch":
+        return {
+          warning: performance.warningTabSwitchTime || 150,
+          critical: performance.maxTabSwitchTime || 300,
+        };
+      case "content_generation":
+        return {
+          warning: performance.warningContentGenerationTime || 1000,
+          critical: performance.maxContentGenerationTime || 2000,
+        };
+      case "constructor":
+        return {
+          warning: performance.warningConstructorTime || 50,
+          critical: performance.maxConstructorTime || 100,
+        };
+      default:
+        return { warning: 500, critical: 1000 };
+    }
+  }
+
+  /**
+   * Fallback performance threshold checking when config not loaded
+   */
+  _checkPerformanceThresholdsFallback(operation, duration) {
+    const thresholds = {
+      render: { max: 1000, warning: 500 },
+      tab_switch: { max: 300, warning: 150 },
+      content_generation: { max: 2000, warning: 1000 },
+      constructor: { max: 100, warning: 50 },
+    };
+
+    const threshold = thresholds[operation];
+    if (!threshold) return;
+
+    if (duration > threshold.max) {
+      this._logTelemetry("performance_violation", {
+        operation,
+        duration,
+        threshold: threshold.max,
+        severity: "critical",
+      });
+    } else if (duration > threshold.warning) {
+      this._logTelemetry("performance_warning", {
+        operation,
+        duration,
+        threshold: threshold.warning,
+        severity: "warning",
+      });
     }
   }
 
@@ -526,7 +646,7 @@ export default class PreLaunchModal {
     this._getMemoryUsage();
 
     // Log baseline establishment
-    this._logTelemetry('baseline_established', {
+    this._logTelemetry("baseline_established", {
       initialMemory: this.performanceMetrics.memoryUsage,
       timestamp: Date.now(),
     });
@@ -544,26 +664,26 @@ export default class PreLaunchModal {
 
       // Educational Context
       learningObjectives: category.learningObjectives || [
-        'Explore ethical decision-making scenarios',
-        'Understand different perspectives on moral choices',
-        'Practice reasoning through complex dilemmas',
-        'Develop critical thinking about AI ethics',
+        "Explore ethical decision-making scenarios",
+        "Understand different perspectives on moral choices",
+        "Practice reasoning through complex dilemmas",
+        "Develop critical thinking about AI ethics",
       ],
 
       isteCriteria: [
-        'Empowered Learner 1.1.5: Use technology to seek feedback and make improvements',
-        'Digital Citizen 1.2.2: Engage in positive, safe, legal and ethical behavior',
-        'Knowledge Constructor 1.3.1: Plan and employ effective research strategies',
-        'Computational Thinker 1.5.3: Collect data and identify patterns',
+        "Empowered Learner 1.1.5: Use technology to seek feedback and make improvements",
+        "Digital Citizen 1.2.2: Engage in positive, safe, legal and ethical behavior",
+        "Knowledge Constructor 1.3.1: Plan and employ effective research strategies",
+        "Computational Thinker 1.5.3: Collect data and identify patterns",
       ],
 
       duration: `${category.estimatedTime || DEFAULT_SCENARIO_DURATION} minutes`,
-      difficulty: category.difficulty || 'intermediate',
-      recommendedAge: '13+',
+      difficulty: category.difficulty || "intermediate",
+      recommendedAge: "13+",
       prerequisites: [
-        'Basic understanding of ethics and moral reasoning',
-        'Awareness of AI and automated systems',
-        'Open mind for exploring different perspectives',
+        "Basic understanding of ethics and moral reasoning",
+        "Awareness of AI and automated systems",
+        "Open mind for exploring different perspectives",
       ],
 
       // Pre-Launch Information
@@ -574,72 +694,72 @@ export default class PreLaunchModal {
 
         vocabulary: [
           {
-            term: 'Ethics',
-            definition: 'The study of what is morally right and wrong',
+            term: "Ethics",
+            definition: "The study of what is morally right and wrong",
           },
           {
-            term: 'Dilemma',
+            term: "Dilemma",
             definition:
-              'A situation requiring a choice between equally undesirable alternatives',
+              "A situation requiring a choice between equally undesirable alternatives",
           },
           {
-            term: 'Stakeholder',
+            term: "Stakeholder",
             definition:
-              'A person or group affected by the decisions being made',
+              "A person or group affected by the decisions being made",
           },
           {
-            term: 'Autonomy',
+            term: "Autonomy",
             definition:
-              'The ability of a system to make decisions independently',
+              "The ability of a system to make decisions independently",
           },
           {
-            term: 'Moral Agency',
+            term: "Moral Agency",
             definition:
-              'The capacity to make moral judgments and be held responsible for actions',
+              "The capacity to make moral judgments and be held responsible for actions",
           },
         ],
 
         preparationTips: [
-          'Consider multiple perspectives before making decisions',
-          'Think about both immediate and long-term consequences',
-          'Remember that ethical reasoning often involves trade-offs',
-          'Stay open to challenging your initial assumptions',
-          'Consider who might be affected by each decision',
+          "Consider multiple perspectives before making decisions",
+          "Think about both immediate and long-term consequences",
+          "Remember that ethical reasoning often involves trade-offs",
+          "Stay open to challenging your initial assumptions",
+          "Consider who might be affected by each decision",
         ],
 
         scenarioOverview: scenario.description,
       },
 
       contentNotes: [
-        'This scenario deals with complex ethical questions that may not have clear answers',
-        'Different cultural and philosophical backgrounds may lead to different conclusions',
+        "This scenario deals with complex ethical questions that may not have clear answers",
+        "Different cultural and philosophical backgrounds may lead to different conclusions",
         'The goal is to develop reasoning skills, not find the "right" answer',
       ],
 
       // Resources and connections
       relatedResources: [
         {
-          type: 'article',
-          title: 'Introduction to AI Ethics',
+          type: "article",
+          title: "Introduction to AI Ethics",
           description:
-            'A comprehensive overview of ethical considerations in artificial intelligence',
-          url: '#',
-          audience: 'general',
+            "A comprehensive overview of ethical considerations in artificial intelligence",
+          url: "#",
+          audience: "general",
         },
         {
-          type: 'video',
-          title: 'Moral Decision-Making in AI Systems',
-          description: 'Video explanation of how AI systems make moral choices',
-          url: '#',
-          audience: 'students',
+          type: "video",
+          title: "Moral Decision-Making in AI Systems",
+          description: "Video explanation of how AI systems make moral choices",
+          url: "#",
+          audience: "students",
         },
         {
-          type: 'activity',
-          title: 'Ethics Discussion Guide',
+          type: "activity",
+          title: "Ethics Discussion Guide",
           description:
-            'Structured questions for group discussion about AI ethics',
-          url: '#',
-          audience: 'educators',
+            "Structured questions for group discussion about AI ethics",
+          url: "#",
+          audience: "educators",
         },
       ],
 
@@ -649,31 +769,31 @@ export default class PreLaunchModal {
       educatorResources: {
         discussionQuestions: [
           `What ethical considerations are most important in the "${category.title}" category?`,
-          'How might different stakeholders view these scenarios differently?',
-          'What real-world applications of these ethical dilemmas can you think of?',
-          'How can we prepare for ethical challenges in AI and automation?',
-          'What role should humans play in automated decision-making?',
+          "How might different stakeholders view these scenarios differently?",
+          "What real-world applications of these ethical dilemmas can you think of?",
+          "How can we prepare for ethical challenges in AI and automation?",
+          "What role should humans play in automated decision-making?",
         ],
 
         extensionActivities: [
-          'Research real-world examples related to this category',
-          'Debate different ethical approaches to these scenarios',
-          'Create your own ethical dilemma scenarios',
-          'Interview experts about AI ethics in this domain',
-          'Design guidelines for ethical AI in this area',
+          "Research real-world examples related to this category",
+          "Debate different ethical approaches to these scenarios",
+          "Create your own ethical dilemma scenarios",
+          "Interview experts about AI ethics in this domain",
+          "Design guidelines for ethical AI in this area",
         ],
 
         classroomTips: [
-          'Encourage students to consider multiple perspectives',
+          "Encourage students to consider multiple perspectives",
           'Emphasize that there may not be single "correct" answers',
-          'Connect scenarios to current events and real-world examples',
-          'Allow time for reflection and discussion after each scenario',
-          'Consider having students work in small groups to discuss choices',
+          "Connect scenarios to current events and real-world examples",
+          "Allow time for reflection and discussion after each scenario",
+          "Consider having students work in small groups to discuss choices",
         ],
 
         relatedStandards: [
-          'CSTA K-12 Computer Science Standards: 3A-IC-24, 3A-IC-25, 3A-IC-26',
-          'ISTE Standards: Digital Citizen 1.2.2, Knowledge Constructor 1.3.1',
+          "CSTA K-12 Computer Science Standards: 3A-IC-24, 3A-IC-25, 3A-IC-26",
+          "ISTE Standards: Digital Citizen 1.2.2, Knowledge Constructor 1.3.1",
         ],
       },
 
@@ -694,18 +814,18 @@ export default class PreLaunchModal {
 
     try {
       // Circuit breaker check
-      if (this.circuitBreaker.state === 'open') {
+      if (this.circuitBreaker.state === "open") {
         const now = Date.now();
         if (now < this.circuitBreaker.nextAttemptTime) {
-          this._logTelemetry('show_blocked_circuit_open', {
+          this._logTelemetry("show_blocked_circuit_open", {
             nextAttemptTime: this.circuitBreaker.nextAttemptTime,
             currentTime: now,
           });
           throw new Error(
-            'Modal show operation blocked: Circuit breaker is open'
+            "Modal show operation blocked: Circuit breaker is open",
           );
         } else {
-          this.circuitBreaker.state = 'half-open';
+          this.circuitBreaker.state = "half-open";
           this.circuitBreaker.successCount = 0;
         }
       }
@@ -717,8 +837,8 @@ export default class PreLaunchModal {
       const contentGenerationTime = performance.now() - contentStartTime;
 
       this._recordPerformanceMetric(
-        'content_generation',
-        contentGenerationTime
+        "content_generation",
+        contentGenerationTime,
       );
 
       // Create modal with error handling
@@ -727,7 +847,7 @@ export default class PreLaunchModal {
         content,
         footer,
         onClose: () => {
-          this._logTelemetry('modal_closed_via_close_callback');
+          this._logTelemetry("modal_closed_via_close_callback");
           this.options.onCancel();
         },
         closeOnBackdrop: false,
@@ -740,16 +860,16 @@ export default class PreLaunchModal {
 
       // Track analytics and performance
       const totalRenderTime = performance.now() - startTime;
-      this._recordPerformanceMetric('render', totalRenderTime);
+      this._recordPerformanceMetric("render", totalRenderTime);
       this._updateCircuitBreaker(true); // Success
 
-      this.trackAnalytics('pre_launch_viewed');
-      this._logTelemetry('modal_shown', {
+      this.trackAnalytics("pre_launch_viewed");
+      this._logTelemetry("modal_shown", {
         renderTime: Math.round(totalRenderTime * 100) / 100,
         contentGenerationTime: Math.round(contentGenerationTime * 100) / 100,
       });
     } catch (error) {
-      this._handleError(error, 'show', () => this.show());
+      this._handleError(error, "show", () => this.show());
       throw error;
     }
   }
@@ -759,7 +879,7 @@ export default class PreLaunchModal {
    */
   close() {
     try {
-      this._logTelemetry('modal_closing', {
+      this._logTelemetry("modal_closing", {
         uptime: Date.now() - this.createdAt,
         renderCount: this.performanceMetrics.renderCount,
         tabSwitchCount: this.performanceMetrics.tabSwitchCount,
@@ -773,7 +893,7 @@ export default class PreLaunchModal {
       // Perform enterprise cleanup
       this._enterpriseCleanup();
     } catch (error) {
-      this._handleError(error, 'close');
+      this._handleError(error, "close");
     }
   }
 
@@ -782,7 +902,7 @@ export default class PreLaunchModal {
    */
   closeWithCleanup(forceDestroy = false) {
     try {
-      this._logTelemetry('modal_closing_with_cleanup', {
+      this._logTelemetry("modal_closing_with_cleanup", {
         forceDestroy,
         uptime: Date.now() - this.createdAt,
       });
@@ -799,7 +919,7 @@ export default class PreLaunchModal {
       // Perform enterprise cleanup
       this._enterpriseCleanup(forceDestroy);
     } catch (error) {
-      this._handleError(error, 'closeWithCleanup');
+      this._handleError(error, "closeWithCleanup");
     }
   }
 
@@ -808,7 +928,7 @@ export default class PreLaunchModal {
    */
   destroy() {
     try {
-      this._logTelemetry('modal_destroying', {
+      this._logTelemetry("modal_destroying", {
         uptime: Date.now() - this.createdAt,
         totalErrors: this.errorCount,
       });
@@ -821,7 +941,7 @@ export default class PreLaunchModal {
       // Perform complete enterprise cleanup
       this._enterpriseCleanup(true);
     } catch (error) {
-      this._handleError(error, 'destroy');
+      this._handleError(error, "destroy");
     }
   }
 
@@ -850,7 +970,7 @@ export default class PreLaunchModal {
       this._flushTelemetryBatch();
 
       // Log final metrics
-      this._logTelemetry('instance_cleanup', {
+      this._logTelemetry("instance_cleanup", {
         isDestroy,
         finalMetrics: { ...this.performanceMetrics },
         finalHealth: {
@@ -870,10 +990,10 @@ export default class PreLaunchModal {
       this.isHealthy = false;
 
       logger.debug(
-        `[PreLaunchModal] Enterprise cleanup completed for instance ${this.instanceId}`
+        `[PreLaunchModal] Enterprise cleanup completed for instance ${this.instanceId}`,
       );
     } catch (error) {
-      logger.error('[PreLaunchModal] Error during enterprise cleanup:', error);
+      logger.error("[PreLaunchModal] Error during enterprise cleanup:", error);
     }
   }
 
@@ -926,7 +1046,7 @@ export default class PreLaunchModal {
                                 For Educators
                             </button>
                         `
-                            : ''
+                            : ""
                         }
                     </div>
                 </nav>
@@ -938,7 +1058,7 @@ export default class PreLaunchModal {
                     ${this.generateEthicsTab()}
                     ${this.generatePreparationTab()}
                     ${this.generateResourcesTab()}
-                    ${this.options.showEducatorResources ? this.generateEducatorTab() : ''}
+                    ${this.options.showEducatorResources ? this.generateEducatorTab() : ""}
                 </div>
             </div>
         `;
@@ -991,11 +1111,11 @@ export default class PreLaunchModal {
                         <div class="content-notes">
                             <h4>Content Notes</h4>
                             <ul class="notes-list">
-                                ${info.contentNotes.map(note => `<li>${note}</li>`).join('')}
+                                ${info.contentNotes.map((note) => `<li>${note}</li>`).join("")}
                             </ul>
                         </div>
                     `
-                        : ''
+                        : ""
                     }
                 </div>
             </div>
@@ -1017,14 +1137,14 @@ export default class PreLaunchModal {
                         <ul class="objectives-list">
                             ${info.learningObjectives
                               .map(
-                                objective => `
+                                (objective) => `
                                 <li class="objective-item">
                                     <span class="objective-icon">🎯</span>
                                     ${objective}
                                 </li>
-                            `
+                            `,
                               )
-                              .join('')}
+                              .join("")}
                         </ul>
                     </div>
                     
@@ -1034,14 +1154,14 @@ export default class PreLaunchModal {
                         <ul class="standards-list">
                             ${info.isteCriteria
                               .map(
-                                standard => `
+                                (standard) => `
                                 <li class="standard-item">
                                     <span class="standard-icon">📋</span>
                                     ${standard}
                                 </li>
-                            `
+                            `,
                               )
-                              .join('')}
+                              .join("")}
                         </ul>
                     </div>
                     
@@ -1054,18 +1174,18 @@ export default class PreLaunchModal {
                             <ul class="prerequisites-list">
                                 ${info.prerequisites
                                   .map(
-                                    prereq => `
+                                    (prereq) => `
                                     <li class="prerequisite-item">
                                         <span class="prereq-icon">📚</span>
                                         ${prereq}
                                     </li>
-                                `
+                                `,
                                   )
-                                  .join('')}
+                                  .join("")}
                             </ul>
                         </div>
                     `
-                        : ''
+                        : ""
                     }
                 </div>
             </div>
@@ -1089,14 +1209,14 @@ export default class PreLaunchModal {
                         <div class="ethics-features">
                             ${radarInfo.features
                               .map(
-                                feature => `
+                                (feature) => `
                                 <div class="feature-item">
                                     <h5>${feature.title}</h5>
                                     <p>${feature.description}</p>
                                 </div>
-                            `
+                            `,
                               )
-                              .join('')}
+                              .join("")}
                         </div>
                         
                         <div class="interpretation-guide">
@@ -1112,7 +1232,7 @@ export default class PreLaunchModal {
                         <div class="dimensions-grid">
                             ${glossary
                               .map(
-                                dimension => `
+                                (dimension) => `
                                 <div class="dimension-item">
                                     <div class="dimension-header">
                                         <span class="dimension-color" style="background-color: ${dimension.color}"></span>
@@ -1120,9 +1240,9 @@ export default class PreLaunchModal {
                                     </div>
                                     <p>${dimension.description}</p>
                                 </div>
-                            `
+                            `,
                               )
-                              .join('')}
+                              .join("")}
                         </div>
                         
                         <div class="ethics-reminder">
@@ -1149,14 +1269,14 @@ export default class PreLaunchModal {
                         <ul class="tips-list">
                             ${info.beforeYouStart.preparationTips
                               .map(
-                                tip => `
+                                (tip) => `
                                 <li class="tip-item">
                                     <span class="tip-icon">💡</span>
                                     ${tip}
                                 </li>
-                            `
+                            `,
                               )
-                              .join('')}
+                              .join("")}
                         </ul>
                     </div>
                     
@@ -1166,14 +1286,14 @@ export default class PreLaunchModal {
                         <div class="vocabulary-grid">
                             ${info.beforeYouStart.vocabulary
                               .map(
-                                item => `
+                                (item) => `
                                 <div class="vocabulary-card">
                                     <h5 class="vocab-term">${item.term}</h5>
                                     <p class="vocab-definition">${item.definition}</p>
                                 </div>
-                            `
+                            `,
                               )
-                              .join('')}
+                              .join("")}
                         </div>
                     </div>
                 </div>
@@ -1198,7 +1318,7 @@ export default class PreLaunchModal {
                     <div class="resources-grid">
                         ${info.relatedResources
                           .map(
-                            resource => `
+                            (resource) => `
                             <div class="resource-card" data-audience="${resource.audience}">
                                 <div class="resource-header">
                                     <span class="resource-type resource-type-${resource.type}">${this.getResourceTypeIcon(resource.type)}</span>
@@ -1210,9 +1330,9 @@ export default class PreLaunchModal {
                                     View Resource <span class="external-icon">↗</span>
                                 </a>
                             </div>
-                        `
+                        `,
                           )
-                          .join('')}
+                          .join("")}
                     </div>
                     
                     ${
@@ -1224,17 +1344,17 @@ export default class PreLaunchModal {
                             <div class="connected-list">
                                 ${info.connectedSimulations
                                   .map(
-                                    simId => `
+                                    (simId) => `
                                     <button class="connected-sim-button" data-simulation="${simId}">
                                         Explore: ${this.getSimulationTitle(simId)}
                                     </button>
-                                `
+                                `,
                                   )
-                                  .join('')}
+                                  .join("")}
                             </div>
                         </div>
                     `
-                        : ''
+                        : ""
                     }
                 </div>
             </div>
@@ -1262,11 +1382,11 @@ export default class PreLaunchModal {
                             <ul class="discussion-questions">
                                 ${resources.discussionQuestions
                                   .map(
-                                    question => `
+                                    (question) => `
                                     <li class="discussion-item">${question}</li>
-                                `
+                                `,
                                   )
-                                  .join('')}
+                                  .join("")}
                             </ul>
                         </div>
                         
@@ -1275,11 +1395,11 @@ export default class PreLaunchModal {
                             <ul class="extension-activities">
                                 ${resources.extensionActivities
                                   .map(
-                                    activity => `
+                                    (activity) => `
                                     <li class="activity-item">${activity}</li>
-                                `
+                                `,
                                   )
-                                  .join('')}
+                                  .join("")}
                             </ul>
                         </div>
                         
@@ -1288,11 +1408,11 @@ export default class PreLaunchModal {
                             <ul class="classroom-tips">
                                 ${resources.classroomTips
                                   .map(
-                                    tip => `
+                                    (tip) => `
                                     <li class="tip-item">${tip}</li>
-                                `
+                                `,
                                   )
-                                  .join('')}
+                                  .join("")}
                             </ul>
                         </div>
                         
@@ -1301,11 +1421,11 @@ export default class PreLaunchModal {
                             <ul class="standards-alignment">
                                 ${resources.relatedStandards
                                   .map(
-                                    standard => `
+                                    (standard) => `
                                     <li class="standard-item">${standard}</li>
-                                `
+                                `,
                                   )
-                                  .join('')}
+                                  .join("")}
                             </ul>
                         </div>
                     </div>
@@ -1339,20 +1459,20 @@ export default class PreLaunchModal {
   setupEventListeners() {
     // Ensure modal container exists and has the expected structure
     if (!this.modal) {
-      logger.error('Modal instance not available for event listener setup');
+      logger.error("Modal instance not available for event listener setup");
       return;
     }
 
     if (!this.modal.element) {
-      logger.error('Modal element not available. Modal structure:', this.modal);
+      logger.error("Modal element not available. Modal structure:", this.modal);
       return;
     }
 
-    if (typeof this.modal.element.querySelectorAll !== 'function') {
+    if (typeof this.modal.element.querySelectorAll !== "function") {
       logger.error(
-        'Modal element does not have querySelectorAll method. Element type:',
+        "Modal element does not have querySelectorAll method. Element type:",
         typeof this.modal.element,
-        this.modal.element
+        this.modal.element,
       );
       return;
     }
@@ -1360,52 +1480,52 @@ export default class PreLaunchModal {
     try {
       // Hamburger menu toggle (mobile navigation)
       const hamburgerButton =
-        this.modal.element.querySelector('.tab-hamburger');
+        this.modal.element.querySelector(".tab-hamburger");
       const tabButtonsContainer = this.modal.element.querySelector(
-        '.tab-buttons-container'
+        ".tab-buttons-container",
       );
 
       if (hamburgerButton && tabButtonsContainer) {
-        hamburgerButton.addEventListener('click', () => {
+        hamburgerButton.addEventListener("click", () => {
           const isExpanded =
-            hamburgerButton.getAttribute('aria-expanded') === 'true';
-          hamburgerButton.setAttribute('aria-expanded', !isExpanded);
-          tabButtonsContainer.classList.toggle('expanded', !isExpanded);
+            hamburgerButton.getAttribute("aria-expanded") === "true";
+          hamburgerButton.setAttribute("aria-expanded", !isExpanded);
+          tabButtonsContainer.classList.toggle("expanded", !isExpanded);
         });
 
         // Close menu when clicking outside
-        document.addEventListener('click', e => {
+        document.addEventListener("click", (e) => {
           // Don't interfere with onboarding coach marks
-          if (e.target.closest('.onboarding-coach-mark')) {
+          if (e.target.closest(".onboarding-coach-mark")) {
             return;
           }
 
-          if (!e.target.closest('.pre-launch-tabs')) {
-            hamburgerButton.setAttribute('aria-expanded', 'false');
-            tabButtonsContainer.classList.remove('expanded');
+          if (!e.target.closest(".pre-launch-tabs")) {
+            hamburgerButton.setAttribute("aria-expanded", "false");
+            tabButtonsContainer.classList.remove("expanded");
           }
         });
 
         // Close menu when pressing Escape key
-        document.addEventListener('keydown', e => {
+        document.addEventListener("keydown", (e) => {
           if (
-            e.key === 'Escape' &&
-            hamburgerButton.getAttribute('aria-expanded') === 'true'
+            e.key === "Escape" &&
+            hamburgerButton.getAttribute("aria-expanded") === "true"
           ) {
-            hamburgerButton.setAttribute('aria-expanded', 'false');
-            tabButtonsContainer.classList.remove('expanded');
+            hamburgerButton.setAttribute("aria-expanded", "false");
+            tabButtonsContainer.classList.remove("expanded");
             hamburgerButton.focus(); // Return focus to hamburger button
           }
         });
       }
 
       // Tab switching (scoped to this modal)
-      const tabButtons = this.modal.element.querySelectorAll('.tab-button');
+      const tabButtons = this.modal.element.querySelectorAll(".tab-button");
       const tabContainer = this.modal.element.querySelector(
-        '.tab-buttons-container'
+        ".tab-buttons-container",
       );
       const tabNavigation =
-        this.modal.element.querySelector('.pre-launch-tabs');
+        this.modal.element.querySelector(".pre-launch-tabs");
 
       // Handle scroll indicators for desktop tab overflow
       const updateScrollIndicators = () => {
@@ -1414,34 +1534,38 @@ export default class PreLaunchModal {
           const canScrollLeft = scrollLeft > 0;
           const canScrollRight = scrollLeft < scrollWidth - clientWidth - 1;
 
-          tabNavigation.classList.toggle('scrollable-left', canScrollLeft);
-          tabNavigation.classList.toggle('scrollable-right', canScrollRight);
+          tabNavigation.classList.toggle("scrollable-left", canScrollLeft);
+          tabNavigation.classList.toggle("scrollable-right", canScrollRight);
         }
       };
 
       // Update scroll indicators on container scroll and resize
       if (tabContainer) {
-        tabContainer.addEventListener('scroll', updateScrollIndicators);
-        window.addEventListener('resize', updateScrollIndicators);
+        tabContainer.addEventListener("scroll", updateScrollIndicators);
+        window.addEventListener("resize", updateScrollIndicators);
         // Initial check
-        setTimeout(updateScrollIndicators, UPDATE_DELAY);
+        const updateDelay = this._getConfigValue(
+          "ui.animations.updateDelay",
+          100,
+        );
+        setTimeout(updateScrollIndicators, updateDelay);
       }
 
-      tabButtons.forEach(button => {
-        button.addEventListener('click', e => {
+      tabButtons.forEach((button) => {
+        button.addEventListener("click", (e) => {
           const tabId = e.target.dataset.tab || e.currentTarget.dataset.tab;
           if (tabId) {
             this.switchTab(tabId);
 
             // Close mobile menu after tab selection
             if (hamburgerButton && tabButtonsContainer) {
-              hamburgerButton.setAttribute('aria-expanded', 'false');
-              tabButtonsContainer.classList.remove('expanded');
+              hamburgerButton.setAttribute("aria-expanded", "false");
+              tabButtonsContainer.classList.remove("expanded");
             }
           } else {
             logger.warn(
-              'Tab button clicked but no data-tab attribute found',
-              e.target
+              "Tab button clicked but no data-tab attribute found",
+              e.target,
             );
           }
         });
@@ -1449,34 +1573,34 @@ export default class PreLaunchModal {
 
       // Action buttons (scoped to this modal)
       const startButton =
-        this.modal.element.querySelector('#start-exploration');
-      const cancelButton = this.modal.element.querySelector('#cancel-launch');
+        this.modal.element.querySelector("#start-exploration");
+      const cancelButton = this.modal.element.querySelector("#cancel-launch");
 
       if (startButton) {
-        startButton.addEventListener('click', () => {
-          logger.debug('Start Exploration button clicked', {
+        startButton.addEventListener("click", () => {
+          logger.debug("Start Exploration button clicked", {
             simulationId: this.simulationId,
             onLaunch: typeof this.options.onLaunch,
           });
 
-          this.trackAnalytics('simulation_launched');
+          this.trackAnalytics("simulation_launched");
           this.close();
 
           // Call the onLaunch callback
-          if (typeof this.options.onLaunch === 'function') {
-            logger.debug('Calling onLaunch callback');
+          if (typeof this.options.onLaunch === "function") {
+            logger.debug("Calling onLaunch callback");
             this.options.onLaunch(this.simulationId);
           } else {
-            logger.error('onLaunch is not a function:', this.options.onLaunch);
+            logger.error("onLaunch is not a function:", this.options.onLaunch);
           }
         });
       } else {
-        logger.error('Start button not found in modal');
+        logger.error("Start button not found in modal");
       }
 
       if (cancelButton) {
-        cancelButton.addEventListener('click', () => {
-          this.trackAnalytics('launch_cancelled');
+        cancelButton.addEventListener("click", () => {
+          this.trackAnalytics("launch_cancelled");
           this.close();
           this.options.onCancel();
         });
@@ -1484,12 +1608,12 @@ export default class PreLaunchModal {
 
       // Connected simulation buttons
       const connectedButtons = document.querySelectorAll(
-        '.connected-sim-button'
+        ".connected-sim-button",
       );
-      connectedButtons.forEach(button => {
-        button.addEventListener('click', e => {
+      connectedButtons.forEach((button) => {
+        button.addEventListener("click", (e) => {
           const targetSimId = e.target.dataset.simulation;
-          this.trackAnalytics('connected_simulation_clicked', {
+          this.trackAnalytics("connected_simulation_clicked", {
             target: targetSimId,
           });
           // Could trigger loading of connected simulation
@@ -1497,19 +1621,19 @@ export default class PreLaunchModal {
       });
 
       // Resource link tracking
-      const resourceLinks = document.querySelectorAll('.resource-link');
-      resourceLinks.forEach(link => {
-        link.addEventListener('click', e => {
-          this.trackAnalytics('resource_accessed', {
+      const resourceLinks = document.querySelectorAll(".resource-link");
+      resourceLinks.forEach((link) => {
+        link.addEventListener("click", (e) => {
+          this.trackAnalytics("resource_accessed", {
             url: e.target.href,
             type: e.target
-              .closest('.resource-card')
-              .querySelector('.resource-type').textContent,
+              .closest(".resource-card")
+              .querySelector(".resource-type").textContent,
           });
         });
       });
     } catch (error) {
-      logger.error('Error setting up PreLaunchModal event listeners:', error);
+      logger.error("Error setting up PreLaunchModal event listeners:", error);
     }
   }
 
@@ -1520,15 +1644,15 @@ export default class PreLaunchModal {
     const startTime = performance.now();
 
     if (!tabId) {
-      logger.warn('switchTab called with null or undefined tabId');
-      this._logTelemetry('tab_switch_invalid', { tabId });
+      logger.warn("switchTab called with null or undefined tabId");
+      this._logTelemetry("tab_switch_invalid", { tabId });
       return;
     }
 
     try {
       // Circuit breaker check for tab switching
-      if (this.circuitBreaker.state === 'open') {
-        this._logTelemetry('tab_switch_blocked_circuit_open', { tabId });
+      if (this.circuitBreaker.state === "open") {
+        this._logTelemetry("tab_switch_blocked_circuit_open", { tabId });
         logger.warn(`Tab switch to ${tabId} blocked: Circuit breaker is open`);
         return;
       }
@@ -1536,62 +1660,66 @@ export default class PreLaunchModal {
       // Find the modal container to scope our searches
       const modalContainer =
         (this.modal && this.modal.element) ||
-        document.querySelector('.pre-launch-modal');
+        document.querySelector(".pre-launch-modal");
       if (!modalContainer) {
-        logger.warn('Pre-launch modal container not found');
-        this._logTelemetry('tab_switch_failed_no_container', { tabId });
+        logger.warn("Pre-launch modal container not found");
+        this._logTelemetry("tab_switch_failed_no_container", { tabId });
         return;
       }
 
       // Update buttons (scoped to the modal)
-      const allTabButtons = modalContainer.querySelectorAll('.tab-button');
-      allTabButtons.forEach(btn => {
-        btn.classList.remove('active');
-        btn.setAttribute('aria-selected', 'false');
+      const allTabButtons = modalContainer.querySelectorAll(".tab-button");
+      allTabButtons.forEach((btn) => {
+        btn.classList.remove("active");
+        btn.setAttribute("aria-selected", "false");
       });
 
       const targetButton = modalContainer.querySelector(
-        `[data-tab="${tabId}"]`
+        `[data-tab="${tabId}"]`,
       );
       if (targetButton) {
-        targetButton.classList.add('active');
-        targetButton.setAttribute('aria-selected', 'true');
+        targetButton.classList.add("active");
+        targetButton.setAttribute("aria-selected", "true");
 
         // Scroll tab into view if needed (desktop only)
         const tabContainer = modalContainer.querySelector(
-          '.tab-buttons-container'
+          ".tab-buttons-container",
         );
-        if (tabContainer && window.innerWidth > MOBILE_BREAKPOINT) {
+        const mobileBreakpoint = this._getConfigValue(
+          "ui.layout.mobileBreakpoint",
+          768,
+        );
+        if (tabContainer && window.innerWidth > mobileBreakpoint) {
           targetButton.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-            inline: 'center',
+            behavior: "smooth",
+            block: "nearest",
+            inline: "center",
           });
         }
 
         // Update mobile menu current label
-        const currentLabel = modalContainer.querySelector('.tab-current-label');
+        const currentLabel = modalContainer.querySelector(".tab-current-label");
         if (currentLabel) {
           const buttonText = targetButton.textContent.trim();
           currentLabel.textContent = buttonText;
         }
       } else {
         logger.warn(`Tab button with data-tab="${tabId}" not found in modal`);
-        this._logTelemetry('tab_switch_failed_button_not_found', { tabId });
+        this._logTelemetry("tab_switch_failed_button_not_found", { tabId });
       }
 
       // Update content (scoped to the modal)
-      const allTabContent = modalContainer.querySelectorAll('.tab-content');
-      allTabContent.forEach(content => {
-        content.classList.remove('active');
+      const allTabContent = modalContainer.querySelectorAll(".tab-content");
+      allTabContent.forEach((content) => {
+        content.classList.remove("active");
       });
 
       const targetContent = modalContainer.querySelector(`#tab-${tabId}`);
       if (targetContent) {
-        targetContent.classList.add('active');
+        targetContent.classList.add("active");
       } else {
         logger.warn(`Tab content with id="tab-${tabId}" not found in modal`);
-        this._logTelemetry('tab_switch_failed_content_not_found', { tabId });
+        this._logTelemetry("tab_switch_failed_content_not_found", { tabId });
       }
 
       // Update state and tracking
@@ -1600,21 +1728,21 @@ export default class PreLaunchModal {
 
       // Track performance and analytics
       const switchTime = performance.now() - startTime;
-      this._recordPerformanceMetric('tab_switch', switchTime, {
+      this._recordPerformanceMetric("tab_switch", switchTime, {
         fromTab: previousTab,
         toTab: tabId,
       });
       this._updateCircuitBreaker(true); // Success
 
-      this.trackAnalytics('tab_switched', { tab: tabId });
-      this._logTelemetry('tab_switched', {
+      this.trackAnalytics("tab_switched", { tab: tabId });
+      this._logTelemetry("tab_switched", {
         fromTab: previousTab,
         toTab: tabId,
         switchTime: Math.round(switchTime * 100) / 100,
       });
     } catch (error) {
-      this._handleError(error, 'switchTab', () => this.switchTab(tabId));
-      logger.error('Error in switchTab:', error);
+      this._handleError(error, "switchTab", () => this.switchTab(tabId));
+      logger.error("Error in switchTab:", error);
     }
   }
 
@@ -1625,21 +1753,21 @@ export default class PreLaunchModal {
 
   formatText(text) {
     return text
-      .split('\n\n')
-      .map(paragraph => `<p>${paragraph.trim()}</p>`)
-      .join('');
+      .split("\n\n")
+      .map((paragraph) => `<p>${paragraph.trim()}</p>`)
+      .join("");
   }
 
   getResourceTypeIcon(type) {
     const icons = {
-      article: '📄',
-      video: '🎥',
-      research: '🔬',
-      interactive: '🖥️',
-      book: '📚',
-      website: '🌐',
+      article: "📄",
+      video: "🎥",
+      research: "🔬",
+      interactive: "🖥️",
+      book: "📚",
+      website: "🌐",
     };
-    return icons[type] || '📎';
+    return icons[type] || "📎";
   }
 
   getSimulationTitle(simId) {
@@ -1649,7 +1777,7 @@ export default class PreLaunchModal {
 
   trackAnalytics(event, data = {}) {
     if (simpleAnalytics) {
-      simpleAnalytics.trackEvent('pre_launch', {
+      simpleAnalytics.trackEvent("pre_launch", {
         event,
         simulation: this.simulationId,
         tab: this.currentTab,
@@ -1669,7 +1797,7 @@ export default class PreLaunchModal {
       const report = {
         timestamp: Date.now(),
         instanceCount: instances.size,
-        systemHealth: 'healthy',
+        systemHealth: "healthy",
         instances: [],
         performance: {
           averageRenderTime: 0,
@@ -1677,7 +1805,7 @@ export default class PreLaunchModal {
           totalModalsShown: 0,
           memoryUsage: performance.memory
             ? Math.round(performance.memory.usedJSHeapSize / 1024 / 1024)
-            : 'unknown',
+            : "unknown",
         },
         circuitBreakers: {
           total: 0,
@@ -1691,12 +1819,12 @@ export default class PreLaunchModal {
       let totalTabSwitchTime = 0;
       let totalModalsShown = 0;
 
-      instances.forEach(instance => {
+      instances.forEach((instance) => {
         const instanceHealth = {
           id: instance.instanceId,
           simulationId: instance.simulationId,
           isHealthy: instance.isHealthy,
-          circuitBreakerState: instance.circuitBreaker?.state || 'unknown',
+          circuitBreakerState: instance.circuitBreaker?.state || "unknown",
           renderCount: instance.performanceMetrics?.renderCount || 0,
           tabSwitchCount: instance.performanceMetrics?.tabSwitchCount || 0,
           averageRenderTime:
@@ -1719,13 +1847,13 @@ export default class PreLaunchModal {
         // Circuit breaker stats
         report.circuitBreakers.total++;
         switch (instanceHealth.circuitBreakerState) {
-          case 'open':
+          case "open":
             report.circuitBreakers.open++;
             break;
-          case 'half-open':
+          case "half-open":
             report.circuitBreakers.halfOpen++;
             break;
-          case 'closed':
+          case "closed":
             report.circuitBreakers.closed++;
             break;
         }
@@ -1733,9 +1861,9 @@ export default class PreLaunchModal {
         // Determine overall health
         if (
           !instanceHealth.isHealthy ||
-          instanceHealth.circuitBreakerState === 'open'
+          instanceHealth.circuitBreakerState === "open"
         ) {
-          report.systemHealth = 'degraded';
+          report.systemHealth = "degraded";
         }
       });
 
@@ -1749,7 +1877,7 @@ export default class PreLaunchModal {
       if (instances.size > 0) {
         const totalTabSwitches = Array.from(instances).reduce(
           (sum, inst) => sum + (inst.performanceMetrics?.tabSwitchCount || 0),
-          0
+          0,
         );
         if (totalTabSwitches > 0) {
           report.performance.averageTabSwitchTime =
@@ -1759,10 +1887,10 @@ export default class PreLaunchModal {
 
       return report;
     } catch (error) {
-      console.error('[PreLaunchModal] Error generating health report:', error);
+      console.error("[PreLaunchModal] Error generating health report:", error);
       return {
         timestamp: Date.now(),
-        systemHealth: 'error',
+        systemHealth: "error",
         error: error.message,
         instanceCount: 0,
         instances: [],
@@ -1770,7 +1898,7 @@ export default class PreLaunchModal {
           averageRenderTime: 0,
           averageTabSwitchTime: 0,
           totalModalsShown: 0,
-          memoryUsage: 'unknown',
+          memoryUsage: "unknown",
         },
         circuitBreakers: { total: 0, open: 0, halfOpen: 0, closed: 0 },
       };
@@ -1808,7 +1936,7 @@ export default class PreLaunchModal {
       let totalTabSwitches = 0;
       let totalErrors = 0;
 
-      instances.forEach(instance => {
+      instances.forEach((instance) => {
         const perf = instance.performanceMetrics || {};
         const instanceMetric = {
           id: instance.instanceId,
@@ -1835,11 +1963,11 @@ export default class PreLaunchModal {
         if (instanceMetric.averageRenderTime > 0) {
           metrics.aggregatedMetrics.minRenderTime = Math.min(
             metrics.aggregatedMetrics.minRenderTime,
-            instanceMetric.averageRenderTime
+            instanceMetric.averageRenderTime,
           );
           metrics.aggregatedMetrics.maxRenderTime = Math.max(
             metrics.aggregatedMetrics.maxRenderTime,
-            instanceMetric.averageRenderTime
+            instanceMetric.averageRenderTime,
           );
         }
       });
@@ -1872,8 +2000,8 @@ export default class PreLaunchModal {
       return metrics;
     } catch (error) {
       console.error(
-        '[PreLaunchModal] Error generating performance metrics:',
-        error
+        "[PreLaunchModal] Error generating performance metrics:",
+        error,
       );
       return {
         timestamp: Date.now(),
@@ -1905,22 +2033,22 @@ export default class PreLaunchModal {
       const instances = PreLaunchModal._instances || new Set();
       const debug = {
         timestamp: Date.now(),
-        version: '1.20-enterprise',
+        version: "1.20-enterprise",
         instanceCount: instances.size,
         globalState: {
           memoryUsage: performance.memory
             ? {
                 used: Math.round(
-                  performance.memory.usedJSHeapSize / 1024 / 1024
+                  performance.memory.usedJSHeapSize / 1024 / 1024,
                 ),
                 total: Math.round(
-                  performance.memory.totalJSHeapSize / 1024 / 1024
+                  performance.memory.totalJSHeapSize / 1024 / 1024,
                 ),
                 limit: Math.round(
-                  performance.memory.jsHeapSizeLimit / 1024 / 1024
+                  performance.memory.jsHeapSizeLimit / 1024 / 1024,
                 ),
               }
-            : 'unavailable',
+            : "unavailable",
           timing: performance.timing
             ? {
                 loadComplete:
@@ -1930,12 +2058,12 @@ export default class PreLaunchModal {
                   performance.timing.domContentLoadedEventEnd -
                   performance.timing.navigationStart,
               }
-            : 'unavailable',
+            : "unavailable",
         },
         instances: [],
       };
 
-      instances.forEach(instance => {
+      instances.forEach((instance) => {
         const debugInfo = {
           id: instance.instanceId,
           simulationId: instance.simulationId,
@@ -1949,7 +2077,7 @@ export default class PreLaunchModal {
             hasSimulationInfo: !!instance.simulationInfo,
           },
           circuitBreaker: {
-            state: instance.circuitBreaker?.state || 'unknown',
+            state: instance.circuitBreaker?.state || "unknown",
             failureCount: instance.circuitBreaker?.failureCount || 0,
             lastFailureTime: instance.circuitBreaker?.lastFailureTime || null,
           },
@@ -1972,11 +2100,11 @@ export default class PreLaunchModal {
 
       return debug;
     } catch (error) {
-      console.error('[PreLaunchModal] Error generating debug info:', error);
+      console.error("[PreLaunchModal] Error generating debug info:", error);
       return {
         timestamp: Date.now(),
         error: error.message,
-        version: '1.20-enterprise',
+        version: "1.20-enterprise",
         instanceCount: 0,
         globalState: {},
         instances: [],
@@ -1999,12 +2127,12 @@ export default class PreLaunchModal {
         results: [],
       };
 
-      const healthPromises = Array.from(instances).map(async instance => {
+      const healthPromises = Array.from(instances).map(async (instance) => {
         try {
           const startTime = performance.now();
 
           // Force health check
-          if (typeof instance._performHealthCheck === 'function') {
+          if (typeof instance._performHealthCheck === "function") {
             await instance._performHealthCheck();
           }
 
@@ -2014,7 +2142,7 @@ export default class PreLaunchModal {
             simulationId: instance.simulationId,
             isHealthy: instance.isHealthy,
             checkDuration: Math.round((endTime - startTime) * 100) / 100,
-            circuitBreakerState: instance.circuitBreaker?.state || 'unknown',
+            circuitBreakerState: instance.circuitBreaker?.state || "unknown",
             errorCount: instance.errorCount || 0,
             uptime: Date.now() - instance.createdAt,
           };
@@ -2029,12 +2157,12 @@ export default class PreLaunchModal {
         } catch (error) {
           results.unhealthyInstances++;
           return {
-            id: instance.instanceId || 'unknown',
-            simulationId: instance.simulationId || 'unknown',
+            id: instance.instanceId || "unknown",
+            simulationId: instance.simulationId || "unknown",
             isHealthy: false,
             error: error.message,
             checkDuration: 0,
-            circuitBreakerState: 'unknown',
+            circuitBreakerState: "unknown",
             errorCount: -1,
           };
         }
@@ -2043,7 +2171,7 @@ export default class PreLaunchModal {
       results.results = await Promise.all(healthPromises);
       return results;
     } catch (error) {
-      console.error('[PreLaunchModal] Error performing health checks:', error);
+      console.error("[PreLaunchModal] Error performing health checks:", error);
       return {
         timestamp: Date.now(),
         error: error.message,
@@ -2070,13 +2198,13 @@ export default class PreLaunchModal {
         results: [],
       };
 
-      const recoveryPromises = Array.from(instances).map(async instance => {
+      const recoveryPromises = Array.from(instances).map(async (instance) => {
         try {
           const startTime = performance.now();
 
           // Reset circuit breaker
           if (instance.circuitBreaker) {
-            instance.circuitBreaker.state = 'closed';
+            instance.circuitBreaker.state = "closed";
             instance.circuitBreaker.failureCount = 0;
             instance.circuitBreaker.lastFailureTime = null;
           }
@@ -2095,9 +2223,9 @@ export default class PreLaunchModal {
           }
 
           // Force re-render if modal is open
-          if (instance.modal && typeof instance.modal.open === 'function') {
+          if (instance.modal && typeof instance.modal.open === "function") {
             // Refresh modal content - would require modal refresh capability
-            instance._logTelemetry('recovery_modal_refresh_attempted');
+            instance._logTelemetry("recovery_modal_refresh_attempted");
           }
 
           const endTime = performance.now();
@@ -2108,7 +2236,7 @@ export default class PreLaunchModal {
             recoveryDuration: Math.round((endTime - startTime) * 100) / 100,
             newState: {
               isHealthy: instance.isHealthy,
-              circuitBreakerState: instance.circuitBreaker?.state || 'unknown',
+              circuitBreakerState: instance.circuitBreaker?.state || "unknown",
               errorCount: instance.errorCount,
             },
           };
@@ -2118,8 +2246,8 @@ export default class PreLaunchModal {
         } catch (error) {
           results.failedRecoveries++;
           return {
-            id: instance.instanceId || 'unknown',
-            simulationId: instance.simulationId || 'unknown',
+            id: instance.instanceId || "unknown",
+            simulationId: instance.simulationId || "unknown",
             recovered: false,
             error: error.message,
             recoveryDuration: 0,
@@ -2130,11 +2258,11 @@ export default class PreLaunchModal {
       results.results = await Promise.all(recoveryPromises);
 
       console.log(
-        `[PreLaunchModal] Emergency recovery completed: ${results.recoveredInstances}/${results.totalInstances} instances recovered`
+        `[PreLaunchModal] Emergency recovery completed: ${results.recoveredInstances}/${results.totalInstances} instances recovered`,
       );
       return results;
     } catch (error) {
-      console.error('[PreLaunchModal] Error during emergency recovery:', error);
+      console.error("[PreLaunchModal] Error during emergency recovery:", error);
       return {
         timestamp: Date.now(),
         error: error.message,

@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Radar Chart Default State Fix Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #f0f0f0;
+      }
+
+      .test-container {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .radar-container {
+        width: 500px;
+        height: 500px;
+        margin: 20px auto;
+        border: 2px solid #ddd;
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+      }
+
+      .info-panel {
+        background: #e8f4f8;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 10px 0;
+        font-family: monospace;
+        white-space: pre-wrap;
+      }
+
+      .btn {
+        background: #007acc;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+      }
+
+      .btn:hover {
+        background: #005999;
+      }
+
+      .fix-applied {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔧 Radar Chart Default State Fix Test</h1>
+
+    <div class="test-container">
+      <h2>Problem Analysis</h2>
+      <p>
+        The user reports: "the blue thing inside the radar chart . the dimnsions
+        thing doesnt initilize with the chart. it should start at the default
+        where all eight dimensions are at score 3"
+      </p>
+
+      <h3>Diagnosis</h3>
+      <ul>
+        <li>✅ Configuration has correct default scores (all 3)</li>
+        <li>✅ RadarChart constructor initializes currentScores correctly</li>
+        <li>
+          ❓ Chart may not be rendering blue polygon when all values are equal
+        </li>
+        <li>❓ Potential Chart.js rendering issue with uniform values</li>
+      </ul>
+    </div>
+
+    <div class="test-container">
+      <h2>Force Refresh Test</h2>
+      <div id="radarChart" class="radar-container"></div>
+      <div id="chartInfo" class="info-panel">Chart not initialized</div>
+
+      <button class="btn" onclick="testDefaultInitialization()">
+        Test Default Init
+      </button>
+      <button class="btn" onclick="forceRefresh()">Force Refresh</button>
+      <button class="btn" onclick="testResetScores()">Test Reset Scores</button>
+      <button class="btn" onclick="testExplicitUpdate()">
+        Explicit Update
+      </button>
+    </div>
+
+    <div class="test-container" id="fixStatus">
+      <h2>Fix Status</h2>
+      <div id="statusInfo" class="info-panel">Testing in progress...</div>
+    </div>
+
+    <script type="module">
+      import RadarChart from "./src/js/components/radar-chart.js";
+
+      let radarInstance = null;
+
+      // Initialize configuration and chart
+      async function initializeChart() {
+        try {
+          // Load configuration first
+          await RadarChart.loadConfiguration();
+          console.log("✅ Configuration loaded");
+
+          // Create radar chart instance
+          radarInstance = new RadarChart("radarChart", {
+            title: "Default State Test",
+            isDemo: false,
+            animated: true,
+            width: 450,
+            height: 450,
+          });
+
+          console.log("✅ Radar chart instance created");
+          console.log("Default scores:", radarInstance.DEFAULT_SCORES);
+          console.log(
+            "Current scores at creation:",
+            radarInstance.currentScores,
+          );
+
+          // Wait for initialization
+          await radarInstance.initializationPromise;
+          console.log("✅ Radar chart initialized");
+
+          updateChartInfo();
+
+          // Test if the issue is with initial rendering
+          setTimeout(() => {
+            testInitialRender();
+          }, 1000);
+        } catch (error) {
+          console.error("❌ Initialization error:", error);
+          document.getElementById("chartInfo").textContent =
+            "Error: " + error.message;
+        }
+      }
+
+      function updateChartInfo() {
+        if (radarInstance) {
+          const info = `
+Chart Instance: ${radarInstance.instanceId}
+Initialized: ${radarInstance.isInitialized}
+Chart Object: ${radarInstance.chart ? "Present" : "Missing"}
+Current Scores: ${JSON.stringify(radarInstance.currentScores, null, 2)}
+Chart Data: ${radarInstance.chart ? JSON.stringify(radarInstance.chart.data.datasets[0].data, null, 2) : "No chart"}
+                `;
+          document.getElementById("chartInfo").textContent = info;
+        }
+      }
+
+      function testInitialRender() {
+        if (radarInstance && radarInstance.chart) {
+          const chartData = radarInstance.chart.data.datasets[0].data;
+          const allThrees = chartData.every((value) => value === 3);
+
+          const status = `
+Initial Render Test:
+- All values are 3: ${allThrees}
+- Chart data: [${chartData.join(", ")}]
+- Background color: ${radarInstance.chart.data.datasets[0].backgroundColor}
+- Border color: ${radarInstance.chart.data.datasets[0].borderColor}
+                `;
+
+          if (allThrees) {
+            // This might be the issue - Chart.js may not render a visible polygon when all values are the same
+            document.getElementById("statusInfo").innerHTML =
+              `
+<div class="fix-applied">
+ISSUE IDENTIFIED: All values are 3, but polygon may not be visible!
+
+Possible solutions:
+1. Force a slight variation in initial values
+2. Ensure background/fill colors are visible
+3. Force chart update after initialization
+</div>
+                    ` + status;
+          } else {
+            document.getElementById("statusInfo").textContent = status;
+          }
+        }
+      }
+
+      // Test functions
+      window.testDefaultInitialization = function () {
+        console.log("Testing default initialization...");
+        if (radarInstance) {
+          console.log("Current scores:", radarInstance.currentScores);
+          console.log("Default scores:", radarInstance.DEFAULT_SCORES);
+          updateChartInfo();
+        }
+      };
+
+      window.forceRefresh = function () {
+        console.log("Force refreshing chart...");
+        if (radarInstance && radarInstance.chart) {
+          radarInstance.chart.update("active");
+          setTimeout(() => {
+            radarInstance.chart.update();
+            updateChartInfo();
+          }, 100);
+        }
+      };
+
+      window.testResetScores = function () {
+        console.log("Testing reset scores...");
+        if (radarInstance) {
+          radarInstance.resetScores();
+          setTimeout(() => {
+            updateChartInfo();
+          }, 500);
+        }
+      };
+
+      window.testExplicitUpdate = function () {
+        console.log("Testing explicit update with slight variation...");
+        if (radarInstance) {
+          // Add tiny variation to make polygon visible
+          const testScores = {
+            fairness: 3.01,
+            sustainability: 3,
+            autonomy: 3,
+            beneficence: 3,
+            transparency: 3,
+            accountability: 3,
+            privacy: 3,
+            proportionality: 2.99,
+          };
+          radarInstance.setScores(testScores);
+          setTimeout(() => {
+            updateChartInfo();
+          }, 500);
+        }
+      };
+
+      // Initialize on load
+      initializeChart();
+    </script>
+  </body>
+</html>

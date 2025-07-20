@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Configuration System Test</title>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-section {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .test-result {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-family: monospace;
+      }
+      .success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+      }
+      .error {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+      }
+      .info {
+        background: #d1ecf1;
+        border: 1px solid #bee5eb;
+        color: #0c5460;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      pre {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔧 Configuration System Test</h1>
+
+    <div class="test-section">
+      <h2>System Status</h2>
+      <div id="system-status">Checking system status...</div>
+    </div>
+
+    <div class="test-section">
+      <h2>Configuration Manager Test</h2>
+      <button onclick="testConfigManager()">Test Configuration Manager</button>
+      <div id="config-manager-result"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Component Registry Test</h2>
+      <button onclick="testComponentRegistry()">Test Component Registry</button>
+      <div id="component-registry-result"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Configuration Loading Test</h2>
+      <button onclick="testConfigLoading()">Load All Configurations</button>
+      <div id="config-loading-result"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>JSON SSOT Validation</h2>
+      <button onclick="validateAllConfigs()">Validate All Config Files</button>
+      <div id="validation-result"></div>
+    </div>
+
+    <script type="module">
+      // Import the configuration system
+      import { AppStartup } from "./src/js/app-startup.js";
+
+      let appStartup = null;
+
+      // Test system status
+      async function checkSystemStatus() {
+        const statusDiv = document.getElementById("system-status");
+        try {
+          appStartup = new AppStartup();
+          await appStartup.initialize();
+          statusDiv.innerHTML =
+            '<div class="test-result success">✅ Configuration system initialized successfully!</div>';
+        } catch (error) {
+          statusDiv.innerHTML = `<div class="test-result error">❌ System initialization failed: ${error.message}</div>`;
+          console.error("System initialization error:", error);
+        }
+      }
+
+      // Test configuration manager
+      window.testConfigManager = async function () {
+        const resultDiv = document.getElementById("config-manager-result");
+        try {
+          if (!appStartup) {
+            throw new Error("System not initialized");
+          }
+
+          const configManager = appStartup.configManager;
+          const testComponent = "badge-modal";
+          const config = await configManager.getComponentConfig(testComponent);
+
+          resultDiv.innerHTML = `
+                    <div class="test-result success">✅ Configuration Manager Working</div>
+                    <div class="test-result info">Loaded config for: ${testComponent}</div>
+                    <pre>${JSON.stringify(config, null, 2)}</pre>
+                `;
+        } catch (error) {
+          resultDiv.innerHTML = `<div class="test-result error">❌ Configuration Manager Error: ${error.message}</div>`;
+        }
+      };
+
+      // Test component registry
+      window.testComponentRegistry = async function () {
+        const resultDiv = document.getElementById("component-registry-result");
+        try {
+          if (!appStartup) {
+            throw new Error("System not initialized");
+          }
+
+          const componentRegistry = appStartup.componentRegistry;
+          const registeredComponents =
+            componentRegistry.getRegisteredComponents();
+
+          resultDiv.innerHTML = `
+                    <div class="test-result success">✅ Component Registry Working</div>
+                    <div class="test-result info">Registered components: ${registeredComponents.length}</div>
+                    <pre>${JSON.stringify(registeredComponents, null, 2)}</pre>
+                `;
+        } catch (error) {
+          resultDiv.innerHTML = `<div class="test-result error">❌ Component Registry Error: ${error.message}</div>`;
+        }
+      };
+
+      // Test configuration loading
+      window.testConfigLoading = async function () {
+        const resultDiv = document.getElementById("config-loading-result");
+        try {
+          if (!appStartup) {
+            throw new Error("System not initialized");
+          }
+
+          const configManager = appStartup.configManager;
+          const components = [
+            "badge-modal",
+            "category-header",
+            "pre-launch-modal",
+            "radar-chart",
+            "scenario-card",
+            "scenario-modal",
+          ];
+          const results = {};
+
+          for (const component of components) {
+            try {
+              const config = await configManager.getComponentConfig(component);
+              results[component] = "✅ Loaded";
+            } catch (error) {
+              results[component] = `❌ ${error.message}`;
+            }
+          }
+
+          resultDiv.innerHTML = `
+                    <div class="test-result success">Configuration Loading Test Complete</div>
+                    <pre>${JSON.stringify(results, null, 2)}</pre>
+                `;
+        } catch (error) {
+          resultDiv.innerHTML = `<div class="test-result error">❌ Configuration Loading Error: ${error.message}</div>`;
+        }
+      };
+
+      // Validate all configurations
+      window.validateAllConfigs = async function () {
+        const resultDiv = document.getElementById("validation-result");
+        try {
+          if (!appStartup) {
+            throw new Error("System not initialized");
+          }
+
+          const configManager = appStartup.configManager;
+          const components = [
+            "badge-modal",
+            "category-header",
+            "pre-launch-modal",
+            "radar-chart",
+            "scenario-card",
+            "scenario-modal",
+          ];
+          const validationResults = {};
+
+          for (const component of components) {
+            try {
+              const config = await configManager.getComponentConfig(component);
+              const isValid = await configManager.validateConfig(
+                component,
+                config,
+              );
+              validationResults[component] = {
+                status: isValid ? "✅ Valid" : "⚠️ Invalid",
+                hasConfig: !!config,
+                configSize: Object.keys(config || {}).length,
+              };
+            } catch (error) {
+              validationResults[component] = {
+                status: `❌ Error: ${error.message}`,
+                hasConfig: false,
+                configSize: 0,
+              };
+            }
+          }
+
+          resultDiv.innerHTML = `
+                    <div class="test-result success">JSON SSOT Validation Complete</div>
+                    <pre>${JSON.stringify(validationResults, null, 2)}</pre>
+                `;
+        } catch (error) {
+          resultDiv.innerHTML = `<div class="test-result error">❌ Validation Error: ${error.message}</div>`;
+        }
+      };
+
+      // Initialize system on page load
+      document.addEventListener("DOMContentLoaded", checkSystemStatus);
+    </script>
+  </body>
+</html>

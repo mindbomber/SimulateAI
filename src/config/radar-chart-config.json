@@ -1,0 +1,356 @@
+{
+  "enterprise": {
+    "health": {
+      "checkInterval": 30000,
+      "heartbeatInterval": 60000,
+      "memoryThresholdMB": 100,
+      "renderTimeThresholdMS": 500,
+      "errorThreshold": 5,
+      "performanceSampleSize": 20
+    },
+    "performance": {
+      "chartRenderTimeout": 5000,
+      "animationFrameBudget": 16,
+      "dataUpdateDebounce": 100,
+      "interactionTimeout": 30000
+    },
+    "telemetry": {
+      "flushInterval": 45000,
+      "batchSize": 50,
+      "eventTypes": {
+        "chartRender": "chart_render",
+        "userInteraction": "user_interaction",
+        "dataUpdate": "data_update",
+        "performanceMetric": "performance_metric",
+        "errorEvent": "error_event"
+      }
+    },
+    "errorRecovery": {
+      "maxRetryAttempts": 3,
+      "retryDelay": 1000,
+      "circuitBreakerThreshold": 5,
+      "circuitBreakerTimeout": 60000
+    }
+  },
+  "chart": {
+    "defaultSize": 400,
+    "animationDuration": 750,
+    "mobileBreakpoint": 768,
+    "modalLabelMaxLength": 10,
+    "scalePercentage": 100
+  },
+  "scoring": {
+    "maxScore": 5,
+    "minScore": 0,
+    "neutralScore": 3,
+    "positiveThreshold": 4
+  },
+  "ethicalAxes": {
+    "fairness": {
+      "label": "Fairness",
+      "description": "Treats all individuals and groups equitably",
+      "color": "#3498db"
+    },
+    "sustainability": {
+      "label": "Sustainability",
+      "description": "Supports long-term ecological and social well-being",
+      "color": "#27ae60"
+    },
+    "autonomy": {
+      "label": "Autonomy",
+      "description": "Respects individual control and self-determination",
+      "color": "#9b59b6"
+    },
+    "beneficence": {
+      "label": "Beneficence",
+      "description": "Promotes well-being and prevents harm",
+      "color": "#e74c3c"
+    },
+    "transparency": {
+      "label": "Transparency",
+      "description": "Provides openness in decision-making processes",
+      "color": "#f39c12"
+    },
+    "accountability": {
+      "label": "Accountability",
+      "description": "Ensures clear responsibility for decisions",
+      "color": "#34495e"
+    },
+    "privacy": {
+      "label": "Privacy",
+      "description": "Protects personal information and data rights",
+      "color": "#e67e22"
+    },
+    "proportionality": {
+      "label": "Proportionality",
+      "description": "Balances benefits against severity of impact",
+      "color": "#1abc9c"
+    }
+  },
+  "defaultScores": {
+    "fairness": 3,
+    "sustainability": 3,
+    "autonomy": 3,
+    "beneficence": 3,
+    "transparency": 3,
+    "accountability": 3,
+    "privacy": 3,
+    "proportionality": 3
+  },
+  "themes": {
+    "negative": {
+      "background": "rgba(239, 68, 68, 0.15)",
+      "border": "rgba(239, 68, 68, 0.8)"
+    },
+    "slightlyNegative": {
+      "background": "rgba(245, 158, 11, 0.15)",
+      "border": "rgba(245, 158, 11, 0.8)"
+    },
+    "neutral": {
+      "background": "rgba(59, 130, 246, 0.15)",
+      "border": "rgba(59, 130, 246, 0.8)"
+    },
+    "slightlyPositive": {
+      "background": "rgba(34, 197, 94, 0.15)",
+      "border": "rgba(34, 197, 94, 0.8)"
+    },
+    "positive": {
+      "background": "rgba(22, 163, 74, 0.15)",
+      "border": "rgba(22, 163, 74, 0.8)"
+    }
+  },
+  "pointColors": {
+    "0": "#ef4444",
+    "1": "#ef4444",
+    "2": "#f87171",
+    "2.5": "#fbbf24",
+    "3": "#9ca3af",
+    "4": "#22c55e",
+    "5": "#16a34a"
+  },
+  "gridColors": {
+    "0": "rgba(239, 68, 68, 0.2)",
+    "1": "rgba(245, 101, 101, 0.15)",
+    "2": "rgba(251, 191, 36, 0.15)",
+    "3": "rgba(156, 163, 175, 0.2)",
+    "4": "rgba(34, 197, 94, 0.15)",
+    "5": "rgba(22, 163, 74, 0.2)",
+    "default": "rgba(156, 163, 175, 0.1)"
+  },
+  "impactDescriptions": {
+    "0-1": "Highly Negative",
+    "1-2": "Negative",
+    "2-3": "Slightly Negative",
+    "3": "Neutral",
+    "3-4": "Slightly Positive",
+    "4-5": "Positive",
+    "5": "Highly Positive"
+  },
+  "demoPatterns": {
+    "utilitarian": {
+      "name": "Utilitarian Ethics",
+      "description": "This approach prioritizes the greatest good for the greatest number, emphasizing beneficence and outcomes over individual rights.",
+      "scores": {
+        "fairness": 3,
+        "sustainability": 4,
+        "autonomy": 2,
+        "beneficence": 5,
+        "transparency": 3,
+        "accountability": 4,
+        "privacy": 2,
+        "proportionality": 4
+      }
+    },
+    "deontological": {
+      "name": "Rights-Based Ethics",
+      "description": "This framework focuses on duties and rights, giving priority to fairness, autonomy, and accountability regardless of consequences.",
+      "scores": {
+        "fairness": 5,
+        "sustainability": 3,
+        "autonomy": 5,
+        "beneficence": 4,
+        "transparency": 4,
+        "accountability": 5,
+        "privacy": 4,
+        "proportionality": 3
+      }
+    },
+    "virtue": {
+      "name": "Virtue Ethics",
+      "description": "This approach emphasizes character and moral virtues, seeking balance across all ethical dimensions through practical wisdom.",
+      "scores": {
+        "fairness": 4,
+        "sustainability": 4,
+        "autonomy": 4,
+        "beneficence": 4,
+        "transparency": 3,
+        "accountability": 4,
+        "privacy": 3,
+        "proportionality": 4
+      }
+    },
+    "balanced": {
+      "name": "Balanced Approach",
+      "description": "This represents a comprehensive ethical framework that considers all dimensions equally, often used in complex real-world scenarios.",
+      "scores": {
+        "fairness": 4,
+        "sustainability": 4,
+        "autonomy": 4,
+        "beneficence": 4,
+        "transparency": 4,
+        "accountability": 4,
+        "privacy": 4,
+        "proportionality": 4
+      }
+    }
+  },
+  "chartConfig": {
+    "layout": {
+      "padding": {
+        "top": 40,
+        "right": 40,
+        "bottom": 40,
+        "left": 40
+      }
+    },
+    "plugins": {
+      "legend": {
+        "display": false,
+        "position": "top",
+        "labels": {
+          "font": {
+            "size": 14,
+            "weight": "500"
+          },
+          "color": "#2d3748",
+          "usePointStyle": true,
+          "pointStyle": "circle"
+        }
+      },
+      "title": {
+        "display": true,
+        "font": {
+          "size": 18,
+          "weight": "bold"
+        },
+        "color": "#1a202c",
+        "padding": {
+          "top": 10,
+          "bottom": 20
+        }
+      },
+      "tooltip": {
+        "enabled": true,
+        "external": null,
+        "mode": "nearest",
+        "intersect": false,
+        "position": "nearest",
+        "backgroundColor": "rgba(255, 255, 255, 0.95)",
+        "titleColor": "#1a202c",
+        "bodyColor": "#2d3748",
+        "borderColor": "#4a5568",
+        "borderWidth": 2,
+        "cornerRadius": 8,
+        "displayColors": false,
+        "titleFont": {
+          "size": 14,
+          "weight": "bold"
+        },
+        "bodyFont": {
+          "size": 12
+        },
+        "padding": 12,
+        "caretPadding": 8,
+        "caretSize": 6,
+        "usePointStyle": false,
+        "boxWidth": 0,
+        "boxHeight": 0
+      }
+    },
+    "scales": {
+      "r": {
+        "beginAtZero": true,
+        "ticks": {
+          "stepSize": 1,
+          "backdropColor": "rgba(255, 255, 255, 0.8)",
+          "backdropPadding": 4,
+          "font": {
+            "size": 11,
+            "weight": "500"
+          },
+          "color": "#4a5568"
+        },
+        "grid": {
+          "lineWidth": 2
+        },
+        "angleLines": {
+          "color": "rgba(156, 163, 175, 0.3)",
+          "lineWidth": 1.5
+        },
+        "pointLabels": {
+          "display": true,
+          "font": {
+            "size": 13,
+            "weight": "bold",
+            "family": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+          },
+          "color": "#1a202c",
+          "padding": 20,
+          "backdropColor": "rgba(255, 255, 255, 0.9)",
+          "backdropPadding": {
+            "x": 6,
+            "y": 3
+          },
+          "borderRadius": 4
+        }
+      }
+    },
+    "dataset": {
+      "borderWidth": 3,
+      "pointBorderColor": "#ffffff",
+      "pointBorderWidth": 1,
+      "pointHoverBackgroundColor": "#ffffff",
+      "pointRadius": 2,
+      "pointHoverRadius": 4,
+      "tension": 0.2
+    },
+    "interaction": {
+      "mode": "nearest",
+      "intersect": false,
+      "includeInvisible": false
+    },
+    "animation": {
+      "duration": 750,
+      "easing": "easeInOutQuart",
+      "animateRotate": true,
+      "animateScale": false
+    },
+    "responsive": true,
+    "maintainAspectRatio": true,
+    "devicePixelRatio": 1,
+    "elements": {
+      "point": {
+        "hoverRadius": 6,
+        "hitRadius": 8,
+        "hoverBorderWidth": 2
+      },
+      "line": {
+        "borderJoinStyle": "round",
+        "borderCapStyle": "round"
+      }
+    },
+    "hover": {
+      "mode": "nearest",
+      "intersect": false,
+      "animationDuration": 200
+    }
+  },
+  "accessibility": {
+    "ariaLabels": {
+      "chart": "Interactive radar chart showing ethical impact across eight dimensions",
+      "fallback": "Radar chart fallback showing ethical scores in list format"
+    }
+  },
+  "version": "1.0.0",
+  "lastUpdated": "2025-01-20"
+}

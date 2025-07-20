@@ -1,0 +1,142 @@
+{
+  "app": {
+    "metadata": {
+      "version": "1.20.0",
+      "buildDate": "2025-07-20",
+      "environment": "production"
+    },
+    "features": {
+      "onboardingTour": {
+        "enabled": true,
+        "autoStart": true,
+        "showForReturningUsers": false
+      },
+      "enterpriseMonitoring": {
+        "enabled": true,
+        "telemetryEnabled": true,
+        "performanceTracking": true
+      },
+      "mcpIntegrations": {
+        "enabled": true,
+        "webResearch": true,
+        "githubIntegration": true,
+        "philosophicalGenerator": true
+      },
+      "firebaseServices": {
+        "enabled": true,
+        "analytics": true,
+        "authentication": true,
+        "messaging": true
+      }
+    },
+    "performance": {
+      "thresholds": {
+        "initTime": 3000,
+        "firstContentfulPaint": 1500,
+        "largestContentfulPaint": 2500,
+        "radarChartRender": 500,
+        "configurationLoad": 200
+      },
+      "monitoring": {
+        "enabled": true,
+        "reportingInterval": 30000,
+        "metricsRetention": 3600000,
+        "componentMetrics": {
+          "radarChart": true,
+          "chartInteractions": true,
+          "tooltipPerformance": true
+        }
+      }
+    },
+    "initialization": {
+      "order": [
+        "theme",
+        "errorHandling",
+        "coreSystems",
+        "ui",
+        "simulations",
+        "onboarding",
+        "mcpIntegrations",
+        "firebaseServices"
+      ],
+      "retryAttempts": 3,
+      "timeoutMs": 10000
+    },
+    "components": {
+      "categoryGrid": {
+        "configPath": "./category-header-config.json",
+        "preload": true,
+        "required": true
+      },
+      "badgeModal": {
+        "configPath": "./badge-modal-config.json",
+        "preload": false,
+        "required": false
+      },
+      "scenarioModal": {
+        "configPath": "./scenario-modal-config.json",
+        "preload": false,
+        "required": true
+      },
+      "preLaunchModal": {
+        "configPath": "./pre-launch-modal-config.json",
+        "preload": false,
+        "required": true
+      },
+      "radarChart": {
+        "configPath": "./radar-chart-config.json",
+        "preload": true,
+        "required": false,
+        "features": {
+          "defaultVisibility": true,
+          "tooltipEnhancement": true,
+          "enterpriseMonitoring": true,
+          "jsonConfigControl": true
+        },
+        "integration": {
+          "useAppTheme": true,
+          "inheritPerformanceSettings": true,
+          "shareEnterpriseMetrics": true
+        }
+      },
+      "scenarioCard": {
+        "configPath": "./scenario-card-config.json",
+        "preload": true,
+        "required": true
+      }
+    },
+    "theming": {
+      "defaultTheme": "auto",
+      "enableSystemDetection": true,
+      "persistUserChoice": true,
+      "supportedThemes": ["light", "dark", "auto", "high-contrast"],
+      "componentTheming": {
+        "radarChart": {
+          "inheritAppTheme": true,
+          "customColorSchemes": true,
+          "dynamicGradients": true
+        }
+      }
+    },
+    "accessibility": {
+      "enableByDefault": true,
+      "features": {
+        "keyboardNavigation": true,
+        "screenReaderSupport": true,
+        "highContrast": false,
+        "reducedMotion": false,
+        "focusManagement": true
+      }
+    },
+    "analytics": {
+      "enabled": true,
+      "events": {
+        "appInitialization": true,
+        "componentLoading": true,
+        "userInteractions": true,
+        "performanceMetrics": true,
+        "errorTracking": true
+      }
+    }
+  }
+}

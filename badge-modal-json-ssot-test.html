@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Badge Modal JSON SSOT Test</title>
+    <link rel="stylesheet" href="src/styles/main.css" />
+    <style>
+      body {
+        font-family: "Segoe UI", system-ui, sans-serif;
+        background: #1a1a1a;
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+      .test-button {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 10px;
+        transition: transform 0.2s ease;
+      }
+      .test-button:hover {
+        transform: scale(1.05);
+      }
+      .config-display {
+        background: #2a2a2a;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px auto;
+        max-width: 800px;
+        text-align: left;
+        overflow-x: auto;
+      }
+      .config-display pre {
+        margin: 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+      .status {
+        padding: 10px;
+        border-radius: 5px;
+        margin: 10px auto;
+        max-width: 600px;
+      }
+      .status.success {
+        background: #2d5a3d;
+      }
+      .status.error {
+        background: #5a2d2d;
+      }
+      .status.loading {
+        background: #3d3d5a;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Badge Modal JSON SSOT Test</h1>
+    <p>Testing the Badge Modal JSON Single Source of Truth implementation</p>
+
+    <div class="controls">
+      <button class="test-button" onclick="loadConfig()">
+        Load Configuration
+      </button>
+      <button class="test-button" onclick="testBadgeModal()">
+        Test Badge Modal
+      </button>
+      <button class="test-button" onclick="showAnimationConfig()">
+        Show Animation Config
+      </button>
+      <button class="test-button" onclick="showEffectsConfig()">
+        Show Effects Config
+      </button>
+    </div>
+
+    <div id="status" class="status loading">Initializing...</div>
+    <div id="configDisplay" class="config-display" style="display: none">
+      <h3>Configuration Data:</h3>
+      <pre id="configContent"></pre>
+    </div>
+
+    <script type="module">
+      import { loadBadgeModalConfig } from "./src/js/utils/badge-modal-config-loader.js";
+      import badgeModal from "./src/js/components/badge-modal.js";
+
+      let currentConfig = null;
+
+      // Make functions global for onclick handlers
+      window.loadConfig = async function () {
+        updateStatus("Loading configuration...", "loading");
+        try {
+          currentConfig = await loadBadgeModalConfig();
+          updateStatus("✅ Configuration loaded successfully!", "success");
+          console.log("Badge Modal Configuration:", currentConfig);
+        } catch (error) {
+          updateStatus(
+            `❌ Error loading configuration: ${error.message}`,
+            "error",
+          );
+          console.error("Configuration load error:", error);
+        }
+      };
+
+      window.testBadgeModal = async function () {
+        if (!currentConfig) {
+          await loadConfig();
+        }
+
+        updateStatus("Testing Badge Modal...", "loading");
+        try {
+          // Test configuration for a sample badge
+          const testBadgeConfig = {
+            categoryEmoji: "🧠",
+            tier: 1,
+            title: "First Badge Achieved!",
+            quote: "Every journey begins with a single step.",
+            categoryName: "Learning",
+            categoryDetails: "You've started your learning journey",
+            sidekickEmoji: "🌟",
+          };
+
+          await badgeModal.showBadgeModal(testBadgeConfig, "main");
+          updateStatus(
+            "✅ Badge Modal displayed with JSON SSOT configuration!",
+            "success",
+          );
+        } catch (error) {
+          updateStatus(
+            `❌ Error testing badge modal: ${error.message}`,
+            "error",
+          );
+          console.error("Badge modal test error:", error);
+        }
+      };
+
+      window.showAnimationConfig = function () {
+        if (!currentConfig) {
+          updateStatus("❌ Please load configuration first", "error");
+          return;
+        }
+
+        const display = document.getElementById("configDisplay");
+        const content = document.getElementById("configContent");
+        content.textContent = JSON.stringify(currentConfig.animations, null, 2);
+        display.style.display = "block";
+        updateStatus("📊 Animation configuration displayed", "success");
+      };
+
+      window.showEffectsConfig = function () {
+        if (!currentConfig) {
+          updateStatus("❌ Please load configuration first", "error");
+          return;
+        }
+
+        const display = document.getElementById("configDisplay");
+        const content = document.getElementById("configContent");
+        content.textContent = JSON.stringify(currentConfig.effects, null, 2);
+        display.style.display = "block";
+        updateStatus("📊 Effects configuration displayed", "success");
+      };
+
+      function updateStatus(message, type) {
+        const statusEl = document.getElementById("status");
+        statusEl.textContent = message;
+        statusEl.className = `status ${type}`;
+      }
+
+      // Initialize on page load
+      updateStatus("Ready to test Badge Modal JSON SSOT", "success");
+    </script>
+  </body>
+</html>

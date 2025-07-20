@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Configuration Integration Test</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .status {
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .status.success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+      }
+      .status.error {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+      }
+      .status.warning {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        color: #856404;
+      }
+      .test-button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      .test-button:hover {
+        background: #0056b3;
+      }
+      .log {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        padding: 10px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 14px;
+        white-space: pre-wrap;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔧 Configuration Integration Test</h1>
+      <p>
+        This page tests the JSON SSOT configuration system integration with
+        app.html
+      </p>
+
+      <div id="status-container">
+        <div class="status warning">Initializing configuration system...</div>
+      </div>
+
+      <div class="test-controls">
+        <h3>🧪 Test Controls</h3>
+        <button class="test-button" onclick="testPreLaunchModal()">
+          Test Pre-Launch Modal
+        </button>
+        <button class="test-button" onclick="testScenarioModal()">
+          Test Scenario Modal
+        </button>
+        <button class="test-button" onclick="testRadarChart()">
+          Test Radar Chart
+        </button>
+        <button class="test-button" onclick="testBadgeModal()">
+          Test Badge Modal
+        </button>
+        <button class="test-button" onclick="showConfigStatus()">
+          Show Config Status
+        </button>
+        <button class="test-button" onclick="clearLog()">Clear Log</button>
+      </div>
+
+      <div class="log-section">
+        <h3>📝 Test Log</h3>
+        <div id="test-log" class="log">Waiting for configuration system...</div>
+      </div>
+    </div>
+
+    <!-- Import app-startup to test integration -->
+    <script type="module">
+      import { appStartup } from "./src/js/app-startup.js";
+
+      let statusContainer = document.getElementById("status-container");
+      let testLog = document.getElementById("test-log");
+
+      function log(message) {
+        const timestamp = new Date().toLocaleTimeString();
+        testLog.textContent += `[${timestamp}] ${message}\n`;
+        testLog.scrollTop = testLog.scrollHeight;
+      }
+
+      function updateStatus(type, message) {
+        statusContainer.innerHTML = `<div class="status ${type}">${message}</div>`;
+      }
+
+      // Test functions
+      window.testPreLaunchModal = async function () {
+        try {
+          log("🧪 Testing Pre-Launch Modal...");
+          const modal = await appStartup.getComponent(
+            "pre-launch-modal",
+            "test-scenario",
+            {
+              onLaunch: () => log("✅ Pre-Launch Modal onLaunch triggered"),
+              onCancel: () => log("✅ Pre-Launch Modal onCancel triggered"),
+            },
+          );
+          log("✅ Pre-Launch Modal component loaded successfully");
+          console.log("Pre-Launch Modal:", modal);
+        } catch (error) {
+          log(`❌ Pre-Launch Modal test failed: ${error.message}`);
+        }
+      };
+
+      window.testScenarioModal = async function () {
+        try {
+          log("🧪 Testing Scenario Modal...");
+          const modal = await appStartup.getComponent("scenario-modal", {
+            isTestMode: true,
+          });
+          log("✅ Scenario Modal component loaded successfully");
+          console.log("Scenario Modal:", modal);
+        } catch (error) {
+          log(`❌ Scenario Modal test failed: ${error.message}`);
+        }
+      };
+
+      window.testRadarChart = async function () {
+        try {
+          log("🧪 Testing Radar Chart...");
+          const chart = await appStartup.getComponent(
+            "radar-chart",
+            "test-chart",
+            {
+              title: "Test Chart",
+              width: 300,
+              height: 300,
+            },
+          );
+          log("✅ Radar Chart component loaded successfully");
+          console.log("Radar Chart:", chart);
+        } catch (error) {
+          log(`❌ Radar Chart test failed: ${error.message}`);
+        }
+      };
+
+      window.testBadgeModal = async function () {
+        try {
+          log("🧪 Testing Badge Modal...");
+          const modal = await appStartup.getComponent("badge-modal");
+          log("✅ Badge Modal component loaded successfully");
+          console.log("Badge Modal:", modal);
+        } catch (error) {
+          log(`❌ Badge Modal test failed: ${error.message}`);
+        }
+      };
+
+      window.showConfigStatus = function () {
+        const status = window.getConfigStatus
+          ? window.getConfigStatus()
+          : "getConfigStatus not available";
+        log("📊 Configuration Status: " + JSON.stringify(status, null, 2));
+      };
+
+      window.clearLog = function () {
+        testLog.textContent = "";
+      };
+
+      // Listen for configuration events
+      window.addEventListener("app:config-initialized", (event) => {
+        updateStatus(
+          "success",
+          "✅ Configuration system initialized successfully!",
+        );
+        log("🎉 Configuration system ready!");
+        log(`   - Total time: ${Math.round(event.detail.totalTime)}ms`);
+        log(`   - Steps completed: ${event.detail.steps.length}`);
+
+        // Show feature flags
+        if (window.SimulateAI?.features) {
+          log(
+            "🏁 Active features: " +
+              Object.entries(window.SimulateAI.features)
+                .filter(([, enabled]) => enabled)
+                .map(([name]) => name)
+                .join(", "),
+          );
+        }
+      });
+
+      // Initial status check
+      setTimeout(() => {
+        if (appStartup.initialized) {
+          updateStatus(
+            "success",
+            "✅ Configuration system already initialized",
+          );
+          log("✅ Configuration system was already ready");
+        } else {
+          log("⏳ Waiting for configuration system initialization...");
+        }
+      }, 1000);
+
+      // Check for errors
+      setTimeout(() => {
+        if (!appStartup.initialized) {
+          updateStatus("error", "❌ Configuration system failed to initialize");
+          log("❌ Configuration system initialization timeout");
+        }
+      }, 10000);
+    </script>
+  </body>
+</html>

@@ -20,46 +20,49 @@
  */
 
 // Import core modules
-import EthicsSimulation from './core/simulation.js';
-import AccessibilityManager from './core/accessibility.js';
-import AnimationManager from './core/animation-manager.js';
-import EducatorToolkit from './core/educator-toolkit.js';
-import DigitalScienceLab from './core/digital-science-lab.js';
-import ScenarioGenerator from './core/scenario-generator.js';
+import EthicsSimulation from "./core/simulation.js";
+import AccessibilityManager from "./core/accessibility.js";
+import AnimationManager from "./core/animation-manager.js";
+import EducatorToolkit from "./core/educator-toolkit.js";
+import DigitalScienceLab from "./core/digital-science-lab.js";
+import ScenarioGenerator from "./core/scenario-generator.js";
 
 // Import user tracking system
-import './user-tracking-init.js';
+import "./user-tracking-init.js";
 
 // Import Firebase Cloud Messaging - DISABLED to prevent duplicate initializations
 // Firebase is now handled through ServiceManager to avoid conflicts
 // import './fcm-simple-init.js';
 
 // Import utilities
-import { userPreferences, userProgress } from './utils/simple-storage.js';
-import { simpleAnalytics } from './utils/simple-analytics.js';
-import Helpers from './utils/helpers.js';
-import canvasManager from './utils/canvas-manager.js';
-import logger from './utils/logger.js';
-import focusManager from './utils/focus-manager.js';
-import scrollManager from './utils/scroll-manager.js';
-import { loopDetector } from './utils/infinite-loop-detector.js';
+import { userPreferences, userProgress } from "./utils/simple-storage.js";
+import { simpleAnalytics } from "./utils/simple-analytics.js";
+import Helpers from "./utils/helpers.js";
+import canvasManager from "./utils/canvas-manager.js";
+import logger from "./utils/logger.js";
+import focusManager from "./utils/focus-manager.js";
+import scrollManager from "./utils/scroll-manager.js";
+import { loopDetector } from "./utils/infinite-loop-detector.js";
+import configIntegrator from "./utils/config-integrator.js";
+import "./utils/console-cleanup.js"; // Initialize console cleanup utility
 
 // Import system metadata collection
-import { getSystemCollector } from './services/system-metadata-collector.js';
+import { getSystemCollector } from "./services/system-metadata-collector.js";
 
 // Import enhanced objects (loaded dynamically as needed)
 // import { EthicsMeter, InteractiveButton, InteractiveSlider } from './objects/enhanced-objects.js';
 
 // Import new modal components
-import PreLaunchModal from './components/pre-launch-modal.js';
-import { EnhancedSimulationModal } from './components/enhanced-simulation-modal.js';
-import { PostSimulationModal } from './components/post-simulation-modal.js';
-import ModalFooterManager from './components/modal-footer-manager.js';
-import MainGrid from './components/main-grid.js';
-import RadarChart from './components/radar-chart.js';
-import OnboardingTour from './components/onboarding-tour.js';
-import { getAllCategories, getCategoryScenarios } from '../data/categories.js';
-import MCPIntegrationManager from './integrations/mcp-integration-manager.js';
+import { EnhancedSimulationModal } from "./components/enhanced-simulation-modal.js";
+import { PostSimulationModal } from "./components/post-simulation-modal.js";
+import ModalFooterManager from "./components/modal-footer-manager.js";
+import MainGrid from "./components/main-grid.js";
+import OnboardingTour from "./components/onboarding-tour.js";
+import { getAllCategories, getCategoryScenarios } from "../data/categories.js";
+import MCPIntegrationManager from "./integrations/mcp-integration-manager.js";
+
+// JSON SSOT Configuration System
+import { appStartup } from "./app-startup.js";
 
 // Community and Authentication Services
 // import AuthService from './services/auth-service.js'; // Now handled by ServiceManager
@@ -107,31 +110,31 @@ const AppDebug = {
   telemetryBatch: [],
 
   log: (message, data = null) => {
-    if (window.DEBUG_MODE || localStorage.getItem('debug') === 'true') {
+    if (window.DEBUG_MODE || localStorage.getItem("debug") === "true") {
       // eslint-disable-next-line no-console
-      console.log(`[App] ${message}`, data || '');
-      AppDebug._bufferLog('log', message, data);
+      console.log(`[App] ${message}`, data || "");
+      AppDebug._bufferLog("log", message, data);
     }
   },
   info: (message, data = null) => {
-    if (window.DEBUG_MODE || localStorage.getItem('debug') === 'true') {
+    if (window.DEBUG_MODE || localStorage.getItem("debug") === "true") {
       // eslint-disable-next-line no-console
-      console.info(`[App] ${message}`, data || '');
-      AppDebug._bufferLog('info', message, data);
+      console.info(`[App] ${message}`, data || "");
+      AppDebug._bufferLog("info", message, data);
     }
   },
   warn: (message, data = null) => {
-    if (window.DEBUG_MODE || localStorage.getItem('debug') === 'true') {
+    if (window.DEBUG_MODE || localStorage.getItem("debug") === "true") {
       // eslint-disable-next-line no-console
-      console.warn(`[App] ${message}`, data || '');
-      AppDebug._bufferLog('warn', message, data);
+      console.warn(`[App] ${message}`, data || "");
+      AppDebug._bufferLog("warn", message, data);
     }
   },
   error: (message, error = null) => {
     // Always show errors
     // eslint-disable-next-line no-console
-    console.error(`[App] ${message}`, error || '');
-    AppDebug._bufferLog('error', message, error);
+    console.error(`[App] ${message}`, error || "");
+    AppDebug._bufferLog("error", message, error);
     AppDebug._queueError(message, error);
   },
 
@@ -198,18 +201,18 @@ const AppDebug = {
     // Send to enterprise monitoring service
     if (window.enterpriseMonitoring) {
       window.enterpriseMonitoring.send(
-        'app_telemetry',
-        AppDebug.telemetryBatch
+        "app_telemetry",
+        AppDebug.telemetryBatch,
       );
     }
 
     // Store locally as backup
     try {
       const existing = JSON.parse(
-        localStorage.getItem('app_telemetry') || '[]'
+        localStorage.getItem("app_telemetry") || "[]",
       );
       const combined = [...existing, ...AppDebug.telemetryBatch].slice(-500); // Keep last 500
-      localStorage.setItem('app_telemetry', JSON.stringify(combined));
+      localStorage.setItem("app_telemetry", JSON.stringify(combined));
     } catch (e) {
       // Storage error - continue without local backup
     }
@@ -227,9 +230,9 @@ const AppDebug = {
 
     // Store locally as backup
     try {
-      const existing = JSON.parse(localStorage.getItem('app_errors') || '[]');
+      const existing = JSON.parse(localStorage.getItem("app_errors") || "[]");
       const combined = [...existing, ...AppDebug.errorQueue].slice(-100); // Keep last 100
-      localStorage.setItem('app_errors', JSON.stringify(combined));
+      localStorage.setItem("app_errors", JSON.stringify(combined));
     } catch (e) {
       // Storage error - continue without local backup
     }
@@ -245,7 +248,7 @@ const AppDebug = {
   },
 
   _getMemoryUsage: () => {
-    if ('memory' in performance) {
+    if ("memory" in performance) {
       return {
         used: performance.memory.usedJSHeapSize,
         total: performance.memory.totalJSHeapSize,
@@ -286,12 +289,12 @@ const AppDebug = {
 class AIEthicsApp {
   constructor() {
     // Version identifier for debugging
-    this.version = 'v2.1.0-enterprise';
+    this.version = "v2.1.0-enterprise";
     this.buildTimestamp = new Date().toISOString();
     this.sessionId = AppDebug._getSessionId();
 
     AppDebug.info(
-      `[App] Initializing AIEthicsApp ${this.version} (Build: ${this.buildTimestamp})`
+      `[App] Initializing AIEthicsApp ${this.version} (Build: ${this.buildTimestamp})`,
     );
 
     // Core application state
@@ -304,7 +307,7 @@ class AIEthicsApp {
 
     // Enterprise monitoring and health
     this.healthStatus = {
-      overall: 'healthy',
+      overall: "healthy",
       components: new Map(),
       lastCheck: null,
       issues: [],
@@ -357,7 +360,7 @@ class AIEthicsApp {
     this.lastFocusedElement = null; // For focus restoration
 
     // Theme and preferences
-    this.currentTheme = 'light';
+    this.currentTheme = "light";
     this.preferences = {
       reducedMotion: false,
       highContrast: false,
@@ -397,46 +400,46 @@ class AIEthicsApp {
     // NOTE: These are thematic categories, not individual scenarios
     this.availableSimulations = [
       {
-        id: 'bias-fairness',
-        title: 'AI Ethics Explorer',
+        id: "bias-fairness",
+        title: "AI Ethics Explorer",
         description:
-          'Explore real-world AI scenarios and see how different choices affect various groups in society. No right answers - just learning through cause and effect.',
-        difficulty: 'beginner',
+          "Explore real-world AI scenarios and see how different choices affect various groups in society. No right answers - just learning through cause and effect.",
+        difficulty: "beginner",
         duration: 1200, // 20 minutes
         thumbnail: null, // Placeholder - will use default thumbnail
-        tags: ['ethics', 'fairness', 'education', 'scenarios', 'open-ended'],
+        tags: ["ethics", "fairness", "education", "scenarios", "open-ended"],
         useCanvas: false, // HTML-only simulation, no canvas needed
-        renderMode: 'html',
+        renderMode: "html",
       },
       {
-        id: 'consent-transparency',
-        title: 'Consent & Transparency',
+        id: "consent-transparency",
+        title: "Consent & Transparency",
         description:
-          'Learn about informed consent and the importance of transparency in AI systems.',
-        difficulty: 'beginner',
+          "Learn about informed consent and the importance of transparency in AI systems.",
+        difficulty: "beginner",
         duration: 480, // 8 minutes
-        thumbnail: 'src/assets/images/consent-transparency-thumb.svg',
-        tags: ['consent', 'transparency', 'privacy', 'communication'],
+        thumbnail: "src/assets/images/consent-transparency-thumb.svg",
+        tags: ["consent", "transparency", "privacy", "communication"],
       },
       {
-        id: 'autonomy-oversight',
-        title: 'Autonomy & Oversight',
+        id: "autonomy-oversight",
+        title: "Autonomy & Oversight",
         description:
-          'Balance AI autonomy with human oversight in critical decision-making scenarios.',
-        difficulty: 'intermediate',
+          "Balance AI autonomy with human oversight in critical decision-making scenarios.",
+        difficulty: "intermediate",
         duration: 720, // 12 minutes
-        thumbnail: 'src/assets/images/autonomy-oversight-thumb.svg',
-        tags: ['autonomy', 'oversight', 'control', 'responsibility'],
+        thumbnail: "src/assets/images/autonomy-oversight-thumb.svg",
+        tags: ["autonomy", "oversight", "control", "responsibility"],
       },
       {
-        id: 'misinformation-trust',
-        title: 'Misinformation & Trust',
+        id: "misinformation-trust",
+        title: "Misinformation & Trust",
         description:
-          'Combat misinformation and build trustworthy AI communication systems.',
-        difficulty: 'advanced',
+          "Combat misinformation and build trustworthy AI communication systems.",
+        difficulty: "advanced",
         duration: 900, // 15 minutes
-        thumbnail: 'src/assets/images/misinformation-trust-thumb.svg',
-        tags: ['misinformation', 'trust', 'communication', 'verification'],
+        thumbnail: "src/assets/images/misinformation-trust-thumb.svg",
+        tags: ["misinformation", "trust", "communication", "verification"],
       },
     ];
 
@@ -458,9 +461,9 @@ class AIEthicsApp {
       // Set up performance baseline
       this._establishPerformanceBaseline();
 
-      AppDebug.info('Enterprise monitoring systems initialized');
+      AppDebug.info("Enterprise monitoring systems initialized");
     } catch (error) {
-      AppDebug.error('Failed to initialize enterprise monitoring:', error);
+      AppDebug.error("Failed to initialize enterprise monitoring:", error);
       // Continue initialization even if monitoring fails
     }
   }
@@ -469,31 +472,31 @@ class AIEthicsApp {
    * Set up error recovery strategies for different types of failures
    */
   _setupErrorRecoveryStrategies() {
-    this.errorRecoveryStrategies.set('simulation_load_failure', {
-      strategy: 'retry_with_fallback',
+    this.errorRecoveryStrategies.set("simulation_load_failure", {
+      strategy: "retry_with_fallback",
       maxRetries: 3,
-      fallbackAction: 'show_basic_simulation',
+      fallbackAction: "show_basic_simulation",
       cooldownMs: 5000,
     });
 
-    this.errorRecoveryStrategies.set('canvas_creation_failure', {
-      strategy: 'html_fallback',
+    this.errorRecoveryStrategies.set("canvas_creation_failure", {
+      strategy: "html_fallback",
       maxRetries: 1,
-      fallbackAction: 'use_html_rendering',
+      fallbackAction: "use_html_rendering",
       cooldownMs: 1000,
     });
 
-    this.errorRecoveryStrategies.set('firebase_connection_failure', {
-      strategy: 'offline_mode',
+    this.errorRecoveryStrategies.set("firebase_connection_failure", {
+      strategy: "offline_mode",
       maxRetries: 5,
-      fallbackAction: 'enable_offline_features',
+      fallbackAction: "enable_offline_features",
       cooldownMs: 10000,
     });
 
-    this.errorRecoveryStrategies.set('memory_exhaustion', {
-      strategy: 'cleanup_and_restart',
+    this.errorRecoveryStrategies.set("memory_exhaustion", {
+      strategy: "cleanup_and_restart",
       maxRetries: 1,
-      fallbackAction: 'force_cleanup_heavy_components',
+      fallbackAction: "force_cleanup_heavy_components",
       cooldownMs: 2000,
     });
   }
@@ -503,16 +506,16 @@ class AIEthicsApp {
    */
   _initializeCircuitBreakers() {
     const criticalComponents = [
-      'simulation_engine',
-      'canvas_manager',
-      'firebase_service',
-      'analytics_service',
-      'authentication_service',
+      "simulation_engine",
+      "canvas_manager",
+      "firebase_service",
+      "analytics_service",
+      "authentication_service",
     ];
 
-    criticalComponents.forEach(component => {
+    criticalComponents.forEach((component) => {
       this.circuitBreakers.set(component, {
-        state: 'closed', // closed, open, half-open
+        state: "closed", // closed, open, half-open
         failureCount: 0,
         threshold: APP_CONSTANTS.ENTERPRISE.CIRCUIT_BREAKER_THRESHOLD,
         timeout: 60000, // 1 minute
@@ -547,7 +550,7 @@ class AIEthicsApp {
    * Get current memory usage if available
    */
   _getCurrentMemoryUsage() {
-    if ('memory' in performance) {
+    if ("memory" in performance) {
       return performance.memory.usedJSHeapSize;
     }
     return 0;
@@ -580,7 +583,7 @@ class AIEthicsApp {
       }, 30000); // Flush every 30 seconds
     }
 
-    AppDebug.info('Enterprise monitoring intervals started');
+    AppDebug.info("Enterprise monitoring intervals started");
   }
 
   /**
@@ -589,7 +592,7 @@ class AIEthicsApp {
   _performHealthCheck() {
     const healthCheck = {
       timestamp: new Date().toISOString(),
-      overall: 'healthy',
+      overall: "healthy",
       components: {},
       memory: this._getCurrentMemoryUsage(),
       errors: AppDebug.errorQueue.length,
@@ -600,31 +603,31 @@ class AIEthicsApp {
     const memoryUsage = this._getCurrentMemoryUsage();
     if (memoryUsage > APP_CONSTANTS.ENTERPRISE.MEMORY_WARNING_THRESHOLD) {
       healthCheck.warnings.push(
-        `High memory usage: ${(memoryUsage / 1024 / 1024).toFixed(2)}MB`
+        `High memory usage: ${(memoryUsage / 1024 / 1024).toFixed(2)}MB`,
       );
-      healthCheck.overall = 'warning';
+      healthCheck.overall = "warning";
     }
 
     // Check error rate
     if (this.performanceMetrics.errorCount > 10) {
       healthCheck.warnings.push(
-        `High error count: ${this.performanceMetrics.errorCount}`
+        `High error count: ${this.performanceMetrics.errorCount}`,
       );
-      healthCheck.overall = 'warning';
+      healthCheck.overall = "warning";
     }
 
     // Check circuit breaker states
     let hasOpenCircuits = false;
     this.circuitBreakers.forEach((breaker, component) => {
       healthCheck.components[component] = breaker.state;
-      if (breaker.state === 'open') {
+      if (breaker.state === "open") {
         hasOpenCircuits = true;
         healthCheck.warnings.push(`Circuit breaker open for ${component}`);
       }
     });
 
     if (hasOpenCircuits) {
-      healthCheck.overall = 'degraded';
+      healthCheck.overall = "degraded";
     }
 
     // Store health status
@@ -636,10 +639,10 @@ class AIEthicsApp {
 
     // Send to enterprise monitoring
     if (window.enterpriseMonitoring) {
-      window.enterpriseMonitoring.send('health_check', healthCheck);
+      window.enterpriseMonitoring.send("health_check", healthCheck);
     }
 
-    AppDebug.info('Health check completed', {
+    AppDebug.info("Health check completed", {
       status: healthCheck.overall,
       warnings: healthCheck.warnings.length,
     });
@@ -674,20 +677,20 @@ class AIEthicsApp {
       performanceData.memory > APP_CONSTANTS.ENTERPRISE.MEMORY_WARNING_THRESHOLD
     ) {
       issues.push(
-        `High memory usage: ${(performanceData.memory / 1024 / 1024).toFixed(2)}MB`
+        `High memory usage: ${(performanceData.memory / 1024 / 1024).toFixed(2)}MB`,
       );
     }
 
     // Send to enterprise monitoring
     if (window.enterpriseMonitoring) {
-      window.enterpriseMonitoring.send('performance_metrics', {
+      window.enterpriseMonitoring.send("performance_metrics", {
         ...performanceData,
         issues,
       });
     }
 
     if (issues.length > 0) {
-      AppDebug.warn('Performance issues detected', issues);
+      AppDebug.warn("Performance issues detected", issues);
     }
   }
 
@@ -695,7 +698,7 @@ class AIEthicsApp {
    * Get performance timing metrics
    */
   _getPerformanceTimings() {
-    const navigation = performance.getEntriesByType('navigation')[0];
+    const navigation = performance.getEntriesByType("navigation")[0];
     if (!navigation) return {};
 
     return {
@@ -711,8 +714,10 @@ class AIEthicsApp {
    * Get First Paint timing
    */
   _getFirstPaint() {
-    const paintEntries = performance.getEntriesByType('paint');
-    const firstPaint = paintEntries.find(entry => entry.name === 'first-paint');
+    const paintEntries = performance.getEntriesByType("paint");
+    const firstPaint = paintEntries.find(
+      (entry) => entry.name === "first-paint",
+    );
     return firstPaint ? firstPaint.startTime : 0;
   }
 
@@ -720,9 +725,9 @@ class AIEthicsApp {
    * Get First Contentful Paint timing
    */
   _getFirstContentfulPaint() {
-    const paintEntries = performance.getEntriesByType('paint');
+    const paintEntries = performance.getEntriesByType("paint");
     const fcp = paintEntries.find(
-      entry => entry.name === 'first-contentful-paint'
+      (entry) => entry.name === "first-contentful-paint",
     );
     return fcp ? fcp.startTime : 0;
   }
@@ -731,8 +736,8 @@ class AIEthicsApp {
    * Get user timing metrics
    */
   _getUserTimingMetrics() {
-    const userTimings = performance.getEntriesByType('measure');
-    return userTimings.map(timing => ({
+    const userTimings = performance.getEntriesByType("measure");
+    return userTimings.map((timing) => ({
       name: timing.name,
       duration: timing.duration,
       startTime: timing.startTime,
@@ -743,11 +748,12 @@ class AIEthicsApp {
    * Get resource timing metrics
    */
   _getResourceTimingMetrics() {
-    const resourceEntries = performance.getEntriesByType('resource');
+    const resourceEntries = performance.getEntriesByType("resource");
     return {
       totalResources: resourceEntries.length,
-      slowResources: resourceEntries.filter(r => r.duration > 1000).length,
-      failedResources: resourceEntries.filter(r => r.responseEnd === 0).length,
+      slowResources: resourceEntries.filter((r) => r.duration > 1000).length,
+      failedResources: resourceEntries.filter((r) => r.responseEnd === 0)
+        .length,
       averageLoadTime:
         resourceEntries.reduce((sum, r) => sum + r.duration, 0) /
         resourceEntries.length,
@@ -773,7 +779,7 @@ class AIEthicsApp {
       this.telemetryFlushInterval = null;
     }
 
-    AppDebug.info('Enterprise monitoring intervals stopped');
+    AppDebug.info("Enterprise monitoring intervals stopped");
   }
   async init() {
     if (this.isInitialized) return;
@@ -781,71 +787,79 @@ class AIEthicsApp {
     const initStartTime = performance.now();
 
     try {
-      AppDebug.log('🚀 Starting AIEthicsApp enterprise initialization...');
+      AppDebug.log("🚀 Starting AIEthicsApp enterprise initialization...");
 
       // Mark initialization start for performance tracking
-      performance.mark('app-init-start');
+      performance.mark("app-init-start");
+
+      // Wait for JSON SSOT configuration system to be ready
+      AppDebug.log("⚙️ Waiting for configuration system...");
+      if (!appStartup.initialized) {
+        await appStartup.initialize();
+      }
+      this._updateComponentHealth("config_system", "healthy");
+      AppDebug.log("✅ Configuration system ready");
 
       // Initialize scroll manager first (handles all scroll behavior)
       scrollManager.init();
-      this._updateComponentHealth('scroll_manager', 'healthy');
+      this._updateComponentHealth("scroll_manager", "healthy");
 
       // Initialize theme detection first
       this.initializeTheme();
-      this._updateComponentHealth('theme_system', 'healthy');
+      this._updateComponentHealth("theme_system", "healthy");
 
       // Initialize error handling
       this.initializeErrorHandling();
-      this._updateComponentHealth('error_handling', 'healthy');
+      this._updateComponentHealth("error_handling", "healthy");
 
       // Initialize infinite loop detection (development mode only)
       this.initializeLoopDetection();
 
       // Initialize core systems with enterprise monitoring
       await this.initializeSystems();
-      this._updateComponentHealth('core_systems', 'healthy');
+      this._updateComponentHealth("core_systems", "healthy");
 
       // Setup UI
       this.setupUI();
-      this._updateComponentHealth('ui_system', 'healthy');
+      this._updateComponentHealth("ui_system", "healthy");
 
       // Load simulations
       await this.loadSimulations();
-      this._updateComponentHealth('simulation_system', 'healthy');
+      this._updateComponentHealth("simulation_system", "healthy");
 
       // Setup event listeners
       this.setupEventListeners();
-      this._updateComponentHealth('event_system', 'healthy');
+      this._updateComponentHealth("event_system", "healthy");
 
       // Initialize accessibility
       this.setupAccessibility();
-      this._updateComponentHealth('accessibility_system', 'healthy');
+      this._updateComponentHealth("accessibility_system", "healthy");
 
       // Render initial state
       this.render();
-      this._updateComponentHealth('render_system', 'healthy');
+      this._updateComponentHealth("render_system", "healthy");
 
       // Initialize hero demo
       await this.initializeHeroDemo();
-      this._updateComponentHealth('hero_demo', 'healthy');
+      this._updateComponentHealth("hero_demo", "healthy");
 
       // Initialize enhanced objects (after visual engine is set up)
       await this.initializeEnhancedObjects();
-      this._updateComponentHealth('enhanced_objects', 'healthy');
+      this._updateComponentHealth("enhanced_objects", "healthy");
 
       // Initialize modal footer management
       this.initializeModalFooterManager();
-      this._updateComponentHealth('modal_system', 'healthy');
+      this._updateComponentHealth("modal_system", "healthy");
 
       // Initialize ethics radar demo
       await this.initializeEthicsRadarDemo();
-      this._updateComponentHealth('ethics_radar', 'healthy');
+      this._updateComponentHealth("ethics_radar", "healthy");
 
       // Initialize onboarding tour for first-time users (prevent multiple instances)
       // Only initialize on app page, not on landing page
       const isAppPage =
-        window.location.pathname.includes('app.html') ||
-        document.querySelector('.categories-grid') !== null;
+        window.location.pathname.includes("app.html") ||
+        document.querySelector(".categories-grid") !== null;
 
       if (isAppPage && !this.onboardingTour && !window.onboardingTourInstance) {
         this.onboardingTour = new OnboardingTour();
@@ -858,35 +872,35 @@ class AIEthicsApp {
 
         // Check and start onboarding tour for first-time users
         this.checkAndStartOnboardingTour();
-        this._updateComponentHealth('onboarding_system', 'healthy');
+        this._updateComponentHealth("onboarding_system", "healthy");
       } else if (!isAppPage) {
         AppDebug.info(
-          'Skipping onboarding tour initialization - not on app page'
+          "Skipping onboarding tour initialization - not on app page",
         );
       } else {
         AppDebug.warn(
-          'OnboardingTour instance already exists, skipping initialization'
+          "OnboardingTour instance already exists, skipping initialization",
         );
       }
 
       // Initialize scroll reveal header
       this.initializeScrollRevealHeader();
-      this._updateComponentHealth('scroll_reveal', 'healthy');
+      this._updateComponentHealth("scroll_reveal", "healthy");
 
       // Initialize MCP integrations
       await this.initializeMCPIntegrations();
-      this._updateComponentHealth('mcp_system', 'healthy');
+      this._updateComponentHealth("mcp_system", "healthy");
 
       // Initialize Firebase and Authentication
       await this.initializeFirebaseServices();
-      this._updateComponentHealth('firebase_system', 'healthy');
+      this._updateComponentHealth("firebase_system", "healthy");
 
       // Mark initialization end for performance tracking
-      performance.mark('app-init-end');
+      performance.mark("app-init-end");
       performance.measure(
-        'app-initialization',
-        'app-init-start',
-        'app-init-end'
+        "app-initialization",
+        "app-init-start",
+        "app-init-end",
       );
 
       const initTime = performance.now() - initStartTime;
@@ -897,14 +911,14 @@ class AIEthicsApp {
 
       this.isInitialized = true;
       AppDebug.log(
-        `AI Ethics App initialized successfully with enterprise infrastructure (${initTime.toFixed(2)}ms)`
+        `AI Ethics App initialized successfully with enterprise infrastructure (${initTime.toFixed(2)}ms)`,
       );
 
       // Perform initial health check
       this._performHealthCheck();
 
       // Track platform initialization for system analytics
-      this.systemCollector.updatePlatformMetrics('platform_initialization', {
+      this.systemCollector.updatePlatformMetrics("platform_initialization", {
         simulationsAvailable: this.availableSimulations.length,
         categoriesAvailable: this.categories?.length || 0,
         browserInfo: Helpers.getBrowserInfo(),
@@ -928,11 +942,11 @@ class AIEthicsApp {
 
       // Track user session start
       this.systemCollector.trackNavigation({
-        from: 'external',
-        to: 'platform-home',
-        action: 'page-load',
+        from: "external",
+        to: "platform-home",
+        action: "page-load",
         metadata: {
-          component: 'main-app',
+          component: "main-app",
           referrer: document.referrer,
           userAgent: navigator.userAgent,
           timestamp: new Date().toISOString(),
@@ -943,7 +957,7 @@ class AIEthicsApp {
       });
 
       // Track initialization with enhanced analytics
-      simpleAnalytics.trackEvent('app_initialized', {
+      simpleAnalytics.trackEvent("app_initialized", {
         simulations_available: this.availableSimulations.length,
         browser: Helpers.getBrowserInfo().browser,
         device: Helpers.getDeviceType(),
@@ -954,24 +968,24 @@ class AIEthicsApp {
         session_id: this.sessionId,
         init_time: initTime,
         enterprise_features_enabled: Object.values(
-          this.enterpriseConfig
+          this.enterpriseConfig,
         ).filter(Boolean).length,
         memory_usage: this._getCurrentMemoryUsage(),
       });
 
       // Set up enterprise error monitoring
-      window.addEventListener('beforeunload', () => {
+      window.addEventListener("beforeunload", () => {
         this._handleApplicationShutdown();
       });
     } catch (error) {
       this.criticalErrorCount++;
-      this._updateComponentHealth('application_core', 'critical');
+      this._updateComponentHealth("application_core", "critical");
 
-      AppDebug.error('Failed to initialize app:', error);
+      AppDebug.error("Failed to initialize app:", error);
       this.handleEnterpriseError(
         error,
-        'Failed to initialize the application. Please refresh the page.',
-        'initialization_failure'
+        "Failed to initialize the application. Please refresh the page.",
+        "initialization_failure",
       );
     }
   }
@@ -989,18 +1003,18 @@ class AIEthicsApp {
     // Update circuit breaker if it exists
     if (this.circuitBreakers.has(component)) {
       const breaker = this.circuitBreakers.get(component);
-      if (status === 'healthy') {
+      if (status === "healthy") {
         breaker.successCount++;
-        if (breaker.state === 'half-open' && breaker.successCount >= 3) {
-          breaker.state = 'closed';
+        if (breaker.state === "half-open" && breaker.successCount >= 3) {
+          breaker.state = "closed";
           breaker.failureCount = 0;
           AppDebug.info(`Circuit breaker closed for ${component}`);
         }
-      } else if (status === 'critical') {
+      } else if (status === "critical") {
         breaker.failureCount++;
         breaker.lastFailureTime = Date.now();
         if (breaker.failureCount >= breaker.threshold) {
-          breaker.state = 'open';
+          breaker.state = "open";
           AppDebug.warn(`Circuit breaker opened for ${component}`);
         }
       }
@@ -1012,8 +1026,8 @@ class AIEthicsApp {
    */
   handleEnterpriseError(
     error,
-    userMessage = 'An unexpected error occurred',
-    errorType = 'general'
+    userMessage = "An unexpected error occurred",
+    errorType = "general",
   ) {
     this.lastError = error;
     this.performanceMetrics.errorCount++;
@@ -1029,7 +1043,7 @@ class AIEthicsApp {
     pattern.lastOccurrence = Date.now();
 
     // Update circuit breaker for error type
-    this._updateComponentHealth(errorType, 'critical');
+    this._updateComponentHealth(errorType, "critical");
 
     // Check if we have a recovery strategy
     const recoveryStrategy = this.errorRecoveryStrategies.get(errorType);
@@ -1038,29 +1052,29 @@ class AIEthicsApp {
     }
 
     // Safely extract error message
-    let errorMessage = 'Unknown error';
-    if (error && typeof error === 'object') {
+    let errorMessage = "Unknown error";
+    if (error && typeof error === "object") {
       errorMessage =
-        error.message || error.toString() || 'Error object without message';
-    } else if (typeof error === 'string') {
+        error.message || error.toString() || "Error object without message";
+    } else if (typeof error === "string") {
       errorMessage = error;
     } else if (error) {
       errorMessage = String(error);
     }
 
     // Enhanced analytics tracking
-    simpleAnalytics.trackEvent('enterprise_error', {
+    simpleAnalytics.trackEvent("enterprise_error", {
       error_type: errorType,
       error_message: errorMessage,
       error_stack:
-        error && error.stack ? error.stack : 'No stack trace available',
+        error && error.stack ? error.stack : "No stack trace available",
       user_agent: navigator.userAgent,
       timestamp: new Date().toISOString(),
       session_id: this.sessionId,
       version: this.version,
       memory_usage: this._getCurrentMemoryUsage(),
       component_health: Array.from(
-        this.healthStatus.components.entries()
+        this.healthStatus.components.entries(),
       ).reduce((acc, [key, value]) => {
         acc[key] = value.status;
         return acc;
@@ -1090,7 +1104,7 @@ class AIEthicsApp {
 
     // Announce error for accessibility
     if (this.accessibilityManager) {
-      this.accessibilityManager.announce(`Error: ${userMessage}`, 'assertive');
+      this.accessibilityManager.announce(`Error: ${userMessage}`, "assertive");
     }
   }
 
@@ -1103,7 +1117,7 @@ class AIEthicsApp {
 
     if (currentRetries >= strategy.maxRetries) {
       AppDebug.warn(
-        `Max retries exceeded for ${errorType}, executing fallback`
+        `Max retries exceeded for ${errorType}, executing fallback`,
       );
       this._executeFallbackAction(strategy.fallbackAction);
       return;
@@ -1112,21 +1126,21 @@ class AIEthicsApp {
     this.retryCounters.set(retryKey, currentRetries + 1);
 
     AppDebug.info(
-      `Executing recovery strategy for ${errorType} (attempt ${currentRetries + 1}/${strategy.maxRetries})`
+      `Executing recovery strategy for ${errorType} (attempt ${currentRetries + 1}/${strategy.maxRetries})`,
     );
 
     setTimeout(() => {
       switch (strategy.strategy) {
-        case 'retry_with_fallback':
+        case "retry_with_fallback":
           this._retryLastOperation(errorType, originalError);
           break;
-        case 'html_fallback':
+        case "html_fallback":
           this._switchToHtmlRendering();
           break;
-        case 'offline_mode':
+        case "offline_mode":
           this._enableOfflineMode();
           break;
-        case 'cleanup_and_restart':
+        case "cleanup_and_restart":
           this._performEmergencyCleanup();
           break;
         default:
@@ -1142,22 +1156,22 @@ class AIEthicsApp {
     AppDebug.info(`Executing fallback action: ${action}`);
 
     switch (action) {
-      case 'show_basic_simulation':
+      case "show_basic_simulation":
         this._showBasicSimulationFallback();
         break;
-      case 'use_html_rendering':
+      case "use_html_rendering":
         this._switchToHtmlRendering();
         break;
-      case 'enable_offline_features':
+      case "enable_offline_features":
         this._enableOfflineMode();
         break;
-      case 'force_cleanup_heavy_components':
+      case "force_cleanup_heavy_components":
         this._performEmergencyCleanup();
         break;
       default:
         AppDebug.warn(`Unknown fallback action: ${action}`);
         this.showError(
-          'The application encountered an error and is running in degraded mode.'
+          "The application encountered an error and is running in degraded mode.",
         );
     }
   }
@@ -1175,9 +1189,9 @@ class AIEthicsApp {
    * Switch to HTML-only rendering mode
    */
   _switchToHtmlRendering() {
-    AppDebug.info('Switching to HTML-only rendering mode');
+    AppDebug.info("Switching to HTML-only rendering mode");
     // Disable canvas-based features and use HTML fallbacks
-    this.visualEngineConfig.renderMode = 'html';
+    this.visualEngineConfig.renderMode = "html";
     this.enterpriseConfig.performanceTrackingEnabled = false; // Reduce overhead
   }
 
@@ -1185,15 +1199,15 @@ class AIEthicsApp {
    * Enable offline mode features
    */
   _enableOfflineMode() {
-    AppDebug.info('Enabling offline mode');
+    AppDebug.info("Enabling offline mode");
     // Disable features that require network connectivity
     this.enterpriseConfig.telemetryEnabled = false;
     this.enterpriseConfig.errorReportingEnabled = false;
     // Show offline indicator to user
     this.showNotification(
-      'Application is running in offline mode',
-      'info',
-      10000
+      "Application is running in offline mode",
+      "info",
+      10000,
     );
   }
 
@@ -1201,7 +1215,7 @@ class AIEthicsApp {
    * Perform emergency cleanup of heavy components
    */
   _performEmergencyCleanup() {
-    AppDebug.warn('Performing emergency cleanup');
+    AppDebug.warn("Performing emergency cleanup");
 
     // Clean up canvases
     if (this.currentSimulationCanvasId) {
@@ -1222,14 +1236,14 @@ class AIEthicsApp {
     // Clear log buffers
     AppDebug.clearBuffers();
 
-    AppDebug.info('Emergency cleanup completed');
+    AppDebug.info("Emergency cleanup completed");
   }
 
   /**
    * Show basic simulation fallback
    */
   _showBasicSimulationFallback() {
-    AppDebug.info('Showing basic simulation fallback');
+    AppDebug.info("Showing basic simulation fallback");
     // Show a simple text-based version of the simulation
     if (this.simulationContainer) {
       this.simulationContainer.innerHTML = `
@@ -1249,22 +1263,22 @@ class AIEthicsApp {
   showEnterpriseError(message, errorType, hasRecovery = false) {
     if (!this.errorBoundary) {
       // Fallback to notification
-      this.showNotification(message, 'error');
+      this.showNotification(message, "error");
       return;
     }
 
-    const errorContent = this.errorBoundary.querySelector('.error-content');
+    const errorContent = this.errorBoundary.querySelector(".error-content");
     if (errorContent) {
-      const messageEl = errorContent.querySelector('.error-message');
-      const retryBtn = errorContent.querySelector('#retry-action');
-      const reportBtn = errorContent.querySelector('#report-error');
-      const fallbackBtn = errorContent.querySelector('#fallback-action');
+      const messageEl = errorContent.querySelector(".error-message");
+      const retryBtn = errorContent.querySelector("#retry-action");
+      const reportBtn = errorContent.querySelector("#report-error");
+      const fallbackBtn = errorContent.querySelector("#fallback-action");
 
       if (messageEl) messageEl.textContent = message;
 
       // Setup retry functionality
       if (retryBtn && hasRecovery) {
-        retryBtn.style.display = 'inline-block';
+        retryBtn.style.display = "inline-block";
         retryBtn.onclick = () => {
           this.hideError();
           // Reset retry counter for this error type
@@ -1276,12 +1290,12 @@ class AIEthicsApp {
           }
         };
       } else if (retryBtn) {
-        retryBtn.style.display = 'none';
+        retryBtn.style.display = "none";
       }
 
       // Setup fallback action
       if (fallbackBtn) {
-        fallbackBtn.style.display = 'inline-block';
+        fallbackBtn.style.display = "inline-block";
         fallbackBtn.onclick = () => {
           this.hideError();
           const strategy = this.errorRecoveryStrategies.get(errorType);
@@ -1299,8 +1313,8 @@ class AIEthicsApp {
       }
     }
 
-    this.errorBoundary.setAttribute('aria-hidden', 'false');
-    this.errorBoundary.style.display = 'flex';
+    this.errorBoundary.setAttribute("aria-hidden", "false");
+    this.errorBoundary.style.display = "flex";
   }
 
   /**
@@ -1330,7 +1344,7 @@ class AIEthicsApp {
       };
 
       // Send to analytics
-      simpleAnalytics.trackEvent('error_reported', errorReport);
+      simpleAnalytics.trackEvent("error_reported", errorReport);
 
       // Send to enterprise error tracking
       if (window.enterpriseErrorTracking) {
@@ -1339,8 +1353,8 @@ class AIEthicsApp {
 
       // Show confirmation
       this.showNotification(
-        'Error report sent. Thank you for helping us improve the application.',
-        'success'
+        "Error report sent. Thank you for helping us improve the application.",
+        "success",
       );
     }
   }
@@ -1349,7 +1363,7 @@ class AIEthicsApp {
    * Handle application shutdown for cleanup
    */
   _handleApplicationShutdown() {
-    AppDebug.info('Application shutting down, performing cleanup');
+    AppDebug.info("Application shutting down, performing cleanup");
 
     // Stop monitoring intervals
     this._stopEnterpriseMonitoring();
@@ -1360,7 +1374,7 @@ class AIEthicsApp {
 
     // Send final health status
     if (window.enterpriseMonitoring) {
-      window.enterpriseMonitoring.send('app_shutdown', {
+      window.enterpriseMonitoring.send("app_shutdown", {
         sessionId: this.sessionId,
         version: this.version,
         timestamp: new Date().toISOString(),
@@ -1373,10 +1387,10 @@ class AIEthicsApp {
   initializeTheme() {
     // Detect system preferences
     const prefersReducedMotion = window.matchMedia?.(
-      '(prefers-reduced-motion: reduce)'
+      "(prefers-reduced-motion: reduce)",
     ).matches;
     const prefersHighContrast = window.matchMedia?.(
-      '(prefers-contrast: high)'
+      "(prefers-contrast: high)",
     ).matches;
 
     // Get saved user preferences (they override system preferences)
@@ -1396,8 +1410,8 @@ class AIEthicsApp {
     };
 
     this.currentTheme = this.preferences.highContrast
-      ? 'high-contrast'
-      : 'light';
+      ? "high-contrast"
+      : "light";
 
     // Apply initial theme
     this.applyTheme();
@@ -1405,14 +1419,14 @@ class AIEthicsApp {
     // Monitor theme changes
     this.setupThemeMonitoring();
 
-    AppDebug.log('Theme initialized:', this.currentTheme, this.preferences);
+    AppDebug.log("Theme initialized:", this.currentTheme, this.preferences);
   }
 
   /**
    * Initialize scroll reveal header functionality
    */
   initializeScrollRevealHeader() {
-    const header = document.querySelector('.header');
+    const header = document.querySelector(".header");
     if (!header) return;
 
     let lastScrollY = window.scrollY;
@@ -1422,18 +1436,18 @@ class AIEthicsApp {
 
       // Don't hide header at the very top of the page
       if (currentScrollY <= 10) {
-        header.classList.remove('header-hidden');
-        header.classList.add('header-visible');
+        header.classList.remove("header-hidden");
+        header.classList.add("header-visible");
       } else {
         // Hide header when scrolling down, show when scrolling up
         if (currentScrollY > lastScrollY && currentScrollY > 100) {
           // Scrolling down - hide header
-          header.classList.add('header-hidden');
-          header.classList.remove('header-visible');
+          header.classList.add("header-hidden");
+          header.classList.remove("header-visible");
         } else if (currentScrollY < lastScrollY) {
           // Scrolling up - show header
-          header.classList.remove('header-hidden');
-          header.classList.add('header-visible');
+          header.classList.remove("header-hidden");
+          header.classList.add("header-visible");
         }
       }
 
@@ -1452,12 +1466,12 @@ class AIEthicsApp {
       }
     };
 
-    window.addEventListener('scroll', throttledHandleScroll, { passive: true });
+    window.addEventListener("scroll", throttledHandleScroll, { passive: true });
 
     // Initialize header as visible
-    header.classList.add('header-visible');
+    header.classList.add("header-visible");
 
-    AppDebug.log('Scroll reveal header initialized');
+    AppDebug.log("Scroll reveal header initialized");
   }
 
   /**
@@ -1465,9 +1479,9 @@ class AIEthicsApp {
    */
   setupThemeMonitoring() {
     const reducedMotionQuery = window.matchMedia?.(
-      '(prefers-reduced-motion: reduce)'
+      "(prefers-reduced-motion: reduce)",
     );
-    const highContrastQuery = window.matchMedia?.('(prefers-contrast: high)');
+    const highContrastQuery = window.matchMedia?.("(prefers-contrast: high)");
 
     const handleThemeChange = () => {
       // Get current saved preferences to check which ones are user-set
@@ -1488,20 +1502,20 @@ class AIEthicsApp {
       if (JSON.stringify(newPreferences) !== JSON.stringify(this.preferences)) {
         this.preferences = newPreferences;
         this.currentTheme = newPreferences.highContrast
-          ? 'high-contrast'
-          : 'light';
+          ? "high-contrast"
+          : "light";
         this.applyTheme();
         this.announceThemeChange();
 
         AppDebug.log(
-          'System theme changed, updated non-user-set preferences:',
-          newPreferences
+          "System theme changed, updated non-user-set preferences:",
+          newPreferences,
         );
       }
     };
 
-    reducedMotionQuery?.addEventListener?.('change', handleThemeChange);
-    highContrastQuery?.addEventListener?.('change', handleThemeChange);
+    reducedMotionQuery?.addEventListener?.("change", handleThemeChange);
+    highContrastQuery?.addEventListener?.("change", handleThemeChange);
   }
 
   /**
@@ -1511,12 +1525,12 @@ class AIEthicsApp {
     const { body } = document;
 
     // Remove existing theme classes
-    body.classList.remove('high-contrast', 'reduced-motion', 'large-text');
+    body.classList.remove("high-contrast", "reduced-motion", "large-text");
 
     // Apply current theme classes
-    if (this.preferences.highContrast) body.classList.add('high-contrast');
-    if (this.preferences.reducedMotion) body.classList.add('reduced-motion');
-    if (this.preferences.largeText) body.classList.add('large-text');
+    if (this.preferences.highContrast) body.classList.add("high-contrast");
+    if (this.preferences.reducedMotion) body.classList.add("reduced-motion");
+    if (this.preferences.largeText) body.classList.add("large-text");
 
     // Update button states (aria-pressed attributes)
     this.updateButtonStates();
@@ -1524,8 +1538,8 @@ class AIEthicsApp {
     // Update theme color meta tag
     const themeColorMeta = document.querySelector('meta[name="theme-color"]');
     if (themeColorMeta) {
-      const themeColor = '#1a73e8'; // Always use light theme color
-      themeColorMeta.setAttribute('content', themeColor);
+      const themeColor = "#1a73e8"; // Always use light theme color
+      themeColorMeta.setAttribute("content", themeColor);
     }
 
     // Update managers if they exist
@@ -1543,26 +1557,26 @@ class AIEthicsApp {
    * Update accessibility button states
    */
   updateButtonStates() {
-    const highContrastBtn = document.getElementById('toggle-high-contrast');
-    const largeTextBtn = document.getElementById('toggle-large-text');
-    const reducedMotionBtn = document.getElementById('toggle-reduced-motion');
+    const highContrastBtn = document.getElementById("toggle-high-contrast");
+    const largeTextBtn = document.getElementById("toggle-large-text");
+    const reducedMotionBtn = document.getElementById("toggle-reduced-motion");
 
     if (highContrastBtn) {
       highContrastBtn.setAttribute(
-        'aria-pressed',
-        this.preferences.highContrast.toString()
+        "aria-pressed",
+        this.preferences.highContrast.toString(),
       );
     }
     if (largeTextBtn) {
       largeTextBtn.setAttribute(
-        'aria-pressed',
-        this.preferences.largeText.toString()
+        "aria-pressed",
+        this.preferences.largeText.toString(),
       );
     }
     if (reducedMotionBtn) {
       reducedMotionBtn.setAttribute(
-        'aria-pressed',
-        this.preferences.reducedMotion.toString()
+        "aria-pressed",
+        this.preferences.reducedMotion.toString(),
       );
     }
   }
@@ -1571,13 +1585,13 @@ class AIEthicsApp {
    * Announce theme changes for accessibility
    */
   announceThemeChange() {
-    const announcement = `Theme changed to ${this.currentTheme.replace('-', ' ')} mode`;
+    const announcement = `Theme changed to ${this.currentTheme.replace("-", " ")} mode`;
 
     if (this.accessibilityManager) {
       this.accessibilityManager.announce(announcement);
     } else {
       // Fallback announcement
-      const liveRegion = document.getElementById('aria-live-polite');
+      const liveRegion = document.getElementById("aria-live-polite");
       if (liveRegion) {
         liveRegion.textContent = announcement;
       }
@@ -1589,44 +1603,44 @@ class AIEthicsApp {
    */
   initializeErrorHandling() {
     // Create error boundary element
-    this.errorBoundary = document.getElementById('error-boundary');
+    this.errorBoundary = document.getElementById("error-boundary");
 
     // Global error handlers
-    window.addEventListener('error', event => {
+    window.addEventListener("error", (event) => {
       const error = event.error || event.message || event;
-      this.handleError(error, 'A JavaScript error occurred');
+      this.handleError(error, "A JavaScript error occurred");
     });
 
-    window.addEventListener('unhandledrejection', event => {
-      this.handleError(event.reason, 'An unhandled promise rejection occurred');
+    window.addEventListener("unhandledrejection", (event) => {
+      this.handleError(event.reason, "An unhandled promise rejection occurred");
     });
 
-    AppDebug.log('Error handling initialized');
+    AppDebug.log("Error handling initialized");
   }
 
   /**
    * Enhanced error handling with recovery options
    */
-  handleError(error, userMessage = 'An unexpected error occurred') {
+  handleError(error, userMessage = "An unexpected error occurred") {
     this.lastError = error;
-    AppDebug.error('App Error:', error);
+    AppDebug.error("App Error:", error);
 
     // Safely extract error message
-    let errorMessage = 'Unknown error';
-    if (error && typeof error === 'object') {
+    let errorMessage = "Unknown error";
+    if (error && typeof error === "object") {
       errorMessage =
-        error.message || error.toString() || 'Error object without message';
-    } else if (typeof error === 'string') {
+        error.message || error.toString() || "Error object without message";
+    } else if (typeof error === "string") {
       errorMessage = error;
     } else if (error) {
       errorMessage = String(error);
     }
 
     // Track error for analytics
-    simpleAnalytics.trackEvent('app_error', {
+    simpleAnalytics.trackEvent("app_error", {
       error_message: errorMessage,
       error_stack:
-        error && error.stack ? error.stack : 'No stack trace available',
+        error && error.stack ? error.stack : "No stack trace available",
       user_agent: navigator.userAgent,
       timestamp: new Date().toISOString(),
     });
@@ -1636,7 +1650,7 @@ class AIEthicsApp {
 
     // Announce error for accessibility
     if (this.accessibilityManager) {
-      this.accessibilityManager.announce(`Error: ${userMessage}`, 'assertive');
+      this.accessibilityManager.announce(`Error: ${userMessage}`, "assertive");
     }
   }
 
@@ -1650,17 +1664,17 @@ class AIEthicsApp {
       return;
     }
 
-    const errorContent = this.errorBoundary.querySelector('.error-content');
+    const errorContent = this.errorBoundary.querySelector(".error-content");
     if (errorContent) {
-      const messageEl = errorContent.querySelector('.error-message');
-      const retryBtn = errorContent.querySelector('#retry-action');
-      const reportBtn = errorContent.querySelector('#report-error');
+      const messageEl = errorContent.querySelector(".error-message");
+      const retryBtn = errorContent.querySelector("#retry-action");
+      const reportBtn = errorContent.querySelector("#report-error");
 
       if (messageEl) messageEl.textContent = message;
 
       // Setup retry functionality
       if (retryBtn && isRecoverable) {
-        retryBtn.style.display = 'inline-block';
+        retryBtn.style.display = "inline-block";
         retryBtn.onclick = () => {
           this.hideError();
           // Attempt to recover by reinitializing
@@ -1669,7 +1683,7 @@ class AIEthicsApp {
           }
         };
       } else if (retryBtn) {
-        retryBtn.style.display = 'none';
+        retryBtn.style.display = "none";
       }
 
       // Setup error reporting
@@ -1680,8 +1694,8 @@ class AIEthicsApp {
       }
     }
 
-    this.errorBoundary.setAttribute('aria-hidden', 'false');
-    this.errorBoundary.style.display = 'flex';
+    this.errorBoundary.setAttribute("aria-hidden", "false");
+    this.errorBoundary.style.display = "flex";
   }
 
   /**
@@ -1689,8 +1703,8 @@ class AIEthicsApp {
    */
   hideError() {
     if (this.errorBoundary) {
-      this.errorBoundary.setAttribute('aria-hidden', 'true');
-      this.errorBoundary.style.display = 'none';
+      this.errorBoundary.setAttribute("aria-hidden", "true");
+      this.errorBoundary.style.display = "none";
     }
   }
 
@@ -1713,11 +1727,11 @@ class AIEthicsApp {
       };
 
       // Send to analytics
-      simpleAnalytics.trackEvent('error_reported', errorReport);
+      simpleAnalytics.trackEvent("error_reported", errorReport);
 
       // Show confirmation
       alert(
-        'Error report sent. Thank you for helping us improve the application.'
+        "Error report sent. Thank you for helping us improve the application.",
       );
     }
   }
@@ -1728,7 +1742,7 @@ class AIEthicsApp {
       // Note: Firebase service may not be available yet, will be updated after Firebase init
       this.systemCollector = getSystemCollector();
       AppDebug.log(
-        'System metadata collector initialized (will connect to Firebase when available)'
+        "System metadata collector initialized (will connect to Firebase when available)",
       );
 
       // Initialize animation manager with theme preferences
@@ -1736,8 +1750,8 @@ class AIEthicsApp {
         enableAnimations: !this.preferences.reducedMotion,
         reducedMotion: this.preferences.reducedMotion,
         performanceMode: this.preferences.reducedMotion
-          ? 'compatibility'
-          : 'balanced',
+          ? "compatibility"
+          : "balanced",
       });
 
       // Initialize accessibility manager with current preferences
@@ -1752,7 +1766,7 @@ class AIEthicsApp {
       // Visual Engine will be initialized later when we have canvas elements
       // Just store the configuration for now
       this.visualEngineConfig = {
-        renderMode: 'canvas',
+        renderMode: "canvas",
         accessibility: true,
         highPerformance: !this.preferences.reducedMotion,
         debug: false,
@@ -1762,9 +1776,9 @@ class AIEthicsApp {
 
       // Systems are already initialized via their modules
       // Simple analytics auto-initializes
-      AppDebug.log('Core systems initialized with modernized infrastructure');
+      AppDebug.log("Core systems initialized with modernized infrastructure");
     } catch (error) {
-      AppDebug.error('Failed to initialize systems:', error);
+      AppDebug.error("Failed to initialize systems:", error);
       throw error;
     }
   }
@@ -1776,20 +1790,20 @@ class AIEthicsApp {
     try {
       // Initialize Educator Toolkit
       this.educatorToolkit = new EducatorToolkit();
-      AppDebug.log('Educator Toolkit initialized');
+      AppDebug.log("Educator Toolkit initialized");
 
       // Initialize Digital Science Lab
       this.digitalScienceLab = new DigitalScienceLab();
-      AppDebug.log('Digital Science Lab initialized');
+      AppDebug.log("Digital Science Lab initialized");
 
       // Initialize Scenario Generator
       this.scenarioGenerator = new ScenarioGenerator();
-      AppDebug.log('Scenario Generator initialized');
+      AppDebug.log("Scenario Generator initialized");
 
       // Connect the modules for integrated functionality
       this.connectEducationalModules();
     } catch (error) {
-      AppDebug.error('Failed to initialize core educational modules:', error);
+      AppDebug.error("Failed to initialize core educational modules:", error);
       throw error;
     }
   }
@@ -1813,7 +1827,7 @@ class AIEthicsApp {
       }
     }
 
-    AppDebug.log('Educational modules connected successfully');
+    AppDebug.log("Educational modules connected successfully");
   }
 
   /**
@@ -1829,7 +1843,7 @@ class AIEthicsApp {
 
         // Get curriculum alignment for this simulation
         const curriculumAlignment = this.educatorToolkit.getCurriculumAlignment(
-          config.tags || []
+          config.tags || [],
         );
         if (curriculumAlignment) {
           simulation.curriculumAlignment = curriculumAlignment;
@@ -1837,7 +1851,7 @@ class AIEthicsApp {
 
         // Get assessment tools for this simulation
         const assessmentTools = this.educatorToolkit.getAssessmentTools(
-          config.difficulty
+          config.difficulty,
         );
         if (assessmentTools) {
           simulation.assessmentTools = assessmentTools;
@@ -1850,7 +1864,7 @@ class AIEthicsApp {
 
         // Get relevant lab stations for this simulation
         const relevantStations = this.digitalScienceLab.getRelevantStations(
-          config.tags || []
+          config.tags || [],
         );
         if (relevantStations) {
           simulation.labStations = relevantStations;
@@ -1864,8 +1878,8 @@ class AIEthicsApp {
         // If this simulation can use generated scenarios, provide them
         if (simulation.supportsGeneratedScenarios) {
           const generatedScenarios = this.scenarioGenerator.generateScenarios(
-            config.tags?.[0] || 'general',
-            config.difficulty || 'beginner'
+            config.tags?.[0] || "general",
+            config.difficulty || "beginner",
           );
           if (generatedScenarios) {
             simulation.generatedScenarios = generatedScenarios;
@@ -1874,12 +1888,12 @@ class AIEthicsApp {
       }
 
       AppDebug.log(
-        `Educational modules connected to simulation: ${simulation.id || 'unknown'}`
+        `Educational modules connected to simulation: ${simulation.id || "unknown"}`,
       );
     } catch (error) {
       AppDebug.error(
-        'Failed to connect educational modules to simulation:',
-        error
+        "Failed to connect educational modules to simulation:",
+        error,
       );
       // Non-critical error - simulation can still function without full integration
     }
@@ -1888,8 +1902,8 @@ class AIEthicsApp {
   setupUI() {
     // Check if we're on the main app page (not the landing page)
     const isAppPage =
-      window.location.pathname.includes('app.html') ||
-      document.querySelector('.categories-grid') !== null;
+      window.location.pathname.includes("app.html") ||
+      document.querySelector(".categories-grid") !== null;
 
     if (!isAppPage) {
       // We're on the landing page, skip UI setup
@@ -1897,13 +1911,13 @@ class AIEthicsApp {
     }
 
     // Get key UI elements
-    this.modal = document.getElementById('simulation-modal');
-    this.simulationContainer = document.getElementById('simulation-container');
-    this.categoriesGrid = document.querySelector('.categories-grid');
-    this.loading = document.getElementById('loading');
+    this.modal = document.getElementById("simulation-modal");
+    this.simulationContainer = document.getElementById("simulation-container");
+    this.categoriesGrid = document.querySelector(".categories-grid");
+    this.loading = document.getElementById("loading");
 
     if (!this.categoriesGrid) {
-      AppDebug.error('Categories grid not found');
+      AppDebug.error("Categories grid not found");
       return;
     }
 
@@ -1916,11 +1930,11 @@ class AIEthicsApp {
    */
   initializeMainGrid() {
     try {
-      AppDebug.log('Attempting to initialize MainGrid...');
+      AppDebug.log("Attempting to initialize MainGrid...");
       this.categoryGrid = new MainGrid();
-      AppDebug.log('Main grid initialized successfully');
+      AppDebug.log("Main grid initialized successfully");
     } catch (error) {
-      AppDebug.error('Failed to initialize main grid:', error);
+      AppDebug.error("Failed to initialize main grid:", error);
       // Fallback to legacy simulation loading if category grid fails
       this.loadLegacySimulations();
     }
@@ -1930,7 +1944,7 @@ class AIEthicsApp {
    * Fallback method for legacy simulation loading
    */
   loadLegacySimulations() {
-    AppDebug.log('Loading legacy simulation cards as fallback');
+    AppDebug.log("Loading legacy simulation cards as fallback");
     // This will be populated with existing simulation loading logic if needed
     // For now, just log that we're in fallback mode
   }
@@ -1938,7 +1952,7 @@ class AIEthicsApp {
   async loadSimulations() {
     // Simulations are loaded dynamically in createSimulationInstance()
     // Store available simulation configs in the simulations Map
-    this.availableSimulations.forEach(simConfig => {
+    this.availableSimulations.forEach((simConfig) => {
       this.simulations.set(simConfig.id, simConfig);
     });
   }
@@ -1950,7 +1964,7 @@ class AIEthicsApp {
   async initializeHeroDemo() {
     // The HeroDemo class is designed for a different hero layout
     // that's not currently implemented. The radar chart demo is working fine.
-    logger.info('Hero demo: Using radar chart demo instead of HeroDemo class');
+    logger.info("Hero demo: Using radar chart demo instead of HeroDemo class");
   }
 
   /**
@@ -1960,9 +1974,9 @@ class AIEthicsApp {
     try {
       // Enhanced objects are loaded dynamically when needed
       // This method is kept for future initialization if needed
-      logger.info('Enhanced objects system ready for dynamic loading');
+      logger.info("Enhanced objects system ready for dynamic loading");
     } catch (error) {
-      logger.error('Failed to initialize enhanced objects:', error);
+      logger.error("Failed to initialize enhanced objects:", error);
       // Non-critical error - app can continue with basic functionality
     }
   }
@@ -1978,9 +1992,9 @@ class AIEthicsApp {
       // Store reference for cleanup
       this.modalFooterManager.app = this;
 
-      logger.info('Modal footer manager initialized successfully');
+      logger.info("Modal footer manager initialized successfully");
     } catch (error) {
-      logger.error('Failed to initialize modal footer manager:', error);
+      logger.error("Failed to initialize modal footer manager:", error);
       // Non-critical error - modals will still work with basic functionality
     }
   }
@@ -1991,19 +2005,19 @@ class AIEthicsApp {
   async initializeEthicsRadarDemo() {
     try {
       // Only initialize if the hero demo container exists
-      const demoContainer = document.getElementById('hero-ethics-chart');
+      const demoContainer = document.getElementById("hero-ethics-chart");
       if (demoContainer) {
         // Initialize the ethics radar demo
         ethicsDemo = new EthicsRadarDemo();
 
-        logger.info('Ethics radar demo initialized successfully');
+        logger.info("Ethics radar demo initialized successfully");
       } else {
         logger.warn(
-          'Hero ethics chart container not found, skipping radar demo initialization'
+          "Hero ethics chart container not found, skipping radar demo initialization",
         );
       }
     } catch (error) {
-      logger.error('Failed to initialize ethics radar demo:', error);
+      logger.error("Failed to initialize ethics radar demo:", error);
       // Non-critical error - the demo is optional
     }
   }
@@ -2013,74 +2027,74 @@ class AIEthicsApp {
     this.setupSurpriseMe();
 
     // Hero section buttons
-    const startLearningBtn = document.getElementById('start-learning');
+    const startLearningBtn = document.getElementById("start-learning");
 
     if (startLearningBtn) {
-      startLearningBtn.addEventListener('click', () => {
+      startLearningBtn.addEventListener("click", () => {
         this.scrollToSimulations();
       });
     }
 
     // Debug: Test scenario modal button
-    const testScenarioBtn = document.getElementById('test-scenario-modal');
+    const testScenarioBtn = document.getElementById("test-scenario-modal");
     if (testScenarioBtn) {
-      testScenarioBtn.addEventListener('click', () => {
+      testScenarioBtn.addEventListener("click", () => {
         this.testScenarioModal();
       });
     }
 
     // Modal controls
     if (this.modal) {
-      const closeBtn = this.modal.querySelector('.modal-close');
-      const resetBtn = document.getElementById('reset-simulation');
-      const nextBtn = document.getElementById('next-scenario');
+      const closeBtn = this.modal.querySelector(".modal-close");
+      const resetBtn = document.getElementById("reset-simulation");
+      const nextBtn = document.getElementById("next-scenario");
 
       if (closeBtn) {
-        closeBtn.addEventListener('click', () => this.closeSimulation());
+        closeBtn.addEventListener("click", () => this.closeSimulation());
 
         // Add focus trapping to the modal
-        this.modal.addEventListener('keydown', e => {
-          if (e.key === 'Tab') {
+        this.modal.addEventListener("keydown", (e) => {
+          if (e.key === "Tab") {
             this.trapFocusInModal(e);
           }
         });
       }
 
       if (resetBtn) {
-        resetBtn.addEventListener('click', () => this.resetCurrentSimulation());
+        resetBtn.addEventListener("click", () => this.resetCurrentSimulation());
       }
 
       if (nextBtn) {
-        nextBtn.addEventListener('click', () => this.nextScenario());
+        nextBtn.addEventListener("click", () => this.nextScenario());
       }
 
       // Close modal on backdrop click
-      this.modal.addEventListener('click', e => {
+      this.modal.addEventListener("click", (e) => {
         if (e.target === this.modal) {
           this.closeSimulation();
         }
       });
 
       // Close modal on Escape key
-      document.addEventListener('keydown', e => {
-        if (e.key === 'Escape' && !this.modal.hasAttribute('aria-hidden')) {
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !this.modal.hasAttribute("aria-hidden")) {
           this.closeSimulation();
         }
       });
     }
 
     // Enhanced simulation card buttons (delegated event handling)
-    document.addEventListener('click', e => {
-      if (e.target.classList.contains('enhanced-sim-button')) {
+    document.addEventListener("click", (e) => {
+      if (e.target.classList.contains("enhanced-sim-button")) {
         e.preventDefault();
-        const simulationId = e.target.getAttribute('data-simulation');
+        const simulationId = e.target.getAttribute("data-simulation");
         if (simulationId) {
           // Learning Lab button - go through pre-launch modal
           this.startSimulation.call(this, simulationId);
         }
-      } else if (e.target.classList.contains('simulation-quick-start-btn')) {
+      } else if (e.target.classList.contains("simulation-quick-start-btn")) {
         e.preventDefault();
-        const simulationId = e.target.getAttribute('data-simulation');
+        const simulationId = e.target.getAttribute("data-simulation");
         if (simulationId) {
           // Quick start button - skip pre-launch modal
           this.launchSimulationDirect.call(this, simulationId);
@@ -2099,13 +2113,13 @@ class AIEthicsApp {
 
     // Check if user has completed the tour
     if (this.onboardingTour.hasCompletedTour()) {
-      AppDebug.log('User has already completed onboarding tour');
+      AppDebug.log("User has already completed onboarding tour");
       return;
     }
 
     // Check if this is a first-time visit
     if (this.onboardingTour.isFirstTimeVisit()) {
-      AppDebug.log('First-time visit detected, starting onboarding tour');
+      AppDebug.log("First-time visit detected, starting onboarding tour");
       // Small delay to ensure all UI is ready
       const UI_READY_DELAY = 500; // ms
       setTimeout(() => {
@@ -2120,11 +2134,11 @@ class AIEthicsApp {
   startOnboardingTour() {
     // Check if we're on the app page
     const isAppPage =
-      window.location.pathname.includes('app.html') ||
-      document.querySelector('.categories-grid') !== null;
+      window.location.pathname.includes("app.html") ||
+      document.querySelector(".categories-grid") !== null;
 
     if (!isAppPage) {
-      AppDebug.warn('Cannot start onboarding tour - not on app page');
+      AppDebug.warn("Cannot start onboarding tour - not on app page");
       return;
     }
 
@@ -2137,10 +2151,10 @@ class AIEthicsApp {
     }
 
     // Clear localStorage to force tour to start
-    localStorage.removeItem('has_visited');
-    localStorage.removeItem('tour_completed');
+    localStorage.removeItem("has_visited");
+    localStorage.removeItem("tour_completed");
 
-    AppDebug.log('Manually starting onboarding tour');
+    AppDebug.log("Manually starting onboarding tour");
     this.onboardingTour.startTour(1);
   }
 
@@ -2161,19 +2175,19 @@ class AIEthicsApp {
   renderSimulationsGrid() {
     if (!this.categoriesGrid) return;
 
-    this.categoriesGrid.innerHTML = '';
+    this.categoriesGrid.innerHTML = "";
 
-    this.availableSimulations.forEach(sim => {
+    this.availableSimulations.forEach((sim) => {
       const card = this.createSimulationCard(sim);
       this.categoriesGrid.appendChild(card);
     });
   }
 
   createSimulationCard(simulation) {
-    const card = Helpers.createElement('div', 'simulation-card', {
-      role: 'gridcell',
-      tabindex: '0',
-      'aria-label': `${simulation.title} simulation`,
+    const card = Helpers.createElement("div", "simulation-card", {
+      role: "gridcell",
+      tabindex: "0",
+      "aria-label": `${simulation.title} simulation`,
     });
 
     const progress = userProgress.getSimulationProgress(simulation.id);
@@ -2183,7 +2197,7 @@ class AIEthicsApp {
     card.innerHTML = `
             <div class="card-thumbnail">
                 <img src="${simulation.thumbnail}" alt="${simulation.title}" onerror="this.src='src/assets/images/default-thumb.svg'">
-                ${isCompleted ? '<div class="completion-badge">✓</div>' : ''}
+                ${isCompleted ? '<div class="completion-badge">✓</div>' : ""}
             </div>
             
             <div class="card-content">
@@ -2196,7 +2210,7 @@ class AIEthicsApp {
                 </div>
                 
                 <div class="card-tags">
-                    ${simulation.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    ${simulation.tags.map((tag) => `<span class="tag">${tag}</span>`).join("")}
                 </div>
                 
                 ${
@@ -2207,30 +2221,30 @@ class AIEthicsApp {
                         <span class="grade">${Helpers.getEthicsGrade(score).grade}</span>
                     </div>
                 `
-                    : ''
+                    : ""
                 }
                   <div class="card-actions">
                     <button class="btn btn-primary enhanced-sim-button" data-simulation="${simulation.id}">
                         Learning Lab Simulation
                     </button>
                     <button class="btn btn-secondary simulation-quick-start-btn" data-simulation="${simulation.id}">
-                        ${isCompleted ? 'Retry' : 'Start'} Simulation
+                        ${isCompleted ? "Retry" : "Start"} Simulation
                     </button>
                 </div>
             </div>
         `;
 
     // Add hover and focus effects
-    card.addEventListener('mouseenter', () => {
-      card.style.transform = 'translateY(-2px)';
+    card.addEventListener("mouseenter", () => {
+      card.style.transform = "translateY(-2px)";
     });
 
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = 'translateY(0)';
+    card.addEventListener("mouseleave", () => {
+      card.style.transform = "translateY(0)";
     });
 
-    card.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         this.startSimulation(simulation.id);
       }
@@ -2245,9 +2259,9 @@ class AIEthicsApp {
   async startSimulation(simulationId) {
     try {
       // Verify 'this' context is correct
-      if (!this || typeof this.showNotification !== 'function') {
+      if (!this || typeof this.showNotification !== "function") {
         throw new Error(
-          'App context not properly bound. startSimulation called with wrong context.'
+          "App context not properly bound. startSimulation called with wrong context.",
         );
       }
 
@@ -2263,22 +2277,22 @@ class AIEthicsApp {
       // Direct launch (skipping pre-launch modal)
       await this.launchSimulationDirect(simulationId);
     } catch (error) {
-      AppDebug.error('Failed to start simulation:', error);
+      AppDebug.error("Failed to start simulation:", error);
       this.hideLoading();
 
       // Use fallback notification if this.showNotification is not available
-      if (typeof this.showNotification === 'function') {
+      if (typeof this.showNotification === "function") {
         this.showNotification(
-          'Failed to start simulation. Please try again.',
-          'error'
+          "Failed to start simulation. Please try again.",
+          "error",
         );
       } else {
         // Fallback to logger and direct notification system
-        logger.error('Failed to start simulation:', error.message);
+        logger.error("Failed to start simulation:", error.message);
         if (window.NotificationToast) {
           window.NotificationToast.show({
-            type: 'error',
-            message: 'Failed to start simulation. Please try again.',
+            type: "error",
+            message: "Failed to start simulation. Please try again.",
             duration: 5000,
             closable: true,
           });
@@ -2289,25 +2303,37 @@ class AIEthicsApp {
 
   /**
    * Shows the pre-launch information modal
+   * Updated to use JSON SSOT configuration system
    */
-  showPreLaunchModal(simulationId) {
-    logger.debug('Showing pre-launch modal for:', simulationId);
+  async showPreLaunchModal(simulationId) {
+    logger.debug("Showing pre-launch modal for:", simulationId);
 
-    const prelaunchModal = new PreLaunchModal(simulationId, {
-      onLaunch: id => {
-        logger.debug('Pre-launch modal onLaunch called with:', id);
-        // User clicked "Start Exploration" - proceed with simulation
-        this.launchSimulationDirect(id || simulationId);
-      },
-      onCancel: () => {
-        logger.debug('Pre-launch modal cancelled');
-        // User clicked "Maybe Later" - just close modal
-        this.hideLoading();
-      },
-      showEducatorResources: true, // Always show educator resources
-    });
+    try {
+      // Get configured component instead of direct instantiation
+      const prelaunchModal = await appStartup.getComponent(
+        "pre-launch-modal",
+        simulationId,
+        {
+          onLaunch: (id) => {
+            logger.debug("Pre-launch modal onLaunch called with:", id);
+            // User clicked "Start Exploration" - proceed with simulation
+            this.launchSimulationDirect(id || simulationId);
+          },
+          onCancel: () => {
+            logger.debug("Pre-launch modal cancelled");
+            // User clicked "Maybe Later" - just close modal
+            this.hideLoading();
+          },
+          showEducatorResources: true, // Always show educator resources
+        },
+      );
 
-    prelaunchModal.show();
+      prelaunchModal.show();
+    } catch (error) {
+      logger.error("Failed to show pre-launch modal:", error);
+      // Fallback to direct launch
+      this.launchSimulationDirect(simulationId);
+    }
   }
 
   /**
@@ -2342,29 +2368,29 @@ class AIEthicsApp {
       // Track simulation start
       simpleAnalytics.trackSimulationStart(simulationId, simConfig.title); // Get simulation container
       const simulationContainer = document.getElementById(
-        'simulation-container'
+        "simulation-container",
       );
       if (!simulationContainer) {
-        throw new Error('Simulation container not found');
+        throw new Error("Simulation container not found");
       }
 
       // Add loading state to container
-      simulationContainer.classList.add('loading');
-      simulationContainer.setAttribute('aria-busy', 'true');
+      simulationContainer.classList.add("loading");
+      simulationContainer.setAttribute("aria-busy", "true");
       simulationContainer.setAttribute(
-        'aria-label',
-        `Loading ${simConfig.title} simulation`
+        "aria-label",
+        `Loading ${simConfig.title} simulation`,
       );
 
       // Clear previous content and remove any error states
-      simulationContainer.innerHTML = '';
-      simulationContainer.classList.remove('error');
+      simulationContainer.innerHTML = "";
+      simulationContainer.classList.remove("error");
       // Create managed canvas for the simulation
       const { canvas, id } = await canvasManager.createCanvas({
         width: 600,
         height: 400,
         container: simulationContainer,
-        className: 'simulation-canvas',
+        className: "simulation-canvas",
         id: `simulation-${simulationId}`,
       });
 
@@ -2372,7 +2398,7 @@ class AIEthicsApp {
       this.currentSimulationCanvasId = id;
 
       // Check if simulation needs canvas or is HTML-only
-      if (simConfig.useCanvas !== false && simConfig.renderMode !== 'html') {
+      if (simConfig.useCanvas !== false && simConfig.renderMode !== "html") {
         // Apply responsive styling to canvas
         canvas.style.cssText = `
                     max-width: 100%;
@@ -2386,7 +2412,7 @@ class AIEthicsApp {
 
         // Create visual engine using canvas manager
         this.engine = await canvasManager.createVisualEngine(id, {
-          renderMode: 'canvas',
+          renderMode: "canvas",
           accessibility: true,
           debug: false,
           width: 600,
@@ -2399,8 +2425,8 @@ class AIEthicsApp {
         // For HTML-only simulations, create a simple mock engine with just the container
         this.engine = {
           container: simulationContainer,
-          type: 'html',
-          renderMode: 'html',
+          type: "html",
+          renderMode: "html",
           start: () => {
             // Mock engine started for HTML simulation
           },
@@ -2421,11 +2447,11 @@ class AIEthicsApp {
       // Create the specific simulation instance
       this.currentSimulation = await this.createSimulationInstance(
         simulationId,
-        simConfig
+        simConfig,
       );
 
       if (!this.currentSimulation) {
-        throw new Error('Failed to create simulation instance');
+        throw new Error("Failed to create simulation instance");
       }
 
       // Initialize the simulation
@@ -2445,30 +2471,30 @@ class AIEthicsApp {
       this.hideLoading();
       // Remove loading state from container
       if (simulationContainer) {
-        simulationContainer.classList.remove('loading');
-        simulationContainer.removeAttribute('aria-busy');
+        simulationContainer.classList.remove("loading");
+        simulationContainer.removeAttribute("aria-busy");
         simulationContainer.setAttribute(
-          'aria-label',
-          `${simConfig.title} simulation`
+          "aria-label",
+          `${simConfig.title} simulation`,
         );
       }
 
-      logger.debug('Simulation launched successfully');
+      logger.debug("Simulation launched successfully");
     } catch (error) {
-      AppDebug.error('Failed to start simulation:', error);
+      AppDebug.error("Failed to start simulation:", error);
       this.hideLoading();
 
       // Add error state to container
       const simulationContainer = document.getElementById(
-        'simulation-container'
+        "simulation-container",
       );
       if (simulationContainer) {
-        simulationContainer.classList.remove('loading');
-        simulationContainer.classList.add('error');
-        simulationContainer.removeAttribute('aria-busy');
+        simulationContainer.classList.remove("loading");
+        simulationContainer.classList.add("error");
+        simulationContainer.removeAttribute("aria-busy");
         simulationContainer.setAttribute(
-          'aria-label',
-          'Simulation failed to load'
+          "aria-label",
+          "Simulation failed to load",
         );
         simulationContainer.innerHTML = `
                     <div style="text-align: center; padding: 2rem;">
@@ -2479,7 +2505,7 @@ class AIEthicsApp {
                 `;
       }
 
-      this.showError('Failed to start the simulation. Please try again.');
+      this.showError("Failed to start the simulation. Please try again.");
     }
   }
 
@@ -2493,24 +2519,24 @@ class AIEthicsApp {
           // Fallback to basic simulation for unimplemented simulations
           const basicScenarios = [
             {
-              id: 'intro',
-              title: 'Introduction',
+              id: "intro",
+              title: "Introduction",
               description:
-                'Welcome to this open-ended exploration of AI ethics',
+                "Welcome to this open-ended exploration of AI ethics",
               objective:
-                'Explore different perspectives and discover consequences of choices',
+                "Explore different perspectives and discover consequences of choices",
             },
             {
-              id: 'decision1',
-              title: 'First Decision',
-              description: 'Make your first ethical choice',
-              objective: 'Choose the most ethical option',
+              id: "decision1",
+              title: "First Decision",
+              description: "Make your first ethical choice",
+              objective: "Choose the most ethical option",
             },
             {
-              id: 'conclusion',
-              title: 'Conclusion',
-              description: 'Reflect on your decisions',
-              objective: 'Review your ethical choices',
+              id: "conclusion",
+              title: "Conclusion",
+              description: "Reflect on your decisions",
+              objective: "Review your ethical choices",
             },
           ];
 
@@ -2522,18 +2548,18 @@ class AIEthicsApp {
             scenarios: basicScenarios,
             ethicsMetrics: [
               {
-                name: 'fairness',
-                label: 'Fairness',
+                name: "fairness",
+                label: "Fairness",
                 value: APP_CONSTANTS.DEFAULTS.ETHICS_METER_VALUE,
               },
               {
-                name: 'transparency',
-                label: 'Transparency',
+                name: "transparency",
+                label: "Transparency",
                 value: APP_CONSTANTS.DEFAULTS.ETHICS_METER_VALUE,
               },
               {
-                name: 'privacy',
-                label: 'Privacy',
+                name: "privacy",
+                label: "Privacy",
                 value: APP_CONSTANTS.DEFAULTS.ETHICS_METER_VALUE,
               },
             ],
@@ -2541,7 +2567,7 @@ class AIEthicsApp {
 
           // Set container reference
           simulation.container = document.getElementById(
-            'simulation-container'
+            "simulation-container",
           );
           break;
         }
@@ -2562,16 +2588,16 @@ class AIEthicsApp {
   setupSimulationEventListeners() {
     if (!this.currentSimulation) return;
 
-    this.currentSimulation.on('simulation:completed', data => {
+    this.currentSimulation.on("simulation:completed", (data) => {
       this.onSimulationCompleted(data);
     });
 
-    this.currentSimulation.on('ethics:updated', data => {
+    this.currentSimulation.on("ethics:updated", (data) => {
       // Handle ethics updates
-      AppDebug.log('Ethics updated:', data);
+      AppDebug.log("Ethics updated:", data);
     });
 
-    this.currentSimulation.on('scenario:loaded', data => {
+    this.currentSimulation.on("scenario:loaded", (data) => {
       // Update UI for new scenario
       this.updateModalTitle(data.scenario.title);
     });
@@ -2581,23 +2607,23 @@ class AIEthicsApp {
    * Handle simulation completion - show post-simulation modal
    */
   onSimulationCompleted(data) {
-    AppDebug.log('Simulation completed:', data);
+    AppDebug.log("Simulation completed:", data);
 
     try {
       // Close the enhanced simulation modal first
       const enhancedModal = document.querySelector(
-        '.enhanced-simulation-modal'
+        ".enhanced-simulation-modal",
       );
       if (enhancedModal) {
-        enhancedModal.style.display = 'none';
-        enhancedModal.setAttribute('aria-hidden', 'true');
+        enhancedModal.style.display = "none";
+        enhancedModal.setAttribute("aria-hidden", "true");
       }
 
       // Track simulation completion
       if (this.currentSimulation && this.currentSimulation.id) {
         simpleAnalytics.trackSimulationComplete(
           this.currentSimulation.id,
-          data
+          data,
         );
 
         // Save simulation completion to Firestore
@@ -2605,31 +2631,31 @@ class AIEthicsApp {
           this.authService
             .saveScenarioCompletion({
               scenarioId: this.currentSimulation.id,
-              categoryId: this.currentSimulation.category || 'unknown',
+              categoryId: this.currentSimulation.category || "unknown",
               selectedOption: data.selectedOption || null,
-              optionText: data.optionText || '',
+              optionText: data.optionText || "",
               impact: data.impact || {},
               simulationData: data,
             })
-            .then(result => {
+            .then((result) => {
               if (result.success) {
                 AppDebug.log(
-                  'Simulation completion saved to Firestore:',
-                  result
+                  "Simulation completion saved to Firestore:",
+                  result,
                 );
               } else if (
-                result.reason !== 'not_authenticated_or_no_firestore'
+                result.reason !== "not_authenticated_or_no_firestore"
               ) {
                 AppDebug.warn(
-                  'Failed to save simulation completion to Firestore:',
-                  result.error
+                  "Failed to save simulation completion to Firestore:",
+                  result.error,
                 );
               }
             })
-            .catch(error => {
+            .catch((error) => {
               AppDebug.warn(
-                'Error saving simulation completion to Firestore:',
-                error
+                "Error saving simulation completion to Firestore:",
+                error,
               );
             });
         }
@@ -2638,12 +2664,12 @@ class AIEthicsApp {
       // Show post-simulation modal
       this.showPostSimulationModal(data);
     } catch (error) {
-      AppDebug.error('Error handling simulation completion:', error);
+      AppDebug.error("Error handling simulation completion:", error);
       // Fallback to basic completion handling
       this.hideModal();
       this.showNotification(
-        'Simulation completed! Thank you for exploring AI Ethics.',
-        'success'
+        "Simulation completed! Thank you for exploring AI Ethics.",
+        "success",
       );
     }
   }
@@ -2652,7 +2678,7 @@ class AIEthicsApp {
    * Show the post-simulation reflection modal
    */
   showPostSimulationModal(data) {
-    const simulationId = this.currentSimulation?.id || 'unknown';
+    const simulationId = this.currentSimulation?.id || "unknown";
 
     const postModal = new PostSimulationModal(simulationId, {
       sessionData: data,
@@ -2660,8 +2686,8 @@ class AIEthicsApp {
         // User finished reflection - close modal and return to main view
         this.hideModal();
         this.showNotification(
-          'Thank you for your thoughtful reflection!',
-          'success'
+          "Thank you for your thoughtful reflection!",
+          "success",
         );
       },
       onSkip: () => {
@@ -2682,19 +2708,19 @@ class AIEthicsApp {
    * Show the enhanced simulation modal for the active simulation
    */
   showEnhancedSimulationModal(simulationId, simConfig) {
-    AppDebug.log('Showing enhanced simulation modal for:', simulationId);
+    AppDebug.log("Showing enhanced simulation modal for:", simulationId);
 
     try {
       // Configure modal options based on simulation type
       const modalOptions = {
         simulation: this.currentSimulation,
         onClose: () => {
-          AppDebug.log('Enhanced modal closed');
+          AppDebug.log("Enhanced modal closed");
           this.enhancedModal = null;
           this.hideModal();
         },
         onMinimize: () => {
-          AppDebug.log('Enhanced modal minimized');
+          AppDebug.log("Enhanced modal minimized");
           // Keep simulation running but minimize UI
         },
       };
@@ -2703,7 +2729,7 @@ class AIEthicsApp {
 
       this.enhancedModal = new EnhancedSimulationModal(
         simulationId,
-        modalOptions
+        modalOptions,
       );
 
       this.enhancedModal.show();
@@ -2712,11 +2738,11 @@ class AIEthicsApp {
       setTimeout(() => {
         const enhancedContainer = this.enhancedModal.getSimulationContainer();
         if (enhancedContainer && this.currentSimulation) {
-          AppDebug.log('Moving simulation to enhanced modal container');
+          AppDebug.log("Moving simulation to enhanced modal container");
 
           // Get the original simulation container content
           const originalContainer = document.getElementById(
-            'simulation-container'
+            "simulation-container",
           );
           if (originalContainer) {
             // Move all content from original container to enhanced container
@@ -2742,7 +2768,7 @@ class AIEthicsApp {
         }
       }, 100); // Small delay to ensure modal is fully created
     } catch (error) {
-      AppDebug.error('Failed to show enhanced simulation modal:', error);
+      AppDebug.error("Failed to show enhanced simulation modal:", error);
       // Fallback to basic modal
       this.showSimulationModal(simConfig);
     }
@@ -2751,7 +2777,7 @@ class AIEthicsApp {
   showSimulationModal(simConfig) {
     if (!this.modal) return;
 
-    const title = this.modal.querySelector('#modal-title');
+    const title = this.modal.querySelector("#modal-title");
     if (title) {
       title.textContent = simConfig.title;
     }
@@ -2760,19 +2786,19 @@ class AIEthicsApp {
     this.lastFocusedElement = document.activeElement;
 
     // Remove inert from modal and set aria-hidden to false
-    this.modal.removeAttribute('inert');
-    this.modal.setAttribute('aria-hidden', 'false');
-    this.modal.style.display = 'flex';
+    this.modal.removeAttribute("inert");
+    this.modal.setAttribute("aria-hidden", "false");
+    this.modal.style.display = "flex";
 
     // Add visible class for CSS opacity transition
     requestAnimationFrame(() => {
-      this.modal.classList.add('visible');
+      this.modal.classList.add("visible");
     });
 
     // Make background content inert
-    const mainContent = document.getElementById('main-content');
+    const mainContent = document.getElementById("main-content");
     if (mainContent) {
-      mainContent.setAttribute('inert', '');
+      mainContent.setAttribute("inert", "");
     }
 
     // Focus management - create focus trap for modal
@@ -2788,7 +2814,7 @@ class AIEthicsApp {
   trapFocusInModal(event) {
     // This is now handled by the focus manager
     // Keep method for backward compatibility but delegate to focus manager
-    if (this.modalFocusTrap && event.key === 'Tab') {
+    if (this.modalFocusTrap && event.key === "Tab") {
       // Focus manager handles this automatically
       return;
     }
@@ -2814,7 +2840,7 @@ class AIEthicsApp {
       this.simulationSlidersCanvasId,
     ];
 
-    canvasesToCleanup.forEach(canvasId => {
+    canvasesToCleanup.forEach((canvasId) => {
       if (canvasId) {
         canvasManager.removeCanvas(canvasId);
       }
@@ -2834,22 +2860,22 @@ class AIEthicsApp {
       }
 
       // Make modal inert and hide it
-      this.modal.setAttribute('inert', '');
-      this.modal.setAttribute('aria-hidden', 'true');
-      this.modal.classList.remove('visible');
-      this.modal.style.display = 'none';
+      this.modal.setAttribute("inert", "");
+      this.modal.setAttribute("aria-hidden", "true");
+      this.modal.classList.remove("visible");
+      this.modal.style.display = "none";
 
       // Remove inert from main content
-      const mainContent = document.getElementById('main-content');
+      const mainContent = document.getElementById("main-content");
       if (mainContent) {
-        mainContent.removeAttribute('inert');
+        mainContent.removeAttribute("inert");
       }
     } // Clear simulation container
     if (this.simulationContainer) {
-      this.simulationContainer.innerHTML = '';
-      this.simulationContainer.classList.remove('loading', 'error');
-      this.simulationContainer.removeAttribute('aria-busy');
-      this.simulationContainer.removeAttribute('aria-label');
+      this.simulationContainer.innerHTML = "";
+      this.simulationContainer.classList.remove("loading", "error");
+      this.simulationContainer.removeAttribute("aria-busy");
+      this.simulationContainer.removeAttribute("aria-label");
     }
   }
 
@@ -2867,8 +2893,8 @@ class AIEthicsApp {
    */
   showLoading() {
     if (this.loading) {
-      this.loading.style.display = 'flex';
-      this.loading.setAttribute('aria-hidden', 'false');
+      this.loading.style.display = "flex";
+      this.loading.setAttribute("aria-hidden", "false");
     }
   }
 
@@ -2877,8 +2903,8 @@ class AIEthicsApp {
    */
   hideLoading() {
     if (this.loading) {
-      this.loading.style.display = 'none';
-      this.loading.setAttribute('aria-hidden', 'true');
+      this.loading.style.display = "none";
+      this.loading.setAttribute("aria-hidden", "true");
     }
   }
 
@@ -2901,7 +2927,7 @@ class AIEthicsApp {
   async populateEnhancedModalData(simulationId) {
     try {
       // Import simulation data
-      const { simulationData } = await import('./data/simulation-info.js');
+      const { simulationData } = await import("./data/simulation-info.js");
       const simData = simulationData[simulationId];
 
       if (!simData) {
@@ -2918,7 +2944,7 @@ class AIEthicsApp {
       // Populate quick resources panel
       this.populateQuickResourcesPanel(simData);
     } catch (error) {
-      AppDebug.error('Failed to populate enhanced modal data:', error);
+      AppDebug.error("Failed to populate enhanced modal data:", error);
     }
   }
 
@@ -2932,49 +2958,49 @@ class AIEthicsApp {
     if (!modal) return;
 
     // Background reading
-    const readingContainer = modal.querySelector('#background-reading');
+    const readingContainer = modal.querySelector("#background-reading");
     if (readingContainer && simData.resources?.backgroundReading) {
       readingContainer.innerHTML = simData.resources.backgroundReading
         .map(
-          resource => `
+          (resource) => `
                 <div class="resource-item">
                     <a href="${resource.url}" target="_blank" class="resource-title">${resource.title}</a>
                     <p class="resource-description">${resource.description}</p>
                 </div>
-            `
+            `,
         )
-        .join('');
+        .join("");
     }
 
     // Related videos
-    const videosContainer = modal.querySelector('#related-videos');
+    const videosContainer = modal.querySelector("#related-videos");
     if (videosContainer && simData.resources?.videos) {
       videosContainer.innerHTML = simData.resources.videos
         .map(
-          video => `
+          (video) => `
                 <div class="resource-item">
                     <a href="${video.url}" target="_blank" class="resource-title">${video.title}</a>
                     <p class="resource-description">${video.description}</p>
                     <span class="resource-duration">${video.duration}</span>
                 </div>
-            `
+            `,
         )
-        .join('');
+        .join("");
     }
 
     // Discussion questions
-    const questionsContainer = modal.querySelector('#discussion-questions');
+    const questionsContainer = modal.querySelector("#discussion-questions");
     if (questionsContainer && simData.educatorResources?.discussionQuestions) {
       questionsContainer.innerHTML =
         simData.educatorResources.discussionQuestions
           .map(
-            question => `
+            (question) => `
                 <div class="resource-item">
                     <p class="discussion-question">${question}</p>
                 </div>
-            `
+            `,
           )
-          .join('');
+          .join("");
     }
   }
 
@@ -2988,7 +3014,7 @@ class AIEthicsApp {
     if (!modal) return;
 
     // Ethics explanation
-    const ethicsContainer = modal.querySelector('#ethics-explanation');
+    const ethicsContainer = modal.querySelector("#ethics-explanation");
     if (ethicsContainer && simData.vocabulary) {
       ethicsContainer.innerHTML = Object.entries(simData.vocabulary)
         .map(
@@ -2997,9 +3023,9 @@ class AIEthicsApp {
                     <h5>${term}</h5>
                     <p>${definition}</p>
                 </div>
-            `
+            `,
         )
-        .join('');
+        .join("");
     }
   }
 
@@ -3013,24 +3039,24 @@ class AIEthicsApp {
     if (!modal) return;
 
     // Quick concepts
-    const conceptsContainer = modal.querySelector('#quick-concepts');
+    const conceptsContainer = modal.querySelector("#quick-concepts");
     if (conceptsContainer && simData.vocabulary) {
       const MAX_QUICK_TERMS = 5;
       const keyTerms = Object.keys(simData.vocabulary).slice(
         0,
-        MAX_QUICK_TERMS
+        MAX_QUICK_TERMS,
       );
       conceptsContainer.innerHTML = keyTerms
         .map(
-          term => `
+          (term) => `
                 <li><a href="#" class="resource-link" data-term="${term}">${term}</a></li>
-            `
+            `,
         )
-        .join('');
+        .join("");
 
       // Add click handlers for terms
-      conceptsContainer.querySelectorAll('[data-term]').forEach(link => {
-        link.addEventListener('click', e => {
+      conceptsContainer.querySelectorAll("[data-term]").forEach((link) => {
+        link.addEventListener("click", (e) => {
           e.preventDefault();
           const {
             dataset: { term },
@@ -3050,8 +3076,8 @@ class AIEthicsApp {
     const NOTIFICATION_DURATION = 5000;
     this.showNotification(
       `${term}: ${definition}`,
-      'info',
-      NOTIFICATION_DURATION
+      "info",
+      NOTIFICATION_DURATION,
     );
   }
 
@@ -3062,7 +3088,7 @@ class AIEthicsApp {
    * @param {number} duration - Auto-dismiss duration in ms (optional)
    * @returns {string|null} - Toast ID or null if failed
    */
-  showNotification(message, type = 'info', duration = 5000) {
+  showNotification(message, type = "info", duration = 5000) {
     if (window.NotificationToast) {
       // Use the global notification toast instance
       return window.NotificationToast.show({
@@ -3086,14 +3112,14 @@ class AIEthicsApp {
     // The shared navigation component calls window.app.launchRandomScenario() when clicked
     // No need to add duplicate event listeners here
 
-    const surpriseMeBtn = document.getElementById('surprise-me-nav');
+    const surpriseMeBtn = document.getElementById("surprise-me-nav");
     if (surpriseMeBtn) {
       // Just verify the button exists for debugging
       AppDebug.log(
-        'Surprise Me button found - handled by shared navigation component'
+        "Surprise Me button found - handled by shared navigation component",
       );
     } else {
-      AppDebug.warn('Surprise Me button not found in DOM');
+      AppDebug.warn("Surprise Me button not found in DOM");
     }
   }
 
@@ -3101,7 +3127,7 @@ class AIEthicsApp {
    * Launches a random uncompleted scenario
    */
   launchRandomScenario() {
-    logger.debug('Surprise Me: launchRandomScenario called');
+    logger.debug("Surprise Me: launchRandomScenario called");
 
     // Debounce to prevent rapid successive calls
     const now = Date.now();
@@ -3110,8 +3136,8 @@ class AIEthicsApp {
     const SURPRISE_COOLDOWN = 2000; // 2 second cooldown between surprise actions
     if (now - this.lastSurpriseTime < SURPRISE_COOLDOWN) {
       logger.debug(
-        'Surprise Me action debounced - too soon after last request',
-        `Time since last: ${now - this.lastSurpriseTime}ms`
+        "Surprise Me action debounced - too soon after last request",
+        `Time since last: ${now - this.lastSurpriseTime}ms`,
       );
       return;
     }
@@ -3120,42 +3146,42 @@ class AIEthicsApp {
     // Refresh category grid progress to ensure we have latest state
     if (this.categoryGrid) {
       this.categoryGrid.userProgress = this.categoryGrid.loadUserProgress();
-      logger.debug('Surprise Me: Refreshed category grid progress');
+      logger.debug("Surprise Me: Refreshed category grid progress");
     }
 
     const randomScenario = this.getRandomUncompletedScenario();
 
     if (!randomScenario) {
-      logger.debug('Surprise Me: No uncompleted scenarios found');
+      logger.debug("Surprise Me: No uncompleted scenarios found");
       this.showNotification(
         "🎉 Congratulations! You've completed all scenarios! Try replaying your favorites.",
-        'success',
-        APP_CONSTANTS.TIMING.NOTIFICATION_DURATION
+        "success",
+        APP_CONSTANTS.TIMING.NOTIFICATION_DURATION,
       );
       return;
     }
 
     // Show notification about the selected scenario
     logger.debug(
-      'Surprise Me: Launching scenario:',
-      randomScenario.scenario.title
+      "Surprise Me: Launching scenario:",
+      randomScenario.scenario.title,
     );
     this.showNotification(
       `🎉 Surprise! Opening "${randomScenario.scenario.title}" from ${randomScenario.category.title}`,
-      'info',
-      APP_CONSTANTS.TIMING.NOTIFICATION_DURATION
+      "info",
+      APP_CONSTANTS.TIMING.NOTIFICATION_DURATION,
     );
 
     // Launch the scenario directly (skip pre-launch modal for surprise factor)
     if (this.categoryGrid) {
-      logger.debug('Surprise Me: Opening via mainGrid');
+      logger.debug("Surprise Me: Opening via mainGrid");
       this.categoryGrid.openScenarioModalDirect(
         randomScenario.category.id,
-        randomScenario.scenario.id
+        randomScenario.scenario.id,
       );
     } else {
       // Fallback if mainGrid is not available
-      logger.warn('MainGrid not available, redirecting to scenario');
+      logger.warn("MainGrid not available, redirecting to scenario");
       window.location.href = `#scenario-${randomScenario.scenario.id}`;
     }
   }
@@ -3164,8 +3190,8 @@ class AIEthicsApp {
    * Debug utility: Clear all progress for testing Surprise Me functionality
    */
   clearAllProgress() {
-    localStorage.removeItem('simulateai_category_progress');
-    logger.info('All progress cleared for testing');
+    localStorage.removeItem("simulateai_category_progress");
+    logger.info("All progress cleared for testing");
     if (this.categoryGrid) {
       this.categoryGrid.userProgress = {};
       this.categoryGrid.render();
@@ -3177,21 +3203,21 @@ class AIEthicsApp {
    */
   markSomeScenariosCompleted() {
     const progress = {
-      'trolley-problem': {
-        'autonomous-vehicle-split': true,
+      "trolley-problem": {
+        "autonomous-vehicle-split": true,
         // Leave tunnel-dilemma and bias-healthcare uncompleted
       },
-      'bias-fairness': {
-        'hiring-algorithm-bias': true,
+      "bias-fairness": {
+        "hiring-algorithm-bias": true,
         // Leave other scenarios uncompleted
       },
     };
 
     localStorage.setItem(
-      'simulateai_category_progress',
-      JSON.stringify(progress)
+      "simulateai_category_progress",
+      JSON.stringify(progress),
     );
-    logger.info('Some scenarios marked as completed for testing');
+    logger.info("Some scenarios marked as completed for testing");
 
     if (this.categoryGrid) {
       this.categoryGrid.userProgress = progress;
@@ -3204,26 +3230,26 @@ class AIEthicsApp {
    */
   debugShowAllContent() {
     const categories = getAllCategories();
-    logger.info('=== DEBUG: All Available Content ===');
-    logger.info('Total categories:', categories.length);
+    logger.info("=== DEBUG: All Available Content ===");
+    logger.info("Total categories:", categories.length);
 
-    categories.forEach(category => {
+    categories.forEach((category) => {
       const scenarios = getCategoryScenarios(category.id);
       logger.info(`Category: ${category.id} (${category.title})`);
       logger.info(
         `  Scenarios (${scenarios.length}):`,
-        scenarios.map(s => `${s.id} - ${s.title}`)
+        scenarios.map((s) => `${s.id} - ${s.title}`),
       );
     });
 
-    const progress = localStorage.getItem('simulateai_category_progress');
-    logger.info('Current progress:', progress ? JSON.parse(progress) : 'None');
+    const progress = localStorage.getItem("simulateai_category_progress");
+    logger.info("Current progress:", progress ? JSON.parse(progress) : "None");
 
     return {
       categories,
       totalScenarios: categories.reduce(
         (sum, cat) => sum + getCategoryScenarios(cat.id).length,
-        0
+        0,
       ),
     };
   }
@@ -3237,18 +3263,18 @@ class AIEthicsApp {
       lastModalOpenTime: this.categoryGrid?.lastModalOpenTime || 0,
       timeSinceLastModal: this.categoryGrid?.lastModalOpenTime
         ? Date.now() - this.categoryGrid.lastModalOpenTime
-        : 'N/A',
+        : "N/A",
       modalCooldown: this.categoryGrid?.modalOpenCooldown || 1000,
       visibleModalBackdrops: document.querySelectorAll(
-        '.modal-backdrop:not([aria-hidden="true"])'
+        '.modal-backdrop:not([aria-hidden="true"])',
       ).length,
       lastSurpriseTime: this.lastSurpriseTime || 0,
       timeSinceLastSurprise: this.lastSurpriseTime
         ? Date.now() - this.lastSurpriseTime
-        : 'N/A',
+        : "N/A",
     };
 
-    logger.info('=== DEBUG: Modal State ===', modalState);
+    logger.info("=== DEBUG: Modal State ===", modalState);
     return modalState;
   }
 
@@ -3260,26 +3286,26 @@ class AIEthicsApp {
     try {
       // Get all categories and their scenarios
       const allCategories = getAllCategories();
-      logger.debug('Surprise Me: Found categories:', allCategories.length);
+      logger.debug("Surprise Me: Found categories:", allCategories.length);
 
       // Load user progress (fresh from localStorage each time)
-      const stored = localStorage.getItem('simulateai_category_progress');
+      const stored = localStorage.getItem("simulateai_category_progress");
       const userProgress = stored ? JSON.parse(stored) : {};
-      logger.debug('Surprise Me: User progress:', userProgress);
+      logger.debug("Surprise Me: User progress:", userProgress);
 
       // Collect all uncompleted scenarios
       const uncompletedScenarios = [];
 
-      allCategories.forEach(category => {
+      allCategories.forEach((category) => {
         const scenarios = getCategoryScenarios(category.id);
         logger.debug(
-          `Surprise Me: Category ${category.id} has ${scenarios.length} scenarios`
+          `Surprise Me: Category ${category.id} has ${scenarios.length} scenarios`,
         );
 
-        scenarios.forEach(scenario => {
+        scenarios.forEach((scenario) => {
           const isCompleted = userProgress[category.id]?.[scenario.id] || false;
           logger.debug(
-            `Surprise Me: Scenario ${scenario.id} completed: ${isCompleted}`
+            `Surprise Me: Scenario ${scenario.id} completed: ${isCompleted}`,
           );
 
           if (!isCompleted) {
@@ -3292,34 +3318,34 @@ class AIEthicsApp {
       });
 
       logger.debug(
-        'Surprise Me: Found uncompleted scenarios:',
-        uncompletedScenarios.length
+        "Surprise Me: Found uncompleted scenarios:",
+        uncompletedScenarios.length,
       );
       logger.debug(
-        'Surprise Me: Uncompleted scenario list:',
-        uncompletedScenarios.map(s => `${s.category.id}/${s.scenario.id}`)
+        "Surprise Me: Uncompleted scenario list:",
+        uncompletedScenarios.map((s) => `${s.category.id}/${s.scenario.id}`),
       );
 
       // Return random uncompleted scenario
       if (uncompletedScenarios.length === 0) {
-        logger.debug('Surprise Me: All scenarios completed');
+        logger.debug("Surprise Me: All scenarios completed");
         return null; // All scenarios completed
       }
 
       const randomIndex = Math.floor(
-        Math.random() * uncompletedScenarios.length
+        Math.random() * uncompletedScenarios.length,
       );
       const selectedScenario = uncompletedScenarios[randomIndex];
       logger.debug(
-        'Surprise Me: Selected scenario:',
+        "Surprise Me: Selected scenario:",
         selectedScenario.scenario.id,
-        'from category:',
-        selectedScenario.category.id
+        "from category:",
+        selectedScenario.category.id,
       );
 
       return selectedScenario;
     } catch (error) {
-      logger.error('Failed to get random uncompleted scenario:', error);
+      logger.error("Failed to get random uncompleted scenario:", error);
       return null;
     }
   }
@@ -3333,15 +3359,15 @@ class AIEthicsApp {
   async scrollToSimulations() {
     try {
       // Ensure the target element exists before scrolling
-      const categoriesSection = document.getElementById('categories');
+      const categoriesSection = document.getElementById("categories");
       if (!categoriesSection) {
-        logger.warn('Categories section not found, cannot scroll');
+        logger.warn("Categories section not found, cannot scroll");
         return;
       }
 
       // Start scrolling immediately (don't wait for navigation state)
-      const scrollPromise = scrollManager.scrollToElement('#categories', {
-        behavior: 'smooth',
+      const scrollPromise = scrollManager.scrollToElement("#categories", {
+        behavior: "smooth",
         offset: 80,
         respectReducedMotion: true,
       });
@@ -3349,68 +3375,69 @@ class AIEthicsApp {
       // Set navigation active state with a small delay to ensure DOM is ready
       setTimeout(() => {
         if (window.sharedNav) {
-          window.sharedNav.setActivePage('simulation-hub');
+          window.sharedNav.setActivePage("simulation-hub");
         }
       }, 100);
 
       // Wait for scroll to complete
       await scrollPromise;
 
-      logger.info('Scrolled to Ethics Categories section');
+      logger.info("Scrolled to Ethics Categories section");
 
       // Track the navigation
-      simpleAnalytics.trackEvent('navigation_to_categories', {
-        source: 'start_learning_button',
-        target: 'ethics_categories',
-        method: 'smooth_scroll',
+      simpleAnalytics.trackEvent("navigation_to_categories", {
+        source: "start_learning_button",
+        target: "ethics_categories",
+        method: "smooth_scroll",
       });
 
       // Announce to screen readers for accessibility
       if (this.accessibilityManager) {
         this.accessibilityManager.announce(
-          'Navigated to Ethics Categories section',
-          false
+          "Navigated to Ethics Categories section",
+          false,
         );
       }
     } catch (error) {
-      logger.error('Failed to scroll to Ethics Categories:', error);
+      logger.error("Failed to scroll to Ethics Categories:", error);
 
       // Fallback: try basic scroll without smooth animation
       try {
-        const categoriesSection = document.getElementById('categories');
+        const categoriesSection = document.getElementById("categories");
         if (categoriesSection) {
-          categoriesSection.scrollIntoView({ block: 'start' });
-          logger.info('Used fallback scroll to Ethics Categories');
+          categoriesSection.scrollIntoView({ block: "start" });
+          logger.info("Used fallback scroll to Ethics Categories");
         }
       } catch (fallbackError) {
-        logger.error('Fallback scroll also failed:', fallbackError);
+        logger.error("Fallback scroll also failed:", fallbackError);
       }
     }
   }
 
   /**
    * Test scenario modal functionality (debug method)
+   * Updated to use JSON SSOT configuration system
    */
   async testScenarioModal() {
     try {
-      logger.info('Testing scenario modal with trolley problem scenario');
+      logger.info("Testing scenario modal with trolley problem scenario");
 
-      // Import and create scenario modal
-      const ScenarioModal = (await import('./components/scenario-modal.js'))
-        .default;
-      const scenarioModal = new ScenarioModal({ isTestMode: true });
+      // Get configured component instead of direct instantiation
+      const scenarioModal = await appStartup.getComponent("scenario-modal", {
+        isTestMode: true,
+      });
 
       // Open with the first trolley problem scenario in test mode
       await scenarioModal.open(
-        'autonomous-vehicle-split',
-        'trolley-problem',
-        true
+        "autonomous-vehicle-split",
+        "trolley-problem",
+        true,
       );
 
-      logger.info('Scenario modal test launched successfully (TEST MODE)');
+      logger.info("Scenario modal test launched successfully (TEST MODE)");
     } catch (error) {
-      logger.error('Failed to test scenario modal:', error);
-      this.showNotification('Failed to open test scenario modal', 'error');
+      logger.error("Failed to test scenario modal:", error);
+      this.showNotification("Failed to open test scenario modal", "error");
     }
   }
 
@@ -3420,11 +3447,11 @@ class AIEthicsApp {
   openEducatorTools() {
     // For now, we can scroll to simulations or open a modal with educator resources
     // This can be enhanced later with dedicated educator functionality
-    logger.info('Opening educator tools');
+    logger.info("Opening educator tools");
 
     // Track the event
-    simpleAnalytics.trackEvent('educator_tools_accessed', {
-      source: 'educator_guide_button',
+    simpleAnalytics.trackEvent("educator_tools_accessed", {
+      source: "educator_guide_button",
     });
 
     // For now, scroll to simulations as a placeholder
@@ -3437,10 +3464,10 @@ class AIEthicsApp {
   initializeLoopDetection() {
     // Only enable in development mode or when explicitly requested
     const isDevelopment =
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1' ||
-      window.location.protocol === 'file:' ||
-      window.location.search.includes('debug=true');
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1" ||
+      window.location.protocol === "file:" ||
+      window.location.search.includes("debug=true");
 
     if (isDevelopment) {
       // Enable the loop detector
@@ -3455,15 +3482,15 @@ class AIEthicsApp {
       }
 
       logger.info(
-        'InfiniteLoopDetector',
-        '🔧 Loop detection enabled for development'
+        "InfiniteLoopDetector",
+        "🔧 Loop detection enabled for development",
       );
     } else {
       // Disable in production
       loopDetector.setEnabled(false);
       logger.info(
-        'InfiniteLoopDetector',
-        '🔒 Loop detection disabled for production'
+        "InfiniteLoopDetector",
+        "🔒 Loop detection disabled for production",
       );
     }
   }
@@ -3473,13 +3500,13 @@ class AIEthicsApp {
    */
   instrumentOnboardingTour(tour) {
     const criticalMethods = [
-      'positionCoachMark',
-      'showStep',
-      'nextStep',
-      'handleAction',
+      "positionCoachMark",
+      "showStep",
+      "nextStep",
+      "handleAction",
     ];
 
-    criticalMethods.forEach(methodName => {
+    criticalMethods.forEach((methodName) => {
       if (tour[methodName]) {
         const original = tour[methodName];
         tour[methodName] = function (...args) {
@@ -3490,8 +3517,8 @@ class AIEthicsApp {
     });
 
     logger.info(
-      'InfiniteLoopDetector',
-      '📊 Instrumented OnboardingTour methods for monitoring'
+      "InfiniteLoopDetector",
+      "📊 Instrumented OnboardingTour methods for monitoring",
     );
   }
 
@@ -3501,12 +3528,12 @@ class AIEthicsApp {
   async initializeMCPIntegrations() {
     // Prevent duplicate initialization
     if (this.mcpInitialized) {
-      AppDebug.debug('MCP integrations already initialized, skipping');
+      AppDebug.debug("MCP integrations already initialized, skipping");
       return;
     }
 
     try {
-      AppDebug.log('Initializing MCP integrations...');
+      AppDebug.log("Initializing MCP integrations...");
 
       this.mcpManager = new MCPIntegrationManager(this);
       const mcpResult = await this.mcpManager.initializeIntegrations();
@@ -3514,15 +3541,15 @@ class AIEthicsApp {
       if (mcpResult.success) {
         this.mcpCapabilities = new Set(mcpResult.capabilities);
         this.mcpInitialized = true; // Mark as initialized
-        AppDebug.log('MCP integrations initialized:', mcpResult.capabilities);
+        AppDebug.log("MCP integrations initialized:", mcpResult.capabilities);
 
         // Enhance existing features with MCP capabilities
         await this.enhanceWithMCPCapabilities();
       } else {
-        AppDebug.warn('MCP integrations failed to initialize');
+        AppDebug.warn("MCP integrations failed to initialize");
       }
     } catch (error) {
-      AppDebug.error('Failed to initialize MCP integrations:', error);
+      AppDebug.error("Failed to initialize MCP integrations:", error);
       // Continue without MCP - app should still function
     }
   }
@@ -3535,23 +3562,23 @@ class AIEthicsApp {
 
     try {
       // Enhance scenario creation
-      if (this.mcpCapabilities.has('scenario_generation')) {
+      if (this.mcpCapabilities.has("scenario_generation")) {
         this.enhanceScenarioCreation();
       }
 
       // Enhance analytics
-      if (this.mcpCapabilities.has('enhanced_analytics')) {
+      if (this.mcpCapabilities.has("enhanced_analytics")) {
         this.enhanceAnalytics();
       }
 
       // Enhance content with real-world examples
-      if (this.mcpCapabilities.has('real_time_content')) {
+      if (this.mcpCapabilities.has("real_time_content")) {
         this.enhanceContentWithRealWorld();
       }
 
-      AppDebug.log('Existing features enhanced with MCP capabilities');
+      AppDebug.log("Existing features enhanced with MCP capabilities");
     } catch (error) {
-      AppDebug.error('Failed to enhance features with MCP:', error);
+      AppDebug.error("Failed to enhance features with MCP:", error);
     }
   }
 
@@ -3560,7 +3587,7 @@ class AIEthicsApp {
    */
   enhanceScenarioCreation() {
     // Add MCP-enhanced scenario creation to the platform
-    this.createEnhancedScenario = async scenarioConfig => {
+    this.createEnhancedScenario = async (scenarioConfig) => {
       return await this.mcpManager.createEnhancedScenario(scenarioConfig);
     };
   }
@@ -3583,11 +3610,11 @@ class AIEthicsApp {
   enhanceContentWithRealWorld() {
     // Add real-world context to scenarios
     this.addRealWorldContext = async (scenarioId, category) => {
-      const webResearch = this.mcpManager.integrations.get('webResearch');
+      const webResearch = this.mcpManager.integrations.get("webResearch");
       if (webResearch) {
         return await webResearch.enrichScenarioWithRealExamples(
           scenarioId,
-          category
+          category,
         );
       }
       return null;
@@ -3609,11 +3636,11 @@ class AIEthicsApp {
    */
   async initializeFirebaseServices() {
     try {
-      AppDebug.log('Initializing Firebase services...');
+      AppDebug.log("Initializing Firebase services...");
 
       // Import service manager to prevent duplicate initializations
       const { default: serviceManager } = await import(
-        './services/service-manager.js'
+        "./services/service-manager.js"
       );
 
       // Initialize services through service manager
@@ -3621,7 +3648,7 @@ class AIEthicsApp {
 
       if (servicesInitialized) {
         AppDebug.log(
-          'Services initialized successfully through ServiceManager'
+          "Services initialized successfully through ServiceManager",
         );
 
         // Get service references
@@ -3636,7 +3663,7 @@ class AIEthicsApp {
           if (this.systemCollector && this.firebaseService) {
             this.systemCollector = getSystemCollector(this.firebaseService);
             AppDebug.log(
-              'System metadata collector connected to Firebase for analytics storage'
+              "System metadata collector connected to Firebase for analytics storage",
             );
           }
 
@@ -3649,13 +3676,13 @@ class AIEthicsApp {
           // Update UI for current auth state
           this.updateUIForAuthState();
         } else {
-          AppDebug.warn('Failed to get service references from ServiceManager');
+          AppDebug.warn("Failed to get service references from ServiceManager");
         }
       } else {
-        AppDebug.warn('ServiceManager initialization failed');
+        AppDebug.warn("ServiceManager initialization failed");
       }
     } catch (error) {
-      AppDebug.error('Failed to initialize Firebase services:', error);
+      AppDebug.error("Failed to initialize Firebase services:", error);
       // Continue without Firebase - app should still function
     }
   }
@@ -3666,16 +3693,16 @@ class AIEthicsApp {
    */
   setupAuthStateListener() {
     if (!this.firebaseService) {
-      AppDebug.warn('Firebase service not available for auth state listener');
+      AppDebug.warn("Firebase service not available for auth state listener");
       return;
     }
 
     try {
       // Set up Firebase onAuthStateChanged listener early in app lifecycle
-      this.firebaseService.onAuthStateChanged(user => {
+      this.firebaseService.onAuthStateChanged((user) => {
         AppDebug.log(
-          'Authentication state changed:',
-          user ? 'User signed in' : 'User signed out'
+          "Authentication state changed:",
+          user ? "User signed in" : "User signed out",
         );
 
         // Update current user state
@@ -3692,9 +3719,9 @@ class AIEthicsApp {
         }
       });
 
-      AppDebug.log('Authentication state listener set up successfully');
+      AppDebug.log("Authentication state listener set up successfully");
     } catch (error) {
-      AppDebug.error('Failed to set up authentication state listener:', error);
+      AppDebug.error("Failed to set up authentication state listener:", error);
     }
   }
 
@@ -3744,11 +3771,11 @@ class AIEthicsApp {
       // Load user profile and preferences
       const userProfile = await this.firebaseService.getUserProfile(user.uid);
       if (userProfile) {
-        AppDebug.log('User profile loaded successfully');
+        AppDebug.log("User profile loaded successfully");
         // Apply user preferences, load progress, etc.
       }
     } catch (error) {
-      AppDebug.error('Error loading user data:', error);
+      AppDebug.error("Error loading user data:", error);
     }
   }
 
@@ -3757,14 +3784,14 @@ class AIEthicsApp {
    */
   clearUserData() {
     // Clear any cached user data, preferences, progress, etc.
-    AppDebug.log('User data cleared');
+    AppDebug.log("User data cleared");
   }
 
   /**
    * Show welcome message for authenticated users
    */
   showWelcomeMessage(user) {
-    const displayName = user.displayName || user.email || 'User';
+    const displayName = user.displayName || user.email || "User";
     AppDebug.log(`Welcome back, ${displayName}!`);
 
     // Could show a toast notification or other welcome UI
@@ -3780,7 +3807,7 @@ class AIEthicsApp {
       this.handleSimulationComplete?.bind(this);
 
     if (originalHandleSimulationComplete) {
-      this.handleSimulationComplete = async simulationData => {
+      this.handleSimulationComplete = async (simulationData) => {
         // Call original completion handler
         await originalHandleSimulationComplete(simulationData);
 
@@ -3814,19 +3841,19 @@ class AIEthicsApp {
 
       const result = await this.firebaseService.logResearchResponse(
         user.uid,
-        researchData
+        researchData,
       );
 
       if (result.success) {
-        AppDebug.log('Research data logged successfully');
+        AppDebug.log("Research data logged successfully");
       } else {
         AppDebug.warn(
-          'Research data logging failed:',
-          result.reason || 'Unknown error'
+          "Research data logging failed:",
+          result.reason || "Unknown error",
         );
       }
     } catch (error) {
-      AppDebug.error('Error logging research data:', error);
+      AppDebug.error("Error logging research data:", error);
     }
   }
 
@@ -3843,32 +3870,32 @@ class AIEthicsApp {
     }
 
     // Update any auth-dependent UI elements
-    const authButtons = document.querySelectorAll('[data-auth-required]');
-    authButtons.forEach(button => {
+    const authButtons = document.querySelectorAll("[data-auth-required]");
+    authButtons.forEach((button) => {
       if (isAuthenticated) {
-        button.style.display = '';
+        button.style.display = "";
         button.disabled = false;
       } else {
-        button.style.display = 'none';
+        button.style.display = "none";
         button.disabled = true;
       }
     });
 
     // Update user-specific content
-    const userContent = document.querySelectorAll('[data-user-content]');
-    userContent.forEach(element => {
-      element.style.display = isAuthenticated ? '' : 'none';
+    const userContent = document.querySelectorAll("[data-user-content]");
+    userContent.forEach((element) => {
+      element.style.display = isAuthenticated ? "" : "none";
     });
 
     // Update guest content
-    const guestContent = document.querySelectorAll('[data-guest-content]');
-    guestContent.forEach(element => {
-      element.style.display = isAuthenticated ? 'none' : '';
+    const guestContent = document.querySelectorAll("[data-guest-content]");
+    guestContent.forEach((element) => {
+      element.style.display = isAuthenticated ? "none" : "";
     });
 
     AppDebug.log(
-      'UI updated for authentication state:',
-      isAuthenticated ? 'authenticated' : 'guest'
+      "UI updated for authentication state:",
+      isAuthenticated ? "authenticated" : "guest",
     );
   }
 
@@ -3903,20 +3930,24 @@ class EthicsRadarDemo {
 
   async initializeDemo() {
     try {
-      // Initialize the demo radar chart with new hero container
-      this.demoChart = new RadarChart('hero-ethics-chart', {
-        title: 'Ethical Impact Analysis',
-        width: 580,
-        height: 580,
-        realTime: false,
-        showLabels: true,
-        animated: true,
-        isDemo: true, // Use minimal container styling
-      });
+      // Get configured component instead of direct instantiation
+      this.demoChart = await appStartup.getComponent(
+        "radar-chart",
+        "hero-ethics-chart",
+        {
+          title: "Ethical Impact Analysis",
+          width: 580,
+          height: 580,
+          realTime: false,
+          showLabels: true,
+          animated: true,
+          isDemo: true, // Use minimal container styling
+        },
+      );
 
-      logger.info('Ethics radar demo initialized successfully');
+      logger.info("Ethics radar demo initialized successfully");
     } catch (error) {
-      logger.error('Failed to initialize ethics radar demo:', error);
+      logger.error("Failed to initialize ethics radar demo:", error);
     }
   }
 
@@ -3982,10 +4013,10 @@ class EthicsRadarDemo {
   }
 
   showFeedback(pattern) {
-    const feedbackContainer = document.getElementById('hero-demo-feedback');
+    const feedbackContainer = document.getElementById("hero-demo-feedback");
     if (!feedbackContainer) return;
 
-    const popoverContent = feedbackContainer.querySelector('.popover-content');
+    const popoverContent = feedbackContainer.querySelector(".popover-content");
     if (!popoverContent) return;
 
     // Clear any existing auto-hide timer
@@ -3996,24 +4027,24 @@ class EthicsRadarDemo {
 
     const feedbackMessages = {
       utilitarian: {
-        title: 'Utilitarian Ethics',
+        title: "Utilitarian Ethics",
         message:
-          'This approach prioritizes the greatest good for the greatest number, emphasizing beneficence and outcomes over individual rights.',
+          "This approach prioritizes the greatest good for the greatest number, emphasizing beneficence and outcomes over individual rights.",
       },
       deontological: {
-        title: 'Rights-Based Ethics',
+        title: "Rights-Based Ethics",
         message:
-          'This framework focuses on duties and rights, giving priority to fairness, autonomy, and accountability regardless of consequences.',
+          "This framework focuses on duties and rights, giving priority to fairness, autonomy, and accountability regardless of consequences.",
       },
       virtue: {
-        title: 'Virtue Ethics',
+        title: "Virtue Ethics",
         message:
-          'This approach emphasizes character and moral virtues, seeking balance across all ethical dimensions through practical wisdom.',
+          "This approach emphasizes character and moral virtues, seeking balance across all ethical dimensions through practical wisdom.",
       },
       balanced: {
-        title: 'Balanced Approach',
+        title: "Balanced Approach",
         message:
-          'This represents a comprehensive ethical framework that considers all dimensions equally, often used in complex real-world scenarios.',
+          "This represents a comprehensive ethical framework that considers all dimensions equally, often used in complex real-world scenarios.",
       },
     };
 
@@ -4023,7 +4054,7 @@ class EthicsRadarDemo {
                 <h5>${feedback.title}</h5>
                 <p>${feedback.message}</p>
             `;
-      feedbackContainer.classList.add('show');
+      feedbackContainer.classList.add("show");
 
       // Set auto-hide timer for 5 seconds
       const AUTO_HIDE_DELAY = 5000; // 5 seconds
@@ -4041,16 +4072,16 @@ class EthicsRadarDemo {
       popoverHideTimeout = null;
     }
 
-    const feedbackContainer = document.getElementById('hero-demo-feedback');
+    const feedbackContainer = document.getElementById("hero-demo-feedback");
     if (!feedbackContainer) return;
 
-    const popoverContent = feedbackContainer.querySelector('.popover-content');
+    const popoverContent = feedbackContainer.querySelector(".popover-content");
 
-    feedbackContainer.classList.remove('show');
+    feedbackContainer.classList.remove("show");
     const FADE_OUT_DELAY = 300; // ms delay for fade out animation
     setTimeout(() => {
       if (popoverContent) {
-        popoverContent.innerHTML = '';
+        popoverContent.innerHTML = "";
       }
     }, FADE_OUT_DELAY);
   }
@@ -4093,12 +4124,12 @@ window.resetEthicsDemo = function () {
 
 // Helper function to position popover above a specific button
 function positionPopoverAboveButton(button) {
-  const feedbackContainer = document.getElementById('hero-demo-feedback');
+  const feedbackContainer = document.getElementById("hero-demo-feedback");
   if (!feedbackContainer || !button) return;
 
   // Get button position and dimensions
   const buttonRect = button.getBoundingClientRect();
-  const controlsContainer = button.closest('.demo-controls-grid');
+  const controlsContainer = button.closest(".demo-controls-grid");
   const controlsRect = controlsContainer.getBoundingClientRect();
 
   // Calculate position relative to the controls container
@@ -4106,89 +4137,89 @@ function positionPopoverAboveButton(button) {
 
   // Apply positioning
   feedbackContainer.style.left = `${leftOffset}px`;
-  feedbackContainer.style.transform = 'translateX(-50%)';
+  feedbackContainer.style.transform = "translateX(-50%)";
 }
 
 // Helper function to update button visual states
 function updateButtonStates(activePattern) {
-  const buttons = document.querySelectorAll('.hero-demo-controls .demo-btn');
+  const buttons = document.querySelectorAll(".hero-demo-controls .demo-btn");
 
-  buttons.forEach(button => {
+  buttons.forEach((button) => {
     const buttonText = button.textContent.toLowerCase();
-    let patternName = '';
+    let patternName = "";
 
     // Map button text to pattern names
-    if (buttonText.includes('utilitarian')) patternName = 'utilitarian';
-    else if (buttonText.includes('rights-based')) patternName = 'deontological';
-    else if (buttonText.includes('virtue')) patternName = 'virtue';
-    else if (buttonText.includes('balanced')) patternName = 'balanced';
+    if (buttonText.includes("utilitarian")) patternName = "utilitarian";
+    else if (buttonText.includes("rights-based")) patternName = "deontological";
+    else if (buttonText.includes("virtue")) patternName = "virtue";
+    else if (buttonText.includes("balanced")) patternName = "balanced";
 
     // Update button state
     if (activePattern === patternName) {
-      button.classList.add('active');
+      button.classList.add("active");
     } else {
-      button.classList.remove('active');
+      button.classList.remove("active");
     }
   });
 }
 
 window.toggleRadarInstructions = function () {
-  const accordion = document.querySelector('.radar-instructions-accordion');
+  const accordion = document.querySelector(".radar-instructions-accordion");
   const content = document.querySelector(
-    '.radar-instructions-accordion .accordion-content'
+    ".radar-instructions-accordion .accordion-content",
   );
 
   if (accordion && content) {
-    const isOpen = accordion.classList.contains('open');
+    const isOpen = accordion.classList.contains("open");
 
     if (isOpen) {
-      accordion.classList.remove('open');
-      content.classList.add('collapsed');
-      content.style.maxHeight = '0';
-      content.style.opacity = '0';
+      accordion.classList.remove("open");
+      content.classList.add("collapsed");
+      content.style.maxHeight = "0";
+      content.style.opacity = "0";
     } else {
-      accordion.classList.add('open');
-      content.classList.remove('collapsed');
+      accordion.classList.add("open");
+      content.classList.remove("collapsed");
       content.style.maxHeight = `${content.scrollHeight}px`;
-      content.style.opacity = '1';
+      content.style.opacity = "1";
     }
   }
 };
 
 window.toggleEthicsGlossary = function () {
-  const accordion = document.querySelector('.ethics-glossary-accordion');
+  const accordion = document.querySelector(".ethics-glossary-accordion");
   const content = document.querySelector(
-    '.ethics-glossary-accordion .accordion-content'
+    ".ethics-glossary-accordion .accordion-content",
   );
 
   if (accordion && content) {
-    const isOpen = accordion.classList.contains('open');
+    const isOpen = accordion.classList.contains("open");
 
     if (isOpen) {
-      accordion.classList.remove('open');
-      content.classList.add('collapsed');
-      content.style.maxHeight = '0';
-      content.style.opacity = '0';
+      accordion.classList.remove("open");
+      content.classList.add("collapsed");
+      content.style.maxHeight = "0";
+      content.style.opacity = "0";
     } else {
-      accordion.classList.add('open');
-      content.classList.remove('collapsed');
+      accordion.classList.add("open");
+      content.classList.remove("collapsed");
       content.style.maxHeight = `${content.scrollHeight}px`;
-      content.style.opacity = '1';
+      content.style.opacity = "1";
     }
   }
 };
 
 // Add click-to-close functionality for accordion content areas
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   // Add click listener for radar instructions accordion content
-  document.addEventListener('click', event => {
+  document.addEventListener("click", (event) => {
     const radarContent = document.querySelector(
-      '.radar-instructions-accordion.open .accordion-content'
+      ".radar-instructions-accordion.open .accordion-content",
     );
     if (radarContent && radarContent.contains(event.target)) {
       // Check if click is within the content area but not on the header
       const header = document.querySelector(
-        '.radar-instructions-accordion .accordion-header'
+        ".radar-instructions-accordion .accordion-header",
       );
       if (!header || !header.contains(event.target)) {
         window.toggleRadarInstructions();
@@ -4197,12 +4228,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add click listener for ethics glossary accordion content
     const glossaryContent = document.querySelector(
-      '.ethics-glossary-accordion.open .accordion-content'
+      ".ethics-glossary-accordion.open .accordion-content",
     );
     if (glossaryContent && glossaryContent.contains(event.target)) {
       // Check if click is within the content area but not on the header
       const header = document.querySelector(
-        '.ethics-glossary-accordion .accordion-header'
+        ".ethics-glossary-accordion .accordion-header",
       );
       if (!header || !header.contains(event.target)) {
         window.toggleEthicsGlossary();
@@ -4214,11 +4245,11 @@ document.addEventListener('DOMContentLoaded', () => {
 /**
  * Fallback for script loading issues
  */
-window.addEventListener('error', event => {
+window.addEventListener("error", (event) => {
   const errorMessage =
-    event.message || event.error?.message || 'Unknown error occurred';
-  AppDebug.error('Error occurred:', errorMessage);
-  AppDebug.error('Event details:', event);
+    event.message || event.error?.message || "Unknown error occurred";
+  AppDebug.error("Error occurred:", errorMessage);
+  AppDebug.error("Event details:", event);
 });
 
 // Initialize the application
@@ -4234,7 +4265,7 @@ const app = new AIEthicsApp();
 AIEthicsApp.getEnterpriseHealthReport = function () {
   const app = window.aiEthicsApp;
   if (!app) {
-    return { error: 'Application instance not found' };
+    return { error: "Application instance not found" };
   }
 
   return {
@@ -4261,31 +4292,31 @@ AIEthicsApp._generateHealthRecommendations = function (app) {
   const memoryUsage = app._getCurrentMemoryUsage();
   if (memoryUsage > APP_CONSTANTS.ENTERPRISE.MEMORY_WARNING_THRESHOLD) {
     recommendations.push({
-      type: 'memory',
-      severity: 'warning',
+      type: "memory",
+      severity: "warning",
       message: `High memory usage detected (${(memoryUsage / 1024 / 1024).toFixed(2)}MB)`,
-      action: 'Consider refreshing the page or closing unused simulations',
+      action: "Consider refreshing the page or closing unused simulations",
     });
   }
 
   // Error rate recommendations
   if (app.performanceMetrics.errorCount > 10) {
     recommendations.push({
-      type: 'errors',
-      severity: 'warning',
+      type: "errors",
+      severity: "warning",
       message: `High error count (${app.performanceMetrics.errorCount})`,
-      action: 'Check console for error details and consider reporting issues',
+      action: "Check console for error details and consider reporting issues",
     });
   }
 
   // Circuit breaker recommendations
   app.circuitBreakers.forEach((breaker, component) => {
-    if (breaker.state === 'open') {
+    if (breaker.state === "open") {
       recommendations.push({
-        type: 'circuit_breaker',
-        severity: 'critical',
+        type: "circuit_breaker",
+        severity: "critical",
         message: `Service degraded: ${component}`,
-        action: 'Some features may be unavailable. Try refreshing the page.',
+        action: "Some features may be unavailable. Try refreshing the page.",
       });
     }
   });
@@ -4296,10 +4327,10 @@ AIEthicsApp._generateHealthRecommendations = function (app) {
     APP_CONSTANTS.ENTERPRISE.PERFORMANCE_WARNING_THRESHOLD
   ) {
     recommendations.push({
-      type: 'performance',
-      severity: 'info',
+      type: "performance",
+      severity: "info",
       message: `Slow initialization time (${app.performanceMetrics.initTime.toFixed(2)}ms)`,
-      action: 'Consider checking network connection or browser performance',
+      action: "Consider checking network connection or browser performance",
     });
   }
 
@@ -4312,7 +4343,7 @@ AIEthicsApp._generateHealthRecommendations = function (app) {
 AIEthicsApp.exportDiagnostics = function () {
   const app = window.aiEthicsApp;
   if (!app) {
-    return { error: 'Application instance not found' };
+    return { error: "Application instance not found" };
   }
 
   return {
@@ -4327,10 +4358,10 @@ AIEthicsApp.exportDiagnostics = function () {
     healthReport: AIEthicsApp.getEnterpriseHealthReport(),
     applicationLogs: AppDebug.exportLogs(),
     performanceData: {
-      navigation: performance.getEntriesByType('navigation'),
-      resources: performance.getEntriesByType('resource'),
-      measures: performance.getEntriesByType('measure'),
-      memory: 'memory' in performance ? performance.memory : null,
+      navigation: performance.getEntriesByType("navigation"),
+      resources: performance.getEntriesByType("resource"),
+      measures: performance.getEntriesByType("measure"),
+      memory: "memory" in performance ? performance.memory : null,
     },
     componentStates: {
       initialized: app.isInitialized,
@@ -4343,8 +4374,8 @@ AIEthicsApp.exportDiagnostics = function () {
 };
 
 // Start the app when DOM is loaded
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => app.init());
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => app.init());
 } else {
   app.init();
 }
@@ -4362,6 +4393,20 @@ window.debugModalState = () => app.debugModalState();
 // Enterprise debugging functions
 window.getEnterpriseHealth = () => AIEthicsApp.getEnterpriseHealthReport();
 window.exportDiagnostics = () => AIEthicsApp.exportDiagnostics();
+
+// Configuration system debugging functions
+window.getConfigStatus = () => {
+  console.log("🔧 Configuration System Status:", {
+    initialized: appStartup.initialized,
+    health: window.SimulateAI?.health,
+    features: window.SimulateAI?.features,
+    metrics: appStartup.getMetrics(),
+  });
+  return appStartup.getMetrics();
+};
+window.reloadConfigs = () => appStartup.reloadConfigurations();
+window.testConfigComponent = (componentId) =>
+  appStartup.getComponent(componentId);
 window.getAppLogs = () => AppDebug.exportLogs();
 window.getAppDiagnostics = () => AppDebug.getDiagnostics();
 window.flushTelemetry = () => AppDebug._flushTelemetry();

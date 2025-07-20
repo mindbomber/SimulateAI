@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Configuration Debug Test</title>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .debug-section {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .debug-result {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-family: monospace;
+        white-space: pre-wrap;
+      }
+      .success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+      }
+      .error {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+      }
+      .info {
+        background: #d1ecf1;
+        border: 1px solid #bee5eb;
+        color: #0c5460;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔍 Configuration Debug Test</h1>
+
+    <div class="debug-section">
+      <h2>Configuration Manager Debug</h2>
+      <button onclick="testConfigManager()">Test Configuration Manager</button>
+      <div id="config-debug-result"></div>
+    </div>
+
+    <script type="module">
+      import logger from "./src/js/logger.js";
+      import ConfigurationManager from "./src/js/utils/configuration-manager.js";
+
+      window.testConfigManager = async function () {
+        const resultDiv = document.getElementById("config-debug-result");
+
+        try {
+          resultDiv.innerHTML =
+            '<div class="debug-result info">Creating ConfigurationManager instance...</div>';
+
+          const configManager = new ConfigurationManager();
+
+          resultDiv.innerHTML +=
+            '<div class="debug-result info">Checking registered loaders...</div>';
+
+          // Check what loaders are registered
+          const loaders = Array.from(configManager.loaders.keys());
+          resultDiv.innerHTML += `<div class="debug-result success">Registered loaders (${loaders.length}):\n${JSON.stringify(loaders, null, 2)}</div>`;
+
+          // Test app config loading
+          resultDiv.innerHTML +=
+            '<div class="debug-result info">Loading app config...</div>';
+
+          const appConfig = await configManager.loadAppConfig();
+          const components = Object.keys(appConfig?.app?.components || {});
+
+          resultDiv.innerHTML += `<div class="debug-result success">App config components:\n${JSON.stringify(components, null, 2)}</div>`;
+
+          // Test individual component loading
+          resultDiv.innerHTML +=
+            '<div class="debug-result info">Testing component loading...</div>';
+
+          for (const componentId of [
+            "categoryGrid",
+            "radarChart",
+            "scenarioCard",
+          ]) {
+            try {
+              const hasLoader = configManager.loaders.has(componentId);
+              resultDiv.innerHTML += `<div class="debug-result ${hasLoader ? "success" : "error"}">${componentId}: ${hasLoader ? "Loader found" : "NO loader found"}</div>`;
+
+              if (hasLoader) {
+                const config =
+                  await configManager.loadComponentConfig(componentId);
+                resultDiv.innerHTML += `<div class="debug-result success">${componentId} config loaded successfully</div>`;
+              }
+            } catch (error) {
+              resultDiv.innerHTML += `<div class="debug-result error">${componentId} failed: ${error.message}</div>`;
+            }
+          }
+        } catch (error) {
+          resultDiv.innerHTML += `<div class="debug-result error">Debug test failed: ${error.message}\n${error.stack}</div>`;
+        }
+      };
+    </script>
+  </body>
+</html>

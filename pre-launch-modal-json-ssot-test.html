@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PreLaunchModal JSON SSOT Test</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+
+      .test-container {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+
+      h1 {
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+      }
+
+      h2 {
+        color: #34495e;
+        border-bottom: 3px solid #3498db;
+        padding-bottom: 10px;
+        margin-top: 30px;
+      }
+
+      .test-section {
+        margin: 20px 0;
+        padding: 20px;
+        border: 1px solid #ecf0f1;
+        border-radius: 8px;
+        background: #fafbfc;
+      }
+
+      .test-button {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 10px 5px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+
+      .test-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+      }
+
+      .test-button.success {
+        background: linear-gradient(135deg, #27ae60, #229954);
+      }
+
+      .test-button.error {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+      }
+
+      .config-display {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 20px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 12px;
+        max-height: 400px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        margin: 15px 0;
+      }
+
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+      }
+
+      .metric-card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #3498db;
+      }
+
+      .metric-value {
+        font-size: 2em;
+        font-weight: bold;
+        color: #2c3e50;
+      }
+
+      .metric-label {
+        color: #7f8c8d;
+        font-size: 0.9em;
+        margin-top: 5px;
+      }
+
+      .status-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+      }
+
+      .status-success {
+        background-color: #27ae60;
+      }
+      .status-warning {
+        background-color: #f39c12;
+      }
+      .status-error {
+        background-color: #e74c3c;
+      }
+
+      .log-output {
+        background: #34495e;
+        color: #ecf0f1;
+        padding: 15px;
+        border-radius: 6px;
+        font-family: monospace;
+        font-size: 11px;
+        max-height: 300px;
+        overflow-y: auto;
+        margin: 15px 0;
+      }
+
+      .feature-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+        margin: 15px 0;
+      }
+
+      .feature-item {
+        display: flex;
+        align-items: center;
+        padding: 8px;
+        background: white;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🚀 PreLaunchModal JSON SSOT Test Suite</h1>
+      <p style="text-align: center; color: #7f8c8d; font-size: 1.1em">
+        Testing enterprise-grade configuration system for PreLaunchModal
+        component
+      </p>
+    </div>
+
+    <div class="test-container">
+      <h2>🔧 Configuration Loading Tests</h2>
+
+      <div class="test-section">
+        <h3>Basic Configuration Loading</h3>
+        <button class="test-button" onclick="testConfigLoading()">
+          Load Configuration
+        </button>
+        <button class="test-button" onclick="testConfigCaching()">
+          Test Caching
+        </button>
+        <button class="test-button" onclick="testConfigValidation()">
+          Test Validation
+        </button>
+        <div id="config-status"></div>
+      </div>
+
+      <div class="test-section">
+        <h3>Configuration Content</h3>
+        <button class="test-button" onclick="showFullConfig()">
+          Show Full Config
+        </button>
+        <button class="test-button" onclick="showEnterpriseConfig()">
+          Enterprise Config
+        </button>
+        <button class="test-button" onclick="showUIConfig()">UI Config</button>
+        <div id="config-content"></div>
+      </div>
+    </div>
+
+    <div class="test-container">
+      <h2>⚡ Enterprise Features</h2>
+
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-value" id="cache-age">--</div>
+          <div class="metric-label">Cache Age (ms)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="config-size">--</div>
+          <div class="metric-label">Config Size (KB)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="computed-props">--</div>
+          <div class="metric-label">Computed Properties</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="validation-status">--</div>
+          <div class="metric-label">Validation Status</div>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h3>Enterprise Monitoring Configuration</h3>
+        <button class="test-button" onclick="testHealthConfig()">
+          Health Monitoring
+        </button>
+        <button class="test-button" onclick="testTelemetryConfig()">
+          Telemetry Config
+        </button>
+        <button class="test-button" onclick="testPerformanceConfig()">
+          Performance Thresholds
+        </button>
+        <button class="test-button" onclick="testCircuitBreakerConfig()">
+          Circuit Breaker
+        </button>
+        <div id="enterprise-results"></div>
+      </div>
+    </div>
+
+    <div class="test-container">
+      <h2>🎨 UI Configuration Tests</h2>
+
+      <div class="test-section">
+        <h3>UI Features</h3>
+        <div class="feature-list" id="ui-features"></div>
+        <button class="test-button" onclick="testUIConfig()">
+          Test UI Configuration
+        </button>
+        <button class="test-button" onclick="testAccessibilityConfig()">
+          Accessibility Features
+        </button>
+        <button class="test-button" onclick="testResponsiveConfig()">
+          Responsive Settings
+        </button>
+        <div id="ui-results"></div>
+      </div>
+    </div>
+
+    <div class="test-container">
+      <h2>🧪 Computed Properties & Utilities</h2>
+
+      <div class="test-section">
+        <h3>Performance Testing</h3>
+        <button class="test-button" onclick="testPerformanceHelpers()">
+          Performance Helpers
+        </button>
+        <button class="test-button" onclick="testCircuitBreakerHelpers()">
+          Circuit Breaker Helpers
+        </button>
+        <button class="test-button" onclick="testErrorRecoveryHelpers()">
+          Error Recovery Helpers
+        </button>
+        <div id="computed-results"></div>
+      </div>
+
+      <div class="test-section">
+        <h3>Utility Functions</h3>
+        <button class="test-button" onclick="testUtilityFunctions()">
+          Test Utilities
+        </button>
+        <button class="test-button" onclick="testNestedAccess()">
+          Nested Value Access
+        </button>
+        <button class="test-button" onclick="testFeatureFlags()">
+          Feature Flags
+        </button>
+        <div id="utility-results"></div>
+      </div>
+    </div>
+
+    <div class="test-container">
+      <h2>📊 Real-time Status</h2>
+      <div id="status-dashboard">
+        <div class="log-output" id="test-log">Test log will appear here...</div>
+      </div>
+    </div>
+
+    <script type="module">
+      import {
+        loadPreLaunchModalConfig,
+        clearConfigCache,
+        getCacheStatus,
+      } from "/src/js/utils/pre-launch-modal-config-loader.js";
+
+      let currentConfig = null;
+      let testLog = [];
+
+      function log(message, type = "info") {
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+        testLog.push(logEntry);
+
+        const logOutput = document.getElementById("test-log");
+        logOutput.textContent = testLog.slice(-50).join("\n");
+        logOutput.scrollTop = logOutput.scrollHeight;
+
+        console.log(logEntry);
+      }
+
+      async function updateMetrics() {
+        const cacheStatus = getCacheStatus();
+
+        document.getElementById("cache-age").textContent =
+          cacheStatus.cacheAge || "--";
+        document.getElementById("config-size").textContent = currentConfig
+          ? Math.round(JSON.stringify(currentConfig).length / 1024) + " KB"
+          : "--";
+        document.getElementById("computed-props").textContent =
+          currentConfig?.computed
+            ? Object.keys(currentConfig.computed).length
+            : "--";
+        document.getElementById("validation-status").textContent =
+          cacheStatus.cacheValid ? "✓ Valid" : "⚠ Invalid";
+      }
+
+      window.testConfigLoading = async function () {
+        try {
+          log("Starting configuration loading test...");
+          const startTime = performance.now();
+
+          currentConfig = await loadPreLaunchModalConfig();
+
+          const loadTime = performance.now() - startTime;
+          log(`Configuration loaded successfully in ${loadTime.toFixed(2)}ms`);
+          log(
+            `Config version: ${currentConfig.metadata?.version || "unknown"}`,
+          );
+
+          document.getElementById("config-status").innerHTML = `
+                    <div style="color: green; margin-top: 10px;">
+                        <span class="status-indicator status-success"></span>
+                        Configuration loaded successfully (${loadTime.toFixed(2)}ms)
+                    </div>
+                `;
+
+          updateMetrics();
+        } catch (error) {
+          log(`Configuration loading failed: ${error.message}`, "error");
+          document.getElementById("config-status").innerHTML = `
+                    <div style="color: red; margin-top: 10px;">
+                        <span class="status-indicator status-error"></span>
+                        Failed to load configuration: ${error.message}
+                    </div>
+                `;
+        }
+      };
+
+      window.testConfigCaching = async function () {
+        try {
+          log("Testing configuration caching...");
+
+          // Clear cache and load fresh
+          clearConfigCache();
+          const firstLoad = performance.now();
+          await loadPreLaunchModalConfig();
+          const firstLoadTime = performance.now() - firstLoad;
+
+          // Load from cache
+          const secondLoad = performance.now();
+          await loadPreLaunchModalConfig();
+          const secondLoadTime = performance.now() - secondLoad;
+
+          log(`First load (fresh): ${firstLoadTime.toFixed(2)}ms`);
+          log(`Second load (cached): ${secondLoadTime.toFixed(2)}ms`);
+          log(
+            `Cache improvement: ${(((firstLoadTime - secondLoadTime) / firstLoadTime) * 100).toFixed(1)}%`,
+          );
+
+          updateMetrics();
+        } catch (error) {
+          log(`Caching test failed: ${error.message}`, "error");
+        }
+      };
+
+      window.testConfigValidation = async function () {
+        try {
+          log("Testing configuration validation...");
+
+          if (!currentConfig) {
+            currentConfig = await loadPreLaunchModalConfig();
+          }
+
+          const isValid = currentConfig.utils.validateIntegrity();
+          log(`Configuration validation: ${isValid ? "PASSED" : "FAILED"}`);
+
+          // Test nested value access
+          const healthInterval = currentConfig.utils.getValue(
+            "enterprise.health.checkInterval",
+            "NOT_FOUND",
+          );
+          log(`Health check interval: ${healthInterval}ms`);
+
+          updateMetrics();
+        } catch (error) {
+          log(`Validation test failed: ${error.message}`, "error");
+        }
+      };
+
+      window.showFullConfig = function () {
+        if (!currentConfig) {
+          alert("Please load configuration first");
+          return;
+        }
+
+        document.getElementById("config-content").innerHTML = `
+                <div class="config-display">${JSON.stringify(currentConfig, null, 2)}</div>
+            `;
+        log("Full configuration displayed");
+      };
+
+      window.showEnterpriseConfig = function () {
+        if (!currentConfig) {
+          alert("Please load configuration first");
+          return;
+        }
+
+        document.getElementById("config-content").innerHTML = `
+                <div class="config-display">${JSON.stringify(currentConfig.enterprise, null, 2)}</div>
+            `;
+        log("Enterprise configuration displayed");
+      };
+
+      window.showUIConfig = function () {
+        if (!currentConfig) {
+          alert("Please load configuration first");
+          return;
+        }
+
+        document.getElementById("config-content").innerHTML = `
+                <div class="config-display">${JSON.stringify(currentConfig.ui, null, 2)}</div>
+            `;
+        log("UI configuration displayed");
+      };
+
+      window.testHealthConfig = function () {
+        if (!currentConfig) {
+          alert("Please load configuration first");
+          return;
+        }
+
+        const health = currentConfig.enterprise.health;
+        const computed = currentConfig.computed.health;
+
+        const results = `
+                <h4>Health Monitoring Configuration:</h4>
+                <ul>
+                    <li>Check Interval: ${health.checkInterval}ms (Valid: ${computed.isCheckIntervalValid()})</li>
+                    <li>Heartbeat Interval: ${health.heartbeatInterval}ms (Valid: ${computed.isHeartbeatIntervalValid()})</li>
+                    <li>Failure Threshold: ${health.failureThreshold}</li>
+                    <li>Effective Check Interval: ${computed.getEffectiveCheckInterval()}ms</li>
+                    <li>Effective Heartbeat Interval: ${computed.getEffectiveHeartbeatInterval()}ms</li>
+                </ul>
+            `;
+
+        document.getElementById("enterprise-results").innerHTML = results;
+        log("Health monitoring configuration tested");
+      };
+
+      window.testTelemetryConfig = function () {
+        if (!currentConfig) {
+          alert("Please load configuration first");
+          return;
+        }
+
+        const telemetry = currentConfig.enterprise.telemetry;
+        const computed = currentConfig.computed.telemetry;
+
+        const results = `
+                <h4>Telemetry Configuration:</h4>
+                <ul>
+                    <li>Flush Interval: ${telemetry.flushInterval}ms</li>
+                    <li>Batch Size: ${telemetry.batchSize}</li>
+                    <li>Effective Batch Size: ${computed.getEffectiveBatchSize()}</li>
+                    <li>Compression Enabled: ${computed.isCompressionEnabled()}</li>
+                    <li>Retry Attempts: ${telemetry.retryAttempts}</li>
+                    <li>Should Flush (50 items): ${computed.shouldFlushBatch(50)}</li>
+                </ul>
+            `;
+
+        document.getElementById("enterprise-results").innerHTML = results;
+        log("Telemetry configuration tested");
+      };
+
+      window.testPerformanceConfig = function () {
+        if (!currentConfig) {
+          alert("Please load configuration first");
+          return;
+        }
+
+        const performance = currentConfig.enterprise.performance;
+        const computed = currentConfig.computed.performance;
+
+        const renderThresholds = computed.getRenderThresholds();
+        const tabThresholds = computed.getTabSwitchThresholds();
+
+        const results = `
+                <h4>Performance Thresholds:</h4>
+                <ul>
+                    <li>Render Warning: ${renderThresholds.warning}ms, Critical: ${renderThresholds.critical}ms</li>
+                    <li>Tab Switch Warning: ${tabThresholds.warning}ms, Critical: ${tabThresholds.critical}ms</li>
+                    <li>Test 800ms render: ${computed.isPerformanceViolation("render", 800) ? "VIOLATION" : "OK"}</li>
+                    <li>Test 600ms render: ${computed.isPerformanceWarning("render", 600) ? "WARNING" : "OK"}</li>
+                    <li>Test 200ms tab switch: ${computed.isPerformanceViolation("tab_switch", 200) ? "VIOLATION" : "OK"}</li>
+                </ul>
+            `;
+
+        document.getElementById("enterprise-results").innerHTML = results;
+        log("Performance configuration tested");
+      };
+
+      window.testCircuitBreakerConfig = function () {
+        if (!currentConfig) {
+          alert("Please load configuration first");
+          return;
+        }
+
+        const cb = currentConfig.enterprise.circuitBreaker;
+        const computed = currentConfig.computed.circuitBreaker;
+
+        const now = Date.now();
+        const testFailureTime = now - 20000; // 20 seconds ago
+
+        const results = `
+                <h4>Circuit Breaker Configuration:</h4>
+                <ul>
+                    <li>Failure Threshold: ${cb.failureThreshold}</li>
+                    <li>Success Threshold: ${cb.successThreshold}</li>
+                    <li>Recovery Timeout: ${cb.recoveryTimeout}ms</li>
+                    <li>Should Trip (5 failures): ${computed.shouldTripCircuit(5)}</li>
+                    <li>Should Close (3 successes): ${computed.shouldCloseCircuit(3)}</li>
+                    <li>Recovery Window Expired: ${computed.isRecoveryWindowExpired(testFailureTime)}</li>
+                    <li>Next Attempt Time: ${new Date(computed.getNextAttemptTime(testFailureTime)).toLocaleTimeString()}</li>
+                </ul>
+            `;
+
+        document.getElementById("enterprise-results").innerHTML = results;
+        log("Circuit breaker configuration tested");
+      };
+
+      window.testUIConfig = function () {
+        if (!currentConfig) {
+          alert("Please load configuration first");
+          return;
+        }
+
+        const ui = currentConfig.ui;
+        const computed = currentConfig.computed.ui;
+
+        const results = `
+                <h4>UI Configuration:</h4>
+                <ul>
+                    <li>Mobile Breakpoint: ${ui.layout.mobileBreakpoint}px</li>
+                    <li>Current Mode: ${computed.isMobile() ? "Mobile" : "Desktop"}</li>
+                    <li>Animation Duration: ${computed.getAnimationDuration()}ms</li>
+                    <li>Tab Animation: ${computed.getAnimationDuration("tab")}ms</li>
+                    <li>Content Animation: ${computed.getAnimationDuration("content")}ms</li>
+                    <li>Overview Tab Icon: ${computed.getTabIcon("overview")}</li>
+                    <li>Ethics Tab Icon: ${computed.getTabIcon("ethics")}</li>
+                </ul>
+            `;
+
+        document.getElementById("ui-results").innerHTML = results;
+        log("UI configuration tested");
+      };
+
+      window.testAccessibilityConfig = function () {
+        if (!currentConfig) {
+          alert("Please load configuration first");
+          return;
+        }
+
+        const computed = currentConfig.computed.ui;
+
+        const features = [
+          "enableAriaLabels",
+          "enableKeyboardNavigation",
+          "enableScreenReaderSupport",
+          "focusManagement",
+        ];
+
+        const results = features
+          .map(
+            (feature) =>
+              `<li>${feature}: ${computed.isAccessibilityEnabled(feature) ? "✓ Enabled" : "✗ Disabled"}</li>`,
+          )
+          .join("");
+
+        document.getElementById("ui-results").innerHTML = `
+                <h4>Accessibility Features:</h4>
+                <ul>${results}</ul>
+            `;
+
+        log("Accessibility configuration tested");
+      };
+
+      window.testResponsiveConfig = function () {
+        if (!currentConfig) {
+          alert("Please load configuration first");
+          return;
+        }
+
+        const computed = currentConfig.computed;
+        const modalStyles = computed.modal.getModalStyles();
+
+        const results = `
+                <h4>Responsive Configuration:</h4>
+                <ul>
+                    <li>Is Mobile: ${computed.ui.isMobile()}</li>
+                    <li>Is Tablet: ${computed.ui.isTablet()}</li>
+                    <li>Modal Max Width: ${modalStyles.maxWidth}px</li>
+                    <li>Modal Min Height: ${modalStyles.minHeight}px</li>
+                    <li>Content Padding: ${modalStyles.padding}px</li>
+                    <li>Close on Backdrop: ${computed.modal.shouldCloseOnBackdrop()}</li>
+                    <li>Close on Escape: ${computed.modal.shouldCloseOnEscape()}</li>
+                </ul>
+            `;
+
+        document.getElementById("ui-results").innerHTML = results;
+        log("Responsive configuration tested");
+      };
+
+      // Initialize the test suite
+      log("PreLaunchModal JSON SSOT Test Suite initialized");
+      log('Click "Load Configuration" to begin testing');
+
+      // Auto-update metrics every 5 seconds
+      setInterval(updateMetrics, 5000);
+    </script>
+  </body>
+</html>

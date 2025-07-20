@@ -16,63 +16,26 @@
  * - Radar chart initialization monitoring
  */
 
-import logger from '../utils/logger.js';
-import RadarChart from './radar-chart.js';
-import scenarioDataManager from '../data/scenario-data-manager.js';
-import { getAllCategories } from '../../data/categories.js';
-import { typewriterSequence } from '../utils/typewriter.js';
-
-// ===== ENTERPRISE CONSTANTS =====
-const ANIMATION_DURATION = 300;
-const RADAR_CHART_MAX_SCORE = 5;
-const RADAR_CHART_NEUTRAL_SCORE = 3;
-
-// Enterprise monitoring thresholds
-const ENTERPRISE_CONSTANTS = {
-  PERFORMANCE: {
-    MAX_MODAL_OPEN_TIME: 3000, // Maximum time for modal opening (ms)
-    MAX_RADAR_INIT_TIME: 2000, // Maximum time for radar chart init (ms)
-    MAX_TYPEWRITER_TIME: 5000, // Maximum time for typewriter effect (ms)
-    MAX_OPTION_SELECT_TIME: 500, // Maximum time for option selection (ms)
-    WARNING_MODAL_OPEN_TIME: 1500, // Warning threshold for modal opening (ms)
-    WARNING_RADAR_INIT_TIME: 1000, // Warning threshold for radar init (ms)
-    MEMORY_WARNING_THRESHOLD: 75, // Warning threshold for memory usage (MB)
-    MEMORY_CRITICAL_THRESHOLD: 150, // Critical threshold for memory usage (MB)
-  },
-  HEALTH: {
-    CHECK_INTERVAL: 20000, // Health check interval (ms)
-    FAILURE_THRESHOLD: 3, // Number of failures before circuit opens
-    RECOVERY_TIMEOUT: 45000, // Time before attempting recovery (ms)
-    HEARTBEAT_INTERVAL: 15000, // Heartbeat interval for health monitoring (ms)
-  },
-  CIRCUIT_BREAKER: {
-    FAILURE_THRESHOLD: 4, // Failures before opening circuit
-    RECOVERY_TIMEOUT: 30000, // Timeout before half-open state (ms)
-    SUCCESS_THRESHOLD: 2, // Successes needed to close circuit
-  },
-  TELEMETRY: {
-    BATCH_SIZE: 8, // Number of events to batch before sending
-    FLUSH_INTERVAL: 12000, // Interval to flush telemetry batch (ms)
-    MAX_EVENTS_MEMORY: 50, // Maximum events to keep in memory
-  },
-  ERROR_RECOVERY: {
-    MAX_RETRY_ATTEMPTS: 3, // Maximum retry attempts for operations
-    RETRY_DELAY: 800, // Base delay between retries (ms)
-    BACKOFF_MULTIPLIER: 1.5, // Exponential backoff multiplier
-  },
-  RADAR_CHART: {
-    MAX_INIT_ATTEMPTS: 15, // Maximum attempts to initialize radar chart
-    INIT_RETRY_DELAY: 200, // Delay between radar chart init attempts (ms)
-    DOM_SETTLE_DELAY: 250, // Delay to let DOM settle before radar init (ms)
-  },
-};
+import logger from "../utils/logger.js";
+import RadarChart from "./radar-chart.js";
+import scenarioDataManager from "../data/scenario-data-manager.js";
+import { getAllCategories } from "../../data/categories.js";
+import { typewriterSequence } from "../utils/typewriter.js";
+import { loadScenarioModalConfig } from "../utils/scenario-modal-config-loader.js";
 
 class ScenarioModal {
   constructor(options = {}) {
     const startTime = performance.now();
 
     try {
-      logger.info('ScenarioModal', 'Constructor called with options:', options);
+      logger.info("ScenarioModal", "Constructor called with options:", options);
+
+      // === CONFIGURATION INITIALIZATION ===
+      this.config = null; // Will be loaded from JSON SSOT
+      this.isConfigLoaded = false;
+
+      // Initialize configuration loading
+      this.initializeConfiguration();
 
       // === ENTERPRISE INITIALIZATION ===
       this.instanceId = `scenario_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -106,7 +69,7 @@ class ScenarioModal {
 
       // Circuit breaker for fault tolerance
       this.circuitBreaker = {
-        state: 'closed', // closed, open, half-open
+        state: "closed", // closed, open, half-open
         failureCount: 0,
         lastFailureTime: null,
         nextAttemptTime: null,
@@ -150,17 +113,46 @@ class ScenarioModal {
 
       // Track constructor performance
       const constructorTime = performance.now() - startTime;
-      this._recordPerformanceMetric('constructor', constructorTime);
+      this._recordPerformanceMetric("constructor", constructorTime);
 
       // Log successful initialization
-      this._logTelemetry('instance_created', {
+      this._logTelemetry("instance_created", {
         options: Object.keys(options),
         constructorTime: Math.round(constructorTime * 100) / 100,
         categoriesCount: this.categories.length,
       });
     } catch (error) {
-      this._handleError(error, 'constructor');
+      this._handleError(error, "constructor");
       throw error;
+    }
+  }
+
+  /**
+   * Initialize configuration from JSON SSOT
+   */
+  async initializeConfiguration() {
+    try {
+      this.config = await loadScenarioModalConfig();
+      this.isConfigLoaded = true;
+      logger.info("ScenarioModal configuration loaded successfully", {
+        hasAnimations: !!this.config.animations,
+        hasEnterprise: !!this.config.enterprise,
+        hasRadarChart: !!this.config.radarChart,
+      });
+      return true;
+    } catch (error) {
+      logger.error("Error loading ScenarioModal configuration:", error);
+      this.isConfigLoaded = false;
+      return false;
+    }
+  }
+
+  /**
+   * Ensure configuration is loaded before operations
+   */
+  async ensureConfigLoaded() {
+    if (!this.isConfigLoaded || !this.config) {
+      await this.initializeConfiguration();
     }
   }
 
@@ -170,29 +162,34 @@ class ScenarioModal {
    */
   _initializeEnterpriseMonitoring() {
     try {
+      // Ensure configuration is available, use fallback values if not
+      const healthConfig = this.config?.enterprise?.health?.monitoring || {};
+      const telemetryConfig =
+        this.config?.enterprise?.telemetry?.batching || {};
+
       // Health check monitoring
       this.healthCheckInterval = setInterval(() => {
         this._performHealthCheck();
-      }, ENTERPRISE_CONSTANTS.HEALTH.CHECK_INTERVAL);
+      }, healthConfig.checkInterval || 20000);
 
       // Telemetry batch flushing
       this.telemetryFlushInterval = setInterval(() => {
         this._flushTelemetryBatch();
-      }, ENTERPRISE_CONSTANTS.TELEMETRY.FLUSH_INTERVAL);
+      }, telemetryConfig.flushInterval || 12000);
 
       // Heartbeat monitoring
       this.heartbeatInterval = setInterval(() => {
         this._sendHeartbeat();
-      }, ENTERPRISE_CONSTANTS.HEALTH.HEARTBEAT_INTERVAL);
+      }, healthConfig.heartbeatInterval || 15000);
 
       // Set up error recovery baseline
       this._establishPerformanceBaseline();
 
       logger.debug(
-        `[ScenarioModal] Enterprise monitoring initialized for instance ${this.instanceId}`
+        `[ScenarioModal] Enterprise monitoring initialized for instance ${this.instanceId}`,
       );
     } catch (error) {
-      this._handleError(error, '_initializeEnterpriseMonitoring');
+      this._handleError(error, "_initializeEnterpriseMonitoring");
       // Don't throw here - monitoring failure shouldn't break modal functionality
     }
   }
@@ -200,7 +197,7 @@ class ScenarioModal {
   /**
    * Enterprise error handling with recovery strategies
    */
-  _handleError(error, context = 'unknown', retryOperation = null) {
+  _handleError(error, context = "unknown", retryOperation = null) {
     this.errorCount++;
     this.lastError = {
       message: error.message,
@@ -214,7 +211,7 @@ class ScenarioModal {
     this._updateCircuitBreaker(false);
 
     // Log the error with telemetry
-    this._logTelemetry('error_occurred', {
+    this._logTelemetry("error_occurred", {
       error: error.message,
       context,
       errorCount: this.errorCount,
@@ -222,18 +219,16 @@ class ScenarioModal {
     });
 
     // Attempt recovery if within limits
-    if (
-      this.recoveryAttempts <
-        ENTERPRISE_CONSTANTS.ERROR_RECOVERY.MAX_RETRY_ATTEMPTS &&
-      retryOperation
-    ) {
+    const errorRecoveryConfig =
+      this.config?.enterprise?.errorRecovery?.retry || {};
+    const maxRetryAttempts = errorRecoveryConfig.maxRetryAttempts || 3;
+    const retryDelay = errorRecoveryConfig.retryDelay || 800;
+    const backoffMultiplier = errorRecoveryConfig.backoffMultiplier || 1.5;
+
+    if (this.recoveryAttempts < maxRetryAttempts && retryOperation) {
       this.recoveryAttempts++;
-      const retryDelay =
-        ENTERPRISE_CONSTANTS.ERROR_RECOVERY.RETRY_DELAY *
-        Math.pow(
-          ENTERPRISE_CONSTANTS.ERROR_RECOVERY.BACKOFF_MULTIPLIER,
-          this.recoveryAttempts - 1
-        );
+      const calculatedRetryDelay =
+        retryDelay * Math.pow(backoffMultiplier, this.recoveryAttempts - 1);
 
       setTimeout(() => {
         try {
@@ -242,15 +237,16 @@ class ScenarioModal {
         } catch (retryError) {
           this._handleError(
             retryError,
-            `${context}_retry_${this.recoveryAttempts}`
+            `${context}_retry_${this.recoveryAttempts}`,
           );
         }
-      }, retryDelay);
+      }, calculatedRetryDelay);
     }
 
     // Update health status
-    this.isHealthy =
-      this.errorCount < ENTERPRISE_CONSTANTS.HEALTH.FAILURE_THRESHOLD;
+    const healthConfig = this.config?.enterprise?.health?.monitoring || {};
+    const failureThreshold = healthConfig.failureThreshold || 3;
+    this.isHealthy = this.errorCount < failureThreshold;
 
     logger.error(`[ScenarioModal] Error in ${context}:`, error);
   }
@@ -270,7 +266,7 @@ class ScenarioModal {
 
       // Update specific metrics
       switch (operation) {
-        case 'modal_open':
+        case "modal_open":
           this.performanceMetrics.modalOpenCount++;
           this.performanceMetrics.totalModalOpenTime += duration;
           this.performanceMetrics.averageModalOpenTime =
@@ -278,7 +274,7 @@ class ScenarioModal {
             this.performanceMetrics.modalOpenCount;
           this.performanceMetrics.lastModalOpenTime = duration;
           break;
-        case 'radar_init':
+        case "radar_init":
           this.performanceMetrics.radarInitCount++;
           this.performanceMetrics.totalRadarInitTime += duration;
           this.performanceMetrics.averageRadarInitTime =
@@ -286,21 +282,21 @@ class ScenarioModal {
             this.performanceMetrics.radarInitCount;
           this.performanceMetrics.lastRadarInitTime = duration;
           break;
-        case 'option_select':
+        case "option_select":
           this.performanceMetrics.optionSelectCount++;
           this.performanceMetrics.totalOptionSelectTime += duration;
           this.performanceMetrics.averageOptionSelectTime =
             this.performanceMetrics.totalOptionSelectTime /
             this.performanceMetrics.optionSelectCount;
           break;
-        case 'typewriter':
+        case "typewriter":
           this.performanceMetrics.typewriterCount++;
           this.performanceMetrics.totalTypewriterTime += duration;
           this.performanceMetrics.averageTypewriterTime =
             this.performanceMetrics.totalTypewriterTime /
             this.performanceMetrics.typewriterCount;
           break;
-        case 'scenario_completion':
+        case "scenario_completion":
           this.performanceMetrics.scenarioCompletionCount++;
           break;
       }
@@ -309,10 +305,10 @@ class ScenarioModal {
       this._checkPerformanceThresholds(operation, duration);
 
       // Log telemetry
-      this._logTelemetry('performance_metric', metric);
+      this._logTelemetry("performance_metric", metric);
     } catch (error) {
       // Don't let performance tracking break the application
-      logger.warn('[ScenarioModal] Error recording performance metric:', error);
+      logger.warn("[ScenarioModal] Error recording performance metric:", error);
     }
   }
 
@@ -321,41 +317,39 @@ class ScenarioModal {
    */
   _updateCircuitBreaker(success) {
     const now = Date.now();
+    const circuitBreakerConfig =
+      this.config?.enterprise?.circuitBreaker?.faultTolerance || {};
+    const successThreshold = circuitBreakerConfig.successThreshold || 2;
+    const failureThreshold = circuitBreakerConfig.failureThreshold || 4;
+    const recoveryTimeout = circuitBreakerConfig.recoveryTimeout || 30000;
 
     if (success) {
-      if (this.circuitBreaker.state === 'half-open') {
+      if (this.circuitBreaker.state === "half-open") {
         this.circuitBreaker.successCount++;
-        if (
-          this.circuitBreaker.successCount >=
-          ENTERPRISE_CONSTANTS.CIRCUIT_BREAKER.SUCCESS_THRESHOLD
-        ) {
-          this.circuitBreaker.state = 'closed';
+        if (this.circuitBreaker.successCount >= successThreshold) {
+          this.circuitBreaker.state = "closed";
           this.circuitBreaker.failureCount = 0;
           this.circuitBreaker.successCount = 0;
         }
-      } else if (this.circuitBreaker.state === 'closed') {
+      } else if (this.circuitBreaker.state === "closed") {
         this.circuitBreaker.failureCount = 0;
       }
     } else {
       this.circuitBreaker.failureCount++;
       this.circuitBreaker.lastFailureTime = now;
 
-      if (
-        this.circuitBreaker.failureCount >=
-        ENTERPRISE_CONSTANTS.CIRCUIT_BREAKER.FAILURE_THRESHOLD
-      ) {
-        this.circuitBreaker.state = 'open';
-        this.circuitBreaker.nextAttemptTime =
-          now + ENTERPRISE_CONSTANTS.CIRCUIT_BREAKER.RECOVERY_TIMEOUT;
+      if (this.circuitBreaker.failureCount >= failureThreshold) {
+        this.circuitBreaker.state = "open";
+        this.circuitBreaker.nextAttemptTime = now + recoveryTimeout;
       }
     }
 
     // Check if circuit should move to half-open
     if (
-      this.circuitBreaker.state === 'open' &&
+      this.circuitBreaker.state === "open" &&
       now >= this.circuitBreaker.nextAttemptTime
     ) {
-      this.circuitBreaker.state = 'half-open';
+      this.circuitBreaker.state = "half-open";
       this.circuitBreaker.successCount = 0;
     }
   }
@@ -382,9 +376,9 @@ class ScenarioModal {
       };
 
       this.lastHealthCheck = Date.now();
-      this._logTelemetry('health_check', healthData);
+      this._logTelemetry("health_check", healthData);
     } catch (error) {
-      this._handleError(error, '_performHealthCheck');
+      this._handleError(error, "_performHealthCheck");
     }
   }
 
@@ -395,7 +389,7 @@ class ScenarioModal {
     try {
       if (performance.memory) {
         const memoryMB = Math.round(
-          performance.memory.usedJSHeapSize / 1024 / 1024
+          performance.memory.usedJSHeapSize / 1024 / 1024,
         );
         this.performanceMetrics.memoryUsage = memoryMB;
         return memoryMB;
@@ -423,14 +417,15 @@ class ScenarioModal {
       this.telemetryBatch.push(telemetryEvent);
 
       // Auto-flush if batch is full
-      if (
-        this.telemetryBatch.length >= ENTERPRISE_CONSTANTS.TELEMETRY.BATCH_SIZE
-      ) {
+      const telemetryConfig =
+        this.config?.enterprise?.telemetry?.batching || {};
+      const batchSize = telemetryConfig.batchSize || 8;
+      if (this.telemetryBatch.length >= batchSize) {
         this._flushTelemetryBatch();
       }
     } catch (error) {
       // Don't let telemetry errors break functionality
-      logger.warn('[ScenarioModal] Telemetry error:', error);
+      logger.warn("[ScenarioModal] Telemetry error:", error);
     }
   }
 
@@ -446,14 +441,14 @@ class ScenarioModal {
       this.telemetryBatch = [];
 
       // In a real implementation, this would send to your analytics service
-      logger.debug('[ScenarioModal] Telemetry batch flushed:', {
+      logger.debug("[ScenarioModal] Telemetry batch flushed:", {
         batchSize: batchData.length,
         instanceId: this.instanceId,
       });
 
       this.lastTelemetryFlush = Date.now();
     } catch (error) {
-      logger.warn('[ScenarioModal] Error flushing telemetry batch:', error);
+      logger.warn("[ScenarioModal] Error flushing telemetry batch:", error);
     }
   }
 
@@ -461,7 +456,7 @@ class ScenarioModal {
    * Send heartbeat signal
    */
   _sendHeartbeat() {
-    this._logTelemetry('heartbeat', {
+    this._logTelemetry("heartbeat", {
       uptime: Date.now() - this.createdAt,
       lastHealthCheck: this.lastHealthCheck,
       isHealthy: this.isHealthy,
@@ -473,63 +468,79 @@ class ScenarioModal {
    * Performance threshold monitoring
    */
   _checkPerformanceThresholds(operation, duration) {
-    const thresholds = ENTERPRISE_CONSTANTS.PERFORMANCE;
+    const performanceConfig =
+      this.config?.enterprise?.performance?.thresholds || {};
 
     switch (operation) {
-      case 'modal_open':
-        if (duration > thresholds.MAX_MODAL_OPEN_TIME) {
-          this._logTelemetry('performance_violation', {
+      case "modal_open": {
+        const maxModalOpenTime = performanceConfig.maxModalOpenTime || 3000;
+        const warningModalOpenTime =
+          performanceConfig.warningModalOpenTime || 1500;
+
+        if (duration > maxModalOpenTime) {
+          this._logTelemetry("performance_violation", {
             operation,
             duration,
-            threshold: thresholds.MAX_MODAL_OPEN_TIME,
-            severity: 'critical',
+            threshold: maxModalOpenTime,
+            severity: "critical",
           });
-        } else if (duration > thresholds.WARNING_MODAL_OPEN_TIME) {
-          this._logTelemetry('performance_warning', {
+        } else if (duration > warningModalOpenTime) {
+          this._logTelemetry("performance_warning", {
             operation,
             duration,
-            threshold: thresholds.WARNING_MODAL_OPEN_TIME,
-            severity: 'warning',
-          });
-        }
-        break;
-      case 'radar_init':
-        if (duration > thresholds.MAX_RADAR_INIT_TIME) {
-          this._logTelemetry('performance_violation', {
-            operation,
-            duration,
-            threshold: thresholds.MAX_RADAR_INIT_TIME,
-            severity: 'critical',
-          });
-        } else if (duration > thresholds.WARNING_RADAR_INIT_TIME) {
-          this._logTelemetry('performance_warning', {
-            operation,
-            duration,
-            threshold: thresholds.WARNING_RADAR_INIT_TIME,
-            severity: 'warning',
+            threshold: warningModalOpenTime,
+            severity: "warning",
           });
         }
         break;
-      case 'option_select':
-        if (duration > thresholds.MAX_OPTION_SELECT_TIME) {
-          this._logTelemetry('performance_violation', {
+      }
+      case "radar_init": {
+        const maxRadarInitTime = performanceConfig.maxRadarInitTime || 2000;
+        const warningRadarInitTime =
+          performanceConfig.warningRadarInitTime || 1000;
+
+        if (duration > maxRadarInitTime) {
+          this._logTelemetry("performance_violation", {
             operation,
             duration,
-            threshold: thresholds.MAX_OPTION_SELECT_TIME,
-            severity: 'warning',
+            threshold: maxRadarInitTime,
+            severity: "critical",
+          });
+        } else if (duration > warningRadarInitTime) {
+          this._logTelemetry("performance_warning", {
+            operation,
+            duration,
+            threshold: warningRadarInitTime,
+            severity: "warning",
           });
         }
         break;
-      case 'typewriter':
-        if (duration > thresholds.MAX_TYPEWRITER_TIME) {
-          this._logTelemetry('performance_violation', {
+      }
+      case "option_select": {
+        const maxOptionSelectTime =
+          performanceConfig.maxOptionSelectTime || 500;
+        if (duration > maxOptionSelectTime) {
+          this._logTelemetry("performance_violation", {
             operation,
             duration,
-            threshold: thresholds.MAX_TYPEWRITER_TIME,
-            severity: 'warning',
+            threshold: maxOptionSelectTime,
+            severity: "warning",
           });
         }
         break;
+      }
+      case "typewriter": {
+        const maxTypewriterTime = performanceConfig.maxTypewriterTime || 5000;
+        if (duration > maxTypewriterTime) {
+          this._logTelemetry("performance_violation", {
+            operation,
+            duration,
+            threshold: maxTypewriterTime,
+            severity: "warning",
+          });
+        }
+        break;
+      }
     }
   }
 
@@ -541,7 +552,7 @@ class ScenarioModal {
     this._getMemoryUsage();
 
     // Log baseline establishment
-    this._logTelemetry('baseline_established', {
+    this._logTelemetry("baseline_established", {
       initialMemory: this.performanceMetrics.memoryUsage,
       timestamp: Date.now(),
     });
@@ -572,7 +583,7 @@ class ScenarioModal {
       this._flushTelemetryBatch();
 
       // Log final metrics
-      this._logTelemetry('instance_cleanup', {
+      this._logTelemetry("instance_cleanup", {
         finalMetrics: { ...this.performanceMetrics },
         finalHealth: {
           isHealthy: this.isHealthy,
@@ -591,10 +602,10 @@ class ScenarioModal {
       this.isHealthy = false;
 
       logger.debug(
-        `[ScenarioModal] Enterprise cleanup completed for instance ${this.instanceId}`
+        `[ScenarioModal] Enterprise cleanup completed for instance ${this.instanceId}`,
       );
     } catch (error) {
-      logger.error('[ScenarioModal] Error during enterprise cleanup:', error);
+      logger.error("[ScenarioModal] Error during enterprise cleanup:", error);
     }
   }
 
@@ -609,20 +620,20 @@ class ScenarioModal {
 
     try {
       // Circuit breaker check
-      if (this.circuitBreaker.state === 'open') {
+      if (this.circuitBreaker.state === "open") {
         const now = Date.now();
         if (now < this.circuitBreaker.nextAttemptTime) {
-          this._logTelemetry('open_blocked_circuit_open', {
+          this._logTelemetry("open_blocked_circuit_open", {
             scenarioId,
             categoryId,
             nextAttemptTime: this.circuitBreaker.nextAttemptTime,
             currentTime: now,
           });
           throw new Error(
-            'Modal open operation blocked: Circuit breaker is open'
+            "Modal open operation blocked: Circuit breaker is open",
           );
         } else {
-          this.circuitBreaker.state = 'half-open';
+          this.circuitBreaker.state = "half-open";
           this.circuitBreaker.successCount = 0;
         }
       }
@@ -630,9 +641,9 @@ class ScenarioModal {
       // Prevent duplicate openings
       if (this.isOpening || this.modal) {
         logger.warn(
-          'Modal is already opening or open, ignoring duplicate request'
+          "Modal is already opening or open, ignoring duplicate request",
         );
-        this._logTelemetry('open_duplicate_request', {
+        this._logTelemetry("open_duplicate_request", {
           scenarioId,
           categoryId,
           isOpening: this.isOpening,
@@ -645,7 +656,7 @@ class ScenarioModal {
       this.wasCompleted = false; // Reset completion flag for new scenario
       this.isTestMode = isTestMode; // Set test mode for this session
 
-      this._logTelemetry('modal_opening_started', {
+      this._logTelemetry("modal_opening_started", {
         scenarioId,
         categoryId,
         isTestMode,
@@ -656,9 +667,9 @@ class ScenarioModal {
         categoryId = this.findCategoryForScenario(scenarioId);
         if (!categoryId) {
           const error = new Error(
-            `Could not find category for scenario: ${scenarioId}`
+            `Could not find category for scenario: ${scenarioId}`,
           );
-          this._handleError(error, 'open_category_not_found');
+          this._handleError(error, "open_category_not_found");
           throw error;
         }
       }
@@ -669,21 +680,21 @@ class ScenarioModal {
       this.currentScenarioId = scenarioId;
       this.scenarioData = await scenarioDataManager.getScenario(
         categoryId,
-        scenarioId
+        scenarioId,
       );
       const dataLoadTime = performance.now() - dataLoadStartTime;
 
       if (!this.scenarioData) {
         const error = new Error(
-          `Could not load scenario data for: ${categoryId}:${scenarioId}`
+          `Could not load scenario data for: ${categoryId}:${scenarioId}`,
         );
-        this._handleError(error, 'open_data_load_failed');
+        this._handleError(error, "open_data_load_failed");
         throw error;
       }
 
       this.currentScenario = this.scenarioData;
 
-      this._logTelemetry('scenario_data_loaded', {
+      this._logTelemetry("scenario_data_loaded", {
         scenarioId,
         categoryId,
         dataLoadTime: Math.round(dataLoadTime * 100) / 100,
@@ -702,7 +713,7 @@ class ScenarioModal {
 
       // Track overall performance
       const totalOpenTime = performance.now() - startTime;
-      this._recordPerformanceMetric('modal_open', totalOpenTime, {
+      this._recordPerformanceMetric("modal_open", totalOpenTime, {
         scenarioId,
         categoryId,
         isTestMode,
@@ -713,7 +724,7 @@ class ScenarioModal {
 
       this._updateCircuitBreaker(true); // Success
 
-      this._logTelemetry('modal_opened_successfully', {
+      this._logTelemetry("modal_opened_successfully", {
         scenarioId,
         categoryId,
         isTestMode,
@@ -724,14 +735,14 @@ class ScenarioModal {
       });
 
       logger.info(
-        'ScenarioModal',
-        `Opened scenario modal for: ${categoryId}:${scenarioId}${isTestMode ? ' (TEST MODE)' : ''} in ${Math.round(totalOpenTime)}ms`
+        "ScenarioModal",
+        `Opened scenario modal for: ${categoryId}:${scenarioId}${isTestMode ? " (TEST MODE)" : ""} in ${Math.round(totalOpenTime)}ms`,
       );
     } catch (error) {
-      this._handleError(error, 'open', () =>
-        this.open(scenarioId, categoryId, isTestMode)
+      this._handleError(error, "open", () =>
+        this.open(scenarioId, categoryId, isTestMode),
       );
-      logger.error('Failed to open scenario modal:', error);
+      logger.error("Failed to open scenario modal:", error);
       alert(`Failed to load scenario: ${scenarioId}. Please try again.`);
 
       // Ensure cleanup on error to prevent modal from being stuck
@@ -748,7 +759,7 @@ class ScenarioModal {
    */
   cleanup() {
     try {
-      this._logTelemetry('cleanup_started', {
+      this._logTelemetry("cleanup_started", {
         hasModal: !!this.modal,
         hasBackdrop: !!this.backdrop,
         currentScenario: this.currentScenarioId,
@@ -775,22 +786,22 @@ class ScenarioModal {
       this.radarChart = null;
 
       // Restore body scrolling
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
 
       // Remove event listeners
       if (this.escapeHandler) {
-        document.removeEventListener('keydown', this.escapeHandler);
+        document.removeEventListener("keydown", this.escapeHandler);
         this.escapeHandler = null;
       }
 
       // Perform enterprise cleanup
       this._enterpriseCleanup();
 
-      this._logTelemetry('cleanup_completed', {
+      this._logTelemetry("cleanup_completed", {
         timestamp: Date.now(),
       });
     } catch (error) {
-      this._handleError(error, 'cleanup');
+      this._handleError(error, "cleanup");
     }
   }
 
@@ -801,7 +812,7 @@ class ScenarioModal {
     for (const category of this.categories) {
       if (
         category.scenarios &&
-        category.scenarios.some(s => s.id === scenarioId)
+        category.scenarios.some((s) => s.id === scenarioId)
       ) {
         return category.id;
       }
@@ -818,26 +829,26 @@ class ScenarioModal {
 
     // Clean up any orphaned modals or radar chart containers from previous instances
     const existingModals = document.querySelectorAll(
-      '.scenario-modal, .scenario-modal-backdrop'
+      ".scenario-modal, .scenario-modal-backdrop",
     );
-    existingModals.forEach(modal => {
-      logger.info('ScenarioModal', 'Removing orphaned modal element');
+    existingModals.forEach((modal) => {
+      logger.info("ScenarioModal", "Removing orphaned modal element");
       modal.remove();
     });
 
     // Clean up any orphaned radar chart containers with Chart.js instances
     const orphanedChartContainers = document.querySelectorAll(
-      '#scenario-radar-chart'
+      "#scenario-radar-chart",
     );
-    orphanedChartContainers.forEach(container => {
-      const canvases = container.querySelectorAll('canvas');
-      canvases.forEach(canvas => {
+    orphanedChartContainers.forEach((container) => {
+      const canvases = container.querySelectorAll("canvas");
+      canvases.forEach((canvas) => {
         if (window.Chart && window.Chart.getChart) {
           const chartInstance = window.Chart.getChart(canvas);
           if (chartInstance) {
             logger.info(
-              'ScenarioModal',
-              'Destroying orphaned Chart.js instance'
+              "ScenarioModal",
+              "Destroying orphaned Chart.js instance",
             );
             chartInstance.destroy();
           }
@@ -846,18 +857,18 @@ class ScenarioModal {
       container.remove();
     });
 
-    logger.info('ScenarioModal', 'Creating scenario modal DOM structure');
+    logger.info("ScenarioModal", "Creating scenario modal DOM structure");
     logger.info(
-      'Current scenario data:',
-      this.currentScenario ? 'LOADED' : 'NULL'
+      "Current scenario data:",
+      this.currentScenario ? "LOADED" : "NULL",
     );
 
     // Create modal elements
-    this.backdrop = document.createElement('div');
-    this.backdrop.className = 'scenario-modal-backdrop';
+    this.backdrop = document.createElement("div");
+    this.backdrop.className = "scenario-modal-backdrop";
 
-    this.modal = document.createElement('div');
-    this.modal.className = 'scenario-modal';
+    this.modal = document.createElement("div");
+    this.modal.className = "scenario-modal";
     this.modal.innerHTML = this.getModalHTML();
 
     // Add to DOM
@@ -865,12 +876,12 @@ class ScenarioModal {
     document.body.appendChild(this.modal);
 
     logger.info(
-      'ScenarioModal',
-      'Scenario modal DOM structure created and appended to body'
+      "ScenarioModal",
+      "Scenario modal DOM structure created and appended to body",
     );
     logger.info(
-      'Modal HTML contains radar chart container:',
-      this.modal.innerHTML.includes('scenario-radar-chart')
+      "Modal HTML contains radar chart container:",
+      this.modal.innerHTML.includes("scenario-radar-chart"),
     );
 
     // Attach event listeners
@@ -882,25 +893,25 @@ class ScenarioModal {
    */
   getModalHTML() {
     logger.info(
-      'getModalHTML called - currentScenario status:',
-      this.currentScenario ? 'LOADED' : 'NULL'
+      "getModalHTML called - currentScenario status:",
+      this.currentScenario ? "LOADED" : "NULL",
     );
 
     if (!this.currentScenario) {
-      logger.warn('No current scenario data - returning loading message');
+      logger.warn("No current scenario data - returning loading message");
       return '<div class="scenario-content"><p>Loading scenario...</p></div>';
     }
 
     const categoryInfo = this.categories.find(
-      c => c.id === this.currentCategoryId
+      (c) => c.id === this.currentCategoryId,
     );
     const categoryTitle = categoryInfo
       ? categoryInfo.title
-      : 'Unknown Category';
+      : "Unknown Category";
 
     logger.info(
-      'ScenarioModal',
-      `Generating HTML for scenario: ${this.currentScenario.title} in category: ${categoryTitle}`
+      "ScenarioModal",
+      `Generating HTML for scenario: ${this.currentScenario.title} in category: ${categoryTitle}`,
     );
 
     const html = `
@@ -946,23 +957,23 @@ class ScenarioModal {
                 </div>
 
                 <div class="scenario-modal-footer">
-                    ${this.isTestMode ? '<div class="test-mode-indicator">🧪 Test Mode - Choices not tracked</div>' : ''}
+                    ${this.isTestMode ? '<div class="test-mode-indicator">🧪 Test Mode - Choices not tracked</div>' : ""}
                     <button class="btn btn-secondary" id="cancel-scenario">
                         Cancel
                     </button>
                     <button class="btn btn-primary" id="confirm-choice" disabled>
-                        ${this.isTestMode ? 'Close Test' : 'Confirm Choice'}
+                        ${this.isTestMode ? "Close Test" : "Confirm Choice"}
                     </button>
                 </div>
             </div>
         `;
 
     logger.info(
-      'ScenarioModal',
-      'Generated scenario modal HTML, checking for radar chart container...'
+      "ScenarioModal",
+      "Generated scenario modal HTML, checking for radar chart container...",
     );
-    logger.info('ScenarioModal', 'HTML contains scenario-radar-chart:', {
-      hasRadarChart: html.includes('scenario-radar-chart'),
+    logger.info("ScenarioModal", "HTML contains scenario-radar-chart:", {
+      hasRadarChart: html.includes("scenario-radar-chart"),
     });
 
     return html;
@@ -973,12 +984,12 @@ class ScenarioModal {
    */
   renderOptions() {
     if (!this.currentScenario.options) {
-      return '<p>No options available</p>';
+      return "<p>No options available</p>";
     }
 
     return this.currentScenario.options
       .map(
-        option => `
+        (option) => `
             <div class="option-card" data-option-id="${option.id}">
                 <div class="option-header">
                     <h4 class="option-title">${option.text}</h4>
@@ -992,26 +1003,26 @@ class ScenarioModal {
                         ? `
                         <div class="pros-section">
                             <h5>Pros</h5>
-                            <ul>${option.pros.map(pro => `<li>${pro}</li>`).join('')}</ul>
+                            <ul>${option.pros.map((pro) => `<li>${pro}</li>`).join("")}</ul>
                         </div>
                     `
-                        : ''
+                        : ""
                     }
                     ${
                       option.cons
                         ? `
                         <div class="cons-section">
                             <h5>Cons</h5>
-                            <ul>${option.cons.map(con => `<li>${con}</li>`).join('')}</ul>
+                            <ul>${option.cons.map((con) => `<li>${con}</li>`).join("")}</ul>
                         </div>
                     `
-                        : ''
+                        : ""
                     }
                 </div>
             </div>
-        `
+        `,
       )
-      .join('');
+      .join("");
   }
 
   /**
@@ -1021,85 +1032,85 @@ class ScenarioModal {
     const startTime = performance.now();
 
     try {
-      this._logTelemetry('radar_init_started', {
+      this._logTelemetry("radar_init_started", {
         timestamp: Date.now(),
         modalState: !!this.modal,
         hasRadarChart: !!this.radarChart,
       });
 
-      logger.info('RadarChart', 'Starting radar chart initialization...');
+      logger.info("RadarChart", "Starting radar chart initialization...");
 
       // Circuit breaker check for radar chart initialization
-      if (this.circuitBreaker.state === 'open') {
-        this._logTelemetry('radar_init_blocked_circuit_open');
+      if (this.circuitBreaker.state === "open") {
+        this._logTelemetry("radar_init_blocked_circuit_open");
         logger.warn(
-          'Radar chart initialization blocked: Circuit breaker is open'
+          "Radar chart initialization blocked: Circuit breaker is open",
         );
         return;
       }
 
       // Enhanced checks for modal state - WITH DETAILED DEBUGGING
-      logger.debug('Modal state debug:', {
+      logger.debug("Modal state debug:", {
         isClosing: this.isClosing,
         hasModal: !!this.modal,
         modalInDOM: this.modal ? document.body.contains(this.modal) : false,
-        modalDisplay: this.modal ? this.modal.style.display : 'no modal',
+        modalDisplay: this.modal ? this.modal.style.display : "no modal",
         modalAriaHidden: this.modal
-          ? this.modal.getAttribute('aria-hidden')
-          : 'no modal',
+          ? this.modal.getAttribute("aria-hidden")
+          : "no modal",
         modalHasAriaHidden: this.modal
-          ? this.modal.hasAttribute('aria-hidden')
+          ? this.modal.hasAttribute("aria-hidden")
           : false,
       });
 
       if (this.isClosing) {
         logger.debug(
-          'RadarChart',
-          'Modal is closing, skipping radar chart initialization'
+          "RadarChart",
+          "Modal is closing, skipping radar chart initialization",
         );
-        this._logTelemetry('radar_init_skipped_modal_closing');
-        logger.debug('Exit: Modal is closing');
+        this._logTelemetry("radar_init_skipped_modal_closing");
+        logger.debug("Exit: Modal is closing");
         return;
       }
 
       if (!this.modal || !document.body.contains(this.modal)) {
         logger.debug(
-          'RadarChart',
-          'Modal not in DOM, skipping radar chart initialization'
+          "RadarChart",
+          "Modal not in DOM, skipping radar chart initialization",
         );
-        logger.debug('Exit: Modal not in DOM');
+        logger.debug("Exit: Modal not in DOM");
         return;
       }
 
       // Check if modal is visible - FIXED LOGIC
       const isVisible =
-        this.modal.style.display !== 'none' &&
-        !this.modal.hasAttribute('aria-hidden') &&
-        this.modal.getAttribute('aria-hidden') !== 'true';
+        this.modal.style.display !== "none" &&
+        !this.modal.hasAttribute("aria-hidden") &&
+        this.modal.getAttribute("aria-hidden") !== "true";
 
-      logger.debug('Visibility check:', {
-        displayNotNone: this.modal.style.display !== 'none',
-        noAriaHiddenAttr: !this.modal.hasAttribute('aria-hidden'),
-        ariaHiddenNotTrue: this.modal.getAttribute('aria-hidden') !== 'true',
+      logger.debug("Visibility check:", {
+        displayNotNone: this.modal.style.display !== "none",
+        noAriaHiddenAttr: !this.modal.hasAttribute("aria-hidden"),
+        ariaHiddenNotTrue: this.modal.getAttribute("aria-hidden") !== "true",
         finalIsVisible: isVisible,
       });
 
       if (!isVisible) {
         logger.debug(
-          'RadarChart',
-          'Modal not visible, skipping radar chart initialization'
+          "RadarChart",
+          "Modal not visible, skipping radar chart initialization",
         );
-        logger.debug('Exit: Modal not visible');
+        logger.debug("Exit: Modal not visible");
         return;
       }
 
-      logger.debug('All modal state checks passed!');
+      logger.debug("All modal state checks passed!");
 
       // Check if RadarChart class is available
       if (!RadarChart) {
         logger.error(
-          'RadarChart',
-          'RadarChart class not available - import failed'
+          "RadarChart",
+          "RadarChart class not available - import failed",
         );
         return;
       }
@@ -1107,32 +1118,35 @@ class ScenarioModal {
       // Check if Chart.js is available
       if (!window.Chart) {
         logger.error(
-          'RadarChart',
-          'Chart.js not loaded - radar chart cannot be initialized'
+          "RadarChart",
+          "Chart.js not loaded - radar chart cannot be initialized",
         );
         return;
       }
 
       logger.debug(
-        'All prerequisites met, proceeding with radar chart initialization'
+        "All prerequisites met, proceeding with radar chart initialization",
       );
       logger.info(
-        'RadarChart',
-        'Prerequisites check passed - Chart.js and RadarChart class available'
+        "RadarChart",
+        "Prerequisites check passed - Chart.js and RadarChart class available",
       );
 
       // IMMEDIATE TEST: Skip complex container search and try direct creation
-      const directContainer = document.getElementById('scenario-radar-chart');
+      const directContainer = document.getElementById("scenario-radar-chart");
       if (directContainer) {
         logger.debug(
-          'Direct container found, attempting immediate chart creation'
+          "Direct container found, attempting immediate chart creation",
         );
         try {
           directContainer.innerHTML =
             '<div style="background: yellow; padding: 10px;">🔄 Creating radar chart...</div>';
 
+          // Load RadarChart configuration first
+          await RadarChart.loadConfiguration();
+
           // Try direct radar chart creation
-          this.radarChart = new RadarChart('scenario-radar-chart', {
+          this.radarChart = new RadarChart("scenario-radar-chart", {
             width: 380,
             height: 380,
             showLabels: true,
@@ -1144,14 +1158,14 @@ class ScenarioModal {
 
           // Set initial neutral scores
           const neutralScores = {
-            fairness: RADAR_CHART_NEUTRAL_SCORE,
-            sustainability: RADAR_CHART_NEUTRAL_SCORE,
-            autonomy: RADAR_CHART_NEUTRAL_SCORE,
-            beneficence: RADAR_CHART_NEUTRAL_SCORE,
-            transparency: RADAR_CHART_NEUTRAL_SCORE,
-            accountability: RADAR_CHART_NEUTRAL_SCORE,
-            privacy: RADAR_CHART_NEUTRAL_SCORE,
-            proportionality: RADAR_CHART_NEUTRAL_SCORE,
+            fairness: this.config.radarChart.neutralScore,
+            sustainability: this.config.radarChart.neutralScore,
+            autonomy: this.config.radarChart.neutralScore,
+            beneficence: this.config.radarChart.neutralScore,
+            transparency: this.config.radarChart.neutralScore,
+            accountability: this.config.radarChart.neutralScore,
+            privacy: this.config.radarChart.neutralScore,
+            proportionality: this.config.radarChart.neutralScore,
           };
 
           if (this.radarChart.initializationPromise) {
@@ -1159,17 +1173,17 @@ class ScenarioModal {
           }
 
           this.radarChart.setScores(neutralScores);
-          logger.debug('Direct radar chart creation successful!');
-          logger.info('RadarChart', 'Direct radar chart creation successful');
+          logger.debug("Direct radar chart creation successful!");
+          logger.info("RadarChart", "Direct radar chart creation successful");
           return; // Exit early on success
         } catch (error) {
-          logger.error('Direct radar chart creation failed:', error);
-          logger.error('RadarChart', 'Direct creation failed:', error);
+          logger.error("Direct radar chart creation failed:", error);
+          logger.error("RadarChart", "Direct creation failed:", error);
           // Continue to complex search below
         }
       } else {
         logger.debug(
-          'Direct container not found, proceeding with complex search'
+          "Direct container not found, proceeding with complex search",
         );
       }
 
@@ -1179,9 +1193,9 @@ class ScenarioModal {
           this.radarChart.destroy();
         } catch (e) {
           logger.warn(
-            'RadarChart',
-            'Failed to destroy existing radar chart',
-            e
+            "RadarChart",
+            "Failed to destroy existing radar chart",
+            e,
           );
         }
         this.radarChart = null;
@@ -1201,51 +1215,51 @@ class ScenarioModal {
           !document.body.contains(this.modal)
         ) {
           logger.info(
-            'RadarChart',
-            'Modal closing during container search, aborting'
+            "RadarChart",
+            "Modal closing during container search, aborting",
           );
           return;
         }
 
         // Check if modal has been properly rendered
-        if (this.modal.style.display === 'none') {
+        if (this.modal.style.display === "none") {
           logger.debug(
-            'RadarChart',
-            `Modal not visible yet (attempt ${attempts + 1}/${maxAttempts})`
+            "RadarChart",
+            `Modal not visible yet (attempt ${attempts + 1}/${maxAttempts})`,
           );
-          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          await new Promise((resolve) => setTimeout(resolve, retryDelay));
           attempts++;
           continue;
         }
 
         // Double-check that modal contains the expected HTML
-        if (!this.modal.innerHTML.includes('scenario-radar-chart')) {
+        if (!this.modal.innerHTML.includes("scenario-radar-chart")) {
           logger.debug(
-            'RadarChart',
-            `Modal HTML incomplete (attempt ${attempts + 1}/${maxAttempts})`
+            "RadarChart",
+            `Modal HTML incomplete (attempt ${attempts + 1}/${maxAttempts})`,
           );
-          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          await new Promise((resolve) => setTimeout(resolve, retryDelay));
           attempts++;
           continue;
         }
 
-        chartContainer = document.getElementById('scenario-radar-chart');
+        chartContainer = document.getElementById("scenario-radar-chart");
         if (!chartContainer) {
           logger.debug(
-            'RadarChart',
-            `Container not found in DOM (attempt ${attempts + 1}/${maxAttempts})`
+            "RadarChart",
+            `Container not found in DOM (attempt ${attempts + 1}/${maxAttempts})`,
           );
-          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          await new Promise((resolve) => setTimeout(resolve, retryDelay));
           attempts++;
         }
       }
 
-      logger.info('RadarChart', `Container search completed`, {
+      logger.info("RadarChart", `Container search completed`, {
         found: !!chartContainer,
         attempts: attempts + 1,
-        modalVisible: this.modal?.style.display !== 'none',
+        modalVisible: this.modal?.style.display !== "none",
         modalInDOM: document.body.contains(this.modal),
-        modalHasHTML: this.modal?.innerHTML.includes('scenario-radar-chart'),
+        modalHasHTML: this.modal?.innerHTML.includes("scenario-radar-chart"),
       });
 
       if (!chartContainer) {
@@ -1253,16 +1267,16 @@ class ScenarioModal {
         // (e.g., user closed modal quickly)
         if (this.isClosing || !document.body.contains(this.modal)) {
           logger.info(
-            'RadarChart',
-            'Modal was closed during initialization, this is normal'
+            "RadarChart",
+            "Modal was closed during initialization, this is normal",
           );
         } else {
-          logger.error('RadarChart', 'Container not found after all attempts', {
-            modalVisible: this.modal?.style.display !== 'none',
-            modalHTML: this.modal?.innerHTML ? 'present' : 'missing',
+          logger.error("RadarChart", "Container not found after all attempts", {
+            modalVisible: this.modal?.style.display !== "none",
+            modalHTML: this.modal?.innerHTML ? "present" : "missing",
             modalInDOM: document.body.contains(this.modal),
             containerInHTML: this.modal?.innerHTML.includes(
-              'scenario-radar-chart'
+              "scenario-radar-chart",
             ),
           });
         }
@@ -1270,15 +1284,15 @@ class ScenarioModal {
       }
 
       // Clean up any existing Chart.js instances in the container
-      const existingCanvases = chartContainer.querySelectorAll('canvas');
-      existingCanvases.forEach(canvas => {
+      const existingCanvases = chartContainer.querySelectorAll("canvas");
+      existingCanvases.forEach((canvas) => {
         // Check if there's a Chart.js instance attached to this canvas
         if (window.Chart && window.Chart.getChart) {
           const chartInstance = window.Chart.getChart(canvas);
           if (chartInstance) {
             logger.info(
-              'RadarChart',
-              'Destroying existing Chart.js instance before creating new one'
+              "RadarChart",
+              "Destroying existing Chart.js instance before creating new one",
             );
             chartInstance.destroy();
           }
@@ -1287,15 +1301,19 @@ class ScenarioModal {
       });
 
       // Clear any existing content to prevent "null" display
-      chartContainer.innerHTML = '';
-      chartContainer.textContent = '';
+      chartContainer.innerHTML = "";
+      chartContainer.textContent = "";
 
-      logger.info('RadarChart', 'Container cleared, initializing radar chart');
+      logger.info("RadarChart", "Container cleared, initializing radar chart");
 
       try {
         // Pass the container ID (string), not the element itself
-        logger.info('RadarChart', 'Creating new RadarChart instance...');
-        this.radarChart = new RadarChart('scenario-radar-chart', {
+        logger.info("RadarChart", "Creating new RadarChart instance...");
+
+        // Load RadarChart configuration first
+        await RadarChart.loadConfiguration();
+
+        this.radarChart = new RadarChart("scenario-radar-chart", {
           width: 380,
           height: 380,
           showLabels: true,
@@ -1304,90 +1322,90 @@ class ScenarioModal {
           realTime: true,
           title: null, // Disable chart title to avoid duplication with h3
         });
-        logger.info('RadarChart', 'RadarChart constructor completed');
+        logger.info("RadarChart", "RadarChart constructor completed");
 
         // Wait for the RadarChart to be fully initialized
         logger.info(
-          'RadarChart',
-          'Waiting for radar chart initialization promise...'
+          "RadarChart",
+          "Waiting for radar chart initialization promise...",
         );
         if (this.radarChart.initializationPromise) {
           await this.radarChart.initializationPromise;
           logger.info(
-            'RadarChart',
-            'Radar chart async initialization completed'
+            "RadarChart",
+            "Radar chart async initialization completed",
           );
         } else {
           logger.warn(
-            'RadarChart',
-            'No initialization promise found on radar chart instance'
+            "RadarChart",
+            "No initialization promise found on radar chart instance",
           );
         }
 
         // Verify the chart was created successfully
         if (!this.radarChart) {
           logger.error(
-            'RadarChart',
-            'Radar chart instance is null after initialization'
+            "RadarChart",
+            "Radar chart instance is null after initialization",
           );
           return;
         }
 
         // Set initial neutral scores (using the correct method)
         const neutralScores = {
-          fairness: RADAR_CHART_NEUTRAL_SCORE,
-          sustainability: RADAR_CHART_NEUTRAL_SCORE,
-          autonomy: RADAR_CHART_NEUTRAL_SCORE,
-          beneficence: RADAR_CHART_NEUTRAL_SCORE,
-          transparency: RADAR_CHART_NEUTRAL_SCORE,
-          accountability: RADAR_CHART_NEUTRAL_SCORE,
-          privacy: RADAR_CHART_NEUTRAL_SCORE,
-          proportionality: RADAR_CHART_NEUTRAL_SCORE,
+          fairness: this.config.radarChart.neutralScore,
+          sustainability: this.config.radarChart.neutralScore,
+          autonomy: this.config.radarChart.neutralScore,
+          beneficence: this.config.radarChart.neutralScore,
+          transparency: this.config.radarChart.neutralScore,
+          accountability: this.config.radarChart.neutralScore,
+          privacy: this.config.radarChart.neutralScore,
+          proportionality: this.config.radarChart.neutralScore,
         };
 
         logger.info(
-          'RadarChart',
-          'Setting initial neutral scores...',
-          neutralScores
+          "RadarChart",
+          "Setting initial neutral scores...",
+          neutralScores,
         );
         this.radarChart.setScores(neutralScores);
         logger.info(
-          'RadarChart',
-          'Radar chart initialized successfully with neutral scores'
+          "RadarChart",
+          "Radar chart initialized successfully with neutral scores",
         );
 
         // Verify chart is visible in DOM
-        const chartCanvas = chartContainer.querySelector('canvas');
+        const chartCanvas = chartContainer.querySelector("canvas");
         if (chartCanvas) {
           logger.info(
-            'RadarChart',
-            'Canvas element created successfully in container'
+            "RadarChart",
+            "Canvas element created successfully in container",
           );
         } else {
           logger.warn(
-            'RadarChart',
-            'No canvas element found in container after initialization'
+            "RadarChart",
+            "No canvas element found in container after initialization",
           );
         }
       } catch (error) {
-        logger.error('RadarChart', 'Error during radar chart creation:', error);
+        logger.error("RadarChart", "Error during radar chart creation:", error);
         this.radarChart = null;
         return;
       }
 
       // Process any pending radar chart updates
       if (this.pendingRadarUpdate && this.selectedOption) {
-        logger.info('ScenarioModal', 'Processing pending radar chart update');
+        logger.info("ScenarioModal", "Processing pending radar chart update");
         this.updateRadarChart();
         this.pendingRadarUpdate = false;
       }
 
       // Track successful radar chart initialization
       const initTime = performance.now() - startTime;
-      this._recordPerformanceMetric('radar_init', initTime);
+      this._recordPerformanceMetric("radar_init", initTime);
       this._updateCircuitBreaker(true); // Success
 
-      this._logTelemetry('radar_init_completed', {
+      this._logTelemetry("radar_init_completed", {
         initTime: Math.round(initTime * 100) / 100,
         hasChart: !!this.radarChart,
         processingPendingUpdate:
@@ -1395,19 +1413,19 @@ class ScenarioModal {
       });
     } catch (error) {
       const initTime = performance.now() - startTime;
-      this._handleError(error, 'initializeRadarChart', () =>
-        this.initializeRadarChart()
+      this._handleError(error, "initializeRadarChart", () =>
+        this.initializeRadarChart(),
       );
 
-      logger.error('Radar chart initialization failed:', error);
+      logger.error("Radar chart initialization failed:", error);
 
-      this._logTelemetry('radar_init_failed', {
+      this._logTelemetry("radar_init_failed", {
         error: error.message,
         initTime: Math.round(initTime * 100) / 100,
       });
 
       // Clear container and show fallback message instead of null
-      const chartContainer = document.getElementById('scenario-radar-chart');
+      const chartContainer = document.getElementById("scenario-radar-chart");
       if (chartContainer) {
         chartContainer.innerHTML = `
                     <div style="
@@ -1437,41 +1455,41 @@ class ScenarioModal {
    */
   attachEventListeners() {
     // Close button
-    const closeButton = this.modal.querySelector('.close-button');
+    const closeButton = this.modal.querySelector(".close-button");
     if (closeButton) {
-      closeButton.addEventListener('click', () => this.close());
+      closeButton.addEventListener("click", () => this.close());
     }
 
     // Backdrop click to close
     if (this.backdrop) {
-      this.backdrop.addEventListener('click', () => this.close());
+      this.backdrop.addEventListener("click", () => this.close());
     }
 
     // Option selection
-    const optionCards = this.modal.querySelectorAll('.option-card');
-    optionCards.forEach(card => {
-      card.addEventListener('click', () => this.selectOption(card));
+    const optionCards = this.modal.querySelectorAll(".option-card");
+    optionCards.forEach((card) => {
+      card.addEventListener("click", () => this.selectOption(card));
     });
 
     // Cancel button
-    const cancelButton = this.modal.querySelector('#cancel-scenario');
+    const cancelButton = this.modal.querySelector("#cancel-scenario");
     if (cancelButton) {
-      cancelButton.addEventListener('click', () => this.close());
+      cancelButton.addEventListener("click", () => this.close());
     }
 
     // Confirm button
-    const confirmButton = this.modal.querySelector('#confirm-choice');
+    const confirmButton = this.modal.querySelector("#confirm-choice");
     if (confirmButton) {
-      confirmButton.addEventListener('click', () => this.confirmChoice());
+      confirmButton.addEventListener("click", () => this.confirmChoice());
     }
 
     // Escape key to close
-    this.escapeHandler = e => {
-      if (e.key === 'Escape') {
+    this.escapeHandler = (e) => {
+      if (e.key === "Escape") {
         this.close();
       }
     };
-    document.addEventListener('keydown', this.escapeHandler);
+    document.addEventListener("keydown", this.escapeHandler);
   }
 
   /**
@@ -1481,12 +1499,12 @@ class ScenarioModal {
     const startTime = performance.now();
 
     try {
-      logger.info('ScenarioModal', 'Option selection started');
+      logger.info("ScenarioModal", "Option selection started");
 
-      const optionId = card.getAttribute('data-option-id');
-      const isCurrentlySelected = card.classList.contains('selected');
+      const optionId = card.getAttribute("data-option-id");
+      const isCurrentlySelected = card.classList.contains("selected");
 
-      this._logTelemetry('option_selection_started', {
+      this._logTelemetry("option_selection_started", {
         optionId,
         isCurrentlySelected,
         currentScenario: this.currentScenarioId,
@@ -1494,14 +1512,14 @@ class ScenarioModal {
 
       // If the clicked option is already selected, deselect it
       if (isCurrentlySelected) {
-        logger.info('ScenarioModal', 'Deselecting currently selected option:', {
+        logger.info("ScenarioModal", "Deselecting currently selected option:", {
           optionId,
         });
 
         // Remove selection
-        card.classList.remove('selected');
-        const details = card.querySelector('.option-details');
-        if (details) details.style.display = 'none';
+        card.classList.remove("selected");
+        const details = card.querySelector(".option-details");
+        if (details) details.style.display = "none";
 
         // Clear selected option
         this.selectedOption = null;
@@ -1509,25 +1527,25 @@ class ScenarioModal {
         // Reset radar chart to neutral state
         if (this.radarChart && this.radarChart.isInitialized) {
           this.radarChart.resetScores();
-          logger.info('RadarChart', 'Radar chart reset to neutral state');
+          logger.info("RadarChart", "Radar chart reset to neutral state");
         }
 
         // Disable confirm button
-        const confirmButton = this.modal.querySelector('#confirm-choice');
+        const confirmButton = this.modal.querySelector("#confirm-choice");
         if (confirmButton) {
           confirmButton.disabled = true;
         }
 
         // Track deselection performance
         const selectionTime = performance.now() - startTime;
-        this._recordPerformanceMetric('option_select', selectionTime, {
+        this._recordPerformanceMetric("option_select", selectionTime, {
           optionId,
           wasSelected: false,
-          action: 'deselect',
+          action: "deselect",
           currentScenario: this.currentScenarioId,
         });
 
-        this._logTelemetry('option_deselected', {
+        this._logTelemetry("option_deselected", {
           optionId,
           selectionTime: Math.round(selectionTime * 100) / 100,
         });
@@ -1536,23 +1554,23 @@ class ScenarioModal {
       }
 
       // Remove previous selection from all cards
-      this.modal.querySelectorAll('.option-card').forEach(c => {
-        c.classList.remove('selected');
-        const details = c.querySelector('.option-details');
-        if (details) details.style.display = 'none';
+      this.modal.querySelectorAll(".option-card").forEach((c) => {
+        c.classList.remove("selected");
+        const details = c.querySelector(".option-details");
+        if (details) details.style.display = "none";
       });
 
       // Select new option
-      card.classList.add('selected');
-      const details = card.querySelector('.option-details');
-      if (details) details.style.display = 'block';
+      card.classList.add("selected");
+      const details = card.querySelector(".option-details");
+      if (details) details.style.display = "block";
 
       // Store selected option
       this.selectedOption = this.currentScenario.options.find(
-        opt => opt.id === optionId
+        (opt) => opt.id === optionId,
       );
 
-      logger.info('Option selected:', {
+      logger.info("Option selected:", {
         optionId,
         hasSelectedOption: !!this.selectedOption,
         hasImpact: !!this.selectedOption?.impact,
@@ -1565,34 +1583,34 @@ class ScenarioModal {
       } else {
         // Store the update request for when chart is ready
         this.pendingRadarUpdate = true;
-        logger.info('ScenarioModal', 'Radar chart not ready, queuing update');
+        logger.info("ScenarioModal", "Radar chart not ready, queuing update");
       }
 
       // Enable confirm button
-      const confirmButton = this.modal.querySelector('#confirm-choice');
+      const confirmButton = this.modal.querySelector("#confirm-choice");
       if (confirmButton) {
         confirmButton.disabled = false;
       }
 
       // Track performance
       const selectionTime = performance.now() - startTime;
-      this._recordPerformanceMetric('option_select', selectionTime, {
+      this._recordPerformanceMetric("option_select", selectionTime, {
         optionId,
         wasSelected: !isCurrentlySelected,
         currentScenario: this.currentScenarioId,
       });
 
-      this._logTelemetry('option_selection_completed', {
+      this._logTelemetry("option_selection_completed", {
         optionId,
         wasSelected: !isCurrentlySelected,
         selectionTime: Math.round(selectionTime * 100) / 100,
         hasRadarChart: !!this.radarChart,
       });
 
-      logger.info('ScenarioModal', 'Option selection completed');
+      logger.info("ScenarioModal", "Option selection completed");
     } catch (error) {
-      this._handleError(error, 'selectOption');
-      logger.error('[ScenarioModal] Error in selectOption:', error);
+      this._handleError(error, "selectOption");
+      logger.error("[ScenarioModal] Error in selectOption:", error);
     }
   }
 
@@ -1606,13 +1624,13 @@ class ScenarioModal {
       !this.selectedOption.impact
     ) {
       logger.warn(
-        'RadarChart',
-        'Cannot update radar chart - missing components',
+        "RadarChart",
+        "Cannot update radar chart - missing components",
         {
           hasRadarChart: !!this.radarChart,
           hasSelectedOption: !!this.selectedOption,
           hasImpact: !!this.selectedOption?.impact,
-        }
+        },
       );
       return;
     }
@@ -1621,8 +1639,8 @@ class ScenarioModal {
       // Check if radar chart is initialized
       if (!this.radarChart.isInitialized) {
         logger.warn(
-          'RadarChart',
-          'Radar chart not yet initialized, skipping update'
+          "RadarChart",
+          "Radar chart not yet initialized, skipping update",
         );
         return;
       }
@@ -1630,28 +1648,28 @@ class ScenarioModal {
       // Convert impact data from (-2 to +2) to radar chart scale (0 to 5)
       // -2 becomes 1, -1 becomes 2, 0 becomes 3, +1 becomes 4, +2 becomes 5
       const impactScores = {};
-      const neutralScore = RADAR_CHART_NEUTRAL_SCORE; // Middle of 0-5 scale
+      const neutralScore = this.config.radarChart.scoring.neutralScore; // Middle of 0-5 scale
 
-      Object.keys(this.selectedOption.impact).forEach(axis => {
+      Object.keys(this.selectedOption.impact).forEach((axis) => {
         const impactValue = this.selectedOption.impact[axis] || 0;
         impactScores[axis] = neutralScore + impactValue;
 
         // Clamp to valid range (0-5)
         impactScores[axis] = Math.max(
-          0,
-          Math.min(RADAR_CHART_MAX_SCORE, impactScores[axis])
+          this.config.radarChart.scoring.minScore,
+          Math.min(this.config.radarChart.scoring.maxScore, impactScores[axis]),
         );
       });
 
       logger.info(
-        'RadarChart',
-        'Updating radar chart with converted scores:',
-        impactScores
+        "RadarChart",
+        "Updating radar chart with converted scores:",
+        impactScores,
       );
       this.radarChart.setScores(impactScores);
-      logger.info('RadarChart', 'Radar chart updated successfully');
+      logger.info("RadarChart", "Radar chart updated successfully");
     } catch (error) {
-      logger.error('Failed to update radar chart:', error);
+      logger.error("Failed to update radar chart:", error);
     }
   }
 
@@ -1660,16 +1678,16 @@ class ScenarioModal {
    */
   async confirmChoice() {
     if (!this.selectedOption) {
-      logger.warn('No option selected for confirmation');
+      logger.warn("No option selected for confirmation");
       return;
     }
 
     // If this is a test scenario, just close the modal without tracking
     if (this.isTestMode) {
-      logger.info('Test scenario completed, closing modal without tracking:', {
+      logger.info("Test scenario completed, closing modal without tracking:", {
         categoryId: this.currentCategoryId,
         scenarioId: this.currentScenarioId,
-        selectedOption: this.selectedOption?.id || 'unknown',
+        selectedOption: this.selectedOption?.id || "unknown",
         testMode: true,
       });
 
@@ -1691,15 +1709,15 @@ class ScenarioModal {
     };
 
     // Dispatch initial scenario completion event (for immediate progress tracking)
-    const event = new CustomEvent('scenario-completed', {
+    const event = new CustomEvent("scenario-completed", {
       detail: completionData,
     });
     document.dispatchEvent(event);
 
-    logger.info('Scenario completed:', {
+    logger.info("Scenario completed:", {
       categoryId: this.currentCategoryId,
       scenarioId: this.currentScenarioId,
-      selectedOption: this.selectedOption?.id || 'unknown',
+      selectedOption: this.selectedOption?.id || "unknown",
     });
 
     // Close modal with delay to show completion, then dispatch final event
@@ -1707,14 +1725,14 @@ class ScenarioModal {
       await this.closeAndWait();
 
       // Dispatch event after modal is fully closed (for badge display)
-      const closedEvent = new CustomEvent('scenario-modal-closed', {
+      const closedEvent = new CustomEvent("scenario-modal-closed", {
         detail: completionData,
       });
       document.dispatchEvent(closedEvent);
 
       logger.info(
-        'ScenarioModal',
-        'Scenario modal fully closed, badges can now be displayed'
+        "ScenarioModal",
+        "Scenario modal fully closed, badges can now be displayed",
       );
     }, 1000);
   }
@@ -1724,7 +1742,7 @@ class ScenarioModal {
    */
   async show() {
     if (!this.modal || !this.backdrop) {
-      logger.error('Modal elements not created');
+      logger.error("Modal elements not created");
       return;
     }
 
@@ -1732,39 +1750,39 @@ class ScenarioModal {
     this.previousFocusedElement = document.activeElement;
 
     // Prevent body scrolling
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
 
     // Add show class for animation and wait for it to complete
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       requestAnimationFrame(() => {
-        this.backdrop.classList.add('show');
-        this.modal.classList.add('show');
+        this.backdrop.classList.add("show");
+        this.modal.classList.add("show");
 
         // Wait for CSS transition to complete
         setTimeout(() => {
           // Focus close button after animation
-          const closeButton = this.modal.querySelector('.close-button');
+          const closeButton = this.modal.querySelector(".close-button");
           if (closeButton) {
             closeButton.focus();
           }
           resolve();
-        }, ANIMATION_DURATION);
+        }, this.config?.animations?.duration || 300);
       });
     });
 
     // Start typewriter effect for the dilemma and ethical question
     // Initialize radar chart first, before typewriter effect - with additional delay
-    logger.debug('About to initialize radar chart');
-    logger.debug('DOM ready state:', document.readyState);
-    logger.debug('Chart.js available:', !!window.Chart);
+    logger.debug("About to initialize radar chart");
+    logger.debug("DOM ready state:", document.readyState);
+    logger.debug("Chart.js available:", !!window.Chart);
     logger.debug(
-      'Container exists:',
-      !!document.getElementById('scenario-radar-chart')
+      "Container exists:",
+      !!document.getElementById("scenario-radar-chart"),
     );
 
     // Add a small delay to ensure DOM is fully settled
     const DOM_SETTLE_DELAY = 200; // ms
-    await new Promise(resolve => setTimeout(resolve, DOM_SETTLE_DELAY));
+    await new Promise((resolve) => setTimeout(resolve, DOM_SETTLE_DELAY));
 
     await this.initializeRadarChart();
 
@@ -1780,8 +1798,11 @@ class ScenarioModal {
       this.close();
       // Wait for the animation to complete plus small buffer
       const CLOSE_BUFFER = 50; // ms
-      await new Promise(resolve =>
-        setTimeout(resolve, ANIMATION_DURATION + CLOSE_BUFFER)
+      await new Promise((resolve) =>
+        setTimeout(
+          resolve,
+          (this.config?.animations?.duration || 300) + CLOSE_BUFFER,
+        ),
       );
     }
   }
@@ -1794,23 +1815,23 @@ class ScenarioModal {
     this.isClosing = true;
 
     if (this.modal) {
-      this.modal.classList.add('closing');
+      this.modal.classList.add("closing");
       setTimeout(() => {
         if (this.modal) {
           this.modal.remove();
           this.modal = null;
         }
-      }, ANIMATION_DURATION);
+      }, this.config?.animations?.duration || 300);
     }
 
     if (this.backdrop) {
-      this.backdrop.classList.add('closing');
+      this.backdrop.classList.add("closing");
       setTimeout(() => {
         if (this.backdrop) {
           this.backdrop.remove();
           this.backdrop = null;
         }
-      }, ANIMATION_DURATION);
+      }, this.config?.animations?.duration || 300);
     }
 
     // Restore focus
@@ -1819,18 +1840,18 @@ class ScenarioModal {
     }
 
     // Restore body scrolling
-    document.body.style.overflow = '';
+    document.body.style.overflow = "";
 
     // Remove event listeners
     if (this.escapeHandler) {
-      document.removeEventListener('keydown', this.escapeHandler);
+      document.removeEventListener("keydown", this.escapeHandler);
       this.escapeHandler = null;
     }
 
     // CRITICAL FIX: Only dispatch uncompleted event if scenario wasn't actually completed
     // This prevents overriding the completion event from confirmChoice
     if (!this.wasCompleted) {
-      const modalClosedEvent = new CustomEvent('scenario-modal-closed', {
+      const modalClosedEvent = new CustomEvent("scenario-modal-closed", {
         detail: {
           categoryId: this.currentCategoryId,
           scenarioId: this.currentScenarioId,
@@ -1840,13 +1861,16 @@ class ScenarioModal {
 
       // Dispatch after a short delay to ensure modal cleanup is complete
       const CLOSE_EVENT_DELAY = 50; // ms - small buffer after animation
-      setTimeout(() => {
-        document.dispatchEvent(modalClosedEvent);
-        logger.info(
-          'ScenarioModal',
-          'Modal closed event dispatched (without completion)'
-        );
-      }, ANIMATION_DURATION + CLOSE_EVENT_DELAY);
+      setTimeout(
+        () => {
+          document.dispatchEvent(modalClosedEvent);
+          logger.info(
+            "ScenarioModal",
+            "Modal closed event dispatched (without completion)",
+          );
+        },
+        (this.config?.animations?.duration || 300) + CLOSE_EVENT_DELAY,
+      );
     }
 
     // Reset state
@@ -1859,7 +1883,7 @@ class ScenarioModal {
     this.isOpening = false; // Reset opening flag
     this.isClosing = false; // Reset closing flag to allow reopening
 
-    logger.info('ScenarioModal', 'Scenario modal closed');
+    logger.info("ScenarioModal", "Scenario modal closed");
   }
 
   /**
@@ -1867,19 +1891,19 @@ class ScenarioModal {
    */
   async startTypewriterEffect() {
     try {
-      const dilemmaElement = this.modal.querySelector('.dilemma-text');
+      const dilemmaElement = this.modal.querySelector(".dilemma-text");
       const ethicalQuestionElement =
-        this.modal.querySelector('.ethical-question');
-      const scenarioContent = this.modal.querySelector('.scenario-content');
+        this.modal.querySelector(".ethical-question");
+      const scenarioContent = this.modal.querySelector(".scenario-content");
 
       if (!dilemmaElement || !ethicalQuestionElement) {
-        logger.warn('Could not find text elements for typewriter effect');
+        logger.warn("Could not find text elements for typewriter effect");
         return;
       }
 
       // Add active class to start typewriter styling
       if (scenarioContent) {
-        scenarioContent.classList.add('typewriter-active');
+        scenarioContent.classList.add("typewriter-active");
       }
 
       // Get the original text content
@@ -1908,14 +1932,14 @@ class ScenarioModal {
         },
       ]);
 
-      logger.info('ScenarioModal', 'Typewriter effect completed');
+      logger.info("ScenarioModal", "Typewriter effect completed");
     } catch (error) {
-      logger.error('Failed to apply typewriter effect:', error);
+      logger.error("Failed to apply typewriter effect:", error);
 
       // Fallback - show text immediately if typewriter fails
-      const dilemmaElement = this.modal.querySelector('.dilemma-text');
+      const dilemmaElement = this.modal.querySelector(".dilemma-text");
       const ethicalQuestionElement =
-        this.modal.querySelector('.ethical-question');
+        this.modal.querySelector(".ethical-question");
 
       if (dilemmaElement) {
         dilemmaElement.textContent = this.currentScenario.dilemma;
@@ -1938,7 +1962,7 @@ class ScenarioModal {
       const report = {
         timestamp: Date.now(),
         instanceCount: instances.size,
-        systemHealth: 'healthy',
+        systemHealth: "healthy",
         instances: [],
         performance: {
           averageModalOpenTime: 0,
@@ -1948,7 +1972,7 @@ class ScenarioModal {
           totalScenariosCompleted: 0,
           memoryUsage: performance.memory
             ? Math.round(performance.memory.usedJSHeapSize / 1024 / 1024)
-            : 'unknown',
+            : "unknown",
         },
         circuitBreakers: {
           total: 0,
@@ -1964,11 +1988,11 @@ class ScenarioModal {
       let totalScenariosOpened = 0;
       let totalScenariosCompleted = 0;
 
-      instances.forEach(instance => {
+      instances.forEach((instance) => {
         const instanceHealth = {
           id: instance.instanceId,
           isHealthy: instance.isHealthy,
-          circuitBreakerState: instance.circuitBreaker?.state || 'unknown',
+          circuitBreakerState: instance.circuitBreaker?.state || "unknown",
           modalOpenCount: instance.performanceMetrics?.modalOpenCount || 0,
           radarInitCount: instance.performanceMetrics?.radarInitCount || 0,
           optionSelectCount:
@@ -2002,13 +2026,13 @@ class ScenarioModal {
         // Circuit breaker stats
         report.circuitBreakers.total++;
         switch (instanceHealth.circuitBreakerState) {
-          case 'open':
+          case "open":
             report.circuitBreakers.open++;
             break;
-          case 'half-open':
+          case "half-open":
             report.circuitBreakers.halfOpen++;
             break;
-          case 'closed':
+          case "closed":
             report.circuitBreakers.closed++;
             break;
         }
@@ -2016,9 +2040,9 @@ class ScenarioModal {
         // Determine overall health
         if (
           !instanceHealth.isHealthy ||
-          instanceHealth.circuitBreakerState === 'open'
+          instanceHealth.circuitBreakerState === "open"
         ) {
-          report.systemHealth = 'degraded';
+          report.systemHealth = "degraded";
         }
       });
 
@@ -2032,7 +2056,7 @@ class ScenarioModal {
       if (instances.size > 0) {
         const totalRadarInits = Array.from(instances).reduce(
           (sum, inst) => sum + (inst.performanceMetrics?.radarInitCount || 0),
-          0
+          0,
         );
         if (totalRadarInits > 0) {
           report.performance.averageRadarInitTime =
@@ -2042,7 +2066,7 @@ class ScenarioModal {
         const totalOptionSelects = Array.from(instances).reduce(
           (sum, inst) =>
             sum + (inst.performanceMetrics?.optionSelectCount || 0),
-          0
+          0,
         );
         if (totalOptionSelects > 0) {
           report.performance.averageOptionSelectTime =
@@ -2055,10 +2079,10 @@ class ScenarioModal {
 
       return report;
     } catch (error) {
-      console.error('[ScenarioModal] Error generating health report:', error);
+      console.error("[ScenarioModal] Error generating health report:", error);
       return {
         timestamp: Date.now(),
-        systemHealth: 'error',
+        systemHealth: "error",
         error: error.message,
         instanceCount: 0,
         instances: [],
@@ -2068,7 +2092,7 @@ class ScenarioModal {
           averageOptionSelectTime: 0,
           totalScenariosOpened: 0,
           totalScenariosCompleted: 0,
-          memoryUsage: 'unknown',
+          memoryUsage: "unknown",
         },
         circuitBreakers: { total: 0, open: 0, halfOpen: 0, closed: 0 },
       };
@@ -2114,7 +2138,7 @@ class ScenarioModal {
       let totalScenariosCompleted = 0;
       let totalErrors = 0;
 
-      instances.forEach(instance => {
+      instances.forEach((instance) => {
         const perf = instance.performanceMetrics || {};
         const instanceMetric = {
           id: instance.instanceId,
@@ -2147,11 +2171,11 @@ class ScenarioModal {
         if (instanceMetric.averageModalOpenTime > 0) {
           metrics.aggregatedMetrics.minModalOpenTime = Math.min(
             metrics.aggregatedMetrics.minModalOpenTime,
-            instanceMetric.averageModalOpenTime
+            instanceMetric.averageModalOpenTime,
           );
           metrics.aggregatedMetrics.maxModalOpenTime = Math.max(
             metrics.aggregatedMetrics.maxModalOpenTime,
-            instanceMetric.averageModalOpenTime
+            instanceMetric.averageModalOpenTime,
           );
         }
       });
@@ -2196,8 +2220,8 @@ class ScenarioModal {
       return metrics;
     } catch (error) {
       console.error(
-        '[ScenarioModal] Error generating performance metrics:',
-        error
+        "[ScenarioModal] Error generating performance metrics:",
+        error,
       );
       return {
         timestamp: Date.now(),
@@ -2240,13 +2264,13 @@ class ScenarioModal {
         results: [],
       };
 
-      const recoveryPromises = Array.from(instances).map(async instance => {
+      const recoveryPromises = Array.from(instances).map(async (instance) => {
         try {
           const startTime = performance.now();
 
           // Reset circuit breaker
           if (instance.circuitBreaker) {
-            instance.circuitBreaker.state = 'closed';
+            instance.circuitBreaker.state = "closed";
             instance.circuitBreaker.failureCount = 0;
             instance.circuitBreaker.lastFailureTime = null;
           }
@@ -2276,7 +2300,7 @@ class ScenarioModal {
             recoveryDuration: Math.round((endTime - startTime) * 100) / 100,
             newState: {
               isHealthy: instance.isHealthy,
-              circuitBreakerState: instance.circuitBreaker?.state || 'unknown',
+              circuitBreakerState: instance.circuitBreaker?.state || "unknown",
               errorCount: instance.errorCount,
             },
           };
@@ -2286,7 +2310,7 @@ class ScenarioModal {
         } catch (error) {
           results.failedRecoveries++;
           return {
-            id: instance.instanceId || 'unknown',
+            id: instance.instanceId || "unknown",
             recovered: false,
             error: error.message,
             recoveryDuration: 0,
@@ -2297,11 +2321,11 @@ class ScenarioModal {
       results.results = await Promise.all(recoveryPromises);
 
       console.log(
-        `[ScenarioModal] Emergency recovery completed: ${results.recoveredInstances}/${results.totalInstances} instances recovered`
+        `[ScenarioModal] Emergency recovery completed: ${results.recoveredInstances}/${results.totalInstances} instances recovered`,
       );
       return results;
     } catch (error) {
-      console.error('[ScenarioModal] Error during emergency recovery:', error);
+      console.error("[ScenarioModal] Error during emergency recovery:", error);
       return {
         timestamp: Date.now(),
         error: error.message,

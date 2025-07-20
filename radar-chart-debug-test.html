@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Radar Chart Debug Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #f0f0f0;
+      }
+
+      .debug-container {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .radar-container {
+        width: 500px;
+        height: 500px;
+        margin: 20px auto;
+        border: 2px solid #ddd;
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+      }
+
+      .info-panel {
+        background: #e8f4f8;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 10px 0;
+        font-family: monospace;
+        white-space: pre-wrap;
+      }
+
+      .btn {
+        background: #007acc;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+      }
+
+      .btn:hover {
+        background: #005999;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🐛 Radar Chart Debug Test</h1>
+
+    <div class="debug-container">
+      <h2>Default Scores Debug</h2>
+      <div id="defaultScoresInfo" class="info-panel">Loading...</div>
+
+      <button class="btn" onclick="debugDefaultScores()">
+        Check Default Scores
+      </button>
+      <button class="btn" onclick="debugCurrentScores()">
+        Check Current Scores
+      </button>
+      <button class="btn" onclick="debugChartData()">Check Chart Data</button>
+    </div>
+
+    <div class="debug-container">
+      <h2>Radar Chart Visualization</h2>
+      <div id="radarChart" class="radar-container"></div>
+      <div id="chartInfo" class="info-panel">Chart not initialized</div>
+    </div>
+
+    <div class="debug-container">
+      <h2>Chart State Monitor</h2>
+      <div id="stateInfo" class="info-panel">Monitoring...</div>
+    </div>
+
+    <script type="module">
+      import RadarChart from "./src/js/components/radar-chart.js";
+
+      let radarInstance = null;
+
+      // Initialize configuration and chart
+      async function initializeChart() {
+        try {
+          // Load configuration first
+          await RadarChart.loadConfiguration();
+          console.log("✅ Configuration loaded");
+
+          // Create radar chart instance
+          radarInstance = new RadarChart("radarChart", {
+            title: "Debug Chart",
+            isDemo: false,
+            animated: true,
+          });
+
+          console.log("✅ Radar chart instance created");
+
+          // Wait for initialization
+          await radarInstance.initializationPromise;
+          console.log("✅ Radar chart initialized");
+
+          updateChartInfo();
+        } catch (error) {
+          console.error("❌ Initialization error:", error);
+          document.getElementById("chartInfo").textContent =
+            "Error: " + error.message;
+        }
+      }
+
+      function updateChartInfo() {
+        if (radarInstance) {
+          const info = `
+Chart Instance: ${radarInstance.instanceId}
+Initialized: ${radarInstance.isInitialized}
+Container ID: ${radarInstance.containerId}
+Chart Object: ${radarInstance.chart ? "Present" : "Missing"}
+Current Scores: ${JSON.stringify(radarInstance.currentScores, null, 2)}
+Default Scores: ${JSON.stringify(radarInstance.DEFAULT_SCORES, null, 2)}
+                `;
+          document.getElementById("chartInfo").textContent = info;
+        }
+      }
+
+      window.debugDefaultScores = function () {
+        if (RadarChart.config) {
+          const info = `
+Configuration Default Scores:
+${JSON.stringify(RadarChart.config.defaultScores, null, 2)}
+
+Instance Default Scores:
+${radarInstance ? JSON.stringify(radarInstance.DEFAULT_SCORES, null, 2) : "No instance"}
+                `;
+          document.getElementById("defaultScoresInfo").textContent = info;
+        } else {
+          document.getElementById("defaultScoresInfo").textContent =
+            "Configuration not loaded";
+        }
+      };
+
+      window.debugCurrentScores = function () {
+        if (radarInstance) {
+          const info = `
+Current Scores (used for chart):
+${JSON.stringify(radarInstance.currentScores, null, 2)}
+
+Are scores all 3? ${Object.values(radarInstance.currentScores).every((score) => score === 3)}
+                `;
+          document.getElementById("defaultScoresInfo").textContent = info;
+        } else {
+          document.getElementById("defaultScoresInfo").textContent =
+            "No chart instance";
+        }
+      };
+
+      window.debugChartData = function () {
+        if (radarInstance && radarInstance.chart) {
+          const chartData = radarInstance.chart.data;
+          const info = `
+Chart Labels:
+${JSON.stringify(chartData.labels, null, 2)}
+
+Chart Data Values:
+${JSON.stringify(chartData.datasets[0].data, null, 2)}
+
+Dataset Background Color: ${chartData.datasets[0].backgroundColor}
+Dataset Border Color: ${chartData.datasets[0].borderColor}
+Point Background Colors: ${JSON.stringify(chartData.datasets[0].pointBackgroundColor, null, 2)}
+                `;
+          document.getElementById("defaultScoresInfo").textContent = info;
+        } else {
+          document.getElementById("defaultScoresInfo").textContent =
+            "Chart not available for inspection";
+        }
+      };
+
+      // Monitor state
+      setInterval(() => {
+        if (radarInstance) {
+          const state = `
+Status: ${radarInstance.isInitialized ? "✅ Initialized" : "⏳ Initializing"}
+Health: ${radarInstance.isHealthy ? "✅ Healthy" : "❌ Unhealthy"}
+Error Count: ${radarInstance.errorCount}
+Last Error: ${radarInstance.lastError || "None"}
+Chart Present: ${radarInstance.chart ? "✅ Yes" : "❌ No"}
+                `;
+          document.getElementById("stateInfo").textContent = state;
+        }
+      }, 1000);
+
+      // Initialize on load
+      initializeChart();
+    </script>
+  </body>
+</html>

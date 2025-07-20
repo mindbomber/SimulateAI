@@ -29,122 +29,70 @@
  */
 
 import logger from "../utils/logger.js";
-
-// === ENTERPRISE RADAR CHART CONSTANTS ===
-const ENTERPRISE_CONSTANTS = {
-  // Health monitoring thresholds
-  HEALTH: {
-    CHECK_INTERVAL: 30000, // 30 seconds
-    HEARTBEAT_INTERVAL: 60000, // 1 minute
-    MEMORY_THRESHOLD_MB: 100, // Memory usage threshold
-    RENDER_TIME_THRESHOLD_MS: 500, // Chart render time threshold
-    ERROR_THRESHOLD: 5, // Max errors before failsafe mode
-    PERFORMANCE_SAMPLE_SIZE: 20, // Rolling average sample size
-  },
-
-  // Performance monitoring
-  PERFORMANCE: {
-    CHART_RENDER_TIMEOUT: 5000, // 5 seconds max render time
-    ANIMATION_FRAME_BUDGET: 16, // 60fps budget in ms
-    DATA_UPDATE_DEBOUNCE: 100, // Debounce data updates
-    INTERACTION_TIMEOUT: 30000, // User interaction timeout
-  },
-
-  // Telemetry configuration
-  TELEMETRY: {
-    FLUSH_INTERVAL: 45000, // 45 seconds
-    BATCH_SIZE: 50, // Events per batch
-    EVENT_TYPES: {
-      CHART_RENDER: "chart_render",
-      USER_INTERACTION: "user_interaction",
-      DATA_UPDATE: "data_update",
-      PERFORMANCE_METRIC: "performance_metric",
-      ERROR_EVENT: "error_event",
-    },
-  },
-
-  // Error recovery settings
-  ERROR_RECOVERY: {
-    MAX_RETRY_ATTEMPTS: 3,
-    RETRY_DELAY: 1000, // Base delay between retries
-    CIRCUIT_BREAKER_THRESHOLD: 5,
-    CIRCUIT_BREAKER_TIMEOUT: 60000,
-  },
-};
-
-// Constants
-const DEFAULT_CHART_SIZE = 400;
-const ANIMATION_DURATION = 750;
-const MAX_SCORE = 5;
-const MIN_SCORE = 0;
-const NEUTRAL_SCORE = 3;
-const POSITIVE_THRESHOLD = 4;
-const MODAL_LABEL_MAX_LENGTH = 10; // Shorter labels for modal context
-const SCALE_PERCENTAGE = 100;
-const MOBILE_BREAKPOINT = 768; // Mobile breakpoint for responsive features
-
-// Ethical axes definitions (0-5 scale, 3 = neutral)
-export const ETHICAL_AXES = {
-  fairness: {
-    label: "Fairness",
-    description: "Treats all individuals and groups equitably",
-    color: "#3498db",
-  },
-  sustainability: {
-    label: "Sustainability",
-    description: "Supports long-term ecological and social well-being",
-    color: "#27ae60",
-  },
-  autonomy: {
-    label: "Autonomy",
-    description: "Respects individual control and self-determination",
-    color: "#9b59b6",
-  },
-  beneficence: {
-    label: "Beneficence",
-    description: "Promotes well-being and prevents harm",
-    color: "#e74c3c",
-  },
-  transparency: {
-    label: "Transparency",
-    description: "Provides openness in decision-making processes",
-    color: "#f39c12",
-  },
-  accountability: {
-    label: "Accountability",
-    description: "Ensures clear responsibility for decisions",
-    color: "#34495e",
-  },
-  privacy: {
-    label: "Privacy",
-    description: "Protects personal information and data rights",
-    color: "#e67e22",
-  },
-  proportionality: {
-    label: "Proportionality",
-    description: "Balances benefits against severity of impact",
-    color: "#1abc9c",
-  },
-};
-
-// Default neutral scores (NEUTRAL_SCORE = neutral impact)
-const DEFAULT_SCORES = {
-  fairness: NEUTRAL_SCORE,
-  sustainability: NEUTRAL_SCORE,
-  autonomy: NEUTRAL_SCORE,
-  beneficence: NEUTRAL_SCORE,
-  transparency: NEUTRAL_SCORE,
-  accountability: NEUTRAL_SCORE,
-  privacy: NEUTRAL_SCORE,
-  proportionality: NEUTRAL_SCORE,
-};
+import {
+  loadRadarConfig,
+  getEnterpriseConstants,
+  getChartConstants,
+  getEthicalAxes,
+  getDefaultScores,
+  getPointColor,
+  getGridColor,
+  getThemeColors,
+  getImpactDescription,
+  getChartConfigTemplate,
+  validateConfig,
+} from "../utils/radar-config-loader.js";
 
 export default class RadarChart {
   static instanceCount = 0;
   static allInstances = new Set();
+  static config = null;
+
+  /**
+   * Load configuration once for all instances
+   */
+  static async loadConfiguration() {
+    if (!RadarChart.config) {
+      try {
+        RadarChart.config = await loadRadarConfig();
+        validateConfig(RadarChart.config);
+        logger.info("RadarChart", "Configuration loaded and validated");
+      } catch (error) {
+        logger.error("RadarChart", "Failed to load configuration", error);
+        throw error;
+      }
+    }
+    return RadarChart.config;
+  }
+
+  /**
+   * Initialize all radar charts with configuration
+   */
+  static async initializeAll() {
+    await RadarChart.loadConfiguration();
+    logger.info(
+      "RadarChart",
+      "Ready to create instances with loaded configuration",
+    );
+  }
 
   constructor(containerId, options = {}) {
     // === ENTERPRISE INITIALIZATION ===
+
+    // Ensure configuration is loaded
+    if (!RadarChart.config) {
+      throw new Error(
+        "Configuration not loaded. Call RadarChart.loadConfiguration() first.",
+      );
+    }
+
+    const config = RadarChart.config;
+
+    // Get constants from configuration
+    this.ENTERPRISE_CONSTANTS = getEnterpriseConstants(config);
+    this.CHART_CONSTANTS = getChartConstants(config);
+    this.ETHICAL_AXES = getEthicalAxes(config);
+    this.DEFAULT_SCORES = getDefaultScores(config);
 
     // Generate unique instance identifiers
     RadarChart.instanceCount++;
@@ -164,8 +112,8 @@ export default class RadarChart {
 
     // Configuration options
     this.options = {
-      width: options.width || DEFAULT_CHART_SIZE,
-      height: options.height || DEFAULT_CHART_SIZE,
+      width: options.width || this.CHART_CONSTANTS.DEFAULT_CHART_SIZE,
+      height: options.height || this.CHART_CONSTANTS.DEFAULT_CHART_SIZE,
       showLabels: options.showLabels !== false,
       showLegend: options.showLegend !== false,
       animated: options.animated !== false,
@@ -177,7 +125,7 @@ export default class RadarChart {
 
     // Core chart properties
     this.chart = null;
-    this.currentScores = { ...DEFAULT_SCORES };
+    this.currentScores = { ...this.DEFAULT_SCORES };
 
     // Track initialization status
     this.isInitialized = false;
@@ -288,7 +236,7 @@ export default class RadarChart {
 
       // Track chart initialization attempt
       this._logTelemetry(
-        ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.CHART_RENDER,
+        this.ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.CHART_RENDER,
         {
           operation: "initialization_start",
         },
@@ -316,9 +264,15 @@ export default class RadarChart {
       this.container.innerHTML = "";
       this.container.textContent = "";
 
-      // Ensure container is properly set up
+      // Ensure container is properly set up for tooltips
       this.container.style.textAlign = "center";
       this.container.style.overflow = "visible";
+      this.container.style.position = "relative";
+      this.container.style.zIndex = "10"; // Ensure above most content
+
+      // Force tooltip support for canvas
+      canvas.style.position = "relative";
+      canvas.style.zIndex = "1";
 
       this.container.appendChild(canvas);
       logger.info(
@@ -346,10 +300,14 @@ export default class RadarChart {
       this.chart = new window.Chart(ctx, config);
       logger.info("RadarChart", "Chart created successfully");
 
-      // Add mobile tooltip dismissal for demo charts and scenario charts
-      if (this.options.isDemo || this.options.realTime) {
-        this.setupMobileTooltipDismissal();
-      }
+      // Force tooltip z-index fix for Chart.js
+      this._setupTooltipZIndexFix();
+
+      // REMOVED: Mobile tooltip dismissal setup moved to _attachEventListenersAfterRender()
+      // This prevents interference with initial chart rendering
+      // if (this.options.isDemo || this.options.realTime) {
+      //   this.setupMobileTooltipDismissal();
+      // }
 
       // Force redraw to ensure labels are visible
       setTimeout(() => {
@@ -358,6 +316,21 @@ export default class RadarChart {
           logger.info("RadarChart", "Chart updated/redrawn");
         }
       }, 100);
+
+      // Ensure default neutral state is visible - Chart.js may not render polygon when all values are equal
+      setTimeout(() => {
+        if (this.chart && this._isAllValuesEqual()) {
+          logger.info(
+            "RadarChart",
+            "All values are equal, ensuring default state visibility",
+          );
+          this._ensureDefaultStateVisibility();
+        }
+
+        // CRITICAL FIX: Attach event listeners AFTER polygon is guaranteed to render
+        // This prevents interference with Chart.js initial rendering cycle
+        this._attachEventListenersAfterRender();
+      }, 200);
 
       this.isInitialized = true;
 
@@ -370,7 +343,7 @@ export default class RadarChart {
 
       // Log successful initialization
       this._logTelemetry(
-        ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.CHART_RENDER,
+        this.ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.CHART_RENDER,
         {
           operation: "initialization_complete",
           duration: initDuration,
@@ -394,234 +367,109 @@ export default class RadarChart {
    * Get Chart.js configuration
    */
   getChartConfig() {
-    const axesLabels = Object.values(ETHICAL_AXES).map((axis) => axis.label);
+    const config = RadarChart.config;
+    const axesLabels = Object.values(this.ETHICAL_AXES).map(
+      (axis) => axis.label,
+    );
     const axesData = Object.values(this.currentScores);
+
+    // Get base configuration template
+    const baseConfig = getChartConfigTemplate(config, this.options);
 
     // Create gradient for the radar fill
     const gradientColors = this.createGradientColors();
 
-    return {
-      type: "radar",
-      data: {
-        labels: axesLabels,
-        datasets: [
-          {
-            label: this.options.title,
-            data: axesData,
-            backgroundColor: gradientColors.background,
-            borderColor: gradientColors.border,
-            borderWidth: 3,
-            pointBackgroundColor: gradientColors.points,
-            pointBorderColor: "#ffffff",
-            pointBorderWidth: 1,
-            pointHoverBackgroundColor: "#ffffff",
-            pointHoverBorderColor: gradientColors.border,
-            pointRadius: 2, // Make dots tiny
-            pointHoverRadius: 4, // Small hover radius
-            tension: 0.2, // Smooth curves between points
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: {
-          padding: {
-            top: 40,
-            right: 40,
-            bottom: 40,
-            left: 40,
-          },
+    // Combine with data
+    baseConfig.data = {
+      labels: axesLabels,
+      datasets: [
+        {
+          label: this.options.title,
+          data: axesData,
+          backgroundColor: gradientColors.background,
+          borderColor: gradientColors.border,
+          borderWidth: config.chartConfig.dataset.borderWidth,
+          pointBackgroundColor: gradientColors.points,
+          pointBorderColor: config.chartConfig.dataset.pointBorderColor,
+          pointBorderWidth: config.chartConfig.dataset.pointBorderWidth,
+          pointHoverBackgroundColor:
+            config.chartConfig.dataset.pointHoverBackgroundColor,
+          pointHoverBorderColor: gradientColors.border,
+          pointRadius: config.chartConfig.dataset.pointRadius,
+          pointHoverRadius: config.chartConfig.dataset.pointHoverRadius,
+          tension: config.chartConfig.dataset.tension,
         },
-        animation: {
-          duration: this.options.animated ? ANIMATION_DURATION : 0,
-          easing: "easeInOutQuart",
-        },
-        interaction: {
-          intersect: false,
-          mode: "nearest",
-        },
-        onClick: (event, activeElements) => {
-          // Handle click events for mobile tooltip toggle
-          this.handleChartClick(event, activeElements);
-        },
-        plugins: {
-          legend: {
-            display: false, // Disable clickable legend to prevent chart toggle
-            position: "top",
-            labels: {
-              font: {
-                size: 14,
-                weight: "500",
-              },
-              color: "#2d3748",
-              usePointStyle: true,
-              pointStyle: "circle",
-            },
-          },
-          title: {
-            display: true, // Enable title instead of legend
-            text: this.options.title || "Ethical Impact Analysis",
-            font: {
-              size: 18,
-              weight: "bold",
-            },
-            color: "#1a202c",
-            padding: {
-              top: 10,
-              bottom: 20,
-            },
-          },
-          tooltip: {
-            enabled: window.innerWidth > MOBILE_BREAKPOINT, // Disable tooltips on mobile
-            backgroundColor: "rgba(255, 255, 255, 0.3)",
-            titleColor: "#1a202c",
-            bodyColor: "#2d3748",
-            borderColor: "#4a5568",
-            borderWidth: 1,
-            cornerRadius: 8,
-            displayColors: false,
-            titleFont: {
-              size: 14,
-              weight: "bold",
-            },
-            bodyFont: {
-              size: 12,
-            },
-            padding: 12,
-            callbacks: {
-              title: (context) => {
-                const axisKey = Object.keys(ETHICAL_AXES)[context[0].dataIndex];
-                return ETHICAL_AXES[axisKey].label;
-              },
-              label: (context) => {
-                const axisKey = Object.keys(ETHICAL_AXES)[context.dataIndex];
-                const axisInfo = ETHICAL_AXES[axisKey];
-                const score = context.parsed.r;
-                const impact = this.getImpactDescription(score);
+      ],
+    };
 
-                return [
-                  `Score: ${score}/5 (${impact})`,
-                  ``,
-                  axisInfo.description,
-                ];
-              },
-            },
-          },
-        },
-        scales: {
-          r: {
-            beginAtZero: true,
-            min: MIN_SCORE,
-            max: MAX_SCORE,
-            ticks: {
-              stepSize: 1,
-              display: this.options.showLabels,
-              backdropColor: "rgba(255, 255, 255, 0.8)",
-              backdropPadding: 4,
-              font: {
-                size: 11,
-                weight: "500",
-              },
-              color: "#4a5568",
-              callback(value) {
-                return value;
-              },
-            },
-            grid: {
-              color: (context) => {
-                // Different colors for different score levels
-                if (context.index === 0) return "rgba(239, 68, 68, 0.2)"; // Red for 0
-                if (context.index === 1) return "rgba(245, 101, 101, 0.15)"; // Light red for 1
-                if (context.index === 2) return "rgba(251, 191, 36, 0.15)"; // Yellow for 2
-                if (context.index === NEUTRAL_SCORE)
-                  return "rgba(156, 163, 175, 0.2)"; // Gray for neutral
-                if (context.index === POSITIVE_THRESHOLD)
-                  return "rgba(34, 197, 94, 0.15)"; // Light green for 4
-                if (context.index === MAX_SCORE)
-                  return "rgba(22, 163, 74, 0.2)"; // Green for 5
-                return "rgba(156, 163, 175, 0.1)";
-              },
-              lineWidth: 2,
-            },
-            angleLines: {
-              color: "rgba(156, 163, 175, 0.3)",
-              lineWidth: 1.5,
-            },
-            pointLabels: {
-              display: true,
-              font: {
-                size: 13,
-                weight: "bold",
-                family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-              },
-              color: "#1a202c",
-              padding: 20,
-              backdropColor: "rgba(255, 255, 255, 0.9)",
-              backdropPadding: {
-                x: 6,
-                y: 3,
-              },
-              borderRadius: 4,
-              callback: (label) => {
-                // Ensure labels are visible - shorter labels for modal
-                return label.length > MODAL_LABEL_MAX_LENGTH
-                  ? `${label.substring(0, MODAL_LABEL_MAX_LENGTH)}...`
-                  : label;
-              },
-            },
-          },
-        },
+    // Add grid color callback using configuration
+    baseConfig.options.scales.r.grid = {
+      ...baseConfig.options.scales.r.grid,
+      color: (context) => getGridColor(config, context.index),
+      lineWidth: config.chartConfig.scales.r.grid.lineWidth,
+    };
+
+    // Update animation duration from configuration
+    baseConfig.options.animation.duration = this.options.animated
+      ? config.chart.animationDuration
+      : 0;
+
+    // Add tooltip callbacks using configuration
+    baseConfig.options.plugins.tooltip.callbacks = {
+      title: (context) => {
+        const axisKey = Object.keys(this.ETHICAL_AXES)[context[0].dataIndex];
+        return this.ETHICAL_AXES[axisKey].label;
+      },
+      label: (context) => {
+        const axisKey = Object.keys(this.ETHICAL_AXES)[context.dataIndex];
+        const axisInfo = this.ETHICAL_AXES[axisKey];
+        const score = context.parsed.r;
+        const impact = getImpactDescription(config, score);
+
+        return [
+          `Score: ${score}/${config.scoring.maxScore} (${impact})`,
+          ``,
+          axisInfo.description,
+        ];
       },
     };
+
+    // Set mobile breakpoint for tooltips
+    baseConfig.options.plugins.tooltip.enabled =
+      window.innerWidth > config.chart.mobileBreakpoint;
+
+    // CRITICAL FIX: Don't add onClick handler during initialization
+    // This can interfere with Chart.js initial polygon rendering
+    // Event handlers will be attached after chart is fully rendered
+    // baseConfig.options.onClick = (event, activeElements) => {
+    //   this.handleChartClick(event, activeElements);
+    // };
+
+    return baseConfig;
   }
 
   /**
    * Create dynamic gradient colors based on current scores
    */
   createGradientColors() {
+    const config = RadarChart.config;
+
     // Calculate average score to determine overall theme
     const avgScore =
       Object.values(this.currentScores).reduce((a, b) => a + b, 0) /
       Object.keys(this.currentScores).length;
 
-    let backgroundColor, borderColor;
+    // Get theme colors from configuration
+    const themeColors = getThemeColors(config, avgScore);
 
-    if (avgScore < 2) {
-      // Negative theme - reds
-      backgroundColor = "rgba(239, 68, 68, 0.15)";
-      borderColor = "rgba(239, 68, 68, 0.8)";
-    } else if (avgScore < NEUTRAL_SCORE) {
-      // Slightly negative - oranges/yellows
-      backgroundColor = "rgba(245, 158, 11, 0.15)";
-      borderColor = "rgba(245, 158, 11, 0.8)";
-    } else if (avgScore === NEUTRAL_SCORE) {
-      // Neutral theme - blues
-      backgroundColor = "rgba(59, 130, 246, 0.15)";
-      borderColor = "rgba(59, 130, 246, 0.8)";
-    } else if (avgScore < POSITIVE_THRESHOLD) {
-      // Slightly positive - light greens
-      backgroundColor = "rgba(34, 197, 94, 0.15)";
-      borderColor = "rgba(34, 197, 94, 0.8)";
-    } else {
-      // Highly positive - deep greens
-      backgroundColor = "rgba(22, 163, 74, 0.15)";
-      borderColor = "rgba(22, 163, 74, 0.8)";
-    }
-
-    // Create point colors based on individual scores
-    const points = Object.values(this.currentScores).map((score) => {
-      if (score <= 1) return "#ef4444"; // red-500
-      if (score <= 2) return "#f87171"; // red-400
-      if (score < NEUTRAL_SCORE) return "#fbbf24"; // amber-400
-      if (score === NEUTRAL_SCORE) return "#9ca3af"; // gray-400
-      if (score < MAX_SCORE) return "#22c55e"; // green-500
-      return "#16a34a"; // green-600
-    });
+    // Create point colors based on individual scores using configuration
+    const points = Object.values(this.currentScores).map((score) =>
+      getPointColor(config, score),
+    );
 
     return {
-      background: backgroundColor,
-      border: borderColor,
+      background: themeColors.background,
+      border: themeColors.border,
       points,
     };
   }
@@ -651,8 +499,8 @@ export default class RadarChart {
         if (axis in this.currentScores) {
           // Clamp score between MIN_SCORE and MAX_SCORE
           this.currentScores[axis] = Math.max(
-            MIN_SCORE,
-            Math.min(MAX_SCORE, score),
+            this.CHART_CONSTANTS.MIN_SCORE,
+            Math.min(this.CHART_CONSTANTS.MAX_SCORE, score),
           );
         }
       }
@@ -670,7 +518,7 @@ export default class RadarChart {
 
       // Log telemetry
       this._logTelemetry(
-        ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.DATA_UPDATE,
+        this.ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.DATA_UPDATE,
         {
           axesUpdated: Object.keys(scoreUpdates),
           updateCount: this.userJourney.dataUpdates,
@@ -711,7 +559,7 @@ export default class RadarChart {
    * Reset all scores to neutral (3)
    */
   resetScores() {
-    this.currentScores = { ...DEFAULT_SCORES };
+    this.currentScores = { ...this.DEFAULT_SCORES };
     this.refreshChart();
   }
 
@@ -726,7 +574,7 @@ export default class RadarChart {
    * Set scores directly
    */
   setScores(scores) {
-    this.currentScores = { ...DEFAULT_SCORES, ...scores };
+    this.currentScores = { ...this.DEFAULT_SCORES, ...scores };
     this.refreshChart();
   }
 
@@ -738,20 +586,153 @@ export default class RadarChart {
       const axesData = Object.values(this.currentScores);
       this.chart.data.datasets[0].data = axesData;
       this.chart.update(this.options.animated ? "active" : "none");
+
+      // Check if we need to ensure visibility for equal values
+      if (this._isAllValuesEqual()) {
+        setTimeout(() => {
+          this._ensureDefaultStateVisibility();
+        }, 100);
+      }
     }
+  }
+
+  /**
+   * Check if all current scores are equal (which may cause Chart.js to not render polygon)
+   * @private
+   * @returns {boolean} True if all values are equal
+   */
+  _isAllValuesEqual() {
+    const values = Object.values(this.currentScores);
+    const firstValue = values[0];
+    return values.every((value) => value === firstValue);
+  }
+
+  /**
+   * Ensure default state visibility when all values are equal
+   * Chart.js may not render polygon when all values are the same
+   * @private
+   */
+  _ensureDefaultStateVisibility() {
+    if (!this.chart) return;
+
+    const neutralScore = RadarChart.config.scoring.neutralScore;
+    const allValuesAreNeutral = Object.values(this.currentScores).every(
+      (score) => score === neutralScore,
+    );
+
+    if (allValuesAreNeutral) {
+      logger.info(
+        "RadarChart",
+        "Applying default state visibility fix for neutral scores",
+      );
+
+      // Add tiny variations to ensure polygon visibility while maintaining neutral appearance
+      const visibilityScores = {
+        fairness: neutralScore + 0.001,
+        sustainability: neutralScore,
+        autonomy: neutralScore,
+        beneficence: neutralScore,
+        transparency: neutralScore,
+        accountability: neutralScore,
+        privacy: neutralScore,
+        proportionality: neutralScore - 0.001,
+      };
+
+      // Update chart data directly to avoid triggering user tracking
+      const axesData = Object.values(visibilityScores);
+      this.chart.data.datasets[0].data = axesData;
+
+      // Force update with active animation to ensure visibility
+      this.chart.update("active");
+
+      // Immediately restore exact neutral scores after visibility is established
+      setTimeout(() => {
+        if (this.chart) {
+          const exactNeutralData = Object.values(this.currentScores);
+          this.chart.data.datasets[0].data = exactNeutralData;
+          this.chart.update();
+          logger.info(
+            "RadarChart",
+            "Default state visibility established and restored to exact neutral",
+          );
+        }
+      }, 50);
+    }
+  }
+
+  /**
+   * Setup aggressive tooltip z-index fix for Chart.js tooltips
+   * This ensures tooltips appear above modal content and other overlays
+   * @private
+   */
+  _setupTooltipZIndexFix() {
+    // Create a MutationObserver to watch for Chart.js tooltip elements
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === 1) {
+            // Element node
+            // Check for Chart.js tooltip elements
+            if (
+              (node.id && node.id.includes("chartjs-tooltip")) ||
+              (node.className && node.className.includes("chartjs-tooltip")) ||
+              (node.dataset && node.dataset.chartjs === "tooltip")
+            ) {
+              // Force high z-index and proper positioning
+              node.style.zIndex = "1100";
+              node.style.position = "fixed";
+              node.style.pointerEvents = "none";
+              logger.info(
+                "RadarChart",
+                "Applied z-index fix to Chart.js tooltip",
+              );
+            }
+
+            // Also check child elements
+            const tooltipElements =
+              node.querySelectorAll &&
+              node.querySelectorAll(
+                '[id*="chartjs-tooltip"], [class*="chartjs-tooltip"], [data-chartjs="tooltip"]',
+              );
+            if (tooltipElements) {
+              tooltipElements.forEach((tooltip) => {
+                tooltip.style.zIndex = "1100";
+                tooltip.style.position = "fixed";
+                tooltip.style.pointerEvents = "none";
+              });
+            }
+          }
+        });
+      });
+    });
+
+    // Start observing document body for tooltip additions
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    // Store observer reference for cleanup
+    this.tooltipObserver = observer;
+
+    // Also apply immediate fix to any existing tooltips
+    setTimeout(() => {
+      const existingTooltips = document.querySelectorAll(
+        '[id*="chartjs-tooltip"], [class*="chartjs-tooltip"], [data-chartjs="tooltip"]',
+      );
+      existingTooltips.forEach((tooltip) => {
+        tooltip.style.zIndex = "1100";
+        tooltip.style.position = "fixed";
+        tooltip.style.pointerEvents = "none";
+      });
+    }, 100);
   }
 
   /**
    * Get impact description for a score
    */
   getImpactDescription(score) {
-    if (score <= 1) return "Highly Negative";
-    if (score <= 2) return "Negative";
-    if (score < NEUTRAL_SCORE) return "Slightly Negative";
-    if (score === NEUTRAL_SCORE) return "Neutral";
-    if (score < POSITIVE_THRESHOLD) return "Slightly Positive";
-    if (score < MAX_SCORE) return "Positive";
-    return "Highly Positive";
+    return getImpactDescription(RadarChart.config, score);
   }
 
   /**
@@ -776,6 +757,7 @@ export default class RadarChart {
    * Show fallback chart if Chart.js fails
    */
   showFallbackChart() {
+    const config = RadarChart.config;
     this.container.innerHTML = `
             <div class="radar-chart-fallback">
                 <h4>${this.options.title}</h4>
@@ -784,10 +766,10 @@ export default class RadarChart {
                       .map(
                         ([axis, score]) => `
                         <div class="score-item">
-                            <span class="axis-label">${ETHICAL_AXES[axis].label}:</span>
-                            <span class="score-value">${score}/5</span>
+                            <span class="axis-label">${this.ETHICAL_AXES[axis].label}:</span>
+                            <span class="score-value">${score}/${config.scoring.maxScore}</span>
                             <div class="score-bar">
-                                <div class="score-fill" style="width: ${(score / MAX_SCORE) * SCALE_PERCENTAGE}%"></div>
+                                <div class="score-fill" style="width: ${(score / config.scoring.maxScore) * config.chart.scalePercentage}%"></div>
                             </div>
                         </div>
                     `,
@@ -818,6 +800,12 @@ export default class RadarChart {
       if (this.chart) {
         this.chart.destroy();
         this.chart = null;
+      }
+
+      // Clean up tooltip observer
+      if (this.tooltipObserver) {
+        this.tooltipObserver.disconnect();
+        this.tooltipObserver = null;
       }
 
       // Clean up mobile event listeners
@@ -891,7 +879,7 @@ export default class RadarChart {
 
     // Log interaction telemetry
     this._logTelemetry(
-      ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.USER_INTERACTION,
+      this.ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.USER_INTERACTION,
       {
         interactionType: "chart_click",
         hasActiveElements: !!(activeElements && activeElements.length > 0),
@@ -1027,6 +1015,48 @@ export default class RadarChart {
     );
   }
 
+  /**
+   * Attach event listeners after chart rendering is complete
+   * This prevents interference with Chart.js initial polygon rendering
+   * @private
+   */
+  _attachEventListenersAfterRender() {
+    if (!this.chart) {
+      logger.warn(
+        "RadarChart",
+        "Cannot attach event listeners - chart not initialized",
+      );
+      return;
+    }
+
+    try {
+      // Add onClick handler to chart configuration
+      this.chart.options.onClick = (event, activeElements) => {
+        this.handleChartClick(event, activeElements);
+      };
+
+      // Set up mobile tooltip dismissal for demo and scenario charts
+      if (this.options.isDemo || this.options.realTime) {
+        this.setupMobileTooltipDismissal();
+      }
+
+      // Update chart to apply new event handlers
+      this.chart.update("none");
+
+      logger.info("RadarChart", "Event listeners attached after chart render", {
+        instanceId: this.instanceId,
+        hasOnClick: !!this.chart.options.onClick,
+        chartType: this.options.isDemo ? "demo" : "scenario",
+      });
+    } catch (error) {
+      logger.error(
+        "RadarChart",
+        "Failed to attach event listeners after render",
+        error,
+      );
+    }
+  }
+
   // === ENTERPRISE MONITORING METHODS ===
 
   /**
@@ -1038,24 +1068,25 @@ export default class RadarChart {
       // Set up health check interval
       this.healthCheckInterval = setInterval(() => {
         this._performHealthCheck();
-      }, ENTERPRISE_CONSTANTS.HEALTH.CHECK_INTERVAL);
+      }, this.ENTERPRISE_CONSTANTS.HEALTH.CHECK_INTERVAL);
 
       // Set up telemetry flush interval
       this.telemetryFlushInterval = setInterval(() => {
         this._flushTelemetryBatch();
-      }, ENTERPRISE_CONSTANTS.TELEMETRY.FLUSH_INTERVAL);
+      }, this.ENTERPRISE_CONSTANTS.TELEMETRY.FLUSH_INTERVAL);
 
       // Set up heartbeat interval
       this.heartbeatInterval = setInterval(() => {
         this._sendHeartbeat();
-      }, ENTERPRISE_CONSTANTS.HEALTH.HEARTBEAT_INTERVAL);
+      }, this.ENTERPRISE_CONSTANTS.HEALTH.HEARTBEAT_INTERVAL);
 
       logger.info("RadarChart", "🏢 Enterprise monitoring initialized", {
         instanceId: this.instanceId,
         instanceUuid: this.instanceUuid,
-        healthCheckInterval: ENTERPRISE_CONSTANTS.HEALTH.CHECK_INTERVAL,
-        telemetryFlushInterval: ENTERPRISE_CONSTANTS.TELEMETRY.FLUSH_INTERVAL,
-        heartbeatInterval: ENTERPRISE_CONSTANTS.HEALTH.HEARTBEAT_INTERVAL,
+        healthCheckInterval: this.ENTERPRISE_CONSTANTS.HEALTH.CHECK_INTERVAL,
+        telemetryFlushInterval:
+          this.ENTERPRISE_CONSTANTS.TELEMETRY.FLUSH_INTERVAL,
+        heartbeatInterval: this.ENTERPRISE_CONSTANTS.HEALTH.HEARTBEAT_INTERVAL,
       });
     } catch (error) {
       this._handleError(error, "_initializeEnterpriseMonitoring");
@@ -1084,7 +1115,7 @@ export default class RadarChart {
     // Open circuit breaker if threshold exceeded
     if (
       this.circuitBreaker.failures >=
-      ENTERPRISE_CONSTANTS.ERROR_RECOVERY.CIRCUIT_BREAKER_THRESHOLD
+      this.ENTERPRISE_CONSTANTS.ERROR_RECOVERY.CIRCUIT_BREAKER_THRESHOLD
     ) {
       this.circuitBreaker.state = "open";
       this.circuitBreaker.isOpen = true;
@@ -1092,22 +1123,25 @@ export default class RadarChart {
     }
 
     // Log telemetry for enterprise systems
-    this._logTelemetry(ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.ERROR_EVENT, {
-      error: error.message,
-      context,
-      circuitBreakerState: this.circuitBreaker.state,
-      errorCount: this.errorCount,
-    });
+    this._logTelemetry(
+      this.ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.ERROR_EVENT,
+      {
+        error: error.message,
+        context,
+        circuitBreakerState: this.circuitBreaker.state,
+        errorCount: this.errorCount,
+      },
+    );
 
     // Attempt recovery if not in failsafe mode
     if (
       !this.circuitBreaker.isOpen &&
       this.circuitBreaker.failures <
-        ENTERPRISE_CONSTANTS.ERROR_RECOVERY.MAX_RETRY_ATTEMPTS
+        this.ENTERPRISE_CONSTANTS.ERROR_RECOVERY.MAX_RETRY_ATTEMPTS
     ) {
       setTimeout(() => {
         this._attemptRecovery(context);
-      }, ENTERPRISE_CONSTANTS.ERROR_RECOVERY.RETRY_DELAY * this.circuitBreaker.failures);
+      }, this.ENTERPRISE_CONSTANTS.ERROR_RECOVERY.RETRY_DELAY * this.circuitBreaker.failures);
     }
 
     logger.error("RadarChart", "Enterprise error handled", {
@@ -1134,7 +1168,7 @@ export default class RadarChart {
       // Keep only recent samples for rolling average
       if (
         this.performanceMetrics.renderTimes.length >
-        ENTERPRISE_CONSTANTS.HEALTH.PERFORMANCE_SAMPLE_SIZE
+        this.ENTERPRISE_CONSTANTS.HEALTH.PERFORMANCE_SAMPLE_SIZE
       ) {
         this.performanceMetrics.renderTimes.shift();
       }
@@ -1142,7 +1176,7 @@ export default class RadarChart {
 
     // Log telemetry
     this._logTelemetry(
-      ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.PERFORMANCE_METRIC,
+      this.ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.PERFORMANCE_METRIC,
       {
         operation,
         duration,
@@ -1172,7 +1206,8 @@ export default class RadarChart {
 
     // Flush if buffer is full
     if (
-      this.telemetryBuffer.length >= ENTERPRISE_CONSTANTS.TELEMETRY.BATCH_SIZE
+      this.telemetryBuffer.length >=
+      this.ENTERPRISE_CONSTANTS.TELEMETRY.BATCH_SIZE
     ) {
       this._flushTelemetryBatch();
     }
@@ -1187,12 +1222,12 @@ export default class RadarChart {
 
     try {
       // In a real enterprise environment, this would send to analytics service
-      // For now, we'll use the logger for enterprise visibility
-      logger.info("RadarChart", "Enterprise telemetry batch", {
-        instanceId: this.instanceId,
-        batchSize: this.telemetryBuffer.length,
-        events: this.telemetryBuffer,
-      });
+      // Enterprise telemetry logging disabled for cleaner console output
+      // logger.info("RadarChart", "Enterprise telemetry batch", {
+      //   instanceId: this.instanceId,
+      //   batchSize: this.telemetryBuffer.length,
+      //   events: this.telemetryBuffer,
+      // });
 
       // Clear the buffer
       this.telemetryBuffer = [];
@@ -1214,9 +1249,10 @@ export default class RadarChart {
 
       // Health status assessment
       this.isHealthy =
-        this.errorCount < ENTERPRISE_CONSTANTS.HEALTH.ERROR_THRESHOLD &&
-        memoryUsage < ENTERPRISE_CONSTANTS.HEALTH.MEMORY_THRESHOLD_MB &&
-        avgRenderTime < ENTERPRISE_CONSTANTS.HEALTH.RENDER_TIME_THRESHOLD_MS &&
+        this.errorCount < this.ENTERPRISE_CONSTANTS.HEALTH.ERROR_THRESHOLD &&
+        memoryUsage < this.ENTERPRISE_CONSTANTS.HEALTH.MEMORY_THRESHOLD_MB &&
+        avgRenderTime <
+          this.ENTERPRISE_CONSTANTS.HEALTH.RENDER_TIME_THRESHOLD_MS &&
         !this.circuitBreaker.isOpen;
 
       this.lastHealthCheck = now;

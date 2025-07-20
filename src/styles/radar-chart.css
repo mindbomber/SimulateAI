@@ -73,12 +73,24 @@
   border-radius: 12px;
   background: transparent;
   box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.12); /* Subtle bottom-right shadow similar to demo */
-  overflow: hidden !important; /* Fix deprecation warning: override Chart.js overflow: visible */
+  /* Removed overflow: hidden to allow Chart.js tooltips to show */
 }
 
-/* Additional canvas overflow fix for all chart canvases */
+/* Chart.js Tooltip Support - Ensure tooltips appear above all content */
 canvas[role="img"] {
-  overflow: hidden !important; /* Prevent deprecated overflow: visible on canvas elements */
+  /* Allow tooltips to show by not clipping overflow */
+  position: relative;
+  z-index: 1;
+}
+
+/* Chart.js tooltip container - must be above modal z-index */
+.chartjs-tooltip,
+div[id^="chartjs-tooltip"],
+div[class*="chartjs-tooltip"],
+div[data-chartjs="tooltip"] {
+  z-index: 1100 !important; /* Above scenario modal z-index of 1055 */
+  position: fixed !important;
+  pointer-events: none !important;
 }
 
 /* Fallback chart when Chart.js fails to load */
@@ -178,7 +190,8 @@ canvas[role="img"] {
     inset 0 1px 0 rgba(255, 255, 255, 0.6);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  overflow: hidden;
+  /* Allow tooltips to overflow container */
+  overflow: visible;
 }
 
 .scenario-radar::before {
@@ -261,7 +274,8 @@ canvas[role="img"] {
     0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
   position: relative;
-  overflow: hidden;
+  /* Allow tooltips to overflow container */
+  overflow: visible;
 }
 
 .results-radar::before {
@@ -697,4 +711,38 @@ body.dark-mode .radar-chart-container:focus-within {
 
 body.dark-mode .score-item:focus-within {
   outline-color: var(--theme-accent);
+}
+
+/* ===== CHART.JS TOOLTIP CONFLICT RESOLUTION ===== */
+/* Additional tooltip fixes for scenario modals */
+.scenario-modal .radar-chart-container,
+.scenario-modal .scenario-radar,
+.scenario-modal .results-radar,
+.scenario-modal #scenario-radar-chart {
+  overflow: visible !important;
+}
+
+/* Ensure all radar chart containers allow tooltip overflow */
+.radar-demo-container,
+.radar-chart-container,
+.scenario-radar,
+.results-radar {
+  overflow: visible !important;
+}
+
+/* Override any conflicting z-index rules from scenario modal */
+.scenario-modal canvas[role="img"],
+.scenario-modal-dialog canvas[role="img"] {
+  position: relative;
+  z-index: 2;
+}
+
+/* Chart.js tooltip positioning fixes for modals */
+.scenario-modal .chartjs-tooltip,
+.scenario-modal div[id^="chartjs-tooltip"],
+.scenario-modal div[class*="chartjs-tooltip"] {
+  z-index: 1100 !important;
+  position: fixed !important;
+  pointer-events: none !important;
+  transform: translateZ(0) !important;
 }

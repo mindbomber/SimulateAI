@@ -3,13 +3,16 @@
  * Provides definitions and explanations for ethical dimensions
  */
 
-import { ETHICAL_AXES } from '../components/radar-chart.js';
+import { loadRadarConfig, getEthicalAxes } from "./radar-config-loader.js";
 
 /**
  * Get ethics glossary data
  */
-export function getEthicsGlossary() {
-  return Object.entries(ETHICAL_AXES).map(([key, data]) => ({
+export async function getEthicsGlossary() {
+  const config = await loadRadarConfig();
+  const ethicalAxes = getEthicalAxes(config);
+
+  return Object.entries(ethicalAxes).map(([key, data]) => ({
     key,
     label: data.label,
     description: data.description,
@@ -22,33 +25,33 @@ export function getEthicsGlossary() {
  */
 export function getRadarChartExplanation() {
   return {
-    title: 'Understanding the Ethical Impact Radar Chart',
+    title: "Understanding the Ethical Impact Radar Chart",
     overview:
       "As you make choices in this scenario, you'll see a radar chart that visualizes how your decisions affect eight key ethical dimensions. This tool helps you understand the complex, multi-dimensional nature of ethical decision-making.",
     features: [
       {
-        title: 'Real-Time Feedback',
+        title: "Real-Time Feedback",
         description:
-          'The chart updates instantly as you select different options, showing immediate ethical implications.',
+          "The chart updates instantly as you select different options, showing immediate ethical implications.",
       },
       {
-        title: 'Multi-Dimensional View',
+        title: "Multi-Dimensional View",
         description:
-          'See how a single decision can impact multiple ethical areas simultaneously—there are rarely simple trade-offs.',
+          "See how a single decision can impact multiple ethical areas simultaneously—there are rarely simple trade-offs.",
       },
       {
-        title: 'No Perfect Scores',
+        title: "No Perfect Scores",
         description:
           "The goal isn't to maximize all dimensions, but to understand how different ethical frameworks prioritize different values.",
       },
       {
-        title: 'Context Matters',
+        title: "Context Matters",
         description:
-          'The same action might be ethical in one context but problematic in another—use the chart to explore these nuances.',
+          "The same action might be ethical in one context but problematic in another—use the chart to explore these nuances.",
       },
     ],
     interpretation:
-      'The radar chart uses a scale from 0-5, where 3 represents a neutral impact. Higher scores indicate positive impacts on that dimension, while lower scores suggest potential concerns. Remember, this is a learning tool designed to prompt reflection, not provide definitive moral judgments.',
+      "The radar chart uses a scale from 0-5, where 3 represents a neutral impact. Higher scores indicate positive impacts on that dimension, while lower scores suggest potential concerns. Remember, this is a learning tool designed to prompt reflection, not provide definitive moral judgments.",
   };
 }
 
@@ -57,11 +60,11 @@ export function getRadarChartExplanation() {
  */
 export function getEthicsLearningTips() {
   return [
-    'Consider how different stakeholders might view your decisions differently',
-    'Think about both immediate and long-term consequences of your choices',
-    'Explore how cultural and contextual factors influence ethical reasoning',
-    'Notice when ethical dimensions conflict with each other—this is normal!',
-    'Use the chart to identify which ethical values you personally prioritize',
-    'Discuss your reasoning with others to broaden your perspective',
+    "Consider how different stakeholders might view your decisions differently",
+    "Think about both immediate and long-term consequences of your choices",
+    "Explore how cultural and contextual factors influence ethical reasoning",
+    "Notice when ethical dimensions conflict with each other—this is normal!",
+    "Use the chart to identify which ethical values you personally prioritize",
+    "Discuss your reasoning with others to broaden your perspective",
   ];
 }

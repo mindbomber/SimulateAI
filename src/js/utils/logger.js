@@ -162,18 +162,25 @@ class Logger {
     // Initialize enterprise monitoring systems
     this._initializeEnterpriseMonitoring();
 
-    // Log enterprise initialization
-    this._logTelemetry(ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.LOG_EVENT, {
-      event: "logger_initialized",
-      instanceId: this.instanceId,
-      initTime: Date.now() - this.startTime,
-      environment: this.isProduction() ? "production" : "development",
-      enabledTypes: Array.from(this.enabledTypes),
-    });
+    // Initialize message deduplication to reduce console noise
+    this.messageCache = new Map();
+    this.maxCacheSize = 500;
+    this.quietMode = localStorage.getItem("quiet-logs") === "true";
+
+    // Log enterprise initialization (only in verbose mode)
+    if (!this.quietMode) {
+      this._logTelemetry(ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.LOG_EVENT, {
+        event: "logger_initialized",
+        instanceId: this.instanceId,
+        initTime: Date.now() - this.startTime,
+        environment: this.isProduction() ? "production" : "development",
+        enabledTypes: Array.from(this.enabledTypes),
+      });
+    }
   }
 
   /**
-   * Detect current environment
+   * Detect current environment and adjust logging accordingly
    */
   detectEnvironment() {
     // Check for common development indicators
@@ -182,7 +189,17 @@ class Logger {
         window.location.hostname === "localhost" ||
         window.location.hostname === "127.0.0.1" ||
         window.location.hostname.includes("dev") ||
-        window.location.search.includes("debug=true");
+        window.location.search.includes("debug=true") ||
+        localStorage.getItem("debug") === "true";
+
+      // In production or quiet mode, reduce logging noise
+      const isQuietMode = localStorage.getItem("quiet-logs") === "true";
+
+      if (isQuietMode) {
+        // Only show errors and warnings in quiet mode
+        return this.levels.WARN;
+      }
+
       return isDev ? this.levels.DEBUG : this.levels.WARN;
     }
     return this.levels.WARN;
@@ -228,6 +245,12 @@ class Logger {
 
       if (!this.enabledTypes.has(level)) {
         return;
+      }
+
+      // Check for duplicate message to reduce console noise
+      const messageKey = `${level}-${context}-${message}`;
+      if (this._isDuplicateMessage(messageKey)) {
+        return; // Skip duplicate message
       }
 
       // Generate correlation ID if enabled
@@ -332,6 +355,40 @@ class Logger {
     const correlationId = `corr-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     this.currentCorrelationId = correlationId;
     return correlationId;
+  }
+
+  /**
+   * Check if message is a duplicate to reduce console noise
+   * @param {string} messageKey - The message key to check
+   * @returns {boolean} True if message is a duplicate
+   * @private
+   */
+  _isDuplicateMessage(messageKey) {
+    const now = Date.now();
+    const cooldownPeriod = 5000; // 5 seconds between duplicate messages
+
+    if (this.messageCache.has(messageKey)) {
+      const lastSeen = this.messageCache.get(messageKey);
+      if (now - lastSeen < cooldownPeriod) {
+        return true; // It's a duplicate within cooldown period
+      }
+    }
+
+    // Update cache with current timestamp
+    this.messageCache.set(messageKey, now);
+
+    // Clean up old cache entries to prevent memory leak
+    if (this.messageCache.size > this.maxCacheSize) {
+      const entriesToDelete = [];
+      this.messageCache.forEach((timestamp, key) => {
+        if (now - timestamp > cooldownPeriod * 2) {
+          entriesToDelete.push(key);
+        }
+      });
+      entriesToDelete.forEach((key) => this.messageCache.delete(key));
+    }
+
+    return false;
   }
 
   /**

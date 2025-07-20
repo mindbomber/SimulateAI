@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ScenarioCard JSON SSOT Demo - SimulateAI</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem;
+      }
+
+      .demo-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .demo-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 2rem;
+        text-align: center;
+      }
+
+      .demo-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .demo-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .demo-content {
+        padding: 3rem 2rem;
+      }
+
+      .section {
+        margin-bottom: 3rem;
+      }
+
+      .section-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 1rem;
+        border-bottom: 3px solid #e2e8f0;
+        padding-bottom: 0.5rem;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .feature-card {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border-left: 4px solid #667eea;
+        transition: transform 0.2s ease;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      .feature-title {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .feature-description {
+        color: #4a5568;
+        font-size: 0.95rem;
+      }
+
+      .comparison-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin: 2rem 0;
+      }
+
+      .comparison-side {
+        background: #f7fafc;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 2px solid #e2e8f0;
+      }
+
+      .comparison-side.before {
+        border-color: #feb2b2;
+      }
+
+      .comparison-side.after {
+        border-color: #9ae6b4;
+      }
+
+      .comparison-title {
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        text-align: center;
+      }
+
+      .before .comparison-title {
+        background: #fed7d7;
+        color: #c53030;
+      }
+
+      .after .comparison-title {
+        background: #c6f6d5;
+        color: #2f855a;
+      }
+
+      .code-block {
+        background: #2d3748;
+        color: #e2e8f0;
+        padding: 1rem;
+        border-radius: 8px;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 0.85rem;
+        overflow-x: auto;
+        white-space: pre-wrap;
+      }
+
+      .scenario-cards-demo {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+      }
+
+      .json-preview {
+        background: #1a202c;
+        color: #e2e8f0;
+        padding: 1.5rem;
+        border-radius: 12px;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 0.85rem;
+        overflow-x: auto;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .benefits-list {
+        list-style: none;
+        padding: 0;
+      }
+
+      .benefits-list li {
+        background: #e6fffa;
+        margin: 0.5rem 0;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        border-left: 4px solid #38b2ac;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .icon {
+        font-size: 1.2rem;
+      }
+
+      @media (max-width: 768px) {
+        body {
+          padding: 1rem;
+        }
+
+        .demo-title {
+          font-size: 2rem;
+        }
+
+        .comparison-container {
+          grid-template-columns: 1fr;
+        }
+
+        .feature-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Import actual scenario card styles */
+      @import url("../src/styles/category-grid.css");
+      @import url("../src/styles/main.css");
+    </style>
+  </head>
+  <body>
+    <div class="demo-container">
+      <header class="demo-header">
+        <h1 class="demo-title">ScenarioCard JSON SSOT</h1>
+        <p class="demo-subtitle">
+          Comprehensive demonstration of converting the ScenarioCard component
+          to use JSON Single Source of Truth configuration
+        </p>
+      </header>
+
+      <main class="demo-content">
+        <!-- JSON SSOT Benefits -->
+        <section class="section">
+          <h2 class="section-title">🎯 JSON SSOT Benefits</h2>
+          <div class="feature-grid">
+            <div class="feature-card">
+              <h3 class="feature-title">
+                <span class="icon">🔧</span>
+                Configuration Management
+              </h3>
+              <p class="feature-description">
+                Centralized configuration for all styling, text content,
+                accessibility labels, and component behavior in a single JSON
+                file.
+              </p>
+            </div>
+            <div class="feature-card">
+              <h3 class="feature-title">
+                <span class="icon">🎨</span>
+                Theme Support
+              </h3>
+              <p class="feature-description">
+                Built-in support for dark mode, high contrast, and custom themes
+                through configuration overrides.
+              </p>
+            </div>
+            <div class="feature-card">
+              <h3 class="feature-title">
+                <span class="icon">📱</span>
+                Responsive Design
+              </h3>
+              <p class="feature-description">
+                Configurable responsive breakpoints and mobile-specific styling
+                modifications.
+              </p>
+            </div>
+            <div class="feature-card">
+              <h3 class="feature-title">
+                <span class="icon">♿</span>
+                Accessibility First
+              </h3>
+              <p class="feature-description">
+                Comprehensive ARIA labels, screen reader support, and
+                accessibility configuration templates.
+              </p>
+            </div>
+            <div class="feature-card">
+              <h3 class="feature-title">
+                <span class="icon">⚡</span>
+                Performance Optimized
+              </h3>
+              <p class="feature-description">
+                Pre-computed templates, caching system, and lazy loading support
+                for optimal performance.
+              </p>
+            </div>
+            <div class="feature-card">
+              <h3 class="feature-title">
+                <span class="icon">🛡️</span>
+                Data Validation
+              </h3>
+              <p class="feature-description">
+                Built-in validation system with fallback values for missing or
+                invalid scenario/category data.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Before vs After Comparison -->
+        <section class="section">
+          <h2 class="section-title">📊 Before vs After Comparison</h2>
+          <div class="comparison-container">
+            <div class="comparison-side before">
+              <h3 class="comparison-title">❌ Before: Hardcoded</h3>
+              <div class="code-block">
+                static render(scenario, category, isCompleted = false) { const
+                safeCategory = { color: category?.color || '#667eea', icon:
+                category?.icon || '🤖', id: category?.id || scenario.categoryId
+                || 'default', ...category, }; return ` &lt;article
+                class="scenario-card ${isCompleted ? 'completed' : ''}"&gt;
+                &lt;div class="scenario-header"&gt; &lt;div
+                class="scenario-icon" style="background-color:
+                ${safeCategory.color}15; color: ${safeCategory.color}"&gt;
+                ${safeCategory.icon} &lt;/div&gt; &lt;div
+                class="scenario-difficulty
+                difficulty-${scenario.difficulty}"&gt; ${scenario.difficulty}
+                &lt;/div&gt; &lt;/div&gt; &lt;!-- More hardcoded HTML... --&gt;
+                &lt;/article&gt; `; }
+              </div>
+            </div>
+            <div class="comparison-side after">
+              <h3 class="comparison-title">✅ After: JSON SSOT</h3>
+              <div class="code-block">
+                static render(scenario, category, isCompleted = false) { //
+                Configuration-driven approach const config = this.config; const
+                { safeScenario, safeCategory } =
+                applyScenarioCardFallbacks(scenario, category); const classes =
+                config.computed.cssClasses; const cardClass = isCompleted ?
+                classes.completed : classes.base; const ariaLabel =
+                config.computed.textTemplates.ariaLabel(safeScenario); return `
+                &lt;${structure.container.element} class="${cardClass}"
+                aria-label="${ariaLabel}"&gt; &lt;!-- Configuration-driven
+                structure... --&gt; &lt;/${structure.container.element}&gt; `; }
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Key Improvements -->
+        <section class="section">
+          <h2 class="section-title">🚀 Key Improvements</h2>
+          <ul class="benefits-list">
+            <li>
+              <span class="icon">🔄</span>
+              <strong>Maintainability:</strong> All styling and content changes
+              managed through JSON configuration
+            </li>
+            <li>
+              <span class="icon">🌐</span>
+              <strong>Internationalization:</strong> Text templates support easy
+              localization
+            </li>
+            <li>
+              <span class="icon">🎛️</span>
+              <strong>Customization:</strong> Theme overrides and responsive
+              configurations
+            </li>
+            <li>
+              <span class="icon">🧪</span>
+              <strong>Testing:</strong> Configuration can be mocked and tested
+              independently
+            </li>
+            <li>
+              <span class="icon">📈</span>
+              <strong>Scalability:</strong> Easy to add new card variants and
+              features
+            </li>
+            <li>
+              <span class="icon">🔍</span>
+              <strong>Debugging:</strong> Clear separation between logic and
+              presentation
+            </li>
+          </ul>
+        </section>
+
+        <!-- Configuration Structure -->
+        <section class="section">
+          <h2 class="section-title">📋 Configuration Structure</h2>
+          <div class="json-preview">
+            { "card": { "structure": { "container": { "element": "article",
+            "baseClass": "scenario-card" }, "header": { "class":
+            "scenario-header", "icon": {...}, "difficulty": {...} }, "content":
+            { "class": "scenario-content", "title": {...}, "description": {...}
+            }, "footer": { "class": "scenario-footer" } }, "buttons": {
+            "learningLab": { "class": "scenario-start-btn", "text": "Learning
+            Lab", "icon": {...} }, "quickStart": { "class":
+            "scenario-quick-start-btn", "text": {...}, "icon": {...} } },
+            "accessibility": { "ariaLabelTemplate": "Scenario: {title} -
+            {difficulty} difficulty", "focusIndicator": {...} }, "fallbacks": {
+            "category": { "color": "#667eea", "icon": "🤖", "id": "default" } }
+            }, "styles": { "spacing": {...}, "dimensions": {...}, "colors":
+            {...} }, "responsive": { "mobile": {...}, "tablet": {...},
+            "desktop": {...} }, "themes": { "dark": {...}, "highContrast": {...}
+            }, "animations": { "hover": {...}, "focus": {...}, "completed":
+            {...} } }
+          </div>
+        </section>
+
+        <!-- Live Demo Cards -->
+        <section class="section">
+          <h2 class="section-title">🎪 Live Demo</h2>
+          <p style="margin-bottom: 1.5rem; color: #4a5568">
+            The scenario cards below are rendered using the new JSON SSOT
+            configuration system:
+          </p>
+          <div class="scenario-cards-demo" id="demo-cards">
+            <!-- Cards will be generated here by JavaScript -->
+          </div>
+        </section>
+
+        <!-- Technical Implementation -->
+        <section class="section">
+          <h2 class="section-title">⚙️ Technical Implementation</h2>
+          <div class="feature-grid">
+            <div class="feature-card">
+              <h3 class="feature-title">
+                <span class="icon">📁</span>
+                File Structure
+              </h3>
+              <p class="feature-description">
+                <code>src/config/scenario-card-config.json</code> - Main
+                configuration<br />
+                <code>src/js/utils/scenario-card-config-loader.js</code> -
+                Configuration loader<br />
+                <code>src/js/components/scenario-card.js</code> - Updated
+                component
+              </p>
+            </div>
+            <div class="feature-card">
+              <h3 class="feature-title">
+                <span class="icon">🔄</span>
+                Configuration Loading
+              </h3>
+              <p class="feature-description">
+                Automatic configuration loading with caching, fallback handling,
+                and validation for optimal performance and reliability.
+              </p>
+            </div>
+            <div class="feature-card">
+              <h3 class="feature-title">
+                <span class="icon">🎯</span>
+                Template System
+              </h3>
+              <p class="feature-description">
+                Pre-computed SVG templates, CSS classes, and text templates for
+                maximum rendering performance.
+              </p>
+            </div>
+            <div class="feature-card">
+              <h3 class="feature-title">
+                <span class="icon">🛡️</span>
+                Error Handling
+              </h3>
+              <p class="feature-description">
+                Comprehensive fallback system ensures cards render correctly
+                even with missing or invalid data.
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module">
+      // This would normally import the actual ScenarioCard component
+      // For demo purposes, we'll create a simplified version
+
+      const demoScenarios = [
+        {
+          id: "ai-bias-detection",
+          title: "AI Bias Detection",
+          description:
+            "Learn to identify and mitigate algorithmic bias in machine learning systems.",
+          difficulty: "advanced",
+          categoryId: "ethics",
+        },
+        {
+          id: "privacy-vs-innovation",
+          title: "Privacy vs Innovation",
+          description:
+            "Balance user privacy concerns with technological advancement needs.",
+          difficulty: "intermediate",
+          categoryId: "privacy",
+        },
+        {
+          id: "automated-hiring",
+          title: "Automated Hiring Systems",
+          description:
+            "Navigate the ethical implications of AI-powered recruitment tools.",
+          difficulty: "beginner",
+          categoryId: "workplace",
+        },
+      ];
+
+      const demoCategories = {
+        ethics: { id: "ethics", color: "#e53e3e", icon: "⚖️", name: "Ethics" },
+        privacy: {
+          id: "privacy",
+          color: "#3182ce",
+          icon: "🔒",
+          name: "Privacy",
+        },
+        workplace: {
+          id: "workplace",
+          color: "#38a169",
+          icon: "🏢",
+          name: "Workplace",
+        },
+      };
+
+      // Simplified card rendering for demo
+      function renderDemoCard(scenario, isCompleted = false) {
+        const category = demoCategories[scenario.categoryId];
+        return `
+                <div class="scenario-card ${isCompleted ? "completed" : ""}" 
+                     style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; transition: all 0.2s ease; cursor: pointer;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.25rem 0.75rem;">
+                        <div style="width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; background-color: ${category.color}15; color: ${category.color};">
+                            ${category.icon}
+                        </div>
+                        <div style="background: ${category.color}; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">
+                            ${scenario.difficulty}
+                        </div>
+                    </div>
+                    <div style="padding: 1rem;">
+                        <h4 style="font-size: 1.1rem; font-weight: 600; color: #2d3748; margin-bottom: 0.5rem;">${scenario.title}</h4>
+                        <p style="color: #4a5568; font-size: 0.9rem; line-height: 1.5; margin-bottom: 1rem;">${scenario.description}</p>
+                    </div>
+                    <div style="padding: 0 1.25rem 1.25rem; display: flex; gap: 0.75rem;">
+                        <button style="flex: 1; background: #f7fafc; border: 1px solid #e2e8f0; color: #4a5568; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease;">
+                            Learning Lab →
+                        </button>
+                        <button style="flex: 1; background: #667eea; border: 1px solid #667eea; color: white; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease;">
+                            ${isCompleted ? "Replay" : "Start"} ▶
+                        </button>
+                    </div>
+                    ${isCompleted ? '<div style="position: absolute; top: 0.75rem; right: 0.75rem; background: #38a169; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">✓</div>' : ""}
+                </div>
+            `;
+      }
+
+      // Render demo cards
+      const demoContainer = document.getElementById("demo-cards");
+      demoScenarios.forEach((scenario, index) => {
+        const isCompleted = index === 2; // Make the last card completed for demo
+        demoContainer.innerHTML += renderDemoCard(scenario, isCompleted);
+      });
+
+      // Add hover effects
+      document.querySelectorAll(".scenario-card").forEach((card) => {
+        card.addEventListener("mouseenter", () => {
+          card.style.transform = "translateY(-4px)";
+          card.style.boxShadow = "0 12px 24px rgba(0, 0, 0, 0.15)";
+          card.style.borderColor = "#667eea";
+        });
+
+        card.addEventListener("mouseleave", () => {
+          card.style.transform = "translateY(0)";
+          card.style.boxShadow = "none";
+          card.style.borderColor = "#e2e8f0";
+        });
+      });
+    </script>
+  </body>
+</html>

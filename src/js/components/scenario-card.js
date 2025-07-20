@@ -15,100 +15,196 @@
  */
 
 /**
- * Reusable Scenario Card Component
+ * Reusable Scenario Card Component with JSON SSOT Configuration
  * Provides consistent scenario card rendering across the application
  * Used by category-grid.js and scenario-browser.js
  */
 
+import {
+  loadScenarioCardConfig,
+  applyScenarioCardFallbacks,
+  validateScenarioCardData,
+} from "../utils/scenario-card-config-loader.js";
+
 class ScenarioCard {
   /**
-   * Create a scenario card HTML string
+   * Initialize configuration
+   */
+  static async loadConfiguration() {
+    try {
+      this.config = await loadScenarioCardConfig();
+      console.log("ScenarioCard configuration loaded successfully");
+      return true;
+    } catch (error) {
+      console.error("Error loading ScenarioCard configuration:", error);
+      return false;
+    }
+  }
+
+  /**
+   * Create a scenario card HTML string using JSON SSOT configuration
    * @param {Object} scenario - Scenario data
    * @param {Object} category - Category data with color, icon, id
    * @param {boolean} isCompleted - Whether scenario is completed
-   * @returns {string} HTML string for the scenario card
+   * @returns {Promise<string>} HTML string for the scenario card
    */
-  static render(scenario, category, isCompleted = false) {
-    // Ensure we have fallback values for category
-    const safeCategory = {
-      color: category?.color || '#667eea',
-      icon: category?.icon || '🤖',
-      id: category?.id || scenario.categoryId || 'default',
-      ...category,
-    };
+  static async render(scenario, category, isCompleted = false) {
+    // Ensure configuration is loaded
+    if (!this.config) {
+      this.config = await loadScenarioCardConfig();
+    }
+
+    // Apply fallbacks for missing data
+    const { safeScenario, safeCategory } = applyScenarioCardFallbacks(
+      scenario,
+      category,
+      this.config,
+    );
+
+    // Validate data
+    const validation = validateScenarioCardData(
+      safeScenario,
+      safeCategory,
+      this.config,
+    );
+    if (!validation.isValid) {
+      console.warn("ScenarioCard validation warnings:", validation.errors);
+    }
+
+    const config = this.config;
+    const classes = config.computed.cssClasses;
+    const structure = config.card.structure;
+    const buttons = config.card.buttons;
+
+    // Generate card classes
+    const cardClass = isCompleted ? classes.completed : classes.base;
+
+    // Generate icon styles
+    const iconBackgroundStyle = config.computed.styles.iconBackground(
+      safeCategory.color,
+    );
+    const iconColorStyle = config.computed.styles.iconColor(safeCategory.color);
+
+    // Generate difficulty class
+    const difficultyClass = config.computed.styles.difficultyClass(
+      safeScenario.difficulty,
+    );
+
+    // Generate text content
+    const ariaLabel = config.computed.textTemplates.ariaLabel(safeScenario);
+    const learningLabAriaLabel =
+      config.computed.textTemplates.learningLabAriaLabel(safeScenario.title);
+    const quickStartText = isCompleted
+      ? buttons.quickStart.text.completed
+      : buttons.quickStart.text.default;
+    const quickStartAriaLabel =
+      config.computed.textTemplates.quickStartAriaLabel(
+        safeScenario.title,
+        isCompleted,
+      );
+
+    // Generate SVG icons
+    const learningLabIcon = config.computed.svgTemplates.learningLabIcon;
+    const quickStartIcon = config.computed.svgTemplates.quickStartIcon;
+
+    // Generate completed badge if needed
+    const completedBadge = isCompleted
+      ? `<div class="${classes.completedBadge}">${structure.completedBadge.icon}</div>`
+      : "";
 
     return `
-      <article class="scenario-card ${isCompleted ? 'completed' : ''}" 
-               data-scenario-id="${scenario.id}" 
+      <${structure.container.element} class="${cardClass}" 
+               data-scenario-id="${safeScenario.id}" 
                data-category-id="${safeCategory.id}"
-               aria-label="Scenario: ${scenario.title} - ${scenario.difficulty} difficulty">
+               aria-label="${ariaLabel}">
           
-          <div class="scenario-header">
-              <div class="scenario-icon" style="background-color: ${safeCategory.color}15; color: ${safeCategory.color}">
+          <div class="${classes.header}">
+              <div class="${classes.icon}" style="${iconBackgroundStyle}; ${iconColorStyle}">
                   ${safeCategory.icon}
               </div>
-              <div class="scenario-difficulty difficulty-${scenario.difficulty}">
-                  ${scenario.difficulty}
+              <div class="${classes.difficulty} ${difficultyClass}">
+                  ${safeScenario.difficulty}
               </div>
           </div>
 
-          <div class="scenario-content">
-              <h4 class="scenario-title">${scenario.title}</h4>
-              <p class="scenario-description">${scenario.description}</p>
+          <div class="${classes.content}">
+              <${structure.content.title.element} class="${classes.title}">${safeScenario.title}</${structure.content.title.element}>
+              <${structure.content.description.element} class="${classes.description}">${safeScenario.description}</${structure.content.description.element}>
           </div>
 
-          <div class="scenario-footer">
-              <button class="scenario-start-btn" aria-label="Learning Lab for ${scenario.title} scenario">
-                  Learning Lab
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
+          <div class="${classes.footer}">
+              <button class="${classes.learningLabBtn}" aria-label="${learningLabAriaLabel}">
+                  ${buttons.learningLab.text}
+                  ${learningLabIcon}
               </button>
-              <button class="scenario-quick-start-btn" aria-label="${isCompleted ? 'Replay' : 'Start'} ${scenario.title} scenario">
-                  ${isCompleted ? 'Replay' : 'Start'}
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M5 3L12 8L5 13V3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
+              <button class="${classes.quickStartBtn}" aria-label="${quickStartAriaLabel}">
+                  ${quickStartText}
+                  ${quickStartIcon}
               </button>
           </div>
 
-          ${isCompleted ? '<div class="scenario-completed-badge">✓</div>' : ''}
-      </article>
+          ${completedBadge}
+      </${structure.container.element}>
     `;
   }
 
   /**
-   * Resolve category data from various sources
+   * Resolve category data from various sources using configuration fallbacks
    * @param {Object} scenario - Scenario data
    * @param {Object|null} enhancedCategories - Enhanced categories lookup
    * @param {Function|null} getCategoriesFunction - Function to get all categories
-   * @returns {Object} Resolved category data
+   * @returns {Promise<Object>} Resolved category data
    */
-  static resolveCategory(
+  static async resolveCategory(
     scenario,
     enhancedCategories = null,
-    getCategoriesFunction = null
+    getCategoriesFunction = null,
   ) {
+    // Ensure configuration is loaded
+    if (!this.config) {
+      this.config = await loadScenarioCardConfig();
+    }
+
     let category = {};
 
     // Try to get category from enhanced categories first
     if (scenario.categoryId && enhancedCategories?.[scenario.categoryId]) {
       category = enhancedCategories[scenario.categoryId];
-    } else if (scenario.category && typeof scenario.category === 'object') {
+    } else if (scenario.category && typeof scenario.category === "object") {
       ({ category } = { category: scenario.category });
     } else if (scenario.categoryId && getCategoriesFunction) {
       // Fallback: try to find category by ID
       const allCategories = getCategoriesFunction();
       category =
-        allCategories.find(cat => cat.id === scenario.categoryId) || {};
+        allCategories.find((cat) => cat.id === scenario.categoryId) || {};
     }
 
-    return {
-      color: category.color || '#667eea',
-      icon: category.icon || '🤖',
-      id: category.id || scenario.categoryId || 'default',
-      ...category,
-    };
+    // Apply fallbacks using configuration
+    const { safeCategory } = applyScenarioCardFallbacks(
+      scenario,
+      category,
+      this.config,
+    );
+    return safeCategory;
+  }
+
+  /**
+   * Get configuration object (useful for debugging or external access)
+   * @returns {Promise<Object>} Current configuration
+   */
+  static async getConfiguration() {
+    if (!this.config) {
+      this.config = await loadScenarioCardConfig();
+    }
+    return this.config;
+  }
+
+  /**
+   * Refresh configuration cache
+   * @returns {Promise<boolean>} Success status
+   */
+  static async refreshConfiguration() {
+    return await this.loadConfiguration();
   }
 }
 

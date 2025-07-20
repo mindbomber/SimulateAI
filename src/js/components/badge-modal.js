@@ -41,12 +41,12 @@ async function loadConfetti() {
   }
   return JSConfetti;
 }
+
 // Import enhanced badge configuration
-import {
-  GLOW_INTENSITY_CLASSES,
-  MAX_IMPLEMENTED_TIER,
-  BADGE_TIERS,
-} from "../data/badge-config.js";
+import { GLOW_INTENSITY_CLASSES } from "../data/badge-config.js";
+
+// Import badge modal configuration loader
+import { loadBadgeModalConfig } from "../utils/badge-modal-config-loader.js";
 
 /**
  * Badge Modal Class
@@ -57,71 +57,26 @@ export class BadgeModal {
     this.isVisible = false;
     this.currentModal = null;
     this.confetti = null; // Will be initialized when needed
-    this.ANIMATION_DURATION = {
-      CONFETTI: 3000,
-      CONFETTI_SECOND_DELAY: 500,
-      CONFETTI_THIRD_DELAY: 1000,
-      CONFETTI_FOURTH_DELAY: 1500,
-      CONFETTI_FIFTH_DELAY: 2000,
-      CONFETTI_SIMULTANEOUS: 10,
-      CONFETTI_NEAR_SIMULTANEOUS: 50,
-      CONFETTI_OVERLAP_SHORT: 100,
-      CONFETTI_OVERLAP_MEDIUM: 150,
-      CONFETTI_OVERLAP_LONG: 200,
-      MODAL_ENTER: 600,
-      MODAL_EXIT: 400,
-      BADGE_SCALE: 800,
-      SIDEKICK_ENTRANCE: 1200,
-      ENTRANCE_DELAY: 100,
-      SHIELD_DELAY: 200,
-      SIDEKICK_DELAY: 400,
-      TEXT_START_DELAY: 400,
-      TEXT_STAGGER_DELAY: 100,
-      TYPEWRITER_START_DELAY: 1000,
-    };
+    this.config = null; // Badge modal configuration from JSON SSOT
 
-    this.PARTICLE_CONFIG = {
-      COUNT: 8, // Reduced from 15 for performance
-      MIN_SIZE: 2,
-      SIZE_RANGE: 3,
-      MAX_DELAY: 8,
-      MIN_DURATION: 15,
-      DURATION_RANGE: 10,
-      DRIFT_MULTIPLIER: 100,
-      DRIFT_OFFSET: 0.5,
-    };
-
-    this.EMOJI_BUBBLE_CONFIG = {
-      CATEGORY_COUNT: 4, // Reduced from 8 for performance
-      SIDEKICK_COUNT: 3, // Reduced from 6 for performance
-      MAX_DELAY: 12,
-      MIN_DURATION: 8,
-      DURATION_RANGE: 4,
-      DRIFT_RANGE: 60,
-    };
-
-    this.TYPEWRITER_CONFIG = {
-      CHAR_SPEED: 20,
-      CURSOR_DELAY: 600,
-      START_DELAY: 50,
-    };
-
-    this.BADGE_TIERS = {
-      MAX_TIER: MAX_IMPLEMENTED_TIER, // Dynamically set from config
-      FULL_PROGRESSION: BADGE_TIERS, // Access to full triangular progression
-      FINALE_THRESHOLDS: {
-        LARGE: 3, // Tier 3+: Large finale
-        EPIC: 6, // Tier 6+: Epic finale with multiple waves
-        LEGENDARY: 9, // Tier 9+: Legendary finale
-      },
-    };
-
-    this.CONFETTI_FINALE_DELAYS = {
-      EPIC_SECOND_WAVE: 200,
-      LEGENDARY_WAVE: 400,
-    };
+    // Initialize configuration loading
+    this.loadConfiguration();
 
     this.bindEvents();
+  }
+
+  /**
+   * Initialize configuration from JSON SSOT
+   */
+  async loadConfiguration() {
+    try {
+      this.config = await loadBadgeModalConfig();
+      logger.info("BadgeModal configuration loaded successfully");
+      return true;
+    } catch (error) {
+      logger.error("Error loading BadgeModal configuration:", error);
+      return false;
+    }
   }
 
   /**
@@ -156,17 +111,24 @@ export class BadgeModal {
       return; // Prevent multiple modals
     }
 
+    // Ensure configuration is loaded
+    if (!this.config) {
+      await this.loadConfiguration();
+    }
+
     this.isVisible = true;
 
     // Start confetti celebration
     this.triggerConfetti(badgeConfig.categoryEmoji, badgeConfig.tier);
 
-    // Delay modal creation to appear with the third wave (second group)
+    // Delay modal creation to appear with the confetti wave
+    const delayDuration =
+      this.config?.animations?.confetti?.secondWaveDelay || 500;
     setTimeout(() => {
       // Create and show modal
       this.createModal(badgeConfig, returnContext);
       this.animateModalEntrance();
-    }, this.ANIMATION_DURATION.CONFETTI_SECOND_DELAY);
+    }, delayDuration);
   }
 
   /**
@@ -185,65 +147,79 @@ export class BadgeModal {
       }
     }
 
-    // Wave 1 - Large confetti (immediate) - Reduced for performance
+    // Ensure configuration is loaded
+    if (!this.config) {
+      await this.loadConfiguration();
+    }
+
+    const confettiConfig = this.config?.effects?.confetti || {};
+
+    // Wave 1 - Large confetti (immediate)
     this.confetti.addConfetti({
       emojis: [categoryEmoji],
-      emojiSize: 60,
-      confettiNumber: 8, // Reduced from 15
+      emojiSize: confettiConfig.largeSizeEmoji || 60,
+      confettiNumber: confettiConfig.largeSizeCount || 8,
     });
 
-    // Wave 2 - Medium confetti (virtually simultaneous with wave 1) - Reduced for performance
+    // Wave 2 - Medium confetti (virtually simultaneous with wave 1)
     setTimeout(() => {
       this.confetti.addConfetti({
         emojis: [categoryEmoji],
-        emojiSize: 40,
-        confettiNumber: 10, // Reduced from 20
+        emojiSize: confettiConfig.mediumSizeEmoji || 40,
+        confettiNumber: confettiConfig.mediumSizeCount || 10,
       });
-    }, this.ANIMATION_DURATION.CONFETTI_SIMULTANEOUS);
+    }, this.config?.animations?.confetti?.simultaneousDelay || 10);
 
-    // Wave 3 - Small confetti (after 500ms gap, with modal appearance) - Reduced for performance
+    // Wave 3 - Small confetti (after delay, with modal appearance)
     setTimeout(() => {
       this.confetti.addConfetti({
         emojis: [categoryEmoji],
-        emojiSize: 25,
-        confettiNumber: 6, // Reduced from 10
+        emojiSize: confettiConfig.smallSizeEmoji || 25,
+        confettiNumber: confettiConfig.smallSizeCount || 6,
       });
-    }, this.ANIMATION_DURATION.CONFETTI_SECOND_DELAY);
+    }, this.config?.animations?.confetti?.secondWaveDelay || 500);
 
-    // Wave 4 - Progressive finale effects based on tier - Reduced for performance
+    // Wave 4 - Progressive finale effects based on tier
     setTimeout(() => {
+      const finaleConfig = this.config?.effects?.confetti?.finale || {};
+      const thresholds = finaleConfig.tierThresholds || {
+        large: 3,
+        epic: 6,
+        legendary: 9,
+      };
+
       // Special finale effects for higher tiers
-      if (badgeTier >= this.BADGE_TIERS.FINALE_THRESHOLDS.LARGE) {
-        // Tier 3+: Large finale - Reduced
+      if (badgeTier >= thresholds.large) {
+        // Tier 3+: Large finale
         this.confetti.addConfetti({
           emojis: [categoryEmoji],
-          emojiSize: 70,
-          confettiNumber: 12, // Reduced from 25
+          emojiSize: finaleConfig.largeSizeEmoji || 70,
+          confettiNumber: finaleConfig.largeSizeCount || 12,
         });
       }
 
-      if (badgeTier >= this.BADGE_TIERS.FINALE_THRESHOLDS.EPIC) {
-        // Tier 6+: Epic finale with multiple waves - Reduced
+      if (badgeTier >= thresholds.epic) {
+        // Tier 6+: Epic finale with multiple waves
         setTimeout(() => {
           this.confetti.addConfetti({
             emojis: [categoryEmoji],
-            emojiSize: 80,
-            confettiNumber: 15, // Reduced from 35
+            emojiSize: finaleConfig.epicSizeEmoji || 80,
+            confettiNumber: finaleConfig.epicSizeCount || 15,
           });
-        }, this.CONFETTI_FINALE_DELAYS.EPIC_SECOND_WAVE);
+        }, this.config?.animations?.confetti?.epicSecondWaveDelay || 200);
       }
 
-      if (badgeTier >= this.BADGE_TIERS.FINALE_THRESHOLDS.LEGENDARY) {
-        // Tier 9+: Legendary finale - Reduced
+      if (badgeTier >= thresholds.legendary) {
+        // Tier 9+: Legendary finale
         setTimeout(() => {
           this.confetti.addConfetti({
             emojis: [categoryEmoji, "✨", "🌟"],
-            emojiSize: 90,
-            confettiNumber: 20, // Reduced from 50
+            emojiSize: finaleConfig.legendarySizeEmoji || 90,
+            confettiNumber: finaleConfig.legendarySizeCount || 20,
           });
-        }, this.CONFETTI_FINALE_DELAYS.LEGENDARY_WAVE);
+        }, this.config?.animations?.confetti?.legendaryWaveDelay || 400);
       }
-    }, this.ANIMATION_DURATION.CONFETTI_THIRD_DELAY);
+    }, this.config?.animations?.confetti?.thirdWaveDelay || 1000);
   }
 
   /**
@@ -275,9 +251,11 @@ export class BadgeModal {
     }
 
     // Initialize typewriter effect after modal is shown
+    const typewriterStartDelay =
+      this.config?.animations?.typewriterStartDelay || 1000;
     setTimeout(() => {
       this.initializeTypewriter(badgeConfig.quote);
-    }, this.ANIMATION_DURATION.TYPEWRITER_START_DELAY);
+    }, typewriterStartDelay);
   }
 
   /**
@@ -382,6 +360,18 @@ export class BadgeModal {
     const details = this.currentModal.querySelector(".badge-details");
     const footer = this.currentModal.querySelector(".badge-modal-footer");
 
+    // Get animation configuration with fallbacks
+    const animConfig = this.config?.animations || {};
+    const modalEnterDuration = animConfig.modalEnterDuration || 600;
+    const badgeScaleDuration = animConfig.badgeScaleDuration || 800;
+    const sidekickEntranceDuration =
+      animConfig.sidekickEntranceDuration || 1200;
+    const entranceDelay = animConfig.entranceDelay || 100;
+    const shieldDelay = animConfig.shieldDelay || 200;
+    const sidekickDelay = animConfig.sidekickDelay || 400;
+    const textStartDelay = animConfig.textStartDelay || 400;
+    const textStaggerDelay = animConfig.textStaggerDelay || 100;
+
     // Initial states
     modal.style.transform = "scale(0.8)";
     modal.style.opacity = "0";
@@ -398,27 +388,27 @@ export class BadgeModal {
 
     // Animate modal entrance
     setTimeout(() => {
-      modal.style.transition = `all ${this.ANIMATION_DURATION.MODAL_ENTER}ms cubic-bezier(0.68, -0.55, 0.265, 1.55)`;
+      modal.style.transition = `all ${modalEnterDuration}ms cubic-bezier(0.68, -0.55, 0.265, 1.55)`;
       modal.style.transform = "scale(1)";
       modal.style.opacity = "1";
-    }, this.ANIMATION_DURATION.ENTRANCE_DELAY);
+    }, entranceDelay);
 
     // Animate shield scale
     setTimeout(() => {
-      shield.style.transition = `transform ${this.ANIMATION_DURATION.BADGE_SCALE}ms cubic-bezier(0.68, -0.55, 0.265, 1.55)`;
+      shield.style.transition = `transform ${badgeScaleDuration}ms cubic-bezier(0.68, -0.55, 0.265, 1.55)`;
       shield.style.transform = "scale(1.1)";
 
       setTimeout(() => {
         shield.style.transform = "scale(1)";
-      }, this.ANIMATION_DURATION.BADGE_SCALE);
-    }, this.ANIMATION_DURATION.SHIELD_DELAY);
+      }, badgeScaleDuration);
+    }, shieldDelay);
 
     // Animate sidekick emoji entrance
     setTimeout(() => {
-      sidekick.style.transition = `all ${this.ANIMATION_DURATION.SIDEKICK_ENTRANCE}ms cubic-bezier(0.68, -0.55, 0.265, 1.55)`;
+      sidekick.style.transition = `all ${sidekickEntranceDuration}ms cubic-bezier(0.68, -0.55, 0.265, 1.55)`;
       sidekick.style.transform = "scale(1) rotate(0deg)";
       sidekick.style.opacity = "1";
-    }, this.ANIMATION_DURATION.SIDEKICK_DELAY);
+    }, sidekickDelay);
 
     // Animate text elements with stagger
     const textElements = [title, quote, details, footer];
@@ -429,8 +419,7 @@ export class BadgeModal {
           element.style.transform = "translateY(0)";
           element.style.opacity = "1";
         },
-        this.ANIMATION_DURATION.TEXT_START_DELAY +
-          index * this.ANIMATION_DURATION.TEXT_STAGGER_DELAY,
+        textStartDelay + index * textStaggerDelay,
       );
     });
   }
@@ -442,9 +431,10 @@ export class BadgeModal {
     if (!this.isVisible || !this.currentModal) return;
 
     const modal = this.currentModal.querySelector(".badge-modal");
+    const modalExitDuration = this.config?.animations?.modalExitDuration || 400;
 
     // Animate exit
-    modal.style.transition = `all ${this.ANIMATION_DURATION.MODAL_EXIT}ms ease-in`;
+    modal.style.transition = `all ${modalExitDuration}ms ease-in`;
     modal.style.transform = "scale(0.9)";
     modal.style.opacity = "0";
 
@@ -455,7 +445,7 @@ export class BadgeModal {
         this.currentModal = null;
       }
       this.isVisible = false;
-    }, this.ANIMATION_DURATION.MODAL_EXIT);
+    }, modalExitDuration);
   }
 
   /**
@@ -486,23 +476,26 @@ export class BadgeModal {
     const particlesContainer = document.createElement("div");
     particlesContainer.className = "particles-container";
 
-    const particleCount = this.PARTICLE_CONFIG.COUNT;
+    // Get particle configuration with fallbacks
+    const particleConfig = this.config?.effects?.particles || {};
+    const particleCount = particleConfig.count || 8;
+
     for (let i = 0; i < particleCount; i++) {
       const particle = document.createElement("div");
       particle.className = "floating-particle";
 
       // Random properties for each particle
       const size =
-        Math.random() * this.PARTICLE_CONFIG.SIZE_RANGE +
-        this.PARTICLE_CONFIG.MIN_SIZE;
+        Math.random() * (particleConfig.sizeRange || 3) +
+        (particleConfig.minSize || 2);
       const left = Math.random() * 100; // 0-100%
-      const animationDelay = Math.random() * this.PARTICLE_CONFIG.MAX_DELAY;
+      const animationDelay = Math.random() * (particleConfig.maxDelay || 8);
       const animationDuration =
-        Math.random() * this.PARTICLE_CONFIG.DURATION_RANGE +
-        this.PARTICLE_CONFIG.MIN_DURATION;
+        Math.random() * (particleConfig.durationRange || 10) +
+        (particleConfig.minDuration || 15);
       const drift =
-        (Math.random() - this.PARTICLE_CONFIG.DRIFT_OFFSET) *
-        this.PARTICLE_CONFIG.DRIFT_MULTIPLIER;
+        (Math.random() - (particleConfig.driftOffset || 0.5)) *
+        (particleConfig.driftMultiplier || 100);
 
       particle.style.cssText = `
         width: ${size}px;
@@ -526,27 +519,38 @@ export class BadgeModal {
    * @param {string} categoryEmoji - Category emoji to bubble
    * @param {string} sidekickEmoji - Sidekick emoji to bubble
    */
+  /**
+   * Creates bubbling emoji effects
+   * @param {string} categoryEmoji - Category emoji for bubbles
+   * @param {string} sidekickEmoji - Sidekick emoji for bubbles
+   */
   createBubblingEmojis(categoryEmoji, sidekickEmoji) {
     if (!this.currentModal) return;
 
     const bubblesContainer = document.createElement("div");
     bubblesContainer.className = "emoji-bubbles-container";
 
+    // Get bubble configuration with fallbacks
+    const bubbleConfig = this.config?.effects?.bubbles || {};
+    const categoryCount = bubbleConfig.categoryCount || 4;
+    const sidekickCount = bubbleConfig.sidekickCount || 3;
+    const maxDelay = bubbleConfig.maxDelay || 12;
+    const minDuration = bubbleConfig.minDuration || 8;
+    const durationRange = bubbleConfig.durationRange || 4;
+    const driftRange = bubbleConfig.driftRange || 60;
+    const driftOffset = bubbleConfig.driftOffset || 0.5;
+
     // Create category emoji bubbles
-    for (let i = 0; i < this.EMOJI_BUBBLE_CONFIG.CATEGORY_COUNT; i++) {
+    for (let i = 0; i < categoryCount; i++) {
       const bubble = document.createElement("div");
       bubble.className = "bubbling-emoji category";
       bubble.textContent = categoryEmoji;
 
       // Random properties for each bubble
       const left = Math.random() * 100; // 0-100%
-      const animationDelay = Math.random() * this.EMOJI_BUBBLE_CONFIG.MAX_DELAY; // 0-12s
-      const animationDuration =
-        Math.random() * this.EMOJI_BUBBLE_CONFIG.DURATION_RANGE +
-        this.EMOJI_BUBBLE_CONFIG.MIN_DURATION; // 8-12s
-      const driftX =
-        (Math.random() - this.PARTICLE_CONFIG.DRIFT_OFFSET) *
-        this.EMOJI_BUBBLE_CONFIG.DRIFT_RANGE; // -30px to 30px horizontal drift
+      const animationDelay = Math.random() * maxDelay; // 0-12s
+      const animationDuration = Math.random() * durationRange + minDuration; // 8-12s
+      const driftX = (Math.random() - driftOffset) * driftRange; // -30px to 30px horizontal drift
 
       bubble.style.cssText = `
         left: ${left}%;
@@ -559,20 +563,16 @@ export class BadgeModal {
     }
 
     // Create sidekick emoji bubbles
-    for (let i = 0; i < this.EMOJI_BUBBLE_CONFIG.SIDEKICK_COUNT; i++) {
+    for (let i = 0; i < sidekickCount; i++) {
       const bubble = document.createElement("div");
       bubble.className = "bubbling-emoji sidekick";
       bubble.textContent = sidekickEmoji;
 
       // Random properties for each bubble
       const left = Math.random() * 100; // 0-100%
-      const animationDelay = Math.random() * this.EMOJI_BUBBLE_CONFIG.MAX_DELAY; // 0-12s
-      const animationDuration =
-        Math.random() * this.EMOJI_BUBBLE_CONFIG.DURATION_RANGE +
-        this.EMOJI_BUBBLE_CONFIG.MIN_DURATION; // 8-12s
-      const driftX =
-        (Math.random() - this.PARTICLE_CONFIG.DRIFT_OFFSET) *
-        this.EMOJI_BUBBLE_CONFIG.DRIFT_RANGE; // -30px to 30px horizontal drift
+      const animationDelay = Math.random() * maxDelay; // 0-12s
+      const animationDuration = Math.random() * durationRange + minDuration; // 8-12s
+      const driftX = (Math.random() - driftOffset) * driftRange; // -30px to 30px horizontal drift
 
       bubble.style.cssText = `
         left: ${left}%;
@@ -584,11 +584,7 @@ export class BadgeModal {
       bubblesContainer.appendChild(bubble);
     }
 
-    // Insert bubbles inside the modal as background
-    const modal = this.currentModal.querySelector(".badge-modal");
-    if (modal) {
-      modal.insertBefore(bubblesContainer, modal.firstChild);
-    }
+    this.currentModal.appendChild(bubblesContainer);
   }
 
   /**
@@ -600,6 +596,12 @@ export class BadgeModal {
 
     const quoteElement = this.currentModal.querySelector(".badge-quote");
     if (!quoteElement) return;
+
+    // Get typewriter configuration with fallbacks
+    const typewriterConfig = this.config?.effects?.typewriter || {};
+    const typeSpeed = typewriterConfig.characterSpeed || 20;
+    const cursorDelay = typewriterConfig.cursorDelay || 600;
+    const startDelay = typewriterConfig.startDelay || 50;
 
     // Reset quote content and prepare for typewriter
     quoteElement.textContent = "";
@@ -614,7 +616,6 @@ export class BadgeModal {
 
     // Start typewriter animation
     let charIndex = 0;
-    const typeSpeed = this.TYPEWRITER_CONFIG.CHAR_SPEED;
 
     const typeCharacter = () => {
       if (charIndex < quote.length) {
@@ -632,7 +633,7 @@ export class BadgeModal {
           quoteElement.style.wordWrap = "break-word";
           quoteElement.style.overflowWrap = "break-word";
           quoteElement.style.hyphens = "auto";
-        }, this.TYPEWRITER_CONFIG.CURSOR_DELAY);
+        }, cursorDelay);
       }
     };
 
@@ -640,7 +641,7 @@ export class BadgeModal {
     quoteElement.style.animation = "typewriter 1.5s steps(30) forwards";
 
     // Start character typing
-    setTimeout(typeCharacter, this.TYPEWRITER_CONFIG.START_DELAY);
+    setTimeout(typeCharacter, startDelay);
   }
 }
 

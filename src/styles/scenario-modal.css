@@ -1110,3 +1110,55 @@ body.dark-mode .test-mode-indicator {
   color: #ffc107;
   border: 1px solid rgba(255, 193, 7, 0.3);
 }
+
+/* ===== CHART.JS TOOLTIP FIX ===== */
+/* Ensure Chart.js tooltips appear above scenario modal content */
+
+/* Chart.js tooltip container - must be above modal z-index */
+.chartjs-tooltip {
+  z-index: 1060 !important; /* Above scenario-modal z-index: 1055 */
+  position: absolute !important;
+  pointer-events: none !important;
+}
+
+/* Chart.js default tooltip styling override for modals */
+.scenario-modal .chartjs-tooltip,
+.scenario-modal-dialog .chartjs-tooltip {
+  z-index: 1060 !important;
+  position: fixed !important; /* Use fixed positioning to break out of modal context */
+}
+
+/* Chart.js canvas tooltips - alternative tooltip implementation */
+.scenario-modal canvas[role="img"] + div[style*="position: absolute"],
+.scenario-modal-dialog canvas[role="img"] + div[style*="position: absolute"] {
+  z-index: 1060 !important;
+  position: fixed !important;
+}
+
+/* Ensure Chart.js tooltip backdrop doesn't interfere */
+.scenario-modal .chart-tooltip,
+.scenario-modal-dialog .chart-tooltip {
+  z-index: 1060 !important;
+  position: fixed !important;
+  pointer-events: none !important;
+}
+
+/* Allow overflow for Chart.js tooltips in sidebar */
+.scenario-sidebar {
+  overflow: visible !important; /* Override any overflow: hidden that blocks tooltips */
+}
+
+/* Ensure radar chart container allows tooltip overflow */
+.scenario-modal #scenario-radar-chart {
+  overflow: visible !important;
+  position: relative !important;
+  z-index: auto !important; /* Don't create new stacking context */
+}
+
+/* Chart.js specific tooltip selectors that might be used */
+div[id^="chartjs-tooltip"],
+div[class*="chartjs-tooltip"],
+div[data-chartjs="tooltip"] {
+  z-index: 1060 !important;
+  position: fixed !important;
+}
