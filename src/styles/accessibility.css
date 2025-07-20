@@ -73,7 +73,7 @@
   left: 6px;
   background: var(--primary-color);
   color: white;
-  padding: 8px;
+  padding: calc(8px * var(--font-scale, 1));
   text-decoration: none;
   border-radius: 0 0 4px 4px;
   z-index: 1000;
@@ -146,7 +146,8 @@ input[disabled] {
   color: #721c24;
   background-color: #f8d7da;
   border: 1px solid #f5c6cb;
-  padding: 0.75rem 1.25rem;
+  padding: calc(0.75rem * var(--font-scale, 1))
+    calc(1.25rem * var(--font-scale, 1));
   margin-bottom: 1rem;
   border-radius: 0.25rem;
 }
@@ -161,7 +162,8 @@ input[disabled] {
   color: #155724;
   background-color: #d4edda;
   border: 1px solid #c3e6cb;
-  padding: 0.75rem 1.25rem;
+  padding: calc(0.75rem * var(--font-scale, 1))
+    calc(1.25rem * var(--font-scale, 1));
   margin-bottom: 1rem;
   border-radius: 0.25rem;
 }
@@ -176,7 +178,8 @@ input[disabled] {
   color: #856404;
   background-color: #fff3cd;
   border: 1px solid #ffeaa7;
-  padding: 0.75rem 1.25rem;
+  padding: calc(0.75rem * var(--font-scale, 1))
+    calc(1.25rem * var(--font-scale, 1));
   margin-bottom: 1rem;
   border-radius: 0.25rem;
 }
@@ -184,13 +187,13 @@ input[disabled] {
 /* Large text mode support */
 @media (min-resolution: 2dppx) {
   body {
-    font-size: 1.1rem;
+    font-size: calc(1.1rem * var(--font-scale, 1));
   }
 
   .btn,
   button {
-    min-height: 44px;
-    min-width: 44px;
+    min-height: var(--touch-target-min, 44px);
+    min-width: var(--touch-target-min, 44px);
   }
 }
 
@@ -201,14 +204,14 @@ input[disabled] {
   a,
   input,
   select {
-    min-height: 44px;
-    min-width: 44px;
-    padding: 12px 16px;
+    min-height: var(--touch-target-min, 44px);
+    min-width: var(--touch-target-min, 44px);
+    padding: calc(12px * var(--font-scale, 1)) calc(16px * var(--font-scale, 1));
   }
 
   .slider-handle {
-    min-width: 44px;
-    min-height: 44px;
+    min-width: var(--touch-target-min, 44px);
+    min-height: var(--touch-target-min, 44px);
   }
 }
 
@@ -454,4 +457,83 @@ body.dark-mode ::-webkit-scrollbar-thumb {
 
 body.dark-mode ::-webkit-scrollbar-thumb:hover {
   background: var(--theme-border-hover);
+}
+
+/* ===== RESPONSIVE ACCESSIBILITY ENHANCEMENTS ===== */
+
+/* Device-adaptive focus indicators */
+.focus-ring-responsive {
+  outline-width: calc(2px * var(--font-scale, 1));
+  outline-offset: calc(2px * var(--font-scale, 1));
+}
+
+/* Responsive message spacing */
+.message-responsive {
+  padding: calc(var(--container-padding, 16px) * 0.75)
+    var(--container-padding, 16px);
+  margin-bottom: calc(1rem * var(--font-scale, 1));
+}
+
+/* Responsive skip links */
+.skip-link-responsive {
+  padding: calc(8px * var(--font-scale, 1)) calc(12px * var(--font-scale, 1));
+  font-size: calc(1rem * var(--font-scale, 1));
+  top: calc(-40px * var(--font-scale, 1));
+}
+
+/* Device-adaptive status indicators */
+.status-indicator-responsive {
+  width: calc(12px * var(--font-scale, 1));
+  height: calc(12px * var(--font-scale, 1));
+  margin-right: calc(8px * var(--font-scale, 1));
+}
+
+/* Responsive scrollbar for accessibility */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar {
+    width: calc(16px * var(--font-scale, 1));
+    height: calc(16px * var(--font-scale, 1));
+  }
+}
+
+@media (max-width: 767px) {
+  ::-webkit-scrollbar {
+    width: calc(12px * var(--font-scale, 1));
+    height: calc(12px * var(--font-scale, 1));
+  }
+}
+
+/* Enhanced touch targets with responsive sizing */
+.touch-enhanced {
+  min-height: var(--touch-target-min, 44px);
+  min-width: var(--touch-target-min, 44px);
+  padding: calc(var(--container-padding, 16px) * 0.5);
+}
+
+/* Responsive landmark spacing */
+.landmark-responsive {
+  margin-bottom: calc(1rem * var(--font-scale, 1));
+  padding: calc(var(--container-padding, 16px) * 0.25) 0;
+}
+
+/* Device-adaptive content spacing */
+.content-spacing-responsive {
+  padding-left: var(--container-padding, 16px);
+  padding-right: var(--container-padding, 16px);
+}
+
+/* Responsive text scaling utilities */
+.text-accessibility-scale {
+  font-size: calc(1rem * var(--font-scale, 1));
+  line-height: calc(1.5 * var(--font-scale, 1));
+}
+
+.text-accessibility-large {
+  font-size: calc(1.25rem * var(--font-scale, 1));
+  line-height: calc(1.4 * var(--font-scale, 1));
+}
+
+.text-accessibility-small {
+  font-size: calc(0.875rem * var(--font-scale, 1));
+  line-height: calc(1.6 * var(--font-scale, 1));
 }

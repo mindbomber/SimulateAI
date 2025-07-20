@@ -55,10 +55,14 @@ limitations under the License.
       content="keyboard-navigation,skip-links,high-contrast,large-text,screen-reader-support"
     />
     <!-- Styles - Optimized load order for CSS architecture -->
-    <!-- 1. Design tokens and base styles -->
+    <!-- 1. Media queries foundation - MUST LOAD FIRST -->
+    <link rel="stylesheet" href="src/styles/media.css" />
+
+    <!-- 2. Design tokens and base styles -->
     <link rel="stylesheet" href="src/styles/main.css" />
     <link rel="stylesheet" href="src/styles/accessibility.css" />
     <link rel="stylesheet" href="src/styles/navigation-highlight-fix.css" />
+    <link rel="stylesheet" href="src/styles/footer.css" />
 
     <!-- 2. Base component styles -->
     <link rel="stylesheet" href="src/styles/simulations.css" />
@@ -193,9 +197,9 @@ limitations under the License.
     <!-- Main Content -->
     <main id="main-content" class="main-content" role="main">
       <!-- Hero Section -->
-      <section class="hero" id="home">
+      <section class="hero container-responsive" id="home">
         <div class="hero-content">
-          <h2 class="hero-title">
+          <h2 class="hero-title text-responsive">
             Explore AI Ethics Through Open-Ended Discovery
           </h2>
           <p class="hero-description">
@@ -210,7 +214,7 @@ limitations under the License.
           </p>
           <div class="hero-actions">
             <button
-              class="btn btn-primary"
+              class="btn btn-primary touch-target"
               id="start-learning"
               aria-describedby="start-learning-description"
               title="Navigate to Ethics Categories section"
@@ -426,9 +430,9 @@ limitations under the License.
       </section>
 
       <!-- Categories Grid -->
-      <section class="categories-section" id="categories">
+      <section class="categories-section container-responsive" id="categories">
         <div class="section-header">
-          <h2 class="section-title">Ethics Categories</h2>
+          <h2 class="section-title text-responsive">Ethics Categories</h2>
           <p class="section-description">
             Explore thematic categories of ethical dilemmas. Each category
             contains multiple scenarios that become interactive
@@ -444,7 +448,7 @@ limitations under the License.
           >
             <button
               type="button"
-              class="view-toggle-btn active"
+              class="view-toggle-btn active touch-target"
               data-view="category"
               role="radio"
               aria-checked="true"
@@ -456,7 +460,7 @@ limitations under the License.
             </button>
             <button
               type="button"
-              class="view-toggle-btn"
+              class="view-toggle-btn touch-target"
               data-view="scenario"
               role="radio"
               aria-checked="false"
@@ -768,9 +772,14 @@ limitations under the License.
       </section>
 
       <!-- Donor Appreciation Section -->
-      <section class="donor-appreciation-section" id="donor-appreciation">
+      <section
+        class="donor-appreciation-section container-responsive"
+        id="donor-appreciation"
+      >
         <div class="section-header">
-          <h2 class="section-title">🙏 Thank You to Our Contributors</h2>
+          <h2 class="section-title text-responsive">
+            🙏 Thank You to Our Contributors
+          </h2>
           <p class="section-description">
             Your support makes ethical AI education accessible to everyone
           </p>

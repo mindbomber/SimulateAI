@@ -1,7 +1,7 @@
 /**
  * Advanced UI Components Styles
  * Modern, accessible styles for modal dialogs, navigation menus, charts, forms, and tooltips
- * Enhanced with CSS custom properties, accessibility, and responsive design
+ * Enhanced with CSS custom properties, accessibility, responsive design, and media.css integration
  */
 
 /* ===== CSS CUSTOM PROPERTIES FOR ADVANCED UI COMPONENTS ===== */
@@ -40,10 +40,17 @@
   --z-modal: 1000;
   --z-tooltip: 1500;
 
-  /* Touch targets and focus (accessibility) */
-  --touch-target-min: 44px;
+  /* Touch targets and focus (accessibility) - now responsive via media.css */
+  --touch-target-min: var(
+    --touch-target-min,
+    44px
+  ); /* Fallback to media.css variable */
   --focus-ring-width: 2px;
   --focus-ring-offset: 2px;
+
+  /* Responsive spacing using media.css variables */
+  --component-padding: var(--container-padding, 1rem);
+  --component-font-scale: var(--font-scale, 1);
 }
 
 /* ===== MODAL DIALOG STYLES ===== */
@@ -61,8 +68,8 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 1rem;
-  padding-top: 2rem;
+  padding: var(--component-padding);
+  padding-top: calc(var(--component-padding) * 2);
   overflow-y: auto;
 }
 
@@ -81,7 +88,9 @@
   z-index: var(--z-modal);
   min-width: 300px;
   max-width: 90vw;
-  max-height: calc(100vh - 4rem); /* Updated for better usability */
+  max-height: calc(
+    100vh - calc(var(--component-padding) * 4)
+  ); /* Responsive height based on padding */
 
   /* Flexbox layout for proper header/body/footer stacking */
   display: flex;
@@ -100,7 +109,7 @@
 }
 
 .modal-header {
-  padding: var(--spacing-5, 20px);
+  padding: calc(var(--component-padding) * var(--component-font-scale));
   border-bottom: 1px solid var(--modal-border);
   display: flex;
   justify-content: space-between;
@@ -115,7 +124,7 @@
 
 .modal-title {
   margin: 0;
-  font-size: var(--font-size-lg, 18px);
+  font-size: calc(var(--font-size-lg, 18px) * var(--component-font-scale));
   font-weight: var(--font-weight-semibold, 600);
   color: var(--color-gray-900, #333);
   line-height: var(--line-height-tight, 1.25);
@@ -124,7 +133,7 @@
 .modal-close {
   background: none;
   border: none;
-  font-size: var(--font-size-2xl, 24px);
+  font-size: calc(var(--font-size-2xl, 24px) * var(--component-font-scale));
   cursor: pointer;
   color: var(--color-gray-600, #666);
   width: var(--touch-target-min);
@@ -150,7 +159,7 @@
 
 /* Modal body - updated for proper flexbox layout */
 .modal-body {
-  padding: var(--spacing-5, 20px);
+  padding: calc(var(--component-padding) * var(--component-font-scale));
   background: var(--modal-background);
 
   /* Flex item properties for proper layout */
@@ -160,7 +169,9 @@
   min-height: 0; /* Important for flex items with overflow */
 
   /* Add some maximum height constraints */
-  max-height: calc(90vh - 140px); /* Account for header and footer space */
+  max-height: calc(
+    90vh - calc(var(--component-padding) * 7 * var(--component-font-scale))
+  ); /* Account for header and footer space */
 }
 
 /* Legacy scoped styles - keep for backward compatibility but make less specific */
@@ -170,12 +181,13 @@
 }
 
 .modal-footer {
-  padding: var(--spacing-3, 12px) var(--spacing-4, 16px);
+  padding: calc(var(--spacing-3, 12px) * var(--component-font-scale))
+    calc(var(--spacing-4, 16px) * var(--component-font-scale));
   border-top: 1px solid var(--modal-border);
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: var(--spacing-2, 8px);
+  gap: calc(var(--spacing-2, 8px) * var(--component-font-scale));
   background: var(--modal-background);
 
   /* Flex item properties for proper stacking */
@@ -313,7 +325,8 @@
 }
 
 .nav-item {
-  padding: var(--spacing-3, 12px) var(--spacing-4, 16px);
+  padding: calc(var(--spacing-3, 12px) * var(--component-font-scale))
+    calc(var(--spacing-4, 16px) * var(--component-font-scale));
   cursor: pointer;
   transition: all var(--transition-fast);
   border-bottom: 1px solid var(--color-gray-100, #f0f0f0);
@@ -325,6 +338,7 @@
   color: var(--color-gray-700, #555);
   text-decoration: none;
   font-weight: var(--font-weight-medium, 500);
+  font-size: calc(1rem * var(--component-font-scale));
 }
 
 .nav-item:last-child {
@@ -366,11 +380,11 @@
 }
 
 .nav-item-icon {
-  margin-right: var(--spacing-2, 10px);
+  margin-right: calc(var(--spacing-2, 10px) * var(--component-font-scale));
   opacity: 0.7;
-  font-size: var(--font-size-base, 16px);
-  width: 20px;
-  height: 20px;
+  font-size: calc(var(--font-size-base, 16px) * var(--component-font-scale));
+  width: calc(20px * var(--component-font-scale));
+  height: calc(20px * var(--component-font-scale));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -422,7 +436,7 @@
   background: var(--modal-background);
   border: 1px solid var(--modal-border);
   border-radius: var(--modal-border-radius);
-  padding: var(--spacing-5, 20px);
+  padding: calc(var(--component-padding) * var(--component-font-scale));
   box-shadow: var(--shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
   position: relative;
   contain: layout style;
@@ -448,9 +462,9 @@
 }
 
 .chart-title {
-  font-size: var(--font-size-lg, 16px);
+  font-size: calc(var(--font-size-lg, 16px) * var(--component-font-scale));
   font-weight: var(--font-weight-semibold, 600);
-  margin-bottom: var(--spacing-5, 20px);
+  margin-bottom: calc(var(--component-padding) * var(--component-font-scale));
   text-align: center;
   color: var(--color-gray-900, #333);
   line-height: var(--line-height-tight, 1.25);
@@ -499,14 +513,14 @@
 
 /* ===== ENHANCED FORM FIELD STYLES ===== */
 .form-field {
-  margin-bottom: var(--spacing-5, 20px);
+  margin-bottom: calc(var(--component-padding) * var(--component-font-scale));
   position: relative;
 }
 
 .form-label {
   display: block;
-  margin-bottom: var(--spacing-1, 5px);
-  font-size: var(--font-size-sm, 14px);
+  margin-bottom: calc(var(--spacing-1, 5px) * var(--component-font-scale));
+  font-size: calc(var(--font-size-sm, 14px) * var(--component-font-scale));
   font-weight: var(--font-weight-medium, 500);
   color: var(--color-gray-900, #333);
   line-height: var(--line-height-normal, 1.5);
@@ -522,10 +536,11 @@
 .form-select,
 .form-textarea {
   width: 100%;
-  padding: var(--spacing-2, 10px) var(--spacing-3, 12px);
+  padding: calc(var(--spacing-2, 10px) * var(--component-font-scale))
+    calc(var(--spacing-3, 12px) * var(--component-font-scale));
   border: 1px solid var(--form-border);
   border-radius: var(--input-border-radius);
-  font-size: var(--font-size-sm, 14px);
+  font-size: calc(var(--font-size-sm, 14px) * var(--component-font-scale));
   font-family: inherit;
   line-height: var(--line-height-normal, 1.5);
   transition:
@@ -677,15 +692,16 @@
   position: absolute;
   background: var(--tooltip-background);
   color: var(--tooltip-text);
-  padding: var(--spacing-2, 8px) var(--spacing-3, 12px);
+  padding: calc(var(--spacing-2, 8px) * var(--component-font-scale))
+    calc(var(--spacing-3, 12px) * var(--component-font-scale));
   border-radius: var(--button-border-radius);
-  font-size: var(--font-size-xs, 12px);
+  font-size: calc(var(--font-size-xs, 12px) * var(--component-font-scale));
   white-space: nowrap;
   z-index: var(--z-tooltip);
   pointer-events: none;
   opacity: 0;
   transition: opacity var(--transition-fast);
-  max-width: 250px;
+  max-width: calc(250px * var(--component-font-scale));
   white-space: normal;
   line-height: var(--line-height-normal, 1.5);
   box-shadow: var(--shadow-md, 0 2px 8px rgba(0, 0, 0, 0.15));
@@ -1156,18 +1172,21 @@
   }
 
   .nav-item {
-    padding: var(--spacing-4, 16px);
+    padding: calc(var(--spacing-4, 16px) * var(--component-font-scale));
   }
 
   .modal-button {
-    padding: var(--spacing-3, 12px) var(--spacing-5, 20px);
-    font-size: var(--font-size-base, 16px);
+    padding: calc(var(--spacing-3, 12px) * var(--component-font-scale))
+      calc(var(--spacing-5, 20px) * var(--component-font-scale));
+    font-size: calc(var(--font-size-base, 16px) * var(--component-font-scale));
   }
 
   .form-input,
   .form-select,
   .form-textarea {
-    font-size: var(--font-size-base, 16px); /* Prevent zoom on iOS */
+    font-size: calc(
+      var(--font-size-base, 16px) * var(--component-font-scale)
+    ); /* Prevent zoom on iOS */
     min-height: var(--touch-target-min);
   }
 
@@ -1313,20 +1332,21 @@
   z-index: 1;
 }
 
-/* Mobile responsive styles */
-@media (max-width: 768px) {
+/* Mobile responsive styles - using media.css breakpoints */
+@media only screen and (max-width: 767px) {
   .modal-backdrop {
-    padding: 0.5rem;
-    padding-top: 1rem;
+    padding: calc(var(--component-padding) * 0.5);
+    padding-top: var(--component-padding);
   }
 
   .modal-backdrop .modal-dialog {
-    max-height: calc(100vh - 2rem);
+    max-height: calc(100vh - calc(var(--component-padding) * 2));
   }
 
   .modal-footer {
-    padding: var(--spacing-2, 8px) var(--spacing-3, 12px);
-    gap: var(--spacing-2, 8px);
+    padding: calc(var(--spacing-2, 8px) * var(--component-font-scale))
+      calc(var(--spacing-3, 12px) * var(--component-font-scale));
+    gap: calc(var(--spacing-2, 8px) * var(--component-font-scale));
     flex-direction: column;
     align-items: stretch;
   }
@@ -1338,24 +1358,80 @@
   }
 
   .modal-footer .modal-button + .modal-button {
-    margin-top: var(--spacing-2, 8px);
+    margin-top: calc(var(--spacing-2, 8px) * var(--component-font-scale));
   }
 }
 
-/* Small mobile adjustments */
-@media (max-width: 480px) {
+/* Small mobile adjustments - using media.css mobile breakpoints */
+@media only screen and (max-width: 479px) {
   .modal-backdrop {
-    padding: 0.25rem;
-    padding-top: 0.5rem;
+    padding: calc(var(--component-padding) * 0.25);
+    padding-top: calc(var(--component-padding) * 0.5);
   }
 
   .modal-backdrop .modal-dialog,
   .modal-dialog {
-    max-height: calc(100vh - 1rem);
+    max-height: calc(100vh - var(--component-padding));
   }
 
   .modal-footer {
-    padding: var(--spacing-1, 4px) var(--spacing-2, 8px);
+    padding: calc(var(--spacing-1, 4px) * var(--component-font-scale))
+      calc(var(--spacing-2, 8px) * var(--component-font-scale));
+  }
+}
+
+/* Tablet responsive enhancements - using media.css tablet breakpoints */
+@media only screen and (min-width: 768px) and (max-width: 1279px) {
+  .modal-dialog {
+    min-width: calc(400px * var(--component-font-scale));
+    max-width: 85vw;
+  }
+
+  .navigation-menu {
+    min-width: calc(250px * var(--component-font-scale));
+  }
+
+  .nav-item {
+    padding: calc(var(--spacing-4, 16px) * var(--component-font-scale));
+  }
+
+  .chart-container {
+    padding: calc(
+      var(--component-padding) * 1.25 * var(--component-font-scale)
+    );
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    font-size: calc(var(--font-size-base, 16px) * var(--component-font-scale));
+  }
+}
+
+/* Laptop/Desktop responsive enhancements - using media.css laptop+ breakpoints */
+@media only screen and (min-width: 1280px) {
+  .modal-dialog {
+    min-width: calc(500px * var(--component-font-scale));
+    max-width: min(800px, 80vw);
+  }
+
+  .navigation-menu {
+    min-width: calc(300px * var(--component-font-scale));
+  }
+
+  .nav-item {
+    padding: calc(var(--spacing-4, 16px) * var(--component-font-scale))
+      calc(var(--spacing-5, 20px) * var(--component-font-scale));
+  }
+
+  .chart-container {
+    padding: calc(var(--component-padding) * 1.5 * var(--component-font-scale));
+  }
+
+  .tooltip.large {
+    max-width: calc(400px * var(--component-font-scale));
+    padding: calc(var(--spacing-4, 16px) * var(--component-font-scale));
+    font-size: calc(var(--font-size-base, 16px) * var(--component-font-scale));
   }
 }
 
@@ -1382,8 +1458,8 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 1rem;
-  padding-top: 2rem;
+  padding: var(--component-padding);
+  padding-top: calc(var(--component-padding) * 2);
   overflow-y: auto;
 }
 
@@ -1394,7 +1470,7 @@
   left: auto;
   transform: none;
   margin: auto;
-  max-height: calc(100vh - 4rem);
+  max-height: calc(100vh - calc(var(--component-padding) * 4));
 }
 
 /* Handle very tall content */

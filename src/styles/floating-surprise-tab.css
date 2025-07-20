@@ -15,9 +15,13 @@
  */
 
 /**
- * Floating Surprise Tab Component Styles
+ * Floating Surprise Tab Component Styles (Refactored)
  * Professional floating "Surprise Me!" button with smooth animations
+ * Uses standardized media queries from media.css
  */
+
+/* Import standardized media queries */
+@import url("./media.css");
 
 /* Main floating surprise tab container */
 .floating-surprise-tab-link {
@@ -30,7 +34,7 @@
   color: inherit;
   display: block;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  width: 280px;
+  width: var(--floating-tab-width, 280px);
   pointer-events: none; /* Disable pointer events on the link */
 }
 
@@ -42,10 +46,10 @@
     0 4px 20px rgba(255, 149, 0, 0.3),
     0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  transform: translateX(calc(100% - 90px));
+  transform: translateX(calc(100% - var(--floating-tab-protrusion, 90px)));
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  min-width: 280px;
-  height: 60px;
+  min-width: var(--floating-tab-width, 280px);
+  height: var(--floating-tab-height, 60px);
   cursor: pointer;
   user-select: none;
   backdrop-filter: blur(10px);
@@ -68,7 +72,7 @@
 .floating-surprise-tab-content {
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 var(--container-padding, 20px);
   height: 100%;
   position: relative;
   z-index: 2;
@@ -118,14 +122,14 @@
 
 .surprise-tab-title {
   font-weight: 600;
-  font-size: 16px;
+  font-size: calc(16px * var(--font-scale, 1));
   margin: 0;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   letter-spacing: 0.5px;
 }
 
 .surprise-tab-subtitle {
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   opacity: 0.9;
   margin: 2px 0 0 0;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
@@ -183,334 +187,8 @@
   transform: translateX(0) scale(0.98);
 }
 
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  .floating-surprise-tab-link {
-    top: 35%; /* Maintain consistent relative positioning */
-  }
-
-  .floating-surprise-tab {
-    min-width: 260px;
-    height: 56px;
-    transform: translateX(
-      calc(100% - 75px)
-    ); /* Standardized mobile protrusion */
-  }
-
-  .floating-surprise-tab-content {
-    padding: 0 16px;
-  }
-
-  .floating-surprise-tab-icon {
-    width: 24px;
-    height: 24px;
-    font-size: 18px;
-  }
-
-  .surprise-tab-title {
-    font-size: 15px;
-  }
-
-  .surprise-tab-subtitle {
-    font-size: 11px;
-  }
-
-  /* Mobile tap states */
-  .floating-surprise-tab:active {
-    transform: translateX(0) scale(0.95);
-  }
-}
-
-@media (max-width: 480px) {
-  .floating-surprise-tab-link {
-    top: 35%; /* Maintain consistent relative positioning */
-  }
-
-  .floating-surprise-tab {
-    min-width: 240px;
-    height: 52px;
-    transform: translateX(
-      calc(100% - 65px)
-    ); /* Standardized small mobile protrusion */
-  }
-
-  .floating-surprise-tab-content {
-    padding: 0 14px;
-  }
-
-  .floating-surprise-tab-icon {
-    width: 22px;
-    height: 22px;
-    font-size: 16px;
-    margin-right: 12px;
-  }
-
-  .surprise-tab-title {
-    font-size: 14px;
-  }
-
-  .surprise-tab-subtitle {
-    font-size: 10px;
-  }
-
-  .floating-surprise-tab-arrow {
-    width: 18px;
-    height: 18px;
-    margin-left: 10px;
-  }
-}
-
-/* Tablet responsiveness */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .floating-surprise-tab-link {
-    top: 35%; /* Maintain consistent relative positioning */
-  }
-
-  .floating-surprise-tab {
-    min-width: 270px;
-  }
-}
-
-/* ==== DEVICE-SPECIFIC OPTIMIZATIONS ==== */
-
-/* iPhone SE (375×667) - Compact mobile */
-@media only screen and (min-width: 375px) and (max-width: 389px) {
-  .floating-surprise-tab-link {
-    width: 210px;
-    top: 35%; /* Maintain consistent relative positioning */
-  }
-
-  .floating-surprise-tab {
-    min-width: 210px;
-    height: 50px;
-    transform: translateX(
-      calc(100% - 60px)
-    ); /* Compact protrusion for small screens */
-  }
-
-  .floating-surprise-tab-content {
-    padding: 0 12px;
-  }
-
-  .floating-surprise-tab-icon {
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
-    font-size: 15px;
-  }
-
-  .surprise-tab-title {
-    font-size: 13px;
-  }
-
-  .surprise-tab-subtitle {
-    font-size: 10px;
-  }
-}
-
-/* iPhone 12/13/14 & Google Pixel 5 (390-393×844-851) - Modern mobile */
-@media only screen and (min-width: 390px) and (max-width: 399px) {
-  .floating-surprise-tab-link {
-    width: 220px;
-    top: 35%; /* Maintain consistent relative positioning */
-  }
-
-  .floating-surprise-tab {
-    min-width: 220px;
-    height: 52px;
-    transform: translateX(calc(100% - 65px)); /* Standard mobile protrusion */
-  }
-
-  .floating-surprise-tab-content {
-    padding: 0 14px;
-  }
-
-  .floating-surprise-tab-icon {
-    width: 22px;
-    height: 22px;
-    margin-right: 12px;
-    font-size: 16px;
-  }
-
-  .surprise-tab-title {
-    font-size: 14px;
-  }
-
-  .surprise-tab-subtitle {
-    font-size: 11px;
-  }
-}
-
-/* iPhone 12 Pro Max (428×926) - Large mobile */
-@media only screen and (min-width: 400px) and (max-width: 480px) {
-  .floating-surprise-tab-link {
-    width: 240px;
-    top: 35%; /* Maintain consistent relative positioning */
-  }
-
-  .floating-surprise-tab {
-    min-width: 240px;
-    height: 54px;
-    transform: translateX(calc(100% - 70px)); /* Slightly larger protrusion */
-  }
-
-  .floating-surprise-tab-content {
-    padding: 0 16px;
-  }
-
-  .floating-surprise-tab-icon {
-    width: 24px;
-    height: 24px;
-    margin-right: 14px;
-    font-size: 18px;
-  }
-
-  .surprise-tab-title {
-    font-size: 15px;
-  }
-
-  .surprise-tab-subtitle {
-    font-size: 12px;
-  }
-}
-
-/* iPad Mini & Samsung Galaxy Tab (768-820×1024-1280) - Small tablets */
-@media only screen and (min-width: 768px) and (max-width: 820px) {
-  .floating-surprise-tab-link {
-    width: 260px;
-    top: 35%; /* Maintain consistent relative positioning */
-  }
-
-  .floating-surprise-tab {
-    min-width: 260px;
-    height: 58px;
-    transform: translateX(calc(100% - 80px)); /* Tablet-optimized protrusion */
-  }
-
-  .floating-surprise-tab-content {
-    padding: 0 18px;
-  }
-
-  .floating-surprise-tab-icon {
-    width: 26px;
-    height: 26px;
-    margin-right: 16px;
-    font-size: 20px;
-  }
-
-  .surprise-tab-title {
-    font-size: 16px;
-  }
-
-  .surprise-tab-subtitle {
-    font-size: 13px;
-  }
-}
-
-/* iPad Pro & Large Tablets (1024-1180×1366-1366) - Large tablets */
-@media only screen and (min-width: 1024px) and (max-width: 1279px) {
-  .floating-surprise-tab-link {
-    width: 280px;
-    top: 35%; /* Maintain consistent relative positioning */
-  }
-
-  .floating-surprise-tab {
-    min-width: 280px;
-    height: 60px;
-    transform: translateX(calc(100% - 85px)); /* Large tablet protrusion */
-  }
-
-  .floating-surprise-tab-content {
-    padding: 0 20px;
-  }
-
-  .floating-surprise-tab-icon {
-    width: 28px;
-    height: 28px;
-    margin-right: 16px;
-    font-size: 20px;
-  }
-
-  .surprise-tab-title {
-    font-size: 16px;
-  }
-
-  .surprise-tab-subtitle {
-    font-size: 13px;
-  }
-}
-
-/* MacBook Air & Standard HD Laptops (1280-1366×768-800) - Compact laptops */
-@media only screen and (min-width: 1280px) and (max-width: 1366px) {
-  .floating-surprise-tab-link {
-    width: 300px;
-    top: 35%; /* Maintain consistent relative positioning */
-  }
-
-  .floating-surprise-tab {
-    min-width: 300px;
-    height: 62px;
-    transform: translateX(calc(100% - 90px)); /* Standard desktop protrusion */
-  }
-
-  .floating-surprise-tab-content {
-    padding: 0 22px;
-  }
-
-  .floating-surprise-tab-icon {
-    width: 30px;
-    height: 30px;
-    margin-right: 17px;
-    font-size: 21px;
-  }
-
-  .surprise-tab-title {
-    font-size: 16px;
-  }
-
-  .surprise-tab-subtitle {
-    font-size: 13px;
-  }
-}
-
-/* MacBook Pro & Microsoft Surface (1500-1536×960-1000) - High-res laptops */
-@media only screen and (min-width: 1500px) {
-  .floating-surprise-tab-link {
-    width: 320px;
-    top: 35%; /* Maintain consistent relative positioning */
-  }
-
-  .floating-surprise-tab {
-    min-width: 320px;
-    height: 64px;
-    transform: translateX(calc(100% - 90px)); /* Premium desktop protrusion */
-  }
-
-  .floating-surprise-tab-content {
-    padding: 0 24px;
-  }
-
-  .floating-surprise-tab-icon {
-    width: 32px;
-    height: 32px;
-    margin-right: 18px;
-    font-size: 22px;
-  }
-
-  .surprise-tab-title {
-    font-size: 17px;
-  }
-
-  .surprise-tab-subtitle {
-    font-size: 14px;
-  }
-
-  .floating-surprise-tab-arrow {
-    width: 26px;
-    height: 26px;
-    margin-left: 14px;
-  }
-}
+/* Responsive behavior inherited from media.css custom properties */
+/* All sizing and positioning values now use CSS custom properties from media.css */
 
 /* Accessibility improvements */
 @media (prefers-reduced-motion: reduce) {

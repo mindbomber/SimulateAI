@@ -24,6 +24,8 @@
  * - Removed body:not(.dark-mode) selectors to prevent specificity conflicts
  * - Uses theme-* variables for consistent theming across components
  * - Integrates with media.css responsive system through CSS custom properties
+ * - Responsive font scaling using --font-scale from media.css
+ * - Device-specific theming adaptations using --container-padding
  */
 
 /* CSS Custom Properties for Theme System */
@@ -242,22 +244,75 @@ body.dark-mode kbd {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
 }
 
-/* Font Size Settings */
+/* Font Size Settings - Enhanced with media.css responsive scaling */
 html.font-size-small {
-  font-size: 14px;
+  font-size: calc(14px * var(--font-scale, 1)); /* Responsive base size */
 }
 
 html.font-size-medium {
-  font-size: 16px;
+  font-size: calc(16px * var(--font-scale, 1)); /* Responsive base size */
 }
 
 html.font-size-large {
-  font-size: 18px;
+  font-size: calc(18px * var(--font-scale, 1)); /* Responsive base size */
 }
 
 html.font-size-extra-large {
-  font-size: 20px;
+  font-size: calc(20px * var(--font-scale, 1)); /* Responsive base size */
 }
+
+/* ===== RESPONSIVE THEMING ENHANCEMENTS ===== */
+/* Device-specific theming adjustments using media.css integration */
+
+/* Settings Menu Responsive Sizing */
+body.dark-mode .settings-menu,
+body.high-contrast .settings-menu {
+  padding: var(--container-padding, 16px);
+  font-size: calc(1rem * var(--font-scale, 1));
+}
+
+body.dark-mode .settings-title,
+body.high-contrast .settings-title {
+  padding-bottom: calc(var(--container-padding, 16px) * 0.5);
+  font-size: calc(1.125rem * var(--font-scale, 1));
+}
+
+/* Responsive Touch Targets for Theme Controls */
+body.dark-mode .toggle-slider,
+body.high-contrast .toggle-slider {
+  min-width: var(--touch-target-min, 44px);
+  min-height: calc(var(--touch-target-min, 44px) * 0.75);
+}
+
+/* Container Responsive Padding */
+body.dark-mode .container,
+body.dark-mode .main-container,
+body.dark-mode .content-container,
+body.dark-mode .page-container {
+  padding-left: var(--container-padding, 16px);
+  padding-right: var(--container-padding, 16px);
+}
+
+/* Responsive Modal Sizing */
+body.dark-mode .modal-content {
+  padding: var(--container-padding, 16px);
+  font-size: calc(1rem * var(--font-scale, 1));
+}
+
+/* Responsive Card Spacing */
+body.dark-mode .card {
+  padding: var(--container-padding, 16px);
+  margin-bottom: calc(var(--container-padding, 16px) * 0.75);
+}
+
+body.dark-mode .card h2,
+body.dark-mode .card h3,
+body.dark-mode .card h4 {
+  font-size: calc(1.25rem * var(--font-scale, 1));
+  margin-bottom: calc(var(--container-padding, 16px) * 0.5);
+}
+
+/* ===== END RESPONSIVE THEMING ENHANCEMENTS ===== */
 
 /* Ensure html element also gets dark background */
 body.dark-mode html {
@@ -740,46 +795,56 @@ body.reduced-motion *::after {
   scroll-behavior: auto !important;
 }
 
-/* Large Click Targets */
+/* Large Click Targets - Enhanced with media.css responsive scaling */
 body.large-click-targets .nav-link {
-  min-height: 48px;
-  padding: 12px 16px;
+  min-height: var(--touch-target-min, 48px); /* Uses media.css touch targets */
+  padding: calc(var(--container-padding, 16px) * 0.75)
+    var(--container-padding, 16px);
   display: flex;
   align-items: center;
 }
 
 body.large-click-targets .settings-toggle {
-  min-height: 48px;
-  padding: 12px 0;
+  min-height: var(--touch-target-min, 48px); /* Uses media.css touch targets */
+  padding: calc(var(--container-padding, 16px) * 0.75) 0;
 }
 
 body.large-click-targets .toggle-slider {
-  width: 56px;
-  height: 32px;
+  width: calc(56px * var(--font-scale, 1)); /* Responsive toggle width */
+  height: calc(32px * var(--font-scale, 1)); /* Responsive toggle height */
 }
 
 body.large-click-targets .toggle-slider::before {
-  width: 28px;
-  height: 28px;
-  top: 2px;
-  left: 2px;
+  width: calc(28px * var(--font-scale, 1)); /* Responsive toggle thumb */
+  height: calc(28px * var(--font-scale, 1)); /* Responsive toggle thumb */
+  top: calc(2px * var(--font-scale, 1));
+  left: calc(2px * var(--font-scale, 1));
 }
 
 body.large-click-targets
   .settings-toggle
   input[type="checkbox"]:checked
   + .toggle-slider::before {
-  transform: translateX(24px);
+  transform: translateX(
+    calc(24px * var(--font-scale, 1))
+  ); /* Responsive translate */
 }
 
 body.large-click-targets .settings-select {
-  min-height: 48px;
-  padding: 12px 16px;
+  min-height: var(--touch-target-min, 48px); /* Uses media.css touch targets */
+  padding: calc(var(--container-padding, 16px) * 0.75)
+    var(--container-padding, 16px);
 }
 
 body.large-click-targets .floating-tab-link {
-  min-width: 72px;
-  min-height: 72px;
+  min-width: var(
+    --floating-tab-width,
+    72px
+  ); /* Uses media.css floating tab sizes */
+  min-height: var(
+    --floating-tab-height,
+    72px
+  ); /* Uses media.css floating tab sizes */
 }
 
 /* System preference respecting */

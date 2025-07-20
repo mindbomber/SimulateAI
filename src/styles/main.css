@@ -20,7 +20,6 @@
  */
 
 /* Import additional stylesheets */
-@import "./media.css";
 @import "./category-grid.css";
 @import "./scenario-modal.css";
 @import "./onboarding-tour.css";
@@ -248,7 +247,7 @@ body {
 }
 
 /* Ensure scroll-aware navbar works properly on mobile */
-@media (max-width: 768px) {
+@media only screen and (max-width: 767px) {
   .header {
     transition:
       transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
@@ -674,14 +673,14 @@ body {
 }
 
 /* Show search filter on mobile */
-@media (max-width: 768px) {
+@media only screen and (max-width: 767px) {
   .mega-menu-filter {
     display: block;
   }
 }
 
 /* Mobile responsive mega menu styles - Simple Dropdown */
-@media (max-width: 768px) {
+@media only screen and (max-width: 767px) {
   .mega-menu {
     position: absolute;
     top: 100%;
@@ -860,7 +859,7 @@ body {
   }
 }
 
-@media (max-width: 480px) {
+@media only screen and (max-width: 428px) {
   .mega-menu-content {
     padding: var(--spacing-3) 0;
   }
@@ -949,31 +948,36 @@ body {
 }
 
 .hero-title {
-  font-size: var(--font-size-4xl);
+  font-size: calc(
+    2.25rem * var(--font-scale, 1)
+  ); /* Responsive scaling based on device */
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-tight);
-  margin-bottom: var(--spacing-6);
+  margin-bottom: calc(var(--spacing-6) * var(--font-scale, 1));
 }
 
 .hero-description {
-  font-size: var(--font-size-lg);
+  font-size: calc(1.125rem * var(--font-scale, 1)); /* Responsive scaling */
   line-height: var(--line-height-relaxed);
-  margin-bottom: var(--spacing-8);
+  margin-bottom: calc(var(--spacing-8) * var(--font-scale, 1));
   color: var(--color-gray-800);
 }
 
 .hero-actions {
   display: flex;
-  gap: var(--spacing-4);
+  gap: calc(var(--spacing-4) * var(--font-scale, 1)); /* Responsive gap */
   flex-wrap: wrap;
   justify-content: center;
+  margin-bottom: calc(var(--spacing-6) * var(--font-scale, 1));
 }
 
 .hero-simulation {
   background: var(--color-gray-50);
   border: 1px solid var(--color-gray-200);
   border-radius: var(--radius-xl);
-  padding: var(--spacing-6);
+  padding: calc(
+    var(--spacing-6) * var(--font-scale, 1)
+  ); /* Responsive padding */
 }
 
 .simulation-preview {
@@ -1109,7 +1113,7 @@ body {
 }
 
 /* Mobile-specific section padding adjustments */
-@media (max-width: 768px) {
+@media only screen and (max-width: 767px) {
   /* Adjust body padding for smaller header on tablets */
   body {
     padding-top: 95px !important; /* Increased padding with !important for tablet header */
@@ -1123,7 +1127,7 @@ body {
   }
 }
 
-@media (max-width: 480px) {
+@media only screen and (max-width: 428px) {
   /* Adjust body padding for smaller header on mobile */
   body {
     padding-top: 90px !important; /* Ensure adequate clearance for mobile header with !important */
@@ -1410,7 +1414,7 @@ video {
 }
 
 /* Mobile-specific simulation container improvements */
-@media (max-width: 768px) {
+@media only screen and (max-width: 767px) {
   .simulation-container {
     /* Ensure touch scrolling works well */
     -webkit-overflow-scrolling: touch;
@@ -1429,7 +1433,7 @@ video {
 }
 
 /* Small screen adjustments */
-@media (max-width: 480px) {
+@media only screen and (max-width: 428px) {
   .simulation-container {
     min-height: 250px; /* Smaller minimum on very small screens */
   }
@@ -1676,16 +1680,16 @@ th {
   gap: var(--spacing-8);
 }
 
-/* Responsive Design - Mobile First */
-@media (min-width: 640px) {
+/* Responsive Design - Aligned with media.css system */
+@media only screen and (min-width: 375px) {
   .header-container {
-    padding: 0 var(--spacing-6);
+    padding: 0 var(--container-padding);
   }
 }
 
-@media (min-width: 768px) {
+@media only screen and (min-width: 768px) {
   .header-container {
-    padding: 0 var(--spacing-8);
+    padding: 0 var(--container-padding);
   }
 
   /* Desktop Navigation - Horizontal Layout */
@@ -1735,7 +1739,7 @@ th {
   .hero {
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-12);
-    padding: var(--spacing-20) var(--spacing-8);
+    padding: var(--spacing-20) var(--container-padding);
   }
 
   .simulations-grid {
@@ -1743,15 +1747,15 @@ th {
   }
 }
 
-@media (min-width: 1024px) {
+@media only screen and (min-width: 1024px) {
   .header-container {
-    padding: 0 var(--spacing-12);
+    padding: 0 var(--container-padding);
     max-width: var(--container-xl);
     margin: 0 auto;
   }
 
   .hero {
-    padding: var(--spacing-20) var(--spacing-12);
+    padding: var(--spacing-20) var(--container-padding);
   }
 
   .simulations-grid {
@@ -1759,7 +1763,7 @@ th {
   }
 }
 
-@media (min-width: 1280px) {
+@media only screen and (min-width: 1280px) {
   .simulations-grid {
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   }
@@ -1773,6 +1777,8 @@ th {
 }
 
 .footer-content {
+  /* Footer styles managed by professional-footer.js component */
+  /* See src/styles/footer.css for all footer styling */
   max-width: var(--container-xl);
   margin: 0 auto;
   padding: var(--spacing-16) var(--spacing-6);
@@ -1899,9 +1905,9 @@ th {
 }
 
 /* Mobile responsiveness for footer */
-@media (max-width: 768px) {
+@media only screen and (max-width: 767px) {
   .footer-content {
-    padding: var(--spacing-12) var(--spacing-4);
+    padding: var(--spacing-12) var(--container-padding);
   }
 
   .footer-sections {
@@ -1920,9 +1926,9 @@ th {
   }
 }
 
-@media (max-width: 480px) {
+@media only screen and (max-width: 428px) {
   .footer-content {
-    padding: var(--spacing-8) var(--spacing-3);
+    padding: var(--spacing-8) var(--container-padding);
   }
 
   .footer-section {
@@ -2188,7 +2194,7 @@ th {
 }
 
 /* Mobile optimizations for donor section */
-@media (max-width: 768px) {
+@media only screen and (max-width: 767px) {
   .donor-list {
     gap: 8px;
     padding: 15px 0;
@@ -2217,7 +2223,7 @@ th {
   }
 }
 
-@media (max-width: 480px) {
+@media only screen and (max-width: 428px) {
   .donor-list {
     justify-content: center;
   }
@@ -2552,7 +2558,7 @@ th {
 }
 
 /* Critical mobile overflow prevention - ensure horizontal scroll never escapes containers */
-@media (max-width: 768px) {
+@media only screen and (max-width: 767px) {
   /* Prevent any horizontal scroll from propagating to document */
   html,
   body {

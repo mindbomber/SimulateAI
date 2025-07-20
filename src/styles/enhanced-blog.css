@@ -1194,6 +1194,8 @@
 }
 
 .footer-content {
+  /* Footer styles managed by professional-footer.js component */
+  /* See src/styles/footer.css for all footer styling */
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1.5rem;

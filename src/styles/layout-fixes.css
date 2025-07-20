@@ -1,42 +1,63 @@
-/* Refactored layout fixes using proper CSS specificity instead of !important */
-/* Updated to use advanced-ui-components.css modal system */
+/**
+ * Copyright 2025 Armando Sori
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-/* Enhanced modal body with higher specificity - updated for new modal system */
-/* Fixed modal body CSS conflicts - consolidated rules to ensure simulation visibility */
+/**
+ * Layout Fixes (Refactored)
+ * Clean, maintainable layout fixes using CSS custom properties from media.css
+ * Eliminates !important declarations and uses proper CSS specificity
+ * 
+ * Note: media.css is loaded via app.html before this file
+ */
+
+/* ===== MODAL SYSTEM FIXES ===== */
+
+/* Modal body layout */
 .modal-backdrop .modal-dialog .modal-body,
 #simulation-modal .modal-dialog .modal-body {
-  display: flex !important;
-  flex-direction: column !important;
-  padding: 20px !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  height: auto !important;
-  min-height: 400px !important;
-  max-height: 80vh !important;
-  flex: 1 !important;
-  background: var(--modal-background, #ffffff) !important;
+  display: flex;
+  flex-direction: column;
+  padding: var(--container-padding, 20px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: auto;
+  min-height: 400px;
+  max-height: 80vh;
+  flex: 1;
+  background: var(--modal-background, #ffffff);
 }
 
-/* Enhanced simulation container with higher specificity - updated for new modal system */
-/* Fixed simulation container visibility issues */
+/* Simulation container layout */
 .modal-backdrop .simulation-container,
 .modal-dialog .simulation-container,
 #simulation-modal .simulation-container,
 .simulation-preview .simulation-container {
-  background: var(--color-gray-50, #f8f9fa) !important;
-  border-radius: 8px !important;
-  padding: 16px !important;
-  min-height: 300px !important;
-  width: 100% !important;
-  display: block !important;
-  margin-bottom: 20px !important;
-  overflow: visible !important;
-  border: 1px solid var(--color-gray-200, #e5e7eb) !important;
+  background: var(--color-gray-50, #f8f9fa);
+  border-radius: 8px;
+  padding: calc(var(--container-padding, 16px) * 1);
+  min-height: 300px;
+  width: 100%;
+  display: block;
+  margin-bottom: var(--container-padding, 20px);
+  overflow: visible;
+  border: 1px solid var(--color-gray-200, #e5e7eb);
   flex: none;
   position: relative;
 }
 
-/* Enhanced canvas sizing with higher specificity - updated for new modal system */
+/* Canvas responsive sizing */
 .modal-backdrop .simulation-container canvas,
 .modal-dialog .simulation-container canvas,
 #simulation-modal .simulation-container canvas,
@@ -48,7 +69,7 @@
   object-fit: contain;
 }
 
-/* Enhanced simulation controls with higher specificity - updated for new modal system */
+/* Simulation controls layout */
 .modal-backdrop .simulation-controls,
 .modal-dialog .simulation-controls,
 #simulation-modal .simulation-controls {
@@ -57,23 +78,25 @@
   overflow: auto;
 }
 
-/* Enhanced simulation controls visibility - fix for modal display issues */
+/* Modal specific simulation elements */
+#simulation-modal .modal-body .simulation-controls,
+#simulation-modal .modal-body .ethics-meters,
+#simulation-modal .modal-body .simulation-actions {
+  display: block;
+  width: 100%;
+}
+
 #simulation-modal .modal-body .simulation-controls {
-  display: block !important;
-  margin-top: 20px !important;
-  width: 100% !important;
+  margin-top: var(--container-padding, 20px);
 }
 
 #simulation-modal .modal-body .ethics-meters {
-  display: block !important;
-  margin-bottom: 20px !important;
+  margin-bottom: var(--container-padding, 20px);
 }
 
-#simulation-modal .modal-body .simulation-actions {
-  display: block !important;
-}
+/* ===== HERO SECTION LAYOUT ===== */
 
-/* Enhanced hero section with higher specificity */
+/* Hero section responsive grid - fully integrated with media.css */
 .main-content .hero {
   background: linear-gradient(
     135deg,
@@ -83,82 +106,97 @@
   color: var(--color-white);
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--spacing-12);
+  gap: calc(var(--container-padding) * 0.5);
   align-items: center;
-  padding: var(--spacing-12) var(--spacing-6);
-  min-height: 600px;
+  padding: calc(var(--container-padding) * 1.5) var(--container-padding);
+  min-height: 500px;
+  font-size: calc(1rem * var(--font-scale, 1));
 }
 
-/* Enhanced responsive hero layout with higher specificity */
-@media (min-width: 768px) {
+/* Hero responsive breakpoints using media.css device categories */
+@media only screen and (min-width: 768px) {
   .main-content .hero {
     grid-template-columns: 1fr 1fr;
-    padding: var(--spacing-16) var(--spacing-8);
+    padding: calc(var(--container-padding) * 1.25) var(--container-padding);
+    min-height: 600px;
+    gap: calc(var(--container-padding) * 0.75);
+  }
+}
+
+@media only screen and (min-width: 1024px) {
+  .main-content .hero {
+    padding: calc(var(--container-padding) * 1.5) var(--container-padding);
+    gap: calc(var(--container-padding) * 1);
     min-height: 700px;
   }
 }
 
-@media (min-width: 1024px) {
+@media only screen and (min-width: 1280px) {
   .main-content .hero {
-    padding: var(--spacing-20) var(--spacing-12);
-    gap: var(--spacing-16);
+    padding: calc(var(--container-padding) * 1.75) var(--container-padding);
+    gap: calc(var(--container-padding) * 1.25);
   }
 }
 
-/* Enhanced hero content alignment with higher specificity */
+/* Hero content alignment - responsive text scaling */
 .main-content .hero .hero-content {
   text-align: center;
 }
 
-@media (min-width: 768px) {
+.main-content .hero .hero-content h1 {
+  font-size: calc(2.5rem * var(--font-scale, 1));
+}
+
+.main-content .hero .hero-content p {
+  font-size: calc(1.125rem * var(--font-scale, 1));
+}
+
+@media only screen and (min-width: 768px) {
   .main-content .hero .hero-content {
     text-align: left;
   }
 }
 
-/* Enhanced hero demo sizing with higher specificity */
+/* Hero simulation container - fully responsive with media.css integration */
 .main-content .hero .hero-simulation {
   background: rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-xl);
-  padding: var(--spacing-3);
+  padding: calc(var(--container-padding) * 0.75);
   backdrop-filter: blur(10px);
   max-width: none;
   width: 100%;
-  min-height: 400px;
+  min-height: calc(300px + (var(--container-padding) * 2));
   height: auto;
-  position: relative; /* Required for popover positioning */
-  overflow: visible; /* Allow popovers to extend outside */
-  z-index: 1; /* Ensure proper stacking context */
+  position: relative;
+  overflow: visible;
+  z-index: 1;
 }
 
-@media (max-width: 767px) {
+/* Hero simulation responsive sizing using device-specific scaling */
+@media only screen and (max-width: 767px) {
   .main-content .hero .hero-simulation {
-    padding: var(--spacing-2);
-    min-height: 350px;
-    position: relative; /* Maintain positioning for popover */
-    overflow: visible; /* Allow popovers to extend outside */
+    padding: calc(var(--container-padding) * 0.5);
+    min-height: calc(250px + var(--container-padding));
   }
 }
 
-@media (min-width: 768px) {
+@media only screen and (min-width: 768px) {
   .main-content .hero .hero-simulation {
-    padding: var(--spacing-4);
-    min-height: 450px;
-    position: relative; /* Maintain positioning for popover */
-    overflow: visible; /* Allow popovers to extend outside */
+    padding: calc(var(--container-padding) * 0.75);
+    min-height: calc(350px + (var(--container-padding) * 1.5));
   }
 }
 
-@media (min-width: 1024px) {
+@media only screen and (min-width: 1024px) {
   .main-content .hero .hero-simulation {
-    padding: var(--spacing-6);
-    min-height: 500px;
-    position: relative; /* Maintain positioning for popover */
-    overflow: visible; /* Allow popovers to extend outside */
+    padding: calc(var(--container-padding) * 1);
+    min-height: calc(400px + (var(--container-padding) * 2));
   }
 }
 
-/* Enhanced simulation preview with higher specificity */
+/* ===== SIMULATION PREVIEW COMPONENTS ===== */
+
+/* Base simulation preview */
 .main-content .simulation-preview,
 #app .simulation-preview {
   min-height: 400px;
@@ -168,7 +206,7 @@
   padding: 0;
 }
 
-/* Enhanced hero demo container with higher specificity */
+/* Demo container with improved media.css integration */
 .main-content .hero .hero-demo-container,
 #app .hero-demo-container {
   background: linear-gradient(
@@ -177,109 +215,106 @@
     rgba(248, 250, 252, 0.95) 100%
   );
   border-radius: 16px;
-  padding: 1.25rem;
+  padding: calc(var(--container-padding) * 0.75);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(10px);
   max-width: 100%;
   margin: 0 auto;
   height: 100%;
-  min-height: 380px;
-  position: relative; /* Required for popover positioning */
-  overflow: visible; /* Allow popovers to extend outside */
-  z-index: 2; /* Higher than hero-simulation for proper stacking */
+  min-height: calc(300px + var(--container-padding));
+  position: relative;
+  overflow: visible;
+  z-index: 2;
+  font-size: calc(1rem * var(--font-scale, 1));
 }
 
-/* Enhanced demo header with higher specificity */
+/* Demo header and text elements with responsive font scaling */
 .main-content .demo-header,
 #app .demo-header {
   text-align: center;
-  margin-bottom: 1rem;
+  margin-bottom: calc(var(--container-padding) * 0.5);
 }
 
-/* Enhanced demo title with higher specificity */
 .main-content .demo-title,
 #app .demo-title {
-  font-size: 1.1rem;
+  font-size: calc(1.25rem * var(--font-scale, 1));
   font-weight: 700;
   color: var(--color-gray-900, #1a202c);
-  margin: 0 0 0.25rem 0;
+  margin: 0 0 calc(var(--container-padding) * 0.25) 0;
 }
 
-/* Enhanced demo subtitle with higher specificity */
 .main-content .demo-subtitle,
 #app .demo-subtitle {
   color: var(--color-gray-600, #718096);
   margin: 0;
-  font-size: 0.8rem;
+  font-size: calc(0.875rem * var(--font-scale, 1));
 }
 
-/* Demo Content Layout with enhanced specificity */
+/* ===== DEMO CONTENT LAYOUT ===== */
+
+/* Demo content grid with responsive gap using media.css */
 .main-content .demo-content,
 #app .demo-content {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1rem;
+  gap: calc(var(--container-padding) * 0.5);
   align-items: start;
 }
 
-@media (min-width: 768px) {
+@media only screen and (min-width: 768px) {
   .main-content .demo-content,
   #app .demo-content {
     grid-template-columns: 1.3fr 1fr;
-    gap: 1.25rem;
+    gap: calc(var(--container-padding) * 0.625);
   }
 }
 
-@media (min-width: 1024px) {
+@media only screen and (min-width: 1024px) {
   .main-content .demo-content,
   #app .demo-content {
     grid-template-columns: 1.5fr 1fr;
-    gap: 1.5rem;
+    gap: calc(var(--container-padding) * 0.75);
   }
 }
 
-/* Scenario Panel with enhanced specificity */
-.main-content .scenario-panel,
-#app .scenario-panel {
+/* ===== SCENARIO PANEL ===== */
+
+.scenario-panel {
   background: rgba(255, 255, 255, 0.8);
   border-radius: 12px;
   padding: 1rem;
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.main-content .scenario-header,
-#app .scenario-header {
+.scenario-header {
   margin-bottom: 0.75rem;
 }
 
-.main-content .scenario-title,
-#app .scenario-title {
-  font-size: 1rem;
+.scenario-title {
+  font-size: calc(1rem * var(--font-scale, 1));
   font-weight: 600;
   color: var(--color-gray-800, #2d3748);
   margin: 0 0 0.25rem 0;
 }
 
-.main-content .scenario-question,
-#app .scenario-question {
-  font-size: 0.85rem;
+.scenario-question {
+  font-size: calc(0.85rem * var(--font-scale, 1));
   color: var(--color-gray-700, #4a5568);
   margin-bottom: 0.75rem;
   line-height: 1.4;
 }
 
-.main-content .scenario-choices,
-#app .scenario-choices {
+.scenario-choices {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  position: relative; /* Required for popover positioning */
+  position: relative;
 }
 
-/* Choice buttons with enhanced specificity */
-.main-content .choice-btn,
-#app .choice-btn {
+/* ===== CHOICE BUTTONS ===== */
+
+.choice-btn {
   background: rgba(255, 255, 255, 0.9);
   border: 2px solid rgba(59, 130, 246, 0.2);
   border-radius: 8px;
@@ -287,94 +322,85 @@
   text-align: left;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--font-scale, 1));
 }
 
-.main-content .choice-btn:hover,
-#app .choice-btn:hover {
+.choice-btn:hover {
   border-color: rgba(59, 130, 246, 0.4);
   background: rgba(59, 130, 246, 0.05);
   transform: translateY(-1px);
 }
 
-.main-content .choice-btn.active,
-#app .choice-btn.active {
+.choice-btn.active {
   border-color: var(--color-primary, #3b82f6);
   background: rgba(59, 130, 246, 0.1);
 }
 
-.main-content .choice-text,
-#app .choice-text {
+.choice-text {
   display: block;
   font-weight: 500;
   color: var(--color-gray-800, #2d3748);
   margin-bottom: 0.15rem;
 }
 
-.main-content .choice-impact,
-#app .choice-impact {
+.choice-impact {
   display: block;
-  font-size: 0.65rem;
+  font-size: calc(0.65rem * var(--font-scale, 1));
   color: var(--color-gray-600, #718096);
   font-style: italic;
 }
 
-/* Ethics Panel with enhanced specificity */
-.main-content .ethics-panel,
-#app .ethics-panel {
+/* ===== ETHICS PANEL ===== */
+
+.ethics-panel {
   background: rgba(255, 255, 255, 0.8);
   border-radius: 12px;
   padding: 1rem;
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.main-content .ethics-title,
-#app .ethics-title {
-  font-size: 1rem;
+.ethics-title {
+  font-size: calc(1rem * var(--font-scale, 1));
   font-weight: 600;
   color: var(--color-gray-800, #2d3748);
   margin: 0 0 0.75rem 0;
 }
 
-.main-content .ethics-meters,
-#app .ethics-meters {
+.ethics-meters {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   margin-bottom: 1rem;
 }
 
-.main-content .ethics-meter,
-#app .ethics-meter {
+/* ===== ETHICS METERS ===== */
+
+.ethics-meter {
   background: rgba(255, 255, 255, 0.6);
   border-radius: 8px;
   padding: 0.5rem;
 }
 
-.main-content .meter-header,
-#app .meter-header {
+.meter-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.35rem;
 }
 
-.main-content .meter-label,
-#app .meter-label {
-  font-size: 0.75rem;
+.meter-label {
+  font-size: calc(0.75rem * var(--font-scale, 1));
   font-weight: 600;
   color: var(--color-gray-700, #4a5568);
 }
 
-.main-content .meter-value,
-#app .meter-value {
-  font-size: 0.75rem;
+.meter-value {
+  font-size: calc(0.75rem * var(--font-scale, 1));
   font-weight: 600;
   color: var(--color-gray-600, #718096);
 }
 
-.main-content .meter-bar,
-#app .meter-bar {
+.meter-bar {
   height: 6px;
   background: rgba(0, 0, 0, 0.1);
   border-radius: 3px;
@@ -382,36 +408,32 @@
   position: relative;
 }
 
-.main-content .meter-fill,
-#app .meter-fill {
+.meter-fill {
   height: 100%;
   border-radius: 3px;
   transition: width 0.8s ease-out;
   background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
 }
 
-/* Meter fill variations with enhanced specificity */
-.main-content .fairness-fill,
-#app .fairness-fill {
+/* Meter fill color variations */
+.fairness-fill {
   background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
 }
 
-.main-content .transparency-fill,
-#app .transparency-fill {
+.transparency-fill {
   background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
 }
 
-.main-content .accountability-fill,
-#app .accountability-fill {
+.accountability-fill {
   background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
 }
 
-/* Demo CTA with enhanced specificity */
-.main-content .demo-cta,
-#app .demo-cta {
+/* ===== DEMO ACTIONS ===== */
+
+.demo-cta {
   width: 100%;
   padding: 0.5rem 0.75rem;
-  font-size: 0.8rem;
+  font-size: calc(0.8rem * var(--font-scale, 1));
   font-weight: 600;
   background: var(--color-primary, #3b82f6);
   color: white;
@@ -421,15 +443,13 @@
   transition: all 0.2s ease;
 }
 
-.main-content .demo-cta:hover,
-#app .demo-cta:hover {
+.demo-cta:hover {
   background: var(--color-primary-dark, #2563eb);
   transform: translateY(-1px);
 }
 
-/* Demo Actions positioned in bottom right corner - Enhanced specificity */
-.main-content .demo-actions,
-#app .demo-actions {
+/* Demo actions positioned in bottom right corner */
+.demo-actions {
   position: absolute;
   bottom: 1.5rem;
   right: 1.5rem;
@@ -438,9 +458,8 @@
   z-index: 100;
 }
 
-.main-content .demo-actions .btn,
-#app .demo-actions .btn {
-  font-size: 0.875rem;
+.demo-actions .btn {
+  font-size: calc(0.875rem * var(--font-scale, 1));
   padding: 0.5rem 1rem;
   border-radius: 8px;
   font-weight: 600;
@@ -449,97 +468,58 @@
   cursor: pointer;
 }
 
-.main-content .demo-actions .btn:hover,
-#app .demo-actions .btn:hover {
+.demo-actions .btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.main-content .demo-actions .btn-primary,
-#app .demo-actions .btn-primary {
+.demo-actions .btn-primary {
   background: var(--color-primary, #3b82f6);
   color: white;
   border: none;
 }
 
-.main-content .demo-actions .btn-primary:hover,
-#app .demo-actions .btn-primary:hover {
+.demo-actions .btn-primary:hover {
   background: var(--color-primary-dark, #2563eb);
 }
 
-.main-content .demo-actions .btn-secondary,
-#app .demo-actions .btn-secondary {
+.demo-actions .btn-secondary {
   background: white;
   color: var(--color-gray-700, #374151);
   border: 1px solid var(--color-gray-300, #d1d5db);
 }
 
-.main-content .demo-actions .btn-secondary:hover,
-#app .demo-actions .btn-secondary:hover {
+.demo-actions .btn-secondary:hover {
   background: var(--color-gray-50, #f9fafb);
   border-color: var(--color-gray-400, #9ca3af);
 }
 
-/* Responsive adjustments for demo actions */
-@media (max-width: 768px) {
-  .main-content .demo-actions,
-  #app .demo-actions {
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+
+/* Mobile responsive demo actions */
+@media only screen and (max-width: 768px) {
+  .demo-actions {
     bottom: 1rem;
     right: 1rem;
     gap: 0.5rem;
   }
 
-  .main-content .demo-actions .btn,
-  #app .demo-actions .btn {
-    font-size: 0.8rem;
+  .demo-actions .btn {
+    font-size: calc(0.8rem * var(--font-scale, 1));
     padding: 0.4rem 0.75rem;
   }
 }
 
-@media (max-width: 480px) {
-  .main-content .demo-actions,
-  #app .demo-actions {
+@media only screen and (max-width: 480px) {
+  .demo-actions {
     bottom: 0.75rem;
     right: 0.75rem;
     flex-direction: column;
     gap: 0.4rem;
   }
 
-  .main-content .demo-actions .btn,
-  #app .demo-actions .btn {
-    font-size: 0.75rem;
+  .demo-actions .btn {
+    font-size: calc(0.75rem * var(--font-scale, 1));
     padding: 0.35rem 0.6rem;
   }
-}
-
-/* FINAL OVERRIDE: Ensure simulation modal visibility - highest specificity */
-/* This rule must come last to override all other modal-body conflicts */
-html body #simulation-modal.modal-backdrop .modal-dialog .modal-body,
-html body #simulation-modal .modal-dialog .modal-body {
-  display: flex !important;
-  flex-direction: column !important;
-  padding: 20px !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  height: auto !important;
-  min-height: 400px !important;
-  max-height: 80vh !important;
-  flex: 1 !important;
-  background: var(--modal-background, #ffffff) !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-/* FINAL OVERRIDE: Ensure simulation container is visible */
-html body #simulation-modal .modal-body .simulation-container {
-  display: block !important;
-  min-height: 300px !important;
-  width: 100% !important;
-  background: var(--color-gray-50, #f8f9fa) !important;
-  border-radius: 8px !important;
-  padding: 16px !important;
-  overflow: visible !important;
-  border: 1px solid var(--color-gray-200, #e5e7eb) !important;
-  visibility: visible !important;
-  opacity: 1 !important;
 }

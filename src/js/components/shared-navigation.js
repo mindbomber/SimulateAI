@@ -3,7 +3,7 @@
  * Loads and manages the shared navigation HTML across all pages
  */
 
-import { UI, TIMING } from '../utils/constants.js';
+import { UI, TIMING } from "../utils/constants.js";
 
 class SharedNavigation {
   constructor() {
@@ -17,8 +17,8 @@ class SharedNavigation {
       retryAttempts: 3,
       retryDelay: 1000,
       cacheTimeout: 5 * 60 * 1000, // 5 minutes
-      performanceMode: 'balanced', // 'high', 'balanced', 'compatibility'
-      accessibilityLevel: 'AA', // 'A', 'AA', 'AAA'
+      performanceMode: "balanced", // 'high', 'balanced', 'compatibility'
+      accessibilityLevel: "AA", // 'A', 'AA', 'AAA'
       enableAnalytics: true,
       enableTelemetry: false,
       enablePrefetch: true,
@@ -47,9 +47,9 @@ class SharedNavigation {
     // Cache management
     this.cache = new Map();
     this.cacheKeys = {
-      HTML: 'nav_html',
-      USER_PREFS: 'user_preferences',
-      TELEMETRY: 'telemetry_data',
+      HTML: "nav_html",
+      USER_PREFS: "user_preferences",
+      TELEMETRY: "telemetry_data",
     };
   }
 
@@ -82,7 +82,7 @@ class SharedNavigation {
       // Set configuration
       this.currentPage = options.currentPage || this.detectCurrentPage();
       const navPath =
-        options.navPath || 'src/components/shared-navigation.html';
+        options.navPath || "src/components/shared-navigation.html";
 
       // Load navigation HTML with retry logic
       await this.loadNavigationHTMLWithRetry(navPath);
@@ -128,13 +128,13 @@ class SharedNavigation {
       this.isInitialized = true;
 
       // Log successful initialization
-      this.logTelemetry('navigation_initialized', {
+      this.logTelemetry("navigation_initialized", {
         initTime: this.metrics.initTime,
         currentPage: this.currentPage,
         userAgent: navigator.userAgent,
       });
     } catch (error) {
-      this.handleEnterpriseError(error, 'initialization');
+      this.handleEnterpriseError(error, "initialization");
       throw error; // Re-throw for upstream handling
     }
   }
@@ -152,7 +152,7 @@ class SharedNavigation {
         return; // Success
       } catch (error) {
         lastError = error;
-        this.logTelemetry('navigation_load_retry', {
+        this.logTelemetry("navigation_load_retry", {
           attempt,
           error: error.message,
           navPath,
@@ -166,7 +166,7 @@ class SharedNavigation {
 
     // All retries failed
     throw new Error(
-      `Failed to load navigation after ${this.config.retryAttempts} attempts: ${lastError.message}`
+      `Failed to load navigation after ${this.config.retryAttempts} attempts: ${lastError.message}`,
     );
   }
 
@@ -175,12 +175,12 @@ class SharedNavigation {
    */
   initializePerformanceMonitoring() {
     // Monitor navigation performance
-    if ('performance' in window && 'PerformanceObserver' in window) {
+    if ("performance" in window && "PerformanceObserver" in window) {
       try {
-        const observer = new PerformanceObserver(list => {
+        const observer = new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
-            if (entry.name.includes('navigation')) {
-              this.logTelemetry('navigation_performance', {
+            if (entry.name.includes("navigation")) {
+              this.logTelemetry("navigation_performance", {
                 name: entry.name,
                 duration: entry.duration,
                 startTime: entry.startTime,
@@ -189,10 +189,10 @@ class SharedNavigation {
           }
         });
 
-        observer.observe({ entryTypes: ['measure', 'navigation'] });
+        observer.observe({ entryTypes: ["measure", "navigation"] });
       } catch (error) {
         // PerformanceObserver not supported, continue without it
-        this.logTelemetry('performance_monitoring_unavailable', {
+        this.logTelemetry("performance_monitoring_unavailable", {
           error: error.message,
         });
       }
@@ -218,16 +218,16 @@ class SharedNavigation {
   initializePrefetching() {
     // Prefetch critical navigation resources
     const prefetchLinks = [
-      'app.html',
-      'about.html',
-      'blog.html',
-      'profile.html',
+      "app.html",
+      "about.html",
+      "blog.html",
+      "profile.html",
     ];
 
-    prefetchLinks.forEach(href => {
+    prefetchLinks.forEach((href) => {
       if (document.head) {
-        const link = document.createElement('link');
-        link.rel = 'prefetch';
+        const link = document.createElement("link");
+        link.rel = "prefetch";
         link.href = href;
         document.head.appendChild(link);
       }
@@ -237,7 +237,7 @@ class SharedNavigation {
   /**
    * Enterprise-grade error handling
    */
-  handleEnterpriseError(error, context = 'unknown') {
+  handleEnterpriseError(error, context = "unknown") {
     this.metrics.errorCount++;
 
     const errorData = {
@@ -257,11 +257,11 @@ class SharedNavigation {
     }
 
     // Log to telemetry
-    this.logTelemetry('navigation_error', errorData);
+    this.logTelemetry("navigation_error", errorData);
 
     // Log to console in development
-    if (this.config.performanceMode === 'high') {
-      console.error('SharedNavigation Error:', errorData);
+    if (this.config.performanceMode === "high") {
+      console.error("SharedNavigation Error:", errorData);
     }
 
     // Try to recover
@@ -273,21 +273,21 @@ class SharedNavigation {
    */
   attemptRecovery(context) {
     switch (context) {
-      case 'initialization':
+      case "initialization":
         // Try fallback navigation
-        if (!document.querySelector('header.header')) {
+        if (!document.querySelector("header.header")) {
           document.body.insertAdjacentHTML(
-            'afterbegin',
-            this.createFallbackNavigation()
+            "afterbegin",
+            this.createFallbackNavigation(),
           );
           this.reinitializeAfterInjection();
         }
         break;
-      case 'mobile_navigation':
+      case "mobile_navigation":
         // Reset mobile navigation state
         this.closeMobileNav();
         break;
-      case 'dropdown':
+      case "dropdown":
         // Close all dropdowns
         this.closeAllDropdowns();
         this.closeMegaMenu();
@@ -328,15 +328,15 @@ class SharedNavigation {
     const batch = this.telemetryQueue.splice(0, this.telemetryBatchSize);
 
     // Send to analytics endpoint (if available)
-    if (window.analytics && typeof window.analytics.track === 'function') {
-      batch.forEach(item => {
+    if (window.analytics && typeof window.analytics.track === "function") {
+      batch.forEach((item) => {
         window.analytics.track(item.event, item.data);
       });
     }
 
     // Store locally as backup
     try {
-      const stored = localStorage.getItem('nav_telemetry') || '[]';
+      const stored = localStorage.getItem("nav_telemetry") || "[]";
       const existing = JSON.parse(stored);
       existing.push(...batch);
 
@@ -345,7 +345,7 @@ class SharedNavigation {
         existing.splice(0, existing.length - 100);
       }
 
-      localStorage.setItem('nav_telemetry', JSON.stringify(existing));
+      localStorage.setItem("nav_telemetry", JSON.stringify(existing));
     } catch (error) {
       // localStorage not available
     }
@@ -357,9 +357,9 @@ class SharedNavigation {
   getSessionId() {
     if (!this.sessionId) {
       this.sessionId =
-        sessionStorage.getItem('nav_session_id') ||
+        sessionStorage.getItem("nav_session_id") ||
         `nav_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      sessionStorage.setItem('nav_session_id', this.sessionId);
+      sessionStorage.setItem("nav_session_id", this.sessionId);
     }
     return this.sessionId;
   }
@@ -370,16 +370,16 @@ class SharedNavigation {
   getUserId() {
     // Try to get from authentication service
     if (window.authService && window.authService.userProfile) {
-      return window.authService.userProfile.uid || 'anonymous';
+      return window.authService.userProfile.uid || "anonymous";
     }
-    return 'anonymous';
+    return "anonymous";
   }
 
   /**
    * Utility delay function
    */
   delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
   async loadNavigationHTML(navPath) {
     // Prevent multiple simultaneous loads
@@ -388,17 +388,17 @@ class SharedNavigation {
     }
 
     this.loadingPromise = fetch(navPath)
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
           throw new Error(`Failed to load navigation: ${response.status}`);
         }
         return response.text();
       })
-      .then(html => {
+      .then((html) => {
         this.navHTML = html;
         return html;
       })
-      .catch(_error => {
+      .catch((_error) => {
         // Error loading navigation HTML
         // Fallback to basic navigation
         this.navHTML = this.createFallbackNavigation();
@@ -417,8 +417,8 @@ class SharedNavigation {
     }
 
     // Priority order for injection targets
-    const navigationContainer = document.getElementById('navigation-container');
-    const existingHeader = document.querySelector('header.header');
+    const navigationContainer = document.getElementById("navigation-container");
+    const existingHeader = document.querySelector("header.header");
 
     if (navigationContainer) {
       // Inject into designated navigation container
@@ -430,11 +430,11 @@ class SharedNavigation {
       // Fallback: inject at body start
       const { body } = document;
       if (body) {
-        body.insertAdjacentHTML('afterbegin', this.navHTML);
+        body.insertAdjacentHTML("afterbegin", this.navHTML);
       } else {
         // Fallback: inject after body loads
-        document.addEventListener('DOMContentLoaded', () => {
-          document.body.insertAdjacentHTML('afterbegin', this.navHTML);
+        document.addEventListener("DOMContentLoaded", () => {
+          document.body.insertAdjacentHTML("afterbegin", this.navHTML);
           this.reinitializeAfterInjection();
         });
         return;
@@ -464,27 +464,27 @@ class SharedNavigation {
     // Check for meta tag with page identifier
     const pageMetaTag = document.querySelector('meta[name="page-id"]');
     if (pageMetaTag) {
-      return pageMetaTag.getAttribute('content');
+      return pageMetaTag.getAttribute("content");
     }
 
     // Detect from URL
     const { pathname } = window.location;
-    const filename = pathname.split('/').pop() || 'index.html';
+    const filename = pathname.split("/").pop() || "index.html";
 
     // Map filenames to page identifiers
     const pageMap = {
-      'index.html': 'home',
-      'app.html': 'scenarios',
-      'about.html': 'about',
-      'blog.html': 'blog',
-      'forum.html': 'forum',
-      'profile.html': 'profile',
-      'privacy-notice.html': 'privacy',
-      'donate.html': 'donate',
-      '': 'home', // Root path
+      "index.html": "home",
+      "app.html": "scenarios",
+      "about.html": "about",
+      "blog.html": "blog",
+      "forum.html": "forum",
+      "profile.html": "profile",
+      "privacy-notice.html": "privacy",
+      "donate.html": "donate",
+      "": "home", // Root path
     };
 
-    return pageMap[filename] || 'home';
+    return pageMap[filename] || "home";
   }
 
   /**
@@ -492,20 +492,23 @@ class SharedNavigation {
    * @param {string} pageId - Page identifier
    */
   setActivePage(pageId) {
-    // Remove existing active states with comprehensive clearing
-    const navLinks = document.querySelectorAll('.nav-link');
-    navLinks.forEach(link => {
-      link.classList.remove('active');
-      link.removeAttribute('aria-current');
+    // Remove existing active states with responsive-friendly clearing
+    const navLinks = document.querySelectorAll(".nav-link");
+    navLinks.forEach((link) => {
+      link.classList.remove("active");
+      link.removeAttribute("aria-current");
 
       // Add clearing class to force remove any residual styling
-      link.classList.add('nav-link-clear-active');
+      link.classList.add("nav-link-clear-active");
 
-      // Force clear inline styles
-      link.style.backgroundColor = '';
-      link.style.color = '';
-      link.style.fontWeight = '';
-      link.style.borderBottomColor = '';
+      // Instead of setting inline styles, use removeProperty to clear any existing inline styles
+      // This preserves CSS cascade and responsive behavior
+      if (link.style.backgroundColor)
+        link.style.removeProperty("background-color");
+      if (link.style.color) link.style.removeProperty("color");
+      if (link.style.fontWeight) link.style.removeProperty("font-weight");
+      if (link.style.borderBottomColor)
+        link.style.removeProperty("border-bottom-color");
     });
 
     // Force reflow to ensure clearing takes effect
@@ -513,15 +516,15 @@ class SharedNavigation {
 
     // Remove clearing classes after a brief delay
     setTimeout(() => {
-      navLinks.forEach(link => {
-        link.classList.remove('nav-link-clear-active');
+      navLinks.forEach((link) => {
+        link.classList.remove("nav-link-clear-active");
       });
 
       // Set new active state
       const activeLink = document.querySelector(`[data-page="${pageId}"]`);
       if (activeLink) {
-        activeLink.classList.add('active');
-        activeLink.setAttribute('aria-current', 'page');
+        activeLink.classList.add("active");
+        activeLink.setAttribute("aria-current", "page");
       }
     }, 20);
 
@@ -559,19 +562,19 @@ class SharedNavigation {
    */
   setupNavigationLinkHandlers() {
     // Use more specific selector for better performance and clarity
-    const mainNavigation = document.querySelector('#main-navigation');
+    const mainNavigation = document.querySelector("#main-navigation");
     if (!mainNavigation) return;
 
-    const navLinks = mainNavigation.querySelectorAll('.nav-link[data-page]');
+    const navLinks = mainNavigation.querySelectorAll(".nav-link[data-page]");
 
-    navLinks.forEach(link => {
+    navLinks.forEach((link) => {
       // Skip simulation-hub as it has its own handler
-      if (link.getAttribute('data-page') === 'simulation-hub') {
+      if (link.getAttribute("data-page") === "simulation-hub") {
         return;
       }
 
-      link.addEventListener('click', () => {
-        const pageId = link.getAttribute('data-page');
+      link.addEventListener("click", () => {
+        const pageId = link.getAttribute("data-page");
         if (pageId) {
           this.setActivePage(pageId);
         }
@@ -585,13 +588,13 @@ class SharedNavigation {
   handleHashNavigation() {
     const { hash } = window.location;
 
-    if (hash === '#categories') {
+    if (hash === "#categories") {
       // Set the active state for simulation-hub
-      this.setActivePage('simulation-hub');
+      this.setActivePage("simulation-hub");
 
       // Small delay to ensure page is fully loaded
       setTimeout(() => {
-        this.scrollToElement('#categories > div.section-header');
+        this.scrollToElement("#categories > div.section-header");
       }, 1000);
     }
   }
@@ -600,18 +603,18 @@ class SharedNavigation {
    * Setup Simulation Hub navigation functionality
    */
   setupSimulationHubNavigation() {
-    const mainNavigation = document.querySelector('#main-navigation');
+    const mainNavigation = document.querySelector("#main-navigation");
     if (!mainNavigation) return;
 
     const simulationHubLink = mainNavigation.querySelector(
-      'a[data-page="simulation-hub"]'
+      'a[data-page="simulation-hub"]',
     );
 
     if (!simulationHubLink) {
       return;
     }
 
-    simulationHubLink.addEventListener('click', e => {
+    simulationHubLink.addEventListener("click", (e) => {
       e.preventDefault();
       this.navigateToSimulationHub();
     });
@@ -622,14 +625,14 @@ class SharedNavigation {
    */
   navigateToSimulationHub() {
     const currentPage =
-      window.location.pathname.split('/').pop() || 'index.html';
-    const targetSelector = '#categories > div.section-header';
+      window.location.pathname.split("/").pop() || "index.html";
+    const targetSelector = "#categories > div.section-header";
 
     // Update active state to simulation-hub
-    this.setActivePage('simulation-hub');
+    this.setActivePage("simulation-hub");
 
     // If we're already on app.html, just scroll to the target
-    if (currentPage === 'app.html') {
+    if (currentPage === "app.html") {
       this.scrollToElement(targetSelector);
     } else {
       // Navigate to app.html and then scroll to the target
@@ -646,35 +649,20 @@ class SharedNavigation {
 
     if (targetElement) {
       targetElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-        inline: 'nearest',
+        behavior: "smooth",
+        block: "start",
+        inline: "nearest",
       });
 
       // Add a slight delay to ensure the element is visible
       setTimeout(() => {
-        // Store original styles
-        const originalBg = targetElement.style.backgroundColor;
-        const originalTransition = targetElement.style.transition;
-
-        // Add highlight effect
-        targetElement.style.transition = 'background-color 0.5s ease';
-        targetElement.style.backgroundColor = 'rgba(108, 92, 231, 0.1)';
+        // Use CSS class for highlight animation instead of inline styles
+        // This preserves responsive behavior and CSS cascade
+        targetElement.classList.add("nav-highlight-animation");
 
         setTimeout(() => {
-          // Restore original background and remove transition
-          targetElement.style.backgroundColor = originalBg;
-          targetElement.style.transition = originalTransition;
-
-          // If original background was empty, remove the property completely
-          if (!originalBg) {
-            targetElement.style.removeProperty('background-color');
-          }
-
-          // If original transition was empty, remove the property completely
-          if (!originalTransition) {
-            targetElement.style.removeProperty('transition');
-          }
+          // Remove the animation class to restore normal appearance
+          targetElement.classList.remove("nav-highlight-animation");
         }, 1000);
       }, 500);
     }
@@ -685,17 +673,17 @@ class SharedNavigation {
    */
   setupMegaMenuListeners() {
     const categoriesDropdown = document.querySelector(
-      '.nav-item-dropdown .nav-link[aria-haspopup="true"]'
+      '.nav-item-dropdown .nav-link[aria-haspopup="true"]',
     );
-    const megaMenu = document.querySelector('.mega-menu');
+    const megaMenu = document.querySelector(".mega-menu");
 
     if (!categoriesDropdown || !megaMenu) return;
 
     // Toggle mega menu on click - support second click to close
-    categoriesDropdown.addEventListener('click', e => {
+    categoriesDropdown.addEventListener("click", (e) => {
       e.preventDefault();
 
-      const isOpen = megaMenu.classList.contains('open');
+      const isOpen = megaMenu.classList.contains("open");
 
       if (isOpen) {
         // Second click - close the mega menu
@@ -707,7 +695,7 @@ class SharedNavigation {
     });
 
     // Close mega menu when clicking outside
-    document.addEventListener('click', e => {
+    document.addEventListener("click", (e) => {
       if (
         !categoriesDropdown.contains(e.target) &&
         !megaMenu.contains(e.target)
@@ -717,10 +705,10 @@ class SharedNavigation {
     });
 
     // Handle mega menu item clicks
-    const megaMenuItems = document.querySelectorAll('.mega-menu-item');
-    megaMenuItems.forEach(item => {
-      item.addEventListener('click', () => {
-        const category = item.getAttribute('data-category');
+    const megaMenuItems = document.querySelectorAll(".mega-menu-item");
+    megaMenuItems.forEach((item) => {
+      item.addEventListener("click", () => {
+        const category = item.getAttribute("data-category");
         if (category) {
           this.handleCategorySelection(category);
         }
@@ -728,10 +716,10 @@ class SharedNavigation {
     });
 
     // Keyboard navigation for mega menu
-    categoriesDropdown.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
+    categoriesDropdown.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        const isOpen = megaMenu.classList.contains('open');
+        const isOpen = megaMenu.classList.contains("open");
         if (isOpen) {
           this.closeMegaMenu();
         } else {
@@ -745,31 +733,31 @@ class SharedNavigation {
    * Setup dropdown menu listeners for community and about sections
    */ setupDropdownListeners() {
     const dropdownTriggers = document.querySelectorAll(
-      '.nav-item-dropdown .nav-link[aria-haspopup="true"]'
+      '.nav-item-dropdown .nav-link[aria-haspopup="true"]',
     );
 
-    dropdownTriggers.forEach(trigger => {
+    dropdownTriggers.forEach((trigger) => {
       // Skip mega menu (handled separately)
-      if (trigger.closest('.nav-item-dropdown').querySelector('.mega-menu')) {
+      if (trigger.closest(".nav-item-dropdown").querySelector(".mega-menu")) {
         return;
       }
 
       // Skip settings dropdown (handled by settings-manager)
-      if (trigger.id === 'settings-nav') {
+      if (trigger.id === "settings-nav") {
         return;
       }
 
       const dropdown = trigger.nextElementSibling;
 
-      if (!dropdown || !dropdown.classList.contains('dropdown-menu')) {
+      if (!dropdown || !dropdown.classList.contains("dropdown-menu")) {
         return;
       }
 
       // Toggle dropdown on click - works for both desktop and mobile
-      trigger.addEventListener('click', e => {
+      trigger.addEventListener("click", (e) => {
         e.preventDefault();
 
-        const isOpen = dropdown.classList.contains('open');
+        const isOpen = dropdown.classList.contains("open");
 
         if (isOpen) {
           // Second click - close the dropdown
@@ -781,7 +769,7 @@ class SharedNavigation {
       });
 
       // Open dropdown on hover (desktop only - mouseenter)
-      trigger.addEventListener('mouseenter', () => {
+      trigger.addEventListener("mouseenter", () => {
         // Only auto-open on hover if we're not on mobile
         if (window.innerWidth > 480) {
           this.openDropdown(trigger, dropdown);
@@ -789,9 +777,9 @@ class SharedNavigation {
       });
 
       // Close dropdown when leaving the entire dropdown area (trigger + menu)
-      const dropdownContainer = trigger.closest('.nav-item-dropdown');
+      const dropdownContainer = trigger.closest(".nav-item-dropdown");
       if (dropdownContainer) {
-        dropdownContainer.addEventListener('mouseleave', () => {
+        dropdownContainer.addEventListener("mouseleave", () => {
           // Only auto-close on hover if we're not on mobile
           if (window.innerWidth > 480) {
             this.closeDropdown(trigger, dropdown);
@@ -800,7 +788,7 @@ class SharedNavigation {
       }
 
       // Close dropdown when clicking outside
-      document.addEventListener('click', e => {
+      document.addEventListener("click", (e) => {
         if (!trigger.contains(e.target) && !dropdown.contains(e.target)) {
           this.closeDropdown(trigger, dropdown);
         }
@@ -821,33 +809,33 @@ class SharedNavigation {
     // No longer setting up tour button listeners here
 
     // Surprise Me button - remove existing listeners first
-    const surpriseBtn = document.getElementById('surprise-me-nav');
+    const surpriseBtn = document.getElementById("surprise-me-nav");
     if (surpriseBtn) {
       // Remove any existing listeners by cloning the element
       const newSurpriseBtn = surpriseBtn.cloneNode(true);
       surpriseBtn.parentNode.replaceChild(newSurpriseBtn, surpriseBtn);
 
       // Add fresh listener
-      newSurpriseBtn.addEventListener('click', e => {
+      newSurpriseBtn.addEventListener("click", (e) => {
         e.preventDefault();
         this.handleSurpriseAction();
       });
     }
 
     // Authentication buttons
-    const signInBtn = document.getElementById('sign-in-nav');
-    const profileBtn = document.getElementById('profile-nav');
-    const signOutBtn = document.getElementById('sign-out-nav');
+    const signInBtn = document.getElementById("sign-in-nav");
+    const profileBtn = document.getElementById("profile-nav");
+    const signOutBtn = document.getElementById("sign-out-nav");
 
     if (signInBtn) {
-      signInBtn.addEventListener('click', () => this.handleSignIn());
+      signInBtn.addEventListener("click", () => this.handleSignIn());
     }
     if (profileBtn) {
       // Profile button will be handled by the dropdown system
       // Individual menu items handle their own navigation
     }
     if (signOutBtn) {
-      signOutBtn.addEventListener('click', () => this.handleSignOut());
+      signOutBtn.addEventListener("click", () => this.handleSignOut());
     }
 
     // Mark action listeners as set up to prevent duplicates
@@ -863,8 +851,8 @@ class SharedNavigation {
       return;
     }
 
-    const navToggle = document.querySelector('.nav-toggle');
-    const mainNav = document.querySelector('#main-navigation');
+    const navToggle = document.querySelector(".nav-toggle");
+    const mainNav = document.querySelector("#main-navigation");
 
     if (!navToggle || !mainNav) {
       return;
@@ -875,7 +863,7 @@ class SharedNavigation {
     navToggle.parentNode.replaceChild(newNavToggle, navToggle);
 
     // Add fresh listener to the new button
-    newNavToggle.addEventListener('click', e => {
+    newNavToggle.addEventListener("click", (e) => {
       e.preventDefault();
       this.toggleMobileNav();
     });
@@ -884,16 +872,16 @@ class SharedNavigation {
     this.setupMobileDropdownListeners();
 
     // Close mobile nav when clicking backdrop
-    const navBackdrop = document.querySelector('.nav-backdrop');
+    const navBackdrop = document.querySelector(".nav-backdrop");
     if (navBackdrop) {
-      navBackdrop.addEventListener('click', () => {
+      navBackdrop.addEventListener("click", () => {
         this.closeMobileNav();
       });
     }
 
     // Close mobile nav on escape key
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && mainNav.classList.contains('open')) {
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && mainNav.classList.contains("open")) {
         this.closeMobileNav();
       }
     });
@@ -906,15 +894,15 @@ class SharedNavigation {
    * Setup mobile-specific dropdown listeners
    */
   setupMobileDropdownListeners() {
-    const mainNavigation = document.querySelector('#main-navigation');
+    const mainNavigation = document.querySelector("#main-navigation");
     if (!mainNavigation) return;
 
     // Find ALL dropdown triggers, including those with href
     const allDropdownTriggers = mainNavigation.querySelectorAll(
-      '.nav-item-dropdown .nav-link[aria-haspopup="true"]'
+      '.nav-item-dropdown .nav-link[aria-haspopup="true"]',
     );
 
-    allDropdownTriggers.forEach(trigger => {
+    allDropdownTriggers.forEach((trigger) => {
       const dropdown = trigger.nextElementSibling;
 
       if (!dropdown) {
@@ -922,13 +910,13 @@ class SharedNavigation {
       }
 
       // Check if this is the categories mega menu
-      const isMegaMenu = dropdown.classList.contains('mega-menu');
+      const isMegaMenu = dropdown.classList.contains("mega-menu");
 
       if (isMegaMenu) {
-        trigger.addEventListener('click', e => {
+        trigger.addEventListener("click", (e) => {
           e.preventDefault(); // Prevent navigation in mobile
 
-          const isOpen = dropdown.classList.contains('open');
+          const isOpen = dropdown.classList.contains("open");
           if (isOpen) {
             this.closeMegaMenu();
           } else {
@@ -941,11 +929,11 @@ class SharedNavigation {
       }
 
       // For regular dropdowns (Community, About)
-      if (dropdown.classList.contains('dropdown-menu')) {
-        trigger.addEventListener('click', e => {
+      if (dropdown.classList.contains("dropdown-menu")) {
+        trigger.addEventListener("click", (e) => {
           e.preventDefault();
 
-          const isOpen = dropdown.classList.contains('open');
+          const isOpen = dropdown.classList.contains("open");
 
           if (isOpen) {
             this.closeDropdown(trigger, dropdown);
@@ -961,9 +949,9 @@ class SharedNavigation {
 
     // Close dropdowns when clicking elsewhere in mobile nav
     if (mainNavigation) {
-      mainNavigation.addEventListener('click', e => {
+      mainNavigation.addEventListener("click", (e) => {
         // If click is not on a dropdown trigger or dropdown content
-        const clickedDropdown = e.target.closest('.nav-item-dropdown');
+        const clickedDropdown = e.target.closest(".nav-item-dropdown");
         if (!clickedDropdown) {
           this.closeAllDropdowns();
           this.closeMegaMenu();
@@ -976,10 +964,10 @@ class SharedNavigation {
    * Setup mega menu search functionality
    */
   setupMegaMenuSearch() {
-    const searchInput = document.querySelector('.mega-menu-search');
+    const searchInput = document.querySelector(".mega-menu-search");
     if (!searchInput) return;
 
-    searchInput.addEventListener('input', e => {
+    searchInput.addEventListener("input", (e) => {
       this.filterMegaMenuItems(e.target.value);
     });
   }
@@ -1017,7 +1005,7 @@ class SharedNavigation {
 
     // Add scroll event listener with throttling
     this.handleScroll = this.throttle(this.onScroll.bind(this), 16); // ~60fps
-    window.addEventListener('scroll', this.handleScroll, { passive: true });
+    window.addEventListener("scroll", this.handleScroll, { passive: true });
 
     // Set initial state based on current scroll position
     this.updateNavbarVisibility();
@@ -1029,15 +1017,15 @@ class SharedNavigation {
   onScroll() {
     const currentScrollY = window.scrollY || window.pageYOffset || 0;
     const scrollDelta = currentScrollY - this.lastScrollY;
-    const header = document.querySelector('.header');
+    const header = document.querySelector(".header");
 
     if (!header) return;
 
     // Add scrolled class for enhanced styling when past header height
     if (currentScrollY > this.headerHeight) {
-      header.classList.add('scrolled');
+      header.classList.add("scrolled");
     } else {
-      header.classList.remove('scrolled');
+      header.classList.remove("scrolled");
     }
 
     // Don't hide navbar if we're at the top of the page
@@ -1060,12 +1048,12 @@ class SharedNavigation {
     }
 
     // Hide navbar when scrolling down, show when scrolling up
-    if (scrollDelta > 0 && !header.classList.contains('header-hidden')) {
+    if (scrollDelta > 0 && !header.classList.contains("header-hidden")) {
       // Scrolling down - hide navbar
       this.hideNavbar();
     } else if (
       scrollDelta < 0 &&
-      !header.classList.contains('header-visible')
+      !header.classList.contains("header-visible")
     ) {
       // Scrolling up - show navbar
       this.showNavbar();
@@ -1089,18 +1077,18 @@ class SharedNavigation {
    */
   shouldAlwaysShowNavbar() {
     // Check if mobile menu is open - use consistent selector
-    const mobileNav = document.querySelector('#main-navigation.open');
+    const mobileNav = document.querySelector("#main-navigation.open");
     if (mobileNav) return true;
 
     // Check if any dropdowns are open
     const openDropdowns = document.querySelectorAll(
-      '.dropdown-menu.open, .mega-menu.open'
+      ".dropdown-menu.open, .mega-menu.open",
     );
     if (openDropdowns.length > 0) return true;
 
     // Check if settings menu is open
     const settingsMenu = document.querySelector(
-      '.settings-menu[style*="display: block"]'
+      '.settings-menu[style*="display: block"]',
     );
     if (settingsMenu) return true;
 
@@ -1111,22 +1099,22 @@ class SharedNavigation {
    * Hide the navbar with smooth animation
    */
   hideNavbar() {
-    const header = document.querySelector('.header');
+    const header = document.querySelector(".header");
     if (!header) return;
 
-    header.classList.add('header-hidden');
-    header.classList.remove('header-visible');
+    header.classList.add("header-hidden");
+    header.classList.remove("header-visible");
   }
 
   /**
    * Show the navbar with smooth animation
    */
   showNavbar() {
-    const header = document.querySelector('.header');
+    const header = document.querySelector(".header");
     if (!header) return;
 
-    header.classList.add('header-visible');
-    header.classList.remove('header-hidden');
+    header.classList.add("header-visible");
+    header.classList.remove("header-hidden");
   }
 
   /**
@@ -1134,15 +1122,15 @@ class SharedNavigation {
    */
   updateNavbarVisibility() {
     const currentScrollY = window.scrollY || window.pageYOffset || 0;
-    const header = document.querySelector('.header');
+    const header = document.querySelector(".header");
 
     if (!header) return;
 
     if (currentScrollY <= this.headerHeight) {
       this.showNavbar();
-      header.classList.remove('scrolled');
+      header.classList.remove("scrolled");
     } else {
-      header.classList.add('scrolled');
+      header.classList.add("scrolled");
     }
   }
 
@@ -1166,7 +1154,7 @@ class SharedNavigation {
             func.apply(this, args);
             lastExecTime = Date.now();
           },
-          delay - (currentTime - lastExecTime)
+          delay - (currentTime - lastExecTime),
         );
       }
     };
@@ -1176,14 +1164,14 @@ class SharedNavigation {
    * Toggle mega menu visibility
    */
   toggleMegaMenu() {
-    const megaMenu = document.querySelector('.mega-menu');
+    const megaMenu = document.querySelector(".mega-menu");
     const trigger = document.querySelector(
-      '.nav-item-dropdown .nav-link[aria-haspopup="true"]'
+      '.nav-item-dropdown .nav-link[aria-haspopup="true"]',
     );
 
     if (!megaMenu || !trigger) return;
 
-    const isOpen = megaMenu.classList.contains('open');
+    const isOpen = megaMenu.classList.contains("open");
 
     if (isOpen) {
       this.closeMegaMenu();
@@ -1196,9 +1184,9 @@ class SharedNavigation {
    * Open mega menu
    */
   openMegaMenu() {
-    const megaMenu = document.querySelector('.mega-menu');
+    const megaMenu = document.querySelector(".mega-menu");
     const trigger = document.querySelector(
-      '.nav-item-dropdown .nav-link[aria-haspopup="true"]'
+      '.nav-item-dropdown .nav-link[aria-haspopup="true"]',
     );
 
     if (!megaMenu || !trigger) return;
@@ -1206,16 +1194,12 @@ class SharedNavigation {
     // Close other dropdowns first
     this.closeAllDropdowns();
 
-    megaMenu.classList.add('open');
-    trigger.setAttribute('aria-expanded', 'true');
-
-    // Force visibility with inline styles for mobile compatibility
-    megaMenu.style.setProperty('display', 'block', 'important');
-    megaMenu.style.setProperty('visibility', 'visible', 'important');
-    megaMenu.style.setProperty('opacity', '1', 'important');
+    megaMenu.classList.add("open");
+    megaMenu.classList.add("force-visible"); // CSS class instead of inline styles
+    trigger.setAttribute("aria-expanded", "true");
 
     // Focus first menu item for accessibility
-    const firstItem = megaMenu.querySelector('.mega-menu-item');
+    const firstItem = megaMenu.querySelector(".mega-menu-item");
     if (firstItem) {
       firstItem.focus();
     }
@@ -1225,46 +1209,31 @@ class SharedNavigation {
    * Close mega menu
    */
   closeMegaMenu() {
-    const megaMenu = document.querySelector('.mega-menu');
+    const megaMenu = document.querySelector(".mega-menu");
     const trigger = document.querySelector(
-      '.nav-item-dropdown .nav-link[aria-haspopup="true"]'
+      '.nav-item-dropdown .nav-link[aria-haspopup="true"]',
     );
 
     if (!megaMenu || !trigger) return;
 
-    megaMenu.classList.remove('open');
-    trigger.setAttribute('aria-expanded', 'false');
-
-    // Reset inline styles to allow CSS to take control
-    megaMenu.style.removeProperty('display');
-    megaMenu.style.removeProperty('visibility');
-    megaMenu.style.removeProperty('opacity');
+    megaMenu.classList.remove("open");
+    megaMenu.classList.remove("force-visible"); // Remove CSS class instead of inline styles
+    trigger.setAttribute("aria-expanded", "false");
   }
 
   /**
    * Toggle dropdown menu
    */
   toggleDropdown(trigger, dropdown) {
-    const isOpen = dropdown.classList.contains('open');
+    const isOpen = dropdown.classList.contains("open");
 
     if (!isOpen) {
       // Close all OTHER dropdowns first (exclude current one)
       this.closeAllDropdownsExcept(dropdown);
 
-      dropdown.classList.add('open');
-      trigger.setAttribute('aria-expanded', 'true');
-
-      // Remove any conflicting styles first
-      dropdown.style.removeProperty('display');
-      dropdown.style.removeProperty('visibility');
-      dropdown.style.removeProperty('opacity');
-
-      // Force visibility with inline styles to override any CSS conflicts
-      dropdown.style.setProperty('display', 'block', 'important');
-      dropdown.style.setProperty('visibility', 'visible', 'important');
-      dropdown.style.setProperty('opacity', '1', 'important');
-      dropdown.style.setProperty('position', 'absolute', 'important');
-      dropdown.style.setProperty('z-index', '9999', 'important');
+      dropdown.classList.add("open");
+      dropdown.classList.add("force-visible"); // CSS class instead of inline styles
+      trigger.setAttribute("aria-expanded", "true");
     } else {
       this.closeDropdown(trigger, dropdown);
     }
@@ -1273,26 +1242,15 @@ class SharedNavigation {
    * Open specific dropdown (for hover events)
    */
   openDropdown(trigger, dropdown) {
-    const isOpen = dropdown.classList.contains('open');
+    const isOpen = dropdown.classList.contains("open");
 
     if (!isOpen) {
       // Close all OTHER dropdowns first (exclude current one)
       this.closeAllDropdownsExcept(dropdown);
 
-      dropdown.classList.add('open');
-      trigger.setAttribute('aria-expanded', 'true');
-
-      // Remove any conflicting styles first
-      dropdown.style.removeProperty('display');
-      dropdown.style.removeProperty('visibility');
-      dropdown.style.removeProperty('opacity');
-
-      // Force visibility with inline styles to override any CSS conflicts
-      dropdown.style.setProperty('display', 'block', 'important');
-      dropdown.style.setProperty('visibility', 'visible', 'important');
-      dropdown.style.setProperty('opacity', '1', 'important');
-      dropdown.style.setProperty('position', 'absolute', 'important');
-      dropdown.style.setProperty('z-index', '9999', 'important');
+      dropdown.classList.add("open");
+      dropdown.classList.add("force-visible"); // CSS class instead of inline styles
+      trigger.setAttribute("aria-expanded", "true");
     }
   }
 
@@ -1300,59 +1258,55 @@ class SharedNavigation {
    * Close specific dropdown
    */
   closeDropdown(trigger, dropdown) {
-    dropdown.classList.remove('open');
-    trigger.setAttribute('aria-expanded', 'false');
-
-    // Reset inline styles to allow CSS to take control
-    dropdown.style.removeProperty('display');
-    dropdown.style.removeProperty('visibility');
-    dropdown.style.removeProperty('opacity');
-    dropdown.style.removeProperty('position');
-    dropdown.style.removeProperty('z-index');
+    dropdown.classList.remove("open");
+    dropdown.classList.remove("force-visible"); // Remove CSS class instead of inline styles
+    trigger.setAttribute("aria-expanded", "false");
   }
 
   /**
    * Close all open dropdowns
    */
   closeAllDropdowns() {
-    const dropdowns = document.querySelectorAll('.dropdown-menu');
+    const dropdowns = document.querySelectorAll(".dropdown-menu");
     const triggers = document.querySelectorAll(
-      '.nav-link[aria-haspopup="true"]'
+      '.nav-link[aria-haspopup="true"]',
     );
 
-    dropdowns.forEach(dropdown => {
-      dropdown.classList.remove('open');
+    dropdowns.forEach((dropdown) => {
+      dropdown.classList.remove("open");
       // Reset inline styles to allow CSS to take control
-      dropdown.style.visibility = '';
-      dropdown.style.opacity = '';
-      dropdown.style.display = '';
+      dropdown.style.visibility = "";
+      dropdown.style.opacity = "";
+      dropdown.style.display = "";
     });
-    triggers.forEach(trigger => trigger.setAttribute('aria-expanded', 'false'));
+    triggers.forEach((trigger) =>
+      trigger.setAttribute("aria-expanded", "false"),
+    );
   }
 
   /**
    * Close all open dropdowns except the specified one
    */
   closeAllDropdownsExcept(exceptDropdown) {
-    const dropdowns = document.querySelectorAll('.dropdown-menu');
+    const dropdowns = document.querySelectorAll(".dropdown-menu");
     const triggers = document.querySelectorAll(
-      '.nav-link[aria-haspopup="true"]'
+      '.nav-link[aria-haspopup="true"]',
     );
 
-    dropdowns.forEach(dropdown => {
+    dropdowns.forEach((dropdown) => {
       if (dropdown !== exceptDropdown) {
-        dropdown.classList.remove('open');
+        dropdown.classList.remove("open");
         // Reset inline styles to allow CSS to take control
-        dropdown.style.visibility = '';
-        dropdown.style.opacity = '';
-        dropdown.style.display = '';
+        dropdown.style.visibility = "";
+        dropdown.style.opacity = "";
+        dropdown.style.display = "";
       }
     });
 
-    triggers.forEach(trigger => {
+    triggers.forEach((trigger) => {
       const associatedDropdown = trigger.nextElementSibling;
       if (associatedDropdown !== exceptDropdown) {
-        trigger.setAttribute('aria-expanded', 'false');
+        trigger.setAttribute("aria-expanded", "false");
       }
     });
   }
@@ -1361,15 +1315,15 @@ class SharedNavigation {
    * Toggle mobile navigation
    */
   toggleMobileNav() {
-    const navToggle = document.querySelector('.nav-toggle');
-    const mainNav = document.querySelector('#main-navigation');
-    const navBackdrop = document.querySelector('.nav-backdrop');
+    const navToggle = document.querySelector(".nav-toggle");
+    const mainNav = document.querySelector("#main-navigation");
+    const navBackdrop = document.querySelector(".nav-backdrop");
 
     if (!navToggle || !mainNav) {
       return;
     }
 
-    const isOpen = mainNav.classList.contains('open');
+    const isOpen = mainNav.classList.contains("open");
 
     if (isOpen) {
       this.closeMobileNav();
@@ -1382,9 +1336,9 @@ class SharedNavigation {
    * Open mobile navigation
    */
   openMobileNav() {
-    const navToggle = document.querySelector('.nav-toggle');
-    const mainNav = document.querySelector('#main-navigation');
-    const navBackdrop = document.querySelector('.nav-backdrop');
+    const navToggle = document.querySelector(".nav-toggle");
+    const mainNav = document.querySelector("#main-navigation");
+    const navBackdrop = document.querySelector(".nav-backdrop");
 
     if (!navToggle || !mainNav) {
       return;
@@ -1394,92 +1348,66 @@ class SharedNavigation {
     this.closeMegaMenu();
     this.closeAllDropdowns();
 
-    // Add class
-    mainNav.classList.add('open');
-    navToggle.setAttribute('aria-expanded', 'true');
-    mainNav.setAttribute('aria-hidden', 'false');
-
-    // Force visibility with inline styles to override any CSS conflicts - RIGHT side
-    mainNav.style.setProperty('position', 'fixed', 'important');
-    mainNav.style.setProperty('top', '0', 'important');
-    mainNav.style.setProperty('right', '0', 'important');
-    mainNav.style.setProperty('left', 'auto', 'important');
-    mainNav.style.setProperty('width', '100%', 'important');
-    mainNav.style.setProperty('height', '100vh', 'important');
-    mainNav.style.setProperty('background', 'white', 'important');
-    mainNav.style.setProperty('z-index', '9999', 'important');
-    mainNav.style.setProperty('display', 'flex', 'important');
-    mainNav.style.setProperty('visibility', 'visible', 'important');
-    mainNav.style.setProperty('opacity', '1', 'important');
-    mainNav.style.setProperty('transform', 'translateX(0)', 'important');
+    // Add classes for mobile navigation
+    mainNav.classList.add("open");
+    mainNav.classList.add("mobile-force-visible"); // CSS class instead of inline styles
+    navToggle.setAttribute("aria-expanded", "true");
+    mainNav.setAttribute("aria-hidden", "false");
 
     // Wait a moment then check the result
     setTimeout(() => {}, 100);
 
     if (navBackdrop) {
-      navBackdrop.classList.add('open');
+      navBackdrop.classList.add("open");
     }
 
     // Prevent body scroll
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
   }
 
   /**
    * Close mobile navigation
    */
   closeMobileNav() {
-    const navToggle = document.querySelector('.nav-toggle');
-    const mainNav = document.querySelector('#main-navigation');
-    const navBackdrop = document.querySelector('.nav-backdrop');
+    const navToggle = document.querySelector(".nav-toggle");
+    const mainNav = document.querySelector("#main-navigation");
+    const navBackdrop = document.querySelector(".nav-backdrop");
 
     if (!navToggle || !mainNav) return;
 
-    mainNav.classList.remove('open');
-    navToggle.setAttribute('aria-expanded', 'false');
-    mainNav.setAttribute('aria-hidden', 'true');
-
-    // Reset all inline styles to allow CSS to take control
-    mainNav.style.removeProperty('position');
-    mainNav.style.removeProperty('top');
-    mainNav.style.removeProperty('left');
-    mainNav.style.removeProperty('right');
-    mainNav.style.removeProperty('width');
-    mainNav.style.removeProperty('height');
-    mainNav.style.removeProperty('background');
-    mainNav.style.removeProperty('z-index');
-    mainNav.style.removeProperty('display');
-    mainNav.style.removeProperty('visibility');
-    mainNav.style.removeProperty('opacity');
-    mainNav.style.removeProperty('transform');
+    mainNav.classList.remove("open");
+    mainNav.classList.remove("mobile-force-visible"); // Remove CSS class instead of inline styles
+    navToggle.setAttribute("aria-expanded", "false");
+    mainNav.setAttribute("aria-hidden", "true");
 
     if (navBackdrop) {
-      navBackdrop.classList.remove('open');
+      navBackdrop.classList.remove("open");
     }
 
     // Restore body scroll
-    document.body.style.overflow = '';
+    document.body.style.overflow = "";
   }
 
   /**
    * Filter mega menu items based on search query
    */
   filterMegaMenuItems(query) {
-    const items = document.querySelectorAll('.mega-menu-item');
+    const items = document.querySelectorAll(".mega-menu-item");
     const normalizedQuery = query.toLowerCase().trim();
 
-    items.forEach(item => {
-      const title = item.querySelector('h4')?.textContent.toLowerCase() || '';
+    items.forEach((item) => {
+      const title = item.querySelector("h4")?.textContent.toLowerCase() || "";
       const description =
-        item.querySelector('p')?.textContent.toLowerCase() || '';
+        item.querySelector("p")?.textContent.toLowerCase() || "";
 
       const matches =
         title.includes(normalizedQuery) ||
         description.includes(normalizedQuery);
 
-      if (matches || normalizedQuery === '') {
-        item.style.display = '';
+      if (matches || normalizedQuery === "") {
+        item.style.display = "";
       } else {
-        item.style.display = 'none';
+        item.style.display = "none";
       }
     });
   }
@@ -1498,7 +1426,7 @@ class SharedNavigation {
 
     // Navigate to category or trigger category selection
     if (
-      typeof window.app !== 'undefined' &&
+      typeof window.app !== "undefined" &&
       window.app.handleCategorySelection
     ) {
       window.app.handleCategorySelection(category);
@@ -1513,23 +1441,23 @@ class SharedNavigation {
    */
   navigateToCategory(category) {
     // If on home page, scroll to specific category or categories section
-    if (this.currentPage === 'home') {
+    if (this.currentPage === "home") {
       // First try to scroll to the specific category section
       const specificCategorySection = document.getElementById(
-        `category-${category}`
+        `category-${category}`,
       );
       if (specificCategorySection) {
         specificCategorySection.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
+          behavior: "smooth",
+          block: "start",
         });
         return;
       }
 
       // Fallback to general categories section
-      const categoriesSection = document.getElementById('categories');
+      const categoriesSection = document.getElementById("categories");
       if (categoriesSection) {
-        categoriesSection.scrollIntoView({ behavior: 'smooth' });
+        categoriesSection.scrollIntoView({ behavior: "smooth" });
         return;
       }
     }
@@ -1558,7 +1486,7 @@ class SharedNavigation {
     this.closeMobileNav();
 
     // Trigger tour through app instance or fallback
-    if (typeof window.app !== 'undefined' && window.app.startOnboardingTour) {
+    if (typeof window.app !== "undefined" && window.app.startOnboardingTour) {
       window.app.startOnboardingTour();
     } else {
       // Tour functionality not available
@@ -1575,7 +1503,7 @@ class SharedNavigation {
     this.closeMobileNav();
 
     // Trigger surprise action through app instance or fallback
-    if (typeof window.app !== 'undefined' && window.app.launchRandomScenario) {
+    if (typeof window.app !== "undefined" && window.app.launchRandomScenario) {
       window.app.launchRandomScenario();
     } else {
       // Surprise me functionality not available
@@ -1589,7 +1517,7 @@ class SharedNavigation {
     // Sign in action triggered
 
     // Trigger sign in through app instance or fallback
-    if (typeof window.app !== 'undefined' && window.app.authService) {
+    if (typeof window.app !== "undefined" && window.app.authService) {
       window.app.authService.signIn();
     } else {
       // Authentication not available
@@ -1601,7 +1529,7 @@ class SharedNavigation {
    */
   handleProfileClick() {
     // Navigate to profile page
-    window.location.href = 'profile.html';
+    window.location.href = "profile.html";
   }
 
   /**
@@ -1611,7 +1539,7 @@ class SharedNavigation {
     // Sign out action triggered
 
     // Trigger sign out through app instance or fallback
-    if (typeof window.app !== 'undefined' && window.app.authService) {
+    if (typeof window.app !== "undefined" && window.app.authService) {
       window.app.authService.signOut();
     } else {
       // Authentication not available
@@ -1625,7 +1553,7 @@ class SharedNavigation {
     // Link accounts action triggered
 
     // Trigger link accounts through app instance or fallback
-    if (typeof window.app !== 'undefined' && window.app.authService) {
+    if (typeof window.app !== "undefined" && window.app.authService) {
       window.app.authService.linkAccounts();
     } else {
       // Authentication not available
@@ -1636,26 +1564,26 @@ class SharedNavigation {
    * Update user display in navigation
    */
   updateUserDisplay(user) {
-    const guestContent = document.querySelector('[data-guest-content]');
-    const userContent = document.querySelector('[data-user-content]');
-    const profileBtn = document.getElementById('profile-nav');
+    const guestContent = document.querySelector("[data-guest-content]");
+    const userContent = document.querySelector("[data-user-content]");
+    const profileBtn = document.getElementById("profile-nav");
 
     if (user) {
       // User is signed in - show profile dropdown, hide sign in
-      if (guestContent) guestContent.style.display = 'none';
-      if (userContent) userContent.style.display = 'block';
+      if (guestContent) guestContent.style.display = "none";
+      if (userContent) userContent.style.display = "block";
 
       // Update profile button text with user info
       if (profileBtn) {
-        const displayName = user.displayName || user.email || 'User';
-        const firstName = displayName.split(' ')[0]; // Get first name
+        const displayName = user.displayName || user.email || "User";
+        const firstName = displayName.split(" ")[0]; // Get first name
         profileBtn.innerHTML = `👤 ${firstName} <span class="dropdown-arrow" aria-hidden="true">▼</span>`;
         profileBtn.title = `${displayName}'s profile menu`;
       }
     } else {
       // User is not signed in - show sign in button, hide profile
-      if (guestContent) guestContent.style.display = 'block';
-      if (userContent) userContent.style.display = 'none';
+      if (guestContent) guestContent.style.display = "block";
+      if (userContent) userContent.style.display = "none";
     }
   }
 
@@ -1693,10 +1621,10 @@ class SharedNavigation {
     // SharedNavigation error occurred
 
     // Try to ensure basic navigation is available
-    if (!document.querySelector('header.header')) {
+    if (!document.querySelector("header.header")) {
       document.body.insertAdjacentHTML(
-        'afterbegin',
-        this.createFallbackNavigation()
+        "afterbegin",
+        this.createFallbackNavigation(),
       );
       this.reinitializeAfterInjection();
     }
@@ -1714,7 +1642,7 @@ class SharedNavigation {
 
       // Remove scroll event listener
       if (this.handleScroll) {
-        window.removeEventListener('scroll', this.handleScroll);
+        window.removeEventListener("scroll", this.handleScroll);
       }
 
       // Clear all timeouts and intervals
@@ -1742,12 +1670,12 @@ class SharedNavigation {
       this.loadingPromise = null;
       this.handleScroll = null;
 
-      this.logTelemetry('navigation_destroyed', {
+      this.logTelemetry("navigation_destroyed", {
         metrics: { ...this.metrics },
         lifetime: Date.now() - this.metrics.lastUpdate,
       });
     } catch (error) {
-      this.handleEnterpriseError(error, 'cleanup');
+      this.handleEnterpriseError(error, "cleanup");
     }
   }
 
@@ -1758,21 +1686,21 @@ class SharedNavigation {
     // This would be more comprehensive in a full implementation
     // For now, we document what should be cleaned up
     const eventTargets = [
-      '.nav-toggle',
-      '.nav-link',
-      '.dropdown-menu',
-      '.mega-menu',
-      '.nav-backdrop',
+      ".nav-toggle",
+      ".nav-link",
+      ".dropdown-menu",
+      ".mega-menu",
+      ".nav-backdrop",
     ];
 
-    eventTargets.forEach(selector => {
+    eventTargets.forEach((selector) => {
       const elements = document.querySelectorAll(selector);
-      elements.forEach(element => {
+      elements.forEach((element) => {
         // In a real implementation, we'd track and remove specific listeners
-        element.removeEventListener('click', () => {});
-        element.removeEventListener('keydown', () => {});
-        element.removeEventListener('mouseenter', () => {});
-        element.removeEventListener('mouseleave', () => {});
+        element.removeEventListener("click", () => {});
+        element.removeEventListener("keydown", () => {});
+        element.removeEventListener("mouseenter", () => {});
+        element.removeEventListener("mouseleave", () => {});
       });
     });
   }
@@ -1782,25 +1710,25 @@ class SharedNavigation {
    */
   validateAccessibility() {
     const issues = [];
-    const mainNav = document.querySelector('#main-navigation');
+    const mainNav = document.querySelector("#main-navigation");
 
     if (!mainNav) {
       issues.push({
-        level: 'error',
-        message: 'Main navigation container not found',
-        wcag: '1.3.1',
+        level: "error",
+        message: "Main navigation container not found",
+        wcag: "1.3.1",
       });
       return issues;
     }
 
     // Check for proper ARIA labels
-    const navLinks = mainNav.querySelectorAll('.nav-link');
+    const navLinks = mainNav.querySelectorAll(".nav-link");
     navLinks.forEach((link, index) => {
-      if (!link.getAttribute('aria-label') && !link.textContent.trim()) {
+      if (!link.getAttribute("aria-label") && !link.textContent.trim()) {
         issues.push({
-          level: 'error',
+          level: "error",
           message: `Navigation link ${index + 1} missing accessible text`,
-          wcag: '2.4.4',
+          wcag: "2.4.4",
           element: link,
         });
       }
@@ -1809,11 +1737,11 @@ class SharedNavigation {
     // Check dropdown accessibility
     const dropdownTriggers = mainNav.querySelectorAll('[aria-haspopup="true"]');
     dropdownTriggers.forEach((trigger, index) => {
-      if (!trigger.getAttribute('aria-expanded')) {
+      if (!trigger.getAttribute("aria-expanded")) {
         issues.push({
-          level: 'warning',
+          level: "warning",
           message: `Dropdown trigger ${index + 1} missing aria-expanded`,
-          wcag: '4.1.2',
+          wcag: "4.1.2",
           element: trigger,
         });
       }
@@ -1821,21 +1749,21 @@ class SharedNavigation {
 
     // Check keyboard navigation
     const focusableElements = mainNav.querySelectorAll(
-      'a, button, [tabindex]:not([tabindex="-1"])'
+      'a, button, [tabindex]:not([tabindex="-1"])',
     );
     if (focusableElements.length === 0) {
       issues.push({
-        level: 'error',
-        message: 'No focusable elements found in navigation',
-        wcag: '2.1.1',
+        level: "error",
+        message: "No focusable elements found in navigation",
+        wcag: "2.1.1",
       });
     }
 
     // Log accessibility audit results
-    this.logTelemetry('accessibility_audit', {
+    this.logTelemetry("accessibility_audit", {
       issueCount: issues.length,
-      errorCount: issues.filter(i => i.level === 'error').length,
-      warningCount: issues.filter(i => i.level === 'warning').length,
+      errorCount: issues.filter((i) => i.level === "error").length,
+      warningCount: issues.filter((i) => i.level === "warning").length,
       level: this.config.accessibilityLevel,
     });
 
@@ -1850,7 +1778,7 @@ class SharedNavigation {
     const performance = this.getPerformanceMetrics();
 
     return {
-      isHealthy: accessibility.filter(i => i.level === 'error').length === 0,
+      isHealthy: accessibility.filter((i) => i.level === "error").length === 0,
       accessibility: {
         score:
           accessibility.length === 0
@@ -1889,7 +1817,7 @@ class SharedNavigation {
    * Get memory usage if available
    */
   getMemoryUsage() {
-    if ('memory' in performance) {
+    if ("memory" in performance) {
       return {
         used: performance.memory.usedJSHeapSize,
         total: performance.memory.totalJSHeapSize,
@@ -1903,13 +1831,13 @@ class SharedNavigation {
    * Enterprise configuration validation
    */
   static validateConfig(config) {
-    const requiredFields = ['retryAttempts', 'retryDelay', 'performanceMode'];
-    const validPerformanceModes = ['high', 'balanced', 'compatibility'];
-    const validAccessibilityLevels = ['A', 'AA', 'AAA'];
+    const requiredFields = ["retryAttempts", "retryDelay", "performanceMode"];
+    const validPerformanceModes = ["high", "balanced", "compatibility"];
+    const validAccessibilityLevels = ["A", "AA", "AAA"];
 
     const errors = [];
 
-    requiredFields.forEach(field => {
+    requiredFields.forEach((field) => {
       if (!(field in config)) {
         errors.push(`Missing required field: ${field}`);
       }
@@ -1919,7 +1847,7 @@ class SharedNavigation {
       config.retryAttempts &&
       (config.retryAttempts < 1 || config.retryAttempts > 10)
     ) {
-      errors.push('retryAttempts must be between 1 and 10');
+      errors.push("retryAttempts must be between 1 and 10");
     }
 
     if (
@@ -1927,7 +1855,7 @@ class SharedNavigation {
       !validPerformanceModes.includes(config.performanceMode)
     ) {
       errors.push(
-        `performanceMode must be one of: ${validPerformanceModes.join(', ')}`
+        `performanceMode must be one of: ${validPerformanceModes.join(", ")}`,
       );
     }
 
@@ -1936,7 +1864,7 @@ class SharedNavigation {
       !validAccessibilityLevels.includes(config.accessibilityLevel)
     ) {
       errors.push(
-        `accessibilityLevel must be one of: ${validAccessibilityLevels.join(', ')}`
+        `accessibilityLevel must be one of: ${validAccessibilityLevels.join(", ")}`,
       );
     }
 
@@ -1950,14 +1878,14 @@ class SharedNavigation {
     // Check if user has moderation privileges
     if (!this.canModerate()) return;
 
-    const navList = document.querySelector('.nav-list');
+    const navList = document.querySelector(".nav-list");
     if (!navList) return;
 
     // Check if moderation link already exists
     if (document.querySelector('[data-page="moderation"]')) return;
 
     // Create moderation link
-    const moderationItem = document.createElement('li');
+    const moderationItem = document.createElement("li");
     moderationItem.innerHTML = `
       <a href="moderation.html" class="nav-link moderation-link" data-page="moderation">
         🛡️ Moderation
@@ -1980,11 +1908,11 @@ class SharedNavigation {
     const MODERATOR_TIER_THRESHOLD = 3;
 
     // Import auth service to check user privileges
-    if (typeof window !== 'undefined' && window.authService) {
+    if (typeof window !== "undefined" && window.authService) {
       const { userProfile } = window.authService;
       return (
-        userProfile?.role === 'moderator' ||
-        userProfile?.role === 'admin' ||
+        userProfile?.role === "moderator" ||
+        userProfile?.role === "admin" ||
         userProfile?.tier >= MODERATOR_TIER_THRESHOLD
       );
     }
@@ -2009,7 +1937,7 @@ SharedNavigation.Utils = {
       instances.push(window.sharedNav);
     }
 
-    return instances.map(instance => ({
+    return instances.map((instance) => ({
       id: instance.getSessionId(),
       health: instance.getHealthMetrics(),
       config: instance.config,
@@ -2020,20 +1948,20 @@ SharedNavigation.Utils = {
    * Debug navigation performance across the application
    */
   debugPerformance() {
-    const navigationEntries = performance.getEntriesByType('navigation');
-    const resourceEntries = performance.getEntriesByType('resource');
+    const navigationEntries = performance.getEntriesByType("navigation");
+    const resourceEntries = performance.getEntriesByType("resource");
 
     const navigationResources = resourceEntries.filter(
-      entry =>
-        entry.name.includes('navigation') ||
-        entry.name.includes('nav') ||
-        entry.name.includes('header')
+      (entry) =>
+        entry.name.includes("navigation") ||
+        entry.name.includes("nav") ||
+        entry.name.includes("header"),
     );
 
     return {
       navigation: navigationEntries,
       resources: navigationResources,
-      memory: 'memory' in performance ? performance.memory : null,
+      memory: "memory" in performance ? performance.memory : null,
       timing: performance.timing,
     };
   },
@@ -2041,10 +1969,10 @@ SharedNavigation.Utils = {
   /**
    * Accessibility compliance checker
    */
-  checkAccessibilityCompliance(level = 'AA') {
+  checkAccessibilityCompliance(level = "AA") {
     const nav = window.sharedNav;
     if (!nav) {
-      return { error: 'Navigation instance not found' };
+      return { error: "Navigation instance not found" };
     }
 
     const oldLevel = nav.config.accessibilityLevel;
@@ -2054,7 +1982,7 @@ SharedNavigation.Utils = {
 
     return {
       level,
-      compliant: results.filter(r => r.level === 'error').length === 0,
+      compliant: results.filter((r) => r.level === "error").length === 0,
       issues: results,
       recommendations:
         SharedNavigation.Utils.getAccessibilityRecommendations(results),
@@ -2067,26 +1995,26 @@ SharedNavigation.Utils = {
   getAccessibilityRecommendations(issues) {
     const recommendations = [];
 
-    issues.forEach(issue => {
+    issues.forEach((issue) => {
       switch (issue.wcag) {
-        case '1.3.1':
+        case "1.3.1":
           recommendations.push(
-            'Add semantic HTML structure with proper landmarks'
+            "Add semantic HTML structure with proper landmarks",
           );
           break;
-        case '2.4.4':
+        case "2.4.4":
           recommendations.push(
-            'Ensure all links have descriptive text or aria-labels'
+            "Ensure all links have descriptive text or aria-labels",
           );
           break;
-        case '4.1.2':
+        case "4.1.2":
           recommendations.push(
-            'Add proper ARIA states and properties to interactive elements'
+            "Add proper ARIA states and properties to interactive elements",
           );
           break;
-        case '2.1.1':
+        case "2.1.1":
           recommendations.push(
-            'Ensure all functionality is keyboard accessible'
+            "Ensure all functionality is keyboard accessible",
           );
           break;
         default:
@@ -2104,13 +2032,13 @@ SharedNavigation.Utils = {
     const healthCheck = SharedNavigation.Utils.globalHealthCheck();
     const performance = SharedNavigation.Utils.debugPerformance();
     const accessibility =
-      SharedNavigation.Utils.checkAccessibilityCompliance('AA');
+      SharedNavigation.Utils.checkAccessibilityCompliance("AA");
 
     return {
       timestamp: new Date().toISOString(),
       summary: {
         instanceCount: healthCheck.length,
-        overallHealth: healthCheck.every(h => h.health.isHealthy),
+        overallHealth: healthCheck.every((h) => h.health.isHealthy),
         accessibilityCompliant: accessibility.compliant,
         performanceGrade:
           SharedNavigation.Utils.calculatePerformanceGrade(performance),
@@ -2132,17 +2060,17 @@ SharedNavigation.Utils = {
    */
   calculatePerformanceGrade(performance) {
     if (!performance.navigation || performance.navigation.length === 0) {
-      return 'Unknown';
+      return "Unknown";
     }
 
     const nav = performance.navigation[0];
     const totalTime = nav.loadEventEnd - nav.navigationStart;
 
-    if (totalTime < 1000) return 'A+';
-    if (totalTime < 2000) return 'A';
-    if (totalTime < 3000) return 'B';
-    if (totalTime < 5000) return 'C';
-    return 'D';
+    if (totalTime < 1000) return "A+";
+    if (totalTime < 2000) return "A";
+    if (totalTime < 3000) return "B";
+    if (totalTime < 5000) return "C";
+    return "D";
   },
 
   /**
@@ -2153,20 +2081,20 @@ SharedNavigation.Utils = {
 
     if (performance.resources.length > 10) {
       recommendations.push(
-        'Consider reducing the number of navigation-related resources'
+        "Consider reducing the number of navigation-related resources",
       );
     }
 
     if (performance.memory && performance.memory.used > 50 * 1024 * 1024) {
       recommendations.push(
-        'Monitor memory usage - navigation components using significant memory'
+        "Monitor memory usage - navigation components using significant memory",
       );
     }
 
     const nav = performance.navigation[0];
     if (nav && nav.loadEventEnd - nav.navigationStart > 3000) {
       recommendations.push(
-        'Navigation loading time is slow - consider optimizing resource loading'
+        "Navigation loading time is slow - consider optimizing resource loading",
       );
     }
 
@@ -2190,7 +2118,7 @@ SharedNavigation.Monitor = {
   register(instance) {
     this.instances.add(instance);
     console.log(
-      `[Navigation Monitor] Registered instance: ${instance.getSessionId()}`
+      `[Navigation Monitor] Registered instance: ${instance.getSessionId()}`,
     );
   },
 
@@ -2200,7 +2128,7 @@ SharedNavigation.Monitor = {
   unregister(instance) {
     this.instances.delete(instance);
     console.log(
-      `[Navigation Monitor] Unregistered instance: ${instance.getSessionId()}`
+      `[Navigation Monitor] Unregistered instance: ${instance.getSessionId()}`,
     );
   },
 
@@ -2218,7 +2146,7 @@ SharedNavigation.Monitor = {
 
     let initTimeSum = 0;
 
-    this.instances.forEach(instance => {
+    this.instances.forEach((instance) => {
       const metrics = instance.metrics;
       telemetry.totalErrors += metrics.errorCount;
       telemetry.totalNavigations += metrics.navigationChanges;
@@ -2238,11 +2166,11 @@ SharedNavigation.Monitor = {
   startMonitoring(intervalMs = 60000) {
     this.monitoringInterval = setInterval(() => {
       const telemetry = this.getAggregatedTelemetry();
-      console.log('[Navigation Monitor] Telemetry:', telemetry);
+      console.log("[Navigation Monitor] Telemetry:", telemetry);
 
       // Send to external monitoring service if available
       if (window.enterpriseMonitoring) {
-        window.enterpriseMonitoring.send('navigation_telemetry', telemetry);
+        window.enterpriseMonitoring.send("navigation_telemetry", telemetry);
       }
     }, intervalMs);
   },
@@ -2271,8 +2199,8 @@ window.debugMobileNav = function () {
 };
 
 // Auto-initialize if DOM is ready - with better duplicate prevention
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => {
     if (!window.sharedNav) {
       window.sharedNav = new SharedNavigation();
       window.sharedNav.init();
