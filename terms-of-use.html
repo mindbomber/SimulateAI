@@ -20,7 +20,7 @@
 
       body {
         font-family:
-          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
           Cantarell, sans-serif;
         line-height: 1.7;
         color: #333;
@@ -59,7 +59,7 @@
       }
 
       .terms-header::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
@@ -126,7 +126,7 @@
       }
 
       .terms-nav li::before {
-        content: counter(section-counter) '. ';
+        content: counter(section-counter) ". ";
         font-weight: 600;
         color: #1a73e8;
       }
@@ -195,7 +195,7 @@
       }
 
       .highlight-box::before {
-        content: '💡';
+        content: "💡";
         position: absolute;
         top: -10px;
         left: 20px;
@@ -210,7 +210,7 @@
       }
 
       .highlight-box.warning::before {
-        content: '⚠️';
+        content: "⚠️";
       }
 
       .highlight-box.important {
@@ -219,7 +219,7 @@
       }
 
       .highlight-box.important::before {
-        content: '🔒';
+        content: "🔒";
       }
 
       .research-section {
@@ -545,8 +545,8 @@
           <p>
             <strong>Voluntary Participation:</strong> Participation is
             voluntary. You may opt out at any time by contacting
-            <a href="mailto:research@simulateai.org" style="color: #1a73e8"
-              >research@simulateai.org</a
+            <a href="mailto:research@simulateai.io" style="color: #1a73e8"
+              >research@simulateai.io</a
             >.
           </p>
 
@@ -607,8 +607,8 @@
           </ul>
           <p>
             Contact us for specific permissions at
-            <a href="mailto:support@simulateai.org" style="color: #1a73e8"
-              >support@simulateai.org</a
+            <a href="mailto:research@simulateai.io" style="color: #1a73e8"
+              >research@simulateai.io</a
             >
           </p>
         </div>
@@ -673,8 +673,8 @@
                 <p>
                   Platform questions, technical issues, and general inquiries
                 </p>
-                <a href="mailto:support@simulateai.org"
-                  >support@simulateai.org</a
+                <a href="mailto:research@simulateai.io"
+                  >research@simulateai.io</a
                 >
               </div>
 
@@ -683,15 +683,17 @@
                 <p>
                   Research participation, consent questions, and study inquiries
                 </p>
-                <a href="mailto:research@simulateai.org"
-                  >research@simulateai.org</a
+                <a href="mailto:research@simulateai.io"
+                  >research@simulateai.io</a
                 >
               </div>
 
               <div class="contact-item">
                 <h4>⚖️ Legal Matters</h4>
                 <p>Terms of use, privacy concerns, and legal inquiries</p>
-                <a href="mailto:legal@simulateai.org">legal@simulateai.org</a>
+                <a href="mailto:research@simulateai.io"
+                  >research@simulateai.io</a
+                >
               </div>
             </div>
           </div>
@@ -725,51 +727,51 @@
 
     <script>
       // Set current date for effective date
-      document.addEventListener('DOMContentLoaded', function () {
+      document.addEventListener("DOMContentLoaded", function () {
         const now = new Date();
-        const dateString = now.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
+        const dateString = now.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
         });
 
-        document.getElementById('effectiveDate').textContent = dateString;
-        document.getElementById('lastUpdated').textContent = dateString;
+        document.getElementById("effectiveDate").textContent = dateString;
+        document.getElementById("lastUpdated").textContent = dateString;
       });
 
       // Smooth scrolling for navigation links
-      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
           e.preventDefault();
-          const target = document.querySelector(this.getAttribute('href'));
+          const target = document.querySelector(this.getAttribute("href"));
           if (target) {
             target.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
+              behavior: "smooth",
+              block: "start",
             });
           }
         });
       });
 
       // Highlight current section on scroll
-      window.addEventListener('scroll', function () {
-        const sections = document.querySelectorAll('.section');
-        const navLinks = document.querySelectorAll('.terms-nav a');
+      window.addEventListener("scroll", function () {
+        const sections = document.querySelectorAll(".section");
+        const navLinks = document.querySelectorAll(".terms-nav a");
 
-        let current = '';
-        sections.forEach(section => {
+        let current = "";
+        sections.forEach((section) => {
           const sectionTop = section.offsetTop;
           if (pageYOffset >= sectionTop - 150) {
-            current = section.getAttribute('id');
+            current = section.getAttribute("id");
           }
         });
 
-        navLinks.forEach(link => {
-          link.style.fontWeight = 'normal';
-          link.style.color = '#333';
-          if (link.getAttribute('href') === `#${current}`) {
-            link.style.fontWeight = '600';
-            link.style.color = '#1a73e8';
+        navLinks.forEach((link) => {
+          link.style.fontWeight = "normal";
+          link.style.color = "#333";
+          if (link.getAttribute("href") === `#${current}`) {
+            link.style.fontWeight = "600";
+            link.style.color = "#1a73e8";
           }
         });
       });
@@ -780,12 +782,12 @@
       }
 
       // Add print button
-      const printButton = document.createElement('button');
-      printButton.innerHTML = '🖨️ Print Terms';
-      printButton.className = 'btn';
-      printButton.style.marginLeft = '15px';
+      const printButton = document.createElement("button");
+      printButton.innerHTML = "🖨️ Print Terms";
+      printButton.className = "btn";
+      printButton.style.marginLeft = "15px";
       printButton.onclick = printTerms;
-      document.querySelector('.back-to-platform').appendChild(printButton);
+      document.querySelector(".back-to-platform").appendChild(printButton);
     </script>
   </body>
 </html>

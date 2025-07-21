@@ -119,7 +119,7 @@ limitations under the License.
               <h3>📧 Email Request</h3>
               <p>Send us a deletion request via email</p>
               <a
-                href="mailto:privacy@simulateai.org?subject=Data%20Deletion%20Request&body=Please%20delete%20all%20my%20personal%20data%20from%20SimulateAI.%0A%0AAccount%20email%3A%20%5Byour-email%5D%0ARequest%20date%3A%20%5Btoday%27s-date%5D%0A%0AConfirmation%3A%20I%20understand%20this%20will%20permanently%20delete%20all%20my%20learning%20progress%20and%20cannot%20be%20undone."
+                href="mailto:research@simulateai.io?subject=Data%20Deletion%20Request&body=Please%20delete%20all%20my%20personal%20data%20from%20SimulateAI.%0A%0AAccount%20email%3A%20%5Byour-email%5D%0ARequest%20date%3A%20%5Btoday%27s-date%5D%0A%0AConfirmation%3A%20I%20understand%20this%20will%20permanently%20delete%20all%20my%20learning%20progress%20and%20cannot%20be%20undone."
                 class="btn btn-outline"
               >
                 Send Email Request
@@ -538,8 +538,8 @@ limitations under the License.
               </ul>
               <p>
                 <strong>Contact:</strong>
-                <a href="mailto:educators@simulateai.org"
-                  >educators@simulateai.org</a
+                <a href="mailto:research@simulateai.io"
+                  >research@simulateai.io</a
                 >
               </p>
             </div>
@@ -555,8 +555,8 @@ limitations under the License.
               </ul>
               <p>
                 <strong>Contact:</strong>
-                <a href="mailto:privacy@simulateai.org"
-                  >privacy@simulateai.org</a
+                <a href="mailto:research@simulateai.io"
+                  >research@simulateai.io</a
                 >
               </p>
             </div>
@@ -571,8 +571,8 @@ limitations under the License.
               <h3>General Questions</h3>
               <p>Questions about the deletion process or your rights</p>
               <div class="contact-methods">
-                <a href="mailto:privacy@simulateai.org" class="contact-link">
-                  📧 privacy@simulateai.org
+                <a href="mailto:research@simulateai.io" class="contact-link">
+                  📧 research@simulateai.io
                 </a>
               </div>
             </div>
@@ -581,8 +581,8 @@ limitations under the License.
               <h3>Educational Institutions</h3>
               <p>Schools, districts, and educational organizations</p>
               <div class="contact-methods">
-                <a href="mailto:educators@simulateai.org" class="contact-link">
-                  🎓 educators@simulateai.org
+                <a href="mailto:research@simulateai.io" class="contact-link">
+                  🎓 research@simulateai.io
                 </a>
               </div>
             </div>
@@ -591,8 +591,8 @@ limitations under the License.
               <h3>Technical Issues</h3>
               <p>Problems with the deletion form or process</p>
               <div class="contact-methods">
-                <a href="mailto:support@simulateai.org" class="contact-link">
-                  🔧 support@simulateai.org
+                <a href="mailto:research@simulateai.io" class="contact-link">
+                  🔧 research@simulateai.io
                 </a>
               </div>
             </div>
@@ -615,56 +615,56 @@ limitations under the License.
     <script>
       // Show instant deletion option for signed-in users
       function showInstantDeleteOption() {
-        document.getElementById('instant-deletion-section').style.display =
-          'block';
+        document.getElementById("instant-deletion-section").style.display =
+          "block";
         document
-          .getElementById('instant-deletion-section')
-          .scrollIntoView({ behavior: 'smooth' });
+          .getElementById("instant-deletion-section")
+          .scrollIntoView({ behavior: "smooth" });
       }
 
       function hideInstantDeleteOption() {
-        document.getElementById('instant-deletion-section').style.display =
-          'none';
+        document.getElementById("instant-deletion-section").style.display =
+          "none";
       }
 
       // Show deletion form
       function showDeletionForm() {
-        document.getElementById('deletion-form-section').style.display =
-          'block';
+        document.getElementById("deletion-form-section").style.display =
+          "block";
         document
-          .getElementById('deletion-form-section')
-          .scrollIntoView({ behavior: 'smooth' });
+          .getElementById("deletion-form-section")
+          .scrollIntoView({ behavior: "smooth" });
       }
 
       function hideDeletionForm() {
-        document.getElementById('deletion-form-section').style.display = 'none';
+        document.getElementById("deletion-form-section").style.display = "none";
       }
 
       // Enable instant delete button when all checkboxes are checked
-      document.addEventListener('DOMContentLoaded', function () {
+      document.addEventListener("DOMContentLoaded", function () {
         const checkboxes = document.querySelectorAll(
-          '#instant-deletion-section input[type="checkbox"]'
+          '#instant-deletion-section input[type="checkbox"]',
         );
-        const deleteButton = document.getElementById('confirm-instant-delete');
+        const deleteButton = document.getElementById("confirm-instant-delete");
 
         function updateDeleteButton() {
-          const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+          const allChecked = Array.from(checkboxes).every((cb) => cb.checked);
           deleteButton.disabled = !allChecked;
         }
 
-        checkboxes.forEach(checkbox => {
-          checkbox.addEventListener('change', updateDeleteButton);
+        checkboxes.forEach((checkbox) => {
+          checkbox.addEventListener("change", updateDeleteButton);
         });
 
         // Form validation
-        const form = document.getElementById('deletion-request-form');
+        const form = document.getElementById("deletion-request-form");
         if (form) {
-          form.addEventListener('submit', handleFormSubmission);
+          form.addEventListener("submit", handleFormSubmission);
         }
 
         // Email confirmation validation
-        const emailInput = document.getElementById('requester-email');
-        const confirmEmailInput = document.getElementById('confirmation-email');
+        const emailInput = document.getElementById("requester-email");
+        const confirmEmailInput = document.getElementById("confirmation-email");
 
         if (emailInput && confirmEmailInput) {
           function validateEmails() {
@@ -673,15 +673,15 @@ limitations under the License.
               emailInput.value !== confirmEmailInput.value
             ) {
               confirmEmailInput.setCustomValidity(
-                'Email addresses do not match'
+                "Email addresses do not match",
               );
             } else {
-              confirmEmailInput.setCustomValidity('');
+              confirmEmailInput.setCustomValidity("");
             }
           }
 
-          emailInput.addEventListener('input', validateEmails);
-          confirmEmailInput.addEventListener('input', validateEmails);
+          emailInput.addEventListener("input", validateEmails);
+          confirmEmailInput.addEventListener("input", validateEmails);
         }
       });
 
@@ -689,9 +689,9 @@ limitations under the License.
       async function processInstantDeletion() {
         try {
           // Show loading state
-          const button = document.getElementById('confirm-instant-delete');
+          const button = document.getElementById("confirm-instant-delete");
           const originalText = button.textContent;
-          button.textContent = 'Deleting...';
+          button.textContent = "Deleting...";
           button.disabled = true;
 
           // Check if user is signed in and get auth service
@@ -701,27 +701,27 @@ limitations under the License.
 
             // Show success message
             showNotification(
-              'Your data has been successfully deleted. You will be redirected to the home page.',
-              'success'
+              "Your data has been successfully deleted. You will be redirected to the home page.",
+              "success",
             );
 
             // Redirect after 3 seconds
             setTimeout(() => {
-              window.location.href = 'app.html';
+              window.location.href = "app.html";
             }, 3000);
           } else {
-            throw new Error('No authenticated user found');
+            throw new Error("No authenticated user found");
           }
         } catch (error) {
-          console.error('Error during instant deletion:', error);
+          console.error("Error during instant deletion:", error);
           showNotification(
-            'An error occurred during deletion. Please try the email or form method instead.',
-            'error'
+            "An error occurred during deletion. Please try the email or form method instead.",
+            "error",
           );
 
           // Reset button
-          const button = document.getElementById('confirm-instant-delete');
-          button.textContent = '🗑️ Delete All My Data';
+          const button = document.getElementById("confirm-instant-delete");
+          button.textContent = "🗑️ Delete All My Data";
           button.disabled = false;
         }
       }
@@ -737,10 +737,10 @@ limitations under the License.
         try {
           // Show loading state
           const submitButton = document.getElementById(
-            'submit-deletion-request'
+            "submit-deletion-request",
           );
           const originalText = submitButton.textContent;
-          submitButton.textContent = 'Submitting...';
+          submitButton.textContent = "Submitting...";
           submitButton.disabled = true;
 
           // Here you would normally send the data to your backend
@@ -749,25 +749,25 @@ limitations under the License.
 
           // Show success message
           showNotification(
-            'Your deletion request has been submitted successfully. You will receive a confirmation email within 24 hours.',
-            'success'
+            "Your deletion request has been submitted successfully. You will receive a confirmation email within 24 hours.",
+            "success",
           );
 
           // Reset form
           form.reset();
           hideDeletionForm();
         } catch (error) {
-          console.error('Error submitting deletion request:', error);
+          console.error("Error submitting deletion request:", error);
           showNotification(
-            'An error occurred while submitting your request. Please try again or contact us directly at privacy@simulateai.org',
-            'error'
+            "An error occurred while submitting your request. Please try again or contact us directly at research@simulateai.io",
+            "error",
           );
         } finally {
           // Reset button
           const submitButton = document.getElementById(
-            'submit-deletion-request'
+            "submit-deletion-request",
           );
-          submitButton.textContent = '🗑️ Submit Deletion Request';
+          submitButton.textContent = "🗑️ Submit Deletion Request";
           submitButton.disabled = false;
         }
       }
@@ -781,16 +781,16 @@ limitations under the License.
               // 90% success rate
               resolve(data);
             } else {
-              reject(new Error('Simulated network error'));
+              reject(new Error("Simulated network error"));
             }
           }, 2000); // 2 second delay
         });
       }
 
       // Show notification
-      function showNotification(message, type = 'info') {
+      function showNotification(message, type = "info") {
         // Create notification element
-        const notification = document.createElement('div');
+        const notification = document.createElement("div");
         notification.className = `notification notification-${type}`;
         notification.innerHTML = `
                 <div class="notification-content">
@@ -947,7 +947,7 @@ limitations under the License.
         background: #f8f9fa;
       }
 
-      .checkbox-container input[type='checkbox'] {
+      .checkbox-container input[type="checkbox"] {
         margin-right: 0.8rem;
         margin-top: 0.2rem;
         transform: scale(1.2);
@@ -995,7 +995,7 @@ limitations under the License.
       }
 
       .form-label.required::after {
-        content: ' *';
+        content: " *";
         color: #dc3545;
       }
 
@@ -1042,7 +1042,7 @@ limitations under the License.
       }
 
       .timeline::before {
-        content: '';
+        content: "";
         position: absolute;
         left: 2rem;
         top: 0;

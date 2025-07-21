@@ -54,7 +54,7 @@
 
       body {
         font-family:
-          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
           Cantarell, sans-serif;
         line-height: 1.6;
         color: #333;
@@ -73,7 +73,7 @@
       }
 
       .hero::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
@@ -609,7 +609,7 @@
       }
 
       .ripple-portal::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 10%;
         left: 10%;
@@ -626,7 +626,7 @@
       }
 
       .ripple-portal::after {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
@@ -764,7 +764,7 @@
       }
 
       .cta-primary::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 50%;
         left: 50%;
@@ -1196,7 +1196,7 @@
           <a href="research-consent.html" class="community-button">
             💳 Donate & Join Study
           </a>
-          <a href="mailto:support@simulateai.org" class="community-button">
+          <a href="mailto:research@simulateai.io" class="community-button">
             💬 Contact Us
           </a>
         </div>
@@ -1221,64 +1221,64 @@
     <script>
       // Floating Emojis Animation
       function createFloatingEmojis() {
-        const container = document.getElementById('floatingEmojis');
+        const container = document.getElementById("floatingEmojis");
         if (!container) return;
 
         // Performance check - disable on low-end devices or reduced motion preference
         if (
           navigator.hardwareConcurrency < 4 ||
-          window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
           navigator.deviceMemory < 4 // Less than 4GB RAM
         ) {
-          console.log('🔧 Floating emojis disabled for performance');
+          console.log("🔧 Floating emojis disabled for performance");
           return;
         }
 
         // AI and tech-themed emojis
         const emojis = [
-          '🤖',
-          '🧠',
-          '💡',
-          '🧬',
-          '🔬',
-          '🚀',
-          '💻',
-          '📱',
-          '🔍',
-          '🎮',
-          '🌐',
-          '📝',
-          '⭐',
-          '🧪',
-          '📡',
-          '🛰️',
-          '🌍',
-          '⚖️',
-          '📙',
-          '🤔',
-          '🧾',
-          '🧭',
-          '🎓',
-          '🌟',
-          '✨',
-          '🖋️',
-          '🖥️',
-          '💭',
-          '✏️',
-          '🌱',
+          "🤖",
+          "🧠",
+          "💡",
+          "🧬",
+          "🔬",
+          "🚀",
+          "💻",
+          "📱",
+          "🔍",
+          "🎮",
+          "🌐",
+          "📝",
+          "⭐",
+          "🧪",
+          "📡",
+          "🛰️",
+          "🌍",
+          "⚖️",
+          "📙",
+          "🤔",
+          "🧾",
+          "🧭",
+          "🎓",
+          "🌟",
+          "✨",
+          "🖋️",
+          "🖥️",
+          "💭",
+          "✏️",
+          "🌱",
         ];
 
         // Create floating emojis at intervals
         function spawnEmoji() {
-          const emoji = document.createElement('div');
-          emoji.className = 'floating-emoji';
+          const emoji = document.createElement("div");
+          emoji.className = "floating-emoji";
 
           // Random emoji from our theme
           emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
 
           // Random horizontal starting position (avoid edges)
           const startX = 5 + Math.random() * 90; // 5% to 95%
-          emoji.style.left = startX + '%';
+          emoji.style.left = startX + "%";
 
           // Simplified randomness for better performance
           const driftAmount = (Math.random() - 0.5) * 60; // -30px to +30px drift
@@ -1290,44 +1290,44 @@
           const rotationDirection = Math.random() < 0.5 ? 360 : -360; // 50% chance each direction
 
           // Set CSS custom properties for animation
-          emoji.style.setProperty('--drift-x', `${driftAmount}px`);
-          emoji.style.setProperty('--wiggle-intensity', `${wiggleIntensity}px`);
-          emoji.style.setProperty('--max-opacity', opacityVariation);
-          emoji.style.setProperty('--scale-variation', scaleVariation);
+          emoji.style.setProperty("--drift-x", `${driftAmount}px`);
+          emoji.style.setProperty("--wiggle-intensity", `${wiggleIntensity}px`);
+          emoji.style.setProperty("--max-opacity", opacityVariation);
+          emoji.style.setProperty("--scale-variation", scaleVariation);
           emoji.style.setProperty(
-            '--rotation-direction',
-            `${rotationDirection}deg`
+            "--rotation-direction",
+            `${rotationDirection}deg`,
           );
 
           // Random size for varied bubbling effect
           const sizeRandom = Math.random();
           let animationDuration;
           if (sizeRandom < 0.2) {
-            emoji.classList.add('tiny');
+            emoji.classList.add("tiny");
             animationDuration = 12; // Fixed duration for performance
           } else if (sizeRandom < 0.4) {
-            emoji.classList.add('small');
+            emoji.classList.add("small");
             animationDuration = 14;
           } else if (sizeRandom < 0.6) {
-            emoji.classList.add('medium');
+            emoji.classList.add("medium");
             animationDuration = 16;
           } else if (sizeRandom < 0.8) {
-            emoji.classList.add('large');
+            emoji.classList.add("large");
             animationDuration = 18;
           } else {
-            emoji.classList.add('big');
+            emoji.classList.add("big");
             animationDuration = 20;
           }
 
           // Set fixed animation duration
-          emoji.style.animationDuration = animationDuration + 's';
+          emoji.style.animationDuration = animationDuration + "s";
 
           // Random animation delay for natural timing
-          emoji.style.animationDelay = Math.random() * 2 + 's'; // Reduced delay range
+          emoji.style.animationDelay = Math.random() * 2 + "s"; // Reduced delay range
 
           // Random starting rotation (simplified)
           const startRotation = Math.random() * 360;
-          emoji.style.setProperty('--start-rotation', `${startRotation}deg`);
+          emoji.style.setProperty("--start-rotation", `${startRotation}deg`);
 
           container.appendChild(emoji);
 
@@ -1338,7 +1338,7 @@
                 emoji.parentNode.removeChild(emoji);
               }
             },
-            (animationDuration + 2) * 1000 // Duration + smaller delay buffer
+            (animationDuration + 2) * 1000, // Duration + smaller delay buffer
           );
         }
 
@@ -1363,47 +1363,47 @@
       }
 
       // Start emoji animation when page loads
-      document.addEventListener('DOMContentLoaded', createFloatingEmojis);
+      document.addEventListener("DOMContentLoaded", createFloatingEmojis);
 
       // Handle Begin Simulation button click with portal transition
       document
-        .getElementById('beginSimulationBtn')
-        .addEventListener('click', function (e) {
+        .getElementById("beginSimulationBtn")
+        .addEventListener("click", function (e) {
           e.preventDefault();
 
           // Create water droplet portal transition
           createPortalTransition(e, () => {
             // Mark that user is coming from home page for first-time experience
-            localStorage.setItem('from_home_page', 'true');
+            localStorage.setItem("from_home_page", "true");
 
             // Clear any existing tour completion to ensure tour starts for new users
-            if (!localStorage.getItem('has_visited')) {
-              localStorage.removeItem('tour_completed');
+            if (!localStorage.getItem("has_visited")) {
+              localStorage.removeItem("tour_completed");
             }
 
             // Navigate to main application
-            window.location.href = 'app.html';
+            window.location.href = "app.html";
           });
         });
 
       // Handle Start Exploring button click (same functionality)
       document
-        .getElementById('startExploringBtn')
-        .addEventListener('click', function (e) {
+        .getElementById("startExploringBtn")
+        .addEventListener("click", function (e) {
           e.preventDefault();
 
           // Create portal transition for consistency
           createPortalTransition(e, () => {
             // Mark that user is coming from home page
-            localStorage.setItem('from_home_page', 'true');
+            localStorage.setItem("from_home_page", "true");
 
             // Clear any existing tour completion to ensure tour starts for new users
-            if (!localStorage.getItem('has_visited')) {
-              localStorage.removeItem('tour_completed');
+            if (!localStorage.getItem("has_visited")) {
+              localStorage.removeItem("tour_completed");
             }
 
             // Navigate to main application
-            window.location.href = 'app.html';
+            window.location.href = "app.html";
           });
         });
 
@@ -1419,17 +1419,17 @@
         const clickYPercent = (clickY / window.innerHeight) * 100;
 
         // Create screen distortion overlay
-        const distortion = document.createElement('div');
-        distortion.className = 'screen-distortion';
-        distortion.style.setProperty('--click-x', clickXPercent + '%');
-        distortion.style.setProperty('--click-y', clickYPercent + '%');
+        const distortion = document.createElement("div");
+        distortion.className = "screen-distortion";
+        distortion.style.setProperty("--click-x", clickXPercent + "%");
+        distortion.style.setProperty("--click-y", clickYPercent + "%");
         document.body.appendChild(distortion);
 
         // Create main ripple portal
-        const ripple = document.createElement('div');
-        ripple.className = 'ripple-portal';
-        ripple.style.setProperty('--click-x', clickXPercent + '%');
-        ripple.style.setProperty('--click-y', clickYPercent + '%');
+        const ripple = document.createElement("div");
+        ripple.className = "ripple-portal";
+        ripple.style.setProperty("--click-x", clickXPercent + "%");
+        ripple.style.setProperty("--click-y", clickYPercent + "%");
         document.body.appendChild(ripple);
 
         // Portal loading indicator removed per user request
@@ -1452,7 +1452,7 @@
         // document.body.appendChild(loading);
 
         // Add subtle haptic feedback if supported
-        if ('vibrate' in navigator) {
+        if ("vibrate" in navigator) {
           navigator.vibrate([30, 10, 30]);
         }
 
@@ -1481,12 +1481,12 @@
       // Portal sound function removed per user request
 
       // Smooth scrolling for anchor links
-      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-          const href = this.getAttribute('href');
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          const href = this.getAttribute("href");
 
           // Skip if href is just "#" or empty
-          if (!href || href === '#') {
+          if (!href || href === "#") {
             return;
           }
 
@@ -1494,8 +1494,8 @@
           const target = document.querySelector(href);
           if (target) {
             target.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
+              behavior: "smooth",
+              block: "start",
             });
           }
         });
@@ -1504,52 +1504,52 @@
       // Intersection Observer for fade-in animations
       const observerOptions = {
         threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px',
+        rootMargin: "0px 0px -50px 0px",
       };
 
-      const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
+            entry.target.classList.add("visible");
           }
         });
       }, observerOptions);
 
       // Observe all fade-in elements
-      document.querySelectorAll('.fade-in').forEach(el => {
+      document.querySelectorAll(".fade-in").forEach((el) => {
         observer.observe(el);
       });
 
       // Add enhanced interactive feedback with portal preview
       document
-        .querySelectorAll('.cta-button, .community-button')
-        .forEach(button => {
-          button.addEventListener('mouseenter', function () {
-            this.style.transform = this.classList.contains('cta-primary')
-              ? 'translateY(-3px)'
-              : 'translateY(-2px)';
+        .querySelectorAll(".cta-button, .community-button")
+        .forEach((button) => {
+          button.addEventListener("mouseenter", function () {
+            this.style.transform = this.classList.contains("cta-primary")
+              ? "translateY(-3px)"
+              : "translateY(-2px)";
 
             // Add subtle pulse effect for primary buttons
-            if (this.classList.contains('cta-primary')) {
+            if (this.classList.contains("cta-primary")) {
               this.style.boxShadow =
-                '0 12px 35px rgba(255, 107, 107, 0.4), 0 0 20px rgba(26, 115, 232, 0.2)';
+                "0 12px 35px rgba(255, 107, 107, 0.4), 0 0 20px rgba(26, 115, 232, 0.2)";
             }
           });
 
-          button.addEventListener('mouseleave', function () {
-            this.style.transform = 'translateY(0)';
+          button.addEventListener("mouseleave", function () {
+            this.style.transform = "translateY(0)";
 
             // Reset shadow
-            if (this.classList.contains('cta-primary')) {
-              this.style.boxShadow = '0 8px 25px rgba(255, 107, 107, 0.3)';
+            if (this.classList.contains("cta-primary")) {
+              this.style.boxShadow = "0 8px 25px rgba(255, 107, 107, 0.3)";
             }
           });
 
           // Add ripple effect on click for all buttons (subtle preview of portal)
-          button.addEventListener('click', function (e) {
+          button.addEventListener("click", function (e) {
             if (
-              !this.id.includes('beginSimulationBtn') &&
-              !this.id.includes('startExploringBtn')
+              !this.id.includes("beginSimulationBtn") &&
+              !this.id.includes("startExploringBtn")
             ) {
               // Create a subtle ripple for non-portal buttons
               const rect = this.getBoundingClientRect();
@@ -1557,7 +1557,7 @@
               const x = e.clientX - rect.left - size / 2;
               const y = e.clientY - rect.top - size / 2;
 
-              const ripple = document.createElement('div');
+              const ripple = document.createElement("div");
               ripple.style.cssText = `
                 position: absolute;
                 width: ${size}px;
@@ -1572,8 +1572,8 @@
                 z-index: 1;
               `;
 
-              this.style.position = 'relative';
-              this.style.overflow = 'hidden';
+              this.style.position = "relative";
+              this.style.overflow = "hidden";
               this.appendChild(ripple);
 
               setTimeout(() => {
@@ -1584,7 +1584,7 @@
         });
 
       // Add button ripple animation
-      const style = document.createElement('style');
+      const style = document.createElement("style");
       style.textContent = `
         @keyframes buttonRipple {
           to {
@@ -1599,7 +1599,7 @@
       let engagementStartTime = Date.now();
       let maxScrollDepth = 0;
 
-      window.addEventListener('scroll', () => {
+      window.addEventListener("scroll", () => {
         const scrollPercent =
           (window.scrollY /
             (document.documentElement.scrollHeight - window.innerHeight)) *
@@ -1608,16 +1608,16 @@
       });
 
       // Log engagement when user leaves (for future analytics)
-      window.addEventListener('beforeunload', () => {
+      window.addEventListener("beforeunload", () => {
         const timeSpent = Date.now() - engagementStartTime;
         console.log(
-          `Page engagement: ${timeSpent}ms, max scroll: ${maxScrollDepth.toFixed(1)}%`
+          `Page engagement: ${timeSpent}ms, max scroll: ${maxScrollDepth.toFixed(1)}%`,
         );
       });
 
       // Keyboard navigation enhancement
-      document.addEventListener('keydown', e => {
-        if (e.key === 'Enter' && e.target.tagName === 'A') {
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && e.target.tagName === "A") {
           e.target.click();
         }
       });
@@ -1625,28 +1625,28 @@
 
     <!-- PWA Service Worker Registration -->
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', async () => {
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", async () => {
           try {
             const registration = await navigator.serviceWorker.register(
-              './sw.js',
+              "./sw.js",
               {
-                scope: '/SimulateAI/',
-              }
+                scope: "/SimulateAI/",
+              },
             );
 
             console.log(
-              '🔥 Service Worker registered successfully:',
-              registration.scope
+              "🔥 Service Worker registered successfully:",
+              registration.scope,
             );
 
             // Handle service worker updates
-            registration.addEventListener('updatefound', () => {
+            registration.addEventListener("updatefound", () => {
               const newWorker = registration.installing;
               if (newWorker) {
-                newWorker.addEventListener('statechange', () => {
+                newWorker.addEventListener("statechange", () => {
                   if (
-                    newWorker.state === 'installed' &&
+                    newWorker.state === "installed" &&
                     navigator.serviceWorker.controller
                   ) {
                     // New content is available, show update notification
@@ -1661,13 +1661,13 @@
               showUpdateNotification();
             }
           } catch (error) {
-            console.warn('🚨 Service Worker registration failed:', error);
+            console.warn("🚨 Service Worker registration failed:", error);
           }
         });
 
         // Show update notification
         function showUpdateNotification() {
-          const updateBanner = document.createElement('div');
+          const updateBanner = document.createElement("div");
           updateBanner.innerHTML = `
             <div style="
               position: fixed;
@@ -1710,7 +1710,7 @@
       // PWA Install Prompt
       let deferredPrompt;
 
-      window.addEventListener('beforeinstallprompt', e => {
+      window.addEventListener("beforeinstallprompt", (e) => {
         // Prevent the mini-infobar from appearing on mobile
         e.preventDefault();
         deferredPrompt = e;
@@ -1721,11 +1721,11 @@
 
       function showInstallPrompt() {
         // Only show if not already installed
-        if (window.matchMedia('(display-mode: standalone)').matches) {
+        if (window.matchMedia("(display-mode: standalone)").matches) {
           return; // Already installed
         }
 
-        const installBanner = document.createElement('div');
+        const installBanner = document.createElement("div");
         installBanner.innerHTML = `
           <div id="pwa-install-banner" style="
             position: fixed;
@@ -1771,52 +1771,52 @@
 
         // Handle install button click
         document
-          .getElementById('install-app-btn')
-          .addEventListener('click', async () => {
+          .getElementById("install-app-btn")
+          .addEventListener("click", async () => {
             if (deferredPrompt) {
               deferredPrompt.prompt();
               const { outcome } = await deferredPrompt.userChoice;
 
-              if (outcome === 'accepted') {
-                console.log('🎉 PWA installed successfully');
+              if (outcome === "accepted") {
+                console.log("🎉 PWA installed successfully");
                 // Track installation
                 if (window.gtag) {
-                  gtag('event', 'pwa_install', {
-                    event_category: 'PWA',
-                    event_label: 'install_accepted',
+                  gtag("event", "pwa_install", {
+                    event_category: "PWA",
+                    event_label: "install_accepted",
                   });
                 }
               }
 
               deferredPrompt = null;
-              document.getElementById('pwa-install-banner').remove();
+              document.getElementById("pwa-install-banner").remove();
             }
           });
       }
 
       // Track PWA usage
-      window.addEventListener('appinstalled', () => {
-        console.log('🎉 PWA was installed');
+      window.addEventListener("appinstalled", () => {
+        console.log("🎉 PWA was installed");
         if (window.gtag) {
-          gtag('event', 'pwa_installed', {
-            event_category: 'PWA',
-            event_label: 'app_installed',
+          gtag("event", "pwa_installed", {
+            event_category: "PWA",
+            event_label: "app_installed",
           });
         }
       });
 
       // Detect PWA launch
       if (
-        window.matchMedia('(display-mode: standalone)').matches ||
+        window.matchMedia("(display-mode: standalone)").matches ||
         window.navigator.standalone
       ) {
-        console.log('📱 Running as PWA');
-        document.body.classList.add('pwa-mode');
+        console.log("📱 Running as PWA");
+        document.body.classList.add("pwa-mode");
 
         if (window.gtag) {
-          gtag('event', 'pwa_launch', {
-            event_category: 'PWA',
-            event_label: 'standalone_launch',
+          gtag("event", "pwa_launch", {
+            event_category: "PWA",
+            event_label: "standalone_launch",
           });
         }
       }
@@ -1824,13 +1824,13 @@
       // Handle offline/online status
       function updateOnlineStatus() {
         const statusIndicator =
-          document.getElementById('connection-status') ||
+          document.getElementById("connection-status") ||
           createStatusIndicator();
 
         if (navigator.onLine) {
-          statusIndicator.style.display = 'none';
+          statusIndicator.style.display = "none";
         } else {
-          statusIndicator.style.display = 'block';
+          statusIndicator.style.display = "block";
           statusIndicator.innerHTML = `
             <div style="
               background: #dc3545;
@@ -1846,8 +1846,8 @@
       }
 
       function createStatusIndicator() {
-        const indicator = document.createElement('div');
-        indicator.id = 'connection-status';
+        const indicator = document.createElement("div");
+        indicator.id = "connection-status";
         indicator.style.cssText = `
           position: fixed;
           top: 0;
@@ -1860,25 +1860,25 @@
       }
 
       // Listen for online/offline events
-      window.addEventListener('online', updateOnlineStatus);
-      window.addEventListener('offline', updateOnlineStatus);
+      window.addEventListener("online", updateOnlineStatus);
+      window.addEventListener("offline", updateOnlineStatus);
 
       // Initial status check
       updateOnlineStatus();
 
       // PWA Performance monitoring
-      if ('performance' in window && 'PerformanceObserver' in window) {
+      if ("performance" in window && "PerformanceObserver" in window) {
         // Monitor largest contentful paint
-        const perfObserver = new PerformanceObserver(entryList => {
+        const perfObserver = new PerformanceObserver((entryList) => {
           for (const entry of entryList.getEntries()) {
-            if (entry.entryType === 'largest-contentful-paint') {
-              console.log('📊 LCP:', entry.startTime);
+            if (entry.entryType === "largest-contentful-paint") {
+              console.log("📊 LCP:", entry.startTime);
 
               // Send to service worker for analytics
               if (navigator.serviceWorker.controller) {
                 navigator.serviceWorker.controller.postMessage({
-                  type: 'PERFORMANCE_MARK',
-                  name: 'LCP',
+                  type: "PERFORMANCE_MARK",
+                  name: "LCP",
                   duration: entry.startTime,
                 });
               }
@@ -1887,7 +1887,7 @@
         });
 
         try {
-          perfObserver.observe({ entryTypes: ['largest-contentful-paint'] });
+          perfObserver.observe({ entryTypes: ["largest-contentful-paint"] });
         } catch (e) {
           // LCP not supported in this browser
         }

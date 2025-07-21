@@ -20,7 +20,7 @@
 
       body {
         font-family:
-          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
           Cantarell, sans-serif;
         line-height: 1.6;
         color: #333;
@@ -329,7 +329,7 @@
         <div class="contact-info">
           <p>
             <strong>Questions?</strong> Contact our research team at
-            <a href="mailto:research@simulateai.org">research@simulateai.org</a>
+            <a href="mailto:research@simulateai.io">research@simulateai.io</a>
           </p>
           <p style="font-size: 12px; color: #666; margin-top: 10px">
             Your participation helps advance ethical AI research and education.
@@ -348,46 +348,46 @@
         // In a real implementation, this would redirect to a payment processor
         // For demo purposes, we'll simulate the process
 
-        const button = document.querySelector('.btn-primary');
-        button.innerHTML = '⏳ Processing Payment...';
+        const button = document.querySelector(".btn-primary");
+        button.innerHTML = "⏳ Processing Payment...";
         button.disabled = true;
 
         setTimeout(() => {
           // Simulate successful payment
           const consentData = JSON.parse(
-            localStorage.getItem('research_consent') || '{}'
+            localStorage.getItem("research_consent") || "{}",
           );
           consentData.donationCompleted = true;
           consentData.donationTimestamp = new Date().toISOString();
           consentData.researchParticipant = true;
-          localStorage.setItem('research_consent', JSON.stringify(consentData));
+          localStorage.setItem("research_consent", JSON.stringify(consentData));
 
           // Show success message
           alert(
-            '🎉 Thank you! Your donation has been processed and your research profile is now active.\n\nYou can now access exclusive research scenarios throughout the SimulateAI platform.'
+            "🎉 Thank you! Your donation has been processed and your research profile is now active.\n\nYou can now access exclusive research scenarios throughout the SimulateAI platform.",
           );
 
           // Redirect to main platform
-          window.location.href = '/';
+          window.location.href = "/";
         }, 3000);
       }
 
       // Check if user has already completed the process
-      document.addEventListener('DOMContentLoaded', function () {
+      document.addEventListener("DOMContentLoaded", function () {
         const consentData = JSON.parse(
-          localStorage.getItem('research_consent') || '{}'
+          localStorage.getItem("research_consent") || "{}",
         );
 
         if (!consentData.timestamp) {
           // No consent found, redirect to consent form
-          alert('Please complete the research consent form first.');
-          window.location.href = '/research-consent.html';
+          alert("Please complete the research consent form first.");
+          window.location.href = "/research-consent.html";
           return;
         }
 
         if (consentData.donationCompleted) {
           // Already completed, show status
-          const successMessage = document.querySelector('.success-message');
+          const successMessage = document.querySelector(".success-message");
           successMessage.innerHTML = `
                     <div class="icon">🌟</div>
                     <h2>Research Profile Active</h2>
@@ -395,7 +395,7 @@
                     <p>Thank you for contributing to ethical AI research!</p>
                 `;
 
-          const actionButtons = document.querySelector('.action-buttons');
+          const actionButtons = document.querySelector(".action-buttons");
           actionButtons.innerHTML = `
                     <a href="/" class="btn btn-primary">
                         🚀 Explore Research Platform

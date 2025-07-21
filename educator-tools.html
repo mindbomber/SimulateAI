@@ -166,7 +166,7 @@
       }
 
       .educator-card::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
@@ -330,7 +330,7 @@
       }
 
       .checklist li::before {
-        content: '✓';
+        content: "✓";
         position: absolute;
         left: 1rem;
         top: 50%;
@@ -373,7 +373,7 @@
       }
 
       .timeline-item::before {
-        content: '';
+        content: "";
         position: absolute;
         left: -2.5rem;
         top: 0.5rem;
@@ -942,7 +942,7 @@
               <li><strong>Follow-up support</strong> and coaching included</li>
             </ul>
             <a
-              href="mailto:training@simulateai.org"
+              href="mailto:research@simulateai.io"
               class="educator-button warning"
               >✉️ Request Custom Training</a
             >
@@ -997,7 +997,7 @@
               integration, and dedicated account management for districts and
               educational organizations.
             </p>
-            <a href="mailto:partnerships@simulateai.org" class="educator-button"
+            <a href="mailto:research@simulateai.io" class="educator-button"
               >🤝 Explore Partnerships</a
             >
           </div>
@@ -1010,7 +1010,7 @@
             outcomes with our community. Featured educators receive recognition,
             free professional development credits, and early access to new
             resources.
-            <a href="mailto:spotlight@simulateai.org"
+            <a href="mailto:research@simulateai.io"
               >Nominate yourself or a colleague!</a
             >
           </p>
@@ -1022,7 +1022,7 @@
         <p>
           © 2025 SimulateAI • <a href="#main-content">Back to top</a> •
           <a href="ethics-guide.html">Ethics Guide</a> •
-          <a href="mailto:educators@simulateai.org">Contact Education Team</a>
+          <a href="mailto:research@simulateai.io">Contact Education Team</a>
         </p>
       </footer>
     </main>
@@ -1040,24 +1040,24 @@
     <script type="module">
       // Ensure the page is fully loaded before initializing navigation
       setTimeout(() => {
-        import('./src/js/components/shared-navigation.js');
+        import("./src/js/components/shared-navigation.js");
       }, 100);
     </script>
 
     <!-- Smooth scrolling for anchor links -->
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-          anchor.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-            if (!href || href === '#') return;
+      document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+          anchor.addEventListener("click", function (e) {
+            const href = this.getAttribute("href");
+            if (!href || href === "#") return;
 
             e.preventDefault();
             const target = document.querySelector(href);
             if (target) {
               target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
+                behavior: "smooth",
+                block: "start",
               });
             }
           });

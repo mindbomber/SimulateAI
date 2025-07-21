@@ -49,17 +49,17 @@ const FOOTER_CONFIG = {
         { text: "Help & FAQ", href: "help-faq.html", icon: "❓" },
         {
           text: "Contact Us",
-          href: "mailto:support@simulateai.org",
+          href: "mailto:research@simulateai.io",
           icon: "📧",
         },
         {
           text: "Report Issue",
-          href: "mailto:support@simulateai.org?subject=Issue Report",
+          href: "mailto:research@simulateai.io?subject=Issue Report",
           icon: "🐛",
         },
         {
           text: "Feedback",
-          href: "mailto:feedback@simulateai.org",
+          href: "mailto:research@simulateai.io",
           icon: "💭",
         },
       ],

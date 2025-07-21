@@ -20,11 +20,11 @@
  * Enhanced with comprehensive user engagement tracking
  */
 
-import { userEngagementTracker } from '../services/user-engagement-tracker.js';
+import { userEngagementTracker } from "../services/user-engagement-tracker.js";
 
 // Constants
-const SETTINGS_STORAGE_KEY = 'simulateai_settings';
-const DONOR_STATUS_KEY = 'simulateai_donor_status';
+const SETTINGS_STORAGE_KEY = "simulateai_settings";
+const DONOR_STATUS_KEY = "simulateai_donor_status";
 const NOTIFICATION_DURATION = 5000;
 const ANIMATION_DURATION = 300;
 const DESKTOP_BREAKPOINT = 768;
@@ -32,69 +32,120 @@ const TOAST_DELAY = 500;
 const SETTINGS_INIT_DELAY = 100;
 const SETTINGS_LATE_APPLY_DELAY = 200;
 
+// Configuration paths
+const APP_CONFIG_PATH = "/src/config/app-config.json";
+const SETTINGS_SCHEMA_PATH = "/src/config/settings-schema.json";
+
 class SettingsManager {
   constructor() {
-    this.settings = this.loadSettings();
+    this.appConfig = null;
+    this.settingsSchema = null;
+    this.settings = {};
     this.isDonor = this.checkDonorStatus();
     this.isInitialized = false;
     this.init();
   }
 
-  init() {
+  async init() {
     if (this.isInitialized) return;
 
-    this.setupEventListeners();
-    this.updateUI();
+    try {
+      // Load configurations in order
+      await this.loadConfigurations();
 
-    // Apply settings after a small delay to ensure DOM is ready
-    setTimeout(() => {
-      this.applySettings();
-    }, SETTINGS_INIT_DELAY);
+      // Initialize settings with integrated defaults
+      this.settings = await this.loadSettings();
 
-    // Also apply settings when window is fully loaded (for Chart.js and other libraries)
-    window.addEventListener('load', () => {
+      this.setupEventListeners();
+      this.updateUI();
+
+      // Apply settings after a small delay to ensure DOM is ready
       setTimeout(() => {
         this.applySettings();
-      }, SETTINGS_LATE_APPLY_DELAY);
-    });
+      }, SETTINGS_INIT_DELAY);
 
-    this.isInitialized = true;
+      // Also apply settings when window is fully loaded (for Chart.js and other libraries)
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          this.applySettings();
+        }, SETTINGS_LATE_APPLY_DELAY);
+      });
 
-    // Watch for dynamically added content and reapply styles
-    this.setupMutationObserver();
+      this.isInitialized = true;
 
-    // Notify that settings manager is ready
-    window.dispatchEvent(
-      new CustomEvent('settingsManagerReady', {
-        detail: {
-          settings: this.settings,
-          isDonor: this.isDonor,
-        },
-      })
-    );
+      // Watch for dynamically added content and reapply styles
+      this.setupMutationObserver();
+
+      // Notify that settings manager is ready
+      window.dispatchEvent(
+        new CustomEvent("settingsManagerReady", {
+          detail: {
+            settings: this.settings,
+            isDonor: this.isDonor,
+            appConfig: this.appConfig,
+            settingsSchema: this.settingsSchema,
+          },
+        }),
+      );
+    } catch (error) {
+      console.error("Settings Manager initialization failed:", error);
+      // Fallback to hardcoded defaults
+      this.settings = this.getFallbackSettings();
+      this.isInitialized = true;
+    }
+  }
+
+  /**
+   * Load app-config.json and settings-schema.json
+   */
+  async loadConfigurations() {
+    try {
+      // Load app config
+      const appConfigResponse = await fetch(APP_CONFIG_PATH);
+      if (appConfigResponse.ok) {
+        this.appConfig = await appConfigResponse.json();
+      } else {
+        console.warn("Failed to load app-config.json, using fallback");
+        this.appConfig = this.getFallbackAppConfig();
+      }
+
+      // Load settings schema
+      const schemaResponse = await fetch(SETTINGS_SCHEMA_PATH);
+      if (schemaResponse.ok) {
+        this.settingsSchema = await schemaResponse.json();
+      } else {
+        console.warn("Failed to load settings-schema.json, using fallback");
+        this.settingsSchema = this.getFallbackSettingsSchema();
+      }
+    } catch (error) {
+      console.error("Configuration loading failed:", error);
+      // Use fallback configurations
+      this.appConfig = this.getFallbackAppConfig();
+      this.settingsSchema = this.getFallbackSettingsSchema();
+    }
   }
 
   setupMutationObserver() {
     // Watch for new radar chart containers being added
-    const observer = new MutationObserver(mutations => {
-      mutations.forEach(mutation => {
-        if (mutation.type === 'childList') {
-          mutation.addedNodes.forEach(node => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === "childList") {
+          mutation.addedNodes.forEach((node) => {
             if (node.nodeType === Node.ELEMENT_NODE) {
               const radarCharts =
                 node.querySelectorAll &&
-                node.querySelectorAll('.radar-chart-container');
+                node.querySelectorAll(".radar-chart-container");
               const heroRadarDemos =
                 node.querySelectorAll &&
-                node.querySelectorAll('.hero-radar-demo');
+                node.querySelectorAll(".hero-radar-demo");
               const scenarioCards =
                 node.querySelectorAll &&
-                node.querySelectorAll('.scenario-card');
+                node.querySelectorAll(".scenario-card");
               const viewToggleControls =
                 node.querySelectorAll &&
-                node.querySelectorAll('.view-toggle-controls');
+                node.querySelectorAll(".view-toggle-controls");
               const mainNavElements =
-                node.querySelectorAll && node.querySelectorAll('.main-nav');
+                node.querySelectorAll && node.querySelectorAll(".main-nav");
 
               if (
                 (radarCharts && radarCharts.length > 0) ||
@@ -111,11 +162,11 @@ class SettingsManager {
               // Also check if the node itself is a component we need to update
               if (
                 node.classList &&
-                (node.classList.contains('radar-chart-container') ||
-                  node.classList.contains('hero-radar-demo') ||
-                  node.classList.contains('scenario-card') ||
-                  node.classList.contains('view-toggle-controls') ||
-                  node.classList.contains('main-nav'))
+                (node.classList.contains("radar-chart-container") ||
+                  node.classList.contains("hero-radar-demo") ||
+                  node.classList.contains("scenario-card") ||
+                  node.classList.contains("view-toggle-controls") ||
+                  node.classList.contains("main-nav"))
               ) {
                 setTimeout(() => {
                   this.applyAppearanceSettings();
@@ -135,213 +186,452 @@ class SettingsManager {
 
   forceDarkModeComponents() {
     // Find all radar chart containers and force dark mode styles
-    const radarCharts = document.querySelectorAll('.radar-chart-container');
-    radarCharts.forEach(chart => {
+    const radarCharts = document.querySelectorAll(".radar-chart-container");
+    radarCharts.forEach((chart) => {
       chart.style.background =
-        'linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%)';
-      chart.style.borderColor = '#444444';
-      chart.style.color = '#ffffff';
+        "linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%)";
+      chart.style.borderColor = "#444444";
+      chart.style.color = "#ffffff";
       chart.style.boxShadow =
-        '0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3)';
+        "0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3)";
     });
 
     // Also handle hero-radar-demo containers
-    const heroRadarDemos = document.querySelectorAll('.hero-radar-demo');
-    heroRadarDemos.forEach(demo => {
+    const heroRadarDemos = document.querySelectorAll(".hero-radar-demo");
+    heroRadarDemos.forEach((demo) => {
       demo.style.background =
-        'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)';
-      demo.style.borderColor = '#444444';
-      demo.style.color = '#ffffff';
+        "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)";
+      demo.style.borderColor = "#444444";
+      demo.style.color = "#ffffff";
 
       // Update text elements inside hero-radar-demo
-      const h3 = demo.querySelector('h3');
+      const h3 = demo.querySelector("h3");
       if (h3) {
-        h3.style.color = '#ffffff';
+        h3.style.color = "#ffffff";
         h3.style.background =
-          'linear-gradient(135deg, #6bb4ff 0%, #9d4edd 100%)';
-        h3.style.webkitBackgroundClip = 'text';
-        h3.style.webkitTextFillColor = 'transparent';
-        h3.style.backgroundClip = 'text';
+          "linear-gradient(135deg, #6bb4ff 0%, #9d4edd 100%)";
+        h3.style.webkitBackgroundClip = "text";
+        h3.style.webkitTextFillColor = "transparent";
+        h3.style.backgroundClip = "text";
       }
 
-      const p = demo.querySelector('p');
+      const p = demo.querySelector("p");
       if (p) {
-        p.style.color = '#cccccc';
+        p.style.color = "#cccccc";
       }
     });
 
     // Handle scenario cards
-    const scenarioCards = document.querySelectorAll('.scenario-card');
-    scenarioCards.forEach(card => {
-      card.style.background = '#2d2d2d';
-      card.style.borderColor = '#444444';
-      card.style.color = '#ffffff';
+    const scenarioCards = document.querySelectorAll(".scenario-card");
+    scenarioCards.forEach((card) => {
+      card.style.background = "#2d2d2d";
+      card.style.borderColor = "#444444";
+      card.style.color = "#ffffff";
       card.style.boxShadow =
-        '0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3)';
+        "0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3)";
 
       // Update scenario header
-      const header = card.querySelector('.scenario-header');
+      const header = card.querySelector(".scenario-header");
       if (header) {
-        header.style.background = 'transparent';
-        header.style.color = '#ffffff';
+        header.style.background = "transparent";
+        header.style.color = "#ffffff";
       }
 
       // Update scenario content
-      const content = card.querySelector('.scenario-content');
+      const content = card.querySelector(".scenario-content");
       if (content) {
-        content.style.background = 'transparent';
-        content.style.color = '#ffffff';
+        content.style.background = "transparent";
+        content.style.color = "#ffffff";
       }
 
       // Update scenario title
-      const title = card.querySelector('.scenario-title');
+      const title = card.querySelector(".scenario-title");
       if (title) {
-        title.style.color = '#ffffff';
+        title.style.color = "#ffffff";
       }
 
       // Update scenario description
-      const description = card.querySelector('.scenario-description');
+      const description = card.querySelector(".scenario-description");
       if (description) {
-        description.style.color = '#cccccc';
+        description.style.color = "#cccccc";
       }
 
       // Update scenario footer
-      const footer = card.querySelector('.scenario-footer');
+      const footer = card.querySelector(".scenario-footer");
       if (footer) {
-        footer.style.color = '#cccccc';
+        footer.style.color = "#cccccc";
       }
 
       // Update scenario icon
-      const icon = card.querySelector('.scenario-icon');
+      const icon = card.querySelector(".scenario-icon");
       if (icon) {
-        icon.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-        icon.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+        icon.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+        icon.style.border = "1px solid rgba(255, 255, 255, 0.2)";
       }
 
       // Update scenario difficulty
-      const difficulty = card.querySelector('.scenario-difficulty');
+      const difficulty = card.querySelector(".scenario-difficulty");
       if (difficulty) {
-        difficulty.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-        difficulty.style.color = '#ffffff';
-        difficulty.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+        difficulty.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+        difficulty.style.color = "#ffffff";
+        difficulty.style.border = "1px solid rgba(255, 255, 255, 0.2)";
       }
 
       // Update scenario buttons
-      const startBtn = card.querySelector('.scenario-start-btn');
+      const startBtn = card.querySelector(".scenario-start-btn");
       if (startBtn) {
-        startBtn.style.backgroundColor = '#4a9eff';
-        startBtn.style.color = '#ffffff';
-        startBtn.style.border = '1px solid #4a9eff';
+        startBtn.style.backgroundColor = "#4a9eff";
+        startBtn.style.color = "#ffffff";
+        startBtn.style.border = "1px solid #4a9eff";
       }
 
-      const quickStartBtn = card.querySelector('.scenario-quick-start-btn');
+      const quickStartBtn = card.querySelector(".scenario-quick-start-btn");
       if (quickStartBtn) {
-        quickStartBtn.style.backgroundColor = '#4a9eff';
-        quickStartBtn.style.color = '#ffffff';
-        quickStartBtn.style.border = '1px solid #4a9eff';
+        quickStartBtn.style.backgroundColor = "#4a9eff";
+        quickStartBtn.style.color = "#ffffff";
+        quickStartBtn.style.border = "1px solid #4a9eff";
       }
     });
 
     // Handle view toggle controls
-    const viewToggleControls = document.querySelector('.view-toggle-controls');
+    const viewToggleControls = document.querySelector(".view-toggle-controls");
     if (viewToggleControls) {
-      viewToggleControls.style.background = '#2d2d2d';
-      viewToggleControls.style.border = '1px solid #444444';
+      viewToggleControls.style.background = "#2d2d2d";
+      viewToggleControls.style.border = "1px solid #444444";
     }
 
-    const viewToggleButtons = document.querySelectorAll('.view-toggle-btn');
-    viewToggleButtons.forEach(btn => {
-      btn.style.color = '#cccccc';
-      btn.style.background = 'transparent';
+    const viewToggleButtons = document.querySelectorAll(".view-toggle-btn");
+    viewToggleButtons.forEach((btn) => {
+      btn.style.color = "#cccccc";
+      btn.style.background = "transparent";
 
-      if (btn.classList.contains('active')) {
-        btn.style.background = '#3d3d3d';
-        btn.style.color = '#4a9eff';
+      if (btn.classList.contains("active")) {
+        btn.style.background = "#3d3d3d";
+        btn.style.color = "#4a9eff";
         btn.style.boxShadow =
-          '0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3)';
+          "0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3)";
       }
     });
 
     // Handle keyboard hint
-    const keyboardHint = document.querySelector('.keyboard-hint');
+    const keyboardHint = document.querySelector(".keyboard-hint");
     if (keyboardHint) {
-      keyboardHint.style.color = '#cccccc';
+      keyboardHint.style.color = "#cccccc";
 
-      const hintText = keyboardHint.querySelector('.hint-text');
+      const hintText = keyboardHint.querySelector(".hint-text");
       if (hintText) {
-        hintText.style.color = '#cccccc';
+        hintText.style.color = "#cccccc";
       }
     }
 
-    const kbdElements = document.querySelectorAll('kbd');
-    kbdElements.forEach(kbd => {
-      kbd.style.background = '#3d3d3d';
-      kbd.style.color = '#ffffff';
-      kbd.style.border = '1px solid #555555';
-      kbd.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.3)';
+    const kbdElements = document.querySelectorAll("kbd");
+    kbdElements.forEach((kbd) => {
+      kbd.style.background = "#3d3d3d";
+      kbd.style.color = "#ffffff";
+      kbd.style.border = "1px solid #555555";
+      kbd.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.3)";
     });
 
     // Handle main navigation
-    const mainNav = document.querySelector('.main-nav');
+    const mainNav = document.querySelector(".main-nav");
     if (mainNav) {
-      mainNav.style.backgroundColor = '#2d2d2d';
+      mainNav.style.backgroundColor = "#2d2d2d";
     }
 
     // Handle nav links
-    const navLinks = document.querySelectorAll('.nav-link');
-    navLinks.forEach(link => {
-      link.style.color = '#ffffff';
+    const navLinks = document.querySelectorAll(".nav-link");
+    navLinks.forEach((link) => {
+      link.style.color = "#ffffff";
     });
 
     // Handle nav groups
-    const navGroups = document.querySelectorAll('.nav-group');
-    navGroups.forEach(group => {
-      group.style.backgroundColor = 'transparent';
+    const navGroups = document.querySelectorAll(".nav-group");
+    navGroups.forEach((group) => {
+      group.style.backgroundColor = "transparent";
     });
 
     // Handle dropdown menus
-    const dropdownMenus = document.querySelectorAll('.dropdown-menu');
-    dropdownMenus.forEach(menu => {
-      menu.style.backgroundColor = '#2d2d2d';
-      menu.style.borderColor = '#444';
-      menu.style.color = '#ffffff';
+    const dropdownMenus = document.querySelectorAll(".dropdown-menu");
+    dropdownMenus.forEach((menu) => {
+      menu.style.backgroundColor = "#2d2d2d";
+      menu.style.borderColor = "#444";
+      menu.style.color = "#ffffff";
     });
 
     // Handle dropdown items
-    const dropdownItems = document.querySelectorAll('.dropdown-item');
-    dropdownItems.forEach(item => {
-      item.style.color = '#ffffff';
-      item.style.backgroundColor = 'transparent';
+    const dropdownItems = document.querySelectorAll(".dropdown-item");
+    dropdownItems.forEach((item) => {
+      item.style.color = "#ffffff";
+      item.style.backgroundColor = "transparent";
     });
   }
 
-  loadSettings() {
-    const defaultSettings = {
-      surpriseTabEnabled: true,
-      tourTabEnabled: true,
-      donateTabEnabled: true,
-      // Theme & Appearance settings
-      theme: 'auto', // 'light', 'dark', 'auto'
-      fontSize: 'medium', // 'small', 'medium', 'large', 'extra-large'
-      highContrast: false,
-      reducedMotion: false,
-      largeClickTargets: false,
-      // Notification settings
-      notificationsEnabled: false,
-      achievementNotifications: true,
-      badgeNotifications: true,
-      progressNotifications: true,
-    };
+  /**
+   * Load and merge settings from schema, app-config, and user preferences
+   */
+  async loadSettings() {
+    try {
+      // 1. Start with schema defaults and app-config integration
+      const integratedDefaults = this.buildIntegratedDefaults();
 
+      // 2. Load user preferences from localStorage
+      const storedSettings = this.loadStoredSettings();
+
+      // 3. Merge and validate
+      const mergedSettings = { ...integratedDefaults, ...storedSettings };
+
+      // 4. Validate constraints and apply overrides
+      const validatedSettings =
+        this.validateAndApplyConstraints(mergedSettings);
+
+      return validatedSettings;
+    } catch (error) {
+      console.error("Settings loading failed:", error);
+      return this.getFallbackSettings();
+    }
+  }
+
+  /**
+   * Build integrated defaults from schema and app-config
+   */
+  buildIntegratedDefaults() {
+    if (!this.settingsSchema?.settings) {
+      return this.getFallbackSettings();
+    }
+
+    const defaults = {};
+
+    // Process each setting category
+    Object.entries(this.settingsSchema.settings).forEach(
+      ([category, settings]) => {
+        Object.entries(settings).forEach(([settingKey, settingDef]) => {
+          const flatKey = this.getFlatKey(category, settingKey);
+
+          // Start with schema default
+          let defaultValue = settingDef.default;
+
+          // Check for app-config inheritance
+          if (settingDef.inherits?.appConfigPath) {
+            const appConfigValue = this.getNestedValue(
+              this.appConfig,
+              settingDef.inherits.appConfigPath,
+            );
+            if (appConfigValue !== undefined) {
+              if (
+                settingDef.inherits.fallbackBehavior === "force_enabled" ||
+                appConfigValue !== false
+              ) {
+                defaultValue = appConfigValue;
+              }
+            }
+          }
+
+          // Check for app-config overrides (feature flags)
+          if (settingDef.overrides?.appConfigPath) {
+            const featureEnabled = this.getNestedValue(
+              this.appConfig,
+              settingDef.overrides.appConfigPath,
+            );
+            if (
+              featureEnabled === false &&
+              settingDef.overrides.behavior === "disable_if_app_disabled"
+            ) {
+              defaultValue = false;
+            }
+          }
+
+          defaults[flatKey] = defaultValue;
+        });
+      },
+    );
+
+    return defaults;
+  }
+
+  /**
+   * Load settings from localStorage with error handling
+   */
+  loadStoredSettings() {
     try {
       const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
-      return stored
-        ? { ...defaultSettings, ...JSON.parse(stored) }
-        : defaultSettings;
+      return stored ? JSON.parse(stored) : {};
     } catch (error) {
-      // Failed to load settings, use defaults
-      return defaultSettings;
+      console.warn("Failed to load stored settings:", error);
+      return {};
     }
+  }
+
+  /**
+   * Validate settings and apply runtime constraints
+   */
+  validateAndApplyConstraints(settings) {
+    if (!this.settingsSchema?.settings) {
+      return settings;
+    }
+
+    const validated = { ...settings };
+
+    // Process each setting for validation and constraints
+    Object.entries(this.settingsSchema.settings).forEach(
+      ([category, categorySettings]) => {
+        Object.entries(categorySettings).forEach(([settingKey, settingDef]) => {
+          const flatKey = this.getFlatKey(category, settingKey);
+          const currentValue = validated[flatKey];
+
+          // Donor privilege validation
+          if (settingDef.requiresDonor && !this.isDonor) {
+            if (settingDef.restrictions?.nonDonorBehavior === "force_enabled") {
+              validated[flatKey] = true;
+            }
+          }
+
+          // Options validation
+          if (
+            settingDef.options &&
+            !settingDef.options.includes(currentValue)
+          ) {
+            // Check if app-config provides valid options
+            if (settingDef.validation?.allowedValues) {
+              const allowedValues = this.getNestedValue(
+                this.appConfig,
+                settingDef.validation.allowedValues,
+              );
+              if (allowedValues && allowedValues.includes(currentValue)) {
+                // Valid according to app-config
+              } else {
+                validated[flatKey] = settingDef.default;
+              }
+            } else {
+              validated[flatKey] = settingDef.default;
+            }
+          }
+
+          // Dependency validation
+          if (settingDef.dependsOn) {
+            const dependencyValue = validated[settingDef.dependsOn];
+            if (!dependencyValue) {
+              validated[flatKey] = false;
+            }
+          }
+
+          // Range validation for numbers
+          if (settingDef.type === "number") {
+            if (settingDef.min !== undefined && currentValue < settingDef.min) {
+              validated[flatKey] = settingDef.min;
+            }
+            if (settingDef.max !== undefined && currentValue > settingDef.max) {
+              validated[flatKey] = settingDef.max;
+            }
+          }
+        });
+      },
+    );
+
+    return validated;
+  }
+
+  /**
+   * Generate flat key for nested settings
+   */
+  getFlatKey(category, settingKey) {
+    return `${category}_${settingKey}`;
+  }
+
+  /**
+   * Get nested value from object using dot notation
+   */
+  getNestedValue(obj, path) {
+    if (!obj || !path) return undefined;
+    return path.split(".").reduce((current, key) => {
+      return current && current[key] !== undefined ? current[key] : undefined;
+    }, obj);
+  }
+
+  /**
+   * Get fallback settings for critical failures
+   */
+  getFallbackSettings() {
+    return {
+      // Core interface settings
+      interface_surpriseTabEnabled: true,
+      interface_tourTabEnabled: true,
+      interface_donateTabEnabled: true,
+
+      // Basic theme settings
+      appearance_theme: "auto",
+      appearance_fontSize: "medium",
+      appearance_highContrast: false,
+      appearance_reducedMotion: false,
+
+      // Essential accessibility
+      accessibility_largeClickTargets: false,
+      accessibility_keyboardNavigation: true,
+
+      // Basic notifications
+      notifications_enabled: false,
+      notifications_achievements: true,
+      notifications_badges: true,
+      notifications_progress: true,
+
+      // Safe performance defaults
+      performance_animations: true,
+      performance_autoSave: true,
+      performance_caching: true,
+    };
+  }
+
+  /**
+   * Get fallback app config for critical failures
+   */
+  getFallbackAppConfig() {
+    return {
+      features: {
+        darkMode: { enabled: true },
+        notifications: { enabled: true },
+        analytics: { enabled: false },
+        accessibility: { enabled: true },
+      },
+      ui: {
+        theme: { default: "auto" },
+        fontSize: { default: "medium", options: ["small", "medium", "large"] },
+      },
+    };
+  }
+
+  /**
+   * Get fallback settings schema for critical failures
+   */
+  getFallbackSettingsSchema() {
+    return {
+      settings: {
+        appearance: {
+          theme: {
+            type: "string",
+            default: "auto",
+            options: ["light", "dark", "auto"],
+          },
+          fontSize: {
+            type: "string",
+            default: "medium",
+            options: ["small", "medium", "large", "extra-large"],
+          },
+        },
+        interface: {
+          surpriseTabEnabled: {
+            type: "boolean",
+            default: true,
+          },
+          tourTabEnabled: {
+            type: "boolean",
+            default: true,
+          },
+          donateTabEnabled: {
+            type: "boolean",
+            default: true,
+          },
+        },
+      },
+    };
   }
 
   saveSettings() {
@@ -355,7 +645,7 @@ class SettingsManager {
   checkDonorStatus() {
     try {
       const donorStatus = localStorage.getItem(DONOR_STATUS_KEY);
-      return donorStatus === 'true';
+      return donorStatus === "true";
     } catch (error) {
       // Failed to check donor status
       return false;
@@ -374,20 +664,20 @@ class SettingsManager {
 
   setupEventListeners() {
     // Surprise tab toggle
-    const surpriseToggle = document.getElementById('toggle-surprise-tab');
+    const surpriseToggle = document.getElementById("toggle-surprise-tab");
     if (surpriseToggle) {
-      surpriseToggle.addEventListener('change', e => {
+      surpriseToggle.addEventListener("change", (e) => {
         const oldValue = this.settings.surpriseTabEnabled;
         this.settings.surpriseTabEnabled = e.target.checked;
 
         // Track the settings change
-        userEngagementTracker.trackUserEvent('settings_change', {
-          settingName: 'surpriseTabEnabled',
+        userEngagementTracker.trackUserEvent("settings_change", {
+          settingName: "surpriseTabEnabled",
           oldValue,
           newValue: e.target.checked,
-          settingType: 'toggle',
-          category: 'interface',
-          context: 'settings_panel',
+          settingType: "toggle",
+          category: "interface",
+          context: "settings_panel",
         });
 
         this.saveSettings();
@@ -396,20 +686,20 @@ class SettingsManager {
     }
 
     // Tour tab toggle
-    const tourToggle = document.getElementById('toggle-tour-tab');
+    const tourToggle = document.getElementById("toggle-tour-tab");
     if (tourToggle) {
-      tourToggle.addEventListener('change', e => {
+      tourToggle.addEventListener("change", (e) => {
         const oldValue = this.settings.tourTabEnabled;
         this.settings.tourTabEnabled = e.target.checked;
 
         // Track the settings change
-        userEngagementTracker.trackUserEvent('settings_change', {
-          settingName: 'tourTabEnabled',
+        userEngagementTracker.trackUserEvent("settings_change", {
+          settingName: "tourTabEnabled",
           oldValue,
           newValue: e.target.checked,
-          settingType: 'toggle',
-          category: 'interface',
-          context: 'settings_panel',
+          settingType: "toggle",
+          category: "interface",
+          context: "settings_panel",
         });
 
         this.saveSettings();
@@ -418,9 +708,9 @@ class SettingsManager {
     }
 
     // Donate tab toggle
-    const donateToggle = document.getElementById('toggle-donate-tab');
+    const donateToggle = document.getElementById("toggle-donate-tab");
     if (donateToggle) {
-      donateToggle.addEventListener('change', e => {
+      donateToggle.addEventListener("change", (e) => {
         const oldValue = this.settings.donateTabEnabled;
 
         // Only donors can disable the donate tab
@@ -429,12 +719,12 @@ class SettingsManager {
           this.showDonationRequiredMessage();
 
           // Track the restricted action
-          userEngagementTracker.trackUserEvent('settings_restriction', {
-            settingName: 'donateTabEnabled',
+          userEngagementTracker.trackUserEvent("settings_restriction", {
+            settingName: "donateTabEnabled",
             attemptedValue: false,
-            restrictionReason: 'non_donor',
-            category: 'access_control',
-            context: 'settings_panel',
+            restrictionReason: "non_donor",
+            category: "access_control",
+            context: "settings_panel",
           });
 
           return;
@@ -443,14 +733,14 @@ class SettingsManager {
         this.settings.donateTabEnabled = e.target.checked;
 
         // Track the settings change
-        userEngagementTracker.trackUserEvent('settings_change', {
-          settingName: 'donateTabEnabled',
+        userEngagementTracker.trackUserEvent("settings_change", {
+          settingName: "donateTabEnabled",
           oldValue,
           newValue: e.target.checked,
-          settingType: 'toggle',
-          category: 'interface',
-          userType: this.isDonor ? 'donor' : 'regular',
-          context: 'settings_panel',
+          settingType: "toggle",
+          category: "interface",
+          userType: this.isDonor ? "donor" : "regular",
+          context: "settings_panel",
         });
 
         this.saveSettings();
@@ -459,20 +749,20 @@ class SettingsManager {
     }
 
     // Theme selection
-    const themeSelect = document.getElementById('theme-select');
+    const themeSelect = document.getElementById("theme-select");
     if (themeSelect) {
-      themeSelect.addEventListener('change', e => {
+      themeSelect.addEventListener("change", (e) => {
         const oldValue = this.settings.theme;
         this.settings.theme = e.target.value;
 
         // Track the theme change
-        userEngagementTracker.trackUserEvent('settings_change', {
-          settingName: 'theme',
+        userEngagementTracker.trackUserEvent("settings_change", {
+          settingName: "theme",
           oldValue,
           newValue: e.target.value,
-          settingType: 'select',
-          category: 'appearance',
-          context: 'settings_panel',
+          settingType: "select",
+          category: "appearance",
+          context: "settings_panel",
         });
 
         this.saveSettings();
@@ -481,20 +771,20 @@ class SettingsManager {
     }
 
     // Font size selection
-    const fontSizeSelect = document.getElementById('font-size-select');
+    const fontSizeSelect = document.getElementById("font-size-select");
     if (fontSizeSelect) {
-      fontSizeSelect.addEventListener('change', e => {
+      fontSizeSelect.addEventListener("change", (e) => {
         const oldValue = this.settings.fontSize;
         this.settings.fontSize = e.target.value;
 
         // Track the font size change
-        userEngagementTracker.trackUserEvent('settings_change', {
-          settingName: 'fontSize',
+        userEngagementTracker.trackUserEvent("settings_change", {
+          settingName: "fontSize",
           oldValue,
           newValue: e.target.value,
-          settingType: 'select',
-          category: 'accessibility',
-          context: 'settings_panel',
+          settingType: "select",
+          category: "accessibility",
+          context: "settings_panel",
         });
 
         this.saveSettings();
@@ -503,20 +793,20 @@ class SettingsManager {
     }
 
     // High contrast toggle
-    const highContrastToggle = document.getElementById('toggle-high-contrast');
+    const highContrastToggle = document.getElementById("toggle-high-contrast");
     if (highContrastToggle) {
-      highContrastToggle.addEventListener('change', e => {
+      highContrastToggle.addEventListener("change", (e) => {
         const oldValue = this.settings.highContrast;
         this.settings.highContrast = e.target.checked;
 
         // Track the accessibility setting change
-        userEngagementTracker.trackUserEvent('settings_change', {
-          settingName: 'highContrast',
+        userEngagementTracker.trackUserEvent("settings_change", {
+          settingName: "highContrast",
           oldValue,
           newValue: e.target.checked,
-          settingType: 'toggle',
-          category: 'accessibility',
-          context: 'settings_panel',
+          settingType: "toggle",
+          category: "accessibility",
+          context: "settings_panel",
         });
 
         this.saveSettings();
@@ -526,10 +816,10 @@ class SettingsManager {
 
     // Reduced motion toggle
     const reducedMotionToggle = document.getElementById(
-      'toggle-reduced-motion'
+      "toggle-reduced-motion",
     );
     if (reducedMotionToggle) {
-      reducedMotionToggle.addEventListener('change', e => {
+      reducedMotionToggle.addEventListener("change", (e) => {
         this.settings.reducedMotion = e.target.checked;
         this.saveSettings();
         this.applySettings();
@@ -537,9 +827,9 @@ class SettingsManager {
     }
 
     // Large click targets toggle
-    const largeTargetsToggle = document.getElementById('toggle-large-targets');
+    const largeTargetsToggle = document.getElementById("toggle-large-targets");
     if (largeTargetsToggle) {
-      largeTargetsToggle.addEventListener('change', e => {
+      largeTargetsToggle.addEventListener("change", (e) => {
         this.settings.largeClickTargets = e.target.checked;
         this.saveSettings();
         this.applySettings();
@@ -550,26 +840,26 @@ class SettingsManager {
     this.setupNotificationEventListeners();
 
     // Settings dropdown toggle
-    const settingsNav = document.getElementById('settings-nav');
+    const settingsNav = document.getElementById("settings-nav");
     if (settingsNav) {
-      settingsNav.addEventListener('click', e => {
+      settingsNav.addEventListener("click", (e) => {
         e.preventDefault();
         this.toggleSettingsDropdown();
       });
     }
 
     // Desktop hover behavior
-    const settingsNavItem = settingsNav?.closest('.nav-item-dropdown');
+    const settingsNavItem = settingsNav?.closest(".nav-item-dropdown");
     if (settingsNavItem) {
       // Open on hover (desktop only)
-      settingsNavItem.addEventListener('mouseenter', () => {
+      settingsNavItem.addEventListener("mouseenter", () => {
         if (window.innerWidth > DESKTOP_BREAKPOINT) {
           this.openSettingsDropdown();
         }
       });
 
       // Close when leaving the dropdown area
-      settingsNavItem.addEventListener('mouseleave', () => {
+      settingsNavItem.addEventListener("mouseleave", () => {
         if (window.innerWidth > DESKTOP_BREAKPOINT) {
           this.closeSettingsDropdown();
         }
@@ -577,9 +867,9 @@ class SettingsManager {
     }
 
     // Close settings on outside click
-    document.addEventListener('click', e => {
-      const settingsDropdown = document.querySelector('.settings-menu');
-      const settingsNav = document.getElementById('settings-nav');
+    document.addEventListener("click", (e) => {
+      const settingsDropdown = document.querySelector(".settings-menu");
+      const settingsNav = document.getElementById("settings-nav");
 
       if (
         settingsDropdown &&
@@ -592,9 +882,9 @@ class SettingsManager {
     });
 
     // Listen for system theme changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    mediaQuery.addEventListener('change', () => {
-      if (this.settings.theme === 'auto') {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    mediaQuery.addEventListener("change", () => {
+      if (this.settings.theme === "auto") {
         this.applyAppearanceSettings();
       }
     });
@@ -602,10 +892,10 @@ class SettingsManager {
 
   updateUI() {
     // Update toggle states
-    const surpriseToggle = document.getElementById('toggle-surprise-tab');
-    const tourToggle = document.getElementById('toggle-tour-tab');
-    const donateToggle = document.getElementById('toggle-donate-tab');
-    const donorNote = document.getElementById('donor-note');
+    const surpriseToggle = document.getElementById("toggle-surprise-tab");
+    const tourToggle = document.getElementById("toggle-tour-tab");
+    const donateToggle = document.getElementById("toggle-donate-tab");
+    const donorNote = document.getElementById("donor-note");
 
     if (surpriseToggle) {
       surpriseToggle.checked = this.settings.surpriseTabEnabled;
@@ -619,48 +909,48 @@ class SettingsManager {
       donateToggle.checked = this.settings.donateTabEnabled;
 
       // Handle donor-only functionality
-      const donateToggleWrapper = donateToggle.closest('.settings-toggle');
+      const donateToggleWrapper = donateToggle.closest(".settings-toggle");
       if (this.isDonor) {
-        donateToggleWrapper.classList.remove('settings-disabled');
+        donateToggleWrapper.classList.remove("settings-disabled");
         donateToggle.disabled = false;
         if (donorNote) {
-          donorNote.style.display = 'block';
+          donorNote.style.display = "block";
         }
       } else {
         if (!this.settings.donateTabEnabled) {
-          donateToggleWrapper.classList.add('settings-disabled');
+          donateToggleWrapper.classList.add("settings-disabled");
           donateToggle.disabled = true;
         }
         if (donorNote) {
-          donorNote.style.display = 'none';
+          donorNote.style.display = "none";
         }
       }
     }
 
     // Update appearance settings
-    const themeSelect = document.getElementById('theme-select');
+    const themeSelect = document.getElementById("theme-select");
     if (themeSelect) {
       themeSelect.value = this.settings.theme;
     }
 
-    const fontSizeSelect = document.getElementById('font-size-select');
+    const fontSizeSelect = document.getElementById("font-size-select");
     if (fontSizeSelect) {
       fontSizeSelect.value = this.settings.fontSize;
     }
 
-    const highContrastToggle = document.getElementById('toggle-high-contrast');
+    const highContrastToggle = document.getElementById("toggle-high-contrast");
     if (highContrastToggle) {
       highContrastToggle.checked = this.settings.highContrast;
     }
 
     const reducedMotionToggle = document.getElementById(
-      'toggle-reduced-motion'
+      "toggle-reduced-motion",
     );
     if (reducedMotionToggle) {
       reducedMotionToggle.checked = this.settings.reducedMotion;
     }
 
-    const largeTargetsToggle = document.getElementById('toggle-large-targets');
+    const largeTargetsToggle = document.getElementById("toggle-large-targets");
     if (largeTargetsToggle) {
       largeTargetsToggle.checked = this.settings.largeClickTargets;
     }
@@ -683,26 +973,26 @@ class SettingsManager {
     const { documentElement: root } = document;
 
     // Apply theme
-    body.classList.remove('theme-light', 'theme-dark', 'theme-auto');
+    body.classList.remove("theme-light", "theme-dark", "theme-auto");
     body.classList.add(`theme-${this.settings.theme}`);
 
     // Apply actual theme based on system preference for auto mode
-    if (this.settings.theme === 'auto') {
+    if (this.settings.theme === "auto") {
       const prefersDark = window.matchMedia(
-        '(prefers-color-scheme: dark)'
+        "(prefers-color-scheme: dark)",
       ).matches;
-      body.classList.toggle('dark-mode', prefersDark);
+      body.classList.toggle("dark-mode", prefersDark);
     } else {
-      body.classList.toggle('dark-mode', this.settings.theme === 'dark');
+      body.classList.toggle("dark-mode", this.settings.theme === "dark");
     }
 
     // Force apply dark mode styles if in dark mode
-    if (body.classList.contains('dark-mode')) {
+    if (body.classList.contains("dark-mode")) {
       this.forceDarkModeComponents();
     }
 
     // Update CSS custom properties for dynamic theming
-    const isDarkMode = body.classList.contains('dark-mode');
+    const isDarkMode = body.classList.contains("dark-mode");
 
     // Update theme-color meta tag
     const themeColorMeta = document.querySelector('meta[name="theme-color"]');
@@ -710,148 +1000,148 @@ class SettingsManager {
 
     if (isDarkMode) {
       // Dark mode colors
-      root.style.setProperty('--text-color', '#ffffff');
-      root.style.setProperty('--text-secondary', '#cccccc');
-      root.style.setProperty('--text-primary', '#ffffff');
-      root.style.setProperty('--border-color', '#444444');
-      root.style.setProperty('--primary-color', '#4a9eff');
-      root.style.setProperty('--primary-accent', '#4a9eff');
-      root.style.setProperty('--primary-dark', '#3a8eef');
-      root.style.setProperty('--color-primary', '#4a9eff');
-      root.style.setProperty('--color-primary-light', '#6bb4ff');
-      root.style.setProperty('--color-primary-dark', '#3a8eef');
-      root.style.setProperty('--hover-bg', '#3d3d3d');
-      root.style.setProperty('--background-color', '#2d2d2d');
-      root.style.setProperty('--color-gray-50', '#3d3d3d');
-      root.style.setProperty('--color-gray-200', '#444444');
-      root.style.setProperty('--color-gray-700', '#cccccc');
-      root.style.setProperty('--color-gray-900', '#ffffff');
-      root.style.setProperty('--color-white', '#2d2d2d');
+      root.style.setProperty("--text-color", "#ffffff");
+      root.style.setProperty("--text-secondary", "#cccccc");
+      root.style.setProperty("--text-primary", "#ffffff");
+      root.style.setProperty("--border-color", "#444444");
+      root.style.setProperty("--primary-color", "#4a9eff");
+      root.style.setProperty("--primary-accent", "#4a9eff");
+      root.style.setProperty("--primary-dark", "#3a8eef");
+      root.style.setProperty("--color-primary", "#4a9eff");
+      root.style.setProperty("--color-primary-light", "#6bb4ff");
+      root.style.setProperty("--color-primary-dark", "#3a8eef");
+      root.style.setProperty("--hover-bg", "#3d3d3d");
+      root.style.setProperty("--background-color", "#2d2d2d");
+      root.style.setProperty("--color-gray-50", "#3d3d3d");
+      root.style.setProperty("--color-gray-200", "#444444");
+      root.style.setProperty("--color-gray-700", "#cccccc");
+      root.style.setProperty("--color-gray-900", "#ffffff");
+      root.style.setProperty("--color-white", "#2d2d2d");
 
       // Update meta tags for dark mode
-      if (themeColorMeta) themeColorMeta.setAttribute('content', '#2d2d2d');
-      if (colorSchemeMeta) colorSchemeMeta.setAttribute('content', 'dark');
+      if (themeColorMeta) themeColorMeta.setAttribute("content", "#2d2d2d");
+      if (colorSchemeMeta) colorSchemeMeta.setAttribute("content", "dark");
     } else {
       // Light mode colors
-      root.style.setProperty('--text-color', '#333333');
-      root.style.setProperty('--text-secondary', '#666666');
-      root.style.setProperty('--text-primary', '#333333');
-      root.style.setProperty('--border-color', '#e0e0e0');
-      root.style.setProperty('--primary-color', '#1a73e8');
-      root.style.setProperty('--primary-accent', '#3498db');
-      root.style.setProperty('--primary-dark', '#2c3e50');
-      root.style.setProperty('--color-primary', '#007cba');
-      root.style.setProperty('--color-primary-light', '#4da6d9');
-      root.style.setProperty('--color-primary-dark', '#005a87');
-      root.style.setProperty('--hover-bg', '#f5f5f5');
-      root.style.setProperty('--background-color', '#ffffff');
-      root.style.setProperty('--color-gray-50', '#f9fafb');
-      root.style.setProperty('--color-gray-200', '#e5e7eb');
-      root.style.setProperty('--color-gray-700', '#374151');
-      root.style.setProperty('--color-gray-900', '#111827');
-      root.style.setProperty('--color-white', '#ffffff');
+      root.style.setProperty("--text-color", "#333333");
+      root.style.setProperty("--text-secondary", "#666666");
+      root.style.setProperty("--text-primary", "#333333");
+      root.style.setProperty("--border-color", "#e0e0e0");
+      root.style.setProperty("--primary-color", "#1a73e8");
+      root.style.setProperty("--primary-accent", "#3498db");
+      root.style.setProperty("--primary-dark", "#2c3e50");
+      root.style.setProperty("--color-primary", "#007cba");
+      root.style.setProperty("--color-primary-light", "#4da6d9");
+      root.style.setProperty("--color-primary-dark", "#005a87");
+      root.style.setProperty("--hover-bg", "#f5f5f5");
+      root.style.setProperty("--background-color", "#ffffff");
+      root.style.setProperty("--color-gray-50", "#f9fafb");
+      root.style.setProperty("--color-gray-200", "#e5e7eb");
+      root.style.setProperty("--color-gray-700", "#374151");
+      root.style.setProperty("--color-gray-900", "#111827");
+      root.style.setProperty("--color-white", "#ffffff");
 
       // Update meta tags for light mode
-      if (themeColorMeta) themeColorMeta.setAttribute('content', '#667eea');
-      if (colorSchemeMeta) colorSchemeMeta.setAttribute('content', 'light');
+      if (themeColorMeta) themeColorMeta.setAttribute("content", "#667eea");
+      if (colorSchemeMeta) colorSchemeMeta.setAttribute("content", "light");
     } // Apply font size
     html.classList.remove(
-      'font-size-small',
-      'font-size-medium',
-      'font-size-large',
-      'font-size-extra-large'
+      "font-size-small",
+      "font-size-medium",
+      "font-size-large",
+      "font-size-extra-large",
     );
     html.classList.add(`font-size-${this.settings.fontSize}`);
 
     // Apply accessibility settings
-    body.classList.toggle('high-contrast', this.settings.highContrast);
-    body.classList.toggle('reduced-motion', this.settings.reducedMotion);
+    body.classList.toggle("high-contrast", this.settings.highContrast);
+    body.classList.toggle("reduced-motion", this.settings.reducedMotion);
     body.classList.toggle(
-      'large-click-targets',
-      this.settings.largeClickTargets
+      "large-click-targets",
+      this.settings.largeClickTargets,
     );
 
     // Update CSS custom properties for high contrast mode
     if (this.settings.highContrast) {
-      root.style.setProperty('--primary-color', '#000000');
-      root.style.setProperty('--secondary-color', '#ffffff');
-      root.style.setProperty('--text-color', '#000000');
-      root.style.setProperty('--background-color', '#ffffff');
+      root.style.setProperty("--primary-color", "#000000");
+      root.style.setProperty("--secondary-color", "#ffffff");
+      root.style.setProperty("--text-color", "#000000");
+      root.style.setProperty("--background-color", "#ffffff");
     }
   }
 
   notifySettingsChanged() {
     // Dispatch custom event for other components to listen to
     window.dispatchEvent(
-      new CustomEvent('settingsChanged', {
+      new CustomEvent("settingsChanged", {
         detail: {
           settings: this.settings,
           isDonor: this.isDonor,
         },
-      })
+      }),
     );
   }
 
   toggleSettingsDropdown() {
-    const settingsNav = document.getElementById('settings-nav');
-    const settingsMenu = document.querySelector('.settings-menu');
+    const settingsNav = document.getElementById("settings-nav");
+    const settingsMenu = document.querySelector(".settings-menu");
 
     if (settingsNav && settingsMenu) {
-      const isExpanded = settingsNav.getAttribute('aria-expanded') === 'true';
+      const isExpanded = settingsNav.getAttribute("aria-expanded") === "true";
       const newState = !isExpanded;
 
-      settingsNav.setAttribute('aria-expanded', newState);
-      settingsMenu.style.display = newState ? 'block' : 'none';
+      settingsNav.setAttribute("aria-expanded", newState);
+      settingsMenu.style.display = newState ? "block" : "none";
 
       // Track settings panel interaction
-      userEngagementTracker.trackUserEvent('settings_panel_interaction', {
-        action: newState ? 'open' : 'close',
-        trigger: 'click',
-        method: 'toggle',
-        context: 'navigation',
+      userEngagementTracker.trackUserEvent("settings_panel_interaction", {
+        action: newState ? "open" : "close",
+        trigger: "click",
+        method: "toggle",
+        context: "navigation",
       });
     }
   }
 
   openSettingsDropdown() {
-    const settingsNav = document.getElementById('settings-nav');
-    const settingsMenu = document.querySelector('.settings-menu');
+    const settingsNav = document.getElementById("settings-nav");
+    const settingsMenu = document.querySelector(".settings-menu");
 
     if (settingsNav && settingsMenu) {
-      const wasOpen = settingsNav.getAttribute('aria-expanded') === 'true';
+      const wasOpen = settingsNav.getAttribute("aria-expanded") === "true";
 
-      settingsNav.setAttribute('aria-expanded', 'true');
-      settingsMenu.style.display = 'block';
+      settingsNav.setAttribute("aria-expanded", "true");
+      settingsMenu.style.display = "block";
 
       // Track settings panel open (if not already open)
       if (!wasOpen) {
-        userEngagementTracker.trackUserEvent('settings_panel_interaction', {
-          action: 'open',
-          trigger: 'hover',
-          method: 'direct',
-          context: 'navigation',
+        userEngagementTracker.trackUserEvent("settings_panel_interaction", {
+          action: "open",
+          trigger: "hover",
+          method: "direct",
+          context: "navigation",
         });
       }
     }
   }
 
   closeSettingsDropdown() {
-    const settingsNav = document.getElementById('settings-nav');
-    const settingsMenu = document.querySelector('.settings-menu');
+    const settingsNav = document.getElementById("settings-nav");
+    const settingsMenu = document.querySelector(".settings-menu");
 
     if (settingsNav && settingsMenu) {
-      const wasOpen = settingsNav.getAttribute('aria-expanded') === 'true';
+      const wasOpen = settingsNav.getAttribute("aria-expanded") === "true";
 
-      settingsNav.setAttribute('aria-expanded', 'false');
-      settingsMenu.style.display = 'none';
+      settingsNav.setAttribute("aria-expanded", "false");
+      settingsMenu.style.display = "none";
 
       // Track settings panel close (if was open)
       if (wasOpen) {
-        userEngagementTracker.trackUserEvent('settings_panel_interaction', {
-          action: 'close',
-          trigger: 'hover_leave',
-          method: 'direct',
-          context: 'navigation',
+        userEngagementTracker.trackUserEvent("settings_panel_interaction", {
+          action: "close",
+          trigger: "hover_leave",
+          method: "direct",
+          context: "navigation",
         });
       }
     }
@@ -859,8 +1149,8 @@ class SettingsManager {
 
   showDonationRequiredMessage() {
     // Create a temporary notification
-    const notification = document.createElement('div');
-    notification.className = 'settings-notification';
+    const notification = document.createElement("div");
+    notification.className = "settings-notification";
     notification.innerHTML = `
       <div class="notification-content">
         <span class="notification-icon">💡</span>
@@ -889,7 +1179,7 @@ class SettingsManager {
     // Auto-remove after duration
     setTimeout(() => {
       if (notification.parentNode) {
-        notification.style.animation = 'slideOut 0.3s ease';
+        notification.style.animation = "slideOut 0.3s ease";
         setTimeout(() => {
           if (notification.parentNode) {
             notification.parentNode.removeChild(notification);
@@ -899,9 +1189,9 @@ class SettingsManager {
     }, NOTIFICATION_DURATION);
 
     // Close button handler
-    const closeBtn = notification.querySelector('.notification-close');
+    const closeBtn = notification.querySelector(".notification-close");
     if (closeBtn) {
-      closeBtn.addEventListener('click', () => {
+      closeBtn.addEventListener("click", () => {
         if (notification.parentNode) {
           notification.parentNode.removeChild(notification);
         }
@@ -914,29 +1204,29 @@ class SettingsManager {
    */
   setupNotificationEventListeners() {
     // Main notifications toggle
-    const notificationsToggle = document.getElementById('toggle-notifications');
+    const notificationsToggle = document.getElementById("toggle-notifications");
     if (notificationsToggle) {
-      notificationsToggle.addEventListener('change', e => {
+      notificationsToggle.addEventListener("change", (e) => {
         this.handleNotificationToggle(e.target.checked);
       });
     }
 
     // Achievement notifications toggle
     const achievementToggle = document.getElementById(
-      'toggle-achievement-notifications'
+      "toggle-achievement-notifications",
     );
     if (achievementToggle) {
-      achievementToggle.addEventListener('change', e => {
+      achievementToggle.addEventListener("change", (e) => {
         const oldValue = this.settings.achievementNotifications;
         this.settings.achievementNotifications = e.target.checked;
 
-        userEngagementTracker.trackUserEvent('settings_change', {
-          settingName: 'achievementNotifications',
+        userEngagementTracker.trackUserEvent("settings_change", {
+          settingName: "achievementNotifications",
           oldValue,
           newValue: e.target.checked,
-          settingType: 'toggle',
-          category: 'notifications',
-          context: 'settings_panel',
+          settingType: "toggle",
+          category: "notifications",
+          context: "settings_panel",
         });
 
         this.saveSettings();
@@ -944,19 +1234,19 @@ class SettingsManager {
     }
 
     // Badge notifications toggle
-    const badgeToggle = document.getElementById('toggle-badge-notifications');
+    const badgeToggle = document.getElementById("toggle-badge-notifications");
     if (badgeToggle) {
-      badgeToggle.addEventListener('change', e => {
+      badgeToggle.addEventListener("change", (e) => {
         const oldValue = this.settings.badgeNotifications;
         this.settings.badgeNotifications = e.target.checked;
 
-        userEngagementTracker.trackUserEvent('settings_change', {
-          settingName: 'badgeNotifications',
+        userEngagementTracker.trackUserEvent("settings_change", {
+          settingName: "badgeNotifications",
           oldValue,
           newValue: e.target.checked,
-          settingType: 'toggle',
-          category: 'notifications',
-          context: 'settings_panel',
+          settingType: "toggle",
+          category: "notifications",
+          context: "settings_panel",
         });
 
         this.saveSettings();
@@ -965,20 +1255,20 @@ class SettingsManager {
 
     // Progress notifications toggle
     const progressToggle = document.getElementById(
-      'toggle-progress-notifications'
+      "toggle-progress-notifications",
     );
     if (progressToggle) {
-      progressToggle.addEventListener('change', e => {
+      progressToggle.addEventListener("change", (e) => {
         const oldValue = this.settings.progressNotifications;
         this.settings.progressNotifications = e.target.checked;
 
-        userEngagementTracker.trackUserEvent('settings_change', {
-          settingName: 'progressNotifications',
+        userEngagementTracker.trackUserEvent("settings_change", {
+          settingName: "progressNotifications",
           oldValue,
           newValue: e.target.checked,
-          settingType: 'toggle',
-          category: 'notifications',
-          context: 'settings_panel',
+          settingType: "toggle",
+          category: "notifications",
+          context: "settings_panel",
         });
 
         this.saveSettings();
@@ -997,46 +1287,46 @@ class SettingsManager {
 
     if (enabled) {
       // Check if notifications are already blocked/denied
-      if (Notification.permission === 'denied') {
+      if (Notification.permission === "denied") {
         // Don't try to request permission again - it's blocked
         this.settings.notificationsEnabled = false;
-        const toggle = document.getElementById('toggle-notifications');
+        const toggle = document.getElementById("toggle-notifications");
         if (toggle) toggle.checked = false;
-        this.updateNotificationStatus('denied');
+        this.updateNotificationStatus("denied");
         this.showHowToUnblockNotifications();
         return;
       }
 
       // Request permission if enabling
       const permission = await this.requestNotificationPermission();
-      this.settings.notificationsEnabled = permission === 'granted';
+      this.settings.notificationsEnabled = permission === "granted";
 
-      if (permission === 'granted') {
+      if (permission === "granted") {
         this.showNotificationSubOptions(true);
         this.initializeFCM();
       } else {
         // Reset toggle if permission denied
-        const toggle = document.getElementById('toggle-notifications');
+        const toggle = document.getElementById("toggle-notifications");
         if (toggle) toggle.checked = false;
         this.updateNotificationStatus(permission);
-        if (permission === 'denied') {
+        if (permission === "denied") {
           this.showHowToUnblockNotifications();
         }
       }
     } else {
       this.settings.notificationsEnabled = false;
       this.showNotificationSubOptions(false);
-      this.updateNotificationStatus('disabled');
+      this.updateNotificationStatus("disabled");
     }
 
-    userEngagementTracker.trackUserEvent('settings_change', {
-      settingName: 'notificationsEnabled',
+    userEngagementTracker.trackUserEvent("settings_change", {
+      settingName: "notificationsEnabled",
       oldValue,
       newValue: this.settings.notificationsEnabled,
-      settingType: 'toggle',
-      category: 'notifications',
+      settingType: "toggle",
+      category: "notifications",
       permissionResult: Notification.permission,
-      context: 'settings_panel',
+      context: "settings_panel",
     });
 
     this.saveSettings();
@@ -1046,15 +1336,15 @@ class SettingsManager {
    * Request notification permission
    */
   async requestNotificationPermission() {
-    if (!('Notification' in window)) {
-      this.updateNotificationStatus('unsupported');
-      return 'denied';
+    if (!("Notification" in window)) {
+      this.updateNotificationStatus("unsupported");
+      return "denied";
     }
 
     // Check if already denied/blocked
-    if (Notification.permission === 'denied') {
-      this.updateNotificationStatus('denied');
-      return 'denied';
+    if (Notification.permission === "denied") {
+      this.updateNotificationStatus("denied");
+      return "denied";
     }
 
     try {
@@ -1063,8 +1353,8 @@ class SettingsManager {
       return permission;
     } catch (error) {
       // Error requesting notification permission - this can happen when blocked
-      this.updateNotificationStatus('denied');
-      return 'denied';
+      this.updateNotificationStatus("denied");
+      return "denied";
     }
   }
 
@@ -1072,8 +1362,8 @@ class SettingsManager {
    * Check current notification permission
    */
   checkNotificationPermission() {
-    if (!('Notification' in window)) {
-      this.updateNotificationStatus('unsupported');
+    if (!("Notification" in window)) {
+      this.updateNotificationStatus("unsupported");
       return;
     }
 
@@ -1081,14 +1371,14 @@ class SettingsManager {
     this.updateNotificationStatus(permission);
 
     // Update settings based on actual permission
-    if (permission === 'granted' && this.settings.notificationsEnabled) {
+    if (permission === "granted" && this.settings.notificationsEnabled) {
       this.showNotificationSubOptions(true);
     } else {
       this.settings.notificationsEnabled = false;
       this.showNotificationSubOptions(false);
 
       // Update the toggle to reflect the correct state
-      const toggle = document.getElementById('toggle-notifications');
+      const toggle = document.getElementById("toggle-notifications");
       if (toggle) {
         toggle.checked = false;
       }
@@ -1101,19 +1391,19 @@ class SettingsManager {
    * Update notification status display
    */
   updateNotificationStatus(status) {
-    const toggle = document.getElementById('toggle-notifications');
+    const toggle = document.getElementById("toggle-notifications");
 
     if (!toggle) return;
 
     // Update toggle state
-    if (status === 'granted' && this.settings.notificationsEnabled) {
+    if (status === "granted" && this.settings.notificationsEnabled) {
       toggle.checked = true;
     } else {
       toggle.checked = false;
     }
 
     // Show a toast for important status changes
-    if (status === 'denied' || status === 'error' || status === 'unsupported') {
+    if (status === "denied" || status === "error" || status === "unsupported") {
       // Auto-show toast for problematic states
       setTimeout(() => {
         this.showNotificationStatusToast(status);
@@ -1126,15 +1416,15 @@ class SettingsManager {
    */
   showNotificationSubOptions(show) {
     const sections = [
-      'notification-types-section',
-      'notification-badges-section',
-      'notification-progress-section',
+      "notification-types-section",
+      "notification-badges-section",
+      "notification-progress-section",
     ];
 
-    sections.forEach(sectionId => {
+    sections.forEach((sectionId) => {
       const section = document.getElementById(sectionId);
       if (section) {
-        section.style.display = show ? 'block' : 'none';
+        section.style.display = show ? "block" : "none";
       }
     });
   }
@@ -1151,15 +1441,15 @@ class SettingsManager {
 
     const toastConfigs = {
       granted: {
-        type: 'success',
-        title: '🔔 Notifications Enabled',
+        type: "success",
+        title: "🔔 Notifications Enabled",
         message:
-          'You will receive notifications for achievements, badges, and progress updates. You can customize these in the settings below.',
+          "You will receive notifications for achievements, badges, and progress updates. You can customize these in the settings below.",
         duration: 5000,
       },
       denied: {
-        type: 'warning',
-        title: '🚫 Notifications Blocked',
+        type: "warning",
+        title: "🚫 Notifications Blocked",
         message: `To enable notifications:
         1. Click the lock/info icon next to the URL
         2. Change notifications from "Block" to "Allow"
@@ -1167,39 +1457,39 @@ class SettingsManager {
         duration: 8000,
       },
       default: {
-        type: 'info',
-        title: '🔔 Enable Notifications?',
+        type: "info",
+        title: "🔔 Enable Notifications?",
         message:
           "Toggle the switch above to enable notifications. You'll be asked for permission to show notifications from SimulateAI.",
         duration: 5000,
       },
       unsupported: {
-        type: 'error',
-        title: '❌ Notifications Not Supported',
+        type: "error",
+        title: "❌ Notifications Not Supported",
         message:
           "Your browser doesn't support notifications. Consider updating your browser or switching to a modern browser like Chrome, Firefox, or Safari.",
         duration: 6000,
       },
       disabled: {
-        type: 'info',
-        title: '🔕 Notifications Disabled',
+        type: "info",
+        title: "🔕 Notifications Disabled",
         message:
-          'Notifications are currently turned off. Toggle the switch above to enable notifications for achievements and progress updates.',
+          "Notifications are currently turned off. Toggle the switch above to enable notifications for achievements and progress updates.",
         duration: 4000,
       },
       error: {
-        type: 'error',
-        title: '⚠️ Notification Error',
+        type: "error",
+        title: "⚠️ Notification Error",
         message:
-          'There was an error with the notification system. Try refreshing the page or check your browser settings.',
+          "There was an error with the notification system. Try refreshing the page or check your browser settings.",
         duration: 6000,
       },
     };
 
     const config = toastConfigs[status] || {
-      type: 'info',
-      title: 'Notification Status',
-      message: 'Click the toggle above to manage notification settings.',
+      type: "info",
+      title: "Notification Status",
+      message: "Click the toggle above to manage notification settings.",
       duration: 4000,
     };
 
@@ -1215,7 +1505,7 @@ class SettingsManager {
   showNotificationStatusFallback(status) {
     const messages = {
       granted:
-        'Notifications are enabled! You will receive alerts for achievements, badges, and progress updates.',
+        "Notifications are enabled! You will receive alerts for achievements, badges, and progress updates.",
       denied:
         'Notifications are blocked. To enable:\n1. Click the lock icon next to the URL\n2. Change notifications to "Allow"\n3. Refresh and try again',
       default:
@@ -1223,13 +1513,13 @@ class SettingsManager {
       unsupported:
         "Your browser doesn't support notifications. Consider updating your browser.",
       disabled:
-        'Notifications are currently disabled. Use the toggle above to enable them.',
-      error: 'There was an error with notifications. Try refreshing the page.',
+        "Notifications are currently disabled. Use the toggle above to enable them.",
+      error: "There was an error with notifications. Try refreshing the page.",
     };
 
     alert(
       messages[status] ||
-        'Click the toggle above to manage notification settings.'
+        "Click the toggle above to manage notification settings.",
     );
   }
 
@@ -1238,7 +1528,7 @@ class SettingsManager {
    */
   showHowToUnblockNotifications() {
     // Use the new toast system for consistent messaging
-    this.showNotificationStatusToast('denied');
+    this.showNotificationStatusToast("denied");
   }
 
   /**
@@ -1249,12 +1539,12 @@ class SettingsManager {
       // Check if FCM is available
       if (
         window.fcmMainApp &&
-        typeof window.fcmMainApp.initialize === 'function'
+        typeof window.fcmMainApp.initialize === "function"
       ) {
         await window.fcmMainApp.initialize();
       } else {
         // Dynamically import FCM if not already loaded
-        const { default: fcmMainApp } = await import('../fcm-main-app.js');
+        const { default: fcmMainApp } = await import("../fcm-main-app.js");
         await fcmMainApp.initialize();
       }
     } catch (error) {
@@ -1268,15 +1558,15 @@ class SettingsManager {
   sendTestNotification() {
     if (
       !this.settings.notificationsEnabled ||
-      Notification.permission !== 'granted'
+      Notification.permission !== "granted"
     ) {
       return;
     }
 
-    new Notification('SimulateAI Test', {
-      body: 'Notifications are working correctly!',
-      icon: '/favicon.ico',
-      badge: '/favicon.ico',
+    new Notification("SimulateAI Test", {
+      body: "Notifications are working correctly!",
+      icon: "/favicon.ico",
+      badge: "/favicon.ico",
     });
   }
 
@@ -1298,13 +1588,13 @@ class SettingsManager {
    */
   updateNotificationUI() {
     // Update notification toggles
-    const notificationsToggle = document.getElementById('toggle-notifications');
+    const notificationsToggle = document.getElementById("toggle-notifications");
     const achievementToggle = document.getElementById(
-      'toggle-achievement-notifications'
+      "toggle-achievement-notifications",
     );
-    const badgeToggle = document.getElementById('toggle-badge-notifications');
+    const badgeToggle = document.getElementById("toggle-badge-notifications");
     const progressToggle = document.getElementById(
-      'toggle-progress-notifications'
+      "toggle-progress-notifications",
     );
 
     if (notificationsToggle) {
@@ -1336,10 +1626,82 @@ class SettingsManager {
   }
 
   setSetting(key, value) {
-    this.settings[key] = value;
+    // Validate the setting before applying
+    const validatedValue = this.validateSingleSetting(key, value);
+
+    this.settings[key] = validatedValue;
     this.saveSettings();
     this.applySettings();
     this.updateUI();
+  }
+
+  /**
+   * Validate a single setting value
+   */
+  validateSingleSetting(key, value) {
+    if (!this.settingsSchema?.settings) {
+      return value; // No schema available, accept value as-is
+    }
+
+    // Find the setting definition
+    const settingDef = this.findSettingDefinition(key);
+    if (!settingDef) {
+      return value; // No definition found, accept value
+    }
+
+    // Type validation
+    if (settingDef.type === "boolean" && typeof value !== "boolean") {
+      return settingDef.default;
+    }
+
+    if (settingDef.type === "string" && typeof value !== "string") {
+      return settingDef.default;
+    }
+
+    if (settingDef.type === "number" && typeof value !== "number") {
+      return settingDef.default;
+    }
+
+    // Options validation
+    if (settingDef.options && !settingDef.options.includes(value)) {
+      return settingDef.default;
+    }
+
+    // Range validation for numbers
+    if (settingDef.type === "number") {
+      if (settingDef.min !== undefined && value < settingDef.min) {
+        return settingDef.min;
+      }
+      if (settingDef.max !== undefined && value > settingDef.max) {
+        return settingDef.max;
+      }
+    }
+
+    // Donor privilege validation
+    if (settingDef.requiresDonor && !this.isDonor) {
+      if (settingDef.restrictions?.nonDonorBehavior === "force_enabled") {
+        return true;
+      }
+      return settingDef.default;
+    }
+
+    return value;
+  }
+
+  /**
+   * Find setting definition by flat key
+   */
+  findSettingDefinition(flatKey) {
+    if (!this.settingsSchema?.settings) return null;
+
+    // Parse the flat key (e.g., "appearance_theme" -> category: "appearance", key: "theme")
+    const parts = flatKey.split("_");
+    if (parts.length < 2) return null;
+
+    const category = parts[0];
+    const settingKey = parts.slice(1).join("_");
+
+    return this.settingsSchema.settings[category]?.[settingKey] || null;
   }
 
   reset() {
@@ -1347,8 +1709,8 @@ class SettingsManager {
       surpriseTabEnabled: true,
       tourTabEnabled: true,
       donateTabEnabled: true,
-      theme: 'auto',
-      fontSize: 'medium',
+      theme: "auto",
+      fontSize: "medium",
       highContrast: false,
       reducedMotion: false,
       largeClickTargets: false,
@@ -1360,7 +1722,7 @@ class SettingsManager {
 }
 
 // Auto-initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   // Wait a bit for shared navigation to inject HTML
   setTimeout(() => {
     if (!window.settingsManager) {
@@ -1370,8 +1732,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Also try to initialize if DOM is already loaded
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       if (!window.settingsManager) {
         window.settingsManager = new SettingsManager();
@@ -1388,7 +1750,7 @@ if (document.readyState === 'loading') {
 }
 
 // Add required CSS animations
-const style = document.createElement('style');
+const style = document.createElement("style");
 style.textContent = `
   @keyframes slideIn {
     from {

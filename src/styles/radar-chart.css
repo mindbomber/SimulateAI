@@ -24,6 +24,9 @@
   margin: 0 auto;
   border-radius: 0; /* No border radius for cleaner look */
   background: transparent;
+  /* CRITICAL: Ensure crisp rendering without forcing pixelation */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: optimizeQuality;
 }
 
 /* Mobile optimization for radar demo */
@@ -74,6 +77,9 @@
   background: transparent;
   box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.12); /* Subtle bottom-right shadow similar to demo */
   /* Removed overflow: hidden to allow Chart.js tooltips to show */
+  /* CRITICAL: Ensure crisp rendering without forcing pixelation */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: optimizeQuality;
 }
 
 /* Chart.js Tooltip Support - Ensure tooltips appear above all content */

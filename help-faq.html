@@ -176,7 +176,7 @@
       }
 
       .faq summary::after {
-        content: '▼';
+        content: "▼";
         transition: transform 0.3s ease;
         color: var(--help-primary);
         font-weight: bold;
@@ -205,7 +205,7 @@
         background: rgba(76, 127, 255, 0.1);
         padding: 0.2rem 0.5rem;
         border-radius: 0.3rem;
-        font-family: 'Monaco', 'Menlo', monospace;
+        font-family: "Monaco", "Menlo", monospace;
       }
 
       .faq-content a {
@@ -517,7 +517,7 @@
               <p>
                 Select <em>Forgot Password</em> on the login screen and enter
                 your email. We'll send a reset link within two minutes. Still
-                waiting? Check spam or whitelist <code>@simulateai.org</code> in
+                waiting? Check spam or whitelist <code>@simulateai.io</code> in
                 your email settings.
               </p>
             </div>
@@ -935,8 +935,8 @@
                 Yes! We welcome donations through our
                 <a href="donate.html">support page</a> and collaborate with
                 educators on scenario development. Email
-                <a href="mailto:scenarios@simulateai.org"
-                  >scenarios@simulateai.org</a
+                <a href="mailto:research@simulateai.io"
+                  >research@simulateai.io</a
                 >
                 to discuss contributing your ethical dilemmas or real-world case
                 studies.
@@ -1037,7 +1037,7 @@
               <strong>Response time:</strong> Within 24 hours (M-F, 9 AM - 5 PM
               ET)
             </p>
-            <a href="mailto:support@simulateai.org" class="help-button"
+            <a href="mailto:research@simulateai.io" class="help-button"
               >Email Support</a
             >
           </div>
@@ -1123,25 +1123,25 @@
     <script type="module">
       // Ensure the page is fully loaded before initializing navigation
       setTimeout(() => {
-        import('./src/js/components/shared-navigation.js');
+        import("./src/js/components/shared-navigation.js");
       }, 100);
     </script>
 
     <!-- Search Functionality -->
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener("DOMContentLoaded", () => {
         // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-          anchor.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-            if (!href || href === '#') return;
+        document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+          anchor.addEventListener("click", function (e) {
+            const href = this.getAttribute("href");
+            if (!href || href === "#") return;
 
             e.preventDefault();
             const target = document.querySelector(href);
             if (target) {
               target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
+                behavior: "smooth",
+                block: "start",
               });
             }
           });

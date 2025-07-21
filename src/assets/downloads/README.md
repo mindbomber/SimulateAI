@@ -38,7 +38,7 @@ For questions about these resources:
 
 - Visit the Help Center
 - Join our Educator Slack Community
-- Email educators@simulateai.org
+- Email research@simulateai.io
 
 ## Licensing
 

@@ -20,7 +20,7 @@
 
       body {
         font-family:
-          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
           Cantarell, sans-serif;
         line-height: 1.6;
         color: #333;
@@ -181,7 +181,7 @@
         background: #e3f2fd;
       }
 
-      .consent-checkbox input[type='checkbox'] {
+      .consent-checkbox input[type="checkbox"] {
         margin-right: 12px;
         margin-top: 2px;
         transform: scale(1.2);
@@ -340,7 +340,7 @@
           </div>
           <div class="study-info-item">
             <span><strong>Contact:</strong></span>
-            <span>research@simulateai.org</span>
+            <span>research@simulateai.io</span>
           </div>
           <div class="study-info-item">
             <span><strong>Date:</strong></span>
@@ -533,7 +533,7 @@
         <div class="contact-info">
           <p>
             <strong>Questions?</strong> Contact our research team at
-            <a href="mailto:research@simulateai.org">research@simulateai.org</a>
+            <a href="mailto:research@simulateai.io">research@simulateai.io</a>
           </p>
           <p style="font-size: 12px; color: #666; margin-top: 10px">
             By clicking "I Agree", you will activate research participant mode
@@ -554,7 +554,7 @@
       const ANIMATION_DELAY_STEP = 100;
 
       // Initialize form
-      document.addEventListener('DOMContentLoaded', function () {
+      document.addEventListener("DOMContentLoaded", function () {
         initializeForm();
         setupEventListeners();
         setupAccessibility();
@@ -562,17 +562,17 @@
 
       function initializeForm() {
         // Set current date
-        const dateElement = document.getElementById('currentDate');
+        const dateElement = document.getElementById("currentDate");
         if (dateElement) {
-          dateElement.textContent = new Date().toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
+          dateElement.textContent = new Date().toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
           });
         }
 
         // Add fade-in animation to sections
-        const sections = document.querySelectorAll('.section');
+        const sections = document.querySelectorAll(".section");
         sections.forEach((section, index) => {
           section.style.animationDelay = `${index * ANIMATION_DELAY_STEP}ms`;
         });
@@ -581,22 +581,22 @@
       function setupEventListeners() {
         // Checkbox handling
         const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-          checkbox.addEventListener('change', handleCheckboxChange);
+        checkboxes.forEach((checkbox) => {
+          checkbox.addEventListener("change", handleCheckboxChange);
         });
 
         // Scroll progress
-        window.addEventListener('scroll', updateScrollProgress);
+        window.addEventListener("scroll", updateScrollProgress);
       }
 
       function handleCheckboxChange(event) {
         const checkbox = event.target;
-        const container = checkbox.closest('.consent-checkbox');
+        const container = checkbox.closest(".consent-checkbox");
 
         if (checkbox.checked) {
-          container.classList.add('checked');
+          container.classList.add("checked");
         } else {
-          container.classList.remove('checked');
+          container.classList.remove("checked");
         }
 
         updateProgress();
@@ -606,11 +606,11 @@
       function updateProgress() {
         const checkboxes = document.querySelectorAll('input[type="checkbox"]');
         const checked = document.querySelectorAll(
-          'input[type="checkbox"]:checked'
+          'input[type="checkbox"]:checked',
         ).length;
         const progress = (checked / checkboxes.length) * 100;
 
-        const progressBar = document.getElementById('progressBar');
+        const progressBar = document.getElementById("progressBar");
         if (progressBar) {
           progressBar.style.width = `${progress}%`;
         }
@@ -622,7 +622,7 @@
           document.documentElement.scrollHeight - window.innerHeight;
         const progress = Math.min((scrolled / total) * 100, 100);
 
-        const progressBar = document.getElementById('progressBar');
+        const progressBar = document.getElementById("progressBar");
         if (progressBar) {
           progressBar.style.width = `${progress}%`;
         }
@@ -630,29 +630,29 @@
 
       function validateAllConsents() {
         const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        const agreeButton = document.getElementById('agreeButton');
+        const agreeButton = document.getElementById("agreeButton");
 
         if (!agreeButton) return;
 
-        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        const allChecked = Array.from(checkboxes).every((cb) => cb.checked);
         agreeButton.disabled = !allChecked;
 
         if (allChecked) {
           agreeButton.style.background =
-            'linear-gradient(135deg, #4caf50 0%, #66bb6a 100%)';
-          agreeButton.innerHTML = '✅ All Requirements Met - Proceed';
+            "linear-gradient(135deg, #4caf50 0%, #66bb6a 100%)";
+          agreeButton.innerHTML = "✅ All Requirements Met - Proceed";
         } else {
-          agreeButton.style.background = '';
-          agreeButton.innerHTML = '🚀 I Agree - Activate Research Profile';
+          agreeButton.style.background = "";
+          agreeButton.innerHTML = "🚀 I Agree - Activate Research Profile";
         }
       }
 
       function submitConsent() {
-        const button = document.getElementById('agreeButton');
+        const button = document.getElementById("agreeButton");
         if (!button) return;
 
         // Show loading state
-        button.innerHTML = '⏳ Processing...';
+        button.innerHTML = "⏳ Processing...";
         button.disabled = true;
 
         // Process consent
@@ -661,34 +661,34 @@
             const consentData = {
               timestamp: new Date().toISOString(),
               consents: {
-                readUnderstood: document.getElementById('consent1').checked,
+                readUnderstood: document.getElementById("consent1").checked,
                 voluntaryParticipation:
-                  document.getElementById('consent2').checked,
-                ageVerification: document.getElementById('consent3').checked,
-                withdrawalRights: document.getElementById('consent4').checked,
+                  document.getElementById("consent2").checked,
+                ageVerification: document.getElementById("consent3").checked,
+                withdrawalRights: document.getElementById("consent4").checked,
               },
               userAgent: navigator.userAgent,
-              version: '1.0',
+              version: "1.0",
             };
 
             // Store consent data
             localStorage.setItem(
-              'research_consent',
-              JSON.stringify(consentData)
+              "research_consent",
+              JSON.stringify(consentData),
             );
 
             // Show success message
             alert(
-              '✅ Consent recorded successfully!\n\nYou will now be redirected to complete your research profile activation.'
+              "✅ Consent recorded successfully!\n\nYou will now be redirected to complete your research profile activation.",
             );
 
             // Redirect to activation page
-            window.location.href = '/research-activation.html';
+            window.location.href = "/research-activation.html";
           } catch (error) {
-            button.innerHTML = '❌ Error - Please Try Again';
+            button.innerHTML = "❌ Error - Please Try Again";
             button.disabled = false;
             alert(
-              'There was an error processing your consent. Please try again.'
+              "There was an error processing your consent. Please try again.",
             );
           }
         }, PROCESSING_DELAY);
@@ -696,22 +696,22 @@
 
       function setupAccessibility() {
         // Keyboard navigation
-        document.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter' && e.target.type === 'checkbox') {
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" && e.target.type === "checkbox") {
             e.target.click();
           }
         });
 
         // Focus indicators
         const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-          checkbox.addEventListener('focus', function () {
-            this.closest('.consent-checkbox').style.outline =
-              '3px solid #1976d2';
+        checkboxes.forEach((checkbox) => {
+          checkbox.addEventListener("focus", function () {
+            this.closest(".consent-checkbox").style.outline =
+              "3px solid #1976d2";
           });
 
-          checkbox.addEventListener('blur', function () {
-            this.closest('.consent-checkbox').style.outline = '';
+          checkbox.addEventListener("blur", function () {
+            this.closest(".consent-checkbox").style.outline = "";
           });
         });
       }
