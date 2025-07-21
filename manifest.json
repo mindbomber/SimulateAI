@@ -2,12 +2,12 @@
   "name": "SimulateAI: Ethical Research Lab",
   "short_name": "SimulateAI",
   "description": "Interactive AI ethics simulations and research platform for exploring complex ethical scenarios in artificial intelligence.",
-  "start_url": "https://mindbomber.github.io/SimulateAI/index.html",
+  "start_url": "https://www.SimulateAI.io/index.html",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#667eea",
   "orientation": "portrait-primary",
-  "scope": "/SimulateAI/",
+  "scope": "/",
   "lang": "en-US",
   "dir": "ltr",
   "icons": [
@@ -46,7 +46,7 @@
       "name": "New Simulation",
       "short_name": "New Sim",
       "description": "Start a new AI ethics simulation",
-      "url": "/SimulateAI/index.html#new-simulation",
+      "url": "/index.html#new-simulation",
       "icons": [
         {
           "src": "./src/assets/icons/Square Icon_192_x_192.png",
@@ -58,7 +58,7 @@
       "name": "Research Dashboard",
       "short_name": "Research",
       "description": "View research insights and analytics",
-      "url": "/SimulateAI/firebase-analytics-dashboard.html",
+      "url": "/firebase-analytics-dashboard.html",
       "icons": [
         {
           "src": "./src/assets/icons/Square Icon_192_x_192.png",
@@ -70,7 +70,7 @@
       "name": "Ethics Explorer",
       "short_name": "Ethics",
       "description": "Explore ethical frameworks and principles",
-      "url": "/SimulateAI/index.html#ethics-explorer",
+      "url": "/index.html#ethics-explorer",
       "icons": [
         {
           "src": "./src/assets/icons/Square Icon_192_x_192.png",

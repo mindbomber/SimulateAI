@@ -47,10 +47,10 @@ limitations under the License.
       property="og:description"
       content="Discover cutting-edge research, educational insights, and community discussions about AI ethics and simulation-based learning"
     />
-    <meta property="og:url" content="https://simulateai.org/blog.html" />
+    <meta property="og:url" content="https://www.SimulateAI.io/blog.html" />
     <meta
       property="og:image"
-      content="https://simulateai.org/src/assets/images/blog-preview.jpg"
+      content="https://www.SimulateAI.io/src/assets/images/blog-preview.jpg"
     />
 
     <!-- Twitter Card -->
@@ -1002,9 +1002,9 @@ For research articles, consider including:
 
     <!-- Enhanced Blog Page Script -->
     <script type="module">
-      import AuthService from './src/js/services/auth-service.js';
-      import BlogService from './src/js/services/blog-service.js';
-      import ContributionService from './src/js/services/contribution-service.js';
+      import AuthService from "./src/js/services/auth-service.js";
+      import BlogService from "./src/js/services/blog-service.js";
+      import ContributionService from "./src/js/services/contribution-service.js";
 
       class BlogPage {
         constructor() {
@@ -1017,7 +1017,7 @@ For research articles, consider including:
           this.postsPerPage = 10;
           this.currentPage = 0;
           this.activeFilters = {};
-          this.searchQuery = '';
+          this.searchQuery = "";
         }
 
         async init() {
@@ -1025,7 +1025,7 @@ For research articles, consider including:
           await this.contributionService.initialize();
 
           // Set up auth state listener
-          this.authService.firebaseService.addAuthStateListener(user => {
+          this.authService.firebaseService.addAuthStateListener((user) => {
             this.currentUser = user;
             this.updateUIForAuth();
           });
@@ -1035,61 +1035,61 @@ For research articles, consider including:
         }
 
         async updateUIForAuth() {
-          const writePostBtn = document.getElementById('write-post-btn');
+          const writePostBtn = document.getElementById("write-post-btn");
           const contributionStatus = document.getElementById(
-            'contribution-status'
+            "contribution-status",
           );
 
           if (this.currentUser) {
             // Check if user has profile
             if (!this.authService.userProfile) {
-              writePostBtn.style.display = 'inline-flex';
-              writePostBtn.querySelector('.btn-text').textContent =
-                'Complete Profile to Post';
+              writePostBtn.style.display = "inline-flex";
+              writePostBtn.querySelector(".btn-text").textContent =
+                "Complete Profile to Post";
               if (contributionStatus) {
                 contributionStatus.textContent =
-                  'Profile setup required to share content';
+                  "Profile setup required to share content";
               }
               return;
             }
 
             // Check if user can post
             if (this.canWritePosts()) {
-              writePostBtn.style.display = 'inline-flex';
+              writePostBtn.style.display = "inline-flex";
 
               // Update button text and status based on donor status
               const guidelines =
                 await this.contributionService.getContributionGuidelines(
-                  this.currentUser.uid
+                  this.currentUser.uid,
                 );
 
               const btnText = guidelines.autoApproval
-                ? 'Share & Publish Instantly'
-                : 'Share Your Research';
-              writePostBtn.querySelector('.btn-text').textContent = btnText;
+                ? "Share & Publish Instantly"
+                : "Share Your Research";
+              writePostBtn.querySelector(".btn-text").textContent = btnText;
 
               if (contributionStatus) {
                 contributionStatus.textContent = guidelines.autoApproval
-                  ? 'Instant publication as a valued donor'
-                  : 'Join our community of contributors';
+                  ? "Instant publication as a valued donor"
+                  : "Join our community of contributors";
               }
             } else {
-              writePostBtn.style.display = 'inline-flex';
-              writePostBtn.querySelector('.btn-text').textContent =
-                'Setup Required';
+              writePostBtn.style.display = "inline-flex";
+              writePostBtn.querySelector(".btn-text").textContent =
+                "Setup Required";
               if (contributionStatus) {
                 contributionStatus.textContent =
-                  'Complete setup to share your expertise';
+                  "Complete setup to share your expertise";
               }
             }
           } else {
             // User not signed in
-            writePostBtn.style.display = 'inline-flex';
-            writePostBtn.querySelector('.btn-text').textContent =
-              'Sign In to Post';
+            writePostBtn.style.display = "inline-flex";
+            writePostBtn.querySelector(".btn-text").textContent =
+              "Sign In to Post";
             if (contributionStatus) {
               contributionStatus.textContent =
-                'Sign in to share your research and insights';
+                "Sign in to share your research and insights";
             }
           }
         }
@@ -1119,8 +1119,8 @@ For research articles, consider including:
 
             // Note: Article rendering is handled by professional-blog.js
           } catch (error) {
-            console.error('Error loading blog posts:', error);
-            this.showError('Failed to load blog posts');
+            console.error("Error loading blog posts:", error);
+            this.showError("Failed to load blog posts");
           } finally {
             this.showLoading(false);
           }
@@ -1130,58 +1130,58 @@ For research articles, consider including:
           // Sample posts for demonstration
           return [
             {
-              id: 'sample1',
-              title: 'The Importance of Bias Detection in AI Education',
+              id: "sample1",
+              title: "The Importance of Bias Detection in AI Education",
               summary:
-                'Exploring how simulation-based learning helps students understand and identify AI bias in real-world scenarios.',
+                "Exploring how simulation-based learning helps students understand and identify AI bias in real-world scenarios.",
               content:
-                'AI bias is one of the most critical issues in modern artificial intelligence...',
-              category: 'ai-bias',
+                "AI bias is one of the most critical issues in modern artificial intelligence...",
+              category: "ai-bias",
               author: {
-                name: 'SimulateAI Team',
+                name: "SimulateAI Team",
                 tier: 3,
-                avatar: '/assets/team-avatar.png',
+                avatar: "/assets/team-avatar.png",
               },
-              tags: ['ai-bias', 'education', 'simulation'],
-              createdAt: new Date('2025-01-15'),
+              tags: ["ai-bias", "education", "simulation"],
+              createdAt: new Date("2025-01-15"),
               featured: true,
               views: 1250,
               likes: 89,
             },
             {
-              id: 'sample2',
-              title: 'Research Update: Student Learning Outcomes',
+              id: "sample2",
+              title: "Research Update: Student Learning Outcomes",
               summary:
-                'Latest findings from our research study on simulation-based AI ethics education effectiveness.',
+                "Latest findings from our research study on simulation-based AI ethics education effectiveness.",
               content:
-                'Our recent research study involving 500+ students shows significant improvements...',
-              category: 'research',
+                "Our recent research study involving 500+ students shows significant improvements...",
+              category: "research",
               author: {
-                name: 'Dr. Sarah Chen',
+                name: "Dr. Sarah Chen",
                 tier: 1,
-                avatar: '/assets/researcher-avatar.png',
+                avatar: "/assets/researcher-avatar.png",
               },
-              tags: ['research', 'education', 'outcomes'],
-              createdAt: new Date('2025-01-12'),
+              tags: ["research", "education", "outcomes"],
+              createdAt: new Date("2025-01-12"),
               featured: false,
               views: 834,
               likes: 67,
             },
             {
-              id: 'sample3',
-              title: 'Privacy by Design in Educational Technology',
+              id: "sample3",
+              title: "Privacy by Design in Educational Technology",
               summary:
-                'How we protect student privacy while enabling meaningful AI ethics education.',
+                "How we protect student privacy while enabling meaningful AI ethics education.",
               content:
-                'Privacy protection is fundamental to our educational approach...',
-              category: 'privacy',
+                "Privacy protection is fundamental to our educational approach...",
+              category: "privacy",
               author: {
-                name: 'Alex Rodriguez',
+                name: "Alex Rodriguez",
                 tier: 2,
-                avatar: '/assets/contributor-avatar.png',
+                avatar: "/assets/contributor-avatar.png",
               },
-              tags: ['privacy', 'design', 'education'],
-              createdAt: new Date('2025-01-10'),
+              tags: ["privacy", "design", "education"],
+              createdAt: new Date("2025-01-10"),
               featured: true,
               views: 945,
               likes: 73,
@@ -1191,90 +1191,92 @@ For research articles, consider including:
 
         getCategoryEmoji(category) {
           const emojis = {
-            research: '🔬',
-            education: '📚',
-            ethics: '⚖️',
-            'ai-bias': '🎯',
-            privacy: '🔒',
-            community: '🤝',
+            research: "🔬",
+            education: "📚",
+            ethics: "⚖️",
+            "ai-bias": "🎯",
+            privacy: "🔒",
+            community: "🤝",
           };
-          return emojis[category] || '📝';
+          return emojis[category] || "📝";
         }
 
         getCategoryName(category) {
           const names = {
-            research: 'Research',
-            education: 'Education',
-            ethics: 'Ethics',
-            'ai-bias': 'AI Bias',
-            privacy: 'Privacy',
-            community: 'Community',
+            research: "Research",
+            education: "Education",
+            ethics: "Ethics",
+            "ai-bias": "AI Bias",
+            privacy: "Privacy",
+            community: "Community",
           };
-          return names[category] || 'General';
+          return names[category] || "General";
         }
 
         getTierBadge(tier) {
           const badges = {
-            0: '',
-            1: '🔬',
-            2: '⭐',
-            3: '👑',
+            0: "",
+            1: "🔬",
+            2: "⭐",
+            3: "👑",
           };
-          return badges[tier] || '';
+          return badges[tier] || "";
         }
 
         formatDate(date) {
-          return date.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
+          return date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
           });
         }
 
         openPost(postId) {
-          const post = this.samplePosts.find(p => p.id === postId);
+          const post = this.samplePosts.find((p) => p.id === postId);
           if (!post) {
-            console.error('Post not found:', postId);
+            console.error("Post not found:", postId);
             return;
           }
 
           // Populate modal with post data
-          document.getElementById('modal-post-title').textContent = post.title;
-          document.getElementById('modal-post-category').textContent =
+          document.getElementById("modal-post-title").textContent = post.title;
+          document.getElementById("modal-post-category").textContent =
             `${this.getCategoryEmoji(post.category)} ${this.getCategoryName(post.category)}`;
-          document.getElementById('modal-post-date').textContent =
+          document.getElementById("modal-post-date").textContent =
             this.formatDate(post.createdAt);
-          document.getElementById('modal-author-name').textContent =
+          document.getElementById("modal-author-name").textContent =
             post.author.name;
-          document.getElementById('modal-author-title').textContent =
-            post.author.title || 'Community Member';
-          document.getElementById('modal-author-avatar').src =
+          document.getElementById("modal-author-title").textContent =
+            post.author.title || "Community Member";
+          document.getElementById("modal-author-avatar").src =
             post.author.avatar;
-          document.getElementById('modal-author-avatar').alt = post.author.name;
+          document.getElementById("modal-author-avatar").alt = post.author.name;
 
           // Generate full post content (in a real app, this would come from the server)
           const fullContent = this.generateFullPostContent(post);
-          document.getElementById('modal-post-content').innerHTML = fullContent;
+          document.getElementById("modal-post-content").innerHTML = fullContent;
 
           // Add tags
-          const tagsContainer = document.getElementById('modal-post-tags');
+          const tagsContainer = document.getElementById("modal-post-tags");
           tagsContainer.innerHTML = post.tags
-            .map(tag => `<span class="post-tag">#${tag}</span>`)
-            .join('');
+            .map((tag) => `<span class="post-tag">#${tag}</span>`)
+            .join("");
 
           // Set up comment system
-          const commentsContainer = document.getElementById('post-comments');
+          const commentsContainer = document.getElementById("post-comments");
           commentsContainer.dataset.postId = postId;
 
           // Initialize comment system
-          import('./src/js/components/blog-comment-system.js').then(module => {
-            const BlogCommentSystem = module.default;
-            new BlogCommentSystem(postId, 'post-comments');
-          });
+          import("./src/js/components/blog-comment-system.js").then(
+            (module) => {
+              const BlogCommentSystem = module.default;
+              new BlogCommentSystem(postId, "post-comments");
+            },
+          );
 
           // Show modal
-          document.getElementById('post-detail-modal').style.display = 'flex';
-          document.body.style.overflow = 'hidden'; // Prevent background scrolling
+          document.getElementById("post-detail-modal").style.display = "flex";
+          document.body.style.overflow = "hidden"; // Prevent background scrolling
         }
 
         generateFullPostContent(post) {
@@ -1313,30 +1315,30 @@ For research articles, consider including:
         }
 
         closeModal() {
-          document.getElementById('post-detail-modal').style.display = 'none';
-          document.body.style.overflow = 'auto'; // Restore scrolling
+          document.getElementById("post-detail-modal").style.display = "none";
+          document.body.style.overflow = "auto"; // Restore scrolling
         }
 
         setupEventHandlers() {
           // Write post button
           document
-            .getElementById('write-post-btn')
-            ?.addEventListener('click', () => {
+            .getElementById("write-post-btn")
+            ?.addEventListener("click", () => {
               this.showWritePostModal();
             });
 
           // New submission modal event handlers
           document
-            .getElementById('close-submission-modal')
-            ?.addEventListener('click', () => {
+            .getElementById("close-submission-modal")
+            ?.addEventListener("click", () => {
               this.hideWritePostModal();
             });
 
           // Close modal when clicking outside
           document
-            .getElementById('blog-submission-modal')
-            ?.addEventListener('click', e => {
-              if (e.target.id === 'blog-submission-modal') {
+            .getElementById("blog-submission-modal")
+            ?.addEventListener("click", (e) => {
+              if (e.target.id === "blog-submission-modal") {
                 this.hideWritePostModal();
               }
             });
@@ -1346,16 +1348,16 @@ For research articles, consider including:
 
           // Form submission
           document
-            .getElementById('blog-submission-form')
-            ?.addEventListener('submit', e => {
+            .getElementById("blog-submission-form")
+            ?.addEventListener("submit", (e) => {
               e.preventDefault();
               this.handleBlogSubmission();
             });
 
           // Save draft functionality
           document
-            .getElementById('save-draft-btn')
-            ?.addEventListener('click', () => {
+            .getElementById("save-draft-btn")
+            ?.addEventListener("click", () => {
               this.saveDraft();
             });
 
@@ -1364,46 +1366,46 @@ For research articles, consider including:
 
           // Load more button
           document
-            .getElementById('load-more-btn')
-            .addEventListener('click', () => {
+            .getElementById("load-more-btn")
+            .addEventListener("click", () => {
               this.currentPage++;
               this.renderBlogPosts();
             });
 
           // Old modal handlers (kept for compatibility)
           document
-            .getElementById('write-post-form')
-            ?.addEventListener('submit', e => {
+            .getElementById("write-post-form")
+            ?.addEventListener("submit", (e) => {
               e.preventDefault();
               this.handlePostSubmission();
             });
 
           document
-            .querySelector('#write-post-modal .modal-close')
-            ?.addEventListener('click', () => {
+            .querySelector("#write-post-modal .modal-close")
+            ?.addEventListener("click", () => {
               this.hideWritePostModal();
             });
 
           // Post detail modal event handlers
           document
-            .querySelector('.modal-close-btn')
-            ?.addEventListener('click', () => {
+            .querySelector(".modal-close-btn")
+            ?.addEventListener("click", () => {
               this.closeModal();
             });
 
           // Close modal when clicking outside content area
           document
-            .getElementById('post-detail-modal')
-            ?.addEventListener('click', e => {
-              if (e.target.id === 'post-detail-modal') {
+            .getElementById("post-detail-modal")
+            ?.addEventListener("click", (e) => {
+              if (e.target.id === "post-detail-modal") {
                 this.closeModal();
               }
             });
 
           // Close modal with Escape key
-          document.addEventListener('keydown', e => {
-            const modal = document.getElementById('post-detail-modal');
-            if (e.key === 'Escape' && modal && modal.style.display === 'flex') {
+          document.addEventListener("keydown", (e) => {
+            const modal = document.getElementById("post-detail-modal");
+            if (e.key === "Escape" && modal && modal.style.display === "flex") {
               this.closeModal();
             }
           });
@@ -1411,18 +1413,18 @@ For research articles, consider including:
 
         setupCharacterCounters() {
           const counters = [
-            { input: 'article-title', counter: 'title-char-count', max: 150 },
+            { input: "article-title", counter: "title-char-count", max: 150 },
             {
-              input: 'article-subtitle',
-              counter: 'subtitle-char-count',
+              input: "article-subtitle",
+              counter: "subtitle-char-count",
               max: 200,
             },
             {
-              input: 'article-excerpt',
-              counter: 'excerpt-char-count',
+              input: "article-excerpt",
+              counter: "excerpt-char-count",
               max: 300,
             },
-            { input: 'author-bio', counter: 'bio-char-count', max: 250 },
+            { input: "author-bio", counter: "bio-char-count", max: 250 },
           ];
 
           counters.forEach(({ input, counter, max }) => {
@@ -1430,17 +1432,17 @@ For research articles, consider including:
             const counterElement = document.getElementById(counter);
 
             if (inputElement && counterElement) {
-              inputElement.addEventListener('input', () => {
+              inputElement.addEventListener("input", () => {
                 const length = inputElement.value.length;
                 counterElement.textContent = `${length}/${max}`;
 
                 // Add warning color when approaching limit
                 if (length > max * 0.9) {
-                  counterElement.style.color = 'var(--warning-color)';
+                  counterElement.style.color = "var(--warning-color)";
                 } else if (length === max) {
-                  counterElement.style.color = 'var(--error-color)';
+                  counterElement.style.color = "var(--error-color)";
                 } else {
-                  counterElement.style.color = 'var(--text-muted)';
+                  counterElement.style.color = "var(--text-muted)";
                 }
               });
             }
@@ -1449,14 +1451,14 @@ For research articles, consider including:
 
         matchesAuthorFilter(post, filter) {
           switch (filter) {
-            case 'team':
-              return post.author.name.includes('SimulateAI Team');
-            case 'community':
+            case "team":
+              return post.author.name.includes("SimulateAI Team");
+            case "community":
               return (
-                !post.author.name.includes('SimulateAI Team') &&
+                !post.author.name.includes("SimulateAI Team") &&
                 post.author.tier >= 1
               );
-            case 'research':
+            case "research":
               return post.author.tier >= 1;
             default:
               return true;
@@ -1483,9 +1485,9 @@ For research articles, consider including:
           }
 
           // Show our new enhanced modal
-          const modal = document.getElementById('blog-submission-modal');
-          modal.classList.add('show');
-          document.body.style.overflow = 'hidden';
+          const modal = document.getElementById("blog-submission-modal");
+          modal.classList.add("show");
+          document.body.style.overflow = "hidden";
 
           // Update UI based on donor status
           await this.updateSubmissionModalForUser();
@@ -1500,12 +1502,12 @@ For research articles, consider including:
             Don't have an account yet? Sign up to join our community of educators, researchers, and AI ethics enthusiasts.
           `;
 
-          if (confirm(message + '\n\nWould you like to sign in now?')) {
+          if (confirm(message + "\n\nWould you like to sign in now?")) {
             // Trigger authentication flow
             if (this.authService && this.authService.signIn) {
               this.authService.signIn();
             } else {
-              window.location.href = 'index.html#auth';
+              window.location.href = "index.html#auth";
             }
           }
         }
@@ -1526,10 +1528,10 @@ For research articles, consider including:
 
           if (
             confirm(
-              message + '\n\nWould you like to complete your profile now?'
+              message + "\n\nWould you like to complete your profile now?",
             )
           ) {
-            window.location.href = 'profile.html?setup=true';
+            window.location.href = "profile.html?setup=true";
           }
         }
 
@@ -1537,7 +1539,7 @@ For research articles, consider including:
           try {
             const guidelines =
               await this.contributionService.getContributionGuidelines(
-                this.currentUser.uid
+                this.currentUser.uid,
               );
 
             let message = `
@@ -1558,124 +1560,124 @@ For research articles, consider including:
               `;
 
               if (
-                confirm(message + '\n\nWould you like to review your profile?')
+                confirm(message + "\n\nWould you like to review your profile?")
               ) {
-                window.location.href = 'profile.html';
+                window.location.href = "profile.html";
               }
             }
           } catch (error) {
-            console.error('Error getting contribution guidelines:', error);
+            console.error("Error getting contribution guidelines:", error);
             alert(
-              'Sorry, there was an error checking your contribution status. Please try again later.'
+              "Sorry, there was an error checking your contribution status. Please try again later.",
             );
           }
         }
 
         hideWritePostModal() {
-          const modal = document.getElementById('blog-submission-modal');
-          modal.classList.remove('show');
-          document.body.style.overflow = 'auto';
+          const modal = document.getElementById("blog-submission-modal");
+          modal.classList.remove("show");
+          document.body.style.overflow = "auto";
           this.resetSubmissionForm();
         }
 
         async updateSubmissionModalForUser() {
-          const donorBenefits = document.getElementById('donor-benefits-info');
+          const donorBenefits = document.getElementById("donor-benefits-info");
           const statusBanner = document.getElementById(
-            'submission-status-banner'
+            "submission-status-banner",
           );
-          const statusIcon = document.getElementById('status-icon');
-          const statusMessage = document.getElementById('status-message');
+          const statusIcon = document.getElementById("status-icon");
+          const statusMessage = document.getElementById("status-message");
           const contributionStatus = document.getElementById(
-            'contribution-status'
+            "contribution-status",
           );
 
           if (this.currentUser) {
             const guidelines =
               await this.contributionService.getContributionGuidelines(
-                this.currentUser.uid
+                this.currentUser.uid,
               );
 
             if (guidelines.autoApproval) {
               // Show donor benefits - immediate publication
-              donorBenefits.style.display = 'block';
-              statusBanner.style.display = 'flex';
-              statusBanner.className = 'status-banner success';
-              statusIcon.textContent = '👑';
+              donorBenefits.style.display = "block";
+              statusBanner.style.display = "flex";
+              statusBanner.className = "status-banner success";
+              statusIcon.textContent = "👑";
               statusMessage.textContent =
-                'As a valued donor, your article will be published immediately upon submission!';
+                "As a valued donor, your article will be published immediately upon submission!";
               contributionStatus.textContent =
-                'Instant publication - no moderation required';
+                "Instant publication - no moderation required";
             } else {
               // Show regular submission process with donation encouragement
-              donorBenefits.style.display = 'none';
-              statusBanner.style.display = 'flex';
-              statusBanner.className = 'status-banner info';
-              statusIcon.textContent = '📝';
+              donorBenefits.style.display = "none";
+              statusBanner.style.display = "flex";
+              statusBanner.className = "status-banner info";
+              statusIcon.textContent = "📝";
               statusMessage.innerHTML = `
                 Your submission will be reviewed by our moderation team before publication (typically within 24 hours).
                 <br><br>
                 <strong>💡 Did you know?</strong> <a href="donate.html" style="color: #1a73e8; text-decoration: underline;">Donors</a> get instant publication without moderation delays!
               `;
               contributionStatus.textContent =
-                'Share your expertise - moderation review required';
+                "Share your expertise - moderation review required";
             }
 
             // Update form submit button text based on status
             const submitBtn = document.querySelector(
-              '#blog-submission-form button[type="submit"]'
+              '#blog-submission-form button[type="submit"]',
             );
             if (submitBtn) {
-              const btnText = submitBtn.querySelector('.btn-text');
+              const btnText = submitBtn.querySelector(".btn-text");
               if (btnText) {
                 btnText.textContent = guidelines.autoApproval
-                  ? 'Publish Article Instantly'
-                  : 'Submit for Review';
+                  ? "Publish Article Instantly"
+                  : "Submit for Review";
               }
             }
           }
         }
 
         resetSubmissionForm() {
-          const form = document.getElementById('blog-submission-form');
+          const form = document.getElementById("blog-submission-form");
           form.reset();
 
           // Reset character counters
-          document.getElementById('title-char-count').textContent = '0/150';
-          document.getElementById('subtitle-char-count').textContent = '0/200';
-          document.getElementById('excerpt-char-count').textContent = '0/300';
-          document.getElementById('bio-char-count').textContent = '0/250';
+          document.getElementById("title-char-count").textContent = "0/150";
+          document.getElementById("subtitle-char-count").textContent = "0/200";
+          document.getElementById("excerpt-char-count").textContent = "0/300";
+          document.getElementById("bio-char-count").textContent = "0/250";
 
           // Hide status banners
-          document.getElementById('submission-status-banner').style.display =
-            'none';
+          document.getElementById("submission-status-banner").style.display =
+            "none";
         }
 
         async handleBlogSubmission() {
           try {
-            const submitBtn = document.getElementById('submit-article-btn');
-            const btnText = submitBtn.querySelector('.btn-text');
+            const submitBtn = document.getElementById("submit-article-btn");
+            const btnText = submitBtn.querySelector(".btn-text");
             const originalText = btnText.textContent;
 
             // Show loading state
-            submitBtn.classList.add('loading');
+            submitBtn.classList.add("loading");
             submitBtn.disabled = true;
 
             // Collect form data
             const formData = {
-              title: document.getElementById('article-title').value.trim(),
+              title: document.getElementById("article-title").value.trim(),
               subtitle: document
-                .getElementById('article-subtitle')
+                .getElementById("article-subtitle")
                 .value.trim(),
-              category: document.getElementById('article-category').value,
-              tags: document.getElementById('article-tags').value.trim(),
-              excerpt: document.getElementById('article-excerpt').value.trim(),
-              content: document.getElementById('article-content').value.trim(),
-              authorBio: document.getElementById('author-bio').value.trim(),
+              category: document.getElementById("article-category").value,
+              tags: document.getElementById("article-tags").value.trim(),
+              excerpt: document.getElementById("article-excerpt").value.trim(),
+              content: document.getElementById("article-content").value.trim(),
+              authorBio: document.getElementById("author-bio").value.trim(),
               affiliation: document
-                .getElementById('author-affiliation')
+                .getElementById("author-affiliation")
                 .value.trim(),
-              agreeTerms: document.getElementById('agree-terms').checked,
-              agreeReview: document.getElementById('agree-review').checked,
+              agreeTerms: document.getElementById("agree-terms").checked,
+              agreeReview: document.getElementById("agree-review").checked,
             };
 
             // Validate required fields
@@ -1687,21 +1689,21 @@ For research articles, consider including:
               !formData.agreeTerms
             ) {
               throw new Error(
-                'Please fill in all required fields and agree to the terms.'
+                "Please fill in all required fields and agree to the terms.",
               );
             }
 
             // Process tags
             const tagsArray = formData.tags
               ? formData.tags
-                  .split(',')
-                  .map(tag => tag.trim())
-                  .filter(tag => tag)
+                  .split(",")
+                  .map((tag) => tag.trim())
+                  .filter((tag) => tag)
               : [];
 
             // Create submission object
             const submission = {
-              type: 'blog',
+              type: "blog",
               title: formData.title,
               subtitle: formData.subtitle,
               excerpt: formData.excerpt,
@@ -1713,9 +1715,9 @@ For research articles, consider including:
               metadata: {
                 wordCount: formData.content.split(/\s+/).length,
                 estimatedReadTime: Math.ceil(
-                  formData.content.split(/\s+/).length / 200
+                  formData.content.split(/\s+/).length / 200,
                 ),
-                submissionSource: 'blog-page',
+                submissionSource: "blog-page",
               },
             };
 
@@ -1730,21 +1732,21 @@ For research articles, consider including:
             this.hideWritePostModal();
             await this.loadBlogPosts();
           } catch (error) {
-            console.error('Blog submission error:', error);
+            console.error("Blog submission error:", error);
             this.showSubmissionError(error.message);
           } finally {
             // Reset button state
-            const submitBtn = document.getElementById('submit-article-btn');
-            const btnText = submitBtn.querySelector('.btn-text');
-            submitBtn.classList.remove('loading');
+            const submitBtn = document.getElementById("submit-article-btn");
+            const btnText = submitBtn.querySelector(".btn-text");
+            submitBtn.classList.remove("loading");
             submitBtn.disabled = false;
-            btnText.textContent = 'Submit Article';
+            btnText.textContent = "Submit Article";
           }
         }
 
         showSubmissionSuccess(result) {
           const message = result.autoApproved
-            ? '🎉 Your article has been published successfully!'
+            ? "🎉 Your article has been published successfully!"
             : "✅ Your article has been submitted for review. You'll receive an email when it's approved.";
 
           // You could integrate with your notification system here
@@ -1759,17 +1761,17 @@ For research articles, consider including:
         async saveDraft() {
           try {
             const formData = {
-              title: document.getElementById('article-title').value.trim(),
+              title: document.getElementById("article-title").value.trim(),
               subtitle: document
-                .getElementById('article-subtitle')
+                .getElementById("article-subtitle")
                 .value.trim(),
-              category: document.getElementById('article-category').value,
-              tags: document.getElementById('article-tags').value.trim(),
-              excerpt: document.getElementById('article-excerpt').value.trim(),
-              content: document.getElementById('article-content').value.trim(),
-              authorBio: document.getElementById('author-bio').value.trim(),
+              category: document.getElementById("article-category").value,
+              tags: document.getElementById("article-tags").value.trim(),
+              excerpt: document.getElementById("article-excerpt").value.trim(),
+              content: document.getElementById("article-content").value.trim(),
+              authorBio: document.getElementById("author-bio").value.trim(),
               affiliation: document
-                .getElementById('author-affiliation')
+                .getElementById("author-affiliation")
                 .value.trim(),
             };
 
@@ -1780,39 +1782,39 @@ For research articles, consider including:
               JSON.stringify({
                 ...formData,
                 savedAt: new Date().toISOString(),
-                type: 'blog-draft',
-              })
+                type: "blog-draft",
+              }),
             );
 
-            alert('💾 Draft saved successfully!');
+            alert("💾 Draft saved successfully!");
           } catch (error) {
-            console.error('Error saving draft:', error);
-            alert('❌ Failed to save draft. Please try again.');
+            console.error("Error saving draft:", error);
+            alert("❌ Failed to save draft. Please try again.");
           }
         }
 
         async handlePostSubmission() {
           try {
             // Get form data
-            const title = document.getElementById('post-title').value.trim();
+            const title = document.getElementById("post-title").value.trim();
             const summary = document
-              .getElementById('post-summary')
+              .getElementById("post-summary")
               .value.trim();
             const content = document
-              .getElementById('post-content')
+              .getElementById("post-content")
               .value.trim();
-            const category = document.getElementById('post-category').value;
+            const category = document.getElementById("post-category").value;
             const tags = document
-              .getElementById('post-tags')
-              .value.split(',')
-              .map(tag => tag.trim())
+              .getElementById("post-tags")
+              .value.split(",")
+              .map((tag) => tag.trim())
               .filter(Boolean);
             const readingTime =
-              document.getElementById('post-reading-time').value;
+              document.getElementById("post-reading-time").value;
 
             // Validate required fields
             if (!title || !summary || !content) {
-              this.showError('Please fill in all required fields');
+              this.showError("Please fill in all required fields");
               return;
             }
 
@@ -1826,7 +1828,7 @@ For research articles, consider including:
               category,
               tags,
               readingTime: parseInt(readingTime, 10),
-              submissionMethod: 'blog_form',
+              submissionMethod: "blog_form",
             });
 
             this.showLoading(false);
@@ -1839,12 +1841,12 @@ For research articles, consider including:
               await this.loadBlogPosts();
             } else {
               this.showSuccess(
-                `📋 ${result.message} We'll notify you when it's reviewed.`
+                `📋 ${result.message} We'll notify you when it's reviewed.`,
               );
             }
 
             // Clear form
-            document.getElementById('write-post-form').reset();
+            document.getElementById("write-post-form").reset();
           } catch (error) {
             this.showLoading(false);
             this.showError(`Failed to submit post: ${error.message}`);
@@ -1852,15 +1854,15 @@ For research articles, consider including:
         }
 
         showLoading(show) {
-          document.getElementById('loading').style.display = show
-            ? 'flex'
-            : 'none';
+          document.getElementById("loading").style.display = show
+            ? "flex"
+            : "none";
         }
 
         showError(message) {
           // TODO: Use notification toast
           if (window.NotificationToast) {
-            window.NotificationToast.show(message, 'error');
+            window.NotificationToast.show(message, "error");
           } else {
             alert(`Error: ${message}`);
           }
@@ -1869,7 +1871,7 @@ For research articles, consider including:
         showSuccess(message) {
           // TODO: Use notification toast
           if (window.NotificationToast) {
-            window.NotificationToast.show(message, 'success');
+            window.NotificationToast.show(message, "success");
           } else {
             alert(message);
           }
@@ -1897,7 +1899,7 @@ For research articles, consider including:
     <script type="module">
       // Ensure the page is fully loaded before initializing navigation
       setTimeout(() => {
-        import('./src/js/components/shared-navigation.js');
+        import("./src/js/components/shared-navigation.js");
       }, 100);
     </script>
   </body>
