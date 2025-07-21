@@ -54,29 +54,144 @@ limitations under the License.
       name="accessibility-features"
       content="keyboard-navigation,skip-links,high-contrast,large-text,screen-reader-support"
     />
+
+    <!-- Critical CSS - Inline for FOUC prevention -->
+    <style>
+      :root {
+        --primary: #1a73e8;
+        --bg: #ffffff;
+        --text: #333333;
+        --font: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+        --header-h: 60px;
+        --modal-z: 9999;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: var(--font);
+        color: var(--text);
+        background: var(--bg);
+        margin: 0;
+        line-height: 1.6;
+        font-size: 16px;
+      }
+      .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: var(--modal-z);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+      .modal-backdrop.visible {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .modal-dialog {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: var(--bg);
+        border-radius: 8px;
+        max-width: 90vw;
+        max-height: 90vh;
+        width: 600px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        height: var(--header-h);
+        background: var(--bg);
+        border-bottom: 1px solid #e5e7eb;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 4px;
+        background: var(--primary);
+        color: white;
+        text-decoration: none;
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+      }
+      .btn:hover {
+        opacity: 0.9;
+      }
+      input,
+      select,
+      textarea {
+        font-family: inherit;
+        font-size: inherit;
+      }
+      .sr-only {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        padding: 0 !important;
+        margin: -1px !important;
+        overflow: hidden !important;
+        clip: rect(0, 0, 0, 0) !important;
+        white-space: nowrap !important;
+        border: 0 !important;
+      }
+      .loading {
+        opacity: 0.7;
+        pointer-events: none;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0d1117;
+          --text: #f0f6fc;
+        }
+      }
+      body.dark-mode {
+        --bg: #0d1117;
+        --text: #f0f6fc;
+      }
+    </style>
+
     <!-- Styles - Optimized load order for CSS architecture -->
-    <!-- 1. Media queries foundation - MUST LOAD FIRST -->
+    <!-- 1. Design tokens foundation - MUST LOAD FIRST -->
+    <link rel="stylesheet" href="src/styles/design-tokens.css" />
+
+    <!-- 2. Media queries foundation -->
     <link rel="stylesheet" href="src/styles/media.css" />
 
-    <!-- 2. Design tokens and base styles -->
+    <!-- 3. Base styles -->
     <link rel="stylesheet" href="src/styles/main.css" />
     <link rel="stylesheet" href="src/styles/accessibility.css" />
     <link rel="stylesheet" href="src/styles/navigation-highlight-fix.css" />
     <link rel="stylesheet" href="src/styles/footer.css" />
 
-    <!-- 2. Base component styles -->
+    <!-- 4. Base component styles -->
     <link rel="stylesheet" href="src/styles/simulations.css" />
     <link rel="stylesheet" href="src/styles/layout-components.css" />
 
-    <!-- 3. Advanced component systems -->
+    <!-- 5. Advanced component systems -->
     <link rel="stylesheet" href="src/styles/advanced-ui-components.css" />
     <link rel="stylesheet" href="src/styles/enhanced-objects.css" />
 
-    <!-- 4. Utility components -->
+    <!-- 6. Utility components -->
     <link rel="stylesheet" href="src/styles/input-utility-components.css" />
     <link rel="stylesheet" href="src/styles/form-input-components.css" />
 
-    <!-- 5. UI utility components -->
+    <!-- 7. UI utility components -->
     <link rel="stylesheet" href="src/styles/notification-toast.css" />
     <link rel="stylesheet" href="src/styles/onboarding-tour.css" />
     <link rel="stylesheet" href="src/styles/scenario-modal.css" />
@@ -87,15 +202,15 @@ limitations under the License.
     <link rel="stylesheet" href="src/styles/card-component.css" />
     <link rel="stylesheet" href="src/styles/loader-spinner.css" />
 
-    <!-- 7. Page-specific and theme styles -->
+    <!-- 8. Page-specific and theme styles -->
     <link rel="stylesheet" href="src/styles/hero-demo.css" />
     <link rel="stylesheet" href="src/styles/bias-fairness.css" />
     <link rel="stylesheet" href="src/styles/category-grid.css" />
 
-    <!-- 8. Layout fixes and overrides -->
+    <!-- 9. Layout fixes and overrides -->
     <link rel="stylesheet" href="src/styles/layout-fixes.css" />
 
-    <!-- 9. Ethics Explorer overrides (moved before consolidated modal) -->
+    <!-- 10. Ethics Explorer overrides (moved before consolidated modal) -->
     <link rel="stylesheet" href="src/styles/ethics-explorer.css" />
 
     <!-- Badge System -->
@@ -104,7 +219,7 @@ limitations under the License.
     <!-- Community Features -->
     <link rel="stylesheet" href="src/styles/community-features.css" />
 
-    <!-- 10. Modal system - consolidated architecture (loaded LAST for highest specificity) -->
+    <!-- 11. Modal system - consolidated architecture (loaded LAST for highest specificity) -->
     <link
       rel="stylesheet"
       href="src/styles/simulation-modal-consolidated.css"

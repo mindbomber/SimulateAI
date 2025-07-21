@@ -960,8 +960,11 @@ class SettingsManager {
   }
 
   applySettings() {
-    // Apply appearance settings
+    // Apply appearance settings with enhanced design token integration
     this.applyAppearanceSettings();
+
+    // Apply user preferences to CSS custom properties
+    this.applyCSSCustomProperties();
 
     // Only notify components - let them handle their own visibility
     this.notifySettingsChanged();
@@ -970,103 +973,153 @@ class SettingsManager {
   applyAppearanceSettings() {
     const { body } = document;
     const { documentElement: html } = document;
-    const { documentElement: root } = document;
 
     // Apply theme
     body.classList.remove("theme-light", "theme-dark", "theme-auto");
-    body.classList.add(`theme-${this.settings.theme}`);
+    body.classList.add(
+      `theme-${this.settings.theme || this.settings.appearance_theme || "auto"}`,
+    );
 
     // Apply actual theme based on system preference for auto mode
-    if (this.settings.theme === "auto") {
+    const themeValue =
+      this.settings.theme || this.settings.appearance_theme || "auto";
+    if (themeValue === "auto") {
       const prefersDark = window.matchMedia(
         "(prefers-color-scheme: dark)",
       ).matches;
       body.classList.toggle("dark-mode", prefersDark);
     } else {
-      body.classList.toggle("dark-mode", this.settings.theme === "dark");
+      body.classList.toggle("dark-mode", themeValue === "dark");
     }
 
-    // Force apply dark mode styles if in dark mode
-    if (body.classList.contains("dark-mode")) {
-      this.forceDarkModeComponents();
-    }
+    // Apply high contrast mode
+    const highContrast =
+      this.settings.highContrast ||
+      this.settings.accessibility_highContrast ||
+      false;
+    body.classList.toggle("high-contrast", highContrast);
 
-    // Update CSS custom properties for dynamic theming
-    const isDarkMode = body.classList.contains("dark-mode");
+    // Apply reduced motion setting
+    const reducedMotion =
+      this.settings.reducedMotion ||
+      this.settings.accessibility_reducedMotion ||
+      false;
+    body.classList.toggle("reduced-motion", reducedMotion);
 
-    // Update theme-color meta tag
-    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
-    const colorSchemeMeta = document.querySelector('meta[name="color-scheme"]');
-
-    if (isDarkMode) {
-      // Dark mode colors
-      root.style.setProperty("--text-color", "#ffffff");
-      root.style.setProperty("--text-secondary", "#cccccc");
-      root.style.setProperty("--text-primary", "#ffffff");
-      root.style.setProperty("--border-color", "#444444");
-      root.style.setProperty("--primary-color", "#4a9eff");
-      root.style.setProperty("--primary-accent", "#4a9eff");
-      root.style.setProperty("--primary-dark", "#3a8eef");
-      root.style.setProperty("--color-primary", "#4a9eff");
-      root.style.setProperty("--color-primary-light", "#6bb4ff");
-      root.style.setProperty("--color-primary-dark", "#3a8eef");
-      root.style.setProperty("--hover-bg", "#3d3d3d");
-      root.style.setProperty("--background-color", "#2d2d2d");
-      root.style.setProperty("--color-gray-50", "#3d3d3d");
-      root.style.setProperty("--color-gray-200", "#444444");
-      root.style.setProperty("--color-gray-700", "#cccccc");
-      root.style.setProperty("--color-gray-900", "#ffffff");
-      root.style.setProperty("--color-white", "#2d2d2d");
-
-      // Update meta tags for dark mode
-      if (themeColorMeta) themeColorMeta.setAttribute("content", "#2d2d2d");
-      if (colorSchemeMeta) colorSchemeMeta.setAttribute("content", "dark");
-    } else {
-      // Light mode colors
-      root.style.setProperty("--text-color", "#333333");
-      root.style.setProperty("--text-secondary", "#666666");
-      root.style.setProperty("--text-primary", "#333333");
-      root.style.setProperty("--border-color", "#e0e0e0");
-      root.style.setProperty("--primary-color", "#1a73e8");
-      root.style.setProperty("--primary-accent", "#3498db");
-      root.style.setProperty("--primary-dark", "#2c3e50");
-      root.style.setProperty("--color-primary", "#007cba");
-      root.style.setProperty("--color-primary-light", "#4da6d9");
-      root.style.setProperty("--color-primary-dark", "#005a87");
-      root.style.setProperty("--hover-bg", "#f5f5f5");
-      root.style.setProperty("--background-color", "#ffffff");
-      root.style.setProperty("--color-gray-50", "#f9fafb");
-      root.style.setProperty("--color-gray-200", "#e5e7eb");
-      root.style.setProperty("--color-gray-700", "#374151");
-      root.style.setProperty("--color-gray-900", "#111827");
-      root.style.setProperty("--color-white", "#ffffff");
-
-      // Update meta tags for light mode
-      if (themeColorMeta) themeColorMeta.setAttribute("content", "#667eea");
-      if (colorSchemeMeta) colorSchemeMeta.setAttribute("content", "light");
-    } // Apply font size
+    // Apply font size setting
+    const fontSize =
+      this.settings.fontSize || this.settings.appearance_fontSize || "medium";
     html.classList.remove(
       "font-size-small",
       "font-size-medium",
       "font-size-large",
       "font-size-extra-large",
     );
-    html.classList.add(`font-size-${this.settings.fontSize}`);
+    html.classList.add(`font-size-${fontSize}`);
 
-    // Apply accessibility settings
-    body.classList.toggle("high-contrast", this.settings.highContrast);
-    body.classList.toggle("reduced-motion", this.settings.reducedMotion);
-    body.classList.toggle(
-      "large-click-targets",
-      this.settings.largeClickTargets,
-    );
+    // Force apply dark mode styles if in dark mode
+    if (body.classList.contains("dark-mode")) {
+      this.forceDarkModeComponents();
+    }
 
-    // Update CSS custom properties for high contrast mode
-    if (this.settings.highContrast) {
-      root.style.setProperty("--primary-color", "#000000");
-      root.style.setProperty("--secondary-color", "#ffffff");
-      root.style.setProperty("--text-color", "#000000");
-      root.style.setProperty("--background-color", "#ffffff");
+    // Update theme-color meta tag
+    this.updateMetaTags();
+  }
+
+  /**
+   * Apply user preferences to CSS custom properties (Enhanced with design tokens)
+   */
+  applyCSSCustomProperties() {
+    const root = document.documentElement;
+
+    // Font size scaling
+    const fontSize =
+      this.settings.fontSize || this.settings.appearance_fontSize || "medium";
+    const fontScaleMap = {
+      small: 0.875,
+      medium: 1,
+      large: 1.125,
+      "extra-large": 1.25,
+    };
+    const fontScale = fontScaleMap[fontSize] || 1;
+    root.style.setProperty("--user-font-scale", fontScale);
+    root.style.setProperty("--user-font-size", `${fontScale}rem`);
+
+    // Theme-aware color properties (using design tokens)
+    const isDarkMode = document.body.classList.contains("dark-mode");
+
+    if (isDarkMode) {
+      // Dark mode: Use design token dark values
+      root.style.setProperty("--color-surface", "#0d1117");
+      root.style.setProperty("--color-surface-secondary", "#161b22");
+      root.style.setProperty("--color-surface-tertiary", "#21262d");
+      root.style.setProperty("--color-on-surface", "#f0f6fc");
+      root.style.setProperty("--color-on-surface-secondary", "#e6edf3");
+      root.style.setProperty("--color-on-surface-tertiary", "#7d8590");
+    } else {
+      // Light mode: Use design token light values
+      root.style.setProperty("--color-surface", "#ffffff");
+      root.style.setProperty("--color-surface-secondary", "#f8f9fa");
+      root.style.setProperty("--color-surface-tertiary", "#f3f4f6");
+      root.style.setProperty("--color-on-surface", "#111827");
+      root.style.setProperty("--color-on-surface-secondary", "#374151");
+      root.style.setProperty("--color-on-surface-tertiary", "#6b7280");
+    }
+
+    // High contrast adjustments
+    const highContrast =
+      this.settings.highContrast ||
+      this.settings.accessibility_highContrast ||
+      false;
+    if (highContrast) {
+      root.style.setProperty("--focus-ring-width", "3px");
+      root.style.setProperty("--border-width-1", "2px");
+    } else {
+      root.style.setProperty("--focus-ring-width", "2px");
+      root.style.setProperty("--border-width-1", "1px");
+    }
+
+    // Reduced motion adjustments
+    const reducedMotion =
+      this.settings.reducedMotion ||
+      this.settings.accessibility_reducedMotion ||
+      false;
+    if (reducedMotion) {
+      root.style.setProperty("--duration-75", "0ms");
+      root.style.setProperty("--duration-150", "0ms");
+      root.style.setProperty("--duration-300", "0ms");
+    } else {
+      root.style.setProperty("--duration-75", "75ms");
+      root.style.setProperty("--duration-150", "150ms");
+      root.style.setProperty("--duration-300", "300ms");
+    }
+
+    // Large click targets for accessibility
+    const largeClickTargets =
+      this.settings.largeClickTargets ||
+      this.settings.accessibility_largeClickTargets ||
+      false;
+    if (largeClickTargets) {
+      root.style.setProperty("--touch-target-min", "44px");
+    } else {
+      root.style.setProperty("--touch-target-min", "32px");
+    }
+  }
+
+  /**
+   * Update meta tags for theme integration
+   */
+  updateMetaTags() {
+    const isDarkMode = document.body.classList.contains("dark-mode");
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    const colorSchemeMeta = document.querySelector('meta[name="color-scheme"]');
+
+    if (isDarkMode) {
+      if (themeColorMeta) themeColorMeta.setAttribute("content", "#0d1117");
+      if (colorSchemeMeta) colorSchemeMeta.setAttribute("content", "dark");
+    } else {
+      if (themeColorMeta) themeColorMeta.setAttribute("content", "#1a73e8");
+      if (colorSchemeMeta) colorSchemeMeta.setAttribute("content", "light");
     }
   }
 

@@ -1,0 +1,324 @@
+/**
+ * Design Tokens - SimulateAI CSS Foundation
+ * 
+ * This file establishes the foundational design system tokens that all other
+ * CSS files reference. Load this file FIRST to prevent CSS custom property conflicts.
+ * 
+ * Order of CSS Loading:
+ * 1. design-tokens.css (this file) - Foundation variables
+ * 2. media.css - Responsive breakpoints
+ * 3. main.css - Base styles
+ * 4. All other component CSS files
+ */
+
+:root {
+  /* ===== BRAND COLORS ===== */
+  --color-brand-primary: #1a73e8;
+  --color-brand-secondary: #4285f4;
+  --color-brand-tertiary: #34a853;
+
+  /* ===== SEMANTIC COLORS ===== */
+  --color-success: #34a853;
+  --color-warning: #fbbc04;
+  --color-error: #ea4335;
+  --color-info: #4285f4;
+
+  /* ===== NEUTRAL SCALE ===== */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-gray-50: #f8f9fa;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+
+  /* ===== SURFACE COLORS (Semantic Usage) ===== */
+  --color-surface: var(--color-white);
+  --color-surface-secondary: var(--color-gray-50);
+  --color-surface-tertiary: var(--color-gray-100);
+  --color-on-surface: var(--color-gray-900);
+  --color-on-surface-secondary: var(--color-gray-700);
+  --color-on-surface-tertiary: var(--color-gray-500);
+
+  /* ===== TYPOGRAPHY SCALE ===== */
+  --font-size-xs: 0.75rem; /* 12px */
+  --font-size-sm: 0.875rem; /* 14px */
+  --font-size-base: 1rem; /* 16px */
+  --font-size-lg: 1.125rem; /* 18px */
+  --font-size-xl: 1.25rem; /* 20px */
+  --font-size-2xl: 1.5rem; /* 24px */
+  --font-size-3xl: 1.875rem; /* 30px */
+  --font-size-4xl: 2.25rem; /* 36px */
+  --font-size-5xl: 3rem; /* 48px */
+  --font-size-6xl: 3.75rem; /* 60px */
+
+  /* ===== FONT WEIGHTS ===== */
+  --font-weight-thin: 100;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;
+
+  /* ===== FONT FAMILIES ===== */
+  --font-family-sans:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", sans-serif;
+  --font-family-serif: "Georgia", "Times New Roman", serif;
+  --font-family-mono:
+    "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", "Courier New", monospace;
+
+  /* ===== LINE HEIGHTS ===== */
+  --line-height-none: 1;
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+
+  /* ===== SPACING SCALE ===== */
+  --space-px: 1px;
+  --space-0: 0;
+  --space-1: 0.25rem; /* 4px */
+  --space-2: 0.5rem; /* 8px */
+  --space-3: 0.75rem; /* 12px */
+  --space-4: 1rem; /* 16px */
+  --space-5: 1.25rem; /* 20px */
+  --space-6: 1.5rem; /* 24px */
+  --space-7: 1.75rem; /* 28px */
+  --space-8: 2rem; /* 32px */
+  --space-9: 2.25rem; /* 36px */
+  --space-10: 2.5rem; /* 40px */
+  --space-11: 2.75rem; /* 44px */
+  --space-12: 3rem; /* 48px */
+  --space-14: 3.5rem; /* 56px */
+  --space-16: 4rem; /* 64px */
+  --space-20: 5rem; /* 80px */
+  --space-24: 6rem; /* 96px */
+  --space-28: 7rem; /* 112px */
+  --space-32: 8rem; /* 128px */
+
+  /* ===== BORDER RADIUS ===== */
+  --radius-none: 0;
+  --radius-sm: 0.125rem; /* 2px */
+  --radius-base: 0.25rem; /* 4px */
+  --radius-md: 0.375rem; /* 6px */
+  --radius-lg: 0.5rem; /* 8px */
+  --radius-xl: 0.75rem; /* 12px */
+  --radius-2xl: 1rem; /* 16px */
+  --radius-3xl: 1.5rem; /* 24px */
+  --radius-full: 9999px; /* Fully rounded */
+
+  /* ===== BORDER WIDTHS ===== */
+  --border-width-0: 0;
+  --border-width-1: 1px;
+  --border-width-2: 2px;
+  --border-width-4: 4px;
+  --border-width-8: 8px;
+
+  /* ===== SHADOWS ===== */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-base:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-md:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --shadow-2xl: 0 50px 100px -20px rgba(0, 0, 0, 0.25);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+
+  /* ===== LAYOUT DIMENSIONS ===== */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1536px;
+  --container-max-width: var(--container-xl);
+
+  /* ===== COMPONENT DIMENSIONS ===== */
+  --header-height: 4rem; /* 64px */
+  --sidebar-width: 16rem; /* 256px */
+  --modal-max-width: 32rem; /* 512px */
+  --modal-max-height: 90vh;
+  --tooltip-max-width: 20rem; /* 320px */
+
+  /* ===== Z-INDEX SCALE ===== */
+  --z-base: 0;
+  --z-docked: 10;
+  --z-dropdown: 1000;
+  --z-sticky: 1010;
+  --z-banner: 1020;
+  --z-overlay: 1030;
+  --z-modal: 1040;
+  --z-popover: 1050;
+  --z-skipLink: 1060;
+  --z-toast: 1070;
+  --z-tooltip: 1080;
+
+  /* ===== ANIMATION & TRANSITIONS ===== */
+  --duration-75: 75ms;
+  --duration-100: 100ms;
+  --duration-150: 150ms;
+  --duration-200: 200ms;
+  --duration-300: 300ms;
+  --duration-500: 500ms;
+  --duration-700: 700ms;
+  --duration-1000: 1000ms;
+
+  --ease-linear: linear;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ===== USER PREFERENCE INTEGRATION ===== */
+  /* These will be dynamically updated by settings-manager.js */
+  --user-font-size: var(--font-size-base);
+  --user-font-scale: 1;
+  --user-line-height: var(--line-height-normal);
+  --user-letter-spacing: normal;
+
+  /* ===== ACCESSIBILITY TOKENS ===== */
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+  --focus-ring-color: var(--color-brand-primary);
+  --focus-ring-opacity: 0.5;
+
+  /* ===== INTERACTION STATES ===== */
+  --hover-opacity: 0.8;
+  --active-opacity: 0.7;
+  --disabled-opacity: 0.5;
+
+  /* ===== CONTENT WIDTHS ===== */
+  --content-width-narrow: 45rem; /* ~720px */
+  --content-width-normal: 65rem; /* ~1040px */
+  --content-width-wide: 85rem; /* ~1360px */
+  --content-width-full: 100%;
+}
+
+/* ===== DARK MODE TOKENS ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Override surface colors for automatic dark mode */
+    --color-surface: #0d1117;
+    --color-surface-secondary: #161b22;
+    --color-surface-tertiary: #21262d;
+    --color-on-surface: #f0f6fc;
+    --color-on-surface-secondary: #e6edf3;
+    --color-on-surface-tertiary: #7d8590;
+  }
+}
+
+/* Dark mode class overrides (when explicitly enabled) */
+body.dark-mode {
+  --color-surface: #0d1117;
+  --color-surface-secondary: #161b22;
+  --color-surface-tertiary: #21262d;
+  --color-on-surface: #f0f6fc;
+  --color-on-surface-secondary: #e6edf3;
+  --color-on-surface-tertiary: #7d8590;
+
+  /* Adjust shadows for dark mode */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-base:
+    0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  --shadow-md:
+    0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg:
+    0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  --shadow-2xl: 0 50px 100px -20px rgba(0, 0, 0, 0.5);
+}
+
+/* ===== HIGH CONTRAST MODE ===== */
+@media (prefers-contrast: high) {
+  :root {
+    --focus-ring-width: 3px;
+    --border-width-1: 2px;
+    --border-width-2: 3px;
+  }
+}
+
+/* High contrast class overrides */
+body.high-contrast {
+  --focus-ring-width: 3px;
+  --border-width-1: 2px;
+  --border-width-2: 3px;
+
+  /* Increase contrast ratios */
+  --color-gray-400: #6b7280;
+  --color-gray-500: #4b5563;
+  --color-gray-600: #374151;
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-75: 0ms;
+    --duration-100: 0ms;
+    --duration-150: 0ms;
+    --duration-200: 0ms;
+    --duration-300: 0ms;
+    --duration-500: 0ms;
+    --duration-700: 0ms;
+    --duration-1000: 0ms;
+  }
+}
+
+/* Reduced motion class overrides */
+body.reduced-motion {
+  --duration-75: 0ms;
+  --duration-100: 0ms;
+  --duration-150: 0ms;
+  --duration-200: 0ms;
+  --duration-300: 0ms;
+  --duration-500: 0ms;
+  --duration-700: 0ms;
+  --duration-1000: 0ms;
+}
+
+/* ===== FONT SIZE SCALING ===== */
+/* These classes will be applied by settings-manager.js */
+html.font-size-small {
+  --user-font-scale: 0.875;
+  --user-font-size: calc(var(--font-size-base) * var(--user-font-scale));
+}
+
+html.font-size-medium {
+  --user-font-scale: 1;
+  --user-font-size: calc(var(--font-size-base) * var(--user-font-scale));
+}
+
+html.font-size-large {
+  --user-font-scale: 1.125;
+  --user-font-size: calc(var(--font-size-base) * var(--user-font-scale));
+}
+
+html.font-size-extra-large {
+  --user-font-scale: 1.25;
+  --user-font-size: calc(var(--font-size-base) * var(--user-font-scale));
+}
+
+/* ===== PRINT TOKENS ===== */
+@media print {
+  :root {
+    --color-surface: white;
+    --color-on-surface: black;
+    --shadow-xs: none;
+    --shadow-sm: none;
+    --shadow-base: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+    --shadow-xl: none;
+    --shadow-2xl: none;
+  }
+}
