@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tooltip Debug Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="src/css/main.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .test-container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .test-section {
+        background: white;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .chart-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-top: 20px;
+      }
+      .chart-container {
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        height: 450px;
+      }
+      .debug-info {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        margin-top: 10px;
+        font-family: monospace;
+        font-size: 12px;
+      }
+      h1 {
+        color: #1f2937;
+        text-align: center;
+      }
+      h2 {
+        color: #374151;
+        margin-bottom: 10px;
+      }
+      .debug-button {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      .debug-button:hover {
+        background: #2563eb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>Tooltip Debug Test</h1>
+      <p>
+        <strong>Testing:</strong> Fixed tooltip behavior - each chart should
+        have its own unique tooltip element.
+      </p>
+
+      <div class="test-section">
+        <h2>Debug Controls</h2>
+        <button class="debug-button" onclick="debugTooltips()">
+          Debug Tooltip Elements
+        </button>
+        <button class="debug-button" onclick="clearAllTooltips()">
+          Clear All Tooltips
+        </button>
+        <button class="debug-button" onclick="logChartInstances()">
+          Log Chart Instances
+        </button>
+
+        <div id="debug-output" class="debug-info">
+          Debug information will appear here...
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h2>Chart Tests</h2>
+        <div class="chart-grid">
+          <div class="chart-container">
+            <h3>Demo Chart 1</h3>
+            <div id="demo-chart-1" style="height: 350px"></div>
+          </div>
+
+          <div class="chart-container">
+            <h3>Demo Chart 2</h3>
+            <div id="demo-chart-2" style="height: 350px"></div>
+          </div>
+        </div>
+
+        <div class="chart-grid">
+          <div class="chart-container">
+            <h3>Scenario Chart 1</h3>
+            <div id="scenario-chart-1" style="height: 350px"></div>
+          </div>
+
+          <div class="chart-container">
+            <h3>Scenario Chart 2</h3>
+            <div id="scenario-chart-2" style="height: 350px"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h2>Expected Behavior</h2>
+        <ul>
+          <li>✅ Each chart should have its own unique tooltip</li>
+          <li>✅ Tooltips should appear near the hovered point</li>
+          <li>✅ No tooltips should appear at the bottom of the screen</li>
+          <li>
+            ✅ Multiple charts can show tooltips simultaneously without
+            interference
+          </li>
+          <li>
+            ✅ Tooltip elements should have unique IDs like:
+            chartjs-tooltip-blur-radar-chart-1
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <script type="module">
+      import { RadarChart } from "./src/js/components/radar-chart.js";
+
+      // Global debug functions
+      window.debugTooltips = function () {
+        const tooltips = document.querySelectorAll('[id*="chartjs-tooltip"]');
+        const output = document.getElementById("debug-output");
+
+        let debugInfo = `Found ${tooltips.length} tooltip elements:\n`;
+
+        tooltips.forEach((tooltip, index) => {
+          debugInfo += `${index + 1}. ID: ${tooltip.id}\n`;
+          debugInfo += `   Visible: ${tooltip.style.opacity !== "0"}\n`;
+          debugInfo += `   Position: ${tooltip.style.left}, ${tooltip.style.top}\n`;
+          debugInfo += `   Content: ${tooltip.textContent.substring(0, 50)}...\n\n`;
+        });
+
+        // Check for legacy shared tooltip
+        const legacyTooltip = document.getElementById("chartjs-tooltip-blur");
+        if (legacyTooltip) {
+          debugInfo += `⚠️  Legacy shared tooltip found: ${legacyTooltip.id}\n`;
+        } else {
+          debugInfo += `✅ No legacy shared tooltip found\n`;
+        }
+
+        output.textContent = debugInfo;
+        console.log("Tooltip Debug:", debugInfo);
+      };
+
+      window.clearAllTooltips = function () {
+        const tooltips = document.querySelectorAll('[id*="chartjs-tooltip"]');
+        tooltips.forEach((tooltip) => tooltip.remove());
+
+        const output = document.getElementById("debug-output");
+        output.textContent = `Cleared ${tooltips.length} tooltip elements.`;
+      };
+
+      window.logChartInstances = function () {
+        const instances = window.debugRadarChartInstances();
+        const output = document.getElementById("debug-output");
+        output.textContent = `Chart Instances:\n${JSON.stringify(instances, null, 2)}`;
+        console.log("Chart Instances:", instances);
+      };
+
+      async function createTestCharts() {
+        console.log("Creating test charts for tooltip debugging...");
+
+        try {
+          // Create multiple charts to test tooltip isolation
+          const charts = [];
+
+          // Demo charts
+          charts.push(
+            new RadarChart("demo-chart-1", {
+              isDemo: true,
+              width: 350,
+              height: 350,
+              title: "Demo Chart 1",
+            }),
+          );
+
+          charts.push(
+            new RadarChart("demo-chart-2", {
+              isDemo: true,
+              width: 350,
+              height: 350,
+              title: "Demo Chart 2",
+            }),
+          );
+
+          // Scenario charts
+          charts.push(
+            new RadarChart("scenario-chart-1", {
+              isDemo: false,
+              width: 350,
+              height: 350,
+              title: "Scenario Chart 1",
+            }),
+          );
+
+          charts.push(
+            new RadarChart("scenario-chart-2", {
+              isDemo: false,
+              width: 350,
+              height: 350,
+              title: "Scenario Chart 2",
+            }),
+          );
+
+          // Initialize all charts
+          for (const chart of charts) {
+            await chart.initializeChart();
+          }
+
+          console.log("All test charts created successfully");
+
+          // Auto-debug after 2 seconds
+          setTimeout(() => {
+            debugTooltips();
+          }, 2000);
+        } catch (error) {
+          console.error("Failed to create test charts:", error);
+          const output = document.getElementById("debug-output");
+          output.textContent = "ERROR: " + error.message;
+        }
+      }
+
+      // Create charts when page loads
+      document.addEventListener("DOMContentLoaded", createTestCharts);
+    </script>
+  </body>
+</html>

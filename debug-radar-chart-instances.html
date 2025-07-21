@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Debug Radar Chart Instances</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+
+      .debug-container {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .status {
+        padding: 15px;
+        border-radius: 5px;
+        margin: 10px 0;
+      }
+
+      .status-ok {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .status-warning {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+
+      .status-error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      button {
+        padding: 10px 15px;
+        margin: 5px;
+        border: none;
+        border-radius: 5px;
+        background: #007bff;
+        color: white;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #0056b3;
+      }
+
+      .debug-output {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        font-family: monospace;
+        margin: 10px 0;
+        white-space: pre-wrap;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .instance-list {
+        margin: 10px 0;
+      }
+
+      .instance-item {
+        padding: 8px;
+        margin: 4px 0;
+        background: #e9ecef;
+        border-radius: 4px;
+        border-left: 4px solid #007bff;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔍 Radar Chart Instance Debugger</h1>
+
+    <div class="debug-container">
+      <h2>📊 Current State Analysis</h2>
+      <div id="current-status" class="status">Analyzing...</div>
+
+      <h3>🎯 Actions</h3>
+      <button onclick="analyzeCurrentState()">📋 Analyze Current State</button>
+      <button onclick="testScenarioModal()">🧪 Test Scenario Modal</button>
+      <button onclick="clearAllInstances()">🧹 Clear All Instances</button>
+      <button onclick="debugRadarChartHealth()">💊 Health Check</button>
+    </div>
+
+    <div class="debug-container">
+      <h2>📈 Real-time Instance Monitor</h2>
+      <div id="instance-count" class="status">Instances: 0</div>
+      <div id="instance-list" class="instance-list"></div>
+    </div>
+
+    <div class="debug-container">
+      <h2>🔬 Debug Output</h2>
+      <div id="debug-output" class="debug-output">Ready for debugging...</div>
+    </div>
+
+    <script type="module">
+      // Global debug functions
+      let debugOutput = "";
+
+      function log(message) {
+        const timestamp = new Date().toLocaleTimeString();
+        debugOutput += `[${timestamp}] ${message}\n`;
+        document.getElementById("debug-output").textContent = debugOutput;
+        console.log(`[RadarDebug] ${message}`);
+      }
+
+      function clearLog() {
+        debugOutput = "";
+        document.getElementById("debug-output").textContent =
+          "Debug output cleared...";
+      }
+
+      window.analyzeCurrentState = function () {
+        log("=== CURRENT STATE ANALYSIS ===");
+
+        // Check for RadarChart class
+        if (typeof window.RadarChart !== "undefined") {
+          log("✅ RadarChart class is available globally");
+
+          // Check for instances
+          if (window.RadarChart.getAllInstances) {
+            const instances = window.RadarChart.getAllInstances();
+            log(`📊 Total RadarChart instances: ${instances.size}`);
+
+            if (instances.size > 0) {
+              log("📋 Instance Details:");
+              let index = 1;
+              instances.forEach((instance) => {
+                log(`  ${index}. ID: ${instance.instanceId || "unknown"}`);
+                log(`     Container: ${instance.containerId || "unknown"}`);
+                log(`     Chart exists: ${!!instance.chart}`);
+                log(`     Is healthy: ${instance.isHealthy !== false}`);
+                index++;
+              });
+            }
+          } else {
+            log("⚠️ RadarChart.getAllInstances() not available");
+          }
+
+          // Check health report
+          if (window.debugRadarChartHealth) {
+            log("💊 Generating health report...");
+            const healthReport = window.debugRadarChartHealth();
+            log(`Health Report: ${JSON.stringify(healthReport, null, 2)}`);
+          }
+        } else {
+          log("❌ RadarChart class not available globally");
+        }
+
+        // Check for scenario modal containers
+        const modalContainers = document.querySelectorAll(
+          "#scenario-radar-chart",
+        );
+        log(
+          `📦 Scenario radar chart containers in DOM: ${modalContainers.length}`,
+        );
+
+        modalContainers.forEach((container, index) => {
+          const canvas = container.querySelector("canvas");
+          log(`  Container ${index + 1}:`);
+          log(`    Has canvas: ${!!canvas}`);
+          if (canvas) {
+            log(`    Canvas dimensions: ${canvas.width}x${canvas.height}`);
+            log(
+              `    CSS dimensions: ${canvas.style.width} x ${canvas.style.height}`,
+            );
+          }
+        });
+
+        // Check for scenario modals
+        const scenarioModals = document.querySelectorAll(".scenario-modal");
+        log(`🪟 Scenario modals in DOM: ${scenarioModals.length}`);
+
+        updateInstanceMonitor();
+      };
+
+      window.testScenarioModal = async function () {
+        log("=== TESTING SCENARIO MODAL ===");
+
+        try {
+          // Try to load the scenario modal directly
+          const { default: ScenarioModal } = await import(
+            "/src/js/components/scenario-modal.js"
+          );
+          log("✅ ScenarioModal class loaded successfully");
+
+          // Create a test instance
+          log("🧪 Creating test ScenarioModal instance...");
+          const testModal = new ScenarioModal();
+          log("✅ ScenarioModal instance created");
+
+          // Try to open it with a test scenario
+          log("🚀 Opening test scenario modal...");
+          await testModal.open("trolley-problem", "moral-dilemmas", true); // Test mode
+          log("✅ Test scenario modal opened successfully");
+        } catch (error) {
+          log(`❌ Error testing scenario modal: ${error.message}`);
+          log(`Stack: ${error.stack}`);
+        }
+      };
+
+      window.clearAllInstances = function () {
+        log("=== CLEARING ALL INSTANCES ===");
+
+        if (
+          typeof window.RadarChart !== "undefined" &&
+          window.RadarChart.getAllInstances
+        ) {
+          const instances = window.RadarChart.getAllInstances();
+          log(`🧹 Clearing ${instances.size} RadarChart instances...`);
+
+          instances.forEach((instance) => {
+            try {
+              if (instance.destroy) {
+                instance.destroy();
+                log(`✅ Destroyed instance: ${instance.instanceId}`);
+              }
+            } catch (error) {
+              log(`❌ Error destroying instance: ${error.message}`);
+            }
+          });
+        }
+
+        // Remove all scenario modal containers
+        const modalContainers = document.querySelectorAll(".scenario-modal");
+        modalContainers.forEach((modal, index) => {
+          modal.remove();
+          log(`🗑️ Removed scenario modal ${index + 1}`);
+        });
+
+        updateInstanceMonitor();
+      };
+
+      window.debugRadarChartHealth = function () {
+        if (
+          typeof window.RadarChart !== "undefined" &&
+          window.RadarChart.getEnterpriseHealthReport
+        ) {
+          return window.RadarChart.getEnterpriseHealthReport();
+        } else if (typeof window.debugRadarChartHealth !== "undefined") {
+          return window.debugRadarChartHealth();
+        }
+        return { error: "Health check not available" };
+      };
+
+      function updateInstanceMonitor() {
+        let instanceCount = 0;
+        let instanceHtml = "";
+
+        if (
+          typeof window.RadarChart !== "undefined" &&
+          window.RadarChart.getAllInstances
+        ) {
+          const instances = window.RadarChart.getAllInstances();
+          instanceCount = instances.size;
+
+          instances.forEach((instance) => {
+            const status =
+              instance.isHealthy !== false ? "Healthy" : "Unhealthy";
+            const hasChart = !!instance.chart;
+            instanceHtml += `
+              <div class="instance-item">
+                <strong>ID:</strong> ${instance.instanceId || "unknown"}<br>
+                <strong>Container:</strong> ${instance.containerId || "unknown"}<br>
+                <strong>Status:</strong> ${status}<br>
+                <strong>Chart:</strong> ${hasChart ? "Active" : "Missing"}
+              </div>
+            `;
+          });
+        }
+
+        const countElement = document.getElementById("instance-count");
+        const listElement = document.getElementById("instance-list");
+
+        countElement.textContent = `Instances: ${instanceCount}`;
+        countElement.className = `status ${instanceCount === 0 ? "status-ok" : instanceCount === 1 ? "status-warning" : "status-error"}`;
+
+        listElement.innerHTML =
+          instanceHtml ||
+          '<div style="color: #666; font-style: italic;">No active instances</div>';
+      }
+
+      function updateStatus(message, type = "ok") {
+        const statusElement = document.getElementById("current-status");
+        statusElement.textContent = message;
+        statusElement.className = `status status-${type}`;
+      }
+
+      // Auto-refresh monitor every 2 seconds
+      setInterval(updateInstanceMonitor, 2000);
+
+      // Initial analysis
+      setTimeout(() => {
+        updateStatus("Analysis ready", "ok");
+        analyzeCurrentState();
+      }, 1000);
+
+      log("🔍 Radar Chart Instance Debugger initialized");
+    </script>
+  </body>
+</html>

@@ -93,6 +93,24 @@ div[data-chartjs="tooltip"] {
   pointer-events: none !important;
 }
 
+/* CRITICAL: Hide any built-in Chart.js tooltips that might still appear */
+.chartjs-tooltip:not([id*="chartjs-tooltip-blur"]),
+div[class*="chartjs-tooltip"]:not([id*="chartjs-tooltip-blur"]) {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Ensure our custom external tooltips are visible */
+div[id*="chartjs-tooltip-blur"] {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 1100 !important;
+  position: absolute !important;
+  pointer-events: none !important;
+}
+
 /* Fallback chart when Chart.js fails to load */
 .radar-chart-fallback {
   padding: 1.5rem;

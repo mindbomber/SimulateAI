@@ -949,7 +949,7 @@ class ScenarioModal {
                     </div>
 
                     <div class="scenario-sidebar">
-                        <div id="scenario-radar-chart" style="min-height: 380px; position: relative;"></div>
+                        <div id="scenario-radar-chart" style="min-height: 400px; width: 400px; height: 400px; position: relative; margin: 0 auto;"></div>
                         <div class="chart-legend">
                             <p>This chart shows how your choice affects different ethical dimensions. Select an option to see its impact.</p>
                         </div>
@@ -1132,62 +1132,23 @@ class ScenarioModal {
         "Prerequisites check passed - Chart.js and RadarChart class available",
       );
 
-      // IMMEDIATE TEST: Skip complex container search and try direct creation
-      const directContainer = document.getElementById("scenario-radar-chart");
-      if (directContainer) {
-        logger.debug(
-          "Direct container found, attempting immediate chart creation",
-        );
+      // Clean up any existing radar chart instance first
+      if (this.radarChart) {
         try {
-          directContainer.innerHTML =
-            '<div style="background: yellow; padding: 10px;">🔄 Creating radar chart...</div>';
-
-          // Load RadarChart configuration first
-          await RadarChart.loadConfiguration();
-
-          // Try direct radar chart creation
-          this.radarChart = new RadarChart("scenario-radar-chart", {
-            width: 380,
-            height: 380,
-            showLabels: true,
-            showLegend: false,
-            animated: true,
-            realTime: true,
-            title: null,
-          });
-
-          // Set initial neutral scores
-          const neutralScores = {
-            fairness: this.config.radarChart.neutralScore,
-            sustainability: this.config.radarChart.neutralScore,
-            autonomy: this.config.radarChart.neutralScore,
-            beneficence: this.config.radarChart.neutralScore,
-            transparency: this.config.radarChart.neutralScore,
-            accountability: this.config.radarChart.neutralScore,
-            privacy: this.config.radarChart.neutralScore,
-            proportionality: this.config.radarChart.neutralScore,
-          };
-
-          if (this.radarChart.initializationPromise) {
-            await this.radarChart.initializationPromise;
-          }
-
-          this.radarChart.setScores(neutralScores);
-          logger.debug("Direct radar chart creation successful!");
-          logger.info("RadarChart", "Direct radar chart creation successful");
-          return; // Exit early on success
-        } catch (error) {
-          logger.error("Direct radar chart creation failed:", error);
-          logger.error("RadarChart", "Direct creation failed:", error);
-          // Continue to complex search below
+          logger.info(
+            "RadarChart",
+            "Cleaning up existing radar chart instance",
+          );
+          this.radarChart.destroy();
+          this.radarChart = null;
+        } catch (e) {
+          logger.warn(
+            "RadarChart",
+            "Failed to destroy existing radar chart",
+            e,
+          );
         }
-      } else {
-        logger.debug(
-          "Direct container not found, proceeding with complex search",
-        );
       }
-
-      // Clean up any existing radar chart instance
       if (this.radarChart) {
         try {
           this.radarChart.destroy();
@@ -1314,8 +1275,8 @@ class ScenarioModal {
         await RadarChart.loadConfiguration();
 
         this.radarChart = new RadarChart("scenario-radar-chart", {
-          width: 380,
-          height: 380,
+          width: 400,
+          height: 400,
           showLabels: true,
           showLegend: false,
           animated: true,
@@ -1351,17 +1312,19 @@ class ScenarioModal {
           return;
         }
 
-        // Set initial neutral scores (using the correct method)
+        // Set initial slightly varied neutral scores to ensure polygon visibility
+        // These values are carefully chosen to average exactly 3.0 while providing variation
         const neutralScores = {
-          fairness: this.config.radarChart.neutralScore,
-          sustainability: this.config.radarChart.neutralScore,
-          autonomy: this.config.radarChart.neutralScore,
-          beneficence: this.config.radarChart.neutralScore,
-          transparency: this.config.radarChart.neutralScore,
-          accountability: this.config.radarChart.neutralScore,
-          privacy: this.config.radarChart.neutralScore,
-          proportionality: this.config.radarChart.neutralScore,
+          fairness: this.config.radarChart.neutralScore + 0.02, // 3.02
+          sustainability: this.config.radarChart.neutralScore - 0.01, // 2.99
+          autonomy: this.config.radarChart.neutralScore + 0.01, // 3.01
+          beneficence: this.config.radarChart.neutralScore - 0.01, // 2.99
+          transparency: this.config.radarChart.neutralScore + 0.01, // 3.01
+          accountability: this.config.radarChart.neutralScore - 0.01, // 2.99
+          privacy: this.config.radarChart.neutralScore + 0.01, // 3.01
+          proportionality: this.config.radarChart.neutralScore - 0.02, // 2.98
         };
+        // Average: (3.02 + 2.99 + 3.01 + 2.99 + 3.01 + 2.99 + 3.01 + 2.98) / 8 = 24.00 / 8 = 3.00 exactly
 
         logger.info(
           "RadarChart",
@@ -1374,13 +1337,61 @@ class ScenarioModal {
           "Radar chart initialized successfully with neutral scores",
         );
 
-        // Verify chart is visible in DOM
+        // Verify chart is visible in DOM and has correct dimensions
         const chartCanvas = chartContainer.querySelector("canvas");
         if (chartCanvas) {
           logger.info(
             "RadarChart",
             "Canvas element created successfully in container",
+            {
+              canvasWidth: chartCanvas.width,
+              canvasHeight: chartCanvas.height,
+              cssWidth: chartCanvas.style.width,
+              cssHeight: chartCanvas.style.height,
+            },
           );
+
+          // CRITICAL FIX: Ensure canvas HTML attributes match CSS dimensions exactly
+          if (chartCanvas.width !== 400 || chartCanvas.height !== 400) {
+            logger.warn(
+              "RadarChart",
+              "Canvas dimensions mismatch detected, fixing",
+              {
+                htmlWidth: chartCanvas.width,
+                htmlHeight: chartCanvas.height,
+                expectedWidth: 400,
+                expectedHeight: 400,
+              },
+            );
+
+            // Force correct canvas dimensions
+            chartCanvas.width = 400;
+            chartCanvas.height = 400;
+            chartCanvas.style.width = "400px";
+            chartCanvas.style.height = "400px";
+
+            // Force chart redraw with corrected dimensions
+            if (this.radarChart && this.radarChart.chart) {
+              logger.info(
+                "RadarChart",
+                "Forcing chart redraw after dimension correction",
+              );
+              this.radarChart.chart.resize();
+              this.radarChart.chart.update("none");
+
+              // Re-apply scores to ensure polygon visibility after resize
+              setTimeout(() => {
+                if (this.radarChart && this.radarChart.chart) {
+                  this.radarChart.setScores(neutralScores);
+                  this.radarChart.chart.update();
+                  logger.info(
+                    "RadarChart",
+                    "Chart redrawn with corrected dimensions and scores",
+                  );
+                }
+              }, 100);
+            }
+          }
         } else {
           logger.warn(
             "RadarChart",

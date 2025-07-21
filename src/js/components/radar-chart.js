@@ -35,9 +35,6 @@ import {
   getChartConstants,
   getEthicalAxes,
   getDefaultScores,
-  getPointColor,
-  getGridColor,
-  getThemeColors,
   getImpactDescription,
   getChartConfigTemplate,
   validateConfig,
@@ -110,7 +107,7 @@ export default class RadarChart {
       throw new Error(error);
     }
 
-    // Configuration options
+    // Configuration options with enhanced context awareness
     this.options = {
       width: options.width || this.CHART_CONSTANTS.DEFAULT_CHART_SIZE,
       height: options.height || this.CHART_CONSTANTS.DEFAULT_CHART_SIZE,
@@ -120,12 +117,22 @@ export default class RadarChart {
       realTime: options.realTime || false, // For scenario real-time updates
       title: options.title || "Ethical Impact Analysis",
       isDemo: options.isDemo || false, // For demo charts that need minimal styling
+      context: options.context || this._determineContext(options), // Auto-detect context
       ...options,
     };
 
     // Core chart properties
     this.chart = null;
+
+    // Use simple whole number scores - no complex decimals
+    // Default is 3 (neutral) - can be 1, 2, 3, 4, or 5
     this.currentScores = { ...this.DEFAULT_SCORES };
+
+    logger.info(
+      "RadarChart",
+      "Using simple whole number scores (1-5 scale, default=3)",
+      this.currentScores,
+    );
 
     // Track initialization status
     this.isInitialized = false;
@@ -208,6 +215,36 @@ export default class RadarChart {
   }
 
   /**
+   * Determine chart context based on options and container
+   * @private
+   * @param {Object} options - Chart options
+   * @returns {string} Context type: 'hero-demo', 'scenario', or 'test'
+   */
+  _determineContext(options) {
+    // Check container ID patterns
+    if (
+      this.containerId.includes("hero") ||
+      this.containerId.includes("demo")
+    ) {
+      return "hero-demo";
+    }
+
+    if (this.containerId.includes("scenario") || options.realTime) {
+      return "scenario";
+    }
+
+    if (
+      this.containerId.includes("test") ||
+      this.containerId.includes("debug")
+    ) {
+      return "test";
+    }
+
+    // Fallback based on isDemo flag
+    return options.isDemo ? "hero-demo" : "scenario";
+  }
+
+  /**
    * Initialize the Chart.js radar chart
   }
     this.initializationPromise = this.initializeChart();
@@ -251,14 +288,26 @@ export default class RadarChart {
         logger.info("RadarChart", "Chart.js already available");
       }
 
-      // Create canvas element
+      // Create canvas element with proper sizing
       const canvas = document.createElement("canvas");
-      canvas.width = this.options.width;
-      canvas.height = this.options.height;
+
+      // CRITICAL: Let Chart.js handle canvas dimensions and DPR scaling for sharp rendering
+      // Don't manually set canvas.width/height as it interferes with device pixel ratio
+
+      // Set CSS dimensions only (Chart.js will handle internal canvas scaling)
+      canvas.style.width = this.options.width + "px";
+      canvas.style.height = this.options.height + "px";
       canvas.style.maxWidth = "100%";
-      canvas.style.height = "auto";
       canvas.style.display = "block";
       canvas.style.margin = "0 auto";
+
+      // Set container dimensions to match
+      this.container.style.width = this.options.width + "px";
+      this.container.style.height = this.options.height + "px";
+      this.container.style.minHeight = this.options.height + "px";
+
+      // Get context for Chart.js (Chart.js will handle DPR scaling automatically)
+      const ctx = canvas.getContext("2d");
 
       // Clear any existing content including any "null" text
       this.container.innerHTML = "";
@@ -275,32 +324,36 @@ export default class RadarChart {
       canvas.style.zIndex = "1";
 
       this.container.appendChild(canvas);
+
+      // VERIFICATION: Log dimensions to ensure they match
+      logger.info("RadarChart", "Canvas dimensions verified", {
+        htmlWidth: canvas.width,
+        htmlHeight: canvas.height,
+        cssWidth: canvas.style.width,
+        cssHeight: canvas.style.height,
+        containerMinHeight: this.container.style.minHeight,
+        expectedMatch:
+          canvas.width === this.options.width &&
+          canvas.height === this.options.height,
+      });
+
       logger.info(
         "RadarChart",
         "Canvas element created and appended to container",
       );
 
       // Apply visual enhancements classes BEFORE creating chart
-      if (this.options.isDemo) {
-        this.container.classList.add("radar-demo-container");
-        logger.info(
-          "RadarChart",
-          "Applied radar-demo-container class for demo chart",
-        );
-      } else {
-        this.container.classList.add("radar-chart-container");
-        logger.info("RadarChart", "Applied radar-chart-container class");
-      }
+      this._applyContextSpecificStyling();
 
       // Initialize Chart.js radar chart
-      const ctx = canvas.getContext("2d");
       const config = this.getChartConfig();
       logger.info("RadarChart", "Creating chart with config", config);
 
       this.chart = new window.Chart(ctx, config);
       logger.info("RadarChart", "Chart created successfully");
 
-      // Force tooltip z-index fix for Chart.js
+      // Apply context-specific configuration
+      this._applyContextSpecificConfiguration(); // Force tooltip z-index fix for Chart.js
       this._setupTooltipZIndexFix();
 
       // REMOVED: Mobile tooltip dismissal setup moved to _attachEventListenersAfterRender()
@@ -317,19 +370,71 @@ export default class RadarChart {
         }
       }, 100);
 
-      // Ensure default neutral state is visible - Chart.js may not render polygon when all values are equal
+      // CRITICAL: Ensure polygon visibility immediately for scenario modal charts
       setTimeout(() => {
-        if (this.chart && this._isAllValuesEqual()) {
-          logger.info(
-            "RadarChart",
-            "All values are equal, ensuring default state visibility",
-          );
-          this._ensureDefaultStateVisibility();
-        }
+        if (this.chart) {
+          // DIMENSION VERIFICATION: Check if canvas dimensions match expectations
+          const canvas = this.container.querySelector("canvas");
+          if (canvas) {
+            const expectedWidth = this.options.width;
+            const expectedHeight = this.options.height;
+            const actualWidth = canvas.width;
+            const actualHeight = canvas.height;
 
-        // CRITICAL FIX: Attach event listeners AFTER polygon is guaranteed to render
-        // This prevents interference with Chart.js initial rendering cycle
-        this._attachEventListenersAfterRender();
+            if (
+              actualWidth !== expectedWidth ||
+              actualHeight !== expectedHeight
+            ) {
+              logger.warn(
+                "RadarChart",
+                "Canvas dimension mismatch detected after initialization",
+                {
+                  expected: `${expectedWidth}x${expectedHeight}`,
+                  actual: `${actualWidth}x${actualHeight}`,
+                  containerId: this.containerId,
+                },
+              );
+
+              // Force correct dimensions
+              canvas.width = expectedWidth;
+              canvas.height = expectedHeight;
+              canvas.style.width = expectedWidth + "px";
+              canvas.style.height = expectedHeight + "px";
+
+              // Force chart resize and redraw
+              this.chart.resize(expectedWidth, expectedHeight);
+              this.chart.update("none");
+
+              logger.info(
+                "RadarChart",
+                "Canvas dimensions corrected and chart redrawn",
+              );
+            }
+          }
+
+          // SIMPLIFIED: Only apply visibility fix if polygon doesn't render (rare case)
+          // Modern Chart.js should render polygons with equal values fine
+          // Reuse the canvas variable already declared above
+          if (canvas && this._isAllValuesEqual()) {
+            // For demo charts, minimal intervention - they should work with pure defaults
+            // For scenario charts, apply fix only if really needed
+            setTimeout(() => {
+              // Check if values are still all equal after initial render
+              if (this._isAllValuesEqual()) {
+                logger.info(
+                  "RadarChart",
+                  "Checking if visibility fix needed for equal values",
+                  { isDemo: this.options.isDemo },
+                );
+                this._ensureDefaultStateVisibility();
+              }
+            }, 50);
+          }
+
+          // CRITICAL FIX: Attach event listeners AFTER polygon is guaranteed to render
+          // This prevents interference with Chart.js initial rendering cycle
+          this._attachEventListenersAfterRender();
+        }
       }, 200);
 
       this.isInitialized = true;
@@ -402,11 +507,23 @@ export default class RadarChart {
       ],
     };
 
-    // Add grid color callback using configuration
+    // Use solid professional dark grid color for all lines
     baseConfig.options.scales.r.grid = {
       ...baseConfig.options.scales.r.grid,
-      color: (context) => getGridColor(config, context.index),
+      color: "rgba(156, 163, 175, 0.3)", // Professional dark gray for all grid lines
       lineWidth: config.chartConfig.scales.r.grid.lineWidth,
+    };
+
+    // Add label truncation with ellipsis for point labels
+    baseConfig.options.scales.r.pointLabels = {
+      ...baseConfig.options.scales.r.pointLabels,
+      callback: function (label) {
+        const maxLength = 10; // Maximum characters before ellipsis
+        if (label.length > maxLength) {
+          return label.substring(0, maxLength - 3) + "...";
+        }
+        return label;
+      },
     };
 
     // Update animation duration from configuration
@@ -417,12 +534,40 @@ export default class RadarChart {
     // Add tooltip callbacks using configuration
     baseConfig.options.plugins.tooltip.callbacks = {
       title: (context) => {
-        const axisKey = Object.keys(this.ETHICAL_AXES)[context[0].dataIndex];
-        return this.ETHICAL_AXES[axisKey].label;
+        // Safety check: ensure context exists and has elements
+        if (!context || !Array.isArray(context) || context.length === 0) {
+          return "Ethical Analysis";
+        }
+
+        // Safety check: ensure first element exists and has dataIndex
+        const firstElement = context[0];
+        if (!firstElement || typeof firstElement.dataIndex !== "number") {
+          return "Ethical Analysis";
+        }
+
+        const axisKey = Object.keys(this.ETHICAL_AXES)[firstElement.dataIndex];
+        return axisKey && this.ETHICAL_AXES[axisKey]
+          ? this.ETHICAL_AXES[axisKey].label
+          : "Ethical Analysis";
       },
       label: (context) => {
+        // Safety check: ensure context exists and has required properties
+        if (
+          !context ||
+          typeof context.dataIndex !== "number" ||
+          !context.parsed
+        ) {
+          return ["Score: N/A", "", "Data not available"];
+        }
+
         const axisKey = Object.keys(this.ETHICAL_AXES)[context.dataIndex];
         const axisInfo = this.ETHICAL_AXES[axisKey];
+
+        // Safety check: ensure axis info exists
+        if (!axisInfo) {
+          return ["Score: N/A", "", "Data not available"];
+        }
+
         const score = context.parsed.r;
         const impact = getImpactDescription(config, score);
 
@@ -434,9 +579,119 @@ export default class RadarChart {
       },
     };
 
+    // Add blur effect to tooltip background
+    baseConfig.options.plugins.tooltip.external = (context) => {
+      // Create unique tooltip ID for this chart instance
+      const tooltipId = `chartjs-tooltip-blur-${this.instanceId}`;
+
+      // Get or create tooltip element specific to this chart instance
+      let tooltipEl = document.getElementById(tooltipId);
+
+      if (!tooltipEl) {
+        tooltipEl = document.createElement("div");
+        tooltipEl.id = tooltipId;
+        tooltipEl.style.cssText = `
+          position: absolute;
+          background: rgba(255, 255, 255, 0.85);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          border-radius: 8px;
+          padding: 12px;
+          pointer-events: none;
+          z-index: 1000;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          font-size: 12px;
+          color: #2d3748;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          transition: opacity 0.2s ease;
+        `;
+        document.body.appendChild(tooltipEl);
+
+        // Store reference for cleanup during destroy
+        this.tooltipElement = tooltipEl;
+      }
+
+      const tooltip = context.tooltip;
+
+      if (tooltip.opacity === 0) {
+        tooltipEl.style.opacity = 0;
+        return;
+      }
+
+      // Generate tooltip content manually since built-in tooltips are disabled
+      let innerHtml = "";
+
+      // Get the active data point info
+      if (tooltip.dataPoints && tooltip.dataPoints.length > 0) {
+        const dataPoint = tooltip.dataPoints[0];
+        const dataIndex = dataPoint.dataIndex;
+
+        // Safety check for dataIndex
+        if (typeof dataIndex === "number" && dataIndex >= 0) {
+          const axisKeys = Object.keys(this.ETHICAL_AXES);
+
+          if (dataIndex < axisKeys.length) {
+            const axisKey = axisKeys[dataIndex];
+            const axisInfo = this.ETHICAL_AXES[axisKey];
+            const score = dataPoint.parsed.r;
+            const impact = getImpactDescription(config, score);
+
+            // Title
+            innerHtml += `<div style="font-weight: bold; margin-bottom: 4px; color: #1a202c;">${axisInfo.label}</div>`;
+
+            // Score info
+            innerHtml += `<div style="margin: 2px 0;">Score: ${score}/${config.scoring.maxScore} (${impact})</div>`;
+            innerHtml += `<div style="margin: 2px 0;"></div>`;
+
+            // Description
+            innerHtml += `<div style="margin: 2px 0;">${axisInfo.description}</div>`;
+          } else {
+            innerHtml = `<div style="color: #666;">Ethical Analysis</div>`;
+          }
+        } else {
+          innerHtml = `<div style="color: #666;">Ethical Analysis</div>`;
+        }
+      } else {
+        innerHtml = `<div style="color: #666;">Ethical Analysis</div>`;
+      }
+
+      tooltipEl.innerHTML = innerHtml;
+
+      const canvas = context.chart.canvas;
+      const canvasRect = canvas.getBoundingClientRect();
+
+      // Position tooltip
+      tooltipEl.style.opacity = 1;
+      tooltipEl.style.left =
+        canvasRect.left + window.scrollX + tooltip.caretX + "px";
+      tooltipEl.style.top =
+        canvasRect.top + window.scrollY + tooltip.caretY + "px";
+    };
+
+    // CRITICAL FIX: Completely disable built-in tooltips when using external tooltip
+    // This prevents dual tooltip display (built-in + external)
+    baseConfig.options.plugins.tooltip.enabled = false;
+
+    // Additional tooltip configuration to ensure external function works
+    baseConfig.options.plugins.tooltip.intersect = false;
+    baseConfig.options.plugins.tooltip.position = "nearest";
+
+    // Ensure external tooltip function is preserved and working
+    if (typeof baseConfig.options.plugins.tooltip.external === "function") {
+      // External function is already set above, keep it
+      logger.info(
+        "RadarChart",
+        "External tooltip function preserved, built-in tooltips disabled",
+      );
+    } else {
+      logger.warn("RadarChart", "External tooltip function missing");
+    }
+
     // Set mobile breakpoint for tooltips
-    baseConfig.options.plugins.tooltip.enabled =
-      window.innerWidth > config.chart.mobileBreakpoint;
+    if (window.innerWidth <= config.chart.mobileBreakpoint) {
+      baseConfig.options.plugins.tooltip.enabled = false;
+    }
 
     // CRITICAL FIX: Don't add onClick handler during initialization
     // This can interfere with Chart.js initial polygon rendering
@@ -449,22 +704,17 @@ export default class RadarChart {
   }
 
   /**
-   * Create dynamic gradient colors based on current scores
+   * Create simple blue gradient colors (always neutral theme)
    */
   createGradientColors() {
     const config = RadarChart.config;
 
-    // Calculate average score to determine overall theme
-    const avgScore =
-      Object.values(this.currentScores).reduce((a, b) => a + b, 0) /
-      Object.keys(this.currentScores).length;
+    // Always use blue neutral theme - no complex score-based color calculations
+    const themeColors = config.themes.neutral;
 
-    // Get theme colors from configuration
-    const themeColors = getThemeColors(config, avgScore);
-
-    // Create point colors based on individual scores using configuration
-    const points = Object.values(this.currentScores).map((score) =>
-      getPointColor(config, score),
+    // Use neutral gray points for all scores
+    const points = Object.values(this.currentScores).map(
+      () => config.pointColors["3"],
     );
 
     return {
@@ -494,13 +744,14 @@ export default class RadarChart {
         return;
       }
 
-      // Validate and apply score updates
+      // Validate and apply score updates - ensure whole numbers only
       for (const [axis, score] of Object.entries(scoreUpdates)) {
         if (axis in this.currentScores) {
-          // Clamp score between MIN_SCORE and MAX_SCORE
+          // Round to whole number and clamp between 1-5
+          const wholeScore = Math.round(score);
           this.currentScores[axis] = Math.max(
-            this.CHART_CONSTANTS.MIN_SCORE,
-            Math.min(this.CHART_CONSTANTS.MAX_SCORE, score),
+            1, // MIN_SCORE is 1
+            Math.min(5, wholeScore), // MAX_SCORE is 5
           );
         }
       }
@@ -597,10 +848,152 @@ export default class RadarChart {
   }
 
   /**
-   * Check if all current scores are equal (which may cause Chart.js to not render polygon)
+   * Apply context-specific styling classes
    * @private
-   * @returns {boolean} True if all values are equal
    */
+  _applyContextSpecificStyling() {
+    switch (this.options.context) {
+      case "hero-demo":
+        this.container.classList.add(
+          "radar-demo-container",
+          "hero-radar-chart",
+        );
+        logger.info("RadarChart", "Applied hero demo styling classes");
+        break;
+      case "scenario":
+        this.container.classList.add(
+          "radar-chart-container",
+          "scenario-radar-chart",
+        );
+        logger.info("RadarChart", "Applied scenario modal styling classes");
+        break;
+      case "test":
+        this.container.classList.add(
+          "radar-chart-container",
+          "test-radar-chart",
+        );
+        logger.info("RadarChart", "Applied test chart styling classes");
+        break;
+      default:
+        // Fallback to legacy behavior
+        if (this.options.isDemo) {
+          this.container.classList.add("radar-demo-container");
+        } else {
+          this.container.classList.add("radar-chart-container");
+        }
+        logger.info("RadarChart", "Applied fallback styling classes");
+    }
+  }
+
+  /**
+   * Apply context-specific chart configuration
+   * @private
+   */
+  _applyContextSpecificConfiguration() {
+    const neutralTheme = RadarChart.config.themes.neutral;
+
+    switch (this.options.context) {
+      case "hero-demo":
+        this._configureHeroDemoChart(neutralTheme);
+        break;
+      case "scenario":
+        this._configureScenarioChart(neutralTheme);
+        break;
+      case "test":
+        this._configureTestChart(neutralTheme);
+        break;
+      default:
+        // Fallback to legacy behavior
+        this._configureLegacyChart(neutralTheme);
+    }
+  }
+
+  /**
+   * Configure hero demo chart
+   * @private
+   * @param {Object} neutralTheme - Theme colors
+   */
+  _configureHeroDemoChart(neutralTheme) {
+    // Hero demo charts: Optimized for interactive demonstrations
+    this.chart.data.datasets[0].backgroundColor = neutralTheme.background;
+    this.chart.data.datasets[0].borderColor = neutralTheme.border;
+    this.chart.data.datasets[0].pointBackgroundColor =
+      RadarChart.config.pointColors["3"];
+
+    // Start with balanced default scores for hero demo
+    this.chart.data.datasets[0].data = Object.values(this.DEFAULT_SCORES);
+    this.chart.update();
+
+    logger.info("RadarChart", "Configured hero demo chart", {
+      context: this.options.context,
+      defaultScores: this.DEFAULT_SCORES,
+    });
+  }
+
+  /**
+   * Configure scenario modal chart
+   * @private
+   * @param {Object} neutralTheme - Theme colors
+   */
+  _configureScenarioChart(neutralTheme) {
+    // Scenario charts: Optimized for real-time ethical decision tracking
+    this.chart.data.datasets[0].backgroundColor = neutralTheme.background;
+    this.chart.data.datasets[0].borderColor = neutralTheme.border;
+    this.chart.data.datasets[0].pointBackgroundColor =
+      RadarChart.config.pointColors["3"];
+
+    // Use exact default scores for scenario consistency
+    this.chart.data.datasets[0].data = Object.values(this.DEFAULT_SCORES);
+    this.chart.update();
+
+    logger.info("RadarChart", "Configured scenario modal chart", {
+      context: this.options.context,
+      realTime: this.options.realTime,
+      defaultScores: this.DEFAULT_SCORES,
+    });
+  }
+
+  /**
+   * Configure test/debug chart
+   * @private
+   * @param {Object} neutralTheme - Theme colors
+   */
+  _configureTestChart(neutralTheme) {
+    // Test charts: Optimized for debugging and validation
+    this.chart.data.datasets[0].backgroundColor = neutralTheme.background;
+    this.chart.data.datasets[0].borderColor = neutralTheme.border;
+    this.chart.data.datasets[0].pointBackgroundColor =
+      RadarChart.config.pointColors["3"];
+
+    // Use default scores for consistent testing
+    this.chart.data.datasets[0].data = Object.values(this.DEFAULT_SCORES);
+    this.chart.update();
+
+    logger.info("RadarChart", "Configured test chart", {
+      context: this.options.context,
+      containerId: this.containerId,
+      defaultScores: this.DEFAULT_SCORES,
+    });
+  }
+
+  /**
+   * Configure chart using legacy method (fallback)
+   * @private
+   * @param {Object} neutralTheme - Theme colors
+   */
+  _configureLegacyChart(neutralTheme) {
+    this.chart.data.datasets[0].backgroundColor = neutralTheme.background;
+    this.chart.data.datasets[0].borderColor = neutralTheme.border;
+    this.chart.data.datasets[0].pointBackgroundColor =
+      RadarChart.config.pointColors["3"];
+    this.chart.data.datasets[0].data = Object.values(this.DEFAULT_SCORES);
+    this.chart.update();
+
+    logger.info("RadarChart", "Applied legacy chart configuration", {
+      isDemo: this.options.isDemo,
+      defaultScores: this.DEFAULT_SCORES,
+    });
+  }
   _isAllValuesEqual() {
     const values = Object.values(this.currentScores);
     const firstValue = values[0];
@@ -608,59 +1001,71 @@ export default class RadarChart {
   }
 
   /**
-   * Ensure default state visibility when all values are equal
-   * Chart.js may not render polygon when all values are the same
+   * SIMPLIFIED: Ensure visibility only when Chart.js can't render equal values
    * @private
    */
   _ensureDefaultStateVisibility() {
     if (!this.chart) return;
 
-    const neutralScore = RadarChart.config.scoring.neutralScore;
-    const allValuesAreNeutral = Object.values(this.currentScores).every(
-      (score) => score === neutralScore,
-    );
-
-    if (allValuesAreNeutral) {
+    // Only apply alternating pattern if Chart.js fails to render polygon with equal values
+    // This should be rare with modern Chart.js versions
+    if (this._isAllValuesEqual()) {
       logger.info(
         "RadarChart",
-        "Applying default state visibility fix for neutral scores",
+        "Applying visibility fix for Chart.js polygon rendering",
+        { context: this.options.context },
       );
 
-      // Add tiny variations to ensure polygon visibility while maintaining neutral appearance
-      const visibilityScores = {
-        fairness: neutralScore + 0.001,
-        sustainability: neutralScore,
-        autonomy: neutralScore,
-        beneficence: neutralScore,
-        transparency: neutralScore,
-        accountability: neutralScore,
-        privacy: neutralScore,
-        proportionality: neutralScore - 0.001,
-      };
+      let pattern;
+      let description;
 
-      // Update chart data directly to avoid triggering user tracking
-      const axesData = Object.values(visibilityScores);
-      this.chart.data.datasets[0].data = axesData;
+      // Context-aware visibility patterns
+      switch (this.options.context) {
+        case "hero-demo":
+          // Hero demo: Always use pure default values (all 3s) for clean demonstrations
+          pattern = [3, 3, 3, 3, 3, 3, 3, 3];
+          description = "pure default pattern for hero demo";
+          break;
+        case "scenario":
+          // Scenario charts: Use minimal variation only if Chart.js requires it
+          pattern = [3, 3, 3, 3, 3, 3, 3, 4];
+          description = "minimal variation pattern for scenario chart";
+          break;
+        case "test":
+          // Test charts: Use pure defaults for predictable testing
+          pattern = [3, 3, 3, 3, 3, 3, 3, 3];
+          description = "pure default pattern for test chart";
+          break;
+        default:
+          // Legacy fallback
+          if (this.options.isDemo) {
+            pattern = [3, 3, 3, 3, 3, 3, 3, 3];
+            description = "pure default pattern (legacy demo)";
+          } else {
+            pattern = [3, 3, 3, 3, 3, 3, 3, 4];
+            description = "minimal variation pattern (legacy scenario)";
+          }
+      }
 
-      // Force update with active animation to ensure visibility
-      this.chart.update("active");
+      logger.info("RadarChart", `Using ${description}`, {
+        context: this.options.context,
+        pattern: pattern,
+      });
 
-      // Immediately restore exact neutral scores after visibility is established
-      setTimeout(() => {
-        if (this.chart) {
-          const exactNeutralData = Object.values(this.currentScores);
-          this.chart.data.datasets[0].data = exactNeutralData;
-          this.chart.update();
-          logger.info(
-            "RadarChart",
-            "Default state visibility established and restored to exact neutral",
-          );
-        }
-      }, 50);
+      // Update chart data with chosen pattern
+      this.chart.data.datasets[0].data = pattern;
+
+      // Apply neutral colors
+      const neutralTheme = RadarChart.config.themes.neutral;
+      const dataset = this.chart.data.datasets[0];
+      dataset.backgroundColor = neutralTheme.background;
+      dataset.borderColor = neutralTheme.border;
+      dataset.pointBackgroundColor = RadarChart.config.pointColors["3"];
+
+      // Simple update
+      this.chart.update();
     }
-  }
-
-  /**
+  } /**
    * Setup aggressive tooltip z-index fix for Chart.js tooltips
    * This ensures tooltips appear above modal content and other overlays
    * @private
@@ -726,6 +1131,64 @@ export default class RadarChart {
         tooltip.style.pointerEvents = "none";
       });
     }, 100);
+  }
+
+  /**
+   * Get demo pattern from JSON SSOT configuration
+   * @param {string} patternName - Pattern name (utilitarian, deontological, etc.)
+   * @returns {Object|null} Pattern data or null if not found
+   */
+  getDemoPattern(patternName) {
+    const config = RadarChart.config;
+    if (!config || !config.demoPatterns || !config.demoPatterns[patternName]) {
+      logger.warn(
+        "RadarChart",
+        `Demo pattern '${patternName}' not found in JSON SSOT`,
+      );
+      return null;
+    }
+
+    const pattern = config.demoPatterns[patternName];
+    logger.info(
+      "RadarChart",
+      `Retrieved demo pattern '${patternName}' from JSON SSOT`,
+      {
+        context: this.options.context,
+        pattern: pattern.name,
+      },
+    );
+
+    return pattern;
+  }
+
+  /**
+   * Apply demo pattern from JSON SSOT (specifically for hero demo context)
+   * @param {string} patternName - Pattern name to apply
+   * @returns {boolean} Success status
+   */
+  applyDemoPattern(patternName) {
+    if (this.options.context !== "hero-demo") {
+      logger.warn(
+        "RadarChart",
+        `applyDemoPattern should only be used with hero-demo context, current: ${this.options.context}`,
+      );
+    }
+
+    const pattern = this.getDemoPattern(patternName);
+    if (!pattern) {
+      return false;
+    }
+
+    // Apply the pattern scores
+    this.setScores(pattern.scores);
+
+    logger.info("RadarChart", `Applied demo pattern '${patternName}'`, {
+      context: this.options.context,
+      scores: pattern.scores,
+      description: pattern.description,
+    });
+
+    return true;
   }
 
   /**
@@ -806,6 +1269,20 @@ export default class RadarChart {
       if (this.tooltipObserver) {
         this.tooltipObserver.disconnect();
         this.tooltipObserver = null;
+      }
+
+      // Clean up instance-specific tooltip element
+      if (this.tooltipElement) {
+        this.tooltipElement.remove();
+        this.tooltipElement = null;
+      }
+
+      // Clean up any legacy shared tooltip element if this is the last instance
+      if (RadarChart.allInstances.size === 1) {
+        const legacyTooltip = document.getElementById("chartjs-tooltip-blur");
+        if (legacyTooltip) {
+          legacyTooltip.remove();
+        }
       }
 
       // Clean up mobile event listeners
@@ -1200,6 +1677,7 @@ export default class RadarChart {
       timestamp: Date.now(),
       containerId: this.containerId,
       chartType: this.options.isDemo ? "demo" : "scenario",
+      context: this.options.context, // Enhanced context tracking
     };
 
     this.telemetryBuffer.push(telemetryEvent);
@@ -1294,8 +1772,8 @@ export default class RadarChart {
       if (performance.memory) {
         return Math.round(performance.memory.usedJSHeapSize / 1024 / 1024);
       }
-      // Fallback estimation based on chart complexity
-      return this.performanceMetrics.totalRenders * 0.1;
+      // Fallback estimation based on chart complexity - round to whole number
+      return Math.round(this.performanceMetrics.totalRenders / 10);
     } catch (error) {
       return 0;
     }
@@ -1515,7 +1993,8 @@ window.debugRadarChartStressTest = function (instanceId) {
   const stressInterval = setInterval(() => {
     const randomScores = {};
     Object.keys(instance.currentScores).forEach((axis) => {
-      randomScores[axis] = Math.random() * 5;
+      // Generate random whole number between 1-5
+      randomScores[axis] = Math.floor(Math.random() * 5) + 1;
     });
 
     instance.updateScores(randomScores);

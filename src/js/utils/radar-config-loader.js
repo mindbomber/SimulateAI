@@ -117,22 +117,6 @@ export function getGridColor(config, index) {
 }
 
 /**
- * Get theme colors based on average score
- * @param {Object} config - Configuration object
- * @param {number} avgScore - Average score
- * @returns {Object} Theme colors {background, border}
- */
-export function getThemeColors(config, avgScore) {
-  const { neutralScore, positiveThreshold } = config.scoring;
-
-  if (avgScore < 2) return config.themes.negative;
-  if (avgScore < neutralScore) return config.themes.slightlyNegative;
-  if (avgScore === neutralScore) return config.themes.neutral;
-  if (avgScore < positiveThreshold) return config.themes.slightlyPositive;
-  return config.themes.positive;
-}
-
-/**
  * Get impact description for score
  * @param {Object} config - Configuration object
  * @param {number} score - Score value

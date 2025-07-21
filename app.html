@@ -1191,16 +1191,7 @@ limitations under the License.
 
     <!-- Chart.js library for radar charts - UMD version -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-    <script>
-      // Test Chart.js availability immediately
-      console.log("Chart.js test - window.Chart available:", !!window.Chart);
-      if (window.Chart) {
-        console.log("Chart.js version:", window.Chart.version);
-        console.log("Chart.js available methods:", Object.keys(window.Chart));
-      } else {
-        console.error("Chart.js failed to load!");
-      }
-    </script>
+    <!-- Chart.js loaded successfully - debug logs removed for cleaner console output -->
 
     <script type="module" src="src/js/components/card-component.js"></script>
     <script type="module" src="src/js/components/loader-spinner.js"></script>

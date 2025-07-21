@@ -245,7 +245,7 @@
         "mode": "nearest",
         "intersect": false,
         "position": "nearest",
-        "backgroundColor": "rgba(255, 255, 255, 0.95)",
+        "backgroundColor": "rgba(255, 255, 255, 0.85)",
         "titleColor": "#1a202c",
         "bodyColor": "#2d3748",
         "borderColor": "#4a5568",
@@ -272,6 +272,7 @@
         "beginAtZero": true,
         "ticks": {
           "stepSize": 1,
+          "display": false,
           "backdropColor": "rgba(255, 255, 255, 0.8)",
           "backdropPadding": 4,
           "font": {
@@ -312,7 +313,7 @@
       "pointHoverBackgroundColor": "#ffffff",
       "pointRadius": 2,
       "pointHoverRadius": 4,
-      "tension": 0.2
+      "tension": 0
     },
     "interaction": {
       "mode": "nearest",
@@ -327,7 +328,7 @@
     },
     "responsive": true,
     "maintainAspectRatio": true,
-    "devicePixelRatio": 1,
+    "devicePixelRatio": null,
     "elements": {
       "point": {
         "hoverRadius": 6,
