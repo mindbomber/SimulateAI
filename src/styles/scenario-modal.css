@@ -11,7 +11,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgb(0 0 0 / 60%);
   backdrop-filter: blur(8px);
   z-index: 1050;
   opacity: 0;
@@ -49,13 +49,13 @@
   max-height: calc(100vh - 4rem);
   width: 100%;
   margin: auto;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
   border-radius: 24px;
   box-shadow:
-    0 25px 50px -12px rgba(0, 0, 0, 0.25),
-    0 8px 32px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+    0 25px 50px -12px rgb(0 0 0 / 25%),
+    0 8px 32px rgb(0 0 0 / 12%),
+    inset 0 1px 0 rgb(255 255 255 / 60%);
+  border: 1px solid rgb(255 255 255 / 80%);
   overflow: hidden;
   position: relative;
 }
@@ -67,8 +67,8 @@
 
 /* Modal Header */
 .scenario-modal-dialog .scenario-modal-header {
-  padding: 2rem 2.5rem 1rem 2.5rem;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.6);
+  padding: 2rem 2.5rem 1rem;
+  border-bottom: 1px solid rgb(229 231 235 / 60%);
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   position: relative;
@@ -100,7 +100,7 @@
   display: block;
   font-size: 0.875rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgb(255 255 255 / 80%);
   margin-bottom: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -111,7 +111,7 @@
   font-weight: 800;
   margin: 0;
   color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 2px 4px rgb(0 0 0 / 20%);
   letter-spacing: -0.025em;
 }
 
@@ -119,8 +119,8 @@
   position: absolute;
   top: 1.5rem;
   right: 2rem;
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgb(255 255 255 / 20%);
+  border: 1px solid rgb(255 255 255 / 30%);
   color: white;
   width: 40px;
   height: 40px;
@@ -136,12 +136,12 @@
 }
 
 .close-button:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgb(255 255 255 / 30%);
   transform: scale(1.1);
 }
 
 .close-button:focus {
-  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline: 2px solid rgb(255 255 255 / 50%);
   outline-offset: 2px;
 }
 
@@ -162,7 +162,7 @@
   min-height: 0; /* Allow flex shrinking */
 }
 
-@media (max-width: 968px) {
+@media (width <= 968px) {
   .scenario-modal .scenario-content,
   .modal-dialog .scenario-content,
   .scenario-modal-dialog .scenario-content {
@@ -180,8 +180,8 @@
   background: white;
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(229, 231, 235, 0.6);
+  box-shadow: 0 8px 25px rgb(0 0 0 / 8%);
+  border: 1px solid rgb(229 231 235 / 60%);
   height: fit-content;
   grid-area: main !important;
 }
@@ -191,16 +191,18 @@
   background: white;
   border-radius: 16px;
   padding: 1rem;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(229, 231, 235, 0.6);
+  box-shadow: 0 8px 25px rgb(0 0 0 / 8%);
+  border: 1px solid rgb(229 231 235 / 60%);
   height: fit-content;
   position: sticky;
   top: 2rem;
   grid-area: sidebar !important;
+
   /* Ensure enough space for radar chart with labels */
   min-width: 400px;
   max-width: 450px;
   overflow: visible;
+
   /* Ensure the sidebar provides enough space for chart labels */
   box-sizing: border-box;
 }
@@ -220,7 +222,7 @@
   font-size: 1.1rem;
   font-weight: 600;
   color: #374151;
-  margin: 0 0 1rem 0;
+  margin: 0 0 1rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -252,18 +254,18 @@
   font-weight: 600;
   background: linear-gradient(
     135deg,
-    rgba(245, 158, 11, 0.1) 0%,
-    rgba(251, 191, 36, 0.05) 100%
+    rgb(245 158 11 / 10%) 0%,
+    rgb(251 191 36 / 5%) 100%
   );
   padding: 2rem;
   border-radius: 16px;
   border-left: 6px solid #f59e0b;
-  border-top: 1px solid rgba(245, 158, 11, 0.2);
-  border-right: 1px solid rgba(245, 158, 11, 0.2);
-  border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+  border-top: 1px solid rgb(245 158 11 / 20%);
+  border-right: 1px solid rgb(245 158 11 / 20%);
+  border-bottom: 1px solid rgb(245 158 11 / 20%);
   box-shadow:
-    0 4px 12px rgba(245, 158, 11, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 4px 12px rgb(245 158 11 / 15%),
+    inset 0 1px 0 rgb(255 255 255 / 80%);
   position: relative;
   font-style: italic;
 }
@@ -276,13 +278,13 @@
   font-weight: 600;
   background: linear-gradient(
     135deg,
-    rgba(102, 126, 234, 0.08) 0%,
-    rgba(118, 75, 162, 0.04) 100%
+    rgb(102 126 234 / 8%) 0%,
+    rgb(118 75 162 / 4%) 100%
   );
   padding: 1.75rem;
   border-radius: 12px;
-  border: 2px solid rgba(102, 126, 234, 0.15);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+  border: 2px solid rgb(102 126 234 / 15%);
+  box-shadow: 0 2px 8px rgb(102 126 234 / 10%);
   position: relative;
 }
 
@@ -308,31 +310,31 @@
   font-size: 1rem;
   line-height: 1.5;
   position: relative;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 5%);
 }
 
 .option-card:hover {
   border-color: #667eea;
-  background: rgba(102, 126, 234, 0.03);
+  background: rgb(102 126 234 / 3%);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+  box-shadow: 0 8px 25px rgb(102 126 234 / 15%);
 }
 
 .option-card:focus {
   outline: none;
   border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 0 0 3px rgb(102 126 234 / 20%);
 }
 
 .option-card.selected {
   border-color: #667eea;
   background: linear-gradient(
     135deg,
-    rgba(102, 126, 234, 0.1) 0%,
-    rgba(118, 75, 162, 0.05) 100%
+    rgb(102 126 234 / 10%) 0%,
+    rgb(118 75 162 / 5%) 100%
   );
   transform: none;
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 4px 20px rgb(102 126 234 / 20%);
 }
 
 /* Enhanced hover state for selected option cards */
@@ -340,11 +342,11 @@
   border-color: #5a67d8;
   background: linear-gradient(
     135deg,
-    rgba(90, 103, 216, 0.15) 0%,
-    rgba(107, 70, 193, 0.08) 100%
+    rgb(90 103 216 / 15%) 0%,
+    rgb(107 70 193 / 8%) 100%
   );
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(90, 103, 216, 0.25);
+  box-shadow: 0 6px 20px rgb(90 103 216 / 25%);
   cursor: pointer;
 }
 
@@ -421,7 +423,7 @@
 .option-details {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid rgba(229, 231, 235, 0.6);
+  border-top: 1px solid rgb(229 231 235 / 60%);
 }
 
 /* Pros/Cons Popover */
@@ -430,14 +432,14 @@
   top: -1rem;
   left: 50%;
   transform: translateX(-50%) translateY(-100%);
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border: 1px solid rgba(102, 126, 234, 0.15);
+  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+  border: 1px solid rgb(102 126 234 / 15%);
   border-radius: 20px;
   padding: 2rem;
   box-shadow:
-    0 25px 50px rgba(0, 0, 0, 0.15),
-    0 10px 25px rgba(102, 126, 234, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 25px 50px rgb(0 0 0 / 15%),
+    0 10px 25px rgb(102 126 234 / 10%),
+    inset 0 1px 0 rgb(255 255 255 / 80%);
   z-index: 1000;
   min-width: 500px;
   max-width: 650px;
@@ -463,9 +465,9 @@
   left: 50%;
   transform: translateX(-50%);
   border: 12px solid transparent;
-  border-top-color: #ffffff;
+  border-top-color: #fff;
   z-index: 1001;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  filter: drop-shadow(0 2px 4px rgb(0 0 0 / 10%));
 }
 
 .pros-cons-popover::before {
@@ -475,7 +477,7 @@
   left: 50%;
   transform: translateX(-50%);
   border: 13px solid transparent;
-  border-top-color: rgba(102, 126, 234, 0.15);
+  border-top-color: rgb(102 126 234 / 15%);
   z-index: 1000;
 }
 
@@ -488,9 +490,9 @@
   font-size: 1.25rem;
   font-weight: 700;
   color: #1a202c;
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 0.75rem;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
@@ -510,17 +512,17 @@
 
 .pros-section,
 .cons-section {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgb(255 255 255 / 70%);
   padding: 1.5rem;
   border-radius: 12px;
-  border: 1px solid rgba(229, 231, 235, 0.5);
+  border: 1px solid rgb(229 231 235 / 50%);
 }
 
 .pros-title {
   font-size: 1.1rem;
   font-weight: 700;
   color: #059669;
-  margin: 0 0 1rem 0;
+  margin: 0 0 1rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -530,7 +532,7 @@
   font-size: 1.1rem;
   font-weight: 700;
   color: #dc2626;
-  margin: 0 0 1rem 0;
+  margin: 0 0 1rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -572,6 +574,7 @@
 }
 
 /* Radar Chart Container - matching actual HTML structure - override radar-chart.css */
+
 /* Radar Chart - Direct styling without redundant container */
 .scenario-modal #scenario-radar-chart {
   text-align: center;
@@ -585,19 +588,23 @@
   box-shadow: none !important;
   border: none !important;
   backdrop-filter: none !important;
+
   /* Force grid placement */
   grid-area: auto;
+
   /* Ensure proper sizing for chart - increased min-height for labels */
   min-height: 450px;
   overflow: visible !important;
+
   /* Ensure container can accommodate chart labels */
   display: flex !important;
   flex-direction: column;
   justify-content: center;
+
   /* Ensure visibility and proper sizing */
   visibility: visible !important;
+
   /* Prevent any text content from showing */
-  position: relative;
 }
 
 /* Remove the old radar-chart-container h3 styling and apply directly if needed */
@@ -605,10 +612,10 @@
   font-size: 1.25rem;
   font-weight: 700;
   color: #1a202c;
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 1.5rem;
   text-align: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
@@ -631,9 +638,11 @@
   height: 400px !important; /* Increased height for chart */
   display: block !important;
   margin: 0 auto !important;
+
   /* Prevent clipping - ensure Chart.js has space for labels */
   transform: none !important;
   overflow: visible !important;
+
   /* Remove padding to give more space to the chart itself */
   padding: 0;
   box-sizing: border-box;
@@ -649,18 +658,18 @@
   gap: 0.75rem;
   margin: 0;
   padding: 1rem;
-  background: rgba(102, 126, 234, 0.05);
+  background: rgb(102 126 234 / 5%);
   border-radius: 10px;
   font-size: 0.9rem;
   color: #4a5568;
-  border: 1px solid rgba(102, 126, 234, 0.1);
+  border: 1px solid rgb(102 126 234 / 10%);
 }
 
 /* Modal Footer */
 .scenario-modal-dialog .scenario-modal-footer {
-  padding: 1rem 2rem 1.25rem 2rem;
-  background: rgba(248, 250, 252, 0.8);
-  border-top: 1px solid rgba(229, 231, 235, 0.6);
+  padding: 1rem 2rem 1.25rem;
+  background: rgb(248 250 252 / 80%);
+  border-top: 1px solid rgb(229 231 235 / 60%);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -679,8 +688,8 @@
   border-radius: 20px;
   font-size: 0.875rem;
   font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 10%);
+  box-shadow: 0 2px 4px rgb(245 158 11 / 20%);
   animation: subtle-pulse 2s ease-in-out infinite;
 }
 
@@ -690,6 +699,7 @@
     opacity: 1;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.9;
     transform: scale(1.02);
@@ -727,11 +737,11 @@
 .scenario-modal-footer .btn-primary {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgb(102 126 234 / 30%);
 }
 
 .scenario-modal-footer .btn-primary:hover:not(:disabled) {
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 20px rgb(102 126 234 / 40%);
   transform: translateY(-2px);
 }
 
@@ -740,8 +750,8 @@
   position: absolute;
   top: 1.5rem;
   right: 1.5rem;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(102, 126, 234, 0.2);
+  background: rgb(255 255 255 / 90%);
+  border: 1px solid rgb(102 126 234 / 20%);
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 50%;
@@ -755,12 +765,12 @@
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(4px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 }
 
 .feedback-close:hover {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.3);
+  background: rgb(239 68 68 / 10%);
+  border-color: rgb(239 68 68 / 30%);
   color: #ef4444;
   transform: scale(1.1);
 }
@@ -773,7 +783,7 @@
 /* Typewriter Effect Styles */
 .typewriter-cursor {
   display: inline-block;
-  background-color: currentColor;
+  background-color: currentcolor;
   margin-left: 2px;
   width: 2px;
   animation: typewriter-blink 1s infinite;
@@ -784,6 +794,7 @@
   50% {
     opacity: 1;
   }
+
   51%,
   100% {
     opacity: 0;
@@ -830,7 +841,7 @@
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .scenario-modal {
     padding: 0.5rem;
     padding-top: 1rem;
@@ -841,7 +852,7 @@
   }
 
   .scenario-modal-dialog .scenario-modal-header {
-    padding: 1.5rem 1.5rem 1rem 1.5rem;
+    padding: 1.5rem 1.5rem 1rem;
   }
 
   .scenario-title {
@@ -918,7 +929,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .scenario-modal {
     padding: 0.25rem;
     padding-top: 0.5rem;
@@ -954,12 +965,12 @@
   }
 
   .option-btn:focus {
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.5);
+    box-shadow: 0 0 0 4px rgb(102 126 234 / 50%);
   }
 
   .pros-cons-popover {
     border-width: 2px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 25px rgb(0 0 0 / 30%);
   }
 }
 
@@ -986,7 +997,7 @@
     transform: translateX(-50%) translateY(-100%) translateY(-1rem);
   }
 
-  @media (max-width: 768px) {
+  @media (width <= 768px) {
     .pros-cons-popover.visible {
       transform: translate(-50%, -50%);
     }
@@ -1054,8 +1065,8 @@ body.dark-mode .option-card:hover {
 body.dark-mode .option-card.selected {
   background: linear-gradient(
     135deg,
-    rgba(74, 158, 255, 0.1) 0%,
-    rgba(157, 78, 221, 0.1) 100%
+    rgb(74 158 255 / 10%) 0%,
+    rgb(157 78 221 / 10%) 100%
   );
   border-color: #4a9eff;
 }
@@ -1069,7 +1080,7 @@ body.dark-mode .option-description {
 }
 
 body.dark-mode .option-details {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(0 0 0 / 20%);
   border-top: 1px solid var(--theme-border);
 }
 
@@ -1106,12 +1117,13 @@ body.dark-mode .chart-legend {
 }
 
 body.dark-mode .test-mode-indicator {
-  background: rgba(255, 193, 7, 0.2);
+  background: rgb(255 193 7 / 20%);
   color: #ffc107;
-  border: 1px solid rgba(255, 193, 7, 0.3);
+  border: 1px solid rgb(255 193 7 / 30%);
 }
 
 /* ===== CHART.JS TOOLTIP FIX ===== */
+
 /* Ensure Chart.js tooltips appear above scenario modal content */
 
 /* Chart.js tooltip container - must be above modal z-index */

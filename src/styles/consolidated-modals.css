@@ -7,11 +7,11 @@
 /* ===== MODAL SYSTEM VARIABLES ===== */
 :root {
   /* Modal backdrop and container */
-  --modal-backdrop: rgba(0, 0, 0, 0.6);
+  --modal-backdrop: rgb(0 0 0 / 60%);
   --modal-background: var(--color-white);
   --modal-border: var(--color-gray-200);
   --modal-shadow:
-    0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    0 20px 25px -5px rgb(0 0 0 / 10%), 0 10px 10px -5px rgb(0 0 0 / 4%);
   --modal-border-radius: var(--radius-lg);
 
   /* Modal dimensions */
@@ -30,8 +30,8 @@
 
   /* Modal animations */
   --transition-modal: 0.3s ease-out;
-  --animation-modal-in: modalSlideIn 0.3s ease-out;
-  --animation-modal-out: modalSlideOut 0.2s ease-in;
+  --animation-modal-in: modalslidein 0.3s ease-out;
+  --animation-modal-out: modalslideout 0.2s ease-in;
 
   /* Z-index management */
   --z-modal-backdrop: 999;
@@ -297,6 +297,7 @@
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
@@ -308,6 +309,7 @@
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
   }
+
   to {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.9);
@@ -319,6 +321,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -326,7 +329,7 @@
 }
 
 /* ===== RESPONSIVE DESIGN ===== */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .modal-dialog {
     width: 95vw;
     max-width: 95vw;
@@ -362,7 +365,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .modal-dialog {
     width: 100vw;
     height: 100vh;

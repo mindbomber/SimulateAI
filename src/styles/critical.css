@@ -1,12 +1,13 @@
 /* Critical CSS - Inline in HTML head for FOUC prevention */
+
 /* Extract essential styles that prevent layout shift during CSS loading */
 
 :root {
   /* Essential variables for immediate rendering */
   --primary: #1a73e8;
-  --bg: #ffffff;
-  --text: #333333;
-  --font: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --bg: #fff;
+  --text: #333;
+  --font: "Inter", -apple-system, blinkmacsystemfont, sans-serif;
   --header-h: 60px;
   --modal-z: 9999;
 }
@@ -28,11 +29,8 @@ body {
 /* Critical modal foundation - prevents flash */
 .modal-backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgb(0 0 0 / 50%);
   z-index: var(--modal-z);
   opacity: 0;
   pointer-events: none;
@@ -54,7 +52,7 @@ body {
   max-width: 90vw;
   max-height: 90vh;
   width: 600px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 10%);
 }
 
 /* Critical navigation foundation */

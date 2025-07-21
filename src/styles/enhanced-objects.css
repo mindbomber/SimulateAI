@@ -8,7 +8,7 @@
 :root {
   /* Enhanced Objects Color System */
   --enhanced-bg-primary: var(--color-gray-50, #f9f9f9);
-  --enhanced-bg-secondary: var(--color-white, #ffffff);
+  --enhanced-bg-secondary: var(--color-white, #fff);
   --enhanced-border: var(--color-gray-300, #d1d5db);
   --enhanced-border-focus: var(--color-primary, #007cba);
   --enhanced-text-primary: var(--color-gray-900, #111827);
@@ -16,10 +16,10 @@
   --enhanced-text-muted: var(--color-gray-500, #9ca3af);
 
   /* Enhanced Objects Shadows */
-  --enhanced-shadow-sm: var(--shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
-  --enhanced-shadow-md: var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
-  --enhanced-shadow-lg: var(--shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1));
-  --enhanced-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --enhanced-shadow-sm: var(--shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 5%));
+  --enhanced-shadow-md: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 10%));
+  --enhanced-shadow-lg: var(--shadow-lg, 0 10px 15px -3px rgb(0 0 0 / 10%));
+  --enhanced-shadow-hover: 0 4px 12px rgb(0 0 0 / 15%);
 
   /* Enhanced Objects Spacing */
   --enhanced-gap-sm: var(--spacing-2, 8px);
@@ -147,7 +147,7 @@
 /* Error State for Ethics Meters */
 .enhanced-ethics-meters.error {
   border-color: var(--color-error, #ef4444);
-  background: rgba(239, 68, 68, 0.05);
+  background: rgb(239 68 68 / 5%);
 }
 
 .enhanced-ethics-meters.error .ethics-meters-header h3 {
@@ -253,7 +253,7 @@
   flex: 1;
   min-height: var(--enhanced-touch-target);
   cursor: pointer;
-  -webkit-appearance: none;
+  appearance: none;
   appearance: none;
   background: transparent;
   border-radius: var(--enhanced-radius-sm);
@@ -268,7 +268,7 @@
 }
 
 .slider-input::-webkit-slider-thumb {
-  -webkit-appearance: none;
+  appearance: none;
   appearance: none;
   background: var(--enhanced-border-focus);
   height: 20px;
@@ -362,9 +362,10 @@
   cursor: pointer;
   transition: all var(--enhanced-transition-base);
   contain: layout style;
+
   /* Prevent accidental selection */
   user-select: none;
-  -webkit-user-select: none;
+  user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -402,7 +403,7 @@
   left: 50%;
   width: 0;
   height: 0;
-  background: rgba(255, 255, 255, 0.3);
+  background: rgb(255 255 255 / 30%);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   transition:
@@ -419,7 +420,7 @@
 /* Button variants */
 .enhanced-sim-button.primary {
   background: var(--color-primary, #007cba);
-  color: var(--color-white, #ffffff);
+  color: var(--color-white, #fff);
   border-color: var(--color-primary, #007cba);
 }
 
@@ -430,7 +431,7 @@
 
 .enhanced-sim-button.secondary {
   background: var(--color-secondary, #6b7280);
-  color: var(--color-white, #ffffff);
+  color: var(--color-white, #fff);
   border-color: var(--color-secondary, #6b7280);
 }
 
@@ -441,7 +442,7 @@
 
 .enhanced-sim-button.danger {
   background: var(--color-error, #ef4444);
-  color: var(--color-white, #ffffff);
+  color: var(--color-white, #fff);
   border-color: var(--color-error, #ef4444);
 }
 
@@ -545,7 +546,7 @@
 /* Canvas error state */
 .enhanced-visual-engine-container.error {
   border-color: var(--color-error, #ef4444);
-  background: rgba(239, 68, 68, 0.05);
+  background: rgb(239 68 68 / 5%);
 }
 
 .enhanced-visual-engine-container.error::before {
@@ -635,8 +636,9 @@
     }
   }
 }
+
 /* ===== RESPONSIVE DESIGN ===== */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .enhanced-ethics-meters,
   .enhanced-actions,
   .enhanced-simulation-sliders {
@@ -682,7 +684,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .enhanced-ethics-meters,
   .enhanced-actions,
   .enhanced-simulation-sliders,
@@ -768,7 +770,7 @@
 }
 
 /* ===== LARGE TEXT MODE SUPPORT ===== */
-@media (min-resolution: 2dppx) and (max-width: 768px) {
+@media (resolution >= 2dppx) and (width <= 768px) {
   .ethics-meters-header h3,
   .actions-header h3,
   .enhanced-simulation-sliders h3 {
@@ -824,14 +826,11 @@
 .enhanced-object-loading::after {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.4),
+    rgb(255 255 255 / 40%),
     transparent
   );
   animation: loading-shimmer 1.5s infinite;
@@ -842,6 +841,7 @@
   0% {
     transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(100%);
   }
@@ -972,7 +972,7 @@
 
   /* Hide interactive elements in print */
   .slider-input {
-    -webkit-appearance: none;
+    appearance: none;
     appearance: none;
     background: #fff !important;
     border: 1px solid #000 !important;
@@ -980,6 +980,7 @@
 }
 
 /* ===== ARIA AND SCREEN READER SUPPORT ===== */
+
 /* Screen reader classes are defined in accessibility.css */
 
 .enhanced-ethics-meters[aria-live="polite"] .meters-container,
@@ -1205,7 +1206,7 @@
 .enhanced-actions,
 .enhanced-simulation-sliders,
 .enhanced-visual-engine-container {
-  text-rendering: optimizeLegibility;
+  text-rendering: optimizelegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -1302,7 +1303,7 @@ body.dark-mode .enhanced-input-field {
 
 body.dark-mode .enhanced-input-field:focus {
   border-color: var(--enhanced-border-focus);
-  box-shadow: 0 0 0 3px rgba(var(--theme-accent-rgb), 0.2);
+  box-shadow: 0 0 0 3px rgb(var(--theme-accent-rgb), 0.2);
 }
 
 body.dark-mode .enhanced-input-field::placeholder {
@@ -1355,7 +1356,7 @@ body.dark-mode .enhanced-grid-item:hover {
 }
 
 body.dark-mode .enhanced-modal-overlay {
-  background: rgba(0, 0, 0, 0.7);
+  background: rgb(0 0 0 / 70%);
 }
 
 body.dark-mode .enhanced-modal-content {

@@ -136,7 +136,7 @@
 }
 
 .tip h4 {
-  margin: 0 0 8px 0;
+  margin: 0 0 8px;
   color: var(--primary-color);
   font-size: 16px;
 }
@@ -161,7 +161,7 @@
 }
 
 /* Responsive design */
-@media (max-width: 600px) {
+@media (width <= 600px) {
   .persistence-settings,
   .security-tips {
     padding: 15px;
@@ -225,7 +225,7 @@ body.dark-mode .persistence-option:hover {
 
 body.dark-mode .persistence-option.selected {
   border-color: var(--color-primary);
-  background: rgba(74, 158, 255, 0.1);
+  background: rgb(74 158 255 / 10%);
 }
 
 body.dark-mode .option-info h4 {
@@ -269,7 +269,7 @@ body.dark-mode .auto-signout-setting select {
 
 body.dark-mode .auto-signout-setting select:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
+  box-shadow: 0 0 0 2px rgb(74 158 255 / 20%);
 }
 
 body.dark-mode .security-tips {

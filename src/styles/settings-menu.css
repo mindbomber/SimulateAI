@@ -51,10 +51,10 @@
   right: 0 !important;
   min-width: calc(320px * var(--font-scale, 1)) !important;
   padding: calc(var(--container-padding, 16px)) !important;
-  background: #ffffff !important;
+  background: #fff !important;
   border: 1px solid #e0e0e0 !important;
   border-radius: calc(8px * var(--font-scale, 1)) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 10%) !important;
   z-index: 1000 !important;
   display: none !important;
   opacity: 1 !important;
@@ -82,8 +82,8 @@
 .settings-title {
   font-size: calc(0.9rem * var(--font-scale, 1)) !important;
   font-weight: 600 !important;
-  color: #333333 !important;
-  margin: 0 0 calc(12px * var(--font-scale, 1)) 0 !important;
+  color: #333 !important;
+  margin: 0 0 calc(12px * var(--font-scale, 1)) !important;
   padding-bottom: calc(8px * var(--font-scale, 1)) !important;
   border-bottom: 1px solid #e0e0e0 !important;
 }
@@ -145,7 +145,7 @@
   background: white;
   border-radius: 50%;
   transition: transform 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 20%);
 }
 
 .settings-toggle input[type="checkbox"]:checked + .toggle-slider {
@@ -158,13 +158,13 @@
 
 .toggle-label {
   font-size: calc(0.9rem * var(--font-scale, 1)) !important;
-  color: #333333 !important;
+  color: #333 !important;
   font-weight: 500 !important;
 }
 
 .settings-select-label {
   font-size: calc(0.9rem * var(--font-scale, 1)) !important;
-  color: #333333 !important;
+  color: #333 !important;
   font-weight: 500 !important;
   margin-bottom: calc(6px * var(--font-scale, 1)) !important;
   display: block !important;
@@ -175,9 +175,9 @@
   padding: calc(8px * var(--font-scale, 1)) calc(12px * var(--font-scale, 1)) !important;
   border: 1px solid #e0e0e0 !important;
   border-radius: calc(4px * var(--font-scale, 1)) !important;
-  background: #ffffff !important;
+  background: #fff !important;
   font-size: calc(0.9rem * var(--font-scale, 1)) !important;
-  color: #333333 !important;
+  color: #333 !important;
   cursor: pointer !important;
   transition: border-color 0.2s ease !important;
   min-height: var(
@@ -189,7 +189,7 @@
 .settings-select:focus {
   outline: none !important;
   border-color: #1a73e8 !important;
-  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2) !important;
+  box-shadow: 0 0 0 2px rgb(26 115 232 / 20%) !important;
 }
 
 .settings-select:hover {
@@ -199,7 +199,7 @@
 .settings-note {
   margin-top: calc(4px * var(--font-scale, 1));
   padding: calc(4px * var(--font-scale, 1)) calc(8px * var(--font-scale, 1));
-  background: rgba(26, 115, 232, 0.1);
+  background: rgb(26 115 232 / 10%);
   border-radius: calc(4px * var(--font-scale, 1));
   border-left: calc(3px * var(--font-scale, 1)) solid #1a73e8;
 }
@@ -224,13 +224,13 @@
 }
 
 .settings-toggle.disabled input[type="checkbox"]:checked + .toggle-slider {
-  background: #999999;
+  background: #999;
 }
 
 /* ===== RESPONSIVE DESIGN WITH MEDIA.CSS INTEGRATION ===== */
 
 /* Mobile devices (using media.css variables) */
-@media only screen and (max-width: 479px) {
+@media only screen and (width <= 479px) {
   .settings-menu {
     min-width: calc(260px * var(--font-scale, 1)) !important;
     padding: var(--container-padding, 14px) !important;
@@ -266,7 +266,7 @@
 }
 
 /* Tablet devices */
-@media only screen and (min-width: 768px) and (max-width: 1279px) {
+@media only screen and (width >= 768px) and (width <= 1279px) {
   .settings-menu {
     min-width: calc(340px * var(--font-scale, 1)) !important;
     padding: var(--container-padding, 20px) !important;
@@ -274,7 +274,7 @@
 }
 
 /* Laptop and desktop devices */
-@media only screen and (min-width: 1280px) {
+@media only screen and (width >= 1280px) {
   .settings-menu {
     min-width: calc(360px * var(--font-scale, 1)) !important;
     padding: var(--container-padding, 24px) !important;
@@ -285,23 +285,23 @@
 @media (prefers-color-scheme: dark) {
   .settings-menu {
     background: #2d2d2d;
-    border-color: #555555;
+    border-color: #555;
   }
 
   .settings-title {
-    color: #ffffff;
+    color: #fff;
   }
 
   .toggle-label {
-    color: #ffffff;
+    color: #fff;
   }
 
   .toggle-slider {
-    background: #555555;
+    background: #555;
   }
 
   .settings-note {
-    background: rgba(26, 115, 232, 0.2);
+    background: rgb(26 115 232 / 20%);
   }
 }
 
@@ -356,8 +356,8 @@ body.dark-mode
 }
 
 body.dark-mode .settings-note {
-  background: rgba(74, 158, 255, 0.1);
-  border: 1px solid rgba(74, 158, 255, 0.3);
+  background: rgb(74 158 255 / 10%);
+  border: 1px solid rgb(74 158 255 / 30%);
   color: var(--theme-text-primary);
 }
 

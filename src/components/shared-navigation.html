@@ -1,14 +1,18 @@
 <!-- Shared Navigation Component -->
 <header class="header" role="banner">
   <div class="header-container">
-    <div class="logo">
+    <a href="index.html" class="logo" aria-label="SimulateAI - Go to homepage">
       <img
         src="src/assets/icons/logo.svg"
         alt="SimulateAI Educational Platform"
-        class="logo-image"
+        class="logo-image logo-full"
       />
-      <h1 class="site-title">SimulateAI</h1>
-    </div>
+      <img
+        src="src/assets/icons/logo-compact.svg"
+        alt="SimulateAI"
+        class="logo-image logo-compact"
+      />
+    </a>
 
     <!-- Mobile hamburger button -->
     <button
@@ -31,9 +35,6 @@
       <!-- Primary Navigation Group -->
       <div class="nav-group nav-group-primary">
         <ul class="nav-list">
-          <li class="nav-item">
-            <a href="index.html" class="nav-link" data-page="home">Home</a>
-          </li>
           <li class="nav-item">
             <a
               href="app.html#categories"

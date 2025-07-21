@@ -16,7 +16,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgb(0 0 0 / 80%);
   backdrop-filter: blur(4px);
   z-index: 10000;
   display: flex;
@@ -29,8 +29,8 @@
   background: linear-gradient(135deg, #2c5aa0 0%, #1e3a5f 100%);
   border-radius: 20px;
   box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.25),
-    0 0 0 1px rgba(255, 255, 255, 0.2);
+    0 20px 60px rgb(0 0 0 / 25%),
+    0 0 0 1px rgb(255 255 255 / 20%);
   max-width: 500px;
   width: 90%;
   max-height: 90vh;
@@ -42,7 +42,7 @@
 .badge-modal-content {
   padding: 2.5rem 2rem 2rem;
   text-align: center;
-  color: #ffffff;
+  color: #fff;
   position: relative;
   z-index: 10;
 }
@@ -73,14 +73,11 @@
 .badge-shield::before {
   content: "";
   position: absolute;
-  top: -15px;
-  left: -15px;
-  right: -15px;
-  bottom: -15px;
+  inset: -15px;
   background: radial-gradient(
     circle,
-    rgba(74, 144, 226, 0.4) 0%,
-    rgba(74, 144, 226, 0.1) 50%,
+    rgb(74 144 226 / 40%) 0%,
+    rgb(74 144 226 / 10%) 50%,
     transparent 70%
   );
   border-radius: 50%;
@@ -92,7 +89,7 @@
   display: block;
   position: relative;
   z-index: 3;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 2px 4px rgb(0 0 0 / 30%));
   animation: shield-glow 3s ease-in-out infinite;
 }
 
@@ -105,7 +102,7 @@
   z-index: 4;
   animation: category-entrance 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.8s
     forwards;
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(0 1px 3px rgb(0 0 0 / 40%));
 }
 
 .badge-sidekick-emoji {
@@ -117,7 +114,7 @@
   transform: scale(0) rotate(-180deg);
   animation: sidekick-bounce 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1.2s
     forwards;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 30%));
 }
 
 /* ========================================
@@ -126,24 +123,24 @@
 
 .badge-glow-low {
   box-shadow:
-    0 0 20px rgba(74, 144, 226, 0.4),
-    0 0 40px rgba(74, 144, 226, 0.2);
+    0 0 20px rgb(74 144 226 / 40%),
+    0 0 40px rgb(74 144 226 / 20%);
   animation: pulseGentleGlow 3s ease-in-out infinite;
 }
 
 .badge-glow-medium {
   box-shadow:
-    0 0 30px rgba(231, 76, 60, 0.5),
-    0 0 60px rgba(231, 76, 60, 0.3),
-    0 0 90px rgba(231, 76, 60, 0.1);
+    0 0 30px rgb(231 76 60 / 50%),
+    0 0 60px rgb(231 76 60 / 30%),
+    0 0 90px rgb(231 76 60 / 10%);
   animation: pulseMediumGlow 2.5s ease-in-out infinite;
 }
 
 .badge-glow-high {
   box-shadow:
-    0 0 40px rgba(241, 196, 15, 0.6),
-    0 0 80px rgba(241, 196, 15, 0.4),
-    0 0 120px rgba(241, 196, 15, 0.2);
+    0 0 40px rgb(241 196 15 / 60%),
+    0 0 80px rgb(241 196 15 / 40%),
+    0 0 120px rgb(241 196 15 / 20%);
   animation:
     pulseIntenseGlow 2s ease-in-out infinite,
     shimmerEffect 4s linear infinite;
@@ -153,9 +150,9 @@
 
 .badge-glow-brilliant {
   box-shadow:
-    0 0 50px rgba(138, 43, 226, 0.7),
-    0 0 100px rgba(138, 43, 226, 0.5),
-    0 0 150px rgba(138, 43, 226, 0.3);
+    0 0 50px rgb(138 43 226 / 70%),
+    0 0 100px rgb(138 43 226 / 50%),
+    0 0 150px rgb(138 43 226 / 30%);
   animation:
     pulseBrilliantGlow 1.8s ease-in-out infinite,
     shimmerEffect 3s linear infinite;
@@ -163,9 +160,9 @@
 
 .badge-glow-radiant {
   box-shadow:
-    0 0 60px rgba(50, 205, 50, 0.8),
-    0 0 120px rgba(50, 205, 50, 0.6),
-    0 0 180px rgba(50, 205, 50, 0.4);
+    0 0 60px rgb(50 205 50 / 80%),
+    0 0 120px rgb(50 205 50 / 60%),
+    0 0 180px rgb(50 205 50 / 40%);
   animation:
     pulseRadiantGlow 1.6s ease-in-out infinite,
     shimmerEffect 2.5s linear infinite;
@@ -173,9 +170,9 @@
 
 .badge-glow-transcendent {
   box-shadow:
-    0 0 70px rgba(255, 20, 147, 0.9),
-    0 0 140px rgba(255, 20, 147, 0.7),
-    0 0 210px rgba(255, 20, 147, 0.5);
+    0 0 70px rgb(255 20 147 / 90%),
+    0 0 140px rgb(255 20 147 / 70%),
+    0 0 210px rgb(255 20 147 / 50%);
   animation:
     pulseTranscendentGlow 1.4s ease-in-out infinite,
     shimmerEffect 2s linear infinite;
@@ -183,9 +180,9 @@
 
 .badge-glow-legendary {
   box-shadow:
-    0 0 80px rgba(255, 140, 0, 1),
-    0 0 160px rgba(255, 140, 0, 0.8),
-    0 0 240px rgba(255, 140, 0, 0.6);
+    0 0 80px rgb(255 140 0 / 100%),
+    0 0 160px rgb(255 140 0 / 80%),
+    0 0 240px rgb(255 140 0 / 60%);
   animation:
     pulseLegendaryGlow 1.2s ease-in-out infinite,
     shimmerEffect 1.8s linear infinite;
@@ -193,10 +190,10 @@
 
 .badge-glow-mythic {
   box-shadow:
-    0 0 90px rgba(75, 0, 130, 1),
-    0 0 180px rgba(75, 0, 130, 0.8),
-    0 0 270px rgba(75, 0, 130, 0.6),
-    0 0 360px rgba(75, 0, 130, 0.4);
+    0 0 90px rgb(75 0 130 / 100%),
+    0 0 180px rgb(75 0 130 / 80%),
+    0 0 270px rgb(75 0 130 / 60%),
+    0 0 360px rgb(75 0 130 / 40%);
   animation:
     pulseMythicGlow 1s ease-in-out infinite,
     shimmerEffect 1.5s linear infinite;
@@ -204,10 +201,10 @@
 
 .badge-glow-cosmic {
   box-shadow:
-    0 0 100px rgba(0, 255, 255, 1),
-    0 0 200px rgba(0, 255, 255, 0.9),
-    0 0 300px rgba(0, 255, 255, 0.7),
-    0 0 400px rgba(0, 255, 255, 0.5);
+    0 0 100px rgb(0 255 255 / 100%),
+    0 0 200px rgb(0 255 255 / 90%),
+    0 0 300px rgb(0 255 255 / 70%),
+    0 0 400px rgb(0 255 255 / 50%);
   animation:
     pulseCosmicGlow 0.8s ease-in-out infinite,
     shimmerEffect 1.2s linear infinite;
@@ -215,11 +212,11 @@
 
 .badge-glow-divine {
   box-shadow:
-    0 0 120px rgba(255, 215, 0, 1),
-    0 0 240px rgba(255, 215, 0, 0.9),
-    0 0 360px rgba(255, 215, 0, 0.8),
-    0 0 480px rgba(255, 215, 0, 0.6),
-    0 0 600px rgba(255, 215, 0, 0.4);
+    0 0 120px rgb(255 215 0 / 100%),
+    0 0 240px rgb(255 215 0 / 90%),
+    0 0 360px rgb(255 215 0 / 80%),
+    0 0 480px rgb(255 215 0 / 60%),
+    0 0 600px rgb(255 215 0 / 40%);
   animation:
     pulseDivineGlow 0.6s ease-in-out infinite,
     shimmerEffect 1s linear infinite;
@@ -233,6 +230,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -242,13 +240,14 @@
   0%,
   100% {
     box-shadow:
-      0 0 20px rgba(74, 144, 226, 0.4),
-      0 0 40px rgba(74, 144, 226, 0.2);
+      0 0 20px rgb(74 144 226 / 40%),
+      0 0 40px rgb(74 144 226 / 20%);
   }
+
   50% {
     box-shadow:
-      0 0 25px rgba(74, 144, 226, 0.5),
-      0 0 50px rgba(74, 144, 226, 0.3);
+      0 0 25px rgb(74 144 226 / 50%),
+      0 0 50px rgb(74 144 226 / 30%);
   }
 }
 
@@ -256,15 +255,16 @@
   0%,
   100% {
     box-shadow:
-      0 0 30px rgba(231, 76, 60, 0.5),
-      0 0 60px rgba(231, 76, 60, 0.3),
-      0 0 90px rgba(231, 76, 60, 0.1);
+      0 0 30px rgb(231 76 60 / 50%),
+      0 0 60px rgb(231 76 60 / 30%),
+      0 0 90px rgb(231 76 60 / 10%);
   }
+
   50% {
     box-shadow:
-      0 0 35px rgba(231, 76, 60, 0.6),
-      0 0 70px rgba(231, 76, 60, 0.4),
-      0 0 105px rgba(231, 76, 60, 0.2);
+      0 0 35px rgb(231 76 60 / 60%),
+      0 0 70px rgb(231 76 60 / 40%),
+      0 0 105px rgb(231 76 60 / 20%);
   }
 }
 
@@ -272,15 +272,16 @@
   0%,
   100% {
     box-shadow:
-      0 0 40px rgba(241, 196, 15, 0.6),
-      0 0 80px rgba(241, 196, 15, 0.4),
-      0 0 120px rgba(241, 196, 15, 0.2);
+      0 0 40px rgb(241 196 15 / 60%),
+      0 0 80px rgb(241 196 15 / 40%),
+      0 0 120px rgb(241 196 15 / 20%);
   }
+
   50% {
     box-shadow:
-      0 0 50px rgba(241, 196, 15, 0.8),
-      0 0 100px rgba(241, 196, 15, 0.6),
-      0 0 150px rgba(241, 196, 15, 0.3);
+      0 0 50px rgb(241 196 15 / 80%),
+      0 0 100px rgb(241 196 15 / 60%),
+      0 0 150px rgb(241 196 15 / 30%);
   }
 }
 
@@ -288,15 +289,16 @@
   0%,
   100% {
     box-shadow:
-      0 0 50px rgba(138, 43, 226, 0.7),
-      0 0 100px rgba(138, 43, 226, 0.5),
-      0 0 150px rgba(138, 43, 226, 0.3);
+      0 0 50px rgb(138 43 226 / 70%),
+      0 0 100px rgb(138 43 226 / 50%),
+      0 0 150px rgb(138 43 226 / 30%);
   }
+
   50% {
     box-shadow:
-      0 0 60px rgba(138, 43, 226, 0.9),
-      0 0 120px rgba(138, 43, 226, 0.7),
-      0 0 180px rgba(138, 43, 226, 0.5);
+      0 0 60px rgb(138 43 226 / 90%),
+      0 0 120px rgb(138 43 226 / 70%),
+      0 0 180px rgb(138 43 226 / 50%);
   }
 }
 
@@ -304,15 +306,16 @@
   0%,
   100% {
     box-shadow:
-      0 0 60px rgba(50, 205, 50, 0.8),
-      0 0 120px rgba(50, 205, 50, 0.6),
-      0 0 180px rgba(50, 205, 50, 0.4);
+      0 0 60px rgb(50 205 50 / 80%),
+      0 0 120px rgb(50 205 50 / 60%),
+      0 0 180px rgb(50 205 50 / 40%);
   }
+
   50% {
     box-shadow:
-      0 0 70px rgba(50, 205, 50, 1),
-      0 0 140px rgba(50, 205, 50, 0.8),
-      0 0 210px rgba(50, 205, 50, 0.6);
+      0 0 70px rgb(50 205 50 / 100%),
+      0 0 140px rgb(50 205 50 / 80%),
+      0 0 210px rgb(50 205 50 / 60%);
   }
 }
 
@@ -320,15 +323,16 @@
   0%,
   100% {
     box-shadow:
-      0 0 70px rgba(255, 20, 147, 0.9),
-      0 0 140px rgba(255, 20, 147, 0.7),
-      0 0 210px rgba(255, 20, 147, 0.5);
+      0 0 70px rgb(255 20 147 / 90%),
+      0 0 140px rgb(255 20 147 / 70%),
+      0 0 210px rgb(255 20 147 / 50%);
   }
+
   50% {
     box-shadow:
-      0 0 80px rgba(255, 20, 147, 1),
-      0 0 160px rgba(255, 20, 147, 0.9),
-      0 0 240px rgba(255, 20, 147, 0.7);
+      0 0 80px rgb(255 20 147 / 100%),
+      0 0 160px rgb(255 20 147 / 90%),
+      0 0 240px rgb(255 20 147 / 70%);
   }
 }
 
@@ -336,15 +340,16 @@
   0%,
   100% {
     box-shadow:
-      0 0 80px rgba(255, 140, 0, 1),
-      0 0 160px rgba(255, 140, 0, 0.8),
-      0 0 240px rgba(255, 140, 0, 0.6);
+      0 0 80px rgb(255 140 0 / 100%),
+      0 0 160px rgb(255 140 0 / 80%),
+      0 0 240px rgb(255 140 0 / 60%);
   }
+
   50% {
     box-shadow:
-      0 0 90px rgba(255, 140, 0, 1),
-      0 0 180px rgba(255, 140, 0, 1),
-      0 0 270px rgba(255, 140, 0, 0.8);
+      0 0 90px rgb(255 140 0 / 100%),
+      0 0 180px rgb(255 140 0 / 100%),
+      0 0 270px rgb(255 140 0 / 80%);
   }
 }
 
@@ -352,17 +357,18 @@
   0%,
   100% {
     box-shadow:
-      0 0 90px rgba(75, 0, 130, 1),
-      0 0 180px rgba(75, 0, 130, 0.8),
-      0 0 270px rgba(75, 0, 130, 0.6),
-      0 0 360px rgba(75, 0, 130, 0.4);
+      0 0 90px rgb(75 0 130 / 100%),
+      0 0 180px rgb(75 0 130 / 80%),
+      0 0 270px rgb(75 0 130 / 60%),
+      0 0 360px rgb(75 0 130 / 40%);
   }
+
   50% {
     box-shadow:
-      0 0 100px rgba(75, 0, 130, 1),
-      0 0 200px rgba(75, 0, 130, 1),
-      0 0 300px rgba(75, 0, 130, 0.8),
-      0 0 400px rgba(75, 0, 130, 0.6);
+      0 0 100px rgb(75 0 130 / 100%),
+      0 0 200px rgb(75 0 130 / 100%),
+      0 0 300px rgb(75 0 130 / 80%),
+      0 0 400px rgb(75 0 130 / 60%);
   }
 }
 
@@ -370,17 +376,18 @@
   0%,
   100% {
     box-shadow:
-      0 0 100px rgba(0, 255, 255, 1),
-      0 0 200px rgba(0, 255, 255, 0.9),
-      0 0 300px rgba(0, 255, 255, 0.7),
-      0 0 400px rgba(0, 255, 255, 0.5);
+      0 0 100px rgb(0 255 255 / 100%),
+      0 0 200px rgb(0 255 255 / 90%),
+      0 0 300px rgb(0 255 255 / 70%),
+      0 0 400px rgb(0 255 255 / 50%);
   }
+
   50% {
     box-shadow:
-      0 0 120px rgba(0, 255, 255, 1),
-      0 0 240px rgba(0, 255, 255, 1),
-      0 0 360px rgba(0, 255, 255, 0.9),
-      0 0 480px rgba(0, 255, 255, 0.7);
+      0 0 120px rgb(0 255 255 / 100%),
+      0 0 240px rgb(0 255 255 / 100%),
+      0 0 360px rgb(0 255 255 / 90%),
+      0 0 480px rgb(0 255 255 / 70%);
   }
 }
 
@@ -388,19 +395,20 @@
   0%,
   100% {
     box-shadow:
-      0 0 120px rgba(255, 215, 0, 1),
-      0 0 240px rgba(255, 215, 0, 0.9),
-      0 0 360px rgba(255, 215, 0, 0.8),
-      0 0 480px rgba(255, 215, 0, 0.6),
-      0 0 600px rgba(255, 215, 0, 0.4);
+      0 0 120px rgb(255 215 0 / 100%),
+      0 0 240px rgb(255 215 0 / 90%),
+      0 0 360px rgb(255 215 0 / 80%),
+      0 0 480px rgb(255 215 0 / 60%),
+      0 0 600px rgb(255 215 0 / 40%);
   }
+
   50% {
     box-shadow:
-      0 0 140px rgba(255, 215, 0, 1),
-      0 0 280px rgba(255, 215, 0, 1),
-      0 0 420px rgba(255, 215, 0, 1),
-      0 0 560px rgba(255, 215, 0, 0.8),
-      0 0 700px rgba(255, 215, 0, 0.6);
+      0 0 140px rgb(255 215 0 / 100%),
+      0 0 280px rgb(255 215 0 / 100%),
+      0 0 420px rgb(255 215 0 / 100%),
+      0 0 560px rgb(255 215 0 / 80%),
+      0 0 700px rgb(255 215 0 / 60%);
   }
 }
 
@@ -414,14 +422,11 @@
 .badge-glow-divine::before {
   content: "";
   position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
+  inset: -2px;
   background: linear-gradient(
     45deg,
     transparent,
-    rgba(255, 255, 255, 0.4),
+    rgb(255 255 255 / 40%),
     transparent
   );
   background-size: 200% 200%;
@@ -450,8 +455,8 @@
   position: absolute;
   background: radial-gradient(
     circle,
-    rgba(255, 255, 255, 0.8) 0%,
-    rgba(255, 255, 255, 0.2) 100%
+    rgb(255 255 255 / 80%) 0%,
+    rgb(255 255 255 / 20%) 100%
   );
   border-radius: 50%;
   animation: float-up linear infinite;
@@ -462,36 +467,21 @@
     transform: translateY(100vh) translateX(0) scale(0);
     opacity: 0;
   }
+
   10% {
     opacity: 1;
     transform: translateY(90vh) translateX(0) scale(1);
   }
+
   90% {
     opacity: 0.8;
     transform: translateY(10vh) translateX(var(--drift)) scale(0.5);
   }
+
   100% {
     transform: translateY(-10vh) translateX(var(--drift)) scale(0);
     opacity: 0;
   }
-}
-
-/* Enhanced badge visual container */
-.badge-visual-container {
-  position: relative;
-  margin-bottom: 2rem;
-  z-index: 10;
-}
-
-/* Layered shield design with pulsing glow */
-.badge-shield {
-  position: relative;
-  display: inline-block;
-  font-size: 4rem;
-  padding: 1rem;
-  transform: scale(0);
-  animation: badge-entrance 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s
-    forwards;
 }
 
 /* Removed pulse-glow effect for better performance */
@@ -502,12 +492,15 @@
     transform: scale(0) rotate(-180deg);
     opacity: 0;
   }
+
   60% {
     transform: scale(1.15) rotate(20deg);
   }
+
   80% {
     transform: scale(0.95) rotate(-10deg);
   }
+
   100% {
     transform: scale(1) rotate(0deg);
     opacity: 1;
@@ -515,46 +508,30 @@
 }
 
 /* Layered shield elements */
-.badge-shield-emoji {
-  display: block;
-  position: relative;
-  z-index: 3;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-  animation: shield-glow 3s ease-in-out infinite;
-}
-
 @keyframes shield-glow {
   0%,
   100% {
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    filter: drop-shadow(0 2px 4px rgb(0 0 0 / 30%));
   }
+
   50% {
-    filter: drop-shadow(0 2px 8px rgba(74, 144, 226, 0.6))
-      drop-shadow(0 0 15px rgba(74, 144, 226, 0.4));
+    filter: drop-shadow(0 2px 8px rgb(74 144 226 / 60%))
+      drop-shadow(0 0 15px rgb(74 144 226 / 40%));
   }
 }
 
-/* Enhanced category emoji with layered effect */
-.badge-category-emoji {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0);
-  font-size: 2.2rem;
-  z-index: 4;
-  animation: category-entrance 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.8s
-    forwards;
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
-}
+/* Enhanced sidekick emoji positioning */
 
 @keyframes category-entrance {
   0% {
     transform: translate(-50%, -50%) scale(0) rotate(90deg);
     opacity: 0;
   }
+
   60% {
     transform: translate(-50%, -50%) scale(1.1) rotate(-10deg);
   }
+
   100% {
     transform: translate(-50%, -50%) scale(1) rotate(0deg);
     opacity: 1;
@@ -562,32 +539,24 @@
 }
 
 /* Enhanced sidekick emoji with bouncy entrance */
-.badge-sidekick-emoji {
-  position: absolute;
-  top: -0.5rem;
-  right: -0.5rem;
-  font-size: 1.4rem;
-  z-index: 5;
-  transform: scale(0) rotate(-180deg);
-  animation: sidekick-bounce 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1.2s
-    forwards;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
-}
-
 @keyframes sidekick-bounce {
   0% {
     transform: scale(0) rotate(-180deg);
     opacity: 0;
   }
+
   50% {
     transform: scale(1.3) rotate(10deg);
   }
+
   70% {
     transform: scale(0.9) rotate(-5deg);
   }
+
   85% {
     transform: scale(1.1) rotate(2deg);
   }
+
   100% {
     transform: scale(1) rotate(0deg);
     opacity: 1;
@@ -596,22 +565,31 @@
 
 /* Typewriter effect for quote */
 .badge-quote {
+  font-size: 1.1rem;
+  font-style: italic;
+  line-height: 1.6;
+  margin: 0 0 1.5rem;
+  color: rgb(255 255 255 / 90%) !important;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  min-height: 3rem; /* Increased to prevent layout shift */
+  display: block;
+  word-wrap: break-word;
   overflow: hidden;
   white-space: nowrap;
   width: 0;
-  max-width: 100%;
   animation:
     typewriter 1.5s steps(30) 1.2s forwards,
     blink-cursor 0.6s step-end 1.2s 2;
-  border-right: 2px solid rgba(255, 255, 255, 0.8);
-  word-wrap: break-word;
-  hyphens: auto;
+  border-right: 2px solid rgb(255 255 255 / 80%);
 }
 
 @keyframes typewriter {
   0% {
     width: 0;
   }
+
   100% {
     width: 100%;
   }
@@ -620,8 +598,9 @@
 @keyframes blink-cursor {
   0%,
   50% {
-    border-right-color: rgba(255, 255, 255, 0.8);
+    border-right-color: rgb(255 255 255 / 80%);
   }
+
   51%,
   100% {
     border-right-color: transparent;
@@ -630,6 +609,12 @@
 
 /* Enhanced text entrance animations */
 .badge-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+  background: linear-gradient(135deg, #fff 0%, #e0e0e0 100%);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
   transform: translateY(30px);
   opacity: 0;
   animation: text-slide-up 0.5s ease-out 0.8s forwards;
@@ -639,7 +624,7 @@
   transform: translateY(20px);
   opacity: 0;
   animation: text-slide-up 0.5s ease-out 2.8s forwards;
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: rgb(255 255 255 / 90%) !important;
   font-size: 1rem;
   line-height: 1.5;
   margin-bottom: 0.5rem;
@@ -649,7 +634,7 @@
   transform: translateY(20px);
   opacity: 0;
   animation: text-slide-up 0.5s ease-out 3s forwards;
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: rgb(255 255 255 / 90%) !important;
   font-size: 0.9rem;
   line-height: 1.4;
 }
@@ -659,6 +644,7 @@
     transform: translateY(20px);
     opacity: 0;
   }
+
   100% {
     transform: translateY(0);
     opacity: 1;
@@ -666,11 +652,6 @@
 }
 
 /* Enhanced modal content container */
-.badge-modal-content {
-  position: relative;
-  z-index: 10;
-}
-
 /* ========================================
    End Enhanced Visual Effects
    ======================================== */
@@ -683,33 +664,6 @@
   margin-bottom: 2rem;
 }
 
-.badge-title {
-  font-size: 2rem;
-  font-weight: 700;
-  margin: 0 0 1rem;
-  background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.badge-quote {
-  font-size: 1.1rem;
-  font-style: italic;
-  line-height: 1.6;
-  margin: 0 0 1.5rem;
-  color: rgba(255, 255, 255, 0.9) !important;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-  min-height: 3rem; /* Increased to prevent layout shift */
-  display: block;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  hyphens: auto;
-}
-
 /* ========================================
    Modal Footer
    ======================================== */
@@ -719,37 +673,37 @@
 }
 
 .badge-close-btn {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
   color: #4a90e2;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgb(255 255 255 / 30%);
   padding: 0.75rem 2rem;
   border-radius: 25px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgb(0 0 0 / 10%);
   min-width: 160px;
 }
 
 .badge-close-btn:hover {
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   color: #357abd;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 15%);
   transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.5);
+  border-color: rgb(255 255 255 / 50%);
 }
 
 .badge-close-btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.4);
+  box-shadow: 0 2px 8px rgb(74 144 226 / 40%);
 }
 
 /* ========================================
    Mobile Responsiveness
    ======================================== */
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .badge-modal {
     width: 95%;
     margin: 1rem;
@@ -797,7 +751,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .badge-modal {
     width: 90%;
     max-width: none;
@@ -835,7 +789,7 @@
   }
 }
 
-@media (max-width: 360px) {
+@media (width <= 360px) {
   .badge-modal {
     width: 85%;
     margin: 1.5rem auto;
@@ -909,32 +863,32 @@
 
 /* Focus styles for accessibility */
 .badge-close-btn:focus {
-  outline: 2px solid #ffffff;
+  outline: 2px solid #fff;
   outline-offset: 2px;
 }
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   .badge-modal {
-    border: 2px solid #ffffff;
-    background: #000000;
+    border: 2px solid #fff;
+    background: #000;
   }
 
   .badge-title {
-    color: #ffffff;
-    -webkit-text-fill-color: #ffffff;
+    color: #fff;
+    -webkit-text-fill-color: #fff;
   }
 
   .badge-quote {
-    color: rgba(255, 255, 255, 0.9);
+    color: rgb(255 255 255 / 90%);
   }
 
   .badge-reason {
-    color: rgba(255, 255, 255, 0.9);
+    color: rgb(255 255 255 / 90%);
   }
 
   .badge-timestamp {
-    color: rgba(255, 255, 255, 0.9);
+    color: rgb(255 255 255 / 90%);
   }
 }
 
@@ -978,30 +932,36 @@
     transform: translateY(100vh) translateX(0) scale(0.3) rotate(0deg);
     opacity: 0;
   }
+
   5% {
     opacity: 0.6;
     transform: translateY(95vh) translateX(0) scale(0.5) rotate(10deg);
   }
+
   15% {
     opacity: 0.8;
     transform: translateY(85vh) translateX(var(--drift-x)) scale(0.7)
       rotate(-5deg);
   }
+
   50% {
     opacity: 0.6;
     transform: translateY(50vh) translateX(var(--drift-x)) scale(1)
       rotate(15deg);
   }
+
   85% {
     opacity: 0.4;
     transform: translateY(15vh) translateX(var(--drift-x)) scale(0.8)
       rotate(-10deg);
   }
+
   95% {
     opacity: 0.2;
     transform: translateY(5vh) translateX(var(--drift-x)) scale(0.4)
       rotate(5deg);
   }
+
   100% {
     transform: translateY(-10vh) translateX(var(--drift-x)) scale(0.2)
       rotate(0deg);
@@ -1015,13 +975,13 @@
 
 /* ===== DARK MODE SUPPORT ===== */
 body.dark-mode .badge-modal-overlay {
-  background: rgba(0, 0, 0, 0.8);
+  background: rgb(0 0 0 / 80%);
 }
 
 body.dark-mode .badge-modal {
   background: var(--theme-bg-secondary);
   border: 1px solid var(--theme-border);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 40px rgb(0 0 0 / 50%);
 }
 
 body.dark-mode .badge-modal-header {
@@ -1103,7 +1063,7 @@ body.dark-mode .badge-item:hover {
 
 body.dark-mode .badge-item.earned {
   border-color: var(--color-success);
-  box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 0 8px rgb(76 175 80 / 30%);
 }
 
 body.dark-mode .badge-item.locked {

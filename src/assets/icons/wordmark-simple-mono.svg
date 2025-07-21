@@ -1,0 +1,21 @@
+<!-- SimulateAI Simple Wordmark - Monochrome -->
+<!-- Copyright 2025 Armando Sori - Licensed under Apache License, Version 2.0 -->
+<svg width="180" height="32" viewBox="0 0 180 32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SimulateAI Simple Wordmark Monochrome">
+  <defs>
+    <!-- Monochrome gradient for text -->
+    <linearGradient id="textGradientMono" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#000"/>
+      <stop offset="50%" style="stop-color:#333"/>
+      <stop offset="100%" style="stop-color:#555"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- SimulateAI Simple Wordmark -->
+  <g transform="translate(10, 16)">
+    <!-- Main brand text only -->
+    <text x="0" y="6" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif" 
+          font-size="22" font-weight="600" fill="url(#textGradientMono)" letter-spacing="-0.4px">
+      Simulate<tspan fill="#000" font-weight="700">AI</tspan>
+    </text>
+  </g>
+</svg>

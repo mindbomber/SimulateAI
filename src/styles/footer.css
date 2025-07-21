@@ -103,7 +103,7 @@ separation of concerns and improve maintainability.
   font-size: 1.8rem;
   font-weight: 700;
   background: linear-gradient(135deg, #3498db, #9b59b6);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
@@ -149,6 +149,7 @@ separation of concerns and improve maintainability.
   max-width: calc(
     33.333% - clamp(0.5rem, var(--container-padding, 30px), 3vw)
   ); /* Enforce 3 columns */
+
   min-width: clamp(120px, 20vw, 200px); /* Responsive minimum width */
   margin-bottom: 0;
   display: flex;
@@ -157,7 +158,9 @@ separation of concerns and improve maintainability.
   overflow-wrap: break-word; /* Prevent text overflow */
 }
 
-.section-title {
+/* Footer section titles - specific to footer content */
+.footer .section-title,
+.footer-content .section-title {
   flex-shrink: 0; /* Prevent title from shrinking */
   font-size: calc(1.1rem * var(--font-scale, 1));
   font-weight: 600;
@@ -267,8 +270,7 @@ separation of concerns and improve maintainability.
 
 .social-links {
   display: flex;
-  flex-direction: row; /* One row with three columns */
-  flex-wrap: nowrap; /* Force single row - never wrap */
+  flex-flow: row nowrap; /* One row with three columns */ /* Force single row - never wrap */
   justify-content: flex-start; /* Align items to start */
   align-items: center; /* Center items vertically */
   gap: clamp(
@@ -283,6 +285,7 @@ separation of concerns and improve maintainability.
   max-width: calc(
     33.333% - clamp(0.5rem, var(--container-padding, 15px), 3vw)
   ); /* Enforce 3 columns */
+
   min-width: clamp(80px, 15vw, 120px); /* Responsive minimum width */
   display: flex;
   align-items: center;
@@ -292,7 +295,7 @@ separation of concerns and improve maintainability.
   text-decoration: none;
   padding: 8px 12px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgb(255 255 255 / 5%);
   transition: all 0.3s ease;
   font-size: 0.9rem;
   white-space: nowrap; /* Prevent text wrapping within items */
@@ -301,7 +304,7 @@ separation of concerns and improve maintainability.
 }
 
 .social-links a:hover {
-  background: rgba(52, 152, 219, 0.2);
+  background: rgb(52 152 219 / 20%);
   color: #3498db;
   transform: translateY(-2px);
 }
@@ -312,8 +315,7 @@ separation of concerns and improve maintainability.
 
 .footer-certifications {
   display: flex;
-  flex-direction: row; /* One row with three columns */
-  flex-wrap: nowrap; /* Force single row - never wrap */
+  flex-flow: row nowrap; /* One row with three columns */ /* Force single row - never wrap */
   justify-content: flex-start; /* Align items to start */
   align-items: center; /* Center items vertically */
   gap: clamp(
@@ -328,6 +330,7 @@ separation of concerns and improve maintainability.
   max-width: calc(
     33.333% - clamp(0.5rem, var(--container-padding, 20px), 3vw)
   ); /* Enforce 3 columns */
+
   min-width: clamp(80px, 15vw, 120px); /* Responsive minimum width */
   display: flex;
   align-items: center;
@@ -349,11 +352,10 @@ separation of concerns and improve maintainability.
    ============================================================================= */
 
 /* Mobile responsive adjustments - using media.css breakpoints */
-@media only screen and (max-width: 767px) {
+@media only screen and (width <= 767px) {
   .footer-main {
     display: flex; /* Switch back to flex for mobile stacking */
-    flex-direction: column; /* Stack vertically on mobile only */
-    flex-wrap: wrap; /* Allow wrapping on mobile */
+    flex-flow: column wrap; /* Stack vertically on mobile only */ /* Allow wrapping on mobile */
     gap: clamp(1rem, var(--container-padding, 2rem), 4vw);
     max-width: 100vw; /* Ensure viewport fit */
     overflow-x: hidden; /* Prevent horizontal overflow */
@@ -378,6 +380,7 @@ separation of concerns and improve maintainability.
   .footer-section {
     flex: 1 1
       calc(33.333% - clamp(0.25rem, var(--container-padding, 12px), 2vw)); /* Still 3 columns */
+
     max-width: calc(
       33.333% - clamp(0.25rem, var(--container-padding, 12px), 2vw)
     );
@@ -410,7 +413,7 @@ separation of concerns and improve maintainability.
 }
 
 /* Small mobile devices - using media.css device detection */
-@media only screen and (max-width: 479px) {
+@media only screen and (width <= 479px) {
   .footer-content {
     padding: 40px var(--container-padding, 1rem) 0;
     min-height: 600px; /* Keep content min-height for very small screens */
@@ -440,6 +443,7 @@ separation of concerns and improve maintainability.
       12vw,
       100px
     ); /* Smaller minimum for very small screens */
+
     font-size: 0.8rem; /* Slightly smaller text for mobile */
     padding: 6px 8px; /* Reduced padding for mobile */
   }
@@ -459,6 +463,7 @@ separation of concerns and improve maintainability.
       12vw,
       100px
     ); /* Smaller minimum for very small screens */
+
     font-size: 0.75rem; /* Slightly smaller text for mobile */
   }
 
@@ -467,7 +472,8 @@ separation of concerns and improve maintainability.
   }
 
   /* Use media.css font scaling for small devices */
-  .section-title {
+  .footer .section-title,
+  .footer-content .section-title {
     font-size: calc(1rem * var(--font-scale, 0.9));
   }
 
@@ -477,7 +483,7 @@ separation of concerns and improve maintainability.
 }
 
 /* Tablet responsive adjustments */
-@media only screen and (min-width: 768px) and (max-width: 1279px) {
+@media only screen and (width >= 768px) and (width <= 1279px) {
   .footer-content {
     padding: 50px var(--container-padding, 24px) 0;
     min-height: 350px; /* Keep content min-height for tablet layout */
@@ -496,7 +502,7 @@ separation of concerns and improve maintainability.
 }
 
 /* Desktop responsive adjustments */
-@media only screen and (min-width: 1280px) {
+@media only screen and (width >= 1280px) {
   .footer-content {
     padding: 60px var(--container-padding, 40px) 0;
     min-height: 400px; /* Keep content min-height for desktop layout */
@@ -527,12 +533,13 @@ separation of concerns and improve maintainability.
     border-top: 2px solid #fff;
   }
 
-  .section-title {
+  .footer .section-title,
+  .footer-content .section-title {
     border-bottom-color: #fff;
   }
 
   .section-links a:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgb(255 255 255 / 10%);
   }
 }
 

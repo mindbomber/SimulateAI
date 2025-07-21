@@ -174,8 +174,7 @@
 .tab-buttons-container {
   display: flex; /* Always flex on desktop */
   width: 100%;
-  overflow-x: auto; /* Add horizontal scroll for desktop */
-  overflow-y: hidden;
+  overflow: auto hidden; /* Add horizontal scroll for desktop */
   scrollbar-width: thin; /* Firefox */
   scrollbar-color: #ccc transparent; /* Firefox */
   scroll-behavior: smooth; /* Smooth scrolling for tab container */
@@ -427,7 +426,7 @@
 
 .resource-item:hover {
   border-color: #667eea;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 2px 8px rgb(102 126 234 / 10%);
   text-decoration: none;
 }
 
@@ -474,7 +473,7 @@
 
 .educator-section .resource-item:hover {
   border-color: #0c5460;
-  box-shadow: 0 2px 8px rgba(12, 84, 96, 0.1);
+  box-shadow: 0 2px 8px rgb(12 84 96 / 10%);
 }
 
 /* Action Buttons */
@@ -514,7 +513,7 @@
 .btn-launch:hover {
   background: var(--color-secondary-dark);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 170, 0, 0.3);
+  box-shadow: 0 4px 12px rgb(0 170 0 / 30%);
 }
 
 .btn-launch:focus {
@@ -562,7 +561,7 @@
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .modal-backdrop:has(.pre-launch-modal) .modal-dialog {
     width: 98vw;
     max-width: none;
@@ -604,7 +603,7 @@
     background: #fff;
     border: 1px solid #e5e5e5;
     border-top: none;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
     z-index: 1000;
     flex-direction: column;
     overflow: visible; /* Reset scroll on mobile */
@@ -686,10 +685,10 @@
 }
 
 .radar-explanation {
-  background: rgba(102, 126, 234, 0.05);
+  background: rgb(102 126 234 / 5%);
   padding: 1.5rem;
   border-radius: 12px;
-  border: 1px solid rgba(102, 126, 234, 0.1);
+  border: 1px solid rgb(102 126 234 / 10%);
 }
 
 .ethics-features {
@@ -703,14 +702,14 @@
   background: white;
   padding: 1rem;
   border-radius: 8px;
-  border: 1px solid rgba(229, 231, 235, 0.6);
+  border: 1px solid rgb(229 231 235 / 60%);
 }
 
 .feature-item h5 {
   color: #2d3748;
   font-size: 1rem;
   font-weight: 600;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.5rem;
 }
 
 .feature-item p {
@@ -721,10 +720,10 @@
 }
 
 .interpretation-guide {
-  background: rgba(245, 158, 11, 0.1);
+  background: rgb(245 158 11 / 10%);
   padding: 1rem;
   border-radius: 8px;
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  border: 1px solid rgb(245 158 11 / 20%);
   margin-top: 1rem;
 }
 
@@ -732,7 +731,7 @@
   color: #92400e;
   font-size: 1rem;
   font-weight: 600;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.5rem;
 }
 
 .interpretation-guide p {
@@ -746,7 +745,7 @@
   background: white;
   padding: 1.5rem;
   border-radius: 12px;
-  border: 1px solid rgba(229, 231, 235, 0.6);
+  border: 1px solid rgb(229 231 235 / 60%);
 }
 
 .dimensions-grid {
@@ -757,16 +756,16 @@
 }
 
 .dimension-item {
-  background: rgba(248, 250, 252, 0.8);
+  background: rgb(248 250 252 / 80%);
   padding: 1rem;
   border-radius: 8px;
-  border: 1px solid rgba(229, 231, 235, 0.4);
+  border: 1px solid rgb(229 231 235 / 40%);
   transition: all 0.2s ease;
 }
 
 .dimension-item:hover {
-  background: rgba(248, 250, 252, 1);
-  border-color: rgba(102, 126, 234, 0.2);
+  background: rgb(248 250 252 / 100%);
+  border-color: rgb(102 126 234 / 20%);
   transform: translateY(-1px);
 }
 
@@ -799,8 +798,8 @@
 }
 
 .ethics-reminder {
-  background: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.2);
+  background: rgb(34 197 94 / 10%);
+  border: 1px solid rgb(34 197 94 / 20%);
   border-radius: 8px;
   padding: 1rem;
   margin-top: 1.5rem;
@@ -819,7 +818,7 @@
 }
 
 /* Mobile responsiveness for ethics tab */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .ethics-features {
     grid-template-columns: 1fr;
     gap: 0.75rem;

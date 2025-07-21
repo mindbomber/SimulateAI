@@ -55,7 +55,7 @@
 }
 
 .section h4 {
-  margin: 0 0 12px 0;
+  margin: 0 0 12px;
   color: var(--primary-color);
   font-size: 16px;
 }
@@ -136,7 +136,7 @@
 }
 
 .option-content p {
-  margin: 0 0 5px 0;
+  margin: 0 0 5px;
   font-size: 13px;
   color: var(--text-secondary);
   line-height: 1.4;
@@ -173,7 +173,7 @@
 
 .suggestion-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
 }
 
 /* Badge Collection Styles */
@@ -218,7 +218,7 @@
 
 .badge-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
 }
 
 .badge-icon {
@@ -231,13 +231,13 @@
 }
 
 .badge-info h4 {
-  margin: 0 0 5px 0;
+  margin: 0 0 5px;
   font-size: 16px;
   color: var(--text-color);
 }
 
 .badge-info p {
-  margin: 0 0 8px 0;
+  margin: 0 0 8px;
   font-size: 13px;
   color: var(--text-secondary);
   line-height: 1.4;
@@ -265,12 +265,12 @@
 }
 
 .no-badges p {
-  margin: 0 0 10px 0;
+  margin: 0 0 10px;
   font-size: 16px;
 }
 
 /* Responsive design */
-@media (max-width: 700px) {
+@media (width <= 700px) {
   .profile-customization,
   .badge-collection {
     padding: 15px;
@@ -365,7 +365,7 @@ body.dark-mode .section textarea {
 body.dark-mode .section input:focus,
 body.dark-mode .section textarea:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
+  box-shadow: 0 0 0 2px rgb(74 158 255 / 20%);
 }
 
 body.dark-mode .section input::placeholder,
@@ -385,7 +385,7 @@ body.dark-mode .color-option {
 
 body.dark-mode .color-option.selected {
   border-color: var(--theme-text-primary);
-  box-shadow: 0 0 8px rgba(74, 158, 255, 0.3);
+  box-shadow: 0 0 8px rgb(74 158 255 / 30%);
 }
 
 /* Badge selection */
@@ -406,7 +406,7 @@ body.dark-mode .badge-option:hover {
 
 body.dark-mode .badge-option.selected {
   border-color: var(--color-primary);
-  background: rgba(74, 158, 255, 0.1);
+  background: rgb(74 158 255 / 10%);
 }
 
 body.dark-mode .badge-card {

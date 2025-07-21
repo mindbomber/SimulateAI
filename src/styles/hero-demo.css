@@ -8,8 +8,8 @@
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   border-radius: 16px;
   padding: var(--container-padding, 2rem);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 25px rgb(0 0 0 / 10%);
+  border: 1px solid rgb(255 255 255 / 20%);
   max-width: 100%;
   margin: 0 auto;
   position: relative; /* Added for absolute positioning of actions */
@@ -24,7 +24,7 @@
   font-size: calc(1.5rem * var(--font-scale, 1));
   font-weight: 700;
   color: var(--color-gray-900);
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.5rem;
 }
 
 .demo-subtitle {
@@ -48,7 +48,7 @@
   background: white;
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 5%);
 }
 
 .scenario-header {
@@ -64,7 +64,7 @@
   font-size: 0.85rem;
   color: var(--color-primary);
   font-weight: 600;
-  background: rgba(0, 124, 186, 0.1);
+  background: rgb(0 124 186 / 10%);
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
 }
@@ -111,20 +111,20 @@
 
 .choice-btn:hover {
   border-color: var(--color-primary);
-  background: rgba(0, 124, 186, 0.02);
+  background: rgb(0 124 186 / 2%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 124, 186, 0.15);
+  box-shadow: 0 4px 12px rgb(0 124 186 / 15%);
 }
 
 .choice-btn:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.2);
+  box-shadow: 0 0 0 3px rgb(0 124 186 / 20%);
 }
 
 .choice-btn.selected {
   border-color: var(--color-primary);
-  background: rgba(0, 124, 186, 0.1);
+  background: rgb(0 124 186 / 10%);
   transform: none;
 }
 
@@ -157,14 +157,14 @@
   top: -1rem;
   left: 50%;
   transform: translateX(-50%) translateY(-100%);
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border: 1px solid rgba(59, 130, 246, 0.15);
+  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+  border: 1px solid rgb(59 130 246 / 15%);
   border-radius: 16px;
   padding: 1.25rem;
   box-shadow:
-    0 20px 40px rgba(0, 0, 0, 0.1),
-    0 8px 16px rgba(59, 130, 246, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 20px 40px rgb(0 0 0 / 10%),
+    0 8px 16px rgb(59 130 246 / 10%),
+    inset 0 1px 0 rgb(255 255 255 / 80%);
   z-index: 1000;
   min-width: 340px;
   max-width: 420px;
@@ -204,19 +204,19 @@
 }
 
 .demo-feedback-popover .popover-content {
-  background: rgba(255, 255, 255, 0.98);
+  background: rgb(255 255 255 / 98%);
   color: #2d3748;
   padding: 1rem 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 25px rgb(0 0 0 / 15%);
   min-width: 280px;
   max-width: 400px;
   position: relative;
-  border: 1px solid rgba(102, 126, 234, 0.2);
+  border: 1px solid rgb(102 126 234 / 20%);
 }
 
 .demo-feedback-popover .popover-content h5 {
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.5rem;
   font-size: 1.1rem;
   font-weight: 600;
   color: #667eea;
@@ -239,7 +239,7 @@
   height: 0;
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
-  border-top: 8px solid rgba(255, 255, 255, 0.98);
+  border-top: 8px solid rgb(255 255 255 / 98%);
 }
 
 /* Arrow shadow effect */
@@ -252,7 +252,7 @@
   height: 0;
   border-left: 9px solid transparent;
   border-right: 9px solid transparent;
-  border-top: 9px solid rgba(102, 126, 234, 0.2);
+  border-top: 9px solid rgb(102 126 234 / 20%);
   z-index: -1;
 }
 
@@ -278,7 +278,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgb(0 0 0 / 10%);
   z-index: 999;
   opacity: 0;
   visibility: hidden;
@@ -307,12 +307,12 @@
   border-radius: 8px;
   font-weight: 600;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 }
 
 .demo-actions .btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 15%);
 }
 
 .demo-actions .btn-primary {
@@ -346,7 +346,7 @@
   border: 2px solid #cbd5e0;
   border-radius: 16px;
   padding: 2rem;
-  margin: 2rem 0 0 0;
+  margin: 2rem 0 0;
   text-align: center;
 }
 
@@ -354,9 +354,9 @@
   font-size: 1.5rem;
   font-weight: 700;
   color: #1a202c;
-  margin: 0 0 1rem 0;
+  margin: 0 0 1rem;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
@@ -386,11 +386,11 @@
   position: relative;
   width: 100%;
   max-width: 650px;
-  margin: 0 auto 2rem auto;
+  margin: 0 auto 2rem;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgb(255 255 255 / 80%);
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
 }
 
 /* Accordion Styles for Instructions */
@@ -399,7 +399,7 @@
   margin: 1.5rem auto;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 }
 
 .radar-instructions-accordion .accordion-item {
@@ -427,7 +427,7 @@
 }
 
 .radar-instructions-accordion .accordion-header:focus {
-  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline: 2px solid rgb(255 255 255 / 50%);
   outline-offset: -2px;
 }
 
@@ -459,13 +459,13 @@
 
 .radar-instructions-accordion .accordion-content-inner {
   padding: 1.5rem;
-  border-top: 1px solid rgba(102, 126, 234, 0.1);
+  border-top: 1px solid rgb(102 126 234 / 10%);
   text-align: left;
 }
 
 .radar-instructions-accordion .accordion-content-inner p {
   color: #4a5568;
-  margin: 0 0 1rem 0;
+  margin: 0 0 1rem;
   line-height: 1.6;
   font-size: 0.95rem;
 }
@@ -473,7 +473,7 @@
 .radar-instructions-accordion .accordion-content-inner ul {
   list-style: none;
   padding: 0;
-  margin: 0 0 1rem 0;
+  margin: 0 0 1rem;
 }
 
 .radar-instructions-accordion .accordion-content-inner li {
@@ -500,8 +500,8 @@
 
 /* Demo Feedback Enhancement */
 #hero-demo-feedback {
-  background: rgba(102, 126, 234, 0.05);
-  border: 1px solid rgba(102, 126, 234, 0.1);
+  background: rgb(102 126 234 / 5%);
+  border: 1px solid rgb(102 126 234 / 10%);
   border-radius: 12px;
   padding: 1.5rem;
   margin-top: 1rem;
@@ -522,7 +522,7 @@
 #hero-demo-feedback h5 {
   color: #667eea;
   font-weight: 700;
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 0.75rem;
   font-size: 1.1rem;
 }
 
@@ -542,16 +542,16 @@
   }
 
   .choice-btn:focus {
-    box-shadow: 0 0 0 4px rgba(0, 124, 186, 0.5);
+    box-shadow: 0 0 0 4px rgb(0 124 186 / 50%);
   }
 
   .meter-fill {
-    border: 2px solid currentColor;
+    border: 2px solid currentcolor;
   }
 
   .scenario-feedback {
     border-width: 2px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 25px rgb(0 0 0 / 30%);
   }
 }
 
@@ -574,7 +574,7 @@
     transform: translateX(-50%) translateY(-100%) translateY(-0.5rem);
   }
 
-  @media (max-width: 768px) {
+  @media (width <= 768px) {
     .scenario-feedback.visible {
       transform: translateY(-100%) translateY(-0.5rem);
     }
@@ -584,7 +584,6 @@
 /* Import demo button styles from ethics-analysis.css for consistency */
 .hero-demo-controls .demo-btn {
   padding: 0.75rem 1.5rem;
-  border: none;
   border-radius: 8px;
   background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
   color: white;
@@ -592,10 +591,10 @@
   font-size: 0.9rem;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+  box-shadow: 0 2px 8px rgb(79 70 229 / 25%);
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgb(255 255 255 / 10%);
 }
 
 .hero-demo-controls .demo-btn::before {
@@ -608,7 +607,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.15),
+    rgb(255 255 255 / 15%),
     transparent
   );
   transition: left 0.5s ease;
@@ -616,7 +615,7 @@
 
 .hero-demo-controls .demo-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 4px 16px rgb(79 70 229 / 35%);
   background: linear-gradient(135deg, #4338ca 0%, #5b21b6 100%);
 }
 
@@ -626,29 +625,29 @@
 
 .hero-demo-controls .demo-btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+  box-shadow: 0 2px 8px rgb(79 70 229 / 25%);
 }
 
 /* Active/Selected state for demo buttons */
 .hero-demo-controls .demo-btn.active {
   background: linear-gradient(135deg, #1e40af 0%, #3730a3 100%);
-  box-shadow: 0 4px 16px rgba(30, 64, 175, 0.4);
+  box-shadow: 0 4px 16px rgb(30 64 175 / 40%);
   transform: translateY(-1px);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgb(255 255 255 / 30%);
 }
 
 .hero-demo-controls .demo-btn.active::before {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.25),
+    rgb(255 255 255 / 25%),
     transparent
   );
 }
 
 .hero-demo-controls .demo-btn.active:hover {
   background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);
-  box-shadow: 0 6px 20px rgba(30, 64, 175, 0.45);
+  box-shadow: 0 6px 20px rgb(30 64 175 / 45%);
 }
 
 /* Ethics Glossary Accordion Styles */
@@ -657,7 +656,7 @@
   margin: 1.5rem auto;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 }
 
 .ethics-glossary-accordion .accordion-item {
@@ -685,14 +684,14 @@
 }
 
 .ethics-glossary-accordion .accordion-header:focus {
-  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline: 2px solid rgb(255 255 255 / 50%);
   outline-offset: -2px;
 }
 
 .ethics-glossary-accordion .accordion-icon {
   font-size: 0.8rem;
   transition: transform 0.3s ease;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgb(255 255 255 / 90%);
 }
 
 .ethics-glossary-accordion.open .accordion-icon {
@@ -738,7 +737,7 @@
 }
 
 .ethics-glossary-accordion .glossary-item h4 {
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.5rem;
   color: #1a202c;
   font-size: 1rem;
   font-weight: 600;
@@ -766,7 +765,7 @@
 }
 
 /* Mobile responsiveness for glossary accordion */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .ethics-glossary-accordion .glossary-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -808,7 +807,7 @@ body.dark-mode .scenario-panel {
 
 body.dark-mode .scenario-counter {
   color: var(--theme-accent);
-  background: rgba(var(--theme-accent-rgb), 0.1);
+  background: rgb(var(--theme-accent-rgb), 0.1);
 }
 
 body.dark-mode .scenario-title {
@@ -827,18 +826,18 @@ body.dark-mode .choice-btn {
 
 body.dark-mode .choice-btn:hover {
   border-color: var(--theme-accent);
-  background: rgba(var(--theme-accent-rgb), 0.1);
+  background: rgb(var(--theme-accent-rgb), 0.1);
   box-shadow: 0 4px 12px var(--theme-shadow);
 }
 
 body.dark-mode .choice-btn:focus {
   border-color: var(--theme-accent);
-  box-shadow: 0 0 0 3px rgba(var(--theme-accent-rgb), 0.2);
+  box-shadow: 0 0 0 3px rgb(var(--theme-accent-rgb), 0.2);
 }
 
 body.dark-mode .choice-btn.selected {
   border-color: var(--theme-accent);
-  background: rgba(var(--theme-accent-rgb), 0.2);
+  background: rgb(var(--theme-accent-rgb), 0.2);
 }
 
 body.dark-mode .choice-text {
@@ -924,7 +923,7 @@ body.dark-mode .radar-instructions-accordion .accordion-header {
 }
 
 body.dark-mode .radar-instructions-accordion .accordion-header:hover {
-  background: rgba(var(--theme-accent-rgb), 0.1);
+  background: rgb(var(--theme-accent-rgb), 0.1);
 }
 
 body.dark-mode .radar-instructions-accordion .accordion-title {
@@ -975,7 +974,7 @@ body.dark-mode .ethics-glossary-accordion .glossary-item p {
 }
 
 body.dark-mode .ethics-glossary-accordion .glossary-note {
-  background: rgba(var(--theme-warning-rgb), 0.1);
+  background: rgb(var(--theme-warning-rgb), 0.1);
   border-color: var(--theme-warning);
 }
 

@@ -10,7 +10,7 @@
 }
 
 .profile-header h3 {
-  margin: 0 0 8px 0;
+  margin: 0 0 8px;
   color: #1f2937;
   font-size: 1.5rem;
 }
@@ -43,7 +43,7 @@
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
   transition: transform 0.2s ease;
 }
 
@@ -102,7 +102,7 @@
 .profile-input:focus {
   outline: none;
   border-color: #4f46e5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  box-shadow: 0 0 0 3px rgb(79 70 229 / 10%);
 }
 
 .help-text {
@@ -123,7 +123,7 @@
 }
 
 .avatar-suggestions p {
-  margin: 0 0 12px 0;
+  margin: 0 0 12px;
   font-size: 0.9rem;
   color: #374151;
 }
@@ -170,7 +170,7 @@
 
 .emoji-avatar-section h4,
 .traditional-avatar-section h4 {
-  margin: 0 0 12px 0;
+  margin: 0 0 12px;
   color: #374151;
   font-size: 1rem;
   font-weight: 600;
@@ -201,7 +201,7 @@
 .emoji-avatar-option:hover {
   border-color: #4f46e5;
   transform: scale(1.1);
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.15);
+  box-shadow: 0 2px 8px rgb(79 70 229 / 15%);
 }
 
 .emoji-avatar-option:active,
@@ -266,7 +266,7 @@
 .modal-actions .btn-primary:hover {
   background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+  box-shadow: 0 4px 12px rgb(79 70 229 / 40%);
 }
 
 .modal-actions .btn-primary:disabled {
@@ -290,7 +290,7 @@
 }
 
 /* Responsive Design */
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .profile-update-modal {
     max-width: 100%;
   }
@@ -341,14 +341,11 @@
 .btn-primary:disabled::after {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.2),
+    rgb(255 255 255 / 20%),
     transparent
   );
   animation: shimmer 1.5s infinite;
@@ -358,13 +355,14 @@
   0% {
     transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(100%);
   }
 }
 
 /* Responsive emoji grid */
-@media (max-width: 640px) {
+@media (width <= 640px) {
   .emoji-grid {
     grid-template-columns: repeat(6, 1fr);
   }
@@ -376,7 +374,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .emoji-grid {
     grid-template-columns: repeat(4, 1fr);
   }
@@ -442,7 +440,7 @@ body.dark-mode .form-input {
 
 body.dark-mode .form-input:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
+  box-shadow: 0 0 0 2px rgb(74 158 255 / 20%);
 }
 
 body.dark-mode .form-input::placeholder {
@@ -493,7 +491,7 @@ body.dark-mode .emoji-avatar-option:hover {
 
 body.dark-mode .emoji-avatar-option.selected {
   border-color: var(--color-primary);
-  background: rgba(74, 158, 255, 0.1);
+  background: rgb(74 158 255 / 10%);
 }
 
 /* Upload section */
@@ -504,7 +502,7 @@ body.dark-mode .upload-section {
 
 body.dark-mode .upload-section:hover {
   border-color: var(--color-primary);
-  background: rgba(74, 158, 255, 0.05);
+  background: rgb(74 158 255 / 5%);
 }
 
 body.dark-mode .upload-icon {
@@ -563,7 +561,7 @@ body.dark-mode .modal-actions .btn.btn-primary:hover {
 
 /* Loading states */
 body.dark-mode .loading-overlay {
-  background: rgba(0, 0, 0, 0.8);
+  background: rgb(0 0 0 / 80%);
 }
 
 body.dark-mode .loading-spinner {

@@ -83,7 +83,7 @@
 .post-content h2,
 .post-content h3 {
   color: #1e293b;
-  margin: 2rem 0 1rem 0;
+  margin: 2rem 0 1rem;
 }
 
 .post-content p {
@@ -153,7 +153,7 @@
 }
 
 .post-comments-section {
-  padding: 0 2rem 2rem 2rem;
+  padding: 0 2rem 2rem;
 }
 
 /* Modal Overlay */
@@ -163,7 +163,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgb(0 0 0 / 50%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -175,7 +175,7 @@
 .modal-container {
   background: white;
   border-radius: 12px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 10%);
   max-width: 600px;
   width: 100%;
   max-height: 80vh;
@@ -232,7 +232,7 @@
 }
 
 /* Responsive Design for Modal */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .modal-overlay {
     padding: 1rem;
   }
@@ -264,17 +264,17 @@
   }
 
   .post-comments-section {
-    padding: 0 1.5rem 1.5rem 1.5rem;
+    padding: 0 1.5rem 1.5rem;
   }
 }
 
 .comment-system {
   margin: 3rem 0;
   padding: 2rem;
-  background: #ffffff;
+  background: #fff;
   border-radius: 12px;
   border: 1px solid #e0e7ff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 5%);
 }
 
 .comment-header {
@@ -406,7 +406,7 @@
 .comment-textarea:focus {
   outline: none;
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 10%);
 }
 
 .character-count {
@@ -489,7 +489,7 @@
 }
 
 .comment-item:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 5%);
 }
 
 .comment-content {
@@ -727,7 +727,7 @@
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .comment-system {
     margin: 2rem 0;
     padding: 1.5rem;

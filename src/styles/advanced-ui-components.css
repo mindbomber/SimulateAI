@@ -7,24 +7,21 @@
 /* ===== CSS CUSTOM PROPERTIES FOR ADVANCED UI COMPONENTS ===== */
 :root {
   /* Component-specific colors (inherits base colors from main.css) */
-  --modal-backdrop: rgba(0, 0, 0, 0.5);
+  --modal-backdrop: rgb(0 0 0 / 50%);
   --modal-background: var(--color-white);
   --modal-border: var(--color-gray-200);
   --modal-shadow: var(--shadow-xl);
-
   --nav-background: var(--color-white);
   --nav-border: var(--color-gray-200);
   --nav-item-hover: var(--color-gray-50);
   --nav-item-selected: var(--color-primary);
   --nav-item-focus: var(--color-warning);
-
   --form-background: var(--color-white);
   --form-border: var(--color-gray-400);
   --form-border-focus: var(--color-primary);
   --form-border-error: var(--color-error);
   --form-disabled-bg: var(--color-gray-50);
-
-  --tooltip-background: rgba(0, 0, 0, 0.9);
+  --tooltip-background: rgb(0 0 0 / 90%);
   --tooltip-text: var(--color-white);
 
   /* Component sizing (uses main.css border radius tokens) */
@@ -45,6 +42,7 @@
     --touch-target-min,
     44px
   ); /* Fallback to media.css variable */
+
   --focus-ring-width: 2px;
   --focus-ring-offset: 2px;
 
@@ -68,6 +66,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
+  contain: strict;
   padding: var(--component-padding);
   padding-top: calc(var(--component-padding) * 2);
   overflow-y: auto;
@@ -88,9 +87,7 @@
   z-index: var(--z-modal);
   min-width: 300px;
   max-width: 90vw;
-  max-height: calc(
-    100vh - calc(var(--component-padding) * 4)
-  ); /* Responsive height based on padding */
+  max-height: 95vh; /* Increased from 90vh for better usability */
 
   /* Flexbox layout for proper header/body/footer stacking */
   display: flex;
@@ -98,7 +95,6 @@
 
   /* Remove overflow: hidden that was clipping content */
   overflow: visible;
-
   animation: modalSlideIn var(--transition-modal);
   border: 1px solid var(--modal-border);
   contain: layout style;
@@ -164,8 +160,7 @@
 
   /* Flex item properties for proper layout */
   flex: 1; /* Take up available space */
-  overflow-y: auto; /* Allow vertical scrolling when content overflows */
-  overflow-x: hidden; /* Prevent horizontal scrolling */
+  overflow: hidden auto; /* Allow vertical scrolling when content overflows */ /* Prevent horizontal scrolling */
   min-height: 0; /* Important for flex items with overflow */
 
   /* Add some maximum height constraints */
@@ -201,8 +196,7 @@
   flex-wrap: wrap;
 
   /* Overflow handling - horizontal scroll for many buttons */
-  overflow-x: auto;
-  overflow-y: visible;
+  overflow: auto visible;
 
   /* Minimum usability */
   min-height: var(--touch-target-min, 44px);
@@ -214,6 +208,9 @@
   /* Border radius for bottom corners */
   border-bottom-left-radius: var(--modal-border-radius);
   border-bottom-right-radius: var(--modal-border-radius);
+
+  /* Animation for layout changes */
+  transition: all var(--transition-normal, 0.2s) ease-in-out;
 }
 
 .scroll-indicator {
@@ -235,7 +232,7 @@
   transition: opacity var(--transition-fast);
   z-index: 20;
   pointer-events: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 }
 
 .scroll-indicator-left {
@@ -303,8 +300,11 @@
   background: var(--nav-background);
   border: 1px solid var(--nav-border);
   border-radius: var(--button-border-radius);
-  box-shadow: var(--shadow-md, 0 2px 8px rgba(0, 0, 0, 0.1));
+  box-shadow: var(--shadow-md, 0 2px 8px rgb(0 0 0 / 10%));
   contain: layout style;
+
+  /* Ensure proper focus flow */
+  isolation: isolate;
 }
 
 .navigation-menu.vertical {
@@ -410,7 +410,7 @@
 }
 
 .nav-item.selected .nav-item-badge {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgb(255 255 255 / 20%);
 }
 
 /* Keyboard Navigation Enhancement */
@@ -437,7 +437,7 @@
   border: 1px solid var(--modal-border);
   border-radius: var(--modal-border-radius);
   padding: calc(var(--component-padding) * var(--component-font-scale));
-  box-shadow: var(--shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
+  box-shadow: var(--shadow-sm, 0 2px 4px rgb(0 0 0 / 10%));
   position: relative;
   contain: layout style;
 }
@@ -557,7 +557,7 @@
 .form-textarea:focus {
   outline: none;
   border-color: var(--form-border-focus);
-  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+  box-shadow: 0 0 0 3px rgb(33 150 243 / 10%);
 }
 
 .form-input:focus-visible,
@@ -571,7 +571,7 @@
 .form-select.error,
 .form-textarea.error {
   border-color: var(--form-border-error);
-  box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
+  box-shadow: 0 0 0 3px rgb(244 67 54 / 10%);
 }
 
 .form-input:disabled,
@@ -696,7 +696,6 @@
     calc(var(--spacing-3, 12px) * var(--component-font-scale));
   border-radius: var(--button-border-radius);
   font-size: calc(var(--font-size-xs, 12px) * var(--component-font-scale));
-  white-space: nowrap;
   z-index: var(--z-tooltip);
   pointer-events: none;
   opacity: 0;
@@ -704,7 +703,7 @@
   max-width: calc(250px * var(--component-font-scale));
   white-space: normal;
   line-height: var(--line-height-normal, 1.5);
-  box-shadow: var(--shadow-md, 0 2px 8px rgba(0, 0, 0, 0.15));
+  box-shadow: var(--shadow-md, 0 2px 8px rgb(0 0 0 / 15%));
   border: 1px solid var(--modal-border);
 }
 
@@ -775,10 +774,8 @@
 }
 
 .tooltip.error::before {
-  border-top-color: var(--form-border-error);
-  border-bottom-color: var(--form-border-error);
-  border-left-color: var(--form-border-error);
-  border-right-color: var(--form-border-error);
+  border-color: var(--form-border-error) var(--form-border-error)
+    var(--form-border-error) var(--form-border-error);
 }
 
 .tooltip.success {
@@ -818,7 +815,7 @@
 /* Error States */
 .component-error {
   border-color: var(--form-border-error) !important;
-  background-color: rgba(244, 67, 54, 0.05);
+  background-color: rgb(244 67 54 / 5%);
 }
 
 .component-error::before {
@@ -834,7 +831,7 @@
 /* Success States */
 .component-success {
   border-color: var(--color-success, #4caf50) !important;
-  background-color: rgba(76, 175, 80, 0.05);
+  background-color: rgb(76 175 80 / 5%);
 }
 
 .component-success::before {
@@ -882,9 +879,6 @@
 
 .advanced-ui-no-select {
   user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
 }
 
 .advanced-ui-truncate {
@@ -902,7 +896,7 @@
 }
 
 .advanced-ui-shadow {
-  box-shadow: var(--shadow-md, 0 2px 8px rgba(0, 0, 0, 0.1));
+  box-shadow: var(--shadow-md, 0 2px 8px rgb(0 0 0 / 10%));
 }
 
 .advanced-ui-transition {
@@ -913,15 +907,19 @@
 .advanced-ui-m-0 {
   margin: 0;
 }
+
 .advanced-ui-m-1 {
   margin: var(--spacing-1, 4px);
 }
+
 .advanced-ui-m-2 {
   margin: var(--spacing-2, 8px);
 }
+
 .advanced-ui-m-3 {
   margin: var(--spacing-3, 12px);
 }
+
 .advanced-ui-m-4 {
   margin: var(--spacing-4, 16px);
 }
@@ -929,15 +927,19 @@
 .advanced-ui-p-0 {
   padding: 0;
 }
+
 .advanced-ui-p-1 {
   padding: var(--spacing-1, 4px);
 }
+
 .advanced-ui-p-2 {
   padding: var(--spacing-2, 8px);
 }
+
 .advanced-ui-p-3 {
   padding: var(--spacing-3, 12px);
 }
+
 .advanced-ui-p-4 {
   padding: var(--spacing-4, 16px);
 }
@@ -946,9 +948,11 @@
 .advanced-ui-text-left {
   text-align: left;
 }
+
 .advanced-ui-text-center {
   text-align: center;
 }
+
 .advanced-ui-text-right {
   text-align: right;
 }
@@ -956,9 +960,11 @@
 .advanced-ui-font-bold {
   font-weight: var(--font-weight-bold, 700);
 }
+
 .advanced-ui-font-medium {
   font-weight: var(--font-weight-medium, 500);
 }
+
 .advanced-ui-font-normal {
   font-weight: var(--font-weight-normal, 400);
 }
@@ -967,12 +973,15 @@
 .advanced-ui-text-primary {
   color: var(--nav-item-selected);
 }
+
 .advanced-ui-text-error {
   color: var(--form-border-error);
 }
+
 .advanced-ui-text-success {
   color: var(--color-success, #4caf50);
 }
+
 .advanced-ui-text-muted {
   color: var(--color-gray-500, #999);
 }
@@ -980,12 +989,15 @@
 .advanced-ui-bg-primary {
   background-color: var(--nav-item-selected);
 }
+
 .advanced-ui-bg-error {
   background-color: var(--form-border-error);
 }
+
 .advanced-ui-bg-success {
   background-color: var(--color-success, #4caf50);
 }
+
 .advanced-ui-bg-muted {
   background-color: var(--color-gray-100, #f5f5f5);
 }
@@ -996,10 +1008,6 @@
 .chart-container,
 .tooltip {
   contain: layout style;
-}
-
-.modal-backdrop {
-  contain: strict;
 }
 
 /* Reduce repaints during interactions */
@@ -1020,7 +1028,7 @@
 .modal-title,
 .chart-title,
 .form-label {
-  text-rendering: optimizeLegibility;
+  text-rendering: optimizelegibility;
   font-feature-settings: "kern" 1;
 }
 
@@ -1054,12 +1062,12 @@
 /* High Contrast Mode Enhancements */
 @media (prefers-contrast: high) {
   :root {
-    --modal-border: #000000;
-    --nav-border: #000000;
-    --form-border: #000000;
-    --form-border-focus: #0066cc;
-    --form-border-error: #cc0000;
-    --nav-item-selected: #000000;
+    --modal-border: #000;
+    --nav-border: #000;
+    --form-border: #000;
+    --form-border-focus: #06c;
+    --form-border-error: #c00;
+    --nav-item-selected: #000;
     --focus-ring-width: 3px;
   }
 
@@ -1074,31 +1082,26 @@
   }
 
   .nav-item.selected {
-    background: #000000;
-    color: #ffffff;
+    background: #000;
+    color: #fff;
   }
 
   .modal-button.primary {
-    background: #000000;
-    color: #ffffff;
-    border: 2px solid #000000;
+    background: #000;
+    color: #fff;
+    border: 2px solid #000;
   }
 
   .modal-button.secondary {
-    background: #ffffff;
-    color: #000000;
-    border: 2px solid #000000;
+    background: #fff;
+    color: #000;
+    border: 2px solid #000;
   }
 }
 
 /* Focus Management and Keyboard Navigation */
 .modal-dialog[tabindex="-1"]:focus {
   outline: none;
-}
-
-.navigation-menu {
-  /* Ensure proper focus flow */
-  isolation: isolate;
 }
 
 /* Skip Links for Modal */
@@ -1187,6 +1190,7 @@
     font-size: calc(
       var(--font-size-base, 16px) * var(--component-font-scale)
     ); /* Prevent zoom on iOS */
+
     min-height: var(--touch-target-min);
   }
 
@@ -1333,7 +1337,7 @@
 }
 
 /* Mobile responsive styles - using media.css breakpoints */
-@media only screen and (max-width: 767px) {
+@media only screen and (width <= 767px) {
   .modal-backdrop {
     padding: calc(var(--component-padding) * 0.5);
     padding-top: var(--component-padding);
@@ -1363,7 +1367,7 @@
 }
 
 /* Small mobile adjustments - using media.css mobile breakpoints */
-@media only screen and (max-width: 479px) {
+@media only screen and (width <= 479px) {
   .modal-backdrop {
     padding: calc(var(--component-padding) * 0.25);
     padding-top: calc(var(--component-padding) * 0.5);
@@ -1381,7 +1385,7 @@
 }
 
 /* Tablet responsive enhancements - using media.css tablet breakpoints */
-@media only screen and (min-width: 768px) and (max-width: 1279px) {
+@media only screen and (width >= 768px) and (width <= 1279px) {
   .modal-dialog {
     min-width: calc(400px * var(--component-font-scale));
     max-width: 85vw;
@@ -1409,7 +1413,7 @@
 }
 
 /* Laptop/Desktop responsive enhancements - using media.css laptop+ breakpoints */
-@media only screen and (min-width: 1280px) {
+@media only screen and (width >= 1280px) {
   .modal-dialog {
     min-width: calc(500px * var(--component-font-scale));
     max-width: min(800px, 80vw);
@@ -1442,26 +1446,11 @@
   z-index: 21;
 }
 
-/* Animation for layout changes */
-.modal-footer {
-  transition: all var(--transition-normal, 0.2s) ease-in-out;
-}
-
 .modal-footer .modal-button {
   transition: all var(--transition-fast, 0.15s) ease-in-out;
 }
 
 /* ===== MODAL LAYOUT SAFETY & EDGE CASES ===== */
-
-/* Ensure modal backdrop uses flexbox for centering */
-.modal-backdrop {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: var(--component-padding);
-  padding-top: calc(var(--component-padding) * 2);
-  overflow-y: auto;
-}
 
 /* Reset modal-dialog positioning when inside flexbox backdrop */
 .modal-backdrop .modal-dialog {
@@ -1471,11 +1460,6 @@
   transform: none;
   margin: auto;
   max-height: calc(100vh - calc(var(--component-padding) * 4));
-}
-
-/* Handle very tall content */
-.modal-dialog {
-  max-height: 95vh; /* Increase from 90vh for better usability */
 }
 
 /* Ensure modal parts have proper border radius inheritance */
@@ -1522,23 +1506,20 @@
 /* ===== DARK MODE SUPPORT ===== */
 body.dark-mode {
   /* Dark mode custom properties override */
-  --modal-backdrop: rgba(0, 0, 0, 0.8);
+  --modal-backdrop: rgb(0 0 0 / 80%);
   --modal-background: var(--theme-bg-secondary);
   --modal-border: var(--theme-border);
-  --modal-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-
+  --modal-shadow: 0 20px 40px rgb(0 0 0 / 50%);
   --nav-background: var(--theme-bg-secondary);
   --nav-border: var(--theme-border);
   --nav-item-hover: var(--theme-bg-primary);
   --nav-item-selected: var(--color-primary);
   --nav-item-focus: var(--color-primary);
-
   --form-background: var(--theme-bg-primary);
   --form-border: var(--theme-border);
   --form-border-focus: var(--color-primary);
   --form-border-error: var(--color-error);
   --form-disabled-bg: var(--theme-bg-secondary);
-
   --tooltip-background: var(--theme-bg-primary);
   --tooltip-text: var(--theme-text-primary);
 }
@@ -1598,7 +1579,7 @@ body.dark-mode .nav-item:hover:not(.disabled) {
 }
 
 body.dark-mode .nav-item.selected {
-  background: rgba(74, 158, 255, 0.1);
+  background: rgb(74 158 255 / 10%);
   color: var(--color-primary);
   border-left-color: var(--color-primary);
 }
@@ -1657,7 +1638,7 @@ body.dark-mode .form-input:focus,
 body.dark-mode .form-select:focus,
 body.dark-mode .form-textarea:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
+  box-shadow: 0 0 0 2px rgb(74 158 255 / 20%);
 }
 
 body.dark-mode .form-input.error,

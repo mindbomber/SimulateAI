@@ -19,7 +19,7 @@
   padding: 3rem 0;
   background: white;
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgb(0 0 0 / 10%);
 }
 
 .about-title {
@@ -52,16 +52,19 @@
   border-radius: 12px;
   padding: 3rem;
   margin-bottom: 2rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 5%);
+  border: 1px solid rgb(0 0 0 / 5%);
 }
 
-.section-title {
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-semibold);
+/* About page section titles - specific to about content */
+.about-page .section-title,
+.about-content .section-title {
+  font-size: calc(1.8rem * var(--font-scale, 1));
+  font-weight: 700;
   color: var(--color-gray-900);
-  margin-bottom: var(--spacing-6);
-  line-height: 1.3;
+  margin-bottom: var(--spacing-4);
+  text-align: center;
+  position: relative;
 }
 
 .section-content {
@@ -94,7 +97,7 @@
 .feature-card:hover {
   border-color: var(--primary-accent, #3498db);
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(52, 152, 219, 0.15);
+  box-shadow: 0 8px 24px rgb(52 152 219 / 15%);
 }
 
 .feature-title {
@@ -157,7 +160,7 @@
 .audience-card:hover {
   border-color: var(--primary-accent, #3498db);
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(52, 152, 219, 0.15);
+  box-shadow: 0 8px 24px rgb(52 152 219 / 15%);
 }
 
 .audience-icon {
@@ -214,7 +217,7 @@
   background: var(--primary-dark, #2980b9);
   border-color: var(--primary-dark, #2980b9);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(52, 152, 219, 0.3);
+  box-shadow: 0 8px 24px rgb(52 152 219 / 30%);
 }
 
 .cta-button.secondary {
@@ -227,7 +230,7 @@
   background: var(--primary-accent, #3498db);
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(52, 152, 219, 0.3);
+  box-shadow: 0 8px 24px rgb(52 152 219 / 30%);
 }
 
 /* Footer Styles */
@@ -246,6 +249,7 @@
 
 .footer-content {
   /* Footer styles managed by professional-footer.js component */
+
   /* See src/styles/footer.css for all footer styling */
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -286,7 +290,7 @@
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .about-container {
     padding: 0 1rem;
   }
@@ -307,7 +311,8 @@
     padding: 2rem;
   }
 
-  .section-title {
+  .about-page .section-title,
+  .about-content .section-title {
     font-size: 2rem;
   }
 
@@ -328,7 +333,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .about-hero {
     padding: 2rem 1rem;
   }
@@ -345,7 +350,8 @@
     padding: 1.5rem;
   }
 
-  .section-title {
+  .about-page .section-title,
+  .about-content .section-title {
     font-size: 1.8rem;
   }
 
@@ -393,7 +399,8 @@ body.dark-mode .about-section {
   box-shadow: 0 4px 16px var(--theme-shadow);
 }
 
-body.dark-mode .section-title {
+body.dark-mode .about-page .section-title,
+body.dark-mode .about-content .section-title {
   color: var(--theme-text-primary);
 }
 

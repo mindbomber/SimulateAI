@@ -43,8 +43,8 @@
   background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
   border-radius: 8px 0 0 8px;
   box-shadow:
-    0 4px 20px rgba(108, 92, 231, 0.3),
-    0 2px 8px rgba(0, 0, 0, 0.1);
+    0 4px 20px rgb(108 92 231 / 30%),
+    0 2px 8px rgb(0 0 0 / 10%);
   overflow: hidden;
   transform: translateX(calc(100% - var(--floating-tab-protrusion, 90px)));
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -53,15 +53,15 @@
   cursor: pointer;
   user-select: none;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgb(255 255 255 / 10%);
   border-right: none;
   pointer-events: auto; /* Enable pointer events only on the tab itself */
 }
 
 .floating-tour-tab:hover {
   box-shadow:
-    0 8px 30px rgba(108, 92, 231, 0.4),
-    0 4px 12px rgba(0, 0, 0, 0.15);
+    0 8px 30px rgb(108 92 231 / 40%),
+    0 4px 12px rgb(0 0 0 / 15%);
 }
 
 .floating-tour-tab.expanded {
@@ -103,6 +103,7 @@
     transform: scale(1);
     filter: brightness(1);
   }
+
   50% {
     transform: scale(1.05);
     filter: brightness(1.1);
@@ -162,7 +163,7 @@
 .floating-tour-tab-ripple {
   position: absolute;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.6);
+  background: rgb(255 255 255 / 60%);
   pointer-events: none;
   transform: scale(0);
   z-index: 1;
@@ -177,6 +178,7 @@
     transform: scale(0);
     opacity: 1;
   }
+
   100% {
     transform: scale(4);
     opacity: 0;
@@ -197,10 +199,12 @@
     transform: translateX(calc(100% - var(--floating-tab-protrusion, 90px)))
       scale(1);
   }
+
   50% {
     transform: translateX(calc(100% - var(--floating-tab-protrusion, 90px)))
       scale(1.05);
   }
+
   100% {
     transform: translateX(calc(100% - var(--floating-tab-protrusion, 90px)))
       scale(1);
@@ -212,11 +216,13 @@
   100% {
     transform: translateX(calc(100% - var(--floating-tab-protrusion, 90px)));
   }
+
   25% {
     transform: translateX(
       calc(100% - var(--floating-tab-protrusion, 90px) + 5px)
     );
   }
+
   75% {
     transform: translateX(
       calc(100% - var(--floating-tab-protrusion, 90px) - 5px)
@@ -237,9 +243,11 @@
   0% {
     transform: translateX(0) scale(1);
   }
+
   50% {
     transform: translateX(0) scale(1.02);
   }
+
   100% {
     transform: translateX(0) scale(1);
   }
@@ -250,9 +258,11 @@
   100% {
     transform: translateX(0);
   }
+
   25% {
     transform: translateX(5px);
   }
+
   75% {
     transform: translateX(-5px);
   }
@@ -265,17 +275,19 @@
 
 .floating-tour-tab-link:focus .floating-tour-tab {
   box-shadow:
-    0 8px 30px rgba(108, 92, 231, 0.4),
-    0 4px 12px rgba(0, 0, 0, 0.15),
-    0 0 0 3px rgba(108, 92, 231, 0.5);
+    0 8px 30px rgb(108 92 231 / 40%),
+    0 4px 12px rgb(0 0 0 / 15%),
+    0 0 0 3px rgb(108 92 231 / 50%);
 }
 
 /* ===== DEVICE-SPECIFIC ADJUSTMENTS ===== */
+
 /* The media.css file handles all the responsive variables */
+
 /* These are just component-specific overrides if needed */
 
 /* Mobile-specific icon adjustments */
-@media only screen and (max-width: 767px) {
+@media only screen and (width <= 767px) {
   .floating-tour-tab-icon {
     width: calc(24px * var(--font-scale, 1));
     height: calc(24px * var(--font-scale, 1));
@@ -295,7 +307,7 @@
 }
 
 /* Tablet-specific adjustments */
-@media only screen and (min-width: 768px) and (max-width: 1279px) {
+@media only screen and (width >= 768px) and (width <= 1279px) {
   .floating-tour-tab-icon {
     width: calc(26px * var(--font-scale, 1));
     height: calc(26px * var(--font-scale, 1));
@@ -304,7 +316,7 @@
 }
 
 /* Desktop-specific adjustments */
-@media only screen and (min-width: 1280px) {
+@media only screen and (width >= 1280px) {
   .floating-tour-tab-icon {
     width: calc(32px * var(--font-scale, 1));
     height: calc(32px * var(--font-scale, 1));
@@ -327,14 +339,14 @@
 @media (prefers-contrast: high) {
   .floating-tour-tab {
     background: linear-gradient(135deg, #4c3dc7 0%, #8288fe 100%);
-    border: var(--border-width, 2px) solid rgba(255, 255, 255, 0.5);
+    border: var(--border-width, 2px) solid rgb(255 255 255 / 50%);
   }
 
   .floating-tour-tab-link:focus .floating-tour-tab {
     box-shadow:
-      0 8px 30px rgba(108, 92, 231, 0.6),
-      0 4px 12px rgba(0, 0, 0, 0.25),
-      0 0 0 var(--focus-ring-width, 4px) rgba(255, 255, 255, 0.8);
+      0 8px 30px rgb(108 92 231 / 60%),
+      0 4px 12px rgb(0 0 0 / 25%),
+      0 0 0 var(--focus-ring-width, 4px) rgb(255 255 255 / 80%);
   }
 }
 
@@ -365,16 +377,16 @@
 /* ===== DARK MODE SUPPORT ===== */
 body.dark-mode .floating-tour-tab {
   background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
-  border: 1px solid rgba(108, 92, 231, 0.3);
+  border: 1px solid rgb(108 92 231 / 30%);
   box-shadow:
-    0 4px 20px rgba(162, 155, 254, 0.3),
-    0 2px 8px rgba(0, 0, 0, 0.3);
+    0 4px 20px rgb(162 155 254 / 30%),
+    0 2px 8px rgb(0 0 0 / 30%);
 }
 
 body.dark-mode .floating-tour-tab:hover {
   box-shadow:
-    0 6px 30px rgba(162, 155, 254, 0.4),
-    0 4px 12px rgba(0, 0, 0, 0.4);
+    0 6px 30px rgb(162 155 254 / 40%),
+    0 4px 12px rgb(0 0 0 / 40%);
 }
 
 body.dark-mode .floating-tour-tab-content,

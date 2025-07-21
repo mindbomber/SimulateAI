@@ -83,7 +83,7 @@ body.dark-mode input[type="email"]:focus,
 body.dark-mode input[type="password"]:focus,
 body.dark-mode .custom-input:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
+  box-shadow: 0 0 0 2px rgb(74 158 255 / 20%);
 }
 
 body.dark-mode input[type="text"]::placeholder,

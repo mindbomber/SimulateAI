@@ -21,7 +21,7 @@
 }
 
 /* Mobile responsiveness */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .nav-user-profile {
     flex-direction: column;
     gap: 8px;
@@ -99,7 +99,7 @@ body.dark-mode .user-greeting {
 
 body.dark-mode .community-feature {
   border-color: var(--color-accent);
-  background: linear-gradient(135deg, rgba(74, 158, 255, 0.1) 10%, transparent);
+  background: linear-gradient(135deg, rgb(74 158 255 / 10%) 10%, transparent);
 }
 
 body.dark-mode .community-feature[data-auth-required] {

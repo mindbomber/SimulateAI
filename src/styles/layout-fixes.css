@@ -30,13 +30,12 @@
   display: flex;
   flex-direction: column;
   padding: var(--container-padding, 20px);
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden auto;
   height: auto;
   min-height: 400px;
   max-height: 80vh;
   flex: 1;
-  background: var(--modal-background, #ffffff);
+  background: var(--modal-background, #fff);
 }
 
 /* Simulation container layout */
@@ -114,7 +113,7 @@
 }
 
 /* Hero responsive breakpoints using media.css device categories */
-@media only screen and (min-width: 768px) {
+@media only screen and (width >= 768px) {
   .main-content .hero {
     grid-template-columns: 1fr 1fr;
     padding: calc(var(--container-padding) * 1.25) var(--container-padding);
@@ -123,7 +122,7 @@
   }
 }
 
-@media only screen and (min-width: 1024px) {
+@media only screen and (width >= 1024px) {
   .main-content .hero {
     padding: calc(var(--container-padding) * 1.5) var(--container-padding);
     gap: calc(var(--container-padding) * 1);
@@ -131,7 +130,7 @@
   }
 }
 
-@media only screen and (min-width: 1280px) {
+@media only screen and (width >= 1280px) {
   .main-content .hero {
     padding: calc(var(--container-padding) * 1.75) var(--container-padding);
     gap: calc(var(--container-padding) * 1.25);
@@ -151,15 +150,15 @@
   font-size: calc(1.125rem * var(--font-scale, 1));
 }
 
-@media only screen and (min-width: 768px) {
+@media only screen and (width >= 768px) {
   .main-content .hero .hero-content {
-    text-align: left;
+    text-align: center; /* Changed from left to center for consistent centering */
   }
 }
 
 /* Hero simulation container - fully responsive with media.css integration */
 .main-content .hero .hero-simulation {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
   border-radius: var(--radius-xl);
   padding: calc(var(--container-padding) * 0.75);
   backdrop-filter: blur(10px);
@@ -173,21 +172,21 @@
 }
 
 /* Hero simulation responsive sizing using device-specific scaling */
-@media only screen and (max-width: 767px) {
+@media only screen and (width <= 767px) {
   .main-content .hero .hero-simulation {
     padding: calc(var(--container-padding) * 0.5);
     min-height: calc(250px + var(--container-padding));
   }
 }
 
-@media only screen and (min-width: 768px) {
+@media only screen and (width >= 768px) {
   .main-content .hero .hero-simulation {
     padding: calc(var(--container-padding) * 0.75);
     min-height: calc(350px + (var(--container-padding) * 1.5));
   }
 }
 
-@media only screen and (min-width: 1024px) {
+@media only screen and (width >= 1024px) {
   .main-content .hero .hero-simulation {
     padding: calc(var(--container-padding) * 1);
     min-height: calc(400px + (var(--container-padding) * 2));
@@ -211,13 +210,13 @@
 #app .hero-demo-container {
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(248, 250, 252, 0.95) 100%
+    rgb(255 255 255 / 95%) 0%,
+    rgb(248 250 252 / 95%) 100%
   );
   border-radius: 16px;
   padding: calc(var(--container-padding) * 0.75);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 25px rgb(0 0 0 / 10%);
+  border: 1px solid rgb(255 255 255 / 30%);
   backdrop-filter: blur(10px);
   max-width: 100%;
   margin: 0 auto;
@@ -241,7 +240,7 @@
   font-size: calc(1.25rem * var(--font-scale, 1));
   font-weight: 700;
   color: var(--color-gray-900, #1a202c);
-  margin: 0 0 calc(var(--container-padding) * 0.25) 0;
+  margin: 0 0 calc(var(--container-padding) * 0.25);
 }
 
 .main-content .demo-subtitle,
@@ -262,7 +261,7 @@
   align-items: start;
 }
 
-@media only screen and (min-width: 768px) {
+@media only screen and (width >= 768px) {
   .main-content .demo-content,
   #app .demo-content {
     grid-template-columns: 1.3fr 1fr;
@@ -270,7 +269,7 @@
   }
 }
 
-@media only screen and (min-width: 1024px) {
+@media only screen and (width >= 1024px) {
   .main-content .demo-content,
   #app .demo-content {
     grid-template-columns: 1.5fr 1fr;
@@ -281,10 +280,10 @@
 /* ===== SCENARIO PANEL ===== */
 
 .scenario-panel {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgb(255 255 255 / 80%);
   border-radius: 12px;
   padding: 1rem;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid rgb(0 0 0 / 5%);
 }
 
 .scenario-header {
@@ -295,7 +294,7 @@
   font-size: calc(1rem * var(--font-scale, 1));
   font-weight: 600;
   color: var(--color-gray-800, #2d3748);
-  margin: 0 0 0.25rem 0;
+  margin: 0 0 0.25rem;
 }
 
 .scenario-question {
@@ -315,8 +314,8 @@
 /* ===== CHOICE BUTTONS ===== */
 
 .choice-btn {
-  background: rgba(255, 255, 255, 0.9);
-  border: 2px solid rgba(59, 130, 246, 0.2);
+  background: rgb(255 255 255 / 90%);
+  border: 2px solid rgb(59 130 246 / 20%);
   border-radius: 8px;
   padding: 0.5rem 0.75rem;
   text-align: left;
@@ -326,14 +325,14 @@
 }
 
 .choice-btn:hover {
-  border-color: rgba(59, 130, 246, 0.4);
-  background: rgba(59, 130, 246, 0.05);
+  border-color: rgb(59 130 246 / 40%);
+  background: rgb(59 130 246 / 5%);
   transform: translateY(-1px);
 }
 
 .choice-btn.active {
   border-color: var(--color-primary, #3b82f6);
-  background: rgba(59, 130, 246, 0.1);
+  background: rgb(59 130 246 / 10%);
 }
 
 .choice-text {
@@ -353,17 +352,17 @@
 /* ===== ETHICS PANEL ===== */
 
 .ethics-panel {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgb(255 255 255 / 80%);
   border-radius: 12px;
   padding: 1rem;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid rgb(0 0 0 / 5%);
 }
 
 .ethics-title {
   font-size: calc(1rem * var(--font-scale, 1));
   font-weight: 600;
   color: var(--color-gray-800, #2d3748);
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 0.75rem;
 }
 
 .ethics-meters {
@@ -376,7 +375,7 @@
 /* ===== ETHICS METERS ===== */
 
 .ethics-meter {
-  background: rgba(255, 255, 255, 0.6);
+  background: rgb(255 255 255 / 60%);
   border-radius: 8px;
   padding: 0.5rem;
 }
@@ -402,7 +401,7 @@
 
 .meter-bar {
   height: 6px;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgb(0 0 0 / 10%);
   border-radius: 3px;
   overflow: hidden;
   position: relative;
@@ -464,13 +463,13 @@
   border-radius: 8px;
   font-weight: 600;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
   cursor: pointer;
 }
 
 .demo-actions .btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 15%);
 }
 
 .demo-actions .btn-primary {
@@ -497,7 +496,7 @@
 /* ===== RESPONSIVE ADJUSTMENTS ===== */
 
 /* Mobile responsive demo actions */
-@media only screen and (max-width: 768px) {
+@media only screen and (width <= 768px) {
   .demo-actions {
     bottom: 1rem;
     right: 1rem;
@@ -510,7 +509,7 @@
   }
 }
 
-@media only screen and (max-width: 480px) {
+@media only screen and (width <= 480px) {
   .demo-actions {
     bottom: 0.75rem;
     right: 0.75rem;

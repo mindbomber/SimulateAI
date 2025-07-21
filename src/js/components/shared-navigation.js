@@ -1594,14 +1594,13 @@ class SharedNavigation {
     return `
             <header class="header" role="banner">
                 <div class="header-container">
-                    <div class="logo">
-                        <img src="src/assets/icons/logo.svg" alt="SimulateAI Educational Platform" class="logo-image">
-                        <h1 class="site-title">SimulateAI</h1>
-                    </div>
+                    <a href="index.html" class="logo" aria-label="SimulateAI - Go to homepage">
+                        <img src="src/assets/icons/logo.svg" alt="SimulateAI Educational Platform" class="logo-image logo-full">
+                        <img src="src/assets/icons/logo-compact.svg" alt="SimulateAI" class="logo-image logo-compact">
+                    </a>
                     <nav class="main-nav" role="navigation" aria-label="Main navigation" id="main-navigation">
                         <div class="nav-group nav-group-primary">
                             <ul class="nav-list">
-                                <li><a href="index.html" class="nav-link" data-page="home">Home</a></li>
                                 <li><a href="app.html" class="nav-link" data-page="scenarios">Scenarios</a></li>
                                 <li><a href="blog.html" class="nav-link" data-page="blog">Blog</a></li>
                                 <li><a href="profile.html" class="nav-link" data-page="profile">Profile</a></li>

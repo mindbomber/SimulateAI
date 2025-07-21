@@ -168,6 +168,28 @@
         z-index: 1;
       }
 
+      .hero-logo-container {
+        margin-bottom: 2rem;
+        animation: fadeInUp 1s ease-out;
+        position: relative;
+        width: 100%;
+        height: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .hero-logo {
+        width: auto;
+        height: clamp(80px, 12vw, 140px);
+        max-width: 600px;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+        display: block;
+      }
+
       .hero h1 {
         font-size: clamp(2.5rem, 5vw, 4rem);
         font-weight: 700;
@@ -477,6 +499,21 @@
 
       /* Mobile Responsiveness */
       @media (max-width: 768px) {
+        .hero-logo-container {
+          position: relative;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .hero-logo {
+          position: relative;
+          left: 50%;
+          transform: translateX(-50%);
+          display: block;
+        }
+
         .hero-actions {
           flex-direction: column;
           align-items: center;
@@ -536,6 +573,21 @@
       }
 
       @media (max-width: 480px) {
+        .hero-logo-container {
+          position: relative;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .hero-logo {
+          position: relative;
+          left: 50%;
+          transform: translateX(-50%);
+          display: block;
+        }
+
         .footer-wave {
           height: 30px;
           top: -30px;
@@ -863,7 +915,13 @@
       <div class="floating-emojis" id="floatingEmojis"></div>
 
       <div class="hero-content">
-        <h1>🌟 Welcome to SimulateAI</h1>
+        <div class="hero-logo-container">
+          <img
+            src="src/assets/icons/wordmark-dark.svg"
+            alt="SimulateAI"
+            class="hero-logo"
+          />
+        </div>
         <p class="hero-subtitle">
           Experience the future of ethical AI education through immersive,
           consequence-driven simulations that prepare learners for real-world

@@ -26,7 +26,7 @@
 }
 
 /* Tablet and up */
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .bias-simulation-container {
     flex-direction: row;
     gap: 20px;
@@ -42,7 +42,7 @@
 }
 
 /* Desktop and up */
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   .bias-simulation-enhanced {
     grid-template-columns: 300px 1fr 250px;
     grid-template-rows: auto;
@@ -54,13 +54,13 @@
   background: white;
   border-radius: 8px;
   padding: 15px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+  border: 1px solid rgb(255 255 255 / 20%);
   width: 100%;
 }
 
 .panel-title {
-  margin: 0 0 15px 0;
+  margin: 0 0 15px;
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--color-gray-900);
@@ -69,15 +69,15 @@
 }
 
 /* Tablet and up */
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .panel {
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
   }
 
   .panel-title {
-    margin: 0 0 20px 0;
+    margin: 0 0 20px;
     font-size: 1.25rem;
     padding-bottom: 10px;
   }
@@ -85,7 +85,7 @@
 
 /* Controls Panel */
 .controls-panel {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
 }
 
 .slider-container {
@@ -106,20 +106,20 @@
   border-radius: 3px;
   background: var(--color-gray-200);
   outline: none;
-  -webkit-appearance: none;
+  appearance: none;
   appearance: none;
   margin-bottom: 10px;
 }
 
 .slider-input::-webkit-slider-thumb {
-  -webkit-appearance: none;
+  appearance: none;
   appearance: none;
   width: 20px;
   height: 20px;
   border-radius: 50%;
   background: var(--color-primary);
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 20%);
   transition: all 0.2s ease;
 }
 
@@ -135,7 +135,7 @@
   background: var(--color-primary);
   cursor: pointer;
   border: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 20%);
 }
 
 .primary-button {
@@ -158,7 +158,7 @@
 
 .primary-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 124, 186, 0.3);
+  box-shadow: 0 8px 20px rgb(0 124 186 / 30%);
 }
 
 .primary-button:active {
@@ -167,13 +167,13 @@
 
 /* Results Panel */
 .results-panel {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
   overflow-y: auto;
   max-height: 600px;
 }
 
 .round-title {
-  margin: 0 0 20px 0;
+  margin: 0 0 20px;
   color: var(--color-primary);
   font-size: 1.1rem;
   font-weight: 600;
@@ -190,12 +190,12 @@
 
 .candidate-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 10%);
   border-color: var(--color-primary-light);
 }
 
 .candidate-info h4 {
-  margin: 0 0 10px 0;
+  margin: 0 0 10px;
   color: var(--color-gray-900);
   font-size: 1.1rem;
 }
@@ -208,15 +208,15 @@
 
 /* Statistics Panel */
 .stats-panel {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
 }
 
 .enhanced-meters-panel {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
 }
 
 .enhanced-meters-panel h3 {
-  margin: 0 0 20px 0;
+  margin: 0 0 20px;
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--color-gray-900);
@@ -276,11 +276,8 @@
 /* Feedback Modal */
 .feedback-modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  inset: 0;
+  background: rgb(0 0 0 / 70%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -295,12 +292,12 @@
   max-width: 600px;
   margin: 20px;
   text-align: center;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 60px rgb(0 0 0 / 30%);
+  border: 1px solid rgb(255 255 255 / 20%);
 }
 
 .feedback-content h3 {
-  margin: 0 0 20px 0;
+  margin: 0 0 20px;
   color: var(--color-primary);
   font-size: 1.5rem;
 }
@@ -323,7 +320,7 @@
 
 .feedback-content .btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 124, 186, 0.3);
+  box-shadow: 0 8px 20px rgb(0 124 186 / 30%);
 }
 
 /* Enhanced Interactive Features */
@@ -349,12 +346,12 @@
 .tab-button.active {
   color: var(--color-primary);
   border-bottom-color: var(--color-primary);
-  background: rgba(0, 124, 186, 0.05);
+  background: rgb(0 124 186 / 5%);
 }
 
 .tab-button:hover {
   color: var(--color-primary);
-  background: rgba(0, 124, 186, 0.05);
+  background: rgb(0 124 186 / 5%);
 }
 
 /* Bias simulation specific tab content - properly show active tabs by default */
@@ -376,7 +373,7 @@
 
 /* Enhanced Controls */
 .enhanced-controls-panel {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
 }
 
 .controls-content {
@@ -409,7 +406,7 @@
 .scenario-dropdown:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.1);
+  box-shadow: 0 0 0 3px rgb(0 124 186 / 10%);
 }
 
 .dataset-info {
@@ -444,19 +441,22 @@
 .stat-value.diversity-high {
   color: var(--color-success);
 }
+
 .stat-value.diversity-medium {
   color: var(--color-warning);
 }
+
 .stat-value.diversity-low {
   color: var(--color-error);
 }
+
 .stat-value.diversity-very-low {
   color: #d32f2f;
 }
 
 /* Enhanced Results Display */
 .enhanced-results-panel {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
 }
 
 .results-header {
@@ -519,13 +519,13 @@
 
 .candidate-card.interactive:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 25px rgb(0 0 0 / 15%);
   border-color: var(--color-primary-light);
 }
 
 .candidate-card.interactive.hovered {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.1);
+  box-shadow: 0 0 0 3px rgb(0 124 186 / 10%);
 }
 
 .candidate-header {
@@ -551,7 +551,7 @@
 }
 
 .candidate-basic-info h4 {
-  margin: 0 0 5px 0;
+  margin: 0 0 5px;
   color: var(--color-gray-900);
   font-size: 1.1rem;
 }
@@ -624,7 +624,7 @@
   display: flex;
   justify-content: space-between;
   padding: 8px 12px;
-  background: rgba(0, 124, 186, 0.05);
+  background: rgb(0 124 186 / 5%);
   border-radius: 6px;
 }
 
@@ -644,7 +644,7 @@
 }
 
 .bias-breakdown h5 {
-  margin: 0 0 10px 0;
+  margin: 0 0 10px;
   color: var(--color-gray-800);
   font-size: 1rem;
 }
@@ -672,7 +672,7 @@
 }
 
 .bias-factor.neutral {
-  background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
+  background: linear-gradient(135deg, #f5f5f5 0%, #eee 100%);
 }
 
 .factor-header {
@@ -696,9 +696,11 @@
 .factor-value.positive {
   color: var(--color-success);
 }
+
 .factor-value.negative {
   color: var(--color-error);
 }
+
 .factor-value.neutral {
   color: var(--color-gray-500);
 }
@@ -734,7 +736,7 @@
 
 .candidate-action-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 124, 186, 0.3);
+  box-shadow: 0 4px 12px rgb(0 124 186 / 30%);
 }
 
 /* Rejected Candidates */
@@ -849,7 +851,7 @@
 }
 
 .analytics-insights h5 {
-  margin: 0 0 15px 0;
+  margin: 0 0 15px;
   color: var(--color-gray-800);
 }
 
@@ -907,7 +909,7 @@
 .config-card:hover {
   border-color: var(--color-primary-light);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
 }
 
 .config-header {
@@ -917,7 +919,7 @@
 }
 
 .config-header h6 {
-  margin: 0 0 5px 0;
+  margin: 0 0 5px;
   color: var(--color-gray-900);
 }
 
@@ -956,7 +958,7 @@
   border: 1px solid var(--color-success);
   border-radius: 8px;
   padding: 15px 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
   z-index: 1001;
   transition: opacity 0.3s ease;
 }
@@ -979,11 +981,8 @@
 /* Candidate Modal */
 .candidate-modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  inset: 0;
+  background: rgb(0 0 0 / 70%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -998,7 +997,7 @@
   max-height: 80vh;
   overflow-y: auto;
   margin: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px rgb(0 0 0 / 30%);
 }
 
 .modal-header {
@@ -1058,7 +1057,7 @@
 }
 
 .bias-analysis-section h4 {
-  margin: 0 0 15px 0;
+  margin: 0 0 15px;
   color: var(--color-gray-800);
 }
 
@@ -1103,6 +1102,7 @@
 .impact-value.positive {
   color: var(--color-success);
 }
+
 .impact-value.negative {
   color: var(--color-error);
 }
@@ -1143,7 +1143,7 @@
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .bias-simulation-container {
     flex-direction: column;
     gap: 15px;

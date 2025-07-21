@@ -53,7 +53,7 @@
 }
 
 .benefit-text h3 {
-  margin: 0 0 0.25rem 0;
+  margin: 0 0 0.25rem;
   color: var(--text-primary);
   font-size: 1rem;
 }
@@ -111,7 +111,7 @@
 .google-btn:hover:not(:disabled) {
   background: #f8f9fa;
   border-color: #c5c7ca;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
 }
 
 /* Facebook Button */
@@ -122,7 +122,7 @@
 
 .facebook-btn:hover:not(:disabled) {
   background: #166fe5;
-  box-shadow: 0 2px 4px rgba(24, 119, 242, 0.3);
+  box-shadow: 0 2px 4px rgb(24 119 242 / 30%);
 }
 
 /* Twitter Button */
@@ -133,7 +133,7 @@
 
 .twitter-btn:hover:not(:disabled) {
   background: #0d95e8;
-  box-shadow: 0 2px 4px rgba(29, 161, 242, 0.3);
+  box-shadow: 0 2px 4px rgb(29 161 242 / 30%);
 }
 
 /* GitHub Button */
@@ -144,7 +144,7 @@
 
 .github-btn:hover:not(:disabled) {
   background: #24292e;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 30%);
 }
 
 /* Authentication Divider */
@@ -232,7 +232,7 @@
 .email-form input:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+  box-shadow: 0 0 0 3px rgb(26 115 232 / 10%);
 }
 
 .email-form .btn {
@@ -273,7 +273,7 @@
 .google-signin-btn:hover {
   background: #f8f9fa;
   border-color: #c5c7ca;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
 }
 
 .google-signin-btn:disabled {
@@ -316,7 +316,7 @@
   background: white;
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
   min-width: 180px;
   z-index: 1000;
   display: none;
@@ -352,7 +352,7 @@
 
 /* User Tier Styles */
 .tier-0 {
-  color: #666666;
+  color: #666;
 }
 
 .tier-1 {
@@ -480,11 +480,11 @@
 }
 
 .blog-post-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
 }
 
 .post-header h2 {
-  margin: 0 0 1rem 0;
+  margin: 0 0 1rem;
   color: var(--text-primary);
   font-size: 1.3rem;
 }
@@ -546,7 +546,7 @@
 
 .category-card:hover {
   border-color: var(--primary-color);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
 }
 
 .category-card.locked {
@@ -560,13 +560,13 @@
 }
 
 .category-card h3 {
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.5rem;
   color: var(--text-primary);
 }
 
 .category-card p {
   color: var(--text-secondary);
-  margin: 0 0 1rem 0;
+  margin: 0 0 1rem;
   font-size: 0.9rem;
 }
 
@@ -623,7 +623,7 @@
 }
 
 .thread-main h3 {
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.5rem;
   color: var(--text-primary);
   font-size: 1.1rem;
 }
@@ -671,7 +671,7 @@
 .form-control:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.1);
+  box-shadow: 0 0 0 2px rgb(26 115 232 / 10%);
 }
 
 .form-control[rows] {
@@ -681,7 +681,7 @@
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .auth-benefits {
     gap: 0.75rem;
   }
@@ -765,7 +765,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.4),
+    rgb(255 255 255 / 40%),
     transparent
   );
   animation: loading 1.5s infinite;
@@ -775,6 +775,7 @@
   0% {
     left: -100%;
   }
+
   100% {
     left: 100%;
   }
@@ -802,7 +803,7 @@ body.dark-mode .benefit-item {
 }
 
 body.dark-mode .benefit-icon {
-  background: rgba(74, 158, 255, 0.1);
+  background: rgb(74 158 255 / 10%);
   color: var(--color-primary);
 }
 
@@ -832,7 +833,7 @@ body.dark-mode .form-input {
 
 body.dark-mode .form-input:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
+  box-shadow: 0 0 0 2px rgb(74 158 255 / 20%);
 }
 
 body.dark-mode .form-input::placeholder {
@@ -965,8 +966,8 @@ body.dark-mode .feature-description {
 
 /* Privacy notice */
 body.dark-mode .privacy-notice {
-  background: rgba(74, 158, 255, 0.1);
-  border: 1px solid rgba(74, 158, 255, 0.3);
+  background: rgb(74 158 255 / 10%);
+  border: 1px solid rgb(74 158 255 / 30%);
   color: var(--theme-text-primary);
 }
 
@@ -1006,7 +1007,7 @@ body.dark-mode .google-signin-btn[disabled]::after {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.2),
+    rgb(255 255 255 / 20%),
     transparent
   );
 }

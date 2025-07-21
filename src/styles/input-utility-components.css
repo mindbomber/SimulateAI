@@ -40,7 +40,7 @@
   background: white;
   border: 1px solid #dee2e6;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
   padding: 16px;
   z-index: 1000;
   min-width: 280px;
@@ -112,7 +112,7 @@
 .datetime-picker-input:focus {
   outline: none;
   border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  box-shadow: 0 0 0 2px rgb(0 123 255 / 25%);
 }
 
 .datetime-picker-input::after {
@@ -131,7 +131,7 @@
   background: white;
   border: 1px solid #dee2e6;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
   z-index: 1000;
   min-width: 320px;
 }
@@ -158,7 +158,7 @@
 }
 
 .datetime-picker-nav:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
 }
 
 .datetime-picker-calendar {
@@ -254,7 +254,7 @@
 .number-input-field:focus {
   outline: none;
   border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  box-shadow: 0 0 0 2px rgb(0 123 255 / 25%);
 }
 
 .number-input-field:disabled {
@@ -377,7 +377,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgb(0 0 0 / 50%);
   z-index: 1000;
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -390,7 +390,7 @@
 .drawer {
   position: fixed;
   background: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
   z-index: 1001;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -505,7 +505,7 @@
 .search-box-input:focus {
   outline: none;
   border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  box-shadow: 0 0 0 2px rgb(0 123 255 / 25%);
 }
 
 .search-box-input:disabled {
@@ -576,7 +576,7 @@
   border: 1px solid #dee2e6;
   border-top: none;
   border-radius: 0 0 8px 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
   z-index: 1000;
   max-height: 200px;
   overflow-y: auto;
@@ -603,7 +603,7 @@
    RESPONSIVE DESIGN
    ============================================================================= */
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .datetime-picker-popup,
   .color-picker-popup {
     position: fixed;

@@ -24,8 +24,8 @@
   --color-info: #4285f4;
 
   /* ===== NEUTRAL SCALE ===== */
-  --color-white: #ffffff;
-  --color-black: #000000;
+  --color-white: #fff;
+  --color-black: #000;
   --color-gray-50: #f8f9fa;
   --color-gray-100: #f3f4f6;
   --color-gray-200: #e5e7eb;
@@ -69,7 +69,7 @@
 
   /* ===== FONT FAMILIES ===== */
   --font-family-sans:
-    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Inter", -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", sans-serif;
   --font-family-serif: "Georgia", "Times New Roman", serif;
   --font-family-mono:
@@ -124,17 +124,17 @@
   --border-width-8: 8px;
 
   /* ===== SHADOWS ===== */
-  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 5%);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 10%), 0 1px 2px 0 rgb(0 0 0 / 6%);
   --shadow-base:
-    0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -1px rgb(0 0 0 / 6%);
   --shadow-md:
-    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -2px rgb(0 0 0 / 5%);
   --shadow-lg:
-    0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  --shadow-2xl: 0 50px 100px -20px rgba(0, 0, 0, 0.25);
-  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+    0 20px 25px -5px rgb(0 0 0 / 10%), 0 10px 10px -5px rgb(0 0 0 / 4%);
+  --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 25%);
+  --shadow-2xl: 0 50px 100px -20px rgb(0 0 0 / 25%);
+  --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 6%);
 
   /* ===== LAYOUT DIMENSIONS ===== */
   --container-sm: 640px;
@@ -173,13 +173,13 @@
   --duration-500: 500ms;
   --duration-700: 700ms;
   --duration-1000: 1000ms;
-
   --ease-linear: linear;
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 
   /* ===== USER PREFERENCE INTEGRATION ===== */
+
   /* These will be dynamically updated by settings-manager.js */
   --user-font-size: var(--font-size-base);
   --user-font-scale: 1;
@@ -227,16 +227,16 @@ body.dark-mode {
   --color-on-surface-tertiary: #7d8590;
 
   /* Adjust shadows for dark mode */
-  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 30%);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 40%), 0 1px 2px 0 rgb(0 0 0 / 30%);
   --shadow-base:
-    0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+    0 4px 6px -1px rgb(0 0 0 / 40%), 0 2px 4px -1px rgb(0 0 0 / 30%);
   --shadow-md:
-    0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+    0 10px 15px -3px rgb(0 0 0 / 40%), 0 4px 6px -2px rgb(0 0 0 / 30%);
   --shadow-lg:
-    0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
-  --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  --shadow-2xl: 0 50px 100px -20px rgba(0, 0, 0, 0.5);
+    0 20px 25px -5px rgb(0 0 0 / 40%), 0 10px 10px -5px rgb(0 0 0 / 20%);
+  --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 50%);
+  --shadow-2xl: 0 50px 100px -20px rgb(0 0 0 / 50%);
 }
 
 /* ===== HIGH CONTRAST MODE ===== */
@@ -287,6 +287,7 @@ body.reduced-motion {
 }
 
 /* ===== FONT SIZE SCALING ===== */
+
 /* These classes will be applied by settings-manager.js */
 html.font-size-small {
   --user-font-scale: 0.875;

@@ -6,10 +6,7 @@
 /* Base modal styles */
 .enhanced-simulation-modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   z-index: 10000;
   display: flex;
   align-items: center;
@@ -26,11 +23,8 @@
 /* Modal backdrop */
 .enhanced-modal-backdrop {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  inset: 0;
+  background: rgb(0 0 0 / 60%);
   backdrop-filter: blur(2px);
 }
 
@@ -41,9 +35,9 @@
   height: 85vh;
   max-width: 1400px;
   max-height: 900px;
-  background: var(--modal-background, #ffffff);
+  background: var(--modal-background, #fff);
   border-radius: 12px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 40px rgb(0 0 0 / 30%);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -117,8 +111,8 @@
   width: 36px;
   height: 36px;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgb(255 255 255 / 10%);
+  border: 1px solid rgb(255 255 255 / 20%);
   color: white;
   display: flex;
   align-items: center;
@@ -128,7 +122,7 @@
 }
 
 .enhanced-modal-controls .btn-icon:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgb(255 255 255 / 20%);
   transform: translateY(-1px);
 }
 
@@ -157,13 +151,13 @@
 
 .enhanced-tab:hover {
   color: var(--color-gray-900, #111827);
-  background: rgba(59, 130, 246, 0.05);
+  background: rgb(59 130 246 / 5%);
 }
 
 .enhanced-tab.active {
   color: var(--color-primary, #2563eb);
   border-bottom-color: var(--color-primary, #2563eb);
-  background: rgba(59, 130, 246, 0.1);
+  background: rgb(59 130 246 / 10%);
 }
 
 .tab-icon {
@@ -202,7 +196,7 @@
   flex: 1;
   padding: 0; /* Removed padding to give more space */
   overflow: auto;
-  background: var(--modal-background, #ffffff);
+  background: var(--modal-background, #fff);
   min-height: 0; /* Allow container to shrink with flexbox */
 }
 
@@ -246,7 +240,7 @@
 }
 
 .ethics-description {
-  margin: 0 0 16px 0;
+  margin: 0 0 16px;
   font-size: 0.9rem;
   color: var(--color-gray-600, #6b7280);
 }
@@ -302,7 +296,7 @@
 }
 
 .resource-section h4 {
-  margin: 0 0 12px 0;
+  margin: 0 0 12px;
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--color-text);
@@ -347,7 +341,7 @@
 }
 
 .tab-content-header h3 {
-  margin: 0 0 8px 0;
+  margin: 0 0 8px;
   font-size: 1.3rem;
   font-weight: 600;
   color: var(--color-text);
@@ -374,7 +368,7 @@
 }
 
 .resource-category h4 {
-  margin: 0 0 16px 0;
+  margin: 0 0 16px;
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--color-text);
@@ -429,7 +423,7 @@
 }
 
 .decision-history h4 {
-  margin: 0 0 16px 0;
+  margin: 0 0 16px;
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--color-text);
@@ -456,7 +450,7 @@
 }
 
 .help-section h4 {
-  margin: 0 0 16px 0;
+  margin: 0 0 16px;
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--color-text);
@@ -507,7 +501,7 @@
 }
 
 /* Responsive design */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .enhanced-modal-container {
     width: 95vw;
     height: 90vh;
@@ -575,7 +569,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .enhanced-modal-container {
     width: 100vw;
     height: 100vh;
@@ -661,11 +655,11 @@
 body.dark-mode .enhanced-modal-container {
   background: var(--theme-bg-secondary);
   border: 1px solid var(--theme-border);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 20px 40px rgb(0 0 0 / 60%);
 }
 
 body.dark-mode .enhanced-modal-backdrop {
-  background: rgba(0, 0, 0, 0.8);
+  background: rgb(0 0 0 / 80%);
 }
 
 /* Modal header */
@@ -748,7 +742,7 @@ body.dark-mode .simulation-step-content {
 
 body.dark-mode .simulation-step.active {
   border-color: var(--color-primary);
-  box-shadow: 0 0 8px rgba(74, 158, 255, 0.3);
+  box-shadow: 0 0 8px rgb(74 158 255 / 30%);
 }
 
 /* Resource panel */
@@ -840,7 +834,7 @@ body.dark-mode .enhanced-input {
 
 body.dark-mode .enhanced-input:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
+  box-shadow: 0 0 0 2px rgb(74 158 255 / 20%);
 }
 
 body.dark-mode .enhanced-input::placeholder {

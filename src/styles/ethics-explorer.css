@@ -19,7 +19,7 @@
   color: white;
   padding: 2rem;
   text-align: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
 }
 
 .header-content {
@@ -27,7 +27,7 @@
 }
 
 .explorer-header h1 {
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.5rem;
   font-size: 2.5rem;
   font-weight: 700;
 }
@@ -53,7 +53,7 @@
 
 .stat-item {
   text-align: center;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
   padding: 0.75rem 1rem;
   border-radius: 8px;
   backdrop-filter: blur(10px);
@@ -75,7 +75,7 @@
 }
 
 .progress-bar {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgb(255 255 255 / 20%);
   height: 8px;
   border-radius: 4px;
   overflow: hidden;
@@ -86,7 +86,7 @@
   height: 100%;
   border-radius: 4px;
   transition: width 0.5s ease;
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 10px rgb(16 185 129 / 50%);
 }
 
 .explorer-main {
@@ -101,12 +101,12 @@
 
 /* Scenario Area */
 .scenario-area {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
   border-radius: 16px;
   padding: 0;
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.08),
-    0 0 0 1px rgba(255, 255, 255, 0.5);
+    0 8px 32px rgb(0 0 0 / 8%),
+    0 0 0 1px rgb(255 255 255 / 50%);
   overflow-y: auto;
   height: 100%;
   position: relative;
@@ -115,8 +115,8 @@
 
 .scenario-area:hover {
   box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.12),
-    0 0 0 1px rgba(255, 255, 255, 0.8);
+    0 12px 40px rgb(0 0 0 / 12%),
+    0 0 0 1px rgb(255 255 255 / 80%);
 }
 
 .scenario-area::before {
@@ -136,6 +136,7 @@
   100% {
     opacity: 0.8;
   }
+
   50% {
     opacity: 1;
   }
@@ -174,7 +175,7 @@
   font-size: 2rem;
   font-weight: 700;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
@@ -189,8 +190,8 @@
 
 .scenarios-grid {
   display: flex;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: auto hidden;
+
   /* Only apply scroll snap on horizontal axis and prevent it from affecting page */
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
@@ -199,6 +200,7 @@
   margin-bottom: 2rem;
   padding: 1rem;
   -webkit-overflow-scrolling: touch;
+
   /* Prevent this element from interfering with page scrolling */
   contain: layout style;
 
@@ -254,7 +256,7 @@
 }
 
 /* Desktop-specific enhancements */
-@media (min-width: 769px) {
+@media (width >= 769px) {
   .scenarios-grid {
     /* Enhanced scroll performance on desktop */
     scroll-behavior: auto; /* Override smooth for wheel events */
@@ -262,13 +264,14 @@
 
   .scenarios-grid:hover {
     /* Subtle indication that horizontal scrolling is available */
-    box-shadow: inset 0 0 0 1px rgba(74, 144, 226, 0.15);
+    box-shadow: inset 0 0 0 1px rgb(74 144 226 / 15%);
+
     /* Add a subtle gradient overlay to indicate scrollability */
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(74, 144, 226, 0.02) 5%,
-      rgba(74, 144, 226, 0.02) 95%,
+      rgb(74 144 226 / 2%) 5%,
+      rgb(74 144 226 / 2%) 95%,
       transparent 100%
     );
   }
@@ -276,7 +279,7 @@
   /* Enhanced visual feedback when actively scrolling */
   .scenarios-grid:active {
     cursor: grabbing;
-    box-shadow: inset 0 0 0 2px rgba(74, 144, 226, 0.2);
+    box-shadow: inset 0 0 0 2px rgb(74 144 226 / 20%);
   }
 
   /* Smoother transitions on desktop */
@@ -296,23 +299,24 @@
 @keyframes scroll-hint-pulse {
   0%,
   100% {
-    box-shadow: inset 0 0 0 1px rgba(74, 144, 226, 0.15);
+    box-shadow: inset 0 0 0 1px rgb(74 144 226 / 15%);
   }
+
   50% {
-    box-shadow: inset 0 0 0 1px rgba(74, 144, 226, 0.25);
+    box-shadow: inset 0 0 0 1px rgb(74 144 226 / 25%);
   }
 }
 
 .scenario-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
   color: #2d3748;
   padding: 0;
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.08),
-    0 0 0 1px rgba(203, 213, 225, 0.3);
+    0 2px 8px rgb(0 0 0 / 8%),
+    0 0 0 1px rgb(203 213 225 / 30%);
   overflow: hidden;
   position: relative;
   border: 1px solid #e2e8f0;
@@ -326,8 +330,8 @@
 .scenario-card:hover {
   transform: translateY(-4px);
   box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.12),
-    0 0 0 1px rgba(102, 126, 234, 0.2);
+    0 8px 24px rgb(0 0 0 / 12%),
+    0 0 0 1px rgb(102 126 234 / 20%);
   border-color: #667eea;
 }
 
@@ -335,8 +339,8 @@
   background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
   border-color: #10b981;
   box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.08),
-    0 0 0 1px rgba(16, 185, 129, 0.3);
+    0 2px 8px rgb(0 0 0 / 8%),
+    0 0 0 1px rgb(16 185 129 / 30%);
 }
 
 .scenario-card.completed::after {
@@ -354,9 +358,11 @@
     transform: scale(0.3);
     opacity: 0;
   }
+
   50% {
     transform: scale(1.1);
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
@@ -367,7 +373,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 1rem 1.5rem 0 1.5rem;
+  padding: 1rem 1.5rem 0;
 }
 
 .scenario-icon {
@@ -383,8 +389,8 @@
   font-weight: 600;
   text-transform: uppercase;
   color: #667eea;
-  background: rgba(102, 126, 234, 0.1);
-  border: 1px solid rgba(102, 126, 234, 0.2);
+  background: rgb(102 126 234 / 10%);
+  border: 1px solid rgb(102 126 234 / 20%);
 }
 
 .completion-badge {
@@ -397,17 +403,18 @@
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.7;
   }
 }
 
 .card-content {
-  padding: 0 1.5rem 1rem 1.5rem;
+  padding: 0 1.5rem 1rem;
 }
 
 .scenario-card h3 {
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 0.75rem;
   font-size: 1.4rem;
   font-weight: 700;
   color: #2d3748;
@@ -429,8 +436,8 @@
 }
 
 .challenge-info {
-  background: rgba(102, 126, 234, 0.05);
-  border: 1px solid rgba(102, 126, 234, 0.1);
+  background: rgb(102 126 234 / 5%);
+  border: 1px solid rgb(102 126 234 / 10%);
   border-radius: 8px;
   padding: 1rem;
   margin: 1rem 0;
@@ -467,7 +474,7 @@
 
 .progress-bar-small {
   flex: 1;
-  background: rgba(203, 213, 225, 0.3);
+  background: rgb(203 213 225 / 30%);
   height: 6px;
   border-radius: 3px;
   overflow: hidden;
@@ -507,10 +514,10 @@
 }
 
 .card-action {
-  background: rgba(102, 126, 234, 0.05);
+  background: rgb(102 126 234 / 5%);
   padding: 1rem 1.5rem;
   text-align: center;
-  border-top: 1px solid rgba(203, 213, 225, 0.3);
+  border-top: 1px solid rgb(203 213 225 / 30%);
   margin-top: auto;
 }
 
@@ -553,13 +560,13 @@
   background: white;
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px rgb(0 0 0 / 5%);
   transition: all 0.3s ease;
 }
 
 .tip-item:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 15px rgb(0 0 0 / 10%);
 }
 
 .tip-icon {
@@ -596,7 +603,7 @@
   border-radius: 12px;
   border-left: 4px solid #667eea;
   position: relative;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 5%);
 }
 
 .scenario-header::before {
@@ -608,7 +615,7 @@
   background: white;
   padding: 0.5rem;
   border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -624,9 +631,11 @@
     transform: scale(0.3);
     opacity: 0;
   }
+
   50% {
     transform: scale(1.1);
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
@@ -643,7 +652,7 @@
 .scenario-setting {
   color: #718096;
   font-size: 1rem;
-  margin: 0.5rem 0 0 0;
+  margin: 0.5rem 0 0;
   font-style: italic;
 }
 
@@ -675,7 +684,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.4),
+    rgb(255 255 255 / 40%),
     transparent
   );
   transition: left 0.5s ease;
@@ -684,7 +693,7 @@
 .back-btn:hover {
   background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
   transform: translateX(-3px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
 }
 
 .back-btn:hover::before {
@@ -711,11 +720,8 @@
 .scenario-area.loading::after {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.8);
+  inset: 0;
+  background: rgb(255 255 255 / 80%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -737,6 +743,7 @@
   from {
     transform: translate(-50%, -50%) rotate(0deg);
   }
+
   to {
     transform: translate(-50%, -50%) rotate(360deg);
   }
@@ -769,7 +776,7 @@
 }
 
 /* Responsive Enhancements for Scenario Area */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .scenario-area {
     border-radius: 12px;
   }
@@ -904,11 +911,11 @@ body.dark-mode .explorer-header h1 {
 }
 
 body.dark-mode .explorer-subtitle {
-  color: rgba(255, 255, 255, 0.9);
+  color: rgb(255 255 255 / 90%);
 }
 
 body.dark-mode .stat-item {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
   backdrop-filter: blur(10px);
 }
 
@@ -917,11 +924,11 @@ body.dark-mode .stat-value {
 }
 
 body.dark-mode .stat-label {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgb(255 255 255 / 80%);
 }
 
 body.dark-mode .progress-bar {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgb(255 255 255 / 20%);
 }
 
 body.dark-mode .progress-fill {
@@ -953,7 +960,7 @@ body.dark-mode .scenario-selection h2 {
     var(--theme-accent) 0%,
     var(--theme-accent-dark) 100%
   );
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
@@ -1022,7 +1029,7 @@ body.dark-mode .scenario-context {
 
 body.dark-mode .difficulty-badge {
   color: var(--theme-accent);
-  background: rgba(var(--theme-accent-rgb), 0.1);
+  background: rgb(var(--theme-accent-rgb), 0.1);
 }
 
 body.dark-mode .completion-badge {

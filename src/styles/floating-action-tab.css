@@ -43,8 +43,8 @@
   background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
   border-radius: 8px 0 0 8px;
   box-shadow:
-    0 4px 20px rgba(238, 90, 82, 0.3),
-    0 2px 8px rgba(0, 0, 0, 0.1);
+    0 4px 20px rgb(238 90 82 / 30%),
+    0 2px 8px rgb(0 0 0 / 10%);
   overflow: hidden;
   transform: translateX(calc(100% - var(--floating-tab-protrusion, 90px)));
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -53,15 +53,15 @@
   cursor: pointer;
   user-select: none;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgb(255 255 255 / 10%);
   border-right: none;
   pointer-events: auto; /* Enable pointer events only on the tab itself */
 }
 
 .floating-action-tab:hover {
   box-shadow:
-    0 8px 30px rgba(238, 90, 82, 0.4),
-    0 4px 12px rgba(0, 0, 0, 0.15);
+    0 8px 30px rgb(238 90 82 / 40%),
+    0 4px 12px rgb(0 0 0 / 15%);
 }
 
 .floating-action-tab.expanded {
@@ -91,14 +91,14 @@
 .heart-icon {
   width: 24px;
   height: 24px;
-  color: rgba(255, 255, 255, 0.95);
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+  color: rgb(255 255 255 / 95%);
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 10%));
   transition: all 0.3s ease;
 }
 
 .floating-action-tab:hover .heart-icon {
   transform: scale(1.1);
-  color: #ffffff;
+  color: #fff;
 }
 
 .floating-tab-text {
@@ -120,15 +120,15 @@
 .tab-title {
   font-size: calc(14px * var(--font-scale, 1));
   font-weight: 600;
-  color: #ffffff;
+  color: #fff;
   line-height: 1.2;
   margin-bottom: 2px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 10%);
 }
 
 .tab-subtitle {
   font-size: calc(11px * var(--font-scale, 1));
-  color: rgba(255, 255, 255, 0.85);
+  color: rgb(255 255 255 / 85%);
   line-height: 1.2;
   font-weight: 400;
 }
@@ -153,7 +153,7 @@
 .arrow-icon {
   width: 16px;
   height: 16px;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgb(255 255 255 / 90%);
   transition: transform 0.2s ease;
 }
 
@@ -169,7 +169,7 @@
   width: 0;
   height: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
+  background: rgb(255 255 255 / 30%);
   transform: translate(-50%, -50%);
   opacity: 0;
   pointer-events: none;
@@ -188,6 +188,7 @@
     opacity: 0.6;
     transform: translate(-50%, -50%) scale(0);
   }
+
   100% {
     opacity: 0;
     transform: translate(-50%, -50%) scale(1);
@@ -201,9 +202,9 @@
 
 .floating-tab-link:focus .floating-action-tab {
   box-shadow:
-    0 8px 30px rgba(238, 90, 82, 0.4),
-    0 4px 12px rgba(0, 0, 0, 0.15),
-    0 0 0 3px rgba(255, 255, 255, 0.3);
+    0 8px 30px rgb(238 90 82 / 40%),
+    0 4px 12px rgb(0 0 0 / 15%),
+    0 0 0 3px rgb(255 255 255 / 30%);
 }
 
 /* Reduced motion support */
@@ -220,24 +221,25 @@
 }
 
 /* Responsive behavior inherited from media.css custom properties */
+
 /* All sizing and positioning values now use CSS custom properties from media.css */
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   .floating-action-tab {
     background: #d32f2f;
-    border: 2px solid #ffffff;
+    border: 2px solid #fff;
   }
 
   .tab-title,
   .tab-subtitle,
   .heart-icon,
   .arrow-icon {
-    color: #ffffff;
+    color: #fff;
   }
 
   .floating-tab-ripple {
-    background: rgba(255, 255, 255, 0.5);
+    background: rgb(255 255 255 / 50%);
   }
 }
 
@@ -251,13 +253,13 @@ body.dark-mode .floating-action-tab {
   border-color: var(--theme-border);
   box-shadow:
     0 4px 20px var(--theme-shadow),
-    0 2px 8px rgba(0, 0, 0, 0.2);
+    0 2px 8px rgb(0 0 0 / 20%);
 }
 
 body.dark-mode .floating-action-tab:hover {
   box-shadow:
     0 8px 30px var(--theme-shadow-heavy),
-    0 4px 12px rgba(0, 0, 0, 0.25);
+    0 4px 12px rgb(0 0 0 / 25%);
 }
 
 body.dark-mode .heart-icon {
@@ -273,7 +275,7 @@ body.dark-mode .tab-title {
 }
 
 body.dark-mode .tab-subtitle {
-  color: rgba(255, 255, 255, 0.85);
+  color: rgb(255 255 255 / 85%);
 }
 
 body.dark-mode .arrow-icon {
@@ -281,13 +283,13 @@ body.dark-mode .arrow-icon {
 }
 
 body.dark-mode .floating-tab-ripple {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgb(255 255 255 / 30%);
 }
 
 body.dark-mode .floating-tab-link:focus .floating-action-tab {
   box-shadow:
     0 8px 30px var(--theme-shadow-heavy),
-    0 4px 12px rgba(0, 0, 0, 0.25),
+    0 4px 12px rgb(0 0 0 / 25%),
     0 0 0 3px var(--theme-accent-light);
 }
 

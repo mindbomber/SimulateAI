@@ -8,8 +8,8 @@
    ============================================================================= */
 
 .data-table {
-  background: #ffffff;
-  border: 1px solid #cccccc;
+  background: #fff;
+  border: 1px solid #ccc;
   border-radius: 4px;
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -19,7 +19,7 @@
 
 .data-table-header {
   background: #f5f5f5;
-  border-bottom: 1px solid #cccccc;
+  border-bottom: 1px solid #ccc;
   display: flex;
   font-weight: 600;
   position: sticky;
@@ -29,7 +29,7 @@
 
 .data-table-header-cell {
   padding: 12px 10px;
-  border-right: 1px solid #cccccc;
+  border-right: 1px solid #ccc;
   cursor: pointer;
   user-select: none;
   position: relative;
@@ -49,7 +49,7 @@
 .data-table-sort-indicator {
   margin-left: 5px;
   font-size: 10px;
-  color: #666666;
+  color: #666;
 }
 
 .data-table-body {
@@ -99,7 +99,7 @@
   justify-content: space-between;
   align-items: center;
   font-size: 12px;
-  color: #666666;
+  color: #666;
 }
 
 .data-table-pagination-info {
@@ -113,8 +113,8 @@
 
 .data-table-pagination-button {
   padding: 5px 12px;
-  border: 1px solid #cccccc;
-  background: #ffffff;
+  border: 1px solid #ccc;
+  background: #fff;
   border-radius: 3px;
   cursor: pointer;
   font-size: 11px;
@@ -123,12 +123,12 @@
 
 .data-table-pagination-button:hover:not(:disabled) {
   background: #f8f9fa;
-  border-color: #999999;
+  border-color: #999;
 }
 
 .data-table-pagination-button:disabled {
   background: #f8f9fa;
-  color: #999999;
+  color: #999;
   cursor: not-allowed;
   opacity: 0.6;
 }
@@ -142,7 +142,7 @@
   width: 320px;
   min-height: 80px;
   border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   z-index: 1000;
@@ -214,7 +214,7 @@
 
 .notification-toast-dismiss:hover {
   opacity: 1;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgb(0 0 0 / 10%);
 }
 
 .notification-toast-actions {
@@ -235,14 +235,14 @@
 }
 
 .notification-toast-action.primary {
-  background: currentColor;
+  background: currentcolor;
   color: white;
 }
 
 .notification-toast-action.secondary {
   background: transparent;
-  color: currentColor;
-  border: 1px solid currentColor;
+  color: currentcolor;
+  border: 1px solid currentcolor;
 }
 
 .notification-toast-progress {
@@ -250,7 +250,7 @@
   bottom: 0;
   left: 0;
   height: 3px;
-  background: currentColor;
+  background: currentcolor;
   opacity: 0.3;
   transition: width 0.1s linear;
 }
@@ -260,6 +260,7 @@
     transform: translateX(100%);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -275,6 +276,7 @@
     transform: translateX(0);
     opacity: 1;
   }
+
   to {
     transform: translateX(100%);
     opacity: 0;
@@ -296,11 +298,8 @@
 
 .loading-spinner.overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.9);
+  inset: 0;
+  background: rgb(255 255 255 / 90%);
   z-index: 999;
   backdrop-filter: blur(2px);
 }
@@ -338,6 +337,7 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -367,7 +367,7 @@
 .loading-spinner-message {
   margin-top: 15px;
   font-size: 13px;
-  color: #666666;
+  color: #666;
   text-align: center;
   font-weight: 500;
 }
@@ -379,7 +379,7 @@
   transform: translate(-50%, -50%) rotate(90deg);
   font-size: 12px;
   font-weight: 600;
-  color: #333333;
+  color: #333;
 }
 
 .loading-spinner-cancel {
@@ -435,21 +435,21 @@
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   .data-table {
-    border-color: #000000;
+    border-color: #000;
   }
 
   .data-table-header {
-    background: #000000;
-    color: #ffffff;
+    background: #000;
+    color: #fff;
   }
 
   .data-table-row:hover {
-    background: #000000;
-    color: #ffffff;
+    background: #000;
+    color: #fff;
   }
 
   .notification-toast {
-    border: 2px solid #000000;
+    border: 2px solid #000;
   }
 }
 
@@ -473,7 +473,7 @@
   }
 
   .data-table {
-    border: 1px solid #000000;
+    border: 1px solid #000;
   }
 
   .data-table-pagination {
@@ -523,7 +523,7 @@ body.dark-mode .data-table-row:hover {
 }
 
 body.dark-mode .data-table-row.selected {
-  background: rgba(74, 158, 255, 0.1);
+  background: rgb(74 158 255 / 10%);
   border-color: var(--color-primary);
 }
 

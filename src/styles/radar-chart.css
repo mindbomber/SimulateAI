@@ -12,7 +12,7 @@
   padding: 1rem; /* Reduced padding for more space */
   background: transparent; /* No background to blend with parent */
   border-radius: 0; /* No border radius */
-  box-shadow: -4px 4px 8px rgba(0, 0, 0, 0.12); /* Subtle bottom-left shadow */
+  box-shadow: -4px 4px 8px rgb(0 0 0 / 12%); /* Subtle bottom-left shadow */
   transition: none; /* No transitions */
   border: none; /* No border */
 }
@@ -24,13 +24,13 @@
   margin: 0 auto;
   border-radius: 0; /* No border radius for cleaner look */
   background: transparent;
+
   /* CRITICAL: Ensure crisp rendering without forcing pixelation */
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: optimizeQuality;
+  image-rendering: optimizequality;
 }
 
 /* Mobile optimization for radar demo */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .radar-demo-container {
     padding: 0.5rem; /* Minimal padding on mobile */
     max-width: 100%; /* Use full width on mobile */
@@ -50,21 +50,21 @@
   max-width: 500px;
   margin: 0 auto;
   padding: 2rem;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
   border-radius: 16px;
   box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.08),
-    0 1px 3px rgba(0, 0, 0, 0.05);
+    0 4px 12px rgb(0 0 0 / 8%),
+    0 1px 3px rgb(0 0 0 / 5%);
   transition: all 0.3s ease;
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  border: 1px solid rgb(226 232 240 / 80%);
 }
 
 .radar-chart-container:hover {
   box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.12),
-    0 2px 6px rgba(0, 0, 0, 0.08);
+    0 8px 20px rgb(0 0 0 / 12%),
+    0 2px 6px rgb(0 0 0 / 8%);
   transform: translateY(-2px);
-  border-color: rgba(156, 163, 175, 0.6);
+  border-color: rgb(156 163 175 / 60%);
 }
 
 /* Chart canvas styling with clean background */
@@ -75,11 +75,12 @@
   margin: 0 auto;
   border-radius: 12px;
   background: transparent;
-  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.12); /* Subtle bottom-right shadow similar to demo */
+  box-shadow: 4px 4px 8px rgb(0 0 0 / 12%); /* Subtle bottom-right shadow similar to demo */
+
   /* Removed overflow: hidden to allow Chart.js tooltips to show */
+
   /* CRITICAL: Ensure crisp rendering without forcing pixelation */
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: optimizeQuality;
+  image-rendering: optimizequality;
 }
 
 /* Chart.js Tooltip Support - Ensure tooltips appear above all content */
@@ -121,13 +122,13 @@ div[id*="chartjs-tooltip-blur"] {
 .radar-chart-fallback {
   padding: 1.5rem;
   text-align: center;
-  background: var(--card-bg, #ffffff);
+  background: var(--card-bg, #fff);
   border-radius: 12px;
   border: 2px dashed var(--border-color, #e0e0e0);
 }
 
 .radar-chart-fallback h4 {
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 1.5rem;
   color: var(--text-primary, #333);
   font-size: 1.2rem;
   font-weight: 600;
@@ -195,13 +196,12 @@ div[id*="chartjs-tooltip-blur"] {
 
 /* Real-time radar chart for scenarios */
 .scenario-radar {
-  position: sticky;
   top: 2rem;
   background: linear-gradient(
     135deg,
-    rgba(102, 126, 234, 0.1) 0%,
-    rgba(118, 75, 162, 0.08) 50%,
-    rgba(240, 171, 252, 0.1) 100%
+    rgb(102 126 234 / 10%) 0%,
+    rgb(118 75 162 / 8%) 50%,
+    rgb(240 171 252 / 10%) 100%
   );
   border: 2px solid transparent;
   border-radius: 24px;
@@ -209,11 +209,12 @@ div[id*="chartjs-tooltip-blur"] {
   margin-bottom: 1rem;
   backdrop-filter: blur(20px);
   box-shadow:
-    0 25px 50px -12px rgba(102, 126, 234, 0.25),
-    0 8px 32px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    0 25px 50px -12px rgb(102 126 234 / 25%),
+    0 8px 32px rgb(0 0 0 / 12%),
+    inset 0 1px 0 rgb(255 255 255 / 60%);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+
   /* Allow tooltips to overflow container */
   overflow: visible;
 }
@@ -221,14 +222,11 @@ div[id*="chartjs-tooltip-blur"] {
 .scenario-radar::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: linear-gradient(
     135deg,
-    rgba(102, 126, 234, 0.1) 0%,
-    rgba(118, 75, 162, 0.05) 100%
+    rgb(102 126 234 / 10%) 0%,
+    rgb(118 75 162 / 5%) 100%
   );
   border-radius: 24px;
   z-index: -1;
@@ -254,11 +252,11 @@ div[id*="chartjs-tooltip-blur"] {
 
 .scenario-radar:hover {
   box-shadow:
-    0 35px 70px -12px rgba(102, 126, 234, 0.4),
-    0 12px 48px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 35px 70px -12px rgb(102 126 234 / 40%),
+    0 12px 48px rgb(0 0 0 / 18%),
+    inset 0 1px 0 rgb(255 255 255 / 80%);
   transform: translateY(-2px) scale(1.01);
-  border-color: rgba(102, 126, 234, 0.3);
+  border-color: rgb(102 126 234 / 30%);
 }
 
 .scenario-radar .radar-title {
@@ -268,11 +266,11 @@ div[id*="chartjs-tooltip-blur"] {
   text-align: center;
   color: #1a202c;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: -0.025em;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 }
 
 .scenario-radar .radar-subtitle {
@@ -288,16 +286,17 @@ div[id*="chartjs-tooltip-blur"] {
 .results-radar {
   background: linear-gradient(
     135deg,
-    var(--card-bg, #ffffff) 0%,
-    rgba(248, 250, 252, 0.9) 100%
+    var(--card-bg, #fff) 0%,
+    rgb(248 250 252 / 90%) 100%
   );
   border-radius: 20px;
   padding: 2.5rem;
   margin: 2rem 0;
   box-shadow:
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    0 20px 25px -5px rgb(0 0 0 / 10%),
+    0 10px 10px -5px rgb(0 0 0 / 4%);
   position: relative;
+
   /* Allow tooltips to overflow container */
   overflow: visible;
 }
@@ -326,7 +325,7 @@ div[id*="chartjs-tooltip-blur"] {
   text-align: center;
   color: var(--text-primary, #1a202c);
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: -0.025em;
@@ -366,7 +365,7 @@ div[id*="chartjs-tooltip-blur"] {
 }
 
 /* Responsive design */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .radar-chart-container {
     padding: 0.75rem;
     margin: 0.5rem;
@@ -407,7 +406,7 @@ div[id*="chartjs-tooltip-blur"] {
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .radar-chart-container {
     padding: 0.5rem;
   }
@@ -449,8 +448,8 @@ div[id*="chartjs-tooltip-blur"] {
   }
 
   .radar-chart-container {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
-    border-color: rgba(226, 232, 240, 0.8) !important;
+    background: linear-gradient(135deg, #fff 0%, #f8fafc 100%) !important;
+    border-color: rgb(226 232 240 / 80%) !important;
   }
 
   .radar-chart-fallback {
@@ -500,6 +499,7 @@ div[id*="chartjs-tooltip-blur"] {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -514,9 +514,11 @@ div[id*="chartjs-tooltip-blur"] {
   0% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.02);
   }
+
   100% {
     transform: scale(1);
   }
@@ -539,7 +541,7 @@ div[id*="chartjs-tooltip-blur"] {
   border: none;
   color: white;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgb(102 126 234 / 40%);
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
@@ -549,7 +551,7 @@ div[id*="chartjs-tooltip-blur"] {
 
 .radar-action-button:hover {
   transform: scale(1.1);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+  box-shadow: 0 6px 20px rgb(102 126 234 / 60%);
 }
 
 .radar-action-button:active {
@@ -672,7 +674,7 @@ body.dark-mode .scenario-radar .radar-title {
     var(--theme-accent) 0%,
     var(--theme-accent-dark) 100%
   );
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
@@ -698,7 +700,7 @@ body.dark-mode .results-radar .radar-title {
     var(--theme-accent) 0%,
     var(--theme-accent-dark) 100%
   );
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
@@ -738,6 +740,7 @@ body.dark-mode .score-item:focus-within {
 }
 
 /* ===== CHART.JS TOOLTIP CONFLICT RESOLUTION ===== */
+
 /* Additional tooltip fixes for scenario modals */
 .scenario-modal .radar-chart-container,
 .scenario-modal .scenario-radar,

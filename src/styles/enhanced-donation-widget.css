@@ -3,7 +3,7 @@
   background: white;
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgb(0 0 0 / 10%);
   max-width: 600px;
   margin: 0 auto;
 }
@@ -29,7 +29,7 @@
   font-size: 1.5rem;
   font-weight: 600;
   color: #2c3e50;
-  margin: 0 0 8px 0;
+  margin: 0 0 8px;
 }
 
 .donation-subtitle {
@@ -202,7 +202,7 @@
 }
 
 .donation-benefits h4 {
-  margin: 0 0 12px 0;
+  margin: 0 0 12px;
   color: #2c3e50;
   font-size: 1rem;
 }
@@ -261,7 +261,7 @@
 .donation-submit-btn:hover {
   background: linear-gradient(135deg, #0056b3, #004085);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  box-shadow: 0 4px 12px rgb(0 123 255 / 30%);
 }
 
 .donation-submit-btn:disabled {
@@ -300,12 +300,12 @@
 
 .recognition-content h4 {
   color: #155724;
-  margin: 0 0 12px 0;
+  margin: 0 0 12px;
 }
 
 .recognition-content p {
   color: #155724;
-  margin: 0 0 16px 0;
+  margin: 0 0 16px;
 }
 
 .recognition-actions {
@@ -350,7 +350,7 @@
   border: 1px solid #dee2e6;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgb(0 0 0 / 10%);
   background: white;
 }
 
@@ -375,11 +375,11 @@
 .donation-accordion .accordion-header:hover {
   background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
   transform: translateY(-1px);
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 25px rgb(0 0 0 / 15%);
 }
 
 .donation-accordion .accordion-header:focus {
-  outline: 3px solid rgba(102, 126, 234, 0.3);
+  outline: 3px solid rgb(102 126 234 / 30%);
   outline-offset: -3px;
 }
 
@@ -404,7 +404,7 @@
 
 .donation-accordion .accordion-subtitle {
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgb(255 255 255 / 90%);
   font-weight: 400;
   margin-left: 8px;
 }
@@ -445,7 +445,7 @@
 /* Enhance visual appeal in accordion */
 .donation-accordion .tier-option:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 10%);
 }
 
 .donation-accordion .donation-submit-btn {
@@ -460,11 +460,11 @@
 .donation-accordion .donation-submit-btn:hover {
   background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px rgb(102 126 234 / 40%);
 }
 
 /* Mobile responsiveness for accordion */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .donation-accordion {
     margin: 20px 16px;
     border-radius: 8px;
@@ -493,6 +493,7 @@
     max-height: 0;
     opacity: 0;
   }
+
   to {
     max-height: 1000px;
     opacity: 1;
@@ -504,6 +505,7 @@
     max-height: 1000px;
     opacity: 1;
   }
+
   to {
     max-height: 0;
     opacity: 0;
@@ -547,13 +549,13 @@ body.dark-mode .auth-banner {
 }
 
 body.dark-mode .auth-banner.success {
-  background: rgba(76, 175, 80, 0.1);
+  background: rgb(76 175 80 / 10%);
   border-color: var(--color-success);
   color: var(--color-success);
 }
 
 body.dark-mode .auth-banner.warning {
-  background: rgba(255, 193, 7, 0.1);
+  background: rgb(255 193 7 / 10%);
   border-color: var(--color-warning);
   color: var(--color-warning);
 }
@@ -576,7 +578,7 @@ body.dark-mode .amount-option:hover {
 }
 
 body.dark-mode .amount-option.selected {
-  background: rgba(74, 158, 255, 0.1);
+  background: rgb(74 158 255 / 10%);
   border-color: var(--color-primary);
   color: var(--color-primary);
 }
@@ -589,7 +591,7 @@ body.dark-mode .custom-amount-input {
 
 body.dark-mode .custom-amount-input:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
+  box-shadow: 0 0 0 2px rgb(74 158 255 / 20%);
 }
 
 /* Payment methods */
@@ -610,7 +612,7 @@ body.dark-mode .payment-method:hover {
 }
 
 body.dark-mode .payment-method.selected {
-  background: rgba(74, 158, 255, 0.1);
+  background: rgb(74 158 255 / 10%);
   border-color: var(--color-primary);
 }
 

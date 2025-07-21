@@ -31,15 +31,19 @@
 /* CSS Custom Properties for Theme System */
 :root {
   /* Light mode theme variables */
-  --theme-bg-primary: #ffffff;
-  --theme-bg-secondary: #f8fafc;
-  --theme-text-primary: #333333;
-  --theme-text-secondary: #666666;
+  --theme-bg-primary: var(--color-white, #fff);
+  --theme-bg-secondary: var(--color-gray-50, #f8fafc);
+  --theme-bg-tertiary: var(--color-gray-100, #f1f5f9);
+  --theme-text-primary: var(--color-gray-900, #333);
+  --theme-text-secondary: var(--color-gray-600, #666);
   --theme-text-muted: #9ca3af;
-  --theme-border: rgba(229, 231, 235, 0.6);
-  --theme-border-hover: rgba(156, 163, 175, 0.4);
-  --theme-shadow: rgba(0, 0, 0, 0.1);
-  --theme-shadow-hover: rgba(0, 0, 0, 0.15);
+  --theme-border: var(--color-gray-200, #e2e8f0);
+  --theme-border-hover: var(--color-gray-300, #d1d5db);
+  --theme-shadow: rgb(0 0 0 / 10%);
+  --theme-shadow-hover: rgb(0 0 0 / 15%);
+  --theme-accent: var(--color-primary, #4a9eff);
+  --theme-accent-dark: var(--color-primary-dark, #3a8eef);
+  --theme-text-on-accent: var(--color-white, #fff);
 }
 
 /* Dark Mode Theme Variables - Override CSS Custom Properties */
@@ -48,40 +52,40 @@ body.dark-mode {
   --theme-bg-primary: #1a1a1a;
   --theme-bg-secondary: #2d2d2d;
   --theme-bg-tertiary: #3d3d3d;
-  --theme-text-primary: #ffffff;
-  --theme-text-secondary: #cccccc;
+  --theme-text-primary: #fff;
+  --theme-text-secondary: #ccc;
   --theme-text-muted: #9ca3af;
-  --theme-border: #444444;
-  --theme-border-hover: #555555;
-  --theme-shadow: rgba(0, 0, 0, 0.4);
-  --theme-shadow-hover: rgba(0, 0, 0, 0.5);
+  --theme-border: #444;
+  --theme-border-hover: #555;
+  --theme-shadow: rgb(0 0 0 / 40%);
+  --theme-shadow-hover: rgb(0 0 0 / 50%);
   --theme-accent: #4a9eff;
   --theme-accent-dark: #3a8eef;
-  --theme-text-on-accent: #ffffff;
+  --theme-text-on-accent: #fff;
 
   /* Override main color system variables */
   --color-white: #1a1a1a;
   --color-gray-50: #2d2d2d;
   --color-gray-100: #3d3d3d;
-  --color-gray-200: #444444;
-  --color-gray-300: #555555;
-  --color-gray-600: #cccccc;
-  --color-gray-800: #cccccc;
-  --color-gray-900: #ffffff;
+  --color-gray-200: #444;
+  --color-gray-300: #555;
+  --color-gray-600: #ccc;
+  --color-gray-800: #ccc;
+  --color-gray-900: #fff;
   --color-primary: #4a9eff;
   --color-primary-dark: #3a8eef;
 
   /* Legacy support variables */
-  --text-color: #ffffff;
-  --text-secondary: #cccccc;
-  --border-color: #444444;
+  --text-color: #fff;
+  --text-secondary: #ccc;
+  --border-color: #444;
   --primary-color: #4a9eff;
   --hover-bg: #3d3d3d;
   --background-color: #2d2d2d;
 
   /* Set overall page background and text color */
   background-color: #1a1a1a !important;
-  color: #ffffff !important;
+  color: #fff !important;
 }
 
 /* Override any gradients that use color-primary-light and color-primary */
@@ -95,8 +99,8 @@ body.dark-mode .radar-chart-container,
 body.dark-mode .radar-chart-container[style*="background"],
 body.dark-mode *[style*="linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)"] {
   background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%) !important;
-  border-color: #444444 !important;
-  color: #ffffff !important;
+  border-color: #444 !important;
+  color: #fff !important;
 }
 
 /* Override any elements using the light gray gradient pattern */
@@ -107,39 +111,39 @@ body.dark-mode .radar-chart-container,
 body.dark-mode .radar-demo-container,
 body.dark-mode .hero-radar-demo {
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
-  color: #ffffff !important;
-  border-color: #444444 !important;
+  color: #fff !important;
+  border-color: #444 !important;
 }
 
 /* Dark mode styling for hero-radar-demo text elements */
 body.dark-mode .hero-radar-demo h3 {
-  color: #ffffff !important;
+  color: #fff !important;
   background: linear-gradient(135deg, #6bb4ff 0%, #9d4edd 100%) !important;
-  -webkit-background-clip: text !important;
+  background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
 }
 
 body.dark-mode .hero-radar-demo p {
-  color: #cccccc !important;
+  color: #ccc !important;
 }
 
 /* Additional specific overrides for radar chart components */
 body.dark-mode .radar-chart-container,
 body.dark-mode .radar-chart-container.radar-chart-container {
   background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%) !important;
-  border: 1px solid #444444 !important;
+  border: 1px solid #444 !important;
   box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.4),
-    0 1px 3px rgba(0, 0, 0, 0.3) !important;
+    0 4px 12px rgb(0 0 0 / 40%),
+    0 1px 3px rgb(0 0 0 / 30%) !important;
 }
 
 body.dark-mode .radar-chart-container:hover,
 body.dark-mode .radar-chart-container.radar-chart-container:hover {
   box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.5),
-    0 2px 6px rgba(0, 0, 0, 0.4) !important;
-  border-color: #555555 !important;
+    0 8px 20px rgb(0 0 0 / 50%),
+    0 2px 6px rgb(0 0 0 / 40%) !important;
+  border-color: #555 !important;
 }
 
 body.dark-mode .hero::before {
@@ -230,18 +234,18 @@ body.dark-mode .view-toggle-btn:focus-visible {
 
 /* Keyboard Hint Dark Mode */
 body.dark-mode .keyboard-hint {
-  color: #cccccc !important;
+  color: #ccc !important;
 }
 
 body.dark-mode .keyboard-hint .hint-text {
-  color: #cccccc !important;
+  color: #ccc !important;
 }
 
 body.dark-mode kbd {
   background: #3d3d3d !important;
-  color: #ffffff !important;
-  border: 1px solid #555555 !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+  color: #fff !important;
+  border: 1px solid #555 !important;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 30%) !important;
 }
 
 /* Font Size Settings - Enhanced with media.css responsive scaling */
@@ -262,6 +266,7 @@ html.font-size-extra-large {
 }
 
 /* ===== RESPONSIVE THEMING ENHANCEMENTS ===== */
+
 /* Device-specific theming adjustments using media.css integration */
 
 /* Settings Menu Responsive Sizing */
@@ -291,18 +296,26 @@ body.dark-mode .content-container,
 body.dark-mode .page-container {
   padding-left: var(--container-padding, 16px);
   padding-right: var(--container-padding, 16px);
+  background-color: #1a1a1a !important;
+  color: #fff !important;
 }
 
 /* Responsive Modal Sizing */
 body.dark-mode .modal-content {
   padding: var(--container-padding, 16px);
   font-size: calc(1rem * var(--font-scale, 1));
+  background-color: var(--background-color, #2d2d2d) !important;
+  color: #fff !important;
+  border-color: var(--border-color, #444) !important;
 }
 
 /* Responsive Card Spacing */
 body.dark-mode .card {
   padding: var(--container-padding, 16px);
   margin-bottom: calc(var(--container-padding, 16px) * 0.75);
+  background-color: var(--theme-bg-secondary) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text-primary) !important;
 }
 
 body.dark-mode .card h2,
@@ -310,6 +323,7 @@ body.dark-mode .card h3,
 body.dark-mode .card h4 {
   font-size: calc(1.25rem * var(--font-scale, 1));
   margin-bottom: calc(var(--container-padding, 16px) * 0.5);
+  color: var(--theme-text-primary) !important;
 }
 
 /* ===== END RESPONSIVE THEMING ENHANCEMENTS ===== */
@@ -322,12 +336,12 @@ body.dark-mode html {
 /* Header Dark Mode */
 body.dark-mode .header {
   background: #2d2d2d !important;
-  border-bottom-color: #444444 !important;
+  border-bottom-color: #444 !important;
 }
 
 body.dark-mode .header-container {
   background-color: #2d2d2d !important;
-  color: #ffffff !important;
+  color: #fff !important;
 }
 
 /* Blog header (sticky) */
@@ -338,12 +352,12 @@ body.dark-mode .blog-header {
 
 body.dark-mode .header-content {
   background: transparent !important;
-  color: #ffffff !important;
+  color: #fff !important;
 }
 
 body.dark-mode .header-nav {
   background: transparent !important;
-  color: #ffffff !important;
+  color: #fff !important;
 }
 
 body.dark-mode .nav-links {
@@ -351,16 +365,7 @@ body.dark-mode .nav-links {
 }
 
 body.dark-mode .nav-links .nav-link {
-  color: #ffffff !important;
-}
-
-/* Container elements */
-body.dark-mode .container,
-body.dark-mode .main-container,
-body.dark-mode .content-container,
-body.dark-mode .page-container {
-  background-color: #1a1a1a !important;
-  color: #ffffff !important;
+  color: #fff !important;
 }
 
 /* Navigation Dark Mode - Uses Theme Variables */
@@ -385,47 +390,26 @@ body.dark-mode .nav-link:hover {
 /* Main Content Areas Dark Mode */
 body.dark-mode .hero-section {
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
-  color: #ffffff !important;
+  color: #fff !important;
   min-height: auto !important;
   padding: 4rem 0 !important;
 }
 
-/* Override any gradients that use color-primary-light and color-primary */
-body.dark-mode *[style*="linear-gradient"][style*="var(--color-primary-light)"],
-body.dark-mode .hero {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
-}
-
-body.dark-mode .hero::before {
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23444444" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>') !important;
-  opacity: 0.3 !important;
-}
-
-body.dark-mode .hero-section::before {
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23444444" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>') !important;
-  opacity: 0.3 !important;
-}
-
-body.dark-mode .hero-container {
-  background: transparent !important;
-  color: #ffffff !important;
-}
-
 body.dark-mode .hero-content {
   background: transparent !important;
-  color: #ffffff !important;
+  color: #fff !important;
 }
 
 body.dark-mode .hero-section h1 {
-  color: #ffffff !important;
+  color: #fff !important;
 }
 
 body.dark-mode .hero-section h2 {
-  color: #ffffff !important;
+  color: #fff !important;
 }
 
 body.dark-mode .hero-section p {
-  color: #cccccc !important;
+  color: #ccc !important;
 }
 
 /* Fix any potential overlay issues */
@@ -441,7 +425,7 @@ body.dark-mode .hero-section > * {
 
 body.dark-mode .section {
   background-color: #1a1a1a !important;
-  color: #ffffff !important;
+  color: #fff !important;
 }
 
 /* Hero section elements */
@@ -460,24 +444,24 @@ body.dark-mode .hero-section .hero-content * {
 /* Hero section specific elements */
 body.dark-mode .hero-badge {
   background: linear-gradient(135deg, #4a9eff, #3a8eef) !important;
-  color: #ffffff !important;
+  color: #fff !important;
 }
 
 body.dark-mode .hero-title {
-  color: #ffffff !important;
-  background: linear-gradient(135deg, #ffffff, #4a9eff) !important;
-  -webkit-background-clip: text !important;
+  color: #fff !important;
+  background: linear-gradient(135deg, #fff, #4a9eff) !important;
+  background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
 }
 
 body.dark-mode .hero-description {
-  color: #cccccc !important;
+  color: #ccc !important;
 }
 
 body.dark-mode .stat-item {
   background: #2d2d2d !important;
-  color: #ffffff !important;
+  color: #fff !important;
 }
 
 body.dark-mode .stat-number {
@@ -485,20 +469,7 @@ body.dark-mode .stat-number {
 }
 
 body.dark-mode .stat-label {
-  color: #cccccc !important;
-}
-
-/* Cards, Buttons, and Forms Dark Mode - Uses Theme Variables */
-body.dark-mode .card {
-  background-color: var(--theme-bg-secondary) !important;
-  border-color: var(--theme-border) !important;
-  color: var(--theme-text-primary) !important;
-}
-
-body.dark-mode .card h2,
-body.dark-mode .card h3,
-body.dark-mode .card h4 {
-  color: var(--theme-text-primary) !important;
+  color: #ccc !important;
 }
 
 body.dark-mode .card p {
@@ -538,13 +509,13 @@ body.dark-mode input:focus,
 body.dark-mode textarea:focus,
 body.dark-mode select:focus {
   border-color: var(--theme-accent) !important;
-  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2) !important;
+  box-shadow: 0 0 0 2px rgb(74 158 255 / 20%) !important;
 }
 
 /* Footer Dark Mode */
 body.dark-mode .footer {
   background-color: var(--background-color, #2d2d2d) !important;
-  color: #ffffff !important;
+  color: #fff !important;
   border-top-color: var(--border-color, #444) !important;
 }
 
@@ -553,16 +524,16 @@ body.dark-mode .footer a {
 }
 
 body.dark-mode .footer a:hover {
-  color: #ffffff !important;
+  color: #fff !important;
 }
 
 /* Mobile Menu Dark Mode */
 body.dark-mode .nav-toggle {
-  color: #ffffff !important;
+  color: #fff !important;
 }
 
 body.dark-mode .nav-toggle span {
-  background-color: #ffffff !important;
+  background-color: #fff !important;
 }
 
 body.dark-mode .nav-toggle:hover {
@@ -580,12 +551,12 @@ body.dark-mode .main-nav {
 /* Tables Dark Mode */
 body.dark-mode table {
   background-color: var(--background-color, #2d2d2d) !important;
-  color: #ffffff !important;
+  color: #fff !important;
 }
 
 body.dark-mode th {
   background-color: #3d3d3d !important;
-  color: #ffffff !important;
+  color: #fff !important;
   border-color: var(--border-color, #444) !important;
 }
 
@@ -599,22 +570,16 @@ body.dark-mode tr:hover {
 
 /* Modals Dark Mode */
 body.dark-mode .modal {
-  background-color: rgba(26, 26, 26, 0.8) !important;
+  background-color: rgb(26 26 26 / 80%) !important;
 }
 
 body.dark-mode .modal-overlay {
-  background: rgba(0, 0, 0, 0.9) !important;
+  background: rgb(0 0 0 / 90%) !important;
 }
 
 body.dark-mode .modal-container {
   background: #2d2d2d !important;
-  color: #ffffff !important;
-}
-
-body.dark-mode .modal-content {
-  background-color: var(--background-color, #2d2d2d) !important;
-  color: #ffffff !important;
-  border-color: var(--border-color, #444) !important;
+  color: #fff !important;
 }
 
 body.dark-mode .modal-header {
@@ -627,18 +592,18 @@ body.dark-mode .modal-footer {
 
 /* Loading screens */
 body.dark-mode .loading-enhanced {
-  background: rgba(26, 26, 26, 0.95) !important;
+  background: rgb(26 26 26 / 95%) !important;
 }
 
 body.dark-mode .loading-container {
   background: #2d2d2d !important;
-  color: #ffffff !important;
+  color: #fff !important;
 }
 
 /* Floating Action Tabs Dark Mode */
 body.dark-mode .floating-action-tab {
   background-color: var(--background-color, #2d2d2d) !important;
-  color: #ffffff !important;
+  color: #fff !important;
   border-color: var(--border-color, #444) !important;
 }
 
@@ -671,17 +636,17 @@ body.dark-mode::-webkit-scrollbar-track {
 body.dark-mode .dropdown-menu {
   background-color: #2d2d2d !important;
   border-color: #444 !important;
-  color: #ffffff !important;
+  color: #fff !important;
 }
 
 body.dark-mode .dropdown-item {
-  color: #ffffff !important;
+  color: #fff !important;
   background-color: transparent !important;
 }
 
 body.dark-mode .dropdown-item:hover {
   background-color: #3d3d3d !important;
-  color: #ffffff !important;
+  color: #fff !important;
 }
 
 body.dark-mode .settings-menu {
@@ -690,19 +655,19 @@ body.dark-mode .settings-menu {
 }
 
 body.dark-mode .settings-title {
-  color: #ffffff !important;
+  color: #fff !important;
   border-bottom-color: #444 !important;
 }
 
 body.dark-mode .toggle-label,
 body.dark-mode .settings-select-label {
-  color: #ffffff !important;
+  color: #fff !important;
 }
 
 body.dark-mode .settings-select {
   background-color: #3d3d3d !important;
   border-color: #555 !important;
-  color: #ffffff !important;
+  color: #fff !important;
 }
 
 body.dark-mode .settings-select:focus {
@@ -722,67 +687,67 @@ body.dark-mode
 
 /* High Contrast Mode */
 body.high-contrast {
-  background-color: #ffffff !important;
-  color: #000000 !important;
+  background-color: #fff !important;
+  color: #000 !important;
 }
 
 body.high-contrast .nav-container {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  border-color: #000000 !important;
+  background-color: #fff !important;
+  color: #000 !important;
+  border-color: #000 !important;
 }
 
 body.high-contrast .nav-link {
-  color: #000000 !important;
+  color: #000 !important;
   text-decoration: underline;
   background-color: transparent !important;
 }
 
 body.high-contrast .nav-link:hover,
 body.high-contrast .nav-link:focus {
-  background-color: #000000 !important;
-  color: #ffffff !important;
+  background-color: #000 !important;
+  color: #fff !important;
 }
 
 body.high-contrast .settings-menu {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  border-color: #000000 !important;
+  background-color: #fff !important;
+  color: #000 !important;
+  border-color: #000 !important;
 }
 
 body.high-contrast .settings-title {
-  color: #000000 !important;
-  border-bottom-color: #000000 !important;
+  color: #000 !important;
+  border-bottom-color: #000 !important;
 }
 
 body.high-contrast .toggle-label,
 body.high-contrast .settings-select-label {
-  color: #000000 !important;
+  color: #000 !important;
 }
 
 body.high-contrast .settings-select {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  border-color: #000000 !important;
+  background-color: #fff !important;
+  color: #000 !important;
+  border-color: #000 !important;
 }
 
 body.high-contrast .toggle-slider {
-  background-color: #ffffff !important;
-  border: 2px solid #000000 !important;
+  background-color: #fff !important;
+  border: 2px solid #000 !important;
 }
 
 body.high-contrast
   .settings-toggle
   input[type="checkbox"]:checked
   + .toggle-slider {
-  background-color: #000000 !important;
+  background-color: #000 !important;
 }
 
 body.high-contrast
   .settings-toggle
   input[type="checkbox"]:checked
   + .toggle-slider::before {
-  background-color: #ffffff !important;
+  background-color: #fff !important;
 }
 
 /* Reduced Motion */
@@ -841,6 +806,7 @@ body.large-click-targets .floating-tab-link {
     --floating-tab-width,
     72px
   ); /* Uses media.css floating tab sizes */
+
   min-height: var(
     --floating-tab-height,
     72px
@@ -851,7 +817,7 @@ body.large-click-targets .floating-tab-link {
 @media (prefers-color-scheme: dark) {
   body.theme-auto {
     background-color: #1a1a1a;
-    color: #ffffff;
+    color: #fff;
   }
 
   body.theme-auto .nav-container {
@@ -860,7 +826,7 @@ body.large-click-targets .floating-tab-link {
   }
 
   body.theme-auto .nav-link {
-    color: #ffffff;
+    color: #fff;
   }
 
   body.theme-auto .nav-link:hover {
@@ -873,19 +839,19 @@ body.large-click-targets .floating-tab-link {
   }
 
   body.theme-auto .settings-title {
-    color: #ffffff !important;
+    color: #fff !important;
     border-bottom-color: #444 !important;
   }
 
   body.theme-auto .toggle-label,
   body.theme-auto .settings-select-label {
-    color: #ffffff !important;
+    color: #fff !important;
   }
 
   body.theme-auto .settings-select {
     background-color: #3d3d3d !important;
     border-color: #555 !important;
-    color: #ffffff !important;
+    color: #fff !important;
   }
 }
 
@@ -902,7 +868,7 @@ body.large-click-targets .floating-tab-link {
 
 /* Focus indicators for accessibility */
 body.high-contrast *:focus {
-  outline: 3px solid #000000 !important;
+  outline: 3px solid #000 !important;
   outline-offset: 2px !important;
 }
 
@@ -925,27 +891,14 @@ body.high-contrast .settings-menu[style*="display: block"] {
 }
 
 /* Theme System Integration - Relies on CSS Custom Properties Cascade */
-/* Light mode is the default - no overrides needed, rely on :root variables */
-/* This section intentionally removed to prevent CSS specificity conflicts */
 
-/* Light Mode Custom Properties Enhancement */
-:root {
-  /* Enhanced light mode integration with existing color system */
-  --theme-bg-primary: var(--color-white, #ffffff);
-  --theme-bg-secondary: var(--color-gray-50, #f8fafc);
-  --theme-bg-tertiary: var(--color-gray-100, #f1f5f9);
-  --theme-text-primary: var(--color-gray-900, #333333);
-  --theme-text-secondary: var(--color-gray-600, #666666);
-  --theme-border: var(--color-gray-200, #e2e8f0);
-  --theme-border-hover: var(--color-gray-300, #d1d5db);
-  --theme-accent: var(--color-primary, #4a9eff);
-  --theme-accent-dark: var(--color-primary-dark, #3a8eef);
-  --theme-text-on-accent: var(--color-white, #ffffff);
-}
+/* Light mode is the default - no overrides needed, rely on :root variables */
+
+/* This section intentionally removed to prevent CSS specificity conflicts */
 
 /* Badge Modal Preservation - These need specific handling */
 .badge-quote,
 .badge-reason,
 .badge-timestamp {
-  color: rgba(255, 255, 255, 0.9);
+  color: rgb(255 255 255 / 90%);
 }

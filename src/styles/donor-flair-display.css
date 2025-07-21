@@ -26,19 +26,19 @@
   background: white;
   border-radius: 50%;
   padding: 2px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 }
 
 .donor-flair-badge[data-tier='3'] {
-  filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.5));
+  filter: drop-shadow(0 0 2px rgb(255 215 0 / 50%));
 }
 
 .donor-flair-badge[data-tier='2'] {
-  filter: drop-shadow(0 0 2px rgba(192, 192, 192, 0.5));
+  filter: drop-shadow(0 0 2px rgb(192 192 192 / 50%));
 }
 
 .donor-flair-badge[data-tier='1'] {
-  filter: drop-shadow(0 0 2px rgba(205, 127, 50, 0.5));
+  filter: drop-shadow(0 0 2px rgb(205 127 50 / 50%));
 }
 
 /* Enhanced Username Styles */
@@ -74,7 +74,7 @@
 
 .appreciation-title {
   color: #2c3e50;
-  margin: 0 0 20px 0;
+  margin: 0 0 20px;
   font-size: 1.3rem;
   display: flex;
   align-items: center;
@@ -92,6 +92,7 @@
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-2px);
   }
@@ -113,12 +114,12 @@
   background: white;
   border-radius: 8px;
   padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 5%);
 }
 
 .tier-title {
   color: #2c3e50;
-  margin: 0 0 12px 0;
+  margin: 0 0 12px;
   font-size: 1.1rem;
   display: flex;
   align-items: center;
@@ -173,7 +174,7 @@
 }
 
 .become-supporter p {
-  margin: 0 0 12px 0;
+  margin: 0 0 12px;
   color: #495057;
 }
 
@@ -191,7 +192,7 @@
 .become-supporter-btn:hover {
   background: linear-gradient(135deg, #0056b3, #004085);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  box-shadow: 0 4px 12px rgb(0 123 255 / 30%);
 }
 
 /* Navigation Flair Enhancement */
@@ -218,6 +219,7 @@
     opacity: 0.7;
     transform: scale(1);
   }
+
   50% {
     opacity: 1;
     transform: scale(1.2);
@@ -239,8 +241,8 @@
 .forum-post-author.has-donor-flair {
   background: linear-gradient(
     135deg,
-    rgba(0, 123, 255, 0.1),
-    rgba(0, 86, 179, 0.1)
+    rgb(0 123 255 / 10%),
+    rgb(0 86 179 / 10%)
   );
   border-radius: 4px;
   padding: 2px 6px;
@@ -263,7 +265,7 @@
 }
 
 /* Mobile Responsiveness */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .donor-appreciation-section {
     padding: 16px;
     margin: 20px 0;
@@ -311,7 +313,7 @@
 @media (prefers-contrast: high) {
   .donor-flair-badge {
     background: white;
-    border: 1px solid currentColor;
+    border: 1px solid currentcolor;
     border-radius: 50%;
     padding: 2px;
   }

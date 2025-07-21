@@ -10,10 +10,10 @@
 }
 
 .toast {
-  background: var(--background-secondary, #ffffff);
+  background: var(--background-secondary, #fff);
   border: 1px solid var(--border-color, #e0e0e0);
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
   margin-bottom: 12px;
   padding: var(--container-padding, 16px) var(--container-padding, 20px);
   position: relative;
@@ -98,7 +98,7 @@
   font-weight: 600;
   font-size: 14px;
   line-height: 1.4;
-  margin: 0 0 4px 0;
+  margin: 0 0 4px;
   color: var(--text-primary, #1f2937);
 }
 
@@ -130,7 +130,7 @@
 }
 
 .toast-close:hover {
-  background: var(--hover-bg, rgba(0, 0, 0, 0.05));
+  background: var(--hover-bg, rgb(0 0 0 / 5%));
   color: var(--text-primary, #1f2937);
 }
 
@@ -145,7 +145,7 @@
   bottom: 0;
   left: 0;
   height: 3px;
-  background: var(--progress-bg, rgba(0, 0, 0, 0.1));
+  background: var(--progress-bg, rgb(0 0 0 / 10%));
   border-radius: 0 0 8px 8px;
   overflow: hidden;
 }
@@ -176,7 +176,7 @@
 @media (prefers-contrast: high) {
   .toast {
     border-width: 2px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 30%);
   }
 
   .toast-close:focus {
@@ -209,22 +209,22 @@ body.dark-mode .toast {
 
 body.dark-mode .toast.success {
   border-left: 4px solid var(--color-success);
-  background: rgba(76, 175, 80, 0.1);
+  background: rgb(76 175 80 / 10%);
 }
 
 body.dark-mode .toast.error {
   border-left: 4px solid var(--color-error);
-  background: rgba(244, 67, 54, 0.1);
+  background: rgb(244 67 54 / 10%);
 }
 
 body.dark-mode .toast.warning {
   border-left: 4px solid var(--color-warning);
-  background: rgba(255, 193, 7, 0.1);
+  background: rgb(255 193 7 / 10%);
 }
 
 body.dark-mode .toast.info {
   border-left: 4px solid var(--color-info);
-  background: rgba(33, 150, 243, 0.1);
+  background: rgb(33 150 243 / 10%);
 }
 
 body.dark-mode .toast-icon {

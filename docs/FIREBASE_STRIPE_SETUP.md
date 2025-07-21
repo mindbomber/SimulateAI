@@ -39,7 +39,7 @@ firebase functions:config:set stripe.webhook_secret="whsec_YOUR_ACTUAL_WEBHOOK_S
 firebase functions:config:set stripe.publishable_key="pk_live_YOUR_ACTUAL_PUBLISHABLE_KEY_HERE"
 
 # Set your frontend URL
-firebase functions:config:set app.frontend_url="https://mindbomber.github.io/SimulateAI"
+firebase functions:config:set app.frontend_url="https://www.SimulateAI.io"
 # For development: firebase functions:config:set app.frontend_url="http://localhost:3000"
 ```
 
@@ -62,15 +62,15 @@ Frontend has been updated with the actual Stripe Price IDs:
 ```javascript
 const tierInfo = {
   1: {
-    stripePriceId: 'price_1RkyADJDA3nPZHAFQJr2ySBR', // $5 Bronze tier
+    stripePriceId: "price_1RkyADJDA3nPZHAFQJr2ySBR", // $5 Bronze tier
     // ...
   },
   2: {
-    stripePriceId: 'price_1RkyADJDA3nPZHAFXasv2dM0', // $10 Silver tier
+    stripePriceId: "price_1RkyADJDA3nPZHAFXasv2dM0", // $10 Silver tier
     // ...
   },
   3: {
-    stripePriceId: 'price_1RkyADJDA3nPZHAFoyRLGmpQ', // $20 Gold tier
+    stripePriceId: "price_1RkyADJDA3nPZHAFoyRLGmpQ", // $20 Gold tier
     // ...
   },
 };
@@ -180,7 +180,9 @@ Users can manage subscriptions via Stripe's customer portal:
 
 ```javascript
 // Call from frontend
-const createPortalSession = firebase.functions().httpsCallable('createPortalSession');
+const createPortalSession = firebase
+  .functions()
+  .httpsCallable("createPortalSession");
 const result = await createPortalSession();
 window.location.href = result.data.url;
 ```
@@ -189,7 +191,9 @@ window.location.href = result.data.url;
 
 ```javascript
 // Call from frontend
-const cancelSubscription = firebase.functions().httpsCallable('cancelSubscription');
+const cancelSubscription = firebase
+  .functions()
+  .httpsCallable("cancelSubscription");
 await cancelSubscription();
 ```
 
@@ -206,7 +210,7 @@ Your Stripe integration is now **FULLY OPERATIONAL** with:
 
 ### 🚀 **Test Your Integration:**
 
-1. **Visit your production app:** https://mindbomber.github.io/SimulateAI
+1. **Visit your production app:** https://www.SimulateAI.io
 2. **Go to Profile page** and test the donation flow
 3. **For local testing:** http://localhost:3000 (requires updating frontend_url temporarily)
 4. **Webhook URL configured:**

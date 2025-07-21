@@ -36,14 +36,14 @@
   justify-content: center;
   font-size: 1.5rem; /* Increased from 1.25rem for larger arrow */
   font-weight: bold;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
   transition: all var(--transition-base);
   z-index: 1000;
   opacity: 0;
   visibility: hidden;
   transform: translateY(10px);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 
 .back-to-top.visible {
@@ -56,13 +56,13 @@
   background: var(--color-primary);
   color: var(--color-white);
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 16px rgb(0 0 0 / 15%);
   border-color: var(--color-primary);
 }
 
 .back-to-top:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 }
 
 .back-to-top:focus {
@@ -71,7 +71,7 @@
 }
 
 /* Mobile adjustments for back to top */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .back-to-top {
     bottom: 1rem;
     right: 1rem;
@@ -82,7 +82,7 @@
 }
 
 /* Ensure button doesn't interfere with mobile navigation */
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .back-to-top {
     bottom: 5rem; /* Move higher to avoid mobile browser UI */
   }

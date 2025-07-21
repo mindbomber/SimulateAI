@@ -6,7 +6,7 @@ Clean, minimal, intelligent design for thoughtful discourse
 /* Reset and Base Styles */
 .blog-page {
   font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Roboto",
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
     "Helvetica Neue", sans-serif;
   line-height: 1.6;
   color: #1a1a1a;
@@ -22,7 +22,7 @@ Clean, minimal, intelligent design for thoughtful discourse
 
 /* Blog Header */
 .blog-header {
-  background: #ffffff;
+  background: #fff;
   border-bottom: 1px solid #e5e5e5;
   padding: 32px 0;
   margin-bottom: 48px;
@@ -45,7 +45,7 @@ Clean, minimal, intelligent design for thoughtful discourse
 .blog-subtitle {
   font-size: 1.125rem;
   color: #666;
-  margin: 8px 0 0 0;
+  margin: 8px 0 0;
   font-weight: 400;
 }
 
@@ -68,7 +68,7 @@ Clean, minimal, intelligent design for thoughtful discourse
 
 /* Filter Section */
 .filter-section {
-  background: #ffffff;
+  background: #fff;
   border-bottom: 1px solid #e5e5e5;
   padding: 24px 0;
   margin-bottom: 48px;
@@ -98,9 +98,9 @@ Clean, minimal, intelligent design for thoughtful discourse
 
 .search-input:focus {
   outline: none;
-  border-color: #0066cc;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+  border-color: #06c;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgb(0 102 204 / 10%);
 }
 
 .filter-groups {
@@ -128,7 +128,7 @@ Clean, minimal, intelligent design for thoughtful discourse
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 0.875rem;
-  background: #ffffff;
+  background: #fff;
   color: #333;
   min-width: 140px;
   cursor: pointer;
@@ -136,7 +136,7 @@ Clean, minimal, intelligent design for thoughtful discourse
 
 .filter-select:focus {
   outline: none;
-  border-color: #0066cc;
+  border-color: #06c;
 }
 
 .sort-group {
@@ -148,7 +148,7 @@ Clean, minimal, intelligent design for thoughtful discourse
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 0.875rem;
-  background: #ffffff;
+  background: #fff;
   color: #333;
   min-width: 120px;
   cursor: pointer;
@@ -167,7 +167,7 @@ Clean, minimal, intelligent design for thoughtful discourse
 }
 
 .article-card {
-  background: #ffffff;
+  background: #fff;
   border: 1px solid #e5e5e5;
   border-radius: 8px;
   padding: 24px;
@@ -178,7 +178,7 @@ Clean, minimal, intelligent design for thoughtful discourse
 .article-card:hover {
   border-color: #ccc;
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 10%);
 }
 
 .article-header {
@@ -190,7 +190,7 @@ Clean, minimal, intelligent design for thoughtful discourse
   font-weight: 600;
   color: #111;
   line-height: 1.4;
-  margin: 0 0 8px 0;
+  margin: 0 0 8px;
 }
 
 .article-meta {
@@ -247,7 +247,7 @@ Clean, minimal, intelligent design for thoughtful discourse
 /* Tag Categories */
 .article-tag[data-category="format"] {
   background: #e6f3ff;
-  color: #0066cc;
+  color: #06c;
 }
 
 .article-tag[data-category="topic"] {
@@ -257,17 +257,17 @@ Clean, minimal, intelligent design for thoughtful discourse
 
 .article-tag[data-category="depth"] {
   background: #fff5e6;
-  color: #cc6600;
+  color: #c60;
 }
 
 .article-tag[data-category="audience"] {
   background: #f0e6ff;
-  color: #6600cc;
+  color: #60c;
 }
 
 .article-tag[data-category="platform"] {
   background: #ffe6f0;
-  color: #cc0066;
+  color: #c06;
 }
 
 .article-footer {
@@ -338,7 +338,7 @@ Clean, minimal, intelligent design for thoughtful discourse
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: #0066cc;
+  background: #06c;
   color: white;
   padding: 4px 8px;
   border-radius: 4px;
@@ -349,11 +349,11 @@ Clean, minimal, intelligent design for thoughtful discourse
 
 .featured-article .article-title {
   font-size: 1.5rem;
-  color: #0066cc;
+  color: #06c;
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .container {
     padding: 0 16px;
   }
@@ -406,7 +406,7 @@ Clean, minimal, intelligent design for thoughtful discourse
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .blog-title {
     font-size: 1.5rem;
   }
@@ -437,7 +437,7 @@ Clean, minimal, intelligent design for thoughtful discourse
   }
 
   .blog-title {
-    color: #ffffff;
+    color: #fff;
   }
 
   .blog-subtitle {
@@ -481,11 +481,11 @@ Clean, minimal, intelligent design for thoughtful discourse
 
   .article-card:hover {
     border-color: #555;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 30%);
   }
 
   .article-title {
-    color: #ffffff;
+    color: #fff;
   }
 
   .article-excerpt {
@@ -576,7 +576,7 @@ body.dark-mode .filter-select:focus,
 body.dark-mode .sort-select:focus {
   border-color: var(--theme-accent);
   background: var(--theme-bg-secondary);
-  box-shadow: 0 0 0 3px rgba(var(--theme-accent-rgb), 0.1);
+  box-shadow: 0 0 0 3px rgb(var(--theme-accent-rgb), 0.1);
 }
 
 body.dark-mode .filter-label {
@@ -626,31 +626,31 @@ body.dark-mode .article-tag:hover {
 }
 
 body.dark-mode .article-tag[data-category="format"] {
-  background: rgba(var(--theme-info-rgb), 0.1);
+  background: rgb(var(--theme-info-rgb), 0.1);
   color: var(--theme-info);
   border-color: var(--theme-info);
 }
 
 body.dark-mode .article-tag[data-category="topic"] {
-  background: rgba(var(--theme-success-rgb), 0.1);
+  background: rgb(var(--theme-success-rgb), 0.1);
   color: var(--theme-success);
   border-color: var(--theme-success);
 }
 
 body.dark-mode .article-tag[data-category="depth"] {
-  background: rgba(var(--theme-warning-rgb), 0.1);
+  background: rgb(var(--theme-warning-rgb), 0.1);
   color: var(--theme-warning);
   border-color: var(--theme-warning);
 }
 
 body.dark-mode .article-tag[data-category="audience"] {
-  background: rgba(var(--theme-accent-rgb), 0.1);
+  background: rgb(var(--theme-accent-rgb), 0.1);
   color: var(--theme-accent);
   border-color: var(--theme-accent);
 }
 
 body.dark-mode .article-tag[data-category="platform"] {
-  background: rgba(var(--theme-error-rgb), 0.1);
+  background: rgb(var(--theme-error-rgb), 0.1);
   color: var(--theme-error);
   border-color: var(--theme-error);
 }
@@ -716,6 +716,7 @@ body.dark-mode .featured-article .article-title {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -728,7 +729,7 @@ body.dark-mode .featured-article .article-title {
 .filter-select:focus,
 .sort-select:focus,
 .article-card:focus {
-  outline: 2px solid #0066cc;
+  outline: 2px solid #06c;
   outline-offset: 2px;
 }
 

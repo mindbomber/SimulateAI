@@ -3,12 +3,13 @@
 .reusable-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgb(0 0 0 / 45%);
   z-index: 10000;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s;
 }
+
 .reusable-modal-backdrop.show {
   opacity: 1;
   pointer-events: auto;
@@ -22,7 +23,7 @@
   background: var(--background-secondary, #fff);
   color: var(--text-primary, #1f2937);
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 8px 32px rgb(0 0 0 / 18%);
   z-index: 10001;
   min-width: 320px;
   max-width: 90vw;
@@ -36,6 +37,7 @@
     opacity 0.2s,
     transform 0.2s;
 }
+
 .reusable-modal.show {
   opacity: 1;
   pointer-events: auto;
@@ -43,7 +45,7 @@
 }
 
 .reusable-modal-header {
-  padding: 20px 24px 12px 24px;
+  padding: 20px 24px 12px;
   font-size: 1.2rem;
   font-weight: 600;
   border-bottom: 1px solid #e5e7eb;
@@ -51,11 +53,13 @@
   align-items: center;
   justify-content: space-between;
 }
+
 .reusable-modal-title {
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
 }
+
 .reusable-modal-close {
   background: none;
   border: none;
@@ -66,6 +70,7 @@
   padding: 2px 8px;
   transition: background 0.15s;
 }
+
 .reusable-modal-close:hover,
 .reusable-modal-close:focus {
   background: #f3f4f6;
@@ -80,20 +85,21 @@
 }
 
 .reusable-modal-footer {
-  padding: 12px 24px 20px 24px;
+  padding: 12px 24px 20px;
   border-top: 1px solid #e5e7eb;
   display: flex;
   justify-content: flex-end;
   gap: 8px;
 }
 
-@media (max-width: 600px) {
+@media (width <= 600px) {
   .reusable-modal {
     min-width: 0;
     width: 98vw;
     max-width: 98vw;
     padding: 0;
   }
+
   .reusable-modal-header,
   .reusable-modal-body,
   .reusable-modal-footer {
@@ -104,14 +110,14 @@
 
 /* ===== DARK MODE SUPPORT ===== */
 body.dark-mode .reusable-modal-backdrop {
-  background: rgba(0, 0, 0, 0.7);
+  background: rgb(0 0 0 / 70%);
 }
 
 body.dark-mode .reusable-modal {
   background: var(--theme-bg-secondary);
   color: var(--theme-text-primary);
   border: 1px solid var(--theme-border);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 12px 40px rgb(0 0 0 / 50%);
 }
 
 body.dark-mode .reusable-modal-header {

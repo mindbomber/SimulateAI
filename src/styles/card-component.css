@@ -3,7 +3,7 @@
 .card {
   background: var(--background-secondary, #fff);
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 7%);
   border: 1px solid #e5e7eb;
   padding: var(--container-padding, 20px) var(--container-padding, 24px);
   margin: 0;
@@ -14,22 +14,26 @@
     box-shadow 0.18s,
     border-color 0.18s;
 }
+
 .card:focus-within,
 .card:hover {
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.12);
+  box-shadow: 0 4px 16px rgb(59 130 246 / 12%);
   border-color: #3b82f6;
 }
+
 .card-header {
   font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 4px;
   color: var(--text-primary, #1f2937);
 }
+
 .card-content {
   flex: 1 1 auto;
   color: var(--text-secondary, #374151);
   font-size: 1rem;
 }
+
 .card-actions {
   display: flex;
   gap: 8px;
@@ -41,6 +45,7 @@
 .card-actions .btn-primary {
   flex: 1;
 }
+
 .card-action-btn {
   background: #3b82f6;
   color: #fff;
@@ -51,6 +56,7 @@
   cursor: pointer;
   transition: background 0.15s;
 }
+
 .card-action-btn:hover,
 .card-action-btn:focus {
   background: #2563eb;
@@ -85,7 +91,7 @@
 body.dark-mode .card {
   background: var(--theme-bg-secondary);
   border: 1px solid var(--theme-border);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 30%);
 }
 
 body.dark-mode .card:focus-within,
@@ -142,20 +148,20 @@ body.dark-mode .simulation-quick-start-btn:focus {
 /* Card variants */
 body.dark-mode .card.card-primary {
   border-color: var(--color-primary);
-  background: rgba(74, 158, 255, 0.05);
+  background: rgb(74 158 255 / 5%);
 }
 
 body.dark-mode .card.card-success {
   border-color: var(--color-success);
-  background: rgba(76, 175, 80, 0.05);
+  background: rgb(76 175 80 / 5%);
 }
 
 body.dark-mode .card.card-warning {
   border-color: var(--color-warning);
-  background: rgba(255, 193, 7, 0.05);
+  background: rgb(255 193 7 / 5%);
 }
 
 body.dark-mode .card.card-error {
   border-color: var(--color-error);
-  background: rgba(244, 67, 54, 0.05);
+  background: rgb(244 67 54 / 5%);
 }

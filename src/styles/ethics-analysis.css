@@ -44,23 +44,23 @@
   background: white;
   padding: 2rem;
   border-radius: 16px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 25px rgb(0 0 0 / 8%);
+  border: 1px solid rgb(255 255 255 / 80%);
   transition: all 0.3s ease;
 }
 
 .ethics-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 12px 40px rgb(0 0 0 / 12%);
 }
 
 .ethics-card h3 {
   font-size: 1.25rem;
   font-weight: 700;
   color: #1a202c;
-  margin: 0 0 1rem 0;
+  margin: 0 0 1rem;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
@@ -77,18 +77,18 @@
   background: white;
   padding: 3rem;
   border-radius: 20px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 12px 40px rgb(0 0 0 / 10%);
+  border: 1px solid rgb(255 255 255 / 80%);
 }
 
 .ethics-glossary h3 {
   font-size: 1.75rem;
   font-weight: 800;
   color: #1a202c;
-  margin: 0 0 2rem 0;
+  margin: 0 0 2rem;
   text-align: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
@@ -102,15 +102,15 @@
 
 .glossary-item {
   padding: 1.5rem;
-  background: rgba(102, 126, 234, 0.03);
+  background: rgb(102 126 234 / 3%);
   border-radius: 12px;
-  border: 1px solid rgba(102, 126, 234, 0.1);
+  border: 1px solid rgb(102 126 234 / 10%);
   transition: all 0.3s ease;
 }
 
 .glossary-item:hover {
-  background: rgba(102, 126, 234, 0.06);
-  border-color: rgba(102, 126, 234, 0.2);
+  background: rgb(102 126 234 / 6%);
+  border-color: rgb(102 126 234 / 20%);
   transform: translateY(-2px);
 }
 
@@ -118,7 +118,7 @@
   font-size: 1.1rem;
   font-weight: 700;
   color: #2d3748;
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 0.75rem;
 }
 
 .glossary-item p {
@@ -129,8 +129,8 @@
 }
 
 .glossary-note {
-  background: rgba(245, 158, 11, 0.1);
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  background: rgb(245 158 11 / 10%);
+  border: 1px solid rgb(245 158 11 / 20%);
   border-radius: 12px;
   padding: 1.5rem;
   margin-top: 2rem;
@@ -161,9 +161,9 @@
   font-size: 1.5rem;
   font-weight: 700;
   color: #1a202c;
-  margin: 0 0 1rem 0;
+  margin: 0 0 1rem;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
@@ -185,7 +185,6 @@
 
 .demo-btn {
   padding: 0.75rem 1.5rem;
-  border: none;
   border-radius: 8px;
   background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
   color: white;
@@ -193,10 +192,10 @@
   font-size: 0.9rem;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+  box-shadow: 0 2px 8px rgb(79 70 229 / 25%);
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgb(255 255 255 / 10%);
 }
 
 .demo-btn::before {
@@ -209,7 +208,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.15),
+    rgb(255 255 255 / 15%),
     transparent
   );
   transition: left 0.5s ease;
@@ -217,7 +216,7 @@
 
 .demo-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 4px 16px rgb(79 70 229 / 35%);
   background: linear-gradient(135deg, #4338ca 0%, #5b21b6 100%);
 }
 
@@ -227,53 +226,53 @@
 
 .demo-btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+  box-shadow: 0 2px 8px rgb(79 70 229 / 25%);
 }
 
 /* Special styling for the reset button */
 .demo-btn.reset-btn {
   background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
-  box-shadow: 0 2px 8px rgba(107, 114, 128, 0.25);
+  box-shadow: 0 2px 8px rgb(107 114 128 / 25%);
 }
 
 .demo-btn.reset-btn:hover {
   background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
-  box-shadow: 0 4px 16px rgba(107, 114, 128, 0.35);
+  box-shadow: 0 4px 16px rgb(107 114 128 / 35%);
 }
 
 .demo-btn.reset-btn::before {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.2),
+    rgb(255 255 255 / 20%),
     transparent
   );
 }
 
 .demo-radar-container {
   max-width: 500px;
-  margin: 0 auto 2rem auto;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  margin: 0 auto 2rem;
+  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.08),
-    0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+    0 4px 12px rgb(0 0 0 / 8%),
+    0 1px 3px rgb(0 0 0 / 5%);
+  border: 1px solid rgb(226 232 240 / 80%);
   transition: all 0.3s ease;
 }
 
 .demo-radar-container:hover {
   box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.12),
-    0 2px 6px rgba(0, 0, 0, 0.08);
+    0 8px 20px rgb(0 0 0 / 12%),
+    0 2px 6px rgb(0 0 0 / 8%);
   transform: translateY(-2px);
-  border-color: rgba(156, 163, 175, 0.6);
+  border-color: rgb(156 163 175 / 60%);
 }
 
 .demo-feedback {
-  background: rgba(102, 126, 234, 0.05);
-  border: 1px solid rgba(102, 126, 234, 0.1);
+  background: rgb(102 126 234 / 5%);
+  border: 1px solid rgb(102 126 234 / 10%);
   border-radius: 12px;
   padding: 1.5rem;
   margin-top: 1rem;
@@ -294,7 +293,7 @@
 .demo-feedback h5 {
   color: #667eea;
   font-weight: 700;
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 0.75rem;
   font-size: 1.1rem;
 }
 
@@ -307,20 +306,20 @@
 
 /* Radar Instructions */
 .radar-instructions {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(102, 126, 234, 0.2);
+  background: rgb(255 255 255 / 90%);
+  border: 1px solid rgb(102 126 234 / 20%);
   border-radius: 12px;
   padding: 1.5rem;
   margin: 1.5rem auto;
   max-width: 600px;
   text-align: left;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 5%);
 }
 
 .radar-instructions h5 {
   color: #667eea;
   font-weight: 700;
-  margin: 0 0 1rem 0;
+  margin: 0 0 1rem;
   font-size: 1.1rem;
   display: flex;
   align-items: center;
@@ -329,7 +328,7 @@
 
 .radar-instructions p {
   color: #4a5568;
-  margin: 0 0 1rem 0;
+  margin: 0 0 1rem;
   line-height: 1.6;
   font-size: 0.95rem;
 }
@@ -341,7 +340,7 @@
 .radar-instructions ul {
   list-style: none;
   padding: 0;
-  margin: 0 0 1rem 0;
+  margin: 0 0 1rem;
 }
 
 .radar-instructions li {
@@ -368,7 +367,7 @@
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .ethics-analysis-section {
     padding: 4rem 0;
   }
@@ -431,7 +430,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .ethics-analysis-section {
     padding: 3rem 0;
   }
@@ -488,7 +487,7 @@
 @media (prefers-contrast: high) {
   .ethics-card {
     border-width: 2px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
   }
 
   .glossary-item {
