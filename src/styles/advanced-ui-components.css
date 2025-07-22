@@ -1034,16 +1034,9 @@
 
 /* ===== ENHANCED ACCESSIBILITY FEATURES ===== */
 
-/* Reduced Motion Support */
+/* Reduced Motion - Moved to design-tokens.css for consolidation */
+/* Modal-specific reduced motion behavior */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-
   .modal-dialog {
     animation: none;
     opacity: 1;

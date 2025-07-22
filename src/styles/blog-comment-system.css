@@ -68,6 +68,12 @@
   color: #1e293b;
 }
 
+/* Author name in comment contexts */
+.comment-system .author-name {
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
 .author-title {
   color: #64748b;
   font-size: 0.875rem;
@@ -150,6 +156,11 @@
 
 .action-icon {
   font-size: 1rem;
+}
+
+/* Smaller action icons in comments */
+.comment-actions .action-icon {
+  font-size: 0.875rem;
 }
 
 .post-comments-section {
@@ -286,6 +297,13 @@
   border-bottom: 2px solid #f1f5f9;
 }
 
+/* Comment header in compact view */
+.comment-system .comment-header {
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+}
+
 .comment-title {
   display: flex;
   align-items: center;
@@ -304,6 +322,11 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+/* Compact comment actions in comment threads */
+.comment-thread .comment-actions {
+  gap: 0.5rem;
 }
 
 .auth-prompt {
@@ -442,7 +465,7 @@
   user-select: none;
 }
 
-.checkbox-container input[type='checkbox'] {
+.checkbox-container input[type="checkbox"] {
   margin: 0;
 }
 
@@ -496,13 +519,6 @@
   padding: 1.5rem;
 }
 
-.comment-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-}
-
 .comment-author {
   display: flex;
   align-items: center;
@@ -528,12 +544,6 @@
   gap: 0.25rem;
 }
 
-.author-name {
-  font-weight: 500;
-  color: #1e293b;
-  font-size: 0.875rem;
-}
-
 .comment-meta {
   display: flex;
   align-items: center;
@@ -544,12 +554,6 @@
 
 .edited-indicator {
   font-style: italic;
-}
-
-.comment-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
 .comment-action-btn {
@@ -569,10 +573,6 @@
 .comment-action-btn:hover {
   background: #f1f5f9;
   color: #1e293b;
-}
-
-.action-icon {
-  font-size: 0.875rem;
 }
 
 .comment-body {
@@ -751,12 +751,6 @@
 
   .submit-actions {
     flex-direction: column;
-  }
-
-  .comment-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
   }
 
   .comment-actions {

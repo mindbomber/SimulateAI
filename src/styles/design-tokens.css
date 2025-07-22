@@ -323,3 +323,39 @@ html.font-size-extra-large {
     --shadow-2xl: none;
   }
 }
+
+/* ===== UNIVERSAL SELECTORS - CONSOLIDATED ===== */
+/* Single source of truth for universal styling */
+
+/* Accessibility: Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print Optimization */
+@media print {
+  *,
+  *::before,
+  *::after {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  *,
+  *::before,
+  *::after {
+    border-color: currentColor;
+  }
+}

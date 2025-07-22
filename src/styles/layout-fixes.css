@@ -56,17 +56,8 @@
   position: relative;
 }
 
-/* Canvas responsive sizing */
-.modal-backdrop .simulation-container canvas,
-.modal-dialog .simulation-container canvas,
-#simulation-modal .simulation-container canvas,
-.simulation-preview .simulation-container canvas {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-}
+/* Canvas responsive sizing consolidated to main.css for consistency */
+/* Canvas selectors moved to main.css for unified management */
 
 /* Simulation controls layout */
 .modal-backdrop .simulation-controls,
@@ -95,103 +86,12 @@
 
 /* ===== HERO SECTION LAYOUT ===== */
 
-/* Hero section responsive grid - fully integrated with media.css */
-.main-content .hero {
-  background: linear-gradient(
-    135deg,
-    var(--color-primary-light) 0%,
-    var(--color-primary) 100%
-  );
-  color: var(--color-white);
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: calc(var(--container-padding) * 0.5);
-  align-items: center;
-  padding: calc(var(--container-padding) * 1.5) var(--container-padding);
-  min-height: 500px;
-  font-size: calc(1rem * var(--font-scale, 1));
-}
-
-/* Hero responsive breakpoints using media.css device categories */
-@media only screen and (width >= 768px) {
-  .main-content .hero {
-    grid-template-columns: 1fr 1fr;
-    padding: calc(var(--container-padding) * 1.25) var(--container-padding);
-    min-height: 600px;
-    gap: calc(var(--container-padding) * 0.75);
-  }
-}
-
-@media only screen and (width >= 1024px) {
-  .main-content .hero {
-    padding: calc(var(--container-padding) * 1.5) var(--container-padding);
-    gap: calc(var(--container-padding) * 1);
-    min-height: 700px;
-  }
-}
-
-@media only screen and (width >= 1280px) {
-  .main-content .hero {
-    padding: calc(var(--container-padding) * 1.75) var(--container-padding);
-    gap: calc(var(--container-padding) * 1.25);
-  }
-}
-
-/* Hero content alignment - responsive text scaling */
-.main-content .hero .hero-content {
-  text-align: center;
-}
-
-.main-content .hero .hero-content h1 {
-  font-size: calc(2.5rem * var(--font-scale, 1));
-}
-
-.main-content .hero .hero-content p {
-  font-size: calc(1.125rem * var(--font-scale, 1));
-}
-
-@media only screen and (width >= 768px) {
-  .main-content .hero .hero-content {
-    text-align: center; /* Changed from left to center for consistent centering */
-  }
-}
-
-/* Hero simulation container - fully responsive with media.css integration */
-.main-content .hero .hero-simulation {
-  background: rgb(255 255 255 / 10%);
-  border-radius: var(--radius-xl);
-  padding: calc(var(--container-padding) * 0.75);
-  backdrop-filter: blur(10px);
-  max-width: none;
-  width: 100%;
-  min-height: calc(300px + (var(--container-padding) * 2));
-  height: auto;
-  position: relative;
-  overflow: visible;
-  z-index: 1;
-}
-
-/* Hero simulation responsive sizing using device-specific scaling */
-@media only screen and (width <= 767px) {
-  .main-content .hero .hero-simulation {
-    padding: calc(var(--container-padding) * 0.5);
-    min-height: calc(250px + var(--container-padding));
-  }
-}
-
-@media only screen and (width >= 768px) {
-  .main-content .hero .hero-simulation {
-    padding: calc(var(--container-padding) * 0.75);
-    min-height: calc(350px + (var(--container-padding) * 1.5));
-  }
-}
-
-@media only screen and (width >= 1024px) {
-  .main-content .hero .hero-simulation {
-    padding: calc(var(--container-padding) * 1);
-    min-height: calc(400px + (var(--container-padding) * 2));
-  }
-}
+/* Hero section styles consolidated to main.css for better organization */
+/* .hero base styles moved to main.css */
+/* .hero responsive breakpoints moved to main.css */
+/* .hero-content styles moved to main.css */
+/* .hero-simulation styles moved to main.css */
+/* .hero-demo-container styles moved to main.css */
 
 /* ===== SIMULATION PREVIEW COMPONENTS ===== */
 
@@ -205,28 +105,8 @@
   padding: 0;
 }
 
-/* Demo container with improved media.css integration */
-.main-content .hero .hero-demo-container,
-#app .hero-demo-container {
-  background: linear-gradient(
-    135deg,
-    rgb(255 255 255 / 95%) 0%,
-    rgb(248 250 252 / 95%) 100%
-  );
-  border-radius: 16px;
-  padding: calc(var(--container-padding) * 0.75);
-  box-shadow: 0 10px 25px rgb(0 0 0 / 10%);
-  border: 1px solid rgb(255 255 255 / 30%);
-  backdrop-filter: blur(10px);
-  max-width: 100%;
-  margin: 0 auto;
-  height: 100%;
-  min-height: calc(300px + var(--container-padding));
-  position: relative;
-  overflow: visible;
-  z-index: 2;
-  font-size: calc(1rem * var(--font-scale, 1));
-}
+/* Demo container styles moved to main.css for consolidation */
+/* .hero-demo-container styles moved to main.css */
 
 /* Demo header and text elements with responsive font scaling */
 .main-content .demo-header,
@@ -290,12 +170,8 @@
   margin-bottom: 0.75rem;
 }
 
-.scenario-title {
-  font-size: calc(1rem * var(--font-scale, 1));
-  font-weight: 600;
-  color: var(--color-gray-800, #2d3748);
-  margin: 0 0 0.25rem;
-}
+/* Scenario component styles consolidated to scenario-modal.css for component ownership */
+/* .scenario-title styles moved to scenario-modal.css */
 
 .scenario-question {
   font-size: calc(0.85rem * var(--font-scale, 1));

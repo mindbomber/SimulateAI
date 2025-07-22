@@ -25,7 +25,7 @@
   },
   "tooltip": {
     "offset": 8,
-    "zIndex": 1000,
+    "zIndex": 1200,
     "positioning": {
       "transform": "translateX(-50%)",
       "position": "fixed"

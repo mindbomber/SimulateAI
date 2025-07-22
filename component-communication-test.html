@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Component Communication Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+      .event-log {
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 4px;
+        max-height: 300px;
+        overflow-y: auto;
+        margin-top: 10px;
+      }
+      .log-entry {
+        margin: 5px 0;
+        padding: 8px;
+        background: white;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 12px;
+      }
+      .log-entry.sent {
+        border-left: 4px solid #28a745;
+      }
+      .log-entry.received {
+        border-left: 4px solid #007bff;
+      }
+      button {
+        padding: 10px 15px;
+        margin: 5px;
+        border: none;
+        border-radius: 4px;
+        background: #007bff;
+        color: white;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+      }
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Component Communication Test</h1>
+    <p>This page tests the event-driven communication between components.</p>
+
+    <div class="test-section">
+      <h3>Event Dispatcher Status</h3>
+      <div id="dispatcher-status" class="status">Checking...</div>
+      <button onclick="checkDispatcher()">Refresh Status</button>
+    </div>
+
+    <div class="test-section">
+      <h3>Authentication Events Test</h3>
+      <p>Test authentication-related events:</p>
+      <button onclick="testSignIn()">Test User Sign In</button>
+      <button onclick="testSignOut()">Test User Sign Out</button>
+      <button onclick="testSessionExtension()">Test Session Extension</button>
+      <button onclick="testIntentionalLogout()">Test Intentional Logout</button>
+    </div>
+
+    <div class="test-section">
+      <h3>Event Communication Test</h3>
+      <p>Test bidirectional communication:</p>
+      <button onclick="testEventFlow()">Test Event Flow</button>
+      <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <div class="test-section">
+      <h3>Event Log</h3>
+      <div id="event-log" class="event-log">
+        <div class="log-entry">
+          Event log initialized - waiting for events...
+        </div>
+      </div>
+    </div>
+
+    <!-- Load Event Dispatcher -->
+    <script type="module" src="src/js/utils/event-dispatcher.js"></script>
+
+    <script type="module">
+      import eventDispatcher, {
+        AUTH_EVENTS,
+        UI_EVENTS,
+        SYSTEM_EVENTS,
+      } from "./src/js/utils/event-dispatcher.js";
+
+      // Global references for testing
+      window.eventDispatcher = eventDispatcher;
+      window.AUTH_EVENTS = AUTH_EVENTS;
+      window.UI_EVENTS = UI_EVENTS;
+      window.SYSTEM_EVENTS = SYSTEM_EVENTS;
+
+      const eventLog = document.getElementById("event-log");
+      const statusDiv = document.getElementById("dispatcher-status");
+
+      // Log function
+      function addLogEntry(message, type = "info") {
+        const entry = document.createElement("div");
+        entry.className = `log-entry ${type}`;
+        entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        eventLog.appendChild(entry);
+        eventLog.scrollTop = eventLog.scrollHeight;
+      }
+
+      // Setup global event listeners for testing
+      function setupTestListeners() {
+        // Listen to all auth events
+        Object.values(AUTH_EVENTS).forEach((eventType) => {
+          eventDispatcher.on(eventType, (event) => {
+            addLogEntry(
+              `Received: ${eventType} - ${JSON.stringify(event.detail)}`,
+              "received",
+            );
+          });
+        });
+
+        // Listen to UI events
+        Object.values(UI_EVENTS).forEach((eventType) => {
+          eventDispatcher.on(eventType, (event) => {
+            addLogEntry(
+              `Received: ${eventType} - ${JSON.stringify(event.detail)}`,
+              "received",
+            );
+          });
+        });
+
+        // Listen to system events
+        Object.values(SYSTEM_EVENTS).forEach((eventType) => {
+          eventDispatcher.on(eventType, (event) => {
+            addLogEntry(
+              `Received: ${eventType} - ${JSON.stringify(event.detail)}`,
+              "received",
+            );
+          });
+        });
+      }
+
+      // Test functions
+      window.checkDispatcher = function () {
+        try {
+          const eventTypes = eventDispatcher.getEventTypes();
+          statusDiv.innerHTML = `
+                    <div class="status success">
+                        ✅ Event Dispatcher Loaded Successfully<br>
+                        Active event listeners: ${eventTypes.length}<br>
+                        Event types: ${eventTypes.join(", ") || "None"}
+                    </div>
+                `;
+        } catch (error) {
+          statusDiv.innerHTML = `
+                    <div class="status error">
+                        ❌ Event Dispatcher Error: ${error.message}
+                    </div>
+                `;
+        }
+      };
+
+      window.testSignIn = function () {
+        const detail = {
+          userId: "test-user-123",
+          email: "test@example.com",
+          timestamp: Date.now(),
+        };
+        eventDispatcher.emit(AUTH_EVENTS.USER_SIGNED_IN, detail);
+        addLogEntry(
+          `Sent: ${AUTH_EVENTS.USER_SIGNED_IN} - ${JSON.stringify(detail)}`,
+          "sent",
+        );
+      };
+
+      window.testSignOut = function () {
+        const detail = {
+          reason: "user_initiated",
+          timestamp: Date.now(),
+        };
+        eventDispatcher.emit(AUTH_EVENTS.USER_SIGNED_OUT, detail);
+        addLogEntry(
+          `Sent: ${AUTH_EVENTS.USER_SIGNED_OUT} - ${JSON.stringify(detail)}`,
+          "sent",
+        );
+      };
+
+      window.testSessionExtension = function () {
+        const detail = {
+          timestamp: Date.now(),
+          source: "test",
+        };
+        eventDispatcher.emit(AUTH_EVENTS.SESSION_EXTENDED, detail);
+        addLogEntry(
+          `Sent: ${AUTH_EVENTS.SESSION_EXTENDED} - ${JSON.stringify(detail)}`,
+          "sent",
+        );
+      };
+
+      window.testIntentionalLogout = function () {
+        const detail = {
+          reason: "intentional_logout",
+          data: {
+            timestamp: Date.now(),
+            source: "test",
+          },
+        };
+        eventDispatcher.emit(AUTH_EVENTS.INTENTIONAL_LOGOUT_REQUESTED, detail);
+        addLogEntry(
+          `Sent: ${AUTH_EVENTS.INTENTIONAL_LOGOUT_REQUESTED} - ${JSON.stringify(detail)}`,
+          "sent",
+        );
+      };
+
+      window.testEventFlow = function () {
+        addLogEntry("Testing event flow...", "info");
+
+        // Test multiple events in sequence
+        setTimeout(() => testSignIn(), 100);
+        setTimeout(() => testSessionExtension(), 200);
+        setTimeout(() => testIntentionalLogout(), 300);
+        setTimeout(() => testSignOut(), 400);
+
+        addLogEntry("Event flow test initiated", "info");
+      };
+
+      window.clearLog = function () {
+        eventLog.innerHTML = '<div class="log-entry">Event log cleared</div>';
+      };
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", () => {
+        setupTestListeners();
+        checkDispatcher();
+        addLogEntry("Test page initialized - event listeners active", "info");
+      });
+
+      // Add some debug info
+      console.log("Event Dispatcher Test Page Loaded");
+      console.log("Available AUTH_EVENTS:", AUTH_EVENTS);
+      console.log("Available UI_EVENTS:", UI_EVENTS);
+      console.log("Available SYSTEM_EVENTS:", SYSTEM_EVENTS);
+    </script>
+  </body>
+</html>

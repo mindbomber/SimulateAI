@@ -303,10 +303,7 @@ main.main-content {
     grid-row: 1;
   }
 
-  .nav-toggle {
-    grid-column: 2;
-    grid-row: 1;
-  }
+  /* .nav-toggle grid layout styles moved to shared-navigation.css for component ownership */
 
   .breadcrumb {
     grid-column: 1 / -1;
@@ -314,10 +311,7 @@ main.main-content {
     margin-left: 0;
   }
 
-  .main-nav {
-    grid-column: 1 / -1;
-    grid-row: 3;
-  }
+  /* .main-nav grid layout styles moved to shared-navigation.css for component ownership */
 }
 
 /* Error page styles */

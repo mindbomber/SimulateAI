@@ -113,6 +113,7 @@
 }
 
 .meters-container canvas {
+  /* Base canvas styles inherited from main.css */
   max-width: 100%;
   height: auto;
   border-radius: var(--enhanced-radius-sm);
@@ -506,6 +507,7 @@
 }
 
 .enhanced-visual-engine-container canvas {
+  /* Base canvas styles inherited from main.css */
   max-width: 100%;
   height: auto;
   border-radius: var(--enhanced-radius-md);
@@ -590,6 +592,7 @@
 }
 
 .visual-engine-container canvas {
+  /* Base canvas styles inherited from main.css */
   max-width: 100%;
   height: auto;
   border-radius: var(--enhanced-radius-md);

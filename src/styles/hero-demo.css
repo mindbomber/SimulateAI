@@ -69,12 +69,8 @@
   border-radius: 20px;
 }
 
-.scenario-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--color-gray-900);
-  margin: 0;
-}
+/* Scenario component styles consolidated to scenario-modal.css for component ownership */
+/* .scenario-title styles moved to scenario-modal.css */
 
 .scenario-question {
   font-size: 1rem;
@@ -340,33 +336,12 @@
    HERO RADAR DEMO STYLES  
    ================================== */
 
-/* Hero Radar Demo Section */
-.hero-radar-demo {
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border: 2px solid #cbd5e0;
-  border-radius: 16px;
-  padding: 2rem;
-  margin: 2rem 0 0;
-  text-align: center;
-}
+/* Hero Radar Demo Section - Consolidated to radar-chart.css */
+/* .hero-radar-demo styles moved to radar-chart.css for component ownership */
 
-.hero-radar-demo h3 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1a202c;
-  margin: 0 0 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+/* .hero-radar-demo h3 styles moved to radar-chart.css for component ownership */
 
-.hero-radar-demo p {
-  color: #4a5568;
-  margin-bottom: 2rem;
-  font-size: 1rem;
-  line-height: 1.6;
-}
+/* .hero-radar-demo p styles moved to radar-chart.css for component ownership */
 
 /* Demo Controls Grid for Better Layout */
 .hero-demo-controls {
@@ -381,17 +356,8 @@
   margin: 0 auto;
 }
 
-/* Hero Radar Container */
-.hero-radar-container {
-  position: relative;
-  width: 100%;
-  max-width: 650px;
-  margin: 0 auto 2rem;
-  padding: 1rem;
-  background: rgb(255 255 255 / 80%);
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
-}
+/* Hero Radar Container - Consolidated to radar-chart.css */
+/* .hero-radar-container styles moved to radar-chart.css for component ownership */
 
 /* Accordion Styles for Instructions */
 .radar-instructions-accordion {
@@ -810,9 +776,8 @@ body.dark-mode .scenario-counter {
   background: rgb(var(--theme-accent-rgb), 0.1);
 }
 
-body.dark-mode .scenario-title {
-  color: var(--theme-text-primary);
-}
+/* Scenario component dark mode styles consolidated to scenario-modal.css for component ownership */
+/* body.dark-mode .scenario-title styles moved to scenario-modal.css */
 
 body.dark-mode .scenario-question {
   color: var(--theme-text-secondary);
@@ -894,23 +859,11 @@ body.dark-mode .demo-actions .btn-primary:hover {
   border-color: var(--theme-accent-dark);
 }
 
-body.dark-mode .hero-radar-demo {
-  background: var(--theme-bg-secondary);
-  border-color: var(--theme-border);
-}
-
-body.dark-mode .hero-radar-demo h3 {
-  color: var(--theme-text-primary);
-}
-
-body.dark-mode .hero-radar-demo p {
-  color: var(--theme-text-secondary);
-}
-
-body.dark-mode .hero-radar-container {
-  background: var(--theme-bg-tertiary);
-  border-color: var(--theme-border);
-}
+/* Hero radar demo dark mode styles consolidated to radar-chart.css */
+/* body.dark-mode .hero-radar-demo styles moved to radar-chart.css */
+/* body.dark-mode .hero-radar-demo h3 styles moved to radar-chart.css */
+/* body.dark-mode .hero-radar-demo p styles moved to radar-chart.css */
+/* body.dark-mode .hero-radar-container styles moved to radar-chart.css */
 
 body.dark-mode .radar-instructions-accordion .accordion-item {
   background: var(--theme-bg-tertiary);

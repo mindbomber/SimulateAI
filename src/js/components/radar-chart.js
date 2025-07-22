@@ -31,13 +31,13 @@
 import logger from "../utils/logger.js";
 import {
   loadRadarConfig,
-  getEnterpriseConstants,
   getChartConstants,
   getEthicalAxes,
   getDefaultScores,
   getImpactDescription,
   getChartConfigTemplate,
   validateConfig,
+  getEnterpriseConstants,
 } from "../utils/radar-config-loader.js";
 
 export default class RadarChart {
@@ -76,39 +76,70 @@ export default class RadarChart {
   constructor(containerId, options = {}) {
     // === ENTERPRISE INITIALIZATION ===
 
-    // Ensure configuration is loaded
+    // Ensure configuration is loaded - Auto-load if not already loaded
     if (!RadarChart.config) {
-      throw new Error(
-        "Configuration not loaded. Call RadarChart.loadConfiguration() first.",
+      logger.warn(
+        "RadarChart",
+        "Configuration not preloaded, loading automatically",
       );
+      // Auto-initialize configuration for better developer experience
+      this.initializationPromise = this._initializeWithConfig(
+        containerId,
+        options,
+      );
+      return; // Exit early, actual initialization happens in _initializeWithConfig
     }
 
+    this._initializeInstance(containerId, options);
+  }
+
+  /**
+   * Initialize instance with automatic configuration loading
+   * @private
+   * @param {string} containerId - Container element ID
+   * @param {Object} options - Chart options
+   */
+  async _initializeWithConfig(containerId, options) {
+    try {
+      await RadarChart.loadConfiguration();
+      this._initializeInstance(containerId, options);
+    } catch (error) {
+      logger.error("RadarChart", "Failed to auto-load configuration", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Initialize the actual chart instance
+   * @private
+   * @param {string} containerId - Container element ID
+   * @param {Object} options - Chart options
+   */
+  _initializeInstance(containerId, options) {
     const config = RadarChart.config;
 
-    // Get constants from configuration
-    this.ENTERPRISE_CONSTANTS = getEnterpriseConstants(config);
+    // === LOAD CONFIGURATION-BASED CONSTANTS ===
     this.CHART_CONSTANTS = getChartConstants(config);
     this.ETHICAL_AXES = getEthicalAxes(config);
     this.DEFAULT_SCORES = getDefaultScores(config);
+    this.ENTERPRISE_CONSTANTS = getEnterpriseConstants(config);
 
-    // Generate unique instance identifiers
-    RadarChart.instanceCount++;
-    this.instanceId = `radar-chart-${RadarChart.instanceCount}`;
-    this.instanceUuid = this._generateUUID();
-    this.createdAt = Date.now();
-
-    // Basic container validation
     this.containerId = containerId;
     this.container = document.getElementById(containerId);
 
     if (!this.container) {
-      const error = `Container with ID '${containerId}' not found`;
-      console.error("❌ RadarChart error:", error);
-      throw new Error(error);
+      throw new Error(`Container element "${containerId}" not found`);
     }
 
-    // Configuration options with enhanced context awareness
+    // Track instance creation for analytics
+    logger.log(
+      "RadarChart",
+      `Creating new instance in container: ${containerId}`,
+    );
+
+    // === MERGE AND VALIDATE OPTIONS ===
     this.options = {
+      ...config.chartDefaults,
       width: options.width || this.CHART_CONSTANTS.DEFAULT_CHART_SIZE,
       height: options.height || this.CHART_CONSTANTS.DEFAULT_CHART_SIZE,
       showLabels: options.showLabels !== false,
@@ -121,14 +152,30 @@ export default class RadarChart {
       ...options,
     };
 
-    // Core chart properties
+    // Validate chart options
+    if (!this._validateChartOptions(this.options)) {
+      throw new Error("Invalid chart configuration options");
+    }
+
+    // === ENTERPRISE INITIALIZATION ===
+    this.instanceId = this._generateUUID();
+    this.instanceNumber = ++RadarChart.instanceCounter;
+    this.createdAt = Date.now();
+
+    // Set container accessibility
+    this.container.setAttribute("aria-label", "Interactive Radar Chart");
+    this.container.setAttribute("role", "img");
+    this.container.setAttribute("tabindex", "0");
+
+    // === CHART CONFIGURATION ===
     this.chart = null;
+    this.currentScores = this.options.scores || { ...this.DEFAULT_SCORES };
 
-    // Use simple whole number scores - no complex decimals
-    // Default is 3 (neutral) - can be 1, 2, 3, 4, or 5
-    this.currentScores = { ...this.DEFAULT_SCORES };
+    // === ACCESSIBILITY INITIALIZATION ===
+    // Note: Accessibility manager integration available if needed
+    // this.accessibilityManager = new RadarChartAccessibility(this);
 
-    logger.info(
+    logger.log(
       "RadarChart",
       "Using simple whole number scores (1-5 scale, default=3)",
       this.currentScores,
@@ -194,7 +241,7 @@ export default class RadarChart {
     logger.info("RadarChart", "🏢 Enterprise radar chart instance created", {
       instanceId: this.instanceId,
       containerId: this.containerId,
-      totalInstances: RadarChart.instanceCount,
+      totalInstances: RadarChart.instanceCounter,
     });
   }
 
@@ -242,6 +289,87 @@ export default class RadarChart {
 
     // Fallback based on isDemo flag
     return options.isDemo ? "hero-demo" : "scenario";
+  }
+
+  /**
+   * Validate chart options
+   * @private
+   * @param {Object} options - Chart options to validate
+   * @returns {boolean} True if options are valid
+   */
+  _validateChartOptions(options) {
+    if (!options || typeof options !== "object") {
+      logger.error("RadarChart", "Options must be a valid object");
+      return false;
+    }
+
+    // Validate dimensions
+    if (
+      options.width &&
+      (typeof options.width !== "number" || options.width <= 0)
+    ) {
+      logger.error("RadarChart", "Width must be a positive number");
+      return false;
+    }
+
+    if (
+      options.height &&
+      (typeof options.height !== "number" || options.height <= 0)
+    ) {
+      logger.error("RadarChart", "Height must be a positive number");
+      return false;
+    }
+
+    // Validate boolean options
+    const booleanOptions = [
+      "showLabels",
+      "showLegend",
+      "animated",
+      "realTime",
+      "isDemo",
+    ];
+    for (const boolOption of booleanOptions) {
+      if (
+        Object.prototype.hasOwnProperty.call(options, boolOption) &&
+        typeof options[boolOption] !== "boolean"
+      ) {
+        logger.error("RadarChart", `${boolOption} must be a boolean value`);
+        return false;
+      }
+    }
+
+    // Validate string options
+    if (options.title && typeof options.title !== "string") {
+      logger.error("RadarChart", "Title must be a string");
+      return false;
+    }
+
+    if (options.context && typeof options.context !== "string") {
+      logger.error("RadarChart", "Context must be a string");
+      return false;
+    }
+
+    // Validate scores object if provided
+    if (options.scores) {
+      if (typeof options.scores !== "object" || Array.isArray(options.scores)) {
+        logger.error("RadarChart", "Scores must be an object");
+        return false;
+      }
+
+      // Check that all score values are numbers within valid range
+      for (const [axis, score] of Object.entries(options.scores)) {
+        if (typeof score !== "number" || score < 1 || score > 5) {
+          logger.error(
+            "RadarChart",
+            `Score for ${axis} must be a number between 1 and 5`,
+          );
+          return false;
+        }
+      }
+    }
+
+    logger.debug("RadarChart", "Chart options validation passed");
+    return true;
   }
 
   /**
@@ -1306,6 +1434,131 @@ export default class RadarChart {
       script.onerror = reject;
       document.head.appendChild(script);
     });
+  }
+
+  // ===== CHART.JS UTILITIES FOR COMPONENT INTEGRATION =====
+
+  /**
+   * Check if Chart.js is available globally
+   * @static
+   * @returns {boolean} True if Chart.js is loaded and available
+   */
+  static isChartJSAvailable() {
+    return typeof window.Chart !== "undefined" && window.Chart.getChart;
+  }
+
+  /**
+   * Ensure Chart.js is loaded globally
+   * @static
+   * @returns {Promise<void>} Promise that resolves when Chart.js is available
+   */
+  static async ensureChartJSLoaded() {
+    if (!RadarChart.isChartJSAvailable()) {
+      logger.info("RadarChart", "Loading Chart.js globally for component use");
+
+      return new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = "https://cdn.jsdelivr.net/npm/chart.js";
+        script.onload = () => {
+          logger.info("RadarChart", "Chart.js loaded successfully");
+          resolve();
+        };
+        script.onerror = (error) => {
+          logger.error("RadarChart", "Failed to load Chart.js", error);
+          reject(error);
+        };
+        document.head.appendChild(script);
+      });
+    }
+  }
+
+  /**
+   * Clean up orphaned Chart.js instances in containers
+   * @static
+   * @param {string|HTMLElement} containerSelector - CSS selector or element containing charts
+   * @returns {number} Number of instances cleaned up
+   */
+  static cleanupOrphanedCharts(containerSelector) {
+    let cleanupCount = 0;
+
+    try {
+      const containers =
+        typeof containerSelector === "string"
+          ? document.querySelectorAll(containerSelector)
+          : [containerSelector];
+
+      containers.forEach((container) => {
+        if (!container) return;
+
+        const canvases = container.querySelectorAll("canvas");
+        canvases.forEach((canvas) => {
+          if (RadarChart.isChartJSAvailable()) {
+            const chartInstance = window.Chart.getChart(canvas);
+            if (chartInstance) {
+              logger.info(
+                "RadarChart",
+                "Destroying orphaned Chart.js instance",
+                {
+                  canvasId: canvas.id || "unnamed",
+                  chartType: chartInstance.config?.type || "unknown",
+                },
+              );
+              chartInstance.destroy();
+              cleanupCount++;
+            }
+          }
+        });
+      });
+
+      if (cleanupCount > 0) {
+        logger.info(
+          "RadarChart",
+          `Cleaned up ${cleanupCount} orphaned Chart.js instances`,
+        );
+      }
+    } catch (error) {
+      logger.error("RadarChart", "Error during Chart.js cleanup", error);
+    }
+
+    return cleanupCount;
+  }
+
+  /**
+   * Destroy specific Chart.js instance in container
+   * @static
+   * @param {string|HTMLElement} container - Container element or selector
+   * @returns {boolean} True if chart was found and destroyed
+   */
+  static destroyChartInContainer(container) {
+    try {
+      const element =
+        typeof container === "string"
+          ? document.querySelector(container)
+          : container;
+
+      if (!element) return false;
+
+      const canvas = element.querySelector("canvas");
+      if (!canvas || !RadarChart.isChartJSAvailable()) return false;
+
+      const chartInstance = window.Chart.getChart(canvas);
+      if (chartInstance) {
+        logger.info(
+          "RadarChart",
+          "Destroying Chart.js instance before replacement",
+          {
+            containerId: element.id || "unnamed",
+            chartType: chartInstance.config?.type || "unknown",
+          },
+        );
+        chartInstance.destroy();
+        return true;
+      }
+    } catch (error) {
+      logger.error("RadarChart", "Error destroying chart instance", error);
+    }
+
+    return false;
   }
 
   /**

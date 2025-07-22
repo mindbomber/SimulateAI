@@ -10,6 +10,178 @@ separation of concerns and improve maintainability.
    PROFESSIONAL FOOTER COMPONENT
    ============================================================================= */
 
+/* ===== ENHANCED GENERAL FOOTER SUPPORT ===== */
+/* Consolidated from main.css and shared-navigation.css for complete footer coverage */
+
+/* General footer base styles - consolidated from main.css */
+.footer {
+  background: var(--color-gray-900);
+  color: var(--color-gray-100);
+  margin-top: var(--spacing-20);
+}
+
+.footer-content {
+  /* Footer styles managed by professional-footer.js component */
+  /* See below for all footer styling */
+  max-width: var(--container-xl);
+  margin: 0 auto;
+  padding: var(--spacing-16) var(--spacing-6);
+}
+
+/* Footer sections grid - consolidated from main.css */
+.footer-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-12);
+  margin-bottom: var(--spacing-12);
+}
+
+.footer-section {
+  padding: var(--spacing-6);
+}
+
+.footer-section-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-white);
+  margin-bottom: var(--spacing-4);
+  border-bottom: 2px solid var(--color-primary);
+  padding-bottom: var(--spacing-2);
+  display: inline-block;
+}
+
+.footer-section-content {
+  color: var(--color-gray-300);
+  line-height: var(--line-height-relaxed);
+}
+
+.footer-section-content p {
+  margin-bottom: var(--spacing-3);
+  font-size: var(--font-size-sm);
+}
+
+.footer-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--spacing-4) 0;
+}
+
+.footer-list li {
+  padding: var(--spacing-1) 0;
+  font-size: var(--font-size-sm);
+  position: relative;
+  padding-left: var(--spacing-4);
+}
+
+.footer-list li::before {
+  content: "•";
+  color: var(--color-primary);
+  position: absolute;
+  left: 0;
+  top: var(--spacing-1);
+}
+
+.footer-link {
+  color: var(--color-primary-light);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.footer-link:hover,
+.footer-link:focus {
+  color: var(--color-white);
+  text-decoration: underline;
+}
+
+.contact-info {
+  margin-top: var(--spacing-4);
+  padding: var(--spacing-4);
+  border-top: 1px solid var(--color-gray-700);
+  background: var(--color-gray-800);
+  border-radius: var(--border-radius-md);
+  color: var(--color-gray-300);
+}
+
+.contact-info p {
+  margin-bottom: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-300);
+}
+
+/* ===== MEGA MENU FOOTER COMPONENTS ===== */
+/* Consolidated from main.css and shared-navigation.css */
+
+.mega-menu-footer {
+  text-align: center;
+  padding-top: var(--spacing-4);
+  border-top: 1px solid var(--color-gray-200);
+}
+
+.mega-menu-view-all {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--radius-base);
+  transition: all var(--transition-fast);
+  display: inline-block;
+  min-height: var(--touch-target-min, 44px);
+  align-items: center;
+  justify-content: center;
+}
+
+.mega-menu-view-all:hover {
+  background: var(--color-gray-50);
+  transform: translateX(2px);
+}
+
+/* Responsive mega menu footer */
+@media (width <= 768px) {
+  .mega-menu-footer {
+    padding-top: calc(0.75rem * var(--font-scale, 1));
+    padding: var(--spacing-3) var(--spacing-3) var(--spacing-4) var(--spacing-3);
+    border-top: 1px solid var(--color-gray-200);
+    margin-top: var(--spacing-3);
+    box-sizing: border-box;
+  }
+
+  .mega-menu-view-all {
+    padding: calc(0.5rem * var(--font-scale, 1))
+      calc(1rem * var(--font-scale, 1));
+    font-weight: 500;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+    display: inline-flex;
+    /* Mobile specific styles */
+    display: block;
+    width: calc(100% - var(--spacing-2));
+    margin: 0 auto;
+    text-align: center;
+    padding: var(--spacing-3) var(--spacing-4);
+    background: var(--color-primary);
+    color: var(--color-white);
+    text-decoration: none;
+    font-weight: var(--font-weight-medium);
+    border-radius: var(--radius-base);
+    transition: all var(--transition-fast);
+    font-size: var(--font-size-base);
+    box-sizing: border-box;
+  }
+}
+
+@media (width <= 480px) {
+  .mega-menu-footer {
+    padding: var(--spacing-3);
+  }
+
+  .mega-menu-view-all {
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-sm);
+  }
+}
+
+/* ===== PROFESSIONAL FOOTER COMPONENT (MAIN) ===== */
+
 /* Professional Footer Styles */
 .professional-footer {
   background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);

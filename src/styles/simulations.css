@@ -360,6 +360,8 @@
   opacity: 0.9;
   transform: scale(1.1);
   cursor: grabbing;
+  /* Performance optimization during drag */
+  will-change: transform;
 }
 
 /* Scenario Progress */
@@ -484,16 +486,9 @@
   }
 }
 
-/* Reduced Motion Accessibility Support */
+/* Reduced Motion - Moved to design-tokens.css for consolidation */
+/* The following hover/focus overrides remain for simulation-specific elements */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-
   .interactive-element:hover {
     transform: none !important;
   }
@@ -867,10 +862,6 @@
   will-change: auto;
 }
 
-.interactive-element.dragging {
-  will-change: transform;
-}
-
 .ethics-meter .meter-fill,
 .progress-fill {
   will-change: width;
@@ -1063,6 +1054,8 @@
   margin: var(--spacing-2) 0;
   font-size: var(--font-size-sm);
   color: var(--color-gray-800);
+  /* Counter for instruction steps */
+  counter-reset: step-counter;
 }
 
 .simulation-instructions .instruction-step {
@@ -1087,10 +1080,6 @@
   justify-content: center;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
-}
-
-.simulation-instructions {
-  counter-reset: step-counter;
 }
 
 /* Reduced Motion Alternatives for Loading States */

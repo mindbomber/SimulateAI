@@ -387,9 +387,10 @@ class MainGrid {
         healthCheck.overall === "healthy" ? "warning" : healthCheck.overall;
     }
 
-    // Store health status
+    // Store health status - preserve original components Map
     this.healthStatus = {
       ...healthCheck,
+      components: this.healthStatus.components || new Map(), // Preserve the original Map
       lastCheck: Date.now(),
       issues: healthCheck.warnings,
     };
@@ -937,7 +938,12 @@ class MainGrid {
 
       // Clear component state
       this.healthStatus.overall = "shutdown";
-      this.healthStatus.components.clear();
+      if (
+        this.healthStatus.components &&
+        typeof this.healthStatus.components.clear === "function"
+      ) {
+        this.healthStatus.components.clear();
+      }
 
       // Send final telemetry
       if (window.enterpriseMonitoring) {
@@ -1037,11 +1043,16 @@ class MainGrid {
         );
 
         // Update health status
-        this.healthStatus.components.set("render_system", {
-          status: "healthy",
-          lastUpdate: Date.now(),
-          renderTime,
-        });
+        if (
+          this.healthStatus.components &&
+          typeof this.healthStatus.components.set === "function"
+        ) {
+          this.healthStatus.components.set("render_system", {
+            status: "healthy",
+            lastUpdate: Date.now(),
+            renderTime,
+          });
+        }
 
         // Log performance
         if (renderTime > ENTERPRISE_CONSTANTS.PERFORMANCE_WARNING_THRESHOLD) {
@@ -1557,9 +1568,11 @@ class MainGrid {
       );
     }
 
-    // Attach CategoryHeader event listeners for progress ring tooltips (category view only)
+    // Attach CategoryHeader event listeners for progress ring tooltips
     if (this.currentView === "category") {
       this.categoryHeader.attachEventListeners(this.categoryContainer);
+    } else if (this.currentView === "scenario") {
+      this.categoryHeader.attachEventListeners(this.scenarioContainer);
     }
 
     // Listen for scenario completion tracking - only add once

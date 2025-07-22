@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+/* Dark mode .nav-toggle styles moved to shared-navigation.css for component ownership */
+
 /**
  * Theme & Appearance Settings Styles
  * Handles dark mode, font sizes, and accessibility options
@@ -89,61 +91,22 @@ body.dark-mode {
 }
 
 /* Override any gradients that use color-primary-light and color-primary */
-body.dark-mode *[style*="linear-gradient"][style*="var(--color-primary-light)"],
-body.dark-mode .hero {
+/* Hero dark mode styles consolidated to main.css for consistency */
+body.dark-mode
+  *[style*="linear-gradient"][style*="var(--color-primary-light)"] {
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
 }
 
-/* Radar chart and other components using light gray gradient */
-body.dark-mode .radar-chart-container,
-body.dark-mode .radar-chart-container[style*="background"],
-body.dark-mode *[style*="linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)"] {
-  background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%) !important;
-  border-color: #444 !important;
-  color: #fff !important;
-}
+/* Radar chart component dark mode styles consolidated to radar-chart.css for component ownership */
+/* All radar chart dark mode styles moved to radar-chart.css */
 
-/* Override any elements using the light gray gradient pattern */
+/* Override any elements using the light gray gradient pattern (non-radar components) */
 body.dark-mode *[style*="linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)"],
 body.dark-mode *[style*="linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)"],
-body.dark-mode .hero-section,
-body.dark-mode .radar-chart-container,
-body.dark-mode .radar-demo-container,
-body.dark-mode .hero-radar-demo {
+body.dark-mode .hero-section {
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
   color: #fff !important;
   border-color: #444 !important;
-}
-
-/* Dark mode styling for hero-radar-demo text elements */
-body.dark-mode .hero-radar-demo h3 {
-  color: #fff !important;
-  background: linear-gradient(135deg, #6bb4ff 0%, #9d4edd 100%) !important;
-  background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-}
-
-body.dark-mode .hero-radar-demo p {
-  color: #ccc !important;
-}
-
-/* Additional specific overrides for radar chart components */
-body.dark-mode .radar-chart-container,
-body.dark-mode .radar-chart-container.radar-chart-container {
-  background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%) !important;
-  border: 1px solid #444 !important;
-  box-shadow:
-    0 4px 12px rgb(0 0 0 / 40%),
-    0 1px 3px rgb(0 0 0 / 30%) !important;
-}
-
-body.dark-mode .radar-chart-container:hover,
-body.dark-mode .radar-chart-container.radar-chart-container:hover {
-  box-shadow:
-    0 8px 20px rgb(0 0 0 / 50%),
-    0 2px 6px rgb(0 0 0 / 40%) !important;
-  border-color: #555 !important;
 }
 
 body.dark-mode .hero::before {
@@ -179,13 +142,9 @@ body.dark-mode .scenario-header {
   color: var(--theme-text-primary);
 }
 
-body.dark-mode .scenario-title {
-  color: var(--theme-text-primary);
-}
-
-body.dark-mode .scenario-description {
-  color: var(--theme-text-secondary);
-}
+/* Scenario component dark mode styles consolidated to scenario-modal.css for component ownership */
+/* body.dark-mode .scenario-title styles moved to scenario-modal.css */
+/* body.dark-mode .scenario-description styles moved to scenario-modal.css */
 
 body.dark-mode .scenario-footer {
   color: var(--theme-text-secondary);
@@ -333,16 +292,7 @@ body.dark-mode html {
   background-color: #1a1a1a !important;
 }
 
-/* Header Dark Mode */
-body.dark-mode .header {
-  background: #2d2d2d !important;
-  border-bottom-color: #444 !important;
-}
-
-body.dark-mode .header-container {
-  background-color: #2d2d2d !important;
-  color: #fff !important;
-}
+/* Header Dark Mode styles moved to shared-navigation.css for better component architecture */
 
 /* Blog header (sticky) */
 body.dark-mode .blog-header {
@@ -350,42 +300,16 @@ body.dark-mode .blog-header {
   border-bottom-color: #4a9eff !important;
 }
 
-body.dark-mode .header-content {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-body.dark-mode .header-nav {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-body.dark-mode .nav-links {
-  background: transparent !important;
-}
-
-body.dark-mode .nav-links .nav-link {
-  color: #fff !important;
-}
-
-/* Navigation Dark Mode - Uses Theme Variables */
-body.dark-mode .nav-container {
-  background-color: var(--theme-bg-secondary);
-  border-bottom-color: var(--theme-border);
-}
-
-body.dark-mode .nav-brand {
-  color: var(--theme-text-primary) !important;
-}
-
-body.dark-mode .nav-link {
-  color: var(--theme-text-primary) !important;
-}
-
-body.dark-mode .nav-link:hover {
-  color: var(--theme-accent) !important;
-  background-color: var(--theme-bg-tertiary) !important;
-}
+/* ===============================================
+   NAVIGATION DARK MODE STYLES MOVED TO shared-navigation.css
+   ===============================================
+   
+   All navigation dark mode styles (.header-content, .header-nav,
+   .nav-links, .nav-container, .nav-brand, .nav-link, .nav-toggle,
+   .dropdown-menu, .dropdown-item, etc.) have been consolidated 
+   into src/styles/shared-navigation.css for better component 
+   architecture and maintainability.
+*/
 
 /* Main Content Areas Dark Mode */
 body.dark-mode .hero-section {
@@ -527,26 +451,9 @@ body.dark-mode .footer a:hover {
   color: #fff !important;
 }
 
-/* Mobile Menu Dark Mode */
-body.dark-mode .nav-toggle {
-  color: #fff !important;
-}
+/* Dark mode navigation toggle styles moved to shared-navigation.css for component ownership */
 
-body.dark-mode .nav-toggle span {
-  background-color: #fff !important;
-}
-
-body.dark-mode .nav-toggle:hover {
-  color: var(--primary-color, #4a9eff) !important;
-}
-
-body.dark-mode .nav-toggle:hover span {
-  background-color: var(--primary-color, #4a9eff) !important;
-}
-
-body.dark-mode .main-nav {
-  background-color: #2d2d2d !important;
-}
+/* Dark mode dropdown styles moved to shared-navigation.css for component ownership */
 
 /* Tables Dark Mode */
 body.dark-mode table {
@@ -577,18 +484,10 @@ body.dark-mode .modal-overlay {
   background: rgb(0 0 0 / 90%) !important;
 }
 
-body.dark-mode .modal-container {
-  background: #2d2d2d !important;
-  color: #fff !important;
-}
-
-body.dark-mode .modal-header {
-  border-bottom-color: var(--border-color, #444) !important;
-}
-
-body.dark-mode .modal-footer {
-  border-top-color: var(--border-color, #444) !important;
-}
+/* General modal component dark mode styles consolidated to pre-launch-modal.css for component ownership */
+/* body.dark-mode .modal-container styles moved to pre-launch-modal.css */
+/* body.dark-mode .modal-header styles moved to pre-launch-modal.css */
+/* body.dark-mode .modal-footer styles moved to pre-launch-modal.css */
 
 /* Loading screens */
 body.dark-mode .loading-enhanced {
@@ -633,21 +532,7 @@ body.dark-mode::-webkit-scrollbar-track {
   background-color: #2d2d2d !important;
 }
 
-body.dark-mode .dropdown-menu {
-  background-color: #2d2d2d !important;
-  border-color: #444 !important;
-  color: #fff !important;
-}
-
-body.dark-mode .dropdown-item {
-  color: #fff !important;
-  background-color: transparent !important;
-}
-
-body.dark-mode .dropdown-item:hover {
-  background-color: #3d3d3d !important;
-  color: #fff !important;
-}
+/* Dark mode dropdown styles moved to shared-navigation.css for component ownership */
 
 body.dark-mode .settings-menu {
   background-color: #2d2d2d !important;
@@ -691,23 +576,7 @@ body.high-contrast {
   color: #000 !important;
 }
 
-body.high-contrast .nav-container {
-  background-color: #fff !important;
-  color: #000 !important;
-  border-color: #000 !important;
-}
-
-body.high-contrast .nav-link {
-  color: #000 !important;
-  text-decoration: underline;
-  background-color: transparent !important;
-}
-
-body.high-contrast .nav-link:hover,
-body.high-contrast .nav-link:focus {
-  background-color: #000 !important;
-  color: #fff !important;
-}
+/* High contrast navigation styles moved to shared-navigation.css for component ownership */
 
 body.high-contrast .settings-menu {
   background-color: #fff !important;
@@ -750,13 +619,9 @@ body.high-contrast
   background-color: #fff !important;
 }
 
-/* Reduced Motion */
-body.reduced-motion *,
-body.reduced-motion *::before,
-body.reduced-motion *::after {
-  animation-duration: 0.01ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.01ms !important;
+/* Reduced Motion - Consolidated universal selector moved to design-tokens.css */
+/* Body-scoped overrides for user preference settings */
+body.reduced-motion {
   scroll-behavior: auto !important;
 }
 

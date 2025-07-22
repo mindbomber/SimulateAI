@@ -841,19 +841,8 @@ class ScenarioModal {
       "#scenario-radar-chart",
     );
     orphanedChartContainers.forEach((container) => {
-      const canvases = container.querySelectorAll("canvas");
-      canvases.forEach((canvas) => {
-        if (window.Chart && window.Chart.getChart) {
-          const chartInstance = window.Chart.getChart(canvas);
-          if (chartInstance) {
-            logger.info(
-              "ScenarioModal",
-              "Destroying orphaned Chart.js instance",
-            );
-            chartInstance.destroy();
-          }
-        }
-      });
+      // Use RadarChart's consolidated cleanup utility
+      RadarChart.cleanupOrphanedCharts(container);
       container.remove();
     });
 
@@ -1115,8 +1104,8 @@ class ScenarioModal {
         return;
       }
 
-      // Check if Chart.js is available
-      if (!window.Chart) {
+      // Check if Chart.js is available using consolidated utility
+      if (!RadarChart.isChartJSAvailable()) {
         logger.error(
           "RadarChart",
           "Chart.js not loaded - radar chart cannot be initialized",
@@ -1244,22 +1233,8 @@ class ScenarioModal {
         return;
       }
 
-      // Clean up any existing Chart.js instances in the container
-      const existingCanvases = chartContainer.querySelectorAll("canvas");
-      existingCanvases.forEach((canvas) => {
-        // Check if there's a Chart.js instance attached to this canvas
-        if (window.Chart && window.Chart.getChart) {
-          const chartInstance = window.Chart.getChart(canvas);
-          if (chartInstance) {
-            logger.info(
-              "RadarChart",
-              "Destroying existing Chart.js instance before creating new one",
-            );
-            chartInstance.destroy();
-          }
-        }
-        canvas.remove();
-      });
+      // Clean up any existing Chart.js instances in the container using consolidated utility
+      RadarChart.destroyChartInContainer(chartContainer);
 
       // Clear any existing content to prevent "null" display
       chartContainer.innerHTML = "";

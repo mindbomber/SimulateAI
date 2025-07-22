@@ -63,9 +63,7 @@
   margin: 0 auto;
 }
 
-/* ===== SCENARIOS GRID LAYOUT - CONSOLIDATED ===== */
-
-/* Base scenarios grid - supports multiple contexts and view modes */
+/* ===== SCENARIOS GRID LAYOUT ===== */
 .scenarios-grid {
   display: flex;
   overflow: auto hidden;
@@ -79,19 +77,6 @@
 
 .scenarios-grid::-webkit-scrollbar {
   display: none;
-}
-
-/* Grid layout mode for scenario browser and category grid scenario view */
-.scenarios-grid[data-view="scenario"] {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: var(--spacing-6);
-  padding: var(--spacing-4);
-  transition: all 0.3s ease;
-  border-radius: var(--radius-lg);
-  box-shadow: inset 0 0 0 1px transparent;
-  overflow: visible;
-  scroll-snap-type: none;
 }
 
 /* Ethics Explorer specific scenarios grid styling */
@@ -121,21 +106,427 @@
   }
 }
 
-/* ===== SCENARIO CARDS - MOVED TO COMPONENT FILE =====
-   Base scenario card styles have been consolidated to:
-   📁 src/styles/scenario-card.css
-   
-   This includes all .scenario-card related styles:
-   - Base card styling and hover states
-   - Completed states and animations
-   - Header, content, footer layouts
-   - Button styling and interactions
-   - Dark mode and accessibility support
-   
-   Context-specific overrides remain in scenario-card.css
-   ============================================= */
+/* ===== SCENARIO CARDS ===== */
+.scenario-card {
+  background: var(--color-white);
+  border: 2px solid var(--color-gray-200);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgb(0 0 0 / 5%);
+  position: relative;
+  cursor: pointer;
+}
 
-/* ===== BROWSER SPECIFIC STYLES ===== */
+.scenario-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgb(0 0 0 / 15%);
+  border-color: var(--color-primary);
+}
+
+.scenario-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary) 0%,
+    var(--color-primary-light) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.scenario-card:hover::before {
+  opacity: 1;
+}
+
+/* Ethics Explorer scenario card styling */
+.ethics-explorer .scenario-card {
+  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+  color: #2d3748;
+  padding: 0;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow:
+    0 2px 8px rgb(0 0 0 / 8%),
+    0 0 0 1px rgb(203 213 225 / 30%);
+  overflow: hidden;
+  position: relative;
+  border: 1px solid #e2e8f0;
+  flex: 0 0 320px;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.ethics-explorer .scenario-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 8px 24px rgb(0 0 0 / 12%),
+    0 0 0 1px rgb(102 126 234 / 20%);
+  border-color: #667eea;
+}
+
+.scenario-card.completed {
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  border-color: #10b981;
+  box-shadow:
+    0 2px 8px rgb(0 0 0 / 8%),
+    0 0 0 1px rgb(16 185 129 / 30%);
+}
+
+.scenario-card.completed::after {
+  content: "✔️";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 1.5rem;
+  z-index: 10;
+  animation: checkmark-bounce 0.6s ease-out;
+}
+
+@keyframes checkmark-bounce {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ===== SCENARIO CARD COMPONENTS ===== */
+.scenario-card-header {
+  padding: var(--spacing-6);
+  border-bottom: 1px solid var(--color-gray-100);
+}
+
+.scenario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-5) var(--spacing-5) var(--spacing-3);
+}
+
+.scenario-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.scenario-category {
+  display: inline-block;
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  padding: var(--spacing-1) var(--spacing-3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.scenario-difficulty {
+  padding: 4px var(--spacing-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-transform: capitalize;
+}
+
+.difficulty-badge {
+  padding: var(--spacing-1) var(--spacing-3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.difficulty-beginner {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.difficulty-intermediate {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.difficulty-advanced {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ===== SCENARIO CONTENT ===== */
+.scenario-card-body {
+  padding: var(--spacing-6);
+}
+
+.scenario-content {
+  flex: 1;
+  padding: 0 var(--spacing-5) var(--spacing-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.category-section .scenario-content,
+.simulations-grid .scenario-content {
+  flex: 1;
+  padding: 0 var(--spacing-5) var(--spacing-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.scenario-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-900);
+  margin-bottom: var(--spacing-3);
+  line-height: var(--line-height-tight);
+}
+
+.category-section .scenario-title,
+.simulations-grid .scenario-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-gray-900);
+  margin: 0;
+  line-height: var(--line-height-tight);
+}
+
+.scenario-description {
+  color: var(--color-gray-700);
+  line-height: var(--line-height-relaxed);
+  font-size: var(--font-size-base);
+}
+
+.category-section .scenario-description,
+.simulations-grid .scenario-description {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+  line-height: var(--line-height-relaxed);
+  margin: 0;
+  flex: 1;
+}
+
+.scenario-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-4);
+  padding-bottom: var(--spacing-3);
+  border-bottom: 1px solid var(--color-gray-100);
+}
+
+.philosophy-tag {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+  font-style: italic;
+  font-weight: var(--font-weight-medium);
+}
+
+/* ===== SCENARIO TAGS ===== */
+.scenario-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-6);
+}
+
+.scenario-tag {
+  background: var(--color-gray-100);
+  color: var(--color-gray-700);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border: 1px solid var(--color-gray-200);
+}
+
+/* General tag styling from main.css */
+.tag {
+  background: var(--color-gray-200);
+  color: var(--color-gray-800);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-base);
+  font-size: var(--font-size-xs);
+  border: 1px solid var(--color-gray-300);
+}
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-6);
+}
+
+/* ===== SCENARIO FOOTER ===== */
+.scenario-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  border-top: 1px solid var(--color-gray-200);
+  background: var(--color-gray-50);
+}
+
+/* ===== SCENARIO ACTIONS ===== */
+.scenario-actions {
+  display: flex;
+  gap: var(--spacing-3);
+}
+
+.btn-scenario {
+  flex: 1;
+  padding: var(--spacing-3) var(--spacing-4);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+}
+
+.btn-scenario-primary {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: 2px solid var(--color-primary);
+}
+
+.btn-scenario-primary:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgb(0 124 186 / 30%);
+}
+
+.btn-scenario-secondary {
+  background: var(--color-white);
+  color: var(--color-gray-700);
+  border: 2px solid var(--color-gray-300);
+}
+
+.btn-scenario-secondary:hover {
+  background: var(--color-gray-50);
+  border-color: var(--color-gray-400);
+  transform: translateY(-1px);
+}
+
+.scenario-quick-start-btn {
+  background: var(--color-secondary);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  flex-shrink: 0;
+}
+
+.scenario-quick-start-btn:hover {
+  background: var(--color-secondary-dark);
+  transform: translateX(2px);
+}
+
+.scenario-quick-start-btn:focus {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+.scenario-start-btn {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: 2px solid var(--color-primary);
+  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+}
+
+.scenario-start-btn:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgb(0 124 186 / 30%);
+}
+
+/* ===== SCENARIO GRID VIEW MODES ===== */
+.scenarios-grid[data-view="scenario"] .scenario-card {
+  max-width: none;
+  width: 100%;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 0;
+  cursor: pointer;
+}
+
+.scenarios-grid[data-view="scenario"] .scenario-card .scenario-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-4);
+  box-sizing: border-box;
+}
+
+.scenarios-grid[data-view="scenario"] .scenario-card .scenario-title {
+  margin-bottom: var(--spacing-3);
+  line-height: 1.3;
+  min-height: 2.6em;
+}
+
+.scenarios-grid[data-view="scenario"] .scenario-card .scenario-description {
+  flex: 1;
+  margin-bottom: var(--spacing-4);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+  min-height: 4.2em;
+}
+
+.scenarios-grid[data-view="scenario"] .scenario-card .scenario-footer {
+  margin-top: auto;
+  padding-top: var(--spacing-2);
+}
 
 /* ===== SCENARIO CARD WRAPPER WITH HOVER EFFECTS ===== */
 .scenario-card-wrapper {
@@ -198,185 +589,6 @@
 
 .scenarios-grid[data-view="scenario"] .scenario-controls-toolbar {
   display: flex;
-}
-
-/* ===== CONSOLIDATED SCENARIO TOOLBAR CONTROLS ===== */
-/* Search Container */
-.search-container {
-  position: relative; /* Required for autocomplete dropdown positioning */
-  flex: 1;
-  max-width: 100%; /* Full width by default on small screens */
-}
-
-/* COMPLETE OVERRIDE: Force search input to proper width on larger screens */
-@media (width >= 769px) {
-  /* Override at the toolbar level */
-  .scenarios-grid[data-view="scenario"] .scenario-controls-toolbar {
-    width: 100% !important;
-    max-width: none !important;
-  }
-
-  /* Force search container to expand */
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-container {
-    flex: 1 !important;
-    min-width: 250px !important;
-    max-width: 450px !important;
-    width: 100% !important;
-  }
-
-  /* Force input wrapper to expand */
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input-wrapper {
-    width: 100% !important;
-    min-width: 250px !important;
-    flex: 1 !important;
-    flex-grow: 1 !important;
-    flex-shrink: 0 !important;
-    box-sizing: border-box !important;
-  }
-
-  /* Force the actual input to expand */
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input {
-    width: 100% !important;
-    min-width: 250px !important;
-    flex: 1 !important;
-    flex-grow: 1 !important;
-    flex-shrink: 0 !important;
-    box-sizing: border-box !important;
-    max-width: none !important;
-  }
-}
-
-@media (width >= 1024px) {
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-container {
-    min-width: 300px !important;
-    max-width: 550px !important;
-  }
-
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input-wrapper {
-    min-width: 300px !important;
-  }
-
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input {
-    min-width: 300px !important;
-  }
-}
-
-@media (width >= 1200px) {
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-container {
-    min-width: 350px !important;
-    max-width: 650px !important;
-  }
-
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input-wrapper {
-    min-width: 350px !important;
-  }
-
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input {
-    min-width: 350px !important;
-  }
-}
-
-/* ===== MOBILE RESPONSIVE LAYOUT FOR SCENARIO TOOLBAR ===== */
-/* Mobile responsive layout for search toolbar */
-@media (width <= 768px) {
-  /* Stack search and controls vertically on mobile */
-  .scenarios-grid[data-view="scenario"] .scenario-controls-toolbar {
-    flex-direction: column !important;
-    align-items: stretch !important;
-    gap: var(--spacing-3) !important;
-    padding: var(--spacing-3) 0 var(--spacing-4) 0 !important;
-  }
-
-  /* Search container takes full width on mobile */
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-container {
-    width: 100% !important;
-    max-width: none !important;
-    min-width: 0 !important;
-    order: 1 !important; /* Search appears first */
-    margin-bottom: var(--spacing-2) !important;
-  }
-
-  /* Controls group appears below search */
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .controls-group {
-    width: 100% !important;
-    justify-content: center !important;
-    order: 2 !important; /* Controls appear second */
-    gap: var(--spacing-4) !important;
-  }
-
-  /* Clear all button responsive adjustments */
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .clear-all-container {
-    margin-left: 0 !important;
-  }
-
-  /* Mobile search input adjustments */
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input-wrapper {
-    width: 100% !important;
-    min-width: 0 !important;
-  }
-
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input {
-    width: 100% !important;
-    min-width: 0 !important;
-    font-size: 16px !important; /* Prevent zoom on iOS */
-  }
-}
-
-/* Extra small mobile adjustments */
-@media (width <= 480px) {
-  .scenarios-grid[data-view="scenario"] .scenario-controls-toolbar {
-    padding: var(--spacing-2) 0 var(--spacing-3) 0 !important;
-  }
-
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .controls-group {
-    flex-wrap: wrap !important;
-    justify-content: space-around !important;
-  }
-
-  /* Clear all button on extra small screens */
-  .clear-all-btn {
-    padding: var(--spacing-2) var(--spacing-3) !important;
-    font-size: var(--font-size-xs) !important;
-  }
-
-  .clear-all-text {
-    display: none !important; /* Hide text on very small screens */
-  }
-
-  .clear-all-icon {
-    width: 14px !important;
-    height: 14px !important;
-  }
 }
 
 /* ===== SEARCH COMPONENTS ===== */
@@ -486,8 +698,7 @@
   border-bottom: 1px solid var(--color-gray-200);
 }
 
-.filter-container,
-.sort-container {
+.filter-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 var(--spacing-6);
@@ -1040,17 +1251,60 @@
 }
 
 /* ===== DARK MODE SUPPORT ===== */
-/* Dark mode styles for scenario cards moved to scenario-card.css */
-
-/* Dark mode for scenarios grid - consolidated from category-grid.css */
-body.dark-mode .scenarios-grid {
-  background: var(--theme-bg-primary);
-}
-
-/* Dark mode for scenario controls toolbar - consolidated from category-grid.css */
-body.dark-mode .scenario-controls-toolbar {
+/* Consolidated dark mode styles from appearance-settings.css */
+body.dark-mode .scenario-card,
+body.dark-mode .scenarios-grid .scenario-card,
+body.dark-mode .category-section .scenario-card,
+body.dark-mode .categories-grid .scenario-card,
+body.dark-mode .simulations-grid .scenario-card {
   background: var(--theme-bg-secondary);
   border: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+  box-shadow: 0 4px 12px var(--theme-shadow);
+}
+
+body.dark-mode .scenario-card:hover,
+body.dark-mode .scenarios-grid .scenario-card:hover,
+body.dark-mode .category-section .scenario-card:hover,
+body.dark-mode .categories-grid .scenario-card:hover,
+body.dark-mode .simulations-grid .scenario-card:hover {
+  background: var(--theme-bg-tertiary);
+  border-color: var(--theme-border-hover);
+  box-shadow: 0 8px 20px var(--theme-shadow-hover);
+}
+
+body.dark-mode .scenario-header {
+  background: transparent;
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .category-section .scenario-title,
+body.dark-mode .simulations-grid .scenario-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .category-section .scenario-description,
+body.dark-mode .simulations-grid .scenario-description {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .scenario-footer {
+  color: var(--theme-text-secondary);
+  background: var(--theme-bg-tertiary);
+  border-top: 1px solid var(--theme-border);
+}
+
+body.dark-mode .scenario-start-btn,
+body.dark-mode .scenario-quick-start-btn {
+  background-color: var(--theme-accent);
+  color: var(--theme-text-on-accent);
+  border: 1px solid var(--theme-accent);
+}
+
+body.dark-mode .scenario-start-btn:hover,
+body.dark-mode .scenario-quick-start-btn:hover {
+  background-color: var(--theme-accent-dark);
+  border-color: var(--theme-accent-dark);
 }
 
 /* Dark mode for search and filter components */
@@ -1119,54 +1373,6 @@ body.dark-mode .scenario-hover-category-header {
 }
 
 /* ===== RESPONSIVE DESIGN ===== */
-
-/* Scenarios grid responsive breakpoints - consolidated from category-grid.css */
-@media (width <= 1200px) {
-  .scenarios-grid {
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: var(--spacing-5);
-  }
-}
-
-@media (width <= 768px) {
-  .scenarios-grid {
-    padding: var(--container-padding) var(--container-padding)
-      calc(var(--container-padding) * 2) var(--container-padding);
-    scroll-padding-left: var(--container-padding);
-    width: 100%;
-    max-width: none;
-    margin: 0;
-    box-sizing: border-box;
-    overflow: auto hidden;
-    -webkit-overflow-scrolling: touch;
-    touch-action: auto;
-  }
-}
-
-@media (width <= 480px) {
-  .scenarios-grid {
-    padding: calc(var(--container-padding) * 0.8)
-      calc(var(--container-padding) * 0.75) calc(var(--container-padding) * 1.5)
-      calc(var(--container-padding) * 0.75);
-    scroll-padding-left: calc(var(--container-padding) * 0.75);
-    gap: calc(var(--container-padding) * 0.8);
-    width: 100%;
-    max-width: none;
-    margin: 0;
-    box-sizing: border-box;
-    overflow: auto hidden;
-    -webkit-overflow-scrolling: touch;
-    touch-action: auto;
-  }
-}
-
-@media (width >= 1200px) {
-  .scenarios-grid {
-    padding: calc(var(--container-padding) * 2)
-      calc(var(--container-padding) * 3);
-  }
-}
-
 /* Large screens - optimize search width */
 @media (width >= 769px) {
   .scenarios-grid[data-view="scenario"] .scenario-controls-toolbar {
@@ -1330,7 +1536,10 @@ body.dark-mode .scenario-hover-category-header {
     padding: var(--spacing-12) var(--spacing-4);
   }
 
-  /* scenario-card-header and scenario-card-body mobile styles moved to scenario-card.css */
+  .scenario-card-header,
+  .scenario-card-body {
+    padding: var(--spacing-4);
+  }
 
   .filter-controls {
     padding: var(--spacing-4);
@@ -1401,32 +1610,11 @@ body.dark-mode .scenario-hover-category-header {
    ✅ scenario-browser.css - Hero section and main layout
    ✅ scenario-browser-new.css - Alternative layout patterns
    ✅ scenario-browser-component.css - Component-specific styles
-   ✅ category-grid.css - Scenario card and grid layouts (.scenarios-grid consolidation)
+   ✅ category-grid.css - Scenario card and grid layouts
    ✅ ethics-explorer.css - Ethics explorer scenario styles
    ✅ main.css - Tag and grid utilities
    ✅ appearance-settings.css - Dark mode scenario styles
    
-   🔧 SCENARIOS GRID CONSOLIDATION (Phase 6):
-   ✅ All .scenarios-grid styles moved from category-grid.css to scenario-browser.css
-   ✅ Responsive breakpoints enhanced with --container-padding variables
-   ✅ Grid layout modes unified for all contexts (flex + grid hybrid)
-   ✅ Dark mode support consolidated
-   ✅ Ethics Explorer specific styles preserved
-   ✅ Mobile touch scrolling and accessibility maintained
-   
-   📊 CONSOLIDATION IMPACT:
-   • Lines moved: ~80 lines from category-grid.css
-   • Unified grid behavior across all scenario contexts
-   • Single source of truth for .scenarios-grid styling
-   • Enhanced responsive scaling with CSS variables
-   • Reduced duplication between files
-   
-   💡 GRID MODES SUPPORTED:
-   • Base flex mode: Horizontal scrolling for category view
-   • Grid mode [data-view="scenario"]: Grid layout for scenario browser
-   • Ethics Explorer mode: Special grid with hover effects
-   • All modes responsive with device-appropriate spacing
-   
    All scenario-related selectors are now consolidated into this single file
    for better maintainability and component organization.
-   =============================================== */
+*/

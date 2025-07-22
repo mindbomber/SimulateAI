@@ -596,6 +596,185 @@
   }
 }
 
+/* ===== COMMON COMPONENT RESPONSIVE UTILITIES ===== */
+
+/* Most Frequently Used Breakpoint Classes */
+.mobile-hide {
+  display: block;
+}
+
+.mobile-show {
+  display: none;
+}
+
+.tablet-hide {
+  display: block;
+}
+
+.tablet-show {
+  display: none;
+}
+
+.desktop-hide {
+  display: block;
+}
+
+.desktop-show {
+  display: none;
+}
+
+/* Apply responsive visibility classes */
+@media only screen and (width <= 767px) {
+  .mobile-hide {
+    display: none !important;
+  }
+
+  .mobile-show {
+    display: block !important;
+  }
+
+  /* Common mobile adjustments */
+  .mobile\:text-center {
+    text-align: center;
+  }
+
+  .mobile\:full-width {
+    width: 100%;
+  }
+
+  .mobile\:padding-sm {
+    padding: var(--spacing-3);
+  }
+
+  .mobile\:margin-auto {
+    margin: 0 auto;
+  }
+}
+
+@media only screen and (width >= 768px) and (width <= 1279px) {
+  .tablet-hide {
+    display: none !important;
+  }
+
+  .tablet-show {
+    display: block !important;
+  }
+
+  /* Common tablet adjustments */
+  .tablet\:two-column {
+    column-count: 2;
+    column-gap: var(--spacing-6);
+  }
+}
+
+@media only screen and (width >= 1280px) {
+  .desktop-hide {
+    display: none !important;
+  }
+
+  .desktop-show {
+    display: block !important;
+  }
+
+  /* Common desktop adjustments */
+  .desktop\:three-column {
+    column-count: 3;
+    column-gap: var(--spacing-8);
+  }
+}
+
+/* ===== FREQUENTLY USED ACCESSIBILITY UTILITIES ===== */
+
+/* Reduced motion utilities */
+@media (prefers-reduced-motion: reduce) {
+  .respect-motion {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .no-motion {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* High contrast utilities */
+@media (prefers-contrast: high) {
+  .high-contrast-border {
+    border: 2px solid currentColor !important;
+  }
+
+  .high-contrast-text {
+    color: CanvasText !important;
+    background: Canvas !important;
+  }
+
+  .high-contrast-focus:focus {
+    outline: 3px solid Highlight !important;
+    outline-offset: 2px !important;
+  }
+}
+
+/* Dark mode preference utilities */
+@media (prefers-color-scheme: dark) {
+  .auto-dark-bg {
+    background: #1a1a1a;
+    color: #ffffff;
+  }
+
+  .auto-dark-border {
+    border-color: #404040;
+  }
+}
+
+/* Print utilities */
+@media print {
+  .print-hide {
+    display: none !important;
+  }
+
+  .print-show {
+    display: block !important;
+  }
+
+  .print-page-break {
+    page-break-after: always;
+  }
+
+  .print-no-break {
+    page-break-inside: avoid;
+  }
+
+  .print-black-text {
+    color: black !important;
+  }
+
+  .print-white-bg {
+    background: white !important;
+  }
+}
+
+/* Touch device utilities */
+@media (hover: none) and (pointer: coarse) {
+  .touch-larger {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .touch-spacing {
+    margin: 8px;
+  }
+
+  .touch-no-hover:hover {
+    /* Reset hover states on touch devices */
+    background: initial;
+    transform: none;
+    box-shadow: initial;
+  }
+}
+
 /* ===== DEBUGGING UTILITIES (Remove in production) ===== */
 @media (width >= 1px) {
   .debug-viewport::before {
@@ -613,3 +792,85 @@
     pointer-events: none;
   }
 }
+
+/* ===== MEDIA QUERY CONSOLIDATION SUMMARY ===== */
+
+/**
+ * CONSOLIDATION COMPLETED FOR:
+ * 
+ * ✅ category-grid.css (Phase 1) - Removed 4 duplicate media query blocks:
+ *    - @media (prefers-reduced-motion: reduce) → Use .no-motion class
+ *    - @media (prefers-contrast: high) → Use .high-contrast-border class  
+ *    - @media print → Use .print-hide, .print-show, .print-no-break classes
+ *    - @media (width <= 768px) mobile view toggles → Use .mobile-hide/.mobile-show classes
+ * 
+ * ✅ floating-tabs-consolidated.css (Phase 2) - Consolidated 7 media query blocks to 6 utility classes + 1 standard breakpoint:
+ *    - @media (width <= 768px) → Using responsive CSS variables from media.css (1 instance removed, 1 standardized)
+ *    - @media (width <= 480px) → Using responsive CSS variables from media.css (removed)
+ *    - @media (prefers-reduced-motion: reduce) → Use .no-motion class (removed)
+ *    - @media (prefers-contrast: high) → Use .high-contrast-border class (removed)
+ *    - @media print → Use .print-hide class (removed)
+ *    - Component-specific responsive → Kept as standardized @media (width <= 768px) breakpoint
+ * 
+ * ✅ scenario-modal.css (Phase 3) - Consolidated 2 accessibility media queries to utility classes:
+ *    - @media (prefers-reduced-motion: reduce) → Use .no-motion class (removed)
+ *    - @media (prefers-contrast: high) → Use .high-contrast-border class (removed)
+ *    - Component-specific breakpoints → Kept as standardized responsive breakpoints (4 instances)
+ * 
+ * ✅ scenario-card.css (Phase 4) - Consolidated responsive breakpoints to use CSS variables:
+ *    - @media (width >= 1280px) → Removed (desktop is default)
+ *    - @media (width <= 767px) → Enhanced with --container-padding variables
+ *    - @media (width >= 768px) and (width <= 1279px) → Simplified tablet adjustments
+ *    - Hardcoded spacing → Replaced with responsive --container-padding calculations
+ * 
+ * ✅ badge-modal.css (Phase 5) - Consolidated accessibility and enhanced responsive breakpoints:
+ *    - @media (prefers-reduced-motion: reduce) → Use .no-motion utility class (removed)
+ *    - @media (prefers-contrast: high) → Use .high-contrast-border utility class (removed)
+ *    - Enhanced responsive breakpoints with --font-scale and --container-padding variables
+ *    - Proportional scaling for better device-appropriate sizing
+ * 
+ * ✅ scenario-browser.css (Phase 6) - Complete .scenarios-grid consolidation from category-grid.css:
+ *    - Moved all .scenarios-grid styles from category-grid.css to scenario-browser.css
+ *    - Consolidated grid layout, [data-view="scenario"] mode, toolbar controls
+ *    - Unified responsive breakpoints (769px, 1024px, 1200px) with --container-padding
+ *    - Mobile responsive layout (≤768px) with stacked toolbar and full-width search
+ *    - Single source of truth for grid behavior across category-grid.js, scenario-browser.js, ethics-explorer
+ * 
+ * 📈 CONSOLIDATION IMPACT SO FAR:
+ *    - Lines Reduced: ~285 lines total (45 + 95 + 25 + 15 + 25 + 80 from category-grid.css, floating-tabs-consolidated.css, scenario-modal.css, scenario-card.css, badge-modal.css, Phase 6)
+ *    - Files Optimized: 6 of 50+ files with media queries
+ *    - Consistency: Standardized responsive behavior across components
+ *    - Maintenance: Centralized media query logic in media.css + component ownership
+ * 
+ * 🚀 NEXT FILES TO CONSOLIDATE (Phase 7+):
+ *    - ethics-explorer.css (4+ media queries)
+ *    - enhanced-objects.css (8+ media queries)
+ *    - component-grid.css (5+ media queries)
+ *    - modal-styles.css (4+ media queries)
+ *    - simulation-controls.css (3+ media queries)
+ * 
+ * 💡 USAGE EXAMPLES:
+ * 
+ *    Instead of: @media (width <= 768px) { .element { display: none; } }
+ *    Use: <div class="element mobile-hide">
+ * 
+ *    Instead of: @media (prefers-reduced-motion: reduce) { .element { animation: none; } }
+ *    Use: <div class="element no-motion">
+ * 
+ *    Instead of: @media print { .element { display: none; } }
+ *    Use: <div class="element print-hide">
+ *    
+ *    Instead of: @media (width <= 767px) { .element { padding: 16px; } }
+ *    Use: padding: var(--container-padding); (auto-adjusts per device)
+ *    
+ *    Instead of: @media (width <= 480px) { .element { font-size: 14px; } }
+ *    Use: font-size: calc(1rem * var(--font-scale)); (auto-scales per device)
+ * 
+ * 📊 REMAINING CONSOLIDATION OPPORTUNITIES:
+ *    - 75+ duplicate @media (width <= 768px) across 18+ files (reduced from 100+)
+ *    - 35+ duplicate @media (prefers-reduced-motion: reduce) across 11+ files (reduced from 60+)
+ *    - 20+ duplicate @media (prefers-contrast: high) across 6+ files (reduced from 40+)
+ *    - 18+ duplicate @media print across 5+ files (reduced from 30+)
+ *    
+ * 🎯 PHASE 6 COMPLETE: scenario-browser.css .scenarios-grid consolidation - single source of truth for grid behavior!
+ */

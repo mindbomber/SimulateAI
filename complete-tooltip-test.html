@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Complete Tooltip Conflict Resolution Test</title>
+
+    <!-- Load CSS in the correct order -->
+    <link rel="stylesheet" href="src/styles/main.css" />
+    <link rel="stylesheet" href="src/styles/radar-chart.css" />
+    <link rel="stylesheet" href="src/styles/scenario-modal.css" />
+
+    <style>
+      body {
+        padding: 20px;
+        font-family: Arial, sans-serif;
+      }
+      .test-section {
+        margin: 40px 0;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+      .test-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #333;
+      }
+      .instructions {
+        background: #f0f8ff;
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        border-left: 4px solid #007bff;
+      }
+      .z-index-demo {
+        position: relative;
+        height: 200px;
+        background: #f9f9f9;
+        border: 2px dashed #ccc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .tooltip-layer {
+        position: absolute;
+        padding: 8px 12px;
+        border-radius: 4px;
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+      }
+      .layer-1050 {
+        background: rgba(255, 0, 0, 0.8);
+        z-index: 1050;
+        top: 80px;
+        left: 20px;
+      }
+      .layer-1055 {
+        background: rgba(0, 255, 0, 0.8);
+        z-index: 1055;
+        top: 100px;
+        left: 40px;
+      }
+      .layer-1060 {
+        background: rgba(0, 0, 255, 0.8);
+        z-index: 1060;
+        top: 120px;
+        left: 60px;
+      }
+      .layer-1100 {
+        background: rgba(255, 165, 0, 0.8);
+        z-index: 1100;
+        top: 140px;
+        left: 80px;
+      }
+      .layer-1200 {
+        background: rgba(128, 0, 128, 0.8);
+        z-index: 1200;
+        top: 160px;
+        left: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Complete Tooltip Conflict Resolution Test</h1>
+    <p>
+      This page tests all tooltip systems to ensure no conflicts exist between
+      CategoryHeader, Chart.js, and Scenario Modal tooltips.
+    </p>
+
+    <div class="test-section">
+      <div class="test-title">Test 1: Z-Index Layer Verification</div>
+      <div class="instructions">
+        <strong>Visual Test:</strong> The purple CategoryHeader tooltip (1200)
+        should be on top of all other layers.
+      </div>
+
+      <div class="z-index-demo">
+        <div class="tooltip-layer layer-1050">Modal Backdrop (1050)</div>
+        <div class="tooltip-layer layer-1055">Scenario Modal (1055)</div>
+        <div class="tooltip-layer layer-1060">Chart.js Tooltip (1060)</div>
+        <div class="tooltip-layer layer-1100">Pros-Cons Popover (1100)</div>
+        <div class="tooltip-layer layer-1200">
+          CategoryHeader Tooltip (1200) ← Should be on top
+        </div>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <div class="test-title">
+        Test 2: CategoryHeader Progress Ring Tooltips
+      </div>
+      <div class="instructions">
+        <strong>Instructions:</strong> Hover over the progress rings. Tooltips
+        should appear above all other elements.
+      </div>
+
+      <div class="category-header" data-category="test">
+        <div class="category-content">
+          <h3>Test Category</h3>
+          <div class="progress-rings">
+            <div class="progress-ring" data-tooltip="Scenarios: 8/10 completed">
+              <div class="ring">
+                <div class="progress-text">8/10</div>
+              </div>
+              <div class="ring-label">Scenarios</div>
+            </div>
+            <div class="progress-ring" data-tooltip="Progress: 75% complete">
+              <div class="ring">
+                <div class="progress-text">75%</div>
+              </div>
+              <div class="ring-label">Progress</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <div class="test-title">Test 3: Scenario Modal Simulation</div>
+      <div class="instructions">
+        <strong>Test:</strong> This simulates a scenario modal with Chart.js
+        tooltips. CategoryHeader tooltips should still work above this layer.
+      </div>
+
+      <!-- Simulate scenario modal backdrop -->
+      <div
+        style="
+          position: relative;
+          background: rgba(0, 0, 0, 0.6);
+          padding: 20px;
+          border-radius: 8px;
+        "
+      >
+        <!-- Simulate scenario modal -->
+        <div
+          style="
+            position: relative;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            z-index: 1055;
+          "
+        >
+          <h4>Simulated Scenario Modal (z-index: 1055)</h4>
+
+          <!-- Simulate Chart.js tooltip -->
+          <div
+            style="position: relative; display: inline-block; margin: 20px 0"
+          >
+            <div
+              style="
+                width: 150px;
+                height: 80px;
+                background: #f0f0f0;
+                border: 1px solid #ccc;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              "
+            >
+              Chart Area
+            </div>
+            <div
+              class="chartjs-tooltip"
+              style="
+                position: absolute;
+                top: -30px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 5px 10px;
+                border-radius: 4px;
+                font-size: 12px;
+                z-index: 1060;
+              "
+            >
+              Chart.js Tooltip (z-index: 1060)
+            </div>
+          </div>
+
+          <!-- Simulate pros-cons popover -->
+          <div
+            class="pros-cons-popover visible"
+            style="
+              position: relative;
+              background: #fff;
+              border: 1px solid #ddd;
+              border-radius: 12px;
+              padding: 15px;
+              margin: 20px 0;
+              z-index: 1100;
+            "
+          >
+            <h5>Pros-Cons Popover (z-index: 1100)</h5>
+            <p>
+              This should appear below CategoryHeader tooltips but above
+              Chart.js tooltips.
+            </p>
+          </div>
+
+          <!-- Test CategoryHeader in modal context -->
+          <div class="category-header" data-category="modal-test">
+            <div
+              class="progress-ring"
+              data-tooltip="CategoryHeader tooltip should appear on top of everything (z-index: 1200)"
+            >
+              <div class="ring">
+                <div class="progress-text">TOP</div>
+              </div>
+              <div class="ring-label">Hover Me</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <div class="test-title">Test 4: CSS Selector Conflict Check</div>
+      <div class="instructions">
+        <strong>Debug:</strong> Check that CategoryHeader tooltips are not
+        affected by Chart.js or scenario modal CSS rules.
+      </div>
+
+      <div id="css-debug-info">
+        <h5>CSS Rule Conflicts:</h5>
+        <ul id="conflict-list"></ul>
+      </div>
+    </div>
+
+    <!-- Load CategoryHeader component -->
+    <script src="src/components/CategoryHeader.js"></script>
+
+    <script>
+      console.log("Starting complete tooltip conflict resolution test...");
+
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("DOM loaded, running tests...");
+
+        // Test 1: Z-Index verification
+        console.log("=== Z-Index Layer Test ===");
+        const layers = document.querySelectorAll(".tooltip-layer");
+        layers.forEach((layer) => {
+          const zIndex = window.getComputedStyle(layer).zIndex;
+          console.log(`${layer.textContent}: z-index ${zIndex}`);
+        });
+
+        // Test 2: CategoryHeader initialization
+        if (typeof window.CategoryHeader !== "undefined") {
+          console.log("=== CategoryHeader Initialization ===");
+          const categoryHeader = new window.CategoryHeader();
+
+          // Test tooltip functionality
+          setTimeout(() => {
+            const progressRings = document.querySelectorAll(".progress-ring");
+            console.log(
+              `Found ${progressRings.length} progress rings for testing`,
+            );
+
+            progressRings.forEach((ring, index) => {
+              const tooltip = ring.getAttribute("data-tooltip");
+              console.log(`Progress ring ${index + 1}: "${tooltip}"`);
+            });
+          }, 500);
+        } else {
+          console.warn("CategoryHeader component not found");
+        }
+
+        // Test 3: CSS conflict detection
+        console.log("=== CSS Conflict Detection ===");
+        const conflictList = document.getElementById("conflict-list");
+
+        // Check for CSS rules that might conflict
+        const potentialConflicts = [
+          ".chartjs-tooltip",
+          ".pros-cons-popover",
+          ".progress-ring-tooltip",
+          'div[class*="tooltip"]',
+        ];
+
+        potentialConflicts.forEach((selector) => {
+          try {
+            const elements = document.querySelectorAll(selector);
+            const li = document.createElement("li");
+            li.textContent = `${selector}: ${elements.length} elements found`;
+            conflictList.appendChild(li);
+          } catch (e) {
+            console.warn(`Could not query selector: ${selector}`);
+          }
+        });
+
+        // Test 4: Computed style verification
+        setTimeout(() => {
+          console.log("=== Computed Style Verification ===");
+          const tooltipElements = document.querySelectorAll(
+            ".progress-ring-tooltip, .chartjs-tooltip, .pros-cons-popover",
+          );
+          tooltipElements.forEach((el) => {
+            const styles = window.getComputedStyle(el);
+            console.log(`${el.className}:`, {
+              zIndex: styles.zIndex,
+              position: styles.position,
+              display: styles.display,
+            });
+          });
+        }, 1000);
+      });
+
+      // Add hover test for visual verification
+      document.addEventListener("mouseover", function (e) {
+        if (e.target.classList.contains("progress-ring")) {
+          console.log(
+            "Hovering over progress ring:",
+            e.target.getAttribute("data-tooltip"),
+          );
+        }
+      });
+    </script>
+  </body>
+</html>

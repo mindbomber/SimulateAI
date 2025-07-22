@@ -198,9 +198,31 @@ class CategoryHeader {
     const config = await this.getConfig();
     const selectors = getSelectors(config);
 
-    const progressRings = container.querySelectorAll(selectors.progressRing);
+    // Try the specific selector first, then fallback to all progress rings
+    let progressRings = container.querySelectorAll(selectors.progressRing);
+
+    if (progressRings.length === 0) {
+      // Fallback to all progress rings if the specific selector doesn't find any
+      progressRings = container.querySelectorAll(selectors.allProgressRings);
+      logger.debug("CategoryHeader using fallback selector for progress rings");
+    }
+
+    // Debug logging
+    logger.debug("CategoryHeader attachProgressRingTooltips called", {
+      container: container,
+      selector: selectors.progressRing,
+      fallbackSelector: selectors.allProgressRings,
+      foundRings: progressRings.length,
+      allRings: container.querySelectorAll(".category-progress-ring").length,
+    });
 
     progressRings.forEach((ring) => {
+      // Only attach to rings that have tooltip data
+      if (!ring.hasAttribute("data-tooltip")) {
+        logger.debug("CategoryHeader skipping ring without tooltip", { ring });
+        return;
+      }
+
       // Clean up existing listeners first
       this.removeEventListeners(ring);
 
@@ -226,6 +248,13 @@ class CategoryHeader {
 
       // Keyboard accessibility
       ring.addEventListener("keydown", boundHandlers.keydown);
+
+      // Debug logging for each ring
+      logger.debug("CategoryHeader attached listeners to ring", {
+        hasTooltip: ring.hasAttribute("data-tooltip"),
+        categoryId: ring.getAttribute("data-category-id"),
+        tooltipContent: ring.getAttribute("data-tooltip"),
+      });
     });
   }
 
@@ -248,57 +277,87 @@ class CategoryHeader {
    * @param {Event} event - Mouse or touch event
    */
   async showTooltip(event) {
-    const config = await this.getConfig();
-    const tooltipConfig = getTooltipConfig(config);
-    const templates = getHtmlTemplates(config);
-    const ring = event.currentTarget;
-    const tooltip = ring.getAttribute(getAttributes(config).dataTooltip);
+    try {
+      const config = await this.getConfig();
+      const tooltipConfig = getTooltipConfig(config);
+      const templates = getHtmlTemplates(config);
+      const ring = event.currentTarget;
+      const tooltip = ring.getAttribute(getAttributes(config).dataTooltip);
 
-    if (!tooltip) return;
-
-    // Remove any existing tooltips
-    this.hideTooltip();
-
-    // Create tooltip element
-    const tooltipEl = document.createElement("div");
-    tooltipEl.className = templates.progressRing.tooltipClass;
-    tooltipEl.textContent = tooltip;
-    tooltipEl.setAttribute(
-      getAttributes(config).role,
-      tooltipConfig.accessibility.role,
-    );
-
-    // Position tooltip above the progress ring
-    const rect = ring.getBoundingClientRect();
-    tooltipEl.style.position = tooltipConfig.positioning.position;
-    tooltipEl.style.left = `${rect.left + rect.width / 2}px`;
-    tooltipEl.style.transform = tooltipConfig.positioning.transform;
-    tooltipEl.style.zIndex = tooltipConfig.zIndex.toString();
-
-    document.body.appendChild(tooltipEl);
-
-    // Calculate position after adding to DOM so we can get tooltip height
-    const tooltipRect = tooltipEl.getBoundingClientRect();
-    const topPosition = rect.top - tooltipRect.height - tooltipConfig.offset;
-
-    // If tooltip would go off-screen at top, show it below instead
-    if (topPosition < 0) {
-      tooltipEl.style.top = `${rect.bottom + tooltipConfig.offset}px`;
-    } else {
-      tooltipEl.style.top = `${topPosition}px`;
-    }
-
-    // Trigger the visible state with a small delay to ensure CSS transition works
-    if (tooltipConfig.performance?.useRequestAnimationFrame) {
-      requestAnimationFrame(() => {
-        tooltipEl.classList.add(templates.progressRing.visibleClass);
+      // Debug logging
+      logger.debug("CategoryHeader showTooltip called", {
+        ring: ring,
+        tooltipContent: tooltip,
+        hasTooltipAttr: ring.hasAttribute("data-tooltip"),
+        config: config ? "loaded" : "null",
+        tooltipConfig: tooltipConfig ? "loaded" : "null",
       });
-    } else {
-      tooltipEl.classList.add(templates.progressRing.visibleClass);
-    }
 
-    // Store reference for cleanup
-    ring._tooltip = tooltipEl;
+      if (!tooltip) {
+        logger.warn("CategoryHeader showTooltip: no tooltip content found");
+        return;
+      }
+
+      // Remove any existing tooltips
+      this.hideTooltip();
+
+      // Create tooltip element
+      const tooltipEl = document.createElement("div");
+      tooltipEl.className = templates.progressRing.tooltipClass;
+      tooltipEl.textContent = tooltip;
+      tooltipEl.setAttribute(
+        getAttributes(config).role,
+        tooltipConfig.accessibility.role,
+      );
+
+      // Position tooltip above the progress ring
+      const rect = ring.getBoundingClientRect();
+      tooltipEl.style.position = tooltipConfig.positioning.position;
+      tooltipEl.style.left = `${rect.left + rect.width / 2}px`;
+      tooltipEl.style.transform = tooltipConfig.positioning.transform;
+      tooltipEl.style.zIndex = tooltipConfig.zIndex.toString();
+
+      document.body.appendChild(tooltipEl);
+
+      logger.debug("CategoryHeader tooltip element created and appended", {
+        tooltip: tooltipEl,
+        className: tooltipEl.className,
+        position: tooltipEl.style.position,
+        left: tooltipEl.style.left,
+        zIndex: tooltipEl.style.zIndex,
+      });
+
+      // Calculate position after adding to DOM so we can get tooltip height
+      const tooltipRect = tooltipEl.getBoundingClientRect();
+      const topPosition = rect.top - tooltipRect.height - tooltipConfig.offset;
+
+      // If tooltip would go off-screen at top, show it below instead
+      if (topPosition < 0) {
+        tooltipEl.style.top = `${rect.bottom + tooltipConfig.offset}px`;
+      } else {
+        tooltipEl.style.top = `${topPosition}px`;
+      }
+
+      // Trigger the visible state with a small delay to ensure CSS transition works
+      if (tooltipConfig.performance?.useRequestAnimationFrame) {
+        requestAnimationFrame(() => {
+          tooltipEl.classList.add(templates.progressRing.visibleClass);
+          logger.debug("CategoryHeader tooltip made visible (RAF)", {
+            visibleClass: templates.progressRing.visibleClass,
+          });
+        });
+      } else {
+        tooltipEl.classList.add(templates.progressRing.visibleClass);
+        logger.debug("CategoryHeader tooltip made visible (immediate)", {
+          visibleClass: templates.progressRing.visibleClass,
+        });
+      }
+
+      // Store reference for cleanup
+      ring._tooltip = tooltipEl;
+    } catch (error) {
+      logger.error("CategoryHeader showTooltip error", error);
+    }
   }
 
   /**

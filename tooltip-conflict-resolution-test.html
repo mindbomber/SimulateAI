@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tooltip Conflict Resolution Test</title>
+
+    <!-- Load main CSS first -->
+    <link rel="stylesheet" href="src/styles/main.css" />
+    <!-- Load radar-chart CSS after main -->
+    <link rel="stylesheet" href="src/styles/radar-chart.css" />
+
+    <style>
+      body {
+        padding: 20px;
+        font-family: Arial, sans-serif;
+      }
+      .test-section {
+        margin: 40px 0;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+      .test-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #333;
+      }
+      .instructions {
+        background: #f0f8ff;
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        border-left: 4px solid #007bff;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Tooltip Conflict Resolution Test</h1>
+    <p>
+      This page tests that CategoryHeader tooltips work correctly after
+      resolving conflicts with radar-chart.css
+    </p>
+
+    <div class="test-section">
+      <div class="test-title">
+        Test 1: CategoryHeader Progress Ring Tooltips
+      </div>
+      <div class="instructions">
+        <strong>Instructions:</strong> Hover over the progress rings below. You
+        should see tooltips appear with progress information.
+      </div>
+
+      <!-- Create a mock category header with progress rings -->
+      <div class="category-header" data-category="test">
+        <div class="category-content">
+          <h3>Test Category</h3>
+          <div class="progress-rings">
+            <div class="progress-ring" data-tooltip="Scenarios: 8/10 completed">
+              <div class="ring">
+                <div class="progress-text">8/10</div>
+              </div>
+              <div class="ring-label">Scenarios</div>
+            </div>
+            <div class="progress-ring" data-tooltip="Progress: 75% complete">
+              <div class="ring">
+                <div class="progress-text">75%</div>
+              </div>
+              <div class="ring-label">Progress</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <div class="test-title">Test 2: Chart.js Tooltip Simulation</div>
+      <div class="instructions">
+        <strong>Instructions:</strong> This simulates a Chart.js tooltip to
+        ensure our exclusion rules work properly.
+      </div>
+
+      <!-- Simulate a Chart.js tooltip -->
+      <div style="position: relative; display: inline-block">
+        <div
+          style="
+            width: 200px;
+            height: 100px;
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+        >
+          Chart Area (hover for tooltip)
+        </div>
+        <div
+          class="chartjs-tooltip"
+          style="
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 1100;
+          "
+        >
+          Chart.js Tooltip (z-index: 1100)
+        </div>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <div class="test-title">Test 3: Z-Index Verification</div>
+      <div class="instructions">
+        <strong>Expected behavior:</strong> CategoryHeader tooltips (z-index:
+        1200) should appear above Chart.js tooltips (z-index: 1100)
+      </div>
+
+      <div style="position: relative">
+        <!-- Chart.js tooltip simulation -->
+        <div
+          style="
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            z-index: 1100;
+          "
+        >
+          Chart.js Tooltip<br />
+          z-index: 1100
+        </div>
+
+        <!-- CategoryHeader tooltip simulation -->
+        <div
+          class="progress-ring-tooltip visible"
+          style="
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            background: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 1200;
+          "
+        >
+          CategoryHeader Tooltip<br />
+          z-index: 1200 (should be on top)
+        </div>
+
+        <div style="height: 120px"></div>
+      </div>
+    </div>
+
+    <!-- Load CategoryHeader component -->
+    <script src="src/components/CategoryHeader.js"></script>
+
+    <script>
+      console.log("Starting tooltip conflict resolution test...");
+
+      // Initialize CategoryHeader for the test category
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("DOM loaded, initializing CategoryHeader...");
+
+        // Check if CategoryHeader is available
+        if (typeof window.CategoryHeader !== "undefined") {
+          console.log("CategoryHeader found, initializing...");
+
+          // Initialize CategoryHeader for our test
+          const categoryHeader = new window.CategoryHeader();
+
+          // Test tooltip functionality
+          setTimeout(() => {
+            console.log("Testing tooltip functionality...");
+
+            // Find progress rings
+            const progressRings = document.querySelectorAll(".progress-ring");
+            console.log(`Found ${progressRings.length} progress rings`);
+
+            progressRings.forEach((ring, index) => {
+              console.log(`Progress ring ${index + 1}:`, {
+                element: ring,
+                tooltip: ring.getAttribute("data-tooltip"),
+                hasEventListeners:
+                  ring.onmouseenter !== null || ring.onmouseleave !== null,
+              });
+            });
+
+            // Check CSS loading
+            console.log("Checking CSS loading...");
+            const categoryHeaderCSS = Array.from(document.styleSheets).find(
+              (sheet) =>
+                sheet.href && sheet.href.includes("category-header.css"),
+            );
+            const radarChartCSS = Array.from(document.styleSheets).find(
+              (sheet) => sheet.href && sheet.href.includes("radar-chart.css"),
+            );
+
+            console.log("CSS Status:", {
+              categoryHeaderCSS: categoryHeaderCSS ? "Loaded" : "Not found",
+              radarChartCSS: radarChartCSS ? "Loaded" : "Not found",
+            });
+          }, 1000);
+        } else {
+          console.warn(
+            "CategoryHeader not found. Make sure the component is loaded.",
+          );
+        }
+      });
+    </script>
+  </body>
+</html>

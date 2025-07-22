@@ -491,6 +491,8 @@
   display: flex;
   gap: 1rem;
   align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
 }
 
 .btn-launch {
@@ -903,23 +905,52 @@
   padding: 0;
 }
 
-.action-buttons {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  justify-content: flex-end;
-  flex-shrink: 0;
+/* ===== ENHANCED GENERAL MODAL SUPPORT ===== */
+/* Consolidated from appearance-settings.css and advanced-ui-components.css for complete modal coverage */
+
+/* General modal container dark mode - applies to all modals including pre-launch */
+body.dark-mode .modal-container,
+body.dark-mode .pre-launch-modal {
+  background: #2d2d2d !important;
+  color: #fff !important;
+}
+
+/* General modal header dark mode - consolidated with pre-launch specific styles */
+body.dark-mode .modal-header,
+body.dark-mode .pre-launch-modal .modal-header {
+  background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+  border-bottom: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+/* General modal footer dark mode - consolidated with pre-launch specific styles */
+body.dark-mode .modal-footer,
+body.dark-mode .pre-launch-modal .modal-footer {
+  background: var(--theme-bg-primary);
+  border-top: 1px solid var(--theme-border);
+}
+
+/* General modal sizing constraints - provides fallback for modal dialogs */
+.modal-backdrop .modal-dialog {
+  max-width: 800px; /* Default modal max-width */
+  width: 90vw;
+  max-height: calc(100vh - 4rem);
+  min-height: 300px;
+}
+
+/* Enhanced modal responsiveness */
+@media (width <= 768px) {
+  .modal-backdrop .modal-dialog {
+    width: 95vw;
+    max-width: none;
+    max-height: calc(100vh - 2rem);
+    min-height: 70vh;
+  }
 }
 
 /* ===== DARK MODE SUPPORT ===== */
 body.dark-mode .pre-launch-modal {
   background: var(--theme-bg-secondary);
-}
-
-body.dark-mode .pre-launch-modal .modal-header {
-  background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
-  border-bottom: 1px solid var(--theme-border);
-  color: var(--theme-text-primary);
 }
 
 body.dark-mode .pre-launch-modal .modal-title {
@@ -928,11 +959,6 @@ body.dark-mode .pre-launch-modal .modal-title {
 
 body.dark-mode .pre-launch-modal .modal-body {
   background: var(--theme-bg-secondary);
-}
-
-body.dark-mode .pre-launch-modal .modal-footer {
-  background: var(--theme-bg-primary);
-  border-top: 1px solid var(--theme-border);
 }
 
 /* Content sections */

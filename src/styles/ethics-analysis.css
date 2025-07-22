@@ -10,8 +10,12 @@
   position: relative;
 }
 
+/* Demo radar container styles consolidated to radar-chart.css for component ownership */
+/* .demo-radar-container styles moved to radar-chart.css */
+/* .demo-radar-container:hover styles moved to radar-chart.css */
+
 .ethics-analysis-section::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -199,7 +203,7 @@
 }
 
 .demo-btn::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
@@ -353,7 +357,7 @@
 }
 
 .radar-instructions li::before {
-  content: '▸';
+  content: "▸";
   color: #667eea;
   font-weight: bold;
   position: absolute;

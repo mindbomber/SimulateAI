@@ -392,16 +392,14 @@ const logoutCSS = `
 `;
 
 // Inject CSS styles
-if (!document.querySelector('#intentional-logout-styles')) {
-  const style = document.createElement('style');
-  style.id = 'intentional-logout-styles';
+if (!document.querySelector("#intentional-logout-styles")) {
+  const style = document.createElement("style");
+  style.id = "intentional-logout-styles";
   style.textContent = logoutCSS;
   document.head.appendChild(style);
 }
 
-// Export CSS string for bundling
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = logoutCSS;
-} else {
+// Export CSS string for bundling - browser environment
+if (typeof window !== "undefined") {
   window.IntentionalLogoutCSS = logoutCSS;
 }

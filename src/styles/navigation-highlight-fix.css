@@ -56,6 +56,8 @@ body.dark-mode .nav-link.active::before {
   color: inherit !important;
   font-weight: inherit !important;
   border-bottom-color: transparent !important;
+  /* Ensure proper positioning context for navigation state changes */
+  position: relative;
 }
 
 .nav-link-clear-active::before,
@@ -96,45 +98,10 @@ body.dark-mode .nav-link-clear-active {
   }
 }
 
-/* Force visibility classes for mega menu and dropdowns */
+/* Force visibility classes for navigation elements */
+/* CONSOLIDATED TO shared-navigation.css - Element.Style Override System */
+/* This file's functionality has been moved to shared-navigation.css for better organization */
 
-/* These replace element.style with !important to ensure override capability */
-.mega-menu.force-visible {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  transform: translateY(0) !important;
-  z-index: 1050 !important;
-}
-
-.dropdown.force-visible {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: absolute !important;
-  z-index: 9999 !important;
-}
-
-/* Navigation clearing helper class */
-.nav-link-clear-active {
-  /* Temporary class to force clearing of any residual styling */
-
-  /* Used briefly during navigation state changes */
-  position: relative; /* Ensure proper positioning context */
-}
-
-/* Mobile navigation force visible state */
-.main-nav.mobile-force-visible {
-  position: fixed !important;
-  top: 0 !important;
-  right: 0 !important;
-  left: auto !important;
-  width: 100% !important;
-  height: 100vh !important;
-  background: white !important;
-  z-index: 9999 !important;
-  display: flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  transform: translateX(0) !important;
-}
+/* Legacy patterns - MOVED TO shared-navigation.css */
+/* .mega-menu.force-visible, .dropdown.force-visible, .main-nav.mobile-force-visible */
+/* All element.style override patterns now centralized in shared-navigation.css */

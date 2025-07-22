@@ -278,18 +278,9 @@
   background: var(--color-primary-light);
 }
 
-.scenario-title {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-gray-900);
-  margin-bottom: var(--spacing-2);
-}
-
-.scenario-description {
-  font-size: var(--font-size-sm);
-  color: var(--color-gray-600);
-  line-height: 1.5;
-}
+/* Scenario component styles consolidated to scenario-modal.css for component ownership */
+/* .scenario-title styles moved to scenario-modal.css */
+/* .scenario-description styles moved to scenario-modal.css */
 
 /* ===== MODAL ANIMATIONS ===== */
 @keyframes modalSlideIn {
@@ -383,7 +374,7 @@
 }
 
 /* ===== ACCESSIBILITY IMPROVEMENTS ===== */
-.modal-dialog[aria-hidden='true'] {
+.modal-dialog[aria-hidden="true"] {
   display: none;
 }
 

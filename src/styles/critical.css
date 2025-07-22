@@ -12,7 +12,8 @@
   --modal-z: 9999;
 }
 
-/* Prevent layout shift */
+/* Prevent layout shift - Critical universal selector kept here for performance */
+/* Other universal selectors consolidated in shared-navigation.css */
 * {
   box-sizing: border-box;
 }

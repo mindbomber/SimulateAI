@@ -44,10 +44,7 @@
   transition: none !important;
   max-height: 400px !important;
   overflow-y: auto !important;
-}
-
-/* Device-specific sizing using CSS custom properties */
-.settings-menu {
+  /* Device-specific sizing using CSS custom properties */
   min-width: calc(320px * var(--font-scale));
 }
 

@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Enterprise Constants Fix Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .status {
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      #radarContainer {
+        width: 400px;
+        height: 400px;
+        border: 1px solid #ddd;
+        margin: 20px auto;
+        background: white;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      .test-results {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 4px;
+        margin-top: 20px;
+      }
+      pre {
+        background: #f4f4f4;
+        padding: 10px;
+        border-radius: 4px;
+        overflow-x: auto;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🔧 Enterprise Constants Fix Test</h1>
+      <p>
+        Testing the fix for the ERROR_RECOVERY undefined error in RadarChart
+        initialization.
+      </p>
+
+      <div class="test-section">
+        <h3>Test Status</h3>
+        <div id="testStatus" class="status info">Running tests...</div>
+      </div>
+
+      <div class="test-section">
+        <h3>RadarChart Creation Test</h3>
+        <button onclick="testRadarChartCreation()">
+          Test RadarChart Creation
+        </button>
+        <div id="radarContainer"></div>
+        <div id="creationResult"></div>
+      </div>
+
+      <div class="test-section">
+        <h3>Enterprise Constants Verification</h3>
+        <button onclick="verifyEnterpriseConstants()">
+          Verify Enterprise Constants
+        </button>
+        <div id="constantsResult"></div>
+      </div>
+
+      <div class="test-section">
+        <h3>Error Recovery Test</h3>
+        <button onclick="testErrorRecovery()">Test Error Recovery</button>
+        <div id="errorRecoveryResult"></div>
+      </div>
+
+      <div class="test-results">
+        <h3>Test Results</h3>
+        <pre id="testResults">Waiting for tests to run...</pre>
+      </div>
+    </div>
+
+    <!-- Load required modules -->
+    <script type="module">
+      import RadarChart from "./src/js/components/radar-chart.js";
+      import logger from "./src/js/utils/logger.js";
+
+      // Global variables for testing
+      window.RadarChart = RadarChart;
+      window.logger = logger;
+      window.testRadarChart = null;
+      window.testResults = [];
+
+      // Utility function to log test results
+      window.logTestResult = function (test, status, message, details = null) {
+        const result = {
+          test,
+          status,
+          message,
+          details,
+          timestamp: new Date().toISOString(),
+        };
+        window.testResults.push(result);
+        updateTestResultsDisplay();
+        console.log(`[TEST] ${test}: ${status} - ${message}`, details || "");
+      };
+
+      function updateTestResultsDisplay() {
+        const resultsElement = document.getElementById("testResults");
+        resultsElement.textContent = window.testResults
+          .map((r) => `[${r.timestamp}] ${r.test}: ${r.status} - ${r.message}`)
+          .join("\n");
+      }
+
+      // Test RadarChart creation
+      window.testRadarChartCreation = async function () {
+        const resultDiv = document.getElementById("creationResult");
+        const container = document.getElementById("radarContainer");
+
+        try {
+          logTestResult(
+            "RadarChart Creation",
+            "RUNNING",
+            "Attempting to create RadarChart instance...",
+          );
+
+          // Clear any existing content
+          container.innerHTML = "";
+
+          // Create test scores
+          const testScores = {
+            privacy: 4,
+            fairness: 3,
+            transparency: 5,
+            accountability: 4,
+            beneficence: 3,
+            nonMaleficence: 4,
+            autonomy: 3,
+            sustainability: 4,
+          };
+
+          // Create RadarChart instance
+          window.testRadarChart = new RadarChart("radarContainer", {
+            scores: testScores,
+            title: "Enterprise Constants Test Chart",
+            width: 380,
+            height: 380,
+            isDemo: true,
+          });
+
+          // Wait for initialization
+          await window.testRadarChart.initializationPromise;
+
+          resultDiv.innerHTML =
+            '<div class="status success">✅ RadarChart created successfully!</div>';
+          logTestResult(
+            "RadarChart Creation",
+            "SUCCESS",
+            "RadarChart instance created without errors",
+          );
+
+          // Check if enterprise constants are properly initialized
+          if (window.testRadarChart.ENTERPRISE_CONSTANTS) {
+            logTestResult(
+              "Enterprise Constants",
+              "SUCCESS",
+              "ENTERPRISE_CONSTANTS properly initialized",
+            );
+          } else {
+            logTestResult(
+              "Enterprise Constants",
+              "ERROR",
+              "ENTERPRISE_CONSTANTS is undefined",
+            );
+          }
+        } catch (error) {
+          resultDiv.innerHTML = `<div class="status error">❌ Error creating RadarChart: ${error.message}</div>`;
+          logTestResult(
+            "RadarChart Creation",
+            "ERROR",
+            error.message,
+            error.stack,
+          );
+        }
+      };
+
+      // Verify enterprise constants structure
+      window.verifyEnterpriseConstants = function () {
+        const resultDiv = document.getElementById("constantsResult");
+
+        if (!window.testRadarChart) {
+          resultDiv.innerHTML =
+            '<div class="status error">❌ Please create a RadarChart instance first</div>';
+          return;
+        }
+
+        try {
+          const constants = window.testRadarChart.ENTERPRISE_CONSTANTS;
+
+          if (!constants) {
+            throw new Error("ENTERPRISE_CONSTANTS is undefined");
+          }
+
+          // Check required properties
+          const requiredPaths = [
+            "ERROR_RECOVERY.CIRCUIT_BREAKER_THRESHOLD",
+            "ERROR_RECOVERY.MAX_RETRY_ATTEMPTS",
+            "ERROR_RECOVERY.RETRY_DELAY",
+            "HEALTH.CHECK_INTERVAL",
+            "HEALTH.HEARTBEAT_INTERVAL",
+            "TELEMETRY.FLUSH_INTERVAL",
+            "TELEMETRY.EVENT_TYPES.ERROR_EVENT",
+          ];
+
+          const results = [];
+          let allValid = true;
+
+          for (const path of requiredPaths) {
+            const keys = path.split(".");
+            let value = constants;
+            let valid = true;
+
+            for (const key of keys) {
+              if (value && typeof value === "object" && key in value) {
+                value = value[key];
+              } else {
+                valid = false;
+                break;
+              }
+            }
+
+            results.push({
+              path,
+              valid,
+              value: valid ? value : "undefined",
+            });
+
+            if (!valid) allValid = false;
+          }
+
+          if (allValid) {
+            resultDiv.innerHTML =
+              '<div class="status success">✅ All enterprise constants are properly defined</div>';
+            logTestResult(
+              "Enterprise Constants Verification",
+              "SUCCESS",
+              "All required constants found",
+            );
+          } else {
+            const missing = results.filter((r) => !r.valid).map((r) => r.path);
+            resultDiv.innerHTML = `<div class="status error">❌ Missing constants: ${missing.join(", ")}</div>`;
+            logTestResult(
+              "Enterprise Constants Verification",
+              "ERROR",
+              `Missing constants: ${missing.join(", ")}`,
+            );
+          }
+
+          // Log all constants for debugging
+          logTestResult(
+            "Enterprise Constants Details",
+            "INFO",
+            "Constants structure",
+            JSON.stringify(constants, null, 2),
+          );
+        } catch (error) {
+          resultDiv.innerHTML = `<div class="status error">❌ Error verifying constants: ${error.message}</div>`;
+          logTestResult(
+            "Enterprise Constants Verification",
+            "ERROR",
+            error.message,
+          );
+        }
+      };
+
+      // Test error recovery functionality
+      window.testErrorRecovery = function () {
+        const resultDiv = document.getElementById("errorRecoveryResult");
+
+        if (!window.testRadarChart) {
+          resultDiv.innerHTML =
+            '<div class="status error">❌ Please create a RadarChart instance first</div>';
+          return;
+        }
+
+        try {
+          // Test that _handleError method can access enterprise constants
+          const mockError = new Error("Test error for recovery testing");
+
+          // Check if the method exists and can be called
+          if (typeof window.testRadarChart._handleError === "function") {
+            // This should not throw an error about undefined ERROR_RECOVERY
+            window.testRadarChart._handleError(mockError, "testErrorRecovery");
+
+            resultDiv.innerHTML =
+              '<div class="status success">✅ Error recovery system is working correctly</div>';
+            logTestResult(
+              "Error Recovery Test",
+              "SUCCESS",
+              "Error recovery method executed without errors",
+            );
+          } else {
+            throw new Error("_handleError method not found");
+          }
+        } catch (error) {
+          resultDiv.innerHTML = `<div class="status error">❌ Error recovery test failed: ${error.message}</div>`;
+          logTestResult("Error Recovery Test", "ERROR", error.message);
+        }
+      };
+
+      // Initialize test status
+      document.getElementById("testStatus").innerHTML =
+        '<div class="status success">✅ Test environment ready</div>';
+      logTestResult(
+        "Test Environment",
+        "SUCCESS",
+        "All modules loaded successfully",
+      );
+    </script>
+  </body>
+</html>

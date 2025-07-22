@@ -899,16 +899,8 @@
 }
 
 /* ===== Reduced Motion ===== */
-@media (prefers-reduced-motion: reduce) {
-  .post-simulation-modal *,
-  .post-simulation-modal *::before,
-  .post-simulation-modal *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
+/* Universal reduced motion selectors MOVED TO shared-navigation.css for consolidation */
+/* Centralized accessibility rules for better performance */
 
 /* ===== Print Styles ===== */
 @media print {

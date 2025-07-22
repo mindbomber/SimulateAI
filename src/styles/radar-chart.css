@@ -1,7 +1,70 @@
 /**
  * Radar Chart Component Styles
  * Styling for ethical impact visualization charts
+ * Consolidated from hero-demo.css, ethics-analysis.css, appearance-settings.css, and scenario-modal.css
  */
+
+/* Hero Radar Demo Section - Consolidated from hero-demo.css */
+.hero-radar-demo {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border: 2px solid #cbd5e0;
+  border-radius: 16px;
+  padding: 2rem;
+  margin: 2rem 0 0;
+  text-align: center;
+}
+
+.hero-radar-demo h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-radar-demo p {
+  color: #4a5568;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Hero Radar Container - Consolidated from hero-demo.css */
+.hero-radar-container {
+  position: relative;
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto 2rem;
+  padding: 1rem;
+  background: rgb(255 255 255 / 80%);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
+}
+
+/* Demo radar container - Consolidated from ethics-analysis.css (similar to .radar-demo-container) */
+.demo-radar-container {
+  max-width: 500px;
+  margin: 0 auto 2rem;
+  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow:
+    0 4px 12px rgb(0 0 0 / 8%),
+    0 1px 3px rgb(0 0 0 / 5%);
+  border: 1px solid rgb(226 232 240 / 80%);
+  transition: all 0.3s ease;
+}
+
+.demo-radar-container:hover {
+  box-shadow:
+    0 8px 20px rgb(0 0 0 / 12%),
+    0 2px 6px rgb(0 0 0 / 8%);
+  transform: translateY(-2px);
+  border-color: rgb(156 163 175 / 60%);
+}
 
 /* Minimal container for demo radar charts - gives more room */
 .radar-demo-container {
@@ -90,32 +153,81 @@ canvas[role="img"] {
   z-index: 1;
 }
 
-/* Chart.js tooltip container - must be above modal z-index */
-.chartjs-tooltip,
-div[id^="chartjs-tooltip"],
-div[class*="chartjs-tooltip"],
-div[data-chartjs="tooltip"] {
-  z-index: 1100 !important; /* Above scenario modal z-index of 1055 */
+/* ===== CONSOLIDATED CHART.JS TOOLTIP PROTECTION ===== */
+
+/* Base Chart.js tooltip protection - covers all standard tooltip scenarios */
+.chartjs-tooltip:not(.progress-ring-tooltip),
+div[id^="chartjs-tooltip"]:not(.progress-ring-tooltip),
+div[id*="chartjs-tooltip-blur"],
+div[class*="chartjs-tooltip"]:not(.progress-ring-tooltip),
+div[data-chartjs="tooltip"]:not(.progress-ring-tooltip) {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 1100 !important;
   position: fixed !important;
   pointer-events: none !important;
 }
 
+/* Modal context tooltips - higher z-index for modal scenarios */
+.scenario-modal .chartjs-tooltip:not(.progress-ring-tooltip),
+.scenario-modal div[id^="chartjs-tooltip"]:not(.progress-ring-tooltip),
+.scenario-modal div[class*="chartjs-tooltip"]:not(.progress-ring-tooltip),
+.scenario-modal div[data-chartjs="tooltip"]:not(.progress-ring-tooltip),
+.scenario-modal-dialog .chartjs-tooltip:not(.progress-ring-tooltip),
+.scenario-modal-dialog div[id^="chartjs-tooltip"]:not(.progress-ring-tooltip),
+.scenario-modal-dialog
+  div[class*="chartjs-tooltip"]:not(.progress-ring-tooltip),
+.scenario-modal-dialog div[data-chartjs="tooltip"]:not(.progress-ring-tooltip) {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 1060 !important;
+  position: fixed !important;
+  pointer-events: none !important;
+}
+
+/* Radar chart visibility protection - simplified to actual usage patterns */
+.radar-demo-container,
+.radar-chart-container,
+.scenario-radar,
+.radar-demo-container canvas,
+.radar-chart-container canvas,
+.scenario-radar canvas {
+  display: block !important;
+  visibility: visible !important;
+}
+
+/* Chart.js tooltip container - must be above modal z-index - consolidated selectors */
 /* CRITICAL: Hide any built-in Chart.js tooltips that might still appear */
-.chartjs-tooltip:not([id*="chartjs-tooltip-blur"]),
-div[class*="chartjs-tooltip"]:not([id*="chartjs-tooltip-blur"]) {
+/* EXCLUDE CategoryHeader progress ring tooltips from Chart.js rules */
+.chartjs-tooltip:not([id*="chartjs-tooltip-blur"]):not(.progress-ring-tooltip),
+div[class*="chartjs-tooltip"]:not([id*="chartjs-tooltip-blur"]):not(
+    .progress-ring-tooltip
+  ) {
   display: none !important;
   opacity: 0 !important;
   visibility: hidden !important;
 }
 
-/* Ensure our custom external tooltips are visible */
-div[id*="chartjs-tooltip-blur"] {
+/* PROTECT CategoryHeader tooltips from Chart.js interference */
+.progress-ring-tooltip {
   display: block !important;
-  opacity: 1 !important;
+  opacity: inherit !important;
+  visibility: inherit !important;
+  z-index: 1200 !important;
+  position: fixed !important;
+}
+
+/* CRITICAL: Scenario grid view protection - ensure radar charts show even when grid is hidden */
+.scenarios-grid[style*="display: none"] .radar-chart-container,
+.scenarios-grid[style*="display: none"] .scenario-radar,
+.view-content[style*="display: none"] .radar-chart-container,
+.view-content[style*="display: none"] .scenario-radar {
+  /* Override parent container inline display:none for radar charts */
+  display: block !important;
   visibility: visible !important;
-  z-index: 1100 !important;
-  position: absolute !important;
-  pointer-events: none !important;
+  position: relative !important;
 }
 
 /* Fallback chart when Chart.js fails to load */
@@ -589,30 +701,72 @@ div[id*="chartjs-tooltip-blur"] {
   }
 }
 
-/* Dark mode support for radar charts */
+/* Dark mode support for radar charts - Enhanced with consolidation from appearance-settings.css */
 body.dark-mode .radar-demo-container {
   background: transparent;
   box-shadow: -4px 4px 8px var(--theme-shadow);
 }
 
 body.dark-mode .radar-chart-container {
-  background: linear-gradient(
-    135deg,
-    var(--theme-bg-secondary) 0%,
-    var(--theme-bg-tertiary) 100%
-  );
-  border-color: var(--theme-border);
-  box-shadow: 0 1px 3px var(--theme-shadow);
+  background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%) !important;
+  border: 1px solid #444 !important;
+  box-shadow:
+    0 4px 12px rgb(0 0 0 / 40%),
+    0 1px 3px rgb(0 0 0 / 30%) !important;
 }
 
 body.dark-mode .radar-chart-container:hover {
-  box-shadow: 0 2px 6px var(--theme-shadow);
-  border-color: var(--theme-accent);
+  box-shadow:
+    0 8px 20px rgb(0 0 0 / 50%),
+    0 2px 6px rgb(0 0 0 / 40%) !important;
+  border-color: #555 !important;
 }
 
 body.dark-mode .radar-chart-container canvas {
   background: transparent;
   box-shadow: 4px 4px 8px var(--theme-shadow);
+}
+
+/* Hero radar demo dark mode - Consolidated from appearance-settings.css */
+body.dark-mode .hero-radar-demo {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+  color: #fff !important;
+  border-color: #444 !important;
+}
+
+body.dark-mode .hero-radar-demo h3 {
+  color: #fff !important;
+  background: linear-gradient(135deg, #6bb4ff 0%, #9d4edd 100%) !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+body.dark-mode .hero-radar-demo p {
+  color: #ccc !important;
+}
+
+/* Hero radar container dark mode */
+body.dark-mode .hero-radar-container {
+  background: rgb(45 45 45 / 80%);
+  border-color: #444;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 40%);
+}
+
+/* Demo radar container dark mode */
+body.dark-mode .demo-radar-container {
+  background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
+  border-color: #444;
+  box-shadow:
+    0 4px 12px rgb(0 0 0 / 40%),
+    0 1px 3px rgb(0 0 0 / 30%);
+}
+
+body.dark-mode .demo-radar-container:hover {
+  box-shadow:
+    0 8px 20px rgb(0 0 0 / 50%),
+    0 2px 6px rgb(0 0 0 / 40%);
+  border-color: #555;
 }
 
 body.dark-mode .radar-chart-fallback {
@@ -741,7 +895,149 @@ body.dark-mode .score-item:focus-within {
 
 /* ===== CHART.JS TOOLTIP CONFLICT RESOLUTION ===== */
 
-/* Additional tooltip fixes for scenario modals */
+/* Scenario Modal Context - Consolidated radar chart selectors */
+.scenario-modal .radar-chart-container,
+.scenario-modal .scenario-radar,
+.scenario-modal .results-radar,
+.scenario-modal #scenario-radar-chart {
+  text-align: center;
+  position: relative !important;
+  width: 100% !important;
+  max-width: 420px !important; /* Increased max-width for larger chart */
+  margin: 1rem auto !important;
+  padding: 0.5rem !important; /* Reduce padding to give more space to chart */
+  background: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  backdrop-filter: none !important;
+
+  /* Force grid placement */
+  grid-area: auto;
+
+  /* Ensure proper sizing for chart - increased min-height for labels */
+  min-height: 450px;
+  overflow: visible !important;
+
+  /* Ensure container can accommodate chart labels */
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+
+  /* Ensure visibility and proper sizing */
+  visibility: visible !important;
+
+  /* Tooltip positioning */
+  z-index: auto !important; /* Don't create new stacking context */
+
+  /* Prevent any text content from showing */
+}
+
+/* Canvas specific styling for scenario modal radar charts - consolidated selectors */
+.scenario-modal .radar-chart-container canvas,
+.scenario-modal .scenario-radar canvas,
+.scenario-modal .results-radar canvas,
+.scenario-modal #scenario-radar-chart canvas {
+  max-width: 100% !important;
+  width: 400px !important; /* Increased width for chart */
+  height: 400px !important; /* Increased height for chart */
+  display: block !important;
+  margin: 0 auto !important;
+
+  /* Prevent clipping - ensure Chart.js has space for labels */
+  transform: none !important;
+  overflow: visible !important;
+
+  /* Remove padding to give more space to the chart itself */
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Scenario modal chart legend styles */
+.scenario-modal .chart-legend h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 1.5rem;
+  text-align: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.scenario-modal .chart-legend {
+  margin-top: 1.5rem;
+}
+
+.scenario-modal .chart-legend p {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 1rem;
+  background: rgb(102 126 234 / 5%);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: #4a5568;
+  border: 1px solid rgb(102 126 234 / 10%);
+}
+
+/* Ensure no unwanted text content displays in radar charts - consolidated selectors */
+.scenario-modal .radar-chart-container:empty::before,
+.scenario-modal .scenario-radar:empty::before,
+.scenario-modal .results-radar:empty::before,
+.scenario-modal #scenario-radar-chart:empty::before {
+  content: "";
+  display: none;
+}
+
+.scenario-modal .radar-chart-container:empty::after,
+.scenario-modal .scenario-radar:empty::after,
+.scenario-modal .results-radar:empty::after,
+.scenario-modal #scenario-radar-chart:empty::after {
+  content: "";
+  display: none;
+}
+
+/* Chart.js Tooltip Support - Consolidated from scenario-modal.css */
+
+/* Chart.js canvas tooltips - alternative tooltip implementation */
+.scenario-modal canvas[role="img"] + div[style*="position: absolute"],
+.scenario-modal-dialog canvas[role="img"] + div[style*="position: absolute"] {
+  z-index: 1060 !important;
+  position: fixed !important;
+}
+
+/* Ensure Chart.js tooltip backdrop doesn't interfere */
+.scenario-modal .chart-tooltip:not(.progress-ring-tooltip),
+.scenario-modal-dialog .chart-tooltip:not(.progress-ring-tooltip) {
+  z-index: 1060 !important;
+  position: fixed !important;
+  pointer-events: none !important;
+}
+
+/* ===== CATEGORY HEADER TOOLTIP PROTECTION ===== */
+
+/* Ensure CategoryHeader tooltips always appear above scenario modals and Chart.js tooltips */
+.progress-ring-tooltip,
+.progress-ring-tooltip.visible {
+  z-index: 1200 !important; /* Always above scenario modals and Chart.js tooltips */
+  position: fixed !important;
+  pointer-events: none !important;
+}
+
+/* Scenario modal context - ensure CategoryHeader tooltips remain on top */
+.scenario-modal .progress-ring-tooltip,
+.scenario-modal-dialog .progress-ring-tooltip,
+.scenario-modal .progress-ring-tooltip.visible,
+.scenario-modal-dialog .progress-ring-tooltip.visible {
+  z-index: 1200 !important;
+  position: fixed !important;
+  pointer-events: none !important;
+}
+
+/* Additional tooltip fixes for scenario modals - consolidated radar selectors */
 .scenario-modal .radar-chart-container,
 .scenario-modal .scenario-radar,
 .scenario-modal .results-radar,
@@ -757,19 +1053,68 @@ body.dark-mode .score-item:focus-within {
   overflow: visible !important;
 }
 
-/* Override any conflicting z-index rules from scenario modal */
+/* Override any conflicting z-index rules from scenario modal - consolidated radar selectors */
+.scenario-modal .radar-chart-container canvas[role="img"],
+.scenario-modal .scenario-radar canvas[role="img"],
+.scenario-modal .results-radar canvas[role="img"],
+.scenario-modal #scenario-radar-chart canvas[role="img"],
 .scenario-modal canvas[role="img"],
 .scenario-modal-dialog canvas[role="img"] {
   position: relative;
   z-index: 2;
 }
 
-/* Chart.js tooltip positioning fixes for modals */
-.scenario-modal .chartjs-tooltip,
-.scenario-modal div[id^="chartjs-tooltip"],
-.scenario-modal div[class*="chartjs-tooltip"] {
+/* ===== INLINE STYLE CONFLICT PROTECTION ===== */
+/* CRITICAL: Ultimate protection against app.html inline style conflicts */
+
+/* Protect all Chart.js elements from inline display:none */
+[class*="chartjs-"],
+[id*="chartjs-"] {
+  /* Force visibility for all Chart.js elements */
+  display: block !important;
+  visibility: visible !important;
+}
+
+/* Protect radar charts in hidden containers (like scenarios-grid with style="display: none") */
+[style*="display: none"] .radar-demo-container,
+[style*="display: none"] .radar-chart-container,
+[style*="display: none"] .scenario-radar,
+[style*="display: none"] .radar-demo-container canvas,
+[style*="display: none"] .radar-chart-container canvas,
+[style*="display: none"] .scenario-radar canvas,
+[style*="display: none"] canvas[id*="radar"],
+[style*="display: none"] canvas[class*="radar"] {
+  /* Override parent inline display:none specifically for radar charts */
+  display: block !important;
+  visibility: visible !important;
+  position: relative !important;
+  z-index: auto !important;
+}
+
+/* Protect search/filter containers that might contain radar charts */
+.search-container[style*="display: none"] .radar-chart-container,
+.scenario-controls-toolbar[style*="display: none"] .radar-chart-container,
+.autocomplete-dropdown[style*="display: none"] .radar-chart-container {
+  /* Override inline display:none for radar charts in UI containers */
+  display: block !important;
+  visibility: visible !important;
+}
+
+/* High-specificity protection for tooltip elements */
+div[style*="display: none"][class*="chartjs-tooltip"],
+div[style*="display: none"][id*="chartjs-tooltip"] {
+  /* Force tooltips to show even with inline display:none */
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+}
+
+/* Protection against z-index conflicts from inline styles */
+[style*="z-index"] .chartjs-tooltip,
+[style*="z-index"] [class*="chartjs-tooltip"],
+[style*="z-index"] [id*="chartjs-tooltip"] {
+  /* Ensure tooltips always appear on top regardless of parent z-index */
   z-index: 1100 !important;
   position: fixed !important;
-  pointer-events: none !important;
-  transform: translateZ(0) !important;
 }

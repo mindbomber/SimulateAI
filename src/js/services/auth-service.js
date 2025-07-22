@@ -19,9 +19,10 @@
  * Handles user authentication and profile management
  */
 
-import FirebaseService from './firebase-service.js';
-import { FirestoreService } from './firestore-service.js';
-import { initializeUIDNormalizer } from '../utils/uid-normalizer.js';
+import FirebaseService from "./firebase-service.js";
+import { FirestoreService } from "./firestore-service.js";
+import { initializeUIDNormalizer } from "../utils/uid-normalizer.js";
+import eventDispatcher, { AUTH_EVENTS } from "../utils/event-dispatcher.js";
 
 export class AuthService {
   constructor(existingFirebaseService = null) {
@@ -46,7 +47,7 @@ export class AuthService {
    */
   initializeNetworkStatusMonitor() {
     // Check if NetworkStatusMonitor is available
-    if (typeof window !== 'undefined' && window.NetworkStatusMonitor) {
+    if (typeof window !== "undefined" && window.NetworkStatusMonitor) {
       window.networkStatusMonitor = new window.NetworkStatusMonitor();
     } else {
       // Load the component if not available
@@ -61,8 +62,8 @@ export class AuthService {
     try {
       // Import the component script if not already loaded
       if (!document.querySelector('script[src*="network-status-monitor"]')) {
-        const script = document.createElement('script');
-        script.src = '/src/js/components/network-status-monitor.js';
+        const script = document.createElement("script");
+        script.src = "/src/js/components/network-status-monitor.js";
         script.onload = () => {
           if (window.NetworkStatusMonitor) {
             window.networkStatusMonitor = new window.NetworkStatusMonitor();
@@ -80,7 +81,7 @@ export class AuthService {
    */
   initializeRateLimitStatus() {
     // Check if RateLimitStatus is available
-    if (typeof window !== 'undefined' && window.RateLimitStatus) {
+    if (typeof window !== "undefined" && window.RateLimitStatus) {
       this.rateLimitStatus = new window.RateLimitStatus();
     } else {
       // Load the component if not available
@@ -95,8 +96,8 @@ export class AuthService {
     try {
       // Import the component script if not already loaded
       if (!document.querySelector('script[src*="rate-limit-status"]')) {
-        const script = document.createElement('script');
-        script.src = '/src/js/components/rate-limit-status.js';
+        const script = document.createElement("script");
+        script.src = "/src/js/components/rate-limit-status.js";
         script.onload = () => {
           if (window.RateLimitStatus) {
             this.rateLimitStatus = new window.RateLimitStatus();
@@ -116,14 +117,14 @@ export class AuthService {
     try {
       const firebaseReady = await this.firebaseService.initialize();
       if (!firebaseReady) {
-        throw new Error('Firebase initialization failed');
+        throw new Error("Firebase initialization failed");
       }
 
       // Initialize UID normalizer
       this.uidNormalizer = initializeUIDNormalizer(this);
 
       // Set up auth state listener
-      this.firebaseService.addAuthStateListener(user => {
+      this.firebaseService.addAuthStateListener((user) => {
         this.handleAuthStateChange(user);
       });
 
@@ -155,14 +156,14 @@ export class AuthService {
       if (this.logoutManager && !previousUser) {
         this.logoutManager.extendSession();
         try {
-          localStorage.setItem('session_start_time', Date.now().toString());
+          localStorage.setItem("session_start_time", Date.now().toString());
         } catch (error) {
           // Ignore storage errors
         }
       }
 
       // Track user engagement with centralized UID
-      this.firebaseService.trackEvent('user_session_start', {
+      this.firebaseService.trackEvent("user_session_start", {
         user_id: currentUID,
         tier: this.userProfile?.tier || 0,
       });
@@ -173,7 +174,7 @@ export class AuthService {
       // Clear session data when user logs out
       if (previousUser) {
         try {
-          localStorage.removeItem('session_start_time');
+          localStorage.removeItem("session_start_time");
         } catch (error) {
           // Ignore storage errors
         }
@@ -310,9 +311,9 @@ export class AuthService {
 
     // Use existing modal system
     const modal = new window.ModalDialog({
-      title: 'Welcome to SimulateAI',
+      title: "Welcome to SimulateAI",
       content: loginHTML,
-      size: 'medium',
+      size: "medium",
       closeOnBackdrop: true,
       closeOnEscape: true,
     });
@@ -329,65 +330,65 @@ export class AuthService {
   setupAuthEventHandlers(modal) {
     // Social login handlers
     document
-      .getElementById('google-signin-btn')
-      ?.addEventListener('click', async () => {
-        await this.signInWithProvider('google', modal);
+      .getElementById("google-signin-btn")
+      ?.addEventListener("click", async () => {
+        await this.signInWithProvider("google", modal);
       });
 
     document
-      .getElementById('facebook-signin-btn')
-      ?.addEventListener('click', async () => {
-        await this.signInWithProvider('facebook', modal);
+      .getElementById("facebook-signin-btn")
+      ?.addEventListener("click", async () => {
+        await this.signInWithProvider("facebook", modal);
       });
 
     document
-      .getElementById('twitter-signin-btn')
-      ?.addEventListener('click', async () => {
-        await this.signInWithProvider('twitter', modal);
+      .getElementById("twitter-signin-btn")
+      ?.addEventListener("click", async () => {
+        await this.signInWithProvider("twitter", modal);
       });
 
     document
-      .getElementById('github-signin-btn')
-      ?.addEventListener('click', async () => {
-        await this.signInWithProvider('github', modal);
+      .getElementById("github-signin-btn")
+      ?.addEventListener("click", async () => {
+        await this.signInWithProvider("github", modal);
       });
 
     // Email form toggle
     document
-      .getElementById('show-email-form-btn')
-      ?.addEventListener('click', () => {
-        document.getElementById('email-auth-form').style.display = 'block';
-        document.getElementById('show-email-form-btn').style.display = 'none';
+      .getElementById("show-email-form-btn")
+      ?.addEventListener("click", () => {
+        document.getElementById("email-auth-form").style.display = "block";
+        document.getElementById("show-email-form-btn").style.display = "none";
       });
 
     // Tab switching
-    document.getElementById('signin-tab')?.addEventListener('click', () => {
-      this.switchAuthTab('signin');
+    document.getElementById("signin-tab")?.addEventListener("click", () => {
+      this.switchAuthTab("signin");
     });
 
-    document.getElementById('signup-tab')?.addEventListener('click', () => {
-      this.switchAuthTab('signup');
+    document.getElementById("signup-tab")?.addEventListener("click", () => {
+      this.switchAuthTab("signup");
     });
 
     // Email form handlers
     document
-      .getElementById('email-signin-form')
-      ?.addEventListener('submit', async e => {
+      .getElementById("email-signin-form")
+      ?.addEventListener("submit", async (e) => {
         e.preventDefault();
         await this.handleEmailSignIn(modal);
       });
 
     document
-      .getElementById('email-signup-form')
-      ?.addEventListener('submit', async e => {
+      .getElementById("email-signup-form")
+      ?.addEventListener("submit", async (e) => {
         e.preventDefault();
         await this.handleEmailSignUp(modal);
       });
 
     // Forgot password handler
     document
-      .getElementById('forgot-password-btn')
-      ?.addEventListener('click', async () => {
+      .getElementById("forgot-password-btn")
+      ?.addEventListener("click", async () => {
         await this.handleForgotPassword();
       });
   }
@@ -396,21 +397,21 @@ export class AuthService {
    * Switch between sign in and sign up tabs
    */
   switchAuthTab(tab) {
-    const signinTab = document.getElementById('signin-tab');
-    const signupTab = document.getElementById('signup-tab');
-    const signinForm = document.getElementById('email-signin-form');
-    const signupForm = document.getElementById('email-signup-form');
+    const signinTab = document.getElementById("signin-tab");
+    const signupTab = document.getElementById("signup-tab");
+    const signinForm = document.getElementById("email-signin-form");
+    const signupForm = document.getElementById("email-signup-form");
 
-    if (tab === 'signin') {
-      signinTab.classList.add('active');
-      signupTab.classList.remove('active');
-      signinForm.style.display = 'block';
-      signupForm.style.display = 'none';
+    if (tab === "signin") {
+      signinTab.classList.add("active");
+      signupTab.classList.remove("active");
+      signinForm.style.display = "block";
+      signupForm.style.display = "none";
     } else {
-      signinTab.classList.remove('active');
-      signupTab.classList.add('active');
-      signinForm.style.display = 'none';
-      signupForm.style.display = 'block';
+      signinTab.classList.remove("active");
+      signupTab.classList.add("active");
+      signinForm.style.display = "none";
+      signupForm.style.display = "block";
     }
   }
 
@@ -425,32 +426,32 @@ export class AuthService {
       const signinBtn = document.getElementById(btnId);
       if (signinBtn) {
         signinBtn.disabled = true;
-        signinBtn.innerHTML = 'Signing in...';
+        signinBtn.innerHTML = "Signing in...";
       }
 
       switch (provider) {
-        case 'google':
+        case "google":
           result = await this.handleAuthWithRateLimit(() =>
-            this.firebaseService.signInWithGoogle()
+            this.firebaseService.signInWithGoogle(),
           );
           break;
-        case 'facebook':
+        case "facebook":
           result = await this.handleAuthWithRateLimit(() =>
-            this.firebaseService.signInWithFacebook()
+            this.firebaseService.signInWithFacebook(),
           );
           break;
-        case 'twitter':
+        case "twitter":
           result = await this.handleAuthWithRateLimit(() =>
-            this.firebaseService.signInWithTwitter()
+            this.firebaseService.signInWithTwitter(),
           );
           break;
-        case 'github':
+        case "github":
           result = await this.handleAuthWithRateLimit(() =>
-            this.firebaseService.signInWithGitHub()
+            this.firebaseService.signInWithGitHub(),
           );
           break;
         default:
-          throw new Error('Unsupported provider');
+          throw new Error("Unsupported provider");
       }
 
       // Handle rate limiting early return
@@ -465,9 +466,9 @@ export class AuthService {
       }
 
       if (result.success) {
-        if (result.pending && result.method === 'redirect') {
+        if (result.pending && result.method === "redirect") {
           // For mobile redirect - show loading message and keep modal open
-          this.showInfoMessage('Redirecting to sign in... Please wait.');
+          this.showInfoMessage("Redirecting to sign in... Please wait.");
 
           // Don't close modal or show success yet - will be handled after redirect
           return;
@@ -475,7 +476,7 @@ export class AuthService {
           // For desktop popup - normal flow
           if (modal) modal.close();
           this.showSuccessMessage(
-            'Welcome! You have been signed in successfully.'
+            "Welcome! You have been signed in successfully.",
           );
 
           // Check if user should be prompted for profile update
@@ -522,23 +523,23 @@ export class AuthService {
    */
   async handleEmailSignIn(modal) {
     try {
-      const email = document.getElementById('signin-email').value;
-      const password = document.getElementById('signin-password').value;
+      const email = document.getElementById("signin-email").value;
+      const password = document.getElementById("signin-password").value;
 
       if (!email || !password) {
-        this.showErrorMessage('Please enter both email and password.');
+        this.showErrorMessage("Please enter both email and password.");
         return;
       }
 
       const result = await this.firebaseService.signInWithEmail(
         email,
-        password
+        password,
       );
 
       if (result.success) {
         if (modal) modal.close();
         this.showSuccessMessage(
-          'Welcome back! You have been signed in successfully.'
+          "Welcome back! You have been signed in successfully.",
         );
 
         const PROFILE_PROMPT_DELAY = 2000; // 2 seconds
@@ -558,31 +559,31 @@ export class AuthService {
    */
   async handleEmailSignUp(modal) {
     try {
-      const name = document.getElementById('signup-name').value;
-      const email = document.getElementById('signup-email').value;
-      const password = document.getElementById('signup-password').value;
-      const confirmPassword = document.getElementById('signup-confirm').value;
+      const name = document.getElementById("signup-name").value;
+      const email = document.getElementById("signup-email").value;
+      const password = document.getElementById("signup-password").value;
+      const confirmPassword = document.getElementById("signup-confirm").value;
 
       if (!name || !email || !password || !confirmPassword) {
-        this.showErrorMessage('Please fill in all fields.');
+        this.showErrorMessage("Please fill in all fields.");
         return;
       }
 
       if (password !== confirmPassword) {
-        this.showErrorMessage('Passwords do not match.');
+        this.showErrorMessage("Passwords do not match.");
         return;
       }
 
       const MIN_PASSWORD_LENGTH = 6;
       if (password.length < MIN_PASSWORD_LENGTH) {
-        this.showErrorMessage('Password must be at least 6 characters long.');
+        this.showErrorMessage("Password must be at least 6 characters long.");
         return;
       }
 
       const result = await this.firebaseService.createAccountWithEmail(
         email,
         password,
-        name
+        name,
       );
 
       if (result.success) {
@@ -591,10 +592,10 @@ export class AuthService {
           await this.ensureUserDocument({
             displayName: name,
             email,
-            role: 'learner',
+            role: "learner",
             profile: {
-              avatar: '',
-              bio: '',
+              avatar: "",
+              bio: "",
               customization: {},
             },
           });
@@ -602,7 +603,7 @@ export class AuthService {
 
         if (modal) modal.close();
         this.showSuccessMessage(
-          'Account created successfully! Welcome to SimulateAI.'
+          "Account created successfully! Welcome to SimulateAI.",
         );
 
         const PROFILE_PROMPT_DELAY = 2000; // 2 seconds
@@ -621,10 +622,10 @@ export class AuthService {
    * Handle forgot password
    */
   async handleForgotPassword() {
-    const email = document.getElementById('signin-email').value;
+    const email = document.getElementById("signin-email").value;
 
     if (!email) {
-      this.showErrorMessage('Please enter your email address first.');
+      this.showErrorMessage("Please enter your email address first.");
       return;
     }
 
@@ -632,7 +633,7 @@ export class AuthService {
       const result = await this.firebaseService.resetPassword(email);
 
       if (result.success) {
-        this.showSuccessMessage('Password reset email sent! Check your inbox.');
+        this.showSuccessMessage("Password reset email sent! Check your inbox.");
       } else {
         throw new Error(result.error);
       }
@@ -644,10 +645,10 @@ export class AuthService {
   /**
    * Sign out current user
    */
-  async signOut(reason = 'user_initiated', logoutData = {}) {
+  async signOut(reason = "user_initiated", logoutData = {}) {
     try {
       // If logout manager is available and this is an intentional logout with reason
-      if (this.logoutManager && reason !== 'user_initiated') {
+      if (this.logoutManager && reason !== "user_initiated") {
         this.logoutManager.handleIntentionalLogout(reason, logoutData);
         return true;
       }
@@ -655,14 +656,14 @@ export class AuthService {
       const result = await this.firebaseService.signOutUser();
       if (result.success) {
         // For user-initiated logout, show standard success message
-        if (reason === 'user_initiated') {
-          this.showSuccessMessage('Successfully signed out');
+        if (reason === "user_initiated") {
+          this.showSuccessMessage("Successfully signed out");
         }
         return true;
       }
       return false;
     } catch (error) {
-      this.showErrorMessage('Sign-out failed');
+      this.showErrorMessage("Sign-out failed");
       return false;
     }
   }
@@ -673,60 +674,60 @@ export class AuthService {
   async triggerIntentionalLogout(reason, data = {}) {
     const logoutReasons = {
       inactivity: {
-        title: 'Signed Out Due to Inactivity',
-        message: 'You have been automatically signed out for security.',
-        reason: 'No activity detected for the configured time period.',
+        title: "Signed Out Due to Inactivity",
+        message: "You have been automatically signed out for security.",
+        reason: "No activity detected for the configured time period.",
         showReauthenticate: true,
         ...data,
       },
       role_change: {
-        title: 'Account Role Updated',
-        message: 'Your account role has been changed.',
-        reason: 'Please sign in again to access your new permissions.',
+        title: "Account Role Updated",
+        message: "Your account role has been changed.",
+        reason: "Please sign in again to access your new permissions.",
         showReauthenticate: true,
         ...data,
       },
       security_logout: {
-        title: 'Security Logout',
-        message: 'You were signed out for security reasons.',
-        reason: 'Unusual activity or security event detected.',
+        title: "Security Logout",
+        message: "You were signed out for security reasons.",
+        reason: "Unusual activity or security event detected.",
         showReauthenticate: true,
         ...data,
       },
       admin_logout: {
-        title: 'Administrative Logout',
-        message: 'You were signed out by an administrator.',
-        reason: 'Contact your administrator if you have questions.',
+        title: "Administrative Logout",
+        message: "You were signed out by an administrator.",
+        reason: "Contact your administrator if you have questions.",
         showReauthenticate: false,
         ...data,
       },
       maintenance: {
-        title: 'System Maintenance',
-        message: 'System maintenance in progress.',
-        reason: 'Please try signing in again after maintenance is complete.',
+        title: "System Maintenance",
+        message: "System maintenance in progress.",
+        reason: "Please try signing in again after maintenance is complete.",
         showReauthenticate: false,
         ...data,
       },
       token_expired: {
-        title: 'Session Expired',
-        message: 'Your authentication session has expired.',
-        reason: 'For security, sessions expire periodically.',
+        title: "Session Expired",
+        message: "Your authentication session has expired.",
+        reason: "For security, sessions expire periodically.",
         showReauthenticate: true,
         ...data,
       },
       too_many_devices: {
-        title: 'Too Many Active Sessions',
-        message: 'You have been signed out due to too many active sessions.',
-        reason: 'You can only be signed in on a limited number of devices.',
+        title: "Too Many Active Sessions",
+        message: "You have been signed out due to too many active sessions.",
+        reason: "You can only be signed in on a limited number of devices.",
         showReauthenticate: true,
         ...data,
       },
     };
 
     const logoutInfo = logoutReasons[reason] || {
-      title: 'Signed Out',
-      message: 'You have been signed out.',
-      reason: data.reason || 'Unknown reason.',
+      title: "Signed Out",
+      message: "You have been signed out.",
+      reason: data.reason || "Unknown reason.",
       showReauthenticate: true,
       ...data,
     };
@@ -742,7 +743,7 @@ export class AuthService {
    * Logout user due to inactivity
    */
   async logoutForInactivity(inactiveMinutes = 30) {
-    return await this.triggerIntentionalLogout('inactivity', {
+    return await this.triggerIntentionalLogout("inactivity", {
       reason: `No activity detected for ${inactiveMinutes} minutes.`,
       inactiveMinutes,
     });
@@ -752,8 +753,8 @@ export class AuthService {
    * Logout user due to role change
    */
   async logoutForRoleChange(newRole, oldRole = null) {
-    return await this.triggerIntentionalLogout('role_change', {
-      reason: `Your role has been updated from ${oldRole || 'previous role'} to ${newRole}.`,
+    return await this.triggerIntentionalLogout("role_change", {
+      reason: `Your role has been updated from ${oldRole || "previous role"} to ${newRole}.`,
       newRole,
       oldRole,
     });
@@ -762,8 +763,8 @@ export class AuthService {
   /**
    * Logout user for security reasons
    */
-  async logoutForSecurity(securityReason = 'Unusual activity detected') {
-    return await this.triggerIntentionalLogout('security_logout', {
+  async logoutForSecurity(securityReason = "Unusual activity detected") {
+    return await this.triggerIntentionalLogout("security_logout", {
       reason: securityReason,
       securityEvent: securityReason,
       timestamp: new Date().toISOString(),
@@ -774,8 +775,8 @@ export class AuthService {
    * Administrative logout
    */
   async logoutByAdmin(adminName = null, adminReason = null) {
-    return await this.triggerIntentionalLogout('admin_logout', {
-      reason: adminReason || 'Logged out by administrator.',
+    return await this.triggerIntentionalLogout("admin_logout", {
+      reason: adminReason || "Logged out by administrator.",
       adminName,
       adminReason,
     });
@@ -785,10 +786,10 @@ export class AuthService {
    * Logout for system maintenance
    */
   async logoutForMaintenance(maintenanceWindow = null) {
-    return await this.triggerIntentionalLogout('maintenance', {
+    return await this.triggerIntentionalLogout("maintenance", {
       reason: maintenanceWindow
         ? `Scheduled maintenance: ${maintenanceWindow}`
-        : 'System maintenance in progress.',
+        : "System maintenance in progress.",
       maintenanceWindow,
     });
   }
@@ -797,8 +798,8 @@ export class AuthService {
    * Logout due to token expiration
    */
   async logoutForTokenExpiration() {
-    return await this.triggerIntentionalLogout('token_expired', {
-      reason: 'Your authentication token has expired for security.',
+    return await this.triggerIntentionalLogout("token_expired", {
+      reason: "Your authentication token has expired for security.",
       expiredAt: new Date().toISOString(),
     });
   }
@@ -807,7 +808,7 @@ export class AuthService {
    * Logout due to too many active sessions
    */
   async logoutForTooManyDevices(maxDevices = 3, currentDevices = null) {
-    return await this.triggerIntentionalLogout('too_many_devices', {
+    return await this.triggerIntentionalLogout("too_many_devices", {
       reason: `Maximum of ${maxDevices} active sessions allowed.`,
       maxDevices,
       currentDevices,
@@ -835,14 +836,14 @@ export class AuthService {
       ) {
         await this.logoutForRoleChange(
           currentProfile.role,
-          this.userProfile.role
+          this.userProfile.role,
         );
         return;
       }
 
       // Example: Check for security flags
       if (currentProfile?.securityFlags?.forceLogout) {
-        await this.logoutForSecurity('Account security flag activated');
+        await this.logoutForSecurity("Account security flag activated");
         return;
       }
     }
@@ -896,13 +897,13 @@ export class AuthService {
    */
   enableAuthenticatedFeatures() {
     // Enable features that require authentication
-    document.querySelectorAll('.auth-required').forEach(element => {
-      element.style.display = 'block';
+    document.querySelectorAll(".auth-required").forEach((element) => {
+      element.style.display = "block";
     });
 
     // Hide login prompts
-    document.querySelectorAll('.login-required').forEach(element => {
-      element.style.display = 'none';
+    document.querySelectorAll(".login-required").forEach((element) => {
+      element.style.display = "none";
     });
   }
 
@@ -911,13 +912,13 @@ export class AuthService {
    */
   hideAuthenticatedFeatures() {
     // Hide features that require authentication
-    document.querySelectorAll('.auth-required').forEach(element => {
-      element.style.display = 'none';
+    document.querySelectorAll(".auth-required").forEach((element) => {
+      element.style.display = "none";
     });
 
     // Show login prompts
-    document.querySelectorAll('.login-required').forEach(element => {
-      element.style.display = 'block';
+    document.querySelectorAll(".login-required").forEach((element) => {
+      element.style.display = "block";
     });
   }
 
@@ -941,35 +942,35 @@ export class AuthService {
    */
   updateAuthenticationUI(isAuthenticated, user) {
     // Update navigation sign in/out buttons
-    const signInBtn = document.getElementById('sign-in-nav');
-    const signOutBtn = document.getElementById('sign-out-nav');
-    const linkAccountsBtn = document.getElementById('link-accounts-nav');
-    const userNameElement = document.getElementById('nav-user-name');
+    const signInBtn = document.getElementById("sign-in-nav");
+    const signOutBtn = document.getElementById("sign-out-nav");
+    const linkAccountsBtn = document.getElementById("link-accounts-nav");
+    const userNameElement = document.getElementById("nav-user-name");
 
     if (signInBtn) {
-      signInBtn.addEventListener('click', () => this.showLoginModal());
+      signInBtn.addEventListener("click", () => this.showLoginModal());
     }
 
     if (signOutBtn) {
-      signOutBtn.addEventListener('click', () => this.signOut());
+      signOutBtn.addEventListener("click", () => this.signOut());
     }
 
     if (linkAccountsBtn) {
-      linkAccountsBtn.addEventListener('click', () =>
-        this.showAccountLinkingModal()
+      linkAccountsBtn.addEventListener("click", () =>
+        this.showAccountLinkingModal(),
       );
     }
 
     // Update user greeting
     if (userNameElement && user) {
       const displayName =
-        user.displayName || user.email?.split('@')[0] || 'User';
+        user.displayName || user.email?.split("@")[0] || "User";
       userNameElement.textContent = `Welcome, ${displayName}!`;
 
       // Show linked provider count as a subtle indicator
       const linkedProviders = this.firebaseService.getUserLinkedProviders();
       if (linkedProviders.length > 1) {
-        userNameElement.title = `Linked accounts: ${linkedProviders.map(p => p.providerId.replace('.com', '')).join(', ')}`;
+        userNameElement.title = `Linked accounts: ${linkedProviders.map((p) => p.providerId.replace(".com", "")).join(", ")}`;
       }
     }
   }
@@ -1003,35 +1004,35 @@ export class AuthService {
    */
   async showAccountLinkingModal() {
     if (!this.firebaseService.isAuthenticated()) {
-      this.showErrorMessage('Please sign in first to link additional accounts');
+      this.showErrorMessage("Please sign in first to link additional accounts");
       return;
     }
 
     const linkedProviders = this.firebaseService.getUserLinkedProviders();
     const availableProviders = [
-      { id: 'google', name: 'Google', icon: '🔍' },
-      { id: 'facebook', name: 'Facebook', icon: '📘' },
-      { id: 'twitter', name: 'Twitter', icon: '🐦' },
-      { id: 'github', name: 'GitHub', icon: '🐙' },
+      { id: "google", name: "Google", icon: "🔍" },
+      { id: "facebook", name: "Facebook", icon: "📘" },
+      { id: "twitter", name: "Twitter", icon: "🐦" },
+      { id: "github", name: "GitHub", icon: "🐙" },
     ];
 
     // Filter out already linked providers
-    const linkedProviderIds = linkedProviders.map(p =>
-      p.providerId.replace('.com', '')
+    const linkedProviderIds = linkedProviders.map((p) =>
+      p.providerId.replace(".com", ""),
     );
     const unlinkableProviders = availableProviders.filter(
-      p => !linkedProviderIds.includes(p.id)
+      (p) => !linkedProviderIds.includes(p.id),
     );
 
     if (unlinkableProviders.length === 0) {
-      this.showInfoMessage('All available accounts are already linked!');
+      this.showInfoMessage("All available accounts are already linked!");
       return;
     }
 
     // Show simple confirmation for now - can be enhanced with full modal later
-    const providerList = unlinkableProviders.map(p => p.name).join(', ');
+    const providerList = unlinkableProviders.map((p) => p.name).join(", ");
     const shouldProceed = confirm(
-      `Link additional accounts? Available: ${providerList}`
+      `Link additional accounts? Available: ${providerList}`,
     );
 
     if (shouldProceed && unlinkableProviders.length > 0) {
@@ -1055,7 +1056,7 @@ export class AuthService {
           this.showInfoMessage(result.message);
         } else {
           this.showInfoMessage(
-            result.message || `Successfully linked ${providerName}!`
+            result.message || `Successfully linked ${providerName}!`,
           );
         }
       } else {
@@ -1071,7 +1072,7 @@ export class AuthService {
    */
   async applySavedPersistencePreferences() {
     try {
-      const savedPrefs = localStorage.getItem('simulateai_auth_persistence');
+      const savedPrefs = localStorage.getItem("simulateai_auth_persistence");
       if (!savedPrefs) return;
 
       const prefs = JSON.parse(savedPrefs);
@@ -1092,7 +1093,7 @@ export class AuthService {
    * Show persistence settings modal for users to control session behavior
    */
   showPersistenceSettings() {
-    const currentMode = this.firebaseService.persistenceMode || 'local';
+    const currentMode = this.firebaseService.persistenceMode || "local";
     const recommendation = this.firebaseService.getRecommendedPersistence();
 
     const modalContent = `
@@ -1106,7 +1107,7 @@ export class AuthService {
         
         <div class="persistence-options">
           <label class="persistence-option">
-            <input type="radio" name="persistence" value="local" ${currentMode === 'local' ? 'checked' : ''}>
+            <input type="radio" name="persistence" value="local" ${currentMode === "local" ? "checked" : ""}>
             <div class="option-content">
               <strong>🏠 Stay Signed In</strong>
               <p>Remain signed in until you sign out manually (recommended for personal devices)</p>
@@ -1114,7 +1115,7 @@ export class AuthService {
           </label>
           
           <label class="persistence-option">
-            <input type="radio" name="persistence" value="session" ${currentMode === 'session' ? 'checked' : ''}>
+            <input type="radio" name="persistence" value="session" ${currentMode === "session" ? "checked" : ""}>
             <div class="option-content">
               <strong>🕐 Session Only</strong>
               <p>Sign out when browser closes (recommended for shared computers)</p>
@@ -1122,7 +1123,7 @@ export class AuthService {
           </label>
           
           <label class="persistence-option">
-            <input type="radio" name="persistence" value="memory" ${currentMode === 'memory' ? 'checked' : ''}>
+            <input type="radio" name="persistence" value="memory" ${currentMode === "memory" ? "checked" : ""}>
             <div class="option-content">
               <strong>🔒 Extra Secure</strong>
               <p>Sign out when tab closes (most secure, least convenient)</p>
@@ -1155,7 +1156,7 @@ export class AuthService {
       </div>
     `;
 
-    this.showCustomModal('Session Settings', modalContent);
+    this.showCustomModal("Session Settings", modalContent);
 
     // Make auth service globally accessible for the button
     window.authService = this;
@@ -1167,17 +1168,17 @@ export class AuthService {
   async applyPersistenceSettings() {
     try {
       const selectedMode = document.querySelector(
-        'input[name="persistence"]:checked'
+        'input[name="persistence"]:checked',
       )?.value;
       const enableAutoSignout = document.getElementById(
-        'enable-auto-signout'
+        "enable-auto-signout",
       )?.checked;
       const autoSignoutMinutes = parseInt(
-        document.getElementById('auto-signout-minutes')?.value
+        document.getElementById("auto-signout-minutes")?.value,
       );
 
       if (!selectedMode) {
-        this.showErrorMessage('Please select a persistence mode');
+        this.showErrorMessage("Please select a persistence mode");
         return;
       }
 
@@ -1189,26 +1190,26 @@ export class AuthService {
       // Apply persistence setting
       const result = await this.firebaseService.setAuthPersistence(
         selectedMode,
-        options
+        options,
       );
 
       if (result.success) {
         // Save user preference
         localStorage.setItem(
-          'simulateai_auth_persistence',
+          "simulateai_auth_persistence",
           JSON.stringify({
             mode: selectedMode,
             autoSignOutMinutes: options.autoSignOutMinutes || null,
             setAt: new Date().toISOString(),
-          })
+          }),
         );
 
         this.showInfoMessage(
-          `Session settings updated: ${this.getPersistenceDisplayName(selectedMode)}`
+          `Session settings updated: ${this.getPersistenceDisplayName(selectedMode)}`,
         );
 
         // Close modal
-        document.querySelector('.modal')?.remove();
+        document.querySelector(".modal")?.remove();
       } else {
         this.showErrorMessage(result.error);
       }
@@ -1222,9 +1223,9 @@ export class AuthService {
    */
   getPersistenceDisplayName(mode) {
     const names = {
-      local: 'Stay Signed In',
-      session: 'Session Only',
-      memory: 'Extra Secure',
+      local: "Stay Signed In",
+      session: "Session Only",
+      memory: "Extra Secure",
     };
     return names[mode] || mode;
   }
@@ -1263,7 +1264,7 @@ export class AuthService {
       </div>
     `;
 
-    this.showCustomModal('Security Tips', modalContent);
+    this.showCustomModal("Security Tips", modalContent);
   }
 
   /**
@@ -1271,7 +1272,7 @@ export class AuthService {
    */
   async showProfileCustomization() {
     if (!this.currentUser) {
-      this.showErrorMessage('Please sign in to customize your profile');
+      this.showErrorMessage("Please sign in to customize your profile");
       return;
     }
 
@@ -1281,16 +1282,16 @@ export class AuthService {
       const badgeData = await this.firebaseService.getUserBadges();
 
       if (!profile) {
-        this.showErrorMessage('Could not load profile data');
+        this.showErrorMessage("Could not load profile data");
         return;
       }
 
       const suggestions =
         this.firebaseService.generateBadgeFlairSuggestions(profile);
       const currentDisplayName =
-        profile.customization?.displayName || profile.displayName || '';
+        profile.customization?.displayName || profile.displayName || "";
       const currentPhotoURL =
-        profile.customization?.photoURL || profile.photoURL || '';
+        profile.customization?.photoURL || profile.photoURL || "";
 
       const modalContent = `
         <div class="profile-customization">
@@ -1298,7 +1299,7 @@ export class AuthService {
           
           <div class="profile-preview">
             <div class="preview-avatar">
-              <img src="${currentPhotoURL || 'https://via.placeholder.com/80x80?text=👤'}" 
+              <img src="${currentPhotoURL || "https://via.placeholder.com/80x80?text=👤"}" 
                    alt="Profile" class="avatar-preview" id="avatar-preview">
             </div>
             <div class="preview-name" id="name-preview">
@@ -1334,7 +1335,7 @@ export class AuthService {
               <div class="badge-options">
                 <label class="badge-option">
                   <input type="radio" name="badge-flair" value="" 
-                         ${!profile.customization?.selectedBadgeFlair ? 'checked' : ''}>
+                         ${!profile.customization?.selectedBadgeFlair ? "checked" : ""}>
                   <div class="option-content">
                     <span class="badge-preview">🚫</span>
                     <strong>No Badge Flair</strong>
@@ -1344,10 +1345,10 @@ export class AuthService {
                 
                 ${badgeData.badges
                   .map(
-                    badge => `
+                    (badge) => `
                   <label class="badge-option">
                     <input type="radio" name="badge-flair" value="${badge.id}"
-                           ${badge.isSelectedFlair ? 'checked' : ''}>
+                           ${badge.isSelectedFlair ? "checked" : ""}>
                     <div class="option-content">
                       <span class="badge-preview" style="color: ${badge.color}">${badge.icon}</span>
                       <strong>${badge.title}</strong>
@@ -1355,13 +1356,13 @@ export class AuthService {
                       <small>Preview: ${badge.icon} Your Name [${badge.title}]</small>
                     </div>
                   </label>
-                `
+                `,
                   )
-                  .join('')}
+                  .join("")}
               </div>
             </div>
             `
-                : ''
+                : ""
             }
             
             ${
@@ -1373,17 +1374,17 @@ export class AuthService {
               <div class="flair-suggestions">
                 ${suggestions
                   .map(
-                    suggestion => `
+                    (suggestion) => `
                   <button class="suggestion-btn" data-badge-id="${suggestion.id}">
                     ${suggestion.previewName}
                   </button>
-                `
+                `,
                   )
-                  .join('')}
+                  .join("")}
               </div>
             </div>
             `
-                : ''
+                : ""
             }
           </div>
           
@@ -1398,17 +1399,17 @@ export class AuthService {
         </div>
       `;
 
-      this.showCustomModal('Profile Customization', modalContent);
+      this.showCustomModal("Profile Customization", modalContent);
 
       // Set up live preview
       this.setupProfilePreview(profile);
 
       // Set up suggestion buttons
-      document.querySelectorAll('.suggestion-btn').forEach(btn => {
-        btn.addEventListener('click', e => {
+      document.querySelectorAll(".suggestion-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
           const { badgeId } = e.target.dataset;
           const radioBtn = document.querySelector(
-            `input[name="badge-flair"][value="${badgeId}"]`
+            `input[name="badge-flair"][value="${badgeId}"]`,
           );
           if (radioBtn) {
             radioBtn.checked = true;
@@ -1418,7 +1419,7 @@ export class AuthService {
       });
     } catch (error) {
       this.showErrorMessage(
-        `Failed to load profile customization: ${error.message}`
+        `Failed to load profile customization: ${error.message}`,
       );
     }
   }
@@ -1426,22 +1427,22 @@ export class AuthService {
   /**
    * Setup live preview for profile customization
    */
-  setupProfilePreview(_profile) {
-    const nameInput = document.getElementById('custom-display-name');
-    const photoInput = document.getElementById('custom-photo-url');
+  setupProfilePreview() {
+    const nameInput = document.getElementById("custom-display-name");
+    const photoInput = document.getElementById("custom-photo-url");
     const badgeInputs = document.querySelectorAll('input[name="badge-flair"]');
 
     // Update preview on input changes
     if (nameInput) {
-      nameInput.addEventListener('input', () => this.updateProfilePreview());
+      nameInput.addEventListener("input", () => this.updateProfilePreview());
     }
 
     if (photoInput) {
-      photoInput.addEventListener('input', () => this.updateProfilePreview());
+      photoInput.addEventListener("input", () => this.updateProfilePreview());
     }
 
-    badgeInputs.forEach(input => {
-      input.addEventListener('change', () => this.updateProfilePreview());
+    badgeInputs.forEach((input) => {
+      input.addEventListener("change", () => this.updateProfilePreview());
     });
   }
 
@@ -1449,23 +1450,23 @@ export class AuthService {
    * Update profile preview in real-time
    */
   async updateProfilePreview() {
-    const namePreview = document.getElementById('name-preview');
-    const avatarPreview = document.getElementById('avatar-preview');
+    const namePreview = document.getElementById("name-preview");
+    const avatarPreview = document.getElementById("avatar-preview");
 
     if (!namePreview || !avatarPreview) return;
 
     const customName =
-      document.getElementById('custom-display-name')?.value || 'Your Name';
-    const customPhoto = document.getElementById('custom-photo-url')?.value;
+      document.getElementById("custom-display-name")?.value || "Your Name";
+    const customPhoto = document.getElementById("custom-photo-url")?.value;
     const selectedBadge = document.querySelector(
-      'input[name="badge-flair"]:checked'
+      'input[name="badge-flair"]:checked',
     )?.value;
 
     // Update avatar
     if (customPhoto) {
       avatarPreview.src = customPhoto;
       avatarPreview.onerror = () => {
-        avatarPreview.src = 'https://via.placeholder.com/80x80?text=👤';
+        avatarPreview.src = "https://via.placeholder.com/80x80?text=👤";
       };
     }
 
@@ -1475,11 +1476,11 @@ export class AuthService {
     if (selectedBadge) {
       const badgeElement = document
         .querySelector(`input[value="${selectedBadge}"]`)
-        ?.closest('.badge-option');
+        ?.closest(".badge-option");
       if (badgeElement) {
         const badgeIcon =
-          badgeElement.querySelector('.badge-preview')?.textContent;
-        const badgeTitle = badgeElement.querySelector('strong')?.textContent;
+          badgeElement.querySelector(".badge-preview")?.textContent;
+        const badgeTitle = badgeElement.querySelector("strong")?.textContent;
         if (badgeIcon && badgeTitle) {
           displayName = `${badgeIcon} ${customName} [${badgeTitle}]`;
         }
@@ -1494,14 +1495,14 @@ export class AuthService {
    */
   async applyProfileCustomization() {
     try {
-      const customName = document.getElementById('custom-display-name')?.value;
-      const customPhoto = document.getElementById('custom-photo-url')?.value;
+      const customName = document.getElementById("custom-display-name")?.value;
+      const customPhoto = document.getElementById("custom-photo-url")?.value;
       const selectedBadge = document.querySelector(
-        'input[name="badge-flair"]:checked'
+        'input[name="badge-flair"]:checked',
       )?.value;
 
       if (!customName?.trim()) {
-        this.showErrorMessage('Display name cannot be empty');
+        this.showErrorMessage("Display name cannot be empty");
         return;
       }
 
@@ -1519,15 +1520,15 @@ export class AuthService {
 
       if (result.success) {
         // Close modal
-        document.querySelector('.modal')?.remove();
+        document.querySelector(".modal")?.remove();
 
         // Track customization with security flag
-        this.firebaseService.trackEvent('profile_customized_secure', {
+        this.firebaseService.trackEvent("profile_customized_secure", {
           has_custom_name: !!customName,
           has_custom_photo: !!customPhoto,
           has_badge_flair: !!selectedBadge,
           flair_badge_id: selectedBadge || null,
-          security_method: 'firebase_function',
+          security_method: "firebase_function",
         });
       } else {
         // Error already shown in updateSecureProfile
@@ -1543,13 +1544,13 @@ export class AuthService {
    */
   showProfileUpdateModal() {
     if (!this.currentUser) {
-      this.showErrorMessage('Please sign in to update your profile');
+      this.showErrorMessage("Please sign in to update your profile");
       return;
     }
 
-    const currentDisplayName = this.currentUser.displayName || '';
-    const currentPhotoURL = this.currentUser.photoURL || '';
-    const userEmail = this.currentUser.email || '';
+    const currentDisplayName = this.currentUser.displayName || "";
+    const currentPhotoURL = this.currentUser.photoURL || "";
+    const userEmail = this.currentUser.email || "";
 
     const modalContent = `
       <div class="profile-update-modal">
@@ -1560,12 +1561,12 @@ export class AuthService {
         
         <div class="current-profile">
           <div class="profile-avatar">
-            <img src="${currentPhotoURL || 'https://via.placeholder.com/60x60?text=👤'}" 
+            <img src="${currentPhotoURL || "https://via.placeholder.com/60x60?text=👤"}" 
                  alt="Current avatar" class="current-avatar" id="current-avatar-preview">
           </div>
           <div class="profile-info">
             <div class="current-name" id="current-name-preview">
-              ${currentDisplayName || userEmail.split('@')[0] || 'Your Name'}
+              ${currentDisplayName || userEmail.split("@")[0] || "Your Name"}
             </div>
             <div class="user-email">${userEmail}</div>
           </div>
@@ -1631,7 +1632,7 @@ export class AuthService {
                 <button type="button" class="avatar-option" data-avatar="https://api.dicebear.com/7.x/avataaars/svg?seed=${userEmail}&backgroundColor=b6e3f4">
                   🎨 Generated Avatar
                 </button>
-                <button type="button" class="avatar-option" data-avatar="https://ui-avatars.com/api/?name=${encodeURIComponent(currentDisplayName || userEmail.split('@')[0])}&background=4f46e5&color=fff&size=200">
+                <button type="button" class="avatar-option" data-avatar="https://ui-avatars.com/api/?name=${encodeURIComponent(currentDisplayName || userEmail.split("@")[0])}&background=4f46e5&color=fff&size=200">
                   🔤 Initials Avatar
                 </button>
                 <button type="button" class="avatar-option" data-avatar="">
@@ -1670,7 +1671,7 @@ export class AuthService {
 
     // Use existing modal system
     const modal = new window.ModalDialog({
-      title: 'Profile Setup',
+      title: "Profile Setup",
       content: modalContent,
       closeOnBackdrop: true,
       closeOnEscape: true,
@@ -1690,43 +1691,43 @@ export class AuthService {
    */
   setupProfileUpdateHandlers() {
     // Live preview for display name
-    const nameInput = document.getElementById('update-display-name');
+    const nameInput = document.getElementById("update-display-name");
     if (nameInput) {
-      nameInput.addEventListener('input', e => {
-        const preview = document.getElementById('current-name-preview');
+      nameInput.addEventListener("input", (e) => {
+        const preview = document.getElementById("current-name-preview");
         if (preview) {
           const newName = e.target.value.trim();
           preview.textContent =
-            newName || this.currentUser.email?.split('@')[0] || 'Your Name';
+            newName || this.currentUser.email?.split("@")[0] || "Your Name";
         }
       });
     }
 
     // Live preview for avatar
-    const photoInput = document.getElementById('update-photo-url');
+    const photoInput = document.getElementById("update-photo-url");
     if (photoInput) {
-      photoInput.addEventListener('input', e => {
-        const preview = document.getElementById('current-avatar-preview');
+      photoInput.addEventListener("input", (e) => {
+        const preview = document.getElementById("current-avatar-preview");
         if (preview) {
           const newURL = e.target.value.trim();
           if (newURL) {
             preview.src = newURL;
             preview.onerror = () => {
-              preview.src = 'https://via.placeholder.com/60x60?text=❌';
+              preview.src = "https://via.placeholder.com/60x60?text=❌";
             };
           } else {
-            preview.src = 'https://via.placeholder.com/60x60?text=👤';
+            preview.src = "https://via.placeholder.com/60x60?text=👤";
           }
         }
       });
     }
 
     // Avatar option buttons (traditional)
-    document.querySelectorAll('.avatar-option').forEach(button => {
-      button.addEventListener('click', e => {
+    document.querySelectorAll(".avatar-option").forEach((button) => {
+      button.addEventListener("click", (e) => {
         const avatarURL = e.target.dataset.avatar;
-        const photoInput = document.getElementById('update-photo-url');
-        const preview = document.getElementById('current-avatar-preview');
+        const photoInput = document.getElementById("update-photo-url");
+        const preview = document.getElementById("current-avatar-preview");
 
         if (photoInput) {
           photoInput.value = avatarURL;
@@ -1736,24 +1737,24 @@ export class AuthService {
           if (avatarURL) {
             preview.src = avatarURL;
           } else {
-            preview.src = 'https://via.placeholder.com/60x60?text=👤';
+            preview.src = "https://via.placeholder.com/60x60?text=👤";
           }
         }
 
         // Visual feedback
         document
-          .querySelectorAll('.avatar-option, .emoji-avatar-option')
-          .forEach(btn => btn.classList.remove('selected'));
-        e.target.classList.add('selected');
+          .querySelectorAll(".avatar-option, .emoji-avatar-option")
+          .forEach((btn) => btn.classList.remove("selected"));
+        e.target.classList.add("selected");
       });
     });
 
     // Emoji avatar option buttons
-    document.querySelectorAll('.emoji-avatar-option').forEach(button => {
-      button.addEventListener('click', e => {
+    document.querySelectorAll(".emoji-avatar-option").forEach((button) => {
+      button.addEventListener("click", (e) => {
         const emoji = e.target.dataset.avatar;
-        const photoInput = document.getElementById('update-photo-url');
-        const preview = document.getElementById('current-avatar-preview');
+        const photoInput = document.getElementById("update-photo-url");
+        const preview = document.getElementById("current-avatar-preview");
 
         // Create a data URL for the emoji
         const emojiDataURL = this.createEmojiAvatar(emoji);
@@ -1764,20 +1765,20 @@ export class AuthService {
 
         if (preview) {
           preview.src = emojiDataURL;
-          preview.style.fontSize = '2rem';
-          preview.style.textAlign = 'center';
-          preview.style.lineHeight = '60px';
+          preview.style.fontSize = "2rem";
+          preview.style.textAlign = "center";
+          preview.style.lineHeight = "60px";
           preview.style.background =
-            'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-          preview.style.color = 'white';
-          preview.style.borderRadius = '50%';
+            "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+          preview.style.color = "white";
+          preview.style.borderRadius = "50%";
         }
 
         // Visual feedback
         document
-          .querySelectorAll('.avatar-option, .emoji-avatar-option')
-          .forEach(btn => btn.classList.remove('selected'));
-        e.target.classList.add('selected');
+          .querySelectorAll(".avatar-option, .emoji-avatar-option")
+          .forEach((btn) => btn.classList.remove("selected"));
+        e.target.classList.add("selected");
       });
     });
   }
@@ -1788,24 +1789,24 @@ export class AuthService {
   async applyProfileUpdate() {
     try {
       const displayName = document
-        .getElementById('update-display-name')
+        .getElementById("update-display-name")
         ?.value?.trim();
       const photoURL = document
-        .getElementById('update-photo-url')
+        .getElementById("update-photo-url")
         ?.value?.trim();
 
       if (!displayName && !photoURL) {
         this.showErrorMessage(
-          'Please enter at least a display name or avatar URL'
+          "Please enter at least a display name or avatar URL",
         );
         return;
       }
 
       // Show loading state
-      const updateBtn = document.querySelector('.btn-primary');
+      const updateBtn = document.querySelector(".btn-primary");
       if (updateBtn) {
         updateBtn.disabled = true;
-        updateBtn.innerHTML = '⏳ Updating Profile...';
+        updateBtn.innerHTML = "⏳ Updating Profile...";
       }
 
       // Prepare update data
@@ -1821,7 +1822,7 @@ export class AuthService {
       const uid = this.getValidatedUID();
       const result = await this.firebaseService.updateUserProfile(
         uid,
-        updateData
+        updateData,
       );
 
       if (result.success) {
@@ -1837,20 +1838,20 @@ export class AuthService {
         }
 
         // Close modal
-        document.querySelector('.modal')?.remove();
+        document.querySelector(".modal")?.remove();
 
         // Show success message
         this.showSuccessMessage(
-          `🎉 Profile updated successfully! Welcome, ${displayName || this.currentUser.displayName}!`
+          `🎉 Profile updated successfully! Welcome, ${displayName || this.currentUser.displayName}!`,
         );
 
         // Track the profile update with centralized UID
         const uid = this.getCurrentUID();
-        this.firebaseService.trackEvent('profile_updated_post_signin', {
+        this.firebaseService.trackEvent("profile_updated_post_signin", {
           user_id: uid,
           updated_display_name: !!displayName,
           updated_photo: !!photoURL,
-          method: 'post_signin_modal',
+          method: "post_signin_modal",
         });
 
         // Trigger UI updates
@@ -1858,24 +1859,24 @@ export class AuthService {
 
         // Dispatch custom event for other components to react
         window.dispatchEvent(
-          new CustomEvent('userProfileUpdated', {
+          new CustomEvent("userProfileUpdated", {
             detail: {
               user: this.currentUser,
               updates: updateData,
             },
-          })
+          }),
         );
       } else {
-        throw new Error(result.error || 'Failed to update profile');
+        throw new Error(result.error || "Failed to update profile");
       }
     } catch (error) {
       this.showErrorMessage(`Profile update failed: ${error.message}`);
 
       // Reset button state
-      const updateBtn = document.querySelector('.btn-primary');
+      const updateBtn = document.querySelector(".btn-primary");
       if (updateBtn) {
         updateBtn.disabled = false;
-        updateBtn.innerHTML = '💾 Update Profile';
+        updateBtn.innerHTML = "💾 Update Profile";
       }
     }
   }
@@ -1885,17 +1886,17 @@ export class AuthService {
    */
   skipProfileUpdate() {
     // Close modal
-    document.querySelector('.modal')?.remove();
+    document.querySelector(".modal")?.remove();
 
     // Track that user skipped with centralized UID
     const uid = this.getCurrentUID();
-    this.firebaseService.trackEvent('profile_update_skipped', {
+    this.firebaseService.trackEvent("profile_update_skipped", {
       user_id: uid,
-      method: 'post_signin_modal',
+      method: "post_signin_modal",
     });
 
     this.showInfoMessage(
-      'You can update your profile anytime from your account settings'
+      "You can update your profile anytime from your account settings",
     );
   }
 
@@ -1917,7 +1918,7 @@ export class AuthService {
       const PROFILE_PROMPT_DELAY = 2000; // 2 seconds
       setTimeout(() => {
         const shouldUpdate = confirm(
-          `👋 Welcome! Would you like to personalize your profile for a better experience in our narrative scenarios?\n\n🎭 Add a display name and avatar to enhance your role-playing experience!`
+          `👋 Welcome! Would you like to personalize your profile for a better experience in our narrative scenarios?\n\n🎭 Add a display name and avatar to enhance your role-playing experience!`,
         );
 
         if (shouldUpdate) {
@@ -1932,15 +1933,15 @@ export class AuthService {
    */
   async quickUpdateDisplayName(newDisplayName) {
     if (!this.currentUser) {
-      throw new Error('User not authenticated');
+      throw new Error("User not authenticated");
     }
 
     if (!newDisplayName || !newDisplayName.trim()) {
-      throw new Error('Display name cannot be empty');
+      throw new Error("Display name cannot be empty");
     }
 
     try {
-      const uid = this.requireAuthentication('profile update');
+      const uid = this.requireAuthentication("profile update");
       const result = await this.firebaseService.updateUserProfile(uid, {
         displayName: newDisplayName.trim(),
       });
@@ -1948,9 +1949,9 @@ export class AuthService {
       if (result.success) {
         // Track the quick update with centralized UID
         const uid = this.getCurrentUID();
-        this.firebaseService.trackEvent('quick_display_name_update', {
+        this.firebaseService.trackEvent("quick_display_name_update", {
           user_id: uid,
-          method: 'narrative_onboarding',
+          method: "narrative_onboarding",
         });
 
         return { success: true };
@@ -1967,12 +1968,89 @@ export class AuthService {
    */
   initializeLogoutManager() {
     // Check if IntentionalLogoutManager is available
-    if (typeof window !== 'undefined' && window.IntentionalLogoutManager) {
+    if (typeof window !== "undefined" && window.IntentionalLogoutManager) {
       this.logoutManager = new window.IntentionalLogoutManager(this);
+      this.setupLogoutEventListeners();
     } else {
       // Load the component if not available
       this.loadIntentionalLogoutManager();
     }
+  }
+
+  /**
+   * Setup event listeners for logout manager communication
+   */
+  setupLogoutEventListeners() {
+    // Listen for logout events from the manager
+    eventDispatcher.on(AUTH_EVENTS.INTENTIONAL_LOGOUT_REQUESTED, (event) => {
+      const { reason, data } = event.detail;
+      this.performLogout(reason, data);
+    });
+
+    // Listen for session extension requests
+    eventDispatcher.on("sessionExtensionRequested", () => {
+      this.extendUserSession();
+    });
+  }
+
+  /**
+   * Extend user session and notify listeners
+   */
+  extendUserSession() {
+    if (this.logoutManager) {
+      this.logoutManager.extendSession();
+    }
+
+    // Dispatch session extended event
+    eventDispatcher.emit(AUTH_EVENTS.SESSION_EXTENDED, {
+      timestamp: Date.now(),
+    });
+  }
+
+  /**
+   * Perform logout with reason tracking
+   */
+  async performLogout(reason = "user_initiated", data = {}) {
+    try {
+      // Clear session data first
+      this.clearSessionData();
+
+      // Sign out from Firebase
+      const result = await this.firebaseService.signOutUser();
+
+      if (result.success) {
+        // Dispatch logout completed event
+        eventDispatcher.emit(AUTH_EVENTS.LOGOUT_COMPLETED, {
+          reason,
+          data,
+          timestamp: Date.now(),
+        });
+
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Still clear local data even if remote logout fails
+      this.clearSessionData();
+      return false;
+    }
+  }
+
+  /**
+   * Clear local session data
+   */
+  clearSessionData() {
+    try {
+      localStorage.removeItem("session_start_time");
+      sessionStorage.clear();
+    } catch (error) {
+      // Ignore storage errors
+    }
+
+    // Clear any cached user data
+    this.currentUser = null;
+    this.userProfile = null;
   }
 
   /**
@@ -1984,11 +2062,13 @@ export class AuthService {
       if (
         !document.querySelector('script[src*="intentional-logout-manager"]')
       ) {
-        const script = document.createElement('script');
-        script.src = '/src/js/components/intentional-logout-manager.js';
+        const script = document.createElement("script");
+        script.type = "module";
+        script.src = "/src/js/components/intentional-logout-manager.js";
         script.onload = () => {
           if (window.IntentionalLogoutManager) {
             this.logoutManager = new window.IntentionalLogoutManager(this);
+            this.setupLogoutEventListeners();
           }
         };
         document.head.appendChild(script);
@@ -2021,7 +2101,7 @@ export class AuthService {
    * Validate that a UID exists and is properly formatted
    */
   isValidUID(uid) {
-    if (!uid || typeof uid !== 'string') return false;
+    if (!uid || typeof uid !== "string") return false;
     // Firebase UIDs are typically 28 characters long and alphanumeric
     return /^[a-zA-Z0-9]{20,}$/.test(uid);
   }
@@ -2033,11 +2113,11 @@ export class AuthService {
     const uid = providedUID || this.getCurrentUID();
 
     if (!uid) {
-      throw new Error('No authenticated user found - UID required');
+      throw new Error("No authenticated user found - UID required");
     }
 
     if (!this.isValidUID(uid)) {
-      throw new Error('Invalid UID format detected');
+      throw new Error("Invalid UID format detected");
     }
 
     return uid;
@@ -2046,7 +2126,7 @@ export class AuthService {
   /**
    * Ensure user is authenticated before proceeding with UID-based operations
    */
-  requireAuthentication(operation = 'operation') {
+  requireAuthentication(operation = "operation") {
     if (!this.currentUser) {
       throw new Error(`Authentication required for ${operation}`);
     }
@@ -2086,15 +2166,15 @@ export class AuthService {
 
       // Check if this is a network error
       if (
-        error.code === 'auth/network-request-failed' ||
-        error.message.includes('network') ||
-        error.message.includes('fetch')
+        error.code === "auth/network-request-failed" ||
+        error.message.includes("network") ||
+        error.message.includes("fetch")
       ) {
         return {
           success: false,
           networkError: true,
           error:
-            'Network connection error. Please check your internet connection.',
+            "Network connection error. Please check your internet connection.",
         };
       }
 
@@ -2112,19 +2192,19 @@ export class AuthService {
    */
   async createUserDocument(userData = {}) {
     if (!this.firestoreService) {
-      return { success: false, error: 'Firestore service not available' };
+      return { success: false, error: "Firestore service not available" };
     }
 
     const uid = this.getCurrentUID();
     if (!uid) {
-      return { success: false, error: 'No authenticated user' };
+      return { success: false, error: "No authenticated user" };
     }
 
     // Merge current user data with provided data
     const userDocData = {
-      displayName: this.currentUser?.displayName || '',
-      email: this.currentUser?.email || '',
-      role: 'learner',
+      displayName: this.currentUser?.displayName || "",
+      email: this.currentUser?.email || "",
+      role: "learner",
       ...userData,
     };
 
@@ -2136,7 +2216,7 @@ export class AuthService {
    */
   async getUserDocument(uid = null) {
     if (!this.firestoreService) {
-      return { success: false, error: 'Firestore service not available' };
+      return { success: false, error: "Firestore service not available" };
     }
 
     return await this.firestoreService.getUserDocument(uid);
@@ -2147,7 +2227,7 @@ export class AuthService {
    */
   async updateUserDocument(updateData, uid = null) {
     if (!this.firestoreService) {
-      return { success: false, error: 'Firestore service not available' };
+      return { success: false, error: "Firestore service not available" };
     }
 
     return await this.firestoreService.updateUserDocument(updateData, uid);
@@ -2158,12 +2238,12 @@ export class AuthService {
    */
   async saveSimulationProgress(simulationId, progressData) {
     if (!this.firestoreService) {
-      return { success: false, error: 'Firestore service not available' };
+      return { success: false, error: "Firestore service not available" };
     }
 
     return await this.firestoreService.saveSimulationProgress(
       simulationId,
-      progressData
+      progressData,
     );
   }
 
@@ -2173,7 +2253,7 @@ export class AuthService {
    */
   async getUserSimulations() {
     if (!this.firestoreService) {
-      return { success: false, error: 'Firestore service not available' };
+      return { success: false, error: "Firestore service not available" };
     }
 
     return await this.firestoreService.getUserSimulations();
@@ -2184,7 +2264,7 @@ export class AuthService {
    */
   async awardBadge(badgeId, badgeData) {
     if (!this.firestoreService) {
-      return { success: false, error: 'Firestore service not available' };
+      return { success: false, error: "Firestore service not available" };
     }
 
     return await this.firestoreService.awardBadge(badgeId, badgeData);
@@ -2195,7 +2275,7 @@ export class AuthService {
    */
   async getUserBadges() {
     if (!this.firestoreService) {
-      return { success: false, error: 'Firestore service not available' };
+      return { success: false, error: "Firestore service not available" };
     }
 
     return await this.firestoreService.getUserBadges();
@@ -2206,12 +2286,12 @@ export class AuthService {
    */
   async updateCategoryProgress(categoryId, progressData) {
     if (!this.firestoreService) {
-      return { success: false, error: 'Firestore service not available' };
+      return { success: false, error: "Firestore service not available" };
     }
 
     return await this.firestoreService.updateCategoryProgress(
       categoryId,
-      progressData
+      progressData,
     );
   }
 
@@ -2220,7 +2300,7 @@ export class AuthService {
    */
   async getUserProgress() {
     if (!this.firestoreService) {
-      return { success: false, error: 'Firestore service not available' };
+      return { success: false, error: "Firestore service not available" };
     }
 
     return await this.firestoreService.getUserProgress();
@@ -2231,7 +2311,7 @@ export class AuthService {
    */
   async startUserSession(sessionData = {}) {
     if (!this.firestoreService) {
-      return { success: false, error: 'Firestore service not available' };
+      return { success: false, error: "Firestore service not available" };
     }
 
     return await this.firestoreService.startSession(sessionData);
@@ -2242,7 +2322,7 @@ export class AuthService {
    */
   async endUserSession(sessionId, sessionData = {}) {
     if (!this.firestoreService) {
-      return { success: false, error: 'Firestore service not available' };
+      return { success: false, error: "Firestore service not available" };
     }
 
     return await this.firestoreService.endSession(sessionId, sessionData);
@@ -2254,12 +2334,12 @@ export class AuthService {
   async saveScenarioCompletion(scenarioData) {
     if (!this.isAuthenticated() || !this.firestoreService) {
       // If user not authenticated or Firestore not available, skip saving
-      return { success: false, reason: 'not_authenticated_or_no_firestore' };
+      return { success: false, reason: "not_authenticated_or_no_firestore" };
     }
 
     try {
       const completionData = {
-        type: 'scenario_completion',
+        type: "scenario_completion",
         scenarioId: scenarioData.scenarioId,
         categoryId: scenarioData.categoryId,
         selectedOption: scenarioData.selectedOption,
@@ -2273,7 +2353,7 @@ export class AuthService {
       // Save to user's simulations subcollection
       const result = await this.firestoreService.saveSimulationProgress(
         `scenario_${scenarioData.scenarioId}`,
-        completionData
+        completionData,
       );
 
       if (result.success) {
@@ -2303,7 +2383,7 @@ export class AuthService {
   getSessionId() {
     try {
       return (
-        localStorage.getItem('session_start_time') || `session_${Date.now()}`
+        localStorage.getItem("session_start_time") || `session_${Date.now()}`
       );
     } catch (error) {
       return `session_${Date.now()}`;
@@ -2315,7 +2395,7 @@ export class AuthService {
    */
   async ensureUserDocument(userData = {}) {
     if (!this.firestoreService) {
-      return { success: false, error: 'Firestore service not available' };
+      return { success: false, error: "Firestore service not available" };
     }
 
     return await this.firestoreService.ensureUserDocument(userData);
@@ -2326,7 +2406,7 @@ export class AuthService {
    */
   async deleteUserAccount() {
     if (!this.currentUser) {
-      throw new Error('No authenticated user found');
+      throw new Error("No authenticated user found");
     }
 
     try {
@@ -2348,8 +2428,8 @@ export class AuthService {
         this.updateUIForAnonymousUser();
 
         // Step 5: Track deletion (anonymized)
-        this.firebaseService.trackEvent('user_account_deleted', {
-          deletion_method: 'user_initiated',
+        this.firebaseService.trackEvent("user_account_deleted", {
+          deletion_method: "user_initiated",
           had_firestore_data: !!this.firestoreService,
           timestamp: new Date().toISOString(),
         });
@@ -2357,10 +2437,10 @@ export class AuthService {
         return {
           success: true,
           message:
-            'Your account and all associated data have been permanently deleted.',
+            "Your account and all associated data have been permanently deleted.",
         };
       } else {
-        throw new Error(deleteResult.error || 'Failed to delete account');
+        throw new Error(deleteResult.error || "Failed to delete account");
       }
     } catch (error) {
       throw new Error(`Account deletion failed: ${error.message}`);
@@ -2374,13 +2454,13 @@ export class AuthService {
     try {
       // Clear auth-related localStorage items
       const authKeys = [
-        'session_start_time',
-        'simulateai_auth_persistence',
-        'user_preferences',
-        'learning_progress',
+        "session_start_time",
+        "simulateai_auth_persistence",
+        "user_preferences",
+        "learning_progress",
       ];
 
-      authKeys.forEach(key => {
+      authKeys.forEach((key) => {
         try {
           localStorage.removeItem(key);
         } catch (error) {
@@ -2410,7 +2490,7 @@ export class AuthService {
     if (window.NotificationToast) {
       window.NotificationToast.show({
         message,
-        type: 'success',
+        type: "success",
         duration: 4000,
       });
     } else {
@@ -2426,7 +2506,7 @@ export class AuthService {
     if (window.NotificationToast) {
       window.NotificationToast.show({
         message,
-        type: 'error',
+        type: "error",
         duration: 6000,
       });
     } else {
@@ -2442,7 +2522,7 @@ export class AuthService {
     if (window.NotificationToast) {
       window.NotificationToast.show({
         message,
-        type: 'info',
+        type: "info",
         duration: 4000,
       });
     } else {
@@ -2468,16 +2548,16 @@ export class AuthService {
    * Create a data URL for emoji avatar
    */
   createEmojiAvatar(emoji, size = 80) {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
 
     canvas.width = size;
     canvas.height = size;
 
     // Create gradient background
     const gradient = ctx.createLinearGradient(0, 0, size, size);
-    gradient.addColorStop(0, '#667eea');
-    gradient.addColorStop(1, '#764ba2');
+    gradient.addColorStop(0, "#667eea");
+    gradient.addColorStop(1, "#764ba2");
 
     // Draw circle background
     ctx.fillStyle = gradient;
@@ -2488,9 +2568,9 @@ export class AuthService {
     // Draw emoji
     const EMOJI_SIZE_RATIO = 0.6;
     ctx.font = `${size * EMOJI_SIZE_RATIO}px Arial`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = 'white';
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "white";
     ctx.fillText(emoji, size / 2, size / 2);
 
     return canvas.toDataURL();
@@ -2500,7 +2580,7 @@ export class AuthService {
    * Check if avatar is an emoji type
    */
   isEmojiAvatar(avatarURL) {
-    return avatarURL && avatarURL.startsWith('emoji:');
+    return avatarURL && avatarURL.startsWith("emoji:");
   }
 
   /**
@@ -2508,7 +2588,7 @@ export class AuthService {
    */
   getEmojiFromAvatar(avatarURL) {
     if (this.isEmojiAvatar(avatarURL)) {
-      return avatarURL.replace('emoji:', '');
+      return avatarURL.replace("emoji:", "");
     }
     return null;
   }
@@ -2521,18 +2601,18 @@ export class AuthService {
       const emoji = this.getEmojiFromAvatar(avatarURL);
       const dataURL = this.createEmojiAvatar(emoji);
 
-      if (element.tagName === 'IMG') {
+      if (element.tagName === "IMG") {
         element.src = dataURL;
       } else {
         element.innerHTML = emoji;
         element.style.background =
-          'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-        element.style.borderRadius = '50%';
-        element.style.display = 'flex';
-        element.style.alignItems = 'center';
-        element.style.justifyContent = 'center';
-        element.style.fontSize = '1.5rem';
-        element.style.color = 'white';
+          "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+        element.style.borderRadius = "50%";
+        element.style.display = "flex";
+        element.style.alignItems = "center";
+        element.style.justifyContent = "center";
+        element.style.fontSize = "1.5rem";
+        element.style.color = "white";
       }
       return true;
     }

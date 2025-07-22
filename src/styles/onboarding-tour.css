@@ -53,6 +53,8 @@ body.onboarding-active {
   min-width: 300px;
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Ensure proper positioning above modal content */
+  isolation: isolate;
   opacity: 0;
   transform: scale(0.9) translateY(-10px);
   animation: onboarding-coach-mark-in 0.3s ease-out 0.1s forwards;
@@ -763,12 +765,8 @@ body.onboarding-active {
 }
 
 /* Text Selection Styling for Coach Marks */
-.onboarding-coach-mark ::selection {
-  background-color: #1a73e8;
-  color: white;
-}
-
-.onboarding-coach-mark ::selection {
+.onboarding-coach-mark ::selection,
+.onboarding-active ::selection {
   background-color: #1a73e8;
   color: white;
 }
@@ -779,30 +777,9 @@ body.onboarding-active {
   color: #1a73e8;
 }
 
-.coach-mark-btn ::selection {
-  background-color: rgb(26 115 232 / 20%);
-  color: #1a73e8;
-}
-
 /* Primary button text selection */
 .coach-mark-btn.primary ::selection {
   background-color: rgb(255 255 255 / 30%);
-  color: white;
-}
-
-.coach-mark-btn.primary ::selection {
-  background-color: rgb(255 255 255 / 30%);
-  color: white;
-}
-
-/* Ensure all onboarding tour elements have proper selection colors */
-.onboarding-active ::selection {
-  background-color: #1a73e8;
-  color: white;
-}
-
-.onboarding-active ::selection {
-  background-color: #1a73e8;
   color: white;
 }
 
@@ -829,11 +806,6 @@ body.onboarding-active {
   z-index: 10015 !important;
   pointer-events: auto !important;
   position: relative !important;
-}
-
-/* Ensure coach mark is properly positioned above modal content */
-.onboarding-coach-mark {
-  isolation: isolate;
 }
 
 /* Prevent any modal backdrop from interfering */

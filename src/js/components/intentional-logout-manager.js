@@ -3,6 +3,8 @@
  * Handles graceful user logout with clear communication about the reason
  */
 
+import eventDispatcher, { AUTH_EVENTS } from "../utils/event-dispatcher.js";
+
 class IntentionalLogoutManager {
   constructor(authService) {
     this.authService = authService;
@@ -43,12 +45,12 @@ class IntentionalLogoutManager {
   setupActivityTracking() {
     this.lastActivity = Date.now();
     const events = [
-      'mousedown',
-      'mousemove',
-      'keypress',
-      'scroll',
-      'touchstart',
-      'click',
+      "mousedown",
+      "mousemove",
+      "keypress",
+      "scroll",
+      "touchstart",
+      "click",
     ];
 
     const updateActivity = () => {
@@ -56,7 +58,7 @@ class IntentionalLogoutManager {
       this.clearWarningIfActive();
     };
 
-    events.forEach(event => {
+    events.forEach((event) => {
       document.addEventListener(event, updateActivity, { passive: true });
     });
 
@@ -79,18 +81,18 @@ class IntentionalLogoutManager {
    */
   setupAuthStateMonitoring() {
     if (this.firebaseService?.auth) {
-      this.firebaseService.auth.onAuthStateChanged(user => {
+      this.firebaseService.auth.onAuthStateChanged((user) => {
         if (
           !user &&
           this.authService?.currentUser &&
           !this.isShowingLogoutModal
         ) {
           // User was signed out externally
-          this.handleIntentionalLogout('external_logout', {
-            title: 'Session Ended',
-            message: 'You have been signed out from another device or window.',
+          this.handleIntentionalLogout("external_logout", {
+            title: "Session Ended",
+            message: "You have been signed out from another device or window.",
             reason:
-              'Your session was terminated from another location for security.',
+              "Your session was terminated from another location for security.",
             showReauthenticate: true,
           });
         }
@@ -111,10 +113,10 @@ class IntentionalLogoutManager {
         this.showInactivityWarning(Math.ceil(timeUntilLogout / 1000));
       } else if (timeUntilLogout <= 0) {
         // Log out due to inactivity
-        this.handleIntentionalLogout('inactivity', {
-          title: 'Signed Out Due to Inactivity',
-          message: 'You have been automatically signed out for security.',
-          reason: 'No activity detected for 30 minutes.',
+        this.handleIntentionalLogout("inactivity", {
+          title: "Signed Out Due to Inactivity",
+          message: "You have been automatically signed out for security.",
+          reason: "No activity detected for 30 minutes.",
           showReauthenticate: true,
         });
         return; // Stop monitoring
@@ -139,10 +141,10 @@ class IntentionalLogoutManager {
       sessionStart &&
       Date.now() - sessionStart > this.config.maxSessionDuration
     ) {
-      this.handleIntentionalLogout('session_expired', {
-        title: 'Session Expired',
-        message: 'Your session has expired for security.',
-        reason: 'Sessions are limited to 8 hours for security purposes.',
+      this.handleIntentionalLogout("session_expired", {
+        title: "Session Expired",
+        message: "Your session has expired for security.",
+        reason: "Sessions are limited to 8 hours for security purposes.",
         showReauthenticate: true,
       });
     }
@@ -153,7 +155,7 @@ class IntentionalLogoutManager {
    */
   getSessionStartTime() {
     try {
-      const sessionData = localStorage.getItem('session_start_time');
+      const sessionData = localStorage.getItem("session_start_time");
       return sessionData ? parseInt(sessionData, 10) : null;
     } catch (error) {
       return null;
@@ -169,13 +171,13 @@ class IntentionalLogoutManager {
     const minutes = Math.ceil(secondsRemaining / 60);
 
     this.showLogoutModal({
-      type: 'warning',
-      title: 'Session Timeout Warning',
-      message: `You will be signed out in ${minutes} minute${minutes > 1 ? 's' : ''} due to inactivity.`,
-      reason: 'This helps protect your account when you step away.',
+      type: "warning",
+      title: "Session Timeout Warning",
+      message: `You will be signed out in ${minutes} minute${minutes > 1 ? "s" : ""} due to inactivity.`,
+      reason: "This helps protect your account when you step away.",
       actions: [
         {
-          text: 'Stay Signed In',
+          text: "Stay Signed In",
           action: () => {
             this.extendSession();
             this.hideLogoutModal();
@@ -183,12 +185,12 @@ class IntentionalLogoutManager {
           primary: true,
         },
         {
-          text: 'Sign Out Now',
+          text: "Sign Out Now",
           action: () => {
-            this.handleIntentionalLogout('user_requested', {
-              title: 'Signed Out',
-              message: 'You have been signed out successfully.',
-              reason: 'You chose to sign out.',
+            this.handleIntentionalLogout("user_requested", {
+              title: "Signed Out",
+              message: "You have been signed out successfully.",
+              reason: "You chose to sign out.",
               showReauthenticate: false,
             });
           },
@@ -197,10 +199,10 @@ class IntentionalLogoutManager {
       ],
       countdown: secondsRemaining,
       autoAction: () => {
-        this.handleIntentionalLogout('inactivity', {
-          title: 'Signed Out Due to Inactivity',
-          message: 'You have been automatically signed out for security.',
-          reason: 'No activity detected for 30 minutes.',
+        this.handleIntentionalLogout("inactivity", {
+          title: "Signed Out Due to Inactivity",
+          message: "You have been automatically signed out for security.",
+          reason: "No activity detected for 30 minutes.",
           showReauthenticate: true,
         });
       },
@@ -212,7 +214,7 @@ class IntentionalLogoutManager {
    */
   async handleIntentionalLogout(reason, options = {}) {
     // Prevent multiple logout attempts
-    if (this.isShowingLogoutModal && reason !== 'user_requested') return;
+    if (this.isShowingLogoutModal && reason !== "user_requested") return;
 
     this.isShowingLogoutModal = true;
 
@@ -224,15 +226,15 @@ class IntentionalLogoutManager {
 
     // Show logout modal
     this.showLogoutModal({
-      type: 'logout',
-      title: options.title || 'Signed Out',
-      message: options.message || 'You have been signed out.',
-      reason: options.reason || 'Session ended.',
+      type: "logout",
+      title: options.title || "Signed Out",
+      message: options.message || "You have been signed out.",
+      reason: options.reason || "Session ended.",
       actions: [
         ...(options.showReauthenticate
           ? [
               {
-                text: 'Sign In Again',
+                text: "Sign In Again",
                 action: () => {
                   this.hideLogoutModal();
                   this.authService?.showLoginModal?.();
@@ -242,7 +244,7 @@ class IntentionalLogoutManager {
             ]
           : []),
         {
-          text: 'Close',
+          text: "Close",
           action: () => {
             this.hideLogoutModal();
           },
@@ -255,7 +257,7 @@ class IntentionalLogoutManager {
     try {
       await this.performLogout();
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
     }
   }
 
@@ -264,17 +266,17 @@ class IntentionalLogoutManager {
    */
   async performLogout() {
     try {
-      // Clear session data
+      // Dispatch logout request event instead of calling auth service directly
+      eventDispatcher.emit(AUTH_EVENTS.INTENTIONAL_LOGOUT_REQUESTED, {
+        reason: "intentional_logout",
+        data: {
+          timestamp: Date.now(),
+          source: "logout_manager",
+        },
+      });
+
+      // Clear local session data
       this.clearSessionData();
-
-      // Sign out from Firebase
-      if (this.authService?.signOut) {
-        await this.authService.signOut();
-      } else if (this.firebaseService?.signOut) {
-        await this.firebaseService.signOut();
-      }
-
-      // Clear any cached data
       this.clearUserData();
     } catch (error) {
       // Even if logout fails, clear local session
@@ -290,8 +292,8 @@ class IntentionalLogoutManager {
   showLogoutModal(config) {
     this.hideLogoutModal(); // Hide any existing modal
 
-    this.logoutModal = document.createElement('div');
-    this.logoutModal.className = 'intentional-logout-modal';
+    this.logoutModal = document.createElement("div");
+    this.logoutModal.className = "intentional-logout-modal";
     this.logoutModal.innerHTML = `
       <div class="logout-modal-overlay">
         <div class="logout-modal-content">
@@ -302,31 +304,31 @@ class IntentionalLogoutManager {
           <div class="logout-modal-body">
             <p class="logout-modal-message">${config.message}</p>
             <p class="logout-modal-reason">${config.reason}</p>
-            ${config.countdown ? `<div class="logout-countdown" data-seconds="${config.countdown}"></div>` : ''}
+            ${config.countdown ? `<div class="logout-countdown" data-seconds="${config.countdown}"></div>` : ""}
           </div>
           <div class="logout-modal-actions">
             ${config.actions
               .map(
-                action => `
-              <button class="logout-action-btn ${action.primary ? 'primary' : 'secondary'}" 
+                (action) => `
+              <button class="logout-action-btn ${action.primary ? "primary" : "secondary"}" 
                       data-action="${action.text}">
                 ${action.text}
               </button>
-            `
+            `,
               )
-              .join('')}
+              .join("")}
           </div>
         </div>
       </div>
     `;
 
     // Add event listeners
-    config.actions.forEach(action => {
+    config.actions.forEach((action) => {
       const button = this.logoutModal.querySelector(
-        `[data-action="${action.text}"]`
+        `[data-action="${action.text}"]`,
       );
       if (button) {
-        button.addEventListener('click', action.action);
+        button.addEventListener("click", action.action);
       }
     });
 
@@ -336,8 +338,8 @@ class IntentionalLogoutManager {
     }
 
     // Prevent modal close on overlay click for important logouts
-    if (config.type === 'logout') {
-      this.logoutModal.addEventListener('click', e => {
+    if (config.type === "logout") {
+      this.logoutModal.addEventListener("click", (e) => {
         e.stopPropagation();
       });
     }
@@ -350,7 +352,7 @@ class IntentionalLogoutManager {
    */
   startCountdown(seconds, autoAction) {
     const countdownElement =
-      this.logoutModal?.querySelector('.logout-countdown');
+      this.logoutModal?.querySelector(".logout-countdown");
     if (!countdownElement) return;
 
     let remaining = seconds;
@@ -358,7 +360,7 @@ class IntentionalLogoutManager {
     const updateCountdown = () => {
       const minutes = Math.floor(remaining / 60);
       const secs = remaining % 60;
-      countdownElement.textContent = `Auto-logout in: ${minutes}:${secs.toString().padStart(2, '0')}`;
+      countdownElement.textContent = `Auto-logout in: ${minutes}:${secs.toString().padStart(2, "0")}`;
 
       if (remaining <= 0) {
         autoAction();
@@ -388,12 +390,12 @@ class IntentionalLogoutManager {
    */
   getIconForType(type) {
     const icons = {
-      warning: '⚠️',
-      logout: '👋',
-      security: '🔒',
-      error: '❌',
+      warning: "⚠️",
+      logout: "👋",
+      security: "🔒",
+      error: "❌",
     };
-    return icons[type] || '🔐';
+    return icons[type] || "🔐";
   }
 
   /**
@@ -404,10 +406,16 @@ class IntentionalLogoutManager {
 
     // Update session start time if needed
     try {
-      localStorage.setItem('session_start_time', Date.now().toString());
+      localStorage.setItem("session_start_time", Date.now().toString());
     } catch (error) {
       // Ignore storage errors
     }
+
+    // Dispatch session extension event
+    eventDispatcher.emit(AUTH_EVENTS.SESSION_EXTENDED, {
+      timestamp: Date.now(),
+      source: "logout_manager",
+    });
   }
 
   /**
@@ -416,7 +424,7 @@ class IntentionalLogoutManager {
   clearWarningIfActive() {
     if (
       this.isShowingLogoutModal &&
-      this.logoutModal?.querySelector('.logout-countdown')
+      this.logoutModal?.querySelector(".logout-countdown")
     ) {
       this.hideLogoutModal();
     }
@@ -441,7 +449,7 @@ class IntentionalLogoutManager {
    */
   clearSessionData() {
     try {
-      localStorage.removeItem('session_start_time');
+      localStorage.removeItem("session_start_time");
       sessionStorage.clear();
     } catch (error) {
       // Ignore storage errors
@@ -465,12 +473,12 @@ class IntentionalLogoutManager {
   logLogoutEvent(reason, options) {
     try {
       if (this.firebaseService?.logAnalytics) {
-        this.firebaseService.logAnalytics('intentional_logout', {
+        this.firebaseService.logAnalytics("intentional_logout", {
           logout_reason: reason,
-          logout_type: options.type || 'automatic',
+          logout_type: options.type || "automatic",
           session_duration:
             Date.now() - (this.getSessionStartTime() || Date.now()),
-          user_id: this.authService?.currentUser?.uid || 'anonymous',
+          user_id: this.authService?.currentUser?.uid || "anonymous",
           timestamp: Date.now(),
         });
       }
@@ -485,9 +493,9 @@ class IntentionalLogoutManager {
 
   // Role change logout
   logoutForRoleChange(newRole, oldRole) {
-    this.handleIntentionalLogout('role_change', {
-      title: 'Role Updated',
-      message: 'Your account role has been updated. Please sign in again.',
+    this.handleIntentionalLogout("role_change", {
+      title: "Role Updated",
+      message: "Your account role has been updated. Please sign in again.",
       reason: `Role changed from ${oldRole} to ${newRole}. Re-authentication required for security.`,
       showReauthenticate: true,
     });
@@ -495,40 +503,41 @@ class IntentionalLogoutManager {
 
   // Security-related logout
   logoutForSecurity(securityReason) {
-    this.handleIntentionalLogout('security', {
-      title: 'Security Logout',
-      message: 'You have been signed out for security reasons.',
-      reason: securityReason || 'Unusual activity detected on your account.',
+    this.handleIntentionalLogout("security", {
+      title: "Security Logout",
+      message: "You have been signed out for security reasons.",
+      reason: securityReason || "Unusual activity detected on your account.",
       showReauthenticate: true,
     });
   }
 
   // Administrative logout
   logoutForAdmin(adminReason) {
-    this.handleIntentionalLogout('admin_action', {
-      title: 'Administrative Logout',
-      message: 'An administrator has signed you out.',
-      reason: adminReason || 'Administrative action required.',
+    this.handleIntentionalLogout("admin_action", {
+      title: "Administrative Logout",
+      message: "An administrator has signed you out.",
+      reason: adminReason || "Administrative action required.",
       showReauthenticate: true,
     });
   }
 
   // Maintenance logout
   logoutForMaintenance(maintenanceInfo) {
-    this.handleIntentionalLogout('maintenance', {
-      title: 'System Maintenance',
-      message: 'System maintenance is beginning. You have been signed out.',
+    this.handleIntentionalLogout("maintenance", {
+      title: "System Maintenance",
+      message: "System maintenance is beginning. You have been signed out.",
       reason:
         maintenanceInfo ||
-        'Scheduled maintenance starting. Please try again later.',
+        "Scheduled maintenance starting. Please try again later.",
       showReauthenticate: false,
     });
   }
 }
 
-// Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = IntentionalLogoutManager;
-} else {
+// Export for use in other modules - browser environment
+if (typeof window !== "undefined") {
   window.IntentionalLogoutManager = IntentionalLogoutManager;
 }
+
+// ES6 module export
+export default IntentionalLogoutManager;

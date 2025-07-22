@@ -56,7 +56,7 @@
 }
 
 .form-label.required::after {
-  content: ' *';
+  content: " *";
   color: var(--color-error);
 }
 
@@ -337,7 +337,7 @@
 }
 
 .breadcrumb-item:not(:last-child)::after {
-  content: '/';
+  content: "/";
   margin-left: var(--spacing-2);
   color: var(--color-gray-400);
 }
@@ -680,7 +680,7 @@ a:hover {
 
 /* Loading states with accessible text */
 .loading::after {
-  content: ' (Loading...)';
+  content: " (Loading...)";
   position: absolute;
   left: -9999px;
 }
@@ -744,11 +744,11 @@ a:hover {
 }
 
 /* Language and direction support */
-[dir='rtl'] {
+[dir="rtl"] {
   text-align: right;
 }
 
-[dir='rtl'] .breadcrumb {
+[dir="rtl"] .breadcrumb {
   direction: rtl;
 }
 
@@ -775,21 +775,13 @@ a:hover {
     break-inside: avoid;
   }
 
-  a[href^='http']::after {
-    content: ' (' attr(href) ')';
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
   }
 }
 
-/* Reduced data mode */
-@media (prefers-reduced-data: reduce) {
-  * {
-    background-image: none !important;
-  }
-
-  .hero-demo::before {
-    display: none;
-  }
-}
+/* Reduced data mode - MOVED TO shared-navigation.css for consolidation */
+/* Universal selectors now centralized for better performance */
 
 /* ===== LAYOUT COMPONENTS ===== */
 

@@ -65,9 +65,7 @@ limitations under the License.
         --header-h: 60px;
         --modal-z: 9999;
       }
-      * {
-        box-sizing: border-box;
-      }
+      /* Universal selector moved to main.css for complete reset */
       body {
         font-family: var(--font);
         color: var(--text);
@@ -104,14 +102,7 @@ limitations under the License.
         width: 600px;
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
       }
-      .header {
-        height: var(--header-h);
-        background: var(--bg);
-        border-bottom: 1px solid #e5e7eb;
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-      }
+      /* Header styles moved to shared-navigation.css for consolidation */
       .container {
         max-width: 1200px;
         margin: 0 auto;
@@ -183,6 +174,9 @@ limitations under the License.
     <link rel="stylesheet" href="src/styles/simulations.css" />
     <link rel="stylesheet" href="src/styles/layout-components.css" />
 
+    <!-- Shared Navigation Component (moved up for proper cascade) -->
+    <link rel="stylesheet" href="src/styles/shared-navigation.css" />
+
     <!-- 5. Advanced component systems -->
     <link rel="stylesheet" href="src/styles/advanced-ui-components.css" />
     <link rel="stylesheet" href="src/styles/enhanced-objects.css" />
@@ -207,6 +201,9 @@ limitations under the License.
     <link rel="stylesheet" href="src/styles/bias-fairness.css" />
     <link rel="stylesheet" href="src/styles/category-grid.css" />
 
+    <!-- Scenario Card Component (used by category-grid and scenario-browser) -->
+    <link rel="stylesheet" href="src/styles/scenario-card.css" />
+
     <!-- 9. Layout fixes and overrides -->
     <link rel="stylesheet" href="src/styles/layout-fixes.css" />
 
@@ -224,9 +221,6 @@ limitations under the License.
       rel="stylesheet"
       href="src/styles/simulation-modal-consolidated.css"
     />
-
-    <!-- Shared Navigation Component -->
-    <link rel="stylesheet" href="src/styles/shared-navigation.css" />
 
     <!-- Back to Top Component -->
     <link rel="stylesheet" href="src/styles/back-to-top.css" />
@@ -1359,6 +1353,16 @@ limitations under the License.
 
     <!-- Settings Manager Component -->
     <script type="module" src="src/js/components/settings-manager.js"></script>
+
+    <!-- Event Dispatcher for Component Communication -->
+    <script type="module" src="src/js/utils/event-dispatcher.js"></script>
+
+    <!-- Intentional Logout System -->
+    <script src="src/js/styles/intentional-logout.css.js"></script>
+    <script
+      type="module"
+      src="src/js/components/intentional-logout-manager.js"
+    ></script>
 
     <!-- Donation Tracker Utility -->
     <script type="module" src="src/js/utils/donation-tracker.js"></script>

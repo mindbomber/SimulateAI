@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🔧 RadarChart Fix Verification</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        color: #333;
+      }
+
+      .chart-container {
+        width: 400px;
+        height: 400px;
+        margin: 20px auto;
+        border: 2px dashed #667eea;
+        border-radius: 10px;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .test-button {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .test-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .log-output {
+        background: #1e1e1e;
+        color: #00ff00;
+        padding: 15px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 12px;
+        max-height: 300px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+      }
+
+      .success {
+        color: #28a745;
+      }
+      .error {
+        color: #dc3545;
+      }
+      .warning {
+        color: #ffc107;
+      }
+      .info {
+        color: #17a2b8;
+      }
+
+      h1 {
+        color: #667eea;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔧 RadarChart Fix Verification</h1>
+      <p>
+        <strong
+          >Testing the fix for "_validateChartOptions is not a function"
+          error:</strong
+        >
+      </p>
+
+      <div class="chart-container" id="test-radar-chart">
+        Ready for chart creation...
+      </div>
+
+      <div style="text-align: center">
+        <button class="test-button" onclick="testRadarChartCreation()">
+          🧪 Test RadarChart Creation
+        </button>
+        <button class="test-button" onclick="testWithInvalidOptions()">
+          ⚠️ Test Invalid Options
+        </button>
+        <button class="test-button" onclick="clearLog()">🗑️ Clear Log</button>
+      </div>
+
+      <div style="margin-top: 20px">
+        <h3>Test Results:</h3>
+        <div class="log-output" id="log-output">Ready for testing...\n</div>
+      </div>
+    </div>
+
+    <!-- Load Chart.js and radar chart component -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module">
+      import RadarChart from "./src/js/components/radar-chart.js";
+
+      // Make RadarChart available globally for testing
+      window.RadarChart = RadarChart;
+
+      // Enhanced logging function
+      window.testLog = function (message, type = "info") {
+        const output = document.getElementById("log-output");
+        const timestamp = new Date().toLocaleTimeString();
+        const logClass = type;
+        const logMessage = `[${timestamp}] ${message}\n`;
+
+        // Add to display
+        const span = document.createElement("span");
+        span.className = logClass;
+        span.textContent = logMessage;
+        output.appendChild(span);
+        output.scrollTop = output.scrollHeight;
+
+        // Also log to console
+        console.log(`[RadarChart Fix Test] ${message}`);
+      };
+
+      // Test 1: Normal RadarChart creation
+      window.testRadarChartCreation = async function () {
+        testLog("🧪 Testing normal RadarChart creation...", "info");
+
+        try {
+          // Clear the container
+          const container = document.getElementById("test-radar-chart");
+          container.innerHTML = "Creating chart...";
+
+          // Create RadarChart with valid options
+          testLog("📊 Creating RadarChart instance...", "info");
+          const chart = new RadarChart("test-radar-chart", {
+            title: "Test Chart",
+            width: 350,
+            height: 350,
+            animated: true,
+            showLabels: true,
+            showLegend: true,
+            isDemo: true,
+          });
+
+          testLog(
+            "✅ RadarChart constructor completed successfully!",
+            "success",
+          );
+          testLog(`📋 Instance ID: ${chart.instanceId}`, "info");
+          testLog(
+            `🏗️ Initialization Promise: ${chart.initializationPromise ? "Created" : "Missing"}`,
+            "info",
+          );
+
+          // Wait for initialization to complete
+          if (chart.initializationPromise) {
+            testLog("⏳ Waiting for chart initialization...", "info");
+            await chart.initializationPromise;
+            testLog("✅ Chart initialization completed!", "success");
+            testLog(
+              `📊 Chart instance: ${chart.chart ? "Created" : "Missing"}`,
+              "info",
+            );
+            testLog(
+              `🎯 Container has canvas: ${!!container.querySelector("canvas")}`,
+              "info",
+            );
+          } else {
+            testLog("✅ Synchronous initialization completed!", "success");
+          }
+
+          testLog("🎉 RadarChart creation test PASSED!", "success");
+        } catch (error) {
+          testLog(`❌ RadarChart creation FAILED: ${error.message}`, "error");
+          testLog(`📋 Error stack: ${error.stack}`, "error");
+          console.error("RadarChart creation error:", error);
+        }
+      };
+
+      // Test 2: Invalid options validation
+      window.testWithInvalidOptions = async function () {
+        testLog("⚠️ Testing RadarChart with invalid options...", "warning");
+
+        try {
+          // Test 1: Invalid width
+          testLog("🧪 Testing invalid width...", "info");
+          try {
+            const chart1 = new RadarChart("test-radar-chart", {
+              width: -100, // Invalid negative width
+              height: 400,
+            });
+            testLog(
+              "❌ Expected validation error for negative width, but none occurred",
+              "error",
+            );
+          } catch (error) {
+            testLog(
+              `✅ Correctly caught invalid width: ${error.message}`,
+              "success",
+            );
+          }
+
+          // Test 2: Invalid scores
+          testLog("🧪 Testing invalid scores...", "info");
+          try {
+            const chart2 = new RadarChart("test-radar-chart", {
+              scores: {
+                utilitarianism: 10, // Invalid score > 5
+                deontology: 3,
+              },
+            });
+            testLog(
+              "❌ Expected validation error for invalid scores, but none occurred",
+              "error",
+            );
+          } catch (error) {
+            testLog(
+              `✅ Correctly caught invalid scores: ${error.message}`,
+              "success",
+            );
+          }
+
+          // Test 3: Invalid boolean option
+          testLog("🧪 Testing invalid boolean option...", "info");
+          try {
+            const chart3 = new RadarChart("test-radar-chart", {
+              animated: "yes", // Invalid non-boolean
+            });
+            testLog(
+              "❌ Expected validation error for invalid boolean, but none occurred",
+              "error",
+            );
+          } catch (error) {
+            testLog(
+              `✅ Correctly caught invalid boolean: ${error.message}`,
+              "success",
+            );
+          }
+
+          testLog("🎉 Invalid options validation test PASSED!", "success");
+        } catch (error) {
+          testLog(`❌ Validation test FAILED: ${error.message}`, "error");
+          console.error("Validation test error:", error);
+        }
+      };
+
+      // Clear log function
+      window.clearLog = function () {
+        const output = document.getElementById("log-output");
+        output.innerHTML = "Log cleared...\n";
+      };
+
+      // Initialize test page
+      testLog("🔧 RadarChart Fix Verification Test initialized", "success");
+      testLog(
+        "📋 Available tests: Normal creation, Invalid options validation",
+        "info",
+      );
+      testLog("🚀 Click the test buttons to verify the fix works!", "info");
+    </script>
+  </body>
+</html>

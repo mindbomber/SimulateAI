@@ -23,24 +23,8 @@
   }
 }
 
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-
-  .animated,
-  .fade,
-  .slide {
-    animation: none !important;
-    transition: none !important;
-  }
-}
+/* Reduced motion support - MOVED TO shared-navigation.css for consolidation */
+/* Universal selectors now centralized for better performance */
 
 /* Screen reader only content */
 .sr-only {
@@ -264,18 +248,8 @@ input[disabled] {
   }
 }
 
-/* Reduced data mode */
-@media (prefers-reduced-data: reduce) {
-  * {
-    background-image: none !important;
-  }
-
-  .thumbnail,
-  .hero-image,
-  .background-image {
-    display: none;
-  }
-}
+/* Reduced data mode - MOVED TO shared-navigation.css for consolidation */
+/* Universal selectors now centralized for better performance */
 
 /* Accessibility announcements */
 .aria-live-region {

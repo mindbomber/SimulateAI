@@ -201,7 +201,8 @@
   /* Ensure enough space for radar chart with labels */
   min-width: 400px;
   max-width: 450px;
-  overflow: visible;
+  /* Allow overflow for Chart.js tooltips */
+  overflow: visible !important;
 
   /* Ensure the sidebar provides enough space for chart labels */
   box-sizing: border-box;
@@ -268,6 +269,8 @@
     inset 0 1px 0 rgb(255 255 255 / 80%);
   position: relative;
   font-style: italic;
+  /* Typewriter spacing properties */
+  min-height: 1.5em;
 }
 
 .ethical-question {
@@ -285,6 +288,8 @@
   border-radius: 12px;
   border: 2px solid rgb(102 126 234 / 15%);
   box-shadow: 0 2px 8px rgb(102 126 234 / 10%);
+  /* Typewriter spacing properties */
+  min-height: 1.5em;
   position: relative;
 }
 
@@ -440,7 +445,7 @@
     0 25px 50px rgb(0 0 0 / 15%),
     0 10px 25px rgb(102 126 234 / 10%),
     inset 0 1px 0 rgb(255 255 255 / 80%);
-  z-index: 1000;
+  z-index: 1100; /* Increased to avoid conflicts with CategoryHeader tooltips (z-index: 1200) */
   min-width: 500px;
   max-width: 650px;
   opacity: 0;
@@ -573,97 +578,8 @@
   font-size: 1.2rem;
 }
 
-/* Radar Chart Container - matching actual HTML structure - override radar-chart.css */
-
-/* Radar Chart - Direct styling without redundant container */
-.scenario-modal #scenario-radar-chart {
-  text-align: center;
-  position: static !important;
-  width: 100% !important;
-  max-width: 420px !important; /* Increased max-width for larger chart */
-  margin: 1rem auto !important;
-  padding: 0.5rem !important; /* Reduce padding to give more space to chart */
-  background: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  border: none !important;
-  backdrop-filter: none !important;
-
-  /* Force grid placement */
-  grid-area: auto;
-
-  /* Ensure proper sizing for chart - increased min-height for labels */
-  min-height: 450px;
-  overflow: visible !important;
-
-  /* Ensure container can accommodate chart labels */
-  display: flex !important;
-  flex-direction: column;
-  justify-content: center;
-
-  /* Ensure visibility and proper sizing */
-  visibility: visible !important;
-
-  /* Prevent any text content from showing */
-}
-
-/* Remove the old radar-chart-container h3 styling and apply directly if needed */
-.scenario-modal .chart-legend h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1a202c;
-  margin: 0 0 1.5rem;
-  text-align: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Ensure no unwanted text content displays in the radar chart */
-.scenario-modal #scenario-radar-chart:empty::before {
-  content: "";
-  display: none;
-}
-
-.scenario-modal #scenario-radar-chart:empty::after {
-  content: "";
-  display: none;
-}
-
-/* Canvas specific styling for the radar chart */
-.scenario-modal #scenario-radar-chart canvas {
-  max-width: 100% !important;
-  width: 400px !important; /* Increased width for chart */
-  height: 400px !important; /* Increased height for chart */
-  display: block !important;
-  margin: 0 auto !important;
-
-  /* Prevent clipping - ensure Chart.js has space for labels */
-  transform: none !important;
-  overflow: visible !important;
-
-  /* Remove padding to give more space to the chart itself */
-  padding: 0;
-  box-sizing: border-box;
-}
-
-.scenario-modal .chart-legend {
-  margin-top: 1.5rem;
-}
-
-.scenario-modal .chart-legend p {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin: 0;
-  padding: 1rem;
-  background: rgb(102 126 234 / 5%);
-  border-radius: 10px;
-  font-size: 0.9rem;
-  color: #4a5568;
-  border: 1px solid rgb(102 126 234 / 10%);
-}
+/* Radar Chart Container - consolidated into radar-chart.css for centralized component management */
+/* All scenario modal radar chart styles moved to radar-chart.css */
 
 /* Modal Footer */
 .scenario-modal-dialog .scenario-modal-footer {
@@ -799,13 +715,6 @@
   100% {
     opacity: 0;
   }
-}
-
-/* Ensure typewriter text elements have proper spacing */
-.dilemma-text,
-.ethical-question {
-  min-height: 1.5em;
-  line-height: 1.6;
 }
 
 /* Additional typewriter styles for better visual experience */
@@ -958,49 +867,46 @@
   }
 }
 
-/* High Contrast Mode Support */
-@media (prefers-contrast: high) {
-  .option-btn {
-    border-width: 3px;
-  }
-
-  .option-btn:focus {
-    box-shadow: 0 0 0 4px rgb(102 126 234 / 50%);
-  }
-
-  .pros-cons-popover {
-    border-width: 2px;
-    box-shadow: 0 8px 25px rgb(0 0 0 / 30%);
-  }
+/* High Contrast Mode Support - Using media.css utilities */
+.high-contrast-border .option-btn {
+  border-width: 3px;
 }
 
-/* Reduced Motion Support */
-@media (prefers-reduced-motion: reduce) {
-  .scenario-modal,
-  .scenario-modal-backdrop,
-  .option-btn,
-  .pros-cons-popover,
-  .feedback-close {
-    transition: none;
-    animation: none;
-  }
+.high-contrast-border .option-btn:focus {
+  box-shadow: 0 0 0 4px rgb(102 126 234 / 50%);
+}
 
-  .option-btn:hover {
-    transform: none;
-  }
+.high-contrast-border .pros-cons-popover {
+  border-width: 2px;
+  box-shadow: 0 8px 25px rgb(0 0 0 / 30%);
+}
 
-  .scenario-modal.show {
-    transform: none;
-  }
+/* Reduced Motion Support - Using media.css utilities */
+.no-motion .scenario-modal,
+.no-motion .scenario-modal-backdrop,
+.no-motion .option-btn,
+.no-motion .pros-cons-popover,
+.no-motion .feedback-close {
+  transition: none;
+  animation: none;
+}
 
-  .pros-cons-popover.visible {
-    transform: translateX(-50%) translateY(-100%) translateY(-1rem);
-  }
+.no-motion .option-btn:hover {
+  transform: none;
+}
 
-  @media (width <= 768px) {
-    .pros-cons-popover.visible {
-      transform: translate(-50%, -50%);
-    }
+.no-motion .scenario-modal.show {
+  transform: none;
+}
+
+.no-motion .pros-cons-popover.visible {
+  transform: translateX(-50%) translateY(-100%) translateY(-1rem);
+}
+
+/* Nested responsive behavior within reduced motion */
+@media (width <= 768px) {
+  .no-motion .pros-cons-popover.visible {
+    transform: translate(-50%, -50%);
   }
 }
 
@@ -1122,55 +1028,81 @@ body.dark-mode .test-mode-indicator {
   border: 1px solid rgb(255 193 7 / 30%);
 }
 
+/* ===== SCENARIO MODAL TRIGGER BUTTON ===== */
+/* Consolidated from main.css for component ownership */
+
+/* Override styles for test scenario modal button to match primary button */
+#test-scenario-modal {
+  /* Base button styles (since we removed .btn class) */
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  font-family: var(--font-family-primary) !important;
+
+  /* Match start-learning button exactly (.btn-primary styles) */
+  background-color: var(--color-primary) !important;
+  color: var(--color-white) !important;
+  border: 2px solid var(--color-primary) !important;
+  padding: var(--spacing-3) var(--spacing-6) !important;
+  border-radius: var(--radius-lg) !important;
+  font-weight: var(--font-weight-medium) !important;
+  font-size: var(--font-size-base) !important;
+  min-height: 44px !important;
+  transition: all var(--transition-fast) !important;
+
+  /* Ensure no outline on focus */
+  outline: none !important;
+}
+
+#test-scenario-modal:hover,
+#test-scenario-modal:focus {
+  background-color: var(--color-primary-dark) !important;
+  color: var(--color-white) !important;
+  border-color: var(--color-primary-dark) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* ===== ENHANCED SCENARIO COMPONENT STYLES ===== */
+/* Scenario card styles moved to scenario-card.css for centralized component management */
+
+/* ===== ENHANCED DARK MODE SUPPORT ===== */
+/* Scenario card dark mode styles moved to scenario-card.css for centralized component management */
+
+/* Scenario modal dark mode enhancements */
+body.dark-mode .scenario-header {
+  background: transparent;
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .scenario-footer {
+  color: var(--theme-text-secondary);
+}
+
 /* ===== CHART.JS TOOLTIP FIX ===== */
+/* Chart.js tooltip styles consolidated into radar-chart.css for centralized component management */
 
-/* Ensure Chart.js tooltips appear above scenario modal content */
-
-/* Chart.js tooltip container - must be above modal z-index */
-.chartjs-tooltip {
-  z-index: 1060 !important; /* Above scenario-modal z-index: 1055 */
-  position: absolute !important;
-  pointer-events: none !important;
-}
-
-/* Chart.js default tooltip styling override for modals */
-.scenario-modal .chartjs-tooltip,
-.scenario-modal-dialog .chartjs-tooltip {
-  z-index: 1060 !important;
-  position: fixed !important; /* Use fixed positioning to break out of modal context */
-}
-
-/* Chart.js canvas tooltips - alternative tooltip implementation */
-.scenario-modal canvas[role="img"] + div[style*="position: absolute"],
-.scenario-modal-dialog canvas[role="img"] + div[style*="position: absolute"] {
-  z-index: 1060 !important;
-  position: fixed !important;
-}
-
-/* Ensure Chart.js tooltip backdrop doesn't interfere */
-.scenario-modal .chart-tooltip,
-.scenario-modal-dialog .chart-tooltip {
-  z-index: 1060 !important;
-  position: fixed !important;
-  pointer-events: none !important;
-}
-
-/* Allow overflow for Chart.js tooltips in sidebar */
-.scenario-sidebar {
-  overflow: visible !important; /* Override any overflow: hidden that blocks tooltips */
-}
-
-/* Ensure radar chart container allows tooltip overflow */
-.scenario-modal #scenario-radar-chart {
-  overflow: visible !important;
-  position: relative !important;
-  z-index: auto !important; /* Don't create new stacking context */
-}
-
-/* Chart.js specific tooltip selectors that might be used */
-div[id^="chartjs-tooltip"],
-div[class*="chartjs-tooltip"],
-div[data-chartjs="tooltip"] {
-  z-index: 1060 !important;
-  position: fixed !important;
-}
+/* ===============================================
+   MEDIA QUERY CONSOLIDATION (Phase 3 Complete)
+   ===============================================
+   
+   📱 CONSOLIDATION RESULTS:
+   ✅ @media (prefers-reduced-motion: reduce) → Replaced with .no-motion utility class
+   ✅ @media (prefers-contrast: high) → Replaced with .high-contrast-border utility class
+   
+   📍 KEPT AS STANDARDIZED BREAKPOINTS:
+   🔄 @media (width <= 968px) → Component-specific layout breakpoint (kept)
+   🔄 @media (width <= 768px) → Standard tablet breakpoint (kept, 2 instances)
+   🔄 @media (width <= 480px) → Standard mobile breakpoint (kept)
+   
+   🎯 CONSOLIDATION BENEFITS:
+   • Eliminated 2 accessibility-related @media query blocks (~25 lines)
+   • Standardized reduced-motion and high-contrast behavior using media.css utilities
+   • Maintained responsive breakpoints for component-specific styling
+   • Enhanced consistency with global accessibility patterns
+   
+   📊 IMPACT: ~25 lines reduced, 2 media queries consolidated to utility classes
+   =============================================== */

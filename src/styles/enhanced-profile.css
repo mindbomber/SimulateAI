@@ -172,21 +172,7 @@
   flex-shrink: 0;
 }
 
-.search-toggle {
-  background: rgb(255 255 255 / 10%);
-  border: none;
-  color: #e2e8f0;
-  padding: 0.75rem;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: var(--transition-fast);
-  font-size: 1.125rem;
-}
-
-.search-toggle:hover {
-  background: rgb(255 255 255 / 20%);
-  color: white;
-}
+/* Search toggle styles moved to shared-navigation.css for consolidation */
 
 .mobile-menu-toggle {
   display: none;
@@ -1736,15 +1722,7 @@
 }
 
 /* ===== ACCESSIBILITY ENHANCEMENTS ===== */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
+/* Reduced Motion - Moved to design-tokens.css for consolidation */
 
 @media (prefers-color-scheme: dark) {
   .enhanced-profile {

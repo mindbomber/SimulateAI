@@ -173,6 +173,8 @@ Clean, minimal, intelligent design for thoughtful discourse
   padding: 24px;
   transition: all 0.2s ease;
   cursor: pointer;
+  /* Entry animation */
+  animation: fadeInUp 0.5s ease-out;
 }
 
 .article-card:hover {
@@ -704,11 +706,6 @@ body.dark-mode .featured-badge {
 
 body.dark-mode .featured-article .article-title {
   color: var(--theme-accent);
-}
-
-/* Animation and Transitions */
-.article-card {
-  animation: fadeInUp 0.5s ease-out;
 }
 
 @keyframes fadeInUp {
