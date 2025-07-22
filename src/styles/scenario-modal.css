@@ -65,6 +65,18 @@
   transform: scale(1) translateY(0);
 }
 
+/* Modal closing animation */
+.scenario-modal.closing {
+  opacity: 0;
+  transform: scale(0.95) translateY(-1rem);
+  transition: all 0.2s ease-out;
+}
+
+.scenario-modal-backdrop.closing {
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+}
+
 /* Modal Header */
 .scenario-modal-dialog .scenario-modal-header {
   padding: 2rem 2.5rem 1rem;

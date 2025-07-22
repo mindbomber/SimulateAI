@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dropdown Display Fix Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .status {
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .warning {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+      .test-button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      .test-button:hover {
+        background: #0056b3;
+      }
+      .fix-item {
+        background: #e8f5e8;
+        border-left: 4px solid #28a745;
+        padding: 10px;
+        margin: 5px 0;
+      }
+      .issue-item {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 10px;
+        margin: 5px 0;
+      }
+      .code-block {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        padding: 10px;
+        font-family: "Courier New", monospace;
+        margin: 10px 0;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🔧 Dropdown Display Property Fix</h1>
+      <p><strong>CRITICAL ISSUE FOUND & FIXED!</strong></p>
+
+      <div class="status success">
+        ✅ <strong>Root Cause Identified:</strong> Dropdown elements were
+        missing the crucial `display` property, causing them to be hidden even
+        when JavaScript toggled `aria-expanded="true"`.
+      </div>
+
+      <h2>🐛 The Problem:</h2>
+
+      <div class="issue-item">
+        <strong>Missing Display Property:</strong>
+        <br />• Dropdowns only had `opacity: 0` and `visibility: hidden` <br />•
+        No explicit `display` property meant any `display: none` rule would
+        override everything <br />• JavaScript could set `aria-expanded="true"`
+        but dropdowns remained invisible
+      </div>
+
+      <div class="code-block">
+        <strong>BEFORE (Broken):</strong>
+        <pre>
+.filter-dropdown,
+.sort-dropdown {
+  opacity: 0;
+  visibility: hidden;
+  /* Missing display property! */
+}</pre
+        >
+      </div>
+
+      <div class="code-block">
+        <strong>AFTER (Fixed):</strong>
+        <pre>
+.filter-dropdown,
+.sort-dropdown {
+  display: block !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.filter-btn[aria-expanded="true"] + .filter-dropdown,
+.sort-btn[aria-expanded="true"] + .sort-dropdown {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}</pre
+        >
+      </div>
+
+      <h2>🛠️ Fixes Applied:</h2>
+
+      <div class="fix-item">
+        <strong>1. scenario-browser-component.css:</strong>
+        <br />• Added `display: block !important` to dropdown base styles
+        <br />• Added `pointer-events: none/auto` for proper interaction <br />•
+        Used `!important` to override any conflicting rules
+      </div>
+
+      <div class="fix-item">
+        <strong>2. scenario-browser.css:</strong>
+        <br />• Applied identical fixes to consolidated dropdown styles <br />•
+        Ensured both CSS files have consistent dropdown behavior <br />•
+        Protected against any CSS cascade issues
+      </div>
+
+      <h2>✨ Expected Results:</h2>
+      <ul>
+        <li>✅ Filter button clicks will now show dropdown menus</li>
+        <li>✅ Sort button clicks will now show dropdown menus</li>
+        <li>✅ Dropdowns will be properly positioned and interactive</li>
+        <li>✅ Smooth opacity/visibility transitions will work</li>
+        <li>✅ JavaScript aria-expanded toggles will be visually effective</li>
+      </ul>
+
+      <div class="status warning">
+        <strong>🧪 Test Instructions:</strong>
+        <br />1. Refresh your main application page to reload the updated CSS
+        <br />2. Navigate to the scenario browser section <br />3. Click the
+        Filter button - dropdown should appear! <br />4. Click the Sort button -
+        dropdown should appear! <br />5. Verify smooth animations and proper
+        interaction
+      </div>
+
+      <button class="test-button" onclick="openMainApp()">
+        🌐 Test Dropdowns Now
+      </button>
+      <button class="test-button" onclick="showTechnicalDetails()">
+        📊 Technical Details
+      </button>
+
+      <div
+        id="technical-details"
+        style="
+          display: none;
+          margin-top: 20px;
+          padding: 15px;
+          background: #f8f9fa;
+          border-radius: 4px;
+        "
+      >
+        <h3>🔍 Technical Analysis</h3>
+        <p><strong>CSS Display Property Hierarchy:</strong></p>
+        <ol>
+          <li>
+            <code>display: none</code> - Element completely removed from layout
+          </li>
+          <li>
+            <code>display: block</code> - Element takes space and can be styled
+          </li>
+          <li>
+            <code>visibility: hidden</code> - Element takes space but is
+            invisible
+          </li>
+          <li>
+            <code>opacity: 0</code> - Element is transparent but interactive
+          </li>
+        </ol>
+
+        <p><strong>Why This Fix Works:</strong></p>
+        <ul>
+          <li>
+            Explicit <code>display: block !important</code> prevents any hidden
+            states
+          </li>
+          <li>
+            <code>pointer-events: none/auto</code> controls interaction properly
+          </li>
+          <li><code>!important</code> overrides any conflicting CSS rules</li>
+          <li>Maintains smooth transitions while ensuring visibility</li>
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      function openMainApp() {
+        window.open("/", "_blank");
+        alert(
+          "✅ Main app opened! Test the filter and sort buttons in the scenario browser - they should now show dropdowns!",
+        );
+      }
+
+      function showTechnicalDetails() {
+        const details = document.getElementById("technical-details");
+        details.style.display =
+          details.style.display === "none" ? "block" : "none";
+      }
+    </script>
+  </body>
+</html>

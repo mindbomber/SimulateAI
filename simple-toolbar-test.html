@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple Toolbar Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        line-height: 1.6;
+      }
+      .test-info {
+        background: #f0f8ff;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+      }
+      .toolbar-test {
+        background: #fff;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 20px;
+      }
+      .simple-toolbar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .simple-btn {
+        padding: 8px 16px;
+        border: 2px solid #333;
+        background: #f0f0f0;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .simple-btn:hover {
+        background: #e0e0e0;
+      }
+      .simple-dropdown {
+        position: relative;
+        display: inline-block;
+      }
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        background: white;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-top: 2px;
+      }
+      .dropdown-content button {
+        display: block;
+        width: 100%;
+        padding: 8px 12px;
+        border: none;
+        background: none;
+        text-align: left;
+        cursor: pointer;
+      }
+      .dropdown-content button:hover {
+        background: #f5f5f5;
+      }
+      .results {
+        background: #f9f9f9;
+        padding: 15px;
+        border-radius: 5px;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      .success {
+        color: green;
+      }
+      .error {
+        color: red;
+      }
+      .info {
+        color: blue;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Simple Toolbar Test</h1>
+
+    <div class="test-info">
+      <h3>🧪 Testing Theory: Is main-grid.js too complex?</h3>
+      <p>
+        This page tests if a simple toolbar implementation works, helping us
+        determine if the issue is with the complexity of main-grid.js.
+      </p>
+      <p>
+        <strong
+          >If this simple version works but the main app doesn't, then
+          main-grid.js is the problem.</strong
+        >
+      </p>
+    </div>
+
+    <div class="toolbar-test">
+      <h3>Simple Toolbar Implementation</h3>
+      <div class="simple-toolbar">
+        <div class="simple-dropdown">
+          <button class="simple-btn" id="simple-filter">Filter ▼</button>
+          <div class="dropdown-content" id="simple-filter-dropdown">
+            <button data-filter="all">All Categories</button>
+            <button data-filter="ethics">Ethics</button>
+            <button data-filter="healthcare">Healthcare</button>
+            <button data-filter="finance">Finance</button>
+          </div>
+        </div>
+
+        <div class="simple-dropdown">
+          <button class="simple-btn" id="simple-sort">Sort ▼</button>
+          <div class="dropdown-content" id="simple-sort-dropdown">
+            <button data-sort="alphabetical">Alphabetical</button>
+            <button data-sort="category">By Category</button>
+            <button data-sort="difficulty">By Difficulty</button>
+          </div>
+        </div>
+
+        <button
+          class="simple-btn"
+          id="test-complex"
+          style="background: #ffeeee"
+        >
+          Test Complex Main-Grid
+        </button>
+      </div>
+
+      <p><strong>Instructions:</strong></p>
+      <ol>
+        <li>Try the simple buttons above - they should work immediately</li>
+        <li>Open the main SimulateAI app in another tab</li>
+        <li>Compare the behavior</li>
+      </ol>
+    </div>
+
+    <div class="results" id="results">
+      <h3>Test Results:</h3>
+      <div id="log"></div>
+    </div>
+
+    <script>
+      function log(message, type = "info") {
+        const logDiv = document.getElementById("log");
+        const div = document.createElement("div");
+        div.className = type;
+        div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        logDiv.appendChild(div);
+        logDiv.scrollTop = logDiv.scrollHeight;
+        console.log(message);
+      }
+
+      function initSimpleTest() {
+        log("🚀 Starting simple toolbar test...", "info");
+
+        const filterBtn = document.getElementById("simple-filter");
+        const sortBtn = document.getElementById("simple-sort");
+        const filterDropdown = document.getElementById(
+          "simple-filter-dropdown",
+        );
+        const sortDropdown = document.getElementById("simple-sort-dropdown");
+        const testComplexBtn = document.getElementById("test-complex");
+
+        // Simple filter button
+        filterBtn.addEventListener("click", function (e) {
+          log("✅ Simple filter button clicked!", "success");
+          e.stopPropagation();
+
+          const isVisible = filterDropdown.style.display === "block";
+          filterDropdown.style.display = isVisible ? "none" : "block";
+          sortDropdown.style.display = "none";
+
+          log(`Filter dropdown: ${filterDropdown.style.display}`, "info");
+        });
+
+        // Simple sort button
+        sortBtn.addEventListener("click", function (e) {
+          log("✅ Simple sort button clicked!", "success");
+          e.stopPropagation();
+
+          const isVisible = sortDropdown.style.display === "block";
+          sortDropdown.style.display = isVisible ? "none" : "block";
+          filterDropdown.style.display = "none";
+
+          log(`Sort dropdown: ${sortDropdown.style.display}`, "info");
+        });
+
+        // Filter options
+        filterDropdown.addEventListener("click", function (e) {
+          if (e.target.hasAttribute("data-filter")) {
+            const filter = e.target.getAttribute("data-filter");
+            log(`✅ Selected filter: ${filter}`, "success");
+            filterDropdown.style.display = "none";
+          }
+        });
+
+        // Sort options
+        sortDropdown.addEventListener("click", function (e) {
+          if (e.target.hasAttribute("data-sort")) {
+            const sort = e.target.getAttribute("data-sort");
+            log(`✅ Selected sort: ${sort}`, "success");
+            sortDropdown.style.display = "none";
+          }
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener("click", function (e) {
+          if (
+            !filterBtn.contains(e.target) &&
+            !filterDropdown.contains(e.target)
+          ) {
+            filterDropdown.style.display = "none";
+          }
+          if (!sortBtn.contains(e.target) && !sortDropdown.contains(e.target)) {
+            sortDropdown.style.display = "none";
+          }
+        });
+
+        // Test complex button - opens main app
+        testComplexBtn.addEventListener("click", function () {
+          log("🔄 Opening main SimulateAI app for comparison...", "info");
+          window.open("/app.html", "_blank");
+        });
+
+        log("✅ Simple test initialized successfully!", "success");
+        log("💡 Try clicking the buttons above", "info");
+      }
+
+      // Initialize when DOM is ready
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initSimpleTest);
+      } else {
+        initSimpleTest();
+      }
+    </script>
+  </body>
+</html>

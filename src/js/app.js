@@ -1931,8 +1931,12 @@ class AIEthicsApp {
   initializeMainGrid() {
     try {
       AppDebug.log("Attempting to initialize MainGrid...");
-      this.categoryGrid = new MainGrid();
-      AppDebug.log("Main grid initialized successfully");
+
+      // Add a small delay to ensure DOM is fully ready
+      setTimeout(() => {
+        this.categoryGrid = new MainGrid();
+        AppDebug.log("Main grid initialized successfully");
+      }, 100);
     } catch (error) {
       AppDebug.error("Failed to initialize main grid:", error);
       // Fallback to legacy simulation loading if category grid fails

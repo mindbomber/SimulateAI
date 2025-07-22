@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simplified Tooltip Test - RadarChart</title>
+    <link rel="stylesheet" href="src/styles/radar-chart.css" />
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 20px;
+        background: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .modal-test {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        z-index: 1050;
+        display: none;
+      }
+      .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1040;
+        display: none;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 10px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      .info {
+        background: #e3f2fd;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        border-left: 4px solid #2196f3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="info">
+      <h2>✅ Simplified Tooltip System Test</h2>
+      <p><strong>What was fixed:</strong></p>
+      <ul>
+        <li>
+          ❌ Removed complex external tooltip system with instance-specific IDs
+        </li>
+        <li>❌ Removed chartjs-tooltip-blur-${instanceId} complications</li>
+        <li>❌ Removed MutationObserver for tooltip z-index hacks</li>
+        <li>✅ Using Chart.js built-in tooltips with clean CSS styling</li>
+        <li>✅ Backdrop blur effect via CSS backdrop-filter</li>
+        <li>✅ Proper modal z-index handling</li>
+      </ul>
+    </div>
+
+    <div class="test-container">
+      <h3>Standard Chart (z-index: 1000)</h3>
+      <div id="standard-radar-chart"></div>
+      <p>Hover over data points to see simplified tooltips</p>
+    </div>
+
+    <div class="test-container">
+      <button onclick="showModal()">Test Modal Chart (z-index: 1060)</button>
+      <p>This tests tooltip visibility above modal backdrop</p>
+    </div>
+
+    <!-- Modal Test -->
+    <div class="modal-backdrop" id="modal-backdrop"></div>
+    <div class="modal-test scenario-modal" id="modal-test">
+      <h3>Modal Radar Chart</h3>
+      <div id="modal-radar-chart"></div>
+      <p>Tooltips should appear above modal (z-index: 1060)</p>
+      <button onclick="hideModal()">Close Modal</button>
+    </div>
+
+    <!-- Load dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module">
+      import RadarChart from "./src/js/components/radar-chart.js";
+
+      // Initialize configuration first
+      await RadarChart.initializeAll();
+
+      // Create standard chart
+      const standardChart = new RadarChart("standard-radar-chart", {
+        context: "hero-demo",
+        width: 300,
+        height: 300,
+        title: "Standard Chart",
+      });
+
+      // Wait for initialization and apply demo pattern
+      await standardChart.initializationPromise;
+      standardChart.applyDemoPattern("utilitarian");
+
+      // Global modal functions
+      window.showModal = async function () {
+        document.getElementById("modal-backdrop").style.display = "block";
+        document.getElementById("modal-test").style.display = "block";
+
+        // Create modal chart
+        const modalChart = new RadarChart("modal-radar-chart", {
+          context: "scenario",
+          width: 250,
+          height: 250,
+          title: "Modal Chart",
+        });
+
+        await modalChart.initializationPromise;
+        modalChart.applyDemoPattern("deontological");
+        window.modalChart = modalChart;
+      };
+
+      window.hideModal = function () {
+        document.getElementById("modal-backdrop").style.display = "none";
+        document.getElementById("modal-test").style.display = "none";
+
+        // Clean up modal chart
+        if (window.modalChart) {
+          window.modalChart.destroy();
+          window.modalChart = null;
+        }
+      };
+
+      console.log("✅ Simplified tooltip system test ready");
+      console.log("🎯 Hover over chart points to test tooltips");
+      console.log('🎯 Click "Test Modal Chart" to test z-index handling');
+    </script>
+  </body>
+</html>

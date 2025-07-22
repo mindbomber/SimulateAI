@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Debug Container Selection</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: #f5f5f5;
+      }
+      .debug-info {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .debug-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #333;
+      }
+      .debug-result {
+        font-family: monospace;
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 5px 0;
+        border-left: 4px solid #007bff;
+      }
+      .error {
+        border-left-color: #dc3545;
+        background: #f8d7da;
+      }
+      .success {
+        border-left-color: #28a745;
+        background: #d4edda;
+      }
+      .warning {
+        border-left-color: #ffc107;
+        background: #fff3cd;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔍 Container Selection Debug</h1>
+
+    <div class="debug-info">
+      <div class="debug-title">Testing Main Grid Container Selection</div>
+      <div id="results"></div>
+    </div>
+
+    <script>
+      function log(message, type = "info") {
+        const results = document.getElementById("results");
+        const div = document.createElement("div");
+        div.className = `debug-result ${type}`;
+        div.textContent = message;
+        results.appendChild(div);
+      }
+
+      // Test 1: Check if main grid container exists
+      log("=== Testing Container Selection ===");
+
+      const mainGridContainer = document.querySelector("#main-grid");
+      if (mainGridContainer) {
+        log("✅ Main grid container found: #main-grid", "success");
+      } else {
+        log("❌ Main grid container NOT found: #main-grid", "error");
+      }
+
+      // Test 2: Check for scenarios-grid
+      const scenariosGrid = document.querySelector(
+        '.scenarios-grid[data-view="scenario"]',
+      );
+      if (scenariosGrid) {
+        log(
+          '✅ Scenarios grid found: .scenarios-grid[data-view="scenario"]',
+          "success",
+        );
+        log(`   - Display style: ${scenariosGrid.style.display}`, "info");
+        log(`   - Classes: ${scenariosGrid.className}`, "info");
+        log(
+          `   - Data-view attribute: ${scenariosGrid.getAttribute("data-view")}`,
+          "info",
+        );
+      } else {
+        log(
+          '❌ Scenarios grid NOT found: .scenarios-grid[data-view="scenario"]',
+          "error",
+        );
+      }
+
+      // Test 3: Check for scenario-controls-toolbar
+      const toolbar = document.querySelector(".scenario-controls-toolbar");
+      if (toolbar) {
+        log(
+          "✅ Scenario controls toolbar found: .scenario-controls-toolbar",
+          "success",
+        );
+      } else {
+        log(
+          "❌ Scenario controls toolbar NOT found: .scenario-controls-toolbar",
+          "error",
+        );
+      }
+
+      // Test 4: Check for filter button
+      const filterBtn = document.querySelector(".filter-btn");
+      if (filterBtn) {
+        log("✅ Filter button found: .filter-btn", "success");
+        log(`   - Button text: "${filterBtn.textContent.trim()}"`, "info");
+        log(
+          `   - Parent container: ${filterBtn.parentElement.className}`,
+          "info",
+        );
+      } else {
+        log("❌ Filter button NOT found: .filter-btn", "error");
+      }
+
+      // Test 5: Check for sort button
+      const sortBtn = document.querySelector(".sort-btn");
+      if (sortBtn) {
+        log("✅ Sort button found: .sort-btn", "success");
+        log(`   - Button text: "${sortBtn.textContent.trim()}"`, "info");
+        log(
+          `   - Parent container: ${sortBtn.parentElement.className}`,
+          "info",
+        );
+      } else {
+        log("❌ Sort button NOT found: .sort-btn", "error");
+      }
+
+      // Test 6: Check if buttons are inside scenarios-grid
+      if (scenariosGrid && filterBtn) {
+        const filterInScenarios = scenariosGrid.querySelector(".filter-btn");
+        if (filterInScenarios) {
+          log("✅ Filter button is inside scenarios-grid", "success");
+        } else {
+          log(
+            "⚠️ Filter button exists but NOT inside scenarios-grid",
+            "warning",
+          );
+        }
+      }
+
+      if (scenariosGrid && sortBtn) {
+        const sortInScenarios = scenariosGrid.querySelector(".sort-btn");
+        if (sortInScenarios) {
+          log("✅ Sort button is inside scenarios-grid", "success");
+        } else {
+          log("⚠️ Sort button exists but NOT inside scenarios-grid", "warning");
+        }
+      }
+
+      // Test 7: Test button click directly
+      log("=== Testing Button Click ===");
+
+      if (filterBtn) {
+        log("🖱️ Testing direct filter button click...", "info");
+        filterBtn.addEventListener("click", function (e) {
+          log(`✅ Filter button click detected! Event: ${e.type}`, "success");
+          log(`   - Target: ${e.target.tagName}.${e.target.className}`, "info");
+          log(
+            `   - Current target: ${e.currentTarget.tagName}.${e.currentTarget.className}`,
+            "info",
+          );
+        });
+      }
+
+      if (sortBtn) {
+        log("🖱️ Testing direct sort button click...", "info");
+        sortBtn.addEventListener("click", function (e) {
+          log(`✅ Sort button click detected! Event: ${e.type}`, "success");
+          log(`   - Target: ${e.target.tagName}.${e.target.className}`, "info");
+          log(
+            `   - Current target: ${e.currentTarget.tagName}.${e.currentTarget.className}`,
+            "info",
+          );
+        });
+      }
+
+      // Test 8: Simulate the main-grid.js selection logic
+      log("=== Simulating MainGrid Selection Logic ===");
+
+      const container = document.querySelector("#main-grid");
+      if (container) {
+        const categoryContainer = container.querySelector(
+          '.categories-grid[data-view="category"]',
+        );
+        const scenarioContainer = container.querySelector(
+          '.scenarios-grid[data-view="scenario"]',
+        );
+
+        if (categoryContainer) {
+          log("✅ Category container found via MainGrid logic", "success");
+        } else {
+          log("❌ Category container NOT found via MainGrid logic", "error");
+        }
+
+        if (scenarioContainer) {
+          log("✅ Scenario container found via MainGrid logic", "success");
+
+          // Test finding buttons within scenario container
+          const filterBtnInContainer =
+            scenarioContainer.querySelector(".filter-btn");
+          const sortBtnInContainer =
+            scenarioContainer.querySelector(".sort-btn");
+
+          if (filterBtnInContainer) {
+            log("✅ Filter button found within scenario container", "success");
+          } else {
+            log(
+              "❌ Filter button NOT found within scenario container",
+              "error",
+            );
+          }
+
+          if (sortBtnInContainer) {
+            log("✅ Sort button found within scenario container", "success");
+          } else {
+            log("❌ Sort button NOT found within scenario container", "error");
+          }
+        } else {
+          log("❌ Scenario container NOT found via MainGrid logic", "error");
+        }
+      }
+
+      log("=== Debug Complete ===");
+      log(
+        "Click the filter or sort buttons above to test if events are detected.",
+        "info",
+      );
+    </script>
+  </body>
+</html>

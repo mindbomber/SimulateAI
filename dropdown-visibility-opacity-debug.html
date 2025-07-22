@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dropdown Visibility & Opacity Debug Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .status {
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .warning {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+      .info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+      .test-button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      .test-button:hover {
+        background: #0056b3;
+      }
+      .fix-item {
+        background: #e8f5e8;
+        border-left: 4px solid #28a745;
+        padding: 10px;
+        margin: 5px 0;
+      }
+      .code-block {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        padding: 10px;
+        font-family: "Courier New", monospace;
+        margin: 10px 0;
+        font-size: 12px;
+      }
+      .debug-list {
+        background: #fff;
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .debug-list li {
+        margin: 5px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🔧 Dropdown Visibility & Opacity Debug</h1>
+      <p><strong>Advanced Debugging Applied!</strong></p>
+
+      <div class="status success">
+        ✅ <strong>Enhanced CSS Rules Added:</strong> Multiple fallback
+        selectors to ensure dropdown visibility regardless of JavaScript state.
+      </div>
+
+      <h2>🐛 The Visibility/Opacity Issue:</h2>
+
+      <div class="status info">
+        <strong>Current State:</strong>
+        <br />• ✅ display: block !important (element takes layout space)
+        <br />• ❌ visibility: hidden (element is not painted) <br />• ❌
+        opacity: 0 (element is transparent) <br />• 🔄 transition: 0.15s
+        ease-in-out (animation in progress)
+      </div>
+
+      <h2>🛠️ Enhanced CSS Rules Applied:</h2>
+
+      <div class="fix-item">
+        <strong>1. Primary Rule (aria-expanded):</strong>
+        <div class="code-block">
+          .filter-btn[aria-expanded="true"] + .filter-dropdown { opacity: 1
+          !important; visibility: visible !important; pointer-events: auto
+          !important; }
+        </div>
+      </div>
+
+      <div class="fix-item">
+        <strong>2. Alternative Class Rule (.active):</strong>
+        <div class="code-block">
+          .filter-btn.active + .filter-dropdown { opacity: 1 !important;
+          visibility: visible !important; pointer-events: auto !important; }
+        </div>
+      </div>
+
+      <div class="fix-item">
+        <strong>3. Focus State Rule:</strong>
+        <div class="code-block">
+          .filter-btn:focus + .filter-dropdown { opacity: 1 !important;
+          visibility: visible !important; pointer-events: auto !important; }
+        </div>
+      </div>
+
+      <div class="fix-item">
+        <strong>4. Emergency Hover Rule (for testing):</strong>
+        <div class="code-block">
+          .filter-container:hover .filter-dropdown { opacity: 1 !important;
+          visibility: visible !important; pointer-events: auto !important; }
+        </div>
+      </div>
+
+      <h2>🧪 Testing Strategy:</h2>
+
+      <div class="debug-list">
+        <h3>Browser DevTools Debugging:</h3>
+        <ol>
+          <li>
+            <strong>Inspect Filter Button:</strong> Right-click → Inspect
+            Element
+          </li>
+          <li>
+            <strong>Check aria-expanded:</strong> Look for
+            <code>aria-expanded="true"</code> attribute
+          </li>
+          <li>
+            <strong>Test Hover:</strong> Hover over filter container - dropdown
+            should appear immediately
+          </li>
+          <li>
+            <strong>Console Test:</strong> Run JavaScript to manually toggle
+            dropdown
+          </li>
+          <li>
+            <strong>CSS Override Test:</strong> Manually set styles in DevTools
+          </li>
+        </ol>
+      </div>
+
+      <div class="status warning">
+        <strong>🔍 Debugging Instructions:</strong>
+        <br />1. <strong>Test Hover First:</strong> The emergency hover rule
+        should show dropdowns immediately when you hover over the filter/sort
+        container areas <br />2. <strong>Check JavaScript:</strong> If hover
+        works but clicking doesn't, the issue is JavaScript not setting
+        aria-expanded <br />3. <strong>Inspect Button State:</strong> Use
+        DevTools to verify if aria-expanded is being toggled <br />4.
+        <strong>Manual Toggle Test:</strong> Use browser console to manually set
+        button attributes
+      </div>
+
+      <h2>🎯 Quick Console Tests:</h2>
+
+      <div class="code-block">
+        <strong>Manual JavaScript Tests (paste in browser console):</strong>
+        <pre>
+// Test 1: Find and manually show dropdown
+const filterBtn = document.querySelector('.filter-btn');
+if (filterBtn) {
+  filterBtn.setAttribute('aria-expanded', 'true');
+  console.log('✅ Set aria-expanded=true on filter button');
+} else {
+  console.log('❌ Filter button not found');
+}
+
+// Test 2: Add active class
+if (filterBtn) {
+  filterBtn.classList.add('active');
+  console.log('✅ Added .active class to filter button');
+}
+
+// Test 3: Check dropdown visibility
+const dropdown = document.querySelector('.filter-dropdown');
+if (dropdown) {
+  const styles = getComputedStyle(dropdown);
+  console.log('Dropdown styles:', {
+    display: styles.display,
+    visibility: styles.visibility,
+    opacity: styles.opacity,
+    transform: styles.transform
+  });
+}</pre
+        >
+      </div>
+
+      <button class="test-button" onclick="openMainApp()">
+        🌐 Test in Main App
+      </button>
+      <button class="test-button" onclick="showConsoleCommands()">
+        📋 Copy Console Commands
+      </button>
+
+      <div id="console-commands" style="display: none; margin-top: 20px">
+        <h3>📋 Copy These Console Commands:</h3>
+        <textarea
+          readonly
+          style="width: 100%; height: 200px; font-family: monospace"
+        >
+// Dropdown Debug Commands - Paste in Browser Console
+
+// 1. Find elements
+const filterBtn = document.querySelector('.filter-btn');
+const sortBtn = document.querySelector('.sort-btn');
+const filterDropdown = document.querySelector('.filter-dropdown');
+const sortDropdown = document.querySelector('.sort-dropdown');
+
+console.log('Elements found:', {
+  filterBtn: !!filterBtn,
+  sortBtn: !!sortBtn,
+  filterDropdown: !!filterDropdown,
+  sortDropdown: !!sortDropdown
+});
+
+// 2. Test manual activation
+if (filterBtn && filterDropdown) {
+  filterBtn.setAttribute('aria-expanded', 'true');
+  filterBtn.classList.add('active');
+  console.log('✅ Manually activated filter dropdown');
+}
+
+// 3. Check computed styles
+if (filterDropdown) {
+  const styles = getComputedStyle(filterDropdown);
+  console.log('Filter dropdown computed styles:', {
+    display: styles.display,
+    visibility: styles.visibility,
+    opacity: styles.opacity,
+    transform: styles.transform,
+    pointerEvents: styles.pointerEvents
+  });
+}
+
+// 4. Force visibility (emergency override)
+if (filterDropdown) {
+  filterDropdown.style.cssText = 'opacity: 1 !important; visibility: visible !important; pointer-events: auto !important;';
+  console.log('🚨 Emergency override applied to filter dropdown');
+}
+            </textarea
+        >
+      </div>
+    </div>
+
+    <script>
+      function openMainApp() {
+        window.open("/", "_blank");
+        alert(
+          "✅ Main app opened!\n\n1. Navigate to scenario browser\n2. Try hovering over filter/sort areas first\n3. If hover shows dropdowns, the CSS is working\n4. If clicking doesn't work, it's a JavaScript issue",
+        );
+      }
+
+      function showConsoleCommands() {
+        const commands = document.getElementById("console-commands");
+        commands.style.display =
+          commands.style.display === "none" ? "block" : "none";
+      }
+    </script>
+  </body>
+</html>

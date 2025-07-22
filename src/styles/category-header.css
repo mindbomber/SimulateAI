@@ -376,6 +376,55 @@
   }
 }
 
+/* ===== SCENARIO HOVER CATEGORY HEADER ===== */
+.scenario-hover-category-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background: rgb(255 255 255 / 98%);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 15%);
+  border: 1px solid var(--color-gray-200);
+  border-bottom: none;
+  transform: translateY(-100%);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  opacity: 0;
+  transition:
+    transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    opacity 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+    box-shadow 0.3s ease-out;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.scenario-card-wrapper:hover .scenario-hover-category-header,
+.scenario-card-wrapper:focus-within .scenario-hover-category-header {
+  transform: translateY(0);
+  opacity: 1;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 20%);
+  pointer-events: auto;
+}
+
+[data-theme="dark"] .scenario-hover-category-header {
+  background: rgb(31 41 55 / 98%);
+  border-color: var(--color-gray-600);
+}
+
+/* Touch device support for scenario hover category headers */
+@media (hover: none) and (pointer: coarse) {
+  .scenario-card-wrapper:active .scenario-hover-category-header,
+  .scenario-card-wrapper:focus .scenario-hover-category-header {
+    transform: translateY(0);
+    opacity: 1;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 20%);
+    pointer-events: auto;
+  }
+}
+
 /* ===== PROGRESS RING TOOLTIP ===== */
 .progress-ring-tooltip {
   background: var(--color-gray-900);
@@ -447,7 +496,57 @@
   border-bottom-color: var(--color-gray-800);
 }
 
+/* ===== SCENARIO VIEW OVERRIDES ===== */
+/* Hide specific elements in scenario view */
+.scenarios-grid[data-view="scenario"] .category-time,
+.scenarios-grid[data-view="scenario"] .category-progress-text,
+.scenarios-grid[data-view="scenario"] .category-difficulty,
+.scenarios-grid[data-view="scenario"] .category-description {
+  display: none !important;
+}
+
 /* ===== RESPONSIVE DESIGN ===== */
+/* Mobile responsive overrides for category header */
+@media (width <= 768px) {
+  .category-header {
+    padding: var(--spacing-6);
+    flex-direction: column;
+    gap: var(--spacing-4);
+    text-align: center;
+    position: relative; /* Ensure absolute positioning context */
+  }
+
+  .category-title-group {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-4);
+    position: static; /* Remove relative positioning from title group */
+  }
+
+  .category-icon-large {
+    width: 60px;
+    height: 60px;
+    font-size: 30px;
+    margin: 0 auto; /* Center the icon */
+  }
+
+  .category-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-2);
+    margin-top: var(--spacing-2);
+  }
+
+  .category-meta-items {
+    align-self: center;
+    justify-content: center;
+  }
+
+  .category-title {
+    font-size: var(--font-size-xl);
+  }
+}
+
 /* Mobile-specific tooltip adjustments */
 @media (width <= 768px) {
   .progress-ring-tooltip {
@@ -538,24 +637,35 @@
     background: #fff;
     color: #000;
   }
+
+  .scenario-hover-category-header {
+    border-width: 2px;
+  }
 }
 
 /* ===============================================
    CATEGORY HEADER COMPONENT CONSOLIDATION COMPLETE
    ===============================================
    
-   This file contains ALL styles for the CategoryHeader component:
+   This file contains ALL styles for category header related components:
    
-   ✅ Category header container and layout
-   ✅ Category title, description, and metadata
-   ✅ Difficulty badges and progress text
-   ✅ Progress ring with SVG styling
-   ✅ Badge alert pulse animations
-   ✅ Progress ring tooltips
-   ✅ Dark theme support
-   ✅ Responsive design
-   ✅ Accessibility features
+   ✅ Category header container and layout (.category-header)
+   ✅ Category title group and info (.category-title-group, .category-info)
+   ✅ Category title, description, and metadata (.category-title, .category-description, .category-meta)
+   ✅ Difficulty badges and progress text (.category-difficulty, .category-time, .category-progress-text)
+   ✅ Progress ring with SVG styling (.category-progress-ring)
+   ✅ Badge alert pulse animations (.pulse-for-badge, .badge-alert)
+   ✅ Progress ring tooltips (.progress-ring-tooltip)
+   ✅ Scenario hover category headers (.scenario-hover-category-header)
+   ✅ Dark theme support ([data-theme="dark"])
+   ✅ Responsive design (mobile/tablet breakpoints)
+   ✅ Touch device support (hover: none)
+   ✅ Accessibility features (reduced motion, high contrast)
    
-   This establishes category-header.css as the dedicated stylesheet
-   for the CategoryHeader JavaScript component.
+   CONSOLIDATED FROM:
+   - category-grid.css: Responsive overrides and dark mode styles
+   - scenario-browser-component.css: .scenario-hover-category-header styles
+   
+   This establishes category-header.css as the single source of truth
+   for ALL category header related styling across the application.
 */

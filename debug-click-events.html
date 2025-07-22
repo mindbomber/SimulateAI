@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Click Events</title>
+</head>
+<body>
+    <h1>Debugging Toolbar Click Events</h1>
+    <div id="results"></div>
+
+    <script>
+        function debugToolbarEvents() {
+            console.log("🔍 Starting click event debugging...");
+            
+            const results = document.getElementById('results');
+            
+            function addResult(message) {
+                console.log(message);
+                const div = document.createElement('div');
+                div.textContent = message;
+                results.appendChild(div);
+            }
+            
+            // Find the toolbar elements
+            const filterBtn = document.querySelector('.filter-btn');
+            const sortBtn = document.querySelector('.sort-btn');
+            const filterDropdown = document.querySelector('.filter-dropdown');
+            const sortDropdown = document.querySelector('.sort-dropdown');
+            
+            addResult("=== Element Discovery ===");
+            addResult(`Filter Button: ${filterBtn ? 'FOUND' : 'NOT FOUND'}`);
+            addResult(`Sort Button: ${sortBtn ? 'FOUND' : 'NOT FOUND'}`);
+            addResult(`Filter Dropdown: ${filterDropdown ? 'FOUND' : 'NOT FOUND'}`);
+            addResult(`Sort Dropdown: ${sortDropdown ? 'FOUND' : 'NOT FOUND'}`);
+            
+            if (filterBtn) {
+                addResult(`Filter Button Classes: ${filterBtn.className}`);
+                addResult(`Filter Button HTML: ${filterBtn.outerHTML.substring(0, 200)}...`);
+                
+                // Check for existing event listeners
+                const listeners = getEventListeners ? getEventListeners(filterBtn) : 'Cannot detect listeners';
+                addResult(`Filter Button Event Listeners: ${JSON.stringify(listeners)}`);
+            }
+            
+            if (sortBtn) {
+                addResult(`Sort Button Classes: ${sortBtn.className}`);
+                addResult(`Sort Button HTML: ${sortBtn.outerHTML.substring(0, 200)}...`);
+                
+                // Check for existing event listeners
+                const listeners = getEventListeners ? getEventListeners(sortBtn) : 'Cannot detect listeners';
+                addResult(`Sort Button Event Listeners: ${JSON.stringify(listeners)}`);
+            }
+            
+            // Add manual click listeners to test
+            addResult("\n=== Adding Test Click Listeners ===");
+            
+            if (filterBtn) {
+                filterBtn.addEventListener('click', function(e) {
+                    addResult(`🖱️ MANUAL FILTER CLICK DETECTED! Event: ${e.type}`);
+                    addResult(`Event target: ${e.target.tagName}.${e.target.className}`);
+                    addResult(`Event currentTarget: ${e.currentTarget.tagName}.${e.currentTarget.className}`);
+                });
+                addResult("✅ Manual filter click listener added");
+            }
+            
+            if (sortBtn) {
+                sortBtn.addEventListener('click', function(e) {
+                    addResult(`🖱️ MANUAL SORT CLICK DETECTED! Event: ${e.type}`);
+                    addResult(`Event target: ${e.target.tagName}.${e.target.className}`);
+                    addResult(`Event currentTarget: ${e.currentTarget.tagName}.${e.currentTarget.className}`);
+                });
+                addResult("✅ Manual sort click listener added");
+            }
+            
+            // Check if MainGrid instance exists
+            addResult("\n=== MainGrid Instance Check ===");
+            const mainGridInstance = window.mainGrid || window.grid || window.mainGridInstance;
+            addResult(`MainGrid instance found: ${mainGridInstance ? 'YES' : 'NO'}`);
+            
+            if (mainGridInstance) {
+                addResult(`MainGrid current view: ${mainGridInstance.currentView}`);
+                addResult(`MainGrid methods available: ${Object.getOwnPropertyNames(Object.getPrototypeOf(mainGridInstance)).join(', ')}`);
+            }
+            
+            addResult("\n✅ Debug setup complete. Try clicking the filter/sort buttons now.");
+        }
+        
+        // Wait for the page to load and then run debug
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', debugToolbarEvents);
+        } else {
+            debugToolbarEvents();
+        }
+    </script>
+</body>
+</html>
+</script>
+</body>
+</html>

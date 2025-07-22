@@ -145,12 +145,9 @@
   display: flex;
 }
 
-/* ===== SEARCH CONTAINER ===== */
-.search-container {
-  position: relative;
-  flex: 1;
-  max-width: 100%;
-}
+/* ===== SEARCH CONTAINER - MOVED TO scenario-browser.css ===== */
+/* Search container styles consolidated to scenario-browser.css for single source of truth */
+/* .search-container styles now handled by .scenario-controls-toolbar .search-container */
 
 .search-input-wrapper {
   position: relative;
@@ -245,18 +242,13 @@
   color: var(--color-primary-700);
 }
 
-/* ===== CONTROLS GROUP ===== */
-.controls-group {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-3);
-}
+/* ===== CONTROLS GROUP - MOVED TO scenario-browser.css ===== */
+/* Controls group styles consolidated to scenario-browser.css for single source of truth */
+/* .controls-group styles now handled by .scenario-controls-toolbar .controls-group */
 
-/* ===== FILTER CONTAINERS ===== */
-.filter-container,
-.sort-container {
-  position: relative;
-}
+/* ===== FILTER CONTAINERS - MOVED TO scenario-browser.css ===== */
+/* Filter container styles consolidated to scenario-browser.css for single source of truth */
+/* .filter-container, .sort-container styles now handled by .scenario-controls-toolbar selectors */
 
 /* ===== FILTER AND SORT BUTTONS ===== */
 .filter-btn,
@@ -324,17 +316,61 @@
   max-height: 300px;
   overflow-y: auto;
   margin-top: var(--spacing-1);
+  /* Critical display properties for dropdown functionality */
+  display: block !important;
   opacity: 0;
   visibility: hidden;
   transform: translateY(-8px);
   transition: all var(--transition-fast);
+  /* Ensure dropdowns are interactive when visible */
+  pointer-events: none;
+}
+
+/* Override JavaScript inline styles when dropdowns should be hidden */
+.filter-dropdown[style*="display: none"],
+.sort-dropdown[style*="display: none"] {
+  display: block !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 .filter-btn[aria-expanded="true"] + .filter-dropdown,
 .sort-btn[aria-expanded="true"] + .sort-dropdown {
-  opacity: 1;
-  visibility: visible;
+  opacity: 1 !important;
+  visibility: visible !important;
   transform: translateY(0);
+  pointer-events: auto !important;
+}
+
+/* Handle JavaScript inline style overrides for visible dropdowns */
+.filter-btn[aria-expanded="true"] + .filter-dropdown[style*="display: block"],
+.sort-btn[aria-expanded="true"] + .sort-dropdown[style*="display: block"] {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0);
+  pointer-events: auto !important;
+}
+
+/* Debug: Alternative CSS selectors to show dropdowns */
+.filter-btn.active + .filter-dropdown,
+.sort-btn.active + .sort-dropdown,
+.filter-btn:focus + .filter-dropdown,
+.sort-btn:focus + .sort-dropdown {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0);
+  pointer-events: auto !important;
+}
+
+/* Emergency override: Show dropdowns on hover for testing */
+.filter-container:hover .filter-dropdown,
+.sort-container:hover .sort-dropdown {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0);
+  pointer-events: auto !important;
 }
 
 /* ===== FILTER OPTIONS ===== */

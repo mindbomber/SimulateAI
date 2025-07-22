@@ -347,34 +347,7 @@
     padding: 0 var(--spacing-3);
   }
 
-  .category-header {
-    padding: var(--spacing-6);
-    flex-direction: column;
-    gap: var(--spacing-4);
-    text-align: center;
-    position: relative; /* Ensure absolute positioning context */
-  }
-
-  .category-title-group {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-4);
-    position: static; /* Remove relative positioning from title group */
-  }
-
-  .category-icon-large {
-    width: 60px;
-    height: 60px;
-    font-size: 30px;
-    margin: 0 auto; /* Center the icon */
-  }
-
-  .category-meta {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-2);
-    margin-top: var(--spacing-2);
-  }
+  /* Category header responsive styles moved to category-header.css */
 
   .category-meta-items {
     align-self: center;
@@ -477,12 +450,8 @@
 
 /* Search Input Styles - moved to scenario-browser.css for consolidation */
 
-/* Controls Group */
-.controls-group {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-3);
-}
+/* Controls Group - MOVED TO scenario-browser.css for consolidation */
+/* .controls-group styles now handled by .scenario-controls-toolbar .controls-group */
 
 /* Filter and Sort Containers - moved to scenario-browser.css for consolidation */
 
@@ -564,18 +533,7 @@ body.dark-mode .category-section {
   border: 1px solid var(--theme-border);
 }
 
-body.dark-mode .category-header {
-  background: var(--theme-bg-secondary);
-  border-bottom: 1px solid var(--theme-border);
-}
-
-body.dark-mode .category-title {
-  color: var(--theme-text-primary);
-}
-
-body.dark-mode .category-description {
-  color: var(--theme-text-secondary);
-}
+/* Dark mode category header styles moved to category-header.css */
 
 /* Scenario cards */
 body.dark-mode .scenario-card {

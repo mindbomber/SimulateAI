@@ -39,6 +39,7 @@ import {
   validateConfig,
   getEnterpriseConstants,
 } from "../utils/radar-config-loader.js";
+import chartEventCoordinator from "../constants/chart-event-coordinator.js";
 
 export default class RadarChart {
   static instanceCount = 0;
@@ -226,6 +227,13 @@ export default class RadarChart {
 
     // Track all instances for enterprise monitoring
     RadarChart.allInstances.add(this);
+
+    // Register with event coordinator to prevent conflicts with other chart systems
+    chartEventCoordinator.registerElement(
+      this.container,
+      "radar-chart.js",
+      this,
+    );
 
     // Initialize enterprise monitoring intervals
     this.healthCheckInterval = null;
@@ -482,8 +490,10 @@ export default class RadarChart {
       logger.info("RadarChart", "Chart created successfully");
 
       // Apply context-specific configuration
-      this._applyContextSpecificConfiguration(); // Force tooltip z-index fix for Chart.js
-      this._setupTooltipZIndexFix();
+      this._applyContextSpecificConfiguration();
+
+      // SIMPLIFIED: No complex tooltip z-index setup needed with built-in tooltips
+      // Chart.js handles tooltip positioning and z-index automatically
 
       // REMOVED: Mobile tooltip dismissal setup moved to _attachEventListenersAfterRender()
       // This prevents interference with initial chart rendering
@@ -678,114 +688,22 @@ export default class RadarChart {
       },
     };
 
-    // Add blur effect to tooltip background
-    baseConfig.options.plugins.tooltip.external = (context) => {
-      // Create unique tooltip ID for this chart instance
-      const tooltipId = `chartjs-tooltip-blur-${this.instanceId}`;
-
-      // Get or create tooltip element specific to this chart instance
-      let tooltipEl = document.getElementById(tooltipId);
-
-      if (!tooltipEl) {
-        tooltipEl = document.createElement("div");
-        tooltipEl.id = tooltipId;
-        tooltipEl.style.cssText = `
-          position: absolute;
-          background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(8px);
-          -webkit-backdrop-filter: blur(8px);
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          border-radius: 8px;
-          padding: 12px;
-          pointer-events: none;
-          z-index: 1000;
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          font-size: 12px;
-          color: #2d3748;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-          transition: opacity 0.2s ease;
-        `;
-        document.body.appendChild(tooltipEl);
-
-        // Store reference for cleanup during destroy
-        this.tooltipElement = tooltipEl;
-      }
-
-      const tooltip = context.tooltip;
-
-      if (tooltip.opacity === 0) {
-        tooltipEl.style.opacity = 0;
-        return;
-      }
-
-      // Generate tooltip content manually since built-in tooltips are disabled
-      let innerHtml = "";
-
-      // Get the active data point info
-      if (tooltip.dataPoints && tooltip.dataPoints.length > 0) {
-        const dataPoint = tooltip.dataPoints[0];
-        const dataIndex = dataPoint.dataIndex;
-
-        // Safety check for dataIndex
-        if (typeof dataIndex === "number" && dataIndex >= 0) {
-          const axisKeys = Object.keys(this.ETHICAL_AXES);
-
-          if (dataIndex < axisKeys.length) {
-            const axisKey = axisKeys[dataIndex];
-            const axisInfo = this.ETHICAL_AXES[axisKey];
-            const score = dataPoint.parsed.r;
-            const impact = getImpactDescription(config, score);
-
-            // Title
-            innerHtml += `<div style="font-weight: bold; margin-bottom: 4px; color: #1a202c;">${axisInfo.label}</div>`;
-
-            // Score info
-            innerHtml += `<div style="margin: 2px 0;">Score: ${score}/${config.scoring.maxScore} (${impact})</div>`;
-            innerHtml += `<div style="margin: 2px 0;"></div>`;
-
-            // Description
-            innerHtml += `<div style="margin: 2px 0;">${axisInfo.description}</div>`;
-          } else {
-            innerHtml = `<div style="color: #666;">Ethical Analysis</div>`;
-          }
-        } else {
-          innerHtml = `<div style="color: #666;">Ethical Analysis</div>`;
-        }
-      } else {
-        innerHtml = `<div style="color: #666;">Ethical Analysis</div>`;
-      }
-
-      tooltipEl.innerHTML = innerHtml;
-
-      const canvas = context.chart.canvas;
-      const canvasRect = canvas.getBoundingClientRect();
-
-      // Position tooltip
-      tooltipEl.style.opacity = 1;
-      tooltipEl.style.left =
-        canvasRect.left + window.scrollX + tooltip.caretX + "px";
-      tooltipEl.style.top =
-        canvasRect.top + window.scrollY + tooltip.caretY + "px";
-    };
-
-    // CRITICAL FIX: Completely disable built-in tooltips when using external tooltip
-    // This prevents dual tooltip display (built-in + external)
-    baseConfig.options.plugins.tooltip.enabled = false;
-
-    // Additional tooltip configuration to ensure external function works
+    // SIMPLIFIED: Use Chart.js built-in tooltips with proper styling via CSS
+    // Enable built-in tooltips - much simpler and more reliable
+    baseConfig.options.plugins.tooltip.enabled = true;
     baseConfig.options.plugins.tooltip.intersect = false;
     baseConfig.options.plugins.tooltip.position = "nearest";
 
-    // Ensure external tooltip function is preserved and working
-    if (typeof baseConfig.options.plugins.tooltip.external === "function") {
-      // External function is already set above, keep it
-      logger.info(
-        "RadarChart",
-        "External tooltip function preserved, built-in tooltips disabled",
-      );
-    } else {
-      logger.warn("RadarChart", "External tooltip function missing");
-    }
+    // Style tooltips via CSS classes instead of complex external functions
+    baseConfig.options.plugins.tooltip.displayColors = false;
+    baseConfig.options.plugins.tooltip.backgroundColor =
+      "rgba(255, 255, 255, 0.95)";
+    baseConfig.options.plugins.tooltip.titleColor = "#1a202c";
+    baseConfig.options.plugins.tooltip.bodyColor = "#2d3748";
+    baseConfig.options.plugins.tooltip.borderColor = "rgba(156, 163, 175, 0.3)";
+    baseConfig.options.plugins.tooltip.borderWidth = 1;
+    baseConfig.options.plugins.tooltip.cornerRadius = 8;
+    baseConfig.options.plugins.tooltip.padding = 12;
 
     // Set mobile breakpoint for tooltips
     if (window.innerWidth <= config.chart.mobileBreakpoint) {
@@ -1286,74 +1204,6 @@ export default class RadarChart {
   }
 
   /**
-   * Setup aggressive tooltip z-index fix for Chart.js tooltips
-   * This ensures tooltips appear above modal content and other overlays
-   * @private
-   */
-  _setupTooltipZIndexFix() {
-    // Create a MutationObserver to watch for Chart.js tooltip elements
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        mutation.addedNodes.forEach((node) => {
-          if (node.nodeType === 1) {
-            // Element node
-            // Check for Chart.js tooltip elements
-            if (
-              (node.id && node.id.includes("chartjs-tooltip")) ||
-              (node.className && node.className.includes("chartjs-tooltip")) ||
-              (node.dataset && node.dataset.chartjs === "tooltip")
-            ) {
-              // Force high z-index and proper positioning
-              node.style.zIndex = "1100";
-              node.style.position = "fixed";
-              node.style.pointerEvents = "none";
-              logger.info(
-                "RadarChart",
-                "Applied z-index fix to Chart.js tooltip",
-              );
-            }
-
-            // Also check child elements
-            const tooltipElements =
-              node.querySelectorAll &&
-              node.querySelectorAll(
-                '[id*="chartjs-tooltip"], [class*="chartjs-tooltip"], [data-chartjs="tooltip"]',
-              );
-            if (tooltipElements) {
-              tooltipElements.forEach((tooltip) => {
-                tooltip.style.zIndex = "1100";
-                tooltip.style.position = "fixed";
-                tooltip.style.pointerEvents = "none";
-              });
-            }
-          }
-        });
-      });
-    });
-
-    // Start observing document body for tooltip additions
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-
-    // Store observer reference for cleanup
-    this.tooltipObserver = observer;
-
-    // Also apply immediate fix to any existing tooltips
-    setTimeout(() => {
-      const existingTooltips = document.querySelectorAll(
-        '[id*="chartjs-tooltip"], [class*="chartjs-tooltip"], [data-chartjs="tooltip"]',
-      );
-      existingTooltips.forEach((tooltip) => {
-        tooltip.style.zIndex = "1100";
-        tooltip.style.position = "fixed";
-        tooltip.style.pointerEvents = "none";
-      });
-    }, 100);
-  }
-
-  /**
    * Get demo pattern from JSON SSOT configuration
    * @param {string} patternName - Pattern name (utilitarian, deontological, etc.)
    * @returns {Object|null} Pattern data or null if not found
@@ -1610,25 +1460,8 @@ export default class RadarChart {
         this.chart = null;
       }
 
-      // Clean up tooltip observer
-      if (this.tooltipObserver) {
-        this.tooltipObserver.disconnect();
-        this.tooltipObserver = null;
-      }
-
-      // Clean up instance-specific tooltip element
-      if (this.tooltipElement) {
-        this.tooltipElement.remove();
-        this.tooltipElement = null;
-      }
-
-      // Clean up any legacy shared tooltip element if this is the last instance
-      if (RadarChart.allInstances.size === 1) {
-        const legacyTooltip = document.getElementById("chartjs-tooltip-blur");
-        if (legacyTooltip) {
-          legacyTooltip.remove();
-        }
-      }
+      // SIMPLIFIED: No need for complex tooltip cleanup since we use Chart.js built-in tooltips
+      // Chart.js automatically handles tooltip cleanup when chart is destroyed
 
       // Clean up mobile event listeners
       if (this.documentTouchHandler) {
@@ -1663,6 +1496,9 @@ export default class RadarChart {
 
       // Remove from instance tracking
       RadarChart.allInstances.delete(this);
+
+      // Unregister from event coordinator
+      chartEventCoordinator.unregisterElement(this.container);
 
       // Mark as destroyed
       this.isDestroyed = true;
@@ -1852,14 +1688,20 @@ export default class RadarChart {
     }
 
     try {
-      // Add onClick handler to chart configuration
+      // Add onClick handler to chart configuration using event coordinator
       this.chart.options.onClick = (event, activeElements) => {
         this.handleChartClick(event, activeElements);
       };
 
-      // Set up mobile tooltip dismissal for demo and scenario charts
+      // Set up mobile tooltip dismissal using event coordinator
       if (this.options.isDemo || this.options.realTime) {
-        this.setupMobileTooltipDismissal();
+        // Use event coordinator for conflict-free event handling
+        chartEventCoordinator.addEventHandler(
+          this.container,
+          "touchstart",
+          this.setupMobileTooltipDismissal.bind(this),
+          { passive: true },
+        );
       }
 
       // Update chart to apply new event handlers

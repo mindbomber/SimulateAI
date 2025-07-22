@@ -173,6 +173,11 @@
   align-items: center;
   gap: var(--spacing-6);
   flex: 1;
+  /* Ensure items stay on same row */
+  flex-wrap: nowrap;
+  min-width: 0; /* Prevent flex item overflow */
+  /* Ensure logo comes first, then navigation */
+  flex-direction: row;
 }
 
 /* Header Right Side - Settings, user menu, etc. */
@@ -184,7 +189,7 @@
 
 /* ===== LOGO COMPONENT STYLES ===== */
 .logo {
-  display: flex;
+  display: flex; /* Flex inside flex container for proper alignment */
   align-items: center;
   gap: var(--spacing-3);
   flex-shrink: 0; /* Prevent logo from shrinking */
@@ -193,6 +198,10 @@
   transition:
     opacity 0.3s ease,
     transform 0.2s ease;
+  /* Ensure logo aligns properly with siblings in flex container */
+  align-self: center;
+  /* Ensure logo is positioned first in row */
+  order: 1;
 }
 
 .logo:hover {
@@ -378,8 +387,22 @@
   display: flex;
   align-items: center;
   gap: calc(0.5rem * var(--font-scale, 1));
-  /* Remove right padding since it's now grouped in header-left */
   padding: 0;
+  /* Base properties that apply to all screen sizes */
+  position: static;
+  width: auto;
+  height: auto;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  z-index: auto;
+  transition: none;
+  overflow-y: visible;
+  /* Ensure navigation doesn't push logo to new line */
+  flex-shrink: 1;
+  min-width: 0;
+  /* Ensure navigation comes after logo */
+  order: 2;
 }
 
 .nav-group {
@@ -1173,17 +1196,7 @@
 /* Laptop/Desktop Navigation Enhancements */
 @media only screen and (width >= 1280px) {
   .main-nav {
-    position: static;
-    width: auto;
-    height: auto;
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    z-index: auto;
-    transition: none;
-    overflow-y: visible;
     flex: 1;
-    display: flex;
     justify-content: center;
     padding: 0 var(--container-padding);
   }
@@ -1265,6 +1278,8 @@
 /* ===== ENHANCED PROFILE NAVIGATION COMPONENTS ===== */
 /* Profile-specific header and navigation patterns */
 .header-container {
+  display: flex;
+  align-items: center;
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 1.5rem;

@@ -17,6 +17,13 @@
   --color-brand-secondary: #4285f4;
   --color-brand-tertiary: #34a853;
 
+  /* ===== PRIMARY COLOR SYSTEM ===== */
+  --color-primary: #1a73e8;
+  --color-primary-dark: #1565c0;
+  --color-primary-light: #42a5f5;
+  --color-secondary: #6b7280;
+  --color-secondary-dark: #4b5563;
+
   /* ===== SEMANTIC COLORS ===== */
   --color-success: #34a853;
   --color-warning: #fbbc04;

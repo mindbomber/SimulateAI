@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Complete Toolbar Debug</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin: 20px;
+      }
+      .debug-section {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      .error {
+        color: red;
+      }
+      .success {
+        color: green;
+      }
+      .info {
+        color: blue;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Complete Toolbar Debugging</h1>
+    <div id="results"></div>
+
+    <script>
+      function log(message, type = "info") {
+        console.log(message);
+        const results = document.getElementById("results");
+        const div = document.createElement("div");
+        div.className = type;
+        div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        results.appendChild(div);
+        results.scrollTop = results.scrollHeight;
+      }
+
+      function debugCompleteFlow() {
+        log("🔍 Starting complete toolbar debugging...", "info");
+
+        // Step 1: Check for MainGrid instance
+        log("=== STEP 1: MainGrid Instance Check ===", "info");
+        const mainGrid =
+          window.mainGrid || window.grid || window.mainGridInstance;
+        if (mainGrid) {
+          log("✅ MainGrid instance found", "success");
+          log(`Current view: ${mainGrid.currentView}`, "info");
+          log(
+            `Scenario container exists: ${!!mainGrid.scenarioContainer}`,
+            "info",
+          );
+
+          // Check if we're in scenario view
+          if (mainGrid.currentView !== "scenario") {
+            log("⚠️ Not in scenario view, switching...", "info");
+            mainGrid.switchView("scenario").then(() => {
+              log("✅ Switched to scenario view", "success");
+              setTimeout(() => continueDebug(mainGrid), 500);
+            });
+            return;
+          }
+        } else {
+          log("❌ MainGrid instance not found", "error");
+          log("Searching for MainGrid in window...", "info");
+          for (let prop in window) {
+            if (
+              prop.toLowerCase().includes("grid") ||
+              prop.toLowerCase().includes("main")
+            ) {
+              log(
+                `Found potential property: ${prop} = ${typeof window[prop]}`,
+                "info",
+              );
+            }
+          }
+        }
+
+        continueDebug(mainGrid);
+      }
+
+      function continueDebug(mainGrid) {
+        // Step 2: Element discovery
+        log("=== STEP 2: Element Discovery ===", "info");
+        const filterBtn = document.querySelector(".filter-btn");
+        const sortBtn = document.querySelector(".sort-btn");
+        const filterDropdown = document.querySelector(".filter-dropdown");
+        const sortDropdown = document.querySelector(".sort-dropdown");
+        const toolbar = document.querySelector(".scenario-controls-toolbar");
+
+        log(
+          `Filter Button: ${filterBtn ? "✅ FOUND" : "❌ NOT FOUND"}`,
+          filterBtn ? "success" : "error",
+        );
+        log(
+          `Sort Button: ${sortBtn ? "✅ FOUND" : "❌ NOT FOUND"}`,
+          sortBtn ? "success" : "error",
+        );
+        log(
+          `Filter Dropdown: ${filterDropdown ? "✅ FOUND" : "❌ NOT FOUND"}`,
+          filterDropdown ? "success" : "error",
+        );
+        log(
+          `Sort Dropdown: ${sortDropdown ? "✅ FOUND" : "❌ NOT FOUND"}`,
+          sortDropdown ? "success" : "error",
+        );
+        log(
+          `Toolbar: ${toolbar ? "✅ FOUND" : "❌ NOT FOUND"}`,
+          toolbar ? "success" : "error",
+        );
+
+        // Step 3: CSS Analysis
+        log("=== STEP 3: CSS Analysis ===", "info");
+        if (filterBtn) {
+          const styles = window.getComputedStyle(filterBtn);
+          log(`Filter button pointer-events: ${styles.pointerEvents}`, "info");
+          log(`Filter button display: ${styles.display}`, "info");
+          log(`Filter button visibility: ${styles.visibility}`, "info");
+          log(`Filter button z-index: ${styles.zIndex}`, "info");
+          log(`Filter button position: ${styles.position}`, "info");
+        }
+
+        if (sortBtn) {
+          const styles = window.getComputedStyle(sortBtn);
+          log(`Sort button pointer-events: ${styles.pointerEvents}`, "info");
+          log(`Sort button display: ${styles.display}`, "info");
+          log(`Sort button visibility: ${styles.visibility}`, "info");
+          log(`Sort button z-index: ${styles.zIndex}`, "info");
+          log(`Sort button position: ${styles.position}`, "info");
+        }
+
+        // Step 4: Event listener check
+        log("=== STEP 4: Event Listener Check ===", "info");
+        if (mainGrid) {
+          try {
+            // Force call setupFilterDropdown and setupSortDropdown
+            log("Attempting to call setupFilterDropdown...", "info");
+            if (typeof mainGrid.setupFilterDropdown === "function") {
+              mainGrid.setupFilterDropdown();
+              log("✅ setupFilterDropdown called successfully", "success");
+            } else {
+              log("❌ setupFilterDropdown method not found", "error");
+            }
+
+            log("Attempting to call setupSortDropdown...", "info");
+            if (typeof mainGrid.setupSortDropdown === "function") {
+              mainGrid.setupSortDropdown();
+              log("✅ setupSortDropdown called successfully", "success");
+            } else {
+              log("❌ setupSortDropdown method not found", "error");
+            }
+          } catch (error) {
+            log(`❌ Error calling setup methods: ${error.message}`, "error");
+          }
+        }
+
+        // Step 5: Manual event listeners
+        log("=== STEP 5: Adding Manual Test Listeners ===", "info");
+
+        if (filterBtn) {
+          // Remove any existing listeners by cloning the element
+          const newFilterBtn = filterBtn.cloneNode(true);
+          filterBtn.parentNode.replaceChild(newFilterBtn, filterBtn);
+
+          newFilterBtn.addEventListener("click", function (e) {
+            log(
+              `🖱️ MANUAL FILTER CLICK! Target: ${e.target.className}`,
+              "success",
+            );
+            log(`Event type: ${e.type}, bubbles: ${e.bubbles}`, "info");
+
+            // Manually toggle dropdown
+            const dropdown = document.querySelector(".filter-dropdown");
+            if (dropdown) {
+              const isVisible = dropdown.style.display === "block";
+              dropdown.style.display = isVisible ? "none" : "block";
+              newFilterBtn.setAttribute("aria-expanded", !isVisible);
+              log(
+                `📋 Manually toggled filter dropdown to: ${dropdown.style.display}`,
+                "success",
+              );
+            }
+          });
+          log("✅ Manual filter click listener added", "success");
+        }
+
+        if (sortBtn) {
+          // Remove any existing listeners by cloning the element
+          const newSortBtn = sortBtn.cloneNode(true);
+          sortBtn.parentNode.replaceChild(newSortBtn, sortBtn);
+
+          newSortBtn.addEventListener("click", function (e) {
+            log(
+              `🖱️ MANUAL SORT CLICK! Target: ${e.target.className}`,
+              "success",
+            );
+            log(`Event type: ${e.type}, bubbles: ${e.bubbles}`, "info");
+
+            // Manually toggle dropdown
+            const dropdown = document.querySelector(".sort-dropdown");
+            if (dropdown) {
+              const isVisible = dropdown.style.display === "block";
+              dropdown.style.display = isVisible ? "none" : "block";
+              newSortBtn.setAttribute("aria-expanded", !isVisible);
+              log(
+                `📋 Manually toggled sort dropdown to: ${dropdown.style.display}`,
+                "success",
+              );
+            }
+          });
+          log("✅ Manual sort click listener added", "success");
+        }
+
+        // Step 6: Console override
+        log("=== STEP 6: Console Access ===", "info");
+        window.debugMainGrid = mainGrid;
+        window.debugForceSetup = function () {
+          log("🔧 Force calling all setup methods...", "info");
+          if (mainGrid) {
+            try {
+              mainGrid.initializeScenarioControls();
+              log("✅ Force setup complete", "success");
+            } catch (error) {
+              log(`❌ Force setup error: ${error.message}`, "error");
+            }
+          }
+        };
+
+        log("✅ Debug complete! Try clicking the buttons now.", "success");
+        log(
+          "💡 You can also run debugForceSetup() in console to force re-initialization",
+          "info",
+        );
+      }
+
+      // Wait for page load
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", debugCompleteFlow);
+      } else {
+        setTimeout(debugCompleteFlow, 1000); // Give time for MainGrid to initialize
+      }
+    </script>
+  </body>
+</html>

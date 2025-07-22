@@ -1,8 +1,9 @@
 /**
  * Advanced UI Components - Specialized interactive components for SimulateAI
  * Modern, accessible, and performant UI components
+ * NOTE: Chart functionality moved to dedicated chart systems (radar-chart.js, canvas-renderer.js)
  *
- * @version 2.0.0
+ * @version 2.1.0
  * @author SimulateAI Team
  * @license Apache-2.0
  */
@@ -13,13 +14,65 @@ import {
   validateNumber,
   validateString,
   FOCUS_RING_WIDTH,
-} from './enhanced-objects.js';
-import logger from '../utils/logger.js';
+} from "./enhanced-objects.js";
+import logger from "../utils/logger.js";
+import { UI_COMPONENT_CONSTANTS } from "../constants/chart-constants.js";
 
-// Constants to avoid magic numbers
+// Use centralized constants instead of local definitions
 const COMPONENT_CONSTANTS = {
-  // Modal defaults
-  DEFAULT_MODAL_WIDTH: 400,
+  ...UI_COMPONENT_CONSTANTS,
+  // Additional UI-specific constants not in central constants
+  MODAL_CLOSE_BUTTON_PADDING: 6,
+  CLOSE_BUTTON_X_PADDING: 6,
+  DEFAULT_NAV_WIDTH: 250,
+  DEFAULT_NAV_HEIGHT: 400,
+  ANIMATION_STAGGER_OFFSET: 50,
+  DEFAULT_LINE_HEIGHT: 20,
+  ICON_WIDTH: 25,
+  BADGE_WIDTH: 30,
+  BADGE_MIN_WIDTH: 20,
+  BADGE_CHAR_WIDTH: 8,
+  BADGE_PADDING: 5,
+  BADGE_HEIGHT: 16,
+  SUBMENU_INDICATOR_SIZE: 15,
+  SUBMENU_ARROW_SIZE: 6,
+  SELECTION_SCALE: 1.05,
+  FOCUS_SCALE: 1.02,
+  PERFORMANCE_THRESHOLD: 16, // 1 frame at 60fps
+  RANDOM_BASE: 36,
+  RANDOM_LENGTH: 9,
+  COLOR_SUBSTR_START: 4,
+  COLOR_SUBSTR_LENGTH: 2,
+  RGB_MAX: 255,
+  LUMINANCE_THRESHOLD: 0.5,
+  LUMINANCE_RED: 0.299,
+  LUMINANCE_GREEN: 0.587,
+  LUMINANCE_BLUE: 0.114,
+  // REMOVED: Chart constants moved to dedicated chart systems
+  // DEFAULT_CHART_WIDTH, CHART_PADDING_RATIO, etc. are now in chart-constants.js
+  DEFAULT_FORM_WIDTH: 200,
+  DEFAULT_FORM_HEIGHT: 40,
+  VALIDATION_DEBOUNCE_TIME: 300,
+  FORM_LABEL_HEIGHT: 20,
+  FORM_HELP_HEIGHT: 20,
+  FORM_MESSAGE_Y_OFFSET: 15,
+  FORM_COUNT_Y_OFFSET: 30,
+  FORM_CURSOR_OFFSET: 4,
+  CHECKBOX_SIZE: 18,
+  CHECKBOX_CHECK_MARGIN: 4,
+  CHECKBOX_CHECK_OFFSET: 6,
+  RADIO_CHECK_RADIUS_DIVISOR: 4,
+  TOOLTIP_SHOW_DELAY: 500,
+  TOOLTIP_HIDE_DELAY: 200,
+  TOOLTIP_MAX_WIDTH: 250,
+  TOOLTIP_BASELINE_SIZE: 16,
+  TOOLTIP_ANIMATION_IN: 200,
+  TOOLTIP_ANIMATION_OUT: 150,
+  TOOLTIP_SLIDE_OFFSET: 10,
+  ALIGNMENT_CENTER_BASE: 50,
+  ANIMATION_FADE_IN: 200,
+  ANIMATION_SCALE_IN: 200,
+  ANIMATION_SLIDE_IN: 200,
   DEFAULT_MODAL_HEIGHT: 300,
   MODAL_SHADOW_OFFSET: 4,
   MODAL_CLOSE_BUTTON_SIZE: 24,
@@ -115,9 +168,9 @@ const COMPONENT_CONSTANTS = {
 
 // Easing functions for animations
 const EASING_FUNCTIONS = {
-  EASE_OUT_CUBIC: 'easeOutCubic',
-  EASE_OUT_QUAD: 'easeOutQuad',
-  EASE_OUT_BACK: 'easeOutBack',
+  EASE_OUT_CUBIC: "easeOutCubic",
+  EASE_OUT_QUAD: "easeOutQuad",
+  EASE_OUT_BACK: "easeOutBack",
 };
 
 // Enhanced constants for UI components
@@ -131,23 +184,23 @@ const UI_CONSTANTS = {
     SLOW: 500,
   },
   COLORS: {
-    PRIMARY: '#2196F3',
-    SECONDARY: '#757575',
-    SUCCESS: '#4CAF50',
-    WARNING: '#FF9800',
-    ERROR: '#F44336',
-    WHITE: '#FFFFFF',
-    BLACK: '#000000',
-    GRAY_50: '#FAFAFA',
-    GRAY_100: '#F5F5F5',
-    GRAY_200: '#EEEEEE',
-    GRAY_300: '#E0E0E0',
-    GRAY_400: '#BDBDBD',
-    GRAY_500: '#9E9E9E',
-    GRAY_600: '#757575',
-    GRAY_700: '#616161',
-    GRAY_800: '#424242',
-    GRAY_900: '#212121',
+    PRIMARY: "#2196F3",
+    SECONDARY: "#757575",
+    SUCCESS: "#4CAF50",
+    WARNING: "#FF9800",
+    ERROR: "#F44336",
+    WHITE: "#FFFFFF",
+    BLACK: "#000000",
+    GRAY_50: "#FAFAFA",
+    GRAY_100: "#F5F5F5",
+    GRAY_200: "#EEEEEE",
+    GRAY_300: "#E0E0E0",
+    GRAY_400: "#BDBDBD",
+    GRAY_500: "#9E9E9E",
+    GRAY_600: "#757575",
+    GRAY_700: "#616161",
+    GRAY_800: "#424242",
+    GRAY_900: "#212121",
   },
   SPACING: {
     XS: 4,
@@ -174,7 +227,7 @@ const UIUtils = {
    * @param {*} data
    */
   debugLog(level, message, data = null) {
-    if (typeof window !== 'undefined' && window.DEBUG_MODE) {
+    if (typeof window !== "undefined" && window.DEBUG_MODE) {
       if (data) {
         logger[level](`[UI] ${message}:`, data);
       } else {
@@ -188,7 +241,7 @@ const UIUtils = {
    * @param {string} prefix
    * @returns {string}
    */
-  generateId(prefix = 'ui') {
+  generateId(prefix = "ui") {
     return `${prefix}_${Date.now()}_${Math.random().toString(COMPONENT_CONSTANTS.RANDOM_BASE).substr(2, COMPONENT_CONSTANTS.RANDOM_LENGTH)}`;
   },
 
@@ -199,15 +252,15 @@ const UIUtils = {
    */
   getContrastColor(backgroundColor) {
     // Simple contrast calculation
-    const color = backgroundColor.replace('#', '');
+    const color = backgroundColor.replace("#", "");
     const r = parseInt(color.substr(0, 2), 16);
     const g = parseInt(color.substr(2, 2), 16);
     const b = parseInt(
       color.substr(
         COMPONENT_CONSTANTS.COLOR_SUBSTR_START,
-        COMPONENT_CONSTANTS.COLOR_SUBSTR_LENGTH
+        COMPONENT_CONSTANTS.COLOR_SUBSTR_LENGTH,
       ),
-      16
+      16,
     );
     const luminance =
       (COMPONENT_CONSTANTS.LUMINANCE_RED * r +
@@ -250,12 +303,12 @@ const UIUtils = {
     renderer.save();
     renderer.font = font;
 
-    const words = text.split(' ');
+    const words = text.split(" ");
     const lines = [];
-    let currentLine = '';
+    let currentLine = "";
 
     for (const word of words) {
-      const testLine = currentLine + (currentLine ? ' ' : '') + word;
+      const testLine = currentLine + (currentLine ? " " : "") + word;
       const metrics = renderer.measureText(testLine);
 
       if (metrics.width > maxWidth && currentLine) {
@@ -286,28 +339,28 @@ class ModalDialog extends BaseObject {
       ...options,
       width: validateNumber(
         options.width,
-        COMPONENT_CONSTANTS.DEFAULT_MODAL_WIDTH
+        COMPONENT_CONSTANTS.DEFAULT_MODAL_WIDTH,
       ),
       height: validateNumber(
         options.height,
-        COMPONENT_CONSTANTS.DEFAULT_MODAL_HEIGHT
+        COMPONENT_CONSTANTS.DEFAULT_MODAL_HEIGHT,
       ),
-      ariaRole: 'dialog',
+      ariaRole: "dialog",
       ariaModal: true,
       tabIndex: -1,
     });
 
     // Content properties
-    this.title = validateString(options.title, 'Dialog');
+    this.title = validateString(options.title, "Dialog");
     this.content = validateString(options.content);
     this.buttons = Array.isArray(options.buttons)
       ? options.buttons
-      : [{ text: 'OK', action: 'close' }];
+      : [{ text: "OK", action: "close" }];
 
     // Behavior properties
     this.closable = options.closable !== false;
     this.backdrop = options.backdrop !== false;
-    this.animation = validateString(options.animation, 'fade');
+    this.animation = validateString(options.animation, "fade");
     this.autoFocus = options.autoFocus !== false;
     this.trapFocus = options.trapFocus !== false;
     this.closeOnEscape = options.closeOnEscape !== false;
@@ -322,7 +375,7 @@ class ModalDialog extends BaseObject {
 
     // Visual properties
     this.zIndex = UI_CONSTANTS.MODAL_Z_INDEX;
-    this.backdropColor = options.backdropColor || 'rgba(0, 0, 0, 0.5)';
+    this.backdropColor = options.backdropColor || "rgba(0, 0, 0, 0.5)";
     this.borderRadius = UI_CONSTANTS.BORDER_RADIUS.LG;
     this.padding = UI_CONSTANTS.SPACING.LG;
 
@@ -363,13 +416,13 @@ class ModalDialog extends BaseObject {
    */
   setupEventHandlers() {
     // Keyboard handling
-    this.on('keyDown', event => this.handleKeyDown(event));
+    this.on("keyDown", (event) => this.handleKeyDown(event));
 
     // Mouse handling for backdrop
-    this.on('click', event => this.handleBackdropClick(event));
+    this.on("click", (event) => this.handleBackdropClick(event));
 
     // Handle animation completion
-    this.on('animationComplete', () => {
+    this.on("animationComplete", () => {
       this.isAnimating = false;
     });
   }
@@ -420,9 +473,9 @@ class ModalDialog extends BaseObject {
       }
 
       // Emit open event
-      this.emit('open', { modal: this });
+      this.emit("open", { modal: this });
     } catch (error) {
-      this.errorHandler(error, 'open');
+      this.errorHandler(error, "open");
     } finally {
       this.isAnimating = false;
     }
@@ -448,15 +501,15 @@ class ModalDialog extends BaseObject {
       // Restore focus
       if (
         this.previousFocus &&
-        typeof this.previousFocus.focus === 'function'
+        typeof this.previousFocus.focus === "function"
       ) {
         this.previousFocus.focus();
       }
 
       // Emit close event
-      this.emit('close', { modal: this });
+      this.emit("close", { modal: this });
     } catch (error) {
-      this.errorHandler(error, 'close');
+      this.errorHandler(error, "close");
     } finally {
       this.isAnimating = false;
     }
@@ -485,62 +538,62 @@ class ModalDialog extends BaseObject {
     const animations = [];
 
     switch (this.animation) {
-      case 'slide':
+      case "slide":
         this.y -= 100;
         animations.push(
           this.animate(
-            'y',
+            "y",
             this.y + 100,
             UI_CONSTANTS.ANIMATION_DURATION.NORMAL,
-            'easeOutCubic'
+            "easeOutCubic",
           ),
-          this.animate('alpha', 1, UI_CONSTANTS.ANIMATION_DURATION.NORMAL)
+          this.animate("alpha", 1, UI_CONSTANTS.ANIMATION_DURATION.NORMAL),
         );
         break;
 
-      case 'scale':
+      case "scale":
         this.scaleX = 0.8;
         this.scaleY = 0.8;
         animations.push(
           this.animate(
-            'scaleX',
+            "scaleX",
             1,
             UI_CONSTANTS.ANIMATION_DURATION.NORMAL,
-            'easeOutBack'
+            "easeOutBack",
           ),
           this.animate(
-            'scaleY',
+            "scaleY",
             1,
             UI_CONSTANTS.ANIMATION_DURATION.NORMAL,
-            'easeOutBack'
+            "easeOutBack",
           ),
-          this.animate('alpha', 1, UI_CONSTANTS.ANIMATION_DURATION.NORMAL)
+          this.animate("alpha", 1, UI_CONSTANTS.ANIMATION_DURATION.NORMAL),
         );
         break;
 
-      case 'bounce':
+      case "bounce":
         this.scaleX = 0.3;
         this.scaleY = 0.3;
         animations.push(
           this.animate(
-            'scaleX',
+            "scaleX",
             1,
             UI_CONSTANTS.ANIMATION_DURATION.SLOW,
-            'bounce'
+            "bounce",
           ),
           this.animate(
-            'scaleY',
+            "scaleY",
             1,
             UI_CONSTANTS.ANIMATION_DURATION.SLOW,
-            'bounce'
+            "bounce",
           ),
-          this.animate('alpha', 1, UI_CONSTANTS.ANIMATION_DURATION.FAST)
+          this.animate("alpha", 1, UI_CONSTANTS.ANIMATION_DURATION.FAST),
         );
         break;
 
       default: // fade
         animations.push(
-          this.animate('alpha', 1, UI_CONSTANTS.ANIMATION_DURATION.NORMAL)
+          this.animate("alpha", 1, UI_CONSTANTS.ANIMATION_DURATION.NORMAL),
         );
     }
 
@@ -552,7 +605,7 @@ class ModalDialog extends BaseObject {
    * @returns {Promise}
    */
   async animateOut() {
-    return this.animate('alpha', 0, UI_CONSTANTS.ANIMATION_DURATION.FAST);
+    return this.animate("alpha", 0, UI_CONSTANTS.ANIMATION_DURATION.FAST);
   }
 
   /**
@@ -563,21 +616,21 @@ class ModalDialog extends BaseObject {
     if (!this.isOpen) return;
 
     switch (event.key) {
-      case 'Escape':
+      case "Escape":
         if (this.closeOnEscape && this.closable) {
           event.preventDefault();
           this.close();
         }
         break;
 
-      case 'Tab':
+      case "Tab":
         if (this.trapFocus) {
           this.handleTabNavigation(event);
         }
         break;
 
-      case 'Enter':
-      case ' ': {
+      case "Enter":
+      case " ": {
         const focusedButton = this.buttonElements[this.focusedButtonIndex];
         if (focusedButton) {
           event.preventDefault();
@@ -586,9 +639,9 @@ class ModalDialog extends BaseObject {
         break;
       }
 
-      case 'ArrowLeft':
-      case 'ArrowRight':
-        this.navigateButtons(event.key === 'ArrowRight' ? 1 : -1);
+      case "ArrowLeft":
+      case "ArrowRight":
+        this.navigateButtons(event.key === "ArrowRight" ? 1 : -1);
         break;
     }
   }
@@ -606,7 +659,7 @@ class ModalDialog extends BaseObject {
     } else {
       this.focusedButtonIndex = Math.min(
         this.buttonElements.length - 1,
-        this.focusedButtonIndex + 1
+        this.focusedButtonIndex + 1,
       );
     }
 
@@ -621,7 +674,7 @@ class ModalDialog extends BaseObject {
     this.focusedButtonIndex = clamp(
       this.focusedButtonIndex + direction,
       0,
-      this.buttonElements.length - 1
+      this.buttonElements.length - 1,
     );
     this.updateButtonFocus();
   }
@@ -666,20 +719,20 @@ class ModalDialog extends BaseObject {
    */
   executeButtonAction(button) {
     try {
-      if (button.action === 'close') {
+      if (button.action === "close") {
         this.close();
-      } else if (typeof button.callback === 'function') {
+      } else if (typeof button.callback === "function") {
         const result = button.callback(this, button);
 
         // If callback returns a promise, handle it
-        if (result && typeof result.then === 'function') {
-          result.catch(error => this.errorHandler(error, 'buttonCallback'));
+        if (result && typeof result.then === "function") {
+          result.catch((error) => this.errorHandler(error, "buttonCallback"));
         }
       }
 
-      this.emit('buttonClick', { button, modal: this });
+      this.emit("buttonClick", { button, modal: this });
     } catch (error) {
-      this.errorHandler(error, 'executeButtonAction');
+      this.errorHandler(error, "executeButtonAction");
     }
   }
 
@@ -690,13 +743,13 @@ class ModalDialog extends BaseObject {
     const buttonSpacing = UI_CONSTANTS.SPACING.SM;
     const totalButtonWidth = this.buttonElements.reduce(
       (sum, btn) => sum + btn.width,
-      0
+      0,
     );
     const totalSpacing = (this.buttonElements.length - 1) * buttonSpacing;
     const startX = (this.width - totalButtonWidth - totalSpacing) / 2;
 
     let currentX = startX;
-    this.buttonElements.forEach(button => {
+    this.buttonElements.forEach((button) => {
       button.x = currentX;
       button.y =
         this.height -
@@ -711,7 +764,7 @@ class ModalDialog extends BaseObject {
    * @param {CanvasRenderingContext2D} renderer
    */
   renderSelf(renderer) {
-    if (renderer.type !== 'canvas' || !this.visible) return;
+    if (renderer.type !== "canvas" || !this.visible) return;
 
     try {
       // Draw backdrop if enabled
@@ -736,7 +789,7 @@ class ModalDialog extends BaseObject {
         this.renderFocusRing(renderer);
       }
     } catch (error) {
-      this.errorHandler(error, 'renderSelf');
+      this.errorHandler(error, "renderSelf");
     }
   }
 
@@ -762,12 +815,12 @@ class ModalDialog extends BaseObject {
    */
   renderModalBackground(renderer) {
     // Shadow
-    renderer.fillStyle = 'rgba(0, 0, 0, 0.2)';
+    renderer.fillStyle = "rgba(0, 0, 0, 0.2)";
     renderer.fillRect(
       COMPONENT_CONSTANTS.MODAL_SHADOW_OFFSET,
       COMPONENT_CONSTANTS.MODAL_SHADOW_OFFSET,
       this.width,
-      this.height
+      this.height,
     );
 
     // Background
@@ -801,13 +854,13 @@ class ModalDialog extends BaseObject {
 
     // Title
     renderer.fillStyle = UI_CONSTANTS.COLORS.GRAY_900;
-    renderer.font = 'bold 16px Arial';
-    renderer.textAlign = 'left';
-    renderer.textBaseline = 'middle';
+    renderer.font = "bold 16px Arial";
+    renderer.textAlign = "left";
+    renderer.textBaseline = "middle";
     renderer.fillText(
       this.title,
       this.padding,
-      headerY + this.headerHeight / 2
+      headerY + this.headerHeight / 2,
     );
 
     // Close button (if closable)
@@ -828,7 +881,7 @@ class ModalDialog extends BaseObject {
     // Button background
     renderer.fillStyle = this.closeButtonHovered
       ? UI_CONSTANTS.COLORS.GRAY_200
-      : 'transparent';
+      : "transparent";
     renderer.fillRect(buttonX, buttonY, buttonSize, buttonSize);
 
     // X symbol
@@ -837,19 +890,19 @@ class ModalDialog extends BaseObject {
     renderer.beginPath();
     renderer.moveTo(
       buttonX + COMPONENT_CONSTANTS.CLOSE_BUTTON_X_PADDING,
-      buttonY + COMPONENT_CONSTANTS.CLOSE_BUTTON_X_PADDING
+      buttonY + COMPONENT_CONSTANTS.CLOSE_BUTTON_X_PADDING,
     );
     renderer.lineTo(
       buttonX + buttonSize - COMPONENT_CONSTANTS.CLOSE_BUTTON_X_PADDING,
-      buttonY + buttonSize - COMPONENT_CONSTANTS.CLOSE_BUTTON_X_PADDING
+      buttonY + buttonSize - COMPONENT_CONSTANTS.CLOSE_BUTTON_X_PADDING,
     );
     renderer.moveTo(
       buttonX + buttonSize - COMPONENT_CONSTANTS.CLOSE_BUTTON_X_PADDING,
-      buttonY + COMPONENT_CONSTANTS.CLOSE_BUTTON_X_PADDING
+      buttonY + COMPONENT_CONSTANTS.CLOSE_BUTTON_X_PADDING,
     );
     renderer.lineTo(
       buttonX + COMPONENT_CONSTANTS.CLOSE_BUTTON_X_PADDING,
-      buttonY + buttonSize - COMPONENT_CONSTANTS.CLOSE_BUTTON_X_PADDING
+      buttonY + buttonSize - COMPONENT_CONSTANTS.CLOSE_BUTTON_X_PADDING,
     );
     renderer.stroke();
   }
@@ -868,21 +921,21 @@ class ModalDialog extends BaseObject {
     // Content text
     if (this.content) {
       renderer.fillStyle = UI_CONSTANTS.COLORS.GRAY_700;
-      renderer.font = '14px Arial';
-      renderer.textAlign = 'left';
-      renderer.textBaseline = 'top';
+      renderer.font = "14px Arial";
+      renderer.textAlign = "left";
+      renderer.textBaseline = "top";
 
       // Wrap text to fit in body
       const maxWidth = this.width - this.padding * 2;
       const lines = UIUtils.wrapText(
         this.content,
         maxWidth,
-        '14px Arial',
-        renderer
+        "14px Arial",
+        renderer,
       );
 
       let lineY = bodyY + this.padding;
-      lines.forEach(line => {
+      lines.forEach((line) => {
         renderer.fillText(line, this.padding, lineY);
         lineY += COMPONENT_CONSTANTS.DEFAULT_LINE_HEIGHT;
       });
@@ -910,7 +963,7 @@ class ModalDialog extends BaseObject {
 
     // Calculate and render buttons
     this.calculateButtonLayout();
-    this.buttonElements.forEach(button => {
+    this.buttonElements.forEach((button) => {
       this.renderButton(renderer, button);
     });
   }
@@ -925,7 +978,7 @@ class ModalDialog extends BaseObject {
     let bgColor = UI_CONSTANTS.COLORS.PRIMARY;
     let textColor = UI_CONSTANTS.COLORS.WHITE;
 
-    if (button.variant === 'secondary') {
+    if (button.variant === "secondary") {
       bgColor = UI_CONSTANTS.COLORS.GRAY_300;
       textColor = UI_CONSTANTS.COLORS.GRAY_700;
     }
@@ -934,9 +987,9 @@ class ModalDialog extends BaseObject {
       bgColor = UI_CONSTANTS.COLORS.GRAY_700;
     } else if (button.isHovered) {
       bgColor =
-        button.variant === 'secondary'
+        button.variant === "secondary"
           ? UI_CONSTANTS.COLORS.GRAY_400
-          : '#1976D2';
+          : "#1976D2";
     }
 
     renderer.fillStyle = bgColor;
@@ -954,13 +1007,13 @@ class ModalDialog extends BaseObject {
 
     // Button text
     renderer.fillStyle = textColor;
-    renderer.font = '14px Arial';
-    renderer.textAlign = 'center';
-    renderer.textBaseline = 'middle';
+    renderer.font = "14px Arial";
+    renderer.textAlign = "center";
+    renderer.textBaseline = "middle";
     renderer.fillText(
       button.text,
       button.x + button.width / 2,
-      button.y + button.height / 2
+      button.y + button.height / 2,
     );
   }
 
@@ -976,7 +1029,7 @@ class ModalDialog extends BaseObject {
       -FOCUS_RING_WIDTH,
       -FOCUS_RING_WIDTH,
       this.width + FOCUS_RING_WIDTH * 2,
-      this.height + FOCUS_RING_WIDTH * 2
+      this.height + FOCUS_RING_WIDTH * 2,
     );
     renderer.setLineDash([]);
   }
@@ -1006,11 +1059,11 @@ class ModalDialog extends BaseObject {
         eventData.y <= buttonBounds.y + buttonBounds.height;
 
       switch (eventType) {
-        case 'mousemove':
+        case "mousemove":
           button.isHovered = inButton;
           break;
 
-        case 'mousedown':
+        case "mousedown":
           if (inButton) {
             button.isPressed = true;
             this.focusedButtonIndex = this.buttonElements.indexOf(button);
@@ -1019,7 +1072,7 @@ class ModalDialog extends BaseObject {
           }
           break;
 
-        case 'mouseup':
+        case "mouseup":
           if (button.isPressed) {
             button.isPressed = false;
             if (inButton) {
@@ -1032,7 +1085,7 @@ class ModalDialog extends BaseObject {
     }
 
     // Handle close button if closable
-    if (this.closable && eventType === 'mousedown') {
+    if (this.closable && eventType === "mousedown") {
       const closeButtonBounds = {
         x:
           this.x +
@@ -1083,11 +1136,11 @@ class NavigationMenu extends BaseObject {
       ...options,
       width: options.width || COMPONENT_CONSTANTS.DEFAULT_NAV_WIDTH,
       height: options.height || COMPONENT_CONSTANTS.DEFAULT_NAV_HEIGHT,
-      ariaRole: 'navigation',
+      ariaRole: "navigation",
     });
 
     this.items = options.items || [];
-    this.orientation = options.orientation || 'vertical'; // 'horizontal', 'vertical'
+    this.orientation = options.orientation || "vertical"; // 'horizontal', 'vertical'
     this.expandable = options.expandable || false;
     this.collapsible = options.collapsible || false;
     this.selectedIndex = options.selectedIndex || 0;
@@ -1105,7 +1158,7 @@ class NavigationMenu extends BaseObject {
     this.isAnimating = false;
 
     // Accessibility
-    this.ariaLabel = options.ariaLabel || 'Navigation menu';
+    this.ariaLabel = options.ariaLabel || "Navigation menu";
     this.ariaOrientation = this.orientation;
 
     // Error handling
@@ -1144,7 +1197,7 @@ class NavigationMenu extends BaseObject {
 
       this.updateAccessibilityAttributes();
     } catch (error) {
-      this.errorHandler(error, 'setupNavigation');
+      this.errorHandler(error, "setupNavigation");
     }
   }
 
@@ -1153,19 +1206,19 @@ class NavigationMenu extends BaseObject {
    */
   bindEvents() {
     try {
-      this.on('keyDown', event => this.handleKeyNavigation(event));
-      this.on('focus', () => this.handleFocus());
-      this.on('blur', () => this.handleBlur());
+      this.on("keyDown", (event) => this.handleKeyNavigation(event));
+      this.on("focus", () => this.handleFocus());
+      this.on("blur", () => this.handleBlur());
 
       // Animation events
-      this.on('animationStart', () => {
+      this.on("animationStart", () => {
         this.isAnimating = true;
       });
-      this.on('animationEnd', () => {
+      this.on("animationEnd", () => {
         this.isAnimating = false;
       });
     } catch (error) {
-      this.errorHandler(error, 'bindEvents');
+      this.errorHandler(error, "bindEvents");
     }
   }
 
@@ -1176,8 +1229,8 @@ class NavigationMenu extends BaseObject {
    */
   addItem(item) {
     try {
-      if (!item || typeof item !== 'object') {
-        throw new Error('Invalid item provided to addItem');
+      if (!item || typeof item !== "object") {
+        throw new Error("Invalid item provided to addItem");
       }
 
       const index = this.menuItems.length;
@@ -1206,10 +1259,10 @@ class NavigationMenu extends BaseObject {
       // Animate item addition
       this.animateItemAddition(menuItem);
 
-      this.emit('itemAdded', { item: menuItem, index });
+      this.emit("itemAdded", { item: menuItem, index });
       return true;
     } catch (error) {
-      this.errorHandler(error, 'addItem');
+      this.errorHandler(error, "addItem");
       return false;
     }
   }
@@ -1240,11 +1293,11 @@ class NavigationMenu extends BaseObject {
       }
 
       this.updateAccessibilityAttributes();
-      this.emit('itemRemoved', { item, index });
+      this.emit("itemRemoved", { item, index });
 
       return true;
     } catch (error) {
-      this.errorHandler(error, 'removeItem');
+      this.errorHandler(error, "removeItem");
       return false;
     }
   }
@@ -1287,24 +1340,24 @@ class NavigationMenu extends BaseObject {
       this.updateSelectionState();
 
       // Execute action
-      if (item.action && typeof item.action === 'function') {
+      if (item.action && typeof item.action === "function") {
         const result = item.action(item, this);
-        if (result && typeof result.then === 'function') {
-          result.catch(error => this.errorHandler(error, 'itemAction'));
+        if (result && typeof result.then === "function") {
+          result.catch((error) => this.errorHandler(error, "itemAction"));
         }
       }
 
       // Animate selection
       this.animateSelection(item);
 
-      this.emit('itemSelected', {
+      this.emit("itemSelected", {
         item,
         index,
         selectedIndices: Array.from(this.selectedIndices),
         multiSelect: this.multiSelect && addToSelection,
       });
     } catch (error) {
-      this.errorHandler(error, 'selectItem');
+      this.errorHandler(error, "selectItem");
     }
   }
 
@@ -1312,7 +1365,7 @@ class NavigationMenu extends BaseObject {
    * Clears all selections
    */
   clearSelection() {
-    this.menuItems.forEach(item => {
+    this.menuItems.forEach((item) => {
       item.isSelected = false;
     });
     this.selectedIndices.clear();
@@ -1335,9 +1388,9 @@ class NavigationMenu extends BaseObject {
     try {
       if (this.isAnimating) return;
 
-      const isVertical = this.orientation === 'vertical';
-      const nextKey = isVertical ? 'ArrowDown' : 'ArrowRight';
-      const prevKey = isVertical ? 'ArrowUp' : 'ArrowLeft';
+      const isVertical = this.orientation === "vertical";
+      const nextKey = isVertical ? "ArrowDown" : "ArrowRight";
+      const prevKey = isVertical ? "ArrowUp" : "ArrowLeft";
 
       switch (event.key) {
         case nextKey:
@@ -1350,29 +1403,29 @@ class NavigationMenu extends BaseObject {
           this.navigateToPreviousItem();
           break;
 
-        case 'Enter':
-        case ' ':
+        case "Enter":
+        case " ":
           event.preventDefault();
           this.activateCurrentItem(event.ctrlKey || event.metaKey);
           break;
 
-        case 'Home':
+        case "Home":
           event.preventDefault();
           this.navigateToFirstItem();
           break;
 
-        case 'End':
+        case "End":
           event.preventDefault();
           this.navigateToLastItem();
           break;
 
-        case 'Escape':
+        case "Escape":
           if (this.collapsible) {
             this.collapse();
           }
           break;
 
-        case 'Tab':
+        case "Tab":
           // Allow natural tab navigation
           break;
 
@@ -1382,7 +1435,7 @@ class NavigationMenu extends BaseObject {
           break;
       }
     } catch (error) {
-      this.errorHandler(error, 'handleKeyNavigation');
+      this.errorHandler(error, "handleKeyNavigation");
     }
   }
 
@@ -1461,7 +1514,7 @@ class NavigationMenu extends BaseObject {
    * @param {string} char
    */
   handleCharacterNavigation(char) {
-    if (char.length !== 1 || char < ' ') return;
+    if (char.length !== 1 || char < " ") return;
 
     const searchChar = char.toLowerCase();
     const startIndex = (this.focusedIndex + 1) % this.menuItems.length;
@@ -1497,12 +1550,12 @@ class NavigationMenu extends BaseObject {
         }
       });
 
-      this.emit('focusChanged', {
+      this.emit("focusChanged", {
         focusedIndex: this.focusedIndex,
         focusedItem: this.menuItems[this.focusedIndex],
       });
     } catch (error) {
-      this.errorHandler(error, 'updateFocus');
+      this.errorHandler(error, "updateFocus");
     }
   }
 
@@ -1520,7 +1573,7 @@ class NavigationMenu extends BaseObject {
    * Handles menu blur
    */
   handleBlur() {
-    this.menuItems.forEach(item => {
+    this.menuItems.forEach((item) => {
       item.isFocused = false;
     });
   }
@@ -1533,7 +1586,7 @@ class NavigationMenu extends BaseObject {
 
     this.isExpanded = true;
     this.animateExpansion(true);
-    this.emit('expanded');
+    this.emit("expanded");
   }
 
   /**
@@ -1544,7 +1597,7 @@ class NavigationMenu extends BaseObject {
 
     this.isExpanded = false;
     this.animateExpansion(false);
-    this.emit('collapsed');
+    this.emit("collapsed");
   }
 
   /**
@@ -1562,7 +1615,7 @@ class NavigationMenu extends BaseObject {
   animateItemAddition(item) {
     if (!this.animationsEnabled) return;
 
-    this.animate('alpha', 1, this.animationDuration, {
+    this.animate("alpha", 1, this.animationDuration, {
       from: 0,
       delay: item.animationOffset,
       easing: EASING_FUNCTIONS.EASE_OUT_CUBIC,
@@ -1574,14 +1627,14 @@ class NavigationMenu extends BaseObject {
 
     // Pulse animation for selection
     this.animate(
-      'scale',
+      "scale",
       COMPONENT_CONSTANTS.SELECTION_SCALE,
       COMPONENT_CONSTANTS.ANIMATION_FAST,
       {
         from: 1,
         yoyo: true,
         easing: EASING_FUNCTIONS.EASE_OUT_QUAD,
-      }
+      },
     );
   }
 
@@ -1591,14 +1644,14 @@ class NavigationMenu extends BaseObject {
     // Subtle scale animation for focus
     item.focusScale = item.focusScale || 1;
     this.animate(
-      'focusScale',
+      "focusScale",
       COMPONENT_CONSTANTS.FOCUS_SCALE,
       COMPONENT_CONSTANTS.ANIMATION_NORMAL,
       {
         from: 1,
         target: item,
         easing: EASING_FUNCTIONS.EASE_OUT_QUAD,
-      }
+      },
     );
   }
 
@@ -1606,7 +1659,7 @@ class NavigationMenu extends BaseObject {
     if (!this.animationsEnabled) return;
 
     const targetHeight = expanding ? this.originalHeight : 0;
-    this.animate('height', targetHeight, this.animationDuration, {
+    this.animate("height", targetHeight, this.animationDuration, {
       easing: EASING_FUNCTIONS.EASE_OUT_CUBIC,
     });
   }
@@ -1633,19 +1686,19 @@ class NavigationMenu extends BaseObject {
 
       const { x, y } = eventData;
       const itemHeight =
-        this.orientation === 'vertical'
+        this.orientation === "vertical"
           ? this.height / this.menuItems.length
           : this.height;
       const itemWidth =
-        this.orientation === 'horizontal'
+        this.orientation === "horizontal"
           ? this.width / this.menuItems.length
           : this.width;
 
       // Find hovered item
       let hoveredIndex = -1;
       for (let i = 0; i < this.menuItems.length; i++) {
-        const itemX = this.orientation === 'horizontal' ? i * itemWidth : 0;
-        const itemY = this.orientation === 'vertical' ? i * itemHeight : 0;
+        const itemX = this.orientation === "horizontal" ? i * itemWidth : 0;
+        const itemY = this.orientation === "vertical" ? i * itemHeight : 0;
 
         if (
           x >= this.x + itemX &&
@@ -1664,18 +1717,18 @@ class NavigationMenu extends BaseObject {
       });
 
       switch (eventType) {
-        case 'mousemove':
+        case "mousemove":
           if (hoveredIndex !== this.hoveredIndex) {
             this.hoveredIndex = hoveredIndex;
-            this.emit('hoverChanged', {
+            this.emit("hoverChanged", {
               hoveredIndex,
               hoveredItem: this.menuItems[hoveredIndex],
             });
           }
           break;
 
-        case 'mousedown':
-        case 'touchstart':
+        case "mousedown":
+        case "touchstart":
           if (hoveredIndex >= 0) {
             this.focusedIndex = hoveredIndex;
             this.updateFocus();
@@ -1683,12 +1736,12 @@ class NavigationMenu extends BaseObject {
           }
           break;
 
-        case 'mouseup':
-        case 'touchend':
+        case "mouseup":
+        case "touchend":
           if (hoveredIndex >= 0) {
             this.selectItem(
               hoveredIndex,
-              eventData.ctrlKey || eventData.metaKey
+              eventData.ctrlKey || eventData.metaKey,
             );
             return true;
           }
@@ -1697,7 +1750,7 @@ class NavigationMenu extends BaseObject {
 
       return super.handleInput(eventType, eventData);
     } catch (error) {
-      this.errorHandler(error, 'handleInput');
+      this.errorHandler(error, "handleInput");
       return false;
     }
   }
@@ -1707,7 +1760,7 @@ class NavigationMenu extends BaseObject {
    * @param {CanvasRenderingContext2D} renderer
    */
   renderSelf(renderer) {
-    if (renderer.type !== 'canvas' || !this.visible) return;
+    if (renderer.type !== "canvas" || !this.visible) return;
 
     try {
       const startTime = performance.now();
@@ -1716,11 +1769,11 @@ class NavigationMenu extends BaseObject {
       if (this.alpha <= 0 || this.scale <= 0) return;
 
       const itemHeight =
-        this.orientation === 'vertical'
+        this.orientation === "vertical"
           ? this.height / this.menuItems.length
           : this.height;
       const itemWidth =
-        this.orientation === 'horizontal'
+        this.orientation === "horizontal"
           ? this.width / this.menuItems.length
           : this.width;
 
@@ -1747,12 +1800,12 @@ class NavigationMenu extends BaseObject {
       if (renderTime > COMPONENT_CONSTANTS.PERFORMANCE_THRESHOLD) {
         // Longer than 1 frame
         UIUtils.debugLog(
-          'warn',
-          `NavigationMenu render took ${renderTime.toFixed(2)}ms`
+          "warn",
+          `NavigationMenu render took ${renderTime.toFixed(2)}ms`,
         );
       }
     } catch (error) {
-      this.errorHandler(error, 'renderSelf');
+      this.errorHandler(error, "renderSelf");
     }
   }
 
@@ -1771,7 +1824,7 @@ class NavigationMenu extends BaseObject {
     renderer.strokeRect(0, 0, this.width, this.height);
 
     // Shadow
-    renderer.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    renderer.fillStyle = "rgba(0, 0, 0, 0.1)";
     renderer.fillRect(2, 2, this.width, this.height);
   }
 
@@ -1784,8 +1837,8 @@ class NavigationMenu extends BaseObject {
    * @param {number} itemHeight
    */
   renderMenuItem(renderer, item, index, itemWidth, itemHeight) {
-    const x = this.orientation === 'horizontal' ? index * itemWidth : 0;
-    const y = this.orientation === 'vertical' ? index * itemHeight : 0;
+    const x = this.orientation === "horizontal" ? index * itemWidth : 0;
+    const y = this.orientation === "vertical" ? index * itemHeight : 0;
 
     // Item background
     let bgColor = UI_CONSTANTS.COLORS.WHITE;
@@ -1822,9 +1875,9 @@ class NavigationMenu extends BaseObject {
         : UI_CONSTANTS.COLORS.GRAY_900;
 
     renderer.fillStyle = textColor;
-    renderer.font = `${item.isSelected ? 'bold ' : ''}14px Arial`;
-    renderer.textAlign = 'left';
-    renderer.textBaseline = 'middle';
+    renderer.font = `${item.isSelected ? "bold " : ""}14px Arial`;
+    renderer.textAlign = "left";
+    renderer.textBaseline = "middle";
 
     let textX = x + UI_CONSTANTS.SPACING.SM;
     const textY = y + itemHeight / 2;
@@ -1845,7 +1898,7 @@ class NavigationMenu extends BaseObject {
       item.text,
       availableWidth,
       renderer.font,
-      renderer
+      renderer,
     );
     renderer.fillText(truncatedText, textX, textY);
 
@@ -1855,7 +1908,7 @@ class NavigationMenu extends BaseObject {
         renderer,
         item.badge,
         x + itemWidth - COMPONENT_CONSTANTS.ICON_WIDTH,
-        y + COMPONENT_CONSTANTS.BADGE_PADDING
+        y + COMPONENT_CONSTANTS.BADGE_PADDING,
       );
     }
 
@@ -1868,7 +1921,7 @@ class NavigationMenu extends BaseObject {
         renderer,
         indicatorX,
         indicatorY,
-        item.isSelected
+        item.isSelected,
       );
     }
   }
@@ -1884,7 +1937,7 @@ class NavigationMenu extends BaseObject {
     const badgeText = String(badge);
     const badgeWidth = Math.max(
       COMPONENT_CONSTANTS.BADGE_MIN_WIDTH,
-      badgeText.length * COMPONENT_CONSTANTS.BADGE_CHAR_WIDTH
+      badgeText.length * COMPONENT_CONSTANTS.BADGE_CHAR_WIDTH,
     );
 
     // Badge background
@@ -1895,13 +1948,13 @@ class NavigationMenu extends BaseObject {
       y,
       badgeWidth,
       COMPONENT_CONSTANTS.BADGE_HEIGHT,
-      UI_CONSTANTS.BORDER_RADIUS.SM
+      UI_CONSTANTS.BORDER_RADIUS.SM,
     );
 
     // Badge text
     renderer.fillStyle = UI_CONSTANTS.COLORS.WHITE;
-    renderer.font = 'bold 10px Arial';
-    renderer.textAlign = 'center';
+    renderer.font = "bold 10px Arial";
+    renderer.textAlign = "center";
     renderer.fillText(badgeText, x, y + UI_CONSTANTS.SPACING.SM);
   }
 
@@ -1937,8 +1990,8 @@ class NavigationMenu extends BaseObject {
     const item = this.menuItems[this.focusedIndex];
     if (!item) return;
 
-    const x = this.orientation === 'horizontal' ? item.index * itemWidth : 0;
-    const y = this.orientation === 'vertical' ? item.index * itemHeight : 0;
+    const x = this.orientation === "horizontal" ? item.index * itemWidth : 0;
+    const y = this.orientation === "vertical" ? item.index * itemHeight : 0;
 
     renderer.strokeStyle = UI_CONSTANTS.COLORS.WARNING;
     renderer.lineWidth = FOCUS_RING_WIDTH;
@@ -1947,7 +2000,7 @@ class NavigationMenu extends BaseObject {
       x - FOCUS_RING_WIDTH,
       y - FOCUS_RING_WIDTH,
       itemWidth + FOCUS_RING_WIDTH * 2,
-      itemHeight + FOCUS_RING_WIDTH * 2
+      itemHeight + FOCUS_RING_WIDTH * 2,
     );
     renderer.setLineDash([]);
   }
@@ -1959,11 +2012,13 @@ class NavigationMenu extends BaseObject {
   getAccessibilityDescription() {
     const selectedCount = this.selectedIndices.size;
     const totalCount = this.menuItems.length;
-    const enabledCount = this.menuItems.filter(item => !item.isDisabled).length;
+    const enabledCount = this.menuItems.filter(
+      (item) => !item.isDisabled,
+    ).length;
 
     return (
       `Navigation menu with ${totalCount} items, ${enabledCount} enabled, ${selectedCount} selected. ` +
-      `Currently ${this.isExpanded ? 'expanded' : 'collapsed'}. ` +
+      `Currently ${this.isExpanded ? "expanded" : "collapsed"}. ` +
       `Orientation: ${this.orientation}.`
     );
   }
@@ -1974,8 +2029,8 @@ class NavigationMenu extends BaseObject {
    * @param {string} context
    */
   defaultErrorHandler(error, context) {
-    UIUtils.debugLog('error', `NavigationMenu error in ${context}`, error);
-    this.emit('error', { error, context, component: 'NavigationMenu' });
+    UIUtils.debugLog("error", `NavigationMenu error in ${context}`, error);
+    this.emit("error", { error, context, component: "NavigationMenu" });
   }
 
   /**
@@ -1995,7 +2050,7 @@ class NavigationMenu extends BaseObject {
 
       super.destroy();
     } catch (error) {
-      this.errorHandler(error, 'destroy');
+      this.errorHandler(error, "destroy");
     }
   }
 }
@@ -2007,14 +2062,14 @@ class Chart extends BaseObject {
       ...options,
       width: options.width || COMPONENT_CONSTANTS.DEFAULT_CHART_WIDTH,
       height: options.height || COMPONENT_CONSTANTS.DEFAULT_CHART_HEIGHT,
-      ariaRole: 'img',
+      ariaRole: "img",
     });
 
-    this.type = options.type || 'line'; // 'line', 'bar', 'pie', 'scatter', 'area'
+    this.type = options.type || "line"; // 'line', 'bar', 'pie', 'scatter', 'area'
     this.data = options.data || [];
     this.labels = options.labels || [];
-    this.title = options.title || '';
-    this.subtitle = options.subtitle || '';
+    this.title = options.title || "";
+    this.subtitle = options.subtitle || "";
     this.showLegend = options.showLegend !== false;
     this.showAxis = options.showAxis !== false;
     this.showGrid = options.showGrid !== false;
@@ -2027,9 +2082,9 @@ class Chart extends BaseObject {
       UI_CONSTANTS.COLORS.WARNING,
       UI_CONSTANTS.COLORS.DANGER,
       UI_CONSTANTS.COLORS.INFO,
-      '#9C27B0',
-      '#607D8B',
-      '#795548',
+      "#9C27B0",
+      "#607D8B",
+      "#795548",
     ];
 
     // Chart dimensions (accounting for margins)
@@ -2080,7 +2135,7 @@ class Chart extends BaseObject {
         this.startEntranceAnimation();
       }
     } catch (error) {
-      this.errorHandler(error, 'setupChart');
+      this.errorHandler(error, "setupChart");
     }
   }
 
@@ -2090,13 +2145,13 @@ class Chart extends BaseObject {
   bindEvents() {
     try {
       if (this.interactive) {
-        this.on('mousemove', event => this.handleMouseMove(event));
-        this.on('mousedown', event => this.handleMouseDown(event));
-        this.on('mouseup', event => this.handleMouseUp(event));
-        this.on('keyDown', event => this.handleKeyDown(event));
+        this.on("mousemove", (event) => this.handleMouseMove(event));
+        this.on("mousedown", (event) => this.handleMouseDown(event));
+        this.on("mouseup", (event) => this.handleMouseUp(event));
+        this.on("keyDown", (event) => this.handleKeyDown(event));
       }
     } catch (error) {
-      this.errorHandler(error, 'bindEvents');
+      this.errorHandler(error, "bindEvents");
     }
   }
 
@@ -2105,54 +2160,54 @@ class Chart extends BaseObject {
    */
   validateData() {
     if (!Array.isArray(this.data)) {
-      throw new Error('Chart data must be an array');
+      throw new Error("Chart data must be an array");
     }
 
     if (this.data.length === 0) {
-      throw new Error('Chart data cannot be empty');
+      throw new Error("Chart data cannot be empty");
     }
 
     // Type-specific validation
     switch (this.type) {
-      case 'pie':
-        if (!this.data.every(val => typeof val === 'number' && val >= 0)) {
-          throw new Error('Pie chart data must be positive numbers');
+      case "pie":
+        if (!this.data.every((val) => typeof val === "number" && val >= 0)) {
+          throw new Error("Pie chart data must be positive numbers");
         }
         break;
 
-      case 'line':
-      case 'area':
-      case 'bar':
+      case "line":
+      case "area":
+      case "bar":
         if (!Array.isArray(this.data[0])) {
           // Single series
-          if (!this.data.every(val => typeof val === 'number')) {
-            throw new Error('Line/Bar chart data must be numbers');
+          if (!this.data.every((val) => typeof val === "number")) {
+            throw new Error("Line/Bar chart data must be numbers");
           }
         } else {
           // Multiple series
           if (
             !this.data.every(
-              series =>
+              (series) =>
                 Array.isArray(series) &&
-                series.every(val => typeof val === 'number')
+                series.every((val) => typeof val === "number"),
             )
           ) {
-            throw new Error('Multi-series data must be arrays of numbers');
+            throw new Error("Multi-series data must be arrays of numbers");
           }
         }
         break;
 
-      case 'scatter':
+      case "scatter":
         if (
           !this.data.every(
-            point =>
+            (point) =>
               Array.isArray(point) &&
               point.length >= 2 &&
-              typeof point[0] === 'number' &&
-              typeof point[1] === 'number'
+              typeof point[0] === "number" &&
+              typeof point[1] === "number",
           )
         ) {
-          throw new Error('Scatter plot data must be [x, y] coordinate pairs');
+          throw new Error("Scatter plot data must be [x, y] coordinate pairs");
         }
         break;
     }
@@ -2164,20 +2219,20 @@ class Chart extends BaseObject {
   processData() {
     try {
       switch (this.type) {
-        case 'line':
-        case 'area':
-        case 'bar':
+        case "line":
+        case "area":
+        case "bar":
           this.processSeriesData();
           break;
-        case 'pie':
+        case "pie":
           this.processPieData();
           break;
-        case 'scatter':
+        case "scatter":
           this.processScatterData();
           break;
       }
     } catch (error) {
-      this.errorHandler(error, 'processData');
+      this.errorHandler(error, "processData");
     }
   }
 
@@ -2220,7 +2275,7 @@ class Chart extends BaseObject {
     const total = this.data.reduce((sum, val) => sum + val, 0);
 
     if (total === 0) {
-      throw new Error('Pie chart total cannot be zero');
+      throw new Error("Pie chart total cannot be zero");
     }
 
     this.processedData = this.data.map((value, index) => ({
@@ -2235,7 +2290,7 @@ class Chart extends BaseObject {
 
     // Calculate cumulative angles for rendering
     let cumulativeAngle = 0;
-    this.processedData.forEach(slice => {
+    this.processedData.forEach((slice) => {
       slice.startAngle = cumulativeAngle;
       slice.endAngle = cumulativeAngle + slice.angle;
       cumulativeAngle += slice.angle;
@@ -2246,10 +2301,10 @@ class Chart extends BaseObject {
    * Processes scatter plot data
    */
   processScatterData() {
-    this.minX = Math.min(...this.data.map(point => point[0]));
-    this.maxX = Math.max(...this.data.map(point => point[0]));
-    this.minY = Math.min(...this.data.map(point => point[1]));
-    this.maxY = Math.max(...this.data.map(point => point[1]));
+    this.minX = Math.min(...this.data.map((point) => point[0]));
+    this.maxX = Math.max(...this.data.map((point) => point[0]));
+    this.minY = Math.min(...this.data.map((point) => point[1]));
+    this.maxY = Math.max(...this.data.map((point) => point[1]));
 
     // Add padding
     const xRange = this.maxX - this.minX;
@@ -2278,20 +2333,20 @@ class Chart extends BaseObject {
   calculateScales() {
     try {
       switch (this.type) {
-        case 'line':
-        case 'area':
-        case 'bar':
+        case "line":
+        case "area":
+        case "bar":
           this.xScale =
             this.chartWidth / (this.processedData[0].values.length - 1);
           this.yScale = this.chartHeight / (this.maxValue - this.minValue);
           break;
 
-        case 'scatter':
+        case "scatter":
           this.xScale = this.chartWidth / (this.maxX - this.minX);
           this.yScale = this.chartHeight / (this.maxY - this.minY);
           break;
 
-        case 'pie':
+        case "pie":
           // Pie charts use radius calculation instead
           this.radius =
             Math.min(this.chartWidth, this.chartHeight) / 2 -
@@ -2299,7 +2354,7 @@ class Chart extends BaseObject {
           break;
       }
     } catch (error) {
-      this.errorHandler(error, 'calculateScales');
+      this.errorHandler(error, "calculateScales");
     }
   }
 
@@ -2314,7 +2369,7 @@ class Chart extends BaseObject {
       y: this.margin.top,
       width: 140,
       itemHeight: 20,
-      items: this.processedData.map(item => ({
+      items: this.processedData.map((item) => ({
         color: item.color,
         label: item.label,
         visible: item.visible,
@@ -2332,9 +2387,9 @@ class Chart extends BaseObject {
       visible: false,
       x: 0,
       y: 0,
-      content: '',
-      width: 'auto',
-      height: 'auto',
+      content: "",
+      width: "auto",
+      height: "auto",
     };
   }
 
@@ -2347,11 +2402,11 @@ class Chart extends BaseObject {
     this.animationProgress = 0;
     this.isAnimating = true;
 
-    this.animate('animationProgress', 1, UI_CONSTANTS.ANIMATION.DURATION.SLOW, {
+    this.animate("animationProgress", 1, UI_CONSTANTS.ANIMATION.DURATION.SLOW, {
       easing: EASING_FUNCTIONS.EASE_OUT_CUBIC,
       onComplete: () => {
         this.isAnimating = false;
-        this.emit('animationComplete');
+        this.emit("animationComplete");
       },
     });
   }
@@ -2380,10 +2435,10 @@ class Chart extends BaseObject {
           this.hideTooltip();
         }
 
-        this.emit('dataPointHover', { dataPoint, x: localX, y: localY });
+        this.emit("dataPointHover", { dataPoint, x: localX, y: localY });
       }
     } catch (error) {
-      this.errorHandler(error, 'handleMouseMove');
+      this.errorHandler(error, "handleMouseMove");
     }
   }
 
@@ -2415,13 +2470,13 @@ class Chart extends BaseObject {
           this.selectedDataPoints.add(dataPoint);
         }
 
-        this.emit('dataPointSelect', {
+        this.emit("dataPointSelect", {
           dataPoint,
           selectedPoints: Array.from(this.selectedDataPoints),
         });
       }
     } catch (error) {
-      this.errorHandler(error, 'handleMouseDown');
+      this.errorHandler(error, "handleMouseDown");
     }
   }
 
@@ -2442,18 +2497,18 @@ class Chart extends BaseObject {
       if (!this.interactive) return;
 
       switch (event.key) {
-        case 'Escape':
+        case "Escape":
           this.selectedDataPoints.clear();
           this.hideTooltip();
-          this.emit('selectionCleared');
+          this.emit("selectionCleared");
           break;
 
-        case 'Enter':
-        case ' ':
+        case "Enter":
+        case " ":
           if (this.hoveredDataPoint) {
             this.selectedDataPoints.clear();
             this.selectedDataPoints.add(this.hoveredDataPoint);
-            this.emit('dataPointSelect', {
+            this.emit("dataPointSelect", {
               dataPoint: this.hoveredDataPoint,
               selectedPoints: Array.from(this.selectedDataPoints),
             });
@@ -2461,7 +2516,7 @@ class Chart extends BaseObject {
           break;
       }
     } catch (error) {
-      this.errorHandler(error, 'handleKeyDown');
+      this.errorHandler(error, "handleKeyDown");
     }
   }
 
@@ -2475,17 +2530,17 @@ class Chart extends BaseObject {
     const tolerance = 10; // Pixel tolerance for hit detection
 
     switch (this.type) {
-      case 'line':
-      case 'area':
+      case "line":
+      case "area":
         return this.findLineDataPoint(x, y, tolerance);
 
-      case 'bar':
+      case "bar":
         return this.findBarDataPoint(x, y);
 
-      case 'pie':
+      case "pie":
         return this.findPieDataPoint(x, y);
 
-      case 'scatter':
+      case "scatter":
         return this.findScatterDataPoint(x, y, tolerance);
 
       default:
@@ -2508,7 +2563,7 @@ class Chart extends BaseObject {
           this.chartHeight - (series.values[i] - this.minValue) * this.yScale;
 
         const distance = Math.sqrt(
-          Math.pow(x - pointX, 2) + Math.pow(y - pointY, 2)
+          Math.pow(x - pointX, 2) + Math.pow(y - pointY, 2),
         );
 
         if (distance <= tolerance) {
@@ -2568,7 +2623,7 @@ class Chart extends BaseObject {
     const centerY = this.chartHeight / 2;
 
     const distance = Math.sqrt(
-      Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2)
+      Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2),
     );
 
     if (distance <= this.radius) {
@@ -2606,7 +2661,7 @@ class Chart extends BaseObject {
       const pointY = this.chartHeight - (point.y - this.minY) * this.yScale;
 
       const distance = Math.sqrt(
-        Math.pow(x - pointX, 2) + Math.pow(y - pointY, 2)
+        Math.pow(x - pointX, 2) + Math.pow(y - pointY, 2),
       );
 
       if (distance <= tolerance) {
@@ -2651,10 +2706,10 @@ class Chart extends BaseObject {
    */
   formatTooltipContent(dataPoint) {
     switch (this.type) {
-      case 'pie':
+      case "pie":
         return `${dataPoint.label}: ${dataPoint.value} (${dataPoint.percentage.toFixed(1)}%)`;
 
-      case 'scatter':
+      case "scatter":
         return `${dataPoint.label}: (${dataPoint.x}, ${dataPoint.y})`;
 
       default:
@@ -2667,7 +2722,7 @@ class Chart extends BaseObject {
    * @param {CanvasRenderingContext2D} renderer
    */
   renderSelf(renderer) {
-    if (renderer.type !== 'canvas' || !this.visible) return;
+    if (renderer.type !== "canvas" || !this.visible) return;
 
     try {
       const startTime = performance.now();
@@ -2686,34 +2741,34 @@ class Chart extends BaseObject {
         this.margin.left,
         this.margin.top,
         this.chartWidth,
-        this.chartHeight
+        this.chartHeight,
       );
       renderer.clip();
 
       // Render grid and axes
-      if (this.showGrid && this.type !== 'pie') {
+      if (this.showGrid && this.type !== "pie") {
         this.renderGrid(renderer);
       }
 
-      if (this.showAxis && this.type !== 'pie') {
+      if (this.showAxis && this.type !== "pie") {
         this.renderAxes(renderer);
       }
 
       // Render chart based on type
       switch (this.type) {
-        case 'line':
+        case "line":
           this.renderLineChart(renderer);
           break;
-        case 'area':
+        case "area":
           this.renderAreaChart(renderer);
           break;
-        case 'bar':
+        case "bar":
           this.renderBarChart(renderer);
           break;
-        case 'pie':
+        case "pie":
           this.renderPieChart(renderer);
           break;
-        case 'scatter':
+        case "scatter":
           this.renderScatterPlot(renderer);
           break;
       }
@@ -2737,12 +2792,12 @@ class Chart extends BaseObject {
 
       if (renderTime > COMPONENT_CONSTANTS.PERFORMANCE_THRESHOLD) {
         UIUtils.debugLog(
-          'warn',
-          `Chart render took ${renderTime.toFixed(2)}ms`
+          "warn",
+          `Chart render took ${renderTime.toFixed(2)}ms`,
         );
       }
     } catch (error) {
-      this.errorHandler(error, 'renderSelf');
+      this.errorHandler(error, "renderSelf");
     }
   }
 
@@ -2754,22 +2809,22 @@ class Chart extends BaseObject {
     // Main title
     if (this.title) {
       renderer.fillStyle = UI_CONSTANTS.COLORS.GRAY_900;
-      renderer.font = 'bold 18px Arial';
-      renderer.textAlign = 'center';
-      renderer.textBaseline = 'top';
+      renderer.font = "bold 18px Arial";
+      renderer.textAlign = "center";
+      renderer.textBaseline = "top";
       renderer.fillText(this.title, this.width / 2, 10);
     }
 
     // Subtitle
     if (this.subtitle) {
       renderer.fillStyle = UI_CONSTANTS.COLORS.GRAY_600;
-      renderer.font = '14px Arial';
-      renderer.textAlign = 'center';
-      renderer.textBaseline = 'top';
+      renderer.font = "14px Arial";
+      renderer.textAlign = "center";
+      renderer.textBaseline = "top";
       renderer.fillText(
         this.subtitle,
         this.width / 2,
-        COMPONENT_CONSTANTS.CHART_SUBTITLE_Y
+        COMPONENT_CONSTANTS.CHART_SUBTITLE_Y,
       );
     }
   }
@@ -2794,9 +2849,9 @@ class Chart extends BaseObject {
     }
 
     // Vertical grid lines (for non-pie charts)
-    if (this.type !== 'pie') {
+    if (this.type !== "pie") {
       const verticalLines =
-        this.type === 'bar'
+        this.type === "bar"
           ? this.processedData[0].values.length
           : Math.min(10, this.processedData[0].values.length);
 
@@ -2831,15 +2886,15 @@ class Chart extends BaseObject {
     renderer.moveTo(this.margin.left, this.margin.top + this.chartHeight);
     renderer.lineTo(
       this.margin.left + this.chartWidth,
-      this.margin.top + this.chartHeight
+      this.margin.top + this.chartHeight,
     );
     renderer.stroke();
 
     // Y-axis labels
     renderer.fillStyle = UI_CONSTANTS.COLORS.GRAY_700;
-    renderer.font = '12px Arial';
-    renderer.textAlign = 'right';
-    renderer.textBaseline = 'middle';
+    renderer.font = "12px Arial";
+    renderer.textAlign = "right";
+    renderer.textBaseline = "middle";
 
     const ySteps = 5;
     for (let i = 0; i <= ySteps; i++) {
@@ -2852,8 +2907,8 @@ class Chart extends BaseObject {
 
     // X-axis labels (for applicable chart types)
     if (this.labels.length > 0) {
-      renderer.textAlign = 'center';
-      renderer.textBaseline = 'top';
+      renderer.textAlign = "center";
+      renderer.textBaseline = "top";
 
       this.labels.forEach((label, index) => {
         const x =
@@ -2875,8 +2930,8 @@ class Chart extends BaseObject {
 
       renderer.strokeStyle = series.color;
       renderer.lineWidth = 3;
-      renderer.lineCap = 'round';
-      renderer.lineJoin = 'round';
+      renderer.lineCap = "round";
+      renderer.lineJoin = "round";
       renderer.globalAlpha =
         series.opacity * (this.animated ? this.animationProgress : 1);
 
@@ -2913,7 +2968,7 @@ class Chart extends BaseObject {
           y,
           COMPONENT_CONSTANTS.CHART_POINT_RADIUS,
           0,
-          2 * Math.PI
+          2 * Math.PI,
         );
         renderer.fill();
 
@@ -3049,7 +3104,7 @@ class Chart extends BaseObject {
         centerY,
         animationRadius,
         slice.startAngle,
-        slice.endAngle
+        slice.endAngle,
       );
       renderer.closePath();
       renderer.fill();
@@ -3074,9 +3129,9 @@ class Chart extends BaseObject {
       const labelY = centerY + Math.sin(labelAngle) * labelRadius;
 
       renderer.fillStyle = UI_CONSTANTS.COLORS.WHITE;
-      renderer.font = 'bold 12px Arial';
-      renderer.textAlign = 'center';
-      renderer.textBaseline = 'middle';
+      renderer.font = "bold 12px Arial";
+      renderer.textAlign = "center";
+      renderer.textBaseline = "middle";
       renderer.fillText(`${slice.percentage.toFixed(1)}%`, labelX, labelY);
 
       renderer.globalAlpha = 1;
@@ -3107,7 +3162,7 @@ class Chart extends BaseObject {
         y,
         COMPONENT_CONSTANTS.CHART_SCATTER_POINT_RADIUS,
         0,
-        2 * Math.PI
+        2 * Math.PI,
       );
       renderer.fill();
 
@@ -3132,12 +3187,12 @@ class Chart extends BaseObject {
     const { x, y, width, itemHeight, items } = this.legend;
 
     // Legend background
-    renderer.fillStyle = 'rgba(255, 255, 255, 0.9)';
+    renderer.fillStyle = "rgba(255, 255, 255, 0.9)";
     renderer.fillRect(
       x,
       y,
       width,
-      items.length * itemHeight + COMPONENT_CONSTANTS.CHART_LEGEND_ITEM_HEIGHT
+      items.length * itemHeight + COMPONENT_CONSTANTS.CHART_LEGEND_ITEM_HEIGHT,
     );
 
     renderer.strokeStyle = UI_CONSTANTS.COLORS.GRAY_300;
@@ -3146,7 +3201,7 @@ class Chart extends BaseObject {
       x,
       y,
       width,
-      items.length * itemHeight + COMPONENT_CONSTANTS.CHART_LEGEND_ITEM_HEIGHT
+      items.length * itemHeight + COMPONENT_CONSTANTS.CHART_LEGEND_ITEM_HEIGHT,
     );
 
     // Legend items
@@ -3159,20 +3214,20 @@ class Chart extends BaseObject {
         x + UI_CONSTANTS.SPACING.MD / 2,
         itemY + UI_CONSTANTS.SPACING.XS,
         COMPONENT_CONSTANTS.CHART_LEGEND_INDICATOR_SIZE,
-        COMPONENT_CONSTANTS.CHART_LEGEND_INDICATOR_HEIGHT
+        COMPONENT_CONSTANTS.CHART_LEGEND_INDICATOR_HEIGHT,
       );
 
       // Label
       renderer.fillStyle = item.visible
         ? UI_CONSTANTS.COLORS.GRAY_900
         : UI_CONSTANTS.COLORS.GRAY_400;
-      renderer.font = '12px Arial';
-      renderer.textAlign = 'left';
-      renderer.textBaseline = 'middle';
+      renderer.font = "12px Arial";
+      renderer.textAlign = "left";
+      renderer.textBaseline = "middle";
       renderer.fillText(
         item.label,
         x + COMPONENT_CONSTANTS.CHART_LEGEND_TEXT_OFFSET,
-        itemY + UI_CONSTANTS.SPACING.MD / 2
+        itemY + UI_CONSTANTS.SPACING.MD / 2,
       );
     });
   }
@@ -3187,7 +3242,7 @@ class Chart extends BaseObject {
     const { x, y, content } = this.tooltip;
 
     // Measure text
-    renderer.font = '12px Arial';
+    renderer.font = "12px Arial";
     const textWidth = renderer.measureText(content).width;
     const padding = 8;
     const tooltipWidth = textWidth + padding * 2;
@@ -3195,20 +3250,20 @@ class Chart extends BaseObject {
       COMPONENT_CONSTANTS.CHART_TOOLTIP_HEIGHT + padding * 2;
 
     // Tooltip background
-    renderer.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    renderer.fillStyle = "rgba(0, 0, 0, 0.8)";
     UIUtils.fillRoundedRect(
       renderer,
       x,
       y,
       tooltipWidth,
       tooltipHeight,
-      COMPONENT_CONSTANTS.CHART_TOOLTIP_RADIUS
+      COMPONENT_CONSTANTS.CHART_TOOLTIP_RADIUS,
     );
 
     // Tooltip text
     renderer.fillStyle = UI_CONSTANTS.COLORS.WHITE;
-    renderer.textAlign = 'left';
-    renderer.textBaseline = 'middle';
+    renderer.textAlign = "left";
+    renderer.textBaseline = "middle";
     renderer.fillText(content, x + padding, y + tooltipHeight / 2);
   }
 
@@ -3225,17 +3280,17 @@ class Chart extends BaseObject {
    */
   getAccessibilityDescription() {
     const dataCount =
-      this.type === 'pie'
+      this.type === "pie"
         ? this.processedData.length
         : this.processedData.reduce(
             (sum, series) => sum + series.values.length,
-            0
+            0,
           );
 
     return (
       `${this.type} chart titled "${this.title}" with ${dataCount} data points. ` +
-      `${this.subtitle ? `${this.subtitle} ` : ''}` +
-      `Interactive: ${this.interactive ? 'yes' : 'no'}.`
+      `${this.subtitle ? `${this.subtitle} ` : ""}` +
+      `Interactive: ${this.interactive ? "yes" : "no"}.`
     );
   }
 
@@ -3245,8 +3300,8 @@ class Chart extends BaseObject {
    * @param {string} context
    */
   defaultErrorHandler(error, context) {
-    UIUtils.debugLog('error', `Chart error in ${context}`, error);
-    this.emit('error', { error, context, component: 'Chart' });
+    UIUtils.debugLog("error", `Chart error in ${context}`, error);
+    this.emit("error", { error, context, component: "Chart" });
   }
 
   /**
@@ -3264,7 +3319,7 @@ class Chart extends BaseObject {
 
       super.destroy();
     } catch (error) {
-      this.errorHandler(error, 'destroy');
+      this.errorHandler(error, "destroy");
     }
   }
 }
@@ -3276,13 +3331,13 @@ class FormField extends BaseObject {
       ...options,
       width: options.width || COMPONENT_CONSTANTS.DEFAULT_FORM_WIDTH,
       height: options.height || COMPONENT_CONSTANTS.DEFAULT_FORM_HEIGHT,
-      ariaRole: 'group',
+      ariaRole: "group",
     });
 
-    this.label = options.label || '';
-    this.type = options.type || 'text'; // 'text', 'number', 'email', 'password', 'textarea', 'select', 'checkbox', 'radio'
-    this.value = options.value || '';
-    this.placeholder = options.placeholder || '';
+    this.label = options.label || "";
+    this.type = options.type || "text"; // 'text', 'number', 'email', 'password', 'textarea', 'select', 'checkbox', 'radio'
+    this.value = options.value || "";
+    this.placeholder = options.placeholder || "";
     this.required = options.required || false;
     this.disabled = options.disabled || false;
     this.readonly = options.readonly || false;
@@ -3295,13 +3350,13 @@ class FormField extends BaseObject {
     this.validateOnChange = options.validateOnChange !== false;
     this.validateOnBlur = options.validateOnBlur !== false;
     this.showCharacterCount = options.showCharacterCount || false;
-    this.helpText = options.helpText || '';
+    this.helpText = options.helpText || "";
 
     // State management
     this.isValid = true;
-    this.errorMessage = '';
-    this.warningMessage = '';
-    this.successMessage = '';
+    this.errorMessage = "";
+    this.warningMessage = "";
+    this.successMessage = "";
     this.isFocused = false;
     this.isDirty = false;
     this.isTouched = false;
@@ -3338,7 +3393,7 @@ class FormField extends BaseObject {
   setupField() {
     try {
       // Process options for select/radio/checkbox types
-      if (['select', 'radio', 'checkbox'].includes(this.type)) {
+      if (["select", "radio", "checkbox"].includes(this.type)) {
         this.processOptions();
       }
 
@@ -3350,7 +3405,7 @@ class FormField extends BaseObject {
         this.validate();
       }
     } catch (error) {
-      this.errorHandler(error, 'setupField');
+      this.errorHandler(error, "setupField");
     }
   }
 
@@ -3361,20 +3416,20 @@ class FormField extends BaseObject {
     try {
       // Built-in validation rules
       if (this.required) {
-        this.addValidationRule('required', value => {
-          if (this.type === 'checkbox') {
+        this.addValidationRule("required", (value) => {
+          if (this.type === "checkbox") {
             return {
               isValid: value === true,
-              message: 'This field is required',
+              message: "This field is required",
             };
           }
-          const isEmpty = !value || value.toString().trim() === '';
-          return { isValid: !isEmpty, message: 'This field is required' };
+          const isEmpty = !value || value.toString().trim() === "";
+          return { isValid: !isEmpty, message: "This field is required" };
         });
       }
 
       if (this.minLength !== null) {
-        this.addValidationRule('minLength', value => {
+        this.addValidationRule("minLength", (value) => {
           const length = value ? value.toString().length : 0;
           return {
             isValid: length >= this.minLength,
@@ -3384,7 +3439,7 @@ class FormField extends BaseObject {
       }
 
       if (this.maxLength !== null) {
-        this.addValidationRule('maxLength', value => {
+        this.addValidationRule("maxLength", (value) => {
           const length = value ? value.toString().length : 0;
           return {
             isValid: length <= this.maxLength,
@@ -3394,42 +3449,42 @@ class FormField extends BaseObject {
       }
 
       if (this.pattern) {
-        this.addValidationRule('pattern', value => {
-          if (!value) return { isValid: true, message: '' };
+        this.addValidationRule("pattern", (value) => {
+          if (!value) return { isValid: true, message: "" };
           const regex = new RegExp(this.pattern);
           return {
             isValid: regex.test(value.toString()),
-            message: 'Please enter a valid format',
+            message: "Please enter a valid format",
           };
         });
       }
 
       // Type-specific validation
       switch (this.type) {
-        case 'email':
-          this.addValidationRule('email', value => {
-            if (!value) return { isValid: true, message: '' };
+        case "email":
+          this.addValidationRule("email", (value) => {
+            if (!value) return { isValid: true, message: "" };
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return {
               isValid: emailRegex.test(value),
-              message: 'Please enter a valid email address',
+              message: "Please enter a valid email address",
             };
           });
           break;
 
-        case 'number':
-          this.addValidationRule('number', value => {
-            if (!value) return { isValid: true, message: '' };
+        case "number":
+          this.addValidationRule("number", (value) => {
+            if (!value) return { isValid: true, message: "" };
             const isValid = !isNaN(value) && isFinite(value);
             return {
               isValid,
-              message: 'Please enter a valid number',
+              message: "Please enter a valid number",
             };
           });
           break;
       }
     } catch (error) {
-      this.errorHandler(error, 'setupValidation');
+      this.errorHandler(error, "setupValidation");
     }
   }
 
@@ -3438,13 +3493,13 @@ class FormField extends BaseObject {
    */
   bindEvents() {
     try {
-      this.on('focus', () => this.handleFocus());
-      this.on('blur', () => this.handleBlur());
-      this.on('input', event => this.handleFieldInput(event));
-      this.on('change', event => this.handleChange(event));
-      this.on('keyDown', event => this.handleKeyDown(event));
+      this.on("focus", () => this.handleFocus());
+      this.on("blur", () => this.handleBlur());
+      this.on("input", (event) => this.handleFieldInput(event));
+      this.on("change", (event) => this.handleChange(event));
+      this.on("keyDown", (event) => this.handleKeyDown(event));
     } catch (error) {
-      this.errorHandler(error, 'bindEvents');
+      this.errorHandler(error, "bindEvents");
     }
   }
 
@@ -3453,7 +3508,7 @@ class FormField extends BaseObject {
    */
   processOptions() {
     this.processedOptions = this.options.map((option, index) => {
-      if (typeof option === 'string') {
+      if (typeof option === "string") {
         return {
           value: option,
           label: option,
@@ -3506,7 +3561,7 @@ class FormField extends BaseObject {
         this.debouncedValidate();
       }
 
-      this.emit('change', {
+      this.emit("change", {
         value: newValue,
         oldValue,
         isValid: this.isValid,
@@ -3518,7 +3573,7 @@ class FormField extends BaseObject {
         this.updateCharacterCount();
       }
     } catch (error) {
-      this.errorHandler(error, 'setValue');
+      this.errorHandler(error, "setValue");
     }
   }
 
@@ -3530,7 +3585,7 @@ class FormField extends BaseObject {
     try {
       this.clearMessages();
       let isValid = true;
-      let firstErrorMessage = '';
+      let firstErrorMessage = "";
 
       // Run synchronous validation rules
       for (const [name, validator] of this.validationRules) {
@@ -3543,44 +3598,44 @@ class FormField extends BaseObject {
             }
           }
         } catch (error) {
-          UIUtils.debugLog('warn', `Validation rule '${name}' failed`, error);
+          UIUtils.debugLog("warn", `Validation rule '${name}' failed`, error);
         }
       }
 
       // Run custom validation if provided
-      if (this.validation && typeof this.validation === 'function') {
+      if (this.validation && typeof this.validation === "function") {
         try {
           const result = this.validation(this.value, this);
           if (result && !result.isValid) {
             isValid = false;
             if (!firstErrorMessage) {
-              firstErrorMessage = result.message || 'Invalid value';
+              firstErrorMessage = result.message || "Invalid value";
             }
           }
         } catch (error) {
-          UIUtils.debugLog('warn', 'Custom validation failed', error);
+          UIUtils.debugLog("warn", "Custom validation failed", error);
           isValid = false;
           if (!firstErrorMessage) {
-            firstErrorMessage = 'Validation error occurred';
+            firstErrorMessage = "Validation error occurred";
           }
         }
       }
 
       // Run async validation if provided
-      if (this.asyncValidation && typeof this.asyncValidation === 'function') {
+      if (this.asyncValidation && typeof this.asyncValidation === "function") {
         try {
           const result = await this.asyncValidation(this.value, this);
           if (result && !result.isValid) {
             isValid = false;
             if (!firstErrorMessage) {
-              firstErrorMessage = result.message || 'Invalid value';
+              firstErrorMessage = result.message || "Invalid value";
             }
           }
         } catch (error) {
-          UIUtils.debugLog('warn', 'Async validation failed', error);
+          UIUtils.debugLog("warn", "Async validation failed", error);
           isValid = false;
           if (!firstErrorMessage) {
-            firstErrorMessage = 'Async validation error occurred';
+            firstErrorMessage = "Async validation error occurred";
           }
         }
       }
@@ -3589,7 +3644,7 @@ class FormField extends BaseObject {
       this.errorMessage = firstErrorMessage;
 
       this.updateAccessibilityAttributes();
-      this.emit('validation', {
+      this.emit("validation", {
         isValid: this.isValid,
         message: this.errorMessage,
         field: this,
@@ -3597,7 +3652,7 @@ class FormField extends BaseObject {
 
       return this.isValid;
     } catch (error) {
-      this.errorHandler(error, 'validate');
+      this.errorHandler(error, "validate");
       return false;
     }
   }
@@ -3619,9 +3674,9 @@ class FormField extends BaseObject {
    * Clears all validation messages
    */
   clearMessages() {
-    this.errorMessage = '';
-    this.warningMessage = '';
-    this.successMessage = '';
+    this.errorMessage = "";
+    this.warningMessage = "";
+    this.successMessage = "";
   }
 
   /**
@@ -3659,9 +3714,9 @@ class FormField extends BaseObject {
     try {
       this.isFocused = true;
       this.animateFocus(true);
-      this.emit('fieldFocus', { field: this });
+      this.emit("fieldFocus", { field: this });
     } catch (error) {
-      this.errorHandler(error, 'handleFocus');
+      this.errorHandler(error, "handleFocus");
     }
   }
 
@@ -3678,9 +3733,9 @@ class FormField extends BaseObject {
         this.validate();
       }
 
-      this.emit('fieldBlur', { field: this });
+      this.emit("fieldBlur", { field: this });
     } catch (error) {
-      this.errorHandler(error, 'handleBlur');
+      this.errorHandler(error, "handleBlur");
     }
   }
 
@@ -3693,7 +3748,7 @@ class FormField extends BaseObject {
       const newValue = event.value;
       this.setValue(newValue);
     } catch (error) {
-      this.errorHandler(error, 'handleFieldInput');
+      this.errorHandler(error, "handleFieldInput");
     }
   }
 
@@ -3704,11 +3759,11 @@ class FormField extends BaseObject {
   handleChange(event) {
     try {
       // For certain field types, change might be different from input
-      if (this.type === 'select' || this.type === 'radio') {
+      if (this.type === "select" || this.type === "radio") {
         this.setValue(event.value);
       }
     } catch (error) {
-      this.errorHandler(error, 'handleChange');
+      this.errorHandler(error, "handleChange");
     }
   }
 
@@ -3719,20 +3774,20 @@ class FormField extends BaseObject {
   handleKeyDown(event) {
     try {
       switch (event.key) {
-        case 'Enter':
-          if (this.type === 'textarea') {
+        case "Enter":
+          if (this.type === "textarea") {
             // Allow line breaks in textarea
             return;
           }
           event.preventDefault();
-          this.emit('submit', { field: this, value: this.value });
+          this.emit("submit", { field: this, value: this.value });
           break;
 
-        case 'Escape':
+        case "Escape":
           this.blur();
           break;
 
-        case 'Tab':
+        case "Tab":
           // Allow natural tab navigation
           break;
 
@@ -3742,7 +3797,7 @@ class FormField extends BaseObject {
           break;
       }
     } catch (error) {
-      this.errorHandler(error, 'handleKeyDown');
+      this.errorHandler(error, "handleKeyDown");
     }
   }
 
@@ -3752,25 +3807,25 @@ class FormField extends BaseObject {
    */
   handleTypeSpecificKeys(event) {
     switch (this.type) {
-      case 'number':
+      case "number":
         // Only allow numeric input
         if (
           !/[0-9\-+.,]/.test(event.key) &&
           ![
-            'Backspace',
-            'Delete',
-            'ArrowLeft',
-            'ArrowRight',
-            'Home',
-            'End',
+            "Backspace",
+            "Delete",
+            "ArrowLeft",
+            "ArrowRight",
+            "Home",
+            "End",
           ].includes(event.key)
         ) {
           event.preventDefault();
         }
         break;
 
-      case 'select':
-      case 'radio':
+      case "select":
+      case "radio":
         this.handleSelectableKeyDown(event);
         break;
     }
@@ -3784,27 +3839,27 @@ class FormField extends BaseObject {
     if (!this.processedOptions || this.processedOptions.length === 0) return;
 
     const currentIndex = this.processedOptions.findIndex(
-      opt => opt.value === this.value
+      (opt) => opt.value === this.value,
     );
     let newIndex = currentIndex;
 
     switch (event.key) {
-      case 'ArrowDown':
+      case "ArrowDown":
         event.preventDefault();
         newIndex = Math.min(currentIndex + 1, this.processedOptions.length - 1);
         break;
 
-      case 'ArrowUp':
+      case "ArrowUp":
         event.preventDefault();
         newIndex = Math.max(currentIndex - 1, 0);
         break;
 
-      case 'Home':
+      case "Home":
         event.preventDefault();
         newIndex = 0;
         break;
 
-      case 'End':
+      case "End":
         event.preventDefault();
         newIndex = this.processedOptions.length - 1;
         break;
@@ -3843,7 +3898,7 @@ class FormField extends BaseObject {
 
     const targetScale = focused ? COMPONENT_CONSTANTS.FOCUS_SCALE : 1;
     this.animate(
-      'focusScale',
+      "focusScale",
       targetScale,
       COMPONENT_CONSTANTS.ANIMATION_NORMAL,
       {
@@ -3852,7 +3907,7 @@ class FormField extends BaseObject {
         onComplete: () => {
           this.isAnimating = false;
         },
-      }
+      },
     );
   }
 
@@ -3889,17 +3944,17 @@ class FormField extends BaseObject {
       const inBounds = this.containsPoint(eventData.x, eventData.y);
 
       switch (eventType) {
-        case 'mousedown':
-        case 'touchstart':
+        case "mousedown":
+        case "touchstart":
           if (inBounds) {
             this.focus();
             return true;
           }
           break;
 
-        case 'mousemove':
+        case "mousemove":
           // Handle hover states for interactive elements
-          if (this.type === 'select' && this.processedOptions) {
+          if (this.type === "select" && this.processedOptions) {
             this.updateOptionHover(eventData);
           }
           break;
@@ -3907,7 +3962,7 @@ class FormField extends BaseObject {
 
       return super.handleInput(eventType, eventData);
     } catch (error) {
-      this.errorHandler(error, 'handleInput');
+      this.errorHandler(error, "handleInput");
       return false;
     }
   }
@@ -3926,33 +3981,33 @@ class FormField extends BaseObject {
    * @param {CanvasRenderingContext2D} renderer
    */
   renderSelf(renderer) {
-    if (renderer.type !== 'canvas' || !this.visible) return;
+    if (renderer.type !== "canvas" || !this.visible) return;
 
     try {
       const startTime = performance.now();
 
       // Render based on field type
       switch (this.type) {
-        case 'text':
-        case 'email':
-        case 'password':
-        case 'number':
+        case "text":
+        case "email":
+        case "password":
+        case "number":
           this.renderTextInput(renderer);
           break;
 
-        case 'textarea':
+        case "textarea":
           this.renderTextarea(renderer);
           break;
 
-        case 'select':
+        case "select":
           this.renderSelect(renderer);
           break;
 
-        case 'checkbox':
+        case "checkbox":
           this.renderCheckbox(renderer);
           break;
 
-        case 'radio':
+        case "radio":
           this.renderRadioGroup(renderer);
           break;
       }
@@ -3980,12 +4035,12 @@ class FormField extends BaseObject {
 
       if (renderTime > COMPONENT_CONSTANTS.PERFORMANCE_THRESHOLD) {
         UIUtils.debugLog(
-          'warn',
-          `FormField render took ${renderTime.toFixed(2)}ms`
+          "warn",
+          `FormField render took ${renderTime.toFixed(2)}ms`,
         );
       }
     } catch (error) {
-      this.errorHandler(error, 'renderSelf');
+      this.errorHandler(error, "renderSelf");
     }
   }
 
@@ -4050,14 +4105,14 @@ class FormField extends BaseObject {
           ? UI_CONSTANTS.COLORS.GRAY_500
           : UI_CONSTANTS.COLORS.GRAY_900;
 
-      renderer.font = `${isPlaceholder ? 'italic ' : ''}14px Arial`;
-      renderer.textAlign = 'left';
-      renderer.textBaseline = 'middle';
+      renderer.font = `${isPlaceholder ? "italic " : ""}14px Arial`;
+      renderer.textAlign = "left";
+      renderer.textBaseline = "middle";
 
       // Handle password masking
       const textToRender =
-        this.type === 'password' && this.value
-          ? '•'.repeat(this.value.length)
+        this.type === "password" && this.value
+          ? "•".repeat(this.value.length)
           : displayValue;
 
       // Truncate text if too long
@@ -4067,13 +4122,13 @@ class FormField extends BaseObject {
         textToRender,
         maxWidth,
         renderer.font,
-        renderer
+        renderer,
       );
 
       renderer.fillText(
         truncatedText,
         offsetX + padding,
-        fieldY + offsetY + scaledHeight / 2
+        fieldY + offsetY + scaledHeight / 2,
       );
     }
 
@@ -4160,20 +4215,20 @@ class FormField extends BaseObject {
     if (this.value === true) {
       renderer.strokeStyle = UI_CONSTANTS.COLORS.PRIMARY;
       renderer.lineWidth = 2;
-      renderer.lineCap = 'round';
+      renderer.lineCap = "round";
 
       renderer.beginPath();
       renderer.moveTo(
         COMPONENT_CONSTANTS.CHECKBOX_CHECK_MARGIN,
-        checkboxY + checkboxSize / 2
+        checkboxY + checkboxSize / 2,
       );
       renderer.lineTo(
         checkboxSize / 2,
-        checkboxY + checkboxSize - COMPONENT_CONSTANTS.CHECKBOX_CHECK_OFFSET
+        checkboxY + checkboxSize - COMPONENT_CONSTANTS.CHECKBOX_CHECK_OFFSET,
       );
       renderer.lineTo(
         checkboxSize - COMPONENT_CONSTANTS.CHECKBOX_CHECK_MARGIN,
-        checkboxY + COMPONENT_CONSTANTS.CHECKBOX_CHECK_OFFSET
+        checkboxY + COMPONENT_CONSTANTS.CHECKBOX_CHECK_OFFSET,
       );
       renderer.stroke();
     }
@@ -4183,13 +4238,13 @@ class FormField extends BaseObject {
       renderer.fillStyle = this.disabled
         ? UI_CONSTANTS.COLORS.GRAY_400
         : UI_CONSTANTS.COLORS.GRAY_900;
-      renderer.font = '14px Arial';
-      renderer.textAlign = 'left';
-      renderer.textBaseline = 'middle';
+      renderer.font = "14px Arial";
+      renderer.textAlign = "left";
+      renderer.textBaseline = "middle";
       renderer.fillText(
         this.label,
         checkboxSize + UI_CONSTANTS.SPACING.SM,
-        checkboxY + checkboxSize / 2
+        checkboxY + checkboxSize / 2,
       );
     }
   }
@@ -4219,7 +4274,7 @@ class FormField extends BaseObject {
         radioY + radioSize / 2,
         radioSize / 2,
         0,
-        2 * Math.PI
+        2 * Math.PI,
       );
       renderer.fill();
 
@@ -4244,7 +4299,7 @@ class FormField extends BaseObject {
           radioY + radioSize / 2,
           radioSize / COMPONENT_CONSTANTS.RADIO_CHECK_RADIUS_DIVISOR,
           0,
-          2 * Math.PI
+          2 * Math.PI,
         );
         renderer.fill();
       }
@@ -4253,13 +4308,13 @@ class FormField extends BaseObject {
       renderer.fillStyle = option.disabled
         ? UI_CONSTANTS.COLORS.GRAY_400
         : UI_CONSTANTS.COLORS.GRAY_900;
-      renderer.font = '14px Arial';
-      renderer.textAlign = 'left';
-      renderer.textBaseline = 'middle';
+      renderer.font = "14px Arial";
+      renderer.textAlign = "left";
+      renderer.textBaseline = "middle";
       renderer.fillText(
         option.label,
         radioSize + UI_CONSTANTS.SPACING.SM,
-        radioY + radioSize / 2
+        radioY + radioSize / 2,
       );
     });
   }
@@ -4269,18 +4324,18 @@ class FormField extends BaseObject {
    * @param {CanvasRenderingContext2D} renderer
    */
   renderLabel(renderer) {
-    if (!this.label || this.type === 'checkbox') return; // Checkbox renders label differently
+    if (!this.label || this.type === "checkbox") return; // Checkbox renders label differently
 
     renderer.fillStyle = this.disabled
       ? UI_CONSTANTS.COLORS.GRAY_400
       : UI_CONSTANTS.COLORS.GRAY_700;
-    renderer.font = `${this.required ? 'bold ' : ''}12px Arial`;
-    renderer.textAlign = 'left';
-    renderer.textBaseline = 'top';
+    renderer.font = `${this.required ? "bold " : ""}12px Arial`;
+    renderer.textAlign = "left";
+    renderer.textBaseline = "top";
 
     let labelText = this.label;
     if (this.required) {
-      labelText += ' *';
+      labelText += " *";
     }
 
     renderer.fillText(labelText, 0, 0);
@@ -4295,27 +4350,27 @@ class FormField extends BaseObject {
 
     if (this.errorMessage) {
       renderer.fillStyle = UI_CONSTANTS.COLORS.DANGER;
-      renderer.font = '11px Arial';
-      renderer.textAlign = 'left';
-      renderer.textBaseline = 'top';
+      renderer.font = "11px Arial";
+      renderer.textAlign = "left";
+      renderer.textBaseline = "top";
       renderer.fillText(this.errorMessage, 0, messageY);
     } else if (this.successMessage) {
       renderer.fillStyle = UI_CONSTANTS.COLORS.SUCCESS;
-      renderer.font = '11px Arial';
-      renderer.textAlign = 'left';
-      renderer.textBaseline = 'top';
+      renderer.font = "11px Arial";
+      renderer.textAlign = "left";
+      renderer.textBaseline = "top";
       renderer.fillText(this.successMessage, 0, messageY);
     } else if (this.warningMessage) {
       renderer.fillStyle = UI_CONSTANTS.COLORS.WARNING;
-      renderer.font = '11px Arial';
-      renderer.textAlign = 'left';
-      renderer.textBaseline = 'top';
+      renderer.font = "11px Arial";
+      renderer.textAlign = "left";
+      renderer.textBaseline = "top";
       renderer.fillText(this.warningMessage, 0, messageY);
     } else if (this.helpText) {
       renderer.fillStyle = UI_CONSTANTS.COLORS.GRAY_500;
-      renderer.font = '11px Arial';
-      renderer.textAlign = 'left';
-      renderer.textBaseline = 'top';
+      renderer.font = "11px Arial";
+      renderer.textAlign = "left";
+      renderer.textBaseline = "top";
       renderer.fillText(this.helpText, 0, messageY);
     }
   }
@@ -4338,13 +4393,13 @@ class FormField extends BaseObject {
     renderer.fillStyle = isOverLimit
       ? UI_CONSTANTS.COLORS.DANGER
       : UI_CONSTANTS.COLORS.GRAY_500;
-    renderer.font = '10px Arial';
-    renderer.textAlign = 'right';
-    renderer.textBaseline = 'top';
+    renderer.font = "10px Arial";
+    renderer.textAlign = "right";
+    renderer.textBaseline = "top";
     renderer.fillText(
       countText,
       this.width,
-      this.height - COMPONENT_CONSTANTS.FORM_COUNT_Y_OFFSET
+      this.height - COMPONENT_CONSTANTS.FORM_COUNT_Y_OFFSET,
     );
   }
 
@@ -4368,7 +4423,7 @@ class FormField extends BaseObject {
     renderer.moveTo(cursorX, y + COMPONENT_CONSTANTS.FORM_CURSOR_OFFSET);
     renderer.lineTo(
       cursorX,
-      y + height - COMPONENT_CONSTANTS.FORM_CURSOR_OFFSET
+      y + height - COMPONENT_CONSTANTS.FORM_CURSOR_OFFSET,
     );
     renderer.stroke();
   }
@@ -4393,7 +4448,7 @@ class FormField extends BaseObject {
       -FOCUS_RING_WIDTH,
       fieldY - FOCUS_RING_WIDTH,
       this.width + FOCUS_RING_WIDTH * 2,
-      fieldHeight + FOCUS_RING_WIDTH * 2
+      fieldHeight + FOCUS_RING_WIDTH * 2,
     );
     renderer.setLineDash([]);
   }
@@ -4405,10 +4460,10 @@ class FormField extends BaseObject {
   getAccessibilityDescription() {
     let description = `${this.type} field`;
     if (this.label) description += ` labeled "${this.label}"`;
-    if (this.required) description += ', required';
-    if (this.disabled) description += ', disabled';
-    if (this.readonly) description += ', read-only';
-    if (!this.isValid) description += ', invalid';
+    if (this.required) description += ", required";
+    if (this.disabled) description += ", disabled";
+    if (this.readonly) description += ", read-only";
+    if (!this.isValid) description += ", invalid";
     return description;
   }
 
@@ -4418,8 +4473,8 @@ class FormField extends BaseObject {
    * @param {string} context
    */
   defaultErrorHandler(error, context) {
-    UIUtils.debugLog('error', `FormField error in ${context}`, error);
-    this.emit('error', { error, context, component: 'FormField' });
+    UIUtils.debugLog("error", `FormField error in ${context}`, error);
+    this.emit("error", { error, context, component: "FormField" });
   }
 
   /**
@@ -4440,7 +4495,7 @@ class FormField extends BaseObject {
 
       super.destroy();
     } catch (error) {
-      this.errorHandler(error, 'destroy');
+      this.errorHandler(error, "destroy");
     }
   }
 }
@@ -4450,27 +4505,27 @@ class Tooltip extends BaseObject {
   constructor(options = {}) {
     super({
       ...options,
-      width: options.width || 'auto',
-      height: options.height || 'auto',
-      ariaRole: 'tooltip',
+      width: options.width || "auto",
+      height: options.height || "auto",
+      ariaRole: "tooltip",
     });
 
-    this.content = options.content || '';
+    this.content = options.content || "";
     this.target = options.target || null;
-    this.position = options.position || 'top'; // 'top', 'bottom', 'left', 'right', 'auto'
+    this.position = options.position || "top"; // 'top', 'bottom', 'left', 'right', 'auto'
     this.showDelay =
       options.showDelay || COMPONENT_CONSTANTS.TOOLTIP_SHOW_DELAY;
     this.hideDelay =
       options.hideDelay || COMPONENT_CONSTANTS.TOOLTIP_HIDE_DELAY;
     this.offset = options.offset || 10;
     this.maxWidth = options.maxWidth || COMPONENT_CONSTANTS.TOOLTIP_MAX_WIDTH;
-    this.theme = options.theme || 'dark'; // 'dark', 'light', 'custom'
+    this.theme = options.theme || "dark"; // 'dark', 'light', 'custom'
     this.allowHtml = options.allowHtml || false;
     this.interactive = options.interactive || false;
     this.followCursor = options.followCursor || false;
     this.persistent = options.persistent || false; // Stay open until explicitly closed
     this.arrow = options.arrow !== false;
-    this.animation = options.animation || 'fade'; // 'fade', 'scale', 'slide', 'none'
+    this.animation = options.animation || "fade"; // 'fade', 'scale', 'slide', 'none'
 
     // State management
     this.isVisible = false;
@@ -4479,7 +4534,7 @@ class Tooltip extends BaseObject {
     this.hideTimer = null;
     this.currentPosition = this.position;
     this.calculatedDimensions = { width: 0, height: 0 };
-    this.arrowPosition = { x: 0, y: 0, direction: 'up' };
+    this.arrowPosition = { x: 0, y: 0, direction: "up" };
 
     // Performance and accessibility
     this.errorHandler =
@@ -4513,7 +4568,7 @@ class Tooltip extends BaseObject {
       this.calculateDimensions();
       this.updateAccessibilityAttributes();
     } catch (error) {
-      this.errorHandler(error, 'setupTooltip');
+      this.errorHandler(error, "setupTooltip");
     }
   }
 
@@ -4523,12 +4578,12 @@ class Tooltip extends BaseObject {
   bindEvents() {
     try {
       // Global events for positioning updates
-      if (typeof window !== 'undefined') {
-        window.addEventListener('resize', () => this.updateViewportBounds());
-        window.addEventListener('scroll', () => this.updatePosition());
+      if (typeof window !== "undefined") {
+        window.addEventListener("resize", () => this.updateViewportBounds());
+        window.addEventListener("scroll", () => this.updatePosition());
       }
     } catch (error) {
-      this.errorHandler(error, 'bindEvents');
+      this.errorHandler(error, "bindEvents");
     }
   }
 
@@ -4540,25 +4595,31 @@ class Tooltip extends BaseObject {
 
     try {
       // Mouse events
-      this.target.on('mouseenter', event => this.handleTargetMouseEnter(event));
-      this.target.on('mouseleave', event => this.handleTargetMouseLeave(event));
-      this.target.on('mousemove', event => this.handleTargetMouseMove(event));
+      this.target.on("mouseenter", (event) =>
+        this.handleTargetMouseEnter(event),
+      );
+      this.target.on("mouseleave", (event) =>
+        this.handleTargetMouseLeave(event),
+      );
+      this.target.on("mousemove", (event) => this.handleTargetMouseMove(event));
 
       // Touch events for mobile
-      this.target.on('touchstart', event => this.handleTargetTouchStart(event));
-      this.target.on('touchend', event => this.handleTargetTouchEnd(event));
-      this.target.on('touchcancel', event =>
-        this.handleTargetTouchCancel(event)
+      this.target.on("touchstart", (event) =>
+        this.handleTargetTouchStart(event),
+      );
+      this.target.on("touchend", (event) => this.handleTargetTouchEnd(event));
+      this.target.on("touchcancel", (event) =>
+        this.handleTargetTouchCancel(event),
       );
 
       // Focus events for accessibility
-      this.target.on('focus', () => this.handleTargetFocus());
-      this.target.on('blur', () => this.handleTargetBlur());
+      this.target.on("focus", () => this.handleTargetFocus());
+      this.target.on("blur", () => this.handleTargetBlur());
 
       // Keyboard events
-      this.target.on('keydown', event => this.handleTargetKeyDown(event));
+      this.target.on("keydown", (event) => this.handleTargetKeyDown(event));
     } catch (error) {
-      this.errorHandler(error, 'bindTargetEvents');
+      this.errorHandler(error, "bindTargetEvents");
     }
   }
 
@@ -4575,7 +4636,7 @@ class Tooltip extends BaseObject {
         this.updatePosition();
       }
     } catch (error) {
-      this.errorHandler(error, 'setContent');
+      this.errorHandler(error, "setContent");
     }
   }
 
@@ -4596,7 +4657,7 @@ class Tooltip extends BaseObject {
         this.bindTargetEvents();
       }
     } catch (error) {
-      this.errorHandler(error, 'setTarget');
+      this.errorHandler(error, "setTarget");
     }
   }
 
@@ -4608,15 +4669,15 @@ class Tooltip extends BaseObject {
 
     // Remove all event listeners
     // This would depend on the event system implementation
-    this.target.off('mouseenter');
-    this.target.off('mouseleave');
-    this.target.off('mousemove');
-    this.target.off('touchstart');
-    this.target.off('touchend');
-    this.target.off('touchcancel');
-    this.target.off('focus');
-    this.target.off('blur');
-    this.target.off('keydown');
+    this.target.off("mouseenter");
+    this.target.off("mouseleave");
+    this.target.off("mousemove");
+    this.target.off("touchstart");
+    this.target.off("touchend");
+    this.target.off("touchcancel");
+    this.target.off("focus");
+    this.target.off("blur");
+    this.target.off("keydown");
   }
 
   /**
@@ -4630,8 +4691,8 @@ class Tooltip extends BaseObject {
       }
 
       // Create temporary canvas to measure text
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
 
       ctx.font = this.getFont();
 
@@ -4641,7 +4702,7 @@ class Tooltip extends BaseObject {
       const padding = this.getPadding();
 
       const textWidth = Math.max(
-        ...lines.map(line => ctx.measureText(line).width)
+        ...lines.map((line) => ctx.measureText(line).width),
       );
       const textHeight = lines.length * lineHeight;
 
@@ -4655,7 +4716,7 @@ class Tooltip extends BaseObject {
       this.width = this.calculatedDimensions.width;
       this.height = this.calculatedDimensions.height;
     } catch (error) {
-      this.errorHandler(error, 'calculateDimensions');
+      this.errorHandler(error, "calculateDimensions");
     }
   }
 
@@ -4667,9 +4728,9 @@ class Tooltip extends BaseObject {
    * @returns {Array<string>}
    */
   wrapText(text, maxWidth, ctx) {
-    const words = text.split(' ');
+    const words = text.split(" ");
     const lines = [];
-    let currentLine = '';
+    let currentLine = "";
 
     for (const word of words) {
       const testLine = currentLine ? `${currentLine} ${word}` : word;
@@ -4695,7 +4756,7 @@ class Tooltip extends BaseObject {
    * @returns {string}
    */
   getFont() {
-    return '12px Arial';
+    return "12px Arial";
   }
 
   /**
@@ -4726,7 +4787,7 @@ class Tooltip extends BaseObject {
    */
   updateViewportBounds() {
     try {
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         this.viewportBounds = {
           width: window.innerWidth,
           height: window.innerHeight,
@@ -4743,7 +4804,7 @@ class Tooltip extends BaseObject {
         };
       }
     } catch (error) {
-      this.errorHandler(error, 'updateViewportBounds');
+      this.errorHandler(error, "updateViewportBounds");
     }
   }
 
@@ -4761,7 +4822,7 @@ class Tooltip extends BaseObject {
         this.show(event);
       }, this.showDelay);
     } catch (error) {
-      this.errorHandler(error, 'scheduleShow');
+      this.errorHandler(error, "scheduleShow");
     }
   }
 
@@ -4778,7 +4839,7 @@ class Tooltip extends BaseObject {
         this.hide();
       }, this.hideDelay);
     } catch (error) {
-      this.errorHandler(error, 'scheduleHide');
+      this.errorHandler(error, "scheduleHide");
     }
   }
 
@@ -4817,9 +4878,9 @@ class Tooltip extends BaseObject {
       // Start entrance animation
       this.startEntranceAnimation();
 
-      this.emit('show', { tooltip: this });
+      this.emit("show", { tooltip: this });
     } catch (error) {
-      this.errorHandler(error, 'show');
+      this.errorHandler(error, "show");
     }
   }
 
@@ -4836,10 +4897,10 @@ class Tooltip extends BaseObject {
       this.startExitAnimation().then(() => {
         this.isVisible = false;
         this.isAnimating = false;
-        this.emit('hide', { tooltip: this });
+        this.emit("hide", { tooltip: this });
       });
     } catch (error) {
-      this.errorHandler(error, 'hide');
+      this.errorHandler(error, "hide");
     }
   }
 
@@ -4890,7 +4951,7 @@ class Tooltip extends BaseObject {
       let position = this.tryPosition(this.position, targetBounds);
 
       // If auto-positioning or preferred position doesn't fit, find best position
-      if ((this.position === 'auto' || !position.fits) && this.viewportBounds) {
+      if ((this.position === "auto" || !position.fits) && this.viewportBounds) {
         position = this.findBestPosition(targetBounds);
       }
 
@@ -4899,7 +4960,7 @@ class Tooltip extends BaseObject {
       this.currentPosition = position.direction;
       this.arrowPosition = position.arrow;
     } catch (error) {
-      this.errorHandler(error, 'calculatePosition');
+      this.errorHandler(error, "calculatePosition");
     }
   }
 
@@ -4918,41 +4979,41 @@ class Tooltip extends BaseObject {
     let x, y, arrowX, arrowY, arrowDirection;
 
     switch (direction) {
-      case 'top':
+      case "top":
         x = targetBounds.x + targetBounds.width / 2 - tooltip.width / 2;
         y = targetBounds.y - tooltip.height - this.offset;
         arrowX = tooltip.width / 2;
         arrowY = tooltip.height;
-        arrowDirection = 'down';
+        arrowDirection = "down";
         break;
 
-      case 'bottom':
+      case "bottom":
         x = targetBounds.x + targetBounds.width / 2 - tooltip.width / 2;
         y = targetBounds.y + targetBounds.height + this.offset;
         arrowX = tooltip.width / 2;
         arrowY = 0;
-        arrowDirection = 'up';
+        arrowDirection = "up";
         break;
 
-      case 'left':
+      case "left":
         x = targetBounds.x - tooltip.width - this.offset;
         y = targetBounds.y + targetBounds.height / 2 - tooltip.height / 2;
         arrowX = tooltip.width;
         arrowY = tooltip.height / 2;
-        arrowDirection = 'right';
+        arrowDirection = "right";
         break;
 
-      case 'right':
+      case "right":
         x = targetBounds.x + targetBounds.width + this.offset;
         y = targetBounds.y + targetBounds.height / 2 - tooltip.height / 2;
         arrowX = 0;
         arrowY = tooltip.height / 2;
-        arrowDirection = 'left';
+        arrowDirection = "left";
         break;
 
       default:
         // Default to top
-        return this.tryPosition('top', targetBounds);
+        return this.tryPosition("top", targetBounds);
     }
 
     // Check if position fits in viewport
@@ -4973,10 +5034,10 @@ class Tooltip extends BaseObject {
    * @returns {Object}
    */
   findBestPosition(targetBounds) {
-    const positions = ['top', 'bottom', 'right', 'left'];
+    const positions = ["top", "bottom", "right", "left"];
 
     // Try each position and score them
-    const scoredPositions = positions.map(pos => {
+    const scoredPositions = positions.map((pos) => {
       const result = this.tryPosition(pos, targetBounds);
       result.score = this.scorePosition(result, targetBounds);
       return result;
@@ -5015,12 +5076,12 @@ class Tooltip extends BaseObject {
       Math.min(
         COMPONENT_CONSTANTS.ALIGNMENT_CENTER_BASE,
         Math.abs(targetCenterX - tooltipCenterX) +
-          Math.abs(targetCenterY - tooltipCenterY)
+          Math.abs(targetCenterY - tooltipCenterY),
       );
     score += alignmentScore;
 
     // Prefer top and bottom positions over left and right
-    if (position.direction === 'top' || position.direction === 'bottom') {
+    if (position.direction === "top" || position.direction === "bottom") {
       score += 10;
     }
 
@@ -5102,16 +5163,16 @@ class Tooltip extends BaseObject {
    * Starts entrance animation
    */
   startEntranceAnimation() {
-    if (!this.animationsEnabled || this.animation === 'none') {
+    if (!this.animationsEnabled || this.animation === "none") {
       this.isAnimating = false;
       return Promise.resolve();
     }
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       switch (this.animation) {
-        case 'fade':
+        case "fade":
           this.alpha = 0;
-          this.animate('alpha', 1, COMPONENT_CONSTANTS.TOOLTIP_ANIMATION_IN, {
+          this.animate("alpha", 1, COMPONENT_CONSTANTS.TOOLTIP_ANIMATION_IN, {
             easing: EASING_FUNCTIONS.EASE_OUT_QUAD,
             onComplete: () => {
               this.isAnimating = false;
@@ -5120,9 +5181,9 @@ class Tooltip extends BaseObject {
           });
           break;
 
-        case 'scale':
+        case "scale":
           this.scale = 0;
-          this.animate('scale', 1, COMPONENT_CONSTANTS.TOOLTIP_ANIMATION_IN, {
+          this.animate("scale", 1, COMPONENT_CONSTANTS.TOOLTIP_ANIMATION_IN, {
             easing: EASING_FUNCTIONS.EASE_OUT_BACK,
             onComplete: () => {
               this.isAnimating = false;
@@ -5131,23 +5192,23 @@ class Tooltip extends BaseObject {
           });
           break;
 
-        case 'slide': {
+        case "slide": {
           const slideOffset =
-            this.currentPosition === 'top' || this.currentPosition === 'bottom'
-              ? this.currentPosition === 'top'
+            this.currentPosition === "top" || this.currentPosition === "bottom"
+              ? this.currentPosition === "top"
                 ? -COMPONENT_CONSTANTS.TOOLTIP_SLIDE_OFFSET
                 : COMPONENT_CONSTANTS.TOOLTIP_SLIDE_OFFSET
-              : this.currentPosition === 'left'
+              : this.currentPosition === "left"
                 ? -COMPONENT_CONSTANTS.TOOLTIP_SLIDE_OFFSET
                 : COMPONENT_CONSTANTS.TOOLTIP_SLIDE_OFFSET;
 
           if (
-            this.currentPosition === 'top' ||
-            this.currentPosition === 'bottom'
+            this.currentPosition === "top" ||
+            this.currentPosition === "bottom"
           ) {
             this.y += slideOffset;
             this.animate(
-              'y',
+              "y",
               this.y - slideOffset,
               COMPONENT_CONSTANTS.TOOLTIP_ANIMATION_IN,
               {
@@ -5156,12 +5217,12 @@ class Tooltip extends BaseObject {
                   this.isAnimating = false;
                   resolve();
                 },
-              }
+              },
             );
           } else {
             this.x += slideOffset;
             this.animate(
-              'x',
+              "x",
               this.x - slideOffset,
               COMPONENT_CONSTANTS.TOOLTIP_ANIMATION_IN,
               {
@@ -5170,7 +5231,7 @@ class Tooltip extends BaseObject {
                   this.isAnimating = false;
                   resolve();
                 },
-              }
+              },
             );
           }
           break;
@@ -5188,58 +5249,58 @@ class Tooltip extends BaseObject {
    * Starts exit animation
    */
   startExitAnimation() {
-    if (!this.animationsEnabled || this.animation === 'none') {
+    if (!this.animationsEnabled || this.animation === "none") {
       return Promise.resolve();
     }
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       switch (this.animation) {
-        case 'fade':
-          this.animate('alpha', 0, COMPONENT_CONSTANTS.TOOLTIP_ANIMATION_OUT, {
+        case "fade":
+          this.animate("alpha", 0, COMPONENT_CONSTANTS.TOOLTIP_ANIMATION_OUT, {
             easing: EASING_FUNCTIONS.EASE_IN_QUAD,
             onComplete: resolve,
           });
           break;
 
-        case 'scale':
-          this.animate('scale', 0, COMPONENT_CONSTANTS.TOOLTIP_ANIMATION_OUT, {
+        case "scale":
+          this.animate("scale", 0, COMPONENT_CONSTANTS.TOOLTIP_ANIMATION_OUT, {
             easing: EASING_FUNCTIONS.EASE_IN_BACK,
             onComplete: resolve,
           });
           break;
 
-        case 'slide': {
+        case "slide": {
           const slideOffset =
-            this.currentPosition === 'top' || this.currentPosition === 'bottom'
-              ? this.currentPosition === 'top'
+            this.currentPosition === "top" || this.currentPosition === "bottom"
+              ? this.currentPosition === "top"
                 ? -COMPONENT_CONSTANTS.TOOLTIP_SLIDE_OFFSET
                 : COMPONENT_CONSTANTS.TOOLTIP_SLIDE_OFFSET
-              : this.currentPosition === 'left'
+              : this.currentPosition === "left"
                 ? -COMPONENT_CONSTANTS.TOOLTIP_SLIDE_OFFSET
                 : COMPONENT_CONSTANTS.TOOLTIP_SLIDE_OFFSET;
 
           if (
-            this.currentPosition === 'top' ||
-            this.currentPosition === 'bottom'
+            this.currentPosition === "top" ||
+            this.currentPosition === "bottom"
           ) {
             this.animate(
-              'y',
+              "y",
               this.y + slideOffset,
               COMPONENT_CONSTANTS.TOOLTIP_ANIMATION_OUT,
               {
                 easing: EASING_FUNCTIONS.EASE_IN_QUAD,
                 onComplete: resolve,
-              }
+              },
             );
           } else {
             this.animate(
-              'x',
+              "x",
               this.x + slideOffset,
               COMPONENT_CONSTANTS.TOOLTIP_ANIMATION_OUT,
               {
                 easing: EASING_FUNCTIONS.EASE_IN_QUAD,
                 onComplete: resolve,
-              }
+              },
             );
           }
           break;
@@ -5300,7 +5361,7 @@ class Tooltip extends BaseObject {
   }
 
   handleTargetKeyDown(event) {
-    if (event.key === 'Escape' && this.isVisible) {
+    if (event.key === "Escape" && this.isVisible) {
       this.hide();
     }
   }
@@ -5310,7 +5371,7 @@ class Tooltip extends BaseObject {
    */
   updateAccessibilityAttributes() {
     this.ariaLabel = this.content;
-    this.ariaLive = 'polite';
+    this.ariaLive = "polite";
     this.ariaAtomic = true;
   }
 
@@ -5319,7 +5380,7 @@ class Tooltip extends BaseObject {
    * @param {CanvasRenderingContext2D} renderer
    */
   renderSelf(renderer) {
-    if (renderer.type !== 'canvas' || !this.visible || !this.isVisible) return;
+    if (renderer.type !== "canvas" || !this.visible || !this.isVisible) return;
 
     try {
       const startTime = performance.now();
@@ -5356,12 +5417,12 @@ class Tooltip extends BaseObject {
 
       if (renderTime > COMPONENT_CONSTANTS.PERFORMANCE_THRESHOLD) {
         UIUtils.debugLog(
-          'warn',
-          `Tooltip render took ${renderTime.toFixed(2)}ms`
+          "warn",
+          `Tooltip render took ${renderTime.toFixed(2)}ms`,
         );
       }
     } catch (error) {
-      this.errorHandler(error, 'renderSelf');
+      this.errorHandler(error, "renderSelf");
     }
   }
 
@@ -5375,14 +5436,14 @@ class Tooltip extends BaseObject {
     const borderRadius = 6;
 
     // Shadow
-    renderer.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    renderer.fillStyle = "rgba(0, 0, 0, 0.1)";
     UIUtils.fillRoundedRect(
       renderer,
       2,
       2,
       this.width,
       this.height,
-      borderRadius
+      borderRadius,
     );
 
     // Background
@@ -5393,7 +5454,7 @@ class Tooltip extends BaseObject {
       0,
       this.width,
       this.height,
-      borderRadius
+      borderRadius,
     );
 
     // Border
@@ -5406,7 +5467,7 @@ class Tooltip extends BaseObject {
         0,
         this.width,
         this.height,
-        borderRadius
+        borderRadius,
       );
     }
   }
@@ -5417,12 +5478,12 @@ class Tooltip extends BaseObject {
    */
   getBackgroundColor() {
     switch (this.theme) {
-      case 'light':
+      case "light":
         return UI_CONSTANTS.COLORS.WHITE;
-      case 'dark':
-        return 'rgba(0, 0, 0, 0.9)';
+      case "dark":
+        return "rgba(0, 0, 0, 0.9)";
       default:
-        return 'rgba(0, 0, 0, 0.8)';
+        return "rgba(0, 0, 0, 0.8)";
     }
   }
 
@@ -5432,7 +5493,7 @@ class Tooltip extends BaseObject {
    */
   getBorderColor() {
     switch (this.theme) {
-      case 'light':
+      case "light":
         return UI_CONSTANTS.COLORS.GRAY_300;
       default:
         return null;
@@ -5445,9 +5506,9 @@ class Tooltip extends BaseObject {
    */
   getTextColor() {
     switch (this.theme) {
-      case 'light':
+      case "light":
         return UI_CONSTANTS.COLORS.GRAY_900;
-      case 'dark':
+      case "dark":
       default:
         return UI_CONSTANTS.COLORS.WHITE;
     }
@@ -5468,25 +5529,25 @@ class Tooltip extends BaseObject {
     renderer.beginPath();
 
     switch (direction) {
-      case 'up':
+      case "up":
         renderer.moveTo(x - arrowSize, y);
         renderer.lineTo(x + arrowSize, y);
         renderer.lineTo(x, y - arrowSize);
         break;
 
-      case 'down':
+      case "down":
         renderer.moveTo(x - arrowSize, y);
         renderer.lineTo(x + arrowSize, y);
         renderer.lineTo(x, y + arrowSize);
         break;
 
-      case 'left':
+      case "left":
         renderer.moveTo(x, y - arrowSize);
         renderer.lineTo(x, y + arrowSize);
         renderer.lineTo(x - arrowSize, y);
         break;
 
-      case 'right':
+      case "right":
         renderer.moveTo(x, y - arrowSize);
         renderer.lineTo(x, y + arrowSize);
         renderer.lineTo(x + arrowSize, y);
@@ -5518,8 +5579,8 @@ class Tooltip extends BaseObject {
 
     renderer.fillStyle = textColor;
     renderer.font = this.getFont();
-    renderer.textAlign = 'left';
-    renderer.textBaseline = 'top';
+    renderer.textAlign = "left";
+    renderer.textBaseline = "top";
 
     this.calculatedDimensions.lines.forEach((line, index) => {
       const x = padding.left;
@@ -5535,7 +5596,7 @@ class Tooltip extends BaseObject {
   getAccessibilityDescription() {
     return (
       `Tooltip with content: "${this.content}". Position: ${this.currentPosition}. ` +
-      `${this.isVisible ? 'Currently visible' : 'Currently hidden'}.`
+      `${this.isVisible ? "Currently visible" : "Currently hidden"}.`
     );
   }
 
@@ -5545,8 +5606,8 @@ class Tooltip extends BaseObject {
    * @param {string} context
    */
   defaultErrorHandler(error, context) {
-    UIUtils.debugLog('error', `Tooltip error in ${context}`, error);
-    this.emit('error', { error, context, component: 'Tooltip' });
+    UIUtils.debugLog("error", `Tooltip error in ${context}`, error);
+    this.emit("error", { error, context, component: "Tooltip" });
   }
 
   /**
@@ -5568,9 +5629,9 @@ class Tooltip extends BaseObject {
       }
 
       // Remove global event listeners
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('resize', this.updateViewportBounds);
-        window.removeEventListener('scroll', this.updatePosition);
+      if (typeof window !== "undefined") {
+        window.removeEventListener("resize", this.updateViewportBounds);
+        window.removeEventListener("scroll", this.updatePosition);
       }
 
       // Stop any running animations
@@ -5578,7 +5639,7 @@ class Tooltip extends BaseObject {
 
       super.destroy();
     } catch (error) {
-      this.errorHandler(error, 'destroy');
+      this.errorHandler(error, "destroy");
     }
   }
 }

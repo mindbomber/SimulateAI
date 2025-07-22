@@ -1,6 +1,7 @@
 /**
  * Enhanced Canvas Renderer for SimulateAI Platform
  * High-performance, accessible, and modern canvas-based graphics rendering
+ * NOTE: Chart.js radar charts are handled by radar-chart.js - this is for custom canvas operations
  *
  * Features:
  * - High-DPI and responsive canvas support
@@ -12,15 +13,21 @@
  * - Security-conscious rendering
  * - Comprehensive error handling
  *
- * @version 2.0.0
+ * @version 2.1.0
  * @author SimulateAI Team
  */
 
-import logger from '../utils/logger.js';
+import logger from "../utils/logger.js";
+import {
+  CANVAS_RENDERER_CONSTANTS,
+  SHARED_CHART_CONSTANTS,
+} from "../constants/chart-constants.js";
 
-// Enhanced constants and configuration
+// Use centralized constants
 const CANVAS_CONSTANTS = {
-  VERSION: '2.0.0',
+  ...CANVAS_RENDERER_CONSTANTS,
+  ...SHARED_CHART_CONSTANTS,
+  VERSION: "2.1.0",
   DEFAULT_WIDTH: 800,
   DEFAULT_HEIGHT: 600,
   MAX_CANVAS_SIZE: 32767, // Browser limitation
@@ -95,25 +102,25 @@ const CANVAS_CONSTANTS = {
   },
   THEMES: {
     LIGHT: {
-      background: '#ffffff',
-      foreground: '#333333',
-      primary: '#007acc',
-      secondary: '#28a745',
-      accent: '#6c757d',
+      background: "#ffffff",
+      foreground: "#333333",
+      primary: "#007acc",
+      secondary: "#28a745",
+      accent: "#6c757d",
     },
     DARK: {
-      background: '#1a1a1a',
-      foreground: '#e0e0e0',
-      primary: '#4da6ff',
-      secondary: '#66bb6a',
-      accent: '#9e9e9e',
+      background: "#1a1a1a",
+      foreground: "#e0e0e0",
+      primary: "#4da6ff",
+      secondary: "#66bb6a",
+      accent: "#9e9e9e",
     },
     HIGH_CONTRAST: {
-      background: '#000000',
-      foreground: '#ffffff',
-      primary: '#ffff00',
-      secondary: '#00ffff',
-      accent: '#ff00ff',
+      background: "#000000",
+      foreground: "#ffffff",
+      primary: "#ffff00",
+      secondary: "#00ffff",
+      accent: "#ff00ff",
     },
   },
 };
@@ -166,7 +173,7 @@ class CanvasPerformanceMonitor {
   }
 
   reset() {
-    Object.keys(this.metrics).forEach(key => {
+    Object.keys(this.metrics).forEach((key) => {
       this.metrics[key] = 0;
     });
   }
@@ -179,7 +186,7 @@ class CanvasAccessibilityManager {
   constructor(canvas, renderer) {
     this.canvas = canvas;
     this.renderer = renderer;
-    this.description = '';
+    this.description = "";
     this.elements = new Map();
     this.focusedElement = null;
     this.setupAccessibility();
@@ -187,19 +194,19 @@ class CanvasAccessibilityManager {
 
   setupAccessibility() {
     // Set up canvas accessibility attributes
-    this.canvas.setAttribute('role', 'img');
-    this.canvas.setAttribute('tabindex', '0');
-    this.updateDescription('Interactive simulation canvas');
+    this.canvas.setAttribute("role", "img");
+    this.canvas.setAttribute("tabindex", "0");
+    this.updateDescription("Interactive simulation canvas");
 
     // Add keyboard navigation
-    this.canvas.addEventListener('keydown', this.handleKeydown.bind(this));
-    this.canvas.addEventListener('focus', this.handleFocus.bind(this));
-    this.canvas.addEventListener('blur', this.handleBlur.bind(this));
+    this.canvas.addEventListener("keydown", this.handleKeydown.bind(this));
+    this.canvas.addEventListener("focus", this.handleFocus.bind(this));
+    this.canvas.addEventListener("blur", this.handleBlur.bind(this));
   }
 
   updateDescription(description) {
     this.description = description;
-    this.canvas.setAttribute('aria-label', description);
+    this.canvas.setAttribute("aria-label", description);
   }
 
   addElement(id, element) {
@@ -221,17 +228,17 @@ class CanvasAccessibilityManager {
 
   handleKeydown(event) {
     const focusableElements = Array.from(this.elements.values()).filter(
-      el => el.focusable
+      (el) => el.focusable,
     );
 
     if (focusableElements.length === 0) return;
 
     let currentIndex = focusableElements.findIndex(
-      el => el.id === this.focusedElement
+      (el) => el.id === this.focusedElement,
     );
 
     switch (event.key) {
-      case 'Tab':
+      case "Tab":
         event.preventDefault();
         if (event.shiftKey) {
           currentIndex =
@@ -243,8 +250,8 @@ class CanvasAccessibilityManager {
         this.focusElement(focusableElements[currentIndex].id);
         break;
 
-      case 'Enter':
-      case ' ':
+      case "Enter":
+      case " ":
         if (this.focusedElement) {
           const element = this.elements.get(this.focusedElement);
           if (element && element.onClick) {
@@ -272,14 +279,14 @@ class CanvasAccessibilityManager {
   }
 
   announceToScreenReader(message) {
-    const announcer = document.createElement('div');
-    announcer.setAttribute('aria-live', 'polite');
-    announcer.setAttribute('aria-atomic', 'true');
-    announcer.style.position = 'absolute';
-    announcer.style.left = '-10000px';
-    announcer.style.width = '1px';
-    announcer.style.height = '1px';
-    announcer.style.overflow = 'hidden';
+    const announcer = document.createElement("div");
+    announcer.setAttribute("aria-live", "polite");
+    announcer.setAttribute("aria-atomic", "true");
+    announcer.style.position = "absolute";
+    announcer.style.left = "-10000px";
+    announcer.style.width = "1px";
+    announcer.style.height = "1px";
+    announcer.style.overflow = "hidden";
 
     document.body.appendChild(announcer);
     announcer.textContent = message;
@@ -290,11 +297,11 @@ class CanvasAccessibilityManager {
   }
 
   handleFocus() {
-    this.canvas.style.outline = '2px solid #007acc';
+    this.canvas.style.outline = "2px solid #007acc";
   }
 
   handleBlur() {
-    this.canvas.style.outline = 'none';
+    this.canvas.style.outline = "none";
     this.focusedElement = null;
   }
 
@@ -331,7 +338,7 @@ class CanvasRenderer {
       pixelRatio: options.pixelRatio || window.devicePixelRatio || 1,
       alpha: options.alpha !== false,
       antialias: options.antialias !== false,
-      theme: options.theme || 'light',
+      theme: options.theme || "light",
       enableAccessibility: options.enableAccessibility !== false,
       enablePerformanceMonitoring:
         options.enablePerformanceMonitoring !== false,
@@ -354,7 +361,7 @@ class CanvasRenderer {
 
     // Safely handle theme selection with proper type checking
     const themeKey = (
-      typeof this.options.theme === 'string' ? this.options.theme : 'light'
+      typeof this.options.theme === "string" ? this.options.theme : "light"
     ).toUpperCase();
     this.currentTheme =
       CANVAS_CONSTANTS.THEMES[themeKey] || CANVAS_CONSTANTS.THEMES.LIGHT;
@@ -378,7 +385,7 @@ class CanvasRenderer {
     try {
       this.initialize();
     } catch (error) {
-      this.errorHandler('Initialization failed', error);
+      this.errorHandler("Initialization failed", error);
     }
   }
 
@@ -400,7 +407,7 @@ class CanvasRenderer {
    */
   validateContainer() {
     if (!this.container || !this.container.nodeType) {
-      throw new Error('Invalid container element provided');
+      throw new Error("Invalid container element provided");
     }
   }
 
@@ -408,31 +415,31 @@ class CanvasRenderer {
    * Create and configure canvas element
    */
   createCanvas() {
-    this.canvas = document.createElement('canvas');
+    this.canvas = document.createElement("canvas");
 
     // Validate canvas size limits
     const maxWidth = Math.min(
       this.options.width,
-      CANVAS_CONSTANTS.MAX_CANVAS_SIZE
+      CANVAS_CONSTANTS.MAX_CANVAS_SIZE,
     );
     const maxHeight = Math.min(
       this.options.height,
-      CANVAS_CONSTANTS.MAX_CANVAS_SIZE
+      CANVAS_CONSTANTS.MAX_CANVAS_SIZE,
     );
 
     // Set canvas styling
-    this.canvas.style.width = '100%';
-    this.canvas.style.height = '100%';
-    this.canvas.style.display = 'block';
-    this.canvas.style.touchAction = 'none'; // Prevent default touch behaviors
+    this.canvas.style.width = "100%";
+    this.canvas.style.height = "100%";
+    this.canvas.style.display = "block";
+    this.canvas.style.touchAction = "none"; // Prevent default touch behaviors
 
     // Set canvas size with device pixel ratio
     this.canvas.width = maxWidth * this.options.pixelRatio;
     this.canvas.height = maxHeight * this.options.pixelRatio;
 
     // Add security attributes
-    this.canvas.setAttribute('data-renderer', 'canvas');
-    this.canvas.setAttribute('data-version', CANVAS_CONSTANTS.VERSION);
+    this.canvas.setAttribute("data-renderer", "canvas");
+    this.canvas.setAttribute("data-version", CANVAS_CONSTANTS.VERSION);
 
     this.container.appendChild(this.canvas);
   }
@@ -444,15 +451,15 @@ class CanvasRenderer {
     const contextOptions = {
       alpha: this.options.alpha,
       antialias: this.options.antialias,
-      colorSpace: 'srgb',
+      colorSpace: "srgb",
       desynchronized: false,
       willReadFrequently: false,
     };
 
-    this.ctx = this.canvas.getContext('2d', contextOptions);
+    this.ctx = this.canvas.getContext("2d", contextOptions);
 
     if (!this.ctx) {
-      throw new Error('Failed to get 2D canvas context');
+      throw new Error("Failed to get 2D canvas context");
     }
 
     // Scale context for high-DPI displays
@@ -468,11 +475,11 @@ class CanvasRenderer {
   applyDefaultStyles() {
     this.ctx.font =
       '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif';
-    this.ctx.textBaseline = 'middle';
-    this.ctx.lineCap = 'round';
-    this.ctx.lineJoin = 'round';
+    this.ctx.textBaseline = "middle";
+    this.ctx.lineCap = "round";
+    this.ctx.lineJoin = "round";
     this.ctx.imageSmoothingEnabled = this.options.antialias;
-    this.ctx.imageSmoothingQuality = 'high';
+    this.ctx.imageSmoothingQuality = "high";
   }
 
   /**
@@ -482,7 +489,7 @@ class CanvasRenderer {
     if (this.options.enableAccessibility) {
       this.accessibilityManager = new CanvasAccessibilityManager(
         this.canvas,
-        this
+        this,
       );
     }
   }
@@ -495,7 +502,7 @@ class CanvasRenderer {
       this.resizeObserver = new ResizeObserver(this.boundHandleResize);
       this.resizeObserver.observe(this.container);
     } else {
-      window.addEventListener('resize', this.boundHandleResize);
+      window.addEventListener("resize", this.boundHandleResize);
     }
   }
 
@@ -504,17 +511,17 @@ class CanvasRenderer {
    */
   setupThemeMonitoring() {
     if (window.matchMedia) {
-      const contrastQuery = window.matchMedia('(prefers-contrast: high)');
+      const contrastQuery = window.matchMedia("(prefers-contrast: high)");
 
       const updateTheme = () => {
-        let newTheme = 'light';
+        let newTheme = "light";
         if (contrastQuery.matches) {
-          newTheme = 'high_contrast';
+          newTheme = "high_contrast";
         }
         this.setTheme(newTheme);
       };
 
-      contrastQuery.addEventListener('change', updateTheme);
+      contrastQuery.addEventListener("change", updateTheme);
 
       // Initial theme detection
       updateTheme();
@@ -557,7 +564,7 @@ class CanvasRenderer {
   setTheme(themeName) {
     // Safely handle theme name with proper type checking
     const themeKey = (
-      typeof themeName === 'string' ? themeName : 'light'
+      typeof themeName === "string" ? themeName : "light"
     ).toUpperCase();
     const theme = CANVAS_CONSTANTS.THEMES[themeKey];
     if (theme && theme !== this.currentTheme) {
@@ -575,7 +582,7 @@ class CanvasRenderer {
     if (this.renderRequested) return;
 
     this.renderRequested = true;
-    this.animationFrameId = requestAnimationFrame(timestamp => {
+    this.animationFrameId = requestAnimationFrame((timestamp) => {
       this.performanceMonitor.startFrame();
       this.renderRequested = false;
       this.lastFrameTime = timestamp;
@@ -605,7 +612,7 @@ class CanvasRenderer {
     x = 0,
     y = 0,
     width = this.options.width,
-    height = this.options.height
+    height = this.options.height,
   ) {
     this.ctx.clearRect(x, y, width, height);
 
@@ -634,8 +641,8 @@ class CanvasRenderer {
   drawRect(x, y, width, height, options = {}) {
     if (this.drawCallCount >= this.options.maxDrawCalls) {
       this.errorHandler(
-        'Maximum draw calls exceeded',
-        new Error('Performance limit')
+        "Maximum draw calls exceeded",
+        new Error("Performance limit"),
       );
       return;
     }
@@ -656,7 +663,7 @@ class CanvasRenderer {
         (width < CANVAS_CONSTANTS.ACCESSIBILITY.MIN_TOUCH_TARGET ||
           height < CANVAS_CONSTANTS.ACCESSIBILITY.MIN_TOUCH_TARGET)
       ) {
-        logger.warn('Interactive element below minimum touch target size');
+        logger.warn("Interactive element below minimum touch target size");
       }
 
       if (fill) {
@@ -685,7 +692,7 @@ class CanvasRenderer {
         this.accessibilityManager.addElement(
           options.id || `rect_${Date.now()}`,
           {
-            type: 'rectangle',
+            type: "rectangle",
             x,
             y,
             width,
@@ -694,11 +701,11 @@ class CanvasRenderer {
             ariaLabel: options.ariaLabel,
             onClick: options.onClick,
             focusable: options.focusable,
-          }
+          },
         );
       }
     } catch (error) {
-      this.errorHandler('Failed to draw rectangle', error);
+      this.errorHandler("Failed to draw rectangle", error);
     } finally {
       this.ctx.restore();
       this.performanceMonitor.recordDrawCall();
@@ -715,7 +722,7 @@ class CanvasRenderer {
    * @param {number|Object} radius - Border radius (number or {tl, tr, br, bl})
    */
   drawRoundedRect(x, y, width, height, radius) {
-    if (typeof radius === 'number') {
+    if (typeof radius === "number") {
       radius = { tl: radius, tr: radius, br: radius, bl: radius };
     }
 
@@ -728,7 +735,7 @@ class CanvasRenderer {
       x + width,
       y + height,
       x + width - radius.br,
-      y + height
+      y + height,
     );
     this.ctx.lineTo(x + radius.bl, y + height);
     this.ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
@@ -776,7 +783,7 @@ class CanvasRenderer {
         this.accessibilityManager.addElement(
           options.id || `circle_${Date.now()}`,
           {
-            type: 'circle',
+            type: "circle",
             x: x - radius,
             y: y - radius,
             width: radius * 2,
@@ -784,11 +791,11 @@ class CanvasRenderer {
             label: options.label,
             ariaLabel: options.ariaLabel,
             onClick: options.onClick,
-          }
+          },
         );
       }
     } catch (error) {
-      this.errorHandler('Failed to draw circle', error);
+      this.errorHandler("Failed to draw circle", error);
     } finally {
       this.ctx.restore();
       this.performanceMonitor.recordDrawCall();
@@ -827,7 +834,7 @@ class CanvasRenderer {
 
       this.ctx.stroke();
     } catch (error) {
-      this.errorHandler('Failed to draw line', error);
+      this.errorHandler("Failed to draw line", error);
     } finally {
       this.ctx.restore();
       this.performanceMonitor.recordDrawCall();
@@ -859,7 +866,7 @@ class CanvasRenderer {
             cp.x,
             cp.y,
             (cp.x + next.x) / 2,
-            (cp.y + next.y) / 2
+            (cp.y + next.y) / 2,
           );
         } else {
           this.ctx.lineTo(points[i].x, points[i].y);
@@ -881,7 +888,7 @@ class CanvasRenderer {
         this.ctx.stroke();
       }
     } catch (error) {
-      this.errorHandler('Failed to draw path', error);
+      this.errorHandler("Failed to draw path", error);
     } finally {
       this.ctx.restore();
       this.performanceMonitor.recordDrawCall();
@@ -898,7 +905,7 @@ class CanvasRenderer {
    */
   drawText(text, x, y, options = {}) {
     if (
-      typeof text !== 'string' ||
+      typeof text !== "string" ||
       this.drawCallCount >= this.options.maxDrawCalls
     )
       return;
@@ -909,7 +916,7 @@ class CanvasRenderer {
       // Accessibility: Ensure minimum font size
       const fontSize = Math.max(
         options.fontSize || CANVAS_CONSTANTS.DEFAULT_FONT_SIZE,
-        CANVAS_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE
+        CANVAS_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE,
       );
 
       // Apply theme-aware defaults
@@ -917,18 +924,18 @@ class CanvasRenderer {
         options.fill || options.color || this.currentTheme.foreground;
 
       // Set font properties with accessibility considerations
-      const fontWeight = options.fontWeight || 'normal';
+      const fontWeight = options.fontWeight || "normal";
       const fontFamily =
         options.fontFamily ||
         '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif';
 
       this.ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
-      this.ctx.textAlign = options.textAlign || 'left';
-      this.ctx.textBaseline = options.textBaseline || 'middle';
+      this.ctx.textAlign = options.textAlign || "left";
+      this.ctx.textBaseline = options.textBaseline || "middle";
 
       // Text shadow for better readability if specified
       if (options.shadow) {
-        this.ctx.shadowColor = options.shadow.color || 'rgba(0,0,0,0.5)';
+        this.ctx.shadowColor = options.shadow.color || "rgba(0,0,0,0.5)";
         this.ctx.shadowBlur = options.shadow.blur || 2;
         this.ctx.shadowOffsetX = options.shadow.offsetX || 1;
         this.ctx.shadowOffsetY = options.shadow.offsetY || 1;
@@ -951,7 +958,7 @@ class CanvasRenderer {
         this.accessibilityManager.addElement(
           options.id || `text_${Date.now()}`,
           {
-            type: 'text',
+            type: "text",
             x,
             y: y - fontSize / 2,
             width: metrics.width,
@@ -959,11 +966,11 @@ class CanvasRenderer {
             text,
             label: options.label || text,
             ariaLabel: options.ariaLabel || text,
-          }
+          },
         );
       }
     } catch (error) {
-      this.errorHandler('Failed to draw text', error);
+      this.errorHandler("Failed to draw text", error);
     } finally {
       this.ctx.restore();
       this.performanceMonitor.recordDrawCall();
@@ -988,21 +995,21 @@ class CanvasRenderer {
       // Ensure minimum touch target size for accessibility
       const adjustedWidth = Math.max(
         width,
-        CANVAS_CONSTANTS.ACCESSIBILITY.MIN_TOUCH_TARGET
+        CANVAS_CONSTANTS.ACCESSIBILITY.MIN_TOUCH_TARGET,
       );
       const adjustedHeight = Math.max(
         height,
-        CANVAS_CONSTANTS.ACCESSIBILITY.MIN_TOUCH_TARGET
+        CANVAS_CONSTANTS.ACCESSIBILITY.MIN_TOUCH_TARGET,
       );
 
       // Theme-aware colors
       const backgroundColor =
         options.backgroundColor ||
-        (options.variant === 'secondary'
+        (options.variant === "secondary"
           ? this.currentTheme.secondary
           : this.currentTheme.primary);
       const borderColor = options.borderColor || this.currentTheme.foreground;
-      const textColor = options.textColor || '#ffffff';
+      const textColor = options.textColor || "#ffffff";
 
       // Draw button background with focus indicator
       const isFocused =
@@ -1028,17 +1035,17 @@ class CanvasRenderer {
         fill: textColor,
         fontSize: Math.max(
           options.fontSize || CANVAS_CONSTANTS.DEFAULT_FONT_SIZE,
-          CANVAS_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE
+          CANVAS_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE,
         ),
-        fontWeight: options.fontWeight || '500',
-        textAlign: 'center',
-        textBaseline: 'middle',
+        fontWeight: options.fontWeight || "500",
+        textAlign: "center",
+        textBaseline: "middle",
         accessible: true,
         id: `${options.id}_text`,
         ariaLabel: `Button: ${text}`,
       });
     } catch (error) {
-      this.errorHandler('Failed to draw button', error);
+      this.errorHandler("Failed to draw button", error);
     }
   }
   /**
@@ -1053,13 +1060,13 @@ class CanvasRenderer {
   drawChart(data, x, y, width, height, options = {}) {
     if (!Array.isArray(data) || data.length === 0) {
       this.errorHandler(
-        'Invalid chart data provided',
-        new Error('Data must be non-empty array')
+        "Invalid chart data provided",
+        new Error("Data must be non-empty array"),
       );
       return;
     }
 
-    const chartType = options.type || 'bar';
+    const chartType = options.type || "bar";
 
     this.ctx.save();
 
@@ -1088,23 +1095,23 @@ class CanvasRenderer {
           {
             fill: this.currentTheme.foreground,
             fontSize: 16,
-            fontWeight: 'bold',
-            textAlign: 'center',
+            fontWeight: "bold",
+            textAlign: "center",
             accessible: true,
             ariaLabel: `Chart title: ${options.title}`,
-          }
+          },
         );
       }
 
       // Render chart based on type
       switch (chartType) {
-        case 'bar':
+        case "bar":
           this.drawBarChart(data, x, y, width, height, options);
           break;
-        case 'line':
+        case "line":
           this.drawLineChart(data, x, y, width, height, options);
           break;
-        case 'pie':
+        case "pie":
           this.drawPieChart(data, x, y, Math.min(width, height), options);
           break;
         default:
@@ -1116,7 +1123,7 @@ class CanvasRenderer {
         this.accessibilityManager.addElement(
           options.id || `chart_${Date.now()}`,
           {
-            type: 'chart',
+            type: "chart",
             x,
             y,
             width,
@@ -1127,11 +1134,11 @@ class CanvasRenderer {
             ariaLabel:
               options.ariaLabel ||
               this.generateChartDescription(data, chartType),
-          }
+          },
         );
       }
     } catch (error) {
-      this.errorHandler('Failed to draw chart', error);
+      this.errorHandler("Failed to draw chart", error);
     } finally {
       this.ctx.restore();
     }
@@ -1146,8 +1153,8 @@ class CanvasRenderer {
   generateChartDescription(data, chartType) {
     const total = data.reduce((sum, item) => sum + (item.value || 0), 0);
     const itemCount = data.length;
-    const maxValue = Math.max(...data.map(d => d.value || 0));
-    const minValue = Math.min(...data.map(d => d.value || 0));
+    const maxValue = Math.max(...data.map((d) => d.value || 0));
+    const minValue = Math.min(...data.map((d) => d.value || 0));
 
     return (
       `${chartType} chart with ${itemCount} data points. ` +
@@ -1167,13 +1174,13 @@ class CanvasRenderer {
     if (!data.length) return;
 
     try {
-      const maxValue = Math.max(...data.map(d => d.value || 0));
+      const maxValue = Math.max(...data.map((d) => d.value || 0));
       if (maxValue === 0) return;
 
       const barWidth = width / data.length;
       const padding = Math.max(
         barWidth * CANVAS_CONSTANTS.CHART_BAR_PADDING_RATIO,
-        CANVAS_CONSTANTS.CHART_BAR_PADDING_MIN
+        CANVAS_CONSTANTS.CHART_BAR_PADDING_MIN,
       );
       const chartArea = height * CANVAS_CONSTANTS.CHART_AREA_RATIO;
 
@@ -1193,7 +1200,7 @@ class CanvasRenderer {
           interactive: options.interactive,
           id: `bar_${index}`,
           label: `${item.label || `Item ${index + 1}`}: ${item.value}`,
-          ariaLabel: `Bar ${index + 1} of ${data.length}: ${item.label || 'Unnamed'} with value ${item.value}`,
+          ariaLabel: `Bar ${index + 1} of ${data.length}: ${item.label || "Unnamed"} with value ${item.value}`,
           onClick: () => options.onBarClick?.(item, index),
         });
 
@@ -1207,11 +1214,11 @@ class CanvasRenderer {
               fill: this.currentTheme.foreground,
               fontSize: Math.max(
                 10,
-                CANVAS_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE
+                CANVAS_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE,
               ),
-              textAlign: 'center',
-              textBaseline: 'bottom',
-            }
+              textAlign: "center",
+              textBaseline: "bottom",
+            },
           );
         }
 
@@ -1225,16 +1232,16 @@ class CanvasRenderer {
               fill: this.currentTheme.foreground,
               fontSize: Math.max(
                 CANVAS_CONSTANTS.LABEL_FONT_SIZE,
-                CANVAS_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE
+                CANVAS_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE,
               ),
-              textAlign: 'center',
-              textBaseline: 'bottom',
-            }
+              textAlign: "center",
+              textBaseline: "bottom",
+            },
           );
         }
       });
     } catch (error) {
-      this.errorHandler('Failed to draw bar chart', error);
+      this.errorHandler("Failed to draw bar chart", error);
     }
   }
   /**
@@ -1249,14 +1256,14 @@ class CanvasRenderer {
   drawLineChart(data, x, y, width, height, options = {}) {
     if (data.length < 2) {
       this.errorHandler(
-        'Line chart requires at least 2 data points',
-        new Error('Insufficient data')
+        "Line chart requires at least 2 data points",
+        new Error("Insufficient data"),
       );
       return;
     }
 
     try {
-      const values = data.map(d => d.value || 0);
+      const values = data.map((d) => d.value || 0);
       const maxValue = Math.max(...values);
       const minValue = Math.min(...values);
       const range = maxValue - minValue || 1; // Avoid division by zero
@@ -1280,7 +1287,7 @@ class CanvasRenderer {
           y + CANVAS_CONSTANTS.CHART_BAR_BOTTOM_MARGIN,
           width,
           chartArea,
-          options
+          options,
         );
       }
 
@@ -1304,9 +1311,9 @@ class CanvasRenderer {
             interactive: options.interactive,
             id: `point_${index}`,
             label: `${point.label || `Point ${index + 1}`}: ${point.value}`,
-            ariaLabel: `Data point ${index + 1} of ${points.length}: ${point.label || 'Unnamed'} with value ${point.value}`,
+            ariaLabel: `Data point ${index + 1} of ${points.length}: ${point.label || "Unnamed"} with value ${point.value}`,
             onClick: () => options.onPointClick?.(data[index], index),
-          }
+          },
         );
 
         // Show value labels if requested
@@ -1318,14 +1325,14 @@ class CanvasRenderer {
             {
               fill: this.currentTheme.foreground,
               fontSize: 10,
-              textAlign: 'center',
-              textBaseline: 'bottom',
-            }
+              textAlign: "center",
+              textBaseline: "bottom",
+            },
           );
         }
       });
     } catch (error) {
-      this.errorHandler('Failed to draw line chart', error);
+      this.errorHandler("Failed to draw line chart", error);
     }
   }
 
@@ -1423,13 +1430,13 @@ class CanvasRenderer {
         if (this.accessibilityManager) {
           const percentage = ((item.value / total) * 100).toFixed(1);
           this.accessibilityManager.addElement(`slice_${index}`, {
-            type: 'pie-slice',
+            type: "pie-slice",
             x: centerX - radius,
             y: centerY - radius,
             width: radius * 2,
             height: radius * 2,
             label: `${item.label || `Slice ${index + 1}`}: ${percentage}%`,
-            ariaLabel: `Pie slice ${index + 1} of ${data.length}: ${item.label || 'Unnamed'} representing ${percentage}% with value ${item.value}`,
+            ariaLabel: `Pie slice ${index + 1} of ${data.length}: ${item.label || "Unnamed"} representing ${percentage}% with value ${item.value}`,
             interactive: options.interactive,
             onClick: () => options.onSliceClick?.(item, index),
           });
@@ -1450,11 +1457,11 @@ class CanvasRenderer {
               fill: this.currentTheme.background,
               fontSize: Math.max(
                 10,
-                CANVAS_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE
+                CANVAS_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE,
               ),
-              textAlign: 'center',
-              textBaseline: 'middle',
-              fontWeight: 'bold',
+              textAlign: "center",
+              textBaseline: "middle",
+              fontWeight: "bold",
             });
           }
         }
@@ -1468,11 +1475,11 @@ class CanvasRenderer {
           data,
           x + size + CANVAS_CONSTANTS.CHART_LEGEND_OFFSET,
           y,
-          options
+          options,
         );
       }
     } catch (error) {
-      this.errorHandler('Failed to draw pie chart', error);
+      this.errorHandler("Failed to draw pie chart", error);
     }
   }
 
@@ -1519,8 +1526,8 @@ class CanvasRenderer {
         {
           fill: this.currentTheme.foreground,
           fontSize: 12,
-          textBaseline: 'middle',
-        }
+          textBaseline: "middle",
+        },
       );
     });
   }
@@ -1538,7 +1545,7 @@ class CanvasRenderer {
     if (
       this.options.respectReducedMotion &&
       window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
       // Skip animation for motion-sensitive users
       if (options.skipOnReducedMotion !== false) {
@@ -1549,7 +1556,7 @@ class CanvasRenderer {
       // Reduce animation duration for motion-sensitive users
       duration = Math.min(
         duration * CANVAS_CONSTANTS.REDUCED_MOTION_DURATION_FACTOR,
-        CANVAS_CONSTANTS.REDUCED_MOTION_MAX_DURATION
+        CANVAS_CONSTANTS.REDUCED_MOTION_MAX_DURATION,
       );
     }
 
@@ -1560,7 +1567,7 @@ class CanvasRenderer {
       id: Math.random()
         .toString(CANVAS_CONSTANTS.ANIMATION_ID_BASE)
         .substr(2, CANVAS_CONSTANTS.ANIMATION_ID_LENGTH),
-      easing: options.easing || 'easeInOut',
+      easing: options.easing || "easeInOut",
       onComplete: options.onComplete,
       onProgress: options.onProgress,
       paused: false,
@@ -1578,7 +1585,7 @@ class CanvasRenderer {
    * @param {Object} animation - Animation object
    */
   runAnimation(animation) {
-    const animate = currentTime => {
+    const animate = (currentTime) => {
       if (animation.cancelled) {
         this.animations.delete(animation);
         return;
@@ -1611,7 +1618,7 @@ class CanvasRenderer {
           }
         }
       } catch (error) {
-        this.errorHandler('Animation callback failed', error);
+        this.errorHandler("Animation callback failed", error);
         this.animations.delete(animation);
       }
     };
@@ -1627,28 +1634,28 @@ class CanvasRenderer {
    */
   applyEasing(t, easing) {
     switch (easing) {
-      case 'linear':
+      case "linear":
         return t;
-      case 'easeIn':
+      case "easeIn":
         return t * t;
-      case 'easeOut':
+      case "easeOut":
         return t * (2 - t);
-      case 'easeInOut':
+      case "easeInOut":
         return t < CANVAS_CONSTANTS.EASING_HALF_POINT
           ? CANVAS_CONSTANTS.EASING_QUADRATIC_FACTOR * t * t
           : -1 +
               (CANVAS_CONSTANTS.EASING_CUBIC_FACTOR -
                 CANVAS_CONSTANTS.EASING_QUADRATIC_FACTOR * t) *
                 t;
-      case 'easeInCubic':
+      case "easeInCubic":
         return t * t * t;
-      case 'easeOutCubic':
+      case "easeOutCubic":
         return --t * t * t + 1;
-      case 'easeInOutCubic':
+      case "easeInOutCubic":
         return t < CANVAS_CONSTANTS.EASING_HALF_POINT
           ? CANVAS_CONSTANTS.EASING_CUBIC_FACTOR * t * t * t
           : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
-      case 'bounce':
+      case "bounce":
         if (t < 1 / CANVAS_CONSTANTS.EASING_BOUNCE_DIVISOR) {
           return CANVAS_CONSTANTS.EASING_BOUNCE_MULTIPLIER * t * t;
         } else if (
@@ -1757,12 +1764,12 @@ class CanvasRenderer {
     const deltaAlpha = targetAlpha - startAlpha;
 
     return this.animate(
-      progress => {
+      (progress) => {
         target.alpha = startAlpha + deltaAlpha * progress;
         this.requestRender();
       },
       duration,
-      options
+      options,
     );
   }
 
@@ -1782,13 +1789,13 @@ class CanvasRenderer {
     const deltaY = targetY - startY;
 
     return this.animate(
-      progress => {
+      (progress) => {
         target.x = startX + deltaX * progress;
         target.y = startY + deltaY * progress;
         this.requestRender();
       },
       duration,
-      options
+      options,
     );
   }
 
@@ -1805,12 +1812,12 @@ class CanvasRenderer {
     const deltaScale = targetScale - startScale;
 
     return this.animate(
-      progress => {
+      (progress) => {
         target.scale = startScale + deltaScale * progress;
         this.requestRender();
       },
       duration,
-      options
+      options,
     );
   }
   // Enhanced rendering and integration methods
@@ -1820,7 +1827,7 @@ class CanvasRenderer {
    * @returns {string} Renderer type
    */
   get type() {
-    return 'canvas';
+    return "canvas";
   }
 
   /**
@@ -1849,10 +1856,10 @@ class CanvasRenderer {
         this.ctx.fillRect(0, 0, this.options.width, this.options.height);
       }
 
-      if (scene.render && typeof scene.render === 'function') {
+      if (scene.render && typeof scene.render === "function") {
         scene.render(this);
       } else if (scene.objects && Array.isArray(scene.objects)) {
-        scene.objects.forEach(obj => this.renderObject(obj));
+        scene.objects.forEach((obj) => this.renderObject(obj));
       }
 
       // Announce scene changes to screen readers
@@ -1860,7 +1867,7 @@ class CanvasRenderer {
         this.accessibilityManager.updateDescription(scene.description);
       }
     } catch (error) {
-      this.errorHandler('Failed to render scene', error);
+      this.errorHandler("Failed to render scene", error);
     } finally {
       this.performanceMonitor.endFrame();
     }
@@ -1887,9 +1894,9 @@ class CanvasRenderer {
 
       if (object.scale && object.scale !== 1) {
         const scaleX =
-          typeof object.scale === 'object' ? object.scale.x : object.scale;
+          typeof object.scale === "object" ? object.scale.x : object.scale;
         const scaleY =
-          typeof object.scale === 'object' ? object.scale.y : object.scale;
+          typeof object.scale === "object" ? object.scale.y : object.scale;
         this.ctx.scale(scaleX, scaleY);
       }
 
@@ -1903,15 +1910,15 @@ class CanvasRenderer {
       }
 
       // Render based on object type or custom render method
-      if (object.render && typeof object.render === 'function') {
+      if (object.render && typeof object.render === "function") {
         object.render(this);
       } else if (object.type) {
         this.renderByType(object);
       }
     } catch (error) {
       this.errorHandler(
-        `Failed to render object: ${object.type || 'unknown'}`,
-        error
+        `Failed to render object: ${object.type || "unknown"}`,
+        error,
       );
     } finally {
       this.ctx.restore();
@@ -1935,8 +1942,8 @@ class CanvasRenderer {
     };
 
     switch (object.type) {
-      case 'rect':
-      case 'rectangle':
+      case "rect":
+      case "rectangle":
         this.drawRect(
           0,
           0,
@@ -1945,21 +1952,21 @@ class CanvasRenderer {
           {
             ...commonOptions,
             borderRadius: object.borderRadius,
-          }
+          },
         );
         break;
 
-      case 'circle':
+      case "circle":
         this.drawCircle(
           0,
           0,
           object.radius || CANVAS_CONSTANTS.DEFAULT_CIRCLE_RADIUS,
-          commonOptions
+          commonOptions,
         );
         break;
 
-      case 'text':
-        this.drawText(object.text || '', 0, 0, {
+      case "text":
+        this.drawText(object.text || "", 0, 0, {
           fill: commonOptions.fill,
           fontSize: object.fontSize,
           fontFamily: object.fontFamily,
@@ -1973,7 +1980,7 @@ class CanvasRenderer {
         });
         break;
 
-      case 'line':
+      case "line":
         this.drawLine(
           object.x1 || 0,
           object.y1 || 0,
@@ -1984,11 +1991,11 @@ class CanvasRenderer {
             strokeWidth: commonOptions.strokeWidth,
             lineCap: object.lineCap,
             dashPattern: object.dashPattern,
-          }
+          },
         );
         break;
 
-      case 'path':
+      case "path":
         if (object.points && Array.isArray(object.points)) {
           this.drawPath(object.points, {
             ...commonOptions,
@@ -1998,7 +2005,7 @@ class CanvasRenderer {
         }
         break;
 
-      case 'image':
+      case "image":
         if (object.src || object.image) {
           this.drawImage(object.src || object.image, 0, 0, {
             width: object.width,
@@ -2016,10 +2023,10 @@ class CanvasRenderer {
           CANVAS_CONSTANTS.PLACEHOLDER_SIZE,
           CANVAS_CONSTANTS.PLACEHOLDER_SIZE,
           {
-            fill: '#ff6b6b',
-            stroke: '#e55555',
+            fill: "#ff6b6b",
+            stroke: "#e55555",
             strokeWidth: 1,
-          }
+          },
         );
         logger.warn(`Unknown object type: ${object.type}`);
     }
@@ -2036,7 +2043,7 @@ class CanvasRenderer {
   drawImage(source, x, y, options = {}) {
     if (this.drawCallCount >= this.options.maxDrawCalls) return;
 
-    const drawImageElement = img => {
+    const drawImageElement = (img) => {
       try {
         const width = options.width || img.naturalWidth || img.width;
         const height = options.height || img.naturalHeight || img.height;
@@ -2057,7 +2064,7 @@ class CanvasRenderer {
 
         // Reset filter
         if (options.filter) {
-          this.ctx.filter = 'none';
+          this.ctx.filter = "none";
         }
 
         // Register with accessibility manager
@@ -2065,33 +2072,33 @@ class CanvasRenderer {
           this.accessibilityManager.addElement(
             options.id || `image_${Date.now()}`,
             {
-              type: 'image',
+              type: "image",
               x,
               y,
               width,
               height,
-              label: options.label || options.alt || 'Image',
+              label: options.label || options.alt || "Image",
               ariaLabel:
-                options.ariaLabel || options.alt || 'Interactive image',
-            }
+                options.ariaLabel || options.alt || "Interactive image",
+            },
           );
         }
 
         this.performanceMonitor.recordDrawCall();
         this.drawCallCount++;
       } catch (error) {
-        this.errorHandler('Failed to draw image', error);
+        this.errorHandler("Failed to draw image", error);
       }
     };
 
-    if (typeof source === 'string') {
+    if (typeof source === "string") {
       // Check cache first
       if (this.imageCache.has(source)) {
         const cachedImg = this.imageCache.get(source);
         if (cachedImg.complete) {
           drawImageElement(cachedImg);
         } else {
-          cachedImg.addEventListener('load', () => drawImageElement(cachedImg));
+          cachedImg.addEventListener("load", () => drawImageElement(cachedImg));
         }
         return;
       }
@@ -2103,8 +2110,8 @@ class CanvasRenderer {
       img.onload = () => drawImageElement(img);
       img.onerror = () => {
         this.errorHandler(
-          'Failed to load image',
-          new Error(`Image not found: ${source}`)
+          "Failed to load image",
+          new Error(`Image not found: ${source}`),
         );
         this.imageCache.delete(source);
       };
@@ -2119,8 +2126,8 @@ class CanvasRenderer {
       drawImageElement(source);
     } else {
       this.errorHandler(
-        'Invalid image source',
-        new Error('Source must be string URL or HTMLImageElement')
+        "Invalid image source",
+        new Error("Source must be string URL or HTMLImageElement"),
       );
     }
   }
@@ -2136,10 +2143,10 @@ class CanvasRenderer {
     let gradient;
 
     try {
-      if (type === 'linear') {
+      if (type === "linear") {
         const { x0 = 0, y0 = 0, x1 = 0, y1 = 100 } = coordinates;
         gradient = this.ctx.createLinearGradient(x0, y0, x1, y1);
-      } else if (type === 'radial') {
+      } else if (type === "radial") {
         const {
           x0 = 0,
           y0 = 0,
@@ -2153,15 +2160,15 @@ class CanvasRenderer {
         throw new Error(`Unsupported gradient type: ${type}`);
       }
 
-      colorStops.forEach(stop => {
-        const offset = typeof stop === 'object' ? stop.offset : stop[0];
-        const color = typeof stop === 'object' ? stop.color : stop[1];
+      colorStops.forEach((stop) => {
+        const offset = typeof stop === "object" ? stop.offset : stop[0];
+        const color = typeof stop === "object" ? stop.color : stop[1];
         gradient.addColorStop(offset, color);
       });
 
       return gradient;
     } catch (error) {
-      this.errorHandler('Failed to create gradient', error);
+      this.errorHandler("Failed to create gradient", error);
       return this.currentTheme.primary;
     }
   }
@@ -2174,8 +2181,8 @@ class CanvasRenderer {
   resize(width, height) {
     if (!width || !height || width <= 0 || height <= 0) {
       this.errorHandler(
-        'Invalid resize dimensions',
-        new Error('Width and height must be positive')
+        "Invalid resize dimensions",
+        new Error("Width and height must be positive"),
       );
       return;
     }
@@ -2198,16 +2205,16 @@ class CanvasRenderer {
 
       // Trigger resize event for listeners
       this.canvas.dispatchEvent(
-        new CustomEvent('canvasResize', {
+        new CustomEvent("canvasResize", {
           detail: { width: maxWidth, height: maxHeight },
-        })
+        }),
       );
 
       // Clear performance metrics on resize
       this.performanceMonitor.reset();
       this.drawCallCount = 0;
     } catch (error) {
-      this.errorHandler('Failed to resize canvas', error);
+      this.errorHandler("Failed to resize canvas", error);
     }
   }
 
@@ -2223,12 +2230,12 @@ class CanvasRenderer {
     x = 0,
     y = 0,
     width = this.options.width,
-    height = this.options.height
+    height = this.options.height,
   ) {
     try {
       return this.ctx.getImageData(x, y, width, height);
     } catch (error) {
-      this.errorHandler('Failed to get image data', error);
+      this.errorHandler("Failed to get image data", error);
       return null;
     }
   }
@@ -2242,8 +2249,8 @@ class CanvasRenderer {
   putImageData(imageData, x = 0, y = 0) {
     if (!imageData) {
       this.errorHandler(
-        'Invalid image data',
-        new Error('ImageData is required')
+        "Invalid image data",
+        new Error("ImageData is required"),
       );
       return;
     }
@@ -2253,7 +2260,7 @@ class CanvasRenderer {
       this.performanceMonitor.recordDrawCall();
       this.drawCallCount++;
     } catch (error) {
-      this.errorHandler('Failed to put image data', error);
+      this.errorHandler("Failed to put image data", error);
     }
   }
 
@@ -2263,11 +2270,11 @@ class CanvasRenderer {
    * @param {number} quality - Image quality
    * @returns {string|null} Data URL or null on error
    */
-  toDataURL(type = 'image/png', quality = 0.92) {
+  toDataURL(type = "image/png", quality = 0.92) {
     try {
       return this.canvas.toDataURL(type, quality);
     } catch (error) {
-      this.errorHandler('Failed to export canvas', error);
+      this.errorHandler("Failed to export canvas", error);
       return null;
     }
   }
@@ -2278,11 +2285,11 @@ class CanvasRenderer {
    * @param {string} type - Image type
    * @param {number} quality - Image quality
    */
-  toBlob(callback, type = 'image/png', quality = 0.92) {
+  toBlob(callback, type = "image/png", quality = 0.92) {
     try {
       this.canvas.toBlob(callback, type, quality);
     } catch (error) {
-      this.errorHandler('Failed to create blob', error);
+      this.errorHandler("Failed to create blob", error);
       callback(null);
     }
   }
@@ -2327,7 +2334,7 @@ class CanvasRenderer {
       if (this.resizeObserver) {
         this.resizeObserver.disconnect();
       } else {
-        window.removeEventListener('resize', this.boundHandleResize);
+        window.removeEventListener("resize", this.boundHandleResize);
       }
 
       // Cancel any pending animation frames
@@ -2353,18 +2360,18 @@ class CanvasRenderer {
 
       // Dispatch cleanup event
       document.dispatchEvent(
-        new CustomEvent('canvasRendererDestroyed', {
+        new CustomEvent("canvasRendererDestroyed", {
           detail: { rendererId: this.id },
-        })
+        }),
       );
     } catch (error) {
-      this.errorHandler('Error during cleanup', error);
+      this.errorHandler("Error during cleanup", error);
     }
   }
 }
 
 // Export for use in other modules
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.CanvasRenderer = CanvasRenderer;
 }
 

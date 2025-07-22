@@ -4,6 +4,7 @@
  */
 
 import { UI, TIMING } from "../utils/constants.js";
+import scrollManager from "../utils/scroll-manager.js";
 
 class SharedNavigation {
   constructor() {
@@ -645,27 +646,7 @@ class SharedNavigation {
    * @param {string} selector - CSS selector for the target element
    */
   scrollToElement(selector) {
-    const targetElement = document.querySelector(selector);
-
-    if (targetElement) {
-      targetElement.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-        inline: "nearest",
-      });
-
-      // Add a slight delay to ensure the element is visible
-      setTimeout(() => {
-        // Use CSS class for highlight animation instead of inline styles
-        // This preserves responsive behavior and CSS cascade
-        targetElement.classList.add("nav-highlight-animation");
-
-        setTimeout(() => {
-          // Remove the animation class to restore normal appearance
-          targetElement.classList.remove("nav-highlight-animation");
-        }, 1000);
-      }, 500);
-    }
+    scrollManager.scrollToElement(selector);
   }
 
   /**
@@ -694,8 +675,18 @@ class SharedNavigation {
       }
     });
 
-    // Close mega menu when clicking outside
+    // Close mega menu when clicking outside (but not on toolbar buttons)
     document.addEventListener("click", (e) => {
+      // Skip if clicking on main-grid toolbar elements
+      if (
+        e.target.closest(".filter-btn") ||
+        e.target.closest(".sort-btn") ||
+        e.target.closest(".filter-dropdown") ||
+        e.target.closest(".sort-dropdown")
+      ) {
+        return;
+      }
+
       if (
         !categoriesDropdown.contains(e.target) &&
         !megaMenu.contains(e.target)
@@ -787,8 +778,18 @@ class SharedNavigation {
         });
       }
 
-      // Close dropdown when clicking outside
+      // Close dropdown when clicking outside (but not on toolbar buttons)
       document.addEventListener("click", (e) => {
+        // Skip if clicking on main-grid toolbar elements
+        if (
+          e.target.closest(".filter-btn") ||
+          e.target.closest(".sort-btn") ||
+          e.target.closest(".filter-dropdown") ||
+          e.target.closest(".sort-dropdown")
+        ) {
+          return;
+        }
+
         if (!trigger.contains(e.target) && !dropdown.contains(e.target)) {
           this.closeDropdown(trigger, dropdown);
         }

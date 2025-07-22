@@ -63,6 +63,44 @@
   margin: 0 auto;
 }
 
+/* ===== MAIN GRID CONTAINER ===== */
+
+/* Categories section - main container for the grid component */
+.categories-section {
+  position: relative;
+  width: 100%;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+  padding: var(--spacing-6);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  transition: all 0.3s ease;
+}
+
+/* Dark mode support for categories section */
+.dark-mode .categories-section {
+  background: var(--color-surface-dark);
+  border: 1px solid var(--color-border-dark);
+}
+
+/* Responsive adjustments for categories section */
+@media (max-width: 768px) {
+  .categories-section {
+    padding: var(--spacing-4);
+    gap: var(--spacing-6);
+  }
+}
+
+@media (max-width: 480px) {
+  .categories-section {
+    padding: var(--spacing-3);
+    gap: var(--spacing-4);
+    border-radius: var(--radius-md);
+  }
+}
+
 /* ===== SCENARIOS GRID LAYOUT - CONSOLIDATED ===== */
 
 /* Base scenarios grid - supports multiple contexts and view modes */
@@ -71,14 +109,42 @@
   overflow: auto hidden;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
   padding-bottom: var(--spacing-2);
   gap: var(--spacing-6);
 }
 
-.scenarios-grid::-webkit-scrollbar {
-  display: none;
+/* Hide scrollbar only on touch devices where users can scroll without visual cues */
+@media (hover: none) and (pointer: coarse) {
+  .scenarios-grid {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scenarios-grid::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Category view mode - horizontal scrolling within category sections */
+.scenarios-grid[data-view="category"] {
+  display: flex;
+  overflow: auto hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  padding-bottom: var(--spacing-2);
+  gap: var(--spacing-6);
+}
+
+/* Hide scrollbar only on touch devices for category view */
+@media (hover: none) and (pointer: coarse) {
+  .scenarios-grid[data-view="category"] {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scenarios-grid[data-view="category"]::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Grid layout mode for scenario browser and category grid scenario view */
@@ -153,39 +219,6 @@
   box-shadow: 0 8px 32px rgb(0 0 0 / 12%);
 }
 
-/* ===== HOVER CATEGORY HEADER ===== */
-.scenario-hover-category-header {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 10;
-  background: rgb(255 255 255 / 98%);
-  backdrop-filter: blur(10px);
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  box-shadow: 0 4px 16px rgb(0 0 0 / 15%);
-  border: 1px solid var(--color-gray-200);
-  border-bottom: none;
-  transform: translateY(-100%);
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
-  opacity: 0;
-  transition:
-    transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
-    opacity 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
-    box-shadow 0.3s ease-out;
-  pointer-events: none;
-  will-change: transform, opacity;
-}
-
-.scenario-card-wrapper:hover .scenario-hover-category-header,
-.scenario-card-wrapper:focus-within .scenario-hover-category-header {
-  transform: translateY(0);
-  opacity: 1;
-  box-shadow: 0 8px 24px rgb(0 0 0 / 20%);
-  pointer-events: auto;
-}
-
 /* ===== SCENARIO CONTROLS TOOLBAR ===== */
 .scenario-controls-toolbar {
   display: none;
@@ -194,18 +227,89 @@
   padding: var(--spacing-4) 0 var(--spacing-6) 0;
   margin-bottom: var(--spacing-2);
   border-bottom: 1px solid var(--color-gray-200);
+  /* Ensure toolbar is always on its own row, outside grid layout */
+  grid-column: 1 / -1; /* Span full width when inside a grid container */
+  order: -1; /* Ensure it appears before grid items */
 }
 
 .scenarios-grid[data-view="scenario"] .scenario-controls-toolbar {
-  display: flex;
+  display: flex !important;
+}
+
+/* Additional selector for view-content compatibility */
+.scenarios-grid.view-content[data-view="scenario"] .scenario-controls-toolbar {
+  display: flex !important;
+}
+
+/* Fallback: Force display when scenario grid is visible */
+.scenarios-grid[data-view="scenario"]:not([style*="display: none"])
+  .scenario-controls-toolbar {
+  display: flex !important;
 }
 
 /* ===== CONSOLIDATED SCENARIO TOOLBAR CONTROLS ===== */
-/* Search Container */
-.search-container {
-  position: relative; /* Required for autocomplete dropdown positioning */
+/* Universal toolbar container styles - consolidated and simplified */
+.scenario-controls-toolbar .search-container,
+.scenario-controls-toolbar .filter-container,
+.scenario-controls-toolbar .sort-container,
+.scenario-controls-toolbar .controls-group {
+  /* Unified container layout */
+  display: flex !important;
+  align-items: center;
+  position: relative;
+  /* Prevent any hidden containers */
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Search container specific */
+.scenario-controls-toolbar .search-container {
   flex: 1;
-  max-width: 100%; /* Full width by default on small screens */
+  max-width: 100%;
+}
+
+/* Controls group specific */
+.scenario-controls-toolbar .controls-group {
+  gap: var(--spacing-3);
+}
+
+/* Filter and sort containers specific */
+.scenario-controls-toolbar .filter-container,
+.scenario-controls-toolbar .sort-container {
+  /* Keep as inline-flex for button grouping */
+  display: inline-flex !important;
+}
+
+/* Enhanced button visibility for debugging */
+.scenario-controls-toolbar .search-input {
+  background: white !important;
+  border: 2px solid #333 !important;
+  color: #333 !important;
+  font-size: 14px !important;
+  padding: 8px 12px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.scenario-controls-toolbar .filter-btn,
+.scenario-controls-toolbar .sort-btn {
+  background: #f0f0f0 !important;
+  border: 2px solid #333 !important;
+  color: #333 !important;
+  font-size: 14px !important;
+  padding: 8px 12px !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+.scenario-controls-toolbar .clear-all-btn {
+  background: #ff6b6b !important;
+  border: 2px solid #d63447 !important;
+  color: white !important;
+  font-size: 14px !important;
+  padding: 8px 12px !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
 }
 
 /* COMPLETE OVERRIDE: Force search input to proper width on larger screens */
@@ -380,12 +484,7 @@
 }
 
 /* ===== SEARCH COMPONENTS ===== */
-.search-container {
-  position: relative;
-  flex: 1;
-  max-width: 100%;
-}
-
+/* Base search container styles (not toolbar-specific) */
 .search-input-wrapper {
   position: relative;
   display: flex;
@@ -459,6 +558,42 @@
   margin-top: 1px;
 }
 
+/* Autocomplete sections */
+.autocomplete-section {
+  border-bottom: 1px solid var(--color-gray-100);
+}
+
+.autocomplete-section:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-section-header {
+  padding: var(--spacing-2) var(--spacing-3);
+  background: var(--color-gray-50);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--color-gray-100);
+}
+
+.autocomplete-scenarios,
+.autocomplete-tags {
+  padding: var(--spacing-1) 0;
+}
+
+.autocomplete-no-results {
+  padding: var(--spacing-4);
+  text-align: center;
+}
+
+.no-results-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+  font-style: italic;
+}
+
 .search-autocomplete-item {
   padding: var(--spacing-3);
   cursor: pointer;
@@ -479,6 +614,166 @@
   color: var(--color-primary-700);
 }
 
+/* Autocomplete item aliases for JavaScript compatibility */
+.autocomplete-item {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-3) var(--spacing-4);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  border-bottom: 1px solid var(--color-gray-100);
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-item:hover {
+  background: var(--color-gray-50);
+}
+
+.autocomplete-item.highlighted {
+  background: var(--color-primary-50);
+  color: var(--color-primary-700);
+}
+
+.autocomplete-item-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: var(--spacing-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-sm);
+  background: var(--color-gray-100);
+  color: var(--color-gray-600);
+  flex-shrink: 0;
+}
+
+.autocomplete-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.autocomplete-item-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-900);
+  margin-bottom: 2px;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.autocomplete-item-meta {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===== SCENARIO COUNT DISPLAY ===== */
+.scenario-count {
+  margin-bottom: var(--spacing-6);
+  padding: var(--spacing-3) var(--spacing-4);
+  background: var(--color-gray-50);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-gray-200);
+  /* Ensure count is on its own row below toolbar when inside a grid container */
+  grid-column: 1 / -1; /* Span full width when inside a grid container */
+  order: 0; /* Appears after toolbar (which has order: -1) but before cards */
+}
+
+.count-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-700);
+  margin: 0;
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+}
+
+.count-number {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+/* ===== FALLBACK UI COMPONENTS ===== */
+.basic-fallback {
+  text-align: center;
+  padding: var(--spacing-20) var(--spacing-6);
+  background: var(--color-gray-50);
+  border-radius: var(--radius-xl);
+  border: 2px dashed var(--color-gray-300);
+  max-width: 600px;
+  margin: var(--spacing-12) auto;
+}
+
+.basic-fallback h2 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-gray-800);
+  margin-bottom: var(--spacing-4);
+}
+
+.basic-fallback p {
+  font-size: var(--font-size-lg);
+  color: var(--color-gray-600);
+  margin-bottom: var(--spacing-8);
+  line-height: var(--line-height-relaxed);
+}
+
+/* Basic button styling */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-3) var(--spacing-6);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.5;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+  user-select: none;
+  min-height: 44px; /* Touch-friendly minimum */
+}
+
+.btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 15%);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgb(59 130 246 / 25%);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgb(59 130 246 / 25%);
+}
+
 /* ===== FILTER COMPONENTS ===== */
 .filter-section {
   background: var(--color-gray-50);
@@ -486,8 +781,9 @@
   border-bottom: 1px solid var(--color-gray-200);
 }
 
-.filter-container,
-.sort-container {
+/* Filter section containers (NOT toolbar containers) */
+.filter-section .filter-container,
+.filter-section .sort-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 var(--spacing-6);
@@ -528,7 +824,8 @@
   align-items: start;
 }
 
-.controls-group {
+/* Controls group in filter section context */
+.filter-section .controls-group {
   display: flex;
   align-items: center;
   gap: var(--spacing-3);
@@ -599,17 +896,61 @@
   max-height: 300px;
   overflow-y: auto;
   margin-top: var(--spacing-1);
+  /* Critical display properties for dropdown functionality */
+  display: block !important;
   opacity: 0;
   visibility: hidden;
   transform: translateY(-8px);
   transition: all var(--transition-fast);
+  /* Ensure dropdowns are interactive when visible */
+  pointer-events: none;
+}
+
+/* Override JavaScript inline styles when dropdowns should be hidden */
+.filter-dropdown[style*="display: none"],
+.sort-dropdown[style*="display: none"] {
+  display: block !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 .filter-btn[aria-expanded="true"] + .filter-dropdown,
 .sort-btn[aria-expanded="true"] + .sort-dropdown {
-  opacity: 1;
-  visibility: visible;
+  opacity: 1 !important;
+  visibility: visible !important;
   transform: translateY(0);
+  pointer-events: auto !important;
+}
+
+/* Handle JavaScript inline style overrides for visible dropdowns */
+.filter-btn[aria-expanded="true"] + .filter-dropdown[style*="display: block"],
+.sort-btn[aria-expanded="true"] + .sort-dropdown[style*="display: block"] {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0);
+  pointer-events: auto !important;
+}
+
+/* Debug: Alternative CSS selectors to show dropdowns */
+.filter-btn.active + .filter-dropdown,
+.sort-btn.active + .sort-dropdown,
+.filter-btn:focus + .filter-dropdown,
+.sort-btn:focus + .sort-dropdown {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0);
+  pointer-events: auto !important;
+}
+
+/* Emergency override: Show dropdowns on hover for testing */
+.filter-container:hover .filter-dropdown,
+.sort-container:hover .sort-dropdown {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0);
+  pointer-events: auto !important;
 }
 
 /* ===== FILTER OPTIONS ===== */
@@ -1047,6 +1388,16 @@ body.dark-mode .scenarios-grid {
   background: var(--theme-bg-primary);
 }
 
+/* Dark mode for category view scenarios grid */
+body.dark-mode .scenarios-grid[data-view="category"] {
+  background: var(--theme-bg-primary);
+}
+
+/* Dark mode for scenario view scenarios grid */
+body.dark-mode .scenarios-grid[data-view="scenario"] {
+  background: var(--theme-bg-primary);
+}
+
 /* Dark mode for scenario controls toolbar - consolidated from category-grid.css */
 body.dark-mode .scenario-controls-toolbar {
   background: var(--theme-bg-secondary);
@@ -1113,36 +1464,116 @@ body.dark-mode .search-autocomplete-item:hover {
   background: var(--theme-bg-tertiary);
 }
 
-body.dark-mode .scenario-hover-category-header {
+/* Dark mode autocomplete items (JS compatibility aliases) */
+body.dark-mode .autocomplete-item {
+  color: var(--theme-text-primary);
+  border-bottom-color: var(--theme-border);
+}
+
+body.dark-mode .autocomplete-item:hover {
+  background: var(--theme-bg-tertiary);
+}
+
+body.dark-mode .autocomplete-item.highlighted {
+  background: var(--color-primary-900);
+  color: var(--color-primary-100);
+}
+
+body.dark-mode .autocomplete-item-icon {
+  background: var(--theme-bg-tertiary);
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .autocomplete-item-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .autocomplete-item-meta {
+  color: var(--theme-text-secondary);
+}
+
+/* Dark mode autocomplete sections */
+body.dark-mode .autocomplete-section-header {
+  background: var(--theme-bg-tertiary);
+  color: var(--theme-text-secondary);
+  border-bottom-color: var(--theme-border);
+}
+
+body.dark-mode .autocomplete-section {
+  border-bottom-color: var(--theme-border);
+}
+
+body.dark-mode .no-results-text {
+  color: var(--theme-text-secondary);
+}
+
+/* Dark mode count display */
+body.dark-mode .scenario-count {
   background: var(--theme-bg-secondary);
   border-color: var(--theme-border);
 }
 
-/* ===== RESPONSIVE DESIGN ===== */
-
-/* Scenarios grid responsive breakpoints - consolidated from category-grid.css */
-@media (width <= 1200px) {
-  .scenarios-grid {
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: var(--spacing-5);
-  }
+body.dark-mode .count-text {
+  color: var(--theme-text-primary);
 }
 
+body.dark-mode .count-number {
+  color: var(--theme-accent);
+}
+
+/* Dark mode fallback UI */
+body.dark-mode .basic-fallback {
+  background: var(--theme-bg-secondary);
+  border-color: var(--theme-border);
+}
+
+body.dark-mode .basic-fallback h2 {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .basic-fallback p {
+  color: var(--theme-text-secondary);
+}
+
+/* Dark mode buttons */
+body.dark-mode .btn-primary {
+  background: var(--theme-accent);
+  border-color: var(--theme-accent);
+  color: var(--theme-bg-primary);
+}
+
+body.dark-mode .btn-primary:hover {
+  background: var(--theme-accent-light);
+  border-color: var(--theme-accent-light);
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* Category view responsive - maintains horizontal scroll behavior */
 @media (width <= 768px) {
-  .scenarios-grid {
+  .scenarios-grid[data-view="category"] {
     padding: var(--container-padding) var(--container-padding)
       calc(var(--container-padding) * 2) var(--container-padding);
     scroll-padding-left: var(--container-padding);
-    width: 100%;
-    max-width: none;
-    margin: 0;
-    box-sizing: border-box;
-    overflow: auto hidden;
+    gap: calc(var(--container-padding) * 0.8);
     -webkit-overflow-scrolling: touch;
     touch-action: auto;
   }
 }
 
+@media (width <= 480px) {
+  .scenarios-grid[data-view="category"] {
+    padding: calc(var(--container-padding) * 0.8)
+      calc(var(--container-padding) * 0.75) calc(var(--container-padding) * 1.5)
+      calc(var(--container-padding) * 0.75);
+    scroll-padding-left: calc(var(--container-padding) * 0.75);
+    gap: calc(var(--container-padding) * 0.8);
+  }
+}
+
+/* Scenarios grid responsive breakpoints - consolidated from category-grid.css */
+
+/* Mobile breakpoints - using CSS variables from media.css */
 @media (width <= 480px) {
   .scenarios-grid {
     padding: calc(var(--container-padding) * 0.8)
@@ -1160,10 +1591,89 @@ body.dark-mode .scenario-hover-category-header {
   }
 }
 
-@media (width >= 1200px) {
+@media (width >= 481px) and (width <= 768px) {
   .scenarios-grid {
+    padding: var(--container-padding) var(--container-padding)
+      calc(var(--container-padding) * 2) var(--container-padding);
+    scroll-padding-left: var(--container-padding);
+    gap: var(--container-padding);
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    box-sizing: border-box;
+    overflow: auto hidden;
+    -webkit-overflow-scrolling: touch;
+    touch-action: auto;
+  }
+}
+
+/* Tablet breakpoints - enhanced with CSS variables */
+@media (width >= 769px) and (width <= 1023px) {
+  .scenarios-grid[data-view="scenario"] {
+    padding: calc(var(--container-padding) * 1.2)
+      calc(var(--container-padding) * 1.4);
+    gap: calc(var(--container-padding) * 1.1);
+    box-sizing: border-box;
+  }
+
+  /* Category view maintains flex layout with appropriate spacing */
+  .scenarios-grid[data-view="category"] {
+    padding: var(--container-padding) calc(var(--container-padding) * 1.2);
+    gap: calc(var(--container-padding) * 1.1);
+    box-sizing: border-box;
+  }
+}
+
+/* Large tablet / Small laptop breakpoints */
+@media (width >= 1024px) and (width <= 1279px) {
+  .scenarios-grid[data-view="scenario"] {
+    padding: calc(var(--container-padding) * 1.4)
+      calc(var(--container-padding) * 1.6);
+    gap: calc(var(--container-padding) * 1.2);
+    box-sizing: border-box;
+  }
+
+  /* Category view maintains flex layout with appropriate spacing */
+  .scenarios-grid[data-view="category"] {
+    padding: calc(var(--container-padding) * 1.2)
+      calc(var(--container-padding) * 1.4);
+    gap: calc(var(--container-padding) * 1.2);
+    box-sizing: border-box;
+  }
+}
+
+/* Desktop breakpoints - using responsive variables */
+@media (width >= 1280px) and (width <= 1919px) {
+  .scenarios-grid[data-view="scenario"] {
+    padding: calc(var(--container-padding) * 1.6)
+      calc(var(--container-padding) * 2);
+    gap: calc(var(--container-padding) * 1.3);
+    box-sizing: border-box;
+  }
+
+  /* Category view maintains flex layout with appropriate spacing */
+  .scenarios-grid[data-view="category"] {
+    padding: calc(var(--container-padding) * 1.4)
+      calc(var(--container-padding) * 1.6);
+    gap: calc(var(--container-padding) * 1.3);
+    box-sizing: border-box;
+  }
+}
+
+@media (width >= 1920px) {
+  .scenarios-grid[data-view="scenario"] {
     padding: calc(var(--container-padding) * 2)
       calc(var(--container-padding) * 3);
+    gap: calc(var(--container-padding) * 1.5);
+    box-sizing: border-box;
+  }
+
+  /* Category view maintains flex layout with appropriate spacing */
+  .scenarios-grid[data-view="category"] {
+    padding: calc(var(--container-padding) * 1.6)
+      calc(var(--container-padding) * 2);
+    gap: calc(var(--container-padding) * 1.5);
+    box-sizing: border-box;
   }
 }
 
@@ -1337,22 +1847,10 @@ body.dark-mode .scenario-hover-category-header {
   }
 }
 
-/* ===== TOUCH DEVICE SUPPORT ===== */
-@media (hover: none) and (pointer: coarse) {
-  .scenario-card-wrapper:active .scenario-hover-category-header,
-  .scenario-card-wrapper:focus .scenario-hover-category-header {
-    transform: translateY(0);
-    opacity: 1;
-    box-shadow: 0 8px 24px rgb(0 0 0 / 20%);
-    pointer-events: auto;
-  }
-}
-
 /* ===== ACCESSIBILITY ===== */
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   .scenario-card-wrapper,
-  .scenario-hover-category-header,
   .filter-dropdown,
   .sort-dropdown,
   .search-autocomplete-dropdown {
@@ -1381,10 +1879,6 @@ body.dark-mode .scenario-hover-category-header {
   .search-input,
   .filter-btn,
   .sort-btn {
-    border-width: 2px;
-  }
-
-  .scenario-hover-category-header {
     border-width: 2px;
   }
 

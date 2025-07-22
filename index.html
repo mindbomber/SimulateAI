@@ -59,6 +59,8 @@
         line-height: 1.6;
         color: #333;
         overflow-x: hidden;
+        width: 100%;
+        max-width: 100vw;
       }
 
       /* Hero Section */
@@ -177,6 +179,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        padding: 10px 0;
       }
 
       .hero-logo {
@@ -184,9 +187,6 @@
         height: clamp(80px, 12vw, 140px);
         max-width: 600px;
         filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
-        position: relative;
-        left: 50%;
-        transform: translateX(-50%);
         display: block;
       }
 
@@ -259,6 +259,8 @@
         padding: 80px 20px;
         max-width: 1200px;
         margin: 0 auto;
+        width: 100%;
+        box-sizing: border-box;
       }
 
       .section h2 {
@@ -273,6 +275,8 @@
         border-radius: 20px;
         padding: 60px 40px;
         margin: 40px 0;
+        width: 100%;
+        box-sizing: border-box;
       }
 
       .features-grid {
@@ -499,19 +503,14 @@
 
       /* Mobile Responsiveness */
       @media (max-width: 768px) {
-        .hero-logo-container {
-          position: relative;
+        .hero-content {
+          padding: 0 15px;
+          max-width: 100%;
           width: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
         }
 
-        .hero-logo {
-          position: relative;
-          left: 50%;
-          transform: translateX(-50%);
-          display: block;
+        .hero-logo-container {
+          padding: 15px 0;
         }
 
         .hero-actions {
@@ -526,7 +525,8 @@
         }
 
         .section {
-          padding: 60px 20px;
+          padding: 60px 15px;
+          max-width: 100%;
         }
 
         .section-intro,
@@ -534,12 +534,31 @@
         .research-highlight,
         .privacy-section,
         .community-section {
-          padding: 40px 25px;
+          padding: 40px 20px;
           margin: 40px 0;
+          border-radius: 15px;
+        }
+
+        .features-grid {
+          grid-template-columns: 1fr;
+          gap: 20px;
+          margin: 30px 0;
+        }
+
+        .audience-grid {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+
+        .research-benefits,
+        .privacy-features {
+          grid-template-columns: 1fr;
+          gap: 15px;
         }
 
         .steps-list li {
           padding-left: 60px;
+          padding-right: 15px;
         }
 
         .steps-list li::before {
@@ -572,20 +591,109 @@
         }
       }
 
+      /* Tablet Responsiveness */
+      @media (max-width: 1024px) and (min-width: 769px) {
+        .hero-content {
+          max-width: 100%;
+          padding: 0 30px;
+        }
+
+        .section {
+          padding: 70px 30px;
+        }
+
+        .section-intro,
+        .how-it-works,
+        .research-highlight,
+        .privacy-section,
+        .community-section {
+          padding: 50px 30px;
+        }
+
+        .features-grid {
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 25px;
+        }
+
+        .audience-grid {
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 20px;
+        }
+      }
+
       @media (max-width: 480px) {
-        .hero-logo-container {
-          position: relative;
+        .hero-content {
+          padding: 0 10px;
           width: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
+        }
+
+        .hero-logo-container {
+          padding: 20px 0;
         }
 
         .hero-logo {
-          position: relative;
-          left: 50%;
-          transform: translateX(-50%);
-          display: block;
+          height: clamp(60px, 15vw, 100px);
+        }
+
+        .hero-subtitle {
+          font-size: clamp(1rem, 4vw, 1.2rem);
+          margin-bottom: 2rem;
+          padding: 0 5px;
+        }
+
+        .section {
+          padding: 40px 10px;
+        }
+
+        .section h2 {
+          font-size: clamp(1.5rem, 6vw, 2rem);
+          padding: 0 5px;
+        }
+
+        .section-intro,
+        .how-it-works,
+        .research-highlight,
+        .privacy-section,
+        .community-section {
+          padding: 30px 15px;
+          margin: 30px 0;
+          border-radius: 12px;
+        }
+
+        .feature-card,
+        .audience-card,
+        .benefit-item,
+        .privacy-item {
+          padding: 20px 15px;
+          margin: 0;
+        }
+
+        .steps-list li {
+          padding: 15px 15px 15px 50px;
+          font-size: 0.9rem;
+        }
+
+        .steps-list li::before {
+          left: 10px;
+          width: 30px;
+          height: 30px;
+          font-size: 14px;
+        }
+
+        .community-actions {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .community-button {
+          width: 100%;
+          max-width: 280px;
+          padding: 12px 20px;
+        }
+
+        .cta-button {
+          padding: 15px 25px;
+          font-size: 16px;
         }
 
         .footer-wave {
@@ -917,7 +1025,7 @@
       <div class="hero-content">
         <div class="hero-logo-container">
           <img
-            src="src/assets/icons/wordmark-dark.svg"
+            src="src/assets/icons/wordmark-dark-centered.svg"
             alt="SimulateAI"
             class="hero-logo"
           />

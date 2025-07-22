@@ -1365,14 +1365,14 @@ class MainGrid {
       this.container.querySelectorAll(".view-toggle-btn");
 
     this.viewToggleButtons.forEach((button) => {
-      button.addEventListener("click", () => {
+      button.addEventListener("click", async () => {
         const newView = button.getAttribute("data-view");
-        this.switchView(newView);
+        await this.switchView(newView);
       });
     });
 
     // Add keyboard shortcut support (V key to toggle views)
-    document.addEventListener("keydown", (event) => {
+    document.addEventListener("keydown", async (event) => {
       // Only trigger if no input fields are focused and no modifiers are pressed
       if (
         event.key === "v" &&
@@ -1384,7 +1384,7 @@ class MainGrid {
         event.preventDefault();
         const newView =
           this.currentView === "category" ? "scenario" : "category";
-        this.switchView(newView);
+        await this.switchView(newView);
 
         // Announce to screen readers
         const announcement = `Switched to ${newView} view`;
@@ -1408,7 +1408,7 @@ class MainGrid {
     }, 1000);
   }
 
-  switchView(newView) {
+  async switchView(newView) {
     if (newView === this.currentView) return;
 
     // Update button states
@@ -1431,14 +1431,31 @@ class MainGrid {
     // Clean up existing document listeners before re-attaching
     this.cleanup();
 
-    // Re-attach event listeners for the new view
-    this.attachEventListeners();
-
     // Initialize scenario controls if switching to scenario view
     if (newView === "scenario") {
-      setTimeout(() => {
-        this.initializeScenarioControls();
-      }, 0);
+      console.log("🔄 Switching to scenario view, ensuring initialization...");
+
+      // Check if toolbar exists, if not render scenario view first
+      const toolbar = this.scenarioContainer?.querySelector(
+        ".scenario-controls-toolbar",
+      );
+      if (!toolbar) {
+        console.log("🔧 Toolbar not found, rendering scenario view first...");
+        await this.renderScenarioView();
+      }
+
+      // Always initialize controls after ensuring toolbar exists
+      console.log("🔧 Initializing scenario controls...");
+      await this.initializeScenarioControls();
+
+      // Re-attach event listeners AFTER scenario controls are initialized
+      console.log(
+        "🔧 Attaching event listeners after scenario controls ready...",
+      );
+      this.attachEventListeners();
+    } else {
+      // For non-scenario views, attach event listeners immediately
+      this.attachEventListeners();
     }
 
     // Log analytics
@@ -2480,11 +2497,11 @@ class MainGrid {
     }
   }
 
-  highlightCategory(categoryId) {
+  async highlightCategory(categoryId) {
     // Category highlighting only works in category view
     if (this.currentView !== "category") {
       // Switch to category view first
-      this.switchView("category");
+      await this.switchView("category");
     }
 
     const section = this.categoryContainer.querySelector(
@@ -2504,13 +2521,16 @@ class MainGrid {
    * Initialize scenario controls (search, filter, sort)
    */
   async initializeScenarioControls() {
+    console.log("🔧 initializeScenarioControls called");
     const toolbar = this.scenarioContainer.querySelector(
       ".scenario-controls-toolbar",
     );
     if (!toolbar) {
       logger.error("MainGrid", "Scenario controls toolbar not found!");
+      console.error("❌ Toolbar not found!");
       return;
     }
+    console.log("✅ Toolbar found:", toolbar);
 
     // Initialize all scenarios data
     try {
@@ -2525,21 +2545,20 @@ class MainGrid {
     // Initialize autocomplete index for keyboard navigation
     this.autocompleteIndex = -1;
 
-    // Add a small delay to ensure HTML is rendered before setting up all controls
-    const DROPDOWN_SETUP_DELAY = 50; // ms
-    setTimeout(() => {
-      // Setup search input with autocomplete
-      this.setupSearchInput();
+    // Setup all controls immediately since we're now called at the right time
+    console.log("🔧 Setting up controls...");
+    // Setup search input with autocomplete
+    this.setupSearchInput();
 
-      // Setup filter dropdown
-      this.setupFilterDropdown();
+    // Setup filter dropdown
+    this.setupFilterDropdown();
 
-      // Setup sort dropdown
-      this.setupSortDropdown();
+    // Setup sort dropdown
+    this.setupSortDropdown();
 
-      // Setup clear all button
-      this.setupClearAllButton();
-    }, DROPDOWN_SETUP_DELAY);
+    // Setup clear all button
+    this.setupClearAllButton();
+    console.log("✅ All controls setup complete");
 
     // Populate category filter options
     this.populateCategoryFilter();
@@ -2570,6 +2589,7 @@ class MainGrid {
    * Setup search input functionality
    */
   setupSearchInput() {
+    console.log("🔍 Setting up search input...");
     const searchInput = this.scenarioContainer.querySelector(".search-input");
     const clearBtn = this.scenarioContainer.querySelector(".search-clear");
     const dropdown = this.scenarioContainer.querySelector(
@@ -2582,10 +2602,18 @@ class MainGrid {
       dropdown: !!dropdown,
     });
 
+    console.log("🔍 Search elements:", {
+      searchInput: !!searchInput,
+      clearBtn: !!clearBtn,
+      dropdown: !!dropdown,
+    });
+
     if (!searchInput) {
       logger.error("Search input not found in scenario container");
+      console.error("❌ Search input not found!");
       return;
     }
+    console.log("✅ Search input found, adding listeners...");
 
     // Initialize autocomplete data
     this.initializeAutocompleteData();
