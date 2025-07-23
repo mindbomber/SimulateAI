@@ -52,13 +52,13 @@ class FloatingTourTab {
 
   listenToSettings() {
     // Listen for settings changes
-    window.addEventListener('settingsChanged', e => {
+    window.addEventListener("settingsChanged", (e) => {
       const { settings } = e.detail;
       this.updateVisibility(settings.tourTabEnabled);
     });
 
     // Listen for settings manager ready
-    window.addEventListener('settingsManagerReady', e => {
+    window.addEventListener("settingsManagerReady", (e) => {
       const { settings } = e.detail;
       this.updateVisibility(settings.tourTabEnabled);
     });
@@ -68,7 +68,7 @@ class FloatingTourTab {
     // Apply initial settings if available
     const applySettings = () => {
       if (window.settingsManager) {
-        const enabled = window.settingsManager.getSetting('tourTabEnabled');
+        const enabled = window.settingsManager.getSetting("tourTabEnabled");
         this.updateVisibility(enabled);
       } else {
         // Default to enabled if settings manager not available
@@ -85,16 +85,16 @@ class FloatingTourTab {
 
   updateVisibility(enabled) {
     if (this.link) {
-      this.link.style.display = enabled ? 'block' : 'none';
+      this.link.style.display = enabled ? "block" : "none";
     }
   }
 
   createElement() {
     // Create the main container
-    this.container = document.createElement('div');
-    this.container.className = 'floating-tour-tab';
-    this.container.setAttribute('role', 'complementary');
-    this.container.setAttribute('aria-label', 'Take Tour feature');
+    this.container = document.createElement("div");
+    this.container.className = "floating-tour-tab";
+    this.container.setAttribute("role", "complementary");
+    this.container.setAttribute("aria-label", "Take Tour feature");
 
     // Create the tab content
     this.container.innerHTML = `
@@ -116,15 +116,15 @@ class FloatingTourTab {
     `;
 
     // Create the clickable link
-    this.link = document.createElement('a');
-    this.link.href = '#';
-    this.link.className = 'floating-tour-tab-link';
+    this.link = document.createElement("a");
+    this.link.href = "#";
+    this.link.className = "floating-tour-tab-link";
     this.link.setAttribute(
-      'aria-label',
-      'Take Tour - Start interactive onboarding'
+      "aria-label",
+      "Take Tour - Start interactive onboarding",
     );
-    this.link.setAttribute('data-action', 'tour');
-    this.link.id = 'take-tour-floating';
+    this.link.setAttribute("data-action", "tour");
+    this.link.id = "take-tour-floating";
 
     // Wrap the container in the link
     this.link.appendChild(this.container);
@@ -137,37 +137,37 @@ class FloatingTourTab {
 
   bindEvents() {
     // Handle resize events
-    window.addEventListener('resize', this.handleResize.bind(this));
+    window.addEventListener("resize", this.handleResize.bind(this));
 
     // Handle hover/click events
     if (this.isMobile) {
       this.link.addEventListener(
-        'touchstart',
-        this.handleTouchStart.bind(this)
+        "touchstart",
+        this.handleTouchStart.bind(this),
       );
-      this.link.addEventListener('touchend', this.handleTouchEnd.bind(this));
-      this.link.addEventListener('click', this.handleMobileClick.bind(this));
+      this.link.addEventListener("touchend", this.handleTouchEnd.bind(this));
+      this.link.addEventListener("click", this.handleMobileClick.bind(this));
     } else {
       this.link.addEventListener(
-        'mouseenter',
-        this.handleMouseEnter.bind(this)
+        "mouseenter",
+        this.handleMouseEnter.bind(this),
       );
       this.link.addEventListener(
-        'mouseleave',
-        this.handleMouseLeave.bind(this)
+        "mouseleave",
+        this.handleMouseLeave.bind(this),
       );
-      this.link.addEventListener('click', this.handleDesktopClick.bind(this));
+      this.link.addEventListener("click", this.handleDesktopClick.bind(this));
     }
 
     // Handle keyboard navigation
-    this.link.addEventListener('keydown', this.handleKeyDown.bind(this));
-    this.link.addEventListener('focus', this.handleFocus.bind(this));
-    this.link.addEventListener('blur', this.handleBlur.bind(this));
+    this.link.addEventListener("keydown", this.handleKeyDown.bind(this));
+    this.link.addEventListener("focus", this.handleFocus.bind(this));
+    this.link.addEventListener("blur", this.handleBlur.bind(this));
   }
 
   unbindEvents() {
     // Cleanup method to remove event listeners if needed
-    window.removeEventListener('resize', this.handleResize.bind(this));
+    window.removeEventListener("resize", this.handleResize.bind(this));
   }
 
   handleResize() {
@@ -256,7 +256,7 @@ class FloatingTourTab {
   }
 
   handleKeyDown(e) {
-    if (e.key === 'Enter' || e.key === ' ') {
+    if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
 
       // Check for debouncing
@@ -287,13 +287,13 @@ class FloatingTourTab {
 
   expand() {
     this.isExpanded = true;
-    this.container.classList.add('expanded');
+    this.container.classList.add("expanded");
     this.clearCollapseTimeout();
   }
 
   collapse() {
     this.isExpanded = false;
-    this.container.classList.remove('expanded');
+    this.container.classList.remove("expanded");
     this.clearCollapseTimeout();
   }
 
@@ -312,11 +312,11 @@ class FloatingTourTab {
   }
 
   createRipple(event) {
-    const ripple = this.container.querySelector('.floating-tour-tab-ripple');
+    const ripple = this.container.querySelector(".floating-tour-tab-ripple");
     if (!ripple) return;
 
     // Clear any existing animation
-    ripple.style.animation = 'none';
+    ripple.style.animation = "none";
 
     // Get coordinates relative to the container
     let clientX, clientY;
@@ -348,33 +348,28 @@ class FloatingTourTab {
 
     // Clean up after animation
     setTimeout(() => {
-      ripple.style.animation = 'none';
+      ripple.style.animation = "none";
     }, TOUR_RIPPLE_DURATION + TOUR_RIPPLE_DELAY);
   }
 
   triggerTour() {
-
     // Provide visual feedback
     this.showFeedback();
 
     // Try multiple methods to trigger the tour
-    if (typeof window.app !== 'undefined' && window.app.startOnboardingTour) {
-
+    if (typeof window.app !== "undefined" && window.app.startOnboardingTour) {
       window.app.startOnboardingTour();
     } else if (
-      typeof window.sharedNav !== 'undefined' &&
+      typeof window.sharedNav !== "undefined" &&
       window.sharedNav.handleTourAction
     ) {
-
       window.sharedNav.handleTourAction();
     } else {
       // Fallback: Try to find and click the tour button in navigation
-      const tourBtn = document.getElementById('start-tour-nav');
+      const tourBtn = document.getElementById("start-tour-nav");
       if (tourBtn) {
-
         tourBtn.click();
       } else {
-
         this.showUnavailableFeedback();
       }
     }
@@ -382,20 +377,20 @@ class FloatingTourTab {
 
   showFeedback() {
     // Add temporary feedback class
-    this.container.classList.add('tour-clicked');
+    this.container.classList.add("tour-clicked");
     setTimeout(() => {
       if (this.container) {
-        this.container.classList.remove('tour-clicked');
+        this.container.classList.remove("tour-clicked");
       }
     }, TOUR_FEEDBACK_DURATION);
   }
 
   showUnavailableFeedback() {
     // Show that tour is unavailable
-    this.container.classList.add('tour-unavailable');
+    this.container.classList.add("tour-unavailable");
     setTimeout(() => {
       if (this.container) {
-        this.container.classList.remove('tour-unavailable');
+        this.container.classList.remove("tour-unavailable");
       }
     }, TOUR_FEEDBACK_DURATION);
   }
@@ -414,8 +409,8 @@ class FloatingTourTab {
 }
 
 // Auto-initialize when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => {
     if (!window.floatingTourTab) {
       window.floatingTourTab = new FloatingTourTab();
     }
@@ -428,6 +423,6 @@ if (document.readyState === 'loading') {
 }
 
 // Export for module usage
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
   module.exports = FloatingTourTab;
 }

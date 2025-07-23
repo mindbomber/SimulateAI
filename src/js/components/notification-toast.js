@@ -19,14 +19,14 @@ const NOTIFICATION_TOAST_CONSTANTS = {
     SUBSTRING_LENGTH: 9,
   },
   TYPES: {
-    SUCCESS: 'success',
-    ERROR: 'error',
-    WARNING: 'warning',
-    INFO: 'info',
+    SUCCESS: "success",
+    ERROR: "error",
+    WARNING: "warning",
+    INFO: "info",
   },
   PROGRESS: {
-    FULL_WIDTH: '100%',
-    EMPTY_WIDTH: '0%',
+    FULL_WIDTH: "100%",
+    EMPTY_WIDTH: "0%",
   },
 };
 
@@ -39,10 +39,10 @@ class NotificationToast {
 
   init() {
     // Create toast container
-    this.container = document.createElement('div');
-    this.container.className = 'toast-container';
-    this.container.setAttribute('aria-live', 'polite');
-    this.container.setAttribute('aria-label', 'Notifications');
+    this.container = document.createElement("div");
+    this.container.className = "toast-container";
+    this.container.setAttribute("aria-live", "polite");
+    this.container.setAttribute("aria-label", "Notifications");
     document.body.appendChild(this.container);
   }
 
@@ -60,8 +60,8 @@ class NotificationToast {
   show(options = {}) {
     const {
       type = NOTIFICATION_TOAST_CONSTANTS.TYPES.INFO,
-      title = '',
-      message = '',
+      title = "",
+      message = "",
       duration = NOTIFICATION_TOAST_CONSTANTS.DURATIONS.DEFAULT,
       closable = true,
       onClose = null,
@@ -81,7 +81,7 @@ class NotificationToast {
 
     // Trigger show animation
     requestAnimationFrame(() => {
-      toast.classList.add('show');
+      toast.classList.add("show");
     });
 
     // Auto-dismiss if duration is set
@@ -96,19 +96,19 @@ class NotificationToast {
   }
 
   createToast(id, type, title, message, closable) {
-    const toast = document.createElement('div');
+    const toast = document.createElement("div");
     toast.className = `toast ${type}`;
-    toast.setAttribute('data-toast-id', id);
-    toast.setAttribute('role', 'alert');
-    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute("data-toast-id", id);
+    toast.setAttribute("role", "alert");
+    toast.setAttribute("aria-live", "assertive");
 
     const icon = this.getIcon(type);
 
     toast.innerHTML = `
             <div class="toast-icon" aria-hidden="true">${icon}</div>
             <div class="toast-content">
-                ${title ? `<div class="toast-title">${this.escapeHtml(title)}</div>` : ''}
-                ${message ? `<div class="toast-message">${this.escapeHtml(message)}</div>` : ''}
+                ${title ? `<div class="toast-title">${this.escapeHtml(title)}</div>` : ""}
+                ${message ? `<div class="toast-message">${this.escapeHtml(message)}</div>` : ""}
             </div>
             ${
               closable
@@ -117,7 +117,7 @@ class NotificationToast {
                     ×
                 </button>
             `
-                : ''
+                : ""
             }
             <div class="toast-progress">
                 <div class="toast-progress-bar" style="width: ${NOTIFICATION_TOAST_CONSTANTS.PROGRESS.FULL_WIDTH}"></div>
@@ -126,8 +126,8 @@ class NotificationToast {
 
     // Add close button event listener
     if (closable) {
-      const closeBtn = toast.querySelector('.toast-close');
-      closeBtn.addEventListener('click', () => this.dismiss(id));
+      const closeBtn = toast.querySelector(".toast-close");
+      closeBtn.addEventListener("click", () => this.dismiss(id));
     }
 
     return toast;
@@ -135,10 +135,10 @@ class NotificationToast {
 
   getIcon(type) {
     const icons = {
-      [NOTIFICATION_TOAST_CONSTANTS.TYPES.SUCCESS]: '✓',
-      [NOTIFICATION_TOAST_CONSTANTS.TYPES.ERROR]: '!',
-      [NOTIFICATION_TOAST_CONSTANTS.TYPES.WARNING]: '⚠',
-      [NOTIFICATION_TOAST_CONSTANTS.TYPES.INFO]: 'i',
+      [NOTIFICATION_TOAST_CONSTANTS.TYPES.SUCCESS]: "✓",
+      [NOTIFICATION_TOAST_CONSTANTS.TYPES.ERROR]: "!",
+      [NOTIFICATION_TOAST_CONSTANTS.TYPES.WARNING]: "⚠",
+      [NOTIFICATION_TOAST_CONSTANTS.TYPES.INFO]: "i",
     };
     return icons[type] || icons[NOTIFICATION_TOAST_CONSTANTS.TYPES.INFO];
   }
@@ -147,7 +147,7 @@ class NotificationToast {
     const toastData = this.toasts.get(id);
     if (!toastData) return;
 
-    const progressBar = toastData.element.querySelector('.toast-progress-bar');
+    const progressBar = toastData.element.querySelector(".toast-progress-bar");
 
     // Animate progress bar
     if (progressBar) {
@@ -177,8 +177,8 @@ class NotificationToast {
     }
 
     // Add hide animation
-    element.classList.add('hide');
-    element.classList.remove('show');
+    element.classList.add("hide");
+    element.classList.remove("show");
 
     // Remove from DOM after animation
     setTimeout(() => {
@@ -188,7 +188,7 @@ class NotificationToast {
       this.toasts.delete(id);
 
       // Call onClose callback
-      if (onClose && typeof onClose === 'function') {
+      if (onClose && typeof onClose === "function") {
         onClose(id);
       }
     }, NOTIFICATION_TOAST_CONSTANTS.ANIMATION.HIDE_DELAY);
@@ -199,7 +199,7 @@ class NotificationToast {
    */
   dismissAll() {
     const ids = Array.from(this.toasts.keys());
-    ids.forEach(id => this.dismiss(id));
+    ids.forEach((id) => this.dismiss(id));
   }
 
   /**
@@ -216,33 +216,33 @@ class NotificationToast {
 
     if (type && type !== this.getCurrentType(element)) {
       element.className = `toast ${type} show`;
-      const icon = element.querySelector('.toast-icon');
+      const icon = element.querySelector(".toast-icon");
       if (icon) {
         icon.textContent = this.getIcon(type);
       }
     }
 
     if (title !== undefined) {
-      const titleEl = element.querySelector('.toast-title');
+      const titleEl = element.querySelector(".toast-title");
       if (titleEl) {
         titleEl.textContent = title;
       } else if (title) {
-        const content = element.querySelector('.toast-content');
-        const newTitle = document.createElement('div');
-        newTitle.className = 'toast-title';
+        const content = element.querySelector(".toast-content");
+        const newTitle = document.createElement("div");
+        newTitle.className = "toast-title";
         newTitle.textContent = title;
         content.insertBefore(newTitle, content.firstChild);
       }
     }
 
     if (message !== undefined) {
-      const messageEl = element.querySelector('.toast-message');
+      const messageEl = element.querySelector(".toast-message");
       if (messageEl) {
         messageEl.textContent = message;
       } else if (message) {
-        const content = element.querySelector('.toast-content');
-        const newMessage = document.createElement('div');
-        newMessage.className = 'toast-message';
+        const content = element.querySelector(".toast-content");
+        const newMessage = document.createElement("div");
+        newMessage.className = "toast-message";
         newMessage.textContent = message;
         content.appendChild(newMessage);
       }
@@ -250,29 +250,29 @@ class NotificationToast {
   }
 
   getCurrentType(element) {
-    const classes = element.className.split(' ');
+    const classes = element.className.split(" ");
     return (
-      classes.find(cls =>
+      classes.find((cls) =>
         [
           NOTIFICATION_TOAST_CONSTANTS.TYPES.SUCCESS,
           NOTIFICATION_TOAST_CONSTANTS.TYPES.ERROR,
           NOTIFICATION_TOAST_CONSTANTS.TYPES.WARNING,
           NOTIFICATION_TOAST_CONSTANTS.TYPES.INFO,
-        ].includes(cls)
+        ].includes(cls),
       ) || NOTIFICATION_TOAST_CONSTANTS.TYPES.INFO
     );
   }
 
   announceToast(title, message) {
-    const announcement = [title, message].filter(Boolean).join(': ');
+    const announcement = [title, message].filter(Boolean).join(": ");
     if (announcement) {
       // Use existing ARIA live region
-      const liveRegion = document.getElementById('aria-live-polite');
+      const liveRegion = document.getElementById("aria-live-polite");
       if (liveRegion) {
         liveRegion.textContent = announcement;
         // Clear after announcement
         setTimeout(() => {
-          liveRegion.textContent = '';
+          liveRegion.textContent = "";
         }, NOTIFICATION_TOAST_CONSTANTS.DURATIONS.ANNOUNCEMENT_CLEAR);
       }
     }
@@ -283,7 +283,7 @@ class NotificationToast {
   }
 
   escapeHtml(text) {
-    const div = document.createElement('div');
+    const div = document.createElement("div");
     div.textContent = text;
     return div.innerHTML;
   }

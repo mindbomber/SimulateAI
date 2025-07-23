@@ -18,18 +18,18 @@
 
 // Configuration constants
 const REPO_CONFIG = {
-  OWNER: 'mindbomber',
-  NAME: 'SimulateAI',
+  OWNER: "mindbomber",
+  NAME: "SimulateAI",
   RELEVANCE_THRESHOLD: 0.6,
   MAX_EXAMPLES: 10,
 };
 
 const EDUCATIONAL_REPOSITORIES = [
-  'mozilla/open-leadership-framework',
-  'p5js/p5.js',
-  'processing/p5.js-website',
-  'ml5js/ml5-library',
-  'tensorflow/tfjs-examples',
+  "mozilla/open-leadership-framework",
+  "p5js/p5.js",
+  "processing/p5.js-website",
+  "ml5js/ml5-library",
+  "tensorflow/tfjs-examples",
 ];
 
 class MCPGitHubIntegration {
@@ -53,8 +53,8 @@ class MCPGitHubIntegration {
    * Initialize contribution templates for different types of content
    */
   initializeTemplates() {
-    this.contributionTemplates.set('scenario', {
-      title: 'New Ethics Scenario: [Category] - [Scenario Name]',
+    this.contributionTemplates.set("scenario", {
+      title: "New Ethics Scenario: [Category] - [Scenario Name]",
       body: `## Scenario Description
 [Brief description of the ethical dilemma]
 
@@ -83,11 +83,11 @@ class MCPGitHubIntegration {
 
 ## Related Issues/Discussions
 [Link to any related issues or discussions]`,
-      labels: ['enhancement', 'scenario', 'education-content'],
+      labels: ["enhancement", "scenario", "education-content"],
     });
 
-    this.contributionTemplates.set('bug', {
-      title: 'Bug Report: [Component] - [Brief Description]',
+    this.contributionTemplates.set("bug", {
+      title: "Bug Report: [Component] - [Brief Description]",
       body: `## Bug Description
 [Clear description of what went wrong]
 
@@ -113,11 +113,11 @@ class MCPGitHubIntegration {
 
 ## Additional Context
 [Any other context about the problem]`,
-      labels: ['bug', 'needs-investigation'],
+      labels: ["bug", "needs-investigation"],
     });
 
-    this.contributionTemplates.set('feature', {
-      title: 'Feature Request: [Component] - [Feature Name]',
+    this.contributionTemplates.set("feature", {
+      title: "Feature Request: [Component] - [Feature Name]",
       body: `## Feature Description
 [Clear description of the requested feature]
 
@@ -144,7 +144,7 @@ class MCPGitHubIntegration {
 
 ## Additional Context
 [Any other context or screenshots about the feature request]`,
-      labels: ['enhancement', 'feature-request'],
+      labels: ["enhancement", "feature-request"],
     });
   }
 
@@ -156,12 +156,12 @@ class MCPGitHubIntegration {
    */
   async findEducationalCodeExamples(topic, ethicsCategory) {
     // Input validation
-    if (!topic || typeof topic !== 'string') {
-      throw new Error('Topic is required and must be a string');
+    if (!topic || typeof topic !== "string") {
+      throw new Error("Topic is required and must be a string");
     }
 
-    if (!ethicsCategory || typeof ethicsCategory !== 'string') {
-      throw new Error('Ethics category is required and must be a string');
+    if (!ethicsCategory || typeof ethicsCategory !== "string") {
+      throw new Error("Ethics category is required and must be a string");
     }
 
     try {
@@ -171,7 +171,7 @@ class MCPGitHubIntegration {
       for (const repo of EDUCATIONAL_REPOSITORIES) {
         const searchResults = await this.searchRepository(repo, topic);
         examples.push(
-          ...this.processSearchResults(searchResults, ethicsCategory)
+          ...this.processSearchResults(searchResults, ethicsCategory),
         );
       }
 
@@ -179,7 +179,7 @@ class MCPGitHubIntegration {
     } catch (error) {
       // TODO: Implement proper error logging/analytics tracking
       if (this.analytics) {
-        this.analytics.track('github_search_error', {
+        this.analytics.track("github_search_error", {
           topic,
           ethicsCategory,
           error: error.message,
@@ -196,49 +196,49 @@ class MCPGitHubIntegration {
   generateContributionGuide() {
     return {
       scenarios: {
-        title: 'Contributing New Ethics Scenarios',
+        title: "Contributing New Ethics Scenarios",
         steps: [
-          'Identify the ethical dilemma and target audience',
-          'Research real-world examples and case studies',
-          'Map to relevant educational standards (ISTE, Common Core, etc.)',
-          'Create scenario data following SimulateAI format',
-          'Write clear options with ethical impacts',
-          'Test with target audience if possible',
-          'Submit pull request with documentation',
+          "Identify the ethical dilemma and target audience",
+          "Research real-world examples and case studies",
+          "Map to relevant educational standards (ISTE, Common Core, etc.)",
+          "Create scenario data following SimulateAI format",
+          "Write clear options with ethical impacts",
+          "Test with target audience if possible",
+          "Submit pull request with documentation",
         ],
-        template: this.contributionTemplates.get('scenario'),
+        template: this.contributionTemplates.get("scenario"),
         examples: [
-          'bias-fairness-scenarios.js',
-          'consent-surveillance-scenarios.js',
+          "bias-fairness-scenarios.js",
+          "consent-surveillance-scenarios.js",
         ],
       },
       technical: {
-        title: 'Contributing Technical Improvements',
+        title: "Contributing Technical Improvements",
         steps: [
-          'Fork the repository',
-          'Create a feature branch',
-          'Follow existing code patterns and conventions',
-          'Add/update tests as needed',
-          'Update documentation',
-          'Submit pull request with clear description',
+          "Fork the repository",
+          "Create a feature branch",
+          "Follow existing code patterns and conventions",
+          "Add/update tests as needed",
+          "Update documentation",
+          "Submit pull request with clear description",
         ],
         codeStandards: [
-          'Use ESLint configuration provided',
-          'Follow accessibility best practices',
-          'Maintain modular architecture',
-          'Include JSDoc comments for new functions',
+          "Use ESLint configuration provided",
+          "Follow accessibility best practices",
+          "Maintain modular architecture",
+          "Include JSDoc comments for new functions",
         ],
       },
       documentation: {
-        title: 'Contributing Documentation',
+        title: "Contributing Documentation",
         types: [
-          'Educator guides and lesson plans',
-          'Technical documentation',
-          'API documentation',
-          'Tutorial content',
-          'Accessibility guidelines',
+          "Educator guides and lesson plans",
+          "Technical documentation",
+          "API documentation",
+          "Tutorial content",
+          "Accessibility guidelines",
         ],
-        format: 'Markdown with clear headings and examples',
+        format: "Markdown with clear headings and examples",
       },
     };
   }
@@ -258,36 +258,36 @@ class MCPGitHubIntegration {
     try {
       // Search for common patterns in educational repositories
       const interactivityExamples = await this.searchRepository(
-        'p5js/p5.js-website',
-        'interactive examples education'
+        "p5js/p5.js-website",
+        "interactive examples education",
       );
       patterns.interactivity = this.extractPatterns(
         interactivityExamples,
-        'interaction'
+        "interaction",
       );
 
       const accessibilityExamples = await this.searchRepository(
-        'mozilla/open-leadership-framework',
-        'accessibility inclusive design'
+        "mozilla/open-leadership-framework",
+        "accessibility inclusive design",
       );
       patterns.accessibility = this.extractPatterns(
         accessibilityExamples,
-        'accessibility'
+        "accessibility",
       );
 
       // Analyze visualization patterns from data viz libraries
       const visualizationExamples = await this.searchRepository(
-        'd3/d3',
-        'educational visualization examples'
+        "d3/d3",
+        "educational visualization examples",
       );
       patterns.visualization = this.extractPatterns(
         visualizationExamples,
-        'visualization'
+        "visualization",
       );
     } catch (error) {
       // TODO: Implement proper error logging/analytics tracking
       if (this.analytics) {
-        this.analytics.track('github_pattern_analysis_error', {
+        this.analytics.track("github_pattern_analysis_error", {
           error: error.message,
         });
       }
@@ -301,16 +301,16 @@ class MCPGitHubIntegration {
    */
   createIssueTemplates() {
     return {
-      '.github/ISSUE_TEMPLATE/scenario-request.md':
-        this.formatIssueTemplate('scenario'),
-      '.github/ISSUE_TEMPLATE/bug-report.md': this.formatIssueTemplate('bug'),
-      '.github/ISSUE_TEMPLATE/feature-request.md':
-        this.formatIssueTemplate('feature'),
-      '.github/ISSUE_TEMPLATE/educator-feedback.md': {
-        name: 'Educator Feedback',
-        about: 'Share feedback from classroom use',
-        title: 'Educator Feedback: [Context] - [Brief Description]',
-        labels: ['educator-feedback', 'enhancement'],
+      ".github/ISSUE_TEMPLATE/scenario-request.md":
+        this.formatIssueTemplate("scenario"),
+      ".github/ISSUE_TEMPLATE/bug-report.md": this.formatIssueTemplate("bug"),
+      ".github/ISSUE_TEMPLATE/feature-request.md":
+        this.formatIssueTemplate("feature"),
+      ".github/ISSUE_TEMPLATE/educator-feedback.md": {
+        name: "Educator Feedback",
+        about: "Share feedback from classroom use",
+        title: "Educator Feedback: [Context] - [Brief Description]",
+        labels: ["educator-feedback", "enhancement"],
         body: `## Context
 - Grade Level: [K-5/6-8/9-12/University]
 - Subject Area: [Computer Science/Social Studies/Ethics/etc.]
@@ -394,7 +394,7 @@ class MCPGitHubIntegration {
    */
   createGitHubWorkflows() {
     return {
-      '.github/workflows/validate-scenarios.yml': `name: Validate Scenario Contributions
+      ".github/workflows/validate-scenarios.yml": `name: Validate Scenario Contributions
 
 on:
   pull_request:
@@ -414,7 +414,7 @@ jobs:
           # Verify ethics impact values
           # Ensure accessibility compliance`,
 
-      '.github/workflows/educator-resources.yml': `name: Update Educator Resources
+      ".github/workflows/educator-resources.yml": `name: Update Educator Resources
 
 on:
   push:
@@ -440,14 +440,14 @@ jobs:
     // Would use MCP github_repo function
     // TODO: Implement actual GitHub repository search
     if (this.analytics) {
-      this.analytics.track('github_repo_search', { repo, query });
+      this.analytics.track("github_repo_search", { repo, query });
     }
     return [];
   }
 
   processSearchResults(results, category) {
     // Process and categorize search results
-    return results.map(result => ({
+    return results.map((result) => ({
       ...result,
       category,
       relevance: this.calculateRelevance(result, category),
@@ -456,14 +456,14 @@ jobs:
 
   rankAndFilterExamples(examples, _topic, _category) {
     return examples
-      .filter(ex => ex.relevance > REPO_CONFIG.RELEVANCE_THRESHOLD)
+      .filter((ex) => ex.relevance > REPO_CONFIG.RELEVANCE_THRESHOLD)
       .sort((a, b) => b.relevance - a.relevance)
       .slice(0, REPO_CONFIG.MAX_EXAMPLES);
   }
 
   extractPatterns(examples, patternType) {
     // Extract common code patterns from examples
-    return examples.map(ex => ({
+    return examples.map((ex) => ({
       pattern: this.identifyPattern(ex.code, patternType),
       usage: ex.usage,
       documentation: ex.docs,
@@ -473,7 +473,7 @@ jobs:
   formatIssueTemplate(type) {
     const template = this.contributionTemplates.get(type);
     return {
-      name: template.title.split(':')[0],
+      name: template.title.split(":")[0],
       about: `Report ${type}s in SimulateAI`,
       title: template.title,
       labels: template.labels,

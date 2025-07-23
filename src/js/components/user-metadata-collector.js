@@ -35,7 +35,7 @@ export class UserMetadataCollector {
       },
       consent: {},
       privacy: {
-        profileVisibility: 'private',
+        profileVisibility: "private",
         sessionTracking: true,
         analyticsOptOut: false,
       },
@@ -87,7 +87,7 @@ export class UserMetadataCollector {
                 Back
               </button>
               <div class="metadata-action-group">
-                ${this.isOptional ? '<button id="metadata-skip-btn" class="btn btn-outline">Skip for Now</button>' : ''}
+                ${this.isOptional ? '<button id="metadata-skip-btn" class="btn btn-outline">Skip for Now</button>' : ""}
                 <button id="metadata-next-btn" class="btn btn-primary">
                   Next
                 </button>
@@ -99,13 +99,13 @@ export class UserMetadataCollector {
     `;
 
     // Remove existing modal if present
-    const existingModal = document.getElementById('metadata-collection-modal');
+    const existingModal = document.getElementById("metadata-collection-modal");
     if (existingModal) {
       existingModal.remove();
     }
 
     // Add modal to page
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    document.body.insertAdjacentHTML("beforeend", modalHTML);
 
     // Setup event listeners
     this.setupEventListeners();
@@ -115,25 +115,25 @@ export class UserMetadataCollector {
    * Setup event listeners for modal controls
    */
   setupEventListeners() {
-    const modal = document.getElementById('metadata-collection-modal');
-    const backBtn = document.getElementById('metadata-back-btn');
-    const nextBtn = document.getElementById('metadata-next-btn');
-    const skipBtn = document.getElementById('metadata-skip-btn');
+    const modal = document.getElementById("metadata-collection-modal");
+    const backBtn = document.getElementById("metadata-back-btn");
+    const nextBtn = document.getElementById("metadata-next-btn");
+    const skipBtn = document.getElementById("metadata-skip-btn");
 
     // Navigation buttons
-    backBtn?.addEventListener('click', () => this.previousStep());
-    nextBtn?.addEventListener('click', () => this.nextStep());
-    skipBtn?.addEventListener('click', () => this.skipCollection());
+    backBtn?.addEventListener("click", () => this.previousStep());
+    nextBtn?.addEventListener("click", () => this.nextStep());
+    skipBtn?.addEventListener("click", () => this.skipCollection());
 
     // Close modal on background click
-    modal.addEventListener('click', e => {
+    modal.addEventListener("click", (e) => {
       if (e.target === modal) {
         this.closeModal();
       }
     });
 
     // Prevent modal close on content click
-    modal.querySelector('.metadata-modal').addEventListener('click', e => {
+    modal.querySelector(".metadata-modal").addEventListener("click", (e) => {
       e.stopPropagation();
     });
   }
@@ -164,8 +164,8 @@ export class UserMetadataCollector {
    */
   updateProgress() {
     const progress = ((this.currentStep + 1) / this.totalSteps) * 100;
-    const progressFill = document.querySelector('.metadata-progress-fill');
-    const progressText = document.querySelector('.metadata-progress-text');
+    const progressFill = document.querySelector(".metadata-progress-fill");
+    const progressText = document.querySelector(".metadata-progress-text");
 
     if (progressFill) progressFill.style.width = `${progress}%`;
     if (progressText)
@@ -176,18 +176,18 @@ export class UserMetadataCollector {
    * Update button states based on current step
    */
   updateButtons() {
-    const backBtn = document.getElementById('metadata-back-btn');
-    const nextBtn = document.getElementById('metadata-next-btn');
+    const backBtn = document.getElementById("metadata-back-btn");
+    const nextBtn = document.getElementById("metadata-next-btn");
 
     // Show/hide back button
     if (backBtn) {
-      backBtn.style.display = this.currentStep > 0 ? 'block' : 'none';
+      backBtn.style.display = this.currentStep > 0 ? "block" : "none";
     }
 
     // Update next button text
     if (nextBtn) {
       nextBtn.textContent =
-        this.currentStep === this.totalSteps - 1 ? 'Complete' : 'Next';
+        this.currentStep === this.totalSteps - 1 ? "Complete" : "Next";
     }
   }
 
@@ -195,10 +195,10 @@ export class UserMetadataCollector {
    * Render welcome and introduction step
    */
   renderWelcomeStep() {
-    const titleElement = document.getElementById('metadata-step-title');
-    const contentElement = document.getElementById('metadata-step-content');
+    const titleElement = document.getElementById("metadata-step-title");
+    const contentElement = document.getElementById("metadata-step-content");
 
-    titleElement.textContent = 'Welcome to SimulateAI Research';
+    titleElement.textContent = "Welcome to SimulateAI Research";
 
     contentElement.innerHTML = `
       <div class="metadata-welcome">
@@ -239,10 +239,10 @@ export class UserMetadataCollector {
    * Render demographic information step
    */
   renderDemographicStep() {
-    const titleElement = document.getElementById('metadata-step-title');
-    const contentElement = document.getElementById('metadata-step-content');
+    const titleElement = document.getElementById("metadata-step-title");
+    const contentElement = document.getElementById("metadata-step-content");
 
-    titleElement.textContent = 'About You';
+    titleElement.textContent = "About You";
 
     contentElement.innerHTML = `
       <div class="metadata-demographic">
@@ -256,10 +256,10 @@ export class UserMetadataCollector {
               <option value="">Select age range</option>
               ${DEMOGRAPHIC_OPTIONS.ageRanges
                 .map(
-                  option =>
-                    `<option value="${option.value}">${option.label}</option>`
+                  (option) =>
+                    `<option value="${option.value}">${option.label}</option>`,
                 )
-                .join('')}
+                .join("")}
             </select>
           </div>
 
@@ -270,10 +270,10 @@ export class UserMetadataCollector {
               <option value="">Select gender identity</option>
               ${DEMOGRAPHIC_OPTIONS.genderIdentities
                 .map(
-                  option =>
-                    `<option value="${option.value}">${option.label}</option>`
+                  (option) =>
+                    `<option value="${option.value}">${option.label}</option>`,
                 )
-                .join('')}
+                .join("")}
             </select>
           </div>
 
@@ -290,10 +290,10 @@ export class UserMetadataCollector {
               <option value="">Select education level</option>
               ${DEMOGRAPHIC_OPTIONS.educationLevels
                 .map(
-                  option =>
-                    `<option value="${option.value}">${option.label}</option>`
+                  (option) =>
+                    `<option value="${option.value}">${option.label}</option>`,
                 )
-                .join('')}
+                .join("")}
             </select>
           </div>
 
@@ -304,10 +304,10 @@ export class UserMetadataCollector {
               <option value="">Select profession or field</option>
               ${DEMOGRAPHIC_OPTIONS.professionCategories
                 .map(
-                  option =>
-                    `<option value="${option.value}">${option.label}</option>`
+                  (option) =>
+                    `<option value="${option.value}">${option.label}</option>`,
                 )
-                .join('')}
+                .join("")}
             </select>
           </div>
 
@@ -318,10 +318,10 @@ export class UserMetadataCollector {
               <option value="">Select affiliation (optional)</option>
               ${DEMOGRAPHIC_OPTIONS.religiousAffiliations
                 .map(
-                  option =>
-                    `<option value="${option.value}">${option.label}</option>`
+                  (option) =>
+                    `<option value="${option.value}">${option.label}</option>`,
                 )
-                .join('')}
+                .join("")}
             </select>
           </div>
         </div>
@@ -340,10 +340,10 @@ export class UserMetadataCollector {
    * Render philosophical approach step
    */
   renderPhilosophyStep() {
-    const titleElement = document.getElementById('metadata-step-title');
-    const contentElement = document.getElementById('metadata-step-content');
+    const titleElement = document.getElementById("metadata-step-title");
+    const contentElement = document.getElementById("metadata-step-content");
 
-    titleElement.textContent = 'Your Philosophical Approach';
+    titleElement.textContent = "Your Philosophical Approach";
 
     contentElement.innerHTML = `
       <div class="metadata-philosophy">
@@ -356,18 +356,18 @@ export class UserMetadataCollector {
             <div class="philosophy-options">
               ${PHILOSOPHICAL_OPTIONS.ethicalFrameworks
                 .map(
-                  framework => `
+                  (framework) => `
                 <div class="philosophy-option">
                   <input type="radio" id="framework-${framework.value}" name="ethical-framework" value="${framework.value}">
                   <label for="framework-${framework.value}" class="philosophy-card">
                     <div class="philosophy-title">${framework.label}</div>
                     <div class="philosophy-description">${framework.description}</div>
-                    <div class="philosophy-keywords">${framework.keywords.join(' • ')}</div>
+                    <div class="philosophy-keywords">${framework.keywords.join(" • ")}</div>
                   </label>
                 </div>
-              `
+              `,
                 )
-                .join('')}
+                .join("")}
             </div>
           </div>
 
@@ -377,7 +377,7 @@ export class UserMetadataCollector {
             <div class="cognitive-style-options">
               ${PHILOSOPHICAL_OPTIONS.cognitiveStyles
                 .map(
-                  style => `
+                  (style) => `
                 <div class="cognitive-option">
                   <input type="radio" id="cognitive-${style.value}" name="cognitive-style" value="${style.value}">
                   <label for="cognitive-${style.value}" class="cognitive-card">
@@ -385,9 +385,9 @@ export class UserMetadataCollector {
                     <div class="cognitive-description">${style.description}</div>
                   </label>
                 </div>
-              `
+              `,
                 )
-                .join('')}
+                .join("")}
             </div>
           </div>
 
@@ -398,10 +398,10 @@ export class UserMetadataCollector {
               <option value="">Select orientation (optional)</option>
               ${PHILOSOPHICAL_OPTIONS.politicalOrientations
                 .map(
-                  option =>
-                    `<option value="${option.value}">${option.label}</option>`
+                  (option) =>
+                    `<option value="${option.value}">${option.label}</option>`,
                 )
-                .join('')}
+                .join("")}
             </select>
             <small class="form-help">This helps us understand how political views might influence ethical reasoning in governance scenarios.</small>
           </div>
@@ -417,10 +417,10 @@ export class UserMetadataCollector {
    * Render moral foundations assessment step
    */
   renderMoralFoundationsStep() {
-    const titleElement = document.getElementById('metadata-step-title');
-    const contentElement = document.getElementById('metadata-step-content');
+    const titleElement = document.getElementById("metadata-step-title");
+    const contentElement = document.getElementById("metadata-step-content");
 
-    titleElement.textContent = 'Moral Foundations';
+    titleElement.textContent = "Moral Foundations";
 
     contentElement.innerHTML = `
       <div class="metadata-moral-foundations">
@@ -442,21 +442,21 @@ export class UserMetadataCollector {
                   <span class="rating-label">Not Important</span>
                   ${[1, 2, 3, 4, 5, 6, 7]
                     .map(
-                      rating => `
+                      (rating) => `
                     <label class="rating-option">
                       <input type="radio" name="foundation-${key}" value="${rating}">
                       <span class="rating-number">${rating}</span>
                     </label>
-                  `
+                  `,
                     )
-                    .join('')}
+                    .join("")}
                   <span class="rating-label">Extremely Important</span>
                 </div>
               </div>
             </div>
-          `
+          `,
             )
-            .join('')}
+            .join("")}
         </div>
 
         <div class="metadata-note">
@@ -473,10 +473,10 @@ export class UserMetadataCollector {
    * Render consent and data sharing step
    */
   renderConsentStep() {
-    const titleElement = document.getElementById('metadata-step-title');
-    const contentElement = document.getElementById('metadata-step-content');
+    const titleElement = document.getElementById("metadata-step-title");
+    const contentElement = document.getElementById("metadata-step-content");
 
-    titleElement.textContent = 'Consent & Data Sharing';
+    titleElement.textContent = "Consent & Data Sharing";
 
     contentElement.innerHTML = `
       <div class="metadata-consent">
@@ -578,18 +578,18 @@ export class UserMetadataCollector {
    */
   loadDemographicData() {
     const fields = [
-      'age-range',
-      'gender-identity',
-      'country',
-      'education-level',
-      'profession',
-      'religious-affiliation',
+      "age-range",
+      "gender-identity",
+      "country",
+      "education-level",
+      "profession",
+      "religious-affiliation",
     ];
     const { demographics } = this.userData;
 
-    fields.forEach(field => {
+    fields.forEach((field) => {
       const element = document.getElementById(field);
-      const key = field.replace(/-([a-z])/g, g => g[1].toUpperCase());
+      const key = field.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
       if (element && demographics[key]) {
         element.value = demographics[key];
       }
@@ -603,7 +603,7 @@ export class UserMetadataCollector {
     const framework = this.userData.philosophy.preferredEthicalFramework;
     if (framework) {
       const frameworkRadio = document.querySelector(
-        `input[name="ethical-framework"][value="${framework}"]`
+        `input[name="ethical-framework"][value="${framework}"]`,
       );
       if (frameworkRadio) frameworkRadio.checked = true;
     }
@@ -611,14 +611,14 @@ export class UserMetadataCollector {
     const { cognitiveStyle } = this.userData.philosophy;
     if (cognitiveStyle) {
       const cognitiveRadio = document.querySelector(
-        `input[name="cognitive-style"][value="${cognitiveStyle}"]`
+        `input[name="cognitive-style"][value="${cognitiveStyle}"]`,
       );
       if (cognitiveRadio) cognitiveRadio.checked = true;
     }
 
     const { politicalOrientation } = this.userData.philosophy;
     if (politicalOrientation) {
-      const politicalSelect = document.getElementById('political-orientation');
+      const politicalSelect = document.getElementById("political-orientation");
       if (politicalSelect) politicalSelect.value = politicalOrientation;
     }
   }
@@ -628,11 +628,11 @@ export class UserMetadataCollector {
    */
   loadMoralFoundationsData() {
     const foundations = this.userData.philosophy.moralFoundations;
-    Object.keys(foundations).forEach(foundation => {
+    Object.keys(foundations).forEach((foundation) => {
       const rating = foundations[foundation];
       if (rating) {
         const radioButton = document.querySelector(
-          `input[name="foundation-${foundation}"][value="${rating}"]`
+          `input[name="foundation-${foundation}"][value="${rating}"]`,
         );
         if (radioButton) radioButton.checked = true;
       }
@@ -645,22 +645,22 @@ export class UserMetadataCollector {
   loadConsentData() {
     const { consent } = this.userData;
     const checkboxes = [
-      'research-participation',
-      'data-sharing',
-      'public-contribution',
-      'insights-sharing',
-      'marketing-communication',
+      "research-participation",
+      "data-sharing",
+      "public-contribution",
+      "insights-sharing",
+      "marketing-communication",
     ];
 
-    checkboxes.forEach(checkboxId => {
+    checkboxes.forEach((checkboxId) => {
       const checkbox = document.getElementById(checkboxId);
-      const key = checkboxId.replace(/-([a-z])/g, g => g[1].toUpperCase());
+      const key = checkboxId.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
       if (checkbox && consent[key]) {
         checkbox.checked = consent[key];
       }
     });
 
-    const dataRetention = document.getElementById('data-retention');
+    const dataRetention = document.getElementById("data-retention");
     if (dataRetention && consent.dataRetentionPeriod) {
       dataRetention.value = consent.dataRetentionPeriod;
     }
@@ -691,12 +691,12 @@ export class UserMetadataCollector {
    */
   saveDemographicData() {
     const fields = [
-      { id: 'age-range', key: 'ageRange' },
-      { id: 'gender-identity', key: 'genderIdentity' },
-      { id: 'country', key: 'country' },
-      { id: 'education-level', key: 'educationLevel' },
-      { id: 'profession', key: 'profession' },
-      { id: 'religious-affiliation', key: 'religiousAffiliation' },
+      { id: "age-range", key: "ageRange" },
+      { id: "gender-identity", key: "genderIdentity" },
+      { id: "country", key: "country" },
+      { id: "education-level", key: "educationLevel" },
+      { id: "profession", key: "profession" },
+      { id: "religious-affiliation", key: "religiousAffiliation" },
     ];
 
     fields.forEach(({ id, key }) => {
@@ -712,20 +712,20 @@ export class UserMetadataCollector {
    */
   savePhilosophyData() {
     const frameworkRadio = document.querySelector(
-      'input[name="ethical-framework"]:checked'
+      'input[name="ethical-framework"]:checked',
     );
     if (frameworkRadio) {
       this.userData.philosophy.preferredEthicalFramework = frameworkRadio.value;
     }
 
     const cognitiveRadio = document.querySelector(
-      'input[name="cognitive-style"]:checked'
+      'input[name="cognitive-style"]:checked',
     );
     if (cognitiveRadio) {
       this.userData.philosophy.cognitiveStyle = cognitiveRadio.value;
     }
 
-    const politicalSelect = document.getElementById('political-orientation');
+    const politicalSelect = document.getElementById("political-orientation");
     if (politicalSelect && politicalSelect.value) {
       this.userData.philosophy.politicalOrientation = politicalSelect.value;
     }
@@ -735,13 +735,13 @@ export class UserMetadataCollector {
    * Save moral foundations data
    */
   saveMoralFoundationsData() {
-    Object.keys(MORAL_FOUNDATIONS).forEach(foundation => {
+    Object.keys(MORAL_FOUNDATIONS).forEach((foundation) => {
       const ratingRadio = document.querySelector(
-        `input[name="foundation-${foundation}"]:checked`
+        `input[name="foundation-${foundation}"]:checked`,
       );
       if (ratingRadio) {
         this.userData.philosophy.moralFoundations[foundation] = parseInt(
-          ratingRadio.value
+          ratingRadio.value,
         );
       }
     });
@@ -752,11 +752,11 @@ export class UserMetadataCollector {
    */
   saveConsentData() {
     const checkboxes = [
-      { id: 'research-participation', key: 'researchParticipation' },
-      { id: 'data-sharing', key: 'dataSharing' },
-      { id: 'public-contribution', key: 'publicContribution' },
-      { id: 'insights-sharing', key: 'insightsSharing' },
-      { id: 'marketing-communication', key: 'marketingCommunication' },
+      { id: "research-participation", key: "researchParticipation" },
+      { id: "data-sharing", key: "dataSharing" },
+      { id: "public-contribution", key: "publicContribution" },
+      { id: "insights-sharing", key: "insightsSharing" },
+      { id: "marketing-communication", key: "marketingCommunication" },
     ];
 
     checkboxes.forEach(({ id, key }) => {
@@ -766,13 +766,13 @@ export class UserMetadataCollector {
       }
     });
 
-    const dataRetention = document.getElementById('data-retention');
+    const dataRetention = document.getElementById("data-retention");
     if (dataRetention) {
       this.userData.consent.dataRetentionPeriod = dataRetention.value;
     }
 
     // Set consent metadata
-    this.userData.consent.consentVersion = '1.0';
+    this.userData.consent.consentVersion = "1.0";
     this.userData.consent.consentDate = new Date().toISOString();
   }
 
@@ -857,7 +857,7 @@ export class UserMetadataCollector {
    * Close the metadata collection modal
    */
   closeModal() {
-    const modal = document.getElementById('metadata-collection-modal');
+    const modal = document.getElementById("metadata-collection-modal");
     if (modal) {
       modal.remove();
     }

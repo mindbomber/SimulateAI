@@ -19,12 +19,12 @@
  * @license Apache-2.0
  */
 
-import logger from './logger.js';
-import StorageManager from './storage.js';
+import logger from "./logger.js";
+import StorageManager from "./storage.js";
 
 // Enhanced constants and configuration
 const ANALYTICS_CONSTANTS = {
-  VERSION: '2.0.0',
+  VERSION: "2.0.0",
   MAX_EVENT_QUEUE_SIZE: 100,
   MAX_BATCH_SIZE: 50,
   MIN_FLUSH_INTERVAL: 10000, // 10 seconds
@@ -33,7 +33,7 @@ const ANALYTICS_CONSTANTS = {
   ERROR_SAMPLING_RATE: 1.0, // 100% for educational platform
   PERFORMANCE_SAMPLING_RATE: 0.1, // 10%
   MAX_STORED_EVENTS: 1000,
-  ANONYMIZATION_SALT: 'SimulateAI_Analytics_2024',
+  ANONYMIZATION_SALT: "SimulateAI_Analytics_2024",
 
   // Time constants
   TIME: {
@@ -115,7 +115,7 @@ const ANALYTICS_CONSTANTS = {
   HASH: {
     HEX_RADIX: 16,
     HEX_PAD_LENGTH: 2,
-    HEX_PAD_CHAR: '0',
+    HEX_PAD_CHAR: "0",
     HASH_SUBSTRING_LENGTH: 16,
     HASH_SHIFT_BITS: 5,
     FALLBACK_RADIX: 36,
@@ -141,13 +141,13 @@ const ANALYTICS_CONSTANTS = {
 };
 
 const ANALYTICS_EVENTS = {
-  INITIALIZED: 'analytics:initialized',
-  SESSION_STARTED: 'analytics:sessionStarted',
-  SESSION_ENDED: 'analytics:sessionEnded',
-  BATCH_SENT: 'analytics:batchSent',
-  ERROR_TRACKED: 'analytics:errorTracked',
-  PRIVACY_CHANGED: 'analytics:privacyChanged',
-  QUOTA_EXCEEDED: 'analytics:quotaExceeded',
+  INITIALIZED: "analytics:initialized",
+  SESSION_STARTED: "analytics:sessionStarted",
+  SESSION_ENDED: "analytics:sessionEnded",
+  BATCH_SENT: "analytics:batchSent",
+  ERROR_TRACKED: "analytics:errorTracked",
+  PRIVACY_CHANGED: "analytics:privacyChanged",
+  QUOTA_EXCEEDED: "analytics:quotaExceeded",
 };
 
 /**
@@ -156,25 +156,25 @@ const ANALYTICS_EVENTS = {
 class AnalyticsTheme {
   static getCurrentTheme() {
     const prefersHighContrast = window.matchMedia(
-      '(prefers-contrast: high)'
+      "(prefers-contrast: high)",
     ).matches;
     const prefersReducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)'
+      "(prefers-reduced-motion: reduce)",
     ).matches;
 
     return {
       highContrast: prefersHighContrast,
       reducedMotion: prefersReducedMotion,
-      theme: prefersHighContrast ? 'highContrast' : 'light',
+      theme: prefersHighContrast ? "highContrast" : "light",
     };
   }
 
   static getAccessibilityContext() {
     return {
       screenReader:
-        navigator.userAgent.includes('NVDA') ||
-        navigator.userAgent.includes('JAWS') ||
-        navigator.userAgent.includes('VoiceOver'),
+        navigator.userAgent.includes("NVDA") ||
+        navigator.userAgent.includes("JAWS") ||
+        navigator.userAgent.includes("VoiceOver"),
       ...this.getCurrentTheme(),
     };
   }
@@ -188,7 +188,7 @@ class AnalyticsErrorHandler {
   static maxErrorsPerType = 10;
 
   static shouldTrackError(error) {
-    const errorKey = `${error.name || 'Unknown'}:${error.message || 'No message'}`;
+    const errorKey = `${error.name || "Unknown"}:${error.message || "No message"}`;
     const count = this.errorCounts.get(errorKey) || 0;
 
     if (count >= this.maxErrorsPerType) {
@@ -203,10 +203,10 @@ class AnalyticsErrorHandler {
     if (!error) return null;
 
     return {
-      name: error.name || 'Unknown',
-      message: error.message || 'Unknown error',
+      name: error.name || "Unknown",
+      message: error.message || "Unknown error",
       stack: this.cleanStackTrace(error.stack),
-      type: error.constructor?.name || 'Error',
+      type: error.constructor?.name || "Error",
       timestamp: Date.now(),
       url: window.location.href,
       userAgent: navigator.userAgent.substring(0, 100),
@@ -218,21 +218,21 @@ class AnalyticsErrorHandler {
     if (!stack) return null;
 
     return stack
-      .split('\n')
+      .split("\n")
       .slice(0, 10) // Limit to 10 lines
-      .map(line => line.trim())
-      .filter(line => line.length > 0)
-      .join('\n');
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0)
+      .join("\n");
   }
 
   static sanitizeContext(context) {
     const sanitized = { ...context };
 
     // Remove sensitive information
-    const sensitiveKeys = ['password', 'token', 'key', 'secret', 'auth'];
-    sensitiveKeys.forEach(key => {
+    const sensitiveKeys = ["password", "token", "key", "secret", "auth"];
+    sensitiveKeys.forEach((key) => {
       if (sanitized[key]) {
-        sanitized[key] = '[REDACTED]';
+        sanitized[key] = "[REDACTED]";
       }
     });
 
@@ -253,17 +253,17 @@ class AnalyticsPerformance {
       this.setupNavigationTracking();
       this.setupResourceTracking();
     } catch (error) {
-      logger.warn('Performance tracking setup failed:', error);
+      logger.warn("Performance tracking setup failed:", error);
     }
   }
 
   static setupPerformanceObserver() {
-    if (typeof PerformanceObserver === 'undefined') return;
+    if (typeof PerformanceObserver === "undefined") return;
 
     // Track paint metrics
-    const paintObserver = new PerformanceObserver(list => {
-      list.getEntries().forEach(entry => {
-        this.trackMetric('paint', {
+    const paintObserver = new PerformanceObserver((list) => {
+      list.getEntries().forEach((entry) => {
+        this.trackMetric("paint", {
           name: entry.name,
           startTime: entry.startTime,
           duration: entry.duration || 0,
@@ -272,20 +272,20 @@ class AnalyticsPerformance {
     });
 
     try {
-      paintObserver.observe({ entryTypes: ['paint'] });
-      this.observers.set('paint', paintObserver);
+      paintObserver.observe({ entryTypes: ["paint"] });
+      this.observers.set("paint", paintObserver);
     } catch (e) {
-      logger.warn('Paint observer not supported:', e);
+      logger.warn("Paint observer not supported:", e);
     }
 
     // Track layout shifts
-    const layoutObserver = new PerformanceObserver(list => {
-      list.getEntries().forEach(entry => {
+    const layoutObserver = new PerformanceObserver((list) => {
+      list.getEntries().forEach((entry) => {
         if (
           entry.value > ANALYTICS_CONSTANTS.PERFORMANCE.LAYOUT_SHIFT_THRESHOLD
         ) {
           // Only track significant shifts
-          this.trackMetric('layout-shift', {
+          this.trackMetric("layout-shift", {
             value: entry.value,
             hadRecentInput: entry.hadRecentInput,
             startTime: entry.startTime,
@@ -295,19 +295,19 @@ class AnalyticsPerformance {
     });
 
     try {
-      layoutObserver.observe({ entryTypes: ['layout-shift'] });
-      this.observers.set('layout-shift', layoutObserver);
+      layoutObserver.observe({ entryTypes: ["layout-shift"] });
+      this.observers.set("layout-shift", layoutObserver);
     } catch (e) {
-      logger.warn('Layout shift observer not supported:', e);
+      logger.warn("Layout shift observer not supported:", e);
     }
   }
 
   static setupNavigationTracking() {
-    window.addEventListener('load', () => {
+    window.addEventListener("load", () => {
       setTimeout(() => {
-        const navigation = performance.getEntriesByType('navigation')[0];
+        const navigation = performance.getEntriesByType("navigation")[0];
         if (navigation) {
-          this.trackMetric('navigation', {
+          this.trackMetric("navigation", {
             domContentLoaded:
               navigation.domContentLoadedEventEnd -
               navigation.domContentLoadedEventStart,
@@ -321,15 +321,15 @@ class AnalyticsPerformance {
   }
 
   static setupResourceTracking() {
-    const resourceObserver = new PerformanceObserver(list => {
-      list.getEntries().forEach(entry => {
+    const resourceObserver = new PerformanceObserver((list) => {
+      list.getEntries().forEach((entry) => {
         if (
           entry.transferSize >
           ANALYTICS_CONSTANTS.PERFORMANCE.LARGE_RESOURCE_SIZE
         ) {
           // Track large resources (>100KB)
-          this.trackMetric('large-resource', {
-            name: entry.name.split('/').pop(),
+          this.trackMetric("large-resource", {
+            name: entry.name.split("/").pop(),
             size: entry.transferSize,
             duration: entry.duration,
             type: entry.initiatorType,
@@ -339,10 +339,10 @@ class AnalyticsPerformance {
     });
 
     try {
-      resourceObserver.observe({ entryTypes: ['resource'] });
-      this.observers.set('resource', resourceObserver);
+      resourceObserver.observe({ entryTypes: ["resource"] });
+      this.observers.set("resource", resourceObserver);
     } catch (e) {
-      logger.warn('Resource observer not supported:', e);
+      logger.warn("Resource observer not supported:", e);
     }
   }
 
@@ -370,7 +370,7 @@ class AnalyticsPerformance {
   }
 
   static cleanup() {
-    this.observers.forEach(observer => observer.disconnect());
+    this.observers.forEach((observer) => observer.disconnect());
     this.observers.clear();
     this.metrics.clear();
   }
@@ -439,7 +439,7 @@ class AnalyticsManager {
       });
 
       if (this.config.debug) {
-        logger.debug('Enhanced AnalyticsManager initialized', {
+        logger.debug("Enhanced AnalyticsManager initialized", {
           enabled: this.config.enabled,
           version: ANALYTICS_CONSTANTS.VERSION,
           features: {
@@ -451,8 +451,8 @@ class AnalyticsManager {
         });
       }
     } catch (error) {
-      logger.error('AnalyticsManager initialization failed:', error);
-      this.trackError(error, { context: 'initialization' });
+      logger.error("AnalyticsManager initialization failed:", error);
+      this.trackError(error, { context: "initialization" });
     }
   }
 
@@ -490,9 +490,9 @@ class AnalyticsManager {
       .toString(ANALYTICS_CONSTANTS.ID_GENERATION.RADIX)
       .substr(
         ANALYTICS_CONSTANTS.ID_GENERATION.SUBSTRING_START,
-        ANALYTICS_CONSTANTS.ID_GENERATION.SUBSTRING_LENGTH
+        ANALYTICS_CONSTANTS.ID_GENERATION.SUBSTRING_LENGTH,
       );
-    const stored = StorageManager.getSessionId?.() || '';
+    const stored = StorageManager.getSessionId?.() || "";
 
     return `${timestamp}_${random}_${stored.substr(-ANALYTICS_CONSTANTS.ID_GENERATION.SESSION_ID_SUFFIX_LENGTH)}`;
   }
@@ -558,7 +558,7 @@ class AnalyticsManager {
       // Regional privacy compliance
       this.applyRegionalPrivacyRules();
     } catch (error) {
-      logger.warn('Privacy consent validation failed:', error);
+      logger.warn("Privacy consent validation failed:", error);
       // Err on the side of privacy
       this.config.enabled = false;
       this.config.anonymizeData = true;
@@ -572,25 +572,25 @@ class AnalyticsManager {
     const { timezone, language } = this.sessionData;
 
     // EU/GDPR regions
-    const gdprRegions = ['Europe', 'EU'];
+    const gdprRegions = ["Europe", "EU"];
     const isGDPRRegion =
-      gdprRegions.some(region => timezone.includes(region)) ||
-      language.startsWith('de') ||
-      language.startsWith('fr') ||
-      language.startsWith('es') ||
-      language.startsWith('it');
+      gdprRegions.some((region) => timezone.includes(region)) ||
+      language.startsWith("de") ||
+      language.startsWith("fr") ||
+      language.startsWith("es") ||
+      language.startsWith("it");
 
     if (isGDPRRegion) {
       this.config.gdprCompliant = true;
       this.config.anonymizeData = true;
       this.config.retentionDays = Math.min(
         this.config.retentionDays,
-        ANALYTICS_CONSTANTS.PRIVACY.GDPR_RETENTION_DAYS
+        ANALYTICS_CONSTANTS.PRIVACY.GDPR_RETENTION_DAYS,
       );
     }
 
     // California/CCPA
-    if (timezone.includes('Los_Angeles') || timezone.includes('Pacific')) {
+    if (timezone.includes("Los_Angeles") || timezone.includes("Pacific")) {
       this.config.anonymizeData = true;
     }
   }
@@ -600,8 +600,8 @@ class AnalyticsManager {
    */
   static requestConsentRenewal() {
     this.dispatchEvent(ANALYTICS_EVENTS.PRIVACY_CHANGED, {
-      action: 'consent_renewal_required',
-      reason: 'gdpr_compliance',
+      action: "consent_renewal_required",
+      reason: "gdpr_compliance",
     });
   }
 
@@ -610,15 +610,15 @@ class AnalyticsManager {
    */
   static setupThemeMonitoring() {
     // Monitor high contrast changes
-    const contrastQuery = window.matchMedia('(prefers-contrast: high)');
-    contrastQuery.addEventListener('change', e => {
-      this.trackThemeChange('high_contrast', e.matches);
+    const contrastQuery = window.matchMedia("(prefers-contrast: high)");
+    contrastQuery.addEventListener("change", (e) => {
+      this.trackThemeChange("high_contrast", e.matches);
     });
 
     // Monitor reduced motion changes
-    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    motionQuery.addEventListener('change', e => {
-      this.trackThemeChange('reduced_motion', e.matches);
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    motionQuery.addEventListener("change", (e) => {
+      this.trackThemeChange("reduced_motion", e.matches);
     });
 
     this.themeObserver = { contrastQuery, motionQuery };
@@ -628,15 +628,15 @@ class AnalyticsManager {
    * Setup network monitoring for offline/online events
    */
   static setupNetworkMonitoring() {
-    window.addEventListener('online', () => {
+    window.addEventListener("online", () => {
       this.isOnline = true;
-      this.trackEvent('network_status', { status: 'online' });
+      this.trackEvent("network_status", { status: "online" });
       this.processRetryQueue();
     });
 
-    window.addEventListener('offline', () => {
+    window.addEventListener("offline", () => {
       this.isOnline = false;
-      this.trackEvent('network_status', { status: 'offline' });
+      this.trackEvent("network_status", { status: "offline" });
     });
   }
 
@@ -649,7 +649,7 @@ class AnalyticsManager {
     // Track screen reader usage
     const isScreenReader = this.detectScreenReader();
     if (isScreenReader) {
-      this.trackAccessibilityUsage('screen_reader', true);
+      this.trackAccessibilityUsage("screen_reader", true);
     }
 
     // Track keyboard navigation
@@ -664,11 +664,11 @@ class AnalyticsManager {
    */
   static detectScreenReader() {
     const userAgent = navigator.userAgent.toLowerCase();
-    const screenReaders = ['nvda', 'jaws', 'dragon', 'voiceover'];
+    const screenReaders = ["nvda", "jaws", "dragon", "voiceover"];
 
     return (
-      screenReaders.some(sr => userAgent.includes(sr)) ||
-      navigator.userAgent.includes('aural') ||
+      screenReaders.some((sr) => userAgent.includes(sr)) ||
+      navigator.userAgent.includes("aural") ||
       (window.speechSynthesis && window.speechSynthesis.speaking)
     );
   }
@@ -680,24 +680,24 @@ class AnalyticsManager {
     let tabKeyUsed = false;
 
     document.addEventListener(
-      'keydown',
-      e => {
-        if (e.key === 'Tab') {
+      "keydown",
+      (e) => {
+        if (e.key === "Tab") {
           if (!tabKeyUsed) {
-            this.trackAccessibilityUsage('keyboard_navigation', true);
+            this.trackAccessibilityUsage("keyboard_navigation", true);
             tabKeyUsed = true;
           }
         }
 
         // Track common accessibility shortcuts
         if (e.altKey || e.ctrlKey) {
-          this.trackAccessibilityUsage('keyboard_shortcut', true, {
+          this.trackAccessibilityUsage("keyboard_shortcut", true, {
             key: e.key,
-            modifier: e.altKey ? 'alt' : 'ctrl',
+            modifier: e.altKey ? "alt" : "ctrl",
           });
         }
       },
-      { once: false, passive: true }
+      { once: false, passive: true },
     );
   }
 
@@ -708,14 +708,14 @@ class AnalyticsManager {
     let focusEvents = 0;
 
     document.addEventListener(
-      'focusin',
+      "focusin",
       () => {
         focusEvents++;
         if (focusEvents === 1) {
-          this.trackAccessibilityUsage('focus_indicators', true);
+          this.trackAccessibilityUsage("focus_indicators", true);
         }
       },
-      { passive: true }
+      { passive: true },
     );
   }
 
@@ -728,7 +728,7 @@ class AnalyticsManager {
       window.dispatchEvent(event);
     } catch (error) {
       if (this.config.debug) {
-        logger.warn('Failed to dispatch analytics event:', error);
+        logger.warn("Failed to dispatch analytics event:", error);
       }
     }
   } /**
@@ -737,7 +737,7 @@ class AnalyticsManager {
   static async startSession() {
     const isReturning = await this.isReturningUser();
 
-    await this.trackEvent('session_start', {
+    await this.trackEvent("session_start", {
       ...this.sessionData,
       returningUser: isReturning,
       sessionCount: await this.getSessionCount(),
@@ -754,7 +754,7 @@ class AnalyticsManager {
    */
   static async getSessionCount() {
     try {
-      const sessions = await StorageManager.get('analytics_sessions', []);
+      const sessions = await StorageManager.get("analytics_sessions", []);
       return sessions.length + 1;
     } catch (error) {
       return 1;
@@ -764,32 +764,32 @@ class AnalyticsManager {
    */
   static setupEventListeners() {
     // Page visibility for session tracking
-    document.addEventListener('visibilitychange', () => {
+    document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
-        this.trackEvent('session_pause', {
+        this.trackEvent("session_pause", {
           pauseTime: Date.now(),
           sessionDuration: Date.now() - this.sessionData.startTime,
         });
       } else {
-        this.trackEvent('session_resume', {
+        this.trackEvent("session_resume", {
           resumeTime: Date.now(),
         });
       }
     });
 
     // Window beforeunload for session end
-    window.addEventListener('beforeunload', () => {
+    window.addEventListener("beforeunload", () => {
       this.endSession();
     });
 
     // Enhanced error tracking
     if (this.config.trackErrors) {
-      window.addEventListener('error', e => {
+      window.addEventListener("error", (e) => {
         const errorData = AnalyticsErrorHandler.formatError(e.error, {
           filename: e.filename,
           lineno: e.lineno,
           colno: e.colno,
-          type: 'javascript_error',
+          type: "javascript_error",
         });
 
         if (errorData && AnalyticsErrorHandler.shouldTrackError(e.error)) {
@@ -798,11 +798,11 @@ class AnalyticsManager {
       });
 
       // Promise rejection tracking
-      window.addEventListener('unhandledrejection', e => {
+      window.addEventListener("unhandledrejection", (e) => {
         const error =
           e.reason instanceof Error ? e.reason : new Error(String(e.reason));
         const errorData = AnalyticsErrorHandler.formatError(error, {
-          type: 'unhandled_promise_rejection',
+          type: "unhandled_promise_rejection",
         });
 
         if (errorData && AnalyticsErrorHandler.shouldTrackError(error)) {
@@ -814,20 +814,20 @@ class AnalyticsManager {
     // Performance tracking setup
     if (
       this.config.trackPerformance &&
-      typeof PerformanceObserver !== 'undefined'
+      typeof PerformanceObserver !== "undefined"
     ) {
       this.setupAdvancedPerformanceTracking();
     }
 
     // Viewport and orientation changes
     window.addEventListener(
-      'resize',
+      "resize",
       this.debounce(() => {
-        this.trackEvent('viewport_change', {
+        this.trackEvent("viewport_change", {
           newSize: `${window.innerWidth}x${window.innerHeight}`,
           orientation: window.orientation || 0,
         });
-      }, ANALYTICS_CONSTANTS.TIME.DEBOUNCE_DELAY)
+      }, ANALYTICS_CONSTANTS.TIME.DEBOUNCE_DELAY),
     );
 
     // Input method tracking
@@ -846,23 +846,23 @@ class AnalyticsManager {
 
         if (usage > ANALYTICS_CONSTANTS.PERFORMANCE.MEMORY_PRESSURE_THRESHOLD) {
           // 80% memory usage
-          this.trackPerformanceMetric('memory_pressure', usage * 100, '%');
+          this.trackPerformanceMetric("memory_pressure", usage * 100, "%");
         }
       }, ANALYTICS_CONSTANTS.TIME.MEMORY_CHECK_INTERVAL); // Check every 30 seconds
     }
 
     // Long task detection
-    if (typeof PerformanceObserver !== 'undefined') {
+    if (typeof PerformanceObserver !== "undefined") {
       try {
-        const longTaskObserver = new PerformanceObserver(list => {
-          list.getEntries().forEach(entry => {
-            this.trackPerformanceMetric('long_task', entry.duration, 'ms');
+        const longTaskObserver = new PerformanceObserver((list) => {
+          list.getEntries().forEach((entry) => {
+            this.trackPerformanceMetric("long_task", entry.duration, "ms");
           });
         });
-        longTaskObserver.observe({ entryTypes: ['longtask'] });
+        longTaskObserver.observe({ entryTypes: ["longtask"] });
       } catch (e) {
         if (this.config.debug) {
-          logger.warn('Long task observer not supported:', e);
+          logger.warn("Long task observer not supported:", e);
         }
       }
     }
@@ -877,36 +877,36 @@ class AnalyticsManager {
     let keyboardUsed = false;
 
     document.addEventListener(
-      'mousedown',
+      "mousedown",
       () => {
         if (!mouseUsed) {
-          this.trackUserInteraction('input_method', 'mouse');
+          this.trackUserInteraction("input_method", "mouse");
           mouseUsed = true;
         }
       },
-      { once: true, passive: true }
+      { once: true, passive: true },
     );
 
     document.addEventListener(
-      'touchstart',
+      "touchstart",
       () => {
         if (!touchUsed) {
-          this.trackUserInteraction('input_method', 'touch');
+          this.trackUserInteraction("input_method", "touch");
           touchUsed = true;
         }
       },
-      { once: true, passive: true }
+      { once: true, passive: true },
     );
 
     document.addEventListener(
-      'keydown',
+      "keydown",
       () => {
         if (!keyboardUsed) {
-          this.trackUserInteraction('input_method', 'keyboard');
+          this.trackUserInteraction("input_method", "keyboard");
           keyboardUsed = true;
         }
       },
-      { once: true, passive: true }
+      { once: true, passive: true },
     );
   }
 
@@ -940,7 +940,7 @@ class AnalyticsManager {
         return this.config.flushInterval;
       return Math.min(
         this.config.flushInterval * 2,
-        ANALYTICS_CONSTANTS.MAX_FLUSH_INTERVAL
+        ANALYTICS_CONSTANTS.MAX_FLUSH_INTERVAL,
       );
     };
 
@@ -972,7 +972,7 @@ class AnalyticsManager {
         sessionId: this.sessionData.sessionId,
         data: await this.enhanceEventData(data),
         url: window.location.pathname,
-        referrer: document.referrer || '',
+        referrer: document.referrer || "",
         viewport: `${window.innerWidth}x${window.innerHeight}`,
         theme: AnalyticsTheme.getCurrentTheme(),
         performance: this.getBasicPerformanceMetrics(),
@@ -987,7 +987,7 @@ class AnalyticsManager {
       }
 
       if (this.config.debug) {
-        logger.debug('Analytics Event:', event);
+        logger.debug("Analytics Event:", event);
       }
 
       // Queue management
@@ -996,10 +996,10 @@ class AnalyticsManager {
       // Prevent memory leaks
       if (this.eventQueue.length > ANALYTICS_CONSTANTS.MAX_EVENT_QUEUE_SIZE) {
         this.eventQueue = this.eventQueue.slice(
-          -ANALYTICS_CONSTANTS.MAX_BATCH_SIZE
+          -ANALYTICS_CONSTANTS.MAX_BATCH_SIZE,
         );
         this.dispatchEvent(ANALYTICS_EVENTS.QUOTA_EXCEEDED, {
-          action: 'queue_trimmed',
+          action: "queue_trimmed",
           newSize: this.eventQueue.length,
         });
       }
@@ -1013,9 +1013,9 @@ class AnalyticsManager {
       }
     } catch (error) {
       if (this.config.debug) {
-        logger.error('Failed to track event:', error);
+        logger.error("Failed to track event:", error);
       }
-      this.trackError(error, { context: 'event_tracking', eventName });
+      this.trackError(error, { context: "event_tracking", eventName });
     }
   }
 
@@ -1024,7 +1024,7 @@ class AnalyticsManager {
    */
   static validateEventName(eventName) {
     return (
-      typeof eventName === 'string' &&
+      typeof eventName === "string" &&
       eventName.length > 0 &&
       eventName.length <= 100 &&
       /^[a-zA-Z0-9_\-.:]+$/.test(eventName)
@@ -1055,7 +1055,7 @@ class AnalyticsManager {
       enhanced._memoryUsage = Math.round(
         performance.memory.usedJSHeapSize /
           ANALYTICS_CONSTANTS.MEMORY.BYTES_PER_KB /
-          ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB
+          ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB,
       ); // MB
     }
 
@@ -1082,12 +1082,12 @@ class AnalyticsManager {
             used: Math.round(
               performance.memory.usedJSHeapSize /
                 ANALYTICS_CONSTANTS.MEMORY.BYTES_PER_KB /
-                ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB
+                ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB,
             ),
             total: Math.round(
               performance.memory.totalJSHeapSize /
                 ANALYTICS_CONSTANTS.MEMORY.BYTES_PER_KB /
-                ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB
+                ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB,
             ),
           }
         : null,
@@ -1102,7 +1102,7 @@ class AnalyticsManager {
       await StorageManager.logAnalyticsEvent(event);
     } catch (error) {
       if (this.config.debug) {
-        logger.warn('Failed to store event locally:', error);
+        logger.warn("Failed to store event locally:", error);
       }
     }
   }
@@ -1111,23 +1111,23 @@ class AnalyticsManager {
    * Anonymize URL for privacy
    */
   static anonymizeUrl(url) {
-    if (!url) return '';
+    if (!url) return "";
 
     try {
       const urlObj = new URL(url, window.location.origin);
 
       // Remove query parameters and hash
-      urlObj.search = '';
-      urlObj.hash = '';
+      urlObj.search = "";
+      urlObj.hash = "";
 
       // Replace specific segments that might contain IDs
       let { pathname } = urlObj;
-      pathname = pathname.replace(/\/\d+/g, '/:id');
-      pathname = pathname.replace(/\/[a-f0-9]{8,}/g, '/:hash');
+      pathname = pathname.replace(/\/\d+/g, "/:id");
+      pathname = pathname.replace(/\/[a-f0-9]{8,}/g, "/:hash");
 
       return pathname;
     } catch (error) {
-      return '/unknown';
+      return "/unknown";
     }
   }
 
@@ -1135,7 +1135,7 @@ class AnalyticsManager {
    * Track theme changes for accessibility insights
    */
   static trackThemeChange(type, enabled) {
-    this.trackEvent('theme_change', {
+    this.trackEvent("theme_change", {
       type,
       enabled,
       theme: AnalyticsTheme.getCurrentTheme(),
@@ -1144,7 +1144,7 @@ class AnalyticsManager {
    * Track ethics decisions with enhanced data
    */
   static trackEthicsDecision(decision) {
-    this.trackEvent('ethics_decision', {
+    this.trackEvent("ethics_decision", {
       simulationId: decision.simulationId,
       scenario: decision.scenario,
       category: decision.category,
@@ -1165,13 +1165,13 @@ class AnalyticsManager {
   static trackSimulationStart(
     simulationId,
     simulationType,
-    additionalData = {}
+    additionalData = {},
   ) {
-    this.trackEvent('simulation_start', {
+    this.trackEvent("simulation_start", {
       simulationId,
       simulationType,
       isRetry: StorageManager.isSimulationCompleted?.(simulationId) || false,
-      userLevel: additionalData.userLevel || 'beginner',
+      userLevel: additionalData.userLevel || "beginner",
       expectedDuration: additionalData.expectedDuration || null,
       prerequisites: additionalData.prerequisites || [],
       learningObjectives: additionalData.learningObjectives || [],
@@ -1184,7 +1184,7 @@ class AnalyticsManager {
    * Track simulation completion with comprehensive data
    */
   static trackSimulationComplete(simulationId, report) {
-    this.trackEvent('simulation_complete', {
+    this.trackEvent("simulation_complete", {
       simulationId,
       duration: report.duration,
       score: report.score,
@@ -1213,9 +1213,9 @@ class AnalyticsManager {
     fromScenario,
     toScenario,
     totalScenarios,
-    additionalData = {}
+    additionalData = {},
   ) {
-    this.trackEvent('scenario_change', {
+    this.trackEvent("scenario_change", {
       simulationId,
       fromScenario,
       toScenario,
@@ -1224,7 +1224,7 @@ class AnalyticsManager {
       timeInPreviousScenario: additionalData.timeInPrevious || null,
       difficulty: additionalData.difficulty || null,
       userInitiated: additionalData.userInitiated !== false,
-      navigationMethod: additionalData.navigationMethod || 'unknown',
+      navigationMethod: additionalData.navigationMethod || "unknown",
     });
   }
 
@@ -1232,11 +1232,11 @@ class AnalyticsManager {
    * Track user interactions with enhanced data
    */
   static trackUserInteraction(interactionType, elementId, additionalData = {}) {
-    this.trackEvent('user_interaction', {
+    this.trackEvent("user_interaction", {
       type: interactionType,
       elementId,
       timestamp: Date.now(),
-      inputMethod: additionalData.inputMethod || 'unknown',
+      inputMethod: additionalData.inputMethod || "unknown",
       duration: additionalData.duration || null,
       coordinates: additionalData.coordinates || null,
       modifierKeys: additionalData.modifierKeys || {},
@@ -1253,13 +1253,13 @@ class AnalyticsManager {
    * Track accessibility feature usage with comprehensive data
    */
   static trackAccessibilityUsage(feature, enabled, additionalData = {}) {
-    this.trackEvent('accessibility_usage', {
+    this.trackEvent("accessibility_usage", {
       feature,
       enabled,
       timestamp: Date.now(),
-      context: additionalData.context || 'unknown',
+      context: additionalData.context || "unknown",
       previousState: additionalData.previousState || null,
-      trigger: additionalData.trigger || 'user',
+      trigger: additionalData.trigger || "user",
       theme: AnalyticsTheme.getCurrentTheme(),
       userAgent: navigator.userAgent.substring(0, 100),
       ...additionalData,
@@ -1272,7 +1272,7 @@ class AnalyticsManager {
   static trackError(error, context = {}) {
     if (!error || !this.config.trackErrors) {
       if (this.config.debug && !error) {
-        logger.warn('Analytics: Attempted to track null/undefined error');
+        logger.warn("Analytics: Attempted to track null/undefined error");
       }
       return;
     }
@@ -1281,18 +1281,18 @@ class AnalyticsManager {
     if (!errorData) return;
 
     this.trackEvent(
-      'error',
+      "error",
       {
         ...errorData,
         errorId: this.generateEventId(),
         sessionId: this.sessionData.sessionId,
         breadcrumbs: this.getErrorBreadcrumbs(),
         recoveryAttempted: context.recoveryAttempted || false,
-        userImpact: context.userImpact || 'unknown',
+        userImpact: context.userImpact || "unknown",
         theme: AnalyticsTheme.getCurrentTheme(),
         performance: this.getBasicPerformanceMetrics(),
       },
-      true
+      true,
     ); // Mark as urgent
 
     this.dispatchEvent(ANALYTICS_EVENTS.ERROR_TRACKED, {
@@ -1308,7 +1308,7 @@ class AnalyticsManager {
     // Return last 10 events as breadcrumbs
     return this.eventQueue
       .slice(-ANALYTICS_CONSTANTS.PERFORMANCE.BREADCRUMB_COUNT)
-      .map(event => ({
+      .map((event) => ({
         name: event.name,
         timestamp: event.timestamp,
         url: event.url,
@@ -1318,10 +1318,10 @@ class AnalyticsManager {
   /**
    * Track performance metrics with enhanced data
    */
-  static trackPerformanceMetric(metricName, value, unit = 'ms') {
+  static trackPerformanceMetric(metricName, value, unit = "ms") {
     if (!this.config.trackPerformance) return;
 
-    this.trackEvent('performance_metric', {
+    this.trackEvent("performance_metric", {
       metric: metricName,
       value,
       unit,
@@ -1332,12 +1332,12 @@ class AnalyticsManager {
             used: Math.round(
               performance.memory.usedJSHeapSize /
                 ANALYTICS_CONSTANTS.MEMORY.BYTES_PER_KB /
-                ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB
+                ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB,
             ),
             limit: Math.round(
               performance.memory.jsHeapSizeLimit /
                 ANALYTICS_CONSTANTS.MEMORY.BYTES_PER_KB /
-                ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB
+                ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB,
             ),
           }
         : null,
@@ -1356,10 +1356,10 @@ class AnalyticsManager {
   static trackLearningPath(simulationId, path, learningObjectives = []) {
     const pathAnalysis = this.analyzeLearningPath(path);
 
-    this.trackEvent('learning_path', {
+    this.trackEvent("learning_path", {
       simulationId,
       pathLength: path.length,
-      uniqueScenarios: new Set(path.map(p => p.scenario)).size,
+      uniqueScenarios: new Set(path.map((p) => p.scenario)).size,
       totalTime: path.reduce((sum, p) => sum + (p.timeSpent || 0), 0),
       averageTimePerScenario: pathAnalysis.averageTime,
       difficultyProgression: pathAnalysis.difficultyProgression,
@@ -1367,7 +1367,7 @@ class AnalyticsManager {
       strugglingAreas: pathAnalysis.strugglingAreas,
       learningObjectivesMet: this.calculateObjectiveCompletion(
         path,
-        learningObjectives
+        learningObjectives,
       ),
       adaptiveAdjustments: pathAnalysis.adaptiveAdjustments,
       theme: AnalyticsTheme.getCurrentTheme(),
@@ -1382,44 +1382,44 @@ class AnalyticsManager {
     if (!path || path.length === 0) {
       return {
         averageTime: 0,
-        difficultyProgression: 'none',
-        masteryLevel: 'unknown',
+        difficultyProgression: "none",
+        masteryLevel: "unknown",
         strugglingAreas: [],
         adaptiveAdjustments: 0,
       };
     }
 
-    const times = path.map(p => p.timeSpent || 0).filter(t => t > 0);
+    const times = path.map((p) => p.timeSpent || 0).filter((t) => t > 0);
     const averageTime =
       times.length > 0 ? times.reduce((a, b) => a + b, 0) / times.length : 0;
 
     // Analyze difficulty progression
-    const difficulties = path.map(p => p.difficulty || 1);
+    const difficulties = path.map((p) => p.difficulty || 1);
     const isIncreasing = difficulties.every(
-      (d, i) => i === 0 || d >= difficulties[i - 1]
+      (d, i) => i === 0 || d >= difficulties[i - 1],
     );
-    const difficultyProgression = isIncreasing ? 'increasing' : 'mixed';
+    const difficultyProgression = isIncreasing ? "increasing" : "mixed";
 
     // Estimate mastery level
-    const correctAnswers = path.filter(p => p.correct === true).length;
+    const correctAnswers = path.filter((p) => p.correct === true).length;
     const masteryPercentage =
       path.length > 0 ? (correctAnswers / path.length) * 100 : 0;
     const masteryLevel =
       masteryPercentage >= ANALYTICS_CONSTANTS.EDUCATION.PROFICIENT_THRESHOLD
-        ? 'high'
+        ? "high"
         : masteryPercentage >= ANALYTICS_CONSTANTS.EDUCATION.BEGINNING_THRESHOLD
-          ? 'medium'
-          : 'low';
+          ? "medium"
+          : "low";
 
     // Identify struggling areas
     const strugglingAreas = path
-      .filter(p => p.attempts > 2 || p.timeSpent > averageTime * 2)
-      .map(p => p.topic || p.scenario)
+      .filter((p) => p.attempts > 2 || p.timeSpent > averageTime * 2)
+      .map((p) => p.topic || p.scenario)
       .filter(Boolean);
 
     // Count adaptive adjustments
     const adaptiveAdjustments = path.filter(
-      p => p.adaptiveHint || p.difficultyAdjusted
+      (p) => p.adaptiveHint || p.difficultyAdjusted,
     ).length;
 
     return {
@@ -1438,15 +1438,15 @@ class AnalyticsManager {
     if (!objectives || objectives.length === 0) return {};
 
     const completion = {};
-    objectives.forEach(objective => {
+    objectives.forEach((objective) => {
       const relatedSteps = path.filter(
-        step =>
+        (step) =>
           step.objectives?.includes(objective.id) ||
-          step.topics?.includes(objective.topic)
+          step.topics?.includes(objective.topic),
       );
 
       const completed = relatedSteps.filter(
-        step => step.correct === true
+        (step) => step.correct === true,
       ).length;
       const total = relatedSteps.length;
 
@@ -1467,7 +1467,7 @@ class AnalyticsManager {
    * Track knowledge gaps with enhanced educational context
    */
   static trackKnowledgeGap(topic, confidence, attempts, additionalData = {}) {
-    this.trackEvent('knowledge_gap', {
+    this.trackEvent("knowledge_gap", {
       topic,
       confidence,
       attempts,
@@ -1478,7 +1478,7 @@ class AnalyticsManager {
       relatedTopics: additionalData.relatedTopics || [],
       prerequisites: additionalData.prerequisites || [],
       learningResources: additionalData.learningResources || [],
-      difficultyLevel: additionalData.difficultyLevel || 'unknown',
+      difficultyLevel: additionalData.difficultyLevel || "unknown",
       timestamp: Date.now(),
       theme: AnalyticsTheme.getCurrentTheme(),
     });
@@ -1492,15 +1492,15 @@ class AnalyticsManager {
       confidence < ANALYTICS_CONSTANTS.EDUCATION.CONFIDENCE_LOW &&
       attempts > ANALYTICS_CONSTANTS.EDUCATION.ATTEMPTS_HIGH
     )
-      return 'critical';
+      return "critical";
     if (
       confidence < ANALYTICS_CONSTANTS.EDUCATION.CONFIDENCE_MEDIUM &&
       attempts > ANALYTICS_CONSTANTS.EDUCATION.ATTEMPTS_MEDIUM
     )
-      return 'high';
+      return "high";
     if (confidence < ANALYTICS_CONSTANTS.EDUCATION.CONFIDENCE_HIGH)
-      return 'medium';
-    return 'low';
+      return "medium";
+    return "low";
   }
 
   /**
@@ -1511,18 +1511,18 @@ class AnalyticsManager {
 
     if (confidence < ANALYTICS_CONSTANTS.EDUCATION.CONFIDENCE_LOW) {
       actions.push(
-        'review_fundamentals',
-        'additional_practice',
-        'tutor_assistance'
+        "review_fundamentals",
+        "additional_practice",
+        "tutor_assistance",
       );
     } else if (confidence < ANALYTICS_CONSTANTS.EDUCATION.CONFIDENCE_MEDIUM) {
-      actions.push('practice_exercises', 'peer_discussion');
+      actions.push("practice_exercises", "peer_discussion");
     } else if (confidence < ANALYTICS_CONSTANTS.EDUCATION.CONFIDENCE_HIGH) {
-      actions.push('light_review', 'confidence_building');
+      actions.push("light_review", "confidence_building");
     }
 
     if (attempts > ANALYTICS_CONSTANTS.EDUCATION.ATTEMPTS_HIGH) {
-      actions.push('alternative_approach', 'break_session');
+      actions.push("alternative_approach", "break_session");
     }
 
     return actions;
@@ -1532,9 +1532,9 @@ class AnalyticsManager {
    * Track educator tool usage with detailed context
    */
   static trackEducatorToolUsage(toolName, context = {}) {
-    this.trackEvent('educator_tool_usage', {
+    this.trackEvent("educator_tool_usage", {
       tool: toolName,
-      context: context.context || 'unknown',
+      context: context.context || "unknown",
       userId: context.userId ? this.hashValue(context.userId) : null,
       classSize: context.classSize || null,
       grade: context.grade || null,
@@ -1552,9 +1552,9 @@ class AnalyticsManager {
    * Track educational outcomes and assessment results
    */
   static trackEducationalOutcome(assessment) {
-    this.trackEvent('educational_outcome', {
+    this.trackEvent("educational_outcome", {
       assessmentId: assessment.id,
-      type: assessment.type || 'unknown',
+      type: assessment.type || "unknown",
       score: assessment.score,
       maxScore: assessment.maxScore,
       percentage:
@@ -1564,7 +1564,7 @@ class AnalyticsManager {
       timeSpent: assessment.timeSpent,
       attempts: assessment.attempts || 1,
       topics: assessment.topics || [],
-      difficulty: assessment.difficulty || 'medium',
+      difficulty: assessment.difficulty || "medium",
       improvementFromPrevious: assessment.previousScore
         ? assessment.score - assessment.previousScore
         : null,
@@ -1580,36 +1580,36 @@ class AnalyticsManager {
    * Calculate mastery level from assessment
    */
   static calculateMasteryLevel(assessment) {
-    if (!assessment.maxScore || assessment.maxScore === 0) return 'unknown';
+    if (!assessment.maxScore || assessment.maxScore === 0) return "unknown";
 
     const percentage = (assessment.score / assessment.maxScore) * 100;
 
     if (percentage >= ANALYTICS_CONSTANTS.EDUCATION.EXPERT_THRESHOLD)
-      return 'expert';
+      return "expert";
     if (percentage >= ANALYTICS_CONSTANTS.EDUCATION.PROFICIENT_THRESHOLD)
-      return 'proficient';
+      return "proficient";
     if (percentage >= ANALYTICS_CONSTANTS.EDUCATION.DEVELOPING_THRESHOLD)
-      return 'developing';
+      return "developing";
     if (percentage >= ANALYTICS_CONSTANTS.EDUCATION.BEGINNING_THRESHOLD)
-      return 'beginning';
-    return 'needs_support';
+      return "beginning";
+    return "needs_support";
   } // Enhanced data processing methods
   /**
    * Enhanced anonymization with improved privacy protection
    */
   static async anonymizeEventData(data) {
-    if (!data || typeof data !== 'object') return data;
+    if (!data || typeof data !== "object") return data;
 
     const anonymized = { ...data };
 
     // Remove or hash potentially identifying information
     const sensitiveFields = [
-      'email',
-      'name',
-      'userId',
-      'ipAddress',
-      'deviceId',
-      'studentId',
+      "email",
+      "name",
+      "userId",
+      "ipAddress",
+      "deviceId",
+      "studentId",
     ];
     for (const field of sensitiveFields) {
       if (anonymized[field]) {
@@ -1621,13 +1621,13 @@ class AnalyticsManager {
     if (anonymized.timestamp) {
       anonymized.timestamp =
         Math.floor(
-          anonymized.timestamp / ANALYTICS_CONSTANTS.TIME.MILLISECONDS_PER_HOUR
+          anonymized.timestamp / ANALYTICS_CONSTANTS.TIME.MILLISECONDS_PER_HOUR,
         ) * ANALYTICS_CONSTANTS.TIME.MILLISECONDS_PER_HOUR;
     }
 
     // Anonymize nested objects
     for (const [key, value] of Object.entries(anonymized)) {
-      if (value && typeof value === 'object' && !Array.isArray(value)) {
+      if (value && typeof value === "object" && !Array.isArray(value)) {
         anonymized[key] = await this.anonymizeEventData(value);
       }
     }
@@ -1640,7 +1640,7 @@ class AnalyticsManager {
     // Generalize screen resolution for privacy
     if (anonymized.screenResolution) {
       anonymized.screenResolution = this.generalizeResolution(
-        anonymized.screenResolution
+        anonymized.screenResolution,
       );
     }
 
@@ -1651,16 +1651,16 @@ class AnalyticsManager {
    * Generalize screen resolution for privacy
    */
   static generalizeResolution(resolution) {
-    if (!resolution || typeof resolution !== 'string') return 'unknown';
+    if (!resolution || typeof resolution !== "string") return "unknown";
 
-    const [width] = resolution.split('x').map(Number);
+    const [width] = resolution.split("x").map(Number);
 
-    if (width >= ANALYTICS_CONSTANTS.SCREEN.RESOLUTION_4K) return '4K+';
-    if (width >= ANALYTICS_CONSTANTS.SCREEN.RESOLUTION_2K) return '2K+';
-    if (width >= ANALYTICS_CONSTANTS.SCREEN.RESOLUTION_FHD) return 'FHD';
-    if (width >= ANALYTICS_CONSTANTS.SCREEN.RESOLUTION_HD_PLUS) return 'HD+';
-    if (width >= ANALYTICS_CONSTANTS.SCREEN.RESOLUTION_HD) return 'HD';
-    return 'SD';
+    if (width >= ANALYTICS_CONSTANTS.SCREEN.RESOLUTION_4K) return "4K+";
+    if (width >= ANALYTICS_CONSTANTS.SCREEN.RESOLUTION_2K) return "2K+";
+    if (width >= ANALYTICS_CONSTANTS.SCREEN.RESOLUTION_FHD) return "FHD";
+    if (width >= ANALYTICS_CONSTANTS.SCREEN.RESOLUTION_HD_PLUS) return "HD+";
+    if (width >= ANALYTICS_CONSTANTS.SCREEN.RESOLUTION_HD) return "HD";
+    return "SD";
   }
 
   /**
@@ -1672,20 +1672,20 @@ class AnalyticsManager {
     try {
       const encoder = new TextEncoder();
       const data = encoder.encode(
-        value + ANALYTICS_CONSTANTS.ANONYMIZATION_SALT
+        value + ANALYTICS_CONSTANTS.ANONYMIZATION_SALT,
       );
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       return hashArray
-        .map(b =>
+        .map((b) =>
           b
             .toString(ANALYTICS_CONSTANTS.HASH.HEX_RADIX)
             .padStart(
               ANALYTICS_CONSTANTS.HASH.HEX_PAD_LENGTH,
-              ANALYTICS_CONSTANTS.HASH.HEX_PAD_CHAR
-            )
+              ANALYTICS_CONSTANTS.HASH.HEX_PAD_CHAR,
+            ),
         )
-        .join('')
+        .join("")
         .substring(0, ANALYTICS_CONSTANTS.HASH.HASH_SUBSTRING_LENGTH);
     } catch (error) {
       // Fallback to simple hash for older browsers
@@ -1723,7 +1723,7 @@ class AnalyticsManager {
 
       this.dispatchEvent(ANALYTICS_EVENTS.BATCH_SENT, {
         eventCount: events.length,
-        method: this.config.endpoint && this.isOnline ? 'endpoint' : 'local',
+        method: this.config.endpoint && this.isOnline ? "endpoint" : "local",
       });
     } catch (error) {
       // Re-queue events on failure
@@ -1731,11 +1731,11 @@ class AnalyticsManager {
       this.addToRetryQueue(events);
 
       if (this.config.debug) {
-        logger.error('Failed to flush analytics events:', error);
+        logger.error("Failed to flush analytics events:", error);
       }
 
       this.trackError(error, {
-        context: 'analytics_flush',
+        context: "analytics_flush",
         eventCount: events.length,
       });
     }
@@ -1750,7 +1750,7 @@ class AnalyticsManager {
     // Limit retry queue size
     if (this.retryQueue.length > ANALYTICS_CONSTANTS.MAX_STORED_EVENTS) {
       this.retryQueue = this.retryQueue.slice(
-        -ANALYTICS_CONSTANTS.MAX_STORED_EVENTS
+        -ANALYTICS_CONSTANTS.MAX_STORED_EVENTS,
       );
     }
   }
@@ -1776,7 +1776,7 @@ class AnalyticsManager {
       this.retryQueue.unshift(...events);
 
       if (this.config.debug) {
-        logger.warn('Failed to send queued events:', error);
+        logger.warn("Failed to send queued events:", error);
       }
     }
   }
@@ -1805,31 +1805,31 @@ class AnalyticsManager {
       let body = JSON.stringify(payload);
       if (
         body.length > ANALYTICS_CONSTANTS.NETWORK.COMPRESSION_THRESHOLD &&
-        'CompressionStream' in window
+        "CompressionStream" in window
       ) {
         body = await this.compressData(body);
         payload.metadata.compressed = true;
       }
 
       const headers = {
-        'Content-Type': 'application/json',
-        'X-Analytics-Version': ANALYTICS_CONSTANTS.VERSION,
-        'X-Session-ID': this.sessionData.sessionId,
+        "Content-Type": "application/json",
+        "X-Analytics-Version": ANALYTICS_CONSTANTS.VERSION,
+        "X-Session-ID": this.sessionData.sessionId,
       };
 
       // Add authentication if available
       if (this.config.apiKey) {
-        headers['Authorization'] = `Bearer ${this.config.apiKey}`;
+        headers["Authorization"] = `Bearer ${this.config.apiKey}`;
       }
 
       const controller = new AbortController();
       const timeoutId = setTimeout(
         () => controller.abort(),
-        ANALYTICS_CONSTANTS.NETWORK.REQUEST_TIMEOUT
+        ANALYTICS_CONSTANTS.NETWORK.REQUEST_TIMEOUT,
       ); // 30 second timeout
 
       const response = await fetch(this.config.endpoint, {
-        method: 'POST',
+        method: "POST",
         headers,
         body,
         signal: controller.signal,
@@ -1851,8 +1851,8 @@ class AnalyticsManager {
         logger.debug(`Sent ${events.length} events to analytics endpoint`);
       }
     } catch (error) {
-      if (error.name === 'AbortError') {
-        throw new Error('Request timeout');
+      if (error.name === "AbortError") {
+        throw new Error("Request timeout");
       }
       throw error;
     }
@@ -1863,7 +1863,7 @@ class AnalyticsManager {
    */
   static async compressData(data) {
     try {
-      const stream = new CompressionStream('gzip');
+      const stream = new CompressionStream("gzip");
       const writer = stream.writable.getWriter();
       const reader = stream.readable.getReader();
 
@@ -1880,7 +1880,7 @@ class AnalyticsManager {
       }
 
       return new Uint8Array(
-        chunks.reduce((acc, chunk) => [...acc, ...chunk], [])
+        chunks.reduce((acc, chunk) => [...acc, ...chunk], []),
       );
     } catch (error) {
       // Fallback to uncompressed data
@@ -1893,7 +1893,7 @@ class AnalyticsManager {
    */
   static processServerInstructions(instructions) {
     if (instructions.updateConfig) {
-      const allowedUpdates = ['flushInterval', 'batchSize', 'debug'];
+      const allowedUpdates = ["flushInterval", "batchSize", "debug"];
       Object.entries(instructions.updateConfig).forEach(([key, value]) => {
         if (allowedUpdates.includes(key)) {
           this.config[key] = value;
@@ -1915,22 +1915,22 @@ class AnalyticsManager {
    */
   static async storeLocally(events) {
     try {
-      const existingEvents = await StorageManager.get('analytics_batch', []);
+      const existingEvents = await StorageManager.get("analytics_batch", []);
       const allEvents = [...existingEvents, ...events];
 
       // Intelligent cleanup based on age and importance
       const cleanedEvents = this.cleanupLocalEvents(allEvents);
 
-      await StorageManager.set('analytics_batch', cleanedEvents);
+      await StorageManager.set("analytics_batch", cleanedEvents);
 
       if (this.config.debug) {
         logger.debug(
-          `Stored ${events.length} events locally (total: ${cleanedEvents.length})`
+          `Stored ${events.length} events locally (total: ${cleanedEvents.length})`,
         );
       }
     } catch (error) {
       if (this.config.debug) {
-        logger.warn('Failed to store events locally:', error);
+        logger.warn("Failed to store events locally:", error);
       }
       throw error;
     }
@@ -1947,11 +1947,11 @@ class AnalyticsManager {
     // Sort by importance and recency
     const sortedEvents = events.sort((a, b) => {
       // Critical events (errors, session events) have higher priority
-      const aImportant = ['error', 'session_start', 'session_end'].includes(
-        a.name
+      const aImportant = ["error", "session_start", "session_end"].includes(
+        a.name,
       );
-      const bImportant = ['error', 'session_start', 'session_end'].includes(
-        b.name
+      const bImportant = ["error", "session_start", "session_end"].includes(
+        b.name,
       );
 
       if (aImportant && !bImportant) return -1;
@@ -1968,7 +1968,7 @@ class AnalyticsManager {
    */
   static async generateInsights() {
     try {
-      const events = await StorageManager.get('analytics_batch', []);
+      const events = await StorageManager.get("analytics_batch", []);
       const decisions = (await StorageManager.getDecisions?.()) || [];
       const performanceMetrics = AnalyticsPerformance.getMetrics();
 
@@ -2012,9 +2012,9 @@ class AnalyticsManager {
       return insights;
     } catch (error) {
       if (this.config.debug) {
-        logger.error('Failed to generate insights:', error);
+        logger.error("Failed to generate insights:", error);
       }
-      return { error: 'Failed to generate insights', timestamp: Date.now() };
+      return { error: "Failed to generate insights", timestamp: Date.now() };
     }
   }
 
@@ -2024,7 +2024,7 @@ class AnalyticsManager {
   static getDateRange(events) {
     if (events.length === 0) return null;
 
-    const timestamps = events.map(e => e.timestamp).filter(Boolean);
+    const timestamps = events.map((e) => e.timestamp).filter(Boolean);
     return {
       start: new Date(Math.min(...timestamps)).toISOString(),
       end: new Date(Math.max(...timestamps)).toISOString(),
@@ -2038,7 +2038,7 @@ class AnalyticsManager {
   static analyzeSessionData(events) {
     const sessions = new Map();
 
-    events.forEach(event => {
+    events.forEach((event) => {
       if (!sessions.has(event.sessionId)) {
         sessions.set(event.sessionId, {
           id: event.sessionId,
@@ -2056,7 +2056,7 @@ class AnalyticsManager {
     });
 
     const sessionArray = Array.from(sessions.values());
-    const durations = sessionArray.map(s => s.end - s.start);
+    const durations = sessionArray.map((s) => s.end - s.start);
 
     return {
       totalSessions: sessionArray.length,
@@ -2066,15 +2066,15 @@ class AnalyticsManager {
           : 0,
       medianDuration: this.calculateMedian(durations),
       shortSessions: durations.filter(
-        d => d < ANALYTICS_CONSTANTS.SESSION.SHORT_SESSION_THRESHOLD
+        (d) => d < ANALYTICS_CONSTANTS.SESSION.SHORT_SESSION_THRESHOLD,
       ).length, // < 1 minute
       mediumSessions: durations.filter(
-        d =>
+        (d) =>
           d >= ANALYTICS_CONSTANTS.SESSION.SHORT_SESSION_THRESHOLD &&
-          d < ANALYTICS_CONSTANTS.SESSION.LONG_SESSION_THRESHOLD
+          d < ANALYTICS_CONSTANTS.SESSION.LONG_SESSION_THRESHOLD,
       ).length, // 1-30 minutes
       longSessions: durations.filter(
-        d => d >= ANALYTICS_CONSTANTS.SESSION.LONG_SESSION_THRESHOLD
+        (d) => d >= ANALYTICS_CONSTANTS.SESSION.LONG_SESSION_THRESHOLD,
       ).length, // > 30 minutes
       bounceRate: this.calculateBounceRate(sessionArray),
       returningUserRate: this.calculateReturningUserRate(events),
@@ -2103,7 +2103,7 @@ class AnalyticsManager {
   static calculateBounceRate(sessions) {
     if (sessions.length === 0) return 0;
 
-    const bounces = sessions.filter(s => s.events.length <= 2).length;
+    const bounces = sessions.filter((s) => s.events.length <= 2).length;
     return (bounces / sessions.length) * 100;
   }
 
@@ -2111,9 +2111,9 @@ class AnalyticsManager {
    * Calculate returning user rate
    */
   static calculateReturningUserRate(events) {
-    const sessionStarts = events.filter(e => e.name === 'session_start');
+    const sessionStarts = events.filter((e) => e.name === "session_start");
     const returningUsers = sessionStarts.filter(
-      e => e.data?.returningUser === true
+      (e) => e.data?.returningUser === true,
     ).length;
 
     return sessionStarts.length > 0
@@ -2125,14 +2125,15 @@ class AnalyticsManager {
    * Analyze engagement patterns
    */
   static analyzeEngagement(events) {
-    const interactions = events.filter(e => e.name === 'user_interaction');
+    const interactions = events.filter((e) => e.name === "user_interaction");
 
     return {
       totalInteractions: interactions.length,
-      interactionTypes: this.groupBy(interactions, e => e.data?.type),
+      interactionTypes: this.groupBy(interactions, (e) => e.data?.type),
       simulationEngagement: {
-        started: events.filter(e => e.name === 'simulation_start').length,
-        completed: events.filter(e => e.name === 'simulation_complete').length,
+        started: events.filter((e) => e.name === "simulation_start").length,
+        completed: events.filter((e) => e.name === "simulation_complete")
+          .length,
         abandoned: this.calculateAbandonmentRate(events),
       },
       avgInteractionsPerSession:
@@ -2157,9 +2158,9 @@ class AnalyticsManager {
    * Calculate simulation abandonment rate
    */
   static calculateAbandonmentRate(events) {
-    const started = events.filter(e => e.name === 'simulation_start').length;
+    const started = events.filter((e) => e.name === "simulation_start").length;
     const completed = events.filter(
-      e => e.name === 'simulation_complete'
+      (e) => e.name === "simulation_complete",
     ).length;
 
     return started > 0 ? ((started - completed) / started) * 100 : 0;
@@ -2171,8 +2172,8 @@ class AnalyticsManager {
   static calculateAvgInteractionsPerSession(events) {
     const sessionInteractions = new Map();
 
-    events.forEach(event => {
-      if (event.name === 'user_interaction') {
+    events.forEach((event) => {
+      if (event.name === "user_interaction") {
         const count = sessionInteractions.get(event.sessionId) || 0;
         sessionInteractions.set(event.sessionId, count + 1);
       }
@@ -2188,13 +2189,15 @@ class AnalyticsManager {
    * Calculate time to first interaction
    */
   static calculateTimeToFirstInteraction(events) {
-    const sessions = this.groupBy(events, e => e.sessionId);
+    const sessions = this.groupBy(events, (e) => e.sessionId);
     const times = [];
 
-    Object.values(sessions).forEach(sessionEvents => {
-      const sessionStart = sessionEvents.find(e => e.name === 'session_start');
+    Object.values(sessions).forEach((sessionEvents) => {
+      const sessionStart = sessionEvents.find(
+        (e) => e.name === "session_start",
+      );
       const firstInteraction = sessionEvents.find(
-        e => e.name === 'user_interaction'
+        (e) => e.name === "user_interaction",
       );
 
       if (sessionStart && firstInteraction) {
@@ -2214,14 +2217,14 @@ class AnalyticsManager {
     let score = 0;
 
     // Base score from interactions
-    score += events.filter(e => e.name === 'user_interaction').length * 2;
+    score += events.filter((e) => e.name === "user_interaction").length * 2;
 
     // Bonus for completed simulations
-    score += events.filter(e => e.name === 'simulation_complete').length * 10;
+    score += events.filter((e) => e.name === "simulation_complete").length * 10;
 
     // Bonus for time spent
     const sessionDurations = new Map();
-    events.forEach(event => {
+    events.forEach((event) => {
       if (!sessionDurations.has(event.sessionId)) {
         sessionDurations.set(event.sessionId, {
           start: event.timestamp,
@@ -2230,18 +2233,18 @@ class AnalyticsManager {
       } else {
         sessionDurations.get(event.sessionId).end = Math.max(
           sessionDurations.get(event.sessionId).end,
-          event.timestamp
+          event.timestamp,
         );
       }
     });
 
     const totalTime = Array.from(sessionDurations.values()).reduce(
       (sum, session) => sum + (session.end - session.start),
-      0
+      0,
     );
 
     score += Math.floor(
-      totalTime / ANALYTICS_CONSTANTS.ANALYTICS.TIME_SCORE_DIVISOR
+      totalTime / ANALYTICS_CONSTANTS.ANALYTICS.TIME_SCORE_DIVISOR,
     ); // 1 point per minute
 
     return Math.min(score, 1000); // Cap at 1000
@@ -2249,7 +2252,7 @@ class AnalyticsManager {
    * Analyze learning progress with advanced educational metrics
    */
   static analyzeLearningProgress(events, _decisions) {
-    const completions = events.filter(e => e.name === 'simulation_complete');
+    const completions = events.filter((e) => e.name === "simulation_complete");
 
     return {
       totalCompletions: completions.length,
@@ -2267,17 +2270,19 @@ class AnalyticsManager {
    * Calculate average score with confidence intervals
    */
   static calculateAverageScore(completions) {
-    if (completions.length === 0) return { average: 0, confidence: 'low' };
+    if (completions.length === 0) return { average: 0, confidence: "low" };
 
-    const scores = completions.map(c => c.data?.score || 0).filter(s => s > 0);
+    const scores = completions
+      .map((c) => c.data?.score || 0)
+      .filter((s) => s > 0);
     const average = scores.reduce((a, b) => a + b, 0) / scores.length;
     const confidence =
       scores.length >= ANALYTICS_CONSTANTS.ANALYTICS.CONFIDENCE_HIGH_THRESHOLD
-        ? 'high'
+        ? "high"
         : scores.length >=
             ANALYTICS_CONSTANTS.ANALYTICS.CONFIDENCE_MEDIUM_THRESHOLD
-          ? 'medium'
-          : 'low';
+          ? "medium"
+          : "low";
 
     return { average, confidence, sampleSize: scores.length };
   }
@@ -2287,15 +2292,15 @@ class AnalyticsManager {
    */
   static calculateImprovementTrend(completions) {
     if (completions.length < ANALYTICS_CONSTANTS.ANALYTICS.MIN_DATA_POINTS)
-      return { trend: 'insufficient_data', slope: 0 };
+      return { trend: "insufficient_data", slope: 0 };
 
     const scores = completions
-      .map(c => ({ score: c.data?.score || 0, timestamp: c.timestamp }))
-      .filter(s => s.score > 0)
+      .map((c) => ({ score: c.data?.score || 0, timestamp: c.timestamp }))
+      .filter((s) => s.score > 0)
       .sort((a, b) => a.timestamp - b.timestamp);
 
     if (scores.length < ANALYTICS_CONSTANTS.ANALYTICS.MIN_DATA_POINTS)
-      return { trend: 'insufficient_data', slope: 0 };
+      return { trend: "insufficient_data", slope: 0 };
 
     // Simple linear regression for trend analysis
     const n = scores.length;
@@ -2306,11 +2311,11 @@ class AnalyticsManager {
 
     const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
 
-    let trend = 'stable';
+    let trend = "stable";
     if (slope > ANALYTICS_CONSTANTS.ANALYTICS.TREND_IMPROVEMENT_THRESHOLD)
-      trend = 'improving';
+      trend = "improving";
     else if (slope < ANALYTICS_CONSTANTS.ANALYTICS.TREND_DECLINE_THRESHOLD)
-      trend = 'declining';
+      trend = "declining";
 
     return { trend, slope, correlation: this.calculateCorrelation(scores) };
   }
@@ -2323,20 +2328,20 @@ class AnalyticsManager {
 
     const n = scores.length;
     const indices = scores.map((_, i) => i);
-    const values = scores.map(s => s.score);
+    const values = scores.map((s) => s.score);
 
     const meanX = indices.reduce((a, b) => a + b, 0) / n;
     const meanY = values.reduce((a, b) => a + b, 0) / n;
 
     const numerator = scores.reduce(
       (sum, s, i) => sum + (i - meanX) * (s.score - meanY),
-      0
+      0,
     );
     const denomX = Math.sqrt(
-      scores.reduce((sum, _, i) => sum + (i - meanX) ** 2, 0)
+      scores.reduce((sum, _, i) => sum + (i - meanX) ** 2, 0),
     );
     const denomY = Math.sqrt(
-      scores.reduce((sum, s) => sum + (s.score - meanY) ** 2, 0)
+      scores.reduce((sum, s) => sum + (s.score - meanY) ** 2, 0),
     );
 
     return denomX * denomY === 0 ? 0 : numerator / (denomX * denomY);
@@ -2347,26 +2352,26 @@ class AnalyticsManager {
    */
   static analyzeAccessibilityUsage(events) {
     const accessibilityEvents = events.filter(
-      e => e.name === 'accessibility_usage'
+      (e) => e.name === "accessibility_usage",
     );
-    const features = this.groupBy(accessibilityEvents, e => e.data?.feature);
-    const themeChanges = events.filter(e => e.name === 'theme_change');
+    const features = this.groupBy(accessibilityEvents, (e) => e.data?.feature);
+    const themeChanges = events.filter((e) => e.name === "theme_change");
 
     return {
       totalUsage: accessibilityEvents.length,
       featureUsage: features,
       themePreferences: this.analyzeThemePreferences(themeChanges),
       screenReaderUsage: accessibilityEvents.filter(
-        e => e.data?.feature === 'screen_reader'
+        (e) => e.data?.feature === "screen_reader",
       ).length,
       keyboardNavigation: accessibilityEvents.filter(
-        e => e.data?.feature === 'keyboard_navigation'
+        (e) => e.data?.feature === "keyboard_navigation",
       ).length,
       highContrastUsage: themeChanges.filter(
-        e => e.data?.type === 'high_contrast' && e.data?.enabled
+        (e) => e.data?.type === "high_contrast" && e.data?.enabled,
       ).length,
       reducedMotionUsage: themeChanges.filter(
-        e => e.data?.type === 'reduced_motion' && e.data?.enabled
+        (e) => e.data?.type === "reduced_motion" && e.data?.enabled,
       ).length,
       accessibilityScore: this.calculateAccessibilityScore(accessibilityEvents),
     };
@@ -2382,14 +2387,14 @@ class AnalyticsManager {
       reducedMotion: 0,
     };
 
-    themeChanges.forEach(event => {
+    themeChanges.forEach((event) => {
       const { type, enabled } = event.data || {};
       if (enabled) {
         switch (type) {
-          case 'high_contrast':
+          case "high_contrast":
             preferences.highContrast++;
             break;
-          case 'reduced_motion':
+          case "reduced_motion":
             preferences.reducedMotion++;
             break;
           default:
@@ -2410,7 +2415,7 @@ class AnalyticsManager {
     let score = 0;
     const features = new Set();
 
-    accessibilityEvents.forEach(event => {
+    accessibilityEvents.forEach((event) => {
       features.add(event.data?.feature);
       score += 10; // Base points for using accessibility features
     });
@@ -2427,10 +2432,10 @@ class AnalyticsManager {
    * Analyze performance metrics
    */
   static analyzePerformanceMetrics(events, _performanceMetrics) {
-    const performanceEvents = events.filter(e =>
-      e.name.startsWith('performance')
+    const performanceEvents = events.filter((e) =>
+      e.name.startsWith("performance"),
     );
-    const errorEvents = events.filter(e => e.name === 'error');
+    const errorEvents = events.filter((e) => e.name === "error");
 
     return {
       totalMetrics: performanceEvents.length,
@@ -2440,11 +2445,11 @@ class AnalyticsManager {
       networkPerformance: this.analyzeNetworkPerformance(events),
       performanceScore: this.calculatePerformanceScore(
         performanceEvents,
-        errorEvents
+        errorEvents,
       ),
       recommendations: this.generatePerformanceRecommendations(
         performanceEvents,
-        errorEvents
+        errorEvents,
       ),
     };
   }
@@ -2454,7 +2459,7 @@ class AnalyticsManager {
    */
   static calculateErrorRate(events) {
     const totalEvents = events.length;
-    const errorEvents = events.filter(e => e.name === 'error').length;
+    const errorEvents = events.filter((e) => e.name === "error").length;
     return totalEvents > 0 ? (errorEvents / totalEvents) * 100 : 0;
   }
 
@@ -2462,17 +2467,18 @@ class AnalyticsManager {
    * Analyze errors with categorization
    */
   static analyzeErrors(events) {
-    const errorEvents = events.filter(e => e.name === 'error');
+    const errorEvents = events.filter((e) => e.name === "error");
 
     return {
       totalErrors: errorEvents.length,
-      errorTypes: this.groupBy(errorEvents, e => e.data?.type || 'unknown'),
+      errorTypes: this.groupBy(errorEvents, (e) => e.data?.type || "unknown"),
       errorsByContext: this.groupBy(
         errorEvents,
-        e => e.data?.context || 'unknown'
+        (e) => e.data?.context || "unknown",
       ),
-      criticalErrors: errorEvents.filter(e => e.data?.userImpact === 'critical')
-        .length,
+      criticalErrors: errorEvents.filter(
+        (e) => e.data?.userImpact === "critical",
+      ).length,
       recurringErrors: this.findRecurringErrors(errorEvents),
       errorTrend: this.calculateErrorTrend(errorEvents),
       resolution: this.analyzeErrorResolution(errorEvents),
@@ -2496,12 +2502,12 @@ class AnalyticsManager {
    * Analyze educational outcomes
    */
   static analyzeEducationalOutcomes(events) {
-    const outcomes = events.filter(e => e.name === 'educational_outcome');
+    const outcomes = events.filter((e) => e.name === "educational_outcome");
 
     return {
       totalAssessments: outcomes.length,
       averagePerformance: this.calculateAveragePerformance(outcomes),
-      masteryLevels: this.groupBy(outcomes, e => e.data?.masteryLevel),
+      masteryLevels: this.groupBy(outcomes, (e) => e.data?.masteryLevel),
       topicPerformance: this.analyzeTopicPerformance(outcomes),
       improvementAreas: this.identifyImprovementAreas(outcomes),
       strengths: this.identifyStrengths(outcomes),
@@ -2527,10 +2533,10 @@ class AnalyticsManager {
       const completions =
         (await StorageManager.getCompletedSimulations?.()) || [];
       const previousSessions = await StorageManager.get(
-        'analytics_sessions',
-        []
+        "analytics_sessions",
+        [],
       );
-      const lastVisit = await StorageManager.get('last_visit_timestamp', 0);
+      const lastVisit = await StorageManager.get("last_visit_timestamp", 0);
 
       const isReturning =
         completions.length > 0 ||
@@ -2542,7 +2548,7 @@ class AnalyticsManager {
             ANALYTICS_CONSTANTS.TIME.MILLISECONDS_PER_SECOND; // 24 hours
 
       // Update last visit
-      await StorageManager.set('last_visit_timestamp', Date.now());
+      await StorageManager.set("last_visit_timestamp", Date.now());
 
       return isReturning;
     } catch (error) {
@@ -2558,18 +2564,18 @@ class AnalyticsManager {
       const sessionDuration = Date.now() - this.sessionData.startTime;
 
       await this.trackEvent(
-        'session_end',
+        "session_end",
         {
           duration: sessionDuration,
           eventCount: this.eventQueue.length,
           theme: AnalyticsTheme.getCurrentTheme(),
           finalUrl: window.location.pathname,
         },
-        true
+        true,
       );
 
       // Store session metadata
-      const sessions = await StorageManager.get('analytics_sessions', []);
+      const sessions = await StorageManager.get("analytics_sessions", []);
       sessions.push({
         id: this.sessionData.sessionId,
         start: this.sessionData.startTime,
@@ -2580,9 +2586,9 @@ class AnalyticsManager {
 
       // Keep only recent sessions
       const recentSessions = sessions.slice(
-        -ANALYTICS_CONSTANTS.ANALYTICS.RECENT_SESSIONS_COUNT
+        -ANALYTICS_CONSTANTS.ANALYTICS.RECENT_SESSIONS_COUNT,
       );
-      await StorageManager.set('analytics_sessions', recentSessions);
+      await StorageManager.set("analytics_sessions", recentSessions);
 
       await this.flush();
 
@@ -2592,7 +2598,7 @@ class AnalyticsManager {
       });
     } catch (error) {
       if (this.config.debug) {
-        logger.error('Failed to end session:', error);
+        logger.error("Failed to end session:", error);
       }
     }
   }
@@ -2623,20 +2629,20 @@ class AnalyticsManager {
           this.startFlushTimer();
         }
 
-        this.trackEvent('analytics_enabled', {
+        this.trackEvent("analytics_enabled", {
           previousState: wasEnabled,
-          consentMethod: 'user_action',
+          consentMethod: "user_action",
         });
       } else if (!enabled && wasEnabled) {
         await this.clearData();
 
         this.trackEvent(
-          'analytics_disabled',
+          "analytics_disabled",
           {
             previousState: wasEnabled,
-            reason: 'user_request',
+            reason: "user_request",
           },
-          true
+          true,
         );
 
         await this.flush(); // Final flush before disabling
@@ -2648,7 +2654,7 @@ class AnalyticsManager {
       });
     } catch (error) {
       if (this.config.debug) {
-        logger.error('Failed to update analytics state:', error);
+        logger.error("Failed to update analytics state:", error);
       }
     }
   }
@@ -2662,9 +2668,9 @@ class AnalyticsManager {
       this.retryQueue = [];
 
       // Clear stored data
-      await StorageManager.remove?.('analytics_batch');
-      await StorageManager.remove?.('analytics_sessions');
-      await StorageManager.remove?.('last_visit_timestamp');
+      await StorageManager.remove?.("analytics_batch");
+      await StorageManager.remove?.("analytics_sessions");
+      await StorageManager.remove?.("last_visit_timestamp");
 
       // Stop timers and observers
       if (this.flushTimer) {
@@ -2677,20 +2683,20 @@ class AnalyticsManager {
 
       // Cleanup theme observers
       if (this.themeObserver) {
-        Object.values(this.themeObserver).forEach(observer => {
+        Object.values(this.themeObserver).forEach((observer) => {
           if (observer && observer.removeEventListener) {
-            observer.removeEventListener('change', () => {});
+            observer.removeEventListener("change", () => {});
           }
         });
         this.themeObserver = null;
       }
 
       if (this.config.debug) {
-        logger.debug('Analytics data cleared successfully');
+        logger.debug("Analytics data cleared successfully");
       }
     } catch (error) {
       if (this.config.debug) {
-        logger.error('Failed to clear analytics data:', error);
+        logger.error("Failed to clear analytics data:", error);
       }
     }
   }
@@ -2701,7 +2707,7 @@ class AnalyticsManager {
   static async exportAnalytics() {
     try {
       const insights = await this.generateInsights();
-      const events = await StorageManager.get('analytics_batch', []);
+      const events = await StorageManager.get("analytics_batch", []);
 
       const exportData = {
         metadata: {
@@ -2713,7 +2719,7 @@ class AnalyticsManager {
         },
         insights,
         events: this.config.anonymizeData
-          ? await Promise.all(events.map(e => this.anonymizeEventData(e)))
+          ? await Promise.all(events.map((e) => this.anonymizeEventData(e)))
           : events,
         summary: {
           totalEvents: events.length,
@@ -2726,10 +2732,10 @@ class AnalyticsManager {
       return exportData;
     } catch (error) {
       if (this.config.debug) {
-        logger.error('Failed to export analytics:', error);
+        logger.error("Failed to export analytics:", error);
       }
       return {
-        error: 'Export failed',
+        error: "Export failed",
         timestamp: new Date().toISOString(),
       };
     }
@@ -2763,14 +2769,14 @@ class AnalyticsManager {
    */
   static updateConfig(newConfig) {
     const allowedUpdates = [
-      'batchSize',
-      'flushInterval',
-      'debug',
-      'trackPerformance',
-      'trackAccessibility',
-      'trackErrors',
-      'endpoint',
-      'apiKey',
+      "batchSize",
+      "flushInterval",
+      "debug",
+      "trackPerformance",
+      "trackAccessibility",
+      "trackErrors",
+      "endpoint",
+      "apiKey",
     ];
 
     Object.entries(newConfig).forEach(([key, value]) => {
@@ -2785,7 +2791,7 @@ class AnalyticsManager {
     }
 
     if (this.config.debug) {
-      logger.debug('Analytics configuration updated:', newConfig);
+      logger.debug("Analytics configuration updated:", newConfig);
     }
   }
 
@@ -2800,7 +2806,7 @@ class AnalyticsManager {
       }
     } catch (error) {
       if (this.config.debug) {
-        logger.error('Force flush failed:', error);
+        logger.error("Force flush failed:", error);
       }
     }
   }
@@ -2819,17 +2825,17 @@ class AnalyticsManager {
             used: Math.round(
               performance.memory.usedJSHeapSize /
                 ANALYTICS_CONSTANTS.MEMORY.BYTES_PER_KB /
-                ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB
+                ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB,
             ),
             total: Math.round(
               performance.memory.totalJSHeapSize /
                 ANALYTICS_CONSTANTS.MEMORY.BYTES_PER_KB /
-                ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB
+                ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB,
             ),
             limit: Math.round(
               performance.memory.jsHeapSizeLimit /
                 ANALYTICS_CONSTANTS.MEMORY.BYTES_PER_KB /
-                ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB
+                ANALYTICS_CONSTANTS.MEMORY.KB_PER_MB,
             ),
           }
         : null,
@@ -2845,7 +2851,7 @@ class AnalyticsManager {
     const retryMemory = this.retryQueue.length * eventSize;
 
     return Math.round(
-      (queueMemory + retryMemory) / ANALYTICS_CONSTANTS.MEMORY.BYTES_PER_KB
+      (queueMemory + retryMemory) / ANALYTICS_CONSTANTS.MEMORY.BYTES_PER_KB,
     ); // KB
   }
 
@@ -2890,7 +2896,7 @@ class AnalyticsManager {
     return [];
   }
   static calculateErrorTrend(_data) {
-    return 'stable';
+    return "stable";
   }
   static analyzeErrorResolution(_data) {
     return {};
@@ -2934,25 +2940,25 @@ class AnalyticsManager {
 }
 
 // Enhanced initialization with error handling
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   // Wait for DOM to be ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      AnalyticsManager.init().catch(error => {
-        logger.warn('Analytics initialization failed:', error);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      AnalyticsManager.init().catch((error) => {
+        logger.warn("Analytics initialization failed:", error);
       });
     });
   } else {
     // Initialize immediately if DOM is ready
-    AnalyticsManager.init().catch(error => {
-      logger.warn('Analytics initialization failed:', error);
+    AnalyticsManager.init().catch((error) => {
+      logger.warn("Analytics initialization failed:", error);
     });
   }
 
   // Global error handler for unhandled analytics errors
-  window.addEventListener('error', event => {
-    if (event.filename && event.filename.includes('analytics')) {
-      logger.warn('Analytics module error:', event.error);
+  window.addEventListener("error", (event) => {
+    if (event.filename && event.filename.includes("analytics")) {
+      logger.warn("Analytics module error:", event.error);
     }
   });
 }

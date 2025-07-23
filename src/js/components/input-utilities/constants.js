@@ -80,14 +80,14 @@ export const INPUT_UTILITY_CONSTANTS = {
 
   // Preset colors
   DEFAULT_PRESET_COLORS: [
-    '#FF0000',
-    '#00FF00',
-    '#0000FF',
-    '#FFFF00',
-    '#FF00FF',
-    '#00FFFF',
-    '#000000',
-    '#FFFFFF',
+    "#FF0000",
+    "#00FF00",
+    "#0000FF",
+    "#FFFF00",
+    "#FF00FF",
+    "#00FFFF",
+    "#000000",
+    "#FFFFFF",
   ],
 
   // Current color display
@@ -115,7 +115,7 @@ export const INPUT_UTILITY_CONSTANTS = {
   ACCORDION_TRANSITION_DURATION: 300,
 
   // Easing constants
-  EASE_OUT_CUBIC: 'cubic-bezier(0.215, 0.610, 0.355, 1.000)',
+  EASE_OUT_CUBIC: "cubic-bezier(0.215, 0.610, 0.355, 1.000)",
 
   // DateTimePicker constants
   DAYS_IN_WEEK: 7,
@@ -131,7 +131,7 @@ export const INPUT_UTILITY_CONSTANTS = {
   CALENDAR_CELL_SIZE: 32,
 
   // More accordion constants
-  ACCORDION_ANIMATION_TIMING: 'ease-out',
+  ACCORDION_ANIMATION_TIMING: "ease-out",
   ACCORDION_HEADER_FONT_WEIGHT: 500,
 };
 
@@ -139,7 +139,7 @@ export const INPUT_UTILITY_CONSTANTS = {
 export const ANIMATION_DEFAULTS = {
   duration: INPUT_UTILITY_CONSTANTS.DEFAULT_ANIMATION_DURATION,
   easing: INPUT_UTILITY_CONSTANTS.EASE_OUT_CUBIC,
-  fill: 'forwards',
+  fill: "forwards",
 };
 
 // Accessibility defaults

@@ -43,7 +43,7 @@ import {
   addDoc,
   deleteDoc,
   serverTimestamp,
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Data Connect will be imported when available
 // import { connectDataConnectEmulator, getDataConnect } from 'firebase/data-connect';
@@ -54,32 +54,32 @@ import {
 const HYBRID_CONFIG = {
   // Use Firestore for real-time, flexible documents
   FIRESTORE_COLLECTIONS: [
-    'analytics_scenario_performance',
-    'analytics_framework_engagement',
-    'analytics_session_tracking',
-    'analytics_platform_metrics',
-    'user_sessions',
-    'notifications',
-    'user_preferences',
-    'badges',
+    "analytics_scenario_performance",
+    "analytics_framework_engagement",
+    "analytics_session_tracking",
+    "analytics_platform_metrics",
+    "user_sessions",
+    "notifications",
+    "user_preferences",
+    "badges",
   ],
 
   // Use Data Connect for structured, relational queries
   DATA_CONNECT_TABLES: [
-    'User',
-    'Scenario',
-    'SimulationDecision',
-    'Donation',
-    'ForumPost',
-    'ForumComment',
+    "User",
+    "Scenario",
+    "SimulationDecision",
+    "Donation",
+    "ForumPost",
+    "ForumComment",
   ],
 
   // Performance thresholds for choosing data source
   THRESHOLDS: {
     LARGE_QUERY_SIZE: 100,
     COMPLEX_JOIN_THRESHOLD: 3,
-    REAL_TIME_PRIORITY: ['user_sessions', 'notifications'],
-    ANALYTICS_PRIORITY: ['analytics_*'],
+    REAL_TIME_PRIORITY: ["user_sessions", "notifications"],
+    ANALYTICS_PRIORITY: ["analytics_*"],
   },
 };
 
@@ -112,7 +112,7 @@ export class HybridDataService {
 
       return false;
     } catch (error) {
-      console.warn('⚠️ Data Connect not available yet:', error.message);
+      console.warn("⚠️ Data Connect not available yet:", error.message);
       return false;
     }
   }
@@ -145,8 +145,8 @@ export class HybridDataService {
 
     // Use Firestore for real-time operations
     if (
-      HYBRID_CONFIG.THRESHOLDS.REAL_TIME_PRIORITY.some(pattern =>
-        new RegExp(pattern.replace('*', '.*')).test(collection)
+      HYBRID_CONFIG.THRESHOLDS.REAL_TIME_PRIORITY.some((pattern) =>
+        new RegExp(pattern.replace("*", ".*")).test(collection),
       )
     ) {
       return false;
@@ -164,7 +164,7 @@ export class HybridDataService {
     try {
       // Use Data Connect schema for structured user data
       const dcUser = {
-        displayName: userData.displayName || 'Anonymous User',
+        displayName: userData.displayName || "Anonymous User",
         email: userData.email,
         researchParticipationStatus: userData.researchParticipant || false,
         flairBadge: userData.flair?.badge || null,
@@ -182,15 +182,15 @@ export class HybridDataService {
       // Create in both systems for redundancy and flexibility
       const results = await Promise.allSettled([
         this.createDataConnectUser(dcUser),
-        this.createFirestoreDocument('users', userData.uid, fsUser),
+        this.createFirestoreDocument("users", userData.uid, fsUser),
       ]);
 
-      this.updatePerformanceMetrics('createUser', startTime);
+      this.updatePerformanceMetrics("createUser", startTime);
 
       return {
         success: true,
-        dataConnect: results[0].status === 'fulfilled',
-        firestore: results[1].status === 'fulfilled',
+        dataConnect: results[0].status === "fulfilled",
+        firestore: results[1].status === "fulfilled",
         user: userData,
       };
     } catch (error) {
@@ -205,9 +205,9 @@ export class HybridDataService {
     // This will use Data Connect mutations when available
     // For now, fallback to Firestore
     return await this.createFirestoreDocument(
-      'dc_users',
+      "dc_users",
       userData.email,
-      userData
+      userData,
     );
   }
 
@@ -223,7 +223,7 @@ export class HybridDataService {
         title: scenarioData.title,
         description: scenarioData.description,
         contentJson: JSON.stringify(scenarioData.content),
-        difficultyLevel: scenarioData.difficultyLevel || 'intermediate',
+        difficultyLevel: scenarioData.difficultyLevel || "intermediate",
         createdAt: new Date(),
       };
 
@@ -234,21 +234,21 @@ export class HybridDataService {
         analytics: {
           completions: 0,
           averageScore: 0,
-          feedbackSentiment: 'neutral',
+          feedbackSentiment: "neutral",
         },
       };
 
       const results = await Promise.allSettled([
         this.createDataConnectScenario(dcScenario),
-        this.createFirestoreDocument('scenarios', scenarioData.id, fsScenario),
+        this.createFirestoreDocument("scenarios", scenarioData.id, fsScenario),
       ]);
 
-      this.updatePerformanceMetrics('createScenario', startTime);
+      this.updatePerformanceMetrics("createScenario", startTime);
 
       return {
         success: true,
-        dataConnect: results[0].status === 'fulfilled',
-        firestore: results[1].status === 'fulfilled',
+        dataConnect: results[0].status === "fulfilled",
+        firestore: results[1].status === "fulfilled",
         scenario: scenarioData,
       };
     } catch (error) {
@@ -261,9 +261,9 @@ export class HybridDataService {
    */
   async createDataConnectScenario(scenarioData) {
     return await this.createFirestoreDocument(
-      'dc_scenarios',
+      "dc_scenarios",
       `scenario_${Date.now()}`,
-      scenarioData
+      scenarioData,
     );
   }
 
@@ -298,18 +298,18 @@ export class HybridDataService {
       const results = await Promise.allSettled([
         this.createDataConnectDecision(dcDecision),
         this.createFirestoreDocument(
-          'simulation_decisions',
+          "simulation_decisions",
           `decision_${Date.now()}`,
-          fsDecision
+          fsDecision,
         ),
       ]);
 
-      this.updatePerformanceMetrics('recordDecision', startTime);
+      this.updatePerformanceMetrics("recordDecision", startTime);
 
       return {
         success: true,
-        dataConnect: results[0].status === 'fulfilled',
-        firestore: results[1].status === 'fulfilled',
+        dataConnect: results[0].status === "fulfilled",
+        firestore: results[1].status === "fulfilled",
         decision: decisionData,
       };
     } catch (error) {
@@ -322,9 +322,9 @@ export class HybridDataService {
    */
   async createDataConnectDecision(decisionData) {
     return await this.createFirestoreDocument(
-      'dc_decisions',
+      "dc_decisions",
       `decision_${Date.now()}`,
-      decisionData
+      decisionData,
     );
   }
 
@@ -359,15 +359,15 @@ export class HybridDataService {
 
       const results = await Promise.allSettled([
         this.createDataConnectPost(dcPost),
-        this.createFirestoreDocument('forum_posts', postData.id, fsPost),
+        this.createFirestoreDocument("forum_posts", postData.id, fsPost),
       ]);
 
-      this.updatePerformanceMetrics('createForumPost', startTime);
+      this.updatePerformanceMetrics("createForumPost", startTime);
 
       return {
         success: true,
-        dataConnect: results[0].status === 'fulfilled',
-        firestore: results[1].status === 'fulfilled',
+        dataConnect: results[0].status === "fulfilled",
+        firestore: results[1].status === "fulfilled",
         post: postData,
       };
     } catch (error) {
@@ -380,9 +380,9 @@ export class HybridDataService {
    */
   async createDataConnectPost(postData) {
     return await this.createFirestoreDocument(
-      'dc_forum_posts',
+      "dc_forum_posts",
       `post_${Date.now()}`,
-      postData
+      postData,
     );
   }
 
@@ -394,9 +394,9 @@ export class HybridDataService {
 
     try {
       const useDataConnect = this.shouldUseDataConnect(
-        'query',
-        'analytics',
-        queryOptions
+        "query",
+        "analytics",
+        queryOptions,
       );
 
       if (useDataConnect) {
@@ -407,7 +407,7 @@ export class HybridDataService {
     } catch (error) {
       return { success: false, error: error.message };
     } finally {
-      this.updatePerformanceMetrics('getAnalytics', startTime);
+      this.updatePerformanceMetrics("getAnalytics", startTime);
     }
   }
 
@@ -463,7 +463,7 @@ export class HybridDataService {
     }
 
     if (queryOptions.orderBy) {
-      queryOptions.orderBy.forEach(([field, direction = 'asc']) => {
+      queryOptions.orderBy.forEach(([field, direction = "asc"]) => {
         q = query(q, orderBy(field, direction));
       });
     }
@@ -473,7 +473,7 @@ export class HybridDataService {
     }
 
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   }
 
   /**
@@ -487,7 +487,7 @@ export class HybridDataService {
     if (docId) {
       // Document listener
       const docRef = doc(this.db, collection, docId);
-      unsubscribe = onSnapshot(docRef, doc => {
+      unsubscribe = onSnapshot(docRef, (doc) => {
         callback(doc.exists() ? { id: doc.id, ...doc.data() } : null);
       });
     } else {
@@ -500,8 +500,8 @@ export class HybridDataService {
         });
       }
 
-      unsubscribe = onSnapshot(q, querySnapshot => {
-        const docs = querySnapshot.docs.map(doc => ({
+      unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const docs = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
@@ -529,11 +529,11 @@ export class HybridDataService {
   async getUserEngagementStats() {
     try {
       const sessions = await this.queryFirestoreCollection(
-        'analytics_session_tracking',
+        "analytics_session_tracking",
         {
-          orderBy: [['timestamp', 'desc']],
+          orderBy: [["timestamp", "desc"]],
           limit: 1000,
-        }
+        },
       );
 
       return {
@@ -541,9 +541,9 @@ export class HybridDataService {
         averageSessionTime:
           sessions.reduce((acc, s) => acc + (s.duration || 0), 0) /
           sessions.length,
-        activeUsers: new Set(sessions.map(s => s.userId)).size,
+        activeUsers: new Set(sessions.map((s) => s.userId)).size,
         bounceRate:
-          sessions.filter(s => s.pageViews === 1).length / sessions.length,
+          sessions.filter((s) => s.pageViews === 1).length / sessions.length,
       };
     } catch (error) {
       return { error: error.message };
@@ -553,11 +553,11 @@ export class HybridDataService {
   async getScenarioPerformanceStats() {
     try {
       const performance = await this.queryFirestoreCollection(
-        'analytics_scenario_performance',
+        "analytics_scenario_performance",
         {
-          orderBy: [['timestamp', 'desc']],
+          orderBy: [["timestamp", "desc"]],
           limit: 500,
-        }
+        },
       );
 
       const byScenario = performance.reduce((acc, p) => {
@@ -584,8 +584,8 @@ export class HybridDataService {
   async getDonationStats() {
     try {
       // This would be much more efficient with Data Connect SQL queries
-      const donations = await this.queryFirestoreCollection('dc_donations', {
-        orderBy: [['donationDate', 'desc']],
+      const donations = await this.queryFirestoreCollection("dc_donations", {
+        orderBy: [["donationDate", "desc"]],
         limit: 1000,
       });
 
@@ -594,7 +594,7 @@ export class HybridDataService {
         totalDonations: donations.length,
         averageDonation:
           donations.reduce((sum, d) => sum + d.amount, 0) / donations.length,
-        uniqueDonors: new Set(donations.map(d => d.userId)).size,
+        uniqueDonors: new Set(donations.map((d) => d.userId)).size,
         byMonth: this.groupDonationsByMonth(donations),
       };
     } catch (error) {
@@ -605,12 +605,12 @@ export class HybridDataService {
   async getForumActivityStats() {
     try {
       const [posts, comments] = await Promise.all([
-        this.queryFirestoreCollection('dc_forum_posts', {
-          orderBy: [['createdAt', 'desc']],
+        this.queryFirestoreCollection("dc_forum_posts", {
+          orderBy: [["createdAt", "desc"]],
           limit: 500,
         }),
-        this.queryFirestoreCollection('dc_forum_comments', {
-          orderBy: [['createdAt', 'desc']],
+        this.queryFirestoreCollection("dc_forum_comments", {
+          orderBy: [["createdAt", "desc"]],
           limit: 1000,
         }),
       ]);
@@ -618,8 +618,8 @@ export class HybridDataService {
       return {
         totalPosts: posts.length,
         totalComments: comments.length,
-        activePosters: new Set(posts.map(p => p.authorId)).size,
-        activeCommenters: new Set(comments.map(c => c.authorId)).size,
+        activePosters: new Set(posts.map((p) => p.authorId)).size,
+        activeCommenters: new Set(comments.map((c) => c.authorId)).size,
         engagementRate: comments.length / posts.length,
       };
     } catch (error) {
@@ -633,7 +633,7 @@ export class HybridDataService {
   updatePerformanceMetrics(operation, startTime) {
     const duration = Date.now() - startTime;
 
-    if (operation.includes('DataConnect')) {
+    if (operation.includes("DataConnect")) {
       this.performanceMetrics.dataConnectQueries++;
     } else {
       this.performanceMetrics.firestoreQueries++;
@@ -667,7 +667,7 @@ export class HybridDataService {
     const recommendations = [];
 
     if (this.performanceMetrics.averageQueryTime > 500) {
-      recommendations.push('Consider implementing query result caching');
+      recommendations.push("Consider implementing query result caching");
     }
 
     if (
@@ -675,7 +675,7 @@ export class HybridDataService {
       this.performanceMetrics.dataConnectQueries * 3
     ) {
       recommendations.push(
-        'Consider migrating complex queries to Data Connect'
+        "Consider migrating complex queries to Data Connect",
       );
     }
 
@@ -687,17 +687,17 @@ export class HybridDataService {
    */
   calculateDifficulty(responses) {
     // Calculate difficulty based on completion time and score variance
-    const times = responses.map(r => r.completionTime).filter(t => t);
-    const scores = responses.map(r => r.ethicsScore).filter(s => s);
+    const times = responses.map((r) => r.completionTime).filter((t) => t);
+    const scores = responses.map((r) => r.ethicsScore).filter((s) => s);
 
-    if (times.length === 0) return 'unknown';
+    if (times.length === 0) return "unknown";
 
     const avgTime = times.reduce((a, b) => a + b, 0) / times.length;
     const scoreVariance = this.calculateVariance(scores);
 
-    if (avgTime > 180000 || scoreVariance > 0.3) return 'hard';
-    if (avgTime > 120000 || scoreVariance > 0.2) return 'medium';
-    return 'easy';
+    if (avgTime > 180000 || scoreVariance > 0.3) return "hard";
+    if (avgTime > 120000 || scoreVariance > 0.2) return "medium";
+    return "easy";
   }
 
   calculateVariance(numbers) {
@@ -726,7 +726,7 @@ export class HybridDataService {
    */
   cleanup() {
     // Unsubscribe from all real-time listeners
-    this.realtimeListeners.forEach(unsubscribe => unsubscribe());
+    this.realtimeListeners.forEach((unsubscribe) => unsubscribe());
     this.realtimeListeners.clear();
 
     // Clear caches
@@ -755,12 +755,12 @@ export class HybridDataService {
         try {
           const imageResult = await this.storageService.uploadUserProfileImage(
             userData.uid,
-            profileImageFile
+            profileImageFile,
           );
 
           // Update user with profile image URL
           if (imageResult.success) {
-            await this.updateFirestoreDocument('users', userData.uid, {
+            await this.updateFirestoreDocument("users", userData.uid, {
               profileImageURL: imageResult.downloadURL,
               profileImagePath: imageResult.filePath,
               updatedAt: serverTimestamp(),
@@ -773,7 +773,7 @@ export class HybridDataService {
         }
       }
 
-      this.updatePerformanceMetrics('createUserWithProfile', startTime);
+      this.updatePerformanceMetrics("createUserWithProfile", startTime);
       return userResult;
     } catch (error) {
       return { success: false, error: error.message };
@@ -796,7 +796,7 @@ export class HybridDataService {
           try {
             const imageResult = await this.storageService.uploadBlogImage(
               blogId,
-              imageFile
+              imageFile,
             );
             if (imageResult.success) {
               uploadedImages.push({
@@ -848,15 +848,15 @@ export class HybridDataService {
 
       const results = await Promise.allSettled([
         this.createDataConnectBlog(dcBlog),
-        this.createFirestoreDocument('blog_posts', blogId, fsBlog),
+        this.createFirestoreDocument("blog_posts", blogId, fsBlog),
       ]);
 
-      this.updatePerformanceMetrics('createBlogPost', startTime);
+      this.updatePerformanceMetrics("createBlogPost", startTime);
 
       return {
         success: true,
-        dataConnect: results[0].status === 'fulfilled',
-        firestore: results[1].status === 'fulfilled',
+        dataConnect: results[0].status === "fulfilled",
+        firestore: results[1].status === "fulfilled",
         blog: enhancedBlogData,
         uploadedImages,
       };
@@ -882,7 +882,7 @@ export class HybridDataService {
             const attachmentResult =
               await this.storageService.uploadForumAttachment(
                 postId,
-                attachmentFile
+                attachmentFile,
               );
 
             if (attachmentResult.success) {
@@ -934,15 +934,15 @@ export class HybridDataService {
 
       const results = await Promise.allSettled([
         this.createDataConnectPost(dcPost),
-        this.createFirestoreDocument('forum_posts', postId, fsPost),
+        this.createFirestoreDocument("forum_posts", postId, fsPost),
       ]);
 
-      this.updatePerformanceMetrics('createForumPost', startTime);
+      this.updatePerformanceMetrics("createForumPost", startTime);
 
       return {
         success: true,
-        dataConnect: results[0].status === 'fulfilled',
-        firestore: results[1].status === 'fulfilled',
+        dataConnect: results[0].status === "fulfilled",
+        firestore: results[1].status === "fulfilled",
         post: enhancedPostData,
         uploadedAttachments,
       };
@@ -957,21 +957,21 @@ export class HybridDataService {
   async getUserFiles(userId) {
     try {
       if (!this.storageService) {
-        return { success: false, error: 'Storage service not available' };
+        return { success: false, error: "Storage service not available" };
       }
 
       const [profileImages, documents] = await Promise.allSettled([
         this.storageService.getUserProfileImages(userId),
-        this.getFirestoreDocument('user_documents', userId),
+        this.getFirestoreDocument("user_documents", userId),
       ]);
 
       return {
         success: true,
         profileImages:
-          profileImages.status === 'fulfilled'
+          profileImages.status === "fulfilled"
             ? profileImages.value
             : { images: [] },
-        documents: documents.status === 'fulfilled' ? documents.value : null,
+        documents: documents.status === "fulfilled" ? documents.value : null,
       };
     } catch (error) {
       return { success: false, error: error.message };
@@ -981,7 +981,7 @@ export class HybridDataService {
   async getBlogAssets(blogId) {
     try {
       if (!this.storageService) {
-        return { success: false, error: 'Storage service not available' };
+        return { success: false, error: "Storage service not available" };
       }
 
       const result = await this.storageService.getBlogImages(blogId);
@@ -994,7 +994,7 @@ export class HybridDataService {
   async getForumAttachments(postId) {
     try {
       if (!this.storageService) {
-        return { success: false, error: 'Storage service not available' };
+        return { success: false, error: "Storage service not available" };
       }
 
       const result = await this.storageService.getForumAttachments(postId);
@@ -1025,9 +1025,9 @@ export class HybridDataService {
    */
   async createDataConnectBlog(blogData) {
     return await this.createFirestoreDocument(
-      'dc_blog_posts',
+      "dc_blog_posts",
       `blog_${Date.now()}`,
-      blogData
+      blogData,
     );
   }
 

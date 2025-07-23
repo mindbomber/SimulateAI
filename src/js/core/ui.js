@@ -33,8 +33,8 @@
  * @license Apache-2.0
  */
 
-import logger from '../utils/logger.js';
-import { COMMON, TIMING } from '../utils/constants.js';
+import logger from "../utils/logger.js";
+import { COMMON, TIMING } from "../utils/constants.js";
 
 // Enhanced constants and configuration
 const UI_CONSTANTS = {
@@ -80,28 +80,28 @@ const UI_CONSTANTS = {
 
 const THEME_COLORS = {
   light: {
-    primary: '#1a73e8',
-    secondary: '#34a853',
-    surface: '#ffffff',
-    background: '#f8f9fa',
-    text: '#202124',
-    border: '#dadce0',
+    primary: "#1a73e8",
+    secondary: "#34a853",
+    surface: "#ffffff",
+    background: "#f8f9fa",
+    text: "#202124",
+    border: "#dadce0",
   },
   dark: {
-    primary: '#4285f4',
-    secondary: '#34a853',
-    surface: '#2d2d30',
-    background: '#1e1e1e',
-    text: '#e8eaed',
-    border: '#5f6368',
+    primary: "#4285f4",
+    secondary: "#34a853",
+    surface: "#2d2d30",
+    background: "#1e1e1e",
+    text: "#e8eaed",
+    border: "#5f6368",
   },
   highContrast: {
-    primary: '#000000',
-    secondary: '#000000',
-    surface: '#ffffff',
-    background: '#ffffff',
-    text: '#000000',
-    border: '#000000',
+    primary: "#000000",
+    secondary: "#000000",
+    surface: "#ffffff",
+    background: "#ffffff",
+    text: "#000000",
+    border: "#000000",
   },
 };
 
@@ -111,27 +111,27 @@ const THEME_COLORS = {
 class UIThemeManager {
   static getCurrentTheme() {
     const prefersHighContrast = window.matchMedia?.(
-      '(prefers-contrast: high)'
+      "(prefers-contrast: high)",
     ).matches;
     const prefersReducedMotion = window.matchMedia?.(
-      '(prefers-reduced-motion: reduce)'
+      "(prefers-reduced-motion: reduce)",
     ).matches;
 
     return {
-      name: prefersHighContrast ? 'highContrast' : 'light',
+      name: prefersHighContrast ? "highContrast" : "light",
       highContrast: prefersHighContrast,
       reducedMotion: prefersReducedMotion,
-      colors: THEME_COLORS[prefersHighContrast ? 'highContrast' : 'light'],
+      colors: THEME_COLORS[prefersHighContrast ? "highContrast" : "light"],
     };
   }
 
   static applyThemeToElement(element, theme = this.getCurrentTheme()) {
-    element.style.setProperty('--theme-primary', theme.colors.primary);
-    element.style.setProperty('--theme-secondary', theme.colors.secondary);
-    element.style.setProperty('--theme-surface', theme.colors.surface);
-    element.style.setProperty('--theme-background', theme.colors.background);
-    element.style.setProperty('--theme-text', theme.colors.text);
-    element.style.setProperty('--theme-border', theme.colors.border);
+    element.style.setProperty("--theme-primary", theme.colors.primary);
+    element.style.setProperty("--theme-secondary", theme.colors.secondary);
+    element.style.setProperty("--theme-surface", theme.colors.surface);
+    element.style.setProperty("--theme-background", theme.colors.background);
+    element.style.setProperty("--theme-text", theme.colors.text);
+    element.style.setProperty("--theme-border", theme.colors.border);
   }
 }
 
@@ -168,7 +168,7 @@ class UIComponent {
   constructor(config = {}) {
     // Performance monitoring
     UIPerformanceMonitor.startMeasurement(
-      `ui-component-init-${this.constructor.name}`
+      `ui-component-init-${this.constructor.name}`,
     );
 
     // Core properties
@@ -195,8 +195,8 @@ class UIComponent {
     this.listeners = new Map();
 
     // Accessibility properties
-    this.ariaLabel = config.ariaLabel || '';
-    this.ariaRole = config.ariaRole || 'button';
+    this.ariaLabel = config.ariaLabel || "";
+    this.ariaRole = config.ariaRole || "button";
     this.focusable = config.focusable !== false;
     this.tabIndex = config.tabIndex || (this.focusable ? 0 : -1);
 
@@ -219,7 +219,7 @@ class UIComponent {
     this.setupThemeMonitoring();
 
     UIPerformanceMonitor.endMeasurement(
-      `ui-component-init-${this.constructor.name}`
+      `ui-component-init-${this.constructor.name}`,
     );
   }
 
@@ -237,7 +237,7 @@ class UIComponent {
 
       this.updateElementPosition();
     } catch (error) {
-      this.errorHandler(error, 'createElement');
+      this.errorHandler(error, "createElement");
     }
   }
 
@@ -245,7 +245,7 @@ class UIComponent {
    * Get element tag (override in subclasses)
    */
   getElementTag() {
-    return 'div';
+    return "div";
   }
 
   /**
@@ -253,16 +253,16 @@ class UIComponent {
    */
   getElementClasses() {
     const baseClasses = [
-      'ui-component',
+      "ui-component",
       `ui-${this.constructor.name.toLowerCase()}`,
-      'theme-aware',
+      "theme-aware",
     ];
 
-    if (this.responsive) baseClasses.push('responsive');
-    if (this.animated) baseClasses.push('animated');
-    if (this.theme.highContrast) baseClasses.push('high-contrast');
+    if (this.responsive) baseClasses.push("responsive");
+    if (this.animated) baseClasses.push("animated");
+    if (this.theme.highContrast) baseClasses.push("high-contrast");
 
-    return baseClasses.join(' ');
+    return baseClasses.join(" ");
   }
 
   /**
@@ -271,29 +271,29 @@ class UIComponent {
   applyStyles() {
     try {
       const baseStyles = {
-        position: 'absolute',
-        boxSizing: 'border-box',
-        userSelect: 'none',
-        outline: 'none',
-        transition: this.animated ? 'all 0.3s ease' : 'none',
+        position: "absolute",
+        boxSizing: "border-box",
+        userSelect: "none",
+        outline: "none",
+        transition: this.animated ? "all 0.3s ease" : "none",
 
         // Custom properties for theming
-        backgroundColor: 'var(--theme-surface)',
-        color: 'var(--theme-text)',
-        borderColor: 'var(--theme-border)',
+        backgroundColor: "var(--theme-surface)",
+        color: "var(--theme-text)",
+        borderColor: "var(--theme-border)",
 
         // Accessibility enhancements
         minWidth: this.focusable
           ? `${UI_CONSTANTS.TOUCH_TARGET_SIZE}px`
-          : 'auto',
+          : "auto",
         minHeight: this.focusable
           ? `${UI_CONSTANTS.TOUCH_TARGET_SIZE}px`
-          : 'auto',
+          : "auto",
 
         // Performance optimizations
-        willChange: this.animated ? 'transform, opacity' : 'auto',
-        backfaceVisibility: 'hidden',
-        transform: 'translateZ(0)', // Force GPU layer
+        willChange: this.animated ? "transform, opacity" : "auto",
+        backfaceVisibility: "hidden",
+        transform: "translateZ(0)", // Force GPU layer
 
         ...this.styles,
       };
@@ -303,7 +303,7 @@ class UIComponent {
       // Add focus styles
       this.addFocusStyles();
     } catch (error) {
-      this.errorHandler(error, 'applyStyles');
+      this.errorHandler(error, "applyStyles");
     }
   }
 
@@ -313,7 +313,7 @@ class UIComponent {
   addFocusStyles() {
     if (!this.focusable) return;
 
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.textContent = `
             #${this.id}:focus {
                 outline: ${UI_CONSTANTS.FOCUS_RING_WIDTH}px solid var(--theme-primary);
@@ -339,25 +339,25 @@ class UIComponent {
     try {
       // ARIA attributes
       if (this.ariaLabel) {
-        this.element.setAttribute('aria-label', this.ariaLabel);
+        this.element.setAttribute("aria-label", this.ariaLabel);
       }
 
       if (this.ariaRole) {
-        this.element.setAttribute('role', this.ariaRole);
+        this.element.setAttribute("role", this.ariaRole);
       }
 
       // Focus management
-      this.element.setAttribute('tabindex', this.tabIndex);
+      this.element.setAttribute("tabindex", this.tabIndex);
 
       // Screen reader support
-      this.element.setAttribute('aria-hidden', this.visible ? 'false' : 'true');
+      this.element.setAttribute("aria-hidden", this.visible ? "false" : "true");
 
       // Touch accessibility
-      if ('ontouchstart' in window) {
-        this.element.style.touchAction = 'manipulation';
+      if ("ontouchstart" in window) {
+        this.element.style.touchAction = "manipulation";
       }
     } catch (error) {
-      this.errorHandler(error, 'setupAccessibility');
+      this.errorHandler(error, "setupAccessibility");
     }
   }
 
@@ -370,29 +370,29 @@ class UIComponent {
     try {
       // Keyboard navigation
       if (this.focusable) {
-        this.addEventListener('keydown', this.handleKeyDown.bind(this));
-        this.addEventListener('keyup', this.handleKeyUp.bind(this));
+        this.addEventListener("keydown", this.handleKeyDown.bind(this));
+        this.addEventListener("keyup", this.handleKeyUp.bind(this));
       }
 
       // Mouse events
-      this.addEventListener('mouseenter', this.handleMouseEnter.bind(this));
-      this.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
+      this.addEventListener("mouseenter", this.handleMouseEnter.bind(this));
+      this.addEventListener("mouseleave", this.handleMouseLeave.bind(this));
 
       // Touch events (with passive listeners for performance)
-      if ('ontouchstart' in window) {
-        this.addEventListener('touchstart', this.handleTouchStart.bind(this), {
+      if ("ontouchstart" in window) {
+        this.addEventListener("touchstart", this.handleTouchStart.bind(this), {
           passive: true,
         });
-        this.addEventListener('touchend', this.handleTouchEnd.bind(this), {
+        this.addEventListener("touchend", this.handleTouchEnd.bind(this), {
           passive: true,
         });
       }
 
       // Focus events
-      this.addEventListener('focus', this.handleFocus.bind(this));
-      this.addEventListener('blur', this.handleBlur.bind(this));
+      this.addEventListener("focus", this.handleFocus.bind(this));
+      this.addEventListener("blur", this.handleBlur.bind(this));
     } catch (error) {
-      this.errorHandler(error, 'setupEventListeners');
+      this.errorHandler(error, "setupEventListeners");
     }
   }
 
@@ -401,16 +401,16 @@ class UIComponent {
    */
   setupThemeMonitoring() {
     // Monitor system theme changes
-    const contrastQuery = window.matchMedia?.('(prefers-contrast: high)');
-    const motionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    const contrastQuery = window.matchMedia?.("(prefers-contrast: high)");
+    const motionQuery = window.matchMedia?.("(prefers-reduced-motion: reduce)");
 
     const handleThemeChange = () => {
       this.theme = UIThemeManager.getCurrentTheme();
       this.updateTheme();
     };
 
-    contrastQuery?.addEventListener?.('change', handleThemeChange);
-    motionQuery?.addEventListener?.('change', handleThemeChange);
+    contrastQuery?.addEventListener?.("change", handleThemeChange);
+    motionQuery?.addEventListener?.("change", handleThemeChange);
 
     // Store references for cleanup
     this.themeQueries = { contrastQuery, motionQuery };
@@ -427,9 +427,9 @@ class UIComponent {
       UIThemeManager.applyThemeToElement(this.element, this.theme);
       this.applyStyles();
 
-      this.emit('themeChanged', this.theme);
+      this.emit("themeChanged", this.theme);
     } catch (error) {
-      this.errorHandler(error, 'updateTheme');
+      this.errorHandler(error, "updateTheme");
     }
   }
 
@@ -437,46 +437,46 @@ class UIComponent {
    * Enhanced event handling methods
    */
   handleKeyDown(event) {
-    if (event.key === 'Enter' || event.key === ' ') {
+    if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      this.emit('activate', { event, source: 'keyboard' });
+      this.emit("activate", { event, source: "keyboard" });
     }
 
-    this.emit('keyDown', { event, key: event.key });
+    this.emit("keyDown", { event, key: event.key });
   }
 
   handleKeyUp(event) {
-    this.emit('keyUp', { event, key: event.key });
+    this.emit("keyUp", { event, key: event.key });
   }
 
   handleMouseEnter(event) {
-    this.element.classList.add('hover');
-    this.emit('mouseEnter', { event });
+    this.element.classList.add("hover");
+    this.emit("mouseEnter", { event });
   }
 
   handleMouseLeave(event) {
-    this.element.classList.remove('hover');
-    this.emit('mouseLeave', { event });
+    this.element.classList.remove("hover");
+    this.emit("mouseLeave", { event });
   }
 
   handleTouchStart(event) {
-    this.element.classList.add('active');
-    this.emit('touchStart', { event });
+    this.element.classList.add("active");
+    this.emit("touchStart", { event });
   }
 
   handleTouchEnd(event) {
-    this.element.classList.remove('active');
-    this.emit('touchEnd', { event });
+    this.element.classList.remove("active");
+    this.emit("touchEnd", { event });
   }
 
   handleFocus(event) {
-    this.element.classList.add('focused');
-    this.emit('focus', { event });
+    this.element.classList.add("focused");
+    this.emit("focus", { event });
   }
 
   handleBlur(event) {
-    this.element.classList.remove('focused');
-    this.emit('blur', { event });
+    this.element.classList.remove("focused");
+    this.emit("blur", { event });
   }
 
   /**
@@ -505,9 +505,9 @@ class UIComponent {
     const isMobile = width < UI_CONSTANTS.BREAKPOINTS.mobile;
     const isTablet = width < UI_CONSTANTS.BREAKPOINTS.tablet;
 
-    this.element.classList.toggle('mobile', isMobile);
-    this.element.classList.toggle('tablet', isTablet && !isMobile);
-    this.element.classList.toggle('desktop', !isTablet);
+    this.element.classList.toggle("mobile", isMobile);
+    this.element.classList.toggle("tablet", isTablet && !isMobile);
+    this.element.classList.toggle("desktop", !isTablet);
 
     // Adjust touch targets on mobile
     if (isMobile && this.focusable) {
@@ -538,23 +538,23 @@ class UIComponent {
   show() {
     this.visible = true;
     if (this.element) {
-      this.element.style.display = 'block';
-      this.element.setAttribute('aria-hidden', 'false');
+      this.element.style.display = "block";
+      this.element.setAttribute("aria-hidden", "false");
 
       if (this.animated) {
-        this.element.style.opacity = '0';
-        this.element.style.transform = 'scale(0.95)';
+        this.element.style.opacity = "0";
+        this.element.style.transform = "scale(0.95)";
 
         requestAnimationFrame(() => {
           this.element.style.transition =
-            'opacity 0.3s ease, transform 0.3s ease';
-          this.element.style.opacity = '1';
-          this.element.style.transform = 'scale(1)';
+            "opacity 0.3s ease, transform 0.3s ease";
+          this.element.style.opacity = "1";
+          this.element.style.transform = "scale(1)";
         });
       }
     }
 
-    this.emit('show');
+    this.emit("show");
   }
 
   hide() {
@@ -562,21 +562,21 @@ class UIComponent {
     if (this.element) {
       if (this.animated) {
         this.element.style.transition =
-          'opacity 0.3s ease, transform 0.3s ease';
-        this.element.style.opacity = '0';
-        this.element.style.transform = 'scale(0.95)';
+          "opacity 0.3s ease, transform 0.3s ease";
+        this.element.style.opacity = "0";
+        this.element.style.transform = "scale(0.95)";
 
         setTimeout(() => {
-          this.element.style.display = 'none';
-          this.element.setAttribute('aria-hidden', 'true');
+          this.element.style.display = "none";
+          this.element.setAttribute("aria-hidden", "true");
         }, TIMING.FAST);
       } else {
-        this.element.style.display = 'none';
-        this.element.setAttribute('aria-hidden', 'true');
+        this.element.style.display = "none";
+        this.element.setAttribute("aria-hidden", "true");
       }
     }
 
-    this.emit('hide');
+    this.emit("hide");
   }
 
   /**
@@ -585,7 +585,7 @@ class UIComponent {
   addEventListener(event, callback, options = {}) {
     if (
       this.performanceOptions.debounceEvents &&
-      ['resize', 'scroll', 'mousemove'].includes(event)
+      ["resize", "scroll", "mousemove"].includes(event)
     ) {
       callback = this.debounce(callback, UI_CONSTANTS.DEBOUNCE_DELAY);
     }
@@ -605,7 +605,7 @@ class UIComponent {
     // Clean up stored listeners
     const listeners = this.listeners.get(event);
     if (listeners) {
-      const index = listeners.findIndex(l => l.callback === callback);
+      const index = listeners.findIndex((l) => l.callback === callback);
       if (index > -1) {
         listeners.splice(index, 1);
       }
@@ -632,7 +632,7 @@ class UIComponent {
 
   emit(event, data = {}) {
     if (this.events.has(event)) {
-      this.events.get(event).forEach(callback => {
+      this.events.get(event).forEach((callback) => {
         try {
           callback(data);
         } catch (error) {
@@ -649,21 +649,21 @@ class UIComponent {
     logger.error(`UI Component Error (${context}):`, error);
 
     // Emit error event for external handling
-    this.emit('error', { error, context });
+    this.emit("error", { error, context });
   }
 
   /**
    * Announce text for screen readers
    */
-  announce(text, priority = 'polite') {
-    const announcement = document.createElement('div');
-    announcement.setAttribute('aria-live', priority);
-    announcement.setAttribute('aria-atomic', 'true');
-    announcement.style.position = 'absolute';
-    announcement.style.left = '-10000px';
-    announcement.style.width = '1px';
-    announcement.style.height = '1px';
-    announcement.style.overflow = 'hidden';
+  announce(text, priority = "polite") {
+    const announcement = document.createElement("div");
+    announcement.setAttribute("aria-live", priority);
+    announcement.setAttribute("aria-atomic", "true");
+    announcement.style.position = "absolute";
+    announcement.style.left = "-10000px";
+    announcement.style.width = "1px";
+    announcement.style.height = "1px";
+    announcement.style.overflow = "hidden";
 
     document.body.appendChild(announcement);
 
@@ -677,7 +677,7 @@ class UIComponent {
 
   update(deltaTime) {
     // Override in subclasses for custom update logic
-    this.emit('update', { deltaTime });
+    this.emit("update", { deltaTime });
   }
 
   render(_renderer) {
@@ -701,8 +701,8 @@ class UIComponent {
       // Clean up theme monitoring
       if (this.themeQueries) {
         const { contrastQuery, motionQuery } = this.themeQueries;
-        contrastQuery?.removeEventListener?.('change', this.themeChangeHandler);
-        motionQuery?.removeEventListener?.('change', this.themeChangeHandler);
+        contrastQuery?.removeEventListener?.("change", this.themeChangeHandler);
+        motionQuery?.removeEventListener?.("change", this.themeChangeHandler);
       }
 
       // Remove DOM element
@@ -715,9 +715,9 @@ class UIComponent {
       this.engine = null;
       this.events.clear();
 
-      this.emit('destroyed');
+      this.emit("destroyed");
     } catch (error) {
-      this.errorHandler(error, 'destroy');
+      this.errorHandler(error, "destroy");
     }
   }
 }
@@ -729,23 +729,23 @@ class UIPanel extends UIComponent {
   constructor(config = {}) {
     super({
       ...config,
-      ariaRole: 'dialog',
-      ariaLabel: config.title || 'Panel',
+      ariaRole: "dialog",
+      ariaLabel: config.title || "Panel",
       styles: {
-        backgroundColor: 'var(--theme-surface)',
-        border: '1px solid var(--theme-border)',
-        borderRadius: '12px',
-        padding: '20px',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-        fontSize: '14px',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        backdropFilter: 'blur(10px)',
+        backgroundColor: "var(--theme-surface)",
+        border: "1px solid var(--theme-border)",
+        borderRadius: "12px",
+        padding: "20px",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+        fontSize: "14px",
+        fontFamily: "system-ui, -apple-system, sans-serif",
+        backdropFilter: "blur(10px)",
         ...config.styles,
       },
     });
 
-    this.title = config.title || '';
-    this.content = config.content || '';
+    this.title = config.title || "";
+    this.content = config.content || "";
     this.components = [];
     this.resizable = config.resizable === true;
     this.closable = config.closable !== false;
@@ -759,7 +759,7 @@ class UIPanel extends UIComponent {
    * Get appropriate element tag for panels
    */
   getElementTag() {
-    return 'section';
+    return "section";
   }
 
   /**
@@ -767,13 +767,13 @@ class UIPanel extends UIComponent {
    */
   getElementClasses() {
     const classes = super.getElementClasses();
-    const panelClasses = ['ui-panel'];
+    const panelClasses = ["ui-panel"];
 
-    if (this.modal) panelClasses.push('modal-dialog');
-    if (this.resizable) panelClasses.push('resizable');
-    if (this.closable) panelClasses.push('closable');
+    if (this.modal) panelClasses.push("modal-dialog");
+    if (this.resizable) panelClasses.push("resizable");
+    if (this.closable) panelClasses.push("closable");
 
-    return `${classes} ${panelClasses.join(' ')}`;
+    return `${classes} ${panelClasses.join(" ")}`;
   }
 
   createContent() {
@@ -786,7 +786,7 @@ class UIPanel extends UIComponent {
                         <span aria-hidden="true">&times;</span>
                     </button>
                 `
-                    : ''
+                    : ""
                 }
                 ${
                   this.title
@@ -795,7 +795,7 @@ class UIPanel extends UIComponent {
                         <h2 class="panel-title">${this.title}</h2>
                     </header>
                 `
-                    : ''
+                    : ""
                 }
                 <main class="panel-content" role="main">${this.content}</main>
                 <footer class="panel-controls" role="toolbar"></footer>
@@ -803,7 +803,7 @@ class UIPanel extends UIComponent {
 
       this.styleContent();
     } catch (error) {
-      this.errorHandler(error, 'createContent');
+      this.errorHandler(error, "createContent");
     }
   }
 
@@ -812,80 +812,80 @@ class UIPanel extends UIComponent {
    */
   styleContent() {
     // Style the close button
-    const closeBtn = this.element.querySelector('.panel-close');
+    const closeBtn = this.element.querySelector(".panel-close");
     if (closeBtn) {
       Object.assign(closeBtn.style, {
-        position: 'absolute',
-        top: '10px',
-        right: '10px',
-        background: 'none',
-        border: 'none',
-        fontSize: '24px',
-        color: 'var(--theme-text)',
-        cursor: 'pointer',
-        width: '32px',
-        height: '32px',
-        borderRadius: '50%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        transition: 'background-color 0.2s ease',
+        position: "absolute",
+        top: "10px",
+        right: "10px",
+        background: "none",
+        border: "none",
+        fontSize: "24px",
+        color: "var(--theme-text)",
+        cursor: "pointer",
+        width: "32px",
+        height: "32px",
+        borderRadius: "50%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        transition: "background-color 0.2s ease",
       });
 
-      closeBtn.addEventListener('click', () => this.close());
-      closeBtn.addEventListener('mouseenter', () => {
-        closeBtn.style.backgroundColor = 'var(--theme-border)';
+      closeBtn.addEventListener("click", () => this.close());
+      closeBtn.addEventListener("mouseenter", () => {
+        closeBtn.style.backgroundColor = "var(--theme-border)";
       });
-      closeBtn.addEventListener('mouseleave', () => {
-        closeBtn.style.backgroundColor = 'transparent';
+      closeBtn.addEventListener("mouseleave", () => {
+        closeBtn.style.backgroundColor = "transparent";
       });
     }
 
     // Style the header
-    const header = this.element.querySelector('.panel-header');
+    const header = this.element.querySelector(".panel-header");
     if (header) {
       Object.assign(header.style, {
-        fontWeight: '600',
-        marginBottom: '16px',
-        paddingBottom: '12px',
-        borderBottom: '1px solid var(--theme-border)',
-        color: 'var(--theme-text)',
+        fontWeight: "600",
+        marginBottom: "16px",
+        paddingBottom: "12px",
+        borderBottom: "1px solid var(--theme-border)",
+        color: "var(--theme-text)",
       });
     }
 
     // Style the title
-    const title = this.element.querySelector('.panel-title');
+    const title = this.element.querySelector(".panel-title");
     if (title) {
       Object.assign(title.style, {
-        margin: '0',
-        fontSize: '18px',
-        fontWeight: '600',
-        color: 'var(--theme-text)',
+        margin: "0",
+        fontSize: "18px",
+        fontWeight: "600",
+        color: "var(--theme-text)",
       });
     }
 
     // Style the content
-    const content = this.element.querySelector('.panel-content');
+    const content = this.element.querySelector(".panel-content");
     if (content) {
       Object.assign(content.style, {
-        marginBottom: '16px',
-        lineHeight: '1.5',
-        color: 'var(--theme-text)',
-        maxHeight: this.modal ? '60vh' : 'none',
-        overflowY: this.modal ? 'auto' : 'visible',
+        marginBottom: "16px",
+        lineHeight: "1.5",
+        color: "var(--theme-text)",
+        maxHeight: this.modal ? "60vh" : "none",
+        overflowY: this.modal ? "auto" : "visible",
       });
     }
 
     // Style the controls
-    const controls = this.element.querySelector('.panel-controls');
+    const controls = this.element.querySelector(".panel-controls");
     if (controls) {
       Object.assign(controls.style, {
-        display: 'flex',
-        gap: '8px',
-        flexWrap: 'wrap',
-        justifyContent: 'flex-end',
-        paddingTop: '12px',
-        borderTop: '1px solid var(--theme-border)',
+        display: "flex",
+        gap: "8px",
+        flexWrap: "wrap",
+        justifyContent: "flex-end",
+        paddingTop: "12px",
+        borderTop: "1px solid var(--theme-border)",
       });
     }
   }
@@ -905,8 +905,8 @@ class UIPanel extends UIComponent {
     }
 
     // Escape key handling
-    this.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && this.closable) {
+    this.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && this.closable) {
         this.close();
       }
     });
@@ -917,22 +917,22 @@ class UIPanel extends UIComponent {
    */
   setupModalBehavior() {
     // Create backdrop
-    this.backdrop = document.createElement('div');
-    this.backdrop.className = 'modal-backdrop';
+    this.backdrop = document.createElement("div");
+    this.backdrop.className = "modal-backdrop";
     Object.assign(this.backdrop.style, {
-      position: 'fixed',
-      top: '0',
-      left: '0',
-      width: '100%',
-      height: '100%',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      backdropFilter: 'blur(4px)',
+      position: "fixed",
+      top: "0",
+      left: "0",
+      width: "100%",
+      height: "100%",
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      backdropFilter: "blur(4px)",
       zIndex: this.zIndex - 1,
-      display: 'none',
+      display: "none",
     });
 
     // Close on backdrop click
-    this.backdrop.addEventListener('click', event => {
+    this.backdrop.addEventListener("click", (event) => {
       if (event.target === this.backdrop) {
         this.close();
       }
@@ -946,9 +946,9 @@ class UIPanel extends UIComponent {
    */
   setupResizableBehavior() {
     // Add resize handles
-    const handles = ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'];
-    handles.forEach(direction => {
-      const handle = document.createElement('div');
+    const handles = ["n", "e", "s", "w", "ne", "se", "sw", "nw"];
+    handles.forEach((direction) => {
+      const handle = document.createElement("div");
       handle.className = `resize-handle resize-${direction}`;
       handle.style.cssText = `
                 position: absolute;
@@ -957,22 +957,22 @@ class UIPanel extends UIComponent {
             `;
 
       switch (direction) {
-        case 'n':
-        case 's':
-          handle.style.cssText += 'left: 0; right: 0; height: 4px;';
-          handle.style[direction === 'n' ? 'top' : 'bottom'] = '-2px';
+        case "n":
+        case "s":
+          handle.style.cssText += "left: 0; right: 0; height: 4px;";
+          handle.style[direction === "n" ? "top" : "bottom"] = "-2px";
           break;
-        case 'e':
-        case 'w':
-          handle.style.cssText += 'top: 0; bottom: 0; width: 4px;';
-          handle.style[direction === 'e' ? 'right' : 'left'] = '-2px';
+        case "e":
+        case "w":
+          handle.style.cssText += "top: 0; bottom: 0; width: 4px;";
+          handle.style[direction === "e" ? "right" : "left"] = "-2px";
           break;
         default: // corners
-          handle.style.cssText += 'width: 8px; height: 8px;';
-          if (direction.includes('n')) handle.style.top = '-4px';
-          if (direction.includes('s')) handle.style.bottom = '-4px';
-          if (direction.includes('e')) handle.style.right = '-4px';
-          if (direction.includes('w')) handle.style.left = '-4px';
+          handle.style.cssText += "width: 8px; height: 8px;";
+          if (direction.includes("n")) handle.style.top = "-4px";
+          if (direction.includes("s")) handle.style.bottom = "-4px";
+          if (direction.includes("e")) handle.style.right = "-4px";
+          if (direction.includes("w")) handle.style.left = "-4px";
       }
 
       this.setupResizeHandle(handle, direction);
@@ -987,7 +987,7 @@ class UIPanel extends UIComponent {
     let isResizing = false;
     let startX, startY, startWidth, startHeight, startLeft, startTop;
 
-    handle.addEventListener('mousedown', event => {
+    handle.addEventListener("mousedown", (event) => {
       isResizing = true;
       startX = event.clientX;
       startY = event.clientY;
@@ -998,13 +998,13 @@ class UIPanel extends UIComponent {
       startLeft = rect.left;
       startTop = rect.top;
 
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
 
       event.preventDefault();
     });
 
-    const handleMouseMove = event => {
+    const handleMouseMove = (event) => {
       if (!isResizing) return;
 
       const deltaX = event.clientX - startX;
@@ -1015,13 +1015,13 @@ class UIPanel extends UIComponent {
       let newLeft = startLeft;
       let newTop = startTop;
 
-      if (direction.includes('e')) newWidth += deltaX;
-      if (direction.includes('w')) {
+      if (direction.includes("e")) newWidth += deltaX;
+      if (direction.includes("w")) {
         newWidth -= deltaX;
         newLeft += deltaX;
       }
-      if (direction.includes('s')) newHeight += deltaY;
-      if (direction.includes('n')) {
+      if (direction.includes("s")) newHeight += deltaY;
+      if (direction.includes("n")) {
         newHeight -= deltaY;
         newTop += deltaY;
       }
@@ -1036,13 +1036,13 @@ class UIPanel extends UIComponent {
 
     const handleMouseUp = () => {
       isResizing = false;
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
   }
 
   setContent(html) {
-    const contentEl = this.element.querySelector('.panel-content');
+    const contentEl = this.element.querySelector(".panel-content");
     if (contentEl) {
       contentEl.innerHTML = html;
     }
@@ -1052,25 +1052,25 @@ class UIPanel extends UIComponent {
    * Close panel with animation
    */
   close() {
-    this.emit('beforeClose');
+    this.emit("beforeClose");
 
     if (this.animated) {
-      this.element.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-      this.element.style.opacity = '0';
-      this.element.style.transform = 'scale(0.95)';
+      this.element.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+      this.element.style.opacity = "0";
+      this.element.style.transform = "scale(0.95)";
 
       if (this.backdrop) {
-        this.backdrop.style.transition = 'opacity 0.3s ease';
-        this.backdrop.style.opacity = '0';
+        this.backdrop.style.transition = "opacity 0.3s ease";
+        this.backdrop.style.opacity = "0";
       }
 
       setTimeout(() => {
         this.hide();
-        this.emit('closed');
+        this.emit("closed");
       }, TIMING.FAST);
     } else {
       this.hide();
-      this.emit('closed');
+      this.emit("closed");
     }
   }
 
@@ -1079,12 +1079,12 @@ class UIPanel extends UIComponent {
    */
   show() {
     if (this.modal && this.backdrop) {
-      this.backdrop.style.display = 'block';
+      this.backdrop.style.display = "block";
       if (this.animated) {
-        this.backdrop.style.opacity = '0';
+        this.backdrop.style.opacity = "0";
         requestAnimationFrame(() => {
-          this.backdrop.style.transition = 'opacity 0.3s ease';
-          this.backdrop.style.opacity = '1';
+          this.backdrop.style.transition = "opacity 0.3s ease";
+          this.backdrop.style.opacity = "1";
         });
       }
     }
@@ -1093,12 +1093,12 @@ class UIPanel extends UIComponent {
 
     // Focus management for accessibility
     const firstFocusable = this.element.querySelector(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
     );
     if (firstFocusable) {
       setTimeout(
         () => firstFocusable.focus(),
-        UI_CONSTANTS.FOCUS_TRANSITION_DELAY
+        UI_CONSTANTS.FOCUS_TRANSITION_DELAY,
       );
     }
   }
@@ -1108,7 +1108,7 @@ class UIPanel extends UIComponent {
    */
   hide() {
     if (this.backdrop) {
-      this.backdrop.style.display = 'none';
+      this.backdrop.style.display = "none";
     }
 
     super.hide();
@@ -1118,75 +1118,75 @@ class UIPanel extends UIComponent {
    * Add modern button with accessibility and theming
    */
   addButton(text, onClick, options = {}) {
-    const button = document.createElement('button');
+    const button = document.createElement("button");
     button.textContent = text;
-    button.className = 'panel-button ui-button';
-    button.type = 'button';
+    button.className = "panel-button ui-button";
+    button.type = "button";
 
     // Accessibility attributes
     if (options.ariaLabel) {
-      button.setAttribute('aria-label', options.ariaLabel);
+      button.setAttribute("aria-label", options.ariaLabel);
     }
 
     if (options.disabled) {
       button.disabled = true;
-      button.setAttribute('aria-disabled', 'true');
+      button.setAttribute("aria-disabled", "true");
     }
 
     // Apply modern styling
     Object.assign(button.style, {
-      padding: '8px 16px',
-      margin: '4px',
-      border: 'none',
-      backgroundColor: 'var(--theme-primary)',
-      color: 'white',
-      borderRadius: '6px',
-      cursor: options.disabled ? 'not-allowed' : 'pointer',
-      fontSize: '14px',
-      fontWeight: '500',
-      fontFamily: 'inherit',
+      padding: "8px 16px",
+      margin: "4px",
+      border: "none",
+      backgroundColor: "var(--theme-primary)",
+      color: "white",
+      borderRadius: "6px",
+      cursor: options.disabled ? "not-allowed" : "pointer",
+      fontSize: "14px",
+      fontWeight: "500",
+      fontFamily: "inherit",
       minHeight: `${UI_CONSTANTS.TOUCH_TARGET_SIZE}px`,
-      transition: 'all 0.2s ease',
-      outline: 'none',
-      opacity: options.disabled ? '0.6' : '1',
+      transition: "all 0.2s ease",
+      outline: "none",
+      opacity: options.disabled ? "0.6" : "1",
       ...options.styles,
     });
 
     // Enhanced event handling
     if (!options.disabled) {
-      button.addEventListener('click', event => {
+      button.addEventListener("click", (event) => {
         try {
           onClick(event);
         } catch (error) {
-          this.errorHandler(error, 'button-click');
+          this.errorHandler(error, "button-click");
         }
       });
 
       // Hover effects
-      button.addEventListener('mouseenter', () => {
+      button.addEventListener("mouseenter", () => {
         if (!button.disabled) {
-          button.style.transform = 'translateY(-1px)';
-          button.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+          button.style.transform = "translateY(-1px)";
+          button.style.boxShadow = "0 4px 8px rgba(0,0,0,0.2)";
         }
       });
 
-      button.addEventListener('mouseleave', () => {
-        button.style.transform = 'translateY(0)';
-        button.style.boxShadow = 'none';
+      button.addEventListener("mouseleave", () => {
+        button.style.transform = "translateY(0)";
+        button.style.boxShadow = "none";
       });
 
       // Active state
-      button.addEventListener('mousedown', () => {
-        button.style.transform = 'translateY(0) scale(0.98)';
+      button.addEventListener("mousedown", () => {
+        button.style.transform = "translateY(0) scale(0.98)";
       });
 
-      button.addEventListener('mouseup', () => {
-        button.style.transform = 'translateY(-1px) scale(1)';
+      button.addEventListener("mouseup", () => {
+        button.style.transform = "translateY(-1px) scale(1)";
       });
 
       // Keyboard handling
-      button.addEventListener('keydown', event => {
-        if (event.key === 'Enter' || event.key === ' ') {
+      button.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
           button.click();
         }
@@ -1194,16 +1194,16 @@ class UIPanel extends UIComponent {
     }
 
     // Add focus styles
-    button.addEventListener('focus', () => {
+    button.addEventListener("focus", () => {
       button.style.outline = `2px solid var(--theme-primary)`;
-      button.style.outlineOffset = '2px';
+      button.style.outlineOffset = "2px";
     });
 
-    button.addEventListener('blur', () => {
-      button.style.outline = 'none';
+    button.addEventListener("blur", () => {
+      button.style.outline = "none";
     });
 
-    const controls = this.element.querySelector('.panel-controls');
+    const controls = this.element.querySelector(".panel-controls");
     if (controls) {
       controls.appendChild(button);
     }
@@ -1215,12 +1215,12 @@ class UIPanel extends UIComponent {
    * Add modern slider with accessibility and theming
    */
   addSlider(label, min, max, value, onChange, options = {}) {
-    const container = document.createElement('div');
-    container.className = 'slider-container';
-    container.style.marginBottom = '16px';
+    const container = document.createElement("div");
+    container.className = "slider-container";
+    container.style.marginBottom = "16px";
 
     // Create label
-    const labelEl = document.createElement('label');
+    const labelEl = document.createElement("label");
     labelEl.textContent = label;
     labelEl.style.cssText = `
             display: block;
@@ -1231,41 +1231,41 @@ class UIPanel extends UIComponent {
         `;
 
     // Create slider input
-    const slider = document.createElement('input');
-    slider.type = 'range';
+    const slider = document.createElement("input");
+    slider.type = "range";
     slider.min = min;
     slider.max = max;
     slider.value = value;
     slider.step = options.step || 1;
-    slider.className = 'panel-slider';
+    slider.className = "panel-slider";
 
     // Generate unique ID for accessibility
     const sliderId = `slider-${this.id}-${Date.now()}`;
     slider.id = sliderId;
-    labelEl.setAttribute('for', sliderId);
+    labelEl.setAttribute("for", sliderId);
 
     // Accessibility attributes
-    slider.setAttribute('role', 'slider');
-    slider.setAttribute('aria-valuemin', min);
-    slider.setAttribute('aria-valuemax', max);
-    slider.setAttribute('aria-valuenow', value);
-    slider.setAttribute('aria-label', label);
+    slider.setAttribute("role", "slider");
+    slider.setAttribute("aria-valuemin", min);
+    slider.setAttribute("aria-valuemax", max);
+    slider.setAttribute("aria-valuenow", value);
+    slider.setAttribute("aria-label", label);
 
     // Apply modern styling
     Object.assign(slider.style, {
-      width: '100%',
-      height: '6px',
-      borderRadius: '3px',
-      background: 'var(--theme-border)',
-      outline: 'none',
-      appearance: 'none',
-      marginBottom: '8px',
-      cursor: 'pointer',
+      width: "100%",
+      height: "6px",
+      borderRadius: "3px",
+      background: "var(--theme-border)",
+      outline: "none",
+      appearance: "none",
+      marginBottom: "8px",
+      cursor: "pointer",
       ...options.styles,
     });
 
     // Style the thumb (webkit browsers)
-    const styleSheet = document.createElement('style');
+    const styleSheet = document.createElement("style");
     styleSheet.textContent = `
             #${sliderId}::-webkit-slider-thumb {
                 appearance: none;
@@ -1300,8 +1300,8 @@ class UIPanel extends UIComponent {
     document.head.appendChild(styleSheet);
 
     // Create value display
-    const valueDisplay = document.createElement('div');
-    valueDisplay.className = 'slider-value-display';
+    const valueDisplay = document.createElement("div");
+    valueDisplay.className = "slider-value-display";
     valueDisplay.style.cssText = `
             display: flex;
             justify-content: space-between;
@@ -1311,72 +1311,72 @@ class UIPanel extends UIComponent {
             opacity: 0.8;
         `;
 
-    const currentValue = document.createElement('span');
+    const currentValue = document.createElement("span");
     currentValue.textContent = value;
-    currentValue.style.fontWeight = '600';
+    currentValue.style.fontWeight = "600";
 
-    const minMaxDisplay = document.createElement('span');
+    const minMaxDisplay = document.createElement("span");
     minMaxDisplay.textContent = `${min} - ${max}`;
 
     valueDisplay.appendChild(currentValue);
     valueDisplay.appendChild(minMaxDisplay);
 
     // Enhanced event handling
-    const handleInput = e => {
+    const handleInput = (e) => {
       const newValue = parseFloat(e.target.value);
       currentValue.textContent = newValue;
-      slider.setAttribute('aria-valuenow', newValue);
+      slider.setAttribute("aria-valuenow", newValue);
 
       try {
         onChange(newValue, e);
       } catch (error) {
-        this.errorHandler(error, 'slider-change');
+        this.errorHandler(error, "slider-change");
       }
     };
 
     // Debounce for performance
     const debouncedHandler = this.debounce(
       handleInput,
-      UI_CONSTANTS.FOCUS_DELAY
+      UI_CONSTANTS.FOCUS_DELAY,
     ); // ~60fps
-    slider.addEventListener('input', debouncedHandler);
+    slider.addEventListener("input", debouncedHandler);
 
     // Immediate feedback for accessibility
-    slider.addEventListener('input', e => {
+    slider.addEventListener("input", (e) => {
       const newValue = parseFloat(e.target.value);
       currentValue.textContent = newValue;
-      slider.setAttribute('aria-valuenow', newValue);
+      slider.setAttribute("aria-valuenow", newValue);
     });
 
     // Keyboard enhancements
-    slider.addEventListener('keydown', event => {
+    slider.addEventListener("keydown", (event) => {
       const step = parseFloat(slider.step);
       let currentVal = parseFloat(slider.value);
 
       switch (event.key) {
-        case 'ArrowUp':
-        case 'ArrowRight':
+        case "ArrowUp":
+        case "ArrowRight":
           event.preventDefault();
           currentVal = Math.min(max, currentVal + step);
           break;
-        case 'ArrowDown':
-        case 'ArrowLeft':
+        case "ArrowDown":
+        case "ArrowLeft":
           event.preventDefault();
           currentVal = Math.max(min, currentVal - step);
           break;
-        case 'Home':
+        case "Home":
           event.preventDefault();
           currentVal = min;
           break;
-        case 'End':
+        case "End":
           event.preventDefault();
           currentVal = max;
           break;
-        case 'PageUp':
+        case "PageUp":
           event.preventDefault();
           currentVal = Math.min(max, currentVal + step * 10);
           break;
-        case 'PageDown':
+        case "PageDown":
           event.preventDefault();
           currentVal = Math.max(min, currentVal - step * 10);
           break;
@@ -1393,7 +1393,7 @@ class UIPanel extends UIComponent {
     container.appendChild(slider);
     container.appendChild(valueDisplay);
 
-    const controls = this.element.querySelector('.panel-controls');
+    const controls = this.element.querySelector(".panel-controls");
     if (controls) {
       controls.appendChild(container);
     }
@@ -1402,10 +1402,10 @@ class UIPanel extends UIComponent {
       container,
       slider,
       valueDisplay,
-      setValue: newValue => {
+      setValue: (newValue) => {
         slider.value = newValue;
         currentValue.textContent = newValue;
-        slider.setAttribute('aria-valuenow', newValue);
+        slider.setAttribute("aria-valuenow", newValue);
       },
     };
   }
@@ -1432,20 +1432,20 @@ class EthicsDisplay extends UIComponent {
   constructor(config = {}) {
     super({
       ...config,
-      ariaRole: 'status',
-      ariaLabel: 'Ethics metrics display',
+      ariaRole: "status",
+      ariaLabel: "Ethics metrics display",
       accessible: true,
       animated: config.animated !== false,
       styles: {
-        backgroundColor: 'var(--theme-surface)',
-        color: 'var(--theme-text)',
-        border: '1px solid var(--theme-border)',
-        borderRadius: '12px',
-        padding: '20px',
-        fontSize: '14px',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        backdropFilter: 'blur(10px)',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        backgroundColor: "var(--theme-surface)",
+        color: "var(--theme-text)",
+        border: "1px solid var(--theme-border)",
+        borderRadius: "12px",
+        padding: "20px",
+        fontSize: "14px",
+        fontFamily: "system-ui, -apple-system, sans-serif",
+        backdropFilter: "blur(10px)",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
         ...config.styles,
       },
     });
@@ -1453,22 +1453,22 @@ class EthicsDisplay extends UIComponent {
     this.metrics = config.metrics || new Map();
     this.showLabels = config.showLabels !== false;
     this.showValues = config.showValues !== false;
-    this.format = config.format || 'percentage'; // 'percentage' | 'decimal' | 'score'
-    this.colorMode = config.colorMode || 'gradient'; // 'gradient' | 'threshold' | 'single'
+    this.format = config.format || "percentage"; // 'percentage' | 'decimal' | 'score'
+    this.colorMode = config.colorMode || "gradient"; // 'gradient' | 'threshold' | 'single'
     this.animated = config.animated !== false && !this.theme.reducedMotion;
 
     // Color schemes for different themes
     this.colorSchemes = {
       gradient: {
-        low: '#ef4444', // Red
-        medium: '#f59e0b', // Amber
-        high: '#22c55e', // Green
+        low: "#ef4444", // Red
+        medium: "#f59e0b", // Amber
+        high: "#22c55e", // Green
       },
       threshold: {
-        poor: '#ef4444',
-        fair: '#f59e0b',
-        good: '#22c55e',
-        excellent: '#06b6d4',
+        poor: "#ef4444",
+        fair: "#f59e0b",
+        good: "#22c55e",
+        excellent: "#06b6d4",
       },
     };
 
@@ -1480,7 +1480,7 @@ class EthicsDisplay extends UIComponent {
    * Get appropriate element tag
    */
   getElementTag() {
-    return 'section';
+    return "section";
   }
 
   /**
@@ -1488,12 +1488,12 @@ class EthicsDisplay extends UIComponent {
    */
   getElementClasses() {
     const classes = super.getElementClasses();
-    const displayClasses = ['ethics-display'];
+    const displayClasses = ["ethics-display"];
 
-    if (this.animated) displayClasses.push('animated');
+    if (this.animated) displayClasses.push("animated");
     if (this.colorMode) displayClasses.push(`color-${this.colorMode}`);
 
-    return `${classes} ${displayClasses.join(' ')}`;
+    return `${classes} ${displayClasses.join(" ")}`;
   }
 
   createMetersDisplay() {
@@ -1509,7 +1509,7 @@ class EthicsDisplay extends UIComponent {
       this.styleHeader();
       this.renderMeters();
     } catch (error) {
-      this.errorHandler(error, 'createMetersDisplay');
+      this.errorHandler(error, "createMetersDisplay");
     }
   }
 
@@ -1517,31 +1517,31 @@ class EthicsDisplay extends UIComponent {
    * Style the header elements
    */
   styleHeader() {
-    const header = this.element.querySelector('.ethics-header');
+    const header = this.element.querySelector(".ethics-header");
     if (header) {
       Object.assign(header.style, {
-        marginBottom: '16px',
-        borderBottom: '1px solid var(--theme-border)',
-        paddingBottom: '12px',
+        marginBottom: "16px",
+        borderBottom: "1px solid var(--theme-border)",
+        paddingBottom: "12px",
       });
     }
 
-    const title = this.element.querySelector('.ethics-title');
+    const title = this.element.querySelector(".ethics-title");
     if (title) {
       Object.assign(title.style, {
-        margin: '0 0 8px 0',
-        fontSize: '18px',
-        fontWeight: '600',
-        color: 'var(--theme-text)',
+        margin: "0 0 8px 0",
+        fontSize: "18px",
+        fontWeight: "600",
+        color: "var(--theme-text)",
       });
     }
 
-    const summary = this.element.querySelector('.ethics-summary');
+    const summary = this.element.querySelector(".ethics-summary");
     if (summary) {
       Object.assign(summary.style, {
-        fontSize: '12px',
-        color: 'var(--theme-text)',
-        opacity: '0.8',
+        fontSize: "12px",
+        color: "var(--theme-text)",
+        opacity: "0.8",
       });
     }
   }
@@ -1550,9 +1550,9 @@ class EthicsDisplay extends UIComponent {
    * Setup live region for screen readers
    */
   setupLiveRegion() {
-    this.liveRegion = document.createElement('div');
-    this.liveRegion.setAttribute('aria-live', 'polite');
-    this.liveRegion.setAttribute('aria-atomic', 'false');
+    this.liveRegion = document.createElement("div");
+    this.liveRegion.setAttribute("aria-live", "polite");
+    this.liveRegion.setAttribute("aria-atomic", "false");
     this.liveRegion.style.cssText = `
             position: absolute;
             left: -10000px;
@@ -1568,10 +1568,10 @@ class EthicsDisplay extends UIComponent {
    * Render all ethics meters
    */
   renderMeters() {
-    const container = this.element.querySelector('.ethics-meters');
+    const container = this.element.querySelector(".ethics-meters");
     if (!container) return;
 
-    container.innerHTML = '';
+    container.innerHTML = "";
 
     this.metrics.forEach((metric, name) => {
       const meterElement = this.createMeter(metric, name);
@@ -1585,9 +1585,9 @@ class EthicsDisplay extends UIComponent {
    * Create individual ethics meter
    */
   createMeter(metric, name) {
-    const meterContainer = document.createElement('div');
-    meterContainer.className = 'ethics-meter';
-    meterContainer.setAttribute('data-metric', name);
+    const meterContainer = document.createElement("div");
+    meterContainer.className = "ethics-meter";
+    meterContainer.setAttribute("data-metric", name);
 
     // Generate unique IDs for accessibility
     const labelId = `label-${this.id}-${name}`;
@@ -1604,10 +1604,10 @@ class EthicsDisplay extends UIComponent {
                 ? `
                 <div class="meter-label" id="${labelId}">
                     ${metric.label}
-                    ${metric.description ? `<span class="meter-description">${metric.description}</span>` : ''}
+                    ${metric.description ? `<span class="meter-description">${metric.description}</span>` : ""}
                 </div>
             `
-                : ''
+                : ""
             }
             
             <div class="meter-container" role="progressbar" 
@@ -1628,7 +1628,7 @@ class EthicsDisplay extends UIComponent {
                         ${formattedValue}
                     </div>
                 `
-                    : ''
+                    : ""
                 }
             </div>
         `;
@@ -1643,88 +1643,88 @@ class EthicsDisplay extends UIComponent {
    */
   styleMeter(container, _metric) {
     Object.assign(container.style, {
-      marginBottom: '16px',
-      position: 'relative',
+      marginBottom: "16px",
+      position: "relative",
     });
 
-    const label = container.querySelector('.meter-label');
+    const label = container.querySelector(".meter-label");
     if (label) {
       Object.assign(label.style, {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '8px',
-        fontSize: '14px',
-        fontWeight: '500',
-        color: 'var(--theme-text)',
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "8px",
+        fontSize: "14px",
+        fontWeight: "500",
+        color: "var(--theme-text)",
       });
     }
 
-    const description = container.querySelector('.meter-description');
+    const description = container.querySelector(".meter-description");
     if (description) {
       Object.assign(description.style, {
-        fontSize: '12px',
-        fontWeight: '400',
-        opacity: '0.7',
-        fontStyle: 'italic',
+        fontSize: "12px",
+        fontWeight: "400",
+        opacity: "0.7",
+        fontStyle: "italic",
       });
     }
 
-    const meterContainer = container.querySelector('.meter-container');
+    const meterContainer = container.querySelector(".meter-container");
     if (meterContainer) {
       Object.assign(meterContainer.style, {
-        position: 'relative',
-        height: '12px',
-        borderRadius: '6px',
-        overflow: 'hidden',
-        backgroundColor: 'var(--theme-border)',
-        border: '1px solid var(--theme-border)',
+        position: "relative",
+        height: "12px",
+        borderRadius: "6px",
+        overflow: "hidden",
+        backgroundColor: "var(--theme-border)",
+        border: "1px solid var(--theme-border)",
       });
     }
 
-    const track = container.querySelector('.meter-track');
+    const track = container.querySelector(".meter-track");
     if (track) {
       Object.assign(track.style, {
-        position: 'absolute',
-        top: '0',
-        left: '0',
-        width: '100%',
-        height: '100%',
-        backgroundColor: 'rgba(0,0,0,0.1)',
-        borderRadius: '6px',
+        position: "absolute",
+        top: "0",
+        left: "0",
+        width: "100%",
+        height: "100%",
+        backgroundColor: "rgba(0,0,0,0.1)",
+        borderRadius: "6px",
       });
     }
 
-    const fill = container.querySelector('.meter-fill');
+    const fill = container.querySelector(".meter-fill");
     if (fill) {
       Object.assign(fill.style, {
-        position: 'absolute',
-        top: '0',
-        left: '0',
-        height: '100%',
-        borderRadius: '6px',
+        position: "absolute",
+        top: "0",
+        left: "0",
+        height: "100%",
+        borderRadius: "6px",
         transition: this.animated
-          ? 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease'
-          : 'none',
+          ? "width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease"
+          : "none",
         backgroundImage:
-          this.colorMode === 'gradient'
-            ? 'linear-gradient(90deg, var(--meter-color) 0%, var(--meter-color) 100%)'
-            : 'none',
+          this.colorMode === "gradient"
+            ? "linear-gradient(90deg, var(--meter-color) 0%, var(--meter-color) 100%)"
+            : "none",
       });
     }
 
-    const valueDisplay = container.querySelector('.meter-value');
+    const valueDisplay = container.querySelector(".meter-value");
     if (valueDisplay) {
       Object.assign(valueDisplay.style, {
-        position: 'absolute',
-        right: '8px',
-        top: '50%',
-        transform: 'translateY(-50%)',
-        fontSize: '11px',
-        fontWeight: '600',
-        color: 'var(--theme-text)',
-        textShadow: '0 1px 2px rgba(0,0,0,0.3)',
-        pointerEvents: 'none',
+        position: "absolute",
+        right: "8px",
+        top: "50%",
+        transform: "translateY(-50%)",
+        fontSize: "11px",
+        fontWeight: "600",
+        color: "var(--theme-text)",
+        textShadow: "0 1px 2px rgba(0,0,0,0.3)",
+        pointerEvents: "none",
       });
     }
   }
@@ -1733,13 +1733,13 @@ class EthicsDisplay extends UIComponent {
    * Get color for metric value
    */
   getColorForValue(value) {
-    if (this.colorMode === 'single') {
+    if (this.colorMode === "single") {
       return this.colorSchemes.gradient.high;
     }
 
     const normalized = Math.max(0, Math.min(100, value)) / 100;
 
-    if (this.colorMode === 'threshold') {
+    if (this.colorMode === "threshold") {
       if (normalized < COMMON.OPACITY_30)
         return this.colorSchemes.threshold.poor;
       if (normalized < COMMON.HALF) return this.colorSchemes.threshold.fair;
@@ -1753,13 +1753,13 @@ class EthicsDisplay extends UIComponent {
       return this.interpolateColor(
         this.colorSchemes.gradient.low,
         this.colorSchemes.gradient.medium,
-        normalized * 2
+        normalized * 2,
       );
     } else {
       return this.interpolateColor(
         this.colorSchemes.gradient.medium,
         this.colorSchemes.gradient.high,
-        (normalized - COMMON.HALF) * COMMON.TWO
+        (normalized - COMMON.HALF) * COMMON.TWO,
       );
     }
   }
@@ -1797,11 +1797,11 @@ class EthicsDisplay extends UIComponent {
    */
   formatValue(value) {
     switch (this.format) {
-      case 'decimal':
+      case "decimal":
         return (value / 100).toFixed(2);
-      case 'score':
+      case "score":
         return `${Math.round(value)}/100`;
-      case 'percentage':
+      case "percentage":
       default:
         return `${Math.round(value)}%`;
     }
@@ -1811,10 +1811,10 @@ class EthicsDisplay extends UIComponent {
    * Update ethics summary
    */
   updateSummary() {
-    const summary = this.element.querySelector('.ethics-summary');
+    const summary = this.element.querySelector(".ethics-summary");
     if (!summary || this.metrics.size === 0) return;
 
-    const values = Array.from(this.metrics.values()).map(m => m.value || 0);
+    const values = Array.from(this.metrics.values()).map((m) => m.value || 0);
     const average = values.reduce((sum, val) => sum + val, 0) / values.length;
     const totalMetrics = this.metrics.size;
 
@@ -1826,12 +1826,12 @@ class EthicsDisplay extends UIComponent {
    * Get ethics grade based on average score
    */
   getEthicsGrade(score) {
-    if (score >= UI_CONSTANTS.ETHICS_GRADES.EXCELLENT) return 'Excellent';
-    if (score >= UI_CONSTANTS.ETHICS_GRADES.GOOD) return 'Good';
-    if (score >= UI_CONSTANTS.ETHICS_GRADES.FAIR) return 'Fair';
+    if (score >= UI_CONSTANTS.ETHICS_GRADES.EXCELLENT) return "Excellent";
+    if (score >= UI_CONSTANTS.ETHICS_GRADES.GOOD) return "Good";
+    if (score >= UI_CONSTANTS.ETHICS_GRADES.FAIR) return "Fair";
     if (score >= UI_CONSTANTS.ETHICS_GRADES.NEEDS_IMPROVEMENT)
-      return 'Needs Improvement';
-    return 'Critical Issues';
+      return "Needs Improvement";
+    return "Critical Issues";
   }
 
   /**
@@ -1845,13 +1845,13 @@ class EthicsDisplay extends UIComponent {
     metric.value = Math.max(0, Math.min(100, newValue));
 
     const meterElement = this.element.querySelector(
-      `[data-metric="${metricName}"]`
+      `[data-metric="${metricName}"]`,
     );
     if (!meterElement) return;
 
-    const fill = meterElement.querySelector('.meter-fill');
-    const valueDisplay = meterElement.querySelector('.meter-value');
-    const progressBar = meterElement.querySelector('.meter-container');
+    const fill = meterElement.querySelector(".meter-fill");
+    const valueDisplay = meterElement.querySelector(".meter-value");
+    const progressBar = meterElement.querySelector(".meter-container");
 
     if (fill) {
       const newColor = this.getColorForValue(metric.value);
@@ -1870,10 +1870,10 @@ class EthicsDisplay extends UIComponent {
     }
 
     if (progressBar) {
-      progressBar.setAttribute('aria-valuenow', Math.round(metric.value));
+      progressBar.setAttribute("aria-valuenow", Math.round(metric.value));
       progressBar.setAttribute(
-        'aria-valuetext',
-        `${this.formatValue(metric.value)} ${metric.description || metric.label}`
+        "aria-valuetext",
+        `${this.formatValue(metric.value)} ${metric.description || metric.label}`,
       );
     }
 
@@ -1884,7 +1884,7 @@ class EthicsDisplay extends UIComponent {
     }
 
     this.updateSummary();
-    this.emit('metricUpdated', {
+    this.emit("metricUpdated", {
       metricName,
       oldValue,
       newValue: metric.value,
@@ -1898,12 +1898,12 @@ class EthicsDisplay extends UIComponent {
     this.metrics.set(name, {
       label: config.label || name,
       value: config.value || 0,
-      description: config.description || '',
+      description: config.description || "",
       color: config.color || null,
     });
 
     this.renderMeters();
-    this.emit('metricAdded', { name, config });
+    this.emit("metricAdded", { name, config });
   }
 
   /**
@@ -1912,7 +1912,7 @@ class EthicsDisplay extends UIComponent {
   removeMetric(name) {
     if (this.metrics.delete(name)) {
       this.renderMeters();
-      this.emit('metricRemoved', { name });
+      this.emit("metricRemoved", { name });
     }
   }
 
@@ -1946,7 +1946,7 @@ class EthicsDisplay extends UIComponent {
       this.updateMetric(name, 0);
     });
 
-    this.emit('metricsReset');
+    this.emit("metricsReset");
   }
 }
 
@@ -1957,20 +1957,20 @@ class FeedbackSystem extends UIComponent {
   constructor(config = {}) {
     super({
       ...config,
-      ariaRole: 'alert',
-      ariaLabel: 'Feedback system',
+      ariaRole: "alert",
+      ariaLabel: "Feedback system",
       accessible: true,
       animated: config.animated !== false,
       styles: {
-        backgroundColor: 'var(--theme-surface)',
-        color: 'var(--theme-text)',
-        border: '1px solid var(--theme-border)',
-        borderRadius: '12px',
-        padding: '16px',
-        fontSize: '14px',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        maxWidth: '400px',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        backgroundColor: "var(--theme-surface)",
+        color: "var(--theme-text)",
+        border: "1px solid var(--theme-border)",
+        borderRadius: "12px",
+        padding: "16px",
+        fontSize: "14px",
+        fontFamily: "system-ui, -apple-system, sans-serif",
+        maxWidth: "400px",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
         ...config.styles,
       },
     });
@@ -1980,7 +1980,7 @@ class FeedbackSystem extends UIComponent {
     this.autoHide = config.autoHide !== false;
     this.hideDelay = config.hideDelay || UI_CONSTANTS.DEFAULT_HIDE_DELAY;
     this.maxItems = config.maxItems || UI_CONSTANTS.MAX_FEEDBACK_ITEMS;
-    this.position = config.position || 'top-right'; // top-right, top-left, bottom-right, bottom-left
+    this.position = config.position || "top-right"; // top-right, top-left, bottom-right, bottom-left
 
     this.createFeedbackContainer();
     this.setupPositioning();
@@ -1990,7 +1990,7 @@ class FeedbackSystem extends UIComponent {
    * Get appropriate element tag
    */
   getElementTag() {
-    return 'aside';
+    return "aside";
   }
 
   /**
@@ -1998,11 +1998,11 @@ class FeedbackSystem extends UIComponent {
    */
   getElementClasses() {
     const classes = super.getElementClasses();
-    const feedbackClasses = ['feedback-system', `position-${this.position}`];
+    const feedbackClasses = ["feedback-system", `position-${this.position}`];
 
-    if (this.animated) feedbackClasses.push('animated');
+    if (this.animated) feedbackClasses.push("animated");
 
-    return `${classes} ${feedbackClasses.join(' ')}`;
+    return `${classes} ${feedbackClasses.join(" ")}`;
   }
 
   createFeedbackContainer() {
@@ -2017,7 +2017,7 @@ class FeedbackSystem extends UIComponent {
 
       this.setupFeedbackBehavior();
     } catch (error) {
-      this.errorHandler(error, 'createFeedbackContainer');
+      this.errorHandler(error, "createFeedbackContainer");
     }
   }
 
@@ -2026,19 +2026,19 @@ class FeedbackSystem extends UIComponent {
    */
   setupPositioning() {
     const positions = {
-      'top-right': { top: '20px', right: '20px' },
-      'top-left': { top: '20px', left: '20px' },
-      'bottom-right': { bottom: '20px', right: '20px' },
-      'bottom-left': { bottom: '20px', left: '20px' },
+      "top-right": { top: "20px", right: "20px" },
+      "top-left": { top: "20px", left: "20px" },
+      "bottom-right": { bottom: "20px", right: "20px" },
+      "bottom-left": { bottom: "20px", left: "20px" },
     };
 
-    const pos = positions[this.position] || positions['top-right'];
+    const pos = positions[this.position] || positions["top-right"];
 
     Object.assign(this.element.style, {
-      position: 'fixed',
+      position: "fixed",
       ...pos,
-      zIndex: '9999',
-      pointerEvents: 'auto',
+      zIndex: "9999",
+      pointerEvents: "auto",
     });
   }
 
@@ -2046,17 +2046,17 @@ class FeedbackSystem extends UIComponent {
    * Setup feedback behavior
    */
   setupFeedbackBehavior() {
-    const clearButton = this.element.querySelector('.feedback-clear');
+    const clearButton = this.element.querySelector(".feedback-clear");
     if (clearButton) {
-      clearButton.addEventListener('click', () => this.clearAll());
+      clearButton.addEventListener("click", () => this.clearAll());
 
       Object.assign(clearButton.style, {
-        background: 'none',
-        border: 'none',
-        color: 'var(--theme-primary)',
-        cursor: 'pointer',
-        fontSize: '12px',
-        textDecoration: 'underline',
+        background: "none",
+        border: "none",
+        color: "var(--theme-primary)",
+        cursor: "pointer",
+        fontSize: "12px",
+        textDecoration: "underline",
       });
     }
   }
@@ -2064,7 +2064,7 @@ class FeedbackSystem extends UIComponent {
   /**
    * Show feedback message with enhanced styling and accessibility
    */
-  showFeedback(message, type = 'info', options = {}) {
+  showFeedback(message, type = "info", options = {}) {
     try {
       const feedback = {
         id: `feedback-${Date.now()}-${Math.random().toString(UI_CONSTANTS.RANDOM_BASE).substr(2, UI_CONSTANTS.RANDOM_ID_LENGTH)}`,
@@ -2091,10 +2091,10 @@ class FeedbackSystem extends UIComponent {
         }, feedback.duration);
       }
 
-      this.emit('feedbackShown', feedback);
+      this.emit("feedbackShown", feedback);
       return feedback.id;
     } catch (error) {
-      this.errorHandler(error, 'showFeedback');
+      this.errorHandler(error, "showFeedback");
       return null;
     }
   }
@@ -2103,27 +2103,27 @@ class FeedbackSystem extends UIComponent {
    * Render individual feedback item
    */
   renderFeedback(feedback) {
-    const container = this.element.querySelector('.feedback-list');
+    const container = this.element.querySelector(".feedback-list");
     if (!container) return;
 
-    const feedbackElement = document.createElement('div');
+    const feedbackElement = document.createElement("div");
     feedbackElement.className = `feedback-item feedback-${feedback.type}`;
-    feedbackElement.setAttribute('data-feedback-id', feedback.id);
-    feedbackElement.setAttribute('role', 'alert');
-    feedbackElement.setAttribute('aria-live', 'assertive');
+    feedbackElement.setAttribute("data-feedback-id", feedback.id);
+    feedbackElement.setAttribute("role", "alert");
+    feedbackElement.setAttribute("aria-live", "assertive");
 
     const typeIcons = {
-      success: '✓',
-      error: '✕',
-      warning: '⚠',
-      info: 'ℹ',
+      success: "✓",
+      error: "✕",
+      warning: "⚠",
+      info: "ℹ",
     };
 
     const typeColors = {
-      success: '#22c55e',
-      error: '#ef4444',
-      warning: '#f59e0b',
-      info: '#3b82f6',
+      success: "#22c55e",
+      error: "#ef4444",
+      warning: "#f59e0b",
+      info: "#3b82f6",
     };
 
     feedbackElement.innerHTML = `
@@ -2136,16 +2136,16 @@ class FeedbackSystem extends UIComponent {
                     <div class="feedback-actions">
                         ${feedback.actions
                           .map(
-                            action => `
+                            (action) => `
                             <button class="feedback-action" data-action="${action.id}">
                                 ${action.label}
                             </button>
-                        `
+                        `,
                           )
-                          .join('')}
+                          .join("")}
                     </div>
                 `
-                    : ''
+                    : ""
                 }
             </div>
             ${
@@ -2155,37 +2155,37 @@ class FeedbackSystem extends UIComponent {
                     <span aria-hidden="true">&times;</span>
                 </button>
             `
-                : ''
+                : ""
             }
         `;
 
     // Style the feedback item
     Object.assign(feedbackElement.style, {
-      display: 'flex',
-      alignItems: 'flex-start',
-      gap: '12px',
-      padding: '16px',
-      marginBottom: '12px',
-      backgroundColor: 'var(--theme-surface)',
+      display: "flex",
+      alignItems: "flex-start",
+      gap: "12px",
+      padding: "16px",
+      marginBottom: "12px",
+      backgroundColor: "var(--theme-surface)",
       border: `1px solid ${typeColors[feedback.type]}`,
       borderLeft: `4px solid ${typeColors[feedback.type]}`,
-      borderRadius: '8px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-      position: 'relative',
-      opacity: '0',
-      transform: this.position.includes('top')
-        ? 'translateY(-20px)'
-        : 'translateY(20px)',
+      borderRadius: "8px",
+      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+      position: "relative",
+      opacity: "0",
+      transform: this.position.includes("top")
+        ? "translateY(-20px)"
+        : "translateY(20px)",
       transition: this.animated
-        ? 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-        : 'none',
+        ? "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+        : "none",
     });
 
     // Style components
     this.styleFeedbackComponents(
       feedbackElement,
       feedback,
-      typeColors[feedback.type]
+      typeColors[feedback.type],
     );
 
     // Setup event handlers
@@ -2196,12 +2196,12 @@ class FeedbackSystem extends UIComponent {
     // Animate in
     if (this.animated) {
       requestAnimationFrame(() => {
-        feedbackElement.style.opacity = '1';
-        feedbackElement.style.transform = 'translateY(0)';
+        feedbackElement.style.opacity = "1";
+        feedbackElement.style.transform = "translateY(0)";
       });
     } else {
-      feedbackElement.style.opacity = '1';
-      feedbackElement.style.transform = 'translateY(0)';
+      feedbackElement.style.opacity = "1";
+      feedbackElement.style.transform = "translateY(0)";
     }
 
     // Show header if we have multiple items
@@ -2212,95 +2212,95 @@ class FeedbackSystem extends UIComponent {
    * Style feedback components
    */
   styleFeedbackComponents(element, feedback, accentColor) {
-    const icon = element.querySelector('.feedback-icon');
+    const icon = element.querySelector(".feedback-icon");
     if (icon) {
       Object.assign(icon.style, {
         color: accentColor,
-        fontSize: '18px',
-        fontWeight: 'bold',
-        minWidth: '20px',
-        textAlign: 'center',
+        fontSize: "18px",
+        fontWeight: "bold",
+        minWidth: "20px",
+        textAlign: "center",
       });
     }
 
-    const content = element.querySelector('.feedback-content');
+    const content = element.querySelector(".feedback-content");
     if (content) {
       Object.assign(content.style, {
-        flex: '1',
-        lineHeight: '1.4',
+        flex: "1",
+        lineHeight: "1.4",
       });
     }
 
-    const message = element.querySelector('.feedback-message');
+    const message = element.querySelector(".feedback-message");
     if (message) {
       Object.assign(message.style, {
-        color: 'var(--theme-text)',
-        marginBottom: feedback.actions.length > 0 ? '8px' : '0',
+        color: "var(--theme-text)",
+        marginBottom: feedback.actions.length > 0 ? "8px" : "0",
       });
     }
 
-    const actions = element.querySelector('.feedback-actions');
+    const actions = element.querySelector(".feedback-actions");
     if (actions) {
       Object.assign(actions.style, {
-        display: 'flex',
-        gap: '8px',
-        flexWrap: 'wrap',
+        display: "flex",
+        gap: "8px",
+        flexWrap: "wrap",
       });
     }
 
     // Style action buttons
-    element.querySelectorAll('.feedback-action').forEach(btn => {
+    element.querySelectorAll(".feedback-action").forEach((btn) => {
       Object.assign(btn.style, {
-        padding: '4px 12px',
+        padding: "4px 12px",
         border: `1px solid ${accentColor}`,
-        backgroundColor: 'transparent',
+        backgroundColor: "transparent",
         color: accentColor,
-        borderRadius: '4px',
-        fontSize: '12px',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
+        borderRadius: "4px",
+        fontSize: "12px",
+        cursor: "pointer",
+        transition: "all 0.2s ease",
       });
 
-      btn.addEventListener('mouseenter', () => {
+      btn.addEventListener("mouseenter", () => {
         btn.style.backgroundColor = accentColor;
-        btn.style.color = 'white';
+        btn.style.color = "white";
       });
 
-      btn.addEventListener('mouseleave', () => {
-        btn.style.backgroundColor = 'transparent';
+      btn.addEventListener("mouseleave", () => {
+        btn.style.backgroundColor = "transparent";
         btn.style.color = accentColor;
       });
     });
 
-    const closeBtn = element.querySelector('.feedback-close');
+    const closeBtn = element.querySelector(".feedback-close");
     if (closeBtn) {
       Object.assign(closeBtn.style, {
-        position: 'absolute',
-        top: '8px',
-        right: '8px',
-        background: 'none',
-        border: 'none',
-        fontSize: '18px',
-        color: 'var(--theme-text)',
-        cursor: 'pointer',
-        width: '24px',
-        height: '24px',
-        borderRadius: '50%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        opacity: '0.7',
-        transition: 'all 0.2s ease',
+        position: "absolute",
+        top: "8px",
+        right: "8px",
+        background: "none",
+        border: "none",
+        fontSize: "18px",
+        color: "var(--theme-text)",
+        cursor: "pointer",
+        width: "24px",
+        height: "24px",
+        borderRadius: "50%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        opacity: "0.7",
+        transition: "all 0.2s ease",
       });
 
-      closeBtn.addEventListener('mouseenter', () => {
-        closeBtn.style.opacity = '1';
-        closeBtn.style.backgroundColor = 'var(--theme-border)';
+      closeBtn.addEventListener("mouseenter", () => {
+        closeBtn.style.opacity = "1";
+        closeBtn.style.backgroundColor = "var(--theme-border)";
       });
 
-      closeBtn.addEventListener('mouseleave', () => {
-        closeBtn.style.opacity = '0.7';
-        closeBtn.style.backgroundColor = 'transparent';
+      closeBtn.addEventListener("mouseleave", () => {
+        closeBtn.style.opacity = "0.7";
+        closeBtn.style.backgroundColor = "transparent";
       });
     }
   }
@@ -2310,24 +2310,24 @@ class FeedbackSystem extends UIComponent {
    */
   setupFeedbackEventHandlers(element, feedback) {
     // Close button
-    const closeBtn = element.querySelector('.feedback-close');
+    const closeBtn = element.querySelector(".feedback-close");
     if (closeBtn) {
-      closeBtn.addEventListener('click', () => {
+      closeBtn.addEventListener("click", () => {
         this.hideFeedback(feedback.id);
       });
     }
 
     // Action buttons
-    element.querySelectorAll('.feedback-action').forEach(btn => {
-      btn.addEventListener('click', event => {
-        const actionId = btn.getAttribute('data-action');
-        const action = feedback.actions.find(a => a.id === actionId);
+    element.querySelectorAll(".feedback-action").forEach((btn) => {
+      btn.addEventListener("click", (event) => {
+        const actionId = btn.getAttribute("data-action");
+        const action = feedback.actions.find((a) => a.id === actionId);
 
         if (action && action.handler) {
           try {
             action.handler(feedback, event);
           } catch (error) {
-            this.errorHandler(error, 'feedback-action');
+            this.errorHandler(error, "feedback-action");
           }
         }
 
@@ -2339,10 +2339,10 @@ class FeedbackSystem extends UIComponent {
     });
 
     // Keyboard navigation
-    element.addEventListener('keydown', event => {
+    element.addEventListener("keydown", (event) => {
       if (this.disabled) return;
 
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         this.hideFeedback(feedback.id);
       }
     });
@@ -2353,19 +2353,19 @@ class FeedbackSystem extends UIComponent {
    */
   hideFeedback(feedbackId) {
     const element = this.element.querySelector(
-      `[data-feedback-id="${feedbackId}"]`
+      `[data-feedback-id="${feedbackId}"]`,
     );
     if (!element) return;
 
     if (this.animated) {
-      element.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-      element.style.opacity = '0';
-      element.style.transform = this.position.includes('top')
-        ? 'translateY(-20px)'
-        : 'translateY(20px)';
-      element.style.maxHeight = '0';
-      element.style.marginBottom = '0';
-      element.style.padding = '0 16px';
+      element.style.transition = "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)";
+      element.style.opacity = "0";
+      element.style.transform = this.position.includes("top")
+        ? "translateY(-20px)"
+        : "translateY(20px)";
+      element.style.maxHeight = "0";
+      element.style.marginBottom = "0";
+      element.style.padding = "0 16px";
 
       setTimeout(() => {
         if (element.parentNode) {
@@ -2379,28 +2379,28 @@ class FeedbackSystem extends UIComponent {
     }
 
     // Remove from queue
-    this.feedbackQueue = this.feedbackQueue.filter(f => f.id !== feedbackId);
+    this.feedbackQueue = this.feedbackQueue.filter((f) => f.id !== feedbackId);
 
-    this.emit('feedbackHidden', { feedbackId });
+    this.emit("feedbackHidden", { feedbackId });
   }
 
   /**
    * Update header visibility
    */
   updateHeader() {
-    const header = this.element.querySelector('.feedback-header');
-    const items = this.element.querySelectorAll('.feedback-item');
+    const header = this.element.querySelector(".feedback-header");
+    const items = this.element.querySelectorAll(".feedback-item");
 
     if (header) {
-      header.style.display = items.length > 1 ? 'flex' : 'none';
+      header.style.display = items.length > 1 ? "flex" : "none";
 
       if (items.length > 1) {
         Object.assign(header.style, {
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '12px 16px',
-          borderBottom: '1px solid var(--theme-border)',
-          marginBottom: '12px',
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "12px 16px",
+          borderBottom: "1px solid var(--theme-border)",
+          marginBottom: "12px",
         });
       }
     }
@@ -2410,35 +2410,35 @@ class FeedbackSystem extends UIComponent {
    * Convenience methods for different feedback types
    */
   showSuccess(message, options = {}) {
-    return this.showFeedback(message, 'success', options);
+    return this.showFeedback(message, "success", options);
   }
 
   showError(message, options = {}) {
-    return this.showFeedback(message, 'error', {
+    return this.showFeedback(message, "error", {
       ...options,
       persistent: true,
     });
   }
 
   showWarning(message, options = {}) {
-    return this.showFeedback(message, 'warning', options);
+    return this.showFeedback(message, "warning", options);
   }
 
   showInfo(message, options = {}) {
-    return this.showFeedback(message, 'info', options);
+    return this.showFeedback(message, "info", options);
   }
 
   /**
    * Clear all feedback items
    */
   clearAll() {
-    const items = this.element.querySelectorAll('.feedback-item');
-    items.forEach(item => {
-      const feedbackId = item.getAttribute('data-feedback-id');
+    const items = this.element.querySelectorAll(".feedback-item");
+    items.forEach((item) => {
+      const feedbackId = item.getAttribute("data-feedback-id");
       this.hideFeedback(feedbackId);
     });
 
-    this.emit('allFeedbackCleared');
+    this.emit("allFeedbackCleared");
   }
 
   /**
@@ -2463,33 +2463,33 @@ class Button extends UIComponent {
   constructor(config = {}) {
     super({
       ...config,
-      ariaRole: 'button',
+      ariaRole: "button",
       focusable: true,
       tabIndex: config.disabled ? -1 : 0,
       styles: {
-        padding: '12px 24px',
-        border: 'none',
-        borderRadius: '8px',
-        fontSize: '14px',
-        fontWeight: '500',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        cursor: config.disabled ? 'not-allowed' : 'pointer',
+        padding: "12px 24px",
+        border: "none",
+        borderRadius: "8px",
+        fontSize: "14px",
+        fontWeight: "500",
+        fontFamily: "system-ui, -apple-system, sans-serif",
+        cursor: config.disabled ? "not-allowed" : "pointer",
         minHeight: `${UI_CONSTANTS.TOUCH_TARGET_SIZE}px`,
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '8px',
-        textDecoration: 'none',
-        outline: 'none',
-        transition: 'all 0.2s ease',
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "8px",
+        textDecoration: "none",
+        outline: "none",
+        transition: "all 0.2s ease",
         ...config.styles,
       },
     });
 
-    this.text = config.text || '';
+    this.text = config.text || "";
     this.icon = config.icon || null;
-    this.variant = config.variant || 'primary'; // primary, secondary, outline, ghost
-    this.size = config.size || 'medium'; // small, medium, large
+    this.variant = config.variant || "primary"; // primary, secondary, outline, ghost
+    this.size = config.size || "medium"; // small, medium, large
     this.disabled = config.disabled === true;
     this.loading = config.loading === true;
     this.onClick = config.onClick || (() => {});
@@ -2503,7 +2503,7 @@ class Button extends UIComponent {
    * Get appropriate element tag
    */
   getElementTag() {
-    return 'button';
+    return "button";
   }
 
   /**
@@ -2512,33 +2512,33 @@ class Button extends UIComponent {
   getElementClasses() {
     const classes = super.getElementClasses();
     const buttonClasses = [
-      'ui-button',
+      "ui-button",
       `variant-${this.variant}`,
       `size-${this.size}`,
     ];
 
-    if (this.disabled) buttonClasses.push('disabled');
-    if (this.loading) buttonClasses.push('loading');
+    if (this.disabled) buttonClasses.push("disabled");
+    if (this.loading) buttonClasses.push("loading");
 
-    return `${classes} ${buttonClasses.join(' ')}`;
+    return `${classes} ${buttonClasses.join(" ")}`;
   }
 
   createButton() {
     try {
-      this.element.type = 'button';
+      this.element.type = "button";
       this.element.disabled = this.disabled;
 
       if (this.ariaLabel) {
-        this.element.setAttribute('aria-label', this.ariaLabel);
+        this.element.setAttribute("aria-label", this.ariaLabel);
       }
 
       if (this.disabled) {
-        this.element.setAttribute('aria-disabled', 'true');
+        this.element.setAttribute("aria-disabled", "true");
       }
 
       this.updateButtonContent();
     } catch (error) {
-      this.errorHandler(error, 'createButton');
+      this.errorHandler(error, "createButton");
     }
   }
 
@@ -2552,7 +2552,7 @@ class Button extends UIComponent {
       content.push('<span class="button-spinner" aria-hidden="true">⟳</span>');
     } else if (this.icon) {
       content.push(
-        `<span class="button-icon" aria-hidden="true">${this.icon}</span>`
+        `<span class="button-icon" aria-hidden="true">${this.icon}</span>`,
       );
     }
 
@@ -2560,20 +2560,20 @@ class Button extends UIComponent {
       content.push(`<span class="button-text">${this.text}</span>`);
     }
 
-    this.element.innerHTML = content.join('');
+    this.element.innerHTML = content.join("");
 
     // Style the spinner
-    const spinner = this.element.querySelector('.button-spinner');
+    const spinner = this.element.querySelector(".button-spinner");
     if (spinner) {
       Object.assign(spinner.style, {
-        animation: 'spin 1s linear infinite',
-        display: 'inline-block',
+        animation: "spin 1s linear infinite",
+        display: "inline-block",
       });
 
       // Add spin animation if not exists
-      if (!document.getElementById('button-spin-animation')) {
-        const style = document.createElement('style');
-        style.id = 'button-spin-animation';
+      if (!document.getElementById("button-spin-animation")) {
+        const style = document.createElement("style");
+        style.id = "button-spin-animation";
         style.textContent = `
                     @keyframes spin {
                         from { transform: rotate(0deg); }
@@ -2591,31 +2591,31 @@ class Button extends UIComponent {
   applyVariantStyles() {
     const variants = {
       primary: {
-        backgroundColor: 'var(--theme-primary)',
-        color: 'white',
-        border: '1px solid var(--theme-primary)',
+        backgroundColor: "var(--theme-primary)",
+        color: "white",
+        border: "1px solid var(--theme-primary)",
       },
       secondary: {
-        backgroundColor: 'var(--theme-border)',
-        color: 'var(--theme-text)',
-        border: '1px solid var(--theme-border)',
+        backgroundColor: "var(--theme-border)",
+        color: "var(--theme-text)",
+        border: "1px solid var(--theme-border)",
       },
       outline: {
-        backgroundColor: 'transparent',
-        color: 'var(--theme-primary)',
-        border: '1px solid var(--theme-primary)',
+        backgroundColor: "transparent",
+        color: "var(--theme-primary)",
+        border: "1px solid var(--theme-primary)",
       },
       ghost: {
-        backgroundColor: 'transparent',
-        color: 'var(--theme-text)',
-        border: '1px solid transparent',
+        backgroundColor: "transparent",
+        color: "var(--theme-text)",
+        border: "1px solid transparent",
       },
     };
 
     const sizes = {
-      small: { padding: '8px 16px', fontSize: '12px', minHeight: '32px' },
-      medium: { padding: '12px 24px', fontSize: '14px', minHeight: '44px' },
-      large: { padding: '16px 32px', fontSize: '16px', minHeight: '52px' },
+      small: { padding: "8px 16px", fontSize: "12px", minHeight: "32px" },
+      medium: { padding: "12px 24px", fontSize: "14px", minHeight: "44px" },
+      large: { padding: "16px 32px", fontSize: "16px", minHeight: "52px" },
     };
 
     const variantStyles = variants[this.variant] || variants.primary;
@@ -2624,8 +2624,8 @@ class Button extends UIComponent {
     Object.assign(this.element.style, variantStyles, sizeStyles);
 
     if (this.disabled) {
-      this.element.style.opacity = '0.6';
-      this.element.style.cursor = 'not-allowed';
+      this.element.style.opacity = "0.6";
+      this.element.style.cursor = "not-allowed";
     }
   }
 
@@ -2636,60 +2636,60 @@ class Button extends UIComponent {
     if (this.disabled) return;
 
     // Click handler
-    this.element.addEventListener('click', event => {
+    this.element.addEventListener("click", (event) => {
       if (this.loading) return;
 
       try {
         this.onClick(event);
-        this.emit('click', { event });
+        this.emit("click", { event });
       } catch (error) {
-        this.errorHandler(error, 'button-click');
+        this.errorHandler(error, "button-click");
       }
     });
 
     // Hover effects
-    this.element.addEventListener('mouseenter', () => {
+    this.element.addEventListener("mouseenter", () => {
       if (this.disabled || this.loading) return;
 
-      this.element.style.transform = 'translateY(-1px)';
-      this.element.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+      this.element.style.transform = "translateY(-1px)";
+      this.element.style.boxShadow = "0 4px 8px rgba(0,0,0,0.2)";
 
       // Variant-specific hover effects
-      if (this.variant === 'primary') {
-        this.element.style.filter = 'brightness(1.1)';
-      } else if (this.variant === 'outline' || this.variant === 'ghost') {
-        this.element.style.backgroundColor = 'var(--theme-primary)';
-        this.element.style.color = 'white';
+      if (this.variant === "primary") {
+        this.element.style.filter = "brightness(1.1)";
+      } else if (this.variant === "outline" || this.variant === "ghost") {
+        this.element.style.backgroundColor = "var(--theme-primary)";
+        this.element.style.color = "white";
       }
     });
 
-    this.element.addEventListener('mouseleave', () => {
+    this.element.addEventListener("mouseleave", () => {
       if (this.disabled || this.loading) return;
 
-      this.element.style.transform = 'translateY(0)';
-      this.element.style.boxShadow = 'none';
-      this.element.style.filter = 'none';
+      this.element.style.transform = "translateY(0)";
+      this.element.style.boxShadow = "none";
+      this.element.style.filter = "none";
 
       // Reset variant styles
       this.applyVariantStyles();
     });
 
     // Active state
-    this.element.addEventListener('mousedown', () => {
+    this.element.addEventListener("mousedown", () => {
       if (this.disabled || this.loading) return;
-      this.element.style.transform = 'translateY(0) scale(0.98)';
+      this.element.style.transform = "translateY(0) scale(0.98)";
     });
 
-    this.element.addEventListener('mouseup', () => {
+    this.element.addEventListener("mouseup", () => {
       if (this.disabled || this.loading) return;
-      this.element.style.transform = 'translateY(-1px) scale(1)';
+      this.element.style.transform = "translateY(-1px) scale(1)";
     });
 
     // Keyboard navigation
-    this.element.addEventListener('keydown', event => {
+    this.element.addEventListener("keydown", (event) => {
       if (this.disabled || this.loading) return;
 
-      if (event.key === 'Enter' || event.key === ' ') {
+      if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
         this.element.click();
       }
@@ -2717,13 +2717,13 @@ class Button extends UIComponent {
    */
   setLoading(loading) {
     this.loading = loading;
-    this.element.classList.toggle('loading', loading);
+    this.element.classList.toggle("loading", loading);
     this.updateButtonContent();
 
     if (loading) {
-      this.element.setAttribute('aria-busy', 'true');
+      this.element.setAttribute("aria-busy", "true");
     } else {
-      this.element.removeAttribute('aria-busy');
+      this.element.removeAttribute("aria-busy");
     }
   }
 
@@ -2733,13 +2733,13 @@ class Button extends UIComponent {
   setDisabled(disabled) {
     this.disabled = disabled;
     this.element.disabled = disabled;
-    this.element.classList.toggle('disabled', disabled);
+    this.element.classList.toggle("disabled", disabled);
 
     if (disabled) {
-      this.element.setAttribute('aria-disabled', 'true');
+      this.element.setAttribute("aria-disabled", "true");
       this.element.tabIndex = -1;
     } else {
-      this.element.removeAttribute('aria-disabled');
+      this.element.removeAttribute("aria-disabled");
       this.element.tabIndex = 0;
     }
 
@@ -2764,13 +2764,13 @@ class Slider extends UIComponent {
   constructor(config = {}) {
     super({
       ...config,
-      ariaRole: 'slider',
+      ariaRole: "slider",
       focusable: true,
       tabIndex: config.disabled ? -1 : 0,
       styles: {
-        position: 'relative',
-        width: '200px',
-        height: '24px',
+        position: "relative",
+        width: "200px",
+        height: "24px",
         ...config.styles,
       },
     });
@@ -2779,14 +2779,14 @@ class Slider extends UIComponent {
     this.max = config.max || 100;
     this.value = Math.max(
       this.min,
-      Math.min(this.max, config.value || this.min)
+      Math.min(this.max, config.value || this.min),
     );
     this.step = config.step || 1;
     this.disabled = config.disabled === true;
-    this.label = config.label || '';
+    this.label = config.label || "";
     this.showValue = config.showValue !== false;
     this.showLabels = config.showLabels === true;
-    this.orientation = config.orientation || 'horizontal'; // horizontal | vertical
+    this.orientation = config.orientation || "horizontal"; // horizontal | vertical
     this.onChange = config.onChange || (() => {});
 
     this.isDragging = false;
@@ -2800,26 +2800,26 @@ class Slider extends UIComponent {
    */
   getElementClasses() {
     const classes = super.getElementClasses();
-    const sliderClasses = ['ui-slider', `orientation-${this.orientation}`];
+    const sliderClasses = ["ui-slider", `orientation-${this.orientation}`];
 
-    if (this.disabled) sliderClasses.push('disabled');
+    if (this.disabled) sliderClasses.push("disabled");
 
-    return `${classes} ${sliderClasses.join(' ')}`;
+    return `${classes} ${sliderClasses.join(" ")}`;
   }
 
   createSlider() {
     try {
       // Set ARIA attributes
-      this.element.setAttribute('aria-valuemin', this.min);
-      this.element.setAttribute('aria-valuemax', this.max);
-      this.element.setAttribute('aria-valuenow', this.value);
+      this.element.setAttribute("aria-valuemin", this.min);
+      this.element.setAttribute("aria-valuemax", this.max);
+      this.element.setAttribute("aria-valuenow", this.value);
 
       if (this.label) {
-        this.element.setAttribute('aria-label', this.label);
+        this.element.setAttribute("aria-label", this.label);
       }
 
       if (this.disabled) {
-        this.element.setAttribute('aria-disabled', 'true');
+        this.element.setAttribute("aria-disabled", "true");
       }
 
       this.element.innerHTML = `
@@ -2828,7 +2828,7 @@ class Slider extends UIComponent {
                     ? `
                     <div class="slider-label">${this.label}</div>
                 `
-                    : ''
+                    : ""
                 }
                 <div class="slider-container">
                     <div class="slider-track"></div>
@@ -2842,7 +2842,7 @@ class Slider extends UIComponent {
                             <span class="slider-max-label">${this.max}</span>
                         </div>
                     `
-                        : ''
+                        : ""
                     }
                 </div>
                 ${
@@ -2850,14 +2850,14 @@ class Slider extends UIComponent {
                     ? `
                     <div class="slider-value" aria-live="polite">${this.value}</div>
                 `
-                    : ''
+                    : ""
                 }
             `;
 
       this.styleSlider();
       this.updateSliderPosition();
     } catch (error) {
-      this.errorHandler(error, 'createSlider');
+      this.errorHandler(error, "createSlider");
     }
   }
 
@@ -2865,129 +2865,129 @@ class Slider extends UIComponent {
    * Style slider components
    */
   styleSlider() {
-    const container = this.element.querySelector('.slider-container');
-    const track = this.element.querySelector('.slider-track');
-    const filled = this.element.querySelector('.slider-filled');
-    const thumb = this.element.querySelector('.slider-thumb');
-    const label = this.element.querySelector('.slider-label');
-    const valueDisplay = this.element.querySelector('.slider-value');
-    const labels = this.element.querySelector('.slider-labels');
+    const container = this.element.querySelector(".slider-container");
+    const track = this.element.querySelector(".slider-track");
+    const filled = this.element.querySelector(".slider-filled");
+    const thumb = this.element.querySelector(".slider-thumb");
+    const label = this.element.querySelector(".slider-label");
+    const valueDisplay = this.element.querySelector(".slider-value");
+    const labels = this.element.querySelector(".slider-labels");
 
     if (container) {
       Object.assign(container.style, {
-        position: 'relative',
-        width: this.orientation === 'horizontal' ? '100%' : '24px',
-        height: this.orientation === 'horizontal' ? '24px' : '200px',
-        margin: this.orientation === 'horizontal' ? '12px 0' : '0 12px',
+        position: "relative",
+        width: this.orientation === "horizontal" ? "100%" : "24px",
+        height: this.orientation === "horizontal" ? "24px" : "200px",
+        margin: this.orientation === "horizontal" ? "12px 0" : "0 12px",
       });
     }
 
     if (track) {
       Object.assign(track.style, {
-        position: 'absolute',
-        backgroundColor: 'var(--theme-border)',
-        borderRadius: '12px',
-        ...(this.orientation === 'horizontal'
+        position: "absolute",
+        backgroundColor: "var(--theme-border)",
+        borderRadius: "12px",
+        ...(this.orientation === "horizontal"
           ? {
-              top: '50%',
-              left: '0',
-              right: '0',
-              height: '6px',
-              transform: 'translateY(-50%)',
+              top: "50%",
+              left: "0",
+              right: "0",
+              height: "6px",
+              transform: "translateY(-50%)",
             }
           : {
-              left: '50%',
-              top: '0',
-              bottom: '0',
-              width: '6px',
-              transform: 'translateX(-50%)',
+              left: "50%",
+              top: "0",
+              bottom: "0",
+              width: "6px",
+              transform: "translateX(-50%)",
             }),
       });
     }
 
     if (filled) {
       Object.assign(filled.style, {
-        position: 'absolute',
-        backgroundColor: 'var(--theme-primary)',
-        borderRadius: '12px',
-        transition: this.animated ? 'all 0.2s ease' : 'none',
-        ...(this.orientation === 'horizontal'
+        position: "absolute",
+        backgroundColor: "var(--theme-primary)",
+        borderRadius: "12px",
+        transition: this.animated ? "all 0.2s ease" : "none",
+        ...(this.orientation === "horizontal"
           ? {
-              top: '50%',
-              left: '0',
-              height: '6px',
-              transform: 'translateY(-50%)',
+              top: "50%",
+              left: "0",
+              height: "6px",
+              transform: "translateY(-50%)",
             }
           : {
-              left: '50%',
-              bottom: '0',
-              width: '6px',
-              transform: 'translateX(-50%)',
+              left: "50%",
+              bottom: "0",
+              width: "6px",
+              transform: "translateX(-50%)",
             }),
       });
     }
 
     if (thumb) {
       Object.assign(thumb.style, {
-        position: 'absolute',
-        width: '20px',
-        height: '20px',
-        backgroundColor: 'var(--theme-primary)',
-        borderRadius: '50%',
-        border: '2px solid white',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-        cursor: this.disabled ? 'not-allowed' : 'grab',
-        transition: this.animated ? 'all 0.2s ease' : 'none',
-        opacity: this.disabled ? '0.6' : '1',
-        ...(this.orientation === 'horizontal'
+        position: "absolute",
+        width: "20px",
+        height: "20px",
+        backgroundColor: "var(--theme-primary)",
+        borderRadius: "50%",
+        border: "2px solid white",
+        boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+        cursor: this.disabled ? "not-allowed" : "grab",
+        transition: this.animated ? "all 0.2s ease" : "none",
+        opacity: this.disabled ? "0.6" : "1",
+        ...(this.orientation === "horizontal"
           ? {
-              top: '50%',
-              transform: 'translate(-50%, -50%)',
+              top: "50%",
+              transform: "translate(-50%, -50%)",
             }
           : {
-              left: '50%',
-              transform: 'translate(-50%, 50%)',
+              left: "50%",
+              transform: "translate(-50%, 50%)",
             }),
       });
     }
 
     if (label) {
       Object.assign(label.style, {
-        fontSize: '14px',
-        fontWeight: '500',
-        color: 'var(--theme-text)',
-        marginBottom: this.orientation === 'horizontal' ? '8px' : '0',
-        marginRight: this.orientation === 'vertical' ? '8px' : '0',
+        fontSize: "14px",
+        fontWeight: "500",
+        color: "var(--theme-text)",
+        marginBottom: this.orientation === "horizontal" ? "8px" : "0",
+        marginRight: this.orientation === "vertical" ? "8px" : "0",
       });
     }
 
     if (valueDisplay) {
       Object.assign(valueDisplay.style, {
-        fontSize: '12px',
-        fontWeight: '600',
-        color: 'var(--theme-primary)',
-        textAlign: 'center',
-        marginTop: this.orientation === 'horizontal' ? '8px' : '0',
-        marginLeft: this.orientation === 'vertical' ? '8px' : '0',
+        fontSize: "12px",
+        fontWeight: "600",
+        color: "var(--theme-primary)",
+        textAlign: "center",
+        marginTop: this.orientation === "horizontal" ? "8px" : "0",
+        marginLeft: this.orientation === "vertical" ? "8px" : "0",
       });
     }
 
     if (labels) {
       Object.assign(labels.style, {
-        display: 'flex',
-        justifyContent: 'space-between',
-        fontSize: '11px',
-        color: 'var(--theme-text)',
-        opacity: '0.7',
-        marginTop: this.orientation === 'horizontal' ? '4px' : '0',
-        ...(this.orientation === 'vertical'
+        display: "flex",
+        justifyContent: "space-between",
+        fontSize: "11px",
+        color: "var(--theme-text)",
+        opacity: "0.7",
+        marginTop: this.orientation === "horizontal" ? "4px" : "0",
+        ...(this.orientation === "vertical"
           ? {
-              flexDirection: 'column',
-              height: '100%',
-              position: 'absolute',
-              left: '100%',
-              top: '0',
-              marginLeft: '8px',
+              flexDirection: "column",
+              height: "100%",
+              position: "absolute",
+              left: "100%",
+              top: "0",
+              marginLeft: "8px",
             }
           : {}),
       });
@@ -2999,10 +2999,10 @@ class Slider extends UIComponent {
    */
   updateSliderPosition() {
     const percentage = ((this.value - this.min) / (this.max - this.min)) * 100;
-    const filled = this.element.querySelector('.slider-filled');
-    const thumb = this.element.querySelector('.slider-thumb');
+    const filled = this.element.querySelector(".slider-filled");
+    const thumb = this.element.querySelector(".slider-thumb");
 
-    if (this.orientation === 'horizontal') {
+    if (this.orientation === "horizontal") {
       if (filled) filled.style.width = `${percentage}%`;
       if (thumb) thumb.style.left = `${percentage}%`;
     } else {
@@ -3017,31 +3017,31 @@ class Slider extends UIComponent {
   setupSliderBehavior() {
     if (this.disabled) return;
 
-    const container = this.element.querySelector('.slider-container');
-    const thumb = this.element.querySelector('.slider-thumb');
+    const container = this.element.querySelector(".slider-container");
+    const thumb = this.element.querySelector(".slider-thumb");
 
     if (!container || !thumb) return;
 
     // Mouse events
-    thumb.addEventListener('mousedown', this.handleMouseDown.bind(this));
-    container.addEventListener('click', this.handleTrackClick.bind(this));
+    thumb.addEventListener("mousedown", this.handleMouseDown.bind(this));
+    container.addEventListener("click", this.handleTrackClick.bind(this));
 
     // Touch events
-    thumb.addEventListener('touchstart', this.handleTouchStart.bind(this), {
+    thumb.addEventListener("touchstart", this.handleTouchStart.bind(this), {
       passive: false,
     });
 
     // Keyboard events
-    this.element.addEventListener('keydown', this.handleKeyDown.bind(this));
+    this.element.addEventListener("keydown", this.handleKeyDown.bind(this));
 
     // Focus events
-    this.element.addEventListener('focus', () => {
+    this.element.addEventListener("focus", () => {
       thumb.style.boxShadow =
-        '0 0 0 3px var(--theme-primary)30, 0 2px 4px rgba(0,0,0,0.2)';
+        "0 0 0 3px var(--theme-primary)30, 0 2px 4px rgba(0,0,0,0.2)";
     });
 
-    this.element.addEventListener('blur', () => {
-      thumb.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+    this.element.addEventListener("blur", () => {
+      thumb.style.boxShadow = "0 2px 4px rgba(0,0,0,0.2)";
     });
   }
 
@@ -3054,15 +3054,15 @@ class Slider extends UIComponent {
     event.preventDefault();
     this.isDragging = true;
 
-    const thumb = this.element.querySelector('.slider-thumb');
+    const thumb = this.element.querySelector(".slider-thumb");
     if (thumb) {
-      thumb.style.cursor = 'grabbing';
+      thumb.style.cursor = "grabbing";
     }
 
-    document.addEventListener('mousemove', this.handleMouseMove.bind(this));
-    document.addEventListener('mouseup', this.handleMouseUp.bind(this));
+    document.addEventListener("mousemove", this.handleMouseMove.bind(this));
+    document.addEventListener("mouseup", this.handleMouseUp.bind(this));
 
-    this.emit('dragStart', { value: this.value });
+    this.emit("dragStart", { value: this.value });
   }
 
   /**
@@ -3082,15 +3082,15 @@ class Slider extends UIComponent {
 
     this.isDragging = false;
 
-    const thumb = this.element.querySelector('.slider-thumb');
+    const thumb = this.element.querySelector(".slider-thumb");
     if (thumb) {
-      thumb.style.cursor = 'grab';
+      thumb.style.cursor = "grab";
     }
 
-    document.removeEventListener('mousemove', this.handleMouseMove.bind(this));
-    document.removeEventListener('mouseup', this.handleMouseUp.bind(this));
+    document.removeEventListener("mousemove", this.handleMouseMove.bind(this));
+    document.removeEventListener("mouseup", this.handleMouseUp.bind(this));
 
-    this.emit('dragEnd', { value: this.value });
+    this.emit("dragEnd", { value: this.value });
   }
 
   /**
@@ -3102,12 +3102,12 @@ class Slider extends UIComponent {
     event.preventDefault();
     this.isDragging = true;
 
-    document.addEventListener('touchmove', this.handleTouchMove.bind(this), {
+    document.addEventListener("touchmove", this.handleTouchMove.bind(this), {
       passive: false,
     });
-    document.addEventListener('touchend', this.handleTouchEnd.bind(this));
+    document.addEventListener("touchend", this.handleTouchEnd.bind(this));
 
-    this.emit('dragStart', { value: this.value });
+    this.emit("dragStart", { value: this.value });
   }
 
   /**
@@ -3128,10 +3128,10 @@ class Slider extends UIComponent {
 
     this.isDragging = false;
 
-    document.removeEventListener('touchmove', this.handleTouchMove.bind(this));
-    document.removeEventListener('touchend', this.handleTouchEnd.bind(this));
+    document.removeEventListener("touchmove", this.handleTouchMove.bind(this));
+    document.removeEventListener("touchend", this.handleTouchEnd.bind(this));
 
-    this.emit('dragEnd', { value: this.value });
+    this.emit("dragEnd", { value: this.value });
   }
 
   /**
@@ -3140,7 +3140,7 @@ class Slider extends UIComponent {
   handleTrackClick(event) {
     if (this.disabled || this.isDragging) return;
 
-    const thumb = event.target.closest('.slider-thumb');
+    const thumb = event.target.closest(".slider-thumb");
     if (thumb) return; // Don't handle clicks on the thumb
 
     this.updateValueFromEvent(event);
@@ -3156,29 +3156,29 @@ class Slider extends UIComponent {
     const largeStep = this.step * 10;
 
     switch (event.key) {
-      case 'ArrowRight':
-      case 'ArrowUp':
+      case "ArrowRight":
+      case "ArrowUp":
         event.preventDefault();
         newValue = Math.min(this.max, this.value + this.step);
         break;
-      case 'ArrowLeft':
-      case 'ArrowDown':
+      case "ArrowLeft":
+      case "ArrowDown":
         event.preventDefault();
         newValue = Math.max(this.min, this.value - this.step);
         break;
-      case 'PageUp':
+      case "PageUp":
         event.preventDefault();
         newValue = Math.min(this.max, this.value + largeStep);
         break;
-      case 'PageDown':
+      case "PageDown":
         event.preventDefault();
         newValue = Math.max(this.min, this.value - largeStep);
         break;
-      case 'Home':
+      case "Home":
         event.preventDefault();
         newValue = this.min;
         break;
-      case 'End':
+      case "End":
         event.preventDefault();
         newValue = this.max;
         break;
@@ -3193,13 +3193,13 @@ class Slider extends UIComponent {
    * Update value from mouse/touch event
    */
   updateValueFromEvent(event) {
-    const container = this.element.querySelector('.slider-container');
+    const container = this.element.querySelector(".slider-container");
     if (!container) return;
 
     const rect = container.getBoundingClientRect();
     let percentage;
 
-    if (this.orientation === 'horizontal') {
+    if (this.orientation === "horizontal") {
       percentage = (event.clientX - rect.left) / rect.width;
     } else {
       percentage = 1 - (event.clientY - rect.top) / rect.height;
@@ -3223,10 +3223,10 @@ class Slider extends UIComponent {
     this.updateSliderPosition();
 
     // Update ARIA
-    this.element.setAttribute('aria-valuenow', this.value);
+    this.element.setAttribute("aria-valuenow", this.value);
 
     // Update value display
-    const valueDisplay = this.element.querySelector('.slider-value');
+    const valueDisplay = this.element.querySelector(".slider-value");
     if (valueDisplay) {
       valueDisplay.textContent = this.value;
     }
@@ -3235,9 +3235,9 @@ class Slider extends UIComponent {
     if (oldValue !== this.value) {
       try {
         this.onChange(this.value, oldValue);
-        this.emit('change', { value: this.value, oldValue });
+        this.emit("change", { value: this.value, oldValue });
       } catch (error) {
-        this.errorHandler(error, 'slider-change');
+        this.errorHandler(error, "slider-change");
       }
     }
   }
@@ -3254,13 +3254,13 @@ class Slider extends UIComponent {
    */
   setDisabled(disabled) {
     this.disabled = disabled;
-    this.element.classList.toggle('disabled', disabled);
+    this.element.classList.toggle("disabled", disabled);
 
     if (disabled) {
-      this.element.setAttribute('aria-disabled', 'true');
+      this.element.setAttribute("aria-disabled", "true");
       this.element.tabIndex = -1;
     } else {
-      this.element.removeAttribute('aria-disabled');
+      this.element.removeAttribute("aria-disabled");
       this.element.tabIndex = 0;
     }
 

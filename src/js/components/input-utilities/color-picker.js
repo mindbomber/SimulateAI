@@ -18,9 +18,9 @@
  * Licensed under the Apache License, Version 2.0
  */
 
-import { BaseObject } from '../../objects/enhanced-objects.js';
-import { INPUT_UTILITY_CONSTANTS } from './constants.js';
-import { ComponentTheme } from './theme.js';
+import { BaseObject } from "../../objects/enhanced-objects.js";
+import { INPUT_UTILITY_CONSTANTS } from "./constants.js";
+import { ComponentTheme } from "./theme.js";
 
 // These utilities are defined in the main input-utility-components.js file
 // We'll import them temporarily until they're extracted to their own modules
@@ -30,7 +30,7 @@ import { ComponentTheme } from './theme.js';
 class ComponentError extends Error {
   constructor(message, component, metadata = {}) {
     super(message);
-    this.name = 'ComponentError';
+    this.name = "ComponentError";
     this.component = component;
     this.metadata = metadata;
     this.timestamp = Date.now();
@@ -57,13 +57,13 @@ const ComponentDebug = {
 
 // Temporary local PerformanceMonitor
 const PerformanceMonitor = {
-  startMonitoring: label => {
-    if (typeof performance !== 'undefined') {
+  startMonitoring: (label) => {
+    if (typeof performance !== "undefined") {
       performance.mark(`${label}-start`);
     }
   },
-  endMonitoring: label => {
-    if (typeof performance !== 'undefined') {
+  endMonitoring: (label) => {
+    if (typeof performance !== "undefined") {
       performance.mark(`${label}-end`);
       try {
         performance.measure(label, `${label}-start`, `${label}-end`);
@@ -77,17 +77,17 @@ const PerformanceMonitor = {
 // Temporary local AnimationManager
 const AnimationManager = {
   animate: async (target, properties, options = {}) => {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const duration = options.duration || 300;
       const startTime = performance.now();
       const startValues = {};
 
       // Store starting values
-      Object.keys(properties).forEach(key => {
+      Object.keys(properties).forEach((key) => {
         startValues[key] = target[key] || 0;
       });
 
-      const animate = currentTime => {
+      const animate = (currentTime) => {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
 
@@ -95,7 +95,7 @@ const AnimationManager = {
         const easedProgress = 1 - Math.pow(1 - progress, 3);
 
         // Update properties
-        Object.keys(properties).forEach(key => {
+        Object.keys(properties).forEach((key) => {
           const start = startValues[key];
           const end = properties[key];
           target[key] = start + (end - start) * easedProgress;
@@ -134,16 +134,16 @@ class ColorPicker extends BaseObject {
         options.width || INPUT_UTILITY_CONSTANTS.DEFAULT_COLOR_PICKER_WIDTH,
       height:
         options.height || INPUT_UTILITY_CONSTANTS.DEFAULT_COLOR_PICKER_HEIGHT,
-      ariaRole: 'button',
-      ariaLabel: options.ariaLabel || 'Color picker',
+      ariaRole: "button",
+      ariaLabel: options.ariaLabel || "Color picker",
     });
 
     // Validate options
     this.validateOptions(options);
 
     // Core properties
-    this.value = options.value || '#ff0000';
-    this.format = options.format || 'hex'; // 'hex', 'rgb', 'hsl', 'hsv'
+    this.value = options.value || "#ff0000";
+    this.format = options.format || "hex"; // 'hex', 'rgb', 'hsl', 'hsv'
     this.showAlpha = options.showAlpha !== false;
     this.showPresets = options.showPresets !== false;
     this.disabled = options.disabled || false;
@@ -154,10 +154,10 @@ class ColorPicker extends BaseObject {
     // Theme integration
     this.theme = options.theme || ComponentTheme.getCurrentTheme();
     this.borderColor =
-      options.borderColor || ComponentTheme.getColor('border', this.theme);
+      options.borderColor || ComponentTheme.getColor("border", this.theme);
     this.backgroundColor =
       options.backgroundColor ||
-      ComponentTheme.getColor('background', this.theme);
+      ComponentTheme.getColor("background", this.theme);
 
     // State management
     this.isOpen = false;
@@ -171,7 +171,7 @@ class ColorPicker extends BaseObject {
     this.renderCache = new Map();
     this.throttledRender = this.throttle(
       this.render.bind(this),
-      PERFORMANCE_THRESHOLDS.eventThrottle
+      PERFORMANCE_THRESHOLDS.eventThrottle,
     );
 
     // Accessibility
@@ -193,47 +193,47 @@ class ColorPicker extends BaseObject {
       this.setupAccessibility();
       this.setupResizeObserver();
     } catch (error) {
-      this.errorHandler.handle(error, 'constructor');
+      this.errorHandler.handle(error, "constructor");
     }
   }
 
   validateOptions(options) {
-    const validFormats = ['hex', 'rgb', 'hsl', 'hsv'];
+    const validFormats = ["hex", "rgb", "hsl", "hsv"];
     if (options.format && !validFormats.includes(options.format)) {
       throw new ComponentError(
         `Invalid color format: ${options.format}`,
-        'ColorPicker'
+        "ColorPicker",
       );
     }
 
     if (options.value && !this.isValidColor(options.value)) {
       ComponentDebug.warn(
-        `Invalid initial color value: ${options.value}, using default`
+        `Invalid initial color value: ${options.value}, using default`,
       );
     }
   }
 
   getDefaultPresets() {
     return [
-      { color: '#ff0000', name: 'Red' },
-      { color: '#00ff00', name: 'Green' },
-      { color: '#0000ff', name: 'Blue' },
-      { color: '#ffff00', name: 'Yellow' },
-      { color: '#ff00ff', name: 'Magenta' },
-      { color: '#00ffff', name: 'Cyan' },
-      { color: '#000000', name: 'Black' },
-      { color: '#ffffff', name: 'White' },
-      { color: '#808080', name: 'Gray' },
-      { color: '#800000', name: 'Maroon' },
-      { color: '#008000', name: 'Dark Green' },
-      { color: '#000080', name: 'Navy' },
+      { color: "#ff0000", name: "Red" },
+      { color: "#00ff00", name: "Green" },
+      { color: "#0000ff", name: "Blue" },
+      { color: "#ffff00", name: "Yellow" },
+      { color: "#ff00ff", name: "Magenta" },
+      { color: "#00ffff", name: "Cyan" },
+      { color: "#000000", name: "Black" },
+      { color: "#ffffff", name: "White" },
+      { color: "#808080", name: "Gray" },
+      { color: "#800000", name: "Maroon" },
+      { color: "#008000", name: "Dark Green" },
+      { color: "#000080", name: "Navy" },
     ];
   }
 
   createScreenReaderAnnouncer() {
-    const announcer = document.createElement('div');
-    announcer.setAttribute('aria-live', 'polite');
-    announcer.setAttribute('aria-atomic', 'true');
+    const announcer = document.createElement("div");
+    announcer.setAttribute("aria-live", "polite");
+    announcer.setAttribute("aria-atomic", "true");
     announcer.style.cssText = `
             position: absolute;
             left: -10000px;
@@ -255,19 +255,19 @@ class ColorPicker extends BaseObject {
         this.adjustLightness(INPUT_UTILITY_CONSTANTS.LIGHTNESS_ADJUSTMENT_STEP),
       ArrowDown: () =>
         this.adjustLightness(
-          -INPUT_UTILITY_CONSTANTS.LIGHTNESS_ADJUSTMENT_STEP
+          -INPUT_UTILITY_CONSTANTS.LIGHTNESS_ADJUSTMENT_STEP,
         ),
-      'Shift+ArrowUp': () =>
+      "Shift+ArrowUp": () =>
         this.adjustSaturation(
-          INPUT_UTILITY_CONSTANTS.SATURATION_ADJUSTMENT_STEP
+          INPUT_UTILITY_CONSTANTS.SATURATION_ADJUSTMENT_STEP,
         ),
-      'Shift+ArrowDown': () =>
+      "Shift+ArrowDown": () =>
         this.adjustSaturation(
-          -INPUT_UTILITY_CONSTANTS.SATURATION_ADJUSTMENT_STEP
+          -INPUT_UTILITY_CONSTANTS.SATURATION_ADJUSTMENT_STEP,
         ),
       Enter: () => this.confirmSelection(),
       Escape: () => this.close(),
-      Tab: event => this.handleTabNavigation(event),
+      Tab: (event) => this.handleTabNavigation(event),
     };
   }
 
@@ -275,13 +275,13 @@ class ColorPicker extends BaseObject {
     return {
       handle: (error, context) => {
         const componentError = new ComponentError(
-          error.message || 'Unknown error',
-          'ColorPicker',
-          { context, originalError: error }
+          error.message || "Unknown error",
+          "ColorPicker",
+          { context, originalError: error },
         );
 
-        ComponentDebug.error('ColorPicker Error', componentError);
-        this.emit('error', componentError);
+        ComponentDebug.error("ColorPicker Error", componentError);
+        this.emit("error", componentError);
 
         // Attempt recovery
         this.recoverFromError(context);
@@ -291,11 +291,11 @@ class ColorPicker extends BaseObject {
 
   recoverFromError(context) {
     switch (context) {
-      case 'color-parsing':
+      case "color-parsing":
         this.value = this.lastValidColor;
         this.parseColor();
         break;
-      case 'render':
+      case "render":
         this.clearRenderCache();
         break;
       default:
@@ -322,24 +322,24 @@ class ColorPicker extends BaseObject {
 
   setupAccessibility() {
     // ARIA attributes
-    this.setAttribute('aria-expanded', this.isOpen.toString());
-    this.setAttribute('aria-haspopup', 'dialog');
-    this.setAttribute('aria-valuemin', '0');
-    this.setAttribute('aria-valuemax', '360');
-    this.setAttribute('aria-valuenow', this.hue.toString());
-    this.setAttribute('aria-valuetext', this.getColorDescription());
+    this.setAttribute("aria-expanded", this.isOpen.toString());
+    this.setAttribute("aria-haspopup", "dialog");
+    this.setAttribute("aria-valuemin", "0");
+    this.setAttribute("aria-valuemax", "360");
+    this.setAttribute("aria-valuenow", this.hue.toString());
+    this.setAttribute("aria-valuetext", this.getColorDescription());
 
     // Keyboard accessibility
-    this.setAttribute('tabindex', this.disabled ? '-1' : '0');
+    this.setAttribute("tabindex", this.disabled ? "-1" : "0");
 
     // Focus management
-    this.addEventListener('focusin', () => this.handleFocusIn());
-    this.addEventListener('focusout', () => this.handleFocusOut());
+    this.addEventListener("focusin", () => this.handleFocusIn());
+    this.addEventListener("focusout", () => this.handleFocusOut());
   }
 
   setupResizeObserver() {
-    if ('ResizeObserver' in window) {
-      this.resizeObserver = new ResizeObserver(_entries => {
+    if ("ResizeObserver" in window) {
+      this.resizeObserver = new ResizeObserver((_entries) => {
         this.clearRenderCache();
         this.throttledRender();
       });
@@ -359,17 +359,17 @@ class ColorPicker extends BaseObject {
         throw new Error(`Invalid color format: ${color}`);
       }
 
-      if (color.startsWith('#')) {
+      if (color.startsWith("#")) {
         this.parseHexColor(color);
-      } else if (color.startsWith('rgb')) {
+      } else if (color.startsWith("rgb")) {
         this.parseRgbColor(color);
-      } else if (color.startsWith('hsl')) {
+      } else if (color.startsWith("hsl")) {
         this.parseHslColor(color);
       }
 
       this.lastValidColor = this.value;
     } catch (error) {
-      this.errorHandler.handle(error, 'color-parsing');
+      this.errorHandler.handle(error, "color-parsing");
     }
   }
 
@@ -379,11 +379,11 @@ class ColorPicker extends BaseObject {
     const g = parseInt(cleanHex.substr(2, 2), 16);
     const b = parseInt(
       cleanHex.substr(INPUT_UTILITY_CONSTANTS.HEX_BLUE_OFFSET, 2),
-      16
+      16,
     );
 
     if (isNaN(r) || isNaN(g) || isNaN(b)) {
-      throw new Error('Invalid hex color format');
+      throw new Error("Invalid hex color format");
     }
 
     const hsl = this.rgbToHsl(r, g, b);
@@ -394,14 +394,14 @@ class ColorPicker extends BaseObject {
 
   parseRgbColor(rgb) {
     const matches = rgb.match(/rgba?\(([^)]+)\)/);
-    if (!matches) throw new Error('Invalid RGB color format');
+    if (!matches) throw new Error("Invalid RGB color format");
 
-    const values = matches[1].split(',').map(v => parseFloat(v.trim()));
+    const values = matches[1].split(",").map((v) => parseFloat(v.trim()));
     if (
       values.length < INPUT_UTILITY_CONSTANTS.RGB_CHANNEL_COUNT ||
       values.some(isNaN)
     ) {
-      throw new Error('Invalid RGB values');
+      throw new Error("Invalid RGB values");
     }
 
     const [r, g, b, a = 1] = values;
@@ -414,14 +414,14 @@ class ColorPicker extends BaseObject {
 
   parseHslColor(hsl) {
     const matches = hsl.match(/hsla?\(([^)]+)\)/);
-    if (!matches) throw new Error('Invalid HSL color format');
+    if (!matches) throw new Error("Invalid HSL color format");
 
-    const values = matches[1].split(',').map(v => parseFloat(v.trim()));
+    const values = matches[1].split(",").map((v) => parseFloat(v.trim()));
     if (
       values.length < INPUT_UTILITY_CONSTANTS.RGB_CHANNEL_COUNT ||
       values.some(isNaN)
     ) {
-      throw new Error('Invalid HSL values');
+      throw new Error("Invalid HSL values");
     }
 
     const [h, s, l, a = 1] = values;
@@ -432,7 +432,7 @@ class ColorPicker extends BaseObject {
   }
 
   isValidColor(color) {
-    if (typeof color !== 'string') return false;
+    if (typeof color !== "string") return false;
 
     const hexPattern = /^#[0-9A-Fa-f]{6}$/;
     const rgbPattern =
@@ -540,14 +540,14 @@ class ColorPicker extends BaseObject {
         p,
         q,
         h / INPUT_UTILITY_CONSTANTS.HUE_MAX_DEGREES +
-          1 / INPUT_UTILITY_CONSTANTS.HSL_DIVISOR_THREE
+          1 / INPUT_UTILITY_CONSTANTS.HSL_DIVISOR_THREE,
       );
       g = hue2rgb(p, q, h / INPUT_UTILITY_CONSTANTS.HUE_MAX_DEGREES);
       b = hue2rgb(
         p,
         q,
         h / INPUT_UTILITY_CONSTANTS.HUE_MAX_DEGREES -
-          1 / INPUT_UTILITY_CONSTANTS.HSL_DIVISOR_THREE
+          1 / INPUT_UTILITY_CONSTANTS.HSL_DIVISOR_THREE,
       );
     }
 
@@ -565,20 +565,20 @@ class ColorPicker extends BaseObject {
       const oldValue = this.value;
 
       switch (this.format) {
-        case 'hex':
+        case "hex":
           this.value = this.rgbToHex(rgb.r, rgb.g, rgb.b);
           break;
-        case 'rgb':
+        case "rgb":
           this.value = this.showAlpha
             ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${this.alpha})`
             : `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
           break;
-        case 'hsl':
+        case "hsl":
           this.value = this.showAlpha
             ? `hsla(${Math.round(this.hue)}, ${Math.round(this.saturation)}%, ${Math.round(this.lightness)}%, ${this.alpha})`
             : `hsl(${Math.round(this.hue)}, ${Math.round(this.saturation)}%, ${Math.round(this.lightness)}%)`;
           break;
-        case 'hsv': {
+        case "hsv": {
           const hsv = this.hslToHsv(this.hue, this.saturation, this.lightness);
           this.value = `hsv(${Math.round(hsv.h)}, ${Math.round(hsv.s)}%, ${Math.round(hsv.v)}%)`;
           break;
@@ -589,7 +589,7 @@ class ColorPicker extends BaseObject {
         this.lastValidColor = this.value;
         this.updateAccessibility();
         this.announceColorChange();
-        this.emit('colorChanged', {
+        this.emit("colorChanged", {
           value: this.value,
           hsl: { h: this.hue, s: this.saturation, l: this.lightness },
           alpha: this.alpha,
@@ -597,14 +597,14 @@ class ColorPicker extends BaseObject {
         });
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'value-update');
+      this.errorHandler.handle(error, "value-update");
     }
   }
 
   rgbToHex(r, g, b) {
-    const toHex = n => {
+    const toHex = (n) => {
       const hex = Math.round(
-        Math.max(0, Math.min(INPUT_UTILITY_CONSTANTS.RGB_MAX_VALUE, n))
+        Math.max(0, Math.min(INPUT_UTILITY_CONSTANTS.RGB_MAX_VALUE, n)),
       ).toString(INPUT_UTILITY_CONSTANTS.HEX_BASE);
       return hex.length === 1 ? `0${hex}` : hex;
     };
@@ -620,8 +620,8 @@ class ColorPicker extends BaseObject {
   }
 
   updateAccessibility() {
-    this.setAttribute('aria-valuenow', this.hue.toString());
-    this.setAttribute('aria-valuetext', this.getColorDescription());
+    this.setAttribute("aria-valuenow", this.hue.toString());
+    this.setAttribute("aria-valuetext", this.getColorDescription());
   }
 
   getColorDescription() {
@@ -634,23 +634,23 @@ class ColorPicker extends BaseObject {
     const { hue } = this;
     if (this.saturation < INPUT_UTILITY_CONSTANTS.SATURATION_THRESHOLD_LOW)
       return this.lightness > INPUT_UTILITY_CONSTANTS.LIGHTNESS_THRESHOLD_HIGH
-        ? 'white'
+        ? "white"
         : this.lightness < INPUT_UTILITY_CONSTANTS.LIGHTNESS_THRESHOLD_LOW
-          ? 'black'
-          : 'gray';
+          ? "black"
+          : "gray";
     if (
       hue < INPUT_UTILITY_CONSTANTS.HUE_RED_MAX ||
       hue >= INPUT_UTILITY_CONSTANTS.HUE_RED_MIN
     )
-      return 'red';
-    if (hue < INPUT_UTILITY_CONSTANTS.HUE_ORANGE_MAX) return 'orange';
-    if (hue < INPUT_UTILITY_CONSTANTS.HUE_YELLOW_MAX) return 'yellow';
-    if (hue < INPUT_UTILITY_CONSTANTS.HUE_GREEN_MAX) return 'green';
-    if (hue < INPUT_UTILITY_CONSTANTS.HUE_CYAN_MAX) return 'cyan';
-    if (hue < INPUT_UTILITY_CONSTANTS.HUE_BLUE_MAX) return 'blue';
-    if (hue < INPUT_UTILITY_CONSTANTS.HUE_PURPLE_MAX) return 'purple';
-    if (hue < INPUT_UTILITY_CONSTANTS.HUE_MAGENTA_MAX) return 'magenta';
-    return 'pink';
+      return "red";
+    if (hue < INPUT_UTILITY_CONSTANTS.HUE_ORANGE_MAX) return "orange";
+    if (hue < INPUT_UTILITY_CONSTANTS.HUE_YELLOW_MAX) return "yellow";
+    if (hue < INPUT_UTILITY_CONSTANTS.HUE_GREEN_MAX) return "green";
+    if (hue < INPUT_UTILITY_CONSTANTS.HUE_CYAN_MAX) return "cyan";
+    if (hue < INPUT_UTILITY_CONSTANTS.HUE_BLUE_MAX) return "blue";
+    if (hue < INPUT_UTILITY_CONSTANTS.HUE_PURPLE_MAX) return "purple";
+    if (hue < INPUT_UTILITY_CONSTANTS.HUE_MAGENTA_MAX) return "magenta";
+    return "pink";
   }
 
   announceColorChange() {
@@ -672,7 +672,7 @@ class ColorPicker extends BaseObject {
         this.handleColorSelection(localX, localY);
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'click-handler');
+      this.errorHandler.handle(error, "click-handler");
     }
   }
 
@@ -681,23 +681,23 @@ class ColorPicker extends BaseObject {
 
     try {
       this.isOpen = true;
-      this.setAttribute('aria-expanded', 'true');
+      this.setAttribute("aria-expanded", "true");
 
       // Animate opening if motion is not reduced
       if (!this.prefersReducedMotion()) {
         await AnimationManager.animate(
           this.animationState,
           { openProgress: 1 },
-          { duration: 200, easing: 'ease-out' }
+          { duration: 200, easing: "ease-out" },
         );
       } else {
         this.animationState.openProgress = 1;
       }
 
-      this.emit('opened');
-      this.announcer.textContent = 'Color picker opened';
+      this.emit("opened");
+      this.announcer.textContent = "Color picker opened";
     } catch (error) {
-      this.errorHandler.handle(error, 'open');
+      this.errorHandler.handle(error, "open");
     }
   }
 
@@ -706,30 +706,30 @@ class ColorPicker extends BaseObject {
 
     try {
       this.isOpen = false;
-      this.setAttribute('aria-expanded', 'false');
+      this.setAttribute("aria-expanded", "false");
 
       // Animate closing
       if (!this.prefersReducedMotion()) {
         await AnimationManager.animate(
           this.animationState,
           { openProgress: 0 },
-          { duration: 150, easing: 'ease-in' }
+          { duration: 150, easing: "ease-in" },
         );
       } else {
         this.animationState.openProgress = 0;
       }
 
-      this.emit('closed');
-      this.announcer.textContent = 'Color picker closed';
+      this.emit("closed");
+      this.announcer.textContent = "Color picker closed";
     } catch (error) {
-      this.errorHandler.handle(error, 'close');
+      this.errorHandler.handle(error, "close");
     }
   }
 
   prefersReducedMotion() {
     return (
       window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
     );
   }
 
@@ -774,8 +774,8 @@ class ColorPicker extends BaseObject {
             INPUT_UTILITY_CONSTANTS.LIGHTNESS_MAX_PERCENT,
             ((x - INPUT_UTILITY_CONSTANTS.SLIDER_MARGIN) /
               (this.width - INPUT_UTILITY_CONSTANTS.SLIDER_MARGIN * 2)) *
-              INPUT_UTILITY_CONSTANTS.LIGHTNESS_MAX_PERCENT
-          )
+              INPUT_UTILITY_CONSTANTS.LIGHTNESS_MAX_PERCENT,
+          ),
         );
         this.updateValue();
       }
@@ -793,8 +793,8 @@ class ColorPicker extends BaseObject {
           Math.min(
             1,
             (x - INPUT_UTILITY_CONSTANTS.SLIDER_MARGIN) /
-              (this.width - INPUT_UTILITY_CONSTANTS.SLIDER_MARGIN * 2)
-          )
+              (this.width - INPUT_UTILITY_CONSTANTS.SLIDER_MARGIN * 2),
+          ),
         );
         this.updateValue();
       }
@@ -805,17 +805,17 @@ class ColorPicker extends BaseObject {
           (this.width - INPUT_UTILITY_CONSTANTS.SLIDER_MARGIN * 2) /
           this.presets.length;
         const presetIndex = Math.floor(
-          (x - INPUT_UTILITY_CONSTANTS.SLIDER_MARGIN) / presetWidth
+          (x - INPUT_UTILITY_CONSTANTS.SLIDER_MARGIN) / presetWidth,
         );
 
         if (presetIndex >= 0 && presetIndex < this.presets.length) {
           this.setValue(
-            this.presets[presetIndex].color || this.presets[presetIndex]
+            this.presets[presetIndex].color || this.presets[presetIndex],
           );
         }
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'color-selection');
+      this.errorHandler.handle(error, "color-selection");
     }
   }
 
@@ -838,7 +838,7 @@ class ColorPicker extends BaseObject {
   }
 
   confirmSelection() {
-    this.emit('colorConfirmed', { value: this.value });
+    this.emit("colorConfirmed", { value: this.value });
     this.close();
   }
 
@@ -849,12 +849,12 @@ class ColorPicker extends BaseObject {
       const { key, shiftKey, ctrlKey, metaKey } = event;
 
       const keyCombo = [
-        shiftKey && 'Shift',
-        (ctrlKey || metaKey) && 'Ctrl',
+        shiftKey && "Shift",
+        (ctrlKey || metaKey) && "Ctrl",
         key,
       ]
         .filter(Boolean)
-        .join('+');
+        .join("+");
 
       const handler =
         this.keyboardHandler[keyCombo] || this.keyboardHandler[key];
@@ -864,7 +864,7 @@ class ColorPicker extends BaseObject {
         handler(event);
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'keyboard-handler');
+      this.errorHandler.handle(error, "keyboard-handler");
     }
   }
 
@@ -891,7 +891,7 @@ class ColorPicker extends BaseObject {
   getFocusableElements() {
     // Return array of focusable elements within the color picker
     return Array.from(
-      this.element?.querySelectorAll('[tabindex]:not([tabindex="-1"])') || []
+      this.element?.querySelectorAll('[tabindex]:not([tabindex="-1"])') || [],
     );
   }
 
@@ -902,7 +902,7 @@ class ColorPicker extends BaseObject {
       const { localX, localY } = event;
       this.handleColorSelection(localX, localY);
     } catch (error) {
-      this.errorHandler.handle(error, 'mouse-move');
+      this.errorHandler.handle(error, "mouse-move");
     }
   }
 
@@ -917,7 +917,7 @@ class ColorPicker extends BaseObject {
       // Add global mouse handlers for drag operations
       this.addGlobalMouseHandlers();
     } catch (error) {
-      this.errorHandler.handle(error, 'mouse-down');
+      this.errorHandler.handle(error, "mouse-down");
     }
   }
 
@@ -930,30 +930,30 @@ class ColorPicker extends BaseObject {
     this.globalMouseMove = this.handleMouseMove.bind(this);
     this.globalMouseUp = this.handleMouseUp.bind(this);
 
-    document.addEventListener('mousemove', this.globalMouseMove);
-    document.addEventListener('mouseup', this.globalMouseUp);
+    document.addEventListener("mousemove", this.globalMouseMove);
+    document.addEventListener("mouseup", this.globalMouseUp);
   }
 
   removeGlobalMouseHandlers() {
     if (this.globalMouseMove) {
-      document.removeEventListener('mousemove', this.globalMouseMove);
+      document.removeEventListener("mousemove", this.globalMouseMove);
       this.globalMouseMove = null;
     }
 
     if (this.globalMouseUp) {
-      document.removeEventListener('mouseup', this.globalMouseUp);
+      document.removeEventListener("mouseup", this.globalMouseUp);
       this.globalMouseUp = null;
     }
   }
 
   handleFocus() {
     this.isFocused = true;
-    this.emit('focus');
+    this.emit("focus");
   }
 
   handleBlur() {
     this.isFocused = false;
-    this.emit('blur');
+    this.emit("blur");
 
     // Close picker on blur if not persistent
     if (this.isOpen && !this.persistent) {
@@ -980,26 +980,26 @@ class ColorPicker extends BaseObject {
         this.adjustHue(delta);
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'wheel-handler');
+      this.errorHandler.handle(error, "wheel-handler");
     }
   }
 
   handleFocusIn() {
-    this.setAttribute('aria-describedby', 'color-picker-instructions');
+    this.setAttribute("aria-describedby", "color-picker-instructions");
     this.announcer.textContent =
-      'Use arrow keys to adjust color, Shift+arrows for saturation, Ctrl+arrows for lightness';
+      "Use arrow keys to adjust color, Shift+arrows for saturation, Ctrl+arrows for lightness";
   }
 
   handleFocusOut() {
-    this.removeAttribute('aria-describedby');
+    this.removeAttribute("aria-describedby");
   }
 
   // Enhanced rendering with performance optimization and caching
   renderSelf(renderer) {
-    if (renderer.type !== 'canvas') return;
+    if (renderer.type !== "canvas") return;
 
     try {
-      PerformanceMonitor.startMonitoring('ColorPicker');
+      PerformanceMonitor.startMonitoring("ColorPicker");
 
       if (!this.isOpen && this.animationState.openProgress === 0) {
         this.renderPreview(renderer);
@@ -1007,9 +1007,9 @@ class ColorPicker extends BaseObject {
         this.renderPicker(renderer);
       }
 
-      PerformanceMonitor.endMonitoring('ColorPicker');
+      PerformanceMonitor.endMonitoring("ColorPicker");
     } catch (error) {
-      this.errorHandler.handle(error, 'render');
+      this.errorHandler.handle(error, "render");
     }
   }
 
@@ -1024,7 +1024,7 @@ class ColorPicker extends BaseObject {
 
     // Create off-screen canvas for caching
     const offscreenCanvas = new OffscreenCanvas(this.width, this.height);
-    const offscreenRenderer = offscreenCanvas.getContext('2d');
+    const offscreenRenderer = offscreenCanvas.getContext("2d");
 
     // Render preview to off-screen canvas
     this.drawPreview(offscreenRenderer);
@@ -1045,21 +1045,21 @@ class ColorPicker extends BaseObject {
 
     // Enhanced border with theme support
     const borderColor = this.disabled
-      ? ComponentTheme.getColor('disabled', this.theme)
+      ? ComponentTheme.getColor("disabled", this.theme)
       : this.isFocused
-        ? ComponentTheme.getColor('focus', this.theme)
-        : ComponentTheme.getColor('border', this.theme);
+        ? ComponentTheme.getColor("focus", this.theme)
+        : ComponentTheme.getColor("border", this.theme);
 
     renderer.strokeStyle = borderColor;
     renderer.lineWidth = this.isFocused ? 2 : 1;
     renderer.strokeRect(0, 0, this.width, this.height);
 
     // Improved dropdown arrow with theme support
-    renderer.fillStyle = ComponentTheme.getColor('textSecondary', this.theme);
-    renderer.font = '12px Arial';
-    renderer.textAlign = 'right';
-    renderer.textBaseline = 'middle';
-    renderer.fillText('▼', this.width - 10, this.height / 2);
+    renderer.fillStyle = ComponentTheme.getColor("textSecondary", this.theme);
+    renderer.font = "12px Arial";
+    renderer.textAlign = "right";
+    renderer.textBaseline = "middle";
+    renderer.fillText("▼", this.width - 10, this.height / 2);
 
     // Focus indicator
     if (this.isFocused) {
@@ -1068,20 +1068,20 @@ class ColorPicker extends BaseObject {
 
     // Disabled overlay
     if (this.disabled) {
-      renderer.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      renderer.fillStyle = "rgba(255, 255, 255, 0.5)";
       renderer.fillRect(0, 0, this.width, this.height);
     }
   }
 
   drawFocusIndicator(renderer) {
-    renderer.strokeStyle = ComponentTheme.getColor('focus', this.theme);
+    renderer.strokeStyle = ComponentTheme.getColor("focus", this.theme);
     renderer.lineWidth = 2;
     renderer.setLineDash([2, 2]);
     renderer.strokeRect(
       INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_OFFSET,
       INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_OFFSET,
       this.width - INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_BORDER,
-      this.height - INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_BORDER
+      this.height - INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_BORDER,
     );
     renderer.setLineDash([]);
   }
@@ -1092,11 +1092,11 @@ class ColorPicker extends BaseObject {
     renderer.globalAlpha = alpha;
 
     // Background with theme support
-    renderer.fillStyle = ComponentTheme.getColor('background', this.theme);
+    renderer.fillStyle = ComponentTheme.getColor("background", this.theme);
     renderer.fillRect(0, 0, this.width, this.height);
 
     // Enhanced border
-    renderer.strokeStyle = ComponentTheme.getColor('border', this.theme);
+    renderer.strokeStyle = ComponentTheme.getColor("border", this.theme);
     renderer.lineWidth = 1;
     renderer.strokeRect(0, 0, this.width, this.height);
 
@@ -1145,7 +1145,7 @@ class ColorPicker extends BaseObject {
           const rgb = this.hslToRgb(
             hue,
             saturation,
-            INPUT_UTILITY_CONSTANTS.COLOR_WHEEL_LIGHTNESS_DEFAULT
+            INPUT_UTILITY_CONSTANTS.COLOR_WHEEL_LIGHTNESS_DEFAULT,
           );
           const index =
             (y * radius * 2 + x) * INPUT_UTILITY_CONSTANTS.RGBA_CHANNELS;
@@ -1173,7 +1173,7 @@ class ColorPicker extends BaseObject {
     const indicatorY = centerY + Math.sin(currentAngle) * currentDistance;
 
     // Indicator ring
-    renderer.strokeStyle = '#ffffff';
+    renderer.strokeStyle = "#ffffff";
     renderer.lineWidth = 3;
     renderer.beginPath();
     renderer.arc(
@@ -1181,11 +1181,11 @@ class ColorPicker extends BaseObject {
       indicatorY,
       INPUT_UTILITY_CONSTANTS.COLOR_INDICATOR_RADIUS,
       0,
-      Math.PI * 2
+      Math.PI * 2,
     );
     renderer.stroke();
 
-    renderer.strokeStyle = '#000000';
+    renderer.strokeStyle = "#000000";
     renderer.lineWidth = 1;
     renderer.beginPath();
     renderer.arc(
@@ -1193,7 +1193,7 @@ class ColorPicker extends BaseObject {
       indicatorY,
       INPUT_UTILITY_CONSTANTS.COLOR_INDICATOR_RADIUS,
       0,
-      Math.PI * 2
+      Math.PI * 2,
     );
     renderer.stroke();
 
@@ -1205,7 +1205,7 @@ class ColorPicker extends BaseObject {
       indicatorY,
       INPUT_UTILITY_CONSTANTS.COLOR_INDICATOR_CENTER_RADIUS,
       0,
-      Math.PI * 2
+      Math.PI * 2,
     );
     renderer.fill();
   }
@@ -1229,7 +1229,7 @@ class ColorPicker extends BaseObject {
     }
 
     // Slider border
-    renderer.strokeStyle = ComponentTheme.getColor('border', this.theme);
+    renderer.strokeStyle = ComponentTheme.getColor("border", this.theme);
     renderer.lineWidth = 1;
     renderer.strokeRect(startX, y, endX - startX, height);
 
@@ -1257,7 +1257,7 @@ class ColorPicker extends BaseObject {
     renderer.fillRect(startX, y, endX - startX, height);
 
     // Slider border
-    renderer.strokeStyle = ComponentTheme.getColor('border', this.theme);
+    renderer.strokeStyle = ComponentTheme.getColor("border", this.theme);
     renderer.lineWidth = 1;
     renderer.strokeRect(startX, y, endX - startX, height);
 
@@ -1274,12 +1274,12 @@ class ColorPicker extends BaseObject {
     for (let i = 0; i < checksX; i++) {
       for (let j = 0; j < checksY; j++) {
         const isEven = (i + j) % 2 === 0;
-        renderer.fillStyle = isEven ? '#ffffff' : '#e0e0e0';
+        renderer.fillStyle = isEven ? "#ffffff" : "#e0e0e0";
         renderer.fillRect(
           x + i * checkSize,
           y + j * checkSize,
           checkSize,
-          checkSize
+          checkSize,
         );
       }
     }
@@ -1294,41 +1294,41 @@ class ColorPicker extends BaseObject {
     const indicatorY = y - INPUT_UTILITY_CONSTANTS.SLIDER_INDICATOR_OFFSET;
 
     // Shadow
-    renderer.fillStyle = 'rgba(0, 0, 0, 0.2)';
+    renderer.fillStyle = "rgba(0, 0, 0, 0.2)";
     renderer.fillRect(
       indicatorX + 1,
       indicatorY + 1,
       indicatorWidth,
-      indicatorHeight
+      indicatorHeight,
     );
 
     // Main indicator
-    renderer.fillStyle = '#ffffff';
+    renderer.fillStyle = "#ffffff";
     renderer.fillRect(indicatorX, indicatorY, indicatorWidth, indicatorHeight);
 
     // Border
-    renderer.strokeStyle = '#000000';
+    renderer.strokeStyle = "#000000";
     renderer.lineWidth = 1;
     renderer.strokeRect(
       indicatorX,
       indicatorY,
       indicatorWidth,
-      indicatorHeight
+      indicatorHeight,
     );
 
     // Arrow pointer
     renderer.beginPath();
     renderer.moveTo(
       x,
-      y + height + INPUT_UTILITY_CONSTANTS.SLIDER_INDICATOR_OFFSET
+      y + height + INPUT_UTILITY_CONSTANTS.SLIDER_INDICATOR_OFFSET,
     );
     renderer.lineTo(
       x - INPUT_UTILITY_CONSTANTS.SLIDER_INDICATOR_OFFSET,
-      y + height + INPUT_UTILITY_CONSTANTS.INDICATOR_HEIGHT_OFFSET
+      y + height + INPUT_UTILITY_CONSTANTS.INDICATOR_HEIGHT_OFFSET,
     );
     renderer.lineTo(
       x + INPUT_UTILITY_CONSTANTS.SLIDER_INDICATOR_OFFSET,
-      y + height + INPUT_UTILITY_CONSTANTS.INDICATOR_HEIGHT_OFFSET
+      y + height + INPUT_UTILITY_CONSTANTS.INDICATOR_HEIGHT_OFFSET,
     );
     renderer.closePath();
     renderer.fill();
@@ -1354,31 +1354,31 @@ class ColorPicker extends BaseObject {
         x + INPUT_UTILITY_CONSTANTS.PRESET_BORDER_OFFSET,
         y + INPUT_UTILITY_CONSTANTS.PRESET_BORDER_OFFSET,
         presetWidth - INPUT_UTILITY_CONSTANTS.PRESET_BORDER_SIZE,
-        height - INPUT_UTILITY_CONSTANTS.PRESET_BORDER_HEIGHT
+        height - INPUT_UTILITY_CONSTANTS.PRESET_BORDER_HEIGHT,
       );
 
       // Border with selection highlight
       renderer.strokeStyle = isSelected
-        ? ComponentTheme.getColor('focus', this.theme)
-        : ComponentTheme.getColor('border', this.theme);
+        ? ComponentTheme.getColor("focus", this.theme)
+        : ComponentTheme.getColor("border", this.theme);
       renderer.lineWidth = isSelected ? 2 : 1;
       renderer.strokeRect(
         x + INPUT_UTILITY_CONSTANTS.PRESET_BORDER_OFFSET,
         y + INPUT_UTILITY_CONSTANTS.PRESET_BORDER_OFFSET,
         presetWidth - INPUT_UTILITY_CONSTANTS.PRESET_BORDER_SIZE,
-        height - INPUT_UTILITY_CONSTANTS.PRESET_BORDER_HEIGHT
+        height - INPUT_UTILITY_CONSTANTS.PRESET_BORDER_HEIGHT,
       );
 
       // Accessibility: Add preset name if available
       if (preset.name && this.isFocused) {
-        renderer.fillStyle = ComponentTheme.getColor('text', this.theme);
-        renderer.font = '10px Arial';
-        renderer.textAlign = 'center';
-        renderer.textBaseline = 'top';
+        renderer.fillStyle = ComponentTheme.getColor("text", this.theme);
+        renderer.font = "10px Arial";
+        renderer.textAlign = "center";
+        renderer.textBaseline = "top";
         renderer.fillText(
           preset.name.substring(0, INPUT_UTILITY_CONSTANTS.PRESET_NAME_LENGTH),
           x + presetWidth / 2,
-          y + height + 2
+          y + height + 2,
         );
       }
     });
@@ -1398,15 +1398,15 @@ class ColorPicker extends BaseObject {
     renderer.fillRect(x, y, width, height);
 
     // Border
-    renderer.strokeStyle = ComponentTheme.getColor('border', this.theme);
+    renderer.strokeStyle = ComponentTheme.getColor("border", this.theme);
     renderer.lineWidth = 1;
     renderer.strokeRect(x, y, width, height);
 
     // Color value text with theme support
-    renderer.fillStyle = ComponentTheme.getColor('text', this.theme);
-    renderer.font = '11px monospace';
-    renderer.textAlign = 'center';
-    renderer.textBaseline = 'top';
+    renderer.fillStyle = ComponentTheme.getColor("text", this.theme);
+    renderer.font = "11px monospace";
+    renderer.textAlign = "center";
+    renderer.textBaseline = "top";
     renderer.fillText(this.value, this.width / 2, y + height + 2);
   }
 
@@ -1414,22 +1414,22 @@ class ColorPicker extends BaseObject {
     if (!this.isFocused) return;
 
     const instructions = [
-      'Arrow keys: Adjust hue/lightness',
-      'Shift+Arrows: Adjust saturation',
-      'Enter: Confirm, Esc: Cancel',
+      "Arrow keys: Adjust hue/lightness",
+      "Shift+Arrows: Adjust saturation",
+      "Enter: Confirm, Esc: Cancel",
     ];
 
-    renderer.fillStyle = ComponentTheme.getColor('textSecondary', this.theme);
-    renderer.font = '10px Arial';
-    renderer.textAlign = 'left';
-    renderer.textBaseline = 'top';
+    renderer.fillStyle = ComponentTheme.getColor("textSecondary", this.theme);
+    renderer.font = "10px Arial";
+    renderer.textAlign = "left";
+    renderer.textBaseline = "top";
 
     instructions.forEach((instruction, index) => {
       renderer.fillText(
         instruction,
         INPUT_UTILITY_CONSTANTS.INSTRUCTION_MARGIN,
         INPUT_UTILITY_CONSTANTS.INSTRUCTION_MARGIN +
-          index * INPUT_UTILITY_CONSTANTS.INSTRUCTION_LINE_HEIGHT
+          index * INPUT_UTILITY_CONSTANTS.INSTRUCTION_LINE_HEIGHT,
       );
     });
   }
@@ -1460,7 +1460,7 @@ class ColorPicker extends BaseObject {
       if (!this.isValidColor(value)) {
         throw new ComponentError(
           `Invalid color value: ${value}`,
-          'ColorPicker'
+          "ColorPicker",
         );
       }
 
@@ -1470,7 +1470,7 @@ class ColorPicker extends BaseObject {
       this.clearRenderCache();
 
       if (oldValue !== this.value) {
-        this.emit('colorChanged', {
+        this.emit("colorChanged", {
           value: this.value,
           oldValue,
           hsl: { h: this.hue, s: this.saturation, l: this.lightness },
@@ -1478,7 +1478,7 @@ class ColorPicker extends BaseObject {
         });
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'setValue');
+      this.errorHandler.handle(error, "setValue");
     }
   }
 
@@ -1496,7 +1496,7 @@ class ColorPicker extends BaseObject {
     if (hue !== undefined)
       this.hue = Math.max(
         0,
-        Math.min(INPUT_UTILITY_CONSTANTS.HUE_MAX_DEGREES, hue)
+        Math.min(INPUT_UTILITY_CONSTANTS.HUE_MAX_DEGREES, hue),
       );
     if (saturation !== undefined)
       this.saturation = Math.max(0, Math.min(100, saturation));
@@ -1508,7 +1508,7 @@ class ColorPicker extends BaseObject {
   }
 
   reset() {
-    this.value = '#ff0000';
+    this.value = "#ff0000";
     this.hue = 0;
     this.saturation = 100;
     this.lightness = 50;
@@ -1516,22 +1516,22 @@ class ColorPicker extends BaseObject {
     this.isOpen = false;
     this.animationState.openProgress = 0;
     this.clearRenderCache();
-    this.emit('reset');
+    this.emit("reset");
   }
 
   enable() {
     this.disabled = false;
-    this.setAttribute('tabindex', '0');
+    this.setAttribute("tabindex", "0");
     this.clearRenderCache();
-    this.emit('enabled');
+    this.emit("enabled");
   }
 
   disable() {
     this.disabled = true;
-    this.setAttribute('tabindex', '-1');
+    this.setAttribute("tabindex", "-1");
     this.close();
     this.clearRenderCache();
-    this.emit('disabled');
+    this.emit("disabled");
   }
 
   // Cleanup and memory management
@@ -1564,9 +1564,9 @@ class ColorPicker extends BaseObject {
 
       // Call parent cleanup
       super.destroy?.();
-      this.emit('destroyed');
+      this.emit("destroyed");
     } catch (error) {
-      ComponentDebug.componentError('ColorPicker', error, 'cleanup');
+      ComponentDebug.componentError("ColorPicker", error, "cleanup");
     }
   }
 }

@@ -41,7 +41,7 @@ class DonationTracker {
     this.setDonorStatus(true);
 
     // Show confirmation
-    const notification = document.createElement('div');
+    const notification = document.createElement("div");
     notification.innerHTML = `
       <div style="
         position: fixed;
@@ -76,7 +76,7 @@ class DonationTracker {
     this.setDonorStatus(false);
 
     // Show confirmation
-    const notification = document.createElement('div');
+    const notification = document.createElement("div");
     notification.innerHTML = `
       <div style="
         position: fixed;

@@ -29,15 +29,15 @@
   box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 }
 
-.donor-flair-badge[data-tier='3'] {
+.donor-flair-badge[data-tier="3"] {
   filter: drop-shadow(0 0 2px rgb(255 215 0 / 50%));
 }
 
-.donor-flair-badge[data-tier='2'] {
+.donor-flair-badge[data-tier="2"] {
   filter: drop-shadow(0 0 2px rgb(192 192 192 / 50%));
 }
 
-.donor-flair-badge[data-tier='1'] {
+.donor-flair-badge[data-tier="1"] {
   filter: drop-shadow(0 0 2px rgb(205 127 50 / 50%));
 }
 
@@ -48,7 +48,7 @@
 }
 
 .has-donor-flair::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -2px;
   left: 0;
@@ -201,7 +201,7 @@
 }
 
 .nav-link.has-donor-flair::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -2px;
   right: -2px;
@@ -249,18 +249,18 @@
 }
 
 /* Tier-specific colors */
-.donor-card[data-tier='3'],
-.donor-tier-group[data-tier='3'] {
+.donor-card[data-tier="3"],
+.donor-tier-group[data-tier="3"] {
   --flair-color: #ffd700;
 }
 
-.donor-card[data-tier='2'],
-.donor-tier-group[data-tier='2'] {
+.donor-card[data-tier="2"],
+.donor-tier-group[data-tier="2"] {
   --flair-color: #c0c0c0;
 }
 
-.donor-card[data-tier='1'],
-.donor-tier-group[data-tier='1'] {
+.donor-card[data-tier="1"],
+.donor-tier-group[data-tier="1"] {
   --flair-color: #cd7f32;
 }
 

@@ -29,7 +29,7 @@ import {
   deleteObject,
   listAll,
   getMetadata,
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 /**
  * Storage Configuration
@@ -62,25 +62,25 @@ const STORAGE_CONFIG = {
 
   // Allowed file types
   ALLOWED_TYPES: {
-    IMAGES: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+    IMAGES: ["image/jpeg", "image/png", "image/gif", "image/webp"],
     DOCUMENTS: [
-      'application/pdf',
-      'text/plain',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      "application/pdf",
+      "text/plain",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ],
-    VIDEOS: ['video/mp4', 'video/webm', 'video/quicktime'],
+    VIDEOS: ["video/mp4", "video/webm", "video/quicktime"],
   },
 
   // Storage paths
   PATHS: {
-    USER_PROFILES: 'users/{userId}/profile',
-    USER_DOCUMENTS: 'users/{userId}/documents',
-    BLOG_IMAGES: 'blogs/{blogId}/images',
-    BLOG_DOCUMENTS: 'blogs/{blogId}/documents',
-    FORUM_ATTACHMENTS: 'forum/{postId}/attachments',
-    SCENARIO_ASSETS: 'scenarios/{scenarioId}/assets',
-    TEMP_UPLOADS: 'temp/{sessionId}',
+    USER_PROFILES: "users/{userId}/profile",
+    USER_DOCUMENTS: "users/{userId}/documents",
+    BLOG_IMAGES: "blogs/{blogId}/images",
+    BLOG_DOCUMENTS: "blogs/{blogId}/documents",
+    FORUM_ATTACHMENTS: "forum/{postId}/attachments",
+    SCENARIO_ASSETS: "scenarios/{scenarioId}/assets",
+    TEMP_UPLOADS: "temp/{sessionId}",
   },
 };
 
@@ -107,36 +107,36 @@ export class FirebaseStorageService {
    * User Profile Operations
    */
   async uploadUserProfileImage(userId, file, progressCallback = null) {
-    const validation = this.validateFile(file, 'PROFILE_IMAGE');
+    const validation = this.validateFile(file, "PROFILE_IMAGE");
     if (!validation.valid) {
       throw new Error(validation.error);
     }
 
-    const filePath = `${STORAGE_CONFIG.PATHS.USER_PROFILES.replace('{userId}', userId)}/avatar_${Date.now()}.${this.getFileExtension(file.name)}`;
+    const filePath = `${STORAGE_CONFIG.PATHS.USER_PROFILES.replace("{userId}", userId)}/avatar_${Date.now()}.${this.getFileExtension(file.name)}`;
     const storageRef = ref(this.storage, filePath);
 
     try {
       const result = await this.uploadFileWithProgress(
         storageRef,
         file,
-        progressCallback
+        progressCallback,
       );
 
       // Store metadata in hybrid data service
       if (this.hybridData) {
         await this.hybridData.createFirestoreDocument(
-          'user_files',
+          "user_files",
           `${userId}_avatar`,
           {
             userId,
-            type: 'profile_image',
+            type: "profile_image",
             fileName: file.name,
             filePath,
             downloadURL: result.downloadURL,
             size: file.size,
             contentType: file.type,
             uploadedAt: new Date(),
-          }
+          },
         );
       }
 
@@ -153,15 +153,15 @@ export class FirebaseStorageService {
 
   async getUserProfileImages(userId) {
     const folderPath = STORAGE_CONFIG.PATHS.USER_PROFILES.replace(
-      '{userId}',
-      userId
+      "{userId}",
+      userId,
     );
     const folderRef = ref(this.storage, folderPath);
 
     try {
       const listResult = await listAll(folderRef);
       const images = await Promise.all(
-        listResult.items.map(async itemRef => {
+        listResult.items.map(async (itemRef) => {
           const downloadURL = await getDownloadURL(itemRef);
           const metadata = await getMetadata(itemRef);
           return {
@@ -172,7 +172,7 @@ export class FirebaseStorageService {
             timeCreated: metadata.timeCreated,
             path: itemRef.fullPath,
           };
-        })
+        }),
       );
 
       return { success: true, images };
@@ -185,36 +185,36 @@ export class FirebaseStorageService {
    * Blog Operations
    */
   async uploadBlogImage(blogId, file, progressCallback = null) {
-    const validation = this.validateFile(file, 'BLOG_IMAGE');
+    const validation = this.validateFile(file, "BLOG_IMAGE");
     if (!validation.valid) {
       throw new Error(validation.error);
     }
 
-    const filePath = `${STORAGE_CONFIG.PATHS.BLOG_IMAGES.replace('{blogId}', blogId)}/image_${Date.now()}_${file.name}`;
+    const filePath = `${STORAGE_CONFIG.PATHS.BLOG_IMAGES.replace("{blogId}", blogId)}/image_${Date.now()}_${file.name}`;
     const storageRef = ref(this.storage, filePath);
 
     try {
       const result = await this.uploadFileWithProgress(
         storageRef,
         file,
-        progressCallback
+        progressCallback,
       );
 
       // Store metadata
       if (this.hybridData) {
         await this.hybridData.createFirestoreDocument(
-          'blog_files',
+          "blog_files",
           `${blogId}_${Date.now()}`,
           {
             blogId,
-            type: 'blog_image',
+            type: "blog_image",
             fileName: file.name,
             filePath,
             downloadURL: result.downloadURL,
             size: file.size,
             contentType: file.type,
             uploadedAt: new Date(),
-          }
+          },
         );
       }
 
@@ -231,15 +231,15 @@ export class FirebaseStorageService {
 
   async getBlogImages(blogId) {
     const folderPath = STORAGE_CONFIG.PATHS.BLOG_IMAGES.replace(
-      '{blogId}',
-      blogId
+      "{blogId}",
+      blogId,
     );
     const folderRef = ref(this.storage, folderPath);
 
     try {
       const listResult = await listAll(folderRef);
       const images = await Promise.all(
-        listResult.items.map(async itemRef => {
+        listResult.items.map(async (itemRef) => {
           const downloadURL = await getDownloadURL(itemRef);
           const metadata = await getMetadata(itemRef);
           return {
@@ -250,7 +250,7 @@ export class FirebaseStorageService {
             timeCreated: metadata.timeCreated,
             path: itemRef.fullPath,
           };
-        })
+        }),
       );
 
       return { success: true, images };
@@ -263,36 +263,36 @@ export class FirebaseStorageService {
    * Forum Operations
    */
   async uploadForumAttachment(postId, file, progressCallback = null) {
-    const validation = this.validateFile(file, 'FORUM_ATTACHMENT');
+    const validation = this.validateFile(file, "FORUM_ATTACHMENT");
     if (!validation.valid) {
       throw new Error(validation.error);
     }
 
-    const filePath = `${STORAGE_CONFIG.PATHS.FORUM_ATTACHMENTS.replace('{postId}', postId)}/attachment_${Date.now()}_${file.name}`;
+    const filePath = `${STORAGE_CONFIG.PATHS.FORUM_ATTACHMENTS.replace("{postId}", postId)}/attachment_${Date.now()}_${file.name}`;
     const storageRef = ref(this.storage, filePath);
 
     try {
       const result = await this.uploadFileWithProgress(
         storageRef,
         file,
-        progressCallback
+        progressCallback,
       );
 
       // Store metadata
       if (this.hybridData) {
         await this.hybridData.createFirestoreDocument(
-          'forum_files',
+          "forum_files",
           `${postId}_${Date.now()}`,
           {
             postId,
-            type: 'forum_attachment',
+            type: "forum_attachment",
             fileName: file.name,
             filePath,
             downloadURL: result.downloadURL,
             size: file.size,
             contentType: file.type,
             uploadedAt: new Date(),
-          }
+          },
         );
       }
 
@@ -309,15 +309,15 @@ export class FirebaseStorageService {
 
   async getForumAttachments(postId) {
     const folderPath = STORAGE_CONFIG.PATHS.FORUM_ATTACHMENTS.replace(
-      '{postId}',
-      postId
+      "{postId}",
+      postId,
     );
     const folderRef = ref(this.storage, folderPath);
 
     try {
       const listResult = await listAll(folderRef);
       const attachments = await Promise.all(
-        listResult.items.map(async itemRef => {
+        listResult.items.map(async (itemRef) => {
           const downloadURL = await getDownloadURL(itemRef);
           const metadata = await getMetadata(itemRef);
           return {
@@ -328,7 +328,7 @@ export class FirebaseStorageService {
             timeCreated: metadata.timeCreated,
             path: itemRef.fullPath,
           };
-        })
+        }),
       );
 
       return { success: true, attachments };
@@ -343,28 +343,28 @@ export class FirebaseStorageService {
   async uploadUserDocument(
     userId,
     file,
-    documentType = 'general',
-    progressCallback = null
+    documentType = "general",
+    progressCallback = null,
   ) {
-    const validation = this.validateFile(file, 'DOCUMENT');
+    const validation = this.validateFile(file, "DOCUMENT");
     if (!validation.valid) {
       throw new Error(validation.error);
     }
 
-    const filePath = `${STORAGE_CONFIG.PATHS.USER_DOCUMENTS.replace('{userId}', userId)}/${documentType}_${Date.now()}_${file.name}`;
+    const filePath = `${STORAGE_CONFIG.PATHS.USER_DOCUMENTS.replace("{userId}", userId)}/${documentType}_${Date.now()}_${file.name}`;
     const storageRef = ref(this.storage, filePath);
 
     try {
       const result = await this.uploadFileWithProgress(
         storageRef,
         file,
-        progressCallback
+        progressCallback,
       );
 
       // Store metadata
       if (this.hybridData) {
         await this.hybridData.createFirestoreDocument(
-          'user_documents',
+          "user_documents",
           `${userId}_${Date.now()}`,
           {
             userId,
@@ -375,7 +375,7 @@ export class FirebaseStorageService {
             size: file.size,
             contentType: file.type,
             uploadedAt: new Date(),
-          }
+          },
         );
       }
 
@@ -401,8 +401,8 @@ export class FirebaseStorageService {
       this.activeUploads.set(uploadId, uploadTask);
 
       uploadTask.on(
-        'state_changed',
-        snapshot => {
+        "state_changed",
+        (snapshot) => {
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           const { state } = snapshot;
@@ -417,17 +417,17 @@ export class FirebaseStorageService {
           }
 
           switch (state) {
-            case 'paused':
+            case "paused":
               // Upload paused
               break;
-            case 'running':
+            case "running":
               // Upload running
               break;
             default:
               break;
           }
         },
-        error => {
+        (error) => {
           this.activeUploads.delete(uploadId);
           reject(error);
         },
@@ -446,7 +446,7 @@ export class FirebaseStorageService {
           } catch (error) {
             reject(error);
           }
-        }
+        },
       );
     });
   }
@@ -486,8 +486,8 @@ export class FirebaseStorageService {
 
       return { success: true, deletedPath: filePath };
     } catch (error) {
-      if (error.code === 'storage/object-not-found') {
-        throw new Error('File not found');
+      if (error.code === "storage/object-not-found") {
+        throw new Error("File not found");
       }
       throw new Error(`File deletion failed: ${error.message}`);
     }
@@ -498,17 +498,17 @@ export class FirebaseStorageService {
    */
   async deleteFiles(filePaths) {
     try {
-      const deletePromises = filePaths.map(path => this.deleteFile(path));
+      const deletePromises = filePaths.map((path) => this.deleteFile(path));
       const results = await Promise.allSettled(deletePromises);
 
-      const successful = results.filter(r => r.status === 'fulfilled');
-      const failed = results.filter(r => r.status === 'rejected');
+      const successful = results.filter((r) => r.status === "fulfilled");
+      const failed = results.filter((r) => r.status === "rejected");
 
       return {
         success: failed.length === 0,
         successful: successful.length,
         failed: failed.length,
-        errors: failed.map(f => f.reason.message),
+        errors: failed.map((f) => f.reason.message),
       };
     } catch (error) {
       throw new Error(`Bulk file deletion failed: ${error.message}`);
@@ -546,7 +546,7 @@ export class FirebaseStorageService {
    */
   validateFile(file, uploadType) {
     if (!file) {
-      return { valid: false, error: 'No file provided' };
+      return { valid: false, error: "No file provided" };
     }
 
     // Check file size
@@ -563,7 +563,7 @@ export class FirebaseStorageService {
     if (!allowedTypes.includes(file.type)) {
       return {
         valid: false,
-        error: `File type ${file.type} is not allowed. Allowed types: ${allowedTypes.join(', ')}`,
+        error: `File type ${file.type} is not allowed. Allowed types: ${allowedTypes.join(", ")}`,
       };
     }
 
@@ -575,15 +575,15 @@ export class FirebaseStorageService {
    */
   getAllowedTypesForUpload(uploadType) {
     switch (uploadType) {
-      case 'PROFILE_IMAGE':
-      case 'BLOG_IMAGE':
+      case "PROFILE_IMAGE":
+      case "BLOG_IMAGE":
         return STORAGE_CONFIG.ALLOWED_TYPES.IMAGES;
-      case 'FORUM_ATTACHMENT':
+      case "FORUM_ATTACHMENT":
         return [
           ...STORAGE_CONFIG.ALLOWED_TYPES.IMAGES,
           ...STORAGE_CONFIG.ALLOWED_TYPES.DOCUMENTS,
         ];
-      case 'DOCUMENT':
+      case "DOCUMENT":
         return STORAGE_CONFIG.ALLOWED_TYPES.DOCUMENTS;
       default:
         return [
@@ -629,24 +629,24 @@ export class FirebaseStorageService {
    * Utility Methods
    */
   formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = BYTES_PER_KB;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
   }
 
   getFileExtension(filename) {
-    return filename.split('.').pop().toLowerCase();
+    return filename.split(".").pop().toLowerCase();
   }
 
-  generateUniqueFileName(originalName, prefix = '') {
+  generateUniqueFileName(originalName, prefix = "") {
     const timestamp = Date.now();
     const random = Math.random()
       .toString(RADIX_BASE_36)
       .substring(2, RANDOM_STRING_LENGTH);
     const extension = this.getFileExtension(originalName);
-    const baseName = originalName.replace(/\.[^/.]+$/, '');
+    const baseName = originalName.replace(/\.[^/.]+$/, "");
 
     return `${prefix}${timestamp}_${random}_${baseName}.${extension}`;
   }
@@ -663,33 +663,33 @@ export class FirebaseStorageService {
       try {
         let result;
         switch (uploadType) {
-          case 'PROFILE_IMAGE':
+          case "PROFILE_IMAGE":
             result = await this.uploadUserProfileImage(
-              'current_user',
+              "current_user",
               file,
-              progressCallback
+              progressCallback,
             );
             break;
-          case 'BLOG_IMAGE':
+          case "BLOG_IMAGE":
             result = await this.uploadBlogImage(
-              'current_blog',
+              "current_blog",
               file,
-              progressCallback
+              progressCallback,
             );
             break;
-          case 'FORUM_ATTACHMENT':
+          case "FORUM_ATTACHMENT":
             result = await this.uploadForumAttachment(
-              'current_post',
+              "current_post",
               file,
-              progressCallback
+              progressCallback,
             );
             break;
           default:
             result = await this.uploadUserDocument(
-              'current_user',
+              "current_user",
               file,
-              'general',
-              progressCallback
+              "general",
+              progressCallback,
             );
         }
 
@@ -701,8 +701,8 @@ export class FirebaseStorageService {
 
     return {
       total: files.length,
-      successful: results.filter(r => r.success).length,
-      failed: results.filter(r => !r.success).length,
+      successful: results.filter((r) => r.success).length,
+      failed: results.filter((r) => !r.success).length,
       results,
     };
   }
@@ -712,7 +712,7 @@ export class FirebaseStorageService {
    */
   async cleanupTempFiles(olderThanHours = 24) {
     try {
-      const tempRef = ref(this.storage, 'temp/');
+      const tempRef = ref(this.storage, "temp/");
       const listResult = await listAll(tempRef);
       const cutoffTime =
         Date.now() -
@@ -738,7 +738,7 @@ export class FirebaseStorageService {
         };
       }
 
-      return { success: true, cleaned: 0, message: 'No temp files to clean' };
+      return { success: true, cleaned: 0, message: "No temp files to clean" };
     } catch (error) {
       throw new Error(`Temp file cleanup failed: ${error.message}`);
     }
@@ -756,7 +756,7 @@ export class FirebaseStorageService {
         folders: {},
       };
 
-      const basePath = userId ? `users/${userId}` : '';
+      const basePath = userId ? `users/${userId}` : "";
       const baseRef = ref(this.storage, basePath);
       const listResult = await listAll(baseRef);
 
@@ -767,15 +767,15 @@ export class FirebaseStorageService {
           stats.totalFiles++;
           stats.totalSize += metadata.size;
 
-          const type = metadata.contentType || 'unknown';
+          const type = metadata.contentType || "unknown";
           stats.fileTypes[type] = (stats.fileTypes[type] || 0) + 1;
 
           const folder =
             itemRef.fullPath
-              .split('/')
+              .split("/")
               .slice(FOLDER_DEPTH_OFFSET, PARENT_FOLDER_INDEX)[
               FOLDER_NAME_INDEX
-            ] || 'root';
+            ] || "root";
           if (!stats.folders[folder]) {
             stats.folders[folder] = { files: 0, size: 0 };
           }
@@ -792,7 +792,7 @@ export class FirebaseStorageService {
         stats.totalFiles += folderStats.totalFiles;
         stats.totalSize += folderStats.totalSize;
 
-        Object.keys(folderStats.fileTypes).forEach(type => {
+        Object.keys(folderStats.fileTypes).forEach((type) => {
           stats.fileTypes[type] =
             (stats.fileTypes[type] || 0) + folderStats.fileTypes[type];
         });

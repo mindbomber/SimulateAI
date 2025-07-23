@@ -23,8 +23,8 @@
  * @license Apache-2.0
  */
 
-import { simpleStorage, userPreferences } from './simple-storage.js';
-import logger from './logger.js';
+import { simpleStorage, userPreferences } from "./simple-storage.js";
+import logger from "./logger.js";
 
 // Constants to avoid magic numbers
 const ANALYTICS_CONSTANTS = {
@@ -46,7 +46,7 @@ class SimpleAnalyticsManager {
     this.sessionId = this.generateSessionId();
     this.startTime = Date.now();
 
-    logger.info('Analytics', '📊 Simple Analytics Manager initialized');
+    logger.info("Analytics", "📊 Simple Analytics Manager initialized");
   }
 
   /**
@@ -90,9 +90,9 @@ class SimpleAnalyticsManager {
         this.events = this.events.slice(-this.maxEvents);
       }
 
-      logger.info('📊 Event tracked:', eventName, data);
+      logger.info("📊 Event tracked:", eventName, data);
     } catch (error) {
-      logger.warn('Error tracking event:', error);
+      logger.warn("Error tracking event:", error);
     }
   }
 
@@ -100,14 +100,14 @@ class SimpleAnalyticsManager {
    * Track page view
    */
   trackPageView(page = window.location.pathname) {
-    this.trackEvent('page_view', { page });
+    this.trackEvent("page_view", { page });
   }
 
   /**
    * Track simulation start
    */
   trackSimulationStart(simulationId, metadata = {}) {
-    this.trackEvent('simulation_start', {
+    this.trackEvent("simulation_start", {
       simulationId,
       ...metadata,
     });
@@ -117,7 +117,7 @@ class SimpleAnalyticsManager {
    * Track simulation completion
    */
   trackSimulationComplete(simulationId, results = {}) {
-    this.trackEvent('simulation_complete', {
+    this.trackEvent("simulation_complete", {
       simulationId,
       score: results.score || 0,
       timeSpent: results.timeSpent || 0,
@@ -130,7 +130,7 @@ class SimpleAnalyticsManager {
    * Track user interaction
    */
   trackInteraction(type, target, details = {}) {
-    this.trackEvent('user_interaction', {
+    this.trackEvent("user_interaction", {
       type,
       target,
       ...details,
@@ -141,7 +141,7 @@ class SimpleAnalyticsManager {
    * Track performance metrics
    */
   trackPerformance(metric, value, details = {}) {
-    this.trackEvent('performance', {
+    this.trackEvent("performance", {
       metric,
       value,
       ...details,
@@ -152,7 +152,7 @@ class SimpleAnalyticsManager {
    * Track accessibility usage
    */
   trackAccessibility(feature, enabled, details = {}) {
-    this.trackEvent('accessibility', {
+    this.trackEvent("accessibility", {
       feature,
       enabled,
       ...details,
@@ -163,9 +163,9 @@ class SimpleAnalyticsManager {
    * Track error
    */
   trackError(error, context = {}) {
-    this.trackEvent('error', {
+    this.trackEvent("error", {
       message: error.message || String(error),
-      stack: error.stack || 'No stack trace',
+      stack: error.stack || "No stack trace",
       ...context,
     });
   }
@@ -175,7 +175,7 @@ class SimpleAnalyticsManager {
    */
   getSessionSummary() {
     const sessionEvents = this.events.filter(
-      e => e.sessionId === this.sessionId
+      (e) => e.sessionId === this.sessionId,
     );
     const duration = Date.now() - this.startTime;
 
@@ -201,7 +201,7 @@ class SimpleAnalyticsManager {
    */
   clearEvents() {
     this.events = [];
-    logger.info('📊 Analytics events cleared');
+    logger.info("📊 Analytics events cleared");
   }
 
   /**
@@ -210,10 +210,10 @@ class SimpleAnalyticsManager {
   saveEvents() {
     try {
       const summary = this.getSessionSummary();
-      simpleStorage.set('analytics_session', summary);
-      simpleStorage.set('analytics_events', this.events);
+      simpleStorage.set("analytics_session", summary);
+      simpleStorage.set("analytics_events", this.events);
     } catch (error) {
-      logger.warn('Error saving analytics events:', error);
+      logger.warn("Error saving analytics events:", error);
     }
   }
 
@@ -222,19 +222,19 @@ class SimpleAnalyticsManager {
    */
   loadEvents() {
     try {
-      const savedEvents = simpleStorage.get('analytics_events', []);
-      const savedSession = simpleStorage.get('analytics_session', null);
+      const savedEvents = simpleStorage.get("analytics_events", []);
+      const savedSession = simpleStorage.get("analytics_session", null);
 
       if (savedEvents.length > 0) {
         this.events = savedEvents;
-        logger.info('📊 Loaded', savedEvents.length, 'analytics events');
+        logger.info("📊 Loaded", savedEvents.length, "analytics events");
       }
 
       if (savedSession) {
-        logger.info('📊 Previous session:', savedSession);
+        logger.info("📊 Previous session:", savedSession);
       }
     } catch (error) {
-      logger.warn('Error loading analytics events:', error);
+      logger.warn("Error loading analytics events:", error);
     }
   }
 
@@ -252,13 +252,13 @@ class SimpleAnalyticsManager {
       }, ANALYTICS_CONSTANTS.AUTO_SAVE_INTERVAL); // Every 30 seconds
 
       // Save events when page unloads
-      window.addEventListener('beforeunload', () => {
+      window.addEventListener("beforeunload", () => {
         this.saveEvents();
       });
 
-      logger.info('Analytics', '📊 Simple Analytics Manager ready');
+      logger.info("Analytics", "📊 Simple Analytics Manager ready");
     } catch (error) {
-      logger.warn('Error initializing analytics:', error);
+      logger.warn("Error initializing analytics:", error);
     }
   }
 
@@ -267,7 +267,7 @@ class SimpleAnalyticsManager {
    */
   setEnabled(enabled) {
     this.enabled = enabled;
-    logger.info('📊 Analytics', enabled ? 'enabled' : 'disabled');
+    logger.info("📊 Analytics", enabled ? "enabled" : "disabled");
 
     // Save preference
     try {
@@ -275,7 +275,7 @@ class SimpleAnalyticsManager {
       prefs.analytics = enabled;
       // Note: We're not saving this back as it would require updating the preference structure
     } catch (error) {
-      logger.warn('Error saving analytics preference:', error);
+      logger.warn("Error saving analytics preference:", error);
     }
   }
 }
@@ -293,4 +293,4 @@ window.SimpleAnalytics = simpleAnalytics;
 // Auto-initialize
 simpleAnalytics.init();
 
-logger.info('Analytics', '✅ Simple Analytics Manager loaded');
+logger.info("Analytics", "✅ Simple Analytics Manager loaded");

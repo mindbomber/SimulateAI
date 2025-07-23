@@ -25,9 +25,9 @@
  * Licensed under the Apache License, Version 2.0
  */
 
-import { BaseObject } from '../../objects/enhanced-objects.js';
-import { INPUT_UTILITY_CONSTANTS } from './constants.js';
-import { ComponentTheme } from './theme.js';
+import { BaseObject } from "../../objects/enhanced-objects.js";
+import { INPUT_UTILITY_CONSTANTS } from "./constants.js";
+import { ComponentTheme } from "./theme.js";
 
 // Number input specific constants
 const NUMBER_INPUT_REPEAT_INTERVAL = 100;
@@ -52,7 +52,7 @@ const DEFAULT_THROTTLE_INTERVAL = 16;
 class ComponentError extends Error {
   constructor(message, component, metadata = {}) {
     super(message);
-    this.name = 'ComponentError';
+    this.name = "ComponentError";
     this.component = component;
     this.metadata = metadata;
     this.timestamp = Date.now();
@@ -98,7 +98,7 @@ class PerformanceMonitor {
         duration > INPUT_UTILITY_CONSTANTS.PERFORMANCE_WARNING_THRESHOLD
       ) {
         ComponentDebug.warn(
-          `Performance warning: ${label} took ${duration.toFixed(2)}ms`
+          `Performance warning: ${label} took ${duration.toFixed(2)}ms`,
         );
       }
       this.timers.delete(label);
@@ -140,8 +140,8 @@ class NumberInput extends BaseObject {
         options.height ||
         INPUT_UTILITY_CONSTANTS.NUMBER_INPUT_DEFAULT_HEIGHT ||
         DEFAULT_NUMBER_INPUT_HEIGHT,
-      ariaRole: 'spinbutton',
-      ariaLabel: options.ariaLabel || 'Number Input',
+      ariaRole: "spinbutton",
+      ariaLabel: options.ariaLabel || "Number Input",
     });
 
     // Validate options
@@ -153,12 +153,12 @@ class NumberInput extends BaseObject {
     this.max = options.max !== undefined ? options.max : Infinity;
     this.step = options.step || 1;
     this.precision = options.precision || 0;
-    this.placeholder = options.placeholder || '';
+    this.placeholder = options.placeholder || "";
     this.disabled = options.disabled || false;
     this.showControls = options.showControls !== false;
     this.allowDecimals = options.allowDecimals !== false;
-    this.prefix = options.prefix || '';
-    this.suffix = options.suffix || '';
+    this.prefix = options.prefix || "";
+    this.suffix = options.suffix || "";
 
     // Theme integration
     this.theme = options.theme || ComponentTheme.getCurrentTheme();
@@ -166,7 +166,7 @@ class NumberInput extends BaseObject {
     // State management
     this.isFocused = false;
     this.isEditing = false;
-    this.editingValue = '';
+    this.editingValue = "";
     this.isMouseDownOnControl = false;
     this.repeatInterval = null;
 
@@ -175,7 +175,7 @@ class NumberInput extends BaseObject {
     this.throttledRender = this.throttle(
       this.render.bind(this),
       INPUT_UTILITY_CONSTANTS.PERFORMANCE_THRESHOLDS?.eventThrottle ||
-        DEFAULT_THROTTLE_INTERVAL
+        DEFAULT_THROTTLE_INTERVAL,
     );
 
     // Accessibility
@@ -190,7 +190,7 @@ class NumberInput extends BaseObject {
       this.setupAccessibility();
       this.setupResizeObserver();
     } catch (error) {
-      this.errorHandler.handle(error, 'constructor');
+      this.errorHandler.handle(error, "constructor");
     }
   }
 
@@ -200,14 +200,14 @@ class NumberInput extends BaseObject {
       options.max !== undefined &&
       options.min > options.max
     ) {
-      throw new ComponentError('min cannot be greater than max', 'NumberInput');
+      throw new ComponentError("min cannot be greater than max", "NumberInput");
     }
 
     if (
       options.step !== undefined &&
-      (typeof options.step !== 'number' || options.step <= 0)
+      (typeof options.step !== "number" || options.step <= 0)
     ) {
-      throw new ComponentError('step must be a positive number', 'NumberInput');
+      throw new ComponentError("step must be a positive number", "NumberInput");
     }
 
     if (
@@ -215,16 +215,16 @@ class NumberInput extends BaseObject {
       (!Number.isInteger(options.precision) || options.precision < 0)
     ) {
       throw new ComponentError(
-        'precision must be a non-negative integer',
-        'NumberInput'
+        "precision must be a non-negative integer",
+        "NumberInput",
       );
     }
   }
 
   createScreenReaderAnnouncer() {
-    const announcer = document.createElement('div');
-    announcer.setAttribute('aria-live', 'polite');
-    announcer.setAttribute('aria-atomic', 'true');
+    const announcer = document.createElement("div");
+    announcer.setAttribute("aria-live", "polite");
+    announcer.setAttribute("aria-atomic", "true");
     announcer.style.cssText = `
             position: absolute;
             left: -10000px;
@@ -253,13 +253,13 @@ class NumberInput extends BaseObject {
     return {
       handle: (error, context) => {
         const componentError = new ComponentError(
-          error.message || 'Unknown error',
-          'NumberInput',
-          { context, originalError: error }
+          error.message || "Unknown error",
+          "NumberInput",
+          { context, originalError: error },
         );
 
-        logger.error('NumberInput Error:', componentError);
-        this.emit('error', componentError);
+        logger.error("NumberInput Error:", componentError);
+        this.emit("error", componentError);
 
         this.recoverFromError(context);
       },
@@ -268,13 +268,13 @@ class NumberInput extends BaseObject {
 
   recoverFromError(context) {
     switch (context) {
-      case 'validation':
+      case "validation":
         this.value = this.clampValue(this.value);
         break;
-      case 'render':
+      case "render":
         this.clearRenderCache();
         break;
-      case 'editing':
+      case "editing":
         this.cancelEdit();
         break;
       default:
@@ -284,26 +284,26 @@ class NumberInput extends BaseObject {
 
   setupAccessibility() {
     // ARIA attributes
-    this.setAttribute('role', 'spinbutton');
-    this.setAttribute('aria-valuemin', this.min.toString());
-    this.setAttribute('aria-valuemax', this.max.toString());
-    this.setAttribute('aria-valuenow', this.value.toString());
-    this.setAttribute('tabindex', this.disabled ? '-1' : '0');
+    this.setAttribute("role", "spinbutton");
+    this.setAttribute("aria-valuemin", this.min.toString());
+    this.setAttribute("aria-valuemax", this.max.toString());
+    this.setAttribute("aria-valuenow", this.value.toString());
+    this.setAttribute("tabindex", this.disabled ? "-1" : "0");
 
     // Update ARIA attributes when value changes
-    this.on('valueChanged', ({ value }) => {
-      this.setAttribute('aria-valuenow', value.toString());
+    this.on("valueChanged", ({ value }) => {
+      this.setAttribute("aria-valuenow", value.toString());
     });
 
     // Keyboard accessibility
-    this.addEventListener('keydown', event => this.handleKeyDown(event));
-    this.addEventListener('focusin', () => this.handleFocusIn());
-    this.addEventListener('focusout', () => this.handleFocusOut());
+    this.addEventListener("keydown", (event) => this.handleKeyDown(event));
+    this.addEventListener("focusin", () => this.handleFocusIn());
+    this.addEventListener("focusout", () => this.handleFocusOut());
   }
 
   setupResizeObserver() {
-    if ('ResizeObserver' in window) {
-      this.resizeObserver = new ResizeObserver(_entries => {
+    if ("ResizeObserver" in window) {
+      this.resizeObserver = new ResizeObserver((_entries) => {
         this.clearRenderCache();
         this.throttledRender();
       });
@@ -337,7 +337,7 @@ class NumberInput extends BaseObject {
       if (numValue === null) {
         throw new ComponentError(
           `Invalid numeric value: ${value}`,
-          'NumberInput'
+          "NumberInput",
         );
       }
 
@@ -346,7 +346,7 @@ class NumberInput extends BaseObject {
       this.clearRenderCache();
 
       if (oldValue !== this.value) {
-        this.emit('valueChanged', {
+        this.emit("valueChanged", {
           value: this.value,
           oldValue,
           formatted: this.formatValue(this.value),
@@ -354,18 +354,18 @@ class NumberInput extends BaseObject {
 
         if (announce) {
           this.announceChange(
-            `Value changed to ${this.formatValue(this.value)}`
+            `Value changed to ${this.formatValue(this.value)}`,
           );
         }
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'setValue');
+      this.errorHandler.handle(error, "setValue");
     }
   }
 
   parseValue(value) {
-    if (typeof value === 'number') return value;
-    if (typeof value === 'string') {
+    if (typeof value === "number") return value;
+    if (typeof value === "string") {
       // Remove prefix and suffix for parsing
       let cleanValue = value;
       if (this.prefix && cleanValue.startsWith(this.prefix)) {
@@ -374,7 +374,7 @@ class NumberInput extends BaseObject {
       if (this.suffix && cleanValue.endsWith(this.suffix)) {
         cleanValue = cleanValue.substring(
           0,
-          cleanValue.length - this.suffix.length
+          cleanValue.length - this.suffix.length,
         );
       }
 
@@ -419,7 +419,7 @@ class NumberInput extends BaseObject {
       this.setValue(this.value + this.step);
       this.announceChange(`Incremented to ${this.formatValue(this.value)}`);
     } catch (error) {
-      this.errorHandler.handle(error, 'increment');
+      this.errorHandler.handle(error, "increment");
     }
   }
 
@@ -428,7 +428,7 @@ class NumberInput extends BaseObject {
       this.setValue(this.value - this.step);
       this.announceChange(`Decremented to ${this.formatValue(this.value)}`);
     } catch (error) {
-      this.errorHandler.handle(error, 'decrement');
+      this.errorHandler.handle(error, "decrement");
     }
   }
 
@@ -436,7 +436,7 @@ class NumberInput extends BaseObject {
     this.stopRepeating();
 
     const repeat = () => {
-      if (operation === 'increment') {
+      if (operation === "increment") {
         this.increment();
       } else {
         this.decrement();
@@ -484,7 +484,7 @@ class NumberInput extends BaseObject {
         this.startEditing();
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'click-handler');
+      this.errorHandler.handle(error, "click-handler");
     }
   }
 
@@ -501,14 +501,14 @@ class NumberInput extends BaseObject {
         this.isMouseDownOnControl = true;
 
         // Start repeating after a delay
-        const operation = localY < this.height / 2 ? 'increment' : 'decrement';
+        const operation = localY < this.height / 2 ? "increment" : "decrement";
         this.startRepeating(operation);
 
         // Prevent text selection
         event.preventDefault();
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'mouse-down');
+      this.errorHandler.handle(error, "mouse-down");
     }
   }
 
@@ -525,13 +525,13 @@ class NumberInput extends BaseObject {
     try {
       if (this.isEditing) {
         switch (event.key) {
-          case 'Enter':
+          case "Enter":
             this.commitEdit();
             break;
-          case 'Escape':
+          case "Escape":
             this.cancelEdit();
             break;
-          case 'Backspace':
+          case "Backspace":
             this.editingValue = this.editingValue.slice(0, -1);
             break;
           default:
@@ -547,13 +547,13 @@ class NumberInput extends BaseObject {
         }
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'keyboard-handler');
+      this.errorHandler.handle(error, "keyboard-handler");
     }
   }
 
   handleFocus() {
     this.isFocused = true;
-    this.emit('focus');
+    this.emit("focus");
   }
 
   handleBlur() {
@@ -561,7 +561,7 @@ class NumberInput extends BaseObject {
     if (this.isEditing) {
       this.commitEdit();
     }
-    this.emit('blur');
+    this.emit("blur");
   }
 
   handleWheel(event) {
@@ -576,32 +576,32 @@ class NumberInput extends BaseObject {
         this.decrement();
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'wheel-handler');
+      this.errorHandler.handle(error, "wheel-handler");
     }
   }
 
   handleFocusIn() {
-    this.setAttribute('aria-describedby', 'number-input-instructions');
+    this.setAttribute("aria-describedby", "number-input-instructions");
     this.announcer.textContent =
-      'Use arrow keys to adjust value, Enter to edit directly';
+      "Use arrow keys to adjust value, Enter to edit directly";
   }
 
   handleFocusOut() {
-    this.removeAttribute('aria-describedby');
+    this.removeAttribute("aria-describedby");
   }
 
   // Enhanced input validation and editing
   isValidInput(key) {
-    const validChars = this.allowDecimals ? '0123456789.-' : '0123456789-';
+    const validChars = this.allowDecimals ? "0123456789.-" : "0123456789-";
     if (!validChars.includes(key)) return false;
 
     // Prevent multiple decimal points
-    if (key === '.' && this.editingValue.includes('.')) return false;
+    if (key === "." && this.editingValue.includes(".")) return false;
 
     // Prevent multiple minus signs or minus in wrong position
     if (
-      key === '-' &&
-      (this.editingValue.includes('-') || this.editingValue.length > 0)
+      key === "-" &&
+      (this.editingValue.includes("-") || this.editingValue.length > 0)
     )
       return false;
 
@@ -612,9 +612,9 @@ class NumberInput extends BaseObject {
     try {
       this.isEditing = true;
       this.editingValue = this.formatValue(this.value);
-      this.announceChange('Editing mode activated');
+      this.announceChange("Editing mode activated");
     } catch (error) {
-      this.errorHandler.handle(error, 'start-editing');
+      this.errorHandler.handle(error, "start-editing");
     }
   }
 
@@ -625,42 +625,42 @@ class NumberInput extends BaseObject {
         this.setValue(newValue, false);
       }
       this.isEditing = false;
-      this.editingValue = '';
-      this.announceChange('Edit committed');
+      this.editingValue = "";
+      this.announceChange("Edit committed");
     } catch (error) {
-      this.errorHandler.handle(error, 'commit-edit');
+      this.errorHandler.handle(error, "commit-edit");
     }
   }
 
   cancelEdit() {
     try {
       this.isEditing = false;
-      this.editingValue = '';
-      this.announceChange('Edit cancelled');
+      this.editingValue = "";
+      this.announceChange("Edit cancelled");
     } catch (error) {
-      this.errorHandler.handle(error, 'cancel-edit');
+      this.errorHandler.handle(error, "cancel-edit");
     }
   }
 
   // Enhanced rendering with theme support
   renderSelf(renderer) {
-    if (renderer.type !== 'canvas') return;
+    if (renderer.type !== "canvas") return;
 
     try {
-      PerformanceMonitor.startMonitoring('NumberInput');
+      PerformanceMonitor.startMonitoring("NumberInput");
 
       // Background with theme support
       renderer.fillStyle = this.disabled
-        ? ComponentTheme.getColor('disabled', this.theme)
-        : ComponentTheme.getColor('background', this.theme);
+        ? ComponentTheme.getColor("disabled", this.theme)
+        : ComponentTheme.getColor("background", this.theme);
       renderer.fillRect(0, 0, this.width, this.height);
 
       // Border with focus state
       const borderColor = this.disabled
-        ? ComponentTheme.getColor('border', this.theme)
+        ? ComponentTheme.getColor("border", this.theme)
         : this.isFocused
-          ? ComponentTheme.getColor('focus', this.theme)
-          : ComponentTheme.getColor('border', this.theme);
+          ? ComponentTheme.getColor("focus", this.theme)
+          : ComponentTheme.getColor("border", this.theme);
 
       renderer.strokeStyle = borderColor;
       renderer.lineWidth = this.isFocused ? 2 : 1;
@@ -671,29 +671,29 @@ class NumberInput extends BaseObject {
         ? this.editingValue
         : this.formatValue(this.value);
       const textColor = this.disabled
-        ? ComponentTheme.getColor('textDisabled', this.theme)
-        : ComponentTheme.getColor('text', this.theme);
+        ? ComponentTheme.getColor("textDisabled", this.theme)
+        : ComponentTheme.getColor("text", this.theme);
 
       renderer.fillStyle = textColor;
-      renderer.font = '14px Arial';
-      renderer.textAlign = 'left';
-      renderer.textBaseline = 'middle';
+      renderer.font = "14px Arial";
+      renderer.textAlign = "left";
+      renderer.textBaseline = "middle";
 
       const placeholderText = displayValue || this.placeholder;
       const isPlaceholder = !displayValue && this.placeholder;
 
       if (isPlaceholder) {
         renderer.fillStyle = ComponentTheme.getColor(
-          'textSecondary',
-          this.theme
+          "textSecondary",
+          this.theme,
         );
-        renderer.font = 'italic 14px Arial';
+        renderer.font = "italic 14px Arial";
       }
 
       renderer.fillText(
         placeholderText,
         NUMBER_INPUT_TEXT_MARGIN,
-        this.height / 2
+        this.height / 2,
       );
 
       // Spinner controls
@@ -713,25 +713,25 @@ class NumberInput extends BaseObject {
 
       // Disabled overlay
       if (this.disabled) {
-        renderer.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        renderer.fillStyle = "rgba(255, 255, 255, 0.6)";
         renderer.fillRect(0, 0, this.width, this.height);
       }
 
-      PerformanceMonitor.endMonitoring('NumberInput');
+      PerformanceMonitor.endMonitoring("NumberInput");
     } catch (error) {
-      this.errorHandler.handle(error, 'render');
+      this.errorHandler.handle(error, "render");
     }
   }
 
   drawFocusIndicator(renderer) {
-    renderer.strokeStyle = ComponentTheme.getColor('focus', this.theme);
+    renderer.strokeStyle = ComponentTheme.getColor("focus", this.theme);
     renderer.lineWidth = 2;
     renderer.setLineDash([2, 2]);
     renderer.strokeRect(
       FOCUS_INDICATOR_OFFSET,
       FOCUS_INDICATOR_OFFSET,
       this.width - FOCUS_INDICATOR_BORDER,
-      this.height - FOCUS_INDICATOR_BORDER
+      this.height - FOCUS_INDICATOR_BORDER,
     );
     renderer.setLineDash([]);
   }
@@ -741,7 +741,7 @@ class NumberInput extends BaseObject {
     const controlX = this.width - controlWidth;
 
     // Separator line
-    renderer.strokeStyle = ComponentTheme.getColor('border', this.theme);
+    renderer.strokeStyle = ComponentTheme.getColor("border", this.theme);
     renderer.lineWidth = 1;
     renderer.beginPath();
     renderer.moveTo(controlX, 0);
@@ -750,29 +750,29 @@ class NumberInput extends BaseObject {
 
     // Control background on hover/active
     const controlBg = this.isMouseDownOnControl
-      ? ComponentTheme.getColor('primaryLight', this.theme)
-      : ComponentTheme.getColor('background', this.theme);
+      ? ComponentTheme.getColor("primaryLight", this.theme)
+      : ComponentTheme.getColor("background", this.theme);
 
     renderer.fillStyle = controlBg;
     renderer.fillRect(controlX + 1, 1, controlWidth - 2, this.height - 2);
 
     // Up arrow
-    renderer.fillStyle = ComponentTheme.getColor('textSecondary', this.theme);
-    renderer.font = '10px Arial';
-    renderer.textAlign = 'center';
-    renderer.textBaseline = 'middle';
+    renderer.fillStyle = ComponentTheme.getColor("textSecondary", this.theme);
+    renderer.font = "10px Arial";
+    renderer.textAlign = "center";
+    renderer.textBaseline = "middle";
     renderer.fillText(
-      '▲',
+      "▲",
       controlX + controlWidth / 2,
-      this.height / NUMBER_INPUT_QUARTER_HEIGHT
+      this.height / NUMBER_INPUT_QUARTER_HEIGHT,
     );
 
     // Down arrow
     renderer.fillText(
-      '▼',
+      "▼",
       controlX + controlWidth / 2,
       (this.height * NUMBER_INPUT_THREE_QUARTER_HEIGHT) /
-        NUMBER_INPUT_QUARTER_HEIGHT
+        NUMBER_INPUT_QUARTER_HEIGHT,
     );
   }
 
@@ -786,7 +786,7 @@ class NumberInput extends BaseObject {
       Math.floor(Date.now() / NUMBER_INPUT_BLINK_INTERVAL) % 2 === 0;
     if (!shouldShow) return;
 
-    renderer.strokeStyle = ComponentTheme.getColor('text', this.theme);
+    renderer.strokeStyle = ComponentTheme.getColor("text", this.theme);
     renderer.lineWidth = 1;
     renderer.beginPath();
     renderer.moveTo(cursorX, NUMBER_INPUT_CURSOR_MARGIN);
@@ -818,27 +818,27 @@ class NumberInput extends BaseObject {
   reset() {
     this.value = 0;
     this.isEditing = false;
-    this.editingValue = '';
+    this.editingValue = "";
     this.isFocused = false;
     this.stopRepeating();
     this.clearRenderCache();
-    this.emit('reset');
+    this.emit("reset");
   }
 
   enable() {
     this.disabled = false;
-    this.setAttribute('tabindex', '0');
+    this.setAttribute("tabindex", "0");
     this.clearRenderCache();
-    this.emit('enabled');
+    this.emit("enabled");
   }
 
   disable() {
     this.disabled = true;
-    this.setAttribute('tabindex', '-1');
+    this.setAttribute("tabindex", "-1");
     this.cancelEdit();
     this.stopRepeating();
     this.clearRenderCache();
-    this.emit('disabled');
+    this.emit("disabled");
   }
 
   // Cleanup and memory management
@@ -868,9 +868,9 @@ class NumberInput extends BaseObject {
 
       // Call parent cleanup
       super.destroy?.();
-      this.emit('destroyed');
+      this.emit("destroyed");
     } catch (error) {
-      logger.error('Error during NumberInput cleanup:', error);
+      logger.error("Error during NumberInput cleanup:", error);
     }
   }
 }

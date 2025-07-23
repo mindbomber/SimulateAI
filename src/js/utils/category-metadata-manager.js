@@ -3,7 +3,7 @@
  * Integrates enhanced metadata with existing category system
  */
 
-import { ETHICAL_CATEGORIES } from '../../data/categories.js';
+import { ETHICAL_CATEGORIES } from "../../data/categories.js";
 
 // Constants
 const DEFAULT_ESTIMATED_TIME = 5;
@@ -24,15 +24,15 @@ export class CategoryMetadataManager {
       metadata: {
         // Philosophical metadata
         philosophicalApproaches: baseCategory.philosophicalApproaches || [],
-        primaryPhilosophy: baseCategory.primaryPhilosophy || 'utilitarian',
+        primaryPhilosophy: baseCategory.primaryPhilosophy || "utilitarian",
         ethicalFrameworks: baseCategory.ethicalFrameworks || [],
 
         // Learning metadata
-        targetAudience: baseCategory.targetAudience || ['students'],
+        targetAudience: baseCategory.targetAudience || ["students"],
         prerequisites: baseCategory.prerequisites || [],
-        complexity: baseCategory.complexity || 'moderate',
-        timeCommitment: baseCategory.timeCommitment || 'medium',
-        interactionLevel: baseCategory.interactionLevel || 'medium',
+        complexity: baseCategory.complexity || "moderate",
+        timeCommitment: baseCategory.timeCommitment || "medium",
+        interactionLevel: baseCategory.interactionLevel || "medium",
 
         // Search and discovery
         searchKeywords: baseCategory.searchKeywords || [],
@@ -47,8 +47,8 @@ export class CategoryMetadataManager {
 
       // Enhanced scenarios with metadata
       scenarios:
-        baseCategory.scenarios?.map(scenario =>
-          this.enhanceScenario(scenario, categoryId)
+        baseCategory.scenarios?.map((scenario) =>
+          this.enhanceScenario(scenario, categoryId),
         ) || [],
     };
   }
@@ -62,17 +62,17 @@ export class CategoryMetadataManager {
       categoryId,
       metadata: {
         // Philosophical metadata
-        philosophicalLeaning: scenario.philosophicalLeaning || 'utilitarian',
+        philosophicalLeaning: scenario.philosophicalLeaning || "utilitarian",
         ethicalDimensions: scenario.ethicalDimensions || [
-          'autonomy',
-          'beneficence',
+          "autonomy",
+          "beneficence",
         ],
 
         // Content metadata
         tags: scenario.tags || [],
         searchKeywords: scenario.searchKeywords || [],
         estimatedTime: scenario.estimatedTime || DEFAULT_ESTIMATED_TIME,
-        complexity: scenario.complexity || 'moderate',
+        complexity: scenario.complexity || "moderate",
 
         // Learning objectives specific to scenario
         learningOutcomes: scenario.learningOutcomes || [],
@@ -91,7 +91,7 @@ export class CategoryMetadataManager {
    */
   static getAllEnhancedCategories() {
     const enhanced = {};
-    Object.keys(ETHICAL_CATEGORIES).forEach(categoryId => {
+    Object.keys(ETHICAL_CATEGORIES).forEach((categoryId) => {
       enhanced[categoryId] = this.getEnhancedCategory(categoryId);
     });
     return enhanced;
@@ -104,7 +104,7 @@ export class CategoryMetadataManager {
     const allCategories = this.getAllEnhancedCategories();
     const results = [];
 
-    Object.values(allCategories).forEach(category => {
+    Object.values(allCategories).forEach((category) => {
       let matches = false;
       const searchQuery = query.toLowerCase();
 
@@ -116,7 +116,7 @@ export class CategoryMetadataManager {
           ...(category.metadata.searchKeywords || []),
           ...(category.metadata.tags || []),
         ]
-          .join(' ')
+          .join(" ")
           .toLowerCase();
 
         matches = searchableText.includes(searchQuery);
@@ -131,13 +131,13 @@ export class CategoryMetadataManager {
 
       if (matches && filters.philosophy) {
         matches = category.metadata.philosophicalApproaches?.includes(
-          filters.philosophy
+          filters.philosophy,
         );
       }
 
       if (matches && filters.tags?.length) {
-        matches = filters.tags.some(tag =>
-          category.metadata.tags?.includes(tag)
+        matches = filters.tags.some((tag) =>
+          category.metadata.tags?.includes(tag),
         );
       }
 
@@ -160,8 +160,8 @@ export class CategoryMetadataManager {
     const allCategories = this.getAllEnhancedCategories();
     const scenarios = [];
 
-    Object.values(allCategories).forEach(category => {
-      category.scenarios.forEach(scenario => {
+    Object.values(allCategories).forEach((category) => {
+      category.scenarios.forEach((scenario) => {
         scenarios.push({
           ...scenario,
           category: {
@@ -184,7 +184,7 @@ export class CategoryMetadataManager {
     const allScenarios = this.getAllScenariosEnhanced();
     const results = [];
 
-    allScenarios.forEach(scenario => {
+    allScenarios.forEach((scenario) => {
       let matches = false;
       const searchQuery = query.toLowerCase();
 
@@ -196,7 +196,7 @@ export class CategoryMetadataManager {
           ...(scenario.metadata.searchKeywords || []),
           ...(scenario.metadata.tags || []),
         ]
-          .join(' ')
+          .join(" ")
           .toLowerCase();
 
         matches = searchableText.includes(searchQuery);
@@ -218,8 +218,8 @@ export class CategoryMetadataManager {
       }
 
       if (matches && filters.tags?.length) {
-        matches = filters.tags.some(tag =>
-          scenario.metadata.tags?.includes(tag)
+        matches = filters.tags.some((tag) =>
+          scenario.metadata.tags?.includes(tag),
         );
       }
 
@@ -242,15 +242,15 @@ export class CategoryMetadataManager {
     const tagCounts = {};
     const allCategories = this.getAllEnhancedCategories();
 
-    Object.values(allCategories).forEach(category => {
+    Object.values(allCategories).forEach((category) => {
       // Count category tags
-      category.metadata.tags?.forEach(tag => {
+      category.metadata.tags?.forEach((tag) => {
         tagCounts[tag] = (tagCounts[tag] || 0) + 1;
       });
 
       // Count scenario tags
-      category.scenarios.forEach(scenario => {
-        scenario.metadata.tags?.forEach(tag => {
+      category.scenarios.forEach((scenario) => {
+        scenario.metadata.tags?.forEach((tag) => {
           tagCounts[tag] = (tagCounts[tag] || 0) + 1;
         });
       });
@@ -280,7 +280,7 @@ export class CategoryMetadataManager {
 
   static getDifficultyBreakdown(scenarios) {
     const breakdown = { beginner: 0, intermediate: 0, advanced: 0 };
-    scenarios.forEach(scenario => {
+    scenarios.forEach((scenario) => {
       breakdown[scenario.difficulty] =
         (breakdown[scenario.difficulty] || 0) + 1;
     });
@@ -289,7 +289,7 @@ export class CategoryMetadataManager {
 
   static getPhilosophyBreakdown(scenarios) {
     const breakdown = {};
-    scenarios.forEach(scenario => {
+    scenarios.forEach((scenario) => {
       const philosophy = scenario.metadata.philosophicalLeaning;
       breakdown[philosophy] = (breakdown[philosophy] || 0) + 1;
     });
@@ -298,8 +298,8 @@ export class CategoryMetadataManager {
 
   static getAverageEstimatedTime(scenarios) {
     const times = scenarios
-      .map(s => s.metadata.estimatedTime)
-      .filter(t => t && t > 0);
+      .map((s) => s.metadata.estimatedTime)
+      .filter((t) => t && t > 0);
 
     return times.length > 0
       ? Math.round(times.reduce((a, b) => a + b, 0) / times.length)

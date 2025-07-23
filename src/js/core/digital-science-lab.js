@@ -6,12 +6,12 @@
 // Constants to avoid magic numbers
 const LAB_CONSTANTS = {
   DURATIONS: {
-    SHORT_SESSION: '20 minutes',
-    MEDIUM_SESSION: '30 minutes',
-    LONG_SESSION: '40 minutes',
-    EXTENDED_SESSION: '45-60 minutes',
-    FULL_LAB_SESSION: '90-120 minutes',
-    PRESENTATION_TIME: '10-minute presentation',
+    SHORT_SESSION: "20 minutes",
+    MEDIUM_SESSION: "30 minutes",
+    LONG_SESSION: "40 minutes",
+    EXTENDED_SESSION: "45-60 minutes",
+    FULL_LAB_SESSION: "90-120 minutes",
+    PRESENTATION_TIME: "10-minute presentation",
   },
   EXPERIMENT_STEPS: {
     STEP_1: 1,
@@ -26,7 +26,7 @@ const LAB_CONSTANTS = {
     COMMUNICATION: 0.2,
   },
   PROJECT_TIMELINE: {
-    WEEK_DURATION: '1 week',
+    WEEK_DURATION: "1 week",
   },
   ARRAY_THRESHOLDS: {
     EMPTY_LENGTH: 0,
@@ -58,90 +58,90 @@ class DigitalScienceLab {
    */
   createLabStations() {
     // Bias Analysis Station
-    this.labStations.set('bias-analysis', {
-      name: 'Bias Detection & Analysis Lab',
-      purpose: 'Investigate how bias enters and affects AI systems',
+    this.labStations.set("bias-analysis", {
+      name: "Bias Detection & Analysis Lab",
+      purpose: "Investigate how bias enters and affects AI systems",
       tools: [
-        'Data Visualization Dashboard',
-        'Statistical Analysis Tools',
-        'Bias Measurement Instruments',
-        'Case Study Database',
+        "Data Visualization Dashboard",
+        "Statistical Analysis Tools",
+        "Bias Measurement Instruments",
+        "Case Study Database",
       ],
       experiments: [
-        'dataset-bias-detection',
-        'algorithmic-fairness-testing',
-        'outcome-disparity-analysis',
+        "dataset-bias-detection",
+        "algorithmic-fairness-testing",
+        "outcome-disparity-analysis",
       ],
       learningOutcomes: [
-        'Identify sources of bias in training data',
-        'Measure fairness across different groups',
-        'Propose bias mitigation strategies',
+        "Identify sources of bias in training data",
+        "Measure fairness across different groups",
+        "Propose bias mitigation strategies",
       ],
     });
 
     // Ethics Decision Lab
-    this.labStations.set('ethics-decision', {
-      name: 'Ethical Decision-Making Laboratory',
-      purpose: 'Explore ethical frameworks and their application to AI',
+    this.labStations.set("ethics-decision", {
+      name: "Ethical Decision-Making Laboratory",
+      purpose: "Explore ethical frameworks and their application to AI",
       tools: [
-        'Ethics Framework Simulator',
-        'Stakeholder Impact Visualizer',
-        'Decision Tree Builder',
-        'Consequence Predictor',
+        "Ethics Framework Simulator",
+        "Stakeholder Impact Visualizer",
+        "Decision Tree Builder",
+        "Consequence Predictor",
       ],
       experiments: [
-        'trolley-problem-variants',
-        'utilitarian-vs-deontological',
-        'stakeholder-conflict-resolution',
+        "trolley-problem-variants",
+        "utilitarian-vs-deontological",
+        "stakeholder-conflict-resolution",
       ],
       learningOutcomes: [
-        'Apply different ethical frameworks',
-        'Analyze stakeholder perspectives',
-        'Navigate ethical trade-offs',
+        "Apply different ethical frameworks",
+        "Analyze stakeholder perspectives",
+        "Navigate ethical trade-offs",
       ],
     });
 
     // Real-World Impact Station
-    this.labStations.set('impact-analysis', {
-      name: 'Real-World Impact Analysis Center',
-      purpose: 'Study actual consequences of AI systems in society',
+    this.labStations.set("impact-analysis", {
+      name: "Real-World Impact Analysis Center",
+      purpose: "Study actual consequences of AI systems in society",
       tools: [
-        'Case Study Explorer',
-        'Impact Measurement Tools',
-        'Timeline Visualizer',
-        'News Analysis Platform',
+        "Case Study Explorer",
+        "Impact Measurement Tools",
+        "Timeline Visualizer",
+        "News Analysis Platform",
       ],
       experiments: [
-        'hiring-algorithm-outcomes',
-        'criminal-justice-ai-effects',
-        'healthcare-ai-disparities',
+        "hiring-algorithm-outcomes",
+        "criminal-justice-ai-effects",
+        "healthcare-ai-disparities",
       ],
       learningOutcomes: [
-        'Connect theory to real-world outcomes',
-        'Evaluate long-term consequences',
-        'Identify pattern across domains',
+        "Connect theory to real-world outcomes",
+        "Evaluate long-term consequences",
+        "Identify pattern across domains",
       ],
     });
 
     // Solution Design Workshop
-    this.labStations.set('solution-design', {
-      name: 'Ethical AI Design Workshop',
-      purpose: 'Create and test ethical AI solutions',
+    this.labStations.set("solution-design", {
+      name: "Ethical AI Design Workshop",
+      purpose: "Create and test ethical AI solutions",
       tools: [
-        'AI System Designer',
-        'Ethics Checklist Generator',
-        'Prototype Testing Environment',
-        'Peer Review Platform',
+        "AI System Designer",
+        "Ethics Checklist Generator",
+        "Prototype Testing Environment",
+        "Peer Review Platform",
       ],
       experiments: [
-        'ethical-hiring-system-design',
-        'fair-lending-algorithm',
-        'inclusive-healthcare-ai',
+        "ethical-hiring-system-design",
+        "fair-lending-algorithm",
+        "inclusive-healthcare-ai",
       ],
       learningOutcomes: [
-        'Design ethical AI systems',
-        'Implement fairness measures',
-        'Test and iterate solutions',
+        "Design ethical AI systems",
+        "Implement fairness measures",
+        "Test and iterate solutions",
       ],
     });
   }
@@ -151,128 +151,128 @@ class DigitalScienceLab {
    */
   setupExperiments() {
     // Experiment: Dataset Bias Detection
-    this.experiments.set('dataset-bias-detection', {
-      title: 'Uncovering Hidden Bias in Training Data',
-      difficulty: 'intermediate',
+    this.experiments.set("dataset-bias-detection", {
+      title: "Uncovering Hidden Bias in Training Data",
+      difficulty: "intermediate",
       duration: LAB_CONSTANTS.DURATIONS.EXTENDED_SESSION,
       materials: [
-        'Simulated datasets',
-        'Analysis tools',
-        'Bias detection algorithms',
+        "Simulated datasets",
+        "Analysis tools",
+        "Bias detection algorithms",
       ],
 
       procedure: [
         {
           step: LAB_CONSTANTS.EXPERIMENT_STEPS.STEP_1,
-          title: 'Data Exploration',
-          description: 'Examine the composition of different datasets',
+          title: "Data Exploration",
+          description: "Examine the composition of different datasets",
           activity:
-            'Use visualization tools to explore demographic distributions',
+            "Use visualization tools to explore demographic distributions",
           questions: [
-            'What groups are represented in this data?',
-            'Are all groups equally represented?',
-            'What might be missing from this dataset?',
+            "What groups are represented in this data?",
+            "Are all groups equally represented?",
+            "What might be missing from this dataset?",
           ],
         },
         {
           step: LAB_CONSTANTS.EXPERIMENT_STEPS.STEP_2,
-          title: 'Bias Identification',
-          description: 'Apply bias detection techniques',
-          activity: 'Run automated bias detection algorithms',
+          title: "Bias Identification",
+          description: "Apply bias detection techniques",
+          activity: "Run automated bias detection algorithms",
           questions: [
-            'Where do the algorithms identify potential bias?',
-            'What types of bias are most common?',
-            'How confident should we be in these results?',
+            "Where do the algorithms identify potential bias?",
+            "What types of bias are most common?",
+            "How confident should we be in these results?",
           ],
         },
         {
           step: LAB_CONSTANTS.EXPERIMENT_STEPS.STEP_3,
-          title: 'Impact Analysis',
-          description: 'Predict real-world consequences',
-          activity: 'Model outcomes for different groups',
+          title: "Impact Analysis",
+          description: "Predict real-world consequences",
+          activity: "Model outcomes for different groups",
           questions: [
-            'How would this bias affect hiring decisions?',
-            'Which groups would benefit or be harmed?',
-            'What are the long-term societal implications?',
+            "How would this bias affect hiring decisions?",
+            "Which groups would benefit or be harmed?",
+            "What are the long-term societal implications?",
           ],
         },
         {
           step: LAB_CONSTANTS.EXPERIMENT_STEPS.STEP_4,
-          title: 'Mitigation Strategies',
-          description: 'Develop approaches to reduce bias',
-          activity: 'Test different bias reduction techniques',
+          title: "Mitigation Strategies",
+          description: "Develop approaches to reduce bias",
+          activity: "Test different bias reduction techniques",
           questions: [
-            'Which mitigation strategies are most effective?',
-            'What are the trade-offs of each approach?',
-            'How do we measure success in bias reduction?',
+            "Which mitigation strategies are most effective?",
+            "What are the trade-offs of each approach?",
+            "How do we measure success in bias reduction?",
           ],
         },
       ],
 
       assessment: {
         formative: [
-          'Lab notebook observations',
-          'Peer discussion participation',
-          'Question responses',
+          "Lab notebook observations",
+          "Peer discussion participation",
+          "Question responses",
         ],
         summative: [
-          'Bias analysis report',
-          'Mitigation strategy proposal',
-          'Reflection essay',
+          "Bias analysis report",
+          "Mitigation strategy proposal",
+          "Reflection essay",
         ],
       },
 
       extensions: [
-        'Research real-world bias cases',
-        'Interview data scientists about bias challenges',
-        'Propose policy solutions for algorithmic accountability',
+        "Research real-world bias cases",
+        "Interview data scientists about bias challenges",
+        "Propose policy solutions for algorithmic accountability",
       ],
     });
 
     // Experiment: Stakeholder Impact Simulation
-    this.experiments.set('stakeholder-impact-simulation', {
-      title: 'Multi-Stakeholder AI Impact Simulation',
-      difficulty: 'advanced',
+    this.experiments.set("stakeholder-impact-simulation", {
+      title: "Multi-Stakeholder AI Impact Simulation",
+      difficulty: "advanced",
       duration: LAB_CONSTANTS.DURATIONS.FULL_LAB_SESSION,
       materials: [
-        'Role-playing cards',
-        'Impact simulation software',
-        'Decision matrices',
+        "Role-playing cards",
+        "Impact simulation software",
+        "Decision matrices",
       ],
 
       setup: {
-        scenario: 'AI-powered content recommendation system for social media',
+        scenario: "AI-powered content recommendation system for social media",
         stakeholders: [
           {
-            role: 'Platform Users',
-            concerns: ['Privacy', 'Content diversity', 'Mental health'],
+            role: "Platform Users",
+            concerns: ["Privacy", "Content diversity", "Mental health"],
           },
           {
-            role: 'Content Creators',
-            concerns: ['Visibility', 'Revenue', 'Creative freedom'],
+            role: "Content Creators",
+            concerns: ["Visibility", "Revenue", "Creative freedom"],
           },
           {
-            role: 'Platform Company',
-            concerns: ['Engagement', 'Revenue', 'Legal compliance'],
+            role: "Platform Company",
+            concerns: ["Engagement", "Revenue", "Legal compliance"],
           },
           {
-            role: 'Advertisers',
-            concerns: ['Target accuracy', 'Brand safety', 'ROI'],
+            role: "Advertisers",
+            concerns: ["Target accuracy", "Brand safety", "ROI"],
           },
           {
-            role: 'Society/Public',
+            role: "Society/Public",
             concerns: [
-              'Misinformation',
-              'Social cohesion',
-              'Democratic discourse',
+              "Misinformation",
+              "Social cohesion",
+              "Democratic discourse",
             ],
           },
           {
-            role: 'Regulators',
+            role: "Regulators",
             concerns: [
-              'Consumer protection',
-              'Competition',
-              'National security',
+              "Consumer protection",
+              "Competition",
+              "National security",
             ],
           },
         ],
@@ -280,29 +280,29 @@ class DigitalScienceLab {
 
       phases: [
         {
-          phase: 'Stakeholder Research',
+          phase: "Stakeholder Research",
           duration: LAB_CONSTANTS.DURATIONS.SHORT_SESSION,
-          activity: 'Each group researches their stakeholder perspective',
-          deliverable: 'Stakeholder profile and key concerns',
+          activity: "Each group researches their stakeholder perspective",
+          deliverable: "Stakeholder profile and key concerns",
         },
         {
-          phase: 'System Design Proposals',
+          phase: "System Design Proposals",
           duration: LAB_CONSTANTS.DURATIONS.MEDIUM_SESSION,
           activity:
-            'Groups propose AI system designs that benefit their stakeholder',
-          deliverable: 'Design proposal with justification',
+            "Groups propose AI system designs that benefit their stakeholder",
+          deliverable: "Design proposal with justification",
         },
         {
-          phase: 'Cross-Stakeholder Negotiation',
+          phase: "Cross-Stakeholder Negotiation",
           duration: LAB_CONSTANTS.DURATIONS.LONG_SESSION,
-          activity: 'Facilitated negotiation to find acceptable compromise',
-          deliverable: 'Negotiated system design',
+          activity: "Facilitated negotiation to find acceptable compromise",
+          deliverable: "Negotiated system design",
         },
         {
-          phase: 'Impact Evaluation',
+          phase: "Impact Evaluation",
           duration: LAB_CONSTANTS.DURATIONS.SHORT_SESSION,
-          activity: 'Evaluate final design against all stakeholder needs',
-          deliverable: 'Impact assessment matrix',
+          activity: "Evaluate final design against all stakeholder needs",
+          deliverable: "Impact assessment matrix",
         },
       ],
     });
@@ -312,43 +312,43 @@ class DigitalScienceLab {
    * Configure collaboration tools for group learning
    */
   configureCollaboration() {
-    this.collaborationTools.set('digital-whiteboard', {
-      name: 'Collaborative Ethics Mapping',
-      purpose: 'Visual collaboration on complex ethical issues',
+    this.collaborationTools.set("digital-whiteboard", {
+      name: "Collaborative Ethics Mapping",
+      purpose: "Visual collaboration on complex ethical issues",
       features: [
-        'Real-time collaborative drawing',
-        'Stakeholder mapping templates',
-        'Decision tree builders',
-        'Impact visualization tools',
+        "Real-time collaborative drawing",
+        "Stakeholder mapping templates",
+        "Decision tree builders",
+        "Impact visualization tools",
       ],
-      integration: 'Embedded in simulation interface',
+      integration: "Embedded in simulation interface",
     });
 
-    this.collaborationTools.set('peer-review-system', {
-      name: 'Structured Peer Review Platform',
-      purpose: 'Facilitate constructive feedback on ethical analyses',
+    this.collaborationTools.set("peer-review-system", {
+      name: "Structured Peer Review Platform",
+      purpose: "Facilitate constructive feedback on ethical analyses",
       features: [
-        'Anonymous and identified review options',
-        'Rubric-based evaluation tools',
-        'Comment threading and discussion',
-        'Revision tracking and iteration support',
+        "Anonymous and identified review options",
+        "Rubric-based evaluation tools",
+        "Comment threading and discussion",
+        "Revision tracking and iteration support",
       ],
       guidelines: this.createPeerReviewGuidelines(),
     });
 
-    this.collaborationTools.set('discussion-facilitator', {
-      name: 'AI-Assisted Discussion Facilitator',
-      purpose: 'Support productive ethical discussions',
+    this.collaborationTools.set("discussion-facilitator", {
+      name: "AI-Assisted Discussion Facilitator",
+      purpose: "Support productive ethical discussions",
       features: [
-        'Conversation starter suggestions',
-        'Perspective diversity monitoring',
-        'Bias detection in arguments',
-        'Evidence integration prompts',
+        "Conversation starter suggestions",
+        "Perspective diversity monitoring",
+        "Bias detection in arguments",
+        "Evidence integration prompts",
       ],
       safeguards: [
-        'Human moderator override',
-        'Inappropriate content filtering',
-        'Balanced participation encouragement',
+        "Human moderator override",
+        "Inappropriate content filtering",
+        "Balanced participation encouragement",
       ],
     });
   }
@@ -358,49 +358,49 @@ class DigitalScienceLab {
    */
   establishAssessment() {
     // Portfolio-Based Assessment
-    this.assessmentMethods.set('ethics-portfolio', {
-      name: 'AI Ethics Learning Portfolio',
-      purpose: 'Comprehensive documentation of ethical reasoning development',
+    this.assessmentMethods.set("ethics-portfolio", {
+      name: "AI Ethics Learning Portfolio",
+      purpose: "Comprehensive documentation of ethical reasoning development",
 
       components: [
         {
-          name: 'Scenario Analysis Collection',
-          description: 'Student responses to various ethical scenarios',
+          name: "Scenario Analysis Collection",
+          description: "Student responses to various ethical scenarios",
           weight: LAB_CONSTANTS.ASSESSMENT_WEIGHTS.UNDERSTANDING,
           criteria: [
-            'Depth of analysis',
-            'Stakeholder consideration',
-            'Ethical reasoning',
+            "Depth of analysis",
+            "Stakeholder consideration",
+            "Ethical reasoning",
           ],
         },
         {
-          name: 'Bias Investigation Project',
-          description: 'In-depth study of bias in a chosen AI application',
+          name: "Bias Investigation Project",
+          description: "In-depth study of bias in a chosen AI application",
           weight: LAB_CONSTANTS.ASSESSMENT_WEIGHTS.CRITICAL_THINKING,
           criteria: [
-            'Research quality',
-            'Analysis rigor',
-            'Solution creativity',
+            "Research quality",
+            "Analysis rigor",
+            "Solution creativity",
           ],
         },
         {
-          name: 'Collaborative Design Challenge',
-          description: 'Group project to design ethical AI system',
+          name: "Collaborative Design Challenge",
+          description: "Group project to design ethical AI system",
           weight: LAB_CONSTANTS.ASSESSMENT_WEIGHTS.COLLABORATION,
           criteria: [
-            'Technical feasibility',
-            'Ethical integration',
-            'Team collaboration',
+            "Technical feasibility",
+            "Ethical integration",
+            "Team collaboration",
           ],
         },
         {
-          name: 'Reflection Essays',
-          description: 'Personal growth and learning reflections',
+          name: "Reflection Essays",
+          description: "Personal growth and learning reflections",
           weight: LAB_CONSTANTS.ASSESSMENT_WEIGHTS.COMMUNICATION,
           criteria: [
-            'Self-awareness',
-            'Growth documentation',
-            'Critical thinking',
+            "Self-awareness",
+            "Growth documentation",
+            "Critical thinking",
           ],
         },
       ],
@@ -409,57 +409,57 @@ class DigitalScienceLab {
     });
 
     // Performance-Based Assessment
-    this.assessmentMethods.set('ethics-performance', {
-      name: 'Real-World Ethics Performance Assessment',
+    this.assessmentMethods.set("ethics-performance", {
+      name: "Real-World Ethics Performance Assessment",
       purpose:
-        'Evaluate ability to apply ethical reasoning in realistic contexts',
+        "Evaluate ability to apply ethical reasoning in realistic contexts",
 
       tasks: [
         {
-          name: 'Ethics Consultation Simulation',
+          name: "Ethics Consultation Simulation",
           description:
-            'Student acts as ethics consultant for fictional AI company',
-          scenario: 'Company planning to deploy facial recognition in schools',
+            "Student acts as ethics consultant for fictional AI company",
+          scenario: "Company planning to deploy facial recognition in schools",
           deliverables: [
-            'Ethics assessment report',
-            'Stakeholder presentation',
-            'Policy recommendations',
+            "Ethics assessment report",
+            "Stakeholder presentation",
+            "Policy recommendations",
           ],
           timeframe: LAB_CONSTANTS.PROJECT_TIMELINE.WEEK_DURATION,
           evaluation:
-            'Expert panel review (teachers, industry professionals, ethicists)',
+            "Expert panel review (teachers, industry professionals, ethicists)",
         },
         {
-          name: 'Public Policy Testimony',
+          name: "Public Policy Testimony",
           description:
-            'Student presents testimony on AI ethics to mock legislative committee',
-          preparation: 'Research current AI regulation proposals',
+            "Student presents testimony on AI ethics to mock legislative committee",
+          preparation: "Research current AI regulation proposals",
           performance: `${LAB_CONSTANTS.DURATIONS.PRESENTATION_TIME} followed by Q&A`,
           audience:
-            'Peers role-playing legislators, advocacy groups, industry representatives',
+            "Peers role-playing legislators, advocacy groups, industry representatives",
         },
       ],
     });
 
     // Peer Assessment Integration
-    this.assessmentMethods.set('peer-assessment', {
-      name: 'Structured Peer Learning Assessment',
-      purpose: 'Develop evaluation skills while supporting peer learning',
+    this.assessmentMethods.set("peer-assessment", {
+      name: "Structured Peer Learning Assessment",
+      purpose: "Develop evaluation skills while supporting peer learning",
 
       methods: [
         {
-          name: 'Ethics Reasoning Peer Review',
+          name: "Ethics Reasoning Peer Review",
           process:
-            'Students review and provide feedback on peers ethical analyses',
-          training: 'Rubric training and calibration exercises',
-          support: 'Structured feedback templates and examples',
+            "Students review and provide feedback on peers ethical analyses",
+          training: "Rubric training and calibration exercises",
+          support: "Structured feedback templates and examples",
         },
         {
-          name: 'Collaborative Solution Evaluation',
-          process: 'Teams evaluate each others AI ethics solutions',
+          name: "Collaborative Solution Evaluation",
+          process: "Teams evaluate each others AI ethics solutions",
           criteria:
-            'Technical soundness, ethical thoroughness, practical feasibility',
-          format: 'Presentation with constructive critique session',
+            "Technical soundness, ethical thoroughness, practical feasibility",
+          format: "Presentation with constructive critique session",
         },
       ],
     });
@@ -471,79 +471,79 @@ class DigitalScienceLab {
   createAgeAdaptations() {
     return {
       elementary: {
-        approach: 'Story-based and character-driven scenarios',
+        approach: "Story-based and character-driven scenarios",
         examples: [
-          'Robot helper in classroom - how should it treat different students?',
-          'Game recommendation system - why do friends get different suggestions?',
-          'Photo tagging AI - when does it make mistakes and why?',
+          "Robot helper in classroom - how should it treat different students?",
+          "Game recommendation system - why do friends get different suggestions?",
+          "Photo tagging AI - when does it make mistakes and why?",
         ],
         activities: [
-          'Role-playing with AI character cards',
-          'Drawing different solutions to AI problems',
-          'Simple voting on ethical choices with discussion',
+          "Role-playing with AI character cards",
+          "Drawing different solutions to AI problems",
+          "Simple voting on ethical choices with discussion",
         ],
         assessments: [
-          'Story completion about fair AI behavior',
-          'Picture drawings of inclusive AI systems',
-          'Simple reflection questions with prompts',
+          "Story completion about fair AI behavior",
+          "Picture drawings of inclusive AI systems",
+          "Simple reflection questions with prompts",
         ],
       },
 
       middle: {
-        approach: 'Problem-solving focused with guided discovery',
+        approach: "Problem-solving focused with guided discovery",
         scenarios: [
-          'School uses AI to assign students to classes',
-          'Social media platform decides what posts to show',
-          'AI helps doctors prioritize patient appointments',
+          "School uses AI to assign students to classes",
+          "Social media platform decides what posts to show",
+          "AI helps doctors prioritize patient appointments",
         ],
         activities: [
-          'Data analysis with simplified real datasets',
-          'Debate simulations with assigned perspectives',
-          'Design challenges with ethical constraints',
+          "Data analysis with simplified real datasets",
+          "Debate simulations with assigned perspectives",
+          "Design challenges with ethical constraints",
         ],
         assessments: [
-          'Case study analysis with structured questions',
-          'Group presentation on bias solutions',
-          'Personal reflection on ethical decision-making',
+          "Case study analysis with structured questions",
+          "Group presentation on bias solutions",
+          "Personal reflection on ethical decision-making",
         ],
       },
 
       high: {
-        approach: 'Research-based inquiry with complex analysis',
+        approach: "Research-based inquiry with complex analysis",
         scenarios: [
-          'AI hiring system with demographic disparities',
-          'Predictive policing algorithm deployment',
-          'Healthcare AI with access and fairness issues',
+          "AI hiring system with demographic disparities",
+          "Predictive policing algorithm deployment",
+          "Healthcare AI with access and fairness issues",
         ],
         activities: [
-          'Statistical analysis of algorithmic bias',
-          'Policy research and proposal development',
-          'Stakeholder interview and analysis projects',
+          "Statistical analysis of algorithmic bias",
+          "Policy research and proposal development",
+          "Stakeholder interview and analysis projects",
         ],
         assessments: [
-          'Research paper on AI ethics topic',
-          'Policy proposal with evidence and analysis',
-          'Capstone project addressing real-world AI ethics challenge',
+          "Research paper on AI ethics topic",
+          "Policy proposal with evidence and analysis",
+          "Capstone project addressing real-world AI ethics challenge",
         ],
       },
 
       college: {
         approach:
-          'Professional-level analysis with interdisciplinary integration',
+          "Professional-level analysis with interdisciplinary integration",
         scenarios: [
-          'Corporate AI ethics consulting project',
-          'Academic research on algorithmic fairness',
-          'Government policy development on AI regulation',
+          "Corporate AI ethics consulting project",
+          "Academic research on algorithmic fairness",
+          "Government policy development on AI regulation",
         ],
         activities: [
-          'Original research with data collection and analysis',
-          'Cross-disciplinary collaboration projects',
-          'Industry partnership and internship opportunities',
+          "Original research with data collection and analysis",
+          "Cross-disciplinary collaboration projects",
+          "Industry partnership and internship opportunities",
         ],
         assessments: [
-          'Thesis-level research project',
-          'Professional consulting deliverables',
-          'Conference presentation or publication',
+          "Thesis-level research project",
+          "Professional consulting deliverables",
+          "Conference presentation or publication",
         ],
       },
     };
@@ -598,19 +598,19 @@ class DigitalScienceLab {
 
     for (const tag of tags) {
       switch (tag.toLowerCase()) {
-        case 'bias':
-        case 'fairness':
-          relevantStations.push(this.labStations.get('bias-analysis'));
+        case "bias":
+        case "fairness":
+          relevantStations.push(this.labStations.get("bias-analysis"));
           break;
-        case 'ethics':
-          relevantStations.push(this.labStations.get('ethics-decision'));
+        case "ethics":
+          relevantStations.push(this.labStations.get("ethics-decision"));
           break;
-        case 'education':
-        case 'scenarios':
-          relevantStations.push(this.labStations.get('solution-design'));
+        case "education":
+        case "scenarios":
+          relevantStations.push(this.labStations.get("solution-design"));
           break;
-        case 'open-ended':
-          relevantStations.push(this.labStations.get('impact-analysis'));
+        case "open-ended":
+          relevantStations.push(this.labStations.get("impact-analysis"));
           break;
       }
     }
@@ -627,16 +627,16 @@ class DigitalScienceLab {
     const experiments = [];
 
     switch (difficulty) {
-      case 'beginner':
-        experiments.push(this.experiments.get('dataset-bias-detection'));
+      case "beginner":
+        experiments.push(this.experiments.get("dataset-bias-detection"));
         break;
-      case 'intermediate':
+      case "intermediate":
         experiments.push(
-          this.experiments.get('dataset-bias-detection'),
-          this.experiments.get('stakeholder-impact-simulation')
+          this.experiments.get("dataset-bias-detection"),
+          this.experiments.get("stakeholder-impact-simulation"),
         );
         break;
-      case 'advanced':
+      case "advanced":
         // All experiments available
         experiments.push(...this.experiments.values());
         break;
@@ -649,21 +649,21 @@ class DigitalScienceLab {
   createPeerReviewGuidelines() {
     return {
       preparation: [
-        'Read the assignment carefully before reviewing',
-        'Consider the rubric criteria during review',
-        'Prepare specific, constructive feedback',
+        "Read the assignment carefully before reviewing",
+        "Consider the rubric criteria during review",
+        "Prepare specific, constructive feedback",
       ],
       process: [
-        'Start with positive observations',
-        'Provide specific suggestions for improvement',
-        'Ask clarifying questions when confused',
-        'Reference examples or resources when helpful',
+        "Start with positive observations",
+        "Provide specific suggestions for improvement",
+        "Ask clarifying questions when confused",
+        "Reference examples or resources when helpful",
       ],
       communication: [
-        'Use respectful, supportive language',
-        'Focus on the work, not the person',
-        'Be specific rather than general in feedback',
-        'Suggest rather than demand changes',
+        "Use respectful, supportive language",
+        "Focus on the work, not the person",
+        "Be specific rather than general in feedback",
+        "Suggest rather than demand changes",
       ],
     };
   }
@@ -672,41 +672,41 @@ class DigitalScienceLab {
     return {
       exemplary: {
         description:
-          'Demonstrates exceptional understanding and application of AI ethics',
+          "Demonstrates exceptional understanding and application of AI ethics",
         indicators: [
-          'Sophisticated analysis of complex ethical dilemmas',
-          'Creative and feasible solutions to bias problems',
-          'Deep reflection on personal growth and learning',
-          'Excellent integration of multiple perspectives',
+          "Sophisticated analysis of complex ethical dilemmas",
+          "Creative and feasible solutions to bias problems",
+          "Deep reflection on personal growth and learning",
+          "Excellent integration of multiple perspectives",
         ],
       },
       proficient: {
         description:
-          'Shows solid understanding and good application of AI ethics concepts',
+          "Shows solid understanding and good application of AI ethics concepts",
         indicators: [
-          'Clear analysis of ethical issues with good reasoning',
-          'Practical solutions to AI bias with some innovation',
-          'Thoughtful reflection on learning experience',
-          'Good consideration of different stakeholder views',
+          "Clear analysis of ethical issues with good reasoning",
+          "Practical solutions to AI bias with some innovation",
+          "Thoughtful reflection on learning experience",
+          "Good consideration of different stakeholder views",
         ],
       },
       developing: {
         description:
-          'Demonstrates basic understanding with some application of concepts',
+          "Demonstrates basic understanding with some application of concepts",
         indicators: [
-          'Basic analysis of ethical issues with limited reasoning',
-          'Simple solutions to bias problems with little innovation',
-          'Surface-level reflection on learning',
-          'Limited consideration of multiple perspectives',
+          "Basic analysis of ethical issues with limited reasoning",
+          "Simple solutions to bias problems with little innovation",
+          "Surface-level reflection on learning",
+          "Limited consideration of multiple perspectives",
         ],
       },
       beginning: {
-        description: 'Shows minimal understanding and limited application',
+        description: "Shows minimal understanding and limited application",
         indicators: [
-          'Unclear or incomplete analysis of ethical issues',
-          'Unrealistic or inappropriate solutions proposed',
-          'Little evidence of reflection or growth',
-          'Single perspective or viewpoint considered',
+          "Unclear or incomplete analysis of ethical issues",
+          "Unrealistic or inappropriate solutions proposed",
+          "Little evidence of reflection or growth",
+          "Single perspective or viewpoint considered",
         ],
       },
     };

@@ -6,7 +6,7 @@
  * @since 2025
  */
 
-import logger from '../utils/logger.js';
+import logger from "../utils/logger.js";
 
 // Configuration Constants
 const INPUT_CONFIG = {
@@ -38,15 +38,15 @@ const INPUT_CONFIG = {
   KEYBOARD_SETTINGS: {
     REPEAT_DELAY: 500,
     REPEAT_RATE: 50,
-    GLOBAL_SHORTCUTS: ['F1', 'F11', 'F12', 'Tab', 'Escape'],
+    GLOBAL_SHORTCUTS: ["F1", "F11", "F12", "Tab", "Escape"],
     ACCESSIBILITY_KEYS: [
-      'Tab',
-      'Enter',
-      'Space',
-      'ArrowUp',
-      'ArrowDown',
-      'ArrowLeft',
-      'ArrowRight',
+      "Tab",
+      "Enter",
+      "Space",
+      "ArrowUp",
+      "ArrowDown",
+      "ArrowLeft",
+      "ArrowRight",
     ],
   },
 
@@ -60,7 +60,7 @@ const INPUT_CONFIG = {
 
   // Accessibility settings
   ACCESSIBILITY: {
-    FOCUS_VISIBLE_OUTLINE: '2px solid #0078d4',
+    FOCUS_VISIBLE_OUTLINE: "2px solid #0078d4",
     HIGH_CONTRAST_SUPPORT: true,
     REDUCED_MOTION_SUPPORT: true,
     SCREEN_READER_SUPPORT: true,
@@ -77,35 +77,35 @@ const INPUT_CONFIG = {
 // Theme Constants
 const INPUT_THEMES = {
   light: {
-    focusColor: '#0078d4',
-    hoverColor: '#106ebe',
-    disabledColor: '#8a8886',
-    backgroundColor: '#ffffff',
-    textColor: '#323130',
+    focusColor: "#0078d4",
+    hoverColor: "#106ebe",
+    disabledColor: "#8a8886",
+    backgroundColor: "#ffffff",
+    textColor: "#323130",
   },
   dark: {
-    focusColor: '#4cc2ff',
-    hoverColor: '#0078d4',
-    disabledColor: '#605e5c',
-    backgroundColor: '#1f1f1f',
-    textColor: '#ffffff',
+    focusColor: "#4cc2ff",
+    hoverColor: "#0078d4",
+    disabledColor: "#605e5c",
+    backgroundColor: "#1f1f1f",
+    textColor: "#ffffff",
   },
   highContrast: {
-    focusColor: '#ffff00',
-    hoverColor: '#ffffff',
-    disabledColor: '#808080',
-    backgroundColor: '#000000',
-    textColor: '#ffffff',
+    focusColor: "#ffff00",
+    hoverColor: "#ffffff",
+    disabledColor: "#808080",
+    backgroundColor: "#000000",
+    textColor: "#ffffff",
   },
 };
 
 // Error Types
 const INPUT_ERRORS = {
-  INVALID_EVENT: 'INVALID_EVENT',
-  HANDLER_ERROR: 'HANDLER_ERROR',
-  GESTURE_ERROR: 'GESTURE_ERROR',
-  GAMEPAD_ERROR: 'GAMEPAD_ERROR',
-  ACCESSIBILITY_ERROR: 'ACCESSIBILITY_ERROR',
+  INVALID_EVENT: "INVALID_EVENT",
+  HANDLER_ERROR: "HANDLER_ERROR",
+  GESTURE_ERROR: "GESTURE_ERROR",
+  GAMEPAD_ERROR: "GAMEPAD_ERROR",
+  ACCESSIBILITY_ERROR: "ACCESSIBILITY_ERROR",
 };
 
 /**
@@ -121,7 +121,7 @@ export class InputManager {
   constructor(engine, options = {}) {
     // Validate required parameters
     if (!engine) {
-      throw new Error('Engine instance is required for InputManager');
+      throw new Error("Engine instance is required for InputManager");
     }
 
     this.engine = engine;
@@ -135,7 +135,7 @@ export class InputManager {
     };
 
     // Theme management
-    this.currentTheme = options.theme || 'light';
+    this.currentTheme = options.theme || "light";
     this.themeColors = INPUT_THEMES[this.currentTheme];
 
     // Initialize helper classes
@@ -234,9 +234,9 @@ export class InputManager {
       // Set up privacy compliance
       this.privacyManager.initialize();
 
-      this.log('InputManager initialized successfully', 'info');
+      this.log("InputManager initialized successfully", "info");
     } catch (error) {
-      this.errorHandler.handleError(error, 'INITIALIZATION_ERROR');
+      this.errorHandler.handleError(error, "INITIALIZATION_ERROR");
       throw error;
     }
   }
@@ -247,7 +247,7 @@ export class InputManager {
    */
   applyTheme(themeName) {
     if (!INPUT_THEMES[themeName]) {
-      this.log(`Unknown theme: ${themeName}`, 'warn');
+      this.log(`Unknown theme: ${themeName}`, "warn");
       return;
     }
 
@@ -258,16 +258,16 @@ export class InputManager {
     const element = this.renderer.getElement();
     if (element) {
       element.style.setProperty(
-        '--input-focus-color',
-        this.themeColors.focusColor
+        "--input-focus-color",
+        this.themeColors.focusColor,
       );
       element.style.setProperty(
-        '--input-hover-color',
-        this.themeColors.hoverColor
+        "--input-hover-color",
+        this.themeColors.hoverColor,
       );
     }
 
-    this.emit('themeChanged', { theme: themeName, colors: this.themeColors });
+    this.emit("themeChanged", { theme: themeName, colors: this.themeColors });
   }
 
   /**
@@ -276,7 +276,7 @@ export class InputManager {
    * @param {string} level - Log level
    * @param {Object} context - Additional context
    */
-  log(message, level = 'info', context = {}) {
+  log(message, level = "info", context = {}) {
     if (!this.privacyManager.shouldLog()) return;
 
     const timestamp = new Date().toISOString();
@@ -285,17 +285,17 @@ export class InputManager {
       level,
       message,
       context,
-      component: 'InputManager',
+      component: "InputManager",
     };
 
     switch (level) {
-      case 'error':
+      case "error":
         logger.error(`[InputManager Error] ${message}`, context);
         break;
-      case 'warn':
+      case "warn":
         logger.warn(`[InputManager Warning] ${message}`, context);
         break;
-      case 'debug':
+      case "debug":
         logger.debug(`[InputManager Debug] ${message}`, context);
         break;
       default:
@@ -328,7 +328,7 @@ export class InputManager {
             func.apply(this, args);
             lastExecTime = performance.now();
           },
-          delay - (currentTime - lastExecTime)
+          delay - (currentTime - lastExecTime),
         );
       }
     };
@@ -346,7 +346,7 @@ export class InputManager {
       mousedown: this.handleMouseDown.bind(this),
       mousemove: this.throttle(
         this.handleMouseMove.bind(this),
-        this.config.THROTTLE_INTERVAL
+        this.config.THROTTLE_INTERVAL,
       ),
       mouseup: this.handleMouseUp.bind(this),
       mouseenter: this.handleMouseEnter.bind(this),
@@ -393,7 +393,7 @@ export class InputManager {
       touchstart: this.handleTouchStart.bind(this),
       touchmove: this.throttle(
         this.handleTouchMove.bind(this),
-        this.config.THROTTLE_INTERVAL
+        this.config.THROTTLE_INTERVAL,
       ),
       touchend: this.handleTouchEnd.bind(this),
       touchcancel: this.handleTouchCancel.bind(this),
@@ -413,9 +413,9 @@ export class InputManager {
 
     this.boundWheelHandler = this.throttle(
       this.handleWheel.bind(this),
-      this.config.THROTTLE_INTERVAL
+      this.config.THROTTLE_INTERVAL,
     );
-    element.addEventListener('wheel', this.boundWheelHandler, options);
+    element.addEventListener("wheel", this.boundWheelHandler, options);
   }
 
   /**
@@ -423,12 +423,12 @@ export class InputManager {
    */
   setupGamepadEvents() {
     window.addEventListener(
-      'gamepadconnected',
-      this.handleGamepadConnected.bind(this)
+      "gamepadconnected",
+      this.handleGamepadConnected.bind(this),
     );
     window.addEventListener(
-      'gamepaddisconnected',
-      this.handleGamepadDisconnected.bind(this)
+      "gamepaddisconnected",
+      this.handleGamepadDisconnected.bind(this),
     );
 
     // Start gamepad polling
@@ -458,13 +458,13 @@ export class InputManager {
     const element = this.renderer.getElement();
 
     // Make element focusable
-    if (!element.hasAttribute('tabindex')) {
-      element.setAttribute('tabindex', '0');
+    if (!element.hasAttribute("tabindex")) {
+      element.setAttribute("tabindex", "0");
     }
 
     // Add focus/blur handlers
-    element.addEventListener('focus', this.handleFocus.bind(this));
-    element.addEventListener('blur', this.handleBlur.bind(this));
+    element.addEventListener("focus", this.handleFocus.bind(this));
+    element.addEventListener("blur", this.handleBlur.bind(this));
   }
 
   /**
@@ -473,8 +473,8 @@ export class InputManager {
   setupAriaSupport() {
     const element = this.renderer.getElement();
 
-    element.setAttribute('role', 'application');
-    element.setAttribute('aria-label', 'Interactive simulation canvas');
+    element.setAttribute("role", "application");
+    element.setAttribute("aria-label", "Interactive simulation canvas");
   }
 
   /**
@@ -518,7 +518,7 @@ export class InputManager {
         button.value > this.config.GAMEPAD_SETTINGS.BUTTON_THRESHOLD;
 
       if (isPressed !== wasPressed) {
-        this.emit(isPressed ? 'gamepadbuttondown' : 'gamepadbuttonup', {
+        this.emit(isPressed ? "gamepadbuttondown" : "gamepadbuttonup", {
           gamepadId: id,
           button: index,
           value: button.value,
@@ -528,7 +528,7 @@ export class InputManager {
 
     // Store current state
     this.gamepad.controllers.set(id, {
-      buttons: gamepad.buttons.map(b => ({
+      buttons: gamepad.buttons.map((b) => ({
         pressed: b.pressed,
         value: b.value,
       })),
@@ -558,7 +558,7 @@ export class InputManager {
       this.updateKeyboardModifiers(event);
 
       const inputEvent = {
-        type: 'mousedown',
+        type: "mousedown",
         x: coords.x,
         y: coords.y,
         button: event.button,
@@ -568,9 +568,9 @@ export class InputManager {
         ...this.keyboard.modifiers,
       };
 
-      this.performanceMonitor.recordEvent('mousedown', now);
-      this.emit('mousedown', inputEvent);
-      this.notifyScene('mousedown', inputEvent);
+      this.performanceMonitor.recordEvent("mousedown", now);
+      this.emit("mousedown", inputEvent);
+      this.notifyScene("mousedown", inputEvent);
     } catch (error) {
       this.errorHandler.handleError(error, INPUT_ERRORS.HANDLER_ERROR);
     }
@@ -601,7 +601,7 @@ export class InputManager {
       this.updateKeyboardModifiers(event);
 
       const inputEvent = {
-        type: 'mousemove',
+        type: "mousemove",
         x: coords.x,
         y: coords.y,
         deltaX,
@@ -614,9 +614,9 @@ export class InputManager {
         ...this.keyboard.modifiers,
       };
 
-      this.performanceMonitor.recordEvent('mousemove', now);
-      this.emit('mousemove', inputEvent);
-      this.notifyScene('mousemove', inputEvent);
+      this.performanceMonitor.recordEvent("mousemove", now);
+      this.emit("mousemove", inputEvent);
+      this.notifyScene("mousemove", inputEvent);
     } catch (error) {
       this.errorHandler.handleError(error, INPUT_ERRORS.HANDLER_ERROR);
     }
@@ -641,7 +641,7 @@ export class InputManager {
       this.updateKeyboardModifiers(event);
 
       const inputEvent = {
-        type: 'mouseup',
+        type: "mouseup",
         x: coords.x,
         y: coords.y,
         button: event.button,
@@ -651,9 +651,9 @@ export class InputManager {
         ...this.keyboard.modifiers,
       };
 
-      this.performanceMonitor.recordEvent('mouseup', now);
-      this.emit('mouseup', inputEvent);
-      this.notifyScene('mouseup', inputEvent);
+      this.performanceMonitor.recordEvent("mouseup", now);
+      this.emit("mouseup", inputEvent);
+      this.notifyScene("mouseup", inputEvent);
 
       // Reset button if no buttons are pressed
       if (this.mouse.buttons.size === 0) {
@@ -671,13 +671,13 @@ export class InputManager {
   handleMouseEnter(event) {
     try {
       const inputEvent = {
-        type: 'mouseenter',
+        type: "mouseenter",
         timestamp: performance.now(),
         originalEvent: event,
       };
 
-      this.emit('mouseenter', inputEvent);
-      this.performanceMonitor.recordEvent('mouseenter');
+      this.emit("mouseenter", inputEvent);
+      this.performanceMonitor.recordEvent("mouseenter");
     } catch (error) {
       this.errorHandler.handleError(error, INPUT_ERRORS.HANDLER_ERROR);
     }
@@ -695,13 +695,13 @@ export class InputManager {
       this.mouse.button = -1;
 
       const inputEvent = {
-        type: 'mouseleave',
+        type: "mouseleave",
         timestamp: performance.now(),
         originalEvent: event,
       };
 
-      this.emit('mouseleave', inputEvent);
-      this.performanceMonitor.recordEvent('mouseleave');
+      this.emit("mouseleave", inputEvent);
+      this.performanceMonitor.recordEvent("mouseleave");
     } catch (error) {
       this.errorHandler.handleError(error, INPUT_ERRORS.HANDLER_ERROR);
     }
@@ -718,15 +718,15 @@ export class InputManager {
 
       const coords = this.getEventCoordinates(event);
       const inputEvent = {
-        type: 'contextmenu',
+        type: "contextmenu",
         x: coords.x,
         y: coords.y,
         timestamp: performance.now(),
         originalEvent: event,
       };
 
-      this.emit('contextmenu', inputEvent);
-      this.performanceMonitor.recordEvent('contextmenu');
+      this.emit("contextmenu", inputEvent);
+      this.performanceMonitor.recordEvent("contextmenu");
     } catch (error) {
       this.errorHandler.handleError(error, INPUT_ERRORS.HANDLER_ERROR);
     }
@@ -753,7 +753,7 @@ export class InputManager {
       this.updateKeyboardModifiers(event);
 
       const inputEvent = {
-        type: 'keydown',
+        type: "keydown",
         key: event.key,
         code: event.code,
         repeat: event.repeat,
@@ -762,9 +762,9 @@ export class InputManager {
         ...this.keyboard.modifiers,
       };
 
-      this.performanceMonitor.recordEvent('keydown', now);
-      this.emit('keydown', inputEvent);
-      this.notifyScene('keydown', inputEvent);
+      this.performanceMonitor.recordEvent("keydown", now);
+      this.emit("keydown", inputEvent);
+      this.notifyScene("keydown", inputEvent);
     } catch (error) {
       this.errorHandler.handleError(error, INPUT_ERRORS.HANDLER_ERROR);
     }
@@ -783,7 +783,7 @@ export class InputManager {
       this.updateKeyboardModifiers(event);
 
       const inputEvent = {
-        type: 'keyup',
+        type: "keyup",
         key: event.key,
         code: event.code,
         timestamp: now,
@@ -791,9 +791,9 @@ export class InputManager {
         ...this.keyboard.modifiers,
       };
 
-      this.performanceMonitor.recordEvent('keyup', now);
-      this.emit('keyup', inputEvent);
-      this.notifyScene('keyup', inputEvent);
+      this.performanceMonitor.recordEvent("keyup", now);
+      this.emit("keyup", inputEvent);
+      this.notifyScene("keyup", inputEvent);
     } catch (error) {
       this.errorHandler.handleError(error, INPUT_ERRORS.HANDLER_ERROR);
     }
@@ -811,7 +811,7 @@ export class InputManager {
       const now = performance.now();
 
       // Update touch state
-      touches.forEach(touch => {
+      touches.forEach((touch) => {
         this.touch.touches.set(touch.identifier, {
           ...touch,
           startTime: now,
@@ -824,16 +824,16 @@ export class InputManager {
       this.detectGestures(touches);
 
       const inputEvent = {
-        type: 'touchstart',
+        type: "touchstart",
         touches,
         touchCount: this.touch.touches.size,
         timestamp: now,
         originalEvent: event,
       };
 
-      this.performanceMonitor.recordEvent('touchstart', now);
-      this.emit('touchstart', inputEvent);
-      this.notifyScene('touchstart', inputEvent);
+      this.performanceMonitor.recordEvent("touchstart", now);
+      this.emit("touchstart", inputEvent);
+      this.notifyScene("touchstart", inputEvent);
     } catch (error) {
       this.errorHandler.handleError(error, INPUT_ERRORS.HANDLER_ERROR);
     }
@@ -851,7 +851,7 @@ export class InputManager {
       const now = performance.now();
 
       // Update touch state
-      touches.forEach(touch => {
+      touches.forEach((touch) => {
         const existingTouch = this.touch.touches.get(touch.identifier);
         if (existingTouch) {
           this.touch.touches.set(touch.identifier, {
@@ -867,7 +867,7 @@ export class InputManager {
       this.updateGestures(touches);
 
       const inputEvent = {
-        type: 'touchmove',
+        type: "touchmove",
         touches,
         gestures: { ...this.touch.gestures },
         touchCount: this.touch.touches.size,
@@ -875,9 +875,9 @@ export class InputManager {
         originalEvent: event,
       };
 
-      this.performanceMonitor.recordEvent('touchmove', now);
-      this.emit('touchmove', inputEvent);
-      this.notifyScene('touchmove', inputEvent);
+      this.performanceMonitor.recordEvent("touchmove", now);
+      this.emit("touchmove", inputEvent);
+      this.notifyScene("touchmove", inputEvent);
     } catch (error) {
       this.errorHandler.handleError(error, INPUT_ERRORS.HANDLER_ERROR);
     }
@@ -895,7 +895,7 @@ export class InputManager {
       const now = performance.now();
 
       // Remove ended touches
-      touches.forEach(touch => {
+      touches.forEach((touch) => {
         this.touch.touches.delete(touch.identifier);
       });
 
@@ -903,7 +903,7 @@ export class InputManager {
       this.finalizeGestures(touches);
 
       const inputEvent = {
-        type: 'touchend',
+        type: "touchend",
         touches,
         gestures: { ...this.touch.gestures },
         touchCount: this.touch.touches.size,
@@ -911,9 +911,9 @@ export class InputManager {
         originalEvent: event,
       };
 
-      this.performanceMonitor.recordEvent('touchend', now);
-      this.emit('touchend', inputEvent);
-      this.notifyScene('touchend', inputEvent);
+      this.performanceMonitor.recordEvent("touchend", now);
+      this.emit("touchend", inputEvent);
+      this.notifyScene("touchend", inputEvent);
     } catch (error) {
       this.errorHandler.handleError(error, INPUT_ERRORS.HANDLER_ERROR);
     }
@@ -930,13 +930,13 @@ export class InputManager {
       this.resetGestures();
 
       const inputEvent = {
-        type: 'touchcancel',
+        type: "touchcancel",
         timestamp: performance.now(),
         originalEvent: event,
       };
 
-      this.emit('touchcancel', inputEvent);
-      this.performanceMonitor.recordEvent('touchcancel');
+      this.emit("touchcancel", inputEvent);
+      this.performanceMonitor.recordEvent("touchcancel");
     } catch (error) {
       this.errorHandler.handleError(error, INPUT_ERRORS.HANDLER_ERROR);
     }
@@ -956,7 +956,7 @@ export class InputManager {
       this.mouse.wheel = event.deltaY;
 
       const inputEvent = {
-        type: 'wheel',
+        type: "wheel",
         x: coords.x,
         y: coords.y,
         deltaX: event.deltaX,
@@ -966,9 +966,9 @@ export class InputManager {
         originalEvent: event,
       };
 
-      this.performanceMonitor.recordEvent('wheel', now);
-      this.emit('wheel', inputEvent);
-      this.notifyScene('wheel', inputEvent);
+      this.performanceMonitor.recordEvent("wheel", now);
+      this.emit("wheel", inputEvent);
+      this.notifyScene("wheel", inputEvent);
     } catch (error) {
       this.errorHandler.handleError(error, INPUT_ERRORS.HANDLER_ERROR);
     }
@@ -983,12 +983,12 @@ export class InputManager {
       this.accessibilityManager.onFocus(event);
 
       const inputEvent = {
-        type: 'focus',
+        type: "focus",
         timestamp: performance.now(),
         originalEvent: event,
       };
 
-      this.emit('focus', inputEvent);
+      this.emit("focus", inputEvent);
     } catch (error) {
       this.errorHandler.handleError(error, INPUT_ERRORS.ACCESSIBILITY_ERROR);
     }
@@ -1003,12 +1003,12 @@ export class InputManager {
       this.accessibilityManager.onBlur(event);
 
       const inputEvent = {
-        type: 'blur',
+        type: "blur",
         timestamp: performance.now(),
         originalEvent: event,
       };
 
-      this.emit('blur', inputEvent);
+      this.emit("blur", inputEvent);
     } catch (error) {
       this.errorHandler.handleError(error, INPUT_ERRORS.ACCESSIBILITY_ERROR);
     }
@@ -1022,24 +1022,24 @@ export class InputManager {
     try {
       const { gamepad } = event;
       this.gamepad.controllers.set(gamepad.id, {
-        buttons: gamepad.buttons.map(b => ({
+        buttons: gamepad.buttons.map((b) => ({
           pressed: b.pressed,
           value: b.value,
         })),
         axes: [...gamepad.axes],
       });
 
-      this.log(`Gamepad connected: ${gamepad.id}`, 'info');
+      this.log(`Gamepad connected: ${gamepad.id}`, "info");
 
       const inputEvent = {
-        type: 'gamepadconnected',
+        type: "gamepadconnected",
         gamepadId: gamepad.id,
         gamepad,
         timestamp: performance.now(),
         originalEvent: event,
       };
 
-      this.emit('gamepadconnected', inputEvent);
+      this.emit("gamepadconnected", inputEvent);
     } catch (error) {
       this.errorHandler.handleError(error, INPUT_ERRORS.GAMEPAD_ERROR);
     }
@@ -1054,16 +1054,16 @@ export class InputManager {
       const { gamepad } = event;
       this.gamepad.controllers.delete(gamepad.id);
 
-      this.log(`Gamepad disconnected: ${gamepad.id}`, 'info');
+      this.log(`Gamepad disconnected: ${gamepad.id}`, "info");
 
       const inputEvent = {
-        type: 'gamepaddisconnected',
+        type: "gamepaddisconnected",
         gamepadId: gamepad.id,
         timestamp: performance.now(),
         originalEvent: event,
       };
 
-      this.emit('gamepaddisconnected', inputEvent);
+      this.emit("gamepaddisconnected", inputEvent);
     } catch (error) {
       this.errorHandler.handleError(error, INPUT_ERRORS.GAMEPAD_ERROR);
     }
@@ -1129,7 +1129,7 @@ export class InputManager {
 
     return (
       globalShortcuts.includes(event.key) ||
-      (event.ctrlKey && ['?', 'h', 'H'].includes(event.key))
+      (event.ctrlKey && ["?", "h", "H"].includes(event.key))
     );
   }
 
@@ -1176,7 +1176,7 @@ export class InputManager {
       this.touch.gestures.pinch.centerY = (touches[0].y + touches[1].y) / 2;
 
       // Emit pinch event
-      this.emit('pinch', {
+      this.emit("pinch", {
         scale,
         centerX: this.touch.gestures.pinch.centerX,
         centerY: this.touch.gestures.pinch.centerY,
@@ -1197,7 +1197,7 @@ export class InputManager {
           deltaY,
         };
 
-        this.emit('panstart', {
+        this.emit("panstart", {
           x: touches[0].x,
           y: touches[0].y,
           deltaX,
@@ -1216,7 +1216,7 @@ export class InputManager {
     if (this.touch.gestures.tap.active) {
       const elapsed = performance.now() - this.touch.gestures.tap.startTime;
       if (elapsed < this.gestureThreshold.TAP_TIMEOUT) {
-        this.emit('tap', {
+        this.emit("tap", {
           x: this.touch.gestures.tap.startX,
           y: this.touch.gestures.tap.startY,
         });
@@ -1225,7 +1225,7 @@ export class InputManager {
 
     // Finalize pan gesture
     if (this.touch.gestures.pan.active) {
-      this.emit('panend', {
+      this.emit("panend", {
         deltaX: this.touch.gestures.pan.deltaX,
         deltaY: this.touch.gestures.pan.deltaY,
       });
@@ -1289,7 +1289,7 @@ export class InputManager {
    */
   emit(eventType, eventData) {
     if (this.eventHandlers.has(eventType)) {
-      this.eventHandlers.get(eventType).forEach(callback => {
+      this.eventHandlers.get(eventType).forEach((callback) => {
         try {
           callback(eventData);
         } catch (error) {
@@ -1391,7 +1391,7 @@ export class InputManager {
         Object.entries(this.boundKeyboardHandlers).forEach(
           ([event, handler]) => {
             document.removeEventListener(event, handler);
-          }
+          },
         );
       }
 
@@ -1404,17 +1404,17 @@ export class InputManager {
 
       // Remove wheel event listener
       if (this.boundWheelHandler) {
-        element.removeEventListener('wheel', this.boundWheelHandler);
+        element.removeEventListener("wheel", this.boundWheelHandler);
       }
 
       // Remove gamepad event listeners
       window.removeEventListener(
-        'gamepadconnected',
-        this.handleGamepadConnected
+        "gamepadconnected",
+        this.handleGamepadConnected,
       );
       window.removeEventListener(
-        'gamepaddisconnected',
-        this.handleGamepadDisconnected
+        "gamepaddisconnected",
+        this.handleGamepadDisconnected,
       );
 
       // Stop gamepad polling
@@ -1433,9 +1433,9 @@ export class InputManager {
       this.gamepad.controllers.clear();
       this.eventHistory = [];
 
-      this.log('InputManager destroyed', 'info');
+      this.log("InputManager destroyed", "info");
     } catch (error) {
-      this.errorHandler.handleError(error, 'DESTRUCTION_ERROR');
+      this.errorHandler.handleError(error, "DESTRUCTION_ERROR");
     }
   }
 }
@@ -1493,7 +1493,7 @@ class InputPerformanceMonitor {
     const recentEvents = [];
 
     for (const [, timestamps] of this.events) {
-      const recent = timestamps.filter(t => now - t < 1000);
+      const recent = timestamps.filter((t) => now - t < 1000);
       recentEvents.push(...recent);
     }
 
@@ -1504,7 +1504,7 @@ class InputPerformanceMonitor {
       this.metrics.averageResponseTime = responseTime;
       this.metrics.peakResponseTime = Math.max(
         this.metrics.peakResponseTime,
-        responseTime
+        responseTime,
       );
     }
   }
@@ -1546,25 +1546,25 @@ class InputAccessibilityManager {
   detectAccessibilityPreferences() {
     if (window.matchMedia) {
       const reducedMotionQuery = window.matchMedia(
-        '(prefers-reduced-motion: reduce)'
+        "(prefers-reduced-motion: reduce)",
       );
       this.reducedMotion = reducedMotionQuery.matches;
 
-      const updateReducedMotion = e => {
+      const updateReducedMotion = (e) => {
         this.reducedMotion = e.matches;
-        this.inputManager.emit('accessibilityChanged', {
+        this.inputManager.emit("accessibilityChanged", {
           reducedMotion: this.reducedMotion,
         });
       };
 
       reducedMotionQuery.addListener(updateReducedMotion);
 
-      const highContrastQuery = window.matchMedia('(prefers-contrast: high)');
+      const highContrastQuery = window.matchMedia("(prefers-contrast: high)");
       this.highContrast = highContrastQuery.matches;
 
-      const updateHighContrast = e => {
+      const updateHighContrast = (e) => {
         this.highContrast = e.matches;
-        this.inputManager.emit('accessibilityChanged', {
+        this.inputManager.emit("accessibilityChanged", {
           highContrast: this.highContrast,
         });
       };
@@ -1577,19 +1577,19 @@ class InputAccessibilityManager {
 
   detectScreenReader() {
     return (
-      window.navigator.userAgent.includes('NVDA') ||
-      window.navigator.userAgent.includes('JAWS') ||
+      window.navigator.userAgent.includes("NVDA") ||
+      window.navigator.userAgent.includes("JAWS") ||
       window.speechSynthesis ||
-      window.navigator.userAgent.includes('VoiceOver')
+      window.navigator.userAgent.includes("VoiceOver")
     );
   }
 
   setupAccessibilityFeatures() {
-    document.addEventListener('keydown', () => {
+    document.addEventListener("keydown", () => {
       this.focusVisible = true;
     });
 
-    document.addEventListener('mousedown', () => {
+    document.addEventListener("mousedown", () => {
       this.focusVisible = false;
     });
   }
@@ -1607,13 +1607,13 @@ class InputAccessibilityManager {
   onFocus(event) {
     this.focusVisible = true;
     if (event.target) {
-      event.target.setAttribute('data-focus-visible', 'true');
+      event.target.setAttribute("data-focus-visible", "true");
     }
   }
 
   onBlur(event) {
     if (event.target) {
-      event.target.removeAttribute('data-focus-visible');
+      event.target.removeAttribute("data-focus-visible");
     }
   }
 
@@ -1647,9 +1647,9 @@ class InputErrorHandler {
     }
 
     if (type === INPUT_ERRORS.INVALID_EVENT) {
-      logger.warn('[InputManager] Invalid event:', errorEntry);
+      logger.warn("[InputManager] Invalid event:", errorEntry);
     } else {
-      logger.error('[InputManager] Error:', errorEntry);
+      logger.error("[InputManager] Error:", errorEntry);
     }
   }
 
@@ -1674,7 +1674,7 @@ class InputPrivacyManager {
   }
 
   initialize() {
-    if (this.respectDNT && navigator.doNotTrack === '1') {
+    if (this.respectDNT && navigator.doNotTrack === "1") {
       this.anonymousTracking = false;
     }
   }
@@ -1700,28 +1700,28 @@ class InputPrivacyManager {
 class InputValidator {
   validate(event, eventType) {
     if (!event) {
-      throw new Error('Event is null or undefined');
+      throw new Error("Event is null or undefined");
     }
 
     if (!eventType) {
-      throw new Error('Event type is required');
+      throw new Error("Event type is required");
     }
 
-    if (typeof event !== 'object') {
-      throw new Error('Event must be an object');
+    if (typeof event !== "object") {
+      throw new Error("Event must be an object");
     }
 
     switch (eventType) {
-      case 'mousedown':
-      case 'mouseup':
-      case 'mousemove':
+      case "mousedown":
+      case "mouseup":
+      case "mousemove":
         return this.validateMouseEvent(event);
-      case 'keydown':
-      case 'keyup':
+      case "keydown":
+      case "keyup":
         return this.validateKeyboardEvent(event);
-      case 'touchstart':
-      case 'touchmove':
-      case 'touchend':
+      case "touchstart":
+      case "touchmove":
+      case "touchend":
         return this.validateTouchEvent(event);
       default:
         return true;
@@ -1730,16 +1730,16 @@ class InputValidator {
 
   validateMouseEvent(event) {
     return (
-      typeof event.clientX === 'number' && typeof event.clientY === 'number'
+      typeof event.clientX === "number" && typeof event.clientY === "number"
     );
   }
 
   validateKeyboardEvent(event) {
-    return typeof event.key === 'string' || typeof event.code === 'string';
+    return typeof event.key === "string" || typeof event.code === "string";
   }
 
   validateTouchEvent(event) {
-    return event.touches && typeof event.touches.length === 'number';
+    return event.touches && typeof event.touches.length === "number";
   }
 }
 

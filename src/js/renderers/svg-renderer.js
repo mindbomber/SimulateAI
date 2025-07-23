@@ -18,15 +18,15 @@
  * @license Apache-2.0
  */
 
-import logger from '../utils/logger.js';
+import logger from "../utils/logger.js";
 
 // Enhanced constants and configuration
 const SVG_CONSTANTS = {
-  VERSION: '2.0.0',
+  VERSION: "2.0.0",
   DEFAULT_WIDTH: 800,
   DEFAULT_HEIGHT: 600,
-  SVG_NAMESPACE: 'http://www.w3.org/2000/svg',
-  XLINK_NAMESPACE: 'http://www.w3.org/1999/xlink',
+  SVG_NAMESPACE: "http://www.w3.org/2000/svg",
+  XLINK_NAMESPACE: "http://www.w3.org/1999/xlink",
   ANIMATION_FPS: 60,
   PERFORMANCE_SAMPLE_RATE: 0.1,
   MAX_ELEMENTS: 10000,
@@ -89,28 +89,28 @@ const SVG_CONSTANTS = {
   },
   THEMES: {
     LIGHT: {
-      background: '#ffffff',
-      foreground: '#333333',
-      primary: '#007acc',
-      secondary: '#28a745',
-      accent: '#6c757d',
-      border: '#e0e0e0',
+      background: "#ffffff",
+      foreground: "#333333",
+      primary: "#007acc",
+      secondary: "#28a745",
+      accent: "#6c757d",
+      border: "#e0e0e0",
     },
     DARK: {
-      background: '#1a1a1a',
-      foreground: '#e0e0e0',
-      primary: '#4da6ff',
-      secondary: '#66bb6a',
-      accent: '#9e9e9e',
-      border: '#404040',
+      background: "#1a1a1a",
+      foreground: "#e0e0e0",
+      primary: "#4da6ff",
+      secondary: "#66bb6a",
+      accent: "#9e9e9e",
+      border: "#404040",
     },
     HIGH_CONTRAST: {
-      background: '#000000',
-      foreground: '#ffffff',
-      primary: '#ffff00',
-      secondary: '#00ffff',
-      accent: '#ff00ff',
-      border: '#ffffff',
+      background: "#000000",
+      foreground: "#ffffff",
+      primary: "#ffff00",
+      secondary: "#00ffff",
+      accent: "#ff00ff",
+      border: "#ffffff",
     },
   },
 };
@@ -170,7 +170,7 @@ class SVGPerformanceMonitor {
   }
 
   reset() {
-    Object.keys(this.metrics).forEach(key => {
+    Object.keys(this.metrics).forEach((key) => {
       this.metrics[key] = 0;
     });
   }
@@ -183,7 +183,7 @@ class SVGAccessibilityManager {
   constructor(svg, renderer) {
     this.svg = svg;
     this.renderer = renderer;
-    this.description = '';
+    this.description = "";
     this.elements = new Map();
     this.focusedElement = null;
     this.tabIndex = 0;
@@ -192,26 +192,26 @@ class SVGAccessibilityManager {
 
   setupAccessibility() {
     // Set up SVG accessibility attributes
-    this.svg.setAttribute('role', 'img');
-    this.svg.setAttribute('tabindex', '0');
-    this.svg.setAttribute('focusable', 'true');
-    this.updateDescription('Interactive simulation SVG graphics');
+    this.svg.setAttribute("role", "img");
+    this.svg.setAttribute("tabindex", "0");
+    this.svg.setAttribute("focusable", "true");
+    this.updateDescription("Interactive simulation SVG graphics");
 
     // Add keyboard navigation
-    this.svg.addEventListener('keydown', this.handleKeydown.bind(this));
-    this.svg.addEventListener('focus', this.handleFocus.bind(this));
-    this.svg.addEventListener('blur', this.handleBlur.bind(this));
-    this.svg.addEventListener('click', this.handleClick.bind(this));
+    this.svg.addEventListener("keydown", this.handleKeydown.bind(this));
+    this.svg.addEventListener("focus", this.handleFocus.bind(this));
+    this.svg.addEventListener("blur", this.handleBlur.bind(this));
+    this.svg.addEventListener("click", this.handleClick.bind(this));
   }
 
   updateDescription(description) {
     this.description = description;
-    this.svg.setAttribute('aria-label', description);
+    this.svg.setAttribute("aria-label", description);
 
     // Update or create title element
-    let title = this.svg.querySelector('title');
+    let title = this.svg.querySelector("title");
     if (!title) {
-      title = document.createElementNS(SVG_CONSTANTS.SVG_NAMESPACE, 'title');
+      title = document.createElementNS(SVG_CONSTANTS.SVG_NAMESPACE, "title");
       this.svg.insertBefore(title, this.svg.firstChild);
     }
     title.textContent = description;
@@ -237,23 +237,23 @@ class SVGAccessibilityManager {
 
   enhanceElementAccessibility(svgElement, elementData) {
     if (elementData.focusable) {
-      svgElement.setAttribute('tabindex', elementData.tabIndex);
-      svgElement.setAttribute('focusable', 'true');
+      svgElement.setAttribute("tabindex", elementData.tabIndex);
+      svgElement.setAttribute("focusable", "true");
     }
 
     if (elementData.ariaLabel) {
-      svgElement.setAttribute('aria-label', elementData.ariaLabel);
+      svgElement.setAttribute("aria-label", elementData.ariaLabel);
     }
 
     if (elementData.role) {
-      svgElement.setAttribute('role', elementData.role);
+      svgElement.setAttribute("role", elementData.role);
     }
 
     // Add title element for screen readers
     if (elementData.label || elementData.ariaLabel) {
       const title = document.createElementNS(
         SVG_CONSTANTS.SVG_NAMESPACE,
-        'title'
+        "title",
       );
       title.textContent = elementData.label || elementData.ariaLabel;
       svgElement.insertBefore(title, svgElement.firstChild);
@@ -263,7 +263,7 @@ class SVGAccessibilityManager {
     if (elementData.description) {
       const desc = document.createElementNS(
         SVG_CONSTANTS.SVG_NAMESPACE,
-        'desc'
+        "desc",
       );
       desc.textContent = elementData.description;
       svgElement.appendChild(desc);
@@ -280,17 +280,17 @@ class SVGAccessibilityManager {
 
   handleKeydown(event) {
     const focusableElements = Array.from(this.elements.values())
-      .filter(el => el.focusable)
+      .filter((el) => el.focusable)
       .sort((a, b) => a.tabIndex - b.tabIndex);
 
     if (focusableElements.length === 0) return;
 
     let currentIndex = focusableElements.findIndex(
-      el => el.id === this.focusedElement
+      (el) => el.id === this.focusedElement,
     );
 
     switch (event.key) {
-      case 'Tab':
+      case "Tab":
         event.preventDefault();
         if (event.shiftKey) {
           currentIndex =
@@ -302,8 +302,8 @@ class SVGAccessibilityManager {
         this.focusElement(focusableElements[currentIndex].id);
         break;
 
-      case 'Enter':
-      case ' ':
+      case "Enter":
+      case " ":
         if (this.focusedElement) {
           const element = this.elements.get(this.focusedElement);
           if (element && element.onClick) {
@@ -313,7 +313,7 @@ class SVGAccessibilityManager {
         }
         break;
 
-      case 'Escape':
+      case "Escape":
         if (this.focusedElement) {
           this.focusedElement = null;
           this.svg.focus();
@@ -361,36 +361,36 @@ class SVGAccessibilityManager {
 
   highlightFocusedElement(element) {
     // Remove previous focus indicators
-    this.svg.querySelectorAll('.focus-indicator').forEach(el => el.remove());
+    this.svg.querySelectorAll(".focus-indicator").forEach((el) => el.remove());
 
     if (element.svgElement) {
       // Create focus indicator
       const bbox = element.svgElement.getBBox();
       const indicator = document.createElementNS(
         SVG_CONSTANTS.SVG_NAMESPACE,
-        'rect'
+        "rect",
       );
-      indicator.setAttribute('class', 'focus-indicator');
-      indicator.setAttribute('x', bbox.x - 2);
-      indicator.setAttribute('y', bbox.y - 2);
+      indicator.setAttribute("class", "focus-indicator");
+      indicator.setAttribute("x", bbox.x - 2);
+      indicator.setAttribute("y", bbox.y - 2);
       indicator.setAttribute(
-        'width',
-        bbox.width + SVG_CONSTANTS.UI.DEFAULT_PADDING
+        "width",
+        bbox.width + SVG_CONSTANTS.UI.DEFAULT_PADDING,
       );
       indicator.setAttribute(
-        'height',
-        bbox.height + SVG_CONSTANTS.UI.DEFAULT_PADDING
+        "height",
+        bbox.height + SVG_CONSTANTS.UI.DEFAULT_PADDING,
       );
-      indicator.setAttribute('fill', 'none');
-      indicator.setAttribute('stroke', '#007acc');
-      indicator.setAttribute('stroke-width', '2');
-      indicator.setAttribute('stroke-dasharray', '4,2');
-      indicator.setAttribute('pointer-events', 'none');
+      indicator.setAttribute("fill", "none");
+      indicator.setAttribute("stroke", "#007acc");
+      indicator.setAttribute("stroke-width", "2");
+      indicator.setAttribute("stroke-dasharray", "4,2");
+      indicator.setAttribute("pointer-events", "none");
 
       // Insert after the focused element
       element.svgElement.parentNode.insertBefore(
         indicator,
-        element.svgElement.nextSibling
+        element.svgElement.nextSibling,
       );
     }
   }
@@ -402,14 +402,14 @@ class SVGAccessibilityManager {
   }
 
   announceToScreenReader(message) {
-    const announcer = document.createElement('div');
-    announcer.setAttribute('aria-live', 'polite');
-    announcer.setAttribute('aria-atomic', 'true');
-    announcer.style.position = 'absolute';
-    announcer.style.left = '-10000px';
-    announcer.style.width = '1px';
-    announcer.style.height = '1px';
-    announcer.style.overflow = 'hidden';
+    const announcer = document.createElement("div");
+    announcer.setAttribute("aria-live", "polite");
+    announcer.setAttribute("aria-atomic", "true");
+    announcer.style.position = "absolute";
+    announcer.style.left = "-10000px";
+    announcer.style.width = "1px";
+    announcer.style.height = "1px";
+    announcer.style.overflow = "hidden";
 
     document.body.appendChild(announcer);
     announcer.textContent = message;
@@ -420,13 +420,13 @@ class SVGAccessibilityManager {
   }
 
   handleFocus() {
-    this.svg.style.outline = '2px solid #007acc';
+    this.svg.style.outline = "2px solid #007acc";
   }
 
   handleBlur() {
-    this.svg.style.outline = 'none';
+    this.svg.style.outline = "none";
     this.focusedElement = null;
-    this.svg.querySelectorAll('.focus-indicator').forEach(el => el.remove());
+    this.svg.querySelectorAll(".focus-indicator").forEach((el) => el.remove());
   }
 
   generateOverallDescription() {
@@ -437,8 +437,8 @@ class SVGAccessibilityManager {
     }
 
     const descriptions = Array.from(elementTypes.entries())
-      .map(([type, count]) => `${count} ${type}${count > 1 ? 's' : ''}`)
-      .join(', ');
+      .map(([type, count]) => `${count} ${type}${count > 1 ? "s" : ""}`)
+      .join(", ");
 
     return `SVG contains ${descriptions}`;
   }
@@ -459,8 +459,8 @@ class SVGRenderer {
     this.options = {
       width: options.width || SVG_CONSTANTS.DEFAULT_WIDTH,
       height: options.height || SVG_CONSTANTS.DEFAULT_HEIGHT,
-      preserveAspectRatio: options.preserveAspectRatio || 'xMidYMid meet',
-      theme: options.theme || 'light',
+      preserveAspectRatio: options.preserveAspectRatio || "xMidYMid meet",
+      theme: options.theme || "light",
       enableAccessibility: options.enableAccessibility !== false,
       enablePerformanceMonitoring:
         options.enablePerformanceMonitoring !== false,
@@ -503,7 +503,7 @@ class SVGRenderer {
     try {
       this.initialize();
     } catch (error) {
-      this.errorHandler('Initialization failed', error);
+      this.errorHandler("Initialization failed", error);
     }
   }
 
@@ -525,7 +525,7 @@ class SVGRenderer {
    */
   validateContainer() {
     if (!this.container || !this.container.nodeType) {
-      throw new Error('Invalid container element provided');
+      throw new Error("Invalid container element provided");
     }
   }
 
@@ -533,16 +533,16 @@ class SVGRenderer {
    * Create and configure SVG element
    */
   createSVG() {
-    this.svg = this.createSVGElement('svg', {
-      width: '100%',
-      height: '100%',
+    this.svg = this.createSVGElement("svg", {
+      width: "100%",
+      height: "100%",
       viewBox: `0 0 ${this.options.width} ${this.options.height}`,
       preserveAspectRatio: this.options.preserveAspectRatio,
-      role: 'img',
-      'aria-label': 'Interactive simulation graphics',
-      class: 'svg-renderer',
-      'data-theme': this.options.theme,
-      'data-version': SVG_CONSTANTS.VERSION,
+      role: "img",
+      "aria-label": "Interactive simulation graphics",
+      class: "svg-renderer",
+      "data-theme": this.options.theme,
+      "data-version": SVG_CONSTANTS.VERSION,
     });
 
     this.container.appendChild(this.svg);
@@ -553,12 +553,12 @@ class SVGRenderer {
    */
   setupStructure() {
     // Create defs for reusable elements
-    this.defs = this.createSVGElement('defs');
+    this.defs = this.createSVGElement("defs");
     this.svg.appendChild(this.defs);
 
     // Create main group for all content
-    this.mainGroup = this.createSVGElement('g', {
-      class: 'main-group',
+    this.mainGroup = this.createSVGElement("g", {
+      class: "main-group",
     });
     this.svg.appendChild(this.mainGroup);
   }
@@ -580,7 +580,7 @@ class SVGRenderer {
       this.resizeObserver = new ResizeObserver(this.boundHandleResize);
       this.resizeObserver.observe(this.container);
     } else {
-      window.addEventListener('resize', this.boundHandleResize);
+      window.addEventListener("resize", this.boundHandleResize);
     }
   }
 
@@ -589,17 +589,17 @@ class SVGRenderer {
    */
   setupThemeMonitoring() {
     if (window.matchMedia) {
-      const contrastQuery = window.matchMedia('(prefers-contrast: high)');
+      const contrastQuery = window.matchMedia("(prefers-contrast: high)");
 
       const updateTheme = () => {
-        let newTheme = 'light';
+        let newTheme = "light";
         if (contrastQuery.matches) {
-          newTheme = 'high_contrast';
+          newTheme = "high_contrast";
         }
         this.setTheme(newTheme);
       };
 
-      contrastQuery.addEventListener('change', updateTheme);
+      contrastQuery.addEventListener("change", updateTheme);
 
       // Initial theme detection
       updateTheme();
@@ -629,7 +629,7 @@ class SVGRenderer {
     if (theme && theme !== this.currentTheme) {
       this.currentTheme = theme;
       this.options.theme = themeName;
-      this.svg.setAttribute('data-theme', themeName);
+      this.svg.setAttribute("data-theme", themeName);
       this.updateThemeStyles();
       this.requestRender();
     }
@@ -640,12 +640,12 @@ class SVGRenderer {
    */
   updateThemeStyles() {
     // Update existing theme-dependent elements
-    this.svg.querySelectorAll('[data-theme-color]').forEach(element => {
-      const colorType = element.getAttribute('data-theme-color');
+    this.svg.querySelectorAll("[data-theme-color]").forEach((element) => {
+      const colorType = element.getAttribute("data-theme-color");
       const colorValue = this.currentTheme[colorType];
       if (colorValue) {
         const attribute =
-          element.getAttribute('data-theme-attribute') || 'fill';
+          element.getAttribute("data-theme-attribute") || "fill";
         element.setAttribute(attribute, colorValue);
       }
     });
@@ -658,7 +658,7 @@ class SVGRenderer {
     if (this.renderRequested) return;
 
     this.renderRequested = true;
-    this.animationFrameId = requestAnimationFrame(timestamp => {
+    this.animationFrameId = requestAnimationFrame((timestamp) => {
       this.performanceMonitor.startFrame();
       this.renderRequested = false;
       this.lastFrameTime = timestamp;
@@ -688,7 +688,7 @@ class SVGRenderer {
     try {
       const element = document.createElementNS(
         SVG_CONSTANTS.SVG_NAMESPACE,
-        tagName
+        tagName,
       );
 
       Object.entries(attributes).forEach(([key, value]) => {
@@ -709,7 +709,7 @@ class SVGRenderer {
    * Add comprehensive default styles with theme support
    */
   addDefaultStyles() {
-    const style = this.createSVGElement('style');
+    const style = this.createSVGElement("style");
     if (!style) return;
 
     style.textContent = `
@@ -804,11 +804,11 @@ class SVGRenderer {
    * @returns {SVGElement} Created layer element
    */
   createLayer(name, zIndex = 0, options = {}) {
-    const layer = this.createSVGElement('g', {
-      class: `layer layer-${name} ${options.className || ''}`,
-      'data-layer': name,
-      'data-z-index': zIndex,
-      transform: options.transform || '',
+    const layer = this.createSVGElement("g", {
+      class: `layer layer-${name} ${options.className || ""}`,
+      "data-layer": name,
+      "data-z-index": zIndex,
+      transform: options.transform || "",
       opacity: options.opacity || 1,
     });
 
@@ -816,17 +816,17 @@ class SVGRenderer {
 
     // Insert layer in correct z-order
     const existingLayers = Array.from(this.mainGroup.children)
-      .filter(child => child.hasAttribute('data-layer'))
+      .filter((child) => child.hasAttribute("data-layer"))
       .sort((a, b) => {
-        const aZ = parseInt(a.getAttribute('data-z-index') || '0');
-        const bZ = parseInt(b.getAttribute('data-z-index') || '0');
+        const aZ = parseInt(a.getAttribute("data-z-index") || "0");
+        const bZ = parseInt(b.getAttribute("data-z-index") || "0");
         return aZ - bZ;
       });
 
     let insertBefore = null;
     for (const existingLayer of existingLayers) {
       const existingZ = parseInt(
-        existingLayer.getAttribute('data-z-index') || '0'
+        existingLayer.getAttribute("data-z-index") || "0",
       );
       if (existingZ > zIndex) {
         insertBefore = existingLayer;
@@ -868,8 +868,8 @@ class SVGRenderer {
   createRect(x, y, width, height, options = {}) {
     if (this.elementCount >= this.options.maxElements) {
       this.errorHandler(
-        'Maximum element count exceeded',
-        new Error('Performance limit')
+        "Maximum element count exceeded",
+        new Error("Performance limit"),
       );
       return null;
     }
@@ -878,9 +878,9 @@ class SVGRenderer {
       // Apply theme-aware defaults
       const fill =
         options.fill ||
-        (options.primary ? this.currentTheme.primary : 'transparent');
+        (options.primary ? this.currentTheme.primary : "transparent");
       const stroke =
-        options.stroke || (options.border ? this.currentTheme.border : 'none');
+        options.stroke || (options.border ? this.currentTheme.border : "none");
 
       // Accessibility: Ensure minimum size for interactive elements
       if (
@@ -888,26 +888,26 @@ class SVGRenderer {
         (width < SVG_CONSTANTS.ACCESSIBILITY.MIN_TOUCH_TARGET ||
           height < SVG_CONSTANTS.ACCESSIBILITY.MIN_TOUCH_TARGET)
       ) {
-        logger.warn('Interactive element below minimum touch target size');
+        logger.warn("Interactive element below minimum touch target size");
       }
 
-      const rect = this.createSVGElement('rect', {
+      const rect = this.createSVGElement("rect", {
         x,
         y,
         width,
         height,
         fill,
         stroke,
-        'stroke-width':
+        "stroke-width":
           options.strokeWidth ||
-          (stroke !== 'none'
+          (stroke !== "none"
             ? SVG_CONSTANTS.ACCESSIBILITY.MIN_STROKE_WIDTH
             : 0),
         rx: options.borderRadius || 0,
         ry: options.borderRadius || 0,
-        class: `rect-element ${options.className || ''} ${options.interactive ? 'interactive clickable accessible-element' : ''}`,
-        'data-theme-color': options.themeColor,
-        'data-theme-attribute': options.themeAttribute || 'fill',
+        class: `rect-element ${options.className || ""} ${options.interactive ? "interactive clickable accessible-element" : ""}`,
+        "data-theme-color": options.themeColor,
+        "data-theme-attribute": options.themeAttribute || "fill",
         ...options.attributes,
       });
 
@@ -918,7 +918,7 @@ class SVGRenderer {
         this.accessibilityManager.addElement(
           options.id || `rect_${this.elementCount}`,
           {
-            type: 'rectangle',
+            type: "rectangle",
             svgElement: rect,
             x,
             y,
@@ -929,8 +929,8 @@ class SVGRenderer {
             description: options.description,
             onClick: options.onClick,
             focusable: options.focusable !== false,
-            role: options.role || 'button',
-          }
+            role: options.role || "button",
+          },
         );
       }
 
@@ -938,7 +938,7 @@ class SVGRenderer {
       this.performanceMonitor.recordElement();
       return rect;
     } catch (error) {
-      this.errorHandler('Failed to create rectangle', error);
+      this.errorHandler("Failed to create rectangle", error);
       return null;
     }
   }
@@ -954,8 +954,8 @@ class SVGRenderer {
   createCircle(cx, cy, radius, options = {}) {
     if (this.elementCount >= this.options.maxElements) {
       this.errorHandler(
-        'Maximum element count exceeded',
-        new Error('Performance limit')
+        "Maximum element count exceeded",
+        new Error("Performance limit"),
       );
       return null;
     }
@@ -964,9 +964,9 @@ class SVGRenderer {
       // Apply theme-aware defaults
       const fill =
         options.fill ||
-        (options.primary ? this.currentTheme.primary : 'transparent');
+        (options.primary ? this.currentTheme.primary : "transparent");
       const stroke =
-        options.stroke || (options.border ? this.currentTheme.border : 'none');
+        options.stroke || (options.border ? this.currentTheme.border : "none");
 
       // Accessibility: Ensure minimum size for interactive elements
       const diameter = radius * 2;
@@ -974,23 +974,23 @@ class SVGRenderer {
         options.interactive &&
         diameter < SVG_CONSTANTS.ACCESSIBILITY.MIN_TOUCH_TARGET
       ) {
-        logger.warn('Interactive circle below minimum touch target size');
+        logger.warn("Interactive circle below minimum touch target size");
       }
 
-      const circle = this.createSVGElement('circle', {
+      const circle = this.createSVGElement("circle", {
         cx,
         cy,
         r: radius,
         fill,
         stroke,
-        'stroke-width':
+        "stroke-width":
           options.strokeWidth ||
-          (stroke !== 'none'
+          (stroke !== "none"
             ? SVG_CONSTANTS.ACCESSIBILITY.MIN_STROKE_WIDTH
             : 0),
-        class: `circle-element ${options.className || ''} ${options.interactive ? 'interactive clickable accessible-element' : ''}`,
-        'data-theme-color': options.themeColor,
-        'data-theme-attribute': options.themeAttribute || 'fill',
+        class: `circle-element ${options.className || ""} ${options.interactive ? "interactive clickable accessible-element" : ""}`,
+        "data-theme-color": options.themeColor,
+        "data-theme-attribute": options.themeAttribute || "fill",
         ...options.attributes,
       });
 
@@ -1001,7 +1001,7 @@ class SVGRenderer {
         this.accessibilityManager.addElement(
           options.id || `circle_${this.elementCount}`,
           {
-            type: 'circle',
+            type: "circle",
             svgElement: circle,
             x: cx - radius,
             y: cy - radius,
@@ -1012,8 +1012,8 @@ class SVGRenderer {
             description: options.description,
             onClick: options.onClick,
             focusable: options.focusable !== false,
-            role: options.role || 'button',
-          }
+            role: options.role || "button",
+          },
         );
       }
 
@@ -1021,7 +1021,7 @@ class SVGRenderer {
       this.performanceMonitor.recordElement();
       return circle;
     } catch (error) {
-      this.errorHandler('Failed to create circle', error);
+      this.errorHandler("Failed to create circle", error);
       return null;
     }
   }
@@ -1038,8 +1038,8 @@ class SVGRenderer {
   createLine(x1, y1, x2, y2, options = {}) {
     if (this.elementCount >= this.options.maxElements) {
       this.errorHandler(
-        'Maximum element count exceeded',
-        new Error('Performance limit')
+        "Maximum element count exceeded",
+        new Error("Performance limit"),
       );
       return null;
     }
@@ -1047,23 +1047,23 @@ class SVGRenderer {
     try {
       const stroke = options.stroke || this.currentTheme.foreground;
 
-      const line = this.createSVGElement('line', {
+      const line = this.createSVGElement("line", {
         x1,
         y1,
         x2,
         y2,
         stroke,
-        'stroke-width': Math.max(
+        "stroke-width": Math.max(
           options.strokeWidth || 1,
-          SVG_CONSTANTS.ACCESSIBILITY.MIN_STROKE_WIDTH
+          SVG_CONSTANTS.ACCESSIBILITY.MIN_STROKE_WIDTH,
         ),
-        'stroke-linecap': options.linecap || 'round',
-        'stroke-linejoin': options.linejoin || 'round',
-        'stroke-dasharray': options.dashArray,
-        'stroke-dashoffset': options.dashOffset,
-        class: `line-element ${options.className || ''}`,
-        'data-theme-color': options.themeColor,
-        'data-theme-attribute': 'stroke',
+        "stroke-linecap": options.linecap || "round",
+        "stroke-linejoin": options.linejoin || "round",
+        "stroke-dasharray": options.dashArray,
+        "stroke-dashoffset": options.dashOffset,
+        class: `line-element ${options.className || ""}`,
+        "data-theme-color": options.themeColor,
+        "data-theme-attribute": "stroke",
         ...options.attributes,
       });
 
@@ -1073,7 +1073,7 @@ class SVGRenderer {
       this.performanceMonitor.recordElement();
       return line;
     } catch (error) {
-      this.errorHandler('Failed to create line', error);
+      this.errorHandler("Failed to create line", error);
       return null;
     }
   }
@@ -1087,33 +1087,33 @@ class SVGRenderer {
   createPath(pathData, options = {}) {
     if (this.elementCount >= this.options.maxElements) {
       this.errorHandler(
-        'Maximum element count exceeded',
-        new Error('Performance limit')
+        "Maximum element count exceeded",
+        new Error("Performance limit"),
       );
       return null;
     }
 
     try {
-      const fill = options.fill || 'none';
+      const fill = options.fill || "none";
       const stroke = options.stroke || this.currentTheme.foreground;
 
-      const path = this.createSVGElement('path', {
+      const path = this.createSVGElement("path", {
         d: pathData,
         fill,
         stroke,
-        'stroke-width':
+        "stroke-width":
           options.strokeWidth ||
-          (stroke !== 'none'
+          (stroke !== "none"
             ? SVG_CONSTANTS.ACCESSIBILITY.MIN_STROKE_WIDTH
             : 0),
-        'stroke-linecap': options.linecap || 'round',
-        'stroke-linejoin': options.linejoin || 'round',
-        'stroke-dasharray': options.dashArray,
-        'stroke-dashoffset': options.dashOffset,
-        'fill-rule': options.fillRule || 'evenodd',
-        class: `path-element ${options.className || ''} ${options.interactive ? 'interactive clickable accessible-element' : ''}`,
-        'data-theme-color': options.themeColor,
-        'data-theme-attribute': options.themeAttribute || 'stroke',
+        "stroke-linecap": options.linecap || "round",
+        "stroke-linejoin": options.linejoin || "round",
+        "stroke-dasharray": options.dashArray,
+        "stroke-dashoffset": options.dashOffset,
+        "fill-rule": options.fillRule || "evenodd",
+        class: `path-element ${options.className || ""} ${options.interactive ? "interactive clickable accessible-element" : ""}`,
+        "data-theme-color": options.themeColor,
+        "data-theme-attribute": options.themeAttribute || "stroke",
         ...options.attributes,
       });
 
@@ -1124,15 +1124,15 @@ class SVGRenderer {
         this.accessibilityManager.addElement(
           options.id || `path_${this.elementCount}`,
           {
-            type: 'path',
+            type: "path",
             svgElement: path,
             label: options.label,
             ariaLabel: options.ariaLabel,
             description: options.description,
             onClick: options.onClick,
             focusable: options.focusable !== false,
-            role: options.role || 'button',
-          }
+            role: options.role || "button",
+          },
         );
       }
 
@@ -1140,7 +1140,7 @@ class SVGRenderer {
       this.performanceMonitor.recordElement();
       return path;
     } catch (error) {
-      this.errorHandler('Failed to create path', error);
+      this.errorHandler("Failed to create path", error);
       return null;
     }
   }
@@ -1156,8 +1156,8 @@ class SVGRenderer {
   createText(x, y, text, options = {}) {
     if (this.elementCount >= this.options.maxElements) {
       this.errorHandler(
-        'Maximum element count exceeded',
-        new Error('Performance limit')
+        "Maximum element count exceeded",
+        new Error("Performance limit"),
       );
       return null;
     }
@@ -1166,30 +1166,30 @@ class SVGRenderer {
       // Accessibility: Ensure minimum font size
       const fontSize = Math.max(
         parseFloat(options.fontSize) || SVG_CONSTANTS.UI.DEFAULT_FONT_SIZE,
-        SVG_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE
+        SVG_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE,
       );
 
       const fill =
         options.fill || options.color || this.currentTheme.foreground;
 
-      const textElement = this.createSVGElement('text', {
+      const textElement = this.createSVGElement("text", {
         x,
         y,
-        'text-anchor': options.textAnchor || 'start',
-        'dominant-baseline': options.dominantBaseline || 'middle',
-        'font-size': fontSize,
-        'font-family': options.fontFamily || 'inherit',
-        'font-weight': options.fontWeight || 'normal',
-        'font-style': options.fontStyle || 'normal',
-        'text-decoration': options.textDecoration,
+        "text-anchor": options.textAnchor || "start",
+        "dominant-baseline": options.dominantBaseline || "middle",
+        "font-size": fontSize,
+        "font-family": options.fontFamily || "inherit",
+        "font-weight": options.fontWeight || "normal",
+        "font-style": options.fontStyle || "normal",
+        "text-decoration": options.textDecoration,
         fill,
         stroke: options.stroke,
-        'stroke-width': options.strokeWidth || 0,
-        'letter-spacing': options.letterSpacing,
-        'word-spacing': options.wordSpacing,
-        class: `text-element ${options.className || ''} ${options.accessible ? 'accessible-element' : ''}`,
-        'data-theme-color': options.themeColor,
-        'data-theme-attribute': 'fill',
+        "stroke-width": options.strokeWidth || 0,
+        "letter-spacing": options.letterSpacing,
+        "word-spacing": options.wordSpacing,
+        class: `text-element ${options.className || ""} ${options.accessible ? "accessible-element" : ""}`,
+        "data-theme-color": options.themeColor,
+        "data-theme-attribute": "fill",
         ...options.attributes,
       });
 
@@ -1201,7 +1201,7 @@ class SVGRenderer {
       if (options.shadow) {
         const filter = this.createTextShadowFilter(options.shadow);
         if (filter) {
-          textElement.setAttribute('filter', `url(#${filter.id})`);
+          textElement.setAttribute("filter", `url(#${filter.id})`);
         }
       }
 
@@ -1210,7 +1210,7 @@ class SVGRenderer {
         this.accessibilityManager.addElement(
           options.id || `text_${this.elementCount}`,
           {
-            type: 'text',
+            type: "text",
             svgElement: textElement,
             x,
             y,
@@ -1220,7 +1220,7 @@ class SVGRenderer {
             label: options.label || text,
             ariaLabel: options.ariaLabel || text,
             description: options.description,
-          }
+          },
         );
       }
 
@@ -1228,7 +1228,7 @@ class SVGRenderer {
       this.performanceMonitor.recordElement();
       return textElement;
     } catch (error) {
-      this.errorHandler('Failed to create text', error);
+      this.errorHandler("Failed to create text", error);
       return null;
     }
   }
@@ -1240,11 +1240,11 @@ class SVGRenderer {
    */
   createGroup(options = {}) {
     try {
-      const group = this.createSVGElement('g', {
-        class: `group-element ${options.className || ''}`,
-        transform: options.transform || '',
+      const group = this.createSVGElement("g", {
+        class: `group-element ${options.className || ""}`,
+        transform: options.transform || "",
         opacity: options.opacity || 1,
-        'data-group-id': options.id,
+        "data-group-id": options.id,
         ...options.attributes,
       });
 
@@ -1254,7 +1254,7 @@ class SVGRenderer {
       this.performanceMonitor.recordElement();
       return group;
     } catch (error) {
-      this.errorHandler('Failed to create group', error);
+      this.errorHandler("Failed to create group", error);
       return null;
     }
   }
@@ -1268,20 +1268,20 @@ class SVGRenderer {
   createTextShadowFilter(shadow) {
     try {
       const filterId = `text-shadow-${Math.random().toString(SVG_CONSTANTS.ID_GENERATION.RADIX).substr(SVG_CONSTANTS.ID_GENERATION.SUBSTRING_START, SVG_CONSTANTS.ID_GENERATION.SUBSTRING_LENGTH)}`;
-      const filter = this.createSVGElement('filter', {
+      const filter = this.createSVGElement("filter", {
         id: filterId,
-        x: '-50%',
-        y: '-50%',
-        width: '200%',
-        height: '200%',
+        x: "-50%",
+        y: "-50%",
+        width: "200%",
+        height: "200%",
       });
 
-      const dropShadow = this.createSVGElement('feDropShadow', {
+      const dropShadow = this.createSVGElement("feDropShadow", {
         dx: shadow.offsetX || 1,
         dy: shadow.offsetY || 1,
-        'std-deviation': shadow.blur || 1,
-        'flood-color': shadow.color || 'rgba(0,0,0,0.5)',
-        'flood-opacity':
+        "std-deviation": shadow.blur || 1,
+        "flood-color": shadow.color || "rgba(0,0,0,0.5)",
+        "flood-opacity":
           shadow.opacity || SVG_CONSTANTS.UI.DEFAULT_SHADOW_OPACITY,
       });
 
@@ -1289,7 +1289,7 @@ class SVGRenderer {
       this.defs.appendChild(filter);
       return filter;
     } catch (error) {
-      this.errorHandler('Failed to create text shadow filter', error);
+      this.errorHandler("Failed to create text shadow filter", error);
       return null;
     }
   }
@@ -1314,22 +1314,22 @@ class SVGRenderer {
       }
 
       let gradient;
-      if (type === 'linear') {
-        gradient = this.createSVGElement('linearGradient', {
+      if (type === "linear") {
+        gradient = this.createSVGElement("linearGradient", {
           id: gradientId,
-          x1: coordinates.x1 || '0%',
-          y1: coordinates.y1 || '0%',
-          x2: coordinates.x2 || '100%',
-          y2: coordinates.y2 || '0%',
+          x1: coordinates.x1 || "0%",
+          y1: coordinates.y1 || "0%",
+          x2: coordinates.x2 || "100%",
+          y2: coordinates.y2 || "0%",
         });
-      } else if (type === 'radial') {
-        gradient = this.createSVGElement('radialGradient', {
+      } else if (type === "radial") {
+        gradient = this.createSVGElement("radialGradient", {
           id: gradientId,
-          cx: coordinates.cx || '50%',
-          cy: coordinates.cy || '50%',
-          r: coordinates.r || '50%',
-          fx: coordinates.fx || coordinates.cx || '50%',
-          fy: coordinates.fy || coordinates.cy || '50%',
+          cx: coordinates.cx || "50%",
+          cy: coordinates.cy || "50%",
+          r: coordinates.r || "50%",
+          fx: coordinates.fx || coordinates.cx || "50%",
+          fy: coordinates.fy || coordinates.cy || "50%",
         });
       } else {
         throw new Error(`Unsupported gradient type: ${type}`);
@@ -1337,15 +1337,15 @@ class SVGRenderer {
 
       if (!gradient) return null;
 
-      colorStops.forEach(stop => {
-        const offset = typeof stop === 'object' ? stop.offset : stop[0];
-        const color = typeof stop === 'object' ? stop.color : stop[1];
-        const opacity = typeof stop === 'object' ? stop.opacity : undefined;
+      colorStops.forEach((stop) => {
+        const offset = typeof stop === "object" ? stop.offset : stop[0];
+        const color = typeof stop === "object" ? stop.color : stop[1];
+        const opacity = typeof stop === "object" ? stop.opacity : undefined;
 
-        const stopElement = this.createSVGElement('stop', {
-          offset: typeof offset === 'number' ? `${offset * 100}%` : offset,
-          'stop-color': color,
-          'stop-opacity': opacity,
+        const stopElement = this.createSVGElement("stop", {
+          offset: typeof offset === "number" ? `${offset * 100}%` : offset,
+          "stop-color": color,
+          "stop-opacity": opacity,
         });
 
         gradient.appendChild(stopElement);
@@ -1355,7 +1355,7 @@ class SVGRenderer {
       this.gradientCache.set(gradientId, gradient);
       return gradient;
     } catch (error) {
-      this.errorHandler('Failed to create gradient', error);
+      this.errorHandler("Failed to create gradient", error);
       return null;
     }
   }
@@ -1376,15 +1376,15 @@ class SVGRenderer {
       // Ensure minimum touch target size
       const adjustedWidth = Math.max(
         width,
-        SVG_CONSTANTS.ACCESSIBILITY.MIN_TOUCH_TARGET
+        SVG_CONSTANTS.ACCESSIBILITY.MIN_TOUCH_TARGET,
       );
       const adjustedHeight = Math.max(
         height,
-        SVG_CONSTANTS.ACCESSIBILITY.MIN_TOUCH_TARGET
+        SVG_CONSTANTS.ACCESSIBILITY.MIN_TOUCH_TARGET,
       );
 
       const button = this.createGroup({
-        className: 'svg-button clickable interactive accessible-element',
+        className: "svg-button clickable interactive accessible-element",
         transform: `translate(${x}, ${y})`,
         id: options.id,
       });
@@ -1398,8 +1398,8 @@ class SVGRenderer {
         strokeWidth: 1,
         borderRadius:
           options.borderRadius || SVG_CONSTANTS.UI.DEFAULT_BORDER_RADIUS,
-        themeColor: 'primary',
-        className: 'button-background',
+        themeColor: "primary",
+        className: "button-background",
       });
 
       // Create button text
@@ -1408,17 +1408,17 @@ class SVGRenderer {
         adjustedHeight / 2,
         text,
         {
-          textAnchor: 'middle',
-          dominantBaseline: 'middle',
-          fill: options.textColor || '#ffffff',
+          textAnchor: "middle",
+          dominantBaseline: "middle",
+          fill: options.textColor || "#ffffff",
           fontSize: Math.max(
             options.fontSize || SVG_CONSTANTS.UI.DEFAULT_FONT_SIZE,
-            SVG_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE
+            SVG_CONSTANTS.ACCESSIBILITY.MIN_FONT_SIZE,
           ),
-          fontWeight: options.fontWeight || '500',
-          className: 'button-text',
+          fontWeight: options.fontWeight || "500",
+          className: "button-text",
           accessible: true,
-        }
+        },
       );
 
       if (background) button.appendChild(background);
@@ -1426,9 +1426,9 @@ class SVGRenderer {
 
       // Add event handlers
       if (onClick) {
-        button.addEventListener('click', onClick);
-        button.addEventListener('keydown', e => {
-          if (e.key === 'Enter' || e.key === ' ') {
+        button.addEventListener("click", onClick);
+        button.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             onClick(e);
           }
@@ -1436,14 +1436,14 @@ class SVGRenderer {
       }
 
       // Set accessibility attributes
-      button.setAttribute('tabindex', '0');
-      button.setAttribute('role', 'button');
-      button.setAttribute('aria-label', options.ariaLabel || text);
+      button.setAttribute("tabindex", "0");
+      button.setAttribute("role", "button");
+      button.setAttribute("aria-label", options.ariaLabel || text);
 
       if (options.disabled) {
-        button.setAttribute('aria-disabled', 'true');
-        button.style.opacity = '0.5';
-        button.style.cursor = 'not-allowed';
+        button.setAttribute("aria-disabled", "true");
+        button.style.opacity = "0.5";
+        button.style.cursor = "not-allowed";
       }
 
       // Register with accessibility manager
@@ -1451,7 +1451,7 @@ class SVGRenderer {
         this.accessibilityManager.addElement(
           options.id || `button_${this.elementCount}`,
           {
-            type: 'button',
+            type: "button",
             svgElement: button,
             x,
             y,
@@ -1463,8 +1463,8 @@ class SVGRenderer {
             description: options.description,
             onClick,
             focusable: !options.disabled,
-            role: 'button',
-          }
+            role: "button",
+          },
         );
       }
 
@@ -1472,7 +1472,7 @@ class SVGRenderer {
       this.performanceMonitor.recordElement();
       return button;
     } catch (error) {
-      this.errorHandler('Failed to create button', error);
+      this.errorHandler("Failed to create button", error);
       return null;
     }
   }
@@ -1489,7 +1489,7 @@ class SVGRenderer {
   createChart(x, y, width, height, options = {}) {
     try {
       const chart = this.createGroup({
-        className: 'svg-chart accessible-element',
+        className: "svg-chart accessible-element",
         transform: `translate(${x}, ${y})`,
         id: options.id,
       });
@@ -1502,7 +1502,7 @@ class SVGRenderer {
           fill: options.backgroundColor || this.currentTheme.background,
           stroke: options.borderColor || this.currentTheme.border,
           strokeWidth: options.borderWidth || 1,
-          className: 'chart-background',
+          className: "chart-background",
         });
 
         if (background) chart.appendChild(background);
@@ -1515,13 +1515,13 @@ class SVGRenderer {
           SVG_CONSTANTS.UI.TITLE_OFFSET,
           options.title,
           {
-            textAnchor: 'middle',
+            textAnchor: "middle",
             fill: this.currentTheme.foreground,
             fontSize: 16,
-            fontWeight: 'bold',
-            className: 'chart-title',
+            fontWeight: "bold",
+            className: "chart-title",
             accessible: true,
-          }
+          },
         );
 
         if (title) chart.appendChild(title);
@@ -1532,17 +1532,17 @@ class SVGRenderer {
         this.accessibilityManager.addElement(
           options.id || `chart_${this.elementCount}`,
           {
-            type: 'chart',
+            type: "chart",
             svgElement: chart,
             x,
             y,
             width,
             height,
-            label: options.label || options.title || 'Chart',
-            ariaLabel: options.ariaLabel || `${options.type || 'Data'} chart`,
+            label: options.label || options.title || "Chart",
+            ariaLabel: options.ariaLabel || `${options.type || "Data"} chart`,
             description:
-              options.description || 'Interactive data visualization',
-          }
+              options.description || "Interactive data visualization",
+          },
         );
       }
 
@@ -1550,7 +1550,7 @@ class SVGRenderer {
       this.performanceMonitor.recordElement();
       return chart;
     } catch (error) {
-      this.errorHandler('Failed to create chart', error);
+      this.errorHandler("Failed to create chart", error);
       return null;
     }
   }
@@ -1573,9 +1573,9 @@ class SVGRenderer {
         return this.patternCache.get(patternId);
       }
 
-      const pattern = this.createSVGElement('pattern', {
+      const pattern = this.createSVGElement("pattern", {
         id: patternId,
-        patternUnits: 'userSpaceOnUse',
+        patternUnits: "userSpaceOnUse",
         width: options.width || 10,
         height: options.height || 10,
       });
@@ -1586,20 +1586,20 @@ class SVGRenderer {
       const strokeWidth = options.strokeWidth || 1;
 
       switch (type) {
-        case 'dots': {
+        case "dots": {
           const dot = this.createCircle(
             SVG_CONSTANTS.MATH.PATTERN_SIZE,
             SVG_CONSTANTS.MATH.PATTERN_SIZE,
             SVG_CONSTANTS.MATH.PATTERN_DOT_RADIUS,
             {
               fill: color,
-            }
+            },
           );
           if (dot) pattern.appendChild(dot);
           break;
         }
 
-        case 'lines': {
+        case "lines": {
           const line = this.createLine(0, 0, 0, 10, {
             stroke: color,
             strokeWidth,
@@ -1608,7 +1608,7 @@ class SVGRenderer {
           break;
         }
 
-        case 'grid': {
+        case "grid": {
           const vLine = this.createLine(0, 0, 0, 10, {
             stroke: color,
             strokeWidth,
@@ -1622,7 +1622,7 @@ class SVGRenderer {
           break;
         }
 
-        case 'diagonal': {
+        case "diagonal": {
           const diagLine = this.createLine(0, 10, 10, 0, {
             stroke: color,
             strokeWidth,
@@ -1639,7 +1639,7 @@ class SVGRenderer {
       this.patternCache.set(patternId, pattern);
       return pattern;
     } catch (error) {
-      this.errorHandler('Failed to create pattern', error);
+      this.errorHandler("Failed to create pattern", error);
       return null;
     }
   }
@@ -1654,11 +1654,11 @@ class SVGRenderer {
    * @param {Object} options - Animation options
    * @returns {string} Animation ID for control
    */
-  animate(element, properties, duration = 1000, easing = 'ease', options = {}) {
+  animate(element, properties, duration = 1000, easing = "ease", options = {}) {
     if (!element) {
       this.errorHandler(
-        'Invalid element for animation',
-        new Error('Element is required')
+        "Invalid element for animation",
+        new Error("Element is required"),
       );
       return null;
     }
@@ -1667,7 +1667,7 @@ class SVGRenderer {
     if (
       this.options.respectReducedMotion &&
       window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
       // Skip animation for motion-sensitive users
       if (options.skipOnReducedMotion !== false) {
@@ -1678,7 +1678,7 @@ class SVGRenderer {
       // Reduce animation duration for motion-sensitive users
       duration = Math.min(
         duration * SVG_CONSTANTS.PERFORMANCE.ANIMATION_DURATION_MULTIPLIER,
-        SVG_CONSTANTS.PERFORMANCE.MAX_ANIMATION_DURATION
+        SVG_CONSTANTS.PERFORMANCE.MAX_ANIMATION_DURATION,
       );
     }
 
@@ -1693,7 +1693,7 @@ class SVGRenderer {
         .toString(SVG_CONSTANTS.ID_GENERATION.RADIX)
         .substr(
           SVG_CONSTANTS.ID_GENERATION.SUBSTRING_START,
-          SVG_CONSTANTS.ID_GENERATION.SUBSTRING_LENGTH
+          SVG_CONSTANTS.ID_GENERATION.SUBSTRING_LENGTH,
         ),
       onComplete: options.onComplete,
       onProgress: options.onProgress,
@@ -1702,13 +1702,13 @@ class SVGRenderer {
     };
 
     // Store starting values
-    Object.keys(properties).forEach(prop => {
+    Object.keys(properties).forEach((prop) => {
       try {
-        if (prop === 'transform') {
-          animation.startValues[prop] = element.getAttribute('transform') || '';
-        } else if (prop === 'opacity') {
+        if (prop === "transform") {
+          animation.startValues[prop] = element.getAttribute("transform") || "";
+        } else if (prop === "opacity") {
           animation.startValues[prop] =
-            parseFloat(element.getAttribute('opacity')) || 1;
+            parseFloat(element.getAttribute("opacity")) || 1;
         } else {
           animation.startValues[prop] =
             parseFloat(element.getAttribute(prop)) || 0;
@@ -1716,7 +1716,7 @@ class SVGRenderer {
       } catch (error) {
         logger.warn(
           `Failed to get starting value for property: ${prop}`,
-          error
+          error,
         );
         animation.startValues[prop] = 0;
       }
@@ -1739,7 +1739,7 @@ class SVGRenderer {
         element.setAttribute(prop, value);
       });
     } catch (error) {
-      this.errorHandler('Failed to apply animation state', error);
+      this.errorHandler("Failed to apply animation state", error);
     }
   }
 
@@ -1748,7 +1748,7 @@ class SVGRenderer {
    * @param {Object} animation - Animation object
    */
   runAnimation(animation) {
-    const animate = currentTime => {
+    const animate = (currentTime) => {
       if (animation.cancelled) {
         this.animations.delete(animation);
         return;
@@ -1770,7 +1770,7 @@ class SVGRenderer {
         Object.entries(animation.properties).forEach(([prop, endValue]) => {
           const startValue = animation.startValues[prop];
 
-          if (prop === 'transform') {
+          if (prop === "transform") {
             // Handle transform separately as it's not numeric
             animation.element.setAttribute(prop, endValue);
           } else {
@@ -1793,7 +1793,7 @@ class SVGRenderer {
           }
         }
       } catch (error) {
-        this.errorHandler('Animation update failed', error);
+        this.errorHandler("Animation update failed", error);
         this.animations.delete(animation);
       }
     };
@@ -1809,25 +1809,25 @@ class SVGRenderer {
    */
   applyEasing(t, easing) {
     switch (easing) {
-      case 'linear':
+      case "linear":
         return t;
-      case 'ease-in':
+      case "ease-in":
         return t * t;
-      case 'ease-out':
+      case "ease-out":
         return t * (2 - t);
-      case 'ease-in-out':
+      case "ease-in-out":
         return t < SVG_CONSTANTS.MATH.EASING_THRESHOLD_1
           ? 2 * t * t
           : -1 + (SVG_CONSTANTS.MATH.EASING_MULTIPLIER - 2 * t) * t;
-      case 'ease-in-cubic':
+      case "ease-in-cubic":
         return t * t * t;
-      case 'ease-out-cubic':
+      case "ease-out-cubic":
         return --t * t * t + 1;
-      case 'ease-in-out-cubic':
+      case "ease-in-out-cubic":
         return t < SVG_CONSTANTS.MATH.EASING_THRESHOLD_1
           ? SVG_CONSTANTS.MATH.EASING_MULTIPLIER * t * t * t
           : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
-      case 'bounce':
+      case "bounce":
         if (t < 1 / SVG_CONSTANTS.MATH.BOUNCE_DIVISOR) {
           return SVG_CONSTANTS.MATH.BOUNCE_COEFFICIENT * t * t;
         } else if (t < 2 / SVG_CONSTANTS.MATH.BOUNCE_DIVISOR) {
@@ -1861,7 +1861,7 @@ class SVGRenderer {
             SVG_CONSTANTS.MATH.BOUNCE_THRESHOLD_3
           );
         }
-      case 'elastic': {
+      case "elastic": {
         const c4 = (2 * Math.PI) / SVG_CONSTANTS.MATH.ELASTIC_DIVISOR;
         return t === 0
           ? 0
@@ -1871,7 +1871,7 @@ class SVGRenderer {
                 Math.sin(
                   (t * SVG_CONSTANTS.MATH.ELASTIC_MULTIPLIER -
                     SVG_CONSTANTS.MATH.ELASTIC_OFFSET) *
-                    c4
+                    c4,
                 ) +
               1;
       }
@@ -1942,8 +1942,8 @@ class SVGRenderer {
       element,
       { opacity: targetOpacity },
       duration,
-      options.easing || 'ease-out',
-      options
+      options.easing || "ease-out",
+      options,
     );
   }
 
@@ -1963,8 +1963,8 @@ class SVGRenderer {
       element,
       { transform: newTransform },
       duration,
-      options.easing || 'ease-out',
-      options
+      options.easing || "ease-out",
+      options,
     );
   }
 
@@ -1977,12 +1977,12 @@ class SVGRenderer {
    * @returns {string} Animation ID
    */
   scaleAnimation(element, targetScale, duration = 500, options = {}) {
-    const currentTransform = element.getAttribute('transform') || '';
+    const currentTransform = element.getAttribute("transform") || "";
     const scaleTransform = `scale(${targetScale})`;
 
     // Preserve existing transforms
     let newTransform = scaleTransform;
-    if (currentTransform && !currentTransform.includes('scale')) {
+    if (currentTransform && !currentTransform.includes("scale")) {
       newTransform = `${currentTransform} ${scaleTransform}`;
     }
 
@@ -1990,8 +1990,8 @@ class SVGRenderer {
       element,
       { transform: newTransform },
       duration,
-      options.easing || 'ease-out',
-      options
+      options.easing || "ease-out",
+      options,
     );
   }
 
@@ -2004,12 +2004,12 @@ class SVGRenderer {
    * @returns {string} Animation ID
    */
   rotateAnimation(element, targetRotation, duration = 500, options = {}) {
-    const currentTransform = element.getAttribute('transform') || '';
+    const currentTransform = element.getAttribute("transform") || "";
     const rotateTransform = `rotate(${targetRotation})`;
 
     // Preserve existing transforms
     let newTransform = rotateTransform;
-    if (currentTransform && !currentTransform.includes('rotate')) {
+    if (currentTransform && !currentTransform.includes("rotate")) {
       newTransform = `${currentTransform} ${rotateTransform}`;
     }
 
@@ -2017,8 +2017,8 @@ class SVGRenderer {
       element,
       { transform: newTransform },
       duration,
-      options.easing || 'ease-out',
-      options
+      options.easing || "ease-out",
+      options,
     );
   }
   // Enhanced rendering and integration methods
@@ -2028,7 +2028,7 @@ class SVGRenderer {
    * @returns {string} Renderer type
    */
   get type() {
-    return 'svg';
+    return "svg";
   }
 
   /**
@@ -2059,16 +2059,16 @@ class SVGRenderer {
           this.options.height,
           {
             fill: scene.backgroundColor,
-            className: 'scene-background',
-          }
+            className: "scene-background",
+          },
         );
         if (background) this.mainGroup.appendChild(background);
       }
 
-      if (scene.render && typeof scene.render === 'function') {
+      if (scene.render && typeof scene.render === "function") {
         scene.render(this);
       } else if (scene.objects && Array.isArray(scene.objects)) {
-        scene.objects.forEach(obj => this.renderObject(obj));
+        scene.objects.forEach((obj) => this.renderObject(obj));
       }
 
       // Announce scene changes to screen readers
@@ -2076,7 +2076,7 @@ class SVGRenderer {
         this.accessibilityManager.updateDescription(scene.description);
       }
     } catch (error) {
-      this.errorHandler('Failed to render scene', error);
+      this.errorHandler("Failed to render scene", error);
     } finally {
       this.performanceMonitor.endFrame();
     }
@@ -2092,7 +2092,7 @@ class SVGRenderer {
     try {
       // Create SVG group for this object
       const group = this.createGroup({
-        className: 'scene-object',
+        className: "scene-object",
         id: object.id,
       });
 
@@ -2113,18 +2113,18 @@ class SVGRenderer {
 
       if (object.scale && object.scale !== 1) {
         const scaleX =
-          typeof object.scale === 'object' ? object.scale.x : object.scale;
+          typeof object.scale === "object" ? object.scale.x : object.scale;
         const scaleY =
-          typeof object.scale === 'object' ? object.scale.y : object.scale;
+          typeof object.scale === "object" ? object.scale.y : object.scale;
         transforms.push(`scale(${scaleX}, ${scaleY})`);
       }
 
       if (transforms.length > 0) {
-        group.setAttribute('transform', transforms.join(' '));
+        group.setAttribute("transform", transforms.join(" "));
       }
 
       if (object.alpha !== undefined) {
-        group.setAttribute('opacity', Math.max(0, Math.min(1, object.alpha)));
+        group.setAttribute("opacity", Math.max(0, Math.min(1, object.alpha)));
       }
 
       // Apply blend mode if specified
@@ -2134,7 +2134,7 @@ class SVGRenderer {
 
       // Render based on object type or custom render method
       let element;
-      if (object.render && typeof object.render === 'function') {
+      if (object.render && typeof object.render === "function") {
         // Let object render itself
         object.render(this, group);
       } else if (object.type) {
@@ -2148,8 +2148,8 @@ class SVGRenderer {
       this.mainGroup.appendChild(group);
     } catch (error) {
       this.errorHandler(
-        `Failed to render object: ${object.type || 'unknown'}`,
-        error
+        `Failed to render object: ${object.type || "unknown"}`,
+        error,
       );
     }
   }
@@ -2177,8 +2177,8 @@ class SVGRenderer {
 
     try {
       switch (object.type) {
-        case 'rect':
-        case 'rectangle':
+        case "rect":
+        case "rectangle":
           return this.createRect(
             0,
             0,
@@ -2187,19 +2187,19 @@ class SVGRenderer {
             {
               ...commonOptions,
               borderRadius: object.borderRadius,
-            }
+            },
           );
 
-        case 'circle':
+        case "circle":
           return this.createCircle(
             0,
             0,
             object.radius || SVG_CONSTANTS.UI.DEFAULT_RADIUS,
-            commonOptions
+            commonOptions,
           );
 
-        case 'ellipse':
-          return this.createSVGElement('ellipse', {
+        case "ellipse":
+          return this.createSVGElement("ellipse", {
             cx: 0,
             cy: 0,
             rx:
@@ -2210,16 +2210,16 @@ class SVGRenderer {
               object.radiusY ||
               object.radius ||
               SVG_CONSTANTS.UI.DEFAULT_RADIUS,
-            fill: commonOptions.fill || 'transparent',
-            stroke: commonOptions.stroke || 'none',
-            'stroke-width':
+            fill: commonOptions.fill || "transparent",
+            stroke: commonOptions.stroke || "none",
+            "stroke-width":
               commonOptions.strokeWidth ||
               SVG_CONSTANTS.ACCESSIBILITY.MIN_STROKE_WIDTH,
-            class: `ellipse-element ${commonOptions.className || ''}`,
+            class: `ellipse-element ${commonOptions.className || ""}`,
           });
 
-        case 'text':
-          return this.createText(0, 0, object.text || '', {
+        case "text":
+          return this.createText(0, 0, object.text || "", {
             fill: commonOptions.fill,
             fontSize: object.fontSize,
             fontFamily: object.fontFamily,
@@ -2235,7 +2235,7 @@ class SVGRenderer {
             description: commonOptions.description,
           });
 
-        case 'line':
+        case "line":
           return this.createLine(
             object.x1 || 0,
             object.y1 || 0,
@@ -2249,10 +2249,10 @@ class SVGRenderer {
               dashArray: object.dashArray,
               dashOffset: object.dashOffset,
               className: commonOptions.className,
-            }
+            },
           );
 
-        case 'path':
+        case "path":
           if (object.pathData || object.d) {
             return this.createPath(object.pathData || object.d, {
               ...commonOptions,
@@ -2264,53 +2264,53 @@ class SVGRenderer {
           }
           break;
 
-        case 'polygon':
+        case "polygon":
           if (object.points) {
             const pointsString = Array.isArray(object.points)
-              ? object.points.map(p => `${p.x},${p.y}`).join(' ')
+              ? object.points.map((p) => `${p.x},${p.y}`).join(" ")
               : object.points;
 
-            return this.createSVGElement('polygon', {
+            return this.createSVGElement("polygon", {
               points: pointsString,
-              fill: commonOptions.fill || 'transparent',
-              stroke: commonOptions.stroke || 'none',
-              'stroke-width':
+              fill: commonOptions.fill || "transparent",
+              stroke: commonOptions.stroke || "none",
+              "stroke-width":
                 commonOptions.strokeWidth ||
                 SVG_CONSTANTS.ACCESSIBILITY.MIN_STROKE_WIDTH,
-              class: `polygon-element ${commonOptions.className || ''}`,
+              class: `polygon-element ${commonOptions.className || ""}`,
             });
           }
           break;
 
-        case 'polyline':
+        case "polyline":
           if (object.points) {
             const pointsString = Array.isArray(object.points)
-              ? object.points.map(p => `${p.x},${p.y}`).join(' ')
+              ? object.points.map((p) => `${p.x},${p.y}`).join(" ")
               : object.points;
 
-            return this.createSVGElement('polyline', {
+            return this.createSVGElement("polyline", {
               points: pointsString,
-              fill: 'none',
+              fill: "none",
               stroke: commonOptions.stroke || this.currentTheme.foreground,
-              'stroke-width':
+              "stroke-width":
                 commonOptions.strokeWidth ||
                 SVG_CONSTANTS.ACCESSIBILITY.MIN_STROKE_WIDTH,
-              class: `polyline-element ${commonOptions.className || ''}`,
+              class: `polyline-element ${commonOptions.className || ""}`,
             });
           }
           break;
 
-        case 'image':
+        case "image":
           if (object.href || object.src) {
-            return this.createSVGElement('image', {
+            return this.createSVGElement("image", {
               x: 0,
               y: 0,
               width: object.width || SVG_CONSTANTS.UI.DEFAULT_OBJECT_SIZE,
               height: object.height || SVG_CONSTANTS.UI.DEFAULT_OBJECT_SIZE,
               href: object.href || object.src,
               preserveAspectRatio:
-                object.preserveAspectRatio || 'xMidYMid meet',
-              class: `image-element ${commonOptions.className || ''}`,
+                object.preserveAspectRatio || "xMidYMid meet",
+              class: `image-element ${commonOptions.className || ""}`,
             });
           }
           break;
@@ -2324,11 +2324,11 @@ class SVGRenderer {
             SVG_CONSTANTS.MATH.PLACEHOLDER_SIZE,
             SVG_CONSTANTS.MATH.PLACEHOLDER_SIZE,
             {
-              fill: '#ff6b6b',
-              stroke: '#e55555',
+              fill: "#ff6b6b",
+              stroke: "#e55555",
               strokeWidth: 1,
-              className: 'unknown-object-placeholder',
-            }
+              className: "unknown-object-placeholder",
+            },
           );
       }
     } catch (error) {
@@ -2348,8 +2348,8 @@ class SVGRenderer {
   resize(width, height) {
     if (!width || !height || width <= 0 || height <= 0) {
       this.errorHandler(
-        'Invalid resize dimensions',
-        new Error('Width and height must be positive')
+        "Invalid resize dimensions",
+        new Error("Width and height must be positive"),
       );
       return;
     }
@@ -2358,20 +2358,20 @@ class SVGRenderer {
       this.options.width = width;
       this.options.height = height;
 
-      this.svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+      this.svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
       // Trigger resize event for listeners
       this.svg.dispatchEvent(
-        new CustomEvent('svgResize', {
+        new CustomEvent("svgResize", {
           detail: { width, height },
-        })
+        }),
       );
 
       // Clear performance metrics on resize
       this.performanceMonitor.reset();
       this.elementCount = 0;
     } catch (error) {
-      this.errorHandler('Failed to resize SVG', error);
+      this.errorHandler("Failed to resize SVG", error);
     }
   }
 
@@ -2384,8 +2384,8 @@ class SVGRenderer {
   addToLayer(layerName, element) {
     if (!element) {
       this.errorHandler(
-        'Invalid element provided to layer',
-        new Error('Element is required')
+        "Invalid element provided to layer",
+        new Error("Element is required"),
       );
       return null;
     }
@@ -2395,7 +2395,7 @@ class SVGRenderer {
       layer.appendChild(element);
       return element;
     } catch (error) {
-      this.errorHandler('Failed to add element to layer', error);
+      this.errorHandler("Failed to add element to layer", error);
       return null;
     }
   }
@@ -2408,10 +2408,10 @@ class SVGRenderer {
     try {
       if (layerName) {
         const layer = this.getLayer(layerName);
-        layer.innerHTML = '';
+        layer.innerHTML = "";
       } else {
         // Clear all content but preserve structure
-        this.mainGroup.innerHTML = '';
+        this.mainGroup.innerHTML = "";
         this.layers.clear();
         this.elementCount = 0;
 
@@ -2423,7 +2423,7 @@ class SVGRenderer {
 
       this.performanceMonitor.recordDOMOperation();
     } catch (error) {
-      this.errorHandler('Failed to clear SVG content', error);
+      this.errorHandler("Failed to clear SVG content", error);
     }
   }
 
@@ -2436,9 +2436,9 @@ class SVGRenderer {
    */
   setViewBox(x, y, width, height) {
     try {
-      this.svg.setAttribute('viewBox', `${x} ${y} ${width} ${height}`);
+      this.svg.setAttribute("viewBox", `${x} ${y} ${width} ${height}`);
     } catch (error) {
-      this.errorHandler('Failed to set viewBox', error);
+      this.errorHandler("Failed to set viewBox", error);
     }
   }
 
@@ -2453,8 +2453,8 @@ class SVGRenderer {
 
       if (options.optimize) {
         // Basic optimization: remove unnecessary whitespace and comments
-        svgString = svgString.replace(/>\s+</g, '><');
-        svgString = svgString.replace(/<!--[\s\S]*?-->/g, '');
+        svgString = svgString.replace(/>\s+</g, "><");
+        svgString = svgString.replace(/<!--[\s\S]*?-->/g, "");
       }
 
       if (options.standalone) {
@@ -2464,8 +2464,8 @@ class SVGRenderer {
 
       return svgString;
     } catch (error) {
-      this.errorHandler('Failed to export SVG', error);
-      return '';
+      this.errorHandler("Failed to export SVG", error);
+      return "";
     }
   }
 
@@ -2480,8 +2480,8 @@ class SVGRenderer {
       const base64 = btoa(unescape(encodeURIComponent(svgString)));
       return `data:image/svg+xml;base64,${base64}`;
     } catch (error) {
-      this.errorHandler('Failed to create data URL', error);
-      return '';
+      this.errorHandler("Failed to create data URL", error);
+      return "";
     }
   }
 
@@ -2512,7 +2512,7 @@ class SVGRenderer {
       this.gradientCache.clear();
       this.patternCache.clear();
     } catch (error) {
-      this.errorHandler('Failed to clear caches', error);
+      this.errorHandler("Failed to clear caches", error);
     }
   }
 
@@ -2523,13 +2523,13 @@ class SVGRenderer {
    */
   getElementById(id) {
     try {
-      if (!id || typeof id !== 'string' || id.trim() === '') {
-        this.errorHandler('getElementById called with invalid ID', { id });
+      if (!id || typeof id !== "string" || id.trim() === "") {
+        this.errorHandler("getElementById called with invalid ID", { id });
         return null;
       }
       return this.svg.querySelector(`#${CSS.escape(id)}`);
     } catch (error) {
-      this.errorHandler('Failed to find element by ID', error);
+      this.errorHandler("Failed to find element by ID", error);
       return null;
     }
   }
@@ -2543,7 +2543,7 @@ class SVGRenderer {
     try {
       return this.svg.querySelectorAll(`.${CSS.escape(className)}`);
     } catch (error) {
-      this.errorHandler('Failed to find elements by class', error);
+      this.errorHandler("Failed to find elements by class", error);
       return [];
     }
   }
@@ -2563,7 +2563,7 @@ class SVGRenderer {
       }
       return { x: 0, y: 0, width: 0, height: 0 };
     } catch (error) {
-      this.errorHandler('Failed to get bounding box', error);
+      this.errorHandler("Failed to get bounding box", error);
       return { x: 0, y: 0, width: 0, height: 0 };
     }
   }
@@ -2583,7 +2583,7 @@ class SVGRenderer {
       if (this.resizeObserver) {
         this.resizeObserver.disconnect();
       } else {
-        window.removeEventListener('resize', this.boundHandleResize);
+        window.removeEventListener("resize", this.boundHandleResize);
       }
 
       // Cancel any pending animation frames
@@ -2611,18 +2611,18 @@ class SVGRenderer {
 
       // Dispatch cleanup event
       document.dispatchEvent(
-        new CustomEvent('svgRendererDestroyed', {
+        new CustomEvent("svgRendererDestroyed", {
           detail: { rendererId: this.id },
-        })
+        }),
       );
     } catch (error) {
-      this.errorHandler('Error during cleanup', error);
+      this.errorHandler("Error during cleanup", error);
     }
   }
 }
 
 // Export for use in other modules
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.SVGRenderer = SVGRenderer;
 }
 

@@ -20,12 +20,12 @@
  */
 
 // Firebase imports
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import appCheckService from './app-check-service.js';
-import HybridDataService from './hybrid-data-service.js';
-import FirebaseStorageService from './firebase-storage-service.js';
-import PWAService from './pwa-service.js';
-import FirebaseAnalyticsService from './firebase-analytics-service.js';
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import appCheckService from "./app-check-service.js";
+import HybridDataService from "./hybrid-data-service.js";
+import FirebaseStorageService from "./firebase-storage-service.js";
+import PWAService from "./pwa-service.js";
+import FirebaseAnalyticsService from "./firebase-analytics-service.js";
 import {
   getAuth,
   signInWithPopup,
@@ -49,7 +49,7 @@ import {
   browserSessionPersistence,
   browserLocalPersistence,
   inMemoryPersistence,
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import {
   getFirestore,
   doc,
@@ -64,24 +64,24 @@ import {
   updateDoc,
   deleteDoc,
   onSnapshot,
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import {
   getStorage,
   ref,
   uploadBytes,
   getDownloadURL,
   deleteObject,
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 import {
   getAnalytics,
   logEvent,
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js';
-import { getPerformance } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-performance.js';
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+import { getPerformance } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-performance.js";
 
 // Import messaging service
-import { MessagingService } from './messaging-service.js';
+import { MessagingService } from "./messaging-service.js";
 // Import performance tracing service
-import { PerformanceTracing } from './performance-tracing.js';
+import { PerformanceTracing } from "./performance-tracing.js";
 
 /**
  * Firebase configuration and initialization
@@ -107,13 +107,13 @@ const getFirebaseConfig = () => {
 
   // Production Firebase configuration for SimulateAI
   return {
-    apiKey: 'AIzaSyAwoc3L-43aXyNjNB9ncGbFm7eE-yn5bFA',
-    authDomain: 'simulateai-research.firebaseapp.com',
-    projectId: 'simulateai-research',
-    storageBucket: 'simulateai-research.firebasestorage.app',
-    messagingSenderId: '52924445915', // Crucial for FCM!
-    appId: '1:52924445915:web:dadca1a93bc382403a08fe',
-    measurementId: 'G-XW8H062BMV',
+    apiKey: "AIzaSyAwoc3L-43aXyNjNB9ncGbFm7eE-yn5bFA",
+    authDomain: "simulateai-research.firebaseapp.com",
+    projectId: "simulateai-research",
+    storageBucket: "simulateai-research.firebasestorage.app",
+    messagingSenderId: "52924445915", // Crucial for FCM!
+    appId: "1:52924445915:web:dadca1a93bc382403a08fe",
+    measurementId: "G-XW8H062BMV",
   };
 };
 
@@ -136,7 +136,7 @@ export class FirebaseService {
     this.currentUser = null;
     this.authStateListeners = [];
     this.profileListeners = new Map(); // For real-time profile updates
-    this.persistenceMode = 'local'; // Default to persistent sessions
+    this.persistenceMode = "local"; // Default to persistent sessions
 
     // Rate limiting system
     this.rateLimiter = {
@@ -159,31 +159,31 @@ export class FirebaseService {
    * @param {string} mode - 'local', 'session', or 'memory'
    * @param {Object} options - Additional options like autoSignOut timer
    */
-  async setAuthPersistence(mode = 'local', options = {}) {
+  async setAuthPersistence(mode = "local", options = {}) {
     if (!this.auth) {
-      throw new Error('Firebase auth not initialized');
+      throw new Error("Firebase auth not initialized");
     }
 
     try {
       let persistence;
 
       switch (mode) {
-        case 'local':
+        case "local":
           // Persist across browser sessions (default)
           persistence = browserLocalPersistence;
-          this.persistenceMode = 'local';
+          this.persistenceMode = "local";
           break;
 
-        case 'session':
+        case "session":
           // Only persist during browser session
           persistence = browserSessionPersistence;
-          this.persistenceMode = 'session';
+          this.persistenceMode = "session";
           break;
 
-        case 'memory':
+        case "memory":
           // No persistence - user signed out when tab closes
           persistence = inMemoryPersistence;
-          this.persistenceMode = 'memory';
+          this.persistenceMode = "memory";
           break;
 
         default:
@@ -193,19 +193,19 @@ export class FirebaseService {
       await setPersistence(this.auth, persistence);
 
       // Set up auto-signout timer if specified
-      if (options.autoSignOutMinutes && mode !== 'memory') {
+      if (options.autoSignOutMinutes && mode !== "memory") {
         this.setupAutoSignOut(options.autoSignOutMinutes);
       }
 
       // Track persistence setting for analytics
-      this.trackEvent('auth_persistence_set', {
+      this.trackEvent("auth_persistence_set", {
         mode,
         auto_signout: options.autoSignOutMinutes || null,
       });
 
       return { success: true, mode };
     } catch (error) {
-      console.error('❌ Failed to set auth persistence:', error);
+      console.error("❌ Failed to set auth persistence:", error);
       return { success: false, error: error.message };
     }
   }
@@ -223,17 +223,16 @@ export class FirebaseService {
 
     this.autoSignOutTimer = setTimeout(async () => {
       if (this.isAuthenticated()) {
-
         await this.signOutUser();
 
         // Notify user about auto sign-out
         if (window.authService) {
           window.authService.showInfoMessage(
-            `You've been automatically signed out after ${minutes} minutes for security.`
+            `You've been automatically signed out after ${minutes} minutes for security.`,
           );
         }
 
-        this.trackEvent('auto_signout_triggered', {
+        this.trackEvent("auto_signout_triggered", {
           timeout_minutes: minutes,
           persistence_mode: this.persistenceMode,
         });
@@ -249,11 +248,11 @@ export class FirebaseService {
    */
   setupActivityDetection(minutes) {
     const events = [
-      'mousedown',
-      'mousemove',
-      'keypress',
-      'scroll',
-      'touchstart',
+      "mousedown",
+      "mousemove",
+      "keypress",
+      "scroll",
+      "touchstart",
     ];
 
     // Remove existing listeners if any
@@ -283,7 +282,7 @@ export class FirebaseService {
     };
 
     // Add activity listeners
-    this.activityListeners = events.map(event => {
+    this.activityListeners = events.map((event) => {
       const handler = throttledReset;
       document.addEventListener(event, handler, { passive: true });
       return { event, handler };
@@ -299,10 +298,10 @@ export class FirebaseService {
 
     if (isSharedComputer) {
       return {
-        mode: 'session',
+        mode: "session",
         autoSignOutMinutes: 15,
         reason:
-          'Shared computer detected - using session persistence with 15min timeout',
+          "Shared computer detected - using session persistence with 15min timeout",
       };
     }
 
@@ -311,15 +310,15 @@ export class FirebaseService {
 
     if (isMobile) {
       return {
-        mode: 'local',
-        reason: 'Mobile device - using persistent sessions for convenience',
+        mode: "local",
+        reason: "Mobile device - using persistent sessions for convenience",
       };
     }
 
     // Default for personal computers
     return {
-      mode: 'local',
-      reason: 'Personal computer - using persistent sessions',
+      mode: "local",
+      reason: "Personal computer - using persistent sessions",
     };
   }
 
@@ -333,18 +332,19 @@ export class FirebaseService {
 
     // Check for common shared computer indicators
     const sharedIndicators = [
-      'kiosk',
-      'public',
-      'lab',
-      'library',
-      'school',
-      'edu',
-      'university',
-      'college',
+      "kiosk",
+      "public",
+      "lab",
+      "library",
+      "school",
+      "edu",
+      "university",
+      "college",
     ];
 
     return sharedIndicators.some(
-      indicator => userAgent.includes(indicator) || hostname.includes(indicator)
+      (indicator) =>
+        userAgent.includes(indicator) || hostname.includes(indicator),
     );
   }
 
@@ -377,13 +377,13 @@ export class FirebaseService {
       // Initialize storage service
       this.storageService = new FirebaseStorageService(
         this.app,
-        this.hybridData
+        this.hybridData,
       );
 
       // Initialize analytics service
       this.analyticsService = new FirebaseAnalyticsService(
         this.app,
-        this.hybridData
+        this.hybridData,
       );
 
       // Initialize performance tracing service
@@ -407,7 +407,7 @@ export class FirebaseService {
 
       return true;
     } catch (error) {
-      console.error('❌ Firebase initialization failed:', error);
+      console.error("❌ Firebase initialization failed:", error);
       return false;
     }
   }
@@ -418,7 +418,7 @@ export class FirebaseService {
    */
   getAppCheck() {
     if (!this.appCheck || !this.appCheck.isReady) {
-      throw new Error('App Check not initialized. Call initialize() first.');
+      throw new Error("App Check not initialized. Call initialize() first.");
     }
     return this.appCheck;
   }
@@ -431,7 +431,7 @@ export class FirebaseService {
     try {
       return this.appCheck && this.appCheck.validateStatus();
     } catch (error) {
-      console.warn('⚠️ App Check status check failed:', error);
+      console.warn("⚠️ App Check status check failed:", error);
       return false;
     }
   }
@@ -444,7 +444,7 @@ export class FirebaseService {
   async getAppCheckToken(action = null) {
     try {
       if (!this.isAppCheckReady()) {
-        throw new Error('App Check not ready');
+        throw new Error("App Check not ready");
       }
 
       if (action) {
@@ -453,7 +453,7 @@ export class FirebaseService {
         return await this.appCheck.getToken();
       }
     } catch (error) {
-      console.error('❌ Failed to get App Check token:', error);
+      console.error("❌ Failed to get App Check token:", error);
       throw error;
     }
   }
@@ -465,7 +465,7 @@ export class FirebaseService {
     try {
       // Check if user has a saved preference
       const savedPreference = localStorage.getItem(
-        'simulateai_auth_persistence'
+        "simulateai_auth_persistence",
       );
 
       if (savedPreference) {
@@ -479,11 +479,10 @@ export class FirebaseService {
       await this.setAuthPersistence(recommendation.mode, {
         autoSignOutMinutes: recommendation.autoSignOutMinutes,
       });
-
     } catch (error) {
-      console.warn('⚠️ Smart persistence setup failed, using default:', error);
+      console.warn("⚠️ Smart persistence setup failed, using default:", error);
       // Fallback to default persistence
-      await this.setAuthPersistence('local');
+      await this.setAuthPersistence("local");
     }
   }
 
@@ -497,14 +496,14 @@ export class FirebaseService {
         // User signed in via redirect
         await this.createOrUpdateUserProfile(result.user);
 
-        this.trackEvent('user_sign_in', {
+        this.trackEvent("user_sign_in", {
           method: this.getProviderFromResult(result),
           user_id: result.user.uid,
-          auth_method: 'redirect',
+          auth_method: "redirect",
         });
       }
     } catch (error) {
-      console.error('❌ Redirect authentication failed:', error);
+      console.error("❌ Redirect authentication failed:", error);
       // Show user-friendly error message
       this.showRedirectError(error);
     }
@@ -514,16 +513,16 @@ export class FirebaseService {
    * Get provider name from auth result
    */
   getProviderFromResult(result) {
-    if (!result.providerId) return 'unknown';
+    if (!result.providerId) return "unknown";
 
     const providerMap = {
-      'google.com': 'google',
-      'facebook.com': 'facebook',
-      'twitter.com': 'twitter',
-      'github.com': 'github',
+      "google.com": "google",
+      "facebook.com": "facebook",
+      "twitter.com": "twitter",
+      "github.com": "github",
     };
 
-    return providerMap[result.providerId] || 'unknown';
+    return providerMap[result.providerId] || "unknown";
   }
 
   /**
@@ -533,7 +532,7 @@ export class FirebaseService {
     // This will be called by auth service to show user-friendly errors
     if (window.authService) {
       window.authService.showErrorMessage(
-        `Authentication failed: ${error.message}`
+        `Authentication failed: ${error.message}`,
       );
     }
   }
@@ -544,7 +543,7 @@ export class FirebaseService {
   isMobileDevice() {
     return (
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        navigator.userAgent
+        navigator.userAgent,
       ) || window.innerWidth <= 768
     );
   }
@@ -553,15 +552,13 @@ export class FirebaseService {
    * Set up authentication state monitoring
    */
   setupAuthStateListener() {
-    onAuthStateChanged(this.auth, user => {
+    onAuthStateChanged(this.auth, (user) => {
       this.currentUser = user;
       this.notifyAuthStateListeners(user);
 
       if (user) {
-
-        this.trackEvent('user_sign_in', { method: 'google' });
+        this.trackEvent("user_sign_in", { method: "google" });
       } else {
-
       }
     });
   }
@@ -593,7 +590,7 @@ export class FirebaseService {
    * Notify all auth state listeners
    */
   notifyAuthStateListeners(user) {
-    this.authStateListeners.forEach(callback => callback(user));
+    this.authStateListeners.forEach((callback) => callback(user));
   }
 
   /**
@@ -602,11 +599,11 @@ export class FirebaseService {
   async signInWithGoogle() {
     return this.authenticateWithRateLimit(async () => {
       const provider = new GoogleAuthProvider();
-      provider.addScope('profile');
-      provider.addScope('email');
+      provider.addScope("profile");
+      provider.addScope("email");
 
-      return await this.authenticateWithProvider(provider, 'google');
-    }, 'google_signin');
+      return await this.authenticateWithProvider(provider, "google");
+    }, "google_signin");
   }
 
   /**
@@ -615,11 +612,11 @@ export class FirebaseService {
   async signInWithFacebook() {
     return this.authenticateWithRateLimit(async () => {
       const provider = new FacebookAuthProvider();
-      provider.addScope('email');
-      provider.addScope('public_profile');
+      provider.addScope("email");
+      provider.addScope("public_profile");
 
-      return await this.authenticateWithProvider(provider, 'facebook');
-    }, 'facebook_signin');
+      return await this.authenticateWithProvider(provider, "facebook");
+    }, "facebook_signin");
   }
 
   /**
@@ -629,8 +626,8 @@ export class FirebaseService {
     return this.authenticateWithRateLimit(async () => {
       const provider = new TwitterAuthProvider();
 
-      return await this.authenticateWithProvider(provider, 'twitter');
-    }, 'twitter_signin');
+      return await this.authenticateWithProvider(provider, "twitter");
+    }, "twitter_signin");
   }
 
   /**
@@ -639,10 +636,10 @@ export class FirebaseService {
   async signInWithGitHub() {
     return this.authenticateWithRateLimit(async () => {
       const provider = new GithubAuthProvider();
-      provider.addScope('user:email');
+      provider.addScope("user:email");
 
-      return await this.authenticateWithProvider(provider, 'github');
-    }, 'github_signin');
+      return await this.authenticateWithProvider(provider, "github");
+    }, "github_signin");
   }
 
   /**
@@ -661,8 +658,8 @@ export class FirebaseService {
         return {
           success: true,
           pending: true,
-          message: 'Redirecting to authentication...',
-          method: 'redirect',
+          message: "Redirecting to authentication...",
+          method: "redirect",
         };
       } else {
         // Use popup for desktop with account linking support
@@ -673,20 +670,20 @@ export class FirebaseService {
           // Create or update user profile
           await this.createOrUpdateUserProfile(user);
 
-          this.trackEvent('user_sign_in', {
+          this.trackEvent("user_sign_in", {
             method: providerName,
             user_id: user.uid,
-            auth_method: 'popup',
+            auth_method: "popup",
           });
 
-          return { success: true, user, method: 'popup' };
+          return { success: true, user, method: "popup" };
         } catch (error) {
           // Handle account linking if user exists with different provider
-          if (error.code === 'auth/account-exists-with-different-credential') {
+          if (error.code === "auth/account-exists-with-different-credential") {
             return await this.handleAccountLinking(
               error,
               provider,
-              providerName
+              providerName,
             );
           }
           throw error;
@@ -711,7 +708,7 @@ export class FirebaseService {
       if (!email) {
         return {
           success: false,
-          error: 'Unable to retrieve email for account linking',
+          error: "Unable to retrieve email for account linking",
         };
       }
 
@@ -719,25 +716,25 @@ export class FirebaseService {
       const signInMethods = await fetchSignInMethodsForEmail(this.auth, email);
 
       if (signInMethods.length === 0) {
-        return { success: false, error: 'No existing account found' };
+        return { success: false, error: "No existing account found" };
       }
 
       // For simplicity, we'll prompt the user about account linking
       // In a production app, you might want a more sophisticated UI
       const shouldLink = confirm(
         `An account with email ${email} already exists. ` +
-          `Current sign-in methods: ${signInMethods.join(', ')}. ` +
-          `Would you like to link your ${providerName} account?`
+          `Current sign-in methods: ${signInMethods.join(", ")}. ` +
+          `Would you like to link your ${providerName} account?`,
       );
 
       if (!shouldLink) {
-        return { success: false, error: 'User declined account linking' };
+        return { success: false, error: "User declined account linking" };
       }
 
       // Sign in with existing method first
       const existingProvider = this.getProviderForMethod(signInMethods[0]);
       if (!existingProvider) {
-        return { success: false, error: 'Unsupported existing sign-in method' };
+        return { success: false, error: "Unsupported existing sign-in method" };
       }
 
       // Sign in with existing provider
@@ -750,7 +747,7 @@ export class FirebaseService {
       // Update user profile to reflect linked accounts
       await this.createOrUpdateUserProfile(linkResult.user);
 
-      this.trackEvent('account_linked', {
+      this.trackEvent("account_linked", {
         user_id: user.uid,
         linked_provider: providerName,
         existing_methods: signInMethods,
@@ -759,12 +756,12 @@ export class FirebaseService {
       return {
         success: true,
         user: linkResult.user,
-        method: 'popup',
+        method: "popup",
         linked: true,
         message: `Successfully linked ${providerName} account!`,
       };
     } catch (linkError) {
-      console.error('❌ Account linking failed:', linkError);
+      console.error("❌ Account linking failed:", linkError);
       return {
         success: false,
         error: `Account linking failed: ${linkError.message}`,
@@ -777,10 +774,10 @@ export class FirebaseService {
    */
   getProviderForMethod(method) {
     const providerMap = {
-      'google.com': new GoogleAuthProvider(),
-      'facebook.com': new FacebookAuthProvider(),
-      'twitter.com': new TwitterAuthProvider(),
-      'github.com': new GithubAuthProvider(),
+      "google.com": new GoogleAuthProvider(),
+      "facebook.com": new FacebookAuthProvider(),
+      "twitter.com": new TwitterAuthProvider(),
+      "github.com": new GithubAuthProvider(),
       password: null, // Email/password requires different handling
     };
 
@@ -793,12 +790,12 @@ export class FirebaseService {
   async linkProviderToCurrentUser(providerName) {
     try {
       if (!this.currentUser) {
-        return { success: false, error: 'No user currently signed in' };
+        return { success: false, error: "No user currently signed in" };
       }
 
       const provider = this.getProviderForMethod(`${providerName}.com`);
       if (!provider) {
-        return { success: false, error: 'Unsupported provider' };
+        return { success: false, error: "Unsupported provider" };
       }
 
       const isMobile = this.isMobileDevice();
@@ -808,7 +805,7 @@ export class FirebaseService {
         return {
           success: true,
           pending: true,
-          message: 'Redirecting to link account...',
+          message: "Redirecting to link account...",
         };
       } else {
         const result = await linkWithPopup(this.currentUser, provider);
@@ -816,7 +813,7 @@ export class FirebaseService {
         // Update user profile
         await this.createOrUpdateUserProfile(result.user);
 
-        this.trackEvent('provider_linked', {
+        this.trackEvent("provider_linked", {
           user_id: this.currentUser.uid,
           linked_provider: providerName,
         });
@@ -839,7 +836,7 @@ export class FirebaseService {
   getUserLinkedProviders() {
     if (!this.currentUser) return [];
 
-    return this.currentUser.providerData.map(provider => ({
+    return this.currentUser.providerData.map((provider) => ({
       providerId: provider.providerId,
       displayName: provider.displayName,
       email: provider.email,
@@ -856,27 +853,27 @@ export class FirebaseService {
         const result = await signInWithEmailAndPassword(
           this.auth,
           email,
-          password
+          password,
         );
         const { user } = result;
 
         // Create or update user profile
         await this.createOrUpdateUserProfile(user);
 
-        this.trackEvent('user_sign_in', {
-          method: 'email',
+        this.trackEvent("user_sign_in", {
+          method: "email",
           user_id: user.uid,
         });
 
         return { success: true, user };
       } catch (error) {
-        this.handleAuthError(error, 'email_signin');
+        this.handleAuthError(error, "email_signin");
         return {
           success: false,
           error: this.getHumanReadableErrorMessage(error),
         };
       }
-    }, 'email_signin');
+    }, "email_signin");
   }
 
   /**
@@ -888,7 +885,7 @@ export class FirebaseService {
         const result = await createUserWithEmailAndPassword(
           this.auth,
           email,
-          password
+          password,
         );
         const { user } = result;
 
@@ -900,20 +897,20 @@ export class FirebaseService {
         // Create or update user profile
         await this.createOrUpdateUserProfile(user);
 
-        this.trackEvent('user_sign_up', {
-          method: 'email',
+        this.trackEvent("user_sign_up", {
+          method: "email",
           user_id: user.uid,
         });
 
         return { success: true, user };
       } catch (error) {
-        this.handleAuthError(error, 'email_signup');
+        this.handleAuthError(error, "email_signup");
         return {
           success: false,
           error: this.getHumanReadableErrorMessage(error),
         };
       }
-    }, 'email_signup');
+    }, "email_signup");
   }
 
   /**
@@ -924,19 +921,19 @@ export class FirebaseService {
       try {
         await sendPasswordResetEmail(this.auth, email);
 
-        this.trackEvent('password_reset_requested', {
-          method: 'email',
+        this.trackEvent("password_reset_requested", {
+          method: "email",
         });
 
         return { success: true };
       } catch (error) {
-        this.handleAuthError(error, 'password_reset');
+        this.handleAuthError(error, "password_reset");
         return {
           success: false,
           error: this.getHumanReadableErrorMessage(error),
         };
       }
-    }, 'password_reset');
+    }, "password_reset");
   }
 
   /**
@@ -945,10 +942,10 @@ export class FirebaseService {
   async signOutUser() {
     try {
       await signOut(this.auth);
-      this.trackEvent('user_sign_out');
+      this.trackEvent("user_sign_out");
       return { success: true };
     } catch (error) {
-      console.error('❌ Sign out failed:', error);
+      console.error("❌ Sign out failed:", error);
       return { success: false, error: error.message };
     }
   }
@@ -958,7 +955,7 @@ export class FirebaseService {
    */
   async createOrUpdateUserProfile(user) {
     try {
-      const userRef = doc(this.db, 'users', user.uid);
+      const userRef = doc(this.db, "users", user.uid);
       const userSnap = await getDoc(userRef);
 
       const now = new Date();
@@ -966,24 +963,24 @@ export class FirebaseService {
       if (!userSnap.exists()) {
         // Create new user profile
         await setDoc(userRef, {
-          displayName: user.displayName || 'Anonymous User',
+          displayName: user.displayName || "Anonymous User",
           email: user.email,
           photoURL: user.photoURL || null,
           tier: 0, // 0=free, 1=research($5+), 2=supporter($25+), etc.
           researchParticipant: false,
           totalDonated: 0,
           flair: {
-            color: '#666666', // Default gray
-            badge: '', // No badge for free tier
-            title: '', // Badge title flair
-            displayName: user.displayName || 'Anonymous User', // Custom display name
+            color: "#666666", // Default gray
+            badge: "", // No badge for free tier
+            title: "", // Badge title flair
+            displayName: user.displayName || "Anonymous User", // Custom display name
           },
           badges: [], // Array of earned badges
           customization: {
-            displayName: user.displayName || 'Anonymous User',
+            displayName: user.displayName || "Anonymous User",
             photoURL: user.photoURL || null,
             selectedBadgeFlair: null, // User-selected badge for flair
-            profileTheme: 'default',
+            profileTheme: "default",
           },
           createdAt: now,
           updatedAt: now,
@@ -992,7 +989,7 @@ export class FirebaseService {
           researchResponsesSubmitted: 0,
         });
 
-        this.trackEvent('user_profile_created', { user_id: user.uid });
+        this.trackEvent("user_profile_created", { user_id: user.uid });
       } else {
         // Update existing user's last login
         await updateDoc(userRef, {
@@ -1003,7 +1000,7 @@ export class FirebaseService {
 
       return true;
     } catch (error) {
-      console.error('❌ Failed to create/update user profile:', error);
+      console.error("❌ Failed to create/update user profile:", error);
       return false;
     }
   }
@@ -1016,10 +1013,10 @@ export class FirebaseService {
     try {
       const uid = userId || this.currentUser?.uid;
       if (!uid) {
-        return { success: false, error: 'No user ID provided' };
+        return { success: false, error: "No user ID provided" };
       }
 
-      const userRef = doc(this.db, 'users', uid);
+      const userRef = doc(this.db, "users", uid);
       const updateData = {
         updatedAt: new Date(),
       };
@@ -1033,12 +1030,12 @@ export class FirebaseService {
 
         if (profileData.displayName) {
           authUpdateData.displayName = profileData.displayName;
-          updateData['customization.displayName'] = profileData.displayName;
+          updateData["customization.displayName"] = profileData.displayName;
         }
 
         if (profileData.photoURL) {
           authUpdateData.photoURL = profileData.photoURL;
-          updateData['customization.photoURL'] = profileData.photoURL;
+          updateData["customization.photoURL"] = profileData.photoURL;
         }
 
         // Update Firebase Auth profile
@@ -1047,7 +1044,7 @@ export class FirebaseService {
 
       // Update Firestore profile
       if (profileData.selectedBadgeFlair) {
-        updateData['customization.selectedBadgeFlair'] =
+        updateData["customization.selectedBadgeFlair"] =
           profileData.selectedBadgeFlair;
 
         // Update flair display
@@ -1063,12 +1060,12 @@ export class FirebaseService {
       }
 
       if (profileData.profileTheme) {
-        updateData['customization.profileTheme'] = profileData.profileTheme;
+        updateData["customization.profileTheme"] = profileData.profileTheme;
       }
 
       await updateDoc(userRef, updateData);
 
-      this.trackEvent('user_profile_updated', {
+      this.trackEvent("user_profile_updated", {
         user_id: uid,
         updated_fields: Object.keys(profileData),
         has_badge_flair: !!profileData.selectedBadgeFlair,
@@ -1090,29 +1087,29 @@ export class FirebaseService {
     try {
       const uid = userId || this.currentUser?.uid;
       if (!uid) {
-        return { success: false, error: 'No user ID provided' };
+        return { success: false, error: "No user ID provided" };
       }
 
       // Validate file type and size
       const allowedTypes = [
-        'image/jpeg',
-        'image/png',
-        'image/webp',
-        'image/gif',
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/gif",
       ];
       const maxSize = 5 * 1024 * 1024; // 5MB
 
       if (!allowedTypes.includes(file.type)) {
         return {
           success: false,
-          error: 'Invalid file type. Please use JPEG, PNG, WebP, or GIF.',
+          error: "Invalid file type. Please use JPEG, PNG, WebP, or GIF.",
         };
       }
 
       if (file.size > maxSize) {
         return {
           success: false,
-          error: 'File too large. Maximum size is 5MB.',
+          error: "File too large. Maximum size is 5MB.",
         };
       }
 
@@ -1130,17 +1127,17 @@ export class FirebaseService {
       // Delete old profile picture if it exists and is not default
       const userProfile = await this.getUserProfile(uid);
       const oldPhotoURL = userProfile?.photoURL;
-      if (oldPhotoURL && oldPhotoURL.includes('firebase')) {
+      if (oldPhotoURL && oldPhotoURL.includes("firebase")) {
         try {
           const oldRef = ref(this.storage, oldPhotoURL);
           await deleteObject(oldRef);
         } catch (error) {
           // Old file might not exist, that's okay
-          console.warn('Could not delete old profile picture:', error);
+          console.warn("Could not delete old profile picture:", error);
         }
       }
 
-      this.trackEvent('profile_picture_uploaded', {
+      this.trackEvent("profile_picture_uploaded", {
         user_id: uid,
         file_size: file.size,
         file_type: file.type,
@@ -1152,7 +1149,7 @@ export class FirebaseService {
         fileName: snapshot.ref.name,
       };
     } catch (error) {
-      console.error('❌ Profile picture upload failed:', error);
+      console.error("❌ Profile picture upload failed:", error);
       return { success: false, error: error.message };
     }
   }
@@ -1167,11 +1164,11 @@ export class FirebaseService {
     try {
       const uid = userId || this.currentUser?.uid;
       if (!uid) {
-        if (callback) callback(null, 'No user ID provided');
+        if (callback) callback(null, "No user ID provided");
         return () => {};
       }
 
-      const userRef = doc(this.db, 'users', uid);
+      const userRef = doc(this.db, "users", uid);
 
       if (!callback) {
         // One-time read
@@ -1182,16 +1179,16 @@ export class FirebaseService {
       // Real-time listener
       const unsubscribe = onSnapshot(
         userRef,
-        doc => {
+        (doc) => {
           if (doc.exists()) {
             callback(doc.data(), null);
           } else {
-            callback(null, 'User profile not found');
+            callback(null, "User profile not found");
           }
         },
-        error => {
+        (error) => {
           callback(null, error.message);
-        }
+        },
       );
 
       // Store listener for cleanup
@@ -1199,7 +1196,7 @@ export class FirebaseService {
 
       return unsubscribe;
     } catch (error) {
-      console.error('❌ Failed to get user profile:', error);
+      console.error("❌ Failed to get user profile:", error);
       if (callback) callback(null, error.message);
       return () => {};
     }
@@ -1216,10 +1213,10 @@ export class FirebaseService {
     try {
       const uid = userId || this.currentUser?.uid;
       if (!uid) {
-        return { success: false, error: 'No user ID provided' };
+        return { success: false, error: "No user ID provided" };
       }
 
-      const userRef = doc(this.db, 'users', uid);
+      const userRef = doc(this.db, "users", uid);
       const updateData = {
         ...profileData,
         updatedAt: new Date(),
@@ -1227,18 +1224,18 @@ export class FirebaseService {
 
       // Handle special fields
       if (profileData.preferences) {
-        updateData['preferences'] = {
+        updateData["preferences"] = {
           ...profileData.preferences,
           lastUpdated: new Date(),
         };
       }
 
       if (profileData.theme) {
-        updateData['customization.profileTheme'] = profileData.theme;
+        updateData["customization.profileTheme"] = profileData.theme;
       }
 
       if (profileData.notificationSettings) {
-        updateData['preferences.notifications'] =
+        updateData["preferences.notifications"] =
           profileData.notificationSettings;
       }
 
@@ -1251,12 +1248,12 @@ export class FirebaseService {
 
         if (profileData.displayName) {
           authUpdateData.displayName = profileData.displayName;
-          updateData['customization.displayName'] = profileData.displayName;
+          updateData["customization.displayName"] = profileData.displayName;
         }
 
         if (profileData.photoURL) {
           authUpdateData.photoURL = profileData.photoURL;
-          updateData['customization.photoURL'] = profileData.photoURL;
+          updateData["customization.photoURL"] = profileData.photoURL;
         }
 
         await this.currentUser.updateProfile(authUpdateData);
@@ -1269,20 +1266,20 @@ export class FirebaseService {
       if (realtime && !this.profileListeners.has(uid)) {
         this.getUserProfileRealtime(uid, (profile, error) => {
           if (error) {
-            console.error('Profile update error:', error);
+            console.error("Profile update error:", error);
             return;
           }
 
           // Emit custom event for profile updates
           window.dispatchEvent(
-            new CustomEvent('profileUpdated', {
+            new CustomEvent("profileUpdated", {
               detail: { userId: uid, profile },
-            })
+            }),
           );
         });
       }
 
-      this.trackEvent('user_profile_updated_enhanced', {
+      this.trackEvent("user_profile_updated_enhanced", {
         user_id: uid,
         updated_fields: Object.keys(profileData),
         has_realtime: realtime,
@@ -1290,7 +1287,7 @@ export class FirebaseService {
 
       return { success: true, updatedFields: Object.keys(profileData) };
     } catch (error) {
-      console.error('❌ Enhanced profile update failed:', error);
+      console.error("❌ Enhanced profile update failed:", error);
       return { success: false, error: error.message };
     }
   }
@@ -1304,13 +1301,13 @@ export class FirebaseService {
     try {
       const uid = userId || this.currentUser?.uid;
       if (!uid) {
-        return { success: false, error: 'No user ID provided' };
+        return { success: false, error: "No user ID provided" };
       }
 
       // Validate preferences structure
       const validPreferences = {
-        theme: preferences.theme || 'default',
-        language: preferences.language || 'en',
+        theme: preferences.theme || "default",
+        language: preferences.language || "en",
         notifications: {
           email: preferences.notifications?.email ?? true,
           browser: preferences.notifications?.browser ?? true,
@@ -1318,25 +1315,25 @@ export class FirebaseService {
           community: preferences.notifications?.community ?? true,
         },
         privacy: {
-          profileVisibility: preferences.privacy?.profileVisibility || 'public',
+          profileVisibility: preferences.privacy?.profileVisibility || "public",
           showBadges: preferences.privacy?.showBadges ?? true,
           showActivity: preferences.privacy?.showActivity ?? true,
         },
         accessibility: {
           highContrast: preferences.accessibility?.highContrast ?? false,
           reducedMotion: preferences.accessibility?.reducedMotion ?? false,
-          fontSize: preferences.accessibility?.fontSize || 'medium',
+          fontSize: preferences.accessibility?.fontSize || "medium",
         },
         lastUpdated: new Date(),
       };
 
-      const userRef = doc(this.db, 'users', uid);
+      const userRef = doc(this.db, "users", uid);
       await updateDoc(userRef, {
         preferences: validPreferences,
         updatedAt: new Date(),
       });
 
-      this.trackEvent('user_preferences_updated', {
+      this.trackEvent("user_preferences_updated", {
         user_id: uid,
         theme: validPreferences.theme,
         notifications_enabled: validPreferences.notifications.email,
@@ -1344,7 +1341,7 @@ export class FirebaseService {
 
       return { success: true, preferences: validPreferences };
     } catch (error) {
-      console.error('❌ Failed to update preferences:', error);
+      console.error("❌ Failed to update preferences:", error);
       return { success: false, error: error.message };
     }
   }
@@ -1362,7 +1359,7 @@ export class FirebaseService {
       }
     } else {
       // Clean up all listeners
-      this.profileListeners.forEach(unsubscribe => {
+      this.profileListeners.forEach((unsubscribe) => {
         unsubscribe();
       });
       this.profileListeners.clear();
@@ -1406,14 +1403,14 @@ export class FirebaseService {
   async getCurrentUserToken() {
     try {
       if (!this.currentUser) {
-        throw new Error('No user currently signed in');
+        throw new Error("No user currently signed in");
       }
 
       // Force refresh token to ensure it's not expired
       const idToken = await this.currentUser.getIdToken(true);
       return idToken;
     } catch (error) {
-      console.error('❌ Failed to get user token:', error);
+      console.error("❌ Failed to get user token:", error);
       throw error;
     }
   }
@@ -1422,7 +1419,7 @@ export class FirebaseService {
    * Make authenticated API call to Firebase Functions
    * Automatically includes user token for verification
    */
-  async makeSecureAPICall(functionName, data = null, method = 'POST') {
+  async makeSecureAPICall(functionName, data = null, method = "POST") {
     try {
       const token = await this.getCurrentUserToken();
       const functionUrl = `https://us-central1-simulateai-research.cloudfunctions.net/${functionName}`;
@@ -1430,12 +1427,12 @@ export class FirebaseService {
       const requestOptions = {
         method,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       };
 
-      if (data && (method === 'POST' || method === 'PUT')) {
+      if (data && (method === "POST" || method === "PUT")) {
         requestOptions.body = JSON.stringify(data);
       }
 
@@ -1443,7 +1440,7 @@ export class FirebaseService {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'API call failed');
+        throw new Error(result.error || "API call failed");
       }
 
       return { success: true, data: result };
@@ -1460,10 +1457,10 @@ export class FirebaseService {
   async submitSecureResearchResponse(scenarioData) {
     try {
       if (!this.isAuthenticated()) {
-        return { success: false, error: 'User not authenticated' };
+        return { success: false, error: "User not authenticated" };
       }
 
-      const result = await this.makeSecureAPICall('submitResearchData', {
+      const result = await this.makeSecureAPICall("submitResearchData", {
         scenarioId: scenarioData.scenarioId,
         responses: scenarioData.responses,
         ethicsScores: scenarioData.ethicsScores,
@@ -1472,10 +1469,10 @@ export class FirebaseService {
       });
 
       if (result.success) {
-        this.trackEvent('secure_research_response_submitted', {
+        this.trackEvent("secure_research_response_submitted", {
           scenario_id: scenarioData.scenarioId,
           submission_id: result.data.submissionId,
-          method: 'secure_function',
+          method: "secure_function",
         });
       }
 
@@ -1492,20 +1489,20 @@ export class FirebaseService {
   async updateSecureUserProfile(profileData) {
     try {
       if (!this.isAuthenticated()) {
-        return { success: false, error: 'User not authenticated' };
+        return { success: false, error: "User not authenticated" };
       }
 
       const result = await this.makeSecureAPICall(
-        'updateUserProfile',
+        "updateUserProfile",
         profileData,
-        'PUT'
+        "PUT",
       );
 
       if (result.success) {
-        this.trackEvent('secure_profile_updated', {
+        this.trackEvent("secure_profile_updated", {
           user_id: this.currentUser.uid,
           updated_fields: result.data.updatedFields || [],
-          method: 'secure_function',
+          method: "secure_function",
         });
       }
 
@@ -1522,19 +1519,19 @@ export class FirebaseService {
   async awardSecureBadge(targetUserId, badgeData, adminKey) {
     try {
       if (!this.isAuthenticated()) {
-        return { success: false, error: 'User not authenticated' };
+        return { success: false, error: "User not authenticated" };
       }
 
       const functionUrl =
-        'https://us-central1-simulateai-research.cloudfunctions.net/awardBadge';
+        "https://us-central1-simulateai-research.cloudfunctions.net/awardBadge";
       const token = await this.getCurrentUserToken();
 
       const response = await fetch(functionUrl, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
-          'X-Admin-Key': adminKey,
+          "X-Admin-Key": adminKey,
         },
         body: JSON.stringify({
           targetUserId,
@@ -1545,20 +1542,20 @@ export class FirebaseService {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Badge awarding failed');
+        throw new Error(result.error || "Badge awarding failed");
       }
 
-      this.trackEvent('secure_badge_awarded', {
+      this.trackEvent("secure_badge_awarded", {
         target_user: targetUserId,
         badge_category: badgeData.category,
         badge_tier: badgeData.tier,
         awarded_by: this.currentUser.uid,
-        method: 'secure_function',
+        method: "secure_function",
       });
 
       return { success: true, data: result };
     } catch (error) {
-      console.error('❌ Secure badge awarding failed:', error);
+      console.error("❌ Secure badge awarding failed:", error);
       return { success: false, error: error.message };
     }
   }
@@ -1570,19 +1567,19 @@ export class FirebaseService {
   async getSecureUserAnalytics() {
     try {
       if (!this.isAuthenticated()) {
-        return { success: false, error: 'User not authenticated' };
+        return { success: false, error: "User not authenticated" };
       }
 
       const result = await this.makeSecureAPICall(
-        'getUserAnalytics',
+        "getUserAnalytics",
         null,
-        'GET'
+        "GET",
       );
 
       if (result.success) {
-        this.trackEvent('secure_analytics_accessed', {
+        this.trackEvent("secure_analytics_accessed", {
           user_id: this.currentUser.uid,
-          method: 'secure_function',
+          method: "secure_function",
         });
       }
 
@@ -1599,14 +1596,14 @@ export class FirebaseService {
   async validateCurrentToken() {
     try {
       if (!this.currentUser) {
-        return { valid: false, reason: 'No user signed in' };
+        return { valid: false, reason: "No user signed in" };
       }
 
       // Get token without forcing refresh to check current status
       const token = await this.currentUser.getIdToken(false);
 
       // Decode token to check expiration (client-side check only)
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = JSON.parse(atob(token.split(".")[1]));
       const now = Math.floor(Date.now() / 1000);
       const isExpired = payload.exp < now;
 
@@ -1641,8 +1638,8 @@ export class FirebaseService {
     ];
 
     // Create hash of combined factors
-    return btoa(factors.join('|'))
-      .replace(/[^a-zA-Z0-9]/g, '')
+    return btoa(factors.join("|"))
+      .replace(/[^a-zA-Z0-9]/g, "")
       .substring(0, 32);
   }
 
@@ -1652,13 +1649,13 @@ export class FirebaseService {
    */
   getClientIP() {
     // This is a simplified approach - in production you'd get this from server
-    return 'unknown';
+    return "unknown";
   }
 
   /**
    * Check if authentication request is rate limited
    */
-  isRateLimited(identifier, operation = 'auth') {
+  isRateLimited(identifier, operation = "auth") {
     const now = Date.now();
     const key = `${identifier}_${operation}`;
 
@@ -1670,7 +1667,7 @@ export class FirebaseService {
         limited: true,
         remainingMs,
         remainingMinutes: Math.ceil(remainingMs / (60 * 1000)),
-        reason: 'cooldown',
+        reason: "cooldown",
       };
     }
 
@@ -1680,7 +1677,7 @@ export class FirebaseService {
 
     // Filter attempts to current window
     const recentAttempts = attempts.filter(
-      timestamp => timestamp > windowStart
+      (timestamp) => timestamp > windowStart,
     );
 
     if (recentAttempts.length >= this.rateLimiter.settings.maxAttempts) {
@@ -1691,7 +1688,7 @@ export class FirebaseService {
         limited: true,
         attempts: recentAttempts.length,
         maxAttempts: this.rateLimiter.settings.maxAttempts,
-        reason: 'max_attempts',
+        reason: "max_attempts",
       };
     }
 
@@ -1701,7 +1698,7 @@ export class FirebaseService {
   /**
    * Record authentication attempt
    */
-  recordAuthAttempt(identifier, operation = 'auth', success = false) {
+  recordAuthAttempt(identifier, operation = "auth", success = false) {
     const now = Date.now();
     const key = `${identifier}_${operation}`;
 
@@ -1714,7 +1711,7 @@ export class FirebaseService {
     // Clean old attempts outside window
     const windowStart = now - this.rateLimiter.settings.windowMs;
     const recentAttempts = attempts.filter(
-      timestamp => timestamp > windowStart
+      (timestamp) => timestamp > windowStart,
     );
 
     // Update attempts
@@ -1727,7 +1724,7 @@ export class FirebaseService {
     }
 
     // Track analytics
-    this.trackEvent('auth_attempt_recorded', {
+    this.trackEvent("auth_attempt_recorded", {
       operation,
       success,
       attempts_count: recentAttempts.length,
@@ -1745,7 +1742,7 @@ export class FirebaseService {
     // Progressive cooldown - increase duration for repeat offenders
     if (this.rateLimiter.settings.progressiveCooldown) {
       const violations = Math.floor(
-        attemptCount / this.rateLimiter.settings.maxAttempts
+        attemptCount / this.rateLimiter.settings.maxAttempts,
       );
       cooldownDuration *= Math.pow(2, violations - 1); // Exponential backoff
 
@@ -1756,11 +1753,11 @@ export class FirebaseService {
     this.rateLimiter.cooldowns.set(key, now + cooldownDuration);
 
     // Track security event
-    this.trackEvent('auth_rate_limit_triggered', {
+    this.trackEvent("auth_rate_limit_triggered", {
       attempt_count: attemptCount,
       cooldown_minutes: Math.ceil(cooldownDuration / (60 * 1000)),
       violations: Math.floor(
-        attemptCount / this.rateLimiter.settings.maxAttempts
+        attemptCount / this.rateLimiter.settings.maxAttempts,
       ),
     });
   }
@@ -1775,11 +1772,11 @@ export class FirebaseService {
     const rateLimitCheck = this.isRateLimited(identifier, operation);
     if (rateLimitCheck.limited) {
       const error = new Error(
-        rateLimitCheck.reason === 'cooldown'
+        rateLimitCheck.reason === "cooldown"
           ? `Too many failed attempts. Please wait ${rateLimitCheck.remainingMinutes} minutes before trying again.`
-          : `Too many attempts. Please wait before trying again.`
+          : `Too many attempts. Please wait before trying again.`,
       );
-      error.code = 'auth/too-many-requests';
+      error.code = "auth/too-many-requests";
       error.rateLimitInfo = rateLimitCheck;
 
       // Record the blocked attempt
@@ -1803,7 +1800,7 @@ export class FirebaseService {
       // Check if it's a network error and handle accordingly
       const networkResult = this.handleNetworkAwareError(
         error,
-        `auth_${operation}`
+        `auth_${operation}`,
       );
       if (networkResult.networkError) {
         // Return the network-aware result instead of throwing
@@ -1818,7 +1815,7 @@ export class FirebaseService {
   /**
    * Get rate limit status for user feedback
    */
-  getRateLimitStatus(operation = 'auth') {
+  getRateLimitStatus(operation = "auth") {
     const identifier = this.getRateLimitIdentifier();
     const key = `${identifier}_${operation}`;
     const now = Date.now();
@@ -1827,7 +1824,7 @@ export class FirebaseService {
     const cooldownEnd = this.rateLimiter.cooldowns.get(key);
     if (cooldownEnd && now < cooldownEnd) {
       return {
-        status: 'cooldown',
+        status: "cooldown",
         remainingMs: cooldownEnd - now,
         remainingMinutes: Math.ceil((cooldownEnd - now) / (60 * 1000)),
       };
@@ -1837,11 +1834,11 @@ export class FirebaseService {
     const attempts = this.rateLimiter.attempts.get(key) || [];
     const windowStart = now - this.rateLimiter.settings.windowMs;
     const recentAttempts = attempts.filter(
-      timestamp => timestamp > windowStart
+      (timestamp) => timestamp > windowStart,
     );
 
     return {
-      status: 'active',
+      status: "active",
       attempts: recentAttempts.length,
       maxAttempts: this.rateLimiter.settings.maxAttempts,
       remaining: this.rateLimiter.settings.maxAttempts - recentAttempts.length,
@@ -1852,16 +1849,16 @@ export class FirebaseService {
   /**
    * Handle Firebase authentication errors with graceful network error handling
    */
-  handleAuthError(error, context = 'authentication') {
+  handleAuthError(error, context = "authentication") {
     // Log error for debugging (but not in production)
     if (this.isDevelopment()) {
       console.error(`🔥 Firebase Auth Error [${context}]:`, error);
     }
 
     // Track authentication errors for analytics
-    this.logAnalytics('auth_error', {
-      error_code: error.code || 'unknown',
-      error_message: error.message || 'Unknown error',
+    this.logAnalytics("auth_error", {
+      error_code: error.code || "unknown",
+      error_message: error.message || "Unknown error",
       context,
       network_available: navigator.onLine,
       timestamp: Date.now(),
@@ -1873,12 +1870,12 @@ export class FirebaseService {
   /**
    * Enhanced error handling that integrates with network status monitoring
    */
-  handleNetworkAwareError(error, context = 'general') {
+  handleNetworkAwareError(error, context = "general") {
     // Handle network errors with the network status monitor
-    if (typeof window !== 'undefined' && window.NetworkStatusMonitor) {
+    if (typeof window !== "undefined" && window.NetworkStatusMonitor) {
       const wasHandled = window.NetworkStatusMonitor.handleNetworkError(
         error,
-        context
+        context,
       );
       if (wasHandled) {
         return {
@@ -1904,17 +1901,17 @@ export class FirebaseService {
    * Get user-friendly error messages for Firebase auth errors
    */
   getHumanReadableErrorMessage(error) {
-    if (!error) return 'An unexpected error occurred';
+    if (!error) return "An unexpected error occurred";
 
-    const errorCode = error.code || '';
+    const errorCode = error.code || "";
     const errorMessage = error.message || error.toString();
 
     // Network-related errors - priority handling
     if (
-      errorCode === 'auth/network-request-failed' ||
-      errorMessage.includes('network') ||
-      errorMessage.includes('fetch') ||
-      errorMessage.includes('NetworkError') ||
+      errorCode === "auth/network-request-failed" ||
+      errorMessage.includes("network") ||
+      errorMessage.includes("fetch") ||
+      errorMessage.includes("NetworkError") ||
       !navigator.onLine
     ) {
       return this.getNetworkErrorMessage();
@@ -1923,54 +1920,54 @@ export class FirebaseService {
     // Specific Firebase auth error codes
     const errorMessages = {
       // Network and connectivity
-      'auth/timeout':
-        'The request timed out. Please check your connection and try again.',
-      'auth/too-many-requests':
-        'Too many attempts. Please wait a few minutes before trying again.',
+      "auth/timeout":
+        "The request timed out. Please check your connection and try again.",
+      "auth/too-many-requests":
+        "Too many attempts. Please wait a few minutes before trying again.",
 
       // User account errors
-      'auth/user-not-found': 'No account found with this email address.',
-      'auth/wrong-password': 'Incorrect password. Please try again.',
-      'auth/invalid-email': 'Please enter a valid email address.',
-      'auth/email-already-in-use': 'An account with this email already exists.',
-      'auth/weak-password': 'Password should be at least 6 characters long.',
-      'auth/user-disabled': 'This account has been disabled.',
-      'auth/invalid-credential':
-        'Invalid login credentials. Please check your email and password.',
+      "auth/user-not-found": "No account found with this email address.",
+      "auth/wrong-password": "Incorrect password. Please try again.",
+      "auth/invalid-email": "Please enter a valid email address.",
+      "auth/email-already-in-use": "An account with this email already exists.",
+      "auth/weak-password": "Password should be at least 6 characters long.",
+      "auth/user-disabled": "This account has been disabled.",
+      "auth/invalid-credential":
+        "Invalid login credentials. Please check your email and password.",
 
       // Provider-specific errors
-      'auth/popup-blocked':
-        'Sign-in popup was blocked. Please allow popups and try again.',
-      'auth/popup-closed-by-user': 'Sign-in was cancelled. Please try again.',
-      'auth/cancelled-popup-request':
-        'Sign-in was cancelled. Please try again.',
-      'auth/redirect-cancelled-by-user':
-        'Sign-in was cancelled. Please try again.',
-      'auth/unauthorized-domain':
-        'This domain is not authorized for authentication.',
+      "auth/popup-blocked":
+        "Sign-in popup was blocked. Please allow popups and try again.",
+      "auth/popup-closed-by-user": "Sign-in was cancelled. Please try again.",
+      "auth/cancelled-popup-request":
+        "Sign-in was cancelled. Please try again.",
+      "auth/redirect-cancelled-by-user":
+        "Sign-in was cancelled. Please try again.",
+      "auth/unauthorized-domain":
+        "This domain is not authorized for authentication.",
 
       // Account linking errors
-      'auth/account-exists-with-different-credential':
-        'An account already exists with the same email but different sign-in credentials.',
-      'auth/credential-already-in-use':
-        'This credential is already associated with a different account.',
-      'auth/provider-already-linked':
-        'This account is already linked with this provider.',
+      "auth/account-exists-with-different-credential":
+        "An account already exists with the same email but different sign-in credentials.",
+      "auth/credential-already-in-use":
+        "This credential is already associated with a different account.",
+      "auth/provider-already-linked":
+        "This account is already linked with this provider.",
 
       // Token and session errors
-      'auth/invalid-api-key':
-        'Authentication service is temporarily unavailable.',
-      'auth/app-deleted': 'Authentication service is temporarily unavailable.',
-      'auth/expired-action-code': 'This verification link has expired.',
-      'auth/invalid-action-code': 'This verification link is invalid.',
+      "auth/invalid-api-key":
+        "Authentication service is temporarily unavailable.",
+      "auth/app-deleted": "Authentication service is temporarily unavailable.",
+      "auth/expired-action-code": "This verification link has expired.",
+      "auth/invalid-action-code": "This verification link is invalid.",
 
       // Rate limiting
-      'auth/quota-exceeded': 'Too many requests. Please try again later.',
+      "auth/quota-exceeded": "Too many requests. Please try again later.",
 
       // Generic fallbacks
-      'auth/operation-not-allowed': 'This sign-in method is not enabled.',
-      'auth/requires-recent-login':
-        'Please sign in again to complete this action.',
+      "auth/operation-not-allowed": "This sign-in method is not enabled.",
+      "auth/requires-recent-login":
+        "Please sign in again to complete this action.",
     };
 
     // Return specific message or generate a friendly fallback
@@ -1980,21 +1977,21 @@ export class FirebaseService {
 
     // Handle generic network/connection issues
     if (
-      errorMessage.includes('fetch') ||
-      errorMessage.includes('CORS') ||
-      errorMessage.includes('ERR_NETWORK') ||
-      errorMessage.includes('ERR_INTERNET_DISCONNECTED')
+      errorMessage.includes("fetch") ||
+      errorMessage.includes("CORS") ||
+      errorMessage.includes("ERR_NETWORK") ||
+      errorMessage.includes("ERR_INTERNET_DISCONNECTED")
     ) {
       return this.getNetworkErrorMessage();
     }
 
     // Generic fallback with helpful context
-    if (errorCode.startsWith('auth/')) {
+    if (errorCode.startsWith("auth/")) {
       return `Authentication failed. Please try again or contact support if the problem persists.`;
     }
 
     // Last resort fallback
-    return 'Something went wrong. Please check your connection and try again.';
+    return "Something went wrong. Please check your connection and try again.";
   }
 
   /**
@@ -2004,19 +2001,19 @@ export class FirebaseService {
     const isOnline = navigator.onLine;
 
     if (!isOnline) {
-      return 'No internet connection detected. Please check your network and try again.';
+      return "No internet connection detected. Please check your network and try again.";
     }
 
     // Online but network issues
     const tips = [
-      'Check your internet connection',
-      'Try refreshing the page',
+      "Check your internet connection",
+      "Try refreshing the page",
       "Disable VPN if you're using one",
-      'Try again in a few moments',
+      "Try again in a few moments",
     ];
 
     return `Network connection problem. Please try the following:\n• ${tips.join(
-      '\n• '
+      "\n• ",
     )}`;
   }
 
@@ -2025,9 +2022,9 @@ export class FirebaseService {
    */
   isDevelopment() {
     return (
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1' ||
-      window.location.protocol === 'file:'
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1" ||
+      window.location.protocol === "file:"
     );
   }
 
@@ -2037,25 +2034,25 @@ export class FirebaseService {
   async deleteCurrentUser() {
     try {
       if (!this.auth.currentUser) {
-        throw new Error('No authenticated user found');
+        throw new Error("No authenticated user found");
       }
 
       // Import deleteUser function
       const { deleteUser } = await import(
-        'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js'
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"
       );
 
       // Delete the user from Firebase Authentication
       await deleteUser(this.auth.currentUser);
 
-      this.trackEvent('user_account_deleted', {
+      this.trackEvent("user_account_deleted", {
         deletion_timestamp: new Date().toISOString(),
-        method: 'user_initiated',
+        method: "user_initiated",
       });
 
       return { success: true };
     } catch (error) {
-      console.error('❌ Account deletion failed:', error);
+      console.error("❌ Account deletion failed:", error);
       return { success: false, error: error.message };
     }
   }
@@ -2068,18 +2065,18 @@ export class FirebaseService {
       if (!this.messaging || !this.currentUser) {
         return {
           success: false,
-          error: 'Messaging not available or user not authenticated',
+          error: "Messaging not available or user not authenticated",
         };
       }
 
       const token = await this.messaging.getRegistrationToken(
-        this.currentUser.uid
+        this.currentUser.uid,
       );
       if (token) {
         return { success: true, token };
       }
 
-      return { success: false, error: 'Failed to get FCM token' };
+      return { success: false, error: "Failed to get FCM token" };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -2091,7 +2088,7 @@ export class FirebaseService {
   async subscribeToThreadNotifications(threadId) {
     try {
       if (!this.messaging || !this.currentUser) {
-        throw new Error('Messaging not available or user not authenticated');
+        throw new Error("Messaging not available or user not authenticated");
       }
 
       await this.messaging.subscribeToThread(threadId, this.currentUser.uid);
@@ -2107,7 +2104,7 @@ export class FirebaseService {
   async subscribeToNewPostNotifications() {
     try {
       if (!this.messaging || !this.currentUser) {
-        throw new Error('Messaging not available or user not authenticated');
+        throw new Error("Messaging not available or user not authenticated");
       }
 
       await this.messaging.subscribeToNewPosts(this.currentUser.uid);
@@ -2215,7 +2212,7 @@ export class FirebaseService {
    */
   async addSystemMetricsBatch(metricsBatch) {
     if (!this.db) {
-      throw new Error('Firestore not initialized');
+      throw new Error("Firestore not initialized");
     }
 
     if (!Array.isArray(metricsBatch) || metricsBatch.length === 0) {
@@ -2234,8 +2231,8 @@ export class FirebaseService {
         const enrichedMetric = {
           ...sanitizedMetric,
           storedAt: timestamp,
-          version: '1.0',
-          source: 'system-metadata-collector',
+          version: "1.0",
+          source: "system-metadata-collector",
           environment: this.getEnvironmentInfo(),
         };
 
@@ -2249,12 +2246,12 @@ export class FirebaseService {
       // Execute all batch operations
       const results = await Promise.allSettled(batch);
 
-      const successful = results.filter(r => r.status === 'fulfilled').length;
-      const failed = results.filter(r => r.status === 'rejected').length;
+      const successful = results.filter((r) => r.status === "fulfilled").length;
+      const failed = results.filter((r) => r.status === "rejected").length;
 
       // Log analytics event for successful batch
       if (successful > 0 && this.analytics) {
-        logEvent(this.analytics, 'system_metrics_batch_stored', {
+        logEvent(this.analytics, "system_metrics_batch_stored", {
           metrics_count: successful,
           batch_size: metricsBatch.length,
           timestamp: timestamp.toISOString(),
@@ -2270,7 +2267,7 @@ export class FirebaseService {
     } catch (error) {
       // Log error event
       if (this.analytics) {
-        logEvent(this.analytics, 'system_metrics_batch_error', {
+        logEvent(this.analytics, "system_metrics_batch_error", {
           error_message: error.message,
           batch_size: metricsBatch.length,
         });
@@ -2302,12 +2299,12 @@ export class FirebaseService {
    */
   async querySystemMetrics(options = {}) {
     if (!this.db) {
-      throw new Error('Firestore not initialized');
+      throw new Error("Firestore not initialized");
     }
 
     try {
       const {
-        metricType = 'scenario_performance',
+        metricType = "scenario_performance",
         startDate = null,
         endDate = null,
         limit = 100,
@@ -2322,23 +2319,23 @@ export class FirebaseService {
       const constraints = [];
 
       if (startDate) {
-        constraints.push(where('timestamp', '>=', new Date(startDate)));
+        constraints.push(where("timestamp", ">=", new Date(startDate)));
       }
 
       if (endDate) {
-        constraints.push(where('timestamp', '<=', new Date(endDate)));
+        constraints.push(where("timestamp", "<=", new Date(endDate)));
       }
 
       if (scenarioId) {
-        constraints.push(where('scenarioId', '==', scenarioId));
+        constraints.push(where("scenarioId", "==", scenarioId));
       }
 
       if (categoryId) {
-        constraints.push(where('categoryId', '==', categoryId));
+        constraints.push(where("categoryId", "==", categoryId));
       }
 
       // Add ordering and limit
-      constraints.push(orderBy('timestamp', 'desc'));
+      constraints.push(orderBy("timestamp", "desc"));
 
       if (limit && limit > 0) {
         constraints.push(limit(limit));
@@ -2348,7 +2345,7 @@ export class FirebaseService {
       const querySnapshot = await getDocs(q);
 
       const metrics = [];
-      querySnapshot.forEach(doc => {
+      querySnapshot.forEach((doc) => {
         metrics.push({
           id: doc.id,
           ...doc.data(),
@@ -2369,11 +2366,11 @@ export class FirebaseService {
   async getSystemAnalyticsSummary(options = {}) {
     try {
       const {
-        timeframe = '7d', // '1d', '7d', '30d', '90d'
+        timeframe = "7d", // '1d', '7d', '30d', '90d'
         metricTypes = [
-          'scenario_performance',
-          'framework_engagement',
-          'session_tracking',
+          "scenario_performance",
+          "framework_engagement",
+          "session_tracking",
         ],
       } = options;
 
@@ -2382,10 +2379,10 @@ export class FirebaseService {
 
       // Calculate start date based on timeframe
       const DAYS_CONFIG = {
-        '1d': 1,
-        '7d': 7,
-        '30d': 30,
-        '90d': 90,
+        "1d": 1,
+        "7d": 7,
+        "30d": 30,
+        "90d": 90,
       };
 
       startDate.setDate(endDate.getDate() - DAYS_CONFIG[timeframe]);
@@ -2408,13 +2405,13 @@ export class FirebaseService {
 
         summary.metrics[metricType] = this.aggregateMetrics(
           metrics,
-          metricType
+          metricType,
         );
       }
 
       return summary;
     } catch (error) {
-      console.error('Failed to get system analytics summary:', error);
+      console.error("Failed to get system analytics summary:", error);
       throw error;
     }
   }
@@ -2429,9 +2426,9 @@ export class FirebaseService {
       const {
         startDate = null,
         endDate = null,
-        anonymizationLevel = 'high', // 'low', 'medium', 'high'
+        anonymizationLevel = "high", // 'low', 'medium', 'high'
         includeMetadata = false,
-        format = 'json', // 'json', 'csv'
+        format = "json", // 'json', 'csv'
       } = options;
 
       const exportData = {
@@ -2440,17 +2437,17 @@ export class FirebaseService {
           anonymizationLevel,
           includeMetadata,
           format,
-          version: '1.0',
+          version: "1.0",
         },
         data: {},
       };
 
       // Export all metric types
       const metricTypes = [
-        'scenario_performance',
-        'framework_engagement',
-        'session_tracking',
-        'platform_metrics',
+        "scenario_performance",
+        "framework_engagement",
+        "session_tracking",
+        "platform_metrics",
       ];
 
       for (const metricType of metricTypes) {
@@ -2464,7 +2461,7 @@ export class FirebaseService {
         // Apply anonymization
         const anonymizedMetrics = this.anonymizeMetricsForExport(
           metrics,
-          anonymizationLevel
+          anonymizationLevel,
         );
 
         exportData.data[metricType] = anonymizedMetrics;
@@ -2472,11 +2469,11 @@ export class FirebaseService {
 
       // Log export event
       if (this.analytics) {
-        logEvent(this.analytics, 'system_analytics_export', {
+        logEvent(this.analytics, "system_analytics_export", {
           anonymization_level: anonymizationLevel,
           record_count: Object.values(exportData.data).reduce(
             (sum, arr) => sum + arr.length,
-            0
+            0,
           ),
           export_format: format,
         });
@@ -2484,7 +2481,7 @@ export class FirebaseService {
 
       return exportData;
     } catch (error) {
-      console.error('Failed to export system analytics:', error);
+      console.error("Failed to export system analytics:", error);
       throw error;
     }
   }
@@ -2497,21 +2494,21 @@ export class FirebaseService {
    */
   subscribeToSystemMetrics(options = {}, callback) {
     if (!this.db) {
-      throw new Error('Firestore not initialized');
+      throw new Error("Firestore not initialized");
     }
 
-    const { metricType = 'scenario_performance', limit = 50 } = options;
+    const { metricType = "scenario_performance", limit = 50 } = options;
 
     const collectionName = this.getCollectionNameForMetric(metricType);
     const q = query(
       collection(this.db, collectionName),
-      orderBy('timestamp', 'desc'),
-      limit(limit)
+      orderBy("timestamp", "desc"),
+      limit(limit),
     );
 
-    return onSnapshot(q, querySnapshot => {
+    return onSnapshot(q, (querySnapshot) => {
       const metrics = [];
-      querySnapshot.forEach(doc => {
+      querySnapshot.forEach((doc) => {
         metrics.push({
           id: doc.id,
           ...doc.data(),
@@ -2550,8 +2547,8 @@ export class FirebaseService {
     }
 
     // Limit string lengths to prevent storage abuse
-    Object.keys(sanitized).forEach(key => {
-      if (typeof sanitized[key] === 'string' && sanitized[key].length > 1000) {
+    Object.keys(sanitized).forEach((key) => {
+      if (typeof sanitized[key] === "string" && sanitized[key].length > 1000) {
         sanitized[key] = `${sanitized[key].substring(0, 1000)}...`;
       }
     });
@@ -2566,14 +2563,14 @@ export class FirebaseService {
    */
   getCollectionNameForMetric(metricType) {
     const collections = {
-      scenario_performance: 'analytics_scenario_performance',
-      framework_engagement: 'analytics_framework_engagement',
-      session_tracking: 'analytics_session_tracking',
-      platform_metrics: 'analytics_platform_metrics',
-      user_interactions: 'analytics_user_interactions',
+      scenario_performance: "analytics_scenario_performance",
+      framework_engagement: "analytics_framework_engagement",
+      session_tracking: "analytics_session_tracking",
+      platform_metrics: "analytics_platform_metrics",
+      user_interactions: "analytics_user_interactions",
     };
 
-    return collections[metricType] || 'analytics_general';
+    return collections[metricType] || "analytics_general";
   }
 
   /**
@@ -2588,7 +2585,7 @@ export class FirebaseService {
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       screenResolution: `${screen.width}x${screen.height}`,
       viewportSize: `${window.innerWidth}x${window.innerHeight}`,
-      connectionType: navigator.connection?.effectiveType || 'unknown',
+      connectionType: navigator.connection?.effectiveType || "unknown",
     };
   }
 
@@ -2600,17 +2597,21 @@ export class FirebaseService {
    */
   aggregateMetrics(metrics, metricType) {
     if (metrics.length === 0) {
-      return { count: 0, summary: 'No data available' };
+      return { count: 0, summary: "No data available" };
     }
 
     const aggregation = {
       count: metrics.length,
-      firstDate: new Date(Math.min(...metrics.map(m => new Date(m.timestamp)))),
-      lastDate: new Date(Math.max(...metrics.map(m => new Date(m.timestamp)))),
+      firstDate: new Date(
+        Math.min(...metrics.map((m) => new Date(m.timestamp))),
+      ),
+      lastDate: new Date(
+        Math.max(...metrics.map((m) => new Date(m.timestamp))),
+      ),
     };
 
     switch (metricType) {
-      case 'scenario_performance': {
+      case "scenario_performance": {
         const actions = metrics.reduce((acc, m) => {
           acc[m.action] = (acc[m.action] || 0) + 1;
           return acc;
@@ -2619,12 +2620,12 @@ export class FirebaseService {
         aggregation.completionRate =
           actions.complete && actions.view
             ? `${((actions.complete / actions.view) * 100).toFixed(2)}%`
-            : '0%';
+            : "0%";
         aggregation.actionBreakdown = actions;
         break;
       }
 
-      case 'framework_engagement': {
+      case "framework_engagement": {
         const frameworks = metrics.reduce((acc, m) => {
           acc[m.frameworkId] = (acc[m.frameworkId] || 0) + 1;
           return acc;
@@ -2637,15 +2638,15 @@ export class FirebaseService {
         break;
       }
 
-      case 'session_tracking': {
+      case "session_tracking": {
         const sessionDurations = metrics
-          .filter(m => m.metadata?.sessionDurationSeconds)
-          .map(m => m.metadata.sessionDurationSeconds);
+          .filter((m) => m.metadata?.sessionDurationSeconds)
+          .map((m) => m.metadata.sessionDurationSeconds);
 
         if (sessionDurations.length > 0) {
           aggregation.averageSessionDuration = Math.round(
             sessionDurations.reduce((a, b) => a + b, 0) /
-              sessionDurations.length
+              sessionDurations.length,
           );
         }
         break;
@@ -2661,17 +2662,17 @@ export class FirebaseService {
    * @param {string} level - Anonymization level
    * @returns {Array} - Anonymized metrics
    */
-  anonymizeMetricsForExport(metrics, level = 'high') {
-    return metrics.map(metric => {
+  anonymizeMetricsForExport(metrics, level = "high") {
+    return metrics.map((metric) => {
       const anonymized = { ...metric };
 
       // Remove identifying fields based on anonymization level
-      if (level === 'high' || level === 'medium') {
+      if (level === "high" || level === "medium") {
         delete anonymized.sessionId;
         delete anonymized.userId;
         delete anonymized.id; // Document ID
       }
-      if (level === 'high') {
+      if (level === "high") {
         delete anonymized.environment;
 
         // Add noise to numerical values
@@ -2680,14 +2681,14 @@ export class FirebaseService {
           anonymized.metadata.completionTime = this.addNoise(
             anonymized.metadata.completionTime,
 
-            NOISE_LEVEL
+            NOISE_LEVEL,
           );
         }
 
         if (anonymized.metadata?.sessionDurationSeconds) {
           anonymized.metadata.sessionDurationSeconds = this.addNoise(
             anonymized.metadata.sessionDurationSeconds,
-            NOISE_LEVEL
+            NOISE_LEVEL,
           );
         }
       }
@@ -2726,7 +2727,7 @@ export class FirebaseService {
    */
   async trackStorageEvent(eventType, data = {}) {
     if (!this.analyticsService) {
-      throw new Error('Analytics service not initialized');
+      throw new Error("Analytics service not initialized");
     }
     return await this.analyticsService.trackStorageEvent(eventType, data);
   }
@@ -2739,7 +2740,7 @@ export class FirebaseService {
    */
   async trackAIAnalysis(analysisType, data = {}) {
     if (!this.analyticsService) {
-      throw new Error('Analytics service not initialized');
+      throw new Error("Analytics service not initialized");
     }
     return await this.analyticsService.trackAIAnalysis(analysisType, data);
   }
@@ -2752,7 +2753,7 @@ export class FirebaseService {
    */
   async trackSecurityEvent(eventType, data = {}) {
     if (!this.analyticsService) {
-      throw new Error('Analytics service not initialized');
+      throw new Error("Analytics service not initialized");
     }
     return await this.analyticsService.trackSecurityEvent(eventType, data);
   }
@@ -2765,7 +2766,7 @@ export class FirebaseService {
    */
   async trackSearchEvent(query, results = {}) {
     if (!this.analyticsService) {
-      throw new Error('Analytics service not initialized');
+      throw new Error("Analytics service not initialized");
     }
     return await this.analyticsService.trackSearchEvent(query, results);
   }
@@ -2776,7 +2777,7 @@ export class FirebaseService {
    */
   async getRealTimeAnalytics() {
     if (!this.analyticsService) {
-      throw new Error('Analytics service not initialized');
+      throw new Error("Analytics service not initialized");
     }
     return await this.analyticsService.getRealTimeAnalytics();
   }
@@ -2786,9 +2787,9 @@ export class FirebaseService {
    * @param {string} timeRange - Time range (1h, 24h, 7d, 30d, 90d)
    * @returns {Promise<Object>} Historical analytics data
    */
-  async getHistoricalAnalytics(timeRange = '7d') {
+  async getHistoricalAnalytics(timeRange = "7d") {
     if (!this.analyticsService) {
-      throw new Error('Analytics service not initialized');
+      throw new Error("Analytics service not initialized");
     }
     return await this.analyticsService.getHistoricalAnalytics(timeRange);
   }
@@ -2800,7 +2801,7 @@ export class FirebaseService {
    */
   async generateDailySummary(date = null) {
     if (!this.analyticsService) {
-      throw new Error('Analytics service not initialized');
+      throw new Error("Analytics service not initialized");
     }
     return await this.analyticsService.generateDailySummary(date);
   }
@@ -2812,7 +2813,7 @@ export class FirebaseService {
    */
   setupAnalyticsListeners(callback) {
     if (!this.analyticsService) {
-      throw new Error('Analytics service not initialized');
+      throw new Error("Analytics service not initialized");
     }
     return this.analyticsService.setupRealtimeListeners(callback);
   }
@@ -2824,7 +2825,7 @@ export class FirebaseService {
    */
   startPerformanceTrace(traceName) {
     if (!this.analyticsService) {
-      throw new Error('Analytics service not initialized');
+      throw new Error("Analytics service not initialized");
     }
     return this.analyticsService.startTrace(traceName);
   }
@@ -2837,7 +2838,7 @@ export class FirebaseService {
    */
   stopPerformanceTrace(traceName, customAttributes = {}) {
     if (!this.analyticsService) {
-      throw new Error('Analytics service not initialized');
+      throw new Error("Analytics service not initialized");
     }
     return this.analyticsService.stopTrace(traceName, customAttributes);
   }
@@ -2850,7 +2851,7 @@ export class FirebaseService {
    */
   trackAuthSignIn(method, data = {}) {
     if (!this.performanceTracing) {
-      throw new Error('Performance tracing not initialized');
+      throw new Error("Performance tracing not initialized");
     }
     return this.performanceTracing.trackAuthSignIn(method, data);
   }
@@ -2863,7 +2864,7 @@ export class FirebaseService {
    */
   trackSimulationFlow(scenarioId, data = {}) {
     if (!this.performanceTracing) {
-      throw new Error('Performance tracing not initialized');
+      throw new Error("Performance tracing not initialized");
     }
     return this.performanceTracing.trackSimulationFlow(scenarioId, data);
   }
@@ -2876,7 +2877,7 @@ export class FirebaseService {
    */
   trackAIOperation(operation, data = {}) {
     if (!this.performanceTracing) {
-      throw new Error('Performance tracing not initialized');
+      throw new Error("Performance tracing not initialized");
     }
     return this.performanceTracing.trackAIOperation(operation, data);
   }

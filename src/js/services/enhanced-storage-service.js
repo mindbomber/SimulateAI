@@ -39,7 +39,7 @@ const AI_CONFIG = {
   CONTENT_MODERATION: {
     ENABLED: true,
     CONFIDENCE_THRESHOLD: 0.8,
-    BLOCKED_CATEGORIES: ['adult', 'violence', 'illegal', 'spam'],
+    BLOCKED_CATEGORIES: ["adult", "violence", "illegal", "spam"],
     AUTO_QUARANTINE: true,
   },
 
@@ -49,16 +49,16 @@ const AI_CONFIG = {
     MAX_TAGS: 10,
     MIN_CONFIDENCE: 0.6,
     CATEGORIES: [
-      'educational',
-      'research',
-      'presentation',
-      'data',
-      'code',
-      'design',
-      'documentation',
-      'media',
-      'personal',
-      'project',
+      "educational",
+      "research",
+      "presentation",
+      "data",
+      "code",
+      "design",
+      "documentation",
+      "media",
+      "personal",
+      "project",
     ],
   },
 
@@ -95,7 +95,7 @@ const SECURITY_CONFIG = {
   // Encryption settings
   ENCRYPTION: {
     ENABLED: true,
-    ALGORITHM: 'AES-256-GCM',
+    ALGORITHM: "AES-256-GCM",
     KEY_ROTATION_DAYS: 90,
     ENCRYPT_METADATA: true,
   },
@@ -183,7 +183,7 @@ export class EnhancedStorageService {
             return await this.quarantineFile(file, userId, moderationResult);
           } else {
             throw new Error(
-              `Content moderation failed: ${moderationResult.reason}`
+              `Content moderation failed: ${moderationResult.reason}`,
             );
           }
         }
@@ -202,7 +202,7 @@ export class EnhancedStorageService {
         finalFile,
         userId,
         category,
-        options.progressCallback
+        options.progressCallback,
       );
 
       // Step 7: Store enhanced metadata
@@ -217,9 +217,9 @@ export class EnhancedStorageService {
 
       if (this.hybridData) {
         await this.hybridData.createFirestoreDocument(
-          'enhanced_files',
+          "enhanced_files",
           uploadResult.fileId,
-          enhancedMetadata
+          enhancedMetadata,
         );
       }
 
@@ -249,19 +249,19 @@ export class EnhancedStorageService {
 
       // Get base search results
       const baseResults = await this.hybridData.queryFirestoreCollection(
-        'enhanced_files',
+        "enhanced_files",
         {
-          where: [['userId', '==', userId]],
+          where: [["userId", "==", userId]],
           limit: options.limit || 50,
-        }
+        },
       );
 
       // AI-powered relevance scoring
       const scoredResults = await Promise.all(
-        baseResults.map(async file => {
+        baseResults.map(async (file) => {
           const relevanceScore = await this.aiAnalyzer.calculateRelevance(
             enhancedQuery,
-            file.aiAnalysis
+            file.aiAnalysis,
           );
 
           return {
@@ -269,15 +269,15 @@ export class EnhancedStorageService {
             relevanceScore,
             matchReasons: this.aiAnalyzer.getMatchReasons(
               enhancedQuery,
-              file.aiAnalysis
+              file.aiAnalysis,
             ),
           };
-        })
+        }),
       );
 
       // Sort by relevance and return top results
       const sortedResults = scoredResults
-        .filter(result => result.relevanceScore > 0.3)
+        .filter((result) => result.relevanceScore > 0.3)
         .sort((a, b) => b.relevanceScore - a.relevanceScore);
 
       return {
@@ -300,10 +300,10 @@ export class EnhancedStorageService {
   async createSmartCollections(userId) {
     try {
       const userFiles = await this.hybridData.queryFirestoreCollection(
-        'enhanced_files',
+        "enhanced_files",
         {
-          where: [['userId', '==', userId]],
-        }
+          where: [["userId", "==", userId]],
+        },
       );
 
       const collections =
@@ -312,13 +312,13 @@ export class EnhancedStorageService {
       // Store smart collections
       for (const collection of collections) {
         await this.hybridData.createFirestoreDocument(
-          'smart_collections',
+          "smart_collections",
           `${userId}_${collection.id}`,
           {
             userId,
             ...collection,
             createdAt: new Date(),
-          }
+          },
         );
       }
 
@@ -341,7 +341,7 @@ export class EnhancedStorageService {
     fileId,
     sharedWithUserId,
     permissions,
-    expiresAt = null
+    expiresAt = null,
   ) {
     try {
       const shareId = this.generateShareId();
@@ -361,13 +361,13 @@ export class EnhancedStorageService {
         await this.encryptionService.createSecureLink(shareRecord);
 
       await this.hybridData.createFirestoreDocument(
-        'file_shares',
+        "file_shares",
         shareId,
-        shareRecord
+        shareRecord,
       );
 
       // Log sharing activity
-      await this.logSecurityEvent('file_shared', {
+      await this.logSecurityEvent("file_shared", {
         fileId,
         sharedWith: sharedWithUserId,
         permissions,
@@ -403,8 +403,8 @@ export class EnhancedStorageService {
     if (!this.hybridData) return null;
 
     const file = await this.hybridData.getFirestoreDocument(
-      'enhanced_files',
-      fileId
+      "enhanced_files",
+      fileId,
     );
     return file?.userId || null;
   }
@@ -413,7 +413,7 @@ export class EnhancedStorageService {
     const quarantineId = `quarantine_${Date.now()}`;
 
     await this.hybridData.createFirestoreDocument(
-      'quarantined_files',
+      "quarantined_files",
       quarantineId,
       {
         userId,
@@ -423,7 +423,7 @@ export class EnhancedStorageService {
         moderationResult,
         quarantinedAt: new Date(),
         reviewed: false,
-      }
+      },
     );
 
     return {
@@ -438,14 +438,14 @@ export class EnhancedStorageService {
     if (!SECURITY_CONFIG.ACCESS_CONTROL.AUDIT_LOGGING) return;
 
     await this.hybridData.createFirestoreDocument(
-      'security_logs',
+      "security_logs",
       `${eventType}_${Date.now()}`,
       {
         eventType,
         data,
         timestamp: new Date(),
         userAgent: navigator.userAgent,
-      }
+      },
     );
   }
 }
@@ -460,17 +460,17 @@ class AIContentAnalyzer {
       size: file.size,
       tags: [],
       confidence: 0,
-      extractedText: '',
+      extractedText: "",
       objects: [],
-      sentiment: 'neutral',
-      caption: '',
-      language: 'unknown',
-      summary: '',
+      sentiment: "neutral",
+      caption: "",
+      language: "unknown",
+      summary: "",
     };
 
-    if (file.type.startsWith('image/')) {
+    if (file.type.startsWith("image/")) {
       return await this.analyzeImage(file, analysis);
-    } else if (file.type.includes('pdf') || file.type.includes('document')) {
+    } else if (file.type.includes("pdf") || file.type.includes("document")) {
       return await this.analyzeDocument(file, analysis);
     } else {
       return await this.analyzeGenericFile(file, analysis);
@@ -509,7 +509,7 @@ class AIContentAnalyzer {
       // Simulate document analysis
       analysis.extractedText = await this.mockTextExtraction(file);
       analysis.language = await this.mockLanguageDetection(
-        analysis.extractedText
+        analysis.extractedText,
       );
       analysis.summary = await this.mockSummarization(analysis.extractedText);
       analysis.tags = await this.mockDocumentTagging(analysis.extractedText);
@@ -531,43 +531,43 @@ class AIContentAnalyzer {
 
   async moderateContent(analysis) {
     // Mock content moderation
-    const blockedKeywords = ['inappropriate', 'spam', 'malicious'];
+    const blockedKeywords = ["inappropriate", "spam", "malicious"];
     const hasBlockedContent = blockedKeywords.some(
-      keyword =>
+      (keyword) =>
         analysis.extractedText.toLowerCase().includes(keyword) ||
-        analysis.tags.some(tag => tag.toLowerCase().includes(keyword))
+        analysis.tags.some((tag) => tag.toLowerCase().includes(keyword)),
     );
 
     return {
       approved: !hasBlockedContent,
       confidence: 0.92,
       reason: hasBlockedContent
-        ? 'Contains blocked keywords'
-        : 'Content approved',
-      categories: hasBlockedContent ? ['spam'] : [],
+        ? "Contains blocked keywords"
+        : "Content approved",
+      categories: hasBlockedContent ? ["spam"] : [],
     };
   }
 
   async enhanceSearchQuery(query) {
     // Mock query enhancement with synonyms and related terms
     const synonyms = {
-      document: ['file', 'paper', 'report'],
-      image: ['photo', 'picture', 'graphic'],
-      presentation: ['slides', 'deck', 'powerpoint'],
+      document: ["file", "paper", "report"],
+      image: ["photo", "picture", "graphic"],
+      presentation: ["slides", "deck", "powerpoint"],
     };
 
     let enhancedQuery = query.toLowerCase();
 
     Object.entries(synonyms).forEach(([term, syns]) => {
       if (enhancedQuery.includes(term)) {
-        enhancedQuery += ` ${syns.join(' ')}`;
+        enhancedQuery += ` ${syns.join(" ")}`;
       }
     });
 
     return {
       original: query,
       enhanced: enhancedQuery,
-      terms: enhancedQuery.split(' ').filter(term => term.length > 2),
+      terms: enhancedQuery.split(" ").filter((term) => term.length > 2),
     };
   }
 
@@ -579,7 +579,7 @@ class AIContentAnalyzer {
       if (fileAnalysis.extractedText.toLowerCase().includes(term)) {
         relevanceScore += 0.3;
       }
-      if (fileAnalysis.tags.some(tag => tag.toLowerCase().includes(term))) {
+      if (fileAnalysis.tags.some((tag) => tag.toLowerCase().includes(term))) {
         relevanceScore += 0.4;
       }
       if (fileAnalysis.caption?.toLowerCase().includes(term)) {
@@ -597,7 +597,7 @@ class AIContentAnalyzer {
       if (fileAnalysis.extractedText.toLowerCase().includes(term)) {
         reasons.push(`Text contains "${term}"`);
       }
-      if (fileAnalysis.tags.some(tag => tag.toLowerCase().includes(term))) {
+      if (fileAnalysis.tags.some((tag) => tag.toLowerCase().includes(term))) {
         reasons.push(`Tagged with "${term}"`);
       }
     }
@@ -609,34 +609,34 @@ class AIContentAnalyzer {
     const collections = [];
 
     // Group by content type
-    const imageFiles = files.filter(f =>
-      f.aiAnalysis?.fileType?.startsWith('image/')
+    const imageFiles = files.filter((f) =>
+      f.aiAnalysis?.fileType?.startsWith("image/"),
     );
     const documentFiles = files.filter(
-      f =>
-        f.aiAnalysis?.fileType?.includes('document') ||
-        f.aiAnalysis?.fileType?.includes('pdf')
+      (f) =>
+        f.aiAnalysis?.fileType?.includes("document") ||
+        f.aiAnalysis?.fileType?.includes("pdf"),
     );
 
     if (imageFiles.length > 0) {
       collections.push({
-        id: 'smart_images',
-        name: 'Smart Images Collection',
-        description: 'Automatically organized image files',
-        files: imageFiles.map(f => f.id),
-        type: 'auto',
-        criteria: 'fileType:image',
+        id: "smart_images",
+        name: "Smart Images Collection",
+        description: "Automatically organized image files",
+        files: imageFiles.map((f) => f.id),
+        type: "auto",
+        criteria: "fileType:image",
       });
     }
 
     if (documentFiles.length > 0) {
       collections.push({
-        id: 'smart_documents',
-        name: 'Smart Documents Collection',
-        description: 'Automatically organized document files',
-        files: documentFiles.map(f => f.id),
-        type: 'auto',
-        criteria: 'fileType:document',
+        id: "smart_documents",
+        name: "Smart Documents Collection",
+        description: "Automatically organized document files",
+        files: documentFiles.map((f) => f.id),
+        type: "auto",
+        criteria: "fileType:document",
       });
     }
 
@@ -648,8 +648,8 @@ class AIContentAnalyzer {
           id: `smart_${tag}`,
           name: `${tag.charAt(0).toUpperCase() + tag.slice(1)} Collection`,
           description: `Files related to ${tag}`,
-          files: taggedFiles.map(f => f.id),
-          type: 'auto',
+          files: taggedFiles.map((f) => f.id),
+          type: "auto",
           criteria: `tag:${tag}`,
         });
       }
@@ -661,9 +661,9 @@ class AIContentAnalyzer {
   groupFilesByTags(files) {
     const tagGroups = {};
 
-    files.forEach(file => {
+    files.forEach((file) => {
       if (file.aiAnalysis?.tags) {
-        file.aiAnalysis.tags.forEach(tag => {
+        file.aiAnalysis.tags.forEach((tag) => {
           if (!tagGroups[tag]) {
             tagGroups[tag] = [];
           }
@@ -677,60 +677,60 @@ class AIContentAnalyzer {
 
   // Mock AI methods (in production, these would call actual AI services)
   async mockOCR(file) {
-    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate processing time
-    return 'Sample extracted text from image using OCR technology';
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate processing time
+    return "Sample extracted text from image using OCR technology";
   }
 
   async mockObjectDetection(file) {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    return ['person', 'computer', 'desk', 'book'];
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    return ["person", "computer", "desk", "book"];
   }
 
   async mockAutoTagging(file) {
     const possibleTags = [
-      'educational',
-      'work',
-      'personal',
-      'research',
-      'presentation',
+      "educational",
+      "work",
+      "personal",
+      "research",
+      "presentation",
     ];
     return possibleTags.slice(0, Math.floor(Math.random() * 3) + 1);
   }
 
   async mockCaptionGeneration(file) {
-    await new Promise(resolve => setTimeout(resolve, 400));
-    return 'A person working at a computer desk with educational materials';
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    return "A person working at a computer desk with educational materials";
   }
 
   async mockTextExtraction(file) {
-    await new Promise(resolve => setTimeout(resolve, 800));
-    return 'This is sample extracted text from the document. It contains information about various topics and could be used for indexing and search purposes.';
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    return "This is sample extracted text from the document. It contains information about various topics and could be used for indexing and search purposes.";
   }
 
   async mockLanguageDetection(text) {
-    return 'en'; // English
+    return "en"; // English
   }
 
   async mockSummarization(text) {
-    await new Promise(resolve => setTimeout(resolve, 600));
-    return 'This document discusses key concepts and provides valuable insights on the topic.';
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    return "This document discusses key concepts and provides valuable insights on the topic.";
   }
 
   async mockDocumentTagging(text) {
-    const documentTags = ['report', 'analysis', 'research', 'documentation'];
+    const documentTags = ["report", "analysis", "research", "documentation"];
     return documentTags.slice(0, Math.floor(Math.random() * 2) + 1);
   }
 
   getFileTypeTags(mimeType) {
     const typeMap = {
-      'application/pdf': ['document', 'pdf'],
-      'image/jpeg': ['image', 'photo'],
-      'image/png': ['image', 'graphic'],
-      'application/zip': ['archive', 'compressed'],
-      'text/plain': ['text', 'document'],
+      "application/pdf": ["document", "pdf"],
+      "image/jpeg": ["image", "photo"],
+      "image/png": ["image", "graphic"],
+      "application/zip": ["archive", "compressed"],
+      "text/plain": ["text", "document"],
     };
 
-    return typeMap[mimeType] || ['file'];
+    return typeMap[mimeType] || ["file"];
   }
 }
 
@@ -742,40 +742,40 @@ class SecurityValidator {
     const result = {
       safe: true,
       checks: [],
-      reason: '',
+      reason: "",
     };
 
     // File size check
     if (file.size > 100 * 1024 * 1024) {
       // 100MB limit
       result.safe = false;
-      result.reason = 'File size exceeds limit';
+      result.reason = "File size exceeds limit";
       return result;
     }
 
     // MIME type validation
     const allowedTypes = [
-      'image/jpeg',
-      'image/png',
-      'image/gif',
-      'image/webp',
-      'application/pdf',
-      'text/plain',
-      'application/zip',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "application/pdf",
+      "text/plain",
+      "application/zip",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ];
 
     if (!allowedTypes.includes(file.type)) {
       result.safe = false;
-      result.reason = 'File type not allowed';
+      result.reason = "File type not allowed";
       return result;
     }
 
     // File header validation (mock)
-    result.checks.push('File header validation: PASSED');
-    result.checks.push('MIME type validation: PASSED');
-    result.checks.push('Size validation: PASSED');
+    result.checks.push("File header validation: PASSED");
+    result.checks.push("MIME type validation: PASSED");
+    result.checks.push("Size validation: PASSED");
 
     return result;
   }
@@ -795,9 +795,9 @@ class PerformanceOptimizer {
       optimizations: [],
     };
 
-    if (file.type.startsWith('image/')) {
+    if (file.type.startsWith("image/")) {
       return await this.optimizeImage(file);
-    } else if (file.type.includes('pdf')) {
+    } else if (file.type.includes("pdf")) {
       return await this.optimizePDF(file);
     }
 
@@ -806,11 +806,11 @@ class PerformanceOptimizer {
 
   async optimizeImage(file) {
     try {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
       const img = new Image();
 
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         img.onload = () => {
           // Optimize dimensions if too large
           let { width, height } = img;
@@ -821,7 +821,7 @@ class PerformanceOptimizer {
             width *= ratio;
             height *= ratio;
             this.optimizationReport.optimizations.push(
-              'Image resized for optimization'
+              "Image resized for optimization",
             );
           }
 
@@ -830,34 +830,34 @@ class PerformanceOptimizer {
           ctx.drawImage(img, 0, 0, width, height);
 
           canvas.toBlob(
-            blob => {
+            (blob) => {
               this.optimizationReport.optimizedSize = blob.size;
               this.optimizationReport.compressionRatio =
                 (1 - blob.size / file.size) * 100;
 
               const optimizedFile = new File([blob], file.name, {
-                type: 'image/jpeg',
+                type: "image/jpeg",
                 lastModified: Date.now(),
               });
 
               resolve(optimizedFile);
             },
-            'image/jpeg',
-            0.85
+            "image/jpeg",
+            0.85,
           );
         };
 
         img.src = URL.createObjectURL(file);
       });
     } catch (error) {
-      this.optimizationReport.optimizations.push('Image optimization failed');
+      this.optimizationReport.optimizations.push("Image optimization failed");
       return file;
     }
   }
 
   async optimizePDF(file) {
     // Mock PDF optimization
-    this.optimizationReport.optimizations.push('PDF metadata cleaned');
+    this.optimizationReport.optimizations.push("PDF metadata cleaned");
     this.optimizationReport.optimizedSize = file.size * 0.9; // 10% reduction
     this.optimizationReport.compressionRatio = 10;
     return file;
@@ -894,7 +894,7 @@ class EncryptionService {
       JSON.stringify({
         shareId: shareRecord.shareId,
         timestamp: Date.now(),
-      })
+      }),
     );
 
     return `https://secure.simulateai.com/share/${linkData}`;
@@ -915,7 +915,7 @@ class ProgressiveUploader {
 
     // Simulate progressive upload
     for (let i = 0; i < totalChunks; i++) {
-      await new Promise(resolve => setTimeout(resolve, 100)); // Simulate chunk upload time
+      await new Promise((resolve) => setTimeout(resolve, 100)); // Simulate chunk upload time
 
       if (progressCallback) {
         progressCallback({

@@ -10,11 +10,11 @@ import {
   getMessaging,
   getToken,
   onMessage,
-} from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-messaging.js';
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js';
+} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-messaging.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 
 // Import your Firebase configuration
-import { firebaseConfig, VAPID_KEY } from './config/firebase-config.js';
+import { firebaseConfig, VAPID_KEY } from "./config/firebase-config.js";
 
 // Constants
 const NOTIFICATION_AUTO_CLOSE_DELAY = 8000; // 8 seconds
@@ -52,9 +52,9 @@ export class FCMMainApp {
       this.setupForegroundMessageHandler();
 
       this.isInitialized = true;
-      this.logInfo('FCM Main App initialized successfully');
+      this.logInfo("FCM Main App initialized successfully");
     } catch (error) {
-      this.handleError('Failed to initialize FCM Main App', error);
+      this.handleError("Failed to initialize FCM Main App", error);
     }
   }
 
@@ -63,13 +63,13 @@ export class FCMMainApp {
    */
   async registerServiceWorker() {
     try {
-      if ('serviceWorker' in navigator) {
+      if ("serviceWorker" in navigator) {
         const registration = await navigator.serviceWorker.register(
-          '/firebase-messaging-sw.js'
+          "/firebase-messaging-sw.js",
         );
         this.logInfo(
-          'Service Worker registered with scope:',
-          registration.scope
+          "Service Worker registered with scope:",
+          registration.scope,
         );
 
         // Optionally pass the service worker registration to getMessaging
@@ -77,10 +77,10 @@ export class FCMMainApp {
 
         return registration;
       } else {
-        throw new Error('Service Worker not supported in this browser');
+        throw new Error("Service Worker not supported in this browser");
       }
     } catch (error) {
-      this.handleError('Service Worker registration failed', error);
+      this.handleError("Service Worker registration failed", error);
       throw error;
     }
   }
@@ -91,15 +91,15 @@ export class FCMMainApp {
   async requestPermissionAndGetToken() {
     try {
       // Check if notifications are supported
-      if (!('Notification' in window)) {
-        throw new Error('This browser does not support notifications');
+      if (!("Notification" in window)) {
+        throw new Error("This browser does not support notifications");
       }
 
       // Request notification permission
       const permission = await Notification.requestPermission();
 
-      if (permission === 'granted') {
-        this.logInfo('Notification permission granted');
+      if (permission === "granted") {
+        this.logInfo("Notification permission granted");
 
         // Get FCM token
         const currentToken = await getToken(this.messaging, {
@@ -108,7 +108,7 @@ export class FCMMainApp {
 
         if (currentToken) {
           this.currentToken = currentToken;
-          this.logInfo('FCM registration token:', currentToken);
+          this.logInfo("FCM registration token:", currentToken);
 
           // TODO: Send this token to your server!
           // You'll need to store this token in your database (e.g., Cloud Firestore)
@@ -117,23 +117,23 @@ export class FCMMainApp {
         } else {
           // Show UI to ask user to enable notifications
           this.logInfo(
-            'No registration token available. Request permission to generate one.'
+            "No registration token available. Request permission to generate one.",
           );
           this.showEnableNotificationsUI();
         }
-      } else if (permission === 'denied') {
-        this.handleError('Notifications blocked by the user');
+      } else if (permission === "denied") {
+        this.handleError("Notifications blocked by the user");
         this.showNotificationsBlockedUI();
       } else {
-        this.logInfo('Notification permission not granted');
+        this.logInfo("Notification permission not granted");
         this.showPermissionRequiredUI();
       }
     } catch (error) {
-      this.handleError('An error occurred while retrieving token', error);
+      this.handleError("An error occurred while retrieving token", error);
 
       // Handle specific error cases
-      if (Notification.permission === 'denied') {
-        this.logInfo('Notifications blocked by the user');
+      if (Notification.permission === "denied") {
+        this.logInfo("Notifications blocked by the user");
         this.showNotificationsBlockedUI();
       }
     }
@@ -143,43 +143,43 @@ export class FCMMainApp {
    * 3. Handle foreground messages
    */
   setupForegroundMessageHandler() {
-    onMessage(this.messaging, payload => {
-      this.logInfo('Foreground message received:', payload);
+    onMessage(this.messaging, (payload) => {
+      this.logInfo("Foreground message received:", payload);
 
       // Customize how you want to display the message in the foreground
       // For example, you could show a custom in-app notification or a toast message.
       const notificationTitle =
-        payload.notification?.title || 'SimulateAI Notification';
+        payload.notification?.title || "SimulateAI Notification";
       const notificationOptions = {
-        body: payload.notification?.body || 'You have a new notification',
-        icon: '/src/assets/icons/logo.svg', // SimulateAI logo
-        badge: '/src/assets/icons/favicon.png',
-        tag: payload.data?.type || 'general',
+        body: payload.notification?.body || "You have a new notification",
+        icon: "/src/assets/icons/logo.svg", // SimulateAI logo
+        badge: "/src/assets/icons/favicon.png",
+        tag: payload.data?.type || "general",
         data: payload.data,
-        requireInteraction: payload.data?.priority === 'high',
+        requireInteraction: payload.data?.priority === "high",
         actions: [
           {
-            action: 'view',
-            title: 'View',
-            icon: '/src/assets/icons/view.svg',
+            action: "view",
+            title: "View",
+            icon: "/src/assets/icons/view.svg",
           },
           {
-            action: 'dismiss',
-            title: 'Dismiss',
-            icon: '/src/assets/icons/close.svg',
+            action: "dismiss",
+            title: "Dismiss",
+            icon: "/src/assets/icons/close.svg",
           },
         ],
       };
 
       // Display the notification using the browser's Notification API
-      if (Notification.permission === 'granted') {
+      if (Notification.permission === "granted") {
         const notification = new Notification(
           notificationTitle,
-          notificationOptions
+          notificationOptions,
         );
 
         // Handle notification click
-        notification.onclick = event => {
+        notification.onclick = (event) => {
           event.preventDefault();
           window.focus();
 
@@ -206,7 +206,7 @@ export class FCMMainApp {
     try {
       // This would typically save to Firestore or your backend
       // For now, we'll store it locally and log it
-      localStorage.setItem('fcm_token', token);
+      localStorage.setItem("fcm_token", token);
 
       // TODO: Implement actual database save
       // Example: Save to Firestore
@@ -223,9 +223,9 @@ export class FCMMainApp {
       });
       */
 
-      this.logInfo('FCM token saved to database');
+      this.logInfo("FCM token saved to database");
     } catch (error) {
-      this.handleError('Failed to save FCM token to database', error);
+      this.handleError("Failed to save FCM token to database", error);
     }
   }
 
@@ -234,7 +234,7 @@ export class FCMMainApp {
    */
   showEnableNotificationsUI() {
     // Create a notification prompt UI
-    const notificationPrompt = document.createElement('div');
+    const notificationPrompt = document.createElement("div");
     notificationPrompt.innerHTML = `
       <div style="
         position: fixed;
@@ -273,7 +273,7 @@ export class FCMMainApp {
    * Show UI when notifications are blocked
    */
   showNotificationsBlockedUI() {
-    this.logInfo('Showing notifications blocked UI');
+    this.logInfo("Showing notifications blocked UI");
     // Could show instructions on how to enable notifications in browser settings
   }
 
@@ -281,7 +281,7 @@ export class FCMMainApp {
    * Show UI when permission is required
    */
   showPermissionRequiredUI() {
-    this.logInfo('Showing permission required UI');
+    this.logInfo("Showing permission required UI");
     // Could show a button to request permission again
   }
 
@@ -304,9 +304,9 @@ export class FCMMainApp {
    */
   logInfo(_message, ..._args) {
     if (
-      typeof window !== 'undefined' &&
+      typeof window !== "undefined" &&
       window.console &&
-      window.location.hostname === 'localhost'
+      window.location.hostname === "localhost"
     ) {
       // Debug logging removed for production
     }
@@ -316,7 +316,7 @@ export class FCMMainApp {
    * Handle errors
    */
   handleError(message, error = null) {
-    if (typeof window !== 'undefined' && window.console) {
+    if (typeof window !== "undefined" && window.console) {
       if (error) {
         window.console.error(`[FCM Error] ${message}:`, error);
       } else {
@@ -330,8 +330,8 @@ export class FCMMainApp {
 const fcmMainApp = new FCMMainApp();
 
 // Auto-initialize when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => {
     fcmMainApp.initialize();
   });
 } else {

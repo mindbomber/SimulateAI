@@ -5,15 +5,15 @@
 
 class NavigationMigration {
   constructor() {
-    this.backupSuffix = '.nav-backup';
+    this.backupSuffix = ".nav-backup";
     this.filesToMigrate = [
-      'index.html',
-      'categories.html',
-      'blog.html',
-      'forum.html',
-      'profile.html',
-      'privacy-notice.html',
-      'donate.html',
+      "index.html",
+      "categories.html",
+      "blog.html",
+      "forum.html",
+      "profile.html",
+      "privacy-notice.html",
+      "donate.html",
     ];
   }
 
@@ -84,7 +84,7 @@ class NavigationMigration {
    */
   addNavigationCSS(content) {
     // Check if already included
-    if (content.includes('shared-navigation.css')) {
+    if (content.includes("shared-navigation.css")) {
       return content;
     }
 
@@ -126,12 +126,12 @@ class NavigationMigration {
     const headerRegex = /<header\s+class="header"[^>]*>.*?<\/header>/gis;
     let result = content.replace(
       headerRegex,
-      '<!-- Navigation will be injected here by SharedNavigation -->'
+      "<!-- Navigation will be injected here by SharedNavigation -->",
     );
 
     // Also remove any standalone nav elements
     const navRegex = /<nav[^>]*class="[^"]*main-nav[^"]*"[^>]*>.*?<\/nav>/gis;
-    result = result.replace(navRegex, '');
+    result = result.replace(navRegex, "");
 
     return result;
   }
@@ -141,7 +141,7 @@ class NavigationMigration {
    */
   addNavigationScript(content) {
     // Check if already included
-    if (content.includes('shared-navigation.js')) {
+    if (content.includes("shared-navigation.js")) {
       return content;
     }
 
@@ -273,10 +273,10 @@ document.addEventListener('DOMContentLoaded', () => {
    */
   needsMigration(content) {
     const hasPageId = content.includes('name="page-id"');
-    const hasSharedCSS = content.includes('shared-navigation.css');
-    const hasSharedJS = content.includes('shared-navigation.js');
+    const hasSharedCSS = content.includes("shared-navigation.css");
+    const hasSharedJS = content.includes("shared-navigation.js");
     const hasOldNav =
-      content.includes('class="header"') || content.includes('main-nav');
+      content.includes('class="header"') || content.includes("main-nav");
 
     return !hasPageId || !hasSharedCSS || !hasSharedJS || hasOldNav;
   }
@@ -286,16 +286,16 @@ document.addEventListener('DOMContentLoaded', () => {
    */
   getPageIdFromFilename(filename) {
     const pageMap = {
-      'index.html': 'home',
-      'categories.html': 'categories',
-      'blog.html': 'blog',
-      'forum.html': 'forum',
-      'profile.html': 'profile',
-      'privacy-notice.html': 'privacy',
-      'donate.html': 'donate',
+      "index.html": "home",
+      "categories.html": "categories",
+      "blog.html": "blog",
+      "forum.html": "forum",
+      "profile.html": "profile",
+      "privacy-notice.html": "privacy",
+      "donate.html": "donate",
     };
 
-    return pageMap[filename] || 'home';
+    return pageMap[filename] || "home";
   }
 }
 

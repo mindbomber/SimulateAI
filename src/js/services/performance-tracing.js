@@ -15,84 +15,84 @@ export class PerformanceTracing {
    */
   static TRACE_NAMES = {
     // Application & Navigation
-    APP_INITIALIZATION: 'app_initialization',
-    PAGE_LOAD_HOME: 'page_load_home',
-    PAGE_LOAD_SIMULATION: 'page_load_simulation',
-    PAGE_LOAD_ANALYTICS: 'page_load_analytics',
-    NAVIGATION_TRANSITION: 'navigation_transition',
-    PWA_APP_LAUNCH: 'pwa_app_launch',
-    SERVICE_WORKER_INIT: 'service_worker_init',
+    APP_INITIALIZATION: "app_initialization",
+    PAGE_LOAD_HOME: "page_load_home",
+    PAGE_LOAD_SIMULATION: "page_load_simulation",
+    PAGE_LOAD_ANALYTICS: "page_load_analytics",
+    NAVIGATION_TRANSITION: "navigation_transition",
+    PWA_APP_LAUNCH: "pwa_app_launch",
+    SERVICE_WORKER_INIT: "service_worker_init",
 
     // Authentication & Profile
-    AUTH_SIGN_IN: 'auth_sign_in',
-    AUTH_SIGN_UP: 'auth_sign_up',
-    AUTH_SIGN_OUT: 'auth_sign_out',
-    AUTH_PROFILE_LOAD: 'auth_profile_load',
-    AUTH_GOOGLE_SIGNIN: 'auth_google_signin',
-    AUTH_FACEBOOK_SIGNIN: 'auth_facebook_signin',
-    PROFILE_PICTURE_UPLOAD: 'profile_picture_upload',
+    AUTH_SIGN_IN: "auth_sign_in",
+    AUTH_SIGN_UP: "auth_sign_up",
+    AUTH_SIGN_OUT: "auth_sign_out",
+    AUTH_PROFILE_LOAD: "auth_profile_load",
+    AUTH_GOOGLE_SIGNIN: "auth_google_signin",
+    AUTH_FACEBOOK_SIGNIN: "auth_facebook_signin",
+    PROFILE_PICTURE_UPLOAD: "profile_picture_upload",
 
     // Simulation & Content
-    SIMULATION_LOAD: 'simulation_load',
-    SIMULATION_START: 'simulation_start',
-    SIMULATION_DECISION: 'simulation_decision',
-    SIMULATION_COMPLETE: 'simulation_complete',
-    SCENARIO_GENERATION: 'scenario_generation',
-    ETHICS_ANALYSIS: 'ethics_analysis',
-    CONTENT_RECOMMENDATION: 'content_recommendation',
+    SIMULATION_LOAD: "simulation_load",
+    SIMULATION_START: "simulation_start",
+    SIMULATION_DECISION: "simulation_decision",
+    SIMULATION_COMPLETE: "simulation_complete",
+    SCENARIO_GENERATION: "scenario_generation",
+    ETHICS_ANALYSIS: "ethics_analysis",
+    CONTENT_RECOMMENDATION: "content_recommendation",
 
     // Data Operations
-    FIRESTORE_USER_CREATE: 'firestore_user_create',
-    FIRESTORE_DATA_SYNC: 'firestore_data_sync',
-    DATA_CONNECT_QUERY: 'data_connect_query',
-    HYBRID_DATA_OPERATION: 'hybrid_data_operation',
-    CACHE_OPERATION: 'cache_operation',
-    OFFLINE_SYNC: 'offline_sync',
+    FIRESTORE_USER_CREATE: "firestore_user_create",
+    FIRESTORE_DATA_SYNC: "firestore_data_sync",
+    DATA_CONNECT_QUERY: "data_connect_query",
+    HYBRID_DATA_OPERATION: "hybrid_data_operation",
+    CACHE_OPERATION: "cache_operation",
+    OFFLINE_SYNC: "offline_sync",
 
     // File & Storage
-    FILE_UPLOAD: 'file_upload',
-    FILE_DOWNLOAD: 'file_download',
-    IMAGE_PROCESSING: 'image_processing',
-    AI_CONTENT_ANALYSIS: 'ai_content_analysis',
-    MALWARE_SCAN: 'malware_scan',
-    STORAGE_BACKUP: 'storage_backup',
+    FILE_UPLOAD: "file_upload",
+    FILE_DOWNLOAD: "file_download",
+    IMAGE_PROCESSING: "image_processing",
+    AI_CONTENT_ANALYSIS: "ai_content_analysis",
+    MALWARE_SCAN: "malware_scan",
+    STORAGE_BACKUP: "storage_backup",
 
     // AI & ML Operations
-    AI_IMAGE_ANALYSIS: 'ai_image_analysis',
-    AI_TEXT_ANALYSIS: 'ai_text_analysis',
-    AI_SENTIMENT_ANALYSIS: 'ai_sentiment_analysis',
-    AI_RECOMMENDATION: 'ai_recommendation',
-    ML_MODEL_INFERENCE: 'ml_model_inference',
-    ETHICS_SCORING: 'ethics_scoring',
+    AI_IMAGE_ANALYSIS: "ai_image_analysis",
+    AI_TEXT_ANALYSIS: "ai_text_analysis",
+    AI_SENTIMENT_ANALYSIS: "ai_sentiment_analysis",
+    AI_RECOMMENDATION: "ai_recommendation",
+    ML_MODEL_INFERENCE: "ml_model_inference",
+    ETHICS_SCORING: "ethics_scoring",
 
     // Analytics & Reporting
-    ANALYTICS_QUERY: 'analytics_query',
-    REPORT_GENERATION: 'report_generation',
-    DASHBOARD_LOAD: 'dashboard_load',
-    CHART_RENDERING: 'chart_rendering',
-    EXPORT_DATA: 'export_data',
-    REAL_TIME_UPDATES: 'real_time_updates',
+    ANALYTICS_QUERY: "analytics_query",
+    REPORT_GENERATION: "report_generation",
+    DASHBOARD_LOAD: "dashboard_load",
+    CHART_RENDERING: "chart_rendering",
+    EXPORT_DATA: "export_data",
+    REAL_TIME_UPDATES: "real_time_updates",
 
     // Forum & Community
-    FORUM_POST_LOAD: 'forum_post_load',
-    FORUM_POST_CREATE: 'forum_post_create',
-    COMMENT_THREAD_LOAD: 'comment_thread_load',
-    USER_INTERACTION: 'user_interaction',
-    NOTIFICATION_DELIVERY: 'notification_delivery',
+    FORUM_POST_LOAD: "forum_post_load",
+    FORUM_POST_CREATE: "forum_post_create",
+    COMMENT_THREAD_LOAD: "comment_thread_load",
+    USER_INTERACTION: "user_interaction",
+    NOTIFICATION_DELIVERY: "notification_delivery",
 
     // Security & Performance
-    SECURITY_VALIDATION: 'security_validation',
-    APP_CHECK_TOKEN: 'app_check_token',
-    RECAPTCHA_VERIFICATION: 'recaptcha_verification',
-    PERMISSION_CHECK: 'permission_check',
-    RATE_LIMIT_CHECK: 'rate_limit_check',
+    SECURITY_VALIDATION: "security_validation",
+    APP_CHECK_TOKEN: "app_check_token",
+    RECAPTCHA_VERIFICATION: "recaptcha_verification",
+    PERMISSION_CHECK: "permission_check",
+    RATE_LIMIT_CHECK: "rate_limit_check",
 
     // PWA Specific
-    PWA_INSTALL: 'pwa_install',
-    PWA_CACHE_UPDATE: 'pwa_cache_update',
-    PWA_OFFLINE_MODE: 'pwa_offline_mode',
-    PWA_BACKGROUND_SYNC: 'pwa_background_sync',
-    PWA_PUSH_NOTIFICATION: 'pwa_push_notification',
+    PWA_INSTALL: "pwa_install",
+    PWA_CACHE_UPDATE: "pwa_cache_update",
+    PWA_OFFLINE_MODE: "pwa_offline_mode",
+    PWA_BACKGROUND_SYNC: "pwa_background_sync",
+    PWA_PUSH_NOTIFICATION: "pwa_push_notification",
   };
 
   /**
@@ -100,15 +100,15 @@ export class PerformanceTracing {
    */
   initializePageLoadTracking() {
     // Track initial page load
-    if (document.readyState === 'loading') {
+    if (document.readyState === "loading") {
       const pageLoadTrace = this.startTrace(
-        PerformanceTracing.TRACE_NAMES.PAGE_LOAD_HOME
+        PerformanceTracing.TRACE_NAMES.PAGE_LOAD_HOME,
       );
 
-      window.addEventListener('load', () => {
+      window.addEventListener("load", () => {
         this.stopTrace(pageLoadTrace, {
           page_type: this.getPageType(),
-          load_source: 'initial',
+          load_source: "initial",
           user_agent: navigator.userAgent.substring(0, 100),
         });
       });
@@ -156,7 +156,7 @@ export class PerformanceTracing {
 
       const duration = this.firebaseService.stopPerformanceTrace(
         traceId,
-        allAttributes
+        allAttributes,
       );
       this.activeTraces.delete(traceId);
 
@@ -172,19 +172,19 @@ export class PerformanceTracing {
    */
 
   // Authentication tracking
-  async trackAuthSignIn(provider = 'email') {
+  async trackAuthSignIn(provider = "email") {
     const traceId = this.startTrace(
       PerformanceTracing.TRACE_NAMES.AUTH_SIGN_IN,
       {
         auth_provider: provider,
-      }
+      },
     );
 
     return {
       complete: (success, error = null) => {
         this.stopTrace(traceId, {
           success: success.toString(),
-          error_type: error?.name || 'none',
+          error_type: error?.name || "none",
           provider,
         });
       },
@@ -192,13 +192,13 @@ export class PerformanceTracing {
   }
 
   // Simulation tracking
-  async trackSimulationFlow(scenarioId, userLevel = 'unknown') {
+  async trackSimulationFlow(scenarioId, userLevel = "unknown") {
     const loadTrace = this.startTrace(
       PerformanceTracing.TRACE_NAMES.SIMULATION_LOAD,
       {
         scenario_id: scenarioId,
         user_level: userLevel,
-      }
+      },
     );
 
     return {
@@ -208,25 +208,25 @@ export class PerformanceTracing {
           PerformanceTracing.TRACE_NAMES.SIMULATION_START,
           {
             scenario_id: scenarioId,
-          }
+          },
         );
       },
 
-      decision: decisionId => {
+      decision: (decisionId) => {
         return this.startTrace(
           PerformanceTracing.TRACE_NAMES.SIMULATION_DECISION,
           {
             scenario_id: scenarioId,
             decision_id: decisionId,
-          }
+          },
         );
       },
 
       complete: (startTrace, decisions = [], ethicsScore = null) => {
         this.stopTrace(startTrace, {
           decisions_count: decisions.length,
-          ethics_score: ethicsScore?.toString() || 'unknown',
-          completion_type: 'finished',
+          ethics_score: ethicsScore?.toString() || "unknown",
+          completion_type: "finished",
         });
       },
     };
@@ -239,7 +239,7 @@ export class PerformanceTracing {
       {
         file_type: fileType,
         file_size: fileSize.toString(),
-      }
+      },
     );
 
     return {
@@ -248,7 +248,7 @@ export class PerformanceTracing {
           PerformanceTracing.TRACE_NAMES.IMAGE_PROCESSING,
           {
             file_type: fileType,
-          }
+          },
         );
       },
 
@@ -257,37 +257,37 @@ export class PerformanceTracing {
           PerformanceTracing.TRACE_NAMES.AI_CONTENT_ANALYSIS,
           {
             file_type: fileType,
-          }
+          },
         );
       },
 
       complete: (success, error = null) => {
         this.stopTrace(traceId, {
           success: success.toString(),
-          error_type: error?.name || 'none',
+          error_type: error?.name || "none",
         });
       },
     };
   }
 
   // Analytics dashboard tracking
-  async trackDashboardLoad(dashboardType = 'main') {
+  async trackDashboardLoad(dashboardType = "main") {
     const traceId = this.startTrace(
       PerformanceTracing.TRACE_NAMES.DASHBOARD_LOAD,
       {
         dashboard_type: dashboardType,
-      }
+      },
     );
 
     return {
-      queryStarted: queryType => {
+      queryStarted: (queryType) => {
         return this.startTrace(PerformanceTracing.TRACE_NAMES.ANALYTICS_QUERY, {
           query_type: queryType,
           dashboard_type: dashboardType,
         });
       },
 
-      chartRendering: chartType => {
+      chartRendering: (chartType) => {
         return this.startTrace(PerformanceTracing.TRACE_NAMES.CHART_RENDERING, {
           chart_type: chartType,
         });
@@ -305,7 +305,7 @@ export class PerformanceTracing {
   // Forum interaction tracking
   async trackForumActivity(activityType) {
     const traceName =
-      activityType === 'create'
+      activityType === "create"
         ? PerformanceTracing.TRACE_NAMES.FORUM_POST_CREATE
         : PerformanceTracing.TRACE_NAMES.FORUM_POST_LOAD;
 
@@ -324,7 +324,7 @@ export class PerformanceTracing {
   }
 
   // AI/ML operations tracking
-  async trackAIOperation(operationType, inputType = 'text') {
+  async trackAIOperation(operationType, inputType = "text") {
     const traceMap = {
       image_analysis: PerformanceTracing.TRACE_NAMES.AI_IMAGE_ANALYSIS,
       text_analysis: PerformanceTracing.TRACE_NAMES.AI_TEXT_ANALYSIS,
@@ -344,10 +344,10 @@ export class PerformanceTracing {
     return {
       complete: (confidence = null, resultCount = 1, error = null) => {
         this.stopTrace(traceId, {
-          confidence_score: confidence?.toString() || 'unknown',
+          confidence_score: confidence?.toString() || "unknown",
           result_count: resultCount.toString(),
           success: (!error).toString(),
-          error_type: error?.name || 'none',
+          error_type: error?.name || "none",
         });
       },
     };
@@ -385,12 +385,12 @@ export class PerformanceTracing {
    */
   getPageType() {
     const path = window.location.pathname;
-    if (path === '/' || path.includes('index')) return 'home';
-    if (path.includes('simulation')) return 'simulation';
-    if (path.includes('analytics')) return 'analytics';
-    if (path.includes('forum')) return 'forum';
-    if (path.includes('profile')) return 'profile';
-    return 'other';
+    if (path === "/" || path.includes("index")) return "home";
+    if (path.includes("simulation")) return "simulation";
+    if (path.includes("analytics")) return "analytics";
+    if (path.includes("forum")) return "forum";
+    if (path.includes("profile")) return "profile";
+    return "other";
   }
 
   trackNavigationChanges() {
@@ -408,12 +408,12 @@ export class PerformanceTracing {
           {
             from_page: currentPage,
             to_page: newPage,
-          }
+          },
         );
 
         setTimeout(() => {
           this.stopTrace(traceId, {
-            navigation_type: 'spa',
+            navigation_type: "spa",
           });
         }, 100);
 
@@ -431,7 +431,7 @@ export class PerformanceTracing {
       trackNavigation();
     };
 
-    window.addEventListener('popstate', trackNavigation);
+    window.addEventListener("popstate", trackNavigation);
   }
 
   /**
@@ -456,7 +456,7 @@ export class PerformanceTracing {
     for (const [id, data] of this.activeTraces.entries()) {
       if (now - data.startTime > maxAge) {
         console.warn(`Force stopping old trace: ${data.name}`);
-        this.stopTrace(id, { force_stopped: 'true' });
+        this.stopTrace(id, { force_stopped: "true" });
       }
     }
   }

@@ -31,15 +31,15 @@ class EthicsScale {
       .toString(ETHICS_SCALE_CONSTANTS.ID_GENERATION.BASE)
       .substr(
         ETHICS_SCALE_CONSTANTS.ID_GENERATION.START,
-        ETHICS_SCALE_CONSTANTS.ID_GENERATION.LENGTH
+        ETHICS_SCALE_CONSTANTS.ID_GENERATION.LENGTH,
       ); // Generate unique ID
     this.options = {
       min: options.min || 0,
       max: options.max || 100,
       value: options.value || ETHICS_SCALE_CONSTANTS.DEFAULT_VALUE,
-      leftLabel: options.leftLabel || 'Less Ethical',
-      rightLabel: options.rightLabel || 'More Ethical',
-      centerLabel: options.centerLabel || 'Neutral',
+      leftLabel: options.leftLabel || "Less Ethical",
+      rightLabel: options.rightLabel || "More Ethical",
+      centerLabel: options.centerLabel || "Neutral",
       showValue: options.showValue !== false,
       onChange: options.onChange || (() => {}),
       disabled: options.disabled || false,
@@ -61,14 +61,14 @@ class EthicsScale {
   }
 
   createElement() {
-    this.element = document.createElement('div');
-    this.element.className = 'ethics-scale';
+    this.element = document.createElement("div");
+    this.element.className = "ethics-scale";
     this.element.innerHTML = `
       <div class="ethics-scale-header">
         <label class="ethics-scale-label">
-          ${this.options.label || 'Ethical Rating'}
+          ${this.options.label || "Ethical Rating"}
         </label>
-        ${this.options.showValue ? `<span class="ethics-scale-value">${this.value}</span>` : ''}
+        ${this.options.showValue ? `<span class="ethics-scale-value">${this.value}</span>` : ""}
       </div>
       
       <div class="ethics-scale-container">
@@ -90,7 +90,7 @@ class EthicsScale {
             step="1"
             aria-label="Ethical rating scale"
             autocomplete="off"
-            ${this.options.disabled ? 'disabled' : ''}
+            ${this.options.disabled ? "disabled" : ""}
           />
           
           <div class="ethics-scale-thumb" style="left: ${this.getThumbPosition()}%"></div>
@@ -108,48 +108,48 @@ class EthicsScale {
       </div>
     `;
 
-    this.slider = this.element.querySelector('.ethics-scale-slider');
-    this.valueDisplay = this.element.querySelector('.ethics-scale-value');
-    this.thumb = this.element.querySelector('.ethics-scale-thumb');
+    this.slider = this.element.querySelector(".ethics-scale-slider");
+    this.valueDisplay = this.element.querySelector(".ethics-scale-value");
+    this.thumb = this.element.querySelector(".ethics-scale-thumb");
     this.description = this.element.querySelector(
-      '.ethics-scale-description p'
+      ".ethics-scale-description p",
     );
 
     this.container.appendChild(this.element);
   }
 
   attachEvents() {
-    this.slider.addEventListener('input', e => {
+    this.slider.addEventListener("input", (e) => {
       this.setValue(parseInt(e.target.value), true);
     });
 
-    this.slider.addEventListener('change', e => {
+    this.slider.addEventListener("change", (e) => {
       this.options.onChange(parseInt(e.target.value));
     });
 
     // Keyboard accessibility
-    this.slider.addEventListener('keydown', e => {
+    this.slider.addEventListener("keydown", (e) => {
       let newValue = this.value;
 
       switch (e.key) {
-        case 'ArrowLeft':
-        case 'ArrowDown':
+        case "ArrowLeft":
+        case "ArrowDown":
           newValue = Math.max(this.options.min, this.value - 1);
           break;
-        case 'ArrowRight':
-        case 'ArrowUp':
+        case "ArrowRight":
+        case "ArrowUp":
           newValue = Math.min(this.options.max, this.value + 1);
           break;
-        case 'Home':
+        case "Home":
           newValue = this.options.min;
           break;
-        case 'End':
+        case "End":
           newValue = this.options.max;
           break;
-        case 'PageDown':
+        case "PageDown":
           newValue = Math.max(this.options.min, this.value - 10);
           break;
-        case 'PageUp':
+        case "PageUp":
           newValue = Math.min(this.options.max, this.value + 10);
           break;
       }
@@ -203,13 +203,13 @@ class EthicsScale {
     const percentage = this.getThumbPosition() / 100;
 
     if (percentage < ETHICS_SCALE_CONSTANTS.COLOR_THRESHOLDS.LOW_HIGH) {
-      return '#e74c3c'; // Red for low ethical rating
+      return "#e74c3c"; // Red for low ethical rating
     } else if (
       percentage < ETHICS_SCALE_CONSTANTS.COLOR_THRESHOLDS.MEDIUM_HIGH
     ) {
-      return '#f39c12'; // Orange for medium ethical rating
+      return "#f39c12"; // Orange for medium ethical rating
     } else {
-      return '#27ae60'; // Green for high ethical rating
+      return "#27ae60"; // Green for high ethical rating
     }
   }
 
@@ -217,24 +217,24 @@ class EthicsScale {
     const percentage = this.getThumbPosition() / 100;
 
     if (percentage < ETHICS_SCALE_CONSTANTS.DESCRIPTION_THRESHOLDS.VERY_LOW) {
-      return 'This choice may have significant negative ethical implications.';
+      return "This choice may have significant negative ethical implications.";
     } else if (percentage < ETHICS_SCALE_CONSTANTS.DESCRIPTION_THRESHOLDS.LOW) {
-      return 'This choice has some ethical concerns that should be considered.';
+      return "This choice has some ethical concerns that should be considered.";
     } else if (
       percentage < ETHICS_SCALE_CONSTANTS.DESCRIPTION_THRESHOLDS.MEDIUM
     ) {
-      return 'This choice is ethically neutral with balanced considerations.';
+      return "This choice is ethically neutral with balanced considerations.";
     } else if (
       percentage < ETHICS_SCALE_CONSTANTS.DESCRIPTION_THRESHOLDS.HIGH
     ) {
-      return 'This choice generally aligns with ethical principles.';
+      return "This choice generally aligns with ethical principles.";
     } else {
-      return 'This choice strongly upholds ethical values and principles.';
+      return "This choice strongly upholds ethical values and principles.";
     }
   }
 
   updateSegmentHighlights() {
-    const segments = this.element.querySelectorAll('.segment');
+    const segments = this.element.querySelectorAll(".segment");
     const percentage = this.getThumbPosition() / 100;
 
     segments.forEach((segment, index) => {
@@ -242,9 +242,9 @@ class EthicsScale {
       const segmentEnd = (index + 1) / ETHICS_SCALE_CONSTANTS.SEGMENT_COUNT;
 
       if (percentage >= segmentStart && percentage <= segmentEnd) {
-        segment.classList.add('active');
+        segment.classList.add("active");
       } else {
-        segment.classList.remove('active');
+        segment.classList.remove("active");
       }
     });
   }
@@ -252,13 +252,13 @@ class EthicsScale {
   disable() {
     this.options.disabled = true;
     this.slider.disabled = true;
-    this.element.classList.add('disabled');
+    this.element.classList.add("disabled");
   }
 
   enable() {
     this.options.disabled = false;
     this.slider.disabled = false;
-    this.element.classList.remove('disabled');
+    this.element.classList.remove("disabled");
   }
 
   destroy() {
@@ -431,17 +431,17 @@ const ethicsScaleStyles = `
 
 // Inject styles if not already present
 if (
-  typeof document !== 'undefined' &&
-  !document.getElementById('ethics-scale-styles')
+  typeof document !== "undefined" &&
+  !document.getElementById("ethics-scale-styles")
 ) {
-  const styleSheet = document.createElement('style');
-  styleSheet.id = 'ethics-scale-styles';
+  const styleSheet = document.createElement("style");
+  styleSheet.id = "ethics-scale-styles";
   styleSheet.textContent = ethicsScaleStyles;
   document.head.appendChild(styleSheet);
 }
 
 // Export for use in other modules
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.EthicsScale = EthicsScale;
 }
 

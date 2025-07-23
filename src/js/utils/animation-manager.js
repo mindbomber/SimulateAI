@@ -11,8 +11,8 @@
 import {
   INPUT_UTILITY_CONSTANTS,
   ANIMATION_DEFAULTS,
-} from '../components/input-utilities/constants.js';
-import { ComponentError } from './component-error.js';
+} from "../components/input-utilities/constants.js";
+import { ComponentError } from "./component-error.js";
 
 // Animation constants to eliminate magic numbers
 const ANIMATION_CONSTANTS = {
@@ -55,17 +55,17 @@ export class AnimationManager {
    */
   static animate(target, properties, options = {}) {
     const config = { ...ANIMATION_DEFAULTS, ...options };
-    const animationId = `${target.id || target.constructor?.name || 'unknown'}_${Date.now()}_${Math.random().toString(ANIMATION_CONSTANTS.ID_RANDOM_BASE).substr(2, ANIMATION_CONSTANTS.ID_RANDOM_LENGTH)}`;
+    const animationId = `${target.id || target.constructor?.name || "unknown"}_${Date.now()}_${Math.random().toString(ANIMATION_CONSTANTS.ID_RANDOM_BASE).substr(2, ANIMATION_CONSTANTS.ID_RANDOM_LENGTH)}`;
 
     return new Promise((resolve, reject) => {
       try {
         // Validate inputs
-        if (!target || typeof target !== 'object') {
-          throw new Error('Animation target must be an object');
+        if (!target || typeof target !== "object") {
+          throw new Error("Animation target must be an object");
         }
 
-        if (!properties || typeof properties !== 'object') {
-          throw new Error('Animation properties must be an object');
+        if (!properties || typeof properties !== "object") {
+          throw new Error("Animation properties must be an object");
         }
 
         const animation = {
@@ -96,14 +96,14 @@ export class AnimationManager {
       } catch (error) {
         reject(
           new ComponentError(
-            'Animation failed',
-            target.constructor?.name || 'Unknown',
+            "Animation failed",
+            target.constructor?.name || "Unknown",
             {
               error: error.message,
               properties: Object.keys(properties),
               config,
-            }
-          )
+            },
+          ),
         );
       }
     });
@@ -127,12 +127,12 @@ export class AnimationManager {
           // Apply easing function
           const easedProgress = this.applyEasing(
             progress,
-            animation.config.easing
+            animation.config.easing,
           );
 
           // Update properties with interpolated values
           for (const [prop, targetValue] of Object.entries(
-            animation.properties
+            animation.properties,
           )) {
             const initialValue = animation.initialValues[prop];
             const delta = targetValue - initialValue;
@@ -146,9 +146,9 @@ export class AnimationManager {
         } catch (error) {
           // Handle animation errors gracefully - use ComponentError for consistency
           const componentError = new ComponentError(
-            'Animation update failed',
-            'AnimationManager',
-            { error: error.message }
+            "Animation update failed",
+            "AnimationManager",
+            { error: error.message },
           );
           completedAnimations.push({ id, animation, error: componentError });
         }
@@ -181,32 +181,32 @@ export class AnimationManager {
    * @param {string} easing - Easing function name
    * @returns {number} Eased progress value
    */
-  static applyEasing(progress, easing = 'linear') {
+  static applyEasing(progress, easing = "linear") {
     switch (easing) {
-      case 'ease-in':
+      case "ease-in":
         return progress * progress;
 
-      case 'ease-out':
+      case "ease-out":
         return 1 - Math.pow(1 - progress, 2);
 
-      case 'ease-in-out':
+      case "ease-in-out":
         return progress < INPUT_UTILITY_CONSTANTS.EASE_THRESHOLD
           ? INPUT_UTILITY_CONSTANTS.EASE_MULTIPLIER * progress * progress
           : 1 -
               Math.pow(
                 INPUT_UTILITY_CONSTANTS.EASE_NEGATIVE_MULTIPLIER * progress +
                   INPUT_UTILITY_CONSTANTS.EASE_MULTIPLIER,
-                INPUT_UTILITY_CONSTANTS.EASE_MULTIPLIER
+                INPUT_UTILITY_CONSTANTS.EASE_MULTIPLIER,
               ) /
                 INPUT_UTILITY_CONSTANTS.EASE_MULTIPLIER;
 
-      case 'ease-in-cubic':
+      case "ease-in-cubic":
         return progress * progress * progress;
 
-      case 'ease-out-cubic':
+      case "ease-out-cubic":
         return 1 - Math.pow(1 - progress, ANIMATION_CONSTANTS.CUBIC_POWER);
 
-      case 'ease-in-out-cubic':
+      case "ease-in-out-cubic":
         return progress < ANIMATION_CONSTANTS.EASE_MIDPOINT
           ? ANIMATION_CONSTANTS.CUBIC_MULTIPLIER *
               progress *
@@ -216,11 +216,11 @@ export class AnimationManager {
               Math.pow(
                 ANIMATION_CONSTANTS.CUBIC_NEGATIVE_FACTOR * progress +
                   ANIMATION_CONSTANTS.HALF_DIVISION,
-                ANIMATION_CONSTANTS.CUBIC_POWER
+                ANIMATION_CONSTANTS.CUBIC_POWER,
               ) /
                 ANIMATION_CONSTANTS.HALF_DIVISION;
 
-      case 'bounce':
+      case "bounce":
         if (progress < 1 / ANIMATION_CONSTANTS.BOUNCE_THRESHOLD_1) {
           return ANIMATION_CONSTANTS.BOUNCE_COEFFICIENT * progress * progress;
         } else if (
@@ -257,7 +257,7 @@ export class AnimationManager {
           );
         }
 
-      case 'elastic': {
+      case "elastic": {
         const c4 =
           (ANIMATION_CONSTANTS.HALF_DIVISION * Math.PI) /
           ANIMATION_CONSTANTS.ELASTIC_PERIOD;
@@ -267,17 +267,17 @@ export class AnimationManager {
             ? 1
             : Math.pow(
                 ANIMATION_CONSTANTS.HALF_DIVISION,
-                -ANIMATION_CONSTANTS.ELASTIC_AMPLITUDE * progress
+                -ANIMATION_CONSTANTS.ELASTIC_AMPLITUDE * progress,
               ) *
                 Math.sin(
                   (progress * ANIMATION_CONSTANTS.ELASTIC_AMPLITUDE -
                     ANIMATION_CONSTANTS.ELASTIC_PHASE) *
-                    c4
+                    c4,
                 ) +
               1;
       }
 
-      case 'linear':
+      case "linear":
       default:
         return progress;
     }
@@ -300,9 +300,9 @@ export class AnimationManager {
       this.activeAnimations.delete(id);
       animation.reject(
         new ComponentError(
-          'Animation cancelled',
-          target.constructor?.name || 'Unknown'
-        )
+          "Animation cancelled",
+          target.constructor?.name || "Unknown",
+        ),
       );
     }
   }
@@ -313,7 +313,7 @@ export class AnimationManager {
   static cancelAllAnimations() {
     for (const [, animation] of this.activeAnimations) {
       animation.reject(
-        new ComponentError('All animations cancelled', 'AnimationManager')
+        new ComponentError("All animations cancelled", "AnimationManager"),
       );
     }
     this.cleanup();

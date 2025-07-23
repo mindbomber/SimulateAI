@@ -19,7 +19,7 @@
  * Integrates PWA functionality with Firebase services
  */
 
-import { UI, TIMING } from '../utils/constants.js';
+import { UI, TIMING } from "../utils/constants.js";
 
 export class PWAService {
   constructor(firebaseService = null) {
@@ -52,13 +52,13 @@ export class PWAService {
       this.initializeBackgroundSync();
 
       // Track PWA initialization
-      this.trackPWAEvent('pwa_service_initialized', {
+      this.trackPWAEvent("pwa_service_initialized", {
         is_installed: this.isInstalled,
         is_online: this.isOnline,
         has_service_worker: !!this.registration,
       });
     } catch (error) {
-      console.error('❌ PWA Service initialization failed:', error);
+      console.error("❌ PWA Service initialization failed:", error);
     }
   }
 
@@ -66,24 +66,24 @@ export class PWAService {
    * Register service worker
    */
   async registerServiceWorker() {
-    if ('serviceWorker' in navigator) {
+    if ("serviceWorker" in navigator) {
       try {
-        this.registration = await navigator.serviceWorker.register('./sw.js', {
-          scope: '/SimulateAI/',
+        this.registration = await navigator.serviceWorker.register("./sw.js", {
+          scope: "/SimulateAI/",
         });
 
         // Handle updates
-        this.registration.addEventListener('updatefound', () => {
+        this.registration.addEventListener("updatefound", () => {
           this.handleServiceWorkerUpdate();
         });
 
         return this.registration;
       } catch (error) {
-        console.error('❌ Service Worker registration failed:', error);
+        console.error("❌ Service Worker registration failed:", error);
         throw error;
       }
     } else {
-      throw new Error('Service Workers not supported');
+      throw new Error("Service Workers not supported");
     }
   }
 
@@ -94,9 +94,9 @@ export class PWAService {
     const newWorker = this.registration.installing;
 
     if (newWorker) {
-      newWorker.addEventListener('statechange', () => {
+      newWorker.addEventListener("statechange", () => {
         if (
-          newWorker.state === 'installed' &&
+          newWorker.state === "installed" &&
           navigator.serviceWorker.controller
         ) {
           this.showUpdateNotification();
@@ -111,16 +111,16 @@ export class PWAService {
   showUpdateNotification() {
     // Custom update notification
     const notification = {
-      title: 'SimulateAI Update Available',
+      title: "SimulateAI Update Available",
       message:
-        'A new version of SimulateAI is ready. Refresh to get the latest features!',
+        "A new version of SimulateAI is ready. Refresh to get the latest features!",
       actions: [
         {
-          text: 'Update Now',
+          text: "Update Now",
           action: () => window.location.reload(),
         },
         {
-          text: 'Later',
+          text: "Later",
           action: () => {
             // User dismissed the update notification
           },
@@ -130,9 +130,9 @@ export class PWAService {
 
     this.showNotification(notification);
 
-    this.trackPWAEvent('update_available_shown', {
-      version: 'v1.10.0',
-      user_choice: 'pending',
+    this.trackPWAEvent("update_available_shown", {
+      version: "v1.10.0",
+      user_choice: "pending",
     });
   }
 
@@ -141,31 +141,31 @@ export class PWAService {
    */
   setupEventListeners() {
     // Online/offline status
-    window.addEventListener('online', () => {
+    window.addEventListener("online", () => {
       this.isOnline = true;
       this.handleOnlineStatusChange(true);
     });
 
-    window.addEventListener('offline', () => {
+    window.addEventListener("offline", () => {
       this.isOnline = false;
       this.handleOnlineStatusChange(false);
     });
 
     // Install prompt
-    window.addEventListener('beforeinstallprompt', e => {
+    window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
       this.installPromptEvent = e;
       this.showInstallPrompt();
     });
 
     // App installed
-    window.addEventListener('appinstalled', () => {
+    window.addEventListener("appinstalled", () => {
       this.isInstalled = true;
       this.handleAppInstalled();
     });
 
     // Visibility change (for background sync)
-    document.addEventListener('visibilitychange', () => {
+    document.addEventListener("visibilitychange", () => {
       if (!document.hidden && this.isOnline) {
         this.processSyncQueue();
       }
@@ -183,7 +183,7 @@ export class PWAService {
       this.showOfflineIndicator();
     }
 
-    this.trackPWAEvent('connectivity_change', {
+    this.trackPWAEvent("connectivity_change", {
       is_online: isOnline,
       sync_queue_length: this.syncQueue.length,
     });
@@ -198,11 +198,11 @@ export class PWAService {
    * Show offline indicator
    */
   showOfflineIndicator() {
-    let indicator = document.getElementById('offline-indicator');
+    let indicator = document.getElementById("offline-indicator");
 
     if (!indicator) {
-      indicator = document.createElement('div');
-      indicator.id = 'offline-indicator';
+      indicator = document.createElement("div");
+      indicator.id = "offline-indicator";
       indicator.style.cssText = `
                 position: fixed;
                 top: 0;
@@ -220,16 +220,16 @@ export class PWAService {
       document.body.appendChild(indicator);
     }
 
-    indicator.style.display = 'block';
+    indicator.style.display = "block";
   }
 
   /**
    * Hide offline indicator
    */
   hideOfflineIndicator() {
-    const indicator = document.getElementById('offline-indicator');
+    const indicator = document.getElementById("offline-indicator");
     if (indicator) {
-      indicator.style.display = 'none';
+      indicator.style.display = "none";
     }
   }
 
@@ -239,11 +239,11 @@ export class PWAService {
   checkInstallationStatus() {
     // Check if running in standalone mode
     this.isInstalled =
-      window.matchMedia('(display-mode: standalone)').matches ||
+      window.matchMedia("(display-mode: standalone)").matches ||
       window.navigator.standalone === true;
 
     if (this.isInstalled) {
-      document.body.classList.add('pwa-installed');
+      document.body.classList.add("pwa-installed");
     }
 
     return this.isInstalled;
@@ -257,16 +257,16 @@ export class PWAService {
     if (this.isInstalled) return;
 
     const prompt = {
-      title: '📱 Install SimulateAI',
+      title: "📱 Install SimulateAI",
       message:
-        'Get the full app experience with offline access and faster loading!',
+        "Get the full app experience with offline access and faster loading!",
       actions: [
         {
-          text: 'Install App',
+          text: "Install App",
           action: () => this.triggerInstall(),
         },
         {
-          text: 'Not Now',
+          text: "Not Now",
           action: () => {
             /* action removed */
           },
@@ -276,7 +276,7 @@ export class PWAService {
 
     this.showNotification(prompt);
 
-    this.trackPWAEvent('install_prompt_shown', {
+    this.trackPWAEvent("install_prompt_shown", {
       prompt_available: !!this.installPromptEvent,
     });
   }
@@ -286,7 +286,7 @@ export class PWAService {
    */
   async triggerInstall() {
     if (!this.installPromptEvent) {
-      console.warn('Install prompt not available');
+      console.warn("Install prompt not available");
       return false;
     }
 
@@ -294,18 +294,18 @@ export class PWAService {
       this.installPromptEvent.prompt();
       const { outcome } = await this.installPromptEvent.userChoice;
 
-      this.trackPWAEvent('install_prompt_result', {
+      this.trackPWAEvent("install_prompt_result", {
         outcome,
         user_choice: outcome,
       });
 
-      if (outcome === 'accepted') {
+      if (outcome === "accepted") {
         return true;
       } else {
         return false;
       }
     } catch (error) {
-      console.error('❌ PWA installation failed:', error);
+      console.error("❌ PWA installation failed:", error);
       return false;
     } finally {
       this.installPromptEvent = null;
@@ -317,15 +317,15 @@ export class PWAService {
    */
   handleAppInstalled() {
     // Remove install prompts
-    const installBanner = document.getElementById('pwa-install-banner');
+    const installBanner = document.getElementById("pwa-install-banner");
     if (installBanner) {
       installBanner.remove();
     }
 
     // Add installed class
-    document.body.classList.add('pwa-installed');
+    document.body.classList.add("pwa-installed");
 
-    this.trackPWAEvent('app_installed', {
+    this.trackPWAEvent("app_installed", {
       installation_time: Date.now(),
       user_agent: navigator.userAgent,
     });
@@ -337,11 +337,11 @@ export class PWAService {
   initializeBackgroundSync() {
     // Listen for background sync events from service worker
     if (
-      'serviceWorker' in navigator &&
-      'sync' in window.ServiceWorkerRegistration.prototype
+      "serviceWorker" in navigator &&
+      "sync" in window.ServiceWorkerRegistration.prototype
     ) {
     } else {
-      console.warn('⚠️ Background sync not supported, using fallback');
+      console.warn("⚠️ Background sync not supported, using fallback");
     }
   }
 
@@ -365,12 +365,12 @@ export class PWAService {
   async registerBackgroundSync() {
     if (
       this.registration &&
-      'sync' in window.ServiceWorkerRegistration.prototype
+      "sync" in window.ServiceWorkerRegistration.prototype
     ) {
       try {
-        await this.registration.sync.register('background-sync');
+        await this.registration.sync.register("background-sync");
       } catch (error) {
-        console.warn('⚠️ Background sync registration failed:', error);
+        console.warn("⚠️ Background sync registration failed:", error);
         // Fallback to manual sync when online
         this.scheduleManualSync();
       }
@@ -412,7 +412,7 @@ export class PWAService {
         await this.processQueuedAction(action);
         results.success++;
       } catch (error) {
-        console.error('❌ Sync action failed:', action.type, error);
+        console.error("❌ Sync action failed:", action.type, error);
         results.failed++;
 
         // Re-queue if it's worth retrying
@@ -423,7 +423,7 @@ export class PWAService {
       }
     }
 
-    this.trackPWAEvent('sync_queue_processed', results);
+    this.trackPWAEvent("sync_queue_processed", results);
 
     if (results.success > 0) {
       this.showSyncNotification(results);
@@ -435,28 +435,28 @@ export class PWAService {
    */
   async processQueuedAction(action) {
     if (!this.firebaseService) {
-      throw new Error('Firebase service not available');
+      throw new Error("Firebase service not available");
     }
 
     switch (action.type) {
-      case 'submit_research_response':
+      case "submit_research_response":
         return await this.firebaseService.submitSecureResearchResponse(
-          action.data
+          action.data,
         );
 
-      case 'update_user_profile':
+      case "update_user_profile":
         return await this.firebaseService.updateSecureUserProfile(action.data);
 
-      case 'track_analytics_event':
+      case "track_analytics_event":
         return await this.firebaseService.trackStorageEvent(
           action.eventName,
-          action.data
+          action.data,
         );
 
-      case 'upload_file':
+      case "upload_file":
         return await this.firebaseService.uploadFileWithAnalysis(
           action.file,
-          action.options
+          action.options,
         );
 
       default:
@@ -491,7 +491,7 @@ export class PWAService {
         : `⚠️ ${results.success} synced, ${results.failed} failed`;
 
     this.showNotification({
-      title: 'Sync Complete',
+      title: "Sync Complete",
       message,
       duration: 3000,
     });
@@ -502,7 +502,7 @@ export class PWAService {
    */
   showNotification(notification) {
     // Create notification element
-    const notificationEl = document.createElement('div');
+    const notificationEl = document.createElement("div");
     notificationEl.style.cssText = `
             position: fixed;
             top: 20px;
@@ -521,13 +521,13 @@ export class PWAService {
     content += `<div style="margin-bottom: 15px;">${notification.message}</div>`;
 
     if (notification.actions) {
-      content += '<div>';
-      notification.actions.forEach(action => {
+      content += "<div>";
+      notification.actions.forEach((action) => {
         content += `<button onclick="this.parentElement.parentElement.remove(); (${action.action.toString()})()" 
                            style="margin-right: 10px; padding: 8px 16px; border: none; border-radius: 5px; 
                            background: #667eea; color: white; cursor: pointer;">${action.text}</button>`;
       });
-      content += '</div>';
+      content += "</div>";
     }
 
     notificationEl.innerHTML = content;
@@ -557,12 +557,12 @@ export class PWAService {
     }
 
     // Also track with Google Analytics if available
-    if (typeof gtag !== 'undefined') {
-      gtag('event', eventName, {
-        event_category: 'PWA',
+    if (typeof gtag !== "undefined") {
+      gtag("event", eventName, {
+        event_category: "PWA",
         event_label: data.label || eventName,
-        custom_parameter_1: this.isInstalled ? 'installed' : 'browser',
-        custom_parameter_2: this.isOnline ? 'online' : 'offline',
+        custom_parameter_1: this.isInstalled ? "installed" : "browser",
+        custom_parameter_2: this.isOnline ? "online" : "offline",
       });
     }
   }
@@ -597,7 +597,7 @@ export class PWAService {
 
         return true;
       } catch (error) {
-        console.error('❌ Cache refresh failed:', error);
+        console.error("❌ Cache refresh failed:", error);
         return false;
       }
     }
@@ -608,7 +608,7 @@ export class PWAService {
    * Get cache usage information
    */
   async getCacheInfo() {
-    if ('storage' in navigator && 'estimate' in navigator.storage) {
+    if ("storage" in navigator && "estimate" in navigator.storage) {
       try {
         const estimate = await navigator.storage.estimate();
         return {
@@ -617,7 +617,7 @@ export class PWAService {
           usagePercentage: ((estimate.usage / estimate.quota) * 100).toFixed(2),
         };
       } catch (error) {
-        console.warn('⚠️ Storage estimate failed:', error);
+        console.warn("⚠️ Storage estimate failed:", error);
         return null;
       }
     }

@@ -7,11 +7,11 @@
  * @license Apache-2.0
  */
 
-import logger from '../utils/logger.js';
+import logger from "../utils/logger.js";
 
 // Constants for performance and consistency
 const DEFAULT_ANIMATION_DURATION = 300;
-const DEFAULT_EASING = 'easeInOut';
+const DEFAULT_EASING = "easeInOut";
 const TOUCH_TARGET_SIZE = 44;
 const FOCUS_RING_WIDTH = 2;
 
@@ -185,44 +185,44 @@ const animationManager = new AnimationManager();
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const lerp = (start, end, progress) => start + (end - start) * progress;
 const validateNumber = (value, defaultValue = 0) =>
-  typeof value === 'number' && !isNaN(value) ? value : defaultValue;
-const validateString = (value, defaultValue = '') =>
-  typeof value === 'string' ? value : defaultValue;
+  typeof value === "number" && !isNaN(value) ? value : defaultValue;
+const validateString = (value, defaultValue = "") =>
+  typeof value === "string" ? value : defaultValue;
 
 // Enhanced easing functions
 const EasingFunctions = {
-  linear: t => t,
-  easeIn: t => t * t,
-  easeOut: t => 1 - (1 - t) * (1 - t),
-  easeInOut: t =>
+  linear: (t) => t,
+  easeIn: (t) => t * t,
+  easeOut: (t) => 1 - (1 - t) * (1 - t),
+  easeInOut: (t) =>
     t < EASING_CONSTANTS.HALF
       ? EASING_CONSTANTS.EASE_IN_OUT_MULTIPLIER * t * t
       : 1 - EASING_CONSTANTS.EASE_IN_OUT_MULTIPLIER * (1 - t) * (1 - t),
-  easeInCubic: t => t * t * t,
-  easeOutCubic: t => 1 - Math.pow(1 - t, EASING_CONSTANTS.CUBIC_POWER),
-  easeInOutCubic: t =>
+  easeInCubic: (t) => t * t * t,
+  easeOutCubic: (t) => 1 - Math.pow(1 - t, EASING_CONSTANTS.CUBIC_POWER),
+  easeInOutCubic: (t) =>
     t < EASING_CONSTANTS.HALF
       ? EASING_CONSTANTS.EASE_IN_OUT_CUBIC_MULTIPLIER * t * t * t
       : 1 -
         Math.pow(
           EASING_CONSTANTS.EASE_NEGATIVE_MULTIPLIER * t +
             EASING_CONSTANTS.EASE_ADDEND,
-          EASING_CONSTANTS.CUBIC_POWER
+          EASING_CONSTANTS.CUBIC_POWER,
         ) /
           EASING_CONSTANTS.EASE_DIVISOR,
-  easeInQuart: t => t * t * t * t,
-  easeOutQuart: t => 1 - Math.pow(1 - t, EASING_CONSTANTS.QUARTIC_POWER),
-  easeInOutQuart: t =>
+  easeInQuart: (t) => t * t * t * t,
+  easeOutQuart: (t) => 1 - Math.pow(1 - t, EASING_CONSTANTS.QUARTIC_POWER),
+  easeInOutQuart: (t) =>
     t < EASING_CONSTANTS.HALF
       ? EASING_CONSTANTS.EASE_IN_OUT_QUART_MULTIPLIER * t * t * t * t
       : 1 -
         Math.pow(
           EASING_CONSTANTS.EASE_NEGATIVE_MULTIPLIER * t +
             EASING_CONSTANTS.EASE_ADDEND,
-          EASING_CONSTANTS.QUARTIC_POWER
+          EASING_CONSTANTS.QUARTIC_POWER,
         ) /
           EASING_CONSTANTS.EASE_DIVISOR,
-  bounce: t => {
+  bounce: (t) => {
     const n1 = EASING_CONSTANTS.BOUNCE_N1;
     const d1 = EASING_CONSTANTS.BOUNCE_D1;
     if (t < EASING_CONSTANTS.BOUNCE_THRESHOLD_1 / d1) return n1 * t * t;
@@ -258,7 +258,7 @@ export class BaseObject {
     this.width = validateNumber(options.width, OBJECT_CONSTANTS.DEFAULT_WIDTH);
     this.height = validateNumber(
       options.height,
-      OBJECT_CONSTANTS.DEFAULT_HEIGHT
+      OBJECT_CONSTANTS.DEFAULT_HEIGHT,
     );
     this.rotation = validateNumber(options.rotation, 0);
     this.scaleX = validateNumber(options.scaleX, 1);
@@ -282,20 +282,20 @@ export class BaseObject {
     this.isDisabled = Boolean(options.disabled);
 
     // Styling with validation
-    this.theme = validateString(options.theme, 'default');
+    this.theme = validateString(options.theme, "default");
     this.className = validateString(options.className);
     this.style = { ...options.style };
 
     // Enhanced accessibility
     this.ariaLabel = validateString(options.ariaLabel);
-    this.ariaRole = validateString(options.ariaRole, 'generic');
+    this.ariaRole = validateString(options.ariaRole, "generic");
     this.ariaDescribedBy = validateString(options.ariaDescribedBy);
     this.ariaExpanded = options.ariaExpanded;
     this.ariaPressed = options.ariaPressed;
     this.ariaChecked = options.ariaChecked;
     this.tabIndex = validateNumber(
       options.tabIndex,
-      this.isInteractive ? 0 : -1
+      this.isInteractive ? 0 : -1,
     );
 
     // Enhanced event system
@@ -314,13 +314,13 @@ export class BaseObject {
 
     // Enhanced layout properties
     this.layout = {
-      type: validateString(options.layout?.type, 'absolute'),
+      type: validateString(options.layout?.type, "absolute"),
       padding: this.validateSpacing(options.layout?.padding),
       margin: this.validateSpacing(options.layout?.margin),
-      align: validateString(options.layout?.align, 'start'),
-      justify: validateString(options.layout?.justify, 'start'),
-      flexDirection: validateString(options.layout?.flexDirection, 'row'),
-      flexWrap: validateString(options.layout?.flexWrap, 'nowrap'),
+      align: validateString(options.layout?.align, "start"),
+      justify: validateString(options.layout?.justify, "start"),
+      flexDirection: validateString(options.layout?.flexDirection, "row"),
+      flexWrap: validateString(options.layout?.flexWrap, "nowrap"),
       gap: validateNumber(options.layout?.gap, 0),
     };
 
@@ -343,10 +343,10 @@ export class BaseObject {
    * @returns {Object}
    */
   validateSpacing(spacing) {
-    if (typeof spacing === 'number') {
+    if (typeof spacing === "number") {
       return { top: spacing, right: spacing, bottom: spacing, left: spacing };
     }
-    if (spacing && typeof spacing === 'object') {
+    if (spacing && typeof spacing === "object") {
       return {
         top: validateNumber(spacing.top, 0),
         right: validateNumber(spacing.right, 0),
@@ -365,7 +365,7 @@ export class BaseObject {
   defaultErrorHandler(error, context) {
     logger.error(
       `Error in ${this.constructor.name} (${this.id}) - ${context}:`,
-      error
+      error,
     );
   }
 
@@ -378,7 +378,7 @@ export class BaseObject {
       .toString(OBJECT_CONSTANTS.ID_BASE)
       .substring(
         OBJECT_CONSTANTS.ID_SUBSTRING_START,
-        OBJECT_CONSTANTS.ID_SUBSTRING_START + OBJECT_CONSTANTS.ID_LENGTH
+        OBJECT_CONSTANTS.ID_SUBSTRING_START + OBJECT_CONSTANTS.ID_LENGTH,
       )}`;
   } /**
    * Sets up default event handlers from options
@@ -386,28 +386,28 @@ export class BaseObject {
    */
   setupDefaultHandlers(options) {
     const events = [
-      'click',
-      'doubleClick',
-      'hover',
-      'hoverEnd',
-      'focus',
-      'blur',
-      'keyDown',
-      'keyUp',
-      'mouseDown',
-      'mouseUp',
-      'mouseMove',
-      'drag',
-      'dragStart',
-      'dragEnd',
-      'drop',
-      'change',
-      'input',
+      "click",
+      "doubleClick",
+      "hover",
+      "hoverEnd",
+      "focus",
+      "blur",
+      "keyDown",
+      "keyUp",
+      "mouseDown",
+      "mouseUp",
+      "mouseMove",
+      "drag",
+      "dragStart",
+      "dragEnd",
+      "drop",
+      "change",
+      "input",
     ];
 
-    events.forEach(event => {
+    events.forEach((event) => {
       const handlerName = `on${event.charAt(0).toUpperCase()}${event.slice(1)}`;
-      if (typeof options[handlerName] === 'function') {
+      if (typeof options[handlerName] === "function") {
         this.on(event, options[handlerName]);
       }
     });
@@ -421,8 +421,8 @@ export class BaseObject {
    * @returns {BaseObject} - Returns this for chaining
    */
   on(event, handler) {
-    if (typeof handler !== 'function') {
-      this.errorHandler(new Error('Event handler must be a function'), 'on');
+    if (typeof handler !== "function") {
+      this.errorHandler(new Error("Event handler must be a function"), "on");
       return this;
     }
 
@@ -480,7 +480,7 @@ export class BaseObject {
         },
       };
 
-      this.eventHandlers.get(event).forEach(handler => {
+      this.eventHandlers.get(event).forEach((handler) => {
         try {
           if (!eventData.propagationStopped) {
             handler.call(this, eventData);
@@ -500,8 +500,8 @@ export class BaseObject {
   addChild(child) {
     if (!(child instanceof BaseObject)) {
       this.errorHandler(
-        new Error('Child must be a BaseObject instance'),
-        'addChild'
+        new Error("Child must be a BaseObject instance"),
+        "addChild",
       );
       return this;
     }
@@ -514,7 +514,7 @@ export class BaseObject {
     child.scene = this.scene;
     this.children.push(child);
 
-    this.emit('childAdded', { child });
+    this.emit("childAdded", { child });
     return this;
   }
 
@@ -529,7 +529,7 @@ export class BaseObject {
       this.children.splice(index, 1);
       child.parent = null;
       child.scene = null;
-      this.emit('childRemoved', { child });
+      this.emit("childRemoved", { child });
     }
     return this;
   }
@@ -551,7 +551,7 @@ export class BaseObject {
    * @returns {BaseObject|null} - Found child or null
    */
   findChildById(id) {
-    return this.children.find(child => child.id === id) || null;
+    return this.children.find((child) => child.id === id) || null;
   }
 
   /**
@@ -560,7 +560,7 @@ export class BaseObject {
    * @returns {BaseObject[]} - Array of matching children
    */
   findChildrenByClass(className) {
-    return this.children.filter(child => child.className.includes(className));
+    return this.children.filter((child) => child.className.includes(className));
   }
 
   // Enhanced Bounds and Collision Detection
@@ -685,31 +685,31 @@ export class BaseObject {
 
     try {
       switch (eventType) {
-        case 'mousedown':
-        case 'pointerdown':
+        case "mousedown":
+        case "pointerdown":
           return this.handlePointerDown(eventData);
 
-        case 'mouseup':
-        case 'pointerup':
+        case "mouseup":
+        case "pointerup":
           return this.handlePointerUp(eventData);
 
-        case 'mousemove':
-        case 'pointermove':
+        case "mousemove":
+        case "pointermove":
           return this.handlePointerMove(eventData);
 
-        case 'keydown':
+        case "keydown":
           return this.handleKeyDown(eventData);
 
-        case 'keyup':
+        case "keyup":
           return this.handleKeyUp(eventData);
 
-        case 'wheel':
+        case "wheel":
           return this.handleWheel(eventData);
 
-        case 'focus':
+        case "focus":
           return this.handleFocus(eventData);
 
-        case 'blur':
+        case "blur":
           return this.handleBlur(eventData);
 
         default:
@@ -729,8 +729,8 @@ export class BaseObject {
         localX: eventData.x - this.x,
         localY: eventData.y - this.y,
       };
-      this.emit('mouseDown', localData);
-      this.emit('pointerDown', localData);
+      this.emit("mouseDown", localData);
+      this.emit("pointerDown", localData);
       return true;
     }
     return false;
@@ -739,11 +739,11 @@ export class BaseObject {
   handlePointerUp(eventData) {
     if (this.isPressed) {
       this.isPressed = false;
-      this.emit('mouseUp', eventData);
-      this.emit('pointerUp', eventData);
+      this.emit("mouseUp", eventData);
+      this.emit("pointerUp", eventData);
 
       if (this.containsPoint(eventData.x, eventData.y)) {
-        this.emit('click', eventData);
+        this.emit("click", eventData);
 
         // Double click detection
         const now = performance.now();
@@ -751,7 +751,7 @@ export class BaseObject {
           this.lastClickTime &&
           now - this.lastClickTime < OBJECT_CONSTANTS.DOUBLE_CLICK_THRESHOLD
         ) {
-          this.emit('doubleClick', eventData);
+          this.emit("doubleClick", eventData);
           this.lastClickTime = 0;
         } else {
           this.lastClickTime = now;
@@ -773,21 +773,21 @@ export class BaseObject {
     };
 
     if (this.isHovered && !wasHovered) {
-      this.emit('hover', localData);
-      this.emit('mouseEnter', localData);
+      this.emit("hover", localData);
+      this.emit("mouseEnter", localData);
     } else if (!this.isHovered && wasHovered) {
-      this.emit('hoverEnd', localData);
-      this.emit('mouseLeave', localData);
+      this.emit("hoverEnd", localData);
+      this.emit("mouseLeave", localData);
     }
 
     if (this.isHovered || this.isDragging) {
-      this.emit('mouseMove', localData);
-      this.emit('pointerMove', localData);
+      this.emit("mouseMove", localData);
+      this.emit("pointerMove", localData);
     }
 
     // Handle dragging
     if (this.isDragging) {
-      this.emit('drag', localData);
+      this.emit("drag", localData);
       return true;
     }
 
@@ -796,17 +796,17 @@ export class BaseObject {
 
   handleKeyDown(eventData) {
     if (this.isFocused) {
-      this.emit('keyDown', eventData);
+      this.emit("keyDown", eventData);
 
       // Handle common accessibility keys
       switch (eventData.key) {
-        case 'Enter':
-        case ' ':
+        case "Enter":
+        case " ":
           if (!eventData.defaultPrevented) {
-            this.emit('click', { ...eventData, synthetic: true });
+            this.emit("click", { ...eventData, synthetic: true });
           }
           break;
-        case 'Escape':
+        case "Escape":
           this.blur();
           break;
       }
@@ -817,7 +817,7 @@ export class BaseObject {
 
   handleKeyUp(eventData) {
     if (this.isFocused) {
-      this.emit('keyUp', eventData);
+      this.emit("keyUp", eventData);
       return true;
     }
     return false;
@@ -825,7 +825,7 @@ export class BaseObject {
 
   handleWheel(eventData) {
     if (this.containsPoint(eventData.x, eventData.y)) {
-      this.emit('wheel', eventData);
+      this.emit("wheel", eventData);
       return true;
     }
     return false;
@@ -834,7 +834,7 @@ export class BaseObject {
   handleFocus(eventData) {
     if (!this.isFocused && this.isFocusable) {
       this.isFocused = true;
-      this.emit('focus', eventData);
+      this.emit("focus", eventData);
       return true;
     }
     return false;
@@ -843,7 +843,7 @@ export class BaseObject {
   handleBlur(eventData) {
     if (this.isFocused) {
       this.isFocused = false;
-      this.emit('blur', eventData);
+      this.emit("blur", eventData);
       return true;
     }
     return false;
@@ -878,14 +878,14 @@ export class BaseObject {
     property,
     targetValue,
     duration = DEFAULT_ANIMATION_DURATION,
-    easing = DEFAULT_EASING
+    easing = DEFAULT_EASING,
   ) {
     if (this.isDestroyed) return Promise.resolve();
 
     // Handle multiple properties
-    if (typeof property === 'object') {
+    if (typeof property === "object") {
       const promises = Object.entries(property).map(([prop, value]) =>
-        this.animate(prop, value, targetValue || duration, duration || easing)
+        this.animate(prop, value, targetValue || duration, duration || easing),
       );
       return Promise.all(promises);
     }
@@ -901,11 +901,11 @@ export class BaseObject {
         const startTime = performance.now();
         const animationId = `${property}_${startTime}`;
         const easingFn =
-          typeof easing === 'function'
+          typeof easing === "function"
             ? easing
             : EasingFunctions[easing] || EasingFunctions.linear;
 
-        const animate = currentTime => {
+        const animate = (currentTime) => {
           if (this.isDestroyed) {
             resolve();
             return false;
@@ -936,7 +936,7 @@ export class BaseObject {
           this.animations.delete(animationId);
         });
       } catch (error) {
-        this.errorHandler(error, 'animate');
+        this.errorHandler(error, "animate");
         reject(error);
       }
     });
@@ -988,7 +988,7 @@ export class BaseObject {
       // Update children
       for (let i = this.children.length - 1; i >= 0; i--) {
         const child = this.children[i];
-        if (child && typeof child.update === 'function') {
+        if (child && typeof child.update === "function") {
           child.update(deltaTime);
         }
       }
@@ -996,7 +996,7 @@ export class BaseObject {
       // Custom update logic (override in subclasses)
       this.onUpdate(deltaTime);
     } catch (error) {
-      this.errorHandler(error, 'update');
+      this.errorHandler(error, "update");
     }
   }
 
@@ -1034,7 +1034,7 @@ export class BaseObject {
 
       this.needsRedraw = false;
     } catch (error) {
-      this.errorHandler(error, 'render');
+      this.errorHandler(error, "render");
       renderer.restore(); // Ensure we restore state even on error
     }
   }
@@ -1071,7 +1071,7 @@ export class BaseObject {
    */
   renderChildren(renderer) {
     for (const child of this.children) {
-      if (child && typeof child.render === 'function') {
+      if (child && typeof child.render === "function") {
         child.render(renderer);
       }
     }
@@ -1113,7 +1113,7 @@ export class BaseObject {
       this.isDestroyed = true;
 
       // Emit destroy event
-      this.emit('destroy');
+      this.emit("destroy");
 
       // Stop all animations
       this.stopAnimations();
@@ -1122,11 +1122,11 @@ export class BaseObject {
       this.eventHandlers.clear();
 
       // Run cleanup tasks
-      this.cleanupTasks.forEach(task => {
+      this.cleanupTasks.forEach((task) => {
         try {
           task();
         } catch (error) {
-          this.errorHandler(error, 'cleanup');
+          this.errorHandler(error, "cleanup");
         }
       });
       this.cleanupTasks = [];
@@ -1135,7 +1135,7 @@ export class BaseObject {
       while (this.children.length > 0) {
         const child = this.children[0];
         this.removeChild(child);
-        if (typeof child.destroy === 'function') {
+        if (typeof child.destroy === "function") {
           child.destroy();
         }
       }
@@ -1152,7 +1152,7 @@ export class BaseObject {
       this.animations = null;
       this.transitions = null;
     } catch (error) {
-      this.errorHandler(error, 'destroy');
+      this.errorHandler(error, "destroy");
     }
   }
 }
@@ -1164,11 +1164,11 @@ export class EthicsMeter extends BaseObject {
       ...options,
       width: options.width || OBJECT_CONSTANTS.METER_DEFAULT_WIDTH,
       height: options.height || OBJECT_CONSTANTS.METER_DEFAULT_HEIGHT,
-      ariaRole: 'progressbar',
+      ariaRole: "progressbar",
       interactive: false,
     });
 
-    this.category = options.category || 'ethics';
+    this.category = options.category || "ethics";
     this.value = options.value || OBJECT_CONSTANTS.METER_DEFAULT_VALUE;
     this.minValue = options.minValue || 0;
     this.maxValue = options.maxValue || OBJECT_CONSTANTS.METER_DEFAULT_MAX;
@@ -1181,13 +1181,13 @@ export class EthicsMeter extends BaseObject {
 
     // Visual styling
     this.colors = {
-      excellent: options.colors?.excellent || '#4CAF50',
-      good: options.colors?.good || '#8BC34A',
-      fair: options.colors?.fair || '#FFC107',
-      poor: options.colors?.poor || '#FF9800',
-      critical: options.colors?.critical || '#F44336',
-      background: options.colors?.background || '#E0E0E0',
-      text: options.colors?.text || '#333333',
+      excellent: options.colors?.excellent || "#4CAF50",
+      good: options.colors?.good || "#8BC34A",
+      fair: options.colors?.fair || "#FFC107",
+      poor: options.colors?.poor || "#FF9800",
+      critical: options.colors?.critical || "#F44336",
+      background: options.colors?.background || "#E0E0E0",
+      text: options.colors?.text || "#333333",
     };
 
     this.thresholds = {
@@ -1207,10 +1207,10 @@ export class EthicsMeter extends BaseObject {
     this.ariaLabel = `${this.label} ethics score: ${this.value} out of ${this.maxValue}`;
   }
 
-  updateScore(newValue, reason = '') {
+  updateScore(newValue, reason = "") {
     const clampedValue = Math.max(
       this.minValue,
-      Math.min(this.maxValue, newValue)
+      Math.min(this.maxValue, newValue),
     );
 
     if (this.animated) {
@@ -1220,7 +1220,7 @@ export class EthicsMeter extends BaseObject {
       this.setValue(clampedValue);
     }
 
-    this.emit('scoreUpdate', {
+    this.emit("scoreUpdate", {
       oldValue: this.value,
       newValue: clampedValue,
       reason,
@@ -1264,11 +1264,11 @@ export class EthicsMeter extends BaseObject {
 
   getScoreLabel() {
     const value = this.displayValue;
-    if (value >= this.thresholds.excellent) return 'Excellent';
-    if (value >= this.thresholds.good) return 'Good';
-    if (value >= this.thresholds.fair) return 'Fair';
-    if (value >= this.thresholds.poor) return 'Poor';
-    return 'Critical';
+    if (value >= this.thresholds.excellent) return "Excellent";
+    if (value >= this.thresholds.good) return "Good";
+    if (value >= this.thresholds.fair) return "Fair";
+    if (value >= this.thresholds.poor) return "Poor";
+    return "Critical";
   }
 
   renderSelf(renderer) {
@@ -1276,14 +1276,14 @@ export class EthicsMeter extends BaseObject {
       (this.displayValue - this.minValue) / (this.maxValue - this.minValue);
     const fillWidth = this.width * percentage;
 
-    if (renderer.type === 'canvas') {
+    if (renderer.type === "canvas") {
       // Background track
       renderer.fillStyle = this.colors.background;
       renderer.fillRect(
         0,
         this.height * OBJECT_CONSTANTS.METER_TRACK_Y_RATIO,
         this.width,
-        this.height * OBJECT_CONSTANTS.METER_TRACK_HEIGHT_RATIO
+        this.height * OBJECT_CONSTANTS.METER_TRACK_HEIGHT_RATIO,
       );
 
       // Progress fill
@@ -1292,12 +1292,12 @@ export class EthicsMeter extends BaseObject {
         0,
         this.height * OBJECT_CONSTANTS.METER_TRACK_Y_RATIO,
         fillWidth,
-        this.height * OBJECT_CONSTANTS.METER_TRACK_HEIGHT_RATIO
+        this.height * OBJECT_CONSTANTS.METER_TRACK_HEIGHT_RATIO,
       );
 
       // Focus ring
       if (this.isFocused) {
-        renderer.strokeStyle = '#2196F3';
+        renderer.strokeStyle = "#2196F3";
         renderer.lineWidth = OBJECT_CONSTANTS.BORDER_WIDTH;
         renderer.strokeRect(
           -OBJECT_CONSTANTS.FOCUS_RING_OFFSET,
@@ -1305,40 +1305,40 @@ export class EthicsMeter extends BaseObject {
             OBJECT_CONSTANTS.FOCUS_RING_OFFSET,
           this.width + OBJECT_CONSTANTS.FOCUS_RING_BUTTON_OFFSET,
           this.height * OBJECT_CONSTANTS.METER_TRACK_HEIGHT_RATIO +
-            OBJECT_CONSTANTS.FOCUS_RING_BUTTON_OFFSET
+            OBJECT_CONSTANTS.FOCUS_RING_BUTTON_OFFSET,
         );
       }
 
       // Label
       if (this.showLabel) {
         renderer.fillStyle = this.colors.text;
-        renderer.font = '14px Arial';
-        renderer.textAlign = 'left';
+        renderer.font = "14px Arial";
+        renderer.textAlign = "left";
         renderer.fillText(
           this.label,
           0,
-          this.height * OBJECT_CONSTANTS.METER_LABEL_Y_RATIO
+          this.height * OBJECT_CONSTANTS.METER_LABEL_Y_RATIO,
         );
       }
 
       // Value display
       if (this.showValue) {
         renderer.fillStyle = this.colors.text;
-        renderer.font = '12px Arial';
-        renderer.textAlign = 'right';
+        renderer.font = "12px Arial";
+        renderer.textAlign = "right";
         const valueText = `${Math.round(this.displayValue)}/${this.maxValue}`;
         renderer.fillText(
           valueText,
           this.width,
-          this.height * OBJECT_CONSTANTS.METER_LABEL_Y_RATIO
+          this.height * OBJECT_CONSTANTS.METER_LABEL_Y_RATIO,
         );
 
         // Score label
-        renderer.font = '10px Arial';
+        renderer.font = "10px Arial";
         renderer.fillText(
           this.getScoreLabel(),
           this.width,
-          this.height * OBJECT_CONSTANTS.METER_VALUE_LABEL_Y_RATIO
+          this.height * OBJECT_CONSTANTS.METER_VALUE_LABEL_Y_RATIO,
         );
       }
     }
@@ -1352,13 +1352,13 @@ export class InteractiveButton extends BaseObject {
       ...options,
       width: options.width || OBJECT_CONSTANTS.BUTTON_DEFAULT_WIDTH,
       height: options.height || OBJECT_CONSTANTS.BUTTON_DEFAULT_HEIGHT,
-      ariaRole: 'button',
+      ariaRole: "button",
     });
 
-    this.text = options.text || 'Button';
+    this.text = options.text || "Button";
     this.icon = options.icon || null;
-    this.variant = options.variant || 'primary';
-    this.size = options.size || 'medium';
+    this.variant = options.variant || "primary";
+    this.size = options.size || "medium";
 
     // Visual states
     this.colors = this.getColorScheme();
@@ -1366,7 +1366,7 @@ export class InteractiveButton extends BaseObject {
 
     // Button state
     this.isLoading = false;
-    this.loadingText = options.loadingText || 'Loading...';
+    this.loadingText = options.loadingText || "Loading...";
 
     // Ripple effect
     this.ripples = [];
@@ -1377,22 +1377,22 @@ export class InteractiveButton extends BaseObject {
   getColorScheme() {
     const schemes = {
       primary: {
-        normal: { bg: '#2196F3', text: '#FFFFFF', border: '#2196F3' },
-        hover: { bg: '#1976D2', text: '#FFFFFF', border: '#1976D2' },
-        pressed: { bg: '#0D47A1', text: '#FFFFFF', border: '#0D47A1' },
-        disabled: { bg: '#CCCCCC', text: '#666666', border: '#CCCCCC' },
+        normal: { bg: "#2196F3", text: "#FFFFFF", border: "#2196F3" },
+        hover: { bg: "#1976D2", text: "#FFFFFF", border: "#1976D2" },
+        pressed: { bg: "#0D47A1", text: "#FFFFFF", border: "#0D47A1" },
+        disabled: { bg: "#CCCCCC", text: "#666666", border: "#CCCCCC" },
       },
       secondary: {
-        normal: { bg: '#757575', text: '#FFFFFF', border: '#757575' },
-        hover: { bg: '#616161', text: '#FFFFFF', border: '#616161' },
-        pressed: { bg: '#424242', text: '#FFFFFF', border: '#424242' },
-        disabled: { bg: '#CCCCCC', text: '#666666', border: '#CCCCCC' },
+        normal: { bg: "#757575", text: "#FFFFFF", border: "#757575" },
+        hover: { bg: "#616161", text: "#FFFFFF", border: "#616161" },
+        pressed: { bg: "#424242", text: "#FFFFFF", border: "#424242" },
+        disabled: { bg: "#CCCCCC", text: "#666666", border: "#CCCCCC" },
       },
       outline: {
-        normal: { bg: 'transparent', text: '#2196F3', border: '#2196F3' },
-        hover: { bg: '#E3F2FD', text: '#1976D2', border: '#1976D2' },
-        pressed: { bg: '#BBDEFB', text: '#0D47A1', border: '#0D47A1' },
-        disabled: { bg: 'transparent', text: '#CCCCCC', border: '#CCCCCC' },
+        normal: { bg: "transparent", text: "#2196F3", border: "#2196F3" },
+        hover: { bg: "#E3F2FD", text: "#1976D2", border: "#1976D2" },
+        pressed: { bg: "#BBDEFB", text: "#0D47A1", border: "#0D47A1" },
+        disabled: { bg: "transparent", text: "#CCCCCC", border: "#CCCCCC" },
       },
     };
 
@@ -1400,31 +1400,31 @@ export class InteractiveButton extends BaseObject {
   }
 
   setupEventHandlers() {
-    this.on('hover', () => {
+    this.on("hover", () => {
       if (!this.isDisabled && !this.isPressed) {
         this.currentColor = this.colors.hover;
         this.animate(
-          'scaleX',
+          "scaleX",
           OBJECT_CONSTANTS.BUTTON_HOVER_SCALE,
-          OBJECT_CONSTANTS.BUTTON_SCALE_DURATION
+          OBJECT_CONSTANTS.BUTTON_SCALE_DURATION,
         );
         this.animate(
-          'scaleY',
+          "scaleY",
           OBJECT_CONSTANTS.BUTTON_HOVER_SCALE,
-          OBJECT_CONSTANTS.BUTTON_SCALE_DURATION
+          OBJECT_CONSTANTS.BUTTON_SCALE_DURATION,
         );
       }
     });
 
-    this.on('hoverEnd', () => {
+    this.on("hoverEnd", () => {
       if (!this.isDisabled && !this.isPressed) {
         this.currentColor = this.colors.normal;
-        this.animate('scaleX', 1, OBJECT_CONSTANTS.BUTTON_SCALE_DURATION);
-        this.animate('scaleY', 1, OBJECT_CONSTANTS.BUTTON_SCALE_DURATION);
+        this.animate("scaleX", 1, OBJECT_CONSTANTS.BUTTON_SCALE_DURATION);
+        this.animate("scaleY", 1, OBJECT_CONSTANTS.BUTTON_SCALE_DURATION);
       }
     });
 
-    this.on('mouseDown', event => {
+    this.on("mouseDown", (event) => {
       if (!this.isDisabled) {
         this.isPressed = true;
         this.currentColor = this.colors.pressed;
@@ -1432,7 +1432,7 @@ export class InteractiveButton extends BaseObject {
       }
     });
 
-    this.on('mouseUp', () => {
+    this.on("mouseUp", () => {
       if (!this.isDisabled) {
         this.isPressed = false;
         this.currentColor = this.isHovered
@@ -1441,8 +1441,8 @@ export class InteractiveButton extends BaseObject {
       }
     });
 
-    this.on('keyDown', event => {
-      if ((event.key === 'Enter' || event.key === ' ') && !this.isDisabled) {
+    this.on("keyDown", (event) => {
+      if ((event.key === "Enter" || event.key === " ") && !this.isDisabled) {
         event.preventDefault();
         this.handleClick();
       }
@@ -1471,7 +1471,7 @@ export class InteractiveButton extends BaseObject {
 
   handleClick() {
     if (!this.isDisabled && !this.isLoading) {
-      this.emit('click', { button: this });
+      this.emit("click", { button: this });
     }
   }
 
@@ -1483,7 +1483,7 @@ export class InteractiveButton extends BaseObject {
 
   updateRipples() {
     const currentTime = performance.now();
-    this.ripples.forEach(ripple => {
+    this.ripples.forEach((ripple) => {
       const elapsed = currentTime - ripple.startTime;
       const progress = Math.min(elapsed / OBJECT_CONSTANTS.RIPPLE_DURATION, 1);
 
@@ -1493,14 +1493,14 @@ export class InteractiveButton extends BaseObject {
   }
 
   renderSelf(renderer) {
-    if (renderer.type !== 'canvas') return;
+    if (renderer.type !== "canvas") return;
 
     this.updateRipples();
 
     const color = this.isDisabled ? this.colors.disabled : this.currentColor;
 
     // Button background
-    if (color.bg !== 'transparent') {
+    if (color.bg !== "transparent") {
       renderer.fillStyle = color.bg;
       renderer.fillRect(0, 0, this.width, this.height);
     }
@@ -1513,17 +1513,17 @@ export class InteractiveButton extends BaseObject {
     }
 
     // Ripple effects
-    this.ripples.forEach(ripple => {
+    this.ripples.forEach((ripple) => {
       renderer.save();
       renderer.globalAlpha = ripple.alpha;
-      renderer.fillStyle = '#FFFFFF';
+      renderer.fillStyle = "#FFFFFF";
       renderer.beginPath();
       renderer.arc(
         ripple.x,
         ripple.y,
         ripple.radius,
         0,
-        Math.PI * OBJECT_CONSTANTS.LOADING_SPINNER_SPEED
+        Math.PI * OBJECT_CONSTANTS.LOADING_SPINNER_SPEED,
       );
       renderer.fill();
       renderer.restore();
@@ -1531,13 +1531,13 @@ export class InteractiveButton extends BaseObject {
 
     // Focus ring
     if (this.isFocused) {
-      renderer.strokeStyle = '#FF9800';
+      renderer.strokeStyle = "#FF9800";
       renderer.lineWidth = OBJECT_CONSTANTS.THICK_BORDER_WIDTH;
       renderer.strokeRect(
         -OBJECT_CONSTANTS.FOCUS_RING_OFFSET,
         -OBJECT_CONSTANTS.FOCUS_RING_OFFSET,
         this.width + OBJECT_CONSTANTS.FOCUS_RING_BUTTON_OFFSET,
-        this.height + OBJECT_CONSTANTS.FOCUS_RING_BUTTON_OFFSET
+        this.height + OBJECT_CONSTANTS.FOCUS_RING_BUTTON_OFFSET,
       );
     }
 
@@ -1545,8 +1545,8 @@ export class InteractiveButton extends BaseObject {
     const displayText = this.isLoading ? this.loadingText : this.text;
     renderer.fillStyle = color.text;
     renderer.font = this.getFontSize();
-    renderer.textAlign = 'center';
-    renderer.textBaseline = 'middle';
+    renderer.textAlign = "center";
+    renderer.textBaseline = "middle";
 
     const textX = this.width / 2;
     const textY = this.height / 2;
@@ -1556,12 +1556,12 @@ export class InteractiveButton extends BaseObject {
       this.renderLoadingSpinner(
         renderer,
         textX - OBJECT_CONSTANTS.BUTTON_SPINNER_OFFSET,
-        textY
+        textY,
       );
       renderer.fillText(
         displayText,
         textX + OBJECT_CONSTANTS.BUTTON_TEXT_OFFSET,
-        textY
+        textY,
       );
     } else {
       renderer.fillText(displayText, textX, textY);
@@ -1570,9 +1570,9 @@ export class InteractiveButton extends BaseObject {
 
   getFontSize() {
     const sizes = {
-      small: '12px Arial',
-      medium: '14px Arial',
-      large: '16px Arial',
+      small: "12px Arial",
+      medium: "14px Arial",
+      large: "16px Arial",
     };
     return sizes[this.size] || sizes.medium;
   }
@@ -1593,7 +1593,7 @@ export class InteractiveButton extends BaseObject {
       0,
       OBJECT_CONSTANTS.SPINNER_RADIUS,
       0,
-      Math.PI * OBJECT_CONSTANTS.LOADING_SPINNER_ARC
+      Math.PI * OBJECT_CONSTANTS.LOADING_SPINNER_ARC,
     );
     renderer.stroke();
 
@@ -1608,7 +1608,7 @@ export class InteractiveSlider extends BaseObject {
       ...options,
       width: options.width || OBJECT_CONSTANTS.SLIDER_DEFAULT_WIDTH,
       height: options.height || OBJECT_CONSTANTS.SLIDER_DEFAULT_HEIGHT,
-      ariaRole: 'slider',
+      ariaRole: "slider",
       draggable: true,
     });
 
@@ -1616,11 +1616,14 @@ export class InteractiveSlider extends BaseObject {
     this.max = options.max || OBJECT_CONSTANTS.SLIDER_DEFAULT_MAX;
     this.value = Math.max(
       this.min,
-      Math.min(this.max, options.value || OBJECT_CONSTANTS.SLIDER_DEFAULT_VALUE)
+      Math.min(
+        this.max,
+        options.value || OBJECT_CONSTANTS.SLIDER_DEFAULT_VALUE,
+      ),
     );
     this.step = options.step || OBJECT_CONSTANTS.SLIDER_DEFAULT_STEP;
-    this.label = options.label || '';
-    this.unit = options.unit || '';
+    this.label = options.label || "";
+    this.unit = options.unit || "";
 
     // Visual properties
     this.trackHeight =
@@ -1632,11 +1635,11 @@ export class InteractiveSlider extends BaseObject {
 
     // Colors
     this.colors = {
-      track: options.colors?.track || '#E0E0E0',
-      fill: options.colors?.fill || '#2196F3',
-      handle: options.colors?.handle || '#FFFFFF',
-      handleBorder: options.colors?.handleBorder || '#2196F3',
-      text: options.colors?.text || '#333333',
+      track: options.colors?.track || "#E0E0E0",
+      fill: options.colors?.fill || "#2196F3",
+      handle: options.colors?.handle || "#FFFFFF",
+      handleBorder: options.colors?.handleBorder || "#2196F3",
+      text: options.colors?.text || "#333333",
     };
 
     // State
@@ -1649,41 +1652,41 @@ export class InteractiveSlider extends BaseObject {
   }
 
   setupEventHandlers() {
-    this.on('mouseDown', event => {
+    this.on("mouseDown", (event) => {
       const handleX = this.getHandlePosition();
       const clickX = event.localX;
 
       if (Math.abs(clickX - handleX) <= this.handleSize / 2) {
         this.isDraggingHandle = true;
         this.dragOffset = clickX - handleX;
-        this.emit('dragStart', { value: this.value });
+        this.emit("dragStart", { value: this.value });
       } else {
         this.jumpToPosition(clickX);
       }
     });
 
-    this.on('hover', event => {
+    this.on("hover", (event) => {
       const handleX = this.getHandlePosition();
       this.hoverHandle =
         Math.abs(event.localX - handleX) <= this.handleSize / 2;
     });
 
-    this.on('keyDown', event => {
+    this.on("keyDown", (event) => {
       let newValue = this.value;
 
       switch (event.key) {
-        case 'ArrowLeft':
-        case 'ArrowDown':
+        case "ArrowLeft":
+        case "ArrowDown":
           newValue = Math.max(this.min, this.value - this.step);
           break;
-        case 'ArrowRight':
-        case 'ArrowUp':
+        case "ArrowRight":
+        case "ArrowUp":
           newValue = Math.min(this.max, this.value + this.step);
           break;
-        case 'Home':
+        case "Home":
           newValue = this.min;
           break;
-        case 'End':
+        case "End":
           newValue = this.max;
           break;
         default:
@@ -1717,7 +1720,7 @@ export class InteractiveSlider extends BaseObject {
     this.updateAccessibility();
 
     if (emitChange && oldValue !== clampedValue) {
-      this.emit('change', {
+      this.emit("change", {
         oldValue,
         newValue: clampedValue,
         percentage: (clampedValue - this.min) / (this.max - this.min),
@@ -1727,9 +1730,9 @@ export class InteractiveSlider extends BaseObject {
 
   updateAccessibility() {
     const percentage = Math.round(
-      ((this.value - this.min) / (this.max - this.min)) * 100
+      ((this.value - this.min) / (this.max - this.min)) * 100,
     );
-    this.ariaLabel = `${this.label || 'Slider'}: ${this.value}${this.unit} (${percentage}%)`;
+    this.ariaLabel = `${this.label || "Slider"}: ${this.value}${this.unit} (${percentage}%)`;
   }
 
   getHandlePosition() {
@@ -1740,7 +1743,7 @@ export class InteractiveSlider extends BaseObject {
   }
 
   renderSelf(renderer) {
-    if (renderer.type !== 'canvas') return;
+    if (renderer.type !== "canvas") return;
 
     const trackY = this.height / 2 - this.trackHeight / 2;
     const handleX = this.getHandlePosition();
@@ -1749,8 +1752,8 @@ export class InteractiveSlider extends BaseObject {
     // Label
     if (this.showLabel && this.label) {
       renderer.fillStyle = this.colors.text;
-      renderer.font = '12px Arial';
-      renderer.textAlign = 'left';
+      renderer.font = "12px Arial";
+      renderer.textAlign = "left";
       renderer.fillText(this.label, 0, OBJECT_CONSTANTS.SLIDER_LABEL_Y_OFFSET);
     }
 
@@ -1760,7 +1763,7 @@ export class InteractiveSlider extends BaseObject {
       this.handleSize / 2,
       trackY,
       this.width - this.handleSize,
-      this.trackHeight
+      this.trackHeight,
     );
 
     // Track fill
@@ -1784,7 +1787,7 @@ export class InteractiveSlider extends BaseObject {
 
     // Focus ring
     if (this.isFocused) {
-      renderer.strokeStyle = '#FF9800';
+      renderer.strokeStyle = "#FF9800";
       renderer.lineWidth = OBJECT_CONSTANTS.BORDER_WIDTH;
       renderer.beginPath();
       renderer.arc(
@@ -1792,7 +1795,7 @@ export class InteractiveSlider extends BaseObject {
         handleY,
         this.handleSize / 2 + OBJECT_CONSTANTS.FOCUS_RING_EXTRA,
         0,
-        Math.PI * OBJECT_CONSTANTS.LOADING_SPINNER_SPEED
+        Math.PI * OBJECT_CONSTANTS.LOADING_SPINNER_SPEED,
       );
       renderer.stroke();
     }
@@ -1800,13 +1803,13 @@ export class InteractiveSlider extends BaseObject {
     // Value display
     if (this.showValue) {
       renderer.fillStyle = this.colors.text;
-      renderer.font = '11px Arial';
-      renderer.textAlign = 'center';
+      renderer.font = "11px Arial";
+      renderer.textAlign = "center";
       const valueText = `${Math.round(this.value)}${this.unit}`;
       renderer.fillText(
         valueText,
         handleX,
-        this.height + OBJECT_CONSTANTS.SLIDER_VALUE_Y_OFFSET
+        this.height + OBJECT_CONSTANTS.SLIDER_VALUE_Y_OFFSET,
       );
     }
   }
@@ -1827,7 +1830,7 @@ export class Scene extends BaseObject {
     };
 
     this.layers = new Map();
-    this.defaultLayer = 'default';
+    this.defaultLayer = "default";
 
     // Performance monitoring
     this.frameCount = 0;
@@ -1875,7 +1878,7 @@ export class Scene extends BaseObject {
 
     // Render layers in order
     for (const [, objects] of this.layers) {
-      objects.forEach(object => {
+      objects.forEach((object) => {
         if (object.render) {
           object.render(renderer);
         }

@@ -3,7 +3,7 @@
  * Demonstrates AI hiring bias scenarios with real-time ethics feedback
  */
 
-import logger from '../utils/logger.js';
+import logger from "../utils/logger.js";
 
 // Constants for hero demo configuration and scoring
 const HERO_DEMO_CONSTANTS = {
@@ -57,8 +57,8 @@ const HERO_DEMO_CONSTANTS = {
 
 class HeroDemo {
   constructor() {
-    logger.info('HeroDemo constructor called');
-    this.container = document.getElementById('hero-demo');
+    logger.info("HeroDemo constructor called");
+    this.container = document.getElementById("hero-demo");
     this.currentScenario = 0;
     this.ethicsScores = {
       fairness: HERO_DEMO_CONSTANTS.BASE_SCORE,
@@ -69,12 +69,12 @@ class HeroDemo {
 
     this.scenarios = [
       {
-        title: 'AI Hiring Assistant',
+        title: "AI Hiring Assistant",
         question:
-          'Your AI system is screening job applications. What data should it use to rank candidates?',
+          "Your AI system is screening job applications. What data should it use to rank candidates?",
         choices: [
           {
-            text: 'Skills, experience, and education only',
+            text: "Skills, experience, and education only",
             impact: {
               fairness: +HERO_DEMO_CONSTANTS.IMPACT_VALUES.SKILLS_ONLY.fairness,
               transparency:
@@ -83,7 +83,7 @@ class HeroDemo {
                 +HERO_DEMO_CONSTANTS.IMPACT_VALUES.SKILLS_ONLY.accountability,
             },
             feedback:
-              'Great choice! Using only relevant qualifications reduces bias.',
+              "Great choice! Using only relevant qualifications reduces bias.",
           },
           {
             text: "Include age and photo for 'cultural fit'",
@@ -95,10 +95,10 @@ class HeroDemo {
                 HERO_DEMO_CONSTANTS.IMPACT_VALUES.AGE_PHOTO.accountability,
             },
             feedback:
-              'This could introduce age and appearance bias into hiring decisions.',
+              "This could introduce age and appearance bias into hiring decisions.",
           },
           {
-            text: 'Add anonymous demographic data for diversity tracking',
+            text: "Add anonymous demographic data for diversity tracking",
             impact: {
               fairness:
                 +HERO_DEMO_CONSTANTS.IMPACT_VALUES.ANONYMOUS_DIVERSITY.fairness,
@@ -110,17 +110,17 @@ class HeroDemo {
                   .accountability,
             },
             feedback:
-              'Good balance - helps track diversity without direct bias.',
+              "Good balance - helps track diversity without direct bias.",
           },
         ],
       },
       {
-        title: 'Algorithm Transparency',
+        title: "Algorithm Transparency",
         question:
-          'A candidate asks why they were rejected. How should your AI system respond?',
+          "A candidate asks why they were rejected. How should your AI system respond?",
         choices: [
           {
-            text: 'Provide detailed explanation of decision factors',
+            text: "Provide detailed explanation of decision factors",
             impact: {
               fairness:
                 +HERO_DEMO_CONSTANTS.IMPACT_VALUES.DETAILED_EXPLANATION
@@ -133,10 +133,10 @@ class HeroDemo {
                   .accountability,
             },
             feedback:
-              'Excellent! Transparency builds trust and allows for bias detection.',
+              "Excellent! Transparency builds trust and allows for bias detection.",
           },
           {
-            text: 'Give generic response to protect trade secrets',
+            text: "Give generic response to protect trade secrets",
             impact: {
               fairness:
                 HERO_DEMO_CONSTANTS.IMPACT_VALUES.GENERIC_RESPONSE.fairness,
@@ -147,10 +147,10 @@ class HeroDemo {
                   .accountability,
             },
             feedback:
-              'This makes it impossible to identify and fix potential bias.',
+              "This makes it impossible to identify and fix potential bias.",
           },
           {
-            text: 'Explain general criteria but keep specifics confidential',
+            text: "Explain general criteria but keep specifics confidential",
             impact: {
               fairness:
                 +HERO_DEMO_CONSTANTS.IMPACT_VALUES.GENERAL_CRITERIA.fairness,
@@ -162,7 +162,7 @@ class HeroDemo {
                   .accountability,
             },
             feedback:
-              'A reasonable compromise, though full transparency is preferred.',
+              "A reasonable compromise, though full transparency is preferred.",
           },
         ],
       },
@@ -171,13 +171,13 @@ class HeroDemo {
     this.init();
   }
   init() {
-    logger.info('HeroDemo init called');
+    logger.info("HeroDemo init called");
     if (!this.container) {
-      logger.error('Hero demo container not found');
+      logger.error("Hero demo container not found");
       return;
     }
 
-    logger.info('Hero demo container found, rendering...');
+    logger.info("Hero demo container found, rendering...");
 
     this.container.innerHTML = `
             <div class="hero-demo-container">
@@ -230,19 +230,19 @@ class HeroDemo {
         `;
     this.attachEventListeners();
     this.updateEthicsDisplay();
-    logger.info('Hero demo initialization completed');
+    logger.info("Hero demo initialization completed");
   }
 
   renderChoices(scenarioIndex) {
     // Check if there's already a selection for this scenario
     const existingChoice = this.userChoices.find(
-      c => c.scenario === scenarioIndex
+      (c) => c.scenario === scenarioIndex,
     );
 
     return this.scenarios[scenarioIndex].choices
       .map((choice, index) => {
         const isSelected = existingChoice && existingChoice.choice === index;
-        const selectedClass = isSelected ? ' selected' : '';
+        const selectedClass = isSelected ? " selected" : "";
 
         return `
                 <button class="choice-btn${selectedClass}" data-choice="${index}" data-scenario="${scenarioIndex}">
@@ -251,7 +251,7 @@ class HeroDemo {
                 </button>
             `;
       })
-      .join('');
+      .join("");
   }
 
   renderEthicsMeters() {
@@ -275,32 +275,32 @@ class HeroDemo {
                     </div>
                 </div>
             </div>
-        `
+        `,
       )
-      .join('');
+      .join("");
   }
 
   attachEventListeners() {
     // Choice buttons
-    this.container.addEventListener('click', e => {
-      if (e.target.closest('.choice-btn')) {
-        this.handleChoice(e.target.closest('.choice-btn'));
-      } else if (e.target.id === 'next-scenario-btn') {
+    this.container.addEventListener("click", (e) => {
+      if (e.target.closest(".choice-btn")) {
+        this.handleChoice(e.target.closest(".choice-btn"));
+      } else if (e.target.id === "next-scenario-btn") {
         this.nextScenario();
-      } else if (e.target.id === 'try-full-simulation') {
+      } else if (e.target.id === "try-full-simulation") {
         this.launchFullSimulation();
       } else if (
-        e.target.id === 'feedback-close-btn' ||
-        e.target.closest('#feedback-close-btn')
+        e.target.id === "feedback-close-btn" ||
+        e.target.closest("#feedback-close-btn")
       ) {
         this.closeFeedback();
       }
     });
 
     // Keyboard navigation
-    this.container.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        if (e.target.classList.contains('choice-btn')) {
+    this.container.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        if (e.target.classList.contains("choice-btn")) {
           e.preventDefault();
           this.handleChoice(e.target);
         }
@@ -314,17 +314,17 @@ class HeroDemo {
     const choice = this.scenarios[scenarioIndex].choices[choiceIndex];
 
     // Remove previous selection styling
-    const allChoices = this.container.querySelectorAll('.choice-btn');
-    allChoices.forEach(btn => {
-      btn.classList.remove('selected');
+    const allChoices = this.container.querySelectorAll(".choice-btn");
+    allChoices.forEach((btn) => {
+      btn.classList.remove("selected");
     });
 
     // Highlight current selection
-    choiceBtn.classList.add('selected');
+    choiceBtn.classList.add("selected");
 
     // Store current choice for this scenario (replace if exists)
     const existingChoiceIndex = this.userChoices.findIndex(
-      c => c.scenario === scenarioIndex
+      (c) => c.scenario === scenarioIndex,
     );
     const choiceData = {
       scenario: scenarioIndex,
@@ -346,7 +346,7 @@ class HeroDemo {
 
     // Track analytics
     if (window.AnalyticsManager) {
-      AnalyticsManager.trackEvent('hero_demo_choice', {
+      AnalyticsManager.trackEvent("hero_demo_choice", {
         scenario: scenarioIndex,
         choice: choiceIndex,
         impact: choice.impact,
@@ -377,14 +377,14 @@ class HeroDemo {
 
     // Apply impact from all current choices
     const calculatedScores = { ...baseScores };
-    this.userChoices.forEach(userChoice => {
+    this.userChoices.forEach((userChoice) => {
       const scenario = this.scenarios[userChoice.scenario];
       const choice = scenario.choices[userChoice.choice];
 
       Object.entries(choice.impact).forEach(([category, change]) => {
         calculatedScores[category] = Math.max(
           0,
-          Math.min(100, calculatedScores[category] + change)
+          Math.min(100, calculatedScores[category] + change),
         );
       });
     });
@@ -409,10 +409,10 @@ class HeroDemo {
 
     // Show change indicator
     const changeIndicator = change > 0 ? `+${change}` : `${change}`;
-    const changeClass = change > 0 ? 'positive' : 'negative';
+    const changeClass = change > 0 ? "positive" : "negative";
 
     // Create floating change indicator
-    const indicator = document.createElement('span');
+    const indicator = document.createElement("span");
     indicator.className = `score-change ${changeClass}`;
     indicator.textContent = changeIndicator;
     valueEl.parentNode.appendChild(indicator);
@@ -452,9 +452,9 @@ class HeroDemo {
   }
 
   showFeedback(message, scenarioIndex) {
-    const feedbackEl = document.getElementById('demo-feedback');
-    const nextBtn = document.getElementById('next-scenario-btn');
-    const tryFullBtn = document.getElementById('try-full-simulation');
+    const feedbackEl = document.getElementById("demo-feedback");
+    const nextBtn = document.getElementById("next-scenario-btn");
+    const tryFullBtn = document.getElementById("try-full-simulation");
 
     feedbackEl.innerHTML = `
             <button class="feedback-close" id="feedback-close-btn" aria-label="Close feedback">×</button>
@@ -465,17 +465,17 @@ class HeroDemo {
         `;
 
     // Show popover with proper animation
-    feedbackEl.style.display = 'block';
-    feedbackEl.classList.add('visible');
+    feedbackEl.style.display = "block";
+    feedbackEl.classList.add("visible");
 
     // Show appropriate next action button
     if (nextBtn && tryFullBtn) {
       if (scenarioIndex < this.scenarios.length - 1) {
-        nextBtn.style.display = 'inline-block';
-        tryFullBtn.style.display = 'none';
+        nextBtn.style.display = "inline-block";
+        tryFullBtn.style.display = "none";
       } else {
-        nextBtn.style.display = 'none';
-        tryFullBtn.style.display = 'inline-block';
+        nextBtn.style.display = "none";
+        tryFullBtn.style.display = "inline-block";
 
         // Show completion summary
         this.showCompletionSummary();
@@ -483,33 +483,33 @@ class HeroDemo {
     }
 
     // Scroll feedback into view
-    feedbackEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    feedbackEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
   closeFeedback() {
-    const feedbackEl = document.getElementById('demo-feedback');
+    const feedbackEl = document.getElementById("demo-feedback");
     if (feedbackEl) {
-      feedbackEl.classList.remove('visible');
+      feedbackEl.classList.remove("visible");
       // Hide after animation completes
       setTimeout(() => {
-        feedbackEl.style.display = 'none';
+        feedbackEl.style.display = "none";
       }, HERO_DEMO_CONSTANTS.ANIMATION.FEEDBACK_HIDE_DELAY);
     }
   }
 
   showCompletionSummary() {
-    const feedbackEl = document.getElementById('demo-feedback');
+    const feedbackEl = document.getElementById("demo-feedback");
     const avgScore = Math.round(
       Object.values(this.ethicsScores).reduce((a, b) => a + b, 0) /
-        HERO_DEMO_CONSTANTS.ETHICS_CATEGORIES_COUNT
+        HERO_DEMO_CONSTANTS.ETHICS_CATEGORIES_COUNT,
     );
 
     const summaryClass =
       avgScore >= HERO_DEMO_CONSTANTS.SCORE_THRESHOLDS.EXCELLENT
-        ? 'excellent'
+        ? "excellent"
         : avgScore >= HERO_DEMO_CONSTANTS.SCORE_THRESHOLDS.GOOD
-          ? 'good'
-          : 'needs-improvement';
+          ? "good"
+          : "needs-improvement";
 
     feedbackEl.innerHTML += `
             <div class="completion-summary">
@@ -532,37 +532,37 @@ class HeroDemo {
       // Update scenario content
       const scenario = this.scenarios[this.currentScenario];
 
-      document.querySelector('.scenario-counter').textContent =
+      document.querySelector(".scenario-counter").textContent =
         `Scenario ${this.currentScenario + 1} of ${this.scenarios.length}`;
-      document.getElementById('demo-scenario-title').textContent =
+      document.getElementById("demo-scenario-title").textContent =
         scenario.title;
-      document.getElementById('demo-question').textContent = scenario.question;
-      document.getElementById('demo-choices').innerHTML = this.renderChoices(
-        this.currentScenario
+      document.getElementById("demo-question").textContent = scenario.question;
+      document.getElementById("demo-choices").innerHTML = this.renderChoices(
+        this.currentScenario,
       );
 
       // Re-add the feedback container since innerHTML replaced it
-      const choicesContainer = document.getElementById('demo-choices');
-      if (!document.getElementById('demo-feedback')) {
-        const feedbackEl = document.createElement('div');
-        feedbackEl.className = 'scenario-feedback';
-        feedbackEl.id = 'demo-feedback';
-        feedbackEl.style.display = 'none';
+      const choicesContainer = document.getElementById("demo-choices");
+      if (!document.getElementById("demo-feedback")) {
+        const feedbackEl = document.createElement("div");
+        feedbackEl.className = "scenario-feedback";
+        feedbackEl.id = "demo-feedback";
+        feedbackEl.style.display = "none";
         feedbackEl.innerHTML =
           '<button class="feedback-close" id="feedback-close-btn" aria-label="Close feedback">×</button>';
         choicesContainer.appendChild(feedbackEl);
       }
 
       // Hide feedback initially
-      const feedbackEl = document.getElementById('demo-feedback');
+      const feedbackEl = document.getElementById("demo-feedback");
       if (feedbackEl) {
-        feedbackEl.style.display = 'none';
-        feedbackEl.classList.remove('visible');
+        feedbackEl.style.display = "none";
+        feedbackEl.classList.remove("visible");
       }
 
       // Check if user has already made a choice for this scenario
       const existingChoice = this.userChoices.find(
-        c => c.scenario === this.currentScenario
+        (c) => c.scenario === this.currentScenario,
       );
       if (existingChoice) {
         // Show the feedback for the existing choice
@@ -578,17 +578,17 @@ class HeroDemo {
   launchFullSimulation() {
     // Trigger the full bias simulation
     if (window.app && window.app.openSimulation) {
-      window.app.openSimulation('bias-fairness');
+      window.app.openSimulation("bias-fairness");
     } else {
       // Fallback: scroll to simulations section
-      document.getElementById('simulations').scrollIntoView({
-        behavior: 'smooth',
+      document.getElementById("simulations").scrollIntoView({
+        behavior: "smooth",
       });
     }
 
     // Track analytics
     if (window.AnalyticsManager) {
-      AnalyticsManager.trackEvent('hero_demo_completed', {
+      AnalyticsManager.trackEvent("hero_demo_completed", {
         finalScores: this.ethicsScores,
         choices: this.userChoices,
       });
@@ -610,10 +610,10 @@ class HeroDemo {
 
   getScoreClass(score) {
     if (score >= HERO_DEMO_CONSTANTS.SCORE_THRESHOLDS.EXCELLENT)
-      return 'excellent';
-    if (score >= HERO_DEMO_CONSTANTS.SCORE_THRESHOLDS.GOOD) return 'good';
-    if (score >= HERO_DEMO_CONSTANTS.SCORE_THRESHOLDS.FAIR) return 'fair';
-    return 'poor';
+      return "excellent";
+    if (score >= HERO_DEMO_CONSTANTS.SCORE_THRESHOLDS.GOOD) return "good";
+    if (score >= HERO_DEMO_CONSTANTS.SCORE_THRESHOLDS.FAIR) return "fair";
+    return "poor";
   }
 
   getSummaryMessage(avgScore) {
@@ -622,7 +622,7 @@ class HeroDemo {
     } else if (avgScore >= HERO_DEMO_CONSTANTS.SCORE_THRESHOLDS.GOOD) {
       return "Good progress! You're thinking about ethics, but there's room for improvement in some areas.";
     } else {
-      return 'Consider how your choices might affect fairness and transparency. Try the full simulation to learn more!';
+      return "Consider how your choices might affect fairness and transparency. Try the full simulation to learn more!";
     }
   }
 

@@ -10,7 +10,7 @@
 .color-picker {
   display: inline-block;
   position: relative;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .color-picker-preview {
@@ -24,7 +24,7 @@
 }
 
 .color-picker-preview::after {
-  content: '▼';
+  content: "▼";
   position: absolute;
   right: 4px;
   top: 50%;
@@ -95,7 +95,7 @@
 .datetime-picker {
   display: inline-block;
   position: relative;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .datetime-picker-input {
@@ -116,7 +116,7 @@
 }
 
 .datetime-picker-input::after {
-  content: '📅';
+  content: "📅";
   position: absolute;
   right: 12px;
   top: 50%;
@@ -237,7 +237,7 @@
 .number-input {
   display: inline-block;
   position: relative;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .number-input-field {
@@ -303,7 +303,7 @@
   border: 1px solid #dee2e6;
   border-radius: 8px;
   overflow: hidden;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .accordion-item {
@@ -392,7 +392,7 @@
   background: white;
   box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
   z-index: 1001;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -488,7 +488,7 @@
 .search-box {
   display: inline-block;
   position: relative;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .search-box-input {

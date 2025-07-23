@@ -20,9 +20,9 @@
  * Licensed under the Apache License, Version 2.0
  */
 
-import { BaseObject } from '../../objects/enhanced-objects.js';
-import { INPUT_UTILITY_CONSTANTS } from './constants.js';
-import { ComponentTheme } from './theme.js';
+import { BaseObject } from "../../objects/enhanced-objects.js";
+import { INPUT_UTILITY_CONSTANTS } from "./constants.js";
+import { ComponentTheme } from "./theme.js";
 
 // Calendar constants
 const MONTHS_IN_YEAR = 12;
@@ -43,7 +43,7 @@ const HEADER_HEIGHT = 80;
 class ComponentError extends Error {
   constructor(message, component, metadata = {}) {
     super(message);
-    this.name = 'ComponentError';
+    this.name = "ComponentError";
     this.component = component;
     this.metadata = metadata;
     this.timestamp = Date.now();
@@ -54,7 +54,7 @@ class ComponentError extends Error {
 const ComponentDebug = {
   isEnabled: true,
   error: (message, ...args) => {
-    if (ComponentDebug.isEnabled && process.env.NODE_ENV === 'development') {
+    if (ComponentDebug.isEnabled && process.env.NODE_ENV === "development") {
       // In development, log to console; in production, this could send to logging service
       // eslint-disable-next-line no-console
       console.error(`[ComponentDebug] ${message}`, ...args);
@@ -88,8 +88,8 @@ class DateTimePicker extends BaseObject {
         options.width || INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_DEFAULT_WIDTH,
       height:
         options.height || INPUT_UTILITY_CONSTANTS.DATETIMEPICKER_DEFAULT_HEIGHT,
-      ariaRole: 'application',
-      ariaLabel: options.ariaLabel || 'Date Time Picker',
+      ariaRole: "application",
+      ariaLabel: options.ariaLabel || "Date Time Picker",
     });
 
     // Validate options
@@ -99,18 +99,18 @@ class DateTimePicker extends BaseObject {
     this.value = options.value ? new Date(options.value) : new Date();
     this.minDate = options.minDate ? new Date(options.minDate) : null;
     this.maxDate = options.maxDate ? new Date(options.maxDate) : null;
-    this.format = options.format || 'YYYY-MM-DD HH:mm';
+    this.format = options.format || "YYYY-MM-DD HH:mm";
     this.showTime = options.showTime !== false; // Default true
     this.showDate = options.showDate !== false; // Default true
     this.disabled = options.disabled || false;
-    this.locale = options.locale || 'en-US';
+    this.locale = options.locale || "en-US";
 
     // Theme integration
     this.theme = options.theme || ComponentTheme.getCurrentTheme();
 
     // State management
     this.isOpen = false;
-    this.currentView = 'calendar'; // 'calendar', 'time'
+    this.currentView = "calendar"; // 'calendar', 'time'
     this.displayMonth = this.value.getMonth();
     this.displayYear = this.value.getFullYear();
     this.selectedHour = this.value.getHours();
@@ -122,7 +122,7 @@ class DateTimePicker extends BaseObject {
     this.renderCache = new Map();
     this.throttledRender = this.throttle(
       this.render.bind(this),
-      PERFORMANCE_THRESHOLDS.eventThrottle
+      PERFORMANCE_THRESHOLDS.eventThrottle,
     );
 
     // Accessibility
@@ -143,13 +143,13 @@ class DateTimePicker extends BaseObject {
       this.setupValidation();
       this.setupFocusManagement();
     } catch (error) {
-      this.errorHandler.handle(error, 'constructor');
+      this.errorHandler.handle(error, "constructor");
     }
   }
 
   validateOptions(options) {
     if (options.value && isNaN(new Date(options.value).getTime())) {
-      throw new ComponentError('Invalid date value provided', 'DateTimePicker');
+      throw new ComponentError("Invalid date value provided", "DateTimePicker");
     }
 
     if (
@@ -158,20 +158,20 @@ class DateTimePicker extends BaseObject {
       new Date(options.minDate) >= new Date(options.maxDate)
     ) {
       throw new ComponentError(
-        'minDate must be less than maxDate',
-        'DateTimePicker'
+        "minDate must be less than maxDate",
+        "DateTimePicker",
       );
     }
 
-    if (options.format && typeof options.format !== 'string') {
-      throw new ComponentError('Format must be a string', 'DateTimePicker');
+    if (options.format && typeof options.format !== "string") {
+      throw new ComponentError("Format must be a string", "DateTimePicker");
     }
   }
 
   createScreenReaderAnnouncer() {
-    const announcer = document.createElement('div');
-    announcer.setAttribute('aria-live', 'polite');
-    announcer.setAttribute('aria-atomic', 'true');
+    const announcer = document.createElement("div");
+    announcer.setAttribute("aria-live", "polite");
+    announcer.setAttribute("aria-atomic", "true");
     announcer.style.cssText = `
             position: absolute;
             left: -10000px;
@@ -188,14 +188,14 @@ class DateTimePicker extends BaseObject {
       Escape: () => this.close(),
       Enter: () => this.handleEnterKey(),
       Space: () => this.handleSpaceKey(),
-      ArrowUp: () => this.navigateCalendar('up'),
-      ArrowDown: () => this.navigateCalendar('down'),
-      ArrowLeft: () => this.navigateCalendar('left'),
-      ArrowRight: () => this.navigateCalendar('right'),
-      Home: () => this.navigateCalendar('home'),
-      End: () => this.navigateCalendar('end'),
-      PageUp: () => this.navigateCalendar('pageUp'),
-      PageDown: () => this.navigateCalendar('pageDown'),
+      ArrowUp: () => this.navigateCalendar("up"),
+      ArrowDown: () => this.navigateCalendar("down"),
+      ArrowLeft: () => this.navigateCalendar("left"),
+      ArrowRight: () => this.navigateCalendar("right"),
+      Home: () => this.navigateCalendar("home"),
+      End: () => this.navigateCalendar("end"),
+      PageUp: () => this.navigateCalendar("pageUp"),
+      PageDown: () => this.navigateCalendar("pageDown"),
       Tab: () => this.handleTabKey(),
     };
   }
@@ -204,13 +204,13 @@ class DateTimePicker extends BaseObject {
     return {
       handle: (error, context) => {
         const componentError = new ComponentError(
-          error.message || 'Unknown error',
-          'DateTimePicker',
-          { context, originalError: error }
+          error.message || "Unknown error",
+          "DateTimePicker",
+          { context, originalError: error },
         );
 
-        ComponentDebug.error('DateTimePicker Error:', componentError);
-        this.emit('error', componentError);
+        ComponentDebug.error("DateTimePicker Error:", componentError);
+        this.emit("error", componentError);
 
         this.recoverFromError(context);
       },
@@ -219,13 +219,13 @@ class DateTimePicker extends BaseObject {
 
   recoverFromError(context) {
     switch (context) {
-      case 'animation':
+      case "animation":
         this.animationState = { openProgress: this.isOpen ? 1 : 0 };
         break;
-      case 'render':
+      case "render":
         this.clearRenderCache();
         break;
-      case 'validation':
+      case "validation":
         this.value = new Date(); // Reset to current date
         break;
       default:
@@ -235,16 +235,16 @@ class DateTimePicker extends BaseObject {
 
   setupAccessibility() {
     // ARIA attributes
-    this.setAttribute('role', 'application');
-    this.setAttribute('aria-expanded', 'false');
-    this.setAttribute('aria-haspopup', 'grid');
+    this.setAttribute("role", "application");
+    this.setAttribute("aria-expanded", "false");
+    this.setAttribute("aria-haspopup", "grid");
 
     // Keyboard accessibility
-    this.setAttribute('tabindex', this.disabled ? '-1' : '0');
+    this.setAttribute("tabindex", this.disabled ? "-1" : "0");
 
     // Focus management
-    this.addEventListener('focusin', () => this.handleFocusIn());
-    this.addEventListener('focusout', () => this.handleFocusOut());
+    this.addEventListener("focusin", () => this.handleFocusIn());
+    this.addEventListener("focusout", () => this.handleFocusOut());
   }
 
   setupEventHandlers() {
@@ -281,7 +281,7 @@ class DateTimePicker extends BaseObject {
     const months = [];
     for (let i = 0; i < MONTHS_IN_YEAR; i++) {
       const date = new Date(REFERENCE_YEAR, i, 1);
-      months.push(date.toLocaleDateString(this.locale, { month: 'long' }));
+      months.push(date.toLocaleDateString(this.locale, { month: "long" }));
     }
     return months;
   }
@@ -291,7 +291,7 @@ class DateTimePicker extends BaseObject {
     // Start from Sunday (0) to Saturday (6)
     for (let i = 0; i < DAYS_IN_WEEK; i++) {
       const date = new Date(REFERENCE_YEAR, 0, 2 + i); // Jan 2, 2000 was a Sunday
-      days.push(date.toLocaleDateString(this.locale, { weekday: 'short' }));
+      days.push(date.toLocaleDateString(this.locale, { weekday: "short" }));
     }
     return days;
   }
@@ -300,7 +300,7 @@ class DateTimePicker extends BaseObject {
     // Different locales have different first days of the week
     // This is a simplified implementation
     const locale = this.locale.toLowerCase();
-    if (locale.startsWith('en-us') || locale.startsWith('en-ca')) {
+    if (locale.startsWith("en-us") || locale.startsWith("en-ca")) {
       return 0; // Sunday
     }
     return 1; // Monday for most other locales
@@ -312,28 +312,28 @@ class DateTimePicker extends BaseObject {
       const currentDate = new Date(this.focusedDate);
 
       switch (direction) {
-        case 'up':
+        case "up":
           currentDate.setDate(currentDate.getDate() - DAYS_IN_WEEK);
           break;
-        case 'down':
+        case "down":
           currentDate.setDate(currentDate.getDate() + DAYS_IN_WEEK);
           break;
-        case 'left':
+        case "left":
           currentDate.setDate(currentDate.getDate() - 1);
           break;
-        case 'right':
+        case "right":
           currentDate.setDate(currentDate.getDate() + 1);
           break;
-        case 'home':
+        case "home":
           currentDate.setDate(1);
           break;
-        case 'end':
+        case "end":
           currentDate.setMonth(currentDate.getMonth() + 1, 0);
           break;
-        case 'pageUp':
+        case "pageUp":
           currentDate.setMonth(currentDate.getMonth() - 1);
           break;
-        case 'pageDown':
+        case "pageDown":
           currentDate.setMonth(currentDate.getMonth() + 1);
           break;
       }
@@ -343,10 +343,10 @@ class DateTimePicker extends BaseObject {
         this.focusedDate = currentDate;
         this.updateDisplayMonth();
         this.announceDate(currentDate);
-        this.emit('dateNavigated', { date: currentDate });
+        this.emit("dateNavigated", { date: currentDate });
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'navigation');
+      this.errorHandler.handle(error, "navigation");
     }
   }
 
@@ -374,10 +374,10 @@ class DateTimePicker extends BaseObject {
   announceDate(date) {
     if (this.announcer) {
       const announcement = date.toLocaleDateString(this.locale, {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       });
       this.announcer.textContent = announcement;
     }
@@ -402,9 +402,9 @@ class DateTimePicker extends BaseObject {
         this.switchToTimeView();
       }
 
-      this.emit('dateSelected', { date: newValue });
+      this.emit("dateSelected", { date: newValue });
     } catch (error) {
-      this.errorHandler.handle(error, 'date-selection');
+      this.errorHandler.handle(error, "date-selection");
     }
   }
 
@@ -418,32 +418,32 @@ class DateTimePicker extends BaseObject {
       this.selectedHour = hour;
       this.selectedMinute = minute;
 
-      this.emit('timeSelected', { time: { hour, minute } });
+      this.emit("timeSelected", { time: { hour, minute } });
     } catch (error) {
-      this.errorHandler.handle(error, 'time-selection');
+      this.errorHandler.handle(error, "time-selection");
     }
   }
 
   setValue(date) {
     if (!this.isDateValid(date)) {
-      throw new ComponentError('Invalid date value', 'DateTimePicker');
+      throw new ComponentError("Invalid date value", "DateTimePicker");
     }
 
     this.value = new Date(date);
-    this.emit('valueChanged', { value: this.value });
+    this.emit("valueChanged", { value: this.value });
   }
 
   // View management
   switchToCalendarView() {
-    this.currentView = 'calendar';
+    this.currentView = "calendar";
     this.clearRenderCache();
-    this.emit('viewChanged', { view: 'calendar' });
+    this.emit("viewChanged", { view: "calendar" });
   }
 
   switchToTimeView() {
-    this.currentView = 'time';
+    this.currentView = "time";
     this.clearRenderCache();
-    this.emit('viewChanged', { view: 'time' });
+    this.emit("viewChanged", { view: "time" });
   }
 
   // Open/close methods with animation
@@ -452,7 +452,7 @@ class DateTimePicker extends BaseObject {
 
     try {
       this.isOpen = true;
-      this.setAttribute('aria-expanded', 'true');
+      this.setAttribute("aria-expanded", "true");
 
       // Animate opening
       if (!this.prefersReducedMotion()) {
@@ -462,9 +462,9 @@ class DateTimePicker extends BaseObject {
       }
 
       this.focusCalendar();
-      this.emit('opened');
+      this.emit("opened");
     } catch (error) {
-      this.errorHandler.handle(error, 'open');
+      this.errorHandler.handle(error, "open");
     }
   }
 
@@ -480,10 +480,10 @@ class DateTimePicker extends BaseObject {
       }
 
       this.isOpen = false;
-      this.setAttribute('aria-expanded', 'false');
-      this.emit('closed');
+      this.setAttribute("aria-expanded", "false");
+      this.emit("closed");
     } catch (error) {
-      this.errorHandler.handle(error, 'close');
+      this.errorHandler.handle(error, "close");
     }
   }
 
@@ -491,7 +491,7 @@ class DateTimePicker extends BaseObject {
     const duration = 200;
     const startTime = PerformanceMonitor.mark();
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const animate = () => {
         const elapsed = PerformanceMonitor.mark() - startTime;
         const progress = Math.min(elapsed / duration, 1);
@@ -513,7 +513,7 @@ class DateTimePicker extends BaseObject {
     const duration = 150;
     const startTime = PerformanceMonitor.mark();
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const animate = () => {
         const elapsed = PerformanceMonitor.mark() - startTime;
         const progress = Math.min(elapsed / duration, 1);
@@ -533,7 +533,7 @@ class DateTimePicker extends BaseObject {
 
   focusCalendar() {
     // Focus management for accessibility
-    if (this.currentView === 'calendar') {
+    if (this.currentView === "calendar") {
       this.announceDate(this.focusedDate);
     }
   }
@@ -541,7 +541,7 @@ class DateTimePicker extends BaseObject {
   prefersReducedMotion() {
     return (
       window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
     );
   }
 
@@ -662,9 +662,9 @@ class DateTimePicker extends BaseObject {
       return;
     }
 
-    if (this.currentView === 'calendar') {
+    if (this.currentView === "calendar") {
       this.handleCalendarClick(localX, localY);
-    } else if (this.currentView === 'time') {
+    } else if (this.currentView === "time") {
       this.handleTimeClick(localX, localY);
     }
   }
@@ -707,14 +707,14 @@ class DateTimePicker extends BaseObject {
         handler();
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'keyboard');
+      this.errorHandler.handle(error, "keyboard");
     }
   }
 
   handleEnterKey() {
     if (!this.isOpen) {
       this.open();
-    } else if (this.currentView === 'calendar') {
+    } else if (this.currentView === "calendar") {
       this.selectDate(this.focusedDate);
     } else {
       this.close();
@@ -724,13 +724,13 @@ class DateTimePicker extends BaseObject {
   handleSpaceKey() {
     if (!this.isOpen) {
       this.open();
-    } else if (this.currentView === 'calendar') {
+    } else if (this.currentView === "calendar") {
       this.selectDate(this.focusedDate);
     }
   }
 
   handleTabKey() {
-    if (this.isOpen && this.currentView === 'calendar' && this.showTime) {
+    if (this.isOpen && this.currentView === "calendar" && this.showTime) {
       this.switchToTimeView();
     }
   }
@@ -754,7 +754,7 @@ class DateTimePicker extends BaseObject {
     try {
       return this.formatDate(this.value, this.format);
     } catch (error) {
-      this.errorHandler.handle(error, 'formatting');
+      this.errorHandler.handle(error, "formatting");
       return this.value.toLocaleDateString(this.locale);
     }
   }
@@ -762,17 +762,17 @@ class DateTimePicker extends BaseObject {
   formatDate(date, format) {
     // Simple date formatting implementation
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hour = String(date.getHours()).padStart(2, '0');
-    const minute = String(date.getMinutes()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hour = String(date.getHours()).padStart(2, "0");
+    const minute = String(date.getMinutes()).padStart(2, "0");
 
     return format
-      .replace('YYYY', year)
-      .replace('MM', month)
-      .replace('DD', day)
-      .replace('HH', hour)
-      .replace('mm', minute);
+      .replace("YYYY", year)
+      .replace("MM", month)
+      .replace("DD", day)
+      .replace("HH", hour)
+      .replace("mm", minute);
   }
 
   // Memory management and cleanup
@@ -791,9 +791,9 @@ class DateTimePicker extends BaseObject {
 
       // Call parent cleanup
       super.destroy?.();
-      this.emit('destroyed');
+      this.emit("destroyed");
     } catch (error) {
-      ComponentDebug.error('Error during DateTimePicker cleanup:', error);
+      ComponentDebug.error("Error during DateTimePicker cleanup:", error);
     }
   }
 
@@ -805,13 +805,13 @@ class DateTimePicker extends BaseObject {
   setMinDate(date) {
     this.minDate = date ? new Date(date) : null;
     this.setupValidation();
-    this.emit('minDateChanged', { minDate: this.minDate });
+    this.emit("minDateChanged", { minDate: this.minDate });
   }
 
   setMaxDate(date) {
     this.maxDate = date ? new Date(date) : null;
     this.setupValidation();
-    this.emit('maxDateChanged', { maxDate: this.maxDate });
+    this.emit("maxDateChanged", { maxDate: this.maxDate });
   }
 
   setLocale(locale) {
@@ -820,12 +820,12 @@ class DateTimePicker extends BaseObject {
     this.dayNames = this.getLocalizedDayNames();
     this.firstDayOfWeek = this.getFirstDayOfWeek();
     this.clearRenderCache();
-    this.emit('localeChanged', { locale });
+    this.emit("localeChanged", { locale });
   }
 
   setFormat(format) {
     this.format = format;
-    this.emit('formatChanged', { format });
+    this.emit("formatChanged", { format });
   }
 
   reset() {
@@ -835,10 +835,10 @@ class DateTimePicker extends BaseObject {
     this.displayYear = this.value.getFullYear();
     this.selectedHour = this.value.getHours();
     this.selectedMinute = this.value.getMinutes();
-    this.currentView = 'calendar';
+    this.currentView = "calendar";
     this.close();
     this.clearRenderCache();
-    this.emit('reset');
+    this.emit("reset");
   }
 
   // Additional helper methods for rendering (simplified versions)
@@ -893,16 +893,16 @@ class DateTimePicker extends BaseObject {
   }
 
   adjustTime(type, delta) {
-    if (type === 'hour') {
+    if (type === "hour") {
       const newHour = Math.max(
         0,
-        Math.min(HOURS_IN_DAY - 1, this.selectedHour + delta)
+        Math.min(HOURS_IN_DAY - 1, this.selectedHour + delta),
       );
       this.selectTime(newHour, this.selectedMinute);
-    } else if (type === 'minute') {
+    } else if (type === "minute") {
       const newMinute = Math.max(
         0,
-        Math.min(MINUTES_IN_HOUR - 1, this.selectedMinute + delta)
+        Math.min(MINUTES_IN_HOUR - 1, this.selectedMinute + delta),
       );
       this.selectTime(this.selectedHour, newMinute);
     }

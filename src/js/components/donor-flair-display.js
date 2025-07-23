@@ -7,27 +7,27 @@ class DonorFlairDisplay {
   constructor() {
     this.flairMapping = {
       bronze: {
-        emoji: '🥉',
-        name: 'Bronze Supporter',
-        color: '#cd7f32',
+        emoji: "🥉",
+        name: "Bronze Supporter",
+        color: "#cd7f32",
         tier: 1,
-        description: 'Contributed $5+ to AI ethics research',
+        description: "Contributed $5+ to AI ethics research",
         threshold: 5,
       },
       silver: {
-        emoji: '🥈',
-        name: 'Silver Patron',
-        color: '#c0c0c0',
+        emoji: "🥈",
+        name: "Silver Patron",
+        color: "#c0c0c0",
         tier: 2,
-        description: 'Contributed $10+ to AI ethics research',
+        description: "Contributed $10+ to AI ethics research",
         threshold: 10,
       },
       gold: {
-        emoji: '🏆',
-        name: 'Gold Champion',
-        color: '#ffd700',
+        emoji: "🏆",
+        name: "Gold Champion",
+        color: "#ffd700",
         tier: 3,
-        description: 'Contributed $20+ to AI ethics research',
+        description: "Contributed $20+ to AI ethics research",
         threshold: 20,
       },
     };
@@ -50,16 +50,16 @@ class DonorFlairDisplay {
     const defaultOptions = {
       showTooltip: true,
       showText: false,
-      size: 'normal', // 'small', 'normal', 'large'
-      style: 'inline', // 'inline', 'block', 'floating'
+      size: "normal", // 'small', 'normal', 'large'
+      style: "inline", // 'inline', 'block', 'floating'
     };
 
     const config = { ...defaultOptions, ...options };
 
-    const badge = document.createElement('span');
+    const badge = document.createElement("span");
     badge.className = `donor-flair-badge ${config.size} ${config.style}`;
-    badge.setAttribute('data-tier', flairInfo.tier);
-    badge.setAttribute('data-flair', flairType);
+    badge.setAttribute("data-tier", flairInfo.tier);
+    badge.setAttribute("data-flair", flairType);
 
     // Set up the badge content
     let content = flairInfo.emoji;
@@ -71,11 +71,11 @@ class DonorFlairDisplay {
     // Add tooltip if enabled
     if (config.showTooltip) {
       badge.title = flairInfo.description;
-      badge.setAttribute('aria-label', flairInfo.description);
+      badge.setAttribute("aria-label", flairInfo.description);
     }
 
     // Add color styling
-    badge.style.setProperty('--flair-color', flairInfo.color);
+    badge.style.setProperty("--flair-color", flairInfo.color);
 
     return badge;
   }
@@ -85,8 +85,8 @@ class DonorFlairDisplay {
    */
   formatDisplayNameWithFlair(displayName, flairType, options = {}) {
     const defaultOptions = {
-      flairPosition: 'before', // 'before', 'after'
-      separator: ' ',
+      flairPosition: "before", // 'before', 'after'
+      separator: " ",
     };
 
     const config = { ...defaultOptions, ...options };
@@ -96,7 +96,7 @@ class DonorFlairDisplay {
 
     const flairBadge = flairInfo.emoji;
 
-    if (config.flairPosition === 'before') {
+    if (config.flairPosition === "before") {
       return `${flairBadge}${config.separator}${displayName}`;
     } else {
       return `${displayName}${config.separator}${flairBadge}`;
@@ -108,19 +108,19 @@ class DonorFlairDisplay {
    */
   enhanceExistingUsernames() {
     // Find elements with user data
-    const userElements = document.querySelectorAll('[data-user-flair]');
+    const userElements = document.querySelectorAll("[data-user-flair]");
 
-    userElements.forEach(element => {
-      const flairType = element.getAttribute('data-user-flair');
+    userElements.forEach((element) => {
+      const flairType = element.getAttribute("data-user-flair");
       const currentText = element.textContent;
 
       if (flairType && this.getFlairInfo(flairType)) {
         const enhancedText = this.formatDisplayNameWithFlair(
           currentText,
-          flairType
+          flairType,
         );
         element.textContent = enhancedText;
-        element.classList.add('has-donor-flair');
+        element.classList.add("has-donor-flair");
       }
     });
   }
@@ -132,8 +132,8 @@ class DonorFlairDisplay {
     const container = document.querySelector(containerSelector);
     if (!container) return;
 
-    const section = document.createElement('div');
-    section.className = 'donor-appreciation-section';
+    const section = document.createElement("div");
+    section.className = "donor-appreciation-section";
     section.innerHTML = `
       <h3 class="appreciation-title">
         <span class="appreciation-icon">💝</span>
@@ -153,9 +153,9 @@ class DonorFlairDisplay {
     container.appendChild(section);
 
     // Add event listener for become supporter button
-    const becomeBtn = section.querySelector('.become-supporter-btn');
+    const becomeBtn = section.querySelector(".become-supporter-btn");
     if (becomeBtn) {
-      becomeBtn.addEventListener('click', () => {
+      becomeBtn.addEventListener("click", () => {
         this.scrollToDonationSection();
       });
     }
@@ -179,7 +179,7 @@ class DonorFlairDisplay {
     return Object.entries(groupedDonors)
       .sort(([a], [b]) => b - a) // Sort by tier descending
       .map(([tier, tierDonors]) => this.renderTierGroup(tier, tierDonors))
-      .join('');
+      .join("");
   }
 
   /**
@@ -199,10 +199,10 @@ class DonorFlairDisplay {
    */
   renderTierGroup(tier, donors) {
     const flairType = Object.keys(this.flairMapping).find(
-      key => this.flairMapping[key].tier === parseInt(tier)
+      (key) => this.flairMapping[key].tier === parseInt(tier),
     );
 
-    if (!flairType) return '';
+    if (!flairType) return "";
 
     const flairInfo = this.flairMapping[flairType];
 
@@ -213,7 +213,7 @@ class DonorFlairDisplay {
           ${flairInfo.name}s
         </h4>
         <div class="donor-list">
-          ${donors.map(donor => this.renderDonorCard(donor)).join('')}
+          ${donors.map((donor) => this.renderDonorCard(donor)).join("")}
         </div>
       </div>
     `;
@@ -225,14 +225,14 @@ class DonorFlairDisplay {
   renderDonorCard(donor) {
     const flairBadge = this.createFlairBadge(donor.flair, {
       showTooltip: true,
-      size: 'small',
+      size: "small",
     });
 
     return `
       <div class="donor-card">
         <div class="donor-info">
-          <span class="donor-name">${donor.displayName || 'Anonymous'}</span>
-          <span class="donor-flair">${flairBadge ? flairBadge.outerHTML : ''}</span>
+          <span class="donor-name">${donor.displayName || "Anonymous"}</span>
+          <span class="donor-flair">${flairBadge ? flairBadge.outerHTML : ""}</span>
         </div>
         <div class="donor-date">
           Supporter since ${this.formatDate(donor.supportSince)}
@@ -245,16 +245,16 @@ class DonorFlairDisplay {
    * Format date for display
    */
   formatDate(dateString) {
-    if (!dateString) return 'Recently';
+    if (!dateString) return "Recently";
 
     try {
       const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
       });
     } catch {
-      return 'Recently';
+      return "Recently";
     }
   }
 
@@ -263,16 +263,16 @@ class DonorFlairDisplay {
    */
   scrollToDonationSection() {
     const donationSection = document.querySelector(
-      '#homepage-donation-button, .donation-widget-container, .enhanced-donation-widget'
+      "#homepage-donation-button, .donation-widget-container, .enhanced-donation-widget",
     );
     if (donationSection) {
       donationSection.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
+        behavior: "smooth",
+        block: "center",
       });
     } else {
       // Fallback - open donation page
-      window.open('donate.html', '_blank');
+      window.open("donate.html", "_blank");
     }
   }
 
@@ -280,7 +280,7 @@ class DonorFlairDisplay {
    * Add flair animations
    */
   addFlairAnimations() {
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.textContent = `
       .donor-flair-badge {
         display: inline-block;
@@ -319,21 +319,21 @@ class DonorFlairDisplay {
    * Set up mutation observer for dynamic content
    */
   setupMutationObserver() {
-    const observer = new MutationObserver(mutations => {
-      mutations.forEach(mutation => {
-        mutation.addedNodes.forEach(node => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
           if (node.nodeType === Node.ELEMENT_NODE) {
-            const flairElements = node.querySelectorAll('[data-user-flair]');
-            flairElements.forEach(element => {
-              const flairType = element.getAttribute('data-user-flair');
-              if (flairType && !element.classList.contains('has-donor-flair')) {
+            const flairElements = node.querySelectorAll("[data-user-flair]");
+            flairElements.forEach((element) => {
+              const flairType = element.getAttribute("data-user-flair");
+              if (flairType && !element.classList.contains("has-donor-flair")) {
                 const currentText = element.textContent;
                 const enhancedText = this.formatDisplayNameWithFlair(
                   currentText,
-                  flairType
+                  flairType,
                 );
                 element.textContent = enhancedText;
-                element.classList.add('has-donor-flair');
+                element.classList.add("has-donor-flair");
               }
             });
           }
@@ -353,11 +353,11 @@ class DonorFlairDisplay {
    */
   calculateFlairFromAmount(totalAmount) {
     if (totalAmount >= this.flairMapping.gold.threshold) {
-      return 'gold';
+      return "gold";
     } else if (totalAmount >= this.flairMapping.silver.threshold) {
-      return 'silver';
+      return "silver";
     } else if (totalAmount >= this.flairMapping.bronze.threshold) {
-      return 'bronze';
+      return "bronze";
     }
     return null;
   }
@@ -372,12 +372,12 @@ class DonorFlairDisplay {
       // For now, we'll simulate the cumulative tracking logic
 
       if (!window.firebase || !window.firebase.firestore) {
-        console.warn('Firebase not available for flair calculation');
+        console.warn("Firebase not available for flair calculation");
         return null;
       }
 
       const db = window.firebase.firestore();
-      const userDoc = await db.collection('users').doc(userId).get();
+      const userDoc = await db.collection("users").doc(userId).get();
 
       if (userDoc.exists) {
         const userData = userDoc.data();
@@ -386,17 +386,16 @@ class DonorFlairDisplay {
 
         // Update user document with new flair if it changed
         if (newFlair && userData.donorFlair !== newFlair) {
-          await db.collection('users').doc(userId).update({
+          await db.collection("users").doc(userId).update({
             donorFlair: newFlair,
             flairUpdatedAt: new Date(),
           });
-
         }
 
         return newFlair;
       }
     } catch (error) {
-      console.error('Error updating user flair:', error);
+      console.error("Error updating user flair:", error);
     }
 
     return null;
@@ -408,15 +407,15 @@ class DonorFlairDisplay {
   async recordDonationAndUpdateFlair(userId, donationAmount) {
     try {
       if (!window.firebase || !window.firebase.firestore) {
-        console.warn('Firebase not available for donation recording');
+        console.warn("Firebase not available for donation recording");
         return null;
       }
 
       const db = window.firebase.firestore();
-      const userRef = db.collection('users').doc(userId);
+      const userRef = db.collection("users").doc(userId);
 
       // Use transaction to safely update total
-      await db.runTransaction(async transaction => {
+      await db.runTransaction(async (transaction) => {
         const userDoc = await transaction.get(userRef);
 
         if (userDoc.exists) {
@@ -449,7 +448,7 @@ class DonorFlairDisplay {
       // Return updated flair
       return await this.updateUserFlairFromDonations(userId);
     } catch (error) {
-      console.error('Error recording donation:', error);
+      console.error("Error recording donation:", error);
       return null;
     }
   }
@@ -471,8 +470,8 @@ class DonorFlairDisplay {
 window.DonorFlairDisplay = DonorFlairDisplay;
 
 // Auto-initialize if DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => {
     DonorFlairDisplay.init();
   });
 } else {

@@ -20,7 +20,7 @@ export class UIDNormalizer {
    * Validate UID format and existence
    */
   isValidUID(uid) {
-    if (!uid || typeof uid !== 'string') return false;
+    if (!uid || typeof uid !== "string") return false;
     // Firebase UIDs are typically 28+ characters, alphanumeric with some special chars
     return /^[a-zA-Z0-9_-]{20,}$/.test(uid);
   }
@@ -32,7 +32,7 @@ export class UIDNormalizer {
     const uid = providedUID || this.getCurrentUID();
 
     if (!uid) {
-      throw new Error('Authentication required - no UID available');
+      throw new Error("Authentication required - no UID available");
     }
 
     if (!this.isValidUID(uid)) {
@@ -45,7 +45,7 @@ export class UIDNormalizer {
   /**
    * Require authentication for UID-based operations
    */
-  requireUID(operation = 'operation') {
+  requireUID(operation = "operation") {
     const uid = this.getCurrentUID();
     if (!uid) {
       throw new Error(`Authentication required for ${operation}`);
@@ -56,7 +56,7 @@ export class UIDNormalizer {
   /**
    * Create UID-based document path for Firestore
    */
-  createUserDocPath(collection = 'users', uid = null) {
+  createUserDocPath(collection = "users", uid = null) {
     const validUID = this.getValidatedUID(uid);
     return `${collection}/${validUID}`;
   }
@@ -64,9 +64,9 @@ export class UIDNormalizer {
   /**
    * Create UID-based storage path
    */
-  createStoragePath(basePath, filename = '', uid = null) {
+  createStoragePath(basePath, filename = "", uid = null) {
     const validUID = this.getValidatedUID(uid);
-    return `${basePath}/${validUID}/${filename}`.replace(/\/+/g, '/');
+    return `${basePath}/${validUID}/${filename}`.replace(/\/+/g, "/");
   }
 
   /**
@@ -79,9 +79,9 @@ export class UIDNormalizer {
   /**
    * Create UID-based cache key
    */
-  createCacheKey(prefix, suffix = '', uid = null) {
+  createCacheKey(prefix, suffix = "", uid = null) {
     const validUID = this.getValidatedUID(uid);
-    const suffixPart = suffix ? `_${suffix}` : '';
+    const suffixPart = suffix ? `_${suffix}` : "";
     return `${prefix}_${validUID}${suffixPart}`;
   }
 
@@ -92,7 +92,7 @@ export class UIDNormalizer {
     const validUIDs = [];
     const invalidUIDs = [];
 
-    uids.forEach(uid => {
+    uids.forEach((uid) => {
       if (this.isValidUID(uid)) {
         validUIDs.push(uid);
       } else {
@@ -122,11 +122,11 @@ export class UIDNormalizer {
    * UID-based error logging
    */
   logUIDError(error, operation, uid = null) {
-    const userUID = uid || this.getCurrentUID() || 'anonymous';
+    const userUID = uid || this.getCurrentUID() || "anonymous";
     // Log UID errors for debugging (development only)
     const isDevelopment =
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1';
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1";
     if (isDevelopment) {
       // eslint-disable-next-line no-console
       console.error(`[UID Error] ${operation}:`, {
@@ -183,7 +183,7 @@ export const UIDUtils = {
    */
   sanitizeUID(uid) {
     if (!uid) return null;
-    return uid.replace(/[^a-zA-Z0-9_-]/g, '');
+    return uid.replace(/[^a-zA-Z0-9_-]/g, "");
   },
 
   /**
@@ -215,7 +215,7 @@ export function initializeUIDNormalizer(authService) {
 export function getUIDNormalizer() {
   if (!globalUIDNormalizer) {
     throw new Error(
-      'UID Normalizer not initialized. Call initializeUIDNormalizer first.'
+      "UID Normalizer not initialized. Call initializeUIDNormalizer first.",
     );
   }
   return globalUIDNormalizer;

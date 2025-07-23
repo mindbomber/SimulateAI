@@ -18,11 +18,11 @@ const CURSOR_REMOVE_DELAY = 500;
  * @returns {Promise} Promise that resolves when typing is complete
  */
 export function typewriterEffect(element, text, options = {}) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const { speed = 50, delay = 0, cursor = true, onComplete = null } = options;
 
     // Clear existing content
-    element.textContent = '';
+    element.textContent = "";
 
     // Add cursor if enabled
     if (cursor) {
@@ -32,7 +32,7 @@ export function typewriterEffect(element, text, options = {}) {
     // Start typing after delay
     setTimeout(() => {
       let index = 0;
-      const textArray = text.split('');
+      const textArray = text.split("");
 
       const typeTimer = setInterval(() => {
         if (index < textArray.length) {
@@ -83,8 +83,8 @@ export async function typewriterSequence(elements) {
  * @returns {Promise} Promise that resolves when all typing is complete
  */
 export async function typewriterParallel(elements) {
-  const promises = elements.map(item =>
-    typewriterEffect(item.element, item.text, item.options)
+  const promises = elements.map((item) =>
+    typewriterEffect(item.element, item.text, item.options),
   );
   return Promise.all(promises);
 }

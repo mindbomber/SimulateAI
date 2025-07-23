@@ -8,7 +8,7 @@
  * current real-world AI challenges.
  */
 
-import { PHILOSOPHICAL_DOMAINS } from '../data/philosophical-taxonomy.js';
+import { PHILOSOPHICAL_DOMAINS } from "../data/philosophical-taxonomy.js";
 
 // Configuration constants
 const SCENARIO_CONFIG = {
@@ -23,37 +23,37 @@ const SCENARIO_CONFIG = {
 // Badge tier configuration following prompt.md specification
 // Using category-specific naming patterns instead of generic tier names
 const BADGE_TIER_THEMES = [
-  { type: 'discovery', examples: ['Explorer', 'Seeker', 'Finder', 'Guardian'] },
+  { type: "discovery", examples: ["Explorer", "Seeker", "Finder", "Guardian"] },
   {
-    type: 'analysis',
-    examples: ['Strategist', 'Investigator', 'Advocate', 'Engineer'],
+    type: "analysis",
+    examples: ["Strategist", "Investigator", "Advocate", "Engineer"],
   },
   {
-    type: 'mastery',
-    examples: ['Architect', 'Champion', 'Ethicist', 'Virtuoso'],
+    type: "mastery",
+    examples: ["Architect", "Champion", "Ethicist", "Virtuoso"],
   },
   {
-    type: 'wisdom',
-    examples: ['Philosopher', 'Sage', 'Synthesizer', 'Mentor'],
+    type: "wisdom",
+    examples: ["Philosopher", "Sage", "Synthesizer", "Mentor"],
   },
-  { type: 'teaching', examples: ['Master', 'Guide', 'Authority', 'Luminary'] },
+  { type: "teaching", examples: ["Master", "Guide", "Authority", "Luminary"] },
   {
-    type: 'transcendent',
-    examples: ['Transcendent', 'Weaver', 'Keeper', 'Oracle'],
-  },
-  {
-    type: 'artistic',
-    examples: ['Virtuoso', 'Artisan', 'Composer', 'Creator'],
+    type: "transcendent",
+    examples: ["Transcendent", "Weaver", "Keeper", "Oracle"],
   },
   {
-    type: 'legendary',
-    examples: ['Legend', 'Immortal', 'Eternal', 'Timeless'],
+    type: "artistic",
+    examples: ["Virtuoso", "Artisan", "Composer", "Creator"],
   },
   {
-    type: 'cosmic',
-    examples: ['Cosmic', 'Universal', 'Infinite', 'Omniscient'],
+    type: "legendary",
+    examples: ["Legend", "Immortal", "Eternal", "Timeless"],
   },
-  { type: 'divine', examples: ['Divine', 'Perfect', 'Absolute', 'Supreme'] },
+  {
+    type: "cosmic",
+    examples: ["Cosmic", "Universal", "Infinite", "Omniscient"],
+  },
+  { type: "divine", examples: ["Divine", "Perfect", "Absolute", "Supreme"] },
 ];
 
 // Triangular number progression (T(n) = n(n+1)/2) - generated programmatically
@@ -82,10 +82,10 @@ export class MCPPhilosophicalCategoryGenerator {
   constructor(mcpWebResearch, mcpProjectGenerator) {
     // Input validation
     if (!mcpWebResearch) {
-      throw new Error('MCP Web Research integration is required');
+      throw new Error("MCP Web Research integration is required");
     }
     if (!mcpProjectGenerator) {
-      throw new Error('MCP Project Generator integration is required');
+      throw new Error("MCP Project Generator integration is required");
     }
 
     this.webResearch = mcpWebResearch;
@@ -111,8 +111,8 @@ export class MCPPhilosophicalCategoryGenerator {
    */
   async generateNewCategory(targetDomain, options = {}) {
     // Input validation
-    if (!targetDomain || typeof targetDomain !== 'string') {
-      throw new Error('Target domain is required and must be a string');
+    if (!targetDomain || typeof targetDomain !== "string") {
+      throw new Error("Target domain is required and must be a string");
     }
 
     if (!this.philosophicalDomains[targetDomain]) {
@@ -124,38 +124,38 @@ export class MCPPhilosophicalCategoryGenerator {
     // Step 1: Research current AI ethics issues
     const currentIssues = await this.researchCurrentAIIssues(
       targetDomain,
-      focusArea
+      focusArea,
     );
 
     // Step 2: Map to philosophical framework
     const philosophicalMapping = this.mapToPhilosophicalFramework(
       currentIssues,
-      targetDomain
+      targetDomain,
     );
 
     // Step 3: Generate category structure
     const categoryStructure = await this.createCategoryStructure(
       philosophicalMapping,
       targetDomain,
-      scenarioCount
+      scenarioCount,
     );
 
     // Step 4: Generate scenarios with increasing complexity
     const scenarios = await this.generateScenarios(
       categoryStructure,
-      scenarioCount
+      scenarioCount,
     );
 
     // Step 5: Create badge progression
     const badgeProgression = this.createBadgeProgression(
       categoryStructure,
-      targetDomain
+      targetDomain,
     );
 
     // Step 6: Generate learning lab content
     const learningLabs = await this.generateLearningLabs(
       scenarios,
-      philosophicalMapping
+      philosophicalMapping,
     );
 
     return {
@@ -164,20 +164,20 @@ export class MCPPhilosophicalCategoryGenerator {
       description: categoryStructure.description,
       icon: categoryStructure.icon,
       color: categoryStructure.color,
-      difficulty: 'intermediate',
+      difficulty: "intermediate",
       estimatedTime: Math.ceil(
-        scenarioCount * SCENARIO_CONFIG.DEFAULT_MINUTES_PER_SCENARIO
+        scenarioCount * SCENARIO_CONFIG.DEFAULT_MINUTES_PER_SCENARIO,
       ),
       philosophicalMapping,
       scenarios,
       badges: badgeProgression,
       learningLabs,
       metadata: {
-        generatedBy: 'MCP',
+        generatedBy: "MCP",
         timestamp: Date.now(),
         primaryDomain: targetDomain,
         secondaryDomains: philosophicalMapping.secondaryDomains,
-        sourceIssues: currentIssues.map(issue => issue.title),
+        sourceIssues: currentIssues.map((issue) => issue.title),
       },
     };
   }
@@ -200,7 +200,7 @@ export class MCPPhilosophicalCategoryGenerator {
       } catch (error) {
         // TODO: Implement proper error logging/analytics tracking
         if (this.webResearch?.analytics) {
-          this.webResearch.analytics.track('research_query_error', {
+          this.webResearch.analytics.track("research_query_error", {
             query,
             targetDomain,
             error: error.message,
@@ -221,7 +221,7 @@ export class MCPPhilosophicalCategoryGenerator {
   buildSearchQueries(domain, focusArea) {
     const baseQueries = [
       `AI ethics ${domain.name.toLowerCase()} 2025`,
-      `artificial intelligence ${domain.description.split(' ').slice(0, SCENARIO_CONFIG.DESCRIPTION_WORD_LIMIT).join(' ')}`,
+      `artificial intelligence ${domain.description.split(" ").slice(0, SCENARIO_CONFIG.DESCRIPTION_WORD_LIMIT).join(" ")}`,
       `robotics ethics ${domain.name.toLowerCase()}`,
     ];
 
@@ -230,7 +230,7 @@ export class MCPPhilosophicalCategoryGenerator {
     }
 
     // Add domain-specific queries
-    domain.aiApplications.slice(0, 2).forEach(application => {
+    domain.aiApplications.slice(0, 2).forEach((application) => {
       baseQueries.push(`${application} ethics controversy`);
     });
 
@@ -249,7 +249,7 @@ export class MCPPhilosophicalCategoryGenerator {
     // Find secondary domains based on issue content
     const secondaryDomains = this.identifySecondaryDomains(
       issues,
-      primaryDomain
+      primaryDomain,
     );
 
     return {
@@ -257,7 +257,7 @@ export class MCPPhilosophicalCategoryGenerator {
       primaryDomainConfig,
       secondaryDomains,
       coreQuestions: this.synthesizeCoreQuestions(issues, primaryDomainConfig),
-      realWorldConnections: issues.map(issue => ({
+      realWorldConnections: issues.map((issue) => ({
         title: issue.title,
         source: issue.source,
         relevance: issue.description,
@@ -279,9 +279,9 @@ export class MCPPhilosophicalCategoryGenerator {
       if (domainId === primaryDomain) return;
 
       let score = 0;
-      issues.forEach(issue => {
+      issues.forEach((issue) => {
         // Check if issue keywords match domain applications
-        domain.aiApplications.forEach(application => {
+        domain.aiApplications.forEach((application) => {
           if (
             this.textSimilarity(issue.description, application) >
             SCENARIO_CONFIG.TEXT_SIMILARITY_THRESHOLD
@@ -363,8 +363,8 @@ export class MCPPhilosophicalCategoryGenerator {
     for (let i = 0; i < complexityPlan.beginner; i++) {
       const scenario = await this.generateIndividualScenario(
         categoryStructure,
-        'beginner',
-        i + 1
+        "beginner",
+        i + 1,
       );
       scenarios.push(scenario);
     }
@@ -373,8 +373,8 @@ export class MCPPhilosophicalCategoryGenerator {
     for (let i = 0; i < complexityPlan.intermediate; i++) {
       const scenario = await this.generateIndividualScenario(
         categoryStructure,
-        'intermediate',
-        complexityPlan.beginner + i + 1
+        "intermediate",
+        complexityPlan.beginner + i + 1,
       );
       scenarios.push(scenario);
     }
@@ -383,8 +383,8 @@ export class MCPPhilosophicalCategoryGenerator {
     for (let i = 0; i < complexityPlan.advanced; i++) {
       const scenario = await this.generateIndividualScenario(
         categoryStructure,
-        'advanced',
-        complexityPlan.beginner + complexityPlan.intermediate + i + 1
+        "advanced",
+        complexityPlan.beginner + complexityPlan.intermediate + i + 1,
       );
       scenarios.push(scenario);
     }
@@ -403,7 +403,7 @@ export class MCPPhilosophicalCategoryGenerator {
     const scenarioConfig = this.buildScenarioConfig(
       categoryStructure,
       complexity,
-      index
+      index,
     );
 
     return {
@@ -467,19 +467,19 @@ export class MCPPhilosophicalCategoryGenerator {
         stakeholderCount: 2,
         decisionPoints: 1,
         ethicalFrameworks: 1,
-        timeConstraint: 'none',
+        timeConstraint: "none",
       },
       intermediate: {
         stakeholderCount: 3,
         decisionPoints: 2,
         ethicalFrameworks: 2,
-        timeConstraint: 'moderate',
+        timeConstraint: "moderate",
       },
       advanced: {
         stakeholderCount: 4,
         decisionPoints: 3,
         ethicalFrameworks: 3,
-        timeConstraint: 'severe',
+        timeConstraint: "severe",
       },
     };
 
@@ -489,28 +489,28 @@ export class MCPPhilosophicalCategoryGenerator {
       title: this.generateScenarioTitle(categoryStructure, complexity, index),
       description: this.generateScenarioDescription(
         categoryStructure,
-        realWorldConnection
+        realWorldConnection,
       ),
       philosophicalContext: this.generatePhilosophicalContext(
         domainConfig,
-        realWorldConnection
+        realWorldConnection,
       ),
       situation: this.generateSituation(
         categoryStructure,
         realWorldConnection,
-        complexity
+        complexity,
       ),
       stakeholders: this.generateStakeholders(
         categoryStructure,
-        modifier.stakeholderCount
+        modifier.stakeholderCount,
       ),
       conflictingValues: this.generateConflictingValues(
         domainConfig,
-        modifier.ethicalFrameworks
+        modifier.ethicalFrameworks,
       ),
       decisionPoints: this.generateDecisionPoints(modifier.decisionPoints),
       philosophicalDepth: this.calculatePhilosophicalDepth(
-        categoryStructure.philosophicalMapping
+        categoryStructure.philosophicalMapping,
       ),
       modifier,
     };
@@ -521,14 +521,14 @@ export class MCPPhilosophicalCategoryGenerator {
    */
   generateScenarioTitle(categoryStructure, complexity, index) {
     const complexityPrefix = {
-      beginner: 'Introduction to',
-      intermediate: 'Navigating',
-      advanced: 'Complex Challenges in',
+      beginner: "Introduction to",
+      intermediate: "Navigating",
+      advanced: "Complex Challenges in",
     };
 
     const baseName = categoryStructure.name
-      .replace(/^AI /, '')
-      .replace(/ in AI Systems$/, '');
+      .replace(/^AI /, "")
+      .replace(/ in AI Systems$/, "");
     return `${complexityPrefix[complexity]} ${baseName} #${index}`;
   }
 
@@ -557,16 +557,16 @@ export class MCPPhilosophicalCategoryGenerator {
    */
   generateSituation(categoryStructure, realWorldConnection, complexity) {
     const complexityModifiers = {
-      beginner: 'straightforward',
-      intermediate: 'multi-faceted',
-      advanced: 'highly complex',
+      beginner: "straightforward",
+      intermediate: "multi-faceted",
+      advanced: "highly complex",
     };
 
     return {
       setting: `A ${complexityModifiers[complexity]} AI deployment scenario`,
       background: `Inspired by recent developments in ${realWorldConnection.title}`,
-      currentState: 'An AI system faces an ethical decision point',
-      urgency: complexity === 'advanced' ? 'immediate' : 'deliberate',
+      currentState: "An AI system faces an ethical decision point",
+      urgency: complexity === "advanced" ? "immediate" : "deliberate",
     };
   }
 
@@ -576,26 +576,26 @@ export class MCPPhilosophicalCategoryGenerator {
   generateStakeholders(categoryStructure, count) {
     const possibleStakeholders = [
       {
-        role: 'AI Developer',
-        concerns: 'Technical functionality and innovation',
+        role: "AI Developer",
+        concerns: "Technical functionality and innovation",
       },
-      { role: 'End User', concerns: 'Personal privacy and autonomy' },
-      { role: 'Society/Public', concerns: 'Collective welfare and justice' },
-      { role: 'Regulatory Body', concerns: 'Compliance and safety standards' },
+      { role: "End User", concerns: "Personal privacy and autonomy" },
+      { role: "Society/Public", concerns: "Collective welfare and justice" },
+      { role: "Regulatory Body", concerns: "Compliance and safety standards" },
       {
-        role: 'Business Leader',
-        concerns: 'Profitability and market position',
+        role: "Business Leader",
+        concerns: "Profitability and market position",
       },
       {
-        role: 'Ethicist',
-        concerns: 'Moral principles and long-term implications',
+        role: "Ethicist",
+        concerns: "Moral principles and long-term implications",
       },
     ];
 
     return possibleStakeholders.slice(0, count).map((stakeholder, index) => ({
       id: `stakeholder-${index + 1}`,
       ...stakeholder,
-      priority: index === 0 ? 'primary' : 'secondary',
+      priority: index === 0 ? "primary" : "secondary",
     }));
   }
 
@@ -604,13 +604,13 @@ export class MCPPhilosophicalCategoryGenerator {
    */
   generateConflictingValues(domainConfig, frameworkCount) {
     const ethicalFrameworks = [
-      { name: 'Utilitarian', focus: 'Greatest good for greatest number' },
-      { name: 'Deontological', focus: 'Duty and rights-based principles' },
-      { name: 'Virtue Ethics', focus: 'Character and moral virtues' },
-      { name: 'Care Ethics', focus: 'Relationships and responsibility' },
+      { name: "Utilitarian", focus: "Greatest good for greatest number" },
+      { name: "Deontological", focus: "Duty and rights-based principles" },
+      { name: "Virtue Ethics", focus: "Character and moral virtues" },
+      { name: "Care Ethics", focus: "Relationships and responsibility" },
     ];
 
-    return ethicalFrameworks.slice(0, frameworkCount).map(framework => ({
+    return ethicalFrameworks.slice(0, frameworkCount).map((framework) => ({
       ...framework,
       application: `How ${framework.name.toLowerCase()} ethics applies to ${domainConfig.name.toLowerCase()}`,
     }));
@@ -621,17 +621,17 @@ export class MCPPhilosophicalCategoryGenerator {
    */
   generateDecisionPoints(count) {
     const baseDecisions = [
-      'Primary action to take',
-      'Stakeholder prioritization',
-      'Risk mitigation strategy',
-      'Long-term implementation approach',
+      "Primary action to take",
+      "Stakeholder prioritization",
+      "Risk mitigation strategy",
+      "Long-term implementation approach",
     ];
 
     return baseDecisions.slice(0, count).map((decision, index) => ({
       id: `decision-${index + 1}`,
       description: decision,
       criticalThinking: `Consider the implications of ${decision.toLowerCase()}`,
-      timeframe: index === 0 ? 'immediate' : 'strategic',
+      timeframe: index === 0 ? "immediate" : "strategic",
     }));
   }
 
@@ -641,30 +641,30 @@ export class MCPPhilosophicalCategoryGenerator {
   generateScenarioChoices(_scenarioConfig) {
     return [
       {
-        id: 'choice-1',
-        text: 'Prioritize individual rights and autonomy',
-        ethicalBasis: 'Deontological',
+        id: "choice-1",
+        text: "Prioritize individual rights and autonomy",
+        ethicalBasis: "Deontological",
         consequences: [
-          'Protects individual freedom',
-          'May limit collective benefit',
+          "Protects individual freedom",
+          "May limit collective benefit",
         ],
       },
       {
-        id: 'choice-2',
-        text: 'Maximize overall welfare and benefit',
-        ethicalBasis: 'Utilitarian',
+        id: "choice-2",
+        text: "Maximize overall welfare and benefit",
+        ethicalBasis: "Utilitarian",
         consequences: [
-          'Optimizes collective outcome',
-          'May compromise individual rights',
+          "Optimizes collective outcome",
+          "May compromise individual rights",
         ],
       },
       {
-        id: 'choice-3',
-        text: 'Seek balanced compromise solution',
-        ethicalBasis: 'Virtue Ethics',
+        id: "choice-3",
+        text: "Seek balanced compromise solution",
+        ethicalBasis: "Virtue Ethics",
         consequences: [
-          'Balances competing interests',
-          'May not fully satisfy any party',
+          "Balances competing interests",
+          "May not fully satisfy any party",
         ],
       },
     ];
@@ -676,10 +676,10 @@ export class MCPPhilosophicalCategoryGenerator {
   generateLearningObjectives(scenarioConfig) {
     return [
       `Analyze ethical implications of AI decisions in ${scenarioConfig.philosophicalContext.domain.toLowerCase()}`,
-      'Apply multiple ethical frameworks to complex scenarios',
-      'Evaluate stakeholder perspectives and competing values',
-      'Construct reasoned arguments for ethical positions',
-      'Reflect on personal ethical reasoning and biases',
+      "Apply multiple ethical frameworks to complex scenarios",
+      "Evaluate stakeholder perspectives and competing values",
+      "Construct reasoned arguments for ethical positions",
+      "Reflect on personal ethical reasoning and biases",
     ];
   }
   /**
@@ -691,11 +691,11 @@ export class MCPPhilosophicalCategoryGenerator {
   generateCategorySpecificBadgeTitle(categoryStructure, tierIndex) {
     const tierTheme = BADGE_TIER_THEMES[tierIndex];
     const categoryKeywords = this.extractCategoryKeywords(
-      categoryStructure.name
+      categoryStructure.name,
     );
 
     // Generate domain-specific prefix + theme role
-    const domainPrefix = categoryKeywords[0] || 'Ethics';
+    const domainPrefix = categoryKeywords[0] || "Ethics";
     const themeRole = tierTheme.examples[0]; // Could be randomized or AI-selected
 
     return `${domainPrefix} ${themeRole}`;
@@ -707,12 +707,12 @@ export class MCPPhilosophicalCategoryGenerator {
    * @returns {Array} Key concepts
    */
   extractCategoryKeywords(categoryName) {
-    const keywords = categoryName.toLowerCase().split(' ');
+    const keywords = categoryName.toLowerCase().split(" ");
     const meaningfulWords = keywords.filter(
-      word => !['the', 'and', 'or', 'of', 'in', 'for', 'with'].includes(word)
+      (word) => !["the", "and", "or", "of", "in", "for", "with"].includes(word),
     );
     return meaningfulWords.map(
-      word => word.charAt(0).toUpperCase() + word.slice(1)
+      (word) => word.charAt(0).toUpperCase() + word.slice(1),
     );
   }
 
@@ -750,54 +750,54 @@ export class MCPPhilosophicalCategoryGenerator {
     // Create tier-appropriate quotes that could relate to the category
     const quotes = {
       discovery: [
-        'The journey of a thousand miles begins with a single step. - Lao Tzu',
-        'The only true wisdom is in knowing you know nothing. - Socrates',
-        'Every expert was once a beginner. - Helen Hayes',
+        "The journey of a thousand miles begins with a single step. - Lao Tzu",
+        "The only true wisdom is in knowing you know nothing. - Socrates",
+        "Every expert was once a beginner. - Helen Hayes",
       ],
       analysis: [
-        'An unexamined life is not worth living. - Socrates',
-        'The function of education is to teach one to think intensively and to think critically. - Martin Luther King Jr.',
-        'Doubt is not a pleasant condition, but certainty is absurd. - Voltaire',
+        "An unexamined life is not worth living. - Socrates",
+        "The function of education is to teach one to think intensively and to think critically. - Martin Luther King Jr.",
+        "Doubt is not a pleasant condition, but certainty is absurd. - Voltaire",
       ],
       mastery: [
-        'Intelligence plus character - that is the goal of true education. - Martin Luther King Jr.',
-        'The real question is not whether machines think but whether men do. - B.F. Skinner',
+        "Intelligence plus character - that is the goal of true education. - Martin Luther King Jr.",
+        "The real question is not whether machines think but whether men do. - B.F. Skinner",
         "You didn't find the answer. You became the question. - Anonymous",
       ],
       wisdom: [
-        'Excellence is never an accident. It is always the result of high intention. - Aristotle',
-        'We are what we repeatedly do. Excellence, then, is not an act, but a habit. - Aristotle',
-        'Wisdom is the reward for a lifetime of listening. - Doug Larson',
+        "Excellence is never an accident. It is always the result of high intention. - Aristotle",
+        "We are what we repeatedly do. Excellence, then, is not an act, but a habit. - Aristotle",
+        "Wisdom is the reward for a lifetime of listening. - Doug Larson",
       ],
       teaching: [
         "The best teachers are those who show you where to look but don't tell you what to see. - Alexandra Trenfor",
-        'Tell me and I forget, teach me and I may remember, involve me and I learn. - Benjamin Franklin',
-        'The art of teaching is the art of assisting discovery. - Mark Van Doren',
+        "Tell me and I forget, teach me and I may remember, involve me and I learn. - Benjamin Franklin",
+        "The art of teaching is the art of assisting discovery. - Mark Van Doren",
       ],
       transcendent: [
-        'The limits of my language mean the limits of my world. - Ludwig Wittgenstein',
+        "The limits of my language mean the limits of my world. - Ludwig Wittgenstein",
         "What we know is a drop, what we don't know is an ocean. - Isaac Newton",
-        'The further a society drifts from truth, the more it will hate those who speak it. - George Orwell',
+        "The further a society drifts from truth, the more it will hate those who speak it. - George Orwell",
       ],
       artistic: [
-        'Every act of creation is first an act of destruction. - Pablo Picasso',
-        'The purpose of art is washing the dust of daily life off our souls. - Pablo Picasso',
-        'Creativity takes courage. - Henri Matisse',
+        "Every act of creation is first an act of destruction. - Pablo Picasso",
+        "The purpose of art is washing the dust of daily life off our souls. - Pablo Picasso",
+        "Creativity takes courage. - Henri Matisse",
       ],
       legendary: [
-        'A society grows great when old men plant trees whose shade they know they shall never sit in. - Greek Proverb',
-        'The best time to plant a tree was 20 years ago. The second best time is now. - Chinese Proverb',
-        'Be yourself; everyone else is already taken. - Oscar Wilde',
+        "A society grows great when old men plant trees whose shade they know they shall never sit in. - Greek Proverb",
+        "The best time to plant a tree was 20 years ago. The second best time is now. - Chinese Proverb",
+        "Be yourself; everyone else is already taken. - Oscar Wilde",
       ],
       cosmic: [
-        'The cosmos is within us. We are made of star-stuff. - Carl Sagan',
+        "The cosmos is within us. We are made of star-stuff. - Carl Sagan",
         "Two things are infinite: the universe and human stupidity; and I'm not sure about the universe. - Albert Einstein",
-        'Look up at the stars and not down at your feet. - Stephen Hawking',
+        "Look up at the stars and not down at your feet. - Stephen Hawking",
       ],
       divine: [
-        'The divine is not something high above us. It is in heaven, it is in earth, it is inside us. - Morihei Ueshiba',
-        'What lies behind us and what lies before us are tiny matters compared to what lies within us. - Ralph Waldo Emerson',
-        'The eternal silence of these infinite spaces frightens me. - Blaise Pascal',
+        "The divine is not something high above us. It is in heaven, it is in earth, it is inside us. - Morihei Ueshiba",
+        "What lies behind us and what lies before us are tiny matters compared to what lies within us. - Ralph Waldo Emerson",
+        "The eternal silence of these infinite spaces frightens me. - Blaise Pascal",
       ],
     };
 
@@ -812,33 +812,33 @@ export class MCPPhilosophicalCategoryGenerator {
     return {
       phases: [
         {
-          name: 'Preparation',
+          name: "Preparation",
           duration: 5,
-          interactions: ['reading', 'vocabulary', 'prior-knowledge'],
+          interactions: ["reading", "vocabulary", "prior-knowledge"],
         },
         {
-          name: 'Exploration',
+          name: "Exploration",
           duration: 15,
           interactions: [
-            'scenario-intro',
-            'stakeholder-analysis',
-            'discussion',
+            "scenario-intro",
+            "stakeholder-analysis",
+            "discussion",
           ],
         },
         {
-          name: 'Analysis',
+          name: "Analysis",
           duration: 20,
-          interactions: ['consequence-mapping', 'principle-application'],
+          interactions: ["consequence-mapping", "principle-application"],
         },
         {
-          name: 'Synthesis',
+          name: "Synthesis",
           duration: 15,
-          interactions: ['argumentation', 'position-defense'],
+          interactions: ["argumentation", "position-defense"],
         },
         {
-          name: 'Assessment',
+          name: "Assessment",
           duration: 10,
-          interactions: ['completion-check', 'reflection', 'peer-review'],
+          interactions: ["completion-check", "reflection", "peer-review"],
         },
       ],
       adaptiveElements: {
@@ -894,7 +894,7 @@ export class MCPPhilosophicalCategoryGenerator {
     // Research current developments related to existing category
     const currentDevelopments = await this.researchCategoryDevelopments(
       categoryId,
-      focusArea
+      focusArea,
     );
 
     // Map existing category to philosophical framework
@@ -906,7 +906,7 @@ export class MCPPhilosophicalCategoryGenerator {
       categoryId,
       currentDevelopments,
       philosophicalMapping,
-      additionalScenarios
+      additionalScenarios,
     );
 
     // Enhance existing scenarios if requested
@@ -914,14 +914,14 @@ export class MCPPhilosophicalCategoryGenerator {
     if (enhanceExisting) {
       enhancedScenarios = await this.enhanceExistingScenarios(
         categoryId,
-        currentDevelopments
+        currentDevelopments,
       );
     }
 
     // Generate comprehensive learning labs
     const learningLabs = await this.generateLearningLabs(
       [...newScenarios, ...enhancedScenarios],
-      philosophicalMapping
+      philosophicalMapping,
     );
 
     return {
@@ -931,10 +931,10 @@ export class MCPPhilosophicalCategoryGenerator {
       learningLabs,
       philosophicalMapping,
       metadata: {
-        generatedBy: 'MCP-Enhancement',
+        generatedBy: "MCP-Enhancement",
         timestamp: Date.now(),
         focusArea,
-        sourceData: currentDevelopments.map(dev => dev.title),
+        sourceData: currentDevelopments.map((dev) => dev.title),
       },
     };
   }
@@ -944,40 +944,40 @@ export class MCPPhilosophicalCategoryGenerator {
    */
   getBadgeReflectionRequirements(level) {
     const requirements = [
-      'Basic understanding demonstrated',
-      'Clear reasoning provided',
-      'Multiple perspectives considered',
-      'Deep philosophical insight shown',
-      'Original synthesis achieved',
-      'Wisdom and transcendence demonstrated',
+      "Basic understanding demonstrated",
+      "Clear reasoning provided",
+      "Multiple perspectives considered",
+      "Deep philosophical insight shown",
+      "Original synthesis achieved",
+      "Wisdom and transcendence demonstrated",
     ];
-    return requirements[level] || 'Appropriate reflection for level';
+    return requirements[level] || "Appropriate reflection for level";
   }
 
   getBadgePeerRequirements(level) {
     const requirements = [
-      'Participate in discussions',
-      'Provide constructive feedback',
-      'Lead meaningful conversations',
-      'Mentor other learners',
-      'Facilitate complex discussions',
-      'Guide community wisdom',
+      "Participate in discussions",
+      "Provide constructive feedback",
+      "Lead meaningful conversations",
+      "Mentor other learners",
+      "Facilitate complex discussions",
+      "Guide community wisdom",
     ];
-    return requirements[level] || 'Engage with learning community';
+    return requirements[level] || "Engage with learning community";
   }
 
   generateNextSteps(categoryStructure, currentLevel) {
     if (currentLevel < SCENARIO_CONFIG.ADVANCED_BADGE_THRESHOLD) {
       return [
-        'Continue exploring scenarios in this category',
-        'Apply learning to related categories',
-        'Engage in peer discussions',
+        "Continue exploring scenarios in this category",
+        "Apply learning to related categories",
+        "Engage in peer discussions",
       ];
     }
     return [
-      'Explore advanced philosophical applications',
-      'Contribute to community knowledge',
-      'Mentor new learners',
+      "Explore advanced philosophical applications",
+      "Contribute to community knowledge",
+      "Mentor new learners",
     ];
   }
 
@@ -990,14 +990,14 @@ export class MCPPhilosophicalCategoryGenerator {
 
   calculateBadgeRarity(level) {
     const rarityLevels = [
-      'Common',
-      'Uncommon',
-      'Rare',
-      'Epic',
-      'Legendary',
-      'Mythic',
+      "Common",
+      "Uncommon",
+      "Rare",
+      "Epic",
+      "Legendary",
+      "Mythic",
     ];
-    return rarityLevels[level] || 'Common';
+    return rarityLevels[level] || "Common";
   }
 
   /**
@@ -1011,7 +1011,7 @@ export class MCPPhilosophicalCategoryGenerator {
       const requiredScenarios = TRIANGULAR_REQUIREMENTS[i];
       const badgeTitle = this.generateCategorySpecificBadgeTitle(
         categoryStructure,
-        i
+        i,
       );
 
       badges.push({

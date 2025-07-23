@@ -20,24 +20,24 @@
  * Fixed version to prevent initialization loops
  */
 
-import logger from '../utils/logger.js';
+import logger from "../utils/logger.js";
 
 // App Check configuration constants
 export const APP_CHECK_CONFIG = {
   // reCAPTCHA v3 site key for SimulateAI
   RECAPTCHA_SITE_KEY:
-    window.location.hostname === 'localhost' ||
-    window.location.hostname === '127.0.0.1'
-      ? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI' // Test key for localhost
-      : '6LfizIQrAAAAAETdjKY14uI3ckhF-JeUujcloH53', // Production key
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+      ? "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // Test key for localhost
+      : "6LfizIQrAAAAAETdjKY14uI3ckhF-JeUujcloH53", // Production key
 
   // Auto-refresh tokens - DISABLED to prevent loops
   AUTO_REFRESH_ENABLED: false,
 
   // Debug mode for development (should be false in production)
   DEBUG_MODE:
-    window.location.hostname === 'localhost' ||
-    window.location.hostname === '127.0.0.1',
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1",
 
   // Token refresh interval (in milliseconds)
   TOKEN_REFRESH_INTERVAL: (() => {
@@ -52,18 +52,18 @@ export const APP_CHECK_CONFIG = {
 
   // App Check actions that align with reCAPTCHA actions
   ACTIONS: {
-    SUBMIT_FORM: 'submit_form',
-    CONTACT_FORM: 'contact_form',
-    RESEARCH_CONSENT: 'research_consent',
-    FEEDBACK_FORM: 'feedback_form',
-    AUTH_LOGIN: 'auth_login',
-    AUTH_SIGNUP: 'auth_signup',
-    SCENARIO_SUBMIT: 'scenario_submit',
-    EMAIL_SUBSCRIBE: 'email_subscribe',
-    DATABASE_READ: 'database_read',
-    DATABASE_WRITE: 'database_write',
-    ANALYTICS_WRITE: 'analytics_write',
-    STORAGE_UPLOAD: 'storage_upload',
+    SUBMIT_FORM: "submit_form",
+    CONTACT_FORM: "contact_form",
+    RESEARCH_CONSENT: "research_consent",
+    FEEDBACK_FORM: "feedback_form",
+    AUTH_LOGIN: "auth_login",
+    AUTH_SIGNUP: "auth_signup",
+    SCENARIO_SUBMIT: "scenario_submit",
+    EMAIL_SUBSCRIBE: "email_subscribe",
+    DATABASE_READ: "database_read",
+    DATABASE_WRITE: "database_write",
+    ANALYTICS_WRITE: "analytics_write",
+    STORAGE_UPLOAD: "storage_upload",
   },
 };
 
@@ -90,12 +90,12 @@ export class AppCheckService {
   async initialize(app) {
     // Prevent multiple initializations
     if (this.initialized) {
-      logger.info('🛡️ App Check already initialized, skipping');
+      logger.info("🛡️ App Check already initialized, skipping");
       return true;
     }
 
     if (this.isInitializing) {
-      logger.info('🛡️ App Check initialization in progress, waiting...');
+      logger.info("🛡️ App Check initialization in progress, waiting...");
       return this.initializationPromise;
     }
 
@@ -123,7 +123,7 @@ export class AppCheckService {
       // For development, skip App Check to avoid ReCAPTCHA issues
       if (APP_CHECK_CONFIG.DEBUG_MODE) {
         logger.warn(
-          '🛡️ App Check disabled in development mode to prevent ReCAPTCHA loops'
+          "🛡️ App Check disabled in development mode to prevent ReCAPTCHA loops",
         );
         this.isReady = false;
         this.isInitializing = false;
@@ -131,14 +131,14 @@ export class AppCheckService {
       }
 
       const { initializeAppCheck, ReCaptchaV3Provider } = await import(
-        'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js'
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js"
       );
 
       // Configure App Check for production only
       try {
         this.appCheck = initializeAppCheck(app, {
           provider: new ReCaptchaV3Provider(
-            APP_CHECK_CONFIG.RECAPTCHA_SITE_KEY
+            APP_CHECK_CONFIG.RECAPTCHA_SITE_KEY,
           ),
           isTokenAutoRefreshEnabled: APP_CHECK_CONFIG.AUTO_REFRESH_ENABLED,
         });
@@ -147,12 +147,12 @@ export class AppCheckService {
         this.isInitializing = false;
         this.lastTokenRefresh = Date.now();
 
-        logger.info('🛡️ Firebase App Check initialized successfully');
+        logger.info("🛡️ Firebase App Check initialized successfully");
         return true;
       } catch (appCheckError) {
         logger.warn(
-          '⚠️ App Check initialization failed, continuing without App Check:',
-          appCheckError.message
+          "⚠️ App Check initialization failed, continuing without App Check:",
+          appCheckError.message,
         );
         // Continue without App Check - Firebase will work but with reduced security
         this.isReady = false;
@@ -160,7 +160,7 @@ export class AppCheckService {
         return true; // Return true to allow app to continue
       }
     } catch (error) {
-      logger.error('❌ App Check initialization failed:', error);
+      logger.error("❌ App Check initialization failed:", error);
       this.isInitializing = false;
       return false;
     }
@@ -174,11 +174,11 @@ export class AppCheckService {
   async getToken(forceRefresh = false) {
     try {
       if (!this.isReady) {
-        logger.warn('⚠️ App Check not ready, skipping token generation');
+        logger.warn("⚠️ App Check not ready, skipping token generation");
         return null;
       }
 
-      const cacheKey = 'appcheck_token';
+      const cacheKey = "appcheck_token";
       const now = Date.now();
 
       // Check if we have a cached token and it's still fresh
@@ -190,7 +190,7 @@ export class AppCheckService {
       }
 
       const { getToken } = await import(
-        'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js'
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js"
       );
       const tokenResponse = await getToken(this.appCheck, forceRefresh);
 
@@ -203,7 +203,7 @@ export class AppCheckService {
       this.lastTokenRefresh = now;
       return tokenResponse.token;
     } catch (error) {
-      logger.error('❌ Failed to get App Check token:', error);
+      logger.error("❌ Failed to get App Check token:", error);
       return null; // Return null instead of throwing to prevent app crashes
     }
   }
@@ -216,7 +216,7 @@ export class AppCheckService {
     try {
       return this.isReady && this.appCheck !== null;
     } catch (error) {
-      logger.warn('⚠️ App Check validation failed:', error);
+      logger.warn("⚠️ App Check validation failed:", error);
       return false;
     }
   }
@@ -243,7 +243,7 @@ export class AppCheckService {
    */
   clearTokenCache() {
     this.tokenCache.clear();
-    logger.info('🧹 App Check token cache cleared');
+    logger.info("🧹 App Check token cache cleared");
   }
 
   /**
@@ -271,7 +271,7 @@ export class AppCheckService {
     } catch (error) {
       logger.error(
         `❌ Failed to get App Check token for action ${action}:`,
-        error
+        error,
       );
       return null; // Return null instead of throwing
     }

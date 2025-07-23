@@ -22,22 +22,22 @@
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: 'AIzaSyAwoc3L-43aXyNjNB9ncGbFm7eE-yn5bFA',
-  authDomain: 'simulateai-research.firebaseapp.com',
-  projectId: 'simulateai-research',
-  storageBucket: 'simulateai-research.firebasestorage.app',
-  messagingSenderId: '52924445915', // Crucial for FCM!
-  appId: '1:52924445915:web:dadca1a93bc382403a08fe',
-  measurementId: 'G-XW8H062BMV',
+  apiKey: "AIzaSyAwoc3L-43aXyNjNB9ncGbFm7eE-yn5bFA",
+  authDomain: "simulateai-research.firebaseapp.com",
+  projectId: "simulateai-research",
+  storageBucket: "simulateai-research.firebasestorage.app",
+  messagingSenderId: "52924445915", // Crucial for FCM!
+  appId: "1:52924445915:web:dadca1a93bc382403a08fe",
+  measurementId: "G-XW8H062BMV",
 };
 
 // Import the functions you need from the SDKs you want to use
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getMessaging,
   getToken,
   onMessage,
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js';
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
 import {
   getFirestore,
   doc,
@@ -45,15 +45,15 @@ import {
   setDoc,
   collection,
   addDoc,
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Configuration constants
 const NOTIFICATION_CONFIG = {
   VAPID_KEY:
-    'BHxifT5EzYByOc7gGI_Iq_W-DHTs4kM823Z38-942vfdX59LZW_0rdwXT6rzNeKC6knJkIJdLvDg0LTavQESnsc', // Your actual VAPID key
-  TOKEN_COLLECTION: 'fcm-tokens',
-  NOTIFICATION_COLLECTION: 'notifications',
-  SUBSCRIPTION_COLLECTION: 'notification-subscriptions',
+    "BHxifT5EzYByOc7gGI_Iq_W-DHTs4kM823Z38-942vfdX59LZW_0rdwXT6rzNeKC6knJkIJdLvDg0LTavQESnsc", // Your actual VAPID key
+  TOKEN_COLLECTION: "fcm-tokens",
+  NOTIFICATION_COLLECTION: "notifications",
+  SUBSCRIPTION_COLLECTION: "notification-subscriptions",
   AUTO_HIDE_DELAY: 5000,
 };
 
@@ -75,8 +75,8 @@ export function initializeFirebaseMessaging() {
     return { app: globalApp, messaging: globalMessaging };
   } catch (error) {
     // Log error for debugging
-    if (typeof window !== 'undefined' && window.console) {
-      window.console.error('Failed to initialize Firebase Messaging:', error);
+    if (typeof window !== "undefined" && window.console) {
+      window.console.error("Failed to initialize Firebase Messaging:", error);
     }
     throw error;
   }
@@ -93,8 +93,8 @@ export async function getFCMToken(vapidKey = NOTIFICATION_CONFIG.VAPID_KEY) {
     return token;
   } catch (error) {
     // Log error for debugging
-    if (typeof window !== 'undefined' && window.console) {
-      window.console.error('Error getting FCM token:', error);
+    if (typeof window !== "undefined" && window.console) {
+      window.console.error("Error getting FCM token:", error);
     }
     throw error;
   }
@@ -132,10 +132,10 @@ class MessagingService {
     try {
       // Check if messaging is supported
       this.isSupported =
-        'serviceWorker' in navigator && 'Notification' in window;
+        "serviceWorker" in navigator && "Notification" in window;
 
       if (!this.isSupported) {
-        this.handleError('Push notifications not supported in this browser');
+        this.handleError("Push notifications not supported in this browser");
         return;
       }
 
@@ -149,24 +149,24 @@ class MessagingService {
       this.setupForegroundMessageHandler();
 
       // Log successful initialization in development
-      this.logInfo('Firebase Messaging initialized');
+      this.logInfo("Firebase Messaging initialized");
     } catch (error) {
-      this.handleError('Error initializing Firebase Messaging', error);
+      this.handleError("Error initializing Firebase Messaging", error);
     }
   }
 
   async registerServiceWorker() {
     try {
-      if ('serviceWorker' in navigator) {
+      if ("serviceWorker" in navigator) {
         const registration = await navigator.serviceWorker.register(
-          '/firebase-messaging-sw.js'
+          "/firebase-messaging-sw.js",
         );
-        this.logInfo('Service Worker registered', registration);
+        this.logInfo("Service Worker registered", registration);
         return registration;
       }
       return null;
     } catch (error) {
-      this.handleError('Service Worker registration failed', error);
+      this.handleError("Service Worker registration failed", error);
       throw error;
     }
   }
@@ -175,15 +175,15 @@ class MessagingService {
     try {
       const permission = await Notification.requestPermission();
 
-      if (permission === 'granted') {
-        this.logInfo('Notification permission granted');
+      if (permission === "granted") {
+        this.logInfo("Notification permission granted");
         return true;
       } else {
-        this.logInfo('Notification permission denied');
+        this.logInfo("Notification permission denied");
         return false;
       }
     } catch (error) {
-      this.handleError('Error requesting notification permission', error);
+      this.handleError("Error requesting notification permission", error);
       return false;
     }
   }
@@ -191,13 +191,13 @@ class MessagingService {
   async getRegistrationToken(userId) {
     try {
       if (!this.messaging) {
-        throw new Error('Messaging not initialized');
+        throw new Error("Messaging not initialized");
       }
 
       // Request permission first
       const hasPermission = await this.requestPermission();
       if (!hasPermission) {
-        throw new Error('Notification permission not granted');
+        throw new Error("Notification permission not granted");
       }
 
       // Get registration token
@@ -206,7 +206,7 @@ class MessagingService {
       });
 
       if (token) {
-        this.logInfo('FCM Registration token', token);
+        this.logInfo("FCM Registration token", token);
         this.currentToken = token;
 
         // Store token in Firestore
@@ -216,11 +216,11 @@ class MessagingService {
 
         return token;
       } else {
-        this.logInfo('No registration token available');
+        this.logInfo("No registration token available");
         return null;
       }
     } catch (error) {
-      this.handleError('Error getting registration token', error);
+      this.handleError("Error getting registration token", error);
       throw error;
     }
   }
@@ -230,7 +230,7 @@ class MessagingService {
       const tokenDoc = doc(
         this.db,
         NOTIFICATION_CONFIG.TOKEN_COLLECTION,
-        userId
+        userId,
       );
 
       await setDoc(
@@ -244,12 +244,12 @@ class MessagingService {
           userAgent: navigator.userAgent,
           isActive: true,
         },
-        { merge: true }
+        { merge: true },
       );
 
-      this.logInfo('FCM token stored for user', userId);
+      this.logInfo("FCM token stored for user", userId);
     } catch (error) {
-      this.handleError('Error storing FCM token', error);
+      this.handleError("Error storing FCM token", error);
       throw error;
     }
   }
@@ -257,8 +257,8 @@ class MessagingService {
   setupForegroundMessageHandler() {
     if (!this.messaging) return;
 
-    onMessage(this.messaging, payload => {
-      this.logInfo('Foreground message received', payload);
+    onMessage(this.messaging, (payload) => {
+      this.logInfo("Foreground message received", payload);
 
       const { notification, data } = payload;
 
@@ -274,12 +274,12 @@ class MessagingService {
     // Create custom notification UI for foreground
     const notificationElement = this.createNotificationElement(
       notification,
-      data
+      data,
     );
 
     // Add to notification container
     const container =
-      document.getElementById('notification-container') ||
+      document.getElementById("notification-container") ||
       this.createNotificationContainer();
     container.appendChild(notificationElement);
 
@@ -296,11 +296,11 @@ class MessagingService {
     // In production, send to logging service
     // Use location check instead of process.env which is not available in browser
     const isDevelopment =
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1';
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1";
     if (isDevelopment) {
       // eslint-disable-next-line no-console
-      console.error(`${message}${error ? ':' : ''}`, error || '');
+      console.error(`${message}${error ? ":" : ""}`, error || "");
     }
   }
 
@@ -308,18 +308,17 @@ class MessagingService {
     // In production, send to analytics
     // Use location check instead of process.env which is not available in browser
     const isDevelopment =
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1';
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1";
     if (isDevelopment) {
       // eslint-disable-next-line no-console
-
     }
   }
 
   createNotificationContainer() {
-    const container = document.createElement('div');
-    container.id = 'notification-container';
-    container.className = 'fcm-notification-container';
+    const container = document.createElement("div");
+    container.id = "notification-container";
+    container.className = "fcm-notification-container";
     container.style.cssText = `
             position: fixed;
             top: 20px;
@@ -332,8 +331,8 @@ class MessagingService {
   }
 
   createNotificationElement(notification, data) {
-    const element = document.createElement('div');
-    element.className = 'fcm-notification';
+    const element = document.createElement("div");
+    element.className = "fcm-notification";
     element.style.cssText = `
             background: white;
             border: 1px solid #ddd;
@@ -347,7 +346,7 @@ class MessagingService {
 
     element.innerHTML = `
             <div class="fcm-notification-header">
-                <img src="${notification.icon || '/src/assets/icons/logo.svg'}" 
+                <img src="${notification.icon || "/src/assets/icons/logo.svg"}" 
                      alt="Icon" 
                      style="width: 24px; height: 24px; margin-right: 12px; float: left;">
                 <h4 style="margin: 0; font-size: 16px; color: #333;">${notification.title}</h4>
@@ -362,12 +361,12 @@ class MessagingService {
         `;
 
     // Add click handlers
-    element.querySelector('.dismiss-btn').onclick = e => {
+    element.querySelector(".dismiss-btn").onclick = (e) => {
       e.stopPropagation();
       element.remove();
     };
 
-    element.querySelector('.view-btn').onclick = e => {
+    element.querySelector(".view-btn").onclick = (e) => {
       e.stopPropagation();
       this.handleNotificationClick(data);
       element.remove();
@@ -385,26 +384,26 @@ class MessagingService {
     if (!data) return;
 
     switch (data.type) {
-      case 'reply':
+      case "reply":
         this.handleReplyNotification(data);
         break;
-      case 'mention':
+      case "mention":
         this.handleMentionNotification(data);
         break;
-      case 'new-post':
+      case "new-post":
         this.handleNewPostNotification(data);
         break;
-      case 'thread-update':
+      case "thread-update":
         this.handleThreadUpdateNotification(data);
         break;
       default:
-        this.logInfo('Unknown notification type', data.type);
+        this.logInfo("Unknown notification type", data.type);
     }
   }
 
   handleNotificationClick(data) {
     if (data.url) {
-      window.open(data.url, '_blank');
+      window.open(data.url, "_blank");
     } else if (data.threadId) {
       window.location.href = `/forum.html#thread=${data.threadId}`;
     } else if (data.postId) {
@@ -414,7 +413,7 @@ class MessagingService {
 
   handleReplyNotification(data) {
     // Handle reply notifications
-    this.logInfo('Reply notification', data);
+    this.logInfo("Reply notification", data);
 
     // Update UI if forum is open
     if (window.forumIntegration && data.threadId) {
@@ -424,22 +423,22 @@ class MessagingService {
 
   handleMentionNotification(data) {
     // Handle mention notifications
-    this.logInfo('Mention notification', data);
+    this.logInfo("Mention notification", data);
 
     // Highlight mention if visible
     if (data.messageId) {
       const messageElement = document.querySelector(
-        `[data-message-id="${data.messageId}"]`
+        `[data-message-id="${data.messageId}"]`,
       );
       if (messageElement) {
-        messageElement.classList.add('mentioned');
+        messageElement.classList.add("mentioned");
       }
     }
   }
 
   handleNewPostNotification(data) {
     // Handle new blog post notifications
-    this.logInfo('New post notification', data);
+    this.logInfo("New post notification", data);
 
     // Update blog list if visible
     if (window.blogService && data.postId) {
@@ -449,7 +448,7 @@ class MessagingService {
 
   handleThreadUpdateNotification(data) {
     // Handle thread update notifications
-    this.logInfo('Thread update notification', data);
+    this.logInfo("Thread update notification", data);
 
     // Update thread list if visible
     if (window.forumIntegration && data.threadId) {
@@ -463,12 +462,12 @@ class MessagingService {
       const subscriptionDoc = doc(
         this.db,
         NOTIFICATION_CONFIG.SUBSCRIPTION_COLLECTION,
-        `${userId}_thread_${threadId}`
+        `${userId}_thread_${threadId}`,
       );
 
       await setDoc(subscriptionDoc, {
         userId,
-        type: 'thread',
+        type: "thread",
         targetId: threadId,
         createdAt: new Date(),
         isActive: true,
@@ -479,9 +478,9 @@ class MessagingService {
         },
       });
 
-      this.logInfo('Subscribed to thread notifications', threadId);
+      this.logInfo("Subscribed to thread notifications", threadId);
     } catch (error) {
-      this.handleError('Error subscribing to thread', error);
+      this.handleError("Error subscribing to thread", error);
       throw error;
     }
   }
@@ -491,13 +490,13 @@ class MessagingService {
       const subscriptionDoc = doc(
         this.db,
         NOTIFICATION_CONFIG.SUBSCRIPTION_COLLECTION,
-        `${userId}_new_posts`
+        `${userId}_new_posts`,
       );
 
       await setDoc(subscriptionDoc, {
         userId,
-        type: 'new-posts',
-        targetId: 'all',
+        type: "new-posts",
+        targetId: "all",
         createdAt: new Date(),
         isActive: true,
         preferences: {
@@ -507,9 +506,9 @@ class MessagingService {
         },
       });
 
-      this.logInfo('Subscribed to new post notifications');
+      this.logInfo("Subscribed to new post notifications");
     } catch (error) {
-      this.handleError('Error subscribing to new posts', error);
+      this.handleError("Error subscribing to new posts", error);
       throw error;
     }
   }
@@ -519,7 +518,7 @@ class MessagingService {
       const subscriptionDoc = doc(
         this.db,
         NOTIFICATION_CONFIG.SUBSCRIPTION_COLLECTION,
-        `${userId}_thread_${threadId}`
+        `${userId}_thread_${threadId}`,
       );
 
       await updateDoc(subscriptionDoc, {
@@ -527,9 +526,9 @@ class MessagingService {
         unsubscribedAt: new Date(),
       });
 
-      this.logInfo('Unsubscribed from thread notifications', threadId);
+      this.logInfo("Unsubscribed from thread notifications", threadId);
     } catch (error) {
-      this.handleError('Error unsubscribing from thread', error);
+      this.handleError("Error unsubscribing from thread", error);
       throw error;
     }
   }
@@ -539,23 +538,23 @@ class MessagingService {
     try {
       const notificationDoc = collection(
         this.db,
-        NOTIFICATION_CONFIG.NOTIFICATION_COLLECTION
+        NOTIFICATION_CONFIG.NOTIFICATION_COLLECTION,
       );
 
       await addDoc(notificationDoc, {
         userId,
         title: notification.title,
         body: notification.body,
-        type: notification.type || 'test',
+        type: notification.type || "test",
         data: notification.data || {},
         createdAt: new Date(),
         sent: false,
         read: false,
       });
 
-      this.logInfo('Test notification queued');
+      this.logInfo("Test notification queued");
     } catch (error) {
-      this.handleError('Error sending test notification', error);
+      this.handleError("Error sending test notification", error);
       throw error;
     }
   }
@@ -563,9 +562,9 @@ class MessagingService {
   // Utility methods
   getPlatform() {
     const { userAgent } = navigator;
-    if (userAgent.includes('Mobile')) return 'mobile';
-    if (userAgent.includes('Tablet')) return 'tablet';
-    return 'desktop';
+    if (userAgent.includes("Mobile")) return "mobile";
+    if (userAgent.includes("Tablet")) return "tablet";
+    return "desktop";
   }
 
   isNotificationSupported() {
@@ -587,7 +586,7 @@ class MessagingService {
       const newToken = await this.getRegistrationToken(userId);
       return newToken;
     } catch (error) {
-      this.handleError('Error refreshing token', error);
+      this.handleError("Error refreshing token", error);
       throw error;
     }
   }
@@ -597,14 +596,14 @@ class MessagingService {
       const tokenDoc = doc(
         this.db,
         NOTIFICATION_CONFIG.TOKEN_COLLECTION,
-        userId
+        userId,
       );
       await updateDoc(tokenDoc, {
         isActive: false,
         deactivatedAt: new Date(),
       });
     } catch (error) {
-      this.handleError('Error marking token inactive', error);
+      this.handleError("Error marking token inactive", error);
     }
   }
 

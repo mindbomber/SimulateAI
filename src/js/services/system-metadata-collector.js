@@ -7,7 +7,7 @@ import {
   METRIC_CALCULATIONS,
   METRIC_TYPES,
   PRIVACY_RULES,
-} from '../data/system-metadata-schema.js';
+} from "../data/system-metadata-schema.js";
 
 /**
  * Constants for system metadata collection
@@ -74,7 +74,7 @@ export class SystemMetadataCollector {
     setInterval(() => this.flushBatch(), this.BATCH_TIMEOUT_MS);
 
     // Clean up on page unload
-    window.addEventListener('beforeunload', () => this.endSession());
+    window.addEventListener("beforeunload", () => this.endSession());
   }
 
   /**
@@ -105,14 +105,14 @@ export class SystemMetadataCollector {
 
     // Update session tracking
     switch (action) {
-      case 'view':
+      case "view":
         this.sessionData.scenariosViewed.push({
           scenarioId,
           timestamp: new Date(),
           timeSpent: 0, // Will be updated when user leaves
         });
         break;
-      case 'complete':
+      case "complete":
         this.sessionData.scenariosCompleted.push({
           scenarioId,
           timestamp: new Date(),
@@ -120,12 +120,12 @@ export class SystemMetadataCollector {
           rating: metadata.rating,
         });
         break;
-      case 'abandon':
+      case "abandon":
         this.sessionData.scenariosAbandoned.push({
           scenarioId,
           timestamp: new Date(),
           timeSpent: metadata.timeSpent || 0,
-          stage: metadata.stage || 'unknown',
+          stage: metadata.stage || "unknown",
         });
         break;
     }
@@ -185,7 +185,7 @@ export class SystemMetadataCollector {
     // Track for session analytics
     const navigationMetric = {
       type: METRIC_TYPES.SESSION_TRACKING,
-      action: 'navigation',
+      action: "navigation",
       from,
       to,
       timestamp: new Date(),
@@ -221,7 +221,7 @@ export class SystemMetadataCollector {
     // Add to batch for analysis
     const interactionMetric = {
       type: METRIC_TYPES.SESSION_TRACKING,
-      action: 'interaction',
+      action: "interaction",
       element,
       interactionType: action,
       duration,
@@ -242,7 +242,7 @@ export class SystemMetadataCollector {
       updateType, // 'user_registration', 'content_creation', 'system_performance'
       data,
       timestamp: new Date(),
-      source: 'system_collector',
+      source: "system_collector",
     };
 
     this.addToBatch(platformMetric);
@@ -261,7 +261,7 @@ export class SystemMetadataCollector {
     }
 
     // Monitor errors
-    window.addEventListener('error', event => {
+    window.addEventListener("error", (event) => {
       this.performanceMetrics.errors.push({
         message: event.message,
         filename: event.filename,
@@ -271,9 +271,9 @@ export class SystemMetadataCollector {
     });
 
     // Monitor unhandled promise rejections
-    window.addEventListener('unhandledrejection', event => {
+    window.addEventListener("unhandledrejection", (event) => {
       this.performanceMetrics.errors.push({
-        message: 'Unhandled Promise Rejection',
+        message: "Unhandled Promise Rejection",
         reason: event.reason,
         timestamp: new Date(),
       });
@@ -334,7 +334,7 @@ export class SystemMetadataCollector {
     // Add noise to prevent inference attacks
     const addNoise = (
       value,
-      noiseLevel = PRIVACY_RULES.anonymization.noiseAddition
+      noiseLevel = PRIVACY_RULES.anonymization.noiseAddition,
     ) => {
       const noise =
         (Math.random() - SYSTEM_CONSTANTS.NOISE_RANDOM_OFFSET) *
@@ -351,10 +351,10 @@ export class SystemMetadataCollector {
     const protectedData = { ...data };
     if (protectedData.sessionMetrics) {
       protectedData.sessionMetrics.duration = addNoise(
-        protectedData.sessionMetrics.duration
+        protectedData.sessionMetrics.duration,
       );
       protectedData.sessionMetrics.engagementScore = addNoise(
-        protectedData.sessionMetrics.engagementScore
+        protectedData.sessionMetrics.engagementScore,
       );
     }
 
@@ -377,7 +377,7 @@ export class SystemMetadataCollector {
     } else if (!this.batchTimeout) {
       this.batchTimeout = setTimeout(
         () => this.flushBatch(),
-        this.BATCH_TIMEOUT_MS
+        this.BATCH_TIMEOUT_MS,
       );
     }
   }
@@ -407,7 +407,7 @@ export class SystemMetadataCollector {
       // Silent fail for metrics - don't interrupt user experience
       // Could send to error tracking service in production
       if (this.firebaseService?.logError) {
-        this.firebaseService.logError('Failed to flush metrics batch', error);
+        this.firebaseService.logError("Failed to flush metrics batch", error);
       }
       // Re-queue failed batch items
       this.batchQueue.unshift(...batch);
@@ -419,7 +419,7 @@ export class SystemMetadataCollector {
    */
   storeBatchLocally(batch) {
     const existingData = JSON.parse(
-      localStorage.getItem('systemMetrics') || '[]'
+      localStorage.getItem("systemMetrics") || "[]",
     );
     existingData.push(...batch);
 
@@ -427,11 +427,11 @@ export class SystemMetadataCollector {
     if (existingData.length > SYSTEM_CONSTANTS.MAX_LOCAL_ENTRIES) {
       existingData.splice(
         0,
-        existingData.length - SYSTEM_CONSTANTS.MAX_LOCAL_ENTRIES
+        existingData.length - SYSTEM_CONSTANTS.MAX_LOCAL_ENTRIES,
       );
     }
 
-    localStorage.setItem('systemMetrics', JSON.stringify(existingData));
+    localStorage.setItem("systemMetrics", JSON.stringify(existingData));
   }
 
   /**
@@ -450,7 +450,7 @@ export class SystemMetadataCollector {
     const hashInput = this.sessionData.sessionId + new Date().toDateString();
     const encodedHash = btoa(hashInput).substring(
       0,
-      SYSTEM_CONSTANTS.HASH_LENGTH
+      SYSTEM_CONSTANTS.HASH_LENGTH,
     );
     return `anon_${encodedHash}`;
   }
@@ -467,14 +467,14 @@ export class SystemMetadataCollector {
   }
 
   detectDeviceType() {
-    if (/Mobi|Android/i.test(navigator.userAgent)) return 'mobile';
-    if (/Tablet|iPad/i.test(navigator.userAgent)) return 'tablet';
-    return 'desktop';
+    if (/Mobi|Android/i.test(navigator.userAgent)) return "mobile";
+    if (/Tablet|iPad/i.test(navigator.userAgent)) return "tablet";
+    return "desktop";
   }
 
   calculateAverageDecisionTime() {
     const decisions = this.sessionData.interactions.filter(
-      i => i.action === 'click' && i.element.includes('decision')
+      (i) => i.action === "click" && i.element.includes("decision"),
     );
     if (decisions.length === 0) return 0;
 
@@ -494,7 +494,7 @@ export class SystemMetadataCollector {
     if (this.performanceMetrics.loadTimes.length === 0) return 0;
     const total = this.performanceMetrics.loadTimes.reduce(
       (sum, time) => sum + time,
-      0
+      0,
     );
     return Math.round(total / this.performanceMetrics.loadTimes.length);
   }
@@ -506,29 +506,30 @@ export class SystemMetadataCollector {
       SYSTEM_CONSTANTS.SECONDS_TO_MINUTES;
     return sessionDurationMinutes > 0
       ? Math.round(
-          this.sessionData.interactions.length / sessionDurationMinutes
+          this.sessionData.interactions.length / sessionDurationMinutes,
         )
       : 0;
   }
 
   analyzeNavigationPattern() {
     const pathLength = this.sessionData.navigationPath.length;
-    if (pathLength < SYSTEM_CONSTANTS.MIN_PATH_LENGTH) return 'exploratory';
+    if (pathLength < SYSTEM_CONSTANTS.MIN_PATH_LENGTH) return "exploratory";
 
-    const uniquePages = new Set(this.sessionData.navigationPath.map(p => p.to))
-      .size;
+    const uniquePages = new Set(
+      this.sessionData.navigationPath.map((p) => p.to),
+    ).size;
     const explorationRatio = uniquePages / pathLength;
 
     if (explorationRatio > SYSTEM_CONSTANTS.EXPLORATORY_THRESHOLD)
-      return 'exploratory';
-    if (explorationRatio > SYSTEM_CONSTANTS.MIXED_THRESHOLD) return 'mixed';
-    return 'focused';
+      return "exploratory";
+    if (explorationRatio > SYSTEM_CONSTANTS.MIXED_THRESHOLD) return "mixed";
+    return "focused";
   }
 
   analyzeContentPreferences() {
     const categoryViews = {};
-    this.sessionData.scenariosViewed.forEach(scenario => {
-      const category = scenario.categoryId || 'unknown';
+    this.sessionData.scenariosViewed.forEach((scenario) => {
+      const category = scenario.categoryId || "unknown";
       categoryViews[category] = (categoryViews[category] || 0) + 1;
     });
 
@@ -540,28 +541,28 @@ export class SystemMetadataCollector {
 
   setupEventListeners() {
     // Track page visibility changes
-    document.addEventListener('visibilitychange', () => {
+    document.addEventListener("visibilitychange", () => {
       this.trackInteraction({
-        element: 'page',
-        action: document.hidden ? 'blur' : 'focus',
+        element: "page",
+        action: document.hidden ? "blur" : "focus",
         metadata: { visibility: document.visibilityState },
       });
     });
 
     // Track scroll behavior
     let scrollTimeout;
-    window.addEventListener('scroll', () => {
+    window.addEventListener("scroll", () => {
       clearTimeout(scrollTimeout);
       scrollTimeout = setTimeout(() => {
         this.trackInteraction({
-          element: 'page',
-          action: 'scroll',
+          element: "page",
+          action: "scroll",
           metadata: {
             scrollY: window.scrollY,
             scrollPercent: Math.round(
               (window.scrollY /
                 (document.documentElement.scrollHeight - window.innerHeight)) *
-                100
+                100,
             ),
           },
         });
@@ -571,8 +572,8 @@ export class SystemMetadataCollector {
 
   startSession() {
     this.trackInteraction({
-      element: 'session',
-      action: 'start',
+      element: "session",
+      action: "start",
       metadata: {
         referrer: document.referrer,
         deviceInfo: this.sessionData.deviceInfo,
@@ -584,8 +585,8 @@ export class SystemMetadataCollector {
     const sessionInsights = this.generateAnonymizedInsights();
 
     this.trackInteraction({
-      element: 'session',
-      action: 'end',
+      element: "session",
+      action: "end",
       metadata: sessionInsights,
     });
 
@@ -601,7 +602,7 @@ export class SystemMetadataCollector {
   }
 
   exportLocalData() {
-    const localData = JSON.parse(localStorage.getItem('systemMetrics') || '[]');
+    const localData = JSON.parse(localStorage.getItem("systemMetrics") || "[]");
     return {
       sessionData: this.sessionData,
       performanceMetrics: this.performanceMetrics,

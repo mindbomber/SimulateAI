@@ -28,14 +28,14 @@ export class BlogCommentSystem {
       // Set up event listeners
       this.setupEventListeners();
     } catch (error) {
-      console.error('Error initializing comment system:', error);
+      console.error("Error initializing comment system:", error);
     }
   }
 
   async checkAuthStatus() {
     // This would integrate with your auth service
     // For now, we'll simulate auth check
-    const user = localStorage.getItem('currentUser');
+    const user = localStorage.getItem("currentUser");
     this.isAuthenticated = !!user;
     this.currentUser = user ? JSON.parse(user) : null;
   }
@@ -47,7 +47,7 @@ export class BlogCommentSystem {
       const storedComments = localStorage.getItem(`comments_${this.postId}`);
       this.comments = storedComments ? JSON.parse(storedComments) : [];
     } catch (error) {
-      console.error('Error loading comments:', error);
+      console.error("Error loading comments:", error);
       this.comments = [];
     }
   }
@@ -56,10 +56,10 @@ export class BlogCommentSystem {
     try {
       localStorage.setItem(
         `comments_${this.postId}`,
-        JSON.stringify(this.comments)
+        JSON.stringify(this.comments),
       );
     } catch (error) {
-      console.error('Error saving comments:', error);
+      console.error("Error saving comments:", error);
     }
   }
 
@@ -112,8 +112,8 @@ export class BlogCommentSystem {
       <div class="comment-form">
         <div class="form-header">
           <div class="user-info">
-            <div class="user-avatar">${this.currentUser?.displayName?.charAt(0)?.toUpperCase() || 'U'}</div>
-            <span class="user-name">${this.currentUser?.displayName || 'Anonymous'}</span>
+            <div class="user-avatar">${this.currentUser?.displayName?.charAt(0)?.toUpperCase() || "U"}</div>
+            <span class="user-name">${this.currentUser?.displayName || "Anonymous"}</span>
           </div>
         </div>
         
@@ -166,8 +166,8 @@ export class BlogCommentSystem {
 
     return this.comments
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-      .map(comment => this.renderComment(comment))
-      .join('');
+      .map((comment) => this.renderComment(comment))
+      .join("");
   }
 
   renderComment(comment) {
@@ -180,12 +180,12 @@ export class BlogCommentSystem {
         <div class="comment-content">
           <div class="comment-header">
             <div class="comment-author">
-              <div class="author-avatar">${comment.authorName?.charAt(0)?.toUpperCase() || 'A'}</div>
+              <div class="author-avatar">${comment.authorName?.charAt(0)?.toUpperCase() || "A"}</div>
               <div class="author-info">
-                <span class="author-name">${comment.authorName || 'Anonymous'}</span>
+                <span class="author-name">${comment.authorName || "Anonymous"}</span>
                 <span class="comment-meta">
                   <time class="comment-time">${timeAgo}</time>
-                  ${comment.isEdited ? '<span class="edited-indicator">(edited)</span>' : ''}
+                  ${comment.isEdited ? '<span class="edited-indicator">(edited)</span>' : ""}
                 </span>
               </div>
             </div>
@@ -203,7 +203,7 @@ export class BlogCommentSystem {
                   Delete
                 </button>
               `
-                  : ''
+                  : ""
               }
               <button class="comment-action-btn reply-comment" data-comment-id="${comment.id}">
                 <span class="action-icon">↩️</span>
@@ -218,7 +218,7 @@ export class BlogCommentSystem {
           
           <div class="comment-footer">
             <div class="comment-reactions">
-              <button class="reaction-btn like-btn ${comment.userLiked ? 'liked' : ''}" 
+              <button class="reaction-btn like-btn ${comment.userLiked ? "liked" : ""}" 
                       data-comment-id="${comment.id}">
                 <span class="reaction-icon">👍</span>
                 <span class="reaction-count">${comment.likes || 0}</span>
@@ -231,10 +231,10 @@ export class BlogCommentSystem {
           comment.replies && comment.replies.length > 0
             ? `
           <div class="comment-replies">
-            ${comment.replies.map(reply => this.renderReply(reply)).join('')}
+            ${comment.replies.map((reply) => this.renderReply(reply)).join("")}
           </div>
         `
-            : ''
+            : ""
         }
       </div>
     `;
@@ -250,8 +250,8 @@ export class BlogCommentSystem {
         <div class="reply-content">
           <div class="reply-header">
             <div class="reply-author">
-              <div class="author-avatar small">${reply.authorName?.charAt(0)?.toUpperCase() || 'A'}</div>
-              <span class="author-name">${reply.authorName || 'Anonymous'}</span>
+              <div class="author-avatar small">${reply.authorName?.charAt(0)?.toUpperCase() || "A"}</div>
+              <span class="author-name">${reply.authorName || "Anonymous"}</span>
               <span class="reply-time">${timeAgo}</span>
             </div>
             
@@ -264,7 +264,7 @@ export class BlogCommentSystem {
                 </button>
               </div>
             `
-                : ''
+                : ""
             }
           </div>
           
@@ -278,38 +278,40 @@ export class BlogCommentSystem {
 
   setupEventListeners() {
     // Comment form submission
-    const commentForm = document.getElementById('comment-form');
+    const commentForm = document.getElementById("comment-form");
     if (commentForm) {
-      commentForm.addEventListener('submit', e => this.handleCommentSubmit(e));
+      commentForm.addEventListener("submit", (e) =>
+        this.handleCommentSubmit(e),
+      );
     }
 
     // Character counter
-    const textarea = document.getElementById('comment-content');
+    const textarea = document.getElementById("comment-content");
     if (textarea) {
-      textarea.addEventListener('input', e =>
-        this.updateCharacterCount(e.target.value)
+      textarea.addEventListener("input", (e) =>
+        this.updateCharacterCount(e.target.value),
       );
     }
 
     // Comment actions
-    this.container.addEventListener('click', e => {
-      const target = e.target.closest('button');
+    this.container.addEventListener("click", (e) => {
+      const target = e.target.closest("button");
       if (!target) return;
 
       const { commentId } = target.dataset;
       const { replyId } = target.dataset;
 
-      if (target.classList.contains('like-btn')) {
+      if (target.classList.contains("like-btn")) {
         this.handleLike(commentId);
-      } else if (target.classList.contains('reply-comment')) {
+      } else if (target.classList.contains("reply-comment")) {
         this.handleReply(commentId);
-      } else if (target.classList.contains('edit-comment')) {
+      } else if (target.classList.contains("edit-comment")) {
         this.handleEdit(commentId);
-      } else if (target.classList.contains('delete-comment')) {
+      } else if (target.classList.contains("delete-comment")) {
         this.handleDelete(commentId);
-      } else if (target.classList.contains('delete-reply')) {
+      } else if (target.classList.contains("delete-reply")) {
         this.handleDeleteReply(replyId);
-      } else if (target.id === 'refresh-comments') {
+      } else if (target.id === "refresh-comments") {
         this.refreshComments();
       }
     });
@@ -318,7 +320,7 @@ export class BlogCommentSystem {
   async handleCommentSubmit(e) {
     e.preventDefault();
 
-    const content = document.getElementById('comment-content').value.trim();
+    const content = document.getElementById("comment-content").value.trim();
     if (!content) return;
 
     try {
@@ -338,23 +340,23 @@ export class BlogCommentSystem {
       await this.saveComments();
 
       // Clear form
-      document.getElementById('comment-content').value = '';
-      this.updateCharacterCount('');
+      document.getElementById("comment-content").value = "";
+      this.updateCharacterCount("");
 
       // Re-render
       this.render();
       this.setupEventListeners();
 
       // Show success message
-      this.showMessage('Comment posted successfully!', 'success');
+      this.showMessage("Comment posted successfully!", "success");
     } catch (error) {
-      console.error('Error posting comment:', error);
-      this.showMessage('Failed to post comment. Please try again.', 'error');
+      console.error("Error posting comment:", error);
+      this.showMessage("Failed to post comment. Please try again.", "error");
     }
   }
 
   handleLike(commentId) {
-    const comment = this.comments.find(c => c.id === commentId);
+    const comment = this.comments.find((c) => c.id === commentId);
     if (!comment) return;
 
     // Toggle like status
@@ -369,10 +371,10 @@ export class BlogCommentSystem {
   async handleReply(commentId) {
     // For now, we'll use a simple prompt. In a real implementation,
     // you'd show an inline reply form
-    const replyContent = prompt('Enter your reply:');
+    const replyContent = prompt("Enter your reply:");
     if (!replyContent) return;
 
-    const comment = this.comments.find(c => c.id === commentId);
+    const comment = this.comments.find((c) => c.id === commentId);
     if (!comment) return;
 
     if (!comment.replies) comment.replies = [];
@@ -392,14 +394,14 @@ export class BlogCommentSystem {
     this.render();
     this.setupEventListeners();
 
-    this.showMessage('Reply posted successfully!', 'success');
+    this.showMessage("Reply posted successfully!", "success");
   }
 
   async handleEdit(commentId) {
-    const comment = this.comments.find(c => c.id === commentId);
+    const comment = this.comments.find((c) => c.id === commentId);
     if (!comment) return;
 
-    const newContent = prompt('Edit your comment:', comment.content);
+    const newContent = prompt("Edit your comment:", comment.content);
     if (!newContent || newContent === comment.content) return;
 
     comment.content = newContent;
@@ -411,27 +413,27 @@ export class BlogCommentSystem {
     this.render();
     this.setupEventListeners();
 
-    this.showMessage('Comment updated successfully!', 'success');
+    this.showMessage("Comment updated successfully!", "success");
   }
 
   async handleDelete(commentId) {
-    if (!confirm('Are you sure you want to delete this comment?')) return;
+    if (!confirm("Are you sure you want to delete this comment?")) return;
 
-    this.comments = this.comments.filter(c => c.id !== commentId);
+    this.comments = this.comments.filter((c) => c.id !== commentId);
     await this.saveComments();
 
     this.render();
     this.setupEventListeners();
 
-    this.showMessage('Comment deleted successfully!', 'success');
+    this.showMessage("Comment deleted successfully!", "success");
   }
 
   async handleDeleteReply(replyId) {
-    if (!confirm('Are you sure you want to delete this reply?')) return;
+    if (!confirm("Are you sure you want to delete this reply?")) return;
 
-    this.comments.forEach(comment => {
+    this.comments.forEach((comment) => {
       if (comment.replies) {
-        comment.replies = comment.replies.filter(r => r.id !== replyId);
+        comment.replies = comment.replies.filter((r) => r.id !== replyId);
       }
     });
 
@@ -440,27 +442,27 @@ export class BlogCommentSystem {
     this.render();
     this.setupEventListeners();
 
-    this.showMessage('Reply deleted successfully!', 'success');
+    this.showMessage("Reply deleted successfully!", "success");
   }
 
   async refreshComments() {
     await this.loadComments();
     this.render();
     this.setupEventListeners();
-    this.showMessage('Comments refreshed!', 'info');
+    this.showMessage("Comments refreshed!", "info");
   }
 
   updateCharacterCount(value) {
-    const charCount = document.getElementById('char-count');
+    const charCount = document.getElementById("char-count");
     if (charCount) {
       charCount.textContent = value.length;
 
       // Add warning style if approaching limit
       const container = charCount.parentElement;
       if (value.length > 900) {
-        container.classList.add('warning');
+        container.classList.add("warning");
       } else {
-        container.classList.remove('warning');
+        container.classList.remove("warning");
       }
     }
   }
@@ -469,7 +471,7 @@ export class BlogCommentSystem {
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
 
-    if (diffInSeconds < 60) return 'just now';
+    if (diffInSeconds < 60) return "just now";
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
     if (diffInSeconds < 86400)
       return `${Math.floor(diffInSeconds / 3600)}h ago`;
@@ -480,34 +482,34 @@ export class BlogCommentSystem {
   }
 
   escapeHtml(text) {
-    const div = document.createElement('div');
+    const div = document.createElement("div");
     div.textContent = text;
     return div.innerHTML;
   }
 
-  showMessage(message, type = 'info') {
+  showMessage(message, type = "info") {
     // Create a simple toast notification
-    const toast = document.createElement('div');
+    const toast = document.createElement("div");
     toast.className = `comment-toast ${type}`;
     toast.textContent = message;
 
     document.body.appendChild(toast);
 
     setTimeout(() => {
-      toast.classList.add('show');
+      toast.classList.add("show");
     }, 100);
 
     setTimeout(() => {
-      toast.classList.remove('show');
+      toast.classList.remove("show");
       setTimeout(() => document.body.removeChild(toast), 300);
     }, 3000);
   }
 }
 
 // Auto-initialize comment systems on blog posts
-document.addEventListener('DOMContentLoaded', () => {
-  const commentContainers = document.querySelectorAll('[data-comment-system]');
-  commentContainers.forEach(container => {
+document.addEventListener("DOMContentLoaded", () => {
+  const commentContainers = document.querySelectorAll("[data-comment-system]");
+  commentContainers.forEach((container) => {
     const { postId } = container.dataset;
     if (postId) {
       new BlogCommentSystem(postId, container.id);

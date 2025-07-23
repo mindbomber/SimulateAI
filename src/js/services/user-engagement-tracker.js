@@ -20,30 +20,30 @@
  * Provides detailed insights for app improvement and user experience optimization
  */
 
-import AnalyticsManager from '../utils/analytics.js';
-import logger from '../utils/logger.js';
-import regionalAnalytics from './regional-analytics.js';
+import AnalyticsManager from "../utils/analytics.js";
+import logger from "../utils/logger.js";
+import regionalAnalytics from "./regional-analytics.js";
 
 // Constants for tracking
 const TRACKING_CONSTANTS = {
   SETTINGS_PANEL: {
     INTERACTIONS: {
-      OPEN: 'settings_panel_open',
-      CLOSE: 'settings_panel_close',
-      SETTING_CHANGE: 'settings_panel_setting_change',
-      TAB_SWITCH: 'settings_panel_tab_switch',
-      HOVER: 'settings_panel_hover',
-      SEARCH: 'settings_panel_search',
-      RESET: 'settings_panel_reset',
-      EXPORT: 'settings_panel_export',
-      IMPORT: 'settings_panel_import',
+      OPEN: "settings_panel_open",
+      CLOSE: "settings_panel_close",
+      SETTING_CHANGE: "settings_panel_setting_change",
+      TAB_SWITCH: "settings_panel_tab_switch",
+      HOVER: "settings_panel_hover",
+      SEARCH: "settings_panel_search",
+      RESET: "settings_panel_reset",
+      EXPORT: "settings_panel_export",
+      IMPORT: "settings_panel_import",
     },
     TABS: {
-      APPEARANCE: 'appearance',
-      ACCESSIBILITY: 'accessibility',
-      PRIVACY: 'privacy',
-      NOTIFICATIONS: 'notifications',
-      ADVANCED: 'advanced',
+      APPEARANCE: "appearance",
+      ACCESSIBILITY: "accessibility",
+      PRIVACY: "privacy",
+      NOTIFICATIONS: "notifications",
+      ADVANCED: "advanced",
     },
     ENGAGEMENT_THRESHOLDS: {
       QUICK_INTERACTION: 3000, // 3 seconds
@@ -69,28 +69,28 @@ const TRACKING_CONSTANTS = {
 
   USER_BEHAVIOR: {
     EVENTS: {
-      NAVIGATION: 'user_navigation',
-      FEATURE_DISCOVERY: 'feature_discovery',
-      WORKFLOW_COMPLETION: 'workflow_completion',
-      HELP_SEEKING: 'help_seeking',
-      CUSTOMIZATION: 'customization',
-      SHARING: 'sharing',
-      FEEDBACK: 'feedback',
+      NAVIGATION: "user_navigation",
+      FEATURE_DISCOVERY: "feature_discovery",
+      WORKFLOW_COMPLETION: "workflow_completion",
+      HELP_SEEKING: "help_seeking",
+      CUSTOMIZATION: "customization",
+      SHARING: "sharing",
+      FEEDBACK: "feedback",
     },
     PATTERNS: {
-      POWER_USER: 'power_user',
-      CASUAL_USER: 'casual_user',
-      EXPLORER: 'explorer',
-      GOAL_ORIENTED: 'goal_oriented',
-      CUSTOMIZER: 'customizer',
+      POWER_USER: "power_user",
+      CASUAL_USER: "casual_user",
+      EXPLORER: "explorer",
+      GOAL_ORIENTED: "goal_oriented",
+      CUSTOMIZER: "customizer",
     },
   },
 
   STORAGE_KEYS: {
-    USER_PROFILE: 'simulateai_user_profile',
-    ENGAGEMENT_METRICS: 'simulateai_engagement_metrics',
-    BEHAVIOR_PATTERNS: 'simulateai_behavior_patterns',
-    SETTINGS_USAGE: 'simulateai_settings_usage',
+    USER_PROFILE: "simulateai_user_profile",
+    ENGAGEMENT_METRICS: "simulateai_engagement_metrics",
+    BEHAVIOR_PATTERNS: "simulateai_behavior_patterns",
+    SETTINGS_USAGE: "simulateai_settings_usage",
   },
 
   TIMING: {
@@ -150,7 +150,7 @@ export class UserEngagementTracker {
     }
 
     this.isInitialized = true;
-    logger.info('UserEngagementTracker initialized');
+    logger.info("UserEngagementTracker initialized");
   }
 
   /**
@@ -161,13 +161,13 @@ export class UserEngagementTracker {
       ...this.userProfile,
       firstVisit: Date.now(),
       userId: this.generateUserId(),
-      userType: 'new',
+      userType: "new",
       onboardingCompleted: false,
       featureDiscoveryProgress: {},
     };
 
     this.saveUserProfile();
-    this.trackUserEvent('new_user_initialized', {
+    this.trackUserEvent("new_user_initialized", {
       userId: this.userProfile.userId,
       timestamp: this.userProfile.firstVisit,
     });
@@ -180,13 +180,13 @@ export class UserEngagementTracker {
    * @returns {Element|null} - The matching element or null
    */
   safeClosest(event, selector) {
-    if (!event || !event.target || typeof event.target.closest !== 'function') {
+    if (!event || !event.target || typeof event.target.closest !== "function") {
       return null;
     }
     try {
       return event.target.closest(selector);
     } catch (error) {
-      logger.warn('Error in safeClosest:', error);
+      logger.warn("Error in safeClosest:", error);
       return null;
     }
   }
@@ -216,44 +216,44 @@ export class UserEngagementTracker {
    */
   setupSettingsPanelTracking() {
     // Track settings panel open/close
-    document.addEventListener('click', event => {
-      if (this.safeClosest(event, '.settings-button')) {
+    document.addEventListener("click", (event) => {
+      if (this.safeClosest(event, ".settings-button")) {
         this.trackSettingsPanelOpen(event);
       }
 
-      if (this.safeClosest(event, '.settings-close')) {
+      if (this.safeClosest(event, ".settings-close")) {
         this.trackSettingsPanelClose(event);
       }
     });
 
     // Track settings changes
-    document.addEventListener('change', event => {
-      if (this.safeClosest(event, '.settings-panel')) {
+    document.addEventListener("change", (event) => {
+      if (this.safeClosest(event, ".settings-panel")) {
         this.trackSettingsChange(event);
       }
     });
 
     // Track tab switches in settings
-    document.addEventListener('click', event => {
-      if (this.safeClosest(event, '.settings-tab')) {
+    document.addEventListener("click", (event) => {
+      if (this.safeClosest(event, ".settings-tab")) {
         this.trackSettingsTabSwitch(event);
       }
     });
 
     // Track hover interactions
     document.addEventListener(
-      'mouseenter',
-      event => {
-        if (this.safeClosest(event, '.settings-panel')) {
+      "mouseenter",
+      (event) => {
+        if (this.safeClosest(event, ".settings-panel")) {
           this.trackSettingsHover(event);
         }
       },
-      true
+      true,
     );
 
     // Track search within settings
-    document.addEventListener('input', event => {
-      if (this.safeClosest(event, '.settings-search')) {
+    document.addEventListener("input", (event) => {
+      if (this.safeClosest(event, ".settings-search")) {
         this.trackSettingsSearch(event);
       }
     });
@@ -264,28 +264,28 @@ export class UserEngagementTracker {
    */
   setupGeneralInteractionTracking() {
     // Track clicks with detailed context
-    document.addEventListener('click', event => {
-      this.trackUserInteraction('click', event);
+    document.addEventListener("click", (event) => {
+      this.trackUserInteraction("click", event);
     });
 
     // Track keyboard navigation
-    document.addEventListener('keydown', event => {
-      if (event.key === 'Tab' || event.key === 'Enter' || event.key === ' ') {
-        this.trackUserInteraction('keyboard', event);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Tab" || event.key === "Enter" || event.key === " ") {
+        this.trackUserInteraction("keyboard", event);
       }
     });
 
     // Track form interactions
-    document.addEventListener('submit', event => {
-      this.trackUserInteraction('form_submit', event);
+    document.addEventListener("submit", (event) => {
+      this.trackUserInteraction("form_submit", event);
     });
 
     // Track scroll behavior
     let scrollTimeout;
-    window.addEventListener('scroll', () => {
+    window.addEventListener("scroll", () => {
       clearTimeout(scrollTimeout);
       scrollTimeout = setTimeout(() => {
-        this.trackUserInteraction('scroll', {
+        this.trackUserInteraction("scroll", {
           scrollY: window.scrollY,
           scrollHeight: document.documentElement.scrollHeight,
           viewportHeight: window.innerHeight,
@@ -299,32 +299,32 @@ export class UserEngagementTracker {
    */
   setupFeatureUsageTracking() {
     // Track scenario interactions
-    document.addEventListener('click', event => {
-      if (this.safeClosest(event, '.scenario-card')) {
-        this.trackFeatureUsage('scenario_selection', event);
+    document.addEventListener("click", (event) => {
+      if (this.safeClosest(event, ".scenario-card")) {
+        this.trackFeatureUsage("scenario_selection", event);
       }
 
-      if (this.safeClosest(event, '.simulation-start')) {
-        this.trackFeatureUsage('simulation_start', event);
+      if (this.safeClosest(event, ".simulation-start")) {
+        this.trackFeatureUsage("simulation_start", event);
       }
 
-      if (this.safeClosest(event, '.decision-option')) {
-        this.trackFeatureUsage('decision_making', event);
+      if (this.safeClosest(event, ".decision-option")) {
+        this.trackFeatureUsage("decision_making", event);
         this.trackScenarioDecisionWithRegionalContext(event);
       }
     });
 
     // Track search usage
-    document.addEventListener('input', event => {
-      if (this.safeClosest(event, '.search-input')) {
-        this.trackFeatureUsage('search', event);
+    document.addEventListener("input", (event) => {
+      if (this.safeClosest(event, ".search-input")) {
+        this.trackFeatureUsage("search", event);
       }
     });
 
     // Track filter usage
-    document.addEventListener('change', event => {
-      if (this.safeClosest(event, '.filter-control')) {
-        this.trackFeatureUsage('filtering', event);
+    document.addEventListener("change", (event) => {
+      if (this.safeClosest(event, ".filter-control")) {
+        this.trackFeatureUsage("filtering", event);
       }
     });
   }
@@ -344,11 +344,11 @@ export class UserEngagementTracker {
     };
 
     // Check for page changes (for SPA navigation)
-    window.addEventListener('popstate', checkPageChange);
+    window.addEventListener("popstate", checkPageChange);
 
     // Track menu navigation
-    document.addEventListener('click', event => {
-      if (this.safeClosest(event, '.nav-link')) {
+    document.addEventListener("click", (event) => {
+      if (this.safeClosest(event, ".nav-link")) {
         this.trackNavigation(window.location.pathname, event.target.href);
       }
     });
@@ -359,12 +359,12 @@ export class UserEngagementTracker {
    */
   setupPerformanceTracking() {
     // Track page load performance
-    window.addEventListener('load', () => {
+    window.addEventListener("load", () => {
       this.trackPerformanceMetrics();
     });
 
     // Track user-perceived performance
-    document.addEventListener('click', event => {
+    document.addEventListener("click", (event) => {
       const startTime = performance.now();
       requestAnimationFrame(() => {
         const endTime = performance.now();
@@ -387,16 +387,16 @@ export class UserEngagementTracker {
       userType: this.getUserType(),
       sessionDuration: Date.now() - this.currentSession.startTime,
       previousActions: this.getRecentActions(
-        TRACKING_CONSTANTS.ANALYSIS.RECENT_ACTIONS_COUNT
+        TRACKING_CONSTANTS.ANALYSIS.RECENT_ACTIONS_COUNT,
       ),
       context: this.getPageContext(),
     };
 
     this.trackUserEvent(
       TRACKING_CONSTANTS.SETTINGS_PANEL.INTERACTIONS.OPEN,
-      metadata
+      metadata,
     );
-    this.updateEngagementMetrics('settings_panel_opens');
+    this.updateEngagementMetrics("settings_panel_opens");
   }
 
   /**
@@ -421,9 +421,9 @@ export class UserEngagementTracker {
 
     this.trackUserEvent(
       TRACKING_CONSTANTS.SETTINGS_PANEL.INTERACTIONS.CLOSE,
-      metadata
+      metadata,
     );
-    this.updateSettingsUsage('panel_sessions', metadata);
+    this.updateSettingsUsage("panel_sessions", metadata);
   }
 
   /**
@@ -450,9 +450,9 @@ export class UserEngagementTracker {
 
     this.trackUserEvent(
       TRACKING_CONSTANTS.SETTINGS_PANEL.INTERACTIONS.SETTING_CHANGE,
-      metadata
+      metadata,
     );
-    this.updateSettingsUsage('setting_changes', metadata);
+    this.updateSettingsUsage("setting_changes", metadata);
     this.analyzeCustomizationBehavior(metadata);
   }
 
@@ -478,9 +478,9 @@ export class UserEngagementTracker {
 
     this.trackUserEvent(
       TRACKING_CONSTANTS.SETTINGS_PANEL.INTERACTIONS.TAB_SWITCH,
-      metadata
+      metadata,
     );
-    this.updateSettingsUsage('tab_switches', metadata);
+    this.updateSettingsUsage("tab_switches", metadata);
     this.updateTabSequence(newTab);
   }
 
@@ -502,7 +502,7 @@ export class UserEngagementTracker {
 
     this.trackUserEvent(
       TRACKING_CONSTANTS.SETTINGS_PANEL.INTERACTIONS.HOVER,
-      metadata
+      metadata,
     );
   }
 
@@ -514,7 +514,7 @@ export class UserEngagementTracker {
     const metadata = {
       searchTerm: searchTerm.substring(
         0,
-        TRACKING_CONSTANTS.ANALYSIS.TEXT_TRUNCATE_LENGTH
+        TRACKING_CONSTANTS.ANALYSIS.TEXT_TRUNCATE_LENGTH,
       ), // Limit for privacy
       searchLength: searchTerm.length,
       userType: this.getUserType(),
@@ -524,9 +524,9 @@ export class UserEngagementTracker {
 
     this.trackUserEvent(
       TRACKING_CONSTANTS.SETTINGS_PANEL.INTERACTIONS.SEARCH,
-      metadata
+      metadata,
     );
-    this.updateSettingsUsage('searches', metadata);
+    this.updateSettingsUsage("searches", metadata);
   }
 
   /**
@@ -548,7 +548,7 @@ export class UserEngagementTracker {
         className: eventOrData.target.className,
         text: eventOrData.target.textContent?.substring(
           0,
-          TRACKING_CONSTANTS.ANALYSIS.TEXT_TRUNCATE_LENGTH
+          TRACKING_CONSTANTS.ANALYSIS.TEXT_TRUNCATE_LENGTH,
         ),
       };
       metadata.coordinates = {
@@ -561,7 +561,7 @@ export class UserEngagementTracker {
 
     this.trackUserEvent(
       TRACKING_CONSTANTS.USER_BEHAVIOR.EVENTS.NAVIGATION,
-      metadata
+      metadata,
     );
     this.currentSession.interactions.push(metadata);
   }
@@ -589,9 +589,9 @@ export class UserEngagementTracker {
 
     this.trackUserEvent(
       TRACKING_CONSTANTS.USER_BEHAVIOR.EVENTS.FEATURE_DISCOVERY,
-      metadata
+      metadata,
     );
-    this.updateEngagementMetrics('features_used', featureName);
+    this.updateEngagementMetrics("features_used", featureName);
   }
 
   /**
@@ -609,9 +609,9 @@ export class UserEngagementTracker {
 
     this.trackUserEvent(
       TRACKING_CONSTANTS.USER_BEHAVIOR.EVENTS.NAVIGATION,
-      metadata
+      metadata,
     );
-    this.updateEngagementMetrics('page_views');
+    this.updateEngagementMetrics("page_views");
   }
 
   /**
@@ -626,13 +626,13 @@ export class UserEngagementTracker {
         performance.timing.navigationStart,
       firstPaint:
         performance
-          .getEntriesByType('paint')
-          .find(entry => entry.name === 'first-paint')?.startTime || 0,
+          .getEntriesByType("paint")
+          .find((entry) => entry.name === "first-paint")?.startTime || 0,
       userType: this.getUserType(),
       context: this.getPageContext(),
     };
 
-    this.trackUserEvent('performance_metrics', performanceData);
+    this.trackUserEvent("performance_metrics", performanceData);
   }
 
   /**
@@ -652,7 +652,7 @@ export class UserEngagementTracker {
         context: this.getPageContext(),
       };
 
-      this.trackUserEvent('interaction_performance', metadata);
+      this.trackUserEvent("interaction_performance", metadata);
     }
   }
 
@@ -693,7 +693,7 @@ export class UserEngagementTracker {
       TRACKING_CONSTANTS.ANALYSIS.MAX_STORED_ENTRIES
     ) {
       this.settingsUsage[category] = this.settingsUsage[category].slice(
-        -TRACKING_CONSTANTS.ANALYSIS.MAX_STORED_ENTRIES
+        -TRACKING_CONSTANTS.ANALYSIS.MAX_STORED_ENTRIES,
       );
     }
 
@@ -720,7 +720,7 @@ export class UserEngagementTracker {
     };
 
     this.saveBehaviorPatterns();
-    this.trackUserEvent('behavior_analysis', patterns);
+    this.trackUserEvent("behavior_analysis", patterns);
   }
 
   /**
@@ -736,7 +736,7 @@ export class UserEngagementTracker {
       accessibilityUsage: this.analyzeAccessibilityUsage(),
     };
 
-    this.trackUserEvent('insights_generated', insights);
+    this.trackUserEvent("insights_generated", insights);
     return insights;
   }
 
@@ -750,20 +750,20 @@ export class UserEngagementTracker {
       timeSpent <
       TRACKING_CONSTANTS.SETTINGS_PANEL.ENGAGEMENT_THRESHOLDS.QUICK_INTERACTION
     ) {
-      return 'quick';
+      return "quick";
     } else if (
       timeSpent <
       TRACKING_CONSTANTS.SETTINGS_PANEL.ENGAGEMENT_THRESHOLDS
         .ENGAGED_INTERACTION
     ) {
-      return 'engaged';
+      return "engaged";
     } else if (
       timeSpent <
       TRACKING_CONSTANTS.SETTINGS_PANEL.ENGAGEMENT_THRESHOLDS.DEEP_ENGAGEMENT
     ) {
-      return 'deep';
+      return "deep";
     }
-    return 'power_user';
+    return "power_user";
   }
 
   /**
@@ -803,7 +803,7 @@ export class UserEngagementTracker {
    * Get user type
    */
   getUserType() {
-    return this.userProfile.userType || 'unknown';
+    return this.userProfile.userType || "unknown";
   }
 
   /**
@@ -832,7 +832,7 @@ export class UserEngagementTracker {
     AnalyticsManager.trackEvent(eventName, {
       ...data,
       userId: this.userProfile.userId,
-      sessionId: this.currentSession.sessionId || 'unknown',
+      sessionId: this.currentSession.sessionId || "unknown",
       timestamp: Date.now(),
     });
   }
@@ -842,7 +842,7 @@ export class UserEngagementTracker {
    */
   startSessionTracking() {
     this.currentSession.sessionId = `session_${Date.now()}_${Math.random().toString(TRACKING_CONSTANTS.ANALYSIS.ID_GENERATION_BASE).substr(TRACKING_CONSTANTS.ANALYSIS.ID_GENERATION_SUBSTR_START, TRACKING_CONSTANTS.ANALYSIS.ID_GENERATION_LENGTH)}`;
-    this.updateEngagementMetrics('session_count');
+    this.updateEngagementMetrics("session_count");
   }
 
   /**
@@ -880,11 +880,11 @@ export class UserEngagementTracker {
   loadUserProfile() {
     try {
       const stored = localStorage.getItem(
-        TRACKING_CONSTANTS.STORAGE_KEYS.USER_PROFILE
+        TRACKING_CONSTANTS.STORAGE_KEYS.USER_PROFILE,
       );
       return stored ? JSON.parse(stored) : {};
     } catch (error) {
-      logger.error('Failed to load user profile:', error);
+      logger.error("Failed to load user profile:", error);
       return {};
     }
   }
@@ -893,21 +893,21 @@ export class UserEngagementTracker {
     try {
       localStorage.setItem(
         TRACKING_CONSTANTS.STORAGE_KEYS.USER_PROFILE,
-        JSON.stringify(this.userProfile)
+        JSON.stringify(this.userProfile),
       );
     } catch (error) {
-      logger.error('Failed to save user profile:', error);
+      logger.error("Failed to save user profile:", error);
     }
   }
 
   loadEngagementMetrics() {
     try {
       const stored = localStorage.getItem(
-        TRACKING_CONSTANTS.STORAGE_KEYS.ENGAGEMENT_METRICS
+        TRACKING_CONSTANTS.STORAGE_KEYS.ENGAGEMENT_METRICS,
       );
       return stored ? JSON.parse(stored) : {};
     } catch (error) {
-      logger.error('Failed to load engagement metrics:', error);
+      logger.error("Failed to load engagement metrics:", error);
       return {};
     }
   }
@@ -916,21 +916,21 @@ export class UserEngagementTracker {
     try {
       localStorage.setItem(
         TRACKING_CONSTANTS.STORAGE_KEYS.ENGAGEMENT_METRICS,
-        JSON.stringify(this.engagementMetrics)
+        JSON.stringify(this.engagementMetrics),
       );
     } catch (error) {
-      logger.error('Failed to save engagement metrics:', error);
+      logger.error("Failed to save engagement metrics:", error);
     }
   }
 
   loadBehaviorPatterns() {
     try {
       const stored = localStorage.getItem(
-        TRACKING_CONSTANTS.STORAGE_KEYS.BEHAVIOR_PATTERNS
+        TRACKING_CONSTANTS.STORAGE_KEYS.BEHAVIOR_PATTERNS,
       );
       return stored ? JSON.parse(stored) : {};
     } catch (error) {
-      logger.error('Failed to load behavior patterns:', error);
+      logger.error("Failed to load behavior patterns:", error);
       return {};
     }
   }
@@ -939,21 +939,21 @@ export class UserEngagementTracker {
     try {
       localStorage.setItem(
         TRACKING_CONSTANTS.STORAGE_KEYS.BEHAVIOR_PATTERNS,
-        JSON.stringify(this.behaviorPatterns)
+        JSON.stringify(this.behaviorPatterns),
       );
     } catch (error) {
-      logger.error('Failed to save behavior patterns:', error);
+      logger.error("Failed to save behavior patterns:", error);
     }
   }
 
   loadSettingsUsage() {
     try {
       const stored = localStorage.getItem(
-        TRACKING_CONSTANTS.STORAGE_KEYS.SETTINGS_USAGE
+        TRACKING_CONSTANTS.STORAGE_KEYS.SETTINGS_USAGE,
       );
       return stored ? JSON.parse(stored) : {};
     } catch (error) {
-      logger.error('Failed to load settings usage:', error);
+      logger.error("Failed to load settings usage:", error);
       return {};
     }
   }
@@ -962,10 +962,10 @@ export class UserEngagementTracker {
     try {
       localStorage.setItem(
         TRACKING_CONSTANTS.STORAGE_KEYS.SETTINGS_USAGE,
-        JSON.stringify(this.settingsUsage)
+        JSON.stringify(this.settingsUsage),
       );
     } catch (error) {
-      logger.error('Failed to save settings usage:', error);
+      logger.error("Failed to save settings usage:", error);
     }
   }
 
@@ -974,25 +974,25 @@ export class UserEngagementTracker {
    */
   trackScenarioDecisionWithRegionalContext(event) {
     try {
-      const decisionElement = this.safeClosest(event, '.decision-option');
+      const decisionElement = this.safeClosest(event, ".decision-option");
       if (!decisionElement) return;
 
       // Extract decision data from DOM
-      const scenarioContainer = decisionElement.closest('.scenario-container');
+      const scenarioContainer = decisionElement.closest(".scenario-container");
       const simulationContainer = decisionElement.closest(
-        '.simulation-container'
+        ".simulation-container",
       );
 
       const decisionData = {
         scenario:
-          scenarioContainer?.getAttribute('data-scenario-id') || 'unknown',
-        category: scenarioContainer?.getAttribute('data-category') || 'unknown',
+          scenarioContainer?.getAttribute("data-scenario-id") || "unknown",
+        category: scenarioContainer?.getAttribute("data-category") || "unknown",
         choice:
-          decisionElement.getAttribute('data-choice-id') ||
+          decisionElement.getAttribute("data-choice-id") ||
           decisionElement.textContent?.trim(),
         choiceText: decisionElement.textContent?.trim(),
         simulationId:
-          simulationContainer?.getAttribute('data-simulation-id') || 'unknown',
+          simulationContainer?.getAttribute("data-simulation-id") || "unknown",
         userId: this.userProfile.userId,
         sessionId: this.currentSession.sessionId,
         timestamp: Date.now(),
@@ -1004,7 +1004,7 @@ export class UserEngagementTracker {
         reasoning: this.extractUserReasoning(decisionElement),
 
         // User interaction metadata
-        interactionType: 'click',
+        interactionType: "click",
         responseTime: this.calculateResponseTime(scenarioContainer),
         confidence: this.extractConfidenceLevel(decisionElement),
         difficulty: this.extractDifficultyLevel(decisionElement),
@@ -1014,27 +1014,27 @@ export class UserEngagementTracker {
       regionalAnalytics.trackScenarioDecision(decisionData);
 
       // Also track with standard analytics
-      this.trackUserEvent('scenario_decision_regional', decisionData);
+      this.trackUserEvent("scenario_decision_regional", decisionData);
 
       // Update local engagement metrics
-      this.updateEngagementMetrics('scenario_decisions', 1);
+      this.updateEngagementMetrics("scenario_decisions", 1);
 
       // Dispatch custom event for other components
       document.dispatchEvent(
-        new CustomEvent('scenario-decision', {
+        new CustomEvent("scenario-decision", {
           detail: decisionData,
-        })
+        }),
       );
 
-      logger.debug('Scenario decision tracked with regional context:', {
+      logger.debug("Scenario decision tracked with regional context:", {
         scenario: decisionData.scenario,
         choice: decisionData.choice,
         userId: decisionData.userId,
       });
     } catch (error) {
       logger.error(
-        'Failed to track scenario decision with regional context:',
-        error
+        "Failed to track scenario decision with regional context:",
+        error,
       );
     }
   }
@@ -1044,10 +1044,10 @@ export class UserEngagementTracker {
    */
   extractEthicsImpact(decisionElement) {
     try {
-      const impactData = decisionElement.getAttribute('data-ethics-impact');
+      const impactData = decisionElement.getAttribute("data-ethics-impact");
       return impactData ? JSON.parse(impactData) : null;
     } catch (error) {
-      logger.warn('Failed to extract ethics impact:', error);
+      logger.warn("Failed to extract ethics impact:", error);
       return null;
     }
   }
@@ -1058,13 +1058,13 @@ export class UserEngagementTracker {
   extractUserReasoning(decisionElement) {
     try {
       const reasoningElement = decisionElement
-        .closest('.scenario-container')
-        ?.querySelector('.user-reasoning');
+        .closest(".scenario-container")
+        ?.querySelector(".user-reasoning");
       return (
         reasoningElement?.value || reasoningElement?.textContent?.trim() || null
       );
     } catch (error) {
-      logger.warn('Failed to extract user reasoning:', error);
+      logger.warn("Failed to extract user reasoning:", error);
       return null;
     }
   }
@@ -1075,11 +1075,11 @@ export class UserEngagementTracker {
   calculateResponseTime(scenarioContainer) {
     try {
       const startTime = parseInt(
-        scenarioContainer?.getAttribute('data-start-time') || '0'
+        scenarioContainer?.getAttribute("data-start-time") || "0",
       );
       return startTime ? Date.now() - startTime : null;
     } catch (error) {
-      logger.warn('Failed to calculate response time:', error);
+      logger.warn("Failed to calculate response time:", error);
       return null;
     }
   }
@@ -1090,13 +1090,13 @@ export class UserEngagementTracker {
   extractConfidenceLevel(decisionElement) {
     try {
       const confidenceElement = decisionElement
-        .closest('.scenario-container')
-        ?.querySelector('.confidence-slider');
+        .closest(".scenario-container")
+        ?.querySelector(".confidence-slider");
       return confidenceElement?.value
         ? parseFloat(confidenceElement.value)
         : null;
     } catch (error) {
-      logger.warn('Failed to extract confidence level:', error);
+      logger.warn("Failed to extract confidence level:", error);
       return null;
     }
   }
@@ -1107,13 +1107,13 @@ export class UserEngagementTracker {
   extractDifficultyLevel(decisionElement) {
     try {
       const difficultyElement = decisionElement
-        .closest('.scenario-container')
-        ?.querySelector('.difficulty-rating');
+        .closest(".scenario-container")
+        ?.querySelector(".difficulty-rating");
       return difficultyElement?.value
         ? parseFloat(difficultyElement.value)
         : null;
     } catch (error) {
-      logger.warn('Failed to extract difficulty level:', error);
+      logger.warn("Failed to extract difficulty level:", error);
       return null;
     }
   }
@@ -1135,7 +1135,7 @@ export class UserEngagementTracker {
       mostChangedSettings: this.getMostChangedSettings(),
       engagementLevel: this.calculateEngagementLevel(avgTimeSpent),
       customizationTendency:
-        totalChanges > 5 ? 'high' : totalChanges > 2 ? 'medium' : 'low',
+        totalChanges > 5 ? "high" : totalChanges > 2 ? "medium" : "low",
     };
   }
 
@@ -1156,10 +1156,10 @@ export class UserEngagementTracker {
       userType: this.determineUserType(),
       journeyStage:
         sessionCount < 3
-          ? 'new'
+          ? "new"
           : sessionCount < 10
-            ? 'exploring'
-            : 'established',
+            ? "exploring"
+            : "established",
     };
   }
 
@@ -1172,7 +1172,7 @@ export class UserEngagementTracker {
 
     if (settingsAnalysis.totalOpens > 5 && settingsAnalysis.totalChanges < 2) {
       painPoints.push(
-        'High settings exploration but low changes - possible UX confusion'
+        "High settings exploration but low changes - possible UX confusion",
       );
     }
 
@@ -1181,7 +1181,7 @@ export class UserEngagementTracker {
       settingsAnalysis.totalChanges < 3
     ) {
       painPoints.push(
-        'Long time in settings with few changes - possible difficulty finding options'
+        "Long time in settings with few changes - possible difficulty finding options",
       );
     }
 
@@ -1199,7 +1199,7 @@ export class UserEngagementTracker {
       totalFeatures: featuresUsed.length,
       adoptionRate: featuresUsed.length / 15, // Assuming 15 total features
       mostUsedFeatures: featuresUsed.slice(0, 5),
-      featureDiscoveryPattern: 'gradual', // Can be enhanced with more data
+      featureDiscoveryPattern: "gradual", // Can be enhanced with more data
     };
   }
 
@@ -1230,7 +1230,7 @@ export class UserEngagementTracker {
     const changes = this.settingsUsage.setting_changes || [];
     const settingCounts = {};
 
-    changes.forEach(change => {
+    changes.forEach((change) => {
       settingCounts[change.setting] = (settingCounts[change.setting] || 0) + 1;
     });
 

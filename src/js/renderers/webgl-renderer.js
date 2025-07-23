@@ -3,7 +3,7 @@
  * Provides hardware-accelerated 2D graphics using WebGL
  */
 
-import logger from '../utils/logger.js';
+import logger from "../utils/logger.js";
 
 // WebGL renderer constants
 const WEBGL_CONSTANTS = {
@@ -48,7 +48,7 @@ export class WebGLRenderer {
       pixelRatio: options.pixelRatio || window.devicePixelRatio || 1,
       alpha: options.alpha !== false,
       antialias: options.antialias !== false,
-      powerPreference: options.powerPreference || 'default',
+      powerPreference: options.powerPreference || "default",
       ...options,
     };
 
@@ -74,10 +74,10 @@ export class WebGLRenderer {
   initialize() {
     try {
       // Create canvas element
-      this.canvas = document.createElement('canvas');
-      this.canvas.style.width = '100%';
-      this.canvas.style.height = '100%';
-      this.canvas.style.display = 'block';
+      this.canvas = document.createElement("canvas");
+      this.canvas.style.width = "100%";
+      this.canvas.style.height = "100%";
+      this.canvas.style.display = "block";
 
       // Set canvas size with device pixel ratio
       this.canvas.width = this.options.width * this.options.pixelRatio;
@@ -85,14 +85,14 @@ export class WebGLRenderer {
 
       // Get WebGL context
       this.gl =
-        this.canvas.getContext('webgl', {
+        this.canvas.getContext("webgl", {
           alpha: this.options.alpha,
           antialias: this.options.antialias,
           powerPreference: this.options.powerPreference,
-        }) || this.canvas.getContext('experimental-webgl');
+        }) || this.canvas.getContext("experimental-webgl");
 
       if (!this.gl) {
-        throw new Error('WebGL not supported');
+        throw new Error("WebGL not supported");
       }
 
       // Setup WebGL state
@@ -102,15 +102,15 @@ export class WebGLRenderer {
       this.setupMatrices();
 
       // Add accessibility attributes
-      this.canvas.setAttribute('role', 'img');
-      this.canvas.setAttribute('aria-label', 'WebGL simulation graphics');
+      this.canvas.setAttribute("role", "img");
+      this.canvas.setAttribute("aria-label", "WebGL simulation graphics");
 
       // Append to container
       this.container.appendChild(this.canvas);
 
-      logger.info('WebGLRenderer: Initialized successfully');
+      logger.info("WebGLRenderer: Initialized successfully");
     } catch (error) {
-      logger.error('WebGLRenderer: Failed to initialize:', error);
+      logger.error("WebGLRenderer: Failed to initialize:", error);
       throw error;
     }
   }
@@ -170,26 +170,26 @@ export class WebGLRenderer {
 
     const program = this.createShaderProgram(
       vertexShaderSource,
-      fragmentShaderSource
+      fragmentShaderSource,
     );
-    this.programs.set('basic', program);
+    this.programs.set("basic", program);
 
     // Get attribute and uniform locations
     program.locations = {
       attributes: {
-        position: this.gl.getAttribLocation(program, 'a_position'),
-        texCoord: this.gl.getAttribLocation(program, 'a_texCoord'),
-        color: this.gl.getAttribLocation(program, 'a_color'),
+        position: this.gl.getAttribLocation(program, "a_position"),
+        texCoord: this.gl.getAttribLocation(program, "a_texCoord"),
+        color: this.gl.getAttribLocation(program, "a_color"),
       },
       uniforms: {
-        projection: this.gl.getUniformLocation(program, 'u_projection'),
-        model: this.gl.getUniformLocation(program, 'u_model'),
-        texture: this.gl.getUniformLocation(program, 'u_texture'),
-        useTexture: this.gl.getUniformLocation(program, 'u_useTexture'),
+        projection: this.gl.getUniformLocation(program, "u_projection"),
+        model: this.gl.getUniformLocation(program, "u_model"),
+        texture: this.gl.getUniformLocation(program, "u_texture"),
+        useTexture: this.gl.getUniformLocation(program, "u_useTexture"),
       },
     };
 
-    this.useProgram('basic');
+    this.useProgram("basic");
   }
 
   createShaderProgram(vertexSource, fragmentSource) {
@@ -198,7 +198,7 @@ export class WebGLRenderer {
     const vertexShader = this.createShader(gl.VERTEX_SHADER, vertexSource);
     const fragmentShader = this.createShader(
       gl.FRAGMENT_SHADER,
-      fragmentSource
+      fragmentSource,
     );
 
     const program = gl.createProgram();
@@ -235,13 +235,13 @@ export class WebGLRenderer {
     const { gl } = this;
 
     // Create vertex buffer
-    this.buffers.set('vertex', gl.createBuffer());
+    this.buffers.set("vertex", gl.createBuffer());
 
     // Create index buffer
-    this.buffers.set('index', gl.createBuffer());
+    this.buffers.set("index", gl.createBuffer());
 
     // Create a buffer for batched rendering
-    this.buffers.set('batch', gl.createBuffer());
+    this.buffers.set("batch", gl.createBuffer());
   }
 
   setupMatrices() {
@@ -252,7 +252,7 @@ export class WebGLRenderer {
       this.options.height,
       0,
       -1,
-      1
+      1,
     );
 
     // Initialize model matrix as identity
@@ -313,19 +313,19 @@ export class WebGLRenderer {
       this.gl.uniformMatrix4fv(
         program.locations.uniforms.projection,
         false,
-        this.projectionMatrix
+        this.projectionMatrix,
       );
       this.gl.uniformMatrix4fv(
         program.locations.uniforms.model,
         false,
-        this.modelMatrix
+        this.modelMatrix,
       );
     }
   }
 
   // Required methods for Visual Engine integration
   get type() {
-    return 'webgl';
+    return "webgl";
   }
 
   getElement() {
@@ -355,12 +355,12 @@ export class WebGLRenderer {
   addToBatch(object) {
     // Simple batching - add object data to buffer
     const batchItem = {
-      type: object.type || 'rect',
+      type: object.type || "rect",
       x: object.x || 0,
       y: object.y || 0,
       width: object.width || WEBGL_CONSTANTS.DEFAULT_OBJECT_SIZE,
       height: object.height || WEBGL_CONSTANTS.DEFAULT_OBJECT_SIZE,
-      color: this.parseColor(object.fill || '#ffffff'),
+      color: this.parseColor(object.fill || "#ffffff"),
       alpha: object.alpha !== undefined ? object.alpha : 1,
       rotation: object.rotation || 0,
       scale: object.scale || 1,
@@ -429,7 +429,7 @@ export class WebGLRenderer {
         color[0],
         color[1],
         color[2],
-        alpha
+        alpha,
       );
 
       // Indices for two triangles
@@ -440,22 +440,22 @@ export class WebGLRenderer {
         baseIndex + 2,
         baseIndex,
         baseIndex + 2,
-        baseIndex + WEBGL_CONSTANTS.TRIANGLE_VERTEX_COUNT
+        baseIndex + WEBGL_CONSTANTS.TRIANGLE_VERTEX_COUNT,
       );
 
       vertexIndex += WEBGL_CONSTANTS.VERTICES_PER_QUAD;
     });
 
     // Upload vertex data
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.get('batch'));
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.get("batch"));
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.DYNAMIC_DRAW);
 
     // Upload index data
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers.get('index'));
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers.get("index"));
     gl.bufferData(
       gl.ELEMENT_ARRAY_BUFFER,
       new Uint16Array(indices),
-      gl.DYNAMIC_DRAW
+      gl.DYNAMIC_DRAW,
     );
 
     // Setup vertex attributes
@@ -469,7 +469,7 @@ export class WebGLRenderer {
       gl.FLOAT,
       false,
       stride,
-      0
+      0,
     );
 
     gl.enableVertexAttribArray(program.locations.attributes.texCoord);
@@ -479,7 +479,7 @@ export class WebGLRenderer {
       gl.FLOAT,
       false,
       stride,
-      WEBGL_CONSTANTS.HEX_SLICE_START * WEBGL_CONSTANTS.BYTES_PER_FLOAT
+      WEBGL_CONSTANTS.HEX_SLICE_START * WEBGL_CONSTANTS.BYTES_PER_FLOAT,
     );
 
     gl.enableVertexAttribArray(program.locations.attributes.color);
@@ -489,7 +489,7 @@ export class WebGLRenderer {
       gl.FLOAT,
       false,
       stride,
-      WEBGL_CONSTANTS.VERTICES_PER_QUAD * WEBGL_CONSTANTS.BYTES_PER_FLOAT
+      WEBGL_CONSTANTS.VERTICES_PER_QUAD * WEBGL_CONSTANTS.BYTES_PER_FLOAT,
     );
 
     // Set uniforms
@@ -504,7 +504,7 @@ export class WebGLRenderer {
 
   parseColor(colorString) {
     // Simple color parsing - just handle hex colors for now
-    if (typeof colorString === 'string' && colorString.startsWith('#')) {
+    if (typeof colorString === "string" && colorString.startsWith("#")) {
       const hex = colorString.slice(1);
       if (hex.length === WEBGL_CONSTANTS.HEX_SHORT_LENGTH) {
         return [
@@ -519,21 +519,21 @@ export class WebGLRenderer {
         return [
           parseInt(
             hex.slice(0, WEBGL_CONSTANTS.HEX_SLICE_START),
-            WEBGL_CONSTANTS.HEX_RADIX
+            WEBGL_CONSTANTS.HEX_RADIX,
           ) / WEBGL_CONSTANTS.COLOR_COMPONENT_MAX,
           parseInt(
             hex.slice(
               WEBGL_CONSTANTS.HEX_SLICE_START,
-              WEBGL_CONSTANTS.HEX_SLICE_MID
+              WEBGL_CONSTANTS.HEX_SLICE_MID,
             ),
-            WEBGL_CONSTANTS.HEX_RADIX
+            WEBGL_CONSTANTS.HEX_RADIX,
           ) / WEBGL_CONSTANTS.COLOR_COMPONENT_MAX,
           parseInt(
             hex.slice(
               WEBGL_CONSTANTS.HEX_SLICE_MID,
-              WEBGL_CONSTANTS.HEX_SLICE_END
+              WEBGL_CONSTANTS.HEX_SLICE_END,
             ),
-            WEBGL_CONSTANTS.HEX_RADIX
+            WEBGL_CONSTANTS.HEX_RADIX,
           ) / WEBGL_CONSTANTS.COLOR_COMPONENT_MAX,
         ];
       }
@@ -564,7 +564,7 @@ export class WebGLRenderer {
         this.options.height,
         0,
         -1,
-        1
+        1,
       );
 
       // Update projection matrix in shader
@@ -572,7 +572,7 @@ export class WebGLRenderer {
         this.gl.uniformMatrix4fv(
           this.activeProgram.locations.uniforms.projection,
           false,
-          this.projectionMatrix
+          this.projectionMatrix,
         );
       }
     }
@@ -612,16 +612,16 @@ export class WebGLRenderer {
   destroy() {
     if (this.gl) {
       // Clean up WebGL resources
-      this.programs.forEach(program => this.gl.deleteProgram(program));
-      this.buffers.forEach(buffer => this.gl.deleteBuffer(buffer));
-      this.textures.forEach(texture => this.gl.deleteTexture(texture));
+      this.programs.forEach((program) => this.gl.deleteProgram(program));
+      this.buffers.forEach((buffer) => this.gl.deleteBuffer(buffer));
+      this.textures.forEach((texture) => this.gl.deleteTexture(texture));
     }
 
     if (this.canvas && this.canvas.parentNode) {
       this.canvas.parentNode.removeChild(this.canvas);
     }
 
-    logger.info('WebGLRenderer: Destroyed');
+    logger.info("WebGLRenderer: Destroyed");
   }
 }
 

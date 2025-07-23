@@ -196,7 +196,7 @@
 }
 
 /* ===== ACCESSIBILITY ===== */
-#simulation-modal[aria-hidden='true'] {
+#simulation-modal[aria-hidden="true"] {
   display: none !important;
 }
 
@@ -236,7 +236,7 @@
 }
 
 /* WebGL-specific context fixes */
-#simulation-modal .simulation-container canvas[data-engine='webgl'] {
+#simulation-modal .simulation-container canvas[data-engine="webgl"] {
   display: block !important;
   touch-action: manipulation !important;
 }

@@ -50,7 +50,7 @@ export class EventPatterns {
    * @returns {Function} Cleanup function
    */
   static delegate(container, selector, eventType, handler) {
-    const delegateHandler = event => {
+    const delegateHandler = (event) => {
       const target = event.target.closest(selector);
       if (target && container.contains(target)) {
         handler.call(target, event);
@@ -74,7 +74,7 @@ export class EventPatterns {
     const { onStart, onMove, onEnd, onCancel } = handlers;
 
     // Check for touch support
-    const hasTouch = 'ontouchstart' in window;
+    const hasTouch = "ontouchstart" in window;
 
     const events = {};
 
@@ -102,10 +102,10 @@ export class EventPatterns {
   static handleKeyboardNavigation(element, keyMap, options = {}) {
     const { preventDefault = true, stopPropagation = false } = options;
 
-    const keyHandler = event => {
+    const keyHandler = (event) => {
       const action = keyMap[event.key] || keyMap[event.code];
 
-      if (action && typeof action === 'function') {
+      if (action && typeof action === "function") {
         if (preventDefault) event.preventDefault();
         if (stopPropagation) event.stopPropagation();
         action(event);
@@ -164,8 +164,8 @@ export class EventPatterns {
       debounceDelay > 0 ? this.debounce(callback, debounceDelay) : callback;
 
     if (window.ResizeObserver) {
-      const observer = new ResizeObserver(entries => {
-        entries.forEach(entry => {
+      const observer = new ResizeObserver((entries) => {
+        entries.forEach((entry) => {
           debouncedCallback(entry.contentRect, entry.target);
         });
       });
@@ -180,10 +180,10 @@ export class EventPatterns {
         debouncedCallback(rect, element);
       };
 
-      window.addEventListener('resize', resizeHandler);
+      window.addEventListener("resize", resizeHandler);
 
       return () => {
-        window.removeEventListener('resize', resizeHandler);
+        window.removeEventListener("resize", resizeHandler);
       };
     }
   }
@@ -196,16 +196,16 @@ export class EventPatterns {
    * @returns {Function} Cleanup function
    */
   static observeIntersection(element, callback, options = {}) {
-    const { threshold = 0, rootMargin = '0px', root = null } = options;
+    const { threshold = 0, rootMargin = "0px", root = null } = options;
 
     if (window.IntersectionObserver) {
       const observer = new IntersectionObserver(
-        entries => {
-          entries.forEach(entry => {
+        (entries) => {
+          entries.forEach((entry) => {
             callback(entry.isIntersecting, entry);
           });
         },
-        { threshold, rootMargin, root }
+        { threshold, rootMargin, root },
       );
 
       observer.observe(element);
@@ -221,10 +221,10 @@ export class EventPatterns {
 
       // Check initially and on scroll
       checkVisibility();
-      window.addEventListener('scroll', checkVisibility);
+      window.addEventListener("scroll", checkVisibility);
 
       return () => {
-        window.removeEventListener('scroll', checkVisibility);
+        window.removeEventListener("scroll", checkVisibility);
       };
     }
   }
@@ -246,27 +246,27 @@ export class EventPatterns {
 
     const getFocusableElements = () => {
       const focusableSelectors = [
-        'button:not([disabled])',
-        'input:not([disabled])',
-        'select:not([disabled])',
-        'textarea:not([disabled])',
-        'a[href]',
+        "button:not([disabled])",
+        "input:not([disabled])",
+        "select:not([disabled])",
+        "textarea:not([disabled])",
+        "a[href]",
         '[tabindex]:not([tabindex="-1"])',
-      ].join(',');
+      ].join(",");
 
       return Array.from(container.querySelectorAll(focusableSelectors)).filter(
-        el => el.offsetParent !== null
+        (el) => el.offsetParent !== null,
       ); // Visible elements only
     };
 
-    const trapFocusHandler = event => {
+    const trapFocusHandler = (event) => {
       if (!trapFocus) return;
 
       const focusableElements = getFocusableElements();
       const firstElement = focusableElements[0];
       const lastElement = focusableElements[focusableElements.length - 1];
 
-      if (event.key === 'Tab') {
+      if (event.key === "Tab") {
         if (event.shiftKey) {
           if (document.activeElement === firstElement) {
             event.preventDefault();
@@ -287,12 +287,12 @@ export class EventPatterns {
       }
 
       if (trapFocus) {
-        container.addEventListener('keydown', trapFocusHandler);
+        container.addEventListener("keydown", trapFocusHandler);
       }
 
       // Set initial focus
       const focusTarget = initialFocus
-        ? typeof initialFocus === 'string'
+        ? typeof initialFocus === "string"
           ? container.querySelector(initialFocus)
           : initialFocus
         : getFocusableElements()[0];
@@ -304,7 +304,7 @@ export class EventPatterns {
 
     const deactivate = () => {
       if (trapFocus) {
-        container.removeEventListener('keydown', trapFocusHandler);
+        container.removeEventListener("keydown", trapFocusHandler);
       }
 
       if (restoreFocus && previousActiveElement) {
@@ -333,12 +333,12 @@ export class EventPatterns {
     const {
       dragData = null,
       ghostImage = null,
-      effectAllowed = 'move',
+      effectAllowed = "move",
     } = options;
 
-    const dragStartHandler = event => {
+    const dragStartHandler = (event) => {
       if (dragData) {
-        event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+        event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
       }
 
       if (ghostImage) {
@@ -352,13 +352,13 @@ export class EventPatterns {
       }
     };
 
-    const dragHandler = event => {
+    const dragHandler = (event) => {
       if (onDragMove) {
         onDragMove(event);
       }
     };
 
-    const dragEndHandler = event => {
+    const dragEndHandler = (event) => {
       if (onDragEnd) {
         onDragEnd(event);
       }
@@ -391,13 +391,13 @@ export class EventPatterns {
 
     const {
       acceptedTypes = [],
-      dropEffect = 'move',
-      highlightClass = 'drag-over',
+      dropEffect = "move",
+      highlightClass = "drag-over",
     } = options;
 
     let dragCounter = 0;
 
-    const dragEnterHandler = event => {
+    const dragEnterHandler = (event) => {
       event.preventDefault();
       dragCounter++;
 
@@ -409,7 +409,7 @@ export class EventPatterns {
       }
     };
 
-    const dragOverHandler = event => {
+    const dragOverHandler = (event) => {
       event.preventDefault();
       event.dataTransfer.dropEffect = dropEffect;
 
@@ -418,7 +418,7 @@ export class EventPatterns {
       }
     };
 
-    const dragLeaveHandler = event => {
+    const dragLeaveHandler = (event) => {
       dragCounter--;
 
       if (dragCounter === 0) {
@@ -429,15 +429,15 @@ export class EventPatterns {
       }
     };
 
-    const dropHandler = event => {
+    const dropHandler = (event) => {
       event.preventDefault();
       dragCounter = 0;
       element.classList.remove(highlightClass);
 
       // Check accepted types
       if (acceptedTypes.length > 0) {
-        const hasAcceptedType = acceptedTypes.some(type =>
-          event.dataTransfer.types.includes(type)
+        const hasAcceptedType = acceptedTypes.some((type) =>
+          event.dataTransfer.types.includes(type),
         );
 
         if (!hasAcceptedType) {

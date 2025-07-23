@@ -27,7 +27,7 @@
  * All operations use the UID normalizer for consistent user identification
  */
 
-import { UIDNormalizer } from '../utils/uid-normalizer.js';
+import { UIDNormalizer } from "../utils/uid-normalizer.js";
 
 export class FirestoreService {
   constructor(firebaseService, authService) {
@@ -53,7 +53,7 @@ export class FirestoreService {
       this.uidNormalizer = new UIDNormalizer(this.authService);
     } catch (error) {
       throw new Error(
-        `FirestoreService initialization failed: ${error.message}`
+        `FirestoreService initialization failed: ${error.message}`,
       );
     }
   }
@@ -63,7 +63,7 @@ export class FirestoreService {
    */
   ensureReady() {
     if (!this.db || !this.uidNormalizer) {
-      throw new Error('FirestoreService not initialized');
+      throw new Error("FirestoreService not initialized");
     }
   }
 
@@ -79,16 +79,16 @@ export class FirestoreService {
       this.ensureReady();
 
       // Get validated UID
-      const uid = this.uidNormalizer.requireUID('user document creation');
+      const uid = this.uidNormalizer.requireUID("user document creation");
 
       // Create document path
-      const userDocPath = this.uidNormalizer.createUserDocPath('users');
+      const userDocPath = this.uidNormalizer.createUserDocPath("users");
 
       // Prepare standardized user document
       const userDoc = this.uidNormalizer.createUserDataObject({
-        displayName: userData.displayName || '',
-        role: userData.role || 'learner',
-        email: userData.email || '',
+        displayName: userData.displayName || "",
+        role: userData.role || "learner",
+        email: userData.email || "",
         createdAt: new Date(),
         updatedAt: new Date(),
         preferences: {
@@ -98,8 +98,8 @@ export class FirestoreService {
           ...userData.preferences,
         },
         profile: {
-          avatar: userData.avatar || '',
-          bio: userData.bio || '',
+          avatar: userData.avatar || "",
+          bio: userData.bio || "",
           customization: userData.customization || {},
           ...userData.profile,
         },
@@ -108,7 +108,7 @@ export class FirestoreService {
 
       // Import Firebase functions
       const { doc, setDoc } = await import(
-        'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
       );
 
       // Create the document
@@ -138,12 +138,12 @@ export class FirestoreService {
 
       const validUID = this.uidNormalizer.getValidatedUID(uid);
       const userDocPath = this.uidNormalizer.createUserDocPath(
-        'users',
-        validUID
+        "users",
+        validUID,
       );
 
       const { doc, getDoc } = await import(
-        'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
       );
 
       const docRef = doc(this.db, userDocPath);
@@ -160,7 +160,7 @@ export class FirestoreService {
           success: true,
           data: null,
           exists: false,
-          message: 'User document not found',
+          message: "User document not found",
         };
       }
     } catch (error) {
@@ -180,12 +180,12 @@ export class FirestoreService {
 
       const validUID = this.uidNormalizer.getValidatedUID(uid);
       const userDocPath = this.uidNormalizer.createUserDocPath(
-        'users',
-        validUID
+        "users",
+        validUID,
       );
 
       const { doc, updateDoc } = await import(
-        'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
       );
 
       // Add updated timestamp
@@ -219,12 +219,12 @@ export class FirestoreService {
 
       const validUID = this.uidNormalizer.getValidatedUID(uid);
       const userDocPath = this.uidNormalizer.createUserDocPath(
-        'users',
-        validUID
+        "users",
+        validUID,
       );
 
       const { doc, deleteDoc } = await import(
-        'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
       );
 
       const docRef = doc(this.db, userDocPath);
@@ -262,7 +262,7 @@ export class FirestoreService {
       };
 
       const { doc, setDoc } = await import(
-        'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
       );
 
       const docRef = doc(this.db, progressPath);
@@ -293,7 +293,7 @@ export class FirestoreService {
       const progressPath = `users/${validUID}/simulations/${simulationId}`;
 
       const { doc, getDoc } = await import(
-        'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
       );
 
       const docRef = doc(this.db, progressPath);
@@ -331,15 +331,15 @@ export class FirestoreService {
       const simulationsPath = `users/${validUID}/simulations`;
 
       const { collection, getDocs, orderBy, query } = await import(
-        'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
       );
 
       const simulationsRef = collection(this.db, simulationsPath);
-      const q = query(simulationsRef, orderBy('completedAt', 'desc'));
+      const q = query(simulationsRef, orderBy("completedAt", "desc"));
       const snapshot = await getDocs(q);
 
       const simulations = [];
-      snapshot.forEach(doc => {
+      snapshot.forEach((doc) => {
         simulations.push({
           id: doc.id,
           ...doc.data(),
@@ -383,7 +383,7 @@ export class FirestoreService {
       };
 
       const { doc, setDoc } = await import(
-        'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
       );
 
       const docRef = doc(this.db, badgePath);
@@ -414,15 +414,15 @@ export class FirestoreService {
       const badgesPath = `users/${validUID}/badges`;
 
       const { collection, getDocs, orderBy, query } = await import(
-        'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
       );
 
       const badgesRef = collection(this.db, badgesPath);
-      const q = query(badgesRef, orderBy('earnedAt', 'desc'));
+      const q = query(badgesRef, orderBy("earnedAt", "desc"));
       const snapshot = await getDocs(q);
 
       const badges = [];
-      snapshot.forEach(doc => {
+      snapshot.forEach((doc) => {
         badges.push({
           id: doc.id,
           ...doc.data(),
@@ -465,7 +465,7 @@ export class FirestoreService {
       };
 
       const { doc, setDoc } = await import(
-        'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
       );
 
       const docRef = doc(this.db, progressPath);
@@ -496,7 +496,7 @@ export class FirestoreService {
       const progressPath = `users/${validUID}/progress/${categoryId}`;
 
       const { doc, getDoc } = await import(
-        'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
       );
 
       const docRef = doc(this.db, progressPath);
@@ -536,15 +536,15 @@ export class FirestoreService {
       const progressPath = `users/${validUID}/progress`;
 
       const { collection, getDocs, orderBy, query } = await import(
-        'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
       );
 
       const progressRef = collection(this.db, progressPath);
-      const q = query(progressRef, orderBy('lastActivity', 'desc'));
+      const q = query(progressRef, orderBy("lastActivity", "desc"));
       const snapshot = await getDocs(q);
 
       const progress = [];
-      snapshot.forEach(doc => {
+      snapshot.forEach((doc) => {
         progress.push({
           id: doc.id,
           ...doc.data(),
@@ -590,7 +590,7 @@ export class FirestoreService {
       };
 
       const { doc, setDoc } = await import(
-        'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
       );
 
       const docRef = doc(this.db, sessionPath);
@@ -626,7 +626,7 @@ export class FirestoreService {
       };
 
       const { doc, updateDoc } = await import(
-        'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
       );
 
       const docRef = doc(this.db, sessionPath);
@@ -659,7 +659,7 @@ export class FirestoreService {
       const validUID = this.uidNormalizer.getValidatedUID(uid);
 
       // Collections to delete
-      const subcollections = ['simulations', 'badges', 'progress', 'sessions'];
+      const subcollections = ["simulations", "badges", "progress", "sessions"];
 
       // Delete all subcollections first
       for (const subcollection of subcollections) {
@@ -672,8 +672,8 @@ export class FirestoreService {
       return {
         success: true,
         uid: validUID,
-        deletedCollections: ['users', ...subcollections],
-        message: 'All user data has been permanently deleted',
+        deletedCollections: ["users", ...subcollections],
+        message: "All user data has been permanently deleted",
       };
     } catch (error) {
       return {
@@ -691,7 +691,7 @@ export class FirestoreService {
       const subcollectionPath = `users/${uid}/${subcollectionName}`;
 
       const { collection, getDocs, doc, deleteDoc } = await import(
-        'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
       );
 
       const subcollectionRef = collection(this.db, subcollectionPath);
@@ -699,7 +699,7 @@ export class FirestoreService {
 
       // Delete all documents in batches to avoid hitting rate limits
       const deletePromises = [];
-      snapshot.forEach(docSnapshot => {
+      snapshot.forEach((docSnapshot) => {
         const docRef = doc(this.db, subcollectionPath, docSnapshot.id);
         deletePromises.push(deleteDoc(docRef));
       });
@@ -747,7 +747,7 @@ export class FirestoreService {
         badges: badgesResult.success ? badgesResult.badges : [],
         progress: progressResult.success ? progressResult.progress : [],
         metadata: {
-          exportedCollections: ['users', 'simulations', 'badges', 'progress'],
+          exportedCollections: ["users", "simulations", "badges", "progress"],
           totalDocuments:
             (simulationsResult.count || 0) +
             (badgesResult.count || 0) +
@@ -790,7 +790,7 @@ export class FirestoreService {
   /**
    * Create a document path using UID normalizer
    */
-  createUserDocPath(collection = 'users', uid = null) {
+  createUserDocPath(collection = "users", uid = null) {
     return this.uidNormalizer?.createUserDocPath(collection, uid);
   }
 
@@ -815,7 +815,7 @@ export class FirestoreService {
     return {
       success: true,
       exists: true,
-      message: 'User document already exists',
+      message: "User document already exists",
     };
   }
 
@@ -827,7 +827,7 @@ export class FirestoreService {
       this.ensureReady();
 
       const { writeBatch } = await import(
-        'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
       );
 
       const batch = writeBatch(this.db);
@@ -835,18 +835,18 @@ export class FirestoreService {
       for (const operation of operations) {
         const { type, path, data } = operation;
         const { doc } = await import(
-          'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+          "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
         );
         const docRef = doc(this.db, path);
 
         switch (type) {
-          case 'set':
+          case "set":
             batch.set(docRef, data);
             break;
-          case 'update':
+          case "update":
             batch.update(docRef, data);
             break;
-          case 'delete':
+          case "delete":
             batch.delete(docRef);
             break;
         }

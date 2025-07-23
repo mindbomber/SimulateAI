@@ -31,8 +31,8 @@
  * @author SimulateAI Team
  */
 
-import logger from '../utils/logger.js';
-import { COMMON, EASING } from '../utils/constants.js';
+import logger from "../utils/logger.js";
+import { COMMON, EASING } from "../utils/constants.js";
 
 // Enhanced constants and configuration
 const ANIMATION_CONSTANTS = {
@@ -63,11 +63,11 @@ const ANIMATION_CONSTANTS = {
 };
 
 const EASING_PRESETS = {
-  accessibility: 'easeInOut',
-  reduced: 'linear',
-  smooth: 'easeOutCubic',
-  bounce: 'bounce',
-  elastic: 'elastic',
+  accessibility: "easeInOut",
+  reduced: "linear",
+  smooth: "easeOutCubic",
+  bounce: "bounce",
+  elastic: "elastic",
 };
 
 /**
@@ -76,16 +76,16 @@ const EASING_PRESETS = {
 class AnimationTheme {
   static getCurrentTheme() {
     const prefersReducedMotion = window.matchMedia?.(
-      '(prefers-reduced-motion: reduce)'
+      "(prefers-reduced-motion: reduce)",
     ).matches;
     const prefersHighContrast = window.matchMedia?.(
-      '(prefers-contrast: high)'
+      "(prefers-contrast: high)",
     ).matches;
 
     return {
       reducedMotion: prefersReducedMotion,
       highContrast: prefersHighContrast,
-      theme: prefersHighContrast ? 'highContrast' : 'light',
+      theme: prefersHighContrast ? "highContrast" : "light",
     };
   }
 
@@ -135,7 +135,7 @@ class AnimationPerformanceMonitor {
       // Performance warning for slow animations
       if (duration > ANIMATION_CONSTANTS.PERFORMANCE_WARNING_THRESHOLD) {
         logger.warn(
-          `Slow animation operation: ${operationName} took ${duration.toFixed(2)}ms`
+          `Slow animation operation: ${operationName} took ${duration.toFixed(2)}ms`,
         );
       }
     }
@@ -159,7 +159,7 @@ class AnimationPerformanceMonitor {
         trackedAnimations: this.memoryTracker.size,
         totalMemoryEstimate: Array.from(this.memoryTracker.values()).reduce(
           (total, item) => total + item.size,
-          0
+          0,
         ),
       },
     };
@@ -172,7 +172,7 @@ class AnimationPerformanceMonitor {
 class AnimationError extends Error {
   constructor(message, context = {}, originalError = null) {
     super(message);
-    this.name = 'AnimationError';
+    this.name = "AnimationError";
     this.context = context;
     this.originalError = originalError;
     this.timestamp = new Date().toISOString();
@@ -221,7 +221,7 @@ export class AnimationManager {
 
   init() {
     const startTime = this.performanceMonitor.startOperation(
-      'animation-manager-init'
+      "animation-manager-init",
     );
 
     try {
@@ -232,28 +232,28 @@ export class AnimationManager {
       this.setupEventListeners();
 
       logger.info(
-        'Animation',
-        'Enhanced AnimationManager initialized with accessibility and performance features'
+        "Animation",
+        "Enhanced AnimationManager initialized with accessibility and performance features",
       );
     } catch (error) {
       this.handleError(
         new AnimationError(
-          'Failed to initialize AnimationManager',
+          "Failed to initialize AnimationManager",
           { engine: this.engine },
-          error
-        )
+          error,
+        ),
       );
     } finally {
-      this.performanceMonitor.endOperation('animation-manager-init', startTime);
+      this.performanceMonitor.endOperation("animation-manager-init", startTime);
     }
   }
 
   setupThemeIntegration() {
     // Watch for theme changes
     const reducedMotionQuery = window.matchMedia(
-      '(prefers-reduced-motion: reduce)'
+      "(prefers-reduced-motion: reduce)",
     );
-    const contrastQuery = window.matchMedia('(prefers-contrast: high)');
+    const contrastQuery = window.matchMedia("(prefers-contrast: high)");
 
     const updateTheme = () => {
       this.theme = AnimationTheme.getCurrentTheme();
@@ -263,8 +263,8 @@ export class AnimationManager {
     };
 
     if (reducedMotionQuery.addEventListener) {
-      reducedMotionQuery.addEventListener('change', updateTheme);
-      contrastQuery.addEventListener('change', updateTheme);
+      reducedMotionQuery.addEventListener("change", updateTheme);
+      contrastQuery.addEventListener("change", updateTheme);
     }
 
     // Store listeners for cleanup
@@ -284,15 +284,15 @@ export class AnimationManager {
   }
 
   createAccessibilityRegion() {
-    if (typeof document === 'undefined') return;
+    if (typeof document === "undefined") return;
 
-    let region = document.getElementById('animation-announcements');
+    let region = document.getElementById("animation-announcements");
     if (!region) {
-      region = document.createElement('div');
-      region.id = 'animation-announcements';
-      region.setAttribute('aria-live', 'polite');
-      region.setAttribute('aria-atomic', 'true');
-      region.className = 'sr-only';
+      region = document.createElement("div");
+      region.id = "animation-announcements";
+      region.setAttribute("aria-live", "polite");
+      region.setAttribute("aria-atomic", "true");
+      region.className = "sr-only";
       region.style.cssText = `
                 position: absolute !important;
                 left: -10000px !important;
@@ -326,8 +326,8 @@ export class AnimationManager {
 
   setupEventListeners() {
     // Listen for visibility changes to pause animations when tab is not active
-    if (typeof document !== 'undefined') {
-      document.addEventListener('visibilitychange', () => {
+    if (typeof document !== "undefined") {
+      document.addEventListener("visibilitychange", () => {
         if (document.hidden) {
           this.pauseAllAnimations();
         } else {
@@ -347,17 +347,17 @@ export class AnimationManager {
   announceThemeChange() {
     if (this.accessibilityConfig.announceAnimations) {
       this.announce(
-        `Animation theme updated: ${this.theme.theme} mode, reduced motion: ${this.reducedMotionMode ? 'on' : 'off'}`
+        `Animation theme updated: ${this.theme.theme} mode, reduced motion: ${this.reducedMotionMode ? "on" : "off"}`,
       );
     }
   } // Enhanced animation methods with accessibility and performance
   animate(target, properties, duration = null, options = {}) {
     const startTime =
-      this.performanceMonitor.startOperation('create-animation');
+      this.performanceMonitor.startOperation("create-animation");
 
     try {
       if (!target || !properties) {
-        throw new AnimationError('Invalid animation parameters', {
+        throw new AnimationError("Invalid animation parameters", {
           target,
           properties,
         });
@@ -390,7 +390,7 @@ export class AnimationManager {
         progress: 0,
 
         // Enhanced options with accessibility
-        easing: options.easing || this.defaultEasing || 'easeInOut',
+        easing: options.easing || this.defaultEasing || "easeInOut",
         delay: options.delay || 0,
         repeat: options.repeat || 0,
         yoyo: options.yoyo || false,
@@ -403,7 +403,7 @@ export class AnimationManager {
         // Accessibility options
         announceStart: options.announceStart || false,
         announceComplete: options.announceComplete || false,
-        description: options.description || '',
+        description: options.description || "",
 
         // State
         started: false,
@@ -423,7 +423,7 @@ export class AnimationManager {
       // Track memory usage
       this.performanceMonitor.trackMemory(
         animation.id,
-        this.estimateAnimationMemory(animation)
+        this.estimateAnimationMemory(animation),
       );
 
       // Accessibility announcement
@@ -435,14 +435,14 @@ export class AnimationManager {
     } catch (error) {
       this.handleError(
         new AnimationError(
-          'Failed to create animation',
+          "Failed to create animation",
           { target, properties, duration, options },
-          error
-        )
+          error,
+        ),
       );
       return null;
     } finally {
-      this.performanceMonitor.endOperation('create-animation', startTime);
+      this.performanceMonitor.endOperation("create-animation", startTime);
     }
   }
 
@@ -455,7 +455,7 @@ export class AnimationManager {
   from(target, properties, duration, options = {}) {
     // Set the starting values, then animate to current values
     const endValues = {};
-    Object.keys(properties).forEach(key => {
+    Object.keys(properties).forEach((key) => {
       endValues[key] = target[key] || 0;
       target[key] = properties[key];
     });
@@ -497,7 +497,7 @@ export class AnimationManager {
     properties,
     duration,
     delay = 0,
-    options = {}
+    options = {},
   ) {
     const timeline = this.timelines.get(timelineId);
     if (!timeline) return null;
@@ -507,7 +507,7 @@ export class AnimationManager {
       properties: this.processProperties(target, properties),
       duration,
       delay,
-      easing: options.easing || 'easeInOut',
+      easing: options.easing || "easeInOut",
       onStart: options.onStart || null,
       onUpdate: options.onUpdate || null,
       onComplete: options.onComplete || null,
@@ -562,11 +562,11 @@ export class AnimationManager {
   }
 
   stopAll() {
-    this.activeAnimations.forEach(id => this.stop(id));
+    this.activeAnimations.forEach((id) => this.stop(id));
   } // Enhanced update method with performance monitoring and error handling
   update(deltaTime) {
     const frameStart =
-      this.performanceMonitor.startOperation('animation-update');
+      this.performanceMonitor.startOperation("animation-update");
     let processedCount = 0;
     let errorCount = 0;
 
@@ -593,7 +593,7 @@ export class AnimationManager {
       }
 
       // Update timelines with error handling
-      this.timelines.forEach(timeline => {
+      this.timelines.forEach((timeline) => {
         if (timeline.started && !timeline.completed && !timeline.paused) {
           try {
             this.updateTimeline(timeline, deltaTime);
@@ -611,19 +611,19 @@ export class AnimationManager {
       const frameTime = performance.now() - frameStart.startTime;
       if (frameTime > this.frameTimeLimit * 2) {
         logger.warn(
-          `Animation frame took ${frameTime.toFixed(2)}ms (processed ${processedCount} animations)`
+          `Animation frame took ${frameTime.toFixed(2)}ms (processed ${processedCount} animations)`,
         );
       }
     } catch (error) {
       this.handleError(
         new AnimationError(
-          'Animation update failed',
+          "Animation update failed",
           { processedCount, errorCount },
-          error
-        )
+          error,
+        ),
       );
     } finally {
-      this.performanceMonitor.endOperation('animation-update', frameStart);
+      this.performanceMonitor.endOperation("animation-update", frameStart);
     }
   }
 
@@ -654,13 +654,13 @@ export class AnimationManager {
       animation.elapsed = now - animation.startTime;
       animation.progress = Math.min(
         Math.max(animation.elapsed / animation.duration, 0),
-        1
+        1,
       );
 
       // Apply easing with error handling
       const easedProgress = this.applyEasing(
         animation.progress,
-        animation.easing
+        animation.easing,
       );
 
       // Update properties with validation
@@ -685,9 +685,9 @@ export class AnimationManager {
     } catch (error) {
       animation.performanceWarnings++;
       throw new AnimationError(
-        'Animation update failed',
+        "Animation update failed",
         { animationId: animation.id },
-        error
+        error,
       );
     }
   }
@@ -698,7 +698,7 @@ export class AnimationManager {
     timeline.progress = Math.min(timeline.elapsed / timeline.duration, 1);
 
     // Update timeline animations
-    timeline.animations.forEach(animation => {
+    timeline.animations.forEach((animation) => {
       const animationStart = timeline.startTime + animation.delay;
       const animationEnd = animationStart + animation.duration;
 
@@ -716,11 +716,11 @@ export class AnimationManager {
 
         const animationProgress = Math.min(
           (now - animationStart) / animation.duration,
-          1
+          1,
         );
         const easedProgress = this.applyEasing(
           animationProgress,
-          animation.easing
+          animation.easing,
         );
 
         this.updateProperties(animation, easedProgress);
@@ -759,7 +759,7 @@ export class AnimationManager {
           if (animation.yoyo) {
             animation.direction *= -1;
             // Swap start and end values for yoyo effect
-            Object.keys(animation.properties).forEach(key => {
+            Object.keys(animation.properties).forEach((key) => {
               const prop = animation.properties[key];
               [prop.start, prop.end] = [prop.end, prop.start];
             });
@@ -773,7 +773,7 @@ export class AnimationManager {
             animation.onRepeat(
               animation.target,
               animation.repeatCount,
-              animation
+              animation,
             );
           }
 
@@ -806,11 +806,11 @@ export class AnimationManager {
     this.errorCount++;
     this.lastError = error;
 
-    logger.error('AnimationManager Error:', error);
+    logger.error("AnimationManager Error:", error);
 
     // Emit error event for application-level handling
     if (this.engine && this.engine.emit) {
-      this.engine.emit('animation:error', error);
+      this.engine.emit("animation:error", error);
     }
 
     // Attempt graceful recovery
@@ -825,10 +825,10 @@ export class AnimationManager {
     } else {
       this.handleError(
         new AnimationError(
-          'Animation execution error',
+          "Animation execution error",
           { animationId: animation.id },
-          error
-        )
+          error,
+        ),
       );
     }
 
@@ -839,29 +839,29 @@ export class AnimationManager {
     ) {
       this.stop(animation.id);
       this.announce(
-        `Animation stopped due to errors: ${animation.description || 'Unknown animation'}`
+        `Animation stopped due to errors: ${animation.description || "Unknown animation"}`,
       );
     }
   }
 
   handleTimelineError(timeline, error) {
-    logger.warn('Timeline error:', error);
+    logger.warn("Timeline error:", error);
     timeline.completed = true;
   }
 
   attemptErrorRecovery(error) {
     switch (error.context?.operation) {
-      case 'create-animation':
+      case "create-animation":
         // Clear any partial animation state
         if (error.context?.animationId) {
           this.stop(error.context.animationId);
         }
         break;
-      case 'animation-update':
+      case "animation-update":
         // Reduce animation complexity temporarily
         this.maxAnimationsPerFrame = Math.max(
           10,
-          this.maxAnimationsPerFrame - 10
+          this.maxAnimationsPerFrame - 10,
         );
         setTimeout(() => {
           this.maxAnimationsPerFrame =
@@ -897,7 +897,7 @@ export class AnimationManager {
         this.accessibilityRegion &&
         this.accessibilityRegion.textContent === announcement.message
       ) {
-        this.accessibilityRegion.textContent = '';
+        this.accessibilityRegion.textContent = "";
       }
     }, ANIMATION_CONSTANTS.CLEANUP_DELAY);
   }
@@ -938,7 +938,7 @@ export class AnimationManager {
 
   // Enhanced control methods
   pauseAllAnimations() {
-    this.activeAnimations.forEach(id => {
+    this.activeAnimations.forEach((id) => {
       const animation = this.animations.get(id);
       if (animation) {
         animation.paused = true;
@@ -946,13 +946,13 @@ export class AnimationManager {
     });
 
     if (this.accessibilityConfig.announceAnimations) {
-      this.announce('All animations paused');
+      this.announce("All animations paused");
     }
   }
 
   resumeAllAnimations() {
     const now = performance.now();
-    this.activeAnimations.forEach(id => {
+    this.activeAnimations.forEach((id) => {
       const animation = this.animations.get(id);
       if (animation && animation.paused) {
         animation.paused = false;
@@ -961,16 +961,16 @@ export class AnimationManager {
     });
 
     if (this.accessibilityConfig.announceAnimations) {
-      this.announce('All animations resumed');
+      this.announce("All animations resumed");
     }
   }
 
   // Settings management
   loadSettings() {
     try {
-      if (typeof localStorage !== 'undefined') {
+      if (typeof localStorage !== "undefined") {
         const settings = JSON.parse(
-          localStorage.getItem('animationSettings') || '{}'
+          localStorage.getItem("animationSettings") || "{}",
         );
         return {
           announceAnimations: settings.announceAnimations !== false,
@@ -983,7 +983,7 @@ export class AnimationManager {
         };
       }
     } catch (error) {
-      logger.warn('Failed to load animation settings:', error);
+      logger.warn("Failed to load animation settings:", error);
     }
 
     return {
@@ -997,14 +997,14 @@ export class AnimationManager {
 
   saveSettings(settings) {
     try {
-      if (typeof localStorage !== 'undefined') {
+      if (typeof localStorage !== "undefined") {
         const currentSettings = this.loadSettings();
         const newSettings = { ...currentSettings, ...settings };
-        localStorage.setItem('animationSettings', JSON.stringify(newSettings));
+        localStorage.setItem("animationSettings", JSON.stringify(newSettings));
         this.settings = newSettings;
       }
     } catch (error) {
-      logger.warn('Failed to save animation settings:', error);
+      logger.warn("Failed to save animation settings:", error);
     }
   }
 
@@ -1017,46 +1017,46 @@ export class AnimationManager {
 
     if (enabled) {
       // Convert existing animations to reduced motion
-      this.activeAnimations.forEach(id => {
+      this.activeAnimations.forEach((id) => {
         const animation = this.animations.get(id);
         if (animation && !animation.completed) {
           animation.duration = Math.min(
             animation.duration,
-            ANIMATION_CONSTANTS.REDUCED_MOTION_DURATION
+            ANIMATION_CONSTANTS.REDUCED_MOTION_DURATION,
           );
-          animation.easing = 'linear';
+          animation.easing = "linear";
         }
       });
     }
 
-    this.announce(`Reduced motion mode ${enabled ? 'enabled' : 'disabled'}`);
+    this.announce(`Reduced motion mode ${enabled ? "enabled" : "disabled"}`);
   }
 
   setAccessibilityAnnouncements(enabled) {
     this.accessibilityConfig.announceAnimations = enabled;
     this.saveSettings({ announceAnimations: enabled });
     this.announce(
-      `Animation announcements ${enabled ? 'enabled' : 'disabled'}`
+      `Animation announcements ${enabled ? "enabled" : "disabled"}`,
     );
   }
 
   updateProperties(animation, progress) {
-    Object.keys(animation.properties).forEach(key => {
+    Object.keys(animation.properties).forEach((key) => {
       const prop = animation.properties[key];
 
-      if (prop.type === 'number') {
+      if (prop.type === "number") {
         animation.target[key] = prop.start + (prop.end - prop.start) * progress;
-      } else if (prop.type === 'color') {
+      } else if (prop.type === "color") {
         animation.target[key] = this.interpolateColor(
           prop.start,
           prop.end,
-          progress
+          progress,
         );
-      } else if (prop.type === 'transform') {
+      } else if (prop.type === "transform") {
         animation.target[key] = this.interpolateTransform(
           prop.start,
           prop.end,
-          progress
+          progress,
         );
       }
     });
@@ -1065,35 +1065,35 @@ export class AnimationManager {
   processProperties(target, properties) {
     const processed = {};
 
-    Object.keys(properties).forEach(key => {
+    Object.keys(properties).forEach((key) => {
       const endValue = properties[key];
       const startValue = target[key] || 0;
 
-      if (typeof endValue === 'number') {
+      if (typeof endValue === "number") {
         processed[key] = {
-          type: 'number',
+          type: "number",
           start: startValue,
           end: endValue,
         };
       } else if (this.isColor(endValue)) {
         processed[key] = {
-          type: 'color',
+          type: "color",
           start: this.parseColor(startValue),
           end: this.parseColor(endValue),
         };
       } else if (
-        typeof endValue === 'string' &&
-        endValue.includes('transform')
+        typeof endValue === "string" &&
+        endValue.includes("transform")
       ) {
         processed[key] = {
-          type: 'transform',
+          type: "transform",
           start: startValue,
           end: endValue,
         };
       } else {
         // Fallback to number
         processed[key] = {
-          type: 'number',
+          type: "number",
           start: parseFloat(startValue) || 0,
           end: parseFloat(endValue) || 0,
         };
@@ -1106,32 +1106,32 @@ export class AnimationManager {
   // Easing functions
   applyEasing(progress, easingName) {
     const easings = {
-      linear: t => t,
-      easeIn: t => t * t,
-      easeOut: t => t * (2 - t),
-      easeInOut: t =>
+      linear: (t) => t,
+      easeIn: (t) => t * t,
+      easeOut: (t) => t * (2 - t),
+      easeInOut: (t) =>
         t < COMMON.HALF
           ? COMMON.TWO * t * t
           : -1 + (COMMON.FOUR - COMMON.TWO * t) * t,
-      easeInCubic: t => t * t * t,
-      easeOutCubic: t => --t * t * t + 1,
-      easeInOutCubic: t =>
+      easeInCubic: (t) => t * t * t,
+      easeOutCubic: (t) => --t * t * t + 1,
+      easeInOutCubic: (t) =>
         t < COMMON.HALF
           ? COMMON.FOUR * t * t * t
           : (t - 1) *
               (COMMON.TWO * t - COMMON.TWO) *
               (COMMON.TWO * t - COMMON.TWO) +
             1,
-      easeInQuart: t => t * t * t * t,
-      easeOutQuart: t => 1 - --t * t * t * t,
-      easeInOutQuart: t =>
+      easeInQuart: (t) => t * t * t * t,
+      easeOutQuart: (t) => 1 - --t * t * t * t,
+      easeInOutQuart: (t) =>
         t < COMMON.HALF
           ? COMMON.EIGHT * t * t * t * t
           : 1 - COMMON.EIGHT * --t * t * t * t,
-      easeInSine: t => 1 - Math.cos((t * Math.PI) / 2),
-      easeOutSine: t => Math.sin((t * Math.PI) / 2),
-      easeInOutSine: t => -(Math.cos(Math.PI * t) - 1) / 2,
-      bounce: t => {
+      easeInSine: (t) => 1 - Math.cos((t * Math.PI) / 2),
+      easeOutSine: (t) => Math.sin((t * Math.PI) / 2),
+      easeInOutSine: (t) => -(Math.cos(Math.PI * t) - 1) / 2,
+      bounce: (t) => {
         if (t < 1 / EASING.BOUNCE_C4) return EASING.BOUNCE_C5 * t * t;
         if (t < COMMON.TWO / EASING.BOUNCE_C4)
           return (
@@ -1154,14 +1154,14 @@ export class AnimationManager {
           COMMON.SIXTYTHREE_SIXTYFOURTHS
         );
       },
-      elastic: t => {
+      elastic: (t) => {
         if (t === 0) return 0;
         if (t === 1) return 1;
         return (
           Math.pow(COMMON.TWO, -COMMON.TEN * t) *
             Math.sin(
               ((t - COMMON.ONE_TENTH) * (COMMON.TWO * Math.PI)) /
-                COMMON.OPACITY_40
+                COMMON.OPACITY_40,
             ) +
           1
         );
@@ -1175,18 +1175,18 @@ export class AnimationManager {
   // Color interpolation
   isColor(value) {
     return (
-      typeof value === 'string' &&
-      (value.startsWith('#') ||
-        value.startsWith('rgb') ||
-        value.startsWith('hsl'))
+      typeof value === "string" &&
+      (value.startsWith("#") ||
+        value.startsWith("rgb") ||
+        value.startsWith("hsl"))
     );
   }
 
   parseColor(color) {
-    if (typeof color !== 'string') return { r: 0, g: 0, b: 0, a: 1 };
+    if (typeof color !== "string") return { r: 0, g: 0, b: 0, a: 1 };
 
     // Simple hex color parsing
-    if (color.startsWith('#')) {
+    if (color.startsWith("#")) {
       const hex = color.slice(1);
       if (hex.length === ANIMATION_CONSTANTS.HEX_SHORT_LENGTH) {
         return {
@@ -1200,14 +1200,14 @@ export class AnimationManager {
           r: parseInt(hex.slice(0, 2), 16),
           g: parseInt(
             hex.slice(2, ANIMATION_CONSTANTS.HEX_SLICE_END_SHORT),
-            16
+            16,
           ),
           b: parseInt(
             hex.slice(
               ANIMATION_CONSTANTS.HEX_SLICE_END_SHORT,
-              ANIMATION_CONSTANTS.HEX_LONG_LENGTH
+              ANIMATION_CONSTANTS.HEX_LONG_LENGTH,
             ),
-            16
+            16,
           ),
           a: 1,
         };
@@ -1243,7 +1243,7 @@ export class AnimationManager {
       }
     });
 
-    toDelete.forEach(id => {
+    toDelete.forEach((id) => {
       this.animations.delete(id);
       this.activeAnimations.delete(id);
     });
@@ -1256,7 +1256,7 @@ export class AnimationManager {
       }
     });
 
-    timelinesToDelete.forEach(id => {
+    timelinesToDelete.forEach((id) => {
       this.timelines.delete(id);
     });
   }
@@ -1267,7 +1267,7 @@ export class AnimationManager {
 
   getActiveTimelineCount() {
     return Array.from(this.timelines.values()).filter(
-      t => t.started && !t.completed
+      (t) => t.started && !t.completed,
     ).length;
   } // Enhanced preset animations with accessibility
   fadeIn(target, duration = null, options = {}) {
@@ -1276,7 +1276,7 @@ export class AnimationManager {
 
     return this.to(target, { opacity: 1 }, actualDuration, {
       ...options,
-      description: options.description || 'Fade in animation',
+      description: options.description || "Fade in animation",
       announceComplete: options.announceComplete || false,
     });
   }
@@ -1286,29 +1286,29 @@ export class AnimationManager {
 
     return this.to(target, { opacity: 0 }, actualDuration, {
       ...options,
-      description: options.description || 'Fade out animation',
+      description: options.description || "Fade out animation",
       announceComplete: options.announceComplete || false,
     });
   }
 
   slideIn(
     target,
-    direction = 'left',
+    direction = "left",
     distance = 100,
     duration = null,
-    options = {}
+    options = {},
   ) {
     const actualDuration = duration || this.defaultDuration;
     const startPos =
-      direction === 'left'
+      direction === "left"
         ? -distance
-        : direction === 'right'
+        : direction === "right"
           ? distance
-          : direction === 'up'
+          : direction === "up"
             ? -distance
             : distance;
 
-    const property = direction === 'left' || direction === 'right' ? 'x' : 'y';
+    const property = direction === "left" || direction === "right" ? "x" : "y";
     const endPos = target[property] || 0;
 
     target[property] = startPos;
@@ -1316,7 +1316,7 @@ export class AnimationManager {
     return this.to(target, { [property]: endPos }, actualDuration, {
       ...options,
       description: options.description || `Slide in from ${direction}`,
-      easing: options.easing || 'easeOutCubic',
+      easing: options.easing || "easeOutCubic",
     });
   }
 
@@ -1329,7 +1329,7 @@ export class AnimationManager {
     return this.to(target, { scale }, actualDuration, {
       ...options,
       yoyo: true,
-      description: options.description || 'Scale animation',
+      description: options.description || "Scale animation",
       onComplete: () => {
         target.scale = originalScale;
         if (options.onComplete) options.onComplete();
@@ -1349,7 +1349,7 @@ export class AnimationManager {
 
     const timeline = this.createTimeline({
       ...options,
-      description: options.description || 'Shake animation',
+      description: options.description || "Shake animation",
     });
 
     for (let i = 0; i < shakeCount; i++) {
@@ -1361,7 +1361,7 @@ export class AnimationManager {
         target,
         { x },
         actualDuration / shakeCount,
-        i * (actualDuration / shakeCount)
+        i * (actualDuration / shakeCount),
       );
     }
 
@@ -1371,7 +1371,7 @@ export class AnimationManager {
       target,
       { x: originalX },
       actualDuration / shakeCount,
-      actualDuration - actualDuration / shakeCount
+      actualDuration - actualDuration / shakeCount,
     );
 
     this.playTimeline(timeline);
@@ -1390,14 +1390,14 @@ export class AnimationManager {
         target,
         {
           borderWidth: 3,
-          borderColor: '#ffff00',
+          borderColor: "#ffff00",
         },
         actualDuration,
         {
           ...options,
-          description: 'Focus highlight animation',
+          description: "Focus highlight animation",
           yoyo: true,
-        }
+        },
       );
     } else {
       // Standard focus animation
@@ -1405,23 +1405,23 @@ export class AnimationManager {
         target,
         {
           scale: 1.05,
-          boxShadow: '0 0 10px rgba(0, 123, 255, 0.5)',
+          boxShadow: "0 0 10px rgba(0, 123, 255, 0.5)",
         },
         actualDuration,
         {
           ...options,
-          description: 'Focus highlight animation',
+          description: "Focus highlight animation",
           yoyo: true,
-          easing: 'easeInOut',
-        }
+          easing: "easeInOut",
+        },
       );
     }
   }
 
-  slideReveal(target, direction = 'down', duration = null, options = {}) {
+  slideReveal(target, direction = "down", duration = null, options = {}) {
     const actualDuration = duration || this.defaultDuration;
     const property =
-      direction === 'down' || direction === 'up' ? 'height' : 'width';
+      direction === "down" || direction === "up" ? "height" : "width";
     const from = 0;
     const to =
       target[
@@ -1431,14 +1431,14 @@ export class AnimationManager {
       100;
 
     target[property] = from;
-    target.overflow = 'hidden';
+    target.overflow = "hidden";
 
     return this.to(target, { [property]: to }, actualDuration, {
       ...options,
       description: options.description || `Slide reveal ${direction}`,
-      easing: 'easeOutCubic',
+      easing: "easeOutCubic",
       onComplete: () => {
-        target.overflow = 'visible';
+        target.overflow = "visible";
         if (options.onComplete) options.onComplete();
       },
     });
@@ -1450,34 +1450,34 @@ export class AnimationManager {
       swipeLeft: () =>
         this.slideIn(
           target,
-          'left',
+          "left",
           ANIMATION_CONSTANTS.SWIPE_DISTANCE,
           null,
-          options
+          options,
         ),
       swipeRight: () =>
         this.slideIn(
           target,
-          'right',
+          "right",
           ANIMATION_CONSTANTS.SWIPE_DISTANCE,
           null,
-          options
+          options,
         ),
       swipeUp: () =>
         this.slideIn(
           target,
-          'up',
+          "up",
           ANIMATION_CONSTANTS.SWIPE_DISTANCE,
           null,
-          options
+          options,
         ),
       swipeDown: () =>
         this.slideIn(
           target,
-          'down',
+          "down",
           ANIMATION_CONSTANTS.SWIPE_DISTANCE,
           null,
-          options
+          options,
         ),
       pinchIn: () =>
         this.scale(target, ANIMATION_CONSTANTS.PINCH_IN_SCALE, null, options),
@@ -1522,9 +1522,9 @@ export class AnimationManager {
       activeTimelines: timelineCount,
       framePerformance: {
         averageFrameTime:
-          metrics.operations['animation-update']?.averageDuration || 0,
+          metrics.operations["animation-update"]?.averageDuration || 0,
         lastFrameTime:
-          metrics.operations['animation-update']?.lastDuration || 0,
+          metrics.operations["animation-update"]?.lastDuration || 0,
         frameTimeLimit: this.frameTimeLimit,
         maxAnimationsPerFrame: this.maxAnimationsPerFrame,
       },
@@ -1536,7 +1536,7 @@ export class AnimationManager {
   } // Enhanced cleanup with comprehensive resource management
   destroy() {
     const startTime =
-      this.performanceMonitor.startOperation('animation-cleanup');
+      this.performanceMonitor.startOperation("animation-cleanup");
 
     try {
       // Stop all animations gracefully
@@ -1568,11 +1568,11 @@ export class AnimationManager {
       // Save final settings
       this.saveSettings(this.settings);
 
-      logger.info('Enhanced AnimationManager destroyed successfully');
+      logger.info("Enhanced AnimationManager destroyed successfully");
     } catch (error) {
-      logger.error('Error during AnimationManager cleanup:', error);
+      logger.error("Error during AnimationManager cleanup:", error);
     } finally {
-      this.performanceMonitor.endOperation('animation-cleanup', startTime);
+      this.performanceMonitor.endOperation("animation-cleanup", startTime);
     }
   }
 
@@ -1583,20 +1583,20 @@ export class AnimationManager {
           this.themeListeners;
 
         if (reducedMotionQuery.removeEventListener) {
-          reducedMotionQuery.removeEventListener('change', updateTheme);
-          contrastQuery.removeEventListener('change', updateTheme);
+          reducedMotionQuery.removeEventListener("change", updateTheme);
+          contrastQuery.removeEventListener("change", updateTheme);
         }
       }
 
       // Remove document event listeners
-      if (typeof document !== 'undefined') {
+      if (typeof document !== "undefined") {
         document.removeEventListener(
-          'visibilitychange',
-          this.handleVisibilityChange
+          "visibilitychange",
+          this.handleVisibilityChange,
         );
       }
     } catch (error) {
-      logger.warn('Event listener cleanup failed:', error);
+      logger.warn("Event listener cleanup failed:", error);
     }
   }
 
@@ -1605,11 +1605,11 @@ export class AnimationManager {
       // Remove accessibility region
       if (this.accessibilityRegion && this.accessibilityRegion.parentNode) {
         this.accessibilityRegion.parentNode.removeChild(
-          this.accessibilityRegion
+          this.accessibilityRegion,
         );
       }
     } catch (error) {
-      logger.warn('Accessibility cleanup failed:', error);
+      logger.warn("Accessibility cleanup failed:", error);
     }
   }
 }
@@ -1617,13 +1617,13 @@ export class AnimationManager {
 // Static utility methods for global animation operations
 AnimationManager.createGlobalStyles = function () {
   if (
-    typeof document === 'undefined' ||
-    document.getElementById('animation-manager-styles')
+    typeof document === "undefined" ||
+    document.getElementById("animation-manager-styles")
   )
     return;
 
-  const styleSheet = document.createElement('style');
-  styleSheet.id = 'animation-manager-styles';
+  const styleSheet = document.createElement("style");
+  styleSheet.id = "animation-manager-styles";
   styleSheet.textContent = `
         /* Global animation styles with accessibility support */
         @media (prefers-reduced-motion: reduce) {
@@ -1682,38 +1682,38 @@ AnimationManager.createGlobalStyles = function () {
 };
 
 AnimationManager.detectAnimationSupport = function () {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === "undefined") return false;
 
-  const testElement = document.createElement('div');
+  const testElement = document.createElement("div");
   const animationProps = [
-    'animation',
-    'webkitAnimation',
-    'mozAnimation',
-    'oAnimation',
-    'msAnimation',
+    "animation",
+    "webkitAnimation",
+    "mozAnimation",
+    "oAnimation",
+    "msAnimation",
   ];
 
-  return animationProps.some(prop => prop in testElement.style);
+  return animationProps.some((prop) => prop in testElement.style);
 };
 
 AnimationManager.getSystemAnimationPreferences = function () {
-  if (typeof window === 'undefined') return {};
+  if (typeof window === "undefined") return {};
 
   return {
     reducedMotion:
-      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false,
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches || false,
     highContrast:
-      window.matchMedia?.('(prefers-contrast: high)').matches || false,
+      window.matchMedia?.("(prefers-contrast: high)").matches || false,
     animationSupport: this.detectAnimationSupport(),
   };
 };
 
 // Initialize global styles when module loads
-if (typeof document !== 'undefined') {
-  if (document.readyState === 'loading') {
+if (typeof document !== "undefined") {
+  if (document.readyState === "loading") {
     document.addEventListener(
-      'DOMContentLoaded',
-      AnimationManager.createGlobalStyles
+      "DOMContentLoaded",
+      AnimationManager.createGlobalStyles,
     );
   } else {
     AnimationManager.createGlobalStyles();

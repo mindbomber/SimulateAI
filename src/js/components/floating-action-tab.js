@@ -47,13 +47,13 @@ class FloatingActionTab {
 
   listenToSettings() {
     // Listen for settings changes
-    window.addEventListener('settingsChanged', e => {
+    window.addEventListener("settingsChanged", (e) => {
       const { settings } = e.detail;
       this.updateVisibility(settings.donateTabEnabled);
     });
 
     // Listen for settings manager ready
-    window.addEventListener('settingsManagerReady', e => {
+    window.addEventListener("settingsManagerReady", (e) => {
       const { settings } = e.detail;
       this.updateVisibility(settings.donateTabEnabled);
     });
@@ -63,7 +63,7 @@ class FloatingActionTab {
     // Apply initial settings if available
     const applySettings = () => {
       if (window.settingsManager) {
-        const enabled = window.settingsManager.getSetting('donateTabEnabled');
+        const enabled = window.settingsManager.getSetting("donateTabEnabled");
         this.updateVisibility(enabled);
       }
     };
@@ -77,16 +77,16 @@ class FloatingActionTab {
 
   updateVisibility(enabled) {
     if (this.link) {
-      this.link.style.display = enabled ? 'block' : 'none';
+      this.link.style.display = enabled ? "block" : "none";
     }
   }
 
   createElement() {
     // Create the main container
-    this.container = document.createElement('div');
-    this.container.className = 'floating-action-tab';
-    this.container.setAttribute('role', 'complementary');
-    this.container.setAttribute('aria-label', 'Donation support');
+    this.container = document.createElement("div");
+    this.container.className = "floating-action-tab";
+    this.container.setAttribute("role", "complementary");
+    this.container.setAttribute("aria-label", "Donation support");
 
     // Create the tab content
     this.container.innerHTML = `
@@ -110,11 +110,11 @@ class FloatingActionTab {
     `;
 
     // Create the clickable link
-    this.link = document.createElement('a');
-    this.link.href = 'donate.html';
-    this.link.className = 'floating-tab-link';
-    this.link.setAttribute('aria-label', 'Navigate to donation page');
-    this.link.setAttribute('data-page', 'donate');
+    this.link = document.createElement("a");
+    this.link.href = "donate.html";
+    this.link.className = "floating-tab-link";
+    this.link.setAttribute("aria-label", "Navigate to donation page");
+    this.link.setAttribute("data-page", "donate");
 
     // Wrap the container in the link
     this.link.appendChild(this.container);
@@ -127,29 +127,29 @@ class FloatingActionTab {
 
   bindEvents() {
     // Handle resize events
-    window.addEventListener('resize', this.handleResize.bind(this));
+    window.addEventListener("resize", this.handleResize.bind(this));
 
     // Handle hover/click events
     if (this.isMobile) {
       this.link.addEventListener(
-        'touchstart',
-        this.handleTouchStart.bind(this)
+        "touchstart",
+        this.handleTouchStart.bind(this),
       );
-      this.link.addEventListener('click', this.handleMobileClick.bind(this));
+      this.link.addEventListener("click", this.handleMobileClick.bind(this));
     } else {
-      this.link.addEventListener('mouseenter', this.handleHover.bind(this));
-      this.link.addEventListener('mouseleave', this.handleLeave.bind(this));
-      this.link.addEventListener('focus', this.handleFocus.bind(this));
-      this.link.addEventListener('blur', this.handleBlur.bind(this));
+      this.link.addEventListener("mouseenter", this.handleHover.bind(this));
+      this.link.addEventListener("mouseleave", this.handleLeave.bind(this));
+      this.link.addEventListener("focus", this.handleFocus.bind(this));
+      this.link.addEventListener("blur", this.handleBlur.bind(this));
     }
 
     // Handle keyboard navigation
-    this.link.addEventListener('keydown', this.handleKeydown.bind(this));
+    this.link.addEventListener("keydown", this.handleKeydown.bind(this));
 
     // Handle visibility changes
     document.addEventListener(
-      'visibilitychange',
-      this.handleVisibilityChange.bind(this)
+      "visibilitychange",
+      this.handleVisibilityChange.bind(this),
     );
   }
 
@@ -224,7 +224,7 @@ class FloatingActionTab {
   }
 
   handleKeydown(e) {
-    if (e.key === 'Enter' || e.key === ' ') {
+    if (e.key === "Enter" || e.key === " ") {
       if (this.isMobile) {
         e.preventDefault();
         this.toggle();
@@ -242,20 +242,20 @@ class FloatingActionTab {
     if (this.isExpanded) return;
 
     this.isExpanded = true;
-    this.container.classList.add('expanded');
+    this.container.classList.add("expanded");
 
     // Add ripple effect
     this.addRipple();
 
     // Announce to screen readers
-    this.announceToScreenReader('Donation tab expanded');
+    this.announceToScreenReader("Donation tab expanded");
   }
 
   collapse() {
     if (!this.isExpanded) return;
 
     this.isExpanded = false;
-    this.container.classList.remove('expanded');
+    this.container.classList.remove("expanded");
   }
 
   toggle() {
@@ -267,20 +267,20 @@ class FloatingActionTab {
   }
 
   addRipple() {
-    const ripple = this.container.querySelector('.floating-tab-ripple');
-    ripple.classList.add('active');
+    const ripple = this.container.querySelector(".floating-tab-ripple");
+    ripple.classList.add("active");
 
     setTimeout(() => {
-      ripple.classList.remove('active');
+      ripple.classList.remove("active");
     }, RIPPLE_DURATION);
   }
 
   announceToScreenReader(message) {
     // Create temporary element for screen reader announcement
-    const announcement = document.createElement('div');
-    announcement.setAttribute('aria-live', 'polite');
-    announcement.setAttribute('aria-atomic', 'true');
-    announcement.className = 'sr-only';
+    const announcement = document.createElement("div");
+    announcement.setAttribute("aria-live", "polite");
+    announcement.setAttribute("aria-atomic", "true");
+    announcement.className = "sr-only";
     announcement.textContent = message;
 
     document.body.appendChild(announcement);
@@ -292,18 +292,18 @@ class FloatingActionTab {
 
   removeEvents() {
     // Remove all event listeners (for cleanup)
-    window.removeEventListener('resize', this.handleResize.bind(this));
+    window.removeEventListener("resize", this.handleResize.bind(this));
     document.removeEventListener(
-      'visibilitychange',
-      this.handleVisibilityChange.bind(this)
+      "visibilitychange",
+      this.handleVisibilityChange.bind(this),
     );
   }
 
   createRipple(touch) {
     if (!touch) return;
 
-    const ripple = document.createElement('span');
-    ripple.className = 'ripple';
+    const ripple = document.createElement("span");
+    ripple.className = "ripple";
     ripple.style.left = `${touch.clientX - this.link.getBoundingClientRect().left}px`;
     ripple.style.top = `${touch.clientY - this.link.getBoundingClientRect().top}px`;
 
@@ -326,7 +326,7 @@ class FloatingActionTab {
 }
 
 // Auto-initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   new FloatingActionTab();
 });
 

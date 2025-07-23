@@ -53,8 +53,8 @@ export class InteractiveObject {
     this.scale = options.scale || 1;
 
     // Styling
-    this.fill = options.fill || '#ffffff';
-    this.stroke = options.stroke || '#cccccc';
+    this.fill = options.fill || "#ffffff";
+    this.stroke = options.stroke || "#cccccc";
     this.strokeWidth = options.strokeWidth || 1;
 
     // State
@@ -90,12 +90,12 @@ export class InteractiveObject {
 
   getDefaultAccessibilityConfig() {
     return {
-      role: 'button',
+      role: "button",
       focusable: true,
-      description: 'Interactive object',
+      description: "Interactive object",
       keyboardActions: {
-        Enter: 'click',
-        Space: 'click',
+        Enter: "click",
+        Space: "click",
       },
     };
   }
@@ -126,7 +126,7 @@ export class InteractiveObject {
     if (!this.enabled || !this.visible) return false;
 
     switch (eventType) {
-      case 'mousedown':
+      case "mousedown":
         if (this.containsPoint(eventData.x, eventData.y)) {
           this.pressed = true;
           if (this.onMouseDown) this.onMouseDown(eventData);
@@ -134,7 +134,7 @@ export class InteractiveObject {
         }
         break;
 
-      case 'mouseup':
+      case "mouseup":
         if (this.pressed) {
           this.pressed = false;
           if (this.onMouseUp) this.onMouseUp(eventData);
@@ -146,7 +146,7 @@ export class InteractiveObject {
         }
         break;
 
-      case 'mousemove': {
+      case "mousemove": {
         const wasHovered = this.hovered;
         this.hovered = this.containsPoint(eventData.x, eventData.y);
 
@@ -162,11 +162,11 @@ export class InteractiveObject {
         break;
       }
 
-      case 'keydown':
+      case "keydown":
         if (this.focused && this.accessibilityConfig.keyboardActions) {
           const action =
             this.accessibilityConfig.keyboardActions[eventData.key];
-          if (action === 'click' && this.onClick) {
+          if (action === "click" && this.onClick) {
             this.onClick(eventData);
             return true;
           }
@@ -220,15 +220,15 @@ export class Button extends InteractiveObject {
     super({
       width: INTERACTIVE_OBJECT_CONSTANTS.BUTTON_DEFAULT_WIDTH,
       height: INTERACTIVE_OBJECT_CONSTANTS.BUTTON_DEFAULT_HEIGHT,
-      fill: '#007cba',
-      stroke: '#005a87',
+      fill: "#007cba",
+      stroke: "#005a87",
       ...options,
     });
 
-    this.type = 'button';
-    this.text = options.text || 'Button';
-    this.textColor = options.textColor || '#ffffff';
-    this.font = options.font || '14px Arial';
+    this.type = "button";
+    this.text = options.text || "Button";
+    this.textColor = options.textColor || "#ffffff";
+    this.font = options.font || "14px Arial";
     this.borderRadius =
       options.borderRadius ||
       INTERACTIVE_OBJECT_CONSTANTS.BUTTON_DEFAULT_BORDER_RADIUS;
@@ -236,12 +236,12 @@ export class Button extends InteractiveObject {
     // Button states
     this.colors = {
       normal: { fill: this.fill, stroke: this.stroke },
-      hover: { fill: options.hoverColor || '#0099e6', stroke: this.stroke },
-      pressed: { fill: options.pressedColor || '#004d73', stroke: this.stroke },
-      disabled: { fill: '#cccccc', stroke: '#999999' },
+      hover: { fill: options.hoverColor || "#0099e6", stroke: this.stroke },
+      pressed: { fill: options.pressedColor || "#004d73", stroke: this.stroke },
+      disabled: { fill: "#cccccc", stroke: "#999999" },
     };
 
-    this.accessibilityConfig.description = options.text || 'Button';
+    this.accessibilityConfig.description = options.text || "Button";
   }
 
   updateStyle() {
@@ -264,7 +264,7 @@ export class Button extends InteractiveObject {
     this.updateStyle();
 
     // Draw button background
-    if (renderer.type === 'canvas') {
+    if (renderer.type === "canvas") {
       renderer.drawRect(this.x, this.y, this.width, this.height, {
         fill: this.fill,
         stroke: this.stroke,
@@ -280,36 +280,36 @@ export class Button extends InteractiveObject {
         {
           font: this.font,
           fill: this.textColor,
-          align: 'center',
-          baseline: 'middle',
-        }
+          align: "center",
+          baseline: "middle",
+        },
       );
       return true;
-    } else if (renderer.type === 'svg') {
-      const group = renderer.createSVGElement('g');
+    } else if (renderer.type === "svg") {
+      const group = renderer.createSVGElement("g");
 
       // Button background
-      const rect = renderer.createSVGElement('rect', {
+      const rect = renderer.createSVGElement("rect", {
         x: this.x,
         y: this.y,
         width: this.width,
         height: this.height,
         fill: this.fill,
         stroke: this.stroke,
-        'stroke-width': this.strokeWidth,
+        "stroke-width": this.strokeWidth,
         rx: this.borderRadius,
       });
       group.appendChild(rect);
 
       // Button text
-      const text = renderer.createSVGElement('text', {
+      const text = renderer.createSVGElement("text", {
         x: this.x + this.width / 2,
         y: this.y + this.height / 2,
-        'text-anchor': 'middle',
-        'dominant-baseline': 'central',
+        "text-anchor": "middle",
+        "dominant-baseline": "central",
         fill: this.textColor,
-        'font-family': 'Arial',
-        'font-size': '14px',
+        "font-family": "Arial",
+        "font-size": "14px",
       });
       text.textContent = this.text;
       group.appendChild(text);
@@ -326,12 +326,12 @@ export class Slider extends InteractiveObject {
     super({
       width: INTERACTIVE_OBJECT_CONSTANTS.SLIDER_DEFAULT_WIDTH,
       height: INTERACTIVE_OBJECT_CONSTANTS.SLIDER_DEFAULT_HEIGHT,
-      fill: '#e0e0e0',
-      stroke: '#cccccc',
+      fill: "#e0e0e0",
+      stroke: "#cccccc",
       ...options,
     });
 
-    this.type = 'slider';
+    this.type = "slider";
     this.min = options.min || 0;
     this.max = options.max || 100;
     this.value =
@@ -347,22 +347,22 @@ export class Slider extends InteractiveObject {
     this.handleHeight =
       options.handleHeight ||
       this.height + INTERACTIVE_OBJECT_CONSTANTS.SLIDER_HANDLE_HEIGHT_OFFSET;
-    this.handleColor = options.handleColor || '#007cba';
-    this.trackColor = options.trackColor || '#f0f0f0';
-    this.fillColor = options.fillColor || '#007cba';
+    this.handleColor = options.handleColor || "#007cba";
+    this.trackColor = options.trackColor || "#f0f0f0";
+    this.fillColor = options.fillColor || "#007cba";
 
     this.isDragging = false;
     this.dragOffset = 0;
 
     this.accessibilityConfig = {
-      role: 'slider',
+      role: "slider",
       focusable: true,
       description: `Slider, value ${this.value}`,
       keyboardActions: {
-        ArrowLeft: 'decrease',
-        ArrowRight: 'increase',
-        ArrowDown: 'decrease',
-        ArrowUp: 'increase',
+        ArrowLeft: "decrease",
+        ArrowRight: "increase",
+        ArrowDown: "decrease",
+        ArrowUp: "increase",
       },
     };
   }
@@ -387,7 +387,7 @@ export class Slider extends InteractiveObject {
     if (!this.enabled || !this.visible) return false;
 
     switch (eventType) {
-      case 'mousedown': {
+      case "mousedown": {
         const handleX = this.getHandlePosition();
         const handleBounds = {
           x: handleX,
@@ -415,7 +415,7 @@ export class Slider extends InteractiveObject {
         break;
       }
 
-      case 'mousemove':
+      case "mousemove":
         if (this.isDragging) {
           const newHandleX = eventData.x - this.dragOffset;
           const progress =
@@ -428,26 +428,26 @@ export class Slider extends InteractiveObject {
         }
         break;
 
-      case 'mouseup':
+      case "mouseup":
         if (this.isDragging) {
           this.isDragging = false;
           return true;
         }
         break;
 
-      case 'keydown':
+      case "keydown":
         if (this.focused) {
           let changed = false;
           const stepSize = this.step;
 
           switch (eventData.key) {
-            case 'ArrowLeft':
-            case 'ArrowDown':
+            case "ArrowLeft":
+            case "ArrowDown":
               this.setValue(this.value - stepSize);
               changed = true;
               break;
-            case 'ArrowRight':
-            case 'ArrowUp':
+            case "ArrowRight":
+            case "ArrowUp":
               this.setValue(this.value + stepSize);
               changed = true;
               break;
@@ -465,7 +465,7 @@ export class Slider extends InteractiveObject {
     const handleX = this.getHandlePosition();
     const progress = (this.value - this.min) / (this.max - this.min);
 
-    if (renderer.type === 'canvas') {
+    if (renderer.type === "canvas") {
       // Draw track
       renderer.drawRect(
         this.x,
@@ -478,7 +478,7 @@ export class Slider extends InteractiveObject {
           fill: this.trackColor,
           stroke: this.stroke,
           strokeWidth: 1,
-        }
+        },
       );
 
       // Draw filled portion
@@ -493,7 +493,7 @@ export class Slider extends InteractiveObject {
           this.height / 2,
           {
             fill: this.fillColor,
-          }
+          },
         );
       }
 
@@ -505,18 +505,18 @@ export class Slider extends InteractiveObject {
         this.handleHeight,
         {
           fill: this.handleColor,
-          stroke: '#005a87',
+          stroke: "#005a87",
           strokeWidth: 2,
           borderRadius: 2,
-        }
+        },
       );
 
       return renderer;
-    } else if (renderer.type === 'svg') {
-      const group = renderer.createSVGElement('g');
+    } else if (renderer.type === "svg") {
+      const group = renderer.createSVGElement("g");
 
       // Track
-      const track = renderer.createSVGElement('rect', {
+      const track = renderer.createSVGElement("rect", {
         x: this.x,
         y:
           this.y +
@@ -531,7 +531,7 @@ export class Slider extends InteractiveObject {
 
       // Fill
       if (progress > 0) {
-        const fill = renderer.createSVGElement('rect', {
+        const fill = renderer.createSVGElement("rect", {
           x: this.x,
           y:
             this.y +
@@ -545,14 +545,14 @@ export class Slider extends InteractiveObject {
       }
 
       // Handle
-      const handle = renderer.createSVGElement('rect', {
+      const handle = renderer.createSVGElement("rect", {
         x: handleX,
         y: this.y - INTERACTIVE_OBJECT_CONSTANTS.SLIDER_HANDLE_Y_OFFSET,
         width: this.handleWidth,
         height: this.handleHeight,
         fill: this.handleColor,
-        stroke: '#005a87',
-        'stroke-width': 2,
+        stroke: "#005a87",
+        "stroke-width": 2,
         rx: 2,
       });
       group.appendChild(handle);
@@ -570,26 +570,26 @@ export class Meter extends InteractiveObject {
     super({
       width: INTERACTIVE_OBJECT_CONSTANTS.METER_DEFAULT_WIDTH,
       height: INTERACTIVE_OBJECT_CONSTANTS.METER_DEFAULT_HEIGHT,
-      fill: '#f0f0f0',
-      stroke: '#cccccc',
+      fill: "#f0f0f0",
+      stroke: "#cccccc",
       interactive: false,
       ...options,
     });
 
-    this.type = 'meter';
+    this.type = "meter";
     this.min = options.min || 0;
     this.max = options.max || 100;
     this.value = options.value !== undefined ? options.value : 0;
-    this.label = options.label || '';
+    this.label = options.label || "";
     this.showValue = options.showValue !== false;
 
     // Styling
-    this.fillColor = options.fillColor || '#4caf50';
-    this.textColor = options.textColor || '#333333';
-    this.font = options.font || '12px Arial';
+    this.fillColor = options.fillColor || "#4caf50";
+    this.textColor = options.textColor || "#333333";
+    this.font = options.font || "12px Arial";
 
     this.accessibilityConfig = {
-      role: 'progressbar',
+      role: "progressbar",
       focusable: false,
       description: `${this.label} progress: ${this.value} of ${this.max}`,
     };
@@ -604,7 +604,7 @@ export class Meter extends InteractiveObject {
     const progress = (this.value - this.min) / (this.max - this.min);
     const fillWidth = this.width * progress;
 
-    if (renderer.type === 'canvas') {
+    if (renderer.type === "canvas") {
       // Draw background
       renderer.drawRect(this.x, this.y, this.width, this.height, {
         fill: this.fill,
@@ -621,7 +621,7 @@ export class Meter extends InteractiveObject {
 
       // Draw text
       if (this.label || this.showValue) {
-        const text = this.label + (this.showValue ? ` ${this.value}` : '');
+        const text = this.label + (this.showValue ? ` ${this.value}` : "");
         renderer.drawText(
           text,
           this.x + this.width / 2,
@@ -629,31 +629,31 @@ export class Meter extends InteractiveObject {
           {
             font: this.font,
             fill: this.textColor,
-            align: 'center',
-            baseline: 'middle',
-          }
+            align: "center",
+            baseline: "middle",
+          },
         );
       }
 
       return renderer;
-    } else if (renderer.type === 'svg') {
-      const group = renderer.createSVGElement('g');
+    } else if (renderer.type === "svg") {
+      const group = renderer.createSVGElement("g");
 
       // Background
-      const bg = renderer.createSVGElement('rect', {
+      const bg = renderer.createSVGElement("rect", {
         x: this.x,
         y: this.y,
         width: this.width,
         height: this.height,
         fill: this.fill,
         stroke: this.stroke,
-        'stroke-width': this.strokeWidth,
+        "stroke-width": this.strokeWidth,
       });
       group.appendChild(bg);
 
       // Fill
       if (fillWidth > 0) {
-        const fill = renderer.createSVGElement('rect', {
+        const fill = renderer.createSVGElement("rect", {
           x: this.x,
           y: this.y,
           width: fillWidth,
@@ -665,15 +665,15 @@ export class Meter extends InteractiveObject {
 
       // Text
       if (this.label || this.showValue) {
-        const text = this.label + (this.showValue ? ` ${this.value}` : '');
-        const textElement = renderer.createSVGElement('text', {
+        const text = this.label + (this.showValue ? ` ${this.value}` : "");
+        const textElement = renderer.createSVGElement("text", {
           x: this.x + this.width / 2,
           y: this.y + this.height / 2,
-          'text-anchor': 'middle',
-          'dominant-baseline': 'central',
+          "text-anchor": "middle",
+          "dominant-baseline": "central",
           fill: this.textColor,
-          'font-family': 'Arial',
-          'font-size': '12px',
+          "font-family": "Arial",
+          "font-size": "12px",
         });
         textElement.textContent = text;
         group.appendChild(textElement);
@@ -693,19 +693,19 @@ export class Label extends InteractiveObject {
       width: INTERACTIVE_OBJECT_CONSTANTS.LABEL_DEFAULT_WIDTH,
       height: INTERACTIVE_OBJECT_CONSTANTS.LABEL_DEFAULT_HEIGHT,
       interactive: false,
-      fill: 'transparent',
-      stroke: 'none',
+      fill: "transparent",
+      stroke: "none",
       ...options,
     });
 
-    this.type = 'label';
-    this.text = options.text || 'Label';
-    this.textColor = options.textColor || '#333333';
-    this.font = options.font || '14px Arial';
-    this.align = options.align || 'left';
+    this.type = "label";
+    this.text = options.text || "Label";
+    this.textColor = options.textColor || "#333333";
+    this.font = options.font || "14px Arial";
+    this.align = options.align || "left";
 
     this.accessibilityConfig = {
-      role: 'text',
+      role: "text",
       focusable: false,
       description: this.text,
     };
@@ -717,7 +717,7 @@ export class Label extends InteractiveObject {
   }
 
   render(renderer) {
-    if (renderer.type === 'canvas') {
+    if (renderer.type === "canvas") {
       renderer.drawText(this.text, this.x, this.y, {
         font: this.font,
         fill: this.textColor,
@@ -725,18 +725,18 @@ export class Label extends InteractiveObject {
       });
 
       return renderer;
-    } else if (renderer.type === 'svg') {
+    } else if (renderer.type === "svg") {
       return renderer.createSVGElement(
-        'text',
+        "text",
         {
           x: this.x,
           y: this.y,
           fill: this.textColor,
-          'font-family': 'Arial',
-          'font-size': '14px',
-          'text-anchor': this.align === 'center' ? 'middle' : this.align,
+          "font-family": "Arial",
+          "font-size": "14px",
+          "text-anchor": this.align === "center" ? "middle" : this.align,
         },
-        this.text
+        this.text,
       );
     }
 

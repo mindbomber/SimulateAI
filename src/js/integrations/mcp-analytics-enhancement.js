@@ -3,7 +3,7 @@
  * Integrates with existing analytics system to provide deeper insights
  */
 
-import logger from '../utils/logger.js';
+import logger from "../utils/logger.js";
 
 // Configuration constants
 const BYTES_PER_KB = 1024; // Standard bytes per kilobyte
@@ -60,7 +60,7 @@ class MCPAnalyticsEnhancement {
    */
   setupPerformanceMonitoring() {
     // Track simulation load times and user interactions
-    this.performanceMetrics.set('simulationMetrics', {
+    this.performanceMetrics.set("simulationMetrics", {
       loadTimes: [],
       interactionLatency: [],
       memoryUsage: [],
@@ -69,7 +69,7 @@ class MCPAnalyticsEnhancement {
     });
 
     // Monitor educational content effectiveness
-    this.performanceMetrics.set('contentEffectiveness', {
+    this.performanceMetrics.set("contentEffectiveness", {
       scenarioCompletionRates: new Map(),
       optionSelectionPatterns: new Map(),
       timeSpentPerScenario: new Map(),
@@ -81,14 +81,14 @@ class MCPAnalyticsEnhancement {
    * Track educational outcomes and learning patterns
    */
   setupEducationalTracking() {
-    this.educationalOutcomes.set('learningProgression', {
+    this.educationalOutcomes.set("learningProgression", {
       conceptMastery: new Map(),
       ethicalReasoningDevelopment: new Map(),
       discussionQuality: new Map(),
       assessmentResults: new Map(),
     });
 
-    this.educationalOutcomes.set('engagementMetrics', {
+    this.educationalOutcomes.set("engagementMetrics", {
       sessionDuration: [],
       returnVisits: new Map(),
       sharingBehavior: new Map(),
@@ -121,19 +121,19 @@ class MCPAnalyticsEnhancement {
     this.predictiveModels = {
       learningSuccess: {
         factors: [
-          'timeSpentPerScenario',
-          'helpSystemUsage',
-          'discussionParticipation',
-          'optionDiversityIndex',
+          "timeSpentPerScenario",
+          "helpSystemUsage",
+          "discussionParticipation",
+          "optionDiversityIndex",
         ],
         predictions: new Map(),
       },
       engagement: {
         factors: [
-          'sessionFrequency',
-          'scenarioCompletion',
-          'resourceAccess',
-          'socialSharing',
+          "sessionFrequency",
+          "scenarioCompletion",
+          "resourceAccess",
+          "socialSharing",
         ],
         predictions: new Map(),
       },
@@ -144,7 +144,7 @@ class MCPAnalyticsEnhancement {
    * Enhanced scenario completion tracking
    */
   trackScenarioCompletion(scenarioId, userId, completionData) {
-    const metrics = this.performanceMetrics.get('contentEffectiveness');
+    const metrics = this.performanceMetrics.get("contentEffectiveness");
 
     // Track completion rate
     if (!metrics.scenarioCompletionRates.has(scenarioId)) {
@@ -168,7 +168,7 @@ class MCPAnalyticsEnhancement {
     this.trackOptionSelections(scenarioId, completionData.selectedOptions);
 
     // Enhanced analytics event
-    this.analytics.track('scenario_completed_enhanced', {
+    this.analytics.track("scenario_completed_enhanced", {
       scenarioId,
       userId,
       duration: completionData.duration,
@@ -187,7 +187,7 @@ class MCPAnalyticsEnhancement {
    * Track option selection patterns for insights
    */
   trackOptionSelections(scenarioId, selectedOptions) {
-    const metrics = this.performanceMetrics.get('contentEffectiveness');
+    const metrics = this.performanceMetrics.get("contentEffectiveness");
 
     if (!metrics.optionSelectionPatterns.has(scenarioId)) {
       metrics.optionSelectionPatterns.set(scenarioId, new Map());
@@ -195,7 +195,7 @@ class MCPAnalyticsEnhancement {
 
     const optionMap = metrics.optionSelectionPatterns.get(scenarioId);
 
-    selectedOptions.forEach(option => {
+    selectedOptions.forEach((option) => {
       const count = optionMap.get(option.id) || 0;
       optionMap.set(option.id, count + 1);
     });
@@ -206,8 +206,8 @@ class MCPAnalyticsEnhancement {
    */
   trackError(error, context = {}) {
     const errorMetrics =
-      this.performanceMetrics.get('simulationMetrics').errorRates;
-    const errorType = error.name || 'UnknownError';
+      this.performanceMetrics.get("simulationMetrics").errorRates;
+    const errorType = error.name || "UnknownError";
 
     if (!errorMetrics.has(errorType)) {
       errorMetrics.set(errorType, {
@@ -224,13 +224,13 @@ class MCPAnalyticsEnhancement {
       ...context,
       timestamp: new Date(),
       userAgent:
-        typeof navigator !== 'undefined' ? navigator.userAgent : 'Node.js',
-      url: typeof window !== 'undefined' ? window.location.href : 'server-side',
+        typeof navigator !== "undefined" ? navigator.userAgent : "Node.js",
+      url: typeof window !== "undefined" ? window.location.href : "server-side",
       stackTrace: error.stack,
     });
 
     // Enhanced error reporting
-    this.analytics.track('error_occurred_enhanced', {
+    this.analytics.track("error_occurred_enhanced", {
       errorType,
       errorMessage: error.message,
       context,
@@ -243,15 +243,15 @@ class MCPAnalyticsEnhancement {
       this.sendRealTimeAlert(error, context);
     }
 
-    logger.error('Enhanced error tracking:', { error, context });
+    logger.error("Enhanced error tracking:", { error, context });
   }
 
   /**
    * Generate educational insights report
    */
   generateEducationalInsights() {
-    const contentMetrics = this.performanceMetrics.get('contentEffectiveness');
-    const learningMetrics = this.educationalOutcomes.get('learningProgression');
+    const contentMetrics = this.performanceMetrics.get("contentEffectiveness");
+    const learningMetrics = this.educationalOutcomes.get("learningProgression");
 
     const insights = {
       scenarioEffectiveness: this.analyzeScenarioEffectiveness(contentMetrics),
@@ -273,7 +273,7 @@ class MCPAnalyticsEnhancement {
     metrics.scenarioCompletionRates.forEach((rates, scenarioId) => {
       const completionRate = rates.completed / (rates.started || 1);
       const avgTimeSpent = this.calculateAverageTime(
-        metrics.timeSpentPerScenario.get(scenarioId) || []
+        metrics.timeSpentPerScenario.get(scenarioId) || [],
       );
 
       effectiveness.set(scenarioId, {
@@ -301,19 +301,19 @@ class MCPAnalyticsEnhancement {
 
     this.predictiveModels.learningSuccess.predictions.set(
       userId,
-      learningPrediction
+      learningPrediction,
     );
 
     // Update engagement prediction
     const engagementFactors = this.extractEngagementFactors(
       userId,
-      completionData
+      completionData,
     );
     const engagementPrediction = this.predictEngagement(engagementFactors);
 
     this.predictiveModels.engagement.predictions.set(
       userId,
-      engagementPrediction
+      engagementPrediction,
     );
   }
 
@@ -328,7 +328,7 @@ class MCPAnalyticsEnhancement {
       performance.memory &&
       performance.memory.usedJSHeapSize > thresholds.maxMemoryUsage
     ) {
-      this.sendPerformanceAlert('high_memory_usage', {
+      this.sendPerformanceAlert("high_memory_usage", {
         current: performance.memory.usedJSHeapSize,
         threshold: thresholds.maxMemoryUsage,
       });
@@ -346,19 +346,19 @@ class MCPAnalyticsEnhancement {
    */
   setupErrorBoundaries() {
     // Only set up browser-specific error handling in browser environment
-    if (typeof window !== 'undefined') {
-      window.addEventListener('error', event => {
+    if (typeof window !== "undefined") {
+      window.addEventListener("error", (event) => {
         this.trackError(event.error, {
-          type: 'javascript_error',
+          type: "javascript_error",
           filename: event.filename,
           lineNumber: event.lineno,
           columnNumber: event.colno,
         });
       });
 
-      window.addEventListener('unhandledrejection', event => {
+      window.addEventListener("unhandledrejection", (event) => {
         this.trackError(new Error(event.reason), {
-          type: 'promise_rejection',
+          type: "promise_rejection",
           reason: event.reason,
         });
       });
@@ -368,20 +368,20 @@ class MCPAnalyticsEnhancement {
   // Utility methods
   calculateErrorSeverity(error, context) {
     // Implement severity calculation logic
-    if (context.type === 'critical_simulation_failure') return 'critical';
-    if (error.name === 'TypeError') return 'high';
-    return 'medium';
+    if (context.type === "critical_simulation_failure") return "critical";
+    if (error.name === "TypeError") return "high";
+    return "medium";
   }
 
   isCriticalError(error, context) {
-    return this.calculateErrorSeverity(error, context) === 'critical';
+    return this.calculateErrorSeverity(error, context) === "critical";
   }
 
   sendRealTimeAlert(error, context) {
     // Send alerts to subscribed monitoring systems
-    this.realTimeDebugger.alertSubscribers.forEach(subscriber => {
+    this.realTimeDebugger.alertSubscribers.forEach((subscriber) => {
       subscriber.notify({
-        type: 'critical_error',
+        type: "critical_error",
         error: error.message,
         context,
         timestamp: new Date(),
@@ -403,7 +403,7 @@ class MCPAnalyticsEnhancement {
     // Analyze completion rates and time spent to assess difficulty
     const rates = metrics.scenarioCompletionRates.get(scenarioId);
     const avgTime = this.calculateAverageTime(
-      metrics.timeSpentPerScenario.get(scenarioId) || []
+      metrics.timeSpentPerScenario.get(scenarioId) || [],
     );
 
     if (
@@ -411,15 +411,15 @@ class MCPAnalyticsEnhancement {
         ANALYTICS_CONFIG.HIGH_DIFFICULTY_COMPLETION_THRESHOLD ||
       avgTime > ANALYTICS_CONFIG.HIGH_DIFFICULTY_TIME_THRESHOLD_MS
     ) {
-      return 'high';
+      return "high";
     } else if (
       rates.completed / rates.started >
         ANALYTICS_CONFIG.LOW_DIFFICULTY_COMPLETION_THRESHOLD &&
       avgTime < ANALYTICS_CONFIG.LOW_DIFFICULTY_TIME_THRESHOLD_MS
     ) {
-      return 'low';
+      return "low";
     }
-    return 'medium';
+    return "medium";
   }
 
   generateScenarioRecommendations(scenarioId, metrics) {
@@ -427,7 +427,7 @@ class MCPAnalyticsEnhancement {
 
     if (metrics.completionRate < ANALYTICS_CONFIG.COMPLETION_RATE_THRESHOLD) {
       recommendations.push(
-        'Consider simplifying scenario or adding more guidance'
+        "Consider simplifying scenario or adding more guidance",
       );
     }
 
@@ -435,7 +435,7 @@ class MCPAnalyticsEnhancement {
       metrics.avgTimeSpent > ANALYTICS_CONFIG.HIGH_DIFFICULTY_TIME_THRESHOLD_MS
     ) {
       recommendations.push(
-        'Scenario may be too complex - consider breaking into smaller parts'
+        "Scenario may be too complex - consider breaking into smaller parts",
       );
     }
 

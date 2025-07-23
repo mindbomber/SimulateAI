@@ -8,7 +8,7 @@ import {
   ref,
   uploadBytesResumable,
   getDownloadURL,
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 /**
  * Advanced Storage Configuration
@@ -42,9 +42,9 @@ const ADVANCED_CONFIG = {
     },
     QUALITY: 0.85,
     FORMATS: {
-      webp: 'image/webp',
-      jpeg: 'image/jpeg',
-      png: 'image/png',
+      webp: "image/webp",
+      jpeg: "image/jpeg",
+      png: "image/png",
     },
   },
 
@@ -90,7 +90,7 @@ export class AdvancedStorageService {
    */
   async processImageForProfile(
     file,
-    sizes = ADVANCED_CONFIG.IMAGE_PROCESSING.PROFILE_SIZES
+    sizes = ADVANCED_CONFIG.IMAGE_PROCESSING.PROFILE_SIZES,
   ) {
     const processedImages = {};
 
@@ -99,7 +99,7 @@ export class AdvancedStorageService {
         const processedFile = await this.resizeImage(
           file,
           dimensions.width,
-          dimensions.height
+          dimensions.height,
         );
         processedImages[sizeName] = processedFile;
       } catch (error) {
@@ -114,11 +114,11 @@ export class AdvancedStorageService {
     file,
     maxWidth,
     maxHeight,
-    quality = ADVANCED_CONFIG.IMAGE_PROCESSING.QUALITY
+    quality = ADVANCED_CONFIG.IMAGE_PROCESSING.QUALITY,
   ) {
     return new Promise((resolve, reject) => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
       const img = new Image();
 
       img.onload = () => {
@@ -127,7 +127,7 @@ export class AdvancedStorageService {
           img.width,
           img.height,
           maxWidth,
-          maxHeight
+          maxHeight,
         );
 
         canvas.width = width;
@@ -138,23 +138,23 @@ export class AdvancedStorageService {
 
         // Convert to blob
         canvas.toBlob(
-          blob => {
+          (blob) => {
             if (blob) {
               const resizedFile = new File([blob], file.name, {
-                type: 'image/jpeg',
+                type: "image/jpeg",
                 lastModified: Date.now(),
               });
               resolve(resizedFile);
             } else {
-              reject(new Error('Failed to create resized image'));
+              reject(new Error("Failed to create resized image"));
             }
           },
-          'image/jpeg',
-          quality
+          "image/jpeg",
+          quality,
         );
       };
 
-      img.onerror = () => reject(new Error('Failed to load image'));
+      img.onerror = () => reject(new Error("Failed to load image"));
       img.src = URL.createObjectURL(file);
     });
   }
@@ -163,7 +163,7 @@ export class AdvancedStorageService {
     originalWidth,
     originalHeight,
     maxWidth,
-    maxHeight
+    maxHeight,
   ) {
     let width = originalWidth;
     let height = originalHeight;
@@ -190,7 +190,7 @@ export class AdvancedStorageService {
       // Check user quota
       const quotaCheck = await this.checkUserQuota(
         userId,
-        file.size * IMAGE_SIZE_MULTIPLIER
+        file.size * IMAGE_SIZE_MULTIPLIER,
       ); // Estimate for multiple sizes
       if (!quotaCheck.allowed) {
         throw new Error(`Upload would exceed quota: ${quotaCheck.message}`);
@@ -209,7 +209,7 @@ export class AdvancedStorageService {
           const result = await this.uploadFileWithProgress(
             storageRef,
             processedFile,
-            progress => {
+            (progress) => {
               if (progressCallback) {
                 progressCallback({
                   size: sizeName,
@@ -220,7 +220,7 @@ export class AdvancedStorageService {
                     100,
                 });
               }
-            }
+            },
           );
 
           uploadResults[sizeName] = {
@@ -240,22 +240,22 @@ export class AdvancedStorageService {
           `${userId}_profile_images`,
           {
             userId,
-            type: 'profile_images',
+            type: "profile_images",
             originalFileName: file.name,
             sizes: uploadResults,
             uploadedAt: new Date(),
             totalSize: Object.values(uploadResults).reduce(
               (sum, img) => sum + img.size,
-              0
+              0,
             ),
-          }
+          },
         );
       }
 
       // Update user quota
       await this.updateUserQuota(
         userId,
-        Object.values(uploadResults).reduce((sum, img) => sum + img.size, 0)
+        Object.values(uploadResults).reduce((sum, img) => sum + img.size, 0),
       );
 
       return {
@@ -280,7 +280,7 @@ export class AdvancedStorageService {
 
       const batchPromises = batch.map(async (file, index) => {
         try {
-          const result = await uploadFunction(file, progress => {
+          const result = await uploadFunction(file, (progress) => {
             if (progressCallback) {
               progressCallback({
                 fileIndex: i + index,
@@ -299,16 +299,16 @@ export class AdvancedStorageService {
 
       const batchResults = await Promise.allSettled(batchPromises);
       results.push(
-        ...batchResults.map(r =>
-          r.status === 'fulfilled' ? r.value : r.reason
-        )
+        ...batchResults.map((r) =>
+          r.status === "fulfilled" ? r.value : r.reason,
+        ),
       );
     }
 
     return {
       total: files.length,
-      successful: results.filter(r => r.success).length,
-      failed: results.filter(r => !r.success).length,
+      successful: results.filter((r) => r.success).length,
+      failed: results.filter((r) => !r.success).length,
       results,
     };
   }
@@ -324,14 +324,14 @@ export class AdvancedStorageService {
       // Check if this hash exists in user's files
       if (this.hybridData) {
         const existingFiles = await this.hybridData.queryFirestoreCollection(
-          'user_files',
+          "user_files",
           {
             where: [
-              ['userId', '==', userId],
-              ['fileHash', '==', fileHash],
+              ["userId", "==", userId],
+              ["fileHash", "==", fileHash],
             ],
             limit: 1,
-          }
+          },
         );
 
         if (existingFiles.length > 0) {
@@ -351,11 +351,11 @@ export class AdvancedStorageService {
 
   async generateFileHash(file) {
     const buffer = await file.arrayBuffer();
-    const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray
-      .map(b => b.toString(HEX_BASE).padStart(HEX_PAD_LENGTH, '0'))
-      .join('');
+      .map((b) => b.toString(HEX_BASE).padStart(HEX_PAD_LENGTH, "0"))
+      .join("");
   }
 
   /**
@@ -400,15 +400,15 @@ export class AdvancedStorageService {
     try {
       if (this.hybridData) {
         const userFiles = await this.hybridData.queryFirestoreCollection(
-          'user_files',
+          "user_files",
           {
-            where: [['userId', '==', userId]],
-          }
+            where: [["userId", "==", userId]],
+          },
         );
 
         return userFiles.reduce(
           (total, file) => total + (file.totalSize || file.size || 0),
-          0
+          0,
         );
       }
       return 0;
@@ -421,14 +421,14 @@ export class AdvancedStorageService {
     try {
       if (this.hybridData) {
         const userProfile = await this.hybridData.getFirestoreDocument(
-          'users',
-          userId
+          "users",
+          userId,
         );
-        return userProfile?.tier || userProfile?.subscription?.tier || 'free';
+        return userProfile?.tier || userProfile?.subscription?.tier || "free";
       }
-      return 'free';
+      return "free";
     } catch (error) {
-      return 'free';
+      return "free";
     }
   }
 
@@ -437,7 +437,7 @@ export class AdvancedStorageService {
 
     try {
       const currentUsage = await this.getUserStorageUsage(userId);
-      await this.hybridData.updateFirestoreDocument('user_storage', userId, {
+      await this.hybridData.updateFirestoreDocument("user_storage", userId, {
         totalUsage: currentUsage + additionalUsage,
         lastUpdated: new Date(),
       });
@@ -453,14 +453,14 @@ export class AdvancedStorageService {
     userId,
     file,
     category,
-    progressCallback = null
+    progressCallback = null,
   ) {
     try {
       // Check for existing versions
       const existingVersions = await this.getFileVersions(
         userId,
         file.name,
-        category
+        category,
       );
       const version = existingVersions.length + 1;
 
@@ -470,13 +470,13 @@ export class AdvancedStorageService {
       const result = await this.uploadFileWithProgress(
         storageRef,
         file,
-        progressCallback
+        progressCallback,
       );
 
       // Store version metadata
       if (this.hybridData) {
         await this.hybridData.createFirestoreDocument(
-          'file_versions',
+          "file_versions",
           `${userId}_${file.name}_v${version}`,
           {
             userId,
@@ -488,18 +488,18 @@ export class AdvancedStorageService {
             size: file.size,
             uploadedAt: new Date(),
             isLatest: true,
-          }
+          },
         );
 
         // Mark previous versions as not latest
         if (existingVersions.length > 0) {
           for (const existingVersion of existingVersions) {
             await this.hybridData.updateFirestoreDocument(
-              'file_versions',
+              "file_versions",
               existingVersion.id,
               {
                 isLatest: false,
-              }
+              },
             );
           }
         }
@@ -521,13 +521,13 @@ export class AdvancedStorageService {
     if (!this.hybridData) return [];
 
     try {
-      return await this.hybridData.queryFirestoreCollection('file_versions', {
+      return await this.hybridData.queryFirestoreCollection("file_versions", {
         where: [
-          ['userId', '==', userId],
-          ['fileName', '==', fileName],
-          ['category', '==', category],
+          ["userId", "==", userId],
+          ["fileName", "==", fileName],
+          ["category", "==", category],
         ],
-        orderBy: [['version', 'desc']],
+        orderBy: [["version", "desc"]],
       });
     } catch (error) {
       return [];
@@ -547,19 +547,19 @@ export class AdvancedStorageService {
           storageRef,
           file,
           progressCallback,
-          attempt
+          attempt,
         );
       } catch (error) {
         lastError = error;
 
         if (attempt < maxRetries) {
           const delay = ADVANCED_CONFIG.PERFORMANCE.RETRY_DELAY * attempt;
-          await new Promise(resolve => setTimeout(resolve, delay));
+          await new Promise((resolve) => setTimeout(resolve, delay));
 
           if (progressCallback) {
             progressCallback({
               progress: 0,
-              state: 'retrying',
+              state: "retrying",
               attempt,
               maxRetries,
             });
@@ -569,7 +569,7 @@ export class AdvancedStorageService {
     }
 
     throw new Error(
-      `Upload failed after ${maxRetries} attempts: ${lastError.message}`
+      `Upload failed after ${maxRetries} attempts: ${lastError.message}`,
     );
   }
 
@@ -583,8 +583,8 @@ export class AdvancedStorageService {
       this.activeUploads.set(uploadId, uploadTask);
 
       uploadTask.on(
-        'state_changed',
-        snapshot => {
+        "state_changed",
+        (snapshot) => {
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
 
@@ -598,7 +598,7 @@ export class AdvancedStorageService {
             });
           }
         },
-        error => {
+        (error) => {
           this.activeUploads.delete(uploadId);
           reject(error);
         },
@@ -617,7 +617,7 @@ export class AdvancedStorageService {
           } catch (error) {
             reject(error);
           }
-        }
+        },
       );
     });
   }
@@ -628,15 +628,15 @@ export class AdvancedStorageService {
   async organizeUserFiles(userId) {
     try {
       if (!this.hybridData) {
-        throw new Error('Hybrid data service not available');
+        throw new Error("Hybrid data service not available");
       }
 
       // Get all user files
       const userFiles = await this.hybridData.queryFirestoreCollection(
-        'user_files',
+        "user_files",
         {
-          where: [['userId', '==', userId]],
-        }
+          where: [["userId", "==", userId]],
+        },
       );
 
       const organization = {
@@ -650,16 +650,16 @@ export class AdvancedStorageService {
 
       for (const file of userFiles) {
         // Categorize by type
-        if (file.contentType?.startsWith('image/')) {
+        if (file.contentType?.startsWith("image/")) {
           organization.images.push(file);
         } else if (
-          file.contentType?.includes('pdf') ||
-          file.contentType?.includes('document')
+          file.contentType?.includes("pdf") ||
+          file.contentType?.includes("document")
         ) {
           organization.documents.push(file);
         } else if (
-          file.contentType?.includes('zip') ||
-          file.contentType?.includes('archive')
+          file.contentType?.includes("zip") ||
+          file.contentType?.includes("archive")
         ) {
           organization.archives.push(file);
         } else {
@@ -678,7 +678,7 @@ export class AdvancedStorageService {
           if (
             this.calculateStringSimilarity(
               userFiles[i].fileName,
-              userFiles[j].fileName
+              userFiles[j].fileName,
             ) > SIMILARITY_THRESHOLD
           ) {
             organization.duplicates.push({
@@ -686,7 +686,7 @@ export class AdvancedStorageService {
               file2: userFiles[j],
               similarity: this.calculateStringSimilarity(
                 userFiles[i].fileName,
-                userFiles[j].fileName
+                userFiles[j].fileName,
               ),
             });
           }
@@ -740,7 +740,7 @@ export class AdvancedStorageService {
           matrix[i][j] = Math.min(
             matrix[i - 1][j - 1] + 1,
             matrix[i][j - 1] + 1,
-            matrix[i - 1][j] + 1
+            matrix[i - 1][j] + 1,
           );
         }
       }
@@ -753,9 +753,9 @@ export class AdvancedStorageService {
    * Utility Methods
    */
   formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
   }
@@ -774,18 +774,18 @@ export class AdvancedStorageService {
       };
 
       if (this.hybridData) {
-        const query = userId ? { where: [['userId', '==', userId]] } : {};
+        const query = userId ? { where: [["userId", "==", userId]] } : {};
 
         const allFiles = await this.hybridData.queryFirestoreCollection(
-          'user_files',
-          query
+          "user_files",
+          query,
         );
 
         // Overview statistics
         analytics.overview = {
           totalFiles: allFiles.length,
           totalSize: allFiles.reduce((sum, file) => sum + (file.size || 0), 0),
-          totalUsers: new Set(allFiles.map(f => f.userId)).size,
+          totalUsers: new Set(allFiles.map((f) => f.userId)).size,
           averageFileSize:
             allFiles.length > 0
               ? allFiles.reduce((sum, file) => sum + (file.size || 0), 0) /
@@ -795,8 +795,8 @@ export class AdvancedStorageService {
 
         // File type breakdown
         const typeStats = {};
-        allFiles.forEach(file => {
-          const type = file.contentType || 'unknown';
+        allFiles.forEach((file) => {
+          const type = file.contentType || "unknown";
           if (!typeStats[type]) {
             typeStats[type] = { count: 0, totalSize: 0 };
           }
@@ -807,10 +807,10 @@ export class AdvancedStorageService {
 
         // Upload trends (by month)
         const trendStats = {};
-        allFiles.forEach(file => {
+        allFiles.forEach((file) => {
           if (file.uploadedAt) {
             const month = new Date(
-              file.uploadedAt.seconds * MILLISECONDS_MULTIPLIER
+              file.uploadedAt.seconds * MILLISECONDS_MULTIPLIER,
             )
               .toISOString()
               .substring(0, MONTH_STRING_LENGTH);
@@ -826,7 +826,7 @@ export class AdvancedStorageService {
         // User activity (if not filtering by specific user)
         if (!userId) {
           const userStats = {};
-          allFiles.forEach(file => {
+          allFiles.forEach((file) => {
             if (!userStats[file.userId]) {
               userStats[file.userId] = { files: 0, totalSize: 0 };
             }

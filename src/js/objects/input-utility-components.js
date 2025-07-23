@@ -9,7 +9,7 @@
  * Licensed under the Apache License, Version 2.0
  */
 
-'use strict';
+"use strict";
 
 // Constants to eliminate magic numbers
 const INPUT_UTILITY_CONSTANTS = {
@@ -284,9 +284,9 @@ const INPUT_UTILITY_CONSTANTS = {
 
 // Utilities have been extracted to modular architecture
 // Import from their new locations for backward compatibility
-import { PerformanceMonitor } from '../utils/performance-monitor.js';
-import { ComponentError } from '../utils/component-error.js';
-import { AnimationManager } from '../utils/animation-manager.js';
+import { PerformanceMonitor } from "../utils/performance-monitor.js";
+import { ComponentError } from "../utils/component-error.js";
+import { AnimationManager } from "../utils/animation-manager.js";
 
 // Export remaining utility classes
 export {

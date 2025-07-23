@@ -5,20 +5,20 @@
  * independently from the CategoryGrid.
  */
 
-import CategoryHeader from './category-header.js';
-import { getCategoryProgress } from '../../data/categories.js';
+import CategoryHeader from "./category-header.js";
+import { getCategoryProgress } from "../../data/categories.js";
 
 // Example usage
 const categoryHeader = new CategoryHeader();
 
 // Example category data
 const exampleCategory = {
-  id: 'ai-bias',
-  title: 'AI Bias & Fairness',
-  description: 'Explore algorithmic bias and fairness in AI systems',
-  icon: '⚖️',
-  color: '#8B5CF6',
-  difficulty: 'intermediate',
+  id: "ai-bias",
+  title: "AI Bias & Fairness",
+  description: "Explore algorithmic bias and fairness in AI systems",
+  icon: "⚖️",
+  color: "#8B5CF6",
+  difficulty: "intermediate",
   estimatedTime: 25,
 };
 
@@ -29,7 +29,7 @@ const progress = getCategoryProgress(exampleCategory.id, {});
 const headerHtml = categoryHeader.render(exampleCategory, progress);
 
 // Add to DOM
-const container = document.getElementById('category-container');
+const container = document.getElementById("category-container");
 if (container) {
   container.innerHTML = headerHtml;
 

@@ -10,8 +10,8 @@
  * - Export functionality for research
  */
 
-import logger from '../utils/logger.js';
-import regionalAnalytics from '../services/regional-analytics.js';
+import logger from "../utils/logger.js";
+import regionalAnalytics from "../services/regional-analytics.js";
 
 /**
  * Dashboard constants
@@ -56,15 +56,15 @@ class RegionalAnalyticsDashboard {
     this.setupEventListeners();
     this.loadInitialData();
 
-    logger.info('Regional Analytics Dashboard initialized');
+    logger.info("Regional Analytics Dashboard initialized");
   }
 
   /**
    * Create the dashboard HTML structure
    */
   createDashboard() {
-    this.dashboardElement = document.createElement('div');
-    this.dashboardElement.className = 'regional-analytics-dashboard';
+    this.dashboardElement = document.createElement("div");
+    this.dashboardElement.className = "regional-analytics-dashboard";
     this.dashboardElement.innerHTML = `
       <div class="dashboard-overlay"></div>
       <div class="dashboard-content">
@@ -173,10 +173,10 @@ class RegionalAnalyticsDashboard {
    * Add dashboard styles
    */
   addDashboardStyles() {
-    const styleId = 'regional-analytics-dashboard-styles';
+    const styleId = "regional-analytics-dashboard-styles";
     if (document.getElementById(styleId)) return;
 
-    const styles = document.createElement('style');
+    const styles = document.createElement("style");
     styles.id = styleId;
     styles.textContent = `
       .regional-analytics-dashboard {
@@ -629,42 +629,42 @@ class RegionalAnalyticsDashboard {
   setupEventListeners() {
     // Close button
     this.dashboardElement
-      .querySelector('.close-btn')
-      .addEventListener('click', () => {
+      .querySelector(".close-btn")
+      .addEventListener("click", () => {
         this.hide();
       });
 
     // Overlay click to close
     this.dashboardElement
-      .querySelector('.dashboard-overlay')
-      .addEventListener('click', () => {
+      .querySelector(".dashboard-overlay")
+      .addEventListener("click", () => {
         this.hide();
       });
 
     // Refresh button
     this.dashboardElement
-      .querySelector('.refresh-btn')
-      .addEventListener('click', () => {
+      .querySelector(".refresh-btn")
+      .addEventListener("click", () => {
         this.refresh();
       });
 
     // Export button
     this.dashboardElement
-      .querySelector('.export-btn')
-      .addEventListener('click', () => {
+      .querySelector(".export-btn")
+      .addEventListener("click", () => {
         this.exportData();
       });
 
     // Tab switching
-    this.dashboardElement.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+    this.dashboardElement.querySelectorAll(".tab-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
         this.switchTab(btn.dataset.tab);
       });
     });
 
     // Keyboard shortcuts
-    document.addEventListener('keydown', event => {
-      if (this.isVisible && event.key === 'Escape') {
+    document.addEventListener("keydown", (event) => {
+      if (this.isVisible && event.key === "Escape") {
         this.hide();
       }
     });
@@ -679,8 +679,8 @@ class RegionalAnalyticsDashboard {
       await this.loadInsights();
       this.hideLoading();
     } catch (error) {
-      logger.error('Failed to load initial regional analytics data:', error);
-      this.showError('Failed to load data');
+      logger.error("Failed to load initial regional analytics data:", error);
+      this.showError("Failed to load data");
     }
   }
 
@@ -692,7 +692,7 @@ class RegionalAnalyticsDashboard {
       this.insights = regionalAnalytics.generateRegionalInsights();
       this.updateDashboard();
     } catch (error) {
-      logger.error('Failed to load regional insights:', error);
+      logger.error("Failed to load regional insights:", error);
       throw error;
     }
   }
@@ -717,26 +717,26 @@ class RegionalAnalyticsDashboard {
     const { globalSummary } = this.insights;
 
     // Update global stats
-    document.getElementById('total-decisions').textContent =
+    document.getElementById("total-decisions").textContent =
       globalSummary.totalDecisions.toLocaleString();
-    document.getElementById('active-regions').textContent =
+    document.getElementById("active-regions").textContent =
       globalSummary.activeRegions;
 
     const period = globalSummary.dataCollectionPeriod;
     if (period) {
       const days = Math.ceil(
-        period.duration / DASHBOARD_CONSTANTS.MILLISECONDS_PER_DAY
+        period.duration / DASHBOARD_CONSTANTS.MILLISECONDS_PER_DAY,
       );
-      document.getElementById('data-period').textContent = `${days} days`;
+      document.getElementById("data-period").textContent = `${days} days`;
     } else {
-      document.getElementById('data-period').textContent = 'N/A';
+      document.getElementById("data-period").textContent = "N/A";
     }
 
     // Update top regions
-    const topRegionsList = document.getElementById('top-regions-list');
+    const topRegionsList = document.getElementById("top-regions-list");
     topRegionsList.innerHTML = globalSummary.topRegions
       .map(
-        region => `
+        (region) => `
         <div class="region-item">
           <div class="region-name">${region.region}</div>
           <div class="region-stats">
@@ -744,9 +744,9 @@ class RegionalAnalyticsDashboard {
             <span>${region.percentage}%</span>
           </div>
         </div>
-      `
+      `,
       )
-      .join('');
+      .join("");
   }
 
   /**
@@ -755,10 +755,10 @@ class RegionalAnalyticsDashboard {
   updateRegions() {
     const { regionalComparisons } = this.insights;
 
-    const comparisonGrid = document.getElementById('regional-comparison');
+    const comparisonGrid = document.getElementById("regional-comparison");
     comparisonGrid.innerHTML = regionalComparisons
       .map(
-        region => `
+        (region) => `
         <div class="region-card">
           <h4>${region.region}</h4>
           <div class="region-info">
@@ -767,10 +767,10 @@ class RegionalAnalyticsDashboard {
             <ul>
               ${region.topScenarios
                 .map(
-                  scenario =>
-                    `<li>${scenario.scenario} (${scenario.totalChoices} choices)</li>`
+                  (scenario) =>
+                    `<li>${scenario.scenario} (${scenario.totalChoices} choices)</li>`,
                 )
-                .join('')}
+                .join("")}
             </ul>
             <p><strong>Cultural Indicators:</strong></p>
             <ul>
@@ -780,9 +780,9 @@ class RegionalAnalyticsDashboard {
             </ul>
           </div>
         </div>
-      `
+      `,
       )
-      .join('');
+      .join("");
   }
 
   /**
@@ -791,7 +791,7 @@ class RegionalAnalyticsDashboard {
   updateEthics() {
     const { ethicsPreferences } = this.insights;
 
-    const ethicsCharts = document.getElementById('ethics-charts');
+    const ethicsCharts = document.getElementById("ethics-charts");
     ethicsCharts.innerHTML = Object.entries(ethicsPreferences)
       .map(
         ([category, data]) => `
@@ -800,7 +800,7 @@ class RegionalAnalyticsDashboard {
           <div class="ethics-bars">
             ${data.regionalVariation
               .map(
-                region => `
+                (region) => `
               <div class="ethics-bar">
                 <div class="ethics-bar-label">${region.region}</div>
                 <div class="ethics-bar-fill">
@@ -808,14 +808,14 @@ class RegionalAnalyticsDashboard {
                   <div class="ethics-bar-text">${region.average.toFixed(2)}</div>
                 </div>
               </div>
-            `
+            `,
               )
-              .join('')}
+              .join("")}
           </div>
         </div>
-      `
+      `,
       )
-      .join('');
+      .join("");
   }
 
   /**
@@ -824,28 +824,28 @@ class RegionalAnalyticsDashboard {
   updateTrends() {
     const { culturalTrends } = this.insights;
 
-    const trendsGrid = document.getElementById('cultural-trends');
+    const trendsGrid = document.getElementById("cultural-trends");
     trendsGrid.innerHTML = Object.entries(culturalTrends)
       .map(
         ([trendType, data]) => `
         <div class="trend-card">
-          <h4>${trendType.replace(/([A-Z])/g, ' $1').trim()}</h4>
+          <h4>${trendType.replace(/([A-Z])/g, " $1").trim()}</h4>
           <div class="trend-list">
             ${Object.entries(data)
               .map(
                 ([region, trend]) => `
               <div class="trend-item">
                 <span>${region}</span>
-                <span>${typeof trend === 'object' ? JSON.stringify(trend) : trend}</span>
+                <span>${typeof trend === "object" ? JSON.stringify(trend) : trend}</span>
               </div>
-            `
+            `,
               )
-              .join('')}
+              .join("")}
           </div>
         </div>
-      `
+      `,
       )
-      .join('');
+      .join("");
   }
 
   /**
@@ -854,10 +854,10 @@ class RegionalAnalyticsDashboard {
   updateInsights() {
     const { recommendations } = this.insights;
 
-    const recommendationsList = document.getElementById('recommendations-list');
+    const recommendationsList = document.getElementById("recommendations-list");
     recommendationsList.innerHTML = recommendations
       .map(
-        rec => `
+        (rec) => `
         <div class="recommendation-item priority-${rec.priority}">
           <div class="recommendation-header">
             <div class="recommendation-region">${rec.region}</div>
@@ -866,9 +866,9 @@ class RegionalAnalyticsDashboard {
           <div class="recommendation-text">${rec.suggestion}</div>
           <div class="recommendation-impact">${rec.impact}</div>
         </div>
-      `
+      `,
       )
-      .join('');
+      .join("");
   }
 
   /**
@@ -876,13 +876,13 @@ class RegionalAnalyticsDashboard {
    */
   switchTab(tabName) {
     // Update tab buttons
-    this.dashboardElement.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.tab === tabName);
+    this.dashboardElement.querySelectorAll(".tab-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.tab === tabName);
     });
 
     // Update panels
-    this.dashboardElement.querySelectorAll('.panel').forEach(panel => {
-      panel.classList.toggle('active', panel.dataset.panel === tabName);
+    this.dashboardElement.querySelectorAll(".panel").forEach((panel) => {
+      panel.classList.toggle("active", panel.dataset.panel === tabName);
     });
   }
 
@@ -890,31 +890,31 @@ class RegionalAnalyticsDashboard {
    * Show loading indicator
    */
   showLoading() {
-    this.dashboardElement.querySelector('.loading-indicator').style.display =
-      'flex';
-    this.dashboardElement.querySelector('.dashboard-tabs').style.display =
-      'none';
-    this.dashboardElement.querySelector('.dashboard-panels').style.display =
-      'none';
+    this.dashboardElement.querySelector(".loading-indicator").style.display =
+      "flex";
+    this.dashboardElement.querySelector(".dashboard-tabs").style.display =
+      "none";
+    this.dashboardElement.querySelector(".dashboard-panels").style.display =
+      "none";
   }
 
   /**
    * Hide loading indicator
    */
   hideLoading() {
-    this.dashboardElement.querySelector('.loading-indicator').style.display =
-      'none';
-    this.dashboardElement.querySelector('.dashboard-tabs').style.display =
-      'flex';
-    this.dashboardElement.querySelector('.dashboard-panels').style.display =
-      'block';
+    this.dashboardElement.querySelector(".loading-indicator").style.display =
+      "none";
+    this.dashboardElement.querySelector(".dashboard-tabs").style.display =
+      "flex";
+    this.dashboardElement.querySelector(".dashboard-panels").style.display =
+      "block";
   }
 
   /**
    * Show error message
    */
   showError(message) {
-    this.dashboardElement.querySelector('.loading-indicator').innerHTML = `
+    this.dashboardElement.querySelector(".loading-indicator").innerHTML = `
       <span class="error-icon">⚠️</span>
       ${message}
     `;
@@ -924,7 +924,7 @@ class RegionalAnalyticsDashboard {
    * Show dashboard
    */
   show() {
-    this.dashboardElement.style.display = 'block';
+    this.dashboardElement.style.display = "block";
     this.isVisible = true;
 
     // Start auto-refresh
@@ -938,7 +938,7 @@ class RegionalAnalyticsDashboard {
    * Hide dashboard
    */
   hide() {
-    this.dashboardElement.style.display = 'none';
+    this.dashboardElement.style.display = "none";
     this.isVisible = false;
 
     // Stop auto-refresh
@@ -965,8 +965,8 @@ class RegionalAnalyticsDashboard {
       await this.loadInsights();
       this.hideLoading();
     } catch (error) {
-      logger.error('Failed to refresh regional analytics:', error);
-      this.showError('Failed to refresh data');
+      logger.error("Failed to refresh regional analytics:", error);
+      this.showError("Failed to refresh data");
     }
   }
 
@@ -977,21 +977,21 @@ class RegionalAnalyticsDashboard {
     try {
       const exportData = regionalAnalytics.exportRegionalData();
       const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-        type: 'application/json',
+        type: "application/json",
       });
       const url = URL.createObjectURL(blob);
 
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
-      a.download = `regional_analytics_${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `regional_analytics_${new Date().toISOString().split("T")[0]}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      logger.info('Regional analytics data exported');
+      logger.info("Regional analytics data exported");
     } catch (error) {
-      logger.error('Failed to export regional analytics data:', error);
+      logger.error("Failed to export regional analytics data:", error);
     }
   }
 

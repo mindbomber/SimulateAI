@@ -51,8 +51,8 @@ class RateLimitStatus {
       return;
     }
 
-    this.container = document.createElement('div');
-    this.container.className = 'rate-limit-status';
+    this.container = document.createElement("div");
+    this.container.className = "rate-limit-status";
     this.container.innerHTML = `
       <div class="rate-limit-content">
         <div class="rate-limit-icon">⏱️</div>
@@ -66,13 +66,13 @@ class RateLimitStatus {
     `;
 
     // Add event listeners
-    const closeBtn = this.container.querySelector('.rate-limit-close');
-    closeBtn.addEventListener('click', () => this.hide());
+    const closeBtn = this.container.querySelector(".rate-limit-close");
+    closeBtn.addEventListener("click", () => this.hide());
 
     // Insert into DOM
     const targetContainer =
-      document.querySelector('.auth-modal') ||
-      document.querySelector('.modal-content') ||
+      document.querySelector(".auth-modal") ||
+      document.querySelector(".modal-content") ||
       document.body;
 
     targetContainer.appendChild(this.container);
@@ -84,21 +84,21 @@ class RateLimitStatus {
   updateContent(rateLimitResult) {
     if (!this.container || !rateLimitResult) return;
 
-    const description = this.container.querySelector('.rate-limit-description');
-    const timer = this.container.querySelector('.rate-limit-timer');
+    const description = this.container.querySelector(".rate-limit-description");
+    const timer = this.container.querySelector(".rate-limit-timer");
 
     // Generate helpful description
     const { remainingMinutes } = rateLimitResult;
-    let message = 'Please wait before trying to sign in again.';
+    let message = "Please wait before trying to sign in again.";
 
     if (remainingMinutes > 60) {
       const hours = Math.ceil(remainingMinutes / 60);
-      message = `Too many failed attempts. Please try again in ${hours} hour${hours > 1 ? 's' : ''}.`;
+      message = `Too many failed attempts. Please try again in ${hours} hour${hours > 1 ? "s" : ""}.`;
     } else if (remainingMinutes > 1) {
       message = `Too many failed attempts. Please try again in ${remainingMinutes} minutes.`;
     } else {
       message =
-        'Too many failed attempts. Please try again in less than a minute.';
+        "Too many failed attempts. Please try again in less than a minute.";
     }
 
     description.textContent = message;
@@ -113,11 +113,11 @@ class RateLimitStatus {
   updateTimer(rateLimitResult) {
     if (!this.container) return;
 
-    const timer = this.container.querySelector('.rate-limit-timer');
+    const timer = this.container.querySelector(".rate-limit-timer");
     const { remainingMinutes, cooldownEnd } = rateLimitResult;
 
     if (!cooldownEnd) {
-      timer.textContent = '';
+      timer.textContent = "";
       return;
     }
 
@@ -125,8 +125,8 @@ class RateLimitStatus {
     const remaining = Math.max(0, cooldownEnd - now);
 
     if (remaining <= 0) {
-      timer.textContent = 'You can try signing in again now.';
-      timer.classList.add('rate-limit-ready');
+      timer.textContent = "You can try signing in again now.";
+      timer.classList.add("rate-limit-ready");
       return;
     }
 
@@ -134,12 +134,12 @@ class RateLimitStatus {
     const seconds = Math.floor((remaining % (60 * 1000)) / 1000);
 
     if (minutes > 0) {
-      timer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')} remaining`;
+      timer.textContent = `${minutes}:${seconds.toString().padStart(2, "0")} remaining`;
     } else {
       timer.textContent = `${seconds} seconds remaining`;
     }
 
-    timer.classList.remove('rate-limit-ready');
+    timer.classList.remove("rate-limit-ready");
   }
 
   /**
@@ -173,8 +173,8 @@ class RateLimitStatus {
    * Show a brief success message when rate limit is lifted
    */
   showReadyMessage() {
-    const message = document.createElement('div');
-    message.className = 'rate-limit-ready-message';
+    const message = document.createElement("div");
+    message.className = "rate-limit-ready-message";
     message.innerHTML = `
       <div class="rate-limit-ready-content">
         <span class="rate-limit-ready-icon">✅</span>
@@ -335,15 +335,15 @@ const rateLimitCSS = `
 `;
 
 // Inject CSS styles
-if (!document.querySelector('#rate-limit-status-styles')) {
-  const style = document.createElement('style');
-  style.id = 'rate-limit-status-styles';
+if (!document.querySelector("#rate-limit-status-styles")) {
+  const style = document.createElement("style");
+  style.id = "rate-limit-status-styles";
   style.textContent = rateLimitCSS;
   document.head.appendChild(style);
 }
 
 // Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
   module.exports = RateLimitStatus;
 } else {
   window.RateLimitStatus = RateLimitStatus;

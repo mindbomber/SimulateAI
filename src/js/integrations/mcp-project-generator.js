@@ -15,8 +15,8 @@
 
 class MCPProjectGenerator {
   constructor() {
-    this.templatePath = 'templates/scenarios/';
-    this.generatedPath = 'src/js/data/scenarios/generated/';
+    this.templatePath = "templates/scenarios/";
+    this.generatedPath = "src/js/data/scenarios/generated/";
     this.webResearch = null;
     this.githubIntegration = null;
   }
@@ -27,14 +27,14 @@ class MCPProjectGenerator {
    * @returns {string} Escaped string
    */
   escapeString(str) {
-    if (typeof str !== 'string') return str;
+    if (typeof str !== "string") return str;
     return str
-      .replace(/\\/g, '\\\\')
+      .replace(/\\/g, "\\\\")
       .replace(/'/g, "\\'")
       .replace(/"/g, '\\"')
-      .replace(/\n/g, '\\n')
-      .replace(/\r/g, '\\r')
-      .replace(/\t/g, '\\t');
+      .replace(/\n/g, "\\n")
+      .replace(/\r/g, "\\r")
+      .replace(/\t/g, "\\t");
   }
 
   /**
@@ -72,16 +72,16 @@ class MCPProjectGenerator {
    */
   async generateNewScenarioCategory(categoryConfig) {
     // Input validation
-    if (!categoryConfig || typeof categoryConfig !== 'object') {
+    if (!categoryConfig || typeof categoryConfig !== "object") {
       throw new Error(
-        'Category configuration is required and must be an object'
+        "Category configuration is required and must be an object",
       );
     }
 
     const { categoryId } = categoryConfig;
 
-    if (!categoryId || typeof categoryId !== 'string') {
-      throw new Error('categoryId is required and must be a string');
+    if (!categoryId || typeof categoryId !== "string") {
+      throw new Error("categoryId is required and must be a string");
     }
 
     try {
@@ -119,10 +119,10 @@ class MCPProjectGenerator {
         config.subtitle ||
         `Explore ${config.categoryName.toLowerCase()} in AI systems`,
       description: this.generateCategoryDescription(config),
-      icon: config.icon || 'default',
+      icon: config.icon || "default",
       color: config.color || this.getDefaultColor(config.categoryId),
-      difficulty: config.complexity || 'intermediate',
-      duration: config.estimatedDuration || '30-45 minutes',
+      difficulty: config.complexity || "intermediate",
+      duration: config.estimatedDuration || "30-45 minutes",
       learningObjectives: this.generateLearningObjectives(config),
       isteCriteria: this.mapToISTEStandards(config),
       scenarios: this.generateBaseScenarios(config),
@@ -140,7 +140,7 @@ class MCPProjectGenerator {
     // This would use MCP create_file function
     await this.createFile(
       `src/js/data/scenarios/${categoryId}-scenarios.js`,
-      scenarioContent
+      scenarioContent,
     );
 
     // Create scenario info for the simulation data
@@ -167,7 +167,7 @@ class MCPProjectGenerator {
  */
 
 export const ${categoryData.id}Scenarios = {
-${categoryData.scenarios.map(scenario => this.formatScenarioForFile(scenario)).join(',\n\n')}
+${categoryData.scenarios.map((scenario) => this.formatScenarioForFile(scenario)).join(",\n\n")}
 };
 
 export default ${categoryData.id}Scenarios;`;
@@ -182,7 +182,7 @@ export default ${categoryData.id}Scenarios;`;
     dilemma: \`${this.escapeString(scenario.dilemma)}\`,
     ethicalQuestion: '${this.escapeString(scenario.ethicalQuestion)}',
     options: [
-${scenario.options.map(option => this.formatOptionForFile(option)).join(',\n')}
+${scenario.options.map((option) => this.formatOptionForFile(option)).join(",\n")}
     ]
   }`;
   }
@@ -206,10 +206,10 @@ ${scenario.options.map(option => this.formatOptionForFile(option)).join(',\n')}
           proportionality: ${option.impact.proportionality}
         },
         pros: [
-${option.pros.map(pro => `          '${this.escapeString(pro)}'`).join(',\n')}
+${option.pros.map((pro) => `          '${this.escapeString(pro)}'`).join(",\n")}
         ],
         cons: [
-${option.cons.map(con => `          '${this.escapeString(con)}'`).join(',\n')}
+${option.cons.map((con) => `          '${this.escapeString(con)}'`).join(",\n")}
         ]
       }`;
   }
@@ -249,10 +249,10 @@ ${option.cons.map(con => `          '${this.escapeString(con)}'`).join(',\n')}
   mapToISTEStandards(config) {
     // Base ISTE standards for AI ethics education
     const baseStandards = [
-      'Digital Citizen 1.2.2: Engage in positive, safe, legal and ethical behavior',
-      'Knowledge Constructor 1.3.2: Evaluate accuracy and perspective of sources',
-      'Innovative Designer 1.4.1: Solve problems by creating new solutions',
-      'Global Collaborator 1.7.3: Examine local and global issues',
+      "Digital Citizen 1.2.2: Engage in positive, safe, legal and ethical behavior",
+      "Knowledge Constructor 1.3.2: Evaluate accuracy and perspective of sources",
+      "Innovative Designer 1.4.1: Solve problems by creating new solutions",
+      "Global Collaborator 1.7.3: Examine local and global issues",
     ];
 
     // Add category-specific standards
@@ -282,7 +282,7 @@ ${option.cons.map(con => `          '${this.escapeString(con)}'`).join(',\n')}
 
     // Write updated categories
     const categoryContent = this.formatCategoriesFile(currentCategories);
-    await this.updateFile('src/data/categories.js', categoryContent);
+    await this.updateFile("src/data/categories.js", categoryContent);
   }
 
   /**
@@ -295,13 +295,13 @@ ${option.cons.map(con => `          '${this.escapeString(con)}'`).join(',\n')}
 ${categoryData.description}
 
 ## Learning Objectives
-${categoryData.learningObjectives.map(obj => `- ${obj}`).join('\n')}
+${categoryData.learningObjectives.map((obj) => `- ${obj}`).join("\n")}
 
 ## ISTE Standards Alignment
-${categoryData.isteCriteria.map(standard => `- ${standard}`).join('\n')}
+${categoryData.isteCriteria.map((standard) => `- ${standard}`).join("\n")}
 
 ## Scenarios
-${categoryData.scenarios.map(scenario => this.formatScenarioDocumentation(scenario)).join('\n\n')}
+${categoryData.scenarios.map((scenario) => this.formatScenarioDocumentation(scenario)).join("\n\n")}
 
 ## Implementation Notes
 - Created using MCP-enhanced scenario generator
@@ -341,7 +341,7 @@ ${categoryData.scenarios.map(scenario => this.formatScenarioDocumentation(scenar
 
   // Utility methods
   getDefaultColor(categoryId) {
-    const colors = ['blue', 'green', 'purple', 'orange', 'red', 'teal'];
+    const colors = ["blue", "green", "purple", "orange", "red", "teal"];
     return colors[categoryId.length % colors.length];
   }
 
@@ -351,13 +351,13 @@ ${categoryData.scenarios.map(scenario => this.formatScenarioDocumentation(scenar
   }
 
   adaptTemplateTitle(_template, _config) {
-    return '';
+    return "";
   }
   adaptTemplateDilemma(_template, _config) {
-    return '';
+    return "";
   }
   adaptTemplateQuestion(_template, _config) {
-    return '';
+    return "";
   }
   generateScenarioOptions(_template, _config) {
     return [];
@@ -366,10 +366,10 @@ ${categoryData.scenarios.map(scenario => this.formatScenarioDocumentation(scenar
     return [];
   }
   formatCategoriesFile(_categories) {
-    return '';
+    return "";
   }
   formatScenarioDocumentation(_scenario) {
-    return '';
+    return "";
   }
   getCreatedFiles(_categoryId) {
     return [];
@@ -378,19 +378,19 @@ ${categoryData.scenarios.map(scenario => this.formatScenarioDocumentation(scenar
     return [];
   }
   generateCategoryDescription(_config) {
-    return '';
+    return "";
   }
   generateEducatorResources(_config) {
     return {};
   }
   generateSimulationInfoContent(_categoryData) {
-    return '';
+    return "";
   }
   updateSimulationInfo(_categoryId, _content) {
     return Promise.resolve();
   }
   generateCategoryCSS(_categoryData) {
-    return '';
+    return "";
   }
 }
 

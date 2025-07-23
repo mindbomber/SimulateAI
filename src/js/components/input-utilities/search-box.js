@@ -1,16 +1,16 @@
-import { BaseObject } from '../../objects/enhanced-objects.js';
-import { logger } from '../../utils/logger.js';
+import { BaseObject } from "../../objects/enhanced-objects.js";
+import { logger } from "../../utils/logger.js";
 import {
   INPUT_UTILITY_CONSTANTS,
   PERFORMANCE_THRESHOLDS,
-} from './constants.js';
-import { ComponentTheme } from './theme.js';
+} from "./constants.js";
+import { ComponentTheme } from "./theme.js";
 
 // Local utility classes to prevent circular dependencies
 class ComponentError extends Error {
   constructor(message, component, details = {}) {
     super(message);
-    this.name = 'ComponentError';
+    this.name = "ComponentError";
     this.component = component;
     this.details = details;
     this.timestamp = new Date().toISOString();
@@ -73,16 +73,16 @@ export class SearchBox extends BaseObject {
       width: options.width || INPUT_UTILITY_CONSTANTS.SEARCHBOX_DEFAULT_WIDTH,
       height:
         options.height || INPUT_UTILITY_CONSTANTS.SEARCHBOX_DEFAULT_HEIGHT,
-      ariaRole: 'searchbox',
-      ariaLabel: options.ariaLabel || 'Search',
+      ariaRole: "searchbox",
+      ariaLabel: options.ariaLabel || "Search",
     });
 
     // Validate options
     this.validateOptions(options);
 
     // Core properties
-    this.value = options.value || '';
-    this.placeholder = options.placeholder || 'Search...';
+    this.value = options.value || "";
+    this.placeholder = options.placeholder || "Search...";
     this.disabled = options.disabled || false;
     this.showClearButton = options.showClearButton !== false;
     this.showSearchButton = options.showSearchButton !== false;
@@ -117,7 +117,7 @@ export class SearchBox extends BaseObject {
     this.renderCache = new Map();
     this.throttledRender = this.throttle(
       this.render.bind(this),
-      PERFORMANCE_THRESHOLDS.eventThrottle
+      PERFORMANCE_THRESHOLDS.eventThrottle,
     );
 
     // Accessibility
@@ -128,54 +128,54 @@ export class SearchBox extends BaseObject {
     this.errorHandler = this.createErrorHandler();
 
     // Performance monitoring
-    this.performanceMonitor = PerformanceMonitor.createInstance('SearchBox');
+    this.performanceMonitor = PerformanceMonitor.createInstance("SearchBox");
 
     try {
       this.setupEventHandlers();
       this.setupAccessibility();
       this.setupResizeObserver();
     } catch (error) {
-      this.errorHandler.handle(error, 'constructor');
+      this.errorHandler.handle(error, "constructor");
     }
   }
 
   validateOptions(options) {
     if (
       options.debounceDelay &&
-      (typeof options.debounceDelay !== 'number' || options.debounceDelay < 0)
+      (typeof options.debounceDelay !== "number" || options.debounceDelay < 0)
     ) {
       throw new ComponentError(
-        'Debounce delay must be a positive number',
-        'SearchBox'
+        "Debounce delay must be a positive number",
+        "SearchBox",
       );
     }
 
     if (
       options.minSearchLength &&
-      (typeof options.minSearchLength !== 'number' ||
+      (typeof options.minSearchLength !== "number" ||
         options.minSearchLength < 0)
     ) {
       throw new ComponentError(
-        'Minimum search length must be a positive number',
-        'SearchBox'
+        "Minimum search length must be a positive number",
+        "SearchBox",
       );
     }
 
     if (
       options.maxSuggestions &&
-      (typeof options.maxSuggestions !== 'number' || options.maxSuggestions < 1)
+      (typeof options.maxSuggestions !== "number" || options.maxSuggestions < 1)
     ) {
       throw new ComponentError(
-        'Maximum suggestions must be a positive number',
-        'SearchBox'
+        "Maximum suggestions must be a positive number",
+        "SearchBox",
       );
     }
   }
 
   createScreenReaderAnnouncer() {
-    const announcer = document.createElement('div');
-    announcer.setAttribute('aria-live', 'polite');
-    announcer.setAttribute('aria-atomic', 'true');
+    const announcer = document.createElement("div");
+    announcer.setAttribute("aria-live", "polite");
+    announcer.setAttribute("aria-atomic", "true");
     announcer.style.cssText = `
             position: absolute;
             left: -10000px;
@@ -193,7 +193,7 @@ export class SearchBox extends BaseObject {
       Escape: () => this.handleEscapeKey(),
       ArrowDown: () => this.navigateSuggestions(1),
       ArrowUp: () => this.navigateSuggestions(-1),
-      Tab: event => this.handleTabKey(event),
+      Tab: (event) => this.handleTabKey(event),
       Backspace: () => this.handleBackspace(),
       Delete: () => this.handleDelete(),
     };
@@ -203,13 +203,13 @@ export class SearchBox extends BaseObject {
     return {
       handle: (error, context) => {
         const componentError = new ComponentError(
-          error.message || 'Unknown error',
-          'SearchBox',
-          { context, originalError: error }
+          error.message || "Unknown error",
+          "SearchBox",
+          { context, originalError: error },
         );
 
-        logger.error('SearchBox Error:', componentError);
-        this.emit('error', componentError);
+        logger.error("SearchBox Error:", componentError);
+        this.emit("error", componentError);
 
         this.recoverFromError(context);
       },
@@ -218,10 +218,10 @@ export class SearchBox extends BaseObject {
 
   recoverFromError(context) {
     switch (context) {
-      case 'search':
+      case "search":
         this.clearSuggestions();
         break;
-      case 'render':
+      case "render":
         this.clearRenderCache();
         break;
       default:
@@ -231,22 +231,22 @@ export class SearchBox extends BaseObject {
 
   setupAccessibility() {
     // ARIA attributes
-    this.setAttribute('role', 'searchbox');
-    this.setAttribute('aria-autocomplete', 'list');
-    this.setAttribute('aria-expanded', 'false');
-    this.setAttribute('aria-haspopup', 'listbox');
+    this.setAttribute("role", "searchbox");
+    this.setAttribute("aria-autocomplete", "list");
+    this.setAttribute("aria-expanded", "false");
+    this.setAttribute("aria-haspopup", "listbox");
 
     // Keyboard accessibility
-    this.setAttribute('tabindex', this.disabled ? '-1' : '0');
+    this.setAttribute("tabindex", this.disabled ? "-1" : "0");
 
     // Focus management
-    this.addEventListener('focusin', () => this.handleFocusIn());
-    this.addEventListener('focusout', () => this.handleFocusOut());
+    this.addEventListener("focusin", () => this.handleFocusIn());
+    this.addEventListener("focusout", () => this.handleFocusOut());
   }
 
   setupResizeObserver() {
-    if ('ResizeObserver' in window) {
-      this.resizeObserver = new ResizeObserver(_entries => {
+    if ("ResizeObserver" in window) {
+      this.resizeObserver = new ResizeObserver((_entries) => {
         this.clearRenderCache();
         this.throttledRender();
       });
@@ -275,19 +275,19 @@ export class SearchBox extends BaseObject {
   async setValue(value) {
     try {
       const oldValue = this.value;
-      this.value = String(value || '');
+      this.value = String(value || "");
 
       if (oldValue !== this.value) {
         this.clearRenderCache();
         this.updateSuggestions();
-        this.emit('valueChanged', { value: this.value, oldValue });
+        this.emit("valueChanged", { value: this.value, oldValue });
 
         if (this.searchOnType) {
           this.debouncedSearch();
         }
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'setValue');
+      this.errorHandler.handle(error, "setValue");
     }
   }
 
@@ -302,7 +302,7 @@ export class SearchBox extends BaseObject {
 
       // Filter suggestions based on current value
       this.filteredSuggestions = this.suggestions
-        .filter(suggestion => {
+        .filter((suggestion) => {
           const suggestionText = this.caseSensitive
             ? suggestion
             : suggestion.toLowerCase();
@@ -313,7 +313,7 @@ export class SearchBox extends BaseObject {
       // Add search history if enabled
       if (this.searchHistory.length > 0 && query.length > 0) {
         const historyMatches = this.searchHistory
-          .filter(item => {
+          .filter((item) => {
             const itemText = this.caseSensitive ? item : item.toLowerCase();
             return (
               itemText.includes(query) &&
@@ -322,7 +322,7 @@ export class SearchBox extends BaseObject {
           })
           .slice(
             0,
-            Math.max(0, this.maxSuggestions - this.filteredSuggestions.length)
+            Math.max(0, this.maxSuggestions - this.filteredSuggestions.length),
           );
 
         this.filteredSuggestions = [
@@ -335,15 +335,15 @@ export class SearchBox extends BaseObject {
       this.selectedSuggestionIndex = -1;
 
       // Update ARIA attributes
-      this.setAttribute('aria-expanded', this.showingSuggestions.toString());
+      this.setAttribute("aria-expanded", this.showingSuggestions.toString());
 
       if (this.showingSuggestions) {
         this.announceChange(
-          `${this.filteredSuggestions.length} suggestions available`
+          `${this.filteredSuggestions.length} suggestions available`,
         );
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'updateSuggestions');
+      this.errorHandler.handle(error, "updateSuggestions");
     }
   }
 
@@ -351,7 +351,7 @@ export class SearchBox extends BaseObject {
     this.filteredSuggestions = [];
     this.showingSuggestions = false;
     this.selectedSuggestionIndex = -1;
-    this.setAttribute('aria-expanded', 'false');
+    this.setAttribute("aria-expanded", "false");
   }
 
   debouncedSearch() {
@@ -367,13 +367,13 @@ export class SearchBox extends BaseObject {
         // Add to search history
         this.addToHistory(this.value);
 
-        this.emit('search', {
+        this.emit("search", {
           query: this.value,
           timestamp: new Date().toISOString(),
         });
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'performSearch');
+      this.errorHandler.handle(error, "performSearch");
     }
   }
 
@@ -385,7 +385,7 @@ export class SearchBox extends BaseObject {
       this.searchHistory = this.searchHistory.slice(0, this.maxHistoryLength);
     }
 
-    this.emit('historyUpdated', { history: this.searchHistory });
+    this.emit("historyUpdated", { history: this.searchHistory });
   }
 
   selectSuggestion(index) {
@@ -397,10 +397,10 @@ export class SearchBox extends BaseObject {
         this.performSearch();
 
         this.announceChange(`Selected: ${selectedValue}`);
-        this.emit('suggestionSelected', { value: selectedValue, index });
+        this.emit("suggestionSelected", { value: selectedValue, index });
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'selectSuggestion');
+      this.errorHandler.handle(error, "selectSuggestion");
     }
   }
 
@@ -424,19 +424,19 @@ export class SearchBox extends BaseObject {
     if (newIndex >= 0) {
       const suggestion = this.filteredSuggestions[newIndex];
       this.announceChange(
-        `${newIndex + 1} of ${this.filteredSuggestions.length}: ${suggestion}`
+        `${newIndex + 1} of ${this.filteredSuggestions.length}: ${suggestion}`,
       );
     } else {
-      this.announceChange('Back to search input');
+      this.announceChange("Back to search input");
     }
 
     this.clearRenderCache();
   }
 
   clear() {
-    this.setValue('');
+    this.setValue("");
     this.clearSuggestions();
-    this.emit('cleared');
+    this.emit("cleared");
   }
 
   announceChange(message) {
@@ -479,7 +479,7 @@ export class SearchBox extends BaseObject {
       if (this.showingSuggestions && localY > this.height) {
         const suggestionIndex = Math.floor(
           (localY - this.height) /
-            INPUT_UTILITY_CONSTANTS.SEARCHBOX_SUGGESTION_HEIGHT
+            INPUT_UTILITY_CONSTANTS.SEARCHBOX_SUGGESTION_HEIGHT,
         );
         if (
           suggestionIndex >= 0 &&
@@ -493,7 +493,7 @@ export class SearchBox extends BaseObject {
       // Focus the input
       this.focus();
     } catch (error) {
-      this.errorHandler.handle(error, 'click-handler');
+      this.errorHandler.handle(error, "click-handler");
     }
   }
 
@@ -507,7 +507,7 @@ export class SearchBox extends BaseObject {
         handler(event);
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'keyboard-handler');
+      this.errorHandler.handle(error, "keyboard-handler");
     }
   }
 
@@ -525,7 +525,7 @@ export class SearchBox extends BaseObject {
         this.setValue(this.value + event.key);
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'keyup-handler');
+      this.errorHandler.handle(error, "keyup-handler");
     }
   }
 
@@ -566,7 +566,7 @@ export class SearchBox extends BaseObject {
   handleFocus() {
     this.isFocused = true;
     this.updateSuggestions();
-    this.emit('focus');
+    this.emit("focus");
   }
 
   handleBlur() {
@@ -574,7 +574,7 @@ export class SearchBox extends BaseObject {
     setTimeout(() => {
       this.isFocused = false;
       this.clearSuggestions();
-      this.emit('blur');
+      this.emit("blur");
     }, INPUT_UTILITY_CONSTANTS.SEARCHBOX_SUGGESTION_ANIMATION_DELAY);
   }
 
@@ -590,10 +590,10 @@ export class SearchBox extends BaseObject {
 
   // Enhanced rendering with theme support
   renderSelf(renderer) {
-    if (renderer.type !== 'canvas') return;
+    if (renderer.type !== "canvas") return;
 
     try {
-      this.performanceMonitor.startMeasurement('render');
+      this.performanceMonitor.startMeasurement("render");
 
       this.renderInputField(renderer);
 
@@ -601,25 +601,25 @@ export class SearchBox extends BaseObject {
         this.renderSuggestions(renderer);
       }
 
-      this.performanceMonitor.endMeasurement('render');
+      this.performanceMonitor.endMeasurement("render");
     } catch (error) {
-      this.errorHandler.handle(error, 'render');
+      this.errorHandler.handle(error, "render");
     }
   }
 
   renderInputField(renderer) {
     // Background with theme support
     const bgColor = this.disabled
-      ? ComponentTheme.getColor('backgroundDisabled', this.theme)
-      : ComponentTheme.getColor('background', this.theme);
+      ? ComponentTheme.getColor("backgroundDisabled", this.theme)
+      : ComponentTheme.getColor("background", this.theme);
 
     renderer.fillStyle = bgColor;
     renderer.fillRect(0, 0, this.width, this.height);
 
     // Border with theme support and focus state
     const borderColor = this.isFocused
-      ? ComponentTheme.getColor('focus', this.theme)
-      : ComponentTheme.getColor('border', this.theme);
+      ? ComponentTheme.getColor("focus", this.theme)
+      : ComponentTheme.getColor("border", this.theme);
 
     renderer.strokeStyle = borderColor;
     renderer.lineWidth = this.isFocused ? 2 : 1;
@@ -656,26 +656,26 @@ export class SearchBox extends BaseObject {
     const iconX = 12;
     const iconY = this.height / 2;
 
-    renderer.fillStyle = ComponentTheme.getColor('textSecondary', this.theme);
-    renderer.font = '16px Arial';
-    renderer.textAlign = 'center';
-    renderer.textBaseline = 'middle';
-    renderer.fillText('🔍', iconX, iconY);
+    renderer.fillStyle = ComponentTheme.getColor("textSecondary", this.theme);
+    renderer.font = "16px Arial";
+    renderer.textAlign = "center";
+    renderer.textBaseline = "middle";
+    renderer.fillText("🔍", iconX, iconY);
   }
 
   renderTextContent(renderer) {
     const displayText = this.value || this.placeholder;
     const isPlaceholder = !this.value;
     const textColor = this.disabled
-      ? ComponentTheme.getColor('disabled', this.theme)
+      ? ComponentTheme.getColor("disabled", this.theme)
       : isPlaceholder
-        ? ComponentTheme.getColor('textSecondary', this.theme)
-        : ComponentTheme.getColor('text', this.theme);
+        ? ComponentTheme.getColor("textSecondary", this.theme)
+        : ComponentTheme.getColor("text", this.theme);
 
     renderer.fillStyle = textColor;
-    renderer.font = isPlaceholder ? 'italic 14px Arial' : '14px Arial';
-    renderer.textAlign = 'left';
-    renderer.textBaseline = 'middle';
+    renderer.font = isPlaceholder ? "italic 14px Arial" : "14px Arial";
+    renderer.textAlign = "left";
+    renderer.textBaseline = "middle";
 
     const textX = 30; // Account for search icon
     const maxTextWidth =
@@ -683,7 +683,7 @@ export class SearchBox extends BaseObject {
     const truncatedText = this.truncateText(
       renderer,
       displayText,
-      maxTextWidth
+      maxTextWidth,
     );
 
     renderer.fillText(truncatedText, textX, this.height / 2);
@@ -697,18 +697,18 @@ export class SearchBox extends BaseObject {
 
     // Button background (hover effect)
     if (this.isClearButtonHovered) {
-      renderer.fillStyle = ComponentTheme.getColor('dangerHover', this.theme);
+      renderer.fillStyle = ComponentTheme.getColor("dangerHover", this.theme);
       renderer.beginPath();
       renderer.arc(buttonX, buttonY, buttonRadius, 0, Math.PI * 2);
       renderer.fill();
     }
 
     // Clear icon
-    renderer.fillStyle = ComponentTheme.getColor('textSecondary', this.theme);
-    renderer.font = '14px Arial';
-    renderer.textAlign = 'center';
-    renderer.textBaseline = 'middle';
-    renderer.fillText('×', buttonX, buttonY);
+    renderer.fillStyle = ComponentTheme.getColor("textSecondary", this.theme);
+    renderer.font = "14px Arial";
+    renderer.textAlign = "center";
+    renderer.textBaseline = "middle";
+    renderer.fillText("×", buttonX, buttonY);
   }
 
   renderSearchButton(renderer) {
@@ -719,35 +719,35 @@ export class SearchBox extends BaseObject {
     const buttonY = 2;
 
     // Button background
-    renderer.fillStyle = ComponentTheme.getColor('primary', this.theme);
+    renderer.fillStyle = ComponentTheme.getColor("primary", this.theme);
     renderer.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
 
     // Button text
-    renderer.fillStyle = ComponentTheme.getColor('primaryText', this.theme);
-    renderer.font = '12px Arial';
-    renderer.textAlign = 'center';
-    renderer.textBaseline = 'middle';
+    renderer.fillStyle = ComponentTheme.getColor("primaryText", this.theme);
+    renderer.font = "12px Arial";
+    renderer.textAlign = "center";
+    renderer.textBaseline = "middle";
     renderer.fillText(
-      'Go',
+      "Go",
       buttonX + buttonWidth / 2,
-      buttonY + buttonHeight / 2
+      buttonY + buttonHeight / 2,
     );
 
     // Button border
-    renderer.strokeStyle = ComponentTheme.getColor('primaryBorder', this.theme);
+    renderer.strokeStyle = ComponentTheme.getColor("primaryBorder", this.theme);
     renderer.lineWidth = 1;
     renderer.strokeRect(buttonX, buttonY, buttonWidth, buttonHeight);
   }
 
   renderFocusIndicator(renderer) {
-    renderer.strokeStyle = ComponentTheme.getColor('focus', this.theme);
+    renderer.strokeStyle = ComponentTheme.getColor("focus", this.theme);
     renderer.lineWidth = 2;
     renderer.setLineDash([2, 2]);
     renderer.strokeRect(
       INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_OFFSET,
       INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_OFFSET,
       this.width - INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_BORDER,
-      this.height - INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_BORDER
+      this.height - INPUT_UTILITY_CONSTANTS.FOCUS_INDICATOR_BORDER,
     );
     renderer.setLineDash([]);
   }
@@ -761,18 +761,18 @@ export class SearchBox extends BaseObject {
     const time = Date.now();
     const opacity =
       Math.sin(
-        time * INPUT_UTILITY_CONSTANTS.SEARCHBOX_CURSOR_BLINK_FREQUENCY
+        time * INPUT_UTILITY_CONSTANTS.SEARCHBOX_CURSOR_BLINK_FREQUENCY,
       ) *
         INPUT_UTILITY_CONSTANTS.SEARCHBOX_CURSOR_OPACITY_FACTOR +
       INPUT_UTILITY_CONSTANTS.SEARCHBOX_CURSOR_OPACITY_BASE;
 
-    renderer.strokeStyle = `rgba(${this.theme === 'dark' ? '255,255,255' : '0,0,0'}, ${opacity})`;
+    renderer.strokeStyle = `rgba(${this.theme === "dark" ? "255,255,255" : "0,0,0"}, ${opacity})`;
     renderer.lineWidth = 1;
     renderer.beginPath();
     renderer.moveTo(cursorX, INPUT_UTILITY_CONSTANTS.SEARCHBOX_CURSOR_MARGIN);
     renderer.lineTo(
       cursorX,
-      this.height - INPUT_UTILITY_CONSTANTS.SEARCHBOX_CURSOR_MARGIN
+      this.height - INPUT_UTILITY_CONSTANTS.SEARCHBOX_CURSOR_MARGIN,
     );
     renderer.stroke();
   }
@@ -783,11 +783,11 @@ export class SearchBox extends BaseObject {
     const totalHeight = this.filteredSuggestions.length * suggestionHeight;
 
     // Suggestions container background
-    renderer.fillStyle = ComponentTheme.getColor('background', this.theme);
+    renderer.fillStyle = ComponentTheme.getColor("background", this.theme);
     renderer.fillRect(0, startY, this.width, totalHeight);
 
     // Suggestions container border
-    renderer.strokeStyle = ComponentTheme.getColor('border', this.theme);
+    renderer.strokeStyle = ComponentTheme.getColor("border", this.theme);
     renderer.lineWidth = 1;
     renderer.strokeRect(0, startY, this.width, totalHeight);
 
@@ -798,7 +798,7 @@ export class SearchBox extends BaseObject {
         suggestion,
         index,
         startY + index * suggestionHeight,
-        suggestionHeight
+        suggestionHeight,
       );
     });
   }
@@ -808,7 +808,7 @@ export class SearchBox extends BaseObject {
 
     // Highlight selected suggestion
     if (isSelected) {
-      renderer.fillStyle = ComponentTheme.getColor('primaryHover', this.theme);
+      renderer.fillStyle = ComponentTheme.getColor("primaryHover", this.theme);
       renderer.fillRect(0, y, this.width, height);
     }
 
@@ -819,43 +819,43 @@ export class SearchBox extends BaseObject {
         suggestion,
         this.value,
         INPUT_UTILITY_CONSTANTS.SEARCHBOX_SUGGESTION_ICON_OFFSET,
-        y + height / 2
+        y + height / 2,
       );
     } else {
-      renderer.fillStyle = ComponentTheme.getColor('text', this.theme);
-      renderer.font = '14px Arial';
-      renderer.textAlign = 'left';
-      renderer.textBaseline = 'middle';
+      renderer.fillStyle = ComponentTheme.getColor("text", this.theme);
+      renderer.font = "14px Arial";
+      renderer.textAlign = "left";
+      renderer.textBaseline = "middle";
 
       const maxWidth = this.width - INPUT_UTILITY_CONSTANTS.ACCORDION_PADDING;
       const truncatedSuggestion = this.truncateText(
         renderer,
         suggestion,
-        maxWidth
+        maxWidth,
       );
       renderer.fillText(
         truncatedSuggestion,
         INPUT_UTILITY_CONSTANTS.ACCORDION_ICON_MARGIN,
-        y + height / 2
+        y + height / 2,
       );
     }
 
     // Selection indicator
     if (isSelected) {
-      renderer.fillStyle = ComponentTheme.getColor('primary', this.theme);
-      renderer.font = '12px Arial';
-      renderer.textAlign = 'right';
-      renderer.textBaseline = 'middle';
+      renderer.fillStyle = ComponentTheme.getColor("primary", this.theme);
+      renderer.font = "12px Arial";
+      renderer.textAlign = "right";
+      renderer.textBaseline = "middle";
       renderer.fillText(
-        '↩',
+        "↩",
         this.width - INPUT_UTILITY_CONSTANTS.SEARCHBOX_SUGGESTION_ICON_OFFSET,
-        y + height / 2
+        y + height / 2,
       );
     }
 
     // Separator line
     if (index < this.filteredSuggestions.length - 1) {
-      renderer.strokeStyle = ComponentTheme.getColor('border', this.theme);
+      renderer.strokeStyle = ComponentTheme.getColor("border", this.theme);
       renderer.lineWidth = 1;
       renderer.beginPath();
       renderer.moveTo(0, y + height);
@@ -869,13 +869,13 @@ export class SearchBox extends BaseObject {
     const caseSensitiveQuery = this.caseSensitive ? query : query.toLowerCase();
     const matchIndex = caseSensitiveText.indexOf(caseSensitiveQuery);
 
-    renderer.font = '14px Arial';
-    renderer.textAlign = 'left';
-    renderer.textBaseline = 'middle';
+    renderer.font = "14px Arial";
+    renderer.textAlign = "left";
+    renderer.textBaseline = "middle";
 
     if (matchIndex === -1) {
       // No match, render normally
-      renderer.fillStyle = ComponentTheme.getColor('text', this.theme);
+      renderer.fillStyle = ComponentTheme.getColor("text", this.theme);
       renderer.fillText(text, x, y);
     } else {
       // Render with highlighting
@@ -887,34 +887,34 @@ export class SearchBox extends BaseObject {
 
       // Before match
       if (beforeMatch) {
-        renderer.fillStyle = ComponentTheme.getColor('text', this.theme);
+        renderer.fillStyle = ComponentTheme.getColor("text", this.theme);
         renderer.fillText(beforeMatch, currentX, y);
         currentX += renderer.measureText(beforeMatch).width;
       }
 
       // Highlighted match
       if (match) {
-        renderer.fillStyle = ComponentTheme.getColor('primaryText', this.theme);
+        renderer.fillStyle = ComponentTheme.getColor("primaryText", this.theme);
         const matchWidth = renderer.measureText(match).width;
 
         // Highlight background
-        renderer.fillStyle = ComponentTheme.getColor('primary', this.theme);
+        renderer.fillStyle = ComponentTheme.getColor("primary", this.theme);
         renderer.fillRect(
           currentX,
           y - INPUT_UTILITY_CONSTANTS.SEARCHBOX_HIGHLIGHT_Y_OFFSET,
           matchWidth,
-          INPUT_UTILITY_CONSTANTS.SEARCHBOX_HIGHLIGHT_HEIGHT
+          INPUT_UTILITY_CONSTANTS.SEARCHBOX_HIGHLIGHT_HEIGHT,
         );
 
         // Match text
-        renderer.fillStyle = ComponentTheme.getColor('primaryText', this.theme);
+        renderer.fillStyle = ComponentTheme.getColor("primaryText", this.theme);
         renderer.fillText(match, currentX, y);
         currentX += matchWidth;
       }
 
       // After match
       if (afterMatch) {
-        renderer.fillStyle = ComponentTheme.getColor('text', this.theme);
+        renderer.fillStyle = ComponentTheme.getColor("text", this.theme);
         renderer.fillText(afterMatch, currentX, y);
       }
     }
@@ -926,7 +926,7 @@ export class SearchBox extends BaseObject {
       return text;
     }
 
-    const ellipsis = '...';
+    const ellipsis = "...";
 
     let truncated = text;
     while (
@@ -962,12 +962,12 @@ export class SearchBox extends BaseObject {
 
   setSuggestions(suggestions) {
     if (!Array.isArray(suggestions)) {
-      throw new ComponentError('Suggestions must be an array', 'SearchBox');
+      throw new ComponentError("Suggestions must be an array", "SearchBox");
     }
 
-    this.suggestions = suggestions.map(s => String(s));
+    this.suggestions = suggestions.map((s) => String(s));
     this.updateSuggestions();
-    this.emit('suggestionsChanged', { suggestions: this.suggestions });
+    this.emit("suggestionsChanged", { suggestions: this.suggestions });
   }
 
   addSuggestion(suggestion) {
@@ -975,7 +975,7 @@ export class SearchBox extends BaseObject {
     if (!this.suggestions.includes(suggestionStr)) {
       this.suggestions.push(suggestionStr);
       this.updateSuggestions();
-      this.emit('suggestionAdded', { suggestion: suggestionStr });
+      this.emit("suggestionAdded", { suggestion: suggestionStr });
     }
   }
 
@@ -984,7 +984,7 @@ export class SearchBox extends BaseObject {
     if (index >= 0) {
       this.suggestions.splice(index, 1);
       this.updateSuggestions();
-      this.emit('suggestionRemoved', { suggestion, index });
+      this.emit("suggestionRemoved", { suggestion, index });
     }
   }
 
@@ -994,37 +994,37 @@ export class SearchBox extends BaseObject {
 
   clearSearchHistory() {
     this.searchHistory = [];
-    this.emit('historyCleared');
+    this.emit("historyCleared");
   }
 
   setPlaceholder(placeholder) {
-    this.placeholder = String(placeholder || '');
+    this.placeholder = String(placeholder || "");
     this.clearRenderCache();
-    this.emit('placeholderChanged', { placeholder: this.placeholder });
+    this.emit("placeholderChanged", { placeholder: this.placeholder });
   }
 
   enable() {
     this.disabled = false;
-    this.setAttribute('tabindex', '0');
+    this.setAttribute("tabindex", "0");
     this.clearRenderCache();
-    this.emit('enabled');
+    this.emit("enabled");
   }
 
   disable() {
     this.disabled = true;
-    this.setAttribute('tabindex', '-1');
+    this.setAttribute("tabindex", "-1");
     this.clearSuggestions();
     this.clearRenderCache();
-    this.emit('disabled');
+    this.emit("disabled");
   }
 
   reset() {
-    this.value = '';
+    this.value = "";
     this.clearSuggestions();
     this.clearSearchHistory();
     this.selectedSuggestionIndex = -1;
     this.clearRenderCache();
-    this.emit('reset');
+    this.emit("reset");
   }
 
   // Cleanup and memory management
@@ -1054,9 +1054,9 @@ export class SearchBox extends BaseObject {
 
       // Call parent cleanup
       super.destroy?.();
-      this.emit('destroyed');
+      this.emit("destroyed");
     } catch (error) {
-      logger.error('Error during SearchBox cleanup:', error);
+      logger.error("Error during SearchBox cleanup:", error);
     }
   }
 }

@@ -51,13 +51,13 @@ class FloatingSurpriseTab {
 
   listenToSettings() {
     // Listen for settings changes
-    window.addEventListener('settingsChanged', e => {
+    window.addEventListener("settingsChanged", (e) => {
       const { settings } = e.detail;
       this.updateVisibility(settings.surpriseTabEnabled);
     });
 
     // Listen for settings manager ready
-    window.addEventListener('settingsManagerReady', e => {
+    window.addEventListener("settingsManagerReady", (e) => {
       const { settings } = e.detail;
       this.updateVisibility(settings.surpriseTabEnabled);
     });
@@ -67,7 +67,7 @@ class FloatingSurpriseTab {
     // Apply initial settings if available
     const applySettings = () => {
       if (window.settingsManager) {
-        const enabled = window.settingsManager.getSetting('surpriseTabEnabled');
+        const enabled = window.settingsManager.getSetting("surpriseTabEnabled");
         this.updateVisibility(enabled);
       }
     };
@@ -81,16 +81,16 @@ class FloatingSurpriseTab {
 
   updateVisibility(enabled) {
     if (this.link) {
-      this.link.style.display = enabled ? 'block' : 'none';
+      this.link.style.display = enabled ? "block" : "none";
     }
   }
 
   createElement() {
     // Create the main container
-    this.container = document.createElement('div');
-    this.container.className = 'floating-surprise-tab';
-    this.container.setAttribute('role', 'complementary');
-    this.container.setAttribute('aria-label', 'Surprise Me feature');
+    this.container = document.createElement("div");
+    this.container.className = "floating-surprise-tab";
+    this.container.setAttribute("role", "complementary");
+    this.container.setAttribute("aria-label", "Surprise Me feature");
 
     // Create the tab content
     this.container.innerHTML = `
@@ -112,15 +112,15 @@ class FloatingSurpriseTab {
     `;
 
     // Create the clickable link
-    this.link = document.createElement('a');
-    this.link.href = '#';
-    this.link.className = 'floating-surprise-tab-link';
+    this.link = document.createElement("a");
+    this.link.href = "#";
+    this.link.className = "floating-surprise-tab-link";
     this.link.setAttribute(
-      'aria-label',
-      'Surprise Me - Launch random scenario'
+      "aria-label",
+      "Surprise Me - Launch random scenario",
     );
-    this.link.setAttribute('data-action', 'surprise');
-    this.link.id = 'surprise-me-floating';
+    this.link.setAttribute("data-action", "surprise");
+    this.link.id = "surprise-me-floating";
 
     // Wrap the container in the link
     this.link.appendChild(this.container);
@@ -133,32 +133,32 @@ class FloatingSurpriseTab {
 
   bindEvents() {
     // Handle resize events
-    window.addEventListener('resize', this.handleResize.bind(this));
+    window.addEventListener("resize", this.handleResize.bind(this));
 
     // Handle hover/click events
     if (this.isMobile) {
       this.link.addEventListener(
-        'touchstart',
-        this.handleTouchStart.bind(this)
+        "touchstart",
+        this.handleTouchStart.bind(this),
       );
-      this.link.addEventListener('touchend', this.handleTouchEnd.bind(this));
-      this.link.addEventListener('click', this.handleMobileClick.bind(this));
+      this.link.addEventListener("touchend", this.handleTouchEnd.bind(this));
+      this.link.addEventListener("click", this.handleMobileClick.bind(this));
     } else {
       this.link.addEventListener(
-        'mouseenter',
-        this.handleMouseEnter.bind(this)
+        "mouseenter",
+        this.handleMouseEnter.bind(this),
       );
       this.link.addEventListener(
-        'mouseleave',
-        this.handleMouseLeave.bind(this)
+        "mouseleave",
+        this.handleMouseLeave.bind(this),
       );
-      this.link.addEventListener('click', this.handleDesktopClick.bind(this));
+      this.link.addEventListener("click", this.handleDesktopClick.bind(this));
     }
 
     // Handle keyboard navigation
-    this.link.addEventListener('keydown', this.handleKeyDown.bind(this));
-    this.link.addEventListener('focus', this.handleFocus.bind(this));
-    this.link.addEventListener('blur', this.handleBlur.bind(this));
+    this.link.addEventListener("keydown", this.handleKeyDown.bind(this));
+    this.link.addEventListener("focus", this.handleFocus.bind(this));
+    this.link.addEventListener("blur", this.handleBlur.bind(this));
   }
 
   handleResize() {
@@ -247,7 +247,7 @@ class FloatingSurpriseTab {
   }
 
   handleKeyDown(e) {
-    if (e.key === 'Enter' || e.key === ' ') {
+    if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
 
       // Check for debouncing
@@ -278,13 +278,13 @@ class FloatingSurpriseTab {
 
   expand() {
     this.isExpanded = true;
-    this.container.classList.add('expanded');
+    this.container.classList.add("expanded");
     this.clearCollapseTimeout();
   }
 
   collapse() {
     this.isExpanded = false;
-    this.container.classList.remove('expanded');
+    this.container.classList.remove("expanded");
     this.clearCollapseTimeout();
   }
 
@@ -304,28 +304,28 @@ class FloatingSurpriseTab {
 
   createRipple(_event) {
     // Reset ripple
-    this.container.classList.remove('ripple-active');
+    this.container.classList.remove("ripple-active");
 
     // Trigger ripple effect
     setTimeout(() => {
-      this.container.classList.add('ripple-active');
+      this.container.classList.add("ripple-active");
     }, SURPRISE_RIPPLE_DELAY);
 
     // Remove ripple effect
     setTimeout(() => {
-      this.container.classList.remove('ripple-active');
+      this.container.classList.remove("ripple-active");
     }, SURPRISE_RIPPLE_DURATION);
   }
 
   triggerSurpriseMe() {
     // Trigger the surprise me functionality
-    if (typeof window.app !== 'undefined' && window.app.launchRandomScenario) {
+    if (typeof window.app !== "undefined" && window.app.launchRandomScenario) {
       window.app.launchRandomScenario();
-    } else if (typeof window.triggerSurpriseMe === 'function') {
+    } else if (typeof window.triggerSurpriseMe === "function") {
       window.triggerSurpriseMe();
     } else {
       // Fallback: try to click the original surprise me button
-      const originalButton = document.getElementById('surprise-me-nav');
+      const originalButton = document.getElementById("surprise-me-nav");
       if (originalButton) {
         originalButton.click();
       }
@@ -336,15 +336,15 @@ class FloatingSurpriseTab {
   }
 
   addSuccessFeedback() {
-    const title = this.container.querySelector('.surprise-tab-title');
-    const subtitle = this.container.querySelector('.surprise-tab-subtitle');
+    const title = this.container.querySelector(".surprise-tab-title");
+    const subtitle = this.container.querySelector(".surprise-tab-subtitle");
 
     if (title && subtitle) {
       const originalTitle = title.textContent;
       const originalSubtitle = subtitle.textContent;
 
-      title.textContent = 'Loading...';
-      subtitle.textContent = 'Finding perfect scenario';
+      title.textContent = "Loading...";
+      subtitle.textContent = "Finding perfect scenario";
 
       // Reset after a short delay
       setTimeout(() => {
@@ -356,15 +356,15 @@ class FloatingSurpriseTab {
 
   unbindEvents() {
     // Remove all event listeners
-    this.link.removeEventListener('mouseenter', this.handleMouseEnter);
-    this.link.removeEventListener('mouseleave', this.handleMouseLeave);
-    this.link.removeEventListener('click', this.handleDesktopClick);
-    this.link.removeEventListener('click', this.handleMobileClick);
-    this.link.removeEventListener('touchstart', this.handleTouchStart);
-    this.link.removeEventListener('touchend', this.handleTouchEnd);
-    this.link.removeEventListener('keydown', this.handleKeyDown);
-    this.link.removeEventListener('focus', this.handleFocus);
-    this.link.removeEventListener('blur', this.handleBlur);
+    this.link.removeEventListener("mouseenter", this.handleMouseEnter);
+    this.link.removeEventListener("mouseleave", this.handleMouseLeave);
+    this.link.removeEventListener("click", this.handleDesktopClick);
+    this.link.removeEventListener("click", this.handleMobileClick);
+    this.link.removeEventListener("touchstart", this.handleTouchStart);
+    this.link.removeEventListener("touchend", this.handleTouchEnd);
+    this.link.removeEventListener("keydown", this.handleKeyDown);
+    this.link.removeEventListener("focus", this.handleFocus);
+    this.link.removeEventListener("blur", this.handleBlur);
   }
 
   destroy() {
@@ -380,19 +380,19 @@ class FloatingSurpriseTab {
 }
 
 // Initialize the floating surprise tab when the DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   // Initialize the floating surprise tab
   window.floatingSurpriseTab = new FloatingSurpriseTab();
 });
 
 // Export global function for easy access
 window.triggerSurpriseMe = function () {
-  if (typeof window.app !== 'undefined' && window.app.launchRandomScenario) {
+  if (typeof window.app !== "undefined" && window.app.launchRandomScenario) {
     window.app.launchRandomScenario();
   }
 };
 
 // Export for potential manual initialization
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
   module.exports = FloatingSurpriseTab;
 }

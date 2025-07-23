@@ -426,7 +426,11 @@
 }
 
 @keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
     transform: translateY(0);
   }
   40% {
@@ -573,7 +577,8 @@
 }
 
 @keyframes learning-pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     filter: brightness(1);
   }
@@ -666,23 +671,30 @@
 }
 
 @keyframes tour-feedback-pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(calc(100% - var(--floating-tab-protrusion, 90px)));
   }
   50% {
-    transform: translateX(calc(100% - var(--floating-tab-protrusion, 90px))) scale(1.02);
+    transform: translateX(calc(100% - var(--floating-tab-protrusion, 90px)))
+      scale(1.02);
   }
 }
 
 @keyframes tour-shake {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(calc(100% - var(--floating-tab-protrusion, 90px)));
   }
   25% {
-    transform: translateX(calc(100% - var(--floating-tab-protrusion, 90px) + 5px));
+    transform: translateX(
+      calc(100% - var(--floating-tab-protrusion, 90px) + 5px)
+    );
   }
   75% {
-    transform: translateX(calc(100% - var(--floating-tab-protrusion, 90px) - 5px));
+    transform: translateX(
+      calc(100% - var(--floating-tab-protrusion, 90px) - 5px)
+    );
   }
 }
 
@@ -695,7 +707,8 @@
 }
 
 @keyframes tour-feedback-pulse-expanded {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0) scale(1);
   }
   50% {
@@ -704,7 +717,8 @@
 }
 
 @keyframes tour-shake-expanded {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0);
   }
   25% {
@@ -739,20 +753,37 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes success-pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 @keyframes error-shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
 }
 
 /* ========================================
@@ -792,8 +823,13 @@
 }
 
 @keyframes mobile-auto-collapse {
-  0%, 70% { transform: translateY(0); }
-  100% { transform: translateY(0); }
+  0%,
+  70% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 
 /* ========================================

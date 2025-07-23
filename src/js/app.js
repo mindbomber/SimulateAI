@@ -2200,7 +2200,15 @@ class AIEthicsApp {
 
     card.innerHTML = `
             <div class="card-thumbnail">
-                <img src="${simulation.thumbnail}" alt="${simulation.title}" onerror="this.src='src/assets/images/default-thumb.svg'">
+                <img src="${simulation.thumbnail}" alt="${simulation.title}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div style="display:none; width:100%; height:200px; background:#f0f0f0; border-radius:8px; align-items:center; justify-content:center; color:#666; font-size:14px;">
+                    <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="64" height="64" rx="8" fill="#e5e7eb"/>
+                        <path d="M20 24h24v16H20z" fill="#9ca3af"/>
+                        <circle cx="26" cy="30" r="2" fill="#6b7280"/>
+                        <path d="m32 36-4-4-4 4h8z" fill="#6b7280"/>
+                    </svg>
+                </div>
                 ${isCompleted ? '<div class="completion-badge">✓</div>' : ""}
             </div>
             

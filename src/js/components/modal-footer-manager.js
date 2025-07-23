@@ -15,8 +15,8 @@ const MODAL_FOOTER_CONSTANTS = {
     TOTAL_PADDING: 40,
   },
   SCROLL: {
-    OPACITY_VISIBLE: '1',
-    OPACITY_HIDDEN: '0',
+    OPACITY_VISIBLE: "1",
+    OPACITY_HIDDEN: "0",
   },
 };
 
@@ -30,8 +30,8 @@ class ModalFooterManager {
   init() {
     // Set up resize observer for responsive behavior
     if (window.ResizeObserver) {
-      this.resizeObserver = new ResizeObserver(entries => {
-        entries.forEach(entry => {
+      this.resizeObserver = new ResizeObserver((entries) => {
+        entries.forEach((entry) => {
           this.handleFooterResize(entry.target);
         });
       });
@@ -45,8 +45,8 @@ class ModalFooterManager {
   }
 
   scanForModalFooters() {
-    const footers = document.querySelectorAll('.modal-footer');
-    footers.forEach(footer => this.manageFooter(footer));
+    const footers = document.querySelectorAll(".modal-footer");
+    footers.forEach((footer) => this.manageFooter(footer));
   }
 
   manageFooter(footer) {
@@ -74,11 +74,11 @@ class ModalFooterManager {
       const hasHorizontalOverflow = footer.scrollWidth > footer.clientWidth;
       const hasVerticalOverflow = footer.scrollHeight > footer.clientHeight;
 
-      footer.classList.toggle('has-overflow-x', hasHorizontalOverflow);
-      footer.classList.toggle('has-overflow-y', hasVerticalOverflow);
+      footer.classList.toggle("has-overflow-x", hasHorizontalOverflow);
+      footer.classList.toggle("has-overflow-y", hasVerticalOverflow);
       footer.classList.toggle(
-        'has-overflow',
-        hasHorizontalOverflow || hasVerticalOverflow
+        "has-overflow",
+        hasHorizontalOverflow || hasVerticalOverflow,
       );
 
       // Add scroll indicators
@@ -93,18 +93,18 @@ class ModalFooterManager {
     checkOverflow();
 
     // Check on scroll
-    footer.addEventListener('scroll', checkOverflow);
+    footer.addEventListener("scroll", checkOverflow);
 
     // Store reference for cleanup
     footer._checkOverflow = checkOverflow;
   }
 
   setupResponsiveBehavior(footer) {
-    const buttons = footer.querySelectorAll('.modal-button');
+    const buttons = footer.querySelectorAll(".modal-button");
 
     // Add many-buttons class if there are many buttons
     if (buttons.length > MODAL_FOOTER_CONSTANTS.LAYOUT.MANY_BUTTONS_THRESHOLD) {
-      footer.classList.add('many-buttons');
+      footer.classList.add("many-buttons");
     }
 
     // Handle responsive button layout
@@ -115,13 +115,13 @@ class ModalFooterManager {
       const isSmallMobile =
         window.innerWidth <= MODAL_FOOTER_CONSTANTS.BREAKPOINTS.SMALL_MOBILE;
 
-      footer.classList.toggle('mobile-layout', isMobile);
-      footer.classList.toggle('small-mobile-layout', isSmallMobile);
+      footer.classList.toggle("mobile-layout", isMobile);
+      footer.classList.toggle("small-mobile-layout", isSmallMobile);
 
       // Calculate if buttons need stacking
       if (!isMobile) {
         let totalButtonWidth = 0;
-        buttons.forEach(button => {
+        buttons.forEach((button) => {
           totalButtonWidth += button.offsetWidth;
         });
 
@@ -131,12 +131,12 @@ class ModalFooterManager {
         const needsStacking =
           totalButtonWidth + gapWidth + padding > footerWidth;
 
-        footer.classList.toggle('needs-stacking', needsStacking);
+        footer.classList.toggle("needs-stacking", needsStacking);
       }
     };
 
     handleResponsiveLayout();
-    window.addEventListener('resize', handleResponsiveLayout);
+    window.addEventListener("resize", handleResponsiveLayout);
 
     // Store reference for cleanup
     footer._handleResponsiveLayout = handleResponsiveLayout;
@@ -144,18 +144,18 @@ class ModalFooterManager {
 
   setupAccessibility(footer) {
     // Add ARIA attributes
-    footer.setAttribute('role', 'group');
-    footer.setAttribute('aria-label', 'Modal actions');
+    footer.setAttribute("role", "group");
+    footer.setAttribute("aria-label", "Modal actions");
 
     // Improve focus management
-    const buttons = footer.querySelectorAll('.modal-button');
+    const buttons = footer.querySelectorAll(".modal-button");
     buttons.forEach((button, index) => {
       // Add keyboard navigation
-      button.addEventListener('keydown', e => {
-        if (e.key === 'ArrowLeft' && index > 0) {
+      button.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft" && index > 0) {
           buttons[index - 1].focus();
           e.preventDefault();
-        } else if (e.key === 'ArrowRight' && index < buttons.length - 1) {
+        } else if (e.key === "ArrowRight" && index < buttons.length - 1) {
           buttons[index + 1].focus();
           e.preventDefault();
         }
@@ -164,25 +164,25 @@ class ModalFooterManager {
 
     // Ensure last button (usually primary) gets focus by default
     const primaryButton =
-      footer.querySelector('.modal-button.primary') ||
-      footer.querySelector('.modal-button:last-child');
+      footer.querySelector(".modal-button.primary") ||
+      footer.querySelector(".modal-button:last-child");
     if (primaryButton) {
-      primaryButton.setAttribute('data-default-focus', 'true');
+      primaryButton.setAttribute("data-default-focus", "true");
     }
   }
 
   addScrollIndicators(footer) {
-    if (footer.querySelector('.scroll-indicator')) return;
+    if (footer.querySelector(".scroll-indicator")) return;
 
     // Left indicator
-    const leftIndicator = document.createElement('div');
-    leftIndicator.className = 'scroll-indicator scroll-indicator-left';
-    leftIndicator.innerHTML = '‹';
+    const leftIndicator = document.createElement("div");
+    leftIndicator.className = "scroll-indicator scroll-indicator-left";
+    leftIndicator.innerHTML = "‹";
 
     // Right indicator
-    const rightIndicator = document.createElement('div');
-    rightIndicator.className = 'scroll-indicator scroll-indicator-right';
-    rightIndicator.innerHTML = '›';
+    const rightIndicator = document.createElement("div");
+    rightIndicator.className = "scroll-indicator scroll-indicator-right";
+    rightIndicator.innerHTML = "›";
 
     footer.appendChild(leftIndicator);
     footer.appendChild(rightIndicator);
@@ -190,14 +190,14 @@ class ModalFooterManager {
     this.updateScrollIndicators(footer);
 
     // Update indicators on scroll
-    footer.addEventListener('scroll', () =>
-      this.updateScrollIndicators(footer)
+    footer.addEventListener("scroll", () =>
+      this.updateScrollIndicators(footer),
     );
   }
 
   updateScrollIndicators(footer) {
-    const leftIndicator = footer.querySelector('.scroll-indicator-left');
-    const rightIndicator = footer.querySelector('.scroll-indicator-right');
+    const leftIndicator = footer.querySelector(".scroll-indicator-left");
+    const rightIndicator = footer.querySelector(".scroll-indicator-right");
 
     if (!leftIndicator || !rightIndicator) return;
 
@@ -214,8 +214,8 @@ class ModalFooterManager {
   }
 
   removeScrollIndicators(footer) {
-    const indicators = footer.querySelectorAll('.scroll-indicator');
-    indicators.forEach(indicator => indicator.remove());
+    const indicators = footer.querySelectorAll(".scroll-indicator");
+    indicators.forEach((indicator) => indicator.remove());
   }
 
   handleFooterResize(footer) {
@@ -228,19 +228,19 @@ class ModalFooterManager {
   }
 
   setupMutationObserver() {
-    const observer = new MutationObserver(mutations => {
-      mutations.forEach(mutation => {
-        mutation.addedNodes.forEach(node => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
           if (node.nodeType === Node.ELEMENT_NODE) {
             // Check if the added node is a modal footer
-            if (node.classList && node.classList.contains('modal-footer')) {
+            if (node.classList && node.classList.contains("modal-footer")) {
               this.manageFooter(node);
             }
             // Check for modal footers within the added node
             const footers =
-              node.querySelectorAll && node.querySelectorAll('.modal-footer');
+              node.querySelectorAll && node.querySelectorAll(".modal-footer");
             if (footers) {
-              footers.forEach(footer => this.manageFooter(footer));
+              footers.forEach((footer) => this.manageFooter(footer));
             }
           }
         });
@@ -262,10 +262,10 @@ class ModalFooterManager {
 
     // Remove event listeners
     if (footer._checkOverflow) {
-      footer.removeEventListener('scroll', footer._checkOverflow);
+      footer.removeEventListener("scroll", footer._checkOverflow);
     }
     if (footer._handleResponsiveLayout) {
-      window.removeEventListener('resize', footer._handleResponsiveLayout);
+      window.removeEventListener("resize", footer._handleResponsiveLayout);
     }
   }
 
@@ -273,7 +273,7 @@ class ModalFooterManager {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
     }
-    this.observedFooters.forEach(footer => this.cleanup(footer));
+    this.observedFooters.forEach((footer) => this.cleanup(footer));
     this.observedFooters.clear();
   }
 }
@@ -282,6 +282,6 @@ class ModalFooterManager {
 export default ModalFooterManager;
 
 // Export for CommonJS (backward compatibility)
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
   module.exports = ModalFooterManager;
 }

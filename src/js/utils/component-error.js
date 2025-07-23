@@ -15,7 +15,7 @@
 export class ComponentError extends Error {
   constructor(message, component, context = {}) {
     super(message);
-    this.name = 'ComponentError';
+    this.name = "ComponentError";
     this.component = component;
     this.context = context;
     this.timestamp = new Date().toISOString();
@@ -33,7 +33,7 @@ export class ComponentError extends Error {
     const contextStr =
       Object.keys(this.context).length > 0
         ? ` Context: ${JSON.stringify(this.context)}`
-        : '';
+        : "";
 
     return `[${this.component}] ${this.message}${contextStr} (${this.timestamp})`;
   }

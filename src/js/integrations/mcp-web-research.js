@@ -29,27 +29,27 @@ const CACHE_CONFIG = {
 };
 
 const SEARCH_QUERIES = {
-  'bias-fairness': [
-    'AI bias lawsuit 2024 2025',
-    'algorithmic discrimination news',
-    'AI fairness research latest',
+  "bias-fairness": [
+    "AI bias lawsuit 2024 2025",
+    "algorithmic discrimination news",
+    "AI fairness research latest",
   ],
-  'consent-surveillance': [
-    'privacy violation AI surveillance',
-    'consent data collection ethics',
-    'AI monitoring controversy',
+  "consent-surveillance": [
+    "privacy violation AI surveillance",
+    "consent data collection ethics",
+    "AI monitoring controversy",
   ],
-  'automation-oversight': [
-    'AI automation job displacement',
-    'human oversight AI systems',
-    'algorithmic decision making oversight',
+  "automation-oversight": [
+    "AI automation job displacement",
+    "human oversight AI systems",
+    "algorithmic decision making oversight",
   ],
-  'misinformation-trust': [
-    'AI misinformation detection',
-    'deepfake detection technology',
-    'AI trustworthiness research',
+  "misinformation-trust": [
+    "AI misinformation detection",
+    "deepfake detection technology",
+    "AI trustworthiness research",
   ],
-  default: ['AI ethics news', 'artificial intelligence ethics'],
+  default: ["AI ethics news", "artificial intelligence ethics"],
 };
 
 class MCPWebResearch {
@@ -75,12 +75,12 @@ class MCPWebResearch {
    */
   async enrichScenarioWithRealExamples(scenarioId, ethicsCategory) {
     // Input validation
-    if (!scenarioId || typeof scenarioId !== 'string') {
-      throw new Error('Scenario ID is required and must be a string');
+    if (!scenarioId || typeof scenarioId !== "string") {
+      throw new Error("Scenario ID is required and must be a string");
     }
 
-    if (!ethicsCategory || typeof ethicsCategory !== 'string') {
-      throw new Error('Ethics category is required and must be a string');
+    if (!ethicsCategory || typeof ethicsCategory !== "string") {
+      throw new Error("Ethics category is required and must be a string");
     }
 
     const cacheKey = `${scenarioId}-${ethicsCategory}`;
@@ -101,7 +101,7 @@ class MCPWebResearch {
         // This would be called through MCP
         const webContent = await this.fetchWebContent(query);
         realExamples.push(
-          ...this.extractRelevantExamples(webContent, ethicsCategory)
+          ...this.extractRelevantExamples(webContent, ethicsCategory),
         );
       }
 
@@ -120,7 +120,7 @@ class MCPWebResearch {
     } catch (error) {
       // TODO: Implement proper error logging/analytics tracking
       if (this.analytics) {
-        this.analytics.track('web_research_error', {
+        this.analytics.track("web_research_error", {
           scenarioId,
           ethicsCategory,
           error: error.message,
@@ -152,7 +152,7 @@ class MCPWebResearch {
     // Simple keyword-based extraction (could be enhanced with NLP)
     const relevantSections = this.findRelevantSections(webContent, category);
 
-    relevantSections.forEach(section => {
+    relevantSections.forEach((section) => {
       examples.push({
         title: this.extractTitle(section),
         summary: this.extractSummary(section),
@@ -163,7 +163,7 @@ class MCPWebResearch {
     });
 
     return examples.filter(
-      ex => ex.relevance > CACHE_CONFIG.RELEVANCE_THRESHOLD
+      (ex) => ex.relevance > CACHE_CONFIG.RELEVANCE_THRESHOLD,
     );
   }
 
@@ -175,7 +175,7 @@ class MCPWebResearch {
   async updateScenarioWithCurrentEvents(scenario) {
     const realWorldData = await this.enrichScenarioWithRealExamples(
       scenario.id,
-      scenario.category
+      scenario.category,
     );
 
     return {
@@ -194,13 +194,13 @@ class MCPWebResearch {
    * @returns {Array<Object>} Array of discussion prompts with context
    */
   generateDiscussionPrompts(realWorldData) {
-    return realWorldData.realWorldExamples.map(example => ({
+    return realWorldData.realWorldExamples.map((example) => ({
       prompt: `How does the scenario you just explored relate to this real-world case: ${example.title}?`,
       context: example.summary,
       thinkingPoints: [
-        'What similarities do you see between the simulation and this real case?',
-        'What differences are there, and why might they matter?',
-        'What lessons from this real case could apply to your simulation choices?',
+        "What similarities do you see between the simulation and this real case?",
+        "What differences are there, and why might they matter?",
+        "What lessons from this real case could apply to your simulation choices?",
       ],
     }));
   }
@@ -209,7 +209,7 @@ class MCPWebResearch {
   async fetchWebContent(_query) {
     // This would use the MCP fetch_webpage function
     // TODO: Implement with MCP fetch_webpage
-    throw new Error('Implement with MCP fetch_webpage');
+    throw new Error("Implement with MCP fetch_webpage");
   }
 
   findRelevantSections(_content, _category) {
@@ -220,17 +220,17 @@ class MCPWebResearch {
 
   extractTitle(_section) {
     // TODO: Implement title extraction from content section
-    return '';
+    return "";
   }
 
   extractSummary(_section) {
     // TODO: Implement summary extraction from content section
-    return '';
+    return "";
   }
 
   extractSource(_section) {
     // TODO: Implement source URL/name extraction
-    return '';
+    return "";
   }
 
   extractDate(_section) {

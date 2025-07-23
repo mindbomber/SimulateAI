@@ -20,8 +20,8 @@
  * For internal use by app developers to understand user patterns
  */
 
-import { userEngagementTracker } from '../services/user-engagement-tracker.js';
-import logger from '../utils/logger.js';
+import { userEngagementTracker } from "../services/user-engagement-tracker.js";
+import logger from "../utils/logger.js";
 
 export class UserInsightsDashboard {
   constructor() {
@@ -47,9 +47,9 @@ export class UserInsightsDashboard {
    * Create the dashboard HTML structure
    */
   createDashboard() {
-    const dashboard = document.createElement('div');
-    dashboard.id = 'user-insights-dashboard';
-    dashboard.className = 'user-insights-dashboard';
+    const dashboard = document.createElement("div");
+    dashboard.id = "user-insights-dashboard";
+    dashboard.className = "user-insights-dashboard";
     dashboard.innerHTML = `
       <div class="dashboard-header">
         <h2>User Insights Dashboard</h2>
@@ -139,7 +139,7 @@ export class UserInsightsDashboard {
     `;
 
     // Add CSS styles
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.textContent = `
       .user-insights-dashboard {
         position: fixed;
@@ -354,40 +354,40 @@ export class UserInsightsDashboard {
    * Setup event listeners for dashboard controls
    */
   setupEventListeners() {
-    const refreshBtn = document.getElementById('refresh-insights');
-    const exportBtn = document.getElementById('export-insights');
-    const closeBtn = document.getElementById('close-dashboard');
+    const refreshBtn = document.getElementById("refresh-insights");
+    const exportBtn = document.getElementById("export-insights");
+    const closeBtn = document.getElementById("close-dashboard");
 
     if (refreshBtn) {
-      refreshBtn.addEventListener('click', () => {
+      refreshBtn.addEventListener("click", () => {
         this.loadInsights();
       });
     }
 
     if (exportBtn) {
-      exportBtn.addEventListener('click', () => {
+      exportBtn.addEventListener("click", () => {
         this.exportInsights();
       });
     }
 
     if (closeBtn) {
-      closeBtn.addEventListener('click', () => {
+      closeBtn.addEventListener("click", () => {
         this.hideDashboard();
       });
     }
 
     // Close dashboard on escape key
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && this.isVisible) {
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && this.isVisible) {
         this.hideDashboard();
       }
     });
 
     // Close dashboard on backdrop click
     document
-      .getElementById('user-insights-dashboard')
-      .addEventListener('click', e => {
-        if (e.target.id === 'user-insights-dashboard') {
+      .getElementById("user-insights-dashboard")
+      .addEventListener("click", (e) => {
+        if (e.target.id === "user-insights-dashboard") {
           this.hideDashboard();
         }
       });
@@ -409,10 +409,10 @@ export class UserInsightsDashboard {
       this.displayPainPoints();
       this.displayRecommendations();
 
-      logger.info('User insights loaded successfully');
+      logger.info("User insights loaded successfully");
     } catch (error) {
-      logger.error('Failed to load user insights:', error);
-      this.showError('Failed to load insights. Please try again.');
+      logger.error("Failed to load user insights:", error);
+      this.showError("Failed to load insights. Please try again.");
     }
   }
 
@@ -420,29 +420,29 @@ export class UserInsightsDashboard {
    * Display user profile data
    */
   displayUserProfile() {
-    const container = document.getElementById('user-profile-data');
+    const container = document.getElementById("user-profile-data");
     const { userProfile, behaviorPatterns } = userEngagementTracker;
 
     container.innerHTML = `
       <div class="metric-row">
         <span class="metric-label">User ID:</span>
-        <span class="metric-value">${userProfile.userId || 'Not set'}</span>
+        <span class="metric-value">${userProfile.userId || "Not set"}</span>
       </div>
       <div class="metric-row">
         <span class="metric-label">User Type:</span>
-        <span class="metric-value">${behaviorPatterns.userType || 'Unknown'}</span>
+        <span class="metric-value">${behaviorPatterns.userType || "Unknown"}</span>
       </div>
       <div class="metric-row">
         <span class="metric-label">First Visit:</span>
-        <span class="metric-value">${userProfile.firstVisit ? new Date(userProfile.firstVisit).toLocaleDateString() : 'Unknown'}</span>
+        <span class="metric-value">${userProfile.firstVisit ? new Date(userProfile.firstVisit).toLocaleDateString() : "Unknown"}</span>
       </div>
       <div class="metric-row">
         <span class="metric-label">Onboarding Status:</span>
-        <span class="metric-value">${userProfile.onboardingCompleted ? 'Complete' : 'Incomplete'}</span>
+        <span class="metric-value">${userProfile.onboardingCompleted ? "Complete" : "Incomplete"}</span>
       </div>
       <div class="metric-row">
         <span class="metric-label">Engagement Level:</span>
-        <span class="metric-value">${behaviorPatterns.engagementLevel || 'Unknown'}</span>
+        <span class="metric-value">${behaviorPatterns.engagementLevel || "Unknown"}</span>
       </div>
     `;
   }
@@ -451,7 +451,7 @@ export class UserInsightsDashboard {
    * Display settings usage data
    */
   displaySettingsUsage() {
-    const container = document.getElementById('settings-usage-data');
+    const container = document.getElementById("settings-usage-data");
     const { settingsUsage } = userEngagementTracker;
 
     const panelSessions = settingsUsage.panel_sessions || [];
@@ -462,7 +462,7 @@ export class UserInsightsDashboard {
       panelSessions.length > 0
         ? panelSessions.reduce(
             (sum, session) => sum + (session.timeSpent || 0),
-            0
+            0,
           ) / panelSessions.length
         : 0;
 
@@ -485,7 +485,7 @@ export class UserInsightsDashboard {
       </div>
       <div class="metric-row">
         <span class="metric-label">Most Changed Settings:</span>
-        <span class="metric-value">${this.getMostChangedSettings(settingChanges).join(', ') || 'None'}</span>
+        <span class="metric-value">${this.getMostChangedSettings(settingChanges).join(", ") || "None"}</span>
       </div>
     `;
   }
@@ -494,7 +494,7 @@ export class UserInsightsDashboard {
    * Display engagement metrics
    */
   displayEngagementMetrics() {
-    const container = document.getElementById('engagement-metrics-data');
+    const container = document.getElementById("engagement-metrics-data");
     const metrics = userEngagementTracker.engagementMetrics;
 
     container.innerHTML = `
@@ -516,7 +516,7 @@ export class UserInsightsDashboard {
       </div>
       <div class="metric-row">
         <span class="metric-label">Last Activity:</span>
-        <span class="metric-value">${metrics.lastUpdate ? new Date(metrics.lastUpdate).toLocaleString() : 'Unknown'}</span>
+        <span class="metric-value">${metrics.lastUpdate ? new Date(metrics.lastUpdate).toLocaleString() : "Unknown"}</span>
       </div>
     `;
   }
@@ -525,29 +525,29 @@ export class UserInsightsDashboard {
    * Display behavior patterns
    */
   displayBehaviorPatterns() {
-    const container = document.getElementById('behavior-patterns-data');
+    const container = document.getElementById("behavior-patterns-data");
     const patterns = userEngagementTracker.behaviorPatterns;
 
     container.innerHTML = `
       <div class="metric-row">
         <span class="metric-label">User Classification:</span>
-        <span class="metric-value">${patterns.userType || 'Unknown'}</span>
+        <span class="metric-value">${patterns.userType || "Unknown"}</span>
       </div>
       <div class="metric-row">
         <span class="metric-label">Engagement Level:</span>
-        <span class="metric-value">${patterns.engagementLevel || 'Unknown'}</span>
+        <span class="metric-value">${patterns.engagementLevel || "Unknown"}</span>
       </div>
       <div class="metric-row">
         <span class="metric-label">Customization Tendency:</span>
-        <span class="metric-value">${patterns.customizationTendency || 'Unknown'}</span>
+        <span class="metric-value">${patterns.customizationTendency || "Unknown"}</span>
       </div>
       <div class="metric-row">
         <span class="metric-label">Help Seeking:</span>
-        <span class="metric-value">${patterns.helpSeekingBehavior || 'Unknown'}</span>
+        <span class="metric-value">${patterns.helpSeekingBehavior || "Unknown"}</span>
       </div>
       <div class="metric-row">
         <span class="metric-label">Preferred Features:</span>
-        <span class="metric-value">${patterns.preferredFeatures?.join(', ') || 'None identified'}</span>
+        <span class="metric-value">${patterns.preferredFeatures?.join(", ") || "None identified"}</span>
       </div>
     `;
   }
@@ -556,7 +556,7 @@ export class UserInsightsDashboard {
    * Display feature adoption data
    */
   displayFeatureAdoption() {
-    const container = document.getElementById('feature-adoption-data');
+    const container = document.getElementById("feature-adoption-data");
     const insights = this.insights?.featureAdoption || {};
 
     container.innerHTML = `
@@ -574,13 +574,13 @@ export class UserInsightsDashboard {
    * Display user journey data
    */
   displayUserJourney() {
-    const container = document.getElementById('user-journey-data');
+    const container = document.getElementById("user-journey-data");
     const insights = this.insights?.userJourney || {};
 
     container.innerHTML = `
       <div class="metric-row">
         <span class="metric-label">Journey Stage:</span>
-        <span class="metric-value">${insights.stage || 'Unknown'}</span>
+        <span class="metric-value">${insights.stage || "Unknown"}</span>
       </div>
       <div class="chart-placeholder">
         User journey visualization would go here
@@ -592,7 +592,7 @@ export class UserInsightsDashboard {
    * Display pain points
    */
   displayPainPoints() {
-    const container = document.getElementById('pain-points-data');
+    const container = document.getElementById("pain-points-data");
     const painPoints = this.insights?.painPoints || [];
 
     if (painPoints.length === 0) {
@@ -603,10 +603,10 @@ export class UserInsightsDashboard {
 
     const painPointsHtml = painPoints
       .map(
-        point =>
-          `<li><span class="tag ${point.priority}-priority">${point.priority}</span> ${point.description}</li>`
+        (point) =>
+          `<li><span class="tag ${point.priority}-priority">${point.priority}</span> ${point.description}</li>`,
       )
-      .join('');
+      .join("");
 
     container.innerHTML = `
       <ul class="metric-list">
@@ -619,7 +619,7 @@ export class UserInsightsDashboard {
    * Display recommendations
    */
   displayRecommendations() {
-    const container = document.getElementById('recommendations-data');
+    const container = document.getElementById("recommendations-data");
 
     // Generate recommendations based on user data
     const recommendations = this.generateRecommendations();
@@ -632,10 +632,10 @@ export class UserInsightsDashboard {
 
     const recommendationsHtml = recommendations
       .map(
-        rec =>
-          `<li><span class="tag ${rec.priority}-priority">${rec.priority}</span> ${rec.text}</li>`
+        (rec) =>
+          `<li><span class="tag ${rec.priority}-priority">${rec.priority}</span> ${rec.text}</li>`,
       )
-      .join('');
+      .join("");
 
     container.innerHTML = `
       <ul class="metric-list">
@@ -658,16 +658,16 @@ export class UserInsightsDashboard {
       this.constants.LOW_ENGAGEMENT_THRESHOLD
     ) {
       recommendations.push({
-        priority: 'high',
-        text: 'Consider improving onboarding experience - user has low session count',
+        priority: "high",
+        text: "Consider improving onboarding experience - user has low session count",
       });
     }
 
     // Settings usage recommendations
     if ((settingsUsage.panel_sessions?.length || 0) === 0) {
       recommendations.push({
-        priority: 'medium',
-        text: 'User has not accessed settings - consider making settings more discoverable',
+        priority: "medium",
+        text: "User has not accessed settings - consider making settings more discoverable",
       });
     }
 
@@ -677,16 +677,16 @@ export class UserInsightsDashboard {
       this.constants.LOW_FEATURE_ADOPTION_THRESHOLD
     ) {
       recommendations.push({
-        priority: 'medium',
-        text: 'Low feature adoption - consider feature discovery prompts',
+        priority: "medium",
+        text: "Low feature adoption - consider feature discovery prompts",
       });
     }
 
     // User type specific recommendations
-    if (behaviorPatterns.userType === 'power_user') {
+    if (behaviorPatterns.userType === "power_user") {
       recommendations.push({
-        priority: 'low',
-        text: 'Power user detected - consider advanced features and shortcuts',
+        priority: "low",
+        text: "Power user detected - consider advanced features and shortcuts",
       });
     }
 
@@ -698,7 +698,7 @@ export class UserInsightsDashboard {
    */
   getMostChangedSettings(settingChanges) {
     const frequency = {};
-    settingChanges.forEach(change => {
+    settingChanges.forEach((change) => {
       frequency[change.settingName] = (frequency[change.settingName] || 0) + 1;
     });
 
@@ -722,12 +722,12 @@ export class UserInsightsDashboard {
     };
 
     const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-      type: 'application/json',
+      type: "application/json",
     });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `user-insights-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `user-insights-${new Date().toISOString().split("T")[0]}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -738,8 +738,8 @@ export class UserInsightsDashboard {
    * Show error message
    */
   showError(message) {
-    const containers = document.querySelectorAll('.data-section');
-    containers.forEach(container => {
+    const containers = document.querySelectorAll(".data-section");
+    containers.forEach((container) => {
       container.innerHTML = `<div style="color: #e74c3c; font-weight: bold;">${message}</div>`;
     });
   }
@@ -748,9 +748,9 @@ export class UserInsightsDashboard {
    * Show the dashboard
    */
   showDashboard() {
-    const dashboard = document.getElementById('user-insights-dashboard');
+    const dashboard = document.getElementById("user-insights-dashboard");
     if (dashboard) {
-      dashboard.classList.add('visible');
+      dashboard.classList.add("visible");
       this.isVisible = true;
       this.loadInsights();
 
@@ -765,9 +765,9 @@ export class UserInsightsDashboard {
    * Hide the dashboard
    */
   hideDashboard() {
-    const dashboard = document.getElementById('user-insights-dashboard');
+    const dashboard = document.getElementById("user-insights-dashboard");
     if (dashboard) {
-      dashboard.classList.remove('visible');
+      dashboard.classList.remove("visible");
       this.isVisible = false;
 
       if (this.refreshInterval) {
@@ -793,7 +793,7 @@ export class UserInsightsDashboard {
 export const userInsightsDashboard = new UserInsightsDashboard();
 
 // Global function to access dashboard (for development/debugging)
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.showUserInsights = () => userInsightsDashboard.showDashboard();
 }
 

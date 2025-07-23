@@ -11,12 +11,12 @@
 import {
   INPUT_UTILITY_CONSTANTS,
   PERFORMANCE_THRESHOLDS,
-} from '../components/input-utilities/constants.js';
+} from "../components/input-utilities/constants.js";
 
 // Local debug utility to avoid circular dependencies
 const ComponentDebug = {
   warn(message, data) {
-    if (typeof window !== 'undefined' && window.DEBUG_MODE) {
+    if (typeof window !== "undefined" && window.DEBUG_MODE) {
       if (data) {
         window.console.warn(`[Performance] ${message}:`, data);
       } else {
@@ -62,7 +62,7 @@ export class PerformanceMonitor {
       // Check against thresholds
       if (duration > PERFORMANCE_THRESHOLDS.renderTime) {
         ComponentDebug.warn(
-          `${this.name} ${key} exceeded threshold: ${duration.toFixed(2)}ms`
+          `${this.name} ${key} exceeded threshold: ${duration.toFixed(2)}ms`,
         );
       }
 
@@ -94,13 +94,13 @@ export class PerformanceMonitor {
 
     if (renderTime > PERFORMANCE_THRESHOLDS.renderTime) {
       ComponentDebug.warn(
-        `Component ${componentId} render time exceeded threshold: ${renderTime}ms`
+        `Component ${componentId} render time exceeded threshold: ${renderTime}ms`,
       );
     }
 
     if (memoryUsage > PERFORMANCE_THRESHOLDS.memoryWarning) {
       ComponentDebug.warn(
-        `High memory usage detected: ${memoryUsage / INPUT_UTILITY_CONSTANTS.BYTES_PER_KB / INPUT_UTILITY_CONSTANTS.BYTES_PER_KB}MB`
+        `High memory usage detected: ${memoryUsage / INPUT_UTILITY_CONSTANTS.BYTES_PER_KB / INPUT_UTILITY_CONSTANTS.BYTES_PER_KB}MB`,
       );
     }
 

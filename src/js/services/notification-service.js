@@ -39,7 +39,7 @@ class NotificationService {
       this.settings = window.settingsManager;
     } else {
       // Wait for settings manager
-      window.addEventListener('settingsManagerReady', event => {
+      window.addEventListener("settingsManagerReady", (event) => {
         this.settings = event.detail.settings;
         this.initializeServices();
       });
@@ -70,7 +70,7 @@ class NotificationService {
         }
       } else {
         // Dynamically import FCM
-        const { default: fcmMainApp } = await import('../fcm-main-app.js');
+        const { default: fcmMainApp } = await import("../fcm-main-app.js");
         this.fcm = fcmMainApp;
         await this.fcm.initialize();
       }
@@ -108,7 +108,7 @@ class NotificationService {
     }
 
     this.sendNotification({
-      type: 'achievement',
+      type: "achievement",
       title,
       message,
       ...options,
@@ -126,10 +126,10 @@ class NotificationService {
     }
 
     this.sendNotification({
-      type: 'badge',
+      type: "badge",
       title: `🏆 Badge Earned: ${badge.title}`,
       message: badge.description || `You've earned the ${badge.title} badge!`,
-      icon: badge.icon || '/favicon.ico',
+      icon: badge.icon || "/favicon.ico",
       ...options,
     });
   }
@@ -145,7 +145,7 @@ class NotificationService {
     }
 
     this.sendNotification({
-      type: 'progress',
+      type: "progress",
       title,
       message,
       ...options,
@@ -158,18 +158,18 @@ class NotificationService {
   sendNotification(notificationData) {
     const settings = this.getNotificationSettings();
 
-    if (!settings.enabled || settings.permission !== 'granted') {
+    if (!settings.enabled || settings.permission !== "granted") {
       // Show as toast instead
       this.showToast(notificationData);
       return;
     }
 
     const {
-      type = 'info',
+      type = "info",
       title,
       message,
-      icon = '/favicon.ico',
-      badge = '/favicon.ico',
+      icon = "/favicon.ico",
+      badge = "/favicon.ico",
       tag,
       data = {},
     } = notificationData;
@@ -214,7 +214,7 @@ class NotificationService {
       return;
     }
 
-    const { type = 'info', title, message } = notificationData;
+    const { type = "info", title, message } = notificationData;
 
     this.toastService.show({
       type: this.mapNotificationTypeToToast(type),
@@ -230,14 +230,14 @@ class NotificationService {
    */
   mapNotificationTypeToToast(notificationType) {
     const typeMap = {
-      achievement: 'success',
-      badge: 'success',
-      progress: 'info',
-      error: 'error',
-      warning: 'warning',
+      achievement: "success",
+      badge: "success",
+      progress: "info",
+      error: "error",
+      warning: "warning",
     };
 
-    return typeMap[notificationType] || 'info';
+    return typeMap[notificationType] || "info";
   }
 
   /**
@@ -247,21 +247,21 @@ class NotificationService {
     const { type, data = {} } = notificationData;
 
     switch (type) {
-      case 'achievement':
+      case "achievement":
         // Navigate to achievements page or show details
         if (data.achievementId) {
           this.navigateToAchievement(data.achievementId);
         }
         break;
 
-      case 'badge':
+      case "badge":
         // Show badge details or navigate to badges page
         if (data.badgeId) {
           this.showBadgeDetails(data.badgeId);
         }
         break;
 
-      case 'progress':
+      case "progress":
         // Navigate to progress page or specific category
         if (data.categoryId) {
           this.navigateToCategory(data.categoryId);
@@ -304,9 +304,9 @@ class NotificationService {
    */
   sendTestNotification() {
     this.sendNotification({
-      type: 'info',
-      title: 'SimulateAI Notifications',
-      message: 'Your notification system is working correctly!',
+      type: "info",
+      title: "SimulateAI Notifications",
+      message: "Your notification system is working correctly!",
       data: {
         test: true,
       },
@@ -317,7 +317,7 @@ class NotificationService {
    * Check if notifications are supported and enabled
    */
   isNotificationSupported() {
-    return 'Notification' in window;
+    return "Notification" in window;
   }
 
   /**
@@ -337,24 +337,24 @@ class NotificationService {
     if (this.fcm) {
       try {
         report.fcmToken = await this.fcm.getCurrentToken();
-        report.fcmStatus = 'working';
+        report.fcmStatus = "working";
       } catch (error) {
-        report.fcmStatus = 'error';
+        report.fcmStatus = "error";
         report.fcmError = error.message;
       }
     }
 
     // Test browser notification
-    if (report.permission === 'granted') {
+    if (report.permission === "granted") {
       try {
-        const testNotification = new Notification('Test', {
-          body: 'Testing notification system',
-          tag: 'robustness-test',
+        const testNotification = new Notification("Test", {
+          body: "Testing notification system",
+          tag: "robustness-test",
         });
         setTimeout(() => testNotification.close(), 1000);
-        report.browserNotificationTest = 'passed';
+        report.browserNotificationTest = "passed";
       } catch (error) {
-        report.browserNotificationTest = 'failed';
+        report.browserNotificationTest = "failed";
         report.browserNotificationError = error.message;
       }
     }

@@ -1,4 +1,4 @@
-import logger from './logger.js';
+import logger from "./logger.js";
 
 /**
  * Enhanced StorageManager - Modern data persistence system for SimulateAI
@@ -42,8 +42,8 @@ const QUOTA_CHECK_INTERVAL = 60000; // 1 minute
 const SESSION_TIMEOUT_MINUTES = 30;
 
 const STORAGE_CONSTANTS = {
-  PREFIX: 'simAI_',
-  VERSION: '2.0.0',
+  PREFIX: "simAI_",
+  VERSION: "2.0.0",
   MAX_STORAGE_SIZE: BASE_TEN * KB_SIZE * MB_SIZE, // 10MB
   COMPRESSION_THRESHOLD: KB_SIZE, // 1KB
   BACKUP_RETENTION_DAYS: 90,
@@ -57,11 +57,11 @@ const STORAGE_CONSTANTS = {
 };
 
 const STORAGE_EVENTS = {
-  DATA_UPDATED: 'storage:dataUpdated',
-  QUOTA_EXCEEDED: 'storage:quotaExceeded',
-  ERROR_OCCURRED: 'storage:errorOccurred',
-  BACKUP_CREATED: 'storage:backupCreated',
-  DATA_MIGRATED: 'storage:dataMigrated',
+  DATA_UPDATED: "storage:dataUpdated",
+  QUOTA_EXCEEDED: "storage:quotaExceeded",
+  ERROR_OCCURRED: "storage:errorOccurred",
+  BACKUP_CREATED: "storage:backupCreated",
+  DATA_MIGRATED: "storage:dataMigrated",
 };
 
 /**
@@ -72,19 +72,19 @@ class StorageEncryption {
 
   static async generateKey() {
     if (!window.crypto?.subtle) {
-      logger.warn('Web Crypto API not available, using base64 encoding');
+      logger.warn("Web Crypto API not available, using base64 encoding");
       return null;
     }
 
     try {
       this.key = await window.crypto.subtle.generateKey(
-        { name: 'AES-GCM', length: 256 },
+        { name: "AES-GCM", length: 256 },
         false,
-        ['encrypt', 'decrypt']
+        ["encrypt", "decrypt"],
       );
       return this.key;
     } catch (error) {
-      logger.warn('Failed to generate encryption key:', error);
+      logger.warn("Failed to generate encryption key:", error);
       return null;
     }
   }
@@ -101,9 +101,9 @@ class StorageEncryption {
 
       const iv = window.crypto.getRandomValues(new Uint8Array(IV_SIZE));
       const encrypted = await window.crypto.subtle.encrypt(
-        { name: 'AES-GCM', iv },
+        { name: "AES-GCM", iv },
         this.key,
-        dataBuffer
+        dataBuffer,
       );
 
       const result = {
@@ -113,7 +113,7 @@ class StorageEncryption {
 
       return btoa(JSON.stringify(result));
     } catch (error) {
-      logger.warn('Encryption failed, using fallback:', error);
+      logger.warn("Encryption failed, using fallback:", error);
       return btoa(JSON.stringify(data));
     }
   }
@@ -139,16 +139,16 @@ class StorageEncryption {
       const iv = new Uint8Array(parsed.iv);
 
       const decrypted = await window.crypto.subtle.decrypt(
-        { name: 'AES-GCM', iv },
+        { name: "AES-GCM", iv },
         this.key,
-        dataArray
+        dataArray,
       );
 
       const decoder = new TextDecoder();
       const jsonString = decoder.decode(decrypted);
       return JSON.parse(jsonString);
     } catch (error) {
-      logger.warn('Decryption failed, trying fallback:', error);
+      logger.warn("Decryption failed, trying fallback:", error);
       try {
         return JSON.parse(atob(encryptedData));
       } catch {
@@ -164,38 +164,38 @@ class StorageEncryption {
 class StorageValidator {
   static validateSimulationId(id) {
     return (
-      typeof id === 'string' &&
+      typeof id === "string" &&
       STORAGE_CONSTANTS.VALIDATION_PATTERNS.SIMULATION_ID.test(id)
     );
   }
 
   static validateUserId(id) {
     return (
-      typeof id === 'string' &&
+      typeof id === "string" &&
       STORAGE_CONSTANTS.VALIDATION_PATTERNS.USER_ID.test(id)
     );
   }
 
   static validateEmail(email) {
     return (
-      typeof email === 'string' &&
+      typeof email === "string" &&
       STORAGE_CONSTANTS.VALIDATION_PATTERNS.EMAIL.test(email)
     );
   }
 
   static sanitizeString(str, maxLength = 1000) {
-    if (typeof str !== 'string') return '';
-    return str.replace(/[<>]/g, '').substring(0, maxLength);
+    if (typeof str !== "string") return "";
+    return str.replace(/[<>]/g, "").substring(0, maxLength);
   }
 
   static validatePreferences(prefs) {
-    if (!prefs || typeof prefs !== 'object') return false;
+    if (!prefs || typeof prefs !== "object") return false;
 
     const validStructure = {
-      accessibility: 'object',
-      simulation: 'object',
-      analytics: 'object',
-      theme: 'object',
+      accessibility: "object",
+      simulation: "object",
+      analytics: "object",
+      theme: "object",
     };
 
     for (const [key, type] of Object.entries(validStructure)) {
@@ -250,7 +250,7 @@ class StorageManager {
         !window.localStorage ||
         !window.sessionStorage
       ) {
-        logger.warn('Local storage not available, using in-memory storage');
+        logger.warn("Local storage not available, using in-memory storage");
         this.storage = new Map();
         this.sessionStorage = new Map();
         this.setupMemoryStorage();
@@ -272,7 +272,7 @@ class StorageManager {
       try {
         // Check if system_backups exists and is potentially corrupted
         const rawData = this.storage.getItem(
-          this.getStorageKey('system_backups')
+          this.getStorageKey("system_backups"),
         );
         if (rawData) {
           try {
@@ -283,26 +283,26 @@ class StorageManager {
               const compressedValue = parsedData.value;
               if (
                 !compressedValue ||
-                typeof compressedValue !== 'string' ||
+                typeof compressedValue !== "string" ||
                 compressedValue.length < 10
               ) {
                 logger.warn(
-                  'system_backups appears corrupted (invalid compressed data), clearing'
+                  "system_backups appears corrupted (invalid compressed data), clearing",
                 );
-                this.storage.removeItem(this.getStorageKey('system_backups'));
+                this.storage.removeItem(this.getStorageKey("system_backups"));
               }
             }
           } catch (parseError) {
             logger.warn(
-              'system_backups contains invalid JSON, clearing:',
-              parseError
+              "system_backups contains invalid JSON, clearing:",
+              parseError,
             );
-            this.storage.removeItem(this.getStorageKey('system_backups'));
+            this.storage.removeItem(this.getStorageKey("system_backups"));
           }
         }
       } catch (error) {
-        logger.warn('Error checking system_backups, clearing:', error);
-        this.storage.removeItem(this.getStorageKey('system_backups'));
+        logger.warn("Error checking system_backups, clearing:", error);
+        this.storage.removeItem(this.getStorageKey("system_backups"));
       }
 
       // Perform data migration
@@ -311,13 +311,13 @@ class StorageManager {
       // Cleanup old data
       this.cleanupOldData();
 
-      logger.debug('Enhanced StorageManager initialized successfully');
-      this.emit(STORAGE_EVENTS.DATA_UPDATED, { action: 'initialized' });
+      logger.debug("Enhanced StorageManager initialized successfully");
+      this.emit(STORAGE_EVENTS.DATA_UPDATED, { action: "initialized" });
 
       this.isInitializing = false; // Clear initialization flag
     } catch (error) {
-      logger.error('Failed to initialize StorageManager:', error);
-      this.handleError(error, 'initialization');
+      logger.error("Failed to initialize StorageManager:", error);
+      this.handleError(error, "initialization");
       this.isInitializing = false; // Clear flag even on error
     }
   }
@@ -331,16 +331,17 @@ class StorageManager {
     // Simulate localStorage API
     if (this.storage instanceof Map) {
       this.storage.setItem = (key, value) => this.storage.set(key, value);
-      this.storage.getItem = key => this.storage.get(key) || null;
-      this.storage.removeItem = key => this.storage.delete(key);
+      this.storage.getItem = (key) => this.storage.get(key) || null;
+      this.storage.removeItem = (key) => this.storage.delete(key);
       this.storage.clear = () => this.storage.clear();
     }
 
     if (this.sessionStorage instanceof Map) {
       this.sessionStorage.setItem = (key, value) =>
         this.sessionStorage.set(key, value);
-      this.sessionStorage.getItem = key => this.sessionStorage.get(key) || null;
-      this.sessionStorage.removeItem = key => this.sessionStorage.delete(key);
+      this.sessionStorage.getItem = (key) =>
+        this.sessionStorage.get(key) || null;
+      this.sessionStorage.removeItem = (key) => this.sessionStorage.delete(key);
       this.sessionStorage.clear = () => this.sessionStorage.clear();
     }
   }
@@ -349,16 +350,16 @@ class StorageManager {
    * Setup cross-tab synchronization
    */
   static setupCrossTabSync() {
-    if (typeof window === 'undefined' || !window.addEventListener) return;
+    if (typeof window === "undefined" || !window.addEventListener) return;
 
-    window.addEventListener('storage', event => {
+    window.addEventListener("storage", (event) => {
       if (event.key && event.key.startsWith(this.STORAGE_PREFIX)) {
         const key = event.key.substring(this.STORAGE_PREFIX.length);
         this.emit(STORAGE_EVENTS.DATA_UPDATED, {
           key,
           oldValue: event.oldValue,
           newValue: event.newValue,
-          source: 'external',
+          source: "external",
         });
       }
     });
@@ -384,7 +385,7 @@ class StorageManager {
    */
   static async checkStorageQuota() {
     try {
-      if ('storage' in navigator && 'estimate' in navigator.storage) {
+      if ("storage" in navigator && "estimate" in navigator.storage) {
         const estimate = await navigator.storage.estimate();
         const usageRatio = estimate.usage / estimate.quota;
 
@@ -398,7 +399,7 @@ class StorageManager {
         }
       }
     } catch (error) {
-      logger.warn('Failed to check storage quota:', error);
+      logger.warn("Failed to check storage quota:", error);
     }
   }
 
@@ -421,17 +422,17 @@ class StorageManager {
         return false;
       }
 
-      const test = '__storage_test__';
+      const test = "__storage_test__";
       localStorage.setItem(test, test);
       localStorage.removeItem(test);
 
       // Additional checks
-      const testObj = { test: 'data' };
+      const testObj = { test: "data" };
       localStorage.setItem(test, JSON.stringify(testObj));
       const retrieved = JSON.parse(localStorage.getItem(test));
       localStorage.removeItem(test);
 
-      return retrieved && retrieved.test === 'data';
+      return retrieved && retrieved.test === "data";
     } catch (e) {
       return false;
     }
@@ -442,27 +443,27 @@ class StorageManager {
    */
   static async migrateData() {
     try {
-      const currentVersion = this.get('version');
+      const currentVersion = this.get("version");
 
       if (!currentVersion) {
         // First time initialization
-        logger.debug('Initializing storage for first time');
+        logger.debug("Initializing storage for first time");
         await this.performFirstTimeSetup();
       } else if (currentVersion !== this.VERSION) {
         logger.debug(
-          `Migrating data from ${currentVersion} to ${this.VERSION}`
+          `Migrating data from ${currentVersion} to ${this.VERSION}`,
         );
         await this.performMigration(currentVersion, this.VERSION);
       }
 
-      this.set('version', this.VERSION);
+      this.set("version", this.VERSION);
       this.emit(STORAGE_EVENTS.DATA_MIGRATED, {
         from: currentVersion,
         to: this.VERSION,
       });
     } catch (error) {
-      logger.error('Data migration failed:', error);
-      this.handleError(error, 'migration');
+      logger.error("Data migration failed:", error);
+      this.handleError(error, "migration");
     }
   }
 
@@ -475,9 +476,9 @@ class StorageManager {
     this.saveUserPreferences(defaultPreferences);
 
     // Create initial backup
-    await this.createBackup('initial_setup');
+    await this.createBackup("initial_setup");
 
-    logger.debug('First time setup completed');
+    logger.debug("First time setup completed");
   }
 
   /**
@@ -486,14 +487,14 @@ class StorageManager {
   static async performMigration(fromVersion, toVersion) {
     try {
       // Version-specific migration logic
-      if (fromVersion === '1.0' && toVersion === '2.0.0') {
+      if (fromVersion === "1.0" && toVersion === "2.0.0") {
         await this.migrateFrom1To2();
       }
 
       // Create migration backup
       await this.createBackup(`migration_${fromVersion}_to_${toVersion}`);
     } catch (error) {
-      logger.error('Migration failed:', error);
+      logger.error("Migration failed:", error);
       throw error;
     }
   }
@@ -503,22 +504,22 @@ class StorageManager {
    */
   static async migrateFrom1To2() {
     // Migrate old preference structure
-    const oldPrefs = this.get('user_preferences');
+    const oldPrefs = this.get("user_preferences");
     if (oldPrefs) {
       const newPrefs = this.convertOldPreferences(oldPrefs);
       this.saveUserPreferences(newPrefs);
     }
 
     // Migrate decision format if needed
-    const decisions = this.get('decisions', []);
-    const migratedDecisions = decisions.map(decision => ({
+    const decisions = this.get("decisions", []);
+    const migratedDecisions = decisions.map((decision) => ({
       ...decision,
-      version: '2.0.0',
+      version: "2.0.0",
       migrated: true,
     }));
 
-    this.set('decisions', migratedDecisions);
-    logger.debug('Migration from 1.0 to 2.0 completed');
+    this.set("decisions", migratedDecisions);
+    logger.debug("Migration from 1.0 to 2.0 completed");
   }
 
   /**
@@ -528,10 +529,10 @@ class StorageManager {
     return {
       ...oldPrefs,
       theme: {
-        mode: 'auto', // auto, light, dark, high-contrast
+        mode: "auto", // auto, light, dark, high-contrast
         reducedMotion: false,
-        fontSize: 'medium',
-        colorScheme: 'default',
+        fontSize: "medium",
+        colorScheme: "default",
       },
       accessibility: {
         ...oldPrefs.accessibility,
@@ -560,12 +561,12 @@ class StorageManager {
       let processedValue = value;
 
       // Validate key
-      if (!key || typeof key !== 'string') {
-        throw new Error('Invalid storage key');
+      if (!key || typeof key !== "string") {
+        throw new Error("Invalid storage key");
       }
 
       // Force safe options for system_backups to prevent corruption loops
-      if (key === 'system_backups') {
+      if (key === "system_backups") {
         options = {
           ...options,
           encrypt: false,
@@ -596,8 +597,8 @@ class StorageManager {
           metadata.compressed = true;
         } catch (compressError) {
           logger.warn(
-            'Compression failed, using uncompressed data:',
-            compressError
+            "Compression failed, using uncompressed data:",
+            compressError,
           );
           processedValue = value;
         }
@@ -613,8 +614,8 @@ class StorageManager {
           metadata.encrypted = true;
         } catch (encryptError) {
           logger.warn(
-            'Encryption failed, using unencrypted data:',
-            encryptError
+            "Encryption failed, using unencrypted data:",
+            encryptError,
           );
         }
       }
@@ -630,7 +631,7 @@ class StorageManager {
       // Check size limits
       if (dataString.length > STORAGE_CONSTANTS.MAX_STORAGE_SIZE / 100) {
         logger.warn(
-          `Large data detected for key '${key}': ${dataString.length} bytes`
+          `Large data detected for key '${key}': ${dataString.length} bytes`,
         );
       }
 
@@ -644,13 +645,13 @@ class StorageManager {
       // Emit update event
       this.emit(STORAGE_EVENTS.DATA_UPDATED, {
         key,
-        action: 'set',
+        action: "set",
         size: dataString.length,
         metadata,
       });
     } catch (error) {
-      logger.error('Error saving to storage:', error);
-      this.handleError(error, 'set', { key, value });
+      logger.error("Error saving to storage:", error);
+      this.handleError(error, "set", { key, value });
       throw error;
     }
   }
@@ -663,7 +664,7 @@ class StorageManager {
       const fullKey = this.STORAGE_PREFIX + key;
 
       // Validate key
-      if (!key || typeof key !== 'string') {
+      if (!key || typeof key !== "string") {
         return defaultValue;
       }
 
@@ -690,7 +691,7 @@ class StorageManager {
         parsedData = JSON.parse(item);
       } catch (parseError) {
         logger.warn(
-          `Invalid JSON data for key '${key}', returning default value`
+          `Invalid JSON data for key '${key}', returning default value`,
         );
         return defaultValue;
       }
@@ -719,7 +720,7 @@ class StorageManager {
         } catch (decryptError) {
           logger.error(
             `Failed to decrypt data for key '${key}':`,
-            decryptError
+            decryptError,
           );
           return defaultValue;
         }
@@ -730,7 +731,7 @@ class StorageManager {
         // Proactive corruption detection before attempting decompression
         if (!this.isValidCompressedData(finalValue)) {
           logger.warn(
-            `Proactively detected corruption in compressed data for key '${key}', clearing`
+            `Proactively detected corruption in compressed data for key '${key}', clearing`,
           );
           this.storage.removeItem(this.getStorageKey(key));
           return defaultValue;
@@ -741,7 +742,7 @@ class StorageManager {
         } catch (decompressError) {
           logger.error(
             `Failed to decompress data for key '${key}':`,
-            decompressError
+            decompressError,
           );
           // Clear the corrupted data immediately to prevent further issues
           logger.info(`Clearing corrupted data for key: ${key}`);
@@ -752,8 +753,8 @@ class StorageManager {
 
       return finalValue;
     } catch (error) {
-      logger.error('Error reading from storage:', error);
-      this.handleError(error, 'get', { key });
+      logger.error("Error reading from storage:", error);
+      this.handleError(error, "get", { key });
       return defaultValue;
     }
   }
@@ -772,7 +773,7 @@ class StorageManager {
         if (existed) {
           this.emit(STORAGE_EVENTS.DATA_UPDATED, {
             key,
-            action: 'remove',
+            action: "remove",
           });
         }
       } else {
@@ -782,13 +783,13 @@ class StorageManager {
         if (existed) {
           this.emit(STORAGE_EVENTS.DATA_UPDATED, {
             key,
-            action: 'remove',
+            action: "remove",
           });
         }
       }
     } catch (error) {
-      logger.error('Error removing from storage:', error);
-      this.handleError(error, 'remove', { key });
+      logger.error("Error removing from storage:", error);
+      this.handleError(error, "remove", { key });
     }
   }
 
@@ -798,14 +799,14 @@ class StorageManager {
         this.storage.clear();
       } else {
         const keys = Object.keys(localStorage);
-        keys.forEach(key => {
+        keys.forEach((key) => {
           if (key.startsWith(this.STORAGE_PREFIX)) {
             localStorage.removeItem(key);
           }
         });
       }
     } catch (e) {
-      logger.error('Error clearing storage:', e);
+      logger.error("Error clearing storage:", e);
     }
   }
 
@@ -825,7 +826,7 @@ class StorageManager {
         this.sessionStorage.setItem(fullKey, JSON.stringify(value));
       }
     } catch (e) {
-      logger.error('Error saving to session storage:', e);
+      logger.error("Error saving to session storage:", e);
     }
   }
 
@@ -849,7 +850,7 @@ class StorageManager {
         return JSON.parse(item);
       }
     } catch (e) {
-      logger.error('Error reading from session storage:', e);
+      logger.error("Error reading from session storage:", e);
     }
 
     return defaultValue;
@@ -860,7 +861,7 @@ class StorageManager {
     try {
       // Validate preferences structure
       if (!StorageValidator.validatePreferences(preferences)) {
-        throw new Error('Invalid preferences structure');
+        throw new Error("Invalid preferences structure");
       }
 
       // Merge with existing preferences to avoid overwriting
@@ -871,32 +872,32 @@ class StorageManager {
       mergedPrefs._metadata = {
         lastUpdated: Date.now(),
         version: this.VERSION,
-        source: 'user',
+        source: "user",
       };
 
-      await this.set('user_preferences', mergedPrefs, { encrypt: true });
+      await this.set("user_preferences", mergedPrefs, { encrypt: true });
 
       // Emit preferences change event
       this.emit(STORAGE_EVENTS.DATA_UPDATED, {
-        key: 'user_preferences',
-        action: 'update',
+        key: "user_preferences",
+        action: "update",
         data: mergedPrefs,
       });
     } catch (error) {
-      logger.error('Failed to save user preferences:', error);
-      this.handleError(error, 'saveUserPreferences', { preferences });
+      logger.error("Failed to save user preferences:", error);
+      this.handleError(error, "saveUserPreferences", { preferences });
       throw error;
     }
   }
 
   static async getUserPreferences() {
     try {
-      const preferences = await this.get('user_preferences');
+      const preferences = await this.get("user_preferences");
 
       if (preferences) {
         // Validate and migrate if necessary
         if (!StorageValidator.validatePreferences(preferences)) {
-          logger.warn('Invalid preferences found, using defaults');
+          logger.warn("Invalid preferences found, using defaults");
           return this.getDefaultPreferences();
         }
 
@@ -906,8 +907,8 @@ class StorageManager {
 
       return this.getDefaultPreferences();
     } catch (error) {
-      logger.error('Failed to get user preferences:', error);
-      this.handleError(error, 'getUserPreferences');
+      logger.error("Failed to get user preferences:", error);
+      this.handleError(error, "getUserPreferences");
       return this.getDefaultPreferences();
     }
   }
@@ -929,10 +930,10 @@ class StorageManager {
         colorBlindSupport: false,
       },
       theme: {
-        mode: 'auto', // auto, light, dark, high-contrast
+        mode: "auto", // auto, light, dark, high-contrast
         reducedMotion: false,
-        fontSize: 'medium',
-        colorScheme: 'default',
+        fontSize: "medium",
+        colorScheme: "default",
         customColors: null,
       },
       simulation: {
@@ -942,7 +943,7 @@ class StorageManager {
         hapticFeedback: true,
         pauseOnFocusLoss: true,
         skipAnimations: false,
-        difficulty: 'adaptive',
+        difficulty: "adaptive",
       },
       privacy: {
         analyticsEnabled: false,
@@ -956,7 +957,7 @@ class StorageManager {
         enableHaptics: true,
         preloadContent: true,
         compressionEnabled: true,
-        qualityMode: 'balanced', // performance, balanced, quality
+        qualityMode: "balanced", // performance, balanced, quality
       },
       analytics: {
         allowTracking: false,
@@ -977,7 +978,7 @@ class StorageManager {
       if (Object.prototype.hasOwnProperty.call(source, key)) {
         if (
           source[key] &&
-          typeof source[key] === 'object' &&
+          typeof source[key] === "object" &&
           !Array.isArray(source[key])
         ) {
           result[key] = this.deepMerge(result[key] || {}, source[key]);
@@ -1006,7 +1007,7 @@ class StorageManager {
 
       return true;
     } catch (error) {
-      logger.error('Failed to update preference:', error);
+      logger.error("Failed to update preference:", error);
       return false;
     }
   }
@@ -1019,7 +1020,7 @@ class StorageManager {
       const preferences = await this.getUserPreferences();
       return preferences[category]?.[key] ?? defaultValue;
     } catch (error) {
-      logger.error('Failed to get preference:', error);
+      logger.error("Failed to get preference:", error);
       return defaultValue;
     }
   }
@@ -1029,35 +1030,35 @@ class StorageManager {
     try {
       // Validate simulation ID
       if (!StorageValidator.validateSimulationId(simulationId)) {
-        throw new Error('Invalid simulation ID format');
+        throw new Error("Invalid simulation ID format");
       }
 
       // Validate progress data
-      if (!progress || typeof progress !== 'object') {
-        throw new Error('Invalid progress data');
+      if (!progress || typeof progress !== "object") {
+        throw new Error("Invalid progress data");
       }
 
-      const allProgress = await this.get('user_progress', {});
+      const allProgress = await this.get("user_progress", {});
       allProgress[simulationId] = {
         ...progress,
         lastUpdated: Date.now(),
         version: this.VERSION,
       };
 
-      await this.set('user_progress', allProgress, {
-        encrypt: this.isSensitiveKey('user_progress'),
+      await this.set("user_progress", allProgress, {
+        encrypt: this.isSensitiveKey("user_progress"),
         compress: true,
       });
 
       this.emit(STORAGE_EVENTS.DATA_UPDATED, {
-        action: 'progress_saved',
+        action: "progress_saved",
         simulationId,
         timestamp: Date.now(),
       });
 
       logger.debug(`User progress saved for simulation: ${simulationId}`);
     } catch (error) {
-      this.handleError(error, 'saveUserProgress', { simulationId });
+      this.handleError(error, "saveUserProgress", { simulationId });
       throw error;
     }
   }
@@ -1068,13 +1069,13 @@ class StorageManager {
         simulationId &&
         !StorageValidator.validateSimulationId(simulationId)
       ) {
-        throw new Error('Invalid simulation ID format');
+        throw new Error("Invalid simulation ID format");
       }
 
-      const allProgress = await this.get('user_progress', {});
+      const allProgress = await this.get("user_progress", {});
       return simulationId ? allProgress[simulationId] : allProgress;
     } catch (error) {
-      this.handleError(error, 'getUserProgress', { simulationId });
+      this.handleError(error, "getUserProgress", { simulationId });
       return simulationId ? null : {};
     }
   }
@@ -1083,31 +1084,31 @@ class StorageManager {
     try {
       if (simulationId) {
         if (!StorageValidator.validateSimulationId(simulationId)) {
-          throw new Error('Invalid simulation ID format');
+          throw new Error("Invalid simulation ID format");
         }
 
-        const allProgress = await this.get('user_progress', {});
+        const allProgress = await this.get("user_progress", {});
         delete allProgress[simulationId];
-        await this.set('user_progress', allProgress);
+        await this.set("user_progress", allProgress);
 
         this.emit(STORAGE_EVENTS.DATA_UPDATED, {
-          action: 'progress_reset',
+          action: "progress_reset",
           simulationId,
           timestamp: Date.now(),
         });
       } else {
-        this.remove('user_progress');
+        this.remove("user_progress");
         this.emit(STORAGE_EVENTS.DATA_UPDATED, {
-          action: 'all_progress_reset',
+          action: "all_progress_reset",
           timestamp: Date.now(),
         });
       }
 
       logger.debug(
-        `User progress reset${simulationId ? ` for ${simulationId}` : ' (all)'}`
+        `User progress reset${simulationId ? ` for ${simulationId}` : " (all)"}`,
       );
     } catch (error) {
-      this.handleError(error, 'resetUserProgress', { simulationId });
+      this.handleError(error, "resetUserProgress", { simulationId });
       throw error;
     }
   }
@@ -1116,18 +1117,18 @@ class StorageManager {
   static async logDecision(decision) {
     try {
       // Validate decision data
-      if (!decision || typeof decision !== 'object') {
-        throw new Error('Invalid decision data');
+      if (!decision || typeof decision !== "object") {
+        throw new Error("Invalid decision data");
       }
 
       if (
         decision.simulationId &&
         !StorageValidator.validateSimulationId(decision.simulationId)
       ) {
-        throw new Error('Invalid simulation ID in decision');
+        throw new Error("Invalid simulation ID in decision");
       }
 
-      const decisions = await this.get('decisions', []);
+      const decisions = await this.get("decisions", []);
       const enrichedDecision = {
         ...decision,
         id: `decision_${Date.now()}_${Math.random().toString(DECIMAL_RADIX).substr(SUBSTRING_START, ID_SUFFIX_LENGTH)}`,
@@ -1135,8 +1136,8 @@ class StorageManager {
         sessionId: this.getSessionId(),
         version: this.VERSION,
         sanitizedContext: StorageValidator.sanitizeString(
-          decision.context || '',
-          DEFAULT_STRING_LIMIT
+          decision.context || "",
+          DEFAULT_STRING_LIMIT,
         ),
       };
 
@@ -1147,25 +1148,25 @@ class StorageManager {
         decisions.splice(0, decisions.length - 1000);
       }
 
-      await this.set('decisions', decisions, {
-        encrypt: this.isSensitiveKey('decisions'),
+      await this.set("decisions", decisions, {
+        encrypt: this.isSensitiveKey("decisions"),
         compress: true,
       });
 
       // Track analytics
-      await this.trackAnalyticsEvent('decision_logged', {
+      await this.trackAnalyticsEvent("decision_logged", {
         simulationId: decision.simulationId,
         category: decision.category,
         ethicsImpact: decision.ethicsImpact,
       });
 
       this.emit(STORAGE_EVENTS.DATA_UPDATED, {
-        action: 'decision_logged',
+        action: "decision_logged",
         decisionId: enrichedDecision.id,
         timestamp: Date.now(),
       });
     } catch (error) {
-      this.handleError(error, 'logDecision', { decision });
+      this.handleError(error, "logDecision", { decision });
       throw error;
     }
   }
@@ -1176,23 +1177,23 @@ class StorageManager {
         simulationId &&
         !StorageValidator.validateSimulationId(simulationId)
       ) {
-        throw new Error('Invalid simulation ID format');
+        throw new Error("Invalid simulation ID format");
       }
 
-      const decisions = await this.get('decisions', []);
+      const decisions = await this.get("decisions", []);
 
       let filtered = decisions;
       if (simulationId) {
-        filtered = decisions.filter(d => d.simulationId === simulationId);
+        filtered = decisions.filter((d) => d.simulationId === simulationId);
       }
 
-      if (limit && typeof limit === 'number' && limit > 0) {
+      if (limit && typeof limit === "number" && limit > 0) {
         filtered = filtered.slice(-limit);
       }
 
       return filtered;
     } catch (error) {
-      this.handleError(error, 'getDecisions', { simulationId, limit });
+      this.handleError(error, "getDecisions", { simulationId, limit });
       return [];
     }
   }
@@ -1220,9 +1221,9 @@ class StorageManager {
       let totalTime = 0;
       const timestamps = [];
 
-      decisions.forEach(decision => {
+      decisions.forEach((decision) => {
         // Category stats
-        const category = decision.category || 'unknown';
+        const category = decision.category || "unknown";
         stats.byCategory[category] = (stats.byCategory[category] || 0) + 1;
 
         // Simulation stats
@@ -1232,7 +1233,7 @@ class StorageManager {
         }
 
         // Ethics impact
-        const impact = decision.ethicsImpact || 'neutral';
+        const impact = decision.ethicsImpact || "neutral";
         if (stats.ethicsImpact[impact] !== undefined) {
           stats.ethicsImpact[impact]++;
         }
@@ -1240,7 +1241,7 @@ class StorageManager {
         // Timing
         if (decision.timestamp) {
           timestamps.push(decision.timestamp);
-          if (decision.timeSpent && typeof decision.timeSpent === 'number') {
+          if (decision.timeSpent && typeof decision.timeSpent === "number") {
             totalTime += decision.timeSpent;
           }
         }
@@ -1255,13 +1256,13 @@ class StorageManager {
         timestamps.sort((a, b) => a - b);
         stats.timeRange.earliest = new Date(timestamps[0]).toISOString();
         stats.timeRange.latest = new Date(
-          timestamps[timestamps.length - 1]
+          timestamps[timestamps.length - 1],
         ).toISOString();
       }
 
       return stats;
     } catch (error) {
-      this.handleError(error, 'getDecisionStats', { simulationId });
+      this.handleError(error, "getDecisionStats", { simulationId });
       return {
         total: 0,
         byCategory: {},
@@ -1277,35 +1278,35 @@ class StorageManager {
   static async markSimulationComplete(simulationId, report) {
     try {
       if (!StorageValidator.validateSimulationId(simulationId)) {
-        throw new Error('Invalid simulation ID format');
+        throw new Error("Invalid simulation ID format");
       }
 
-      if (!report || typeof report !== 'object') {
-        throw new Error('Invalid completion report');
+      if (!report || typeof report !== "object") {
+        throw new Error("Invalid completion report");
       }
 
       const completion = {
         id: simulationId,
         completedAt: Date.now(),
         score: report.score || 0,
-        feedback: StorageValidator.sanitizeString(report.feedback || '', 1000),
-        ethicsRating: report.ethicsRating || 'unknown',
+        feedback: StorageValidator.sanitizeString(report.feedback || "", 1000),
+        ethicsRating: report.ethicsRating || "unknown",
         timeSpent: report.timeSpent || 0,
         decisionCount: report.decisionCount || 0,
         version: this.VERSION,
       };
 
-      const completions = await this.get('completed_simulations', []);
+      const completions = await this.get("completed_simulations", []);
 
       // Remove any previous completion for this simulation
-      const existingIndex = completions.findIndex(c => c.id === simulationId);
+      const existingIndex = completions.findIndex((c) => c.id === simulationId);
       if (existingIndex > -1) {
         completions.splice(existingIndex, 1);
       }
 
       completions.push(completion);
-      await this.set('completed_simulations', completions, {
-        encrypt: this.isSensitiveKey('completed_simulations'),
+      await this.set("completed_simulations", completions, {
+        encrypt: this.isSensitiveKey("completed_simulations"),
         compress: true,
       });
 
@@ -1318,7 +1319,7 @@ class StorageManager {
       });
 
       // Track analytics
-      await this.trackAnalyticsEvent('simulation_completed', {
+      await this.trackAnalyticsEvent("simulation_completed", {
         simulationId,
         score: completion.score,
         timeSpent: completion.timeSpent,
@@ -1326,23 +1327,23 @@ class StorageManager {
       });
 
       this.emit(STORAGE_EVENTS.DATA_UPDATED, {
-        action: 'simulation_completed',
+        action: "simulation_completed",
         simulationId,
         timestamp: Date.now(),
       });
 
       logger.debug(`Simulation ${simulationId} marked as complete`);
     } catch (error) {
-      this.handleError(error, 'markSimulationComplete', { simulationId });
+      this.handleError(error, "markSimulationComplete", { simulationId });
       throw error;
     }
   }
 
   static async getCompletedSimulations() {
     try {
-      return await this.get('completed_simulations', []);
+      return await this.get("completed_simulations", []);
     } catch (error) {
-      this.handleError(error, 'getCompletedSimulations');
+      this.handleError(error, "getCompletedSimulations");
       return [];
     }
   }
@@ -1356,7 +1357,7 @@ class StorageManager {
       const progress = await this.getUserProgress(simulationId);
       return progress && progress.completed === true;
     } catch (error) {
-      this.handleError(error, 'isSimulationCompleted', { simulationId });
+      this.handleError(error, "isSimulationCompleted", { simulationId });
       return false;
     }
   }
@@ -1364,8 +1365,8 @@ class StorageManager {
   // Enhanced analytics with async support and validation
   static async trackAnalyticsEvent(eventType, data = {}) {
     try {
-      if (!eventType || typeof eventType !== 'string') {
-        throw new Error('Invalid event type');
+      if (!eventType || typeof eventType !== "string") {
+        throw new Error("Invalid event type");
       }
 
       const event = {
@@ -1374,11 +1375,11 @@ class StorageManager {
         timestamp: Date.now(),
         sessionId: this.getSessionId(),
         userAgent: navigator.userAgent,
-        url: window.location?.href || 'unknown',
+        url: window.location?.href || "unknown",
         version: this.VERSION,
       };
 
-      const events = this.getSession('analytics_events', []);
+      const events = this.getSession("analytics_events", []);
       events.push(event);
 
       // Keep only last 100 events in session for performance
@@ -1386,20 +1387,20 @@ class StorageManager {
         events.splice(0, events.length - 100);
       }
 
-      this.setSession('analytics_events', events);
+      this.setSession("analytics_events", events);
 
       // Also store persistent analytics summary
       await this.updateAnalyticsSummary(eventType, data);
 
       logger.debug(`Analytics event tracked: ${eventType}`);
     } catch (error) {
-      this.handleError(error, 'trackAnalyticsEvent', { eventType, data });
+      this.handleError(error, "trackAnalyticsEvent", { eventType, data });
     }
   }
 
   static async updateAnalyticsSummary(eventType, _data) {
     try {
-      const summary = await this.get('analytics_summary', {
+      const summary = await this.get("analytics_summary", {
         totalEvents: 0,
         eventTypes: {},
         lastUpdated: Date.now(),
@@ -1409,37 +1410,37 @@ class StorageManager {
       summary.eventTypes[eventType] = (summary.eventTypes[eventType] || 0) + 1;
       summary.lastUpdated = Date.now();
 
-      await this.set('analytics_summary', summary, {
-        encrypt: this.isSensitiveKey('analytics_summary'),
+      await this.set("analytics_summary", summary, {
+        encrypt: this.isSensitiveKey("analytics_summary"),
         compress: true,
       });
     } catch (error) {
-      logger.warn('Failed to update analytics summary:', error);
+      logger.warn("Failed to update analytics summary:", error);
     }
   }
 
   static getAnalyticsEvents() {
-    return this.getSession('analytics_events', []);
+    return this.getSession("analytics_events", []);
   }
 
   static async getAnalyticsSummary() {
     try {
-      return await this.get('analytics_summary', {
+      return await this.get("analytics_summary", {
         totalEvents: 0,
         eventTypes: {},
         lastUpdated: null,
       });
     } catch (error) {
-      this.handleError(error, 'getAnalyticsSummary');
+      this.handleError(error, "getAnalyticsSummary");
       return { totalEvents: 0, eventTypes: {}, lastUpdated: null };
     }
   }
 
   // Backup and restore functionality
-  static async createBackup(label = 'manual_backup') {
+  static async createBackup(label = "manual_backup") {
     // Skip backup creation during initialization to prevent loops
     if (this.isInitializing) {
-      logger.debug('Skipping backup creation during initialization');
+      logger.debug("Skipping backup creation during initialization");
       return null;
     }
     try {
@@ -1456,7 +1457,7 @@ class StorageManager {
         },
       };
 
-      const backups = await this.get('system_backups', []);
+      const backups = await this.get("system_backups", []);
 
       // Add backup ID
       backupData.id = `backup_${Date.now()}_${Math.random().toString(DECIMAL_RADIX).substr(SUBSTRING_START, ID_SUFFIX_LENGTH)}`;
@@ -1468,7 +1469,7 @@ class StorageManager {
         backups.splice(0, backups.length - 10);
       }
 
-      await this.set('system_backups', backups, {
+      await this.set("system_backups", backups, {
         encrypt: false, // Temporarily disable to prevent corruption loop
         compress: false, // Temporarily disable to prevent corruption loop
       });
@@ -1482,16 +1483,16 @@ class StorageManager {
       logger.debug(`Backup created: ${label} (${backupData.id})`);
       return backupData.id;
     } catch (error) {
-      this.handleError(error, 'createBackup', { label });
+      this.handleError(error, "createBackup", { label });
       throw error;
     }
   }
 
   static async getBackups() {
     try {
-      const backups = await this.get('system_backups', []);
+      const backups = await this.get("system_backups", []);
       // Return metadata only, not full data
-      return backups.map(backup => ({
+      return backups.map((backup) => ({
         id: backup.id,
         label: backup.label,
         createdAt: backup.createdAt,
@@ -1499,22 +1500,22 @@ class StorageManager {
         dataSize: JSON.stringify(backup.data).length,
       }));
     } catch (error) {
-      this.handleError(error, 'getBackups');
+      this.handleError(error, "getBackups");
       return [];
     }
   }
 
   static async restoreFromBackup(backupId) {
     try {
-      if (!backupId || typeof backupId !== 'string') {
-        throw new Error('Invalid backup ID');
+      if (!backupId || typeof backupId !== "string") {
+        throw new Error("Invalid backup ID");
       }
 
-      const backups = await this.get('system_backups', []);
-      const backup = backups.find(b => b.id === backupId);
+      const backups = await this.get("system_backups", []);
+      const backup = backups.find((b) => b.id === backupId);
 
       if (!backup) {
-        throw new Error('Backup not found');
+        throw new Error("Backup not found");
       }
 
       // Create a backup of current state before restoring
@@ -1528,23 +1529,23 @@ class StorageManager {
       }
 
       if (data.progress) {
-        await this.set('user_progress', data.progress);
+        await this.set("user_progress", data.progress);
       }
 
       if (data.decisions) {
-        await this.set('decisions', data.decisions);
+        await this.set("decisions", data.decisions);
       }
 
       if (data.completions) {
-        await this.set('completed_simulations', data.completions);
+        await this.set("completed_simulations", data.completions);
       }
 
       if (data.analyticsSummary) {
-        await this.set('analytics_summary', data.analyticsSummary);
+        await this.set("analytics_summary", data.analyticsSummary);
       }
 
       this.emit(STORAGE_EVENTS.DATA_UPDATED, {
-        action: 'backup_restored',
+        action: "backup_restored",
         backupId,
         timestamp: Date.now(),
       });
@@ -1552,26 +1553,26 @@ class StorageManager {
       logger.debug(`Data restored from backup: ${backupId}`);
       return true;
     } catch (error) {
-      this.handleError(error, 'restoreFromBackup', { backupId });
+      this.handleError(error, "restoreFromBackup", { backupId });
       throw error;
     }
   }
 
   static async deleteBackup(backupId) {
     try {
-      if (!backupId || typeof backupId !== 'string') {
-        throw new Error('Invalid backup ID');
+      if (!backupId || typeof backupId !== "string") {
+        throw new Error("Invalid backup ID");
       }
 
-      const backups = await this.get('system_backups', []);
-      const index = backups.findIndex(b => b.id === backupId);
+      const backups = await this.get("system_backups", []);
+      const index = backups.findIndex((b) => b.id === backupId);
 
       if (index === -1) {
-        throw new Error('Backup not found');
+        throw new Error("Backup not found");
       }
 
       backups.splice(index, 1);
-      await this.set('system_backups', backups, {
+      await this.set("system_backups", backups, {
         encrypt: false,
         compress: false,
       });
@@ -1579,18 +1580,18 @@ class StorageManager {
       logger.debug(`Backup deleted: ${backupId}`);
       return true;
     } catch (error) {
-      this.handleError(error, 'deleteBackup', { backupId });
+      this.handleError(error, "deleteBackup", { backupId });
       throw error;
     }
   }
 
   static async clearBackups() {
     try {
-      this.remove('system_backups');
-      logger.debug('All backups cleared');
+      this.remove("system_backups");
+      logger.debug("All backups cleared");
       return true;
     } catch (error) {
-      this.handleError(error, 'clearBackups');
+      this.handleError(error, "clearBackups");
       throw error;
     }
   }
@@ -1612,29 +1613,29 @@ class StorageManager {
       }
 
       // Track export event
-      await this.trackAnalyticsEvent('data_exported', {
+      await this.trackAnalyticsEvent("data_exported", {
         includeAnalytics,
         dataSize: JSON.stringify(data).length,
       });
 
       return JSON.stringify(data, null, 2);
     } catch (error) {
-      this.handleError(error, 'exportData');
+      this.handleError(error, "exportData");
       throw error;
     }
   }
 
   static async importData(jsonData, options = {}) {
     try {
-      if (!jsonData || typeof jsonData !== 'string') {
-        throw new Error('Invalid JSON data');
+      if (!jsonData || typeof jsonData !== "string") {
+        throw new Error("Invalid JSON data");
       }
 
       const data = JSON.parse(jsonData);
 
       // Validate data structure
       if (!data.version) {
-        throw new Error('Invalid data format - missing version');
+        throw new Error("Invalid data format - missing version");
       }
 
       // Create backup before import
@@ -1653,45 +1654,45 @@ class StorageManager {
         importedItems++;
       }
 
-      if (data.progress && typeof data.progress === 'object') {
-        await this.set('user_progress', data.progress);
+      if (data.progress && typeof data.progress === "object") {
+        await this.set("user_progress", data.progress);
         importedItems++;
       }
 
       if (data.decisions && Array.isArray(data.decisions)) {
-        await this.set('decisions', data.decisions);
+        await this.set("decisions", data.decisions);
         importedItems++;
       }
 
       if (data.completions && Array.isArray(data.completions)) {
-        await this.set('completed_simulations', data.completions);
+        await this.set("completed_simulations", data.completions);
         importedItems++;
       }
 
-      if (data.analyticsSummary && typeof data.analyticsSummary === 'object') {
-        await this.set('analytics_summary', data.analyticsSummary);
+      if (data.analyticsSummary && typeof data.analyticsSummary === "object") {
+        await this.set("analytics_summary", data.analyticsSummary);
         importedItems++;
       }
 
       // Track import event
-      await this.trackAnalyticsEvent('data_imported', {
+      await this.trackAnalyticsEvent("data_imported", {
         importedItems,
         dataVersion: data.version,
         importOptions: options,
       });
 
       this.emit(STORAGE_EVENTS.DATA_UPDATED, {
-        action: 'data_imported',
+        action: "data_imported",
         importedItems,
         timestamp: Date.now(),
       });
 
       logger.debug(
-        `Data imported successfully. Items imported: ${importedItems}`
+        `Data imported successfully. Items imported: ${importedItems}`,
       );
       return { success: true, importedItems };
     } catch (error) {
-      this.handleError(error, 'importData', { options });
+      this.handleError(error, "importData", { options });
       return { success: false, error: error.message };
     }
   }
@@ -1717,7 +1718,7 @@ class StorageManager {
         }
       }
     } catch (error) {
-      logger.error('Error calculating storage size:', error);
+      logger.error("Error calculating storage size:", error);
     }
 
     return totalSize;
@@ -1735,26 +1736,26 @@ class StorageManager {
       let cleanedItems = 0;
 
       // Clean old decisions
-      const decisions = await this.get('decisions', []);
-      const recentDecisions = decisions.filter(d => d.timestamp > cutoffTime);
+      const decisions = await this.get("decisions", []);
+      const recentDecisions = decisions.filter((d) => d.timestamp > cutoffTime);
       if (recentDecisions.length !== decisions.length) {
-        await this.set('decisions', recentDecisions);
+        await this.set("decisions", recentDecisions);
         cleanedItems += decisions.length - recentDecisions.length;
       }
 
       // Clean old session data
       if (this.sessionStorage) {
         try {
-          const analyticsEvents = this.getSession('analytics_events', []);
+          const analyticsEvents = this.getSession("analytics_events", []);
           const recentEvents = analyticsEvents.filter(
-            e => e.timestamp > cutoffTime
+            (e) => e.timestamp > cutoffTime,
           );
           if (recentEvents.length !== analyticsEvents.length) {
-            this.setSession('analytics_events', recentEvents);
+            this.setSession("analytics_events", recentEvents);
             cleanedItems += analyticsEvents.length - recentEvents.length;
           }
         } catch (error) {
-          logger.warn('Failed to clean session analytics:', error);
+          logger.warn("Failed to clean session analytics:", error);
         }
       }
 
@@ -1766,11 +1767,11 @@ class StorageManager {
           MINUTES_PER_HOUR *
           SECONDS_PER_MINUTE *
           MS_PER_SECOND;
-      const backups = await this.get('system_backups', []);
-      const recentBackups = backups.filter(b => b.createdAt > backupCutoff);
+      const backups = await this.get("system_backups", []);
+      const recentBackups = backups.filter((b) => b.createdAt > backupCutoff);
       if (recentBackups.length !== backups.length) {
         // Use safe storage options to prevent corruption loop
-        await this.set('system_backups', recentBackups, {
+        await this.set("system_backups", recentBackups, {
           encrypt: false,
           compress: false,
         });
@@ -1778,18 +1779,18 @@ class StorageManager {
       }
 
       // Track cleanup
-      await this.trackAnalyticsEvent('data_cleanup', {
+      await this.trackAnalyticsEvent("data_cleanup", {
         olderThanDays,
         cleanedItems,
         cutoffTime,
       });
 
       logger.debug(
-        `Cleaned ${cleanedItems} old data items (older than ${olderThanDays} days)`
+        `Cleaned ${cleanedItems} old data items (older than ${olderThanDays} days)`,
       );
       return cleanedItems;
     } catch (error) {
-      this.handleError(error, 'cleanupOldData', { olderThanDays });
+      this.handleError(error, "cleanupOldData", { olderThanDays });
       return 0;
     }
   }
@@ -1799,12 +1800,12 @@ class StorageManager {
    */
   static getSessionId() {
     // Try to get existing session ID from session storage
-    let sessionId = this.getSession('session_id');
+    let sessionId = this.getSession("session_id");
 
     if (!sessionId) {
       // Generate new session ID
       sessionId = `session_${Date.now()}_${Math.random().toString(DECIMAL_RADIX).substr(SUBSTRING_START, ID_SUFFIX_LENGTH)}`;
-      this.setSession('session_id', sessionId);
+      this.setSession("session_id", sessionId);
     }
 
     return sessionId;
@@ -1815,14 +1816,14 @@ class StorageManager {
    */
   static isSensitiveKey(key) {
     const sensitiveKeys = [
-      'user_credentials',
-      'personal_data',
-      'analytics_data',
-      'email',
-      'user_id',
-      'session_token',
+      "user_credentials",
+      "personal_data",
+      "analytics_data",
+      "email",
+      "user_id",
+      "session_token",
     ];
-    return sensitiveKeys.some(sensitive => key.includes(sensitive));
+    return sensitiveKeys.some((sensitive) => key.includes(sensitive));
   }
 
   /**
@@ -1836,7 +1837,7 @@ class StorageManager {
 
     try {
       const jsonString = JSON.stringify(data);
-      const stream = new CompressionStream('gzip');
+      const stream = new CompressionStream("gzip");
       const writer = stream.writable.getWriter();
       const reader = stream.readable.getReader();
 
@@ -1853,7 +1854,7 @@ class StorageManager {
       }
 
       const compressed = new Uint8Array(
-        chunks.reduce((acc, chunk) => acc + chunk.length, 0)
+        chunks.reduce((acc, chunk) => acc + chunk.length, 0),
       );
       let offset = 0;
       for (const chunk of chunks) {
@@ -1863,7 +1864,7 @@ class StorageManager {
 
       return Array.from(compressed);
     } catch (error) {
-      logger.warn('Native compression failed, using fallback:', error);
+      logger.warn("Native compression failed, using fallback:", error);
       return this.simpleCompress(JSON.stringify(data));
     }
   }
@@ -1876,7 +1877,7 @@ class StorageManager {
   static isValidCompressedData(compressedData) {
     try {
       // Basic type and existence checks
-      if (!compressedData || typeof compressedData !== 'string') {
+      if (!compressedData || typeof compressedData !== "string") {
         return false;
       }
 
@@ -1925,7 +1926,7 @@ class StorageManager {
       return true;
     } catch (error) {
       // If validation itself fails, assume corruption
-      logger.warn('Error during compressed data validation:', error);
+      logger.warn("Error during compressed data validation:", error);
       return false;
     }
   }
@@ -1940,7 +1941,7 @@ class StorageManager {
 
     try {
       const compressed = new Uint8Array(compressedData);
-      const stream = new DecompressionStream('gzip');
+      const stream = new DecompressionStream("gzip");
       const writer = stream.writable.getWriter();
       const reader = stream.readable.getReader();
 
@@ -1957,7 +1958,7 @@ class StorageManager {
       }
 
       const decompressed = new Uint8Array(
-        chunks.reduce((acc, chunk) => acc + chunk.length, 0)
+        chunks.reduce((acc, chunk) => acc + chunk.length, 0),
       );
       let offset = 0;
       for (const chunk of chunks) {
@@ -1968,15 +1969,15 @@ class StorageManager {
       const jsonString = new TextDecoder().decode(decompressed);
       return JSON.parse(jsonString);
     } catch (error) {
-      logger.warn('Native decompression failed, using fallback:', error);
+      logger.warn("Native decompression failed, using fallback:", error);
       try {
         return JSON.parse(this.simpleDecompress(compressedData));
       } catch (fallbackError) {
         logger.error(
-          'Both native and fallback decompression failed:',
-          fallbackError
+          "Both native and fallback decompression failed:",
+          fallbackError,
         );
-        throw new Error('Data corruption: Unable to decompress data');
+        throw new Error("Data corruption: Unable to decompress data");
       }
     }
   }
@@ -1985,9 +1986,9 @@ class StorageManager {
    * Simple compression fallback using Run-Length Encoding
    */
   static simpleCompress(str) {
-    if (typeof str !== 'string') return str;
+    if (typeof str !== "string") return str;
 
-    let compressed = '';
+    let compressed = "";
     for (let i = 0; i < str.length; i++) {
       let count = 1;
       while (i + 1 < str.length && str[i] === str[i + 1]) {
@@ -2004,9 +2005,9 @@ class StorageManager {
    */
   static simpleDecompress(compressed) {
     try {
-      if (typeof compressed !== 'string') return compressed;
+      if (typeof compressed !== "string") return compressed;
 
-      let decompressed = '';
+      let decompressed = "";
       for (let i = 0; i < compressed.length; i++) {
         if (/\d/.test(compressed[i])) {
           const count = parseInt(compressed[i]);
@@ -2022,8 +2023,8 @@ class StorageManager {
       }
       return decompressed;
     } catch (error) {
-      logger.error('Simple decompression failed:', error);
-      throw new Error('Fallback decompression failed: Data is corrupted');
+      logger.error("Simple decompression failed:", error);
+      throw new Error("Fallback decompression failed: Data is corrupted");
     }
   }
 
@@ -2038,14 +2039,14 @@ class StorageManager {
       this.remove(key);
 
       // If it's system_backups, clear it entirely
-      if (key === 'system_backups') {
-        logger.info('Clearing corrupted system_backups data');
+      if (key === "system_backups") {
+        logger.info("Clearing corrupted system_backups data");
         return [];
       }
 
       // For other data, try to restore from a backup if available
       try {
-        const backups = await this.get('system_backups', []);
+        const backups = await this.get("system_backups", []);
         if (backups.length > 0) {
           const latestBackup = backups[backups.length - 1];
           if (latestBackup.data && latestBackup.data[key]) {
@@ -2055,7 +2056,7 @@ class StorageManager {
           }
         }
       } catch (backupError) {
-        logger.warn('Could not restore from backup:', backupError);
+        logger.warn("Could not restore from backup:", backupError);
       }
 
       // Return fallback value
@@ -2066,7 +2067,7 @@ class StorageManager {
 
       return null;
     } catch (error) {
-      logger.error('Recovery failed:', error);
+      logger.error("Recovery failed:", error);
       return fallbackValue;
     }
   }
@@ -2092,7 +2093,7 @@ class StorageManager {
 
     // Store error for debugging (with size limit)
     try {
-      const errors = this.getSession('storage_errors', []);
+      const errors = this.getSession("storage_errors", []);
       errors.push(errorInfo);
 
       // Keep only last 50 errors
@@ -2100,9 +2101,9 @@ class StorageManager {
         errors.splice(0, errors.length - ERROR_LOG_LIMIT);
       }
 
-      this.setSession('storage_errors', errors);
+      this.setSession("storage_errors", errors);
     } catch (logError) {
-      logger.warn('Failed to log storage error:', logError);
+      logger.warn("Failed to log storage error:", logError);
     }
   }
 
@@ -2129,11 +2130,11 @@ class StorageManager {
   static emit(event, data) {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
-      listeners.forEach(callback => {
+      listeners.forEach((callback) => {
         try {
           callback(data);
         } catch (error) {
-          logger.error('Event listener error:', error);
+          logger.error("Event listener error:", error);
         }
       });
     }
@@ -2141,11 +2142,11 @@ class StorageManager {
 }
 
 // Initialize when module loads
-if (typeof window !== 'undefined') {
-  StorageManager.init().catch(error => {
+if (typeof window !== "undefined") {
+  StorageManager.init().catch((error) => {
     logger.error(
-      'Storage initialization failed, continuing with limited functionality:',
-      error
+      "Storage initialization failed, continuing with limited functionality:",
+      error,
     );
     // Don't re-throw the error to prevent app initialization failure
   });

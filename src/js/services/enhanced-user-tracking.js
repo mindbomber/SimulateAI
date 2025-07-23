@@ -6,11 +6,11 @@
  * and provides global access points for development and debugging.
  */
 
-import { userEngagementTracker } from './user-engagement-tracker.js';
-import { UserInsightsDashboard } from '../components/user-insights-dashboard.js';
-import regionalAnalytics from './regional-analytics.js';
-import regionalAnalyticsDashboard from '../components/regional-analytics-dashboard.js';
-import logger from '../utils/logger.js';
+import { userEngagementTracker } from "./user-engagement-tracker.js";
+import { UserInsightsDashboard } from "../components/user-insights-dashboard.js";
+import regionalAnalytics from "./regional-analytics.js";
+import regionalAnalyticsDashboard from "../components/regional-analytics-dashboard.js";
+import logger from "../utils/logger.js";
 
 /**
  * Constants for analysis
@@ -59,12 +59,12 @@ class EnhancedUserTracking {
 
       this.isInitialized = true;
       logger.info(
-        'Enhanced User Metadata Tracking System initialized successfully'
+        "Enhanced User Metadata Tracking System initialized successfully",
       );
     } catch (error) {
       logger.error(
-        'Failed to initialize Enhanced User Metadata Tracking System:',
-        error
+        "Failed to initialize Enhanced User Metadata Tracking System:",
+        error,
       );
     }
   }
@@ -74,7 +74,7 @@ class EnhancedUserTracking {
    */
   async initialize() {
     if (this.isInitialized) {
-      logger.info('Enhanced user tracking already initialized');
+      logger.info("Enhanced user tracking already initialized");
       return;
     }
     await this.init();
@@ -84,20 +84,20 @@ class EnhancedUserTracking {
    * Setup keyboard shortcuts for dashboards
    */
   setupKeyboardShortcuts() {
-    document.addEventListener('keydown', event => {
+    document.addEventListener("keydown", (event) => {
       // Only in development mode
       const isDevelopment =
-        window.location.hostname === 'localhost' ||
-        window.location.hostname === '127.0.0.1';
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1";
       if (!isDevelopment) return;
 
       if (event.ctrlKey && event.shiftKey) {
         switch (event.key) {
-          case 'I':
+          case "I":
             event.preventDefault();
             this.toggleUserInsightsDashboard();
             break;
-          case 'R':
+          case "R":
             event.preventDefault();
             this.toggleRegionalAnalyticsDashboard();
             break;
@@ -141,7 +141,7 @@ class EnhancedUserTracking {
       // Manual tracking
       trackEvent: (eventName, data) =>
         this.userEngagementTracker.trackUserEvent(eventName, data),
-      trackScenarioDecision: decisionData =>
+      trackScenarioDecision: (decisionData) =>
         this.regionalAnalytics.trackScenarioDecision(decisionData),
     };
 
@@ -162,7 +162,7 @@ class EnhancedUserTracking {
    */
   setupIntegrationEvents() {
     // When a scenario decision is made, ensure both systems track it
-    document.addEventListener('scenario-decision', event => {
+    document.addEventListener("scenario-decision", (event) => {
       const decisionData = event.detail;
 
       // Track in regional analytics
@@ -170,32 +170,32 @@ class EnhancedUserTracking {
 
       // Track in user engagement
       this.userEngagementTracker.trackUserEvent(
-        'scenario_decision',
-        decisionData
+        "scenario_decision",
+        decisionData,
       );
     });
 
     // When user settings change, update regional context if needed
-    document.addEventListener('settings-changed', event => {
+    document.addEventListener("settings-changed", (event) => {
       const settingsData = event.detail;
 
       // If location settings changed, reinitialize regional analytics
       if (
-        settingsData.category === 'privacy' &&
-        settingsData.setting === 'location_consent'
+        settingsData.category === "privacy" &&
+        settingsData.setting === "location_consent"
       ) {
         this.regionalAnalytics.loadGeographicData();
       }
     });
 
     // Cross-dashboard communication
-    document.addEventListener('dashboard-opened', event => {
+    document.addEventListener("dashboard-opened", (event) => {
       const dashboardType = event.detail.type;
 
-      if (dashboardType === 'user-insights') {
+      if (dashboardType === "user-insights") {
         // Load fresh regional data for context
         this.regionalAnalytics.flushPendingData();
-      } else if (dashboardType === 'regional-analytics') {
+      } else if (dashboardType === "regional-analytics") {
         // Ensure user engagement data is up to date
         this.userEngagementTracker.flushMetadata();
       }
@@ -210,9 +210,9 @@ class EnhancedUserTracking {
 
     // Dispatch event for integration
     document.dispatchEvent(
-      new CustomEvent('dashboard-opened', {
-        detail: { type: 'user-insights' },
-      })
+      new CustomEvent("dashboard-opened", {
+        detail: { type: "user-insights" },
+      }),
     );
   }
 
@@ -224,9 +224,9 @@ class EnhancedUserTracking {
 
     // Dispatch event for integration
     document.dispatchEvent(
-      new CustomEvent('dashboard-opened', {
-        detail: { type: 'regional-analytics' },
-      })
+      new CustomEvent("dashboard-opened", {
+        detail: { type: "regional-analytics" },
+      }),
     );
   }
 
@@ -241,7 +241,7 @@ class EnhancedUserTracking {
         userProfile: this.userEngagementTracker.getUserProfile(),
         sessionActive: this.userEngagementTracker.currentSession.active,
         metricsCount: Object.keys(
-          this.userEngagementTracker.getEngagementMetrics()
+          this.userEngagementTracker.getEngagementMetrics(),
         ).length,
       },
       regionalAnalytics: this.regionalAnalytics.getStatus(),
@@ -265,7 +265,7 @@ class EnhancedUserTracking {
     return {
       metadata: {
         reportDate: new Date().toISOString(),
-        reportVersion: '1.0.0',
+        reportVersion: "1.0.0",
         systemStatus: this.getSystemStatus(),
       },
       userInsights,
@@ -282,26 +282,26 @@ class EnhancedUserTracking {
       const analysis = {
         userRegionalAlignment: this.analyzeUserRegionalAlignment(
           userInsights,
-          regionalInsights
+          regionalInsights,
         ),
         behaviorConsistency: this.analyzeBehaviorConsistency(
           userInsights,
-          regionalInsights
+          regionalInsights,
         ),
         culturalInfluence: this.analyzeCulturalInfluence(
           userInsights,
-          regionalInsights
+          regionalInsights,
         ),
         recommendations: this.generateCrossAnalysisRecommendations(
           userInsights,
-          regionalInsights
+          regionalInsights,
         ),
       };
 
       return analysis;
     } catch (error) {
-      logger.error('Failed to perform cross-analysis:', error);
-      return { error: 'Cross-analysis failed' };
+      logger.error("Failed to perform cross-analysis:", error);
+      return { error: "Cross-analysis failed" };
     }
   }
 
@@ -311,11 +311,11 @@ class EnhancedUserTracking {
   analyzeUserRegionalAlignment(userInsights, regionalInsights) {
     const userRegion = this.regionalAnalytics.geographicData?.region;
     const regionalData = regionalInsights.regionalComparisons.find(
-      r => r.region === userRegion
+      (r) => r.region === userRegion,
     );
 
     if (!regionalData) {
-      return { alignment: 'unknown', reason: 'Regional data not available' };
+      return { alignment: "unknown", reason: "Regional data not available" };
     }
 
     // Compare user behavior patterns with regional averages
@@ -325,7 +325,7 @@ class EnhancedUserTracking {
     let alignmentScore = 0;
     let comparisons = 0;
 
-    Object.keys(regionalBehavior).forEach(ethicsCategory => {
+    Object.keys(regionalBehavior).forEach((ethicsCategory) => {
       if (userBehavior[ethicsCategory] !== undefined) {
         const userValue = userBehavior[ethicsCategory];
         const regionalValue = regionalBehavior[ethicsCategory];
@@ -333,7 +333,7 @@ class EnhancedUserTracking {
 
         alignmentScore += Math.max(
           0,
-          1 - difference / ANALYSIS_CONSTANTS.SCALE_FACTOR
+          1 - difference / ANALYSIS_CONSTANTS.SCALE_FACTOR,
         ); // Normalize to 0-1 scale
         comparisons++;
       }
@@ -341,8 +341,8 @@ class EnhancedUserTracking {
 
     if (comparisons === 0) {
       return {
-        alignment: 'insufficient_data',
-        reason: 'Not enough comparable data',
+        alignment: "insufficient_data",
+        reason: "Not enough comparable data",
       };
     }
 
@@ -351,13 +351,13 @@ class EnhancedUserTracking {
     return {
       alignment:
         averageAlignment > ANALYSIS_CONSTANTS.ALIGNMENT_THRESHOLDS.HIGH
-          ? 'high'
+          ? "high"
           : averageAlignment > ANALYSIS_CONSTANTS.ALIGNMENT_THRESHOLDS.MEDIUM
-            ? 'medium'
-            : 'low',
+            ? "medium"
+            : "low",
       score: averageAlignment,
       comparisons,
-      details: 'User behavior alignment with regional patterns',
+      details: "User behavior alignment with regional patterns",
     };
   }
 
@@ -372,8 +372,8 @@ class EnhancedUserTracking {
     return {
       userType,
       userRegion,
-      consistency: 'analysis_pending',
-      note: 'Behavior consistency analysis requires more data collection',
+      consistency: "analysis_pending",
+      note: "Behavior consistency analysis requires more data collection",
     };
   }
 
@@ -385,16 +385,16 @@ class EnhancedUserTracking {
       this.regionalAnalytics.geographicData?.culturalContext;
 
     if (!culturalContext) {
-      return { influence: 'unknown', reason: 'Cultural context not available' };
+      return { influence: "unknown", reason: "Cultural context not available" };
     }
 
     return {
       culturalContext,
-      influence: 'moderate',
+      influence: "moderate",
       indicators: [
-        'Settings preferences align with regional patterns',
-        'Decision-making patterns show cultural influence',
-        'Feature usage reflects regional trends',
+        "Settings preferences align with regional patterns",
+        "Decision-making patterns show cultural influence",
+        "Feature usage reflects regional trends",
       ],
     };
   }
@@ -406,25 +406,25 @@ class EnhancedUserTracking {
     const recommendations = [];
 
     // User-specific recommendations
-    if (userInsights.userClassification === 'power_user') {
+    if (userInsights.userClassification === "power_user") {
       recommendations.push({
-        type: 'user_enhancement',
-        priority: 'high',
+        type: "user_enhancement",
+        priority: "high",
         suggestion:
-          'Provide advanced regional analytics features for power users',
-        impact: 'Increase engagement with data-driven insights',
+          "Provide advanced regional analytics features for power users",
+        impact: "Increase engagement with data-driven insights",
       });
     }
 
     // Regional-specific recommendations
     const userRegion = this.regionalAnalytics.geographicData?.region;
     const regionalRecs = regionalInsights.recommendations.filter(
-      r => r.region === userRegion
+      (r) => r.region === userRegion,
     );
 
-    regionalRecs.forEach(rec => {
+    regionalRecs.forEach((rec) => {
       recommendations.push({
-        type: 'regional_personalization',
+        type: "regional_personalization",
         priority: rec.priority,
         suggestion: `Personalize experience: ${rec.suggestion}`,
         impact: rec.impact,
@@ -440,19 +440,19 @@ class EnhancedUserTracking {
   exportComprehensiveData() {
     const report = this.generateComprehensiveReport();
     const blob = new Blob([JSON.stringify(report, null, 2)], {
-      type: 'application/json',
+      type: "application/json",
     });
     const url = URL.createObjectURL(blob);
 
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `comprehensive_analytics_${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `comprehensive_analytics_${new Date().toISOString().split("T")[0]}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    logger.info('Comprehensive analytics data exported');
+    logger.info("Comprehensive analytics data exported");
   }
 
   /**
@@ -465,7 +465,7 @@ class EnhancedUserTracking {
     // Clear regional analytics data
     this.regionalAnalytics.clearRegionalData();
 
-    logger.info('All tracking data cleared');
+    logger.info("All tracking data cleared");
   }
 }
 

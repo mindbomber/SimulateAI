@@ -19,10 +19,10 @@
  * Manages singleton instances of all services to prevent duplicate initializations
  */
 
-import logger from '../utils/logger.js';
-import FirebaseService from './firebase-service.js';
-import { AuthService } from './auth-service.js';
-import appCheckService from './app-check-service.js';
+import logger from "../utils/logger.js";
+import FirebaseService from "./firebase-service.js";
+import { AuthService } from "./auth-service.js";
+import appCheckService from "./app-check-service.js";
 
 class ServiceManager {
   constructor() {
@@ -50,18 +50,18 @@ class ServiceManager {
 
   async _initializeServices() {
     try {
-      logger.info('🚀 ServiceManager: Initializing core services...');
+      logger.info("🚀 ServiceManager: Initializing core services...");
 
       // 1. Initialize Firebase Service first (core dependency)
       const firebaseService = new FirebaseService();
       const firebaseInitialized = await firebaseService.initialize();
 
       if (!firebaseInitialized) {
-        throw new Error('Firebase service initialization failed');
+        throw new Error("Firebase service initialization failed");
       }
 
-      this.services.set('firebase', firebaseService);
-      logger.info('✅ ServiceManager: Firebase service initialized');
+      this.services.set("firebase", firebaseService);
+      logger.info("✅ ServiceManager: Firebase service initialized");
 
       // 2. Initialize Auth Service (depends on Firebase)
       const authService = new AuthService(firebaseService);
@@ -69,24 +69,24 @@ class ServiceManager {
 
       if (!authInitialized) {
         logger.warn(
-          '⚠️ ServiceManager: Auth service initialization failed, continuing...'
+          "⚠️ ServiceManager: Auth service initialization failed, continuing...",
         );
       }
 
-      this.services.set('auth', authService);
-      logger.info('✅ ServiceManager: Auth service initialized');
+      this.services.set("auth", authService);
+      logger.info("✅ ServiceManager: Auth service initialized");
 
       // 3. App Check is already initialized as part of Firebase service
-      this.services.set('appCheck', appCheckService);
-      logger.info('✅ ServiceManager: App Check service registered');
+      this.services.set("appCheck", appCheckService);
+      logger.info("✅ ServiceManager: App Check service registered");
 
       this.initialized = true;
       logger.info(
-        '🎉 ServiceManager: All core services initialized successfully'
+        "🎉 ServiceManager: All core services initialized successfully",
       );
       return true;
     } catch (error) {
-      logger.error('❌ ServiceManager: Service initialization failed:', error);
+      logger.error("❌ ServiceManager: Service initialization failed:", error);
       this.initialized = false;
       this.initializationPromise = null;
       return false;
@@ -101,7 +101,7 @@ class ServiceManager {
   getService(serviceName) {
     if (!this.initialized) {
       logger.warn(
-        `⚠️ ServiceManager: Services not initialized yet, cannot get ${serviceName}`
+        `⚠️ ServiceManager: Services not initialized yet, cannot get ${serviceName}`,
       );
       return null;
     }
@@ -119,7 +119,7 @@ class ServiceManager {
    * @returns {FirebaseService|null}
    */
   getFirebaseService() {
-    return this.getService('firebase');
+    return this.getService("firebase");
   }
 
   /**
@@ -127,7 +127,7 @@ class ServiceManager {
    * @returns {AuthService|null}
    */
   getAuthService() {
-    return this.getService('auth');
+    return this.getService("auth");
   }
 
   /**
@@ -135,7 +135,7 @@ class ServiceManager {
    * @returns {AppCheckService|null}
    */
   getAppCheckService() {
-    return this.getService('appCheck');
+    return this.getService("appCheck");
   }
 
   /**
@@ -184,6 +184,6 @@ const serviceManager = new ServiceManager();
 export default serviceManager;
 
 // Also export for global access
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.serviceManager = serviceManager;
 }

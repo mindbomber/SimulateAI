@@ -3,7 +3,7 @@
  * Starting with the most critical components for SimulateAI
  */
 
-import { BaseObject } from './enhanced-objects.js';
+import { BaseObject } from "./enhanced-objects.js";
 
 // Constants to eliminate magic numbers
 const PRIORITY_COMPONENT_CONSTANTS = {
@@ -75,13 +75,13 @@ class DataTable extends BaseObject {
       height:
         options.height ||
         PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_DEFAULT_HEIGHT,
-      ariaRole: 'table',
+      ariaRole: "table",
     });
 
     this.columns = options.columns || [];
     this.data = options.data || [];
     this.sortColumn = options.sortColumn || null;
-    this.sortDirection = options.sortDirection || 'asc'; // 'asc' or 'desc'
+    this.sortDirection = options.sortDirection || "asc"; // 'asc' or 'desc'
     this.selectedRows = new Set(options.selectedRows || []);
     this.currentPage = options.currentPage || 1;
     this.pageSize =
@@ -98,10 +98,10 @@ class DataTable extends BaseObject {
     this.rowHeight =
       options.rowHeight ||
       PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_DEFAULT_ROW_HEIGHT;
-    this.borderColor = options.borderColor || '#CCCCCC';
-    this.headerBackground = options.headerBackground || '#F5F5F5';
-    this.alternateRowColor = options.alternateRowColor || '#FAFAFA';
-    this.selectedRowColor = options.selectedRowColor || '#E3F2FD';
+    this.borderColor = options.borderColor || "#CCCCCC";
+    this.headerBackground = options.headerBackground || "#F5F5F5";
+    this.alternateRowColor = options.alternateRowColor || "#FAFAFA";
+    this.selectedRowColor = options.selectedRowColor || "#E3F2FD";
 
     // State
     this.filters = new Map();
@@ -114,15 +114,15 @@ class DataTable extends BaseObject {
   setupTable() {
     // Calculate display metrics
     this.visibleRows = Math.floor(
-      (this.height - this.headerHeight) / this.rowHeight
+      (this.height - this.headerHeight) / this.rowHeight,
     );
     this.totalPages = Math.ceil(this.getFilteredData().length / this.pageSize);
 
     // Event handlers
-    this.on('click', event => this.handleClick(event));
-    this.on('mouseMove', event => this.handleMouseMove(event));
-    this.on('keyDown', event => this.handleKeyDown(event));
-    this.on('scroll', event => this.handleScroll(event));
+    this.on("click", (event) => this.handleClick(event));
+    this.on("mouseMove", (event) => this.handleMouseMove(event));
+    this.on("keyDown", (event) => this.handleKeyDown(event));
+    this.on("scroll", (event) => this.handleScroll(event));
   }
 
   // Data Management Methods
@@ -131,8 +131,8 @@ class DataTable extends BaseObject {
 
     // Apply filters
     for (const [column, filterValue] of this.filters) {
-      if (filterValue && filterValue.trim() !== '') {
-        filteredData = filteredData.filter(row => {
+      if (filterValue && filterValue.trim() !== "") {
+        filteredData = filteredData.filter((row) => {
           const cellValue = row[column];
           return String(cellValue)
             .toLowerCase()
@@ -151,7 +151,7 @@ class DataTable extends BaseObject {
         if (aVal < bVal) comparison = -1;
         else if (aVal > bVal) comparison = 1;
 
-        return this.sortDirection === 'desc' ? -comparison : comparison;
+        return this.sortDirection === "desc" ? -comparison : comparison;
       });
     }
 
@@ -168,12 +168,12 @@ class DataTable extends BaseObject {
   // Interaction Methods
   sortByColumn(columnKey) {
     if (this.sortColumn === columnKey) {
-      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+      this.sortDirection = this.sortDirection === "asc" ? "desc" : "asc";
     } else {
       this.sortColumn = columnKey;
-      this.sortDirection = 'asc';
+      this.sortDirection = "asc";
     }
-    this.emit('sort', { column: columnKey, direction: this.sortDirection });
+    this.emit("sort", { column: columnKey, direction: this.sortDirection });
   }
 
   selectRow(rowIndex, multiSelect = false) {
@@ -189,24 +189,24 @@ class DataTable extends BaseObject {
       this.selectedRows.add(rowIndex);
     }
 
-    this.emit('selectionChange', {
+    this.emit("selectionChange", {
       selectedRows: Array.from(this.selectedRows),
     });
   }
 
   setFilter(columnKey, value) {
-    if (value && value.trim() !== '') {
+    if (value && value.trim() !== "") {
       this.filters.set(columnKey, value);
     } else {
       this.filters.delete(columnKey);
     }
     this.currentPage = 1; // Reset to first page
-    this.emit('filter', { column: columnKey, value });
+    this.emit("filter", { column: columnKey, value });
   }
 
   goToPage(page) {
     this.currentPage = Math.max(1, Math.min(page, this.totalPages));
-    this.emit('pageChange', { page: this.currentPage });
+    this.emit("pageChange", { page: this.currentPage });
   }
 
   // Event Handlers
@@ -216,7 +216,7 @@ class DataTable extends BaseObject {
     // Check header clicks (for sorting)
     if (localY <= this.headerHeight) {
       const columnIndex = Math.floor(
-        localX / (this.width / this.columns.length)
+        localX / (this.width / this.columns.length),
       );
       const column = this.columns[columnIndex];
       if (column && column.sortable !== false) {
@@ -237,7 +237,7 @@ class DataTable extends BaseObject {
   handleMouseMove(event) {
     const { localY } = event;
     const newHoveredRow = Math.floor(
-      (localY - this.headerHeight) / this.rowHeight
+      (localY - this.headerHeight) / this.rowHeight,
     );
 
     if (newHoveredRow !== this.hoveredRow) {
@@ -247,20 +247,20 @@ class DataTable extends BaseObject {
 
   handleKeyDown(event) {
     switch (event.key) {
-      case 'ArrowUp':
+      case "ArrowUp":
         // Navigate up
         break;
-      case 'ArrowDown':
+      case "ArrowDown":
         // Navigate down
         break;
-      case 'Enter':
-      case ' ':
+      case "Enter":
+      case " ":
         // Select current row
         break;
-      case 'PageUp':
+      case "PageUp":
         this.goToPage(this.currentPage - 1);
         break;
-      case 'PageDown':
+      case "PageDown":
         this.goToPage(this.currentPage + 1);
         break;
     }
@@ -268,7 +268,7 @@ class DataTable extends BaseObject {
 
   // Rendering
   renderSelf(renderer) {
-    if (renderer.type !== 'canvas') return;
+    if (renderer.type !== "canvas") return;
 
     this.renderTable(renderer);
     this.renderHeader(renderer);
@@ -281,7 +281,7 @@ class DataTable extends BaseObject {
 
   renderTable(renderer) {
     // Table background
-    renderer.fillStyle = '#FFFFFF';
+    renderer.fillStyle = "#FFFFFF";
     renderer.fillRect(0, 0, this.width, this.height);
 
     // Table border
@@ -318,14 +318,14 @@ class DataTable extends BaseObject {
       }
 
       // Header text
-      renderer.fillStyle = '#333333';
-      renderer.font = 'bold 12px Arial';
-      renderer.textAlign = 'left';
-      renderer.textBaseline = 'middle';
+      renderer.fillStyle = "#333333";
+      renderer.font = "bold 12px Arial";
+      renderer.textAlign = "left";
+      renderer.textBaseline = "middle";
       renderer.fillText(
         column.title || column.key,
         x + 10,
-        this.headerHeight / 2
+        this.headerHeight / 2,
       );
 
       // Sort indicator
@@ -335,10 +335,10 @@ class DataTable extends BaseObject {
           columnWidth -
           PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_SORT_INDICATOR_OFFSET;
         const sortY = this.headerHeight / 2;
-        const arrow = this.sortDirection === 'asc' ? '▲' : '▼';
+        const arrow = this.sortDirection === "asc" ? "▲" : "▼";
 
-        renderer.font = '10px Arial';
-        renderer.textAlign = 'center';
+        renderer.font = "10px Arial";
+        renderer.textAlign = "center";
         renderer.fillText(arrow, sortX, sortY);
       }
     });
@@ -353,13 +353,13 @@ class DataTable extends BaseObject {
       const actualRowIndex = (this.currentPage - 1) * this.pageSize + index;
 
       // Row background
-      let backgroundColor = '#FFFFFF';
+      let backgroundColor = "#FFFFFF";
       if (this.selectedRows.has(actualRowIndex)) {
         backgroundColor = this.selectedRowColor;
       } else if (index % 2 === 1) {
         backgroundColor = this.alternateRowColor;
       } else if (index === this.hoveredRow) {
-        backgroundColor = '#F0F0F0';
+        backgroundColor = "#F0F0F0";
       }
 
       renderer.fillStyle = backgroundColor;
@@ -387,22 +387,22 @@ class DataTable extends BaseObject {
         }
 
         // Cell text
-        renderer.fillStyle = '#333333';
-        renderer.font = '11px Arial';
-        renderer.textAlign = 'left';
-        renderer.textBaseline = 'middle';
+        renderer.fillStyle = "#333333";
+        renderer.font = "11px Arial";
+        renderer.textAlign = "left";
+        renderer.textBaseline = "middle";
 
         let displayValue = cellValue;
-        if (column.format && typeof column.format === 'function') {
+        if (column.format && typeof column.format === "function") {
           displayValue = column.format(cellValue);
-        } else if (column.type === 'number' && typeof cellValue === 'number') {
+        } else if (column.type === "number" && typeof cellValue === "number") {
           displayValue = cellValue.toFixed(2);
         }
 
         renderer.fillText(
-          String(displayValue || ''),
+          String(displayValue || ""),
           cellX + 10,
-          y + this.rowHeight / 2
+          y + this.rowHeight / 2,
         );
       });
     });
@@ -414,12 +414,12 @@ class DataTable extends BaseObject {
     const totalData = this.getFilteredData().length;
 
     // Pagination background
-    renderer.fillStyle = '#F9F9F9';
+    renderer.fillStyle = "#F9F9F9";
     renderer.fillRect(
       0,
       paginationY,
       this.width,
-      PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_HEIGHT
+      PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_HEIGHT,
     );
 
     // Pagination info
@@ -427,14 +427,14 @@ class DataTable extends BaseObject {
     const endItem = Math.min(this.currentPage * this.pageSize, totalData);
     const infoText = `${startItem}-${endItem} of ${totalData}`;
 
-    renderer.fillStyle = '#666666';
-    renderer.font = '11px Arial';
-    renderer.textAlign = 'left';
+    renderer.fillStyle = "#666666";
+    renderer.font = "11px Arial";
+    renderer.textAlign = "left";
     renderer.fillText(
       infoText,
       PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_TEXT_OFFSET,
       paginationY +
-        PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_TEXT_Y_OFFSET
+        PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_TEXT_Y_OFFSET,
     );
 
     // Page controls
@@ -451,39 +451,39 @@ class DataTable extends BaseObject {
       PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_NEXT_X_OFFSET;
 
     // Previous button
-    renderer.fillStyle = this.currentPage > 1 ? '#2196F3' : '#CCCCCC';
+    renderer.fillStyle = this.currentPage > 1 ? "#2196F3" : "#CCCCCC";
     renderer.fillRect(
       prevX,
       buttonY,
       buttonWidth,
-      PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_BUTTON_HEIGHT
+      PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_BUTTON_HEIGHT,
     );
-    renderer.fillStyle = '#FFFFFF';
-    renderer.textAlign = 'center';
+    renderer.fillStyle = "#FFFFFF";
+    renderer.textAlign = "center";
     renderer.fillText(
-      'Previous',
+      "Previous",
       prevX +
         PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_BUTTON_TEXT_X_OFFSET,
       buttonY +
-        PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_BUTTON_TEXT_Y_OFFSET
+        PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_BUTTON_TEXT_Y_OFFSET,
     );
 
     // Next button
     renderer.fillStyle =
-      this.currentPage < this.totalPages ? '#2196F3' : '#CCCCCC';
+      this.currentPage < this.totalPages ? "#2196F3" : "#CCCCCC";
     renderer.fillRect(
       nextX,
       buttonY,
       buttonWidth,
-      PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_BUTTON_HEIGHT
+      PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_BUTTON_HEIGHT,
     );
-    renderer.fillStyle = '#FFFFFF';
+    renderer.fillStyle = "#FFFFFF";
     renderer.fillText(
-      'Next',
+      "Next",
       nextX +
         PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_BUTTON_TEXT_X_OFFSET,
       buttonY +
-        PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_BUTTON_TEXT_Y_OFFSET
+        PRIORITY_COMPONENT_CONSTANTS.DATA_TABLE_PAGINATION_BUTTON_TEXT_Y_OFFSET,
     );
   }
 
@@ -493,24 +493,24 @@ class DataTable extends BaseObject {
     this.selectedRows.clear();
     this.currentPage = 1;
     this.totalPages = Math.ceil(this.getFilteredData().length / this.pageSize);
-    this.emit('dataChange', { data: newData });
+    this.emit("dataChange", { data: newData });
   }
 
   getSelectedData() {
     const filteredData = this.getFilteredData();
     return Array.from(this.selectedRows)
-      .map(index => filteredData[index])
+      .map((index) => filteredData[index])
       .filter(Boolean);
   }
 
-  exportData(format = 'json') {
+  exportData(format = "json") {
     const data = this.getFilteredData();
 
-    if (format === 'csv') {
-      const headers = this.columns.map(col => col.title || col.key).join(',');
+    if (format === "csv") {
+      const headers = this.columns.map((col) => col.title || col.key).join(",");
       const rows = data
-        .map(row => this.columns.map(col => row[col.key]).join(','))
-        .join('\n');
+        .map((row) => this.columns.map((col) => row[col.key]).join(","))
+        .join("\n");
       return `${headers}\n${rows}`;
     }
 
@@ -532,11 +532,11 @@ class NotificationToast extends BaseObject {
       height:
         options.height ||
         PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_DEFAULT_HEIGHT,
-      ariaRole: 'alert',
+      ariaRole: "alert",
     });
 
-    this.message = options.message || 'Notification';
-    this.type = options.type || 'info'; // 'success', 'error', 'warning', 'info'
+    this.message = options.message || "Notification";
+    this.type = options.type || "info"; // 'success', 'error', 'warning', 'info'
     this.duration =
       options.duration ||
       PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_DEFAULT_DURATION; // Auto-dismiss time
@@ -554,10 +554,10 @@ class NotificationToast extends BaseObject {
 
   getDefaultIcon() {
     const icons = {
-      success: '✓',
-      error: '✗',
-      warning: '⚠',
-      info: 'ℹ',
+      success: "✓",
+      error: "✗",
+      warning: "⚠",
+      info: "ℹ",
     };
     return icons[this.type] || icons.info;
   }
@@ -578,7 +578,7 @@ class NotificationToast extends BaseObject {
   show() {
     this.isVisible = true;
     this.startTime = performance.now();
-    this.emit('show', this);
+    this.emit("show", this);
 
     // Auto-dismiss timer
     if (this.duration > 0) {
@@ -590,16 +590,16 @@ class NotificationToast extends BaseObject {
 
   hide() {
     this.isVisible = false;
-    this.emit('hide', this);
+    this.emit("hide", this);
 
     // Remove from parent/engine after animation
     setTimeout(() => {
-      this.emit('remove', this);
+      this.emit("remove", this);
     }, PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_REMOVE_DELAY);
   }
 
   renderSelf(renderer) {
-    if (!this.isVisible || renderer.type !== 'canvas') return;
+    if (!this.isVisible || renderer.type !== "canvas") return;
 
     // Update progress for auto-dismiss
     if (this.duration > 0 && this.startTime) {
@@ -618,40 +618,40 @@ class NotificationToast extends BaseObject {
       0,
       0,
       PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_BORDER_WIDTH,
-      this.height
+      this.height,
     );
 
     // Icon
     renderer.fillStyle = colors.accent;
-    renderer.font = '16px Arial';
-    renderer.textAlign = 'center';
+    renderer.font = "16px Arial";
+    renderer.textAlign = "center";
     renderer.fillText(
       this.icon,
       PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_ICON_X,
-      this.height / 2
+      this.height / 2,
     );
 
     // Message
     renderer.fillStyle = colors.text;
-    renderer.font = '13px Arial';
-    renderer.textAlign = 'left';
-    renderer.textBaseline = 'middle';
+    renderer.font = "13px Arial";
+    renderer.textAlign = "left";
+    renderer.textBaseline = "middle";
     renderer.fillText(
       this.message,
       PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_MESSAGE_X,
-      this.height / 2
+      this.height / 2,
     );
 
     // Dismiss button
     if (this.dismissible) {
       renderer.fillStyle = colors.text;
-      renderer.font = '14px Arial';
-      renderer.textAlign = 'center';
+      renderer.font = "14px Arial";
+      renderer.textAlign = "center";
       renderer.fillText(
-        '×',
+        "×",
         this.width -
           PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_DISMISS_X_OFFSET,
-        this.height / 2
+        this.height / 2,
       );
     }
 
@@ -666,7 +666,7 @@ class NotificationToast extends BaseObject {
         this.height -
           PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_PROGRESS_HEIGHT,
         progressWidth,
-        PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_PROGRESS_HEIGHT
+        PRIORITY_COMPONENT_CONSTANTS.NOTIFICATION_TOAST_PROGRESS_HEIGHT,
       );
       renderer.globalAlpha = 1;
     }
@@ -675,24 +675,24 @@ class NotificationToast extends BaseObject {
   getTypeColors() {
     const colorSchemes = {
       success: {
-        background: '#E8F5E8',
-        accent: '#4CAF50',
-        text: '#2E7D32',
+        background: "#E8F5E8",
+        accent: "#4CAF50",
+        text: "#2E7D32",
       },
       error: {
-        background: '#FFEBEE',
-        accent: '#F44336',
-        text: '#C62828',
+        background: "#FFEBEE",
+        accent: "#F44336",
+        text: "#C62828",
       },
       warning: {
-        background: '#FFF3E0',
-        accent: '#FF9800',
-        text: '#E65100',
+        background: "#FFF3E0",
+        accent: "#FF9800",
+        text: "#E65100",
       },
       info: {
-        background: '#E3F2FD',
-        accent: '#2196F3',
-        text: '#1565C0',
+        background: "#E3F2FD",
+        accent: "#2196F3",
+        text: "#1565C0",
       },
     };
 
@@ -714,11 +714,11 @@ class LoadingSpinner extends BaseObject {
       height:
         options.height ||
         PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_DEFAULT_HEIGHT,
-      ariaRole: 'progressbar',
+      ariaRole: "progressbar",
     });
 
-    this.message = options.message || 'Loading...';
-    this.size = options.size || 'medium'; // 'small', 'medium', 'large'
+    this.message = options.message || "Loading...";
+    this.size = options.size || "medium"; // 'small', 'medium', 'large'
     this.progress = options.progress || null; // null for indeterminate
     this.cancellable = options.cancellable || false;
     this.overlay = options.overlay !== false;
@@ -737,15 +737,15 @@ class LoadingSpinner extends BaseObject {
     const sizes = {
       small: {
         spinner: PRIORITY_COMPONENT_CONSTANTS.SPINNER_SIZE_SMALL,
-        font: '11px Arial',
+        font: "11px Arial",
       },
       medium: {
         spinner: PRIORITY_COMPONENT_CONSTANTS.SPINNER_SIZE_MEDIUM,
-        font: '13px Arial',
+        font: "13px Arial",
       },
       large: {
         spinner: PRIORITY_COMPONENT_CONSTANTS.SPINNER_SIZE_LARGE,
-        font: '15px Arial',
+        font: "15px Arial",
       },
     };
 
@@ -774,11 +774,11 @@ class LoadingSpinner extends BaseObject {
 
   setProgress(progress) {
     this.progress = Math.max(0, Math.min(1, progress));
-    this.emit('progressChange', { progress: this.progress });
+    this.emit("progressChange", { progress: this.progress });
   }
 
   renderSelf(renderer) {
-    if (renderer.type !== 'canvas') return;
+    if (renderer.type !== "canvas") return;
 
     // Overlay background
     if (this.overlay) {
@@ -800,26 +800,26 @@ class LoadingSpinner extends BaseObject {
 
     // Message
     if (this.message) {
-      renderer.fillStyle = '#666666';
+      renderer.fillStyle = "#666666";
       renderer.font = this.font;
-      renderer.textAlign = 'center';
-      renderer.textBaseline = 'top';
+      renderer.textAlign = "center";
+      renderer.textBaseline = "top";
       renderer.fillText(
         this.message,
         centerX,
         centerY +
           this.spinnerSize / 2 +
-          PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_MESSAGE_Y_OFFSET
+          PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_MESSAGE_Y_OFFSET,
       );
     }
 
     // Progress percentage
     if (this.progress !== null) {
       const percentage = `${Math.round(this.progress * 100)}%`;
-      renderer.fillStyle = '#333333';
+      renderer.fillStyle = "#333333";
       renderer.font = this.font;
-      renderer.textAlign = 'center';
-      renderer.textBaseline = 'middle';
+      renderer.textAlign = "center";
+      renderer.textBaseline = "middle";
       renderer.fillText(percentage, centerX, centerY);
     }
 
@@ -829,23 +829,23 @@ class LoadingSpinner extends BaseObject {
         centerY +
         this.spinnerSize / 2 +
         PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_CANCEL_Y_OFFSET;
-      renderer.fillStyle = '#F44336';
+      renderer.fillStyle = "#F44336";
       renderer.fillRect(
         centerX -
           PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_CANCEL_BUTTON_X_OFFSET,
         cancelY,
         PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_CANCEL_BUTTON_WIDTH,
-        PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_CANCEL_BUTTON_HEIGHT
+        PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_CANCEL_BUTTON_HEIGHT,
       );
 
-      renderer.fillStyle = '#FFFFFF';
-      renderer.font = '11px Arial';
-      renderer.textAlign = 'center';
+      renderer.fillStyle = "#FFFFFF";
+      renderer.font = "11px Arial";
+      renderer.textAlign = "center";
       renderer.fillText(
-        'Cancel',
+        "Cancel",
         centerX,
         cancelY +
-          PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_CANCEL_BUTTON_TEXT_Y_OFFSET
+          PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_CANCEL_BUTTON_TEXT_Y_OFFSET,
       );
     }
   }
@@ -858,7 +858,7 @@ class LoadingSpinner extends BaseObject {
     renderer.rotate(this.rotation);
 
     // Spinner arc
-    renderer.strokeStyle = '#2196F3';
+    renderer.strokeStyle = "#2196F3";
     renderer.lineWidth =
       PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_LINE_WIDTH;
     renderer.beginPath();
@@ -867,7 +867,7 @@ class LoadingSpinner extends BaseObject {
       0,
       radius,
       0,
-      Math.PI * PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_ARC_END_MULTIPLIER
+      Math.PI * PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_ARC_END_MULTIPLIER,
     );
     renderer.stroke();
 
@@ -878,7 +878,7 @@ class LoadingSpinner extends BaseObject {
     const radius = this.spinnerSize / 2;
 
     // Background circle
-    renderer.strokeStyle = '#E0E0E0';
+    renderer.strokeStyle = "#E0E0E0";
     renderer.lineWidth =
       PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_PROGRESS_LINE_WIDTH;
     renderer.beginPath();
@@ -889,7 +889,7 @@ class LoadingSpinner extends BaseObject {
     if (this.progress > 0) {
       const progressAngle = this.progress * Math.PI * 2;
 
-      renderer.strokeStyle = '#2196F3';
+      renderer.strokeStyle = "#2196F3";
       renderer.lineWidth =
         PRIORITY_COMPONENT_CONSTANTS.LOADING_SPINNER_PROGRESS_LINE_WIDTH;
       renderer.beginPath();
@@ -898,7 +898,7 @@ class LoadingSpinner extends BaseObject {
         centerY,
         radius,
         -Math.PI / 2,
-        -Math.PI / 2 + progressAngle
+        -Math.PI / 2 + progressAngle,
       );
       renderer.stroke();
     }

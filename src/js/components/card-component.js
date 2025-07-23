@@ -10,16 +10,16 @@ class CardComponent {
    * @param {Array<{label: string, onClick: function, className?: string}>} [options.actions] - Action buttons
    * @returns {HTMLElement}
    */
-  static create({ header = '', content = '', actions = [] } = {}) {
-    const card = document.createElement('div');
-    card.className = 'card';
+  static create({ header = "", content = "", actions = [] } = {}) {
+    const card = document.createElement("div");
+    card.className = "card";
     card.tabIndex = 0;
 
     // Header
     if (header) {
-      const headerEl = document.createElement('div');
-      headerEl.className = 'card-header';
-      if (typeof header === 'string') {
+      const headerEl = document.createElement("div");
+      headerEl.className = "card-header";
+      if (typeof header === "string") {
         headerEl.textContent = header;
       } else {
         headerEl.appendChild(header);
@@ -29,9 +29,9 @@ class CardComponent {
 
     // Content
     if (content) {
-      const contentEl = document.createElement('div');
-      contentEl.className = 'card-content';
-      if (typeof content === 'string') {
+      const contentEl = document.createElement("div");
+      contentEl.className = "card-content";
+      if (typeof content === "string") {
         contentEl.textContent = content;
       } else {
         contentEl.appendChild(content);
@@ -41,14 +41,14 @@ class CardComponent {
 
     // Actions
     if (actions && actions.length) {
-      const actionsEl = document.createElement('div');
-      actionsEl.className = 'card-actions';
-      actions.forEach(action => {
-        const btn = document.createElement('button');
-        btn.className = `card-action-btn${action.className ? ` ${action.className}` : ''}`;
-        btn.type = 'button';
+      const actionsEl = document.createElement("div");
+      actionsEl.className = "card-actions";
+      actions.forEach((action) => {
+        const btn = document.createElement("button");
+        btn.className = `card-action-btn${action.className ? ` ${action.className}` : ""}`;
+        btn.type = "button";
         btn.textContent = action.label;
-        btn.addEventListener('click', action.onClick);
+        btn.addEventListener("click", action.onClick);
         actionsEl.appendChild(btn);
       });
       card.appendChild(actionsEl);

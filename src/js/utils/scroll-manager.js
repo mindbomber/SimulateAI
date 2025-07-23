@@ -3,7 +3,7 @@
  * Consolidates all scroll-related functionality into a single, efficient manager
  */
 
-import { logger } from './logger.js';
+import { logger } from "./logger.js";
 
 class ScrollManager {
   constructor() {
@@ -28,15 +28,15 @@ class ScrollManager {
     this.setupScrollRestoration();
     this.setupGlobalScrollBehavior();
     this.initializeHorizontalScrolling();
-    logger.info('ScrollManager initialized');
+    logger.info("ScrollManager initialized");
   }
 
   /**
    * Setup scroll restoration behavior
    */
   setupScrollRestoration() {
-    if ('scrollRestoration' in history) {
-      history.scrollRestoration = 'manual';
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
     }
   }
 
@@ -48,13 +48,13 @@ class ScrollManager {
     this.resetScrollPosition();
 
     // Setup event listeners for scroll reset
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () =>
-        this.resetScrollPosition()
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () =>
+        this.resetScrollPosition(),
       );
     }
 
-    window.addEventListener('pageshow', () => this.resetScrollPosition());
+    window.addEventListener("pageshow", () => this.resetScrollPosition());
   }
 
   /**
@@ -66,7 +66,7 @@ class ScrollManager {
 
     // Ensure smooth scrolling is enabled after reset
     setTimeout(() => {
-      document.documentElement.classList.add('loaded');
+      document.documentElement.classList.add("loaded");
     }, 100);
   }
 
@@ -78,21 +78,21 @@ class ScrollManager {
    */
   async scrollToElement(target, options = {}) {
     const element =
-      typeof target === 'string' ? document.querySelector(target) : target;
+      typeof target === "string" ? document.querySelector(target) : target;
     if (!element) {
-      logger.warn('ScrollManager: Element not found for scrolling', target);
+      logger.warn("ScrollManager: Element not found for scrolling", target);
       return;
     }
 
     const {
-      behavior = 'smooth',
+      behavior = "smooth",
       offset = this.SCROLL_OFFSET,
       respectReducedMotion = true,
     } = options;
 
     // Check if element is inside a modal
     const modalContainer = element.closest(
-      '.scenario-modal, .pre-launch-modal, .modal, [role="dialog"]'
+      '.scenario-modal, .pre-launch-modal, .modal, [role="dialog"]',
     );
 
     if (modalContainer) {
@@ -102,7 +102,7 @@ class ScrollManager {
         element,
         offset,
         behavior,
-        respectReducedMotion
+        respectReducedMotion,
       );
     }
   }
@@ -118,15 +118,15 @@ class ScrollManager {
   async scrollWithinModal(element, modalContainer, offset, behavior) {
     const modalScrollContainer =
       modalContainer.querySelector(
-        '.modal-content, .scenario-content, .modal-body'
+        ".modal-content, .scenario-content, .modal-body",
       ) || modalContainer;
 
-    if (behavior === 'auto' || this.shouldUseInstantScroll()) {
+    if (behavior === "auto" || this.shouldUseInstantScroll()) {
       // Use native scrollIntoView for instant scrolling
       element.scrollIntoView({
-        behavior: 'auto',
-        block: 'center',
-        inline: 'nearest',
+        behavior: "auto",
+        block: "center",
+        inline: "nearest",
       });
       return;
     }
@@ -143,7 +143,7 @@ class ScrollManager {
     await this.animateScroll(
       modalScrollContainer,
       targetScrollTop,
-      'scrollTop'
+      "scrollTop",
     );
   }
 
@@ -157,17 +157,17 @@ class ScrollManager {
    */
   async scrollMainWindow(element, offset, behavior, respectReducedMotion) {
     const prefersReducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)'
+      "(prefers-reduced-motion: reduce)",
     ).matches;
     const actualBehavior =
-      respectReducedMotion && prefersReducedMotion ? 'auto' : behavior;
+      respectReducedMotion && prefersReducedMotion ? "auto" : behavior;
 
-    if (actualBehavior === 'auto' || this.shouldUseInstantScroll()) {
+    if (actualBehavior === "auto" || this.shouldUseInstantScroll()) {
       // Use native scrollIntoView for instant scrolling
       element.scrollIntoView({
-        behavior: 'auto',
-        block: 'center',
-        inline: 'nearest',
+        behavior: "auto",
+        block: "center",
+        inline: "nearest",
       });
       return;
     }
@@ -176,19 +176,19 @@ class ScrollManager {
     const elementRect = element.getBoundingClientRect();
     const targetScrollTop = Math.max(
       0,
-      elementRect.top + window.pageYOffset - offset
+      elementRect.top + window.pageYOffset - offset,
     );
 
-    await this.animateScroll(window, targetScrollTop, 'pageYOffset');
+    await this.animateScroll(window, targetScrollTop, "pageYOffset");
   }
 
   /**
    * Animate scroll with easing
    */
   async animateScroll(scrollContainer, targetPosition, propertyName) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const startPosition =
-        propertyName === 'scrollTop'
+        propertyName === "scrollTop"
           ? scrollContainer.scrollTop
           : window.pageYOffset;
 
@@ -202,7 +202,7 @@ class ScrollManager {
       this.isAutoScrolling = true;
       let startTime = null;
 
-      const animation = currentTime => {
+      const animation = (currentTime) => {
         if (startTime === null) startTime = currentTime;
         const timeElapsed = currentTime - startTime;
         const progress = Math.min(timeElapsed / this.SCROLL_DURATION, 1);
@@ -215,7 +215,7 @@ class ScrollManager {
 
         const currentPosition = startPosition + distance * ease;
 
-        if (propertyName === 'scrollTop') {
+        if (propertyName === "scrollTop") {
           scrollContainer.scrollTop = currentPosition;
         } else {
           window.scrollTo(0, currentPosition);
@@ -240,7 +240,7 @@ class ScrollManager {
   initializeHorizontalScrolling() {
     // Horizontal scroll enhancement removed - using native browser scrolling
     // This method is kept for API compatibility but does nothing
-    logger.info('ScrollManager: Using native horizontal scrolling');
+    logger.info("ScrollManager: Using native horizontal scrolling");
   }
 
   /**
@@ -258,7 +258,7 @@ class ScrollManager {
    * Check if instant scroll should be used
    */
   shouldUseInstantScroll() {
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
 
   /**
@@ -274,7 +274,7 @@ class ScrollManager {
    * Cleanup method
    */
   cleanup() {
-    this.observers.forEach(observer => observer.disconnect());
+    this.observers.forEach((observer) => observer.disconnect());
     this.observers.clear();
     this.debouncedHandlers.clear();
 

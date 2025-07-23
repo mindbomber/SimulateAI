@@ -8,7 +8,7 @@
  * Licensed under the Apache License, Version 2.0
  */
 
-import { ComponentTheme } from '../objects/input-utility-components.js';
+import { ComponentTheme } from "../objects/input-utility-components.js";
 
 /**
  * Common canvas rendering utilities
@@ -22,8 +22,8 @@ export class CanvasRenderer {
    */
   static applyThemeStyles(ctx, theme, options = {}) {
     const {
-      fillColor = 'background',
-      strokeColor = 'border',
+      fillColor = "background",
+      strokeColor = "border",
       fillStyle = null,
       strokeStyle = null,
     } = options;
@@ -53,7 +53,7 @@ export class CanvasRenderer {
   static createLinearGradient(ctx, x0, y0, x1, y1, colorStops) {
     const gradient = ctx.createLinearGradient(x0, y0, x1, y1);
 
-    colorStops.forEach(stop => {
+    colorStops.forEach((stop) => {
       gradient.addColorStop(stop.offset, stop.color);
     });
 
@@ -79,13 +79,13 @@ export class CanvasRenderer {
     height,
     radius,
     theme,
-    options = {}
+    options = {},
   ) {
     const {
       fill = true,
       stroke = true,
-      fillColor = 'background',
-      strokeColor = 'border',
+      fillColor = "background",
+      strokeColor = "border",
       lineWidth = 1,
     } = options;
 
@@ -128,8 +128,8 @@ export class CanvasRenderer {
     const {
       fill = true,
       stroke = true,
-      fillColor = 'background',
-      strokeColor = 'border',
+      fillColor = "background",
+      strokeColor = "border",
       lineWidth = 1,
     } = options;
 
@@ -161,10 +161,10 @@ export class CanvasRenderer {
   static drawThemedText(ctx, text, x, y, maxWidth, theme, options = {}) {
     const {
       fontSize = 14,
-      fontFamily = 'Inter, sans-serif',
-      textColor = 'text',
-      textAlign = 'left',
-      textBaseline = 'top',
+      fontFamily = "Inter, sans-serif",
+      textColor = "text",
+      textAlign = "left",
+      textBaseline = "top",
       lineHeight = 1.2,
     } = options;
 
@@ -176,15 +176,15 @@ export class CanvasRenderer {
 
     // Handle text wrapping if maxWidth is specified
     if (maxWidth && ctx.measureText(text).width > maxWidth) {
-      const words = text.split(' ');
-      let line = '';
+      const words = text.split(" ");
+      let line = "";
       let currentY = y;
 
       for (const word of words) {
         const testLine = `${line + word} `;
         const metrics = ctx.measureText(testLine);
 
-        if (metrics.width > maxWidth && line !== '') {
+        if (metrics.width > maxWidth && line !== "") {
           ctx.fillText(line.trim(), x, currentY);
           line = `${word} `;
           currentY += fontSize * lineHeight;
@@ -218,7 +218,7 @@ export class CanvasRenderer {
         const checkY = y + row * checkSize;
         const isEven = (row + col) % 2 === 0;
 
-        ctx.fillStyle = isEven ? '#ffffff' : '#e0e0e0';
+        ctx.fillStyle = isEven ? "#ffffff" : "#e0e0e0";
         ctx.fillRect(checkX, checkY, checkSize, checkSize);
       }
     }
@@ -237,7 +237,7 @@ export class CanvasRenderer {
       desynchronized = false,
     } = options;
 
-    const ctx = canvas.getContext('2d', {
+    const ctx = canvas.getContext("2d", {
       willReadFrequently,
       alpha,
       desynchronized,
@@ -245,7 +245,7 @@ export class CanvasRenderer {
 
     // Apply common optimizations
     ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
+    ctx.imageSmoothingQuality = "high";
 
     return ctx;
   }
@@ -263,7 +263,7 @@ export class CanvasRenderer {
     width,
     height,
     theme,
-    bgColor = 'background'
+    bgColor = "background",
   ) {
     ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = ComponentTheme.getColor(bgColor, theme);
@@ -290,7 +290,7 @@ export class CanvasFocusRenderer {
       radius = 4,
       offset = 2,
       lineWidth = 2,
-      focusColor = 'focus',
+      focusColor = "focus",
     } = options;
 
     const focusX = x - offset;
@@ -310,7 +310,7 @@ export class CanvasFocusRenderer {
       focusHeight,
       radius,
       theme,
-      { fill: false, stroke: true, strokeColor: focusColor }
+      { fill: false, stroke: true, strokeColor: focusColor },
     );
 
     ctx.setLineDash([]);

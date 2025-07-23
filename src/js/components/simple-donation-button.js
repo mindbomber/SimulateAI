@@ -5,25 +5,25 @@
 
 function createDonationButton(container, options = {}) {
   const defaultOptions = {
-    title: '🎓 Support Research',
-    subtitle: 'Quick donation via Stripe',
-    theme: 'blue', // blue, green, purple
-    size: 'medium', // small, medium, large
+    title: "🎓 Support Research",
+    subtitle: "Quick donation via Stripe",
+    theme: "blue", // blue, green, purple
+    size: "medium", // small, medium, large
     showAmounts: true,
   };
 
   const config = { ...defaultOptions, ...options };
 
   const themes = {
-    blue: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    green: 'linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%)',
-    purple: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    blue: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+    green: "linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%)",
+    purple: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
   };
 
   const sizes = {
-    small: { padding: '12px 16px', fontSize: '0.85em' },
-    medium: { padding: '16px 24px', fontSize: '1em' },
-    large: { padding: '20px 32px', fontSize: '1.1em' },
+    small: { padding: "12px 16px", fontSize: "0.85em" },
+    medium: { padding: "16px 24px", fontSize: "1em" },
+    large: { padding: "20px 32px", fontSize: "1.1em" },
   };
 
   const buttonHTML = `
@@ -57,12 +57,12 @@ function createDonationButton(container, options = {}) {
           $5 • $10 • $20
         </div>
       `
-          : ''
+          : ""
       }
     </div>
   `;
 
-  if (typeof container === 'string') {
+  if (typeof container === "string") {
     document.querySelector(container).innerHTML = buttonHTML;
   } else {
     container.innerHTML = buttonHTML;
@@ -71,7 +71,7 @@ function createDonationButton(container, options = {}) {
 
 function openDonationModal() {
   // Create modal overlay
-  const modal = document.createElement('div');
+  const modal = document.createElement("div");
   modal.style.cssText = `
     position: fixed;
     top: 0;
@@ -86,7 +86,7 @@ function openDonationModal() {
     backdrop-filter: blur(5px);
   `;
 
-  const modalContent = document.createElement('div');
+  const modalContent = document.createElement("div");
   modalContent.style.cssText = `
     background: white;
     border-radius: 12px;
@@ -206,54 +206,54 @@ function openDonationModal() {
   `;
 
   modal.appendChild(modalContent);
-  modal.className = 'modal-overlay';
+  modal.className = "modal-overlay";
   document.body.appendChild(modal);
 
   // Add event listeners to modal buttons
-  const modalButtons = modal.querySelectorAll('.modal-donation-btn');
-  const modalStatus = modal.querySelector('.modal-status');
+  const modalButtons = modal.querySelectorAll(".modal-donation-btn");
+  const modalStatus = modal.querySelector(".modal-status");
 
-  modalButtons.forEach(button => {
-    button.addEventListener('click', async e => {
-      const { tier } = e.target.closest('button').dataset;
-      const donorEmail = modal.querySelector('#modal-donor-email').value;
+  modalButtons.forEach((button) => {
+    button.addEventListener("click", async (e) => {
+      const { tier } = e.target.closest("button").dataset;
+      const donorEmail = modal.querySelector("#modal-donor-email").value;
 
       // Disable buttons and show loading
-      modalButtons.forEach(btn => (btn.disabled = true));
-      modalStatus.innerHTML = '⏳ Creating secure checkout...';
+      modalButtons.forEach((btn) => (btn.disabled = true));
+      modalStatus.innerHTML = "⏳ Creating secure checkout...";
 
       try {
         await processModalDonation(tier, donorEmail);
       } catch (error) {
-        console.error('Donation error:', error);
-        modalStatus.innerHTML = '❌ Error creating checkout. Please try again.';
-        modalButtons.forEach(btn => (btn.disabled = false));
+        console.error("Donation error:", error);
+        modalStatus.innerHTML = "❌ Error creating checkout. Please try again.";
+        modalButtons.forEach((btn) => (btn.disabled = false));
       }
     });
   });
 
   // Close modal when clicking outside
-  modal.addEventListener('click', e => {
+  modal.addEventListener("click", (e) => {
     if (e.target === modal) {
       modal.remove();
     }
   });
 }
 
-async function processModalDonation(tier, donorEmail = '') {
+async function processModalDonation(tier, donorEmail = "") {
   if (!window.firebase) {
-    throw new Error('Firebase not initialized');
+    throw new Error("Firebase not initialized");
   }
 
   const priceIds = {
-    1: 'price_1RkyADJDA3nPZHAFQJr2ySBR', // $5 Bronze
-    2: 'price_1RkyADJDA3nPZHAFXasv2dM0', // $10 Silver
-    3: 'price_1RkyADJDA3nPZHAFoyRLGmpQ', // $20 Gold
+    1: "price_1RkyADJDA3nPZHAFQJr2ySBR", // $5 Bronze
+    2: "price_1RkyADJDA3nPZHAFXasv2dM0", // $10 Silver
+    3: "price_1RkyADJDA3nPZHAFoyRLGmpQ", // $20 Gold
   };
 
   const createAnonymousCheckout = firebase
     .functions()
-    .httpsCallable('createAnonymousCheckout');
+    .httpsCallable("createAnonymousCheckout");
 
   const result = await createAnonymousCheckout({
     priceId: priceIds[tier],
@@ -265,7 +265,7 @@ async function processModalDonation(tier, donorEmail = '') {
     // Redirect to Stripe Checkout
     window.location.href = result.data.url;
   } else {
-    throw new Error('No checkout URL received');
+    throw new Error("No checkout URL received");
   }
 }
 

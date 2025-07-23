@@ -17,7 +17,7 @@
  * @license Apache-2.0
  */
 
-import logger from './logger.js';
+import logger from "./logger.js";
 
 // Enhanced constants and configuration
 const CANVAS_CONSTANTS = {
@@ -72,13 +72,13 @@ const COMPUTED_CONSTANTS = {
 };
 
 const CANVAS_EVENTS = {
-  CANVAS_CREATED: 'canvas:created',
-  CANVAS_REMOVED: 'canvas:removed',
-  ENGINE_CREATED: 'canvas:engineCreated',
-  ENGINE_REMOVED: 'canvas:engineRemoved',
-  PERFORMANCE_WARNING: 'canvas:performanceWarning',
-  ERROR_OCCURRED: 'canvas:errorOccurred',
-  RESIZE_DETECTED: 'canvas:resizeDetected',
+  CANVAS_CREATED: "canvas:created",
+  CANVAS_REMOVED: "canvas:removed",
+  ENGINE_CREATED: "canvas:engineCreated",
+  ENGINE_REMOVED: "canvas:engineRemoved",
+  PERFORMANCE_WARNING: "canvas:performanceWarning",
+  ERROR_OCCURRED: "canvas:errorOccurred",
+  RESIZE_DETECTED: "canvas:resizeDetected",
 };
 
 /**
@@ -87,16 +87,16 @@ const CANVAS_EVENTS = {
 class CanvasTheme {
   static getCurrentTheme() {
     const prefersHighContrast = window.matchMedia?.(
-      '(prefers-contrast: high)'
+      "(prefers-contrast: high)",
     ).matches;
     const prefersReducedMotion = window.matchMedia?.(
-      '(prefers-reduced-motion: reduce)'
+      "(prefers-reduced-motion: reduce)",
     ).matches;
 
     return {
       highContrast: prefersHighContrast,
       reducedMotion: prefersReducedMotion,
-      theme: prefersHighContrast ? 'highContrast' : 'light',
+      theme: prefersHighContrast ? "highContrast" : "light",
     };
   }
 
@@ -104,9 +104,9 @@ class CanvasTheme {
     const currentTheme = theme || this.getCurrentTheme();
 
     return {
-      backgroundColor: currentTheme.highContrast ? '#000000' : '#ffffff',
-      borderColor: currentTheme.highContrast ? '#ffff00' : '#e0e0e0',
-      focusColor: currentTheme.highContrast ? '#ffff00' : '#007bff',
+      backgroundColor: currentTheme.highContrast ? "#000000" : "#ffffff",
+      borderColor: currentTheme.highContrast ? "#ffff00" : "#e0e0e0",
+      focusColor: currentTheme.highContrast ? "#ffff00" : "#007bff",
     };
   }
 }
@@ -148,14 +148,14 @@ class CanvasPerformanceMonitor {
     this.operations.delete(operationId);
 
     // Use different thresholds for different operation types
-    const getThreshold = opId => {
+    const getThreshold = (opId) => {
       if (
-        opId.includes('engine-creation') ||
-        opId.includes('canvas-creation')
+        opId.includes("engine-creation") ||
+        opId.includes("canvas-creation")
       ) {
         return PERFORMANCE_THRESHOLDS.ENGINE_CREATION; // Engine/canvas creation can take longer
       }
-      if (opId.includes('render') || opId.includes('draw')) {
+      if (opId.includes("render") || opId.includes("draw")) {
         return PERFORMANCE_THRESHOLDS.RENDER_TARGET; // Rendering operations should be fast (60fps)
       }
       return PERFORMANCE_THRESHOLDS.DEFAULT_OPERATION; // Default threshold for other operations
@@ -164,7 +164,7 @@ class CanvasPerformanceMonitor {
     const threshold = getThreshold(operationId);
     if (duration > threshold) {
       logger.warn(
-        `Slow canvas operation: ${operationId} took ${duration.toFixed(2)}ms (threshold: ${threshold}ms)`
+        `Slow canvas operation: ${operationId} took ${duration.toFixed(2)}ms (threshold: ${threshold}ms)`,
       );
     }
 
@@ -187,7 +187,7 @@ class CanvasPerformanceMonitor {
 class CanvasError extends Error {
   constructor(message, context = {}, originalError = null) {
     super(message);
-    this.name = 'CanvasError';
+    this.name = "CanvasError";
     this.context = context;
     this.canvasId = context.canvasId;
     this.timestamp = Date.now();
@@ -212,7 +212,7 @@ class CanvasManager {
     this.theme = CanvasTheme.getCurrentTheme();
     this.cleanupInterval = null;
     this.accessibilityEnabled = true;
-    this.touchSupported = 'ontouchstart' in window;
+    this.touchSupported = "ontouchstart" in window;
     this.errorCount = 0;
 
     // Setup theme monitoring
@@ -224,15 +224,15 @@ class CanvasManager {
     // Setup global error handling
     this.setupErrorHandling();
 
-    logger.debug('Enhanced CanvasManager initialized with advanced features');
+    logger.debug("Enhanced CanvasManager initialized with advanced features");
   }
 
   /**
    * Setup theme change monitoring
    */
   setupThemeMonitoring() {
-    const contrastQuery = window.matchMedia?.('(prefers-contrast: high)');
-    const motionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    const contrastQuery = window.matchMedia?.("(prefers-contrast: high)");
+    const motionQuery = window.matchMedia?.("(prefers-reduced-motion: reduce)");
 
     const handleThemeChange = () => {
       this.theme = CanvasTheme.getCurrentTheme();
@@ -240,8 +240,8 @@ class CanvasManager {
       this.emit(CANVAS_EVENTS.THEME_CHANGED, { theme: this.theme });
     };
 
-    contrastQuery?.addEventListener?.('change', handleThemeChange);
-    motionQuery?.addEventListener?.('change', handleThemeChange);
+    contrastQuery?.addEventListener?.("change", handleThemeChange);
+    motionQuery?.addEventListener?.("change", handleThemeChange);
 
     // Store references for cleanup
     this.themeQueries = { contrastQuery, motionQuery };
@@ -261,17 +261,17 @@ class CanvasManager {
    * Setup global error handling
    */
   setupErrorHandling() {
-    window.addEventListener('error', event => {
-      if (event.target && event.target.tagName === 'CANVAS') {
+    window.addEventListener("error", (event) => {
+      if (event.target && event.target.tagName === "CANVAS") {
         this.handleError(
           new CanvasError(
-            'Canvas error detected',
+            "Canvas error detected",
             {
               canvasId: event.target.id,
               error: event.error,
             },
-            event.error
-          )
+            event.error,
+          ),
         );
       }
     });
@@ -295,12 +295,12 @@ class CanvasManager {
       } catch (error) {
         this.handleError(
           new CanvasError(
-            'Failed to update canvas theme',
+            "Failed to update canvas theme",
             {
               canvasId,
             },
-            error
-          )
+            error,
+          ),
         );
       }
     }
@@ -314,16 +314,16 @@ class CanvasManager {
 
     canvas.style.backgroundColor = style.backgroundColor;
     canvas.style.border = `1px solid ${style.borderColor}`;
-    canvas.style.outline = 'none';
+    canvas.style.outline = "none";
 
     // Add theme classes
-    canvas.classList.toggle('canvas-high-contrast', this.theme.highContrast);
-    canvas.classList.toggle('canvas-reduced-motion', this.theme.reducedMotion);
+    canvas.classList.toggle("canvas-high-contrast", this.theme.highContrast);
+    canvas.classList.toggle("canvas-reduced-motion", this.theme.reducedMotion);
   } /**
    * Create a managed canvas with enhanced features and accessibility
    */
   async createCanvas(options = {}) {
-    const startTime = this.performanceMonitor.startOperation('canvas-creation');
+    const startTime = this.performanceMonitor.startOperation("canvas-creation");
 
     try {
       const {
@@ -331,21 +331,21 @@ class CanvasManager {
         height = CANVAS_CONSTANTS.DEFAULT_HEIGHT,
         id = null,
         container = null,
-        className = 'managed-canvas',
+        className = "managed-canvas",
         accessibility = true,
         responsive = false,
         touchSupport = this.touchSupported,
-        ariaLabel = 'Interactive canvas element',
+        ariaLabel = "Interactive canvas element",
       } = options;
 
       // Validate dimensions
       const validatedWidth = Math.max(
         CANVAS_CONSTANTS.MIN_WIDTH,
-        Math.min(CANVAS_CONSTANTS.MAX_WIDTH, width)
+        Math.min(CANVAS_CONSTANTS.MAX_WIDTH, width),
       );
       const validatedHeight = Math.max(
         CANVAS_CONSTANTS.MIN_HEIGHT,
-        Math.min(CANVAS_CONSTANTS.MAX_HEIGHT, height)
+        Math.min(CANVAS_CONSTANTS.MAX_HEIGHT, height),
       );
 
       // Generate unique ID if not provided
@@ -354,13 +354,13 @@ class CanvasManager {
       // Check if canvas already exists
       if (this.canvases.has(canvasId)) {
         logger.warn(
-          `Canvas with ID ${canvasId} already exists. Returning existing canvas.`
+          `Canvas with ID ${canvasId} already exists. Returning existing canvas.`,
         );
         const existingCanvasData = this.canvases.get(canvasId);
         return { canvas: existingCanvasData.element, id: canvasId };
       }
 
-      const canvas = document.createElement('canvas');
+      const canvas = document.createElement("canvas");
       canvas.id = canvasId;
       canvas.width = validatedWidth;
       canvas.height = validatedHeight;
@@ -370,7 +370,7 @@ class CanvasManager {
       if (accessibility && this.accessibilityEnabled) {
         this.setupCanvasAccessibility(canvas, {
           ariaLabel,
-          role: options.role || 'img',
+          role: options.role || "img",
           description: options.description,
         });
       }
@@ -420,22 +420,22 @@ class CanvasManager {
       });
 
       logger.debug(
-        `Created enhanced canvas: ${canvasId} (${validatedWidth}x${validatedHeight})`
+        `Created enhanced canvas: ${canvasId} (${validatedWidth}x${validatedHeight})`,
       );
       return { canvas, id: canvasId };
     } catch (error) {
       this.handleError(
         new CanvasError(
-          'Failed to create canvas',
+          "Failed to create canvas",
           {
             options,
           },
-          error
-        )
+          error,
+        ),
       );
       throw error;
     } finally {
-      this.performanceMonitor.endOperation('canvas-creation', startTime);
+      this.performanceMonitor.endOperation("canvas-creation", startTime);
     }
   }
 
@@ -446,33 +446,33 @@ class CanvasManager {
     const { ariaLabel, role, description } = accessibilityOptions;
 
     // Basic ARIA attributes
-    canvas.setAttribute('role', role);
-    canvas.setAttribute('aria-label', ariaLabel);
-    canvas.setAttribute('tabindex', '0');
+    canvas.setAttribute("role", role);
+    canvas.setAttribute("aria-label", ariaLabel);
+    canvas.setAttribute("tabindex", "0");
 
     // Enhanced accessibility features
     if (description) {
       const descId = `${canvas.id}-description`;
-      const descElement = document.createElement('div');
+      const descElement = document.createElement("div");
       descElement.id = descId;
-      descElement.className = 'sr-only';
+      descElement.className = "sr-only";
       descElement.textContent = description;
       canvas.parentNode?.insertBefore(descElement, canvas.nextSibling);
-      canvas.setAttribute('aria-describedby', descId);
+      canvas.setAttribute("aria-describedby", descId);
     }
 
     // Focus styling
-    canvas.addEventListener('focus', () => {
+    canvas.addEventListener("focus", () => {
       canvas.style.outline = `${CANVAS_CONSTANTS.FOCUS_RING_WIDTH}px solid ${CanvasTheme.getCanvasStyle(this.theme).focusColor}`;
-      canvas.style.outlineOffset = '2px';
+      canvas.style.outlineOffset = "2px";
     });
 
-    canvas.addEventListener('blur', () => {
-      canvas.style.outline = 'none';
+    canvas.addEventListener("blur", () => {
+      canvas.style.outline = "none";
     });
 
     // Keyboard event handling
-    canvas.addEventListener('keydown', e => {
+    canvas.addEventListener("keydown", (e) => {
       this.handleCanvasKeydown(canvas.id, e);
     });
   }
@@ -482,25 +482,25 @@ class CanvasManager {
    */
   setupTouchSupport(canvas) {
     // Touch event handling with proper touch targets
-    canvas.style.touchAction = 'manipulation';
+    canvas.style.touchAction = "manipulation";
     canvas.style.minWidth = `${CANVAS_CONSTANTS.TOUCH_TARGET_SIZE}px`;
     canvas.style.minHeight = `${CANVAS_CONSTANTS.TOUCH_TARGET_SIZE}px`;
 
     // Prevent default touch behaviors that might interfere
     canvas.addEventListener(
-      'touchstart',
-      e => {
+      "touchstart",
+      (e) => {
         e.preventDefault();
       },
-      { passive: false }
+      { passive: false },
     );
 
     canvas.addEventListener(
-      'touchmove',
-      e => {
+      "touchmove",
+      (e) => {
         e.preventDefault();
       },
-      { passive: false }
+      { passive: false },
     );
   }
 
@@ -512,27 +512,27 @@ class CanvasManager {
 
     // Standard accessibility keyboard shortcuts
     switch (event.key) {
-      case 'Enter':
-      case ' ':
+      case "Enter":
+      case " ":
         // Trigger interaction
         if (engine && engine.handleInteraction) {
-          engine.handleInteraction('activate');
+          engine.handleInteraction("activate");
         }
         event.preventDefault();
         break;
 
-      case 'Escape':
+      case "Escape":
         // Cancel or exit
         if (engine && engine.handleInteraction) {
-          engine.handleInteraction('cancel');
+          engine.handleInteraction("cancel");
         }
         event.preventDefault();
         break;
 
-      case 'ArrowUp':
-      case 'ArrowDown':
-      case 'ArrowLeft':
-      case 'ArrowRight':
+      case "ArrowUp":
+      case "ArrowDown":
+      case "ArrowLeft":
+      case "ArrowRight":
         // Navigation within canvas
         if (engine && engine.handleNavigation) {
           engine.handleNavigation(event.key);
@@ -544,7 +544,7 @@ class CanvasManager {
    * Create a visual engine for a specific canvas with enhanced features
    */
   async createVisualEngine(canvasId, engineOptions = {}) {
-    const startTime = this.performanceMonitor.startOperation('engine-creation');
+    const startTime = this.performanceMonitor.startOperation("engine-creation");
 
     try {
       const canvasData = this.canvases.get(canvasId);
@@ -553,21 +553,21 @@ class CanvasManager {
           `Canvas ${canvasId} not found. Create canvas first.`,
           {
             canvasId,
-          }
+          },
         );
       }
 
       // Check if engine already exists for this canvas
       if (this.visualEngines.has(canvasId)) {
         logger.warn(
-          `Visual engine for ${canvasId} already exists. Returning existing engine.`
+          `Visual engine for ${canvasId} already exists. Returning existing engine.`,
         );
         return this.visualEngines.get(canvasId);
       }
 
       // Enhanced engine options with theme and accessibility integration
       const enhancedOptions = {
-        renderMode: 'canvas',
+        renderMode: "canvas",
         accessibility: this.accessibilityEnabled,
         debug: false,
         theme: this.theme.theme, // Extract the theme string from the theme object
@@ -580,11 +580,11 @@ class CanvasManager {
       };
 
       // Import visual engine dynamically to avoid circular dependencies
-      const VisualEngine = await import('../core/visual-engine.js');
+      const VisualEngine = await import("../core/visual-engine.js");
 
       const engine = new VisualEngine.default(
         canvasData.element,
-        enhancedOptions
+        enhancedOptions,
       );
 
       // Enhanced engine integration
@@ -597,16 +597,16 @@ class CanvasManager {
       }
 
       if (engine.setErrorHandler) {
-        engine.setErrorHandler(error => {
+        engine.setErrorHandler((error) => {
           this.handleError(
             new CanvasError(
-              'Visual engine error',
+              "Visual engine error",
               {
                 canvasId,
                 engineError: error.message,
               },
-              error
-            )
+              error,
+            ),
           );
         });
       }
@@ -635,12 +635,12 @@ class CanvasManager {
             canvasId,
             engineOptions,
           },
-          error
-        )
+          error,
+        ),
       );
       throw error;
     } finally {
-      this.performanceMonitor.endOperation('engine-creation', startTime);
+      this.performanceMonitor.endOperation("engine-creation", startTime);
     }
   }
 
@@ -650,7 +650,7 @@ class CanvasManager {
   setupEngineEventListeners(canvasId, engine) {
     // Performance monitoring
     if (engine.on) {
-      engine.on('render', renderTime => {
+      engine.on("render", (renderTime) => {
         const canvasData = this.canvases.get(canvasId);
         if (canvasData) {
           canvasData.performanceMetrics.renderCount++;
@@ -670,19 +670,19 @@ class CanvasManager {
         }
       });
 
-      engine.on('error', error => {
+      engine.on("error", (error) => {
         this.handleError(
           new CanvasError(
-            'Engine error event',
+            "Engine error event",
             {
               canvasId,
             },
-            error
-          )
+            error,
+          ),
         );
       });
 
-      engine.on('accessibility', data => {
+      engine.on("accessibility", (data) => {
         // Handle accessibility events from engine
         if (data.announcement) {
           this.announceToScreenReader(data.announcement);
@@ -694,13 +694,13 @@ class CanvasManager {
   /**
    * Announce information to screen readers
    */
-  announceToScreenReader(message, priority = 'polite') {
+  announceToScreenReader(message, priority = "polite") {
     if (!this.accessibilityEnabled) return;
 
-    const announcement = document.createElement('div');
-    announcement.setAttribute('aria-live', priority);
-    announcement.setAttribute('aria-atomic', 'true');
-    announcement.className = 'sr-only';
+    const announcement = document.createElement("div");
+    announcement.setAttribute("aria-live", priority);
+    announcement.setAttribute("aria-atomic", "true");
+    announcement.className = "sr-only";
     announcement.textContent = message;
 
     document.body.appendChild(announcement);
@@ -728,7 +728,7 @@ class CanvasManager {
    * Remove canvas and cleanup associated resources with enhanced cleanup
    */
   async removeCanvas(canvasId) {
-    const startTime = this.performanceMonitor.startOperation('canvas-removal');
+    const startTime = this.performanceMonitor.startOperation("canvas-removal");
 
     try {
       // Cleanup visual engine first
@@ -767,15 +767,15 @@ class CanvasManager {
     } catch (error) {
       this.handleError(
         new CanvasError(
-          'Failed to remove canvas',
+          "Failed to remove canvas",
           {
             canvasId,
           },
-          error
-        )
+          error,
+        ),
       );
     } finally {
-      this.performanceMonitor.endOperation('canvas-removal', startTime);
+      this.performanceMonitor.endOperation("canvas-removal", startTime);
     }
   }
 
@@ -783,7 +783,7 @@ class CanvasManager {
    * Remove visual engine and cleanup resources with enhanced error handling
    */
   async removeVisualEngine(canvasId) {
-    const startTime = this.performanceMonitor.startOperation('engine-removal');
+    const startTime = this.performanceMonitor.startOperation("engine-removal");
 
     try {
       const engine = this.visualEngines.get(canvasId);
@@ -815,7 +815,7 @@ class CanvasManager {
           // Clear canvas context
           const canvas = this.getCanvas(canvasId);
           if (canvas) {
-            const ctx = canvas.getContext('2d');
+            const ctx = canvas.getContext("2d");
             if (ctx) {
               ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
@@ -823,7 +823,7 @@ class CanvasManager {
         } catch (cleanupError) {
           logger.warn(
             `Error during engine cleanup for ${canvasId}:`,
-            cleanupError
+            cleanupError,
           );
         }
 
@@ -841,15 +841,15 @@ class CanvasManager {
     } catch (error) {
       this.handleError(
         new CanvasError(
-          'Failed to remove visual engine',
+          "Failed to remove visual engine",
           {
             canvasId,
           },
-          error
-        )
+          error,
+        ),
       );
     } finally {
-      this.performanceMonitor.endOperation('engine-removal', startTime);
+      this.performanceMonitor.endOperation("engine-removal", startTime);
     }
   }
 
@@ -857,10 +857,10 @@ class CanvasManager {
    * Enhanced cleanup of all canvases and engines
    */
   async cleanup() {
-    const startTime = this.performanceMonitor.startOperation('full-cleanup');
+    const startTime = this.performanceMonitor.startOperation("full-cleanup");
 
     try {
-      logger.debug('Starting enhanced canvas manager cleanup...');
+      logger.debug("Starting enhanced canvas manager cleanup...");
 
       // Stop periodic cleanup
       if (this.cleanupInterval) {
@@ -872,8 +872,8 @@ class CanvasManager {
       if (this.themeQueries) {
         const { contrastQuery, motionQuery } = this.themeQueries;
 
-        contrastQuery?.removeEventListener?.('change', this.themeChangeHandler);
-        motionQuery?.removeEventListener?.('change', this.themeChangeHandler);
+        contrastQuery?.removeEventListener?.("change", this.themeChangeHandler);
+        motionQuery?.removeEventListener?.("change", this.themeChangeHandler);
       }
 
       // Remove all visual engines
@@ -902,13 +902,13 @@ class CanvasManager {
       // Reset performance monitoring
       this.performanceMonitor.reset();
 
-      logger.debug('Enhanced canvas manager cleanup complete');
+      logger.debug("Enhanced canvas manager cleanup complete");
     } catch (error) {
       this.handleError(
-        new CanvasError('Failed to complete cleanup', {}, error)
+        new CanvasError("Failed to complete cleanup", {}, error),
       );
     } finally {
-      this.performanceMonitor.endOperation('full-cleanup', startTime);
+      this.performanceMonitor.endOperation("full-cleanup", startTime);
     }
   }
 
@@ -916,10 +916,10 @@ class CanvasManager {
    * Enhanced pause functionality with performance optimization
    */
   pauseAll() {
-    const startTime = this.performanceMonitor.startOperation('pause-all');
+    const startTime = this.performanceMonitor.startOperation("pause-all");
 
     try {
-      this.activeEngines.forEach(canvasId => {
+      this.activeEngines.forEach((canvasId) => {
         const engine = this.visualEngines.get(canvasId);
         if (engine && engine.pause) {
           try {
@@ -933,10 +933,10 @@ class CanvasManager {
       logger.debug(`Paused ${this.activeEngines.size} active engines`);
     } catch (error) {
       this.handleError(
-        new CanvasError('Failed to pause all engines', {}, error)
+        new CanvasError("Failed to pause all engines", {}, error),
       );
     } finally {
-      this.performanceMonitor.endOperation('pause-all', startTime);
+      this.performanceMonitor.endOperation("pause-all", startTime);
     }
   }
 
@@ -944,10 +944,10 @@ class CanvasManager {
    * Enhanced resume functionality with error handling
    */
   resumeAll() {
-    const startTime = this.performanceMonitor.startOperation('resume-all');
+    const startTime = this.performanceMonitor.startOperation("resume-all");
 
     try {
-      this.activeEngines.forEach(canvasId => {
+      this.activeEngines.forEach((canvasId) => {
         const engine = this.visualEngines.get(canvasId);
         if (engine && engine.resume) {
           try {
@@ -961,10 +961,10 @@ class CanvasManager {
       logger.debug(`Resumed ${this.activeEngines.size} active engines`);
     } catch (error) {
       this.handleError(
-        new CanvasError('Failed to resume all engines', {}, error)
+        new CanvasError("Failed to resume all engines", {}, error),
       );
     } finally {
-      this.performanceMonitor.endOperation('resume-all', startTime);
+      this.performanceMonitor.endOperation("resume-all", startTime);
     }
   } /**
    * Enhanced status reporting with performance metrics
@@ -1010,17 +1010,17 @@ class CanvasManager {
    * Enhanced canvas resizing with validation and notifications
    */
   async resizeCanvas(canvasId, width, height) {
-    const startTime = this.performanceMonitor.startOperation('canvas-resize');
+    const startTime = this.performanceMonitor.startOperation("canvas-resize");
 
     try {
       // Validate dimensions
       const validatedWidth = Math.max(
         CANVAS_CONSTANTS.MIN_WIDTH,
-        Math.min(CANVAS_CONSTANTS.MAX_WIDTH, width)
+        Math.min(CANVAS_CONSTANTS.MAX_WIDTH, width),
       );
       const validatedHeight = Math.max(
         CANVAS_CONSTANTS.MIN_HEIGHT,
-        Math.min(CANVAS_CONSTANTS.MAX_HEIGHT, height)
+        Math.min(CANVAS_CONSTANTS.MAX_HEIGHT, height),
       );
 
       const canvas = this.getCanvas(canvasId);
@@ -1058,7 +1058,7 @@ class CanvasManager {
         });
 
         logger.debug(
-          `Resized canvas ${canvasId} to ${validatedWidth}x${validatedHeight}`
+          `Resized canvas ${canvasId} to ${validatedWidth}x${validatedHeight}`,
         );
 
         // Announce resize to screen readers if significant change
@@ -1067,24 +1067,24 @@ class CanvasManager {
           Math.abs(validatedHeight - oldHeight);
         if (sizeChange > PERFORMANCE_THRESHOLDS.SIGNIFICANT_SIZE_CHANGE) {
           this.announceToScreenReader(
-            `Canvas resized to ${validatedWidth} by ${validatedHeight} pixels`
+            `Canvas resized to ${validatedWidth} by ${validatedHeight} pixels`,
           );
         }
       }
     } catch (error) {
       this.handleError(
         new CanvasError(
-          'Failed to resize canvas',
+          "Failed to resize canvas",
           {
             canvasId,
             width,
             height,
           },
-          error
-        )
+          error,
+        ),
       );
     } finally {
-      this.performanceMonitor.endOperation('canvas-resize', startTime);
+      this.performanceMonitor.endOperation("canvas-resize", startTime);
     }
   }
 
@@ -1097,7 +1097,7 @@ class CanvasManager {
       const canvasData = this.canvases.get(canvasId);
 
       if (!canvas || !canvasData) {
-        throw new CanvasError('Canvas not found for responsive setup', {
+        throw new CanvasError("Canvas not found for responsive setup", {
           canvasId,
         });
       }
@@ -1109,7 +1109,7 @@ class CanvasManager {
 
       // Create debounced resize handler
       let resizeTimeout;
-      const debouncedResize = entries => {
+      const debouncedResize = (entries) => {
         if (resizeTimeout) {
           clearTimeout(resizeTimeout);
         }
@@ -1145,12 +1145,12 @@ class CanvasManager {
     } catch (error) {
       this.handleError(
         new CanvasError(
-          'Failed to make canvas responsive',
+          "Failed to make canvas responsive",
           {
             canvasId,
           },
-          error
-        )
+          error,
+        ),
       );
     }
   }
@@ -1194,7 +1194,7 @@ class CanvasManager {
         this.performanceMonitor.reset();
       }
     } catch (error) {
-      logger.warn('Maintenance cleanup error:', error);
+      logger.warn("Maintenance cleanup error:", error);
     }
   }
 
@@ -1204,7 +1204,7 @@ class CanvasManager {
   handleError(error) {
     this.errorCount++;
 
-    logger.error('Canvas Manager Error:', error);
+    logger.error("Canvas Manager Error:", error);
 
     // Emit error event for application-level handling
     this.emit(CANVAS_EVENTS.ERROR_OCCURRED, {
@@ -1215,7 +1215,7 @@ class CanvasManager {
     });
 
     // Attempt recovery for certain error types
-    if (error.canvasId && error.message.includes('engine')) {
+    if (error.canvasId && error.message.includes("engine")) {
       this.attemptEngineRecovery(error.canvasId);
     }
   }
@@ -1247,12 +1247,12 @@ class CanvasManager {
         } catch (recoveryError) {
           logger.error(
             `Engine recovery failed for canvas: ${canvasId}`,
-            recoveryError
+            recoveryError,
           );
         }
       }, 1000);
     } catch (error) {
-      logger.error('Engine recovery attempt failed:', error);
+      logger.error("Engine recovery attempt failed:", error);
     }
   }
 
@@ -1279,11 +1279,11 @@ class CanvasManager {
   emit(event, data) {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
-      listeners.forEach(callback => {
+      listeners.forEach((callback) => {
         try {
           callback(data);
         } catch (error) {
-          logger.error('Canvas event listener error:', error);
+          logger.error("Canvas event listener error:", error);
         }
       });
     }
@@ -1294,16 +1294,16 @@ class CanvasManager {
 const canvasManager = new CanvasManager();
 
 // Enhanced cleanup on page unload with proper async handling
-window.addEventListener('beforeunload', async () => {
+window.addEventListener("beforeunload", async () => {
   try {
     await canvasManager.cleanup();
   } catch (error) {
-    logger.error('Error during canvas manager cleanup:', error);
+    logger.error("Error during canvas manager cleanup:", error);
   }
 });
 
 // Handle page visibility changes for performance optimization
-document.addEventListener('visibilitychange', () => {
+document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     canvasManager.pauseAll();
   } else {
@@ -1312,13 +1312,13 @@ document.addEventListener('visibilitychange', () => {
 });
 
 // Handle focus/blur for accessibility
-window.addEventListener('focus', () => {
+window.addEventListener("focus", () => {
   if (canvasManager.accessibilityEnabled) {
     canvasManager.resumeAll();
   }
 });
 
-window.addEventListener('blur', () => {
+window.addEventListener("blur", () => {
   if (canvasManager.accessibilityEnabled) {
     canvasManager.pauseAll();
   }

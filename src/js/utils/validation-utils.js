@@ -31,7 +31,7 @@ export class ValidationUtils {
       return {
         isValid: false,
         value: returnDefault,
-        error: 'Value must be an array',
+        error: "Value must be an array",
       };
     }
 
@@ -39,7 +39,7 @@ export class ValidationUtils {
       return {
         isValid: false,
         value: returnDefault,
-        error: 'Array cannot be empty',
+        error: "Array cannot be empty",
       };
     }
 
@@ -78,14 +78,14 @@ export class ValidationUtils {
       minLength = 0,
       maxLength = Infinity,
       pattern = null,
-      returnDefault = '',
+      returnDefault = "",
     } = options;
 
-    if (typeof value !== 'string') {
+    if (typeof value !== "string") {
       return {
         isValid: false,
         value: returnDefault,
-        error: 'Value must be a string',
+        error: "Value must be a string",
       };
     }
 
@@ -93,7 +93,7 @@ export class ValidationUtils {
       return {
         isValid: false,
         value: returnDefault,
-        error: 'String cannot be empty',
+        error: "String cannot be empty",
       };
     }
 
@@ -117,7 +117,7 @@ export class ValidationUtils {
       return {
         isValid: false,
         value: returnDefault,
-        error: 'String does not match required pattern',
+        error: "String does not match required pattern",
       };
     }
 
@@ -149,7 +149,7 @@ export class ValidationUtils {
       return {
         isValid: false,
         value: returnDefault,
-        error: 'Value must be a valid number',
+        error: "Value must be a valid number",
       };
     }
 
@@ -157,7 +157,7 @@ export class ValidationUtils {
       return {
         isValid: false,
         value: returnDefault,
-        error: 'Value must be finite',
+        error: "Value must be finite",
       };
     }
 
@@ -193,19 +193,19 @@ export class ValidationUtils {
   static validateFunction(value, options = {}) {
     const { returnDefault = () => {}, allowAsync = true } = options;
 
-    if (typeof value !== 'function') {
+    if (typeof value !== "function") {
       return {
         isValid: false,
         value: returnDefault,
-        error: 'Value must be a function',
+        error: "Value must be a function",
       };
     }
 
-    if (!allowAsync && value.constructor.name === 'AsyncFunction') {
+    if (!allowAsync && value.constructor.name === "AsyncFunction") {
       return {
         isValid: false,
         value: returnDefault,
-        error: 'Async functions not allowed',
+        error: "Async functions not allowed",
       };
     }
 
@@ -236,15 +236,15 @@ export class ValidationUtils {
       return {
         isValid: false,
         value: returnDefault,
-        error: 'Value cannot be null',
+        error: "Value cannot be null",
       };
     }
 
-    if (typeof value !== 'object' || Array.isArray(value)) {
+    if (typeof value !== "object" || Array.isArray(value)) {
       return {
         isValid: false,
         value: returnDefault,
-        error: 'Value must be an object',
+        error: "Value must be an object",
       };
     }
 
@@ -283,7 +283,7 @@ export class ValidationUtils {
     try {
       return operation(validation.value);
     } catch (error) {
-      console.warn('Array operation failed:', error);
+      console.warn("Array operation failed:", error);
       return defaultReturn;
     }
   }
@@ -302,19 +302,19 @@ export class ValidationUtils {
       let result;
 
       switch (type) {
-        case 'array':
+        case "array":
           result = this.validateArray(value, options);
           break;
-        case 'string':
+        case "string":
           result = this.validateString(value, options);
           break;
-        case 'number':
+        case "number":
           result = this.validateNumber(value, options);
           break;
-        case 'function':
+        case "function":
           result = this.validateFunction(value, options);
           break;
-        case 'object':
+        case "object":
           result = this.validateObject(value, options);
           break;
         default:
@@ -356,14 +356,14 @@ export class TypeUtils {
    * Check if value is a non-empty string (common pattern)
    */
   static isNonEmptyString(value) {
-    return typeof value === 'string' && value.length > 0;
+    return typeof value === "string" && value.length > 0;
   }
 
   /**
    * Check if value is a valid number (common pattern)
    */
   static isValidNumber(value) {
-    return typeof value === 'number' && isFinite(value) && !isNaN(value);
+    return typeof value === "number" && isFinite(value) && !isNaN(value);
   }
 
   /**
@@ -372,7 +372,7 @@ export class TypeUtils {
   static isPlainObject(value) {
     return (
       value !== null &&
-      typeof value === 'object' &&
+      typeof value === "object" &&
       !Array.isArray(value) &&
       value.constructor === Object
     );
@@ -384,7 +384,7 @@ export class TypeUtils {
   static safeGet(obj, path, defaultValue = null) {
     if (!this.isPlainObject(obj)) return defaultValue;
 
-    const keys = path.split('.');
+    const keys = path.split(".");
     let current = obj;
 
     for (const key of keys) {

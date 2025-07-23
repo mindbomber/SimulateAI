@@ -4,7 +4,7 @@
  * Based on Firebase/Firestore best practices for blog content
  */
 
-import FirebaseService from './firebase-service.js';
+import FirebaseService from "./firebase-service.js";
 import {
   collection,
   doc,
@@ -24,7 +24,7 @@ import {
   arrayUnion,
   arrayRemove,
   serverTimestamp,
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 class BlogService extends FirebaseService {
   constructor() {
@@ -56,7 +56,7 @@ class BlogService extends FirebaseService {
   async createPost(postData) {
     try {
       if (!this.currentUser) {
-        throw new Error('Authentication required to create posts');
+        throw new Error("Authentication required to create posts");
       }
 
       // Validate required fields
@@ -71,17 +71,17 @@ class BlogService extends FirebaseService {
 
         // Author information
         authorUID: this.currentUser.uid,
-        authorName: this.currentUser.displayName || 'Anonymous',
+        authorName: this.currentUser.displayName || "Anonymous",
         authorEmail: this.currentUser.email,
         authorPhoto: this.currentUser.photoURL,
-        authorBio: postData.authorBio || '',
-        authorAffiliation: postData.authorAffiliation || '',
+        authorBio: postData.authorBio || "",
+        authorAffiliation: postData.authorAffiliation || "",
 
         // Metadata and categorization
         tags: Array.isArray(postData.tags) ? postData.tags : [],
-        category: postData.category || 'general',
+        category: postData.category || "general",
         primaryTopic: postData.primaryTopic || postData.category,
-        contentType: postData.contentType || 'article',
+        contentType: postData.contentType || "article",
 
         // Timestamps and versioning
         createdAt: serverTimestamp(),
@@ -92,8 +92,8 @@ class BlogService extends FirebaseService {
         // Publication and visibility
         isPublished: postData.isPublished || false,
         isDraft: !postData.isPublished,
-        visibility: postData.visibility || 'public', // public, private, unlisted
-        status: postData.isPublished ? 'published' : 'draft',
+        visibility: postData.visibility || "public", // public, private, unlisted
+        status: postData.isPublished ? "published" : "draft",
 
         // Engagement metrics
         viewCount: 0,
@@ -114,11 +114,11 @@ class BlogService extends FirebaseService {
         metaDescription: postData.metaDescription || postData.excerpt,
 
         // Research-specific fields
-        researchType: postData.researchType || 'general',
-        methodology: postData.methodology || '',
+        researchType: postData.researchType || "general",
+        methodology: postData.methodology || "",
         citations: postData.citations || [],
         peerReviewed: postData.peerReviewed || false,
-        academicLevel: postData.academicLevel || 'general',
+        academicLevel: postData.academicLevel || "general",
 
         // Version control
         version: 1,
@@ -134,10 +134,10 @@ class BlogService extends FirebaseService {
       };
 
       // Add to posts collection
-      const docRef = await addDoc(collection(this.db, 'posts'), post);
+      const docRef = await addDoc(collection(this.db, "posts"), post);
 
       // Create author's post reference
-      await this.updateAuthorPostsList(this.currentUser.uid, docRef.id, 'add');
+      await this.updateAuthorPostsList(this.currentUser.uid, docRef.id, "add");
 
       // Index for search if published
       if (post.isPublished) {
@@ -148,11 +148,11 @@ class BlogService extends FirebaseService {
       this.postsCache.clear();
 
       // Dispatch event for UI updates
-      this.dispatchEvent('postCreated', { postId: docRef.id, post });
+      this.dispatchEvent("postCreated", { postId: docRef.id, post });
 
       return { id: docRef.id, ...post };
     } catch (error) {
-      this.handleError('Error creating post', error);
+      this.handleError("Error creating post", error);
       throw new Error(`Failed to create post: ${error.message}`);
     }
   }
@@ -163,21 +163,21 @@ class BlogService extends FirebaseService {
   async updatePost(postId, updates) {
     try {
       if (!this.currentUser) {
-        throw new Error('Authentication required');
+        throw new Error("Authentication required");
       }
 
-      const postRef = doc(this.db, 'posts', postId);
+      const postRef = doc(this.db, "posts", postId);
       const postDoc = await getDoc(postRef);
 
       if (!postDoc.exists()) {
-        throw new Error('Post not found');
+        throw new Error("Post not found");
       }
 
       const currentPost = postDoc.data();
 
       // Verify ownership
       if (currentPost.authorUID !== this.currentUser.uid) {
-        throw new Error('Unauthorized: Can only edit your own posts');
+        throw new Error("Unauthorized: Can only edit your own posts");
       }
 
       // Create version history entry
@@ -201,7 +201,7 @@ class BlogService extends FirebaseService {
       if (updates.isPublished && !currentPost.isPublished) {
         updateData.publishedAt = serverTimestamp();
         updateData.isDraft = false;
-        updateData.status = 'published';
+        updateData.status = "published";
       }
 
       await updateDoc(postRef, updateData);
@@ -217,11 +217,11 @@ class BlogService extends FirebaseService {
       // Clear cache
       this.postsCache.delete(postId);
 
-      this.dispatchEvent('postUpdated', { postId, updates: updateData });
+      this.dispatchEvent("postUpdated", { postId, updates: updateData });
 
       return true;
     } catch (error) {
-      this.handleError('Error updating post', error);
+      this.handleError("Error updating post", error);
       throw error;
     }
   }
@@ -236,39 +236,39 @@ class BlogService extends FirebaseService {
         category = null,
         tags = [],
         authorUID = null,
-        status = 'published',
+        status = "published",
         featured = null,
         limit: limitCount = this.postsPerPage,
-        orderByField = 'publishedAt',
-        orderDirection = 'desc',
+        orderByField = "publishedAt",
+        orderDirection = "desc",
         startAfter: startAfterDoc = null,
         realtime = false,
       } = options;
 
       // Build query
-      let q = collection(this.db, 'posts');
+      let q = collection(this.db, "posts");
 
       // Apply filters
       const constraints = [];
 
       if (status) {
-        constraints.push(where('status', '==', status));
+        constraints.push(where("status", "==", status));
       }
 
       if (category) {
-        constraints.push(where('category', '==', category));
+        constraints.push(where("category", "==", category));
       }
 
       if (authorUID) {
-        constraints.push(where('authorUID', '==', authorUID));
+        constraints.push(where("authorUID", "==", authorUID));
       }
 
       if (featured !== null) {
-        constraints.push(where('featured', '==', featured));
+        constraints.push(where("featured", "==", featured));
       }
 
       if (tags.length > 0) {
-        constraints.push(where('tags', 'array-contains-any', tags));
+        constraints.push(where("tags", "array-contains-any", tags));
       }
 
       // Add ordering
@@ -290,7 +290,7 @@ class BlogService extends FirebaseService {
       const querySnapshot = await getDocs(q);
       const posts = [];
 
-      querySnapshot.forEach(doc => {
+      querySnapshot.forEach((doc) => {
         const post = { id: doc.id, ...doc.data() };
         posts.push(this.processPostData(post));
         this.postsCache.set(doc.id, post);
@@ -303,7 +303,7 @@ class BlogService extends FirebaseService {
 
       return posts;
     } catch (error) {
-      this.handleError('Error getting posts', error);
+      this.handleError("Error getting posts", error);
       throw error;
     }
   }
@@ -322,11 +322,11 @@ class BlogService extends FirebaseService {
         return cachedPost;
       }
 
-      const postRef = doc(this.db, 'posts', postId);
+      const postRef = doc(this.db, "posts", postId);
       const postDoc = await getDoc(postRef);
 
       if (!postDoc.exists()) {
-        throw new Error('Post not found');
+        throw new Error("Post not found");
       }
 
       const post = { id: postDoc.id, ...postDoc.data() };
@@ -342,7 +342,7 @@ class BlogService extends FirebaseService {
 
       return processedPost;
     } catch (error) {
-      this.handleError('Error getting post', error);
+      this.handleError("Error getting post", error);
       throw error;
     }
   }
@@ -358,23 +358,23 @@ class BlogService extends FirebaseService {
 
       const searchTerms = searchQuery
         .toLowerCase()
-        .split(' ')
-        .filter(term => term.length > 1);
+        .split(" ")
+        .filter((term) => term.length > 1);
 
       // Build base query
-      let q = collection(this.db, 'posts');
+      let q = collection(this.db, "posts");
       const constraints = [
-        where('status', '==', 'published'),
-        orderBy('publishedAt', 'desc'),
+        where("status", "==", "published"),
+        orderBy("publishedAt", "desc"),
       ];
 
       // Apply additional filters
       if (filters.category) {
-        constraints.push(where('category', '==', filters.category));
+        constraints.push(where("category", "==", filters.category));
       }
 
       if (filters.tags && filters.tags.length > 0) {
-        constraints.push(where('tags', 'array-contains-any', filters.tags));
+        constraints.push(where("tags", "array-contains-any", filters.tags));
       }
 
       q = query(q, ...constraints);
@@ -382,7 +382,7 @@ class BlogService extends FirebaseService {
       const querySnapshot = await getDocs(q);
       const posts = [];
 
-      querySnapshot.forEach(doc => {
+      querySnapshot.forEach((doc) => {
         const post = { id: doc.id, ...doc.data() };
 
         // Client-side search scoring
@@ -398,7 +398,7 @@ class BlogService extends FirebaseService {
 
       return posts.slice(0, this.SEARCH_RESULTS_LIMIT);
     } catch (error) {
-      this.handleError('Error searching posts', error);
+      this.handleError("Error searching posts", error);
       throw error;
     }
   }
@@ -409,13 +409,13 @@ class BlogService extends FirebaseService {
   async addComment(postId, commentData) {
     try {
       if (!this.currentUser) {
-        throw new Error('Authentication required to comment');
+        throw new Error("Authentication required to comment");
       }
 
       const comment = {
         content: commentData.content.trim(),
         authorUID: this.currentUser.uid,
-        authorName: this.currentUser.displayName || 'Anonymous',
+        authorName: this.currentUser.displayName || "Anonymous",
         authorPhoto: this.currentUser.photoURL,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
@@ -426,11 +426,11 @@ class BlogService extends FirebaseService {
       };
 
       // Add to comments subcollection
-      const commentsRef = collection(this.db, 'posts', postId, 'comments');
+      const commentsRef = collection(this.db, "posts", postId, "comments");
       const docRef = await addDoc(commentsRef, comment);
 
       // Update post comment count
-      const postRef = doc(this.db, 'posts', postId);
+      const postRef = doc(this.db, "posts", postId);
       await updateDoc(postRef, {
         commentCount: increment(1),
         updatedAt: serverTimestamp(),
@@ -439,7 +439,7 @@ class BlogService extends FirebaseService {
       // Clear post cache
       this.postsCache.delete(postId);
 
-      this.dispatchEvent('commentAdded', {
+      this.dispatchEvent("commentAdded", {
         postId,
         commentId: docRef.id,
         comment,
@@ -447,7 +447,7 @@ class BlogService extends FirebaseService {
 
       return { id: docRef.id, ...comment };
     } catch (error) {
-      this.handleError('Error adding comment', error);
+      this.handleError("Error adding comment", error);
       throw error;
     }
   }
@@ -459,27 +459,27 @@ class BlogService extends FirebaseService {
     try {
       const {
         limit: limitCount = 20,
-        orderBy: orderByField = 'createdAt',
-        orderDirection = 'desc',
+        orderBy: orderByField = "createdAt",
+        orderDirection = "desc",
       } = options;
 
-      const commentsRef = collection(this.db, 'posts', postId, 'comments');
+      const commentsRef = collection(this.db, "posts", postId, "comments");
       const q = query(
         commentsRef,
         orderBy(orderByField, orderDirection),
-        limit(limitCount)
+        limit(limitCount),
       );
 
       const querySnapshot = await getDocs(q);
       const comments = [];
 
-      querySnapshot.forEach(doc => {
+      querySnapshot.forEach((doc) => {
         comments.push({ id: doc.id, ...doc.data() });
       });
 
       return comments;
     } catch (error) {
-      this.handleError('Error getting comments', error);
+      this.handleError("Error getting comments", error);
       throw error;
     }
   }
@@ -490,20 +490,20 @@ class BlogService extends FirebaseService {
   async togglePostLike(postId) {
     try {
       if (!this.currentUser) {
-        throw new Error('Authentication required');
+        throw new Error("Authentication required");
       }
 
       const userLikesRef = doc(
         this.db,
-        'users',
+        "users",
         this.currentUser.uid,
-        'likes',
-        postId
+        "likes",
+        postId,
       );
       const userLikeDoc = await getDoc(userLikesRef);
       const hasLiked = userLikeDoc.exists();
 
-      const postRef = doc(this.db, 'posts', postId);
+      const postRef = doc(this.db, "posts", postId);
 
       if (hasLiked) {
         // Unlike
@@ -525,11 +525,11 @@ class BlogService extends FirebaseService {
       // Clear cache
       this.postsCache.delete(postId);
 
-      this.dispatchEvent('postLikeToggled', { postId, liked: !hasLiked });
+      this.dispatchEvent("postLikeToggled", { postId, liked: !hasLiked });
 
       return !hasLiked;
     } catch (error) {
-      this.handleError('Error toggling post like', error);
+      this.handleError("Error toggling post like", error);
       throw error;
     }
   }
@@ -543,21 +543,21 @@ class BlogService extends FirebaseService {
 
       const likesRef = collection(
         this.db,
-        'users',
+        "users",
         this.currentUser.uid,
-        'likes'
+        "likes",
       );
-      const q = query(likesRef, orderBy('likedAt', 'desc'));
+      const q = query(likesRef, orderBy("likedAt", "desc"));
       const querySnapshot = await getDocs(q);
 
       const likedPostIds = [];
-      querySnapshot.forEach(doc => {
+      querySnapshot.forEach((doc) => {
         likedPostIds.push(doc.id);
       });
 
       return likedPostIds;
     } catch (error) {
-      this.handleError('Error getting user liked posts', error);
+      this.handleError("Error getting user liked posts", error);
       return [];
     }
   }
@@ -570,12 +570,12 @@ class BlogService extends FirebaseService {
       return await this.getPosts({
         category,
         limit,
-        status: 'published',
-        orderByField: 'publishedAt',
-        orderDirection: 'desc',
+        status: "published",
+        orderByField: "publishedAt",
+        orderDirection: "desc",
       });
     } catch (error) {
-      this.handleError('Error getting posts by category', error);
+      this.handleError("Error getting posts by category", error);
       throw error;
     }
   }
@@ -588,12 +588,12 @@ class BlogService extends FirebaseService {
       return await this.getPosts({
         featured: true,
         limit,
-        status: 'published',
-        orderByField: 'publishedAt',
-        orderDirection: 'desc',
+        status: "published",
+        orderByField: "publishedAt",
+        orderDirection: "desc",
       });
     } catch (error) {
-      this.handleError('Error getting featured posts', error);
+      this.handleError("Error getting featured posts", error);
       throw error;
     }
   }
@@ -607,12 +607,12 @@ class BlogService extends FirebaseService {
 
       return await this.getPosts({
         authorUID: this.currentUser.uid,
-        status: 'draft',
-        orderByField: 'updatedAt',
-        orderDirection: 'desc',
+        status: "draft",
+        orderByField: "updatedAt",
+        orderDirection: "desc",
       });
     } catch (error) {
-      this.handleError('Error getting user drafts', error);
+      this.handleError("Error getting user drafts", error);
       return [];
     }
   }
@@ -623,22 +623,22 @@ class BlogService extends FirebaseService {
 
   validatePostData(postData) {
     if (!postData.title || postData.title.trim().length === 0) {
-      throw new Error('Post title is required');
+      throw new Error("Post title is required");
     }
 
     if (!postData.body || postData.body.trim().length === 0) {
-      throw new Error('Post content is required');
+      throw new Error("Post content is required");
     }
 
     if (postData.title.length > this.MAX_TITLE_LENGTH) {
       throw new Error(
-        `Post title too long (max ${this.MAX_TITLE_LENGTH} characters)`
+        `Post title too long (max ${this.MAX_TITLE_LENGTH} characters)`,
       );
     }
   }
 
   generateExcerpt(body, maxLength = this.MAX_EXCERPT_LENGTH) {
-    const plainText = body.replace(/<[^>]*>/g, '').replace(/\n+/g, ' ');
+    const plainText = body.replace(/<[^>]*>/g, "").replace(/\n+/g, " ");
     return plainText.length > maxLength
       ? `${plainText.substring(0, maxLength).trim()}...`
       : plainText;
@@ -647,10 +647,10 @@ class BlogService extends FirebaseService {
   generateSlug(title) {
     return title
       .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '');
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
   }
 
   calculateReadTime(content) {
@@ -662,15 +662,15 @@ class BlogService extends FirebaseService {
     let score = 0;
     const title = post.title.toLowerCase();
     const body = post.body.toLowerCase();
-    const excerpt = (post.excerpt || '').toLowerCase();
-    const tags = post.tags.map(tag => tag.toLowerCase());
+    const excerpt = (post.excerpt || "").toLowerCase();
+    const tags = post.tags.map((tag) => tag.toLowerCase());
 
-    searchTerms.forEach(term => {
+    searchTerms.forEach((term) => {
       // Title matches get highest score
       if (title.includes(term)) score += this.SEARCH_WEIGHTS.TITLE;
 
       // Tag matches get high score
-      if (tags.some(tag => tag.includes(term)))
+      if (tags.some((tag) => tag.includes(term)))
         score += this.SEARCH_WEIGHTS.TAG;
 
       // Excerpt matches get medium score
@@ -685,15 +685,15 @@ class BlogService extends FirebaseService {
 
   processPostData(post) {
     // Convert Firestore timestamps to JavaScript Date objects
-    if (post.createdAt && typeof post.createdAt.toDate === 'function') {
+    if (post.createdAt && typeof post.createdAt.toDate === "function") {
       post.createdAt = post.createdAt.toDate();
     }
 
-    if (post.publishedAt && typeof post.publishedAt.toDate === 'function') {
+    if (post.publishedAt && typeof post.publishedAt.toDate === "function") {
       post.publishedAt = post.publishedAt.toDate();
     }
 
-    if (post.updatedAt && typeof post.updatedAt.toDate === 'function') {
+    if (post.updatedAt && typeof post.updatedAt.toDate === "function") {
       post.updatedAt = post.updatedAt.toDate();
     }
 
@@ -702,50 +702,50 @@ class BlogService extends FirebaseService {
 
   async trackPostView(postId) {
     try {
-      const postRef = doc(this.db, 'posts', postId);
+      const postRef = doc(this.db, "posts", postId);
       await updateDoc(postRef, {
         viewCount: increment(1),
       });
     } catch (error) {
-      this.handleError('Error tracking post view', error);
+      this.handleError("Error tracking post view", error);
     }
   }
 
   async updateAuthorPostsList(authorUID, postId, action) {
     try {
-      const userRef = doc(this.db, 'users', authorUID);
+      const userRef = doc(this.db, "users", authorUID);
       const updateData = {};
 
-      if (action === 'add') {
+      if (action === "add") {
         updateData.postIds = arrayUnion(postId);
         updateData.postCount = increment(1);
-      } else if (action === 'remove') {
+      } else if (action === "remove") {
         updateData.postIds = arrayRemove(postId);
         updateData.postCount = increment(-1);
       }
 
       await updateDoc(userRef, updateData);
     } catch (error) {
-      this.handleError('Error updating author posts list', error);
+      this.handleError("Error updating author posts list", error);
     }
   }
 
   async indexPostForSearch(postId, post) {
     // This would integrate with a search service like Algolia or implement custom indexing
-    this.logInfo('Indexing post for search', { postId, title: post.title });
+    this.logInfo("Indexing post for search", { postId, title: post.title });
   }
 
   setupRealtimePostListener(query, options) {
     const listenerId = `posts_${Date.now()}`;
 
-    const unsubscribe = onSnapshot(query, querySnapshot => {
+    const unsubscribe = onSnapshot(query, (querySnapshot) => {
       const posts = [];
-      querySnapshot.forEach(doc => {
+      querySnapshot.forEach((doc) => {
         const post = { id: doc.id, ...doc.data() };
         posts.push(this.processPostData(post));
       });
 
-      this.dispatchEvent('postsUpdated', { posts, options });
+      this.dispatchEvent("postsUpdated", { posts, options });
     });
 
     this.activeListeners.set(listenerId, unsubscribe);
@@ -755,7 +755,7 @@ class BlogService extends FirebaseService {
   detectChanges(oldPost, updates) {
     const changes = [];
 
-    Object.keys(updates).forEach(key => {
+    Object.keys(updates).forEach((key) => {
       if (oldPost[key] !== updates[key]) {
         changes.push({
           field: key,
@@ -776,7 +776,7 @@ class BlogService extends FirebaseService {
   handleError(context, error) {
     if (this.currentUser) {
       // Log error for debugging in development
-      if (window.location.hostname === 'localhost') {
+      if (window.location.hostname === "localhost") {
         // eslint-disable-next-line no-console
         console.error(`${context}:`, error);
       }
@@ -785,15 +785,14 @@ class BlogService extends FirebaseService {
   }
 
   logInfo(context, data) {
-    if (window.location.hostname === 'localhost') {
+    if (window.location.hostname === "localhost") {
       // eslint-disable-next-line no-console
-
     }
   }
 
   // Cleanup method
   cleanup() {
-    this.activeListeners.forEach(unsubscribe => unsubscribe());
+    this.activeListeners.forEach((unsubscribe) => unsubscribe());
     this.activeListeners.clear();
     this.postsCache.clear();
   }

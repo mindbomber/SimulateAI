@@ -6,9 +6,9 @@
 class DonorAppreciation {
   constructor() {
     this.donorContainer = document.getElementById(
-      'donor-recognition-container'
+      "donor-recognition-container",
     );
-    this.donorList = document.getElementById('donor-list');
+    this.donorList = document.getElementById("donor-list");
     this.init();
   }
 
@@ -25,20 +25,20 @@ class DonorAppreciation {
     // Sample donor data - in production this would come from your backend
     const sampleDonors = [
       {
-        name: 'Anonymous Educator',
-        level: 'gold',
+        name: "Anonymous Educator",
+        level: "gold",
         amount: 100,
-        date: '2025-01-15',
+        date: "2025-01-15",
       },
-      { name: 'Dr. Sarah M.', level: 'silver', amount: 25, date: '2025-01-14' },
+      { name: "Dr. Sarah M.", level: "silver", amount: 25, date: "2025-01-14" },
       {
-        name: 'Ethics Researcher',
-        level: 'premium',
+        name: "Ethics Researcher",
+        level: "premium",
         amount: 250,
-        date: '2025-01-12',
+        date: "2025-01-12",
       },
-      { name: 'AI Student', level: 'bronze', amount: 10, date: '2025-01-10' },
-      { name: 'Professor Chen', level: 'gold', amount: 75, date: '2025-01-08' },
+      { name: "AI Student", level: "bronze", amount: 10, date: "2025-01-10" },
+      { name: "Professor Chen", level: "gold", amount: 75, date: "2025-01-08" },
     ];
 
     this.displayDonors(sampleDonors);
@@ -51,7 +51,7 @@ class DonorAppreciation {
     if (!this.donorList) return;
 
     // Clear existing content
-    this.donorList.innerHTML = '';
+    this.donorList.innerHTML = "";
 
     if (donors.length === 0) {
       this.donorList.innerHTML = `
@@ -65,13 +65,13 @@ class DonorAppreciation {
 
     // Sort donors by date (most recent first)
     const sortedDonors = donors.sort(
-      (a, b) => new Date(b.date) - new Date(a.date)
+      (a, b) => new Date(b.date) - new Date(a.date),
     );
 
     // Display recent donors (last 10)
     const recentDonors = sortedDonors.slice(0, 10);
 
-    recentDonors.forEach(donor => {
+    recentDonors.forEach((donor) => {
       const donorBadge = this.createDonorBadge(donor);
       this.donorList.appendChild(donorBadge);
     });
@@ -84,7 +84,7 @@ class DonorAppreciation {
    * Create a donor badge element
    */
   createDonorBadge(donor) {
-    const badge = document.createElement('div');
+    const badge = document.createElement("div");
     badge.className = `donor-badge ${donor.level}`;
 
     const icon = this.getDonorIcon(donor.level);
@@ -105,12 +105,12 @@ class DonorAppreciation {
    */
   getDonorIcon(level) {
     const icons = {
-      premium: '💎',
-      gold: '🏆',
-      silver: '🥈',
-      bronze: '🏅',
+      premium: "💎",
+      gold: "🏆",
+      silver: "🥈",
+      bronze: "🏅",
     };
-    return icons[level] || '❤️';
+    return icons[level] || "❤️";
   }
 
   /**
@@ -119,7 +119,7 @@ class DonorAppreciation {
   formatDonorName(name) {
     const MAX_NAME_LENGTH = 20;
     const TRUNCATE_LENGTH = 17;
-    const ELLIPSIS = '...';
+    const ELLIPSIS = "...";
 
     // If name is too long, truncate it
     if (name.length > MAX_NAME_LENGTH) {
@@ -135,8 +135,8 @@ class DonorAppreciation {
     const totalAmount = donors.reduce((sum, donor) => sum + donor.amount, 0);
     const donorCount = donors.length;
 
-    const statsElement = document.createElement('div');
-    statsElement.className = 'donor-stats';
+    const statsElement = document.createElement("div");
+    statsElement.className = "donor-stats";
     statsElement.innerHTML = `
       <div class="stats-grid">
         <div class="stat-item">
@@ -172,30 +172,30 @@ class DonorAppreciation {
    */
   setupEventListeners() {
     // Listen for donation events to refresh the display
-    document.addEventListener('donation-completed', () => {
+    document.addEventListener("donation-completed", () => {
       this.loadDonorData();
     });
 
     // Add hover effects to donor badges
     if (this.donorList) {
       this.donorList.addEventListener(
-        'mouseenter',
-        e => {
-          if (e.target.classList.contains('donor-badge')) {
-            this.animateBadge(e.target, 'enter');
+        "mouseenter",
+        (e) => {
+          if (e.target.classList.contains("donor-badge")) {
+            this.animateBadge(e.target, "enter");
           }
         },
-        true
+        true,
       );
 
       this.donorList.addEventListener(
-        'mouseleave',
-        e => {
-          if (e.target.classList.contains('donor-badge')) {
-            this.animateBadge(e.target, 'leave');
+        "mouseleave",
+        (e) => {
+          if (e.target.classList.contains("donor-badge")) {
+            this.animateBadge(e.target, "leave");
           }
         },
-        true
+        true,
       );
     }
   }
@@ -204,12 +204,12 @@ class DonorAppreciation {
    * Animate donor badge on hover
    */
   animateBadge(badge, action) {
-    if (action === 'enter') {
-      badge.style.transform = 'scale(1.1)';
-      badge.style.zIndex = '10';
+    if (action === "enter") {
+      badge.style.transform = "scale(1.1)";
+      badge.style.zIndex = "10";
     } else {
-      badge.style.transform = '';
-      badge.style.zIndex = '';
+      badge.style.transform = "";
+      badge.style.zIndex = "";
     }
   }
 
@@ -224,12 +224,12 @@ class DonorAppreciation {
 }
 
 // Initialize donor appreciation when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   new DonorAppreciation();
 });
 
 // Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
   module.exports = DonorAppreciation;
 }
 

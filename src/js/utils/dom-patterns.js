@@ -24,7 +24,7 @@ export class DOMPatterns {
    * @param {string|Element[]} content - Element content
    * @returns {HTMLElement} Created element
    */
-  static createElement(tagName, attributes = {}, styles = {}, content = '') {
+  static createElement(tagName, attributes = {}, styles = {}, content = "") {
     const element = document.createElement(tagName);
 
     // Set attributes
@@ -42,10 +42,10 @@ export class DOMPatterns {
     });
 
     // Set content
-    if (typeof content === 'string') {
+    if (typeof content === "string") {
       element.textContent = content;
     } else if (Array.isArray(content)) {
-      content.forEach(child => {
+      content.forEach((child) => {
         if (child instanceof HTMLElement) {
           element.appendChild(child);
         }
@@ -68,7 +68,7 @@ export class DOMPatterns {
       id,
       name,
       placeholder,
-      value = '',
+      value = "",
       required = false,
       disabled = false,
       min,
@@ -82,14 +82,14 @@ export class DOMPatterns {
       onBlur,
     } = config;
 
-    const input = this.createElement('input', {
+    const input = this.createElement("input", {
       type,
       id,
       name,
       placeholder,
       value,
-      required: required ? 'required' : null,
-      disabled: disabled ? 'disabled' : null,
+      required: required ? "required" : null,
+      disabled: disabled ? "disabled" : null,
       min,
       max,
       step,
@@ -98,10 +98,10 @@ export class DOMPatterns {
     });
 
     // Add event listeners
-    if (onInput) input.addEventListener('input', onInput);
-    if (onChange) input.addEventListener('change', onChange);
-    if (onFocus) input.addEventListener('focus', onFocus);
-    if (onBlur) input.addEventListener('blur', onBlur);
+    if (onInput) input.addEventListener("input", onInput);
+    if (onChange) input.addEventListener("change", onChange);
+    if (onFocus) input.addEventListener("focus", onFocus);
+    if (onBlur) input.addEventListener("blur", onBlur);
 
     return input;
   }
@@ -114,36 +114,36 @@ export class DOMPatterns {
    */
   static createButton(text, config = {}) {
     const {
-      type = 'button',
-      variant = 'primary',
-      size = 'medium',
+      type = "button",
+      variant = "primary",
+      size = "medium",
       disabled = false,
       icon,
       onClick,
-      className = '',
+      className = "",
     } = config;
 
     const buttonClass = `btn btn-${variant} btn-${size} ${className}`.trim();
 
-    const button = this.createElement('button', {
+    const button = this.createElement("button", {
       type,
-      disabled: disabled ? 'disabled' : null,
+      disabled: disabled ? "disabled" : null,
       class: buttonClass,
     });
 
     // Button content
     if (icon) {
       const iconElement = this.createElement(
-        'span',
-        { class: 'btn-icon' },
+        "span",
+        { class: "btn-icon" },
         {},
-        icon
+        icon,
       );
       const textElement = this.createElement(
-        'span',
-        { class: 'btn-text' },
+        "span",
+        { class: "btn-text" },
         {},
-        text
+        text,
       );
       button.appendChild(iconElement);
       button.appendChild(textElement);
@@ -153,7 +153,7 @@ export class DOMPatterns {
 
     // Add click handler
     if (onClick) {
-      button.addEventListener('click', onClick);
+      button.addEventListener("click", onClick);
     }
 
     return button;
@@ -166,55 +166,55 @@ export class DOMPatterns {
    */
   static createModal(config = {}) {
     const {
-      title = '',
-      content = '',
+      title = "",
+      content = "",
       showCloseButton = true,
       showBackdrop = true,
       keyboard = true,
-      size = 'medium',
+      size = "medium",
       onClose,
     } = config;
 
     // Modal backdrop
-    const backdrop = this.createElement('div', {
-      class: 'modal-backdrop',
-      'data-dismiss': 'modal',
+    const backdrop = this.createElement("div", {
+      class: "modal-backdrop",
+      "data-dismiss": "modal",
     });
 
     // Modal container
-    const modal = this.createElement('div', {
+    const modal = this.createElement("div", {
       class: `modal modal-${size}`,
-      role: 'dialog',
-      'aria-modal': 'true',
-      tabindex: '-1',
+      role: "dialog",
+      "aria-modal": "true",
+      tabindex: "-1",
     });
 
     // Modal dialog
-    const dialog = this.createElement('div', { class: 'modal-dialog' });
+    const dialog = this.createElement("div", { class: "modal-dialog" });
 
     // Modal content
-    const modalContent = this.createElement('div', { class: 'modal-content' });
+    const modalContent = this.createElement("div", { class: "modal-content" });
 
     // Modal header
     if (title || showCloseButton) {
-      const header = this.createElement('div', { class: 'modal-header' });
+      const header = this.createElement("div", { class: "modal-header" });
 
       if (title) {
         const titleElement = this.createElement(
-          'h5',
-          { class: 'modal-title' },
+          "h5",
+          { class: "modal-title" },
           {},
-          title
+          title,
         );
         header.appendChild(titleElement);
       }
 
       if (showCloseButton) {
-        const closeBtn = this.createElement('button', {
-          type: 'button',
-          class: 'btn-close',
-          'aria-label': 'Close',
-          'data-dismiss': 'modal',
+        const closeBtn = this.createElement("button", {
+          type: "button",
+          class: "btn-close",
+          "aria-label": "Close",
+          "data-dismiss": "modal",
         });
         header.appendChild(closeBtn);
       }
@@ -223,8 +223,8 @@ export class DOMPatterns {
     }
 
     // Modal body
-    const body = this.createElement('div', { class: 'modal-body' });
-    if (typeof content === 'string') {
+    const body = this.createElement("div", { class: "modal-body" });
+    if (typeof content === "string") {
       body.innerHTML = content;
     } else if (content instanceof HTMLElement) {
       body.appendChild(content);
@@ -243,22 +243,22 @@ export class DOMPatterns {
     };
 
     if (showBackdrop) {
-      backdrop.addEventListener('click', closeModal);
+      backdrop.addEventListener("click", closeModal);
     }
 
     if (keyboard) {
-      const handleKeydown = e => {
-        if (e.key === 'Escape') {
+      const handleKeydown = (e) => {
+        if (e.key === "Escape") {
           closeModal();
-          document.removeEventListener('keydown', handleKeydown);
+          document.removeEventListener("keydown", handleKeydown);
         }
       };
-      document.addEventListener('keydown', handleKeydown);
+      document.addEventListener("keydown", handleKeydown);
     }
 
     // Close button handler
-    modal.querySelectorAll('[data-dismiss="modal"]').forEach(btn => {
-      btn.addEventListener('click', closeModal);
+    modal.querySelectorAll('[data-dismiss="modal"]').forEach((btn) => {
+      btn.addEventListener("click", closeModal);
     });
 
     return {
@@ -284,13 +284,13 @@ export class DOMPatterns {
     const { mobile = {}, tablet = {}, desktop = {} } = breakpoints;
 
     // Create media query listeners
-    const mobileQuery = window.matchMedia('(max-width: 768px)');
+    const mobileQuery = window.matchMedia("(max-width: 768px)");
     const tabletQuery = window.matchMedia(
-      '(min-width: 769px) and (max-width: 1024px)'
+      "(min-width: 769px) and (max-width: 1024px)",
     );
-    const desktopQuery = window.matchMedia('(min-width: 1025px)');
+    const desktopQuery = window.matchMedia("(min-width: 1025px)");
 
-    const applyStyles = styles => {
+    const applyStyles = (styles) => {
       Object.entries(styles).forEach(([property, value]) => {
         element.style[property] = value;
       });
@@ -337,7 +337,7 @@ export class DOMPatterns {
       const fieldErrors = [];
 
       // Required validation
-      if (fieldRules.required && (!value || value.trim() === '')) {
+      if (fieldRules.required && (!value || value.trim() === "")) {
         fieldErrors.push(`${fieldName} is required`);
       }
 
@@ -348,7 +348,7 @@ export class DOMPatterns {
         value.length < fieldRules.minLength
       ) {
         fieldErrors.push(
-          `${fieldName} must be at least ${fieldRules.minLength} characters`
+          `${fieldName} must be at least ${fieldRules.minLength} characters`,
         );
       }
 
@@ -359,19 +359,19 @@ export class DOMPatterns {
         value.length > fieldRules.maxLength
       ) {
         fieldErrors.push(
-          `${fieldName} must be no more than ${fieldRules.maxLength} characters`
+          `${fieldName} must be no more than ${fieldRules.maxLength} characters`,
         );
       }
 
       // Pattern validation
       if (fieldRules.pattern && value && !fieldRules.pattern.test(value)) {
         fieldErrors.push(
-          fieldRules.patternMessage || `${fieldName} format is invalid`
+          fieldRules.patternMessage || `${fieldName} format is invalid`,
         );
       }
 
       // Custom validation
-      if (fieldRules.custom && typeof fieldRules.custom === 'function') {
+      if (fieldRules.custom && typeof fieldRules.custom === "function") {
         const customResult = fieldRules.custom(value);
         if (customResult !== true) {
           fieldErrors.push(customResult || `${fieldName} is invalid`);
@@ -398,7 +398,7 @@ export class DOMPatterns {
    */
   static setLoadingState(element, isLoading, config = {}) {
     const {
-      loadingText = 'Loading...',
+      loadingText = "Loading...",
       spinner = true,
       disableInteraction = true,
     } = config;
@@ -409,7 +409,7 @@ export class DOMPatterns {
       element.dataset.originalDisabled = element.disabled;
 
       // Create loading content
-      let loadingContent = '';
+      let loadingContent = "";
       if (spinner) {
         loadingContent += '<span class="spinner"></span>';
       }
@@ -419,10 +419,10 @@ export class DOMPatterns {
 
       if (disableInteraction) {
         element.disabled = true;
-        element.style.pointerEvents = 'none';
+        element.style.pointerEvents = "none";
       }
 
-      element.classList.add('loading');
+      element.classList.add("loading");
     } else {
       // Restore original content
       if (element.dataset.originalContent) {
@@ -431,14 +431,14 @@ export class DOMPatterns {
       }
 
       if (element.dataset.originalDisabled !== undefined) {
-        element.disabled = element.dataset.originalDisabled === 'true';
+        element.disabled = element.dataset.originalDisabled === "true";
         delete element.dataset.originalDisabled;
       } else {
         element.disabled = false;
       }
 
-      element.style.pointerEvents = '';
-      element.classList.remove('loading');
+      element.style.pointerEvents = "";
+      element.classList.remove("loading");
     }
   }
 
@@ -450,58 +450,58 @@ export class DOMPatterns {
    */
   static createNotification(message, config = {}) {
     const {
-      type = 'info', // 'success', 'warning', 'error', 'info'
+      type = "info", // 'success', 'warning', 'error', 'info'
       duration = 5000,
       closable = true,
-      position = 'top-right',
+      position = "top-right",
       icon = true,
     } = config;
 
-    const notification = this.createElement('div', {
+    const notification = this.createElement("div", {
       class: `notification notification-${type} notification-${position}`,
-      role: 'alert',
+      role: "alert",
     });
 
     // Icon
     if (icon) {
       const icons = {
-        success: '✓',
-        warning: '⚠',
-        error: '✕',
-        info: 'ℹ',
+        success: "✓",
+        warning: "⚠",
+        error: "✕",
+        info: "ℹ",
       };
       const iconElement = this.createElement(
-        'span',
-        { class: 'notification-icon' },
+        "span",
+        { class: "notification-icon" },
         {},
-        icons[type] || icons.info
+        icons[type] || icons.info,
       );
       notification.appendChild(iconElement);
     }
 
     // Message
     const messageElement = this.createElement(
-      'span',
-      { class: 'notification-message' },
+      "span",
+      { class: "notification-message" },
       {},
-      message
+      message,
     );
     notification.appendChild(messageElement);
 
     // Close button
     if (closable) {
       const closeBtn = this.createElement(
-        'button',
+        "button",
         {
-          type: 'button',
-          class: 'notification-close',
-          'aria-label': 'Close notification',
+          type: "button",
+          class: "notification-close",
+          "aria-label": "Close notification",
         },
         {},
-        '×'
+        "×",
       );
 
-      closeBtn.addEventListener('click', () => {
+      closeBtn.addEventListener("click", () => {
         notification.remove();
       });
 
@@ -518,10 +518,10 @@ export class DOMPatterns {
     }
 
     // Add to container or body
-    let container = document.querySelector('.notifications-container');
+    let container = document.querySelector(".notifications-container");
     if (!container) {
-      container = this.createElement('div', {
-        class: 'notifications-container',
+      container = this.createElement("div", {
+        class: "notifications-container",
       });
       document.body.appendChild(container);
     }

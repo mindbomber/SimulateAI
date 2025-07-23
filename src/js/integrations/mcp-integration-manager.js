@@ -3,12 +3,12 @@
  * Central coordination point for all MCP-enhanced features
  */
 
-import MCPWebResearch from './mcp-web-research.js';
-import MCPProjectGenerator from './mcp-project-generator.js';
-import MCPGitHubIntegration from './mcp-github-integration.js';
-import MCPAnalyticsEnhancement from './mcp-analytics-enhancement.js';
-import { MCPPhilosophicalCategoryGenerator } from './mcp-philosophical-generator.js';
-import logger from '../utils/logger.js';
+import MCPWebResearch from "./mcp-web-research.js";
+import MCPProjectGenerator from "./mcp-project-generator.js";
+import MCPGitHubIntegration from "./mcp-github-integration.js";
+import MCPAnalyticsEnhancement from "./mcp-analytics-enhancement.js";
+import { MCPPhilosophicalCategoryGenerator } from "./mcp-philosophical-generator.js";
+import logger from "../utils/logger.js";
 
 class MCPIntegrationManager {
   constructor(app) {
@@ -26,7 +26,7 @@ class MCPIntegrationManager {
   async initializeIntegrations() {
     // Prevent duplicate initialization
     if (this.initialized) {
-      logger.debug('MCP integrations already initialized, skipping');
+      logger.debug("MCP integrations already initialized, skipping");
       return {
         success: true,
         capabilities: Array.from(this.mcpCapabilities),
@@ -35,48 +35,48 @@ class MCPIntegrationManager {
     }
 
     try {
-      logger.info('Initializing MCP integrations for SimulateAI...');
+      logger.info("Initializing MCP integrations for SimulateAI...");
 
       // Initialize web research capabilities first (dependency for others)
       const webResearch = new MCPWebResearch();
-      this.integrations.set('webResearch', webResearch);
-      this.mcpCapabilities.add('fetch_webpage');
-      this.mcpCapabilities.add('real_time_content');
+      this.integrations.set("webResearch", webResearch);
+      this.mcpCapabilities.add("fetch_webpage");
+      this.mcpCapabilities.add("real_time_content");
 
       // Initialize project generation capabilities (dependency for philosophical generator)
       const projectGenerator = new MCPProjectGenerator();
-      this.integrations.set('projectGenerator', projectGenerator);
-      this.mcpCapabilities.add('create_new_workspace');
-      this.mcpCapabilities.add('scenario_generation');
+      this.integrations.set("projectGenerator", projectGenerator);
+      this.mcpCapabilities.add("create_new_workspace");
+      this.mcpCapabilities.add("scenario_generation");
 
       // Initialize GitHub integration
-      this.integrations.set('githubIntegration', new MCPGitHubIntegration());
-      this.mcpCapabilities.add('github_repo');
-      this.mcpCapabilities.add('collaborative_development');
+      this.integrations.set("githubIntegration", new MCPGitHubIntegration());
+      this.mcpCapabilities.add("github_repo");
+      this.mcpCapabilities.add("collaborative_development");
 
       // Initialize philosophical generator with dependencies
       this.integrations.set(
-        'philosophicalGenerator',
-        new MCPPhilosophicalCategoryGenerator(webResearch, projectGenerator)
+        "philosophicalGenerator",
+        new MCPPhilosophicalCategoryGenerator(webResearch, projectGenerator),
       );
-      this.mcpCapabilities.add('philosophical_frameworks');
-      this.mcpCapabilities.add('ethical_scenario_generation');
+      this.mcpCapabilities.add("philosophical_frameworks");
+      this.mcpCapabilities.add("ethical_scenario_generation");
 
       // Initialize analytics enhancement
       if (this.app.analytics) {
         this.integrations.set(
-          'analyticsEnhancement',
-          new MCPAnalyticsEnhancement(this.app.analytics)
+          "analyticsEnhancement",
+          new MCPAnalyticsEnhancement(this.app.analytics),
         );
-        this.mcpCapabilities.add('enhanced_analytics');
-        this.mcpCapabilities.add('educational_insights');
+        this.mcpCapabilities.add("enhanced_analytics");
+        this.mcpCapabilities.add("educational_insights");
       }
 
       // Set up cross-integration communication
       this.setupIntegrationCommunication();
 
       this.initialized = true;
-      logger.info('MCP integrations initialized successfully');
+      logger.info("MCP integrations initialized successfully");
 
       return {
         success: true,
@@ -84,7 +84,7 @@ class MCPIntegrationManager {
         integrations: Array.from(this.integrations.keys()),
       };
     } catch (error) {
-      logger.error('Failed to initialize MCP integrations:', error);
+      logger.error("Failed to initialize MCP integrations:", error);
       throw error;
     }
   }
@@ -93,12 +93,12 @@ class MCPIntegrationManager {
    * Set up communication between different integrations
    */
   setupIntegrationCommunication() {
-    const projectGenerator = this.integrations.get('projectGenerator');
-    const githubIntegration = this.integrations.get('githubIntegration');
+    const projectGenerator = this.integrations.get("projectGenerator");
+    const githubIntegration = this.integrations.get("githubIntegration");
     const philosophicalGenerator = this.integrations.get(
-      'philosophicalGenerator'
+      "philosophicalGenerator",
     );
-    const analytics = this.integrations.get('analyticsEnhancement');
+    const analytics = this.integrations.get("analyticsEnhancement");
 
     // Connect GitHub integration to project generation
     if (githubIntegration && projectGenerator) {
@@ -115,7 +115,7 @@ class MCPIntegrationManager {
     // Connect analytics to all other integrations
     if (analytics) {
       this.integrations.forEach((integration, name) => {
-        if (name !== 'analyticsEnhancement' && integration.setAnalytics) {
+        if (name !== "analyticsEnhancement" && integration.setAnalytics) {
           integration.setAnalytics(analytics);
         }
       });
@@ -131,13 +131,13 @@ class MCPIntegrationManager {
     }
 
     try {
-      const webResearch = this.integrations.get('webResearch');
-      const projectGenerator = this.integrations.get('projectGenerator');
-      const analytics = this.integrations.get('analyticsEnhancement');
+      const webResearch = this.integrations.get("webResearch");
+      const projectGenerator = this.integrations.get("projectGenerator");
+      const analytics = this.integrations.get("analyticsEnhancement");
 
       logger.info(
-        'Creating enhanced scenario with MCP capabilities:',
-        scenarioConfig
+        "Creating enhanced scenario with MCP capabilities:",
+        scenarioConfig,
       );
 
       // Step 1: Research real-world context
@@ -145,7 +145,7 @@ class MCPIntegrationManager {
       if (webResearch && scenarioConfig.includeRealWorldExamples) {
         realWorldContext = await webResearch.enrichScenarioWithRealExamples(
           scenarioConfig.scenarioId,
-          scenarioConfig.ethicsCategory
+          scenarioConfig.ethicsCategory,
         );
       }
 
@@ -165,7 +165,7 @@ class MCPIntegrationManager {
       const documentation = await this.generateComprehensiveDocumentation(
         scenarioConfig,
         realWorldContext,
-        scenarioStructure
+        scenarioStructure,
       );
 
       return {
@@ -174,13 +174,13 @@ class MCPIntegrationManager {
         realWorldContext,
         documentation,
         mcpCapabilitiesUsed: this.getUsedCapabilities([
-          'web_research',
-          'project_generation',
-          'analytics_tracking',
+          "web_research",
+          "project_generation",
+          "analytics_tracking",
         ]),
       };
     } catch (error) {
-      logger.error('Failed to create enhanced scenario:', error);
+      logger.error("Failed to create enhanced scenario:", error);
       throw error;
     }
   }
@@ -221,7 +221,7 @@ class MCPIntegrationManager {
 
       return enhancements;
     } catch (error) {
-      logger.error('Platform enhancement failed:', error);
+      logger.error("Platform enhancement failed:", error);
       return enhancements; // Return partial results
     }
   }
@@ -230,22 +230,22 @@ class MCPIntegrationManager {
    * Update content with current events and real-world examples
    */
   async updateContentWithCurrentEvents() {
-    const webResearch = this.integrations.get('webResearch');
+    const webResearch = this.integrations.get("webResearch");
     if (!webResearch) return [];
 
     const updates = [];
     const categories = [
-      'bias-fairness',
-      'consent-surveillance',
-      'automation-oversight',
-      'misinformation-trust',
+      "bias-fairness",
+      "consent-surveillance",
+      "automation-oversight",
+      "misinformation-trust",
     ];
 
     for (const category of categories) {
       try {
         const currentEvents = await webResearch.enrichScenarioWithRealExamples(
           `current-events-${Date.now()}`,
-          category
+          category,
         );
 
         if (currentEvents.realWorldExamples.length > 0) {
@@ -259,7 +259,7 @@ class MCPIntegrationManager {
       } catch (error) {
         logger.warn(
           `Failed to update content for category ${category}:`,
-          error
+          error,
         );
       }
     }
@@ -271,7 +271,7 @@ class MCPIntegrationManager {
    * Analyze technical improvements using GitHub research
    */
   async analyzeTechnicalImprovements() {
-    const githubIntegration = this.integrations.get('githubIntegration');
+    const githubIntegration = this.integrations.get("githubIntegration");
     if (!githubIntegration) return [];
 
     try {
@@ -281,37 +281,37 @@ class MCPIntegrationManager {
       // Analyze patterns and suggest improvements
       if (patterns.accessibility.length > 0) {
         improvements.push({
-          area: 'accessibility',
+          area: "accessibility",
           suggestions: this.generateAccessibilityImprovements(
-            patterns.accessibility
+            patterns.accessibility,
           ),
-          priority: 'high',
+          priority: "high",
         });
       }
 
       if (patterns.interactivity.length > 0) {
         improvements.push({
-          area: 'interactivity',
+          area: "interactivity",
           suggestions: this.generateInteractivityImprovements(
-            patterns.interactivity
+            patterns.interactivity,
           ),
-          priority: 'medium',
+          priority: "medium",
         });
       }
 
       if (patterns.visualization.length > 0) {
         improvements.push({
-          area: 'visualization',
+          area: "visualization",
           suggestions: this.generateVisualizationImprovements(
-            patterns.visualization
+            patterns.visualization,
           ),
-          priority: 'medium',
+          priority: "medium",
         });
       }
 
       return improvements;
     } catch (error) {
-      logger.warn('Failed to analyze technical improvements:', error);
+      logger.warn("Failed to analyze technical improvements:", error);
       return [];
     }
   }
@@ -320,7 +320,7 @@ class MCPIntegrationManager {
    * Enhance community features
    */
   async enhanceCommunityFeatures() {
-    const githubIntegration = this.integrations.get('githubIntegration');
+    const githubIntegration = this.integrations.get("githubIntegration");
     if (!githubIntegration) return [];
 
     try {
@@ -335,7 +335,7 @@ class MCPIntegrationManager {
         communityGuidelines: this.generateCommunityGuidelines(),
       };
     } catch (error) {
-      logger.warn('Failed to enhance community features:', error);
+      logger.warn("Failed to enhance community features:", error);
       return [];
     }
   }
@@ -344,7 +344,7 @@ class MCPIntegrationManager {
    * Generate analytics insights
    */
   async generateAnalyticsInsights() {
-    const analytics = this.integrations.get('analyticsEnhancement');
+    const analytics = this.integrations.get("analyticsEnhancement");
     if (!analytics) return {};
 
     try {
@@ -356,11 +356,11 @@ class MCPIntegrationManager {
         performanceMetrics: performanceReport,
         recommendations: this.generatePlatformRecommendations(
           insights,
-          performanceReport
+          performanceReport,
         ),
       };
     } catch (error) {
-      logger.warn('Failed to generate analytics insights:', error);
+      logger.warn("Failed to generate analytics insights:", error);
       return {};
     }
   }
@@ -401,12 +401,12 @@ class MCPIntegrationManager {
   async generateComprehensiveDocumentation(
     scenarioConfig,
     realWorldContext,
-    scenarioStructure
+    scenarioStructure,
   ) {
     const documentation = {
       implementation: this.generateImplementationDocs(
         scenarioConfig,
-        scenarioStructure
+        scenarioStructure,
       ),
       educator: this.generateEducatorDocs(scenarioConfig, realWorldContext),
       technical: this.generateTechnicalDocs(scenarioStructure),
@@ -418,7 +418,7 @@ class MCPIntegrationManager {
 
   // Utility methods
   getUsedCapabilities(capabilities) {
-    return capabilities.filter(cap => this.mcpCapabilities.has(cap));
+    return capabilities.filter((cap) => this.mcpCapabilities.has(cap));
   }
 
   getIntegrationStatus() {
@@ -436,80 +436,80 @@ class MCPIntegrationManager {
   async testIntegration(name, _integration) {
     // Implement basic integration testing
     switch (name) {
-      case 'webResearch':
+      case "webResearch":
         return { webSearchCapable: true, cacheEnabled: true };
-      case 'projectGenerator':
+      case "projectGenerator":
         return { templateGeneration: true, fileCreation: true };
-      case 'githubIntegration':
+      case "githubIntegration":
         return { repositoryAccess: true, patternAnalysis: true };
-      case 'philosophicalGenerator':
+      case "philosophicalGenerator":
         return { categoryGeneration: true, scenarioCreation: true };
-      case 'analyticsEnhancement':
+      case "analyticsEnhancement":
         return { tracking: true, insights: true };
       default:
-        return { status: 'unknown' };
+        return { status: "unknown" };
     }
   }
 
   generateAccessibilityImprovements(_patterns) {
     return [
-      'Implement enhanced keyboard navigation patterns',
-      'Add ARIA live regions for dynamic content',
-      'Improve color contrast ratios',
-      'Add focus indicators for custom components',
+      "Implement enhanced keyboard navigation patterns",
+      "Add ARIA live regions for dynamic content",
+      "Improve color contrast ratios",
+      "Add focus indicators for custom components",
     ];
   }
 
   generateInteractivityImprovements(_patterns) {
     return [
-      'Add gesture-based interactions for touch devices',
-      'Implement collaborative real-time features',
-      'Enhance visual feedback for user actions',
-      'Add progressive disclosure for complex scenarios',
+      "Add gesture-based interactions for touch devices",
+      "Implement collaborative real-time features",
+      "Enhance visual feedback for user actions",
+      "Add progressive disclosure for complex scenarios",
     ];
   }
 
   generateVisualizationImprovements(_patterns) {
     return [
-      'Implement responsive data visualizations',
-      'Add interactive charts for ethics metrics',
-      'Create animated transitions for state changes',
-      'Develop customizable dashboard layouts',
+      "Implement responsive data visualizations",
+      "Add interactive charts for ethics metrics",
+      "Create animated transitions for state changes",
+      "Develop customizable dashboard layouts",
     ];
   }
 
   generateCommunityGuidelines() {
     return {
-      codeOfConduct: 'Respectful and inclusive behavior expected',
-      contributionProcess: 'Follow established templates and review process',
-      educatorSupport: 'Dedicated channels for educator feedback and support',
-      studentSafety: 'Privacy and safety protocols for educational use',
+      codeOfConduct: "Respectful and inclusive behavior expected",
+      contributionProcess: "Follow established templates and review process",
+      educatorSupport: "Dedicated channels for educator feedback and support",
+      studentSafety: "Privacy and safety protocols for educational use",
     };
   }
 
   generatePlatformRecommendations(_insights, _performanceReport) {
     return [
-      'Optimize loading times for better user experience',
-      'Enhance mobile responsiveness for classroom use',
-      'Implement progressive web app features',
-      'Add offline capabilities for limited connectivity environments',
+      "Optimize loading times for better user experience",
+      "Enhance mobile responsiveness for classroom use",
+      "Implement progressive web app features",
+      "Add offline capabilities for limited connectivity environments",
     ];
   }
 
   generateImplementationDocs(_scenarioConfig, _scenarioStructure) {
-    return 'Implementation documentation placeholder';
+    return "Implementation documentation placeholder";
   }
 
   generateEducatorDocs(_scenarioConfig, _realWorldContext) {
-    return 'Educator documentation placeholder';
+    return "Educator documentation placeholder";
   }
 
   generateTechnicalDocs(_scenarioStructure) {
-    return 'Technical documentation placeholder';
+    return "Technical documentation placeholder";
   }
 
   generateCommunityDocs(_scenarioConfig) {
-    return 'Community documentation placeholder';
+    return "Community documentation placeholder";
   }
 }
 

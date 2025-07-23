@@ -5,7 +5,7 @@
  * in the SimulateAI application.
  */
 
-import logger from './logger.js';
+import logger from "./logger.js";
 
 class InfiniteLoopDetector {
   constructor() {
@@ -37,10 +37,10 @@ class InfiniteLoopDetector {
   /**
    * Track function execution to detect potential loops
    */
-  trackExecution(functionName, context = '') {
+  trackExecution(functionName, context = "") {
     if (!this.isEnabled) return;
 
-    const key = `${functionName}${context ? `:${context}` : ''}`;
+    const key = `${functionName}${context ? `:${context}` : ""}`;
     const now = Date.now();
 
     // Initialize tracking for this function
@@ -52,7 +52,7 @@ class InfiniteLoopDetector {
     // Get existing timestamps and filter to time window
     const timestamps = this.callTimestamps.get(key);
     const recentCalls = timestamps.filter(
-      time => now - time < this.thresholds.timeWindow
+      (time) => now - time < this.thresholds.timeWindow,
     );
     recentCalls.push(now);
 
@@ -62,7 +62,7 @@ class InfiniteLoopDetector {
 
     // Check for excessive calls
     if (recentCalls.length > this.thresholds.callsPerSecond) {
-      this.handleSuspiciousActivity(key, recentCalls.length, 'EXCESSIVE_CALLS');
+      this.handleSuspiciousActivity(key, recentCalls.length, "EXCESSIVE_CALLS");
     }
 
     // Check call stack depth
@@ -74,10 +74,10 @@ class InfiniteLoopDetector {
    */
   checkCallStackDepth(functionName) {
     const { stack } = new Error();
-    const lines = stack.split('\n');
+    const lines = stack.split("\n");
 
     if (lines.length > this.thresholds.maxStackDepth) {
-      this.handleSuspiciousActivity(functionName, lines.length, 'DEEP_STACK');
+      this.handleSuspiciousActivity(functionName, lines.length, "DEEP_STACK");
       return true;
     }
 
@@ -87,8 +87,8 @@ class InfiniteLoopDetector {
       this.handleSuspiciousActivity(
         functionName,
         functionPattern.maxRepeats,
-        'RECURSIVE_PATTERN',
-        functionPattern.repeatedFunction
+        "RECURSIVE_PATTERN",
+        functionPattern.repeatedFunction,
       );
       return true;
     }
@@ -102,7 +102,7 @@ class InfiniteLoopDetector {
   analyzeCallStack(stackLines) {
     const functionNames = stackLines
       .slice(2) // Skip Error and checkCallStackDepth
-      .map(line => {
+      .map((line) => {
         const match = line.match(/at\s+(\w+)/);
         return match ? match[1] : null;
       })
@@ -126,15 +126,15 @@ class InfiniteLoopDetector {
   /**
    * Handle detection of suspicious activity
    */
-  handleSuspiciousActivity(functionName, count, type, details = '') {
+  handleSuspiciousActivity(functionName, count, type, details = "") {
     const message = this.formatWarningMessage(
       functionName,
       count,
       type,
-      details
+      details,
     );
 
-    logger.warn('InfiniteLoopDetector', `🚨 POTENTIAL LOOP: ${message}`);
+    logger.warn("InfiniteLoopDetector", `🚨 POTENTIAL LOOP: ${message}`);
 
     // Record the incident
     this.recordIncident(functionName, count, type, details);
@@ -150,11 +150,11 @@ class InfiniteLoopDetector {
    */
   formatWarningMessage(functionName, count, type, details) {
     switch (type) {
-      case 'EXCESSIVE_CALLS':
+      case "EXCESSIVE_CALLS":
         return `${functionName} called ${count} times in ${this.thresholds.timeWindow}ms`;
-      case 'DEEP_STACK':
+      case "DEEP_STACK":
         return `Deep call stack detected: ${count} levels in ${functionName}`;
-      case 'RECURSIVE_PATTERN':
+      case "RECURSIVE_PATTERN":
         return `Recursive pattern: ${details} appears ${count} times in stack (from ${functionName})`;
       default:
         return `Suspicious activity in ${functionName}: ${count} (${type})`;
@@ -168,9 +168,9 @@ class InfiniteLoopDetector {
     if (this.emergencyStopExecuted) return false;
 
     return (
-      (type === 'EXCESSIVE_CALLS' && count > this.EMERGENCY_CALLS_THRESHOLD) ||
-      (type === 'DEEP_STACK' && count > this.EMERGENCY_STACK_THRESHOLD) ||
-      (type === 'RECURSIVE_PATTERN' &&
+      (type === "EXCESSIVE_CALLS" && count > this.EMERGENCY_CALLS_THRESHOLD) ||
+      (type === "DEEP_STACK" && count > this.EMERGENCY_STACK_THRESHOLD) ||
+      (type === "RECURSIVE_PATTERN" &&
         count > this.EMERGENCY_RECURSION_THRESHOLD)
     );
   }
@@ -202,16 +202,16 @@ class InfiniteLoopDetector {
   /**
    * Execute emergency stop to halt runaway processes
    */
-  executeEmergencyStop(reason = 'Manual trigger') {
+  executeEmergencyStop(reason = "Manual trigger") {
     if (this.emergencyStopExecuted) {
-      logger.info('InfiniteLoopDetector', '🛑 Emergency stop already executed');
+      logger.info("InfiniteLoopDetector", "🛑 Emergency stop already executed");
       return;
     }
 
     this.emergencyStopExecuted = true;
     logger.warn(
-      'InfiniteLoopDetector',
-      `🛑 EXECUTING EMERGENCY STOP: ${reason}`
+      "InfiniteLoopDetector",
+      `🛑 EXECUTING EMERGENCY STOP: ${reason}`,
     );
 
     // Clear all timeouts and intervals
@@ -226,7 +226,7 @@ class InfiniteLoopDetector {
     // Disable this detector to prevent it from triggering more warnings
     this.isEnabled = false;
 
-    logger.info('InfiniteLoopDetector', '🛑 Emergency stop completed');
+    logger.info("InfiniteLoopDetector", "🛑 Emergency stop completed");
   }
 
   /**
@@ -239,9 +239,9 @@ class InfiniteLoopDetector {
         window.clearTimeout(i);
         window.clearInterval(i);
       }
-      logger.info('InfiniteLoopDetector', '✅ All timers cleared');
+      logger.info("InfiniteLoopDetector", "✅ All timers cleared");
     } catch (error) {
-      logger.error('InfiniteLoopDetector', '❌ Error clearing timers', error);
+      logger.error("InfiniteLoopDetector", "❌ Error clearing timers", error);
     }
   }
 
@@ -254,26 +254,26 @@ class InfiniteLoopDetector {
       if (window.app?.onboardingTour?.contentObserver) {
         window.app.onboardingTour.contentObserver.disconnect();
         logger.info(
-          'InfiniteLoopDetector',
-          '✅ Onboarding content observer disconnected'
+          "InfiniteLoopDetector",
+          "✅ Onboarding content observer disconnected",
         );
       }
 
       // Disconnect any mutation observers
       if (window.activeMutationObservers) {
-        window.activeMutationObservers.forEach(observer =>
-          observer.disconnect()
+        window.activeMutationObservers.forEach((observer) =>
+          observer.disconnect(),
         );
         logger.info(
-          'InfiniteLoopDetector',
-          '✅ Active mutation observers disconnected'
+          "InfiniteLoopDetector",
+          "✅ Active mutation observers disconnected",
         );
       }
     } catch (error) {
       logger.error(
-        'InfiniteLoopDetector',
-        '❌ Error disconnecting observers',
-        error
+        "InfiniteLoopDetector",
+        "❌ Error disconnecting observers",
+        error,
       );
     }
   }
@@ -285,22 +285,22 @@ class InfiniteLoopDetector {
     try {
       // Cancel animation frames
       if (window.activeAnimationFrames) {
-        window.activeAnimationFrames.forEach(id => cancelAnimationFrame(id));
-        logger.info('InfiniteLoopDetector', '✅ Animation frames cancelled');
+        window.activeAnimationFrames.forEach((id) => cancelAnimationFrame(id));
+        logger.info("InfiniteLoopDetector", "✅ Animation frames cancelled");
       }
 
       // Stop CSS animations
-      const elements = document.querySelectorAll('*');
-      elements.forEach(el => {
-        el.style.animationPlayState = 'paused';
-        el.style.transitionDuration = '0s';
+      const elements = document.querySelectorAll("*");
+      elements.forEach((el) => {
+        el.style.animationPlayState = "paused";
+        el.style.transitionDuration = "0s";
       });
-      logger.info('InfiniteLoopDetector', '✅ CSS animations paused');
+      logger.info("InfiniteLoopDetector", "✅ CSS animations paused");
     } catch (error) {
       logger.error(
-        'InfiniteLoopDetector',
-        '❌ Error stopping animations',
-        error
+        "InfiniteLoopDetector",
+        "❌ Error stopping animations",
+        error,
       );
     }
   }
@@ -325,7 +325,7 @@ class InfiniteLoopDetector {
     stats.topCallers = sortedCalls.map(([name, count]) => {
       const timestamps = this.callTimestamps.get(name) || [];
       const recentCount = timestamps.filter(
-        t => Date.now() - t < this.thresholds.timeWindow
+        (t) => Date.now() - t < this.thresholds.timeWindow,
       ).length;
       return { name, totalCalls: count, recentCalls: recentCount };
     });
@@ -341,7 +341,7 @@ class InfiniteLoopDetector {
     this.callTimestamps.clear();
     this.emergencyStopExecuted = false;
     this.isEnabled = true;
-    logger.info('InfiniteLoopDetector', '🔄 Loop detector reset');
+    logger.info("InfiniteLoopDetector", "🔄 Loop detector reset");
   }
 
   /**
@@ -350,8 +350,8 @@ class InfiniteLoopDetector {
   setEnabled(enabled) {
     this.isEnabled = enabled;
     logger.info(
-      'InfiniteLoopDetector',
-      `🔧 Loop detector ${enabled ? 'enabled' : 'disabled'}`
+      "InfiniteLoopDetector",
+      `🔧 Loop detector ${enabled ? "enabled" : "disabled"}`,
     );
   }
 }
@@ -363,7 +363,7 @@ const loopDetector = new InfiniteLoopDetector();
 export { InfiniteLoopDetector, loopDetector };
 
 // Add to window for debugging (always available in browser)
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.loopDetector = loopDetector;
 
   // Add convenient debugging functions
@@ -371,7 +371,7 @@ if (typeof window !== 'undefined') {
     // Track a specific function
     trackFunction: (obj, methodName) => {
       if (!obj[methodName]) {
-        logger.error('DebugUtils', `Method ${methodName} not found on object`);
+        logger.error("DebugUtils", `Method ${methodName} not found on object`);
         return;
       }
 
@@ -382,8 +382,8 @@ if (typeof window !== 'undefined') {
       };
 
       logger.info(
-        'DebugUtils',
-        `Now tracking ${obj.constructor.name}.${methodName}`
+        "DebugUtils",
+        `Now tracking ${obj.constructor.name}.${methodName}`,
       );
     },
 
@@ -392,8 +392,8 @@ if (typeof window !== 'undefined') {
       if (originalMethod) {
         obj[methodName] = originalMethod;
         logger.info(
-          'DebugUtils',
-          `Stopped tracking ${obj.constructor.name}.${methodName}`
+          "DebugUtils",
+          `Stopped tracking ${obj.constructor.name}.${methodName}`,
         );
       }
     },
@@ -402,17 +402,17 @@ if (typeof window !== 'undefined') {
     getStats: () => loopDetector.getStats(),
 
     // Manual emergency stop
-    emergencyStop: reason => loopDetector.executeEmergencyStop(reason),
+    emergencyStop: (reason) => loopDetector.executeEmergencyStop(reason),
 
     // Reset detector
     reset: () => loopDetector.reset(),
 
     // Enable/disable
-    setEnabled: enabled => loopDetector.setEnabled(enabled),
+    setEnabled: (enabled) => loopDetector.setEnabled(enabled),
   };
 
   logger.info(
-    'DebugUtils',
-    'Debug utilities loaded. Use window.debugUtils for manual controls.'
+    "DebugUtils",
+    "Debug utilities loaded. Use window.debugUtils for manual controls.",
   );
 }

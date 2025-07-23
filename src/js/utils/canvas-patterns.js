@@ -12,7 +12,7 @@
  * Licensed under the Apache License, Version 2.0
  */
 
-import { ComponentTheme } from '../objects/input-utility-components.js';
+import { ComponentTheme } from "../objects/input-utility-components.js";
 
 /**
  * Constants for common rendering patterns
@@ -25,14 +25,14 @@ export const CANVAS_PATTERNS = {
   CORNER_RADIUS: 4,
 
   // Common patterns identified in analysis
-  BACKGROUND_WITH_BORDER: 'background_with_border',
-  HEADER_WITH_DIVIDER: 'header_with_divider',
-  CONTENT_AREA: 'content_area',
-  BUTTON_STYLED: 'button_styled',
-  ICON_TEXT_COMBO: 'icon_text_combo',
-  PROGRESS_BAR: 'progress_bar',
-  LIST_ITEM: 'list_item',
-  TOOLTIP_STYLE: 'tooltip_style',
+  BACKGROUND_WITH_BORDER: "background_with_border",
+  HEADER_WITH_DIVIDER: "header_with_divider",
+  CONTENT_AREA: "content_area",
+  BUTTON_STYLED: "button_styled",
+  ICON_TEXT_COMBO: "icon_text_combo",
+  PROGRESS_BAR: "progress_bar",
+  LIST_ITEM: "list_item",
+  TOOLTIP_STYLE: "tooltip_style",
 };
 
 /**
@@ -57,11 +57,11 @@ export class CanvasPatterns {
     width,
     height,
     theme,
-    options = {}
+    options = {},
   ) {
     const {
-      backgroundColor = 'background',
-      borderColor = 'border',
+      backgroundColor = "background",
+      borderColor = "border",
       borderWidth = CANVAS_PATTERNS.BORDER_WIDTH,
       fillStyle = null,
       strokeStyle = null,
@@ -101,15 +101,15 @@ export class CanvasPatterns {
     height,
     text,
     theme,
-    options = {}
+    options = {},
   ) {
     const {
-      backgroundColor = 'backgroundSecondary',
-      textColor = 'text',
-      dividerColor = 'border',
-      fontSize = '14px',
-      fontFamily = 'Arial',
-      textAlign = 'left',
+      backgroundColor = "backgroundSecondary",
+      textColor = "text",
+      dividerColor = "border",
+      fontSize = "14px",
+      fontFamily = "Arial",
+      textAlign = "left",
       padding = 10,
     } = options;
 
@@ -121,9 +121,9 @@ export class CanvasPatterns {
     renderer.fillStyle = ComponentTheme.getColor(textColor, theme);
     renderer.font = `${fontSize} ${fontFamily}`;
     renderer.textAlign = textAlign;
-    renderer.textBaseline = 'middle';
+    renderer.textBaseline = "middle";
 
-    const textX = textAlign === 'center' ? x + width / 2 : x + padding;
+    const textX = textAlign === "center" ? x + width / 2 : x + padding;
     renderer.fillText(text, textX, y + height / 2);
 
     // Bottom divider
@@ -148,8 +148,8 @@ export class CanvasPatterns {
    */
   static renderContentArea(renderer, x, y, width, height, theme, options = {}) {
     const {
-      backgroundColor = 'background',
-      borderColor = 'border',
+      backgroundColor = "background",
+      borderColor = "border",
       showBorder = true,
       clip = false,
     } = options;
@@ -196,14 +196,14 @@ export class CanvasPatterns {
     height,
     text,
     theme,
-    options = {}
+    options = {},
   ) {
     const {
-      backgroundColor = 'primary',
-      textColor = 'primaryText',
-      borderColor = 'border',
-      fontSize = '12px',
-      fontFamily = 'Arial',
+      backgroundColor = "primary",
+      textColor = "primaryText",
+      borderColor = "border",
+      fontSize = "12px",
+      fontFamily = "Arial",
       isHovered = false,
       isPressed = false,
       showBorder = true,
@@ -231,8 +231,8 @@ export class CanvasPatterns {
     // Button text
     renderer.fillStyle = ComponentTheme.getColor(textColor, theme);
     renderer.font = `${fontSize} ${fontFamily}`;
-    renderer.textAlign = 'center';
-    renderer.textBaseline = 'middle';
+    renderer.textAlign = "center";
+    renderer.textBaseline = "middle";
     renderer.fillText(text, x + width / 2, y + height / 2);
   }
 
@@ -249,13 +249,13 @@ export class CanvasPatterns {
    */
   static renderIconWithText(renderer, x, y, icon, text, theme, options = {}) {
     const {
-      iconColor = 'text',
-      textColor = 'text',
-      iconSize = '16px',
-      textSize = '14px',
-      fontFamily = 'Arial',
+      iconColor = "text",
+      textColor = "text",
+      iconSize = "16px",
+      textSize = "14px",
+      fontFamily = "Arial",
       spacing = 8,
-      align = 'left', // 'left', 'center'
+      align = "left", // 'left', 'center'
     } = options;
 
     const iconFont = `${iconSize} ${fontFamily}`;
@@ -272,15 +272,15 @@ export class CanvasPatterns {
 
     // Calculate starting position based on alignment
     let startX = x;
-    if (align === 'center') {
+    if (align === "center") {
       startX = x - totalWidth / 2;
     }
 
     // Render icon
     renderer.fillStyle = ComponentTheme.getColor(iconColor, theme);
     renderer.font = iconFont;
-    renderer.textAlign = 'left';
-    renderer.textBaseline = 'middle';
+    renderer.textAlign = "left";
+    renderer.textBaseline = "middle";
     renderer.fillText(icon, startX, y);
 
     // Render text
@@ -311,15 +311,15 @@ export class CanvasPatterns {
     height,
     progress,
     theme,
-    options = {}
+    options = {},
   ) {
     const {
-      trackColor = 'backgroundSecondary',
-      fillColor = 'primary',
-      borderColor = 'border',
+      trackColor = "backgroundSecondary",
+      fillColor = "primary",
+      borderColor = "border",
       showBorder = true,
       showText = false,
-      textColor = 'text',
+      textColor = "text",
     } = options;
 
     // Progress track
@@ -344,9 +344,9 @@ export class CanvasPatterns {
     if (showText) {
       const percentage = `${Math.round(progress * 100)}%`;
       renderer.fillStyle = ComponentTheme.getColor(textColor, theme);
-      renderer.font = '11px Arial';
-      renderer.textAlign = 'center';
-      renderer.textBaseline = 'middle';
+      renderer.font = "11px Arial";
+      renderer.textAlign = "center";
+      renderer.textBaseline = "middle";
       renderer.fillText(percentage, x + width / 2, y + height / 2);
     }
   }
@@ -371,17 +371,17 @@ export class CanvasPatterns {
     height,
     text,
     theme,
-    options = {}
+    options = {},
   ) {
     const {
       isSelected = false,
       isHovered = false,
-      textColor = 'text',
-      selectedColor = 'primaryHover',
-      hoveredColor = 'backgroundSecondary',
+      textColor = "text",
+      selectedColor = "primaryHover",
+      hoveredColor = "backgroundSecondary",
       padding = 10,
-      fontSize = '13px',
-      fontFamily = 'Arial',
+      fontSize = "13px",
+      fontFamily = "Arial",
     } = options;
 
     // Item background
@@ -396,8 +396,8 @@ export class CanvasPatterns {
     // Item text
     renderer.fillStyle = ComponentTheme.getColor(textColor, theme);
     renderer.font = `${fontSize} ${fontFamily}`;
-    renderer.textAlign = 'left';
-    renderer.textBaseline = 'middle';
+    renderer.textAlign = "left";
+    renderer.textBaseline = "middle";
 
     // Truncate text if needed
     const maxWidth = width - padding * 2;
@@ -427,12 +427,12 @@ export class CanvasPatterns {
    */
   static renderTooltip(renderer, x, y, text, theme, options = {}) {
     const {
-      backgroundColor = 'backgroundSecondary',
-      textColor = 'text',
-      borderColor = 'border',
+      backgroundColor = "backgroundSecondary",
+      textColor = "text",
+      borderColor = "border",
       padding = 8,
-      fontSize = '12px',
-      fontFamily = 'Arial',
+      fontSize = "12px",
+      fontFamily = "Arial",
       cornerRadius = 4,
       showShadow = true,
       maxWidth = 200,
@@ -449,7 +449,7 @@ export class CanvasPatterns {
 
     // Shadow
     if (showShadow) {
-      renderer.fillStyle = 'rgba(0, 0, 0, 0.2)';
+      renderer.fillStyle = "rgba(0, 0, 0, 0.2)";
       this.drawRoundedRect(
         renderer,
         x + 2,
@@ -458,7 +458,7 @@ export class CanvasPatterns {
         tooltipHeight,
         cornerRadius,
         true,
-        false
+        false,
       );
     }
 
@@ -472,7 +472,7 @@ export class CanvasPatterns {
       tooltipHeight,
       cornerRadius,
       true,
-      false
+      false,
     );
 
     // Tooltip border
@@ -486,13 +486,13 @@ export class CanvasPatterns {
       tooltipHeight,
       cornerRadius,
       false,
-      true
+      true,
     );
 
     // Tooltip text
     renderer.fillStyle = ComponentTheme.getColor(textColor, theme);
-    renderer.textAlign = 'left';
-    renderer.textBaseline = 'middle';
+    renderer.textAlign = "left";
+    renderer.textBaseline = "middle";
     renderer.fillText(text, x + padding, y + tooltipHeight / 2);
 
     return { width: tooltipWidth, height: tooltipHeight };
@@ -517,7 +517,7 @@ export class CanvasPatterns {
     height,
     radius,
     fill = true,
-    stroke = false
+    stroke = false,
   ) {
     renderer.beginPath();
     renderer.moveTo(x + radius, y);
@@ -528,7 +528,7 @@ export class CanvasPatterns {
       x + width,
       y + height,
       x + width - radius,
-      y + height
+      y + height,
     );
     renderer.lineTo(x + radius, y + height);
     renderer.quadraticCurveTo(x, y + height, x, y + height - radius);
@@ -556,7 +556,7 @@ export class CanvasPatterns {
    */
   static renderGrid(renderer, x, y, width, height, theme, options = {}) {
     const {
-      gridColor = 'border',
+      gridColor = "border",
       horizontalLines = 5,
       verticalLines = 5,
       dashPattern = [2, 2],
@@ -598,7 +598,7 @@ export class CanvasPatterns {
    * @param {string} ellipsis - Ellipsis characters
    * @returns {string} Truncated text
    */
-  static truncateText(renderer, text, maxWidth, ellipsis = '...') {
+  static truncateText(renderer, text, maxWidth, ellipsis = "...") {
     if (renderer.measureText(text).width <= maxWidth) {
       return text;
     }

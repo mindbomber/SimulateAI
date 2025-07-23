@@ -36,14 +36,14 @@ const FOCUS_CONSTANTS = {
 
 // Standard selectors for focusable elements
 const FOCUSABLE_SELECTORS = [
-  'button:not([disabled])',
-  '[href]:not([disabled])',
-  'input:not([disabled])',
-  'select:not([disabled])',
-  'textarea:not([disabled])',
+  "button:not([disabled])",
+  "[href]:not([disabled])",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  "textarea:not([disabled])",
   '[tabindex]:not([tabindex="-1"]):not([disabled])',
   '[contenteditable="true"]',
-].join(', ');
+].join(", ");
 
 /**
  * Focus Stack Manager - tracks focus history for restoration
@@ -55,7 +55,7 @@ class FocusStack {
   }
 
   push(element) {
-    if (element && typeof element.focus === 'function') {
+    if (element && typeof element.focus === "function") {
       this.stack.push(element);
       if (this.stack.length > this.maxSize) {
         this.stack.shift(); // Remove oldest entry
@@ -95,22 +95,22 @@ class FocusManager {
 
   init() {
     // Track keyboard vs mouse navigation
-    document.addEventListener('mousedown', () => {
-      this.lastFocusMethod = 'mouse';
-      document.documentElement.classList.remove('keyboard-navigation');
+    document.addEventListener("mousedown", () => {
+      this.lastFocusMethod = "mouse";
+      document.documentElement.classList.remove("keyboard-navigation");
     });
 
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Tab') {
-        this.lastFocusMethod = 'keyboard';
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Tab") {
+        this.lastFocusMethod = "keyboard";
         this.keyboardNavigationActive = true;
-        document.documentElement.classList.add('keyboard-navigation');
+        document.documentElement.classList.add("keyboard-navigation");
       }
     });
 
     // Global escape key handler for trapped focus
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && this.activeTrappers.size > 0) {
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && this.activeTrappers.size > 0) {
         this.handleEscapeKey(e);
       }
     });
@@ -164,14 +164,14 @@ class FocusManager {
     if (
       element &&
       document.contains(element) &&
-      typeof element.focus === 'function'
+      typeof element.focus === "function"
     ) {
       try {
         element.focus();
         return true;
       } catch (error) {
         // Silent fail for focus restoration - avoid console.warn for linting
-        if (process?.env?.NODE_ENV === 'development') {
+        if (process?.env?.NODE_ENV === "development") {
           // Only log in development
         }
       }
@@ -197,17 +197,17 @@ class FocusManager {
     const {
       delay = 0,
       preventScroll = false,
-      method = 'programmatic',
+      method = "programmatic",
     } = options;
 
-    if (!element || typeof element.focus !== 'function') {
+    if (!element || typeof element.focus !== "function") {
       return false;
     }
 
     this.lastFocusMethod = method;
 
     if (delay > 0) {
-      await new Promise(resolve => setTimeout(resolve, delay));
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
 
     try {
@@ -243,7 +243,7 @@ class FocusManager {
 
     return this.focusElement(firstFocusable, {
       delay,
-      method: 'auto',
+      method: "auto",
     });
   }
 
@@ -263,10 +263,10 @@ class FocusManager {
       this.storeFocus();
     }
 
-    const trapId = Symbol('focus-trap');
+    const trapId = Symbol("focus-trap");
 
-    const trapHandler = event => {
-      if (event.key === 'Tab') {
+    const trapHandler = (event) => {
+      if (event.key === "Tab") {
         this.handleTabInTrap(event, container);
       }
     };
@@ -275,7 +275,7 @@ class FocusManager {
     this.activeTrappers.add(trapId);
 
     // Set up event listener
-    document.addEventListener('keydown', trapHandler);
+    document.addEventListener("keydown", trapHandler);
 
     // Auto-focus if requested
     if (autoFocus) {
@@ -287,7 +287,7 @@ class FocusManager {
       id: trapId,
       container,
       destroy: () => {
-        document.removeEventListener('keydown', trapHandler);
+        document.removeEventListener("keydown", trapHandler);
         this.activeTrappers.delete(trapId);
 
         if (restoreFocus) {
@@ -356,14 +356,14 @@ class FocusManager {
     const {
       selector = container.children,
       wrap = true,
-      orientation = 'both', // 'horizontal', 'vertical', 'both'
+      orientation = "both", // 'horizontal', 'vertical', 'both'
     } = options;
 
-    return event => {
+    return (event) => {
       const items = Array.from(
-        typeof selector === 'string'
+        typeof selector === "string"
           ? container.querySelectorAll(selector)
-          : selector
+          : selector,
       );
 
       const currentIndex = items.indexOf(document.activeElement);
@@ -372,8 +372,8 @@ class FocusManager {
       let newIndex = currentIndex;
 
       switch (event.key) {
-        case 'ArrowLeft':
-          if (orientation === 'horizontal' || orientation === 'both') {
+        case "ArrowLeft":
+          if (orientation === "horizontal" || orientation === "both") {
             event.preventDefault();
             newIndex =
               wrap && currentIndex === 0
@@ -382,8 +382,8 @@ class FocusManager {
           }
           break;
 
-        case 'ArrowRight':
-          if (orientation === 'horizontal' || orientation === 'both') {
+        case "ArrowRight":
+          if (orientation === "horizontal" || orientation === "both") {
             event.preventDefault();
             newIndex =
               wrap && currentIndex === items.length - 1
@@ -392,8 +392,8 @@ class FocusManager {
           }
           break;
 
-        case 'ArrowUp':
-          if (orientation === 'vertical' || orientation === 'both') {
+        case "ArrowUp":
+          if (orientation === "vertical" || orientation === "both") {
             event.preventDefault();
             newIndex =
               wrap && currentIndex === 0
@@ -402,8 +402,8 @@ class FocusManager {
           }
           break;
 
-        case 'ArrowDown':
-          if (orientation === 'vertical' || orientation === 'both') {
+        case "ArrowDown":
+          if (orientation === "vertical" || orientation === "both") {
             event.preventDefault();
             newIndex =
               wrap && currentIndex === items.length - 1
@@ -412,12 +412,12 @@ class FocusManager {
           }
           break;
 
-        case 'Home':
+        case "Home":
           event.preventDefault();
           newIndex = 0;
           break;
 
-        case 'End':
+        case "End":
           event.preventDefault();
           newIndex = items.length - 1;
           break;
@@ -431,9 +431,9 @@ class FocusManager {
 
         // Scroll into view if needed
         items[newIndex].scrollIntoView({
-          behavior: 'smooth',
-          block: 'nearest',
-          inline: 'nearest',
+          behavior: "smooth",
+          block: "nearest",
+          inline: "nearest",
         });
       }
     };

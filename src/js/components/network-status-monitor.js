@@ -20,14 +20,14 @@ class NetworkStatusMonitor {
    * Initialize network event listeners
    */
   initializeNetworkListeners() {
-    window.addEventListener('online', () => {
+    window.addEventListener("online", () => {
       this.isOnline = true;
-      this.handleNetworkChange('online');
+      this.handleNetworkChange("online");
     });
 
-    window.addEventListener('offline', () => {
+    window.addEventListener("offline", () => {
       this.isOnline = false;
-      this.handleNetworkChange('offline');
+      this.handleNetworkChange("offline");
     });
   }
 
@@ -35,7 +35,7 @@ class NetworkStatusMonitor {
    * Handle network status changes
    */
   handleNetworkChange(status) {
-    if (status === 'online') {
+    if (status === "online") {
       this.showReconnectedMessage();
       this.hide();
       this.retryCount = 0;
@@ -47,7 +47,7 @@ class NetworkStatusMonitor {
   /**
    * Show network error status
    */
-  showNetworkError(context = 'general', errorDetails = null) {
+  showNetworkError(context = "general", errorDetails = null) {
     this.lastErrorContext = context;
     this.createContainer();
     this.updateContent(context, errorDetails);
@@ -59,9 +59,9 @@ class NetworkStatusMonitor {
    * Show offline status
    */
   showOfflineStatus() {
-    this.showNetworkError('offline', {
-      title: 'No Internet Connection',
-      message: 'Please check your network connection and try again.',
+    this.showNetworkError("offline", {
+      title: "No Internet Connection",
+      message: "Please check your network connection and try again.",
       canRetry: false,
     });
   }
@@ -91,8 +91,8 @@ class NetworkStatusMonitor {
       return;
     }
 
-    this.container = document.createElement('div');
-    this.container.className = 'network-status-monitor';
+    this.container = document.createElement("div");
+    this.container.className = "network-status-monitor";
     this.container.innerHTML = `
       <div class="network-status-content">
         <div class="network-status-icon">🌐</div>
@@ -119,16 +119,16 @@ class NetworkStatusMonitor {
     `;
 
     // Add event listeners
-    const retryBtn = this.container.querySelector('.network-retry-btn');
-    const closeBtn = this.container.querySelector('.network-close-btn');
+    const retryBtn = this.container.querySelector(".network-retry-btn");
+    const closeBtn = this.container.querySelector(".network-close-btn");
 
-    retryBtn.addEventListener('click', () => this.retryConnection());
-    closeBtn.addEventListener('click', () => this.hide());
+    retryBtn.addEventListener("click", () => this.retryConnection());
+    closeBtn.addEventListener("click", () => this.hide());
 
     // Insert into DOM
     const targetContainer =
-      document.querySelector('.auth-modal') ||
-      document.querySelector('.modal-content') ||
+      document.querySelector(".auth-modal") ||
+      document.querySelector(".modal-content") ||
       document.body;
 
     targetContainer.appendChild(this.container);
@@ -140,68 +140,68 @@ class NetworkStatusMonitor {
   updateContent(context, errorDetails) {
     if (!this.container) return;
 
-    const icon = this.container.querySelector('.network-status-icon');
-    const title = this.container.querySelector('.network-status-title');
+    const icon = this.container.querySelector(".network-status-icon");
+    const title = this.container.querySelector(".network-status-title");
     const description = this.container.querySelector(
-      '.network-status-description'
+      ".network-status-description",
     );
-    const retryBtn = this.container.querySelector('.network-retry-btn');
+    const retryBtn = this.container.querySelector(".network-retry-btn");
 
     // Update based on context
     switch (context) {
-      case 'offline':
-        icon.textContent = '📵';
-        title.textContent = 'No Internet Connection';
+      case "offline":
+        icon.textContent = "📵";
+        title.textContent = "No Internet Connection";
         description.textContent =
-          'You appear to be offline. Please check your connection.';
-        retryBtn.style.display = 'none';
+          "You appear to be offline. Please check your connection.";
+        retryBtn.style.display = "none";
         break;
 
-      case 'auth_network_error':
-        icon.textContent = '🔐';
-        title.textContent = 'Authentication Network Error';
+      case "auth_network_error":
+        icon.textContent = "🔐";
+        title.textContent = "Authentication Network Error";
         description.textContent =
-          'Unable to connect to authentication servers. This may be temporary.';
-        retryBtn.style.display = 'inline-block';
+          "Unable to connect to authentication servers. This may be temporary.";
+        retryBtn.style.display = "inline-block";
         break;
 
-      case 'firebase_network_error':
-        icon.textContent = '☁️';
-        title.textContent = 'Service Connection Issue';
+      case "firebase_network_error":
+        icon.textContent = "☁️";
+        title.textContent = "Service Connection Issue";
         description.textContent =
-          'Having trouble connecting to our servers. Please try again.';
-        retryBtn.style.display = 'inline-block';
+          "Having trouble connecting to our servers. Please try again.";
+        retryBtn.style.display = "inline-block";
         break;
 
-      case 'timeout':
-        icon.textContent = '⏱️';
-        title.textContent = 'Request Timeout';
+      case "timeout":
+        icon.textContent = "⏱️";
+        title.textContent = "Request Timeout";
         description.textContent =
-          'The request took too long. Your connection may be slow.';
-        retryBtn.style.display = 'inline-block';
+          "The request took too long. Your connection may be slow.";
+        retryBtn.style.display = "inline-block";
         break;
 
       default:
-        icon.textContent = '🌐';
-        title.textContent = errorDetails?.title || 'Network Error';
+        icon.textContent = "🌐";
+        title.textContent = errorDetails?.title || "Network Error";
         description.textContent =
           errorDetails?.message ||
-          'A network error occurred. Please try again.';
+          "A network error occurred. Please try again.";
         retryBtn.style.display =
-          errorDetails?.canRetry !== false ? 'inline-block' : 'none';
+          errorDetails?.canRetry !== false ? "inline-block" : "none";
     }
 
     // Update retry button text based on retry count
     if (this.retryCount > 0) {
       retryBtn.textContent = `Try Again (${this.retryCount}/${this.maxRetries})`;
     } else {
-      retryBtn.textContent = 'Try Again';
+      retryBtn.textContent = "Try Again";
     }
 
     // Disable retry if max attempts reached
     if (this.retryCount >= this.maxRetries) {
       retryBtn.disabled = true;
-      retryBtn.textContent = 'Max Retries Reached';
+      retryBtn.textContent = "Max Retries Reached";
     }
   }
 
@@ -215,10 +215,10 @@ class NetworkStatusMonitor {
 
     this.retryCount++;
 
-    const retryBtn = this.container?.querySelector('.network-retry-btn');
+    const retryBtn = this.container?.querySelector(".network-retry-btn");
     if (retryBtn) {
       retryBtn.disabled = true;
-      retryBtn.textContent = 'Testing Connection...';
+      retryBtn.textContent = "Testing Connection...";
     }
 
     // Test network connectivity
@@ -250,10 +250,10 @@ class NetworkStatusMonitor {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-      const response = await fetch('https://www.google.com/favicon.ico', {
-        method: 'HEAD',
+      const response = await fetch("https://www.google.com/favicon.ico", {
+        method: "HEAD",
         signal: controller.signal,
-        cache: 'no-cache',
+        cache: "no-cache",
       });
 
       clearTimeout(timeoutId);
@@ -275,7 +275,7 @@ class NetworkStatusMonitor {
       if (navigator.onLine) {
         const isConnected = await this.testConnectivity();
         if (isConnected) {
-          this.handleNetworkChange('online');
+          this.handleNetworkChange("online");
         }
       }
     }, 10000); // Check every 10 seconds
@@ -285,8 +285,8 @@ class NetworkStatusMonitor {
    * Show reconnection success message
    */
   showReconnectedMessage() {
-    const message = document.createElement('div');
-    message.className = 'network-reconnected-message';
+    const message = document.createElement("div");
+    message.className = "network-reconnected-message";
     message.innerHTML = `
       <div class="network-reconnected-content">
         <span class="network-reconnected-icon">✅</span>
@@ -310,16 +310,16 @@ class NetworkStatusMonitor {
   notifyReconnection() {
     // Dispatch custom event for other components to listen to
     window.dispatchEvent(
-      new CustomEvent('networkReconnected', {
+      new CustomEvent("networkReconnected", {
         detail: { timestamp: Date.now() },
-      })
+      }),
     );
   }
 
   /**
    * Static method to handle network errors in other components
    */
-  static handleNetworkError(error, context = 'general') {
+  static handleNetworkError(error, context = "general") {
     if (!window.networkStatusMonitor) {
       window.networkStatusMonitor = new NetworkStatusMonitor();
     }
@@ -327,17 +327,17 @@ class NetworkStatusMonitor {
     // Check if it's a network-related error
     const isNetworkError =
       !navigator.onLine ||
-      error?.code === 'auth/network-request-failed' ||
-      error?.message?.includes('network') ||
-      error?.message?.includes('fetch') ||
-      error?.message?.includes('NetworkError') ||
-      error?.name === 'NetworkError';
+      error?.code === "auth/network-request-failed" ||
+      error?.message?.includes("network") ||
+      error?.message?.includes("fetch") ||
+      error?.message?.includes("NetworkError") ||
+      error?.name === "NetworkError";
 
     if (isNetworkError) {
       window.networkStatusMonitor.showNetworkError(context, {
-        title: 'Network Connection Problem',
+        title: "Network Connection Problem",
         message:
-          'Unable to connect to the server. Please check your internet connection.',
+          "Unable to connect to the server. Please check your internet connection.",
         canRetry: true,
       });
       return true; // Indicates error was handled
@@ -529,15 +529,15 @@ const networkStatusCSS = `
 `;
 
 // Inject CSS styles
-if (!document.querySelector('#network-status-styles')) {
-  const style = document.createElement('style');
-  style.id = 'network-status-styles';
+if (!document.querySelector("#network-status-styles")) {
+  const style = document.createElement("style");
+  style.id = "network-status-styles";
   style.textContent = networkStatusCSS;
   document.head.appendChild(style);
 }
 
 // Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
   module.exports = NetworkStatusMonitor;
 } else {
   window.NetworkStatusMonitor = NetworkStatusMonitor;

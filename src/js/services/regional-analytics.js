@@ -13,14 +13,14 @@
  * before any optional server-side aggregation.
  */
 
-import logger from '../utils/logger.js';
-import AnalyticsManager from '../utils/analytics.js';
+import logger from "../utils/logger.js";
+import AnalyticsManager from "../utils/analytics.js";
 
 /**
  * Constants for regional analytics
  */
 const REGIONAL_ANALYTICS_CONSTANTS = {
-  STORAGE_PREFIX: 'simulateai_regional_',
+  STORAGE_PREFIX: "simulateai_regional_",
   MAX_DECISIONS_PER_REGION: 1000,
   TOP_REGIONS_LIMIT: 5,
   TOP_SCENARIOS_LIMIT: 3,
@@ -44,24 +44,24 @@ REGIONAL_ANALYTICS_CONSTANTS.CACHE_DURATION =
   REGIONAL_ANALYTICS_CONSTANTS.TIME_CONSTANTS.MILLISECONDS_PER_SECOND;
 
 REGIONAL_ANALYTICS_CONSTANTS.ETHICS_FRAMEWORKS = [
-  'utilitarian',
-  'deontological',
-  'virtue-ethics',
-  'care-ethics',
-  'consequentialist',
-  'rights-based',
-  'cultural-relativist',
+  "utilitarian",
+  "deontological",
+  "virtue-ethics",
+  "care-ethics",
+  "consequentialist",
+  "rights-based",
+  "cultural-relativist",
 ];
 
 REGIONAL_ANALYTICS_CONSTANTS.DECISION_CATEGORIES = [
-  'fairness',
-  'sustainability',
-  'autonomy',
-  'beneficence',
-  'transparency',
-  'accountability',
-  'privacy',
-  'proportionality',
+  "fairness",
+  "sustainability",
+  "autonomy",
+  "beneficence",
+  "transparency",
+  "accountability",
+  "privacy",
+  "proportionality",
 ];
 
 /**
@@ -84,7 +84,7 @@ class RegionalAnalytics {
   async init() {
     // Prevent multiple initializations
     if (this.isInitialized) {
-      logger.debug('Regional Analytics already initialized, skipping');
+      logger.debug("Regional Analytics already initialized, skipping");
       return;
     }
 
@@ -94,9 +94,9 @@ class RegionalAnalytics {
       this.setupEventListeners();
       this.isInitialized = true;
 
-      logger.info('Regional Analytics initialized successfully');
+      logger.info("Regional Analytics initialized successfully");
     } catch (error) {
-      logger.error('Failed to initialize Regional Analytics:', error);
+      logger.error("Failed to initialize Regional Analytics:", error);
     }
   }
 
@@ -120,19 +120,19 @@ class RegionalAnalytics {
       this.geographicData = geographic;
       this.storeGeographicData(geographic);
 
-      logger.info('Geographic data loaded:', {
+      logger.info("Geographic data loaded:", {
         region: geographic.region,
         country: geographic.country,
         timezone: geographic.timezone,
       });
     } catch (error) {
-      logger.error('Failed to load geographic data:', error);
+      logger.error("Failed to load geographic data:", error);
       // Fallback to minimal data
       this.geographicData = {
-        region: 'unknown',
-        country: 'unknown',
-        timezone: 'UTC',
-        locale: 'en-US',
+        region: "unknown",
+        country: "unknown",
+        timezone: "UTC",
+        locale: "en-US",
       };
     }
   }
@@ -143,38 +143,38 @@ class RegionalAnalytics {
   estimateGeographicData(timezone, locale) {
     // Regional mapping based on timezone
     const regionMapping = {
-      'America/': 'Americas',
-      'Europe/': 'Europe',
-      'Asia/': 'Asia',
-      'Africa/': 'Africa',
-      'Australia/': 'Oceania',
-      'Pacific/': 'Oceania',
+      "America/": "Americas",
+      "Europe/": "Europe",
+      "Asia/": "Asia",
+      "Africa/": "Africa",
+      "Australia/": "Oceania",
+      "Pacific/": "Oceania",
     };
 
     // Country mapping from locale
     const countryMapping = {
-      'en-US': 'United States',
-      'en-GB': 'United Kingdom',
-      'en-CA': 'Canada',
-      'en-AU': 'Australia',
-      'fr-FR': 'France',
-      'de-DE': 'Germany',
-      'es-ES': 'Spain',
-      'it-IT': 'Italy',
-      'ja-JP': 'Japan',
-      'ko-KR': 'South Korea',
-      'zh-CN': 'China',
-      'pt-BR': 'Brazil',
-      'ru-RU': 'Russia',
-      'ar-SA': 'Saudi Arabia',
-      'hi-IN': 'India',
+      "en-US": "United States",
+      "en-GB": "United Kingdom",
+      "en-CA": "Canada",
+      "en-AU": "Australia",
+      "fr-FR": "France",
+      "de-DE": "Germany",
+      "es-ES": "Spain",
+      "it-IT": "Italy",
+      "ja-JP": "Japan",
+      "ko-KR": "South Korea",
+      "zh-CN": "China",
+      "pt-BR": "Brazil",
+      "ru-RU": "Russia",
+      "ar-SA": "Saudi Arabia",
+      "hi-IN": "India",
     };
 
-    const region = Object.keys(regionMapping).find(key =>
-      timezone.startsWith(key)
+    const region = Object.keys(regionMapping).find((key) =>
+      timezone.startsWith(key),
     );
-    const estimatedRegion = region ? regionMapping[region] : 'Unknown';
-    const estimatedCountry = countryMapping[locale] || 'Unknown';
+    const estimatedRegion = region ? regionMapping[region] : "Unknown";
+    const estimatedCountry = countryMapping[locale] || "Unknown";
 
     return {
       region: estimatedRegion,
@@ -192,43 +192,43 @@ class RegionalAnalytics {
   getCulturalContext(region) {
     const contexts = {
       Americas: {
-        individualism: 'high',
-        collectivism: 'low',
-        powerDistance: 'medium',
-        uncertaintyAvoidance: 'medium',
+        individualism: "high",
+        collectivism: "low",
+        powerDistance: "medium",
+        uncertaintyAvoidance: "medium",
       },
       Europe: {
-        individualism: 'medium',
-        collectivism: 'medium',
-        powerDistance: 'low',
-        uncertaintyAvoidance: 'high',
+        individualism: "medium",
+        collectivism: "medium",
+        powerDistance: "low",
+        uncertaintyAvoidance: "high",
       },
       Asia: {
-        individualism: 'low',
-        collectivism: 'high',
-        powerDistance: 'high',
-        uncertaintyAvoidance: 'medium',
+        individualism: "low",
+        collectivism: "high",
+        powerDistance: "high",
+        uncertaintyAvoidance: "medium",
       },
       Africa: {
-        individualism: 'low',
-        collectivism: 'high',
-        powerDistance: 'high',
-        uncertaintyAvoidance: 'medium',
+        individualism: "low",
+        collectivism: "high",
+        powerDistance: "high",
+        uncertaintyAvoidance: "medium",
       },
       Oceania: {
-        individualism: 'high',
-        collectivism: 'low',
-        powerDistance: 'low',
-        uncertaintyAvoidance: 'low',
+        individualism: "high",
+        collectivism: "low",
+        powerDistance: "low",
+        uncertaintyAvoidance: "low",
       },
     };
 
     return (
       contexts[region] || {
-        individualism: 'unknown',
-        collectivism: 'unknown',
-        powerDistance: 'unknown',
-        uncertaintyAvoidance: 'unknown',
+        individualism: "unknown",
+        collectivism: "unknown",
+        powerDistance: "unknown",
+        uncertaintyAvoidance: "unknown",
       }
     );
   }
@@ -237,17 +237,17 @@ class RegionalAnalytics {
    * Check if user has given location consent
    */
   hasLocationConsent() {
-    const consent = localStorage.getItem('simulateai_location_consent');
-    return consent === 'granted';
+    const consent = localStorage.getItem("simulateai_location_consent");
+    return consent === "granted";
   }
 
   /**
    * Request precise location with user consent
    */
   async requestPreciseLocation(geographic) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       navigator.geolocation.getCurrentPosition(
-        position => {
+        (position) => {
           geographic.coordinates = {
             latitude: Math.round(position.coords.latitude * 10) / 10, // Rounded for privacy
             longitude: Math.round(position.coords.longitude * 10) / 10,
@@ -255,12 +255,12 @@ class RegionalAnalytics {
           geographic.preciseLocation = true;
           resolve(geographic);
         },
-        error => {
-          logger.warn('Precise location not available:', error.message);
+        (error) => {
+          logger.warn("Precise location not available:", error.message);
           geographic.preciseLocation = false;
           resolve(geographic);
         },
-        { timeout: 5000, enableHighAccuracy: false }
+        { timeout: 5000, enableHighAccuracy: false },
       );
     });
   }
@@ -270,7 +270,7 @@ class RegionalAnalytics {
    */
   trackScenarioDecision(decisionData) {
     if (!this.isInitialized || !this.geographicData) {
-      logger.warn('Regional analytics not initialized for decision tracking');
+      logger.warn("Regional analytics not initialized for decision tracking");
       return;
     }
 
@@ -295,7 +295,7 @@ class RegionalAnalytics {
     // Track with analytics
     this.trackDecisionAnalytics(enhancedDecision);
 
-    logger.debug('Scenario decision tracked with regional context:', {
+    logger.debug("Scenario decision tracked with regional context:", {
       scenario: decisionData.scenario,
       region: this.geographicData.region,
       choice: decisionData.choice,
@@ -308,7 +308,7 @@ class RegionalAnalytics {
   storeDecisionLocally(decision) {
     try {
       const storageKey = `${REGIONAL_ANALYTICS_CONSTANTS.STORAGE_PREFIX}decisions`;
-      let decisions = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      let decisions = JSON.parse(localStorage.getItem(storageKey) || "[]");
 
       decisions.push(decision);
 
@@ -317,13 +317,13 @@ class RegionalAnalytics {
         decisions.length > REGIONAL_ANALYTICS_CONSTANTS.MAX_DECISIONS_PER_REGION
       ) {
         decisions = decisions.slice(
-          -REGIONAL_ANALYTICS_CONSTANTS.MAX_DECISIONS_PER_REGION
+          -REGIONAL_ANALYTICS_CONSTANTS.MAX_DECISIONS_PER_REGION,
         );
       }
 
       localStorage.setItem(storageKey, JSON.stringify(decisions));
     } catch (error) {
-      logger.error('Failed to store decision locally:', error);
+      logger.error("Failed to store decision locally:", error);
     }
   }
 
@@ -374,7 +374,7 @@ class RegionalAnalytics {
    * Track decision with analytics
    */
   trackDecisionAnalytics(decision) {
-    AnalyticsManager.trackEvent('regional_decision', {
+    AnalyticsManager.trackEvent("regional_decision", {
       region: decision.geographic.region,
       country: decision.geographic.country,
       scenario: decision.scenario,
@@ -408,7 +408,7 @@ class RegionalAnalytics {
   generateGlobalSummary() {
     const totalDecisions = Array.from(this.decisionPatterns.values()).reduce(
       (sum, pattern) => sum + pattern.totalDecisions,
-      0
+      0,
     );
 
     const activeRegions = this.decisionPatterns.size;
@@ -476,12 +476,12 @@ class RegionalAnalytics {
 
     for (const [region, patterns] of this.decisionPatterns) {
       const cultural = this.getCulturalIndicators(region);
-      if (cultural.individualism !== 'unknown') {
+      if (cultural.individualism !== "unknown") {
         trends.set(region, {
           individualism: cultural.individualism,
-          autonomyPreference: this.getEthicsAverage(patterns, 'autonomy'),
-          fairnessPreference: this.getEthicsAverage(patterns, 'fairness'),
-          beneficencePreference: this.getEthicsAverage(patterns, 'beneficence'),
+          autonomyPreference: this.getEthicsAverage(patterns, "autonomy"),
+          fairnessPreference: this.getEthicsAverage(patterns, "fairness"),
+          beneficencePreference: this.getEthicsAverage(patterns, "beneficence"),
         });
       }
     }
@@ -497,19 +497,19 @@ class RegionalAnalytics {
 
     for (const [region, decisionData] of this.decisionPatterns) {
       const cultural = this.getCulturalIndicators(region);
-      if (cultural.powerDistance !== 'unknown') {
+      if (cultural.powerDistance !== "unknown") {
         patterns.set(region, {
           powerDistance: cultural.powerDistance,
           authorityRespect: this.getEthicsAverage(
             decisionData,
-            'accountability'
+            "accountability",
           ),
           hierarchyPreference: this.getEthicsAverage(
             decisionData,
-            'transparency'
+            "transparency",
           ),
           leadershipStyle:
-            cultural.powerDistance === 'high' ? 'hierarchical' : 'egalitarian',
+            cultural.powerDistance === "high" ? "hierarchical" : "egalitarian",
         });
       }
     }
@@ -526,13 +526,13 @@ class RegionalAnalytics {
     for (const [region, decisionData] of this.decisionPatterns) {
       const cultural = this.getCulturalIndicators(region);
       patterns.set(region, {
-        uncertaintyAvoidance: cultural.uncertaintyAvoidance || 'medium',
-        riskTolerance: this.getEthicsAverage(decisionData, 'proportionality'),
+        uncertaintyAvoidance: cultural.uncertaintyAvoidance || "medium",
+        riskTolerance: this.getEthicsAverage(decisionData, "proportionality"),
         structurePreference: this.getEthicsAverage(
           decisionData,
-          'accountability'
+          "accountability",
         ),
-        innovationOpenness: this.getEthicsAverage(decisionData, 'autonomy'),
+        innovationOpenness: this.getEthicsAverage(decisionData, "autonomy"),
       });
     }
 
@@ -547,10 +547,10 @@ class RegionalAnalytics {
 
     for (const [region, decisionData] of this.decisionPatterns) {
       const frameworkPreferences = {
-        utilitarian: this.getEthicsAverage(decisionData, 'beneficence'),
-        deontological: this.getEthicsAverage(decisionData, 'fairness'),
-        virtue: this.getEthicsAverage(decisionData, 'accountability'),
-        care: this.getEthicsAverage(decisionData, 'sustainability'),
+        utilitarian: this.getEthicsAverage(decisionData, "beneficence"),
+        deontological: this.getEthicsAverage(decisionData, "fairness"),
+        virtue: this.getEthicsAverage(decisionData, "accountability"),
+        care: this.getEthicsAverage(decisionData, "sustainability"),
       };
 
       frameworks.set(region, frameworkPreferences);
@@ -565,7 +565,7 @@ class RegionalAnalytics {
   generateEthicsPreferences() {
     const preferences = {};
 
-    REGIONAL_ANALYTICS_CONSTANTS.DECISION_CATEGORIES.forEach(category => {
+    REGIONAL_ANALYTICS_CONSTANTS.DECISION_CATEGORIES.forEach((category) => {
       preferences[category] = this.analyzeEthicsCategory(category);
     });
 
@@ -599,7 +599,7 @@ class RegionalAnalytics {
     if (totalCount > 0) {
       analysis.globalAverage = totalSum / totalCount;
       analysis.regionalVariation = regionalData.sort(
-        (a, b) => b.average - a.average
+        (a, b) => b.average - a.average,
       );
       analysis.highestRegion = regionalData[0];
       analysis.lowestRegion = regionalData[regionalData.length - 1];
@@ -621,25 +621,25 @@ class RegionalAnalytics {
 
       recommendations.push({
         region,
-        type: 'regional_customization',
-        priority: 'high',
+        type: "regional_customization",
+        priority: "high",
         suggestion: this.generateRegionalCustomizationSuggestion(
           ethicsProfile,
-          culturalContext
+          culturalContext,
         ),
         impact:
-          'Improve user engagement by tailoring content to regional preferences',
+          "Improve user engagement by tailoring content to regional preferences",
       });
     }
 
     // Global feature recommendations
     const globalTrends = this.identifyGlobalTrends();
     recommendations.push({
-      region: 'global',
-      type: 'feature_development',
-      priority: 'medium',
+      region: "global",
+      type: "feature_development",
+      priority: "medium",
       suggestion: this.generateGlobalFeatureSuggestion(globalTrends),
-      impact: 'Enhance platform with features that appeal to global audience',
+      impact: "Enhance platform with features that appeal to global audience",
     });
 
     return recommendations;
@@ -652,7 +652,7 @@ class RegionalAnalytics {
     const decisions = this.getAllDecisions();
     if (decisions.length === 0) return null;
 
-    const timestamps = decisions.map(d => d.timestamp);
+    const timestamps = decisions.map((d) => d.timestamp);
     const earliest = Math.min(...timestamps);
     const latest = Math.max(...timestamps);
 
@@ -669,9 +669,9 @@ class RegionalAnalytics {
   getAllDecisions() {
     try {
       const storageKey = `${REGIONAL_ANALYTICS_CONSTANTS.STORAGE_PREFIX}decisions`;
-      return JSON.parse(localStorage.getItem(storageKey) || '[]');
+      return JSON.parse(localStorage.getItem(storageKey) || "[]");
     } catch (error) {
-      logger.error('Failed to get all decisions:', error);
+      logger.error("Failed to get all decisions:", error);
       return [];
     }
   }
@@ -682,10 +682,10 @@ class RegionalAnalytics {
   getCulturalIndicators(_region) {
     return (
       this.geographicData?.culturalContext || {
-        individualism: 'unknown',
-        collectivism: 'unknown',
-        powerDistance: 'unknown',
-        uncertaintyAvoidance: 'unknown',
+        individualism: "unknown",
+        collectivism: "unknown",
+        powerDistance: "unknown",
+        uncertaintyAvoidance: "unknown",
       }
     );
   }
@@ -709,7 +709,7 @@ class RegionalAnalytics {
         scenario,
         totalChoices: Array.from(data.choices.values()).reduce(
           (sum, count) => sum + count,
-          0
+          0,
         ),
       }));
   }
@@ -726,46 +726,46 @@ class RegionalAnalytics {
     const suggestions = [];
 
     // Individualism-based suggestions
-    if (culturalContext.individualism === 'high') {
+    if (culturalContext.individualism === "high") {
       suggestions.push(
-        'Emphasize personal autonomy and individual choice scenarios'
+        "Emphasize personal autonomy and individual choice scenarios",
       );
-    } else if (culturalContext.individualism === 'low') {
+    } else if (culturalContext.individualism === "low") {
       suggestions.push(
-        'Focus on collective benefit and community-oriented scenarios'
+        "Focus on collective benefit and community-oriented scenarios",
       );
     }
 
     // Power distance suggestions
-    if (culturalContext.powerDistance === 'high') {
+    if (culturalContext.powerDistance === "high") {
       suggestions.push(
-        'Include scenarios about authority and hierarchical decision-making'
+        "Include scenarios about authority and hierarchical decision-making",
       );
-    } else if (culturalContext.powerDistance === 'low') {
+    } else if (culturalContext.powerDistance === "low") {
       suggestions.push(
-        'Emphasize egalitarian and participatory decision-making scenarios'
+        "Emphasize egalitarian and participatory decision-making scenarios",
       );
     }
 
-    return suggestions.join('; ');
+    return suggestions.join("; ");
   }
 
   generateGlobalFeatureSuggestion(trends) {
     const suggestions = [];
 
     if (trends.needsTransparency) {
-      suggestions.push('Add transparency explanations for AI decisions');
+      suggestions.push("Add transparency explanations for AI decisions");
     }
 
     if (trends.needsAccessibility) {
-      suggestions.push('Improve accessibility features for global users');
+      suggestions.push("Improve accessibility features for global users");
     }
 
     if (trends.needsCulturalAdaptation) {
-      suggestions.push('Implement cultural adaptation features');
+      suggestions.push("Implement cultural adaptation features");
     }
 
-    return suggestions.join('; ');
+    return suggestions.join("; ");
   }
 
   identifyGlobalTrends() {
@@ -782,7 +782,7 @@ class RegionalAnalytics {
     let count = 0;
 
     for (const [, patterns] of this.decisionPatterns) {
-      const avg = this.getEthicsAverage(patterns, 'transparency');
+      const avg = this.getEthicsAverage(patterns, "transparency");
       if (avg !== null) {
         transparencySum += avg;
         count++;
@@ -803,7 +803,7 @@ class RegionalAnalytics {
   analyzeCulturalAdaptationNeed() {
     // Check if there are significant regional differences
     const ethicsVariations =
-      REGIONAL_ANALYTICS_CONSTANTS.DECISION_CATEGORIES.map(category => {
+      REGIONAL_ANALYTICS_CONSTANTS.DECISION_CATEGORIES.map((category) => {
         const regionalValues = [];
         for (const [, patterns] of this.decisionPatterns) {
           const avg = this.getEthicsAverage(patterns, category);
@@ -838,7 +838,7 @@ class RegionalAnalytics {
 
       localStorage.setItem(cacheKey, JSON.stringify(cacheData));
     } catch (error) {
-      logger.error('Failed to cache insights:', error);
+      logger.error("Failed to cache insights:", error);
     }
   }
 
@@ -854,13 +854,13 @@ class RegionalAnalytics {
         const cacheData = JSON.parse(cached);
         if (cacheData.expiresAt > Date.now()) {
           this.regionalInsights = new Map(Object.entries(cacheData.insights));
-          logger.info('Loaded cached regional insights');
+          logger.info("Loaded cached regional insights");
         } else {
           localStorage.removeItem(cacheKey);
         }
       }
     } catch (error) {
-      logger.error('Failed to load cached analytics:', error);
+      logger.error("Failed to load cached analytics:", error);
     }
   }
 
@@ -872,7 +872,7 @@ class RegionalAnalytics {
       const storageKey = `${REGIONAL_ANALYTICS_CONSTANTS.STORAGE_PREFIX}geographic`;
       localStorage.setItem(storageKey, JSON.stringify(data));
     } catch (error) {
-      logger.error('Failed to store geographic data:', error);
+      logger.error("Failed to store geographic data:", error);
     }
   }
 
@@ -888,12 +888,12 @@ class RegionalAnalytics {
    */
   setupEventListeners() {
     // Listen for scenario decisions
-    document.addEventListener('scenario-decision', event => {
+    document.addEventListener("scenario-decision", (event) => {
       this.trackScenarioDecision(event.detail);
     });
 
     // Listen for page visibility changes to update session data
-    document.addEventListener('visibilitychange', () => {
+    document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
         this.flushPendingData();
       }
@@ -907,9 +907,9 @@ class RegionalAnalytics {
     // Ensure all pending data is saved
     try {
       this.generateRegionalInsights();
-      logger.info('Flushed regional analytics data');
+      logger.info("Flushed regional analytics data");
     } catch (error) {
-      logger.error('Failed to flush regional analytics data:', error);
+      logger.error("Failed to flush regional analytics data:", error);
     }
   }
 
@@ -923,7 +923,7 @@ class RegionalAnalytics {
       insights: this.generateRegionalInsights(),
       metadata: {
         exportDate: new Date().toISOString(),
-        version: '1.0.0',
+        version: "1.0.0",
         totalDecisions: this.getAllDecisions().length,
         activeRegions: this.decisionPatterns.size,
       },
@@ -936,11 +936,11 @@ class RegionalAnalytics {
    * Clear all regional data
    */
   clearRegionalData() {
-    const keys = ['geographic', 'decisions', 'insights_cache', 'patterns'].map(
-      key => `${REGIONAL_ANALYTICS_CONSTANTS.STORAGE_PREFIX}${key}`
+    const keys = ["geographic", "decisions", "insights_cache", "patterns"].map(
+      (key) => `${REGIONAL_ANALYTICS_CONSTANTS.STORAGE_PREFIX}${key}`,
     );
 
-    keys.forEach(key => {
+    keys.forEach((key) => {
       localStorage.removeItem(key);
     });
 
@@ -948,7 +948,7 @@ class RegionalAnalytics {
     this.regionalInsights.clear();
     this.geographicData = null;
 
-    logger.info('Regional analytics data cleared');
+    logger.info("Regional analytics data cleared");
   }
 
   /**
@@ -983,7 +983,7 @@ class RegionalAnalytics {
         };
       }
     } catch (error) {
-      logger.error('Failed to get cache status:', error);
+      logger.error("Failed to get cache status:", error);
     }
 
     return { exists: false };

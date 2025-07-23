@@ -32,15 +32,15 @@
  * @author SimulateAI Team
  */
 
-import { InputManager } from './input-manager.js';
-import AccessibilityManager from './accessibility.js';
-import logger from '../utils/logger.js';
-import { TIMING, LIMITS } from '../utils/constants.js';
-import AnimationManager from './animation-manager.js';
-import { Scene } from './scene.js';
-import CanvasRenderer from '../renderers/canvas-renderer.js';
-import SVGRenderer from '../renderers/svg-renderer.js';
-import WebGLRenderer from '../renderers/webgl-renderer.js';
+import { InputManager } from "./input-manager.js";
+import AccessibilityManager from "./accessibility.js";
+import logger from "../utils/logger.js";
+import { TIMING, LIMITS } from "../utils/constants.js";
+import AnimationManager from "./animation-manager.js";
+import { Scene } from "./scene.js";
+import CanvasRenderer from "../renderers/canvas-renderer.js";
+import SVGRenderer from "../renderers/svg-renderer.js";
+import WebGLRenderer from "../renderers/webgl-renderer.js";
 
 // Enhanced constants and configuration
 const ENGINE_CONSTANTS = {
@@ -58,16 +58,16 @@ const ENGINE_CONSTANTS = {
 };
 
 const RENDER_MODES = {
-  AUTO: 'auto',
-  CANVAS: 'canvas',
-  SVG: 'svg',
-  WEBGL: 'webgl',
+  AUTO: "auto",
+  CANVAS: "canvas",
+  SVG: "svg",
+  WEBGL: "webgl",
 };
 
 const PERFORMANCE_MODES = {
-  HIGH: 'high',
-  BALANCED: 'balanced',
-  COMPATIBILITY: 'compatibility',
+  HIGH: "high",
+  BALANCED: "balanced",
+  COMPATIBILITY: "compatibility",
 };
 
 /**
@@ -76,12 +76,12 @@ const PERFORMANCE_MODES = {
 class EngineError extends Error {
   constructor(message, context = {}, originalError = null) {
     super(message);
-    this.name = 'EngineError';
+    this.name = "EngineError";
     this.context = context;
     this.originalError = originalError;
     this.timestamp = new Date().toISOString();
-    this.engineState = context.engineState || 'unknown';
-    this.renderMode = context.renderMode || 'unknown';
+    this.engineState = context.engineState || "unknown";
+    this.renderMode = context.renderMode || "unknown";
   }
 }
 
@@ -115,8 +115,8 @@ class EnginePerformanceMonitor {
       // Performance warning for slow operations
       if (duration > ENGINE_CONSTANTS.PERFORMANCE_WARNING_THRESHOLD) {
         logger.warn(
-          'Engine',
-          `Slow engine operation: ${operationName} took ${duration.toFixed(2)}ms`
+          "Engine",
+          `Slow engine operation: ${operationName} took ${duration.toFixed(2)}ms`,
         );
       }
     }
@@ -129,7 +129,7 @@ class EnginePerformanceMonitor {
         trackedComponents: this.memoryTracker.size,
         totalMemoryEstimate: Array.from(this.memoryTracker.values()).reduce(
           (total, item) => total + item.size,
-          0
+          0,
         ),
       },
     };
@@ -153,16 +153,16 @@ class EnginePerformanceMonitor {
 class EngineTheme {
   static getCurrentTheme() {
     const prefersReducedMotion = window.matchMedia?.(
-      '(prefers-reduced-motion: reduce)'
+      "(prefers-reduced-motion: reduce)",
     ).matches;
     const prefersHighContrast = window.matchMedia?.(
-      '(prefers-contrast: high)'
+      "(prefers-contrast: high)",
     ).matches;
 
     return {
       reducedMotion: prefersReducedMotion,
       highContrast: prefersHighContrast,
-      theme: prefersHighContrast ? 'highContrast' : 'light',
+      theme: prefersHighContrast ? "highContrast" : "light",
     };
   }
 
@@ -256,18 +256,18 @@ class SimulationEngine {
       // Initialize engine
       this.init();
     } catch (error) {
-      logger.error('Engine', 'Engine initialization failed:', error);
+      logger.error("Engine", "Engine initialization failed:", error);
       throw new EngineError(
-        'Failed to initialize SimulationEngine',
+        "Failed to initialize SimulationEngine",
         { containerId, config },
-        error
+        error,
       );
     }
   }
 
   init() {
     try {
-      EnginePerformanceMonitor.startOperation('engine_init');
+      EnginePerformanceMonitor.startOperation("engine_init");
 
       this.setupRenderer();
       this.setupInputHandling();
@@ -288,28 +288,28 @@ class SimulationEngine {
 
       // Announce successful initialization
       if (this.accessibilityManager) {
-        this.accessibilityManager.announce('Simulation engine initialized');
+        this.accessibilityManager.announce("Simulation engine initialized");
       }
 
-      EnginePerformanceMonitor.endOperation('engine_init');
+      EnginePerformanceMonitor.endOperation("engine_init");
       logger.info(
-        'Engine',
-        `SimulationEngine initialized with ${this.config.renderMode} renderer`
+        "Engine",
+        `SimulationEngine initialized with ${this.config.renderMode} renderer`,
       );
     } catch (error) {
       this.handleError(
         new EngineError(
-          'Engine initialization failed',
+          "Engine initialization failed",
           { renderMode: this.config.renderMode },
-          error
-        )
+          error,
+        ),
       );
     }
   }
 
   setupRenderer() {
     try {
-      EnginePerformanceMonitor.startOperation('renderer_setup');
+      EnginePerformanceMonitor.startOperation("renderer_setup");
 
       const { renderMode: configRenderMode } = this.config;
       let renderMode = configRenderMode;
@@ -338,8 +338,8 @@ class SimulationEngine {
             this.renderer = new WebGLRenderer(this.container, rendererConfig);
           } else {
             logger.warn(
-              'Engine',
-              'WebGL not supported, falling back to Canvas'
+              "Engine",
+              "WebGL not supported, falling back to Canvas",
             );
             this.renderer = new CanvasRenderer(this.container, rendererConfig);
             renderMode = RENDER_MODES.CANVAS;
@@ -358,28 +358,28 @@ class SimulationEngine {
         this.renderer.setupAccessibility();
       }
 
-      EnginePerformanceMonitor.endOperation('renderer_setup');
+      EnginePerformanceMonitor.endOperation("renderer_setup");
     } catch (error) {
-      logger.error('Engine', 'Failed to initialize renderer:', error);
+      logger.error("Engine", "Failed to initialize renderer:", error);
       // Enhanced fallback with error tracking
       try {
         this.renderer = new CanvasRenderer(this.container, this.config);
         this.config.renderMode = RENDER_MODES.CANVAS;
         this.handleError(
           new EngineError(
-            'Renderer fallback activated',
+            "Renderer fallback activated",
             {
               originalMode: this.config.renderMode,
               fallbackMode: RENDER_MODES.CANVAS,
             },
-            error
-          )
+            error,
+          ),
         );
       } catch (fallbackError) {
         throw new EngineError(
-          'All renderer initialization failed',
+          "All renderer initialization failed",
           { originalError: error },
-          fallbackError
+          fallbackError,
         );
       }
     }
@@ -389,26 +389,26 @@ class SimulationEngine {
     this.inputManager = new InputManager(this.renderer.getElement());
 
     // Register for common input events
-    this.inputManager.on('mousedown', event => this.handleMouseDown(event));
-    this.inputManager.on('mousemove', event => this.handleMouseMove(event));
-    this.inputManager.on('mouseup', event => this.handleMouseUp(event));
-    this.inputManager.on('keydown', event => this.handleKeyDown(event));
-    this.inputManager.on('keyup', event => this.handleKeyUp(event));
-    this.inputManager.on('touch', event => this.handleTouch(event));
+    this.inputManager.on("mousedown", (event) => this.handleMouseDown(event));
+    this.inputManager.on("mousemove", (event) => this.handleMouseMove(event));
+    this.inputManager.on("mouseup", (event) => this.handleMouseUp(event));
+    this.inputManager.on("keydown", (event) => this.handleKeyDown(event));
+    this.inputManager.on("keyup", (event) => this.handleKeyUp(event));
+    this.inputManager.on("touch", (event) => this.handleTouch(event));
   }
 
   setupAccessibility() {
     if (this.config.accessibility) {
       this.accessibilityManager = new AccessibilityManager(
         this.container,
-        this
+        this,
       );
     }
   }
 
   setupPerformanceMonitoring() {
     try {
-      EnginePerformanceMonitor.startOperation('performance_setup');
+      EnginePerformanceMonitor.startOperation("performance_setup");
 
       // Enhanced performance monitoring based on performance mode
       switch (this.config.performance) {
@@ -432,9 +432,9 @@ class SimulationEngine {
         }, TIMING.POLLING_INTERVAL);
       }
 
-      EnginePerformanceMonitor.endOperation('performance_setup');
+      EnginePerformanceMonitor.endOperation("performance_setup");
     } catch (error) {
-      logger.warn('Engine', 'Performance monitoring setup failed:', error);
+      logger.warn("Engine", "Performance monitoring setup failed:", error);
     }
   }
 
@@ -478,7 +478,7 @@ class SimulationEngine {
       // Integrate animation manager with engine
       this.animationManager.setEngine(this);
     } catch (error) {
-      logger.warn('Engine', 'Failed to initialize animation manager:', error);
+      logger.warn("Engine", "Failed to initialize animation manager:", error);
       this.animationManager = null;
     }
   }
@@ -494,9 +494,9 @@ class SimulationEngine {
   setupThemeMonitoring() {
     // Monitor theme changes
     const reducedMotionQuery = window.matchMedia?.(
-      '(prefers-reduced-motion: reduce)'
+      "(prefers-reduced-motion: reduce)",
     );
-    const highContrastQuery = window.matchMedia?.('(prefers-contrast: high)');
+    const highContrastQuery = window.matchMedia?.("(prefers-contrast: high)");
 
     const handleThemeChange = () => {
       const newThemeConfig = EngineTheme.getEngineConfig();
@@ -507,16 +507,16 @@ class SimulationEngine {
     };
 
     if (reducedMotionQuery?.addEventListener) {
-      reducedMotionQuery.addEventListener('change', handleThemeChange);
+      reducedMotionQuery.addEventListener("change", handleThemeChange);
     }
     if (highContrastQuery?.addEventListener) {
-      highContrastQuery.addEventListener('change', handleThemeChange);
+      highContrastQuery.addEventListener("change", handleThemeChange);
     }
 
     // Store cleanup functions
     this.themeCleanup = () => {
-      reducedMotionQuery?.removeEventListener?.('change', handleThemeChange);
-      highContrastQuery?.removeEventListener?.('change', handleThemeChange);
+      reducedMotionQuery?.removeEventListener?.("change", handleThemeChange);
+      highContrastQuery?.removeEventListener?.("change", handleThemeChange);
     };
   }
 
@@ -542,12 +542,12 @@ class SimulationEngine {
 
     // Update container classes for theme
     const themeClasses = [];
-    if (this.config.highContrast) themeClasses.push('high-contrast');
-    if (this.themeConfig.reducedMotion) themeClasses.push('reduced-motion');
+    if (this.config.highContrast) themeClasses.push("high-contrast");
+    if (this.themeConfig.reducedMotion) themeClasses.push("reduced-motion");
 
     this.container.className = `${this.container.className
-      .replace(/\b(high-contrast|reduced-motion)\b/g, '')
-      .trim()} ${themeClasses.join(' ')}`;
+      .replace(/\b(high-contrast|reduced-motion)\b/g, "")
+      .trim()} ${themeClasses.join(" ")}`;
   }
 
   handleThemeChange() {
@@ -571,7 +571,7 @@ class SimulationEngine {
 
       // Notify accessibility manager
       if (this.accessibilityManager) {
-        this.accessibilityManager.announce('Theme changed');
+        this.accessibilityManager.announce("Theme changed");
       }
 
       // Save updated settings
@@ -579,20 +579,20 @@ class SimulationEngine {
     } catch (error) {
       this.handleError(
         new EngineError(
-          'Theme change handling failed',
+          "Theme change handling failed",
           { newTheme: this.themeConfig },
-          error
-        )
+          error,
+        ),
       );
     }
   }
 
   loadSettings() {
     try {
-      const saved = localStorage.getItem('simulationEngine_settings');
+      const saved = localStorage.getItem("simulationEngine_settings");
       return saved ? JSON.parse(saved) : {};
     } catch (error) {
-      logger.warn('Engine', 'Failed to load engine settings:', error);
+      logger.warn("Engine", "Failed to load engine settings:", error);
       return {};
     }
   }
@@ -610,8 +610,8 @@ class SimulationEngine {
       };
 
       localStorage.setItem(
-        'simulationEngine_settings',
-        JSON.stringify(settings)
+        "simulationEngine_settings",
+        JSON.stringify(settings),
       );
 
       // Debounced save to prevent excessive writes
@@ -620,13 +620,13 @@ class SimulationEngine {
         // Additional settings persistence could go here
       }, 1000);
     } catch (error) {
-      logger.warn('Engine', 'Failed to save engine settings:', error);
+      logger.warn("Engine", "Failed to save engine settings:", error);
     }
   }
 
   performMemoryCleanup() {
     try {
-      EnginePerformanceMonitor.startOperation('memory_cleanup');
+      EnginePerformanceMonitor.startOperation("memory_cleanup");
 
       // Clean up performance data
       if (this.performanceData.frameTimeHistory.length > 100) {
@@ -651,9 +651,9 @@ class SimulationEngine {
       }
 
       this.lastMemoryCleanup = now;
-      EnginePerformanceMonitor.endOperation('memory_cleanup');
+      EnginePerformanceMonitor.endOperation("memory_cleanup");
     } catch (error) {
-      this.handleError(new EngineError('Memory cleanup failed', {}, error));
+      this.handleError(new EngineError("Memory cleanup failed", {}, error));
     }
   }
 
@@ -661,18 +661,18 @@ class SimulationEngine {
     this.errorCount++;
     this.lastError = error;
 
-    logger.error('Engine', 'Engine Error:', error);
+    logger.error("Engine", "Engine Error:", error);
 
     // Announce error to accessibility manager
-    if (this.accessibilityManager && error.name === 'EngineError') {
-      this.accessibilityManager.announce('Engine error occurred', 'assertive');
+    if (this.accessibilityManager && error.name === "EngineError") {
+      this.accessibilityManager.announce("Engine error occurred", "assertive");
     }
 
     // Recovery attempts for critical errors
     if (this.recoveryAttempts < this.maxRecoveryAttempts) {
       this.recoveryAttempts++;
       logger.info(
-        `Attempting recovery ${this.recoveryAttempts}/${this.maxRecoveryAttempts}`
+        `Attempting recovery ${this.recoveryAttempts}/${this.maxRecoveryAttempts}`,
       );
 
       // Attempt recovery based on error type
@@ -687,7 +687,7 @@ class SimulationEngine {
 
   attemptRendererRecovery() {
     try {
-      logger.info('Attempting renderer recovery...');
+      logger.info("Attempting renderer recovery...");
 
       // Try to reinitialize with canvas renderer
       if (this.renderer) {
@@ -698,24 +698,24 @@ class SimulationEngine {
       this.setupRenderer();
 
       this.recoveryAttempts = 0; // Reset on successful recovery
-      logger.info('Renderer recovery successful');
+      logger.info("Renderer recovery successful");
     } catch (recoveryError) {
-      logger.error('Renderer recovery failed:', recoveryError);
+      logger.error("Renderer recovery failed:", recoveryError);
     }
   }
 
   // Component management
   addComponent(component) {
     try {
-      if (!component || typeof component.update !== 'function') {
-        throw new EngineError('Invalid component: must have update method', {
+      if (!component || typeof component.update !== "function") {
+        throw new EngineError("Invalid component: must have update method", {
           component,
         });
       }
 
       EnginePerformanceMonitor.trackMemory(
         `component_${component.id || Date.now()}`,
-        component.memorySize || ENGINE_CONSTANTS.DEFAULT_COMPONENT_MEMORY_SIZE
+        component.memorySize || ENGINE_CONSTANTS.DEFAULT_COMPONENT_MEMORY_SIZE,
       );
 
       component.setEngine?.(this);
@@ -734,7 +734,7 @@ class SimulationEngine {
       return component;
     } catch (error) {
       this.handleError(
-        new EngineError('Failed to add component', { component }, error)
+        new EngineError("Failed to add component", { component }, error),
       );
       return null;
     }
@@ -759,7 +759,7 @@ class SimulationEngine {
       }
     } catch (error) {
       this.handleError(
-        new EngineError('Failed to remove component', { component }, error)
+        new EngineError("Failed to remove component", { component }, error),
       );
     }
   }
@@ -782,12 +782,12 @@ class SimulationEngine {
 
       // Announce start to accessibility
       if (this.accessibilityManager) {
-        this.accessibilityManager.announce('Simulation started');
+        this.accessibilityManager.announce("Simulation started");
       }
 
       this.animate();
     } catch (error) {
-      this.handleError(new EngineError('Failed to start engine', {}, error));
+      this.handleError(new EngineError("Failed to start engine", {}, error));
     }
   }
 
@@ -810,13 +810,13 @@ class SimulationEngine {
 
       // Announce stop to accessibility
       if (this.accessibilityManager) {
-        this.accessibilityManager.announce('Simulation stopped');
+        this.accessibilityManager.announce("Simulation stopped");
       }
 
       // Save settings
       this.saveSettings();
     } catch (error) {
-      this.handleError(new EngineError('Failed to stop engine', {}, error));
+      this.handleError(new EngineError("Failed to stop engine", {}, error));
     }
   }
 
@@ -838,10 +838,10 @@ class SimulationEngine {
 
       // Announce pause to accessibility
       if (this.accessibilityManager) {
-        this.accessibilityManager.announce('Simulation paused');
+        this.accessibilityManager.announce("Simulation paused");
       }
     } catch (error) {
-      this.handleError(new EngineError('Failed to pause engine', {}, error));
+      this.handleError(new EngineError("Failed to pause engine", {}, error));
     }
   }
 
@@ -859,12 +859,12 @@ class SimulationEngine {
 
       // Announce resume to accessibility
       if (this.accessibilityManager) {
-        this.accessibilityManager.announce('Simulation resumed');
+        this.accessibilityManager.announce("Simulation resumed");
       }
 
       this.animate();
     } catch (error) {
-      this.handleError(new EngineError('Failed to resume engine', {}, error));
+      this.handleError(new EngineError("Failed to resume engine", {}, error));
     }
   }
 
@@ -928,17 +928,17 @@ class SimulationEngine {
     } catch (error) {
       this.handleError(
         new EngineError(
-          'Animation loop error',
+          "Animation loop error",
           { deltaTime: this.deltaTime, frameCount: this.frameCount },
-          error
-        )
+          error,
+        ),
       );
     }
   }
 
   update(deltaTime) {
     try {
-      EnginePerformanceMonitor.startOperation('scene_update');
+      EnginePerformanceMonitor.startOperation("scene_update");
 
       // Update all scene components
       this.scene.update(deltaTime);
@@ -953,10 +953,10 @@ class SimulationEngine {
         this.animationManager.update(deltaTime);
       }
 
-      EnginePerformanceMonitor.endOperation('scene_update');
+      EnginePerformanceMonitor.endOperation("scene_update");
     } catch (error) {
       this.handleError(
-        new EngineError('Update loop error', { deltaTime }, error)
+        new EngineError("Update loop error", { deltaTime }, error),
       );
     }
   }
@@ -965,14 +965,14 @@ class SimulationEngine {
     try {
       if (!this.renderer) return;
 
-      EnginePerformanceMonitor.startOperation('scene_render');
+      EnginePerformanceMonitor.startOperation("scene_render");
 
       this.renderer.clear();
       this.scene.render(this.renderer);
 
-      EnginePerformanceMonitor.endOperation('scene_render');
+      EnginePerformanceMonitor.endOperation("scene_render");
     } catch (error) {
-      this.handleError(new EngineError('Render loop error', {}, error));
+      this.handleError(new EngineError("Render loop error", {}, error));
     }
   }
 
@@ -984,12 +984,12 @@ class SimulationEngine {
       this.performanceData.averageFrameTime =
         this.performanceData.frameTimeHistory.reduce(
           (sum, time) => sum + time,
-          0
+          0,
         ) / this.performanceData.frameTimeHistory.length;
 
       this.performanceData.worstFrameTime = Math.max(
         this.performanceData.worstFrameTime,
-        frameTime
+        frameTime,
       );
     }
   }
@@ -998,10 +998,10 @@ class SimulationEngine {
   handleMouseDown(event) {
     try {
       const sceneCoords = this.screenToScene(event.x, event.y);
-      this.scene.handleInput('mousedown', { ...event, ...sceneCoords });
+      this.scene.handleInput("mousedown", { ...event, ...sceneCoords });
     } catch (error) {
       this.handleError(
-        new EngineError('Mouse down handler error', { event }, error)
+        new EngineError("Mouse down handler error", { event }, error),
       );
     }
   }
@@ -1009,10 +1009,10 @@ class SimulationEngine {
   handleMouseMove(event) {
     try {
       const sceneCoords = this.screenToScene(event.x, event.y);
-      this.scene.handleInput('mousemove', { ...event, ...sceneCoords });
+      this.scene.handleInput("mousemove", { ...event, ...sceneCoords });
     } catch (error) {
       this.handleError(
-        new EngineError('Mouse move handler error', { event }, error)
+        new EngineError("Mouse move handler error", { event }, error),
       );
     }
   }
@@ -1020,10 +1020,10 @@ class SimulationEngine {
   handleMouseUp(event) {
     try {
       const sceneCoords = this.screenToScene(event.x, event.y);
-      this.scene.handleInput('mouseup', { ...event, ...sceneCoords });
+      this.scene.handleInput("mouseup", { ...event, ...sceneCoords });
     } catch (error) {
       this.handleError(
-        new EngineError('Mouse up handler error', { event }, error)
+        new EngineError("Mouse up handler error", { event }, error),
       );
     }
   }
@@ -1035,20 +1035,20 @@ class SimulationEngine {
         return; // Accessibility manager handled the event
       }
 
-      this.scene.handleInput('keydown', event);
+      this.scene.handleInput("keydown", event);
     } catch (error) {
       this.handleError(
-        new EngineError('Key down handler error', { event }, error)
+        new EngineError("Key down handler error", { event }, error),
       );
     }
   }
 
   handleKeyUp(event) {
     try {
-      this.scene.handleInput('keyup', event);
+      this.scene.handleInput("keyup", event);
     } catch (error) {
       this.handleError(
-        new EngineError('Key up handler error', { event }, error)
+        new EngineError("Key up handler error", { event }, error),
       );
     }
   }
@@ -1056,10 +1056,10 @@ class SimulationEngine {
   handleTouch(event) {
     try {
       const sceneCoords = this.screenToScene(event.x, event.y);
-      this.scene.handleInput('touch', { ...event, ...sceneCoords });
+      this.scene.handleInput("touch", { ...event, ...sceneCoords });
     } catch (error) {
       this.handleError(
-        new EngineError('Touch handler error', { event }, error)
+        new EngineError("Touch handler error", { event }, error),
       );
     }
   }
@@ -1073,7 +1073,7 @@ class SimulationEngine {
         sceneY: screenY - rect.top,
       };
     } catch (error) {
-      logger.warn('Screen to scene coordinate transformation failed:', error);
+      logger.warn("Screen to scene coordinate transformation failed:", error);
       return { sceneX: screenX, sceneY: screenY };
     }
   }
@@ -1081,9 +1081,9 @@ class SimulationEngine {
   // Enhanced utility methods
   isWebGLSupported() {
     try {
-      const canvas = document.createElement('canvas');
+      const canvas = document.createElement("canvas");
       const context =
-        canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
       return !!context;
     } catch (e) {
       return false;
@@ -1108,7 +1108,7 @@ class SimulationEngine {
       EnginePerformanceMonitor.getMetrics();
       const memoryInfo = performance.memory
         ? `Memory: ${(performance.memory.usedJSHeapSize / ENGINE_CONSTANTS.BYTES_TO_MEGABYTES).toFixed(2)}MB`
-        : 'Memory: N/A';
+        : "Memory: N/A";
 
       this.debugOverlay.innerHTML = `
                 FPS: ${this.fps}
@@ -1119,10 +1119,10 @@ class SimulationEngine {
                 Errors: ${this.errorCount}
                 Theme: ${this.themeConfig.theme}
                 Reduced Motion: ${this.themeConfig.reducedMotion}
-                Avg Frame: ${this.performanceData.averageFrameTime?.toFixed(2) || 'N/A'}ms
+                Avg Frame: ${this.performanceData.averageFrameTime?.toFixed(2) || "N/A"}ms
             `;
     } catch (error) {
-      logger.warn('Debug info update failed:', error);
+      logger.warn("Debug info update failed:", error);
     }
   }
 
@@ -1133,9 +1133,9 @@ class SimulationEngine {
       this.useFrustumCulling = true;
       this.useLevelOfDetail = true;
 
-      logger.info('Performance optimizations enabled');
+      logger.info("Performance optimizations enabled");
     } catch (error) {
-      logger.warn('Failed to enable performance optimizations:', error);
+      logger.warn("Failed to enable performance optimizations:", error);
     }
   }
 
@@ -1188,9 +1188,9 @@ class SimulationEngine {
       // Save final settings
       this.saveSettings();
 
-      logger.info('SimulationEngine destroyed');
+      logger.info("SimulationEngine destroyed");
     } catch (error) {
-      logger.error('Engine destruction error:', error);
+      logger.error("Engine destruction error:", error);
     }
   }
 
@@ -1224,7 +1224,7 @@ class SimulationEngine {
       this.saveSettings();
     } catch (error) {
       this.handleError(
-        new EngineError('Configuration update failed', { newConfig }, error)
+        new EngineError("Configuration update failed", { newConfig }, error),
       );
     }
   }
@@ -1232,10 +1232,10 @@ class SimulationEngine {
   setupDebugTools() {
     try {
       // Create enhanced debug overlay with theme support
-      const debugOverlay = document.createElement('div');
-      debugOverlay.className = 'debug-overlay';
-      debugOverlay.setAttribute('role', 'complementary');
-      debugOverlay.setAttribute('aria-label', 'Debug Information');
+      const debugOverlay = document.createElement("div");
+      debugOverlay.className = "debug-overlay";
+      debugOverlay.setAttribute("role", "complementary");
+      debugOverlay.setAttribute("aria-label", "Debug Information");
 
       const baseStyles = `
                 position: absolute;
@@ -1254,7 +1254,7 @@ class SimulationEngine {
             `;
 
       const themeStyles =
-        'background: rgba(255, 255, 255, 0.9); color: #333; border-color: rgba(0, 0, 0, 0.1);';
+        "background: rgba(255, 255, 255, 0.9); color: #333; border-color: rgba(0, 0, 0, 0.1);";
 
       debugOverlay.style.cssText = baseStyles + themeStyles;
 
@@ -1264,25 +1264,25 @@ class SimulationEngine {
       // Add debug keyboard shortcuts
       this.setupDebugKeyboard();
     } catch (error) {
-      logger.warn('Debug tools setup failed:', error);
+      logger.warn("Debug tools setup failed:", error);
     }
   }
 
   setupDebugKeyboard() {
     // Debug keyboard shortcuts
-    const handleDebugKeys = event => {
+    const handleDebugKeys = (event) => {
       if (!this.config.debug) return;
 
       // Ctrl/Cmd + Shift + D: Toggle debug overlay
       if (
         (event.ctrlKey || event.metaKey) &&
         event.shiftKey &&
-        event.key === 'D'
+        event.key === "D"
       ) {
         event.preventDefault();
         if (this.debugOverlay) {
           this.debugOverlay.style.display =
-            this.debugOverlay.style.display === 'none' ? 'block' : 'none';
+            this.debugOverlay.style.display === "none" ? "block" : "none";
         }
       }
 
@@ -1290,18 +1290,18 @@ class SimulationEngine {
       if (
         (event.ctrlKey || event.metaKey) &&
         event.shiftKey &&
-        event.key === 'P'
+        event.key === "P"
       ) {
         event.preventDefault();
-        logger.debug('Engine Performance Snapshot:', this.getMetrics());
+        logger.debug("Engine Performance Snapshot:", this.getMetrics());
       }
     };
 
-    document.addEventListener('keydown', handleDebugKeys);
+    document.addEventListener("keydown", handleDebugKeys);
 
     // Store cleanup function
     this.debugKeyboardCleanup = () => {
-      document.removeEventListener('keydown', handleDebugKeys);
+      document.removeEventListener("keydown", handleDebugKeys);
     };
   }
 }

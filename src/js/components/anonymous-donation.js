@@ -7,9 +7,9 @@ class AnonymousDonation {
     this.container = options.container || document.body;
     this.firebase = options.firebase; // Pass in Firebase instance
     this.priceIds = {
-      1: 'price_1RkyADJDA3nPZHAFQJr2ySBR', // $5 Bronze
-      2: 'price_1RkyADJDA3nPZHAFXasv2dM0', // $10 Silver
-      3: 'price_1RkyADJDA3nPZHAFoyRLGmpQ', // $20 Gold
+      1: "price_1RkyADJDA3nPZHAFQJr2ySBR", // $5 Bronze
+      2: "price_1RkyADJDA3nPZHAFXasv2dM0", // $10 Silver
+      3: "price_1RkyADJDA3nPZHAFoyRLGmpQ", // $20 Gold
     };
     this.init();
   }
@@ -125,7 +125,7 @@ class AnonymousDonation {
       </div>
     `;
 
-    if (typeof this.container === 'string') {
+    if (typeof this.container === "string") {
       document.querySelector(this.container).innerHTML = donationHTML;
     } else {
       this.container.innerHTML = donationHTML;
@@ -133,50 +133,50 @@ class AnonymousDonation {
   }
 
   attachEventListeners() {
-    const buttons = document.querySelectorAll('.donation-btn');
-    const statusDiv = document.querySelector('.donation-status');
+    const buttons = document.querySelectorAll(".donation-btn");
+    const statusDiv = document.querySelector(".donation-status");
 
-    buttons.forEach(button => {
-      button.addEventListener('mouseenter', () => {
-        button.style.transform = 'translateY(-2px)';
-        button.style.boxShadow = '0 4px 16px rgba(0,0,0,0.2)';
+    buttons.forEach((button) => {
+      button.addEventListener("mouseenter", () => {
+        button.style.transform = "translateY(-2px)";
+        button.style.boxShadow = "0 4px 16px rgba(0,0,0,0.2)";
       });
 
-      button.addEventListener('mouseleave', () => {
-        button.style.transform = 'translateY(0)';
-        button.style.boxShadow = 'none';
+      button.addEventListener("mouseleave", () => {
+        button.style.transform = "translateY(0)";
+        button.style.boxShadow = "none";
       });
 
-      button.addEventListener('click', async e => {
+      button.addEventListener("click", async (e) => {
         const { tier } = e.target.dataset;
 
         if (!tier) return;
 
-        const donorEmail = document.getElementById('donor-email').value;
+        const donorEmail = document.getElementById("donor-email").value;
 
         // Disable buttons and show loading
-        buttons.forEach(btn => (btn.disabled = true));
-        statusDiv.innerHTML = '⏳ Creating secure checkout...';
+        buttons.forEach((btn) => (btn.disabled = true));
+        statusDiv.innerHTML = "⏳ Creating secure checkout...";
 
         try {
           await this.createCheckout(tier, donorEmail);
         } catch (error) {
-          statusDiv.innerHTML = '❌ Error creating checkout. Please try again.';
-          buttons.forEach(btn => (btn.disabled = false));
+          statusDiv.innerHTML = "❌ Error creating checkout. Please try again.";
+          buttons.forEach((btn) => (btn.disabled = false));
         }
       });
     });
   }
 
-  async createCheckout(tier, donorEmail = '') {
+  async createCheckout(tier, donorEmail = "") {
     if (!this.firebase) {
-      throw new Error('Firebase instance not provided');
+      throw new Error("Firebase instance not provided");
     }
 
     try {
       const createAnonymousCheckout = this.firebase
         .functions()
-        .httpsCallable('createAnonymousCheckout');
+        .httpsCallable("createAnonymousCheckout");
 
       const result = await createAnonymousCheckout({
         priceId: this.priceIds[tier],
@@ -188,7 +188,7 @@ class AnonymousDonation {
         // Redirect to Stripe Checkout
         window.location.href = result.data.url;
       } else {
-        throw new Error('No checkout URL received');
+        throw new Error("No checkout URL received");
       }
     } catch (error) {
       // Fallback for local development
@@ -196,8 +196,8 @@ class AnonymousDonation {
     }
   }
 
-  simulateCheckout(tier, donorEmail = '') {
-    const flairText = donorEmail ? ` for ${donorEmail}` : '';
+  simulateCheckout(tier, donorEmail = "") {
+    const flairText = donorEmail ? ` for ${donorEmail}` : "";
     const message = `🧪 Development Mode: This would redirect to Stripe checkout for tier ${
       tier
     } donation${flairText}.\n\nIn production, this will redirect to a real Stripe checkout page.`;
@@ -205,9 +205,9 @@ class AnonymousDonation {
     const confirmText = `${message}\n\nWould you like to see a mock checkout URL?`;
 
     if (window.confirm(confirmText)) {
-      const tierNames = { 1: 'Bronze', 2: 'Silver', 3: 'Gold' };
+      const tierNames = { 1: "Bronze", 2: "Silver", 3: "Gold" };
       const tierAmounts = { 1: 5, 2: 10, 3: 20 };
-      const tierName = tierNames[tier] || 'Unknown';
+      const tierName = tierNames[tier] || "Unknown";
       const amount = tierAmounts[tier] || 0;
 
       const htmlContent =
@@ -228,7 +228,7 @@ class AnonymousDonation {
         `<button class="btn" style="background: #6c757d;" onclick="window.close()">Cancel</button></div></body></html>`;
 
       const dataUrl = `data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`;
-      window.open(dataUrl, '_blank');
+      window.open(dataUrl, "_blank");
     }
   }
 
@@ -239,9 +239,9 @@ class AnonymousDonation {
 }
 
 // Auto-initialize if Firebase is available globally
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   // Look for donation containers and auto-initialize
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener("DOMContentLoaded", () => {
     // Wait a bit for Firebase to be initialized
     setTimeout(() => {
       if (
@@ -250,9 +250,9 @@ if (typeof window !== 'undefined') {
         window.firebase.apps.length > 0
       ) {
         const containers = document.querySelectorAll(
-          '.donation-widget-container'
+          ".donation-widget-container",
         );
-        containers.forEach(container => {
+        containers.forEach((container) => {
           new AnonymousDonation({
             container,
             firebase: window.firebase,
@@ -274,11 +274,11 @@ if (typeof window !== 'undefined') {
 }
 
 // Export for module systems
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
   module.exports = AnonymousDonation;
 }
 
 // Make available globally
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.AnonymousDonation = AnonymousDonation;
 }

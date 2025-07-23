@@ -3,13 +3,13 @@
  * Replacement for ReusableModal to consolidate modal implementations
  */
 
-import logger from '../utils/logger.js';
+import logger from "../utils/logger.js";
 
 class ModalUtility {
   constructor({
-    title = '',
-    content = '',
-    footer = '',
+    title = "",
+    content = "",
+    footer = "",
     onClose = null,
     closeOnBackdrop = true,
     closeOnEscape = true,
@@ -36,13 +36,13 @@ class ModalUtility {
 
   _build() {
     // Create modal structure using advanced-ui-components.css classes
-    this.element = document.createElement('div');
+    this.element = document.createElement("div");
     this.element.id = this.id;
-    this.element.className = 'modal-backdrop';
-    this.element.setAttribute('role', 'dialog');
-    this.element.setAttribute('aria-modal', 'true');
-    this.element.setAttribute('aria-labelledby', `${this.id}-title`);
-    this.element.style.display = 'none';
+    this.element.className = "modal-backdrop";
+    this.element.setAttribute("role", "dialog");
+    this.element.setAttribute("aria-modal", "true");
+    this.element.setAttribute("aria-labelledby", `${this.id}-title`);
+    this.element.style.display = "none";
     // Use inert instead of aria-hidden for better accessibility
     this.element.inert = true;
 
@@ -64,7 +64,7 @@ class ModalUtility {
                         ${this.footer}
                     </div>
                 `
-                    : ''
+                    : ""
                 }
             </div>
         `;
@@ -74,14 +74,14 @@ class ModalUtility {
 
   _setupEventListeners() {
     // Close button
-    const closeBtn = this.element.querySelector('.modal-close');
+    const closeBtn = this.element.querySelector(".modal-close");
     if (closeBtn) {
-      closeBtn.addEventListener('click', () => this.close());
+      closeBtn.addEventListener("click", () => this.close());
     }
 
     // Backdrop click
     if (this.closeOnBackdrop) {
-      this.element.addEventListener('click', e => {
+      this.element.addEventListener("click", (e) => {
         if (e.target === this.element) {
           this.close();
         }
@@ -90,12 +90,12 @@ class ModalUtility {
 
     // Escape key
     if (this.closeOnEscape) {
-      this._escapeHandler = e => {
-        if (e.key === 'Escape' && this.isOpen) {
+      this._escapeHandler = (e) => {
+        if (e.key === "Escape" && this.isOpen) {
           this.close();
         }
       };
-      document.addEventListener('keydown', this._escapeHandler);
+      document.addEventListener("keydown", this._escapeHandler);
     }
   }
 
@@ -108,18 +108,18 @@ class ModalUtility {
     this.element.inert = false;
 
     // Show the modal
-    this.element.style.display = 'flex';
+    this.element.style.display = "flex";
 
     // Check if onboarding is active and adjust modal behavior accordingly
     const isOnboardingActive =
-      document.body.classList.contains('onboarding-active');
+      document.body.classList.contains("onboarding-active");
     if (isOnboardingActive) {
       // Allow onboarding interactions by making modal backdrop less intrusive
-      this.element.style.pointerEvents = 'none';
+      this.element.style.pointerEvents = "none";
       // But keep the modal dialog interactive
-      const modalDialog = this.element.querySelector('.modal-dialog');
+      const modalDialog = this.element.querySelector(".modal-dialog");
       if (modalDialog) {
-        modalDialog.style.pointerEvents = 'auto';
+        modalDialog.style.pointerEvents = "auto";
       }
     }
 
@@ -128,13 +128,13 @@ class ModalUtility {
 
     // Add visible class in next frame for CSS transition
     requestAnimationFrame(() => {
-      this.element.classList.add('visible');
+      this.element.classList.add("visible");
     });
 
     // Focus management - delay to ensure modal is visible and transition started
     setTimeout(() => {
       const firstFocusable = this.element.querySelector(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
       );
       if (firstFocusable) {
         firstFocusable.focus();
@@ -142,23 +142,23 @@ class ModalUtility {
     }, 100);
 
     // Add body class to prevent scrolling
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
   }
 
   close() {
     if (!this.isOpen) return;
 
     this.isOpen = false;
-    this.element.classList.remove('visible');
+    this.element.classList.remove("visible");
 
     // Make modal non-interactable
     this.element.inert = true;
 
     // Restore normal pointer events for modal
-    this.element.style.pointerEvents = '';
-    const modalDialog = this.element.querySelector('.modal-dialog');
+    this.element.style.pointerEvents = "";
+    const modalDialog = this.element.querySelector(".modal-dialog");
     if (modalDialog) {
-      modalDialog.style.pointerEvents = '';
+      modalDialog.style.pointerEvents = "";
     }
 
     // Restore page interactability
@@ -169,15 +169,15 @@ class ModalUtility {
     setTimeout(() => {
       if (!this.isOpen) {
         // Double check in case modal was reopened
-        this.element.style.display = 'none';
+        this.element.style.display = "none";
       }
     }, animationDuration);
 
     // Restore body scrolling
-    document.body.style.overflow = '';
+    document.body.style.overflow = "";
 
     // Call onClose callback if provided
-    if (this.onClose && typeof this.onClose === 'function') {
+    if (this.onClose && typeof this.onClose === "function") {
       this.onClose();
     }
   }
@@ -185,12 +185,12 @@ class ModalUtility {
   _setPageInert(inert) {
     // Get all direct children of body except our modal and onboarding elements
     const bodyChildren = Array.from(document.body.children);
-    bodyChildren.forEach(child => {
+    bodyChildren.forEach((child) => {
       if (
         child !== this.element &&
-        !child.classList.contains('onboarding-overlay') &&
-        !child.classList.contains('onboarding-spotlight') &&
-        !child.classList.contains('onboarding-coach-mark')
+        !child.classList.contains("onboarding-overlay") &&
+        !child.classList.contains("onboarding-spotlight") &&
+        !child.classList.contains("onboarding-coach-mark")
       ) {
         child.inert = inert;
       }
@@ -201,7 +201,7 @@ class ModalUtility {
     this.close();
 
     if (this._escapeHandler) {
-      document.removeEventListener('keydown', this._escapeHandler);
+      document.removeEventListener("keydown", this._escapeHandler);
     }
 
     if (this.element && this.element.parentNode) {
@@ -217,25 +217,25 @@ class ModalUtility {
   static cleanupOrphanedModals() {
     // Clean up modals with generated IDs
     const orphanedModals = document.querySelectorAll(
-      '[id^="modal-"]:not([style*="display: flex"])'
+      '[id^="modal-"]:not([style*="display: flex"])',
     );
-    orphanedModals.forEach(modal => {
+    orphanedModals.forEach((modal) => {
       // Check if modal is hidden or has no active class
       if (
-        modal.style.display === 'none' ||
-        !modal.classList.contains('visible')
+        modal.style.display === "none" ||
+        !modal.classList.contains("visible")
       ) {
         modal.remove();
-        logger.info('ModalUtility', 'Cleaned up orphaned modal:', modal.id);
+        logger.info("ModalUtility", "Cleaned up orphaned modal:", modal.id);
       }
     });
 
     // Clean up generic modal structure elements that may be orphaned
-    const modalBackdrops = document.querySelectorAll('.modal-backdrop');
-    modalBackdrops.forEach(backdrop => {
+    const modalBackdrops = document.querySelectorAll(".modal-backdrop");
+    modalBackdrops.forEach((backdrop) => {
       // Check if backdrop has no visible content or is empty
       const hasVisibleContent = backdrop.querySelector(
-        '.modal-dialog .modal-body *:not(:empty)'
+        ".modal-dialog .modal-body *:not(:empty)",
       );
       const hasActiveModal =
         backdrop.closest('[id^="modal-"]') ||
@@ -243,46 +243,46 @@ class ModalUtility {
 
       if (!hasVisibleContent && !hasActiveModal) {
         backdrop.remove();
-        logger.info('ModalUtility', 'Cleaned up orphaned modal backdrop');
+        logger.info("ModalUtility", "Cleaned up orphaned modal backdrop");
       }
     });
 
     // Clean up simulation modal specifically
-    const simulationModal = document.getElementById('simulation-modal');
+    const simulationModal = document.getElementById("simulation-modal");
     if (simulationModal) {
       // Check if it's actually being used
       const isVisible =
-        simulationModal.style.display === 'flex' ||
-        simulationModal.classList.contains('show') ||
-        simulationModal.classList.contains('visible');
+        simulationModal.style.display === "flex" ||
+        simulationModal.classList.contains("show") ||
+        simulationModal.classList.contains("visible");
 
       if (!isVisible) {
         simulationModal.remove();
-        logger.info('ModalUtility', 'Cleaned up orphaned simulation modal');
+        logger.info("ModalUtility", "Cleaned up orphaned simulation modal");
       }
     }
 
     // Clean up any standalone modal-dialog or modal-body elements
     const orphanedDialogs = document.querySelectorAll(
-      '.modal-dialog:not(.modal-backdrop .modal-dialog)'
+      ".modal-dialog:not(.modal-backdrop .modal-dialog)",
     );
-    orphanedDialogs.forEach(dialog => {
+    orphanedDialogs.forEach((dialog) => {
       if (
-        !dialog.closest('.modal-backdrop') &&
+        !dialog.closest(".modal-backdrop") &&
         !dialog.closest('[id^="modal-"]')
       ) {
         dialog.remove();
-        logger.info('ModalUtility', 'Cleaned up orphaned modal dialog');
+        logger.info("ModalUtility", "Cleaned up orphaned modal dialog");
       }
     });
 
     const orphanedBodies = document.querySelectorAll(
-      '.modal-body:not(.modal-dialog .modal-body)'
+      ".modal-body:not(.modal-dialog .modal-body)",
     );
-    orphanedBodies.forEach(body => {
-      if (!body.closest('.modal-dialog') && !body.closest('[id^="modal-"]')) {
+    orphanedBodies.forEach((body) => {
+      if (!body.closest(".modal-dialog") && !body.closest('[id^="modal-"]')) {
         body.remove();
-        logger.info('ModalUtility', 'Cleaned up orphaned modal body');
+        logger.info("ModalUtility", "Cleaned up orphaned modal body");
       }
     });
   }
@@ -294,7 +294,7 @@ class ModalUtility {
     const modal = document.getElementById(modalId);
     if (modal) {
       modal.remove();
-      logger.info('ModalUtility', 'Force destroyed modal:', modalId);
+      logger.info("ModalUtility", "Force destroyed modal:", modalId);
       return true;
     }
     return false;
@@ -305,92 +305,92 @@ class ModalUtility {
    * This removes ALL modal elements that are not actively displayed
    */
   static aggressiveModalCleanup() {
-    logger.info('ModalUtility', 'Starting aggressive modal cleanup');
+    logger.info("ModalUtility", "Starting aggressive modal cleanup");
 
     // Clean up all modal backdrops that are not actively showing content
-    const allBackdrops = document.querySelectorAll('.modal-backdrop');
-    allBackdrops.forEach(backdrop => {
+    const allBackdrops = document.querySelectorAll(".modal-backdrop");
+    allBackdrops.forEach((backdrop) => {
       const isVisible =
-        backdrop.style.display === 'flex' ||
-        backdrop.classList.contains('show') ||
-        backdrop.classList.contains('visible');
+        backdrop.style.display === "flex" ||
+        backdrop.classList.contains("show") ||
+        backdrop.classList.contains("visible");
 
       if (!isVisible) {
         backdrop.remove();
-        logger.info('ModalUtility', 'Aggressively removed modal backdrop');
+        logger.info("ModalUtility", "Aggressively removed modal backdrop");
       }
     });
 
     // Clean up simulation modal if not active
-    const simulationModal = document.getElementById('simulation-modal');
+    const simulationModal = document.getElementById("simulation-modal");
     if (simulationModal) {
       const isActive =
-        simulationModal.style.display === 'flex' ||
-        simulationModal.classList.contains('show') ||
-        simulationModal.classList.contains('visible');
+        simulationModal.style.display === "flex" ||
+        simulationModal.classList.contains("show") ||
+        simulationModal.classList.contains("visible");
 
       if (!isActive) {
         simulationModal.remove();
-        logger.info('ModalUtility', 'Aggressively removed simulation modal');
+        logger.info("ModalUtility", "Aggressively removed simulation modal");
       }
     }
 
     // Clean up all orphaned modal dialogs
-    const allDialogs = document.querySelectorAll('.modal-dialog');
-    allDialogs.forEach(dialog => {
+    const allDialogs = document.querySelectorAll(".modal-dialog");
+    allDialogs.forEach((dialog) => {
       const hasActiveParent =
         dialog.closest('.modal-backdrop[style*="display: flex"]') ||
         dialog.closest('[id^="modal-"][style*="display: flex"]') ||
-        dialog.closest('.show') ||
-        dialog.closest('.visible');
+        dialog.closest(".show") ||
+        dialog.closest(".visible");
 
       if (!hasActiveParent) {
         dialog.remove();
-        logger.info('ModalUtility', 'Aggressively removed modal dialog');
+        logger.info("ModalUtility", "Aggressively removed modal dialog");
       }
     });
 
     // Clean up all orphaned modal bodies
-    const allBodies = document.querySelectorAll('.modal-body');
-    allBodies.forEach(body => {
+    const allBodies = document.querySelectorAll(".modal-body");
+    allBodies.forEach((body) => {
       const hasActiveParent =
-        body.closest('.modal-dialog') ||
+        body.closest(".modal-dialog") ||
         body.closest('.modal-backdrop[style*="display: flex"]') ||
         body.closest('[id^="modal-"][style*="display: flex"]') ||
-        body.closest('.show') ||
-        body.closest('.visible');
+        body.closest(".show") ||
+        body.closest(".visible");
 
       if (!hasActiveParent) {
         body.remove();
-        logger.info('ModalUtility', 'Aggressively removed modal body');
+        logger.info("ModalUtility", "Aggressively removed modal body");
       }
     });
 
     // Clean up any remaining modal elements with generated IDs
     const allGeneratedModals = document.querySelectorAll('[id^="modal-"]');
-    allGeneratedModals.forEach(modal => {
+    allGeneratedModals.forEach((modal) => {
       const isVisible =
-        modal.style.display === 'flex' ||
-        modal.classList.contains('show') ||
-        modal.classList.contains('visible');
+        modal.style.display === "flex" ||
+        modal.classList.contains("show") ||
+        modal.classList.contains("visible");
 
       if (!isVisible) {
         modal.remove();
         logger.info(
-          'ModalUtility',
-          'Aggressively removed generated modal:',
-          modal.id
+          "ModalUtility",
+          "Aggressively removed generated modal:",
+          modal.id,
         );
       }
     });
 
-    logger.info('ModalUtility', 'Aggressive modal cleanup completed');
+    logger.info("ModalUtility", "Aggressive modal cleanup completed");
   }
 
   // Update content methods
   setTitle(title) {
     this.title = title;
-    const titleEl = this.element.querySelector('.modal-title');
+    const titleEl = this.element.querySelector(".modal-title");
     if (titleEl) {
       titleEl.textContent = title;
     }
@@ -398,7 +398,7 @@ class ModalUtility {
 
   setContent(content) {
     this.content = content;
-    const bodyEl = this.element.querySelector('.modal-body');
+    const bodyEl = this.element.querySelector(".modal-body");
     if (bodyEl) {
       bodyEl.innerHTML = content;
     }
@@ -406,13 +406,13 @@ class ModalUtility {
 
   setFooter(footer) {
     this.footer = footer;
-    let footerEl = this.element.querySelector('.modal-footer');
+    let footerEl = this.element.querySelector(".modal-footer");
 
     if (footer) {
       if (!footerEl) {
-        footerEl = document.createElement('div');
-        footerEl.className = 'modal-footer';
-        this.element.querySelector('.modal-dialog').appendChild(footerEl);
+        footerEl = document.createElement("div");
+        footerEl.className = "modal-footer";
+        this.element.querySelector(".modal-dialog").appendChild(footerEl);
       }
       footerEl.innerHTML = footer;
     } else if (footerEl) {
@@ -425,7 +425,7 @@ class ModalUtility {
 export default ModalUtility;
 
 // Make available globally for backward compatibility
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.ModalUtility = ModalUtility;
   // Also provide as ModalDialog for auth service compatibility
   window.ModalDialog = ModalUtility;

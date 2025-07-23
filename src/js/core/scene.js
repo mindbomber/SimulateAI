@@ -125,7 +125,7 @@ export class Scene {
 
   clear() {
     // Call onRemoved for all objects
-    this.objects.forEach(object => {
+    this.objects.forEach((object) => {
       if (object.onRemoved) {
         object.onRemoved();
       }
@@ -179,9 +179,9 @@ export class Scene {
     // Get sorted layer indices
     const layerIndices = Array.from(this.layers.keys()).sort((a, b) => a - b);
 
-    layerIndices.forEach(layerIndex => {
+    layerIndices.forEach((layerIndex) => {
       const layer = this.layers.get(layerIndex);
-      layer.forEach(object => {
+      layer.forEach((object) => {
         if (object.visible !== false) {
           renderer.renderObject(object);
         }
@@ -189,7 +189,7 @@ export class Scene {
     });
 
     // Render objects not in any layer
-    this.objects.forEach(object => {
+    this.objects.forEach((object) => {
       if (object.layer === undefined && object.visible !== false) {
         renderer.renderObject(object);
       }
@@ -199,10 +199,10 @@ export class Scene {
   renderByZIndex(renderer) {
     // Create sorted copy of objects by z-index
     const sortedObjects = [...this.objects].sort(
-      (a, b) => (a.zIndex || 0) - (b.zIndex || 0)
+      (a, b) => (a.zIndex || 0) - (b.zIndex || 0),
     );
 
-    sortedObjects.forEach(object => {
+    sortedObjects.forEach((object) => {
       if (object.visible !== false) {
         renderer.renderObject(object);
       }
@@ -233,7 +233,7 @@ export class Scene {
     const results = [];
     const area = { x, y, width, height };
 
-    this.objects.forEach(object => {
+    this.objects.forEach((object) => {
       if (object.visible !== false && object.getBounds) {
         const bounds = object.getBounds();
         if (this.rectanglesIntersect(area, bounds)) {
@@ -246,12 +246,12 @@ export class Scene {
   }
 
   getObjectsByType(type) {
-    return this.objects.filter(object => object.type === type);
+    return this.objects.filter((object) => object.type === type);
   }
 
   getObjectsByTag(tag) {
     return this.objects.filter(
-      object => object.tags && object.tags.includes(tag)
+      (object) => object.tags && object.tags.includes(tag),
     );
   }
 
@@ -277,12 +277,12 @@ export class Scene {
 
     // Filter by layer if specified
     if (layer !== null) {
-      objectsToTest = objectsToTest.filter(obj => obj.layer === layer);
+      objectsToTest = objectsToTest.filter((obj) => obj.layer === layer);
     }
 
     // Filter by type if specified
     if (type !== null) {
-      objectsToTest = objectsToTest.filter(obj => obj.type === type);
+      objectsToTest = objectsToTest.filter((obj) => obj.type === type);
     }
 
     // Test objects in reverse order (top to bottom)
@@ -353,7 +353,7 @@ export class Scene {
 
       // For mouse/touch events, check if point is within object bounds
       if (
-        (eventType.includes('mouse') || eventType.includes('touch')) &&
+        (eventType.includes("mouse") || eventType.includes("touch")) &&
         eventData.x !== undefined &&
         eventData.y !== undefined
       ) {
@@ -362,13 +362,13 @@ export class Scene {
           object.containsPoint(eventData.x, eventData.y)
         ) {
           // Trigger object-specific events
-          if (eventType === 'mousedown' && object.onMouseDown) {
+          if (eventType === "mousedown" && object.onMouseDown) {
             object.onMouseDown(eventData);
             return true;
-          } else if (eventType === 'mouseup' && object.onClick) {
+          } else if (eventType === "mouseup" && object.onClick) {
             object.onClick(eventData);
             return true;
-          } else if (eventType === 'mousemove' && object.onMouseMove) {
+          } else if (eventType === "mousemove" && object.onMouseMove) {
             object.onMouseMove(eventData);
             return true;
           }
@@ -381,7 +381,7 @@ export class Scene {
 
   handleResize() {
     // Notify all objects of resize
-    this.objects.forEach(object => {
+    this.objects.forEach((object) => {
       if (object.onResize) {
         object.onResize();
       }
@@ -393,7 +393,7 @@ export class Scene {
     if (!object || !properties || duration <= 0) return;
 
     const {
-      easing = 'easeInOut',
+      easing = "easeInOut",
       onComplete = null,
       onUpdate = null,
     } = options;
@@ -402,11 +402,11 @@ export class Scene {
     const startValues = {};
 
     // Store initial values
-    Object.keys(properties).forEach(key => {
+    Object.keys(properties).forEach((key) => {
       startValues[key] = object[key] || 0;
     });
 
-    const animate = currentTime => {
+    const animate = (currentTime) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
 
@@ -414,7 +414,7 @@ export class Scene {
       const easedProgress = this.applyEasing(progress, easing);
 
       // Update object properties
-      Object.keys(properties).forEach(key => {
+      Object.keys(properties).forEach((key) => {
         const startValue = startValues[key];
         const endValue = properties[key];
         object[key] = startValue + (endValue - startValue) * easedProgress;
@@ -436,22 +436,22 @@ export class Scene {
 
   applyEasing(t, type) {
     switch (type) {
-      case 'linear':
+      case "linear":
         return t;
-      case 'easeIn':
+      case "easeIn":
         return t * t;
-      case 'easeOut':
+      case "easeOut":
         return 1 - (1 - t) * (1 - t);
-      case 'easeInOut':
+      case "easeInOut":
         return t < EASING_CONSTANTS.HALF
           ? EASING_CONSTANTS.TWO * t * t
           : 1 -
               Math.pow(
                 -EASING_CONSTANTS.TWO * t + EASING_CONSTANTS.TWO,
-                EASING_CONSTANTS.TWO
+                EASING_CONSTANTS.TWO,
               ) /
                 EASING_CONSTANTS.TWO;
-      case 'bounce':
+      case "bounce":
         if (
           t <
           EASING_CONSTANTS.BOUNCE_THRESHOLD_1 / EASING_CONSTANTS.BOUNCE_DIVISOR

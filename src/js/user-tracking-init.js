@@ -20,20 +20,20 @@
  * with enhanced regional analytics capabilities
  */
 
-import enhancedUserTracking from './services/enhanced-user-tracking.js';
-import logger from './utils/logger.js';
+import enhancedUserTracking from "./services/enhanced-user-tracking.js";
+import logger from "./utils/logger.js";
 
 // Initialize enhanced user tracking when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   try {
-    logger.info('Initializing enhanced user tracking system...');
+    logger.info("Initializing enhanced user tracking system...");
 
     // Initialize the enhanced user tracking system
     enhancedUserTracking.initialize();
 
-    logger.info('Enhanced user tracking system initialized successfully');
+    logger.info("Enhanced user tracking system initialized successfully");
   } catch (error) {
-    logger.error('Failed to initialize enhanced user tracking system:', error);
+    logger.error("Failed to initialize enhanced user tracking system:", error);
   }
 });
 

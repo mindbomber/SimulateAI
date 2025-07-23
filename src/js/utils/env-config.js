@@ -14,25 +14,25 @@ class EnvironmentConfig {
     const metaEnv = import.meta.env || {};
     const isDevelopment =
       metaEnv.DEV ||
-      (!metaEnv.PROD && window.location.hostname === 'localhost');
+      (!metaEnv.PROD && window.location.hostname === "localhost");
     const isProduction =
       metaEnv.PROD ||
-      (!metaEnv.DEV && window.location.hostname !== 'localhost');
+      (!metaEnv.DEV && window.location.hostname !== "localhost");
 
     // Load environment variables
     const config = {
       // Firebase Configuration
       firebase: {
-        apiKey: metaEnv.VITE_FIREBASE_API_KEY || 'demo-api-key',
+        apiKey: metaEnv.VITE_FIREBASE_API_KEY || "demo-api-key",
         authDomain:
-          metaEnv.VITE_FIREBASE_AUTH_DOMAIN || 'demo-project.firebaseapp.com',
-        projectId: metaEnv.VITE_FIREBASE_PROJECT_ID || 'demo-project',
+          metaEnv.VITE_FIREBASE_AUTH_DOMAIN || "demo-project.firebaseapp.com",
+        projectId: metaEnv.VITE_FIREBASE_PROJECT_ID || "demo-project",
         storageBucket:
-          metaEnv.VITE_FIREBASE_STORAGE_BUCKET || 'demo-project.appspot.com',
+          metaEnv.VITE_FIREBASE_STORAGE_BUCKET || "demo-project.appspot.com",
         messagingSenderId:
-          metaEnv.VITE_FIREBASE_MESSAGING_SENDER_ID || '123456789',
-        appId: metaEnv.VITE_FIREBASE_APP_ID || '1:123456789:web:abcdef',
-        measurementId: metaEnv.VITE_FIREBASE_MEASUREMENT_ID || 'G-ABCDEF1234',
+          metaEnv.VITE_FIREBASE_MESSAGING_SENDER_ID || "123456789",
+        appId: metaEnv.VITE_FIREBASE_APP_ID || "1:123456789:web:abcdef",
+        measurementId: metaEnv.VITE_FIREBASE_MEASUREMENT_ID || "G-ABCDEF1234",
       },
 
       // Stripe Configuration
@@ -43,7 +43,7 @@ class EnvironmentConfig {
       // Environment Settings
       environment:
         import.meta.env.VITE_ENVIRONMENT ||
-        (isProduction ? 'production' : 'development'),
+        (isProduction ? "production" : "development"),
       isDevelopment,
       isProduction,
     };
@@ -56,15 +56,15 @@ class EnvironmentConfig {
 
   validateConfig(config) {
     const requiredKeys = [
-      'firebase.apiKey',
-      'firebase.authDomain',
-      'firebase.projectId',
-      'stripe.publishableKey',
+      "firebase.apiKey",
+      "firebase.authDomain",
+      "firebase.projectId",
+      "stripe.publishableKey",
     ];
 
     const missing = [];
 
-    requiredKeys.forEach(keyPath => {
+    requiredKeys.forEach((keyPath) => {
       const value = this.getNestedValue(config, keyPath);
       if (!value) {
         missing.push(keyPath);
@@ -75,17 +75,17 @@ class EnvironmentConfig {
       // Log missing environment variables for debugging
       if (window.console && window.console.error) {
         window.console.error(
-          '❌ Missing required environment variables:',
-          missing
+          "❌ Missing required environment variables:",
+          missing,
         );
         window.console.error(
-          'Please check your .env file and ensure all required variables are set.'
+          "Please check your .env file and ensure all required variables are set.",
         );
 
         // In development, show helpful message
         if (config.isDevelopment && window.console.info) {
           window.console.info(
-            '💡 Copy .env.example to .env and fill in your values'
+            "💡 Copy .env.example to .env and fill in your values",
           );
         }
       }
@@ -93,7 +93,7 @@ class EnvironmentConfig {
   }
 
   getNestedValue(obj, path) {
-    return path.split('.').reduce((current, key) => current?.[key], obj);
+    return path.split(".").reduce((current, key) => current?.[key], obj);
   }
 
   // Getter methods for easy access
@@ -124,21 +124,21 @@ class EnvironmentConfig {
     // Check for hardcoded API keys (basic patterns)
     const codeText = document.documentElement.innerHTML;
 
-    if (codeText.includes('AIzaSy') && this.isProduction()) {
-      warnings.push('Firebase API key may be hardcoded');
+    if (codeText.includes("AIzaSy") && this.isProduction()) {
+      warnings.push("Firebase API key may be hardcoded");
     }
 
-    if (codeText.includes('sk_live_') && this.isProduction()) {
-      warnings.push('Stripe secret key found in code (CRITICAL)');
+    if (codeText.includes("sk_live_") && this.isProduction()) {
+      warnings.push("Stripe secret key found in code (CRITICAL)");
     }
 
-    if (codeText.includes('pk_live_') && this.isProduction()) {
-      warnings.push('Stripe publishable key may be hardcoded');
+    if (codeText.includes("pk_live_") && this.isProduction()) {
+      warnings.push("Stripe publishable key may be hardcoded");
     }
 
     if (warnings.length > 0) {
       if (window.console && window.console.warn) {
-        window.console.warn('🔒 Security Warning:', warnings);
+        window.console.warn("🔒 Security Warning:", warnings);
       }
     }
 

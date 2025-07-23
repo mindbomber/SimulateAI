@@ -1,4 +1,4 @@
-import logger from '../utils/logger.js';
+import logger from "../utils/logger.js";
 
 /**
  * Modern Layout Components
@@ -6,7 +6,7 @@ import logger from '../utils/logger.js';
  * Enhanced with accessibility, performance, themes, and modern JavaScript patterns
  */
 
-import { BaseObject } from './enhanced-objects.js';
+import { BaseObject } from "./enhanced-objects.js";
 
 // Constants to eliminate magic numbers
 const LAYOUT_COMPONENT_CONSTANTS = {
@@ -129,170 +129,170 @@ class ComponentTheme {
   static themes = {
     light: {
       // Base colors
-      background: '#ffffff',
-      backgroundSecondary: '#f8f9fa',
-      backgroundDisabled: '#e9ecef',
-      text: '#212529',
-      textSecondary: '#6c757d',
-      disabled: '#adb5bd',
+      background: "#ffffff",
+      backgroundSecondary: "#f8f9fa",
+      backgroundDisabled: "#e9ecef",
+      text: "#212529",
+      textSecondary: "#6c757d",
+      disabled: "#adb5bd",
 
       // Interactive elements
-      primary: '#007bff',
-      primaryHover: '#0056b3',
-      primaryText: '#ffffff',
-      primaryBorder: '#0056b3',
+      primary: "#007bff",
+      primaryHover: "#0056b3",
+      primaryText: "#ffffff",
+      primaryBorder: "#0056b3",
 
       // Layout-specific colors
-      border: '#dee2e6',
-      borderActive: '#007bff',
-      shadow: 'rgba(0, 0, 0, 0.1)',
-      overlay: 'rgba(0, 0, 0, 0.5)',
+      border: "#dee2e6",
+      borderActive: "#007bff",
+      shadow: "rgba(0, 0, 0, 0.1)",
+      overlay: "rgba(0, 0, 0, 0.5)",
 
       // Status colors
-      success: '#28a745',
-      successHover: '#218838',
-      warning: '#ffc107',
-      warningHover: '#e0a800',
-      danger: '#dc3545',
-      dangerHover: '#c82333',
+      success: "#28a745",
+      successHover: "#218838",
+      warning: "#ffc107",
+      warningHover: "#e0a800",
+      danger: "#dc3545",
+      dangerHover: "#c82333",
 
       // Focus and selection
-      focus: '#007bff',
-      selection: '#e3f2fd',
-      hover: '#f5f5f5',
+      focus: "#007bff",
+      selection: "#e3f2fd",
+      hover: "#f5f5f5",
 
       // Tab-specific colors
-      tabBackground: '#f8f9fa',
-      tabActive: '#ffffff',
-      tabBorder: '#dee2e6',
-      tabHover: '#e9ecef',
+      tabBackground: "#f8f9fa",
+      tabActive: "#ffffff",
+      tabBorder: "#dee2e6",
+      tabHover: "#e9ecef",
 
       // Tree-specific colors
-      treeExpander: '#6c757d',
-      treeSelected: '#007bff',
-      treeHover: '#f8f9fa',
+      treeExpander: "#6c757d",
+      treeSelected: "#007bff",
+      treeHover: "#f8f9fa",
 
       // Progress colors
-      progressTrack: '#e9ecef',
-      progressFill: '#007bff',
-      progressComplete: '#28a745',
+      progressTrack: "#e9ecef",
+      progressFill: "#007bff",
+      progressComplete: "#28a745",
 
       // Upload colors
-      uploadBorder: '#007bff',
-      uploadHover: '#e3f2fd',
-      uploadError: '#dc3545',
+      uploadBorder: "#007bff",
+      uploadHover: "#e3f2fd",
+      uploadError: "#dc3545",
     },
 
     dark: {
       // Base colors
-      background: '#1a1a1a',
-      backgroundSecondary: '#2d2d2d',
-      backgroundDisabled: '#404040',
-      text: '#ffffff',
-      textSecondary: '#b3b3b3',
-      disabled: '#666666',
+      background: "#1a1a1a",
+      backgroundSecondary: "#2d2d2d",
+      backgroundDisabled: "#404040",
+      text: "#ffffff",
+      textSecondary: "#b3b3b3",
+      disabled: "#666666",
 
       // Interactive elements
-      primary: '#4dabf7',
-      primaryHover: '#339af0',
-      primaryText: '#000000',
-      primaryBorder: '#339af0',
+      primary: "#4dabf7",
+      primaryHover: "#339af0",
+      primaryText: "#000000",
+      primaryBorder: "#339af0",
 
       // Layout-specific colors
-      border: '#404040',
-      borderActive: '#4dabf7',
-      shadow: 'rgba(0, 0, 0, 0.3)',
-      overlay: 'rgba(0, 0, 0, 0.7)',
+      border: "#404040",
+      borderActive: "#4dabf7",
+      shadow: "rgba(0, 0, 0, 0.3)",
+      overlay: "rgba(0, 0, 0, 0.7)",
 
       // Status colors
-      success: '#51cf66',
-      successHover: '#40c057',
-      warning: '#ffd43b',
-      warningHover: '#fab005',
-      danger: '#ff6b6b',
-      dangerHover: '#fa5252',
+      success: "#51cf66",
+      successHover: "#40c057",
+      warning: "#ffd43b",
+      warningHover: "#fab005",
+      danger: "#ff6b6b",
+      dangerHover: "#fa5252",
 
       // Focus and selection
-      focus: '#4dabf7',
-      selection: '#1c7ed6',
-      hover: '#2d2d2d',
+      focus: "#4dabf7",
+      selection: "#1c7ed6",
+      hover: "#2d2d2d",
 
       // Tab-specific colors
-      tabBackground: '#2d2d2d',
-      tabActive: '#1a1a1a',
-      tabBorder: '#404040',
-      tabHover: '#333333',
+      tabBackground: "#2d2d2d",
+      tabActive: "#1a1a1a",
+      tabBorder: "#404040",
+      tabHover: "#333333",
 
       // Tree-specific colors
-      treeExpander: '#b3b3b3',
-      treeSelected: '#4dabf7',
-      treeHover: '#2d2d2d',
+      treeExpander: "#b3b3b3",
+      treeSelected: "#4dabf7",
+      treeHover: "#2d2d2d",
 
       // Progress colors
-      progressTrack: '#404040',
-      progressFill: '#4dabf7',
-      progressComplete: '#51cf66',
+      progressTrack: "#404040",
+      progressFill: "#4dabf7",
+      progressComplete: "#51cf66",
 
       // Upload colors
-      uploadBorder: '#4dabf7',
-      uploadHover: '#1c7ed6',
-      uploadError: '#ff6b6b',
+      uploadBorder: "#4dabf7",
+      uploadHover: "#1c7ed6",
+      uploadError: "#ff6b6b",
     },
 
     highContrast: {
       // Base colors
-      background: '#000000',
-      backgroundSecondary: '#1a1a1a',
-      backgroundDisabled: '#333333',
-      text: '#ffffff',
-      textSecondary: '#cccccc',
-      disabled: '#666666',
+      background: "#000000",
+      backgroundSecondary: "#1a1a1a",
+      backgroundDisabled: "#333333",
+      text: "#ffffff",
+      textSecondary: "#cccccc",
+      disabled: "#666666",
 
       // Interactive elements
-      primary: '#ffffff',
-      primaryHover: '#cccccc',
-      primaryText: '#000000',
-      primaryBorder: '#ffffff',
+      primary: "#ffffff",
+      primaryHover: "#cccccc",
+      primaryText: "#000000",
+      primaryBorder: "#ffffff",
 
       // Layout-specific colors
-      border: '#ffffff',
-      borderActive: '#ffff00',
-      shadow: 'rgba(255, 255, 255, 0.3)',
-      overlay: 'rgba(0, 0, 0, 0.8)',
+      border: "#ffffff",
+      borderActive: "#ffff00",
+      shadow: "rgba(255, 255, 255, 0.3)",
+      overlay: "rgba(0, 0, 0, 0.8)",
 
       // Status colors
-      success: '#00ff00',
-      successHover: '#00cc00',
-      warning: '#ffff00',
-      warningHover: '#cccc00',
-      danger: '#ff0000',
-      dangerHover: '#cc0000',
+      success: "#00ff00",
+      successHover: "#00cc00",
+      warning: "#ffff00",
+      warningHover: "#cccc00",
+      danger: "#ff0000",
+      dangerHover: "#cc0000",
 
       // Focus and selection
-      focus: '#ffff00',
-      selection: '#0000ff',
-      hover: '#333333',
+      focus: "#ffff00",
+      selection: "#0000ff",
+      hover: "#333333",
 
       // Tab-specific colors
-      tabBackground: '#1a1a1a',
-      tabActive: '#000000',
-      tabBorder: '#ffffff',
-      tabHover: '#333333',
+      tabBackground: "#1a1a1a",
+      tabActive: "#000000",
+      tabBorder: "#ffffff",
+      tabHover: "#333333",
 
       // Tree-specific colors
-      treeExpander: '#ffffff',
-      treeSelected: '#ffff00',
-      treeHover: '#333333',
+      treeExpander: "#ffffff",
+      treeSelected: "#ffff00",
+      treeHover: "#333333",
 
       // Progress colors
-      progressTrack: '#333333',
-      progressFill: '#ffffff',
-      progressComplete: '#00ff00',
+      progressTrack: "#333333",
+      progressFill: "#ffffff",
+      progressComplete: "#00ff00",
 
       // Upload colors
-      uploadBorder: '#ffffff',
-      uploadHover: '#333333',
-      uploadError: '#ff0000',
+      uploadBorder: "#ffffff",
+      uploadHover: "#333333",
+      uploadError: "#ff0000",
     },
   };
 
@@ -300,12 +300,12 @@ class ComponentTheme {
     // Check for high contrast preference
     if (
       window.matchMedia &&
-      window.matchMedia('(prefers-contrast: high)').matches
+      window.matchMedia("(prefers-contrast: high)").matches
     ) {
-      return 'highContrast';
+      return "highContrast";
     }
 
-    return 'light';
+    return "light";
   }
 
   static getColor(colorName, customTheme = null) {
@@ -313,7 +313,7 @@ class ComponentTheme {
     return (
       this.themes[theme]?.[colorName] ||
       this.themes.light[colorName] ||
-      '#000000'
+      "#000000"
     );
   }
 
@@ -332,9 +332,10 @@ class PerformanceMonitor {
 
   static createInstance(componentId) {
     const instance = {
-      startMeasurement: operation =>
+      startMeasurement: (operation) =>
         this.startMeasurement(componentId, operation),
-      endMeasurement: operation => this.endMeasurement(componentId, operation),
+      endMeasurement: (operation) =>
+        this.endMeasurement(componentId, operation),
       getMetrics: () => this.getMetrics(componentId),
     };
     this.instances.set(componentId, instance);
@@ -368,7 +369,7 @@ class PerformanceMonitor {
       // Log performance warnings
       if (measurement.duration > PERFORMANCE_THRESHOLDS.renderTime) {
         logger.warn(
-          `Performance warning: ${operation} took ${measurement.duration.toFixed(2)}ms in ${componentId}`
+          `Performance warning: ${operation} took ${measurement.duration.toFixed(2)}ms in ${componentId}`,
         );
       }
 
@@ -379,7 +380,7 @@ class PerformanceMonitor {
   }
 
   static getMemoryUsage() {
-    if ('memory' in performance) {
+    if ("memory" in performance) {
       return performance.memory.usedJSHeapSize;
     }
     return 0;
@@ -388,7 +389,7 @@ class PerformanceMonitor {
   static getMetrics(componentId) {
     const measurements = Array.from(this.measurements.entries())
       .filter(([key]) => key.startsWith(componentId))
-      .map(([key, value]) => ({ operation: key.split('-')[1], ...value }));
+      .map(([key, value]) => ({ operation: key.split("-")[1], ...value }));
 
     return {
       activeOperations: measurements.length,
@@ -403,7 +404,7 @@ class PerformanceMonitor {
 class ComponentError extends Error {
   constructor(message, component, context = {}) {
     super(message);
-    this.name = 'ComponentError';
+    this.name = "ComponentError";
     this.component = component;
     this.context = context;
     this.timestamp = new Date().toISOString();
@@ -475,16 +476,16 @@ class AnimationManager {
 
   static applyEasing(progress, easing) {
     const easings = {
-      linear: t => t,
-      easeIn: t => t * t,
-      easeOut: t => 1 - Math.pow(1 - t, 2),
-      easeInOut: t =>
+      linear: (t) => t,
+      easeIn: (t) => t * t,
+      easeOut: (t) => 1 - Math.pow(1 - t, 2),
+      easeInOut: (t) =>
         t < LAYOUT_COMPONENT_CONSTANTS.EASING_HALF_POINT
           ? 2 * t * t
           : -1 + (LAYOUT_COMPONENT_CONSTANTS.EASING_CURVE_FACTOR - 2 * t) * t,
-      easeOutCubic: t =>
+      easeOutCubic: (t) =>
         1 - Math.pow(1 - t, LAYOUT_COMPONENT_CONSTANTS.EASING_CUBIC_POWER),
-      bounce: t => {
+      bounce: (t) => {
         if (t < 1 / LAYOUT_COMPONENT_CONSTANTS.BOUNCE_DIVISOR)
           return LAYOUT_COMPONENT_CONSTANTS.BOUNCE_MULTIPLIER * t * t;
         if (t < 2 / LAYOUT_COMPONENT_CONSTANTS.BOUNCE_DIVISOR)
@@ -535,7 +536,7 @@ class AnimationManager {
 // Enhanced constants and defaults
 const ANIMATION_DEFAULTS = {
   duration: 250,
-  easing: 'easeOutCubic',
+  easing: "easeOutCubic",
 };
 
 // Accessibility defaults (currently unused)
@@ -570,8 +571,8 @@ class TabContainer extends BaseObject {
       height:
         options.height ||
         LAYOUT_COMPONENT_CONSTANTS.TAB_CONTAINER_DEFAULT_HEIGHT,
-      ariaRole: 'tablist',
-      ariaLabel: options.ariaLabel || 'Tab Container',
+      ariaRole: "tablist",
+      ariaLabel: options.ariaLabel || "Tab Container",
     });
 
     // Validate options
@@ -606,7 +607,7 @@ class TabContainer extends BaseObject {
     this.renderCache = new Map();
     this.throttledRender = this.throttle(
       this.render.bind(this),
-      PERFORMANCE_THRESHOLDS.eventThrottle
+      PERFORMANCE_THRESHOLDS.eventThrottle,
     );
 
     // Accessibility
@@ -617,7 +618,7 @@ class TabContainer extends BaseObject {
     this.errorHandler = this.createErrorHandler();
 
     // Performance monitoring
-    this.performanceMonitor = PerformanceMonitor.createInstance('TabContainer');
+    this.performanceMonitor = PerformanceMonitor.createInstance("TabContainer");
 
     try {
       this.setupTabs();
@@ -625,41 +626,41 @@ class TabContainer extends BaseObject {
       this.setupAccessibility();
       this.setupResizeObserver();
     } catch (error) {
-      this.errorHandler.handle(error, 'constructor');
+      this.errorHandler.handle(error, "constructor");
     }
   }
 
   validateOptions(options) {
     if (
       options.maxTabs &&
-      (typeof options.maxTabs !== 'number' || options.maxTabs < 1)
+      (typeof options.maxTabs !== "number" || options.maxTabs < 1)
     ) {
       throw new ComponentError(
-        'maxTabs must be a positive number',
-        'TabContainer'
+        "maxTabs must be a positive number",
+        "TabContainer",
       );
     }
 
     if (
       options.tabHeight &&
-      (typeof options.tabHeight !== 'number' ||
+      (typeof options.tabHeight !== "number" ||
         options.tabHeight < LAYOUT_COMPONENT_CONSTANTS.TAB_MIN_HEIGHT)
     ) {
       throw new ComponentError(
         `tabHeight must be at least ${LAYOUT_COMPONENT_CONSTANTS.TAB_MIN_HEIGHT} pixels`,
-        'TabContainer'
+        "TabContainer",
       );
     }
 
     if (options.tabs && !Array.isArray(options.tabs)) {
-      throw new ComponentError('tabs must be an array', 'TabContainer');
+      throw new ComponentError("tabs must be an array", "TabContainer");
     }
   }
 
   createScreenReaderAnnouncer() {
-    const announcer = document.createElement('div');
-    announcer.setAttribute('aria-live', 'polite');
-    announcer.setAttribute('aria-atomic', 'true');
+    const announcer = document.createElement("div");
+    announcer.setAttribute("aria-live", "polite");
+    announcer.setAttribute("aria-atomic", "true");
     announcer.style.cssText = `
             position: absolute;
             left: -10000px;
@@ -675,8 +676,8 @@ class TabContainer extends BaseObject {
     return {
       ArrowLeft: () => this.navigateTab(-1),
       ArrowRight: () => this.navigateTab(1),
-      Home: () => this.navigateToTab('first'),
-      End: () => this.navigateToTab('last'),
+      Home: () => this.navigateToTab("first"),
+      End: () => this.navigateToTab("last"),
       Enter: () => this.activateFocusedTab(),
       Space: () => this.activateFocusedTab(),
       Delete: () => this.closeFocusedTab(),
@@ -688,13 +689,13 @@ class TabContainer extends BaseObject {
     return {
       handle: (error, context) => {
         const componentError = new ComponentError(
-          error.message || 'Unknown error',
-          'TabContainer',
-          { context, originalError: error }
+          error.message || "Unknown error",
+          "TabContainer",
+          { context, originalError: error },
         );
 
-        logger.error('TabContainer Error:', componentError);
-        this.emit('error', componentError);
+        logger.error("TabContainer Error:", componentError);
+        this.emit("error", componentError);
 
         this.recoverFromError(context);
       },
@@ -703,14 +704,14 @@ class TabContainer extends BaseObject {
 
   recoverFromError(context) {
     switch (context) {
-      case 'tab-management':
+      case "tab-management":
         this.validateTabState();
         break;
-      case 'animation':
+      case "animation":
         this.animationState.tabTransitions.clear();
         AnimationManager.cancelAllAnimations();
         break;
-      case 'render':
+      case "render":
         this.clearRenderCache();
         break;
       default:
@@ -720,21 +721,21 @@ class TabContainer extends BaseObject {
 
   setupAccessibility() {
     // ARIA attributes
-    this.setAttribute('role', 'tablist');
-    this.setAttribute('aria-multiselectable', 'false');
-    this.setAttribute('aria-orientation', 'horizontal');
+    this.setAttribute("role", "tablist");
+    this.setAttribute("aria-multiselectable", "false");
+    this.setAttribute("aria-orientation", "horizontal");
 
     // Keyboard accessibility
-    this.setAttribute('tabindex', this.disabled ? '-1' : '0');
+    this.setAttribute("tabindex", this.disabled ? "-1" : "0");
 
     // Focus management
-    this.addEventListener('focusin', () => this.handleFocusIn());
-    this.addEventListener('focusout', () => this.handleFocusOut());
+    this.addEventListener("focusin", () => this.handleFocusIn());
+    this.addEventListener("focusout", () => this.handleFocusOut());
   }
 
   setupResizeObserver() {
-    if ('ResizeObserver' in window) {
-      this.resizeObserver = new ResizeObserver(_entries => {
+    if ("ResizeObserver" in window) {
+      this.resizeObserver = new ResizeObserver((_entries) => {
         this.clearRenderCache();
         this.throttledRender();
       });
@@ -750,9 +751,9 @@ class TabContainer extends BaseObject {
       // Ensure we have at least one tab
       if (this.tabs.length === 0) {
         this.tabs.push({
-          id: 'default',
-          title: 'Tab 1',
-          content: 'Default content',
+          id: "default",
+          title: "Tab 1",
+          content: "Default content",
           closeable: false,
         });
       }
@@ -761,7 +762,7 @@ class TabContainer extends BaseObject {
       this.tabs = this.tabs.map((tab, index) => ({
         id: tab.id || `tab-${index}`,
         title: tab.title || `Tab ${index + 1}`,
-        content: tab.content || '',
+        content: tab.content || "",
         closeable: tab.closeable !== false && this.closeable,
         icon: tab.icon || null,
         badge: tab.badge || null,
@@ -777,7 +778,7 @@ class TabContainer extends BaseObject {
       // Set up ARIA relationships
       this.updateTabAccessibility();
     } catch (error) {
-      this.errorHandler.handle(error, 'tab-setup');
+      this.errorHandler.handle(error, "tab-setup");
     }
   }
 
@@ -785,9 +786,9 @@ class TabContainer extends BaseObject {
     // Ensure we have valid tabs
     if (this.tabs.length === 0) {
       this.tabs.push({
-        id: 'fallback',
-        title: 'Default Tab',
-        content: '',
+        id: "fallback",
+        title: "Default Tab",
+        content: "",
         closeable: false,
       });
     }
@@ -795,7 +796,7 @@ class TabContainer extends BaseObject {
     // Clamp active tab index
     this.activeTabIndex = Math.max(
       0,
-      Math.min(this.activeTabIndex, this.tabs.length - 1)
+      Math.min(this.activeTabIndex, this.tabs.length - 1),
     );
 
     // Ensure focused tab is valid
@@ -830,14 +831,14 @@ class TabContainer extends BaseObject {
   async addTab(tabData, index = -1) {
     try {
       if (this.tabs.length >= this.maxTabs) {
-        this.announceChange('Maximum number of tabs reached');
+        this.announceChange("Maximum number of tabs reached");
         return false;
       }
 
       const newTab = {
         id: tabData.id || `tab-${Date.now()}`,
-        title: tabData.title || 'New Tab',
-        content: tabData.content || '',
+        title: tabData.title || "New Tab",
+        content: tabData.content || "",
         closeable: tabData.closeable !== false && this.closeable,
         icon: tabData.icon || null,
         badge: tabData.badge || null,
@@ -868,11 +869,11 @@ class TabContainer extends BaseObject {
       this.clearRenderCache();
 
       this.announceChange(`Tab "${newTab.title}" added`);
-      this.emit('tabAdded', { tab: newTab, index: insertIndex });
+      this.emit("tabAdded", { tab: newTab, index: insertIndex });
 
       return true;
     } catch (error) {
-      this.errorHandler.handle(error, 'addTab');
+      this.errorHandler.handle(error, "addTab");
       return false;
     }
   }
@@ -885,7 +886,7 @@ class TabContainer extends BaseObject {
 
       const removedTab = this.tabs[index];
       if (!removedTab.closeable) {
-        this.announceChange('Tab cannot be closed');
+        this.announceChange("Tab cannot be closed");
         return false;
       }
 
@@ -902,7 +903,7 @@ class TabContainer extends BaseObject {
       } else if (index === this.activeTabIndex) {
         this.activeTabIndex = Math.min(
           this.activeTabIndex,
-          this.tabs.length - 1
+          this.tabs.length - 1,
         );
       }
 
@@ -915,11 +916,11 @@ class TabContainer extends BaseObject {
       this.clearRenderCache();
 
       this.announceChange(`Tab "${removedTab.title}" removed`);
-      this.emit('tabRemoved', { tab: removedTab, index });
+      this.emit("tabRemoved", { tab: removedTab, index });
 
       return true;
     } catch (error) {
-      this.errorHandler.handle(error, 'removeTab');
+      this.errorHandler.handle(error, "removeTab");
       return false;
     }
   }
@@ -945,14 +946,14 @@ class TabContainer extends BaseObject {
 
         const activeTab = this.tabs[index];
         this.announceChange(`Tab "${activeTab.title}" activated`);
-        this.emit('tabChanged', {
+        this.emit("tabChanged", {
           previousIndex,
           activeIndex: index,
           tab: activeTab,
         });
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'setActiveTab');
+      this.errorHandler.handle(error, "setActiveTab");
     }
   }
 
@@ -968,7 +969,7 @@ class TabContainer extends BaseObject {
         }
 
         this.clearRenderCache();
-        this.emit('tabUpdated', {
+        this.emit("tabUpdated", {
           index,
           tab: this.tabs[index],
           updates,
@@ -976,7 +977,7 @@ class TabContainer extends BaseObject {
         });
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'updateTab');
+      this.errorHandler.handle(error, "updateTab");
     }
   }
 
@@ -1045,23 +1046,23 @@ class TabContainer extends BaseObject {
 
   handleKeyDown(event) {
     switch (event.key) {
-      case 'ArrowLeft':
+      case "ArrowLeft":
         if (this.activeTabIndex > 0) {
           this.setActiveTab(this.activeTabIndex - 1);
         }
         break;
-      case 'ArrowRight':
+      case "ArrowRight":
         if (this.activeTabIndex < this.tabs.length - 1) {
           this.setActiveTab(this.activeTabIndex + 1);
         }
         break;
-      case 'Home':
+      case "Home":
         this.setActiveTab(0);
         break;
-      case 'End':
+      case "End":
         this.setActiveTab(this.tabs.length - 1);
         break;
-      case 'Delete':
+      case "Delete":
         if (this.tabs[this.activeTabIndex]?.closeable) {
           this.removeTab(this.activeTabIndex);
         }
@@ -1106,12 +1107,12 @@ class TabContainer extends BaseObject {
       this.activeTabIndex++;
     }
 
-    this.emit('tabReordered', { fromIndex, toIndex, tab });
+    this.emit("tabReordered", { fromIndex, toIndex, tab });
   }
 
   // Rendering
   renderSelf(renderer) {
-    if (renderer.type !== 'canvas') return;
+    if (renderer.type !== "canvas") return;
 
     this.renderTabHeaders(renderer);
     this.renderActiveContent(renderer);
@@ -1128,7 +1129,7 @@ class TabContainer extends BaseObject {
       if (isActive) {
         backgroundColor = this.activeTabColor;
       } else if (isHovered) {
-        backgroundColor = '#e9ecef';
+        backgroundColor = "#e9ecef";
       }
 
       renderer.fillStyle = backgroundColor;
@@ -1141,14 +1142,14 @@ class TabContainer extends BaseObject {
 
       // Active tab indicator
       if (isActive) {
-        renderer.fillStyle = '#007bff';
+        renderer.fillStyle = "#007bff";
         renderer.fillRect(
           bounds.x,
           bounds.y +
             bounds.height -
             LAYOUT_COMPONENT_CONSTANTS.TAB_BORDER_OFFSET,
           bounds.width,
-          LAYOUT_COMPONENT_CONSTANTS.TAB_BORDER_WIDTH
+          LAYOUT_COMPONENT_CONSTANTS.TAB_BORDER_WIDTH,
         );
       }
 
@@ -1158,18 +1159,18 @@ class TabContainer extends BaseObject {
 
       // Icon
       if (tab.icon) {
-        renderer.fillStyle = tab.disabled ? '#999999' : '#333333';
-        renderer.font = '14px Arial';
-        renderer.textAlign = 'left';
+        renderer.fillStyle = tab.disabled ? "#999999" : "#333333";
+        renderer.font = "14px Arial";
+        renderer.textAlign = "left";
         renderer.fillText(tab.icon, textX, bounds.y + bounds.height / 2 + 2);
         textX += LAYOUT_COMPONENT_CONSTANTS.TAB_ICON_OFFSET;
       }
 
       // Title
-      renderer.fillStyle = tab.disabled ? '#999999' : '#333333';
-      renderer.font = isActive ? 'bold 12px Arial' : '12px Arial';
-      renderer.textAlign = 'left';
-      renderer.textBaseline = 'middle';
+      renderer.fillStyle = tab.disabled ? "#999999" : "#333333";
+      renderer.font = isActive ? "bold 12px Arial" : "12px Arial";
+      renderer.textAlign = "left";
+      renderer.textBaseline = "middle";
       const maxTextWidth =
         bounds.width -
         (textX - bounds.x) -
@@ -1177,7 +1178,7 @@ class TabContainer extends BaseObject {
       let { title } = tab;
       const titleWidth = renderer.measureText(title).width;
       if (titleWidth > maxTextWidth) {
-        const ellipsis = '...';
+        const ellipsis = "...";
         const ellipsisWidth = renderer.measureText(ellipsis).width;
         const availableWidth = maxTextWidth - ellipsisWidth;
 
@@ -1206,20 +1207,20 @@ class TabContainer extends BaseObject {
           bounds.x + bounds.width - LAYOUT_COMPONENT_CONSTANTS.TAB_BADGE_OFFSET;
         const badgeY = bounds.y + LAYOUT_COMPONENT_CONSTANTS.TAB_BADGE_Y_OFFSET;
 
-        renderer.fillStyle = '#dc3545';
+        renderer.fillStyle = "#dc3545";
         renderer.beginPath();
         renderer.arc(
           badgeX,
           badgeY,
           LAYOUT_COMPONENT_CONSTANTS.TAB_BADGE_RADIUS,
           0,
-          Math.PI * 2
+          Math.PI * 2,
         );
         renderer.fill();
 
-        renderer.fillStyle = '#ffffff';
-        renderer.font = 'bold 10px Arial';
-        renderer.textAlign = 'center';
+        renderer.fillStyle = "#ffffff";
+        renderer.font = "bold 10px Arial";
+        renderer.textAlign = "center";
         renderer.fillText(tab.badge, badgeX, badgeY + 1);
       }
 
@@ -1231,10 +1232,10 @@ class TabContainer extends BaseObject {
           LAYOUT_COMPONENT_CONSTANTS.TAB_CLOSE_BUTTON_OFFSET;
         const closeY = bounds.y + bounds.height / 2;
 
-        renderer.fillStyle = isHovered ? '#dc3545' : '#666666';
-        renderer.font = '12px Arial';
-        renderer.textAlign = 'center';
-        renderer.fillText('×', closeX, closeY);
+        renderer.fillStyle = isHovered ? "#dc3545" : "#666666";
+        renderer.font = "12px Arial";
+        renderer.textAlign = "center";
+        renderer.fillText("×", closeX, closeY);
       }
     });
   }
@@ -1256,15 +1257,15 @@ class TabContainer extends BaseObject {
     if (this.activeTabIndex >= 0 && this.activeTabIndex < this.tabs.length) {
       const activeTab = this.tabs[this.activeTabIndex];
 
-      if (typeof activeTab.content === 'string') {
-        renderer.fillStyle = '#333333';
-        renderer.font = '14px Arial';
-        renderer.textAlign = 'left';
-        renderer.textBaseline = 'top';
+      if (typeof activeTab.content === "string") {
+        renderer.fillStyle = "#333333";
+        renderer.font = "14px Arial";
+        renderer.textAlign = "left";
+        renderer.textBaseline = "top";
         renderer.fillText(
           activeTab.content,
           LAYOUT_COMPONENT_CONSTANTS.TAB_CONTENT_PADDING,
-          contentY + LAYOUT_COMPONENT_CONSTANTS.TAB_CONTENT_PADDING
+          contentY + LAYOUT_COMPONENT_CONSTANTS.TAB_CONTENT_PADDING,
         );
       }
       // If content is a component/object, it should render itself
@@ -1275,10 +1276,10 @@ class TabContainer extends BaseObject {
     const duration = 300;
     const animation = AnimationManager.createAnimation({
       duration,
-      easing: 'easeOutCubic',
-      onUpdate: progress => {
+      easing: "easeOutCubic",
+      onUpdate: (progress) => {
         this.animationState.tabTransitions.set(index, {
-          type: 'insert',
+          type: "insert",
           progress,
           scale:
             LAYOUT_COMPONENT_CONSTANTS.ANIMATION_SCALE_MIN +
@@ -1300,10 +1301,10 @@ class TabContainer extends BaseObject {
     const duration = 200;
     const animation = AnimationManager.createAnimation({
       duration,
-      easing: 'easeInCubic',
-      onUpdate: progress => {
+      easing: "easeInCubic",
+      onUpdate: (progress) => {
         this.animationState.tabTransitions.set(index, {
-          type: 'remove',
+          type: "remove",
           progress: 1 - progress,
           scale:
             1 - LAYOUT_COMPONENT_CONSTANTS.ANIMATION_SCALE_RANGE * progress,
@@ -1326,8 +1327,8 @@ class TabContainer extends BaseObject {
 
     const animation = AnimationManager.createAnimation({
       duration,
-      easing: 'easeInOutCubic',
-      onUpdate: progress => {
+      easing: "easeInOutCubic",
+      onUpdate: (progress) => {
         this.animationState.contentFade =
           progress < LAYOUT_COMPONENT_CONSTANTS.ANIMATION_FADE_OFFSET
             ? 1 - progress * LAYOUT_COMPONENT_CONSTANTS.ANIMATION_FADE_DIVISOR
@@ -1355,10 +1356,10 @@ class TabContainer extends BaseObject {
 
   navigateToTab(position) {
     switch (position) {
-      case 'first':
+      case "first":
         this.focusedTabIndex = 0;
         break;
-      case 'last':
+      case "last":
         this.focusedTabIndex = this.tabs.length - 1;
         break;
     }
@@ -1417,7 +1418,7 @@ class TabContainer extends BaseObject {
   prefersReducedMotion() {
     return (
       window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
     );
   }
 
@@ -1472,11 +1473,11 @@ class TabContainer extends BaseObject {
   }
 
   getTabById(id) {
-    return this.tabs.find(tab => tab.id === id);
+    return this.tabs.find((tab) => tab.id === id);
   }
 
   getTabIndex(id) {
-    return this.tabs.findIndex(tab => tab.id === id);
+    return this.tabs.findIndex((tab) => tab.id === id);
   }
 
   getTabs() {
@@ -1501,7 +1502,7 @@ class TabContainer extends BaseObject {
   setTheme(theme) {
     this.theme = theme;
     this.clearRenderCache();
-    this.emit('themeChanged', { theme });
+    this.emit("themeChanged", { theme });
   }
 }
 
@@ -1523,8 +1524,8 @@ class ProgressStepper extends BaseObject {
       height:
         options.height ||
         LAYOUT_COMPONENT_CONSTANTS.PROGRESS_STEPPER_DEFAULT_HEIGHT,
-      ariaRole: 'progressbar',
-      ariaLabel: options.ariaLabel || 'Progress Steps',
+      ariaRole: "progressbar",
+      ariaLabel: options.ariaLabel || "Progress Steps",
     });
 
     // Validate options
@@ -1534,9 +1535,9 @@ class ProgressStepper extends BaseObject {
     this.steps = options.steps || [];
     this.currentStep = Math.max(
       0,
-      Math.min(options.currentStep || 0, this.steps.length - 1)
+      Math.min(options.currentStep || 0, this.steps.length - 1),
     );
-    this.orientation = options.orientation || 'horizontal';
+    this.orientation = options.orientation || "horizontal";
     this.allowStepClick = options.allowStepClick !== false;
     this.showStepNumbers = options.showStepNumbers !== false;
     this.showLabels = options.showLabels !== false;
@@ -1559,7 +1560,7 @@ class ProgressStepper extends BaseObject {
     this.renderCache = new Map();
     this.throttledRender = this.throttle(
       this.render.bind(this),
-      PERFORMANCE_THRESHOLDS.eventThrottle
+      PERFORMANCE_THRESHOLDS.eventThrottle,
     );
 
     // Accessibility
@@ -1571,7 +1572,7 @@ class ProgressStepper extends BaseObject {
 
     // Performance monitoring
     this.performanceMonitor =
-      PerformanceMonitor.createInstance('ProgressStepper');
+      PerformanceMonitor.createInstance("ProgressStepper");
 
     try {
       this.setupSteps();
@@ -1579,40 +1580,40 @@ class ProgressStepper extends BaseObject {
       this.setupAccessibility();
       this.updateProgress();
     } catch (error) {
-      this.errorHandler.handle(error, 'constructor');
+      this.errorHandler.handle(error, "constructor");
     }
   }
 
   validateOptions(options) {
     if (
       options.currentStep &&
-      (typeof options.currentStep !== 'number' || options.currentStep < 0)
+      (typeof options.currentStep !== "number" || options.currentStep < 0)
     ) {
       throw new ComponentError(
-        'currentStep must be a non-negative number',
-        'ProgressStepper'
+        "currentStep must be a non-negative number",
+        "ProgressStepper",
       );
     }
 
     if (
       options.orientation &&
-      !['horizontal', 'vertical'].includes(options.orientation)
+      !["horizontal", "vertical"].includes(options.orientation)
     ) {
       throw new ComponentError(
         'orientation must be "horizontal" or "vertical"',
-        'ProgressStepper'
+        "ProgressStepper",
       );
     }
 
     if (options.steps && !Array.isArray(options.steps)) {
-      throw new ComponentError('steps must be an array', 'ProgressStepper');
+      throw new ComponentError("steps must be an array", "ProgressStepper");
     }
   }
 
   createScreenReaderAnnouncer() {
-    const announcer = document.createElement('div');
-    announcer.setAttribute('aria-live', 'polite');
-    announcer.setAttribute('aria-atomic', 'true');
+    const announcer = document.createElement("div");
+    announcer.setAttribute("aria-live", "polite");
+    announcer.setAttribute("aria-atomic", "true");
     announcer.style.cssText = `
             position: absolute;
             left: -10000px;
@@ -1630,8 +1631,8 @@ class ProgressStepper extends BaseObject {
       ArrowRight: () => this.navigateStep(1),
       ArrowUp: () => this.navigateStep(-1),
       ArrowDown: () => this.navigateStep(1),
-      Home: () => this.navigateToStep('first'),
-      End: () => this.navigateToStep('last'),
+      Home: () => this.navigateToStep("first"),
+      End: () => this.navigateToStep("last"),
       Enter: () => this.activateFocusedStep(),
       Space: () => this.activateFocusedStep(),
       Escape: () => this.handleEscape(),
@@ -1642,13 +1643,13 @@ class ProgressStepper extends BaseObject {
     return {
       handle: (error, context) => {
         const componentError = new ComponentError(
-          error.message || 'Unknown error',
-          'ProgressStepper',
-          { context, originalError: error }
+          error.message || "Unknown error",
+          "ProgressStepper",
+          { context, originalError: error },
         );
 
-        logger.error('ProgressStepper Error:', componentError);
-        this.emit('error', componentError);
+        logger.error("ProgressStepper Error:", componentError);
+        this.emit("error", componentError);
 
         this.recoverFromError(context);
       },
@@ -1657,15 +1658,15 @@ class ProgressStepper extends BaseObject {
 
   recoverFromError(context) {
     switch (context) {
-      case 'step-management':
+      case "step-management":
         this.validateStepState();
         break;
-      case 'animation':
+      case "animation":
         this.animationState.stepTransitions.clear();
         this.animatingSteps.clear();
         AnimationManager.cancelAllAnimations();
         break;
-      case 'render':
+      case "render":
         this.clearRenderCache();
         break;
       default:
@@ -1675,21 +1676,21 @@ class ProgressStepper extends BaseObject {
 
   setupAccessibility() {
     // ARIA attributes
-    this.setAttribute('role', 'progressbar');
-    this.setAttribute('aria-valuemin', '0');
-    this.setAttribute('aria-valuemax', this.steps.length - 1);
-    this.setAttribute('aria-valuenow', this.currentStep);
+    this.setAttribute("role", "progressbar");
+    this.setAttribute("aria-valuemin", "0");
+    this.setAttribute("aria-valuemax", this.steps.length - 1);
+    this.setAttribute("aria-valuenow", this.currentStep);
     this.setAttribute(
-      'aria-valuetext',
-      this.getStepDescription(this.currentStep)
+      "aria-valuetext",
+      this.getStepDescription(this.currentStep),
     );
 
     // Keyboard accessibility
-    this.setAttribute('tabindex', this.disabled ? '-1' : '0');
+    this.setAttribute("tabindex", this.disabled ? "-1" : "0");
 
     // Focus management
-    this.addEventListener('focusin', () => this.handleFocusIn());
-    this.addEventListener('focusout', () => this.handleFocusOut());
+    this.addEventListener("focusin", () => this.handleFocusIn());
+    this.addEventListener("focusout", () => this.handleFocusOut());
   }
 
   setupSteps() {
@@ -1697,9 +1698,9 @@ class ProgressStepper extends BaseObject {
       // Ensure we have at least one step
       if (this.steps.length === 0) {
         this.steps.push({
-          id: 'default',
-          title: 'Step 1',
-          description: 'Default step',
+          id: "default",
+          title: "Step 1",
+          description: "Default step",
           completed: false,
         });
       }
@@ -1708,7 +1709,7 @@ class ProgressStepper extends BaseObject {
       this.steps = this.steps.map((step, index) => ({
         id: step.id || `step-${index}`,
         title: step.title || `Step ${index + 1}`,
-        description: step.description || '',
+        description: step.description || "",
         completed: step.completed || false,
         disabled: step.disabled || false,
         icon: step.icon || null,
@@ -1722,7 +1723,7 @@ class ProgressStepper extends BaseObject {
       // Update accessibility
       this.updateStepAccessibility();
     } catch (error) {
-      this.errorHandler.handle(error, 'step-setup');
+      this.errorHandler.handle(error, "step-setup");
     }
   }
 
@@ -1730,9 +1731,9 @@ class ProgressStepper extends BaseObject {
     // Ensure we have valid steps
     if (this.steps.length === 0) {
       this.steps.push({
-        id: 'fallback',
-        title: 'Default Step',
-        description: '',
+        id: "fallback",
+        title: "Default Step",
+        description: "",
         completed: false,
       });
     }
@@ -1740,7 +1741,7 @@ class ProgressStepper extends BaseObject {
     // Clamp current step
     this.currentStep = Math.max(
       0,
-      Math.min(this.currentStep, this.steps.length - 1)
+      Math.min(this.currentStep, this.steps.length - 1),
     );
 
     // Ensure focused step is valid
@@ -1750,10 +1751,10 @@ class ProgressStepper extends BaseObject {
   }
 
   updateStepAccessibility() {
-    this.setAttribute('aria-valuenow', this.currentStep);
+    this.setAttribute("aria-valuenow", this.currentStep);
     this.setAttribute(
-      'aria-valuetext',
-      this.getStepDescription(this.currentStep)
+      "aria-valuetext",
+      this.getStepDescription(this.currentStep),
     );
 
     // Calculate progress percentage
@@ -1767,13 +1768,13 @@ class ProgressStepper extends BaseObject {
     if (index >= 0 && index < this.steps.length) {
       const step = this.steps[index];
       const status = step.completed
-        ? 'completed'
+        ? "completed"
         : index === this.currentStep
-          ? 'current'
-          : 'pending';
-      return `${step.title}, ${status}. ${step.description || ''}`.trim();
+          ? "current"
+          : "pending";
+      return `${step.title}, ${status}. ${step.description || ""}`.trim();
     }
-    return '';
+    return "";
   }
 
   setupEventHandlers() {
@@ -1812,7 +1813,7 @@ class ProgressStepper extends BaseObject {
           this.clearRenderCache();
 
           this.announceChange(`Moved to ${step.title}`);
-          this.emit('stepChanged', {
+          this.emit("stepChanged", {
             previousStep,
             currentStep: stepIndex,
             step: this.steps[stepIndex],
@@ -1820,7 +1821,7 @@ class ProgressStepper extends BaseObject {
         }
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'goToStep');
+      this.errorHandler.handle(error, "goToStep");
     }
   }
 
@@ -1851,13 +1852,13 @@ class ProgressStepper extends BaseObject {
 
         const step = this.steps[stepIndex];
         this.announceChange(`${step.title} completed`);
-        this.emit('stepCompleted', {
+        this.emit("stepCompleted", {
           stepIndex,
           step: this.steps[stepIndex],
         });
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'completeStep');
+      this.errorHandler.handle(error, "completeStep");
     }
   }
 
@@ -1872,10 +1873,10 @@ class ProgressStepper extends BaseObject {
 
   getStepStatus(index) {
     const step = this.steps[index];
-    if (step.completed) return 'completed';
-    if (index === this.currentStep) return 'active';
-    if (step.disabled) return 'disabled';
-    return 'inactive';
+    if (step.completed) return "completed";
+    if (index === this.currentStep) return "active";
+    if (step.disabled) return "disabled";
+    return "inactive";
   }
 
   // Animation methods
@@ -1883,9 +1884,9 @@ class ProgressStepper extends BaseObject {
     const duration = 300;
     const animation = AnimationManager.createAnimation({
       duration,
-      easing: 'easeOutCubic',
-      onUpdate: progress => {
-        this.animationState.stepTransitions.set('transition', {
+      easing: "easeOutCubic",
+      onUpdate: (progress) => {
+        this.animationState.stepTransitions.set("transition", {
           fromIndex,
           toIndex,
           progress,
@@ -1893,7 +1894,7 @@ class ProgressStepper extends BaseObject {
         this.invalidate();
       },
       onComplete: () => {
-        this.animationState.stepTransitions.delete('transition');
+        this.animationState.stepTransitions.delete("transition");
         this.invalidate();
       },
     });
@@ -1907,10 +1908,10 @@ class ProgressStepper extends BaseObject {
 
     const animation = AnimationManager.createAnimation({
       duration,
-      easing: 'easeOutElastic',
-      onUpdate: progress => {
+      easing: "easeOutElastic",
+      onUpdate: (progress) => {
         this.animationState.stepTransitions.set(`completion-${index}`, {
-          type: 'complete',
+          type: "complete",
           index,
           progress,
           scale:
@@ -1931,7 +1932,7 @@ class ProgressStepper extends BaseObject {
   }
 
   updateProgress() {
-    const completedSteps = this.steps.filter(step => step.completed).length;
+    const completedSteps = this.steps.filter((step) => step.completed).length;
     this.progressPercentage =
       this.steps.length > 0 ? (completedSteps / this.steps.length) * 100 : 0;
 
@@ -1941,16 +1942,16 @@ class ProgressStepper extends BaseObject {
     }
 
     if (!this.prefersReducedMotion()) {
-      const currentProgress = this.getAttribute('aria-valuenow') || 0;
+      const currentProgress = this.getAttribute("aria-valuenow") || 0;
       const targetProgress = this.currentStep;
 
       this.animationState.progressAnimation = AnimationManager.createAnimation({
         duration: 400,
-        easing: 'easeOutCubic',
-        onUpdate: progress => {
+        easing: "easeOutCubic",
+        onUpdate: (progress) => {
           const value =
             currentProgress + (targetProgress - currentProgress) * progress;
-          this.setAttribute('aria-valuenow', Math.round(value));
+          this.setAttribute("aria-valuenow", Math.round(value));
         },
         onComplete: () => {
           this.animationState.progressAnimation = null;
@@ -1959,7 +1960,7 @@ class ProgressStepper extends BaseObject {
 
       this.animationState.progressAnimation.start();
     } else {
-      this.setAttribute('aria-valuenow', this.currentStep);
+      this.setAttribute("aria-valuenow", this.currentStep);
     }
   }
 
@@ -1970,13 +1971,13 @@ class ProgressStepper extends BaseObject {
 
       const stepIndex = this.getStepIndexFromPosition(
         event.localX,
-        event.localY
+        event.localY,
       );
       if (stepIndex >= 0) {
         this.goToStep(stepIndex);
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'handleClick');
+      this.errorHandler.handle(error, "handleClick");
     }
   }
 
@@ -2021,10 +2022,10 @@ class ProgressStepper extends BaseObject {
 
   navigateToStep(position) {
     switch (position) {
-      case 'first':
+      case "first":
         this.focusedStepIndex = 0;
         break;
-      case 'last':
+      case "last":
         this.focusedStepIndex = this.steps.length - 1;
         break;
     }
@@ -2070,7 +2071,7 @@ class ProgressStepper extends BaseObject {
 
   getStepIndexFromPosition(x, y) {
     try {
-      if (this.orientation === 'horizontal') {
+      if (this.orientation === "horizontal") {
         const stepWidth = this.width / this.steps.length;
         const stepIndex = Math.floor(x / stepWidth);
         return stepIndex >= 0 && stepIndex < this.steps.length ? stepIndex : -1;
@@ -2080,25 +2081,25 @@ class ProgressStepper extends BaseObject {
         return stepIndex >= 0 && stepIndex < this.steps.length ? stepIndex : -1;
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'getStepIndexFromPosition');
+      this.errorHandler.handle(error, "getStepIndexFromPosition");
       return -1;
     }
   }
 
   // Enhanced rendering with theme support
   renderSelf(renderer) {
-    if (renderer.type !== 'canvas') return;
+    if (renderer.type !== "canvas") return;
 
     try {
       const theme = ComponentTheme.themes[this.theme];
 
-      if (this.orientation === 'horizontal') {
+      if (this.orientation === "horizontal") {
         this.renderHorizontalStepper(renderer, theme);
       } else {
         this.renderVerticalStepper(renderer, theme);
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'render');
+      this.errorHandler.handle(error, "render");
     }
   }
 
@@ -2122,7 +2123,7 @@ class ProgressStepper extends BaseObject {
         startX,
         lineY,
         endX,
-        lineY
+        lineY,
       );
       if (isCompleted) {
         gradient.addColorStop(0, theme.progressComplete);
@@ -2137,7 +2138,7 @@ class ProgressStepper extends BaseObject {
 
       renderer.strokeStyle = gradient;
       renderer.lineWidth = 3;
-      renderer.lineCap = 'round';
+      renderer.lineCap = "round";
       renderer.beginPath();
       renderer.moveTo(startX, lineY);
       renderer.lineTo(endX, lineY);
@@ -2156,7 +2157,7 @@ class ProgressStepper extends BaseObject {
       // Animation effects
       let scale = 1;
       const completionAnim = this.animationState.stepTransitions.get(
-        `completion-${index}`
+        `completion-${index}`,
       );
       if (completionAnim) {
         ({ scale } = completionAnim);
@@ -2170,17 +2171,17 @@ class ProgressStepper extends BaseObject {
       let textColor = theme.textSecondary;
 
       switch (status) {
-        case 'completed':
+        case "completed":
           fillColor = theme.progressComplete;
           strokeColor = theme.progressComplete;
           textColor = theme.background;
           break;
-        case 'active':
+        case "active":
           fillColor = theme.progressFill;
           strokeColor = theme.progressFill;
           textColor = theme.background;
           break;
-        case 'disabled':
+        case "disabled":
           fillColor = theme.backgroundDisabled;
           strokeColor = theme.disabled;
           textColor = theme.disabled;
@@ -2191,7 +2192,7 @@ class ProgressStepper extends BaseObject {
       if (isHovered && !step.disabled) {
         fillColor = this.lightenColor(
           fillColor,
-          LAYOUT_COMPONENT_CONSTANTS.PROGRESS_LIGHTEN_FACTOR
+          LAYOUT_COMPONENT_CONSTANTS.PROGRESS_LIGHTEN_FACTOR,
         );
       }
 
@@ -2205,7 +2206,7 @@ class ProgressStepper extends BaseObject {
           centerY,
           currentRadius + LAYOUT_COMPONENT_CONSTANTS.PROGRESS_RADIUS_OFFSET,
           0,
-          Math.PI * 2
+          Math.PI * 2,
         );
         renderer.stroke();
       }
@@ -2222,31 +2223,31 @@ class ProgressStepper extends BaseObject {
       // Step content with better typography
       if (step.completed) {
         renderer.fillStyle = textColor;
-        renderer.font = 'bold 14px Arial';
-        renderer.textAlign = 'center';
-        renderer.textBaseline = 'middle';
-        renderer.fillText('✓', centerX, centerY);
+        renderer.font = "bold 14px Arial";
+        renderer.textAlign = "center";
+        renderer.textBaseline = "middle";
+        renderer.fillText("✓", centerX, centerY);
       } else if (this.showStepNumbers) {
         renderer.fillStyle = textColor;
-        renderer.font = 'bold 12px Arial';
-        renderer.textAlign = 'center';
-        renderer.textBaseline = 'middle';
+        renderer.font = "bold 12px Arial";
+        renderer.textAlign = "center";
+        renderer.textBaseline = "middle";
         renderer.fillText((index + 1).toString(), centerX, centerY);
       } else if (step.icon) {
         renderer.fillStyle = textColor;
-        renderer.font = '14px Arial';
-        renderer.textAlign = 'center';
-        renderer.textBaseline = 'middle';
+        renderer.font = "14px Arial";
+        renderer.textAlign = "center";
+        renderer.textBaseline = "middle";
         renderer.fillText(step.icon, centerX, centerY);
       }
 
       // Enhanced step labels
       if (this.showLabels && step.title) {
         renderer.fillStyle =
-          status === 'active' ? theme.text : theme.textSecondary;
-        renderer.font = status === 'active' ? 'bold 11px Arial' : '11px Arial';
-        renderer.textAlign = 'center';
-        renderer.textBaseline = 'top';
+          status === "active" ? theme.text : theme.textSecondary;
+        renderer.font = status === "active" ? "bold 11px Arial" : "11px Arial";
+        renderer.textAlign = "center";
+        renderer.textBaseline = "top";
 
         // Truncate long titles
         const maxWidth = stepWidth - 10;
@@ -2266,13 +2267,13 @@ class ProgressStepper extends BaseObject {
         // Optional indicator
         if (step.optional) {
           renderer.fillStyle = theme.textSecondary;
-          renderer.font = '9px Arial';
+          renderer.font = "9px Arial";
           renderer.fillText(
-            '(optional)',
+            "(optional)",
             centerX,
             centerY +
               currentRadius +
-              LAYOUT_COMPONENT_CONSTANTS.PROGRESS_RADIUS_PADDING
+              LAYOUT_COMPONENT_CONSTANTS.PROGRESS_RADIUS_PADDING,
           );
         }
       }
@@ -2296,7 +2297,7 @@ class ProgressStepper extends BaseObject {
         ? theme.progressComplete
         : theme.progressTrack;
       renderer.lineWidth = 3;
-      renderer.lineCap = 'round';
+      renderer.lineCap = "round";
       renderer.beginPath();
       renderer.moveTo(centerX, startY);
       renderer.lineTo(centerX, endY);
@@ -2318,17 +2319,17 @@ class ProgressStepper extends BaseObject {
       let textColor = theme.textSecondary;
 
       switch (status) {
-        case 'completed':
+        case "completed":
           fillColor = theme.progressComplete;
           strokeColor = theme.progressComplete;
           textColor = theme.background;
           break;
-        case 'active':
+        case "active":
           fillColor = theme.progressFill;
           strokeColor = theme.progressFill;
           textColor = theme.background;
           break;
-        case 'disabled':
+        case "disabled":
           fillColor = theme.backgroundDisabled;
           strokeColor = theme.disabled;
           textColor = theme.disabled;
@@ -2338,7 +2339,7 @@ class ProgressStepper extends BaseObject {
       if (isHovered && !step.disabled) {
         fillColor = this.lightenColor(
           fillColor,
-          LAYOUT_COMPONENT_CONSTANTS.PROGRESS_LIGHTEN_FACTOR
+          LAYOUT_COMPONENT_CONSTANTS.PROGRESS_LIGHTEN_FACTOR,
         );
       }
 
@@ -2352,7 +2353,7 @@ class ProgressStepper extends BaseObject {
           centerY,
           circleRadius + LAYOUT_COMPONENT_CONSTANTS.PROGRESS_CIRCLE_BORDER,
           0,
-          Math.PI * 2
+          Math.PI * 2,
         );
         renderer.stroke();
       }
@@ -2369,54 +2370,54 @@ class ProgressStepper extends BaseObject {
       // Step content
       if (step.completed) {
         renderer.fillStyle = textColor;
-        renderer.font = 'bold 12px Arial';
-        renderer.textAlign = 'center';
-        renderer.textBaseline = 'middle';
-        renderer.fillText('✓', centerX, centerY);
+        renderer.font = "bold 12px Arial";
+        renderer.textAlign = "center";
+        renderer.textBaseline = "middle";
+        renderer.fillText("✓", centerX, centerY);
       } else if (this.showStepNumbers) {
         renderer.fillStyle = textColor;
-        renderer.font = 'bold 10px Arial';
-        renderer.textAlign = 'center';
-        renderer.textBaseline = 'middle';
+        renderer.font = "bold 10px Arial";
+        renderer.textAlign = "center";
+        renderer.textBaseline = "middle";
         renderer.fillText((index + 1).toString(), centerX, centerY);
       }
 
       // Labels and descriptions
       if (this.showLabels && step.title) {
         renderer.fillStyle =
-          status === 'active' ? theme.text : theme.textSecondary;
-        renderer.font = status === 'active' ? 'bold 12px Arial' : '12px Arial';
-        renderer.textAlign = 'left';
-        renderer.textBaseline = 'middle';
+          status === "active" ? theme.text : theme.textSecondary;
+        renderer.font = status === "active" ? "bold 12px Arial" : "12px Arial";
+        renderer.textAlign = "left";
+        renderer.textBaseline = "middle";
         renderer.fillText(
           step.title,
           centerX +
             circleRadius +
             LAYOUT_COMPONENT_CONSTANTS.PROGRESS_TEXT_OFFSET_X,
-          centerY - LAYOUT_COMPONENT_CONSTANTS.PROGRESS_TEXT_OFFSET_Y
+          centerY - LAYOUT_COMPONENT_CONSTANTS.PROGRESS_TEXT_OFFSET_Y,
         );
 
         if (step.description) {
           renderer.fillStyle = theme.textSecondary;
-          renderer.font = '10px Arial';
+          renderer.font = "10px Arial";
           renderer.fillText(
             step.description,
             centerX +
               circleRadius +
               LAYOUT_COMPONENT_CONSTANTS.PROGRESS_TEXT_OFFSET_X,
-            centerY + 10
+            centerY + 10,
           );
         }
 
         if (step.optional) {
           renderer.fillStyle = theme.textSecondary;
-          renderer.font = 'italic 9px Arial';
+          renderer.font = "italic 9px Arial";
           renderer.fillText(
-            '(optional)',
+            "(optional)",
             centerX +
               circleRadius +
               LAYOUT_COMPONENT_CONSTANTS.PROGRESS_TEXT_OFFSET_X,
-            centerY + LAYOUT_COMPONENT_CONSTANTS.PROGRESS_DESCRIPTION_Y_OFFSET
+            centerY + LAYOUT_COMPONENT_CONSTANTS.PROGRESS_DESCRIPTION_Y_OFFSET,
           );
         }
       }
@@ -2425,28 +2426,28 @@ class ProgressStepper extends BaseObject {
 
   // Utility methods
   lightenColor(color, amount) {
-    const num = parseInt(color.replace('#', ''), 16);
+    const num = parseInt(color.replace("#", ""), 16);
     const r = Math.min(
       LAYOUT_COMPONENT_CONSTANTS.COLOR_MAX_VALUE,
       Math.floor(
         (num >> LAYOUT_COMPONENT_CONSTANTS.COLOR_RED_SHIFT) +
-          amount * LAYOUT_COMPONENT_CONSTANTS.COLOR_MAX_VALUE
-      )
+          amount * LAYOUT_COMPONENT_CONSTANTS.COLOR_MAX_VALUE,
+      ),
     );
     const g = Math.min(
       LAYOUT_COMPONENT_CONSTANTS.COLOR_MAX_VALUE,
       Math.floor(
         ((num >> LAYOUT_COMPONENT_CONSTANTS.COLOR_GREEN_SHIFT) &
           LAYOUT_COMPONENT_CONSTANTS.COLOR_GREEN_MASK) +
-          amount * LAYOUT_COMPONENT_CONSTANTS.COLOR_MAX_VALUE
-      )
+          amount * LAYOUT_COMPONENT_CONSTANTS.COLOR_MAX_VALUE,
+      ),
     );
     const b = Math.min(
       LAYOUT_COMPONENT_CONSTANTS.COLOR_MAX_VALUE,
       Math.floor(
         (num & LAYOUT_COMPONENT_CONSTANTS.COLOR_BLUE_MASK) +
-          amount * LAYOUT_COMPONENT_CONSTANTS.COLOR_MAX_VALUE
-      )
+          amount * LAYOUT_COMPONENT_CONSTANTS.COLOR_MAX_VALUE,
+      ),
     );
     return `rgb(${r}, ${g}, ${b})`;
   }
@@ -2460,7 +2461,7 @@ class ProgressStepper extends BaseObject {
   prefersReducedMotion() {
     return (
       window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
     );
   }
 
@@ -2488,7 +2489,7 @@ class ProgressStepper extends BaseObject {
     this.animatingSteps.clear();
     this.animationState.stepTransitions.clear();
 
-    this.steps.forEach(step => {
+    this.steps.forEach((step) => {
       step.completed = false;
     });
 
@@ -2496,8 +2497,8 @@ class ProgressStepper extends BaseObject {
     this.updateStepAccessibility();
     this.clearRenderCache();
 
-    this.announceChange('Progress reset');
-    this.emit('reset');
+    this.announceChange("Progress reset");
+    this.emit("reset");
   }
 
   destroy() {
@@ -2520,7 +2521,7 @@ class ProgressStepper extends BaseObject {
   }
 
   getProgress() {
-    const completedSteps = this.steps.filter(step => step.completed).length;
+    const completedSteps = this.steps.filter((step) => step.completed).length;
     return this.steps.length > 0 ? completedSteps / this.steps.length : 0;
   }
 
@@ -2540,8 +2541,8 @@ class ProgressStepper extends BaseObject {
     try {
       const newStep = {
         id: stepData.id || `step-${Date.now()}`,
-        title: stepData.title || 'New Step',
-        description: stepData.description || '',
+        title: stepData.title || "New Step",
+        description: stepData.description || "",
         completed: stepData.completed || false,
         disabled: stepData.disabled || false,
         icon: stepData.icon || null,
@@ -2562,13 +2563,13 @@ class ProgressStepper extends BaseObject {
       this.updateStepAccessibility();
       this.clearRenderCache();
 
-      this.emit('stepAdded', {
+      this.emit("stepAdded", {
         step: newStep,
         index: index >= 0 ? index : this.steps.length - 1,
       });
       return true;
     } catch (error) {
-      this.errorHandler.handle(error, 'addStep');
+      this.errorHandler.handle(error, "addStep");
       return false;
     }
   }
@@ -2591,12 +2592,12 @@ class ProgressStepper extends BaseObject {
         this.updateStepAccessibility();
         this.clearRenderCache();
 
-        this.emit('stepRemoved', { step: removedStep, index });
+        this.emit("stepRemoved", { step: removedStep, index });
         return true;
       }
       return false;
     } catch (error) {
-      this.errorHandler.handle(error, 'removeStep');
+      this.errorHandler.handle(error, "removeStep");
       return false;
     }
   }
@@ -2608,7 +2609,7 @@ class ProgressStepper extends BaseObject {
         Object.assign(this.steps[index], updates);
 
         this.clearRenderCache();
-        this.emit('stepUpdated', {
+        this.emit("stepUpdated", {
           index,
           step: this.steps[index],
           updates,
@@ -2618,7 +2619,7 @@ class ProgressStepper extends BaseObject {
       }
       return false;
     } catch (error) {
-      this.errorHandler.handle(error, 'updateStep');
+      this.errorHandler.handle(error, "updateStep");
       return false;
     }
   }
@@ -2626,7 +2627,7 @@ class ProgressStepper extends BaseObject {
   setTheme(theme) {
     this.theme = theme;
     this.clearRenderCache();
-    this.emit('themeChanged', { theme });
+    this.emit("themeChanged", { theme });
   }
 }
 
@@ -2646,21 +2647,21 @@ class SplitPane extends BaseObject {
         options.width || LAYOUT_COMPONENT_CONSTANTS.SPLIT_PANE_DEFAULT_WIDTH,
       height:
         options.height || LAYOUT_COMPONENT_CONSTANTS.SPLIT_PANE_DEFAULT_HEIGHT,
-      ariaRole: 'separator',
-      ariaLabel: options.ariaLabel || 'Split Pane',
+      ariaRole: "separator",
+      ariaLabel: options.ariaLabel || "Split Pane",
     });
 
     // Validate options
     this.validateOptions(options);
 
     // Core properties
-    this.orientation = options.orientation || 'horizontal';
+    this.orientation = options.orientation || "horizontal";
     this.split = Math.max(
       LAYOUT_COMPONENT_CONSTANTS.SPLIT_MIN_RATIO,
       Math.min(
         LAYOUT_COMPONENT_CONSTANTS.SPLIT_MAX_RATIO,
-        options.split || LAYOUT_COMPONENT_CONSTANTS.SPLIT_DEFAULT_RATIO
-      )
+        options.split || LAYOUT_COMPONENT_CONSTANTS.SPLIT_DEFAULT_RATIO,
+      ),
     );
     this.minSize = options.minSize || LAYOUT_COMPONENT_CONSTANTS.SPLIT_MIN_SIZE;
     this.splitterSize =
@@ -2693,7 +2694,7 @@ class SplitPane extends BaseObject {
     this.renderCache = new Map();
     this.throttledRender = this.throttle(
       this.render.bind(this),
-      PERFORMANCE_THRESHOLDS.eventThrottle
+      PERFORMANCE_THRESHOLDS.eventThrottle,
     );
 
     // Accessibility
@@ -2704,55 +2705,55 @@ class SplitPane extends BaseObject {
     this.errorHandler = this.createErrorHandler();
 
     // Performance monitoring
-    this.performanceMonitor = PerformanceMonitor.createInstance('SplitPane');
+    this.performanceMonitor = PerformanceMonitor.createInstance("SplitPane");
 
     try {
       this.setupEventHandlers();
       this.setupAccessibility();
       this.updateAccessibility();
     } catch (error) {
-      this.errorHandler.handle(error, 'constructor');
+      this.errorHandler.handle(error, "constructor");
     }
   }
 
   validateOptions(options) {
     if (
       options.split &&
-      (typeof options.split !== 'number' ||
+      (typeof options.split !== "number" ||
         options.split < 0 ||
         options.split > 1)
     ) {
       throw new ComponentError(
-        'split must be a number between 0 and 1',
-        'SplitPane'
+        "split must be a number between 0 and 1",
+        "SplitPane",
       );
     }
 
     if (
       options.orientation &&
-      !['horizontal', 'vertical'].includes(options.orientation)
+      !["horizontal", "vertical"].includes(options.orientation)
     ) {
       throw new ComponentError(
         'orientation must be "horizontal" or "vertical"',
-        'SplitPane'
+        "SplitPane",
       );
     }
 
     if (
       options.minSize &&
-      (typeof options.minSize !== 'number' || options.minSize < 0)
+      (typeof options.minSize !== "number" || options.minSize < 0)
     ) {
       throw new ComponentError(
-        'minSize must be a non-negative number',
-        'SplitPane'
+        "minSize must be a non-negative number",
+        "SplitPane",
       );
     }
   }
 
   createScreenReaderAnnouncer() {
-    const announcer = document.createElement('div');
-    announcer.setAttribute('aria-live', 'polite');
-    announcer.setAttribute('aria-atomic', 'true');
+    const announcer = document.createElement("div");
+    announcer.setAttribute("aria-live", "polite");
+    announcer.setAttribute("aria-atomic", "true");
     announcer.style.cssText = `
             position: absolute;
             left: -10000px;
@@ -2786,13 +2787,13 @@ class SplitPane extends BaseObject {
     return {
       handle: (error, context) => {
         const componentError = new ComponentError(
-          error.message || 'Unknown error',
-          'SplitPane',
-          { context, originalError: error }
+          error.message || "Unknown error",
+          "SplitPane",
+          { context, originalError: error },
         );
 
-        logger.error('SplitPane Error:', componentError);
-        this.emit('error', componentError);
+        logger.error("SplitPane Error:", componentError);
+        this.emit("error", componentError);
 
         this.recoverFromError(context);
       },
@@ -2801,19 +2802,19 @@ class SplitPane extends BaseObject {
 
   recoverFromError(context) {
     switch (context) {
-      case 'resize':
+      case "resize":
         this.isResizing = false;
         this.split = Math.max(
           LAYOUT_COMPONENT_CONSTANTS.SPLIT_MIN_RATIO,
-          Math.min(LAYOUT_COMPONENT_CONSTANTS.SPLIT_MAX_RATIO, this.split)
+          Math.min(LAYOUT_COMPONENT_CONSTANTS.SPLIT_MAX_RATIO, this.split),
         );
         break;
-      case 'animation':
+      case "animation":
         this.animationState.splitTransition = null;
         this.animationState.collapseAnimation = null;
         AnimationManager.cancelAllAnimations();
         break;
-      case 'render':
+      case "render":
         this.clearRenderCache();
         break;
       default:
@@ -2823,30 +2824,30 @@ class SplitPane extends BaseObject {
 
   setupAccessibility() {
     // ARIA attributes
-    this.setAttribute('role', 'separator');
-    this.setAttribute('aria-orientation', this.orientation);
-    this.setAttribute('aria-valuemin', '10');
-    this.setAttribute('aria-valuemax', '90');
-    this.setAttribute('aria-valuenow', Math.round(this.split * 100));
-    this.setAttribute('aria-valuetext', this.getSplitDescription());
+    this.setAttribute("role", "separator");
+    this.setAttribute("aria-orientation", this.orientation);
+    this.setAttribute("aria-valuemin", "10");
+    this.setAttribute("aria-valuemax", "90");
+    this.setAttribute("aria-valuenow", Math.round(this.split * 100));
+    this.setAttribute("aria-valuetext", this.getSplitDescription());
 
     // Keyboard accessibility
-    this.setAttribute('tabindex', this.disabled ? '-1' : '0');
+    this.setAttribute("tabindex", this.disabled ? "-1" : "0");
 
     // Focus management
-    this.addEventListener('focusin', () => this.handleFocusIn());
-    this.addEventListener('focusout', () => this.handleFocusOut());
+    this.addEventListener("focusin", () => this.handleFocusIn());
+    this.addEventListener("focusout", () => this.handleFocusOut());
   }
 
   updateAccessibility() {
-    this.setAttribute('aria-valuenow', Math.round(this.split * 100));
-    this.setAttribute('aria-valuetext', this.getSplitDescription());
+    this.setAttribute("aria-valuenow", Math.round(this.split * 100));
+    this.setAttribute("aria-valuetext", this.getSplitDescription());
   }
 
   getSplitDescription() {
     const percentage = Math.round(this.split * 100);
-    const orientation = this.orientation === 'horizontal' ? 'left' : 'top';
-    return `${orientation} pane ${percentage}%, ${orientation === 'left' ? 'right' : 'bottom'} pane ${100 - percentage}%`;
+    const orientation = this.orientation === "horizontal" ? "left" : "top";
+    return `${orientation} pane ${percentage}%, ${orientation === "left" ? "right" : "bottom"} pane ${100 - percentage}%`;
   }
 
   setupEventHandlers() {
@@ -2870,7 +2871,7 @@ class SplitPane extends BaseObject {
     try {
       const clampedSplit = Math.max(
         LAYOUT_COMPONENT_CONSTANTS.SPLIT_MIN_RATIO,
-        Math.min(LAYOUT_COMPONENT_CONSTANTS.SPLIT_MAX_RATIO, newSplit)
+        Math.min(LAYOUT_COMPONENT_CONSTANTS.SPLIT_MAX_RATIO, newSplit),
       );
 
       if (clampedSplit === this.split) return;
@@ -2888,11 +2889,11 @@ class SplitPane extends BaseObject {
       this.clearRenderCache();
 
       this.announceChange(
-        `Split adjusted to ${Math.round(clampedSplit * 100)}%`
+        `Split adjusted to ${Math.round(clampedSplit * 100)}%`,
       );
-      this.emit('splitChanged', { oldSplit, newSplit: clampedSplit });
+      this.emit("splitChanged", { oldSplit, newSplit: clampedSplit });
     } catch (error) {
-      this.errorHandler.handle(error, 'setSplit');
+      this.errorHandler.handle(error, "setSplit");
     }
   }
 
@@ -2911,10 +2912,10 @@ class SplitPane extends BaseObject {
         // Default to collapsing the smaller pane
         const collapseLeft =
           this.split > LAYOUT_COMPONENT_CONSTANTS.SPLIT_CENTER_THRESHOLD;
-        await this.collapse(collapseLeft ? 'left' : 'right');
+        await this.collapse(collapseLeft ? "left" : "right");
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'toggleCollapse');
+      this.errorHandler.handle(error, "toggleCollapse");
     }
   }
 
@@ -2923,7 +2924,7 @@ class SplitPane extends BaseObject {
 
     try {
       const targetSplit =
-        side === 'left'
+        side === "left"
           ? LAYOUT_COMPONENT_CONSTANTS.SPLIT_COLLAPSED_RATIO
           : LAYOUT_COMPONENT_CONSTANTS.SPLIT_EXPANDED_RATIO;
 
@@ -2939,9 +2940,9 @@ class SplitPane extends BaseObject {
       this.clearRenderCache();
 
       this.announceChange(`${side} pane collapsed`);
-      this.emit('paneCollapsed', { side });
+      this.emit("paneCollapsed", { side });
     } catch (error) {
-      this.errorHandler.handle(error, 'collapse');
+      this.errorHandler.handle(error, "collapse");
     }
   }
 
@@ -2964,9 +2965,9 @@ class SplitPane extends BaseObject {
       this.clearRenderCache();
 
       this.announceChange(`${expandedSide} pane expanded`);
-      this.emit('paneExpanded', { side: expandedSide });
+      this.emit("paneExpanded", { side: expandedSide });
     } catch (error) {
-      this.errorHandler.handle(error, 'expand');
+      this.errorHandler.handle(error, "expand");
     }
   }
 
@@ -2976,8 +2977,8 @@ class SplitPane extends BaseObject {
 
     const animation = AnimationManager.createAnimation({
       duration,
-      easing: 'easeOutCubic',
-      onUpdate: progress => {
+      easing: "easeOutCubic",
+      onUpdate: (progress) => {
         this.animatedSplit = fromSplit + (toSplit - fromSplit) * progress;
         this.invalidate();
       },
@@ -2998,8 +2999,8 @@ class SplitPane extends BaseObject {
 
     const animation = AnimationManager.createAnimation({
       duration,
-      easing: 'easeInOutCubic',
-      onUpdate: progress => {
+      easing: "easeInOutCubic",
+      onUpdate: (progress) => {
         this.animatedSplit = fromSplit + (toSplit - fromSplit) * progress;
         this.invalidate();
       },
@@ -3019,7 +3020,7 @@ class SplitPane extends BaseObject {
   getSplitterBounds() {
     const split = this.animatedSplit || this.split;
 
-    if (this.orientation === 'horizontal') {
+    if (this.orientation === "horizontal") {
       const splitX = this.width * split;
       return {
         x: splitX - this.splitterSize / 2,
@@ -3039,14 +3040,14 @@ class SplitPane extends BaseObject {
   }
 
   getLeftPaneBounds() {
-    if (this.collapsed === 'left') {
+    if (this.collapsed === "left") {
       return { x: 0, y: 0, width: 0, height: 0 };
     }
-    if (this.collapsed === 'right') {
+    if (this.collapsed === "right") {
       return { x: 0, y: 0, width: this.width, height: this.height };
     }
 
-    if (this.orientation === 'horizontal') {
+    if (this.orientation === "horizontal") {
       const splitX = this.width * this.split;
       return {
         x: 0,
@@ -3066,14 +3067,14 @@ class SplitPane extends BaseObject {
   }
 
   getRightPaneBounds() {
-    if (this.collapsed === 'right') {
+    if (this.collapsed === "right") {
       return { x: 0, y: 0, width: 0, height: 0 };
     }
-    if (this.collapsed === 'left') {
+    if (this.collapsed === "left") {
       return { x: 0, y: 0, width: this.width, height: this.height };
     }
 
-    if (this.orientation === 'horizontal') {
+    if (this.orientation === "horizontal") {
       const splitX = this.width * this.split;
       return {
         x: splitX + this.splitterSize / 2,
@@ -3114,18 +3115,18 @@ class SplitPane extends BaseObject {
         this.isResizing = true;
         this.startSplit = this.split;
 
-        if (this.orientation === 'horizontal') {
+        if (this.orientation === "horizontal") {
           this.startMousePos = localX;
         } else {
           this.startMousePos = localY;
         }
 
-        this.announceChange('Started resizing split pane');
-        this.emit('resizeStart', { split: this.split });
+        this.announceChange("Started resizing split pane");
+        this.emit("resizeStart", { split: this.split });
         event.stopPropagation();
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'handleMouseDown');
+      this.errorHandler.handle(error, "handleMouseDown");
     }
   }
 
@@ -3134,10 +3135,10 @@ class SplitPane extends BaseObject {
       const { localX, localY } = event;
 
       if (this.isResizing) {
-        const currentPos = this.orientation === 'horizontal' ? localX : localY;
+        const currentPos = this.orientation === "horizontal" ? localX : localY;
         const delta = currentPos - this.startMousePos;
         const totalSize =
-          this.orientation === 'horizontal' ? this.width : this.height;
+          this.orientation === "horizontal" ? this.width : this.height;
         const deltaRatio = delta / totalSize;
 
         let newSplit = this.startSplit + deltaRatio;
@@ -3151,7 +3152,7 @@ class SplitPane extends BaseObject {
         this.updateAccessibility();
         this.clearRenderCache();
 
-        this.emit('resize', { split: newSplit });
+        this.emit("resize", { split: newSplit });
       } else {
         // Update hover state
         const wasHovering = this.isHovering;
@@ -3164,13 +3165,13 @@ class SplitPane extends BaseObject {
         // Update cursor
         if (this.resizable && this.isHovering) {
           document.body.style.cursor =
-            this.orientation === 'horizontal' ? 'col-resize' : 'row-resize';
+            this.orientation === "horizontal" ? "col-resize" : "row-resize";
         } else {
-          document.body.style.cursor = 'default';
+          document.body.style.cursor = "default";
         }
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'handleMouseMove');
+      this.errorHandler.handle(error, "handleMouseMove");
     }
   }
 
@@ -3178,15 +3179,15 @@ class SplitPane extends BaseObject {
     try {
       if (this.isResizing) {
         this.isResizing = false;
-        document.body.style.cursor = 'default';
+        document.body.style.cursor = "default";
 
         this.announceChange(
-          `Split adjusted to ${Math.round(this.split * 100)}%`
+          `Split adjusted to ${Math.round(this.split * 100)}%`,
         );
-        this.emit('resizeEnd', { split: this.split });
+        this.emit("resizeEnd", { split: this.split });
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'handleMouseUp');
+      this.errorHandler.handle(error, "handleMouseUp");
     }
   }
 
@@ -3198,7 +3199,7 @@ class SplitPane extends BaseObject {
         this.toggleCollapse();
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'handleDoubleClick');
+      this.errorHandler.handle(error, "handleDoubleClick");
     }
   }
 
@@ -3220,7 +3221,7 @@ class SplitPane extends BaseObject {
   handleBlur() {
     this.isFocused = false;
     this.invalidate();
-    document.body.style.cursor = 'default';
+    document.body.style.cursor = "default";
   }
 
   handleFocusIn() {
@@ -3240,16 +3241,16 @@ class SplitPane extends BaseObject {
       this.animatedSplit = this.startSplit;
       this.updateAccessibility();
       this.clearRenderCache();
-      document.body.style.cursor = 'default';
+      document.body.style.cursor = "default";
 
-      this.announceChange('Resize cancelled');
-      this.emit('resizeCancel');
+      this.announceChange("Resize cancelled");
+      this.emit("resizeCancel");
     }
   }
 
   // Enhanced rendering with theme support
   renderSelf(renderer) {
-    if (renderer.type !== 'canvas') return;
+    if (renderer.type !== "canvas") return;
 
     try {
       const theme = ComponentTheme.themes[this.theme];
@@ -3261,7 +3262,7 @@ class SplitPane extends BaseObject {
         this.renderFocusIndicator(renderer, theme);
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'render');
+      this.errorHandler.handle(error, "render");
     }
   }
 
@@ -3275,7 +3276,7 @@ class SplitPane extends BaseObject {
       leftBounds.x,
       leftBounds.y,
       leftBounds.width,
-      leftBounds.height
+      leftBounds.height,
     );
 
     // Right/Bottom pane background
@@ -3284,7 +3285,7 @@ class SplitPane extends BaseObject {
       rightBounds.x,
       rightBounds.y,
       rightBounds.width,
-      rightBounds.height
+      rightBounds.height,
     );
 
     // Pane borders
@@ -3294,17 +3295,17 @@ class SplitPane extends BaseObject {
       leftBounds.x,
       leftBounds.y,
       leftBounds.width,
-      leftBounds.height
+      leftBounds.height,
     );
     renderer.strokeRect(
       rightBounds.x,
       rightBounds.y,
       rightBounds.width,
-      rightBounds.height
+      rightBounds.height,
     );
 
     // Render pane content
-    if (this.leftPane && typeof this.leftPane.render === 'function') {
+    if (this.leftPane && typeof this.leftPane.render === "function") {
       renderer.save();
       renderer.translate(leftBounds.x, leftBounds.y);
       renderer.beginPath();
@@ -3314,7 +3315,7 @@ class SplitPane extends BaseObject {
       renderer.restore();
     }
 
-    if (this.rightPane && typeof this.rightPane.render === 'function') {
+    if (this.rightPane && typeof this.rightPane.render === "function") {
       renderer.save();
       renderer.translate(rightBounds.x, rightBounds.y);
       renderer.beginPath();
@@ -3343,7 +3344,7 @@ class SplitPane extends BaseObject {
     const gripColor = theme.textSecondary;
     renderer.fillStyle = gripColor;
 
-    if (this.orientation === 'horizontal') {
+    if (this.orientation === "horizontal") {
       const centerX = bounds.x + bounds.width / 2;
       const centerY = bounds.y + bounds.height / 2;
 
@@ -3356,7 +3357,7 @@ class SplitPane extends BaseObject {
             centerX - LAYOUT_COMPONENT_CONSTANTS.TREE_GRIP_SIZE,
             y - 1,
             1,
-            2
+            2,
           );
           renderer.fillRect(centerX + 2, y - 1, 1, 2);
         }
@@ -3374,7 +3375,7 @@ class SplitPane extends BaseObject {
             x - 1,
             centerY - LAYOUT_COMPONENT_CONSTANTS.TREE_GRIP_SIZE,
             2,
-            1
+            1,
           );
           renderer.fillRect(x - 1, centerY + 2, 2, 1);
         }
@@ -3395,7 +3396,7 @@ class SplitPane extends BaseObject {
       bounds.x - 2,
       bounds.y - 2,
       bounds.width + LAYOUT_COMPONENT_CONSTANTS.TREE_SELECTION_PADDING,
-      bounds.height + LAYOUT_COMPONENT_CONSTANTS.TREE_SELECTION_PADDING
+      bounds.height + LAYOUT_COMPONENT_CONSTANTS.TREE_SELECTION_PADDING,
     );
     renderer.setLineDash([]);
   }
@@ -3410,7 +3411,7 @@ class SplitPane extends BaseObject {
   prefersReducedMotion() {
     return (
       window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
     );
   }
 
@@ -3446,8 +3447,8 @@ class SplitPane extends BaseObject {
     this.updateAccessibility();
     this.clearRenderCache();
 
-    this.announceChange('Split pane reset');
-    this.emit('reset');
+    this.announceChange("Split pane reset");
+    this.emit("reset");
   }
 
   destroy() {
@@ -3461,7 +3462,7 @@ class SplitPane extends BaseObject {
     AnimationManager.cancelAllAnimations();
     this.renderCache.clear();
 
-    document.body.style.cursor = 'default';
+    document.body.style.cursor = "default";
 
     super.destroy();
   }
@@ -3470,13 +3471,13 @@ class SplitPane extends BaseObject {
   setLeftPane(content) {
     this.leftPane = content;
     this.clearRenderCache();
-    this.emit('paneChanged', { pane: 'left', content });
+    this.emit("paneChanged", { pane: "left", content });
   }
 
   setRightPane(content) {
     this.rightPane = content;
     this.clearRenderCache();
-    this.emit('paneChanged', { pane: 'right', content });
+    this.emit("paneChanged", { pane: "right", content });
   }
 
   getSplit() {
@@ -3489,20 +3490,20 @@ class SplitPane extends BaseObject {
 
   setOrientation(orientation) {
     if (
-      ['horizontal', 'vertical'].includes(orientation) &&
+      ["horizontal", "vertical"].includes(orientation) &&
       orientation !== this.orientation
     ) {
       this.orientation = orientation;
-      this.setAttribute('aria-orientation', orientation);
+      this.setAttribute("aria-orientation", orientation);
       this.clearRenderCache();
-      this.emit('orientationChanged', { orientation });
+      this.emit("orientationChanged", { orientation });
     }
   }
 
   setTheme(theme) {
     this.theme = theme;
     this.clearRenderCache();
-    this.emit('themeChanged', { theme });
+    this.emit("themeChanged", { theme });
   }
 }
 
@@ -3522,8 +3523,8 @@ class TreeView extends BaseObject {
         options.width || LAYOUT_COMPONENT_CONSTANTS.TREE_VIEW_DEFAULT_WIDTH,
       height:
         options.height || LAYOUT_COMPONENT_CONSTANTS.TREE_VIEW_DEFAULT_HEIGHT,
-      ariaRole: 'tree',
-      ariaLabel: options.ariaLabel || 'Tree View',
+      ariaRole: "tree",
+      ariaLabel: options.ariaLabel || "Tree View",
     });
 
     // Validate options
@@ -3564,7 +3565,7 @@ class TreeView extends BaseObject {
     this.visibleRange = { start: 0, end: 0 };
     this.throttledRender = this.throttle(
       this.render.bind(this),
-      PERFORMANCE_THRESHOLDS.eventThrottle
+      PERFORMANCE_THRESHOLDS.eventThrottle,
     );
 
     // Accessibility
@@ -3575,7 +3576,7 @@ class TreeView extends BaseObject {
     this.errorHandler = this.createErrorHandler();
 
     // Performance monitoring
-    this.performanceMonitor = PerformanceMonitor.createInstance('TreeView');
+    this.performanceMonitor = PerformanceMonitor.createInstance("TreeView");
 
     try {
       this.setupNodes();
@@ -3583,41 +3584,41 @@ class TreeView extends BaseObject {
       this.setupAccessibility();
       this.updateVirtualization();
     } catch (error) {
-      this.errorHandler.handle(error, 'constructor');
+      this.errorHandler.handle(error, "constructor");
     }
   }
 
   validateOptions(options) {
     if (options.data && !Array.isArray(options.data)) {
-      throw new ComponentError('data must be an array', 'TreeView');
+      throw new ComponentError("data must be an array", "TreeView");
     }
 
     if (
       options.indentSize &&
-      (typeof options.indentSize !== 'number' || options.indentSize < 0)
+      (typeof options.indentSize !== "number" || options.indentSize < 0)
     ) {
       throw new ComponentError(
-        'indentSize must be a non-negative number',
-        'TreeView'
+        "indentSize must be a non-negative number",
+        "TreeView",
       );
     }
 
     if (
       options.nodeHeight &&
-      (typeof options.nodeHeight !== 'number' ||
+      (typeof options.nodeHeight !== "number" ||
         options.nodeHeight < LAYOUT_COMPONENT_CONSTANTS.TREE_MIN_NODE_HEIGHT)
     ) {
       throw new ComponentError(
-        'nodeHeight must be at least 16 pixels',
-        'TreeView'
+        "nodeHeight must be at least 16 pixels",
+        "TreeView",
       );
     }
   }
 
   createScreenReaderAnnouncer() {
-    const announcer = document.createElement('div');
-    announcer.setAttribute('aria-live', 'polite');
-    announcer.setAttribute('aria-atomic', 'true');
+    const announcer = document.createElement("div");
+    announcer.setAttribute("aria-live", "polite");
+    announcer.setAttribute("aria-atomic", "true");
     announcer.style.cssText = `
             position: absolute;
             left: -10000px;
@@ -3635,12 +3636,12 @@ class TreeView extends BaseObject {
       ArrowDown: () => this.navigateNode(1),
       ArrowLeft: () => this.collapseOrNavigateUp(),
       ArrowRight: () => this.expandOrNavigateDown(),
-      Home: () => this.navigateToNode('first'),
-      End: () => this.navigateToNode('last'),
+      Home: () => this.navigateToNode("first"),
+      End: () => this.navigateToNode("last"),
       Enter: () => this.activateFocusedNode(),
       Space: () => this.toggleFocusedNode(),
       Escape: () => this.handleEscape(),
-      '*': () => this.expandAll(),
+      "*": () => this.expandAll(),
     };
   }
 
@@ -3648,13 +3649,13 @@ class TreeView extends BaseObject {
     return {
       handle: (error, context) => {
         const componentError = new ComponentError(
-          error.message || 'Unknown error',
-          'TreeView',
-          { context, originalError: error }
+          error.message || "Unknown error",
+          "TreeView",
+          { context, originalError: error },
         );
 
-        logger.error('TreeView Error:', componentError);
-        this.emit('error', componentError);
+        logger.error("TreeView Error:", componentError);
+        this.emit("error", componentError);
 
         this.recoverFromError(context);
       },
@@ -3663,16 +3664,16 @@ class TreeView extends BaseObject {
 
   recoverFromError(context) {
     switch (context) {
-      case 'node-management':
+      case "node-management":
         this.validateNodeState();
         break;
-      case 'animation':
+      case "animation":
         this.animationState.expandAnimations.clear();
         this.animationState.collapseAnimations.clear();
         this.animatingNodes.clear();
         AnimationManager.cancelAllAnimations();
         break;
-      case 'render':
+      case "render":
         this.clearRenderCache();
         break;
       default:
@@ -3682,16 +3683,16 @@ class TreeView extends BaseObject {
 
   setupAccessibility() {
     // ARIA attributes
-    this.setAttribute('role', 'tree');
-    this.setAttribute('aria-multiselectable', this.multiSelect.toString());
-    this.setAttribute('aria-activedescendant', '');
+    this.setAttribute("role", "tree");
+    this.setAttribute("aria-multiselectable", this.multiSelect.toString());
+    this.setAttribute("aria-activedescendant", "");
 
     // Keyboard accessibility
-    this.setAttribute('tabindex', this.disabled ? '-1' : '0');
+    this.setAttribute("tabindex", this.disabled ? "-1" : "0");
 
     // Focus management
-    this.addEventListener('focusin', () => this.handleFocusIn());
-    this.addEventListener('focusout', () => this.handleFocusOut());
+    this.addEventListener("focusin", () => this.handleFocusIn());
+    this.addEventListener("focusout", () => this.handleFocusOut());
   }
 
   setupNodes() {
@@ -3705,7 +3706,7 @@ class TreeView extends BaseObject {
       // Validate selection state
       this.validateNodeState();
     } catch (error) {
-      this.errorHandler.handle(error, 'node-setup');
+      this.errorHandler.handle(error, "node-setup");
     }
   }
 
@@ -3730,7 +3731,7 @@ class TreeView extends BaseObject {
         normalizedNode.children = this.normalizeNodes(
           normalizedNode.children,
           normalizedNode,
-          level + 1
+          level + 1,
         );
       }
       return normalizedNode;
@@ -3821,7 +3822,7 @@ class TreeView extends BaseObject {
       this.selectedNode = nodeId;
     }
 
-    this.emit('nodeSelected', {
+    this.emit("nodeSelected", {
       nodeId,
       selectedNodes: Array.from(this.selectedNodes),
     });
@@ -3870,11 +3871,11 @@ class TreeView extends BaseObject {
   handleWheel(event) {
     const maxScroll = Math.max(
       0,
-      this.visibleNodes.length * this.nodeHeight - this.height
+      this.visibleNodes.length * this.nodeHeight - this.height,
     );
     this.scrollY = Math.max(
       0,
-      Math.min(maxScroll, this.scrollY + event.deltaY)
+      Math.min(maxScroll, this.scrollY + event.deltaY),
     );
   }
 
@@ -3883,7 +3884,7 @@ class TreeView extends BaseObject {
     if (!this.visibleNodes.length) return;
 
     let currentIndex = this.focusedNode
-      ? this.visibleNodes.findIndex(n => n.id === this.focusedNode)
+      ? this.visibleNodes.findIndex((n) => n.id === this.focusedNode)
       : -1;
 
     if (currentIndex === -1) {
@@ -3891,7 +3892,7 @@ class TreeView extends BaseObject {
     } else {
       currentIndex = Math.max(
         0,
-        Math.min(this.visibleNodes.length - 1, currentIndex + direction)
+        Math.min(this.visibleNodes.length - 1, currentIndex + direction),
       );
     }
 
@@ -3906,10 +3907,10 @@ class TreeView extends BaseObject {
 
     let nodeIndex;
     switch (position) {
-      case 'first':
+      case "first":
         nodeIndex = 0;
         break;
-      case 'last':
+      case "last":
         nodeIndex = this.visibleNodes.length - 1;
         break;
       default:
@@ -3963,7 +3964,7 @@ class TreeView extends BaseObject {
   activateFocusedNode() {
     if (this.focusedNode) {
       this.selectNode(this.focusedNode);
-      this.emit('nodeActivated', { nodeId: this.focusedNode });
+      this.emit("nodeActivated", { nodeId: this.focusedNode });
     }
   }
 
@@ -3977,18 +3978,18 @@ class TreeView extends BaseObject {
     this.selectedNodes.clear();
     this.selectedNode = null;
     this.updateAccessibility();
-    this.announceChange('Selection cleared');
-    this.emit('selectionCleared');
+    this.announceChange("Selection cleared");
+    this.emit("selectionCleared");
   }
 
   setFocusedNode(nodeId) {
     this.focusedNode = nodeId;
-    this.setAttribute('aria-activedescendant', nodeId || '');
+    this.setAttribute("aria-activedescendant", nodeId || "");
     this.invalidate();
   }
 
   scrollToNode(nodeId) {
-    const nodeIndex = this.visibleNodes.findIndex(n => n.id === nodeId);
+    const nodeIndex = this.visibleNodes.findIndex((n) => n.id === nodeId);
     if (nodeIndex === -1) return;
 
     const nodeY = nodeIndex * this.nodeHeight;
@@ -4017,7 +4018,7 @@ class TreeView extends BaseObject {
       this.updateVirtualization();
     }
 
-    this.emit('nodeExpanded', { nodeId, node });
+    this.emit("nodeExpanded", { nodeId, node });
   }
 
   collapseNode(nodeId, animate = true) {
@@ -4035,11 +4036,11 @@ class TreeView extends BaseObject {
       this.updateVirtualization();
     }
 
-    this.emit('nodeCollapsed', { nodeId, node });
+    this.emit("nodeCollapsed", { nodeId, node });
   }
 
   clearChildSelections(node) {
-    const clearChildren = children => {
+    const clearChildren = (children) => {
       for (const child of children) {
         this.selectedNodes.delete(child.id);
         if (child.children) {
@@ -4060,8 +4061,8 @@ class TreeView extends BaseObject {
 
     const animation = AnimationManager.animate({
       duration: 300,
-      easing: 'easeOutCubic',
-      onUpdate: _progress => {
+      easing: "easeOutCubic",
+      onUpdate: (_progress) => {
         // Visual expansion effect
         this.invalidate();
       },
@@ -4082,8 +4083,8 @@ class TreeView extends BaseObject {
 
     const animation = AnimationManager.animate({
       duration: 300,
-      easing: 'easeInCubic',
-      onUpdate: _progress => {
+      easing: "easeInCubic",
+      onUpdate: (_progress) => {
         // Visual collapse effect
         this.invalidate();
       },
@@ -4107,11 +4108,11 @@ class TreeView extends BaseObject {
     const buffer = 5; // Render a few extra items for smooth scrolling
     const startIndex = Math.max(
       0,
-      Math.floor(this.scrollY / this.nodeHeight) - buffer
+      Math.floor(this.scrollY / this.nodeHeight) - buffer,
     );
     const endIndex = Math.min(
       this.visibleNodes.length - 1,
-      Math.ceil((this.scrollY + this.height) / this.nodeHeight) + buffer
+      Math.ceil((this.scrollY + this.height) / this.nodeHeight) + buffer,
     );
 
     this.visibleRange = { start: startIndex, end: endIndex };
@@ -4154,10 +4155,10 @@ class TreeView extends BaseObject {
 
   // Enhanced rendering with performance optimizations
   renderSelf(renderer) {
-    const startTime = this.performanceMonitor.startOperation('render');
+    const startTime = this.performanceMonitor.startOperation("render");
 
     try {
-      if (renderer.type !== 'canvas') return;
+      if (renderer.type !== "canvas") return;
 
       // Apply theme
       const colors = this.theme.getColors();
@@ -4198,9 +4199,9 @@ class TreeView extends BaseObject {
         this.renderFocusIndicator(renderer, colors);
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'render');
+      this.errorHandler.handle(error, "render");
     } finally {
-      this.performanceMonitor.endOperation('render', startTime);
+      this.performanceMonitor.endOperation("render", startTime);
     }
   }
 
@@ -4284,29 +4285,29 @@ class TreeView extends BaseObject {
     const isExpanded = this.expandedNodes.has(node.id);
 
     renderer.fillStyle = colors.text;
-    renderer.font = '10px Arial';
-    renderer.textAlign = 'center';
-    renderer.textBaseline = 'middle';
+    renderer.font = "10px Arial";
+    renderer.textAlign = "center";
+    renderer.textBaseline = "middle";
 
     // Use CSS arrow symbols for better accessibility
-    const icon = isExpanded ? '▼' : '▶';
+    const icon = isExpanded ? "▼" : "▶";
     renderer.fillText(icon, iconX, iconY);
   }
 
   renderNodeIcon(renderer, node, x, y, colors) {
     renderer.fillStyle = colors.text;
-    renderer.font = '14px Arial';
-    renderer.textAlign = 'left';
-    renderer.textBaseline = 'middle';
+    renderer.font = "14px Arial";
+    renderer.textAlign = "left";
+    renderer.textBaseline = "middle";
     renderer.fillText(node.icon, x, y + this.nodeHeight / 2);
     return x + LAYOUT_COMPONENT_CONSTANTS.TREE_TEXT_OFFSET;
   }
 
   renderNodeText(renderer, node, x, y, colors, isSelected) {
     renderer.fillStyle = isSelected ? colors.primaryText : colors.text;
-    renderer.font = `${isSelected ? 'bold ' : ''}13px Arial`;
-    renderer.textAlign = 'left';
-    renderer.textBaseline = 'middle';
+    renderer.font = `${isSelected ? "bold " : ""}13px Arial`;
+    renderer.textAlign = "left";
+    renderer.textBaseline = "middle";
 
     // Truncate text if too long
     const maxWidth = this.width - x - 10;
@@ -4319,7 +4320,7 @@ class TreeView extends BaseObject {
       ) {
         text = text.slice(0, -1);
       }
-      text += '...';
+      text += "...";
     }
 
     renderer.fillText(text, x, y + this.nodeHeight / 2);
@@ -4333,7 +4334,7 @@ class TreeView extends BaseObject {
       2,
       y + 1,
       this.width - LAYOUT_COMPONENT_CONSTANTS.TREE_FOCUS_BORDER_OFFSET,
-      this.nodeHeight - 2
+      this.nodeHeight - 2,
     );
     renderer.setLineDash([]);
   }
@@ -4342,7 +4343,7 @@ class TreeView extends BaseObject {
     if (!this.focusedNode) return;
 
     const nodeIndex = this.visibleNodes.findIndex(
-      n => n.id === this.focusedNode
+      (n) => n.id === this.focusedNode,
     );
     if (nodeIndex === -1) return;
 
@@ -4366,7 +4367,7 @@ class TreeView extends BaseObject {
     const totalHeight = this.visibleNodes.length * this.nodeHeight;
     const thumbHeight = Math.max(
       LAYOUT_COMPONENT_CONSTANTS.TREE_SCROLLBAR_MIN_HEIGHT,
-      (this.height / totalHeight) * this.height
+      (this.height / totalHeight) * this.height,
     );
     const scrollRange = totalHeight - this.height;
     const thumbY =
@@ -4393,13 +4394,13 @@ class TreeView extends BaseObject {
   }
 
   updateAccessibility() {
-    this.setAttribute('aria-multiselectable', this.multiSelect.toString());
-    this.setAttribute('aria-disabled', this.disabled.toString());
+    this.setAttribute("aria-multiselectable", this.multiSelect.toString());
+    this.setAttribute("aria-disabled", this.disabled.toString());
 
     if (this.focusedNode) {
-      this.setAttribute('aria-activedescendant', this.focusedNode);
+      this.setAttribute("aria-activedescendant", this.focusedNode);
     } else {
-      this.removeAttribute('aria-activedescendant');
+      this.removeAttribute("aria-activedescendant");
     }
   }
 
@@ -4413,7 +4414,7 @@ class TreeView extends BaseObject {
   prefersReducedMotion() {
     return (
       window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
     );
   }
 
@@ -4450,8 +4451,8 @@ class TreeView extends BaseObject {
     this.updateAccessibility();
     this.clearRenderCache();
 
-    this.announceChange('Tree view reset');
-    this.emit('reset');
+    this.announceChange("Tree view reset");
+    this.emit("reset");
   }
 
   destroy() {
@@ -4473,12 +4474,12 @@ class TreeView extends BaseObject {
     this.data = Array.isArray(data) ? data : [];
     this.setupNodes();
     this.announceChange(`Tree updated with ${this.visibleNodes.length} items`);
-    this.emit('dataChanged', { data: this.data });
+    this.emit("dataChanged", { data: this.data });
   }
 
   getSelectedNodes() {
     return Array.from(this.selectedNodes)
-      .map(id => this.findNodeById(id))
+      .map((id) => this.findNodeById(id))
       .filter(Boolean);
   }
 
@@ -4497,11 +4498,11 @@ class TreeView extends BaseObject {
       this.selectedNodes.size > 0 ? Array.from(this.selectedNodes)[0] : null;
     this.updateAccessibility();
     this.invalidate();
-    this.emit('selectionChanged', { selectedNodes: this.getSelectedNodes() });
+    this.emit("selectionChanged", { selectedNodes: this.getSelectedNodes() });
   }
 
   expandAll() {
-    const expandAllRecursive = nodes => {
+    const expandAllRecursive = (nodes) => {
       for (const node of nodes) {
         if (node.children && node.children.length > 0) {
           this.expandedNodes.add(node.id);
@@ -4512,21 +4513,21 @@ class TreeView extends BaseObject {
 
     expandAllRecursive(this.data);
     this.updateVirtualization();
-    this.announceChange('All nodes expanded');
-    this.emit('allExpanded');
+    this.announceChange("All nodes expanded");
+    this.emit("allExpanded");
   }
 
   collapseAll() {
     this.expandedNodes.clear();
     this.updateVirtualization();
-    this.announceChange('All nodes collapsed');
-    this.emit('allCollapsed');
+    this.announceChange("All nodes collapsed");
+    this.emit("allCollapsed");
   }
 
   setTheme(theme) {
     this.theme = theme;
     this.clearRenderCache();
-    this.emit('themeChanged', { theme });
+    this.emit("themeChanged", { theme });
   }
 
   setMultiSelect(enabled) {
@@ -4542,7 +4543,7 @@ class TreeView extends BaseObject {
       }
     }
     this.invalidate();
-    this.emit('multiSelectChanged', { enabled });
+    this.emit("multiSelectChanged", { enabled });
   }
 }
 
@@ -4562,8 +4563,8 @@ class FileUpload extends BaseObject {
         options.width || LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_DEFAULT_WIDTH,
       height:
         options.height || LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_DEFAULT_HEIGHT,
-      ariaRole: 'button',
-      ariaLabel: options.ariaLabel || 'File Upload Area',
+      ariaRole: "button",
+      ariaLabel: options.ariaLabel || "File Upload Area",
     });
 
     // Validate options
@@ -4571,7 +4572,7 @@ class FileUpload extends BaseObject {
 
     // Core properties
     this.multiple = options.multiple || false;
-    this.accept = options.accept || '*/*';
+    this.accept = options.accept || "*/*";
     this.maxFileSize =
       options.maxFileSize ||
       LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_MAX_SIZE_MB *
@@ -4586,12 +4587,12 @@ class FileUpload extends BaseObject {
 
     // Enhanced messaging
     this.uploadText =
-      options.uploadText || 'Drop files here or click to upload';
-    this.browseText = options.browseText || 'Browse Files';
+      options.uploadText || "Drop files here or click to upload";
+    this.browseText = options.browseText || "Browse Files";
     this.errorMessages = {
-      fileSize: 'File size exceeds maximum allowed size',
-      fileType: 'File type is not supported',
-      maxFiles: 'Maximum number of files exceeded',
+      fileSize: "File size exceeds maximum allowed size",
+      fileType: "File type is not supported",
+      maxFiles: "Maximum number of files exceeded",
       ...options.errorMessages,
     };
 
@@ -4612,7 +4613,7 @@ class FileUpload extends BaseObject {
     this.renderCache = new Map();
     this.throttledRender = this.throttle(
       this.render.bind(this),
-      PERFORMANCE_THRESHOLDS.eventThrottle
+      PERFORMANCE_THRESHOLDS.eventThrottle,
     );
 
     // Accessibility
@@ -4623,40 +4624,40 @@ class FileUpload extends BaseObject {
     this.errorHandler = this.createErrorHandler();
 
     // Performance monitoring
-    this.performanceMonitor = PerformanceMonitor.createInstance('FileUpload');
+    this.performanceMonitor = PerformanceMonitor.createInstance("FileUpload");
 
     try {
       this.setupEventHandlers();
       this.setupAccessibility();
       this.setupFileInput();
     } catch (error) {
-      this.errorHandler.handle(error, 'constructor');
+      this.errorHandler.handle(error, "constructor");
     }
   }
 
   validateOptions(options) {
     if (
       options.maxFileSize &&
-      (typeof options.maxFileSize !== 'number' || options.maxFileSize <= 0)
+      (typeof options.maxFileSize !== "number" || options.maxFileSize <= 0)
     ) {
       throw new ComponentError(
-        'maxFileSize must be a positive number',
-        'FileUpload'
+        "maxFileSize must be a positive number",
+        "FileUpload",
       );
     }
 
     if (
       options.maxFiles &&
-      (typeof options.maxFiles !== 'number' || options.maxFiles < 1)
+      (typeof options.maxFiles !== "number" || options.maxFiles < 1)
     ) {
-      throw new ComponentError('maxFiles must be at least 1', 'FileUpload');
+      throw new ComponentError("maxFiles must be at least 1", "FileUpload");
     }
   }
 
   createScreenReaderAnnouncer() {
-    const announcer = document.createElement('div');
-    announcer.setAttribute('aria-live', 'polite');
-    announcer.setAttribute('aria-atomic', 'true');
+    const announcer = document.createElement("div");
+    announcer.setAttribute("aria-live", "polite");
+    announcer.setAttribute("aria-atomic", "true");
     announcer.style.cssText = `
             position: absolute;
             left: -10000px;
@@ -4680,13 +4681,13 @@ class FileUpload extends BaseObject {
     return {
       handle: (error, context) => {
         const componentError = new ComponentError(
-          error.message || 'Unknown error',
-          'FileUpload',
-          { context, originalError: error }
+          error.message || "Unknown error",
+          "FileUpload",
+          { context, originalError: error },
         );
 
-        logger.error('FileUpload Error:', componentError);
-        this.emit('error', componentError);
+        logger.error("FileUpload Error:", componentError);
+        this.emit("error", componentError);
 
         this.recoverFromError(context);
       },
@@ -4695,19 +4696,19 @@ class FileUpload extends BaseObject {
 
   recoverFromError(context) {
     switch (context) {
-      case 'file-validation':
+      case "file-validation":
         this.clearErrors();
         break;
-      case 'upload':
+      case "upload":
         this.isUploading = false;
         this.uploadProgress.clear();
         break;
-      case 'animation':
+      case "animation":
         this.animationState.dragAnimation = null;
         this.animationState.progressAnimations.clear();
         AnimationManager.cancelAllAnimations();
         break;
-      case 'render':
+      case "render":
         this.clearRenderCache();
         break;
       default:
@@ -4717,33 +4718,33 @@ class FileUpload extends BaseObject {
 
   setupAccessibility() {
     // ARIA attributes
-    this.setAttribute('role', 'button');
+    this.setAttribute("role", "button");
     this.setAttribute(
-      'aria-label',
-      this.multiple ? 'Upload multiple files' : 'Upload file'
+      "aria-label",
+      this.multiple ? "Upload multiple files" : "Upload file",
     );
-    this.setAttribute('aria-describedby', this.uploadText);
+    this.setAttribute("aria-describedby", this.uploadText);
 
     // Keyboard accessibility
-    this.setAttribute('tabindex', this.disabled ? '-1' : '0');
+    this.setAttribute("tabindex", this.disabled ? "-1" : "0");
 
     // Focus management
-    this.addEventListener('focusin', () => this.handleFocusIn());
-    this.addEventListener('focusout', () => this.handleFocusOut());
+    this.addEventListener("focusin", () => this.handleFocusIn());
+    this.addEventListener("focusout", () => this.handleFocusOut());
   }
 
   setupFileInput() {
     // Create hidden file input
-    this.fileInput = document.createElement('input');
-    this.fileInput.type = 'file';
+    this.fileInput = document.createElement("input");
+    this.fileInput.type = "file";
     this.fileInput.multiple = this.multiple;
     this.fileInput.accept = this.accept;
     if (this.allowDirectories) {
       this.fileInput.webkitdirectory = true;
     }
-    this.fileInput.style.display = 'none';
+    this.fileInput.style.display = "none";
 
-    this.fileInput.addEventListener('change', event => {
+    this.fileInput.addEventListener("change", (event) => {
       this.handleFileInputChange(event);
     });
 
@@ -4751,11 +4752,11 @@ class FileUpload extends BaseObject {
   }
 
   setupEventHandlers() {
-    this.on('click', event => this.handleClick(event));
-    this.on('dragEnter', event => this.handleDragEnter(event));
-    this.on('dragOver', event => this.handleDragOver(event));
-    this.on('dragLeave', event => this.handleDragLeave(event));
-    this.on('drop', event => this.handleDrop(event));
+    this.on("click", (event) => this.handleClick(event));
+    this.on("dragEnter", (event) => this.handleDragEnter(event));
+    this.on("dragOver", (event) => this.handleDragOver(event));
+    this.on("dragLeave", (event) => this.handleDragLeave(event));
+    this.on("drop", (event) => this.handleDrop(event));
   }
 
   // File Management
@@ -4763,7 +4764,7 @@ class FileUpload extends BaseObject {
     const newFiles = Array.from(fileList);
 
     // Validate files
-    const validFiles = newFiles.filter(file => this.validateFile(file));
+    const validFiles = newFiles.filter((file) => this.validateFile(file));
 
     if (!this.multiple) {
       this.files = validFiles.slice(0, 1);
@@ -4771,11 +4772,11 @@ class FileUpload extends BaseObject {
       this.files = [...this.files, ...validFiles].slice(0, this.maxFiles);
     }
 
-    this.emit('filesAdded', { files: validFiles });
+    this.emit("filesAdded", { files: validFiles });
 
     if (validFiles.length !== newFiles.length) {
-      this.emit('filesRejected', {
-        rejected: newFiles.filter(f => !this.validateFile(f)),
+      this.emit("filesRejected", {
+        rejected: newFiles.filter((f) => !this.validateFile(f)),
       });
     }
   }
@@ -4787,16 +4788,16 @@ class FileUpload extends BaseObject {
     }
 
     // Type validation
-    if (this.accept !== '*/*') {
-      const acceptedTypes = this.accept.split(',').map(type => type.trim());
-      const isAccepted = acceptedTypes.some(type => {
-        if (type.startsWith('.')) {
+    if (this.accept !== "*/*") {
+      const acceptedTypes = this.accept.split(",").map((type) => type.trim());
+      const isAccepted = acceptedTypes.some((type) => {
+        if (type.startsWith(".")) {
           // File extension
           return file.name.toLowerCase().endsWith(type.toLowerCase());
         } else {
           // MIME type
           return (
-            file.type === type || file.type.startsWith(type.replace('*', ''))
+            file.type === type || file.type.startsWith(type.replace("*", ""))
           );
         }
       });
@@ -4812,13 +4813,13 @@ class FileUpload extends BaseObject {
   removeFile(index) {
     if (index >= 0 && index < this.files.length) {
       const removedFile = this.files.splice(index, 1)[0];
-      this.emit('fileRemoved', { file: removedFile, index });
+      this.emit("fileRemoved", { file: removedFile, index });
     }
   }
 
   clearFiles() {
     this.files = [];
-    this.emit('filesCleared');
+    this.emit("filesCleared");
   }
 
   startUpload() {
@@ -4826,7 +4827,7 @@ class FileUpload extends BaseObject {
 
     this.isUploading = true;
     this.uploadProgress = 0;
-    this.emit('uploadStarted', { files: this.files });
+    this.emit("uploadStarted", { files: this.files });
 
     // Simulate upload progress (in real implementation, this would be actual upload)
     this.simulateUpload();
@@ -4842,9 +4843,9 @@ class FileUpload extends BaseObject {
         this.uploadProgress = 1;
         this.isUploading = false;
         clearInterval(interval);
-        this.emit('uploadCompleted', { files: this.files });
+        this.emit("uploadCompleted", { files: this.files });
       } else {
-        this.emit('uploadProgress', { progress: this.uploadProgress });
+        this.emit("uploadProgress", { progress: this.uploadProgress });
       }
     }, 100);
   }
@@ -4854,7 +4855,7 @@ class FileUpload extends BaseObject {
     if (this.disabled) return;
 
     // In a real implementatio, this would trigger a file picker dialog
-    this.emit('browseRequested');
+    this.emit("browseRequested");
   }
 
   handleDragEnter(event) {
@@ -4890,21 +4891,21 @@ class FileUpload extends BaseObject {
 
   // Rendering
   renderSelf(renderer) {
-    if (renderer.type !== 'canvas') return;
+    if (renderer.type !== "canvas") return;
 
     // Background
     let { backgroundColor } = this;
     if (this.isDragOver) {
       backgroundColor = this.dragOverColor;
     } else if (this.disabled) {
-      backgroundColor = '#f8f9fa';
+      backgroundColor = "#f8f9fa";
     }
 
     renderer.fillStyle = backgroundColor;
     renderer.fillRect(0, 0, this.width, this.height);
 
     // Border
-    renderer.strokeStyle = this.isDragOver ? '#007bff' : this.borderColor;
+    renderer.strokeStyle = this.isDragOver ? "#007bff" : this.borderColor;
     renderer.lineWidth = this.isDragOver ? 2 : 1;
     renderer.setLineDash(
       this.isDragOver
@@ -4912,7 +4913,7 @@ class FileUpload extends BaseObject {
             LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_DASH_SIZE,
             LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_DASH_SIZE,
           ]
-        : []
+        : [],
     );
     renderer.strokeRect(0, 0, this.width, this.height);
     renderer.setLineDash([]);
@@ -4934,20 +4935,20 @@ class FileUpload extends BaseObject {
 
     // Upload icon
     renderer.fillStyle = this.iconColor;
-    renderer.font = '48px Arial';
-    renderer.textAlign = 'center';
-    renderer.textBaseline = 'middle';
+    renderer.font = "48px Arial";
+    renderer.textAlign = "center";
+    renderer.textBaseline = "middle";
     renderer.fillText(
-      '📁',
+      "📁",
       centerX,
-      centerY - LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_ICON_Y_OFFSET
+      centerY - LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_ICON_Y_OFFSET,
     );
 
     // Upload text
-    renderer.fillStyle = this.disabled ? '#999999' : this.textColor;
-    renderer.font = '14px Arial';
-    renderer.textAlign = 'center';
-    renderer.textBaseline = 'middle';
+    renderer.fillStyle = this.disabled ? "#999999" : this.textColor;
+    renderer.font = "14px Arial";
+    renderer.textAlign = "center";
+    renderer.textBaseline = "middle";
     renderer.fillText(this.uploadText, centerX, centerY + 10);
 
     // Browse button
@@ -4958,13 +4959,13 @@ class FileUpload extends BaseObject {
       const buttonY =
         centerY + LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_BUTTON_Y_OFFSET;
 
-      renderer.fillStyle = '#007bff';
+      renderer.fillStyle = "#007bff";
       renderer.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
 
-      renderer.fillStyle = '#ffffff';
-      renderer.font = '12px Arial';
-      renderer.textAlign = 'center';
-      renderer.textBaseline = 'middle';
+      renderer.fillStyle = "#ffffff";
+      renderer.font = "12px Arial";
+      renderer.textAlign = "center";
+      renderer.textBaseline = "middle";
       renderer.fillText(this.browseText, centerX, buttonY + buttonHeight / 2);
     }
   }
@@ -4974,45 +4975,45 @@ class FileUpload extends BaseObject {
     const startY = 10;
 
     renderer.fillStyle = this.textColor;
-    renderer.font = '12px Arial';
-    renderer.textAlign = 'left';
-    renderer.textBaseline = 'middle';
+    renderer.font = "12px Arial";
+    renderer.textAlign = "left";
+    renderer.textBaseline = "middle";
 
     this.files.forEach((file, index) => {
       const y = startY + index * itemHeight;
 
       // File icon
-      renderer.fillText('📄', 10, y + itemHeight / 2);
+      renderer.fillText("📄", 10, y + itemHeight / 2);
 
       // File name
       renderer.fillText(
         file.name,
         LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_FILE_NAME_X,
-        y + itemHeight / 2
+        y + itemHeight / 2,
       );
 
       // File size
       const sizeText = this.formatFileSize(file.size);
-      renderer.fillStyle = '#666666';
-      renderer.textAlign = 'right';
+      renderer.fillStyle = "#666666";
+      renderer.textAlign = "right";
       renderer.fillText(
         sizeText,
         this.width - LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_SIZE_TEXT_OFFSET,
-        y + itemHeight / 2
+        y + itemHeight / 2,
       );
 
       // Remove button
-      renderer.fillStyle = '#dc3545';
-      renderer.textAlign = 'center';
+      renderer.fillStyle = "#dc3545";
+      renderer.textAlign = "center";
       renderer.fillText(
-        '×',
+        "×",
         this.width -
           LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_REMOVE_BUTTON_OFFSET,
-        y + itemHeight / 2
+        y + itemHeight / 2,
       );
 
       renderer.fillStyle = this.textColor;
-      renderer.textAlign = 'left';
+      renderer.textAlign = "left";
     });
   }
 
@@ -5021,42 +5022,42 @@ class FileUpload extends BaseObject {
     const progressY = this.height - progressHeight - 10;
 
     // Progress background
-    renderer.fillStyle = '#e9ecef';
+    renderer.fillStyle = "#e9ecef";
     renderer.fillRect(
       10,
       progressY,
       this.width - LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_PROGRESS_MARGIN,
-      progressHeight
+      progressHeight,
     );
 
     // Progress bar
-    renderer.fillStyle = '#007bff';
+    renderer.fillStyle = "#007bff";
     renderer.fillRect(
       10,
       progressY,
       (this.width - LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_PROGRESS_MARGIN) *
         this.uploadProgress,
-      progressHeight
+      progressHeight,
     );
 
     // Progress text
     renderer.fillStyle = this.textColor;
-    renderer.font = '11px Arial';
-    renderer.textAlign = 'center';
-    renderer.textBaseline = 'bottom';
+    renderer.font = "11px Arial";
+    renderer.textAlign = "center";
+    renderer.textBaseline = "bottom";
     renderer.fillText(
       `Uploading... ${Math.round(this.uploadProgress * 100)}%`,
       this.width / 2,
-      progressY - LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_PROGRESS_TEXT_Y_OFFSET
+      progressY - LAYOUT_COMPONENT_CONSTANTS.FILE_UPLOAD_PROGRESS_TEXT_Y_OFFSET,
     );
   }
 
   // Utility Methods
   formatFileSize(bytes) {
-    if (bytes === 0) return '0 B';
+    if (bytes === 0) return "0 B";
 
     const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const sizes = ["B", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
 
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
@@ -5081,8 +5082,8 @@ class FileUpload extends BaseObject {
       this.fileInput.multiple = multiple;
     }
     this.setAttribute(
-      'aria-label',
-      multiple ? 'Upload multiple files' : 'Upload file'
+      "aria-label",
+      multiple ? "Upload multiple files" : "Upload file",
     );
   }
 
@@ -5104,7 +5105,7 @@ class FileUpload extends BaseObject {
   setTheme(theme) {
     this.theme = theme;
     this.clearRenderCache();
-    this.emit('themeChanged', { theme });
+    this.emit("themeChanged", { theme });
   }
 }
 

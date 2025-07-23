@@ -7,22 +7,22 @@
  * @license Apache-2.0
  */
 
-import logger from '../utils/logger.js';
+import logger from "../utils/logger.js";
 
 /**
  * Configuration for Google reCAPTCHA v3
  */
 const RECAPTCHA_CONFIG = {
-  SITE_KEY: '6LfizIQrAAAAAETdjKY14uI3ckhF-JeUujcloH53',
+  SITE_KEY: "6LfizIQrAAAAAETdjKY14uI3ckhF-JeUujcloH53",
   ACTIONS: {
-    SUBMIT_FORM: 'submit_form',
-    CONTACT_FORM: 'contact_form',
-    RESEARCH_CONSENT: 'research_consent',
-    FEEDBACK_FORM: 'feedback_form',
-    AUTH_LOGIN: 'auth_login',
-    AUTH_SIGNUP: 'auth_signup',
-    SCENARIO_SUBMIT: 'scenario_submit',
-    EMAIL_SUBSCRIBE: 'email_subscribe',
+    SUBMIT_FORM: "submit_form",
+    CONTACT_FORM: "contact_form",
+    RESEARCH_CONSENT: "research_consent",
+    FEEDBACK_FORM: "feedback_form",
+    AUTH_LOGIN: "auth_login",
+    AUTH_SIGNUP: "auth_signup",
+    SCENARIO_SUBMIT: "scenario_submit",
+    EMAIL_SUBSCRIBE: "email_subscribe",
   },
   MIN_SCORE: 0.5, // Minimum score to consider valid (0.0 to 1.0)
   TIMEOUT: 10000, // 10 seconds timeout for reCAPTCHA
@@ -53,9 +53,9 @@ export class RecaptchaService {
     try {
       await this.waitForRecaptchaLoad();
       this.isLoaded = true;
-      logger.info('reCAPTCHA', '✅ Google reCAPTCHA v3 service initialized');
+      logger.info("reCAPTCHA", "✅ Google reCAPTCHA v3 service initialized");
     } catch (error) {
-      logger.error('reCAPTCHA', '❌ Failed to initialize reCAPTCHA:', error);
+      logger.error("reCAPTCHA", "❌ Failed to initialize reCAPTCHA:", error);
     }
   }
 
@@ -69,7 +69,7 @@ export class RecaptchaService {
 
     this.loadingPromise = new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
-        reject(new Error('reCAPTCHA loading timeout'));
+        reject(new Error("reCAPTCHA loading timeout"));
       }, RECAPTCHA_CONFIG.TIMEOUT);
 
       const checkRecaptcha = () => {
@@ -101,18 +101,18 @@ export class RecaptchaService {
       }
 
       if (!window.grecaptcha || !window.grecaptcha.execute) {
-        throw new Error('reCAPTCHA not available');
+        throw new Error("reCAPTCHA not available");
       }
 
       const token = await window.grecaptcha.execute(this.siteKey, { action });
 
-      logger.info('reCAPTCHA', `✅ Token generated for action: ${action}`);
+      logger.info("reCAPTCHA", `✅ Token generated for action: ${action}`);
       return token;
     } catch (error) {
       logger.error(
-        'reCAPTCHA',
+        "reCAPTCHA",
         `❌ Failed to execute reCAPTCHA for action ${action}:`,
-        error
+        error,
       );
       throw error;
     }
@@ -127,25 +127,25 @@ export class RecaptchaService {
   bindToButton(
     button,
     action = RECAPTCHA_CONFIG.ACTIONS.SUBMIT_FORM,
-    callback = null
+    callback = null,
   ) {
     if (!button) {
-      logger.warn('reCAPTCHA', 'No button element provided for binding');
+      logger.warn("reCAPTCHA", "No button element provided for binding");
       return;
     }
 
     // Add reCAPTCHA attributes
-    button.classList.add('g-recaptcha');
-    button.setAttribute('data-sitekey', this.siteKey);
-    button.setAttribute('data-action', action);
+    button.classList.add("g-recaptcha");
+    button.setAttribute("data-sitekey", this.siteKey);
+    button.setAttribute("data-action", action);
 
     if (callback) {
       const callbackName = `recaptcha_callback_${Date.now()}_${Math.random().toString(RECAPTCHA_CONFIG.CALLBACK_ID_BASE).substr(2, RECAPTCHA_CONFIG.CALLBACK_ID_LENGTH)}`;
       window[callbackName] = callback;
-      button.setAttribute('data-callback', callbackName);
+      button.setAttribute("data-callback", callbackName);
     }
 
-    logger.info('reCAPTCHA', `✅ Button bound with action: ${action}`);
+    logger.info("reCAPTCHA", `✅ Button bound with action: ${action}`);
   }
 
   /**
@@ -157,30 +157,30 @@ export class RecaptchaService {
   protectForm(
     form,
     action = RECAPTCHA_CONFIG.ACTIONS.SUBMIT_FORM,
-    submitHandler = null
+    submitHandler = null,
   ) {
     if (!form) {
-      logger.warn('reCAPTCHA', 'No form element provided for protection');
+      logger.warn("reCAPTCHA", "No form element provided for protection");
       return;
     }
 
     const originalSubmit = form.onsubmit;
 
-    form.onsubmit = async event => {
+    form.onsubmit = async (event) => {
       event.preventDefault();
 
       let submitBtn = null;
-      let originalText = '';
+      let originalText = "";
 
       try {
         // Show loading state
         submitBtn = form.querySelector(
-          'button[type="submit"], input[type="submit"]'
+          'button[type="submit"], input[type="submit"]',
         );
         if (submitBtn) {
           submitBtn.disabled = true;
           originalText = submitBtn.textContent;
-          submitBtn.textContent = '🔒 Verifying...';
+          submitBtn.textContent = "🔒 Verifying...";
 
           // Restore button after timeout
           setTimeout(() => {
@@ -196,12 +196,12 @@ export class RecaptchaService {
 
         // Add token to form data
         let tokenInput = form.querySelector(
-          'input[name="g-recaptcha-response"]'
+          'input[name="g-recaptcha-response"]',
         );
         if (!tokenInput) {
-          tokenInput = document.createElement('input');
-          tokenInput.type = 'hidden';
-          tokenInput.name = 'g-recaptcha-response';
+          tokenInput = document.createElement("input");
+          tokenInput.type = "hidden";
+          tokenInput.name = "g-recaptcha-response";
           form.appendChild(tokenInput);
         }
         tokenInput.value = token;
@@ -221,10 +221,10 @@ export class RecaptchaService {
           submitBtn.textContent = originalText;
         }
       } catch (error) {
-        logger.error('reCAPTCHA', 'Form submission failed:', error);
+        logger.error("reCAPTCHA", "Form submission failed:", error);
 
         // Show error message
-        this.showError(form, 'Security verification failed. Please try again.');
+        this.showError(form, "Security verification failed. Please try again.");
 
         // Restore button
         if (submitBtn) {
@@ -234,7 +234,7 @@ export class RecaptchaService {
       }
     };
 
-    logger.info('reCAPTCHA', `✅ Form protected with action: ${action}`);
+    logger.info("reCAPTCHA", `✅ Form protected with action: ${action}`);
   }
 
   /**
@@ -244,7 +244,7 @@ export class RecaptchaService {
    * @returns {boolean} - Basic validation result
    */
   validateToken(token) {
-    if (!token || typeof token !== 'string') {
+    if (!token || typeof token !== "string") {
       return false;
     }
 
@@ -263,14 +263,14 @@ export class RecaptchaService {
    */
   showError(element, message) {
     // Remove existing error
-    const existingError = element.parentNode.querySelector('.recaptcha-error');
+    const existingError = element.parentNode.querySelector(".recaptcha-error");
     if (existingError) {
       existingError.remove();
     }
 
     // Create error element
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'recaptcha-error';
+    const errorDiv = document.createElement("div");
+    errorDiv.className = "recaptcha-error";
     errorDiv.style.cssText = `
       color: #dc3545;
       background: #f8d7da;
@@ -315,7 +315,7 @@ export class RecaptchaService {
   reset() {
     if (window.grecaptcha && window.grecaptcha.reset) {
       window.grecaptcha.reset();
-      logger.info('reCAPTCHA', '🔄 reCAPTCHA reset');
+      logger.info("reCAPTCHA", "🔄 reCAPTCHA reset");
     }
   }
 }
@@ -325,21 +325,21 @@ const recaptchaService = new RecaptchaService();
 
 // Global callback functions for automatic binding
 window.onRecaptchaSubmit = async function (token) {
-  logger.info('reCAPTCHA', '✅ Token received via callback:', token);
+  logger.info("reCAPTCHA", "✅ Token received via callback:", token);
 
   // Find the form associated with the reCAPTCHA button
   const recaptchaButton = document.querySelector(
-    '.g-recaptcha[data-callback="onRecaptchaSubmit"]'
+    '.g-recaptcha[data-callback="onRecaptchaSubmit"]',
   );
   if (recaptchaButton) {
-    const form = recaptchaButton.closest('form');
+    const form = recaptchaButton.closest("form");
     if (form) {
       // Add token to form
       let tokenInput = form.querySelector('input[name="g-recaptcha-response"]');
       if (!tokenInput) {
-        tokenInput = document.createElement('input');
-        tokenInput.type = 'hidden';
-        tokenInput.name = 'g-recaptcha-response';
+        tokenInput = document.createElement("input");
+        tokenInput.type = "hidden";
+        tokenInput.name = "g-recaptcha-response";
         form.appendChild(tokenInput);
       }
       tokenInput.value = token;
@@ -355,9 +355,9 @@ export { RECAPTCHA_CONFIG };
 export default recaptchaService;
 
 // Make available globally for debugging
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.recaptchaService = recaptchaService;
   window.RECAPTCHA_ACTIONS = RECAPTCHA_CONFIG.ACTIONS;
 }
 
-logger.info('reCAPTCHA', '📦 reCAPTCHA service module loaded');
+logger.info("reCAPTCHA", "📦 reCAPTCHA service module loaded");

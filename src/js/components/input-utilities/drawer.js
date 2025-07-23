@@ -27,9 +27,9 @@
  * Licensed under the Apache License, Version 2.0
  */
 
-import { BaseObject } from '../../objects/enhanced-objects.js';
-import { INPUT_UTILITY_CONSTANTS } from './constants.js';
-import { ComponentTheme } from './theme.js';
+import { BaseObject } from "../../objects/enhanced-objects.js";
+import { INPUT_UTILITY_CONSTANTS } from "./constants.js";
+import { ComponentTheme } from "./theme.js";
 
 // Drawer specific constants
 const DRAWER_CONSTANTS = {
@@ -60,7 +60,7 @@ const DRAWER_CONSTANTS = {
 class ComponentError extends Error {
   constructor(message, component, metadata = {}) {
     super(message);
-    this.name = 'ComponentError';
+    this.name = "ComponentError";
     this.component = component;
     this.metadata = metadata;
     this.timestamp = Date.now();
@@ -95,10 +95,10 @@ class PerformanceMonitor {
 
   static createInstance(label) {
     return {
-      startMeasurement: operation => {
+      startMeasurement: (operation) => {
         this.timers.set(`${label}-${operation}`, performance.now());
       },
-      endMeasurement: operation => {
+      endMeasurement: (operation) => {
         const start = this.timers.get(`${label}-${operation}`);
         if (start) {
           const duration = performance.now() - start;
@@ -107,7 +107,7 @@ class PerformanceMonitor {
             duration > INPUT_UTILITY_CONSTANTS.PERFORMANCE_WARNING_THRESHOLD
           ) {
             ComponentDebug.warn(
-              `Performance warning: ${label}-${operation} took ${duration.toFixed(2)}ms`
+              `Performance warning: ${label}-${operation} took ${duration.toFixed(2)}ms`,
             );
           }
           this.timers.delete(`${label}-${operation}`);
@@ -159,8 +159,8 @@ class Drawer extends BaseObject {
         options.height ||
         INPUT_UTILITY_CONSTANTS.ACCORDION_DEFAULT_HEIGHT ||
         DRAWER_CONSTANTS.DEFAULT_HEIGHT,
-      ariaRole: 'dialog',
-      ariaLabel: options.ariaLabel || 'Drawer',
+      ariaRole: "dialog",
+      ariaLabel: options.ariaLabel || "Drawer",
     });
 
     // Validate options
@@ -168,11 +168,11 @@ class Drawer extends BaseObject {
 
     // Core properties
     this.isOpen = options.isOpen || false;
-    this.position = options.position || 'left'; // 'left', 'right', 'top', 'bottom'
+    this.position = options.position || "left"; // 'left', 'right', 'top', 'bottom'
     this.modal = options.modal !== false;
     this.persistent = options.persistent || false;
-    this.title = options.title || '';
-    this.content = options.content || '';
+    this.title = options.title || "";
+    this.content = options.content || "";
     this.disabled = options.disabled || false;
 
     // Theme integration
@@ -193,7 +193,7 @@ class Drawer extends BaseObject {
     this.throttledRender = this.throttle(
       this.render.bind(this),
       INPUT_UTILITY_CONSTANTS.PERFORMANCE_THRESHOLDS?.eventThrottle ||
-        DRAWER_CONSTANTS.DEFAULT_THROTTLE_INTERVAL
+        DRAWER_CONSTANTS.DEFAULT_THROTTLE_INTERVAL,
     );
 
     // Accessibility
@@ -208,7 +208,7 @@ class Drawer extends BaseObject {
     this.errorHandler = this.createErrorHandler();
 
     // Performance monitoring
-    this.performanceMonitor = PerformanceMonitor.createInstance('Drawer');
+    this.performanceMonitor = PerformanceMonitor.createInstance("Drawer");
 
     // Touch support
     this.isCloseButtonHovered = false;
@@ -219,35 +219,35 @@ class Drawer extends BaseObject {
       this.setupResizeObserver();
       this.setupTouchSupport();
     } catch (error) {
-      this.errorHandler.handle(error, 'constructor');
+      this.errorHandler.handle(error, "constructor");
     }
   }
 
   validateOptions(options) {
-    const validPositions = ['left', 'right', 'top', 'bottom'];
+    const validPositions = ["left", "right", "top", "bottom"];
     if (options.position && !validPositions.includes(options.position)) {
       throw new ComponentError(
-        `Invalid position: ${options.position}. Must be one of: ${validPositions.join(', ')}`,
-        'Drawer'
+        `Invalid position: ${options.position}. Must be one of: ${validPositions.join(", ")}`,
+        "Drawer",
       );
     }
 
     if (
       options.animationDuration &&
-      (typeof options.animationDuration !== 'number' ||
+      (typeof options.animationDuration !== "number" ||
         options.animationDuration < 0)
     ) {
       throw new ComponentError(
-        'Animation duration must be a positive number',
-        'Drawer'
+        "Animation duration must be a positive number",
+        "Drawer",
       );
     }
   }
 
   createScreenReaderAnnouncer() {
-    const announcer = document.createElement('div');
-    announcer.setAttribute('aria-live', 'polite');
-    announcer.setAttribute('aria-atomic', 'true');
+    const announcer = document.createElement("div");
+    announcer.setAttribute("aria-live", "polite");
+    announcer.setAttribute("aria-atomic", "true");
     announcer.style.cssText = `
             position: absolute;
             left: -10000px;
@@ -262,7 +262,7 @@ class Drawer extends BaseObject {
   createKeyboardHandler() {
     return {
       Escape: () => !this.persistent && this.close(),
-      Tab: event => this.handleTabNavigation(event),
+      Tab: (event) => this.handleTabNavigation(event),
       Enter: () => this.handleEnterKey(),
       Space: () => this.handleSpaceKey(),
     };
@@ -272,13 +272,13 @@ class Drawer extends BaseObject {
     return {
       handle: (error, context) => {
         const componentError = new ComponentError(
-          error.message || 'Unknown error',
-          'Drawer',
-          { context, originalError: error }
+          error.message || "Unknown error",
+          "Drawer",
+          { context, originalError: error },
         );
 
-        logger.error('Drawer Error:', componentError);
-        this.emit('error', componentError);
+        logger.error("Drawer Error:", componentError);
+        this.emit("error", componentError);
 
         this.recoverFromError(context);
       },
@@ -287,11 +287,11 @@ class Drawer extends BaseObject {
 
   recoverFromError(context) {
     switch (context) {
-      case 'animation':
+      case "animation":
         this.animationState.isAnimating = false;
         AnimationManager.cancelAnimation(this);
         break;
-      case 'render':
+      case "render":
         this.clearRenderCache();
         break;
       default:
@@ -301,25 +301,25 @@ class Drawer extends BaseObject {
 
   setupAccessibility() {
     // ARIA attributes
-    this.setAttribute('role', 'dialog');
-    this.setAttribute('aria-modal', this.modal.toString());
-    this.setAttribute('aria-hidden', (!this.isOpen).toString());
+    this.setAttribute("role", "dialog");
+    this.setAttribute("aria-modal", this.modal.toString());
+    this.setAttribute("aria-hidden", (!this.isOpen).toString());
 
     if (this.title) {
-      this.setAttribute('aria-labelledby', `drawer-title-${this.id}`);
+      this.setAttribute("aria-labelledby", `drawer-title-${this.id}`);
     }
 
     // Keyboard accessibility
-    this.setAttribute('tabindex', this.disabled ? '-1' : '0');
+    this.setAttribute("tabindex", this.disabled ? "-1" : "0");
 
     // Focus management
-    this.addEventListener('focusin', () => this.handleFocusIn());
-    this.addEventListener('focusout', () => this.handleFocusOut());
+    this.addEventListener("focusin", () => this.handleFocusIn());
+    this.addEventListener("focusout", () => this.handleFocusOut());
   }
 
   setupResizeObserver() {
-    if ('ResizeObserver' in window) {
-      this.resizeObserver = new ResizeObserver(_entries => {
+    if ("ResizeObserver" in window) {
+      this.resizeObserver = new ResizeObserver((_entries) => {
         this.clearRenderCache();
         this.throttledRender();
       });
@@ -340,9 +340,9 @@ class Drawer extends BaseObject {
       isDragging: false,
     };
 
-    this.addEventListener('touchstart', this.handleTouchStart.bind(this));
-    this.addEventListener('touchmove', this.handleTouchMove.bind(this));
-    this.addEventListener('touchend', this.handleTouchEnd.bind(this));
+    this.addEventListener("touchstart", this.handleTouchStart.bind(this));
+    this.addEventListener("touchmove", this.handleTouchMove.bind(this));
+    this.addEventListener("touchend", this.handleTouchEnd.bind(this));
   }
 
   setupEventHandlers() {
@@ -365,7 +365,7 @@ class Drawer extends BaseObject {
         return;
 
       this.isOpen = true;
-      this.setAttribute('aria-hidden', 'false');
+      this.setAttribute("aria-hidden", "false");
 
       // Store previously focused element for restoration
       if (this.restoreFocus && document.activeElement) {
@@ -374,7 +374,7 @@ class Drawer extends BaseObject {
 
       // Animate opening
       if (!this.prefersReducedMotion()) {
-        await this.startAnimation('open');
+        await this.startAnimation("open");
       } else {
         this.animationState.progress = 1;
       }
@@ -382,10 +382,10 @@ class Drawer extends BaseObject {
       // Focus management
       this.manageFocus();
 
-      this.announceChange(`${this.title || 'Drawer'} opened`);
-      this.emit('drawerOpened', { position: this.position });
+      this.announceChange(`${this.title || "Drawer"} opened`);
+      this.emit("drawerOpened", { position: this.position });
     } catch (error) {
-      this.errorHandler.handle(error, 'open');
+      this.errorHandler.handle(error, "open");
     }
   }
 
@@ -394,11 +394,11 @@ class Drawer extends BaseObject {
       if (!this.isOpen || this.animationState.isAnimating) return;
 
       this.isOpen = false;
-      this.setAttribute('aria-hidden', 'true');
+      this.setAttribute("aria-hidden", "true");
 
       // Animate closing
       if (!this.prefersReducedMotion()) {
-        await this.startAnimation('close');
+        await this.startAnimation("close");
       } else {
         this.animationState.progress = 0;
       }
@@ -409,10 +409,10 @@ class Drawer extends BaseObject {
         this.previouslyFocusedElement = null;
       }
 
-      this.announceChange(`${this.title || 'Drawer'} closed`);
-      this.emit('drawerClosed', { position: this.position });
+      this.announceChange(`${this.title || "Drawer"} closed`);
+      this.emit("drawerClosed", { position: this.position });
     } catch (error) {
-      this.errorHandler.handle(error, 'close');
+      this.errorHandler.handle(error, "close");
     }
   }
 
@@ -429,13 +429,13 @@ class Drawer extends BaseObject {
     this.animationState.type = type;
     this.animationState.startTime = performance.now();
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const animate = () => {
         const elapsed = performance.now() - this.animationState.startTime;
         const progress = Math.min(elapsed / this.animationDuration, 1);
         const easedProgress = this.easeOutCubic(progress);
 
-        if (type === 'open') {
+        if (type === "open") {
           this.animationState.progress = easedProgress;
         } else {
           this.animationState.progress = 1 - easedProgress;
@@ -466,7 +466,7 @@ class Drawer extends BaseObject {
   prefersReducedMotion() {
     return (
       window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
     );
   }
 
@@ -487,28 +487,28 @@ class Drawer extends BaseObject {
     const { progress } = this.animationState;
 
     switch (this.position) {
-      case 'left':
+      case "left":
         return {
           x: -this.width + this.width * progress,
           y: 0,
           width: this.width,
           height: this.height,
         };
-      case 'right':
+      case "right":
         return {
           x: this.width - this.width * progress,
           y: 0,
           width: this.width,
           height: this.height,
         };
-      case 'top':
+      case "top":
         return {
           x: 0,
           y: -this.height + this.height * progress,
           width: this.width,
           height: this.height,
         };
-      case 'bottom':
+      case "bottom":
         return {
           x: 0,
           y: this.height - this.height * progress,
@@ -554,7 +554,7 @@ class Drawer extends BaseObject {
         }
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'click-handler');
+      this.errorHandler.handle(error, "click-handler");
     }
   }
 
@@ -568,7 +568,7 @@ class Drawer extends BaseObject {
         handler(event);
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'keyboard-handler');
+      this.errorHandler.handle(error, "keyboard-handler");
     }
   }
 
@@ -597,32 +597,32 @@ class Drawer extends BaseObject {
 
   handleEnterKey() {
     // Can be overridden for specific drawer actions
-    this.emit('enterPressed');
+    this.emit("enterPressed");
   }
 
   handleSpaceKey() {
     // Can be overridden for specific drawer actions
-    this.emit('spacePressed');
+    this.emit("spacePressed");
   }
 
   handleFocus() {
     this.isFocused = true;
-    this.emit('focus');
+    this.emit("focus");
   }
 
   handleBlur() {
     this.isFocused = false;
-    this.emit('blur');
+    this.emit("blur");
   }
 
   handleFocusIn() {
     this.isFocused = true;
-    this.emit('focusIn');
+    this.emit("focusIn");
   }
 
   handleFocusOut() {
     this.isFocused = false;
-    this.emit('focusOut');
+    this.emit("focusOut");
   }
 
   // Touch support for mobile
@@ -663,16 +663,16 @@ class Drawer extends BaseObject {
     // Check for swipe to close based on drawer position
     let shouldClose = false;
     switch (this.position) {
-      case 'left':
+      case "left":
         shouldClose = deltaX < -threshold;
         break;
-      case 'right':
+      case "right":
         shouldClose = deltaX > threshold;
         break;
-      case 'top':
+      case "top":
         shouldClose = deltaY < -threshold;
         break;
-      case 'bottom':
+      case "bottom":
         shouldClose = deltaY > threshold;
         break;
     }
@@ -686,26 +686,26 @@ class Drawer extends BaseObject {
 
   getFocusableElements() {
     const selectors = [
-      'button',
-      '[href]',
-      'input',
-      'select',
-      'textarea',
+      "button",
+      "[href]",
+      "input",
+      "select",
+      "textarea",
       '[tabindex]:not([tabindex="-1"])',
     ];
 
     return Array.from(
-      this.element?.querySelectorAll(selectors.join(',')) || []
-    ).filter(el => !el.disabled && el.offsetParent !== null);
+      this.element?.querySelectorAll(selectors.join(",")) || [],
+    ).filter((el) => !el.disabled && el.offsetParent !== null);
   }
 
   // Enhanced rendering with theme support
   renderSelf(renderer) {
-    if (renderer.type !== 'canvas') return;
+    if (renderer.type !== "canvas") return;
     if (this.animationState.progress <= 0) return;
 
     try {
-      this.performanceMonitor.startMeasurement('render');
+      this.performanceMonitor.startMeasurement("render");
 
       // Render overlay if modal
       if (this.modal) {
@@ -715,27 +715,27 @@ class Drawer extends BaseObject {
       // Render drawer
       this.renderDrawer(renderer);
 
-      this.performanceMonitor.endMeasurement('render');
+      this.performanceMonitor.endMeasurement("render");
     } catch (error) {
-      this.errorHandler.handle(error, 'render');
+      this.errorHandler.handle(error, "render");
     }
   }
 
   renderOverlay(renderer) {
     const alpha = this.animationState.progress * DRAWER_CONSTANTS.OVERLAY_ALPHA;
-    const overlayColor = ComponentTheme.getColor('overlay', this.theme);
+    const overlayColor = ComponentTheme.getColor("overlay", this.theme);
 
     // Parse overlay color or use default
     let baseColor = `rgba(0, 0, 0, ${alpha})`;
-    if (overlayColor.startsWith('rgba')) {
+    if (overlayColor.startsWith("rgba")) {
       const rgbaMatch = overlayColor.match(/rgba\(([^)]+)\)/);
       if (rgbaMatch) {
-        const parts = rgbaMatch[1].split(',');
+        const parts = rgbaMatch[1].split(",");
         if (parts.length >= DRAWER_CONSTANTS.RGB_MIN_PARTS) {
           baseColor = `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${alpha})`;
         }
       }
-    } else if (overlayColor.startsWith('rgb')) {
+    } else if (overlayColor.startsWith("rgb")) {
       const rgbMatch = overlayColor.match(/rgb\(([^)]+)\)/);
       if (rgbMatch) {
         baseColor = `rgba(${rgbMatch[1]}, ${alpha})`;
@@ -751,34 +751,34 @@ class Drawer extends BaseObject {
 
     // Enhanced shadow with theme support
     const shadowColor =
-      ComponentTheme.getColor('shadow', this.theme) || 'rgba(0, 0, 0, 0.15)';
+      ComponentTheme.getColor("shadow", this.theme) || "rgba(0, 0, 0, 0.15)";
     renderer.shadowColor = shadowColor;
     renderer.shadowBlur = DRAWER_CONSTANTS.SHADOW_BLUR;
     renderer.shadowOffsetX =
-      this.position === 'left'
+      this.position === "left"
         ? DRAWER_CONSTANTS.SHADOW_OFFSET
-        : this.position === 'right'
+        : this.position === "right"
           ? -DRAWER_CONSTANTS.SHADOW_OFFSET
           : 0;
     renderer.shadowOffsetY =
-      this.position === 'top'
+      this.position === "top"
         ? DRAWER_CONSTANTS.SHADOW_OFFSET
-        : this.position === 'bottom'
+        : this.position === "bottom"
           ? -DRAWER_CONSTANTS.SHADOW_OFFSET
           : 0;
 
     // Drawer background with theme support
-    renderer.fillStyle = ComponentTheme.getColor('background', this.theme);
+    renderer.fillStyle = ComponentTheme.getColor("background", this.theme);
     renderer.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
 
     // Reset shadow
-    renderer.shadowColor = 'transparent';
+    renderer.shadowColor = "transparent";
     renderer.shadowBlur = 0;
     renderer.shadowOffsetX = 0;
     renderer.shadowOffsetY = 0;
 
     // Drawer border with theme support
-    renderer.strokeStyle = ComponentTheme.getColor('border', this.theme);
+    renderer.strokeStyle = ComponentTheme.getColor("border", this.theme);
     renderer.lineWidth = 1;
     renderer.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
 
@@ -801,13 +801,13 @@ class Drawer extends BaseObject {
 
     // Header background with theme support
     renderer.fillStyle = ComponentTheme.getColor(
-      'backgroundSecondary',
-      this.theme
+      "backgroundSecondary",
+      this.theme,
     );
     renderer.fillRect(bounds.x, bounds.y, bounds.width, headerHeight);
 
     // Header border with theme support
-    renderer.strokeStyle = ComponentTheme.getColor('border', this.theme);
+    renderer.strokeStyle = ComponentTheme.getColor("border", this.theme);
     renderer.lineWidth = 1;
     renderer.beginPath();
     renderer.moveTo(bounds.x, bounds.y + headerHeight);
@@ -815,21 +815,21 @@ class Drawer extends BaseObject {
     renderer.stroke();
 
     // Title with theme support and truncation
-    renderer.fillStyle = ComponentTheme.getColor('text', this.theme);
-    renderer.font = 'bold 16px Arial';
-    renderer.textAlign = 'left';
-    renderer.textBaseline = 'middle';
+    renderer.fillStyle = ComponentTheme.getColor("text", this.theme);
+    renderer.font = "bold 16px Arial";
+    renderer.textAlign = "left";
+    renderer.textBaseline = "middle";
 
     const maxTitleWidth = bounds.width - DRAWER_CONSTANTS.CLOSE_BUTTON_SIZE; // Account for close button
     const truncatedTitle = this.truncateText(
       renderer,
       this.title,
-      maxTitleWidth
+      maxTitleWidth,
     );
     renderer.fillText(
       truncatedTitle,
       bounds.x + DRAWER_CONSTANTS.CONTENT_PADDING,
-      bounds.y + headerHeight / 2
+      bounds.y + headerHeight / 2,
     );
 
     // Enhanced close button with hover state
@@ -839,24 +839,24 @@ class Drawer extends BaseObject {
 
     // Close button background (optional hover effect)
     if (this.isCloseButtonHovered) {
-      renderer.fillStyle = ComponentTheme.getColor('dangerHover', this.theme);
+      renderer.fillStyle = ComponentTheme.getColor("dangerHover", this.theme);
       renderer.beginPath();
       renderer.arc(
         closeButtonX,
         closeButtonY,
         DRAWER_CONSTANTS.CLOSE_BUTTON_RADIUS,
         0,
-        Math.PI * 2
+        Math.PI * 2,
       );
       renderer.fill();
     }
 
     // Close button icon
-    renderer.fillStyle = ComponentTheme.getColor('textSecondary', this.theme);
-    renderer.font = '18px Arial';
-    renderer.textAlign = 'center';
-    renderer.textBaseline = 'middle';
-    renderer.fillText('×', closeButtonX, closeButtonY);
+    renderer.fillStyle = ComponentTheme.getColor("textSecondary", this.theme);
+    renderer.font = "18px Arial";
+    renderer.textAlign = "center";
+    renderer.textBaseline = "middle";
+    renderer.fillText("×", closeButtonX, closeButtonY);
   }
 
   renderContent(renderer, bounds) {
@@ -867,19 +867,19 @@ class Drawer extends BaseObject {
     const padding = DRAWER_CONSTANTS.CONTENT_PADDING;
 
     // Content area with theme support
-    renderer.fillStyle = ComponentTheme.getColor('text', this.theme);
-    renderer.font = '14px Arial';
-    renderer.textAlign = 'left';
-    renderer.textBaseline = 'top';
+    renderer.fillStyle = ComponentTheme.getColor("text", this.theme);
+    renderer.font = "14px Arial";
+    renderer.textAlign = "left";
+    renderer.textBaseline = "top";
 
     // Enhanced content rendering with line wrapping
-    const lines = this.content.split('\n');
+    const lines = this.content.split("\n");
     const maxWidth = bounds.width - padding * 2;
     let currentY = contentY + padding;
 
-    lines.forEach(line => {
+    lines.forEach((line) => {
       const wrappedLines = this.wrapText(renderer, line, maxWidth);
-      wrappedLines.forEach(wrappedLine => {
+      wrappedLines.forEach((wrappedLine) => {
         if (
           currentY + DRAWER_CONSTANTS.CONTENT_LINE_HEIGHT <=
           contentY + contentHeight - padding
@@ -892,7 +892,7 @@ class Drawer extends BaseObject {
   }
 
   renderFocusIndicator(renderer, bounds) {
-    renderer.strokeStyle = ComponentTheme.getColor('focus', this.theme);
+    renderer.strokeStyle = ComponentTheme.getColor("focus", this.theme);
     renderer.lineWidth = 2;
     renderer.setLineDash([
       DRAWER_CONSTANTS.BORDER_DASH_SIZE,
@@ -902,18 +902,18 @@ class Drawer extends BaseObject {
       bounds.x + DRAWER_CONSTANTS.FOCUS_INDICATOR_OFFSET,
       bounds.y + DRAWER_CONSTANTS.FOCUS_INDICATOR_OFFSET,
       bounds.width - DRAWER_CONSTANTS.FOCUS_INDICATOR_BORDER,
-      bounds.height - DRAWER_CONSTANTS.FOCUS_INDICATOR_BORDER
+      bounds.height - DRAWER_CONSTANTS.FOCUS_INDICATOR_BORDER,
     );
     renderer.setLineDash([]);
   }
 
   wrapText(renderer, text, maxWidth) {
-    const words = text.split(' ');
+    const words = text.split(" ");
     const lines = [];
-    let currentLine = '';
+    let currentLine = "";
 
     for (const word of words) {
-      const testLine = currentLine + (currentLine ? ' ' : '') + word;
+      const testLine = currentLine + (currentLine ? " " : "") + word;
       const metrics = renderer.measureText(testLine);
 
       if (metrics.width > maxWidth && currentLine) {
@@ -928,7 +928,7 @@ class Drawer extends BaseObject {
       lines.push(currentLine);
     }
 
-    return lines.length ? lines : [''];
+    return lines.length ? lines : [""];
   }
 
   truncateText(renderer, text, maxWidth) {
@@ -937,7 +937,7 @@ class Drawer extends BaseObject {
       return text;
     }
 
-    const ellipsis = '...';
+    const ellipsis = "...";
 
     let truncated = text;
     while (
@@ -970,42 +970,42 @@ class Drawer extends BaseObject {
   setTitle(title) {
     this.title = title;
     if (this.title) {
-      this.setAttribute('aria-labelledby', `drawer-title-${this.id}`);
+      this.setAttribute("aria-labelledby", `drawer-title-${this.id}`);
     }
     this.clearRenderCache();
-    this.emit('titleChanged', { title });
+    this.emit("titleChanged", { title });
   }
 
   setContent(content) {
     this.content = content;
     this.clearRenderCache();
-    this.emit('contentChanged', { content });
+    this.emit("contentChanged", { content });
   }
 
   setPosition(position) {
-    const validPositions = ['left', 'right', 'top', 'bottom'];
+    const validPositions = ["left", "right", "top", "bottom"];
     if (!validPositions.includes(position)) {
-      throw new ComponentError(`Invalid position: ${position}`, 'Drawer');
+      throw new ComponentError(`Invalid position: ${position}`, "Drawer");
     }
 
     this.position = position;
     this.clearRenderCache();
-    this.emit('positionChanged', { position });
+    this.emit("positionChanged", { position });
   }
 
   enable() {
     this.disabled = false;
-    this.setAttribute('tabindex', '0');
+    this.setAttribute("tabindex", "0");
     this.clearRenderCache();
-    this.emit('enabled');
+    this.emit("enabled");
   }
 
   disable() {
     this.disabled = true;
-    this.setAttribute('tabindex', '-1');
+    this.setAttribute("tabindex", "-1");
     this.close();
     this.clearRenderCache();
-    this.emit('disabled');
+    this.emit("disabled");
   }
 
   reset() {
@@ -1016,9 +1016,9 @@ class Drawer extends BaseObject {
       type: null,
       startTime: 0,
     };
-    this.setAttribute('aria-hidden', 'true');
+    this.setAttribute("aria-hidden", "true");
     this.clearRenderCache();
-    this.emit('reset');
+    this.emit("reset");
   }
 
   // Cleanup and memory management
@@ -1053,9 +1053,9 @@ class Drawer extends BaseObject {
       }
       // Call parent cleanup
       super.destroy?.();
-      this.emit('destroyed');
+      this.emit("destroyed");
     } catch (error) {
-      logger.error('Error during Drawer cleanup:', error);
+      logger.error("Error during Drawer cleanup:", error);
     }
   }
 }
