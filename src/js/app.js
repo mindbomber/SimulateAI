@@ -910,6 +910,10 @@ class AIEthicsApp {
       this._startEnterpriseMonitoring();
 
       this.isInitialized = true;
+
+      // Trigger hero entrance animations
+      this.initializeHeroAnimations();
+
       AppDebug.log(
         `AI Ethics App initialized successfully with enterprise infrastructure (${initTime.toFixed(2)}ms)`,
       );
@@ -1969,6 +1973,26 @@ class AIEthicsApp {
     // The HeroDemo class is designed for a different hero layout
     // that's not currently implemented. The radar chart demo is working fine.
     logger.info("Hero demo: Using radar chart demo instead of HeroDemo class");
+  }
+
+  /**
+   * Initialize hero entrance animations
+   * Triggers elegant fade-in and slide-up animations for the hero section
+   */
+  initializeHeroAnimations() {
+    try {
+      // Add 'loaded' class to html element to trigger CSS animations
+      document.documentElement.classList.add("loaded");
+
+      // Optional: Add slight delay to ensure all elements are rendered
+      setTimeout(() => {
+        // Additional animation triggers can be added here if needed
+        logger.info("Hero entrance animations initialized successfully");
+      }, 100);
+    } catch (error) {
+      logger.error("Failed to initialize hero animations:", error);
+      // Non-critical error - page will still function without animations
+    }
   }
 
   /**

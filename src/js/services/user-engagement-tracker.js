@@ -743,6 +743,72 @@ export class UserEngagementTracker {
   // Helper methods
 
   /**
+   * Calculate overall engagement level based on multiple metrics
+   */
+  calculateOverallEngagement() {
+    const metrics = this.engagementMetrics;
+
+    // Default to 'casual' if no metrics available
+    if (!metrics || Object.keys(metrics).length === 0) {
+      return "casual";
+    }
+
+    let score = 0;
+    let factors = 0;
+
+    // Session metrics (25% weight)
+    if (metrics.session_count > 0) {
+      factors++;
+      if (metrics.session_count >= 10) score += 4;
+      else if (metrics.session_count >= 5) score += 3;
+      else if (metrics.session_count >= 2) score += 2;
+      else score += 1;
+    }
+
+    // Feature usage (25% weight)
+    const featuresUsed = metrics.features_used?.length || 0;
+    if (featuresUsed > 0) {
+      factors++;
+      if (featuresUsed >= 8) score += 4;
+      else if (featuresUsed >= 5) score += 3;
+      else if (featuresUsed >= 3) score += 2;
+      else score += 1;
+    }
+
+    // Time spent metrics (25% weight)
+    const avgTimeSpent = metrics.time_spent_per_session || 0;
+    if (avgTimeSpent > 0) {
+      factors++;
+      if (avgTimeSpent >= 300000)
+        score += 4; // 5+ minutes
+      else if (avgTimeSpent >= 120000)
+        score += 3; // 2+ minutes
+      else if (avgTimeSpent >= 60000)
+        score += 2; // 1+ minute
+      else score += 1;
+    }
+
+    // Settings customization (25% weight)
+    const settingsChanges = this.settingsUsage.setting_changes?.length || 0;
+    if (settingsChanges > 0) {
+      factors++;
+      if (settingsChanges >= 10) score += 4;
+      else if (settingsChanges >= 5) score += 3;
+      else if (settingsChanges >= 2) score += 2;
+      else score += 1;
+    }
+
+    // Calculate average score
+    const averageScore = factors > 0 ? score / factors : 0;
+
+    // Return engagement level based on average score
+    if (averageScore >= 3.5) return "power_user";
+    else if (averageScore >= 2.5) return "deep";
+    else if (averageScore >= 1.5) return "engaged";
+    else return "casual";
+  }
+
+  /**
    * Calculate engagement level based on time spent
    */
   calculateEngagementLevel(timeSpent) {

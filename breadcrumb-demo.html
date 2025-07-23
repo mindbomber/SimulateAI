@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Breadcrumb Navigation Demo - SimulateAI</title>
+    <link rel="stylesheet" href="src/styles/shared-navigation.css" />
+    <style>
+      /* Demo page specific styles */
+      :root {
+        --header-h: 80px;
+        --nav-spacing-xs: 0.25rem;
+        --nav-spacing-sm: 0.5rem;
+        --nav-spacing-md: 0.75rem;
+        --nav-spacing-lg: 1rem;
+        --nav-spacing-xl: 1.5rem;
+        --nav-spacing-2xl: 2rem;
+      }
+
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #f8fafc;
+        color: #1e293b;
+        line-height: 1.6;
+      }
+
+      .demo-header {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        padding: 1rem 2rem;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        height: var(--header-h);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .demo-logo {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #3b82f6;
+      }
+
+      .demo-nav {
+        display: flex;
+        gap: 2rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .demo-nav a {
+        color: #64748b;
+        text-decoration: none;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+      }
+
+      .demo-nav a:hover {
+        color: #1e293b;
+        background: rgba(248, 250, 252, 0.8);
+      }
+
+      .main-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-top: 2rem;
+      }
+
+      .demo-section {
+        margin-bottom: 3rem;
+        padding: 2rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #fafbfc;
+      }
+
+      .demo-title {
+        color: #1e293b;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      .demo-description {
+        color: #64748b;
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+      }
+
+      .toggle-section {
+        margin: 2rem 0;
+        padding: 1rem;
+        background: #f1f5f9;
+        border-radius: 8px;
+      }
+
+      .toggle-button {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-right: 1rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+      }
+
+      .toggle-button:hover {
+        background: #2563eb;
+        transform: translateY(-1px);
+      }
+
+      /* Demo responsive adjustments */
+      @media (width <= 768px) {
+        .demo-nav {
+          display: none;
+        }
+
+        .main-content {
+          padding: 1rem;
+          margin-top: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Demo Header -->
+    <header class="demo-header">
+      <div class="demo-logo">SimulateAI</div>
+      <nav>
+        <ul class="demo-nav">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#scenarios">Scenarios</a></li>
+          <li><a href="#community">Community</a></li>
+          <li><a href="#about">About</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- Breadcrumb Navigation Examples -->
+
+    <!-- Basic Breadcrumb -->
+    <div class="breadcrumb-container">
+      <div class="breadcrumb-wrapper">
+        <nav aria-label="Breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a href="#home">
+                <span class="breadcrumb-icon breadcrumb-home">🏠</span>
+                Home
+              </a>
+            </li>
+            <li class="breadcrumb-item">
+              <a href="#scenarios">
+                <span class="breadcrumb-icon">🎭</span>
+                Scenarios
+              </a>
+            </li>
+            <li class="breadcrumb-item">
+              <a href="#ai-ethics">
+                <span class="breadcrumb-icon">🤖</span>
+                AI Ethics
+              </a>
+            </li>
+            <li class="breadcrumb-item active">
+              <span class="breadcrumb-icon">📚</span>
+              Autonomous Vehicles
+            </li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <h1>Breadcrumb Navigation System</h1>
+      <p>
+        This demo showcases the modern breadcrumb navigation system integrated
+        with your SimulateAI navigation design.
+      </p>
+
+      <!-- Basic Breadcrumb Demo -->
+      <div class="demo-section">
+        <h2 class="demo-title">Basic Breadcrumb Navigation</h2>
+        <p class="demo-description">
+          The basic breadcrumb shows the hierarchical path to the current page
+          with clean typography and subtle hover effects.
+        </p>
+
+        <div class="breadcrumb-container">
+          <div class="breadcrumb-wrapper">
+            <nav aria-label="Basic Breadcrumb">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                  <a href="#home">
+                    <span class="breadcrumb-icon breadcrumb-home">🏠</span>
+                    Home
+                  </a>
+                </li>
+                <li class="breadcrumb-item">
+                  <a href="#learning">Learning Center</a>
+                </li>
+                <li class="breadcrumb-item active">Current Page</li>
+              </ol>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      <!-- Enhanced Breadcrumb with Actions -->
+      <div class="demo-section">
+        <h2 class="demo-title">Enhanced Breadcrumb with Actions</h2>
+        <p class="demo-description">
+          This version includes action buttons for common page operations like
+          sharing, bookmarking, or editing.
+        </p>
+
+        <div class="breadcrumb-container">
+          <div class="breadcrumb-wrapper">
+            <nav aria-label="Enhanced Breadcrumb">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                  <a href="#home">
+                    <span class="breadcrumb-icon breadcrumb-home">🏠</span>
+                    Home
+                  </a>
+                </li>
+                <li class="breadcrumb-item">
+                  <a href="#scenarios">
+                    <span class="breadcrumb-icon">🎭</span>
+                    Scenarios
+                  </a>
+                </li>
+                <li class="breadcrumb-item active">
+                  <span class="breadcrumb-icon">🤖</span>
+                  AI Healthcare Ethics
+                </li>
+              </ol>
+              <div class="breadcrumb-actions">
+                <a href="#bookmark" class="breadcrumb-action">
+                  <span>🔖</span>
+                  Bookmark
+                </a>
+                <a href="#share" class="breadcrumb-action">
+                  <span>📤</span>
+                  Share
+                </a>
+              </div>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      <!-- Breadcrumb with Search -->
+      <div class="demo-section">
+        <h2 class="demo-title">Breadcrumb with Integrated Search</h2>
+        <p class="demo-description">
+          For content-heavy sections, you can integrate a search field directly
+          into the breadcrumb navigation.
+        </p>
+
+        <div class="breadcrumb-container">
+          <div class="breadcrumb-wrapper">
+            <nav aria-label="Breadcrumb with Search">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                  <a href="#home">
+                    <span class="breadcrumb-icon breadcrumb-home">🏠</span>
+                    Home
+                  </a>
+                </li>
+                <li class="breadcrumb-item">
+                  <a href="#library">
+                    <span class="breadcrumb-icon">📚</span>
+                    Resource Library
+                  </a>
+                </li>
+                <li class="breadcrumb-item active">
+                  <span class="breadcrumb-icon">🔍</span>
+                  Search Results
+                </li>
+              </ol>
+              <div class="breadcrumb-search">
+                <span class="breadcrumb-search-icon">🔍</span>
+                <input
+                  type="search"
+                  placeholder="Search resources..."
+                  aria-label="Search resources"
+                />
+              </div>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compact Breadcrumb -->
+      <div class="demo-section">
+        <h2 class="demo-title">Compact Breadcrumb (Mobile)</h2>
+        <p class="demo-description">
+          On mobile devices or when space is limited, the breadcrumb
+          automatically collapses to show only the most relevant levels.
+        </p>
+
+        <div class="breadcrumb-container">
+          <div class="breadcrumb-wrapper">
+            <nav aria-label="Compact Breadcrumb">
+              <ol class="breadcrumb breadcrumb-compact">
+                <li class="breadcrumb-item">
+                  <a href="#home">
+                    <span class="breadcrumb-icon breadcrumb-home">🏠</span>
+                    Home
+                  </a>
+                </li>
+                <li class="breadcrumb-item">
+                  <a href="#scenarios">Scenarios</a>
+                </li>
+                <li class="breadcrumb-item">
+                  <a href="#category">AI Ethics</a>
+                </li>
+                <li class="breadcrumb-item">
+                  <a href="#subcategory">Healthcare</a>
+                </li>
+                <li class="breadcrumb-item active">Current Page</li>
+              </ol>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      <!-- Theme Toggle Demo -->
+      <div class="toggle-section">
+        <h3>Theme Testing</h3>
+        <p>Test the breadcrumb navigation in different themes:</p>
+        <button class="toggle-button" onclick="toggleDarkMode()">
+          Toggle Dark Mode
+        </button>
+        <button class="toggle-button" onclick="toggleHighContrast()">
+          Toggle High Contrast
+        </button>
+      </div>
+
+      <!-- Implementation Guide -->
+      <div class="demo-section">
+        <h2 class="demo-title">Implementation Guide</h2>
+        <div class="demo-description">
+          <h3>HTML Structure:</h3>
+          <pre><code>&lt;div class="breadcrumb-container"&gt;
+    &lt;div class="breadcrumb-wrapper"&gt;
+        &lt;nav aria-label="Breadcrumb"&gt;
+            &lt;ol class="breadcrumb"&gt;
+                &lt;li class="breadcrumb-item"&gt;
+                    &lt;a href="#home"&gt;
+                        &lt;span class="breadcrumb-icon breadcrumb-home"&gt;🏠&lt;/span&gt;
+                        Home
+                    &lt;/a&gt;
+                &lt;/li&gt;
+                &lt;li class="breadcrumb-item"&gt;
+                    &lt;a href="#page"&gt;Page&lt;/a&gt;
+                &lt;/li&gt;
+                &lt;li class="breadcrumb-item active"&gt;Current Page&lt;/li&gt;
+            &lt;/ol&gt;
+        &lt;/nav&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+          <h3>Key Features:</h3>
+          <ul>
+            <li>
+              <strong>Responsive Design:</strong> Automatically adapts to mobile
+              screens
+            </li>
+            <li>
+              <strong>Accessibility:</strong> Proper ARIA labels and semantic
+              HTML
+            </li>
+            <li>
+              <strong>Dark Mode Support:</strong> Seamless integration with your
+              theme system
+            </li>
+            <li>
+              <strong>Glass Morphism:</strong> Modern backdrop blur effects
+            </li>
+            <li>
+              <strong>Interactive Elements:</strong> Action buttons and search
+              integration
+            </li>
+            <li>
+              <strong>Customizable:</strong> Easy to modify colors and spacing
+            </li>
+          </ul>
+
+          <h3>CSS Classes:</h3>
+          <ul>
+            <li>
+              <code>.breadcrumb-compact</code> - Collapsed view for mobile
+            </li>
+            <li><code>.breadcrumb-item.active</code> - Current page styling</li>
+            <li><code>.breadcrumb-actions</code> - Action buttons container</li>
+            <li><code>.breadcrumb-search</code> - Integrated search field</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Theme toggle functionality for demo
+      function toggleDarkMode() {
+        document.body.classList.toggle("dark-mode");
+        document.body.classList.remove("high-contrast");
+      }
+
+      function toggleHighContrast() {
+        document.body.classList.toggle("high-contrast");
+        document.body.classList.remove("dark-mode");
+      }
+
+      // Breadcrumb scroll behavior
+      let lastScrollTop = 0;
+      window.addEventListener("scroll", function () {
+        const breadcrumbs = document.querySelectorAll(".breadcrumb-container");
+        const scrollTop =
+          window.pageYOffset || document.documentElement.scrollTop;
+
+        breadcrumbs.forEach((breadcrumb) => {
+          if (scrollTop > lastScrollTop && scrollTop > 100) {
+            // Scrolling down
+            breadcrumb.classList.add("hidden");
+            breadcrumb.classList.remove("visible");
+          } else {
+            // Scrolling up
+            breadcrumb.classList.remove("hidden");
+            breadcrumb.classList.add("visible");
+          }
+        });
+
+        lastScrollTop = scrollTop;
+      });
+
+      // Search functionality demo
+      document.addEventListener("DOMContentLoaded", function () {
+        const searchInputs = document.querySelectorAll(
+          ".breadcrumb-search input",
+        );
+        searchInputs.forEach((input) => {
+          input.addEventListener("input", function () {
+            // Demo search functionality
+            console.log("Searching for:", this.value);
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

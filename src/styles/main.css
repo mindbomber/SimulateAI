@@ -168,6 +168,26 @@ html {
   overflow-x: hidden;
 }
 
+/* Page loaded state for triggering animations */
+html.loaded {
+  scroll-behavior: smooth; /* Re-enable smooth scrolling after page loads */
+}
+
+/* Enhanced animation trigger state */
+html.loaded .hero .hero-content,
+html.loaded .hero .hero-content h1,
+html.loaded .hero .hero-content p,
+html.loaded .hero .hero-simulation,
+html.loaded .hero-title,
+html.loaded .hero-description,
+html.loaded .hero-actions,
+html.loaded .hero-radar-demo,
+html.loaded .hero-radar-demo h3,
+html.loaded .hero-radar-demo p {
+  /* Ensure animations are properly triggered */
+  animation-play-state: running;
+}
+
 body {
   font-family: var(--font-family-primary);
   font-size: var(--font-size-base);
@@ -383,14 +403,29 @@ html.loaded {
 /* Hero content alignment - responsive text scaling */
 .hero .hero-content {
   text-align: center;
+  /* Initial state for entrance animation */
+  opacity: 0;
+  transform: translateY(30px);
+  animation: heroContentEnter 0.8s ease-out forwards;
+  animation-delay: 0.2s;
 }
 
 .hero .hero-content h1 {
   font-size: calc(2.5rem * var(--font-scale, 1));
+  /* Individual animation for title */
+  opacity: 0;
+  transform: translateY(20px);
+  animation: heroElementEnter 0.6s ease-out forwards;
+  animation-delay: 0.4s;
 }
 
 .hero .hero-content p {
   font-size: calc(1.125rem * var(--font-scale, 1));
+  /* Individual animation for description */
+  opacity: 0;
+  transform: translateY(15px);
+  animation: heroElementEnter 0.6s ease-out forwards;
+  animation-delay: 0.6s;
 }
 
 /* Hero simulation container - fully responsive */
@@ -406,6 +441,11 @@ html.loaded {
   position: relative;
   overflow: visible;
   z-index: 1;
+  /* Initial state for entrance animation */
+  opacity: 0;
+  transform: translateY(40px) scale(0.95);
+  animation: heroSimulationEnter 0.8s ease-out forwards;
+  animation-delay: 0.5s;
 }
 
 /* Demo container with improved integration */
@@ -439,6 +479,11 @@ html.loaded {
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-tight);
   margin-bottom: calc(var(--spacing-6) * var(--font-scale, 1));
+  /* Individual animation for standalone hero title */
+  opacity: 0;
+  transform: translateY(25px);
+  animation: heroElementEnter 0.7s ease-out forwards;
+  animation-delay: 0.3s;
 }
 
 .hero-description {
@@ -446,6 +491,11 @@ html.loaded {
   line-height: var(--line-height-relaxed);
   margin-bottom: calc(var(--spacing-8) * var(--font-scale, 1));
   color: var(--color-gray-800);
+  /* Individual animation for standalone hero description */
+  opacity: 0;
+  transform: translateY(20px);
+  animation: heroElementEnter 0.7s ease-out forwards;
+  animation-delay: 0.5s;
 }
 
 .hero-actions {
@@ -454,6 +504,11 @@ html.loaded {
   flex-wrap: wrap;
   justify-content: center;
   margin-bottom: calc(var(--spacing-6) * var(--font-scale, 1));
+  /* Individual animation for hero actions */
+  opacity: 0;
+  transform: translateY(15px);
+  animation: heroElementEnter 0.6s ease-out forwards;
+  animation-delay: 0.8s;
 }
 
 .hero-simulation {
@@ -1872,6 +1927,60 @@ th {
 
   100% {
     transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* ===== HERO ENTRANCE ANIMATIONS ===== */
+/* Elegant, professional entrance animations for hero section */
+
+@keyframes heroContentEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroElementEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroSimulationEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Respect reduced motion preferences - disable animations for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .hero .hero-content,
+  .hero .hero-content h1,
+  .hero .hero-content p,
+  .hero .hero-simulation,
+  .hero-title,
+  .hero-description,
+  .hero-actions,
+  .hero-radar-demo,
+  .hero-radar-demo h3,
+  .hero-radar-demo p {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 
