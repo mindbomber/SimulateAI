@@ -1318,6 +1318,9 @@ limitations under the License.
           performance.mark("page-loaded");
           performance.measure("page-load-time", "page-start", "page-loaded");
 
+          // Add loaded class to enable entrance animations
+          document.documentElement.classList.add("loaded");
+
           // Report to our analytics system
           const measure = performance.getEntriesByName("page-load-time")[0];
           if (measure && window.SimpleAnalytics) {
@@ -1326,6 +1329,17 @@ limitations under the License.
               measure.duration,
             );
           }
+        });
+      }
+
+      // Fallback mechanism to ensure loaded class is added
+      // Add loaded class immediately for CSS that needs it
+      document.documentElement.classList.add("loaded");
+
+      // Also ensure it's added after DOMContentLoaded if not already
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => {
+          document.documentElement.classList.add("loaded");
         });
       }
 

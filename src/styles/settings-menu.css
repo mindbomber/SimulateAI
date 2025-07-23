@@ -2,23 +2,7 @@
  * Copyright 2025 Armando Sori
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file e.settings-disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.settings-disabled:hover {
-  opacity: 0.5;
-}
-
-.settings-disabled .toggle-slider {
-  background: #e0e0e0;
-  cursor: not-allowed;
-}
-
-.settings-disabled input[type='checkbox']:checked + .toggle-slider {
-  background: #999999;
-}ce with the License.
+ * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0

@@ -1271,36 +1271,49 @@ class AIEthicsApp {
       return;
     }
 
+    // OPTIMIZED: Cache DOM queries and batch operations
     const errorContent = this.errorBoundary.querySelector(".error-content");
     if (errorContent) {
-      const messageEl = errorContent.querySelector(".error-message");
-      const retryBtn = errorContent.querySelector("#retry-action");
-      const reportBtn = errorContent.querySelector("#report-error");
-      const fallbackBtn = errorContent.querySelector("#fallback-action");
+      // Get all elements at once
+      const elements = {
+        messageEl: errorContent.querySelector(".error-message"),
+        retryBtn: errorContent.querySelector("#retry-action"),
+        reportBtn: errorContent.querySelector("#report-error"),
+        fallbackBtn: errorContent.querySelector("#fallback-action"),
+      };
 
-      if (messageEl) messageEl.textContent = message;
+      if (elements.messageEl) elements.messageEl.textContent = message;
+
+      // OPTIMIZED: Batch style operations
+      const styleUpdates = {};
 
       // Setup retry functionality
-      if (retryBtn && hasRecovery) {
-        retryBtn.style.display = "inline-block";
-        retryBtn.onclick = () => {
-          this.hideError();
-          // Reset retry counter for this error type
-          this.retryCounters.set(errorType, 0);
-          // Attempt to recover
-          const strategy = this.errorRecoveryStrategies.get(errorType);
-          if (strategy) {
-            this._executeRecoveryStrategy(errorType, strategy, this.lastError);
-          }
-        };
-      } else if (retryBtn) {
-        retryBtn.style.display = "none";
+      if (elements.retryBtn) {
+        if (hasRecovery) {
+          styleUpdates.retryDisplay = "inline-block";
+          elements.retryBtn.onclick = () => {
+            this.hideError();
+            // Reset retry counter for this error type
+            this.retryCounters.set(errorType, 0);
+            // Attempt to recover
+            const strategy = this.errorRecoveryStrategies.get(errorType);
+            if (strategy) {
+              this._executeRecoveryStrategy(
+                errorType,
+                strategy,
+                this.lastError,
+              );
+            }
+          };
+        } else {
+          styleUpdates.retryDisplay = "none";
+        }
       }
 
       // Setup fallback action
-      if (fallbackBtn) {
-        fallbackBtn.style.display = "inline-block";
-        fallbackBtn.onclick = () => {
+      if (elements.fallbackBtn) {
+        styleUpdates.fallbackDisplay = "inline-block";
+        elements.fallbackBtn.onclick = () => {
           this.hideError();
           const strategy = this.errorRecoveryStrategies.get(errorType);
           if (strategy) {
@@ -1310,15 +1323,26 @@ class AIEthicsApp {
       }
 
       // Setup error reporting
-      if (reportBtn) {
-        reportBtn.onclick = () => {
+      if (elements.reportBtn) {
+        elements.reportBtn.onclick = () => {
           this.reportEnterpriseError(errorType);
         };
       }
+
+      // Apply all style updates at once
+      if (elements.retryBtn && styleUpdates.retryDisplay) {
+        elements.retryBtn.style.display = styleUpdates.retryDisplay;
+      }
+      if (elements.fallbackBtn && styleUpdates.fallbackDisplay) {
+        elements.fallbackBtn.style.display = styleUpdates.fallbackDisplay;
+      }
     }
 
+    // OPTIMIZED: Batch attribute and style changes
+    Object.assign(this.errorBoundary.style, {
+      display: "flex",
+    });
     this.errorBoundary.setAttribute("aria-hidden", "false");
-    this.errorBoundary.style.display = "flex";
   }
 
   /**
@@ -1434,22 +1458,35 @@ class AIEthicsApp {
     if (!header) return;
 
     let lastScrollY = window.scrollY;
+    let headerState = "visible"; // Track current state to avoid redundant changes
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
+      let newState = headerState;
 
       // Don't hide header at the very top of the page
       if (currentScrollY <= 10) {
-        header.classList.remove("header-hidden");
-        header.classList.add("header-visible");
+        newState = "visible";
       } else {
         // Hide header when scrolling down, show when scrolling up
         if (currentScrollY > lastScrollY && currentScrollY > 100) {
           // Scrolling down - hide header
-          header.classList.add("header-hidden");
-          header.classList.remove("header-visible");
+          newState = "hidden";
         } else if (currentScrollY < lastScrollY) {
           // Scrolling up - show header
+          newState = "visible";
+        }
+      }
+
+      // OPTIMIZED: Only update DOM if state actually changed
+      if (newState !== headerState) {
+        headerState = newState;
+
+        // OPTIMIZED: Batch class operations
+        if (newState === "hidden") {
+          header.classList.remove("header-visible");
+          header.classList.add("header-hidden");
+        } else {
           header.classList.remove("header-hidden");
           header.classList.add("header-visible");
         }
@@ -1474,6 +1511,7 @@ class AIEthicsApp {
 
     // Initialize header as visible
     header.classList.add("header-visible");
+    headerState = "visible";
 
     AppDebug.log("Scroll reveal header initialized");
   }
@@ -1528,22 +1566,35 @@ class AIEthicsApp {
   applyTheme() {
     const { body } = document;
 
-    // Remove existing theme classes
-    body.classList.remove("high-contrast", "reduced-motion", "large-text");
+    // OPTIMIZED: Batch class operations to avoid multiple layout recalculations
+    const classesToRemove = ["high-contrast", "reduced-motion", "large-text"];
+    const classesToAdd = [];
 
-    // Apply current theme classes
-    if (this.preferences.highContrast) body.classList.add("high-contrast");
-    if (this.preferences.reducedMotion) body.classList.add("reduced-motion");
-    if (this.preferences.largeText) body.classList.add("large-text");
+    // Determine which classes to add
+    if (this.preferences.highContrast) classesToAdd.push("high-contrast");
+    if (this.preferences.reducedMotion) classesToAdd.push("reduced-motion");
+    if (this.preferences.largeText) classesToAdd.push("large-text");
+
+    // Remove existing theme classes
+    body.classList.remove(...classesToRemove);
+
+    // Add new theme classes
+    if (classesToAdd.length > 0) {
+      body.classList.add(...classesToAdd);
+    }
 
     // Update button states (aria-pressed attributes)
     this.updateButtonStates();
 
+    // OPTIMIZED: Cache theme color meta query
+    if (!this._themeColorMeta) {
+      this._themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    }
+
     // Update theme color meta tag
-    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
-    if (themeColorMeta) {
+    if (this._themeColorMeta) {
       const themeColor = "#1a73e8"; // Always use light theme color
-      themeColorMeta.setAttribute("content", themeColor);
+      this._themeColorMeta.setAttribute("content", themeColor);
     }
 
     // Update managers if they exist
@@ -1561,28 +1612,44 @@ class AIEthicsApp {
    * Update accessibility button states
    */
   updateButtonStates() {
-    const highContrastBtn = document.getElementById("toggle-high-contrast");
-    const largeTextBtn = document.getElementById("toggle-large-text");
-    const reducedMotionBtn = document.getElementById("toggle-reduced-motion");
+    // OPTIMIZED: Cache button queries and batch attribute updates
+    if (!this._accessibilityButtons) {
+      this._accessibilityButtons = {
+        highContrast: document.getElementById("toggle-high-contrast"),
+        largeText: document.getElementById("toggle-large-text"),
+        reducedMotion: document.getElementById("toggle-reduced-motion"),
+      };
+    }
 
-    if (highContrastBtn) {
-      highContrastBtn.setAttribute(
-        "aria-pressed",
-        this.preferences.highContrast.toString(),
-      );
+    const { highContrast, largeText, reducedMotion } =
+      this._accessibilityButtons;
+
+    // OPTIMIZED: Batch attribute updates to minimize DOM mutations
+    const updates = [];
+
+    if (highContrast) {
+      updates.push({
+        element: highContrast,
+        value: this.preferences.highContrast.toString(),
+      });
     }
-    if (largeTextBtn) {
-      largeTextBtn.setAttribute(
-        "aria-pressed",
-        this.preferences.largeText.toString(),
-      );
+    if (largeText) {
+      updates.push({
+        element: largeText,
+        value: this.preferences.largeText.toString(),
+      });
     }
-    if (reducedMotionBtn) {
-      reducedMotionBtn.setAttribute(
-        "aria-pressed",
-        this.preferences.reducedMotion.toString(),
-      );
+    if (reducedMotion) {
+      updates.push({
+        element: reducedMotion,
+        value: this.preferences.reducedMotion.toString(),
+      });
     }
+
+    // Apply all updates
+    updates.forEach(({ element, value }) => {
+      element.setAttribute("aria-pressed", value);
+    });
   }
 
   /**
@@ -1594,10 +1661,14 @@ class AIEthicsApp {
     if (this.accessibilityManager) {
       this.accessibilityManager.announce(announcement);
     } else {
+      // OPTIMIZED: Cache live region query
+      if (!this._liveRegion) {
+        this._liveRegion = document.getElementById("aria-live-polite");
+      }
+
       // Fallback announcement
-      const liveRegion = document.getElementById("aria-live-polite");
-      if (liveRegion) {
-        liveRegion.textContent = announcement;
+      if (this._liveRegion) {
+        this._liveRegion.textContent = announcement;
       }
     }
   }
@@ -1668,26 +1739,38 @@ class AIEthicsApp {
       return;
     }
 
-    const errorContent = this.errorBoundary.querySelector(".error-content");
-    if (errorContent) {
-      const messageEl = errorContent.querySelector(".error-message");
-      const retryBtn = errorContent.querySelector("#retry-action");
-      const reportBtn = errorContent.querySelector("#report-error");
+    // OPTIMIZED: Cache DOM queries for error content
+    if (!this._errorElements) {
+      const errorContent = this.errorBoundary.querySelector(".error-content");
+      if (errorContent) {
+        this._errorElements = {
+          content: errorContent,
+          messageEl: errorContent.querySelector(".error-message"),
+          retryBtn: errorContent.querySelector("#retry-action"),
+          reportBtn: errorContent.querySelector("#report-error"),
+        };
+      }
+    }
+
+    if (this._errorElements && this._errorElements.content) {
+      const { messageEl, retryBtn, reportBtn } = this._errorElements;
 
       if (messageEl) messageEl.textContent = message;
 
-      // Setup retry functionality
-      if (retryBtn && isRecoverable) {
-        retryBtn.style.display = "inline-block";
-        retryBtn.onclick = () => {
-          this.hideError();
-          // Attempt to recover by reinitializing
-          if (!this.isInitialized) {
-            this.init();
-          }
-        };
-      } else if (retryBtn) {
-        retryBtn.style.display = "none";
+      // OPTIMIZED: Batch style operations
+      if (retryBtn) {
+        const displayValue = isRecoverable ? "inline-block" : "none";
+        retryBtn.style.display = displayValue;
+
+        if (isRecoverable) {
+          retryBtn.onclick = () => {
+            this.hideError();
+            // Attempt to recover by reinitializing
+            if (!this.isInitialized) {
+              this.init();
+            }
+          };
+        }
       }
 
       // Setup error reporting
@@ -1698,8 +1781,11 @@ class AIEthicsApp {
       }
     }
 
+    // OPTIMIZED: Batch attribute and style changes
+    Object.assign(this.errorBoundary.style, {
+      display: "flex",
+    });
     this.errorBoundary.setAttribute("aria-hidden", "false");
-    this.errorBoundary.style.display = "flex";
   }
 
   /**
@@ -1707,8 +1793,11 @@ class AIEthicsApp {
    */
   hideError() {
     if (this.errorBoundary) {
+      // OPTIMIZED: Batch attribute and style changes
+      Object.assign(this.errorBoundary.style, {
+        display: "none",
+      });
       this.errorBoundary.setAttribute("aria-hidden", "true");
-      this.errorBoundary.style.display = "none";
     }
   }
 

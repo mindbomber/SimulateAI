@@ -802,17 +802,23 @@ class MainGrid {
    * Force modal cleanup
    */
   _forceModalCleanup() {
-    // Remove any modal elements
-    document.querySelectorAll(".modal-backdrop, .modal").forEach((modal) => {
+    // OPTIMIZED: Batch DOM queries and operations
+    const modalsToRemove = document.querySelectorAll(".modal-backdrop, .modal");
+    const inertElements = document.querySelectorAll("[inert]");
+
+    // Batch all DOM removals
+    modalsToRemove.forEach((modal) => {
       modal.remove();
     });
 
-    // Reset body styles
-    document.body.style.overflow = "";
+    // OPTIMIZED: Batch style operations using Object.assign
+    Object.assign(document.body.style, {
+      overflow: "",
+    });
     document.body.classList.remove("modal-open");
 
-    // Remove inert attributes
-    document.querySelectorAll("[inert]").forEach((el) => {
+    // Batch inert attribute removal
+    inertElements.forEach((el) => {
       el.removeAttribute("inert");
     });
 
@@ -1083,13 +1089,25 @@ class MainGrid {
   }
 
   async renderCategoryView() {
-    this.categoryContainer.innerHTML = "";
+    // OPTIMIZED: Use document fragment to batch DOM operations
+    const categoryFragment = document.createDocumentFragment();
 
-    // Create the complete category-based layout
-    for (const category of this.categories) {
-      const categorySection = await this.createCategorySection(category);
-      this.categoryContainer.appendChild(categorySection);
-    }
+    // OPTIMIZED: Create all category sections in parallel
+    const categorySectionPromises = this.categories.map(async (category) => {
+      return await this.createCategorySection(category);
+    });
+
+    // Wait for all sections to be created
+    const categorySections = await Promise.all(categorySectionPromises);
+
+    // Add all sections to fragment
+    categorySections.forEach((section) =>
+      categoryFragment.appendChild(section),
+    );
+
+    // Clear container and append all sections in single operation
+    this.categoryContainer.innerHTML = "";
+    this.categoryContainer.appendChild(categoryFragment);
   }
 
   async renderScenarioView() {
@@ -1237,16 +1255,19 @@ class MainGrid {
         return;
       }
 
+      // OPTIMIZED: Build all scenario cards in document fragment to reduce DOM mutations
+      const scenarioFragment = document.createDocumentFragment();
+
       // Add scenario count display
       const countElement = document.createElement("div");
       countElement.className = "scenario-count";
       countElement.innerHTML = `
         <p class="count-text">Showing <span class="count-number">${allScenarios.length}</span> scenarios across all categories</p>
       `;
-      this.scenarioContainer.appendChild(countElement);
+      scenarioFragment.appendChild(countElement);
 
-      // Create individual scenario cards with hover category headers
-      for (const scenario of allScenarios) {
+      // OPTIMIZED: Create all scenario cards in parallel for better performance
+      const scenarioCardPromises = allScenarios.map(async (scenario) => {
         const category = {
           id: scenario.categoryId,
           color: scenario.category?.color || "#667eea",
@@ -1256,31 +1277,40 @@ class MainGrid {
 
         const isCompleted =
           this.userProgress[scenario.categoryId]?.[scenario.id] || false;
-        const scenarioCardHtml = await ScenarioCard.render(
-          scenario,
-          category,
-          isCompleted,
-        );
 
-        // Create wrapper with category header for hover effect
+        // Create both card and header HTML in parallel
+        const [scenarioCardHtml, categoryHeaderHtml] = await Promise.all([
+          ScenarioCard.render(scenario, category, isCompleted),
+          this.categoryHeader.render(
+            scenario.category || category,
+            this.getCategoryProgress(scenario.categoryId),
+          ),
+        ]);
+
+        // OPTIMIZED: Create wrapper and set all content at once
         const cardWrapper = document.createElement("div");
         cardWrapper.className = "scenario-card-wrapper";
-        cardWrapper.innerHTML = scenarioCardHtml;
 
         // Add category header for hover effect
-        const categoryProgress = this.getCategoryProgress(scenario.categoryId);
-        const categoryHeaderHtml = await this.categoryHeader.render(
-          scenario.category || category,
-          categoryProgress,
-        );
-
         const categoryHeaderElement = document.createElement("div");
         categoryHeaderElement.className = "scenario-hover-category-header";
         categoryHeaderElement.innerHTML = categoryHeaderHtml;
 
+        // Set wrapper content and append header in single operation
+        cardWrapper.innerHTML = scenarioCardHtml;
         cardWrapper.appendChild(categoryHeaderElement);
-        this.scenarioContainer.appendChild(cardWrapper);
-      }
+
+        return cardWrapper;
+      });
+
+      // Wait for all cards to be created
+      const scenarioCards = await Promise.all(scenarioCardPromises);
+
+      // OPTIMIZED: Append all cards at once using document fragment
+      scenarioCards.forEach((card) => scenarioFragment.appendChild(card));
+
+      // Single DOM operation to add all scenario content
+      this.scenarioContainer.appendChild(scenarioFragment);
 
       logger.info(
         "MainGrid",
@@ -1306,53 +1336,66 @@ class MainGrid {
     );
     existingCards.forEach((card) => card.remove());
 
+    // OPTIMIZED: Use document fragment for batched DOM operations
+    const fallbackFragment = document.createDocumentFragment();
     let totalScenarios = 0;
 
-    // Fallback approach using basic category data
+    // OPTIMIZED: Create all scenario cards in parallel
+    const allCardPromises = [];
+
     for (const category of this.categories) {
       const scenarios = getCategoryScenarios(category.id);
       totalScenarios += scenarios.length;
 
-      for (const scenario of scenarios) {
-        const isCompleted =
-          this.userProgress[category.id]?.[scenario.id] || false;
-        const scenarioCardHtml = await ScenarioCard.render(
-          scenario,
-          category,
-          isCompleted,
+      // Add each scenario card creation to promises array
+      scenarios.forEach((scenario) => {
+        allCardPromises.push(
+          (async () => {
+            const isCompleted =
+              this.userProgress[category.id]?.[scenario.id] || false;
+
+            // Create card and header HTML in parallel
+            const [scenarioCardHtml, categoryHeaderHtml] = await Promise.all([
+              ScenarioCard.render(scenario, category, isCompleted),
+              this.categoryHeader.render(
+                category,
+                this.getCategoryProgress(category.id),
+              ),
+            ]);
+
+            // Create wrapper with category header for hover effect
+            const cardWrapper = document.createElement("div");
+            cardWrapper.className = "scenario-card-wrapper";
+            cardWrapper.innerHTML = scenarioCardHtml;
+
+            // Add category header for hover effect
+            const categoryHeaderElement = document.createElement("div");
+            categoryHeaderElement.className = "scenario-hover-category-header";
+            categoryHeaderElement.innerHTML = categoryHeaderHtml;
+
+            cardWrapper.appendChild(categoryHeaderElement);
+            return cardWrapper;
+          })(),
         );
-
-        // Create wrapper with category header for hover effect
-        const cardWrapper = document.createElement("div");
-        cardWrapper.className = "scenario-card-wrapper";
-        cardWrapper.innerHTML = scenarioCardHtml;
-
-        // Add category header for hover effect
-        const categoryProgress = this.getCategoryProgress(category.id);
-        const categoryHeaderHtml = await this.categoryHeader.render(
-          category,
-          categoryProgress,
-        );
-
-        const categoryHeaderElement = document.createElement("div");
-        categoryHeaderElement.className = "scenario-hover-category-header";
-        categoryHeaderElement.innerHTML = categoryHeaderHtml;
-
-        cardWrapper.appendChild(categoryHeaderElement);
-        this.scenarioContainer.appendChild(cardWrapper);
-      }
+      });
     }
 
-    // Add count element at the beginning
+    // Wait for all cards to be created
+    const allCards = await Promise.all(allCardPromises);
+
+    // Add count element first
     const countElement = document.createElement("div");
     countElement.className = "scenario-count";
     countElement.innerHTML = `
       <p class="count-text">Showing <span class="count-number">${totalScenarios}</span> scenarios across all categories</p>
     `;
-    this.scenarioContainer.insertBefore(
-      countElement,
-      this.scenarioContainer.firstChild,
-    );
+    fallbackFragment.appendChild(countElement);
+
+    // Add all cards to fragment
+    allCards.forEach((card) => fallbackFragment.appendChild(card));
+
+    // Single DOM operation to add all content
+    this.scenarioContainer.appendChild(fallbackFragment);
 
     logger.info(
       "MainGrid",
@@ -1411,19 +1454,22 @@ class MainGrid {
   async switchView(newView) {
     if (newView === this.currentView) return;
 
-    // Update button states
-    this.viewToggleButtons.forEach((button) => {
-      const isActive = button.getAttribute("data-view") === newView;
-      button.classList.toggle("active", isActive);
-      button.setAttribute("aria-checked", isActive.toString());
-    });
+    // OPTIMIZED: Batch all DOM updates using requestAnimationFrame for smoother performance
+    requestAnimationFrame(() => {
+      // Update button states
+      this.viewToggleButtons.forEach((button) => {
+        const isActive = button.getAttribute("data-view") === newView;
+        button.classList.toggle("active", isActive);
+        button.setAttribute("aria-checked", isActive.toString());
+      });
 
-    // Update view containers
-    const containers = this.container.querySelectorAll(".view-content");
-    containers.forEach((container) => {
-      const isActive = container.getAttribute("data-view") === newView;
-      container.classList.toggle("active", isActive);
-      container.style.display = isActive ? "" : "none";
+      // OPTIMIZED: Batch container style updates
+      const containers = this.container.querySelectorAll(".view-content");
+      containers.forEach((container) => {
+        const isActive = container.getAttribute("data-view") === newView;
+        container.classList.toggle("active", isActive);
+        container.style.display = isActive ? "" : "none";
+      });
     });
 
     this.currentView = newView;

@@ -7,6 +7,10 @@
  * Contains global resets and accessibility rules for consistent behavior
  */
 
+/* Import required component styles */
+@import url("./settings-menu.css");
+@import url("./footer.css");
+
 /* ===== MODERN NAVIGATION DESIGN SYSTEM ===== */
 :root {
   /* Header Dimensions */
@@ -14,17 +18,17 @@
   --header-padding-y: 1rem;
   --header-padding-x: 1.5rem;
 
-  /* Navigation Colors - Modern Neutral Palette */
+  /* Navigation Colors - Indigo-Purple Theme to match donor cards */
   --nav-bg-primary: rgba(255, 255, 255, 0.85);
   --nav-bg-hover: rgba(248, 250, 252, 0.8);
-  --nav-bg-active: rgba(226, 232, 240, 0.6);
+  --nav-bg-active: rgba(238, 242, 255, 0.6); /* Indigo-50 with transparency */
 
-  --nav-text-color: #64748b;
-  --nav-text-hover: #1e293b;
-  --nav-text-active: #0f172a;
+  --nav-text-color: #6366f1; /* Indigo-500 - matches donor card theme */
+  --nav-text-hover: #4f46e5; /* Indigo-600 */
+  --nav-text-active: #3730a3; /* Indigo-700 */
 
-  --nav-border-color: rgba(226, 232, 240, 0.6);
-  --nav-border-hover: rgba(226, 232, 240, 0.8);
+  --nav-border-color: rgba(99, 102, 241, 0.2); /* Indigo with transparency */
+  --nav-border-hover: rgba(99, 102, 241, 0.3);
 
   /* Shadows & Effects */
   --nav-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
@@ -360,7 +364,7 @@
 }
 
 .breadcrumb-item a:focus {
-  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline: 2px solid rgba(99, 102, 241, 0.5); /* Indigo-500 */
   outline-offset: 2px;
 }
 
@@ -418,7 +422,7 @@
 
 .breadcrumb-action:hover {
   background: rgba(255, 255, 255, 1);
-  border-color: rgba(59, 130, 246, 0.5);
+  border-color: rgba(99, 102, 241, 0.5); /* Indigo-500 */
   color: var(--nav-text-hover, #1e293b);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -439,8 +443,8 @@
 }
 
 .breadcrumb-search:focus-within {
-  border-color: rgba(59, 130, 246, 0.5);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: rgba(99, 102, 241, 0.5); /* Indigo-500 */
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); /* Indigo-500 */
 }
 
 .breadcrumb-search input {
@@ -541,7 +545,11 @@
   bottom: 0;
   left: 0;
   height: 2px;
-  background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
+  background: linear-gradient(
+    90deg,
+    #6366f1 0%,
+    #4f46e5 100%
+  ); /* Indigo-500 to Indigo-600 */
   transition: width 0.3s ease;
   border-radius: 1px;
 }
@@ -859,13 +867,21 @@
 /* Sign Up Button - Primary CTA */
 .nav-group-auth .nav-link:last-child {
   color: white;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.4);
+  background: linear-gradient(
+    135deg,
+    #6366f1 0%,
+    #4f46e5 100%
+  ); /* Indigo-500 to Indigo-600 */
+  box-shadow: 0 1px 3px rgba(99, 102, 241, 0.4); /* Indigo-500 */
 }
 
 .nav-group-auth .nav-link:last-child:hover {
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+  background: linear-gradient(
+    135deg,
+    #4f46e5 0%,
+    #3730a3 100%
+  ); /* Indigo-600 to Indigo-700 */
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4); /* Indigo-500 */
   transform: translateY(-1px);
 }
 
@@ -2017,7 +2033,7 @@ body.dark-mode .breadcrumb-action {
 
 body.dark-mode .breadcrumb-action:hover {
   background: rgba(68, 68, 68, 1);
-  border-color: rgba(59, 130, 246, 0.5);
+  border-color: rgba(99, 102, 241, 0.5); /* Indigo-500 */
   color: var(--theme-text-primary, #fff);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
@@ -2028,8 +2044,8 @@ body.dark-mode .breadcrumb-search {
 }
 
 body.dark-mode .breadcrumb-search:focus-within {
-  border-color: rgba(59, 130, 246, 0.5);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  border-color: rgba(99, 102, 241, 0.5); /* Indigo-500 */
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); /* Indigo-500 */
 }
 
 body.dark-mode .breadcrumb-search input {

@@ -541,7 +541,7 @@ class OnboardingTour {
             hasNextButton: true,
             action: "next",
             onShow() {
-              // Enhanced auto-scroll to ensure "For Educators" tab is visible
+              // OPTIMIZED: Enhanced auto-scroll with visibility check to avoid unnecessary scrolling
               const educatorTab =
                 document.querySelector(
                   '.tab-buttons-container [data-tab="educator"]',
@@ -551,23 +551,33 @@ class OnboardingTour {
                 );
 
               if (educatorTab) {
-                // Scroll the tab into view with enhanced positioning
-                educatorTab.scrollIntoView({
-                  behavior: "smooth",
-                  block: "center",
-                  inline: "center",
-                });
+                // OPTIMIZED: Check if element is already in viewport to avoid unnecessary scrolling
+                const isInViewport = this.isElementInViewport(educatorTab);
 
-                // Also scroll the tab container to ensure proper visibility
-                const tabContainer = educatorTab.closest(
-                  ".tab-buttons-container",
-                );
-                if (tabContainer) {
-                  tabContainer.scrollIntoView({
+                if (!isInViewport) {
+                  // Scroll the tab into view with enhanced positioning
+                  educatorTab.scrollIntoView({
                     behavior: "smooth",
                     block: "center",
                     inline: "center",
                   });
+                }
+
+                // Also check tab container visibility before scrolling
+                const tabContainer = educatorTab.closest(
+                  ".tab-buttons-container",
+                );
+                if (tabContainer) {
+                  const containerInViewport =
+                    this.isElementInViewport(tabContainer);
+
+                  if (!containerInViewport) {
+                    tabContainer.scrollIntoView({
+                      behavior: "smooth",
+                      block: "center",
+                      inline: "center",
+                    });
+                  }
                 }
 
                 logger.info(
@@ -576,6 +586,7 @@ class OnboardingTour {
                   {
                     element: educatorTab,
                     container: tabContainer,
+                    wasInViewport: isInViewport,
                   },
                 );
               } else {
@@ -590,14 +601,20 @@ class OnboardingTour {
                 'a[href="#educator-tools"]',
               );
               if (navEducatorsTab) {
-                navEducatorsTab.scrollIntoView({
-                  behavior: "smooth",
-                  block: "center",
-                });
+                // OPTIMIZED: Check if nav element needs scrolling
+                const navInViewport = this.isElementInViewport(navEducatorsTab);
+
+                if (!navInViewport) {
+                  navEducatorsTab.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                  });
+                }
+
                 logger.info(
                   "OnboardingTour",
                   "Auto-scrolled to Educator Tools nav link",
-                  { element: navEducatorsTab },
+                  { element: navEducatorsTab, wasInViewport: navInViewport },
                 );
               }
             },
@@ -748,9 +765,14 @@ class OnboardingTour {
       this.currentTutorial === this.TUTORIAL_3 &&
       this.currentStep === this.TUTORIAL_3_STEP_3_INDEX
     ) {
-      this.coachMark.style.zIndex = "10020";
-      this.coachMark.style.isolation = "isolate";
-      this.coachMark.style.position = "fixed";
+      // OPTIMIZED: Batch special tutorial 3 styles
+      const tutorial3Styles = {
+        zIndex: "10020",
+        isolation: "isolate",
+        position: "fixed",
+      };
+      Object.assign(this.coachMark.style, tutorial3Styles);
+
       logger.warn(
         "OnboardingTour",
         "TUTORIAL 3 STEP 3 - Applied aggressive stacking",
@@ -780,10 +802,19 @@ class OnboardingTour {
     const modalBackdrops = document.querySelectorAll(".modal-backdrop");
     modalBackdrops.forEach((backdrop) => {
       if (backdrop.style.display !== "none") {
-        backdrop.style.pointerEvents = "none";
+        // OPTIMIZED: Batch modal backdrop style changes
+        const backdropStyles = {
+          pointerEvents: "none",
+        };
+        Object.assign(backdrop.style, backdropStyles);
+
         const modalDialog = backdrop.querySelector(".modal-dialog");
         if (modalDialog) {
-          modalDialog.style.pointerEvents = "auto";
+          // OPTIMIZED: Batch modal dialog style changes
+          const dialogStyles = {
+            pointerEvents: "auto",
+          };
+          Object.assign(modalDialog.style, dialogStyles);
         }
         logger.debug("OnboardingTour", "Made modal onboarding-friendly", {
           modalId: backdrop.id,
@@ -918,11 +949,15 @@ class OnboardingTour {
     const rect = targetElement.getBoundingClientRect();
     const padding = 8;
 
-    this.spotlight.style.left = `${rect.left - padding}px`;
-    this.spotlight.style.top = `${rect.top + window.pageYOffset - padding}px`;
-    this.spotlight.style.width = `${rect.width + padding * 2}px`;
-    this.spotlight.style.height = `${rect.height + padding * 2}px`;
-    this.spotlight.style.display = "block";
+    // OPTIMIZED: Batch all spotlight positioning styles to reduce DOM mutations
+    const spotlightStyles = {
+      left: `${rect.left - padding}px`,
+      top: `${rect.top + window.pageYOffset - padding}px`,
+      width: `${rect.width + padding * 2}px`,
+      height: `${rect.height + padding * 2}px`,
+      display: "block",
+    };
+    Object.assign(this.spotlight.style, spotlightStyles);
   }
 
   positionCoachMark(
@@ -933,6 +968,13 @@ class OnboardingTour {
   ) {
     if (!this.coachMark) return;
 
+    // OPTIMIZED: Use requestAnimationFrame for smoother positioning
+    requestAnimationFrame(() => {
+      this._performPositioning(targetElement, position, step, retryCount);
+    });
+  }
+
+  _performPositioning(targetElement, position, step, retryCount) {
     // Prevent infinite recursion - max 3 retries
     const MAX_POSITION_RETRIES = 3;
     if (retryCount > MAX_POSITION_RETRIES) {
@@ -946,17 +988,22 @@ class OnboardingTour {
     // MOBILE-AWARE POSITIONING LOGIC
     const isMobile = window.innerWidth <= this.MOBILE_BREAKPOINT; // Mobile breakpoint
 
-    // Get coach mark dimensions after content is set
-    this.coachMark.style.visibility = "hidden";
-    this.coachMark.style.display = "block";
-    this.coachMark.style.position = "fixed"; // Use fixed positioning for consistent behavior
-    this.coachMark.style.zIndex = "10014";
+    // OPTIMIZED: Batch initial style setup to reduce DOM mutations
+    const initialStyles = {
+      visibility: "hidden",
+      display: "block",
+      position: "fixed",
+      zIndex: "10014",
+      width: "", // Reset width
+      maxHeight: "", // Reset max height
+      overflow: "", // Reset overflow
+    };
+
+    // Apply all initial styles at once
+    Object.assign(this.coachMark.style, initialStyles);
 
     // Reset mobile overlay class in case it was previously set
     this.coachMark.classList.remove("mobile-overlay");
-    this.coachMark.style.width = ""; // Reset width
-    this.coachMark.style.maxHeight = ""; // Reset max height
-    this.coachMark.style.overflow = ""; // Reset overflow
 
     const coachMarkRect = this.coachMark.getBoundingClientRect();
     const viewportHeight = window.innerHeight;
@@ -1065,9 +1112,14 @@ class OnboardingTour {
             coachMarkRect.height -
             spacing -
             this.MOBILE_NAVIGATION_SPACE; // Leave space for navigation
-          this.coachMark.style.width = `${viewportWidth - spacing * 2}px`;
-          this.coachMark.style.maxHeight = `${viewportHeight * this.MOBILE_MAX_HEIGHT_RATIO}px`;
-          this.coachMark.style.overflow = "auto";
+
+          // OPTIMIZED: Batch mobile overlay styles
+          const mobileOverlayStyles = {
+            width: `${viewportWidth - spacing * 2}px`,
+            maxHeight: `${viewportHeight * this.MOBILE_MAX_HEIGHT_RATIO}px`,
+            overflow: "auto",
+          };
+          Object.assign(this.coachMark.style, mobileOverlayStyles);
 
           logger.debug(
             "OnboardingTour",
@@ -1150,7 +1202,12 @@ class OnboardingTour {
               coachMarkRect.height -
               spacing -
               this.MOBILE_NAVIGATION_SPACE;
-            this.coachMark.style.width = `${viewportWidth - spacing * 2}px`;
+
+            // OPTIMIZED: Batch mobile overlay styles for collision handling
+            const mobileCollisionStyles = {
+              width: `${viewportWidth - spacing * 2}px`,
+            };
+            Object.assign(this.coachMark.style, mobileCollisionStyles);
           } else {
             // Desktop fallback positioning
             // Try positioning to the right
@@ -1236,7 +1293,12 @@ class OnboardingTour {
             spacing -
             this.MOBILE_NAVIGATION_SPACE,
         );
-        this.coachMark.style.width = `${viewportWidth - spacing * 2}px`;
+
+        // OPTIMIZED: Apply mobile centering styles in batch
+        const mobileCenterStyles = {
+          width: `${viewportWidth - spacing * 2}px`,
+        };
+        Object.assign(this.coachMark.style, mobileCenterStyles);
       } else {
         left = viewportWidth / 2 - coachMarkRect.width / 2;
         top = viewportHeight / 2 - coachMarkRect.height / 2;
@@ -1249,13 +1311,16 @@ class OnboardingTour {
       });
     }
 
-    // Apply position
-    this.coachMark.style.left = `${left}px`;
-    this.coachMark.style.top = `${top}px`;
-    this.coachMark.style.visibility = "visible";
-    this.coachMark.style.opacity = "1";
-    this.coachMark.style.pointerEvents = "auto";
-    this.coachMark.style.display = "block";
+    // OPTIMIZED: Apply final position and visibility in batch to reduce DOM mutations
+    const finalPositionStyles = {
+      left: `${left}px`,
+      top: `${top}px`,
+      visibility: "visible",
+      opacity: "1",
+      pointerEvents: "auto",
+      display: "block",
+    };
+    Object.assign(this.coachMark.style, finalPositionStyles);
 
     // Final verification that coach mark is visible
     const finalRect = this.coachMark.getBoundingClientRect();
@@ -1283,9 +1348,12 @@ class OnboardingTour {
         },
       );
 
-      // Emergency fallback: center in viewport
-      this.coachMark.style.left = `${viewportWidth / 2 - coachMarkRect.width / 2}px`;
-      this.coachMark.style.top = `${viewportHeight / 2 - coachMarkRect.height / 2}px`;
+      // OPTIMIZED: Emergency fallback with batched style update
+      const fallbackStyles = {
+        left: `${viewportWidth / 2 - coachMarkRect.width / 2}px`,
+        top: `${viewportHeight / 2 - coachMarkRect.height / 2}px`,
+      };
+      Object.assign(this.coachMark.style, fallbackStyles);
     }
 
     logger.info(
@@ -1477,7 +1545,11 @@ class OnboardingTour {
     }
 
     try {
-      this.coachMark.innerHTML = this.createCoachMarkContent(step, tutorial);
+      // OPTIMIZED: Only update innerHTML if content has actually changed
+      const newContent = this.createCoachMarkContent(step, tutorial);
+      if (this.coachMark.innerHTML !== newContent) {
+        this.coachMark.innerHTML = newContent;
+      }
     } catch (error) {
       logger.error("OnboardingTour", "Error setting coach mark innerHTML", {
         error: error.message,
@@ -1490,12 +1562,15 @@ class OnboardingTour {
     // Position coach mark
     this.positionCoachMark(targetElement, step.position, step);
 
-    // Ensure coach mark is visible and interactive
-    this.coachMark.style.display = "block";
-    this.coachMark.style.visibility = "visible";
-    this.coachMark.style.opacity = "1";
-    this.coachMark.style.pointerEvents = "auto";
-    this.coachMark.style.zIndex = "10014";
+    // OPTIMIZED: Batch final coach mark visibility styles to reduce DOM mutations
+    const finalVisibilityStyles = {
+      display: "block",
+      visibility: "visible",
+      opacity: "1",
+      pointerEvents: "auto",
+      zIndex: "10014",
+    };
+    Object.assign(this.coachMark.style, finalVisibilityStyles);
 
     // Set up event listeners for buttons
     this.setupEventListeners(step);

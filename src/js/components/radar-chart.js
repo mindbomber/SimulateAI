@@ -430,17 +430,29 @@ export default class RadarChart {
       // CRITICAL: Let Chart.js handle canvas dimensions and DPR scaling for sharp rendering
       // Don't manually set canvas.width/height as it interferes with device pixel ratio
 
-      // Set CSS dimensions only (Chart.js will handle internal canvas scaling)
-      canvas.style.width = this.options.width + "px";
-      canvas.style.height = this.options.height + "px";
-      canvas.style.maxWidth = "100%";
-      canvas.style.display = "block";
-      canvas.style.margin = "0 auto";
+      // OPTIMIZED: Batch DOM style changes to minimize reflows
+      const canvasStyles = {
+        width: this.options.width + "px",
+        height: this.options.height + "px",
+        maxWidth: "100%",
+        display: "block",
+        margin: "0 auto",
+        position: "relative",
+        zIndex: "1",
+      };
 
-      // Set container dimensions to match
-      this.container.style.width = this.options.width + "px";
-      this.container.style.height = this.options.height + "px";
-      this.container.style.minHeight = this.options.height + "px";
+      const containerStyles = {
+        width: this.options.width + "px",
+        height: this.options.height + "px",
+        minHeight: this.options.height + "px",
+        textAlign: "center",
+        overflow: "visible",
+        position: "relative",
+        zIndex: "10",
+      };
+
+      // Apply all canvas styles in one batch to minimize reflows
+      Object.assign(canvas.style, canvasStyles);
 
       // Get context for Chart.js (Chart.js will handle DPR scaling automatically)
       const ctx = canvas.getContext("2d");
@@ -449,19 +461,11 @@ export default class RadarChart {
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = "high";
 
-      // Clear any existing content including any "null" text
+      // OPTIMIZED: Single DOM clear operation
       this.container.innerHTML = "";
-      this.container.textContent = "";
 
-      // Ensure container is properly set up for tooltips
-      this.container.style.textAlign = "center";
-      this.container.style.overflow = "visible";
-      this.container.style.position = "relative";
-      this.container.style.zIndex = "10"; // Ensure above most content
-
-      // Force tooltip support for canvas
-      canvas.style.position = "relative";
-      canvas.style.zIndex = "1";
+      // Apply all container styles in one batch to minimize reflows
+      Object.assign(this.container.style, containerStyles);
 
       this.container.appendChild(canvas);
 
@@ -495,56 +499,9 @@ export default class RadarChart {
       // SIMPLIFIED: No complex tooltip z-index setup needed with built-in tooltips
       // Chart.js handles tooltip positioning and z-index automatically
 
-      // REMOVED: Mobile tooltip dismissal setup moved to _attachEventListenersAfterRender()
-      // This prevents interference with initial chart rendering
-      // if (this.options.isDemo || this.options.realTime) {
-      //   this.setupMobileTooltipDismissal();
-      // }
-
-      // Force redraw to ensure labels are visible
-      setTimeout(() => {
-        if (this.chart) {
-          this.chart.update();
-          logger.info("RadarChart", "Chart updated/redrawn");
-        }
-      }, 100);
-
-      // CRITICAL: Ensure polygon visibility immediately for scenario modal charts
-      setTimeout(() => {
-        if (this.chart) {
-          // REMOVED: Canvas dimension "correction" that was breaking DPR scaling
-          // Chart.js automatically handles Device Pixel Ratio scaling for sharp rendering
-          // Manual canvas.width/height changes destroy this and cause blurry charts
-
-          const canvas = this.container.querySelector("canvas");
-
-          // PROACTIVE: For scenario charts, ensure polygon is always visible from start
-          if (this.options.context === "scenario") {
-            logger.info(
-              "RadarChart",
-              "Ensuring scenario chart polygon visibility",
-            );
-            // Force a gentle update to ensure polygon renders properly
-            this._ensureScenarioPolygonVisibility();
-          } else if (canvas && this._isAllValuesEqual()) {
-            // For other chart types, apply visibility fix only if needed
-            setTimeout(() => {
-              if (this._isAllValuesEqual()) {
-                logger.info(
-                  "RadarChart",
-                  "Checking if visibility fix needed for equal values",
-                  { isDemo: this.options.isDemo },
-                );
-                this._ensureDefaultStateVisibility();
-              }
-            }, 50);
-          }
-
-          // CRITICAL FIX: Attach event listeners AFTER polygon is guaranteed to render
-          // This prevents interference with Chart.js initial rendering cycle
-          this._attachEventListenersAfterRender();
-        }
-      }, 200);
+      // OPTIMIZED: Single deferred initialization to minimize DOM thrashing
+      // Combine all post-initialization tasks into one operation
+      this._deferredInitialization();
 
       this.isInitialized = true;
 
@@ -575,6 +532,40 @@ export default class RadarChart {
       this._handleError(error, "initializeChart");
       this.showFallbackChart();
     }
+  }
+
+  /**
+   * Optimized deferred initialization to minimize DOM thrashing
+   * Combines multiple post-initialization tasks into a single operation
+   * @private
+   */
+  _deferredInitialization() {
+    // Use requestAnimationFrame for optimal timing
+    requestAnimationFrame(() => {
+      if (!this.chart) return;
+
+      // Single chart update instead of multiple scattered updates
+      this.chart.update("none");
+      logger.info("RadarChart", "Chart updated/redrawn");
+
+      // Context-specific polygon visibility handling
+      if (this.options.context === "scenario") {
+        logger.info("RadarChart", "Ensuring scenario chart polygon visibility");
+        this._ensureScenarioPolygonVisibility();
+      } else if (this._isAllValuesEqual()) {
+        logger.info(
+          "RadarChart",
+          "Checking if visibility fix needed for equal values",
+          {
+            isDemo: this.options.isDemo,
+          },
+        );
+        this._ensureDefaultStateVisibility();
+      }
+
+      // Attach event listeners after chart is fully rendered
+      this._attachEventListenersAfterRender();
+    });
   }
 
   /**
@@ -867,32 +858,62 @@ export default class RadarChart {
    * Refresh the chart display
    */
   refreshChart() {
-    if (this.chart) {
-      const axesData = Object.values(this.currentScores);
-      this.chart.data.datasets[0].data = axesData;
+    if (!this.chart) return;
 
-      // For scenario charts, use smooth animations; for demos, use configurable animations
-      const animationMode =
-        this.options.context === "scenario"
+    // OPTIMIZED: Check if data actually changed before updating
+    const newData = Object.values(this.currentScores);
+    const currentData = this.chart.data.datasets[0].data;
+
+    // Skip update if data hasn't changed
+    if (this._arraysEqual(newData, currentData)) {
+      return;
+    }
+
+    // Update data
+    this.chart.data.datasets[0].data = newData;
+
+    // For scenario charts, use smooth animations; for demos, use configurable animations
+    const animationMode =
+      this.options.context === "scenario"
+        ? "active"
+        : this.options.animated
           ? "active"
-          : this.options.animated
-            ? "active"
-            : "none";
+          : "none";
 
-      this.chart.update(animationMode);
+    this.chart.update(animationMode);
 
-      // Context-aware visibility handling
-      if (this._isAllValuesEqual()) {
-        if (this.options.context === "scenario") {
-          // For scenario charts, immediately ensure visibility without delay
-          this._ensureScenarioPolygonVisibility();
-        } else {
-          // For other charts, use the standard approach with delay
-          setTimeout(() => {
-            this._ensureDefaultStateVisibility();
-          }, 100);
-        }
+    // OPTIMIZED: Only apply visibility fixes if needed and avoid nested setTimeout
+    if (this._isAllValuesEqual()) {
+      this._handleEqualValuesVisibility();
+    }
+  }
+
+  /**
+   * Check if two arrays are equal
+   * @private
+   */
+  _arraysEqual(arr1, arr2) {
+    if (arr1.length !== arr2.length) return false;
+    return arr1.every((val, index) => val === arr2[index]);
+  }
+
+  /**
+   * Handle visibility for equal values without nested timeouts
+   * @private
+   */
+  _handleEqualValuesVisibility() {
+    if (this.options.context === "scenario") {
+      // For scenario charts, immediately ensure visibility
+      this._ensureScenarioPolygonVisibility();
+    } else {
+      // For other charts, use single timeout
+      if (this._visibilityTimeout) {
+        clearTimeout(this._visibilityTimeout);
       }
+      this._visibilityTimeout = setTimeout(() => {
+        this._ensureDefaultStateVisibility();
+        this._visibilityTimeout = null;
+      }, 100);
     }
   }
 
@@ -909,8 +930,13 @@ export default class RadarChart {
 
     const axesData = Object.values(this.currentScores);
 
-    // Check if this is the first real update from initial state
+    // OPTIMIZED: Check if data actually changed before updating
     const currentData = this.chart.data.datasets[0].data;
+    if (this._arraysEqual(axesData, currentData)) {
+      return; // Skip update if data hasn't changed
+    }
+
+    // Check if this is the first real update from initial state
     const isTransitioningFromInitial = currentData.some(
       (val) => val !== Math.floor(val),
     );
@@ -1100,6 +1126,18 @@ export default class RadarChart {
   }
 
   /**
+   * Helper to detect if chart data has actually changed
+   * @private
+   * @param {Array} newData - New data array
+   * @returns {boolean} - Whether data changed
+   */
+  _hasDataChanged(newData) {
+    if (!this.chart || !this.chart.data.datasets[0]) return true;
+    const currentData = this.chart.data.datasets[0].data;
+    return !this._arraysEqual(currentData, newData);
+  }
+
+  /**
    * SIMPLIFIED: Ensure visibility only when Chart.js can't render equal values
    * @private
    */
@@ -1154,15 +1192,23 @@ export default class RadarChart {
       // Update chart data with chosen pattern
       this.chart.data.datasets[0].data = pattern;
 
-      // Apply neutral colors
+      // OPTIMIZED: Check if colors need updating
       const neutralTheme = RadarChart.config.themes.neutral;
       const dataset = this.chart.data.datasets[0];
-      dataset.backgroundColor = neutralTheme.background;
-      dataset.borderColor = neutralTheme.border;
-      dataset.pointBackgroundColor = RadarChart.config.pointColors["3"];
+      const needsColorUpdate =
+        dataset.backgroundColor !== neutralTheme.background ||
+        dataset.borderColor !== neutralTheme.border ||
+        dataset.pointBackgroundColor !== RadarChart.config.pointColors["3"];
 
-      // Simple update
-      this.chart.update();
+      if (needsColorUpdate) {
+        // Apply neutral colors
+        dataset.backgroundColor = neutralTheme.background;
+        dataset.borderColor = neutralTheme.border;
+        dataset.pointBackgroundColor = RadarChart.config.pointColors["3"];
+
+        // Single update
+        this.chart.update("none");
+      }
     }
   }
 
@@ -1174,11 +1220,17 @@ export default class RadarChart {
   _ensureScenarioPolygonVisibility() {
     if (!this.chart || this.options.context !== "scenario") return;
 
+    // OPTIMIZED: Check if already applied
+    const currentData = this.chart.data.datasets[0].data;
+    const targetPattern = [3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.01];
+
+    if (this._arraysEqual(currentData, targetPattern)) {
+      return; // Already applied, skip update
+    }
+
     // For scenario charts, ensure we have a very subtle variation that makes polygon visible
     // This pattern is barely noticeable but ensures Chart.js renders the polygon
-    const subtleVisibilityPattern = [3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.01]; // Extremely subtle
-
-    this.chart.data.datasets[0].data = subtleVisibilityPattern;
+    this.chart.data.datasets[0].data = targetPattern;
 
     // Keep current scores as neutral whole numbers for consistency
     const axisKeys = Object.keys(this.ETHICAL_AXES);
@@ -1198,7 +1250,7 @@ export default class RadarChart {
 
     logger.info("RadarChart", "Applied scenario chart polygon visibility fix", {
       context: this.options.context,
-      pattern: subtleVisibilityPattern,
+      pattern: targetPattern,
       currentScores: this.currentScores,
     });
   }
@@ -1492,6 +1544,12 @@ export default class RadarChart {
       if (this.telemetryFlushInterval) {
         clearInterval(this.telemetryFlushInterval);
         this.telemetryFlushInterval = null;
+      }
+
+      // OPTIMIZED: Clean up visibility timeout
+      if (this._visibilityTimeout) {
+        clearTimeout(this._visibilityTimeout);
+        this._visibilityTimeout = null;
       }
 
       // Remove from instance tracking

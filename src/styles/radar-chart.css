@@ -12,13 +12,16 @@
   padding: 2rem;
   margin: 2rem 0 0;
   text-align: center;
-  
-  /* Robust animation with automatic fallback */
-  opacity: 0;
-  transform: translateY(50px) scale(0.95);
-  animation: 
-    heroRadarDemoEnter 0.9s ease-out forwards 0.7s,
-    heroRadarDemoFallback 0.3s ease-out forwards 3s;
+
+  /* Ensure visibility by default with optional animation enhancement */
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: all 0.3s ease-out;
+}
+
+/* Only apply entrance animation when page is loaded and animations are supported */
+html.loaded .hero-radar-demo {
+  animation: heroRadarDemoEnter 0.9s ease-out forwards 0.7s;
 }
 
 .hero-radar-demo h3 {
@@ -30,13 +33,16 @@
   background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  
-  /* Robust heading animation with fallback */
-  opacity: 0;
-  transform: translateY(20px);
-  animation: 
-    heroRadarElementEnter 0.6s ease-out forwards 1.0s,
-    heroRadarDemoFallback 0.3s ease-out forwards 3.5s;
+
+  /* Ensure visibility by default with optional animation enhancement */
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.3s ease-out;
+}
+
+/* Only apply entrance animation when page is loaded and animations are supported */
+html.loaded .hero-radar-demo h3 {
+  animation: heroRadarElementEnter 0.6s ease-out forwards 1s;
 }
 
 .hero-radar-demo p {
@@ -44,13 +50,16 @@
   margin-bottom: 2rem;
   font-size: 1rem;
   line-height: 1.6;
-  
-  /* Robust description animation with fallback */
-  opacity: 0;
-  transform: translateY(15px);
-  animation: 
-    heroRadarElementEnter 0.6s ease-out forwards 1.2s,
-    heroRadarDemoFallback 0.3s ease-out forwards 4s;
+
+  /* Ensure visibility by default with optional animation enhancement */
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.3s ease-out;
+}
+
+/* Only apply entrance animation when page is loaded and animations are supported */
+html.loaded .hero-radar-demo p {
+  animation: heroRadarElementEnter 0.6s ease-out forwards 1.2s;
 }
 
 /* Hero Radar Container - Consolidated from hero-demo.css */
@@ -139,6 +148,9 @@
   box-shadow:
     0 4px 12px rgb(0 0 0 / 8%),
     0 1px 3px rgb(0 0 0 / 5%);
+  transition: all 0.3s ease;
+  border: 1px solid rgb(226 232 240 / 80%);
+}
 
 /* ===== CONTEXT-SPECIFIC RADAR CHART CONTAINERS ===== */
 
@@ -282,7 +294,7 @@ canvas[role="img"] {
   backdrop-filter: blur(8px) !important;
   -webkit-backdrop-filter: blur(8px) !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important;
 }
 
 /* PROTECT CategoryHeader tooltips from Chart.js interference */
@@ -776,6 +788,27 @@ canvas[role="img"] {
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+/* Additional fallback animations to ensure visibility */
+@keyframes heroRadarDemoVisible {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes heroRadarElementVisible {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

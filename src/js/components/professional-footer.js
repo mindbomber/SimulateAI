@@ -84,14 +84,14 @@ const FOOTER_CONFIG = {
         icon: "💻",
       },
       {
-        text: "Academia",
-        href: "https://www.academia.edu/search?q=SimulateAI",
-        icon: "🎓",
-      },
-      {
         text: "LinkedIn",
         href: "https://www.linkedin.com/company/simulateai-ethics",
         icon: "👔",
+      },
+      {
+        text: "Slack",
+        href: "https://simulateai.slack.com/",
+        icon: "💬",
       },
     ],
   },
@@ -119,8 +119,9 @@ function generateFooterHTML() {
           <!-- Brand Section -->
           <div class="footer-brand">
             <div class="brand-logo">
-              <span class="brand-icon">🤖</span>
-              <span class="brand-name">${brand.name}</span>
+              <a href="index.html" aria-label="Return to SimulateAI Homepage">
+                <img src="src/assets/icons/logo.svg" alt="SimulateAI Logo" class="brand-logo-img">
+              </a>
             </div>
             <p class="brand-tagline">${brand.tagline}</p>
             <div class="brand-stats">
@@ -143,7 +144,7 @@ function generateFooterHTML() {
           <div class="footer-sections">
             ${Object.entries(sections)
               .map(
-                ([_key, section]) => `
+                ([, section]) => `
               <div class="footer-section">
                 <h4 class="section-title">${section.title}</h4>
                 <ul class="section-links">
