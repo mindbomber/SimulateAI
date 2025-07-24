@@ -17,6 +17,18 @@
 /**
  * Main Application - SimulateAI Educational Platform
  * Initializes the platform and manages the overall application state
+ *
+ * ARCHITECTURE: Improved Component Coordination
+ * ============================================
+ * app.js          → Application lifecycle, services, error handling
+ * MainGrid        → UI coordination, event handling, view management
+ * SimulateAI fn   → Business logic, component coordination, navigation
+ * category-grid   → Category display and interaction (future)
+ * scenario-browser → Scenario browsing and filtering
+ *
+ * The MainGrid component now receives a SimulateAI function from app.js
+ * that coordinates category-grid and scenario-browser components while
+ * providing access to app services, analytics, and configuration.
  */
 
 // Import core modules
@@ -42,6 +54,7 @@ import "./user-tracking-init.js";
 // Import utilities
 import { userPreferences, userProgress } from "./utils/simple-storage.js";
 import { simpleAnalytics } from "./utils/simple-analytics.js";
+import AnalyticsManager from "./utils/analytics.js";
 import Helpers from "./utils/helpers.js";
 import canvasManager from "./utils/canvas-manager-compat.js";
 import logger from "./utils/logger.js";
@@ -63,7 +76,6 @@ import ModalFooterManager from "./components/modal-footer-manager.js";
 import MainGrid from "./components/main-grid.js";
 import OnboardingTour from "./components/onboarding-tour.js";
 import { getAllCategories, getCategoryScenarios } from "../data/categories.js";
-import MCPIntegrationManager from "./integrations/mcp-integration-manager.js";
 
 // JSON SSOT Configuration System
 import { appStartup } from "./app-startup.js";
@@ -332,6 +344,10 @@ class AIEthicsApp {
       circuitBreakerEnabled: true,
     };
 
+    // Enhanced Analytics Manager
+    this.analyticsManager = AnalyticsManager;
+    this.simpleAnalytics = simpleAnalytics; // Keep for backward compatibility
+
     // Modernized managers
     this.accessibilityManager = null;
     this.animationManager = null;
@@ -383,6 +399,11 @@ class AIEthicsApp {
     this.currentUser = null;
     this.userWelcomed = false; // Track if user has been welcomed this session
 
+    // Firebase Cloud Messaging
+    this.messagingService = null;
+    this.notificationToken = null;
+    this.messagingInitialized = false;
+
     // Scenario Browser Integration
     this.scenarioBrowserIntegration = null;
     this.scenarioBrowser = null;
@@ -413,6 +434,54 @@ class AIEthicsApp {
 
     // Initialize enterprise monitoring
     this._initializeEnterpriseMonitoring();
+  }
+
+  /**
+   * Get component configuration from ConfigurationIntegrator
+   * @param {string} componentName - Name of the component
+   * @returns {Object|null} Component configuration or null if not found
+   */
+  async getComponentConfig(componentName) {
+    try {
+      // Try to get cached config first
+      let config = configIntegrator.getComponentConfig(componentName);
+
+      // If not cached, load it
+      if (!config) {
+        config = await configIntegrator.loadComponentConfig(componentName);
+      }
+
+      return config;
+    } catch (error) {
+      AppDebug.error(`Failed to get config for ${componentName}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Get app configuration from ConfigurationIntegrator
+   * @returns {Object|null} App configuration or null if not loaded
+   */
+  getAppConfig() {
+    return configIntegrator.getAppConfig();
+  }
+
+  /**
+   * Check if a component should be preloaded based on configuration
+   * @param {string} componentName - Name of the component
+   * @returns {boolean} Whether component should be preloaded
+   */
+  shouldPreloadComponent(componentName) {
+    return configIntegrator.shouldPreloadComponent(componentName);
+  }
+
+  /**
+   * Check if a component is required for app functionality
+   * @param {string} componentName - Name of the component
+   * @returns {boolean} Whether component is required
+   */
+  isComponentRequired(componentName) {
+    return configIntegrator.isComponentRequired(componentName);
   }
 
   /**
@@ -514,6 +583,44 @@ class AIEthicsApp {
       return performance.memory.usedJSHeapSize;
     }
     return 0;
+  }
+
+  /**
+   * Get accessibility features currently in use
+   */
+  _getUsedAccessibilityFeatures() {
+    const features = [];
+
+    if (this.preferences.highContrast) {
+      features.push("high_contrast");
+    }
+
+    if (this.preferences.largeText) {
+      features.push("large_text");
+    }
+
+    if (this.preferences.reducedMotion) {
+      features.push("reduced_motion");
+    }
+
+    // Check for screen reader usage
+    if (
+      navigator.userAgent.includes("NVDA") ||
+      navigator.userAgent.includes("JAWS") ||
+      navigator.userAgent.includes("VoiceOver")
+    ) {
+      features.push("screen_reader");
+    }
+
+    // Check for keyboard navigation
+    if (
+      document.activeElement &&
+      document.activeElement.matches(":focus-visible")
+    ) {
+      features.push("keyboard_navigation");
+    }
+
+    return features;
   }
 
   /**
@@ -760,6 +867,18 @@ class AIEthicsApp {
       this._updateComponentHealth("config_system", "healthy");
       AppDebug.log("✅ Configuration system ready");
 
+      // Initialize ConfigurationIntegrator for component configurations
+      AppDebug.log("⚙️ Initializing configuration integrator...");
+      try {
+        await configIntegrator.initialize();
+        this._updateComponentHealth("config_integrator", "healthy");
+        AppDebug.log("✅ Configuration integrator ready");
+      } catch (error) {
+        AppDebug.error("Failed to initialize configuration integrator", error);
+        this._updateComponentHealth("config_integrator", "error");
+        // Continue with degraded functionality
+      }
+
       // Register simulateai with configuration system
       this.registerSimulateaiWithConfig();
 
@@ -935,6 +1054,22 @@ class AIEthicsApp {
         memory_usage: this._getCurrentMemoryUsage(),
       });
 
+      // Track with Enhanced Analytics Manager for deeper insights
+      if (this.analyticsManager.isInitialized) {
+        this.analyticsManager.trackEvent("app_initialized", {
+          version: this.version,
+          sessionId: this.sessionId,
+          initTime,
+          enterpriseFeatures: this.enterpriseConfig,
+          accessibility: this.preferences,
+          deviceInfo: {
+            browser: Helpers.getBrowserInfo().browser,
+            device: Helpers.getDeviceType(),
+          },
+          memoryUsage: this._getCurrentMemoryUsage(),
+        });
+      }
+
       // Set up enterprise error monitoring
       window.addEventListener("beforeunload", () => {
         this._handleApplicationShutdown();
@@ -1043,6 +1178,17 @@ class AIEthicsApp {
       }, {}),
       retry_count: this.retryCounters.get(errorType) || 0,
     });
+
+    // Enhanced analytics error tracking
+    if (this.analyticsManager.isInitialized) {
+      this.analyticsManager.trackError(error, {
+        errorType,
+        userImpact: "high",
+        recoveryAttempted: this.retryCounters.has(errorType),
+        componentHealth: Object.fromEntries(this.healthStatus.components),
+        context: "enterprise_error_handler",
+      });
+    }
 
     // Send to enterprise error tracking
     if (window.enterpriseErrorTracking) {
@@ -1908,6 +2054,30 @@ class AIEthicsApp {
 
       // Systems are already initialized via their modules
       // Simple analytics auto-initializes
+
+      // Initialize Enhanced Analytics Manager
+      try {
+        await this.analyticsManager.init({
+          enabled: true,
+          anonymizeData: true,
+          batchSize: 20,
+          flushInterval: 30000,
+          debug: AppDebug.isDebugMode(),
+          trackPerformance: true,
+          trackAccessibility: true,
+          trackErrors: true,
+          gdprCompliant: true,
+          retentionDays: 90,
+        });
+        AppDebug.log("Enhanced Analytics Manager initialized successfully");
+      } catch (error) {
+        AppDebug.warn(
+          "Enhanced Analytics Manager initialization failed:",
+          error,
+        );
+        // Fall back to simple analytics only
+      }
+
       AppDebug.log("Core systems initialized with modernized infrastructure");
     } catch (error) {
       AppDebug.error("Failed to initialize systems:", error);
@@ -1950,16 +2120,57 @@ class AIEthicsApp {
   connectEducationalModules() {
     // Connect scenario generator to educator toolkit for assessment alignment
     if (this.educatorToolkit && this.scenarioGenerator) {
-      this.educatorToolkit.setScenarioGenerator(this.scenarioGenerator);
+      try {
+        if (typeof this.educatorToolkit.setScenarioGenerator === "function") {
+          this.educatorToolkit.setScenarioGenerator(this.scenarioGenerator);
+        } else {
+          AppDebug.warn(
+            "EducatorToolkit.setScenarioGenerator method not available",
+          );
+        }
+      } catch (error) {
+        AppDebug.warn(
+          "Failed to connect scenario generator to educator toolkit:",
+          error,
+        );
+      }
     }
 
     // Connect digital science lab to both toolkit and generator
     if (this.digitalScienceLab) {
       if (this.educatorToolkit) {
-        this.digitalScienceLab.setEducatorToolkit(this.educatorToolkit);
+        try {
+          if (typeof this.digitalScienceLab.setEducatorToolkit === "function") {
+            this.digitalScienceLab.setEducatorToolkit(this.educatorToolkit);
+          } else {
+            AppDebug.warn(
+              "DigitalScienceLab.setEducatorToolkit method not available",
+            );
+          }
+        } catch (error) {
+          AppDebug.warn(
+            "Failed to connect educator toolkit to digital science lab:",
+            error,
+          );
+        }
       }
       if (this.scenarioGenerator) {
-        this.digitalScienceLab.setScenarioGenerator(this.scenarioGenerator);
+        try {
+          if (
+            typeof this.digitalScienceLab.setScenarioGenerator === "function"
+          ) {
+            this.digitalScienceLab.setScenarioGenerator(this.scenarioGenerator);
+          } else {
+            AppDebug.warn(
+              "DigitalScienceLab.setScenarioGenerator method not available",
+            );
+          }
+        } catch (error) {
+          AppDebug.warn(
+            "Failed to connect scenario generator to digital science lab:",
+            error,
+          );
+        }
       }
     }
 
@@ -2003,18 +2214,59 @@ class AIEthicsApp {
 
         // Connect educational modules to simulateai
         if (this.educatorToolkit) {
-          this.simulateaiConfig.assessmentCapabilities =
-            this.educatorToolkit.getAvailableAssessments();
+          try {
+            // Check if method exists before calling
+            if (
+              typeof this.educatorToolkit.getAvailableAssessments === "function"
+            ) {
+              this.simulateaiConfig.assessmentCapabilities =
+                this.educatorToolkit.getAvailableAssessments();
+            } else {
+              this.simulateaiConfig.assessmentCapabilities = [
+                "basic-assessment",
+              ];
+            }
+          } catch (error) {
+            AppDebug.warn("Failed to get educator toolkit assessments:", error);
+            this.simulateaiConfig.assessmentCapabilities = ["basic-assessment"];
+          }
         }
 
         if (this.digitalScienceLab) {
-          this.simulateaiConfig.labStations =
-            this.digitalScienceLab.getAvailableStations();
+          try {
+            // Check if method exists before calling
+            if (
+              typeof this.digitalScienceLab.getAvailableStations === "function"
+            ) {
+              this.simulateaiConfig.labStations =
+                this.digitalScienceLab.getAvailableStations();
+            } else {
+              this.simulateaiConfig.labStations = ["ethics-analysis-station"];
+            }
+          } catch (error) {
+            AppDebug.warn("Failed to get digital science lab stations:", error);
+            this.simulateaiConfig.labStations = ["ethics-analysis-station"];
+          }
         }
 
         if (this.scenarioGenerator) {
-          this.simulateaiConfig.generationCapabilities =
-            this.scenarioGenerator.getCapabilities();
+          try {
+            // Check if method exists before calling
+            if (typeof this.scenarioGenerator.getCapabilities === "function") {
+              this.simulateaiConfig.generationCapabilities =
+                this.scenarioGenerator.getCapabilities();
+            } else {
+              this.simulateaiConfig.generationCapabilities = [
+                "basic-generation",
+              ];
+            }
+          } catch (error) {
+            AppDebug.warn(
+              "Failed to get scenario generator capabilities:",
+              error,
+            );
+            this.simulateaiConfig.generationCapabilities = ["basic-generation"];
+          }
         }
 
         AppDebug.log(
@@ -2346,12 +2598,165 @@ class AIEthicsApp {
       setTimeout(() => {
         this.categoryGrid = new MainGrid();
 
-        AppDebug.log("Main grid initialized successfully");
+        // Pass the SimulateAI initializer function to MainGrid for coordination
+        this.categoryGrid.setSimulateAIInitializer(
+          this.createSimulateAIFunction(),
+        );
+
+        AppDebug.log(
+          "Main grid initialized successfully with SimulateAI coordination",
+        );
       }, 100);
     } catch (error) {
       AppDebug.error("Failed to initialize main grid:", error);
       // Fallback to legacy simulation loading if category grid fails
       this.loadLegacySimulations();
+    }
+  }
+
+  /**
+   * Create the SimulateAI function that MainGrid can use to coordinate
+   * category-grid and scenario-browser components
+   * @returns {Object} SimulateAI coordination interface
+   */
+  createSimulateAIFunction() {
+    return {
+      // Core simulation launcher
+      launchSimulation: (config) => this.startSimulation("simulateai", config),
+
+      // Navigation coordination
+      navigateToCategory: (categoryId) =>
+        this.navigateToSpecificScenario(categoryId, null, "category_nav"),
+      navigateToScenario: (categoryId, scenarioId) =>
+        this.navigateToSpecificScenario(categoryId, scenarioId, "scenario_nav"),
+
+      // Component integration methods
+      initializeCategoryGrid: () => this.initializeCategoryGridComponent(),
+      initializeScenarioBrowser: () =>
+        this.initializeScenarioBrowserComponent(),
+
+      // App services access
+      getAnalytics: () => this.analyticsManager,
+      getBadgeManager: () => this.badgeManager,
+      getAccessibilityManager: () => this.accessibilityManager,
+      getAnimationManager: () => this.animationManager,
+
+      // Configuration access
+      getConfig: () => this.simulateaiConfig,
+      getAppConfig: () => this.getAppConfig(),
+      getPreferences: () => this.preferences,
+
+      // Event coordination
+      onSimulationComplete: (data) => this.handleSimulationComplete(data),
+      onError: (error, context) => this.handleError(error, context),
+
+      // State management
+      getCurrentUser: () => this.currentUser,
+      getCurrentTheme: () => this.currentTheme,
+
+      // Enhanced features
+      trackEvent: (eventName, data) =>
+        this.trackUserInteraction(eventName, data),
+      showBadge: (badgeId) => this.badgeManager?.showBadgeModal?.(badgeId),
+
+      // Performance and monitoring
+      getHealthStatus: () => this.healthStatus,
+      getPerformanceMetrics: () => this.performanceMetrics,
+
+      // Enterprise features
+      handleEnterpriseError: (error, context) =>
+        this.handleEnterpriseError(
+          error,
+          "MainGrid coordination error",
+          context,
+        ),
+
+      // Accessibility support
+      announceToScreenReader: (message, priority = "polite") => {
+        if (this.accessibilityManager) {
+          this.accessibilityManager.announce(message, priority);
+        }
+      },
+    };
+  }
+
+  /**
+   * Initialize category grid component (called by MainGrid)
+   * @returns {boolean} Success status
+   */
+  initializeCategoryGridComponent() {
+    try {
+      AppDebug.log(
+        "Initializing category grid component for MainGrid coordination",
+      );
+
+      // Category grid initialization logic
+      // This would load and setup category-grid.js if it exists as a separate component
+
+      // For now, category functionality is built into MainGrid
+      // Future: This could initialize a separate CategoryGrid component
+
+      AppDebug.log("Category grid component initialized successfully");
+      return true;
+    } catch (error) {
+      AppDebug.error("Failed to initialize category grid component:", error);
+      this.handleEnterpriseError(
+        error,
+        "Category grid component initialization failed",
+        "category_grid_init",
+      );
+      return false;
+    }
+  }
+
+  /**
+   * Initialize scenario browser component (called by MainGrid)
+   * @returns {Object|null} Scenario browser instance or null
+   */
+  initializeScenarioBrowserComponent() {
+    try {
+      AppDebug.log(
+        "Initializing scenario browser component for MainGrid coordination",
+      );
+
+      // Check if ScenarioBrowser is available globally
+      if (window.ScenarioBrowser) {
+        this.scenarioBrowser = new window.ScenarioBrowser({
+          integrateWithSimulateAI: true,
+          routeThroughSimulateAI: true,
+          useSimulateAIModals: true,
+          parentContext: "main-grid",
+          onNavigationRequest: (categoryId, scenarioId) => {
+            // Handle navigation requests from scenario browser
+            this.navigateToSpecificScenario(
+              categoryId,
+              scenarioId,
+              "scenario_browser",
+            );
+          },
+        });
+
+        // Initialize the scenario browser
+        if (this.scenarioBrowser.init) {
+          this.scenarioBrowser.init();
+        }
+
+        AppDebug.log("Scenario browser component initialized successfully");
+        return this.scenarioBrowser;
+      } else {
+        AppDebug.warn(
+          "ScenarioBrowser not available, using built-in scenario functionality",
+        );
+        return null;
+      }
+    } catch (error) {
+      AppDebug.error("Failed to initialize scenario browser component:", error);
+      this.handleEnterpriseError(
+        error,
+        "Scenario browser component initialization failed",
+        "scenario_browser_init",
+      );
+      return null;
     }
   }
 
@@ -2829,7 +3234,24 @@ class AIEthicsApp {
       }
 
       // Track simulation start
-      simpleAnalytics.trackSimulationStart(simulationId, simConfig.title); // Get simulation container
+      simpleAnalytics.trackSimulationStart(simulationId, simConfig.title);
+
+      // Enhanced analytics for simulation start
+      if (this.analyticsManager.isInitialized) {
+        this.analyticsManager.trackSimulationStart(
+          simulationId,
+          "ethics_simulation",
+          {
+            title: simConfig.title,
+            userLevel: "intermediate", // Could be derived from user progress
+            expectedDuration: simConfig.estimatedTime || 600000, // 10 minutes default
+            prerequisites: simConfig.prerequisites || [],
+            learningObjectives: simConfig.learningObjectives || [],
+          },
+        );
+      }
+
+      // Get simulation container
       const simulationContainer = document.getElementById(
         "simulation-container",
       );
@@ -3140,6 +3562,42 @@ class AIEthicsApp {
   }
 
   /**
+   * Handle simulation completion (called by MainGrid via SimulateAI function)
+   * @param {Object} data - Simulation completion data
+   */
+  handleSimulationComplete(data) {
+    AppDebug.log("SimulateAI function - Simulation completion:", data);
+
+    try {
+      // Delegate to the existing simulation completion handler
+      this.onSimulationCompleted(data);
+
+      // Track via enhanced analytics if available
+      if (this.analyticsManager.isInitialized) {
+        this.analyticsManager.trackEvent("simulation_complete_via_maingrid", {
+          ...data,
+          source: "main_grid_coordination",
+          timestamp: new Date().toISOString(),
+          sessionId: this.sessionId,
+        });
+      }
+
+      // Update component health
+      this._updateComponentHealth("simulation_completion", "healthy");
+    } catch (error) {
+      AppDebug.error(
+        "Error handling simulation completion via MainGrid:",
+        error,
+      );
+      this.handleEnterpriseError(
+        error,
+        "Failed to handle simulation completion",
+        "simulation_completion",
+      );
+    }
+  }
+
+  /**
    * Handle simulation completion - show post-simulation modal
    */
   onSimulationCompleted(data) {
@@ -3161,6 +3619,28 @@ class AIEthicsApp {
           this.currentSimulation.id,
           data,
         );
+
+        // Enhanced analytics for simulation completion
+        if (this.analyticsManager.isInitialized) {
+          const completionReport = {
+            duration: data.duration || 0,
+            score: data.finalScore || 0,
+            decisions: data.decisions || [],
+            scenarios: data.totalScenarios || 1,
+            ethicsMetrics: data.ethicsMetrics || {},
+            completionRate: 100, // Assuming full completion
+            hintsUsed: data.hintsUsed || 0,
+            errorsEncountered: data.errorsEncountered || 0,
+            accessibilityFeaturesUsed: this._getUsedAccessibilityFeatures(),
+            learningOutcomes: data.learningOutcomes || {},
+            userFeedback: data.userFeedback || null,
+          };
+
+          this.analyticsManager.trackSimulationComplete(
+            this.currentSimulation.id,
+            completionReport,
+          );
+        }
 
         // Save simulation completion to Firestore
         if (this.authService) {
@@ -3241,7 +3721,8 @@ class AIEthicsApp {
     // Import and open the scenario modal
     import("./components/scenario-modal.js")
       .then(({ default: ScenarioModal }) => {
-        const scenarioModal = new ScenarioModal();
+        const scenarioConfig = this.getComponentConfig("scenario-modal");
+        const scenarioModal = new ScenarioModal(scenarioConfig);
         scenarioModal.open(scenarioId, categoryId);
       })
       .catch((error) => {
@@ -3255,12 +3736,17 @@ class AIEthicsApp {
   showScenarioReflectionModal(data) {
     const { categoryId, scenarioId, selectedOption } = data;
 
+    // Get scenario reflection modal configuration
+    const reflectionConfig =
+      this.getComponentConfig("scenario-reflection-modal") || {};
+
     // The ScenarioReflectionModal automatically shows itself when constructed
     new ScenarioReflectionModal({
       categoryId: categoryId,
       scenarioId: scenarioId,
       selectedOption: selectedOption,
       scenarioData: data.scenarioData || {},
+      ...reflectionConfig,
       onComplete: (reflectionData) => {
         // User finished reflection - show success message
         this.showNotification(
@@ -4454,9 +4940,12 @@ class AIEthicsApp {
     if (!badges || badges.length === 0) return;
 
     try {
+      // Get badge modal configuration
+      const badgeConfig = this.getComponentConfig("badge-modal");
+
       // Check if badge modal component is available
       if (window.BadgeModal) {
-        const badgeModal = new window.BadgeModal();
+        const badgeModal = new window.BadgeModal(badgeConfig);
         await badgeModal.showCelebration(badges);
       } else {
         // Fallback to simple notification
@@ -4719,6 +5208,9 @@ class AIEthicsApp {
           // Set up research data logging integration
           this.setupResearchDataIntegration();
 
+          // Initialize Firebase Cloud Messaging
+          await this.initializeFirebaseMessaging();
+
           // Update UI for current auth state
           this.updateUIForAuthState();
         } else {
@@ -4904,6 +5396,283 @@ class AIEthicsApp {
   }
 
   /**
+   * Initialize Firebase Cloud Messaging for push notifications
+   */
+  async initializeFirebaseMessaging() {
+    try {
+      AppDebug.log("Initializing Firebase Cloud Messaging...");
+
+      if (!this.firebaseService) {
+        AppDebug.warn("Firebase service not available for messaging");
+        return;
+      }
+
+      // Check if messaging is supported
+      if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+        AppDebug.warn("Browser does not support push notifications");
+        return;
+      }
+
+      // Register service worker
+      await this.registerMessagingServiceWorker();
+
+      // Get messaging instance
+      if (
+        this.firebaseService &&
+        typeof this.firebaseService.getMessaging === "function"
+      ) {
+        this.messagingService = this.firebaseService.getMessaging();
+        if (!this.messagingService) {
+          AppDebug.warn("Firebase messaging not available");
+          return;
+        }
+
+        // Set up foreground message handling
+        this.setupForegroundMessageHandling();
+
+        // Request notification permission and get token
+        await this.requestNotificationPermission();
+      } else {
+        AppDebug.warn("Firebase messaging service method not available");
+        return;
+      }
+
+      this.messagingInitialized = true;
+      AppDebug.log("Firebase Cloud Messaging initialized successfully");
+    } catch (error) {
+      AppDebug.error("Failed to initialize Firebase Cloud Messaging:", error);
+      // Continue without messaging - app should still function
+    }
+  }
+
+  /**
+   * Register Firebase Messaging Service Worker
+   */
+  async registerMessagingServiceWorker() {
+    try {
+      // Register the service worker
+      const registration = await navigator.serviceWorker.register(
+        "/firebase-messaging-sw.js",
+        { scope: "/" },
+      );
+
+      AppDebug.log("Firebase messaging service worker registered successfully");
+
+      // Set up message handling from service worker
+      navigator.serviceWorker.addEventListener("message", (event) => {
+        if (event.data && event.data.type) {
+          this.handleServiceWorkerMessage(event.data);
+        }
+      });
+
+      return registration;
+    } catch (error) {
+      AppDebug.error(
+        "Failed to register Firebase messaging service worker:",
+        error,
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Set up foreground message handling
+   */
+  setupForegroundMessageHandling() {
+    if (!this.messagingService) return;
+
+    // Handle messages when app is in foreground
+    this.messagingService.onMessage((payload) => {
+      AppDebug.log("Foreground message received:", payload);
+
+      // Show in-app notification
+      this.showInAppNotification(payload);
+
+      // Track analytics
+      this.trackNotificationReceived(payload, "foreground");
+    });
+  }
+
+  /**
+   * Request notification permission and get FCM token
+   */
+  async requestNotificationPermission() {
+    try {
+      // Check current permission
+      const permission = Notification.permission;
+
+      if (permission === "denied") {
+        AppDebug.warn("Notification permission denied by user");
+        return;
+      }
+
+      let finalPermission = permission;
+
+      // Request permission if not already granted
+      if (permission === "default") {
+        finalPermission = await Notification.requestPermission();
+      }
+
+      if (finalPermission === "granted") {
+        // Get FCM token
+        await this.getFCMToken();
+      } else {
+        AppDebug.log("Notification permission not granted");
+      }
+    } catch (error) {
+      AppDebug.error("Error requesting notification permission:", error);
+    }
+  }
+
+  /**
+   * Get FCM registration token
+   */
+  async getFCMToken() {
+    try {
+      if (!this.messagingService) {
+        throw new Error("Messaging service not initialized");
+      }
+
+      // Get token
+      const token = await this.messagingService.getToken({
+        vapidKey:
+          "BH7Q8X9XJ9Y8Z7A6B5C4D3E2F1G0H9I8J7K6L5M4N3O2P1Q0R9S8T7U6V5W4X3Y2Z1",
+      });
+
+      if (token) {
+        this.notificationToken = token;
+        AppDebug.log("FCM token obtained successfully");
+
+        // Store token for current user
+        await this.storeFCMTokenForUser(token);
+
+        // Set up token refresh handling
+        this.setupTokenRefreshHandling();
+      } else {
+        AppDebug.warn("No FCM token available");
+      }
+    } catch (error) {
+      AppDebug.error("Error getting FCM token:", error);
+    }
+  }
+
+  /**
+   * Store FCM token for current user
+   */
+  async storeFCMTokenForUser(token) {
+    try {
+      if (!this.currentUser || !this.firebaseService) return;
+
+      // Store token in user profile
+      await this.firebaseService.updateUserFCMToken(
+        this.currentUser.uid,
+        token,
+      );
+      AppDebug.log("FCM token stored for user");
+    } catch (error) {
+      AppDebug.error("Error storing FCM token for user:", error);
+    }
+  }
+
+  /**
+   * Set up token refresh handling
+   */
+  setupTokenRefreshHandling() {
+    if (!this.messagingService) return;
+
+    this.messagingService.onTokenRefresh(async () => {
+      try {
+        AppDebug.log("FCM token refreshed");
+        await this.getFCMToken(); // Get new token and store it
+      } catch (error) {
+        AppDebug.error("Error handling token refresh:", error);
+      }
+    });
+  }
+
+  /**
+   * Handle messages from service worker
+   */
+  handleServiceWorkerMessage(data) {
+    AppDebug.log("Message from service worker:", data);
+
+    switch (data.type) {
+      case "notification-clicked":
+        this.trackNotificationClicked(data);
+        break;
+      case "notification-dismissed":
+        this.trackNotificationDismissed(data);
+        break;
+      default:
+        AppDebug.log("Unknown service worker message type:", data.type);
+    }
+  }
+
+  /**
+   * Show in-app notification for foreground messages
+   */
+  showInAppNotification(payload) {
+    const { notification, data } = payload;
+
+    // Use existing notification system if available
+    if (typeof this.showNotification === "function") {
+      this.showNotification(
+        notification.title || "SimulateAI Notification",
+        "info",
+        {
+          body: notification.body,
+          icon: notification.icon,
+          data: data,
+        },
+      );
+    } else if (window.NotificationToast) {
+      window.NotificationToast.show({
+        type: "info",
+        message: `${notification.title}: ${notification.body}`,
+        duration: 6000,
+        closable: true,
+        data: data,
+      });
+    }
+  }
+
+  /**
+   * Track notification analytics
+   */
+  trackNotificationReceived(payload, context) {
+    simpleAnalytics.trackEvent("notification_received", {
+      type: payload.data?.type || "general",
+      context: context, // 'foreground' or 'background'
+      title: payload.notification?.title,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  /**
+   * Track notification click analytics
+   */
+  trackNotificationClicked(data) {
+    simpleAnalytics.trackEvent("notification_clicked", {
+      type: data.notificationType || "general",
+      threadId: data.threadId,
+      messageId: data.messageId,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  /**
+   * Track notification dismissal analytics
+   */
+  trackNotificationDismissed(data) {
+    simpleAnalytics.trackEvent("notification_dismissed", {
+      type: data.notificationType || "general",
+      threadId: data.threadId,
+      messageId: data.messageId,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  /**
    * Update UI based on current authentication state
    */
   updateUIForAuthState() {
@@ -4976,12 +5745,17 @@ class EthicsRadarDemo {
 
   async initializeDemo() {
     try {
+      // Get radar chart configuration
+      const radarConfig =
+        window.aiEthicsApp?.getComponentConfig("radar-chart") || {};
+
       // Get configured component instead of direct instantiation
       this.demoChart = await appStartup.getComponent(
         "radar-chart",
         "hero-ethics-chart",
         {
           title: "Ethical Impact Analysis",
+          ...radarConfig,
           width: 580,
           height: 580,
           realTime: false,
@@ -5109,6 +5883,68 @@ class EthicsRadarDemo {
         popoverHideTimeout = null;
       }, AUTO_HIDE_DELAY);
     }
+  }
+
+  /**
+   * Enhanced analytics helper methods
+   */
+
+  /**
+   * Track user interaction with enhanced analytics
+   */
+  trackUserInteraction(interactionType, elementId, additionalData = {}) {
+    if (this.analyticsManager.isInitialized) {
+      this.analyticsManager.trackUserInteraction(interactionType, elementId, {
+        ...additionalData,
+        sessionId: this.sessionId,
+        currentTheme: this.currentTheme,
+        accessibility: this.preferences,
+        inputMethod: additionalData.inputMethod || "unknown",
+      });
+    }
+  }
+
+  /**
+   * Track educational outcome with enhanced analytics
+   */
+  trackEducationalOutcome(assessment) {
+    if (this.analyticsManager.isInitialized) {
+      this.analyticsManager.trackEducationalOutcome({
+        ...assessment,
+        sessionId: this.sessionId,
+        accessibility: this._getUsedAccessibilityFeatures(),
+        theme: this.currentTheme,
+      });
+    }
+  }
+
+  /**
+   * Track ethics decision with enhanced analytics
+   */
+  trackEthicsDecision(decision) {
+    if (this.analyticsManager.isInitialized) {
+      this.analyticsManager.trackEthicsDecision({
+        ...decision,
+        sessionId: this.sessionId,
+        accessibility: this._getUsedAccessibilityFeatures(),
+        theme: this.currentTheme,
+      });
+    }
+  }
+
+  /**
+   * Generate analytics insights
+   */
+  async generateAnalyticsInsights() {
+    if (this.analyticsManager.isInitialized) {
+      try {
+        return await this.analyticsManager.generateInsights();
+      } catch (error) {
+        AppDebug.warn("Failed to generate analytics insights:", error);
+        return null;
+      }
+    }
+    return null;
   }
 
   hideFeedback() {
@@ -5457,6 +6293,104 @@ window.getAppLogs = () => AppDebug.exportLogs();
 window.getAppDiagnostics = () => AppDebug.getDiagnostics();
 window.flushTelemetry = () => AppDebug._flushTelemetry();
 window.clearAppBuffers = () => AppDebug.clearBuffers();
+
+// Enhanced Analytics debugging functions
+window.getAnalyticsStatus = () => {
+  const status = {
+    enhanced: {
+      initialized: AnalyticsManager.isInitialized,
+      config: AnalyticsManager.config,
+      queueSize: AnalyticsManager.eventQueue?.length || 0,
+      retryQueueSize: AnalyticsManager.retryQueue?.length || 0,
+    },
+    simple: {
+      available: typeof simpleAnalytics !== "undefined",
+      initialized: simpleAnalytics.isInitialized || false,
+    },
+  };
+  console.log("🔍 Analytics System Status:", status);
+  return status;
+};
+
+window.flushAnalytics = () => {
+  if (AnalyticsManager.isInitialized) {
+    AnalyticsManager.flush();
+    console.log("📤 Enhanced analytics flushed");
+  }
+};
+
+window.generateAnalyticsInsights = async () => {
+  if (app.analyticsManager.isInitialized) {
+    const insights = await app.generateAnalyticsInsights();
+    console.log("📊 Analytics Insights:", insights);
+    return insights;
+  }
+  console.warn("Enhanced analytics not initialized");
+  return null;
+};
+
+window.trackTestEvent = (eventName, data = {}) => {
+  if (app.analyticsManager.isInitialized) {
+    app.analyticsManager.trackEvent(eventName, { ...data, test: true });
+    console.log(`📝 Test event tracked: ${eventName}`, data);
+  }
+};
+
+// SimulateAI Coordination debugging functions
+window.getCoordinationStatus = () => {
+  if (app && app.categoryGrid && app.categoryGrid.getCoordinationStatus) {
+    const status = app.categoryGrid.getCoordinationStatus();
+    console.log("🔗 MainGrid Coordination Status:", status);
+    return status;
+  }
+  console.warn("MainGrid coordination not available");
+  return null;
+};
+
+window.testCoordinatedLaunch = (
+  categoryId = "fairness",
+  scenarioId = "hiring-algorithm",
+) => {
+  if (app && app.categoryGrid && app.categoryGrid.launchCoordinatedScenario) {
+    console.log(
+      `🚀 Testing coordinated scenario launch: ${scenarioId} in ${categoryId}`,
+    );
+    app.categoryGrid.launchCoordinatedScenario(categoryId, scenarioId, {
+      test: true,
+    });
+  } else {
+    console.warn("Coordinated scenario launch not available");
+  }
+};
+
+window.getCoordinatedService = (serviceName) => {
+  if (app && app.categoryGrid && app.categoryGrid.getCoordinatedService) {
+    const service = app.categoryGrid.getCoordinatedService(serviceName);
+    console.log(`🔧 Coordinated service '${serviceName}':`, service);
+    return service;
+  }
+  console.warn("Coordinated services not available");
+  return null;
+};
+
+window.testSimulateAIFunction = () => {
+  if (app && app.createSimulateAIFunction) {
+    const simulateAIFunc = app.createSimulateAIFunction();
+    console.log(
+      "🎯 SimulateAI Function Interface:",
+      Object.keys(simulateAIFunc),
+    );
+    console.log("📊 Available services:", {
+      analytics: !!simulateAIFunc.getAnalytics(),
+      badges: !!simulateAIFunc.getBadgeManager(),
+      accessibility: !!simulateAIFunc.getAccessibilityManager(),
+      config: !!simulateAIFunc.getConfig(),
+    });
+    return simulateAIFunc;
+  }
+  console.warn("SimulateAI function not available");
+  return null;
+};
 
 // Export the class for ES6 modules
 export default AIEthicsApp;

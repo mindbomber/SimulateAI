@@ -86,6 +86,16 @@ import { PerformanceTracing } from "./performance-tracing.js";
 /**
  * Firebase configuration and initialization
  */
+// Import centralized Firebase configuration
+import {
+  firebaseConfig as centralizedConfig,
+  analyticsConfig,
+  messagingConfig,
+  performanceConfig,
+  securityConfig,
+  devConfig,
+} from "../config/firebase-config.js";
+
 const getFirebaseConfig = () => {
   // Try to get from environment config utility first
   if (window.envConfig) {
@@ -105,19 +115,20 @@ const getFirebaseConfig = () => {
     };
   }
 
-  // Production Firebase configuration for SimulateAI
-  return {
-    apiKey: "AIzaSyAwoc3L-43aXyNjNB9ncGbFm7eE-yn5bFA",
-    authDomain: "simulateai-research.firebaseapp.com",
-    projectId: "simulateai-research",
-    storageBucket: "simulateai-research.firebasestorage.app",
-    messagingSenderId: "52924445915", // Crucial for FCM!
-    appId: "1:52924445915:web:dadca1a93bc382403a08fe",
-    measurementId: "G-XW8H062BMV",
-  };
+  // Use centralized configuration from firebase-config.js
+  return centralizedConfig;
 };
 
 const firebaseConfig = getFirebaseConfig();
+
+// Export additional configurations for use by other services
+export {
+  analyticsConfig,
+  messagingConfig,
+  performanceConfig,
+  securityConfig,
+  devConfig,
+};
 
 /**
  * Main Firebase Service Class

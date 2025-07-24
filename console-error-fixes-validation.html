@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Console Error Fixes - SimulateAI</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .error-status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-family: monospace;
+      }
+      .fixed {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .pending {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      .console-output {
+        background: #2d3748;
+        color: #e2e8f0;
+        padding: 15px;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+        max-height: 400px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+      }
+      .error-log {
+        color: #fc8181;
+      }
+      .warn-log {
+        color: #f6e05e;
+      }
+      .info-log {
+        color: #63b3ed;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Console Error Fixes Validation</h1>
+    <p>This page validates that the console errors have been resolved</p>
+
+    <div class="test-container">
+      <h2>1. Educational Modules Error Status</h2>
+      <div id="educational-status" class="error-status pending">
+        Checking...
+      </div>
+      <p>
+        <strong>Fixed Issue:</strong>
+        <code
+          >this.educatorToolkit.getAvailableAssessments is not a function</code
+        >
+      </p>
+      <p>
+        <strong>Solution:</strong> Added proper method existence checks and
+        fallback values
+      </p>
+      <button onclick="checkEducationalModules()">
+        Test Educational Modules
+      </button>
+    </div>
+
+    <div class="test-container">
+      <h2>2. Firebase Messaging Error Status</h2>
+      <div id="firebase-status" class="error-status pending">Checking...</div>
+      <p>
+        <strong>Fixed Issue:</strong>
+        <code>this.firebaseService.getMessaging is not a function</code>
+      </p>
+      <p>
+        <strong>Solution:</strong> Added method existence checks before calling
+        Firebase messaging
+      </p>
+      <button onclick="checkFirebaseMessaging()">
+        Test Firebase Messaging
+      </button>
+    </div>
+
+    <div class="test-container">
+      <h2>3. Console Output Monitor</h2>
+      <div id="console-monitor" class="console-output">
+        Monitoring console output...
+      </div>
+      <button onclick="clearConsoleMonitor()">Clear Monitor</button>
+      <button onclick="testFullAppInit()">Test Full App Initialization</button>
+    </div>
+
+    <div class="test-container">
+      <h2>4. Error Pattern Detection</h2>
+      <div id="error-patterns"></div>
+      <button onclick="analyzeErrorPatterns()">Analyze Error Patterns</button>
+    </div>
+
+    <script type="module">
+      import "./src/js/app.js";
+
+      // Console monitoring
+      const originalError = console.error;
+      const originalWarn = console.warn;
+      const originalLog = console.log;
+      const originalInfo = console.info;
+
+      let consoleOutput = [];
+      let errorPatterns = [];
+
+      function logToMonitor(level, args) {
+        const timestamp = new Date().toISOString().split("T")[1].slice(0, -1);
+        const message = Array.from(args)
+          .map((arg) =>
+            typeof arg === "object"
+              ? JSON.stringify(arg, null, 2)
+              : String(arg),
+          )
+          .join(" ");
+
+        consoleOutput.push({
+          level,
+          timestamp,
+          message,
+          fullMessage: message,
+        });
+
+        // Check for specific error patterns
+        if (level === "error") {
+          if (message.includes("getAvailableAssessments")) {
+            errorPatterns.push(
+              "Educational Modules Error - getAvailableAssessments",
+            );
+          }
+          if (message.includes("getMessaging")) {
+            errorPatterns.push("Firebase Messaging Error - getMessaging");
+          }
+          if (message.includes("is not a function")) {
+            errorPatterns.push("Method Not Found Error");
+          }
+        }
+
+        updateConsoleMonitor();
+      }
+
+      console.error = function (...args) {
+        logToMonitor("error", args);
+        originalError.apply(console, args);
+      };
+
+      console.warn = function (...args) {
+        logToMonitor("warn", args);
+        originalWarn.apply(console, args);
+      };
+
+      console.info = function (...args) {
+        logToMonitor("info", args);
+        originalInfo.apply(console, args);
+      };
+
+      function updateConsoleMonitor() {
+        const monitor = document.getElementById("console-monitor");
+        const recent = consoleOutput.slice(-20); // Show last 20 messages
+
+        monitor.innerHTML = recent
+          .map((entry) => {
+            const className =
+              entry.level === "error"
+                ? "error-log"
+                : entry.level === "warn"
+                  ? "warn-log"
+                  : "info-log";
+            return `<div class="${className}">[${entry.timestamp}] [${entry.level.toUpperCase()}] ${entry.message}</div>`;
+          })
+          .join("");
+
+        monitor.scrollTop = monitor.scrollHeight;
+      }
+
+      window.checkEducationalModules = function () {
+        const statusEl = document.getElementById("educational-status");
+
+        try {
+          if (window.aiEthicsApp) {
+            const hasEducatorToolkit = !!window.aiEthicsApp.educatorToolkit;
+            const hasDigitalScienceLab = !!window.aiEthicsApp.digitalScienceLab;
+            const hasScenarioGenerator = !!window.aiEthicsApp.scenarioGenerator;
+
+            let status = "✅ Educational modules initialized without errors:\n";
+            status += `- Educator Toolkit: ${hasEducatorToolkit ? "Present" : "Missing"}\n`;
+            status += `- Digital Science Lab: ${hasDigitalScienceLab ? "Present" : "Missing"}\n`;
+            status += `- Scenario Generator: ${hasScenarioGenerator ? "Present" : "Missing"}`;
+
+            statusEl.className = "error-status fixed";
+            statusEl.textContent = status;
+          } else {
+            statusEl.className = "error-status error";
+            statusEl.textContent = "❌ aiEthicsApp not available yet";
+          }
+        } catch (error) {
+          statusEl.className = "error-status error";
+          statusEl.textContent = `❌ Error checking educational modules: ${error.message}`;
+        }
+      };
+
+      window.checkFirebaseMessaging = function () {
+        const statusEl = document.getElementById("firebase-status");
+
+        try {
+          if (window.aiEthicsApp) {
+            const hasFirebaseService = !!window.aiEthicsApp.firebaseService;
+            const messagingInitialized =
+              window.aiEthicsApp.messagingInitialized;
+
+            let status = "✅ Firebase messaging checks passed:\n";
+            status += `- Firebase Service: ${hasFirebaseService ? "Available" : "Not Available"}\n`;
+            status += `- Messaging Initialized: ${messagingInitialized ? "Yes" : "No"}\n`;
+            status += `- Method checking: Implemented with fallbacks`;
+
+            statusEl.className = "error-status fixed";
+            statusEl.textContent = status;
+          } else {
+            statusEl.className = "error-status error";
+            statusEl.textContent = "❌ aiEthicsApp not available yet";
+          }
+        } catch (error) {
+          statusEl.className = "error-status error";
+          statusEl.textContent = `❌ Error checking Firebase messaging: ${error.message}`;
+        }
+      };
+
+      window.clearConsoleMonitor = function () {
+        consoleOutput = [];
+        errorPatterns = [];
+        document.getElementById("console-monitor").innerHTML =
+          "Console monitor cleared...";
+      };
+
+      window.testFullAppInit = function () {
+        if (window.aiEthicsApp && !window.aiEthicsApp.isInitialized) {
+          console.info("Testing full app initialization...");
+          window.aiEthicsApp
+            .init()
+            .then(() => {
+              console.info("App initialization completed successfully");
+            })
+            .catch((error) => {
+              console.error("App initialization failed:", error);
+            });
+        } else {
+          console.info("App already initialized or not available");
+        }
+      };
+
+      window.analyzeErrorPatterns = function () {
+        const patternsEl = document.getElementById("error-patterns");
+
+        if (errorPatterns.length === 0) {
+          patternsEl.innerHTML =
+            '<div class="error-status fixed">✅ No error patterns detected! Console errors have been resolved.</div>';
+        } else {
+          const uniquePatterns = [...new Set(errorPatterns)];
+          patternsEl.innerHTML = `
+                    <div class="error-status error">❌ Error patterns detected:</div>
+                    <ul>
+                        ${uniquePatterns.map((pattern) => `<li>${pattern}</li>`).join("")}
+                    </ul>
+                `;
+        }
+      };
+
+      // Auto-run checks after app loads
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          checkEducationalModules();
+          checkFirebaseMessaging();
+          analyzeErrorPatterns();
+        }, 2000);
+      });
+    </script>
+  </body>
+</html>

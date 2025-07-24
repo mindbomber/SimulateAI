@@ -180,6 +180,12 @@ class MainGrid {
     this.performanceMonitoringInterval = null;
     this.telemetryFlushInterval = null;
 
+    // SimulateAI coordination system
+    this.simulateAIFunction = null;
+    this.categoryGridComponent = null;
+    this.scenarioBrowserComponent = null;
+    this.coordinationEnabled = false;
+
     // Initialize enterprise monitoring
     this._initializeEnterpriseMonitoring();
 
@@ -187,6 +193,106 @@ class MainGrid {
     this._trackOperation("initialization", async () => {
       await this.init();
     });
+  }
+
+  /**
+   * Set the SimulateAI function for coordinating category-grid and scenario-browser
+   * @param {Object} simulateAIFunction - The SimulateAI coordination interface from app.js
+   */
+  setSimulateAIInitializer(simulateAIFunction) {
+    try {
+      this.simulateAIFunction = simulateAIFunction;
+      this.coordinationEnabled = true;
+
+      AppDebug.log(
+        "MainGrid: SimulateAI function set, initializing component coordination",
+      );
+
+      // Initialize coordinated components
+      this._initializeCoordinatedComponents();
+
+      AppDebug.log("MainGrid: SimulateAI coordination enabled successfully");
+    } catch (error) {
+      AppDebug.error("MainGrid: Failed to set SimulateAI initializer:", error);
+      this.coordinationEnabled = false;
+    }
+  }
+
+  /**
+   * Initialize coordinated components using the SimulateAI function
+   * @private
+   */
+  _initializeCoordinatedComponents() {
+    if (!this.simulateAIFunction) {
+      AppDebug.warn(
+        "MainGrid: No SimulateAI function available for coordination",
+      );
+      return;
+    }
+
+    try {
+      // Initialize category grid component
+      this.categoryGridComponent =
+        this.simulateAIFunction.initializeCategoryGrid();
+
+      // Initialize scenario browser component
+      this.scenarioBrowserComponent =
+        this.simulateAIFunction.initializeScenarioBrowser();
+
+      // Set up event coordination
+      this._setupEventCoordination();
+
+      AppDebug.log("MainGrid: Coordinated components initialized", {
+        categoryGrid: !!this.categoryGridComponent,
+        scenarioBrowser: !!this.scenarioBrowserComponent,
+      });
+    } catch (error) {
+      AppDebug.error(
+        "MainGrid: Failed to initialize coordinated components:",
+        error,
+      );
+      this.simulateAIFunction.onError(error, "component_coordination");
+    }
+  }
+
+  /**
+   * Set up event coordination between components
+   * @private
+   */
+  _setupEventCoordination() {
+    if (!this.simulateAIFunction) return;
+
+    try {
+      // Set up simulation launch coordination
+      this.launchSimulation = (config) => {
+        return this.simulateAIFunction.launchSimulation(config);
+      };
+
+      // Set up navigation coordination
+      this.navigateToCategory = (categoryId) => {
+        return this.simulateAIFunction.navigateToCategory(categoryId);
+      };
+
+      this.navigateToScenario = (categoryId, scenarioId) => {
+        return this.simulateAIFunction.navigateToScenario(
+          categoryId,
+          scenarioId,
+        );
+      };
+
+      // Set up analytics coordination
+      this.trackEvent = (eventName, data) => {
+        return this.simulateAIFunction.trackEvent(eventName, {
+          ...data,
+          source: "main_grid",
+          component: "MainGrid",
+        });
+      };
+
+      AppDebug.log("MainGrid: Event coordination established");
+    } catch (error) {
+      AppDebug.error("MainGrid: Failed to set up event coordination:", error);
+    }
   }
 
   /**
@@ -4068,6 +4174,94 @@ class MainGrid {
         results: [],
       };
     }
+  }
+
+  // ===== SIMULATEAI COORDINATION UTILITIES =====
+
+  /**
+   * Get the current coordination status
+   * @returns {Object} Coordination status information
+   */
+  getCoordinationStatus() {
+    return {
+      enabled: this.coordinationEnabled,
+      simulateAIFunction: !!this.simulateAIFunction,
+      categoryGridComponent: !!this.categoryGridComponent,
+      scenarioBrowserComponent: !!this.scenarioBrowserComponent,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  /**
+   * Handle coordinated scenario launch
+   * @param {string} categoryId - Category identifier
+   * @param {string} scenarioId - Scenario identifier
+   * @param {Object} options - Launch options
+   */
+  launchCoordinatedScenario(categoryId, scenarioId, options = {}) {
+    if (!this.coordinationEnabled || !this.simulateAIFunction) {
+      AppDebug.warn(
+        "MainGrid: Coordination not enabled, using fallback scenario launch",
+      );
+      return this.openScenario(categoryId, scenarioId);
+    }
+
+    try {
+      // Track the launch via coordination
+      this.trackEvent("coordinated_scenario_launch", {
+        categoryId,
+        scenarioId,
+        options,
+        coordinationStatus: this.getCoordinationStatus(),
+      });
+
+      // Launch via SimulateAI function
+      return this.simulateAIFunction.navigateToScenario(categoryId, scenarioId);
+    } catch (error) {
+      AppDebug.error("MainGrid: Failed coordinated scenario launch:", error);
+      this.simulateAIFunction?.onError(error, "coordinated_scenario_launch");
+
+      // Fallback to standard launch
+      return this.openScenario(categoryId, scenarioId);
+    }
+  }
+
+  /**
+   * Get access to SimulateAI services through coordination
+   * @param {string} serviceName - Name of the service to access
+   * @returns {*} The requested service or null
+   */
+  getCoordinatedService(serviceName) {
+    if (!this.coordinationEnabled || !this.simulateAIFunction) {
+      return null;
+    }
+
+    const serviceMap = {
+      analytics: () => this.simulateAIFunction.getAnalytics(),
+      badges: () => this.simulateAIFunction.getBadgeManager(),
+      accessibility: () => this.simulateAIFunction.getAccessibilityManager(),
+      config: () => this.simulateAIFunction.getConfig(),
+      appConfig: () => this.simulateAIFunction.getAppConfig(),
+      preferences: () => this.simulateAIFunction.getPreferences(),
+    };
+
+    const serviceGetter = serviceMap[serviceName];
+    if (serviceGetter) {
+      try {
+        return serviceGetter();
+      } catch (error) {
+        AppDebug.error(
+          `MainGrid: Failed to get coordinated service '${serviceName}':`,
+          error,
+        );
+        return null;
+      }
+    }
+
+    AppDebug.warn(
+      `MainGrid: Unknown coordinated service requested: ${serviceName}`,
+    );
+    return null;
   }
 }
 

@@ -9,6 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "echo \"Tests will be added\" && exit 0",
+    "test:firebase-config": "node src/js/test/firebase-config-test.js",
     "lint": "eslint src/js/**/*.js",
     "format": "prettier --write src/**/*.{js,css,html}",
     "verify": "echo \"All components verified and integrated\" && npm run lint",
