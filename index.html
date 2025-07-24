@@ -1,0 +1,635 @@
+<!--
+Copyright 2025 Armando Sori
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#1a73e8">
+    <meta name="color-scheme" content="light">
+    <title>SimulateAI - AI Ethics Education Through Interactive Simulations</title>
+    <meta name="description" content="Empower educators and learners to explore AI ethics, robotics, and emerging technologies through open-ended, consequence-driven simulations that mirror real-world scenarios">
+    <meta name="keywords" content="AI ethics education, robotics ethics, ISTE standards, interactive simulations, educator resources, PhET-inspired learning, consequence-driven education, open-ended exploration">
+    <meta name="author" content="SimulateAI Educational Platform">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SimulateAI - AI Ethics Education Through Interactive Simulations">
+    <meta property="og:description" content="Empower educators and learners to explore AI ethics, robotics, and emerging technologies through open-ended, consequence-driven simulations that mirror real-world scenarios">
+    <meta property="og:url" content="https://simulateai.org">
+    
+    <!-- Accessibility -->
+    <meta name="accessibility-features" content="keyboard-navigation,skip-links,high-contrast,large-text,screen-reader-support">
+      <!-- Styles - Optimized load order for CSS architecture -->
+    <!-- 1. Design tokens and base styles -->
+    
+    <!-- 2. Base component styles -->
+    
+    <!-- 3. Advanced component systems -->
+    
+    <!-- 4. Utility components -->
+    
+    <!-- 5. UI utility components -->
+
+    
+    <!-- 7. Page-specific and theme styles -->
+    
+    <!-- 8. Layout fixes and overrides -->
+    
+    <!-- 9. Ethics Explorer overrides (moved before consolidated modal) -->
+    
+    <!-- Badge System -->
+    
+    <!-- 10. Modal system - consolidated architecture (loaded LAST for highest specificity) -->
+    
+    <!-- Icons and Favicons -->
+    <link rel="icon" type="image/svg+xml" href="./assets/favicon-BMmyeBYb.svg">
+      <!-- Preload critical resources -->
+    <link rel="preload" href="./assets/app-BgYX15nX.js" as="script" crossorigin>
+    
+    <!-- DNS prefetch for external resources -->
+    <link rel="dns-prefetch" href="//unpkg.com">
+    
+    <!-- Resource hints -->
+    <link rel="prefetch" href="./assets/engine-BHZ-uiZE.js">
+    <link rel="prefetch" href="./assets/accessibility-CyQwKwXc.js">
+    <link rel="prefetch" href="./assets/animation-manager-DsA0i8tg.js">
+    
+    <!-- Immediate scroll reset to prevent page restoration scrolling -->
+    <script>
+        // Simple scroll restoration prevention
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        
+        // Force scroll to top immediately (synchronous)
+        window.scrollTo(0, 0);
+    </script>
+    
+    <!-- Inert polyfill for older browsers -->
+    <script>
+        // Check if inert is supported, if not load polyfill
+        if (!('inert' in HTMLElement.prototype)) {
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/wicg-inert@3.1.2/dist/inert.min.js';
+            document.head.appendChild(script);
+        }
+    </script>
+  <script type="module" crossorigin src="./assets/main-BO5t0xpb.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/ui-D3JF1NtD.js">
+  <link rel="modulepreload" crossorigin href="./assets/core-Bu-3NiyB.js">
+  <link rel="modulepreload" crossorigin href="./assets/utils-BNgYPo66.js">
+  <link rel="stylesheet" crossorigin href="./assets/main-lMvsNwDg.css">
+</head>
+<body>    <!-- Skip to content for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- ARIA live regions for announcements -->
+    <div id="aria-live-polite" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+    <div id="aria-live-assertive" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
+    
+    <!-- Status and notification area -->
+    <div id="status-region" role="status" aria-live="polite" class="sr-only"></div>
+    
+    <!-- Header -->
+    <header class="header" role="banner">
+        <div class="header-container">
+            <div class="logo">
+                <img src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20200%20200'%20role='img'%20aria-label='SimulateAI%20Logo'%3e%3cdefs%3e%3clinearGradient%20id='logoGradient'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3e%3cstop%20offset='0%25'%20style='stop-color:%23007acc;stop-opacity:1'%20/%3e%3cstop%20offset='100%25'%20style='stop-color:%23005a9e;stop-opacity:1'%20/%3e%3c/linearGradient%3e%3c/defs%3e%3c!--%20Brain/Circuit%20Design%20--%3e%3ccircle%20cx='100'%20cy='100'%20r='80'%20fill='url(%23logoGradient)'%20opacity='0.1'/%3e%3c!--%20Neural%20Network%20Nodes%20--%3e%3ccircle%20cx='100'%20cy='50'%20r='8'%20fill='url(%23logoGradient)'/%3e%3ccircle%20cx='70'%20cy='80'%20r='6'%20fill='url(%23logoGradient)'/%3e%3ccircle%20cx='130'%20cy='80'%20r='6'%20fill='url(%23logoGradient)'/%3e%3ccircle%20cx='60'%20cy='120'%20r='6'%20fill='url(%23logoGradient)'/%3e%3ccircle%20cx='100'%20cy='120'%20r='8'%20fill='url(%23logoGradient)'/%3e%3ccircle%20cx='140'%20cy='120'%20r='6'%20fill='url(%23logoGradient)'/%3e%3ccircle%20cx='100'%20cy='150'%20r='8'%20fill='url(%23logoGradient)'/%3e%3c!--%20Connections%20--%3e%3cline%20x1='100'%20y1='50'%20x2='70'%20y2='80'%20stroke='url(%23logoGradient)'%20stroke-width='2'%20opacity='0.7'/%3e%3cline%20x1='100'%20y1='50'%20x2='130'%20y2='80'%20stroke='url(%23logoGradient)'%20stroke-width='2'%20opacity='0.7'/%3e%3cline%20x1='70'%20y1='80'%20x2='60'%20y2='120'%20stroke='url(%23logoGradient)'%20stroke-width='2'%20opacity='0.7'/%3e%3cline%20x1='70'%20y1='80'%20x2='100'%20y2='120'%20stroke='url(%23logoGradient)'%20stroke-width='2'%20opacity='0.7'/%3e%3cline%20x1='130'%20y1='80'%20x2='100'%20y2='120'%20stroke='url(%23logoGradient)'%20stroke-width='2'%20opacity='0.7'/%3e%3cline%20x1='130'%20y1='80'%20x2='140'%20y2='120'%20stroke='url(%23logoGradient)'%20stroke-width='2'%20opacity='0.7'/%3e%3cline%20x1='60'%20y1='120'%20x2='100'%20y2='150'%20stroke='url(%23logoGradient)'%20stroke-width='2'%20opacity='0.7'/%3e%3cline%20x1='100'%20y1='120'%20x2='100'%20y2='150'%20stroke='url(%23logoGradient)'%20stroke-width='2'%20opacity='0.7'/%3e%3cline%20x1='140'%20y1='120'%20x2='100'%20y2='150'%20stroke='url(%23logoGradient)'%20stroke-width='2'%20opacity='0.7'/%3e%3c!--%20Ethics%20Symbol%20(Balance)%20--%3e%3crect%20x='85'%20y='160'%20width='30'%20height='4'%20fill='url(%23logoGradient)'%20rx='2'/%3e%3cline%20x1='100'%20y1='162'%20x2='100'%20y2='175'%20stroke='url(%23logoGradient)'%20stroke-width='3'/%3e%3ccircle%20cx='90'%20cy='158'%20r='3'%20fill='none'%20stroke='url(%23logoGradient)'%20stroke-width='2'/%3e%3ccircle%20cx='110'%20cy='158'%20r='3'%20fill='none'%20stroke='url(%23logoGradient)'%20stroke-width='2'/%3e%3c/svg%3e" alt="SimulateAI Educational Platform" class="logo-image">
+                <h1 class="site-title">SimulateAI</h1>
+            </div>
+              
+            <!-- Mobile hamburger button -->
+            <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="main-navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+              
+            <nav class="main-nav" role="navigation" aria-label="Main navigation" id="main-navigation">
+                <ul class="nav-list">
+                    <li><a href="#home" class="nav-link active" aria-current="page">Home</a></li>
+                    <li class="nav-item-dropdown">
+                        <a href="#categories" class="nav-link" aria-expanded="false" aria-haspopup="true">
+                            Categories
+                            <span class="dropdown-arrow" aria-hidden="true">▼</span>
+                        </a>
+                        <div class="mega-menu" role="menu" aria-label="Ethics categories">
+                            <div class="mega-menu-content">
+                                <div class="mega-menu-header">
+                                    <h3>Explore AI Ethics Categories</h3>
+                                    <p>Navigate 10 compelling categories of ethical dilemmas in AI and technology</p>
+                                    <div class="mega-menu-filter">
+                                        <input type="text" 
+                                               id="category-search" 
+                                               name="category-search"
+                                               placeholder="Search categories..." 
+                                               class="mega-menu-search" 
+                                               aria-label="Search categories"
+                                               autocomplete="off">
+                                    </div>
+                                </div>
+                                <div class="mega-menu-grid">
+                                    <a href="#category-trolley-problem" class="mega-menu-item" role="menuitem">
+                                        <span class="mega-menu-icon">🚃</span>
+                                        <div class="mega-menu-text">
+                                            <h4>The Trolley Problem</h4>
+                                            <p>Life-and-death moral decisions</p>
+                                        </div>
+                                    </a>
+                                    <a href="#category-ai-black-box" class="mega-menu-item" role="menuitem">
+                                        <span class="mega-menu-icon">📦</span>
+                                        <div class="mega-menu-text">
+                                            <h4>The AI Black Box</h4>
+                                            <p>Unexplainable AI decisions</p>
+                                        </div>
+                                    </a>
+                                    <a href="#category-automation-oversight" class="mega-menu-item" role="menuitem">
+                                        <span class="mega-menu-icon">⚖️</span>
+                                        <div class="mega-menu-text">
+                                            <h4>Automation vs Human Oversight</h4>
+                                            <p>When machines override humans</p>
+                                        </div>
+                                    </a>
+                                    <a href="#category-consent-surveillance" class="mega-menu-item" role="menuitem">
+                                        <span class="mega-menu-icon">👁️</span>
+                                        <div class="mega-menu-text">
+                                            <h4>Consent and Surveillance</h4>
+                                            <p>Privacy vs safety trade-offs</p>
+                                        </div>
+                                    </a>
+                                    <a href="#category-responsibility-blame" class="mega-menu-item" role="menuitem">
+                                        <span class="mega-menu-icon">⚡</span>
+                                        <div class="mega-menu-text">
+                                            <h4>Responsibility and Blame</h4>
+                                            <p>Who's accountable for AI actions?</p>
+                                        </div>
+                                    </a>
+                                    <a href="#category-ship-of-theseus" class="mega-menu-item" role="menuitem">
+                                        <span class="mega-menu-icon">🚢</span>
+                                        <div class="mega-menu-text">
+                                            <h4>The Ship of Theseus</h4>
+                                            <p>Identity and consciousness in AI</p>
+                                        </div>
+                                    </a>
+                                    <a href="#category-simulation-hypothesis" class="mega-menu-item" role="menuitem">
+                                        <span class="mega-menu-icon">🌐</span>
+                                        <div class="mega-menu-text">
+                                            <h4>The Simulation Hypothesis</h4>
+                                            <p>Ethics of simulated realities</p>
+                                        </div>
+                                    </a>
+                                    <a href="#category-experience-machine" class="mega-menu-item" role="menuitem">
+                                        <span class="mega-menu-icon">🎭</span>
+                                        <div class="mega-menu-text">
+                                            <h4>The Experience Machine</h4>
+                                            <p>Artificial happiness and authenticity</p>
+                                        </div>
+                                    </a>
+                                    <a href="#category-sorites-paradox" class="mega-menu-item" role="menuitem">
+                                        <span class="mega-menu-icon">🔄</span>
+                                        <div class="mega-menu-text">
+                                            <h4>The Sorites Paradox</h4>
+                                            <p>Gradual change and moral drift</p>
+                                        </div>
+                                    </a>
+                                    <a href="#category-moral-luck" class="mega-menu-item" role="menuitem">
+                                        <span class="mega-menu-icon">🎲</span>
+                                        <div class="mega-menu-text">
+                                            <h4>Moral Luck</h4>
+                                            <p>Chance events and AI decisions</p>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="mega-menu-footer">
+                                    <a href="#categories" class="mega-menu-view-all">View All Categories →</a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li><a href="#ethics-analysis" class="nav-link">Ethics Guide</a></li>
+                    <li><a href="#educator-tools" class="nav-link">Educator Tools</a></li>
+                    <li><a href="#about" class="nav-link">About</a></li>
+                    <li><a href="#" class="nav-link tour-btn" id="start-tour-nav">📚 Take Tour</a></li>
+                    <li><a href="#" class="nav-link surprise-me-btn" id="surprise-me-nav">🎉Surprise Me!</a></li>
+                </ul>
+            </nav>
+        </div>
+        
+        <!-- Mobile navigation backdrop -->
+        <div class="nav-backdrop" aria-hidden="true"></div>
+    </header>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="main-content" role="main">
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <h2 class="hero-title">Explore AI Ethics Through Open-Ended Discovery</h2>
+                <p class="hero-description">
+                    SimulateAI empowers educators and learners of all ages to explore the complex world of AI ethics, 
+                    robotics, and emerging technologies through consequence-driven simulations that mirror real-world scenarios.
+                    Navigate challenging ethical dilemmas where every decision reveals the intricate balance between innovation, 
+                    responsibility, and human values. Experience firsthand how technological choices shape our future, 
+                    one thoughtful decision at a time.
+                </p>
+                <div class="hero-actions">
+                    <button class="btn btn-primary" id="start-learning" 
+                            aria-describedby="start-learning-description"
+                            title="Navigate to Ethics Categories section">
+                        Start Exploring
+                    </button>
+                    <span id="start-learning-description" class="sr-only">
+                        Navigate to the Ethics Categories section to explore thematic categories of ethical dilemmas
+                    </span>
+                    <!-- Debug: Test scenario modal button -->
+                    <button id="test-scenario-modal">Test Scenario</button>
+                </div>
+            </div>
+            
+            <!-- Interactive Radar Chart Demo moved to hero -->
+            <div class="hero-radar-demo">
+                <h3>Interactive Ethics Radar Chart</h3>
+                <p>Experience how ethical decisions affect multiple dimensions simultaneously. Click the buttons to see different decision patterns:</p>
+                
+                <div class="hero-demo-controls">
+                    <!-- Feedback popover positioned above controls -->
+                    <div id="hero-demo-feedback" class="demo-feedback-popover">
+                        <div class="popover-content"></div>
+                        <div class="popover-arrow"></div>
+                    </div>
+                    
+                    <div class="demo-controls-grid">
+                        <button class="demo-btn" data-pattern="utilitarian" onclick="simulateEthicsPattern('utilitarian', this)">Utilitarian</button>
+                        <button class="demo-btn" data-pattern="deontological" onclick="simulateEthicsPattern('deontological', this)">Rights-Based</button>
+                        <button class="demo-btn" data-pattern="virtue" onclick="simulateEthicsPattern('virtue', this)">Virtue Ethics</button>
+                        <button class="demo-btn balanced-btn" data-pattern="balanced" onclick="simulateEthicsPattern('balanced', this)">Balanced</button>
+                    </div>
+                </div>
+                
+                <div id="hero-ethics-chart" class="radar-chart-wrapper"></div>
+                
+                <!-- Accordion for instructions -->
+                <div class="radar-instructions-accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header" role="button" tabindex="0" aria-expanded="false" onclick="toggleRadarInstructions()">
+                            <span class="accordion-icon">▶</span>
+                            <span class="accordion-title">💡 How to Read the Chart</span>
+                        </div>
+                        <div class="accordion-content collapsed">
+                            <div class="accordion-content-inner">
+                                <p><strong>Hover over any point</strong> on the radar chart to see detailed information about that ethical dimension. Each point shows:</p>
+                                <ul>
+                                    <li><strong>Axis Name:</strong> The specific ethical principle (e.g., Fairness, Sustainability)</li>
+                                    <li><strong>Score Value:</strong> How strongly this approach emphasizes that principle (1-5 scale)</li>
+                                    <li><strong>Description:</strong> What this principle means and why it matters</li>
+                                    <li><strong>Impact Level:</strong> Whether the emphasis is low, moderate, or high</li>
+                                </ul>
+                                <p>The <strong>shape and size</strong> of the radar pattern shows the overall ethical "signature" of each approach. A larger, more balanced shape indicates consideration of multiple principles, while a smaller or skewed shape shows focused emphasis on specific values.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Accordion for ethics glossary -->
+                <div class="ethics-glossary-accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header" role="button" tabindex="0" aria-expanded="false" onclick="toggleEthicsGlossary()">
+                            <span class="accordion-icon">▶</span>
+                            <span class="accordion-title">📚 Ethical Dimensions Glossary</span>
+                        </div>
+                        <div class="accordion-content collapsed">
+                            <div class="accordion-content-inner">
+                                <div class="glossary-grid">
+                                    <div class="glossary-item">
+                                        <h4>Fairness</h4>
+                                        <p>Treats all individuals and groups equitably, ensuring unbiased and just outcomes for everyone involved.</p>
+                                    </div>
+                                    <div class="glossary-item">
+                                        <h4>Sustainability</h4>
+                                        <p>Supports long-term ecological and social well-being, considering environmental and societal impacts.</p>
+                                    </div>
+                                    <div class="glossary-item">
+                                        <h4>Autonomy</h4>
+                                        <p>Respects individual control and self-determination, preserving people's ability to make their own choices.</p>
+                                    </div>
+                                    <div class="glossary-item">
+                                        <h4>Beneficence</h4>
+                                        <p>Promotes well-being and prevents harm, actively working to benefit individuals and communities.</p>
+                                    </div>
+                                    <div class="glossary-item">
+                                        <h4>Transparency</h4>
+                                        <p>Provides openness in decision-making processes, ensuring clarity about how and why decisions are made.</p>
+                                    </div>
+                                    <div class="glossary-item">
+                                        <h4>Accountability</h4>
+                                        <p>Ensures clear responsibility for decisions, with mechanisms for oversight and consequences for actions.</p>
+                                    </div>
+                                    <div class="glossary-item">
+                                        <h4>Privacy</h4>
+                                        <p>Protects personal information and data rights, safeguarding individual confidentiality and control over personal data.</p>
+                                    </div>
+                                    <div class="glossary-item">
+                                        <h4>Proportionality</h4>
+                                        <p>Balances benefits against severity of impact, ensuring responses are appropriate to the situation's scale and context.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="glossary-note">
+                                    <p><strong>Remember:</strong> These dimensions often interact and sometimes conflict with each other. Real ethical decision-making involves thoughtfully balancing these competing values based on context, stakeholder needs, and long-term consequences.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Categories Grid -->
+        <section class="categories-section" id="categories">
+            <div class="section-header">
+                <h2 class="section-title">Ethics Categories</h2>
+                <p class="section-description">
+                    Explore thematic categories of ethical dilemmas. Each category contains multiple scenarios 
+                    that become interactive simulations—discover consequences, perspectives, and solutions through guided exploration.
+                </p>
+            </div>
+            
+            <div class="categories-grid" role="grid" aria-label="Available ethics categories">
+                <!-- Category cards will be dynamically generated -->
+            </div>
+        </section>
+
+        <!-- Ethical Impact Analysis Section -->
+        <section class="ethics-analysis-section" id="ethics-analysis">
+            <div class="section-header">
+                <h2 class="section-title">Understanding Ethical Impact Analysis</h2>
+                <p class="section-description">
+                    Learn how our interactive radar charts help visualize the ethical dimensions of your decisions
+                </p>
+            </div>
+            
+            <div class="ethics-content">
+                <div class="ethics-explanation">
+                    <div class="ethics-card">
+                        <h3>🎯 Real-Time Ethics Visualization</h3>
+                        <p>As you explore different scenarios and make choices, our radar chart displays how your decisions impact eight key ethical dimensions. This immediate feedback helps you understand the complex trade-offs inherent in ethical decision-making.</p>
+                    </div>
+                    
+                    <div class="ethics-card">
+                        <h3>📊 Multi-Dimensional Analysis</h3>
+                        <p>Unlike simple right/wrong answers, our radar chart shows that ethical decisions affect multiple areas simultaneously. See how choices about privacy might impact transparency, or how promoting fairness could influence autonomy.</p>
+                    </div>
+                    
+                    <div class="ethics-card">
+                        <h3>🔍 Educational Discovery</h3>
+                        <p>The radar chart serves as a learning tool, not a judgment system. There are no "perfect" scores—instead, explore how different ethical frameworks prioritize different values and consider the context-dependent nature of ethical reasoning.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Educator Tools Section -->
+        <section class="educator-section" id="educator-tools">
+            <div class="section-header">
+                <h2 class="section-title">Comprehensive Educator Support</h2>
+                <p class="section-description">
+                    ISTE-aligned resources and professional development tools for seamless classroom integration
+                </p>
+            </div>
+            
+            <div class="educator-grid">
+                <div class="educator-card">
+                    <h3>Standards-Aligned Curriculum</h3>
+                    <p>Ready-to-use lesson plans aligned with ISTE Standards and educational best practices</p>
+                    <button class="btn btn-outline">Download Resources</button>
+                </div>
+                
+                <div class="educator-card">
+                    <h3>Open-Ended Assessment Tools</h3>
+                    <p>Rubrics and reflection frameworks for evaluating critical thinking and ethical reasoning</p>
+                    <button class="btn btn-outline">View Assessment Tools</button>
+                </div>
+                
+                <div class="educator-card">
+                    <h3>Learning Analytics Dashboard</h3>
+                    <p>Track student exploration patterns and evidence-based learning outcomes</p>
+                    <button class="btn btn-outline">Open Dashboard</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="about-section" id="about">
+            <div class="section-header">
+                <h2 class="section-title">About SimulateAI</h2>
+                <p class="section-description">
+                    Digital science laboratory for AI ethics education—where discovery drives understanding
+                </p>
+            </div>
+            
+            <div class="about-content">
+                <div class="about-card">
+                    <h3>Our Educational Mission</h3>
+                    <p>Empowering educators and learners through open-ended, consequence-driven simulations that build critical thinking skills and ethical reasoning frameworks for an AI-driven world.</p>
+                </div>
+                
+                <div class="about-card">
+                    <h3>PhET-Inspired Excellence</h3>
+                    <p>Following proven educational models, we create research-based, universally accessible simulations with comprehensive pedagogical integration for all learning environments.</p>
+                </div>
+                
+                <div class="about-card">
+                    <h3>Professional Standards</h3>
+                    <p>ISTE-aligned resources, evidence-based outcomes, and measurable learning objectives designed to meet the highest educational technology standards.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Enhanced Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-content">
+            <!-- Main footer sections -->
+            <div class="footer-sections">
+                <!-- Privacy Section -->
+                <div class="footer-section" id="privacy">
+                    <h3 class="footer-section-title">Privacy Policy</h3>
+                    <div class="footer-section-content">
+                        <p>We are committed to protecting your privacy. This platform:</p>
+                        <ul class="footer-list">
+                            <li>Stores learning progress locally in your browser</li>
+                            <li>Uses anonymized analytics to improve educational content</li>
+                            <li>Does not share personal information with third parties</li>
+                            <li>Complies with educational privacy standards (FERPA, COPPA)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Accessibility Section -->
+                <div class="footer-section" id="accessibility">
+                    <h3 class="footer-section-title">Accessibility Statement</h3>
+                    <div class="footer-section-content">
+                        <p>This platform is designed to be accessible to all learners. Features include:</p>
+                        <ul class="footer-list">
+                            <li>Keyboard navigation support</li>
+                            <li>Screen reader compatibility</li>
+                            <li>High contrast and large text options</li>
+                            <li>Reduced motion settings for users with vestibular disorders</li>
+                            <li>WCAG 2.1 AA compliance</li>
+                        </ul>
+                        <p>If you encounter any accessibility barriers, please <a href="#contact" class="footer-link">contact us</a>.</p>
+                    </div>
+                </div>
+
+                <!-- Contact Section -->
+                <div class="footer-section" id="contact">
+                    <h3 class="footer-section-title">Connect With SimulateAI</h3>
+                    <div class="footer-section-content">
+                        <p>Join our educational community! Connect with us for:</p>
+                        <ul class="footer-list">
+                            <li>Educator support and professional development</li>
+                            <li>Institutional partnerships and ISTE certification</li>
+                            <li>Technical assistance and platform guidance</li>
+                            <li>Curriculum integration and assessment support</li>
+                            <li>Accessibility resources and accommodations</li>
+                        </ul>
+                        <div class="contact-info">
+                            <p><strong>Email:</strong> <a href="mailto:educators@simulateai.org" class="footer-link">educators@simulateai.org</a></p>
+                            <p><strong>GitHub:</strong> <a href="https://github.com/simulateai" target="_blank" rel="noopener noreferrer" class="footer-link">SimulateAI Open Source</a></p>
+                            <p><strong>Resources:</strong> <a href="docs/EDUCATOR_GUIDE.md" class="footer-link">Educator Guide</a> | <a href="docs/ISTE_CERTIFICATION_ROADMAP.md" class="footer-link">ISTE Certification</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer bottom -->
+            <div class="footer-bottom">
+                <p class="footer-copyright">&copy; 2025 SimulateAI Educational Platform. Open source AI ethics education for all learners.</p>
+                <nav class="footer-nav" aria-label="Footer navigation">
+                    <a href="#privacy" class="footer-nav-link">Privacy</a>
+                    <a href="#accessibility" class="footer-nav-link">Accessibility</a>
+                    <a href="#contact" class="footer-nav-link">Contact</a>
+                    <a href="docs/EDUCATOR_GUIDE.md" class="footer-nav-link">Educators</a>
+                </nav>
+            </div>
+        </div>
+    </footer>
+      <!-- Simulation Modal - Updated to use advanced-ui-components.css modal system -->
+    <div id="simulation-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-title" inert>
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h2 id="modal-title" class="modal-title"></h2>
+                <button class="modal-close" aria-label="Close simulation" type="button">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="simulation-container" class="simulation-container" role="main" aria-label="Interactive simulation">
+                    <!-- Active simulation will be loaded here -->
+                </div>
+                
+                <div class="simulation-controls" role="complementary" aria-label="Simulation controls and metrics">
+                    <div class="ethics-meters">
+                        <!-- Enhanced ethics meters with visual engine will be loaded here -->
+                        <div class="ethics-meters-header">
+                            <h3>Ethics Monitoring</h3>
+                            <p>Track how your decisions affect different ethical dimensions</p>
+                        </div>
+                        <div class="meters-container" role="group" aria-label="Ethics meters">
+                            <!-- Enhanced meters will be dynamically created here -->
+                        </div>
+                    </div>
+                    
+                    <div class="simulation-actions">
+                        <div class="actions-header">
+                            <h3>Simulation Controls</h3>
+                        </div>
+                        <div class="actions-container" role="group" aria-label="Simulation action buttons">
+                            <!-- Enhanced interactive buttons will be created here -->
+                            <button class="btn btn-secondary" id="reset-simulation" style="display: none;" type="button">
+                                <span class="btn-text">Reset</span>
+                                <span class="btn-description sr-only">Reset the current simulation to start over</span>
+                            </button>
+                            <button class="btn btn-primary" id="next-scenario" style="display: none;" type="button">
+                                <span class="btn-text">Next Scenario</span>
+                                <span class="btn-description sr-only">Continue to the next scenario</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    <!-- Loading indicator -->
+    <div id="loading" class="loading" aria-hidden="true" role="status">
+        <div class="loading-spinner" aria-hidden="true"></div>
+        <p class="loading-text">Loading simulation...</p>
+        <div class="loading-progress" role="progressbar" aria-label="Loading progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar"></div>
+        </div>
+    </div>
+    
+    <!-- Error boundary -->
+    <div id="error-boundary" class="error-boundary" role="alert" aria-hidden="true">
+        <div class="error-content">
+            <h2>Something went wrong</h2>
+            <p class="error-message"></p>
+            <div class="error-actions">
+                <button class="btn btn-primary" id="retry-action" type="button">Try Again</button>
+                <button class="btn btn-secondary" id="report-error" type="button">Report Issue</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+
+    
+    <!-- Performance monitoring -->
+    <script>
+        // Enhanced performance monitoring for our modernized engine
+        if ('performance' in window && 'mark' in performance) {
+            performance.mark('page-start');
+            
+            window.addEventListener('load', () => {
+                performance.mark('page-loaded');
+                performance.measure('page-load-time', 'page-start', 'page-loaded');
+                
+                // Report to our analytics system
+                const measure = performance.getEntriesByName('page-load-time')[0];
+                if (measure && window.SimpleAnalytics) {
+                    window.SimpleAnalytics.trackPerformance('page-load', measure.duration);
+                }
+            });
+        }
+        
+        // Enhanced error handling
+        window.addEventListener('error', (event) => {
+            // Log error for debugging (console allowed in HTML for error handling)
+            if (window.ErrorBoundary) {
+                window.ErrorBoundary.handleError(event.error);
+            }
+        });
+        
+        window.addEventListener('unhandledrejection', (event) => {
+            // Log promise rejection for debugging (console allowed in HTML for error handling)
+            if (window.ErrorBoundary) {
+                window.ErrorBoundary.handleError(event.reason);
+            }
+        });
+    </script>
+</body>
+</html>
