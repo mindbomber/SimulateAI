@@ -51,6 +51,24 @@
   --component-font-scale: var(--font-scale, 1);
 }
 
+/* ===== TRANSITION PRESETS ===== */
+/* Standardized transition patterns to reduce duplication */
+.transition-standard {
+  transition: all var(--transition-fast, 0.15s) ease-in-out;
+}
+
+.transition-modal {
+  transition: opacity var(--transition-modal, 0.3s) ease-out;
+}
+
+.transition-tooltip {
+  transition: opacity var(--transition-fast, 0.15s) ease-in-out;
+}
+
+.transition-nav {
+  transition: all var(--transition-normal, 0.2s) ease-in-out;
+}
+
 /* ===== MODAL DIALOG STYLES ===== */
 .modal-backdrop {
   position: fixed;
@@ -63,13 +81,18 @@
   opacity: 0;
   transition: opacity var(--transition-modal);
   backdrop-filter: blur(2px);
+
+  /* Center the modal dialog */
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  contain: strict;
-  padding: var(--component-padding);
-  padding-top: calc(var(--component-padding) * 2);
+
+  /* Enable scrolling for tall modals */
   overflow-y: auto;
+  padding: var(--component-padding);
+
+  /* Performance optimization */
+  contain: strict;
 }
 
 .modal-backdrop.visible {
@@ -77,23 +100,22 @@
 }
 
 .modal-dialog {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   background: var(--modal-background);
   border-radius: var(--modal-border-radius);
   box-shadow: var(--modal-shadow);
   z-index: var(--z-modal);
   min-width: 300px;
   max-width: 90vw;
-  max-height: 95vh; /* Increased from 90vh for better usability */
+  max-height: 95vh;
+
+  /* Remove conflicting positioning - let flexbox handle centering */
+  position: relative;
 
   /* Flexbox layout for proper header/body/footer stacking */
   display: flex;
   flex-direction: column;
 
-  /* Remove overflow: hidden that was clipping content */
+  /* Allow content to overflow properly */
   overflow: visible;
   animation: modalSlideIn var(--transition-modal);
   border: 1px solid var(--modal-border);
@@ -552,6 +574,7 @@
   min-height: var(--touch-target-min);
 }
 
+/* Consolidated form input states */
 .form-input:focus,
 .form-select:focus,
 .form-textarea:focus {
@@ -723,47 +746,46 @@
   border: 6px solid transparent;
 }
 
-.tooltip.top {
-  margin-bottom: 6px;
+/* Tooltip Positioning - Consolidated */
+.tooltip.top,
+.tooltip.bottom {
+  margin: 6px 0;
+}
+
+.tooltip.left,
+.tooltip.right {
+  margin: 0 6px;
+}
+
+.tooltip.top::before,
+.tooltip.bottom::before {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.tooltip.left::before,
+.tooltip.right::before {
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .tooltip.top::before {
   top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
   border-top-color: var(--tooltip-background);
-}
-
-.tooltip.bottom {
-  margin-top: 6px;
 }
 
 .tooltip.bottom::before {
   bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
   border-bottom-color: var(--tooltip-background);
-}
-
-.tooltip.left {
-  margin-right: 6px;
 }
 
 .tooltip.left::before {
   left: 100%;
-  top: 50%;
-  transform: translateY(-50%);
   border-left-color: var(--tooltip-background);
-}
-
-.tooltip.right {
-  margin-left: 6px;
 }
 
 .tooltip.right::before {
   right: 100%;
-  top: 50%;
-  transform: translateY(-50%);
   border-right-color: var(--tooltip-background);
 }
 
@@ -1160,10 +1182,19 @@
 
 /* ===== TOUCH DEVICE OPTIMIZATIONS ===== */
 @media (hover: none) and (pointer: coarse) {
+  /* Consolidated touch targets */
+  .nav-item,
+  .modal-button,
+  .modal-close,
+  .form-input,
+  .form-select,
+  .form-textarea {
+    min-height: var(--touch-target-min);
+  }
+
   .nav-item,
   .modal-button,
   .modal-close {
-    min-height: var(--touch-target-min);
     min-width: var(--touch-target-min);
   }
 
@@ -1183,8 +1214,6 @@
     font-size: calc(
       var(--font-size-base, 16px) * var(--component-font-scale)
     ); /* Prevent zoom on iOS */
-
-    min-height: var(--touch-target-min);
   }
 
   /* Hide hover effects on touch devices */
@@ -1333,11 +1362,14 @@
 @media only screen and (width <= 767px) {
   .modal-backdrop {
     padding: calc(var(--component-padding) * 0.5);
+    align-items: flex-start;
     padding-top: var(--component-padding);
   }
 
-  .modal-backdrop .modal-dialog {
+  .modal-dialog {
     max-height: calc(100vh - calc(var(--component-padding) * 2));
+    margin-top: auto;
+    margin-bottom: auto;
   }
 
   .modal-footer {
@@ -1366,7 +1398,6 @@
     padding-top: calc(var(--component-padding) * 0.5);
   }
 
-  .modal-backdrop .modal-dialog,
   .modal-dialog {
     max-height: calc(100vh - var(--component-padding));
   }
@@ -1445,13 +1476,10 @@
 
 /* ===== MODAL LAYOUT SAFETY & EDGE CASES ===== */
 
-/* Reset modal-dialog positioning when inside flexbox backdrop */
-.modal-backdrop .modal-dialog {
-  position: relative;
-  top: auto;
-  left: auto;
-  transform: none;
-  margin: auto;
+/* Modal dialog is now positioned by flexbox, not absolute positioning */
+.modal-dialog {
+  /* Remove conflicting margin auto since flexbox handles centering */
+  margin: 0;
   max-height: calc(100vh - calc(var(--component-padding) * 4));
 }
 
@@ -1610,11 +1638,8 @@ body.dark-mode .chart-no-data {
   color: var(--theme-text-secondary);
 }
 
-/* Form components */
-body.dark-mode .form-field {
-  color: var(--theme-text-primary);
-}
-
+/* Form components - consolidated dark mode styles */
+body.dark-mode .form-field,
 body.dark-mode .form-label {
   color: var(--theme-text-primary);
 }

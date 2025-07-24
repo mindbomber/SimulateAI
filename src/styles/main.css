@@ -205,7 +205,7 @@ body {
   overflow-x: hidden;
 
   /* Add padding for fixed header */
-  padding-top: 80px; /* Approximate header height */
+  padding-top: var(--header-h, 80px); /* Use header height variable */
 
   /* Prevent scroll anchoring that might restore position */
   overflow-anchor: none;
@@ -626,7 +626,9 @@ html.loaded {
 @media only screen and (width <= 767px) {
   /* Adjust body padding for smaller header on tablets */
   body {
-    padding-top: 95px !important; /* Increased padding with !important for tablet header */
+    padding-top: calc(
+      var(--header-h, 80px) + 15px
+    ) !important; /* Increased padding with !important for tablet header */
   }
 
   .simulations-section,
@@ -640,7 +642,9 @@ html.loaded {
 @media only screen and (width <= 428px) {
   /* Adjust body padding for smaller header on mobile */
   body {
-    padding-top: 90px !important; /* Ensure adequate clearance for mobile header with !important */
+    padding-top: calc(
+      var(--header-h, 80px) + 10px
+    ) !important; /* Ensure adequate clearance for mobile header with !important */
   }
 
   .simulations-section,

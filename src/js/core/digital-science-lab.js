@@ -144,6 +144,72 @@ class DigitalScienceLab {
         "Test and iterate solutions",
       ],
     });
+
+    // Privacy & Data Protection Lab
+    this.labStations.set("privacy-protection", {
+      name: "Privacy & Data Protection Laboratory",
+      purpose: "Explore privacy implications and data protection in AI systems",
+      tools: [
+        "Data Flow Analyzer",
+        "Privacy Impact Assessment Tools",
+        "Consent Management Simulator",
+        "Anonymization Testing Platform",
+      ],
+      experiments: [
+        "personal-data-audit",
+        "consent-mechanism-design",
+        "data-minimization-strategies",
+      ],
+      learningOutcomes: [
+        "Understand privacy by design principles",
+        "Evaluate data collection practices",
+        "Design privacy-preserving AI systems",
+      ],
+    });
+
+    // Autonomy & Agency Lab
+    this.labStations.set("autonomy-agency", {
+      name: "Autonomy & Human Agency Laboratory",
+      purpose: "Examine the balance between AI autonomy and human control",
+      tools: [
+        "Decision Pathway Mapper",
+        "Human-AI Interaction Simulator",
+        "Autonomy Level Calculator",
+        "Override Mechanism Designer",
+      ],
+      experiments: [
+        "autonomous-vehicle-scenarios",
+        "medical-ai-decision-support",
+        "financial-trading-algorithms",
+      ],
+      learningOutcomes: [
+        "Analyze appropriate levels of AI autonomy",
+        "Design human oversight mechanisms",
+        "Evaluate human-AI collaboration models",
+      ],
+    });
+
+    // Justice & Rights Lab
+    this.labStations.set("justice-rights", {
+      name: "Justice & Human Rights Laboratory",
+      purpose: "Investigate AI impacts on justice, equality, and human rights",
+      tools: [
+        "Rights Impact Analyzer",
+        "Justice Metrics Dashboard",
+        "Equality Assessment Tools",
+        "Legal Compliance Checker",
+      ],
+      experiments: [
+        "criminal-justice-ai-analysis",
+        "hiring-equity-assessment",
+        "healthcare-access-evaluation",
+      ],
+      learningOutcomes: [
+        "Assess AI impacts on human rights",
+        "Measure justice and equality outcomes",
+        "Design rights-preserving AI systems",
+      ],
+    });
   }
 
   /**
@@ -600,23 +666,100 @@ class DigitalScienceLab {
       switch (tag.toLowerCase()) {
         case "bias":
         case "fairness":
+        case "algorithmic-bias":
+        case "discrimination":
+        case "transparency":
+        case "training-bias":
+        case "bias-accumulation":
+        case "cumulative-bias":
           relevantStations.push(this.labStations.get("bias-analysis"));
           break;
+
         case "ethics":
+        case "decision-making":
+        case "responsibility":
+        case "utilitarianism":
+        case "deontology":
+        case "moral-calculus":
+        case "moral-weights":
+        case "ethical-frameworks":
           relevantStations.push(this.labStations.get("ethics-decision"));
           break;
+
         case "education":
         case "scenarios":
+        case "solution-design":
+        case "ethical-ai":
+        case "design-ethics":
+        case "system-design":
           relevantStations.push(this.labStations.get("solution-design"));
           break;
+
         case "open-ended":
+        case "social-impact":
+        case "real-world":
+        case "consequences":
+        case "stakeholder-impact":
+        case "societal-implications":
+          relevantStations.push(this.labStations.get("impact-analysis"));
+          break;
+
+        // Additional mappings for comprehensive coverage
+        case "privacy":
+        case "surveillance":
+        case "data-protection":
+        case "consent":
+        case "personal-data":
+        case "data-security":
+          // Privacy gets its dedicated lab plus impact analysis
+          relevantStations.push(this.labStations.get("privacy-protection"));
+          relevantStations.push(this.labStations.get("impact-analysis"));
+          break;
+
+        case "autonomy":
+        case "autonomous-systems":
+        case "autonomous-vehicles":
+        case "agency":
+        case "human-control":
+        case "human-oversight":
+          // Autonomy gets its dedicated lab plus ethics
+          relevantStations.push(this.labStations.get("autonomy-agency"));
+          relevantStations.push(this.labStations.get("ethics-decision"));
+          break;
+
+        case "justice":
+        case "equality":
+        case "equity":
+        case "civil-rights":
+        case "human-rights":
+        case "legal-compliance":
+          // Justice gets its dedicated lab plus bias analysis
+          relevantStations.push(this.labStations.get("justice-rights"));
+          relevantStations.push(this.labStations.get("bias-analysis"));
+          break;
+
+        case "life-death":
+        case "life-preservation":
+        case "harm-prevention":
+        case "safety":
+        case "risk-assessment":
+          // Life-death scenarios map to ethics and impact analysis
+          relevantStations.push(this.labStations.get("ethics-decision"));
           relevantStations.push(this.labStations.get("impact-analysis"));
           break;
       }
     }
 
-    return relevantStations.length > LAB_CONSTANTS.ARRAY_THRESHOLDS.EMPTY_LENGTH
-      ? relevantStations
+    // Remove duplicates while preserving order
+    const uniqueStations = relevantStations
+      .filter(
+        (station, index, array) =>
+          array.findIndex((s) => s?.name === station?.name) === index,
+      )
+      .filter((station) => station !== undefined);
+
+    return uniqueStations.length > LAB_CONSTANTS.ARRAY_THRESHOLDS.EMPTY_LENGTH
+      ? uniqueStations
       : null;
   }
 
@@ -643,6 +786,97 @@ class DigitalScienceLab {
     }
 
     return experiments;
+  }
+
+  /**
+   * Generate lab progress reports for educators
+   */
+  generateProgressReport(studentId, timeframe = "semester") {
+    return {
+      studentId,
+      timeframe,
+      labStationProgress: this.trackLabStationProgress(studentId),
+      experimentCompletion: this.trackExperimentProgress(studentId),
+      skillDevelopment: this.assessSkillDevelopment(studentId),
+      collaborationMetrics: this.trackCollaborationMetrics(studentId),
+      ethicalReasoningGrowth: this.measureEthicalReasoningGrowth(studentId),
+      recommendations: this.generatePersonalizedRecommendations(studentId),
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  /**
+   * Create industry partnership integration
+   */
+  setupIndustryIntegration() {
+    return {
+      guestSpeakerProgram: {
+        name: "AI Ethics Professionals Network",
+        purpose: "Connect students with industry experts",
+        features: [
+          "Virtual guest lectures",
+          "Q&A sessions with AI ethicists",
+          "Career pathway discussions",
+          "Real-world case study presentations",
+        ],
+      },
+      internshipProgram: {
+        name: "AI Ethics Internship Pipeline",
+        purpose: "Provide real-world experience opportunities",
+        partners: [
+          "Tech companies with AI ethics teams",
+          "Non-profits focused on AI safety",
+          "Government agencies working on AI policy",
+          "Research institutions studying AI impact",
+        ],
+      },
+      projectSponsorship: {
+        name: "Industry-Sponsored Ethics Projects",
+        purpose: "Students work on real industry challenges",
+        benefits: [
+          "Authentic problem-solving experience",
+          "Mentorship from industry professionals",
+          "Portfolio development opportunities",
+          "Potential job placement pathways",
+        ],
+      },
+    };
+  }
+
+  /**
+   * Advanced research data collection system
+   */
+  setupResearchDataCollection() {
+    return {
+      ethicsLearningAnalytics: {
+        purpose: "Study how students develop ethical reasoning",
+        dataPoints: [
+          "Decision patterns across scenarios",
+          "Stakeholder consideration evolution",
+          "Bias recognition improvement",
+          "Collaborative problem-solving growth",
+        ],
+        privacy: "Fully anonymized, IRB-approved protocols",
+      },
+      pedagogicalEffectiveness: {
+        purpose: "Optimize teaching methods for AI ethics",
+        metrics: [
+          "Lab station engagement levels",
+          "Experiment completion rates",
+          "Assessment performance trends",
+          "Student feedback analysis",
+        ],
+      },
+      curriculumDevelopment: {
+        purpose: "Inform development of new educational content",
+        insights: [
+          "Most challenging ethical concepts",
+          "Most effective teaching strategies",
+          "Optimal sequence for skill development",
+          "Age-appropriate complexity levels",
+        ],
+      },
+    };
   }
 
   // Helper methods
@@ -709,6 +943,63 @@ class DigitalScienceLab {
           "Single perspective or viewpoint considered",
         ],
       },
+    };
+  }
+
+  /**
+   * Track lab station progress for individual students
+   */
+  trackLabStationProgress(studentId) {
+    return {
+      stationsVisited: this.getVisitedStations(studentId),
+      stationsCompleted: this.getCompletedStations(studentId),
+      timeSpentPerStation: this.getStationTimeMetrics(studentId),
+      skillsAcquired: this.getAcquiredSkills(studentId),
+      preferredLearningStyles: this.identifyLearningPreferences(studentId),
+    };
+  }
+
+  /**
+   * Track experiment completion and performance
+   */
+  trackExperimentProgress(studentId) {
+    return {
+      experimentsCompleted: this.getCompletedExperiments(studentId),
+      experimentsInProgress: this.getInProgressExperiments(studentId),
+      averageCompletionTime: this.calculateAverageCompletionTime(studentId),
+      qualityOfWork: this.assessWorkQuality(studentId),
+      collaborationFrequency: this.measureCollaborationLevel(studentId),
+    };
+  }
+
+  /**
+   * Assess skill development across ethical reasoning domains
+   */
+  assessSkillDevelopment(studentId) {
+    return {
+      ethicalReasoningLevel: this.measureEthicalReasoning(studentId),
+      biasDetectionSkills: this.assessBiasDetection(studentId),
+      stakeholderAnalysisAbility: this.evaluateStakeholderAnalysis(studentId),
+      solutionDesignCreativity: this.rateSolutionDesign(studentId),
+      communicationEffectiveness: this.assessCommunication(studentId),
+      criticalThinkingGrowth: this.measureCriticalThinking(studentId),
+    };
+  }
+
+  /**
+   * Generate personalized learning recommendations
+   */
+  generatePersonalizedRecommendations(studentId) {
+    const progress = this.trackLabStationProgress(studentId);
+    const skills = this.assessSkillDevelopment(studentId);
+
+    return {
+      nextLabStations: this.recommendNextStations(progress, skills),
+      suggestedExperiments: this.recommendExperiments(skills),
+      skillFocusAreas: this.identifySkillGaps(skills),
+      collaborationOpportunities: this.suggestCollaborations(studentId),
+      extensionActivities: this.recommendExtensions(skills),
+      resourceRecommendations: this.suggestResources(skills),
     };
   }
 }

@@ -60,7 +60,7 @@ export class PerformanceMonitor {
       this.startTimes.delete(key);
 
       // Check against thresholds
-      if (duration > PERFORMANCE_THRESHOLDS.renderTime) {
+      if (duration > PERFORMANCE_THRESHOLDS.RENDER_WARNING_MS) {
         ComponentDebug.warn(
           `${this.name} ${key} exceeded threshold: ${duration.toFixed(2)}ms`,
         );
@@ -92,13 +92,18 @@ export class PerformanceMonitor {
     const renderTime = performance.now() - metrics.renderStart;
     const memoryUsage = this.getMemoryUsage();
 
-    if (renderTime > PERFORMANCE_THRESHOLDS.renderTime) {
+    if (renderTime > PERFORMANCE_THRESHOLDS.RENDER_WARNING_MS) {
       ComponentDebug.warn(
         `Component ${componentId} render time exceeded threshold: ${renderTime}ms`,
       );
     }
 
-    if (memoryUsage > PERFORMANCE_THRESHOLDS.memoryWarning) {
+    if (
+      memoryUsage >
+      PERFORMANCE_THRESHOLDS.MEMORY_WARNING_MB *
+        INPUT_UTILITY_CONSTANTS.BYTES_PER_KB *
+        INPUT_UTILITY_CONSTANTS.BYTES_PER_KB
+    ) {
       ComponentDebug.warn(
         `High memory usage detected: ${memoryUsage / INPUT_UTILITY_CONSTANTS.BYTES_PER_KB / INPUT_UTILITY_CONSTANTS.BYTES_PER_KB}MB`,
       );

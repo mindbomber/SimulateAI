@@ -152,7 +152,8 @@
   --container-max-width: var(--container-xl);
 
   /* ===== COMPONENT DIMENSIONS ===== */
-  --header-height: 4rem; /* 64px */
+  --header-height: 5rem; /* 80px - consistent with --header-h */
+  --header-h: 80px; /* Alias for compatibility */
   --sidebar-width: 16rem; /* 256px */
   --modal-max-width: 32rem; /* 512px */
   --modal-max-height: 90vh;

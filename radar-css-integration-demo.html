@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Radar Chart CSS Integration Demo</title>
+    <link rel="stylesheet" href="src/styles/main.css" />
+    <link rel="stylesheet" href="src/styles/radar-chart.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .demo-section {
+        margin: 30px 0;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+
+      .demo-button {
+        margin: 10px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        background: #4a9eff;
+        color: white;
+        cursor: pointer;
+      }
+
+      .demo-button:hover {
+        background: #3a8eef;
+      }
+
+      .radar-chart-demo {
+        width: 300px;
+        height: 300px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        margin: 20px;
+        padding: 20px;
+        display: inline-block;
+        text-align: center;
+        transition: all 0.3s ease;
+      }
+
+      .color-demo {
+        width: 100px;
+        height: 20px;
+        margin: 10px;
+        border-radius: 4px;
+        display: inline-block;
+        text-align: center;
+        line-height: 20px;
+        font-size: 12px;
+      }
+
+      .status-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+      }
+
+      .status-success {
+        background-color: #00aa00;
+      }
+      .status-info {
+        background-color: #4a9eff;
+      }
+      .status-warning {
+        background-color: #ff9900;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🎨 Radar Chart CSS Integration Demo</h1>
+    <p>
+      <strong
+        >Demonstrating the new CSS integration features added to
+        radar-config-loader.js</strong
+      >
+    </p>
+
+    <div class="demo-section">
+      <h2>🎯 Theme Application Demo</h2>
+      <p>Test dynamic theme application to radar chart containers</p>
+
+      <button class="demo-button" onclick="applyTheme('light')">
+        Apply Light Theme
+      </button>
+      <button class="demo-button" onclick="applyTheme('dark')">
+        Apply Dark Theme
+      </button>
+      <button class="demo-button" onclick="applyTheme('high-contrast')">
+        Apply High Contrast
+      </button>
+      <button class="demo-button" onclick="clearThemes()">Clear Themes</button>
+
+      <div>
+        <div class="radar-chart-demo radar-chart-container" id="theme-demo-1">
+          <h3>Chart Container 1</h3>
+          <p>Theme classes will be applied here</p>
+        </div>
+
+        <div class="radar-chart-demo hero-radar-chart" id="theme-demo-2">
+          <h3>Hero Chart 2</h3>
+          <p>Watch the theme changes</p>
+        </div>
+      </div>
+
+      <div id="theme-status">
+        <p>Current theme: <span id="current-theme">none</span></p>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h2>🎨 CSS Custom Properties Integration</h2>
+      <p>Test configuration synchronization with CSS custom properties</p>
+
+      <button class="demo-button" onclick="syncConfigColors()">
+        Sync Colors from Config
+      </button>
+      <button class="demo-button" onclick="syncBreakpoints()">
+        Sync Responsive Breakpoints
+      </button>
+      <button class="demo-button" onclick="fullCSSIntegration()">
+        Full CSS Integration
+      </button>
+
+      <div id="color-demo-area">
+        <h3>Score Colors (will update from config)</h3>
+        <div class="color-demo score-fill" data-score="0">Score 0-1</div>
+        <div class="color-demo score-fill" data-score="2">Score 2</div>
+        <div class="color-demo score-fill" data-score="2.5">Score 2.5</div>
+        <div class="color-demo score-fill" data-score="3">Score 3</div>
+        <div class="color-demo score-fill" data-score="4">Score 4</div>
+        <div class="color-demo score-fill" data-score="5">Score 5</div>
+      </div>
+
+      <div id="css-status">
+        <p>
+          CSS Properties Status: <span id="css-sync-status">Not synced</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h2>📱 Responsive Integration Demo</h2>
+      <p>Test responsive breakpoints from configuration</p>
+
+      <button class="demo-button" onclick="testResponsive()">
+        Apply Responsive Config
+      </button>
+      <button class="demo-button" onclick="showBreakpoints()">
+        Show Current Breakpoints
+      </button>
+
+      <div id="responsive-status">
+        <p>Mobile breakpoint: <span id="mobile-bp">--</span></p>
+        <p>Tablet breakpoint: <span id="tablet-bp">--</span></p>
+        <p>Desktop breakpoint: <span id="desktop-bp">--</span></p>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h2>📊 Integration Status</h2>
+      <div id="integration-status">
+        <p>
+          <span class="status-indicator status-info"></span>
+          <strong>Theme Integration:</strong>
+          <span id="theme-integration-status">Ready</span>
+        </p>
+        <p>
+          <span class="status-indicator status-info"></span>
+          <strong>Color Sync:</strong> <span id="color-sync-status">Ready</span>
+        </p>
+        <p>
+          <span class="status-indicator status-info"></span>
+          <strong>Responsive Integration:</strong>
+          <span id="responsive-integration-status">Ready</span>
+        </p>
+        <p>
+          <span class="status-indicator status-info"></span>
+          <strong>CSS Custom Properties:</strong>
+          <span id="css-properties-status">Ready</span>
+        </p>
+      </div>
+    </div>
+
+    <script type="module">
+      // Import the enhanced radar config loader
+      import {
+        loadRadarConfig,
+        applyThemeToContainer,
+        syncColorsWithCSS,
+        applyResponsiveCSS,
+        initializeCSSIntegration,
+        getResponsiveBreakpoint,
+      } from "./src/js/utils/radar-config-loader.js";
+
+      let currentConfig = null;
+      let currentTheme = null;
+
+      // Load configuration on page load
+      async function loadConfig() {
+        try {
+          currentConfig = await loadRadarConfig();
+          document.getElementById("color-sync-status").textContent =
+            "Config loaded";
+          updateStatus("theme-integration-status", "Config loaded", "success");
+          console.log("Radar configuration loaded:", currentConfig);
+          return currentConfig;
+        } catch (error) {
+          console.error("Failed to load radar configuration:", error);
+          updateStatus("color-sync-status", "Failed to load config", "warning");
+
+          // Create mock config for demo purposes
+          return createMockConfig();
+        }
+      }
+
+      function createMockConfig() {
+        return {
+          pointColors: {
+            0: "#ff4757",
+            2: "#ff6b35",
+            2.5: "#ffa726",
+            3: "#ffeb3b",
+            4: "#8bc34a",
+            5: "#4caf50",
+          },
+          gridColors: {
+            0: "rgba(0, 0, 0, 0.1)",
+            1: "rgba(0, 0, 0, 0.15)",
+            2: "rgba(0, 0, 0, 0.2)",
+            default: "rgba(0, 0, 0, 0.1)",
+          },
+          scoring: {
+            maxScore: 5,
+            minScore: 0,
+            neutralScore: 3,
+            positiveThreshold: 4,
+          },
+          chart: {
+            mobileBreakpoint: 768,
+            tabletBreakpoint: 1024,
+            desktopBreakpoint: 1200,
+          },
+          themes: {
+            light: {
+              colors: {
+                background: "#ffffff",
+                border: "#e2e8f0",
+                text: "#333333",
+              },
+            },
+            dark: {
+              colors: {
+                background: "#1a1a1a",
+                border: "#444444",
+                text: "#ffffff",
+              },
+            },
+            "high-contrast": {
+              colors: {
+                background: "#000000",
+                border: "#ffffff",
+                text: "#ffffff",
+              },
+            },
+          },
+        };
+      }
+
+      function updateStatus(elementId, text, type = "info") {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.textContent = text;
+          const indicator =
+            element.parentElement.querySelector(".status-indicator");
+          if (indicator) {
+            indicator.className = `status-indicator status-${type}`;
+          }
+        }
+      }
+
+      // Global functions for demo buttons
+      window.applyTheme = async function (themeName) {
+        if (!currentConfig) {
+          currentConfig = await loadConfig();
+        }
+
+        const containers = document.querySelectorAll(
+          ".radar-chart-container, .hero-radar-chart",
+        );
+        containers.forEach((container) => {
+          applyThemeToContainer(container, themeName);
+        });
+
+        currentTheme = themeName;
+        document.getElementById("current-theme").textContent = themeName;
+        updateStatus(
+          "theme-integration-status",
+          `Applied ${themeName} theme`,
+          "success",
+        );
+      };
+
+      window.clearThemes = function () {
+        const containers = document.querySelectorAll(
+          ".radar-chart-container, .hero-radar-chart",
+        );
+        containers.forEach((container) => {
+          applyThemeToContainer(container, null);
+        });
+
+        currentTheme = null;
+        document.getElementById("current-theme").textContent = "none";
+        updateStatus("theme-integration-status", "Themes cleared", "info");
+      };
+
+      window.syncConfigColors = async function () {
+        if (!currentConfig) {
+          currentConfig = await loadConfig();
+        }
+
+        syncColorsWithCSS(currentConfig);
+        document.getElementById("css-sync-status").textContent =
+          "Colors synced!";
+        updateStatus("color-sync-status", "Colors synchronized", "success");
+      };
+
+      window.syncBreakpoints = async function () {
+        if (!currentConfig) {
+          currentConfig = await loadConfig();
+        }
+
+        applyResponsiveCSS(currentConfig);
+        updateStatus(
+          "responsive-integration-status",
+          "Breakpoints synced",
+          "success",
+        );
+      };
+
+      window.fullCSSIntegration = async function () {
+        if (!currentConfig) {
+          currentConfig = await loadConfig();
+        }
+
+        initializeCSSIntegration(currentConfig, {
+          syncColors: true,
+          applyResponsive: true,
+          autoTheme: currentTheme !== null,
+          themeName: currentTheme,
+        });
+
+        updateStatus(
+          "css-properties-status",
+          "Full integration complete",
+          "success",
+        );
+      };
+
+      window.testResponsive = async function () {
+        if (!currentConfig) {
+          currentConfig = await loadConfig();
+        }
+
+        applyResponsiveCSS(currentConfig);
+        showBreakpoints();
+      };
+
+      window.showBreakpoints = function () {
+        const style = getComputedStyle(document.documentElement);
+
+        document.getElementById("mobile-bp").textContent =
+          style.getPropertyValue("--radar-mobile-breakpoint") ||
+          "768px (default)";
+        document.getElementById("tablet-bp").textContent =
+          style.getPropertyValue("--radar-tablet-breakpoint") ||
+          "1024px (default)";
+        document.getElementById("desktop-bp").textContent =
+          style.getPropertyValue("--radar-desktop-breakpoint") ||
+          "1200px (default)";
+      };
+
+      // Initialize demo
+      document.addEventListener("DOMContentLoaded", async function () {
+        console.log("🎨 Radar Chart CSS Integration Demo initialized");
+        await loadConfig();
+        showBreakpoints();
+      });
+    </script>
+  </body>
+</html>

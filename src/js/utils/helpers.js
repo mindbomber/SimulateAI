@@ -602,18 +602,39 @@ class ThemeHelpers {
   }
 
   static applyTheme(element, theme = null) {
-    const colors = this.getThemeColors(theme);
     const currentTheme = theme || this.getCurrentTheme();
+    const colors = this.getThemeColors(currentTheme);
 
-    element.style.backgroundColor = colors.background;
-    element.style.color = colors.text;
+    // Only update styles if they're different (avoid unnecessary DOM mutations)
+    if (element.style.backgroundColor !== colors.background) {
+      element.style.backgroundColor = colors.background;
+    }
+    if (element.style.color !== colors.text) {
+      element.style.color = colors.text;
+    }
 
-    // Add theme-specific classes
-    element.classList.remove("theme-light", "theme-high-contrast");
-    element.classList.add(`theme-${currentTheme.theme}`);
+    // Only update classes if needed
+    const themeClass = `theme-${currentTheme.theme}`;
+    if (!element.classList.contains(themeClass)) {
+      element.classList.remove(
+        "theme-light",
+        "theme-dark",
+        "theme-high-contrast",
+      );
+      element.classList.add(themeClass);
+    }
 
-    if (currentTheme.reducedMotion) {
+    // Only add reduce-motion class if needed
+    if (
+      currentTheme.reducedMotion &&
+      !element.classList.contains("reduce-motion")
+    ) {
       element.classList.add("reduce-motion");
+    } else if (
+      !currentTheme.reducedMotion &&
+      element.classList.contains("reduce-motion")
+    ) {
+      element.classList.remove("reduce-motion");
     }
 
     return colors;
@@ -921,13 +942,23 @@ class Helpers {
     const denominator = Math.sqrt(sumSqX * sumSqY);
     return denominator === 0 ? 0 : numerator / denominator;
   } // Enhanced Array utilities with performance optimization
+
+  /**
+   * Internal helper to validate arrays and reduce duplication
+   * @private
+   */
+  static _validateArray(array, allowEmpty = true) {
+    if (!Array.isArray(array)) return false;
+    return allowEmpty || array.length > 0;
+  }
+
   /**
    * Shuffle an array using Fisher-Yates algorithm (non-mutating)
    * @param {Array} array - Array to shuffle
    * @returns {Array} Shuffled copy of the array
    */
   static shuffleArray(array) {
-    if (!Array.isArray(array)) return [];
+    if (!this._validateArray(array)) return [];
     const shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -942,7 +973,7 @@ class Helpers {
    * @returns {*} Random element or undefined if array is empty
    */
   static getRandomElement(array) {
-    if (!Array.isArray(array) || array.length === 0) return undefined;
+    if (!this._validateArray(array, false)) return undefined;
     return array[Math.floor(Math.random() * array.length)];
   }
 
@@ -953,7 +984,7 @@ class Helpers {
    * @returns {Array} Array of selected elements
    */
   static getRandomElements(array, count) {
-    if (!Array.isArray(array) || count <= 0) return [];
+    if (!this._validateArray(array) || count <= 0) return [];
     const shuffled = this.shuffleArray(array);
     return shuffled.slice(0, Math.min(count, shuffled.length));
   }
@@ -2236,7 +2267,7 @@ class Helpers {
 
     const tooltip = this.createElement("div", {
       id,
-      className: `${className} ${className}--${position}`,
+      className: `${className} ${position}`,
       role: "tooltip",
       "aria-hidden": "true",
       textContent: content,
@@ -3487,7 +3518,7 @@ class Helpers {
     let totalWeight = 0;
     let validMetrics = 0;
 
-    const processMetric = (metric, _key) => {
+    const processMetric = (metric) => {
       if (typeof metric === "object" && metric !== null) {
         const value = typeof metric.value === "number" ? metric.value : 0;
         const weight =
@@ -5288,7 +5319,7 @@ class Helpers {
       }
     };
 
-    const createAnimation = (config, _index) => {
+    const createAnimation = (config) => {
       const animationConfig = {
         ...config,
         completeCallback: () => {

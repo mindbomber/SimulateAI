@@ -78,7 +78,6 @@ class ScenarioModal {
 
       // Enterprise telemetry batching
       this.telemetryBatch = [];
-      this.telemetryBuffer = [];
       this.lastTelemetryFlush = Date.now();
 
       // Health monitoring intervals
@@ -101,8 +100,12 @@ class ScenarioModal {
       this.currentCategoryId = null;
       this.currentScenarioId = null;
       this.isOpening = false; // Flag to prevent duplicate openings
+      this.isClosing = false; // Flag to prevent duplicate closings
       this.wasCompleted = false; // Flag to track if scenario was completed
       this.isTestMode = options.isTestMode || false; // Flag for test scenarios
+
+      // Event handlers
+      this.escapeHandler = null; // For keyboard event cleanup
 
       // Cache for categories and scenarios
       this.categories = getAllCategories();
@@ -209,6 +212,11 @@ class ScenarioModal {
 
     // Update circuit breaker
     this._updateCircuitBreaker(false);
+
+    // Update individual error rate
+    const totalOperations = this.performanceMetrics.modalOpenCount || 1;
+    this.performanceMetrics.errorRate =
+      Math.round((this.errorCount / totalOperations) * 10000) / 100; // Percentage with 2 decimals
 
     // Log the error with telemetry
     this._logTelemetry("error_occurred", {
@@ -775,6 +783,20 @@ class ScenarioModal {
         this.backdrop = null;
       }
 
+      // Clean up radar chart instance first
+      if (this.radarChart) {
+        try {
+          logger.info("ScenarioModal", "Destroying radar chart during cleanup");
+          this.radarChart.destroy();
+        } catch (e) {
+          logger.warn(
+            "ScenarioModal",
+            "Failed to destroy radar chart during cleanup",
+            e,
+          );
+        }
+      }
+
       // Reset all state flags
       this.isOpening = false;
       this.isClosing = false;
@@ -938,7 +960,7 @@ class ScenarioModal {
                     </div>
 
                     <div class="scenario-sidebar">
-                        <div id="scenario-radar-chart" style="min-height: 400px; width: 400px; height: 400px; position: relative; margin: 0 auto;"></div>
+                        <div id="scenario-radar-chart" style="min-height: var(--radar-chart-size, 400px); width: var(--radar-chart-size, 400px); height: var(--radar-chart-size, 400px); position: relative; margin: 0 auto;"></div>
                         <div class="chart-legend">
                             <p>This chart shows how your choice affects different ethical dimensions. Select an option to see its impact.</p>
                         </div>
@@ -1248,10 +1270,11 @@ class ScenarioModal {
 
         // Load RadarChart configuration first
         await RadarChart.loadConfiguration();
+        const chartConfig = RadarChart.config;
 
         this.radarChart = new RadarChart("scenario-radar-chart", {
-          width: 400,
-          height: 400,
+          width: chartConfig?.chart?.defaultSize || 400,
+          height: chartConfig?.chart?.defaultSize || 400,
           showLabels: true,
           showLegend: false,
           animated: true,
@@ -1287,17 +1310,21 @@ class ScenarioModal {
           return;
         }
 
+        // Ensure radar chart config exists
+        const radarConfig = this.config?.radarChart || {};
+        const neutralScore = radarConfig.neutralScore || 3.0;
+
         // Set initial slightly varied neutral scores to ensure polygon visibility
         // These values are carefully chosen to average exactly 3.0 while providing variation
         const neutralScores = {
-          fairness: this.config.radarChart.neutralScore + 0.02, // 3.02
-          sustainability: this.config.radarChart.neutralScore - 0.01, // 2.99
-          autonomy: this.config.radarChart.neutralScore + 0.01, // 3.01
-          beneficence: this.config.radarChart.neutralScore - 0.01, // 2.99
-          transparency: this.config.radarChart.neutralScore + 0.01, // 3.01
-          accountability: this.config.radarChart.neutralScore - 0.01, // 2.99
-          privacy: this.config.radarChart.neutralScore + 0.01, // 3.01
-          proportionality: this.config.radarChart.neutralScore - 0.02, // 2.98
+          fairness: neutralScore + 0.02, // 3.02
+          sustainability: neutralScore - 0.01, // 2.99
+          autonomy: neutralScore + 0.01, // 3.01
+          beneficence: neutralScore - 0.01, // 2.99
+          transparency: neutralScore + 0.01, // 3.01
+          accountability: neutralScore - 0.01, // 2.99
+          privacy: neutralScore + 0.01, // 3.01
+          proportionality: neutralScore - 0.02, // 2.98
         };
         // Average: (3.02 + 2.99 + 3.01 + 2.99 + 3.01 + 2.99 + 3.01 + 2.98) / 8 = 24.00 / 8 = 3.00 exactly
 
@@ -1327,23 +1354,27 @@ class ScenarioModal {
           );
 
           // CRITICAL FIX: Ensure canvas HTML attributes match CSS dimensions exactly
-          if (chartCanvas.width !== 400 || chartCanvas.height !== 400) {
+          const expectedSize = chartConfig?.chart?.defaultSize || 400;
+          if (
+            chartCanvas.width !== expectedSize ||
+            chartCanvas.height !== expectedSize
+          ) {
             logger.warn(
               "RadarChart",
               "Canvas dimensions mismatch detected, fixing",
               {
                 htmlWidth: chartCanvas.width,
                 htmlHeight: chartCanvas.height,
-                expectedWidth: 400,
-                expectedHeight: 400,
+                expectedWidth: expectedSize,
+                expectedHeight: expectedSize,
               },
             );
 
             // Force correct canvas dimensions
-            chartCanvas.width = 400;
-            chartCanvas.height = 400;
-            chartCanvas.style.width = "400px";
-            chartCanvas.style.height = "400px";
+            chartCanvas.width = expectedSize;
+            chartCanvas.height = expectedSize;
+            chartCanvas.style.width = `${expectedSize}px`;
+            chartCanvas.style.height = `${expectedSize}px`;
 
             // Force chart redraw with corrected dimensions
             if (this.radarChart && this.radarChart.chart) {

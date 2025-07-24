@@ -25,7 +25,7 @@ export const RADAR_CHART_CONSTANTS = {
 
   // Chart.js specific
   CHART_TYPE: "radar",
-  MAINTIAN_ASPECT_RATIO: true,
+  MAINTAIN_ASPECT_RATIO: true,
   RESPONSIVE: true,
 
   // Tooltip settings

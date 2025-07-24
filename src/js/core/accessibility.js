@@ -180,11 +180,9 @@ class AccessibilityManager {
     this.announcementDelay = ACCESSIBILITY_CONSTANTS.ANNOUNCEMENT_DELAY;
     this.theme = AccessibilityTheme.getCurrentTheme();
     this.isHighContrastMode = this.theme.highContrast;
-    this.isReducedMotionMode = this.theme.reducedMotion;
 
     // Performance monitoring
     this.performanceMonitor = AccessibilityPerformanceMonitor;
-    this.renderCache = new Map();
 
     // Advanced features
     this.gestureHandler = null;
@@ -196,6 +194,19 @@ class AccessibilityManager {
     // Error handling
     this.errorCount = 0;
     this.lastError = null;
+
+    // Performance optimizations
+    this.cachedContainerRect = null;
+    this.needsContainerRectUpdate = true;
+
+    // Setup resize observer to invalidate container rect cache
+    if (window.ResizeObserver) {
+      this.resizeObserver = new ResizeObserver(() => {
+        this.needsContainerRectUpdate = true;
+      });
+      this.resizeObserver.observe(this.container);
+    }
+
     this.init();
   }
 
@@ -236,30 +247,40 @@ class AccessibilityManager {
     }
   }
 
+  /**
+   * Utility method to set multiple attributes efficiently
+   */
+  setElementAttributes(element, attributes) {
+    Object.entries(attributes).forEach(([key, value]) => {
+      if (value !== null && value !== undefined) {
+        element.setAttribute(key, value);
+      }
+    });
+  }
+
   setupContainer() {
     // Enhanced container setup with theme awareness
+    const containerAttributes = {};
+
     if (!this.container.hasAttribute("tabindex")) {
-      this.container.setAttribute("tabindex", "0");
+      containerAttributes.tabindex = "0";
     }
 
     if (!this.container.hasAttribute("role")) {
-      this.container.setAttribute("role", "application");
+      containerAttributes.role = "application";
     }
 
     if (!this.container.hasAttribute("aria-label")) {
-      this.container.setAttribute(
-        "aria-label",
-        "AI Ethics Simulation Environment",
-      );
+      containerAttributes["aria-label"] = "AI Ethics Simulation Environment";
     }
 
     // Enhanced accessibility attributes
-    this.container.setAttribute(
-      "aria-describedby",
-      "accessibility-description",
-    );
-    this.container.setAttribute("aria-live", "polite");
-    this.container.setAttribute("aria-atomic", "false");
+    containerAttributes["aria-describedby"] = "accessibility-description";
+    containerAttributes["aria-live"] = "polite";
+    containerAttributes["aria-atomic"] = "false";
+
+    // Apply all attributes at once
+    this.setElementAttributes(this.container, containerAttributes);
 
     // Theme-aware classes
     this.container.classList.add("accessibility-enabled");
@@ -280,19 +301,104 @@ class AccessibilityManager {
     document.body.appendChild(description);
   }
 
+  /**
+   * Centralized method to update theme-related CSS classes
+   */
+  updateThemeClasses(element = this.container, options = {}) {
+    const updates = {
+      "high-contrast": options.highContrast ?? this.theme.highContrast,
+      "reduced-motion": options.reducedMotion ?? this.theme.reducedMotion,
+      "accessibility-enabled": true,
+    };
+
+    Object.entries(updates).forEach(([className, shouldAdd]) => {
+      element.classList.toggle(className, shouldAdd);
+    });
+  }
+
   updateContainerTheme() {
-    this.container.classList.toggle("high-contrast", this.theme.highContrast);
-    this.container.classList.toggle("reduced-motion", this.theme.reducedMotion);
+    // Use centralized theme class updates
+    this.updateThemeClasses();
 
     // Update CSS custom properties for enhanced theming
-    this.container.style.setProperty(
-      "--accessibility-focus-color",
-      this.theme.highContrast ? "#ffff00" : "#007bff",
+    const customProperties = {
+      "--accessibility-focus-color": this.theme.highContrast
+        ? "#ffff00"
+        : "#007bff",
+      "--accessibility-bg-color": this.theme.highContrast
+        ? "#000000"
+        : "#ffffff",
+    };
+
+    Object.entries(customProperties).forEach(([property, value]) => {
+      this.container.style.setProperty(property, value);
+    });
+  }
+
+  /**
+   * Centralized error handling with consistent logging and context
+   */
+  handleAccessibilityError(operation, error, context = {}) {
+    const errorContext = {
+      operation,
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      screenReader: this.screenReaderEnabled,
+      ...context,
+    };
+
+    // Log error with context
+    console.error(`Accessibility Error in ${operation}:`, error, errorContext);
+
+    // Create accessibility-specific error
+    const accessibilityError = new AccessibilityError(
+      `Failed to execute ${operation}`,
+      errorContext,
+      error,
     );
-    this.container.style.setProperty(
-      "--accessibility-bg-color",
-      this.theme.highContrast ? "#000000" : "#ffffff",
-    );
+
+    // Announce error to screen readers if appropriate
+    if (this.screenReaderEnabled && !context.silent) {
+      this.announce(`Error in ${operation}. Please try again.`, true);
+    }
+
+    return accessibilityError;
+  }
+
+  /**
+   * Performance monitoring decorator to reduce repetitive performance tracking
+   */
+  withPerformanceMonitoring(operationName, fn, context = {}) {
+    return (...args) => {
+      const startTime = this.performanceMonitor.startOperation(operationName);
+
+      try {
+        const result = fn.apply(this, args);
+
+        // Handle both sync and async operations
+        if (result && typeof result.then === "function") {
+          return result
+            .then((value) => {
+              this.performanceMonitor.endOperation(operationName, startTime);
+              return value;
+            })
+            .catch((error) => {
+              this.performanceMonitor.endOperation(operationName, startTime);
+              throw this.handleAccessibilityError(
+                operationName,
+                error,
+                context,
+              );
+            });
+        } else {
+          this.performanceMonitor.endOperation(operationName, startTime);
+          return result;
+        }
+      } catch (error) {
+        this.performanceMonitor.endOperation(operationName, startTime);
+        throw this.handleAccessibilityError(operationName, error, context);
+      }
+    };
   }
 
   setupThemeIntegration() {
@@ -791,8 +897,7 @@ class AccessibilityManager {
   }
 
   createAccessibilityToolbar() {
-    if (!this.theme.highContrast && !this.isAccessibilityToolbarRequested)
-      return;
+    if (!this.theme.highContrast) return;
 
     this.accessibilityToolbar = document.createElement("div");
     this.accessibilityToolbar.className = "accessibility-toolbar";
@@ -1529,9 +1634,15 @@ class AccessibilityManager {
   updateFocusIndicator(component) {
     if (!component.element || !this.focusIndicator) return;
 
+    // Cache container rect if it hasn't changed
+    if (!this.cachedContainerRect || this.needsContainerRectUpdate) {
+      this.cachedContainerRect = this.container.getBoundingClientRect();
+      this.needsContainerRectUpdate = false;
+    }
+
     try {
       const rect = component.element.getBoundingClientRect();
-      const containerRect = this.container.getBoundingClientRect();
+      const containerRect = this.cachedContainerRect;
 
       const left =
         rect.left -
@@ -1544,37 +1655,30 @@ class AccessibilityManager {
       const width = rect.width + ACCESSIBILITY_CONSTANTS.FOCUS_BORDER_PADDING;
       const height = rect.height + ACCESSIBILITY_CONSTANTS.FOCUS_BORDER_PADDING;
 
-      this.focusIndicator.style.cssText += `
-                display: block;
-                left: ${left}px;
-                top: ${top}px;
-                width: ${width}px;
-                height: ${height}px;
-            `;
-
-      // Ensure focus indicator is visible
-      if (this.theme.reducedMotion) {
-        this.focusIndicator.scrollIntoView({ block: "nearest" });
-      } else {
-        this.focusIndicator.scrollIntoView({
-          block: "nearest",
-          behavior: "smooth",
+      // Batch focus indicator style updates
+      requestAnimationFrame(() => {
+        this.setElementAttributes(this.focusIndicator, {
+          style: `display: block; left: ${left}px; top: ${top}px; width: ${width}px; height: ${height}px;`,
         });
-      }
+
+        // Ensure focus indicator is visible
+        if (this.theme.reducedMotion) {
+          this.focusIndicator.scrollIntoView({ block: "nearest" });
+        } else {
+          this.focusIndicator.scrollIntoView({
+            block: "nearest",
+            behavior: "smooth",
+          });
+        }
+      });
     } catch (error) {
-      this.handleError(
-        new AccessibilityError(
-          "Focus indicator update failed",
-          {
-            componentId: component.id,
-          },
-          error,
-        ),
-      );
+      this.handleAccessibilityError("updateFocusIndicator", error, {
+        componentId: component.id,
+      });
     }
   }
 
-  // Enhanced screen reader announcements with intelligent queuing
+  // Enhanced screen reader announcements with intelligent queuing and debouncing
   announce(message, urgent = false, options = {}) {
     if (!message) return;
 
@@ -1588,7 +1692,30 @@ class AccessibilityManager {
       repeat: options.repeat || false,
     };
 
-    // Check for duplicate announcements
+    // Enhanced debouncing: check for duplicate announcements with time-based deduplication
+    const debounceKey = `${announcement.category}-${announcement.message}`;
+    const now = Date.now();
+    const debounceThreshold = urgent ? 500 : 2000; // Shorter debounce for urgent messages
+
+    if (this.lastAnnouncements && this.lastAnnouncements.has(debounceKey)) {
+      const lastTime = this.lastAnnouncements.get(debounceKey);
+      if (now - lastTime < debounceThreshold && !options.allowDuplicates) {
+        return; // Skip duplicate announcement within debounce window
+      }
+    }
+
+    // Initialize debounce tracking if needed
+    if (!this.lastAnnouncements) {
+      this.lastAnnouncements = new Map();
+    }
+    this.lastAnnouncements.set(debounceKey, now);
+
+    // Clean up old debounce entries periodically
+    if (this.lastAnnouncements.size > 50) {
+      this.cleanupAnnouncementCache();
+    }
+
+    // Check for duplicate announcements in current queue
     if (
       !options.allowDuplicates &&
       this.isDuplicateAnnouncement(announcement)
@@ -1603,6 +1730,20 @@ class AccessibilityManager {
       this.processUrgentAnnouncement(announcement);
     } else {
       setTimeout(() => this.processAnnouncements(), announcement.delay);
+    }
+  }
+
+  /**
+   * Clean up old announcement cache entries to prevent memory leaks
+   */
+  cleanupAnnouncementCache() {
+    const now = Date.now();
+    const maxAge = 60000; // 1 minute
+
+    for (const [key, timestamp] of this.lastAnnouncements.entries()) {
+      if (now - timestamp > maxAge) {
+        this.lastAnnouncements.delete(key);
+      }
     }
   }
 
@@ -1752,20 +1893,21 @@ class AccessibilityManager {
 
   setHighContrastMode(enabled) {
     this.isHighContrastMode = enabled;
+    this.theme.highContrast = enabled;
 
-    if (enabled) {
-      this.container.classList.add("high-contrast");
-      document.body.classList.add("high-contrast");
-      this.theme.highContrast = true;
-    } else {
-      this.container.classList.remove("high-contrast");
-      document.body.classList.remove("high-contrast");
-      this.theme.highContrast = false;
-    }
+    // Batch DOM mutations using requestAnimationFrame
+    requestAnimationFrame(() => {
+      // Update container classes
+      this.updateThemeClasses(this.container, { highContrast: enabled });
 
-    this.updateContainerTheme();
-    this.applyThemeSpecificStyles();
-    this.updateFocusIndicatorTheme();
+      // Update body classes
+      this.updateThemeClasses(document.body, { highContrast: enabled });
+
+      // Update related theme styles
+      this.updateContainerTheme();
+      this.applyThemeSpecificStyles();
+      this.updateFocusIndicatorTheme();
+    });
 
     this.announce(
       `High contrast mode ${enabled ? "enabled" : "disabled"}`,
@@ -1782,13 +1924,11 @@ class AccessibilityManager {
   }
 
   setLargeTextMode(enabled) {
-    if (enabled) {
-      this.container.classList.add("large-text");
-      document.body.classList.add("large-text");
-    } else {
-      this.container.classList.remove("large-text");
-      document.body.classList.remove("large-text");
-    }
+    // Batch DOM mutations using requestAnimationFrame
+    requestAnimationFrame(() => {
+      this.updateThemeClasses(this.container, { "large-text": enabled });
+      this.updateThemeClasses(document.body, { "large-text": enabled });
+    });
 
     this.announce(
       `Large text mode ${enabled ? "enabled" : "disabled"}`,

@@ -767,3 +767,157 @@ body.high-contrast .settings-menu[style*="display: block"] {
 .badge-timestamp {
   color: rgb(255 255 255 / 90%);
 }
+
+/* ===== MISSING THEME CLASSES FOR HELPERS.JS INTEGRATION ===== */
+
+/* Explicit Light Theme Class (uses default light theme variables) */
+body.theme-light {
+  /* Force light theme regardless of system preference */
+  --theme-bg-primary: var(--color-white, #fff);
+  --theme-bg-secondary: var(--color-gray-50, #f8fafc);
+  --theme-bg-tertiary: var(--color-gray-100, #f1f5f9);
+  --theme-text-primary: var(--color-gray-900, #333);
+  --theme-text-secondary: var(--color-gray-600, #666);
+  --theme-text-muted: #9ca3af;
+  --theme-border: var(--color-gray-200, #e2e8f0);
+  --theme-border-hover: var(--color-gray-300, #d1d5db);
+  --theme-shadow: rgb(0 0 0 / 10%);
+  --theme-shadow-hover: rgb(0 0 0 / 15%);
+  --theme-accent: var(--color-primary, #4a9eff);
+  --theme-accent-dark: var(--color-primary-dark, #3a8eef);
+  --theme-text-on-accent: var(--color-white, #fff);
+
+  background-color: #fff !important;
+  color: #333 !important;
+}
+
+/* Explicit Dark Theme Class (mirrors body.dark-mode) */
+body.theme-dark {
+  /* Override theme system variables for dark mode */
+  --theme-bg-primary: #1a1a1a;
+  --theme-bg-secondary: #2d2d2d;
+  --theme-bg-tertiary: #3d3d3d;
+  --theme-text-primary: #fff;
+  --theme-text-secondary: #ccc;
+  --theme-text-muted: #9ca3af;
+  --theme-border: #444;
+  --theme-border-hover: #555;
+  --theme-shadow: rgb(0 0 0 / 40%);
+  --theme-shadow-hover: rgb(0 0 0 / 50%);
+  --theme-accent: #4a9eff;
+  --theme-accent-dark: #3a8eef;
+  --theme-text-on-accent: #fff;
+
+  /* Override main color system variables */
+  --color-white: #1a1a1a;
+  --color-gray-50: #2d2d2d;
+  --color-gray-100: #3d3d3d;
+  --color-gray-200: #444;
+  --color-gray-300: #555;
+  --color-gray-600: #ccc;
+  --color-gray-800: #ccc;
+  --color-gray-900: #fff;
+  --color-primary: #4a9eff;
+  --color-primary-dark: #3a8eef;
+
+  background-color: #1a1a1a !important;
+  color: #fff !important;
+}
+
+/* High Contrast Theme Class (enhanced accessibility) */
+body.theme-high-contrast {
+  /* High contrast theme with maximum accessibility */
+  --theme-bg-primary: #000;
+  --theme-bg-secondary: #111;
+  --theme-bg-tertiary: #222;
+  --theme-text-primary: #fff;
+  --theme-text-secondary: #fff;
+  --theme-text-muted: #ccc;
+  --theme-border: #fff;
+  --theme-border-hover: #ccc;
+  --theme-shadow: rgb(255 255 255 / 20%);
+  --theme-shadow-hover: rgb(255 255 255 / 30%);
+  --theme-accent: #ffff00; /* High contrast yellow */
+  --theme-accent-dark: #ffcc00;
+  --theme-text-on-accent: #000;
+
+  /* Override main color system variables for high contrast */
+  --color-white: #000;
+  --color-gray-50: #111;
+  --color-gray-100: #222;
+  --color-gray-200: #fff;
+  --color-gray-300: #ccc;
+  --color-gray-600: #fff;
+  --color-gray-800: #fff;
+  --color-gray-900: #fff;
+  --color-primary: #ffff00;
+  --color-primary-dark: #ffcc00;
+
+  background-color: #000 !important;
+  color: #fff !important;
+}
+
+/* High contrast focus indicators */
+body.theme-high-contrast *:focus {
+  outline: 4px solid #ffff00 !important;
+  outline-offset: 2px !important;
+  background-color: #ffff00 !important;
+  color: #000 !important;
+}
+
+/* High contrast links */
+body.theme-high-contrast a {
+  color: #ffff00 !important;
+  text-decoration: underline !important;
+}
+
+body.theme-high-contrast a:hover,
+body.theme-high-contrast a:focus {
+  background-color: #ffff00 !important;
+  color: #000 !important;
+}
+
+/* ===== REDUCE MOTION CLASS FOR HELPERS.JS INTEGRATION ===== */
+
+/* Reduce Motion Class (for JavaScript-applied accessibility preference) */
+.reduce-motion,
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+  transform: none !important;
+}
+
+/* Specific element animations to disable */
+.reduce-motion .fade-in,
+.reduce-motion .slide-in,
+.reduce-motion .bounce,
+.reduce-motion .pulse,
+.reduce-motion .spin {
+  animation: none !important;
+  transform: none !important;
+}
+
+/* Tooltip animations */
+.reduce-motion .tooltip {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Modal animations */
+.reduce-motion .modal,
+.reduce-motion .modal-backdrop {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Chart animations */
+.reduce-motion .chart-animation,
+.reduce-motion .radar-chart,
+.reduce-motion .progress-bar {
+  animation: none !important;
+  transition: none !important;
+}

@@ -1761,7 +1761,7 @@ class MainGrid {
     }
   }
 
-  handleScenarioClick(event) {
+  async handleScenarioClick(event) {
     const scenarioCard = event.target.closest(".scenario-card");
     if (!scenarioCard) return;
 
@@ -1803,11 +1803,11 @@ class MainGrid {
       this.openScenarioModalDirect(categoryId, scenarioId);
     } else if (isLearningLabBtn) {
       // Learning Lab button - go through pre-launch modal
-      this.openScenario(categoryId, scenarioId);
+      await this.openScenario(categoryId, scenarioId);
     }
   }
 
-  handleScenarioKeydown(event) {
+  async handleScenarioKeydown(event) {
     if (event.key === "Enter" || event.key === " ") {
       const scenarioCard = event.target.closest(".scenario-card");
       if (!scenarioCard) return;
@@ -1834,12 +1834,12 @@ class MainGrid {
         this.openScenarioModalDirect(categoryId, scenarioId);
       } else if (isLearningLabBtn) {
         // Learning Lab button - go through pre-launch modal
-        this.openScenario(categoryId, scenarioId);
+        await this.openScenario(categoryId, scenarioId);
       }
     }
   }
 
-  openScenario(categoryId, scenarioId) {
+  async openScenario(categoryId, scenarioId) {
     const category = this.categories.find((c) => c.id === categoryId);
     const scenario = category?.scenarios.find((s) => s.id === scenarioId);
 
@@ -1884,7 +1884,7 @@ class MainGrid {
     document.dispatchEvent(event);
 
     // Open the PreLaunchModal configured for this category
-    this.openCategoryPremodal(category, scenario);
+    await this.openCategoryPremodal(category, scenario);
   }
 
   /**
@@ -1927,7 +1927,7 @@ class MainGrid {
     });
   }
 
-  openCategoryPremodal(category, scenario) {
+  async openCategoryPremodal(category, scenario) {
     try {
       // Clean up any existing modals first
       this.cleanupExistingModals();
@@ -1947,7 +1947,7 @@ class MainGrid {
         showEducatorResources: true,
       });
 
-      preModal.show();
+      await preModal.show();
     } catch (error) {
       logger.error("Failed to open category premodal:", error);
       // Fallback to simple alert

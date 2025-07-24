@@ -120,6 +120,59 @@
   transform: translateY(0) !important;
 }
 
+/* ===== SETTINGS NAVIGATION HOVER LOGIC ===== */
+/* Ensure #settings-nav dropdown stays open on hover and has highest z-index */
+#settings-nav {
+  position: relative;
+}
+
+/* Settings dropdown container with highest z-index */
+#settings-nav + .dropdown-menu,
+#settings-nav + .settings-menu {
+  z-index: 10000 !important; /* Higher than all other elements */
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease;
+}
+
+/* Keep settings menu open when hovering over trigger or menu */
+#settings-nav:hover + .dropdown-menu,
+#settings-nav:hover + .settings-menu,
+.nav-item-dropdown:hover .dropdown-menu,
+.nav-item-dropdown:hover .settings-menu {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 10000 !important;
+}
+
+/* Ensure the entire nav-item-dropdown container maintains hover state */
+.nav-item-dropdown {
+  position: relative;
+}
+
+.nav-item-dropdown:hover {
+  z-index: 10001 !important; /* Container gets even higher z-index when hovered */
+}
+
+/* Settings menu should close when user scrolls away */
+/* This will be handled by JavaScript, but we ensure it has proper positioning */
+.nav-item-dropdown .settings-menu {
+  position: absolute !important;
+  top: calc(100% + 5px) !important;
+  right: 0 !important;
+  white-space: nowrap;
+}
+
+/* Force settings menu above floating tabs and other overlay elements */
+.nav-item-dropdown:hover .settings-menu,
+.nav-item-dropdown:focus-within .settings-menu {
+  z-index: 10000 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
 /* Mobile Navigation Force-Visible States */
 .main-nav.force-visible,
 .main-nav.open,
@@ -725,7 +778,7 @@
   /* Base properties that apply to all screen sizes */
   position: static;
   width: auto;
-  height: auto;
+  height: var(--header-h); /* Match header height for consistent alignment */
   background: transparent;
   border: none;
   box-shadow: none;
@@ -739,27 +792,34 @@
   order: 2;
 }
 
+/* Navigation Group Organization - Modern Flexbox Architecture */
+/* Note: .nav-items replaces legacy .nav-list naming for semantic clarity */
 .nav-group {
   display: flex;
   align-items: center;
 }
 
-.nav-group .nav-list {
+.nav-group .nav-items {
   display: flex;
   align-items: center;
-  list-style: none;
   margin: 0;
   padding: 0;
+  height: var(
+    --header-h
+  ); /* Match header and main-nav height for perfect alignment */
   gap: calc(0.5rem * var(--font-scale, 1));
 }
 
-/* Primary Navigation Group */
+/* Primary Navigation Group - Override general nav-items styles */
 .nav-group-primary {
   flex: 1;
 }
 
-.nav-group-primary .nav-list {
+.nav-group-primary .nav-items {
   gap: calc(2rem * var(--font-scale, 1));
+  /* Override fixed height - use min-height for flexibility */
+  height: auto !important;
+  min-height: var(--header-h);
 }
 
 .nav-group-primary .nav-link {
@@ -794,25 +854,35 @@
   position: relative;
 }
 
-.nav-group-community .nav-list {
+.nav-group-community .nav-items {
   gap: calc(0.75rem * var(--font-scale, 1));
 }
 
-/* About Navigation Group */
-.nav-group-about {
+/* About & Actions Navigation Groups */
+.nav-group-about,
+.nav-group-actions {
   position: relative;
 }
 
-.nav-group-about .nav-list {
+.nav-group-about .nav-items,
+.nav-group-actions .nav-items {
   gap: calc(0.75rem * var(--font-scale, 1));
 }
 
-/* Action Buttons Group */
+/* Dropdown navigation links - ensure proper alignment for arrows */
+.nav-item-dropdown .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Specific positioning for actions group */
 .nav-group-actions {
   margin-left: auto;
 }
 
-.nav-group-actions .nav-list {
+/* Specific spacing override for actions items */
+.nav-group-actions .nav-items {
   gap: calc(0.5rem * var(--font-scale, 1));
 }
 
@@ -1038,6 +1108,15 @@
   }
 }
 
+/* Fill the gap between mobile and tablet for header-container */
+@media only screen and (width >= 480px) and (width <= 767px) {
+  .header-container {
+    padding: 0 1.25rem; /* Between mobile and desktop padding */
+    height: var(--header-h); /* Maintain consistent height */
+    min-height: var(--header-h);
+  }
+}
+
 @media only screen and (width <= 479px) {
   .header-container {
     position: relative;
@@ -1097,13 +1176,13 @@
     width: 100%;
   }
 
-  .nav-group .nav-list {
+  .nav-group .nav-items {
     flex-direction: column;
     width: 100%;
     gap: 0;
   }
 
-  .nav-group .nav-list li {
+  .nav-group .nav-item {
     width: 100%;
   }
 
@@ -1617,11 +1696,12 @@
     padding: 0 var(--container-padding);
   }
 
-  .nav-group-primary .nav-list {
+  .nav-group-primary .nav-items {
     gap: calc(1.25rem * var(--font-scale));
   }
 
-  .nav-group-actions .nav-list {
+  .nav-group-about .nav-items,
+  .nav-group-actions .nav-items {
     gap: calc(0.75rem * var(--font-scale));
   }
 
@@ -1644,7 +1724,7 @@
     padding: 0 var(--container-padding);
   }
 
-  .nav-list {
+  .nav-items {
     padding: 0;
     flex-direction: row;
     gap: var(--spacing-1, calc(1.5rem * var(--font-scale)));
@@ -1669,11 +1749,12 @@
     border-bottom: 2px solid var(--color-primary);
   }
 
-  .nav-group-primary .nav-list {
+  .nav-group-primary .nav-items {
     gap: calc(1.5rem * var(--font-scale));
   }
 
-  .nav-group-actions .nav-list {
+  .nav-group-about .nav-items,
+  .nav-group-actions .nav-items {
     gap: calc(1rem * var(--font-scale));
   }
 
@@ -2093,11 +2174,19 @@ body.dark-mode .nav-search input::placeholder {
   .header {
     padding: 0 var(--container-padding);
   }
+
+  .header-container {
+    padding: 0 var(--container-padding); /* Align with header padding */
+  }
 }
 
 @media only screen and (width >= 768px) {
   .header {
     padding: 0 var(--container-padding);
+  }
+
+  .header-container {
+    padding: 0 var(--container-padding); /* Match header padding */
   }
 }
 
@@ -2105,6 +2194,12 @@ body.dark-mode .nav-search input::placeholder {
   .header {
     padding: 0 var(--container-padding);
     max-width: var(--container-xl);
+    margin: 0 auto;
+  }
+
+  .header-container {
+    padding: 0 var(--container-padding);
+    max-width: var(--container-xl); /* Match header max-width constraint */
     margin: 0 auto;
   }
 }
@@ -2119,6 +2214,12 @@ body.dark-mode .nav-search-btn:hover {
 
 /* ===== ENHANCED PROFILE DARK MODE ===== */
 /* Enhanced Profile Header Dark Mode */
+body.dark-mode .header-container {
+  background: transparent;
+  color: var(--theme-text-primary, #fff);
+  border-bottom-color: var(--theme-border, rgba(255, 255, 255, 0.1));
+}
+
 body.dark-mode .header-content {
   background: transparent !important;
   color: #fff !important;

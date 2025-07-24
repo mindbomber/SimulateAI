@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Logger Console Fix Test</title>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .status {
+        padding: 15px;
+        border-radius: 6px;
+        margin: 15px 0;
+      }
+      .success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+      }
+      .info {
+        background: #d1ecf1;
+        border: 1px solid #bee5eb;
+        color: #0c5460;
+      }
+      .warning {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        color: #856404;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+        font-size: 14px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      button.danger {
+        background: #dc3545;
+      }
+      button.danger:hover {
+        background: #c82333;
+      }
+      button.success {
+        background: #28a745;
+      }
+      button.success:hover {
+        background: #218838;
+      }
+      .code {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        font-family: monospace;
+        margin: 10px 0;
+        border-left: 4px solid #007bff;
+      }
+      .console-output {
+        background: #000;
+        color: #00ff00;
+        padding: 15px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 12px;
+        max-height: 300px;
+        overflow-y: auto;
+        margin: 15px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔧 Logger Console Fix & Quiet Mode</h1>
+
+      <div class="status info">
+        <h3>✅ Issues Fixed:</h3>
+        <ul>
+          <li>
+            <strong>RadarChart Constants Error</strong> - Added fallback for
+            undefined ENTERPRISE_CONSTANTS
+          </li>
+          <li>
+            <strong>Console Noise Reduction</strong> - Enhanced quiet mode
+            filtering for INFO messages
+          </li>
+          <li>
+            <strong>Error Prevention</strong> - Added defensive programming for
+            undefined properties
+          </li>
+        </ul>
+      </div>
+
+      <h2>🔇 Quiet Mode Control</h2>
+      <p>Control console output verbosity with these options:</p>
+
+      <div style="margin: 20px 0">
+        <button onclick="enableQuietMode()" class="success">
+          Enable Quiet Mode
+        </button>
+        <button onclick="disableQuietMode()" class="danger">
+          Disable Quiet Mode
+        </button>
+        <button onclick="checkQuietMode()">Check Current Mode</button>
+      </div>
+
+      <div class="code">
+        <strong>Manual Control:</strong><br />
+        // Enable quiet mode in console:<br />
+        localStorage.setItem('quiet-logs', 'true');<br />
+        <br />
+        // Disable quiet mode:<br />
+        localStorage.removeItem('quiet-logs');<br />
+        <br />
+        // Check status:<br />
+        localStorage.getItem('quiet-logs');
+      </div>
+
+      <h2>🧪 Test Logging Functions</h2>
+      <div style="margin: 20px 0">
+        <button onclick="testInfoMessages()">Test INFO Messages</button>
+        <button onclick="testWarnMessages()">Test WARN Messages</button>
+        <button onclick="testErrorMessages()">Test ERROR Messages</button>
+        <button onclick="testImportantMessages()">
+          Test Important Messages
+        </button>
+      </div>
+
+      <h2>📊 Current Status</h2>
+      <div id="status-output" class="status info">
+        <div id="current-mode">Checking current mode...</div>
+        <div id="enabled-types">Loading logger info...</div>
+      </div>
+
+      <h2>📝 Console Output Monitor</h2>
+      <div id="console-monitor" class="console-output">
+        Console messages will appear here...
+      </div>
+
+      <div class="status success">
+        <h3>🎯 Expected Behavior:</h3>
+        <ul>
+          <li>
+            <strong>Quiet Mode ON</strong>: Only errors, warnings, and important
+            info messages show
+          </li>
+          <li>
+            <strong>Quiet Mode OFF</strong>: All messages show (default verbose
+            behavior)
+          </li>
+          <li>
+            <strong>RadarChart</strong>: No more "Cannot read properties of
+            undefined" errors
+          </li>
+          <li>
+            <strong>Performance</strong>: Reduced console noise improves
+            performance
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <script type="module">
+      // Import logger for testing
+      import logger from "./src/js/utils/logger.js";
+
+      // Store original console methods to monitor output
+      const originalLog = console.log;
+      const originalInfo = console.info;
+      const originalWarn = console.warn;
+      const originalError = console.error;
+
+      // Monitor console output
+      const consoleMonitor = document.getElementById("console-monitor");
+      let messageCount = 0;
+
+      function addToMonitor(level, ...args) {
+        messageCount++;
+        const timestamp = new Date().toLocaleTimeString();
+        const message = args
+          .map((arg) =>
+            typeof arg === "object"
+              ? JSON.stringify(arg, null, 2)
+              : String(arg),
+          )
+          .join(" ");
+
+        consoleMonitor.innerHTML += `<div>[${timestamp}] [${level.toUpperCase()}] ${message}</div>`;
+        consoleMonitor.scrollTop = consoleMonitor.scrollHeight;
+
+        // Keep only last 50 messages
+        const lines = consoleMonitor.children;
+        if (lines.length > 50) {
+          lines[0].remove();
+        }
+      }
+
+      // Override console methods to monitor
+      console.info = function (...args) {
+        addToMonitor("info", ...args);
+        return originalInfo.apply(console, args);
+      };
+
+      console.warn = function (...args) {
+        addToMonitor("warn", ...args);
+        return originalWarn.apply(console, args);
+      };
+
+      console.error = function (...args) {
+        addToMonitor("error", ...args);
+        return originalError.apply(console, args);
+      };
+
+      // Global functions for button controls
+      window.enableQuietMode = function () {
+        localStorage.setItem("quiet-logs", "true");
+        updateStatus();
+        addToMonitor(
+          "system",
+          "🔇 Quiet mode ENABLED - INFO messages will be filtered",
+        );
+        alert(
+          "Quiet mode enabled! Refresh the page to see reduced console output.",
+        );
+      };
+
+      window.disableQuietMode = function () {
+        localStorage.removeItem("quiet-logs");
+        updateStatus();
+        addToMonitor(
+          "system",
+          "🔊 Quiet mode DISABLED - All messages will show",
+        );
+        alert(
+          "Quiet mode disabled! Refresh the page to see full console output.",
+        );
+      };
+
+      window.checkQuietMode = function () {
+        const isQuiet = localStorage.getItem("quiet-logs") === "true";
+        addToMonitor(
+          "system",
+          `Quiet mode is currently: ${isQuiet ? "ENABLED" : "DISABLED"}`,
+        );
+        updateStatus();
+      };
+
+      window.testInfoMessages = function () {
+        addToMonitor("system", "Testing INFO messages...");
+
+        // These should be filtered in quiet mode
+        logger.info(
+          "Test",
+          "Regular info message - should be filtered in quiet mode",
+        );
+        logger.info("ConfigManager", "Loading configuration data");
+        logger.info("AppStartup", "Initialization in progress");
+
+        setTimeout(() => {
+          addToMonitor("system", "INFO message test completed");
+        }, 100);
+      };
+
+      window.testWarnMessages = function () {
+        addToMonitor("system", "Testing WARN messages...");
+
+        // These should always show
+        logger.warn("Test", "Warning message - should always show");
+        logger.warn("RadarChart", "Configuration validation warning");
+
+        setTimeout(() => {
+          addToMonitor("system", "WARN message test completed");
+        }, 100);
+      };
+
+      window.testErrorMessages = function () {
+        addToMonitor("system", "Testing ERROR messages...");
+
+        // These should always show
+        logger.error("Test", "Error message - should always show");
+        logger.error("RadarChart", "Failed to initialize component");
+
+        setTimeout(() => {
+          addToMonitor("system", "ERROR message test completed");
+        }, 100);
+      };
+
+      window.testImportantMessages = function () {
+        addToMonitor("system", "Testing important INFO messages...");
+
+        // These should show even in quiet mode due to important keywords
+        logger.info("Test", "Critical error occurred during initialization");
+        logger.info("System", "Failed to load required configuration");
+        logger.info("Network", "Warning: Connection timeout detected");
+
+        setTimeout(() => {
+          addToMonitor("system", "Important message test completed");
+        }, 100);
+      };
+
+      function updateStatus() {
+        const isQuiet = localStorage.getItem("quiet-logs") === "true";
+        const currentMode = document.getElementById("current-mode");
+        const enabledTypes = document.getElementById("enabled-types");
+
+        currentMode.innerHTML = `<strong>Quiet Mode:</strong> ${isQuiet ? "🔇 ENABLED" : "🔊 DISABLED"}`;
+
+        // Try to get logger status
+        try {
+          if (logger && logger.enabledTypes) {
+            const types = Array.from(logger.enabledTypes).join(", ");
+            enabledTypes.innerHTML = `<strong>Enabled Log Types:</strong> ${types}`;
+          } else {
+            enabledTypes.innerHTML =
+              "<strong>Logger Status:</strong> Loading...";
+          }
+        } catch (error) {
+          enabledTypes.innerHTML = `<strong>Logger Status:</strong> Error - ${error.message}`;
+        }
+      }
+
+      // Initialize status on load
+      document.addEventListener("DOMContentLoaded", () => {
+        updateStatus();
+        addToMonitor("system", "🔧 Logger Console Fix Test loaded");
+        addToMonitor("system", `Message count will be tracked here...`);
+
+        // Test that logger works without errors
+        try {
+          logger.info("Logger Fix Test", "Testing logger functionality");
+          addToMonitor("system", "✅ Logger is working correctly");
+        } catch (error) {
+          addToMonitor("error", `❌ Logger error: ${error.message}`);
+        }
+      });
+
+      // Auto-update status every 5 seconds
+      setInterval(updateStatus, 5000);
+    </script>
+  </body>
+</html>

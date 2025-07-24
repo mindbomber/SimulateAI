@@ -356,6 +356,18 @@ class UserProgress {
     });
   }
 
+  // Check if simulation is completed
+  isSimulationCompleted(simulationId) {
+    const progress = this.getSimulationProgress(simulationId);
+    return progress.completed || false;
+  }
+
+  // Get completed simulations list
+  getCompletedSimulations() {
+    const stats = this.getOverallStats();
+    return stats.completedSimulations || [];
+  }
+
   // Overall user stats
   getOverallStats() {
     return this.storage.get("overall_stats", {
@@ -389,19 +401,127 @@ class UserProgress {
   }
 }
 
+/**
+ * Enhanced analytics support for storage consolidation
+ */
+class AnalyticsStorage {
+  constructor(storage) {
+    this.storage = storage;
+  }
+
+  // Session management
+  getSessionId() {
+    return this.storage.get("analytics_session_id", "");
+  }
+
+  setSessionId(sessionId) {
+    this.storage.set("analytics_session_id", sessionId);
+  }
+
+  // Analytics events batching
+  async getAnalyticsBatch() {
+    return this.storage.get("analytics_batch", []);
+  }
+
+  async setAnalyticsBatch(events) {
+    this.storage.set("analytics_batch", events);
+  }
+
+  // Analytics sessions
+  async getAnalyticsSessions() {
+    return this.storage.get("analytics_sessions", []);
+  }
+
+  async setAnalyticsSessions(sessions) {
+    this.storage.set("analytics_sessions", sessions);
+  }
+
+  // Last visit timestamp
+  async getLastVisitTimestamp() {
+    return this.storage.get("last_visit_timestamp", 0);
+  }
+
+  async setLastVisitTimestamp(timestamp) {
+    this.storage.set("last_visit_timestamp", timestamp);
+  }
+
+  // User decisions storage
+  async getDecisions() {
+    return this.storage.get("user_decisions", []);
+  }
+
+  async setDecisions(decisions) {
+    this.storage.set("user_decisions", decisions);
+  }
+
+  // Log analytics event
+  async logAnalyticsEvent(event) {
+    const events = await this.getAnalyticsBatch();
+    events.push({
+      ...event,
+      timestamp: Date.now(),
+      id: Math.random().toString(36).substr(2, 9),
+    });
+    await this.setAnalyticsBatch(events);
+  }
+
+  // User preferences bridge methods for analytics compatibility
+  async getUserPreferences() {
+    return this.storage.get("user_preferences", {
+      theme: "light",
+      language: "en",
+      accessibility: {},
+      analytics: {
+        enabled: true,
+        trackingConsent: false,
+      },
+    });
+  }
+
+  async saveUserPreferences(preferences) {
+    this.storage.set("user_preferences", preferences);
+  }
+}
+
 // Create singleton instances
 const simpleStorage = new SimpleStorageManager();
 const userPreferences = new UserPreferences(simpleStorage);
 const userProgress = new UserProgress(simpleStorage);
+const analyticsStorage = new AnalyticsStorage(simpleStorage);
 
 // Export for use in other modules
-export { SimpleStorageManager, simpleStorage, userPreferences, userProgress };
+export {
+  SimpleStorageManager,
+  simpleStorage,
+  userPreferences,
+  userProgress,
+  analyticsStorage,
+};
+
+// Legacy compatibility layer for analytics.js migration
+export const StorageManager = {
+  // Basic storage operations
+  get: (key, defaultValue) => simpleStorage.get(key, defaultValue),
+  set: (key, value) => simpleStorage.set(key, value),
+  remove: (key) => simpleStorage.remove(key),
+
+  // Analytics-specific methods
+  getSessionId: () => analyticsStorage.getSessionId(),
+  getUserPreferences: () => analyticsStorage.getUserPreferences(),
+  saveUserPreferences: (prefs) => analyticsStorage.saveUserPreferences(prefs),
+  getDecisions: () => analyticsStorage.getDecisions(),
+  getCompletedSimulations: () => userProgress.getCompletedSimulations(),
+  isSimulationCompleted: (id) => userProgress.isSimulationCompleted(id),
+  logAnalyticsEvent: (event) => analyticsStorage.logAnalyticsEvent(event),
+};
 
 // Make available globally for debugging
 window.SimpleStorage = {
   manager: simpleStorage,
   preferences: userPreferences,
   progress: userProgress,
+  analytics: analyticsStorage,
+  legacy: StorageManager,
 };
 
 logger.info("Storage", "✅ Simple Storage Manager initialized");

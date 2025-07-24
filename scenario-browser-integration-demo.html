@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scenario Browser SimulateAI Integration Demo</title>
+    <link rel="stylesheet" href="src/styles/main.css" />
+    <link rel="stylesheet" href="src/styles/scenario-browser.css" />
+    <style>
+      .demo-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      .demo-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      }
+
+      .demo-header h1 {
+        margin: 0 0 1rem 0;
+        font-size: 2.5rem;
+        font-weight: 700;
+      }
+
+      .demo-header p {
+        margin: 0;
+        font-size: 1.2rem;
+        opacity: 0.9;
+      }
+
+      .integration-status {
+        background: #f8f9fa;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+      }
+
+      .status-item {
+        display: flex;
+        align-items: center;
+        margin: 0.5rem 0;
+      }
+
+      .status-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 0.5rem;
+        font-size: 1.2rem;
+      }
+
+      .status-good {
+        color: #28a745;
+      }
+      .status-warning {
+        color: #ffc107;
+      }
+      .status-error {
+        color: #dc3545;
+      }
+
+      .demo-controls {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      .demo-controls h3 {
+        margin-top: 0;
+        color: #333;
+      }
+
+      .control-group {
+        margin: 1rem 0;
+      }
+
+      .control-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #555;
+      }
+
+      .demo-button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        margin: 0.25rem;
+        transition: all 0.2s ease;
+      }
+
+      .demo-button:hover {
+        background: #0056b3;
+        transform: translateY(-1px);
+      }
+
+      .demo-button.secondary {
+        background: #6c757d;
+      }
+
+      .demo-button.secondary:hover {
+        background: #545b62;
+      }
+
+      .demo-button.success {
+        background: #28a745;
+      }
+
+      .demo-button.success:hover {
+        background: #1e7e34;
+      }
+
+      .scenario-browser-container {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .log-container {
+        background: #212529;
+        color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 6px;
+        margin: 1rem 0;
+        max-height: 300px;
+        overflow-y: auto;
+        font-family: "Courier New", monospace;
+        font-size: 0.9rem;
+      }
+
+      .log-entry {
+        margin: 0.25rem 0;
+      }
+
+      .log-entry.info {
+        color: #17a2b8;
+      }
+      .log-entry.success {
+        color: #28a745;
+      }
+      .log-entry.warning {
+        color: #ffc107;
+      }
+      .log-entry.error {
+        color: #dc3545;
+      }
+
+      .feature-highlight {
+        background: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-radius: 0 6px 6px 0;
+      }
+
+      .feature-highlight h4 {
+        margin-top: 0;
+        color: #1976d2;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="demo-container">
+      <div class="demo-header">
+        <h1>🔗 Scenario Browser SimulateAI Integration</h1>
+        <p>
+          Demonstrating unified navigation architecture between scenario browser
+          and SimulateAI ecosystem
+        </p>
+      </div>
+
+      <div class="integration-status">
+        <h3>📊 Integration Status</h3>
+        <div id="status-display">
+          <div class="status-item">
+            <span class="status-icon">⏳</span>
+            <span>Checking integration status...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-controls">
+        <h3>🎮 Demo Controls</h3>
+
+        <div class="control-group">
+          <label>Integration Configuration:</label>
+          <button class="demo-button" onclick="enableIntegration()">
+            ✅ Enable SimulateAI Integration
+          </button>
+          <button class="demo-button secondary" onclick="disableIntegration()">
+            ❌ Disable Integration
+          </button>
+          <button class="demo-button" onclick="checkStatus()">
+            🔍 Check Status
+          </button>
+        </div>
+
+        <div class="control-group">
+          <label>Navigation Testing:</label>
+          <button
+            class="demo-button success"
+            onclick="testScenarioNavigation()"
+          >
+            🎯 Test Scenario Navigation
+          </button>
+          <button
+            class="demo-button success"
+            onclick="testCategoryNavigation()"
+          >
+            📁 Test Category Navigation
+          </button>
+          <button class="demo-button success" onclick="testModalDirect()">
+            🚀 Test Direct Modal
+          </button>
+        </div>
+
+        <div class="control-group">
+          <label>Fallback Testing:</label>
+          <button
+            class="demo-button secondary"
+            onclick="testFallbackNavigation()"
+          >
+            🔄 Test Fallback Navigation
+          </button>
+          <button class="demo-button secondary" onclick="clearLogs()">
+            🧹 Clear Logs
+          </button>
+        </div>
+      </div>
+
+      <div class="feature-highlight">
+        <h4>🌟 Key Integration Features</h4>
+        <ul>
+          <li>
+            <strong>Unified Navigation:</strong> Scenario browser routes through
+            SimulateAI for consistent UX
+          </li>
+          <li>
+            <strong>Educational Context:</strong> Maintains educational flow and
+            pre-launch modals
+          </li>
+          <li>
+            <strong>Smart Fallbacks:</strong> Graceful degradation when
+            SimulateAI components unavailable
+          </li>
+          <li>
+            <strong>Configurable Integration:</strong> Enable/disable
+            integration modes as needed
+          </li>
+          <li>
+            <strong>Context Preservation:</strong> Tracks navigation source and
+            maintains user context
+          </li>
+        </ul>
+      </div>
+
+      <div class="log-container" id="demo-logs">
+        <div class="log-entry info">
+          [INFO] Demo initialized - ready for testing
+        </div>
+      </div>
+
+      <div class="scenario-browser-container">
+        <div id="scenario-browser-demo">
+          <!-- Scenario browser will be initialized here -->
+          <div style="padding: 2rem; text-align: center; color: #666">
+            <h3>🔄 Initializing Scenario Browser...</h3>
+            <p>
+              The integrated scenario browser will appear here once initialized.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load the required modules -->
+    <script type="module">
+      import ScenarioBrowser from "./src/js/components/scenario-browser.js";
+      import {
+        ScenarioBrowserIntegration,
+        initializeIntegratedScenarioBrowser,
+      } from "./src/js/utils/scenario-browser-integration.js";
+
+      // Mock app instance for demonstration
+      const mockApp = {
+        startSimulation: (simulationId, config) => {
+          logEvent(
+            "success",
+            `🎯 App.startSimulation called: ${simulationId}`,
+            config,
+          );
+          return true;
+        },
+        categoryGrid: {
+          switchView: (view) => {
+            logEvent("info", `📋 CategoryGrid.switchView: ${view}`);
+            return Promise.resolve();
+          },
+        },
+        scenarioModal: {
+          open: (scenarioId, categoryId) => {
+            logEvent(
+              "success",
+              `🎭 ScenarioModal.open: ${scenarioId} in ${categoryId}`,
+            );
+          },
+        },
+      };
+
+      // Global variables for demo
+      let scenarioBrowser = null;
+      let integration = null;
+
+      // Initialize demo
+      function initializeDemo() {
+        logEvent("info", "🚀 Initializing Scenario Browser Integration Demo");
+
+        try {
+          // Create integration instance
+          integration = new ScenarioBrowserIntegration(mockApp);
+
+          // Initialize scenario browser with integration
+          scenarioBrowser = integration.initializeScenarioBrowser(
+            "#scenario-browser-demo",
+            {
+              integrateWithSimulateAI: true,
+              routeThroughSimulateAI: true,
+              useSimulateAIModals: true,
+              parentContext: "integration-demo",
+            },
+          );
+
+          // Initialize the scenario browser UI
+          scenarioBrowser
+            .init()
+            .then(() => {
+              logEvent(
+                "success",
+                "✅ Scenario browser initialized with SimulateAI integration",
+              );
+              updateStatusDisplay();
+            })
+            .catch((error) => {
+              logEvent(
+                "error",
+                "❌ Failed to initialize scenario browser",
+                error,
+              );
+            });
+        } catch (error) {
+          logEvent("error", "❌ Demo initialization failed", error);
+        }
+      }
+
+      // Demo functions (make them global)
+      window.enableIntegration = function () {
+        if (scenarioBrowser) {
+          scenarioBrowser.enableSimulateAIIntegration({
+            routeThroughSimulateAI: true,
+            useSimulateAIModals: true,
+          });
+          logEvent("success", "✅ SimulateAI integration enabled");
+          updateStatusDisplay();
+        }
+      };
+
+      window.disableIntegration = function () {
+        if (scenarioBrowser) {
+          scenarioBrowser.disableSimulateAIIntegration();
+          logEvent("warning", "⚠️ SimulateAI integration disabled");
+          updateStatusDisplay();
+        }
+      };
+
+      window.checkStatus = function () {
+        if (integration) {
+          const status = integration.getStatus();
+          logEvent("info", "📊 Integration Status:", status);
+          updateStatusDisplay();
+        }
+      };
+
+      window.testScenarioNavigation = function () {
+        if (scenarioBrowser) {
+          logEvent("info", "🎯 Testing scenario navigation...");
+          scenarioBrowser.openScenario("trolley-problem", "trolley-basic");
+        }
+      };
+
+      window.testCategoryNavigation = function () {
+        if (integration) {
+          logEvent("info", "📁 Testing category navigation...");
+          integration.navigateToScenario("ai-black-box", "ai-hiring-bias");
+        }
+      };
+
+      window.testModalDirect = function () {
+        if (scenarioBrowser) {
+          logEvent("info", "🚀 Testing direct modal access...");
+          scenarioBrowser.openScenarioModalDirect(
+            "consent-surveillance",
+            "surveillance-consent",
+          );
+        }
+      };
+
+      window.testFallbackNavigation = function () {
+        if (integration) {
+          logEvent("info", "🔄 Testing fallback navigation...");
+          integration.handleFallbackNavigation("test-scenario-id", "demo-test");
+        }
+      };
+
+      window.clearLogs = function () {
+        const logContainer = document.getElementById("demo-logs");
+        logContainer.innerHTML =
+          '<div class="log-entry info">[INFO] Logs cleared</div>';
+      };
+
+      // Utility functions
+      function logEvent(type, message, data = null) {
+        const timestamp = new Date().toLocaleTimeString();
+        const logContainer = document.getElementById("demo-logs");
+        const logEntry = document.createElement("div");
+        logEntry.className = `log-entry ${type}`;
+
+        let logText = `[${timestamp}] ${message}`;
+        if (data) {
+          logText += ` - ${JSON.stringify(data, null, 2)}`;
+        }
+
+        logEntry.textContent = logText;
+        logContainer.appendChild(logEntry);
+        logContainer.scrollTop = logContainer.scrollHeight;
+
+        // Also log to console
+        console.log(`Demo ${type.toUpperCase()}:`, message, data);
+      }
+
+      function updateStatusDisplay() {
+        const statusDisplay = document.getElementById("status-display");
+
+        if (!integration || !scenarioBrowser) {
+          statusDisplay.innerHTML =
+            '<div class="status-item"><span class="status-icon status-error">❌</span><span>Integration not initialized</span></div>';
+          return;
+        }
+
+        const status = integration.getStatus();
+        const items = [];
+
+        // Check scenario browser status
+        if (status.scenarioBrowser.initialized) {
+          items.push(
+            '<div class="status-item"><span class="status-icon status-good">✅</span><span>Scenario Browser: Initialized</span></div>',
+          );
+        } else {
+          items.push(
+            '<div class="status-item"><span class="status-icon status-error">❌</span><span>Scenario Browser: Not Initialized</span></div>',
+          );
+        }
+
+        // Check integration status
+        if (status.scenarioBrowser.integrationEnabled) {
+          items.push(
+            '<div class="status-item"><span class="status-icon status-good">🔗</span><span>SimulateAI Integration: Enabled</span></div>',
+          );
+        } else {
+          items.push(
+            '<div class="status-item"><span class="status-icon status-warning">⚠️</span><span>SimulateAI Integration: Disabled</span></div>',
+          );
+        }
+
+        // Check app availability
+        if (status.app.available) {
+          items.push(
+            '<div class="status-item"><span class="status-icon status-good">📱</span><span>App Instance: Available</span></div>',
+          );
+        } else {
+          items.push(
+            '<div class="status-item"><span class="status-icon status-warning">⚠️</span><span>App Instance: Mock (Demo Mode)</span></div>',
+          );
+        }
+
+        // Check routing configuration
+        const routingStatus = status.scenarioBrowser.status;
+        if (routingStatus?.routeThroughSimulateAI) {
+          items.push(
+            '<div class="status-item"><span class="status-icon status-good">🛣️</span><span>Routing: Through SimulateAI</span></div>',
+          );
+        } else {
+          items.push(
+            '<div class="status-item"><span class="status-icon status-warning">🔄</span><span>Routing: Direct (Fallback)</span></div>',
+          );
+        }
+
+        statusDisplay.innerHTML = items.join("");
+      }
+
+      // Initialize demo when page loads
+      document.addEventListener("DOMContentLoaded", initializeDemo);
+    </script>
+  </body>
+</html>

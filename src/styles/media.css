@@ -273,7 +273,8 @@
 @media only screen and (orientation: portrait) {
   :root {
     --orientation: "portrait";
-    --header-height: 64px;
+    --header-height: 80px;
+    --header-h: 80px;
     --footer-height: 80px;
   }
 }
@@ -282,7 +283,8 @@
 @media only screen and (orientation: landscape) {
   :root {
     --orientation: "landscape";
-    --header-height: 56px;
+    --header-height: 80px;
+    --header-h: 80px;
     --footer-height: 64px;
   }
 }

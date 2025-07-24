@@ -1087,11 +1087,22 @@ class SharedNavigation {
     );
     if (openDropdowns.length > 0) return true;
 
-    // Check if settings menu is open
+    // Check if settings menu is open (display block or hover state)
     const settingsMenu = document.querySelector(
       '.settings-menu[style*="display: block"]',
     );
     if (settingsMenu) return true;
+
+    // Check if settings nav is being hovered
+    const settingsNavDropdown = document.querySelector(
+      ".nav-item-dropdown:hover",
+    );
+    if (
+      settingsNavDropdown &&
+      settingsNavDropdown.querySelector("#settings-nav")
+    ) {
+      return true;
+    }
 
     return false;
   }

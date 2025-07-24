@@ -32,6 +32,7 @@
 import { getSimulationInfo } from "../data/simulation-info.js";
 import ModalUtility from "./modal-utility.js";
 import { simpleAnalytics } from "../utils/simple-analytics.js";
+import DigitalScienceLab from "../core/digital-science-lab.js";
 import {
   getRadarChartExplanation,
   getEthicsGlossary,
@@ -54,8 +55,12 @@ export default class PreLaunchModal {
         onLaunch: options.onLaunch || (() => {}),
         onCancel: options.onCancel || (() => {}),
         showEducatorResources: options.showEducatorResources || false,
+        educationalContext: options.educationalContext || null,
         ...options,
       };
+
+      // Store educational context for use in content generation
+      this.educationalContext = this.options.educationalContext;
 
       // Load configuration asynchronously
       this.config = null;
@@ -110,6 +115,25 @@ export default class PreLaunchModal {
         PreLaunchModal._instances = new Set();
       }
       PreLaunchModal._instances.add(this);
+
+      // Initialize DigitalScienceLab for enhanced educational features
+      try {
+        this.digitalScienceLab = new DigitalScienceLab();
+        this._logTelemetry("digital_science_lab_initialized", {
+          instanceId: this.instanceId,
+          success: true,
+        });
+      } catch (error) {
+        console.warn(
+          "[PreLaunchModal] Failed to initialize DigitalScienceLab:",
+          error,
+        );
+        this.digitalScienceLab = null;
+        this._logTelemetry("digital_science_lab_initialization_failed", {
+          instanceId: this.instanceId,
+          error: error.message,
+        });
+      }
 
       // Check if category data is provided directly (for category-based premodals)
       if (options.categoryData && options.scenarioData) {
@@ -809,7 +833,7 @@ export default class PreLaunchModal {
   /**
    * Shows the pre-launch modal with enterprise monitoring
    */
-  show() {
+  async show() {
     const startTime = performance.now();
 
     try {
@@ -832,7 +856,7 @@ export default class PreLaunchModal {
 
       // Generate content with timing
       const contentStartTime = performance.now();
-      const content = this.generateModalContent();
+      const content = await this.generateModalContent();
       const footer = this.generateModalFooter();
       const contentGenerationTime = performance.now() - contentStartTime;
 
@@ -986,6 +1010,22 @@ export default class PreLaunchModal {
         PreLaunchModal._instances.delete(this);
       }
 
+      // Cleanup DigitalScienceLab if initialized
+      if (this.digitalScienceLab) {
+        try {
+          // DigitalScienceLab doesn't have explicit cleanup, but we can null the reference
+          this.digitalScienceLab = null;
+          this._logTelemetry("digital_science_lab_cleaned_up", {
+            instanceId: this.instanceId,
+          });
+        } catch (error) {
+          logger.warn(
+            "[PreLaunchModal] Error cleaning up DigitalScienceLab:",
+            error,
+          );
+        }
+      }
+
       // Reset state
       this.isHealthy = false;
 
@@ -1000,7 +1040,10 @@ export default class PreLaunchModal {
   /**
    * Generates the main modal content with tabs
    */
-  generateModalContent() {
+  async generateModalContent() {
+    // Generate the ethics tab content asynchronously
+    const ethicsTabContent = await this.generateEthicsTab();
+
     // Generate the tabbed content for the pre-launch modal
     return `
             <div class="pre-launch-modal">
@@ -1055,7 +1098,7 @@ export default class PreLaunchModal {
                 <div class="pre-launch-content">
                     ${this.generateOverviewTab()}
                     ${this.generateObjectivesTab()}
-                    ${this.generateEthicsTab()}
+                    ${ethicsTabContent}
                     ${this.generatePreparationTab()}
                     ${this.generateResourcesTab()}
                     ${this.options.showEducatorResources ? this.generateEducatorTab() : ""}
@@ -1194,10 +1237,132 @@ export default class PreLaunchModal {
 
   /**
    * Generates the ethics guide tab
+   * Updated to handle async glossary loading
    */
-  generateEthicsTab() {
-    const radarInfo = getRadarChartExplanation();
-    const glossary = getEthicsGlossary();
+  async generateEthicsTab() {
+    try {
+      const radarInfo = getRadarChartExplanation();
+      const glossary = await getEthicsGlossary();
+
+      // Validate that glossary is an array
+      if (!Array.isArray(glossary)) {
+        logger.warn(
+          "[PreLaunchModal] Ethics glossary is not an array, using fallback",
+          glossary,
+        );
+        return this._generateEthicsTabFallback(radarInfo);
+      }
+
+      return `
+              <div class="tab-content" id="tab-ethics" role="tabpanel" aria-labelledby="tab-ethics">
+                  <div class="ethics-guide">
+                      <div class="radar-explanation">
+                          <h4>${radarInfo.title}</h4>
+                          <p class="section-description">${radarInfo.overview}</p>
+                          
+                          <div class="ethics-features">
+                              ${radarInfo.features
+                                .map(
+                                  (feature) => `
+                                  <div class="feature-item">
+                                      <h5>${feature.title}</h5>
+                                      <p>${feature.description}</p>
+                                  </div>
+                              `,
+                                )
+                                .join("")}
+                          </div>
+                          
+                          <div class="interpretation-guide">
+                              <h5>How to Interpret the Chart</h5>
+                              <p>${radarInfo.interpretation}</p>
+                          </div>
+                      </div>
+                      
+                      <div class="ethics-dimensions">
+                          <h4>Ethical Dimensions Explained</h4>
+                          <p class="section-description">Each point on the radar chart represents one of these ethical considerations:</p>
+                          
+                          <div class="dimensions-grid">
+                              ${glossary
+                                .map(
+                                  (dimension) => `
+                                  <div class="dimension-item">
+                                      <div class="dimension-header">
+                                          <span class="dimension-color" style="background-color: ${dimension.color}"></span>
+                                          <h5>${dimension.label}</h5>
+                                      </div>
+                                      <p>${dimension.description}</p>
+                                  </div>
+                              `,
+                                )
+                                .join("")}
+                          </div>
+                          
+                          <div class="ethics-reminder">
+                              <p><strong>Remember:</strong> These dimensions often interact and sometimes conflict. Real ethical decision-making involves thoughtfully balancing these competing values based on context and consequences.</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          `;
+    } catch (error) {
+      logger.error("[PreLaunchModal] Error generating ethics tab:", error);
+      this._handleError(error, "generateEthicsTab");
+      const radarInfo = getRadarChartExplanation();
+      return this._generateEthicsTabFallback(radarInfo);
+    }
+  }
+
+  /**
+   * Generate fallback ethics tab when glossary loading fails
+   * @private
+   */
+  _generateEthicsTabFallback(radarInfo) {
+    logger.debug("[PreLaunchModal] Generating ethics tab fallback");
+
+    const fallbackDimensions = [
+      {
+        label: "Fairness",
+        description: "Ensuring equitable treatment and equal opportunities",
+        color: "#3b82f6",
+      },
+      {
+        label: "Privacy",
+        description: "Protecting personal information and individual autonomy",
+        color: "#10b981",
+      },
+      {
+        label: "Transparency",
+        description: "Making AI decisions understandable and explainable",
+        color: "#f59e0b",
+      },
+      {
+        label: "Accountability",
+        description: "Clear responsibility for AI system outcomes",
+        color: "#ef4444",
+      },
+      {
+        label: "Human Agency",
+        description: "Preserving human control and decision-making",
+        color: "#8b5cf6",
+      },
+      {
+        label: "Safety",
+        description: "Preventing harm and ensuring reliable operation",
+        color: "#06b6d4",
+      },
+      {
+        label: "Beneficence",
+        description: "Promoting wellbeing and positive outcomes",
+        color: "#84cc16",
+      },
+      {
+        label: "Non-maleficence",
+        description: "Avoiding harm and negative consequences",
+        color: "#f97316",
+      },
+    ];
 
     return `
             <div class="tab-content" id="tab-ethics" role="tabpanel" aria-labelledby="tab-ethics">
@@ -1230,7 +1395,7 @@ export default class PreLaunchModal {
                         <p class="section-description">Each point on the radar chart represents one of these ethical considerations:</p>
                         
                         <div class="dimensions-grid">
-                            ${glossary
+                            ${fallbackDimensions
                               .map(
                                 (dimension) => `
                                 <div class="dimension-item">
@@ -1247,6 +1412,14 @@ export default class PreLaunchModal {
                         
                         <div class="ethics-reminder">
                             <p><strong>Remember:</strong> These dimensions often interact and sometimes conflict. Real ethical decision-making involves thoughtfully balancing these competing values based on context and consequences.</p>
+                        </div>
+                        
+                        <div class="notice-box" style="margin-top: 1.5rem;">
+                            <div class="notice-icon">⚠️</div>
+                            <div class="notice-content">
+                                <strong>Using Default Dimensions:</strong>
+                                <p>The ethics glossary data could not be loaded. Showing default ethical dimensions for reference.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1363,22 +1536,33 @@ export default class PreLaunchModal {
 
   /**
    * Generates the educator resources tab
+   * Enhanced with better educational context integration and debugging
    */
   generateEducatorTab() {
     const info = this.simulationInfo;
     const resources = info.educatorResources;
 
+    // Debug logging
+    logger.debug("[PreLaunchModal] Generating educator tab", {
+      hasEducationalContext: !!this.educationalContext,
+      hasResources: !!resources,
+      showEducatorResources: this.options.showEducatorResources,
+      instanceId: this.instanceId,
+    });
+
     return `
             <div class="tab-content" id="tab-educator" role="tabpanel" aria-labelledby="tab-educator">
                 <div class="educator-content">
                     <div class="educator-intro">
-                        <h4>Educator Resources</h4>
+                        <h4>📚 Educator Resources</h4>
                         <p class="section-description">Tools and guidance for classroom implementation:</p>
                     </div>
                     
+                    ${this.generateEducationalContextSection()}
+                    
                     <div class="educator-sections">
                         <div class="educator-section">
-                            <h5>Discussion Questions</h5>
+                            <h5>💬 Discussion Questions</h5>
                             <ul class="discussion-questions">
                                 ${resources.discussionQuestions
                                   .map(
@@ -1391,7 +1575,7 @@ export default class PreLaunchModal {
                         </div>
                         
                         <div class="educator-section">
-                            <h5>Extension Activities</h5>
+                            <h5>🚀 Extension Activities</h5>
                             <ul class="extension-activities">
                                 ${resources.extensionActivities
                                   .map(
@@ -1404,7 +1588,7 @@ export default class PreLaunchModal {
                         </div>
                         
                         <div class="educator-section">
-                            <h5>Classroom Tips</h5>
+                            <h5>💡 Classroom Tips</h5>
                             <ul class="classroom-tips">
                                 ${resources.classroomTips
                                   .map(
@@ -1417,7 +1601,7 @@ export default class PreLaunchModal {
                         </div>
                         
                         <div class="educator-section">
-                            <h5>Standards Alignment</h5>
+                            <h5>📋 Standards Alignment</h5>
                             <ul class="standards-alignment">
                                 ${resources.relatedStandards
                                   .map(
@@ -1429,9 +1613,808 @@ export default class PreLaunchModal {
                             </ul>
                         </div>
                     </div>
+
+                    ${this._generateEducatorDebugInfo()}
                 </div>
             </div>
         `;
+  }
+
+  /**
+   * Generate educational context section for educator tab
+   * Enhanced with better debugging, fallback content, and improved presentation
+   * Now generates educational content dynamically using toolkit methods
+   */
+  generateEducationalContextSection() {
+    try {
+      // Enhanced debugging and validation
+      logger.debug("[PreLaunchModal] Generating educational context section", {
+        hasEducationalContext: !!this.educationalContext,
+        educationalContext: this.educationalContext,
+        instanceId: this.instanceId,
+      });
+
+      // Generate educational content dynamically if not provided
+      let curriculum, assessments, labStations, scenarioTemplates;
+
+      if (this.educationalContext) {
+        // Use provided educational context
+        ({ curriculum, assessments, labStations, scenarioTemplates } =
+          this.educationalContext);
+      } else {
+        // Generate educational content dynamically using toolkit methods
+        try {
+          // Import toolkit if available
+          if (window.app && window.app.educatorToolkit) {
+            const toolkit = window.app.educatorToolkit;
+            const categoryInfo = this.simulationInfo.categoryInfo;
+
+            if (categoryInfo) {
+              // Enhanced tag collection: use category tags + ethical dimensions + philosophical approach
+              const allTags = [
+                ...(categoryInfo.tags || []),
+                ...(categoryInfo.ethicalDimensions || []),
+                ...(categoryInfo.philosophicalApproaches || []),
+              ].filter(Boolean);
+
+              curriculum = toolkit.getCurriculumAlignment(allTags);
+
+              // Pass tags to assessment tools for content-specific assessments
+              assessments = toolkit.getAssessmentTools(
+                this.simulationInfo.difficulty || "intermediate",
+                allTags,
+              );
+
+              // Generate lab stations and scenario templates if available
+              if (toolkit.getLabStations) {
+                labStations = toolkit.getLabStations(allTags);
+              }
+
+              // If toolkit doesn't provide lab stations, try DigitalScienceLab with enhanced tags
+              if (!labStations && this.digitalScienceLab) {
+                try {
+                  labStations =
+                    this.digitalScienceLab.getRelevantStations(allTags);
+                  if (labStations) {
+                    logger.info(
+                      "[PreLaunchModal] Generated lab stations from DigitalScienceLab",
+                      {
+                        stationCount: labStations.length,
+                        tags: allTags,
+                        categoryTags: categoryInfo.tags?.length || 0,
+                        ethicalDimensions:
+                          categoryInfo.ethicalDimensions?.length || 0,
+                        philosophicalApproaches:
+                          categoryInfo.philosophicalApproaches?.length || 0,
+                      },
+                    );
+                  }
+                } catch (error) {
+                  logger.warn(
+                    "[PreLaunchModal] Failed to get lab stations from DigitalScienceLab:",
+                    error,
+                  );
+                }
+              }
+
+              if (toolkit.getScenarioTemplates) {
+                scenarioTemplates = toolkit.getScenarioTemplates(
+                  this.simulationInfo.difficulty || "intermediate",
+                );
+              }
+
+              logger.info(
+                "[PreLaunchModal] Generated educational content dynamically",
+                {
+                  curriculumItems: curriculum?.length || 0,
+                  assessmentItems: assessments?.length || 0,
+                  labStationItems: labStations?.length || 0,
+                  templateItems: scenarioTemplates?.length || 0,
+                },
+              );
+            }
+          }
+        } catch (error) {
+          logger.warn(
+            "[PreLaunchModal] Failed to generate educational content dynamically:",
+            error,
+          );
+        }
+      }
+
+      // If still no educational context after attempting generation, try DigitalScienceLab as last resort
+      if (!curriculum && !assessments && !labStations && !scenarioTemplates) {
+        if (this.digitalScienceLab) {
+          try {
+            // Generate basic educational content from DigitalScienceLab
+            const categoryInfo = this.simulationInfo.categoryInfo;
+            const difficulty = this.simulationInfo.difficulty || "intermediate";
+
+            if (categoryInfo) {
+              // Use enhanced tag collection for fallback as well
+              const allTags = [
+                ...(categoryInfo.tags || []),
+                ...(categoryInfo.ethicalDimensions || []),
+                ...(categoryInfo.philosophicalApproaches || []),
+              ].filter(Boolean);
+
+              labStations = this.digitalScienceLab.getRelevantStations(allTags);
+
+              // Get appropriate experiments for the difficulty level
+              const experiments =
+                this.digitalScienceLab.getExperimentsForLevel(difficulty);
+              if (experiments && experiments.length > 0) {
+                // Convert experiments to scenario templates format
+                scenarioTemplates = experiments.map((exp) => ({
+                  name: exp.title,
+                  description: exp.difficulty,
+                  type: "experiment",
+                  duration: exp.duration,
+                  materials: exp.materials || [],
+                  procedure: exp.procedure || [],
+                }));
+              }
+
+              // Generate basic curriculum alignment using philosophical leaning
+              if (
+                categoryInfo.philosophicalLeaning ||
+                categoryInfo.primaryPhilosophy
+              ) {
+                curriculum = [
+                  {
+                    standard: "Philosophical Framework",
+                    approach:
+                      categoryInfo.philosophicalLeaning ||
+                      categoryInfo.primaryPhilosophy,
+                    description: `Apply ${categoryInfo.philosophicalLeaning || categoryInfo.primaryPhilosophy} approach to ethical analysis`,
+                    relevantTags: allTags.slice(0, 5),
+                  },
+                ];
+              }
+
+              logger.info(
+                "[PreLaunchModal] Generated fallback content from DigitalScienceLab",
+                {
+                  labStations: labStations?.length || 0,
+                  experiments: experiments?.length || 0,
+                  enhancedTags: allTags.length,
+                  philosophicalApproach:
+                    categoryInfo.philosophicalLeaning ||
+                    categoryInfo.primaryPhilosophy,
+                },
+              );
+            }
+
+            // If we got any content from DigitalScienceLab, don't show the fallback
+            if (labStations || scenarioTemplates || curriculum) {
+              // Continue with normal rendering
+            } else {
+              return this._generateEducationalContextFallback(
+                "No educational content available - toolkit methods may not be accessible",
+              );
+            }
+          } catch (error) {
+            logger.warn(
+              "[PreLaunchModal] Failed to generate DigitalScienceLab fallback content:",
+              error,
+            );
+            return this._generateEducationalContextFallback(
+              "No educational content available - toolkit methods may not be accessible",
+            );
+          }
+        } else {
+          return this._generateEducationalContextFallback(
+            "No educational content available - toolkit methods may not be accessible",
+          );
+        }
+      }
+
+      // Check if we have any actual educational data
+      const hasValidData = this._validateEducationalData({
+        curriculum,
+        assessments,
+        labStations,
+        scenarioTemplates,
+      });
+
+      if (!hasValidData) {
+        return this._generateEducationalContextFallback();
+      }
+
+      let content = '<div class="educational-context-section">';
+      content += '<div class="educational-header">';
+      content += "<h4>🤖 AI-Enhanced Educational Support</h4>";
+      content +=
+        '<p class="section-description">This simulation includes comprehensive educational resources powered by AI:</p>';
+      content += "</div>";
+
+      let sectionsAdded = 0;
+
+      // Enhanced Curriculum alignment with better formatting
+      if (curriculum && Array.isArray(curriculum) && curriculum.length > 0) {
+        content += this._generateCurriculumSection(curriculum);
+        sectionsAdded++;
+      }
+
+      // Enhanced Assessment tools with detailed information
+      if (assessments && Array.isArray(assessments) && assessments.length > 0) {
+        content += this._generateAssessmentSection(assessments);
+        sectionsAdded++;
+      }
+
+      // Enhanced Lab stations with interactive features
+      if (labStations && Array.isArray(labStations) && labStations.length > 0) {
+        content += this._generateLabStationsSection(labStations);
+        sectionsAdded++;
+      }
+
+      // Enhanced Scenario templates with preview capabilities
+      if (
+        scenarioTemplates &&
+        Array.isArray(scenarioTemplates) &&
+        scenarioTemplates.length > 0
+      ) {
+        content += this._generateScenarioTemplatesSection(scenarioTemplates);
+        sectionsAdded++;
+      }
+
+      // Add Educator Dashboard Preview (always available)
+      content += this._generateEducatorDashboardPreview();
+      sectionsAdded++;
+
+      // Add Professional Development Preview (always available)
+      content += this._generateProfessionalDevelopmentPreview();
+      sectionsAdded++;
+
+      // Add summary information
+      if (sectionsAdded > 0) {
+        content += this._generateEducationalSummary(sectionsAdded);
+      }
+
+      content += "</div>";
+
+      // Log successful generation
+      this._logTelemetry("educational_context_generated", {
+        sectionsGenerated: sectionsAdded,
+        hasData: hasValidData,
+        timestamp: Date.now(),
+      });
+
+      return content;
+    } catch (error) {
+      logger.error(
+        "[PreLaunchModal] Error generating educational context section:",
+        error,
+      );
+      this._handleError(error, "generateEducationalContextSection");
+      return this._generateEducationalContextFallback(
+        "Error loading educational content",
+      );
+    }
+  }
+
+  /**
+   * Validate educational data structure
+   * @private
+   */
+  _validateEducationalData({
+    curriculum,
+    assessments,
+    labStations,
+    scenarioTemplates,
+  }) {
+    const hasValidCurriculum =
+      curriculum && Array.isArray(curriculum) && curriculum.length > 0;
+    const hasValidAssessments =
+      assessments && Array.isArray(assessments) && assessments.length > 0;
+    const hasValidLabStations =
+      labStations && Array.isArray(labStations) && labStations.length > 0;
+    const hasValidTemplates =
+      scenarioTemplates &&
+      Array.isArray(scenarioTemplates) &&
+      scenarioTemplates.length > 0;
+
+    return (
+      hasValidCurriculum ||
+      hasValidAssessments ||
+      hasValidLabStations ||
+      hasValidTemplates
+    );
+  }
+
+  /**
+   * Generate enhanced curriculum alignment section
+   * @private
+   */
+  _generateCurriculumSection(curriculum) {
+    let content = `
+      <div class="curriculum-standards-preview">
+        <div class="section-header">
+          <h4>📚 Curriculum Standards Alignment</h4>
+          <span class="section-badge">${curriculum.length} Standard${curriculum.length !== 1 ? "s" : ""}</span>
+        </div>
+        <p class="section-description">This simulation aligns with key educational standards and frameworks</p>
+        <div class="standards-grid">
+    `;
+
+    curriculum.forEach((item, index) => {
+      content += `
+        <div class="standard-preview" data-standard="${item.standard || ""}" data-index="${index}">
+          <div class="standard-header">
+            <span class="standard-code">${item.code || item.standard || "STD"}</span>
+            <span class="standard-progress">85% coverage</span>
+          </div>
+          <h5 class="standard-title">${item.standard || "Educational Standard"}</h5>
+          <p class="standard-description">${item.description || "Supports curriculum alignment goals"}</p>
+        </div>
+      `;
+    });
+
+    content += `
+        </div>
+        <div class="standards-summary">
+          <div class="coverage-stats">
+            <div class="coverage-stat">
+              <span class="coverage-percentage">80%+</span>
+              <span class="coverage-label">Standards Coverage</span>
+            </div>
+            <div class="coverage-stat">
+              <span class="coverage-percentage">${curriculum.length}</span>
+              <span class="coverage-label">Standards Aligned</span>
+            </div>
+            <div class="coverage-stat">
+              <span class="coverage-percentage">K-12</span>
+              <span class="coverage-label">Grade Levels</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    return content;
+  }
+
+  /**
+   * Generate enhanced assessment tools section
+   * @private
+   */
+  _generateAssessmentSection(assessments) {
+    let content = `
+      <div class="assessment-tools-preview">
+        <div class="section-header">
+          <h4>📝 Assessment Tools</h4>
+          <span class="section-badge">${assessments.length} Tool${assessments.length !== 1 ? "s" : ""}</span>
+        </div>
+        <p class="section-description">Comprehensive assessment methods for evaluating student learning</p>
+        <div class="assessment-categories">
+    `;
+
+    assessments.forEach((tool, index) => {
+      if (tool && tool.name) {
+        content += `
+          <div class="assessment-category" data-tool="${tool.name}" data-index="${index}">
+            <div class="assessment-category-header">
+              <div class="assessment-category-icon">📊</div>
+              <h5 class="assessment-category-title">${tool.name}</h5>
+            </div>
+            <p class="tool-description">${tool.description || "Assessment tool for measuring student understanding"}</p>
+            <ul class="assessment-methods">
+              <li>Formative assessment strategies</li>
+              <li>Summative evaluation methods</li>
+              <li>Peer review components</li>
+              ${tool.type ? `<li>Specialized ${tool.type} tools</li>` : ""}
+            </ul>
+            ${tool.difficulty ? `<span class="assessment-weight">Difficulty: ${tool.difficulty}</span>` : ""}
+          </div>
+        `;
+      } else if (tool && tool.type) {
+        content += `
+          <div class="assessment-category" data-index="${index}">
+            <div class="assessment-category-header">
+              <div class="assessment-category-icon">✅</div>
+              <h5 class="assessment-category-title">${tool.type}</h5>
+            </div>
+            <p class="tool-description">${tool.tools ? `${tool.tools.length} assessment instruments available` : "Various assessment tools"}</p>
+            <ul class="assessment-methods">
+              <li>Portfolio-based assessment</li>
+              <li>Performance evaluation</li>
+              <li>Collaborative assessment</li>
+            </ul>
+          </div>
+        `;
+      } else {
+        content += `
+          <div class="assessment-category" data-index="${index}">
+            <div class="assessment-category-header">
+              <div class="assessment-category-icon">📋</div>
+              <h5 class="assessment-category-title">Comprehensive Assessment</h5>
+            </div>
+            <p class="tool-description">Customized assessment suite for this simulation</p>
+            <ul class="assessment-methods">
+              <li>Scenario-based evaluation</li>
+              <li>Ethical reasoning assessment</li>
+              <li>Critical thinking measurement</li>
+            </ul>
+          </div>
+        `;
+      }
+    });
+
+    content += `
+        </div>
+      </div>
+    `;
+
+    return content;
+  }
+
+  /**
+   * Generate enhanced lab stations section
+   * @private
+   */
+  _generateLabStationsSection(labStations) {
+    let content = `
+      <div class="lab-stations-overview">
+        <div class="section-header">
+          <h4>🔬 Virtual Lab Stations</h4>
+          <span class="section-badge">${labStations.length} Station${labStations.length !== 1 ? "s" : ""}</span>
+        </div>
+        <p class="section-description">Interactive virtual laboratories for hands-on AI ethics exploration</p>
+        <div class="lab-stations-grid">
+    `;
+
+    labStations.forEach((station, index) => {
+      if (station && station.name) {
+        // Enhanced display for DigitalScienceLab stations
+        const tools = station.tools
+          ? Array.isArray(station.tools)
+            ? station.tools
+            : [station.tools]
+          : [];
+        const experiments = station.experiments
+          ? Array.isArray(station.experiments)
+            ? station.experiments
+            : [station.experiments]
+          : [];
+        const learningOutcomes = station.learningOutcomes
+          ? Array.isArray(station.learningOutcomes)
+            ? station.learningOutcomes
+            : [station.learningOutcomes]
+          : [];
+
+        content += `
+          <div class="lab-station-preview" data-station="${station.name}" data-index="${index}">
+            <div class="station-header">
+              <div class="station-icon">🔬</div>
+              <div class="station-meta">
+                <div class="station-duration">45-60 min</div>
+                <div class="station-difficulty">Intermediate</div>
+              </div>
+            </div>
+            <h5 class="station-title">${station.name}</h5>
+            <p class="station-description">${station.purpose || station.description || "Interactive learning station for exploring AI ethics concepts"}</p>
+            
+            ${
+              tools.length > 0
+                ? `
+              <div class="station-tools">
+                ${tools
+                  .slice(0, 4)
+                  .map((tool) => `<span class="tool-tag">${tool}</span>`)
+                  .join("")}
+                ${tools.length > 4 ? `<span class="tool-tag">+${tools.length - 4} more</span>` : ""}
+              </div>
+            `
+                : ""
+            }
+            
+            ${
+              learningOutcomes.length > 0
+                ? `
+              <div class="station-objectives">
+                <h6>Learning Objectives:</h6>
+                <ul>
+                  ${learningOutcomes
+                    .slice(0, 3)
+                    .map((outcome) => `<li>${outcome}</li>`)
+                    .join("")}
+                  ${learningOutcomes.length > 3 ? `<li><em>+${learningOutcomes.length - 3} more objectives</em></li>` : ""}
+                </ul>
+              </div>
+            `
+                : ""
+            }
+          </div>
+        `;
+      } else {
+        content += `
+          <div class="lab-station-card" data-index="${index}">
+            <div class="station-header">
+              <strong class="station-name">Interactive Lab Station</strong>
+            </div>
+            <p class="station-purpose">Hands-on learning experience for this simulation</p>
+          </div>
+        `;
+      }
+    });
+
+    content += `
+        </div>
+      </div>
+    `;
+
+    return content;
+  }
+
+  /**
+   * Generate enhanced scenario templates section
+   * @private
+   */
+  _generateScenarioTemplatesSection(scenarioTemplates) {
+    let content = `
+      <div class="educator-section scenario-templates-section">
+        <div class="section-header">
+          <h5>📋 Additional Scenario Templates</h5>
+          <span class="section-badge">${scenarioTemplates.length} Template${scenarioTemplates.length !== 1 ? "s" : ""}</span>
+        </div>
+        <p class="section-description">Create custom scenarios using these AI-generated templates:</p>
+        <div class="templates-grid">
+    `;
+
+    scenarioTemplates.forEach((template, index) => {
+      content += `
+        <div class="template-card" data-template="${template.title || template.name || `template-${index}`}" data-index="${index}">
+          <div class="template-header">
+            <strong class="template-title">${template.title || template.name || "Custom Scenario Template"}</strong>
+            ${template.difficulty ? `<span class="template-difficulty">${template.difficulty}</span>` : ""}
+          </div>
+          ${template.description ? `<p class="template-description">${template.description}</p>` : ""}
+          ${template.tags ? `<div class="template-tags">${Array.isArray(template.tags) ? template.tags.map((tag) => `<span class="tag">${tag}</span>`).join("") : template.tags}</div>` : ""}
+          ${template.estimatedTime ? `<div class="template-time">Est. Time: ${template.estimatedTime} minutes</div>` : ""}
+        </div>
+      `;
+    });
+
+    content += `
+        </div>
+      </div>
+    `;
+
+    return content;
+  }
+
+  /**
+   * Generate educator dashboard preview section
+   * @private
+   */
+  _generateEducatorDashboardPreview() {
+    return `
+      <div class="educator-dashboard-preview">
+        <div class="section-header">
+          <h4>📊 Educator Dashboard</h4>
+          <span class="section-badge">Real-time Analytics</span>
+        </div>
+        <p class="section-description">Comprehensive classroom analytics and student progress tracking</p>
+        
+        <div class="dashboard-metrics">
+          <div class="metric-card">
+            <div class="metric-icon">👥</div>
+            <span class="metric-value">25</span>
+            <span class="metric-label">Students</span>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon">📈</div>
+            <span class="metric-value">87%</span>
+            <span class="metric-label">Engagement</span>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon">✅</div>
+            <span class="metric-value">78%</span>
+            <span class="metric-label">Completion</span>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon">🎯</div>
+            <span class="metric-value">5</span>
+            <span class="metric-label">Lab Stations</span>
+          </div>
+        </div>
+        
+        <div class="dashboard-insights">
+          <div class="insights-header">
+            <h5>💡 Key Insights</h5>
+          </div>
+          <ul class="insights-list">
+            <li><span class="insight-icon">🔍</span>Students excel at bias recognition</li>
+            <li><span class="insight-icon">💬</span>Strong participation in ethical discussions</li>
+            <li><span class="insight-icon">🤝</span>Collaborative problem-solving growing</li>
+            <li><span class="insight-icon">📚</span>Need more support with complex reasoning</li>
+          </ul>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Generate professional development preview section
+   * @private
+   */
+  _generateProfessionalDevelopmentPreview() {
+    return `
+      <div class="professional-development-preview">
+        <div class="section-header">
+          <h4>🎓 Professional Development</h4>
+          <span class="section-badge">Educator Growth</span>
+        </div>
+        <p class="section-description">Comprehensive training and certification programs for AI ethics education</p>
+        
+        <div class="development-features">
+          <div class="development-feature">
+            <div class="feature-header">
+              <div class="feature-icon">🏫</div>
+              <h5 class="feature-title">Workshops & Training</h5>
+            </div>
+            <p class="feature-description">Hands-on workshops covering AI ethics fundamentals and advanced facilitation techniques</p>
+            <ul class="feature-benefits">
+              <li>AI Ethics Fundamentals (3 hours)</li>
+              <li>Advanced Facilitation (6 hours)</li>
+              <li>Curriculum Integration Strategies</li>
+            </ul>
+          </div>
+          
+          <div class="development-feature">
+            <div class="feature-header">
+              <div class="feature-icon">🏆</div>
+              <h5 class="feature-title">Certification Program</h5>
+            </div>
+            <p class="feature-description">Earn official AI Ethics Educator certification with comprehensive portfolio requirements</p>
+            <ul class="feature-benefits">
+              <li>Official credential recognition</li>
+              <li>Access to advanced resources</li>
+              <li>Professional community network</li>
+            </ul>
+          </div>
+          
+          <div class="development-feature">
+            <div class="feature-header">
+              <div class="feature-icon">🤝</div>
+              <h5 class="feature-title">Community & Support</h5>
+            </div>
+            <p class="feature-description">Connect with educators worldwide through forums, best practices sharing, and peer support</p>
+            <ul class="feature-benefits">
+              <li>Educator forum access</li>
+              <li>Best practices library</li>
+              <li>Monthly community calls</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Generate educational summary section
+   * @private
+   */
+  _generateEducationalSummary(sectionsCount) {
+    return `
+      <div class="educational-summary">
+        <div class="summary-stats">
+          <div class="stat-item">
+            <span class="stat-number">${sectionsCount}</span>
+            <span class="stat-label">Educational Resource${sectionsCount !== 1 ? "s" : ""}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">🎯</span>
+            <span class="stat-label">AI-Powered Learning</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">📈</span>
+            <span class="stat-label">Learning Outcomes</span>
+          </div>
+        </div>
+        <p class="summary-text">These resources are dynamically generated based on the simulation content and learning objectives.</p>
+      </div>
+    `;
+  }
+
+  /**
+   * Generate debug information for educator tab (development mode)
+   * @private
+   */
+  _generateEducatorDebugInfo() {
+    // Only show debug info in development mode or when explicitly enabled
+    const showDebug =
+      window.location.hostname === "localhost" ||
+      window.location.search.includes("debug=true") ||
+      localStorage.getItem("prelaunch-debug") === "true";
+
+    if (!showDebug) {
+      return "";
+    }
+
+    return `
+      <div class="educator-debug-section" style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 0.5rem; border-left: 4px solid #007bff;">
+        <details>
+          <summary style="cursor: pointer; font-weight: 600; margin-bottom: 0.5rem;">🔧 Debug Information</summary>
+          <div class="debug-content" style="font-family: monospace; font-size: 0.85rem;">
+            <div><strong>Educational Context Status:</strong> ${this.educationalContext ? "Available" : "Not Available"}</div>
+            ${
+              this.educationalContext
+                ? `
+              <div><strong>Curriculum Items:</strong> ${this.educationalContext.curriculum?.length || 0}</div>
+              <div><strong>Assessment Tools:</strong> ${this.educationalContext.assessments?.length || 0}</div>
+              <div><strong>Lab Stations:</strong> ${this.educationalContext.labStations?.length || 0}</div>
+              <div><strong>Scenario Templates:</strong> ${this.educationalContext.scenarioTemplates?.length || 0}</div>
+            `
+                : ""
+            }
+            <div><strong>Simulation ID:</strong> ${this.simulationId}</div>
+            <div><strong>Instance ID:</strong> ${this.instanceId}</div>
+            <div><strong>Options:</strong> ${JSON.stringify(Object.keys(this.options))}</div>
+            <div style="margin-top: 0.5rem;">
+              <strong>Raw Educational Context:</strong>
+              <pre style="background: white; padding: 0.5rem; border-radius: 0.25rem; overflow-x: auto; max-height: 200px;">${JSON.stringify(this.educationalContext, null, 2)}</pre>
+            </div>
+          </div>
+        </details>
+      </div>
+    `;
+  }
+
+  /**
+   * Generate fallback content when educational context is not available
+   * @private
+   */
+  _generateEducationalContextFallback(errorMessage = null) {
+    logger.debug(
+      "[PreLaunchModal] Generating educational context fallback",
+      errorMessage,
+    );
+
+    return `
+      <div class="educational-context-section educational-fallback">
+        <div class="educational-header">
+          <h4>🤖 Educational Resources</h4>
+          ${
+            errorMessage
+              ? `<div class="error-notice">${errorMessage}</div>`
+              : '<p class="section-description">Educational resources are being prepared for this simulation.</p>'
+          }
+        </div>
+        
+        <div class="fallback-content">
+          <div class="educator-section">
+            <h5>📚 Learning Integration</h5>
+            <p>This simulation supports educational objectives through:</p>
+            <ul class="learning-features">
+              <li>Interactive scenario-based learning</li>
+              <li>Critical thinking development</li>
+              <li>Ethical reasoning practice</li>
+              <li>Real-world application examples</li>
+            </ul>
+          </div>
+          
+          <div class="educator-section">
+            <h5>🎯 Educational Value</h5>
+            <p>Students will engage with:</p>
+            <ul class="educational-benefits">
+              <li>Complex problem-solving scenarios</li>
+              <li>Multi-perspective analysis</li>
+              <li>Decision-making frameworks</li>
+              <li>Collaborative discussion opportunities</li>
+            </ul>
+          </div>
+          
+          <div class="notice-box">
+            <div class="notice-icon">💡</div>
+            <div class="notice-content">
+              <strong>Enhanced Experience:</strong>
+              <p>Full educational resources including curriculum alignment, assessment tools, and lab stations will be available when AI educational modules are active.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
   }
 
   /**

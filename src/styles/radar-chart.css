@@ -4,6 +4,131 @@
  * Consolidated from hero-demo.css, ethics-analysis.css, appearance-settings.css, and scenario-modal.css
  */
 
+/* ===== CSS CUSTOM PROPERTIES FOR RADAR CHART INTEGRATION ===== */
+:root {
+  /* Radar Chart Configuration Integration */
+  /* These properties are populated by radar-config-loader.js syncColorsWithCSS() function */
+
+  /* Chart Sizing (synced with radar-chart-config.json) */
+  --radar-chart-size: 400px;
+  --radar-chart-default-size: 400px;
+
+  /* Point Colors (dynamically set from config.pointColors) */
+  --radar-point-color-0: #ff4757; /* Poor score - red */
+  --radar-point-color-2: #ff6b35; /* Below average - orange */
+  --radar-point-color-2-5: #ffa726; /* Slightly below average - amber */
+  --radar-point-color-3: #ffeb3b; /* Neutral - yellow */
+  --radar-point-color-4: #8bc34a; /* Good - light green */
+  --radar-point-color-5: #4caf50; /* Excellent - green */
+
+  /* Grid Colors (dynamically set from config.gridColors) */
+  --radar-grid-color-0: rgba(0, 0, 0, 0.1);
+  --radar-grid-color-1: rgba(0, 0, 0, 0.15);
+  --radar-grid-color-2: rgba(0, 0, 0, 0.2);
+  --radar-grid-color-default: rgba(0, 0, 0, 0.1);
+
+  /* Scoring Thresholds (dynamically set from config.scoring) */
+  --radar-max-score: 5;
+  --radar-min-score: 0;
+  --radar-neutral-score: 3;
+  --radar-positive-threshold: 4;
+
+  /* Responsive Breakpoints (dynamically set from config.chart) */
+  --radar-mobile-breakpoint: 768px;
+  --radar-tablet-breakpoint: 1024px;
+  --radar-desktop-breakpoint: 1200px;
+
+  /* Theme Integration Variables (populated by theme sync) */
+  /* Format: --radar-theme-{themeName}-{colorKey} */
+  /* Examples:
+   * --radar-theme-light-background: #ffffff;
+   * --radar-theme-dark-background: #1a1a1a;
+   * --radar-theme-high-contrast-accent: #ffff00;
+   */
+}
+
+/* ===== RADAR CHART THEME CLASSES ===== */
+
+/* Base theme class modifications for radar charts */
+.radar-chart-container.theme-light,
+.hero-radar-chart.theme-light,
+.scenario-radar.theme-light {
+  background-color: var(--radar-theme-light-background, #ffffff);
+  border-color: var(--radar-theme-light-border, #e2e8f0);
+  color: var(--radar-theme-light-text, #333333);
+}
+
+.radar-chart-container.theme-dark,
+.hero-radar-chart.theme-dark,
+.scenario-radar.theme-dark {
+  background-color: var(--radar-theme-dark-background, #1a1a1a);
+  border-color: var(--radar-theme-dark-border, #444444);
+  color: var(--radar-theme-dark-text, #ffffff);
+}
+
+.radar-chart-container.theme-high-contrast,
+.hero-radar-chart.theme-high-contrast,
+.scenario-radar.theme-high-contrast {
+  background-color: var(--radar-theme-high-contrast-background, #000000);
+  border-color: var(--radar-theme-high-contrast-border, #ffffff);
+  color: var(--radar-theme-high-contrast-text, #ffffff);
+}
+
+/* Dynamic score coloring using CSS custom properties */
+.score-fill {
+  background-color: var(--radar-point-color-3); /* Default to neutral */
+}
+
+.score-fill[data-score="0"],
+.score-fill[data-score="1"] {
+  background-color: var(--radar-point-color-0);
+}
+
+.score-fill[data-score="2"] {
+  background-color: var(--radar-point-color-2);
+}
+
+.score-fill[data-score="2.5"] {
+  background-color: var(--radar-point-color-2-5);
+}
+
+.score-fill[data-score="3"] {
+  background-color: var(--radar-point-color-3);
+}
+
+.score-fill[data-score="4"] {
+  background-color: var(--radar-point-color-4);
+}
+
+.score-fill[data-score="5"] {
+  background-color: var(--radar-point-color-5);
+}
+
+/* Responsive radar chart adjustments using config breakpoints */
+@media (max-width: var(--radar-mobile-breakpoint, 768px)) {
+  .radar-chart-container {
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+
+  .hero-radar-demo {
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+}
+
+@media (max-width: var(--radar-tablet-breakpoint, 1024px)) {
+  .radar-demo-container {
+    max-width: 90%;
+  }
+
+  .scenario-radar {
+    padding: 1.25rem;
+  }
+}
+
+/* ===== ORIGINAL RADAR CHART STYLES ===== */
+
 /* Hero Radar Demo Section - Consolidated from hero-demo.css */
 .hero-radar-demo {
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);

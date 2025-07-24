@@ -38,6 +38,7 @@ import {
   getChartConfigTemplate,
   validateConfig,
   getEnterpriseConstants,
+  initializeCSSIntegration,
 } from "../utils/radar-config-loader.js";
 import chartEventCoordinator from "../constants/chart-event-coordinator.js";
 
@@ -54,7 +55,17 @@ export default class RadarChart {
       try {
         RadarChart.config = await loadRadarConfig();
         validateConfig(RadarChart.config);
-        logger.info("RadarChart", "Configuration loaded and validated");
+
+        // Initialize CSS integration for consistent styling
+        initializeCSSIntegration(RadarChart.config, {
+          syncThemes: true,
+          syncScoring: true,
+        });
+
+        logger.info(
+          "RadarChart",
+          "Configuration loaded, validated, and CSS synchronized",
+        );
       } catch (error) {
         logger.error("RadarChart", "Failed to load configuration", error);
         throw error;
@@ -123,7 +134,33 @@ export default class RadarChart {
     this.CHART_CONSTANTS = getChartConstants(config);
     this.ETHICAL_AXES = getEthicalAxes(config);
     this.DEFAULT_SCORES = getDefaultScores(config);
-    this.ENTERPRISE_CONSTANTS = getEnterpriseConstants(config);
+
+    // Load enterprise constants with comprehensive validation
+    try {
+      this.ENTERPRISE_CONSTANTS = getEnterpriseConstants(config);
+    } catch (error) {
+      logger.warn(
+        "RadarChart",
+        "Failed to load enterprise constants from config:",
+        error.message,
+      );
+      this.ENTERPRISE_CONSTANTS = null;
+    }
+
+    // Validate enterprise constants structure thoroughly
+    if (
+      !this.ENTERPRISE_CONSTANTS ||
+      !this.ENTERPRISE_CONSTANTS.TELEMETRY ||
+      !this.ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES ||
+      !this.ENTERPRISE_CONSTANTS.HEALTH ||
+      !this.ENTERPRISE_CONSTANTS.ERROR_RECOVERY
+    ) {
+      logger.warn(
+        "RadarChart",
+        "Enterprise constants not loaded properly or missing required structure, using defaults",
+      );
+      this.ENTERPRISE_CONSTANTS = this._getDefaultEnterpriseConstants();
+    }
 
     this.containerId = containerId;
     this.container = document.getElementById(containerId);
@@ -251,6 +288,40 @@ export default class RadarChart {
       containerId: this.containerId,
       totalInstances: RadarChart.instanceCounter,
     });
+  }
+
+  /**
+   * Get default enterprise constants as fallback
+   * @private
+   * @returns {Object} Default enterprise constants
+   */
+  _getDefaultEnterpriseConstants() {
+    return {
+      TELEMETRY: {
+        EVENT_TYPES: {
+          CHART_RENDER: "chart_render",
+          DATA_UPDATE: "data_update",
+          USER_INTERACTION: "user_interaction",
+          ERROR_EVENT: "error_event",
+          PERFORMANCE_METRIC: "performance_metric",
+        },
+        BATCH_SIZE: 50,
+        FLUSH_INTERVAL: 60000,
+      },
+      HEALTH: {
+        CHECK_INTERVAL: 30000,
+        ERROR_THRESHOLD: 10,
+        MEMORY_THRESHOLD_MB: 50,
+        RENDER_TIME_THRESHOLD_MS: 1000,
+        HEARTBEAT_INTERVAL: 60000,
+        PERFORMANCE_SAMPLE_SIZE: 100,
+      },
+      ERROR_RECOVERY: {
+        CIRCUIT_BREAKER_THRESHOLD: 5,
+        MAX_RETRY_ATTEMPTS: 3,
+        RETRY_DELAY: 1000,
+      },
+    };
   }
 
   /**
@@ -407,13 +478,15 @@ export default class RadarChart {
 
       logger.info("RadarChart", "Initializing radar chart");
 
-      // Track chart initialization attempt
-      this._logTelemetry(
-        this.ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.CHART_RENDER,
-        {
-          operation: "initialization_start",
-        },
-      );
+      // Track chart initialization attempt (with safe access)
+      if (this.ENTERPRISE_CONSTANTS?.TELEMETRY?.EVENT_TYPES?.CHART_RENDER) {
+        this._logTelemetry(
+          this.ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.CHART_RENDER,
+          {
+            operation: "initialization_start",
+          },
+        );
+      }
 
       // Ensure Chart.js is loaded
       if (typeof window.Chart === "undefined") {
@@ -512,15 +585,17 @@ export default class RadarChart {
       // Track user journey
       this.userJourney.chartViews++;
 
-      // Log successful initialization
-      this._logTelemetry(
-        this.ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.CHART_RENDER,
-        {
-          operation: "initialization_complete",
-          duration: initDuration,
-          containerId: this.containerId,
-        },
-      );
+      // Log successful initialization (with safe access)
+      if (this.ENTERPRISE_CONSTANTS?.TELEMETRY?.EVENT_TYPES?.CHART_RENDER) {
+        this._logTelemetry(
+          this.ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.CHART_RENDER,
+          {
+            operation: "initialization_complete",
+            duration: initDuration,
+            containerId: this.containerId,
+          },
+        );
+      }
 
       logger.info("RadarChart", "Radar chart initialized successfully", {
         instanceId: this.instanceId,
@@ -1835,35 +1910,48 @@ export default class RadarChart {
     this.circuitBreaker.lastFailureTime = Date.now();
 
     // Open circuit breaker if threshold exceeded
-    if (
-      this.circuitBreaker.failures >=
-      this.ENTERPRISE_CONSTANTS.ERROR_RECOVERY.CIRCUIT_BREAKER_THRESHOLD
-    ) {
+    const maxThreshold =
+      this.ENTERPRISE_CONSTANTS?.ERROR_RECOVERY?.CIRCUIT_BREAKER_THRESHOLD || 5;
+    if (this.circuitBreaker.failures >= maxThreshold) {
       this.circuitBreaker.state = "open";
       this.circuitBreaker.isOpen = true;
       this._enterFailsafeMode();
     }
 
-    // Log telemetry for enterprise systems
-    this._logTelemetry(
-      this.ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.ERROR_EVENT,
-      {
+    // Log telemetry for enterprise systems (with safe access)
+    if (this.ENTERPRISE_CONSTANTS?.TELEMETRY?.EVENT_TYPES?.ERROR_EVENT) {
+      this._logTelemetry(
+        this.ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.ERROR_EVENT,
+        {
+          error: error.message,
+          context,
+          circuitBreakerState: this.circuitBreaker.state,
+          errorCount: this.errorCount,
+        },
+      );
+    } else {
+      // Fallback logging if enterprise constants are not available
+      logger.error("RadarChart", `Error in ${context}: ${error.message}`, {
         error: error.message,
         context,
         circuitBreakerState: this.circuitBreaker.state,
         errorCount: this.errorCount,
-      },
-    );
+      });
+    }
 
     // Attempt recovery if not in failsafe mode
+    const maxRetries =
+      this.ENTERPRISE_CONSTANTS?.ERROR_RECOVERY?.MAX_RETRY_ATTEMPTS || 3;
+    const retryDelay =
+      this.ENTERPRISE_CONSTANTS?.ERROR_RECOVERY?.RETRY_DELAY || 1000;
+
     if (
       !this.circuitBreaker.isOpen &&
-      this.circuitBreaker.failures <
-        this.ENTERPRISE_CONSTANTS.ERROR_RECOVERY.MAX_RETRY_ATTEMPTS
+      this.circuitBreaker.failures < maxRetries
     ) {
       setTimeout(() => {
         this._attemptRecovery(context);
-      }, this.ENTERPRISE_CONSTANTS.ERROR_RECOVERY.RETRY_DELAY * this.circuitBreaker.failures);
+      }, retryDelay * this.circuitBreaker.failures);
     }
 
     logger.error("RadarChart", "Enterprise error handled", {

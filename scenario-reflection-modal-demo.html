@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scenario Reflection Modal Demo</title>
+
+    <!-- Bootstrap CSS (for base modal styles) -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Custom CSS -->
+    <link
+      rel="stylesheet"
+      href="src/css/components/scenario-reflection-modal.css"
+    />
+    <link rel="stylesheet" href="src/css/shared-navigation.css" />
+
+    <style>
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+      }
+
+      .demo-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      }
+
+      .demo-title {
+        text-align: center;
+        color: #2c3e50;
+        margin-bottom: 2rem;
+      }
+
+      .test-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .test-btn {
+        padding: 1rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .test-btn-primary {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+      }
+
+      .test-btn-secondary {
+        background: linear-gradient(135deg, #6c757d, #495057);
+        color: white;
+      }
+
+      .test-btn-success {
+        background: linear-gradient(135deg, #28a745, #1e7e34);
+        color: white;
+      }
+
+      .test-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .info-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .info-section h3 {
+        color: #495057;
+        margin-bottom: 1rem;
+      }
+
+      .feature-list {
+        list-style: none;
+        padding: 0;
+      }
+
+      .feature-list li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #dee2e6;
+      }
+
+      .feature-list li:last-child {
+        border-bottom: none;
+      }
+
+      .feature-list li::before {
+        content: "✅ ";
+        margin-right: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="demo-container">
+      <h1 class="demo-title">🎯 Scenario Reflection Modal Demo</h1>
+
+      <div class="info-section">
+        <h3>New Features</h3>
+        <ul class="feature-list">
+          <li>Community choice comparison with global statistics</li>
+          <li>Single-choice ethical impact visualization</li>
+          <li>Brief but meaningful reflection questions</li>
+          <li>Research data collection for academic purposes</li>
+          <li>Cultural and demographic insight gathering</li>
+          <li>Personalized insights and learning recommendations</li>
+          <li>Suggested next scenarios based on user choices</li>
+        </ul>
+      </div>
+
+      <div class="test-buttons">
+        <button
+          class="test-btn test-btn-primary"
+          onclick="testBiasFairnessScenario()"
+        >
+          🤖 Test Bias & Fairness Scenario
+        </button>
+
+        <button
+          class="test-btn test-btn-secondary"
+          onclick="testPrivacyScenario()"
+        >
+          🔒 Test Privacy Scenario
+        </button>
+
+        <button
+          class="test-btn test-btn-success"
+          onclick="testTransparencyScenario()"
+        >
+          🔍 Test Transparency Scenario
+        </button>
+      </div>
+
+      <div class="info-section">
+        <h3>How This Improves the User Experience</h3>
+        <p>
+          <strong>Before:</strong> Generic reflection questions that didn't
+          match the single-choice scenario format.
+        </p>
+        <p>
+          <strong>Now:</strong> Focused on the specific choice made, community
+          comparison, and relevant research data collection.
+        </p>
+        <p>
+          <strong>Research Value:</strong> Collects meaningful data about global
+          ethical decision patterns while providing valuable insights to users.
+        </p>
+      </div>
+    </div>
+
+    <!-- Include necessary dependencies -->
+    <script type="module">
+      // Mock implementations for the demo
+      window.simulationInfo = {
+        "bias-fairness": {
+          title: "Bias & Fairness Explorer",
+          scenarios: [
+            {
+              id: "hiring-algorithm",
+              title: "AI Hiring Algorithm Bias",
+              description:
+                "A tech company's AI hiring tool shows bias against certain demographics.",
+            },
+          ],
+        },
+        "privacy-surveillance": {
+          title: "Privacy & Surveillance",
+          scenarios: [
+            {
+              id: "facial-recognition",
+              title: "Facial Recognition in Public Spaces",
+              description:
+                "City wants to implement facial recognition for security.",
+            },
+          ],
+        },
+        "transparency-explainability": {
+          title: "Transparency & Explainability",
+          scenarios: [
+            {
+              id: "medical-diagnosis",
+              title: "AI Medical Diagnosis System",
+              description:
+                "Hospital AI system makes diagnosis recommendations.",
+            },
+          ],
+        },
+      };
+
+      // Mock analytics
+      window.simpleAnalytics = {
+        trackEvent: (event, action, data) => {
+          console.log("Analytics Event:", event, action, data);
+        },
+      };
+
+      // Mock user progress
+      window.userProgress = {
+        addResearchData: (data) => {
+          console.log("Research Data Saved:", data);
+        },
+      };
+
+      // Mock modal utility
+      class MockModalUtility {
+        constructor(options) {
+          this.options = options;
+          this.modalElement = document.createElement("div");
+          this.modalElement.className = "modal scenario-reflection-modal";
+          this.modalElement.innerHTML = `
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">${options.title}</h5>
+                                <button type="button" class="btn-close" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                ${options.content}
+                            </div>
+                            <div class="modal-footer">
+                                ${options.footer}
+                            </div>
+                        </div>
+                    </div>
+                `;
+        }
+
+        open() {
+          document.body.appendChild(this.modalElement);
+          this.modalElement.style.display = "block";
+          this.modalElement.classList.add("show");
+
+          // Close button functionality
+          const closeBtn = this.modalElement.querySelector(".btn-close");
+          if (closeBtn) {
+            closeBtn.addEventListener("click", () => this.close());
+          }
+        }
+
+        close() {
+          if (this.modalElement && this.modalElement.parentNode) {
+            this.modalElement.parentNode.removeChild(this.modalElement);
+          }
+          if (this.options.onClose) {
+            this.options.onClose();
+          }
+        }
+      }
+
+      // Import and set up the scenario reflection modal
+      import("./src/js/components/scenario-reflection-modal.js")
+        .then((module) => {
+          const { ScenarioReflectionModal } = module;
+
+          // Override ModalUtility for demo
+          window.ModalUtility = MockModalUtility;
+
+          // Test functions
+          window.testBiasFairnessScenario = () => {
+            new ScenarioReflectionModal({
+              categoryId: "bias-fairness",
+              scenarioId: "hiring-algorithm",
+              selectedOption: {
+                id: "option-a",
+                text: "Temporarily pause the AI system until bias is fixed",
+                description:
+                  "Prioritize fairness over efficiency in the short term",
+                impact: {
+                  fairness: 0.9,
+                  transparency: 0.7,
+                  accountability: 0.8,
+                  privacy: 0.5,
+                  beneficence: 0.6,
+                },
+              },
+              scenarioData: {
+                title: "AI Hiring Algorithm Bias",
+                description:
+                  "A tech company's AI hiring tool shows bias against certain demographics.",
+                options: [
+                  {
+                    id: "option-a",
+                    text: "Temporarily pause the AI system until bias is fixed",
+                  },
+                  {
+                    id: "option-b",
+                    text: "Continue using the system while working on improvements",
+                  },
+                  {
+                    id: "option-c",
+                    text: "Replace with human-only hiring process",
+                  },
+                ],
+              },
+              onComplete: (data) => {
+                alert("Reflection completed! Check console for data.");
+                console.log("Reflection Data:", data);
+              },
+              onSkip: () => {
+                alert("Reflection skipped.");
+              },
+            });
+          };
+
+          window.testPrivacyScenario = () => {
+            new ScenarioReflectionModal({
+              categoryId: "privacy-surveillance",
+              scenarioId: "facial-recognition",
+              selectedOption: {
+                id: "option-b",
+                text: "Implement with strong privacy protections",
+                description: "Balance security needs with privacy rights",
+                impact: {
+                  fairness: 0.6,
+                  transparency: 0.8,
+                  accountability: 0.7,
+                  privacy: 0.8,
+                  beneficence: 0.7,
+                },
+              },
+              scenarioData: {
+                title: "Facial Recognition in Public Spaces",
+                description:
+                  "City wants to implement facial recognition for security.",
+                options: [
+                  {
+                    id: "option-a",
+                    text: "Reject the facial recognition system entirely",
+                  },
+                  {
+                    id: "option-b",
+                    text: "Implement with strong privacy protections",
+                  },
+                  {
+                    id: "option-c",
+                    text: "Full implementation for maximum security",
+                  },
+                ],
+              },
+              onComplete: (data) => {
+                alert("Reflection completed! Check console for data.");
+                console.log("Reflection Data:", data);
+              },
+              onSkip: () => {
+                alert("Reflection skipped.");
+              },
+            });
+          };
+
+          window.testTransparencyScenario = () => {
+            new ScenarioReflectionModal({
+              categoryId: "transparency-explainability",
+              scenarioId: "medical-diagnosis",
+              selectedOption: {
+                id: "option-c",
+                text: "Require AI explanations for all diagnoses",
+                description:
+                  "Maximize transparency even if it slows down the process",
+                impact: {
+                  fairness: 0.8,
+                  transparency: 0.95,
+                  accountability: 0.9,
+                  privacy: 0.6,
+                  beneficence: 0.7,
+                },
+              },
+              scenarioData: {
+                title: "AI Medical Diagnosis System",
+                description:
+                  "Hospital AI system makes diagnosis recommendations.",
+                options: [
+                  {
+                    id: "option-a",
+                    text: "Use AI recommendations without explanation",
+                  },
+                  {
+                    id: "option-b",
+                    text: "Provide explanations only when requested",
+                  },
+                  {
+                    id: "option-c",
+                    text: "Require AI explanations for all diagnoses",
+                  },
+                ],
+              },
+              onComplete: (data) => {
+                alert("Reflection completed! Check console for data.");
+                console.log("Reflection Data:", data);
+              },
+              onSkip: () => {
+                alert("Reflection skipped.");
+              },
+            });
+          };
+        })
+        .catch((error) => {
+          console.error("Failed to load ScenarioReflectionModal:", error);
+          alert(
+            "Demo requires the ScenarioReflectionModal component to be available.",
+          );
+        });
+    </script>
+  </body>
+</html>

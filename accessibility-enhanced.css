@@ -1,0 +1,396 @@
+/**
+ * Enhanced Accessibility CSS Definitions
+ * Missing CSS classes for accessibility.js functionality
+ * Based on CSS Selector Usage Pattern Analysis
+ */
+
+/* ==========================================================================
+   CSS CUSTOM PROPERTIES FOR ACCESSIBILITY
+   ========================================================================== */
+:root {
+  /* Accessibility color scheme */
+  --accessibility-focus-color: #007bff;
+  --accessibility-focus-bg: rgba(0, 123, 255, 0.1);
+  --accessibility-high-contrast-bg: #000000;
+  --accessibility-high-contrast-text: #ffffff;
+  --accessibility-overlay-bg: rgba(0, 0, 0, 0.9);
+
+  /* Accessibility timing */
+  --accessibility-transition-duration: 0.15s;
+  --accessibility-reduced-motion-duration: 0.01ms;
+
+  /* Accessibility spacing */
+  --accessibility-focus-offset: 2px;
+  --accessibility-focus-border-width: 2px;
+  --accessibility-toolbar-padding: 10px;
+}
+
+/* High contrast theme overrides */
+[data-theme="high-contrast"] {
+  --accessibility-focus-color: #ffff00;
+  --accessibility-focus-bg: rgba(255, 255, 0, 0.2);
+}
+
+/* ==========================================================================
+   CORE ACCESSIBILITY CLASSES
+   ========================================================================== */
+
+/**
+ * .accessibility-enabled - Root container class for accessibility features
+ * Applied dynamically by accessibility.js to enable enhanced accessibility
+ */
+.accessibility-enabled {
+  /* Enhanced focus management */
+  position: relative;
+}
+
+.accessibility-enabled *:focus {
+  outline: var(--accessibility-focus-border-width) solid
+    var(--accessibility-focus-color);
+  outline-offset: var(--accessibility-focus-offset);
+  transition: outline-color var(--accessibility-transition-duration) ease;
+}
+
+.accessibility-enabled *:focus-visible {
+  outline: var(--accessibility-focus-border-width) solid
+    var(--accessibility-focus-color);
+  outline-offset: var(--accessibility-focus-offset);
+  box-shadow: 0 0 0 1px var(--accessibility-focus-bg);
+}
+
+/**
+ * .accessibility-overlay - Overlay container for accessibility UI elements
+ * Contains focus indicators, toolbars, and other accessibility UI
+ */
+.accessibility-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+/**
+ * .accessibility-toolbar - Floating toolbar for accessibility controls
+ * Provides quick access to accessibility features
+ */
+.accessibility-toolbar {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--accessibility-overlay-bg);
+  color: white;
+  padding: var(--accessibility-toolbar-padding);
+  border-radius: 5px;
+  z-index: 10000;
+  pointer-events: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  transition: all var(--accessibility-transition-duration) ease;
+}
+
+.accessibility-toolbar button {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 12px;
+  margin: 2px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all var(--accessibility-transition-duration) ease;
+}
+
+.accessibility-toolbar button:hover,
+.accessibility-toolbar button:focus {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: var(--accessibility-focus-color);
+  outline: none;
+}
+
+.accessibility-toolbar button:active {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(1px);
+}
+
+/**
+ * .focus-indicator - Visual focus indicator for keyboard navigation
+ * Dynamically positioned to highlight focused elements
+ */
+.focus-indicator {
+  position: absolute;
+  border: var(--accessibility-focus-border-width) solid
+    var(--accessibility-focus-color);
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 9998;
+  transition: all var(--accessibility-transition-duration) ease;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8);
+  background: var(--accessibility-focus-bg);
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.focus-indicator.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ==========================================================================
+   ACCESSIBILITY FEATURE CLASSES
+   ========================================================================== */
+
+/**
+ * .large-text - Large text mode for accessibility
+ * Increases font sizes across the application
+ */
+.large-text,
+.large-text * {
+  font-size: 1.25em !important;
+  line-height: 1.5 !important;
+}
+
+.large-text h1 {
+  font-size: 2.5em !important;
+}
+.large-text h2 {
+  font-size: 2em !important;
+}
+.large-text h3 {
+  font-size: 1.75em !important;
+}
+.large-text h4 {
+  font-size: 1.5em !important;
+}
+.large-text h5 {
+  font-size: 1.25em !important;
+}
+.large-text h6 {
+  font-size: 1.1em !important;
+}
+
+.large-text .btn,
+.large-text button {
+  min-height: 48px;
+  min-width: 48px;
+  padding: 12px 16px;
+}
+
+.large-text input,
+.large-text select,
+.large-text textarea {
+  min-height: 48px;
+  padding: 12px;
+}
+
+/**
+ * .reduced-motion - Reduced motion preferences for accessibility
+ * Disables animations and transitions for users who prefer reduced motion
+ */
+.reduced-motion,
+.reduced-motion *,
+.reduced-motion *::before,
+.reduced-motion *::after {
+  animation-duration: var(--accessibility-reduced-motion-duration) !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: var(--accessibility-reduced-motion-duration) !important;
+  scroll-behavior: auto !important;
+}
+
+.reduced-motion .focus-indicator {
+  transition: none !important;
+}
+
+.reduced-motion .accessibility-toolbar {
+  transition: none !important;
+}
+
+/* Respect system preference for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .reduced-motion *,
+  .reduced-motion *::before,
+  .reduced-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/**
+ * .high-contrast - High contrast mode enhancements
+ * Extends existing high contrast support with additional rules
+ */
+.high-contrast {
+  --accessibility-focus-color: #ffff00;
+  --accessibility-high-contrast-bg: #000000;
+  --accessibility-high-contrast-text: #ffffff;
+}
+
+.high-contrast .accessibility-toolbar {
+  background: var(--accessibility-high-contrast-bg);
+  border: 2px solid var(--accessibility-high-contrast-text);
+}
+
+.high-contrast .focus-indicator {
+  border-color: var(--accessibility-focus-color);
+  box-shadow: 0 0 0 1px var(--accessibility-high-contrast-bg);
+}
+
+.high-contrast .accessibility-toolbar button {
+  border-color: var(--accessibility-high-contrast-text);
+  color: var(--accessibility-high-contrast-text);
+}
+
+.high-contrast .accessibility-toolbar button:hover,
+.high-contrast .accessibility-toolbar button:focus {
+  background: var(--accessibility-high-contrast-text);
+  color: var(--accessibility-high-contrast-bg);
+}
+
+/* ==========================================================================
+   ACCESSIBILITY UTILITY CLASSES
+   ========================================================================== */
+
+/**
+ * Screen reader announcements
+ * Enhanced from existing sr-only class
+ */
+.sr-only-live {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Live regions for screen readers */
+.live-region {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.live-region[aria-live="assertive"] {
+  /* Urgent announcements */
+}
+
+.live-region[aria-live="polite"] {
+  /* Non-urgent announcements */
+}
+
+/* ==========================================================================
+   RESPONSIVE ACCESSIBILITY
+   ========================================================================== */
+
+/* Mobile accessibility enhancements */
+@media (max-width: 768px) {
+  .accessibility-toolbar {
+    top: 10px;
+    right: 10px;
+    padding: 8px;
+  }
+
+  .accessibility-toolbar button {
+    padding: 10px;
+    margin: 1px;
+  }
+
+  .large-text .btn,
+  .large-text button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* High DPI displays */
+@media (resolution >= 2dppx) {
+  .focus-indicator {
+    border-width: 1px;
+  }
+
+  .accessibility-toolbar {
+    border-radius: 3px;
+  }
+}
+
+/* ==========================================================================
+   ACCESSIBILITY STATES AND INTERACTIONS
+   ========================================================================== */
+
+/* Enhanced focus states */
+.accessibility-enabled [tabindex]:focus,
+.accessibility-enabled [role="button"]:focus,
+.accessibility-enabled [role="link"]:focus {
+  outline: var(--accessibility-focus-border-width) solid
+    var(--accessibility-focus-color);
+  outline-offset: var(--accessibility-focus-offset);
+}
+
+/* Skip to content enhancements */
+.skip-to-content {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--accessibility-focus-color);
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  border-radius: 0 0 4px 4px;
+  z-index: 10001;
+  font-weight: 500;
+  transition: top var(--accessibility-transition-duration) ease;
+}
+
+.skip-to-content:focus {
+  top: 0;
+}
+
+/* Accessibility error states */
+.accessibility-error {
+  border: 2px solid #dc3545;
+  background: #f8d7da;
+  color: #721c24;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 4px;
+}
+
+/* Accessibility success states */
+.accessibility-success {
+  border: 2px solid #28a745;
+  background: #d4edda;
+  color: #155724;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   PRINT ACCESSIBILITY
+   ========================================================================== */
+
+@media print {
+  .accessibility-overlay,
+  .accessibility-toolbar,
+  .focus-indicator {
+    display: none !important;
+  }
+
+  .sr-only,
+  .sr-only-live,
+  .live-region {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    clip: auto !important;
+    overflow: visible !important;
+  }
+}

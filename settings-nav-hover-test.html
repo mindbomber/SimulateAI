@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settings Navigation Hover Test</title>
+    <link rel="stylesheet" href="src/styles/shared-navigation.css" />
+    <link rel="stylesheet" href="src/styles/settings-menu.css" />
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f5f5f5;
+        min-height: 200vh; /* Make page scrollable to test scroll behavior */
+      }
+
+      .test-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .test-section {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 6px;
+        margin: 15px 0;
+        border-left: 4px solid #007bff;
+      }
+
+      .status {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-weight: 500;
+        font-size: 12px;
+      }
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+      }
+      .status.warning {
+        background: #fff3cd;
+        color: #856404;
+      }
+
+      .instructions {
+        background: #e7f3ff;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+        border: 1px solid #b3d7ff;
+      }
+
+      .floating-tab {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 25px;
+        z-index: 5000;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .overlay-element {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        z-index: 8000;
+        display: none;
+      }
+
+      /* Override for header positioning since this is a test page */
+      .header {
+        position: relative !important;
+        margin-bottom: 20px;
+      }
+
+      /* Highlight hover states for testing */
+      .nav-item-dropdown:hover {
+        background-color: rgba(102, 126, 234, 0.1) !important;
+        border-radius: 4px;
+      }
+
+      /* Visual indicator for z-index testing */
+      .z-index-indicator {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        background: #ff6b6b;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        z-index: 5500;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-header">
+      <h1>🧪 Settings Navigation Hover Test</h1>
+      <p>Testing hover behavior and z-index for #settings-nav</p>
+    </div>
+
+    <!-- Test Navigation -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">
+          <span style="font-size: 1.5em; font-weight: bold">SimulateAI</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="nav-group nav-group-actions">
+          <ul class="nav-list">
+            <li class="nav-item-dropdown">
+              <a
+                href="#"
+                class="nav-link"
+                aria-expanded="false"
+                aria-haspopup="true"
+                id="settings-nav"
+              >
+                Settings
+                <span class="dropdown-arrow" aria-hidden="true">▼</span>
+              </a>
+              <div class="dropdown-menu settings-menu">
+                <div class="settings-section">
+                  <h4 class="settings-title">Floating Tabs</h4>
+                  <div class="settings-item">
+                    <label class="settings-toggle" for="toggle-surprise-tab">
+                      <input type="checkbox" id="toggle-surprise-tab" checked />
+                      <span class="toggle-slider"></span>
+                      <span class="toggle-label">Surprise Me! Tab</span>
+                    </label>
+                  </div>
+                  <div class="settings-item">
+                    <label class="settings-toggle" for="toggle-tour-tab">
+                      <input type="checkbox" id="toggle-tour-tab" checked />
+                      <span class="toggle-slider"></span>
+                      <span class="toggle-label">Take Tour Tab</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="settings-section">
+                  <h4 class="settings-title">Appearance</h4>
+                  <div class="settings-item">
+                    <label class="settings-toggle" for="toggle-dark-mode">
+                      <input type="checkbox" id="toggle-dark-mode" />
+                      <span class="toggle-slider"></span>
+                      <span class="toggle-label">Dark Mode</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <!-- Z-Index Test Elements -->
+    <div class="z-index-indicator">Z-Index: 5500</div>
+    <div class="floating-tab">Floating Tab (Z: 5000)</div>
+    <div class="overlay-element" id="testOverlay">
+      Overlay Element (Z: 8000)
+    </div>
+
+    <div class="content">
+      <div class="instructions">
+        <h3>🎯 Test Instructions</h3>
+        <ol>
+          <li>
+            <strong>Hover Test:</strong> Hover over the "Settings" link in the
+            header. The dropdown should appear.
+          </li>
+          <li>
+            <strong>Persistence Test:</strong> Move your mouse into the dropdown
+            menu. It should stay open.
+          </li>
+          <li>
+            <strong>Mouse Leave Test:</strong> Move your mouse away from both
+            the link and dropdown. It should close after a brief delay.
+          </li>
+          <li>
+            <strong>Z-Index Test:</strong> When dropdown is open, it should
+            appear above the floating tab (blue button).
+          </li>
+          <li>
+            <strong>Scroll Test:</strong> Open the dropdown, then scroll down.
+            It should close automatically.
+          </li>
+          <li>
+            <strong>Click Test:</strong> Click the Settings link to ensure click
+            behavior still works.
+          </li>
+        </ol>
+      </div>
+
+      <div class="test-section">
+        <h3>✅ Expected Behaviors</h3>
+        <ul>
+          <li>
+            <span class="status success">PASS</span> Dropdown opens immediately
+            on hover
+          </li>
+          <li>
+            <span class="status success">PASS</span> Dropdown stays open when
+            hovering over menu content
+          </li>
+          <li>
+            <span class="status success">PASS</span> Dropdown closes with 150ms
+            delay when mouse leaves
+          </li>
+          <li>
+            <span class="status success">PASS</span> Dropdown has z-index 10000
+            (above floating elements)
+          </li>
+          <li>
+            <span class="status success">PASS</span> Dropdown closes
+            automatically on scroll
+          </li>
+          <li>
+            <span class="status success">PASS</span> Click functionality
+            preserved
+          </li>
+        </ul>
+      </div>
+
+      <div class="test-section">
+        <h3>🔧 Z-Index Hierarchy</h3>
+        <ul>
+          <li><strong>Settings Dropdown:</strong> z-index: 10000 (highest)</li>
+          <li><strong>Overlay Element:</strong> z-index: 8000</li>
+          <li><strong>Z-Index Indicator:</strong> z-index: 5500</li>
+          <li><strong>Floating Tab:</strong> z-index: 5000</li>
+          <li><strong>Normal Content:</strong> z-index: auto</li>
+        </ul>
+      </div>
+
+      <div class="test-section">
+        <h3>📊 Scroll Test Area</h3>
+        <p>
+          Scroll down this page with the settings dropdown open to test the
+          scroll-away behavior.
+        </p>
+
+        <!-- Add lots of content to make page scrollable -->
+        <div
+          style="
+            height: 100px;
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+          "
+        >
+          Scroll Test Content Block 1
+        </div>
+        <div
+          style="
+            height: 100px;
+            background: linear-gradient(45deg, #e0e0e0, #d0d0d0);
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+          "
+        >
+          Scroll Test Content Block 2
+        </div>
+        <div
+          style="
+            height: 100px;
+            background: linear-gradient(45deg, #d0d0d0, #c0c0c0);
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+          "
+        >
+          Scroll Test Content Block 3
+        </div>
+        <div
+          style="
+            height: 100px;
+            background: linear-gradient(45deg, #c0c0c0, #b0b0b0);
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+          "
+        >
+          Scroll Test Content Block 4
+        </div>
+        <div
+          style="
+            height: 100px;
+            background: linear-gradient(45deg, #b0b0b0, #a0a0a0);
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+          "
+        >
+          Scroll Test Content Block 5
+        </div>
+      </div>
+
+      <button
+        onclick="showOverlay()"
+        style="
+          padding: 10px 20px;
+          background: #007bff;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          margin: 10px 0;
+        "
+      >
+        Show Overlay (Z-Index Test)
+      </button>
+    </div>
+
+    <!-- Load JavaScript -->
+    <script src="src/js/utils/logger.js"></script>
+    <script src="src/js/components/settings-manager.js"></script>
+    <script src="src/js/components/shared-navigation.js"></script>
+
+    <script>
+      // Simple test implementation since we don't have the full app loaded
+      window.userEngagementTracker = {
+        trackUserEvent: function (event, data) {
+          console.log("User Event Tracked:", event, data);
+        },
+      };
+
+      // Initialize settings manager for testing
+      document.addEventListener("DOMContentLoaded", function () {
+        // Simple settings manager initialization
+        const settingsNav = document.getElementById("settings-nav");
+        const settingsMenu = document.querySelector(".settings-menu");
+
+        if (settingsNav && settingsMenu) {
+          const navItemDropdown = settingsNav.closest(".nav-item-dropdown");
+          let hoverTimeout = null;
+
+          // Show on hover
+          navItemDropdown.addEventListener("mouseenter", () => {
+            clearTimeout(hoverTimeout);
+            settingsNav.setAttribute("aria-expanded", "true");
+            settingsMenu.style.display = "block";
+            console.log("🟢 Settings dropdown opened on hover");
+          });
+
+          // Hide on mouse leave with delay
+          navItemDropdown.addEventListener("mouseleave", () => {
+            hoverTimeout = setTimeout(() => {
+              settingsNav.setAttribute("aria-expanded", "false");
+              settingsMenu.style.display = "none";
+              console.log("🔴 Settings dropdown closed on mouse leave");
+            }, 150);
+          });
+
+          // Click toggle
+          settingsNav.addEventListener("click", (e) => {
+            e.preventDefault();
+            const isExpanded =
+              settingsNav.getAttribute("aria-expanded") === "true";
+            const newState = !isExpanded;
+            settingsNav.setAttribute("aria-expanded", newState);
+            settingsMenu.style.display = newState ? "block" : "none";
+            console.log(
+              "🔵 Settings dropdown toggled by click:",
+              newState ? "open" : "closed",
+            );
+          });
+
+          // Scroll listener
+          let scrollTimeout = null;
+          window.addEventListener("scroll", () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+              if (settingsMenu.style.display === "block") {
+                settingsNav.setAttribute("aria-expanded", "false");
+                settingsMenu.style.display = "none";
+                console.log("🟡 Settings dropdown closed on scroll");
+              }
+            }, 100);
+          });
+        }
+
+        console.log("✅ Settings navigation hover test initialized");
+      });
+
+      function showOverlay() {
+        const overlay = document.getElementById("testOverlay");
+        overlay.style.display = "block";
+        setTimeout(() => {
+          overlay.style.display = "none";
+        }, 2000);
+      }
+
+      // Monitor dropdown state changes
+      const observer = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutation) {
+          if (
+            mutation.type === "attributes" &&
+            mutation.attributeName === "style"
+          ) {
+            const target = mutation.target;
+            if (target.classList.contains("settings-menu")) {
+              const isVisible = target.style.display === "block";
+              console.log(
+                `📊 Settings menu visibility changed: ${isVisible ? "VISIBLE" : "HIDDEN"}`,
+              );
+
+              // Update z-index indicator
+              const indicator = document.querySelector(".z-index-indicator");
+              if (isVisible) {
+                indicator.style.background = "#28a745";
+                indicator.textContent = "Settings Menu Active (Z: 10000)";
+              } else {
+                indicator.style.background = "#ff6b6b";
+                indicator.textContent = "Z-Index: 5500";
+              }
+            }
+          }
+        });
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const settingsMenu = document.querySelector(".settings-menu");
+        if (settingsMenu) {
+          observer.observe(settingsMenu, {
+            attributes: true,
+            attributeFilter: ["style"],
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

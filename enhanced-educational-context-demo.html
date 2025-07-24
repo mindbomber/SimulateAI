@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Enhanced Educational Context Demo - Pre-Launch Modal</title>
+    <link rel="stylesheet" href="src/styles/pre-launch-modal.css" />
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        margin: 0;
+        padding: 2rem;
+        background: #f8f9fa;
+        line-height: 1.6;
+      }
+      .demo-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .demo-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+      }
+      .demo-header h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 2rem;
+        font-weight: 600;
+      }
+      .demo-header p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 1.1rem;
+      }
+      .demo-content {
+        padding: 2rem;
+      }
+      .toggle-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+      }
+      .toggle-btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        background: #667eea;
+        color: white;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+      .toggle-btn:hover {
+        background: #5a67d8;
+        transform: translateY(-1px);
+      }
+      .toggle-btn.active {
+        background: #4c51bf;
+      }
+      .comparison-container {
+        display: grid;
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+      @media (min-width: 1024px) {
+        .comparison-container {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      .comparison-section {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .comparison-header {
+        background: #f3f4f6;
+        padding: 1rem;
+        font-weight: 600;
+        text-align: center;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .comparison-content {
+        padding: 1.5rem;
+      }
+      .fallback-demo .educational-context-section {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border-left-color: #f59e0b;
+      }
+      .info-box {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+      }
+      .info-box h3 {
+        color: #1e40af;
+        margin: 0 0 1rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .info-box ul {
+        margin: 0;
+        padding-left: 1.5rem;
+      }
+      .info-box li {
+        color: #1e3a8a;
+        margin-bottom: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="demo-container">
+      <div class="demo-header">
+        <h1>🚀 Enhanced Educational Context Demo</h1>
+        <p>
+          Preview the improved Learning Lab experience in the Pre-Launch Modal
+        </p>
+      </div>
+
+      <div class="demo-content">
+        <div class="info-box">
+          <h3>🎯 Enhancement Overview</h3>
+          <p>
+            The pre-launch modal now provides comprehensive educational context
+            when users choose the Learning Lab path. Here are the key
+            improvements:
+          </p>
+          <ul>
+            <li>
+              <strong>Rich Visual Presentation:</strong> Card-based layout with
+              enhanced typography and spacing
+            </li>
+            <li>
+              <strong>Comprehensive Content:</strong> Curriculum alignment,
+              assessment tools, lab stations, and scenario templates
+            </li>
+            <li>
+              <strong>Smart Fallbacks:</strong> Informative content when AI
+              educational modules aren't available
+            </li>
+            <li>
+              <strong>Debug Support:</strong> Development tools for
+              troubleshooting educational context issues
+            </li>
+            <li>
+              <strong>Responsive Design:</strong> Optimized for all screen sizes
+              and accessibility needs
+            </li>
+          </ul>
+        </div>
+
+        <div class="toggle-buttons">
+          <button class="toggle-btn active" onclick="showEnhanced()">
+            ✨ Enhanced Version (With AI Data)
+          </button>
+          <button class="toggle-btn" onclick="showFallback()">
+            🔄 Fallback Version (No AI Data)
+          </button>
+          <button class="toggle-btn" onclick="toggleDarkMode()">
+            🌙 Toggle Dark Mode
+          </button>
+          <button class="toggle-btn" onclick="toggleDebug()">
+            🔧 Toggle Debug Info
+          </button>
+        </div>
+
+        <div class="comparison-container">
+          <div class="comparison-section">
+            <div class="comparison-header">Enhanced Educational Context</div>
+            <div class="comparison-content" id="enhanced-demo">
+              <!-- Enhanced content will be inserted here -->
+            </div>
+          </div>
+
+          <div class="comparison-section">
+            <div class="comparison-header">Implementation Details</div>
+            <div class="comparison-content">
+              <h4>🛠️ Technical Improvements</h4>
+              <ul>
+                <li>
+                  <strong>Modular Design:</strong> Separate methods for each
+                  educational section
+                </li>
+                <li>
+                  <strong>Error Handling:</strong> Comprehensive try-catch
+                  blocks with recovery
+                </li>
+                <li>
+                  <strong>Data Validation:</strong> Smart checking for valid
+                  educational data
+                </li>
+                <li>
+                  <strong>Performance:</strong> Efficient rendering with minimal
+                  DOM manipulation
+                </li>
+                <li>
+                  <strong>Accessibility:</strong> ARIA labels, semantic HTML,
+                  and keyboard navigation
+                </li>
+              </ul>
+
+              <h4>📊 Educational Data Structure</h4>
+              <ul>
+                <li>
+                  <strong>Curriculum:</strong> Standards alignment with codes
+                  and descriptions
+                </li>
+                <li>
+                  <strong>Assessments:</strong> Rubrics, knowledge checks, and
+                  portfolio tools
+                </li>
+                <li>
+                  <strong>Lab Stations:</strong> Hands-on activities with
+                  equipment lists
+                </li>
+                <li>
+                  <strong>Templates:</strong> Scenario builders for custom
+                  learning experiences
+                </li>
+              </ul>
+
+              <h4>🎨 Visual Enhancements</h4>
+              <ul>
+                <li>
+                  <strong>Card Layout:</strong> Organized, scannable information
+                  presentation
+                </li>
+                <li>
+                  <strong>Color Coding:</strong> Consistent visual hierarchy and
+                  branding
+                </li>
+                <li>
+                  <strong>Interactive Elements:</strong> Hover effects and
+                  smooth transitions
+                </li>
+                <li>
+                  <strong>Responsive Grid:</strong> Adapts to screen size
+                  automatically
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let showDebugInfo = false;
+
+      // Enhanced educational context data (from fallback)
+      const enhancedData = {
+        curriculum: [
+          {
+            standard: "CCSS.ELA-LITERACY.RST.9-10.7",
+            code: "RST.9-10.7",
+            description:
+              "Translate quantitative or technical information expressed in words in a text into visual form",
+            gradeLevel: "9-12",
+            subject: "English Language Arts & Literacy",
+          },
+          {
+            standard: "NGSS.HS-ETS1-3",
+            code: "HS-ETS1-3",
+            description:
+              "Evaluate a solution to a complex real-world problem based on prioritized criteria",
+            gradeLevel: "9-12",
+            subject: "Engineering Design",
+          },
+          {
+            standard: "CSTA.3A-AP-13",
+            code: "3A-AP-13",
+            description:
+              "Create prototypes that use algorithms to solve computational problems",
+            gradeLevel: "9-12",
+            subject: "Computer Science",
+          },
+        ],
+        assessments: [
+          {
+            name: "Ethical Decision Making Rubric",
+            type: "Performance Assessment",
+            description:
+              "Evaluate student ability to analyze ethical dilemmas and propose solutions",
+            difficulty: "intermediate",
+            timeEstimate: 15,
+          },
+          {
+            name: "AI Ethics Knowledge Check",
+            type: "Formative Assessment",
+            description:
+              "Quick check of understanding for key AI ethics concepts",
+            difficulty: "beginner",
+            timeEstimate: 10,
+          },
+          {
+            name: "Scenario Analysis Portfolio",
+            type: "Summative Assessment",
+            description:
+              "Students demonstrate learning through reflection and analysis",
+            difficulty: "advanced",
+            timeEstimate: 45,
+          },
+        ],
+        labStations: [
+          {
+            name: "AI Bias Detection Lab",
+            category: "Hands-on Investigation",
+            purpose:
+              "Students examine real-world examples of AI bias and develop detection strategies",
+            equipment: ["Computers", "Dataset samples", "Analysis worksheets"],
+            duration: 30,
+            groupSize: "2-3",
+          },
+          {
+            name: "Ethical Framework Station",
+            category: "Collaborative Discussion",
+            purpose: "Apply different ethical frameworks to AI scenarios",
+            equipment: [
+              "Framework reference cards",
+              "Scenario cards",
+              "Flipchart paper",
+            ],
+            duration: 25,
+            groupSize: "4-5",
+          },
+          {
+            name: "AI Impact Timeline",
+            category: "Research & Analysis",
+            purpose:
+              "Create timeline of AI development and its societal impacts",
+            equipment: [
+              "Research materials",
+              "Timeline template",
+              "Presentation tools",
+            ],
+            duration: 40,
+            groupSize: "3-4",
+          },
+        ],
+        scenarioTemplates: [
+          {
+            title: "AI in Healthcare Decisions",
+            description:
+              "Explore ethical considerations when AI systems make medical recommendations",
+            difficulty: "intermediate",
+            estimatedTime: 20,
+            tags: ["healthcare", "bias", "transparency"],
+          },
+          {
+            title: "Autonomous Vehicle Dilemma",
+            description:
+              "Examine moral choices in self-driving car programming",
+            difficulty: "advanced",
+            estimatedTime: 25,
+            tags: ["transportation", "safety", "decision-making"],
+          },
+          {
+            title: "AI Hiring Systems",
+            description:
+              "Analyze fairness and bias in AI-powered recruitment tools",
+            difficulty: "beginner",
+            estimatedTime: 18,
+            tags: ["employment", "fairness", "discrimination"],
+          },
+        ],
+      };
+
+      function generateEnhancedContent() {
+        const { curriculum, assessments, labStations, scenarioTemplates } =
+          enhancedData;
+
+        let content = '<div class="educational-context-section">';
+        content += '<div class="educational-header">';
+        content += "<h4>🤖 AI-Enhanced Educational Support</h4>";
+        content +=
+          '<p class="section-description">This simulation includes comprehensive educational resources powered by AI:</p>';
+        content += "</div>";
+
+        // Curriculum section
+        content += `
+                <div class="educator-section curriculum-section">
+                    <div class="section-header">
+                        <h5>📚 Curriculum Standards Alignment</h5>
+                        <span class="section-badge">${curriculum.length} Standards</span>
+                    </div>
+                    <div class="curriculum-grid">
+            `;
+
+        curriculum.forEach((item, index) => {
+          content += `
+                    <div class="curriculum-card" data-standard="${item.standard}" data-index="${index}">
+                        <div class="curriculum-header">
+                            <strong class="standard-name">${item.standard}</strong>
+                            <span class="standard-code">${item.code}</span>
+                        </div>
+                        <p class="standard-description">${item.description}</p>
+                        <div class="grade-level">Grade Level: ${item.gradeLevel}</div>
+                        <div class="subject-area">Subject: ${item.subject}</div>
+                    </div>
+                `;
+        });
+
+        content += "</div></div>";
+
+        // Assessment section
+        content += `
+                <div class="educator-section assessment-section">
+                    <div class="section-header">
+                        <h5>📝 Recommended Assessment Tools</h5>
+                        <span class="section-badge">${assessments.length} Tools</span>
+                    </div>
+                    <div class="assessment-grid">
+            `;
+
+        assessments.forEach((tool, index) => {
+          content += `
+                    <div class="assessment-card" data-tool="${tool.name}" data-index="${index}">
+                        <div class="assessment-header">
+                            <strong class="tool-name">${tool.name}</strong>
+                            <span class="tool-type">${tool.type}</span>
+                        </div>
+                        <p class="tool-description">${tool.description}</p>
+                        <div class="assessment-difficulty">Difficulty: ${tool.difficulty}</div>
+                        <div class="time-estimate">Time: ${tool.timeEstimate} minutes</div>
+                    </div>
+                `;
+        });
+
+        content += "</div></div>";
+
+        // Lab stations section
+        content += `
+                <div class="educator-section lab-stations-section">
+                    <div class="section-header">
+                        <h5>🔬 Recommended Lab Stations</h5>
+                        <span class="section-badge">${labStations.length} Stations</span>
+                    </div>
+                    <div class="lab-stations-grid">
+            `;
+
+        labStations.forEach((station, index) => {
+          content += `
+                    <div class="lab-station-card" data-station="${station.name}" data-index="${index}">
+                        <div class="station-header">
+                            <strong class="station-name">${station.name}</strong>
+                            <span class="station-category">${station.category}</span>
+                        </div>
+                        <p class="station-purpose">${station.purpose}</p>
+                        <div class="equipment-list">Equipment: ${station.equipment.join(", ")}</div>
+                        <div class="station-duration">Duration: ${station.duration} minutes</div>
+                        <div class="group-size">Group Size: ${station.groupSize} students</div>
+                    </div>
+                `;
+        });
+
+        content += "</div></div>";
+
+        // Scenario templates section
+        content += `
+                <div class="educator-section scenario-templates-section">
+                    <div class="section-header">
+                        <h5>📋 Additional Scenario Templates</h5>
+                        <span class="section-badge">${scenarioTemplates.length} Templates</span>
+                    </div>
+                    <p class="section-description">Create custom scenarios using these AI-generated templates:</p>
+                    <div class="templates-grid">
+            `;
+
+        scenarioTemplates.forEach((template, index) => {
+          content += `
+                    <div class="template-card" data-template="${template.title}" data-index="${index}">
+                        <div class="template-header">
+                            <strong class="template-title">${template.title}</strong>
+                            <span class="template-difficulty">${template.difficulty}</span>
+                        </div>
+                        <p class="template-description">${template.description}</p>
+                        <div class="template-tags">
+                            ${template.tags.map((tag) => `<span class="tag">${tag}</span>`).join("")}
+                        </div>
+                        <div class="template-time">Est. Time: ${template.estimatedTime} minutes</div>
+                    </div>
+                `;
+        });
+
+        content += "</div></div>";
+
+        // Summary
+        content += `
+                <div class="educational-summary">
+                    <div class="summary-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">4</span>
+                            <span class="stat-label">Educational Resources</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">🎯</span>
+                            <span class="stat-label">AI-Powered Learning</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">📈</span>
+                            <span class="stat-label">Learning Outcomes</span>
+                        </div>
+                    </div>
+                    <p class="summary-text">These resources are dynamically generated based on the simulation content and learning objectives.</p>
+                </div>
+            `;
+
+        if (showDebugInfo) {
+          content += `
+                    <div class="educator-debug-section" style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 0.5rem; border-left: 4px solid #007bff;">
+                        <details open>
+                            <summary style="cursor: pointer; font-weight: 600; margin-bottom: 0.5rem;">🔧 Debug Information</summary>
+                            <div class="debug-content" style="font-family: monospace; font-size: 0.85rem;">
+                                <div><strong>Educational Context Status:</strong> Available (Enhanced Demo)</div>
+                                <div><strong>Curriculum Items:</strong> ${curriculum.length}</div>
+                                <div><strong>Assessment Tools:</strong> ${assessments.length}</div>
+                                <div><strong>Lab Stations:</strong> ${labStations.length}</div>
+                                <div><strong>Scenario Templates:</strong> ${scenarioTemplates.length}</div>
+                                <div><strong>Simulation ID:</strong> simulateai-demo</div>
+                                <div><strong>Instance ID:</strong> demo_${Date.now()}</div>
+                                <div style="margin-top: 0.5rem;">
+                                    <strong>Data Source:</strong> Fallback educational context with comprehensive demo data
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                `;
+        }
+
+        content += "</div>";
+        return content;
+      }
+
+      function generateFallbackContent() {
+        let content = `
+                <div class="educational-context-section educational-fallback">
+                    <div class="educational-header">
+                        <h4>🤖 Educational Resources</h4>
+                        <p class="section-description">Educational resources are being prepared for this simulation.</p>
+                    </div>
+                    
+                    <div class="fallback-content">
+                        <div class="educator-section">
+                            <h5>📚 Learning Integration</h5>
+                            <p>This simulation supports educational objectives through:</p>
+                            <ul class="learning-features">
+                                <li>Interactive scenario-based learning</li>
+                                <li>Critical thinking development</li>
+                                <li>Ethical reasoning practice</li>
+                                <li>Real-world application examples</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="educator-section">
+                            <h5>🎯 Educational Value</h5>
+                            <p>Students will engage with:</p>
+                            <ul class="educational-benefits">
+                                <li>Complex problem-solving scenarios</li>
+                                <li>Multi-perspective analysis</li>
+                                <li>Decision-making frameworks</li>
+                                <li>Collaborative discussion opportunities</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="notice-box">
+                            <div class="notice-icon">💡</div>
+                            <div class="notice-content">
+                                <strong>Enhanced Experience:</strong>
+                                <p>Full educational resources including curriculum alignment, assessment tools, and lab stations will be available when AI educational modules are active.</p>
+                            </div>
+                        </div>
+                    </div>
+            `;
+
+        if (showDebugInfo) {
+          content += `
+                    <div class="educator-debug-section" style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 0.5rem; border-left: 4px solid #007bff;">
+                        <details open>
+                            <summary style="cursor: pointer; font-weight: 600; margin-bottom: 0.5rem;">🔧 Debug Information</summary>
+                            <div class="debug-content" style="font-family: monospace; font-size: 0.85rem;">
+                                <div><strong>Educational Context Status:</strong> Not Available (Fallback Demo)</div>
+                                <div><strong>Curriculum Items:</strong> 0</div>
+                                <div><strong>Assessment Tools:</strong> 0</div>
+                                <div><strong>Lab Stations:</strong> 0</div>
+                                <div><strong>Scenario Templates:</strong> 0</div>
+                                <div><strong>Simulation ID:</strong> simulateai-demo</div>
+                                <div><strong>Instance ID:</strong> demo_${Date.now()}</div>
+                                <div style="margin-top: 0.5rem;">
+                                    <strong>Fallback Reason:</strong> No AI educational modules available or educational context data empty
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                `;
+        }
+
+        content += "</div>";
+        return content;
+      }
+
+      function showEnhanced() {
+        document.getElementById("enhanced-demo").innerHTML =
+          generateEnhancedContent();
+        document
+          .querySelectorAll(".toggle-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        document.querySelector(".toggle-btn").classList.add("active");
+      }
+
+      function showFallback() {
+        document.getElementById("enhanced-demo").innerHTML =
+          generateFallbackContent();
+        document
+          .querySelectorAll(".toggle-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        document.querySelectorAll(".toggle-btn")[1].classList.add("active");
+      }
+
+      function toggleDarkMode() {
+        document.body.classList.toggle("dark-mode");
+      }
+
+      function toggleDebug() {
+        showDebugInfo = !showDebugInfo;
+        // Refresh current view
+        if (document.querySelector(".educational-fallback")) {
+          showFallback();
+        } else {
+          showEnhanced();
+        }
+      }
+
+      // Initialize with enhanced content
+      showEnhanced();
+    </script>
+  </body>
+</html>

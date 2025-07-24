@@ -20,7 +20,7 @@
  */
 
 import logger from "./logger.js";
-import StorageManager from "./storage.js";
+import { StorageManager } from "./simple-storage.js";
 
 // Enhanced constants and configuration
 const ANALYTICS_CONSTANTS = {

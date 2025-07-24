@@ -578,7 +578,7 @@ class HeroDemo {
   launchFullSimulation() {
     // Trigger the full bias simulation
     if (window.app && window.app.openSimulation) {
-      window.app.openSimulation("bias-fairness");
+      window.app.openSimulation("simulateai");
     } else {
       // Fallback: scroll to simulations section
       document.getElementById("simulations").scrollIntoView({

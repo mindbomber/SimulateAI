@@ -1,6 +1,7 @@
 /**
  * Scenario Browser Component
  * Handles filtering, searching, and displaying AI ethics scenarios with enhanced metadata
+ * Integrated with SimulateAI navigation architecture for consistent user experience
  */
 
 import CategoryMetadataManager from "../utils/category-metadata-manager.js";
@@ -9,12 +10,11 @@ import PreLaunchModal from "./pre-launch-modal.js";
 import ScenarioCard from "./scenario-card.js";
 
 // Constants
-const MAX_VISIBLE_TAGS = 4;
 const DEBOUNCE_DELAY = 300;
 const DIFFICULTY_ORDER = { beginner: 1, intermediate: 2, advanced: 3 };
 
 class ScenarioBrowser {
-  constructor() {
+  constructor(options = {}) {
     this.scenarios = [];
     this.filteredScenarios = [];
     this.availableTags = new Set();
@@ -35,6 +35,25 @@ class ScenarioBrowser {
     // Enhanced metadata support
     this.metadataManager = CategoryMetadataManager;
     this.enhancedCategories = null;
+
+    // SimulateAI integration options
+    this.simulateAIIntegration = {
+      enabled: options.integrateWithSimulateAI !== false, // Default to true
+      routeThroughSimulateAI: options.routeThroughSimulateAI !== false, // Default to true
+      useSimulateAIModals: options.useSimulateAIModals !== false, // Default to true
+      parentContext: options.parentContext || "scenario-browser", // Track context
+      onNavigationRequest: options.onNavigationRequest || null, // Callback for navigation
+    };
+
+    // Integration logging
+    if (this.simulateAIIntegration.enabled) {
+      console.log("🔗 ScenarioBrowser: SimulateAI integration enabled", {
+        routeThroughSimulateAI:
+          this.simulateAIIntegration.routeThroughSimulateAI,
+        useSimulateAIModals: this.simulateAIIntegration.useSimulateAIModals,
+        parentContext: this.simulateAIIntegration.parentContext,
+      });
+    }
   }
 
   /**
@@ -930,7 +949,15 @@ class ScenarioBrowser {
   }
 
   openScenario(categoryId, scenarioId) {
-    // Open with pre-launch modal (Learning Lab flow) - same as category-grid.js
+    // Check if we should route through SimulateAI architecture
+    if (
+      this.simulateAIIntegration.enabled &&
+      this.simulateAIIntegration.routeThroughSimulateAI
+    ) {
+      return this.openScenarioViaSimulateAI(categoryId, scenarioId);
+    }
+
+    // Original behavior - Open with pre-launch modal (Learning Lab flow) - same as category-grid.js
     try {
       // Find the scenario and category data
       const scenario = this.scenarios.find((s) => s.id === scenarioId);
@@ -953,8 +980,131 @@ class ScenarioBrowser {
       this.openScenarioPremodal(category, scenario);
     } catch (error) {
       // Fallback navigation
-      window.location.href = `simulation.html?scenario=${scenarioId}`;
+      this.handleFallbackNavigation(scenarioId, "openScenario error");
     }
+  }
+
+  /**
+   * Route scenario access through SimulateAI architecture for consistency
+   */
+  openScenarioViaSimulateAI(categoryId, scenarioId) {
+    try {
+      // Check if parent app has simulateAI navigation capability
+      if (window.app && typeof window.app.startSimulation === "function") {
+        console.log(
+          "🔗 ScenarioBrowser: Routing through SimulateAI architecture",
+          { categoryId, scenarioId },
+        );
+
+        // Use app's navigation system to maintain consistency
+        // This ensures the scenario goes through the proper simulateAI flow
+        if (this.simulateAIIntegration.onNavigationRequest) {
+          // Custom navigation callback
+          this.simulateAIIntegration.onNavigationRequest("scenario", {
+            categoryId,
+            scenarioId,
+          });
+        } else {
+          // Default: route through simulateAI first, then to specific scenario
+          window.app.startSimulation("simulateai", {
+            targetScenario: scenarioId,
+            targetCategory: categoryId,
+            context: "scenario-browser-navigation",
+          });
+        }
+        return;
+      }
+
+      // Fallback: check if MainGrid is available for direct category navigation
+      if (window.app && window.app.categoryGrid) {
+        console.log("🔗 ScenarioBrowser: Using MainGrid navigation", {
+          categoryId,
+          scenarioId,
+        });
+
+        // Switch to category view and highlight the specific scenario
+        window.app.categoryGrid.switchView("category").then(() => {
+          // Try to navigate to the specific category and scenario
+          if (categoryId) {
+            // Trigger category-specific navigation if possible
+            const categoryElement = document.querySelector(
+              `[data-category-id="${categoryId}"]`,
+            );
+            if (categoryElement) {
+              categoryElement.click();
+            }
+          }
+        });
+        return;
+      }
+
+      // Ultimate fallback: use original navigation
+      console.log(
+        "⚠️ ScenarioBrowser: SimulateAI navigation not available, using fallback",
+      );
+      this.openScenarioOriginal(categoryId, scenarioId);
+    } catch (error) {
+      console.error(
+        "❌ ScenarioBrowser: Error in SimulateAI navigation, using fallback",
+        error,
+      );
+      this.openScenarioOriginal(categoryId, scenarioId);
+    }
+  }
+
+  /**
+   * Original scenario opening logic (preserved for fallback)
+   */
+  openScenarioOriginal(categoryId, scenarioId) {
+    try {
+      // Find the scenario and category data
+      const scenario = this.scenarios.find((s) => s.id === scenarioId);
+      let category = {};
+
+      // Try to get category from enhanced categories first
+      if (categoryId && this.enhancedCategories[categoryId]) {
+        category = this.enhancedCategories[categoryId];
+      } else if (categoryId) {
+        // Fallback: try to find category by ID in metadataManager
+        const allCategories = this.metadataManager.getAllCategories();
+        category = allCategories.find((cat) => cat.id === categoryId) || {};
+      }
+
+      if (!scenario) {
+        throw new Error(`Scenario not found: ${scenarioId}`);
+      }
+
+      // Open the PreLaunchModal configured for this scenario
+      this.openScenarioPremodal(category, scenario);
+    } catch (error) {
+      // Fallback navigation
+      this.handleFallbackNavigation(scenarioId, "openScenarioOriginal error");
+    }
+  }
+
+  /**
+   * Centralized fallback navigation handler
+   */
+  handleFallbackNavigation(scenarioId, context = "unknown") {
+    console.log(
+      `🔄 ScenarioBrowser: Using fallback navigation for ${scenarioId} (context: ${context})`,
+    );
+
+    // Check if we have a custom fallback handler
+    if (this.simulateAIIntegration.onNavigationRequest) {
+      try {
+        this.simulateAIIntegration.onNavigationRequest("fallback", {
+          scenarioId,
+          context,
+        });
+        return;
+      } catch (error) {
+        console.error("Custom fallback handler failed:", error);
+      }
+    }
+
+    // Default fallback: direct URL navigation
+    window.location.href = `simulation.html?scenario=${scenarioId}`;
   }
 
   openScenarioPremodal(category, scenario) {
@@ -992,20 +1142,95 @@ class ScenarioBrowser {
 
   openScenarioModalDirect(categoryId, scenarioId) {
     // Direct access to scenario modal (Start button flow) - skip pre-launch modal
+    // Check if we should route through SimulateAI architecture
+    if (
+      this.simulateAIIntegration.enabled &&
+      this.simulateAIIntegration.useSimulateAIModals
+    ) {
+      console.log(
+        "🔗 ScenarioBrowser: Using SimulateAI modal system for direct access",
+        { categoryId, scenarioId },
+      );
+
+      // Try to use the integrated modal system
+      if (this.simulateAIIntegration.onNavigationRequest) {
+        this.simulateAIIntegration.onNavigationRequest("modal-direct", {
+          categoryId,
+          scenarioId,
+        });
+        return;
+      }
+    }
+
+    // Original behavior
     this.openScenarioModal(scenarioId, categoryId);
   }
 
   openLearningLab(scenarioId) {
+    // Check if we should route through SimulateAI
+    if (
+      this.simulateAIIntegration.enabled &&
+      this.simulateAIIntegration.routeThroughSimulateAI
+    ) {
+      console.log(
+        "🔗 ScenarioBrowser: Routing Learning Lab through SimulateAI",
+        { scenarioId },
+      );
+
+      if (this.simulateAIIntegration.onNavigationRequest) {
+        this.simulateAIIntegration.onNavigationRequest("learning-lab", {
+          scenarioId,
+        });
+        return;
+      }
+    }
+
     // Implementation for opening learning lab
     window.location.href = `learning-lab.html?scenario=${scenarioId}`;
   }
 
   startScenario(scenarioId) {
+    // Check if we should route through SimulateAI
+    if (
+      this.simulateAIIntegration.enabled &&
+      this.simulateAIIntegration.routeThroughSimulateAI
+    ) {
+      console.log(
+        "🔗 ScenarioBrowser: Routing scenario start through SimulateAI",
+        { scenarioId },
+      );
+
+      if (this.simulateAIIntegration.onNavigationRequest) {
+        this.simulateAIIntegration.onNavigationRequest("start-scenario", {
+          scenarioId,
+        });
+        return;
+      }
+    }
+
     // Implementation for starting scenario
     window.location.href = `simulation.html?scenario=${scenarioId}`;
   }
 
   openScenarioDetails(scenarioId) {
+    // Check if we should route through SimulateAI
+    if (
+      this.simulateAIIntegration.enabled &&
+      this.simulateAIIntegration.routeThroughSimulateAI
+    ) {
+      console.log(
+        "🔗 ScenarioBrowser: Routing scenario details through SimulateAI",
+        { scenarioId },
+      );
+
+      if (this.simulateAIIntegration.onNavigationRequest) {
+        this.simulateAIIntegration.onNavigationRequest("scenario-details", {
+          scenarioId,
+        });
+        return;
+      }
+    }
+
     // Implementation for scenario details or default action
     window.location.href = `simulation.html?scenario=${scenarioId}`;
   }
@@ -1096,25 +1321,67 @@ class ScenarioBrowser {
       }
     }
   }
+
+  /**
+   * Enable SimulateAI integration with custom options
+   * @param {Object} options - Integration configuration options
+   */
+  enableSimulateAIIntegration(options = {}) {
+    this.simulateAIIntegration = {
+      ...this.simulateAIIntegration,
+      ...options,
+      enabled: true,
+    };
+
+    console.log(
+      "✅ ScenarioBrowser: SimulateAI integration updated",
+      this.simulateAIIntegration,
+    );
+    return this;
+  }
+
+  /**
+   * Disable SimulateAI integration (revert to standalone behavior)
+   */
+  disableSimulateAIIntegration() {
+    this.simulateAIIntegration.enabled = false;
+    console.log("❌ ScenarioBrowser: SimulateAI integration disabled");
+    return this;
+  }
+
+  /**
+   * Get current integration status
+   */
+  getSimulateAIIntegrationStatus() {
+    return {
+      ...this.simulateAIIntegration,
+      isMainAppAvailable: !!(window.app && window.app.startSimulation),
+      isMainGridAvailable: !!(window.app && window.app.categoryGrid),
+    };
+  }
 }
 
-// Global functions
+// Global functions for backward compatibility
 window.clearAllFilters = function () {
   window.scenarioBrowser?.clearAllFilters();
 };
 
-window.previewScenario = function (_scenarioId) {
-  // TODO: Implement scenario preview modal
-  // Preview functionality will be added when modal system is integrated
+window.previewScenario = function (scenarioId) {
+  // Enhanced preview functionality with SimulateAI integration
+  if (
+    window.scenarioBrowser &&
+    window.scenarioBrowser.simulateAIIntegration?.enabled
+  ) {
+    window.scenarioBrowser.openScenario(null, scenarioId);
+  } else {
+    // TODO: Implement scenario preview modal
+    // Preview functionality will be added when modal system is integrated
+    console.log("Preview scenario:", scenarioId);
+  }
 };
 
 // Initialize global instance
 window.scenarioBrowser = null;
-
-// Export for use in other modules
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = ScenarioBrowser;
-}
 
 // ES6 module export
 export default ScenarioBrowser;

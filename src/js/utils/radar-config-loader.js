@@ -46,7 +46,7 @@ export function getEnterpriseConstants(config) {
     PERFORMANCE: config.enterprise.performance,
     TELEMETRY: {
       ...config.enterprise.telemetry,
-      EVENT_TYPES: config.enterprise.telemetry.eventTypes,
+      // EVENT_TYPES already included in spread, removing duplicate
     },
     ERROR_RECOVERY: config.enterprise.errorRecovery,
   };
@@ -90,23 +90,6 @@ export function getDefaultScores(config) {
 }
 
 /**
- * Get color for score value
- * @param {Object} config - Configuration object
- * @param {number} score - Score value
- * @returns {string} Color hex code
- */
-export function getPointColor(config, score) {
-  const { neutralScore, maxScore } = config.scoring;
-
-  if (score <= 1) return config.pointColors["0"];
-  if (score <= 2) return config.pointColors["2"];
-  if (score < neutralScore) return config.pointColors["2.5"];
-  if (score === neutralScore) return config.pointColors["3"];
-  if (score < maxScore) return config.pointColors["4"];
-  return config.pointColors["5"];
-}
-
-/**
  * Get grid color for context index
  * @param {Object} config - Configuration object
  * @param {number} index - Grid line index
@@ -114,24 +97,6 @@ export function getPointColor(config, score) {
  */
 export function getGridColor(config, index) {
   return config.gridColors[index] || config.gridColors.default;
-}
-
-/**
- * Get impact description for score
- * @param {Object} config - Configuration object
- * @param {number} score - Score value
- * @returns {string} Impact description
- */
-export function getImpactDescription(config, score) {
-  const { neutralScore, positiveThreshold, maxScore } = config.scoring;
-
-  if (score <= 1) return config.impactDescriptions["0-1"];
-  if (score <= 2) return config.impactDescriptions["1-2"];
-  if (score < neutralScore) return config.impactDescriptions["2-3"];
-  if (score === neutralScore) return config.impactDescriptions["3"];
-  if (score < positiveThreshold) return config.impactDescriptions["3-4"];
-  if (score < maxScore) return config.impactDescriptions["4-5"];
-  return config.impactDescriptions["5"];
 }
 
 /**
@@ -145,79 +110,382 @@ export function getDemoPattern(config, patternName) {
 }
 
 /**
+ * Apply theme classes to radar chart container
+ * @param {HTMLElement} container - Chart container element
+ * @param {string} themeName - Theme name from configuration
+ * @param {Object} options - Application options
+ */
+export function applyThemeToContainer(container, themeName, options = {}) {
+  if (!(container instanceof HTMLElement)) {
+    logger.warn(
+      "RadarConfig",
+      "Invalid container element for theme application",
+    );
+    return;
+  }
+
+  const { baseClass = "radar-chart-container" } = options;
+
+  // Remove existing theme classes
+  const existingClasses = Array.from(container.classList);
+  const themeClasses = existingClasses.filter((cls) =>
+    cls.startsWith("theme-"),
+  );
+  themeClasses.forEach((cls) => container.classList.remove(cls));
+
+  // Ensure base class exists
+  if (!container.classList.contains(baseClass)) {
+    container.classList.add(baseClass);
+  }
+
+  // Apply new theme class
+  if (themeName) {
+    const themeClass = `theme-${themeName}`;
+    container.classList.add(themeClass);
+
+    logger.info("RadarConfig", `Applied theme class: ${themeClass}`, {
+      container: container.id || container.className,
+      theme: themeName,
+    });
+  }
+}
+
+/**
+ * Synchronize configuration colors with CSS custom properties
+ * @param {Object} config - Configuration object
+ * @param {Object} options - Sync options
+ */
+export function syncColorsWithCSS(config, options = {}) {
+  if (typeof document === "undefined") {
+    logger.warn("RadarConfig", "Document not available for CSS sync");
+    return;
+  }
+
+  const {
+    scope = document.documentElement,
+    prefix = "--radar",
+    syncThemes = true,
+    syncScoring = true,
+  } = options;
+
+  try {
+    // Sync point colors
+    if (config.pointColors && syncScoring) {
+      Object.entries(config.pointColors).forEach(([key, value]) => {
+        const propertyName = `${prefix}-point-color-${key}`;
+        scope.style.setProperty(propertyName, value);
+      });
+    }
+
+    // Sync grid colors
+    if (config.gridColors && syncScoring) {
+      Object.entries(config.gridColors).forEach(([key, value]) => {
+        const propertyName = `${prefix}-grid-color-${key}`;
+        scope.style.setProperty(propertyName, value);
+      });
+    }
+
+    // Sync theme colors
+    if (config.themes && syncThemes) {
+      Object.entries(config.themes).forEach(([themeName, themeData]) => {
+        if (themeData.colors) {
+          Object.entries(themeData.colors).forEach(([colorKey, colorValue]) => {
+            const propertyName = `${prefix}-theme-${themeName}-${colorKey}`;
+            scope.style.setProperty(propertyName, colorValue);
+          });
+        }
+      });
+    }
+
+    // Sync scoring thresholds for CSS calculations
+    if (config.scoring && syncScoring) {
+      scope.style.setProperty(
+        `${prefix}-max-score`,
+        config.scoring.maxScore.toString(),
+      );
+      scope.style.setProperty(
+        `${prefix}-min-score`,
+        config.scoring.minScore.toString(),
+      );
+      scope.style.setProperty(
+        `${prefix}-neutral-score`,
+        config.scoring.neutralScore.toString(),
+      );
+      scope.style.setProperty(
+        `${prefix}-positive-threshold`,
+        config.scoring.positiveThreshold.toString(),
+      );
+    }
+
+    // Sync chart dimensions for CSS consistency
+    if (config.chart) {
+      scope.style.setProperty(
+        `${prefix}-chart-size`,
+        `${config.chart.defaultSize}px`,
+      );
+      scope.style.setProperty(
+        `${prefix}-chart-default-size`,
+        `${config.chart.defaultSize}px`,
+      );
+      scope.style.setProperty(
+        `${prefix}-mobile-breakpoint`,
+        `${config.chart.mobileBreakpoint}px`,
+      );
+    }
+
+    logger.info("RadarConfig", "CSS custom properties synchronized", {
+      prefix,
+      pointColors: config.pointColors
+        ? Object.keys(config.pointColors).length
+        : 0,
+      gridColors: config.gridColors ? Object.keys(config.gridColors).length : 0,
+      themes: config.themes ? Object.keys(config.themes).length : 0,
+    });
+  } catch (error) {
+    logger.error("RadarConfig", "Failed to sync colors with CSS", error);
+  }
+}
+
+/**
+ * Get responsive breakpoint from configuration
+ * @param {Object} config - Configuration object
+ * @param {string} breakpointName - Breakpoint name ('mobile', 'tablet', 'desktop')
+ * @returns {string} CSS media query string
+ */
+export function getResponsiveBreakpoint(config, breakpointName) {
+  const breakpoints = {
+    mobile: config.chart?.mobileBreakpoint || 768,
+    tablet: config.chart?.tabletBreakpoint || 1024,
+    desktop: config.chart?.desktopBreakpoint || 1200,
+  };
+
+  const value = breakpoints[breakpointName];
+  if (!value) {
+    logger.warn("RadarConfig", `Unknown breakpoint: ${breakpointName}`);
+    return null;
+  }
+
+  return `(max-width: ${value}px)`;
+}
+
+/**
+ * Apply responsive configuration to CSS
+ * @param {Object} config - Configuration object
+ * @param {Object} options - Application options
+ */
+export function applyResponsiveCSS(config, options = {}) {
+  if (typeof document === "undefined") return;
+
+  const { prefix = "--radar" } = options;
+
+  try {
+    // Sync breakpoints with CSS custom properties
+    if (config.chart) {
+      if (config.chart.mobileBreakpoint) {
+        document.documentElement.style.setProperty(
+          `${prefix}-mobile-breakpoint`,
+          `${config.chart.mobileBreakpoint}px`,
+        );
+      }
+      if (config.chart.tabletBreakpoint) {
+        document.documentElement.style.setProperty(
+          `${prefix}-tablet-breakpoint`,
+          `${config.chart.tabletBreakpoint}px`,
+        );
+      }
+      if (config.chart.desktopBreakpoint) {
+        document.documentElement.style.setProperty(
+          `${prefix}-desktop-breakpoint`,
+          `${config.chart.desktopBreakpoint}px`,
+        );
+      }
+    }
+
+    logger.info("RadarConfig", "Responsive CSS properties applied");
+  } catch (error) {
+    logger.error("RadarConfig", "Failed to apply responsive CSS", error);
+  }
+}
+
+/**
+ * Initialize complete CSS integration
+ * @param {Object} config - Configuration object
+ * @param {Object} options - Integration options
+ */
+export function initializeCSSIntegration(config, options = {}) {
+  const {
+    syncColors = true,
+    applyResponsive = true,
+    autoTheme = false,
+    themeName = null,
+  } = options;
+
+  try {
+    // Sync colors with CSS custom properties
+    if (syncColors) {
+      syncColorsWithCSS(config, options);
+    }
+
+    // Apply responsive breakpoints
+    if (applyResponsive) {
+      applyResponsiveCSS(config, options);
+    }
+
+    // Auto-apply theme to radar containers if requested
+    if (autoTheme && themeName) {
+      const containers = document.querySelectorAll(
+        ".radar-chart-container, .hero-radar-chart, .scenario-radar",
+      );
+      containers.forEach((container) => {
+        applyThemeToContainer(container, themeName, options);
+      });
+    }
+
+    logger.info("RadarConfig", "CSS integration initialized", {
+      syncColors,
+      applyResponsive,
+      autoTheme,
+      themeName,
+      containersFound: autoTheme
+        ? document.querySelectorAll(
+            ".radar-chart-container, .hero-radar-chart, .scenario-radar",
+          ).length
+        : 0,
+    });
+  } catch (error) {
+    logger.error("RadarConfig", "Failed to initialize CSS integration", error);
+  }
+}
+
+/**
+ * Helper function to safely get config value with fallback
+ * @param {*} value - Config value to check
+ * @param {*} fallback - Fallback value
+ * @returns {*} Value or fallback
+ */
+function getConfigValue(value, fallback) {
+  return value !== undefined ? value : fallback;
+}
+
+/**
+ * Helper function to get score range classification
+ * @param {Object} scoring - Scoring configuration
+ * @param {number} score - Score value
+ * @returns {string} Score range key
+ */
+function getScoreRange(scoring, score) {
+  const { neutralScore, positiveThreshold, maxScore } = scoring;
+
+  if (score <= 1) return "0-1";
+  if (score <= 2) return "1-2";
+  if (score < neutralScore) return "2-3";
+  if (score === neutralScore) return "3";
+  if (score < positiveThreshold) return "3-4";
+  if (score < maxScore) return "4-5";
+  return "5";
+}
+
+/**
+ * Get color for score value
+ * @param {Object} config - Configuration object
+ * @param {number} score - Score value
+ * @returns {string} Color hex code
+ */
+export function getPointColor(config, score) {
+  // Reuse centralized score classification
+  const range = getScoreRange(config.scoring, score);
+
+  // Map ranges to point color keys
+  const colorMap = {
+    "0-1": "0",
+    "1-2": "2",
+    "2-3": "2.5",
+    3: "3",
+    "3-4": "4",
+    "4-5": "4",
+    5: "5",
+  };
+
+  return config.pointColors[colorMap[range]];
+}
+
+/**
+ * Get impact description for score
+ * @param {Object} config - Configuration object
+ * @param {number} score - Score value
+ * @returns {string} Impact description
+ */
+export function getImpactDescription(config, score) {
+  // Reuse centralized score classification
+  const range = getScoreRange(config.scoring, score);
+  return config.impactDescriptions[range];
+}
+
+/**
  * Get Chart.js configuration template
  * @param {Object} config - Configuration object
  * @param {Object} options - Chart options override
  * @returns {Object} Chart.js configuration
  */
 export function getChartConfigTemplate(config, options = {}) {
+  // Cache config sections to avoid repeated property access
+  const { chartConfig, chart, scoring } = config;
+  const {
+    animation = {},
+    interaction = {},
+    scales = {},
+    plugins = {},
+  } = chartConfig;
+
   const template = {
     type: "radar",
     options: {
-      responsive:
-        config.chartConfig.responsive !== undefined
-          ? config.chartConfig.responsive
-          : true,
-      maintainAspectRatio:
-        config.chartConfig.maintainAspectRatio !== undefined
-          ? config.chartConfig.maintainAspectRatio
-          : false,
-      devicePixelRatio: config.chartConfig.devicePixelRatio || 1,
-      layout: config.chartConfig.layout,
+      responsive: getConfigValue(chartConfig.responsive, true),
+      maintainAspectRatio: getConfigValue(
+        chartConfig.maintainAspectRatio,
+        false,
+      ),
+      devicePixelRatio: chartConfig.devicePixelRatio || 1,
+      layout: chartConfig.layout,
       animation: {
         duration:
           options.animated !== false
-            ? config.chartConfig.animation?.duration ||
-              config.chart.animationDuration
+            ? animation.duration || chart.animationDuration
             : 0,
-        easing: config.chartConfig.animation?.easing || "easeInOutQuart",
-        animateRotate:
-          config.chartConfig.animation?.animateRotate !== undefined
-            ? config.chartConfig.animation.animateRotate
-            : true,
-        animateScale:
-          config.chartConfig.animation?.animateScale !== undefined
-            ? config.chartConfig.animation.animateScale
-            : false,
+        easing: animation.easing || "easeInOutQuart",
+        animateRotate: getConfigValue(animation.animateRotate, true),
+        animateScale: getConfigValue(animation.animateScale, false),
       },
       interaction: {
-        intersect:
-          config.chartConfig.interaction?.intersect !== undefined
-            ? config.chartConfig.interaction.intersect
-            : false,
-        mode: config.chartConfig.interaction?.mode || "nearest",
-        includeInvisible:
-          config.chartConfig.interaction?.includeInvisible !== undefined
-            ? config.chartConfig.interaction.includeInvisible
-            : false,
+        intersect: getConfigValue(interaction.intersect, false),
+        mode: interaction.mode || "nearest",
+        includeInvisible: getConfigValue(interaction.includeInvisible, false),
       },
       plugins: {
-        ...config.chartConfig.plugins,
+        ...plugins,
         title: {
-          ...config.chartConfig.plugins.title,
+          ...plugins.title,
           text: options.title || "Ethical Impact Analysis",
         },
         tooltip: {
-          ...config.chartConfig.plugins.tooltip,
-          enabled:
-            typeof window !== "undefined"
-              ? window.innerWidth > config.chart.mobileBreakpoint
-              : true,
+          ...plugins.tooltip,
+          // Remove DOM dependency - let caller handle responsive logic
+          enabled: options.enableTooltips !== false,
         },
       },
       scales: {
         r: {
-          ...config.chartConfig.scales.r,
-          min: config.scoring.minScore,
-          max: config.scoring.maxScore,
+          ...scales.r,
+          min: scoring.minScore,
+          max: scoring.maxScore,
           ticks: {
-            ...config.chartConfig.scales.r.ticks,
+            ...scales.r?.ticks,
             display: options.showLabels !== false,
           },
         },
       },
-      elements: config.chartConfig.elements || {},
-      hover: config.chartConfig.hover || {
+      elements: chartConfig.elements || {},
+      hover: chartConfig.hover || {
         mode: "nearest",
         intersect: false,
         animationDuration: 200,
@@ -289,9 +557,12 @@ export function getConfigSummary(config) {
   };
 }
 
-// Make configuration loader available globally for debugging
-if (typeof window !== "undefined") {
-  window.debugRadarConfig = async function () {
+/**
+ * Create debug configuration loader function
+ * @returns {Function} Debug function (avoid global pollution)
+ */
+export function createDebugFunction() {
+  return async function debugRadarConfig() {
     try {
       const config = await loadRadarConfig();
       return getConfigSummary(config);
@@ -300,6 +571,19 @@ if (typeof window !== "undefined") {
       return null;
     }
   };
+}
+
+// Conditionally expose debug function to avoid global pollution
+if (typeof window !== "undefined" && typeof window.location !== "undefined") {
+  // Only expose in development (localhost or development domains)
+  const isDevelopment =
+    window.location.hostname === "localhost" ||
+    window.location.hostname.includes("dev") ||
+    window.location.port !== "";
+
+  if (isDevelopment) {
+    window.debugRadarConfig = createDebugFunction();
+  }
 }
 
 // Export the main loader function as default

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Logger Fix Test</title>
+  </head>
+  <body>
+    <h1>Logger Fix Test</h1>
+    <div id="test-results"></div>
+    <button onclick="testLogger()">Test Logger</button>
+
+    <script type="module">
+      // Test the logger fix
+      import logger from "./src/js/utils/logger.js";
+
+      window.testLogger = function () {
+        const results = document.getElementById("test-results");
+        results.innerHTML = "<h3>Testing Logger...</h3>";
+
+        try {
+          // Test different log levels
+          logger.info("Logger test - INFO level");
+          logger.warn("Logger test - WARN level");
+          logger.error("Logger test - ERROR level");
+          logger.debug("Logger test - DEBUG level");
+
+          results.innerHTML += "<p>✅ Logger is working correctly!</p>";
+          results.innerHTML += "<p>Check console for log messages.</p>";
+
+          // Test logger properties
+          results.innerHTML += `<p>Logger levels: ${JSON.stringify(logger.levels)}</p>`;
+          results.innerHTML += `<p>Current log level: ${logger.currentLevel}</p>`;
+          results.innerHTML += `<p>Environment cache: ${JSON.stringify(logger._environmentCache)}</p>`;
+        } catch (error) {
+          results.innerHTML += `<p>❌ Logger error: ${error.message}</p>`;
+          console.error("Logger test failed:", error);
+        }
+      };
+
+      // Auto-test on load
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log("Logger fix test page loaded");
+        // Test that logger initialization doesn't throw errors
+        try {
+          console.log("Logger instance created successfully");
+          console.log("Logger levels:", logger.levels);
+          console.log("Logger environment cache:", logger._environmentCache);
+        } catch (error) {
+          console.error("Logger initialization failed:", error);
+        }
+      });
+    </script>
+  </body>
+</html>

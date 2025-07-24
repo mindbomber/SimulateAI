@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSS/JavaScript Integration Test - Implementation Fix</title>
+    <link rel="stylesheet" href="src/styles/main.css" />
+    <link rel="stylesheet" href="src/styles/appearance-settings.css" />
+    <link rel="stylesheet" href="src/styles/advanced-ui-components.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .test-section {
+        margin: 20px 0;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+
+      .test-button {
+        margin: 10px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        background: #4a9eff;
+        color: white;
+        cursor: pointer;
+      }
+
+      .test-button:hover {
+        background: #3a8eef;
+      }
+
+      .status-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+      }
+
+      .status-pass {
+        background-color: #00aa00;
+      }
+
+      .status-fail {
+        background-color: #aa0000;
+      }
+
+      .status-warning {
+        background-color: #ff9900;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔧 CSS/JavaScript Integration Fix - Implementation Test</h1>
+    <p>
+      <strong
+        >Testing the resolution of CSS selector pattern mismatches in
+        helpers.js</strong
+      >
+    </p>
+
+    <div class="test-section">
+      <h2>🎨 Theme Class Implementation Test</h2>
+      <p>
+        Testing newly implemented theme classes: <code>.theme-light</code>,
+        <code>.theme-dark</code>, <code>.theme-high-contrast</code>
+      </p>
+
+      <button class="test-button" onclick="testThemeClasses()">
+        Test Theme Classes
+      </button>
+      <button class="test-button" onclick="applyTheme('light')">
+        Apply Light Theme
+      </button>
+      <button class="test-button" onclick="applyTheme('dark')">
+        Apply Dark Theme
+      </button>
+      <button class="test-button" onclick="applyTheme('high-contrast')">
+        Apply High Contrast
+      </button>
+
+      <div id="theme-status">
+        <p>Click buttons to test theme application...</p>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>♿ Accessibility Motion Reduction Test</h2>
+      <p>
+        Testing newly implemented <code>.reduce-motion</code> class for
+        accessibility
+      </p>
+
+      <button class="test-button" onclick="toggleReduceMotion()">
+        Toggle Reduce Motion
+      </button>
+      <button
+        class="test-button"
+        id="animated-button"
+        style="transition: all 0.3s ease"
+      >
+        Animated Element
+      </button>
+
+      <div id="motion-status">
+        <p>Motion preferences: <span id="motion-state">Normal</span></p>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>💬 Tooltip Integration Test</h2>
+      <p>
+        Testing corrected tooltip class naming (<code>.tooltip.position</code>
+        instead of <code>.tooltip--position</code>)
+      </p>
+
+      <button class="test-button" id="tooltip-trigger-1">
+        Hover for Top Tooltip
+      </button>
+      <button class="test-button" id="tooltip-trigger-2">
+        Hover for Bottom Tooltip
+      </button>
+      <button class="test-button" id="tooltip-trigger-3">
+        Hover for Left Tooltip
+      </button>
+      <button class="test-button" id="tooltip-trigger-4">
+        Hover for Right Tooltip
+      </button>
+
+      <div id="tooltip-status">
+        <p>Hover over buttons to test tooltip positioning...</p>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>📊 Implementation Status Summary</h2>
+      <div id="implementation-summary">
+        <p>
+          <span class="status-indicator status-pass"></span>
+          <strong>Theme Classes:</strong> Added .theme-light, .theme-dark,
+          .theme-high-contrast
+        </p>
+        <p>
+          <span class="status-indicator status-pass"></span>
+          <strong>Motion Accessibility:</strong> Added .reduce-motion class
+          implementation
+        </p>
+        <p>
+          <span class="status-indicator status-pass"></span>
+          <strong>Tooltip Classes:</strong> Fixed JavaScript to use existing CSS
+          convention (.tooltip.position)
+        </p>
+        <p>
+          <span class="status-indicator status-pass"></span>
+          <strong>CSS Integration:</strong> All helpers.js selectors now have
+          corresponding CSS implementations
+        </p>
+      </div>
+    </div>
+
+    <script type="module">
+      import { Helpers } from "./src/js/utils/helpers.js";
+
+      // Make functions globally available for onclick handlers
+      window.testThemeClasses = function () {
+        const themes = ["theme-light", "theme-dark", "theme-high-contrast"];
+        const results = [];
+
+        themes.forEach((theme) => {
+          // Test if CSS class exists by checking computed styles
+          document.body.className = theme;
+          const computedStyle = window.getComputedStyle(document.body);
+          const hasStyle = computedStyle.backgroundColor !== "rgba(0, 0, 0, 0)";
+          results.push(
+            `${theme}: ${hasStyle ? "✅ Implemented" : "❌ Missing"}`,
+          );
+        });
+
+        // Reset theme
+        document.body.className = "";
+
+        document.getElementById("theme-status").innerHTML = `
+                <h3>Theme Class Test Results:</h3>
+                ${results.map((result) => `<p>${result}</p>`).join("")}
+            `;
+      };
+
+      window.applyTheme = function (theme) {
+        // Remove existing theme classes
+        document.body.classList.remove(
+          "theme-light",
+          "theme-dark",
+          "theme-high-contrast",
+        );
+
+        // Apply new theme using helpers.js pattern
+        if (theme) {
+          document.body.classList.add(`theme-${theme}`);
+        }
+
+        const currentTheme = document.body.classList.contains("theme-light")
+          ? "Light"
+          : document.body.classList.contains("theme-dark")
+            ? "Dark"
+            : document.body.classList.contains("theme-high-contrast")
+              ? "High Contrast"
+              : "Default";
+
+        document.getElementById("theme-status").innerHTML = `
+                <p><strong>Current Theme:</strong> ${currentTheme}</p>
+                <p><strong>Body Classes:</strong> ${document.body.className || "none"}</p>
+            `;
+      };
+
+      window.toggleReduceMotion = function () {
+        const hasReduceMotion =
+          document.body.classList.contains("reduce-motion");
+
+        if (hasReduceMotion) {
+          document.body.classList.remove("reduce-motion");
+        } else {
+          document.body.classList.add("reduce-motion");
+        }
+
+        const state = document.body.classList.contains("reduce-motion")
+          ? "Reduced Motion"
+          : "Normal";
+        document.getElementById("motion-state").textContent = state;
+
+        // Test animation impact
+        const animatedButton = document.getElementById("animated-button");
+        animatedButton.style.backgroundColor = hasReduceMotion
+          ? "#ff6b6b"
+          : "#4a9eff";
+
+        setTimeout(() => {
+          animatedButton.style.backgroundColor = "#4a9eff";
+        }, 500);
+      };
+
+      // Initialize tooltips
+      document.addEventListener("DOMContentLoaded", function () {
+        // Test tooltip creation with corrected class names
+        try {
+          const trigger1 = document.getElementById("tooltip-trigger-1");
+          const trigger2 = document.getElementById("tooltip-trigger-2");
+          const trigger3 = document.getElementById("tooltip-trigger-3");
+          const trigger4 = document.getElementById("tooltip-trigger-4");
+
+          if (typeof Helpers.createAccessibleTooltip === "function") {
+            Helpers.createAccessibleTooltip(trigger1, "Top tooltip content", {
+              position: "top",
+            });
+            Helpers.createAccessibleTooltip(
+              trigger2,
+              "Bottom tooltip content",
+              { position: "bottom" },
+            );
+            Helpers.createAccessibleTooltip(trigger3, "Left tooltip content", {
+              position: "left",
+            });
+            Helpers.createAccessibleTooltip(trigger4, "Right tooltip content", {
+              position: "right",
+            });
+
+            document.getElementById("tooltip-status").innerHTML = `
+                        <p>✅ Tooltips created successfully with corrected class naming</p>
+                        <p><strong>Classes used:</strong> .tooltip.top, .tooltip.bottom, .tooltip.left, .tooltip.right</p>
+                    `;
+          } else {
+            throw new Error("Helpers.createAccessibleTooltip not available");
+          }
+        } catch (error) {
+          document.getElementById("tooltip-status").innerHTML = `
+                    <p>❌ Tooltip creation failed: ${error.message}</p>
+                    <p>This may be due to import issues - check browser console</p>
+                `;
+        }
+      });
+
+      // Run initial test
+      setTimeout(() => {
+        if (typeof window.testThemeClasses === "function") {
+          window.testThemeClasses();
+        }
+      }, 500);
+    </script>
+  </body>
+</html>

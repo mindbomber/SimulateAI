@@ -2319,6 +2319,329 @@ class CanvasRenderer {
     this.imageCache.clear();
   }
 
+  // Pattern utility methods integrated from canvas-patterns.js
+
+  /**
+   * Create and cache pattern for efficient reuse
+   * @param {string} type - Pattern type
+   * @param {Object} options - Pattern options
+   * @returns {CanvasPattern|string} Pattern or fallback color
+   */
+  createPattern(type, options = {}) {
+    try {
+      const patternId = `${type}_${JSON.stringify(options)}`;
+
+      // Check cache first
+      if (this.patternCache && this.patternCache.has(patternId)) {
+        return this.patternCache.get(patternId);
+      }
+
+      let pattern;
+
+      switch (type) {
+        case "dots":
+          pattern = this.createDotPattern(options);
+          break;
+        case "lines":
+          pattern = this.createLinePattern(options);
+          break;
+        case "stripes":
+          pattern = this.createStripePattern(options);
+          break;
+        case "grid":
+          pattern = this.createGridPattern(options);
+          break;
+        case "checkerboard":
+          pattern = this.createCheckerboardPattern(options);
+          break;
+        case "noise":
+          pattern = this.createNoisePattern(options);
+          break;
+        default:
+          logger.warn(`Unknown pattern type: ${type}`);
+          return options.fallbackColor || this.currentTheme.primary;
+      }
+
+      // Cache the pattern
+      if (!this.patternCache) {
+        this.patternCache = new Map();
+      }
+      this.patternCache.set(patternId, pattern);
+
+      return pattern;
+    } catch (error) {
+      this.errorHandler("Failed to create pattern", error);
+      return options.fallbackColor || this.currentTheme.primary;
+    }
+  }
+
+  /**
+   * Create dot pattern
+   * @param {Object} options - Pattern options
+   * @returns {CanvasPattern} Dot pattern
+   */
+  createDotPattern(options = {}) {
+    const size = options.size || 20;
+    const dotSize = options.dotSize || 3;
+    const color = options.color || this.currentTheme.primary;
+    const backgroundColor = options.backgroundColor || "transparent";
+
+    const patternCanvas = document.createElement("canvas");
+    patternCanvas.width = size;
+    patternCanvas.height = size;
+    const patternCtx = patternCanvas.getContext("2d");
+
+    // Background
+    if (backgroundColor !== "transparent") {
+      patternCtx.fillStyle = backgroundColor;
+      patternCtx.fillRect(0, 0, size, size);
+    }
+
+    // Dot
+    patternCtx.fillStyle = color;
+    patternCtx.beginPath();
+    patternCtx.arc(size / 2, size / 2, dotSize, 0, 2 * Math.PI);
+    patternCtx.fill();
+
+    return this.ctx.createPattern(patternCanvas, "repeat");
+  }
+
+  /**
+   * Create line pattern
+   * @param {Object} options - Pattern options
+   * @returns {CanvasPattern} Line pattern
+   */
+  createLinePattern(options = {}) {
+    const size = options.size || 20;
+    const lineWidth = options.lineWidth || 1;
+    const color = options.color || this.currentTheme.primary;
+    const backgroundColor = options.backgroundColor || "transparent";
+    const angle = options.angle || 0;
+
+    const patternCanvas = document.createElement("canvas");
+    patternCanvas.width = size;
+    patternCanvas.height = size;
+    const patternCtx = patternCanvas.getContext("2d");
+
+    // Background
+    if (backgroundColor !== "transparent") {
+      patternCtx.fillStyle = backgroundColor;
+      patternCtx.fillRect(0, 0, size, size);
+    }
+
+    // Apply rotation
+    patternCtx.save();
+    patternCtx.translate(size / 2, size / 2);
+    patternCtx.rotate((angle * Math.PI) / 180);
+    patternCtx.translate(-size / 2, -size / 2);
+
+    // Line
+    patternCtx.strokeStyle = color;
+    patternCtx.lineWidth = lineWidth;
+    patternCtx.beginPath();
+    patternCtx.moveTo(0, size / 2);
+    patternCtx.lineTo(size, size / 2);
+    patternCtx.stroke();
+
+    patternCtx.restore();
+
+    return this.ctx.createPattern(patternCanvas, "repeat");
+  }
+
+  /**
+   * Create stripe pattern
+   * @param {Object} options - Pattern options
+   * @returns {CanvasPattern} Stripe pattern
+   */
+  createStripePattern(options = {}) {
+    const width = options.width || 20;
+    const height = options.height || 20;
+    const stripeWidth = options.stripeWidth || 10;
+    const color1 = options.color1 || this.currentTheme.primary;
+    const color2 = options.color2 || this.currentTheme.secondary;
+    const vertical = options.vertical || false;
+
+    const patternCanvas = document.createElement("canvas");
+    patternCanvas.width = width;
+    patternCanvas.height = height;
+    const patternCtx = patternCanvas.getContext("2d");
+
+    if (vertical) {
+      // Vertical stripes
+      patternCtx.fillStyle = color1;
+      patternCtx.fillRect(0, 0, stripeWidth, height);
+      patternCtx.fillStyle = color2;
+      patternCtx.fillRect(stripeWidth, 0, width - stripeWidth, height);
+    } else {
+      // Horizontal stripes
+      patternCtx.fillStyle = color1;
+      patternCtx.fillRect(0, 0, width, stripeWidth);
+      patternCtx.fillStyle = color2;
+      patternCtx.fillRect(0, stripeWidth, width, height - stripeWidth);
+    }
+
+    return this.ctx.createPattern(patternCanvas, "repeat");
+  }
+
+  /**
+   * Create grid pattern
+   * @param {Object} options - Pattern options
+   * @returns {CanvasPattern} Grid pattern
+   */
+  createGridPattern(options = {}) {
+    const size = options.size || 20;
+    const lineWidth = options.lineWidth || 1;
+    const color = options.color || this.currentTheme.foreground;
+    const backgroundColor = options.backgroundColor || "transparent";
+
+    const patternCanvas = document.createElement("canvas");
+    patternCanvas.width = size;
+    patternCanvas.height = size;
+    const patternCtx = patternCanvas.getContext("2d");
+
+    // Background
+    if (backgroundColor !== "transparent") {
+      patternCtx.fillStyle = backgroundColor;
+      patternCtx.fillRect(0, 0, size, size);
+    }
+
+    // Grid lines
+    patternCtx.strokeStyle = color;
+    patternCtx.lineWidth = lineWidth;
+    patternCtx.beginPath();
+
+    // Vertical line
+    patternCtx.moveTo(0, 0);
+    patternCtx.lineTo(0, size);
+
+    // Horizontal line
+    patternCtx.moveTo(0, 0);
+    patternCtx.lineTo(size, 0);
+
+    patternCtx.stroke();
+
+    return this.ctx.createPattern(patternCanvas, "repeat");
+  }
+
+  /**
+   * Create checkerboard pattern
+   * @param {Object} options - Pattern options
+   * @returns {CanvasPattern} Checkerboard pattern
+   */
+  createCheckerboardPattern(options = {}) {
+    const size = options.size || 20;
+    const color1 = options.color1 || this.currentTheme.background;
+    const color2 = options.color2 || this.currentTheme.foreground;
+
+    const patternCanvas = document.createElement("canvas");
+    patternCanvas.width = size * 2;
+    patternCanvas.height = size * 2;
+    const patternCtx = patternCanvas.getContext("2d");
+
+    // Create checkerboard pattern
+    patternCtx.fillStyle = color1;
+    patternCtx.fillRect(0, 0, size, size);
+    patternCtx.fillRect(size, size, size, size);
+
+    patternCtx.fillStyle = color2;
+    patternCtx.fillRect(size, 0, size, size);
+    patternCtx.fillRect(0, size, size, size);
+
+    return this.ctx.createPattern(patternCanvas, "repeat");
+  }
+
+  /**
+   * Create noise pattern
+   * @param {Object} options - Pattern options
+   * @returns {CanvasPattern} Noise pattern
+   */
+  createNoisePattern(options = {}) {
+    const size = options.size || 50;
+    const intensity = options.intensity || 0.1;
+    const baseColor = options.baseColor || this.currentTheme.background;
+
+    const patternCanvas = document.createElement("canvas");
+    patternCanvas.width = size;
+    patternCanvas.height = size;
+    const patternCtx = patternCanvas.getContext("2d");
+
+    // Base color
+    patternCtx.fillStyle = baseColor;
+    patternCtx.fillRect(0, 0, size, size);
+
+    // Add noise
+    const imageData = patternCtx.getImageData(0, 0, size, size);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+      const noise = (Math.random() - 0.5) * intensity * 255;
+      data[i] = Math.max(0, Math.min(255, data[i] + noise)); // R
+      data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise)); // G
+      data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise)); // B
+    }
+
+    patternCtx.putImageData(imageData, 0, 0);
+
+    return this.ctx.createPattern(patternCanvas, "repeat");
+  }
+
+  /**
+   * Apply pattern to rectangle with enhanced options
+   * @param {number} x - X coordinate
+   * @param {number} y - Y coordinate
+   * @param {number} width - Rectangle width
+   * @param {number} height - Rectangle height
+   * @param {string} patternType - Pattern type
+   * @param {Object} options - Pattern and drawing options
+   */
+  drawPatternRect(x, y, width, height, patternType, options = {}) {
+    const pattern = this.createPattern(patternType, options);
+
+    this.drawRect(x, y, width, height, {
+      fill: pattern,
+      stroke: options.stroke,
+      strokeWidth: options.strokeWidth,
+      borderRadius: options.borderRadius,
+      interactive: options.interactive,
+      id: options.id,
+      label: options.label,
+      ariaLabel: options.ariaLabel,
+      onClick: options.onClick,
+    });
+  }
+
+  /**
+   * Apply pattern to circle
+   * @param {number} x - Center X coordinate
+   * @param {number} y - Center Y coordinate
+   * @param {number} radius - Circle radius
+   * @param {string} patternType - Pattern type
+   * @param {Object} options - Pattern and drawing options
+   */
+  drawPatternCircle(x, y, radius, patternType, options = {}) {
+    const pattern = this.createPattern(patternType, options);
+
+    this.drawCircle(x, y, radius, {
+      fill: pattern,
+      stroke: options.stroke,
+      strokeWidth: options.strokeWidth,
+      interactive: options.interactive,
+      id: options.id,
+      label: options.label,
+      ariaLabel: options.ariaLabel,
+      onClick: options.onClick,
+    });
+  }
+
+  /**
+   * Clear pattern cache
+   */
+  clearPatternCache() {
+    if (this.patternCache) {
+      this.patternCache.clear();
+    }
+  }
+
   /**
    * Clean up resources and event listeners
    */
@@ -2329,6 +2652,7 @@ class CanvasRenderer {
 
       // Clear caches
       this.clearImageCache();
+      this.clearPatternCache();
 
       // Remove event listeners
       if (this.resizeObserver) {

@@ -846,24 +846,42 @@ class SettingsManager {
         e.preventDefault();
         this.toggleSettingsDropdown();
       });
-    }
 
-    // Desktop hover behavior
-    const settingsNavItem = settingsNav?.closest(".nav-item-dropdown");
-    if (settingsNavItem) {
-      // Open on hover (desktop only)
-      settingsNavItem.addEventListener("mouseenter", () => {
-        if (window.innerWidth > DESKTOP_BREAKPOINT) {
-          this.openSettingsDropdown();
-        }
-      });
+      // Add hover behavior for settings dropdown
+      const navItemDropdown = settingsNav.closest(".nav-item-dropdown");
+      if (navItemDropdown) {
+        let hoverTimeout = null;
 
-      // Close when leaving the dropdown area
-      settingsNavItem.addEventListener("mouseleave", () => {
-        if (window.innerWidth > DESKTOP_BREAKPOINT) {
-          this.closeSettingsDropdown();
-        }
-      });
+        // Show on hover (desktop only)
+        navItemDropdown.addEventListener("mouseenter", () => {
+          if (window.innerWidth > DESKTOP_BREAKPOINT) {
+            clearTimeout(hoverTimeout);
+            this.openSettingsDropdown();
+          }
+        });
+
+        // Hide on mouse leave with small delay to prevent flicker
+        navItemDropdown.addEventListener("mouseleave", () => {
+          if (window.innerWidth > DESKTOP_BREAKPOINT) {
+            hoverTimeout = setTimeout(() => {
+              this.closeSettingsDropdown();
+            }, 150); // Small delay to prevent accidental closes
+          }
+        });
+
+        // Add scroll listener to close dropdown when user scrolls
+        let scrollTimeout = null;
+        window.addEventListener("scroll", () => {
+          clearTimeout(scrollTimeout);
+          scrollTimeout = setTimeout(() => {
+            // Only close if menu is open and we've scrolled significantly
+            const settingsMenu = document.querySelector(".settings-menu");
+            if (settingsMenu && settingsMenu.style.display === "block") {
+              this.closeSettingsDropdown();
+            }
+          }, 100);
+        });
+      }
     }
 
     // Close settings on outside click

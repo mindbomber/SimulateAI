@@ -1029,6 +1029,8 @@ class EducatorToolkit {
       switch (tag.toLowerCase()) {
         case "ethics":
         case "fairness":
+        case "moral-calculus":
+        case "ethical-frameworks":
           alignments.push({
             standard: "CSTA",
             code: "3A-IC-25",
@@ -1036,7 +1038,11 @@ class EducatorToolkit {
               "Evaluate the ways computing impacts personal, ethical, social, economic, and cultural practices",
           });
           break;
+
         case "bias":
+        case "algorithmic-bias":
+        case "discrimination":
+        case "training-bias":
           alignments.push({
             standard: "CSTA",
             code: "2-IC-21",
@@ -1044,7 +1050,75 @@ class EducatorToolkit {
               "Discuss issues of bias and accessibility in the design of existing technologies",
           });
           break;
+
+        case "privacy":
+        case "data-protection":
+        case "surveillance":
+        case "consent":
+          alignments.push({
+            standard: "CSTA",
+            code: "3A-IC-28",
+            description:
+              "Explain the beneficial and harmful effects that intellectual property laws can have on innovation",
+          });
+          alignments.push({
+            standard: "CSTA",
+            code: "2-IC-22",
+            description:
+              "Collaborate with many contributors through strategies such as crowdsourcing, surveys, and online collaboration to solve problems",
+          });
+          break;
+
+        case "autonomy":
+        case "decision-making":
+        case "autonomous-systems":
+        case "human-control":
+          alignments.push({
+            standard: "CSTA",
+            code: "3A-IC-26",
+            description:
+              "Choose from existing cybersecurity measures to reduce threats to computing systems",
+          });
+          alignments.push({
+            standard: "NGSS",
+            practice: "Systems and System Models",
+            description:
+              "Analyze autonomous systems and their decision-making processes",
+          });
+          break;
+
+        case "justice":
+        case "equality":
+        case "human-rights":
+        case "civil-rights":
+          alignments.push({
+            standard: "NCSS",
+            theme: "Power, Authority, and Governance",
+            description:
+              "Examine how AI systems affect power distribution and governance structures",
+          });
+          alignments.push({
+            standard: "CSTA",
+            code: "3A-IC-24",
+            description:
+              "Analyze the beneficial and harmful effects of computing innovations",
+          });
+          break;
+
+        case "transparency":
+        case "explainability":
+        case "accountability":
+          alignments.push({
+            standard: "CSTA",
+            code: "3A-IC-27",
+            description:
+              "Use tools and methods for collaboration on a project to increase connectivity of people in different cultures and career fields",
+          });
+          break;
+
         case "education":
+        case "learning":
+        case "pedagogy":
           alignments.push({
             standard: "NGSS",
             practice: "Engaging in Argument from Evidence",
@@ -1052,18 +1126,55 @@ class EducatorToolkit {
               "Use evidence to construct and support arguments about ethical implications",
           });
           break;
+
+        case "social-impact":
+        case "societal-implications":
+        case "real-world":
+          alignments.push({
+            standard: "NCSS",
+            theme: "Science, Technology, and Society",
+            description:
+              "Analyze the impact of AI technologies on society and social institutions",
+          });
+          break;
+
+        case "life-death":
+        case "harm-prevention":
+        case "safety":
+          alignments.push({
+            standard: "CSTA",
+            code: "3A-IC-24",
+            description:
+              "Analyze the beneficial and harmful effects of computing innovations",
+          });
+          alignments.push({
+            standard: "NGSS",
+            practice: "Constructing Explanations",
+            description:
+              "Construct explanations about the ethical implications of life-critical AI systems",
+          });
+          break;
       }
     }
 
-    return alignments.length > 0 ? alignments : null;
+    // Remove duplicates while preserving order
+    const uniqueAlignments = alignments.filter(
+      (alignment, index, array) =>
+        array.findIndex(
+          (a) => a.standard === alignment.standard && a.code === alignment.code,
+        ) === index,
+    );
+
+    return uniqueAlignments.length > 0 ? uniqueAlignments : null;
   }
 
   /**
-   * Get assessment tools based on difficulty level
+   * Get assessment tools based on difficulty level and content tags
    */
-  getAssessmentTools(difficulty) {
+  getAssessmentTools(difficulty, tags = []) {
     const tools = [];
 
+    // Base difficulty-driven assessments
     switch (difficulty) {
       case "beginner":
         tools.push(
@@ -1085,6 +1196,105 @@ class EducatorToolkit {
           this.classroomActivities.get("cross-curricular"),
         );
         break;
+    }
+
+    // Content-specific assessment enhancements based on tags
+    for (const tag of tags) {
+      switch (tag.toLowerCase()) {
+        case "bias":
+        case "algorithmic-bias":
+        case "discrimination":
+          // Add specific bias investigation assessments
+          if (!tools.find((t) => t?.name?.includes("Bias Investigation"))) {
+            tools.push({
+              type: "content-specific",
+              name: "Bias Detection & Analysis Assessment",
+              description:
+                "Hands-on assessment of bias identification and mitigation strategies",
+              activities: [
+                "Dataset bias audit",
+                "Algorithm fairness testing",
+                "Mitigation strategy proposal",
+              ],
+            });
+          }
+          break;
+
+        case "ethics":
+        case "moral-calculus":
+        case "utilitarianism":
+        case "deontology":
+          // Add ethical framework application assessments
+          if (!tools.find((t) => t?.name?.includes("Ethics Framework"))) {
+            tools.push({
+              type: "content-specific",
+              name: "Ethical Framework Application Assessment",
+              description: "Apply different ethical frameworks to AI scenarios",
+              activities: [
+                "Utilitarian analysis",
+                "Deontological evaluation",
+                "Virtue ethics application",
+              ],
+            });
+          }
+          break;
+
+        case "privacy":
+        case "data-protection":
+        case "surveillance":
+          // Add privacy-specific assessments
+          if (!tools.find((t) => t?.name?.includes("Privacy"))) {
+            tools.push({
+              type: "content-specific",
+              name: "Privacy Impact Assessment",
+              description: "Evaluate privacy implications of AI systems",
+              activities: [
+                "Data flow analysis",
+                "Consent mechanism evaluation",
+                "Privacy by design implementation",
+              ],
+            });
+          }
+          break;
+
+        case "autonomy":
+        case "decision-making":
+        case "human-control":
+          // Add autonomy-specific assessments
+          if (!tools.find((t) => t?.name?.includes("Autonomy"))) {
+            tools.push({
+              type: "content-specific",
+              name: "Human-AI Autonomy Balance Assessment",
+              description:
+                "Analyze appropriate levels of AI autonomy and human oversight",
+              activities: [
+                "Autonomy level analysis",
+                "Override mechanism design",
+                "Human-AI collaboration evaluation",
+              ],
+            });
+          }
+          break;
+
+        case "social-impact":
+        case "real-world":
+        case "societal-implications":
+          // Add impact analysis assessments
+          if (!tools.find((t) => t?.name?.includes("Impact"))) {
+            tools.push({
+              type: "content-specific",
+              name: "Societal Impact Analysis Assessment",
+              description:
+                "Comprehensive analysis of AI's broader societal effects",
+              activities: [
+                "Stakeholder impact mapping",
+                "Long-term consequence analysis",
+                "Policy recommendation development",
+              ],
+            });
+          }
+          break;
+      }
     }
 
     return tools.length > 0 ? tools : null;
@@ -1327,6 +1537,276 @@ class EducatorToolkit {
         "Balance criticism with encouragement",
         "Ask clarifying questions",
       ],
+    };
+  }
+
+  /**
+   * Generate comprehensive educator dashboard data
+   */
+  generateEducatorDashboard(classId) {
+    return {
+      classOverview: this.getClassOverview(classId),
+      studentProgress: this.getStudentProgressSummary(classId),
+      standardsAlignment: this.trackStandardsProgress(classId),
+      assessmentInsights: this.analyzeAssessmentData(classId),
+      engagementMetrics: this.measureClassEngagement(classId),
+      recommendedInterventions: this.suggestInterventions(classId),
+      parentCommunication: this.generateParentUpdates(classId),
+    };
+  }
+
+  /**
+   * Create professional development resources for educators
+   */
+  createProfessionalDevelopment() {
+    return {
+      workshops: {
+        "AI Ethics Fundamentals": {
+          duration: "3 hours",
+          audience: "All educators",
+          objectives: [
+            "Understand basic AI ethics concepts",
+            "Learn to facilitate ethical discussions",
+            "Practice using SimulateAI platform",
+          ],
+          activities: [
+            "Hands-on scenario exploration",
+            "Discussion facilitation practice",
+            "Assessment strategy development",
+          ],
+        },
+        "Advanced Facilitation Techniques": {
+          duration: "6 hours",
+          audience: "Experienced educators",
+          objectives: [
+            "Master complex ethical reasoning discussions",
+            "Handle controversial topics effectively",
+            "Adapt content for diverse learners",
+          ],
+          activities: [
+            "Case study analysis",
+            "Role-playing difficult scenarios",
+            "Cultural sensitivity training",
+          ],
+        },
+      },
+      resources: {
+        "Quick Start Guide": "Step-by-step platform introduction",
+        "Troubleshooting FAQ": "Common issues and solutions",
+        "Best Practices Library": "Proven teaching strategies",
+        "Community Forum": "Peer support and idea sharing",
+      },
+      certification: {
+        "AI Ethics Educator": {
+          requirements: [
+            "Complete foundational workshop",
+            "Teach 5+ scenarios with documentation",
+            "Submit reflection portfolio",
+            "Pass competency assessment",
+          ],
+          benefits: [
+            "Official certification credential",
+            "Access to advanced resources",
+            "Invitation to educator network",
+            "Conference presentation opportunities",
+          ],
+        },
+      },
+    };
+  }
+
+  /**
+   * Adaptive curriculum system that adjusts based on student performance
+   */
+  createAdaptiveCurriculum() {
+    return {
+      difficultyAdjustment: {
+        automatic: "System adjusts based on student performance",
+        manual: "Educator can override automatic adjustments",
+        factors: [
+          "Completion time",
+          "Answer quality",
+          "Help requests",
+          "Peer interaction",
+        ],
+      },
+      personalization: {
+        learningStyle: "Adapt to visual, auditory, kinesthetic preferences",
+        interestAreas: "Emphasize healthcare, finance, education contexts",
+        culturalContext: "Include relevant cultural perspectives",
+        careerGoals: "Connect to student career aspirations",
+      },
+      scaffolding: {
+        conceptual: "Build from concrete to abstract thinking",
+        linguistic: "Support English language learners",
+        cognitive: "Accommodate different processing speeds",
+        social: "Balance individual and group work",
+      },
+    };
+  }
+
+  /**
+   * Integration with external educational systems
+   */
+  setupExternalIntegrations() {
+    return {
+      LMS: {
+        compatible: ["Canvas", "Blackboard", "Moodle", "Google Classroom"],
+        features: [
+          "Single sign-on",
+          "Grade passback",
+          "Assignment integration",
+          "Progress tracking",
+        ],
+      },
+      assessmentPlatforms: {
+        compatible: ["Kahoot", "Quizizz", "Padlet", "Flipgrid"],
+        benefits: [
+          "Seamless workflow",
+          "Familiar interfaces",
+          "Enhanced engagement",
+          "Data aggregation",
+        ],
+      },
+      researchPartners: {
+        universities: "Collaboration on educational research",
+        thinkTanks: "Policy and curriculum development",
+        nonprofits: "Community engagement projects",
+        industry: "Real-world application examples",
+      },
+    };
+  }
+
+  /**
+   * Supporting methods for educator dashboard and analytics
+   */
+  getClassOverview(classId) {
+    return {
+      totalStudents: 25,
+      activeScenarios: 5,
+      completionRate: 78,
+      averageEngagement: 85,
+      topChallenges: ["Bias recognition", "Stakeholder analysis"],
+      topStrengths: ["Critical thinking", "Collaborative discussion"],
+    };
+  }
+
+  getStudentProgressSummary(classId) {
+    return {
+      onTrack: 18,
+      needsSupport: 5,
+      exceeding: 2,
+      detailedMetrics: {
+        averageScenarioCompletion: 4.2,
+        averageReflectionQuality: "Developing",
+        peerInteractionLevel: "High",
+        ethicalReasoningGrowth: "+15%",
+      },
+    };
+  }
+
+  trackStandardsProgress(classId) {
+    return {
+      CSTA: {
+        "1A-IC-16": { mastery: 85, inProgress: 10, notStarted: 5 },
+        "1A-IC-17": { mastery: 72, inProgress: 20, notStarted: 8 },
+        "1A-IC-18": { mastery: 90, inProgress: 8, notStarted: 2 },
+      },
+      NGSS: {
+        "5-ESS3-1": { mastery: 78, inProgress: 15, notStarted: 7 },
+        "MS-ETS1-1": { mastery: 82, inProgress: 12, notStarted: 6 },
+      },
+      NCSS: {
+        "Theme 2": { mastery: 75, inProgress: 18, notStarted: 7 },
+        "Theme 10": { mastery: 88, inProgress: 10, notStarted: 2 },
+      },
+    };
+  }
+
+  analyzeAssessmentData(classId) {
+    return {
+      formativeInsights: {
+        commonMisconceptions: [
+          "AI bias is always intentional",
+          "Technology is neutral",
+          "Privacy is all-or-nothing",
+        ],
+        strongAreas: [
+          "Identifying stakeholders",
+          "Recognizing multiple perspectives",
+          "Asking clarifying questions",
+        ],
+      },
+      summativeResults: {
+        averageScore: 82,
+        distribution: { A: 8, B: 12, C: 4, D: 1, F: 0 },
+        improvementAreas: ["Complex reasoning", "Real-world application"],
+      },
+    };
+  }
+
+  measureClassEngagement(classId) {
+    return {
+      discussionParticipation: 87,
+      scenarioCompletion: 78,
+      peerInteraction: 92,
+      questionAsking: 75,
+      voluntaryExploration: 65,
+      trends: {
+        weeklyGrowth: "+3%",
+        mostEngagingTopics: ["Healthcare AI", "Social media algorithms"],
+        leastEngagingTopics: ["Technical specifications", "Legal frameworks"],
+      },
+    };
+  }
+
+  suggestInterventions(classId) {
+    return {
+      individual: [
+        {
+          student: "Alex R.",
+          issue: "Low participation in discussions",
+          suggestion: "Try smaller group discussions first",
+        },
+        {
+          student: "Jordan M.",
+          issue: "Struggling with bias recognition",
+          suggestion: "Provide additional bias examples worksheet",
+        },
+      ],
+      classWide: [
+        {
+          issue: "Technical terminology confusion",
+          suggestion: "Create class glossary and reference guide",
+        },
+        {
+          issue: "Need more real-world connections",
+          suggestion: "Invite guest speaker from tech industry",
+        },
+      ],
+    };
+  }
+
+  generateParentUpdates(classId) {
+    return {
+      newsletter: {
+        subject: "AI Ethics Learning Progress Update",
+        highlights: [
+          "Students explored healthcare AI decision-making",
+          "Collaborative problem-solving skills developing well",
+          "Strong growth in critical thinking abilities",
+        ],
+        atHome: [
+          "Discuss AI use in family's daily life",
+          "Ask about scenario discussions from class",
+          "Encourage questions about technology ethics",
+        ],
+      },
+      individualReports: {
+        template: "Personalized progress summary for each student",
+        metrics: ["Engagement", "Critical thinking", "Collaboration"],
+        nextSteps: "Specific goals for continued growth",
+      },
     };
   }
 

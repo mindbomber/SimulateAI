@@ -44,7 +44,6 @@ const UI_CONSTANTS = {
   FOCUS_TRANSITION_DELAY: 100, // Delay for focus transitions in modals
   TOUCH_TARGET_SIZE: 44,
   FOCUS_RING_WIDTH: 2,
-  RIPPLE_DURATION: 600,
   BREAKPOINTS: {
     mobile: 768,
     tablet: 1024,
@@ -76,6 +75,11 @@ const UI_CONSTANTS = {
 
   // Animation delays
   CLEANUP_DELAY: 300,
+
+  // Centralized animation timing (prevent duplicate rules)
+  TRANSITION_EASE: "all 0.3s ease",
+  TRANSITION_CUBIC: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+  OPACITY_TRANSFORM_TRANSITION: "opacity 0.3s ease, transform 0.3s ease",
 };
 
 const THEME_COLORS = {
@@ -134,6 +138,90 @@ class UIThemeManager {
     element.style.setProperty("--theme-border", theme.colors.border);
   }
 }
+
+/**
+ * Centralized style management to reduce DOM mutations
+ */
+class UIStyleManager {
+  static styleElements = new Map();
+
+  static addGlobalStyles() {
+    if (document.getElementById("ui-global-styles")) return; // Already added
+
+    const style = document.createElement("style");
+    style.id = "ui-global-styles";
+    style.textContent = `
+      /* Centralized focus styles */
+      .ui-component:focus {
+        outline: ${UI_CONSTANTS.FOCUS_RING_WIDTH}px solid var(--theme-primary);
+        outline-offset: 2px;
+        box-shadow: 0 0 0 4px var(--theme-primary)20;
+      }
+      
+      .ui-component:focus:not(:focus-visible) {
+        outline: none;
+        box-shadow: none;
+      }
+      
+      /* Animation transitions */
+      .ui-animated {
+        transition: ${UI_CONSTANTS.TRANSITION_EASE};
+      }
+      
+      .ui-animated-cubic {
+        transition: ${UI_CONSTANTS.TRANSITION_CUBIC};
+      }
+      
+      .ui-show-animation {
+        transition: ${UI_CONSTANTS.OPACITY_TRANSFORM_TRANSITION};
+      }
+      
+      /* Hover and focus states */
+      .ui-component.hover {
+        transform: translateY(-1px);
+      }
+      
+      .ui-component.active {
+        transform: translateY(1px);
+      }
+      
+      .ui-component.focused {
+        z-index: 1;
+      }
+      
+      /* Responsive classes */
+      .ui-component.mobile {
+        min-width: ${UI_CONSTANTS.TOUCH_TARGET_SIZE}px;
+        min-height: ${UI_CONSTANTS.TOUCH_TARGET_SIZE}px;
+      }
+    `;
+
+    document.head.appendChild(style);
+  }
+
+  static getOrCreateStyleElement(id) {
+    if (this.styleElements.has(id)) {
+      return this.styleElements.get(id);
+    }
+
+    const style = document.createElement("style");
+    style.id = `ui-styles-${id}`;
+    document.head.appendChild(style);
+    this.styleElements.set(id, style);
+    return style;
+  }
+
+  static removeStyleElement(id) {
+    const style = this.styleElements.get(id);
+    if (style && style.parentNode) {
+      style.parentNode.removeChild(style);
+      this.styleElements.delete(id);
+    }
+  }
+}
+
+// Initialize global styles
+UIStyleManager.addGlobalStyles();
 
 /**
  * Performance monitoring utility for UI components
@@ -275,7 +363,6 @@ class UIComponent {
         boxSizing: "border-box",
         userSelect: "none",
         outline: "none",
-        transition: this.animated ? "all 0.3s ease" : "none",
 
         // Custom properties for theming
         backgroundColor: "var(--theme-surface)",
@@ -300,34 +387,21 @@ class UIComponent {
 
       Object.assign(this.element.style, baseStyles);
 
-      // Add focus styles
-      this.addFocusStyles();
+      // Use CSS classes instead of inline styles for animations
+      if (this.animated) {
+        this.element.classList.add("ui-animated");
+      }
     } catch (error) {
       this.errorHandler(error, "applyStyles");
     }
   }
 
   /**
-   * Add modern focus styles
+   * Add modern focus styles using CSS classes
    */
   addFocusStyles() {
-    if (!this.focusable) return;
-
-    const style = document.createElement("style");
-    style.textContent = `
-            #${this.id}:focus {
-                outline: ${UI_CONSTANTS.FOCUS_RING_WIDTH}px solid var(--theme-primary);
-                outline-offset: 2px;
-                box-shadow: 0 0 0 4px var(--theme-primary)20;
-            }
-            
-            #${this.id}:focus:not(:focus-visible) {
-                outline: none;
-                box-shadow: none;
-            }
-        `;
-
-    document.head.appendChild(style);
+    // Focus styles are now handled by global CSS classes
+    // No need to create individual style elements
   }
 
   /**
@@ -542,12 +616,12 @@ class UIComponent {
       this.element.setAttribute("aria-hidden", "false");
 
       if (this.animated) {
+        // Use CSS classes for animations
+        this.element.classList.add("ui-show-animation");
         this.element.style.opacity = "0";
         this.element.style.transform = "scale(0.95)";
 
         requestAnimationFrame(() => {
-          this.element.style.transition =
-            "opacity 0.3s ease, transform 0.3s ease";
           this.element.style.opacity = "1";
           this.element.style.transform = "scale(1)";
         });
@@ -561,8 +635,7 @@ class UIComponent {
     this.visible = false;
     if (this.element) {
       if (this.animated) {
-        this.element.style.transition =
-          "opacity 0.3s ease, transform 0.3s ease";
+        this.element.classList.add("ui-show-animation");
         this.element.style.opacity = "0";
         this.element.style.transform = "scale(0.95)";
 
@@ -680,7 +753,7 @@ class UIComponent {
     this.emit("update", { deltaTime });
   }
 
-  render(_renderer) {
+  render() {
     // UI components render to DOM, not canvas/svg
     // Override in subclasses if needed
   }
@@ -746,7 +819,6 @@ class UIPanel extends UIComponent {
 
     this.title = config.title || "";
     this.content = config.content || "";
-    this.components = [];
     this.resizable = config.resizable === true;
     this.closable = config.closable !== false;
     this.modal = config.modal === true;
@@ -801,6 +873,8 @@ class UIPanel extends UIComponent {
                 <footer class="panel-controls" role="toolbar"></footer>
             `;
 
+      // Cache frequently accessed elements
+      this.cacheElements();
       this.styleContent();
     } catch (error) {
       this.errorHandler(error, "createContent");
@@ -808,11 +882,25 @@ class UIPanel extends UIComponent {
   }
 
   /**
-   * Apply modern styling to panel content
+   * Cache DOM elements to reduce querySelector calls
+   */
+  cacheElements() {
+    this.cachedElements = {
+      closeBtn: this.element.querySelector(".panel-close"),
+      header: this.element.querySelector(".panel-header"),
+      title: this.element.querySelector(".panel-title"),
+      content: this.element.querySelector(".panel-content"),
+      controls: this.element.querySelector(".panel-controls"),
+    };
+  }
+
+  /**
+   * Apply modern styling to panel content using cached elements
    */
   styleContent() {
+    const { closeBtn, header, title, content, controls } = this.cachedElements;
+
     // Style the close button
-    const closeBtn = this.element.querySelector(".panel-close");
     if (closeBtn) {
       Object.assign(closeBtn.style, {
         position: "absolute",
@@ -842,7 +930,6 @@ class UIPanel extends UIComponent {
     }
 
     // Style the header
-    const header = this.element.querySelector(".panel-header");
     if (header) {
       Object.assign(header.style, {
         fontWeight: "600",
@@ -854,7 +941,6 @@ class UIPanel extends UIComponent {
     }
 
     // Style the title
-    const title = this.element.querySelector(".panel-title");
     if (title) {
       Object.assign(title.style, {
         margin: "0",
@@ -865,7 +951,6 @@ class UIPanel extends UIComponent {
     }
 
     // Style the content
-    const content = this.element.querySelector(".panel-content");
     if (content) {
       Object.assign(content.style, {
         marginBottom: "16px",
@@ -877,7 +962,6 @@ class UIPanel extends UIComponent {
     }
 
     // Style the controls
-    const controls = this.element.querySelector(".panel-controls");
     if (controls) {
       Object.assign(controls.style, {
         display: "flex",
@@ -1042,9 +1126,8 @@ class UIPanel extends UIComponent {
   }
 
   setContent(html) {
-    const contentEl = this.element.querySelector(".panel-content");
-    if (contentEl) {
-      contentEl.innerHTML = html;
+    if (this.cachedElements?.content) {
+      this.cachedElements.content.innerHTML = html;
     }
   }
 
@@ -1055,7 +1138,7 @@ class UIPanel extends UIComponent {
     this.emit("beforeClose");
 
     if (this.animated) {
-      this.element.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+      this.element.style.transition = UI_CONSTANTS.OPACITY_TRANSFORM_TRANSITION;
       this.element.style.opacity = "0";
       this.element.style.transform = "scale(0.95)";
 
@@ -1203,9 +1286,8 @@ class UIPanel extends UIComponent {
       button.style.outline = "none";
     });
 
-    const controls = this.element.querySelector(".panel-controls");
-    if (controls) {
-      controls.appendChild(button);
+    if (this.cachedElements?.controls) {
+      this.cachedElements.controls.appendChild(button);
     }
 
     return button;
@@ -1393,9 +1475,8 @@ class UIPanel extends UIComponent {
     container.appendChild(slider);
     container.appendChild(valueDisplay);
 
-    const controls = this.element.querySelector(".panel-controls");
-    if (controls) {
-      controls.appendChild(container);
+    if (this.cachedElements?.controls) {
+      this.cachedElements.controls.appendChild(container);
     }
 
     return {
@@ -1506,6 +1587,8 @@ class EthicsDisplay extends UIComponent {
                 <main class="ethics-meters" role="main"></main>
             `;
 
+      // Cache frequently accessed elements
+      this.cacheElements();
       this.styleHeader();
       this.renderMeters();
     } catch (error) {
@@ -1514,10 +1597,23 @@ class EthicsDisplay extends UIComponent {
   }
 
   /**
-   * Style the header elements
+   * Cache DOM elements to reduce querySelector calls
+   */
+  cacheElements() {
+    this.cachedElements = {
+      header: this.element.querySelector(".ethics-header"),
+      title: this.element.querySelector(".ethics-title"),
+      summary: this.element.querySelector(".ethics-summary"),
+      meters: this.element.querySelector(".ethics-meters"),
+    };
+  }
+
+  /**
+   * Style the header elements using cached references
    */
   styleHeader() {
-    const header = this.element.querySelector(".ethics-header");
+    const { header, title, summary } = this.cachedElements;
+
     if (header) {
       Object.assign(header.style, {
         marginBottom: "16px",
@@ -1526,7 +1622,6 @@ class EthicsDisplay extends UIComponent {
       });
     }
 
-    const title = this.element.querySelector(".ethics-title");
     if (title) {
       Object.assign(title.style, {
         margin: "0 0 8px 0",
@@ -1536,7 +1631,6 @@ class EthicsDisplay extends UIComponent {
       });
     }
 
-    const summary = this.element.querySelector(".ethics-summary");
     if (summary) {
       Object.assign(summary.style, {
         fontSize: "12px",
@@ -1565,17 +1659,16 @@ class EthicsDisplay extends UIComponent {
   }
 
   /**
-   * Render all ethics meters
+   * Render all ethics meters using cached elements
    */
   renderMeters() {
-    const container = this.element.querySelector(".ethics-meters");
-    if (!container) return;
+    if (!this.cachedElements?.meters) return;
 
-    container.innerHTML = "";
+    this.cachedElements.meters.innerHTML = "";
 
     this.metrics.forEach((metric, name) => {
       const meterElement = this.createMeter(metric, name);
-      container.appendChild(meterElement);
+      this.cachedElements.meters.appendChild(meterElement);
     });
 
     this.updateSummary();
@@ -1641,7 +1734,7 @@ class EthicsDisplay extends UIComponent {
   /**
    * Style individual meter
    */
-  styleMeter(container, _metric) {
+  styleMeter(container) {
     Object.assign(container.style, {
       marginBottom: "16px",
       position: "relative",
@@ -1808,18 +1901,17 @@ class EthicsDisplay extends UIComponent {
   }
 
   /**
-   * Update ethics summary
+   * Update ethics summary using cached elements
    */
   updateSummary() {
-    const summary = this.element.querySelector(".ethics-summary");
-    if (!summary || this.metrics.size === 0) return;
+    if (!this.cachedElements?.summary || this.metrics.size === 0) return;
 
     const values = Array.from(this.metrics.values()).map((m) => m.value || 0);
     const average = values.reduce((sum, val) => sum + val, 0) / values.length;
     const totalMetrics = this.metrics.size;
 
     const gradeText = this.getEthicsGrade(average);
-    summary.textContent = `Overall: ${this.formatValue(average)} (${gradeText}) • ${totalMetrics} metrics`;
+    this.cachedElements.summary.textContent = `Overall: ${this.formatValue(average)} (${gradeText}) • ${totalMetrics} metrics`;
   }
 
   /**
@@ -1837,7 +1929,7 @@ class EthicsDisplay extends UIComponent {
   /**
    * Update specific metric with animation
    */
-  updateMetric(metricName, newValue, _options = {}) {
+  updateMetric(metricName, newValue) {
     const metric = this.metrics.get(metricName);
     if (!metric) return;
 
@@ -2176,9 +2268,7 @@ class FeedbackSystem extends UIComponent {
       transform: this.position.includes("top")
         ? "translateY(-20px)"
         : "translateY(20px)",
-      transition: this.animated
-        ? "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
-        : "none",
+      transition: this.animated ? UI_CONSTANTS.TRANSITION_CUBIC : "none",
     });
 
     // Style components
@@ -2358,7 +2448,7 @@ class FeedbackSystem extends UIComponent {
     if (!element) return;
 
     if (this.animated) {
-      element.style.transition = "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)";
+      element.style.transition = UI_CONSTANTS.TRANSITION_CUBIC;
       element.style.opacity = "0";
       element.style.transform = this.position.includes("top")
         ? "translateY(-20px)"
@@ -3077,7 +3167,7 @@ class Slider extends UIComponent {
   /**
    * Handle mouse up to end drag
    */
-  handleMouseUp(_event) {
+  handleMouseUp() {
     if (!this.isDragging) return;
 
     this.isDragging = false;
@@ -3123,7 +3213,7 @@ class Slider extends UIComponent {
   /**
    * Handle touch end
    */
-  handleTouchEnd(_event) {
+  handleTouchEnd() {
     if (!this.isDragging) return;
 
     this.isDragging = false;
@@ -3277,6 +3367,7 @@ export {
   Button,
   Slider,
   UIThemeManager,
+  UIStyleManager,
   UIPerformanceMonitor,
   UI_CONSTANTS,
   THEME_COLORS,

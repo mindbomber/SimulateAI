@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SimulateAI - Simple Validation Test</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        min-height: 100vh;
+      }
+
+      .test-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 30px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+
+      .test-result {
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border-left: 4px solid #4caf50;
+      }
+
+      .test-fail {
+        border-left-color: #f44336;
+        background: rgba(244, 67, 54, 0.2);
+      }
+
+      button {
+        background: linear-gradient(45deg, #4caf50, #45a049);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      #results {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🔧 Simple Consolidation Test</h1>
+      <p>
+        Testing if consolidated files are accessible via direct script
+        loading...
+      </p>
+
+      <button onclick="testBasicFunctionality()">Run Basic Tests</button>
+      <button onclick="testFileAccess()">Test File Access</button>
+
+      <div id="results"></div>
+    </div>
+
+    <!-- Load files directly without modules -->
+    <script src="src/js/utils/analytics.js"></script>
+
+    <script>
+      function addResult(test, status, details = "") {
+        const results = document.getElementById("results");
+        const div = document.createElement("div");
+        div.className = `test-result ${status === "PASS" ? "" : "test-fail"}`;
+        div.innerHTML = `
+                <strong>${test}:</strong> ${status === "PASS" ? "✅" : "❌"} ${status}
+                ${details ? `<br><small>${details}</small>` : ""}
+            `;
+        results.appendChild(div);
+      }
+
+      function testBasicFunctionality() {
+        document.getElementById("results").innerHTML = "";
+
+        // Test 1: Basic JavaScript functionality
+        try {
+          const testObj = { test: "working" };
+          addResult(
+            "Basic JavaScript",
+            "PASS",
+            "Object creation and manipulation working",
+          );
+        } catch (error) {
+          addResult("Basic JavaScript", "FAIL", error.message);
+        }
+
+        // Test 2: LocalStorage
+        try {
+          localStorage.setItem("test-key", "test-value");
+          const retrieved = localStorage.getItem("test-key");
+          if (retrieved === "test-value") {
+            addResult("LocalStorage", "PASS", "Storage read/write working");
+          } else {
+            addResult("LocalStorage", "FAIL", "Storage value mismatch");
+          }
+        } catch (error) {
+          addResult("LocalStorage", "FAIL", error.message);
+        }
+
+        // Test 3: Check what's on window
+        const windowObjects = [];
+        const relevantProps = [
+          "SimpleStorage",
+          "CanvasRenderer",
+          "UnifiedAnimationManager",
+          "ModalStackManager",
+          "AnalyticsManager",
+          "AnimationManagerCompat",
+        ];
+
+        relevantProps.forEach((prop) => {
+          if (typeof window[prop] !== "undefined") {
+            windowObjects.push(prop);
+          }
+        });
+
+        if (windowObjects.length > 0) {
+          addResult(
+            "Window Objects",
+            "PASS",
+            `Found: ${windowObjects.join(", ")}`,
+          );
+        } else {
+          addResult(
+            "Window Objects",
+            "FAIL",
+            "No consolidated objects found on window",
+          );
+        }
+
+        // Test 4: Canvas functionality
+        try {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          ctx.fillStyle = "#4CAF50";
+          ctx.fillRect(0, 0, 50, 50);
+          addResult("Canvas Basic", "PASS", "Canvas rendering working");
+        } catch (error) {
+          addResult("Canvas Basic", "FAIL", error.message);
+        }
+      }
+
+      async function testFileAccess() {
+        document.getElementById("results").innerHTML = "";
+
+        const testFiles = [
+          "src/js/utils/simple-storage.js",
+          "src/js/renderers/canvas-renderer.js",
+          "src/js/core/unified-animation-manager.js",
+          "src/js/components/enhanced-modal-system.js",
+        ];
+
+        for (const file of testFiles) {
+          try {
+            const response = await fetch(file);
+            if (response.ok) {
+              const content = await response.text();
+              addResult(
+                `File Access: ${file.split("/").pop()}`,
+                "PASS",
+                `${Math.round(content.length / 1024)}KB loaded`,
+              );
+            } else {
+              addResult(
+                `File Access: ${file.split("/").pop()}`,
+                "FAIL",
+                `HTTP ${response.status}`,
+              );
+            }
+          } catch (error) {
+            addResult(
+              `File Access: ${file.split("/").pop()}`,
+              "FAIL",
+              error.message,
+            );
+          }
+        }
+      }
+
+      // Auto-run basic tests
+      setTimeout(testBasicFunctionality, 1000);
+    </script>
+  </body>
+</html>

@@ -20,12 +20,17 @@
  */
 
 // Import core modules
-import EthicsSimulation from "./core/simulation.js";
 import AccessibilityManager from "./core/accessibility.js";
 import AnimationManager from "./core/animation-manager.js";
 import EducatorToolkit from "./core/educator-toolkit.js";
 import DigitalScienceLab from "./core/digital-science-lab.js";
 import ScenarioGenerator from "./core/scenario-generator.js";
+
+// Import MCP integrations
+import MCPIntegrationManager from "./integrations/mcp-integration-manager.js";
+
+// Import badge system
+import badgeManager from "./core/badge-manager.js";
 
 // Import user tracking system
 import "./user-tracking-init.js";
@@ -38,7 +43,7 @@ import "./user-tracking-init.js";
 import { userPreferences, userProgress } from "./utils/simple-storage.js";
 import { simpleAnalytics } from "./utils/simple-analytics.js";
 import Helpers from "./utils/helpers.js";
-import canvasManager from "./utils/canvas-manager.js";
+import canvasManager from "./utils/canvas-manager-compat.js";
 import logger from "./utils/logger.js";
 import focusManager from "./utils/focus-manager.js";
 import scrollManager from "./utils/scroll-manager.js";
@@ -53,8 +58,7 @@ import { getSystemCollector } from "./services/system-metadata-collector.js";
 // import { EthicsMeter, InteractiveButton, InteractiveSlider } from './objects/enhanced-objects.js';
 
 // Import new modal components
-import { EnhancedSimulationModal } from "./components/enhanced-simulation-modal.js";
-import { PostSimulationModal } from "./components/post-simulation-modal.js";
+import { ScenarioReflectionModal } from "./components/scenario-reflection-modal.js";
 import ModalFooterManager from "./components/modal-footer-manager.js";
 import MainGrid from "./components/main-grid.js";
 import OnboardingTour from "./components/onboarding-tour.js";
@@ -300,10 +304,7 @@ class AIEthicsApp {
     // Core application state
     this.currentSimulation = null;
     this.engine = null;
-    this.visualEngine = null;
-    this.simulations = new Map();
     this.isInitialized = false;
-    this.heroDemo = null;
 
     // Enterprise monitoring and health
     this.healthStatus = {
@@ -340,17 +341,11 @@ class AIEthicsApp {
     this.digitalScienceLab = null;
     this.scenarioGenerator = null;
 
-    // Enhanced objects for UI
-    this.ethicsMeters = new Map();
-    this.interactiveButtons = new Map();
-    this.simulationSliders = new Map();
+    // Badge management system
+    this.badgeManager = null;
 
-    // Canvas management IDs
-    this.currentSimulationCanvasId = null;
-    this.ethicsMetersCanvasId = null;
-    this.interactiveButtonsCanvasId = null;
-    this.simulationSlidersCanvasId = null;
-    this.heroDemoCanvasId = null;
+    // Canvas management IDs (only keeping essential ones)
+    this.currentSimulationCanvasId = null; // May be needed for cleanup
 
     // UI elements
     this.modal = null;
@@ -388,6 +383,11 @@ class AIEthicsApp {
     this.currentUser = null;
     this.userWelcomed = false; // Track if user has been welcomed this session
 
+    // Scenario Browser Integration
+    this.scenarioBrowserIntegration = null;
+    this.scenarioBrowser = null;
+    this.scenarioBrowserInitialized = false;
+
     // Debouncing for user actions
     this.lastSurpriseTime = 0; // Track last surprise me action for debouncing
 
@@ -396,52 +396,20 @@ class AIEthicsApp {
     this.performanceMonitoringInterval = null;
     this.telemetryFlushInterval = null;
 
-    // Available simulation categories (each containing multiple scenarios)
-    // NOTE: These are thematic categories, not individual scenarios
-    this.availableSimulations = [
-      {
-        id: "bias-fairness",
-        title: "AI Ethics Explorer",
-        description:
-          "Explore real-world AI scenarios and see how different choices affect various groups in society. No right answers - just learning through cause and effect.",
-        difficulty: "beginner",
-        duration: 1200, // 20 minutes
-        thumbnail: null, // Placeholder - will use default thumbnail
-        tags: ["ethics", "fairness", "education", "scenarios", "open-ended"],
-        useCanvas: false, // HTML-only simulation, no canvas needed
-        renderMode: "html",
-      },
-      {
-        id: "consent-transparency",
-        title: "Consent & Transparency",
-        description:
-          "Learn about informed consent and the importance of transparency in AI systems.",
-        difficulty: "beginner",
-        duration: 480, // 8 minutes
-        thumbnail: "src/assets/images/consent-transparency-thumb.svg",
-        tags: ["consent", "transparency", "privacy", "communication"],
-      },
-      {
-        id: "autonomy-oversight",
-        title: "Autonomy & Oversight",
-        description:
-          "Balance AI autonomy with human oversight in critical decision-making scenarios.",
-        difficulty: "intermediate",
-        duration: 720, // 12 minutes
-        thumbnail: "src/assets/images/autonomy-oversight-thumb.svg",
-        tags: ["autonomy", "oversight", "control", "responsibility"],
-      },
-      {
-        id: "misinformation-trust",
-        title: "Misinformation & Trust",
-        description:
-          "Combat misinformation and build trustworthy AI communication systems.",
-        difficulty: "advanced",
-        duration: 900, // 15 minutes
-        thumbnail: "src/assets/images/misinformation-trust-thumb.svg",
-        tags: ["misinformation", "trust", "communication", "verification"],
-      },
-    ];
+    // Main simulation entry point - connects to the full scenario system
+    // This launches the ScenarioModal which provides access to all scenario categories
+    this.simulateaiConfig = {
+      id: "simulateai",
+      title: "Simulation Launcher",
+      description:
+        "Launch the scenario browser to explore AI ethics simulations. Choose from multiple scenario categories covering fairness, bias, transparency, and real-world AI impact.",
+      difficulty: "beginner",
+      duration: 1200, // 20 minutes
+      thumbnail: null, // Placeholder - will use default thumbnail
+      tags: ["launcher", "scenarios", "ethics", "education", "gateway"],
+      useCanvas: false, // HTML-only simulation, no canvas needed
+      renderMode: "html",
+    };
 
     // Initialize enterprise monitoring
     this._initializeEnterpriseMonitoring();
@@ -479,13 +447,6 @@ class AIEthicsApp {
       cooldownMs: 5000,
     });
 
-    this.errorRecoveryStrategies.set("canvas_creation_failure", {
-      strategy: "html_fallback",
-      maxRetries: 1,
-      fallbackAction: "use_html_rendering",
-      cooldownMs: 1000,
-    });
-
     this.errorRecoveryStrategies.set("firebase_connection_failure", {
       strategy: "offline_mode",
       maxRetries: 5,
@@ -507,7 +468,6 @@ class AIEthicsApp {
   _initializeCircuitBreakers() {
     const criticalComponents = [
       "simulation_engine",
-      "canvas_manager",
       "firebase_service",
       "analytics_service",
       "authentication_service",
@@ -800,6 +760,9 @@ class AIEthicsApp {
       this._updateComponentHealth("config_system", "healthy");
       AppDebug.log("✅ Configuration system ready");
 
+      // Register simulateai with configuration system
+      this.registerSimulateaiWithConfig();
+
       // Initialize scroll manager first (handles all scroll behavior)
       scrollManager.init();
       this._updateComponentHealth("scroll_manager", "healthy");
@@ -823,8 +786,7 @@ class AIEthicsApp {
       this.setupUI();
       this._updateComponentHealth("ui_system", "healthy");
 
-      // Load simulations
-      await this.loadSimulations();
+      // Simulation configuration loaded directly (simulateai only)
       this._updateComponentHealth("simulation_system", "healthy");
 
       // Setup event listeners
@@ -838,14 +800,6 @@ class AIEthicsApp {
       // Render initial state
       this.render();
       this._updateComponentHealth("render_system", "healthy");
-
-      // Initialize hero demo
-      await this.initializeHeroDemo();
-      this._updateComponentHealth("hero_demo", "healthy");
-
-      // Initialize enhanced objects (after visual engine is set up)
-      await this.initializeEnhancedObjects();
-      this._updateComponentHealth("enhanced_objects", "healthy");
 
       // Initialize modal footer management
       this.initializeModalFooterManager();
@@ -887,6 +841,10 @@ class AIEthicsApp {
       this.initializeScrollRevealHeader();
       this._updateComponentHealth("scroll_reveal", "healthy");
 
+      // Initialize scenario browser integration
+      await this.initializeScenarioBrowserIntegration();
+      this._updateComponentHealth("scenario_browser", "healthy");
+
       // Initialize MCP integrations
       await this.initializeMCPIntegrations();
       this._updateComponentHealth("mcp_system", "healthy");
@@ -923,7 +881,7 @@ class AIEthicsApp {
 
       // Track platform initialization for system analytics
       this.systemCollector.updatePlatformMetrics("platform_initialization", {
-        simulationsAvailable: this.availableSimulations.length,
+        simulationsAvailable: 1, // Only simulateai available
         categoriesAvailable: this.categories?.length || 0,
         browserInfo: Helpers.getBrowserInfo(),
         deviceType: Helpers.getDeviceType(),
@@ -962,7 +920,7 @@ class AIEthicsApp {
 
       // Track initialization with enhanced analytics
       simpleAnalytics.trackEvent("app_initialized", {
-        simulations_available: this.availableSimulations.length,
+        simulations_available: 1, // Only simulateai available
         browser: Helpers.getBrowserInfo().browser,
         device: Helpers.getDeviceType(),
         theme: this.currentTheme,
@@ -1190,12 +1148,11 @@ class AIEthicsApp {
   }
 
   /**
-   * Switch to HTML-only rendering mode
+   * Switch to HTML-only rendering mode (default for simulateai)
    */
   _switchToHtmlRendering() {
-    AppDebug.info("Switching to HTML-only rendering mode");
-    // Disable canvas-based features and use HTML fallbacks
-    this.visualEngineConfig.renderMode = "html";
+    AppDebug.info("HTML-only rendering mode active");
+    // Already in HTML mode - simulateai is HTML-only by design
     this.enterpriseConfig.performanceTrackingEnabled = false; // Reduce overhead
   }
 
@@ -1252,7 +1209,7 @@ class AIEthicsApp {
     if (this.simulationContainer) {
       this.simulationContainer.innerHTML = `
         <div class="fallback-simulation">
-          <h3>AI Ethics Explorer - Basic Mode</h3>
+          <h3>Simulation Launcher - Basic Mode</h3>
           <p>We're running in a simplified mode due to technical limitations.</p>
           <p>You can still explore ethical scenarios through this basic interface.</p>
           <button class="btn btn-primary" onclick="location.reload()">Try Full Version Again</button>
@@ -1514,6 +1471,91 @@ class AIEthicsApp {
     headerState = "visible";
 
     AppDebug.log("Scroll reveal header initialized");
+  }
+
+  /**
+   * Register simulateai configuration with the global configuration system
+   */
+  registerSimulateaiWithConfig() {
+    try {
+      // Register simulateai as the primary simulation gateway
+      if (window.appStartup && window.appStartup.registerComponent) {
+        window.appStartup.registerComponent("simulateai", {
+          config: this.simulateaiConfig,
+          capabilities: [
+            "scenario-browser-integration",
+            "mcp-enhanced-content",
+            "educational-alignment",
+            "enterprise-monitoring",
+            "accessibility-compliant",
+          ],
+          dependencies: [
+            "scenario-browser",
+            "category-metadata-manager",
+            "pre-launch-modal",
+            "educational-modules",
+          ],
+        });
+      }
+
+      // Update feature flags for simulateai
+      if (window.SimulateAI && window.SimulateAI.features) {
+        window.SimulateAI.features.simulateaiIntegration = true;
+        window.SimulateAI.features.scenarioBrowserIntegration =
+          this.scenarioBrowserInitialized;
+        window.SimulateAI.features.mcpIntegration = this.mcpInitialized;
+        window.SimulateAI.features.educationalModules = !!(
+          this.educatorToolkit &&
+          this.digitalScienceLab &&
+          this.scenarioGenerator
+        );
+      }
+
+      AppDebug.log("SimulateAI registered with configuration system");
+    } catch (error) {
+      AppDebug.error(
+        "Failed to register simulateai with config system:",
+        error,
+      );
+    }
+  }
+
+  /**
+   * Initialize scenario browser integration for enhanced navigation
+   */
+  async initializeScenarioBrowserIntegration() {
+    try {
+      AppDebug.log("Initializing scenario browser integration...");
+
+      // Import the integration utilities dynamically
+      const { ScenarioBrowserIntegration } = await import(
+        "./utils/scenario-browser-integration.js"
+      );
+
+      // Create integration manager
+      this.scenarioBrowserIntegration = new ScenarioBrowserIntegration(this);
+
+      // Configure integration settings
+      this.scenarioBrowserIntegration.configure({
+        routeThroughSimulateAI: true,
+        useSimulateAIModals: true,
+        enableUnifiedNavigation: true,
+        preserveEducationalContext: true,
+      });
+
+      this.scenarioBrowserInitialized = true;
+      AppDebug.log("Scenario browser integration initialized successfully");
+
+      // Make integration available globally for debugging
+      window.scenarioBrowserIntegration = this.scenarioBrowserIntegration;
+    } catch (error) {
+      AppDebug.error(
+        "Failed to initialize scenario browser integration:",
+        error,
+      );
+      // Continue without integration - app should still function
+      this.scenarioBrowserInitialized = false;
+    }
   }
 
   /**
@@ -1856,15 +1898,12 @@ class AIEthicsApp {
       // Initialize core educational modules
       await this.initializeCoreModules();
 
-      // Visual Engine will be initialized later when we have canvas elements
-      // Just store the configuration for now
+      // Visual Engine configuration (HTML-only for simulateai)
+      // Simplified for focused gateway architecture
       this.visualEngineConfig = {
-        renderMode: "canvas",
+        renderMode: "html",
         accessibility: true,
-        highPerformance: !this.preferences.reducedMotion,
         debug: false,
-        highContrast: this.preferences.highContrast,
-        reducedMotion: this.preferences.reducedMotion,
       };
 
       // Systems are already initialized via their modules
@@ -1892,6 +1931,10 @@ class AIEthicsApp {
       // Initialize Scenario Generator
       this.scenarioGenerator = new ScenarioGenerator();
       AppDebug.log("Scenario Generator initialized");
+
+      // Initialize Badge Manager (using existing singleton)
+      this.badgeManager = badgeManager;
+      AppDebug.log("Badge Manager initialized (using singleton instance)");
 
       // Connect the modules for integrated functionality
       this.connectEducationalModules();
@@ -1921,6 +1964,294 @@ class AIEthicsApp {
     }
 
     AppDebug.log("Educational modules connected successfully");
+
+    // Enhance simulateai configuration with educational context
+    this.enhanceSimulateaiWithEducationalModules();
+  }
+
+  /**
+   * Enhance the simulateai configuration with educational module capabilities
+   */
+  enhanceSimulateaiWithEducationalModules() {
+    try {
+      // Add educational context to simulateai config
+      if (this.simulateaiConfig) {
+        this.simulateaiConfig.educationalEnhancements = {
+          curriculumAlignment: true,
+          assessmentIntegration: true,
+          labStationSupport: true,
+          scenarioGeneration: true,
+        };
+
+        // Add educational metadata
+        this.simulateaiConfig.educationalMetadata = {
+          gradeLevel: "6-12",
+          subjects: [
+            "Computer Science",
+            "Ethics",
+            "Social Studies",
+            "Critical Thinking",
+          ],
+          standards: ["ISTE", "NGSS", "CCSS"],
+          learningObjectives: [
+            "Understand AI bias and fairness",
+            "Analyze ethical decision-making frameworks",
+            "Evaluate societal impact of AI systems",
+            "Develop critical thinking about technology",
+          ],
+        };
+
+        // Connect educational modules to simulateai
+        if (this.educatorToolkit) {
+          this.simulateaiConfig.assessmentCapabilities =
+            this.educatorToolkit.getAvailableAssessments();
+        }
+
+        if (this.digitalScienceLab) {
+          this.simulateaiConfig.labStations =
+            this.digitalScienceLab.getAvailableStations();
+        }
+
+        if (this.scenarioGenerator) {
+          this.simulateaiConfig.generationCapabilities =
+            this.scenarioGenerator.getCapabilities();
+        }
+
+        AppDebug.log(
+          "SimulateAI configuration enhanced with educational modules",
+          this.simulateaiConfig.educationalEnhancements,
+        );
+      }
+    } catch (error) {
+      AppDebug.error(
+        "Failed to enhance simulateai with educational modules:",
+        error,
+      );
+    }
+  }
+
+  /**
+   * Get educational context for a simulation configuration
+   * Enhanced with better error handling, fallback data, and debugging
+   * @param {Object} config - The simulation configuration
+   * @returns {Object} Educational context with curriculum alignment, assessments, and lab stations
+   */
+  getEducationalContext(config) {
+    const context = {
+      curriculum: null,
+      assessments: null,
+      labStations: null,
+      scenarioTemplates: null,
+    };
+
+    try {
+      AppDebug.log("Getting educational context for config:", config);
+
+      // Validate config
+      if (!config) {
+        AppDebug.warn("No simulation config provided for educational context");
+        return this._getEducationalContextFallback("simulateai");
+      }
+
+      // Educational methods are now handled by PreLaunchModal dynamically
+      // This avoids redundant calls and centralizes educational content generation
+
+      // Get relevant lab stations from Digital Science Lab
+      if (this.digitalScienceLab && config?.tags) {
+        try {
+          context.labStations = this.digitalScienceLab.getRelevantStations(
+            config.tags,
+          );
+          AppDebug.log("Lab stations retrieved:", context.labStations);
+        } catch (error) {
+          AppDebug.error("Error getting lab stations:", error);
+          context.labStations = null;
+        }
+      } else {
+        AppDebug.warn(
+          "Digital Science Lab not available or config missing tags",
+          {
+            hasLab: !!this.digitalScienceLab,
+            hasTags: !!config?.tags,
+          },
+        );
+      }
+
+      // Get scenario templates from Scenario Generator
+      if (this.scenarioGenerator && config?.tags) {
+        try {
+          context.scenarioTemplates =
+            this.scenarioGenerator.getTemplatesForTags(config.tags);
+          AppDebug.log(
+            "Scenario templates retrieved:",
+            context.scenarioTemplates,
+          );
+        } catch (error) {
+          AppDebug.error("Error getting scenario templates:", error);
+          context.scenarioTemplates = null;
+        }
+      } else {
+        AppDebug.warn(
+          "Scenario Generator not available or config missing tags",
+          {
+            hasGenerator: !!this.scenarioGenerator,
+            hasTags: !!config?.tags,
+          },
+        );
+      }
+
+      // Check if we have any valid educational data
+      const hasValidData =
+        (context.curriculum &&
+          Array.isArray(context.curriculum) &&
+          context.curriculum.length > 0) ||
+        (context.assessments &&
+          Array.isArray(context.assessments) &&
+          context.assessments.length > 0) ||
+        (context.labStations &&
+          Array.isArray(context.labStations) &&
+          context.labStations.length > 0) ||
+        (context.scenarioTemplates &&
+          Array.isArray(context.scenarioTemplates) &&
+          context.scenarioTemplates.length > 0);
+
+      if (!hasValidData) {
+        AppDebug.warn(
+          "No valid educational data found, using fallback",
+          context,
+        );
+        return this._getEducationalContextFallback(config.id || "simulateai");
+      }
+
+      AppDebug.log("Educational context successfully generated:", context);
+      return context;
+    } catch (error) {
+      AppDebug.error("Failed to get educational context:", error);
+      return this._getEducationalContextFallback(config?.id || "simulateai"); // Return fallback context on error
+    }
+  }
+
+  /**
+   * Generate fallback educational context for testing and demonstration
+   * @private
+   */
+  _getEducationalContextFallback(simulationId) {
+    AppDebug.log("Generating fallback educational context for:", simulationId);
+
+    return {
+      curriculum: [
+        {
+          standard: "CCSS.ELA-LITERACY.RST.9-10.7",
+          code: "RST.9-10.7",
+          description:
+            "Translate quantitative or technical information expressed in words in a text into visual form",
+          gradeLevel: "9-12",
+          subject: "English Language Arts & Literacy",
+        },
+        {
+          standard: "NGSS.HS-ETS1-3",
+          code: "HS-ETS1-3",
+          description:
+            "Evaluate a solution to a complex real-world problem based on prioritized criteria",
+          gradeLevel: "9-12",
+          subject: "Engineering Design",
+        },
+        {
+          standard: "CSTA.3A-AP-13",
+          code: "3A-AP-13",
+          description:
+            "Create prototypes that use algorithms to solve computational problems",
+          gradeLevel: "9-12",
+          subject: "Computer Science",
+        },
+      ],
+      assessments: [
+        {
+          name: "Ethical Decision Making Rubric",
+          type: "Performance Assessment",
+          description:
+            "Evaluate student ability to analyze ethical dilemmas and propose solutions",
+          difficulty: "intermediate",
+          timeEstimate: 15,
+        },
+        {
+          name: "AI Ethics Knowledge Check",
+          type: "Formative Assessment",
+          description:
+            "Quick check of understanding for key AI ethics concepts",
+          difficulty: "beginner",
+          timeEstimate: 10,
+        },
+        {
+          name: "Scenario Analysis Portfolio",
+          type: "Summative Assessment",
+          description:
+            "Students demonstrate learning through reflection and analysis",
+          difficulty: "advanced",
+          timeEstimate: 45,
+        },
+      ],
+      labStations: [
+        {
+          name: "AI Bias Detection Lab",
+          category: "Hands-on Investigation",
+          purpose:
+            "Students examine real-world examples of AI bias and develop detection strategies",
+          equipment: ["Computers", "Dataset samples", "Analysis worksheets"],
+          duration: 30,
+          groupSize: "2-3",
+        },
+        {
+          name: "Ethical Framework Station",
+          category: "Collaborative Discussion",
+          purpose: "Apply different ethical frameworks to AI scenarios",
+          equipment: [
+            "Framework reference cards",
+            "Scenario cards",
+            "Flipchart paper",
+          ],
+          duration: 25,
+          groupSize: "4-5",
+        },
+        {
+          name: "AI Impact Timeline",
+          category: "Research & Analysis",
+          purpose: "Create timeline of AI development and its societal impacts",
+          equipment: [
+            "Research materials",
+            "Timeline template",
+            "Presentation tools",
+          ],
+          duration: 40,
+          groupSize: "3-4",
+        },
+      ],
+      scenarioTemplates: [
+        {
+          title: "AI in Healthcare Decisions",
+          description:
+            "Explore ethical considerations when AI systems make medical recommendations",
+          difficulty: "intermediate",
+          estimatedTime: 20,
+          tags: ["healthcare", "bias", "transparency"],
+        },
+        {
+          title: "Autonomous Vehicle Dilemma",
+          description: "Examine moral choices in self-driving car programming",
+          difficulty: "advanced",
+          estimatedTime: 25,
+          tags: ["transportation", "safety", "decision-making"],
+        },
+        {
+          title: "AI Hiring Systems",
+          description:
+            "Analyze fairness and bias in AI-powered recruitment tools",
+          difficulty: "beginner",
+          estimatedTime: 18,
+          tags: ["employment", "fairness", "discrimination"],
+        },
+      ],
+    };
   }
 
   /**
@@ -1933,22 +2264,8 @@ class AIEthicsApp {
       // Connect Educator Toolkit
       if (this.educatorToolkit && simulation) {
         simulation.educatorToolkit = this.educatorToolkit;
-
-        // Get curriculum alignment for this simulation
-        const curriculumAlignment = this.educatorToolkit.getCurriculumAlignment(
-          config.tags || [],
-        );
-        if (curriculumAlignment) {
-          simulation.curriculumAlignment = curriculumAlignment;
-        }
-
-        // Get assessment tools for this simulation
-        const assessmentTools = this.educatorToolkit.getAssessmentTools(
-          config.difficulty,
-        );
-        if (assessmentTools) {
-          simulation.assessmentTools = assessmentTools;
-        }
+        // Educational methods are now called dynamically by PreLaunchModal
+        // This avoids redundant property assignment
       }
 
       // Connect Digital Science Lab
@@ -2028,6 +2345,7 @@ class AIEthicsApp {
       // Add a small delay to ensure DOM is fully ready
       setTimeout(() => {
         this.categoryGrid = new MainGrid();
+
         AppDebug.log("Main grid initialized successfully");
       }, 100);
     } catch (error) {
@@ -2044,24 +2362,6 @@ class AIEthicsApp {
     AppDebug.log("Loading legacy simulation cards as fallback");
     // This will be populated with existing simulation loading logic if needed
     // For now, just log that we're in fallback mode
-  }
-
-  async loadSimulations() {
-    // Simulations are loaded dynamically in createSimulationInstance()
-    // Store available simulation configs in the simulations Map
-    this.availableSimulations.forEach((simConfig) => {
-      this.simulations.set(simConfig.id, simConfig);
-    });
-  }
-
-  /**
-   * Initialize hero demo component
-   * Currently using radar chart demo instead of HeroDemo class
-   */
-  async initializeHeroDemo() {
-    // The HeroDemo class is designed for a different hero layout
-    // that's not currently implemented. The radar chart demo is working fine.
-    logger.info("Hero demo: Using radar chart demo instead of HeroDemo class");
   }
 
   /**
@@ -2081,20 +2381,6 @@ class AIEthicsApp {
     } catch (error) {
       logger.error("Failed to initialize hero animations:", error);
       // Non-critical error - page will still function without animations
-    }
-  }
-
-  /**
-   * Initialize enhanced objects (visual components)
-   */
-  async initializeEnhancedObjects() {
-    try {
-      // Enhanced objects are loaded dynamically when needed
-      // This method is kept for future initialization if needed
-      logger.info("Enhanced objects system ready for dynamic loading");
-    } catch (error) {
-      logger.error("Failed to initialize enhanced objects:", error);
-      // Non-critical error - app can continue with basic functionality
     }
   }
 
@@ -2218,6 +2504,16 @@ class AIEthicsApp {
         }
       }
     });
+
+    // Scenario completion event listener
+    document.addEventListener("scenario-completed", (event) => {
+      this.handleScenarioCompleted(event);
+    });
+
+    // Suggested scenario navigation
+    document.addEventListener("open-suggested-scenario", (event) => {
+      this.handleSuggestedScenario(event);
+    });
   }
 
   /**
@@ -2294,10 +2590,11 @@ class AIEthicsApp {
 
     this.categoriesGrid.innerHTML = "";
 
-    this.availableSimulations.forEach((sim) => {
-      const card = this.createSimulationCard(sim);
+    // For simulateai focused architecture, show single simulation
+    if (this.simulateaiConfig) {
+      const card = this.createSimulationCard(this.simulateaiConfig);
       this.categoriesGrid.appendChild(card);
-    });
+    }
   }
 
   createSimulationCard(simulation) {
@@ -2395,7 +2692,7 @@ class AIEthicsApp {
         !userPreferences.shouldSkipPreLaunch(simulationId);
 
       if (shouldShowPreLaunch) {
-        this.showPreLaunchModal(simulationId);
+        await this.showPreLaunchModal(simulationId);
         return; // Pre-launch modal will call launchSimulationDirect when ready
       }
 
@@ -2428,12 +2725,32 @@ class AIEthicsApp {
 
   /**
    * Shows the pre-launch information modal
+   * Enhanced with better educational context integration and debugging
    * Updated to use JSON SSOT configuration system
    */
   async showPreLaunchModal(simulationId) {
     logger.debug("Showing pre-launch modal for:", simulationId);
 
     try {
+      // Get simulation configuration and educational context
+      // Get simulation config - only simulateai is supported
+      const simConfig =
+        simulationId === "simulateai" ? this.simulateaiConfig : null;
+      AppDebug.log("Simulation config for pre-launch modal:", simConfig);
+
+      if (!simConfig) {
+        AppDebug.error("No simulation config found for ID:", simulationId);
+        throw new Error(
+          `No simulation configuration found for: ${simulationId}`,
+        );
+      }
+
+      const educationalContext = this.getEducationalContext(simConfig);
+      AppDebug.log(
+        "Educational context for pre-launch modal:",
+        educationalContext,
+      );
+
       // Get configured component instead of direct instantiation
       const prelaunchModal = await appStartup.getComponent(
         "pre-launch-modal",
@@ -2450,12 +2767,37 @@ class AIEthicsApp {
             this.hideLoading();
           },
           showEducatorResources: true, // Always show educator resources
+          educationalContext: educationalContext, // Pass educational context to pre-launch modal
         },
       );
 
-      prelaunchModal.show();
+      // Additional debugging for educational context
+      AppDebug.log("Pre-launch modal created with options:", {
+        simulationId,
+        hasEducationalContext: !!educationalContext,
+        educationalContextKeys: educationalContext
+          ? Object.keys(educationalContext)
+          : [],
+        educationalContextSummary: educationalContext
+          ? {
+              curriculum: educationalContext.curriculum?.length || 0,
+              assessments: educationalContext.assessments?.length || 0,
+              labStations: educationalContext.labStations?.length || 0,
+              scenarioTemplates:
+                educationalContext.scenarioTemplates?.length || 0,
+            }
+          : null,
+      });
+
+      await prelaunchModal.show();
     } catch (error) {
       logger.error("Failed to show pre-launch modal:", error);
+      AppDebug.error("Pre-launch modal error details:", {
+        simulationId,
+        error: error.message,
+        stack: error.stack,
+        availableSimulations: Array.from(this.simulations.keys()),
+      });
       // Fallback to direct launch
       this.launchSimulationDirect(simulationId);
     }
@@ -2479,13 +2821,9 @@ class AIEthicsApp {
         this.currentSimulationCanvasId = null;
       }
 
-      // Cleanup hero demo canvas if running
-      if (this.heroDemoCanvasId) {
-        canvasManager.removeCanvas(this.heroDemoCanvasId);
-        this.heroDemoCanvasId = null;
-      }
-
-      const simConfig = this.simulations.get(simulationId);
+      // Get simulation config - only simulateai is supported
+      const simConfig =
+        simulationId === "simulateai" ? this.simulateaiConfig : null;
       if (!simConfig) {
         throw new Error(`Simulation ${simulationId} not found`);
       }
@@ -2510,20 +2848,21 @@ class AIEthicsApp {
       // Clear previous content and remove any error states
       simulationContainer.innerHTML = "";
       simulationContainer.classList.remove("error");
-      // Create managed canvas for the simulation
-      const { canvas, id } = await canvasManager.createCanvas({
-        width: 600,
-        height: 400,
-        container: simulationContainer,
-        className: "simulation-canvas",
-        id: `simulation-${simulationId}`,
-      });
-
-      // Store canvas ID for cleanup
-      this.currentSimulationCanvasId = id;
 
       // Check if simulation needs canvas or is HTML-only
       if (simConfig.useCanvas !== false && simConfig.renderMode !== "html") {
+        // Create managed canvas for the simulation
+        const { canvas, id } = await canvasManager.createCanvas({
+          width: 600,
+          height: 400,
+          container: simulationContainer,
+          className: "simulation-canvas",
+          id: `simulation-${simulationId}`,
+        });
+
+        // Store canvas ID for cleanup
+        this.currentSimulationCanvasId = id;
+
         // Apply responsive styling to canvas
         canvas.style.cssText = `
                     max-width: 100%;
@@ -2562,49 +2901,69 @@ class AIEthicsApp {
             // Mock engine destroyed for HTML simulation
           },
         };
+      }
 
-        // Remove the canvas element since it's not needed
-        if (canvas && canvas.parentNode) {
-          canvas.parentNode.removeChild(canvas);
+      // Route simulateai to use the main grid category browser
+      if (simulationId === "simulateai") {
+        this.hideLoading();
+
+        // Handle enhanced navigation from scenario browser
+        const navigationContext = config?.sourceContext || "direct";
+        const targetScenario = config?.targetScenario;
+        const targetCategory = config?.targetCategory;
+        const autoNavigate = config?.autoNavigateToScenario;
+
+        // Enhance simulateai with all integrated capabilities
+        await this.enhanceSimulateaiExperience(config);
+
+        // Display the main grid category browser (provides access to all scenario categories)
+        if (this.categoryGrid) {
+          // Ensure we're in category view mode
+          if (this.categoryGrid.currentView !== "category") {
+            await this.categoryGrid.switchView("category");
+          }
+
+          // Handle automatic navigation to specific scenario if requested
+          if (autoNavigate && targetScenario) {
+            AppDebug.log(
+              `SimulateAI: Auto-navigating to scenario ${targetScenario} in category ${targetCategory || "unknown"} (source: ${navigationContext})`,
+            );
+
+            // Use enhanced navigation if available
+            if (this.scenarioBrowserIntegration) {
+              this.scenarioBrowserIntegration.navigateToScenario(
+                targetCategory,
+                targetScenario,
+              );
+            } else {
+              // Delay navigation to allow main grid to fully render
+              setTimeout(() => {
+                this.navigateToSpecificScenario(
+                  targetCategory,
+                  targetScenario,
+                  navigationContext,
+                );
+              }, 500);
+            }
+          }
+
+          AppDebug.log(
+            `Launched Simulation Launcher via MainGrid category browser (context: ${navigationContext}, educational context shown in pre-launch modal)`,
+          );
+        } else {
+          AppDebug.error(
+            "MainGrid not initialized, cannot display category browser",
+          );
+          throw new Error("Category browser not available");
         }
+        return;
       }
 
-      // Create the specific simulation instance
-      this.currentSimulation = await this.createSimulationInstance(
-        simulationId,
-        simConfig,
-      );
-
-      if (!this.currentSimulation) {
-        throw new Error("Failed to create simulation instance");
-      }
-
-      // Initialize the simulation
-      this.currentSimulation.init(this.engine);
-
-      // Setup simulation event listeners
-      this.setupSimulationEventListeners();
-
-      // Show the enhanced simulation modal instead of the basic modal
-      this.showEnhancedSimulationModal(simulationId, simConfig);
-
-      // Start the engine
-      this.engine.start();
-      // Start the simulation
-      this.currentSimulation.start();
-
+      // For any other simulations (none currently exist), show error
       this.hideLoading();
-      // Remove loading state from container
-      if (simulationContainer) {
-        simulationContainer.classList.remove("loading");
-        simulationContainer.removeAttribute("aria-busy");
-        simulationContainer.setAttribute(
-          "aria-label",
-          `${simConfig.title} simulation`,
-        );
-      }
-
-      logger.debug("Simulation launched successfully");
+      throw new Error(
+        `Simulation ${simulationId} is not implemented. Only 'simulateai' is available.`,
+      );
     } catch (error) {
       AppDebug.error("Failed to start simulation:", error);
       this.hideLoading();
@@ -2634,98 +2993,150 @@ class AIEthicsApp {
     }
   }
 
-  async createSimulationInstance(simulationId, config) {
+  /**
+   * Navigate to a specific scenario within the MainGrid system
+   * Used for scenario browser integration and direct scenario navigation
+   * @param {string} categoryId - Target category ID
+   * @param {string} scenarioId - Target scenario ID
+   * @param {string} context - Navigation context for logging
+   */
+  navigateToSpecificScenario(categoryId, scenarioId, context = "direct") {
     try {
-      let simulation;
+      AppDebug.log(
+        `Navigating to specific scenario: ${scenarioId} in category: ${categoryId} (context: ${context})`,
+      );
 
-      // Load the specific simulation class based on ID
-      switch (simulationId) {
-        default: {
-          // Fallback to basic simulation for unimplemented simulations
-          const basicScenarios = [
-            {
-              id: "intro",
-              title: "Introduction",
-              description:
-                "Welcome to this open-ended exploration of AI ethics",
-              objective:
-                "Explore different perspectives and discover consequences of choices",
-            },
-            {
-              id: "decision1",
-              title: "First Decision",
-              description: "Make your first ethical choice",
-              objective: "Choose the most ethical option",
-            },
-            {
-              id: "conclusion",
-              title: "Conclusion",
-              description: "Reflect on your decisions",
-              objective: "Review your ethical choices",
-            },
-          ];
+      // Ensure category grid is available and in category view
+      if (!this.categoryGrid) {
+        throw new Error("CategoryGrid not available for navigation");
+      }
 
-          simulation = new EthicsSimulation(simulationId, {
-            title: config.title,
-            description: config.description,
-            difficulty: config.difficulty,
-            duration: config.duration,
-            scenarios: basicScenarios,
-            ethicsMetrics: [
-              {
-                name: "fairness",
-                label: "Fairness",
-                value: APP_CONSTANTS.DEFAULTS.ETHICS_METER_VALUE,
-              },
-              {
-                name: "transparency",
-                label: "Transparency",
-                value: APP_CONSTANTS.DEFAULTS.ETHICS_METER_VALUE,
-              },
-              {
-                name: "privacy",
-                label: "Privacy",
-                value: APP_CONSTANTS.DEFAULTS.ETHICS_METER_VALUE,
-              },
-            ],
-          });
+      // Method 1: Try to find and click the category card
+      if (categoryId) {
+        const categorySelector = `[data-category-id="${categoryId}"], [data-category="${categoryId}"]`;
+        const categoryElement = document.querySelector(categorySelector);
 
-          // Set container reference
-          simulation.container = document.getElementById(
-            "simulation-container",
+        if (categoryElement) {
+          AppDebug.log(
+            `Found category element for ${categoryId}, simulating click`,
           );
-          break;
+          categoryElement.click();
+
+          // After category opens, try to find and click the scenario
+          setTimeout(() => {
+            this.navigateToScenarioInCategory(scenarioId, context);
+          }, 750); // Give time for category to open
+
+          return true;
         }
       }
 
-      // Connect core educational modules to the simulation
-      if (simulation) {
-        this.connectModulesToSimulation(simulation, config);
-      }
-
-      return simulation;
+      // Method 2: Try direct scenario navigation if no category found
+      return this.navigateToScenarioInCategory(scenarioId, context);
     } catch (error) {
-      AppDebug.error(`Failed to load simulation ${simulationId}:`, error);
-      throw error;
+      AppDebug.error("Error navigating to specific scenario:", error);
+
+      // Fallback: direct navigation to simulation.html
+      const fallbackUrl = `simulation.html?scenario=${scenarioId}&category=${categoryId || "unknown"}&source=${context}`;
+      AppDebug.log(`Using fallback navigation to: ${fallbackUrl}`);
+      window.location.href = fallbackUrl;
+
+      return false;
     }
   }
 
-  setupSimulationEventListeners() {
-    if (!this.currentSimulation) return;
+  /**
+   * Enhanced navigation that integrates with scenario browser
+   * @param {string} action - Navigation action ('scenario', 'category', 'learning-lab')
+   * @param {Object} data - Navigation data
+   */
+  handleEnhancedNavigation(action, data) {
+    try {
+      AppDebug.log(`Enhanced navigation request: ${action}`, data);
 
-    this.currentSimulation.on("simulation:completed", (data) => {
-      this.onSimulationCompleted(data);
-    });
+      // Use scenario browser integration if available
+      if (this.scenarioBrowserIntegration) {
+        return this.scenarioBrowserIntegration.handleNavigationRequest(
+          action,
+          data,
+        );
+      }
 
-    this.currentSimulation.on("ethics:updated", (data) => {
-      // Handle ethics updates
-      AppDebug.log("Ethics updated:", data);
-    });
+      // Fallback to standard navigation
+      switch (action) {
+        case "scenario":
+          return this.navigateToSpecificScenario(
+            data.categoryId,
+            data.scenarioId,
+            data.context || "enhanced-nav",
+          );
+        case "category":
+          return this.switchToCategory(data.categoryId);
+        case "learning-lab":
+          window.location.href = `learning-lab.html?scenario=${data.scenarioId}&source=enhanced-nav`;
+          return true;
+        default:
+          AppDebug.warn(`Unknown enhanced navigation action: ${action}`);
+          return false;
+      }
+    } catch (error) {
+      AppDebug.error("Enhanced navigation failed:", error);
+      return false;
+    }
+  }
 
-    this.currentSimulation.on("scenario:loaded", (data) => {
-      // Update UI for new scenario
-      this.updateModalTitle(data.scenario.title);
-    });
+  /**
+   * Navigate to a scenario within the currently displayed category
+   * @param {string} scenarioId - Target scenario ID
+   * @param {string} context - Navigation context
+   */
+  navigateToScenarioInCategory(scenarioId, context = "direct") {
+    try {
+      // Look for scenario card with the target ID
+      const scenarioSelectors = [
+        `[data-scenario-id="${scenarioId}"]`,
+        `[data-scenario="${scenarioId}"]`,
+        `.scenario-card[data-id="${scenarioId}"]`,
+      ];
+
+      for (const selector of scenarioSelectors) {
+        const scenarioElement = document.querySelector(selector);
+        if (scenarioElement) {
+          AppDebug.log(
+            `Found scenario element for ${scenarioId}, simulating click (context: ${context})`,
+          );
+          scenarioElement.click();
+          return true;
+        }
+      }
+
+      // If scenario not found in DOM, it might not be visible yet
+      // Try to find a "Show More" or "Load More" button
+      const loadMoreBtn = document.querySelector(
+        '#load-more-btn, .load-more-btn, [data-action="load-more"]',
+      );
+      if (loadMoreBtn && loadMoreBtn.style.display !== "none") {
+        AppDebug.log(
+          `Scenario ${scenarioId} not visible, trying to load more scenarios`,
+        );
+        loadMoreBtn.click();
+
+        // Retry after loading more
+        setTimeout(() => {
+          this.navigateToScenarioInCategory(scenarioId, `${context}-retry`);
+        }, 1000);
+
+        return true;
+      }
+
+      AppDebug.warn(
+        `Scenario element not found for ${scenarioId} in current view`,
+      );
+      return false;
+    } catch (error) {
+      AppDebug.error("Error navigating to scenario in category:", error);
+      return false;
+    }
   }
 
   /**
@@ -2800,103 +3211,101 @@ class AIEthicsApp {
   }
 
   /**
-   * Show the post-simulation reflection modal
+   * Handle scenario completion and show reflection modal
    */
-  showPostSimulationModal(data) {
-    const simulationId = this.currentSimulation?.id || "unknown";
+  handleScenarioCompleted(event) {
+    const { categoryId, scenarioId, selectedOption, option } = event.detail;
 
-    const postModal = new PostSimulationModal(simulationId, {
-      sessionData: data,
-      onComplete: () => {
-        // User finished reflection - close modal and return to main view
-        this.hideModal();
-        this.showNotification(
-          "Thank you for your thoughtful reflection!",
-          "success",
-        );
-      },
-      onSkip: () => {
-        // User skipped reflection - just close modal
-        this.hideModal();
-      },
-      onRestart: () => {
-        // User wants to restart simulation
-        this.hideModal();
-        this.startSimulation(simulationId);
-      },
+    AppDebug.log("Scenario completed in app.js:", {
+      categoryId,
+      scenarioId,
+      selectedOption: selectedOption?.id || option?.id,
     });
 
-    postModal.show();
+    // Show the scenario reflection modal
+    this.showScenarioReflectionModal({
+      categoryId,
+      scenarioId,
+      selectedOption: selectedOption || option,
+    });
   }
 
   /**
-   * Show the enhanced simulation modal for the active simulation
+   * Handle suggested scenario navigation
    */
-  showEnhancedSimulationModal(simulationId, simConfig) {
-    AppDebug.log("Showing enhanced simulation modal for:", simulationId);
+  handleSuggestedScenario(event) {
+    const { categoryId, scenarioId } = event.detail;
 
-    try {
-      // Configure modal options based on simulation type
-      const modalOptions = {
-        simulation: this.currentSimulation,
-        onClose: () => {
-          AppDebug.log("Enhanced modal closed");
-          this.enhancedModal = null;
-          this.hideModal();
-        },
-        onMinimize: () => {
-          AppDebug.log("Enhanced modal minimized");
-          // Keep simulation running but minimize UI
-        },
-      };
+    AppDebug.log("Opening suggested scenario:", { categoryId, scenarioId });
 
-      // No specific simulation optimizations needed - all use default configuration
+    // Import and open the scenario modal
+    import("./components/scenario-modal.js")
+      .then(({ default: ScenarioModal }) => {
+        const scenarioModal = new ScenarioModal();
+        scenarioModal.open(scenarioId, categoryId);
+      })
+      .catch((error) => {
+        AppDebug.error("Failed to open suggested scenario:", error);
+      });
+  }
 
-      this.enhancedModal = new EnhancedSimulationModal(
-        simulationId,
-        modalOptions,
-      );
+  /**
+   * Show the scenario-specific reflection modal
+   */
+  showScenarioReflectionModal(data) {
+    const { categoryId, scenarioId, selectedOption } = data;
 
-      this.enhancedModal.show();
+    // The ScenarioReflectionModal automatically shows itself when constructed
+    new ScenarioReflectionModal({
+      categoryId: categoryId,
+      scenarioId: scenarioId,
+      selectedOption: selectedOption,
+      scenarioData: data.scenarioData || {},
+      onComplete: (reflectionData) => {
+        // User finished reflection - show success message
+        this.showNotification(
+          "Thank you for your thoughtful reflection! Your insights contribute to our research.",
+          "success",
+        );
 
-      // CRITICAL: Connect the simulation to the enhanced modal's container
-      setTimeout(() => {
-        const enhancedContainer = this.enhancedModal.getSimulationContainer();
-        if (enhancedContainer && this.currentSimulation) {
-          AppDebug.log("Moving simulation to enhanced modal container");
+        // Track completion
+        simpleAnalytics.trackEvent("scenario_reflection", "completed", {
+          category_id: categoryId,
+          scenario_id: scenarioId,
+          selected_option: selectedOption?.id,
+          research_data_points: Object.keys(reflectionData).length,
+        });
+      },
+      onSkip: () => {
+        // User skipped reflection - show gentle reminder
+        this.showNotification(
+          "Reflection skipped. You can always revisit scenarios to explore different perspectives.",
+          "info",
+        );
+      },
+    });
+  }
 
-          // Get the original simulation container content
-          const originalContainer = document.getElementById(
-            "simulation-container",
-          );
-          if (originalContainer) {
-            // Move all content from original container to enhanced container
-            while (originalContainer.firstChild) {
-              enhancedContainer.appendChild(originalContainer.firstChild);
-            }
+  /**
+   * Show the post-simulation reflection modal (legacy - for old simulation system)
+   */
+  showPostSimulationModal(data) {
+    // Legacy method - redirect to scenario reflection for now
+    // This maintains compatibility with any old simulation completion events
+    AppDebug.warn(
+      "showPostSimulationModal called - redirecting to scenario reflection",
+    );
 
-            // Update the simulation's container reference
-            if (this.engine) {
-              this.engine.container = enhancedContainer;
-            }
-
-            // If the simulation has a container property, update it
-            if (this.currentSimulation.container) {
-              this.currentSimulation.container = enhancedContainer;
-            }
-
-            // Re-setup the simulation UI in the new container
-            if (this.currentSimulation.setupUI) {
-              this.currentSimulation.setupUI();
-            }
-          }
-        }
-      }, 100); // Small delay to ensure modal is fully created
-    } catch (error) {
-      AppDebug.error("Failed to show enhanced simulation modal:", error);
-      // Fallback to basic modal
-      this.showSimulationModal(simConfig);
-    }
+    this.showScenarioReflectionModal({
+      categoryId: "unknown",
+      scenarioId: "legacy-simulation",
+      selectedOption: {
+        id: "legacy",
+        text: "Legacy simulation choice",
+        description: "Completed legacy simulation",
+      },
+      scenarioData: data,
+    });
   }
 
   showSimulationModal(simConfig) {
@@ -2958,12 +3367,7 @@ class AIEthicsApp {
     }
 
     // Cleanup all managed canvases
-    const canvasesToCleanup = [
-      this.currentSimulationCanvasId,
-      this.ethicsMetersCanvasId,
-      this.interactiveButtonsCanvasId,
-      this.simulationSlidersCanvasId,
-    ];
+    const canvasesToCleanup = [this.currentSimulationCanvasId];
 
     canvasesToCleanup.forEach((canvasId) => {
       if (canvasId) {
@@ -2973,9 +3377,6 @@ class AIEthicsApp {
 
     // Reset canvas IDs
     this.currentSimulationCanvasId = null;
-    this.ethicsMetersCanvasId = null;
-    this.interactiveButtonsCanvasId = null;
-    this.simulationSlidersCanvasId = null;
 
     if (this.modal) {
       // Clean up focus trap
@@ -3052,8 +3453,8 @@ class AIEthicsApp {
   async populateEnhancedModalData(simulationId) {
     try {
       // Import simulation data
-      const { simulationData } = await import("./data/simulation-info.js");
-      const simData = simulationData[simulationId];
+      const { simulationInfo } = await import("./data/simulation-info.js");
+      const simData = simulationInfo[simulationId];
 
       if (!simData) {
         AppDebug.warn(`No simulation data found for ${simulationId}`);
@@ -3332,7 +3733,7 @@ class AIEthicsApp {
         "autonomous-vehicle-split": true,
         // Leave tunnel-dilemma and bias-healthcare uncompleted
       },
-      "bias-fairness": {
+      simulateai: {
         "hiring-algorithm-bias": true,
         // Leave other scenarios uncompleted
       },
@@ -3701,6 +4102,21 @@ class AIEthicsApp {
         this.enhanceContentWithRealWorld();
       }
 
+      // Enhance community features with GitHub integration
+      if (this.mcpCapabilities.has("github_integration")) {
+        this.enhanceCommunityFeatures();
+      }
+
+      // Enhance project generation capabilities
+      if (this.mcpCapabilities.has("project_generation")) {
+        this.enhanceProjectGeneration();
+      }
+
+      // Connect MCP to scenario browser if available
+      if (this.scenarioBrowserIntegration && this.mcpManager) {
+        this.connectMCPToScenarioBrowser();
+      }
+
       AppDebug.log("Existing features enhanced with MCP capabilities");
     } catch (error) {
       AppDebug.error("Failed to enhance features with MCP:", error);
@@ -3744,6 +4160,511 @@ class AIEthicsApp {
       }
       return null;
     };
+  }
+
+  /**
+   * Enhanced community features with GitHub integration
+   */
+  enhanceCommunityFeatures() {
+    const githubIntegration =
+      this.mcpManager.integrations.get("githubIntegration");
+    if (githubIntegration) {
+      // Add community collaboration features
+      this.submitCommunityContent = async (content) => {
+        return await githubIntegration.submitCommunityContribution(content);
+      };
+
+      // Add educational pattern analysis
+      this.analyzeEducationalPatterns = async () => {
+        return await githubIntegration.analyzeEducationalPatterns();
+      };
+    }
+  }
+
+  /**
+   * Enhanced project generation capabilities
+   */
+  enhanceProjectGeneration() {
+    const projectGenerator =
+      this.mcpManager.integrations.get("projectGenerator");
+    if (projectGenerator) {
+      // Add automated scenario generation
+      this.generateNewScenario = async (category, parameters) => {
+        return await projectGenerator.generateScenarioCategory(
+          category,
+          parameters,
+        );
+      };
+
+      // Add ISTE standards alignment
+      this.alignWithStandards = async (content) => {
+        return await projectGenerator.alignWithEducationalStandards(content);
+      };
+    }
+  }
+
+  /**
+   * Connect MCP capabilities to scenario browser
+   */
+  connectMCPToScenarioBrowser() {
+    if (this.scenarioBrowserIntegration && this.mcpManager) {
+      // Enhance scenario browser with MCP content enrichment
+      this.scenarioBrowserIntegration.mcpManager = this.mcpManager;
+
+      // Add real-time content updates
+      this.scenarioBrowserIntegration.enableRealTimeUpdates = true;
+
+      AppDebug.log("MCP capabilities connected to scenario browser");
+    }
+  }
+
+  /**
+   * Enhance the simulateai experience with all integrated capabilities
+   * @param {Object} config - Configuration passed to simulateai
+   */
+  async enhanceSimulateaiExperience(config = {}) {
+    try {
+      AppDebug.log(
+        "Enhancing simulateai experience with integrated capabilities...",
+      );
+
+      // Apply MCP enhancements if available
+      if (this.mcpInitialized && this.mcpManager) {
+        // Add real-world context to scenarios
+        if (this.mcpCapabilities.has("real_time_content")) {
+          await this.addRealWorldContextToSimulateai();
+        }
+
+        // Generate enhanced scenarios if needed
+        if (
+          this.mcpCapabilities.has("scenario_generation") &&
+          config.generateContent
+        ) {
+          await this.generateEnhancedContent(config.contentType || "ethics");
+        }
+      }
+
+      // Apply educational enhancements
+      if (
+        this.educatorToolkit ||
+        this.digitalScienceLab ||
+        this.scenarioGenerator
+      ) {
+        this.applyEducationalEnhancements();
+      }
+
+      // Apply badge system enhancements
+      if (this.badgeManager) {
+        this.applyBadgeSystemEnhancements(config);
+      }
+
+      // Apply scenario browser integration enhancements
+      if (this.scenarioBrowserIntegration) {
+        this.scenarioBrowserIntegration.configure({
+          routeThroughSimulateAI: true,
+          useSimulateAIModals: true,
+          parentContext: config.sourceContext || "simulateai-enhanced",
+        });
+      }
+
+      // Track enhanced experience
+      simpleAnalytics.trackEvent("simulateai_enhanced_experience", {
+        mcp_enabled: this.mcpInitialized,
+        educational_modules: !!(
+          this.educatorToolkit &&
+          this.digitalScienceLab &&
+          this.scenarioGenerator
+        ),
+        badge_system_enabled: !!this.badgeManager,
+        scenario_browser_integration: this.scenarioBrowserInitialized,
+        context: config.sourceContext || "direct",
+        timestamp: new Date().toISOString(),
+      });
+
+      AppDebug.log("SimulateAI experience enhanced successfully");
+    } catch (error) {
+      AppDebug.error("Failed to enhance simulateai experience:", error);
+      // Continue with basic experience
+    }
+  }
+
+  /**
+   * Add real-world context to simulateai scenarios
+   */
+  async addRealWorldContextToSimulateai() {
+    if (this.addRealWorldContext) {
+      try {
+        const realWorldData = await this.addRealWorldContext(
+          "ai-ethics",
+          "general",
+        );
+        if (realWorldData) {
+          AppDebug.log("Real-world context added to simulateai");
+        }
+      } catch (error) {
+        AppDebug.warn("Failed to add real-world context:", error);
+      }
+    }
+  }
+
+  /**
+   * Generate enhanced content using MCP capabilities
+   */
+  async generateEnhancedContent(contentType) {
+    if (this.generateNewScenario) {
+      try {
+        const enhancedContent = await this.generateNewScenario(contentType, {
+          difficulty: "adaptive",
+          realWorldExamples: true,
+          educationalAlignment: true,
+        });
+        if (enhancedContent) {
+          AppDebug.log("Enhanced content generated for simulateai");
+        }
+      } catch (error) {
+        AppDebug.warn("Failed to generate enhanced content:", error);
+      }
+    }
+  }
+
+  /**
+   * Apply educational enhancements to simulateai
+   */
+  applyEducationalEnhancements() {
+    // Enhance with educator toolkit capabilities
+    if (this.educatorToolkit) {
+      // Add assessment integration
+      window.simulateaiAssessments =
+        this.educatorToolkit.getAvailableAssessments();
+    }
+
+    // Enhance with digital science lab capabilities
+    if (this.digitalScienceLab) {
+      // Add lab station integration
+      window.simulateaiLabStations =
+        this.digitalScienceLab.getAvailableStations();
+    }
+
+    // Enhance with scenario generator capabilities
+    if (this.scenarioGenerator) {
+      // Add dynamic scenario generation
+      window.simulateaiScenarioGeneration =
+        this.scenarioGenerator.getCapabilities();
+    }
+
+    AppDebug.log("Educational enhancements applied to simulateai");
+  }
+
+  /**
+   * Apply badge system enhancements to simulateai
+   */
+  applyBadgeSystemEnhancements(config = {}) {
+    if (!this.badgeManager) {
+      AppDebug.warn("Badge manager not available for simulateai enhancement");
+      return;
+    }
+
+    try {
+      // Make badge manager globally available for scenario completion tracking
+      window.simulateaiBadgeManager = this.badgeManager;
+
+      // Add badge progress tracking capabilities
+      window.simulateaiBadgeTracking = {
+        trackScenarioCompletion: (categoryId, scenarioId) => {
+          return this.trackBadgeProgress(categoryId, scenarioId);
+        },
+        getBadgeProgress: (categoryId) => {
+          return this.badgeManager.getBadgeProgress(categoryId);
+        },
+        getEarnedBadges: (categoryId) => {
+          return this.badgeManager.getEarnedBadges(categoryId);
+        },
+      };
+
+      // Add badge celebration functionality
+      window.simulateaiBadgeCelebration = {
+        showBadgeModal: (badges) => {
+          return this.showBadgeCelebrationModal(badges);
+        },
+      };
+
+      AppDebug.log("Badge system enhancements applied to simulateai");
+    } catch (error) {
+      AppDebug.error("Failed to apply badge system enhancements:", error);
+    }
+  }
+
+  /**
+   * Track badge progress for scenario completion
+   * @param {string} categoryId - Category identifier
+   * @param {string} scenarioId - Scenario identifier
+   * @returns {Array} Newly earned badges
+   */
+  async trackBadgeProgress(categoryId, scenarioId) {
+    if (!this.badgeManager) {
+      AppDebug.warn("Badge manager not available for progress tracking");
+      return [];
+    }
+
+    try {
+      // Update scenario completion and check for new badges
+      const newlyEarnedBadges = this.badgeManager.updateScenarioCompletion(
+        categoryId,
+        scenarioId,
+      );
+
+      // If badges were earned, show celebration and sync with Firebase
+      if (newlyEarnedBadges.length > 0) {
+        AppDebug.log(
+          `New badges earned in ${categoryId}:`,
+          newlyEarnedBadges.map((b) => b.title),
+        );
+
+        // Sync badges with Firebase backend (if authenticated)
+        await this.syncBadgesWithFirebase(newlyEarnedBadges);
+
+        // Show badge celebration modal
+        await this.showBadgeCelebrationModal(newlyEarnedBadges);
+
+        // Track badge achievements
+        simpleAnalytics.trackEvent("badge_earned", {
+          categoryId,
+          scenarioId,
+          badgeCount: newlyEarnedBadges.length,
+          badgeTiers: newlyEarnedBadges.map((b) => b.tier),
+          timestamp: new Date().toISOString(),
+        });
+      }
+
+      // Submit research data if user is authenticated and participating
+      await this.submitScenarioResearchData(categoryId, scenarioId);
+
+      return newlyEarnedBadges;
+    } catch (error) {
+      AppDebug.error("Failed to track badge progress:", error);
+      return [];
+    }
+  }
+
+  /**
+   * Show badge celebration modal for newly earned badges
+   * @param {Array} badges - Array of newly earned badge configurations
+   */
+  async showBadgeCelebrationModal(badges) {
+    if (!badges || badges.length === 0) return;
+
+    try {
+      // Check if badge modal component is available
+      if (window.BadgeModal) {
+        const badgeModal = new window.BadgeModal();
+        await badgeModal.showCelebration(badges);
+      } else {
+        // Fallback to simple notification
+        const badgeTitle =
+          badges.length === 1 ? badges[0].title : `${badges.length} new badges`;
+
+        if (typeof this.showNotification === "function") {
+          this.showNotification(
+            `🎉 Congratulations! You earned: ${badgeTitle}`,
+            "success",
+          );
+        } else if (window.NotificationToast) {
+          window.NotificationToast.show({
+            type: "success",
+            message: `🎉 Congratulations! You earned: ${badgeTitle}`,
+            duration: 5000,
+            closable: true,
+          });
+        }
+      }
+    } catch (error) {
+      AppDebug.error("Failed to show badge celebration:", error);
+    }
+  }
+
+  /**
+   * Sync newly earned badges with Firebase backend
+   * @param {Array} badges - Array of newly earned badge configurations
+   */
+  async syncBadgesWithFirebase(badges) {
+    if (!this.authService || !this.currentUser) {
+      AppDebug.log("User not authenticated, skipping Firebase badge sync");
+      return;
+    }
+
+    try {
+      for (const badge of badges) {
+        AppDebug.log(`Syncing badge with Firebase: ${badge.title}`);
+
+        // Call Firebase Function to award badge
+        const result = await this.callFirebaseFunction(
+          "awardBadge",
+          {
+            targetUserId: this.currentUser.uid,
+            badgeData: {
+              category: badge.categoryId,
+              tier: badge.tier,
+              title: badge.title,
+              description: badge.description,
+              icon: badge.icon,
+              color: badge.color,
+            },
+          },
+          true,
+        ); // requiresAuth = true
+
+        if (result.success) {
+          AppDebug.log(`Badge synced successfully: ${badge.title}`);
+        } else {
+          AppDebug.warn(`Failed to sync badge: ${badge.title}`, result.error);
+        }
+      }
+    } catch (error) {
+      AppDebug.error("Failed to sync badges with Firebase:", error);
+      // Continue execution - local badges still work
+    }
+  }
+
+  /**
+   * Submit research data for scenario completion
+   * @param {string} categoryId - Category identifier
+   * @param {string} scenarioId - Scenario identifier
+   */
+  async submitScenarioResearchData(categoryId, scenarioId) {
+    if (!this.authService || !this.currentUser) {
+      AppDebug.log("User not authenticated, skipping research data submission");
+      return;
+    }
+
+    try {
+      // Get user profile to check research participation
+      const userProfile = await this.getUserProfile();
+      if (!userProfile?.researchParticipant) {
+        AppDebug.log("User not enrolled in research, skipping data submission");
+        return;
+      }
+
+      // Collect scenario completion data
+      const researchData = {
+        scenarioId: `${categoryId}_${scenarioId}`,
+        responses: this.getScenarioResponses(categoryId, scenarioId),
+        ethicsScores: this.getScenarioEthicsScores(categoryId, scenarioId),
+        completionTime: this.getScenarioCompletionTime(categoryId, scenarioId),
+      };
+
+      // Submit to Firebase Function
+      const result = await this.callFirebaseFunction(
+        "submitResearchData",
+        researchData,
+        true,
+      );
+
+      if (result.success) {
+        AppDebug.log(`Research data submitted for ${categoryId}/${scenarioId}`);
+      } else {
+        AppDebug.warn(`Failed to submit research data: ${result.error}`);
+      }
+    } catch (error) {
+      AppDebug.error("Failed to submit research data:", error);
+      // Continue execution - research submission is optional
+    }
+  }
+
+  /**
+   * Call Firebase Function with authentication
+   * @param {string} functionName - Name of the Firebase Function
+   * @param {Object} data - Data to send to the function
+   * @param {boolean} requiresAuth - Whether the function requires authentication
+   * @returns {Object} Function result
+   */
+  async callFirebaseFunction(functionName, data, requiresAuth = false) {
+    try {
+      if (!this.firebaseService) {
+        throw new Error("Firebase service not initialized");
+      }
+
+      if (requiresAuth && !this.currentUser) {
+        throw new Error("Authentication required for this function");
+      }
+
+      // Get Firebase Functions instance
+      const functions = this.firebaseService.getFunctions();
+      if (!functions) {
+        throw new Error("Firebase Functions not available");
+      }
+
+      // Get ID token for authentication
+      let headers = {};
+      if (requiresAuth && this.currentUser) {
+        const idToken = await this.currentUser.getIdToken();
+        headers["Authorization"] = `Bearer ${idToken}`;
+      }
+
+      // Call the function
+      const functionCall = functions.httpsCallable(functionName);
+      const result = await functionCall(data);
+
+      return result.data;
+    } catch (error) {
+      AppDebug.error(`Firebase function call failed (${functionName}):`, error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Get user profile from Firebase
+   * @returns {Object|null} User profile data
+   */
+  async getUserProfile() {
+    try {
+      if (!this.currentUser) return null;
+
+      const result = await this.callFirebaseFunction(
+        "getUserAnalytics",
+        {},
+        true,
+      );
+      return result.success ? result.analytics.profile : null;
+    } catch (error) {
+      AppDebug.error("Failed to get user profile:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Get scenario responses for research data
+   * @param {string} categoryId - Category identifier
+   * @param {string} scenarioId - Scenario identifier
+   * @returns {Object} Scenario responses
+   */
+  getScenarioResponses(categoryId, scenarioId) {
+    // This would be implemented based on how scenario responses are stored
+    // For now, return empty object as placeholder
+    return {};
+  }
+
+  /**
+   * Get scenario ethics scores for research data
+   * @param {string} categoryId - Category identifier
+   * @param {string} scenarioId - Scenario identifier
+   * @returns {Object} Ethics scores
+   */
+  getScenarioEthicsScores(categoryId, scenarioId) {
+    // This would be implemented based on how ethics scores are stored
+    // For now, return empty object as placeholder
+    return {};
+  }
+
+  /**
+   * Get scenario completion time for research data
+   * @param {string} categoryId - Category identifier
+   * @param {string} scenarioId - Scenario identifier
+   * @returns {number} Completion time in milliseconds
+   */
+  getScenarioCompletionTime(categoryId, scenarioId) {
+    // This would be implemented based on how completion times are tracked
+    // For now, return 0 as placeholder
+    return 0;
   }
 
   /**

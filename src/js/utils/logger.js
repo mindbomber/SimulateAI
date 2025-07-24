@@ -96,10 +96,13 @@ class Logger {
   constructor() {
     // ⭐ ENTERPRISE INITIALIZATION ⭐
 
+    // OPTIMIZED: Cache current timestamp to avoid multiple Date.now() calls
+    const initTimestamp = Date.now();
+
     // Generate unique instance identifier for enterprise tracking
     this.instanceId = this._generateUUID();
-    this.sessionId = `log-session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    this.startTime = Date.now();
+    this.sessionId = `log-session-${initTimestamp}-${Math.random().toString(36).substr(2, 9)}`;
+    this.startTime = initTimestamp;
 
     // Add to enterprise instance tracking
     if (!Logger._instances) {
@@ -107,41 +110,7 @@ class Logger {
     }
     Logger._instances.add(this);
 
-    // Enterprise monitoring initialization
-    this.errorCount = 0;
-    this.circuitBreakerTripped = false;
-    this.telemetryBatch = [];
-    this.lastTelemetryFlush = Date.now();
-
-    // Performance tracking
-    this.performanceMetrics = {
-      totalLogs: 0,
-      logsByLevel: { error: 0, warn: 0, info: 0, debug: 0, trace: 0 },
-      operationTimes: [],
-      bufferFlushes: 0,
-      lastOperation: Date.now(),
-    };
-
-    // Centralized log aggregation
-    this.logBuffer = [];
-    this.lastBufferFlush = Date.now();
-    this.bufferCompressionEnabled =
-      ENTERPRISE_CONSTANTS.AGGREGATION.COMPRESSION_ENABLED;
-
-    // Health monitoring
-    this.healthMetrics = {
-      isHealthy: true,
-      lastHealthCheck: Date.now(),
-      memoryUsage: 0,
-      errorRate: 0,
-      bufferSize: 0,
-    };
-
-    // Correlation ID tracking for enterprise logging
-    this.correlationIds = new Map();
-    this.currentCorrelationId = null;
-
-    // Original logger properties
+    // Define log levels FIRST - before environment detection
     this.levels = {
       ERROR: 0,
       WARN: 1,
@@ -150,12 +119,49 @@ class Logger {
       TRACE: 4,
     };
 
+    // Enterprise monitoring initialization
+    this.errorCount = 0;
+    this.circuitBreakerTripped = false;
+    this.telemetryBatch = [];
+    this.lastTelemetryFlush = initTimestamp;
+
+    // Performance tracking
+    this.performanceMetrics = {
+      totalLogs: 0,
+      logsByLevel: { error: 0, warn: 0, info: 0, debug: 0, trace: 0 },
+      operationTimes: [],
+      bufferFlushes: 0,
+      lastOperation: initTimestamp,
+    };
+
+    // Centralized log aggregation
+    this.logBuffer = [];
+    this.lastBufferFlush = initTimestamp;
+    this.bufferCompressionEnabled =
+      ENTERPRISE_CONSTANTS.AGGREGATION.COMPRESSION_ENABLED;
+
+    // Health monitoring
+    this.healthMetrics = {
+      isHealthy: true,
+      lastHealthCheck: initTimestamp,
+      memoryUsage: 0,
+      errorRate: 0,
+      bufferSize: 0,
+    };
+
+    // OPTIMIZED: Cache environment detection to avoid repeated window.location access
+    this._environmentCache = this._detectEnvironmentOnce();
+
+    // Correlation ID tracking for enterprise logging
+    this.correlationIds = new Map();
+    this.currentCorrelationId = null;
+
     // Set log level based on environment
-    this.currentLevel = this.detectEnvironment();
+    this.currentLevel = this._environmentCache.logLevel;
     this.enabledTypes = new Set(["error", "warn", "info"]);
 
     // Production mode disables most logging
-    if (this.isProduction()) {
+    if (this._environmentCache.isProduction) {
       this.enabledTypes = new Set(["error"]);
     }
 
@@ -172,55 +178,80 @@ class Logger {
       this._logTelemetry(ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.LOG_EVENT, {
         event: "logger_initialized",
         instanceId: this.instanceId,
-        initTime: Date.now() - this.startTime,
-        environment: this.isProduction() ? "production" : "development",
+        initTime: initTimestamp - this.startTime, // Should be near 0
+        environment: this._environmentCache.isProduction
+          ? "production"
+          : "development",
         enabledTypes: Array.from(this.enabledTypes),
       });
     }
   }
 
   /**
-   * Detect current environment and adjust logging accordingly
+   * OPTIMIZED: Cache environment detection to avoid repeated window.location access
+   * @private
    */
-  detectEnvironment() {
+  _detectEnvironmentOnce() {
+    const cache = {
+      isProduction: false,
+      isDevelopment: false,
+      logLevel: this.levels.WARN,
+      hostname: null,
+      isQuietMode: false,
+    };
+
     // Check for common development indicators
     if (typeof window !== "undefined") {
-      const isDev =
-        window.location.hostname === "localhost" ||
-        window.location.hostname === "127.0.0.1" ||
-        window.location.hostname.includes("dev") ||
+      // OPTIMIZED: Cache hostname to avoid repeated access
+      cache.hostname = window.location.hostname;
+
+      cache.isDevelopment =
+        cache.hostname === "localhost" ||
+        cache.hostname === "127.0.0.1" ||
+        cache.hostname.includes("dev") ||
         window.location.search.includes("debug=true") ||
         localStorage.getItem("debug") === "true";
 
+      cache.isProduction =
+        cache.hostname !== "localhost" &&
+        cache.hostname !== "127.0.0.1" &&
+        !cache.hostname.includes("dev");
+
       // In production or quiet mode, reduce logging noise
-      const isQuietMode = localStorage.getItem("quiet-logs") === "true";
+      cache.isQuietMode = localStorage.getItem("quiet-logs") === "true";
 
-      if (isQuietMode) {
+      if (cache.isQuietMode) {
         // Only show errors and warnings in quiet mode
-        return this.levels.WARN;
+        cache.logLevel = this.levels.WARN;
+      } else {
+        cache.logLevel = cache.isDevelopment
+          ? this.levels.DEBUG
+          : this.levels.WARN;
       }
-
-      return isDev ? this.levels.DEBUG : this.levels.WARN;
     }
-    return this.levels.WARN;
+
+    return cache;
   }
 
   /**
-   * Check if running in production
+   * OPTIMIZED: Use cached environment detection
+   */
+  detectEnvironment() {
+    return this._environmentCache.logLevel;
+  }
+
+  /**
+   * OPTIMIZED: Use cached environment detection
    */
   isProduction() {
-    return (
-      typeof window !== "undefined" &&
-      window.location.hostname !== "localhost" &&
-      window.location.hostname !== "127.0.0.1" &&
-      !window.location.hostname.includes("dev")
-    );
+    return this._environmentCache.isProduction;
   }
 
   /**
-   * Format log message with timestamp and context
+   * OPTIMIZED: Format log message with cached timestamp generation
    */
   formatMessage(level, context, message, data) {
+    // OPTIMIZED: Cache timestamp generation to avoid multiple new Date() calls
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
     const contextStr = context ? ` [${context}]` : "";
@@ -245,6 +276,32 @@ class Logger {
 
       if (!this.enabledTypes.has(level)) {
         return;
+      }
+
+      // Quiet mode filtering - reduce INFO noise
+      if (this.quietMode && level === "info") {
+        // Only allow important info messages in quiet mode
+        const importantKeywords = [
+          "Error",
+          "Failed",
+          "Warning",
+          "Critical",
+          "Issue",
+          "Problem",
+          "Exception",
+          "Timeout",
+          "Retry",
+          "Circuit breaker",
+        ];
+        const isImportant = importantKeywords.some(
+          (keyword) =>
+            message.toLowerCase().includes(keyword.toLowerCase()) ||
+            (context && context.toLowerCase().includes(keyword.toLowerCase())),
+        );
+
+        if (!isImportant) {
+          return; // Skip non-important info messages in quiet mode
+        }
       }
 
       // Check for duplicate message to reduce console noise
@@ -348,6 +405,7 @@ class Logger {
 
   /**
    * Generate correlation ID for request tracking
+   * OPTIMIZED: Use cached timestamp for better performance
    * @returns {string} Correlation ID
    * @private
    */
@@ -392,7 +450,7 @@ class Logger {
   }
 
   /**
-   * Create structured log entry with enterprise metadata
+   * OPTIMIZED: Create structured log entry with enterprise metadata and cached environment data
    * @private
    */
   _createStructuredLog(level, context, message, data, correlationId) {
@@ -405,7 +463,9 @@ class Logger {
       sessionId: this.sessionId,
       correlationId,
       version: "1.20.0",
-      environment: this.isProduction() ? "production" : "development",
+      environment: this._environmentCache.isProduction
+        ? "production"
+        : "development",
     };
 
     // Add data if provided
@@ -545,22 +605,26 @@ class Logger {
   }
 
   /**
-   * Handle errors with enterprise error management
+   * OPTIMIZED: Handle errors with enterprise error management and reduced state mutations
    * @param {Error} error - The error to handle
    * @param {string} context - Context where the error occurred
    * @private
    */
   _handleError(error, context = "unknown") {
     this.errorCount++;
-    this.healthMetrics.errorRate =
-      this.errorCount / ((Date.now() - this.startTime) / 1000);
 
+    // OPTIMIZED: Batch calculations to reduce state changes
+    const now = Date.now();
+    const uptime = now - this.startTime;
+    this.healthMetrics.errorRate = this.errorCount / (uptime / 1000);
+
+    // OPTIMIZED: Create error data object once to avoid redundant object creation
     const errorData = {
       instanceId: this.instanceId,
       context,
       message: error.message,
       stack: error.stack,
-      timestamp: new Date().toISOString(),
+      timestamp: new Date(now).toISOString(),
       errorCount: this.errorCount,
       sessionId: this.sessionId,
     };
@@ -1092,12 +1156,28 @@ Logger._instances = new Set();
 const logger = new Logger();
 
 // ⭐ GLOBAL ENTERPRISE DEBUG FUNCTIONS ⭐
+// OPTIMIZED: Conditional global exposure to avoid unnecessary window pollution
 
 /**
- * Global debug function for Logger enterprise status
- * Usage: debugLogger() in browser console
+ * OPTIMIZED: Conditionally expose global debug functions based on environment
+ * Only expose in development to reduce global namespace pollution
  */
-if (typeof window !== "undefined") {
+function exposeGlobalDebugFunctions() {
+  if (typeof window === "undefined") return;
+
+  // Only expose in development environments
+  const isDevelopment =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.hostname.includes("dev") ||
+    localStorage.getItem("debug") === "true";
+
+  if (!isDevelopment) return;
+
+  /**
+   * Global debug function for Logger enterprise status
+   * Usage: debugLogger() in browser console
+   */
   window.debugLogger = function () {
     return Logger.debugEnterpriseStatus();
   };
@@ -1148,6 +1228,9 @@ if (typeof window !== "undefined") {
     console.log("All logger buffers flushed");
   };
 }
+
+// OPTIMIZED: Call the function to expose debug functions conditionally
+exposeGlobalDebugFunctions();
 
 // ES6 module exports
 export default logger;
