@@ -222,26 +222,15 @@ class UnifiedAnimationPerformanceMonitor {
 }
 
 /**
- * Enhanced error handling for animation operations
- */
-class UnifiedAnimationError extends Error {
-  constructor(message, context = {}, originalError = null) {
-    super(message);
-    this.name = "UnifiedAnimationError";
-    this.context = context;
-    this.originalError = originalError;
-    this.timestamp = Date.now();
-  }
-}
-
-/**
  * Main Unified Animation Manager Class
  * Consolidates all animation management functionality
+ * Phase 2.3 Enhanced: DataHandler Integration for Animation State Persistence
  */
 export class UnifiedAnimationManager {
-  constructor(engine = null) {
+  constructor(engine = null, app = null) {
     // Core state management
     this.engine = engine;
+    this.app = app; // Phase 2.3: Enhanced app integration parameter
     this.animations = new Map();
     this.timelines = new Map();
     this.activeAnimations = new Set();
@@ -281,8 +270,11 @@ export class UnifiedAnimationManager {
     // Touch/gesture support
     this.gestureAnimations = new Map();
 
-    // Settings persistence
-    this.settings = this.loadSettings();
+    // Phase 2.3: DataHandler Integration for enhanced settings persistence
+    this.dataHandler = this.app?.dataHandler || null;
+
+    // Settings persistence with DataHandler-first pattern
+    this.settings = this.loadSettingsSync(); // Sync initialization for constructor
 
     // Configuration
     this.accessibilityConfig = {
@@ -1313,15 +1305,42 @@ export class UnifiedAnimationManager {
   }
 
   /**
-   * Load settings from localStorage
-   * @returns {Object} Settings object
+   * Load settings from DataHandler (async, DataHandler-first pattern)
+   * @returns {Promise<Object>} Settings object
    */
-  loadSettings() {
+  async loadAnimationSettings() {
     try {
+      if (this.dataHandler) {
+        // Try DataHandler first
+        const settings = await this.dataHandler.load("animationSettings");
+        if (settings) {
+          return {
+            announceAnimations: settings.announceAnimations !== false,
+            respectReducedMotion: settings.respectReducedMotion !== false,
+            enableKeyboardControls: settings.enableKeyboardControls !== false,
+            forceAnimations: settings.forceAnimations || false,
+            maxAnimationsPerFrame:
+              settings.maxAnimationsPerFrame ||
+              UNIFIED_ANIMATION_CONSTANTS.MAX_ANIMATIONS_PER_FRAME,
+            animationPreferences: settings.animationPreferences || {},
+            performanceSettings: settings.performanceSettings || {},
+            accessibilitySettings: settings.accessibilitySettings || {},
+            customEasingSettings: settings.customEasingSettings || {},
+          };
+        }
+      }
+
+      // Fallback to localStorage
       if (typeof localStorage !== "undefined") {
         const settings = JSON.parse(
           localStorage.getItem("animationSettings") || "{}",
         );
+
+        // Migrate to DataHandler if available
+        if (this.dataHandler && Object.keys(settings).length > 0) {
+          await this.dataHandler.save("animationSettings", settings);
+        }
+
         return {
           announceAnimations: settings.announceAnimations !== false,
           respectReducedMotion: settings.respectReducedMotion !== false,
@@ -1330,6 +1349,10 @@ export class UnifiedAnimationManager {
           maxAnimationsPerFrame:
             settings.maxAnimationsPerFrame ||
             UNIFIED_ANIMATION_CONSTANTS.MAX_ANIMATIONS_PER_FRAME,
+          animationPreferences: settings.animationPreferences || {},
+          performanceSettings: settings.performanceSettings || {},
+          accessibilitySettings: settings.accessibilitySettings || {},
+          customEasingSettings: settings.customEasingSettings || {},
         };
       }
     } catch (error) {
@@ -1343,24 +1366,231 @@ export class UnifiedAnimationManager {
       forceAnimations: false,
       maxAnimationsPerFrame:
         UNIFIED_ANIMATION_CONSTANTS.MAX_ANIMATIONS_PER_FRAME,
+      animationPreferences: {},
+      performanceSettings: {},
+      accessibilitySettings: {},
+      customEasingSettings: {},
     };
   }
 
   /**
-   * Save settings to localStorage
+   * Save settings to DataHandler (async, DataHandler-first pattern)
+   * @param {Object} settings - Settings to save
+   * @returns {Promise<boolean>} Success status
+   */
+  async saveAnimationSettings(settings) {
+    try {
+      const currentSettings = await this.loadAnimationSettings();
+      const newSettings = { ...currentSettings, ...settings };
+
+      if (this.dataHandler) {
+        // Save to DataHandler first
+        await this.dataHandler.save("animationSettings", newSettings);
+      }
+
+      // Also save to localStorage for immediate access
+      if (typeof localStorage !== "undefined") {
+        localStorage.setItem("animationSettings", JSON.stringify(newSettings));
+      }
+
+      this.settings = newSettings;
+
+      // Update configuration based on new settings
+      this.accessibilityConfig = {
+        announceAnimations: newSettings.announceAnimations || true,
+        respectReducedMotion: newSettings.respectReducedMotion || true,
+        enableKeyboardControls: newSettings.enableKeyboardControls || true,
+      };
+
+      // Update theme and animation defaults
+      this.updateAnimationDefaults();
+
+      return true;
+    } catch (error) {
+      logger.warn("Failed to save animation settings:", error);
+      return false;
+    }
+  }
+
+  /**
+   * Load animation state from DataHandler (async)
+   * @returns {Promise<Object>} Animation state object
+   */
+  async loadAnimationState() {
+    try {
+      if (this.dataHandler) {
+        const state = await this.dataHandler.load("animationState");
+        if (state) {
+          return {
+            activeAnimations: state.activeAnimations || [],
+            timelines: state.timelines || [],
+            performanceMetrics: state.performanceMetrics || {},
+            lastSession: state.lastSession || null,
+          };
+        }
+      }
+
+      // Fallback to localStorage
+      if (typeof localStorage !== "undefined") {
+        const state = JSON.parse(
+          localStorage.getItem("animationState") || "{}",
+        );
+
+        // Migrate to DataHandler if available
+        if (this.dataHandler && Object.keys(state).length > 0) {
+          await this.dataHandler.save("animationState", state);
+        }
+
+        return {
+          activeAnimations: state.activeAnimations || [],
+          timelines: state.timelines || [],
+          performanceMetrics: state.performanceMetrics || {},
+          lastSession: state.lastSession || null,
+        };
+      }
+    } catch (error) {
+      logger.warn("Failed to load animation state:", error);
+    }
+
+    return {
+      activeAnimations: [],
+      timelines: [],
+      performanceMetrics: {},
+      lastSession: null,
+    };
+  }
+
+  /**
+   * Save animation state to DataHandler (async)
+   * @param {Object} state - Animation state to save
+   * @returns {Promise<boolean>} Success status
+   */
+  async saveAnimationState(state) {
+    try {
+      const stateData = {
+        activeAnimations:
+          state.activeAnimations || Array.from(this.activeAnimations),
+        timelines: state.timelines || Array.from(this.timelines.keys()),
+        performanceMetrics:
+          state.performanceMetrics || this.performanceMonitor.getMetrics(),
+        lastSession: Date.now(),
+        ...state,
+      };
+
+      if (this.dataHandler) {
+        // Save to DataHandler first
+        await this.dataHandler.save("animationState", stateData);
+      }
+
+      // Also save to localStorage for immediate access
+      if (typeof localStorage !== "undefined") {
+        localStorage.setItem("animationState", JSON.stringify(stateData));
+      }
+
+      return true;
+    } catch (error) {
+      logger.warn("Failed to save animation state:", error);
+      return false;
+    }
+  }
+
+  /**
+   * Load settings synchronously (for constructor and backward compatibility)
+   * @returns {Object} Settings object
+   */
+  loadSettingsSync() {
+    try {
+      if (typeof localStorage !== "undefined") {
+        const settings = JSON.parse(
+          localStorage.getItem("animationSettings") || "{}",
+        );
+        return {
+          announceAnimations: settings.announceAnimations !== false,
+          respectReducedMotion: settings.respectReducedMotion !== false,
+          enableKeyboardControls: settings.enableKeyboardControls !== false,
+          forceAnimations: settings.forceAnimations || false,
+          maxAnimationsPerFrame:
+            settings.maxAnimationsPerFrame ||
+            UNIFIED_ANIMATION_CONSTANTS.MAX_ANIMATIONS_PER_FRAME,
+          animationPreferences: settings.animationPreferences || {},
+          performanceSettings: settings.performanceSettings || {},
+          accessibilitySettings: settings.accessibilitySettings || {},
+          customEasingSettings: settings.customEasingSettings || {},
+        };
+      }
+    } catch (error) {
+      logger.warn("Failed to load animation settings synchronously:", error);
+    }
+
+    return {
+      announceAnimations: true,
+      respectReducedMotion: true,
+      enableKeyboardControls: true,
+      forceAnimations: false,
+      maxAnimationsPerFrame:
+        UNIFIED_ANIMATION_CONSTANTS.MAX_ANIMATIONS_PER_FRAME,
+      animationPreferences: {},
+      performanceSettings: {},
+      accessibilitySettings: {},
+      customEasingSettings: {},
+    };
+  }
+
+  /**
+   * Save settings synchronously (compatibility wrapper)
+   * @param {Object} settings - Settings to save
+   * @returns {boolean} Success status
+   */
+  saveSettingsSync(settings) {
+    try {
+      const currentSettings = this.loadSettingsSync();
+      const newSettings = { ...currentSettings, ...settings };
+
+      if (typeof localStorage !== "undefined") {
+        localStorage.setItem("animationSettings", JSON.stringify(newSettings));
+      }
+
+      this.settings = newSettings;
+
+      // Update configuration
+      this.accessibilityConfig = {
+        announceAnimations: newSettings.announceAnimations || true,
+        respectReducedMotion: newSettings.respectReducedMotion || true,
+        enableKeyboardControls: newSettings.enableKeyboardControls || true,
+      };
+
+      // Trigger async save to DataHandler if available
+      if (this.dataHandler) {
+        this.saveAnimationSettings(settings).catch((error) => {
+          logger.warn(
+            "Failed to save animation settings to DataHandler:",
+            error,
+          );
+        });
+      }
+
+      return true;
+    } catch (error) {
+      logger.warn("Failed to save animation settings synchronously:", error);
+      return false;
+    }
+  }
+
+  /**
+   * Load settings from localStorage (original method, now deprecated)
+   * @deprecated Use loadAnimationSettings() for DataHandler integration
+   * @returns {Object} Settings object
+   */
+  loadSettings() {
+    return this.loadSettingsSync();
+  }
+
+  /**
+   * Save settings to localStorage (original method, now enhanced)
    * @param {Object} settings - Settings to save
    */
   saveSettings(settings) {
-    try {
-      if (typeof localStorage !== "undefined") {
-        const currentSettings = this.loadSettings();
-        const newSettings = { ...currentSettings, ...settings };
-        localStorage.setItem("animationSettings", JSON.stringify(newSettings));
-        this.settings = newSettings;
-      }
-    } catch (error) {
-      logger.warn("Failed to save animation settings:", error);
-    }
+    this.saveSettingsSync(settings);
   }
 
   /**

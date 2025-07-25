@@ -1,0 +1,821 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phase 2.4 StorageManager Integration Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .test-result {
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+      .result-pass {
+        background-color: #d4edda;
+        color: #155724;
+      }
+      .result-fail {
+        background-color: #f8d7da;
+        color: #721c24;
+      }
+      .result-info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+      }
+      .progress {
+        width: 100%;
+        height: 20px;
+        background-color: #e0e0e0;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 10px 0;
+      }
+      .progress-bar {
+        height: 100%;
+        background-color: #4caf50;
+        transition: width 0.3s ease;
+      }
+      .status-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+      }
+      .status-pass {
+        background-color: #28a745;
+      }
+      .status-fail {
+        background-color: #dc3545;
+      }
+      .status-pending {
+        background-color: #ffc107;
+      }
+      h1 {
+        color: #333;
+      }
+      h2 {
+        color: #666;
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔧 Phase 2.4 StorageManager Integration Test</h1>
+    <p>
+      Testing StorageManager enhancement with DataHandler integration and
+      backward compatibility.
+    </p>
+
+    <div class="progress">
+      <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+    </div>
+    <div id="progress-text">Starting tests...</div>
+
+    <div class="test-container">
+      <h2>🏗️ Component Initialization Tests</h2>
+      <div id="init-results"></div>
+    </div>
+
+    <div class="test-container">
+      <h2>🔄 DataHandler Integration Tests</h2>
+      <div id="datahandler-results"></div>
+    </div>
+
+    <div class="test-container">
+      <h2>⚡ Sync Methods Compatibility Tests</h2>
+      <div id="sync-results"></div>
+    </div>
+
+    <div class="test-container">
+      <h2>🔄 Migration Tests</h2>
+      <div id="migration-results"></div>
+    </div>
+
+    <div class="test-container">
+      <h2>🛡️ Error Handling Tests</h2>
+      <div id="error-results"></div>
+    </div>
+
+    <div class="test-container">
+      <h2>📊 Test Summary</h2>
+      <div id="summary"></div>
+    </div>
+
+    <!-- Load required scripts -->
+    <script type="module" src="src/js/utils/logger.js"></script>
+    <script type="module" src="src/js/utils/storage.js"></script>
+    <script type="module" src="src/js/core/data-handler.js"></script>
+    <script
+      type="module"
+      src="src/js/core/app-enhanced-integration.js"
+    ></script>
+
+    <script type="module">
+      import logger from "./src/js/utils/logger.js";
+      import StorageManager from "./src/js/utils/storage.js";
+      import DataHandler from "./src/js/core/data-handler.js";
+      import EnhancedApp from "./src/js/core/app-enhanced-integration.js";
+
+      const testResults = {
+        init: 0,
+        datahandler: 0,
+        sync: 0,
+        migration: 0,
+        error: 0,
+        total: 0,
+      };
+
+      let currentTest = 0;
+      const totalTests = 20;
+
+      function updateProgress() {
+        currentTest++;
+        const percentage = (currentTest / totalTests) * 100;
+        document.getElementById("progress-bar").style.width = percentage + "%";
+        document.getElementById("progress-text").textContent =
+          `Progress: ${currentTest}/${totalTests} tests completed (${Math.round(percentage)}%)`;
+      }
+
+      function addResult(category, testName, passed, details = "") {
+        const container = document.getElementById(category + "-results");
+        const result = document.createElement("div");
+        result.className = `test-result ${passed ? "result-pass" : "result-fail"}`;
+
+        const status = passed ? "✅" : "❌";
+        const detailText = details ? ` - ${details}` : "";
+        result.textContent = `${status} ${testName}${detailText}`;
+
+        container.appendChild(result);
+
+        if (passed) testResults[category]++;
+        testResults.total++;
+        updateProgress();
+      }
+
+      async function testComponentInitialization() {
+        console.log("Testing Component Initialization...");
+
+        // Test 1: StorageManager availability
+        try {
+          if (
+            typeof StorageManager !== "undefined" &&
+            StorageManager.initialize
+          ) {
+            addResult(
+              "init",
+              "StorageManager Available",
+              true,
+              "StorageManager class loaded with initialize method",
+            );
+          } else {
+            addResult(
+              "init",
+              "StorageManager Available",
+              false,
+              "StorageManager class or initialize method missing",
+            );
+          }
+        } catch (error) {
+          addResult("init", "StorageManager Available", false, error.message);
+        }
+
+        // Test 2: DataHandler availability
+        try {
+          const dataHandler = new DataHandler();
+          addResult(
+            "init",
+            "DataHandler Creation",
+            true,
+            "DataHandler instance created successfully",
+          );
+        } catch (error) {
+          addResult("init", "DataHandler Creation", false, error.message);
+        }
+
+        // Test 3: EnhancedApp availability
+        try {
+          if (typeof EnhancedApp !== "undefined") {
+            addResult(
+              "init",
+              "EnhancedApp Available",
+              true,
+              "EnhancedApp class loaded",
+            );
+          } else {
+            addResult(
+              "init",
+              "EnhancedApp Available",
+              false,
+              "EnhancedApp class not found",
+            );
+          }
+        } catch (error) {
+          addResult("init", "EnhancedApp Available", false, error.message);
+        }
+
+        // Test 4: StorageManager basic initialization
+        try {
+          await StorageManager.init();
+          addResult(
+            "init",
+            "Basic StorageManager Init",
+            true,
+            "StorageManager initialized successfully",
+          );
+        } catch (error) {
+          addResult("init", "Basic StorageManager Init", false, error.message);
+        }
+      }
+
+      async function testDataHandlerIntegration() {
+        console.log("Testing DataHandler Integration...");
+
+        // Test 5: Enhanced initialization with app
+        try {
+          const dataHandler = new DataHandler();
+          const mockApp = { dataHandler };
+
+          await StorageManager.initialize(mockApp);
+
+          if (StorageManager.dataHandler === dataHandler) {
+            addResult(
+              "datahandler",
+              "Enhanced Initialization",
+              true,
+              "DataHandler properly integrated",
+            );
+          } else {
+            addResult(
+              "datahandler",
+              "Enhanced Initialization",
+              false,
+              "DataHandler not properly set",
+            );
+          }
+        } catch (error) {
+          addResult(
+            "datahandler",
+            "Enhanced Initialization",
+            false,
+            error.message,
+          );
+        }
+
+        // Test 6: DataHandler storage operations
+        try {
+          const testData = {
+            test: "datahandler-integration",
+            timestamp: Date.now(),
+          };
+          await StorageManager.set("test-datahandler", testData);
+
+          const retrieved = await StorageManager.get("test-datahandler");
+          if (retrieved && retrieved.test === testData.test) {
+            addResult(
+              "datahandler",
+              "DataHandler Storage",
+              true,
+              "Data stored and retrieved through enhanced methods",
+            );
+          } else {
+            addResult(
+              "datahandler",
+              "DataHandler Storage",
+              false,
+              "Data retrieval failed or mismatched",
+            );
+          }
+        } catch (error) {
+          addResult("datahandler", "DataHandler Storage", false, error.message);
+        }
+
+        // Test 7: Fallback behavior
+        try {
+          // Temporarily disable DataHandler
+          const originalDataHandler = StorageManager.dataHandler;
+          StorageManager.dataHandler = null;
+
+          const testData = { test: "fallback-test", timestamp: Date.now() };
+          await StorageManager.set("test-fallback", testData);
+
+          const retrieved = await StorageManager.get("test-fallback");
+          if (retrieved && retrieved.test === testData.test) {
+            addResult(
+              "datahandler",
+              "Fallback Behavior",
+              true,
+              "Fallback to localStorage working",
+            );
+          } else {
+            addResult(
+              "datahandler",
+              "Fallback Behavior",
+              false,
+              "Fallback failed",
+            );
+          }
+
+          // Restore DataHandler
+          StorageManager.dataHandler = originalDataHandler;
+        } catch (error) {
+          addResult("datahandler", "Fallback Behavior", false, error.message);
+        }
+
+        // Test 8: Enhanced remove operation
+        try {
+          await StorageManager.set("test-remove", { data: "to-be-removed" });
+          await StorageManager.remove("test-remove");
+
+          const retrieved = await StorageManager.get("test-remove");
+          if (retrieved === null || retrieved === undefined) {
+            addResult(
+              "datahandler",
+              "Enhanced Remove",
+              true,
+              "Data properly removed from both systems",
+            );
+          } else {
+            addResult(
+              "datahandler",
+              "Enhanced Remove",
+              false,
+              "Data not properly removed",
+            );
+          }
+        } catch (error) {
+          addResult("datahandler", "Enhanced Remove", false, error.message);
+        }
+      }
+
+      async function testSyncMethodsCompatibility() {
+        console.log("Testing Sync Methods Compatibility...");
+
+        // Test 9: getSync method
+        try {
+          const testData = { sync: "test-data", timestamp: Date.now() };
+          StorageManager.setSync("test-sync-get", testData);
+
+          const retrieved = StorageManager.getSync("test-sync-get");
+          if (retrieved && retrieved.sync === testData.sync) {
+            addResult(
+              "sync",
+              "getSync Method",
+              true,
+              "Synchronous get working correctly",
+            );
+          } else {
+            addResult(
+              "sync",
+              "getSync Method",
+              false,
+              "getSync returned incorrect data",
+            );
+          }
+        } catch (error) {
+          addResult("sync", "getSync Method", false, error.message);
+        }
+
+        // Test 10: setSync method
+        try {
+          const testData = { sync: "set-test", value: 12345 };
+          const success = StorageManager.setSync("test-sync-set", testData);
+
+          if (success) {
+            const retrieved = StorageManager.getSync("test-sync-set");
+            if (retrieved && retrieved.sync === testData.sync) {
+              addResult(
+                "sync",
+                "setSync Method",
+                true,
+                "Synchronous set working correctly",
+              );
+            } else {
+              addResult(
+                "sync",
+                "setSync Method",
+                false,
+                "setSync data not retrievable",
+              );
+            }
+          } else {
+            addResult(
+              "sync",
+              "setSync Method",
+              false,
+              "setSync returned false",
+            );
+          }
+        } catch (error) {
+          addResult("sync", "setSync Method", false, error.message);
+        }
+
+        // Test 11: removeSync method
+        try {
+          StorageManager.setSync("test-sync-remove", { data: "to-remove" });
+          const success = StorageManager.removeSync("test-sync-remove");
+
+          if (success) {
+            const retrieved = StorageManager.getSync("test-sync-remove");
+            if (!retrieved) {
+              addResult(
+                "sync",
+                "removeSync Method",
+                true,
+                "Synchronous remove working correctly",
+              );
+            } else {
+              addResult(
+                "sync",
+                "removeSync Method",
+                false,
+                "removeSync did not remove data",
+              );
+            }
+          } else {
+            addResult(
+              "sync",
+              "removeSync Method",
+              false,
+              "removeSync returned false",
+            );
+          }
+        } catch (error) {
+          addResult("sync", "removeSync Method", false, error.message);
+        }
+
+        // Test 12: Backward compatibility
+        try {
+          // Test that old code patterns still work
+          await StorageManager.set("compat-test", { legacy: true });
+          const data = await StorageManager.get("compat-test");
+
+          if (data && data.legacy === true) {
+            addResult(
+              "sync",
+              "Backward Compatibility",
+              true,
+              "Legacy method calls still functional",
+            );
+          } else {
+            addResult(
+              "sync",
+              "Backward Compatibility",
+              false,
+              "Legacy compatibility broken",
+            );
+          }
+        } catch (error) {
+          addResult("sync", "Backward Compatibility", false, error.message);
+        }
+      }
+
+      async function testMigrationFeatures() {
+        console.log("Testing Migration Features...");
+
+        // Test 13: Migration key detection
+        try {
+          // Simulate existing localStorage data
+          localStorage.setItem(
+            "ai_ethics_user_preferences",
+            JSON.stringify({
+              value: { theme: "dark", language: "en" },
+              metadata: { timestamp: Date.now() },
+            }),
+          );
+
+          const data = StorageManager.getSync("user_preferences");
+          if (data && data.theme === "dark") {
+            addResult(
+              "migration",
+              "Migration Key Detection",
+              true,
+              "Existing localStorage data accessible",
+            );
+          } else {
+            addResult(
+              "migration",
+              "Migration Key Detection",
+              false,
+              "Cannot access existing localStorage data",
+            );
+          }
+        } catch (error) {
+          addResult(
+            "migration",
+            "Migration Key Detection",
+            false,
+            error.message,
+          );
+        }
+
+        // Test 14: Data preservation during migration
+        try {
+          const originalData = { preserved: true, timestamp: Date.now() };
+          StorageManager.setSync("migration-test", originalData);
+
+          // Simulate migration process
+          const retrievedData = StorageManager.getSync("migration-test");
+          if (retrievedData && retrievedData.preserved === true) {
+            addResult(
+              "migration",
+              "Data Preservation",
+              true,
+              "Data preserved during migration simulation",
+            );
+          } else {
+            addResult(
+              "migration",
+              "Data Preservation",
+              false,
+              "Data not preserved correctly",
+            );
+          }
+        } catch (error) {
+          addResult("migration", "Data Preservation", false, error.message);
+        }
+
+        // Test 15: Enhanced app integration simulation
+        try {
+          if (typeof EnhancedApp !== "undefined") {
+            // Test that EnhancedApp can initialize StorageManager
+            const mockApp = {
+              dataHandler: new DataHandler(),
+              components: new Map(),
+            };
+
+            await StorageManager.initialize(mockApp);
+
+            if (StorageManager.dataHandler) {
+              addResult(
+                "migration",
+                "Enhanced App Integration",
+                true,
+                "StorageManager integrates with enhanced app",
+              );
+            } else {
+              addResult(
+                "migration",
+                "Enhanced App Integration",
+                false,
+                "Enhanced app integration failed",
+              );
+            }
+          } else {
+            addResult(
+              "migration",
+              "Enhanced App Integration",
+              false,
+              "EnhancedApp not available for testing",
+            );
+          }
+        } catch (error) {
+          addResult(
+            "migration",
+            "Enhanced App Integration",
+            false,
+            error.message,
+          );
+        }
+
+        // Test 16: Storage consolidation
+        try {
+          // Test that both old and new methods access the same data
+          const testData = { consolidation: "test", id: Math.random() };
+
+          await StorageManager.set("consolidation-test", testData);
+          const syncData = StorageManager.getSync("consolidation-test");
+
+          if (syncData && syncData.consolidation === testData.consolidation) {
+            addResult(
+              "migration",
+              "Storage Consolidation",
+              true,
+              "Sync and async methods access same data",
+            );
+          } else {
+            addResult(
+              "migration",
+              "Storage Consolidation",
+              false,
+              "Data access inconsistency detected",
+            );
+          }
+        } catch (error) {
+          addResult("migration", "Storage Consolidation", false, error.message);
+        }
+      }
+
+      async function testErrorHandling() {
+        console.log("Testing Error Handling...");
+
+        // Test 17: Invalid key handling
+        try {
+          const result1 = await StorageManager.get("");
+          const result2 = await StorageManager.get(null);
+
+          if (result1 === null && result2 === null) {
+            addResult(
+              "error",
+              "Invalid Key Handling",
+              true,
+              "Invalid keys handled gracefully",
+            );
+          } else {
+            addResult(
+              "error",
+              "Invalid Key Handling",
+              false,
+              "Invalid key handling inconsistent",
+            );
+          }
+        } catch (error) {
+          addResult("error", "Invalid Key Handling", false, error.message);
+        }
+
+        // Test 18: Storage quota simulation
+        try {
+          // Test with reasonable data sizes
+          const largeData = { data: "x".repeat(1000), test: "quota" };
+          await StorageManager.set("quota-test", largeData);
+
+          const retrieved = await StorageManager.get("quota-test");
+          if (retrieved && retrieved.test === "quota") {
+            addResult(
+              "error",
+              "Storage Quota Handling",
+              true,
+              "Large data handled correctly",
+            );
+          } else {
+            addResult(
+              "error",
+              "Storage Quota Handling",
+              false,
+              "Large data handling failed",
+            );
+          }
+        } catch (error) {
+          addResult("error", "Storage Quota Handling", false, error.message);
+        }
+
+        // Test 19: Corrupted data recovery
+        try {
+          // Simulate corrupted data scenario
+          localStorage.setItem("ai_ethics_corrupted-test", "invalid-json-data");
+
+          const result = StorageManager.getSync(
+            "corrupted-test",
+            "default-value",
+          );
+          if (result === "default-value") {
+            addResult(
+              "error",
+              "Corrupted Data Recovery",
+              true,
+              "Corrupted data returns default value",
+            );
+          } else {
+            addResult(
+              "error",
+              "Corrupted Data Recovery",
+              false,
+              "Corrupted data not handled properly",
+            );
+          }
+        } catch (error) {
+          addResult("error", "Corrupted Data Recovery", false, error.message);
+        }
+
+        // Test 20: DataHandler failure simulation
+        try {
+          const originalDataHandler = StorageManager.dataHandler;
+
+          // Simulate DataHandler failure
+          StorageManager.dataHandler = {
+            saveData: () => Promise.reject(new Error("Simulated failure")),
+            getData: () => Promise.reject(new Error("Simulated failure")),
+          };
+
+          // Should fallback to localStorage
+          await StorageManager.set("failure-test", { test: "fallback" });
+          const result = await StorageManager.get("failure-test");
+
+          if (result && result.test === "fallback") {
+            addResult(
+              "error",
+              "DataHandler Failure Recovery",
+              true,
+              "Graceful fallback to localStorage",
+            );
+          } else {
+            addResult(
+              "error",
+              "DataHandler Failure Recovery",
+              false,
+              "Fallback mechanism failed",
+            );
+          }
+
+          // Restore original DataHandler
+          StorageManager.dataHandler = originalDataHandler;
+        } catch (error) {
+          addResult(
+            "error",
+            "DataHandler Failure Recovery",
+            false,
+            error.message,
+          );
+        }
+      }
+
+      function generateSummary() {
+        const total = testResults.total;
+        const passed =
+          testResults.init +
+          testResults.datahandler +
+          testResults.sync +
+          testResults.migration +
+          testResults.error;
+        const passRate = total > 0 ? ((passed / total) * 100).toFixed(1) : 0;
+
+        const summary = document.getElementById("summary");
+        summary.innerHTML = `
+                <div class="test-result ${passed === total ? "result-pass" : "result-info"}">
+                    <strong>Overall Result: ${passed}/${total} tests passed (${passRate}%)</strong>
+                </div>
+                <div class="test-result result-info">
+                    <span class="status-indicator ${testResults.init > 0 ? "status-pass" : "status-fail"}"></span>
+                    Component Initialization: ${testResults.init}/4 tests passed
+                </div>
+                <div class="test-result result-info">
+                    <span class="status-indicator ${testResults.datahandler > 0 ? "status-pass" : "status-fail"}"></span>
+                    DataHandler Integration: ${testResults.datahandler}/4 tests passed
+                </div>
+                <div class="test-result result-info">
+                    <span class="status-indicator ${testResults.sync > 0 ? "status-pass" : "status-fail"}"></span>
+                    Sync Methods Compatibility: ${testResults.sync}/4 tests passed
+                </div>
+                <div class="test-result result-info">
+                    <span class="status-indicator ${testResults.migration > 0 ? "status-pass" : "status-fail"}"></span>
+                    Migration Features: ${testResults.migration}/4 tests passed
+                </div>
+                <div class="test-result result-info">
+                    <span class="status-indicator ${testResults.error > 0 ? "status-pass" : "status-fail"}"></span>
+                    Error Handling: ${testResults.error}/4 tests passed
+                </div>
+                <div class="test-result ${passed === total ? "result-pass" : passed > total * 0.7 ? "result-info" : "result-fail"}">
+                    <strong>Phase 2.4 Status: ${passed === total ? "✅ FULLY FUNCTIONAL" : passed > total * 0.7 ? "⚠️ MOSTLY FUNCTIONAL" : "❌ NEEDS ATTENTION"}</strong>
+                </div>
+            `;
+      }
+
+      async function runAllTests() {
+        console.log(
+          "🔧 Starting Phase 2.4 StorageManager Integration Tests...",
+        );
+
+        try {
+          await testComponentInitialization();
+          await testDataHandlerIntegration();
+          await testSyncMethodsCompatibility();
+          await testMigrationFeatures();
+          await testErrorHandling();
+
+          generateSummary();
+
+          document.getElementById("progress-text").textContent =
+            "✅ All tests completed!";
+          console.log(
+            "🎉 Phase 2.4 StorageManager Integration Tests Complete!",
+          );
+        } catch (error) {
+          console.error("Test execution failed:", error);
+          document.getElementById("progress-text").textContent =
+            "❌ Test execution failed: " + error.message;
+        }
+      }
+
+      // Start tests when page loads
+      window.addEventListener("load", () => {
+        setTimeout(runAllTests, 500);
+      });
+    </script>
+  </body>
+</html>

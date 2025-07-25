@@ -102,11 +102,16 @@ const TRACKING_CONSTANTS = {
 };
 
 export class UserEngagementTracker {
-  constructor() {
-    this.userProfile = this.loadUserProfile();
-    this.engagementMetrics = this.loadEngagementMetrics();
-    this.behaviorPatterns = this.loadBehaviorPatterns();
-    this.settingsUsage = this.loadSettingsUsage();
+  constructor(app = null) {
+    // Enhanced integration with DataHandler
+    this.app = app;
+    this.dataHandler = app?.dataHandler || null;
+
+    // Initialize with empty data - will be loaded async in init()
+    this.userProfile = {};
+    this.engagementMetrics = {};
+    this.behaviorPatterns = {};
+    this.settingsUsage = {};
 
     this.currentSession = {
       startTime: Date.now(),
@@ -128,7 +133,77 @@ export class UserEngagementTracker {
 
     this.isInitialized = false; // Track initialization state
 
-    this.init();
+    // Note: init() is now async and should be called externally for enhanced instances
+    if (!this.dataHandler) {
+      // Legacy mode - sync initialization for backward compatibility
+      this.userProfile = this.loadUserProfileSync();
+      this.engagementMetrics = this.loadEngagementMetricsSync();
+      this.behaviorPatterns = this.loadBehaviorPatternsSync();
+      this.settingsUsage = this.loadSettingsUsageSync();
+      this.init();
+    }
+  }
+
+  /**
+   * Async initialization for enhanced DataHandler integration
+   */
+  async initializeAsync() {
+    if (this.isInitialized) {
+      return;
+    }
+
+    // Load data from DataHandler/localStorage
+    this.userProfile = await this.loadUserProfile();
+    this.engagementMetrics = await this.loadEngagementMetrics();
+    this.behaviorPatterns = await this.loadBehaviorPatterns();
+    this.settingsUsage = await this.loadSettingsUsage();
+
+    // Complete initialization
+    await this.init();
+  }
+
+  /**
+   * Sync fallback methods for backward compatibility
+   */
+  loadUserProfileSync() {
+    try {
+      const stored = localStorage.getItem(TRACKING_CONSTANTS.STORAGE_KEYS.USER_PROFILE);
+      return stored ? JSON.parse(stored) : {};
+    } catch (error) {
+      logger.error("Failed to load user profile sync:", error);
+      return {};
+    }
+  }
+
+  loadEngagementMetricsSync() {
+    try {
+      const stored = localStorage.getItem(TRACKING_CONSTANTS.STORAGE_KEYS.ENGAGEMENT_METRICS);
+      return stored ? JSON.parse(stored) : {};
+    } catch (error) {
+      logger.error("Failed to load engagement metrics sync:", error);
+      return {};
+    }
+  }
+
+  loadBehaviorPatternsSync() {
+    try {
+      const stored = localStorage.getItem(TRACKING_CONSTANTS.STORAGE_KEYS.BEHAVIOR_PATTERNS);
+      return stored ? JSON.parse(stored) : {};
+    } catch (error) {
+      logger.error("Failed to load behavior patterns sync:", error);
+      return {};
+    }
+  }
+
+  loadSettingsUsageSync() {
+    try {
+      const stored = localStorage.getItem(TRACKING_CONSTANTS.STORAGE_KEYS.SETTINGS_USAGE);
+      return stored ? JSON.parse(stored) : {};
+    } catch (error) {
+      logger.error("Failed to load settings usage sync:", error);
+      return {};
+    }
+  }
   }
 
   /**
@@ -166,7 +241,7 @@ export class UserEngagementTracker {
       featureDiscoveryProgress: {},
     };
 
-    this.saveUserProfile();
+    this.saveUserProfileSync();
     this.trackUserEvent("new_user_initialized", {
       userId: this.userProfile.userId,
       timestamp: this.userProfile.firstVisit,
@@ -671,7 +746,7 @@ export class UserEngagementTracker {
     }
 
     this.engagementMetrics.lastUpdate = Date.now();
-    this.saveEngagementMetrics();
+    this.saveEngagementMetricsSync();
   }
 
   /**
@@ -697,7 +772,7 @@ export class UserEngagementTracker {
       );
     }
 
-    this.saveSettingsUsage();
+    this.saveSettingsUsageSync();
   }
 
   /**
@@ -935,15 +1010,28 @@ export class UserEngagementTracker {
    * Flush metadata to storage
    */
   flushMetadata() {
-    this.saveUserProfile();
-    this.saveEngagementMetrics();
-    this.saveBehaviorPatterns();
-    this.saveSettingsUsage();
+    this.saveUserProfileSync();
+    this.saveEngagementMetricsSync();
+    this.saveBehaviorPatternsSync();
+    this.saveSettingsUsageSync();
   }
 
   // Storage methods
 
-  loadUserProfile() {
+  async loadUserProfile() {
+    // Try DataHandler first
+    if (this.dataHandler) {
+      try {
+        const profile = await this.dataHandler.loadSettings('userEngagementTracker_userProfile');
+        if (profile && Object.keys(profile).length > 0) {
+          return profile;
+        }
+      } catch (error) {
+        console.warn('[UserEngagementTracker] DataHandler failed, using localStorage fallback for userProfile:', error);
+      }
+    }
+
+    // Fallback to localStorage
     try {
       const stored = localStorage.getItem(
         TRACKING_CONSTANTS.STORAGE_KEYS.USER_PROFILE,
@@ -955,7 +1043,18 @@ export class UserEngagementTracker {
     }
   }
 
-  saveUserProfile() {
+  async saveUserProfile() {
+    // Try DataHandler first
+    if (this.dataHandler) {
+      try {
+        await this.dataHandler.saveSettings('userEngagementTracker_userProfile', this.userProfile);
+        return;
+      } catch (error) {
+        console.warn('[UserEngagementTracker] DataHandler failed, using localStorage fallback for userProfile:', error);
+      }
+    }
+
+    // Fallback to localStorage
     try {
       localStorage.setItem(
         TRACKING_CONSTANTS.STORAGE_KEYS.USER_PROFILE,
@@ -966,7 +1065,20 @@ export class UserEngagementTracker {
     }
   }
 
-  loadEngagementMetrics() {
+  async loadEngagementMetrics() {
+    // Try DataHandler first
+    if (this.dataHandler) {
+      try {
+        const metrics = await this.dataHandler.loadSettings('userEngagementTracker_engagementMetrics');
+        if (metrics && Object.keys(metrics).length > 0) {
+          return metrics;
+        }
+      } catch (error) {
+        console.warn('[UserEngagementTracker] DataHandler failed, using localStorage fallback for engagementMetrics:', error);
+      }
+    }
+
+    // Fallback to localStorage
     try {
       const stored = localStorage.getItem(
         TRACKING_CONSTANTS.STORAGE_KEYS.ENGAGEMENT_METRICS,
@@ -978,7 +1090,18 @@ export class UserEngagementTracker {
     }
   }
 
-  saveEngagementMetrics() {
+  async saveEngagementMetrics() {
+    // Try DataHandler first
+    if (this.dataHandler) {
+      try {
+        await this.dataHandler.saveSettings('userEngagementTracker_engagementMetrics', this.engagementMetrics);
+        return;
+      } catch (error) {
+        console.warn('[UserEngagementTracker] DataHandler failed, using localStorage fallback for engagementMetrics:', error);
+      }
+    }
+
+    // Fallback to localStorage
     try {
       localStorage.setItem(
         TRACKING_CONSTANTS.STORAGE_KEYS.ENGAGEMENT_METRICS,
@@ -989,7 +1112,20 @@ export class UserEngagementTracker {
     }
   }
 
-  loadBehaviorPatterns() {
+  async loadBehaviorPatterns() {
+    // Try DataHandler first
+    if (this.dataHandler) {
+      try {
+        const patterns = await this.dataHandler.loadSettings('userEngagementTracker_behaviorPatterns');
+        if (patterns && Object.keys(patterns).length > 0) {
+          return patterns;
+        }
+      } catch (error) {
+        console.warn('[UserEngagementTracker] DataHandler failed, using localStorage fallback for behaviorPatterns:', error);
+      }
+    }
+
+    // Fallback to localStorage
     try {
       const stored = localStorage.getItem(
         TRACKING_CONSTANTS.STORAGE_KEYS.BEHAVIOR_PATTERNS,
@@ -1001,7 +1137,18 @@ export class UserEngagementTracker {
     }
   }
 
-  saveBehaviorPatterns() {
+  async saveBehaviorPatterns() {
+    // Try DataHandler first
+    if (this.dataHandler) {
+      try {
+        await this.dataHandler.saveSettings('userEngagementTracker_behaviorPatterns', this.behaviorPatterns);
+        return;
+      } catch (error) {
+        console.warn('[UserEngagementTracker] DataHandler failed, using localStorage fallback for behaviorPatterns:', error);
+      }
+    }
+
+    // Fallback to localStorage
     try {
       localStorage.setItem(
         TRACKING_CONSTANTS.STORAGE_KEYS.BEHAVIOR_PATTERNS,
@@ -1012,7 +1159,20 @@ export class UserEngagementTracker {
     }
   }
 
-  loadSettingsUsage() {
+  async loadSettingsUsage() {
+    // Try DataHandler first
+    if (this.dataHandler) {
+      try {
+        const usage = await this.dataHandler.loadSettings('userEngagementTracker_settingsUsage');
+        if (usage && Object.keys(usage).length > 0) {
+          return usage;
+        }
+      } catch (error) {
+        console.warn('[UserEngagementTracker] DataHandler failed, using localStorage fallback for settingsUsage:', error);
+      }
+    }
+
+    // Fallback to localStorage
     try {
       const stored = localStorage.getItem(
         TRACKING_CONSTANTS.STORAGE_KEYS.SETTINGS_USAGE,
@@ -1024,7 +1184,18 @@ export class UserEngagementTracker {
     }
   }
 
-  saveSettingsUsage() {
+  async saveSettingsUsage() {
+    // Try DataHandler first
+    if (this.dataHandler) {
+      try {
+        await this.dataHandler.saveSettings('userEngagementTracker_settingsUsage', this.settingsUsage);
+        return;
+      } catch (error) {
+        console.warn('[UserEngagementTracker] DataHandler failed, using localStorage fallback for settingsUsage:', error);
+      }
+    }
+
+    // Fallback to localStorage
     try {
       localStorage.setItem(
         TRACKING_CONSTANTS.STORAGE_KEYS.SETTINGS_USAGE,
@@ -1033,6 +1204,33 @@ export class UserEngagementTracker {
     } catch (error) {
       logger.error("Failed to save settings usage:", error);
     }
+  }
+
+  /**
+   * Sync wrapper methods for backward compatibility
+   */
+  saveUserProfileSync() {
+    this.saveUserProfile().catch(error => {
+      console.error('[UserEngagementTracker] Failed to save user profile:', error);
+    });
+  }
+
+  saveEngagementMetricsSync() {
+    this.saveEngagementMetrics().catch(error => {
+      console.error('[UserEngagementTracker] Failed to save engagement metrics:', error);
+    });
+  }
+
+  saveBehaviorPatternsSync() {
+    this.saveBehaviorPatterns().catch(error => {
+      console.error('[UserEngagementTracker] Failed to save behavior patterns:', error);
+    });
+  }
+
+  saveSettingsUsageSync() {
+    this.saveSettingsUsage().catch(error => {
+      console.error('[UserEngagementTracker] Failed to save settings usage:', error);
+    });
   }
 
   /**

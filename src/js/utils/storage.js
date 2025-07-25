@@ -306,6 +306,23 @@ class StorageManager {
   static quotaWarningThreshold = QUOTA_WARNING_THRESHOLD; // 80% of quota
   static isInitializing = false; // Track initialization state to prevent loops
 
+  // Enhanced DataHandler Integration for Phase 2.4
+  static dataHandler = null;
+
+  /**
+   * Enhanced constructor for DataHandler integration
+   * @param {Object} app - Enhanced app instance with DataHandler
+   */
+  static initialize(app = null) {
+    this.dataHandler = app?.dataHandler || null;
+    if (this.dataHandler) {
+      console.log("[StorageManager] DataHandler integration enabled");
+    } else {
+      console.log("[StorageManager] Using standalone mode");
+    }
+    return this.init();
+  }
+
   /**
    * Get the full storage key with prefix
    */
@@ -662,8 +679,50 @@ class StorageManager {
     };
   } /**
    * Enhanced storage set method with compression and encryption
+   * Integrates with DataHandler for Firebase sync when available
    */
   static async set(key, value, options = {}) {
+    try {
+      // DataHandler integration - save to DataHandler first if available
+      if (this.dataHandler) {
+        try {
+          const success = await this.dataHandler.saveData(
+            `storage_${key}`,
+            value,
+            {
+              ...options,
+              source: "StorageManager",
+            },
+          );
+          if (success) {
+            console.log(
+              `[StorageManager] Data saved to DataHandler for key: ${key}`,
+            );
+            // Also save to local storage for immediate access and fallback
+            await this.setLocal(key, value, options);
+            return;
+          }
+        } catch (dataHandlerError) {
+          console.warn(
+            `[StorageManager] DataHandler failed for key '${key}', using local storage:`,
+            dataHandlerError,
+          );
+        }
+      }
+
+      // Fallback to local storage
+      await this.setLocal(key, value, options);
+    } catch (error) {
+      logger.error("Error in enhanced set method:", error);
+      this.handleError(error, "set", { key, value });
+      throw error;
+    }
+  }
+
+  /**
+   * Original local storage set method (renamed for internal use)
+   */
+  static async setLocal(key, value, options = {}) {
     try {
       const fullKey = this.STORAGE_PREFIX + key;
       let processedValue = value;
@@ -759,16 +818,49 @@ class StorageManager {
         metadata,
       });
     } catch (error) {
-      logger.error("Error saving to storage:", error);
-      this.handleError(error, "set", { key, value });
+      logger.error("Error saving to local storage:", error);
+      this.handleError(error, "setLocal", { key, value });
       throw error;
     }
   }
 
   /**
    * Enhanced storage get method with decompression and decryption
+   * Integrates with DataHandler for Firebase sync when available
    */
   static async get(key, defaultValue = null) {
+    try {
+      // DataHandler integration - try DataHandler first if available
+      if (this.dataHandler) {
+        try {
+          const data = await this.dataHandler.getData(`storage_${key}`);
+          if (data !== null && data !== undefined) {
+            console.log(
+              `[StorageManager] Data retrieved from DataHandler for key: ${key}`,
+            );
+            return data;
+          }
+        } catch (dataHandlerError) {
+          console.warn(
+            `[StorageManager] DataHandler failed for key '${key}', using local storage:`,
+            dataHandlerError,
+          );
+        }
+      }
+
+      // Fallback to local storage
+      return await this.getLocal(key, defaultValue);
+    } catch (error) {
+      logger.error("Error in enhanced get method:", error);
+      this.handleError(error, "get", { key });
+      return defaultValue;
+    }
+  }
+
+  /**
+   * Original local storage get method (renamed for internal use)
+   */
+  static async getLocal(key, defaultValue = null) {
     try {
       const fullKey = this.STORAGE_PREFIX + key;
 
@@ -862,16 +954,47 @@ class StorageManager {
 
       return finalValue;
     } catch (error) {
-      logger.error("Error reading from storage:", error);
-      this.handleError(error, "get", { key });
+      logger.error("Error reading from local storage:", error);
+      this.handleError(error, "getLocal", { key });
       return defaultValue;
     }
   }
 
   /**
    * Enhanced remove method with cleanup
+   * Integrates with DataHandler for Firebase sync when available
    */
-  static remove(key) {
+  static async remove(key) {
+    try {
+      // DataHandler integration - remove from DataHandler first if available
+      if (this.dataHandler) {
+        try {
+          const success = await this.dataHandler.removeData(`storage_${key}`);
+          if (success) {
+            console.log(
+              `[StorageManager] Data removed from DataHandler for key: ${key}`,
+            );
+          }
+        } catch (dataHandlerError) {
+          console.warn(
+            `[StorageManager] DataHandler removal failed for key '${key}':`,
+            dataHandlerError,
+          );
+        }
+      }
+
+      // Always remove from local storage as well
+      this.removeLocal(key);
+    } catch (error) {
+      logger.error("Error in enhanced remove method:", error);
+      this.handleError(error, "remove", { key });
+    }
+  }
+
+  /**
+   * Original local storage remove method (renamed for internal use)
+   */
+  static removeLocal(key) {
     try {
       const fullKey = this.STORAGE_PREFIX + key;
 
@@ -897,12 +1020,43 @@ class StorageManager {
         }
       }
     } catch (error) {
-      logger.error("Error removing from storage:", error);
-      this.handleError(error, "remove", { key });
+      logger.error("Error removing from local storage:", error);
+      this.handleError(error, "removeLocal", { key });
     }
   }
 
-  static clear() {
+  /**
+   * Enhanced clear method with DataHandler integration
+   */
+  static async clear() {
+    try {
+      // Clear from DataHandler if available
+      if (this.dataHandler) {
+        try {
+          // Get all storage keys that start with 'storage_' prefix
+          // Note: DataHandler doesn't have a clear method, so we'll need to implement this differently
+          console.log(
+            `[StorageManager] DataHandler clear not implemented - only clearing local storage`,
+          );
+        } catch (dataHandlerError) {
+          console.warn(
+            `[StorageManager] DataHandler clear failed:`,
+            dataHandlerError,
+          );
+        }
+      }
+
+      // Clear local storage
+      this.clearLocal();
+    } catch (error) {
+      logger.error("Error in enhanced clear method:", error);
+    }
+  }
+
+  /**
+   * Original local storage clear method (renamed for internal use)
+   */
+  static clearLocal() {
     try {
       if (this.storage instanceof Map) {
         this.storage.clear();
@@ -2522,6 +2676,126 @@ class StorageManager {
           logger.error("Event listener error:", error);
         }
       });
+    }
+  }
+
+  /**
+   * Sync wrapper methods for backward compatibility
+   * These methods provide synchronous interfaces for components that need immediate responses
+   */
+
+  /**
+   * Synchronous get wrapper - uses localStorage as fallback for immediate access
+   * @param {string} key - Storage key
+   * @param {*} defaultValue - Default value if key not found
+   * @returns {*} Stored value or default
+   */
+  static getSync(key, defaultValue = null) {
+    try {
+      const fullKey = this.STORAGE_PREFIX + key;
+      let item;
+
+      if (this.storage instanceof Map) {
+        item = this.storage.get(fullKey);
+      } else {
+        item = this.storage?.getItem(fullKey);
+      }
+
+      if (!item) return defaultValue;
+
+      try {
+        const parsedData = JSON.parse(item);
+        // Handle legacy data format
+        if (!parsedData.metadata) {
+          return parsedData.value || parsedData;
+        }
+        return parsedData.value;
+      } catch (parseError) {
+        return defaultValue;
+      }
+    } catch (error) {
+      logger.warn(`Sync get failed for key '${key}':`, error);
+      return defaultValue;
+    }
+  }
+
+  /**
+   * Synchronous set wrapper - saves to localStorage immediately, queues DataHandler save
+   * @param {string} key - Storage key
+   * @param {*} value - Value to store
+   * @param {Object} options - Storage options
+   */
+  static setSync(key, value, options = {}) {
+    try {
+      // Save to localStorage immediately for sync access
+      const fullKey = this.STORAGE_PREFIX + key;
+      const metadata = {
+        timestamp: Date.now(),
+        version: this.VERSION,
+        type: typeof value,
+        compressed: false,
+        encrypted: false,
+      };
+
+      const finalData = { value, metadata };
+      const dataString = JSON.stringify(finalData);
+
+      if (this.storage instanceof Map) {
+        this.storage.set(fullKey, dataString);
+      } else {
+        this.storage?.setItem(fullKey, dataString);
+      }
+
+      // Asynchronously save to DataHandler if available
+      if (this.dataHandler) {
+        this.dataHandler
+          .saveData(`storage_${key}`, value, {
+            ...options,
+            source: "StorageManager_sync",
+          })
+          .catch((error) => {
+            console.warn(
+              `[StorageManager] Async DataHandler save failed for key '${key}':`,
+              error,
+            );
+          });
+      }
+
+      return true;
+    } catch (error) {
+      logger.warn(`Sync set failed for key '${key}':`, error);
+      return false;
+    }
+  }
+
+  /**
+   * Synchronous remove wrapper
+   * @param {string} key - Storage key to remove
+   */
+  static removeSync(key) {
+    try {
+      const fullKey = this.STORAGE_PREFIX + key;
+
+      if (this.storage instanceof Map) {
+        this.storage.delete(fullKey);
+      } else {
+        this.storage?.removeItem(fullKey);
+      }
+
+      // Asynchronously remove from DataHandler if available
+      if (this.dataHandler) {
+        this.dataHandler.removeData(`storage_${key}`).catch((error) => {
+          console.warn(
+            `[StorageManager] Async DataHandler remove failed for key '${key}':`,
+            error,
+          );
+        });
+      }
+
+      return true;
+    } catch (error) {
+      logger.warn(`Sync remove failed for key '${key}':`, error);
+      return false;
     }
   }
 }

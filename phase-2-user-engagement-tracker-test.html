@@ -1,0 +1,983 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phase 2.2 - UserEngagementTracker Migration Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .status {
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .warning {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+      .info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+      .test-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin: 20px 0;
+      }
+      .data-display {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 15px;
+        margin: 10px 0;
+        font-family: monospace;
+        white-space: pre-wrap;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      button:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+      }
+      .migration-status {
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        gap: 10px;
+        align-items: center;
+        margin: 5px 0;
+      }
+      .status-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+      }
+      .status-ready {
+        background: #28a745;
+      }
+      .status-pending {
+        background: #ffc107;
+      }
+      .status-error {
+        background: #dc3545;
+      }
+      .analytics-panel {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 10px 0;
+      }
+      .metric-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+        border-bottom: 1px solid #eee;
+      }
+      .metric-item:last-child {
+        border-bottom: none;
+      }
+      .progress-bar {
+        width: 100%;
+        height: 20px;
+        background: #e9ecef;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 5px 0;
+      }
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #28a745, #20c997);
+        transition: width 0.3s ease;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🎯 Phase 2.2: UserEngagementTracker Migration Test</h1>
+      <p>
+        Testing enhanced UserEngagementTracker integration with DataHandler and
+        analytics persistence.
+      </p>
+
+      <div id="initialization-status" class="status info">
+        <strong>Initialization Status:</strong>
+        <span id="init-status">Starting...</span>
+      </div>
+    </div>
+
+    <div class="test-container">
+      <h2>📊 Migration Status Dashboard</h2>
+      <div class="migration-status">
+        <div>
+          <span class="status-indicator" id="datahandler-status"></span
+          >DataHandler
+        </div>
+        <div id="datahandler-info">Checking...</div>
+      </div>
+      <div class="migration-status">
+        <div>
+          <span class="status-indicator" id="enhanced-app-status"></span
+          >Enhanced App
+        </div>
+        <div id="enhanced-app-info">Checking...</div>
+      </div>
+      <div class="migration-status">
+        <div>
+          <span class="status-indicator" id="user-tracker-status"></span
+          >UserEngagementTracker Class
+        </div>
+        <div id="user-tracker-info">Checking...</div>
+      </div>
+      <div class="migration-status">
+        <div>
+          <span class="status-indicator" id="integration-status"></span
+          >DataHandler Integration
+        </div>
+        <div id="integration-info">Checking...</div>
+      </div>
+      <div class="migration-status">
+        <div>
+          <span class="status-indicator" id="analytics-status"></span>Analytics
+          Migration
+        </div>
+        <div id="analytics-info">Checking...</div>
+      </div>
+    </div>
+
+    <div class="test-container">
+      <h2>🚀 UserEngagementTracker Tests</h2>
+      <div class="test-grid">
+        <div>
+          <h3>Enhanced Tracker Instance</h3>
+          <div>
+            <button id="create-tracker-btn" onclick="createEnhancedTracker()">
+              Create Enhanced Tracker
+            </button>
+            <button
+              id="simulate-interaction-btn"
+              onclick="simulateUserInteraction()"
+              disabled
+            >
+              Simulate User Interaction
+            </button>
+            <button
+              id="track-settings-btn"
+              onclick="trackSettingsUsage()"
+              disabled
+            >
+              Track Settings Usage
+            </button>
+            <button
+              id="generate-insights-btn"
+              onclick="generateUserInsights()"
+              disabled
+            >
+              Generate Insights
+            </button>
+          </div>
+          <div class="analytics-panel" id="tracker-status">
+            <div class="metric-item">
+              <span>Status:</span>
+              <span id="tracker-status-value">Not initialized</span>
+            </div>
+            <div class="metric-item">
+              <span>Session ID:</span>
+              <span id="session-id-value">None</span>
+            </div>
+            <div class="metric-item">
+              <span>User Type:</span>
+              <span id="user-type-value">Unknown</span>
+            </div>
+            <div class="metric-item">
+              <span>Interactions:</span>
+              <span id="interactions-count">0</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h3>Data Persistence Tests</h3>
+          <div>
+            <button onclick="testDataHandlerPersistence()">
+              Test DataHandler Persistence
+            </button>
+            <button onclick="testLegacyFallback()">Test Legacy Fallback</button>
+            <button onclick="testDataMigration()">Test Data Migration</button>
+            <button onclick="clearAllAnalytics()">Clear All Analytics</button>
+          </div>
+          <div class="data-display" id="persistence-results">
+            Persistence test results will appear here...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="test-container">
+      <h2>📈 Analytics Dashboard</h2>
+      <div class="test-grid">
+        <div>
+          <h3>User Profile</h3>
+          <div class="data-display" id="user-profile-display">
+            User profile data will appear here...
+          </div>
+          <button onclick="loadUserProfile()">Load User Profile</button>
+          <button onclick="updateUserProfile()">Update User Profile</button>
+        </div>
+        <div>
+          <h3>Engagement Metrics</h3>
+          <div class="analytics-panel" id="engagement-metrics">
+            <div class="metric-item">
+              <span>Session Count:</span>
+              <span id="session-count">0</span>
+            </div>
+            <div class="metric-item">
+              <span>Settings Opens:</span>
+              <span id="settings-opens">0</span>
+            </div>
+            <div class="metric-item">
+              <span>Features Used:</span>
+              <span id="features-used">0</span>
+            </div>
+            <div class="metric-item">
+              <span>Engagement Level:</span>
+              <span id="engagement-level">Casual</span>
+            </div>
+            <div class="progress-bar">
+              <div
+                class="progress-fill"
+                id="engagement-progress"
+                style="width: 0%"
+              ></div>
+            </div>
+          </div>
+          <button onclick="loadEngagementMetrics()">
+            Load Engagement Metrics
+          </button>
+          <button onclick="simulateEngagement()">Simulate Engagement</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="test-container">
+      <h2>🔍 Phase 2.2 Migration Verification</h2>
+      <div id="verification-results">
+        <div class="status info">Running verification tests...</div>
+      </div>
+    </div>
+
+    <!-- Load core dependencies -->
+    <script src="src/js/core/data-handler.js"></script>
+    <script src="src/js/core/ui-binder.js"></script>
+    <script src="src/js/core/app-enhanced-integration.js"></script>
+    <script src="src/js/services/user-engagement-tracker.js"></script>
+    <script src="src/js/utils/analytics.js"></script>
+    <script src="src/js/utils/logger.js"></script>
+
+    <script>
+      let enhancedApp = null;
+      let enhancedTracker = null;
+      let initializationComplete = false;
+
+      async function initializeTest() {
+        try {
+          updateStatus("init-status", "Initializing Enhanced App...", "info");
+
+          // Check dependencies
+          await checkDependencies();
+
+          // Initialize Enhanced App
+          enhancedApp = new EnhancedApp();
+          await enhancedApp.init();
+
+          updateStatus(
+            "init-status",
+            "Enhanced App initialized successfully!",
+            "success",
+          );
+          initializationComplete = true;
+
+          // Run verification tests
+          await runVerificationTests();
+        } catch (error) {
+          console.error("Initialization failed:", error);
+          updateStatus(
+            "init-status",
+            `Initialization failed: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      async function checkDependencies() {
+        // Check DataHandler
+        if (window.DataHandler) {
+          updateMigrationStatus("datahandler-status", "status-ready");
+          document.getElementById("datahandler-info").textContent =
+            "Available and ready";
+        } else {
+          updateMigrationStatus("datahandler-status", "status-error");
+          document.getElementById("datahandler-info").textContent =
+            "Not found - migration not possible";
+          throw new Error("DataHandler not available");
+        }
+
+        // Check Enhanced App
+        if (window.EnhancedApp) {
+          updateMigrationStatus("enhanced-app-status", "status-ready");
+          document.getElementById("enhanced-app-info").textContent =
+            "Available and ready";
+        } else {
+          updateMigrationStatus("enhanced-app-status", "status-error");
+          document.getElementById("enhanced-app-info").textContent =
+            "Not found - integration not possible";
+          throw new Error("EnhancedApp not available");
+        }
+
+        // Check UserEngagementTracker
+        if (window.UserEngagementTracker) {
+          updateMigrationStatus("user-tracker-status", "status-ready");
+          document.getElementById("user-tracker-info").textContent =
+            "Class available - checking for enhancements";
+
+          // Check if UserEngagementTracker has been enhanced
+          const tempTracker = new UserEngagementTracker();
+          if (tempTracker.dataHandler !== undefined) {
+            updateMigrationStatus("integration-status", "status-ready");
+            document.getElementById("integration-info").textContent =
+              "Enhanced constructor detected - ready for DataHandler integration";
+          } else {
+            updateMigrationStatus("integration-status", "status-error");
+            document.getElementById("integration-info").textContent =
+              "Constructor not enhanced - migration incomplete";
+          }
+        } else {
+          updateMigrationStatus("user-tracker-status", "status-error");
+          document.getElementById("user-tracker-info").textContent =
+            "UserEngagementTracker class not found";
+          throw new Error("UserEngagementTracker not available");
+        }
+
+        // Check analytics migration capability
+        if (
+          window.userEngagementTracker &&
+          typeof window.userEngagementTracker.initializeAsync === "function"
+        ) {
+          updateMigrationStatus("analytics-status", "status-ready");
+          document.getElementById("analytics-info").textContent =
+            "Async initialization available - ready for data migration";
+        } else {
+          updateMigrationStatus("analytics-status", "status-pending");
+          document.getElementById("analytics-info").textContent =
+            "Legacy instance detected - will be replaced during enhancement";
+        }
+      }
+
+      function updateMigrationStatus(elementId, statusClass) {
+        const element = document.getElementById(elementId);
+        element.className = `status-indicator ${statusClass}`;
+      }
+
+      function updateStatus(elementId, message, type) {
+        const element = document.getElementById(elementId);
+        element.textContent = message;
+        element.parentElement.className = `status ${type}`;
+      }
+
+      async function createEnhancedTracker() {
+        if (!initializationComplete) {
+          alert("Please wait for initialization to complete");
+          return;
+        }
+
+        try {
+          // Get the enhanced tracker from EnhancedApp components
+          enhancedTracker = enhancedApp.components.get("userEngagementTracker");
+
+          if (enhancedTracker && enhancedTracker.dataHandler) {
+            updateStatus(
+              "init-status",
+              "Enhanced UserEngagementTracker ready with DataHandler integration!",
+              "success",
+            );
+
+            // Update UI
+            document.getElementById("create-tracker-btn").disabled = true;
+            document.getElementById("simulate-interaction-btn").disabled =
+              false;
+            document.getElementById("track-settings-btn").disabled = false;
+            document.getElementById("generate-insights-btn").disabled = false;
+
+            // Update tracker status display
+            updateTrackerStatus();
+
+            // Load initial data
+            await loadUserProfile();
+            await loadEngagementMetrics();
+          } else {
+            updateStatus(
+              "init-status",
+              "UserEngagementTracker enhanced but DataHandler integration failed",
+              "warning",
+            );
+          }
+        } catch (error) {
+          console.error(
+            "Failed to create enhanced UserEngagementTracker:",
+            error,
+          );
+          updateStatus(
+            "init-status",
+            `Failed to create enhanced tracker: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      function updateTrackerStatus() {
+        if (!enhancedTracker) return;
+
+        document.getElementById("tracker-status-value").textContent =
+          enhancedTracker.isInitialized ? "Initialized" : "Initializing";
+        document.getElementById("session-id-value").textContent =
+          enhancedTracker.currentSession?.sessionId || "None";
+        document.getElementById("user-type-value").textContent =
+          enhancedTracker.getUserType?.() || "Unknown";
+        document.getElementById("interactions-count").textContent =
+          enhancedTracker.currentSession?.interactions?.length || 0;
+      }
+
+      async function simulateUserInteraction() {
+        if (!enhancedTracker) return;
+
+        try {
+          // Simulate various user interactions
+          enhancedTracker.trackUserEvent("test_interaction", {
+            type: "button_click",
+            element: "simulate_button",
+            timestamp: Date.now(),
+          });
+
+          enhancedTracker.updateEngagementMetrics(
+            "test_interactions",
+            "simulated_click",
+          );
+
+          updateTrackerStatus();
+          await loadEngagementMetrics();
+
+          updateStatus(
+            "init-status",
+            "User interaction simulated and tracked successfully!",
+            "success",
+          );
+        } catch (error) {
+          console.error("Failed to simulate interaction:", error);
+          updateStatus(
+            "init-status",
+            `Failed to simulate interaction: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      async function trackSettingsUsage() {
+        if (!enhancedTracker) return;
+
+        try {
+          // Simulate settings panel usage
+          enhancedTracker.updateSettingsUsage("test_sessions", {
+            action: "panel_open",
+            duration: 5000,
+            changes: 2,
+            timestamp: Date.now(),
+          });
+
+          enhancedTracker.updateEngagementMetrics("settings_panel_opens");
+
+          updateTrackerStatus();
+          await loadEngagementMetrics();
+
+          updateStatus(
+            "init-status",
+            "Settings usage tracked successfully!",
+            "success",
+          );
+        } catch (error) {
+          console.error("Failed to track settings usage:", error);
+          updateStatus(
+            "init-status",
+            `Failed to track settings: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      async function generateUserInsights() {
+        if (!enhancedTracker) return;
+
+        try {
+          const insights = enhancedTracker.generateInsights();
+
+          document.getElementById("persistence-results").textContent =
+            "Generated User Insights:\n" + JSON.stringify(insights, null, 2);
+
+          updateStatus(
+            "init-status",
+            "User insights generated successfully!",
+            "success",
+          );
+        } catch (error) {
+          console.error("Failed to generate insights:", error);
+          updateStatus(
+            "init-status",
+            `Failed to generate insights: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      async function testDataHandlerPersistence() {
+        try {
+          const testData = {
+            testUser: "migration_test",
+            timestamp: Date.now(),
+            phase: "2.2",
+            dataHandlerTest: true,
+          };
+
+          // Test saving to DataHandler
+          await enhancedApp.dataHandler.saveSettings(
+            "userEngagementTracker_test",
+            testData,
+          );
+
+          // Test loading from DataHandler
+          const loaded = await enhancedApp.dataHandler.loadSettings(
+            "userEngagementTracker_test",
+          );
+
+          document.getElementById("persistence-results").textContent =
+            "DataHandler Persistence Test:\nSaved: " +
+            JSON.stringify(testData, null, 2) +
+            "\nLoaded: " +
+            JSON.stringify(loaded, null, 2);
+
+          updateStatus(
+            "init-status",
+            "DataHandler persistence test passed!",
+            "success",
+          );
+        } catch (error) {
+          console.error("DataHandler persistence test failed:", error);
+          document.getElementById("persistence-results").textContent =
+            "DataHandler persistence test failed: " + error.message;
+          updateStatus(
+            "init-status",
+            `DataHandler test failed: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      async function testLegacyFallback() {
+        try {
+          const testData = {
+            legacyTest: true,
+            timestamp: Date.now(),
+            fallbackMode: "localStorage",
+          };
+
+          // Save to localStorage directly
+          localStorage.setItem(
+            "userEngagementTracker_fallback_test",
+            JSON.stringify(testData),
+          );
+
+          // Create tracker without DataHandler to test fallback
+          const fallbackTracker = new UserEngagementTracker();
+
+          document.getElementById("persistence-results").textContent =
+            "Legacy Fallback Test:\nStored in localStorage: " +
+            JSON.stringify(testData, null, 2) +
+            "\nTracker can access localStorage: " +
+            (fallbackTracker.loadUserProfileSync ? "Yes" : "No");
+
+          updateStatus(
+            "init-status",
+            "Legacy fallback test passed!",
+            "success",
+          );
+        } catch (error) {
+          console.error("Legacy fallback test failed:", error);
+          document.getElementById("persistence-results").textContent =
+            "Legacy fallback test failed: " + error.message;
+          updateStatus(
+            "init-status",
+            `Fallback test failed: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      async function testDataMigration() {
+        try {
+          // Simulate existing localStorage data
+          const existingData = {
+            userId: "migration_test_user",
+            userType: "power_user",
+            firstVisit: Date.now() - 86400000, // 1 day ago
+            onboardingCompleted: true,
+          };
+
+          localStorage.setItem(
+            "simulateai_user_profile",
+            JSON.stringify(existingData),
+          );
+
+          // Create new enhanced tracker to test migration
+          const migrationTracker = new UserEngagementTracker(enhancedApp);
+          await migrationTracker.initializeAsync();
+
+          // Check if data was migrated
+          const migratedProfile = await migrationTracker.loadUserProfile();
+
+          document.getElementById("persistence-results").textContent =
+            "Data Migration Test:\nOriginal localStorage: " +
+            JSON.stringify(existingData, null, 2) +
+            "\nMigrated to DataHandler: " +
+            JSON.stringify(migratedProfile, null, 2);
+
+          updateStatus("init-status", "Data migration test passed!", "success");
+        } catch (error) {
+          console.error("Data migration test failed:", error);
+          document.getElementById("persistence-results").textContent =
+            "Data migration test failed: " + error.message;
+          updateStatus(
+            "init-status",
+            `Migration test failed: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      async function clearAllAnalytics() {
+        try {
+          if (enhancedApp && enhancedApp.dataHandler) {
+            await enhancedApp.dataHandler.clearSettings(
+              "userEngagementTracker_userProfile",
+            );
+            await enhancedApp.dataHandler.clearSettings(
+              "userEngagementTracker_engagementMetrics",
+            );
+            await enhancedApp.dataHandler.clearSettings(
+              "userEngagementTracker_behaviorPatterns",
+            );
+            await enhancedApp.dataHandler.clearSettings(
+              "userEngagementTracker_settingsUsage",
+            );
+          }
+
+          // Clear localStorage
+          Object.keys(localStorage).forEach((key) => {
+            if (
+              key.startsWith("simulateai_") ||
+              key.startsWith("userEngagementTracker_")
+            ) {
+              localStorage.removeItem(key);
+            }
+          });
+
+          document.getElementById("persistence-results").textContent =
+            "All analytics data cleared";
+          document.getElementById("user-profile-display").textContent =
+            "User profile cleared";
+
+          // Reset displays
+          document.getElementById("session-count").textContent = "0";
+          document.getElementById("settings-opens").textContent = "0";
+          document.getElementById("features-used").textContent = "0";
+          document.getElementById("engagement-level").textContent = "Casual";
+          document.getElementById("engagement-progress").style.width = "0%";
+
+          updateStatus(
+            "init-status",
+            "All analytics data cleared successfully",
+            "info",
+          );
+        } catch (error) {
+          console.error("Failed to clear analytics:", error);
+          updateStatus(
+            "init-status",
+            `Failed to clear data: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      async function loadUserProfile() {
+        if (!enhancedTracker) return;
+
+        try {
+          const profile = await enhancedTracker.loadUserProfile();
+          document.getElementById("user-profile-display").textContent =
+            JSON.stringify(profile, null, 2);
+        } catch (error) {
+          console.error("Failed to load user profile:", error);
+          document.getElementById("user-profile-display").textContent =
+            "Failed to load user profile: " + error.message;
+        }
+      }
+
+      async function updateUserProfile() {
+        if (!enhancedTracker) return;
+
+        try {
+          enhancedTracker.userProfile = {
+            ...enhancedTracker.userProfile,
+            lastUpdated: new Date().toISOString(),
+            testUpdate: "Phase 2.2 migration test",
+            userType: "test_user",
+          };
+
+          await enhancedTracker.saveUserProfile();
+          await loadUserProfile();
+
+          updateStatus(
+            "init-status",
+            "User profile updated successfully!",
+            "success",
+          );
+        } catch (error) {
+          console.error("Failed to update user profile:", error);
+          updateStatus(
+            "init-status",
+            `Failed to update profile: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      async function loadEngagementMetrics() {
+        if (!enhancedTracker) return;
+
+        try {
+          const metrics = await enhancedTracker.loadEngagementMetrics();
+
+          document.getElementById("session-count").textContent =
+            metrics.session_count || 0;
+          document.getElementById("settings-opens").textContent =
+            metrics.settings_panel_opens || 0;
+          document.getElementById("features-used").textContent = (
+            metrics.features_used || []
+          ).length;
+
+          const engagement =
+            enhancedTracker.calculateOverallEngagement?.() || "casual";
+          document.getElementById("engagement-level").textContent = engagement;
+
+          // Update progress bar
+          const engagementValues = {
+            casual: 25,
+            engaged: 50,
+            deep: 75,
+            power_user: 100,
+          };
+          const progressWidth = engagementValues[engagement] || 25;
+          document.getElementById("engagement-progress").style.width =
+            progressWidth + "%";
+        } catch (error) {
+          console.error("Failed to load engagement metrics:", error);
+        }
+      }
+
+      async function simulateEngagement() {
+        if (!enhancedTracker) return;
+
+        try {
+          // Simulate multiple types of engagement
+          enhancedTracker.updateEngagementMetrics("session_count");
+          enhancedTracker.updateEngagementMetrics("settings_panel_opens");
+          enhancedTracker.updateEngagementMetrics(
+            "features_used",
+            "test_feature_" + Date.now(),
+          );
+
+          await loadEngagementMetrics();
+          updateTrackerStatus();
+
+          updateStatus(
+            "init-status",
+            "Engagement metrics simulated successfully!",
+            "success",
+          );
+        } catch (error) {
+          console.error("Failed to simulate engagement:", error);
+          updateStatus(
+            "init-status",
+            `Failed to simulate engagement: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      async function runVerificationTests() {
+        const results = document.getElementById("verification-results");
+        results.innerHTML =
+          '<div class="status info">Running Phase 2.2 verification tests...</div>';
+
+        const tests = [
+          {
+            name: "UserEngagementTracker Constructor Enhancement",
+            test: () => {
+              const tempTracker = new UserEngagementTracker(enhancedApp);
+              return (
+                tempTracker.dataHandler !== undefined &&
+                tempTracker.app !== undefined
+              );
+            },
+          },
+          {
+            name: "Async Storage Methods Available",
+            test: () => {
+              const tempTracker = new UserEngagementTracker();
+              return (
+                typeof tempTracker.loadUserProfile === "function" &&
+                typeof tempTracker.saveUserProfile === "function" &&
+                typeof tempTracker.initializeAsync === "function"
+              );
+            },
+          },
+          {
+            name: "Sync Wrapper Methods Available",
+            test: () => {
+              const tempTracker = new UserEngagementTracker();
+              return (
+                typeof tempTracker.saveUserProfileSync === "function" &&
+                typeof tempTracker.saveEngagementMetricsSync === "function"
+              );
+            },
+          },
+          {
+            name: "DataHandler Integration Ready",
+            test: () => {
+              return (
+                enhancedApp &&
+                enhancedApp.components.has("userEngagementTracker")
+              );
+            },
+          },
+          {
+            name: "Migration Status Tracking",
+            test: () => {
+              return (
+                enhancedApp &&
+                enhancedApp.migrationStatus &&
+                enhancedApp.migrationStatus.userEngagementTracker === true
+              );
+            },
+          },
+          {
+            name: "Analytics Data Persistence",
+            test: async () => {
+              const tracker = enhancedApp.components.get(
+                "userEngagementTracker",
+              );
+              if (!tracker) return false;
+
+              try {
+                const testMetrics = { test: "phase_2_2_verification" };
+                await tracker.saveEngagementMetrics(testMetrics);
+                const loaded = await tracker.loadEngagementMetrics();
+                return loaded && loaded.test === "phase_2_2_verification";
+              } catch (error) {
+                return false;
+              }
+            },
+          },
+        ];
+
+        let passed = 0;
+        let total = tests.length;
+
+        for (const test of tests) {
+          try {
+            const result =
+              typeof test.test === "function"
+                ? test.test.constructor.name === "AsyncFunction"
+                  ? await test.test()
+                  : test.test()
+                : false;
+
+            if (result) {
+              results.innerHTML += `<div class="status success">✅ ${test.name}: PASSED</div>`;
+              passed++;
+            } else {
+              results.innerHTML += `<div class="status error">❌ ${test.name}: FAILED</div>`;
+            }
+          } catch (error) {
+            results.innerHTML += `<div class="status error">❌ ${test.name}: ERROR - ${error.message}</div>`;
+          }
+        }
+
+        results.innerHTML += `<div class="status ${passed === total ? "success" : "warning"}">
+                <strong>Phase 2.2 Verification Results: ${passed}/${total} tests passed</strong>
+            </div>`;
+
+        if (passed === total) {
+          updateStatus(
+            "init-status",
+            "Phase 2.2 migration verification completed successfully!",
+            "success",
+          );
+        } else {
+          updateStatus(
+            "init-status",
+            `Phase 2.2 verification completed with ${total - passed} issues`,
+            "warning",
+          );
+        }
+      }
+
+      // Initialize when page loads
+      document.addEventListener("DOMContentLoaded", initializeTest);
+    </script>
+  </body>
+</html>

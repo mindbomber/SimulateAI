@@ -180,7 +180,7 @@ class EngineTheme {
 }
 
 class SimulationEngine {
-  constructor(containerId, config = {}) {
+  constructor(containerId, config = {}, app = null) {
     try {
       this.container = document.getElementById(containerId);
       if (!this.container) {
@@ -188,6 +188,10 @@ class SimulationEngine {
           containerId,
         });
       }
+
+      // Enhanced App integration for DataHandler access
+      this.app = app;
+      this.dataHandler = app?.getDataHandler?.() || null;
 
       // Get theme configuration
       this.themeConfig = EngineTheme.getEngineConfig();
@@ -246,8 +250,9 @@ class SimulationEngine {
       this.componentPool = new Map();
       this.lastMemoryCleanup = Date.now();
 
-      // Settings and persistence
-      this.settings = this.loadSettings();
+      // Settings and persistence with DataHandler integration
+      this.settings = {};
+      this.initializeSettings();
       this.settingsSaveTimer = null;
 
       // Theme change monitoring
@@ -263,6 +268,108 @@ class SimulationEngine {
         error,
       );
     }
+  }
+
+  /**
+   * Initialize settings with DataHandler integration
+   */
+  async initializeSettings() {
+    try {
+      this.settings = await this.loadSettings();
+    } catch (error) {
+      logger.warn("Engine", "Failed to initialize settings:", error);
+      this.settings = {};
+    }
+  }
+
+  /**
+   * Enhanced settings loading with DataHandler support
+   */
+  async loadSettings() {
+    try {
+      // Try DataHandler first if available
+      if (this.dataHandler) {
+        const engineSettings =
+          await this.dataHandler.getData("engine_settings");
+        if (engineSettings) {
+          console.log("[SimulationEngine] Settings loaded from DataHandler");
+          return engineSettings;
+        }
+      }
+
+      // Fallback to localStorage
+      const saved = localStorage.getItem("simulationEngine_settings");
+      const settings = saved ? JSON.parse(saved) : {};
+
+      console.log("[SimulationEngine] Settings loaded from localStorage");
+      return settings;
+    } catch (error) {
+      logger.warn("Engine", "Failed to load engine settings:", error);
+      return {};
+    }
+  }
+
+  /**
+   * Enhanced settings saving with DataHandler support
+   */
+  async saveSettings() {
+    if (!this.config.autoSave) return;
+
+    try {
+      const settings = {
+        renderMode: this.config.renderMode,
+        performance: this.config.performance,
+        accessibility: this.config.accessibility,
+        debug: this.config.debug,
+        targetFPS: this.config.targetFPS,
+        enableAnimations: this.config.enableAnimations,
+        memoryCleanup: this.config.memoryCleanup,
+        lastSaved: Date.now(),
+        version: "2.0.0",
+      };
+
+      // Save to DataHandler first if available
+      if (this.dataHandler) {
+        const success = await this.dataHandler.saveData(
+          "engine_settings",
+          settings,
+        );
+        if (success) {
+          console.log("[SimulationEngine] Settings saved to DataHandler");
+
+          // Update local settings cache
+          this.settings = settings;
+          return;
+        }
+      }
+
+      // Fallback to localStorage
+      localStorage.setItem(
+        "simulationEngine_settings",
+        JSON.stringify(settings),
+      );
+
+      // Update local settings cache
+      this.settings = settings;
+      console.log("[SimulationEngine] Settings saved to localStorage");
+
+      // Debounced save to prevent excessive writes
+      clearTimeout(this.settingsSaveTimer);
+      this.settingsSaveTimer = setTimeout(() => {
+        // Additional settings persistence could go here
+      }, 1000);
+    } catch (error) {
+      logger.warn("Engine", "Failed to save engine settings:", error);
+    }
+  }
+
+  /**
+   * Synchronous settings save wrapper for event handlers
+   */
+  saveSettingsSync() {
+    this.saveSettings().catch((error) => {
+      logger.warn("Engine", "Async settings save failed:", error);
+    });
   }
 
   init() {
@@ -575,7 +682,7 @@ class SimulationEngine {
       }
 
       // Save updated settings
-      this.saveSettings();
+      this.saveSettingsSync();
     } catch (error) {
       this.handleError(
         new EngineError(
@@ -584,43 +691,6 @@ class SimulationEngine {
           error,
         ),
       );
-    }
-  }
-
-  loadSettings() {
-    try {
-      const saved = localStorage.getItem("simulationEngine_settings");
-      return saved ? JSON.parse(saved) : {};
-    } catch (error) {
-      logger.warn("Engine", "Failed to load engine settings:", error);
-      return {};
-    }
-  }
-
-  saveSettings() {
-    if (!this.config.autoSave) return;
-
-    try {
-      const settings = {
-        renderMode: this.config.renderMode,
-        performance: this.config.performance,
-        accessibility: this.config.accessibility,
-        debug: this.config.debug,
-        lastSaved: Date.now(),
-      };
-
-      localStorage.setItem(
-        "simulationEngine_settings",
-        JSON.stringify(settings),
-      );
-
-      // Debounced save to prevent excessive writes
-      clearTimeout(this.settingsSaveTimer);
-      this.settingsSaveTimer = setTimeout(() => {
-        // Additional settings persistence could go here
-      }, 1000);
-    } catch (error) {
-      logger.warn("Engine", "Failed to save engine settings:", error);
     }
   }
 
@@ -814,7 +884,7 @@ class SimulationEngine {
       }
 
       // Save settings
-      this.saveSettings();
+      this.saveSettingsSync();
     } catch (error) {
       this.handleError(new EngineError("Failed to stop engine", {}, error));
     }
@@ -1186,7 +1256,7 @@ class SimulationEngine {
       this.componentPool.clear();
 
       // Save final settings
-      this.saveSettings();
+      this.saveSettingsSync();
 
       logger.info("SimulationEngine destroyed");
     } catch (error) {
@@ -1221,7 +1291,7 @@ class SimulationEngine {
         this.setupPerformanceMonitoring();
       }
 
-      this.saveSettings();
+      this.saveSettingsSync();
     } catch (error) {
       this.handleError(
         new EngineError("Configuration update failed", { newConfig }, error),
