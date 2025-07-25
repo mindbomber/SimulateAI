@@ -2404,7 +2404,7 @@ class AIEthicsApp {
         enableCaching: true,
         enableOfflineQueue: true,
       });
-      await this.dataHandler.initialize();
+      await this.dataHandler.initialize(this.firebaseService);
       AppDebug.log("DataHandler initialized");
 
       // Initialize UIBinder for unified UI management

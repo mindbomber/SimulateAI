@@ -12,8 +12,26 @@
  */
 
 class UIBinder {
-  constructor(dataHandler = null) {
-    this.dataHandler = dataHandler;
+  constructor(options = {}) {
+    // Handle both old style (dataHandler) and new style (options) constructors
+    if (
+      typeof options === "object" &&
+      (options.enableThemeManager || options.dataHandler)
+    ) {
+      // New options-based constructor
+      this.dataHandler = options.dataHandler || null;
+      this.enableThemeManager = options.enableThemeManager !== false;
+      this.enableAccessibility = options.enableAccessibility !== false;
+      this.enablePerformanceMonitoring =
+        options.enablePerformanceMonitoring !== false;
+    } else {
+      // Legacy constructor (dataHandler parameter)
+      this.dataHandler = options;
+      this.enableThemeManager = true;
+      this.enableAccessibility = true;
+      this.enablePerformanceMonitoring = true;
+    }
+
     this.themeCache = new Map();
     this.componentRegistry = new Map();
     this.eventDelegates = new Map();
@@ -30,6 +48,13 @@ class UIBinder {
   }
 
   /**
+   * Initialize UIBinder (alias for backward compatibility)
+   */
+  async initialize() {
+    return await this.init();
+  }
+
+  /**
    * Initialize UIBinder
    */
   async init() {
@@ -37,16 +62,22 @@ class UIBinder {
 
     try {
       // Load saved theme preferences
-      await this.loadThemePreferences();
+      if (this.enableThemeManager) {
+        await this.loadThemePreferences();
+      }
 
       // Set up global event delegation
       this.setupGlobalEventDelegation();
 
       // Initialize accessibility features
-      this.initializeAccessibilityFeatures();
+      if (this.enableAccessibility) {
+        this.initializeAccessibilityFeatures();
+      }
 
       // Set up performance monitoring
-      this.setupPerformanceMonitoring();
+      if (this.enablePerformanceMonitoring) {
+        this.setupPerformanceMonitoring();
+      }
 
       this.isInitialized = true;
       console.log("[UIBinder] Initialization complete");

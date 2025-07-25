@@ -12,8 +12,29 @@
  */
 
 class DataHandler {
-  constructor(firebaseService = null) {
-    this.firebaseService = firebaseService;
+  constructor(options = {}) {
+    // Handle both old style (firebaseService) and new style (options) constructors
+    if (
+      typeof options === "object" &&
+      (options.appName || options.firebaseService)
+    ) {
+      // New options-based constructor
+      this.appName = options.appName || "SimulateAI";
+      this.version = options.version || "1.40";
+      this.enableFirebase = options.enableFirebase !== false;
+      this.enableCaching = options.enableCaching !== false;
+      this.enableOfflineQueue = options.enableOfflineQueue !== false;
+      this.firebaseService = options.firebaseService || null;
+    } else {
+      // Legacy constructor - assume first parameter is firebaseService
+      this.firebaseService = options;
+      this.appName = "SimulateAI";
+      this.version = "1.40";
+      this.enableFirebase = true;
+      this.enableCaching = true;
+      this.enableOfflineQueue = true;
+    }
+
     this.cache = new Map();
     this.pendingOperations = new Map();
     this.operationQueue = [];
@@ -29,6 +50,25 @@ class DataHandler {
 
     this.initializeEventListeners();
     console.log("[DataHandler] Initialized with caching and queue management");
+  }
+
+  /**
+   * Initialize with Firebase service for backward compatibility
+   */
+  async initialize(firebaseService = null) {
+    if (firebaseService) {
+      this.firebaseService = firebaseService;
+    }
+
+    console.log("[DataHandler] Initialization complete", {
+      hasFirebase: !!this.firebaseService,
+      appName: this.appName,
+      version: this.version,
+      enableCaching: this.enableCaching,
+      enableOfflineQueue: this.enableOfflineQueue,
+    });
+
+    return this;
   }
 
   initializeEventListeners() {
@@ -442,6 +482,17 @@ class DataHandler {
       results[key] = await this.getData(key, options);
     }
     return results;
+  }
+
+  /**
+   * Compatibility aliases for components expecting get/set methods
+   */
+  async get(key, options = {}) {
+    return await this.getData(key, options);
+  }
+
+  async set(key, data, options = {}) {
+    return await this.saveData(key, data, options);
   }
 }
 
