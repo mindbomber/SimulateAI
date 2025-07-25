@@ -36,6 +36,7 @@ import ModalUtility from "./modal-utility.js";
 import { simulationInfo } from "../data/simulation-info.js";
 import { userProgress } from "../utils/simple-storage.js";
 import { simpleAnalytics } from "../utils/simple-analytics.js";
+import { loadScenarioReflectionConfig } from "../utils/scenario-reflection-config-loader.js";
 
 // Reflection step constants for scenario-based reflection
 const SCENARIO_REFLECTION_STEPS = {
@@ -63,13 +64,13 @@ export class ScenarioReflectionModal {
     this.selectedOption = this.options.selectedOption;
     this.reflectionData = {};
     this.currentStep = 0;
-    this.totalSteps = 4;
+    this.config = null; // Will be loaded asynchronously
     this.modal = null;
 
     // Mock community data (in real app, this would come from your analytics API)
     this.communityStats = this.generateCommunityStats();
 
-    // Initialize and show the modal
+    // Initialize and show the modal (async)
     this.init();
   }
 
@@ -138,33 +139,73 @@ export class ScenarioReflectionModal {
   /**
    * Initialize the reflection modal
    */
-  init() {
-    // Track analytics
-    simpleAnalytics.trackEvent("scenario_reflection_modal", "opened", {
-      category_id: this.options.categoryId,
-      scenario_id: this.options.scenarioId,
-      selected_option: this.selectedOption?.id || "unknown",
-    });
+  async init() {
+    try {
+      // Load configuration first
+      console.log("📋 Loading scenario reflection configuration...");
+      this.config = await loadScenarioReflectionConfig();
+      console.log("✅ Configuration loaded:", this.config);
 
-    // Generate modal content
-    const content = this.generateModalContent();
-    const footer = this.generateModalFooter();
+      // Set totalSteps from config
+      this.totalSteps = this.config.steps.totalSteps;
 
-    // Create modal
-    this.modal = new ModalUtility({
-      title: this.generateModalTitle(),
-      content,
-      footer,
-      onClose: this.handleClose.bind(this),
-      closeOnBackdrop: false,
-      closeOnEscape: true,
-      size: "large",
-      className: "scenario-reflection-modal",
-    });
+      // Track analytics
+      if (this.config.integration.analytics.trackCompletion) {
+        simpleAnalytics.trackEvent("scenario_reflection_modal", "opened", {
+          category_id: this.options.categoryId,
+          scenario_id: this.options.scenarioId,
+          selected_option: this.selectedOption?.id || "unknown",
+        });
+      }
 
-    this.modal.open();
-    this.setupEventHandlers();
-    this.initializeCharts();
+      // Generate modal content
+      const content = this.generateModalContent();
+      const footer = this.generateModalFooter();
+
+      // Create modal
+      this.modal = new ModalUtility({
+        title: this.generateModalTitle(),
+        content,
+        footer,
+        onClose: this.handleClose.bind(this),
+        closeOnBackdrop: false,
+        closeOnEscape: true,
+        size: "large",
+        className: "scenario-reflection-modal",
+      });
+
+      this.modal.open();
+      this.setupEventHandlers();
+      this.initializeCharts();
+    } catch (error) {
+      console.error(
+        "❌ Failed to initialize scenario reflection modal:",
+        error,
+      );
+
+      // Fallback to hardcoded values
+      this.totalSteps = 4;
+      this.config = this.getFallbackConfig();
+
+      // Continue with initialization
+      const content = this.generateModalContent();
+      const footer = this.generateModalFooter();
+
+      this.modal = new ModalUtility({
+        title: this.generateModalTitle(),
+        content,
+        footer,
+        onClose: this.handleClose.bind(this),
+        closeOnBackdrop: false,
+        closeOnEscape: true,
+        size: "large",
+        className: "scenario-reflection-modal",
+      });
+
+      this.modal.open();
+      this.setupEventHandlers();
+      this.initializeCharts();
+    }
   }
 
   /**
@@ -803,7 +844,12 @@ export class ScenarioReflectionModal {
    * Collect research data
    */
   collectResearchData(element) {
-    if (!this.options.collectResearchData) return;
+    if (
+      !this.options.collectResearchData ||
+      !this.config?.research?.dataCollection?.enableTracking
+    ) {
+      return;
+    }
 
     const dataType = element.getAttribute("data-research");
     const value =
@@ -811,14 +857,24 @@ export class ScenarioReflectionModal {
 
     this.reflectionData[dataType] = value;
 
+    // Add timestamp if configured
+    if (this.config.research.dataCollection.includeTimestamps) {
+      this.reflectionData[`${dataType}_timestamp`] = Date.now();
+    }
+
     // Track for analytics
-    simpleAnalytics.trackEvent("research_data_collected", dataType, {
-      scenario_id: this.options.scenarioId,
-      category_id: this.options.categoryId,
-      selected_option: this.selectedOption?.id,
-      data_type: dataType,
-      value: value,
-    });
+    if (this.config.integration.analytics.recordChoiceData) {
+      simpleAnalytics.trackEvent("research_data_collected", dataType, {
+        scenario_id: this.options.scenarioId,
+        category_id: this.options.categoryId,
+        selected_option: this.selectedOption?.id,
+        data_type: dataType,
+        value: value,
+        ...(this.config.research.dataCollection.includeTimestamps && {
+          timestamp: Date.now(),
+        }),
+      });
+    }
   }
 
   /**
@@ -826,30 +882,38 @@ export class ScenarioReflectionModal {
    */
   handleComplete() {
     // Save research data
-    this.saveResearchData();
+    if (this.config?.research?.dataCollection?.enableTracking) {
+      this.saveResearchData();
+    }
 
     // Track completion
-    simpleAnalytics.trackEvent("scenario_reflection_completed", "completed", {
-      scenario_id: this.options.scenarioId,
-      category_id: this.options.categoryId,
-      selected_option: this.selectedOption?.id,
-      research_data_points: Object.keys(this.reflectionData).length,
-    });
+    if (this.config?.integration?.analytics?.trackCompletion) {
+      simpleAnalytics.trackEvent("scenario_reflection_completed", "completed", {
+        scenario_id: this.options.scenarioId,
+        category_id: this.options.categoryId,
+        selected_option: this.selectedOption?.id,
+        research_data_points: Object.keys(this.reflectionData).length,
+      });
+    }
 
     // Dispatch event for badge system integration
-    const reflectionCompletedEvent = new CustomEvent(
-      "scenarioReflectionCompleted",
-      {
+    if (this.config?.integration?.badgeSystem?.enabled) {
+      const eventName = this.config.integration.badgeSystem.eventName;
+      const reflectionCompletedEvent = new CustomEvent(eventName, {
         detail: {
           scenarioId: this.options.scenarioId,
           categoryId: this.options.categoryId,
           selectedOption: this.selectedOption,
           reflectionData: this.reflectionData,
           timestamp: Date.now(),
+          ...(this.config.integration.badgeSystem.includeMetadata && {
+            config: this.config,
+            totalSteps: this.totalSteps,
+          }),
         },
-      },
-    );
-    document.dispatchEvent(reflectionCompletedEvent);
+      });
+      document.dispatchEvent(reflectionCompletedEvent);
+    }
 
     this.options.onComplete(this.reflectionData);
     this.modal.close();
@@ -975,5 +1039,41 @@ export class ScenarioReflectionModal {
     }
 
     return `<ul>${explanations.map((exp) => `<li>${exp}</li>`).join("")}</ul>`;
+  }
+
+  /**
+   * Get fallback configuration if loading fails
+   * @returns {Object} Fallback configuration
+   */
+  getFallbackConfig() {
+    return {
+      steps: {
+        totalSteps: 4,
+        allowSkip: true,
+        requireCompletion: false,
+        enableProgress: true,
+      },
+      research: {
+        dataCollection: {
+          enableTracking: true,
+          anonymousMode: true,
+          includeTimestamps: true,
+          trackProgression: true,
+        },
+      },
+      integration: {
+        badgeSystem: {
+          enabled: true,
+          eventName: "scenarioReflectionCompleted",
+          deferredDisplay: true,
+          includeMetadata: true,
+        },
+        analytics: {
+          trackCompletion: true,
+          recordChoiceData: true,
+          measureReflectionQuality: false,
+        },
+      },
+    };
   }
 }

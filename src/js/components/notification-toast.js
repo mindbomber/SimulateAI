@@ -34,6 +34,7 @@ class NotificationToast {
   constructor() {
     this.container = null;
     this.toasts = new Map();
+    this.isPaused = false; // Flag to temporarily suppress notifications
     this.init();
   }
 
@@ -55,9 +56,18 @@ class NotificationToast {
    * @param {number} options.duration - Auto-dismiss duration in ms (0 = no auto-dismiss)
    * @param {boolean} options.closable - Whether the toast can be manually closed
    * @param {Function} options.onClose - Callback when toast is closed
-   * @returns {string} Toast ID
+   * @param {boolean} options.force - Force show even if paused (for critical notifications)
+   * @returns {string} Toast ID or null if suppressed
    */
   show(options = {}) {
+    // Skip showing notification if paused (unless forced)
+    if (this.isPaused && !options.force) {
+      console.log(
+        "[NotificationToast] Notification suppressed during badge celebration",
+      );
+      return null;
+    }
+
     const {
       type = NOTIFICATION_TOAST_CONSTANTS.TYPES.INFO,
       title = "",
@@ -327,6 +337,30 @@ class NotificationToast {
       title,
       message,
     });
+  }
+
+  /**
+   * Pause notifications (for badge celebrations or other priority UI)
+   */
+  pause() {
+    this.isPaused = true;
+    console.log("[NotificationToast] Notifications paused");
+  }
+
+  /**
+   * Resume notifications
+   */
+  resume() {
+    this.isPaused = false;
+    console.log("[NotificationToast] Notifications resumed");
+  }
+
+  /**
+   * Check if notifications are currently paused
+   * @returns {boolean} True if paused
+   */
+  isNotificationsPaused() {
+    return this.isPaused;
   }
 }
 

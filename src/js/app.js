@@ -34,6 +34,7 @@
 // Import core modules
 import AccessibilityManager from "./core/accessibility.js";
 import AnimationManager from "./core/animation-manager.js";
+import globalEventManager from "./core/global-event-manager.js";
 import DataHandler from "./core/data-handler.js";
 import UIBinder from "./core/ui-binder.js";
 import { UIManager } from "./core/ui.js"; // Phase 3.2: UIManager integration
@@ -48,6 +49,7 @@ import MCPIntegrationManager from "./integrations/mcp-integration-manager.js";
 
 // Import badge system
 import badgeManager from "./core/badge-manager.js";
+import badgeModal from "./components/badge-modal.js";
 
 // Import user tracking system
 import "./user-tracking-init.js";
@@ -308,7 +310,7 @@ const AppDebug = {
   },
 };
 
-class AIEthicsApp {
+class SimulateAIApp {
   constructor() {
     // Version identifier for debugging
     this.version = "v2.1.0-enterprise";
@@ -316,7 +318,7 @@ class AIEthicsApp {
     this.sessionId = AppDebug._getSessionId();
 
     AppDebug.info(
-      `[App] Initializing AIEthicsApp ${this.version} (Build: ${this.buildTimestamp})`,
+      `[App] Initializing SimulateAI Platform ${this.version} (Build: ${this.buildTimestamp})`,
     );
 
     // Core application state
@@ -896,7 +898,7 @@ class AIEthicsApp {
     const initStartTime = performance.now();
 
     try {
-      AppDebug.log("🚀 Starting AIEthicsApp phased initialization...");
+      AppDebug.log("🚀 Starting SimulateAI Platform phased initialization...");
       performance.mark("app-init-start");
 
       // ========================================================================
@@ -1086,7 +1088,13 @@ class AIEthicsApp {
     const phaseStartTime = performance.now();
 
     try {
-      // Event Listeners
+      // Initialize Global Event Manager
+      globalEventManager.initialize();
+
+      // Register this app with the event manager
+      this.registerWithEventManager();
+
+      // Event Listeners (now handled by Global Event Manager)
       this.setupEventListeners();
       this._updateComponentHealth("event_system", "healthy");
 
@@ -1202,7 +1210,7 @@ class AIEthicsApp {
       });
 
       AppDebug.log(
-        `🎉 AIEthicsApp initialized successfully (${initTime.toFixed(2)}ms)`,
+        `🎉 SimulateAI Platform initialized successfully (${initTime.toFixed(2)}ms)`,
       );
     } catch (error) {
       AppDebug.error("Finalization failed:", error);
@@ -2172,8 +2180,173 @@ class AIEthicsApp {
   }
 
   /**
-   * Enhanced error handling with recovery options
+   * Register this app with the Global Event Manager
    */
+  registerWithEventManager() {
+    globalEventManager.registerComponent("simulateAIApp", this, {
+      "navigation.start_learning": this.handleStartLearning.bind(this),
+      "simulation.start": this.handleSimulationStart.bind(this),
+      "simulation.quick-start": this.handleSimulationQuickStart.bind(this),
+      "simulation.reset": this.handleSimulationReset.bind(this),
+      "simulation.next": this.handleSimulationNext.bind(this),
+      "simulation.close": this.handleSimulationClose.bind(this),
+      "modal.close": this.handleModalClose.bind(this),
+      "modal.backdrop-click": this.handleModalBackdropClick.bind(this),
+      "modal.tab-trap": this.handleModalTabTrap.bind(this),
+      "demo.pattern": this.handleDemoPattern.bind(this),
+      "system.escape": this.handleEscapeKey.bind(this),
+      "system.scroll": this.handleScrollEvent.bind(this),
+      "accessibility.theme_change": this.handleThemeChange.bind(this),
+      "system.app_shutdown": this.handleAppShutdown.bind(this),
+      "system.error": this.handleGlobalError.bind(this),
+      "system.unhandled_rejection": this.handleUnhandledRejection.bind(this),
+    });
+  }
+
+  /**
+   * Handle start learning event from Global Event Manager
+   */
+  handleStartLearning() {
+    const categoriesSection = document.getElementById("categories");
+    if (categoriesSection) {
+      categoriesSection.scrollIntoView({ behavior: "smooth" });
+    }
+  }
+
+  /**
+   * Handle simulation start events from Global Event Manager
+   */
+  handleSimulationStart(data) {
+    const { simulationId } = data;
+    if (simulationId) {
+      this.startSimulation(simulationId);
+    }
+  }
+
+  /**
+   * Handle simulation quick start events from Global Event Manager
+   */
+  handleSimulationQuickStart(data) {
+    const { simulationId } = data;
+    if (simulationId) {
+      this.launchSimulationDirect(simulationId);
+    }
+  }
+
+  /**
+   * Handle simulation reset from Global Event Manager
+   */
+  handleSimulationReset() {
+    this.resetCurrentSimulation();
+  }
+
+  /**
+   * Handle simulation next from Global Event Manager
+   */
+  handleSimulationNext() {
+    this.nextScenario();
+  }
+
+  /**
+   * Handle simulation close from Global Event Manager
+   */
+  handleSimulationClose() {
+    this.closeSimulation();
+  }
+
+  /**
+   * Handle modal close from Global Event Manager
+   */
+  handleModalClose() {
+    this.closeSimulation();
+  }
+
+  /**
+   * Handle modal backdrop clicks from Global Event Manager
+   */
+  handleModalBackdropClick(data) {
+    const { event } = data;
+    if (event.target === this.modal) {
+      this.closeSimulation();
+    }
+  }
+
+  /**
+   * Handle modal tab trapping from Global Event Manager
+   */
+  handleModalTabTrap(data) {
+    const { event } = data;
+    this.trapFocusInModal(event);
+  }
+
+  /**
+   * Handle demo pattern events from Global Event Manager
+   */
+  handleDemoPattern(data) {
+    const { pattern } = data;
+    if (window.simulateEthicsPattern) {
+      window.simulateEthicsPattern(pattern);
+    }
+  }
+
+  /**
+   * Handle escape key from Global Event Manager
+   */
+  handleEscapeKey() {
+    if (this.modal && this.modal.classList.contains("visible")) {
+      this.closeSimulation();
+    }
+  }
+
+  /**
+   * Handle scroll events from Global Event Manager
+   */
+  handleScrollEvent() {
+    // The scroll reveal header is already handled by individual components
+    // This could be used for additional scroll-based features if needed
+  }
+
+  /**
+   * Handle theme changes from Global Event Manager
+   */
+  handleThemeChange(data) {
+    const { type, matches } = data;
+
+    if (type === "reduced_motion") {
+      this.preferences.reducedMotion = matches;
+    } else if (type === "high_contrast") {
+      this.preferences.highContrast = matches;
+    }
+
+    this.currentTheme = this.preferences.highContrast
+      ? "high-contrast"
+      : "light";
+    this.applyTheme();
+    this.announceThemeChange();
+  }
+
+  /**
+   * Handle app shutdown from Global Event Manager
+   */
+  handleAppShutdown() {
+    this._handleApplicationShutdown();
+  }
+
+  /**
+   * Handle global errors from Global Event Manager
+   */
+  handleGlobalError(data) {
+    const { event } = data;
+    this.handleError(event.error || event.message);
+  }
+
+  /**
+   * Handle unhandled promise rejections from Global Event Manager
+   */
+  handleUnhandledRejection(data) {
+    const { event } = data;
+    this.handleError(event.reason, "An unhandled promise rejection occurred");
+  }
   handleError(error, userMessage = "An unexpected error occurred") {
     this.lastError = error;
     AppDebug.error("App Error:", error);
@@ -3243,85 +3416,62 @@ class AIEthicsApp {
   }
 
   setupEventListeners() {
-    // Surprise Me functionality
-    this.setupSurpriseMe();
+    console.log("Setting up event listeners with Global Event Manager...");
 
-    // Hero section buttons
-    const startLearningBtn = document.getElementById("start-learning");
+    try {
+      // Initialize Global Event Manager if not already done
+      if (!globalEventManager.isInitialized) {
+        globalEventManager.initialize();
+      }
 
-    if (startLearningBtn) {
-      startLearningBtn.addEventListener("click", () => {
-        this.scrollToSimulations();
-      });
+      // Register this app component with the Global Event Manager
+      this.registerWithEventManager();
+
+      // Setup accessibility preference monitoring
+      this.setupAccessibilityListeners();
+
+      // Setup Surprise Me functionality (UI-specific)
+      this.setupSurpriseMe();
+
+      // Setup scenario completion and suggested scenario listeners
+      this.setupScenarioEventListeners();
+
+      console.log("Event listeners setup completed with Global Event Manager");
+    } catch (error) {
+      console.error("Error setting up event listeners:", error);
+      this.showErrorMessage(
+        "Failed to setup event listeners. Some features may not work properly.",
+      );
     }
+  }
 
-    // Debug: Test scenario modal button
-    const testScenarioBtn = document.getElementById("test-scenario-modal");
-    if (testScenarioBtn) {
-      testScenarioBtn.addEventListener("click", () => {
-        this.testScenarioModal();
+  /**
+   * Setup accessibility preference listeners
+   */
+  setupAccessibilityListeners() {
+    const reducedMotionQuery = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    );
+    reducedMotionQuery.addEventListener("change", (e) => {
+      globalEventManager.notifyComponents("accessibility.theme_change", {
+        type: "reduced_motion",
+        matches: e.matches,
       });
-    }
-
-    // Modal controls
-    if (this.modal) {
-      const closeBtn = this.modal.querySelector(".modal-close");
-      const resetBtn = document.getElementById("reset-simulation");
-      const nextBtn = document.getElementById("next-scenario");
-
-      if (closeBtn) {
-        closeBtn.addEventListener("click", () => this.closeSimulation());
-
-        // Add focus trapping to the modal
-        this.modal.addEventListener("keydown", (e) => {
-          if (e.key === "Tab") {
-            this.trapFocusInModal(e);
-          }
-        });
-      }
-
-      if (resetBtn) {
-        resetBtn.addEventListener("click", () => this.resetCurrentSimulation());
-      }
-
-      if (nextBtn) {
-        nextBtn.addEventListener("click", () => this.nextScenario());
-      }
-
-      // Close modal on backdrop click
-      this.modal.addEventListener("click", (e) => {
-        if (e.target === this.modal) {
-          this.closeSimulation();
-        }
-      });
-
-      // Close modal on Escape key
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && !this.modal.hasAttribute("aria-hidden")) {
-          this.closeSimulation();
-        }
-      });
-    }
-
-    // Enhanced simulation card buttons (delegated event handling)
-    document.addEventListener("click", (e) => {
-      if (e.target.classList.contains("enhanced-sim-button")) {
-        e.preventDefault();
-        const simulationId = e.target.getAttribute("data-simulation");
-        if (simulationId) {
-          // Learning Lab button - go through pre-launch modal
-          this.startSimulation.call(this, simulationId);
-        }
-      } else if (e.target.classList.contains("simulation-quick-start-btn")) {
-        e.preventDefault();
-        const simulationId = e.target.getAttribute("data-simulation");
-        if (simulationId) {
-          // Quick start button - skip pre-launch modal
-          this.launchSimulationDirect.call(this, simulationId);
-        }
-      }
     });
 
+    const highContrastQuery = window.matchMedia("(prefers-contrast: high)");
+    highContrastQuery.addEventListener("change", (e) => {
+      globalEventManager.notifyComponents("accessibility.theme_change", {
+        type: "high_contrast",
+        matches: e.matches,
+      });
+    });
+  }
+
+  /**
+   * Setup scenario-specific event listeners
+   */
+  setupScenarioEventListeners() {
     // Scenario completion event listener
     document.addEventListener("scenario-completed", (event) => {
       this.handleScenarioCompleted(event);
@@ -5379,34 +5529,73 @@ class AIEthicsApp {
     if (!badges || badges.length === 0) return;
 
     try {
-      // Get badge modal configuration
-      const badgeConfig = this.getComponentConfig("badge-modal");
+      // Pause notifications during badge celebration to prevent interference
+      if (window.NotificationToast) {
+        window.NotificationToast.pause();
+      }
 
-      // Check if badge modal component is available
-      if (window.BadgeModal) {
-        const badgeModal = new window.BadgeModal(badgeConfig);
-        await badgeModal.showCelebration(badges);
+      // Try to use the BadgeModal component
+      if (badgeModal) {
+        console.log("Using BadgeModal for celebration:", badges);
+
+        // Show each badge with proper timing
+        for (let i = 0; i < badges.length; i++) {
+          const badge = badges[i];
+
+          // Add delay between multiple badges and wait for previous modal to close
+          if (i > 0) {
+            // Wait for previous modal to close
+            while (badgeModal.isModalVisible && badgeModal.isModalVisible()) {
+              await new Promise((resolve) => setTimeout(resolve, 100));
+            }
+            // Additional delay between badges
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+          }
+
+          try {
+            await badgeModal.showBadgeModal(badge, "main", {
+              showConfetti: true,
+              isMultiple: badges.length > 1,
+              badgeIndex: i + 1,
+              totalBadges: badges.length,
+            });
+          } catch (modalError) {
+            console.error(
+              `Error showing badge modal for badge ${i + 1}:`,
+              modalError,
+            );
+            // Continue with next badge
+          }
+        }
+
+        // Wait for final modal to complete
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       } else {
-        // Fallback to simple notification
+        console.warn("BadgeModal not available, using fallback notification");
+        // Fallback to simple notification only if BadgeModal truly isn't available
         const badgeTitle =
           badges.length === 1 ? badges[0].title : `${badges.length} new badges`;
 
-        if (typeof this.showNotification === "function") {
-          this.showNotification(
-            `🎉 Congratulations! You earned: ${badgeTitle}`,
-            "success",
-          );
-        } else if (window.NotificationToast) {
+        if (window.NotificationToast) {
           window.NotificationToast.show({
             type: "success",
             message: `🎉 Congratulations! You earned: ${badgeTitle}`,
             duration: 5000,
             closable: true,
+            force: true, // Force show even though notifications are paused
           });
         }
       }
     } catch (error) {
-      AppDebug.error("Failed to show badge celebration:", error);
+      console.error("Failed to show badge celebration:", error);
+    } finally {
+      // Always resume notifications after badge celebration (with delay)
+      setTimeout(() => {
+        if (window.NotificationToast) {
+          window.NotificationToast.resume();
+          console.log("Badge celebration complete - notifications resumed");
+        }
+      }, 2000);
     }
   }
 
@@ -6179,7 +6368,7 @@ class EthicsRadarDemo {
     try {
       // Get radar chart configuration
       const radarConfig =
-        window.aiEthicsApp?.getComponentConfig("radar-chart") || {};
+        window.simulateAIApp?.getComponentConfig("radar-chart") || {};
 
       // Get configured component instead of direct instantiation
       this.demoChart = await appStartup.getComponent(
@@ -6567,7 +6756,7 @@ window.addEventListener("error", (event) => {
 });
 
 // Initialize the application
-const app = new AIEthicsApp();
+const app = new SimulateAIApp();
 
 // ============================================================================
 // ENTERPRISE STATIC UTILITIES
@@ -6576,8 +6765,8 @@ const app = new AIEthicsApp();
 /**
  * Get enterprise application health report
  */
-AIEthicsApp.getEnterpriseHealthReport = function () {
-  const app = window.aiEthicsApp;
+SimulateAIApp.getEnterpriseHealthReport = function () {
+  const app = window.simulateAIApp;
   if (!app) {
     return { error: "Application instance not found" };
   }
@@ -6592,14 +6781,14 @@ AIEthicsApp.getEnterpriseHealthReport = function () {
     circuitBreakerStates: Object.fromEntries(app.circuitBreakers),
     errorPatterns: Object.fromEntries(app.errorPatterns),
     memoryUsage: app._getCurrentMemoryUsage(),
-    recommendations: AIEthicsApp._generateHealthRecommendations(app),
+    recommendations: SimulateAIApp._generateHealthRecommendations(app),
   };
 };
 
 /**
  * Generate health recommendations based on current state
  */
-AIEthicsApp._generateHealthRecommendations = function (app) {
+SimulateAIApp._generateHealthRecommendations = function (app) {
   const recommendations = [];
 
   // Memory usage recommendations
@@ -6654,8 +6843,8 @@ AIEthicsApp._generateHealthRecommendations = function (app) {
 /**
  * Export enterprise diagnostics for support
  */
-AIEthicsApp.exportDiagnostics = function () {
-  const app = window.aiEthicsApp;
+SimulateAIApp.exportDiagnostics = function () {
+  const app = window.simulateAIApp;
   if (!app) {
     return { error: "Application instance not found" };
   }
@@ -6669,7 +6858,7 @@ AIEthicsApp.exportDiagnostics = function () {
       userAgent: navigator.userAgent,
       url: window.location.href,
     },
-    healthReport: AIEthicsApp.getEnterpriseHealthReport(),
+    healthReport: SimulateAIApp.getEnterpriseHealthReport(),
     applicationLogs: AppDebug.exportLogs(),
     performanceData: {
       navigation: performance.getEntriesByType("navigation"),
@@ -6697,6 +6886,12 @@ if (document.readyState === "loading") {
 // Make app globally available for inline event handlers
 window.app = app;
 
+// Make app available as SimulateAI app instance
+window.simulateAIApp = app;
+
+// Add backward compatibility
+window.aiEthicsApp = app;
+
 // Add debug functions for testing Surprise Me functionality
 window.clearAllProgress = () => app.clearAllProgress();
 window.markSomeScenariosCompleted = () => app.markSomeScenariosCompleted();
@@ -6718,8 +6913,8 @@ window.getDeferredBadgeStatus = () => {
 };
 
 // Enterprise debugging functions
-window.getEnterpriseHealth = () => AIEthicsApp.getEnterpriseHealthReport();
-window.exportDiagnostics = () => AIEthicsApp.exportDiagnostics();
+window.getEnterpriseHealth = () => SimulateAIApp.getEnterpriseHealthReport();
+window.exportDiagnostics = () => SimulateAIApp.exportDiagnostics();
 
 // Configuration system debugging functions
 window.getConfigStatus = () => {
@@ -6741,7 +6936,7 @@ window.clearAppBuffers = () => AppDebug.clearBuffers();
 
 // Phased Initialization debugging functions
 window.getInitializationStatus = () => {
-  const app = window.aiEthicsApp;
+  const app = window.simulateAIApp;
   if (!app) {
     return { error: "Application instance not found" };
   }
@@ -6758,7 +6953,7 @@ window.getInitializationStatus = () => {
 };
 
 window.getPhaseTimings = () => {
-  const app = window.aiEthicsApp;
+  const app = window.simulateAIApp;
   if (!app || !app.performanceMetrics.phaseTimings) {
     return { error: "Phase timings not available" };
   }
@@ -6785,7 +6980,7 @@ window.getPhaseTimings = () => {
 };
 
 window.retryFailedPhase = async (phaseName) => {
-  const app = window.aiEthicsApp;
+  const app = window.simulateAIApp;
   if (!app) {
     console.error("Application instance not found");
     return false;
@@ -6937,4 +7132,4 @@ window.testSimulateAIFunction = () => {
 };
 
 // Export the class for ES6 modules
-export default AIEthicsApp;
+export default SimulateAIApp;

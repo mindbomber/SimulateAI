@@ -18,7 +18,7 @@
   height: 100%;
   background: rgb(0 0 0 / 80%);
   backdrop-filter: blur(4px);
-  z-index: 10000;
+  z-index: 10001; /* Higher than notifications (10000) to ensure badge celebrations appear above */
   display: flex;
   align-items: center;
   justify-content: center;

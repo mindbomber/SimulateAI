@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scenario Reflection Modal Configuration Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .test-result {
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      .config-display {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 15px;
+        font-family: monospace;
+        white-space: pre-wrap;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🎯 Scenario Reflection Modal Configuration Test</h1>
+      <p>
+        This test verifies that the scenario reflection modal and configuration
+        file are properly integrated.
+      </p>
+
+      <div class="test-controls">
+        <button onclick="testConfigLoader()">Test Config Loader</button>
+        <button onclick="testModalIntegration()">Test Modal Integration</button>
+        <button onclick="testEventDispatch()">Test Event Dispatch</button>
+        <button onclick="clearResults()">Clear Results</button>
+      </div>
+
+      <div id="test-results"></div>
+
+      <div class="test-container">
+        <h3>📋 Configuration Preview</h3>
+        <div id="config-display" class="config-display">
+          Click "Test Config Loader" to load configuration...
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { loadScenarioReflectionConfig } from "./src/js/utils/scenario-reflection-config-loader.js";
+      import { ScenarioReflectionModal } from "./src/js/components/scenario-reflection-modal.js";
+
+      let testResults = [];
+      let loadedConfig = null;
+
+      window.testConfigLoader = async function () {
+        addResult("info", "🔄 Testing configuration loader...");
+
+        try {
+          const startTime = performance.now();
+          loadedConfig = await loadScenarioReflectionConfig();
+          const loadTime = performance.now() - startTime;
+
+          // Display configuration
+          document.getElementById("config-display").textContent =
+            JSON.stringify(loadedConfig, null, 2);
+
+          // Verify key properties
+          const checks = [
+            {
+              name: "Total Steps",
+              condition: loadedConfig.steps?.totalSteps === 4,
+              value: loadedConfig.steps?.totalSteps,
+            },
+            {
+              name: "Badge System Event Name",
+              condition:
+                loadedConfig.integration?.badgeSystem?.eventName ===
+                "scenarioReflectionCompleted",
+              value: loadedConfig.integration?.badgeSystem?.eventName,
+            },
+            {
+              name: "Research Data Collection",
+              condition:
+                loadedConfig.research?.dataCollection?.enableTracking === true,
+              value: loadedConfig.research?.dataCollection?.enableTracking,
+            },
+            {
+              name: "Analytics Tracking",
+              condition:
+                loadedConfig.integration?.analytics?.trackCompletion === true,
+              value: loadedConfig.integration?.analytics?.trackCompletion,
+            },
+          ];
+
+          let passedChecks = 0;
+          checks.forEach((check) => {
+            if (check.condition) {
+              addResult("success", `✅ ${check.name}: ${check.value}`);
+              passedChecks++;
+            } else {
+              addResult(
+                "error",
+                `❌ ${check.name}: Expected vs Actual: ${check.value}`,
+              );
+            }
+          });
+
+          addResult("info", `📊 Load time: ${loadTime.toFixed(2)}ms`);
+          addResult(
+            passedChecks === checks.length ? "success" : "error",
+            `🎯 Configuration test: ${passedChecks}/${checks.length} checks passed`,
+          );
+        } catch (error) {
+          addResult(
+            "error",
+            `❌ Configuration loading failed: ${error.message}`,
+          );
+          console.error("Config test error:", error);
+        }
+      };
+
+      window.testModalIntegration = async function () {
+        addResult("info", "🔄 Testing modal integration...");
+
+        if (!loadedConfig) {
+          addResult("error", "❌ Please run config loader test first");
+          return;
+        }
+
+        try {
+          // Create test scenario data
+          const testOptions = {
+            categoryId: "bias-fairness",
+            scenarioId: "test-scenario",
+            selectedOption: {
+              id: "option-1",
+              text: "Test option",
+              impact: {
+                fairness: 0.8,
+                privacy: 0.6,
+                transparency: 0.7,
+              },
+            },
+            scenarioData: {
+              title: "Test Ethical Scenario",
+              description: "A test scenario for integration testing",
+              options: [
+                { id: "option-1", text: "Test option 1" },
+                { id: "option-2", text: "Test option 2" },
+              ],
+            },
+            onComplete: (data) => {
+              addResult(
+                "success",
+                `✅ Modal completed with data: ${Object.keys(data).length} fields`,
+              );
+            },
+            onSkip: () => {
+              addResult("info", "⏭️ Modal was skipped");
+            },
+          };
+
+          // Create modal instance (this should load config internally)
+          const modal = new ScenarioReflectionModal(testOptions);
+
+          addResult("success", "✅ Modal instance created successfully");
+          addResult(
+            "info",
+            "🎯 Modal should be visible now - check if it loaded with proper configuration",
+          );
+        } catch (error) {
+          addResult("error", `❌ Modal integration failed: ${error.message}`);
+          console.error("Modal integration error:", error);
+        }
+      };
+
+      window.testEventDispatch = function () {
+        addResult("info", "🔄 Testing event dispatch integration...");
+
+        // Listen for the configured event
+        const eventName =
+          loadedConfig?.integration?.badgeSystem?.eventName ||
+          "scenarioReflectionCompleted";
+
+        const eventListener = (event) => {
+          addResult(
+            "success",
+            `✅ Event "${eventName}" received with detail keys: ${Object.keys(event.detail).join(", ")}`,
+          );
+          document.removeEventListener(eventName, eventListener);
+        };
+
+        document.addEventListener(eventName, eventListener);
+
+        // Dispatch test event
+        const testEvent = new CustomEvent(eventName, {
+          detail: {
+            scenarioId: "test-scenario",
+            categoryId: "test-category",
+            timestamp: Date.now(),
+            test: true,
+          },
+        });
+
+        document.dispatchEvent(testEvent);
+        addResult("info", `📡 Test event "${eventName}" dispatched`);
+      };
+
+      window.clearResults = function () {
+        testResults = [];
+        document.getElementById("test-results").innerHTML = "";
+      };
+
+      function addResult(type, message) {
+        testResults.push({
+          type,
+          message,
+          timestamp: new Date().toLocaleTimeString(),
+        });
+        updateResultsDisplay();
+      }
+
+      function updateResultsDisplay() {
+        const container = document.getElementById("test-results");
+        container.innerHTML = testResults
+          .map(
+            (result) =>
+              `<div class="test-result ${result.type}">
+                    <strong>[${result.timestamp}]</strong> ${result.message}
+                </div>`,
+          )
+          .join("");
+        container.scrollTop = container.scrollHeight;
+      }
+
+      // Auto-run config test on page load
+      setTimeout(() => {
+        addResult("info", "🚀 Page loaded - ready for testing");
+      }, 100);
+    </script>
+  </body>
+</html>
