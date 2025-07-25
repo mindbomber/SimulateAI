@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phase 3.1 AnalyticsManager Migration Test</title>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+        line-height: 1.6;
+        margin: 20px;
+        background-color: #f5f5f5;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .test-section {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+      .test-section h3 {
+        margin-top: 0;
+        color: #495057;
+        border-bottom: 2px solid #667eea;
+        padding-bottom: 10px;
+      }
+      .status {
+        font-weight: bold;
+        padding: 5px 10px;
+        border-radius: 4px;
+        display: inline-block;
+        margin: 5px 0;
+      }
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+      }
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .status.warning {
+        background: #fff3cd;
+        color: #856404;
+      }
+      .status.info {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+      .button {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+        font-size: 14px;
+      }
+      .button:hover {
+        background: #5a67d8;
+      }
+      .button:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+      }
+      .log {
+        background: #212529;
+        color: #f8f9fa;
+        padding: 15px;
+        border-radius: 4px;
+        font-family: "Monaco", "Courier New", monospace;
+        font-size: 12px;
+        max-height: 300px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        margin-top: 10px;
+      }
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+      }
+      .metric {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 15px;
+        text-align: center;
+      }
+      .metric-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: #667eea;
+      }
+      .metric-label {
+        font-size: 12px;
+        color: #6c757d;
+        text-transform: uppercase;
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🎯 Phase 3.1 Migration Test</h1>
+        <p>AnalyticsManager DataHandler Integration Verification</p>
+      </div>
+
+      <div class="test-section">
+        <h3>📊 Migration Status</h3>
+        <div id="migration-status">
+          <span class="status info">Testing migration...</span>
+        </div>
+        <div id="migration-details"></div>
+      </div>
+
+      <div class="test-section">
+        <h3>🔧 AnalyticsManager Features</h3>
+        <button class="button" onclick="testStaticAnalytics()">
+          Test Static Analytics
+        </button>
+        <button class="button" onclick="testInstanceAnalytics()">
+          Test Instance Analytics
+        </button>
+        <button class="button" onclick="testDataHandlerPersistence()">
+          Test DataHandler Persistence
+        </button>
+        <button class="button" onclick="testEventTracking()">
+          Test Event Tracking
+        </button>
+        <button class="button" onclick="testSessionManagement()">
+          Test Session Management
+        </button>
+        <div id="feature-results"></div>
+      </div>
+
+      <div class="test-section">
+        <h3>📈 Analytics Metrics</h3>
+        <div class="metrics" id="analytics-metrics">
+          <div class="metric">
+            <div class="metric-value" id="static-events">0</div>
+            <div class="metric-label">Static Events</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value" id="instance-events">0</div>
+            <div class="metric-label">Instance Events</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value" id="datahandler-saves">0</div>
+            <div class="metric-label">DataHandler Saves</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value" id="session-count">0</div>
+            <div class="metric-label">Sessions</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h3>📝 Test Log</h3>
+        <button class="button" onclick="clearLog()">Clear Log</button>
+        <div id="test-log" class="log"></div>
+      </div>
+    </div>
+
+    <!-- Import the enhanced app and analytics -->
+    <script type="module">
+      import AnalyticsManager from "./src/js/utils/analytics.js";
+      import DataHandler from "./src/js/core/data-handler.js";
+
+      // Global variables for testing
+      window.testAnalytics = AnalyticsManager;
+      window.testDataHandler = new DataHandler();
+      window.testAnalyticsInstance = null;
+      window.testMetrics = {
+        staticEvents: 0,
+        instanceEvents: 0,
+        dataHandlerSaves: 0,
+        sessionCount: 0,
+      };
+
+      // Initialize test environment
+      async function initializeTests() {
+        log("🚀 Initializing Phase 3.1 Migration Tests...");
+
+        try {
+          // Test static analytics initialization (backward compatibility)
+          await window.testAnalytics.init({
+            enabled: true,
+            debug: true,
+            batchSize: 5,
+          });
+          log("✅ Static AnalyticsManager initialized");
+          updateStatus("Static analytics initialized", "success");
+
+          // Create enhanced instance with DataHandler
+          window.testAnalyticsInstance = new AnalyticsManager({
+            dataHandler: window.testDataHandler,
+          });
+          await window.testAnalyticsInstance.init({
+            enabled: true,
+            debug: true,
+            batchSize: 5,
+          });
+          log("✅ Enhanced AnalyticsManager instance created with DataHandler");
+          updateStatus(
+            "Instance analytics initialized with DataHandler support",
+            "success",
+          );
+
+          // Test basic functionality
+          log("🔍 Running initial compatibility tests...");
+          await runCompatibilityTests();
+        } catch (error) {
+          log(`❌ Initialization failed: ${error.message}`);
+          updateStatus("Migration test initialization failed", "error");
+        }
+      }
+
+      async function runCompatibilityTests() {
+        try {
+          // Test static method access
+          if (typeof window.testAnalytics.trackEvent === "function") {
+            log("✅ Static trackEvent method accessible");
+          }
+
+          // Test instance method access
+          if (typeof window.testAnalyticsInstance.trackEvent === "function") {
+            log("✅ Instance trackEvent method accessible");
+          }
+
+          // Test DataHandler integration
+          if (window.testAnalyticsInstance.dataHandler) {
+            log("✅ DataHandler integration confirmed");
+          }
+
+          updateStatus("Basic compatibility tests passed", "success");
+        } catch (error) {
+          log(`❌ Compatibility test failed: ${error.message}`);
+          updateStatus("Compatibility tests failed", "error");
+        }
+      }
+
+      // Global test functions
+      window.testStaticAnalytics = async function () {
+        log("🧪 Testing static analytics...");
+        try {
+          if (window.testAnalytics.trackEvent) {
+            window.testAnalytics.trackEvent("static_test_event", {
+              testId: Date.now(),
+              method: "static",
+            });
+            window.testMetrics.staticEvents++;
+            updateMetric("static-events", window.testMetrics.staticEvents);
+            log("✅ Static event tracked successfully");
+            updateFeatureResult("Static Analytics: Working ✅");
+          } else {
+            throw new Error("Static trackEvent method not available");
+          }
+        } catch (error) {
+          log(`❌ Static analytics test failed: ${error.message}`);
+          updateFeatureResult("Static Analytics: Failed ❌");
+        }
+      };
+
+      window.testInstanceAnalytics = async function () {
+        log("🧪 Testing instance analytics...");
+        try {
+          if (
+            window.testAnalyticsInstance &&
+            window.testAnalyticsInstance.trackEvent
+          ) {
+            await window.testAnalyticsInstance.trackEvent(
+              "instance_test_event",
+              {
+                testId: Date.now(),
+                method: "instance",
+                dataHandler: !!window.testAnalyticsInstance.dataHandler,
+              },
+            );
+            window.testMetrics.instanceEvents++;
+            updateMetric("instance-events", window.testMetrics.instanceEvents);
+            log("✅ Instance event tracked successfully");
+            updateFeatureResult("Instance Analytics: Working ✅");
+          } else {
+            throw new Error(
+              "Instance not available or trackEvent method missing",
+            );
+          }
+        } catch (error) {
+          log(`❌ Instance analytics test failed: ${error.message}`);
+          updateFeatureResult("Instance Analytics: Failed ❌");
+        }
+      };
+
+      window.testDataHandlerPersistence = async function () {
+        log("🧪 Testing DataHandler persistence...");
+        try {
+          if (
+            window.testAnalyticsInstance &&
+            window.testAnalyticsInstance.dataHandler
+          ) {
+            const testData = { testSave: Date.now(), phase: "3.1" };
+            await window.testAnalyticsInstance.saveAnalyticsConfig(testData);
+            window.testMetrics.dataHandlerSaves++;
+            updateMetric(
+              "datahandler-saves",
+              window.testMetrics.dataHandlerSaves,
+            );
+            log("✅ DataHandler save successful");
+
+            const loadedData =
+              await window.testAnalyticsInstance.loadAnalyticsConfig();
+            if (loadedData) {
+              log("✅ DataHandler load successful");
+              updateFeatureResult("DataHandler Persistence: Working ✅");
+            } else {
+              log("⚠️ DataHandler load returned empty");
+              updateFeatureResult("DataHandler Persistence: Partial ⚠️");
+            }
+          } else {
+            throw new Error("DataHandler not available on instance");
+          }
+        } catch (error) {
+          log(`❌ DataHandler persistence test failed: ${error.message}`);
+          updateFeatureResult("DataHandler Persistence: Failed ❌");
+        }
+      };
+
+      window.testEventTracking = async function () {
+        log("🧪 Testing event tracking capabilities...");
+        try {
+          // Test multiple event types
+          const events = [
+            {
+              name: "user_interaction",
+              data: { element: "button", action: "click" },
+            },
+            {
+              name: "page_view",
+              data: { page: "test", timestamp: Date.now() },
+            },
+            { name: "performance_metric", data: { loadTime: 150, memory: 25 } },
+          ];
+
+          for (const event of events) {
+            if (window.testAnalyticsInstance) {
+              await window.testAnalyticsInstance.trackEvent(
+                event.name,
+                event.data,
+              );
+              window.testMetrics.instanceEvents++;
+            }
+          }
+
+          updateMetric("instance-events", window.testMetrics.instanceEvents);
+          log(`✅ Tracked ${events.length} different event types`);
+          updateFeatureResult("Event Tracking: Working ✅");
+        } catch (error) {
+          log(`❌ Event tracking test failed: ${error.message}`);
+          updateFeatureResult("Event Tracking: Failed ❌");
+        }
+      };
+
+      window.testSessionManagement = async function () {
+        log("🧪 Testing session management...");
+        try {
+          if (window.testAnalyticsInstance) {
+            await window.testAnalyticsInstance.initializeInstanceSession();
+            window.testMetrics.sessionCount++;
+            updateMetric("session-count", window.testMetrics.sessionCount);
+
+            const sessionId =
+              window.testAnalyticsInstance.instanceSessionData?.sessionId;
+            if (sessionId) {
+              log(`✅ Session created: ${sessionId}`);
+              updateFeatureResult("Session Management: Working ✅");
+            } else {
+              throw new Error("Session ID not generated");
+            }
+          } else {
+            throw new Error("Analytics instance not available");
+          }
+        } catch (error) {
+          log(`❌ Session management test failed: ${error.message}`);
+          updateFeatureResult("Session Management: Failed ❌");
+        }
+      };
+
+      // Helper functions
+      function log(message) {
+        const timestamp = new Date().toISOString().split("T")[1].split(".")[0];
+        const logElement = document.getElementById("test-log");
+        logElement.textContent += `[${timestamp}] ${message}\n`;
+        logElement.scrollTop = logElement.scrollHeight;
+        console.log(message);
+      }
+
+      function updateStatus(message, type) {
+        const statusElement = document.getElementById("migration-status");
+        statusElement.innerHTML = `<span class="status ${type}">${message}</span>`;
+      }
+
+      function updateFeatureResult(result) {
+        const resultsElement = document.getElementById("feature-results");
+        const div = document.createElement("div");
+        div.innerHTML = `<span class="status info">${result}</span>`;
+        resultsElement.appendChild(div);
+      }
+
+      function updateMetric(metricId, value) {
+        document.getElementById(metricId).textContent = value;
+      }
+
+      window.clearLog = function () {
+        document.getElementById("test-log").textContent = "";
+      };
+
+      // Initialize tests when page loads
+      document.addEventListener("DOMContentLoaded", initializeTests);
+    </script>
+  </body>
+</html>

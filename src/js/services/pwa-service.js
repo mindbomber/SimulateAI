@@ -16,29 +16,202 @@
 
 /**
  * PWA Service - Progressive Web App Features Integration
- * Integrates PWA functionality with Firebase services
+ * Phase 3.5: Enhanced with DataHandler integration for persistent PWA state management
+ * Integrates PWA functionality with Firebase services and persistent storage
  */
 
 import { UI, TIMING } from "../utils/constants.js";
 
 export class PWAService {
-  constructor(firebaseService = null) {
+  constructor(firebaseService = null, app = null) {
     this.firebaseService = firebaseService;
+    this.app = app; // Phase 3.5: App instance for DataHandler integration
+    this.dataHandler = null; // Phase 3.5: DataHandler for persistent storage
     this.registration = null;
     this.isInstalled = false;
     this.isOnline = navigator.onLine;
     this.syncQueue = [];
     this.installPromptEvent = null;
 
+    // Phase 3.5: Persistent PWA state management
+    this.installationHistory = [];
+    this.connectivityHistory = [];
+    this.syncMetrics = {
+      totalSyncs: 0,
+      failedSyncs: 0,
+      lastSyncTime: null,
+      averageSyncDuration: 0,
+    };
+
+    // Phase 3.5: PWA health monitoring
+    this.pwaHealth = {
+      serviceWorkerStatus: "unknown",
+      installStatus: "unknown",
+      connectivityStatus: this.isOnline ? "online" : "offline",
+      syncQueueHealth: "healthy",
+    };
+
     // Don't auto-initialize to prevent service duplication
     // Call init() manually after construction
   }
 
   /**
+   * Phase 3.5: Initialize DataHandler integration for persistent PWA state
+   */
+  async initializeDataHandlerIntegration() {
+    if (this.app && this.app.dataHandler) {
+      this.dataHandler = this.app.dataHandler;
+
+      // Load existing PWA data
+      await this.loadPWAData();
+
+      // Initialize PWA analytics
+      this.initializePWAAnalytics();
+
+      console.log("✅ PWAService: DataHandler integration initialized");
+    } else {
+      console.warn(
+        "⚠️ PWAService: DataHandler not available, using fallback storage",
+      );
+    }
+  }
+
+  /**
+   * Phase 3.5: Load PWA persistent data from DataHandler
+   */
+  async loadPWAData() {
+    if (!this.dataHandler) return;
+
+    try {
+      const pwaData = (await this.dataHandler.get("pwa_state")) || {};
+
+      this.installationHistory = pwaData.installationHistory || [];
+      this.connectivityHistory = pwaData.connectivityHistory || [];
+      this.syncMetrics = {
+        ...this.syncMetrics,
+        ...pwaData.syncMetrics,
+      };
+
+      console.log("✅ PWAService: Loaded persistent PWA data");
+    } catch (error) {
+      console.error("❌ PWAService: Failed to load PWA data:", error);
+    }
+  }
+
+  /**
+   * Phase 3.5: Save PWA state to persistent storage
+   */
+  async savePWAData() {
+    if (!this.dataHandler) return;
+
+    try {
+      const pwaData = {
+        installationHistory: this.installationHistory,
+        connectivityHistory: this.connectivityHistory,
+        syncMetrics: this.syncMetrics,
+        lastUpdated: Date.now(),
+      };
+
+      await this.dataHandler.set("pwa_state", pwaData);
+    } catch (error) {
+      console.error("❌ PWAService: Failed to save PWA data:", error);
+    }
+  }
+
+  /**
+   * Phase 3.5: Initialize PWA analytics tracking
+   */
+  initializePWAAnalytics() {
+    if (this.app && this.app.analytics) {
+      // Track PWA initialization in app analytics
+      this.app.analytics.trackEvent("pwa_datahandler_integration", {
+        has_data_handler: !!this.dataHandler,
+        installation_history_count: this.installationHistory.length,
+        connectivity_history_count: this.connectivityHistory.length,
+        total_syncs: this.syncMetrics.totalSyncs,
+      });
+    }
+  }
+
+  /**
+   * Phase 3.5: Enhanced PWA event tracking with DataHandler persistence
+   */
+  trackInstallationEvent(eventType, details = {}) {
+    const installEvent = {
+      type: eventType,
+      timestamp: Date.now(),
+      details: {
+        ...details,
+        user_agent: navigator.userAgent,
+        is_standalone: this.isInstalled,
+      },
+    };
+
+    this.installationHistory.push(installEvent);
+
+    // Keep only last 50 installation events
+    if (this.installationHistory.length > 50) {
+      this.installationHistory = this.installationHistory.slice(-50);
+    }
+
+    this.debouncedSave();
+    this.trackPWAEvent("installation_event", installEvent);
+  }
+
+  /**
+   * Phase 3.5: Enhanced connectivity tracking with persistence
+   */
+  trackConnectivityEvent(online) {
+    const connectivityEvent = {
+      status: online ? "online" : "offline",
+      timestamp: Date.now(),
+      navigator_online: navigator.onLine,
+    };
+
+    this.connectivityHistory.push(connectivityEvent);
+
+    // Keep only last 100 connectivity events
+    if (this.connectivityHistory.length > 100) {
+      this.connectivityHistory = this.connectivityHistory.slice(-100);
+    }
+
+    this.pwaHealth.connectivityStatus = online ? "online" : "offline";
+    this.debouncedSave();
+    this.trackPWAEvent("connectivity_change", connectivityEvent);
+  }
+
+  /**
+   * Phase 3.5: Update PWA health monitoring
+   */
+  updatePWAHealth() {
+    this.pwaHealth = {
+      serviceWorkerStatus: this.registration ? "active" : "inactive",
+      installStatus: this.isInstalled ? "installed" : "browser",
+      connectivityStatus: this.isOnline ? "online" : "offline",
+      syncQueueHealth: this.syncQueue.length > 50 ? "overloaded" : "healthy",
+    };
+  }
+
+  /**
+   * Phase 3.5: Debounced save to prevent excessive storage writes
+   */
+  debouncedSave = (() => {
+    let timeout;
+    return () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => this.savePWAData(), 1000);
+    };
+  })();
+
+  /**
    * Initialize PWA service
+   * Phase 3.5: Enhanced with DataHandler integration
    */
   async init() {
     try {
+      // Phase 3.5: Initialize DataHandler integration first
+      await this.initializeDataHandlerIntegration();
+
       // Register service worker
       await this.registerServiceWorker();
 
@@ -51,14 +224,24 @@ export class PWAService {
       // Initialize background sync
       this.initializeBackgroundSync();
 
+      // Phase 3.5: Update PWA health status
+      this.updatePWAHealth();
+
       // Track PWA initialization
       this.trackPWAEvent("pwa_service_initialized", {
         is_installed: this.isInstalled,
         is_online: this.isOnline,
         has_service_worker: !!this.registration,
+        has_data_handler: !!this.dataHandler,
       });
     } catch (error) {
       console.error("❌ PWA Service initialization failed:", error);
+
+      // Phase 3.5: Track initialization failure
+      this.trackPWAEvent("pwa_service_init_failed", {
+        error: error.message,
+        stack: error.stack,
+      });
     }
   }
 
@@ -174,8 +357,13 @@ export class PWAService {
 
   /**
    * Handle online/offline status changes
+   * Phase 3.5: Enhanced with persistent connectivity tracking
    */
   handleOnlineStatusChange(isOnline) {
+    // Phase 3.5: Update stored connectivity status first
+    this.isOnline = isOnline;
+    this.trackConnectivityEvent(isOnline);
+
     if (isOnline) {
       this.processSyncQueue();
       this.hideOfflineIndicator();
@@ -183,10 +371,8 @@ export class PWAService {
       this.showOfflineIndicator();
     }
 
-    this.trackPWAEvent("connectivity_change", {
-      is_online: isOnline,
-      sync_queue_length: this.syncQueue.length,
-    });
+    // Phase 3.5: Update PWA health monitoring
+    this.updatePWAHealth();
 
     // Notify Firebase service if available
     if (this.firebaseService && this.firebaseService.handleConnectivityChange) {
@@ -314,8 +500,11 @@ export class PWAService {
 
   /**
    * Handle app installation
+   * Phase 3.5: Enhanced with persistent installation tracking
    */
   handleAppInstalled() {
+    this.isInstalled = true;
+
     // Remove install prompts
     const installBanner = document.getElementById("pwa-install-banner");
     if (installBanner) {
@@ -325,14 +514,20 @@ export class PWAService {
     // Add installed class
     document.body.classList.add("pwa-installed");
 
-    this.trackPWAEvent("app_installed", {
+    // Phase 3.5: Track installation with enhanced details
+    this.trackInstallationEvent("app_installed", {
       installation_time: Date.now(),
       user_agent: navigator.userAgent,
+      installation_source: "app_banner",
     });
+
+    // Phase 3.5: Update PWA health status
+    this.updatePWAHealth();
   }
 
   /**
    * Initialize background sync for offline actions
+   * Phase 3.5: Enhanced with DataHandler integration
    */
   initializeBackgroundSync() {
     // Listen for background sync events from service worker
@@ -340,8 +535,29 @@ export class PWAService {
       "serviceWorker" in navigator &&
       "sync" in window.ServiceWorkerRegistration.prototype
     ) {
+      // Background sync is supported
+      console.log("✅ Background sync supported");
+
+      // Phase 3.5: Track sync capability
+      this.trackPWAEvent("background_sync_supported", {
+        has_sync: true,
+        user_agent: navigator.userAgent,
+      });
+
+      // Listen for sync messages from service worker
+      navigator.serviceWorker.addEventListener("message", (event) => {
+        if (event.data && event.data.type === "SYNC_COMPLETE") {
+          this.handleSyncComplete(event.data.payload);
+        }
+      });
     } else {
       console.warn("⚠️ Background sync not supported, using fallback");
+
+      // Phase 3.5: Track lack of sync capability
+      this.trackPWAEvent("background_sync_not_supported", {
+        has_sync: false,
+        user_agent: navigator.userAgent,
+      });
     }
   }
 
@@ -482,6 +698,46 @@ export class PWAService {
   }
 
   /**
+   * Phase 3.5: Handle sync completion from service worker
+   */
+  handleSyncComplete(payload) {
+    console.log("✅ Background sync completed:", payload);
+
+    // Update sync metrics
+    this.syncMetrics.totalSyncs++;
+    this.syncMetrics.lastSyncTime = Date.now();
+
+    if (payload.duration) {
+      // Update average sync duration
+      if (this.syncMetrics.averageSyncDuration === 0) {
+        this.syncMetrics.averageSyncDuration = payload.duration;
+      } else {
+        this.syncMetrics.averageSyncDuration =
+          (this.syncMetrics.averageSyncDuration + payload.duration) / 2;
+      }
+    }
+
+    if (payload.success === false) {
+      this.syncMetrics.failedSyncs++;
+    }
+
+    // Update PWA health
+    this.updatePWAHealth();
+
+    // Save metrics
+    this.debouncedSave();
+
+    // Track the sync completion
+    this.trackPWAEvent("background_sync_completed", {
+      sync_type: payload.type || "unknown",
+      success: payload.success !== false,
+      duration: payload.duration,
+      total_syncs: this.syncMetrics.totalSyncs,
+      failed_syncs: this.syncMetrics.failedSyncs,
+    });
+  }
+
+  /**
    * Show sync completion notification
    */
   showSyncNotification(results) {
@@ -557,8 +813,8 @@ export class PWAService {
     }
 
     // Also track with Google Analytics if available
-    if (typeof gtag !== "undefined") {
-      gtag("event", eventName, {
+    if (typeof window !== "undefined" && typeof window.gtag !== "undefined") {
+      window.gtag("event", eventName, {
         event_category: "PWA",
         event_label: data.label || eventName,
         custom_parameter_1: this.isInstalled ? "installed" : "browser",

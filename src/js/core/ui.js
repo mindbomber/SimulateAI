@@ -250,7 +250,8 @@ class UIPerformanceMonitor {
 
 /**
  * Enhanced UIComponent - Base class for all UI components
- * Provides modern accessibility, theming, and performance features
+ * Phase 3.2: DataHandler Integration for UI State Management
+ * Provides modern accessibility, theming, performance features, and persistent UI state
  */
 class UIComponent {
   constructor(config = {}) {
@@ -258,6 +259,11 @@ class UIComponent {
     UIPerformanceMonitor.startMeasurement(
       `ui-component-init-${this.constructor.name}`,
     );
+
+    // Phase 3.2: DataHandler Integration
+    this.app = config.app || null;
+    this.dataHandler = config.app?.dataHandler || null;
+    this.persistentState = config.persistentState !== false;
 
     // Core properties
     this.id =
@@ -295,9 +301,23 @@ class UIComponent {
       debounceEvents: config.debounceEvents !== false,
     };
 
+    // Phase 3.2: Persistent UI preferences
+    this.uiPreferences = {
+      position: null,
+      size: null,
+      theme: null,
+      accessibility: null,
+      customizations: {},
+    };
+
     // Error handling
     this.errorHandler =
       config.errorHandler || this.defaultErrorHandler.bind(this);
+
+    // Phase 3.2: Initialize async with DataHandler if available
+    if (this.dataHandler && this.persistentState) {
+      this.initializeUIStateAsync();
+    }
 
     // Initialize component
     this.createElement();
@@ -309,6 +329,145 @@ class UIComponent {
     UIPerformanceMonitor.endMeasurement(
       `ui-component-init-${this.constructor.name}`,
     );
+  }
+
+  /**
+   * Phase 3.2: Async initialization for UI state management
+   */
+  async initializeUIStateAsync() {
+    try {
+      // Load persistent UI preferences
+      await this.loadUIPreferences();
+
+      // Apply loaded preferences to component
+      this.applyUIPreferences();
+
+      console.log(
+        `[UIComponent] ${this.constructor.name} initialized with persistent state`,
+      );
+    } catch (error) {
+      console.warn(
+        `[UIComponent] Failed to initialize UI state for ${this.constructor.name}:`,
+        error,
+      );
+    }
+  }
+
+  /**
+   * Phase 3.2: Load UI preferences from DataHandler
+   */
+  async loadUIPreferences() {
+    if (!this.dataHandler) return;
+
+    try {
+      const storageKey = `ui_component_${this.constructor.name.toLowerCase()}_${this.id}`;
+      const storedPreferences = await this.dataHandler.getData(storageKey);
+
+      if (storedPreferences && Object.keys(storedPreferences).length > 0) {
+        this.uiPreferences = { ...this.uiPreferences, ...storedPreferences };
+        console.log(
+          `[UIComponent] Loaded UI preferences for ${this.constructor.name}`,
+        );
+      }
+    } catch (error) {
+      console.warn(`[UIComponent] Failed to load UI preferences:`, error);
+    }
+  }
+
+  /**
+   * Phase 3.2: Save UI preferences to DataHandler
+   */
+  async saveUIPreferences() {
+    if (!this.dataHandler || !this.persistentState) return;
+
+    try {
+      const storageKey = `ui_component_${this.constructor.name.toLowerCase()}_${this.id}`;
+
+      // Prepare preferences data
+      const preferencesToSave = {
+        position: this.position,
+        size: this.size,
+        theme: this.theme,
+        accessibility: {
+          ariaLabel: this.ariaLabel,
+          focusable: this.focusable,
+          tabIndex: this.tabIndex,
+        },
+        customizations: this.uiPreferences.customizations,
+        lastUpdated: Date.now(),
+      };
+
+      await this.dataHandler.saveData(storageKey, preferencesToSave);
+      console.log(
+        `[UIComponent] Saved UI preferences for ${this.constructor.name}`,
+      );
+    } catch (error) {
+      console.warn(`[UIComponent] Failed to save UI preferences:`, error);
+    }
+  }
+
+  /**
+   * Phase 3.2: Apply loaded UI preferences to component
+   */
+  applyUIPreferences() {
+    try {
+      // Apply position if available
+      if (this.uiPreferences.position) {
+        this.position = { ...this.position, ...this.uiPreferences.position };
+      }
+
+      // Apply size if available
+      if (this.uiPreferences.size) {
+        this.size = { ...this.size, ...this.uiPreferences.size };
+      }
+
+      // Apply accessibility preferences
+      if (this.uiPreferences.accessibility) {
+        const { accessibility } = this.uiPreferences;
+        if (accessibility.ariaLabel) this.ariaLabel = accessibility.ariaLabel;
+        if (accessibility.focusable !== undefined)
+          this.focusable = accessibility.focusable;
+        if (accessibility.tabIndex !== undefined)
+          this.tabIndex = accessibility.tabIndex;
+      }
+
+      // Apply theme preferences
+      if (this.uiPreferences.theme) {
+        this.theme = { ...this.theme, ...this.uiPreferences.theme };
+      }
+
+      console.log(
+        `[UIComponent] Applied UI preferences for ${this.constructor.name}`,
+      );
+    } catch (error) {
+      console.warn(`[UIComponent] Failed to apply UI preferences:`, error);
+    }
+  }
+
+  /**
+   * Phase 3.2: Update UI preferences and save to DataHandler
+   */
+  async updateUIPreferences(updates) {
+    try {
+      // Update local preferences
+      this.uiPreferences = { ...this.uiPreferences, ...updates };
+
+      // Apply updates to component
+      this.applyUIPreferences();
+
+      // Save to DataHandler
+      await this.saveUIPreferences();
+
+      // Trigger preference change event
+      this.triggerEvent("ui-preferences-changed", {
+        componentId: this.id,
+        componentType: this.constructor.name,
+        updates,
+        timestamp: Date.now(),
+      });
+    } catch (error) {
+      console.warn(`[UIComponent] Failed to update UI preferences:`, error);
+    }
   }
 
   /**
@@ -601,12 +760,32 @@ class UIComponent {
     this.position.x = x;
     this.position.y = y;
     this.updateElementPosition();
+
+    // Phase 3.2: Save position to DataHandler
+    if (this.persistentState) {
+      this.saveUIPreferences().catch((error) => {
+        console.warn(
+          `[UIComponent] Failed to save position for ${this.constructor.name}:`,
+          error,
+        );
+      });
+    }
   }
 
   setSize(width, height) {
     this.size.width = width;
     this.size.height = height;
     this.updateElementPosition();
+
+    // Phase 3.2: Save size to DataHandler
+    if (this.persistentState) {
+      this.saveUIPreferences().catch((error) => {
+        console.warn(
+          `[UIComponent] Failed to save size for ${this.constructor.name}:`,
+          error,
+        );
+      });
+    }
   }
 
   show() {
@@ -3358,6 +3537,250 @@ class Slider extends UIComponent {
   }
 }
 
+/**
+ * Phase 3.2: UIManager - Global UI component coordinator with DataHandler integration
+ * Manages UI components, preferences, themes, and persistent state across the application
+ */
+class UIManager {
+  constructor(app = null) {
+    this.app = app;
+    this.dataHandler = app?.dataHandler || null;
+    this.components = new Map();
+    this.globalUIPreferences = {};
+    this.themeWatchers = new Set();
+    this.initialized = false;
+
+    console.log(
+      "[UIManager] Created with DataHandler support:",
+      !!this.dataHandler,
+    );
+  }
+
+  /**
+   * Initialize UIManager with global UI preferences
+   */
+  async initialize() {
+    if (this.initialized) return;
+
+    try {
+      // Load global UI preferences
+      await this.loadGlobalUIPreferences();
+
+      // Apply global theme preferences
+      this.applyGlobalThemePreferences();
+
+      // Setup theme change monitoring
+      this.setupGlobalThemeMonitoring();
+
+      this.initialized = true;
+      console.log("[UIManager] Initialized with global UI preferences");
+    } catch (error) {
+      console.warn("[UIManager] Failed to initialize:", error);
+    }
+  }
+
+  /**
+   * Register a UI component with the manager
+   */
+  registerComponent(component) {
+    if (component && component.id) {
+      this.components.set(component.id, component);
+      console.log(
+        `[UIManager] Registered component: ${component.constructor.name} (${component.id})`,
+      );
+    }
+  }
+
+  /**
+   * Unregister a UI component
+   */
+  unregisterComponent(componentId) {
+    if (this.components.has(componentId)) {
+      const component = this.components.get(componentId);
+      this.components.delete(componentId);
+      console.log(
+        `[UIManager] Unregistered component: ${component.constructor.name} (${componentId})`,
+      );
+    }
+  }
+
+  /**
+   * Create UI component with DataHandler support
+   */
+  createComponent(ComponentClass, config = {}) {
+    const enhancedConfig = {
+      ...config,
+      app: this.app,
+    };
+
+    const component = new ComponentClass(enhancedConfig);
+    this.registerComponent(component);
+    return component;
+  }
+
+  /**
+   * Load global UI preferences from DataHandler
+   */
+  async loadGlobalUIPreferences() {
+    if (!this.dataHandler) return;
+
+    try {
+      const storedPreferences = await this.dataHandler.getData(
+        "global_ui_preferences",
+      );
+      if (storedPreferences && Object.keys(storedPreferences).length > 0) {
+        this.globalUIPreferences = storedPreferences;
+        console.log("[UIManager] Loaded global UI preferences");
+      }
+    } catch (error) {
+      console.warn("[UIManager] Failed to load global UI preferences:", error);
+    }
+  }
+
+  /**
+   * Save global UI preferences to DataHandler
+   */
+  async saveGlobalUIPreferences() {
+    if (!this.dataHandler) return;
+
+    try {
+      await this.dataHandler.saveData(
+        "global_ui_preferences",
+        this.globalUIPreferences,
+      );
+      console.log("[UIManager] Saved global UI preferences");
+    } catch (error) {
+      console.warn("[UIManager] Failed to save global UI preferences:", error);
+    }
+  }
+
+  /**
+   * Update global UI preferences
+   */
+  async updateGlobalUIPreferences(updates) {
+    this.globalUIPreferences = { ...this.globalUIPreferences, ...updates };
+
+    // Apply to all registered components
+    this.components.forEach((component) => {
+      if (component.updateUIPreferences) {
+        component.updateUIPreferences(updates);
+      }
+    });
+
+    // Save to DataHandler
+    await this.saveGlobalUIPreferences();
+
+    console.log("[UIManager] Updated global UI preferences");
+  }
+
+  /**
+   * Apply global theme preferences
+   */
+  applyGlobalThemePreferences() {
+    if (this.globalUIPreferences.theme) {
+      UIThemeManager.setTheme(this.globalUIPreferences.theme);
+    }
+  }
+
+  /**
+   * Setup global theme monitoring
+   */
+  setupGlobalThemeMonitoring() {
+    // Monitor system theme changes
+    const themeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    themeQuery.addEventListener("change", () => {
+      this.handleSystemThemeChange();
+    });
+
+    // Monitor accessibility preference changes
+    const reducedMotionQuery = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    );
+    reducedMotionQuery.addEventListener("change", () => {
+      this.handleAccessibilityChange();
+    });
+  }
+
+  /**
+   * Handle system theme changes
+   */
+  async handleSystemThemeChange() {
+    const systemPrefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)",
+    ).matches;
+
+    if (!this.globalUIPreferences.themeOverride) {
+      await this.updateGlobalUIPreferences({
+        theme: systemPrefersDark ? "dark" : "light",
+        lastThemeUpdate: Date.now(),
+      });
+    }
+  }
+
+  /**
+   * Handle accessibility preference changes
+   */
+  async handleAccessibilityChange() {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    await this.updateGlobalUIPreferences({
+      accessibility: {
+        ...this.globalUIPreferences.accessibility,
+        reducedMotion: prefersReducedMotion,
+      },
+      lastAccessibilityUpdate: Date.now(),
+    });
+  }
+
+  /**
+   * Get component by ID
+   */
+  getComponent(componentId) {
+    return this.components.get(componentId);
+  }
+
+  /**
+   * Get all components of a specific type
+   */
+  getComponentsByType(ComponentClass) {
+    return Array.from(this.components.values()).filter(
+      (component) => component instanceof ComponentClass,
+    );
+  }
+
+  /**
+   * Cleanup all components
+   */
+  cleanup() {
+    this.components.forEach((component) => {
+      if (component.cleanup) {
+        component.cleanup();
+      }
+    });
+    this.components.clear();
+    console.log("[UIManager] Cleaned up all components");
+  }
+
+  /**
+   * Get UI statistics
+   */
+  getUIStatistics() {
+    return {
+      totalComponents: this.components.size,
+      componentTypes: [
+        ...new Set(
+          Array.from(this.components.values()).map((c) => c.constructor.name),
+        ),
+      ],
+      dataHandlerEnabled: !!this.dataHandler,
+      globalPreferences: this.globalUIPreferences,
+      registeredComponents: Array.from(this.components.keys()),
+    };
+  }
+}
+
 // Export all UI components
 export {
   UIComponent,
@@ -3369,6 +3792,7 @@ export {
   UIThemeManager,
   UIStyleManager,
   UIPerformanceMonitor,
+  UIManager,
   UI_CONSTANTS,
   THEME_COLORS,
 };

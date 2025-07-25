@@ -377,9 +377,11 @@ class AnalyticsPerformance {
 }
 
 /**
- * Enhanced AnalyticsManager with modern features
+ * Enhanced AnalyticsManager with DataHandler Integration - Phase 3.1
+ * Supports both static usage (backward compatibility) and instance usage (enhanced features)
  */
 class AnalyticsManager {
+  // Static properties for backward compatibility
   static isInitialized = false;
   static config = {
     enabled: true,
@@ -400,7 +402,414 @@ class AnalyticsManager {
   static flushTimer = null;
   static themeObserver = null;
   static isOnline = navigator.onLine;
-  static retryQueue = []; /**
+  static retryQueue = [];
+
+  // Global singleton instance for enhanced features
+  static globalInstance = null;
+
+  /**
+   * Enhanced constructor for DataHandler integration
+   * @param {Object} app - Enhanced app instance with DataHandler
+   */
+  constructor(app = null) {
+    this.app = app;
+    this.dataHandler = app?.dataHandler || null;
+    this.isInstanceInitialized = false;
+
+    // Instance-specific properties
+    this.instanceConfig = { ...AnalyticsManager.config };
+    this.instanceEventQueue = [];
+    this.instanceSessionData = {};
+    this.instanceFlushTimer = null;
+
+    console.log(
+      "[AnalyticsManager] Instance created with DataHandler support:",
+      !!this.dataHandler,
+    );
+
+    // Auto-initialize async if DataHandler available
+    if (this.dataHandler) {
+      this.initializeAsync();
+    }
+  }
+
+  /**
+   * Async initialization for DataHandler integration
+   */
+  async initializeAsync() {
+    if (this.isInstanceInitialized) return;
+
+    try {
+      // Load stored analytics configuration
+      await this.loadAnalyticsConfig();
+
+      // Load stored session data
+      await this.loadSessionData();
+
+      // Load stored event queue
+      await this.loadEventQueue();
+
+      this.isInstanceInitialized = true;
+      console.log("[AnalyticsManager] Instance initialized with DataHandler");
+    } catch (error) {
+      console.warn(
+        "[AnalyticsManager] Failed to initialize with DataHandler:",
+        error,
+      );
+    }
+  }
+
+  /**
+   * Load analytics configuration from DataHandler
+   */
+  async loadAnalyticsConfig() {
+    if (!this.dataHandler) return;
+
+    try {
+      const storedConfig = await this.dataHandler.getData("analytics_config");
+      if (storedConfig && Object.keys(storedConfig).length > 0) {
+        this.instanceConfig = { ...this.instanceConfig, ...storedConfig };
+        console.log(
+          "[AnalyticsManager] Loaded analytics config from DataHandler",
+        );
+      }
+    } catch (error) {
+      console.warn(
+        "[AnalyticsManager] Failed to load analytics config:",
+        error,
+      );
+    }
+  }
+
+  /**
+   * Save analytics configuration to DataHandler
+   */
+  async saveAnalyticsConfig() {
+    if (!this.dataHandler) return;
+
+    try {
+      await this.dataHandler.saveData("analytics_config", this.instanceConfig);
+      console.log("[AnalyticsManager] Saved analytics config to DataHandler");
+    } catch (error) {
+      console.warn(
+        "[AnalyticsManager] Failed to save analytics config:",
+        error,
+      );
+    }
+  }
+
+  /**
+   * Load session data from DataHandler
+   */
+  async loadSessionData() {
+    if (!this.dataHandler) return;
+
+    try {
+      const storedSession = await this.dataHandler.getData("analytics_session");
+      if (storedSession && Object.keys(storedSession).length > 0) {
+        this.instanceSessionData = storedSession;
+        console.log("[AnalyticsManager] Loaded session data from DataHandler");
+      }
+    } catch (error) {
+      console.warn("[AnalyticsManager] Failed to load session data:", error);
+    }
+  }
+
+  /**
+   * Save session data to DataHandler
+   */
+  async saveSessionData() {
+    if (!this.dataHandler) return;
+
+    try {
+      await this.dataHandler.saveData(
+        "analytics_session",
+        this.instanceSessionData,
+      );
+      console.log("[AnalyticsManager] Saved session data to DataHandler");
+    } catch (error) {
+      console.warn("[AnalyticsManager] Failed to save session data:", error);
+    }
+  }
+
+  /**
+   * Load event queue from DataHandler
+   */
+  async loadEventQueue() {
+    if (!this.dataHandler) return;
+
+    try {
+      const storedQueue = await this.dataHandler.getData(
+        "analytics_event_queue",
+      );
+      if (storedQueue && Array.isArray(storedQueue)) {
+        this.instanceEventQueue = storedQueue;
+        console.log("[AnalyticsManager] Loaded event queue from DataHandler");
+      }
+    } catch (error) {
+      console.warn("[AnalyticsManager] Failed to load event queue:", error);
+    }
+  }
+
+  /**
+   * Save event queue to DataHandler
+   */
+  async saveEventQueue() {
+    if (!this.dataHandler) return;
+
+    try {
+      await this.dataHandler.saveData(
+        "analytics_event_queue",
+        this.instanceEventQueue,
+      );
+      console.log("[AnalyticsManager] Saved event queue to DataHandler");
+    } catch (error) {
+      console.warn("[AnalyticsManager] Failed to save event queue:", error);
+    }
+  }
+
+  /**
+   * Get or create global singleton instance
+   */
+  static getGlobalInstance(app = null) {
+    if (!this.globalInstance && app) {
+      this.globalInstance = new AnalyticsManager(app);
+    }
+    return this.globalInstance;
+  }
+
+  /**
+   * Instance method: Initialize the analytics system with enhanced features
+   * @param {Object} config - Configuration options
+   */
+  async init(config = {}) {
+    if (this.isInstanceInitialized) return;
+
+    try {
+      // Merge configuration
+      this.instanceConfig = { ...this.instanceConfig, ...config };
+
+      // Save configuration to DataHandler
+      await this.saveAnalyticsConfig();
+
+      // Initialize session data with enhanced information
+      await this.initializeInstanceSession();
+
+      // Check user consent and privacy preferences
+      await this.validatePrivacyConsentInstance();
+
+      if (this.instanceConfig.enabled) {
+        await this.startInstanceSession();
+        this.setupInstanceEventListeners();
+        this.setupInstanceThemeMonitoring();
+        this.setupInstanceNetworkMonitoring();
+        this.startInstanceFlushTimer();
+
+        if (this.instanceConfig.trackPerformance) {
+          AnalyticsPerformance.startTracking();
+        }
+
+        // Initialize accessibility tracking
+        this.initializeInstanceAccessibilityTracking();
+      }
+
+      this.isInstanceInitialized = true;
+
+      if (this.instanceConfig.debug) {
+        console.log(
+          "[AnalyticsManager] Instance initialized with DataHandler support",
+          {
+            enabled: this.instanceConfig.enabled,
+            version: ANALYTICS_CONSTANTS.VERSION,
+            dataHandler: !!this.dataHandler,
+          },
+        );
+      }
+    } catch (error) {
+      console.error(
+        "[AnalyticsManager] Instance initialization failed:",
+        error,
+      );
+    }
+  }
+
+  /**
+   * Instance method: Track events with DataHandler persistence
+   */
+  async trackEvent(eventName, eventData = {}, context = {}) {
+    if (!this.instanceConfig.enabled) return;
+
+    const event = this.createEventObject(eventName, eventData, context);
+    this.instanceEventQueue.push(event);
+
+    // Save event queue to DataHandler
+    await this.saveEventQueue();
+
+    // Process queue if it reaches batch size
+    if (this.instanceEventQueue.length >= this.instanceConfig.batchSize) {
+      await this.flushInstanceEvents();
+    }
+
+    if (this.instanceConfig.debug) {
+      console.log("[AnalyticsManager] Event tracked:", event);
+    }
+  }
+
+  /**
+   * Instance method: Initialize session data with DataHandler persistence
+   */
+  async initializeInstanceSession() {
+    this.instanceSessionData = {
+      sessionId: await this.generateInstanceSessionId(),
+      startTime: Date.now(),
+      userAgent: navigator.userAgent,
+      language: navigator.language,
+      languages: navigator.languages || [navigator.language],
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      screenResolution: `${screen.width}x${screen.height}`,
+      viewportSize: `${window.innerWidth}x${window.innerHeight}`,
+      colorDepth: screen.colorDepth,
+      pixelRatio: window.devicePixelRatio || 1,
+      platform: navigator.platform,
+      cookieEnabled: navigator.cookieEnabled,
+      onlineStatus: navigator.onLine,
+      theme: AnalyticsTheme.getCurrentTheme(),
+      accessibility: AnalyticsTheme.getAccessibilityContext(),
+      memory: AnalyticsManager.getMemoryInfo(),
+      connection: AnalyticsManager.getConnectionInfo(),
+    };
+
+    // Save session data to DataHandler
+    await this.saveSessionData();
+  }
+
+  /**
+   * Instance method: Generate unique session ID with DataHandler persistence
+   */
+  async generateInstanceSessionId() {
+    const timestamp = Date.now();
+    const random = Math.random()
+      .toString(ANALYTICS_CONSTANTS.ID_GENERATION.RADIX)
+      .substr(
+        ANALYTICS_CONSTANTS.ID_GENERATION.SUBSTRING_START,
+        ANALYTICS_CONSTANTS.ID_GENERATION.SUBSTRING_LENGTH,
+      );
+
+    let stored = "";
+    if (this.dataHandler) {
+      try {
+        const sessionData = await this.dataHandler.getData(
+          "analytics_session_id",
+        );
+        stored = sessionData || "";
+      } catch (error) {
+        console.warn(
+          "[AnalyticsManager] Failed to load session ID from DataHandler:",
+          error,
+        );
+      }
+    }
+
+    // Fallback to StorageManager
+    if (!stored) {
+      stored = StorageManager.getSessionId?.() || "";
+    }
+
+    const sessionId = stored || `${timestamp}-${random}`;
+
+    // Save session ID to DataHandler
+    if (this.dataHandler) {
+      try {
+        await this.dataHandler.saveData("analytics_session_id", sessionId);
+      } catch (error) {
+        console.warn(
+          "[AnalyticsManager] Failed to save session ID to DataHandler:",
+          error,
+        );
+      }
+    }
+
+    return sessionId;
+  }
+
+  /**
+   * Helper methods for instance functionality
+   */
+  createEventObject(eventName, eventData = {}, context = {}) {
+    return {
+      id: this.generateEventId(),
+      name: eventName,
+      data: this.sanitizeEventData(eventData),
+      context: this.sanitizeEventData(context),
+      timestamp: Date.now(),
+      sessionId: this.instanceSessionData.sessionId || "unknown",
+      url: window.location.href,
+      referrer: document.referrer,
+      theme: AnalyticsTheme.getCurrentTheme(),
+    };
+  }
+
+  generateEventId() {
+    return `evt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  sanitizeEventData(data) {
+    if (!this.instanceConfig.anonymizeData) return data;
+    const sanitized = { ...data };
+    const sensitiveKeys = [
+      "password",
+      "token",
+      "key",
+      "secret",
+      "auth",
+      "email",
+    ];
+    sensitiveKeys.forEach((key) => {
+      if (sanitized[key]) sanitized[key] = "[REDACTED]";
+    });
+    return sanitized;
+  }
+
+  async flushInstanceEvents() {
+    if (this.instanceEventQueue.length === 0) return;
+    try {
+      const events = [...this.instanceEventQueue];
+      this.instanceEventQueue = [];
+      await this.saveEventQueue();
+      if (this.instanceConfig.debug) {
+        console.log("[AnalyticsManager] Flushed events:", events.length);
+      }
+    } catch (error) {
+      console.error("[AnalyticsManager] Failed to flush events:", error);
+    }
+  }
+
+  // Instance delegation methods
+  async validatePrivacyConsentInstance() {
+    return AnalyticsManager.validatePrivacyConsent();
+  }
+  async startInstanceSession() {
+    return AnalyticsManager.startSession();
+  }
+  setupInstanceEventListeners() {
+    return AnalyticsManager.setupEventListeners();
+  }
+  setupInstanceThemeMonitoring() {
+    return AnalyticsManager.setupThemeMonitoring();
+  }
+  setupInstanceNetworkMonitoring() {
+    return AnalyticsManager.setupNetworkMonitoring();
+  }
+  initializeInstanceAccessibilityTracking() {
+    return AnalyticsManager.initializeAccessibilityTracking();
+  }
+
+  startInstanceFlushTimer() {
+    if (this.instanceFlushTimer) clearInterval(this.instanceFlushTimer);
+    this.instanceFlushTimer = setInterval(() => {
+      this.flushInstanceEvents();
+    }, this.instanceConfig.flushInterval);
+  } /**
    * Initialize the analytics system with enhanced features
    * @param {Object} config - Configuration options
    */

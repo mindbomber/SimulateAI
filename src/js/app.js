@@ -36,9 +36,12 @@ import AccessibilityManager from "./core/accessibility.js";
 import AnimationManager from "./core/animation-manager.js";
 import DataHandler from "./core/data-handler.js";
 import UIBinder from "./core/ui-binder.js";
+import { UIManager } from "./core/ui.js"; // Phase 3.2: UIManager integration
 import EducatorToolkit from "./core/educator-toolkit.js";
 import DigitalScienceLab from "./core/digital-science-lab.js";
 import ScenarioGenerator from "./core/scenario-generator.js";
+import PerformanceMonitor from "./utils/performance-monitor.js"; // Phase 3.3: PerformanceMonitor integration
+import { ComponentRegistry } from "./utils/component-registry.js"; // Phase 3.4: ComponentRegistry integration
 
 // Import MCP integrations
 import MCPIntegrationManager from "./integrations/mcp-integration-manager.js";
@@ -68,6 +71,7 @@ import "./utils/console-cleanup.js"; // Initialize console cleanup utility
 
 // Import system metadata collection
 import { getSystemCollector } from "./services/system-metadata-collector.js";
+import { PWAService } from "./services/pwa-service.js"; // Phase 3.5: PWAService integration
 
 // Import enhanced objects (loaded dynamically as needed)
 // import { EthicsMeter, InteractiveButton, InteractiveSlider } from './objects/enhanced-objects.js';
@@ -346,13 +350,18 @@ class AIEthicsApp {
       circuitBreakerEnabled: true,
     };
 
-    // Enhanced Analytics Manager
-    this.analyticsManager = AnalyticsManager;
+    // Enhanced Analytics Manager - Phase 3.1 Integration
+    this.analyticsManager = AnalyticsManager; // Keep static reference for backward compatibility
+    this.analyticsInstance = null; // New instance with DataHandler support
     this.simpleAnalytics = simpleAnalytics; // Keep for backward compatibility
 
     // Modernized managers
     this.accessibilityManager = null;
     this.animationManager = null;
+
+    // Phase 3.3: Performance Monitor Integration
+    this.performanceMonitor = null; // Enhanced instance with DataHandler support
+    this.appPerformanceMonitor = null; // Application-level performance tracking
 
     // Core educational modules
     this.educatorToolkit = null;
@@ -400,6 +409,9 @@ class AIEthicsApp {
     this.authService = null;
     this.currentUser = null;
     this.userWelcomed = false; // Track if user has been welcomed this session
+
+    // Phase 3.5: PWA Service Integration
+    this.pwaService = null; // Enhanced PWA management with DataHandler integration
 
     // Firebase Cloud Messaging
     this.messagingService = null;
@@ -719,6 +731,7 @@ class AIEthicsApp {
 
   /**
    * Perform performance monitoring check
+   * Phase 3.3: Enhanced with PerformanceMonitor integration
    */
   _performPerformanceCheck() {
     const performanceData = {
@@ -728,6 +741,15 @@ class AIEthicsApp {
       userTiming: this._getUserTimingMetrics(),
       resourceTiming: this._getResourceTimingMetrics(),
     };
+
+    // Phase 3.3: Integrate with PerformanceMonitor analytics
+    if (this.performanceMonitor) {
+      const analytics = PerformanceMonitor.getGlobalAnalytics();
+      performanceData.monitorAnalytics = analytics;
+
+      // Track this performance check as a measurement
+      this.appPerformanceMonitor?.startMeasurement("performance_check");
+    }
 
     // Update performance metrics
     this.performanceMetrics.lastPerformanceCheck = Date.now();
@@ -750,6 +772,15 @@ class AIEthicsApp {
       );
     }
 
+    // Phase 3.3: Add PerformanceMonitor health assessment
+    if (performanceData.monitorAnalytics) {
+      if (performanceData.monitorAnalytics.systemHealth === "critical") {
+        issues.push("Critical performance issues detected by monitors");
+      } else if (performanceData.monitorAnalytics.systemHealth === "degraded") {
+        issues.push("Performance degradation detected by monitors");
+      }
+    }
+
     // Send to enterprise monitoring
     if (window.enterpriseMonitoring) {
       window.enterpriseMonitoring.send("performance_metrics", {
@@ -760,6 +791,15 @@ class AIEthicsApp {
 
     if (issues.length > 0) {
       AppDebug.warn("Performance issues detected", issues);
+    }
+
+    // Phase 3.3: Complete performance check measurement
+    if (this.appPerformanceMonitor) {
+      this.appPerformanceMonitor.endMeasurement("performance_check", {
+        issuesFound: issues.length,
+        systemHealth:
+          performanceData.monitorAnalytics?.systemHealth || "unknown",
+      });
     }
   }
 
@@ -856,21 +896,62 @@ class AIEthicsApp {
     const initStartTime = performance.now();
 
     try {
-      AppDebug.log("🚀 Starting AIEthicsApp enterprise initialization...");
-
-      // Mark initialization start for performance tracking
+      AppDebug.log("🚀 Starting AIEthicsApp phased initialization...");
       performance.mark("app-init-start");
 
-      // Wait for JSON SSOT configuration system to be ready
-      AppDebug.log("⚙️ Waiting for configuration system...");
+      // ========================================================================
+      // PHASE 1: FOUNDATION - Core infrastructure and configuration
+      // ========================================================================
+      await this._initializePhase1Foundation();
+
+      // ========================================================================
+      // PHASE 2: SERVICES - Backend services and data management
+      // ========================================================================
+      await this._initializePhase2Services();
+
+      // ========================================================================
+      // PHASE 3: COMPONENTS - Main application components
+      // ========================================================================
+      await this._initializePhase3Components();
+
+      // ========================================================================
+      // PHASE 4: INTERACTIONS - Events, accessibility, and user tracking
+      // ========================================================================
+      await this._initializePhase4Interactions();
+
+      // ========================================================================
+      // PHASE 5: EDUCATIONAL - Advanced features and enhancements
+      // ========================================================================
+      await this._initializePhase5Educational();
+
+      // ========================================================================
+      // FINALIZATION - Complete initialization and start monitoring
+      // ========================================================================
+      await this._finalizeInitialization(initStartTime);
+    } catch (error) {
+      await this._handleInitializationFailure(error);
+    }
+  }
+
+  /**
+   * Phase 1: Foundation - Core infrastructure and configuration
+   * Sets up the fundamental systems needed for the app to function
+   */
+  async _initializePhase1Foundation() {
+    AppDebug.log(
+      "📋 Phase 1: Foundation - Initializing core infrastructure...",
+    );
+    const phaseStartTime = performance.now();
+
+    try {
+      // Configuration System
+      AppDebug.log("⚙️ Setting up configuration system...");
       if (!appStartup.initialized) {
         await appStartup.initialize();
       }
       this._updateComponentHealth("config_system", "healthy");
-      AppDebug.log("✅ Configuration system ready");
 
-      // Initialize ConfigurationIntegrator for component configurations
-      AppDebug.log("⚙️ Initializing configuration integrator...");
+      // Configuration Integrator
       try {
         await configIntegrator.initialize();
         this._updateComponentHealth("config_integrator", "healthy");
@@ -884,97 +965,215 @@ class AIEthicsApp {
       // Register simulateai with configuration system
       this.registerSimulateaiWithConfig();
 
-      // Initialize scroll manager first (handles all scroll behavior)
+      // Scroll Manager
       scrollManager.init();
       this._updateComponentHealth("scroll_manager", "healthy");
 
-      // Initialize theme detection first
+      // Theme System
       this.initializeTheme();
       this._updateComponentHealth("theme_system", "healthy");
 
-      // Initialize error handling
+      // Error Handling
       this.initializeErrorHandling();
       this._updateComponentHealth("error_handling", "healthy");
 
-      // Initialize infinite loop detection (development mode only)
+      // Development Tools (in dev mode only)
       this.initializeLoopDetection();
 
-      // Initialize core systems with enterprise monitoring
+      const phaseTime = performance.now() - phaseStartTime;
+      AppDebug.log(
+        `✅ Phase 1 Foundation completed (${phaseTime.toFixed(2)}ms)`,
+      );
+      this._trackPhaseCompletion("foundation", phaseTime);
+    } catch (error) {
+      AppDebug.error("Phase 1 Foundation failed:", error);
+      this._updateComponentHealth("foundation_phase", "critical");
+      throw new Error(`Foundation phase failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Phase 2: Services - Backend services and data management
+   * Initializes external services, authentication, and data systems
+   */
+  async _initializePhase2Services() {
+    AppDebug.log("🔧 Phase 2: Services - Initializing backend services...");
+    const phaseStartTime = performance.now();
+
+    try {
+      // Core Systems (Analytics, Storage, etc.)
       await this.initializeSystems();
       this._updateComponentHealth("core_systems", "healthy");
 
-      // Setup UI
+      // Firebase and Authentication
+      await this.initializeFirebaseServices();
+      this._updateComponentHealth("firebase_system", "healthy");
+
+      // Firebase Cloud Messaging (if supported)
+      try {
+        await this.initializeFirebaseMessaging();
+        this._updateComponentHealth("firebase_messaging", "healthy");
+      } catch (error) {
+        AppDebug.warn("Firebase messaging not available:", error.message);
+        this._updateComponentHealth("firebase_messaging", "degraded");
+        // Continue without messaging - not critical
+      }
+
+      const phaseTime = performance.now() - phaseStartTime;
+      AppDebug.log(`✅ Phase 2 Services completed (${phaseTime.toFixed(2)}ms)`);
+      this._trackPhaseCompletion("services", phaseTime);
+    } catch (error) {
+      AppDebug.error("Phase 2 Services failed:", error);
+      this._updateComponentHealth("services_phase", "critical");
+      throw new Error(`Services phase failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Phase 3: Components - Main application components
+   * Sets up UI components, modals, and core functionality
+   */
+  async _initializePhase3Components() {
+    AppDebug.log("🧩 Phase 3: Components - Initializing UI components...");
+    const phaseStartTime = performance.now();
+
+    try {
+      // UI Setup
       this.setupUI();
       this._updateComponentHealth("ui_system", "healthy");
 
-      // Simulation configuration loaded directly (simulateai only)
+      // Simulation System
       this._updateComponentHealth("simulation_system", "healthy");
 
-      // Setup event listeners
-      this.setupEventListeners();
-      this._updateComponentHealth("event_system", "healthy");
-
-      // Initialize accessibility
-      this.setupAccessibility();
-      this._updateComponentHealth("accessibility_system", "healthy");
-
-      // Render initial state
-      this.render();
-      this._updateComponentHealth("render_system", "healthy");
-
-      // Initialize modal footer management
+      // Modal Management
       this.initializeModalFooterManager();
       this._updateComponentHealth("modal_system", "healthy");
 
-      // Initialize ethics radar demo
+      // Ethics Radar Demo
       await this.initializeEthicsRadarDemo();
       this._updateComponentHealth("ethics_radar", "healthy");
 
-      // Initialize onboarding tour for first-time users (prevent multiple instances)
-      // Only initialize on app page, not on landing page
+      // Scenario Browser Integration
+      await this.initializeScenarioBrowserIntegration();
+      this._updateComponentHealth("scenario_browser", "healthy");
+
+      // Scroll Reveal Header
+      this.initializeScrollRevealHeader();
+      this._updateComponentHealth("scroll_reveal", "healthy");
+
+      // Initial Render
+      this.render();
+      this._updateComponentHealth("render_system", "healthy");
+
+      const phaseTime = performance.now() - phaseStartTime;
+      AppDebug.log(
+        `✅ Phase 3 Components completed (${phaseTime.toFixed(2)}ms)`,
+      );
+      this._trackPhaseCompletion("components", phaseTime);
+    } catch (error) {
+      AppDebug.error("Phase 3 Components failed:", error);
+      this._updateComponentHealth("components_phase", "critical");
+      throw new Error(`Components phase failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Phase 4: Interactions - Events, accessibility, and user tracking
+   * Sets up event handlers, accessibility features, and user interaction tracking
+   */
+  async _initializePhase4Interactions() {
+    AppDebug.log("⚡ Phase 4: Interactions - Setting up user interactions...");
+    const phaseStartTime = performance.now();
+
+    try {
+      // Event Listeners
+      this.setupEventListeners();
+      this._updateComponentHealth("event_system", "healthy");
+
+      // Accessibility
+      this.setupAccessibility();
+      this._updateComponentHealth("accessibility_system", "healthy");
+
+      // Authentication State Listener
+      this.setupAuthStateListener();
+      this._updateComponentHealth("auth_state_listener", "healthy");
+
+      // Research Data Integration
+      this.setupResearchDataIntegration();
+      this._updateComponentHealth("research_integration", "healthy");
+
+      // Hero Animations
+      this.initializeHeroAnimations();
+      this._updateComponentHealth("hero_animations", "healthy");
+
+      const phaseTime = performance.now() - phaseStartTime;
+      AppDebug.log(
+        `✅ Phase 4 Interactions completed (${phaseTime.toFixed(2)}ms)`,
+      );
+      this._trackPhaseCompletion("interactions", phaseTime);
+    } catch (error) {
+      AppDebug.error("Phase 4 Interactions failed:", error);
+      this._updateComponentHealth("interactions_phase", "critical");
+      throw new Error(`Interactions phase failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Phase 5: Educational - Advanced features and enhancements
+   * Initializes educational tools, badges, onboarding, and MCP integrations
+   */
+  async _initializePhase5Educational() {
+    AppDebug.log(
+      "🎓 Phase 5: Educational - Initializing educational features...",
+    );
+    const phaseStartTime = performance.now();
+
+    try {
+      // MCP Integrations
+      await this.initializeMCPIntegrations();
+      this._updateComponentHealth("mcp_system", "healthy");
+
+      // Onboarding Tour (app page only)
       const isAppPage =
         window.location.pathname.includes("app.html") ||
         document.querySelector(".categories-grid") !== null;
 
       if (isAppPage && !this.onboardingTour && !window.onboardingTourInstance) {
         this.onboardingTour = new OnboardingTour();
-
-        // Make onboarding tour available globally for debugging
         window.onboardingTourInstance = this.onboardingTour;
-
-        // Instrument onboarding tour for loop detection (development mode)
         this.instrumentOnboardingTour(this.onboardingTour);
-
-        // Check and start onboarding tour for first-time users
         this.checkAndStartOnboardingTour();
         this._updateComponentHealth("onboarding_system", "healthy");
       } else if (!isAppPage) {
-        AppDebug.info(
-          "Skipping onboarding tour initialization - not on app page",
-        );
+        AppDebug.info("Skipping onboarding tour - not on app page");
       } else {
-        AppDebug.warn(
-          "OnboardingTour instance already exists, skipping initialization",
-        );
+        AppDebug.warn("OnboardingTour instance already exists");
       }
 
-      // Initialize scroll reveal header
-      this.initializeScrollRevealHeader();
-      this._updateComponentHealth("scroll_reveal", "healthy");
+      const phaseTime = performance.now() - phaseStartTime;
+      AppDebug.log(
+        `✅ Phase 5 Educational completed (${phaseTime.toFixed(2)}ms)`,
+      );
+      this._trackPhaseCompletion("educational", phaseTime);
+    } catch (error) {
+      AppDebug.error("Phase 5 Educational failed:", error);
+      this._updateComponentHealth("educational_phase", "degraded");
+      // Don't throw - educational features are non-critical
+      AppDebug.warn(
+        "Educational features may be limited due to initialization failure",
+      );
+    }
+  }
 
-      // Initialize scenario browser integration
-      await this.initializeScenarioBrowserIntegration();
-      this._updateComponentHealth("scenario_browser", "healthy");
+  /**
+   * Finalization - Complete initialization and start monitoring
+   * Wraps up initialization, starts monitoring, and tracks metrics
+   */
+  async _finalizeInitialization(initStartTime) {
+    AppDebug.log("🏁 Finalizing initialization...");
 
-      // Initialize MCP integrations
-      await this.initializeMCPIntegrations();
-      this._updateComponentHealth("mcp_system", "healthy");
-
-      // Initialize Firebase and Authentication
-      await this.initializeFirebaseServices();
-      this._updateComponentHealth("firebase_system", "healthy");
-
-      // Mark initialization end for performance tracking
+    try {
+      // Mark performance end
       performance.mark("app-init-end");
       performance.measure(
         "app-initialization",
@@ -988,104 +1187,193 @@ class AIEthicsApp {
       // Start enterprise monitoring
       this._startEnterpriseMonitoring();
 
+      // Set initialization flag
       this.isInitialized = true;
-
-      // Trigger hero entrance animations
-      this.initializeHeroAnimations();
-
-      AppDebug.log(
-        `AI Ethics App initialized successfully with enterprise infrastructure (${initTime.toFixed(2)}ms)`,
-      );
 
       // Perform initial health check
       this._performHealthCheck();
 
-      // Track platform initialization for system analytics
-      this.systemCollector.updatePlatformMetrics("platform_initialization", {
-        simulationsAvailable: 1, // Only simulateai available
-        categoriesAvailable: this.categories?.length || 0,
-        browserInfo: Helpers.getBrowserInfo(),
-        deviceType: Helpers.getDeviceType(),
-        currentTheme: this.currentTheme,
-        accessibilityEnabled:
-          this.preferences.highContrast || this.preferences.largeText,
-        timestamp: new Date().toISOString(),
-        initTime,
-        version: this.version,
-        sessionId: this.sessionId,
-        enterpriseFeatures: {
-          monitoring: this.enterpriseConfig.monitoringEnabled,
-          telemetry: this.enterpriseConfig.telemetryEnabled,
-          errorReporting: this.enterpriseConfig.errorReportingEnabled,
-          performanceTracking: this.enterpriseConfig.performanceTrackingEnabled,
-          healthChecks: this.enterpriseConfig.healthChecksEnabled,
-          circuitBreaker: this.enterpriseConfig.circuitBreakerEnabled,
-        },
-      });
+      // Track initialization analytics
+      this._trackInitializationComplete(initTime);
 
-      // Track user session start
-      this.systemCollector.trackNavigation({
-        from: "external",
-        to: "platform-home",
-        action: "page-load",
-        metadata: {
-          component: "main-app",
-          referrer: document.referrer,
-          userAgent: navigator.userAgent,
-          timestamp: new Date().toISOString(),
-          sessionId: this.sessionId,
-          version: this.version,
-          initTime,
-        },
-      });
-
-      // Track initialization with enhanced analytics
-      simpleAnalytics.trackEvent("app_initialized", {
-        simulations_available: 1, // Only simulateai available
-        browser: Helpers.getBrowserInfo().browser,
-        device: Helpers.getDeviceType(),
-        theme: this.currentTheme,
-        accessibility_enabled:
-          this.preferences.highContrast || this.preferences.largeText,
-        version: this.version,
-        session_id: this.sessionId,
-        init_time: initTime,
-        enterprise_features_enabled: Object.values(
-          this.enterpriseConfig,
-        ).filter(Boolean).length,
-        memory_usage: this._getCurrentMemoryUsage(),
-      });
-
-      // Track with Enhanced Analytics Manager for deeper insights
-      if (this.analyticsManager.isInitialized) {
-        this.analyticsManager.trackEvent("app_initialized", {
-          version: this.version,
-          sessionId: this.sessionId,
-          initTime,
-          enterpriseFeatures: this.enterpriseConfig,
-          accessibility: this.preferences,
-          deviceInfo: {
-            browser: Helpers.getBrowserInfo().browser,
-            device: Helpers.getDeviceType(),
-          },
-          memoryUsage: this._getCurrentMemoryUsage(),
-        });
-      }
-
-      // Set up enterprise error monitoring
+      // Set up shutdown handler
       window.addEventListener("beforeunload", () => {
         this._handleApplicationShutdown();
       });
-    } catch (error) {
-      this.criticalErrorCount++;
-      this._updateComponentHealth("application_core", "critical");
 
-      AppDebug.error("Failed to initialize app:", error);
+      AppDebug.log(
+        `🎉 AIEthicsApp initialized successfully (${initTime.toFixed(2)}ms)`,
+      );
+    } catch (error) {
+      AppDebug.error("Finalization failed:", error);
+      this._updateComponentHealth("finalization", "error");
+      throw new Error(`Finalization failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Handle initialization failure with recovery options
+   */
+  async _handleInitializationFailure(error) {
+    this.criticalErrorCount++;
+    this._updateComponentHealth("application_core", "critical");
+
+    AppDebug.error("Application initialization failed:", error);
+
+    // Attempt graceful degradation
+    try {
+      AppDebug.log("Attempting graceful degradation...");
+
+      // Set minimal working state
+      this.isInitialized = false;
+
+      // Track the failure
+      simpleAnalytics.trackEvent("app_initialization_failed", {
+        error_message: error.message,
+        error_phase: this._getCurrentPhase(),
+        timestamp: new Date().toISOString(),
+        session_id: this.sessionId,
+      });
+
+      // Show user-friendly error
       this.handleEnterpriseError(
         error,
-        "Failed to initialize the application. Please refresh the page.",
+        "The application failed to start properly. Please refresh the page to try again.",
         "initialization_failure",
       );
+    } catch (recoveryError) {
+      AppDebug.error(
+        "Failed to handle initialization failure gracefully:",
+        recoveryError,
+      );
+
+      // Last resort: basic error display
+      console.error(
+        "Critical initialization failure. Please refresh the page.",
+      );
+    }
+  }
+
+  /**
+   * Track phase completion for analytics and monitoring
+   */
+  _trackPhaseCompletion(phaseName, phaseTime) {
+    // Store phase timing for diagnostics
+    if (!this.performanceMetrics.phaseTimings) {
+      this.performanceMetrics.phaseTimings = {};
+    }
+    this.performanceMetrics.phaseTimings[phaseName] = phaseTime;
+
+    // Track with analytics
+    if (this.analyticsManager.isInitialized) {
+      this.analyticsManager.trackEvent("initialization_phase_complete", {
+        phase: phaseName,
+        duration: phaseTime,
+        sessionId: this.sessionId,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }
+
+  /**
+   * Get current initialization phase for error reporting
+   */
+  _getCurrentPhase() {
+    const phases = [
+      "foundation",
+      "services",
+      "components",
+      "interactions",
+      "educational",
+    ];
+    const completedPhases = Object.keys(
+      this.performanceMetrics.phaseTimings || {},
+    );
+
+    if (completedPhases.length === 0) return "foundation";
+    if (completedPhases.length >= phases.length) return "finalization";
+
+    return phases[completedPhases.length];
+  }
+
+  /**
+   * Track complete initialization analytics
+   */
+  _trackInitializationComplete(initTime) {
+    // Track platform initialization for system analytics
+    this.systemCollector.updatePlatformMetrics("platform_initialization", {
+      simulationsAvailable: 1,
+      categoriesAvailable: this.categories?.length || 0,
+      browserInfo: Helpers.getBrowserInfo(),
+      deviceType: Helpers.getDeviceType(),
+      currentTheme: this.currentTheme,
+      accessibilityEnabled:
+        this.preferences.highContrast || this.preferences.largeText,
+      timestamp: new Date().toISOString(),
+      initTime,
+      version: this.version,
+      sessionId: this.sessionId,
+      phaseTimings: this.performanceMetrics.phaseTimings,
+      enterpriseFeatures: {
+        monitoring: this.enterpriseConfig.monitoringEnabled,
+        telemetry: this.enterpriseConfig.telemetryEnabled,
+        errorReporting: this.enterpriseConfig.errorReportingEnabled,
+        performanceTracking: this.enterpriseConfig.performanceTrackingEnabled,
+        healthChecks: this.enterpriseConfig.healthChecksEnabled,
+        circuitBreaker: this.enterpriseConfig.circuitBreakerEnabled,
+      },
+    });
+
+    // Track user session start
+    this.systemCollector.trackNavigation({
+      from: "external",
+      to: "platform-home",
+      action: "page-load",
+      metadata: {
+        component: "main-app",
+        referrer: document.referrer,
+        userAgent: navigator.userAgent,
+        timestamp: new Date().toISOString(),
+        sessionId: this.sessionId,
+        version: this.version,
+        initTime,
+        phaseTimings: this.performanceMetrics.phaseTimings,
+      },
+    });
+
+    // Track initialization with simple analytics
+    simpleAnalytics.trackEvent("app_initialized", {
+      simulations_available: 1,
+      browser: Helpers.getBrowserInfo().browser,
+      device: Helpers.getDeviceType(),
+      theme: this.currentTheme,
+      accessibility_enabled:
+        this.preferences.highContrast || this.preferences.largeText,
+      version: this.version,
+      session_id: this.sessionId,
+      init_time: initTime,
+      phase_timings: this.performanceMetrics.phaseTimings,
+      enterprise_features_enabled: Object.values(this.enterpriseConfig).filter(
+        Boolean,
+      ).length,
+      memory_usage: this._getCurrentMemoryUsage(),
+    });
+
+    // Track with Enhanced Analytics Manager
+    if (this.analyticsManager.isInitialized) {
+      this.analyticsManager.trackEvent("app_initialized", {
+        version: this.version,
+        sessionId: this.sessionId,
+        initTime,
+        phaseTimings: this.performanceMetrics.phaseTimings,
+        enterpriseFeatures: this.enterpriseConfig,
+        accessibility: this.preferences,
+        deviceInfo: {
+          browser: Helpers.getBrowserInfo().browser,
+          device: Helpers.getDeviceType(),
+        },
+        memoryUsage: this._getCurrentMemoryUsage(),
+      });
     }
   }
 
@@ -2057,9 +2345,25 @@ class AIEthicsApp {
       // Systems are already initialized via their modules
       // Simple analytics auto-initializes
 
-      // Initialize Enhanced Analytics Manager
+      // Initialize Enhanced Analytics Manager - Phase 3.1 Integration
       try {
+        // Initialize static version for backward compatibility
         await this.analyticsManager.init({
+          enabled: true,
+          anonymizeData: true,
+          batchSize: 20,
+          flushInterval: 30000,
+          debug: AppDebug.isDebugMode(),
+          trackPerformance: true,
+          trackAccessibility: true,
+          trackErrors: true,
+          gdprCompliant: true,
+          retentionDays: 90,
+        });
+
+        // Create enhanced instance with DataHandler support
+        this.analyticsInstance = new AnalyticsManager(this);
+        await this.analyticsInstance.init({
           enabled: true,
           anonymizeData: true,
           batchSize: 20,
@@ -2112,6 +2416,34 @@ class AIEthicsApp {
       });
       await this.uiBinder.initialize();
       AppDebug.log("UIBinder initialized");
+
+      // Initialize UIManager for enhanced UI state management (Phase 3.2)
+      this.uiManager = new UIManager(this);
+      await this.uiManager.initialize();
+      AppDebug.log("UIManager initialized with DataHandler integration");
+
+      // Initialize PerformanceMonitor for enhanced metrics tracking (Phase 3.3)
+      this.performanceMonitor = PerformanceMonitor.getAppMonitor(this);
+      this.appPerformanceMonitor = PerformanceMonitor.createEnhancedMonitor(
+        "app_lifecycle",
+        this,
+      );
+      PerformanceMonitor.enable(); // Enable global monitoring
+      AppDebug.log(
+        "PerformanceMonitor initialized with DataHandler integration",
+      );
+
+      // Initialize ComponentRegistry for enhanced component tracking (Phase 3.4)
+      this.componentRegistry = ComponentRegistry.getAppRegistry(this);
+      await this.componentRegistry.initializeDataHandlerIntegration();
+      AppDebug.log(
+        "ComponentRegistry initialized with DataHandler integration",
+      );
+
+      // Initialize PWAService for enhanced Progressive Web App features (Phase 3.5)
+      this.pwaService = new PWAService(this.firebaseService, this);
+      await this.pwaService.init();
+      AppDebug.log("PWAService initialized with DataHandler integration");
 
       // Initialize Educator Toolkit
       this.educatorToolkit = new EducatorToolkit();
@@ -2712,8 +3044,9 @@ class AIEthicsApp {
       initializeScenarioBrowser: () =>
         this.initializeScenarioBrowserComponent(),
 
-      // App services access
-      getAnalytics: () => this.analyticsManager,
+      // App services access - Phase 3.1 Enhanced Analytics
+      getAnalytics: () => this.analyticsManager, // Static version for backward compatibility
+      getAnalyticsInstance: () => this.analyticsInstance, // Enhanced instance with DataHandler
       getBadgeManager: () => this.badgeManager,
       getAccessibilityManager: () => this.accessibilityManager,
       getAnimationManager: () => this.animationManager,
@@ -6405,6 +6738,105 @@ window.getAppLogs = () => AppDebug.exportLogs();
 window.getAppDiagnostics = () => AppDebug.getDiagnostics();
 window.flushTelemetry = () => AppDebug._flushTelemetry();
 window.clearAppBuffers = () => AppDebug.clearBuffers();
+
+// Phased Initialization debugging functions
+window.getInitializationStatus = () => {
+  const app = window.aiEthicsApp;
+  if (!app) {
+    return { error: "Application instance not found" };
+  }
+
+  return {
+    isInitialized: app.isInitialized,
+    currentPhase: app._getCurrentPhase(),
+    phaseTimings: app.performanceMetrics.phaseTimings || {},
+    totalInitTime: app.performanceMetrics.initTime || 0,
+    componentHealth: Object.fromEntries(app.healthStatus.components),
+    criticalErrorCount: app.criticalErrorCount || 0,
+    timestamp: new Date().toISOString(),
+  };
+};
+
+window.getPhaseTimings = () => {
+  const app = window.aiEthicsApp;
+  if (!app || !app.performanceMetrics.phaseTimings) {
+    return { error: "Phase timings not available" };
+  }
+
+  const timings = app.performanceMetrics.phaseTimings;
+  const totalTime = Object.values(timings).reduce((sum, time) => sum + time, 0);
+
+  console.log("⏱️ Initialization Phase Timings:");
+  Object.entries(timings).forEach(([phase, time]) => {
+    const percentage = ((time / totalTime) * 100).toFixed(1);
+    console.log(`  ${phase}: ${time.toFixed(2)}ms (${percentage}%)`);
+  });
+  console.log(`  Total: ${totalTime.toFixed(2)}ms`);
+
+  return {
+    timings,
+    totalTime,
+    breakdown: Object.entries(timings).map(([phase, time]) => ({
+      phase,
+      time: Math.round(time),
+      percentage: Math.round((time / totalTime) * 100),
+    })),
+  };
+};
+
+window.retryFailedPhase = async (phaseName) => {
+  const app = window.aiEthicsApp;
+  if (!app) {
+    console.error("Application instance not found");
+    return false;
+  }
+
+  console.log(`🔄 Attempting to retry ${phaseName} phase...`);
+
+  try {
+    switch (phaseName) {
+      case "foundation":
+        await app._initializePhase1Foundation();
+        break;
+      case "services":
+        await app._initializePhase2Services();
+        break;
+      case "components":
+        await app._initializePhase3Components();
+        break;
+      case "interactions":
+        await app._initializePhase4Interactions();
+        break;
+      case "educational":
+        await app._initializePhase5Educational();
+        break;
+      default:
+        console.error(`Unknown phase: ${phaseName}`);
+        return false;
+    }
+    console.log(`✅ ${phaseName} phase retry completed successfully`);
+    return true;
+  } catch (error) {
+    console.error(`❌ ${phaseName} phase retry failed:`, error);
+    return false;
+  }
+};
+
+window.debugInitialization = () => {
+  console.log("🔍 Initialization Debug Report:");
+  console.log("================================");
+
+  const status = window.getInitializationStatus();
+  console.log("Status:", status);
+
+  const timings = window.getPhaseTimings();
+  console.log("Timings:", timings);
+
+  const health = window.getEnterpriseHealth();
+  console.log("Health:", health);
+
+  return { status, timings, health };
+};
 
 // Enhanced Analytics debugging functions
 window.getAnalyticsStatus = () => {
