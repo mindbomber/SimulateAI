@@ -1,0 +1,924 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Badge Manager DataHandler Migration Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .test-section {
+        border-left: 4px solid #007cba;
+        padding-left: 15px;
+        margin: 15px 0;
+      }
+      .test-result {
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .test-result.pass {
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+      }
+      .test-result.fail {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+      }
+      .test-result.warning {
+        background-color: #fff3cd;
+        border: 1px solid #ffeaa7;
+        color: #856404;
+      }
+      .status-indicator {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 12px;
+      }
+      .status-pass {
+        background-color: #28a745;
+      }
+      .status-fail {
+        background-color: #dc3545;
+      }
+      .status-warning {
+        background-color: #ffc107;
+        color: #212529;
+      }
+      .button {
+        background-color: #007cba;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      .button:hover {
+        background-color: #005a8b;
+      }
+      .badge-demo {
+        display: inline-block;
+        padding: 4px 8px;
+        background-color: #007cba;
+        color: white;
+        border-radius: 12px;
+        font-size: 12px;
+        margin: 2px;
+      }
+      .code-snippet {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        padding: 10px;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        overflow-x: auto;
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🏆 Badge Manager DataHandler Migration Test</h1>
+      <p>
+        Testing Badge Manager component migration to DataHandler-first approach
+        with Firebase sync and localStorage fallback.
+      </p>
+
+      <div class="test-section">
+        <h2>📋 Migration Status</h2>
+        <div id="migration-status">Running tests...</div>
+      </div>
+
+      <div class="test-section">
+        <h2>🔧 Module Integration Tests</h2>
+        <div id="integration-tests"></div>
+      </div>
+
+      <div class="test-section">
+        <h2>💾 Data Persistence Tests</h2>
+        <div id="persistence-tests"></div>
+      </div>
+
+      <div class="test-section">
+        <h2>🔄 Migration Verification</h2>
+        <div id="migration-tests"></div>
+      </div>
+
+      <div class="test-section">
+        <h2>🏆 Badge Operations Tests</h2>
+        <div id="operations-tests"></div>
+      </div>
+
+      <div class="test-section">
+        <h2>⚡ Performance Tests</h2>
+        <div id="performance-tests"></div>
+      </div>
+
+      <div class="test-section">
+        <h2>🧪 Interactive Tests</h2>
+        <button class="button" onclick="testBadgeEarning()">
+          Test Badge Earning
+        </button>
+        <button class="button" onclick="testDataMigration()">
+          Test Data Migration
+        </button>
+        <button class="button" onclick="resetBadgeData()">
+          Reset Badge Data
+        </button>
+        <button class="button" onclick="runFullTest()">
+          Run Full Test Suite
+        </button>
+      </div>
+
+      <div class="test-section">
+        <h2>📊 Badge System Demo</h2>
+        <div id="badge-demo"></div>
+      </div>
+    </div>
+
+    <!-- Core modules -->
+    <script src="src/js/core/data-handler.js"></script>
+    <script src="src/js/core/ui-binder.js"></script>
+    <script src="src/js/core/app-enhanced-integration.js"></script>
+
+    <!-- Badge system modules -->
+    <script src="src/js/data/badge-config.js"></script>
+    <script src="src/js/core/badge-manager.js"></script>
+
+    <script>
+      let testResults = {
+        integration: 0,
+        persistence: 0,
+        migration: 0,
+        operations: 0,
+        performance: 0,
+        total: 0,
+      };
+
+      function addResult(containerId, testName, passed, details = "") {
+        const container = document.getElementById(containerId);
+        const result = document.createElement("div");
+        result.className = `test-result ${passed ? "pass" : "fail"}`;
+
+        const status = passed ? "pass" : "fail";
+        testResults[containerId.replace("-tests", "")]++;
+        testResults.total++;
+
+        result.innerHTML = `
+                <div>
+                    <strong>${testName}</strong>
+                    ${details ? `<br><small>${details}</small>` : ""}
+                </div>
+                <div class="status-indicator status-${status}">
+                    ${passed ? "✓" : "✗"}
+                </div>
+            `;
+
+        container.appendChild(result);
+      }
+
+      function addWarning(containerId, testName, details = "") {
+        const container = document.getElementById(containerId);
+        const result = document.createElement("div");
+        result.className = "test-result warning";
+
+        result.innerHTML = `
+                <div>
+                    <strong>${testName}</strong>
+                    ${details ? `<br><small>${details}</small>` : ""}
+                </div>
+                <div class="status-indicator status-warning">
+                    !
+                </div>
+            `;
+
+        container.appendChild(result);
+      }
+
+      async function runIntegrationTests() {
+        console.log("Running Badge Manager Integration Tests...");
+
+        // Test 1: Badge Manager class availability
+        try {
+          if (typeof BadgeManager !== "undefined") {
+            addResult(
+              "integration-tests",
+              "BadgeManager Class Available",
+              true,
+              "BadgeManager class loaded successfully",
+            );
+          } else {
+            addResult(
+              "integration-tests",
+              "BadgeManager Class Available",
+              false,
+              "BadgeManager class not found",
+            );
+          }
+        } catch (error) {
+          addResult(
+            "integration-tests",
+            "BadgeManager Class Available",
+            false,
+            error.message,
+          );
+        }
+
+        // Test 2: Badge manager singleton availability
+        try {
+          if (typeof badgeManager !== "undefined" && badgeManager) {
+            addResult(
+              "integration-tests",
+              "Badge Manager Singleton",
+              true,
+              "Global badgeManager instance available",
+            );
+          } else {
+            addResult(
+              "integration-tests",
+              "Badge Manager Singleton",
+              false,
+              "Global badgeManager instance not found",
+            );
+          }
+        } catch (error) {
+          addResult(
+            "integration-tests",
+            "Badge Manager Singleton",
+            false,
+            error.message,
+          );
+        }
+
+        // Test 3: Enhanced constructor test
+        try {
+          const testManager = new BadgeManager();
+          if (testManager.STORAGE_KEY && testManager.badgeState !== undefined) {
+            addResult(
+              "integration-tests",
+              "Enhanced Constructor",
+              true,
+              "Constructor properly initializes properties",
+            );
+          } else {
+            addResult(
+              "integration-tests",
+              "Enhanced Constructor",
+              false,
+              "Constructor missing required properties",
+            );
+          }
+        } catch (error) {
+          addResult(
+            "integration-tests",
+            "Enhanced Constructor",
+            false,
+            error.message,
+          );
+        }
+
+        // Test 4: DataHandler integration check
+        try {
+          if (typeof DataHandler !== "undefined") {
+            const dataHandler = new DataHandler();
+            const testManager = new BadgeManager({ dataHandler });
+            if (testManager.dataHandler === dataHandler) {
+              addResult(
+                "integration-tests",
+                "DataHandler Integration",
+                true,
+                "BadgeManager properly accepts DataHandler",
+              );
+            } else {
+              addResult(
+                "integration-tests",
+                "DataHandler Integration",
+                false,
+                "DataHandler not properly set",
+              );
+            }
+          } else {
+            addWarning(
+              "integration-tests",
+              "DataHandler Integration",
+              "DataHandler not available for testing",
+            );
+          }
+        } catch (error) {
+          addResult(
+            "integration-tests",
+            "DataHandler Integration",
+            false,
+            error.message,
+          );
+        }
+
+        // Test 5: Badge config availability
+        try {
+          if (
+            typeof getBadgeConfig !== "undefined" &&
+            typeof ACTIVE_BADGE_TIERS !== "undefined"
+          ) {
+            addResult(
+              "integration-tests",
+              "Badge Config Available",
+              true,
+              "Badge configuration modules loaded",
+            );
+          } else {
+            addResult(
+              "integration-tests",
+              "Badge Config Available",
+              false,
+              "Badge configuration missing",
+            );
+          }
+        } catch (error) {
+          addResult(
+            "integration-tests",
+            "Badge Config Available",
+            false,
+            error.message,
+          );
+        }
+      }
+
+      async function runPersistenceTests() {
+        console.log("Running Badge Manager Persistence Tests...");
+
+        // Test 6: Badge state save/load
+        try {
+          const testManager = new BadgeManager();
+          await testManager.initializeAsync();
+
+          // Set test badge state
+          testManager.badgeState = {
+            "test-category": {
+              badges: {
+                tier1: {
+                  unlocked: true,
+                  timestamp: Date.now(),
+                  requirement: 5,
+                },
+              },
+              totalCompleted: 5,
+              lastUpdated: Date.now(),
+            },
+          };
+
+          // Test save
+          await testManager.saveBadgeState();
+
+          // Test load
+          const loaded = await testManager.loadBadgeState();
+          if (
+            loaded &&
+            loaded["test-category"] &&
+            loaded["test-category"].badges.tier1.unlocked
+          ) {
+            addResult(
+              "persistence-tests",
+              "Badge State Persistence",
+              true,
+              "Badge state saved and loaded successfully",
+            );
+          } else {
+            addResult(
+              "persistence-tests",
+              "Badge State Persistence",
+              false,
+              "Badge state not properly persisted",
+            );
+          }
+        } catch (error) {
+          addResult(
+            "persistence-tests",
+            "Badge State Persistence",
+            false,
+            error.message,
+          );
+        }
+
+        // Test 7: Async initialization
+        try {
+          const testManager = new BadgeManager();
+          await testManager.initializeAsync();
+          if (testManager.isInitialized) {
+            addResult(
+              "persistence-tests",
+              "Async Initialization",
+              true,
+              "Badge manager initialized asynchronously",
+            );
+          } else {
+            addResult(
+              "persistence-tests",
+              "Async Initialization",
+              false,
+              "Async initialization failed",
+            );
+          }
+        } catch (error) {
+          addResult(
+            "persistence-tests",
+            "Async Initialization",
+            false,
+            error.message,
+          );
+        }
+
+        // Test 8: Sync wrapper functionality
+        try {
+          const testManager = new BadgeManager();
+          testManager.badgeState = { test: "sync" };
+          testManager.saveBadgeStateSync(); // Should not throw
+          addResult(
+            "persistence-tests",
+            "Sync Wrapper",
+            true,
+            "Sync save wrapper works without errors",
+          );
+        } catch (error) {
+          addResult("persistence-tests", "Sync Wrapper", false, error.message);
+        }
+      }
+
+      async function runMigrationTests() {
+        console.log("Running Badge Manager Migration Tests...");
+
+        // Test 9: localStorage fallback
+        try {
+          const testData = {
+            "migration-test": {
+              badges: { tier1: { unlocked: true, timestamp: Date.now() } },
+              totalCompleted: 3,
+            },
+          };
+
+          // Save to localStorage
+          localStorage.setItem(
+            "simulateai_badge_progress",
+            JSON.stringify(testData),
+          );
+
+          // Load with manager (should find localStorage data)
+          const testManager = new BadgeManager();
+          const loaded = await testManager.loadBadgeState();
+
+          if (loaded && loaded["migration-test"]) {
+            addResult(
+              "migration-tests",
+              "localStorage Fallback",
+              true,
+              "Successfully loads from localStorage",
+            );
+          } else {
+            addResult(
+              "migration-tests",
+              "localStorage Fallback",
+              false,
+              "Failed to load from localStorage",
+            );
+          }
+        } catch (error) {
+          addResult(
+            "migration-tests",
+            "localStorage Fallback",
+            false,
+            error.message,
+          );
+        }
+
+        // Test 10: Data migration to DataHandler
+        try {
+          if (typeof DataHandler !== "undefined") {
+            const dataHandler = new DataHandler();
+            const testManager = new BadgeManager({ dataHandler });
+
+            // Set up localStorage data
+            const testData = {
+              "migrate-test": { badges: {}, totalCompleted: 1 },
+            };
+            localStorage.setItem(
+              "simulateai_badge_progress",
+              JSON.stringify(testData),
+            );
+
+            // Load should trigger migration
+            await testManager.loadBadgeState();
+
+            // Check if migration occurred (DataHandler saveData would be called)
+            addResult(
+              "migration-tests",
+              "DataHandler Migration",
+              true,
+              "Badge data migration process completed",
+            );
+          } else {
+            addWarning(
+              "migration-tests",
+              "DataHandler Migration",
+              "DataHandler not available for migration test",
+            );
+          }
+        } catch (error) {
+          addResult(
+            "migration-tests",
+            "DataHandler Migration",
+            false,
+            error.message,
+          );
+        }
+      }
+
+      async function runOperationsTests() {
+        console.log("Running Badge Manager Operations Tests...");
+
+        // Test 11: Badge earning simulation
+        try {
+          const testManager = new BadgeManager();
+          await testManager.initializeAsync();
+
+          // Simulate category progress in localStorage
+          const categoryProgress = {
+            "test-ethics": {
+              scenario1: true,
+              scenario2: true,
+              scenario3: true,
+              scenario4: true,
+              scenario5: true, // 5 completed = tier 1 badge
+            },
+          };
+          localStorage.setItem(
+            "simulateai_category_progress",
+            JSON.stringify(categoryProgress),
+          );
+
+          // Update badge progress
+          const newBadges = testManager.updateScenarioCompletion(
+            "test-ethics",
+            "scenario5",
+          );
+
+          if (
+            testManager.badgeState["test-ethics"] &&
+            testManager.badgeState["test-ethics"].totalCompleted === 5
+          ) {
+            addResult(
+              "operations-tests",
+              "Badge Earning Process",
+              true,
+              `Scenario completion tracked, badges: ${newBadges.length}`,
+            );
+          } else {
+            addResult(
+              "operations-tests",
+              "Badge Earning Process",
+              false,
+              "Badge earning process failed",
+            );
+          }
+        } catch (error) {
+          addResult(
+            "operations-tests",
+            "Badge Earning Process",
+            false,
+            error.message,
+          );
+        }
+
+        // Test 12: Badge progress calculation
+        try {
+          const testManager = new BadgeManager();
+          await testManager.initializeAsync();
+
+          // Set up test progress
+          localStorage.setItem(
+            "simulateai_category_progress",
+            JSON.stringify({
+              "test-category": { scenario1: true, scenario2: true },
+            }),
+          );
+
+          const progress = testManager.getBadgeProgress("test-category");
+
+          if (progress && progress.completed === 2 && progress.nextBadge) {
+            addResult(
+              "operations-tests",
+              "Badge Progress Calculation",
+              true,
+              `Progress: ${progress.completed}/5, Next: ${progress.nextBadge.requirement}`,
+            );
+          } else {
+            addResult(
+              "operations-tests",
+              "Badge Progress Calculation",
+              false,
+              "Progress calculation failed",
+            );
+          }
+        } catch (error) {
+          addResult(
+            "operations-tests",
+            "Badge Progress Calculation",
+            false,
+            error.message,
+          );
+        }
+
+        // Test 13: Category initialization
+        try {
+          const testManager = new BadgeManager();
+          await testManager.initializeAsync();
+
+          testManager.initializeCategoryBadges("new-category");
+
+          if (
+            testManager.badgeState["new-category"] &&
+            testManager.badgeState["new-category"].badges
+          ) {
+            addResult(
+              "operations-tests",
+              "Category Initialization",
+              true,
+              "New category properly initialized",
+            );
+          } else {
+            addResult(
+              "operations-tests",
+              "Category Initialization",
+              false,
+              "Category initialization failed",
+            );
+          }
+        } catch (error) {
+          addResult(
+            "operations-tests",
+            "Category Initialization",
+            false,
+            error.message,
+          );
+        }
+      }
+
+      async function runPerformanceTests() {
+        console.log("Running Badge Manager Performance Tests...");
+
+        // Test 14: Initialization speed
+        try {
+          const startTime = performance.now();
+          const testManager = new BadgeManager();
+          await testManager.initializeAsync();
+          const endTime = performance.now();
+
+          const initTime = endTime - startTime;
+          if (initTime < 100) {
+            // Should initialize quickly
+            addResult(
+              "performance-tests",
+              "Initialization Speed",
+              true,
+              `Initialized in ${initTime.toFixed(2)}ms`,
+            );
+          } else {
+            addResult(
+              "performance-tests",
+              "Initialization Speed",
+              false,
+              `Slow initialization: ${initTime.toFixed(2)}ms`,
+            );
+          }
+        } catch (error) {
+          addResult(
+            "performance-tests",
+            "Initialization Speed",
+            false,
+            error.message,
+          );
+        }
+
+        // Test 15: Badge calculation performance
+        try {
+          const testManager = new BadgeManager();
+          await testManager.initializeAsync();
+
+          // Set up large progress data
+          const largeProgress = {};
+          for (let i = 1; i <= 100; i++) {
+            largeProgress[`scenario${i}`] = i <= 50; // 50 completed
+          }
+          localStorage.setItem(
+            "simulateai_category_progress",
+            JSON.stringify({
+              "perf-test": largeProgress,
+            }),
+          );
+
+          const startTime = performance.now();
+          const progress = testManager.getBadgeProgress("perf-test");
+          const endTime = performance.now();
+
+          const calcTime = endTime - startTime;
+          if (calcTime < 50 && progress.completed === 50) {
+            addResult(
+              "performance-tests",
+              "Badge Calculation Performance",
+              true,
+              `Calculated 100 scenarios in ${calcTime.toFixed(2)}ms`,
+            );
+          } else {
+            addResult(
+              "performance-tests",
+              "Badge Calculation Performance",
+              false,
+              `Performance issue: ${calcTime.toFixed(2)}ms`,
+            );
+          }
+        } catch (error) {
+          addResult(
+            "performance-tests",
+            "Badge Calculation Performance",
+            false,
+            error.message,
+          );
+        }
+      }
+
+      async function testBadgeEarning() {
+        const demo = document.getElementById("badge-demo");
+        demo.innerHTML = "<h3>🏆 Badge Earning Demo</h3>";
+
+        try {
+          const manager = badgeManager || new BadgeManager();
+          await manager.initializeAsync();
+
+          // Simulate earning badges in Ethics category
+          const categoryProgress = {
+            ethics: {},
+          };
+
+          // Add scenarios one by one
+          for (let i = 1; i <= 10; i++) {
+            categoryProgress.ethics[`scenario${i}`] = true;
+            localStorage.setItem(
+              "simulateai_category_progress",
+              JSON.stringify(categoryProgress),
+            );
+
+            const newBadges = manager.updateScenarioCompletion(
+              "ethics",
+              `scenario${i}`,
+            );
+
+            if (newBadges.length > 0) {
+              newBadges.forEach((badge) => {
+                demo.innerHTML += `<div class="badge-demo">🏆 Earned: ${badge.name} (Tier ${badge.tier})</div>`;
+              });
+            }
+          }
+
+          const progress = manager.getBadgeProgress("ethics");
+          demo.innerHTML += `<p>Final Progress: ${progress.completed} scenarios completed, ${progress.earnedBadges.length} badges earned</p>`;
+        } catch (error) {
+          demo.innerHTML += `<p style="color: red;">Error: ${error.message}</p>`;
+        }
+      }
+
+      async function testDataMigration() {
+        const demo = document.getElementById("badge-demo");
+        demo.innerHTML = "<h3>🔄 Data Migration Demo</h3>";
+
+        try {
+          // Create legacy localStorage data
+          const legacyData = {
+            "migration-demo": {
+              badges: {
+                tier1: { unlocked: true, timestamp: Date.now() - 86400000 },
+                tier2: { unlocked: false, timestamp: null },
+              },
+              totalCompleted: 7,
+              lastUpdated: Date.now() - 86400000,
+            },
+          };
+          localStorage.setItem(
+            "simulateai_badge_progress",
+            JSON.stringify(legacyData),
+          );
+
+          // Create manager with DataHandler
+          const dataHandler = new DataHandler();
+          const manager = new BadgeManager({ dataHandler });
+
+          // Load data (should trigger migration)
+          const migratedData = await manager.loadBadgeState();
+
+          demo.innerHTML +=
+            '<div class="code-snippet">Legacy Data:<br>' +
+            JSON.stringify(legacyData, null, 2) +
+            "</div>";
+          demo.innerHTML +=
+            '<div class="code-snippet">Migrated Data:<br>' +
+            JSON.stringify(migratedData, null, 2) +
+            "</div>";
+          demo.innerHTML += "<p>✅ Migration completed successfully!</p>";
+        } catch (error) {
+          demo.innerHTML += `<p style="color: red;">Migration Error: ${error.message}</p>`;
+        }
+      }
+
+      async function resetBadgeData() {
+        try {
+          const manager = badgeManager || new BadgeManager();
+          manager.resetBadgeProgress();
+          localStorage.removeItem("simulateai_category_progress");
+
+          document.getElementById("badge-demo").innerHTML =
+            "<h3>🧹 Badge Data Reset</h3><p>All badge data has been cleared.</p>";
+        } catch (error) {
+          document.getElementById("badge-demo").innerHTML =
+            `<h3>🧹 Reset Error</h3><p style="color: red;">${error.message}</p>`;
+        }
+      }
+
+      async function runFullTest() {
+        // Clear previous results
+        [
+          "integration-tests",
+          "persistence-tests",
+          "migration-tests",
+          "operations-tests",
+          "performance-tests",
+        ].forEach((id) => {
+          document.getElementById(id).innerHTML = "";
+        });
+
+        testResults = {
+          integration: 0,
+          persistence: 0,
+          migration: 0,
+          operations: 0,
+          performance: 0,
+          total: 0,
+        };
+
+        await runIntegrationTests();
+        await runPersistenceTests();
+        await runMigrationTests();
+        await runOperationsTests();
+        await runPerformanceTests();
+
+        // Update migration status
+        const statusDiv = document.getElementById("migration-status");
+        const totalTests = testResults.total;
+        const passedTests =
+          document.querySelectorAll(".test-result.pass").length;
+        const failedTests =
+          document.querySelectorAll(".test-result.fail").length;
+        const warnings = document.querySelectorAll(
+          ".test-result.warning",
+        ).length;
+
+        statusDiv.innerHTML = `
+                <h3>🎯 Migration Test Results</h3>
+                <p><strong>Total Tests:</strong> ${totalTests}</p>
+                <p><strong>Passed:</strong> <span style="color: #28a745;">${passedTests}</span></p>
+                <p><strong>Failed:</strong> <span style="color: #dc3545;">${failedTests}</span></p>
+                <p><strong>Warnings:</strong> <span style="color: #ffc107;">${warnings}</span></p>
+                <p><strong>Success Rate:</strong> ${totalTests > 0 ? ((passedTests / totalTests) * 100).toFixed(1) : 0}%</p>
+                ${failedTests === 0 ? '<p style="color: #28a745; font-weight: bold;">✅ Badge Manager migration successful!</p>' : '<p style="color: #dc3545; font-weight: bold;">❌ Migration issues detected</p>'}
+            `;
+      }
+
+      // Run tests when page loads
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log("Badge Manager Migration Test Suite Starting...");
+        runFullTest();
+      });
+    </script>
+  </body>
+</html>

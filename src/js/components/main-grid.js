@@ -69,7 +69,11 @@ const ENTERPRISE_CONSTANTS = {
 };
 
 class MainGrid {
-  constructor() {
+  constructor(app = null) {
+    // Enhanced integration
+    this.app = app;
+    this.dataHandler = app?.dataHandler || null;
+
     // Enterprise monitoring setup
     this.instanceId = `maingrid_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     this.version = "v2.1.0-enterprise";
@@ -82,7 +86,7 @@ class MainGrid {
     this.viewToggleButtons = null;
     this.currentView = "category"; // 'category' or 'scenario'
     this.categories = getAllCategories();
-    this.userProgress = this.loadUserProgress();
+    this.userProgress = {}; // Will be loaded async
     this.lastModalOpenTime = 0; // Debounce tracking
     this.modalOpenCooldown = 500; // Minimum time between modal opens (ms)
     this.isModalOpen = false; // Track if modal is currently open
@@ -90,6 +94,14 @@ class MainGrid {
     this.modalClosedHandler = null; // Store bound event handler
     this.scenarioCompletedHandler = null; // Store bound event handler
     this.scenarioReflectionCompletedHandler = null; // Store bound reflection handler
+
+    // Initialize async
+    this.initializeAsync();
+  }
+
+  async initializeAsync() {
+    // Load user progress asynchronously
+    this.userProgress = await this.loadUserProgress();
 
     // Queue for deferred badge notifications (wait for reflection completion)
     this.deferredBadges = new Map(); // scenarioId -> { badges, scenarioData, timestamp }
@@ -1108,25 +1120,80 @@ class MainGrid {
     this.setupViewToggle();
   }
 
-  loadUserProgress() {
-    // Load user progress from localStorage
+  async loadUserProgress() {
     try {
+      // Try DataHandler first if available
+      if (this.dataHandler) {
+        const stored = await this.dataHandler.getData("user_progress");
+        if (stored && Object.keys(stored).length > 0) {
+          console.log("[MainGrid] User progress loaded from DataHandler");
+          return stored;
+        }
+      }
+
+      // Fallback to localStorage
       const stored = localStorage.getItem("simulateai_category_progress");
-      return stored ? JSON.parse(stored) : {};
+      const progress = stored ? JSON.parse(stored) : {};
+
+      // Migrate to DataHandler if available
+      if (progress && Object.keys(progress).length > 0 && this.dataHandler) {
+        try {
+          await this.dataHandler.saveData("user_progress", progress);
+          console.log(
+            "[MainGrid] Migrated user progress from localStorage to DataHandler",
+          );
+        } catch (error) {
+          console.warn(
+            "[MainGrid] Failed to migrate progress to DataHandler:",
+            error,
+          );
+        }
+      }
+
+      console.log("[MainGrid] User progress loaded from localStorage");
+      return progress;
     } catch (error) {
       logger.error("Failed to load user progress:", error);
       return {};
     }
   }
 
-  saveUserProgress() {
+  async saveUserProgress() {
     try {
+      // Try DataHandler first if available
+      if (this.dataHandler) {
+        const success = await this.dataHandler.saveData(
+          "user_progress",
+          this.userProgress,
+        );
+        if (success) {
+          console.log("[MainGrid] User progress saved to DataHandler");
+          // Also save to localStorage for immediate access
+          localStorage.setItem(
+            "simulateai_category_progress",
+            JSON.stringify(this.userProgress),
+          );
+          return;
+        }
+      }
+
+      // Fallback to localStorage
       localStorage.setItem(
         "simulateai_category_progress",
         JSON.stringify(this.userProgress),
       );
+      console.log("[MainGrid] User progress saved to localStorage");
     } catch (error) {
       logger.error("Failed to save user progress:", error);
+      // Try localStorage as final fallback
+      try {
+        localStorage.setItem(
+          "simulateai_category_progress",
+          JSON.stringify(this.userProgress),
+        );
+      } catch (fallbackError) {
+        logger.error("All save methods failed:", fallbackError);
+      }
     }
   }
 
@@ -2319,7 +2386,10 @@ class MainGrid {
       this.completedScenarios.delete(scenarioId);
     }
 
-    this.saveUserProgress();
+    // Save progress asynchronously (non-blocking)
+    this.saveUserProgress().catch((error) => {
+      console.warn("[MainGrid] Failed to save user progress:", error);
+    });
 
     // Check for newly earned badges and defer them for reflection completion
     if (completed && checkBadges) {
@@ -2792,8 +2862,8 @@ class MainGrid {
   }
 
   // Public API for external components
-  refreshProgress() {
-    this.userProgress = this.loadUserProgress();
+  async refreshProgress() {
+    this.userProgress = await this.loadUserProgress();
 
     // Refresh completed scenarios set
     this.completedScenarios.clear();

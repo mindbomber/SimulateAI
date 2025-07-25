@@ -167,7 +167,9 @@ export class UserEngagementTracker {
    */
   loadUserProfileSync() {
     try {
-      const stored = localStorage.getItem(TRACKING_CONSTANTS.STORAGE_KEYS.USER_PROFILE);
+      const stored = localStorage.getItem(
+        TRACKING_CONSTANTS.STORAGE_KEYS.USER_PROFILE,
+      );
       return stored ? JSON.parse(stored) : {};
     } catch (error) {
       logger.error("Failed to load user profile sync:", error);
@@ -177,7 +179,9 @@ export class UserEngagementTracker {
 
   loadEngagementMetricsSync() {
     try {
-      const stored = localStorage.getItem(TRACKING_CONSTANTS.STORAGE_KEYS.ENGAGEMENT_METRICS);
+      const stored = localStorage.getItem(
+        TRACKING_CONSTANTS.STORAGE_KEYS.ENGAGEMENT_METRICS,
+      );
       return stored ? JSON.parse(stored) : {};
     } catch (error) {
       logger.error("Failed to load engagement metrics sync:", error);
@@ -187,7 +191,9 @@ export class UserEngagementTracker {
 
   loadBehaviorPatternsSync() {
     try {
-      const stored = localStorage.getItem(TRACKING_CONSTANTS.STORAGE_KEYS.BEHAVIOR_PATTERNS);
+      const stored = localStorage.getItem(
+        TRACKING_CONSTANTS.STORAGE_KEYS.BEHAVIOR_PATTERNS,
+      );
       return stored ? JSON.parse(stored) : {};
     } catch (error) {
       logger.error("Failed to load behavior patterns sync:", error);
@@ -197,13 +203,14 @@ export class UserEngagementTracker {
 
   loadSettingsUsageSync() {
     try {
-      const stored = localStorage.getItem(TRACKING_CONSTANTS.STORAGE_KEYS.SETTINGS_USAGE);
+      const stored = localStorage.getItem(
+        TRACKING_CONSTANTS.STORAGE_KEYS.SETTINGS_USAGE,
+      );
       return stored ? JSON.parse(stored) : {};
     } catch (error) {
       logger.error("Failed to load settings usage sync:", error);
       return {};
     }
-  }
   }
 
   /**
@@ -1022,12 +1029,17 @@ export class UserEngagementTracker {
     // Try DataHandler first
     if (this.dataHandler) {
       try {
-        const profile = await this.dataHandler.loadSettings('userEngagementTracker_userProfile');
+        const profile = await this.dataHandler.getData(
+          "userEngagementTracker_userProfile",
+        );
         if (profile && Object.keys(profile).length > 0) {
           return profile;
         }
       } catch (error) {
-        console.warn('[UserEngagementTracker] DataHandler failed, using localStorage fallback for userProfile:', error);
+        console.warn(
+          "[UserEngagementTracker] DataHandler failed, using localStorage fallback for userProfile:",
+          error,
+        );
       }
     }
 
@@ -1047,10 +1059,16 @@ export class UserEngagementTracker {
     // Try DataHandler first
     if (this.dataHandler) {
       try {
-        await this.dataHandler.saveSettings('userEngagementTracker_userProfile', this.userProfile);
+        await this.dataHandler.saveData(
+          "userEngagementTracker_userProfile",
+          this.userProfile,
+        );
         return;
       } catch (error) {
-        console.warn('[UserEngagementTracker] DataHandler failed, using localStorage fallback for userProfile:', error);
+        console.warn(
+          "[UserEngagementTracker] DataHandler failed, using localStorage fallback for userProfile:",
+          error,
+        );
       }
     }
 
@@ -1069,12 +1087,17 @@ export class UserEngagementTracker {
     // Try DataHandler first
     if (this.dataHandler) {
       try {
-        const metrics = await this.dataHandler.loadSettings('userEngagementTracker_engagementMetrics');
+        const metrics = await this.dataHandler.getData(
+          "userEngagementTracker_engagementMetrics",
+        );
         if (metrics && Object.keys(metrics).length > 0) {
           return metrics;
         }
       } catch (error) {
-        console.warn('[UserEngagementTracker] DataHandler failed, using localStorage fallback for engagementMetrics:', error);
+        console.warn(
+          "[UserEngagementTracker] DataHandler failed, using localStorage fallback for engagementMetrics:",
+          error,
+        );
       }
     }
 
@@ -1094,10 +1117,16 @@ export class UserEngagementTracker {
     // Try DataHandler first
     if (this.dataHandler) {
       try {
-        await this.dataHandler.saveSettings('userEngagementTracker_engagementMetrics', this.engagementMetrics);
+        await this.dataHandler.saveData(
+          "userEngagementTracker_engagementMetrics",
+          this.engagementMetrics,
+        );
         return;
       } catch (error) {
-        console.warn('[UserEngagementTracker] DataHandler failed, using localStorage fallback for engagementMetrics:', error);
+        console.warn(
+          "[UserEngagementTracker] DataHandler failed, using localStorage fallback for engagementMetrics:",
+          error,
+        );
       }
     }
 
@@ -1116,12 +1145,17 @@ export class UserEngagementTracker {
     // Try DataHandler first
     if (this.dataHandler) {
       try {
-        const patterns = await this.dataHandler.loadSettings('userEngagementTracker_behaviorPatterns');
+        const patterns = await this.dataHandler.getData(
+          "userEngagementTracker_behaviorPatterns",
+        );
         if (patterns && Object.keys(patterns).length > 0) {
           return patterns;
         }
       } catch (error) {
-        console.warn('[UserEngagementTracker] DataHandler failed, using localStorage fallback for behaviorPatterns:', error);
+        console.warn(
+          "[UserEngagementTracker] DataHandler failed, using localStorage fallback for behaviorPatterns:",
+          error,
+        );
       }
     }
 
@@ -1141,10 +1175,16 @@ export class UserEngagementTracker {
     // Try DataHandler first
     if (this.dataHandler) {
       try {
-        await this.dataHandler.saveSettings('userEngagementTracker_behaviorPatterns', this.behaviorPatterns);
+        await this.dataHandler.saveData(
+          "userEngagementTracker_behaviorPatterns",
+          this.behaviorPatterns,
+        );
         return;
       } catch (error) {
-        console.warn('[UserEngagementTracker] DataHandler failed, using localStorage fallback for behaviorPatterns:', error);
+        console.warn(
+          "[UserEngagementTracker] DataHandler failed, using localStorage fallback for behaviorPatterns:",
+          error,
+        );
       }
     }
 
@@ -1163,12 +1203,17 @@ export class UserEngagementTracker {
     // Try DataHandler first
     if (this.dataHandler) {
       try {
-        const usage = await this.dataHandler.loadSettings('userEngagementTracker_settingsUsage');
+        const usage = await this.dataHandler.getData(
+          "userEngagementTracker_settingsUsage",
+        );
         if (usage && Object.keys(usage).length > 0) {
           return usage;
         }
       } catch (error) {
-        console.warn('[UserEngagementTracker] DataHandler failed, using localStorage fallback for settingsUsage:', error);
+        console.warn(
+          "[UserEngagementTracker] DataHandler failed, using localStorage fallback for settingsUsage:",
+          error,
+        );
       }
     }
 
@@ -1188,10 +1233,16 @@ export class UserEngagementTracker {
     // Try DataHandler first
     if (this.dataHandler) {
       try {
-        await this.dataHandler.saveSettings('userEngagementTracker_settingsUsage', this.settingsUsage);
+        await this.dataHandler.saveData(
+          "userEngagementTracker_settingsUsage",
+          this.settingsUsage,
+        );
         return;
       } catch (error) {
-        console.warn('[UserEngagementTracker] DataHandler failed, using localStorage fallback for settingsUsage:', error);
+        console.warn(
+          "[UserEngagementTracker] DataHandler failed, using localStorage fallback for settingsUsage:",
+          error,
+        );
       }
     }
 
@@ -1210,26 +1261,38 @@ export class UserEngagementTracker {
    * Sync wrapper methods for backward compatibility
    */
   saveUserProfileSync() {
-    this.saveUserProfile().catch(error => {
-      console.error('[UserEngagementTracker] Failed to save user profile:', error);
+    this.saveUserProfile().catch((error) => {
+      console.error(
+        "[UserEngagementTracker] Failed to save user profile:",
+        error,
+      );
     });
   }
 
   saveEngagementMetricsSync() {
-    this.saveEngagementMetrics().catch(error => {
-      console.error('[UserEngagementTracker] Failed to save engagement metrics:', error);
+    this.saveEngagementMetrics().catch((error) => {
+      console.error(
+        "[UserEngagementTracker] Failed to save engagement metrics:",
+        error,
+      );
     });
   }
 
   saveBehaviorPatternsSync() {
-    this.saveBehaviorPatterns().catch(error => {
-      console.error('[UserEngagementTracker] Failed to save behavior patterns:', error);
+    this.saveBehaviorPatterns().catch((error) => {
+      console.error(
+        "[UserEngagementTracker] Failed to save behavior patterns:",
+        error,
+      );
     });
   }
 
   saveSettingsUsageSync() {
-    this.saveSettingsUsage().catch(error => {
-      console.error('[UserEngagementTracker] Failed to save settings usage:', error);
+    this.saveSettingsUsage().catch((error) => {
+      console.error(
+        "[UserEngagementTracker] Failed to save settings usage:",
+        error,
+      );
     });
   }
 
@@ -1503,8 +1566,6 @@ export class UserEngagementTracker {
       .slice(0, 5)
       .map(([setting, count]) => ({ setting, count }));
   }
-
-  // ...existing code...
 }
 
 // Create singleton instance

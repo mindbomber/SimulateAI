@@ -147,6 +147,10 @@ class EnhancedApp {
         name: "storageManager", // Phase 2.4
         initializer: this.initializeStorageManager.bind(this),
       },
+      {
+        name: "badgeManager", // Phase 1 continuation
+        initializer: this.initializeBadgeManager.bind(this),
+      },
     ];
 
     for (const { name, initializer } of componentInitializers) {
@@ -528,6 +532,46 @@ class EnhancedApp {
           fallbackError,
         );
       }
+    }
+  }
+
+  /**
+   * Enhanced BadgeManager integration
+   * Phase 1 continuation: Badge system DataHandler migration
+   */
+  async initializeBadgeManager() {
+    if (!window.BadgeManager && !window.badgeManager) {
+      console.warn(
+        "[EnhancedApp] BadgeManager not found, skipping enhancement",
+      );
+      return;
+    }
+
+    try {
+      // Get badge manager instance (could be singleton or class)
+      let badgeManager = window.badgeManager || window.BadgeManager;
+
+      // If it's a class, create enhanced instance
+      if (typeof badgeManager === "function") {
+        badgeManager = new badgeManager(this);
+      } else if (badgeManager && !badgeManager.dataHandler) {
+        // Enhance existing instance
+        badgeManager.app = this;
+        badgeManager.dataHandler = this.dataHandler;
+        await badgeManager.initializeAsync();
+      }
+
+      // Store reference for component communication
+      this.components.set("badgeManager", badgeManager);
+
+      // Make globally available
+      window.badgeManager = badgeManager;
+
+      console.log(
+        "[EnhancedApp] BadgeManager enhanced with DataHandler integration",
+      );
+    } catch (error) {
+      console.error("[EnhancedApp] BadgeManager initialization failed:", error);
     }
   }
 

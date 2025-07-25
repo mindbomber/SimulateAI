@@ -34,6 +34,8 @@
 // Import core modules
 import AccessibilityManager from "./core/accessibility.js";
 import AnimationManager from "./core/animation-manager.js";
+import DataHandler from "./core/data-handler.js";
+import UIBinder from "./core/ui-binder.js";
 import EducatorToolkit from "./core/educator-toolkit.js";
 import DigitalScienceLab from "./core/digital-science-lab.js";
 import ScenarioGenerator from "./core/scenario-generator.js";
@@ -2090,6 +2092,27 @@ class AIEthicsApp {
    */
   async initializeCoreModules() {
     try {
+      // Initialize DataHandler for centralized data management
+      this.dataHandler = new DataHandler({
+        appName: "SimulateAI",
+        version: "1.40",
+        enableFirebase: true,
+        enableCaching: true,
+        enableOfflineQueue: true,
+      });
+      await this.dataHandler.initialize();
+      AppDebug.log("DataHandler initialized");
+
+      // Initialize UIBinder for unified UI management
+      this.uiBinder = new UIBinder({
+        enableThemeManager: true,
+        enableAccessibility: true,
+        enablePerformanceMonitoring: true,
+        dataHandler: this.dataHandler,
+      });
+      await this.uiBinder.initialize();
+      AppDebug.log("UIBinder initialized");
+
       // Initialize Educator Toolkit
       this.educatorToolkit = new EducatorToolkit();
       AppDebug.log("Educator Toolkit initialized");
@@ -2118,6 +2141,60 @@ class AIEthicsApp {
    * Connect educational modules for integrated functionality
    */
   connectEducationalModules() {
+    // Connect DataHandler and UIBinder to provide centralized services
+    if (this.dataHandler && this.uiBinder) {
+      try {
+        // Make DataHandler available to all educational modules
+        if (
+          this.educatorToolkit &&
+          typeof this.educatorToolkit.setDataHandler === "function"
+        ) {
+          this.educatorToolkit.setDataHandler(this.dataHandler);
+        }
+        if (
+          this.digitalScienceLab &&
+          typeof this.digitalScienceLab.setDataHandler === "function"
+        ) {
+          this.digitalScienceLab.setDataHandler(this.dataHandler);
+        }
+        if (
+          this.scenarioGenerator &&
+          typeof this.scenarioGenerator.setDataHandler === "function"
+        ) {
+          this.scenarioGenerator.setDataHandler(this.dataHandler);
+        }
+
+        // Make UIBinder available for consistent theming and UI management
+        if (
+          this.educatorToolkit &&
+          typeof this.educatorToolkit.setUIBinder === "function"
+        ) {
+          this.educatorToolkit.setUIBinder(this.uiBinder);
+        }
+        if (
+          this.digitalScienceLab &&
+          typeof this.digitalScienceLab.setUIBinder === "function"
+        ) {
+          this.digitalScienceLab.setUIBinder(this.uiBinder);
+        }
+        if (
+          this.scenarioGenerator &&
+          typeof this.scenarioGenerator.setUIBinder === "function"
+        ) {
+          this.scenarioGenerator.setUIBinder(this.uiBinder);
+        }
+
+        AppDebug.log(
+          "DataHandler and UIBinder connected to educational modules",
+        );
+      } catch (error) {
+        AppDebug.warn(
+          "Failed to connect DataHandler/UIBinder to educational modules:",
+          error,
+        );
+      }
+    }
+
     // Connect scenario generator to educator toolkit for assessment alignment
     if (this.educatorToolkit && this.scenarioGenerator) {
       try {
@@ -2640,6 +2717,8 @@ class AIEthicsApp {
       getBadgeManager: () => this.badgeManager,
       getAccessibilityManager: () => this.accessibilityManager,
       getAnimationManager: () => this.animationManager,
+      getDataHandler: () => this.dataHandler,
+      getUIBinder: () => this.uiBinder,
 
       // Configuration access
       getConfig: () => this.simulateaiConfig,

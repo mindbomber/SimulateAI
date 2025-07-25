@@ -4,7 +4,9 @@
  */
 
 class DonationPreferences {
-  constructor() {
+  constructor(app = null) {
+    this.app = app;
+    this.dataHandler = app?.dataHandler || null;
     this.isAuthenticated = false;
     this.currentUser = null;
     this.preferences = {
@@ -39,39 +41,87 @@ class DonationPreferences {
   }
 
   /**
-   * Load user preferences from Firebase or localStorage
+   * Load user preferences with DataHandler-first approach
    */
   async loadUserPreferences() {
-    if (this.isAuthenticated && window.firebase?.firestore) {
-      try {
-        const db = window.firebase.firestore();
-        const userDoc = await db
-          .collection("userPreferences")
-          .doc(this.currentUser.uid)
-          .get();
-
-        if (userDoc.exists) {
-          this.preferences = { ...this.preferences, ...userDoc.data() };
+    try {
+      // Try DataHandler first if available
+      if (this.dataHandler) {
+        const stored = await this.dataHandler.getData("donation_preferences");
+        if (stored && Object.keys(stored).length > 0) {
+          this.preferences = { ...this.preferences, ...stored };
+          console.log(
+            "[DonationPreferences] Preferences loaded from DataHandler",
+          );
+          return;
         }
-      } catch (error) {
-        console.error("Error loading user preferences:", error);
-        // Fallback to localStorage
+      }
+
+      // Fallback to Firebase/localStorage
+      if (this.isAuthenticated && window.firebase?.firestore) {
+        try {
+          const db = window.firebase.firestore();
+          const userDoc = await db
+            .collection("userPreferences")
+            .doc(this.currentUser.uid)
+            .get();
+
+          if (userDoc.exists) {
+            const firebaseData = userDoc.data();
+            this.preferences = { ...this.preferences, ...firebaseData };
+
+            // Migrate to DataHandler if available
+            if (this.dataHandler && Object.keys(firebaseData).length > 0) {
+              await this.dataHandler.saveData(
+                "donation_preferences",
+                this.preferences,
+              );
+              console.log(
+                "[DonationPreferences] Migrated preferences from Firebase to DataHandler",
+              );
+            }
+          }
+        } catch (error) {
+          console.error("Error loading user preferences from Firebase:", error);
+          // Fallback to localStorage
+          this.loadFromLocalStorage();
+        }
+      } else {
+        // Use localStorage for non-authenticated users
         this.loadFromLocalStorage();
       }
-    } else {
-      // Use localStorage for non-authenticated users
+    } catch (error) {
+      console.warn("[DonationPreferences] Failed to load preferences:", error);
       this.loadFromLocalStorage();
     }
   }
 
   /**
-   * Load preferences from localStorage
+   * Load preferences from localStorage with DataHandler migration
    */
   loadFromLocalStorage() {
     const saved = localStorage.getItem("donationPreferences");
     if (saved) {
       try {
-        this.preferences = { ...this.preferences, ...JSON.parse(saved) };
+        const localData = JSON.parse(saved);
+        this.preferences = { ...this.preferences, ...localData };
+
+        // Migrate to DataHandler if available
+        if (this.dataHandler && Object.keys(localData).length > 0) {
+          this.dataHandler
+            .saveData("donation_preferences", this.preferences)
+            .then(() => {
+              console.log(
+                "[DonationPreferences] Migrated preferences from localStorage to DataHandler",
+              );
+            })
+            .catch((error) => {
+              console.warn(
+                "[DonationPreferences] Failed to migrate to DataHandler:",
+                error,
+              );
+            });
+        }
       } catch (error) {
         console.error("Error parsing saved preferences:", error);
       }
@@ -79,25 +129,49 @@ class DonationPreferences {
   }
 
   /**
-   * Save user preferences
+   * Save user preferences with DataHandler-first approach
    */
   async savePreferences(newPreferences) {
     this.preferences = { ...this.preferences, ...newPreferences };
 
-    if (this.isAuthenticated && window.firebase?.firestore) {
-      try {
-        const db = window.firebase.firestore();
-        await db
-          .collection("userPreferences")
-          .doc(this.currentUser.uid)
-          .set(this.preferences, { merge: true });
-        console.log("✅ Preferences saved to Firebase");
-      } catch (error) {
-        console.error("Error saving preferences to Firebase:", error);
-        // Fallback to localStorage
+    try {
+      // Try DataHandler first if available
+      if (this.dataHandler) {
+        const success = await this.dataHandler.saveData(
+          "donation_preferences",
+          this.preferences,
+        );
+        if (success) {
+          console.log("[DonationPreferences] Preferences saved to DataHandler");
+          // Also save to localStorage for immediate access
+          localStorage.setItem(
+            "donationPreferences",
+            JSON.stringify(this.preferences),
+          );
+          this.updatePreferencesUI();
+          return;
+        }
+      }
+
+      // Fallback to Firebase/localStorage
+      if (this.isAuthenticated && window.firebase?.firestore) {
+        try {
+          const db = window.firebase.firestore();
+          await db
+            .collection("userPreferences")
+            .doc(this.currentUser.uid)
+            .set(this.preferences, { merge: true });
+          console.log("✅ Preferences saved to Firebase");
+        } catch (error) {
+          console.error("Error saving preferences to Firebase:", error);
+          // Fallback to localStorage
+          this.saveToLocalStorage();
+        }
+      } else {
         this.saveToLocalStorage();
       }
-    } else {
+    } catch (error) {
+      console.warn("[DonationPreferences] Failed to save preferences:", error);
       this.saveToLocalStorage();
     }
 
@@ -464,24 +538,29 @@ class DonationPreferences {
     container.insertAdjacentHTML("beforeend", buttonHTML);
   }
 
-  // Static method for easy initialization
-  static init() {
+  // Static method for easy initialization with app reference
+  static init(app = null) {
     if (!window.donationPreferences) {
-      window.donationPreferences = new DonationPreferences();
+      const appRef = app || window.simulateAI || window.app || null;
+      window.donationPreferences = new DonationPreferences(appRef);
     }
     return window.donationPreferences;
   }
 }
 
-// Auto-initialize
+// Auto-initialize when DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
-  DonationPreferences.init();
+  setTimeout(() => {
+    if (!window.donationPreferences) {
+      // Try to get app reference from SimulateAI or global app
+      const app = window.simulateAI || window.app || null;
+      window.donationPreferences = new DonationPreferences(app);
+    }
+  }, 100);
 });
 
-// Make available globally
+// Make class available globally
 window.DonationPreferences = DonationPreferences;
 
-// Export for modules
-if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
-  module.exports = DonationPreferences;
-}
+// Export for ES modules
+export default DonationPreferences;

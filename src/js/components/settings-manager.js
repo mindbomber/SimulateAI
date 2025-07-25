@@ -37,11 +37,13 @@ const APP_CONFIG_PATH = "/src/config/app-config.json";
 const SETTINGS_SCHEMA_PATH = "/src/config/settings-schema.json";
 
 class SettingsManager {
-  constructor() {
+  constructor(app = null) {
+    this.app = app;
+    this.dataHandler = app?.dataHandler || null;
     this.appConfig = null;
     this.settingsSchema = null;
     this.settings = {};
-    this.isDonor = this.checkDonorStatus();
+    this.isDonor = false; // Will be loaded async
     this.isInitialized = false;
     this.init();
   }
@@ -52,6 +54,9 @@ class SettingsManager {
     try {
       // Load configurations in order
       await this.loadConfigurations();
+
+      // Load donor status asynchronously
+      this.isDonor = await this.checkDonorStatus();
 
       // Initialize settings with integrated defaults
       this.settings = await this.loadSettings();
@@ -374,8 +379,8 @@ class SettingsManager {
       // 1. Start with schema defaults and app-config integration
       const integratedDefaults = this.buildIntegratedDefaults();
 
-      // 2. Load user preferences from localStorage
-      const storedSettings = this.loadStoredSettings();
+      // 2. Load user preferences from storage (DataHandler-first)
+      const storedSettings = await this.loadStoredSettings();
 
       // 3. Merge and validate
       const mergedSettings = { ...integratedDefaults, ...storedSettings };
@@ -449,14 +454,42 @@ class SettingsManager {
   }
 
   /**
-   * Load settings from localStorage with error handling
+   * Load settings from storage with DataHandler-first approach
    */
-  loadStoredSettings() {
+  async loadStoredSettings() {
     try {
+      // Try DataHandler first if available
+      if (this.dataHandler) {
+        const stored = await this.dataHandler.getData("settings_manager");
+        if (stored && Object.keys(stored).length > 0) {
+          console.log("[SettingsManager] Settings loaded from DataHandler");
+          return stored;
+        }
+      }
+
+      // Fallback to localStorage
       const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
-      return stored ? JSON.parse(stored) : {};
+      const settings = stored ? JSON.parse(stored) : {};
+
+      // If we found settings in localStorage and have DataHandler, migrate them
+      if (settings && Object.keys(settings).length > 0 && this.dataHandler) {
+        try {
+          await this.dataHandler.saveData("settings_manager", settings);
+          console.log(
+            "[SettingsManager] Migrated settings from localStorage to DataHandler",
+          );
+        } catch (error) {
+          console.warn(
+            "[SettingsManager] Failed to migrate settings to DataHandler:",
+            error,
+          );
+        }
+      }
+
+      console.log("[SettingsManager] Settings loaded from localStorage");
+      return settings;
     } catch (error) {
-      console.warn("Failed to load stored settings:", error);
+      console.warn("[SettingsManager] Failed to load stored settings:", error);
       return {};
     }
   }
@@ -634,31 +667,106 @@ class SettingsManager {
     };
   }
 
-  saveSettings() {
+  /**
+   * Save settings with DataHandler-first approach
+   */
+  async saveSettings() {
     try {
+      // Try DataHandler first if available
+      if (this.dataHandler) {
+        const success = await this.dataHandler.saveData(
+          "settings_manager",
+          this.settings,
+        );
+        if (success) {
+          console.log("[SettingsManager] Settings saved to DataHandler");
+          // Also save to localStorage for immediate access
+          localStorage.setItem(
+            SETTINGS_STORAGE_KEY,
+            JSON.stringify(this.settings),
+          );
+          return;
+        }
+      }
+
+      // Fallback to localStorage
       localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(this.settings));
+      console.log("[SettingsManager] Settings saved to localStorage");
     } catch (error) {
-      // Failed to save settings
+      console.warn("[SettingsManager] Failed to save settings:", error);
+      // Try localStorage as final fallback
+      try {
+        localStorage.setItem(
+          SETTINGS_STORAGE_KEY,
+          JSON.stringify(this.settings),
+        );
+      } catch (fallbackError) {
+        console.error(
+          "[SettingsManager] All save methods failed:",
+          fallbackError,
+        );
+      }
     }
   }
 
-  checkDonorStatus() {
+  /**
+   * Synchronous settings save wrapper for event handlers
+   */
+  saveSettingsSync() {
+    this.saveSettings().catch((error) => {
+      console.warn("[SettingsManager] Async settings save failed:", error);
+    });
+  }
+
+  /**
+   * Check donor status with DataHandler-first approach
+   */
+  async checkDonorStatus() {
     try {
+      // Try DataHandler first if available
+      if (this.dataHandler) {
+        const donorStatus = await this.dataHandler.getData("donor_status");
+        if (donorStatus !== null && donorStatus !== undefined) {
+          return donorStatus === true || donorStatus === "true";
+        }
+      }
+
+      // Fallback to localStorage
       const donorStatus = localStorage.getItem(DONOR_STATUS_KEY);
       return donorStatus === "true";
     } catch (error) {
-      // Failed to check donor status
+      console.warn("[SettingsManager] Failed to check donor status:", error);
       return false;
     }
   }
 
-  setDonorStatus(isDonor) {
+  /**
+   * Set donor status with DataHandler-first approach
+   */
+  async setDonorStatus(isDonor) {
     try {
+      // Try DataHandler first if available
+      if (this.dataHandler) {
+        const success = await this.dataHandler.saveData(
+          "donor_status",
+          isDonor,
+        );
+        if (success) {
+          console.log("[SettingsManager] Donor status saved to DataHandler");
+          // Also save to localStorage for immediate access
+          localStorage.setItem(DONOR_STATUS_KEY, isDonor.toString());
+          this.isDonor = isDonor;
+          this.updateUI();
+          return;
+        }
+      }
+
+      // Fallback to localStorage
       localStorage.setItem(DONOR_STATUS_KEY, isDonor.toString());
       this.isDonor = isDonor;
       this.updateUI();
     } catch (error) {
-      // Failed to set donor status
+      console.warn("[SettingsManager] Failed to set donor status:", error);
     }
   }
 
@@ -680,7 +788,7 @@ class SettingsManager {
           context: "settings_panel",
         });
 
-        this.saveSettings();
+        this.saveSettingsSync();
         this.applySettings();
       });
     }
@@ -702,7 +810,7 @@ class SettingsManager {
           context: "settings_panel",
         });
 
-        this.saveSettings();
+        this.saveSettingsSync();
         this.applySettings();
       });
     }
@@ -743,7 +851,7 @@ class SettingsManager {
           context: "settings_panel",
         });
 
-        this.saveSettings();
+        this.saveSettingsSync();
         this.applySettings();
       });
     }
@@ -765,7 +873,7 @@ class SettingsManager {
           context: "settings_panel",
         });
 
-        this.saveSettings();
+        this.saveSettingsSync();
         this.applySettings();
       });
     }
@@ -787,7 +895,7 @@ class SettingsManager {
           context: "settings_panel",
         });
 
-        this.saveSettings();
+        this.saveSettingsSync();
         this.applySettings();
       });
     }
@@ -809,7 +917,7 @@ class SettingsManager {
           context: "settings_panel",
         });
 
-        this.saveSettings();
+        this.saveSettingsSync();
         this.applySettings();
       });
     }
@@ -821,7 +929,7 @@ class SettingsManager {
     if (reducedMotionToggle) {
       reducedMotionToggle.addEventListener("change", (e) => {
         this.settings.reducedMotion = e.target.checked;
-        this.saveSettings();
+        this.saveSettingsSync();
         this.applySettings();
       });
     }
@@ -831,7 +939,7 @@ class SettingsManager {
     if (largeTargetsToggle) {
       largeTargetsToggle.addEventListener("change", (e) => {
         this.settings.largeClickTargets = e.target.checked;
-        this.saveSettings();
+        this.saveSettingsSync();
         this.applySettings();
       });
     }
@@ -1300,7 +1408,7 @@ class SettingsManager {
           context: "settings_panel",
         });
 
-        this.saveSettings();
+        this.saveSettingsSync();
       });
     }
 
@@ -1320,7 +1428,7 @@ class SettingsManager {
           context: "settings_panel",
         });
 
-        this.saveSettings();
+        this.saveSettingsSync();
       });
     }
 
@@ -1342,7 +1450,7 @@ class SettingsManager {
           context: "settings_panel",
         });
 
-        this.saveSettings();
+        this.saveSettingsSync();
       });
     }
 
@@ -1400,7 +1508,7 @@ class SettingsManager {
       context: "settings_panel",
     });
 
-    this.saveSettings();
+    this.saveSettingsSync();
   }
 
   /**
@@ -1454,7 +1562,7 @@ class SettingsManager {
         toggle.checked = false;
       }
 
-      this.saveSettings();
+      this.saveSettingsSync();
     }
   }
 
@@ -1701,7 +1809,7 @@ class SettingsManager {
     const validatedValue = this.validateSingleSetting(key, value);
 
     this.settings[key] = validatedValue;
-    this.saveSettings();
+    this.saveSettingsSync();
     this.applySettings();
     this.updateUI();
   }
@@ -1786,7 +1894,7 @@ class SettingsManager {
       reducedMotion: false,
       largeClickTargets: false,
     };
-    this.saveSettings();
+    this.saveSettingsSync();
     this.applySettings();
     this.updateUI();
   }
@@ -1794,10 +1902,12 @@ class SettingsManager {
 
 // Auto-initialize when DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
-  // Wait a bit for shared navigation to inject HTML
+  // Wait a bit for shared navigation to inject HTML and app to initialize
   setTimeout(() => {
     if (!window.settingsManager) {
-      window.settingsManager = new SettingsManager();
+      // Try to get app reference from SimulateAI or global app
+      const app = window.simulateAI || window.app || null;
+      window.settingsManager = new SettingsManager(app);
     }
   }, 100);
 });
@@ -1807,7 +1917,8 @@ if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       if (!window.settingsManager) {
-        window.settingsManager = new SettingsManager();
+        const app = window.simulateAI || window.app || null;
+        window.settingsManager = new SettingsManager(app);
       }
     }, 100);
   });
@@ -1815,7 +1926,8 @@ if (document.readyState === "loading") {
   // DOM is already loaded - wait for navigation to be injected
   setTimeout(() => {
     if (!window.settingsManager) {
-      window.settingsManager = new SettingsManager();
+      const app = window.simulateAI || window.app || null;
+      window.settingsManager = new SettingsManager(app);
     }
   }, 100);
 }

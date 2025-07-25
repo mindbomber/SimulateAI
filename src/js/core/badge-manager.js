@@ -33,38 +33,118 @@ import {
  * Manages badge state, progress tracking, and achievement calculations
  */
 export class BadgeManager {
-  constructor() {
+  constructor(app = null) {
+    this.app = app;
+    this.dataHandler = app?.dataHandler || null;
     this.STORAGE_KEY = "simulateai_badge_progress";
     this.CATEGORY_PROGRESS_KEY = "simulateai_category_progress";
-    this.badgeState = this.loadBadgeState();
+    this.badgeState = {}; // Will be loaded async in initializeAsync()
     // Don't load category progress in constructor - always read fresh from localStorage
     this.categoryProgress = {};
+    this.isInitialized = false;
+
+    // Auto-initialize for backward compatibility
+    this.initializeAsync();
   }
 
   /**
-   * Loads badge state from localStorage
+   * Async initialization for enhanced DataHandler integration
+   */
+  async initializeAsync() {
+    if (this.isInitialized) return;
+
+    try {
+      this.badgeState = await this.loadBadgeState();
+      this.isInitialized = true;
+    } catch (error) {
+      console.warn("[BadgeManager] Async initialization failed:", error);
+      // Fallback to empty state
+      this.badgeState = {};
+      this.isInitialized = true;
+    }
+  }
+
+  /**
+   * Loads badge state from DataHandler with localStorage fallback
    * @returns {Object} Badge state object
    */
-  loadBadgeState() {
+  async loadBadgeState() {
     try {
+      // Try DataHandler first if available
+      if (this.dataHandler) {
+        const stored = await this.dataHandler.getData("badge_manager_state");
+        if (stored && Object.keys(stored).length > 0) {
+          console.log("[BadgeManager] Badge state loaded from DataHandler");
+          return stored;
+        }
+      }
+
+      // Fallback to localStorage
       const stored = localStorage.getItem(this.STORAGE_KEY);
-      return stored ? JSON.parse(stored) : {};
+      const badgeState = stored ? JSON.parse(stored) : {};
+
+      // If we found badge state in localStorage and have DataHandler, migrate it
+      if (
+        badgeState &&
+        Object.keys(badgeState).length > 0 &&
+        this.dataHandler
+      ) {
+        await this.dataHandler.saveData("badge_manager_state", badgeState);
+        console.log(
+          "[BadgeManager] Migrated badge state from localStorage to DataHandler",
+        );
+      }
+
+      return badgeState;
     } catch (error) {
-      // Silent error handling for badge state loading
+      console.warn("[BadgeManager] Failed to load badge state:", error);
       return {};
     }
   }
 
   /**
-   * Saves badge state to localStorage
+   * Saves badge state with DataHandler-first approach
    */
-  saveBadgeState() {
+  async saveBadgeState() {
     try {
+      // Try DataHandler first if available
+      if (this.dataHandler) {
+        const success = await this.dataHandler.saveData(
+          "badge_manager_state",
+          this.badgeState,
+        );
+        if (success) {
+          console.log("[BadgeManager] Badge state saved to DataHandler");
+          // Also save to localStorage for immediate access
+          localStorage.setItem(
+            this.STORAGE_KEY,
+            JSON.stringify(this.badgeState),
+          );
+          return;
+        }
+      }
+
+      // Fallback to localStorage
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.badgeState));
+      console.log("[BadgeManager] Badge state saved to localStorage");
     } catch (error) {
-      // Silent error handling for badge state saving
-      // Could implement user notification here if needed
+      console.warn("[BadgeManager] Failed to save badge state:", error);
+      // Try localStorage as final fallback
+      try {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.badgeState));
+      } catch (fallbackError) {
+        console.error("[BadgeManager] All save methods failed:", fallbackError);
+      }
     }
+  }
+
+  /**
+   * Synchronous badge state save wrapper for immediate operations
+   */
+  saveBadgeStateSync() {
+    this.saveBadgeState().catch((error) => {
+      console.warn("[BadgeManager] Async badge state save failed:", error);
+    });
   }
 
   /**
@@ -97,10 +177,10 @@ export class BadgeManager {
    * Updates scenario completion and checks for new badge achievements
    * Follows the same pattern as existing category-grid.js updateProgress method
    * @param {string} categoryId - Category identifier
-   * @param {string} _scenarioId - Scenario identifier (for logging/analytics, not used in logic)
+   * @param {string} scenarioId - Scenario identifier (for logging/analytics)
    * @returns {Array} Array of newly earned badges
    */
-  updateScenarioCompletion(categoryId, _scenarioId) {
+  updateScenarioCompletion(categoryId, scenarioId) {
     // Initialize category if needed
     this.initializeCategoryBadges(categoryId);
 
@@ -125,8 +205,15 @@ export class BadgeManager {
       completionCount,
     );
 
-    // Save updated state
-    this.saveBadgeState();
+    // Save updated state using sync wrapper for immediate operation
+    this.saveBadgeStateSync();
+
+    // Log for analytics if scenario provided
+    if (scenarioId) {
+      console.log(
+        `[BadgeManager] Updated completion for ${categoryId}:${scenarioId}, earned ${newlyEarnedBadges.length} new badges`,
+      );
+    }
 
     return newlyEarnedBadges;
   }
@@ -325,6 +412,13 @@ export class BadgeManager {
 }
 
 // Create singleton instance
-const badgeManager = new BadgeManager();
+let badgeManager;
+
+// Enhanced initialization for app integration
+if (typeof window !== "undefined" && window.app) {
+  badgeManager = new BadgeManager(window.app);
+} else {
+  badgeManager = new BadgeManager();
+}
 
 export default badgeManager;
