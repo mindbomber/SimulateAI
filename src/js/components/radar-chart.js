@@ -44,8 +44,71 @@ import chartEventCoordinator from "../constants/chart-event-coordinator.js";
 
 export default class RadarChart {
   static instanceCount = 0;
+  static instanceCounter = 0; // Add missing static property
   static allInstances = new Set();
   static config = null;
+  static animationCoordinator = {
+    activeAnimations: 0,
+    maxConcurrentAnimations: 1, // Limit to 1 animation at a time
+
+    /**
+     * Request permission to animate
+     * @param {string} instanceId - The instance requesting animation
+     * @param {string} context - The context (hero-demo, scenario, etc.)
+     * @returns {boolean} Whether animation is allowed
+     */
+    requestAnimation(instanceId, context) {
+      // Hero demo gets lower priority if scenario animations are happening
+      if (context === "hero-demo" && this.hasActiveScenarioAnimations()) {
+        logger.info(
+          "RadarChart",
+          `Delaying hero demo animation due to active scenario animations`,
+          {
+            instanceId,
+            activeAnimations: this.activeAnimations,
+          },
+        );
+        return false;
+      }
+
+      if (this.activeAnimations < this.maxConcurrentAnimations) {
+        this.activeAnimations++;
+        logger.info("RadarChart", `Animation granted`, {
+          instanceId,
+          context,
+          activeAnimations: this.activeAnimations,
+        });
+        return true;
+      }
+
+      return false;
+    },
+
+    /**
+     * Release animation slot
+     * @param {string} instanceId - The instance releasing animation
+     */
+    releaseAnimation(instanceId) {
+      if (this.activeAnimations > 0) {
+        this.activeAnimations--;
+        logger.info("RadarChart", `Animation released`, {
+          instanceId,
+          activeAnimations: this.activeAnimations,
+        });
+      }
+    },
+
+    /**
+     * Check if scenario animations are active
+     * @returns {boolean}
+     */
+    hasActiveScenarioAnimations() {
+      return Array.from(RadarChart.allInstances).some(
+        (instance) =>
+          instance.options?.context === "scenario" && instance.isAnimating,
+      );
+    },
+  };
 
   /**
    * Load configuration once for all instances
@@ -218,6 +281,10 @@ export default class RadarChart {
       "Using simple whole number scores (1-5 scale, default=3)",
       this.currentScores,
     );
+
+    // Chart rendering and animation state
+    this.isAnimating = false;
+    // Removed unused pendingAnimations array
 
     // Track initialization status
     this.isInitialized = false;
@@ -449,12 +516,6 @@ export default class RadarChart {
 
     logger.debug("RadarChart", "Chart options validation passed");
     return true;
-  }
-
-  /**
-   * Initialize the Chart.js radar chart
-  }
-    this.initializationPromise = this.initializeChart();
   }
 
   /**
@@ -1100,18 +1161,61 @@ export default class RadarChart {
    */
   _configureHeroDemoChart(neutralTheme) {
     // Hero demo charts: Optimized for interactive demonstrations
-    this.chart.data.datasets[0].backgroundColor = neutralTheme.background;
-    this.chart.data.datasets[0].borderColor = neutralTheme.border;
-    this.chart.data.datasets[0].pointBackgroundColor =
-      RadarChart.config.pointColors["3"];
+    // Batch all dataset changes to minimize DOM mutations
+    const dataset = this.chart.data.datasets[0];
+    dataset.backgroundColor = neutralTheme.background;
+    dataset.borderColor = neutralTheme.border;
+    dataset.pointBackgroundColor = RadarChart.config.pointColors["3"];
+    dataset.data = Object.values(this.DEFAULT_SCORES);
 
-    // Start with balanced default scores for hero demo
-    this.chart.data.datasets[0].data = Object.values(this.DEFAULT_SCORES);
-    this.chart.update();
+    // Use animation coordinator to prevent simultaneous animations
+    const canAnimate = RadarChart.animationCoordinator.requestAnimation(
+      this.instanceId,
+      this.options.context,
+    );
+
+    if (canAnimate) {
+      this.isAnimating = true;
+      this.chart.update(); // Animated update
+
+      // Release animation slot after completion
+      setTimeout(
+        () => {
+          this.isAnimating = false;
+          RadarChart.animationCoordinator.releaseAnimation(this.instanceId);
+        },
+        (RadarChart.config?.chart?.animationDuration || 1000) + 100,
+      );
+    } else {
+      // No animation - instant update
+      this.chart.update("none");
+
+      // Queue animation for later if desired
+      setTimeout(() => {
+        if (
+          RadarChart.animationCoordinator.requestAnimation(
+            this.instanceId,
+            this.options.context,
+          )
+        ) {
+          this.isAnimating = true;
+          this.chart.update();
+
+          setTimeout(
+            () => {
+              this.isAnimating = false;
+              RadarChart.animationCoordinator.releaseAnimation(this.instanceId);
+            },
+            (RadarChart.config?.chart?.animationDuration || 1000) + 100,
+          );
+        }
+      }, 1500); // Delay hero demo animation if scenarios are active
+    }
 
     logger.info("RadarChart", "Configured hero demo chart", {
       context: this.options.context,
       defaultScores: this.DEFAULT_SCORES,
+      animated: canAnimate,
     });
   }
 
@@ -1122,16 +1226,17 @@ export default class RadarChart {
    */
   _configureScenarioChart(neutralTheme) {
     // Scenario charts: Optimized for real-time ethical decision tracking
-    this.chart.data.datasets[0].backgroundColor = neutralTheme.background;
-    this.chart.data.datasets[0].borderColor = neutralTheme.border;
-    this.chart.data.datasets[0].pointBackgroundColor =
-      RadarChart.config.pointColors["3"];
+    // Batch all dataset changes to minimize DOM mutations
+    const dataset = this.chart.data.datasets[0];
+    dataset.backgroundColor = neutralTheme.background;
+    dataset.borderColor = neutralTheme.border;
+    dataset.pointBackgroundColor = RadarChart.config.pointColors["3"];
 
     // CRITICAL: Ensure polygon visibility from the start for scenario charts
     // Use a pattern that's virtually neutral but guarantees polygon visibility
     // This prevents the "abrupt appearance" when first option is selected
     const visiblePattern = [3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.02]; // Minimal variation
-    this.chart.data.datasets[0].data = visiblePattern;
+    dataset.data = visiblePattern;
 
     // Keep current scores as whole numbers for consistency
     const axisKeys = Object.keys(this.ETHICAL_AXES);
@@ -1139,7 +1244,24 @@ export default class RadarChart {
       this.currentScores[key] = 3; // Keep all as neutral 3
     });
 
-    this.chart.update("none"); // No animation for initial setup
+    // Scenario charts get priority for animations
+    const canAnimate = RadarChart.animationCoordinator.requestAnimation(
+      this.instanceId,
+      this.options.context,
+    );
+
+    if (canAnimate) {
+      this.isAnimating = true;
+      this.chart.update("none"); // No animation for initial setup, but track as animated
+
+      // Release quickly since this is just setup
+      setTimeout(() => {
+        this.isAnimating = false;
+        RadarChart.animationCoordinator.releaseAnimation(this.instanceId);
+      }, 100);
+    } else {
+      this.chart.update("none"); // No animation for initial setup
+    }
 
     logger.info(
       "RadarChart",
@@ -1149,6 +1271,7 @@ export default class RadarChart {
         realTime: this.options.realTime,
         visiblePattern: visiblePattern,
         currentScores: this.currentScores,
+        animated: canAnimate,
       },
     );
   }
@@ -1160,13 +1283,14 @@ export default class RadarChart {
    */
   _configureTestChart(neutralTheme) {
     // Test charts: Optimized for debugging and validation
-    this.chart.data.datasets[0].backgroundColor = neutralTheme.background;
-    this.chart.data.datasets[0].borderColor = neutralTheme.border;
-    this.chart.data.datasets[0].pointBackgroundColor =
-      RadarChart.config.pointColors["3"];
+    // Batch all dataset changes to minimize DOM mutations
+    const dataset = this.chart.data.datasets[0];
+    dataset.backgroundColor = neutralTheme.background;
+    dataset.borderColor = neutralTheme.border;
+    dataset.pointBackgroundColor = RadarChart.config.pointColors["3"];
+    dataset.data = Object.values(this.DEFAULT_SCORES);
 
-    // Use default scores for consistent testing
-    this.chart.data.datasets[0].data = Object.values(this.DEFAULT_SCORES);
+    // Single chart update after all changes
     this.chart.update();
 
     logger.info("RadarChart", "Configured test chart", {
@@ -1182,11 +1306,14 @@ export default class RadarChart {
    * @param {Object} neutralTheme - Theme colors
    */
   _configureLegacyChart(neutralTheme) {
-    this.chart.data.datasets[0].backgroundColor = neutralTheme.background;
-    this.chart.data.datasets[0].borderColor = neutralTheme.border;
-    this.chart.data.datasets[0].pointBackgroundColor =
-      RadarChart.config.pointColors["3"];
-    this.chart.data.datasets[0].data = Object.values(this.DEFAULT_SCORES);
+    // Batch all dataset changes to minimize DOM mutations
+    const dataset = this.chart.data.datasets[0];
+    dataset.backgroundColor = neutralTheme.background;
+    dataset.borderColor = neutralTheme.border;
+    dataset.pointBackgroundColor = RadarChart.config.pointColors["3"];
+    dataset.data = Object.values(this.DEFAULT_SCORES);
+
+    // Single chart update after all changes
     this.chart.update();
 
     logger.info("RadarChart", "Applied legacy chart configuration", {
@@ -1625,6 +1752,12 @@ export default class RadarChart {
       if (this._visibilityTimeout) {
         clearTimeout(this._visibilityTimeout);
         this._visibilityTimeout = null;
+      }
+
+      // Clean up animation coordination
+      if (this.isAnimating) {
+        RadarChart.animationCoordinator.releaseAnimation(this.instanceId);
+        this.isAnimating = false;
       }
 
       // Remove from instance tracking

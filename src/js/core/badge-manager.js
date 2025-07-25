@@ -78,16 +78,19 @@ export class BadgeManager {
         totalCompleted: 0,
         lastUpdated: Date.now(),
       };
+    }
 
-      // Initialize all badge tiers as unearned
-      ACTIVE_BADGE_TIERS.forEach((tier) => {
-        this.badgeState[categoryId].badges[`tier${tier.tier}`] = {
+    // Ensure all active badge tiers exist (handles tier expansion)
+    ACTIVE_BADGE_TIERS.forEach((tier) => {
+      const tierKey = `tier${tier.tier}`;
+      if (!this.badgeState[categoryId].badges[tierKey]) {
+        this.badgeState[categoryId].badges[tierKey] = {
           unlocked: false,
           timestamp: null,
           requirement: tier.requirement,
         };
-      });
-    }
+      }
+    });
   }
 
   /**
@@ -142,8 +145,12 @@ export class BadgeManager {
       const tierKey = `tier${tier.tier}`;
       const badgeInfo = categoryBadges[tierKey];
 
-      // Check if badge should be earned but hasn't been unlocked yet
-      if (completionCount >= tier.requirement && !badgeInfo.unlocked) {
+      // Safety check: ensure badgeInfo exists before accessing properties
+      if (
+        badgeInfo &&
+        completionCount >= tier.requirement &&
+        !badgeInfo.unlocked
+      ) {
         // Mark badge as earned
         badgeInfo.unlocked = true;
         badgeInfo.timestamp = Date.now();
@@ -178,7 +185,8 @@ export class BadgeManager {
       const tierKey = `tier${tier.tier}`;
       const badgeInfo = categoryBadges[tierKey];
 
-      if (badgeInfo.unlocked) {
+      // Safety check: ensure badgeInfo exists before accessing properties
+      if (badgeInfo && badgeInfo.unlocked) {
         const badgeConfig = getBadgeConfig(categoryId, tier.tier);
         if (badgeConfig) {
           earnedBadges.push({

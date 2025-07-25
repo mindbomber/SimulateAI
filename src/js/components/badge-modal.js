@@ -43,7 +43,7 @@ async function loadConfetti() {
 }
 
 // Import enhanced badge configuration
-import { GLOW_INTENSITY_CLASSES } from "../data/badge-config.js";
+import { GLOW_INTENSITY_CLASSES, BADGE_TIERS } from "../data/badge-config.js";
 
 // Import badge modal configuration loader
 import { loadBadgeModalConfig } from "../utils/badge-modal-config-loader.js";
@@ -105,8 +105,9 @@ export class BadgeModal {
    * Shows a badge achievement modal with confetti
    * @param {Object} badgeConfig - Badge configuration object
    * @param {string} returnContext - Context to return to ('main' or 'category')
+   * @param {Object} options - Additional options for the modal display
    */
-  async showBadgeModal(badgeConfig, returnContext = "main") {
+  async showBadgeModal(badgeConfig, returnContext = "main", options = {}) {
     if (this.isVisible) {
       return; // Prevent multiple modals
     }
@@ -118,12 +119,13 @@ export class BadgeModal {
 
     this.isVisible = true;
 
-    // Start confetti celebration
+    // Start confetti celebration (options.showConfetti is for future use)
     this.triggerConfetti(badgeConfig.categoryEmoji, badgeConfig.tier);
 
     // Delay modal creation to appear with the confetti wave
     const delayDuration =
       this.config?.animations?.confetti?.secondWaveDelay || 500;
+
     setTimeout(() => {
       // Create and show modal
       this.createModal(badgeConfig, returnContext);
@@ -316,9 +318,7 @@ export class BadgeModal {
    */
   getTierText(tier) {
     // Find the requirement for this tier from BADGE_TIERS
-    const tierConfig = this.BADGE_TIERS.FULL_PROGRESSION.find(
-      (t) => t.tier === tier,
-    );
+    const tierConfig = BADGE_TIERS.find((t) => t.tier === tier);
     const requirement = tierConfig ? tierConfig.requirement : tier;
 
     // Special cases for lower tiers

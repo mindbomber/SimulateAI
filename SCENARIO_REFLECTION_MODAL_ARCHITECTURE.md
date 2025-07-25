@@ -112,7 +112,7 @@ Your reflection modal now:
 ### New Files Created:
 
 1. `scenario-reflection-modal.js` - Main component
-2. `scenario-reflection-modal.css` - Styling
+2. `src/styles/scenario-reflection-modal.css` - Styling
 3. `scenario-reflection-modal-demo.html` - Testing interface
 
 ### Integration Points:

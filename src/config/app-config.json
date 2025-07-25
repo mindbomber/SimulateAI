@@ -78,6 +78,11 @@
         "preload": false,
         "required": true
       },
+      "scenario-reflection-modal": {
+        "configPath": "./scenario-reflection-modal-config.json",
+        "preload": false,
+        "required": false
+      },
       "preLaunchModal": {
         "configPath": "./pre-launch-modal-config.json",
         "preload": false,

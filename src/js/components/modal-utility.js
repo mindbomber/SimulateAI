@@ -13,6 +13,8 @@ class ModalUtility {
     onClose = null,
     closeOnBackdrop = true,
     closeOnEscape = true,
+    className = "",
+    size = "medium",
   } = {}) {
     this.title = title;
     this.content = content;
@@ -20,6 +22,8 @@ class ModalUtility {
     this.onClose = onClose;
     this.closeOnBackdrop = closeOnBackdrop;
     this.closeOnEscape = closeOnEscape;
+    this.className = className;
+    this.size = size;
     this.isOpen = false;
     this.element = null;
 
@@ -38,7 +42,7 @@ class ModalUtility {
     // Create modal structure using advanced-ui-components.css classes
     this.element = document.createElement("div");
     this.element.id = this.id;
-    this.element.className = "modal-backdrop";
+    this.element.className = `modal-backdrop${this.className ? ` ${this.className}` : ""}`;
     this.element.setAttribute("role", "dialog");
     this.element.setAttribute("aria-modal", "true");
     this.element.setAttribute("aria-labelledby", `${this.id}-title`);
@@ -47,7 +51,7 @@ class ModalUtility {
     this.element.inert = true;
 
     this.element.innerHTML = `
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-${this.size}">
                 <div class="modal-header">
                     <h2 id="${this.id}-title" class="modal-title">${this.title}</h2>
                     <button class="modal-close" aria-label="Close modal" type="button">

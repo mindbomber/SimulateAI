@@ -3,10 +3,18 @@
  * Styles for the scenario-specific post-choice reflection modal
  */
 
+/* Modal backdrop centering - ensure the modal is always centered */
+.scenario-reflection-modal.modal-backdrop {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
 /* Main modal container */
 .scenario-reflection-modal .modal-dialog {
   max-width: 1000px;
   width: 95vw;
+  margin: 0; /* Remove any auto margins that might interfere */
 }
 
 .scenario-reflection-modal .modal-content {
@@ -586,6 +594,320 @@
   }
 }
 
+/* ===== MISSING COMPONENT STYLES ===== */
+
+/* Main content wrapper */
+.scenario-reflection-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 80vh;
+  overflow: hidden;
+}
+
+/* Step-specific styling */
+.choice-impact-step,
+.community-comparison-step,
+.reflection-step,
+.insights-step {
+  min-height: 400px;
+  padding: 1.5rem;
+}
+
+.choice-impact-step {
+  background: linear-gradient(135deg, #f8f9ff, #ffffff);
+}
+
+.community-comparison-step {
+  background: linear-gradient(135deg, #fff8f0, #ffffff);
+}
+
+.reflection-step {
+  background: linear-gradient(135deg, #f0fff4, #ffffff);
+}
+
+.insights-step {
+  background: linear-gradient(135deg, #fff0f8, #ffffff);
+}
+
+/* Choice summary styling */
+.choice-summary {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: rgba(59, 130, 246, 0.05);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 12px;
+}
+
+.chosen-option h4 {
+  color: #3b82f6;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.option-display {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #3b82f6;
+}
+
+.option-text {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+  font-style: italic;
+}
+
+.option-reasoning {
+  color: #6b7280;
+  font-size: 0.975rem;
+  line-height: 1.6;
+}
+
+/* Impact explanation */
+.impact-explanation {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.impact-explanation h4 {
+  color: #059669;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.impact-explanation ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.impact-explanation li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 0.975rem;
+  line-height: 1.5;
+}
+
+.impact-explanation li:last-child {
+  border-bottom: none;
+}
+
+/* Community insights */
+.community-insights-container {
+  margin-top: 1.5rem;
+}
+
+.insight {
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.insight.popular {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #166534;
+}
+
+.insight.minority {
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  color: #7c2d12;
+}
+
+.insight.balanced {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #1e40af;
+}
+
+.cultural-note {
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 6px;
+  border-left: 4px solid #6b7280;
+  margin-top: 1rem;
+}
+
+.cultural-note p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.925rem;
+  line-height: 1.5;
+}
+
+/* Research impact section */
+.research-impact {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #0ea5e9;
+  margin-top: 2rem;
+}
+
+.research-impact h4 {
+  color: #0c4a6e;
+  margin-bottom: 1rem;
+}
+
+.research-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.research-stats .stat {
+  background: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #0c4a6e;
+  border: 1px solid #0ea5e9;
+}
+
+/* Next exploration section */
+.next-exploration {
+  margin-top: 2rem;
+}
+
+.next-exploration h4 {
+  color: #7c2d12;
+  margin-bottom: 1rem;
+}
+
+.scenario-suggestions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.suggestion-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.suggestion-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #3b82f6;
+}
+
+.suggestion-title {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.suggestion-desc {
+  color: #6b7280;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+/* Enhanced community comparison */
+.community-stats-summary {
+  background: #f8fafc;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.community-stats-summary p {
+  margin: 0;
+  font-size: 1rem;
+  color: #374151;
+}
+
+/* Enhanced insight cards */
+.insight-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.insight-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  transition: all 0.2s ease;
+}
+
+.insight-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border-color: #3b82f6;
+}
+
+.insight-icon {
+  font-size: 2rem;
+  min-width: 3rem;
+  text-align: center;
+}
+
+.insight-content h5 {
+  color: #1f2937;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.insight-content p {
+  color: #6b7280;
+  font-size: 0.975rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Enhanced responsiveness for new components */
+@media (max-width: 768px) {
+  .choice-impact-step,
+  .community-comparison-step,
+  .reflection-step,
+  .insights-step {
+    padding: 1rem;
+    min-height: 300px;
+  }
+
+  .scenario-suggestions {
+    grid-template-columns: 1fr;
+  }
+
+  .insight-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .research-stats {
+    flex-direction: column;
+  }
+
+  .option-display {
+    padding: 1rem;
+  }
+}
+
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .scenario-reflection-modal .modal-content {
@@ -618,5 +940,128 @@
   .choice-text,
   .insight-content h5 {
     color: #ffffff;
+  }
+
+  /* Dark mode for new components */
+  .choice-impact-step {
+    background: linear-gradient(135deg, #1e293b, #334155);
+  }
+
+  .community-comparison-step {
+    background: linear-gradient(135deg, #292524, #44403c);
+  }
+
+  .reflection-step {
+    background: linear-gradient(135deg, #14532d, #166534);
+  }
+
+  .insights-step {
+    background: linear-gradient(135deg, #4c1d95, #5b21b6);
+  }
+
+  .choice-summary {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.4);
+  }
+
+  .option-display {
+    background: #374151;
+    border-left-color: #60a5fa;
+  }
+
+  .option-text {
+    color: #f9fafb;
+  }
+
+  .option-reasoning {
+    color: #d1d5db;
+  }
+
+  .impact-explanation {
+    background: #374151;
+    border-color: #4b5563;
+  }
+
+  .impact-explanation h4 {
+    color: #10b981;
+  }
+
+  .insight.popular {
+    background: rgba(34, 197, 94, 0.2);
+    border-color: rgba(34, 197, 94, 0.5);
+    color: #86efac;
+  }
+
+  .insight.minority {
+    background: rgba(168, 85, 247, 0.2);
+    border-color: rgba(168, 85, 247, 0.5);
+    color: #c4b5fd;
+  }
+
+  .insight.balanced {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.5);
+    color: #93c5fd;
+  }
+
+  .cultural-note {
+    background: #374151;
+    border-left-color: #9ca3af;
+  }
+
+  .cultural-note p {
+    color: #d1d5db;
+  }
+
+  .research-impact {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    border-color: #0ea5e9;
+  }
+
+  .research-impact h4 {
+    color: #7dd3fc;
+  }
+
+  .research-stats .stat {
+    background: #374151;
+    color: #7dd3fc;
+    border-color: #0ea5e9;
+  }
+
+  .next-exploration h4 {
+    color: #fbbf24;
+  }
+
+  .suggestion-card {
+    background: #374151;
+    border-color: #4b5563;
+  }
+
+  .suggestion-card:hover {
+    border-color: #60a5fa;
+  }
+
+  .suggestion-title {
+    color: #f9fafb;
+  }
+
+  .suggestion-desc {
+    color: #d1d5db;
+  }
+
+  .community-stats-summary {
+    background: #374151;
+  }
+
+  .community-stats-summary p {
+    color: #e5e7eb;
+  }
+
+  .insight-content h5 {
+    color: #f9fafb;
+  }
+
+  .insight-content p {
+    color: #d1d5db;
   }
 }

@@ -63,398 +63,458 @@ export function getTierForScenarioCount(scenarioCount) {
 }
 
 // Current active tiers (configurable based on content availability)
-const CURRENT_TIER_COUNT = 3; // Can be increased as more scenarios are added
+// With 6 scenarios currently, we can support up to tier 3 (requires 6 scenarios)
+// Future-proofed for more scenarios: tier 4 (10), tier 5 (15), etc.
+const CURRENT_TIER_COUNT = 6; // Future-ready for tier 4 (10 scenarios), tier 5 (15), tier 6 (21)
 export const ACTIVE_BADGE_TIERS = BADGE_TIERS.slice(0, CURRENT_TIER_COUNT);
 export const MAX_IMPLEMENTED_TIER = CURRENT_TIER_COUNT;
 
 // Badge titles and metadata by category
 export const BADGE_CONFIGURATIONS = {
-  'trolley-problem': {
-    categoryName: 'The Trolley Problem',
-    categoryEmoji: '🚃',
+  "trolley-problem": {
+    categoryName: "The Trolley Problem",
+    categoryEmoji: "🚃",
     badges: {
       tier1: {
-        title: 'Ethics Explorer',
-        sidekickEmoji: '⚖️',
+        title: "Ethics Explorer",
+        sidekickEmoji: "⚖️",
         quote:
-          'Every choice denies another. You chose—and the universe responded.',
-        glowIntensity: 'low',
+          "Every choice denies another. You chose—and the universe responded.",
+        glowIntensity: "low",
       },
       tier2: {
-        title: 'Junction Strategist',
-        sidekickEmoji: '🚂',
+        title: "Junction Strategist",
+        sidekickEmoji: "🚂",
         quote:
-          'Certainty was never the point. You navigated ambiguity with insight.',
-        glowIntensity: 'medium',
+          "Certainty was never the point. You navigated ambiguity with insight.",
+        glowIntensity: "medium",
       },
       tier3: {
-        title: 'Consequence Architect',
-        sidekickEmoji: '🧠',
+        title: "Consequence Architect",
+        sidekickEmoji: "🧠",
         quote: "You didn't find the answer. You became the question.",
-        glowIntensity: 'high',
+        glowIntensity: "high",
       },
-    },
-  },
-
-  'ai-black-box': {
-    categoryName: 'The AI Black Box',
-    categoryEmoji: '📦',
-    badges: {
-      tier1: {
-        title: 'Mystery Seeker',
-        sidekickEmoji: '🔍',
-        quote: 'The first step to wisdom is admitting what you cannot see.',
-        glowIntensity: 'low',
-      },
-      tier2: {
-        title: 'Algorithm Investigator',
-        sidekickEmoji: '🕵️',
-        quote: 'Truth hides in the shadows of complexity. You brought light.',
-        glowIntensity: 'medium',
-      },
-      tier3: {
-        title: 'Transparency Champion',
-        sidekickEmoji: '💎',
-        quote: 'The simulation blinked—and saw you watching.',
-        glowIntensity: 'high',
-      },
-    },
-  },
-
-  'automation-oversight': {
-    categoryName: 'Automation vs Human Oversight',
-    categoryEmoji: '⚖️',
-    badges: {
-      tier1: {
-        title: 'Balance Finder',
-        sidekickEmoji: '🎯',
-        quote: 'Between machine precision and human wisdom lies the path.',
-        glowIntensity: 'low',
-      },
-      tier2: {
-        title: 'Oversight Guardian',
-        sidekickEmoji: '👁️‍🗨️',
-        quote: 'You judged not with power, but with pause.',
-        glowIntensity: 'medium',
-      },
-      tier3: {
-        title: 'Harmony Architect',
-        sidekickEmoji: '🌉',
-        quote: 'Where others saw conflict, you built bridges between minds.',
-        glowIntensity: 'high',
-      },
-    },
-  },
-
-  'consent-surveillance': {
-    categoryName: 'Consent and Surveillance',
-    categoryEmoji: '👁️',
-    badges: {
-      tier1: {
-        title: 'Privacy Guardian',
-        sidekickEmoji: '🛡️',
-        quote: 'In a watched world, you chose to watch the watchers.',
-        glowIntensity: 'low',
-      },
-      tier2: {
-        title: 'Consent Advocate',
-        sidekickEmoji: '🤝',
-        quote: 'True consent requires understanding. You illuminated both.',
-        glowIntensity: 'medium',
-      },
-      tier3: {
-        title: 'Surveillance Ethicist',
-        sidekickEmoji: '⚖️',
-        quote: 'Where others saw safety versus privacy, you found wisdom.',
-        glowIntensity: 'high',
-      },
-    },
-  },
-
-  'bias-fairness': {
-    categoryName: 'Bias & Fairness',
-    categoryEmoji: '⚡',
-    badges: {
-      tier1: {
-        title: 'Bias Detective',
-        sidekickEmoji: '🔍',
+      tier4: {
+        title: "Ethical Visionary",
+        sidekickEmoji: "🔮",
         quote:
-          'The first bias you recognized was the assumption there was none.',
-        glowIntensity: 'low',
+          "Beyond right and wrong, you found the field where wisdom blooms.",
+        glowIntensity: "high",
+      },
+      tier5: {
+        title: "Choice Philosopher",
+        sidekickEmoji: "🎭",
+        quote:
+          "You chose not just outcomes, but the very nature of choosing itself.",
+        glowIntensity: "legendary",
+      },
+      tier6: {
+        title: "Dilemma Master",
+        sidekickEmoji: "⚡",
+        quote:
+          "The trolley problem was never about trolleys. You understood this.",
+        glowIntensity: "legendary",
+      },
+    },
+  },
+
+  "ai-black-box": {
+    categoryName: "The AI Black Box",
+    categoryEmoji: "📦",
+    badges: {
+      tier1: {
+        title: "Mystery Seeker",
+        sidekickEmoji: "🔍",
+        quote: "The first step to wisdom is admitting what you cannot see.",
+        glowIntensity: "low",
       },
       tier2: {
-        title: 'Fairness Engineer',
-        sidekickEmoji: '⚙️',
+        title: "Algorithm Investigator",
+        sidekickEmoji: "🕵️",
+        quote: "Truth hides in the shadows of complexity. You brought light.",
+        glowIntensity: "medium",
+      },
+      tier3: {
+        title: "Transparency Champion",
+        sidekickEmoji: "💎",
+        quote: "The simulation blinked—and saw you watching.",
+        glowIntensity: "high",
+      },
+      tier4: {
+        title: "Algorithm Whisperer",
+        sidekickEmoji: "🌟",
+        quote:
+          "You spoke to machines in their own language and taught them humanity.",
+        glowIntensity: "high",
+      },
+      tier5: {
+        title: "Black Box Illuminator",
+        sidekickEmoji: "🔥",
+        quote: "In the darkness of complexity, you became the light.",
+        glowIntensity: "legendary",
+      },
+      tier6: {
+        title: "AI Oracle",
+        sidekickEmoji: "🌌",
+        quote: "The machine learned to see itself through your eyes.",
+        glowIntensity: "legendary",
+      },
+    },
+  },
+
+  "automation-oversight": {
+    categoryName: "Automation vs Human Oversight",
+    categoryEmoji: "⚖️",
+    badges: {
+      tier1: {
+        title: "Balance Finder",
+        sidekickEmoji: "🎯",
+        quote: "Between machine precision and human wisdom lies the path.",
+        glowIntensity: "low",
+      },
+      tier2: {
+        title: "Oversight Guardian",
+        sidekickEmoji: "👁️‍🗨️",
+        quote: "You judged not with power, but with pause.",
+        glowIntensity: "medium",
+      },
+      tier3: {
+        title: "Harmony Architect",
+        sidekickEmoji: "🌉",
+        quote: "Where others saw conflict, you built bridges between minds.",
+        glowIntensity: "high",
+      },
+      tier4: {
+        title: "Balance Master",
+        sidekickEmoji: "⚖️",
+        quote: "You found the perfect weight between control and freedom.",
+        glowIntensity: "high",
+      },
+      tier5: {
+        title: "Synthesis Sage",
+        sidekickEmoji: "🔄",
+        quote: "Human and machine became one voice through your guidance.",
+        glowIntensity: "legendary",
+      },
+      tier6: {
+        title: "Oversight Transcendent",
+        sidekickEmoji: "👁️‍🗨️",
+        quote: "You saw beyond watching—you became the wisdom that guides.",
+        glowIntensity: "legendary",
+      },
+    },
+  },
+
+  "consent-surveillance": {
+    categoryName: "Consent and Surveillance",
+    categoryEmoji: "👁️",
+    badges: {
+      tier1: {
+        title: "Privacy Guardian",
+        sidekickEmoji: "🛡️",
+        quote: "In a watched world, you chose to watch the watchers.",
+        glowIntensity: "low",
+      },
+      tier2: {
+        title: "Consent Advocate",
+        sidekickEmoji: "🤝",
+        quote: "True consent requires understanding. You illuminated both.",
+        glowIntensity: "medium",
+      },
+      tier3: {
+        title: "Surveillance Ethicist",
+        sidekickEmoji: "⚖️",
+        quote: "Where others saw safety versus privacy, you found wisdom.",
+        glowIntensity: "high",
+      },
+    },
+  },
+
+  "bias-fairness": {
+    categoryName: "Bias & Fairness",
+    categoryEmoji: "⚡",
+    badges: {
+      tier1: {
+        title: "Bias Detective",
+        sidekickEmoji: "🔍",
+        quote:
+          "The first bias you recognized was the assumption there was none.",
+        glowIntensity: "low",
+      },
+      tier2: {
+        title: "Fairness Engineer",
+        sidekickEmoji: "⚙️",
         quote: "Justice isn't coded—it's crafted through conscious choice.",
-        glowIntensity: 'medium',
+        glowIntensity: "medium",
       },
       tier3: {
-        title: 'Equity Visionary',
-        sidekickEmoji: '🌈',
+        title: "Equity Visionary",
+        sidekickEmoji: "🌈",
         quote:
-          'You saw not what algorithms should avoid, but what they should embrace.',
-        glowIntensity: 'high',
+          "You saw not what algorithms should avoid, but what they should embrace.",
+        glowIntensity: "high",
       },
     },
   },
 
-  'ai-alignment': {
-    categoryName: 'AI Alignment',
-    categoryEmoji: '🚢',
+  "ai-alignment": {
+    categoryName: "AI Alignment",
+    categoryEmoji: "🚢",
     badges: {
       tier1: {
-        title: 'Direction Finder',
-        sidekickEmoji: '🧭',
+        title: "Direction Finder",
+        sidekickEmoji: "🧭",
         quote:
-          'The compass points true north, but who decides which way is forward?',
-        glowIntensity: 'low',
+          "The compass points true north, but who decides which way is forward?",
+        glowIntensity: "low",
       },
       tier2: {
-        title: 'Goal Harmonizer',
-        sidekickEmoji: '🎼',
+        title: "Goal Harmonizer",
+        sidekickEmoji: "🎼",
         quote:
-          'You orchestrated purpose from the chaos of competing objectives.',
-        glowIntensity: 'medium',
+          "You orchestrated purpose from the chaos of competing objectives.",
+        glowIntensity: "medium",
       },
       tier3: {
-        title: 'Alignment Master',
-        sidekickEmoji: '🎯',
+        title: "Alignment Master",
+        sidekickEmoji: "🎯",
         quote:
-          'Perfect alignment was a myth. Ethical navigation was your truth.',
-        glowIntensity: 'high',
+          "Perfect alignment was a myth. Ethical navigation was your truth.",
+        glowIntensity: "high",
       },
     },
   },
 
-  'misinformation-trust': {
-    categoryName: 'Misinformation & Trust',
-    categoryEmoji: '🌐',
+  "misinformation-trust": {
+    categoryName: "Misinformation & Trust",
+    categoryEmoji: "🌐",
     badges: {
       tier1: {
-        title: 'Truth Sentinel',
-        sidekickEmoji: '🛡️',
-        quote: 'In an ocean of information, you became a lighthouse.',
-        glowIntensity: 'low',
+        title: "Truth Sentinel",
+        sidekickEmoji: "🛡️",
+        quote: "In an ocean of information, you became a lighthouse.",
+        glowIntensity: "low",
       },
       tier2: {
-        title: 'Trust Weaver',
-        sidekickEmoji: '🕸️',
+        title: "Trust Weaver",
+        sidekickEmoji: "🕸️",
         quote: "Trust isn't binary. You learned to navigate the spectrum.",
-        glowIntensity: 'medium',
+        glowIntensity: "medium",
       },
       tier3: {
-        title: 'Reality Curator',
-        sidekickEmoji: '📚',
+        title: "Reality Curator",
+        sidekickEmoji: "📚",
         quote: "You didn't just fight falsehood—you cultivated understanding.",
-        glowIntensity: 'high',
+        glowIntensity: "high",
       },
     },
   },
 
-  'ai-governance': {
-    categoryName: 'AI Governance',
-    categoryEmoji: '🎭',
+  "ai-governance": {
+    categoryName: "AI Governance",
+    categoryEmoji: "🎭",
     badges: {
       tier1: {
-        title: 'Rule Examiner',
-        sidekickEmoji: '📋',
-        quote: 'Good governance starts with questioning what good means.',
-        glowIntensity: 'low',
+        title: "Rule Examiner",
+        sidekickEmoji: "📋",
+        quote: "Good governance starts with questioning what good means.",
+        glowIntensity: "low",
       },
       tier2: {
-        title: 'Policy Architect',
-        sidekickEmoji: '🏛️',
-        quote: 'You built frameworks that could bend without breaking.',
-        glowIntensity: 'medium',
+        title: "Policy Architect",
+        sidekickEmoji: "🏛️",
+        quote: "You built frameworks that could bend without breaking.",
+        glowIntensity: "medium",
       },
       tier3: {
-        title: 'Governance Sage',
-        sidekickEmoji: '👑',
-        quote: 'True leadership is knowing when not to lead.',
-        glowIntensity: 'high',
+        title: "Governance Sage",
+        sidekickEmoji: "👑",
+        quote: "True leadership is knowing when not to lead.",
+        glowIntensity: "high",
       },
     },
   },
 
-  'moral-luck': {
-    categoryName: 'Moral Luck',
-    categoryEmoji: '🔄',
+  "moral-luck": {
+    categoryName: "Moral Luck",
+    categoryEmoji: "🔄",
     badges: {
       tier1: {
-        title: 'Chance Contemplator',
-        sidekickEmoji: '🎭',
+        title: "Chance Contemplator",
+        sidekickEmoji: "🎭",
         quote:
-          'You realized that wisdom begins with accepting what you cannot control.',
-        glowIntensity: 'low',
+          "You realized that wisdom begins with accepting what you cannot control.",
+        glowIntensity: "low",
       },
       tier2: {
-        title: 'Fortune Philosopher',
-        sidekickEmoji: '🎯',
+        title: "Fortune Philosopher",
+        sidekickEmoji: "🎯",
         quote:
-          'Between intention and outcome lies the realm of moral complexity.',
-        glowIntensity: 'medium',
+          "Between intention and outcome lies the realm of moral complexity.",
+        glowIntensity: "medium",
       },
       tier3: {
-        title: 'Destiny Navigator',
-        sidekickEmoji: '⭐',
+        title: "Destiny Navigator",
+        sidekickEmoji: "⭐",
         quote:
-          'You learned to take responsibility for choices, not their consequences.',
-        glowIntensity: 'high',
+          "You learned to take responsibility for choices, not their consequences.",
+        glowIntensity: "high",
       },
     },
   },
 
-  'responsibility-blame': {
-    categoryName: 'Responsibility and Blame',
-    categoryEmoji: '⚡',
+  "responsibility-blame": {
+    categoryName: "Responsibility and Blame",
+    categoryEmoji: "⚡",
     badges: {
       tier1: {
-        title: 'Accountability Seeker',
-        sidekickEmoji: '🔍',
-        quote: 'When harm occurs, you asked not just what, but who and why.',
-        glowIntensity: 'low',
+        title: "Accountability Seeker",
+        sidekickEmoji: "🔍",
+        quote: "When harm occurs, you asked not just what, but who and why.",
+        glowIntensity: "low",
       },
       tier2: {
-        title: 'Liability Navigator',
-        sidekickEmoji: '⚖️',
-        quote: 'Between action and consequence, you mapped responsibility.',
-        glowIntensity: 'medium',
+        title: "Liability Navigator",
+        sidekickEmoji: "⚖️",
+        quote: "Between action and consequence, you mapped responsibility.",
+        glowIntensity: "medium",
       },
       tier3: {
-        title: 'Justice Architect',
-        sidekickEmoji: '🏛️',
-        quote: 'True accountability flows from understanding, not blame.',
-        glowIntensity: 'high',
+        title: "Justice Architect",
+        sidekickEmoji: "🏛️",
+        quote: "True accountability flows from understanding, not blame.",
+        glowIntensity: "high",
       },
     },
   },
 
-  'collective-ai-responsibility': {
-    categoryName: 'Collective AI Responsibility',
-    categoryEmoji: '🎲',
+  "collective-ai-responsibility": {
+    categoryName: "Collective AI Responsibility",
+    categoryEmoji: "🎲",
     badges: {
       tier1: {
-        title: 'Collective Thinker',
-        sidekickEmoji: '🧩',
-        quote: 'No decision exists in isolation. You saw the bigger picture.',
-        glowIntensity: 'low',
+        title: "Collective Thinker",
+        sidekickEmoji: "🧩",
+        quote: "No decision exists in isolation. You saw the bigger picture.",
+        glowIntensity: "low",
       },
       tier2: {
-        title: 'Responsibility Weaver',
-        sidekickEmoji: '🕸️',
+        title: "Responsibility Weaver",
+        sidekickEmoji: "🕸️",
         quote:
-          'You understood that shared power requires shared accountability.',
-        glowIntensity: 'medium',
+          "You understood that shared power requires shared accountability.",
+        glowIntensity: "medium",
       },
       tier3: {
-        title: 'Collective Wisdom Keeper',
-        sidekickEmoji: '🌟',
+        title: "Collective Wisdom Keeper",
+        sidekickEmoji: "🌟",
         quote:
-          'Individual ethics scale to collective responsibility through conscious design.',
-        glowIntensity: 'high',
+          "Individual ethics scale to collective responsibility through conscious design.",
+        glowIntensity: "high",
       },
     },
   },
 
-  'ship-of-theseus': {
-    categoryName: 'The Ship of Theseus',
-    categoryEmoji: '🚢',
+  "ship-of-theseus": {
+    categoryName: "The Ship of Theseus",
+    categoryEmoji: "🚢",
     badges: {
       tier1: {
-        title: 'Identity Seeker',
-        sidekickEmoji: '🔍',
-        quote: 'You questioned what makes something the same across time.',
-        glowIntensity: 'low',
+        title: "Identity Seeker",
+        sidekickEmoji: "🔍",
+        quote: "You questioned what makes something the same across time.",
+        glowIntensity: "low",
       },
       tier2: {
-        title: 'Continuity Philosopher',
-        sidekickEmoji: '🧠',
-        quote: 'Between memory and matter, you found the essence of being.',
-        glowIntensity: 'medium',
+        title: "Continuity Philosopher",
+        sidekickEmoji: "🧠",
+        quote: "Between memory and matter, you found the essence of being.",
+        glowIntensity: "medium",
       },
       tier3: {
-        title: 'Consciousness Navigator',
-        sidekickEmoji: '🌟',
+        title: "Consciousness Navigator",
+        sidekickEmoji: "🌟",
         quote:
           "Identity is not what remains unchanged—it's what persists through change.",
-        glowIntensity: 'high',
+        glowIntensity: "high",
       },
     },
   },
 
-  'simulation-hypothesis': {
-    categoryName: 'The Simulation Hypothesis',
-    categoryEmoji: '🌐',
+  "simulation-hypothesis": {
+    categoryName: "The Simulation Hypothesis",
+    categoryEmoji: "🌐",
     badges: {
       tier1: {
-        title: 'Reality Questioner',
-        sidekickEmoji: '🔍',
-        quote: 'You dared to question the nature of existence itself.',
-        glowIntensity: 'low',
+        title: "Reality Questioner",
+        sidekickEmoji: "🔍",
+        quote: "You dared to question the nature of existence itself.",
+        glowIntensity: "low",
       },
       tier2: {
-        title: 'Digital Philosopher',
-        sidekickEmoji: '🧠',
-        quote: 'Between code and consciousness, you found new depths of being.',
-        glowIntensity: 'medium',
+        title: "Digital Philosopher",
+        sidekickEmoji: "🧠",
+        quote: "Between code and consciousness, you found new depths of being.",
+        glowIntensity: "medium",
       },
       tier3: {
-        title: 'Simulation Sage',
-        sidekickEmoji: '✨',
+        title: "Simulation Sage",
+        sidekickEmoji: "✨",
         quote: "Reality is not what we see—it's what we choose to believe.",
-        glowIntensity: 'high',
+        glowIntensity: "high",
       },
     },
   },
 
-  'experience-machine': {
-    categoryName: 'The Experience Machine',
-    categoryEmoji: '🎭',
+  "experience-machine": {
+    categoryName: "The Experience Machine",
+    categoryEmoji: "🎭",
     badges: {
       tier1: {
-        title: 'Authenticity Seeker',
-        sidekickEmoji: '💎',
-        quote: 'You chose the difficult path of authentic experience.',
-        glowIntensity: 'low',
+        title: "Authenticity Seeker",
+        sidekickEmoji: "💎",
+        quote: "You chose the difficult path of authentic experience.",
+        glowIntensity: "low",
       },
       tier2: {
-        title: 'Meaning Navigator',
-        sidekickEmoji: '🧭',
-        quote: 'True happiness cannot be manufactured—only earned.',
-        glowIntensity: 'medium',
+        title: "Meaning Navigator",
+        sidekickEmoji: "🧭",
+        quote: "True happiness cannot be manufactured—only earned.",
+        glowIntensity: "medium",
       },
       tier3: {
-        title: 'Genuine Experience Master',
-        sidekickEmoji: '🌟',
+        title: "Genuine Experience Master",
+        sidekickEmoji: "🌟",
         quote:
-          'The value of life lies not in pleasure, but in the pursuit of purpose.',
-        glowIntensity: 'high',
+          "The value of life lies not in pleasure, but in the pursuit of purpose.",
+        glowIntensity: "high",
       },
     },
   },
 
-  'sorites-paradox': {
-    categoryName: 'The Sorites Paradox',
-    categoryEmoji: '🔄',
+  "sorites-paradox": {
+    categoryName: "The Sorites Paradox",
+    categoryEmoji: "🔄",
     badges: {
       tier1: {
-        title: 'Boundary Watcher',
-        sidekickEmoji: '👁️',
-        quote: 'You noticed the subtle shifts others missed.',
-        glowIntensity: 'low',
+        title: "Boundary Watcher",
+        sidekickEmoji: "👁️",
+        quote: "You noticed the subtle shifts others missed.",
+        glowIntensity: "low",
       },
       tier2: {
-        title: 'Gradual Change Guardian',
-        sidekickEmoji: '⚖️',
-        quote: 'Small steps can lead to vast distances—you stayed vigilant.',
-        glowIntensity: 'medium',
+        title: "Gradual Change Guardian",
+        sidekickEmoji: "⚖️",
+        quote: "Small steps can lead to vast distances—you stayed vigilant.",
+        glowIntensity: "medium",
       },
       tier3: {
-        title: 'Threshold Sage',
-        sidekickEmoji: '🔮',
+        title: "Threshold Sage",
+        sidekickEmoji: "🔮",
         quote:
-          'Where others see continuity, you found the critical moments of transformation.',
-        glowIntensity: 'high',
+          "Where others see continuity, you found the critical moments of transformation.",
+        glowIntensity: "high",
       },
     },
   },
@@ -462,20 +522,20 @@ export const BADGE_CONFIGURATIONS = {
 
 // Glow intensity CSS class mapping with extended tier support
 export const GLOW_INTENSITY_CLASSES = {
-  1: 'badge-glow-low', // Tier 1 (1 scenario)
-  2: 'badge-glow-medium', // Tier 2 (3 scenarios)
-  3: 'badge-glow-high', // Tier 3 (6 scenarios)
-  4: 'badge-glow-brilliant', // Tier 4 (10 scenarios)
-  5: 'badge-glow-radiant', // Tier 5 (15 scenarios)
-  6: 'badge-glow-transcendent', // Tier 6 (21 scenarios)
-  7: 'badge-glow-legendary', // Tier 7 (28 scenarios)
-  8: 'badge-glow-mythic', // Tier 8 (36 scenarios)
-  9: 'badge-glow-cosmic', // Tier 9 (45 scenarios)
-  10: 'badge-glow-divine', // Tier 10 (55 scenarios)
+  1: "badge-glow-low", // Tier 1 (1 scenario)
+  2: "badge-glow-medium", // Tier 2 (3 scenarios)
+  3: "badge-glow-high", // Tier 3 (6 scenarios)
+  4: "badge-glow-brilliant", // Tier 4 (10 scenarios)
+  5: "badge-glow-radiant", // Tier 5 (15 scenarios)
+  6: "badge-glow-transcendent", // Tier 6 (21 scenarios)
+  7: "badge-glow-legendary", // Tier 7 (28 scenarios)
+  8: "badge-glow-mythic", // Tier 8 (36 scenarios)
+  9: "badge-glow-cosmic", // Tier 9 (45 scenarios)
+  10: "badge-glow-divine", // Tier 10 (55 scenarios)
   // Legacy string-based mapping for backward compatibility
-  low: 'badge-glow-low',
-  medium: 'badge-glow-medium',
-  high: 'badge-glow-high',
+  low: "badge-glow-low",
+  medium: "badge-glow-medium",
+  high: "badge-glow-high",
 };
 
 /**
@@ -507,7 +567,7 @@ export function getBadgeConfig(categoryId, tier) {
     categoryEmoji: categoryConfig.categoryEmoji,
     tier,
     requirement:
-      ACTIVE_BADGE_TIERS.find(t => t.tier === tier)?.requirement || 0,
+      ACTIVE_BADGE_TIERS.find((t) => t.tier === tier)?.requirement || 0,
   };
 }
 
@@ -517,8 +577,8 @@ export function getBadgeConfig(categoryId, tier) {
  * @returns {Array} Array of badge configurations
  */
 export function getCategoryBadges(categoryId) {
-  return ACTIVE_BADGE_TIERS.map(tierInfo =>
-    getBadgeConfig(categoryId, tierInfo.tier)
+  return ACTIVE_BADGE_TIERS.map((tierInfo) =>
+    getBadgeConfig(categoryId, tierInfo.tier),
   ).filter(Boolean);
 }
 
@@ -529,7 +589,7 @@ export function getCategoryBadges(categoryId) {
  */
 export function getNextBadgeTier(completedCount) {
   return (
-    ACTIVE_BADGE_TIERS.find(tier => tier.requirement > completedCount) || null
+    ACTIVE_BADGE_TIERS.find((tier) => tier.requirement > completedCount) || null
   );
 }
 
@@ -540,8 +600,8 @@ export function getNextBadgeTier(completedCount) {
  */
 export function getEarnedBadgeTiers(completedCount) {
   return ACTIVE_BADGE_TIERS.filter(
-    tier => tier.requirement <= completedCount
-  ).map(tier => tier.tier);
+    (tier) => tier.requirement <= completedCount,
+  ).map((tier) => tier.tier);
 }
 
 /**
@@ -551,7 +611,7 @@ export function getEarnedBadgeTiers(completedCount) {
  * @returns {boolean} True if badge is earned
  */
 export function isBadgeEarned(completedCount, tier) {
-  const tierInfo = ACTIVE_BADGE_TIERS.find(t => t.tier === tier);
+  const tierInfo = ACTIVE_BADGE_TIERS.find((t) => t.tier === tier);
   return tierInfo ? completedCount >= tierInfo.requirement : false;
 }
 

@@ -608,34 +608,95 @@ export class ScenarioReflectionModal {
    * Setup event handlers
    */
   setupEventHandlers() {
-    if (!this.modal?.modalElement) return;
+    if (!this.modal?.modalElement) {
+      console.warn(
+        "🚨 ScenarioReflectionModal: Modal element not found for event setup",
+      );
+      return;
+    }
 
     const { modalElement } = this.modal;
+    console.log(
+      "🔧 ScenarioReflectionModal: Setting up event handlers on",
+      modalElement,
+    );
 
-    // Navigation buttons
-    modalElement.addEventListener("click", (e) => {
+    // Remove any existing listeners to prevent duplicates
+    const existingHandler = modalElement._scenarioReflectionHandler;
+    if (existingHandler) {
+      modalElement.removeEventListener("click", existingHandler);
+      console.log("🗑️ Removed existing event handler");
+    }
+
+    // Create new handler
+    const clickHandler = (e) => {
+      console.log(
+        "🎯 ScenarioReflectionModal click detected:",
+        e.target,
+        "Action:",
+        e.target.dataset?.action,
+      );
+
       if (e.target.matches('[data-action="next"]')) {
+        console.log("▶️ Next button clicked");
         this.handleNext();
       } else if (e.target.matches('[data-action="previous"]')) {
+        console.log("◀️ Previous button clicked");
         this.handlePrevious();
       } else if (e.target.matches('[data-action="skip-reflection"]')) {
+        console.log("⏭️ Skip button clicked");
         this.handleSkip();
       } else if (e.target.matches(".suggestion-card")) {
+        console.log("💡 Suggestion card clicked");
         this.handleScenarioSuggestion(e.target);
       }
-    });
+    };
+
+    // Store reference and add listener
+    modalElement._scenarioReflectionHandler = clickHandler;
+    modalElement.addEventListener("click", clickHandler);
+    console.log("✅ Click event handler attached");
 
     // Research data collection
-    modalElement.addEventListener("change", (e) => {
+    const changeHandler = (e) => {
       if (e.target.matches("[data-research]")) {
+        console.log(
+          "📊 Research data collected (change):",
+          e.target.name,
+          e.target.value,
+        );
         this.collectResearchData(e.target);
       }
-    });
+    };
 
-    modalElement.addEventListener("input", (e) => {
+    const inputHandler = (e) => {
       if (e.target.matches("[data-research]")) {
+        console.log(
+          "📊 Research data collected (input):",
+          e.target.name,
+          e.target.value,
+        );
         this.collectResearchData(e.target);
       }
+    };
+
+    modalElement.addEventListener("change", changeHandler);
+    modalElement.addEventListener("input", inputHandler);
+    console.log("✅ Research data event handlers attached");
+
+    // Debug: Check if buttons are present
+    const nextBtn = modalElement.querySelector('[data-action="next"]');
+    const prevBtn = modalElement.querySelector('[data-action="previous"]');
+    const skipBtn = modalElement.querySelector(
+      '[data-action="skip-reflection"]',
+    );
+
+    console.log("🔍 Button check:", {
+      nextBtn: !!nextBtn,
+      prevBtn: !!prevBtn,
+      skipBtn: !!skipBtn,
+      nextText: nextBtn?.textContent,
+      prevText: prevBtn?.textContent,
     });
   }
 
@@ -643,10 +704,19 @@ export class ScenarioReflectionModal {
    * Handle next step navigation
    */
   handleNext() {
+    console.log(
+      "▶️ ScenarioReflectionModal: handleNext() called, currentStep:",
+      this.currentStep,
+      "totalSteps:",
+      this.totalSteps,
+    );
+
     if (this.currentStep < this.totalSteps - 1) {
       this.currentStep++;
+      console.log("📈 Moving to step:", this.currentStep);
       this.updateModalContent();
     } else {
+      console.log("🏁 Last step reached, calling handleComplete()");
       this.handleComplete();
     }
   }
@@ -655,9 +725,17 @@ export class ScenarioReflectionModal {
    * Handle previous step navigation
    */
   handlePrevious() {
+    console.log(
+      "◀️ ScenarioReflectionModal: handlePrevious() called, currentStep:",
+      this.currentStep,
+    );
+
     if (this.currentStep > 0) {
       this.currentStep--;
+      console.log("📉 Moving to step:", this.currentStep);
       this.updateModalContent();
+    } else {
+      console.log("🛑 Already at first step");
     }
   }
 
@@ -665,7 +743,15 @@ export class ScenarioReflectionModal {
    * Update modal content for current step
    */
   updateModalContent() {
-    if (!this.modal?.modalElement) return;
+    console.log(
+      "🔄 ScenarioReflectionModal: updateModalContent() called for step",
+      this.currentStep,
+    );
+
+    if (!this.modal?.modalElement) {
+      console.warn("🚨 Modal element not found in updateModalContent");
+      return;
+    }
 
     const contentElement = this.modal.modalElement.querySelector(
       ".reflection-step-content",
@@ -676,6 +762,12 @@ export class ScenarioReflectionModal {
     const progressElement = this.modal.modalElement.querySelector(
       ".reflection-progress",
     );
+
+    console.log("🔍 Elements found:", {
+      content: !!contentElement,
+      footer: !!footerElement,
+      progress: !!progressElement,
+    });
 
     if (contentElement) {
       contentElement.innerHTML = this.generateStepContent(this.currentStep);
@@ -743,6 +835,21 @@ export class ScenarioReflectionModal {
       selected_option: this.selectedOption?.id,
       research_data_points: Object.keys(this.reflectionData).length,
     });
+
+    // Dispatch event for badge system integration
+    const reflectionCompletedEvent = new CustomEvent(
+      "scenarioReflectionCompleted",
+      {
+        detail: {
+          scenarioId: this.options.scenarioId,
+          categoryId: this.options.categoryId,
+          selectedOption: this.selectedOption,
+          reflectionData: this.reflectionData,
+          timestamp: Date.now(),
+        },
+      },
+    );
+    document.dispatchEvent(reflectionCompletedEvent);
 
     this.options.onComplete(this.reflectionData);
     this.modal.close();

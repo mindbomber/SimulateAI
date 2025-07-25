@@ -21,15 +21,26 @@
  */
 
 import enhancedUserTracking from "./services/enhanced-user-tracking.js";
+import googleAnalytics from "./services/google-analytics.js";
 import logger from "./utils/logger.js";
 
 // Initialize enhanced user tracking when DOM is ready
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   try {
     logger.info("Initializing enhanced user tracking system...");
 
+    // Initialize Google Analytics first
+    await googleAnalytics.initialize();
+
     // Initialize the enhanced user tracking system
     enhancedUserTracking.initialize();
+
+    // Track app startup in GA4
+    googleAnalytics.trackEvent("app_startup", {
+      timestamp: Date.now(),
+      user_agent: navigator.userAgent,
+      viewport: `${window.innerWidth}x${window.innerHeight}`,
+    });
 
     logger.info("Enhanced user tracking system initialized successfully");
   } catch (error) {
@@ -38,4 +49,4 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Export for use in other modules
-export { enhancedUserTracking };
+export { enhancedUserTracking, googleAnalytics };

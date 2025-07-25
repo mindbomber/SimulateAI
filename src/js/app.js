@@ -3330,13 +3330,13 @@ class AIEthicsApp {
         this.hideLoading();
 
         // Handle enhanced navigation from scenario browser
-        const navigationContext = config?.sourceContext || "direct";
-        const targetScenario = config?.targetScenario;
-        const targetCategory = config?.targetCategory;
-        const autoNavigate = config?.autoNavigateToScenario;
+        const navigationContext = simConfig?.sourceContext || "direct";
+        const targetScenario = simConfig?.targetScenario;
+        const targetCategory = simConfig?.targetCategory;
+        const autoNavigate = simConfig?.autoNavigateToScenario;
 
         // Enhance simulateai with all integrated capabilities
-        await this.enhanceSimulateaiExperience(config);
+        await this.enhanceSimulateaiExperience(simConfig);
 
         // Display the main grid category browser (provides access to all scenario categories)
         if (this.categoryGrid) {
@@ -3736,40 +3736,67 @@ class AIEthicsApp {
   showScenarioReflectionModal(data) {
     const { categoryId, scenarioId, selectedOption } = data;
 
-    // Get scenario reflection modal configuration
-    const reflectionConfig =
-      this.getComponentConfig("scenario-reflection-modal") || {};
+    try {
+      // Get scenario reflection modal configuration (fallback to empty object if not found)
+      const reflectionConfig =
+        this.getComponentConfig("scenario-reflection-modal") || {};
 
-    // The ScenarioReflectionModal automatically shows itself when constructed
-    new ScenarioReflectionModal({
-      categoryId: categoryId,
-      scenarioId: scenarioId,
-      selectedOption: selectedOption,
-      scenarioData: data.scenarioData || {},
-      ...reflectionConfig,
-      onComplete: (reflectionData) => {
-        // User finished reflection - show success message
-        this.showNotification(
-          "Thank you for your thoughtful reflection! Your insights contribute to our research.",
-          "success",
-        );
+      // The ScenarioReflectionModal automatically shows itself when constructed
+      new ScenarioReflectionModal({
+        categoryId: categoryId,
+        scenarioId: scenarioId,
+        selectedOption: selectedOption,
+        scenarioData: data.scenarioData || {},
+        ...reflectionConfig,
+        onComplete: (reflectionData) => {
+          // User finished reflection - show success message
+          this.showNotification(
+            "Thank you for your thoughtful reflection! Your insights contribute to our research.",
+            "success",
+          );
 
-        // Track completion
-        simpleAnalytics.trackEvent("scenario_reflection", "completed", {
-          category_id: categoryId,
-          scenario_id: scenarioId,
-          selected_option: selectedOption?.id,
-          research_data_points: Object.keys(reflectionData).length,
-        });
-      },
-      onSkip: () => {
-        // User skipped reflection - show gentle reminder
-        this.showNotification(
-          "Reflection skipped. You can always revisit scenarios to explore different perspectives.",
-          "info",
-        );
-      },
-    });
+          // Track completion
+          simpleAnalytics.trackEvent("scenario_reflection", "completed", {
+            category_id: categoryId,
+            scenario_id: scenarioId,
+            selected_option: selectedOption?.id,
+            research_data_points: Object.keys(reflectionData).length,
+          });
+        },
+        onSkip: () => {
+          // User skipped reflection - show gentle reminder
+          this.showNotification(
+            "Reflection skipped. You can always revisit scenarios to explore different perspectives.",
+            "info",
+          );
+        },
+      });
+    } catch (error) {
+      console.warn(
+        "Failed to get config for scenario-reflection-modal:",
+        error.message,
+      );
+
+      // Fallback: create reflection modal without config
+      new ScenarioReflectionModal({
+        categoryId: categoryId,
+        scenarioId: scenarioId,
+        selectedOption: selectedOption,
+        scenarioData: data.scenarioData || {},
+        onComplete: (reflectionData) => {
+          this.showNotification(
+            "Thank you for your thoughtful reflection! Your insights contribute to our research.",
+            "success",
+          );
+        },
+        onSkip: () => {
+          this.showNotification(
+            "Reflection skipped. You can always revisit scenarios to explore different perspectives.",
+            "info",
+          );
+        },
+      });
+    }
   }
 
   /**
@@ -5721,13 +5748,6 @@ class AIEthicsApp {
     return this.authService?.getCurrentUser() || null;
   }
 
-  /**
-   * Get user profile information
-   */
-  getUserProfile() {
-    return this.authService?.getUserProfile() || null;
-  }
-
   // ...existing methods...
 }
 
@@ -6271,6 +6291,19 @@ window.markSomeScenariosCompleted = () => app.markSomeScenariosCompleted();
 window.testSurpriseMe = () => app.launchRandomScenario();
 window.debugShowAllContent = () => app.debugShowAllContent();
 window.debugModalState = () => app.debugModalState();
+
+// Deferred badge debugging functions
+window.getDeferredBadgeStatus = () => {
+  if (
+    app.mainGrid &&
+    typeof app.mainGrid.getDeferredBadgeStatus === "function"
+  ) {
+    return app.mainGrid.getDeferredBadgeStatus();
+  } else {
+    console.log("MainGrid not available or method not found");
+    return null;
+  }
+};
 
 // Enterprise debugging functions
 window.getEnterpriseHealth = () => AIEthicsApp.getEnterpriseHealthReport();

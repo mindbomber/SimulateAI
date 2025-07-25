@@ -89,6 +89,10 @@ class MainGrid {
     this.scenarioModal = null; // Reusable modal instance
     this.modalClosedHandler = null; // Store bound event handler
     this.scenarioCompletedHandler = null; // Store bound event handler
+    this.scenarioReflectionCompletedHandler = null; // Store bound reflection handler
+
+    // Queue for deferred badge notifications (wait for reflection completion)
+    this.deferredBadges = new Map(); // scenarioId -> { badges, scenarioData, timestamp }
 
     // Enterprise health and performance monitoring
     this.healthStatus = {
@@ -204,16 +208,16 @@ class MainGrid {
       this.simulateAIFunction = simulateAIFunction;
       this.coordinationEnabled = true;
 
-      AppDebug.log(
+      logger.info(
         "MainGrid: SimulateAI function set, initializing component coordination",
       );
 
       // Initialize coordinated components
       this._initializeCoordinatedComponents();
 
-      AppDebug.log("MainGrid: SimulateAI coordination enabled successfully");
+      logger.info("MainGrid: SimulateAI coordination enabled successfully");
     } catch (error) {
-      AppDebug.error("MainGrid: Failed to set SimulateAI initializer:", error);
+      logger.error("MainGrid: Failed to set SimulateAI initializer:", error);
       this.coordinationEnabled = false;
     }
   }
@@ -224,7 +228,7 @@ class MainGrid {
    */
   _initializeCoordinatedComponents() {
     if (!this.simulateAIFunction) {
-      AppDebug.warn(
+      logger.warn(
         "MainGrid: No SimulateAI function available for coordination",
       );
       return;
@@ -242,12 +246,12 @@ class MainGrid {
       // Set up event coordination
       this._setupEventCoordination();
 
-      AppDebug.log("MainGrid: Coordinated components initialized", {
+      logger.info("MainGrid: Coordinated components initialized", {
         categoryGrid: !!this.categoryGridComponent,
         scenarioBrowser: !!this.scenarioBrowserComponent,
       });
     } catch (error) {
-      AppDebug.error(
+      logger.error(
         "MainGrid: Failed to initialize coordinated components:",
         error,
       );
@@ -289,9 +293,9 @@ class MainGrid {
         });
       };
 
-      AppDebug.log("MainGrid: Event coordination established");
+      logger.info("MainGrid: Event coordination established");
     } catch (error) {
-      AppDebug.error("MainGrid: Failed to set up event coordination:", error);
+      logger.error("MainGrid: Failed to set up event coordination:", error);
     }
   }
 
@@ -1737,6 +1741,16 @@ class MainGrid {
       );
     }
 
+    // Listen for scenario reflection completion (for deferred badges) - only add once
+    if (!this.scenarioReflectionCompletedHandler) {
+      this.scenarioReflectionCompletedHandler =
+        this.handleReflectionCompletion.bind(this);
+      document.addEventListener(
+        "scenarioReflectionCompleted",
+        this.scenarioReflectionCompletedHandler,
+      );
+    }
+
     // Attach CategoryHeader event listeners for progress ring tooltips
     if (this.currentView === "category") {
       this.categoryHeader.attachEventListeners(this.categoryContainer);
@@ -1781,6 +1795,15 @@ class MainGrid {
         this.modalClosedHandler,
       );
       this.modalClosedHandler = null;
+    }
+
+    // Remove scenario reflection completion event listener
+    if (this.scenarioReflectionCompletedHandler) {
+      document.removeEventListener(
+        "scenarioReflectionCompleted",
+        this.scenarioReflectionCompletedHandler,
+      );
+      this.scenarioReflectionCompletedHandler = null;
     }
 
     // Remove scenario completed event listener
@@ -2253,7 +2276,7 @@ class MainGrid {
   /**
    * Handle scenario modal fully closed event (for badge display)
    */
-  handleScenarioModalClosed(event) {
+  async handleScenarioModalClosed(event) {
     const { categoryId, scenarioId, completed = true } = event.detail;
 
     logger.info("Scenario modal fully closed:", {
@@ -2273,7 +2296,8 @@ class MainGrid {
 
     // Only check for newly earned badges if scenario was actually completed
     if (completed && categoryId && scenarioId) {
-      this.checkForNewBadges(categoryId, scenarioId);
+      // DEFERRED BADGE SYSTEM: Store badges for later display after reflection
+      await this.deferBadgesForReflection(categoryId, scenarioId);
     } else {
       logger.debug(
         "Scenario modal closed without completion - skipping badge check",
@@ -2297,9 +2321,9 @@ class MainGrid {
 
     this.saveUserProgress();
 
-    // Check for newly earned badges only if explicitly requested
+    // Check for newly earned badges and defer them for reflection completion
     if (completed && checkBadges) {
-      this.checkForNewBadges(categoryId, scenarioId);
+      this.deferBadgesForReflection(categoryId, scenarioId);
     }
 
     // Update scenario completion status in DOM without full re-render
@@ -2462,11 +2486,11 @@ class MainGrid {
   }
 
   /**
-   * Checks for newly earned badges and displays them
-   * @param {string} categoryId - Category identifier
-   * @param {string} scenarioId - Scenario identifier
+   * Check for new badges and defer them for display after reflection completion
+   * @param {string} categoryId - Category ID
+   * @param {string} scenarioId - Scenario ID
    */
-  async checkForNewBadges(categoryId, scenarioId) {
+  async deferBadgesForReflection(categoryId, scenarioId) {
     try {
       // Refresh badge manager's category progress
       badgeManager.refreshCategoryProgress();
@@ -2478,40 +2502,194 @@ class MainGrid {
       );
 
       if (newBadges && newBadges.length > 0) {
-        // Display each new badge with a delay between multiple badges
-        for (let i = 0; i < newBadges.length; i++) {
-          const badge = newBadges[i];
+        logger.info(
+          `✋ DEFERRED: ${newBadges.length} badges for scenario ${scenarioId} - waiting for reflection completion`,
+        );
 
-          // Add small delay between multiple badges
-          if (i > 0) {
-            await this.delay(BADGE_DELAY_MS);
-          }
+        // Debug: Show badge titles being deferred
+        const badgeTitles = newBadges.map((b) => b.title).join(", ");
+        logger.info(`📋 Deferred badges: ${badgeTitles}`);
 
-          // Show badge modal with main context (from home page)
-          await badgeModal.showBadgeModal(badge, "main");
+        // Store badges to show after reflection modal is closed
+        this.deferredBadges.set(scenarioId, {
+          badges: newBadges,
+          categoryId,
+          scenarioId,
+          timestamp: Date.now(),
+        });
 
-          // Track badge achievement
-          logger.info("Badge earned:", {
-            categoryId: badge.categoryId,
-            badgeTitle: badge.title,
-            tier: badge.tier,
-            timestamp: badge.timestamp,
+        // Track the badge deferral
+        if (window.AnalyticsManager) {
+          window.AnalyticsManager.trackEvent("badges_deferred", {
+            categoryId,
+            scenarioId,
+            badgeCount: newBadges.length,
+            badgeTitles: badgeTitles,
           });
-
-          // Track analytics if available
-          if (window.AnalyticsManager) {
-            window.AnalyticsManager.trackEvent("badge_earned", {
-              categoryId: badge.categoryId,
-              badgeTitle: badge.title,
-              tier: badge.tier,
-              scenarioId,
-            });
-          }
         }
+      } else {
+        logger.info(`No new badges earned for scenario ${scenarioId}`);
       }
     } catch (error) {
-      logger.error("Error checking for new badges:", error);
+      logger.error("Error deferring badges for reflection:", error);
     }
+  }
+
+  /**
+   * Handle scenario reflection completion and show deferred badges
+   * This runs AFTER the user closes the reflection modal
+   * @param {CustomEvent} event - Reflection completion event
+   */
+  async handleReflectionCompletion(event) {
+    try {
+      logger.info("🎯 Handling reflection completion:", event.detail);
+
+      const scenarioId = event.detail.scenarioId;
+
+      // Check if we have deferred badges for this scenario
+      const deferredBadgeData = this.deferredBadges.get(scenarioId);
+
+      if (deferredBadgeData && deferredBadgeData.badges.length > 0) {
+        logger.info(
+          `🎉 SHOWING DEFERRED BADGES: ${deferredBadgeData.badges.length} badges for scenario ${scenarioId}`,
+        );
+
+        const badgeTitles = deferredBadgeData.badges
+          .map((b) => b.title)
+          .join(", ");
+        logger.info(`🏆 Badge celebration: ${badgeTitles}`);
+
+        // Show badge notifications for each new badge with enhanced timing
+        for (let i = 0; i < deferredBadgeData.badges.length; i++) {
+          const badge = deferredBadgeData.badges[i];
+
+          // Log each badge data for debugging
+          logger.info(`Badge ${i + 1} data:`, {
+            title: badge.title,
+            categoryId: badge.categoryId,
+            categoryEmoji: badge.categoryEmoji,
+            sidekickEmoji: badge.sidekickEmoji,
+            tier: badge.tier,
+            hasRequiredFields: !!(
+              badge.title &&
+              badge.categoryEmoji &&
+              badge.sidekickEmoji
+            ),
+          });
+
+          setTimeout(
+            async () => {
+              try {
+                logger.info("Showing deferred badge modal for:", badge.title);
+                logger.info("Badge data validation:", {
+                  hasTitle: !!badge.title,
+                  hasCategoryEmoji: !!badge.categoryEmoji,
+                  hasSidekickEmoji: !!badge.sidekickEmoji,
+                  hasQuote: !!badge.quote,
+                  tier: badge.tier,
+                  fullBadge: badge,
+                });
+
+                // Announce badge for accessibility
+                if (this.accessibilityManager) {
+                  this.accessibilityManager.announce(
+                    `Congratulations! You've earned the ${badge.title} badge!`,
+                    "assertive",
+                  );
+                }
+
+                logger.info("About to call badgeModal.showBadgeModal...");
+
+                // Show badge modal with reflection context and enhanced celebration
+                await badgeModal.showBadgeModal(badge, "reflection", {
+                  showConfetti: true,
+                  celebrationLevel: "high",
+                  autoClose: false, // Let user close manually to fully enjoy
+                });
+
+                logger.info("Badge modal showBadgeModal call completed");
+
+                // Track badge achievement
+                logger.info("Deferred badge displayed:", {
+                  categoryId: badge.categoryId,
+                  badgeTitle: badge.title,
+                  tier: badge.tier,
+                  timestamp: badge.timestamp,
+                  deferralTime: Date.now() - deferredBadgeData.timestamp,
+                });
+
+                // Track analytics
+                if (window.AnalyticsManager) {
+                  window.AnalyticsManager.trackEvent("deferred_badge_shown", {
+                    categoryId: badge.categoryId,
+                    badgeTitle: badge.title,
+                    tier: badge.tier,
+                    scenarioId,
+                    deferralTime: Date.now() - deferredBadgeData.timestamp,
+                  });
+                }
+              } catch (error) {
+                logger.error("Failed to show deferred badge modal:", error);
+              }
+            },
+            i * 2000 + 1000,
+          ); // Stagger badges: 1s, 3s, 5s, etc.
+        }
+
+        // Clean up deferred badges
+        this.deferredBadges.delete(scenarioId);
+
+        // Track the overall deferred badge completion
+        if (window.AnalyticsManager) {
+          // Safely extract reflection text for analytics
+          const reflectionText =
+            event.detail.reflection?.text ||
+            event.detail.reflection?.content ||
+            (typeof event.detail.reflection === "string"
+              ? event.detail.reflection
+              : "");
+
+          window.AnalyticsManager.trackEvent("deferred_badges_completed", {
+            scenarioId: scenarioId,
+            categoryId: event.detail.categoryId,
+            badgeCount: deferredBadgeData.badges.length,
+            totalDeferralTime: Date.now() - deferredBadgeData.timestamp,
+            reflectionWords: reflectionText
+              ? reflectionText.split(" ").length
+              : 0,
+          });
+        }
+      } else {
+        logger.info(`No deferred badges to show for scenario ${scenarioId}`);
+      }
+    } catch (error) {
+      logger.error("Error in handleReflectionCompletion:", error);
+    }
+  }
+
+  /**
+   * Debug method to check deferred badge status
+   * Available in browser console: window.app.mainGrid.getDeferredBadgeStatus()
+   */
+  getDeferredBadgeStatus() {
+    const status = {
+      totalDeferred: this.deferredBadges.size,
+      scenarios: [],
+    };
+
+    for (const [scenarioId, data] of this.deferredBadges) {
+      status.scenarios.push({
+        scenarioId,
+        categoryId: data.categoryId,
+        badgeCount: data.badges.length,
+        badgeTitles: data.badges.map((b) => b.title),
+        waitingTime: Date.now() - data.timestamp,
+        timestamp: new Date(data.timestamp).toLocaleTimeString(),
+      });
+    }
+
+    console.table(status.scenarios);
+    return status;
   }
 
   /**
@@ -4200,7 +4378,7 @@ class MainGrid {
    */
   launchCoordinatedScenario(categoryId, scenarioId, options = {}) {
     if (!this.coordinationEnabled || !this.simulateAIFunction) {
-      AppDebug.warn(
+      logger.warn(
         "MainGrid: Coordination not enabled, using fallback scenario launch",
       );
       return this.openScenario(categoryId, scenarioId);
@@ -4218,7 +4396,7 @@ class MainGrid {
       // Launch via SimulateAI function
       return this.simulateAIFunction.navigateToScenario(categoryId, scenarioId);
     } catch (error) {
-      AppDebug.error("MainGrid: Failed coordinated scenario launch:", error);
+      logger.error("MainGrid: Failed coordinated scenario launch:", error);
       this.simulateAIFunction?.onError(error, "coordinated_scenario_launch");
 
       // Fallback to standard launch
@@ -4250,7 +4428,7 @@ class MainGrid {
       try {
         return serviceGetter();
       } catch (error) {
-        AppDebug.error(
+        logger.error(
           `MainGrid: Failed to get coordinated service '${serviceName}':`,
           error,
         );
@@ -4258,7 +4436,7 @@ class MainGrid {
       }
     }
 
-    AppDebug.warn(
+    logger.warn(
       `MainGrid: Unknown coordinated service requested: ${serviceName}`,
     );
     return null;
