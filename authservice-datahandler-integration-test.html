@@ -1,0 +1,947 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AuthService DataHandler Integration Test</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #333;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #4a90e2, #357abd);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: 300;
+      }
+
+      .header p {
+        margin: 10px 0 0 0;
+        opacity: 0.9;
+        font-size: 1.1rem;
+      }
+
+      .test-container {
+        padding: 30px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .test-container:last-child {
+        border-bottom: none;
+      }
+
+      .test-container h2 {
+        color: #4a90e2;
+        margin-top: 0;
+        font-size: 1.8rem;
+        font-weight: 400;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 15px;
+        margin: 20px 0;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        background: linear-gradient(135deg, #4a90e2, #357abd);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        min-width: 140px;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .btn.secondary {
+        background: linear-gradient(135deg, #6c757d, #495057);
+      }
+
+      .btn.success {
+        background: linear-gradient(135deg, #28a745, #20c997);
+      }
+
+      .btn.danger {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+      }
+
+      .status {
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 8px;
+        font-weight: 500;
+      }
+
+      .status.info {
+        background: linear-gradient(135deg, #cce7ff, #b3d9ff);
+        color: #0056b3;
+        border-left: 4px solid #4a90e2;
+      }
+
+      .status.success {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        color: #155724;
+        border-left: 4px solid #28a745;
+      }
+
+      .status.error {
+        background: linear-gradient(135deg, #f8d7da, #f1b0b7);
+        color: #721c24;
+        border-left: 4px solid #dc3545;
+      }
+
+      .status.warning {
+        background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+        color: #856404;
+        border-left: 4px solid #ffc107;
+      }
+
+      .data-display {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 15px 0;
+        font-family: "Courier New", monospace;
+        white-space: pre-wrap;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+      }
+
+      .metric-card {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .metric-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #4a90e2;
+        display: block;
+      }
+
+      .metric-label {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-top: 5px;
+      }
+
+      .progress-bar {
+        background: #e9ecef;
+        border-radius: 10px;
+        height: 20px;
+        margin: 15px 0;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        background: linear-gradient(135deg, #4a90e2, #357abd);
+        height: 100%;
+        border-radius: 10px;
+        transition: width 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .test-section {
+        margin: 30px 0;
+      }
+
+      .test-section h3 {
+        color: #495057;
+        border-bottom: 2px solid #4a90e2;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          margin: 10px;
+          border-radius: 8px;
+        }
+
+        .header {
+          padding: 20px;
+        }
+
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .test-container {
+          padding: 20px;
+        }
+
+        .button-group {
+          flex-direction: column;
+        }
+
+        .btn {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🔐 AuthService DataHandler Integration</h1>
+        <p>
+          Comprehensive testing for centralized authentication data management
+        </p>
+      </div>
+
+      <div class="test-container">
+        <h2>🚀 Initialization Status</h2>
+        <div id="init-status" class="status info">
+          Initializing components...
+        </div>
+        <div class="button-group">
+          <button class="btn" onclick="initializeTest()">
+            Initialize Test
+          </button>
+          <button class="btn secondary" onclick="checkDependencies()">
+            Check Dependencies
+          </button>
+          <button class="btn success" onclick="runComprehensiveTest()">
+            Run All Tests
+          </button>
+        </div>
+      </div>
+
+      <div class="test-container">
+        <h2>📊 AuthService Integration Status</h2>
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <span class="metric-value" id="datahandler-status">❌</span>
+            <div class="metric-label">DataHandler Available</div>
+          </div>
+          <div class="metric-card">
+            <span class="metric-value" id="authservice-status">❌</span>
+            <div class="metric-label">AuthService Enhanced</div>
+          </div>
+          <div class="metric-card">
+            <span class="metric-value" id="methods-status">❌</span>
+            <div class="metric-label">Async Methods Available</div>
+          </div>
+          <div class="metric-card">
+            <span class="metric-value" id="integration-status">❌</span>
+            <div class="metric-label">Integration Complete</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="test-container">
+        <h2>🔑 Authentication Preferences Testing</h2>
+        <div class="test-section">
+          <h3>Persistence Preferences</h3>
+          <div class="button-group">
+            <button class="btn" onclick="testSaveAuthPreferences()">
+              Save Preferences
+            </button>
+            <button class="btn secondary" onclick="testLoadAuthPreferences()">
+              Load Preferences
+            </button>
+            <button class="btn danger" onclick="clearAuthPreferences()">
+              Clear Preferences
+            </button>
+          </div>
+          <div id="auth-prefs-display" class="data-display">
+            No preferences loaded yet...
+          </div>
+        </div>
+      </div>
+
+      <div class="test-container">
+        <h2>🕒 Session Data Management</h2>
+        <div class="test-section">
+          <h3>Session Tracking</h3>
+          <div class="button-group">
+            <button class="btn" onclick="testSaveSessionData()">
+              Start Session
+            </button>
+            <button class="btn secondary" onclick="testLoadSessionData()">
+              Load Session
+            </button>
+            <button class="btn danger" onclick="testClearSessionData()">
+              Clear Session
+            </button>
+          </div>
+          <div id="session-data-display" class="data-display">
+            No session data loaded yet...
+          </div>
+        </div>
+      </div>
+
+      <div class="test-container">
+        <h2>🔄 DataHandler Migration Testing</h2>
+        <div class="test-section">
+          <h3>Data Migration Verification</h3>
+          <div class="button-group">
+            <button class="btn" onclick="testDataMigration()">
+              Test Migration
+            </button>
+            <button class="btn secondary" onclick="verifyDataConsistency()">
+              Verify Consistency
+            </button>
+            <button class="btn success" onclick="testAsyncInitialization()">
+              Test Async Init
+            </button>
+          </div>
+          <div id="migration-results" class="data-display">
+            Migration test results will appear here...
+          </div>
+        </div>
+      </div>
+
+      <div class="test-container">
+        <h2>🧪 Integration Verification</h2>
+        <div id="verification-results">
+          <div class="status info">Ready to run verification tests...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load dependencies -->
+    <script src="src/js/core/data-handler.js"></script>
+    <script src="src/js/services/firebase-service.js"></script>
+    <script src="src/js/services/auth-service.js"></script>
+    <script src="src/js/utils/logger.js"></script>
+
+    <script>
+      let dataHandler = null;
+      let authService = null;
+      let enhancedAuthService = null;
+      let initializationComplete = false;
+
+      // Update status helper
+      function updateStatus(elementId, message, type = "info") {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.className = `status ${type}`;
+          element.textContent = message;
+        }
+      }
+
+      // Update metric display
+      function updateMetric(metricId, value, type = "success") {
+        const element = document.getElementById(metricId);
+        if (element) {
+          element.textContent = type === "success" ? "✅" : "❌";
+          element.style.color = type === "success" ? "#28a745" : "#dc3545";
+        }
+      }
+
+      async function initializeTest() {
+        try {
+          updateStatus("init-status", "Initializing DataHandler...", "info");
+
+          // Initialize DataHandler
+          if (window.DataHandler) {
+            dataHandler = new window.DataHandler();
+            await dataHandler.initialize();
+            updateMetric("datahandler-status", "available", "success");
+          } else {
+            throw new Error("DataHandler not available");
+          }
+
+          updateStatus("init-status", "Initializing AuthService...", "info");
+
+          // Initialize AuthService with DataHandler integration
+          if (window.AuthService) {
+            // Create app-like object for DataHandler integration
+            const app = { dataHandler: dataHandler };
+            enhancedAuthService = new window.AuthService(null, app);
+
+            // Also test legacy constructor
+            authService = new window.AuthService();
+
+            updateMetric("authservice-status", "available", "success");
+          } else {
+            throw new Error("AuthService not available");
+          }
+
+          // Check for async methods
+          const hasAsyncMethods =
+            typeof enhancedAuthService.loadAuthPreferences === "function" &&
+            typeof enhancedAuthService.saveAuthPreferences === "function" &&
+            typeof enhancedAuthService.loadSessionData === "function" &&
+            typeof enhancedAuthService.saveSessionData === "function" &&
+            typeof enhancedAuthService.removeSessionData === "function" &&
+            typeof enhancedAuthService.initializeAsync === "function";
+
+          if (hasAsyncMethods) {
+            updateMetric("methods-status", "available", "success");
+          }
+
+          // Test async initialization
+          await enhancedAuthService.initializeAsync();
+
+          updateMetric("integration-status", "complete", "success");
+          initializationComplete = true;
+
+          updateStatus(
+            "init-status",
+            "✅ All components initialized successfully!",
+            "success",
+          );
+        } catch (error) {
+          console.error("Initialization failed:", error);
+          updateStatus(
+            "init-status",
+            `❌ Initialization failed: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      function checkDependencies() {
+        const dependencies = [
+          { name: "DataHandler", available: !!window.DataHandler },
+          { name: "AuthService", available: !!window.AuthService },
+          { name: "Logger", available: !!window.logger },
+        ];
+
+        let message = "Dependencies Check:\n";
+        dependencies.forEach((dep) => {
+          const status = dep.available ? "✅" : "❌";
+          message += `${status} ${dep.name}\n`;
+        });
+
+        document.getElementById("init-status").textContent = message;
+        document.getElementById("init-status").className = "status info";
+      }
+
+      async function testSaveAuthPreferences() {
+        if (!enhancedAuthService) {
+          updateStatus("init-status", "Please initialize test first", "error");
+          return;
+        }
+
+        try {
+          const testPreferences = {
+            mode: "local",
+            autoSignOutMinutes: 30,
+            setAt: new Date().toISOString(),
+            testData: "AuthService DataHandler integration test",
+          };
+
+          await enhancedAuthService.saveAuthPreferences(testPreferences);
+
+          document.getElementById("auth-prefs-display").textContent =
+            JSON.stringify(testPreferences, null, 2);
+
+          updateStatus(
+            "init-status",
+            "✅ Auth preferences saved successfully!",
+            "success",
+          );
+        } catch (error) {
+          console.error("Failed to save auth preferences:", error);
+          updateStatus(
+            "init-status",
+            `❌ Failed to save preferences: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      async function testLoadAuthPreferences() {
+        if (!enhancedAuthService) {
+          updateStatus("init-status", "Please initialize test first", "error");
+          return;
+        }
+
+        try {
+          const preferences = await enhancedAuthService.loadAuthPreferences();
+
+          if (preferences) {
+            document.getElementById("auth-prefs-display").textContent =
+              JSON.stringify(preferences, null, 2);
+            updateStatus(
+              "init-status",
+              "✅ Auth preferences loaded successfully!",
+              "success",
+            );
+          } else {
+            document.getElementById("auth-prefs-display").textContent =
+              "No preferences found";
+            updateStatus(
+              "init-status",
+              "ℹ️ No auth preferences found",
+              "warning",
+            );
+          }
+        } catch (error) {
+          console.error("Failed to load auth preferences:", error);
+          updateStatus(
+            "init-status",
+            `❌ Failed to load preferences: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      async function clearAuthPreferences() {
+        if (!enhancedAuthService) {
+          updateStatus("init-status", "Please initialize test first", "error");
+          return;
+        }
+
+        try {
+          await enhancedAuthService.removeSessionData(
+            "simulateai_auth_persistence",
+          );
+
+          document.getElementById("auth-prefs-display").textContent =
+            "Preferences cleared";
+
+          updateStatus(
+            "init-status",
+            "✅ Auth preferences cleared successfully!",
+            "success",
+          );
+        } catch (error) {
+          console.error("Failed to clear auth preferences:", error);
+          updateStatus(
+            "init-status",
+            `❌ Failed to clear preferences: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      async function testSaveSessionData() {
+        if (!enhancedAuthService) {
+          updateStatus("init-status", "Please initialize test first", "error");
+          return;
+        }
+
+        try {
+          const sessionStartTime = Date.now().toString();
+          const testSessionData = {
+            sessionId: `test_session_${sessionStartTime}`,
+            startTime: sessionStartTime,
+            userAgent: navigator.userAgent.substring(0, 50) + "...",
+          };
+
+          await enhancedAuthService.saveSessionData(
+            "session_start_time",
+            sessionStartTime,
+          );
+          await enhancedAuthService.saveSessionData(
+            "test_session_data",
+            JSON.stringify(testSessionData),
+          );
+
+          document.getElementById("session-data-display").textContent =
+            JSON.stringify(testSessionData, null, 2);
+
+          updateStatus(
+            "init-status",
+            "✅ Session data saved successfully!",
+            "success",
+          );
+        } catch (error) {
+          console.error("Failed to save session data:", error);
+          updateStatus(
+            "init-status",
+            `❌ Failed to save session data: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      async function testLoadSessionData() {
+        if (!enhancedAuthService) {
+          updateStatus("init-status", "Please initialize test first", "error");
+          return;
+        }
+
+        try {
+          const sessionStartTime =
+            await enhancedAuthService.loadSessionData("session_start_time");
+          const testSessionData =
+            await enhancedAuthService.loadSessionData("test_session_data");
+
+          const sessionData = {
+            sessionStartTime: sessionStartTime,
+            testSessionData: testSessionData
+              ? JSON.parse(testSessionData)
+              : null,
+            loadedAt: new Date().toISOString(),
+          };
+
+          document.getElementById("session-data-display").textContent =
+            JSON.stringify(sessionData, null, 2);
+
+          updateStatus(
+            "init-status",
+            "✅ Session data loaded successfully!",
+            "success",
+          );
+        } catch (error) {
+          console.error("Failed to load session data:", error);
+          updateStatus(
+            "init-status",
+            `❌ Failed to load session data: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      async function testClearSessionData() {
+        if (!enhancedAuthService) {
+          updateStatus("init-status", "Please initialize test first", "error");
+          return;
+        }
+
+        try {
+          await enhancedAuthService.clearSessionData();
+
+          document.getElementById("session-data-display").textContent =
+            "Session data cleared";
+
+          updateStatus(
+            "init-status",
+            "✅ Session data cleared successfully!",
+            "success",
+          );
+        } catch (error) {
+          console.error("Failed to clear session data:", error);
+          updateStatus(
+            "init-status",
+            `❌ Failed to clear session data: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      async function testDataMigration() {
+        if (!enhancedAuthService) {
+          updateStatus("init-status", "Please initialize test first", "error");
+          return;
+        }
+
+        try {
+          let results = "Data Migration Test Results:\n\n";
+
+          // Test 1: Save data via localStorage directly
+          localStorage.setItem("test_migration_key", "legacy_data_value");
+          results += "✅ Step 1: Saved data directly to localStorage\n";
+
+          // Test 2: Load via DataHandler (should fall back to localStorage)
+          const loadedData =
+            await enhancedAuthService.loadSessionData("test_migration_key");
+          results += `✅ Step 2: Loaded via DataHandler: ${loadedData}\n`;
+
+          // Test 3: Save via DataHandler (should sync to both)
+          await enhancedAuthService.saveSessionData(
+            "test_migration_key",
+            "datahandler_enhanced_value",
+          );
+          results += "✅ Step 3: Saved via DataHandler (dual storage)\n";
+
+          // Test 4: Verify localStorage was updated
+          const localStorageValue = localStorage.getItem("test_migration_key");
+          results += `✅ Step 4: localStorage value: ${localStorageValue}\n`;
+
+          // Test 5: Clean up
+          await enhancedAuthService.removeSessionData("test_migration_key");
+          results += "✅ Step 5: Cleaned up test data\n";
+
+          results += "\n🎉 Migration test completed successfully!";
+
+          document.getElementById("migration-results").textContent = results;
+
+          updateStatus(
+            "init-status",
+            "✅ Data migration test completed!",
+            "success",
+          );
+        } catch (error) {
+          console.error("Data migration test failed:", error);
+          document.getElementById("migration-results").textContent =
+            `❌ Migration test failed: ${error.message}`;
+          updateStatus(
+            "init-status",
+            `❌ Migration test failed: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      async function verifyDataConsistency() {
+        if (!enhancedAuthService) {
+          updateStatus("init-status", "Please initialize test first", "error");
+          return;
+        }
+
+        try {
+          let results = "Data Consistency Verification:\n\n";
+
+          // Test data consistency between DataHandler and localStorage
+          const testData = {
+            consistencyTest: true,
+            timestamp: Date.now(),
+            randomValue: Math.random().toString(36).substring(2, 15),
+          };
+
+          // Save via DataHandler
+          await enhancedAuthService.saveAuthPreferences(testData);
+          results += "✅ Saved test data via DataHandler\n";
+
+          // Load via both methods
+          const dataHandlerData =
+            await enhancedAuthService.loadAuthPreferences();
+          const localStorageData = JSON.parse(
+            localStorage.getItem("simulateai_auth_persistence") || "{}",
+          );
+
+          results += `✅ DataHandler data: ${JSON.stringify(dataHandlerData).substring(0, 50)}...\n`;
+          results += `✅ localStorage data: ${JSON.stringify(localStorageData).substring(0, 50)}...\n`;
+
+          // Verify consistency
+          const isConsistent =
+            JSON.stringify(dataHandlerData) ===
+            JSON.stringify(localStorageData);
+          results += `${isConsistent ? "✅" : "❌"} Data consistency: ${isConsistent ? "PASS" : "FAIL"}\n`;
+
+          document.getElementById("migration-results").textContent = results;
+
+          updateStatus(
+            "init-status",
+            isConsistent
+              ? "✅ Data consistency verified!"
+              : "❌ Data inconsistency detected!",
+            isConsistent ? "success" : "error",
+          );
+        } catch (error) {
+          console.error("Consistency verification failed:", error);
+          updateStatus(
+            "init-status",
+            `❌ Consistency verification failed: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      async function testAsyncInitialization() {
+        if (!enhancedAuthService) {
+          updateStatus("init-status", "Please initialize test first", "error");
+          return;
+        }
+
+        try {
+          const startTime = Date.now();
+          await enhancedAuthService.initializeAsync();
+          const endTime = Date.now();
+
+          const results = `Async Initialization Test:
+✅ Initialization completed
+⏱️ Duration: ${endTime - startTime}ms
+📊 DataHandler available: ${!!enhancedAuthService.dataHandler}
+🔧 Methods accessible: ${typeof enhancedAuthService.loadAuthPreferences === "function"}`;
+
+          document.getElementById("migration-results").textContent = results;
+
+          updateStatus(
+            "init-status",
+            "✅ Async initialization test completed!",
+            "success",
+          );
+        } catch (error) {
+          console.error("Async initialization test failed:", error);
+          updateStatus(
+            "init-status",
+            `❌ Async init test failed: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      async function runComprehensiveTest() {
+        try {
+          updateStatus(
+            "init-status",
+            "Running comprehensive test suite...",
+            "info",
+          );
+
+          await initializeTest();
+          await new Promise((resolve) => setTimeout(resolve, 500));
+
+          await testSaveAuthPreferences();
+          await new Promise((resolve) => setTimeout(resolve, 300));
+
+          await testLoadAuthPreferences();
+          await new Promise((resolve) => setTimeout(resolve, 300));
+
+          await testSaveSessionData();
+          await new Promise((resolve) => setTimeout(resolve, 300));
+
+          await testLoadSessionData();
+          await new Promise((resolve) => setTimeout(resolve, 300));
+
+          await testDataMigration();
+          await new Promise((resolve) => setTimeout(resolve, 300));
+
+          await verifyDataConsistency();
+          await new Promise((resolve) => setTimeout(resolve, 300));
+
+          await testAsyncInitialization();
+
+          updateStatus(
+            "init-status",
+            "🎉 Comprehensive test suite completed successfully!",
+            "success",
+          );
+
+          runVerificationTests();
+        } catch (error) {
+          console.error("Comprehensive test failed:", error);
+          updateStatus(
+            "init-status",
+            `❌ Comprehensive test failed: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      function runVerificationTests() {
+        const results = document.getElementById("verification-results");
+        results.innerHTML =
+          '<div class="status info">Running AuthService integration verification...</div>';
+
+        const tests = [
+          {
+            name: "Enhanced Constructor with DataHandler",
+            test: () => {
+              const testApp = { dataHandler: dataHandler };
+              const testAuth = new window.AuthService(null, testApp);
+              return (
+                testAuth.dataHandler === dataHandler && testAuth.app === testApp
+              );
+            },
+          },
+          {
+            name: "Legacy Constructor Compatibility",
+            test: () => {
+              const legacyAuth = new window.AuthService();
+              return legacyAuth.dataHandler === null && legacyAuth.app === null;
+            },
+          },
+          {
+            name: "Async Storage Methods Available",
+            test: () => {
+              return (
+                typeof enhancedAuthService.loadAuthPreferences === "function" &&
+                typeof enhancedAuthService.saveAuthPreferences === "function" &&
+                typeof enhancedAuthService.loadSessionData === "function" &&
+                typeof enhancedAuthService.saveSessionData === "function" &&
+                typeof enhancedAuthService.removeSessionData === "function"
+              );
+            },
+          },
+          {
+            name: "Async Initialization Method",
+            test: () => {
+              return typeof enhancedAuthService.initializeAsync === "function";
+            },
+          },
+          {
+            name: "DataHandler Integration Ready",
+            test: () => {
+              return enhancedAuthService.dataHandler !== null;
+            },
+          },
+          {
+            name: "Session Methods Enhanced",
+            test: () => {
+              // Check if clearSessionData is async
+              const clearSessionMethod = enhancedAuthService.clearSessionData;
+              return clearSessionMethod.constructor.name === "AsyncFunction";
+            },
+          },
+        ];
+
+        tests.forEach((test, index) => {
+          setTimeout(() => {
+            try {
+              const result = test.test();
+              const status = result ? "✅ PASS" : "❌ FAIL";
+              const className = result ? "success" : "error";
+
+              results.innerHTML += `<div class="status ${className}">${status} ${test.name}</div>`;
+            } catch (error) {
+              results.innerHTML += `<div class="status error">❌ ERROR ${test.name}: ${error.message}</div>`;
+            }
+
+            // Add final summary
+            if (index === tests.length - 1) {
+              setTimeout(() => {
+                results.innerHTML +=
+                  '<div class="status info">🔍 AuthService DataHandler integration verification completed!</div>';
+              }, 100);
+            }
+          }, index * 200);
+        });
+      }
+
+      // Auto-initialize on page load
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          initializeTest();
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>

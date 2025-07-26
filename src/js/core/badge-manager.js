@@ -175,25 +175,17 @@ export class BadgeManager {
 
   /**
    * Updates scenario completion and checks for new badge achievements
-   * Follows the same pattern as existing category-grid.js updateProgress method
+   * Enhanced to use DataHandler with localStorage fallback
    * @param {string} categoryId - Category identifier
    * @param {string} scenarioId - Scenario identifier (for logging/analytics)
-   * @returns {Array} Array of newly earned badges
+   * @returns {Promise<Array>} Array of newly earned badges
    */
-  updateScenarioCompletion(categoryId, scenarioId) {
+  async updateScenarioCompletion(categoryId, scenarioId) {
     // Initialize category if needed
     this.initializeCategoryBadges(categoryId);
 
-    // Get current completion count for this category from localStorage
-    // This matches the existing pattern in category-grid.js and category-page.js
-    const stored = localStorage.getItem("simulateai_category_progress");
-    const userProgress = stored ? JSON.parse(stored) : {};
-    const categoryProgress = userProgress[categoryId] || {};
-
-    const completedScenarios = Object.keys(categoryProgress).filter(
-      (scenarioKey) => categoryProgress[scenarioKey] === true,
-    );
-    const completionCount = completedScenarios.length;
+    // Get current completion count using DataHandler-first approach
+    const completionCount = await this.getCategoryCompletionCount(categoryId);
 
     // Update badge state with current count
     this.badgeState[categoryId].totalCompleted = completionCount;
@@ -205,8 +197,8 @@ export class BadgeManager {
       completionCount,
     );
 
-    // Save updated state using sync wrapper for immediate operation
-    this.saveBadgeStateSync();
+    // Save updated state using async operation
+    await this.saveBadgeState();
 
     // Log for analytics if scenario provided
     if (scenarioId) {
@@ -291,39 +283,62 @@ export class BadgeManager {
   /**
    * Gets next available badge for a category
    * @param {string} categoryId - Category identifier
-   * @returns {Object|null} Next badge configuration or null if all earned
+   * @returns {Promise<Object|null>} Next badge configuration or null if all earned
    */
-  getNextBadge(categoryId) {
-    const completionCount = this.getCategoryCompletionCount(categoryId);
+  async getNextBadge(categoryId) {
+    const completionCount = await this.getCategoryCompletionCount(categoryId);
     const nextTier = getNextBadgeTier(completionCount);
 
     return nextTier ? getBadgeConfig(categoryId, nextTier.tier) : null;
   }
 
   /**
-   * Gets completion count for a category using the same localStorage pattern as existing code
+   * Gets completion count for a category using DataHandler with localStorage fallback
    * @param {string} categoryId - Category identifier
    * @returns {number} Number of completed scenarios
    */
-  getCategoryCompletionCount(categoryId) {
-    // Always load fresh category progress from localStorage to match existing pattern
-    const stored = localStorage.getItem("simulateai_category_progress");
-    const userProgress = stored ? JSON.parse(stored) : {};
-    const categoryProgress = userProgress[categoryId] || {};
+  async getCategoryCompletionCount(categoryId) {
+    try {
+      let userProgress = {};
 
-    return Object.keys(categoryProgress).filter(
-      (scenarioKey) => categoryProgress[scenarioKey] === true,
-    ).length;
+      // Try DataHandler first if available
+      if (this.dataHandler) {
+        userProgress = (await this.dataHandler.getData("user_progress")) || {};
+      }
+
+      // Fallback to localStorage if DataHandler unavailable or returns empty
+      if (!userProgress || Object.keys(userProgress).length === 0) {
+        const stored = localStorage.getItem("simulateai_category_progress");
+        userProgress = stored ? JSON.parse(stored) : {};
+      }
+
+      const categoryProgress = userProgress[categoryId] || {};
+      return Object.keys(categoryProgress).filter(
+        (scenarioKey) => categoryProgress[scenarioKey] === true,
+      ).length;
+    } catch (error) {
+      console.warn(
+        `[BadgeManager] Failed to get completion count for ${categoryId}:`,
+        error,
+      );
+      // Final fallback to localStorage
+      const stored = localStorage.getItem("simulateai_category_progress");
+      const userProgress = stored ? JSON.parse(stored) : {};
+      const categoryProgress = userProgress[categoryId] || {};
+      return Object.keys(categoryProgress).filter(
+        (scenarioKey) => categoryProgress[scenarioKey] === true,
+      ).length;
+    }
   }
 
   /**
    * Gets progress towards next badge
    * @param {string} categoryId - Category identifier
-   * @returns {Object} Progress information
+   * @returns {Promise<Object>} Progress information
    */
-  getBadgeProgress(categoryId) {
-    const completionCount = this.getCategoryCompletionCount(categoryId);
-    const nextBadge = this.getNextBadge(categoryId);
+  async getBadgeProgress(categoryId) {
+    const completionCount = await this.getCategoryCompletionCount(categoryId);
+    const nextBadge = await this.getNextBadge(categoryId);
     const earnedBadges = this.getEarnedBadges(categoryId);
 
     return {
@@ -346,18 +361,52 @@ export class BadgeManager {
 
   /**
    * Gets all badge states across all categories
-   * @returns {Object} Complete badge state summary
+   * @returns {Promise<Object>} Complete badge state summary
    */
-  getAllBadgeStates() {
+  async getAllBadgeStates() {
     const allStates = {};
 
-    // Reload category progress to get latest data using consistent localStorage pattern
-    const stored = localStorage.getItem("simulateai_category_progress");
-    const userProgress = stored ? JSON.parse(stored) : {};
+    try {
+      // Get user progress from DataHandler with localStorage fallback
+      let userProgress = {};
 
-    Object.keys(userProgress).forEach((categoryId) => {
-      allStates[categoryId] = this.getBadgeProgress(categoryId);
-    });
+      if (this.dataHandler) {
+        userProgress = (await this.dataHandler.getData("user_progress")) || {};
+      }
+
+      if (!userProgress || Object.keys(userProgress).length === 0) {
+        const stored = localStorage.getItem("simulateai_category_progress");
+        userProgress = stored ? JSON.parse(stored) : {};
+      }
+
+      // Process each category asynchronously
+      const categoryIds = Object.keys(userProgress);
+      const promises = categoryIds.map(async (categoryId) => {
+        const badgeProgress = await this.getBadgeProgress(categoryId);
+        return { categoryId, badgeProgress };
+      });
+
+      const results = await Promise.all(promises);
+      results.forEach(({ categoryId, badgeProgress }) => {
+        allStates[categoryId] = badgeProgress;
+      });
+    } catch (error) {
+      console.warn("[BadgeManager] Failed to get all badge states:", error);
+      // Fallback to localStorage
+      const stored = localStorage.getItem("simulateai_category_progress");
+      const userProgress = stored ? JSON.parse(stored) : {};
+
+      for (const categoryId of Object.keys(userProgress)) {
+        try {
+          allStates[categoryId] = await this.getBadgeProgress(categoryId);
+        } catch (catError) {
+          console.warn(
+            `[BadgeManager] Failed to get badge progress for ${categoryId}:`,
+            catError,
+          );
+        }
+      }
+    }
 
     return allStates;
   }
@@ -401,13 +450,52 @@ export class BadgeManager {
   }
 
   /**
-   * Force updates category progress from current localStorage state
-   * Matches the pattern used in existing category-grid.js and category-page.js
+   * Force updates category progress from DataHandler with localStorage fallback
+   * Enhanced to use DataHandler-first approach for consistency
    */
-  refreshCategoryProgress() {
-    // Load fresh data from localStorage using the same key as existing code
-    const stored = localStorage.getItem("simulateai_category_progress");
-    this.categoryProgress = stored ? JSON.parse(stored) : {};
+  async refreshCategoryProgress() {
+    try {
+      let categoryProgress = {};
+
+      // Try DataHandler first if available
+      if (this.dataHandler) {
+        categoryProgress =
+          (await this.dataHandler.getData("user_progress")) || {};
+      }
+
+      // Fallback to localStorage if DataHandler unavailable or returns empty
+      if (!categoryProgress || Object.keys(categoryProgress).length === 0) {
+        const stored = localStorage.getItem("simulateai_category_progress");
+        categoryProgress = stored ? JSON.parse(stored) : {};
+      }
+
+      this.categoryProgress = categoryProgress;
+    } catch (error) {
+      console.warn(
+        "[BadgeManager] Failed to refresh category progress:",
+        error,
+      );
+      // Final fallback to localStorage
+      const stored = localStorage.getItem("simulateai_category_progress");
+      this.categoryProgress = stored ? JSON.parse(stored) : {};
+    }
+  }
+
+  /**
+   * Synchronous version for backward compatibility
+   * Uses localStorage directly for immediate access
+   */
+  refreshCategoryProgressSync() {
+    try {
+      const stored = localStorage.getItem("simulateai_category_progress");
+      this.categoryProgress = stored ? JSON.parse(stored) : {};
+    } catch (error) {
+      console.warn(
+        "[BadgeManager] Failed to refresh category progress (sync):",
+        error,
+      );
+      this.categoryProgress = {};
+    }
   }
 }
 

@@ -262,8 +262,8 @@ class CategoryHeader {
     const attributes = getAttributes(config);
     const badgeConfig = getBadgeConfig(config);
 
-    // Get badge progress information
-    const badgeProgress = badgeManager.getBadgeProgress(category.id);
+    // Get badge progress information (now async)
+    const badgeProgress = await badgeManager.getBadgeProgress(category.id);
     const isOneScenarioAwayFromBadge =
       badgeProgress.nextBadge &&
       badgeProgress.progress.remaining === badgeConfig.alertThreshold;
@@ -1137,8 +1137,8 @@ class CategoryHeader {
       }
 
       // Update badge alert class and tooltip
-      badgeManager.refreshCategoryProgress();
-      const badgeProgress = badgeManager.getBadgeProgress(categoryId);
+      await badgeManager.refreshCategoryProgress();
+      const badgeProgress = await badgeManager.getBadgeProgress(categoryId);
       const isOneScenarioAwayFromBadge =
         badgeProgress.nextBadge &&
         badgeProgress.progress.remaining === badgeConfig.alertThreshold;
@@ -1200,9 +1200,9 @@ class CategoryHeader {
       const badgeConfig = getBadgeConfig(config);
 
       // Ensure badge manager has latest progress data
-      badgeManager.refreshCategoryProgress();
+      await badgeManager.refreshCategoryProgress();
 
-      const progress = badgeManager.getBadgeProgress(categoryId);
+      const progress = await badgeManager.getBadgeProgress(categoryId);
 
       if (!progress || !progress.nextBadge || !progress.progress) {
         return null;

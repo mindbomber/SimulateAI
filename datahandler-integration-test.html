@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DataHandler Integration Test</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: #333;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2.5rem;
+      }
+
+      .test-section {
+        margin: 30px 0;
+        padding: 20px;
+        border: 2px solid #ecf0f1;
+        border-radius: 10px;
+        background: #f8f9fa;
+      }
+
+      .test-section h2 {
+        color: #34495e;
+        margin-top: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .status {
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        font-weight: bold;
+      }
+
+      .status.success {
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+      }
+
+      .status.error {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+      }
+
+      .status.warning {
+        background-color: #fff3cd;
+        border: 1px solid #ffeaa7;
+        color: #856404;
+      }
+
+      .status.info {
+        background-color: #d1ecf1;
+        border: 1px solid #bee5eb;
+        color: #0c5460;
+      }
+
+      .test-controls {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin: 20px 0;
+      }
+
+      button {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        min-width: 120px;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      button:disabled {
+        background: #bdc3c7;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .data-display {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 15px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 12px;
+        white-space: pre-wrap;
+        max-height: 300px;
+        overflow-y: auto;
+        margin: 10px 0;
+      }
+
+      .progress-indicator {
+        display: none;
+        align-items: center;
+        gap: 10px;
+        color: #3498db;
+        font-weight: 600;
+      }
+
+      .spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #ecf0f1;
+        border-top: 2px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .test-results {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .test-result {
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #3498db;
+      }
+
+      .test-result.pass {
+        background: #d4edda;
+        border-left-color: #27ae60;
+      }
+
+      .test-result.fail {
+        background: #f8d7da;
+        border-left-color: #e74c3c;
+      }
+
+      .test-result h4 {
+        margin: 0 0 10px 0;
+        color: #2c3e50;
+      }
+
+      .emoji {
+        font-size: 1.2em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔗 DataHandler Integration Test</h1>
+      <p style="text-align: center; color: #7f8c8d; font-size: 1.1em">
+        Testing complete DataHandler integration for scenario progress and badge
+        system
+      </p>
+
+      <div class="test-section">
+        <h2><span class="emoji">🔧</span> System Status</h2>
+        <div id="systemStatus">
+          <div class="progress-indicator" id="loadingIndicator">
+            <div class="spinner"></div>
+            <span>Initializing system...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h2><span class="emoji">💾</span> DataHandler Tests</h2>
+        <div class="test-controls">
+          <button onclick="testDataHandlerBasics()">
+            Test DataHandler Basics
+          </button>
+          <button onclick="testProgressSave()">Test Progress Save</button>
+          <button onclick="testProgressLoad()">Test Progress Load</button>
+          <button onclick="testBadgeStateSync()">Test Badge State</button>
+        </div>
+        <div id="dataHandlerResults"></div>
+      </div>
+
+      <div class="test-section">
+        <h2><span class="emoji">🏆</span> Badge System Tests</h2>
+        <div class="test-controls">
+          <button onclick="testBadgeProgress()">Test Badge Progress</button>
+          <button onclick="testAsyncMethods()">Test Async Methods</button>
+          <button onclick="testScenarioCompletion()">
+            Test Scenario Completion
+          </button>
+          <button onclick="simulateDataHandlerFlow()">
+            Simulate Full Flow
+          </button>
+        </div>
+        <div id="badgeSystemResults"></div>
+      </div>
+
+      <div class="test-section">
+        <h2><span class="emoji">📊</span> Data Consistency Tests</h2>
+        <div class="test-controls">
+          <button onclick="testDataConsistency()">Test Data Consistency</button>
+          <button onclick="testFallbackMechanism()">Test Fallback</button>
+          <button onclick="clearAllData()">Clear All Data</button>
+        </div>
+        <div id="consistencyResults"></div>
+      </div>
+
+      <div class="test-section">
+        <h2><span class="emoji">📈</span> Real-time Monitoring</h2>
+        <div id="monitoringData" class="data-display">
+          Monitoring data will appear here...
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import DataHandler from "./src/js/core/data-handler.js";
+      import { BadgeManager } from "./src/js/core/badge-manager.js";
+
+      let dataHandler;
+      let badgeManager;
+      let testResults = {};
+
+      // Wait for DOM to be ready
+      document.addEventListener("DOMContentLoaded", async () => {
+        await initializeSystem();
+      });
+
+      async function initializeSystem() {
+        const statusDiv = document.getElementById("systemStatus");
+        const loadingIndicator = document.getElementById("loadingIndicator");
+
+        try {
+          loadingIndicator.style.display = "flex";
+
+          // Initialize DataHandler
+          statusDiv.innerHTML +=
+            '<div class="status info">🔧 Initializing DataHandler...</div>';
+          dataHandler = new DataHandler({
+            appName: "SimulateAI",
+            version: "1.50",
+            enableFirebase: false, // Test without Firebase first
+            enableCaching: true,
+            enableOfflineQueue: true,
+          });
+          await dataHandler.initialize();
+
+          // Initialize BadgeManager with DataHandler
+          statusDiv.innerHTML +=
+            '<div class="status info">🏆 Initializing BadgeManager...</div>';
+          badgeManager = new BadgeManager({ dataHandler });
+          await badgeManager.initializeAsync();
+
+          // Make available globally for testing
+          window.testDataHandler = dataHandler;
+          window.testBadgeManager = badgeManager;
+
+          loadingIndicator.style.display = "none";
+          statusDiv.innerHTML +=
+            '<div class="status success">✅ System initialized successfully!</div>';
+
+          // Run initial health check
+          await performHealthCheck();
+        } catch (error) {
+          loadingIndicator.style.display = "none";
+          statusDiv.innerHTML += `<div class="status error">❌ Initialization failed: ${error.message}</div>`;
+          console.error("System initialization failed:", error);
+        }
+      }
+
+      async function performHealthCheck() {
+        try {
+          const health = await dataHandler.healthCheck();
+          const statusDiv = document.getElementById("systemStatus");
+
+          statusDiv.innerHTML += `<div class="status ${health.status === "healthy" ? "success" : "warning"}">
+                    📊 Health Check: ${health.status.toUpperCase()}
+                    <br>• localStorage: ${health.localStorage ? "✅" : "❌"}
+                    <br>• Cache: ${health.cache ? "✅" : "❌"}
+                    <br>• Queue Length: ${health.queue}
+                </div>`;
+        } catch (error) {
+          console.error("Health check failed:", error);
+        }
+      }
+
+      window.testDataHandlerBasics = async function () {
+        const resultsDiv = document.getElementById("dataHandlerResults");
+        resultsDiv.innerHTML =
+          '<div class="status info">🧪 Testing DataHandler basics...</div>';
+
+        try {
+          // Test save/get operations
+          const testData = { test: "value", timestamp: Date.now() };
+
+          // Save data
+          const saveResult = await dataHandler.saveData("test_key", testData);
+          const getData = await dataHandler.getData("test_key");
+
+          if (saveResult && getData && getData.test === testData.test) {
+            resultsDiv.innerHTML +=
+              '<div class="status success">✅ Basic save/get operations working</div>';
+            testResults.dataHandlerBasics = true;
+          } else {
+            resultsDiv.innerHTML +=
+              '<div class="status error">❌ Basic operations failed</div>';
+            testResults.dataHandlerBasics = false;
+          }
+
+          // Test specialized methods
+          const progress = { category1: { scenario1: true, scenario2: false } };
+          await dataHandler.saveUserProgress(progress);
+          const loadedProgress = await dataHandler.getUserProgress();
+
+          if (loadedProgress && loadedProgress.category1) {
+            resultsDiv.innerHTML +=
+              '<div class="status success">✅ User progress methods working</div>';
+          } else {
+            resultsDiv.innerHTML +=
+              '<div class="status error">❌ User progress methods failed</div>';
+          }
+        } catch (error) {
+          resultsDiv.innerHTML += `<div class="status error">❌ Error: ${error.message}</div>`;
+          testResults.dataHandlerBasics = false;
+        }
+      };
+
+      window.testProgressSave = async function () {
+        const resultsDiv = document.getElementById("dataHandlerResults");
+        resultsDiv.innerHTML +=
+          '<div class="status info">💾 Testing progress save operations...</div>';
+
+        try {
+          const sampleProgress = {
+            "ai-ethics": {
+              "scenario-1": true,
+              "scenario-2": true,
+              "scenario-3": false,
+            },
+            "bias-fairness": {
+              "scenario-1": true,
+              "scenario-2": false,
+            },
+          };
+
+          // Save via DataHandler
+          const success = await dataHandler.saveUserProgress(sampleProgress);
+
+          // Verify in localStorage (should be synced)
+          const localData = localStorage.getItem(
+            "simulateai_category_progress",
+          );
+          const parsedLocal = localData ? JSON.parse(localData) : {};
+
+          // Verify via DataHandler
+          const handlerData = await dataHandler.getUserProgress();
+
+          if (success && parsedLocal["ai-ethics"] && handlerData["ai-ethics"]) {
+            resultsDiv.innerHTML +=
+              '<div class="status success">✅ Progress save with dual storage working</div>';
+          } else {
+            resultsDiv.innerHTML +=
+              '<div class="status error">❌ Progress save failed</div>';
+          }
+        } catch (error) {
+          resultsDiv.innerHTML += `<div class="status error">❌ Progress save error: ${error.message}</div>`;
+        }
+      };
+
+      window.testBadgeProgress = async function () {
+        const resultsDiv = document.getElementById("badgeSystemResults");
+        resultsDiv.innerHTML =
+          '<div class="status info">🏆 Testing badge progress with DataHandler...</div>';
+
+        try {
+          // Test async getBadgeProgress
+          const progress = await badgeManager.getBadgeProgress("ai-ethics");
+
+          if (progress && typeof progress.completed === "number") {
+            resultsDiv.innerHTML +=
+              '<div class="status success">✅ Async getBadgeProgress working</div>';
+            resultsDiv.innerHTML += `<div class="status info">📊 AI Ethics Progress: ${progress.completed} completed</div>`;
+          } else {
+            resultsDiv.innerHTML +=
+              '<div class="status error">❌ getBadgeProgress failed</div>';
+          }
+
+          // Test completion count
+          const count =
+            await badgeManager.getCategoryCompletionCount("ai-ethics");
+          resultsDiv.innerHTML += `<div class="status info">📈 Completion Count: ${count}</div>`;
+        } catch (error) {
+          resultsDiv.innerHTML += `<div class="status error">❌ Badge progress error: ${error.message}</div>`;
+        }
+      };
+
+      window.testAsyncMethods = async function () {
+        const resultsDiv = document.getElementById("badgeSystemResults");
+        resultsDiv.innerHTML +=
+          '<div class="status info">⚡ Testing all async badge methods...</div>';
+
+        try {
+          // Test all async methods
+          const categoryId = "ai-ethics";
+
+          const [badgeProgress, nextBadge, completionCount, allStates] =
+            await Promise.all([
+              badgeManager.getBadgeProgress(categoryId),
+              badgeManager.getNextBadge(categoryId),
+              badgeManager.getCategoryCompletionCount(categoryId),
+              badgeManager.getAllBadgeStates(),
+            ]);
+
+          const results = {
+            badgeProgress: !!badgeProgress,
+            nextBadge: nextBadge !== undefined,
+            completionCount: typeof completionCount === "number",
+            allStates: !!allStates && typeof allStates === "object",
+          };
+
+          const allPassed = Object.values(results).every((r) => r);
+
+          if (allPassed) {
+            resultsDiv.innerHTML +=
+              '<div class="status success">✅ All async methods working correctly</div>';
+          } else {
+            resultsDiv.innerHTML +=
+              '<div class="status error">❌ Some async methods failed</div>';
+          }
+
+          resultsDiv.innerHTML += `<div class="data-display">${JSON.stringify(results, null, 2)}</div>`;
+        } catch (error) {
+          resultsDiv.innerHTML += `<div class="status error">❌ Async methods error: ${error.message}</div>`;
+        }
+      };
+
+      window.testScenarioCompletion = async function () {
+        const resultsDiv = document.getElementById("badgeSystemResults");
+        resultsDiv.innerHTML +=
+          '<div class="status info">🎯 Testing scenario completion flow...</div>';
+
+        try {
+          // Simulate scenario completion
+          const categoryId = "ai-ethics";
+          const scenarioId = "test-scenario-" + Date.now();
+
+          // Update scenario completion (async)
+          const newBadges = await badgeManager.updateScenarioCompletion(
+            categoryId,
+            scenarioId,
+          );
+
+          resultsDiv.innerHTML += `<div class="status success">✅ Scenario completion processed</div>`;
+          resultsDiv.innerHTML += `<div class="status info">🏆 New badges earned: ${newBadges.length}</div>`;
+
+          if (newBadges.length > 0) {
+            resultsDiv.innerHTML += `<div class="data-display">${JSON.stringify(newBadges, null, 2)}</div>`;
+          }
+        } catch (error) {
+          resultsDiv.innerHTML += `<div class="status error">❌ Scenario completion error: ${error.message}</div>`;
+        }
+      };
+
+      window.simulateDataHandlerFlow = async function () {
+        const resultsDiv = document.getElementById("badgeSystemResults");
+        resultsDiv.innerHTML +=
+          '<div class="status info">🔄 Simulating complete DataHandler flow...</div>';
+
+        try {
+          // 1. Save progress via DataHandler
+          const progress = {
+            "ai-ethics": {
+              "scenario-1": true,
+              "scenario-2": true,
+              "scenario-3": true,
+              "scenario-4": true,
+              "scenario-5": true, // Should trigger badge
+            },
+          };
+
+          await dataHandler.saveUserProgress(progress);
+          resultsDiv.innerHTML +=
+            '<div class="status success">✅ Progress saved via DataHandler</div>';
+
+          // 2. Refresh badge manager to use new data
+          await badgeManager.refreshCategoryProgress();
+          resultsDiv.innerHTML +=
+            '<div class="status success">✅ Badge manager refreshed</div>';
+
+          // 3. Check for badges
+          const badgeProgress =
+            await badgeManager.getBadgeProgress("ai-ethics");
+          resultsDiv.innerHTML += `<div class="status info">📊 Badge Progress: ${badgeProgress.completed} scenarios completed</div>`;
+
+          // 4. Simulate completion trigger
+          const newBadges = await badgeManager.updateScenarioCompletion(
+            "ai-ethics",
+            "final-scenario",
+          );
+          resultsDiv.innerHTML += `<div class="status success">✅ Flow completed - ${newBadges.length} badges earned</div>`;
+        } catch (error) {
+          resultsDiv.innerHTML += `<div class="status error">❌ Flow simulation error: ${error.message}</div>`;
+        }
+      };
+
+      window.testDataConsistency = async function () {
+        const resultsDiv = document.getElementById("consistencyResults");
+        resultsDiv.innerHTML =
+          '<div class="status info">🔍 Testing data consistency...</div>';
+
+        try {
+          const testData = { consistency: "test", timestamp: Date.now() };
+
+          // Save via DataHandler
+          await dataHandler.saveUserProgress(testData);
+
+          // Get via different methods
+          const handlerData = await dataHandler.getUserProgress();
+          const directLocal = JSON.parse(
+            localStorage.getItem("simulateai_category_progress") || "{}",
+          );
+
+          const consistent =
+            JSON.stringify(handlerData) === JSON.stringify(directLocal);
+
+          if (consistent) {
+            resultsDiv.innerHTML +=
+              '<div class="status success">✅ Data consistency maintained</div>';
+          } else {
+            resultsDiv.innerHTML +=
+              '<div class="status error">❌ Data inconsistency detected</div>';
+            resultsDiv.innerHTML += `<div class="data-display">Handler: ${JSON.stringify(handlerData, null, 2)}\n\nLocal: ${JSON.stringify(directLocal, null, 2)}</div>`;
+          }
+        } catch (error) {
+          resultsDiv.innerHTML += `<div class="status error">❌ Consistency test error: ${error.message}</div>`;
+        }
+      };
+
+      window.testFallbackMechanism = async function () {
+        const resultsDiv = document.getElementById("consistencyResults");
+        resultsDiv.innerHTML +=
+          '<div class="status info">🛡️ Testing fallback mechanism...</div>';
+
+        try {
+          // Simulate DataHandler failure by temporarily disabling it
+          const originalDataHandler = badgeManager.dataHandler;
+          badgeManager.dataHandler = null;
+
+          // Test that it falls back to localStorage
+          const count =
+            await badgeManager.getCategoryCompletionCount("ai-ethics");
+
+          // Restore DataHandler
+          badgeManager.dataHandler = originalDataHandler;
+
+          if (typeof count === "number") {
+            resultsDiv.innerHTML +=
+              '<div class="status success">✅ Fallback mechanism working</div>';
+          } else {
+            resultsDiv.innerHTML +=
+              '<div class="status error">❌ Fallback mechanism failed</div>';
+          }
+        } catch (error) {
+          resultsDiv.innerHTML += `<div class="status error">❌ Fallback test error: ${error.message}</div>`;
+        }
+      };
+
+      window.clearAllData = function () {
+        const resultsDiv = document.getElementById("consistencyResults");
+
+        try {
+          // Clear localStorage
+          localStorage.removeItem("simulateai_category_progress");
+          localStorage.removeItem("simulateai_badge_progress");
+
+          // Clear DataHandler cache
+          dataHandler.clearCache();
+
+          resultsDiv.innerHTML +=
+            '<div class="status warning">⚠️ All test data cleared</div>';
+        } catch (error) {
+          resultsDiv.innerHTML += `<div class="status error">❌ Clear data error: ${error.message}</div>`;
+        }
+      };
+
+      // Auto-update monitoring display
+      setInterval(async () => {
+        if (!dataHandler) return;
+
+        try {
+          const metrics = dataHandler.getPerformanceMetrics();
+          const monitoringDiv = document.getElementById("monitoringData");
+
+          const monitoringText = `
+=== DataHandler Performance Metrics ===
+Cache Hit Rate: ${metrics.cacheHitRate?.toFixed(2) || 0}%
+Operations: ${metrics.operationCount}
+Avg Response Time: ${metrics.averageResponseTime?.toFixed(2) || 0}ms
+Cache Size: ${metrics.cacheSize}
+Queue Length: ${metrics.queueLength}
+
+=== Badge Manager Status ===
+Initialized: ${badgeManager ? badgeManager.isInitialized : false}
+Last Updated: ${new Date().toLocaleTimeString()}
+
+=== Storage Status ===
+LocalStorage Available: ${!!window.localStorage}
+DataHandler Ready: ${dataHandler ? "Yes" : "No"}
+                `;
+
+          monitoringDiv.textContent = monitoringText;
+        } catch (error) {
+          // Silent fail for monitoring
+        }
+      }, 2000);
+    </script>
+  </body>
+</html>

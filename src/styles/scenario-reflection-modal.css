@@ -508,14 +508,30 @@ body.dark-mode .scenario-reflection-modal,
 .stakeholder-card:hover,
 .framework-card:hover,
 .insight-card:hover {
-  transform: translateY(-1px);
+  /* Use a more subtle transform to prevent emoji glitches */
+  transform: translateY(-0.5px) translateZ(0);
   box-shadow: var(--lab-shadow-md);
+  /* Ensure smooth rendering during hover */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .stakeholder-icon,
 .insight-icon {
   font-size: var(--lab-text-2xl);
   flex-shrink: 0;
+  /* Fix emoji rendering glitches on transform */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  /* Prevent emoji from being blurry or glitchy */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  /* Ensure emoji stays crisp */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .stakeholder-content h5,

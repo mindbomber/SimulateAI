@@ -4749,7 +4749,7 @@ class SimulateAIApp {
     const now = Date.now();
     if (!this.lastSurpriseTime) this.lastSurpriseTime = 0;
 
-    const SURPRISE_COOLDOWN = 2000; // 2 second cooldown between surprise actions
+    const SURPRISE_COOLDOWN = 500; // Reduced to 500ms - just prevent double-clicks
     if (now - this.lastSurpriseTime < SURPRISE_COOLDOWN) {
       logger.debug(
         "Surprise Me action debounced - too soon after last request",
@@ -5463,8 +5463,8 @@ class SimulateAIApp {
         trackScenarioCompletion: (categoryId, scenarioId) => {
           return this.trackBadgeProgress(categoryId, scenarioId);
         },
-        getBadgeProgress: (categoryId) => {
-          return this.badgeManager.getBadgeProgress(categoryId);
+        getBadgeProgress: async (categoryId) => {
+          return await this.badgeManager.getBadgeProgress(categoryId);
         },
         getEarnedBadges: (categoryId) => {
           return this.badgeManager.getEarnedBadges(categoryId);
@@ -5497,11 +5497,12 @@ class SimulateAIApp {
     }
 
     try {
-      // Update scenario completion and check for new badges
-      const newlyEarnedBadges = this.badgeManager.updateScenarioCompletion(
-        categoryId,
-        scenarioId,
-      );
+      // Update scenario completion and check for new badges (now async)
+      const newlyEarnedBadges =
+        await this.badgeManager.updateScenarioCompletion(
+          categoryId,
+          scenarioId,
+        );
 
       // If badges were earned, show celebration and sync with Firebase
       if (newlyEarnedBadges.length > 0) {

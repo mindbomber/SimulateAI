@@ -584,7 +584,7 @@ export class ScenarioReflectionModal {
       }
 
       const content = this.generateModalContent();
-      const footer = this.generateModalFooter();
+      // Footer is now included within content
 
       if (this.performanceTracker) {
         this.performanceTracker.mark("content-generation-end");
@@ -598,7 +598,7 @@ export class ScenarioReflectionModal {
       this.modal = new ModalUtility({
         title: this.generateModalTitle(),
         content,
-        footer,
+        // footer: null, // Footer is now included in content
         onClose: this.handleClose.bind(this),
         closeOnBackdrop: false,
         closeOnEscape: true,
@@ -650,12 +650,12 @@ export class ScenarioReflectionModal {
 
       // Continue with initialization
       const content = this.generateModalContent();
-      const footer = this.generateModalFooter();
+      // Footer is now included within content
 
       this.modal = new ModalUtility({
         title: this.generateModalTitle(),
         content,
-        footer,
+        // footer: null, // Footer is now included in content
         onClose: this.handleClose.bind(this),
         closeOnBackdrop: false,
         closeOnEscape: true,
@@ -697,14 +697,8 @@ export class ScenarioReflectionModal {
   generateModalContent() {
     return `
       <div class="scenario-reflection-content">
-        <!-- Progress Indicator -->
+        <!-- Progress Steps -->
         <div class="reflection-progress">
-          <div class="progress-bar" role="progressbar" 
-               aria-valuenow="${this.currentStep}" 
-               aria-valuemin="0" 
-               aria-valuemax="${this.totalSteps}">
-            <div class="progress-fill" style="width: ${(this.currentStep / this.totalSteps) * 100}%"></div>
-          </div>
           <div class="progress-steps">
             ${this.generateProgressSteps()}
           </div>
@@ -713,6 +707,11 @@ export class ScenarioReflectionModal {
         <!-- Main Content Area -->
         <div class="reflection-step-content">
           ${this.generateStepContent(this.currentStep)}
+        </div>
+
+        <!-- Footer integrated within content to ensure proper stacking -->
+        <div class="modal-footer scenario-reflection-footer">
+          ${this.generateModalFooter()}
         </div>
       </div>
     `;
@@ -1434,28 +1433,26 @@ export class ScenarioReflectionModal {
    */
   generateModalFooter() {
     return `
-      <div class="modal-footer-content">
-        <div class="footer-left">
-          <button class="btn btn-outline" data-action="skip-reflection">
-            Skip to End
-          </button>
-        </div>
-        
-        <div class="footer-center">
-          <span class="step-indicator">
-            ${this.currentStep + 1} of ${this.totalSteps}
-          </span>
-        </div>
-        
-        <div class="footer-right">
-          <button class="btn btn-secondary" data-action="previous" 
-                  ${this.currentStep === 0 ? "disabled" : ""}>
-            ← Previous
-          </button>
-          <button class="btn btn-primary" data-action="next">
-            ${this.currentStep === this.totalSteps - 1 ? "Complete" : "Next →"}
-          </button>
-        </div>
+      <div class="footer-left">
+        <button class="btn btn-outline" data-action="skip-reflection">
+          Skip to End
+        </button>
+      </div>
+      
+      <div class="footer-center">
+        <span class="step-indicator">
+          ${this.currentStep + 1} of ${this.totalSteps}
+        </span>
+      </div>
+      
+      <div class="footer-right">
+        <button class="btn btn-secondary" data-action="previous" 
+                ${this.currentStep === 0 ? "disabled" : ""}>
+          ← Previous
+        </button>
+        <button class="btn btn-primary" data-action="next">
+          ${this.currentStep === this.totalSteps - 1 ? "Complete" : "Next →"}
+        </button>
       </div>
     `;
   }
@@ -1669,7 +1666,7 @@ export class ScenarioReflectionModal {
       ".reflection-step-content",
     );
     const footerElement = this.modal.element.querySelector(
-      ".modal-footer-content",
+      ".scenario-reflection-footer",
     );
     const progressElement = this.modal.element.querySelector(
       ".reflection-progress",
@@ -1690,12 +1687,7 @@ export class ScenarioReflectionModal {
     }
 
     if (progressElement) {
-      const progressBar = progressElement.querySelector(".progress-fill");
       const progressSteps = progressElement.querySelector(".progress-steps");
-
-      if (progressBar) {
-        progressBar.style.width = `${(this.currentStep / this.totalSteps) * 100}%`;
-      }
 
       if (progressSteps) {
         progressSteps.innerHTML = this.generateProgressSteps();

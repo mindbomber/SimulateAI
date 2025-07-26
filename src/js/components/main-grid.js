@@ -2232,12 +2232,8 @@ class MainGrid {
       const scenarioModal = this.getScenarioModal();
       scenarioModal.open(scenarioId, categoryId);
 
-      // Listen for scenario completion
-      document.addEventListener(
-        "scenario-completed",
-        this.handleScenarioCompleted.bind(this),
-        { once: true },
-      );
+      // Note: No need to add event listener here as we already have a persistent
+      // listener in attachEventListeners() that handles all scenario completions
     } catch (error) {
       logger.error("Failed to open scenario modal:", error);
       // Fallback to alert
@@ -2372,8 +2368,28 @@ class MainGrid {
         },
       });
 
-      // Update progress (without badge checking)
-      this.updateProgress(category.id, scenarioId, true, false);
+      // Update progress (with badge checking for surprise tab scenarios)
+      this.updateProgress(category.id, scenarioId, true, true);
+
+      // Reset surprise tab cooldown to allow immediate new surprise
+      if (window.app && window.app.lastSurpriseTime) {
+        window.app.lastSurpriseTime = 0;
+        logger.debug("Reset surprise tab cooldown after scenario completion");
+      }
+
+      // Reset modal open cooldown to allow immediate new modal opens
+      this.lastModalOpenTime = 0;
+      this.isModalOpen = false;
+      logger.debug("Reset modal cooldown after scenario completion");
+
+      // Reset scenario modal state to allow immediate new opens
+      const scenarioModal = this.getScenarioModal();
+      if (scenarioModal && typeof scenarioModal.resetForReopen === "function") {
+        scenarioModal.resetForReopen();
+        logger.debug(
+          "Reset scenario modal for immediate reopening after completion",
+        );
+      }
 
       // Track analytics if available
       if (window.AnalyticsManager) {
@@ -2610,11 +2626,11 @@ class MainGrid {
    */
   async deferBadgesForReflection(categoryId, scenarioId) {
     try {
-      // Refresh badge manager's category progress
-      badgeManager.refreshCategoryProgress();
+      // Refresh badge manager's category progress (now async)
+      await badgeManager.refreshCategoryProgress();
 
-      // Check for newly earned badges
-      const newBadges = badgeManager.updateScenarioCompletion(
+      // Check for newly earned badges (now async)
+      const newBadges = await badgeManager.updateScenarioCompletion(
         categoryId,
         scenarioId,
       );
@@ -2756,6 +2772,31 @@ class MainGrid {
 
         // Clean up deferred badges
         this.deferredBadges.delete(scenarioId);
+
+        // Reset surprise tab cooldown to allow immediate new surprise
+        if (window.app && window.app.lastSurpriseTime) {
+          window.app.lastSurpriseTime = 0;
+          logger.debug(
+            "Reset surprise tab cooldown after reflection completion",
+          );
+        }
+
+        // Reset modal open cooldown to allow immediate new modal opens
+        this.lastModalOpenTime = 0;
+        this.isModalOpen = false;
+        logger.debug("Reset modal cooldown after reflection completion");
+
+        // Reset scenario modal state to allow immediate new opens
+        const scenarioModal = this.getScenarioModal();
+        if (
+          scenarioModal &&
+          typeof scenarioModal.resetForReopen === "function"
+        ) {
+          scenarioModal.resetForReopen();
+          logger.debug(
+            "Reset scenario modal for immediate reopening after reflection completion",
+          );
+        }
 
         // Track the overall deferred badge completion
         if (window.AnalyticsManager) {

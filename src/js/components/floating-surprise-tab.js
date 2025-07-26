@@ -61,6 +61,17 @@ class FloatingSurpriseTab {
       const { settings } = e.detail;
       this.updateVisibility(settings.surpriseTabEnabled);
     });
+
+    // Listen for surprise me requests from other components
+    document.addEventListener("surpriseMeRequested", (e) => {
+      console.log(
+        "FloatingSurpriseTab: Received surpriseMeRequested event:",
+        e.detail,
+      );
+      if (e.detail && e.detail.source !== "floating-tab") {
+        this.addSuccessFeedback();
+      }
+    });
   }
 
   applyInitialSettings() {
@@ -318,21 +329,107 @@ class FloatingSurpriseTab {
   }
 
   triggerSurpriseMe() {
-    // Trigger the surprise me functionality
-    if (typeof window.app !== "undefined" && window.app.launchRandomScenario) {
-      window.app.launchRandomScenario();
-    } else if (typeof window.triggerSurpriseMe === "function") {
-      window.triggerSurpriseMe();
-    } else {
-      // Fallback: try to click the original surprise me button
-      const originalButton = document.getElementById("surprise-me-nav");
-      if (originalButton) {
-        originalButton.click();
+    console.log("FloatingSurpriseTab: triggerSurpriseMe called");
+
+    // Try multiple approaches to trigger surprise me functionality
+    let success = false;
+
+    // Approach 1: Use main grid's launch random scenario method
+    if (
+      window.mainGrid &&
+      typeof window.mainGrid.launchRandomScenario === "function"
+    ) {
+      console.log("FloatingSurpriseTab: Using mainGrid.launchRandomScenario");
+      try {
+        window.mainGrid.launchRandomScenario();
+        success = true;
+      } catch (error) {
+        console.error(
+          "FloatingSurpriseTab: Error with mainGrid.launchRandomScenario:",
+          error,
+        );
       }
     }
 
-    // Add visual feedback
-    this.addSuccessFeedback();
+    // Approach 2: Use app's launch random scenario method
+    if (
+      !success &&
+      window.app &&
+      typeof window.app.launchRandomScenario === "function"
+    ) {
+      console.log("FloatingSurpriseTab: Using app.launchRandomScenario");
+      try {
+        window.app.launchRandomScenario();
+        success = true;
+      } catch (error) {
+        console.error(
+          "FloatingSurpriseTab: Error with app.launchRandomScenario:",
+          error,
+        );
+      }
+    }
+
+    // Approach 3: Use global triggerSurpriseMe function
+    if (
+      !success &&
+      typeof window.triggerSurpriseMe === "function" &&
+      window.triggerSurpriseMe !== this.triggerSurpriseMe
+    ) {
+      console.log("FloatingSurpriseTab: Using global triggerSurpriseMe");
+      try {
+        window.triggerSurpriseMe();
+        success = true;
+      } catch (error) {
+        console.error(
+          "FloatingSurpriseTab: Error with global triggerSurpriseMe:",
+          error,
+        );
+      }
+    }
+
+    // Approach 4: Fallback to clicking the original surprise me button
+    if (!success) {
+      console.log("FloatingSurpriseTab: Fallback to clicking original button");
+      const originalButton = document.getElementById("surprise-me-nav");
+      if (originalButton) {
+        try {
+          originalButton.click();
+          success = true;
+        } catch (error) {
+          console.error(
+            "FloatingSurpriseTab: Error clicking original button:",
+            error,
+          );
+        }
+      }
+    }
+
+    // Approach 5: Try to trigger via custom event
+    if (!success) {
+      console.log("FloatingSurpriseTab: Dispatching custom event");
+      try {
+        const event = new CustomEvent("surpriseMeRequested", {
+          detail: { source: "floating-tab" },
+        });
+        document.dispatchEvent(event);
+        success = true;
+      } catch (error) {
+        console.error(
+          "FloatingSurpriseTab: Error dispatching custom event:",
+          error,
+        );
+      }
+    }
+
+    if (success) {
+      // Add visual feedback
+      this.addSuccessFeedback();
+    } else {
+      console.warn(
+        "FloatingSurpriseTab: All approaches failed to trigger surprise me",
+      );
+      this.addErrorFeedback();
+    }
   }
 
   addSuccessFeedback() {
@@ -345,6 +442,25 @@ class FloatingSurpriseTab {
 
       title.textContent = "Loading...";
       subtitle.textContent = "Finding perfect scenario";
+
+      // Reset after a short delay
+      setTimeout(() => {
+        title.textContent = originalTitle;
+        subtitle.textContent = originalSubtitle;
+      }, SURPRISE_FEEDBACK_DURATION);
+    }
+  }
+
+  addErrorFeedback() {
+    const title = this.container.querySelector(".surprise-tab-title");
+    const subtitle = this.container.querySelector(".surprise-tab-subtitle");
+
+    if (title && subtitle) {
+      const originalTitle = title.textContent;
+      const originalSubtitle = subtitle.textContent;
+
+      title.textContent = "Oops!";
+      subtitle.textContent = "Try again in a moment";
 
       // Reset after a short delay
       setTimeout(() => {
@@ -393,6 +509,6 @@ window.triggerSurpriseMe = function () {
 };
 
 // Export for potential manual initialization
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = FloatingSurpriseTab;
+if (typeof window !== "undefined") {
+  window.FloatingSurpriseTab = FloatingSurpriseTab;
 }

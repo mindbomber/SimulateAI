@@ -2354,6 +2354,18 @@ class ScenarioModal {
       };
     }
   }
+
+  /**
+   * Reset modal state to allow immediate reopening
+   * Called after scenario completion to ensure subsequent opens work
+   */
+  resetForReopen() {
+    logger.debug("ScenarioModal: Resetting state for immediate reopening");
+    this.isOpening = false;
+    this.isClosing = false;
+    // Don't set modal = null as that's handled by the close() method
+    // This method only resets the flags that might block reopening
+  }
 }
 
 export default ScenarioModal;

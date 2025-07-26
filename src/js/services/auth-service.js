@@ -25,7 +25,7 @@ import { initializeUIDNormalizer } from "../utils/uid-normalizer.js";
 import eventDispatcher, { AUTH_EVENTS } from "../utils/event-dispatcher.js";
 
 export class AuthService {
-  constructor(existingFirebaseService = null) {
+  constructor(existingFirebaseService = null, app = null) {
     this.firebaseService = existingFirebaseService || new FirebaseService();
     this.currentUser = null;
     this.userProfile = null;
@@ -34,6 +34,10 @@ export class AuthService {
     this.logoutManager = null;
     this.uidNormalizer = null;
     this.firestoreService = null;
+
+    // DataHandler integration for centralized data management
+    this.app = app;
+    this.dataHandler = app?.dataHandler || null;
 
     // Initialize components when available
     this.initializeRateLimitStatus();
@@ -156,7 +160,10 @@ export class AuthService {
       if (this.logoutManager && !previousUser) {
         this.logoutManager.extendSession();
         try {
-          localStorage.setItem("session_start_time", Date.now().toString());
+          await this.saveSessionData(
+            "session_start_time",
+            Date.now().toString(),
+          );
         } catch (error) {
           // Ignore storage errors
         }
@@ -174,7 +181,7 @@ export class AuthService {
       // Clear session data when user logs out
       if (previousUser) {
         try {
-          localStorage.removeItem("session_start_time");
+          await this.removeSessionData("session_start_time");
         } catch (error) {
           // Ignore storage errors
         }
@@ -1072,18 +1079,16 @@ export class AuthService {
    */
   async applySavedPersistencePreferences() {
     try {
-      const savedPrefs = localStorage.getItem("simulateai_auth_persistence");
+      const savedPrefs = await this.loadAuthPreferences();
       if (!savedPrefs) return;
-
-      const prefs = JSON.parse(savedPrefs);
 
       // Apply the saved persistence mode
       const options = {};
-      if (prefs.autoSignOutMinutes) {
-        options.autoSignOutMinutes = prefs.autoSignOutMinutes;
+      if (savedPrefs.autoSignOutMinutes) {
+        options.autoSignOutMinutes = savedPrefs.autoSignOutMinutes;
       }
 
-      await this.firebaseService.setAuthPersistence(prefs.mode, options);
+      await this.firebaseService.setAuthPersistence(savedPrefs.mode, options);
     } catch (error) {
       // Persistence preferences could not be applied
     }
@@ -1194,15 +1199,12 @@ export class AuthService {
       );
 
       if (result.success) {
-        // Save user preference
-        localStorage.setItem(
-          "simulateai_auth_persistence",
-          JSON.stringify({
-            mode: selectedMode,
-            autoSignOutMinutes: options.autoSignOutMinutes || null,
-            setAt: new Date().toISOString(),
-          }),
-        );
+        // Save user preference using DataHandler
+        await this.saveAuthPreferences({
+          mode: selectedMode,
+          autoSignOutMinutes: options.autoSignOutMinutes || null,
+          setAt: new Date().toISOString(),
+        });
 
         this.showInfoMessage(
           `Session settings updated: ${this.getPersistenceDisplayName(selectedMode)}`,
@@ -2040,9 +2042,9 @@ export class AuthService {
   /**
    * Clear local session data
    */
-  clearSessionData() {
+  async clearSessionData() {
     try {
-      localStorage.removeItem("session_start_time");
+      await this.removeSessionData("session_start_time");
       sessionStorage.clear();
     } catch (error) {
       // Ignore storage errors
@@ -2380,11 +2382,10 @@ export class AuthService {
   /**
    * Get session ID for tracking
    */
-  getSessionId() {
+  async getSessionId() {
     try {
-      return (
-        localStorage.getItem("session_start_time") || `session_${Date.now()}`
-      );
+      const sessionStartTime = await this.loadSessionData("session_start_time");
+      return sessionStartTime || `session_${Date.now()}`;
     } catch (error) {
       return `session_${Date.now()}`;
     }
@@ -2450,9 +2451,9 @@ export class AuthService {
   /**
    * Clear all local user data (localStorage, sessionStorage, etc.)
    */
-  clearLocalUserData() {
+  async clearLocalUserData() {
     try {
-      // Clear auth-related localStorage items
+      // Clear auth-related data using DataHandler
       const authKeys = [
         "session_start_time",
         "simulateai_auth_persistence",
@@ -2460,13 +2461,13 @@ export class AuthService {
         "learning_progress",
       ];
 
-      authKeys.forEach((key) => {
+      for (const key of authKeys) {
         try {
-          localStorage.removeItem(key);
+          await this.removeSessionData(key);
         } catch (error) {
           // Ignore individual removal errors
         }
-      });
+      }
 
       // Clear any sessionStorage data
       try {
@@ -2617,6 +2618,172 @@ export class AuthService {
       return true;
     }
     return false;
+  }
+
+  // DataHandler Storage Methods
+
+  /**
+   * Load authentication preferences using DataHandler with localStorage fallback
+   */
+  async loadAuthPreferences() {
+    // Try DataHandler first
+    if (this.dataHandler) {
+      try {
+        const prefs = await this.dataHandler.getData("authService_persistence");
+        if (prefs) {
+          return prefs;
+        }
+      } catch (error) {
+        console.warn(
+          "[AuthService] DataHandler failed, using localStorage fallback for auth preferences:",
+          error,
+        );
+      }
+    }
+
+    // Fallback to localStorage
+    try {
+      const stored = localStorage.getItem("simulateai_auth_persistence");
+      return stored ? JSON.parse(stored) : null;
+    } catch (error) {
+      console.error("Failed to load auth preferences:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Save authentication preferences using DataHandler with localStorage fallback
+   */
+  async saveAuthPreferences(preferences) {
+    // Try DataHandler first
+    if (this.dataHandler) {
+      try {
+        await this.dataHandler.saveData("authService_persistence", preferences);
+        // Also save to localStorage for immediate access
+        localStorage.setItem(
+          "simulateai_auth_persistence",
+          JSON.stringify(preferences),
+        );
+        return;
+      } catch (error) {
+        console.warn(
+          "[AuthService] DataHandler failed, using localStorage fallback for saving auth preferences:",
+          error,
+        );
+      }
+    }
+
+    // Fallback to localStorage
+    try {
+      localStorage.setItem(
+        "simulateai_auth_persistence",
+        JSON.stringify(preferences),
+      );
+    } catch (error) {
+      console.error("Failed to save auth preferences:", error);
+    }
+  }
+
+  /**
+   * Load session data using DataHandler with localStorage fallback
+   */
+  async loadSessionData(key) {
+    // Try DataHandler first
+    if (this.dataHandler) {
+      try {
+        const data = await this.dataHandler.getData(`authService_${key}`);
+        if (data !== null && data !== undefined) {
+          return data;
+        }
+      } catch (error) {
+        console.warn(
+          `[AuthService] DataHandler failed, using localStorage fallback for ${key}:`,
+          error,
+        );
+      }
+    }
+
+    // Fallback to localStorage
+    try {
+      return localStorage.getItem(key);
+    } catch (error) {
+      console.error(`Failed to load session data for ${key}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Save session data using DataHandler with localStorage fallback
+   */
+  async saveSessionData(key, value) {
+    // Try DataHandler first
+    if (this.dataHandler) {
+      try {
+        await this.dataHandler.saveData(`authService_${key}`, value);
+        // Also save to localStorage for immediate access
+        localStorage.setItem(key, value);
+        return;
+      } catch (error) {
+        console.warn(
+          `[AuthService] DataHandler failed, using localStorage fallback for saving ${key}:`,
+          error,
+        );
+      }
+    }
+
+    // Fallback to localStorage
+    try {
+      localStorage.setItem(key, value);
+    } catch (error) {
+      console.error(`Failed to save session data for ${key}:`, error);
+    }
+  }
+
+  /**
+   * Remove session data using DataHandler with localStorage fallback
+   */
+  async removeSessionData(key) {
+    // Try DataHandler first
+    if (this.dataHandler) {
+      try {
+        await this.dataHandler.removeData(`authService_${key}`);
+        // Also remove from localStorage
+        localStorage.removeItem(key);
+        return;
+      } catch (error) {
+        console.warn(
+          `[AuthService] DataHandler failed, using localStorage fallback for removing ${key}:`,
+          error,
+        );
+      }
+    }
+
+    // Fallback to localStorage
+    try {
+      localStorage.removeItem(key);
+    } catch (error) {
+      console.error(`Failed to remove session data for ${key}:`, error);
+    }
+  }
+
+  /**
+   * Initialize async data loading for enhanced integration
+   */
+  async initializeAsync() {
+    if (!this.dataHandler) {
+      console.warn(
+        "[AuthService] No DataHandler available for async initialization",
+      );
+      return;
+    }
+
+    try {
+      // Pre-load auth preferences for faster access
+      await this.loadAuthPreferences();
+      console.log("[AuthService] Async initialization completed");
+    } catch (error) {
+      console.error("[AuthService] Async initialization failed:", error);
+    }
   }
 }
 

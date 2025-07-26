@@ -250,43 +250,189 @@ class SimpleStorageManager {
 
 /**
  * Convenience methods for common storage operations
+ * Enhanced with DataHandler integration for Phase 3.3
  */
 class UserPreferences {
-  constructor(storage) {
+  constructor(storage, app = null) {
     this.storage = storage;
+    this.dataHandler = app?.dataHandler || null;
+
+    if (this.dataHandler) {
+      console.log("[UserPreferences] DataHandler integration enabled");
+    } else {
+      console.log("[UserPreferences] Using storage-only mode");
+    }
   }
 
   // User interface preferences
-  getTheme() {
+  async getTheme() {
+    // Try DataHandler first if available
+    if (this.dataHandler) {
+      try {
+        const theme = await this.dataHandler.getData("userPreferences_theme");
+        if (theme !== null && theme !== undefined) {
+          return theme;
+        }
+      } catch (error) {
+        console.warn(
+          "[UserPreferences] DataHandler failed for theme, using storage fallback:",
+          error,
+        );
+      }
+    }
+
+    // Fallback to storage
     return this.storage.get("theme", "light");
   }
 
-  setTheme(theme) {
+  async setTheme(theme) {
+    // Try DataHandler first if available
+    if (this.dataHandler) {
+      try {
+        const success = await this.dataHandler.saveData(
+          "userPreferences_theme",
+          theme,
+        );
+        if (success) {
+          console.log("[UserPreferences] Theme saved to DataHandler");
+          // Also save to storage for immediate access
+          this.storage.set("theme", theme);
+          return;
+        }
+      } catch (error) {
+        console.warn(
+          "[UserPreferences] DataHandler failed for saving theme, using storage fallback:",
+          error,
+        );
+      }
+    }
+
+    // Fallback to storage
     this.storage.set("theme", theme);
   }
 
-  getLanguage() {
+  async getLanguage() {
+    // Try DataHandler first if available
+    if (this.dataHandler) {
+      try {
+        const language = await this.dataHandler.getData(
+          "userPreferences_language",
+        );
+        if (language !== null && language !== undefined) {
+          return language;
+        }
+      } catch (error) {
+        console.warn(
+          "[UserPreferences] DataHandler failed for language, using storage fallback:",
+          error,
+        );
+      }
+    }
+
+    // Fallback to storage
     return this.storage.get("language", "en");
   }
 
-  setLanguage(language) {
+  async setLanguage(language) {
+    // Try DataHandler first if available
+    if (this.dataHandler) {
+      try {
+        const success = await this.dataHandler.saveData(
+          "userPreferences_language",
+          language,
+        );
+        if (success) {
+          console.log("[UserPreferences] Language saved to DataHandler");
+          // Also save to storage for immediate access
+          this.storage.set("language", language);
+          return;
+        }
+      } catch (error) {
+        console.warn(
+          "[UserPreferences] DataHandler failed for saving language, using storage fallback:",
+          error,
+        );
+      }
+    }
+
+    // Fallback to storage
     this.storage.set("language", language);
   }
 
   // Accessibility preferences
-  getAccessibilitySettings() {
+  async getAccessibilitySettings() {
+    // Try DataHandler first if available
+    if (this.dataHandler) {
+      try {
+        const settings = await this.dataHandler.getData(
+          "userPreferences_accessibility",
+        );
+        if (settings !== null && settings !== undefined) {
+          return settings;
+        }
+      } catch (error) {
+        console.warn(
+          "[UserPreferences] DataHandler failed for accessibility settings, using storage fallback:",
+          error,
+        );
+      }
+    }
+
+    // Fallback to storage
     return this.storage.get("accessibility", {
       // Note: undefined values mean user hasn't set them explicitly
       // Boolean values mean user has made an explicit choice
     });
   }
 
-  setAccessibilitySettings(settings) {
+  async setAccessibilitySettings(settings) {
+    // Try DataHandler first if available
+    if (this.dataHandler) {
+      try {
+        const success = await this.dataHandler.saveData(
+          "userPreferences_accessibility",
+          settings,
+        );
+        if (success) {
+          console.log(
+            "[UserPreferences] Accessibility settings saved to DataHandler",
+          );
+          // Also save to storage for immediate access
+          this.storage.set("accessibility", settings);
+          return;
+        }
+      } catch (error) {
+        console.warn(
+          "[UserPreferences] DataHandler failed for saving accessibility settings, using storage fallback:",
+          error,
+        );
+      }
+    }
+
+    // Fallback to storage
     this.storage.set("accessibility", settings);
   }
 
   // Pre-launch modal preferences
-  getPreLaunchSettings() {
+  async getPreLaunchSettings() {
+    // Try DataHandler first if available
+    if (this.dataHandler) {
+      try {
+        const settings = await this.dataHandler.getData(
+          "userPreferences_preLaunch",
+        );
+        if (settings !== null && settings !== undefined) {
+          return settings;
+        }
+      } catch (error) {
+        console.warn(
+          "[UserPreferences] DataHandler failed for pre-launch settings, using storage fallback:",
+          error,
+        );
+      }
+    }
+
+    // Fallback to storage
     return this.storage.get("preLaunchSettings", {
       skipPreLaunch: false,
       skipPreLaunchFor: {},
@@ -294,39 +440,145 @@ class UserPreferences {
     });
   }
 
-  setPreLaunchSettings(settings) {
+  async setPreLaunchSettings(settings) {
+    // Try DataHandler first if available
+    if (this.dataHandler) {
+      try {
+        const success = await this.dataHandler.saveData(
+          "userPreferences_preLaunch",
+          settings,
+        );
+        if (success) {
+          console.log(
+            "[UserPreferences] Pre-launch settings saved to DataHandler",
+          );
+          // Also save to storage for immediate access
+          this.storage.set("preLaunchSettings", settings);
+          return;
+        }
+      } catch (error) {
+        console.warn(
+          "[UserPreferences] DataHandler failed for saving pre-launch settings, using storage fallback:",
+          error,
+        );
+      }
+    }
+
+    // Fallback to storage
     this.storage.set("preLaunchSettings", settings);
   }
 
   // Convenience methods for pre-launch modal
-  shouldSkipPreLaunch(simulationId = null) {
-    const settings = this.getPreLaunchSettings();
+  async shouldSkipPreLaunch(simulationId = null) {
+    const settings = await this.getPreLaunchSettings();
     if (simulationId) {
       return settings.skipPreLaunch || settings.skipPreLaunchFor[simulationId];
     }
     return settings.skipPreLaunch;
   }
 
-  setSkipPreLaunchFor(simulationId, skip = true) {
-    const settings = this.getPreLaunchSettings();
+  async setSkipPreLaunchFor(simulationId, skip = true) {
+    const settings = await this.getPreLaunchSettings();
     settings.skipPreLaunchFor[simulationId] = skip;
-    this.setPreLaunchSettings(settings);
+    await this.setPreLaunchSettings(settings);
   }
 
-  setSkipPreLaunchGlobally(skip = true) {
-    const settings = this.getPreLaunchSettings();
+  async setSkipPreLaunchGlobally(skip = true) {
+    const settings = await this.getPreLaunchSettings();
     settings.skipPreLaunch = skip;
-    this.setPreLaunchSettings(settings);
+    await this.setPreLaunchSettings(settings);
   }
 
   // All preferences as one object
-  getAllPreferences() {
+  async getAllPreferences() {
     return {
-      theme: this.getTheme(),
-      language: this.getLanguage(),
-      accessibility: this.getAccessibilitySettings(),
-      preLaunch: this.getPreLaunchSettings(),
+      theme: await this.getTheme(),
+      language: await this.getLanguage(),
+      accessibility: await this.getAccessibilitySettings(),
+      preLaunch: await this.getPreLaunchSettings(),
     };
+  }
+
+  /**
+   * Enhanced data migration - migrate existing storage data to DataHandler
+   */
+  async migratePreferencesToDataHandler() {
+    if (!this.dataHandler) {
+      console.log("[UserPreferences] No DataHandler available for migration");
+      return;
+    }
+
+    try {
+      const migrationKeys = [
+        { storage: "theme", dataHandler: "userPreferences_theme" },
+        { storage: "language", dataHandler: "userPreferences_language" },
+        {
+          storage: "accessibility",
+          dataHandler: "userPreferences_accessibility",
+        },
+        {
+          storage: "preLaunchSettings",
+          dataHandler: "userPreferences_preLaunch",
+        },
+      ];
+
+      let migratedCount = 0;
+
+      for (const keyMap of migrationKeys) {
+        try {
+          // Check if data exists in storage but not in DataHandler
+          const storageData = this.storage.get(keyMap.storage);
+          if (storageData !== null && storageData !== undefined) {
+            const existingData = await this.dataHandler.getData(
+              keyMap.dataHandler,
+            );
+            if (existingData === null || existingData === undefined) {
+              // Migrate to DataHandler
+              await this.dataHandler.saveData(keyMap.dataHandler, storageData, {
+                source: "UserPreferences_migration",
+              });
+              migratedCount++;
+              console.log(
+                `[UserPreferences] Migrated ${keyMap.storage} to DataHandler`,
+              );
+            }
+          }
+        } catch (keyError) {
+          console.warn(
+            `[UserPreferences] Failed to migrate ${keyMap.storage}:`,
+            keyError,
+          );
+        }
+      }
+
+      if (migratedCount > 0) {
+        console.log(
+          `[UserPreferences] Successfully migrated ${migratedCount} preference keys to DataHandler`,
+        );
+      } else {
+        console.log("[UserPreferences] No preferences required migration");
+      }
+    } catch (error) {
+      console.error("[UserPreferences] Preferences migration failed:", error);
+    }
+  }
+
+  /**
+   * Initialize UserPreferences with enhanced app integration
+   * This method allows late binding of DataHandler after initial creation
+   */
+  async initialize(app = null) {
+    this.dataHandler = app?.dataHandler || null;
+
+    if (this.dataHandler) {
+      console.log(
+        "[UserPreferences] Enhanced integration enabled with DataHandler",
+      );
+      // Perform migration if DataHandler is available
+      await this.migratePreferencesToDataHandler();
+    } else {
+      console.log("[UserPreferences] Running in storage-only mode");
+    }
   }
 }
 

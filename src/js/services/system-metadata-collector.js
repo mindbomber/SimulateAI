@@ -32,8 +32,13 @@ const SYSTEM_CONSTANTS = {
 };
 
 export class SystemMetadataCollector {
-  constructor(firebaseService = null) {
+  constructor(firebaseService = null, app = null) {
     this.firebaseService = firebaseService;
+
+    // DataHandler integration for centralized telemetry management
+    this.app = app;
+    this.dataHandler = app?.dataHandler || null;
+
     this.sessionData = {
       sessionId: this.generateSessionId(),
       startTime: new Date(),
@@ -401,7 +406,7 @@ export class SystemMetadataCollector {
         await this.firebaseService.addSystemMetricsBatch(batch);
       } else {
         // Fallback to local storage for development
-        this.storeBatchLocally(batch);
+        await this.storeBatchLocally(batch);
       }
     } catch (error) {
       // Silent fail for metrics - don't interrupt user experience
@@ -417,10 +422,8 @@ export class SystemMetadataCollector {
   /**
    * Store batch locally for development/testing
    */
-  storeBatchLocally(batch) {
-    const existingData = JSON.parse(
-      localStorage.getItem("systemMetrics") || "[]",
-    );
+  async storeBatchLocally(batch) {
+    const existingData = await this.loadSystemMetrics();
     existingData.push(...batch);
 
     // Keep only last entries to prevent storage overflow
@@ -431,7 +434,7 @@ export class SystemMetadataCollector {
       );
     }
 
-    localStorage.setItem("systemMetrics", JSON.stringify(existingData));
+    await this.saveSystemMetrics(existingData);
   }
 
   /**
@@ -601,8 +604,8 @@ export class SystemMetadataCollector {
     return this.calculateEngagementInsights();
   }
 
-  exportLocalData() {
-    const localData = JSON.parse(localStorage.getItem("systemMetrics") || "[]");
+  async exportLocalData() {
+    const localData = await this.loadSystemMetrics();
     return {
       sessionData: this.sessionData,
       performanceMetrics: this.performanceMetrics,
@@ -610,14 +613,196 @@ export class SystemMetadataCollector {
       insights: this.generateAnonymizedInsights(),
     };
   }
+
+  // DataHandler Storage Methods
+
+  /**
+   * Load system metrics using DataHandler with localStorage fallback
+   */
+  async loadSystemMetrics() {
+    // Try DataHandler first
+    if (this.dataHandler) {
+      try {
+        const metrics = await this.dataHandler.getData(
+          "systemMetadataCollector_metrics",
+        );
+        if (metrics && Array.isArray(metrics)) {
+          return metrics;
+        }
+      } catch (error) {
+        console.warn(
+          "[SystemMetadataCollector] DataHandler failed, using localStorage fallback for metrics:",
+          error,
+        );
+      }
+    }
+
+    // Fallback to localStorage
+    try {
+      return JSON.parse(localStorage.getItem("systemMetrics") || "[]");
+    } catch (error) {
+      console.error("Failed to load system metrics:", error);
+      return [];
+    }
+  }
+
+  /**
+   * Save system metrics using DataHandler with localStorage fallback
+   */
+  async saveSystemMetrics(metrics) {
+    // Try DataHandler first
+    if (this.dataHandler) {
+      try {
+        await this.dataHandler.saveData(
+          "systemMetadataCollector_metrics",
+          metrics,
+        );
+        // Also save to localStorage for immediate access
+        localStorage.setItem("systemMetrics", JSON.stringify(metrics));
+        return;
+      } catch (error) {
+        console.warn(
+          "[SystemMetadataCollector] DataHandler failed, using localStorage fallback for saving metrics:",
+          error,
+        );
+      }
+    }
+
+    // Fallback to localStorage
+    try {
+      localStorage.setItem("systemMetrics", JSON.stringify(metrics));
+    } catch (error) {
+      console.error("Failed to save system metrics:", error);
+    }
+  }
+
+  /**
+   * Load performance data using DataHandler with localStorage fallback
+   */
+  async loadPerformanceData() {
+    // Try DataHandler first
+    if (this.dataHandler) {
+      try {
+        const perfData = await this.dataHandler.getData(
+          "systemMetadataCollector_performance",
+        );
+        if (perfData) {
+          return perfData;
+        }
+      } catch (error) {
+        console.warn(
+          "[SystemMetadataCollector] DataHandler failed, using localStorage fallback for performance data:",
+          error,
+        );
+      }
+    }
+
+    // Fallback to localStorage
+    try {
+      const stored = localStorage.getItem("systemPerformanceData");
+      return stored ? JSON.parse(stored) : null;
+    } catch (error) {
+      console.error("Failed to load performance data:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Save performance data using DataHandler with localStorage fallback
+   */
+  async savePerformanceData(performanceData) {
+    // Try DataHandler first
+    if (this.dataHandler) {
+      try {
+        await this.dataHandler.saveData(
+          "systemMetadataCollector_performance",
+          performanceData,
+        );
+        // Also save to localStorage for immediate access
+        localStorage.setItem(
+          "systemPerformanceData",
+          JSON.stringify(performanceData),
+        );
+        return;
+      } catch (error) {
+        console.warn(
+          "[SystemMetadataCollector] DataHandler failed, using localStorage fallback for saving performance data:",
+          error,
+        );
+      }
+    }
+
+    // Fallback to localStorage
+    try {
+      localStorage.setItem(
+        "systemPerformanceData",
+        JSON.stringify(performanceData),
+      );
+    } catch (error) {
+      console.error("Failed to save performance data:", error);
+    }
+  }
+
+  /**
+   * Initialize async data loading for enhanced integration
+   */
+  async initializeAsync() {
+    if (!this.dataHandler) {
+      console.warn(
+        "[SystemMetadataCollector] No DataHandler available for async initialization",
+      );
+      return;
+    }
+
+    try {
+      // Pre-load system metrics for faster access
+      await this.loadSystemMetrics();
+      // Pre-load performance data
+      await this.loadPerformanceData();
+      console.log("[SystemMetadataCollector] Async initialization completed");
+    } catch (error) {
+      console.error(
+        "[SystemMetadataCollector] Async initialization failed:",
+        error,
+      );
+    }
+  }
+
+  /**
+   * Clear all stored metrics (both DataHandler and localStorage)
+   */
+  async clearAllMetrics() {
+    // Clear from DataHandler
+    if (this.dataHandler) {
+      try {
+        await this.dataHandler.removeData("systemMetadataCollector_metrics");
+        await this.dataHandler.removeData(
+          "systemMetadataCollector_performance",
+        );
+      } catch (error) {
+        console.warn(
+          "[SystemMetadataCollector] Failed to clear DataHandler metrics:",
+          error,
+        );
+      }
+    }
+
+    // Clear from localStorage
+    try {
+      localStorage.removeItem("systemMetrics");
+      localStorage.removeItem("systemPerformanceData");
+    } catch (error) {
+      console.error("Failed to clear localStorage metrics:", error);
+    }
+  }
 }
 
 // Singleton pattern for global access
 let systemCollector = null;
 
-export const getSystemCollector = (firebaseService = null) => {
+export const getSystemCollector = (firebaseService = null, app = null) => {
   if (!systemCollector) {
-    systemCollector = new SystemMetadataCollector(firebaseService);
+    systemCollector = new SystemMetadataCollector(firebaseService, app);
   }
   return systemCollector;
 };

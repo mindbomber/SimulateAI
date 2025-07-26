@@ -140,6 +140,22 @@ class EnhancedApp {
         initializer: this.initializeUserEngagementTracker.bind(this),
       },
       {
+        name: "authService", // Phase 3.1: Authentication DataHandler integration
+        initializer: this.initializeAuthService.bind(this),
+      },
+      {
+        name: "systemMetadataCollector", // Phase 3.2: System metrics DataHandler integration
+        initializer: this.initializeSystemMetadataCollector.bind(this),
+      },
+      {
+        name: "userPreferences", // Phase 3.3: User preferences DataHandler integration
+        initializer: this.initializeUserPreferences.bind(this),
+      },
+      {
+        name: "scenarioDataManager", // Phase 3.4: Scenario data management DataHandler integration
+        initializer: this.initializeScenarioDataManager.bind(this),
+      },
+      {
         name: "unifiedAnimationManager", // Phase 2.3
         initializer: this.initializeUnifiedAnimationManager.bind(this),
       },
@@ -572,6 +588,342 @@ class EnhancedApp {
       );
     } catch (error) {
       console.error("[EnhancedApp] BadgeManager initialization failed:", error);
+    }
+  }
+
+  /**
+   * Enhanced AuthService integration
+   * Phase 3.1: Authentication system DataHandler migration
+   */
+  async initializeAuthService() {
+    if (!window.AuthService) {
+      console.warn("[EnhancedApp] AuthService not found, skipping enhancement");
+      return;
+    }
+
+    try {
+      // Check if there's an existing authService instance
+      const existingAuthService = window.authService;
+
+      if (existingAuthService) {
+        // Migrate existing data if available
+        let existingData = null;
+        try {
+          existingData = {
+            sessionData: localStorage.getItem("session_start_time"),
+            authPreferences: localStorage.getItem(
+              "simulateai_auth_persistence",
+            ),
+            userPreferences: localStorage.getItem("user_preferences"),
+          };
+        } catch (error) {
+          console.warn(
+            "[EnhancedApp] Could not access existing AuthService data:",
+            error,
+          );
+        }
+
+        // If we have existing data, migrate it to DataHandler
+        if (
+          existingData &&
+          (existingData.sessionData || existingData.authPreferences)
+        ) {
+          try {
+            const enhancedAuthService = new window.AuthService(
+              existingAuthService.firebaseService,
+              this,
+            );
+
+            // Migrate session data
+            if (existingData.sessionData) {
+              await enhancedAuthService.saveSessionData(
+                "session_start_time",
+                existingData.sessionData,
+              );
+            }
+
+            // Migrate auth preferences
+            if (existingData.authPreferences) {
+              const prefs = JSON.parse(existingData.authPreferences);
+              await enhancedAuthService.saveAuthPreferences(prefs);
+            }
+
+            // Replace global instance
+            this.components.set("authService", enhancedAuthService);
+            window.authService = enhancedAuthService;
+
+            // Initialize async features
+            await enhancedAuthService.initializeAsync();
+
+            console.log(
+              "[EnhancedApp] Migrated existing AuthService data to DataHandler",
+            );
+          } catch (error) {
+            console.warn(
+              "[EnhancedApp] Could not migrate AuthService data:",
+              error,
+            );
+          }
+        }
+      } else {
+        // Create new enhanced AuthService instance
+        const authService = new window.AuthService(null, this);
+
+        // Store reference for component communication
+        this.components.set("authService", authService);
+
+        // Make globally available
+        window.authService = authService;
+
+        // Initialize async features
+        await authService.initializeAsync();
+
+        console.log(
+          "[EnhancedApp] AuthService created with DataHandler integration",
+        );
+      }
+
+      // Track migration status
+      this.migrationStatus.authService = {
+        status: "complete",
+        timestamp: new Date().toISOString(),
+        dataHandler: true,
+        asyncMethods: true,
+      };
+
+      console.log(
+        "[EnhancedApp] AuthService enhanced with DataHandler integration",
+      );
+    } catch (error) {
+      console.error("[EnhancedApp] AuthService initialization failed:", error);
+      this.migrationStatus.authService = {
+        status: "error",
+        error: error.message,
+        timestamp: new Date().toISOString(),
+      };
+    }
+  }
+
+  /**
+   * Enhanced SystemMetadataCollector integration
+   * Phase 3.2: System telemetry and performance metrics DataHandler migration
+   */
+  async initializeSystemMetadataCollector() {
+    if (!window.SystemMetadataCollector && !window.getSystemCollector) {
+      console.warn(
+        "[EnhancedApp] SystemMetadataCollector not found, skipping enhancement",
+      );
+      return;
+    }
+
+    try {
+      // Check if there's an existing systemCollector instance
+      const existingCollector =
+        window.systemCollector || window.getSystemCollector?.();
+
+      if (existingCollector) {
+        // Migrate existing data if available
+        let existingData = null;
+        try {
+          existingData = {
+            systemMetrics: localStorage.getItem("systemMetrics"),
+            performanceData: localStorage.getItem("systemPerformanceData"),
+            sessionData: existingCollector.sessionData,
+            performanceMetrics: existingCollector.performanceMetrics,
+          };
+        } catch (error) {
+          console.warn(
+            "[EnhancedApp] Could not access existing SystemMetadataCollector data:",
+            error,
+          );
+        }
+
+        // If we have existing data, migrate it to DataHandler
+        if (
+          existingData &&
+          (existingData.systemMetrics || existingData.performanceData)
+        ) {
+          try {
+            const enhancedCollector = new window.SystemMetadataCollector(
+              existingCollector.firebaseService,
+              this,
+            );
+
+            // Migrate system metrics
+            if (existingData.systemMetrics) {
+              const metrics = JSON.parse(existingData.systemMetrics);
+              await enhancedCollector.saveSystemMetrics(metrics);
+            }
+
+            // Migrate performance data
+            if (existingData.performanceData) {
+              const perfData = JSON.parse(existingData.performanceData);
+              await enhancedCollector.savePerformanceData(perfData);
+            }
+
+            // Replace global instance
+            this.components.set("systemMetadataCollector", enhancedCollector);
+            window.systemCollector = enhancedCollector;
+
+            // Initialize async features
+            await enhancedCollector.initializeAsync();
+
+            console.log(
+              "[EnhancedApp] Migrated existing SystemMetadataCollector data to DataHandler",
+            );
+          } catch (error) {
+            console.warn(
+              "[EnhancedApp] Could not migrate SystemMetadataCollector data:",
+              error,
+            );
+          }
+        }
+      } else {
+        // Create new enhanced SystemMetadataCollector instance
+        const firebaseService = window.firebaseService || null;
+        const systemCollector = new window.SystemMetadataCollector(
+          firebaseService,
+          this,
+        );
+
+        // Store reference for component communication
+        this.components.set("systemMetadataCollector", systemCollector);
+
+        // Make globally available
+        window.systemCollector = systemCollector;
+
+        // Initialize async features
+        await systemCollector.initializeAsync();
+
+        console.log(
+          "[EnhancedApp] SystemMetadataCollector created with DataHandler integration",
+        );
+      }
+
+      // Track migration status
+      this.migrationStatus.systemMetadataCollector = {
+        status: "complete",
+        timestamp: new Date().toISOString(),
+        dataHandler: true,
+        asyncMethods: true,
+      };
+
+      console.log(
+        "[EnhancedApp] SystemMetadataCollector enhanced with DataHandler integration",
+      );
+    } catch (error) {
+      console.error(
+        "[EnhancedApp] SystemMetadataCollector initialization failed:",
+        error,
+      );
+      this.migrationStatus.systemMetadataCollector = {
+        status: "error",
+        error: error.message,
+        timestamp: new Date().toISOString(),
+      };
+    }
+  }
+
+  /**
+   * Phase 3.3: UserPreferences DataHandler integration
+   */
+  async initializeUserPreferences() {
+    try {
+      // Import UserPreferences if not already available
+      const { userPreferences } = await import("../utils/simple-storage.js");
+
+      if (!userPreferences) {
+        console.warn(
+          "[EnhancedApp] UserPreferences not found, skipping enhancement",
+        );
+        return;
+      }
+
+      // Initialize UserPreferences with DataHandler integration
+      await userPreferences.initialize(this);
+
+      // Store reference for component communication
+      this.components.set("userPreferences", userPreferences);
+
+      // Track migration status
+      this.migrationStatus.userPreferences = {
+        status: "complete",
+        timestamp: new Date().toISOString(),
+        dataHandler: true,
+        asyncMethods: true,
+        migration: true,
+      };
+
+      console.log(
+        "[EnhancedApp] UserPreferences enhanced with DataHandler integration",
+      );
+    } catch (error) {
+      console.error(
+        "[EnhancedApp] UserPreferences initialization failed:",
+        error,
+      );
+      this.migrationStatus.userPreferences = {
+        status: "error",
+        error: error.message,
+        timestamp: new Date().toISOString(),
+      };
+    }
+  }
+
+  /**
+   * Phase 3.4: ScenarioDataManager DataHandler integration
+   */
+  async initializeScenarioDataManager() {
+    try {
+      // Import ScenarioDataManager class
+      const { ScenarioDataManager } = await import(
+        "../data/scenario-data-manager.js"
+      );
+
+      if (!ScenarioDataManager) {
+        console.warn(
+          "[EnhancedApp] ScenarioDataManager not found, skipping enhancement",
+        );
+        return;
+      }
+
+      // Create enhanced instance with DataHandler integration
+      const enhancedScenarioDataManager = new ScenarioDataManager(this);
+
+      // Initialize with DataHandler integration
+      await enhancedScenarioDataManager.initialize(this);
+
+      // Preload common scenarios for performance
+      await enhancedScenarioDataManager.preloadCommonScenarios();
+
+      // Store reference for component communication
+      this.components.set("scenarioDataManager", enhancedScenarioDataManager);
+
+      // Also make it globally available for backward compatibility
+      window.scenarioDataManager = enhancedScenarioDataManager;
+
+      // Track migration status
+      this.migrationStatus.scenarioDataManager = {
+        status: "complete",
+        timestamp: new Date().toISOString(),
+        dataHandler: true,
+        caching: true,
+        preloaded: true,
+      };
+
+      console.log(
+        "[EnhancedApp] ScenarioDataManager enhanced with DataHandler integration",
+      );
+    } catch (error) {
+      console.error(
+        "[EnhancedApp] ScenarioDataManager initialization failed:",
+        error,
+      );
+      this.migrationStatus.scenarioDataManager = {
+        status: "error",
+        error: error.message,
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 

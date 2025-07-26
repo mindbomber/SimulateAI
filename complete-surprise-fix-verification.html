@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Complete Surprise Tab Fix Verification</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #f5f5f5;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        color: #27ae60;
+        border-bottom: 3px solid #27ae60;
+        padding-bottom: 10px;
+      }
+
+      .complete-fix {
+        background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+        border: 2px solid #27ae60;
+        color: #1b5e20;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      .test-button {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 10px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .test-button:hover {
+        background: linear-gradient(135deg, #c0392b, #a93226);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .fixes-list {
+        background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+        border: 1px solid #2196f3;
+        color: #0d47a1;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
+
+      .test-instructions {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        color: #856404;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
+
+      .logs {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 15px;
+        border-radius: 6px;
+        font-family: monospace;
+        white-space: pre-wrap;
+        max-height: 400px;
+        overflow-y: auto;
+        margin: 10px 0;
+        border: 1px solid #34495e;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>✅ Complete Surprise Tab Fix - Final Verification</h1>
+
+      <div class="complete-fix">
+        🎉 All fixes applied! Surprise tab should now work perfectly! 🎉
+      </div>
+
+      <div class="fixes-list">
+        <h3>🔧 Complete Fix Applied:</h3>
+        <ul>
+          <li><strong>App Cooldown:</strong> Reduced from 2000ms to 500ms</li>
+          <li>
+            <strong>Modal Cooldown:</strong> Reset after scenario completion
+          </li>
+          <li>
+            <strong>Modal State:</strong> Reset modal flags after completion
+          </li>
+          <li>
+            <strong>Scenario Modal:</strong> Reset isOpening and modal state
+          </li>
+          <li>
+            <strong>Reflection Reset:</strong> All resets applied after
+            reflection completion
+          </li>
+        </ul>
+      </div>
+
+      <div class="test-instructions">
+        <h3>🧪 Final Test Instructions:</h3>
+        <ol>
+          <li>Click "Test Complete Flow" to test the surprise tab</li>
+          <li>Complete the scenario (select any option)</li>
+          <li>Complete the reflection modal</li>
+          <li>Immediately click "Test Complete Flow" again</li>
+          <li>
+            <strong>Expected:</strong> Modal should open immediately, no
+            "loading" stuck state
+          </li>
+        </ol>
+      </div>
+
+      <div style="text-align: center; margin: 30px 0">
+        <button class="test-button" onclick="testCompleteFlow()">
+          🎲 Test Complete Flow
+        </button>
+        <button class="test-button" onclick="checkAllStates()">
+          📊 Check All States
+        </button>
+        <button class="test-button" onclick="forceResetEverything()">
+          🔄 Force Reset Everything
+        </button>
+      </div>
+
+      <div id="debugLogs" class="logs">Complete flow testing ready...\n</div>
+    </div>
+
+    <!-- Load the main SimulateAI application -->
+    <script type="module" src="src/js/app.js"></script>
+
+    <script>
+      // Debug logging function
+      function logDebug(message, data = null) {
+        const timestamp = new Date().toLocaleTimeString();
+        const logElement = document.getElementById("debugLogs");
+        const logLine = `[${timestamp}] ${message}${data ? "\n" + JSON.stringify(data, null, 2) : ""}`;
+
+        console.log(message, data);
+        logElement.textContent += logLine + "\n";
+        logElement.scrollTop = logElement.scrollHeight;
+      }
+
+      // Test complete flow
+      function testCompleteFlow() {
+        logDebug("🎲 Testing complete surprise tab flow...");
+
+        if (window.floatingSurpriseTab) {
+          try {
+            window.floatingSurpriseTab.triggerSurpriseMe();
+            logDebug("✅ Surprise tab triggered - should show modal");
+          } catch (error) {
+            logDebug("❌ Error:", error);
+          }
+        } else {
+          logDebug("❌ FloatingSurpriseTab not found");
+        }
+      }
+
+      // Check all states
+      function checkAllStates() {
+        logDebug("📊 Checking all states...");
+
+        const allStates = {
+          // App states
+          appLastSurpriseTime: window.app ? window.app.lastSurpriseTime : "N/A",
+
+          // Main grid states
+          mainGridLastModalTime: window.mainGrid
+            ? window.mainGrid.lastModalOpenTime
+            : "N/A",
+          mainGridIsModalOpen: window.mainGrid
+            ? window.mainGrid.isModalOpen
+            : "N/A",
+
+          // Scenario modal states
+          scenarioModalExists: !!(
+            window.mainGrid && window.mainGrid.scenarioModal
+          ),
+          scenarioModalIsOpening:
+            window.mainGrid?.scenarioModal?.isOpening || "N/A",
+          scenarioModalHasModal: !!window.mainGrid?.scenarioModal?.modal,
+
+          // DOM states
+          modalBackdropVisible: !!document.querySelector(
+            '.modal-backdrop:not([aria-hidden="true"])',
+          ),
+          openModals: document.querySelectorAll(".modal").length,
+
+          // Cooldown calculations
+          currentTime: Date.now(),
+        };
+
+        logDebug("📊 All States:", allStates);
+
+        // Calculate and show cooldowns
+        if (window.app && window.app.lastSurpriseTime) {
+          const surpriseCooldown = Math.max(
+            0,
+            500 - (Date.now() - window.app.lastSurpriseTime),
+          );
+          logDebug(
+            `⏱️ Surprise cooldown: ${surpriseCooldown}ms (should be 0 after completion)`,
+          );
+        }
+
+        if (window.mainGrid && window.mainGrid.lastModalOpenTime) {
+          const modalCooldown = Math.max(
+            0,
+            1000 - (Date.now() - window.mainGrid.lastModalOpenTime),
+          );
+          logDebug(
+            `⏱️ Modal cooldown: ${modalCooldown}ms (should be 0 after completion)`,
+          );
+        }
+      }
+
+      // Force reset everything
+      function forceResetEverything() {
+        logDebug("🔄 Force resetting everything...");
+
+        // Reset app states
+        if (window.app) {
+          window.app.lastSurpriseTime = 0;
+          logDebug("✅ Reset app surprise time");
+        }
+
+        // Reset main grid states
+        if (window.mainGrid) {
+          window.mainGrid.lastModalOpenTime = 0;
+          window.mainGrid.isModalOpen = false;
+          logDebug("✅ Reset main grid states");
+
+          // Reset scenario modal states
+          const scenarioModal = window.mainGrid.scenarioModal;
+          if (scenarioModal) {
+            scenarioModal.isOpening = false;
+            scenarioModal.modal = null;
+            scenarioModal.isClosing = false;
+            logDebug("✅ Reset scenario modal states");
+          }
+        }
+
+        logDebug("✅ Everything reset - ready for clean testing");
+      }
+
+      // Listen for key events
+      document.addEventListener("scenario-selected", (e) => {
+        logDebug("📡 SUCCESS: Modal opened - scenario-selected event:", {
+          categoryId: e.detail.categoryId,
+          scenarioId: e.detail.scenarioId,
+          title: e.detail.scenario?.title,
+        });
+      });
+
+      document.addEventListener("scenario-completed", (e) => {
+        logDebug("📡 Scenario completed:", e.detail);
+        setTimeout(() => {
+          logDebug("📊 Checking states after scenario completion...");
+          checkAllStates();
+        }, 500);
+      });
+
+      document.addEventListener("scenarioReflectionCompleted", (e) => {
+        logDebug("📡 Reflection completed:", e.detail);
+        setTimeout(() => {
+          logDebug("📊 Checking states after reflection completion...");
+          checkAllStates();
+          logDebug(
+            "🎯 NOW try clicking 'Test Complete Flow' again - it should work!",
+          );
+        }, 500);
+      });
+
+      // Initialize
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          logDebug("🚀 Complete fix verification page loaded");
+          logDebug("✅ All fixes have been applied:");
+          logDebug("  - App cooldown: 2000ms → 500ms");
+          logDebug("  - Modal cooldown reset after completion");
+          logDebug("  - Modal state reset after completion");
+          logDebug("  - Scenario modal state reset after completion");
+          logDebug("🎯 Ready for final testing!");
+          checkAllStates();
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>
