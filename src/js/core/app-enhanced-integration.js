@@ -51,9 +51,6 @@ class EnhancedApp {
       // Initialize DataHandler
       await this.initializeDataHandler();
 
-      // Initialize UIBinder
-      await this.initializeUIBinder();
-
       // Initialize enhanced components
       await this.initializeEnhancedComponents();
 
@@ -101,19 +98,47 @@ class EnhancedApp {
 
   /**
    * Initialize UIBinder with DataHandler integration
+   * Phase 3.6: UI management and theming DataHandler integration
    */
   async initializeUIBinder() {
     try {
-      this.uiBinder = new window.UIBinder(this.dataHandler);
+      // Create enhanced UIBinder with DataHandler integration
+      this.uiBinder = new window.UIBinder({
+        dataHandler: this.dataHandler,
+        enableThemeManager: true,
+        enableAccessibility: true,
+        enablePerformanceMonitoring: true,
+      });
       await this.uiBinder.init();
 
+      // Register component for tracking
+      this.components.set("uiBinder", this.uiBinder);
+
+      // Make globally available for backward compatibility
+      if (typeof window !== "undefined") {
+        window.uiBinder = this.uiBinder;
+      }
+
       const healthCheck = this.uiBinder.healthCheck();
-      console.log("[EnhancedApp] UIBinder initialized:", healthCheck.status);
+      console.log(
+        "[EnhancedApp] UIBinder Phase 3.6 initialized:",
+        healthCheck.status,
+      );
+      console.log(
+        "[EnhancedApp] UIBinder migration status: Phase 3.6 DataHandler integration complete",
+      );
     } catch (error) {
       console.error("[EnhancedApp] UIBinder initialization failed:", error);
       // Create fallback UIBinder
       this.uiBinder = new window.UIBinder();
       await this.uiBinder.init();
+
+      // Register fallback component
+      this.components.set("uiBinder", this.uiBinder);
+
+      if (typeof window !== "undefined") {
+        window.uiBinder = this.uiBinder;
+      }
     }
   }
 
@@ -154,6 +179,14 @@ class EnhancedApp {
       {
         name: "scenarioDataManager", // Phase 3.4: Scenario data management DataHandler integration
         initializer: this.initializeScenarioDataManager.bind(this),
+      },
+      {
+        name: "pwaService", // Phase 3.5: Progressive Web App DataHandler integration
+        initializer: this.initializePWAService.bind(this),
+      },
+      {
+        name: "uiBinder", // Phase 3.6: UI management and theming DataHandler integration
+        initializer: this.initializeUIBinder.bind(this),
       },
       {
         name: "unifiedAnimationManager", // Phase 2.3
@@ -924,6 +957,58 @@ class EnhancedApp {
         error: error.message,
         timestamp: new Date().toISOString(),
       };
+    }
+  }
+
+  /**
+   * Phase 3.5: PWAService DataHandler integration
+   */
+  async initializePWAService() {
+    try {
+      // Import PWAService class
+      const { PWAService } = await import("../services/pwa-service.js");
+
+      if (!PWAService) {
+        console.warn(
+          "[EnhancedApp] PWAService not found, skipping enhancement",
+        );
+        return null;
+      }
+
+      // Create enhanced PWAService instance with DataHandler integration
+      const enhancedPWAService = new PWAService(this.firebaseService, this);
+
+      // Initialize DataHandler integration and PWA features
+      await enhancedPWAService.init();
+
+      // Register PWA service for component communication
+      this.components.set("pwaService", enhancedPWAService);
+
+      // Make available globally for backward compatibility
+      window.pwaService = enhancedPWAService;
+
+      // Track migration status
+      this.migrationStatus.pwaService = {
+        status: "complete",
+        timestamp: new Date().toISOString(),
+        dataHandler: true,
+        analytics: true,
+        persistence: true,
+      };
+
+      console.log(
+        "[EnhancedApp] PWAService enhanced with DataHandler integration",
+      );
+
+      return enhancedPWAService;
+    } catch (error) {
+      console.error("[EnhancedApp] PWAService initialization failed:", error);
+      this.migrationStatus.pwaService = {
+        status: "error",
+        error: error.message,
+        timestamp: new Date().toISOString(),
+      };
+      return null;
     }
   }
 

@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UIBinder Phase 3.6 DataHandler Integration Test</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #333;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+      }
+
+      h1 {
+        color: #4a5568;
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 2.5em;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .subtitle {
+        text-align: center;
+        color: #666;
+        font-size: 1.2em;
+        margin-bottom: 30px;
+      }
+
+      .status {
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        font-weight: bold;
+        border-left: 5px solid;
+      }
+
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+        border-color: #28a745;
+      }
+
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+        border-color: #dc3545;
+      }
+
+      .status.info {
+        background: #cce7ff;
+        color: #004085;
+        border-color: #007bff;
+      }
+
+      .test-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+      }
+
+      .test-section {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      }
+
+      .test-section h3 {
+        color: #495057;
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+      }
+
+      .test-result {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+      }
+
+      .test-result.pass {
+        border-color: #28a745;
+        background: #d4edda;
+        color: #155724;
+      }
+
+      .test-result.fail {
+        border-color: #dc3545;
+        background: #f8d7da;
+        color: #721c24;
+      }
+
+      .test-result.info {
+        border-color: #17a2b8;
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+
+      .controls {
+        text-align: center;
+        margin: 30px 0;
+      }
+
+      .btn {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 16px;
+        margin: 0 10px;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .btn.danger {
+        background: linear-gradient(45deg, #dc3545, #c82333);
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+      }
+
+      .btn.danger:hover {
+        box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+      }
+
+      .analytics-dashboard {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      }
+
+      .metric {
+        display: inline-block;
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 5px;
+        min-width: 150px;
+        text-align: center;
+      }
+
+      .metric-value {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #007bff;
+      }
+
+      .metric-label {
+        color: #666;
+        font-size: 0.9em;
+      }
+
+      .theme-demo {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      }
+
+      .theme-selector {
+        margin: 10px 0;
+      }
+
+      .theme-selector select {
+        padding: 8px 12px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+      }
+
+      .component-demo {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      }
+
+      .progress-bar {
+        background: #e9ecef;
+        border-radius: 10px;
+        overflow: hidden;
+        height: 20px;
+        margin: 10px 0;
+      }
+
+      .progress-fill {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        height: 100%;
+        transition: width 0.3s ease;
+      }
+
+      .phase-badge {
+        display: inline-block;
+        background: linear-gradient(45deg, #17a2b8, #138496);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 0.8em;
+        font-weight: bold;
+        margin-left: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🎨 UIBinder Phase 3.6 Integration Test</h1>
+      <div class="subtitle">
+        Testing enhanced UIBinder integration with DataHandler and comprehensive
+        theming management
+        <span class="phase-badge">Phase 3.6</span>
+      </div>
+
+      <div id="initialization-status" class="status info">
+        <strong>Initialization Status:</strong>
+        <span id="init-status">Starting...</span>
+      </div>
+
+      <div class="controls">
+        <button class="btn" onclick="runAllTests()">🧪 Run All Tests</button>
+        <button class="btn" onclick="testDataIntegration()">
+          💾 Test DataHandler Integration
+        </button>
+        <button class="btn" onclick="testThemeManagement()">
+          🎨 Test Theme Management
+        </button>
+        <button class="btn" onclick="testComponentRegistry()">
+          📋 Test Component Registry
+        </button>
+        <button class="btn danger" onclick="clearTestData()">
+          🗑️ Clear Test Data
+        </button>
+      </div>
+
+      <div class="test-grid">
+        <!-- Basic Integration Tests -->
+        <div class="test-section">
+          <h3>🔧 Phase 3.6 Integration Tests</h3>
+          <div id="integration-tests">
+            <button class="btn" onclick="testPhase36Integration()">
+              Test Phase 3.6 Setup
+            </button>
+            <div id="integration-results"></div>
+          </div>
+        </div>
+
+        <!-- DataHandler Integration Tests -->
+        <div class="test-section">
+          <h3>💾 DataHandler Features</h3>
+          <div id="datahandler-tests">
+            <button class="btn" onclick="testThemePersistence()">
+              Test Theme Persistence
+            </button>
+            <div id="datahandler-results"></div>
+          </div>
+        </div>
+
+        <!-- Theme Management Tests -->
+        <div class="test-section">
+          <h3>🎨 Theme Management</h3>
+          <div id="theme-tests">
+            <button class="btn" onclick="testThemeApplication()">
+              Test Theme Application
+            </button>
+            <div id="theme-results"></div>
+          </div>
+        </div>
+
+        <!-- Component System Tests -->
+        <div class="test-section">
+          <h3>📋 Component System</h3>
+          <div id="component-tests">
+            <button class="btn" onclick="testComponentManagement()">
+              Test Component Management
+            </button>
+            <div id="component-results"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analytics Dashboard -->
+      <div class="analytics-dashboard">
+        <h3>📊 UIBinder Analytics Dashboard</h3>
+        <div id="analytics-metrics">
+          <div class="metric">
+            <div class="metric-value" id="components-count">0</div>
+            <div class="metric-label">Components</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value" id="themes-cached">0</div>
+            <div class="metric-label">Cached Themes</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value" id="dom-operations">0</div>
+            <div class="metric-label">DOM Operations</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value" id="theme-applications">0</div>
+            <div class="metric-label">Theme Applications</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value" id="event-bindings">0</div>
+            <div class="metric-label">Event Bindings</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value" id="animations-processed">0</div>
+            <div class="metric-label">Animations</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Theme Demo -->
+      <div class="theme-demo">
+        <h3>🎨 Interactive Theme Management</h3>
+        <div class="theme-selector">
+          <label for="theme-select">Select Theme:</label>
+          <select id="theme-select" onchange="applySelectedTheme()">
+            <option value="light">Light Theme</option>
+            <option value="dark">Dark Theme</option>
+            <option value="custom">Custom Theme</option>
+          </select>
+        </div>
+        <div id="theme-demo-content">
+          <p>This content will change based on the selected theme.</p>
+          <button class="btn" onclick="testThemeFeatures()">
+            Test Theme Features
+          </button>
+        </div>
+      </div>
+
+      <!-- Component Demo -->
+      <div class="component-demo">
+        <h3>📋 Component Management Demo</h3>
+        <button class="btn" onclick="createTestComponent()">
+          Create Test Component
+        </button>
+        <button class="btn" onclick="showTestModal()">Show Test Modal</button>
+        <div id="component-demo-area"></div>
+      </div>
+
+      <!-- Progress Tracking -->
+      <div class="analytics-dashboard">
+        <h3>📈 Test Progress</h3>
+        <div class="progress-bar">
+          <div class="progress-fill" id="test-progress" style="width: 0%"></div>
+        </div>
+        <div id="progress-text">Ready to start testing...</div>
+      </div>
+    </div>
+
+    <script>
+      let enhancedApp = null;
+      let uiBinder = null;
+      let dataHandler = null;
+      let testProgress = 0;
+      let totalTests = 16;
+
+      // Initialize test environment
+      window.addEventListener("DOMContentLoaded", async function () {
+        try {
+          document.getElementById("init-status").textContent =
+            "Loading modules...";
+
+          // Wait for modules to be available
+          await waitForModules();
+
+          // Initialize Enhanced App
+          if (window.EnhancedApp) {
+            enhancedApp = new window.EnhancedApp();
+            await enhancedApp.init();
+
+            uiBinder = enhancedApp.getComponent("uiBinder");
+            dataHandler = enhancedApp.dataHandler;
+          }
+
+          if (uiBinder && dataHandler) {
+            document.getElementById("init-status").textContent =
+              "Phase 3.6 integration ready!";
+            document.getElementById("initialization-status").className =
+              "status success";
+            updateAnalyticsDashboard();
+          } else {
+            throw new Error("UIBinder or DataHandler not available");
+          }
+        } catch (error) {
+          console.error("Initialization failed:", error);
+          document.getElementById("init-status").textContent =
+            `Failed: ${error.message}`;
+          document.getElementById("initialization-status").className =
+            "status error";
+        }
+      });
+
+      async function waitForModules() {
+        return new Promise((resolve) => {
+          const checkModules = () => {
+            if (window.EnhancedApp && window.UIBinder && window.DataHandler) {
+              resolve();
+            } else {
+              setTimeout(checkModules, 100);
+            }
+          };
+          checkModules();
+        });
+      }
+
+      function updateProgress() {
+        const percentage = (testProgress / totalTests) * 100;
+        document.getElementById("test-progress").style.width = percentage + "%";
+        document.getElementById("progress-text").textContent =
+          `Tests completed: ${testProgress}/${totalTests} (${Math.round(percentage)}%)`;
+      }
+
+      function addResult(containerId, message, type) {
+        const container = document.getElementById(containerId);
+        const result = document.createElement("div");
+        result.className = `test-result ${type}`;
+        result.textContent = message;
+        container.appendChild(result);
+        if (type !== "info") testProgress++;
+        updateProgress();
+      }
+
+      // Test Phase 3.6 Integration
+      async function testPhase36Integration() {
+        const containerId = "integration-results";
+        document.getElementById(containerId).innerHTML = "";
+
+        try {
+          // Test 1: Enhanced App integration
+          if (enhancedApp && enhancedApp.getComponent("uiBinder")) {
+            addResult(
+              containerId,
+              "✅ UIBinder registered in EnhancedApp components",
+              "pass",
+            );
+          } else {
+            addResult(
+              containerId,
+              "❌ UIBinder not found in EnhancedApp components",
+              "fail",
+            );
+          }
+
+          // Test 2: DataHandler integration
+          if (uiBinder && uiBinder.dataHandler) {
+            addResult(
+              containerId,
+              "✅ UIBinder has DataHandler integration",
+              "pass",
+            );
+          } else {
+            addResult(
+              containerId,
+              "❌ UIBinder missing DataHandler integration",
+              "fail",
+            );
+          }
+
+          // Test 3: Global availability
+          if (window.uiBinder) {
+            addResult(containerId, "✅ UIBinder available globally", "pass");
+          } else {
+            addResult(
+              containerId,
+              "❌ UIBinder not available globally",
+              "fail",
+            );
+          }
+
+          // Test 4: Migration status tracking
+          const migrationStatus = enhancedApp.getMigrationStatus();
+          if (migrationStatus.uiBinder) {
+            addResult(
+              containerId,
+              "✅ UIBinder Phase 3.6 migration status tracked",
+              "pass",
+            );
+          } else {
+            addResult(
+              containerId,
+              "❌ UIBinder migration status not tracked",
+              "fail",
+            );
+          }
+        } catch (error) {
+          addResult(
+            containerId,
+            `❌ Integration test failed: ${error.message}`,
+            "fail",
+          );
+        }
+      }
+
+      // Test Theme Persistence
+      async function testThemePersistence() {
+        const containerId = "datahandler-results";
+        document.getElementById(containerId).innerHTML = "";
+
+        try {
+          // Test theme saving
+          await uiBinder.applyTheme("dark", { temporary: false });
+          addResult(containerId, "✅ Dark theme applied and saved", "pass");
+
+          // Verify DataHandler storage
+          const savedTheme = await dataHandler.getData("theme");
+          if (savedTheme === "dark") {
+            addResult(
+              containerId,
+              "✅ Theme persisted via DataHandler",
+              "pass",
+            );
+          } else {
+            addResult(
+              containerId,
+              "❌ Theme not persisted via DataHandler",
+              "fail",
+            );
+          }
+
+          // Test theme loading
+          await uiBinder.loadThemePreferences();
+          addResult(
+            containerId,
+            "✅ Theme preferences loaded successfully",
+            "pass",
+          );
+
+          // Test custom theme data
+          const customTheme = {
+            cssVariables: {
+              "--primary-bg": "#2d3748",
+              "--text-primary": "#e2e8f0",
+            },
+            bodyClasses: ["theme-custom"],
+          };
+
+          await dataHandler.saveData("theme_custom", customTheme);
+          const loadedCustomTheme = await uiBinder.loadThemeData("custom");
+
+          if (loadedCustomTheme && loadedCustomTheme.cssVariables) {
+            addResult(
+              containerId,
+              "✅ Custom theme data loaded from DataHandler",
+              "pass",
+            );
+          } else {
+            addResult(containerId, "❌ Custom theme data not loaded", "fail");
+          }
+        } catch (error) {
+          addResult(
+            containerId,
+            `❌ Theme persistence test failed: ${error.message}`,
+            "fail",
+          );
+        }
+      }
+
+      // Test Theme Application
+      async function testThemeApplication() {
+        const containerId = "theme-results";
+        document.getElementById(containerId).innerHTML = "";
+
+        try {
+          // Test light theme
+          await uiBinder.applyTheme("light");
+          if (document.body.classList.contains("theme-light")) {
+            addResult(
+              containerId,
+              "✅ Light theme applied successfully",
+              "pass",
+            );
+          } else {
+            addResult(containerId, "❌ Light theme not applied", "fail");
+          }
+
+          // Test dark theme
+          await uiBinder.applyTheme("dark");
+          if (document.body.classList.contains("theme-dark")) {
+            addResult(
+              containerId,
+              "✅ Dark theme applied successfully",
+              "pass",
+            );
+          } else {
+            addResult(containerId, "❌ Dark theme not applied", "fail");
+          }
+
+          // Test CSS variables
+          const rootStyle = getComputedStyle(document.documentElement);
+          const primaryBg = rootStyle.getPropertyValue("--primary-bg").trim();
+          if (primaryBg) {
+            addResult(
+              containerId,
+              "✅ CSS variables applied correctly",
+              "pass",
+            );
+          } else {
+            addResult(containerId, "❌ CSS variables not applied", "fail");
+          }
+
+          // Test theme caching
+          const cachedThemes = uiBinder.themeCache.size;
+          if (cachedThemes > 0) {
+            addResult(
+              containerId,
+              `✅ Theme caching working (${cachedThemes} themes cached)`,
+              "pass",
+            );
+          } else {
+            addResult(containerId, "❌ Theme caching not working", "fail");
+          }
+        } catch (error) {
+          addResult(
+            containerId,
+            `❌ Theme application test failed: ${error.message}`,
+            "fail",
+          );
+        }
+      }
+
+      // Test Component Management
+      async function testComponentManagement() {
+        const containerId = "component-results";
+        document.getElementById(containerId).innerHTML = "";
+
+        try {
+          // Test component registration
+          uiBinder.registerComponent("testComponent", {
+            factory: (container, props, uiBinder) => {
+              const element = document.createElement("div");
+              element.textContent = "Test Component";
+              element.className = "test-component";
+              container.appendChild(element);
+              return element;
+            },
+          });
+
+          if (uiBinder.componentRegistry.has("testComponent")) {
+            addResult(containerId, "✅ Component registration working", "pass");
+          } else {
+            addResult(containerId, "❌ Component registration failed", "fail");
+          }
+
+          // Test component creation
+          const testContainer = document.createElement("div");
+          const component = await uiBinder.createComponent(
+            "testComponent",
+            testContainer,
+          );
+
+          if (component && testContainer.querySelector(".test-component")) {
+            addResult(containerId, "✅ Component creation working", "pass");
+          } else {
+            addResult(containerId, "❌ Component creation failed", "fail");
+          }
+
+          // Test performance metrics
+          const metrics = uiBinder.getPerformanceMetrics();
+          if (metrics && typeof metrics.componentCount === "number") {
+            addResult(
+              containerId,
+              `✅ Performance metrics available (${metrics.componentCount} components)`,
+              "pass",
+            );
+          } else {
+            addResult(
+              containerId,
+              "❌ Performance metrics not available",
+              "fail",
+            );
+          }
+
+          // Test health check
+          const healthCheck = uiBinder.healthCheck();
+          if (healthCheck && healthCheck.status === "healthy") {
+            addResult(containerId, "✅ UIBinder health check passed", "pass");
+          } else {
+            addResult(containerId, "❌ UIBinder health check failed", "fail");
+          }
+        } catch (error) {
+          addResult(
+            containerId,
+            `❌ Component management test failed: ${error.message}`,
+            "fail",
+          );
+        }
+      }
+
+      // Update Analytics Dashboard
+      function updateAnalyticsDashboard() {
+        if (!uiBinder) return;
+
+        const metrics = uiBinder.getPerformanceMetrics();
+        if (metrics) {
+          document.getElementById("components-count").textContent =
+            metrics.componentCount || 0;
+          document.getElementById("themes-cached").textContent =
+            metrics.themesCached || 0;
+          document.getElementById("dom-operations").textContent =
+            metrics.domOperations || 0;
+          document.getElementById("theme-applications").textContent =
+            metrics.themeApplications || 0;
+          document.getElementById("event-bindings").textContent =
+            metrics.eventBindings || 0;
+          document.getElementById("animations-processed").textContent =
+            metrics.animationsProcessed || 0;
+        }
+      }
+
+      // Interactive Functions
+      async function runAllTests() {
+        testProgress = 0;
+        updateProgress();
+
+        await testPhase36Integration();
+        await testThemePersistence();
+        await testThemeApplication();
+        await testComponentManagement();
+
+        updateAnalyticsDashboard();
+      }
+
+      async function testDataIntegration() {
+        await testThemePersistence();
+        updateAnalyticsDashboard();
+      }
+
+      async function testThemeManagement() {
+        await testThemeApplication();
+        updateAnalyticsDashboard();
+      }
+
+      async function testComponentRegistry() {
+        await testComponentManagement();
+        updateAnalyticsDashboard();
+      }
+
+      async function applySelectedTheme() {
+        const selectedTheme = document.getElementById("theme-select").value;
+        if (uiBinder) {
+          await uiBinder.applyTheme(selectedTheme);
+          updateAnalyticsDashboard();
+        }
+      }
+
+      async function createTestComponent() {
+        if (!uiBinder) return;
+
+        const container = document.getElementById("component-demo-area");
+        const componentDiv = document.createElement("div");
+        componentDiv.className = "test-component-demo";
+        componentDiv.innerHTML = `
+          <h4>Dynamic Test Component</h4>
+          <p>Created at: ${new Date().toLocaleTimeString()}</p>
+          <button onclick="this.parentElement.remove()">Remove</button>
+        `;
+        container.appendChild(componentDiv);
+        updateAnalyticsDashboard();
+      }
+
+      async function showTestModal() {
+        if (!uiBinder) return;
+
+        await uiBinder.showModal({
+          title: "UIBinder Phase 3.6 Test Modal",
+          content: `
+            <p>This modal demonstrates UIBinder's modal management capabilities with Phase 3.6 DataHandler integration.</p>
+            <p><strong>Features:</strong></p>
+            <ul>
+              <li>DataHandler integration for persistence</li>
+              <li>Theme-aware styling</li>
+              <li>Accessibility enhancements</li>
+              <li>Performance optimization</li>
+            </ul>
+          `,
+          actions: [
+            {
+              id: "close",
+              label: "Close",
+              type: "primary",
+              handler: () => true,
+            },
+          ],
+        });
+        updateAnalyticsDashboard();
+      }
+
+      async function clearTestData() {
+        if (dataHandler) {
+          await dataHandler.removeData("theme");
+          await dataHandler.removeData("theme_custom");
+          console.log("Test data cleared");
+          updateAnalyticsDashboard();
+        }
+      }
+
+      // Auto-update analytics every 5 seconds
+      setInterval(() => {
+        if (uiBinder) {
+          updateAnalyticsDashboard();
+        }
+      }, 5000);
+    </script>
+  </body>
+</html>

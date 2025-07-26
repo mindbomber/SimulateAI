@@ -17,10 +17,15 @@
 /**
  * Scenario Data Manager
  * Centralized manager for loading and validating scenario data across all categories
- * Enhanced with DataHandler integration for Phase 3.4
+ * Enhanced with DataHandler integration for Phase 3.4 and creation date metadata
  */
 
 import logger from "../utils/logger.js";
+import {
+  addCreationMetadata,
+  getScenarioCreationDate,
+  getCategoryCreationDate,
+} from "./scenario-creation-dates.js";
 
 class ScenarioDataManager {
   constructor(app = null) {
@@ -178,15 +183,18 @@ class ScenarioDataManager {
       const scenario = categoryScenarios[scenarioId];
 
       if (scenario) {
-        // Cache in memory
-        this.scenarioCache.set(cacheKey, scenario);
+        // Add creation metadata to scenario
+        const enhancedScenario = addCreationMetadata(scenario, scenarioId);
+
+        // Cache enhanced scenario in memory
+        this.scenarioCache.set(cacheKey, enhancedScenario);
 
         // Cache in DataHandler if available
         if (this.dataHandler) {
           try {
             await this.dataHandler.saveData(
               `scenarioDataManager_scenario_${cacheKey}`,
-              scenario,
+              enhancedScenario,
               {
                 source: "ScenarioDataManager_scenarioLoad",
                 categoryId: categoryId,
@@ -195,7 +203,7 @@ class ScenarioDataManager {
               },
             );
             console.log(
-              `[ScenarioDataManager] Scenario ${cacheKey} cached in DataHandler`,
+              `[ScenarioDataManager] Scenario ${cacheKey} cached in DataHandler with metadata`,
             );
           } catch (error) {
             console.warn(
@@ -205,7 +213,7 @@ class ScenarioDataManager {
           }
         }
 
-        return scenario;
+        return enhancedScenario;
       } else {
         logger.warn(
           `Scenario ${scenarioId} not found in category ${categoryId}`,
@@ -446,6 +454,40 @@ class ScenarioDataManager {
     };
 
     return stats;
+  }
+
+  /**
+   * Get scenario creation metadata
+   * @param {string} scenarioId - The scenario identifier
+   * @returns {object|null} Metadata object with creation date and theme
+   */
+  getScenarioMetadata(scenarioId) {
+    const creationDate = getScenarioCreationDate(scenarioId);
+    if (!creationDate) return null;
+
+    return {
+      createdAt: creationDate,
+      updatedAt: creationDate, // Initially same as creation date
+      version: 1.0,
+      isPublished: true,
+    };
+  }
+
+  /**
+   * Get category creation metadata
+   * @param {string} categoryId - The category identifier
+   * @returns {object|null} Metadata object with creation date
+   */
+  getCategoryMetadata(categoryId) {
+    const creationDate = getCategoryCreationDate(categoryId);
+    if (!creationDate) return null;
+
+    return {
+      createdAt: creationDate,
+      updatedAt: creationDate,
+      version: 1.0,
+      isPublished: true,
+    };
   }
 }
 

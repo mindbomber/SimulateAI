@@ -879,6 +879,267 @@ export class PWAService {
     }
     return null;
   }
+
+  /**
+   * Phase 3.5: Get comprehensive PWA analytics
+   */
+  getPWAAnalytics() {
+    const now = Date.now();
+    const last24Hours = now - 24 * 60 * 60 * 1000;
+    const last7Days = now - 7 * 24 * 60 * 60 * 1000;
+
+    // Connectivity analysis
+    const recentConnectivity = this.connectivityHistory.filter(
+      (event) => event.timestamp >= last24Hours,
+    );
+
+    const connectivityChanges = recentConnectivity.length;
+    const offlineTime = recentConnectivity
+      .filter((event) => event.status === "offline")
+      .reduce((total, event, index, arr) => {
+        const nextEvent = arr[index + 1];
+        if (nextEvent && nextEvent.status === "online") {
+          return total + (nextEvent.timestamp - event.timestamp);
+        }
+        return total;
+      }, 0);
+
+    // Installation analysis
+    const recentInstallations = this.installationHistory.filter(
+      (event) => event.timestamp >= last7Days,
+    );
+
+    // Sync performance analysis
+    const syncSuccessRate =
+      this.syncMetrics.totalSyncs > 0
+        ? (
+            ((this.syncMetrics.totalSyncs - this.syncMetrics.failedSyncs) /
+              this.syncMetrics.totalSyncs) *
+            100
+          ).toFixed(2)
+        : 100;
+
+    return {
+      overview: {
+        isInstalled: this.isInstalled,
+        isOnline: this.isOnline,
+        hasServiceWorker: !!this.registration,
+        hasDataHandler: !!this.dataHandler,
+        healthStatus: this.getPWAHealthScore(),
+      },
+      connectivity: {
+        currentStatus: this.isOnline ? "online" : "offline",
+        changes24h: connectivityChanges,
+        offlineTime24h: Math.round(offlineTime / 1000 / 60), // minutes
+        connectivityReliability: this.getConnectivityReliability(),
+      },
+      installation: {
+        installationCount7d: recentInstallations.length,
+        totalInstallEvents: this.installationHistory.length,
+        lastInstallEvent:
+          this.installationHistory.length > 0
+            ? this.installationHistory[this.installationHistory.length - 1]
+            : null,
+      },
+      sync: {
+        totalSyncs: this.syncMetrics.totalSyncs,
+        failedSyncs: this.syncMetrics.failedSyncs,
+        successRate: syncSuccessRate,
+        averageDuration: this.syncMetrics.averageSyncDuration,
+        lastSyncTime: this.syncMetrics.lastSyncTime,
+        queueLength: this.syncQueue.length,
+      },
+      performance: {
+        cacheEnabled: !!this.registration,
+        backgroundSyncSupported:
+          "sync" in window.ServiceWorkerRegistration.prototype,
+        persistentStorageAvailable: !!this.dataHandler,
+        healthScore: this.getPWAHealthScore(),
+      },
+      timestamp: now,
+    };
+  }
+
+  /**
+   * Phase 3.5: Calculate PWA health score
+   */
+  getPWAHealthScore() {
+    let score = 0;
+    const maxScore = 100;
+
+    // Service Worker health (25 points)
+    if (this.registration && this.pwaHealth.serviceWorkerStatus === "active") {
+      score += 25;
+    }
+
+    // Connectivity stability (25 points)
+    const connectivityReliability = this.getConnectivityReliability();
+    score += Math.round(connectivityReliability * 0.25);
+
+    // Sync performance (25 points)
+    if (this.syncMetrics.totalSyncs > 0) {
+      const successRate =
+        (this.syncMetrics.totalSyncs - this.syncMetrics.failedSyncs) /
+        this.syncMetrics.totalSyncs;
+      score += Math.round(successRate * 25);
+    } else {
+      score += 25; // No syncs attempted, assume healthy
+    }
+
+    // Queue health (25 points)
+    if (this.syncQueue.length === 0) {
+      score += 25;
+    } else if (this.syncQueue.length < 10) {
+      score += 15;
+    } else if (this.syncQueue.length < 50) {
+      score += 5;
+    }
+    // else 0 points for overloaded queue
+
+    return Math.min(score, maxScore);
+  }
+
+  /**
+   * Phase 3.5: Calculate connectivity reliability percentage
+   */
+  getConnectivityReliability() {
+    if (this.connectivityHistory.length < 2) return 100;
+
+    const totalTime =
+      this.connectivityHistory[this.connectivityHistory.length - 1].timestamp -
+      this.connectivityHistory[0].timestamp;
+
+    let onlineTime = 0;
+
+    for (let i = 0; i < this.connectivityHistory.length - 1; i++) {
+      const current = this.connectivityHistory[i];
+      const next = this.connectivityHistory[i + 1];
+      const duration = next.timestamp - current.timestamp;
+
+      if (current.status === "online") {
+        onlineTime += duration;
+      }
+    }
+
+    return totalTime > 0 ? Math.round((onlineTime / totalTime) * 100) : 100;
+  }
+
+  /**
+   * Phase 3.5: Get sync queue analytics
+   */
+  getSyncQueueAnalytics() {
+    const now = Date.now();
+    const oldestItem =
+      this.syncQueue.length > 0
+        ? Math.min(...this.syncQueue.map((item) => item.timestamp))
+        : now;
+
+    return {
+      totalItems: this.syncQueue.length,
+      oldestItemAge: Math.round((now - oldestItem) / 1000 / 60), // minutes
+      itemTypes: this.syncQueue.reduce((types, item) => {
+        types[item.type] = (types[item.type] || 0) + 1;
+        return types;
+      }, {}),
+      averageAge:
+        this.syncQueue.length > 0
+          ? Math.round(
+              this.syncQueue.reduce(
+                (sum, item) => sum + (now - item.timestamp),
+                0,
+              ) /
+                this.syncQueue.length /
+                1000 /
+                60,
+            )
+          : 0,
+    };
+  }
+
+  /**
+   * Phase 3.5: Clear old PWA data for maintenance
+   */
+  async clearOldPWAData() {
+    if (!this.dataHandler) return;
+
+    try {
+      const cutoffTime = Date.now() - 30 * 24 * 60 * 60 * 1000; // 30 days
+
+      // Clear old connectivity history
+      this.connectivityHistory = this.connectivityHistory.filter(
+        (event) => event.timestamp >= cutoffTime,
+      );
+
+      // Clear old installation history
+      this.installationHistory = this.installationHistory.filter(
+        (event) => event.timestamp >= cutoffTime,
+      );
+
+      // Clear old sync queue items
+      this.syncQueue = this.syncQueue.filter(
+        (item) => item.timestamp >= cutoffTime,
+      );
+
+      // Save cleaned data
+      await this.savePWAData();
+
+      console.log("✅ PWAService: Cleared old PWA data");
+    } catch (error) {
+      console.error("❌ PWAService: Failed to clear old data:", error);
+    }
+  }
+
+  /**
+   * Phase 3.5: Export PWA data for analysis
+   */
+  async exportPWAData() {
+    const analytics = this.getPWAAnalytics();
+    const syncQueueAnalytics = this.getSyncQueueAnalytics();
+
+    return {
+      exportTimestamp: Date.now(),
+      pwaService: {
+        version: "3.5.0",
+        features: {
+          dataHandlerIntegration: !!this.dataHandler,
+          serviceWorkerSupport: !!this.registration,
+          backgroundSyncSupport:
+            "sync" in window.ServiceWorkerRegistration.prototype,
+        },
+      },
+      analytics,
+      syncQueue: syncQueueAnalytics,
+      rawData: {
+        installationHistory: this.installationHistory,
+        connectivityHistory: this.connectivityHistory.slice(-100), // Last 100 events
+        syncMetrics: this.syncMetrics,
+        pwaHealth: this.pwaHealth,
+      },
+    };
+  }
+
+  /**
+   * Phase 3.5: Reset PWA analytics data
+   */
+  async resetAnalytics() {
+    if (!this.dataHandler) return;
+
+    try {
+      this.installationHistory = [];
+      this.connectivityHistory = [];
+      this.syncMetrics = {
+        totalSyncs: 0,
+        failedSyncs: 0,
+        lastSyncTime: null,
+        averageSyncDuration: 0,
+      };
+
+      await this.savePWAData();
+      console.log("✅ PWAService: Analytics data reset");
+    } catch (error) {
+      console.error("❌ PWAService: Failed to reset analytics:", error);
+    }
+  }
 }
 
 // Export for use in other modules
