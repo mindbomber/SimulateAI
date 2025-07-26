@@ -47,6 +47,12 @@
   z-index: 10; /* Above bubbling emojis (z-index: 1) */
 }
 
+/* Ensure all content elements appear above bubbling emojis */
+.badge-modal-content > * {
+  position: relative;
+  z-index: 20; /* Above bubbling emojis container */
+}
+
 /* ========================================
    Badge Visual Container
    ======================================== */
@@ -54,7 +60,7 @@
 .badge-visual-container {
   margin-bottom: 2rem;
   position: relative;
-  z-index: 10;
+  z-index: 30; /* Above bubbling emojis and other content */
 }
 
 .badge-shield {
@@ -896,93 +902,79 @@
 /* Bubbling emoji containers - positioned behind modal content */
 .emoji-bubbles-container {
   position: absolute;
-  top: 0;
+  top: 0; /* Fill entire content area */
   left: 0;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  bottom: 0;
   pointer-events: none;
   overflow: hidden;
-  z-index: 1; /* Behind modal content */
-  border-radius: 20px; /* Match modal border radius */
+  z-index: 1; /* Behind modal content (z-index: 10) */
+  border-radius: 0; /* No border radius since it's inside content area */
 }
 
 /* Animated bubbling versions of badge emojis for background effect */
-.bubbling-emoji {
+.emoji-bubbles-container .bubbling-emoji {
   position: absolute;
-  font-size: 1.5rem;
   opacity: 0;
   z-index: 1; /* Behind modal content */
-  animation: bubble-up linear;
-  filter: blur(0.5px);
-}
-
-.bubbling-emoji.category {
-  animation-duration: 8s;
-}
-
-.bubbling-emoji.sidekick {
-  animation-duration: 10s;
-  font-size: 1.2rem;
-}
-
-/* Enhanced positioning for badge emojis within modal bounds */
-.emoji-bubbles-container .badge-sidekick-emoji,
-.emoji-bubbles-container .badge-category-emoji {
-  position: absolute;
-  z-index: 1; /* Behind modal content but visible */
-  pointer-events: none;
   animation: bubble-up linear infinite;
-  opacity: 0;
+  filter: blur(0.5px);
+  bottom: 0; /* Start at bottom of container */
+  left: 50%; /* Center horizontally, offset by transform */
+  pointer-events: none;
 }
 
-.emoji-bubbles-container .badge-sidekick-emoji {
-  animation-duration: 10s;
-  font-size: 1.2rem;
-}
-
-.emoji-bubbles-container .badge-category-emoji {
-  animation-duration: 8s;
+.emoji-bubbles-container .bubbling-emoji.category {
   font-size: 1.5rem;
+}
+
+.emoji-bubbles-container .bubbling-emoji.sidekick {
+  font-size: 1.2rem;
 }
 
 @keyframes bubble-up {
   0% {
-    transform: translateY(100%) translateX(0) scale(0.3) rotate(0deg);
+    transform: translateY(0) translateX(-50%) scale(0.2) rotate(0deg);
     opacity: 0;
   }
 
-  5% {
-    opacity: 0.6;
-    transform: translateY(95%) translateX(0) scale(0.5) rotate(10deg);
-  }
-
-  15% {
-    opacity: 0.8;
-    transform: translateY(85%) translateX(var(--drift-x, 10px)) scale(0.7)
-      rotate(-5deg);
-  }
-
-  50% {
-    opacity: 0.6;
-    transform: translateY(50%) translateX(var(--drift-x, 20px)) scale(1)
-      rotate(15deg);
-  }
-
-  85% {
+  10% {
     opacity: 0.4;
-    transform: translateY(15%) translateX(var(--drift-x, 15px)) scale(0.8)
+    transform: translateY(-20px) translateX(calc(-50% + var(--drift-x, 0px)))
+      scale(0.4) rotate(15deg);
+  }
+
+  25% {
+    opacity: 0.7;
+    transform: translateY(-50px)
+      translateX(calc(-50% + var(--drift-x, 0px) * 1.2)) scale(0.6)
       rotate(-10deg);
   }
 
-  95% {
-    opacity: 0.2;
-    transform: translateY(5%) translateX(var(--drift-x, 5px)) scale(0.4)
-      rotate(5deg);
+  50% {
+    opacity: 0.8;
+    transform: translateY(-90px)
+      translateX(calc(-50% + var(--drift-x, 0px) * 1.5)) scale(0.9)
+      rotate(20deg);
+  }
+
+  75% {
+    opacity: 0.6;
+    transform: translateY(-130px)
+      translateX(calc(-50% + var(--drift-x, 0px) * 1.2)) scale(0.7)
+      rotate(-15deg);
+  }
+
+  90% {
+    opacity: 0.3;
+    transform: translateY(-160px)
+      translateX(calc(-50% + var(--drift-x, 0px) * 0.8)) scale(0.4)
+      rotate(10deg);
   }
 
   100% {
-    transform: translateY(-10%) translateX(var(--drift-x, 0px)) scale(0.2)
-      rotate(0deg);
+    transform: translateY(-180px)
+      translateX(calc(-50% + var(--drift-x, 0px) * 0.5)) scale(0.2) rotate(0deg);
     opacity: 0;
   }
 }

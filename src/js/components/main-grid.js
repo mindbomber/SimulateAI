@@ -1854,6 +1854,13 @@ class MainGrid {
         "scenario-modal-closed",
         this.modalClosedHandler,
       );
+      logger.info(
+        "🎯 MAIN-GRID: scenario-modal-closed event listener attached",
+      );
+    } else {
+      logger.info(
+        "🎯 MAIN-GRID: scenario-modal-closed event listener already exists",
+      );
     }
 
     // Listen for scenario reflection completion (for deferred badges) - only add once
@@ -2410,10 +2417,11 @@ class MainGrid {
   async handleScenarioModalClosed(event) {
     const { categoryId, scenarioId, completed = true } = event.detail;
 
-    logger.info("Scenario modal fully closed:", {
+    logger.info("🔥 SCENARIO MODAL CLOSED - MainGrid received event:", {
       categoryId,
       scenarioId,
       completed,
+      eventDetail: event.detail,
     });
 
     // CRITICAL FIX: Always reset modal state to allow new modals to open
@@ -2427,11 +2435,15 @@ class MainGrid {
 
     // Only check for newly earned badges if scenario was actually completed
     if (completed && categoryId && scenarioId) {
+      logger.info(
+        `🎯 CALLING deferBadgesForReflection for ${categoryId}:${scenarioId}`,
+      );
       // DEFERRED BADGE SYSTEM: Store badges for later display after reflection
       await this.deferBadgesForReflection(categoryId, scenarioId);
     } else {
       logger.debug(
         "Scenario modal closed without completion - skipping badge check",
+        { completed, categoryId, scenarioId },
       );
     }
   }
@@ -2626,13 +2638,24 @@ class MainGrid {
    */
   async deferBadgesForReflection(categoryId, scenarioId) {
     try {
+      logger.info(
+        `🏆 deferBadgesForReflection called for ${categoryId}:${scenarioId}`,
+      );
+
       // Refresh badge manager's category progress (now async)
+      logger.info("Refreshing badge manager category progress...");
       await badgeManager.refreshCategoryProgress();
 
       // Check for newly earned badges (now async)
+      logger.info("Checking for newly earned badges...");
       const newBadges = await badgeManager.updateScenarioCompletion(
         categoryId,
         scenarioId,
+      );
+
+      logger.info(
+        `Badge check result: ${newBadges?.length || 0} badges found`,
+        newBadges,
       );
 
       if (newBadges && newBadges.length > 0) {

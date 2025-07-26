@@ -108,29 +108,100 @@ export class BadgeModal {
    * @param {Object} options - Additional options for the modal display
    */
   async showBadgeModal(badgeConfig, returnContext = "main", options = {}) {
-    if (this.isVisible) {
-      return; // Prevent multiple modals
+    try {
+      logger.info("🏆 BadgeModal.showBadgeModal called", {
+        badgeConfig,
+        returnContext,
+        options,
+      });
+
+      if (this.isVisible) {
+        logger.warn("Badge modal already visible, preventing multiple modals");
+        return; // Prevent multiple modals
+      }
+
+      // Validate badge configuration
+      if (!this.validateBadgeConfig(badgeConfig)) {
+        logger.error("Invalid badge configuration provided:", badgeConfig);
+        return;
+      }
+
+      // Ensure configuration is loaded
+      if (!this.config) {
+        logger.info("Loading badge modal configuration...");
+        const configLoaded = await this.loadConfiguration();
+        if (!configLoaded) {
+          logger.error("Failed to load badge modal configuration");
+          return;
+        }
+      }
+
+      this.isVisible = true;
+
+      // Start confetti celebration (options.showConfetti is for future use)
+      logger.info("Starting confetti celebration...");
+      this.triggerConfetti(badgeConfig.categoryEmoji, badgeConfig.tier);
+
+      // Delay modal creation to appear with the confetti wave
+      const delayDuration =
+        this.config?.animations?.confetti?.secondWaveDelay || 500;
+
+      setTimeout(() => {
+        try {
+          // Create and show modal
+          logger.info("Creating and showing badge modal...");
+          this.createModal(badgeConfig, returnContext);
+          this.animateModalEntrance();
+          logger.info("Badge modal displayed successfully");
+        } catch (modalError) {
+          logger.error("Error creating badge modal:", modalError);
+          this.isVisible = false;
+        }
+      }, delayDuration);
+    } catch (error) {
+      logger.error("Error in showBadgeModal:", error);
+      this.isVisible = false;
+      throw error;
+    }
+  }
+
+  /**
+   * Validates badge configuration
+   * @param {Object} badgeConfig - Badge configuration to validate
+   * @returns {boolean} True if valid
+   */
+  validateBadgeConfig(badgeConfig) {
+    if (!badgeConfig) {
+      logger.error("Badge config is null or undefined");
+      return false;
     }
 
-    // Ensure configuration is loaded
-    if (!this.config) {
-      await this.loadConfiguration();
+    const requiredFields = ["title", "categoryEmoji", "sidekickEmoji", "quote"];
+    const missingFields = requiredFields.filter((field) => !badgeConfig[field]);
+
+    if (missingFields.length > 0) {
+      logger.error("Missing required badge fields:", missingFields);
+      logger.error("Badge config:", badgeConfig);
+      return false;
     }
 
-    this.isVisible = true;
+    // Add default values for optional fields
+    if (!badgeConfig.timestamp) {
+      badgeConfig.timestamp = Date.now();
+      logger.warn("Badge config missing timestamp, using current time");
+    }
 
-    // Start confetti celebration (options.showConfetti is for future use)
-    this.triggerConfetti(badgeConfig.categoryEmoji, badgeConfig.tier);
+    if (!badgeConfig.tier) {
+      badgeConfig.tier = 1;
+      logger.warn("Badge config missing tier, defaulting to 1");
+    }
 
-    // Delay modal creation to appear with the confetti wave
-    const delayDuration =
-      this.config?.animations?.confetti?.secondWaveDelay || 500;
+    if (!badgeConfig.glowIntensity) {
+      badgeConfig.glowIntensity = "low";
+      logger.warn("Badge config missing glowIntensity, defaulting to 'low'");
+    }
 
-    setTimeout(() => {
-      // Create and show modal
-      this.createModal(badgeConfig, returnContext);
-      this.animateModalEntrance();
-    }, delayDuration);
+    return true;
   }
 
   /**
@@ -267,7 +338,9 @@ export class BadgeModal {
    * @returns {string} Modal HTML
    */
   generateModalHTML(badgeConfig, returnContext) {
-    const timestamp = new Date(badgeConfig.timestamp).toLocaleString("en-US", {
+    // Handle timestamp safely - use current time if not provided
+    const badgeTimestamp = badgeConfig.timestamp || Date.now();
+    const timestamp = new Date(badgeTimestamp).toLocaleString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
@@ -428,10 +501,17 @@ export class BadgeModal {
    * Closes the badge modal
    */
   closeModal() {
-    if (!this.isVisible || !this.currentModal) return;
+    logger.info("🔒 BadgeModal.closeModal called");
+
+    if (!this.isVisible || !this.currentModal) {
+      logger.warn("Badge modal already closed or not visible");
+      return;
+    }
 
     const modal = this.currentModal.querySelector(".badge-modal");
     const modalExitDuration = this.config?.animations?.modalExitDuration || 400;
+
+    logger.info("Animating badge modal exit...");
 
     // Animate exit
     modal.style.transition = `all ${modalExitDuration}ms ease-in`;
@@ -443,8 +523,10 @@ export class BadgeModal {
       if (this.currentModal) {
         document.body.removeChild(this.currentModal);
         this.currentModal = null;
+        logger.info("Badge modal removed from DOM");
       }
       this.isVisible = false;
+      logger.info("Badge modal closed successfully");
     }, modalExitDuration);
   }
 
@@ -584,7 +666,16 @@ export class BadgeModal {
       bubblesContainer.appendChild(bubble);
     }
 
-    this.currentModal.appendChild(bubblesContainer);
+    // Append bubbles container to modal content (behind content) for proper positioning
+    const modalContent = this.currentModal.querySelector(
+      ".badge-modal-content",
+    );
+    if (modalContent) {
+      modalContent.appendChild(bubblesContainer);
+    } else {
+      // Fallback to modal if content not found
+      this.currentModal.appendChild(bubblesContainer);
+    }
   }
 
   /**

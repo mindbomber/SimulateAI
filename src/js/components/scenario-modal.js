@@ -1746,6 +1746,11 @@ class ScenarioModal {
       const closedEvent = new CustomEvent("scenario-modal-closed", {
         detail: completionData,
       });
+
+      logger.info(
+        "🚀 DISPATCHING scenario-modal-closed event:",
+        completionData,
+      );
       document.dispatchEvent(closedEvent);
 
       logger.info(
