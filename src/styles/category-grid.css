@@ -417,6 +417,15 @@
   /* .scenarios-grid styles moved to scenario-browser.css for consolidation */
 }
 
+/* Tablet responsive adjustments - maintain uniform rectangular shapes */
+@media (width >= 769px) and (width <= 1199px) {
+  .category-section .scenario-card,
+  .simulations-grid .scenario-card {
+    flex: 0 0 320px; /* Medium cards on tablets - maintains uniform shape */
+    min-height: 280px;
+  }
+}
+
 /* Desktop responsive adjustments for scenarios grid - moved to scenario-browser.css */
 @media (width >= 1200px) {
   /* .scenarios-grid styles moved to scenario-browser.css for consolidation */

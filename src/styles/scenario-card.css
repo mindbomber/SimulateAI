@@ -196,7 +196,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-3);
-  padding: var(--spacing-0) var(--spacing-5) var(--spacing-5); /* From config: styles.spacing.footerPadding */
+  padding: 16px 16px 16px 16px; /* Uniform 16px padding on all sides */
   border-top: 1px solid var(--color-gray-200);
   background: var(--color-gray-50);
   margin-top: auto;
@@ -208,15 +208,18 @@
   color: var(--color-white);
   border: none;
   border-radius: var(--radius-lg);
-  padding: var(--spacing-2) var(--spacing-4);
+  padding: var(--spacing-2) var(--spacing-6);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   cursor: pointer;
   transition: all var(--transition-base);
   display: flex;
-  align-items: center;
+  align-items: left;
   gap: var(--spacing-2);
   text-decoration: none;
+  flex: 1;
+  min-width: 0; /* Increased minimum width to extend further right */
+  justify-content: left; /* Center content within button */
 }
 
 .scenario-start-btn:hover {

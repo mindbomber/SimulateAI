@@ -60,10 +60,129 @@ class CategoryHeader {
   }
 
   constructor() {
-    this.boundEvents = new Map(); // Track bound event handlers for cleanup
+    this.boundEvents = new Map();
+    this.mutationObserver = null;
 
-    // Configuration will be loaded when needed
-    this.configPromise = CategoryHeader.loadConfiguration();
+    // Automatically initialize tooltips when DOM is ready
+    this.initializeAutomaticTooltips();
+  }
+
+  /**
+   * Initialize automatic tooltip functionality for all users
+   * This runs without manual intervention
+   */
+  initializeAutomaticTooltips() {
+    // Wait for DOM to be ready
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => {
+        this.setupGlobalTooltipMonitoring();
+      });
+    } else {
+      this.setupGlobalTooltipMonitoring();
+    }
+  }
+
+  /**
+   * Set up global monitoring for progress rings and tooltips
+   * This ensures tooltips work automatically for all users
+   */
+  async setupGlobalTooltipMonitoring() {
+    logger.info("CategoryHeader: Setting up global tooltip monitoring...");
+
+    try {
+      // Initial tooltip attachment
+      await this.performGlobalTooltipAttachment();
+
+      // Set up view change monitoring
+      this.setupViewChangeMonitoring();
+
+      // Set up periodic checks for new rings
+      this.setupPeriodicTooltipChecks();
+
+      logger.info("CategoryHeader: Global tooltip monitoring setup complete");
+    } catch (error) {
+      logger.error(
+        "CategoryHeader: Error setting up global tooltip monitoring:",
+        error,
+      );
+    }
+  }
+
+  /**
+   * Perform global tooltip attachment to all progress rings
+   */
+  async performGlobalTooltipAttachment() {
+    const containers = [
+      document.querySelector(".scenarios-grid"),
+      document.querySelector(".category-container"),
+      document.querySelector(".scenario-container"),
+      document.body, // Fallback to search entire page
+    ].filter(Boolean);
+
+    for (const container of containers) {
+      try {
+        await this.attachTooltipsToProgressRingsRobust(container);
+      } catch (error) {
+        logger.warn(
+          "CategoryHeader: Error attaching tooltips to container:",
+          error,
+        );
+      }
+    }
+  }
+
+  /**
+   * Set up monitoring for view changes to reattach tooltips
+   */
+  setupViewChangeMonitoring() {
+    // Monitor for view changes by watching data-view attribute changes
+    const observer = new MutationObserver((mutations) => {
+      let shouldReattach = false;
+
+      mutations.forEach((mutation) => {
+        if (
+          mutation.type === "attributes" &&
+          mutation.attributeName === "data-view"
+        ) {
+          logger.debug(
+            "CategoryHeader: View change detected, scheduling tooltip reattachment...",
+          );
+          shouldReattach = true;
+        }
+      });
+
+      if (shouldReattach) {
+        // Delay to ensure view transition is complete
+        setTimeout(() => {
+          this.performGlobalTooltipAttachment();
+        }, 500);
+      }
+    });
+
+    // Observe all scenarios-grid elements for data-view changes
+    document.querySelectorAll(".scenarios-grid").forEach((grid) => {
+      observer.observe(grid, {
+        attributes: true,
+        attributeFilter: ["data-view"],
+      });
+    });
+  }
+
+  /**
+   * Set up periodic checks for new progress rings
+   */
+  setupPeriodicTooltipChecks() {
+    setInterval(() => {
+      const unfixedRings = document.querySelectorAll(
+        '.category-progress-ring:not([data-tooltip-robust="true"])',
+      );
+      if (unfixedRings.length > 0) {
+        logger.debug(
+          `CategoryHeader: Found ${unfixedRings.length} unfixed progress rings, applying tooltips...`,
+        );
+        this.performGlobalTooltipAttachment();
+      }
+    }, 5000); // Check every 5 seconds
   }
 
   /**
@@ -183,80 +302,443 @@ class CategoryHeader {
    * Attaches event listeners to category header elements
    * @param {HTMLElement} container - Container element with category headers
    */
-  attachEventListeners(container) {
+  async attachEventListeners(container) {
     if (!container) return;
 
-    // Add tooltip functionality for progress rings
-    this.attachProgressRingTooltips(container);
+    logger.debug("CategoryHeader: attachEventListeners called", {
+      containerType: container.tagName,
+      progressRingsFound: container.querySelectorAll(".category-progress-ring")
+        .length,
+    });
+
+    // Single, robust tooltip attachment method
+    await this.attachTooltipsToProgressRings(container);
+
+    // TIMING FIX: Single retry for late-rendered elements
+    setTimeout(async () => {
+      await this.attachTooltipsToProgressRings(container);
+    }, 1000);
+
+    // Set up MutationObserver to catch dynamically added progress rings
+    await this.setupProgressRingObserver(container);
+
+    logger.debug("CategoryHeader: attachEventListeners completed", {
+      boundEventsCount: this.boundEvents.size,
+    });
   }
 
   /**
-   * Attaches tooltip functionality to progress rings
-   * @param {HTMLElement} container - Container element
+   * Sets up a MutationObserver to automatically attach tooltips to new progress rings
+   * @param {HTMLElement} container - Container to observe
    */
-  async attachProgressRingTooltips(container) {
+  async setupProgressRingObserver(container) {
+    if (!container || this.mutationObserver) return;
+
     const config = await this.getConfig();
     const selectors = getSelectors(config);
 
-    // Try the specific selector first, then fallback to all progress rings
-    let progressRings = container.querySelectorAll(selectors.progressRing);
+    this.mutationObserver = new MutationObserver((mutations) => {
+      let hasNewRings = false;
 
-    if (progressRings.length === 0) {
-      // Fallback to all progress rings if the specific selector doesn't find any
-      progressRings = container.querySelectorAll(selectors.allProgressRings);
-      logger.debug("CategoryHeader using fallback selector for progress rings");
-    }
+      mutations.forEach((mutation) => {
+        if (mutation.type === "childList") {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              // Check if the added node is a progress ring or contains progress rings
+              const isProgressRing = node.classList?.contains(
+                "category-progress-ring",
+              );
+              const hasProgressRings =
+                node.querySelectorAll?.(selectors.allProgressRings).length > 0;
 
-    // Debug logging
-    logger.debug("CategoryHeader attachProgressRingTooltips called", {
-      container: container,
-      selector: selectors.progressRing,
-      fallbackSelector: selectors.allProgressRings,
-      foundRings: progressRings.length,
-      allRings: container.querySelectorAll(".category-progress-ring").length,
+              if (isProgressRing || hasProgressRings) {
+                hasNewRings = true;
+              }
+            }
+          });
+        }
+      });
+
+      if (hasNewRings) {
+        logger.debug(
+          "CategoryHeader: New progress rings detected, attaching tooltips...",
+        );
+        // Small delay to ensure DOM is fully updated
+        setTimeout(() => {
+          this.attachTooltipsToProgressRings(container);
+        }, 100);
+      }
     });
 
-    progressRings.forEach((ring) => {
-      // Only attach to rings that have tooltip data
-      if (!ring.hasAttribute("data-tooltip")) {
-        logger.debug("CategoryHeader skipping ring without tooltip", { ring });
+    // Start observing
+    this.mutationObserver.observe(container, {
+      childList: true,
+      subtree: true,
+    });
+
+    logger.debug("CategoryHeader: MutationObserver set up for progress rings");
+  }
+
+  /**
+   * Enhanced tooltip attachment with robust error handling and fallbacks
+   * This ensures tooltips work reliably across all views and scenarios
+   * @param {HTMLElement} container - Container element
+   */
+  async attachTooltipsToProgressRingsRobust(container) {
+    logger.debug("CategoryHeader: Starting robust tooltip attachment...");
+
+    try {
+      const config = await this.getConfig();
+      const selectors = getSelectors(config);
+
+      // Find all progress rings in the container
+      const rings = container.querySelectorAll(selectors.allProgressRings);
+      logger.debug(
+        `CategoryHeader: Found ${rings.length} progress rings for tooltip attachment`,
+      );
+
+      if (rings.length === 0) {
+        logger.warn(
+          "CategoryHeader: No progress rings found for tooltip attachment",
+        );
         return;
       }
 
-      // Clean up existing listeners first
-      this.removeEventListeners(ring);
+      // Process each ring with enhanced error handling
+      for (let i = 0; i < rings.length; i++) {
+        const ring = rings[i];
 
-      // Create bound event handlers for cleanup
-      const boundHandlers = {
-        mouseenter: this.showTooltip.bind(this),
-        mouseleave: this.hideTooltip.bind(this),
-        touchstart: this.handleProgressRingTouch.bind(this),
-        click: this.handleProgressRingClick.bind(this),
-        keydown: this.handleProgressRingKeydown.bind(this),
-      };
+        try {
+          // Skip if ring is not in DOM or already processed
+          if (!ring || !ring.parentNode) {
+            logger.debug(`CategoryHeader: Skipping ring ${i + 1} - not in DOM`);
+            continue;
+          }
 
-      // Store bound handlers for cleanup
-      this.boundEvents.set(ring, boundHandlers);
+          // Skip if already has robust tooltips attached
+          if (ring.getAttribute("data-tooltip-robust") === "true") {
+            logger.debug(
+              `CategoryHeader: Skipping ring ${i + 1} - already has robust tooltips`,
+            );
+            continue;
+          }
 
-      // Desktop: hover events
-      ring.addEventListener("mouseenter", boundHandlers.mouseenter);
-      ring.addEventListener("mouseleave", boundHandlers.mouseleave);
+          // Ensure tooltip data exists
+          await this.ensureTooltipData(ring, i);
 
-      // Mobile: touch/tap events
-      ring.addEventListener("touchstart", boundHandlers.touchstart);
-      ring.addEventListener("click", boundHandlers.click);
+          // Ensure accessibility attributes
+          this.ensureAccessibilityAttributes(ring);
 
-      // Keyboard accessibility
-      ring.addEventListener("keydown", boundHandlers.keydown);
+          // Remove old event listeners first
+          this.removeEventListeners(ring);
 
-      // Debug logging for each ring
-      logger.debug("CategoryHeader attached listeners to ring", {
-        hasTooltip: ring.hasAttribute("data-tooltip"),
-        categoryId: ring.getAttribute("data-category-id"),
-        tooltipContent: ring.getAttribute("data-tooltip"),
-      });
-    });
+          // Attach enhanced event listeners
+          await this.attachEnhancedEventListeners(ring, i);
+
+          // Mark as having robust tooltips
+          ring.setAttribute("data-tooltip-robust", "true");
+
+          logger.debug(
+            `CategoryHeader: Successfully attached robust tooltips to ring ${i + 1}`,
+          );
+        } catch (ringError) {
+          logger.error(
+            `CategoryHeader: Failed to attach tooltips to ring ${i + 1}:`,
+            ringError,
+          );
+          // Continue with other rings even if one fails
+        }
+      }
+
+      logger.info(
+        `CategoryHeader: Robust tooltip attachment completed for ${rings.length} rings`,
+      );
+    } catch (error) {
+      logger.error(
+        "CategoryHeader: Error in robust tooltip attachment:",
+        error,
+      );
+    }
   }
+
+  /**
+   * Ensure accessibility attributes for progress ring
+   * @param {HTMLElement} ring - Progress ring element
+   */
+  ensureAccessibilityAttributes(ring) {
+    if (!ring.hasAttribute("role")) {
+      ring.setAttribute("role", "button");
+    }
+    if (!ring.hasAttribute("tabindex")) {
+      ring.setAttribute("tabindex", "0");
+    }
+    if (!ring.hasAttribute("aria-label")) {
+      const tooltipContent = ring.getAttribute("data-tooltip");
+      ring.setAttribute("aria-label", `Category progress: ${tooltipContent}`);
+    }
+  }
+
+  /**
+   * Attach enhanced event listeners with better error handling
+   * @param {HTMLElement} ring - Progress ring element
+   * @param {number} index - Ring index for debugging
+   */
+  async attachEnhancedEventListeners(ring, index) {
+    const config = await this.getConfig();
+
+    // Create enhanced event handlers with error handling
+    const showTooltipEnhanced = async (event) => {
+      try {
+        // Use event.target as fallback if currentTarget is null
+        const targetRing = event.currentTarget || event.target;
+        if (!targetRing) {
+          logger.warn(
+            `CategoryHeader: No target for tooltip show event on ring ${index + 1}`,
+          );
+          return;
+        }
+
+        const rect = targetRing.getBoundingClientRect();
+        const content = targetRing.getAttribute("data-tooltip");
+
+        if (!content) {
+          logger.warn(
+            `CategoryHeader: No tooltip content for ring ${index + 1}`,
+          );
+          return;
+        }
+
+        // Create tooltip with enhanced styling
+        this.createEnhancedTooltip(content, rect, targetRing);
+
+        logger.debug(
+          `CategoryHeader: Enhanced tooltip shown for ring ${index + 1}`,
+        );
+      } catch (error) {
+        logger.error(
+          `CategoryHeader: Error showing enhanced tooltip for ring ${index + 1}:`,
+          error,
+        );
+      }
+    };
+
+    const hideTooltipEnhanced = () => {
+      try {
+        // Remove all tooltips created by this component
+        document
+          .querySelectorAll(
+            ".progress-ring-tooltip, .enhanced-progress-tooltip",
+          )
+          .forEach((el) => el.remove());
+
+        // Clear ring reference
+        if (ring._currentTooltip) {
+          ring._currentTooltip = null;
+        }
+      } catch (error) {
+        logger.error(
+          `CategoryHeader: Error hiding enhanced tooltip for ring ${index + 1}:`,
+          error,
+        );
+      }
+    };
+
+    // Attach event listeners with error handling
+    try {
+      ring.addEventListener("mouseenter", showTooltipEnhanced);
+      ring.addEventListener("mouseleave", hideTooltipEnhanced);
+
+      // Touch support
+      ring.addEventListener(
+        "touchstart",
+        (e) => {
+          e.preventDefault();
+          showTooltipEnhanced(e);
+          setTimeout(hideTooltipEnhanced, 3000);
+        },
+        { passive: false },
+      );
+
+      // Click support
+      ring.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if ("ontouchstart" in window) {
+          if (ring._currentTooltip) {
+            hideTooltipEnhanced();
+          } else {
+            showTooltipEnhanced(e);
+            setTimeout(hideTooltipEnhanced, 3000);
+          }
+        }
+      });
+
+      // Keyboard support
+      ring.addEventListener("keydown", (e) => {
+        if (["Enter", " ", "Escape"].includes(e.key)) {
+          e.preventDefault();
+          if (e.key === "Escape") {
+            hideTooltipEnhanced();
+          } else {
+            showTooltipEnhanced(e);
+            setTimeout(hideTooltipEnhanced, 3000);
+          }
+        }
+      });
+
+      // Store event listeners for cleanup
+      ring._enhancedTooltipListeners = {
+        showTooltipEnhanced,
+        hideTooltipEnhanced,
+      };
+    } catch (error) {
+      logger.error(
+        `CategoryHeader: Error attaching enhanced event listeners to ring ${index + 1}:`,
+        error,
+      );
+    }
+  }
+
+  /**
+   * Create enhanced tooltip with better styling and positioning
+   * @param {string} content - Tooltip content
+   * @param {DOMRect} rect - Target element rect
+   * @param {HTMLElement} targetRing - Target ring element
+   */
+  createEnhancedTooltip(content, rect, targetRing) {
+    // Remove existing tooltips
+    document
+      .querySelectorAll(".progress-ring-tooltip, .enhanced-progress-tooltip")
+      .forEach((el) => el.remove());
+
+    const tooltip = document.createElement("div");
+    tooltip.className =
+      "progress-ring-tooltip visible enhanced-progress-tooltip";
+    tooltip.textContent = content;
+
+    // Enhanced styling
+    tooltip.style.cssText = `
+      position: fixed !important;
+      top: ${rect.top - 50}px !important;
+      left: ${rect.left + rect.width / 2}px !important;
+      transform: translateX(-50%) !important;
+      z-index: 1300 !important;
+      background: #1f2937 !important;
+      color: white !important;
+      padding: 12px 16px !important;
+      border-radius: 6px !important;
+      font-size: 14px !important;
+      opacity: 1 !important;
+      display: block !important;
+      visibility: visible !important;
+      max-width: 300px !important;
+      min-width: 200px !important;
+      text-align: center !important;
+      line-height: 1.5 !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+      border: 1px solid #374151 !important;
+      pointer-events: none !important;
+      transition: opacity 0.2s ease !important;
+    `;
+
+    // Handle screen edge positioning
+    if (rect.top - 50 < 0) {
+      tooltip.style.top = `${rect.bottom + 8}px !important`;
+    }
+
+    // Prevent tooltip from going off screen horizontally
+    const tooltipRect = tooltip.getBoundingClientRect();
+    if (rect.left + rect.width / 2 - 150 < 0) {
+      tooltip.style.left = "10px !important";
+      tooltip.style.transform = "none !important";
+    } else if (rect.left + rect.width / 2 + 150 > window.innerWidth) {
+      tooltip.style.right = "10px !important";
+      tooltip.style.left = "auto !important";
+      tooltip.style.transform = "none !important";
+    }
+
+    document.body.appendChild(tooltip);
+    targetRing._currentTooltip = tooltip;
+
+    return tooltip;
+  }
+
+  /**
+   * Consolidated method to attach tooltips to progress rings
+   * Replaces attachProgressRingTooltips, retryAttachTooltips, robustTooltipAttachment, and attachRobustListeners
+   * @param {HTMLElement} container - Container element
+   */
+  async attachTooltipsToProgressRings(container) {
+    // Use the robust implementation as the default
+    return this.attachTooltipsToProgressRingsRobust(container);
+  }
+
+  /**
+   * Attaches event listeners to a single progress ring
+   * @param {HTMLElement} ring - Progress ring element
+   */
+  attachSingleRingListeners(ring) {
+    // Create bound event handlers with consistent binding
+    const boundHandlers = {
+      mouseenter: (e) => this.showTooltip(e),
+      mouseleave: () => this.hideTooltip(),
+      touchstart: (e) => this.handleProgressRingTouch(e),
+      click: (e) => this.handleProgressRingClick(e),
+      keydown: (e) => this.handleProgressRingKeydown(e),
+    };
+
+    // Store bound handlers for cleanup
+    this.boundEvents.set(ring, boundHandlers);
+
+    // Attach all event listeners
+    Object.entries(boundHandlers).forEach(([event, handler]) => {
+      ring.addEventListener(event, handler);
+    });
+
+    // Mark ring as having tooltip listeners attached
+    ring._tooltipAttached = true;
+  }
+
+  /**
+   * Ensures a progress ring has tooltip data
+   * @param {HTMLElement} ring - Progress ring element
+   * @param {number} index - Ring index for fallback naming
+   */
+  async ensureTooltipData(ring, index) {
+    const config = await this.getConfig();
+    const selectors = getSelectors(config);
+
+    if (!ring.hasAttribute("data-tooltip")) {
+      // Create fallback tooltip data like the manual fix
+      const percentage =
+        ring.querySelector(selectors.percentageSpan)?.textContent || "0%";
+      const categoryId =
+        ring.getAttribute("data-category-id") || `category-${index + 1}`;
+
+      // Try to get better tooltip content if possible
+      let tooltipContent = `Progress: ${percentage}`;
+
+      // Look for category title in parent elements for better context
+      const categoryTitle = ring
+        .closest(selectors.categoryHeader)
+        ?.querySelector(selectors.categoryTitle)?.textContent;
+      if (categoryTitle) {
+        tooltipContent = `${categoryTitle}: ${percentage} complete`;
+      } else if (categoryId && categoryId !== `category-${index + 1}`) {
+        tooltipContent = `${categoryId}: ${percentage} complete`;
+      }
+
+      ring.setAttribute("data-tooltip", tooltipContent);
+      logger.debug(
+        `CategoryHeader: Added missing tooltip data to ring ${index}:`,
+        tooltipContent,
+      );
+    }
+  }
+
+  /**
+   * Updates MutationObserver to call the consolidated attachment method
+   */
 
   /**
    * Removes event listeners from a progress ring
@@ -281,7 +763,35 @@ class CategoryHeader {
       const config = await this.getConfig();
       const tooltipConfig = getTooltipConfig(config);
       const templates = getHtmlTemplates(config);
-      const ring = event.currentTarget;
+      const selectors = getSelectors(config);
+      let ring = event.currentTarget;
+
+      // Fallback to event.target if currentTarget is null
+      if (!ring && event.target) {
+        ring = event.target;
+        logger.warn(
+          "CategoryHeader showTooltip: using event.target as fallback",
+          {
+            eventType: event?.type,
+            target: event.target,
+            targetClass: event.target?.className,
+          },
+        );
+      }
+
+      // Final null check for ring element
+      if (!ring) {
+        logger.error(
+          "CategoryHeader showTooltip: both event.currentTarget and event.target are null",
+          {
+            event: event,
+            eventType: event?.type,
+            eventTarget: event?.target,
+          },
+        );
+        return;
+      }
+
       const tooltip = ring.getAttribute(getAttributes(config).dataTooltip);
 
       // Debug logging
@@ -294,7 +804,60 @@ class CategoryHeader {
       });
 
       if (!tooltip) {
-        logger.warn("CategoryHeader showTooltip: no tooltip content found");
+        logger.warn("CategoryHeader showTooltip: no tooltip content found", {
+          ring: ring,
+          categoryId: ring.getAttribute("data-category-id"),
+          hasDataTooltip: ring.hasAttribute("data-tooltip"),
+          allAttributes: Array.from(ring.attributes).map(
+            (attr) => `${attr.name}="${attr.value}"`,
+          ),
+        });
+
+        // FALLBACK: Create a basic tooltip if data is missing
+        const categoryId = ring.getAttribute("data-category-id");
+        const percentage =
+          ring.querySelector(selectors.percentageSpan)?.textContent || "0%";
+        const fallbackTooltip =
+          `Category progress: ${percentage}` +
+          (categoryId ? ` (${categoryId})` : "");
+
+        logger.debug("CategoryHeader using fallback tooltip:", fallbackTooltip);
+
+        // Use fallback tooltip content
+        const tooltipEl = document.createElement("div");
+        tooltipEl.className = templates.progressRing.tooltipClass;
+        tooltipEl.textContent = fallbackTooltip;
+        tooltipEl.setAttribute(
+          getAttributes(config).role,
+          tooltipConfig.accessibility.role,
+        );
+
+        // Position tooltip above the progress ring
+        const rect = ring.getBoundingClientRect();
+        tooltipEl.style.position = tooltipConfig.positioning.position;
+        tooltipEl.style.left = `${rect.left + rect.width / 2}px`;
+        tooltipEl.style.transform = tooltipConfig.positioning.transform;
+        tooltipEl.style.zIndex = tooltipConfig.zIndex.toString();
+
+        document.body.appendChild(tooltipEl);
+
+        // Calculate position after adding to DOM
+        const tooltipRect = tooltipEl.getBoundingClientRect();
+        const topPosition =
+          rect.top - tooltipRect.height - tooltipConfig.offset;
+
+        if (topPosition < 0) {
+          tooltipEl.style.top = `${rect.bottom + tooltipConfig.offset}px`;
+        } else {
+          tooltipEl.style.top = `${topPosition}px`;
+        }
+
+        // Make visible
+        tooltipEl.classList.add(templates.progressRing.visibleClass);
+
+        // Store reference for cleanup
+        ring._tooltip = tooltipEl;
+
         return;
       }
 
@@ -413,7 +976,34 @@ class CategoryHeader {
 
     // On mobile, toggle tooltip
     if ("ontouchstart" in window) {
-      const ring = event.currentTarget;
+      let ring = event.currentTarget;
+
+      // Fallback to event.target if currentTarget is null
+      if (!ring && event.target) {
+        ring = event.target;
+        logger.warn(
+          "CategoryHeader handleProgressRingClick: using event.target as fallback",
+          {
+            eventType: event?.type,
+            target: event.target,
+            targetClass: event.target?.className,
+          },
+        );
+      }
+
+      // Final null check for ring element
+      if (!ring) {
+        logger.error(
+          "CategoryHeader handleProgressRingClick: both event.currentTarget and event.target are null",
+          {
+            event: event,
+            eventType: event?.type,
+            eventTarget: event?.target,
+          },
+        );
+        return;
+      }
+
       if (ring._tooltip) {
         this.hideTooltip();
       } else {
@@ -458,6 +1048,13 @@ class CategoryHeader {
     });
 
     this.boundEvents.clear();
+
+    // Clean up MutationObserver
+    if (this.mutationObserver) {
+      this.mutationObserver.disconnect();
+      this.mutationObserver = null;
+      logger.debug("CategoryHeader: MutationObserver cleaned up");
+    }
   }
 
   /**
@@ -562,6 +1159,14 @@ class CategoryHeader {
         percentage: progress.percentage,
         badgeAlert: isOneScenarioAwayFromBadge,
       });
+
+      // TOOLTIP FIX: Ensure tooltip functionality after progress ring update
+      // This handles cases where progress rings are updated dynamically
+      if (!progressRing._tooltipAttached) {
+        setTimeout(() => {
+          this.attachTooltipsToProgressRings(container);
+        }, 100);
+      }
     } catch (error) {
       logger.error("Error updating progress ring:", error);
     }
@@ -605,6 +1210,20 @@ class CategoryHeader {
       return null;
     }
   }
+}
+
+// Global automatic initialization for all users
+// This ensures tooltips work without manual intervention
+if (typeof window !== "undefined") {
+  // Create a global instance for automatic tooltip management
+  window.categoryHeaderTooltipManager = new CategoryHeader();
+
+  // Also expose the class for manual instantiation
+  window.CategoryHeader = CategoryHeader;
+
+  logger.info(
+    "CategoryHeader: Global tooltip management initialized automatically",
+  );
 }
 
 export default CategoryHeader;

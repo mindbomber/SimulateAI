@@ -25,7 +25,7 @@
   },
   "tooltip": {
     "offset": 8,
-    "zIndex": 1200,
+    "zIndex": 1300,
     "positioning": {
       "transform": "translateX(-50%)",
       "position": "fixed"
@@ -118,7 +118,9 @@
     "percentageSpan": ".progress-percentage",
     "existingTooltips": ".progress-ring-tooltip",
     "allProgressRings": ".category-progress-ring",
-    "categoryProgressText": ".category-meta .category-progress-text"
+    "categoryProgressText": ".category-meta .category-progress-text",
+    "categoryHeader": ".category-header",
+    "categoryTitle": ".category-title"
   },
   "attributes": {
     "dataTooltip": "data-tooltip",

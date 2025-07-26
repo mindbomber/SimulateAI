@@ -43,48 +43,6 @@
   --lab-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* ===== MODAL BODY OVERRIDE ===== */
-.modal-backdrop .scenario-reflection-modal .modal-dialog .modal-body,
-.scenario-reflection-modal .modal-dialog .modal-body,
-.scenario-reflection-modal .modal-body,
-.modal-dialog .scenario-reflection-modal .modal-body,
-div.scenario-reflection-modal .modal-body {
-  overflow: hidden !important; /* Remove scroll from modal body since content area handles it */
-  padding: 0 !important; /* Let the reflection content handle its own padding */
-  max-height: none !important; /* Remove any height constraints */
-}
-
-/* Fix body overflow when modal is open - prevent viewport scroll */
-body[style*="overflow: hidden"] {
-  overflow: hidden !important;
-  position: fixed !important;
-  width: 100% !important;
-  height: 100% !important;
-}
-
-/* Override dark mode styles for reflection modal to maintain laboratory theme */
-body.dark-mode .scenario-reflection-modal .modal-body,
-body.dark-mode .scenario-reflection-modal .modal-dialog,
-body.dark-mode .scenario-reflection-modal .modal-content,
-[data-theme="dark"] .scenario-reflection-modal .modal-body,
-[data-theme="dark"] .scenario-reflection-modal .modal-dialog,
-[data-theme="dark"] .scenario-reflection-modal .modal-content {
-  background: var(--lab-white) !important;
-  color: var(--lab-charcoal) !important;
-  border-color: var(--lab-gray) !important;
-}
-
-/* Ensure laboratory color palette is maintained in dark mode */
-body.dark-mode .scenario-reflection-modal,
-[data-theme="dark"] .scenario-reflection-modal {
-  --lab-white: #fefefe;
-  --lab-light-gray: #f8f9fa;
-  --lab-gray: #e2e8f0;
-  --lab-dark-gray: #64748b;
-  --lab-charcoal: #1e293b;
-  --lab-accent: #3b82f6;
-}
-
 /* ===== MODAL FOUNDATION ===== */
 .scenario-reflection-modal .modal-dialog {
   max-width: 900px;
@@ -102,12 +60,9 @@ body.dark-mode .scenario-reflection-modal,
 
 /* ===== PROGRESS INDICATORS - CLEAN VISUALIZATION ===== */
 .reflection-progress {
-  background: linear-gradient(135deg, #fdfdfe, #fafbfc, #f8f9fa);
+  background: linear-gradient(135deg, var(--lab-light-gray), var(--lab-white));
   padding: var(--lab-space-6);
   border-bottom: 1px solid var(--lab-gray);
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.02),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .progress-container {
@@ -197,7 +152,7 @@ body.dark-mode .scenario-reflection-modal,
 
 .step-title {
   font-size: var(--lab-text-xs);
-  color: var(--lab-charcoal);
+  color: var(--lab-dark-gray);
   text-align: center;
   font-weight: 500;
   line-height: 1.3;
@@ -211,14 +166,10 @@ body.dark-mode .scenario-reflection-modal,
 
 /* ===== STEP CONTENT - INFORMATION HIERARCHY ===== */
 .reflection-step-content {
-  background: linear-gradient(135deg, #fdfdfe, #fafbfc);
   padding: var(--lab-space-8);
   min-height: 400px;
-  max-height: calc(
-    100vh - 320px
-  ); /* Account for progress header (~150px) and footer (170.6px) */
+  max-height: 65vh;
   overflow-y: auto;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .step-content h3 {
@@ -230,7 +181,7 @@ body.dark-mode .scenario-reflection-modal,
 }
 
 .step-description {
-  color: var(--lab-charcoal);
+  color: var(--lab-dark-gray);
   margin-bottom: var(--lab-space-8);
   line-height: 1.6;
   font-size: var(--lab-text-base);
@@ -238,25 +189,19 @@ body.dark-mode .scenario-reflection-modal,
 
 /* ===== CHOICE SUMMARY - HIGHLIGHT USER DECISION ===== */
 .choice-summary {
-  background: linear-gradient(135deg, #fdfdfe, #fafbfc);
+  background: var(--lab-light-gray);
   border-radius: var(--lab-radius-md);
   padding: var(--lab-space-6);
   margin-bottom: var(--lab-space-8);
   border-left: 4px solid var(--lab-accent);
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.04),
-    0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
 .option-display {
-  background: linear-gradient(135deg, #fdfdfe, #fafbfc);
+  background: var(--lab-white);
   border-radius: var(--lab-radius);
   padding: var(--lab-space-4);
   border: 1px solid var(--lab-gray);
   margin-top: var(--lab-space-4);
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.03),
-    0 1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .option-text {
@@ -267,7 +212,7 @@ body.dark-mode .scenario-reflection-modal,
 }
 
 .option-reasoning {
-  color: var(--lab-charcoal);
+  color: var(--lab-dark-gray);
   line-height: 1.5;
 }
 
@@ -277,26 +222,10 @@ body.dark-mode .scenario-reflection-modal,
 }
 
 .impact-radar {
-  background: linear-gradient(135deg, #fdfdfe, #fafbfc);
+  background: var(--lab-white);
   border-radius: var(--lab-radius-md);
-  padding: var(--lab-space-8);
+  padding: var(--lab-space-6);
   border: 1px solid var(--lab-gray);
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.04),
-    0 1px 2px rgba(0, 0, 0, 0.06);
-  position: relative;
-  overflow: hidden;
-}
-
-.impact-radar::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--lab-accent), #1e40af);
-  opacity: 0.3;
 }
 
 .impact-dimension {
@@ -308,8 +237,8 @@ body.dark-mode .scenario-reflection-modal,
 
 .dimension-label {
   min-width: 120px;
-  font-weight: 600;
-  color: #0f172a;
+  font-weight: 500;
+  color: var(--lab-charcoal);
   font-size: var(--lab-text-sm);
   text-transform: capitalize;
 }
@@ -337,30 +266,23 @@ body.dark-mode .scenario-reflection-modal,
   color: var(--lab-accent);
   font-size: var(--lab-text-sm);
   font-variant-numeric: tabular-nums;
-  /* Note: Scores are validated in JavaScript to ensure ethical values are always 1-5 (never 0) */
 }
 
 /* ===== COMMUNITY VISUALIZATION - HORIZONTAL BAR CHART ===== */
 .community-stats-summary {
-  background: linear-gradient(135deg, #fdfdfe, #fafbfc);
+  background: var(--lab-light-gray);
   border-radius: var(--lab-radius-md);
   padding: var(--lab-space-5);
   margin-bottom: var(--lab-space-6);
   text-align: center;
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.04),
-    0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
 .community-bar-chart {
-  background: linear-gradient(135deg, #fdfdfe, #fafbfc);
+  background: var(--lab-white);
   border-radius: var(--lab-radius-md);
   padding: var(--lab-space-6);
   border: 1px solid var(--lab-gray);
   margin-bottom: var(--lab-space-8);
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.04),
-    0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
 .choice-bar {
@@ -451,13 +373,10 @@ body.dark-mode .scenario-reflection-modal,
 
 .insight,
 .reflection-section {
-  background: linear-gradient(135deg, #fdfdfe, #fafbfc);
+  background: var(--lab-white);
   border-radius: var(--lab-radius-md);
   padding: var(--lab-space-6);
   border: 1px solid var(--lab-gray);
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.04),
-    0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
 .insight.popular {
@@ -495,14 +414,11 @@ body.dark-mode .scenario-reflection-modal,
 .insight-card {
   display: flex;
   gap: var(--lab-space-4);
-  background: linear-gradient(135deg, #fdfdfe, #fafbfc);
+  background: var(--lab-light-gray);
   border-radius: var(--lab-radius);
   padding: var(--lab-space-4);
   border: 1px solid var(--lab-gray);
   transition: all 0.2s ease;
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.03),
-    0 1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .stakeholder-card:hover,
@@ -555,13 +471,10 @@ body.dark-mode .scenario-reflection-modal,
 .demo-question,
 .reflection-question,
 .reflection-question-deep {
-  background: linear-gradient(135deg, #fdfdfe, #fafbfc);
+  background: var(--lab-white);
   border-radius: var(--lab-radius);
   padding: var(--lab-space-5);
   border: 1px solid var(--lab-gray);
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.03),
-    0 1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .demo-question label,
@@ -583,12 +496,9 @@ body.dark-mode .scenario-reflection-modal,
   border: 1px solid var(--lab-gray);
   border-radius: var(--lab-radius);
   font-size: var(--lab-text-base);
-  background: linear-gradient(135deg, #fdfdfe, #fafbfc);
+  background: var(--lab-white);
   color: var(--lab-charcoal);
   transition: border-color 0.2s ease;
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.02),
-    0 1px 1px rgba(0, 0, 0, 0.04);
 }
 
 .demo-question select:focus,
@@ -677,11 +587,8 @@ body.dark-mode .scenario-reflection-modal,
   justify-content: space-between;
   align-items: center;
   padding: var(--lab-space-6);
-  background: linear-gradient(135deg, #fdfdfe, #fafbfc);
+  background: var(--lab-light-gray);
   border-top: 1px solid var(--lab-gray);
-  box-shadow:
-    0 -1px 3px rgba(0, 0, 0, 0.02),
-    0 -1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .footer-left,
@@ -777,9 +684,6 @@ body.dark-mode .scenario-reflection-modal,
     flex: 1;
     overflow-y: auto;
     padding: var(--lab-space-4);
-    max-height: calc(
-      100vh - 220px
-    ); /* Account for mobile header and footer (170.6px) plus buffer */
   }
 
   .progress-steps {
@@ -809,7 +713,7 @@ body.dark-mode .scenario-reflection-modal,
     --lab-light-gray: #1f2937;
     --lab-gray: #374151;
     --lab-dark-gray: #9ca3af;
-    --lab-charcoal: #1e293b;
+    --lab-charcoal: #f9fafb;
     --lab-accent-light: #1e3a8a;
   }
 }

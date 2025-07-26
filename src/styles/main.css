@@ -600,7 +600,12 @@ html.loaded {
 }
 
 .section-header {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto;
+  gap: var(--spacing-4);
   text-align: center;
+  justify-items: center;
   margin-top: var(--spacing-20);
   margin-bottom: var(--spacing-16);
 }

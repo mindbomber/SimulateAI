@@ -34,7 +34,9 @@ if (container) {
   container.innerHTML = headerHtml;
 
   // Attach event listeners for tooltips
-  categoryHeader.attachEventListeners(container);
+  categoryHeader.attachEventListeners(container).catch((error) => {
+    console.error("Failed to attach CategoryHeader event listeners:", error);
+  });
 }
 
 // Cleanup when done

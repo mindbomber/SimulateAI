@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tooltip Debug - Simple Test</title>
+    <link rel="stylesheet" href="src/styles/main.css" />
+    <link rel="stylesheet" href="src/styles/category-header.css" />
+    <style>
+      body {
+        padding: 20px;
+        font-family: Arial, sans-serif;
+      }
+      .debug-info {
+        background: #f0f0f0;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 8px;
+        white-space: pre-wrap;
+      }
+      .test-container {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        margin: 20px 0;
+        padding: 20px;
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Tooltip Debug - Simple Test</h1>
+
+    <div class="debug-info" id="debug-output">Loading debug information...</div>
+
+    <div class="test-container">
+      <h3>Manual Progress Ring Test:</h3>
+      <div
+        class="category-progress-ring"
+        data-tooltip="Test tooltip content"
+        data-category-id="test-category"
+        role="button"
+        tabindex="0"
+        aria-label="Category progress: Test tooltip content"
+      >
+        <svg width="60" height="60" viewBox="0 0 60 60">
+          <circle
+            cx="30"
+            cy="30"
+            r="26"
+            fill="none"
+            stroke="#e5e7eb"
+            stroke-width="4"
+          />
+          <circle
+            cx="30"
+            cy="30"
+            r="26"
+            fill="none"
+            stroke="#3b82f6"
+            stroke-width="4"
+            stroke-linecap="round"
+            stroke-dasharray="163"
+            stroke-dashoffset="65"
+            style="transform: rotate(-90deg); transform-origin: 30px 30px"
+          />
+        </svg>
+        <span class="progress-percentage">60%</span>
+      </div>
+      <p>Hover over the progress ring ↑</p>
+    </div>
+
+    <button onclick="debugTooltipIssue()">🔍 Debug Tooltip Issue</button>
+    <button onclick="testManualTooltip()">🧪 Test Manual Tooltip</button>
+    <button onclick="checkCSSConflicts()">⚙️ Check CSS Conflicts</button>
+
+    <script type="module">
+      import CategoryHeader from "./src/js/components/category-header.js";
+
+      let debugOutput = document.getElementById("debug-output");
+      let categoryHeaderInstance = null;
+
+      function log(message, data = null) {
+        console.log(message, data);
+        debugOutput.textContent += `${new Date().toLocaleTimeString()}: ${message}\n`;
+        if (data) {
+          debugOutput.textContent += `  ${JSON.stringify(data, null, 2)}\n`;
+        }
+        debugOutput.scrollTop = debugOutput.scrollHeight;
+      }
+
+      // Make functions global for button clicks
+      window.debugTooltipIssue = async function () {
+        log("🔍 Starting tooltip debug...");
+
+        // Find progress rings
+        const rings = document.querySelectorAll(".category-progress-ring");
+        log(`Found ${rings.length} progress rings`);
+
+        rings.forEach((ring, index) => {
+          log(`Ring ${index + 1}:`, {
+            hasTooltip: ring.hasAttribute("data-tooltip"),
+            tooltipContent: ring.getAttribute("data-tooltip"),
+            categoryId: ring.getAttribute("data-category-id"),
+            classes: Array.from(ring.classList),
+            visible: ring.offsetWidth > 0 && ring.offsetHeight > 0,
+          });
+        });
+
+        // Test CategoryHeader
+        if (!categoryHeaderInstance) {
+          try {
+            log("Creating CategoryHeader instance...");
+            categoryHeaderInstance = new CategoryHeader();
+            log("✅ CategoryHeader instance created");
+
+            const config = await categoryHeaderInstance.getConfig();
+            log("✅ Configuration loaded", {
+              hasTooltip: !!config.tooltip,
+              tooltipZIndex: config.tooltip?.zIndex,
+              selectors: Object.keys(config.selectors || {}),
+            });
+
+            // Attach event listeners
+            log("Attaching event listeners...");
+            await categoryHeaderInstance.attachEventListeners(document.body);
+            log("✅ Event listeners attached");
+
+            // Check bound events
+            log(
+              `Bound events count: ${categoryHeaderInstance.boundEvents.size}`,
+            );
+          } catch (error) {
+            log("❌ Error with CategoryHeader:", error.message);
+          }
+        }
+      };
+
+      window.testManualTooltip = function () {
+        log("🧪 Testing manual tooltip creation...");
+
+        const ring = document.querySelector(".category-progress-ring");
+        if (!ring) {
+          log("❌ No progress ring found");
+          return;
+        }
+
+        // Remove existing test tooltips
+        document
+          .querySelectorAll(".manual-test-tooltip")
+          .forEach((el) => el.remove());
+
+        // Create manual tooltip
+        const tooltip = document.createElement("div");
+        tooltip.className = "progress-ring-tooltip visible manual-test-tooltip";
+        tooltip.textContent =
+          "Manual test tooltip - if you see this, CSS is working!";
+        tooltip.style.cssText = `
+                position: fixed !important;
+                top: 200px !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                z-index: 1300 !important;
+                background: #1f2937 !important;
+                color: white !important;
+                padding: 12px 16px !important;
+                border-radius: 6px !important;
+                opacity: 1 !important;
+                display: block !important;
+                visibility: visible !important;
+                border: 2px solid lime !important;
+            `;
+
+        document.body.appendChild(tooltip);
+        log("✅ Manual tooltip created");
+
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+          tooltip.remove();
+          log("Manual tooltip auto-removed");
+        }, 3000);
+      };
+
+      window.checkCSSConflicts = function () {
+        log("⚙️ Checking for CSS conflicts...");
+
+        // Create test element
+        const testTooltip = document.createElement("div");
+        testTooltip.className = "progress-ring-tooltip";
+        testTooltip.style.position = "fixed";
+        testTooltip.style.top = "-1000px"; // Hide it
+        document.body.appendChild(testTooltip);
+
+        const computedStyles = getComputedStyle(testTooltip);
+
+        log("Tooltip CSS values:", {
+          zIndex: computedStyles.zIndex,
+          position: computedStyles.position,
+          display: computedStyles.display,
+          visibility: computedStyles.visibility,
+          opacity: computedStyles.opacity,
+          transform: computedStyles.transform,
+          background: computedStyles.backgroundColor,
+          color: computedStyles.color,
+        });
+
+        testTooltip.remove();
+
+        // Check for category-header.css
+        const stylesheets = Array.from(document.styleSheets);
+        const categoryHeaderCSS = stylesheets.find(
+          (sheet) => sheet.href && sheet.href.includes("category-header.css"),
+        );
+        log("CategoryHeader CSS loaded:", !!categoryHeaderCSS);
+
+        if (categoryHeaderCSS) {
+          log("CategoryHeader CSS href:", categoryHeaderCSS.href);
+        }
+      };
+
+      // Initialize on page load
+      window.addEventListener("load", () => {
+        log("🚀 Page loaded - starting automatic debug...");
+        debugTooltipIssue();
+
+        // Test basic hover events
+        const ring = document.querySelector(".category-progress-ring");
+        if (ring) {
+          log("Setting up basic hover test...");
+
+          ring.addEventListener("mouseenter", (e) => {
+            log("🎯 Mouse entered progress ring - basic event works!");
+          });
+
+          ring.addEventListener("mouseleave", (e) => {
+            log("🎯 Mouse left progress ring - basic event works!");
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Progress Ring Tooltip Debug v2</title>
+    <link rel="stylesheet" href="src/styles/main.css" />
+    <style>
+      body {
+        padding: 50px;
+        background: #f5f5f5;
+      }
+      .debug-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      .test-section {
+        margin-bottom: 40px;
+        padding: 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+      }
+      .test-grid {
+        display: flex;
+        gap: 30px;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .debug-info {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 6px;
+        margin-top: 20px;
+        font-family: monospace;
+        font-size: 14px;
+      }
+      /* Force highest z-index for test */
+      .force-high-zindex {
+        position: fixed !important;
+        z-index: 999999 !important;
+        background: red !important;
+        color: white !important;
+        padding: 20px !important;
+        border: 3px solid yellow !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="debug-container">
+      <h1>Progress Ring Tooltip Debug v2</h1>
+
+      <div class="test-section">
+        <h2>Test: Z-Index Issues</h2>
+        <div class="test-grid">
+          <div
+            class="category-progress-ring"
+            data-tooltip="Test tooltip content"
+            data-category-id="debug-test"
+            role="button"
+            tabindex="0"
+          >
+            <svg width="60" height="60" viewBox="0 0 60 60">
+              <circle
+                cx="30"
+                cy="30"
+                r="25"
+                fill="none"
+                stroke="#e0e0e0"
+                stroke-width="4"
+              />
+              <circle
+                cx="30"
+                cy="30"
+                r="25"
+                fill="none"
+                stroke="#007cba"
+                stroke-width="4"
+                stroke-linecap="round"
+                stroke-dasharray="157"
+                stroke-dashoffset="62.8"
+                style="transform: rotate(-90deg); transform-origin: 30px 30px"
+              />
+            </svg>
+            <span class="progress-percentage">60%</span>
+          </div>
+        </div>
+
+        <button id="test-manual-tooltip">
+          Create Test Tooltip (High Z-Index)
+        </button>
+        <button id="test-import-config">Test Import Config</button>
+        <button id="check-css-conflicts">Check CSS Conflicts</button>
+
+        <div id="debug-output" class="debug-info">
+          Debug output will appear here...
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      const debugOutput = document.getElementById("debug-output");
+
+      function log(message, data = null) {
+        console.log(message, data);
+        debugOutput.innerHTML += `<div><strong>${new Date().toLocaleTimeString()}:</strong> ${message}</div>`;
+        if (data) {
+          debugOutput.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        }
+        debugOutput.scrollTop = debugOutput.scrollHeight;
+      }
+
+      // Test 1: Manual tooltip creation with extreme z-index
+      document
+        .getElementById("test-manual-tooltip")
+        .addEventListener("click", () => {
+          log("Creating manual tooltip...");
+
+          // Remove existing test tooltips
+          document
+            .querySelectorAll(".test-tooltip")
+            .forEach((el) => el.remove());
+
+          const tooltip = document.createElement("div");
+          tooltip.className = "test-tooltip force-high-zindex";
+          tooltip.textContent =
+            "TEST TOOLTIP - Should be visible above everything!";
+          tooltip.style.top = "100px";
+          tooltip.style.left = "50%";
+          tooltip.style.transform = "translateX(-50%)";
+
+          document.body.appendChild(tooltip);
+          log("Manual tooltip created with extreme z-index");
+
+          // Auto-remove
+          setTimeout(() => {
+            tooltip.remove();
+            log("Manual tooltip removed");
+          }, 3000);
+        });
+
+      // Test 2: Check if imports work
+      document
+        .getElementById("test-import-config")
+        .addEventListener("click", async () => {
+          log("Testing module imports...");
+
+          try {
+            // Try to import the config loader
+            const configModule = await import(
+              "./src/js/utils/category-header-config-loader.js"
+            );
+            log(
+              "✅ Config loader imported successfully",
+              Object.keys(configModule),
+            );
+
+            // Try to load config
+            const config = await configModule.loadCategoryHeaderConfig();
+            log("✅ Config loaded successfully", {
+              hasProgressRing: !!config.progressRing,
+              hasTooltip: !!config.tooltip,
+              tooltipZIndex: config.tooltip?.zIndex,
+            });
+
+            // Try to import CategoryHeader
+            const headerModule = await import(
+              "./src/js/components/category-header.js"
+            );
+            log("✅ CategoryHeader imported successfully");
+
+            // Create instance and test
+            const categoryHeader = new headerModule.default();
+            log("✅ CategoryHeader instance created");
+          } catch (error) {
+            log("❌ Import failed:", error.message);
+          }
+        });
+
+      // Test 3: Check for CSS conflicts
+      document
+        .getElementById("check-css-conflicts")
+        .addEventListener("click", () => {
+          log("Checking for CSS conflicts...");
+
+          // Create test element with progress-ring-tooltip class
+          const testTooltip = document.createElement("div");
+          testTooltip.className = "progress-ring-tooltip";
+          testTooltip.style.position = "fixed";
+          testTooltip.style.top = "-1000px"; // Hide it
+          document.body.appendChild(testTooltip);
+
+          const computedStyles = getComputedStyle(testTooltip);
+
+          log("Tooltip CSS values:", {
+            zIndex: computedStyles.zIndex,
+            position: computedStyles.position,
+            display: computedStyles.display,
+            visibility: computedStyles.visibility,
+            opacity: computedStyles.opacity,
+            transform: computedStyles.transform,
+          });
+
+          testTooltip.remove();
+
+          // Check for conflicting styles
+          const allStylesheets = Array.from(document.styleSheets);
+          log(`Found ${allStylesheets.length} stylesheets`);
+
+          // Check if main.css loaded
+          const mainCSSLoaded = Array.from(
+            document.querySelectorAll('link[rel="stylesheet"]'),
+          ).some((link) => link.href.includes("main.css"));
+          log("Main CSS loaded:", mainCSSLoaded);
+        });
+
+      // Test basic hover events
+      const progressRing = document.querySelector(".category-progress-ring");
+      if (progressRing) {
+        log("Progress ring found, adding test event listeners...");
+
+        progressRing.addEventListener("mouseenter", (e) => {
+          log("Mouse enter detected on progress ring");
+
+          // Try to create tooltip manually like the component would
+          const tooltip = document.createElement("div");
+          tooltip.className = "progress-ring-tooltip visible";
+          tooltip.textContent = "Manual hover tooltip test";
+          tooltip.style.position = "fixed";
+          tooltip.style.left = "50%";
+          tooltip.style.top = "150px";
+          tooltip.style.transform = "translateX(-50%)";
+          tooltip.style.zIndex = "1200";
+          tooltip.style.background = "#1f2937";
+          tooltip.style.color = "white";
+          tooltip.style.padding = "12px 16px";
+          tooltip.style.borderRadius = "6px";
+
+          document.body.appendChild(tooltip);
+          log("Manual hover tooltip created");
+
+          // Store reference for cleanup
+          progressRing._testTooltip = tooltip;
+        });
+
+        progressRing.addEventListener("mouseleave", (e) => {
+          log("Mouse leave detected on progress ring");
+          if (progressRing._testTooltip) {
+            progressRing._testTooltip.remove();
+            progressRing._testTooltip = null;
+            log("Manual hover tooltip removed");
+          }
+        });
+      } else {
+        log("❌ No progress ring found!");
+      }
+
+      log("Debug script loaded and ready");
+    </script>
+  </body>
+</html>

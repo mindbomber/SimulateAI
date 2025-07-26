@@ -169,18 +169,25 @@
   transform: scale(1.05);
 }
 
+.category-progress-ring:focus {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+  border-radius: var(--radius-full);
+}
+
+.category-progress-ring.pulse-for-badge {
+  animation: badge-pulse-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  filter: drop-shadow(
+    0 0 8px var(--progress-pulse-color, var(--color-accent-400))
+  );
+}
+
 .category-progress-ring.pulse-for-badge:hover {
   transform: scale(1.25);
   filter: drop-shadow(
       0 0 16px var(--progress-pulse-color, var(--color-accent-400))
     )
     brightness(1.1);
-}
-
-.category-progress-ring:focus {
-  outline: 2px solid var(--color-primary-500);
-  outline-offset: 2px;
-  border-radius: var(--radius-full);
 }
 
 .category-progress-ring.pulse-for-badge:focus {
@@ -207,6 +214,10 @@
   transition: all var(--transition-base);
 }
 
+[data-theme="dark"] .progress-percentage {
+  color: var(--color-gray-300);
+}
+
 .category-progress-ring.pulse-for-badge .progress-percentage {
   color: var(--progress-pulse-color, var(--color-accent-600));
   font-weight: var(--font-weight-black);
@@ -227,10 +238,6 @@
       0 0 12px var(--progress-pulse-light, var(--color-accent-300));
     color: var(--progress-pulse-dark, var(--color-accent-700));
   }
-}
-
-[data-theme="dark"] .progress-percentage {
-  color: var(--color-gray-300);
 }
 
 [data-theme="dark"]
@@ -257,12 +264,6 @@
 }
 
 /* ===== BADGE ALERT PULSE ANIMATION ===== */
-.category-progress-ring.pulse-for-badge {
-  animation: badge-pulse-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  filter: drop-shadow(
-    0 0 8px var(--progress-pulse-color, var(--color-accent-400))
-  );
-}
 
 .category-progress-ring.pulse-for-badge::before {
   content: "";
@@ -328,6 +329,7 @@
 }
 
 /* ===== BADGE ALERT ANIMATION (ALTERNATIVE STYLE) ===== */
+
 /* Alternative badge alert animation for backward compatibility */
 .category-progress-ring.badge-alert {
   animation: badge-pulse-simple 2s ease-in-out infinite;
@@ -340,7 +342,7 @@
   left: 50%;
   width: 100%;
   height: 100%;
-  border: 2px solid currentColor;
+  border: 2px solid currentcolor;
   border-radius: 50%;
   transform: translate(-50%, -50%);
   animation: badge-pulse-ring-simple 2s ease-in-out infinite;
@@ -401,17 +403,17 @@
   will-change: transform, opacity;
 }
 
+[data-theme="dark"] .scenario-hover-category-header {
+  background: rgb(31 41 55 / 98%);
+  border-color: var(--color-gray-600);
+}
+
 .scenario-card-wrapper:hover .scenario-hover-category-header,
 .scenario-card-wrapper:focus-within .scenario-hover-category-header {
   transform: translateY(0);
   opacity: 1;
   box-shadow: 0 8px 24px rgb(0 0 0 / 20%);
   pointer-events: auto;
-}
-
-[data-theme="dark"] .scenario-hover-category-header {
-  background: rgb(31 41 55 / 98%);
-  border-color: var(--color-gray-600);
 }
 
 /* Touch device support for scenario hover category headers */
@@ -452,7 +454,7 @@
     transform 0.2s ease-out;
 
   /* CRITICAL: Protect from radar-chart.css conflicts */
-  z-index: 1200 !important;
+  z-index: 1300 !important;
   position: fixed !important;
   display: block !important;
   visibility: visible !important;
@@ -497,6 +499,7 @@
 }
 
 /* ===== SCENARIO VIEW OVERRIDES ===== */
+
 /* Hide specific elements in scenario view */
 .scenarios-grid[data-view="scenario"] .category-time,
 .scenarios-grid[data-view="scenario"] .category-progress-text,
@@ -505,7 +508,29 @@
   display: none !important;
 }
 
+/* Adjust category title size in scenario view */
+.scenarios-grid[data-view="scenario"] .category-title {
+  font-size: 18px !important;
+}
+
+/* Ensure progress rings and tooltips work in scenario view */
+.scenarios-grid[data-view="scenario"] .category-progress-ring {
+  display: flex !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* Ensure tooltips are visible in scenario view */
+.scenarios-grid[data-view="scenario"] .progress-ring-tooltip,
+.scenarios-grid[data-view="scenario"] .manual-fix-tooltip {
+  z-index: 1300 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
 /* ===== RESPONSIVE DESIGN ===== */
+
 /* Mobile responsive overrides for category header */
 @media (width <= 768px) {
   .category-header {
@@ -567,6 +592,8 @@
   }
 }
 
+/* Mobile progress ring positioning adjustments */
+
 @media (width <= 480px) {
   .progress-ring-tooltip {
     max-width: 200px;
@@ -589,6 +616,7 @@
     transform: translateX(
       calc(30px + var(--spacing-3))
     ); /* Center + half icon width + spacing */
+
     width: 50px;
     height: 50px;
     display: flex;
@@ -604,6 +632,7 @@
 }
 
 /* ===== ACCESSIBILITY ===== */
+
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   .category-progress-ring,
@@ -622,9 +651,9 @@
 }
 
 /* High contrast mode support */
-@media (prefers-contrast: high) {
+@media (prefers-contrast: more) {
   .category-progress-ring {
-    outline: 2px solid currentColor;
+    outline: 2px solid currentcolor;
   }
 
   .progress-ring-tooltip {

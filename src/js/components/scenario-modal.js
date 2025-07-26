@@ -1723,6 +1723,7 @@ class ScenarioModal {
       selectedOption: this.selectedOption,
       option: this.selectedOption, // Legacy compatibility
       completed: true, // Mark as completed
+      scenarioData: this.scenarioData, // Include the scenario data with options
     };
 
     // Dispatch initial scenario completion event (for immediate progress tracking)

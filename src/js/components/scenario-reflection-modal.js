@@ -408,28 +408,45 @@ export class ScenarioReflectionModal {
       scenarioData: this.options.scenarioData,
       selectedOption: this.selectedOption,
       options: this.options.scenarioData.options,
+      fullOptions: this.options,
     });
 
     // Mock data showing how the community chose
     const options = this.options.scenarioData.options || [];
 
+    console.log(
+      "🔍 Debug - options array:",
+      options,
+      "length:",
+      options.length,
+    );
+
     if (options.length === 0) {
-      console.warn("⚠️ No options found in scenario data, creating fallback");
+      console.warn(
+        "⚠️ No options found in scenario data, creating fallback with 3 options",
+      );
       return {
         totalResponses: 25000,
         options: [
           {
             optionId: "fallback-1",
             optionText: "Option A (Fallback)",
-            percentage: 60,
-            count: 15000,
+            percentage: 45,
+            count: 11250,
             isUserChoice: true,
           },
           {
             optionId: "fallback-2",
             optionText: "Option B (Fallback)",
-            percentage: 40,
-            count: 10000,
+            percentage: 35,
+            count: 8750,
+            isUserChoice: false,
+          },
+          {
+            optionId: "fallback-3",
+            optionText: "Option C (Fallback)",
+            percentage: 20,
+            count: 5000,
             isUserChoice: false,
           },
         ],
@@ -928,9 +945,10 @@ export class ScenarioReflectionModal {
       <div class="impact-radar">
         ${dimensions
           .map((dim) => {
-            // Impact values are on 0-5 scale from radar chart, convert to percentage (0-100%)
+            // Impact values are on 0-5 scale from radar chart
             const rawValue = impact[dim] || 2.5; // Default to neutral (middle) if not specified
-            const percentage = Math.round((rawValue / 5) * 100); // Convert 0-5 scale to 0-100%
+            const scoreOutOfFive = Math.max(1, Math.round(rawValue)); // Ensure minimum score of 1 (1-5 scale)
+            const percentage = Math.max(20, Math.round((rawValue / 5) * 100)); // Convert 0-5 scale to 20-100% for bar width (minimum 20% for visibility)
 
             return `
           <div class="impact-dimension">
@@ -938,7 +956,7 @@ export class ScenarioReflectionModal {
             <div class="dimension-bar">
               <div class="dimension-fill" style="width: ${percentage}%"></div>
             </div>
-            <div class="dimension-value">${percentage}%</div>
+            <div class="dimension-value">${scoreOutOfFive}/5</div>
           </div>
         `;
           })

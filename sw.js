@@ -1,166 +1,166 @@
 // SimulateAI Service Worker
 // Comprehensive PWA service worker with offline support and caching strategies
 
-const CACHE_NAME = 'simulateai-v1.10.0';
-const OFFLINE_CACHE = 'simulateai-offline-v1.0';
-const RUNTIME_CACHE = 'simulateai-runtime-v1.0';
+const CACHE_NAME = "simulateai-v1.10.0";
+const OFFLINE_CACHE = "simulateai-offline-v1.0";
+const RUNTIME_CACHE = "simulateai-runtime-v1.0";
 
 // Core files to cache immediately
 const CORE_FILES = [
-  '/SimulateAI/',
-  '/SimulateAI/index.html',
-  '/SimulateAI/app.html',
-  '/SimulateAI/manifest.json',
+  "/SimulateAI/",
+  "/SimulateAI/index.html",
+  "/SimulateAI/app.html",
+  "/SimulateAI/manifest.json",
 
   // Core JavaScript
-  '/SimulateAI/src/js/app.js',
-  '/SimulateAI/src/js/config/firebase-config.js',
-  '/SimulateAI/src/js/services/firebase-service.js',
-  '/SimulateAI/src/js/services/firebase-analytics-service.js',
-  '/SimulateAI/src/js/services/hybrid-data-service.js',
+  "/SimulateAI/src/js/app.js",
+  "/SimulateAI/src/js/config/firebase-config.js",
+  "/SimulateAI/src/js/services/firebase-service.js",
+  "/SimulateAI/src/js/services/firebase-analytics-service.js",
+  "/SimulateAI/src/js/services/hybrid-data-service.js",
 
   // Core CSS
-  '/SimulateAI/src/styles/main.css',
-  '/SimulateAI/src/styles/priority-components.css',
-  '/SimulateAI/src/styles/consolidated-components.css',
+  "/SimulateAI/src/styles/main.css",
+  "/SimulateAI/src/styles/priority-components.css",
+  "/SimulateAI/src/styles/consolidated-components.css",
 
   // Essential assets
-  '/SimulateAI/src/assets/icons/Square Icon_192_x_192.png',
-  '/SimulateAI/src/assets/icons/Square Icon_512_x_512.png',
-  '/SimulateAI/src/assets/icons/favicon.svg',
-  '/SimulateAI/src/assets/icons/logo.svg',
+  "/SimulateAI/src/assets/icons/Square Icon_192_x_192.png",
+  "/SimulateAI/src/assets/icons/Square Icon_512_x_512.png",
+  "/SimulateAI/src/assets/icons/favicon.svg",
+  "/SimulateAI/src/assets/icons/logo.svg",
 
   // Data files
-  '/SimulateAI/src/data/categories.js',
+  "/SimulateAI/src/data/categories.js",
 ];
 
 // Files to cache on first visit
 const EXTENDED_FILES = [
   // Additional pages
-  '/SimulateAI/firebase-analytics-dashboard.html',
-  '/SimulateAI/firebase-integration-demo.html',
+  "/SimulateAI/firebase-analytics-dashboard.html",
+  "/SimulateAI/firebase-integration-demo.html",
 
   // Component files
-  '/SimulateAI/src/js/components/badge-modal.js',
-  '/SimulateAI/src/js/components/card-component.js',
-  '/SimulateAI/src/js/components/main-grid.js',
-  '/SimulateAI/src/js/components/enhanced-simulation-modal.js',
-  '/SimulateAI/src/js/components/ethics-explorer.js',
-  '/SimulateAI/src/js/components/onboarding-tour.js',
+  "/SimulateAI/src/js/components/badge-modal.js",
+  "/SimulateAI/src/js/components/card-component.js",
+  "/SimulateAI/src/js/components/main-grid.js",
+  "/SimulateAI/src/js/components/enhanced-simulation-modal.js",
+  "/SimulateAI/src/js/components/ethics-explorer.js",
+  "/SimulateAI/src/js/components/onboarding-tour.js",
 
   // Additional styles
-  '/SimulateAI/src/styles/badge-modal.css',
-  '/SimulateAI/src/styles/card-component.css',
-  '/SimulateAI/src/styles/ethics-explorer.css',
-  '/SimulateAI/src/styles/onboarding-tour.css',
-  '/SimulateAI/src/styles/enhanced-simulation-modal.css',
+  "/SimulateAI/src/styles/badge-modal.css",
+  "/SimulateAI/src/styles/card-component.css",
+  "/SimulateAI/src/styles/ethics-explorer.css",
+  "/SimulateAI/src/styles/onboarding-tour.css",
+  "/SimulateAI/src/styles/enhanced-simulation-modal.css",
 ];
 
 // Network-first resources (always try network first)
 const NETWORK_FIRST = [
-  '/SimulateAI/src/js/services/',
-  '/SimulateAI/firebase-analytics-dashboard.html',
-  '/SimulateAI/firebase-integration-demo.html',
+  "/SimulateAI/src/js/services/",
+  "/SimulateAI/firebase-analytics-dashboard.html",
+  "/SimulateAI/firebase-integration-demo.html",
 ];
 
 // Cache-first resources (static assets)
 const CACHE_FIRST = [
-  '/SimulateAI/src/assets/',
-  '/SimulateAI/src/styles/',
-  '/SimulateAI/manifest.json',
+  "/SimulateAI/src/assets/",
+  "/SimulateAI/src/styles/",
+  "/SimulateAI/manifest.json",
 ];
 
 // Runtime cache patterns
 const RUNTIME_PATTERNS = [
   {
     pattern: /^https:\/\/www\.gstatic\.com\/firebasejs\//,
-    strategy: 'stale-while-revalidate',
-    cacheName: 'firebase-cdn',
+    strategy: "stale-while-revalidate",
+    cacheName: "firebase-cdn",
   },
   {
     pattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\//,
-    strategy: 'stale-while-revalidate',
-    cacheName: 'google-fonts',
+    strategy: "stale-while-revalidate",
+    cacheName: "google-fonts",
   },
   {
     pattern: /^https:\/\/.*\.firebaseapp\.com\//,
-    strategy: 'network-first',
-    cacheName: 'firebase-api',
+    strategy: "network-first",
+    cacheName: "firebase-api",
   },
   {
     pattern: /^https:\/\/.*\.cloudfunctions\.net\//,
-    strategy: 'network-only',
-    cacheName: 'cloud-functions',
+    strategy: "network-only",
+    cacheName: "cloud-functions",
   },
 ];
 
 // Install event - cache core resources
-self.addEventListener('install', event => {
-  console.log('🔧 Service Worker installing...');
+self.addEventListener("install", (event) => {
+  console.log("🔧 Service Worker installing...");
 
   event.waitUntil(
     Promise.all([
-      caches.open(CACHE_NAME).then(cache => {
-        console.log('📦 Caching core files...');
+      caches.open(CACHE_NAME).then((cache) => {
+        console.log("📦 Caching core files...");
         return cache.addAll(
           CORE_FILES.map(
-            url =>
+            (url) =>
               new Request(url, {
-                cache: 'reload',
-              })
-          )
+                cache: "reload",
+              }),
+          ),
         );
       }),
-      caches.open(OFFLINE_CACHE).then(cache => {
-        console.log('📦 Caching offline fallbacks...');
+      caches.open(OFFLINE_CACHE).then((cache) => {
+        console.log("📦 Caching offline fallbacks...");
         return cache.addAll([
-          '/SimulateAI/offline.html',
-          '/SimulateAI/src/assets/icons/Square Icon_192_x_192.png',
+          "/SimulateAI/offline.html",
+          "/SimulateAI/src/assets/icons/Square Icon_192_x_192.png",
         ]);
       }),
     ])
       .then(() => {
-        console.log('✅ Service Worker installation complete');
+        console.log("✅ Service Worker installation complete");
         // Force activation of new service worker
         return self.skipWaiting();
       })
-      .catch(error => {
-        console.error('❌ Service Worker installation failed:', error);
-      })
+      .catch((error) => {
+        console.error("❌ Service Worker installation failed:", error);
+      }),
   );
 });
 
 // Activate event - clean up old caches
-self.addEventListener('activate', event => {
-  console.log('🚀 Service Worker activating...');
+self.addEventListener("activate", (event) => {
+  console.log("🚀 Service Worker activating...");
 
   event.waitUntil(
     Promise.all([
       // Clean up old caches
-      caches.keys().then(cacheNames => {
+      caches.keys().then((cacheNames) => {
         return Promise.all(
-          cacheNames.map(cacheName => {
+          cacheNames.map((cacheName) => {
             if (
               cacheName !== CACHE_NAME &&
               cacheName !== OFFLINE_CACHE &&
               cacheName !== RUNTIME_CACHE &&
-              !cacheName.includes('firebase-cdn') &&
-              !cacheName.includes('google-fonts')
+              !cacheName.includes("firebase-cdn") &&
+              !cacheName.includes("google-fonts")
             ) {
-              console.log('🗑️ Deleting old cache:', cacheName);
+              console.log("🗑️ Deleting old cache:", cacheName);
               return caches.delete(cacheName);
             }
-          })
+          }),
         );
       }),
       // Take control of all clients
       self.clients.claim(),
     ]).then(() => {
-      console.log('✅ Service Worker activated and ready');
+      console.log("✅ Service Worker activated and ready");
 
       // Cache extended files in background
       cacheExtendedFiles();
-    })
+    }),
   );
 });
 
@@ -168,36 +168,36 @@ self.addEventListener('activate', event => {
 async function cacheExtendedFiles() {
   try {
     const cache = await caches.open(CACHE_NAME);
-    console.log('📦 Background caching extended files...');
+    console.log("📦 Background caching extended files...");
 
     // Cache files in batches to avoid overwhelming the browser
     const batchSize = 5;
     for (let i = 0; i < EXTENDED_FILES.length; i += batchSize) {
       const batch = EXTENDED_FILES.slice(i, i + batchSize);
       await Promise.all(
-        batch.map(url =>
+        batch.map((url) =>
           cache
-            .add(new Request(url, { cache: 'reload' }))
-            .catch(error => console.warn('Failed to cache:', url, error))
-        )
+            .add(new Request(url, { cache: "reload" }))
+            .catch((error) => console.warn("Failed to cache:", url, error)),
+        ),
       );
       // Small delay between batches
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
 
-    console.log('✅ Extended files cached successfully');
+    console.log("✅ Extended files cached successfully");
   } catch (error) {
-    console.warn('⚠️ Background caching failed:', error);
+    console.warn("⚠️ Background caching failed:", error);
   }
 }
 
 // Fetch event - handle all network requests
-self.addEventListener('fetch', event => {
+self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
   // Skip non-GET requests and chrome-extension requests
-  if (request.method !== 'GET' || url.protocol === 'chrome-extension:') {
+  if (request.method !== "GET" || url.protocol === "chrome-extension:") {
     return;
   }
 
@@ -235,7 +235,7 @@ async function handleRequest(request) {
     // Default: network first with cache fallback
     return handleNetworkFirst(request);
   } catch (error) {
-    console.error('❌ Request handling failed:', error);
+    console.error("❌ Request handling failed:", error);
     return handleOfflineFallback(request);
   }
 }
@@ -245,11 +245,11 @@ async function handleRuntimeCache(request, pattern) {
   const cache = await caches.open(pattern.cacheName);
 
   switch (pattern.strategy) {
-    case 'stale-while-revalidate':
+    case "stale-while-revalidate":
       return staleWhileRevalidate(request, cache);
-    case 'network-first':
+    case "network-first":
       return networkFirst(request, cache);
-    case 'network-only':
+    case "network-only":
       return fetch(request);
     default:
       return cacheFirst(request, cache);
@@ -264,13 +264,13 @@ async function handleAppShell(request) {
   if (cachedResponse) {
     // Update cache in background
     fetch(request)
-      .then(response => {
+      .then((response) => {
         if (response.ok) {
           cache.put(request, response.clone());
         }
       })
-      .catch(error => {
-        console.warn('Background update failed:', error);
+      .catch((error) => {
+        console.warn("Background update failed:", error);
       });
 
     return cachedResponse;
@@ -329,7 +329,7 @@ async function networkFirst(request, cache, timeout = 5000) {
     const response = await Promise.race([
       fetch(request),
       new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Network timeout')), timeout)
+        setTimeout(() => reject(new Error("Network timeout")), timeout),
       ),
     ]);
 
@@ -350,14 +350,14 @@ async function staleWhileRevalidate(request, cache) {
   const cachedResponse = await cache.match(request);
 
   const networkResponse = fetch(request)
-    .then(response => {
+    .then((response) => {
       if (response.ok) {
         cache.put(request, response.clone());
       }
       return response;
     })
-    .catch(error => {
-      console.warn('Network update failed:', error);
+    .catch((error) => {
+      console.warn("Network update failed:", error);
       return null;
     });
 
@@ -368,32 +368,32 @@ async function staleWhileRevalidate(request, cache) {
 function isAppShellRequest(request) {
   const url = new URL(request.url);
   return (
-    url.pathname === '/SimulateAI/' ||
-    url.pathname === '/SimulateAI/index.html' ||
-    url.pathname.endsWith('.html')
+    url.pathname === "/SimulateAI/" ||
+    url.pathname === "/SimulateAI/index.html" ||
+    url.pathname.endsWith(".html")
   );
 }
 
 function isStaticAsset(request) {
   const url = new URL(request.url);
   return (
-    url.pathname.includes('/src/assets/') ||
-    url.pathname.includes('/src/styles/') ||
-    url.pathname.endsWith('.css') ||
-    url.pathname.endsWith('.js') ||
-    url.pathname.endsWith('.png') ||
-    url.pathname.endsWith('.jpg') ||
-    url.pathname.endsWith('.svg') ||
-    url.pathname.endsWith('.ico')
+    url.pathname.includes("/src/assets/") ||
+    url.pathname.includes("/src/styles/") ||
+    url.pathname.endsWith(".css") ||
+    url.pathname.endsWith(".js") ||
+    url.pathname.endsWith(".png") ||
+    url.pathname.endsWith(".jpg") ||
+    url.pathname.endsWith(".svg") ||
+    url.pathname.endsWith(".ico")
   );
 }
 
 function isApiRequest(request) {
   const url = new URL(request.url);
   return (
-    url.hostname.includes('firebase') ||
-    url.hostname.includes('googleapis') ||
-    url.pathname.includes('/api/')
+    url.hostname.includes("firebase") ||
+    url.hostname.includes("googleapis") ||
+    url.pathname.includes("/api/")
   );
 }
 
@@ -402,19 +402,19 @@ async function handleOfflineFallback(request) {
   const url = new URL(request.url);
 
   // For HTML pages, return offline page
-  if (request.headers.get('accept')?.includes('text/html')) {
+  if (request.headers.get("accept")?.includes("text/html")) {
     const offlineCache = await caches.open(OFFLINE_CACHE);
-    const offlinePage = await offlineCache.match('/SimulateAI/offline.html');
+    const offlinePage = await offlineCache.match("/SimulateAI/offline.html");
     if (offlinePage) {
       return offlinePage;
     }
   }
 
   // For images, return cached fallback icon
-  if (request.headers.get('accept')?.includes('image/')) {
+  if (request.headers.get("accept")?.includes("image/")) {
     const offlineCache = await caches.open(OFFLINE_CACHE);
     const fallbackImage = await offlineCache.match(
-      '/SimulateAI/src/assets/icons/Square Icon_192_x_192.png'
+      "/SimulateAI/src/assets/icons/Square Icon_192_x_192.png",
     );
     if (fallbackImage) {
       return fallbackImage;
@@ -422,20 +422,20 @@ async function handleOfflineFallback(request) {
   }
 
   // For other resources, return network error
-  return new Response('Network error', {
+  return new Response("Network error", {
     status: 503,
-    statusText: 'Service Unavailable',
+    statusText: "Service Unavailable",
     headers: new Headers({
-      'Content-Type': 'text/plain',
+      "Content-Type": "text/plain",
     }),
   });
 }
 
 // Background sync for offline actions
-self.addEventListener('sync', event => {
-  console.log('🔄 Background sync triggered:', event.tag);
+self.addEventListener("sync", (event) => {
+  console.log("🔄 Background sync triggered:", event.tag);
 
-  if (event.tag === 'background-sync') {
+  if (event.tag === "background-sync") {
     event.waitUntil(doBackgroundSync());
   }
 });
@@ -443,78 +443,78 @@ self.addEventListener('sync', event => {
 async function doBackgroundSync() {
   try {
     // Handle any queued offline actions
-    console.log('📤 Processing offline queue...');
+    console.log("📤 Processing offline queue...");
 
     // This would integrate with your Firebase offline queue
     // For now, just log that sync is available
-    console.log('✅ Background sync completed');
+    console.log("✅ Background sync completed");
   } catch (error) {
-    console.error('❌ Background sync failed:', error);
+    console.error("❌ Background sync failed:", error);
   }
 }
 
 // Push notification handling
-self.addEventListener('push', event => {
+self.addEventListener("push", (event) => {
   if (!event.data) {
-    console.log('Push event but no data');
+    console.log("Push event but no data");
     return;
   }
 
   const data = event.data.json();
-  console.log('📬 Push notification received:', data);
+  console.log("📬 Push notification received:", data);
 
   const options = {
-    body: data.body || 'New update from SimulateAI',
-    icon: '/SimulateAI/src/assets/icons/Square Icon_192_x_192.png',
-    badge: '/SimulateAI/src/assets/icons/Square Icon_192_x_192.png',
-    tag: data.tag || 'simulateai-notification',
+    body: data.body || "New update from SimulateAI",
+    icon: "/SimulateAI/src/assets/icons/Square Icon_192_x_192.png",
+    badge: "/SimulateAI/src/assets/icons/Square Icon_192_x_192.png",
+    tag: data.tag || "simulateai-notification",
     requireInteraction: data.requireInteraction || false,
     actions: data.actions || [],
     data: data.data || {},
   };
 
   event.waitUntil(
-    self.registration.showNotification(data.title || 'SimulateAI', options)
+    self.registration.showNotification(data.title || "SimulateAI", options),
   );
 });
 
 // Notification click handling
-self.addEventListener('notificationclick', event => {
-  console.log('🔔 Notification clicked:', event.notification.tag);
+self.addEventListener("notificationclick", (event) => {
+  console.log("🔔 Notification clicked:", event.notification.tag);
 
   event.notification.close();
 
   // Handle notification actions
   if (event.action) {
-    console.log('📱 Notification action:', event.action);
+    console.log("📱 Notification action:", event.action);
     // Handle specific actions based on event.action
   }
 
   // Open or focus the app
   event.waitUntil(
     clients
-      .matchAll({ includeUncontrolled: true, type: 'window' })
-      .then(clientList => {
+      .matchAll({ includeUncontrolled: true, type: "window" })
+      .then((clientList) => {
         // Check if app is already open
         for (const client of clientList) {
-          if (client.url.includes('/SimulateAI/') && 'focus' in client) {
+          if (client.url.includes("/SimulateAI/") && "focus" in client) {
             return client.focus();
           }
         }
 
         // Open new window
         if (clients.openWindow) {
-          return clients.openWindow('/SimulateAI/');
+          return clients.openWindow("/SimulateAI/");
         }
-      })
+      }),
   );
 });
 
 // Performance monitoring
-self.addEventListener('message', event => {
-  if (event.data && event.data.type === 'PERFORMANCE_MARK') {
-    console.log('📊 Performance mark:', event.data.name, event.data.duration);
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "PERFORMANCE_MARK") {
+    console.log("📊 Performance mark:", event.data.name, event.data.duration);
   }
 });
 
-console.log('🔥 SimulateAI Service Worker loaded successfully');
+console.log("🔥 SimulateAI Service Worker loaded successfully");

@@ -70,6 +70,7 @@ import scrollManager from "./utils/scroll-manager.js";
 import { loopDetector } from "./utils/infinite-loop-detector.js";
 import configIntegrator from "./utils/config-integrator.js";
 import "./utils/console-cleanup.js"; // Initialize console cleanup utility
+import "./utils/tooltip-auto-init.js"; // Initialize automatic tooltips for all users
 
 // Import system metadata collection
 import { getSystemCollector } from "./services/system-metadata-collector.js";
@@ -4256,12 +4257,15 @@ class SimulateAIApp {
    * Handle scenario completion and show reflection modal
    */
   handleScenarioCompleted(event) {
-    const { categoryId, scenarioId, selectedOption, option } = event.detail;
+    const { categoryId, scenarioId, selectedOption, option, scenarioData } =
+      event.detail;
 
     AppDebug.log("Scenario completed in app.js:", {
       categoryId,
       scenarioId,
       selectedOption: selectedOption?.id || option?.id,
+      hasScenarioData: !!scenarioData,
+      optionsCount: scenarioData?.options?.length || 0,
     });
 
     // Show the scenario reflection modal
@@ -4269,6 +4273,7 @@ class SimulateAIApp {
       categoryId,
       scenarioId,
       selectedOption: selectedOption || option,
+      scenarioData: scenarioData || {},
     });
   }
 
@@ -4339,19 +4344,29 @@ class SimulateAIApp {
         error.message,
       );
 
-      // Fallback: create reflection modal without config
+      // Fallback: create reflection modal without config (but with same callbacks)
       new ScenarioReflectionModal({
         categoryId: categoryId,
         scenarioId: scenarioId,
         selectedOption: selectedOption,
         scenarioData: data.scenarioData || {},
         onComplete: (reflectionData) => {
+          // User finished reflection - show success message
           this.showNotification(
             "Thank you for your thoughtful reflection! Your insights contribute to our research.",
             "success",
           );
+
+          // Track completion
+          simpleAnalytics.trackEvent("scenario_reflection", "completed", {
+            category_id: categoryId,
+            scenario_id: scenarioId,
+            selected_option: selectedOption?.id,
+            research_data_points: Object.keys(reflectionData).length,
+          });
         },
         onSkip: () => {
+          // User skipped reflection - show gentle reminder
           this.showNotification(
             "Reflection skipped. You can always revisit scenarios to explore different perspectives.",
             "info",

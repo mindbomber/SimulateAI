@@ -133,6 +133,10 @@ export class UserEngagementTracker {
 
     this.isInitialized = false; // Track initialization state
 
+    // Event listener management
+    this.eventListeners = new Map(); // Store listeners for cleanup
+    this.isTrackingEnabled = true; // Allow disabling tracking
+
     // Note: init() is now async and should be called externally for enhanced instances
     if (!this.dataHandler) {
       // Legacy mode - sync initialization for backward compatibility
@@ -277,6 +281,14 @@ export class UserEngagementTracker {
    * Setup event listeners for comprehensive tracking
    */
   setupEventListeners() {
+    // Prevent duplicate listeners
+    if (this.eventListeners.size > 0) {
+      logger.warn(
+        "Event listeners already set up, skipping duplicate registration",
+      );
+      return;
+    }
+
     // Settings panel specific tracking
     this.setupSettingsPanelTracking();
 
@@ -291,41 +303,66 @@ export class UserEngagementTracker {
 
     // Performance and error tracking
     this.setupPerformanceTracking();
+
+    logger.debug("UserEngagementTracker: Event listeners setup complete", {
+      totalListeners: this.eventListeners.size,
+    });
+  }
+
+  /**
+   * Add event listener with tracking for cleanup
+   */
+  addTrackedEventListener(target, event, handler, options = false) {
+    if (!this.isTrackingEnabled) return;
+
+    const key = `${target.constructor.name}_${event}_${Date.now()}`;
+    const boundHandler = handler.bind(this);
+
+    target.addEventListener(event, boundHandler, options);
+
+    this.eventListeners.set(key, {
+      target,
+      event,
+      handler: boundHandler,
+      options,
+    });
+
+    return key;
   }
 
   /**
    * Setup settings panel specific tracking
    */
   setupSettingsPanelTracking() {
-    // Track settings panel open/close
-    document.addEventListener("click", (event) => {
+    // Consolidated settings panel click tracking
+    this.addTrackedEventListener(document, "click", (event) => {
+      if (!this.isTrackingEnabled) return;
+
       if (this.safeClosest(event, ".settings-button")) {
         this.trackSettingsPanelOpen(event);
-      }
-
-      if (this.safeClosest(event, ".settings-close")) {
+      } else if (this.safeClosest(event, ".settings-close")) {
         this.trackSettingsPanelClose(event);
+      } else if (this.safeClosest(event, ".settings-tab")) {
+        this.trackSettingsTabSwitch(event);
       }
     });
 
     // Track settings changes
-    document.addEventListener("change", (event) => {
+    this.addTrackedEventListener(document, "change", (event) => {
+      if (!this.isTrackingEnabled) return;
+
       if (this.safeClosest(event, ".settings-panel")) {
         this.trackSettingsChange(event);
       }
     });
 
-    // Track tab switches in settings
-    document.addEventListener("click", (event) => {
-      if (this.safeClosest(event, ".settings-tab")) {
-        this.trackSettingsTabSwitch(event);
-      }
-    });
-
     // Track hover interactions
-    document.addEventListener(
+    this.addTrackedEventListener(
+      document,
       "mouseenter",
       (event) => {
+        if (!this.isTrackingEnabled) return;
+
         if (this.safeClosest(event, ".settings-panel")) {
           this.trackSettingsHover(event);
         }
@@ -334,7 +371,9 @@ export class UserEngagementTracker {
     );
 
     // Track search within settings
-    document.addEventListener("input", (event) => {
+    this.addTrackedEventListener(document, "input", (event) => {
+      if (!this.isTrackingEnabled) return;
+
       if (this.safeClosest(event, ".settings-search")) {
         this.trackSettingsSearch(event);
       }
@@ -345,26 +384,31 @@ export class UserEngagementTracker {
    * Setup general interaction tracking
    */
   setupGeneralInteractionTracking() {
-    // Track clicks with detailed context
-    document.addEventListener("click", (event) => {
+    // Consolidated general click tracking
+    this.addTrackedEventListener(document, "click", (event) => {
+      if (!this.isTrackingEnabled) return;
       this.trackUserInteraction("click", event);
     });
 
     // Track keyboard navigation
-    document.addEventListener("keydown", (event) => {
+    this.addTrackedEventListener(document, "keydown", (event) => {
+      if (!this.isTrackingEnabled) return;
       if (event.key === "Tab" || event.key === "Enter" || event.key === " ") {
         this.trackUserInteraction("keyboard", event);
       }
     });
 
     // Track form interactions
-    document.addEventListener("submit", (event) => {
+    this.addTrackedEventListener(document, "submit", (event) => {
+      if (!this.isTrackingEnabled) return;
       this.trackUserInteraction("form_submit", event);
     });
 
-    // Track scroll behavior
+    // Track scroll behavior with debouncing
     let scrollTimeout;
-    window.addEventListener("scroll", () => {
+    this.addTrackedEventListener(window, "scroll", () => {
+      if (!this.isTrackingEnabled) return;
+
       clearTimeout(scrollTimeout);
       scrollTimeout = setTimeout(() => {
         this.trackUserInteraction("scroll", {
@@ -380,31 +424,33 @@ export class UserEngagementTracker {
    * Setup feature usage tracking
    */
   setupFeatureUsageTracking() {
-    // Track scenario interactions
-    document.addEventListener("click", (event) => {
+    // Consolidated feature click tracking
+    this.addTrackedEventListener(document, "click", (event) => {
+      if (!this.isTrackingEnabled) return;
+
       if (this.safeClosest(event, ".scenario-card")) {
         this.trackFeatureUsage("scenario_selection", event);
-      }
-
-      if (this.safeClosest(event, ".simulation-start")) {
+      } else if (this.safeClosest(event, ".simulation-start")) {
         this.trackFeatureUsage("simulation_start", event);
-      }
-
-      if (this.safeClosest(event, ".decision-option")) {
+      } else if (this.safeClosest(event, ".decision-option")) {
         this.trackFeatureUsage("decision_making", event);
         this.trackScenarioDecisionWithRegionalContext(event);
       }
     });
 
-    // Track search usage
-    document.addEventListener("input", (event) => {
+    // Track search and filter usage
+    this.addTrackedEventListener(document, "input", (event) => {
+      if (!this.isTrackingEnabled) return;
+
       if (this.safeClosest(event, ".search-input")) {
         this.trackFeatureUsage("search", event);
       }
     });
 
     // Track filter usage
-    document.addEventListener("change", (event) => {
+    this.addTrackedEventListener(document, "change", (event) => {
+      if (!this.isTrackingEnabled) return;
+
       if (this.safeClosest(event, ".filter-control")) {
         this.trackFeatureUsage("filtering", event);
       }
@@ -426,10 +472,12 @@ export class UserEngagementTracker {
     };
 
     // Check for page changes (for SPA navigation)
-    window.addEventListener("popstate", checkPageChange);
+    this.addTrackedEventListener(window, "popstate", checkPageChange);
 
     // Track menu navigation
-    document.addEventListener("click", (event) => {
+    this.addTrackedEventListener(document, "click", (event) => {
+      if (!this.isTrackingEnabled) return;
+
       if (this.safeClosest(event, ".nav-link")) {
         this.trackNavigation(window.location.pathname, event.target.href);
       }
@@ -441,18 +489,66 @@ export class UserEngagementTracker {
    */
   setupPerformanceTracking() {
     // Track page load performance
-    window.addEventListener("load", () => {
+    this.addTrackedEventListener(window, "load", () => {
+      if (!this.isTrackingEnabled) return;
       this.trackPerformanceMetrics();
     });
 
     // Track user-perceived performance
-    document.addEventListener("click", (event) => {
+    this.addTrackedEventListener(document, "click", (event) => {
+      if (!this.isTrackingEnabled) return;
+
       const startTime = performance.now();
       requestAnimationFrame(() => {
         const endTime = performance.now();
         this.trackInteractionPerformance(event, endTime - startTime);
       });
     });
+  }
+
+  /**
+   * Clean up all event listeners
+   */
+  removeAllEventListeners() {
+    this.eventListeners.forEach((listenerInfo) => {
+      const { target, event, handler, options } = listenerInfo;
+      target.removeEventListener(event, handler, options);
+    });
+
+    this.eventListeners.clear();
+    logger.debug("UserEngagementTracker: All event listeners removed");
+  }
+
+  /**
+   * Enable/disable tracking
+   */
+  setTrackingEnabled(enabled) {
+    this.isTrackingEnabled = enabled;
+    logger.debug(
+      `UserEngagementTracker: Tracking ${enabled ? "enabled" : "disabled"}`,
+    );
+  }
+
+  /**
+   * Destroy the tracker and clean up resources
+   */
+  destroy() {
+    this.removeAllEventListeners();
+    this.isInitialized = false;
+    this.isTrackingEnabled = false;
+
+    // Clear any running intervals
+    if (this.patternAnalysisInterval) {
+      clearInterval(this.patternAnalysisInterval);
+    }
+    if (this.insightsInterval) {
+      clearInterval(this.insightsInterval);
+    }
+    if (this.metadataFlushInterval) {
+      clearInterval(this.metadataFlushInterval);
+    }
+
+    logger.info("UserEngagementTracker destroyed");
   }
 
   /**
@@ -998,17 +1094,17 @@ export class UserEngagementTracker {
    */
   schedulePeriodicTasks() {
     // Analyze behavior patterns every 15 minutes
-    setInterval(() => {
+    this.patternAnalysisInterval = setInterval(() => {
       this.analyzeBehaviorPatterns();
     }, TRACKING_CONSTANTS.TIMING.PATTERN_ANALYSIS_INTERVAL);
 
     // Generate insights every 5 minutes
-    setInterval(() => {
+    this.insightsInterval = setInterval(() => {
       this.generateInsights();
     }, TRACKING_CONSTANTS.TIMING.SESSION_SUMMARY_INTERVAL);
 
     // Flush metadata every 30 seconds
-    setInterval(() => {
+    this.metadataFlushInterval = setInterval(() => {
       this.flushMetadata();
     }, TRACKING_CONSTANTS.TIMING.METADATA_FLUSH_INTERVAL);
   }
@@ -1551,6 +1647,25 @@ export class UserEngagementTracker {
   }
 
   /**
+   * Get event listener status for debugging
+   */
+  getEventListenerStatus() {
+    return {
+      totalListeners: this.eventListeners.size,
+      isTrackingEnabled: this.isTrackingEnabled,
+      isInitialized: this.isInitialized,
+      listeners: Array.from(this.eventListeners.entries()).map(
+        ([key, info]) => ({
+          key,
+          target: info.target.constructor.name,
+          event: info.event,
+          hasOptions: !!info.options,
+        }),
+      ),
+    };
+  }
+
+  /**
    * Get most frequently changed settings
    */
   getMostChangedSettings() {
@@ -1568,6 +1683,16 @@ export class UserEngagementTracker {
   }
 }
 
-// Create singleton instance
-export const userEngagementTracker = new UserEngagementTracker();
+// Create and export singleton instance with enhanced app integration when available
+let globalInstance = null;
+
+export function getUserEngagementTracker(app = null) {
+  if (!globalInstance) {
+    globalInstance = new UserEngagementTracker(app);
+  }
+  return globalInstance;
+}
+
+// Legacy singleton export for backward compatibility
+export const userEngagementTracker = getUserEngagementTracker();
 export default userEngagementTracker;

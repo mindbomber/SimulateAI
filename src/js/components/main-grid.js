@@ -1217,7 +1217,25 @@ class MainGrid {
         });
 
         // Attach event listeners after rendering
-        this.attachEventListeners();
+        await this.attachEventListeners();
+
+        // TOOLTIP FIX: Ensure robust tooltip attachment after all rendering is complete
+        if (
+          this.categoryHeader &&
+          this.categoryHeader.robustTooltipAttachment
+        ) {
+          console.log(
+            "🔧 MainGrid: Applying robust tooltip attachment after render...",
+          );
+
+          // Apply to both view containers
+          this.categoryHeader.robustTooltipAttachment(this.categoryContainer);
+          this.categoryHeader.robustTooltipAttachment(this.scenarioContainer);
+
+          // Set up observers for both containers
+          this.categoryHeader.setupProgressRingObserver(this.categoryContainer);
+          this.categoryHeader.setupProgressRingObserver(this.scenarioContainer);
+        }
 
         const renderTime = performance.now() - renderStartTime;
         this.performanceMetrics.renderTime = renderTime;
@@ -1675,10 +1693,40 @@ class MainGrid {
       console.log(
         "🔧 Attaching event listeners after scenario controls ready...",
       );
-      this.attachEventListeners();
+      await this.attachEventListeners();
+
+      // TOOLTIP FIX: Ensure tooltips work in scenario view
+      if (
+        this.categoryHeader &&
+        this.categoryHeader.attachTooltipsToProgressRings
+      ) {
+        console.log(
+          "🔧 MainGrid: Applying tooltip attachment for scenario view...",
+        );
+        setTimeout(async () => {
+          await this.categoryHeader.attachTooltipsToProgressRings(
+            this.scenarioContainer,
+          );
+        }, 500); // Small delay to ensure scenario controls are fully initialized
+      }
     } else {
       // For non-scenario views, attach event listeners immediately
-      this.attachEventListeners();
+      await this.attachEventListeners();
+
+      // TOOLTIP FIX: Ensure tooltips work in category view
+      if (
+        this.categoryHeader &&
+        this.categoryHeader.attachTooltipsToProgressRings
+      ) {
+        console.log(
+          "🔧 MainGrid: Applying tooltip attachment for category view...",
+        );
+        setTimeout(async () => {
+          await this.categoryHeader.attachTooltipsToProgressRings(
+            this.categoryContainer,
+          );
+        }, 100); // Small delay to ensure rendering is complete
+      }
     }
 
     // Log analytics
@@ -1734,7 +1782,7 @@ class MainGrid {
     return await ScenarioCard.render(scenario, category, isCompleted);
   }
 
-  attachEventListeners() {
+  async attachEventListeners() {
     // Debug log to track event listener attachment
     logger.debug("MainGrid attachEventListeners called", {
       currentView: this.currentView,
@@ -1820,9 +1868,9 @@ class MainGrid {
 
     // Attach CategoryHeader event listeners for progress ring tooltips
     if (this.currentView === "category") {
-      this.categoryHeader.attachEventListeners(this.categoryContainer);
+      await this.categoryHeader.attachEventListeners(this.categoryContainer);
     } else if (this.currentView === "scenario") {
-      this.categoryHeader.attachEventListeners(this.scenarioContainer);
+      await this.categoryHeader.attachEventListeners(this.scenarioContainer);
     }
 
     // Listen for scenario completion tracking - only add once
