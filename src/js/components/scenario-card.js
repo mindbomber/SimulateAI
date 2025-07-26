@@ -107,11 +107,6 @@ class ScenarioCard {
     const learningLabIcon = config.computed.svgTemplates.learningLabIcon;
     const quickStartIcon = config.computed.svgTemplates.quickStartIcon;
 
-    // Generate completed badge if needed
-    const completedBadge = isCompleted
-      ? `<div class="${classes.completedBadge}">${structure.completedBadge.icon}</div>`
-      : "";
-
     return `
       <${structure.container.element} class="${cardClass}" 
                data-scenario-id="${safeScenario.id}" 
@@ -142,8 +137,6 @@ class ScenarioCard {
                   ${quickStartIcon}
               </button>
           </div>
-
-          ${completedBadge}
       </${structure.container.element}>
     `;
   }

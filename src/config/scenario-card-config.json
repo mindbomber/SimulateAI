@@ -34,10 +34,6 @@
       },
       "footer": {
         "class": "scenario-footer"
-      },
-      "completedBadge": {
-        "class": "scenario-completed-badge",
-        "icon": "✓"
       }
     },
     "buttons": {

@@ -47,7 +47,6 @@ const EXTENDED_FILES = [
   '/SimulateAI/src/js/components/enhanced-simulation-modal.js',
   '/SimulateAI/src/js/components/ethics-explorer.js',
   '/SimulateAI/src/js/components/onboarding-tour.js',
-  '/SimulateAI/src/js/components/post-simulation-modal.js',
 
   // Additional styles
   '/SimulateAI/src/styles/badge-modal.css',

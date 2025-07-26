@@ -80,6 +80,27 @@ limitations under the License.
         --header-h: 80px;
         --modal-z: 9999;
       }
+
+      /* Animation for hero demo visual feedback */
+      @keyframes fadeInOut {
+        0% {
+          opacity: 0;
+          transform: translateX(-50%) translateY(-10px);
+        }
+        20% {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+        80% {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+        100% {
+          opacity: 0;
+          transform: translateX(-50%) translateY(-10px);
+        }
+      }
+
       /* Universal selector moved to main.css for complete reset */
       body {
         font-family: var(--font);
@@ -208,6 +229,7 @@ limitations under the License.
     <link rel="stylesheet" href="src/styles/notification-toast.css" />
     <link rel="stylesheet" href="src/styles/onboarding-tour.css" />
     <link rel="stylesheet" href="src/styles/scenario-modal.css" />
+    <link rel="stylesheet" href="src/styles/scenario-reflection-modal.css" />
     <link rel="stylesheet" href="src/styles/radar-chart.css" />
     <link rel="stylesheet" href="src/styles/session-settings.css" />
     <link rel="stylesheet" href="src/styles/profile-customization.css" />
@@ -219,9 +241,22 @@ limitations under the License.
     <link rel="stylesheet" href="src/styles/hero-demo.css" />
     <link rel="stylesheet" href="src/styles/bias-fairness.css" />
     <link rel="stylesheet" href="src/styles/category-grid.css" />
+    <link rel="stylesheet" href="src/styles/category-page.css" />
+
+    <!-- Scenario Browser and Components -->
+    <link rel="stylesheet" href="src/styles/scenario-browser.css" />
 
     <!-- Scenario Card Component (used by category-grid and scenario-browser) -->
     <link rel="stylesheet" href="src/styles/scenario-card.css" />
+
+    <!-- Ethics Analysis Components -->
+    <link rel="stylesheet" href="src/styles/ethics-analysis.css" />
+
+    <!-- User Interaction Components -->
+    <link rel="stylesheet" href="src/styles/user-metadata-collector.css" />
+
+    <!-- Community and Support Features -->
+    <link rel="stylesheet" href="src/styles/donor-flair-display.css" />
 
     <!-- 9. Layout fixes and overrides -->
     <link rel="stylesheet" href="src/styles/layout-fixes.css" />

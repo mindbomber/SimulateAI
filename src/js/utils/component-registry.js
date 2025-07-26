@@ -260,6 +260,13 @@ class ComponentRegistry {
       singleton: false,
     });
 
+    // Also register with camelCase naming for app-config.json compatibility
+    this.componentFactories.set("radarChart", {
+      factory: () => import("../components/radar-chart.js"),
+      configId: "radarChart", // Use app-config.json naming
+      singleton: false,
+    });
+
     this.componentFactories.set("scenario-card", {
       factory: () => import("../components/scenario-card.js"),
       configId: "scenario-card",

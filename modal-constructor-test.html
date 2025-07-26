@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modal Constructor Test</title>
+    <link rel="stylesheet" href="src/css/app.css" />
+    <link rel="stylesheet" href="src/css/components/modal.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .test-result {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🔧 Scenario Reflection Modal - Constructor Test</h1>
+      <p>
+        This page tests if the ScenarioReflectionModal constructor works without
+        errors.
+      </p>
+
+      <div id="test-results"></div>
+
+      <div>
+        <button onclick="testBasicConstructor()">Test Basic Constructor</button>
+        <button onclick="testEnterpriseConstructor()">
+          Test Enterprise Constructor
+        </button>
+        <button onclick="testWithMissingParams()">
+          Test Missing Parameters
+        </button>
+        <button onclick="clearResults()">Clear Results</button>
+      </div>
+    </div>
+
+    <!-- Load dependencies -->
+    <script src="src/js/utils/modal-utility.js"></script>
+    <script src="src/js/utils/simple-analytics.js"></script>
+    <script src="src/js/utils/config/scenario-reflection-config.js"></script>
+    <script src="src/js/utils/simple-state-management.js"></script>
+    <script src="src/js/utils/event-dispatcher.js"></script>
+    <script src="src/js/data/simulation-info.js"></script>
+    <script src="src/js/components/scenario-reflection-modal.js"></script>
+
+    <script>
+      function addTestResult(message, type = "info") {
+        const resultsDiv = document.getElementById("test-results");
+        const resultElement = document.createElement("div");
+        resultElement.className = `test-result ${type}`;
+        resultElement.innerHTML = `
+                <strong>${new Date().toLocaleTimeString()}</strong>: ${message}
+            `;
+        resultsDiv.appendChild(resultElement);
+      }
+
+      function testBasicConstructor() {
+        addTestResult("🧪 Testing basic constructor...", "info");
+
+        try {
+          const modal = new ScenarioReflectionModal({
+            categoryId: "healthcare-ai",
+            scenarioId: "test-scenario",
+            scenarioData: {
+              title: "Test Scenario",
+              description: "A test scenario for constructor validation",
+              options: [
+                { id: "opt1", text: "Option 1" },
+                { id: "opt2", text: "Option 2" },
+              ],
+            },
+            selectedOption: { id: "opt1", text: "Option 1" },
+          });
+
+          addTestResult("✅ Basic constructor succeeded!", "success");
+          addTestResult(`Instance ID: ${modal.instanceId}`, "info");
+          addTestResult(
+            `Performance metrics initialized: ${!!modal.performanceMetrics}`,
+            "info",
+          );
+
+          // Test cleanup
+          if (modal.destroy) {
+            modal.destroy();
+            addTestResult("✅ Modal destroyed successfully", "success");
+          }
+        } catch (error) {
+          addTestResult(
+            `❌ Basic constructor failed: ${error.message}`,
+            "error",
+          );
+          console.error("Constructor test error:", error);
+        }
+      }
+
+      function testEnterpriseConstructor() {
+        addTestResult("🏢 Testing enterprise constructor...", "info");
+
+        try {
+          const modal = new ScenarioReflectionModal({
+            categoryId: "healthcare-ai",
+            scenarioId: "test-scenario",
+            scenarioData: {
+              title: "Enterprise Test Scenario",
+              description: "Testing enterprise features",
+              options: [
+                { id: "opt1", text: "Option 1" },
+                { id: "opt2", text: "Option 2" },
+              ],
+            },
+            selectedOption: { id: "opt1", text: "Option 1" },
+            enterpriseMonitoring: true,
+            enhancedAccessibility: true,
+            advancedAnalytics: true,
+          });
+
+          addTestResult("✅ Enterprise constructor succeeded!", "success");
+          addTestResult(`Instance ID: ${modal.instanceId}`, "info");
+          addTestResult(
+            `Health monitor active: ${!!modal.healthMonitor}`,
+            "info",
+          );
+          addTestResult(
+            `Circuit breaker initialized: ${!!modal.circuitBreaker}`,
+            "info",
+          );
+          addTestResult(
+            `Performance tracker active: ${!!modal.performanceTracker}`,
+            "info",
+          );
+
+          // Test health metrics
+          const metrics = modal.getHealthMetrics();
+          if (metrics) {
+            addTestResult(
+              `✅ Health metrics available: ${JSON.stringify(metrics)}`,
+              "success",
+            );
+          } else {
+            addTestResult("⚠️ Health metrics not available", "info");
+          }
+
+          // Test cleanup
+          if (modal.destroy) {
+            modal.destroy();
+            addTestResult(
+              "✅ Enterprise modal destroyed successfully",
+              "success",
+            );
+          }
+        } catch (error) {
+          addTestResult(
+            `❌ Enterprise constructor failed: ${error.message}`,
+            "error",
+          );
+          console.error("Enterprise constructor test error:", error);
+        }
+      }
+
+      function testWithMissingParams() {
+        addTestResult("🔍 Testing with missing parameters...", "info");
+
+        try {
+          const modal = new ScenarioReflectionModal({
+            // Missing categoryId and scenarioId intentionally
+            scenarioData: {
+              title: "Minimal Test",
+              options: [],
+            },
+          });
+
+          addTestResult(
+            "✅ Constructor handled missing parameters gracefully",
+            "success",
+          );
+          addTestResult(`Instance ID generated: ${modal.instanceId}`, "info");
+
+          // Test cleanup
+          if (modal.destroy) {
+            modal.destroy();
+            addTestResult("✅ Minimal modal destroyed successfully", "success");
+          }
+        } catch (error) {
+          addTestResult(
+            `❌ Missing params test failed: ${error.message}`,
+            "error",
+          );
+          console.error("Missing params test error:", error);
+        }
+      }
+
+      function clearResults() {
+        document.getElementById("test-results").innerHTML = "";
+        addTestResult("🧹 Test results cleared", "info");
+      }
+
+      // Auto-run basic test on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        addTestResult("🚀 Constructor test page loaded", "info");
+        addTestResult(
+          "Ready to test ScenarioReflectionModal constructor",
+          "info",
+        );
+      });
+    </script>
+  </body>
+</html>

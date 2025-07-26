@@ -147,7 +147,6 @@
    - .scenario-header, .scenario-icon, .scenario-difficulty
    - .scenario-content, .scenario-title, .scenario-description
    - .scenario-footer, .scenario-start-btn, .scenario-quick-start-btn
-   - .scenario-completed-badge and accessibility features
    - Context-specific overrides and responsive design
    ============================================= */
 
@@ -287,7 +286,6 @@
    - .scenario-footer
    - .scenario-start-btn
    - .scenario-quick-start-btn
-   - .scenario-completed-badge
    
    Context-specific overrides remain in scenario-card.css
    ============================================= */

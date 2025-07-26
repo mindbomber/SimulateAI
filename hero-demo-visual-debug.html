@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hero Demo Visual Debug</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .debug-container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin: 20px 0;
+      }
+      .chart-wrapper {
+        width: 500px;
+        height: 500px;
+        margin: 20px auto;
+        border: 3px solid #007bff;
+        border-radius: 8px;
+        padding: 20px;
+        background: white;
+        position: relative;
+      }
+      .pattern-info {
+        background: #e3f2fd;
+        padding: 15px;
+        border-radius: 6px;
+        margin: 20px 0;
+        border-left: 4px solid #2196f3;
+      }
+      .demo-controls {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+      .demo-btn {
+        padding: 15px 20px;
+        border: 3px solid #007bff;
+        background: transparent;
+        color: #007bff;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+      .demo-btn:hover {
+        background: #007bff;
+        color: white;
+        transform: scale(1.05);
+      }
+      .demo-btn.active {
+        background: #28a745;
+        border-color: #28a745;
+        color: white;
+        box-shadow: 0 0 20px rgba(40, 167, 69, 0.5);
+      }
+      .debug-values {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 15px;
+        font-family: monospace;
+        white-space: pre-wrap;
+        font-size: 12px;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+      .status-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+      }
+      .status-working {
+        background: #28a745;
+      }
+      .status-error {
+        background: #dc3545;
+      }
+      .status-warning {
+        background: #ffc107;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="debug-container">
+      <h1>🔍 Hero Demo Visual Debug</h1>
+      <p>
+        <span class="status-indicator status-working"></span>Testing radar chart
+        visual updates and button functionality
+      </p>
+
+      <div class="pattern-info">
+        <h3>Current Pattern: <span id="current-pattern">None</span></h3>
+        <p>
+          <strong>Status:</strong>
+          <span id="pattern-status">Ready to test</span>
+        </p>
+      </div>
+
+      <div class="chart-wrapper">
+        <canvas id="hero-ethics-chart"></canvas>
+      </div>
+
+      <div class="demo-controls">
+        <button
+          class="demo-btn"
+          onclick="testVisualPattern('utilitarian', this)"
+        >
+          🎯 Utilitarian<br />
+          <small>Maximize overall good</small>
+        </button>
+        <button
+          class="demo-btn"
+          onclick="testVisualPattern('deontological', this)"
+        >
+          ⚖️ Rights-Based<br />
+          <small>Duty & principles</small>
+        </button>
+        <button class="demo-btn" onclick="testVisualPattern('virtue', this)">
+          🌟 Virtue Ethics<br />
+          <small>Character & virtues</small>
+        </button>
+        <button class="demo-btn" onclick="testVisualPattern('balanced', this)">
+          ⚡ Balanced<br />
+          <small>Mixed approach</small>
+        </button>
+      </div>
+
+      <div class="demo-controls">
+        <button
+          class="demo-btn"
+          onclick="resetChart()"
+          style="
+            grid-column: 1 / -1;
+            background: #dc3545;
+            border-color: #dc3545;
+            color: white;
+          "
+        >
+          🔄 Reset Chart
+        </button>
+      </div>
+    </div>
+
+    <div class="debug-container">
+      <h3>📊 Real-time Chart Values</h3>
+      <div id="chart-values" class="debug-values">Initializing...</div>
+    </div>
+
+    <script type="module">
+      // Test if the main app is loaded and working
+      async function testMainAppIntegration() {
+        const statusEl = document.getElementById("pattern-status");
+
+        if (window.simulateEthicsPattern && window.ethicsDemo) {
+          statusEl.innerHTML =
+            '<span class="status-indicator status-working"></span>Main app integration available';
+          return true;
+        } else {
+          statusEl.innerHTML =
+            '<span class="status-indicator status-warning"></span>Using standalone mode';
+          return false;
+        }
+      }
+
+      let currentPattern = null;
+      let debugChart = null;
+
+      // Import radar chart for standalone mode
+      const { default: RadarChart } = await import(
+        "./src/js/components/radar-chart.js"
+      );
+
+      // Enhanced pattern definitions with more dramatic differences
+      const enhancedPatterns = {
+        utilitarian: {
+          fairness: 2, // Low - focus on outcomes
+          sustainability: 5, // High - long-term benefits
+          autonomy: 1, // Very low - collective good
+          beneficence: 5, // Very high - maximize benefit
+          transparency: 3, // Medium
+          accountability: 4, // High
+          privacy: 1, // Low - transparency over privacy
+          proportionality: 5, // High - measured response
+        },
+        deontological: {
+          fairness: 5, // Very high - equal treatment
+          sustainability: 3, // Medium
+          autonomy: 5, // Very high - individual rights
+          beneficence: 3, // Medium - not primary focus
+          transparency: 5, // Very high - clear rules
+          accountability: 5, // Very high - duty-based
+          privacy: 5, // Very high - individual rights
+          proportionality: 2, // Low - rules are absolute
+        },
+        virtue: {
+          fairness: 4, // High - justice virtue
+          sustainability: 4, // High - wisdom virtue
+          autonomy: 4, // High - respect for persons
+          beneficence: 5, // Very high - compassion
+          transparency: 3, // Medium - prudence in disclosure
+          accountability: 4, // High - integrity
+          privacy: 3, // Medium - balance needed
+          proportionality: 4, // High - practical wisdom
+        },
+        balanced: {
+          fairness: 4, // Balanced
+          sustainability: 4, // Balanced
+          autonomy: 4, // Balanced
+          beneficence: 4, // Balanced
+          transparency: 4, // Balanced
+          accountability: 4, // Balanced
+          privacy: 4, // Balanced
+          proportionality: 4, // Balanced
+        },
+      };
+
+      function updatePatternDisplay(pattern) {
+        document.getElementById("current-pattern").textContent =
+          pattern || "None";
+        currentPattern = pattern;
+
+        // Update button states
+        document.querySelectorAll(".demo-btn").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+
+        if (pattern) {
+          const activeBtn = document.querySelector(`[onclick*="${pattern}"]`);
+          if (activeBtn) activeBtn.classList.add("active");
+        }
+      }
+
+      function updateChartValues(values) {
+        const valuesEl = document.getElementById("chart-values");
+        if (values) {
+          const formatted = Object.entries(values)
+            .map(([key, val]) => `${key.padEnd(15)}: ${val}/5`)
+            .join("\n");
+          valuesEl.textContent = `Pattern: ${currentPattern || "default"}\n\n${formatted}`;
+        } else {
+          valuesEl.textContent = "No values available";
+        }
+      }
+
+      // Test function that works with both main app and standalone
+      window.testVisualPattern = async function (pattern, buttonElement) {
+        console.log(`🎯 Testing pattern: ${pattern}`);
+
+        // Try main app first
+        if (window.simulateEthicsPattern && window.ethicsDemo) {
+          console.log("📱 Using main app integration");
+          window.simulateEthicsPattern(pattern, buttonElement);
+          updatePatternDisplay(pattern);
+
+          // Get current values from main app chart
+          if (window.ethicsDemo && window.ethicsDemo.demoChart) {
+            const chartData =
+              window.ethicsDemo.demoChart.chart?.data?.datasets?.[0]?.data;
+            if (chartData) {
+              const axes = [
+                "fairness",
+                "sustainability",
+                "autonomy",
+                "beneficence",
+                "transparency",
+                "accountability",
+                "privacy",
+                "proportionality",
+              ];
+              const values = {};
+              axes.forEach((axis, i) => {
+                values[axis] = chartData[i] || 0;
+              });
+              updateChartValues(values);
+            }
+          }
+        } else if (debugChart) {
+          console.log("🔧 Using standalone mode");
+          const patternData = enhancedPatterns[pattern];
+          if (patternData) {
+            debugChart.setScores(patternData);
+            updatePatternDisplay(pattern);
+            updateChartValues(patternData);
+
+            document.getElementById("pattern-status").innerHTML =
+              `<span class="status-indicator status-working"></span>Applied ${pattern} pattern with enhanced contrast`;
+          }
+        }
+      };
+
+      window.resetChart = function () {
+        console.log("🔄 Resetting chart");
+
+        if (window.resetEthicsDemo) {
+          window.resetEthicsDemo();
+        } else if (debugChart) {
+          debugChart.resetScores();
+        }
+
+        updatePatternDisplay(null);
+        updateChartValues(null);
+        document.getElementById("pattern-status").innerHTML =
+          '<span class="status-indicator status-working"></span>Chart reset to default values';
+      };
+
+      // Initialize standalone chart if main app not available
+      async function initStandaloneChart() {
+        try {
+          const container = document.getElementById("hero-ethics-chart");
+          if (!container) {
+            throw new Error("Chart container not found");
+          }
+
+          debugChart = new RadarChart("hero-ethics-chart", {
+            title: "Visual Debug Chart",
+            width: 460,
+            height: 460,
+            realTime: false,
+            showLabels: true,
+            animated: true,
+            isDemo: true,
+          });
+
+          console.log("✅ Standalone debug chart initialized");
+          document.getElementById("pattern-status").innerHTML =
+            '<span class="status-indicator status-working"></span>Standalone debug chart ready';
+
+          return true;
+        } catch (error) {
+          console.error("❌ Failed to initialize standalone chart:", error);
+          document.getElementById("pattern-status").innerHTML =
+            '<span class="status-indicator status-error"></span>Failed to initialize chart';
+          return false;
+        }
+      }
+
+      // Wait for page load and initialize
+      document.addEventListener("DOMContentLoaded", async () => {
+        console.log("🔄 Initializing visual debug...");
+
+        // Wait a moment for main app to load
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        const hasMainApp = await testMainAppIntegration();
+
+        if (!hasMainApp) {
+          await initStandaloneChart();
+        }
+
+        console.log("✅ Visual debug initialized");
+      });
+    </script>
+  </body>
+</html>

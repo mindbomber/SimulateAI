@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Enterprise Monitoring Test</title>
+    <link rel="stylesheet" href="src/css/app.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .test-result {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-family: monospace;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+      .warning {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      .metrics-display {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 10px 0;
+      }
+      .metric-item {
+        display: inline-block;
+        background: white;
+        padding: 8px 12px;
+        margin: 4px;
+        border-radius: 4px;
+        border: 1px solid #dee2e6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🏢 Enterprise Monitoring Test</h1>
+      <p>
+        Testing the enterprise monitoring features of ScenarioReflectionModal
+      </p>
+
+      <div id="test-results"></div>
+
+      <div>
+        <button onclick="testEnterpriseInitialization()">
+          Test Enterprise Initialization
+        </button>
+        <button onclick="testCircuitBreaker()">Test Circuit Breaker</button>
+        <button onclick="testEventDispatching()">Test Event Dispatching</button>
+        <button onclick="testHealthMetrics()">Test Health Metrics</button>
+        <button onclick="clearResults()">Clear Results</button>
+      </div>
+
+      <div class="metrics-display" id="metrics-display" style="display: none">
+        <h3>📊 Live Metrics</h3>
+        <div id="metrics-content"></div>
+      </div>
+    </div>
+
+    <!-- Load dependencies -->
+    <script src="src/js/utils/modal-utility.js"></script>
+    <script src="src/js/utils/simple-analytics.js"></script>
+    <script src="src/js/utils/config/scenario-reflection-config.js"></script>
+    <script src="src/js/utils/simple-state-management.js"></script>
+    <script src="src/js/utils/event-dispatcher.js"></script>
+    <script src="src/js/data/simulation-info.js"></script>
+    <script src="src/js/components/scenario-reflection-modal.js"></script>
+
+    <script>
+      let testModal = null;
+      let eventLog = [];
+
+      function addTestResult(message, type = "info") {
+        const resultsDiv = document.getElementById("test-results");
+        const resultElement = document.createElement("div");
+        resultElement.className = `test-result ${type}`;
+        resultElement.innerHTML = `
+                <strong>${new Date().toLocaleTimeString()}</strong>: ${message}
+            `;
+        resultsDiv.appendChild(resultElement);
+        resultsDiv.scrollTop = resultsDiv.scrollHeight;
+      }
+
+      function showMetrics(metrics) {
+        const metricsDisplay = document.getElementById("metrics-display");
+        const metricsContent = document.getElementById("metrics-content");
+
+        if (metrics) {
+          metricsDisplay.style.display = "block";
+          metricsContent.innerHTML = Object.entries(metrics)
+            .map(
+              ([key, value]) =>
+                `<span class="metric-item"><strong>${key}:</strong> ${JSON.stringify(value)}</span>`,
+            )
+            .join("");
+        } else {
+          metricsDisplay.style.display = "none";
+        }
+      }
+
+      function testEnterpriseInitialization() {
+        addTestResult("🧪 Testing enterprise initialization...", "info");
+
+        try {
+          testModal = new ScenarioReflectionModal({
+            categoryId: "test-category",
+            scenarioId: "test-scenario",
+            scenarioData: {
+              title: "Enterprise Test Scenario",
+              description: "Testing enterprise monitoring features",
+              options: [
+                { id: "opt1", text: "Option 1" },
+                { id: "opt2", text: "Option 2" },
+              ],
+            },
+            selectedOption: { id: "opt1", text: "Option 1" },
+            enterpriseMonitoring: true,
+          });
+
+          addTestResult("✅ Modal created successfully", "success");
+          addTestResult(`Instance ID: ${testModal.instanceId}`, "info");
+
+          // Check enterprise components
+          if (testModal.healthMonitor) {
+            addTestResult("✅ Health monitor initialized", "success");
+          } else {
+            addTestResult("❌ Health monitor not found", "error");
+          }
+
+          if (testModal.circuitBreaker) {
+            addTestResult(
+              `✅ Circuit breaker initialized (state: ${testModal.circuitBreaker.state})`,
+              "success",
+            );
+          } else {
+            addTestResult("❌ Circuit breaker not found", "error");
+          }
+
+          if (testModal.performanceTracker) {
+            addTestResult("✅ Performance tracker initialized", "success");
+          } else {
+            addTestResult("❌ Performance tracker not found", "error");
+          }
+
+          // Show metrics
+          const metrics = testModal.getHealthMetrics();
+          if (metrics) {
+            addTestResult("✅ Health metrics available", "success");
+            showMetrics(metrics);
+          } else {
+            addTestResult("❌ Health metrics not available", "error");
+          }
+        } catch (error) {
+          addTestResult(
+            `❌ Enterprise initialization failed: ${error.message}`,
+            "error",
+          );
+          console.error("Enterprise initialization test error:", error);
+        }
+      }
+
+      function testCircuitBreaker() {
+        if (!testModal || !testModal.circuitBreaker) {
+          addTestResult(
+            "⚠️ Create a modal first to test circuit breaker",
+            "warning",
+          );
+          return;
+        }
+
+        addTestResult("🔧 Testing circuit breaker...", "info");
+
+        const circuitBreaker = testModal.circuitBreaker;
+        addTestResult(`Initial state: ${circuitBreaker.state}`, "info");
+        addTestResult(`Threshold: ${circuitBreaker.threshold}`, "info");
+
+        // Test failure simulation
+        try {
+          testModal._updateCircuitBreaker(false);
+          addTestResult(
+            `After failure: failures=${circuitBreaker.failures}, state=${circuitBreaker.state}`,
+            "info",
+          );
+
+          // Test success
+          testModal._updateCircuitBreaker(true);
+          addTestResult(
+            `After success: successes=${circuitBreaker.successes}, state=${circuitBreaker.state}`,
+            "success",
+          );
+        } catch (error) {
+          addTestResult(
+            `❌ Circuit breaker test failed: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      function testEventDispatching() {
+        addTestResult("📡 Testing event dispatching...", "info");
+
+        if (!window.eventDispatcher) {
+          addTestResult("❌ Event dispatcher not available", "error");
+          return;
+        }
+
+        // Set up event listeners
+        const testEvents = [];
+
+        eventDispatcher.on("componentReady", (data) => {
+          testEvents.push({ type: "componentReady", data });
+          addTestResult(
+            `📡 Received componentReady event: ${JSON.stringify(data)}`,
+            "success",
+          );
+        });
+
+        eventDispatcher.on("userInteraction", (data) => {
+          testEvents.push({ type: "userInteraction", data });
+          addTestResult(
+            `📡 Received userInteraction event: ${JSON.stringify(data)}`,
+            "success",
+          );
+        });
+
+        // Test event emission
+        try {
+          eventDispatcher.emit("componentReady", {
+            component: "TestComponent",
+            timestamp: Date.now(),
+          });
+
+          eventDispatcher.emit("userInteraction", {
+            action: "test-action",
+            timestamp: Date.now(),
+          });
+
+          addTestResult(
+            `✅ Events dispatched successfully. Received ${testEvents.length} events`,
+            "success",
+          );
+        } catch (error) {
+          addTestResult(
+            `❌ Event dispatching failed: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      function testHealthMetrics() {
+        if (!testModal) {
+          addTestResult(
+            "⚠️ Create a modal first to test health metrics",
+            "warning",
+          );
+          return;
+        }
+
+        addTestResult("📊 Testing health metrics...", "info");
+
+        try {
+          // Track some interactions
+          testModal._trackUserInteraction("test-interaction", { test: true });
+          testModal._trackUserInteraction("another-interaction", { value: 42 });
+
+          // Get updated metrics
+          const metrics = testModal.getHealthMetrics();
+
+          if (metrics) {
+            addTestResult("✅ Health metrics updated successfully", "success");
+            showMetrics(metrics);
+
+            // Validate metrics structure
+            const expectedProps = [
+              "component",
+              "interactions",
+              "errors",
+              "circuitBreakerState",
+              "performance",
+              "uptime",
+            ];
+            const missingProps = expectedProps.filter(
+              (prop) => !(prop in metrics),
+            );
+
+            if (missingProps.length === 0) {
+              addTestResult(
+                "✅ All expected metric properties present",
+                "success",
+              );
+            } else {
+              addTestResult(
+                `⚠️ Missing metric properties: ${missingProps.join(", ")}`,
+                "warning",
+              );
+            }
+          } else {
+            addTestResult("❌ Health metrics not available", "error");
+          }
+        } catch (error) {
+          addTestResult(
+            `❌ Health metrics test failed: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      function clearResults() {
+        document.getElementById("test-results").innerHTML = "";
+        document.getElementById("metrics-display").style.display = "none";
+        addTestResult("🧹 Test results cleared", "info");
+      }
+
+      // Auto-run basic test on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        addTestResult("🚀 Enterprise monitoring test page loaded", "info");
+        addTestResult("Ready to test enterprise features", "info");
+
+        // Check if required dependencies are available
+        if (typeof ScenarioReflectionModal !== "undefined") {
+          addTestResult(
+            "✅ ScenarioReflectionModal class available",
+            "success",
+          );
+        } else {
+          addTestResult("❌ ScenarioReflectionModal class not found", "error");
+        }
+
+        if (window.eventDispatcher) {
+          addTestResult("✅ Event dispatcher available", "success");
+        } else {
+          addTestResult("❌ Event dispatcher not found", "error");
+        }
+      });
+    </script>
+  </body>
+</html>

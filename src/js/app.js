@@ -6366,13 +6366,32 @@ class EthicsRadarDemo {
 
   async initializeDemo() {
     try {
-      // Get radar chart configuration
+      console.log("🔄 EthicsRadarDemo: Starting initialization...");
+
+      // Check if demo already exists to prevent double initialization
+      if (this.demoChart) {
+        console.log("⚠️ EthicsRadarDemo: Demo already initialized, skipping");
+        return;
+      }
+
+      // Check if container is already in use
+      const container = document.getElementById("hero-ethics-chart");
+      if (container.hasChildNodes()) {
+        console.log(
+          "⚠️ EthicsRadarDemo: Container already has content, clearing it",
+        );
+        container.innerHTML = "";
+      }
+
+      // Get radar chart configuration (fix: use 'radarChart' not 'radar-chart')
       const radarConfig =
-        window.simulateAIApp?.getComponentConfig("radar-chart") || {};
+        window.simulateAIApp?.getComponentConfig("radarChart") || {};
+
+      console.log("📋 EthicsRadarDemo: Radar config loaded:", radarConfig);
 
       // Get configured component instead of direct instantiation
       this.demoChart = await appStartup.getComponent(
-        "radar-chart",
+        "radarChart", // Fix: use 'radarChart' not 'radar-chart'
         "hero-ethics-chart",
         {
           title: "Ethical Impact Analysis",
@@ -6386,13 +6405,21 @@ class EthicsRadarDemo {
         },
       );
 
+      console.log(
+        "✅ EthicsRadarDemo: Chart component created:",
+        this.demoChart,
+      );
       logger.info("Ethics radar demo initialized successfully");
     } catch (error) {
+      console.error("❌ EthicsRadarDemo: Initialization failed:", error);
       logger.error("Failed to initialize ethics radar demo:", error);
     }
   }
 
   simulatePattern(pattern) {
+    console.log("🎨 EthicsRadarDemo: simulatePattern called with:", pattern);
+    console.log("📊 Chart instance:", this.demoChart);
+
     const patterns = {
       utilitarian: {
         fairness: 3,
@@ -6437,11 +6464,196 @@ class EthicsRadarDemo {
     };
 
     if (this.demoChart && patterns[pattern]) {
+      console.log("✅ Applying pattern scores:", patterns[pattern]);
+
+      // Add visual feedback for pattern application
+      this.highlightChartChange(pattern);
+
       setTimeout(() => {
-        this.demoChart.setScores(patterns[pattern]);
-        this.showFeedback(pattern);
+        try {
+          // Debug: Check chart data before and after
+          const beforeData = this.demoChart.chart?.data?.datasets?.[0]?.data;
+          console.log("🔍 Chart data BEFORE setScores:", beforeData);
+
+          this.demoChart.setScores(patterns[pattern]);
+
+          // Check data after a brief delay to ensure update completed
+          setTimeout(() => {
+            const afterData = this.demoChart.chart?.data?.datasets?.[0]?.data;
+            console.log("🔍 Chart data AFTER setScores:", afterData);
+            console.log("🔍 Pattern values:", Object.values(patterns[pattern]));
+
+            // Force chart update if data didn't change when it should have
+            if (
+              beforeData &&
+              afterData &&
+              JSON.stringify(beforeData) === JSON.stringify(afterData)
+            ) {
+              console.log("⚠️ Chart data unchanged - forcing update");
+              this.demoChart.chart.update("active");
+            }
+          }, 50);
+
+          // TEMPORARILY DISABLE FEEDBACK TO TEST CHART UPDATES
+          // this.showFeedback(pattern);
+          console.log(
+            "📈 Pattern applied successfully - feedback disabled for testing",
+          );
+
+          // Show values in console for debugging
+          console.log(
+            "🎨 Visual values applied:",
+            Object.entries(patterns[pattern])
+              .map(([key, val]) => `${key}: ${val}`)
+              .join(", "),
+          );
+        } catch (error) {
+          console.error("❌ Error applying pattern:", error);
+        }
       }, this.ANIMATION_DELAY);
+    } else {
+      console.error("❌ Cannot apply pattern:", {
+        demoChart: !!this.demoChart,
+        patternExists: !!patterns[pattern],
+        pattern: pattern,
+      });
     }
+  }
+
+  highlightChartChange(pattern) {
+    const chartContainer = document.getElementById("hero-ethics-chart");
+    if (!chartContainer) return;
+
+    // Add visual emphasis to show chart is updating
+    chartContainer.style.transition = "all 0.3s ease";
+    chartContainer.style.transform = "scale(1.02)";
+    chartContainer.style.boxShadow = "0 0 20px rgba(0, 123, 255, 0.5)";
+
+    // Show pattern name briefly
+    const patternLabels = {
+      utilitarian: "🎯 Utilitarian",
+      deontological: "⚖️ Rights-Based",
+      virtue: "🌟 Virtue Ethics",
+      balanced: "⚡ Balanced",
+    };
+
+    const label = document.createElement("div");
+    label.textContent = patternLabels[pattern] || pattern;
+    label.style.cssText = `
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #007bff;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 14px;
+      z-index: 1000;
+      animation: fadeInOut 2s ease-in-out;
+    `;
+
+    chartContainer.style.position = "relative";
+    chartContainer.appendChild(label);
+
+    // Reset after animation
+    setTimeout(() => {
+      chartContainer.style.transform = "scale(1)";
+      chartContainer.style.boxShadow = "none";
+      if (label.parentNode) {
+        label.remove();
+      }
+    }, 1000);
+  }
+
+  // DEBUG: Test chart updating directly without any popovers or other interference
+  testDirectChartUpdate(pattern) {
+    console.log("🧪 TESTING: Direct chart update for pattern:", pattern);
+
+    if (!this.demoChart) {
+      console.error("❌ TESTING: No chart instance available");
+      return;
+    }
+
+    const patterns = {
+      utilitarian: {
+        fairness: 1,
+        sustainability: 5,
+        autonomy: 1,
+        beneficence: 5,
+        transparency: 2,
+        accountability: 3,
+        privacy: 1,
+        proportionality: 4,
+      },
+      deontological: {
+        fairness: 5,
+        sustainability: 2,
+        autonomy: 5,
+        beneficence: 3,
+        transparency: 5,
+        accountability: 5,
+        privacy: 5,
+        proportionality: 2,
+      },
+      virtue: {
+        fairness: 4,
+        sustainability: 4,
+        autonomy: 4,
+        beneficence: 4,
+        transparency: 3,
+        accountability: 4,
+        privacy: 3,
+        proportionality: 4,
+      },
+      balanced: {
+        fairness: 4,
+        sustainability: 4,
+        autonomy: 4,
+        beneficence: 4,
+        transparency: 4,
+        accountability: 4,
+        privacy: 4,
+        proportionality: 4,
+      },
+    };
+
+    const testPattern = patterns[pattern];
+    if (!testPattern) {
+      console.error("❌ TESTING: Invalid pattern:", pattern);
+      return;
+    }
+
+    console.log("🧪 TESTING: Applying values:", testPattern);
+
+    // Get data before
+    const before = this.demoChart.chart?.data?.datasets?.[0]?.data?.slice();
+    console.log("🧪 TESTING: Data BEFORE:", before);
+
+    // Apply pattern
+    this.demoChart.setScores(testPattern);
+
+    // Force immediate update
+    this.demoChart.chart.update("none");
+
+    setTimeout(() => {
+      const after = this.demoChart.chart?.data?.datasets?.[0]?.data?.slice();
+      console.log("🧪 TESTING: Data AFTER:", after);
+
+      // Visual comparison
+      const changed =
+        !before || !after || JSON.stringify(before) !== JSON.stringify(after);
+      console.log("🧪 TESTING: Data changed:", changed);
+
+      if (changed) {
+        console.log("✅ TESTING: Chart updated successfully!");
+      } else {
+        console.log("❌ TESTING: Chart data did not change");
+        console.log("🧪 TESTING: Forcing redraw...");
+        this.demoChart.chart.update("active");
+      }
+    }, 100);
   }
 
   reset() {
@@ -6597,14 +6809,19 @@ let popoverHideTimeout = null; // Track auto-hide timer for popover
 
 // Global functions for radar demo controls with toggle functionality
 window.simulateEthicsPattern = function (pattern, buttonElement) {
+  console.log("🎯 Button clicked:", pattern, "ethicsDemo:", ethicsDemo);
+
   if (ethicsDemo) {
+    console.log("✅ EthicsDemo found, processing pattern:", pattern);
     // If clicking the same pattern, toggle it off (deselect)
     if (currentActivePattern === pattern) {
+      console.log("🔄 Toggling off current pattern:", pattern);
       ethicsDemo.reset();
       currentActivePattern = null;
       updateButtonStates(null);
     } else {
       // Otherwise, select the new pattern
+      console.log("🎨 Applying new pattern:", pattern);
       ethicsDemo.simulatePattern(pattern);
       currentActivePattern = pattern;
       updateButtonStates(pattern);
@@ -6614,6 +6831,10 @@ window.simulateEthicsPattern = function (pattern, buttonElement) {
         positionPopoverAboveButton(buttonElement);
       }
     }
+  } else {
+    console.error(
+      "❌ EthicsDemo not initialized - chart may have failed to load",
+    );
   }
 };
 
@@ -6622,6 +6843,15 @@ window.resetEthicsDemo = function () {
     ethicsDemo.reset();
     currentActivePattern = null;
     updateButtonStates(null);
+  }
+};
+
+// DEBUG: Add direct chart testing function
+window.testChartDirect = function (pattern) {
+  if (ethicsDemo) {
+    ethicsDemo.testDirectChartUpdate(pattern);
+  } else {
+    console.error("❌ EthicsDemo not initialized");
   }
 };
 

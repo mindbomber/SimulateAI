@@ -87,7 +87,7 @@
 }
 
 .scenario-card.completed::after {
-  content: "✓"; /* From config: structure.completedBadge.icon */
+  content: "✓"; /* Checkmark icon for completed scenarios */
   position: absolute;
   top: 10px;
   right: 10px;

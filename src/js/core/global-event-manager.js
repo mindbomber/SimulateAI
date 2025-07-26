@@ -436,6 +436,28 @@ class GlobalEventManager {
     if (pattern) {
       this.notifyComponents("demo", { pattern, event });
       this.trackEvent("demo_pattern", { pattern });
+
+      // IMPORTANT: Also execute the inline onclick handler if it exists
+      // This ensures compatibility with existing onclick="simulateEthicsPattern(...)" handlers
+      if (btn.onclick && typeof btn.onclick === "function") {
+        try {
+          btn.onclick.call(btn, event);
+        } catch (error) {
+          console.error("Error executing inline onclick handler:", error);
+        }
+      }
+
+      // Alternative: Look for onclick attribute and execute it
+      const onclickAttr = btn.getAttribute("onclick");
+      if (onclickAttr) {
+        try {
+          // Create a function that executes in the button's context
+          const onclickFunction = new Function("event", onclickAttr);
+          onclickFunction.call(btn, event);
+        } catch (error) {
+          console.error("Error executing onclick attribute:", error);
+        }
+      }
     }
   }
 

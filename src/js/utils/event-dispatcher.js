@@ -152,6 +152,10 @@ const UI_EVENTS = {
   // Component events
   COMPONENT_LOADED: "componentLoaded",
   COMPONENT_ERROR: "componentError",
+
+  // User interaction events
+  USER_INTERACTION: "userInteraction",
+  ANALYTICS_EVENT: "analyticsEvent",
 };
 
 // System Events
@@ -167,6 +171,12 @@ const SYSTEM_EVENTS = {
   // Error events
   UNHANDLED_ERROR: "unhandledError",
   CRITICAL_ERROR: "criticalError",
+  ERROR_OCCURRED: "errorOccurred",
+
+  // Component lifecycle events
+  COMPONENT_READY: "componentReady",
+  COMPONENT_DESTROYED: "componentDestroyed",
+  COMPONENT_ERROR: "componentError",
 };
 
 // Create global event dispatcher instance

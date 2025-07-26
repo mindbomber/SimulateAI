@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Community Bar Chart Test - SimulateAI</title>
+    <link rel="stylesheet" href="src/styles/base.css" />
+    <link rel="stylesheet" href="src/styles/scenario-reflection-modal.css" />
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        margin: 20px;
+        background: #f8fafc;
+        line-height: 1.6;
+      }
+      .test-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .alert {
+        padding: 12px;
+        border-radius: 6px;
+        margin: 10px 0;
+      }
+      .alert-success {
+        background: #dcfce7;
+        border: 1px solid #86efac;
+        color: #166534;
+      }
+      .btn {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.2s;
+        margin: 10px 5px;
+      }
+      .btn:hover {
+        background: #2563eb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🏘️ Community Bar Chart CSS Test</h1>
+      <p>
+        This test verifies that the community bar chart styles are loading and
+        displaying correctly.
+      </p>
+
+      <div class="alert alert-success">
+        <strong>Fixed:</strong> Added missing
+        <code>scenario-reflection-modal.css</code> to app.html
+      </div>
+
+      <h2>Test Community Data</h2>
+      <button class="btn" onclick="showSampleChart('balanced')">
+        Balanced Choices
+      </button>
+      <button class="btn" onclick="showSampleChart('polarized')">
+        Polarized Choices
+      </button>
+      <button class="btn" onclick="showSampleChart('majority')">
+        Clear Majority
+      </button>
+
+      <div id="chart-container"></div>
+
+      <h2>Expected Features</h2>
+      <ul>
+        <li>✅ Horizontal bar chart layout</li>
+        <li>✅ Three option bars with percentages</li>
+        <li>✅ User's choice highlighted with "👈 Your Choice" indicator</li>
+        <li>✅ Smooth animations and gradient colors</li>
+        <li>✅ Percentage labels and people counts</li>
+      </ul>
+    </div>
+
+    <script>
+      function showSampleChart(type) {
+        let chartData;
+
+        switch (type) {
+          case "balanced":
+            chartData = {
+              options: [
+                {
+                  optionText: "Prioritize Privacy Protection",
+                  percentage: 35,
+                  count: 1247,
+                  isUserChoice: true,
+                },
+                {
+                  optionText: "Balance Privacy and Transparency",
+                  percentage: 32,
+                  count: 1139,
+                  isUserChoice: false,
+                },
+                {
+                  optionText: "Maximize Data Transparency",
+                  percentage: 33,
+                  count: 1176,
+                  isUserChoice: false,
+                },
+              ],
+            };
+            break;
+          case "polarized":
+            chartData = {
+              options: [
+                {
+                  optionText: "Strong Privacy Stance",
+                  percentage: 47,
+                  count: 2847,
+                  isUserChoice: false,
+                },
+                {
+                  optionText: "Moderate Approach",
+                  percentage: 8,
+                  count: 485,
+                  isUserChoice: true,
+                },
+                {
+                  optionText: "Complete Transparency",
+                  percentage: 45,
+                  count: 2730,
+                  isUserChoice: false,
+                },
+              ],
+            };
+            break;
+          case "majority":
+            chartData = {
+              options: [
+                {
+                  optionText: "Ethical AI Development",
+                  percentage: 73,
+                  count: 4392,
+                  isUserChoice: true,
+                },
+                {
+                  optionText: "Rapid Innovation Focus",
+                  percentage: 18,
+                  count: 1084,
+                  isUserChoice: false,
+                },
+                {
+                  optionText: "Regulatory Compliance Only",
+                  percentage: 9,
+                  count: 542,
+                  isUserChoice: false,
+                },
+              ],
+            };
+            break;
+        }
+
+        const chartHTML = generateCommunityChart(chartData);
+        document.getElementById("chart-container").innerHTML = `
+                <h3>Community Response: ${type.charAt(0).toUpperCase() + type.slice(1)} Distribution</h3>
+                ${chartHTML}
+            `;
+      }
+
+      function generateCommunityChart(communityStats) {
+        return `
+                <div class="community-bar-chart">
+                    ${communityStats.options
+                      .map(
+                        (stat) => `
+                        <div class="choice-bar ${stat.isUserChoice ? "user-choice" : ""}">
+                            <div class="choice-label">
+                                <span class="choice-text">${stat.optionText}</span>
+                                ${stat.isUserChoice ? '<span class="your-choice-indicator">👈 Your Choice</span>' : ""}
+                            </div>
+                            <div class="choice-bar-container">
+                                <div class="choice-bar-fill" style="width: ${stat.percentage}%"></div>
+                                <span class="choice-percentage">${stat.percentage}%</span>
+                            </div>
+                            <div class="choice-count">${stat.count.toLocaleString()} people</div>
+                        </div>
+                    `,
+                      )
+                      .join("")}
+                </div>
+            `;
+      }
+
+      // Auto-load balanced chart
+      showSampleChart("balanced");
+    </script>
+  </body>
+</html>

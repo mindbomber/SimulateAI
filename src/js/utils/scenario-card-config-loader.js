@@ -85,8 +85,6 @@ export async function loadScenarioCardConfig() {
           title: scenarioCardConfig.card.structure.content.title.class,
           description:
             scenarioCardConfig.card.structure.content.description.class,
-          completedBadge:
-            scenarioCardConfig.card.structure.completedBadge.class,
           learningLabBtn: scenarioCardConfig.card.buttons.learningLab.class,
           quickStartBtn: scenarioCardConfig.card.buttons.quickStart.class,
         },
