@@ -63,22 +63,42 @@ class CategoryHeader {
     this.boundEvents = new Map();
     this.mutationObserver = null;
 
-    // Automatically initialize tooltips when DOM is ready
-    this.initializeAutomaticTooltips();
+    // Initialize configuration promise first
+    this.configPromise = CategoryHeader.loadConfiguration();
+
+    // Defer automatic tooltip initialization to avoid blocking constructor
+    setTimeout(() => {
+      this.initializeAutomaticTooltips().catch((error) => {
+        logger.error(
+          "CategoryHeader: Failed to initialize automatic tooltips:",
+          error,
+        );
+      });
+    }, 0);
   }
 
   /**
    * Initialize automatic tooltip functionality for all users
    * This runs without manual intervention
    */
-  initializeAutomaticTooltips() {
-    // Wait for DOM to be ready
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", () => {
+  async initializeAutomaticTooltips() {
+    try {
+      // Wait for configuration to be loaded first
+      await this.configPromise;
+
+      // Wait for DOM to be ready
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => {
+          this.setupGlobalTooltipMonitoring();
+        });
+      } else {
         this.setupGlobalTooltipMonitoring();
-      });
-    } else {
-      this.setupGlobalTooltipMonitoring();
+      }
+    } catch (error) {
+      logger.error(
+        "CategoryHeader: Error initializing automatic tooltips:",
+        error,
+      );
     }
   }
 
@@ -484,8 +504,6 @@ class CategoryHeader {
    * @param {number} index - Ring index for debugging
    */
   async attachEnhancedEventListeners(ring, index) {
-    const config = await this.getConfig();
-
     // Create enhanced event handlers with error handling
     const showTooltipEnhanced = async (event) => {
       try {
@@ -647,7 +665,6 @@ class CategoryHeader {
     }
 
     // Prevent tooltip from going off screen horizontally
-    const tooltipRect = tooltip.getBoundingClientRect();
     if (rect.left + rect.width / 2 - 150 < 0) {
       tooltip.style.left = "10px !important";
       tooltip.style.transform = "none !important";
