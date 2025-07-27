@@ -1284,13 +1284,116 @@ class MainGrid {
   }
 
   async renderCategoryView() {
+    // Clear existing content but preserve structure
+    const existingCards = this.categoryContainer.querySelectorAll(
+      ".category-section, .category-controls-toolbar, .no-categories",
+    );
+    existingCards.forEach((card) => card.remove());
+
+    // Remove existing toolbar to force recreation with latest options
+    const existingToolbar = this.categoryContainer.querySelector(
+      ".category-controls-toolbar",
+    );
+    if (existingToolbar) {
+      existingToolbar.remove();
+    }
+
+    // Create category controls toolbar
+    const toolbar = document.createElement("div");
+    toolbar.className = "category-controls-toolbar";
+    toolbar.innerHTML = `
+        <div class="search-container">
+          <div class="search-input-wrapper">
+            <svg class="search-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd"/>
+            </svg>
+            <input type="search" class="search-input" placeholder="Search categories by title and tags..." aria-label="Search categories by title and tags" autocomplete="off" spellcheck="false">
+            <button type="button" class="search-clear" aria-label="Clear search" style="display: none">
+              <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="controls-group">
+          <div class="sort-container">
+            <button class="sort-btn" aria-expanded="false" aria-haspopup="true">
+              <span class="sort-text">Sort: A-Z</span>
+              <svg class="sort-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+              </svg>
+            </button>
+            <div class="sort-dropdown" style="display: none;">
+              <button type="button" class="sort-option active" data-sort="alphabetical" role="option" aria-selected="true">
+                <span class="option-text">Alphabetical (A-Z)</span>
+                <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/>
+                </svg>
+              </button>
+              <button type="button" class="sort-option" data-sort="alphabetical-desc" role="option" aria-selected="false">
+                <span class="option-text">Alphabetical (Z-A)</span>
+                <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/>
+                </svg>
+              </button>
+              <button type="button" class="sort-option" data-sort="progress" role="option" aria-selected="false">
+                <span class="option-text">Progress (Most Complete)</span>
+                <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/>
+                </svg>
+              </button>
+              <button type="button" class="sort-option" data-sort="progress-desc" role="option" aria-selected="false">
+                <span class="option-text">Progress (Least Complete)</span>
+                <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/>
+                </svg>
+              </button>
+              <button type="button" class="sort-option" data-sort="difficulty" role="option" aria-selected="false">
+                <span class="option-text">Difficulty (Beginner First)</span>
+                <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/>
+                </svg>
+              </button>
+              <button type="button" class="sort-option" data-sort="difficulty-desc" role="option" aria-selected="false">
+                <span class="option-text">Difficulty (Advanced First)</span>
+                <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="clear-all-container">
+            <button class="clear-all-btn">
+              <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clip-rule="evenodd"/>
+              </svg>
+              <span>Clear All</span>
+            </button>
+          </div>
+        </div>
+      `;
+
+    // Add toolbar to container
+    this.categoryContainer.appendChild(toolbar);
+
+    // Initialize category filtering state
+    this.categoryFilters = {
+      search: "",
+      sortBy: "alphabetical",
+    };
+
+    // Setup category toolbar event listeners
+    this.setupCategoryControls();
+
     // OPTIMIZED: Use document fragment to batch DOM operations
     const categoryFragment = document.createDocumentFragment();
 
     // OPTIMIZED: Create all category sections in parallel
-    const categorySectionPromises = this.categories.map(async (category) => {
-      return await this.createCategorySection(category);
-    });
+    const categorySectionPromises = this.getFilteredCategories().map(
+      async (category) => {
+        return await this.createCategorySection(category);
+      },
+    );
 
     // Wait for all sections to be created
     const categorySections = await Promise.all(categorySectionPromises);
@@ -1300,8 +1403,7 @@ class MainGrid {
       categoryFragment.appendChild(section),
     );
 
-    // Clear container and append all sections in single operation
-    this.categoryContainer.innerHTML = "";
+    // Append all sections in single operation
     this.categoryContainer.appendChild(categoryFragment);
   }
 
@@ -4650,6 +4752,235 @@ class MainGrid {
       `MainGrid: Unknown coordinated service requested: ${serviceName}`,
     );
     return null;
+  }
+
+  /**
+   * Setup category controls toolbar functionality
+   */
+  setupCategoryControls() {
+    const searchInput = this.categoryContainer.querySelector(".search-input");
+    const searchClear = this.categoryContainer.querySelector(".search-clear");
+    const sortBtn = this.categoryContainer.querySelector(".sort-btn");
+    const sortDropdown = this.categoryContainer.querySelector(".sort-dropdown");
+    const sortOptions = this.categoryContainer.querySelectorAll(".sort-option");
+    const clearAllBtn = this.categoryContainer.querySelector(".clear-all-btn");
+
+    if (!searchInput || !sortBtn || !clearAllBtn) {
+      logger.warn("Category controls elements not found");
+      return;
+    }
+
+    // Search input functionality
+    let searchDebounceTimer;
+    searchInput.addEventListener("input", (e) => {
+      const query = e.target.value.trim();
+
+      // Show/hide clear button
+      if (searchClear) {
+        searchClear.style.display = query ? "flex" : "none";
+      }
+
+      // Debounced search
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        this.categoryFilters.search = query;
+        this.applyCategoryFilters();
+      }, 300);
+    });
+
+    // Search clear functionality
+    if (searchClear) {
+      searchClear.addEventListener("click", () => {
+        searchInput.value = "";
+        searchClear.style.display = "none";
+        this.categoryFilters.search = "";
+        this.applyCategoryFilters();
+      });
+    }
+
+    // Sort button functionality
+    sortBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isVisible = sortDropdown.style.display === "block";
+      sortDropdown.style.display = isVisible ? "none" : "block";
+      sortBtn.setAttribute("aria-expanded", !isVisible);
+    });
+
+    // Sort options functionality
+    sortOptions.forEach((option) => {
+      option.addEventListener("click", (e) => {
+        e.preventDefault();
+        const sortValue = option.getAttribute("data-sort");
+        const sortText =
+          option.querySelector(".option-text")?.textContent.trim() ||
+          option.textContent.trim();
+
+        // Update active state
+        sortOptions.forEach((opt) => {
+          opt.classList.remove("active");
+          opt.setAttribute("aria-selected", "false");
+        });
+        option.classList.add("active");
+        option.setAttribute("aria-selected", "true");
+
+        // Update button text
+        const sortTextElement = sortBtn.querySelector(".sort-text");
+        if (sortTextElement) {
+          sortTextElement.textContent = `Sort: ${sortText.replace("Alphabetical ", "").replace("Progress ", "").replace("Difficulty ", "")}`;
+        }
+
+        this.categoryFilters.sortBy = sortValue;
+        this.applyCategoryFilters();
+        sortDropdown.style.display = "none";
+        sortBtn.setAttribute("aria-expanded", "false");
+      });
+    });
+
+    // Clear all functionality
+    clearAllBtn.addEventListener("click", () => {
+      // Reset search
+      searchInput.value = "";
+      if (searchClear) {
+        searchClear.style.display = "none";
+      }
+
+      // Reset sort to default
+      sortOptions.forEach((opt) => {
+        opt.classList.remove("active");
+        opt.setAttribute("aria-selected", "false");
+      });
+      const defaultSort = this.categoryContainer.querySelector(
+        ".sort-option[data-sort='alphabetical']",
+      );
+      if (defaultSort) {
+        defaultSort.classList.add("active");
+        defaultSort.setAttribute("aria-selected", "true");
+      }
+      const sortTextElement = sortBtn.querySelector(".sort-text");
+      if (sortTextElement) {
+        sortTextElement.textContent = "Sort: A-Z";
+      }
+
+      // Reset filters
+      this.categoryFilters = {
+        search: "",
+        sortBy: "alphabetical",
+      };
+
+      this.applyCategoryFilters();
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!sortBtn.contains(e.target) && !sortDropdown.contains(e.target)) {
+        sortDropdown.style.display = "none";
+        sortBtn.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
+
+  /**
+   * Apply category filters and re-render
+   */
+  async applyCategoryFilters() {
+    // Get filtered and sorted categories using enhanced filters
+    const filteredCategories = this.getFilteredCategoriesEnhanced();
+
+    // Clear existing category sections (but preserve toolbar)
+    const existingSections =
+      this.categoryContainer.querySelectorAll(".category-section");
+    existingSections.forEach((section) => section.remove());
+
+    // Render filtered categories
+    const categoryFragment = document.createDocumentFragment();
+    const categorySectionPromises = filteredCategories.map(async (category) => {
+      return await this.createCategorySection(category);
+    });
+
+    const categorySections = await Promise.all(categorySectionPromises);
+    categorySections.forEach((section) =>
+      categoryFragment.appendChild(section),
+    );
+    this.categoryContainer.appendChild(categoryFragment);
+
+    // Update count display (if we add one later)
+    this.updateCategoryCount(filteredCategories.length);
+  }
+
+  /**
+   * Get filtered and sorted categories with enhanced search and sort functionality
+   */
+  getFilteredCategoriesEnhanced() {
+    let filtered = [...this.categories];
+
+    // Apply search filter
+    if (this.categoryFilters.search) {
+      const searchTerm = this.categoryFilters.search.toLowerCase();
+      filtered = filtered.filter((category) => {
+        // Search in title
+        const titleMatch = category.title?.toLowerCase().includes(searchTerm);
+
+        // Search in tags
+        const tagMatch = category.tags?.some((tag) =>
+          tag.toLowerCase().includes(searchTerm),
+        );
+
+        return titleMatch || tagMatch;
+      });
+    }
+
+    // Apply sorting
+    switch (this.categoryFilters.sortBy) {
+      case "alphabetical":
+        filtered.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      case "alphabetical-desc":
+        filtered.sort((a, b) => b.title.localeCompare(a.title));
+        break;
+      case "progress":
+        filtered.sort((a, b) => {
+          const progressA = this.getCategoryProgress(a.id).percentage;
+          const progressB = this.getCategoryProgress(b.id).percentage;
+          return progressB - progressA; // Most complete first
+        });
+        break;
+      case "progress-desc":
+        filtered.sort((a, b) => {
+          const progressA = this.getCategoryProgress(a.id).percentage;
+          const progressB = this.getCategoryProgress(b.id).percentage;
+          return progressA - progressB; // Least complete first
+        });
+        break;
+      case "difficulty":
+        filtered.sort((a, b) => {
+          const difficultyOrder = { beginner: 1, intermediate: 2, advanced: 3 };
+          const diffA = difficultyOrder[a.difficulty] || 2;
+          const diffB = difficultyOrder[b.difficulty] || 2;
+          return diffA - diffB; // Beginner first
+        });
+        break;
+      case "difficulty-desc":
+        filtered.sort((a, b) => {
+          const difficultyOrder = { beginner: 1, intermediate: 2, advanced: 3 };
+          const diffA = difficultyOrder[a.difficulty] || 2;
+          const diffB = difficultyOrder[b.difficulty] || 2;
+          return diffB - diffA; // Advanced first
+        });
+        break;
+      default:
+        // Default to alphabetical
+        filtered.sort((a, b) => a.title.localeCompare(b.title));
+    }
+
+    return filtered;
+  }
+
+  /**
+   * Update category count display
+   */
+  updateCategoryCount(count) {
+    // For now, just log the count. We can add a visual counter later if needed
+    logger.info(`Showing ${count} of ${this.categories.length} categories`);
   }
 }
 

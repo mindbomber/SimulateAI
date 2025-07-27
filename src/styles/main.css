@@ -667,23 +667,6 @@ html.loaded {
   margin-bottom: var(--spacing-12);
 }
 
-.simulation-card {
-  background: var(--color-white);
-  border: 1px solid var(--color-gray-200);
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  transition: all var(--transition-base);
-  cursor: pointer;
-  position: relative;
-}
-
-.simulation-card:hover,
-.simulation-card:focus {
-  box-shadow: var(--shadow-lg);
-  border-color: var(--color-primary);
-  outline: none;
-}
-
 .card-thumbnail {
   position: relative;
   height: 200px;
@@ -696,10 +679,6 @@ html.loaded {
   height: 100%;
   object-fit: cover;
   transition: transform var(--transition-base);
-}
-
-.simulation-card:hover .card-thumbnail img {
-  transform: scale(1.05);
 }
 
 .completion-badge {
@@ -1008,8 +987,7 @@ video {
 
 /* CSS Performance Optimizations */
 .simulation-container,
-.modal-dialog,
-.simulation-card {
+.modal-dialog {
   contain: layout style;
   will-change: auto;
 }
@@ -1756,12 +1734,6 @@ th {
     display: none !important;
   }
 
-  .simulation-card {
-    break-inside: avoid;
-    border: 1px solid #ccc;
-    margin-bottom: 1rem;
-  }
-
   .hero {
     background: none !important;
     color: black !important;
@@ -1788,7 +1760,6 @@ th {
 /* Focus Visible Enhancement for Better Keyboard Navigation */
 .btn:focus-visible,
 .nav-link:focus-visible,
-.simulation-card:focus-visible,
 .modal-close:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
@@ -2110,15 +2081,13 @@ body.dark-mode section {
 
 /* Cards and containers */
 body.dark-mode .card,
-body.dark-mode .simulation-card,
 body.dark-mode .container {
   background: var(--theme-bg-secondary);
   border: 1px solid var(--theme-border);
   color: var(--theme-text-primary);
 }
 
-body.dark-mode .card:hover,
-body.dark-mode .simulation-card:hover {
+body.dark-mode .card:hover {
   border-color: var(--theme-border-hover);
   box-shadow: 0 4px 12px var(--theme-shadow-hover);
 }

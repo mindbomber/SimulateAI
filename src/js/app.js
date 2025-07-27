@@ -2195,6 +2195,7 @@ class SimulateAIApp {
       "modal.backdrop-click": this.handleModalBackdropClick.bind(this),
       "modal.tab-trap": this.handleModalTabTrap.bind(this),
       "demo.pattern": this.handleDemoPattern.bind(this),
+      "scenario.launch": this.handleScenarioLaunch.bind(this),
       "system.escape": this.handleEscapeKey.bind(this),
       "system.scroll": this.handleScrollEvent.bind(this),
       "accessibility.theme_change": this.handleThemeChange.bind(this),
@@ -2287,6 +2288,32 @@ class SimulateAIApp {
     const { pattern } = data;
     if (window.simulateEthicsPattern) {
       window.simulateEthicsPattern(pattern);
+    }
+  }
+
+  /**
+   * Handle scenario launch events from Global Event Manager
+   */
+  handleScenarioLaunch(data) {
+    const { categoryId, scenarioId } = data;
+
+    // Use MainGrid to launch the scenario
+    if (this.categoryGrid) {
+      try {
+        this.categoryGrid.openScenarioModalDirect(categoryId, scenarioId);
+      } catch (error) {
+        console.error("Failed to launch test scenario:", error);
+        this.showNotification(
+          "Failed to launch test scenario. Please try again.",
+          "error",
+        );
+      }
+    } else {
+      console.warn("MainGrid not available for scenario launch");
+      this.showNotification(
+        "Scenario system not ready. Please refresh the page.",
+        "warning",
+      );
     }
   }
 
@@ -3548,101 +3575,8 @@ class SimulateAIApp {
   }
 
   render() {
-    // Skip rendering the old simulations grid if MainGrid is active
-    if (!this.categoryGrid) {
-      this.renderSimulationsGrid();
-    }
+    // Legacy simulations grid removed - now handled by MainGrid component
     // Hero demo is now handled by the HeroDemo class
-  }
-
-  renderSimulationsGrid() {
-    if (!this.categoriesGrid) return;
-
-    this.categoriesGrid.innerHTML = "";
-
-    // For simulateai focused architecture, show single simulation
-    if (this.simulateaiConfig) {
-      const card = this.createSimulationCard(this.simulateaiConfig);
-      this.categoriesGrid.appendChild(card);
-    }
-  }
-
-  createSimulationCard(simulation) {
-    const card = Helpers.createElement("div", "simulation-card", {
-      role: "gridcell",
-      tabindex: "0",
-      "aria-label": `${simulation.title} simulation`,
-    });
-
-    const progress = userProgress.getSimulationProgress(simulation.id);
-    const isCompleted = progress.completed || false;
-    const score = progress.score || 0;
-
-    card.innerHTML = `
-            <div class="card-thumbnail">
-                <img src="${simulation.thumbnail}" alt="${simulation.title}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div style="display:none; width:100%; height:200px; background:#f0f0f0; border-radius:8px; align-items:center; justify-content:center; color:#666; font-size:14px;">
-                    <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="64" height="64" rx="8" fill="#e5e7eb"/>
-                        <path d="M20 24h24v16H20z" fill="#9ca3af"/>
-                        <circle cx="26" cy="30" r="2" fill="#6b7280"/>
-                        <path d="m32 36-4-4-4 4h8z" fill="#6b7280"/>
-                    </svg>
-                </div>
-                ${isCompleted ? '<div class="completion-badge">✓</div>' : ""}
-            </div>
-            
-            <div class="card-content">
-                <h3 class="card-title">${simulation.title}</h3>
-                <p class="card-description">${simulation.description}</p>
-                
-                <div class="card-meta">
-                    <span class="difficulty difficulty-${simulation.difficulty}">${Helpers.capitalize(simulation.difficulty)}</span>
-                    <span class="duration">${Helpers.formatDuration(simulation.duration * 1000)}</span>
-                </div>
-                
-                <div class="card-tags">
-                    ${simulation.tags.map((tag) => `<span class="tag">${tag}</span>`).join("")}
-                </div>
-                
-                ${
-                  isCompleted
-                    ? `
-                    <div class="completion-info">
-                        <span class="score">Score: ${score}/100</span>
-                        <span class="grade">${Helpers.getEthicsGrade(score).grade}</span>
-                    </div>
-                `
-                    : ""
-                }
-                  <div class="card-actions">
-                    <button class="btn btn-primary enhanced-sim-button" data-simulation="${simulation.id}">
-                        Learning Lab Simulation
-                    </button>
-                    <button class="btn btn-secondary simulation-quick-start-btn" data-simulation="${simulation.id}">
-                        ${isCompleted ? "Retry" : "Start"} Simulation
-                    </button>
-                </div>
-            </div>
-        `;
-
-    // Add hover and focus effects
-    card.addEventListener("mouseenter", () => {
-      card.style.transform = "translateY(-2px)";
-    });
-
-    card.addEventListener("mouseleave", () => {
-      card.style.transform = "translateY(0)";
-    });
-
-    card.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        this.startSimulation(simulation.id);
-      }
-    });
-
-    return card;
   }
 
   /**

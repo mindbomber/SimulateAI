@@ -125,6 +125,280 @@
   display: none;
 }
 
+/* ===== CATEGORY CONTROLS TOOLBAR ===== */
+/* Minimal toolbar for category view - search categories by title/tag and sort */
+.category-controls-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+  padding: var(--spacing-4) var(--spacing-6);
+  margin-bottom: var(--spacing-6);
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: var(--spacing-4);
+  z-index: 10;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Search container for category title and tag search */
+.category-controls-toolbar .search-container {
+  flex: 1;
+  min-width: 200px;
+  max-width: 400px;
+  position: relative;
+}
+
+/* Controls group for sort and clear actions */
+.category-controls-toolbar .controls-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  flex-shrink: 0;
+}
+
+/* Sort container - minimal category sorting */
+.category-controls-toolbar .sort-container {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Clear all container - reset category filters */
+.category-controls-toolbar .clear-all-container {
+  display: inline-flex;
+}
+
+/* Enhanced search input for category filtering */
+.category-controls-toolbar .search-input {
+  background: white !important;
+  border: 1px solid var(--color-gray-300) !important;
+  color: var(--color-gray-800) !important;
+  font-size: 14px !important;
+  /* Preserve left padding for search icon */
+  padding: var(--spacing-3) var(--spacing-10) var(--spacing-3) 2.75rem !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  border-radius: var(--radius-md) !important;
+  transition: all var(--transition-base) !important;
+}
+
+.category-controls-toolbar .search-input:focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px var(--color-primary-light) !important;
+  outline: none !important;
+}
+
+.category-controls-toolbar .search-input::placeholder {
+  color: var(--color-gray-500) !important;
+}
+
+/* Category sort and clear buttons */
+.category-controls-toolbar .sort-btn,
+.category-controls-toolbar .clear-all-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-4);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+
+  /* Enhanced typography for category controls */
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue",
+    Arial, sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+  color: var(--color-gray-800);
+  text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.02);
+
+  /* Subtle gradient for modern feel */
+  background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.category-controls-toolbar .sort-btn:hover,
+.category-controls-toolbar .clear-all-btn:hover {
+  border-color: var(--color-gray-500);
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.12),
+    0 2px 4px rgba(0, 0, 0, 0.08);
+  color: var(--color-gray-900);
+  text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.06);
+}
+
+.category-controls-toolbar .sort-btn:focus,
+.category-controls-toolbar .clear-all-btn:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow:
+    0 0 0 3px var(--color-primary-light),
+    0 4px 12px rgba(0, 0, 0, 0.12),
+    0 2px 4px rgba(0, 0, 0, 0.08);
+  color: var(--color-gray-900);
+  text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.06);
+}
+
+/* Clear all button - slightly different styling for destructive action */
+.category-controls-toolbar .clear-all-btn {
+  color: var(--color-gray-700);
+  border-color: var(--color-gray-300);
+}
+
+.category-controls-toolbar .clear-all-btn:hover {
+  color: var(--color-red-600);
+  border-color: var(--color-red-300);
+  background: linear-gradient(135deg, #fefefe 0%, #fef2f2 100%);
+}
+
+.category-controls-toolbar .clear-all-btn:focus {
+  border-color: var(--color-red-500);
+  box-shadow:
+    0 0 0 3px rgba(239, 68, 68, 0.1),
+    0 4px 12px rgba(0, 0, 0, 0.12),
+    0 2px 4px rgba(0, 0, 0, 0.08);
+  color: var(--color-red-700);
+}
+
+/* Category sort dropdown - clean borderless design */
+.category-controls-toolbar .sort-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 100;
+  background: var(--color-white);
+  border: none;
+  border-radius: var(--radius-md);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.08);
+  min-width: 180px;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 0;
+  display: block !important;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: all var(--transition-fast);
+  pointer-events: none;
+}
+
+.category-controls-toolbar .sort-btn[aria-expanded="true"] + .sort-dropdown {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0);
+  pointer-events: auto !important;
+}
+
+/* Category sort options */
+.category-controls-toolbar .sort-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-3) var(--spacing-4);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  border-bottom: none;
+  position: relative;
+  margin-bottom: 1px;
+
+  /* Enhanced typography for category sorting */
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue",
+    Arial, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 475;
+  letter-spacing: -0.005em;
+  line-height: 1.45;
+  color: var(--color-gray-850);
+  text-shadow: 0 0.5px 0.5px rgba(0, 0, 0, 0.015);
+  background: transparent;
+}
+
+.category-controls-toolbar .sort-option:hover {
+  color: var(--color-gray-950);
+  transform: translateX(2px);
+  background: linear-gradient(
+    90deg,
+    rgba(241, 245, 249, 0.9) 0%,
+    rgba(226, 232, 240, 0.95) 100%
+  );
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.04);
+}
+
+.category-controls-toolbar .sort-option.active {
+  font-weight: 575;
+  color: var(--color-primary-900);
+  background: linear-gradient(
+    90deg,
+    rgba(219, 234, 254, 0.9) 0%,
+    rgba(191, 219, 254, 0.95) 100%
+  );
+  box-shadow:
+    inset 0 0 0 1px var(--color-primary-300),
+    0 1px 4px rgba(59, 130, 246, 0.15);
+  text-shadow: 0 0.5px 1px rgba(59, 130, 246, 0.12);
+  border-left: 3px solid var(--color-primary-600);
+  padding-left: calc(var(--spacing-4) - 3px);
+}
+
+/* Mobile responsive design for category toolbar */
+@media (width <= 768px) {
+  .category-controls-toolbar {
+    flex-direction: column;
+    gap: var(--spacing-3);
+    padding: var(--spacing-3);
+    position: static; /* Remove sticky on mobile */
+  }
+
+  .category-controls-toolbar .search-container {
+    width: 100%;
+    max-width: none;
+    order: 1;
+  }
+
+  .category-controls-toolbar .controls-group {
+    width: 100%;
+    justify-content: space-between;
+    order: 2;
+  }
+
+  .category-controls-toolbar .sort-btn,
+  .category-controls-toolbar .clear-all-btn {
+    flex: 1;
+    justify-content: center;
+    padding: var(--spacing-3) var(--spacing-2);
+    font-size: 0.875rem;
+  }
+}
+
+@media (width <= 480px) {
+  .category-controls-toolbar .controls-group {
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  .category-controls-toolbar .sort-btn,
+  .category-controls-toolbar .clear-all-btn {
+    width: 100%;
+  }
+}
+
 /* ===== COMPONENT STYLES EXTRACTED =====
    
    Scenario browser component styles moved to:

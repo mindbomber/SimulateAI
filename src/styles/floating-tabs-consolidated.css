@@ -70,6 +70,23 @@
   z-index: 998;
 }
 
+/* Pre-launch modal specific - ensure tabs are behind the backdrop */
+.modal-backdrop:has(.pre-launch-modal) ~ .floating-action-tab-link,
+.modal-backdrop:has(.pre-launch-modal) ~ .floating-surprise-tab-link,
+.modal-backdrop:has(.pre-launch-modal) ~ .floating-tour-tab-link {
+  z-index: 500 !important; /* Well below modal backdrop */
+}
+
+/* Alternative approach - when pre-launch modal is active, reduce floating tab z-index */
+body:has(.pre-launch-modal.visible) .floating-action-tab-link,
+body:has(.pre-launch-modal) .floating-action-tab-link,
+body:has(.pre-launch-modal.visible) .floating-surprise-tab-link,
+body:has(.pre-launch-modal) .floating-surprise-tab-link,
+body:has(.pre-launch-modal.visible) .floating-tour-tab-link,
+body:has(.pre-launch-modal) .floating-tour-tab-link {
+  z-index: 500 !important; /* Well below modal backdrop */
+}
+
 /* ========================================
    FLOATING ACTION TAB (Donation Button)
    ======================================== */

@@ -220,6 +220,26 @@
   opacity: 1 !important;
 }
 
+/* Pre-launch modal specific - ensure navigation is behind the backdrop */
+.modal-backdrop:has(.pre-launch-modal) ~ .header,
+.modal-backdrop:has(.pre-launch-modal) ~ .nav-item-dropdown,
+.modal-backdrop:has(.pre-launch-modal) ~ .settings-menu {
+  z-index: 500 !important; /* Well below modal backdrop */
+}
+
+/* Alternative approach - when pre-launch modal is active, reduce header z-index */
+body:has(.pre-launch-modal.visible) .header,
+body:has(.pre-launch-modal) .header {
+  z-index: 500 !important; /* Well below modal backdrop */
+}
+
+body:has(.pre-launch-modal.visible) .nav-item-dropdown,
+body:has(.pre-launch-modal) .nav-item-dropdown,
+body:has(.pre-launch-modal.visible) .settings-menu,
+body:has(.pre-launch-modal) .settings-menu {
+  z-index: 500 !important; /* Well below modal backdrop */
+}
+
 /* Button Override System - Prevents element.style button conflicts */
 .btn.force-visible {
   display: inline-flex !important;

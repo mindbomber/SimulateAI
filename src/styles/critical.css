@@ -9,7 +9,7 @@
   --text: #333;
   --font: "Inter", -apple-system, blinkmacsystemfont, sans-serif;
   --header-h: 80px;
-  --modal-z: 9999;
+  --modal-z: 15000;
 }
 
 /* Prevent layout shift - Critical universal selector kept here for performance */

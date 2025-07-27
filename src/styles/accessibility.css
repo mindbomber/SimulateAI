@@ -261,11 +261,6 @@ input[disabled] {
 }
 
 /* Custom focus rings for different elements */
-.simulation-card:focus {
-  outline: 3px solid var(--primary-color);
-  outline-offset: 4px;
-}
-
 .nav-link:focus {
   outline: 2px solid var(--primary-color);
   outline-offset: 2px;

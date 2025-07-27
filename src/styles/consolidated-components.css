@@ -631,11 +631,6 @@
 /* ===== ADDITIONAL ACCESSIBILITY ENHANCEMENTS ===== */
 
 /* Enhanced focus indicators for specific elements */
-.simulation-card:focus {
-  outline: 3px solid var(--color-primary);
-  outline-offset: 4px;
-}
-
 .nav-link:focus {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;

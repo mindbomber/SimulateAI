@@ -145,8 +145,9 @@ class GlobalEventManager {
     // Test scenario modal button (debug)
     if (target.id === "test-scenario-modal") {
       event.preventDefault();
-      this.notifyComponents("demo.pattern", {
-        pattern: "test-scenario",
+      this.notifyComponents("scenario.launch", {
+        categoryId: "trolley-problem",
+        scenarioId: "autonomous-vehicle-split",
         event,
         target,
       });
