@@ -60,9 +60,12 @@
   color: inherit;
   display: block;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none;
+  pointer-events: none; /* Critical: Prevent hover on invisible areas */
   max-width: none !important;
 }
+
+/* Note: Individual tabs (.floating-*-tab) have pointer-events: auto 
+   so they only respond to hover/click on the visible portion */
 
 /* Z-index layering */
 .floating-action-tab-link {
@@ -367,6 +370,7 @@
   transform: translateY(-50%);
   z-index: 999;
   width: var(--floating-tab-width, 280px);
+  pointer-events: none; /* Critical: Prevent hover on invisible areas */
 }
 
 .floating-surprise-tab {
@@ -523,6 +527,7 @@
   transform: translateY(-50%);
   z-index: 1001;
   width: var(--floating-tab-width, 280px);
+  pointer-events: none; /* Critical: Prevent hover on invisible areas */
 }
 
 .floating-tour-tab {

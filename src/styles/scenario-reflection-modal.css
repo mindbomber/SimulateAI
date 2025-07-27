@@ -2044,7 +2044,7 @@ body.modal-open.reflection-modal-open .floating-tour-tab-link {
   opacity: 0.2;
   filter: blur(1px);
   transition: all 0.3s ease;
-  pointer-events: none;
+  /* Remove pointer-events override - let individual tab rules handle this */
 }
 
 /* Alternative selector for when modal has specific class */
@@ -2063,7 +2063,7 @@ body.modal-open.reflection-modal-open .floating-tour-tab-link {
   opacity: 0.2;
   filter: blur(1px);
   transition: all 0.3s ease;
-  pointer-events: none;
+  /* Remove pointer-events override - let individual tab rules handle this */
 }
 
 /* Ensure modal backdrop doesn't interfere with our effects */
@@ -2075,14 +2075,20 @@ body.modal-open.reflection-modal-open .floating-tour-tab-link {
 /* Reset effects when modal is closed */
 body:not(.modal-open) .header,
 body:not(.modal-open) .main-nav,
-body:not(.modal-open) .nav-container,
+body:not(.modal-open) .nav-container {
+  opacity: 1;
+  filter: none;
+  transition: all 0.3s ease;
+}
+
+/* Reset visual effects for floating tabs when modal is closed, but preserve their individual pointer-events settings */
 body:not(.modal-open) .floating-action-tab-link,
 body:not(.modal-open) .floating-surprise-tab-link,
 body:not(.modal-open) .floating-tour-tab-link {
   opacity: 1;
   filter: none;
-  pointer-events: auto;
   transition: all 0.3s ease;
+  /* Don't override pointer-events - let each tab's CSS handle this correctly */
 }
 
 @media (prefers-contrast: high) {
