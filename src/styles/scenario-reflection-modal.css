@@ -86,10 +86,20 @@ body.dark-mode .scenario-reflection-modal,
 }
 
 /* ===== MODAL FOUNDATION ===== */
+/* High z-index to ensure modal appears above navigation and floating tabs */
+.scenario-reflection-modal {
+  z-index: 1200 !important; /* Above shared nav (1001) and floating tabs (1000-1001) */
+}
+
+.scenario-reflection-modal .modal-backdrop {
+  z-index: 1199 !important; /* Just below modal content */
+}
+
 .scenario-reflection-modal .modal-dialog {
   max-width: 900px;
   width: 90vw;
   margin: 2rem auto;
+  z-index: 1201 !important; /* Above modal backdrop */
 }
 
 .scenario-reflection-modal .modal-content {
@@ -482,6 +492,688 @@ body.dark-mode .scenario-reflection-modal,
   font-weight: 600;
 }
 
+/* ===== NEXT EXPLORATION - TYPOGRAPHY OF CURIOSITY & POSSIBILITY ===== */
+/* Design Intent: Inspire continued learning with dynamic, forward-looking typography */
+.next-exploration {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe, #f8fafc);
+  border-radius: var(--lab-radius-lg);
+  padding: var(--lab-space-8);
+  margin-top: var(--lab-space-8);
+  border: 1px solid #0ea5e9;
+  position: relative;
+  overflow: hidden;
+}
+
+.next-exploration::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #0ea5e9, #0284c7, #0369a1);
+  opacity: 0.8;
+}
+
+.next-exploration h4 {
+  /* Typography for excitement and forward momentum */
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Roboto",
+    sans-serif;
+  font-size: 1.375rem; /* Slightly larger than default for emphasis */
+  font-weight: 700; /* Bold to convey confidence and energy */
+  letter-spacing: -0.02em; /* Tight spacing for modern, sleek feel */
+  line-height: 1.2; /* Compact for impact */
+  color: #0369a1; /* Deep blue for trust and exploration */
+  margin-bottom: var(--lab-space-5);
+  text-transform: none; /* Natural case for approachability */
+
+  /* Subtle text shadow for depth and premium feel */
+  text-shadow: 0 1px 2px rgba(3, 105, 161, 0.1);
+
+  /* Add breathing room and visual hierarchy */
+  padding-bottom: var(--lab-space-2);
+  border-bottom: 2px solid rgba(14, 165, 233, 0.2);
+}
+
+.next-exploration .next-scenarios p {
+  /* Typography for clarity and encouragement */
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue",
+    Arial, sans-serif;
+  font-size: var(--lab-text-base); /* Readable base size */
+  font-weight: 500; /* Medium weight for clarity without heaviness */
+  line-height: 1.6; /* Generous line height for easy reading */
+  color: #1e40af; /* Rich blue for engagement */
+  margin-bottom: var(--lab-space-5);
+
+  /* Subtle italic for invitation tone */
+  font-style: italic;
+  opacity: 0.9;
+}
+
+.scenario-suggestions {
+  display: grid;
+  gap: var(--lab-space-4);
+  margin-top: var(--lab-space-5);
+}
+
+.suggestion-card {
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  border-radius: var(--lab-radius);
+  padding: var(--lab-space-5);
+  border: 1px solid rgba(14, 165, 233, 0.2);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+}
+
+.suggestion-card:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(14, 165, 233, 0.15);
+  border-color: #0ea5e9;
+}
+
+.suggestion-title {
+  /* Typography for clarity and immediate recognition */
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 1.125rem; /* Readable but prominent */
+  font-weight: 650; /* Semi-bold for hierarchy without overwhelming */
+  line-height: 1.3; /* Tight for titles */
+  color: #0f172a; /* Near-black for maximum readability */
+  margin-bottom: var(--lab-space-2);
+
+  /* Optimize for quick scanning */
+  letter-spacing: -0.01em;
+}
+
+.suggestion-desc {
+  /* Typography for supporting information */
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+  font-size: 0.9375rem; /* Slightly smaller than base for hierarchy */
+  font-weight: 400; /* Regular weight for easy reading */
+  line-height: 1.5; /* Comfortable line height */
+  color: #475569; /* Muted but readable gray */
+
+  /* Add subtle sophistication */
+  opacity: 0.85;
+}
+
+/* ===== RESEARCH IMPACT - TYPOGRAPHY OF PURPOSE & CONTRIBUTION ===== */
+/* Design Intent: Convey significance, trust, and global impact with authoritative typography */
+.research-impact {
+  background: linear-gradient(135deg, #f0fdf4, #ecfdf5, #f9fafb);
+  border-radius: var(--lab-radius-lg);
+  padding: var(--lab-space-8);
+  margin-top: var(--lab-space-8);
+  border: 1px solid #22c55e;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.research-impact::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #22c55e, #16a34a, #15803d);
+  opacity: 0.9;
+}
+
+.research-impact h4 {
+  /* Typography for authority and scientific credibility */
+  font-family:
+    "Georgia", "Times New Roman", serif; /* Serif for academic authority */
+  font-size: 1.5rem; /* Larger for gravitas */
+  font-weight: 600; /* Semi-bold for professional authority */
+  letter-spacing: -0.015em; /* Slight tightening for elegance */
+  line-height: 1.25; /* Compact for impact */
+  color: #064e3b; /* Deep green for growth and research */
+  margin-bottom: var(--lab-space-6);
+
+  /* Add sophistication with subtle text effects */
+  text-shadow: 0 1px 3px rgba(6, 78, 59, 0.1);
+
+  /* Create visual separation */
+  padding-bottom: var(--lab-space-3);
+  border-bottom: 2px solid rgba(34, 197, 94, 0.3);
+  margin-bottom: var(--lab-space-6);
+}
+
+.research-impact > p {
+  /* Typography for meaningful explanation */
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue",
+    sans-serif;
+  font-size: 1.0625rem; /* Slightly larger than base for importance */
+  font-weight: 450; /* Between normal and medium for readability */
+  line-height: 1.65; /* Generous spacing for thoughtful reading */
+  color: #166534; /* Rich green for trust and growth */
+  margin-bottom: var(--lab-space-6);
+  max-width: 42ch; /* Optimal reading width */
+  margin-left: auto;
+  margin-right: auto;
+
+  /* Add warmth and approachability */
+  opacity: 0.95;
+}
+
+.research-stats {
+  display: flex;
+  justify-content: center;
+  gap: var(--lab-space-5);
+  margin-top: var(--lab-space-6);
+  flex-wrap: wrap;
+}
+
+.research-stats .stat {
+  /* Typography for impressive statistics */
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  padding: var(--lab-space-4) var(--lab-space-5);
+  border-radius: 25px; /* Pill shape for modern feel */
+  font-weight: 600; /* Semi-bold for emphasis */
+  font-size: 0.9375rem; /* Optimized for quick scanning */
+  color: #065f46; /* Deep green for credibility */
+  box-shadow:
+    0 4px 6px rgba(34, 197, 94, 0.1),
+    0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  transition: all 0.2s ease;
+
+  /* Optimize for scanning */
+  letter-spacing: -0.005em;
+  line-height: 1.4;
+
+  /* Add subtle hierarchy with tabular numbers */
+  font-variant-numeric: tabular-nums;
+}
+
+.research-stats .stat:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 6px 12px rgba(34, 197, 94, 0.15),
+    0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== ALTERNATIVE PERSPECTIVES - TYPOGRAPHY OF CRITICAL THINKING ===== */
+/* Design Intent: Encourage thoughtful reconsideration and cognitive flexibility */
+.reflection-section.alternative-perspectives {
+  background: linear-gradient(135deg, #fefbff, #f8f4ff, #f3f1ff);
+  border-radius: var(--lab-radius-lg);
+  padding: var(--lab-space-8);
+  margin-top: var(--lab-space-6);
+  border: 1px solid #a855f7;
+  position: relative;
+  overflow: hidden;
+}
+
+.reflection-section.alternative-perspectives::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #a855f7, #9333ea, #7c3aed);
+  opacity: 0.8;
+}
+
+.reflection-section.alternative-perspectives h4 {
+  /* Typography for intellectual curiosity and open-mindedness */
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue",
+    sans-serif;
+  font-size: 1.4375rem; /* Prominent but approachable */
+  font-weight: 650; /* Semi-bold for thought leadership */
+  letter-spacing: -0.015em; /* Slight tightening for sophistication */
+  line-height: 1.25; /* Compact for impact */
+  color: #6b21a8; /* Deep purple for wisdom and contemplation */
+  margin-bottom: var(--lab-space-6);
+
+  /* Add depth and contemplative quality */
+  text-shadow: 0 1px 2px rgba(107, 33, 168, 0.1);
+
+  /* Create visual separation for thought leadership */
+  padding-bottom: var(--lab-space-3);
+  border-bottom: 2px solid rgba(168, 85, 247, 0.25);
+}
+
+.alternative-choice-analysis {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lab-space-6);
+}
+
+.alternative-option {
+  background: linear-gradient(135deg, #ffffff, #faf9fc);
+  border-radius: var(--lab-radius-md);
+  padding: var(--lab-space-6);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  box-shadow:
+    0 2px 4px rgba(168, 85, 247, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.alternative-option h5 {
+  /* Typography for gentle guidance and invitation */
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 1.125rem; /* Clear but not overwhelming */
+  font-weight: 500; /* Medium weight for gentle authority */
+  line-height: 1.35; /* Comfortable reading */
+  color: #7c3aed; /* Rich purple for thoughtful engagement */
+  margin-bottom: var(--lab-space-4);
+
+  /* Add warmth and approachability */
+  opacity: 0.9;
+}
+
+.alternative-text {
+  /* Typography for the alternative choice - should feel different but valid */
+  font-family:
+    "Georgia", "Times New Roman", serif; /* Serif for gravitas and distinction */
+  font-size: 1.0625rem; /* Slightly larger for importance */
+  font-weight: 400; /* Regular weight to avoid judgment */
+  line-height: 1.6; /* Generous spacing for contemplation */
+  color: #553c9a; /* Deeper purple for the alternative voice */
+  font-style: italic; /* Italic to distinguish from user's choice */
+  padding: var(--lab-space-4) var(--lab-space-5);
+  background: rgba(168, 85, 247, 0.04);
+  border-radius: var(--lab-radius);
+  border-left: 3px solid #a855f7;
+  position: relative;
+}
+
+.alternative-text::before {
+  content: "\201C"; /* Left double quotation mark */
+  position: absolute;
+  left: var(--lab-space-3);
+  top: var(--lab-space-2);
+  font-size: 1.5rem;
+  color: #a855f7;
+  opacity: 0.6;
+  font-family: serif;
+}
+
+.alternative-text::after {
+  content: "\201D"; /* Right double quotation mark */
+  position: absolute;
+  right: var(--lab-space-3);
+  bottom: var(--lab-space-2);
+  font-size: 1.5rem;
+  color: #a855f7;
+  opacity: 0.6;
+  font-family: serif;
+}
+
+.alternative-questions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lab-space-5);
+}
+
+.what-if-question {
+  background: linear-gradient(135deg, #ffffff, #faf9fc);
+  border-radius: var(--lab-radius);
+  padding: var(--lab-space-5);
+  border: 1px solid rgba(168, 85, 247, 0.15);
+}
+
+.what-if-question strong {
+  /* Typography for analytical thinking prompts */
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 1.0625rem; /* Readable size for questions */
+  font-weight: 600; /* Semi-bold for clear prompting */
+  color: #6b21a8; /* Deep purple for intellectual engagement */
+  display: block;
+  margin-bottom: var(--lab-space-3);
+  line-height: 1.4;
+}
+
+.impact-differences {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lab-space-3);
+}
+
+.impact-differences li {
+  /* Typography for thoughtful possibilities */
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+  font-size: 0.9375rem; /* Slightly smaller for supporting information */
+  font-weight: 400; /* Regular weight for easy reading */
+  line-height: 1.55; /* Comfortable line height */
+  color: #7c3aed; /* Rich purple for engagement */
+  padding: var(--lab-space-2) var(--lab-space-3);
+  background: rgba(168, 85, 247, 0.05);
+  border-radius: var(--lab-radius-sm);
+  border-left: 2px solid rgba(168, 85, 247, 0.3);
+
+  /* Add sophistication */
+  opacity: 0.9;
+}
+
+.impact-differences li em {
+  /* Style the emphasized text within possibilities */
+  font-style: normal; /* Remove default italic */
+  font-weight: 500; /* Medium weight for subtle emphasis */
+  color: #6b21a8; /* Slightly darker for hierarchy */
+}
+
+.reflection-prompt {
+  background: linear-gradient(135deg, #fefbff, #f8f4ff);
+  border-radius: var(--lab-radius);
+  padding: var(--lab-space-5);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-left: 4px solid #a855f7;
+  position: relative;
+}
+
+.reflection-prompt strong {
+  /* Typography for personal reflection prompts */
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 1rem; /* Standard readable size */
+  font-weight: 600; /* Semi-bold for clear prompting */
+  color: #6b21a8; /* Deep purple for contemplation */
+  display: block;
+  margin-bottom: var(--lab-space-3);
+  line-height: 1.4;
+}
+
+.reflection-prompt {
+  /* Typography for the reflection question itself */
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue",
+    sans-serif;
+  font-size: 1rem; /* Clear reading size */
+  font-weight: 450; /* Between normal and medium for thoughtfulness */
+  line-height: 1.65; /* Generous spacing for deep consideration */
+  color: #7c3aed; /* Rich purple for engagement */
+}
+
+.no-alternatives {
+  /* Typography for empty state - should be gentle and understanding */
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+  font-size: var(--lab-text-base);
+  font-weight: 400;
+  line-height: 1.6;
+  color: #9333ea;
+  text-align: center;
+  padding: var(--lab-space-6);
+  font-style: italic;
+  opacity: 0.8;
+}
+
+/* ===== IMPACT EXPLANATION - TYPOGRAPHY OF ANALYTICAL CLARITY ===== */
+/* Design Intent: Present complex ethical analysis with clarity and scientific precision */
+.impact-explanation {
+  background: linear-gradient(135deg, #f0fdf4, #ecfdf5, #f6fffa);
+  border-radius: var(--lab-radius-lg);
+  padding: var(--lab-space-8);
+  margin-top: var(--lab-space-6);
+  border: 1px solid #16a34a;
+  position: relative;
+  overflow: hidden;
+}
+
+.impact-explanation::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #16a34a, #15803d, #166534);
+  opacity: 0.8;
+}
+
+.impact-explanation h4 {
+  /* Typography for analytical insight and scientific understanding */
+  font-family:
+    "Georgia", "Times New Roman", serif; /* Serif for analytical authority */
+  font-size: 1.375rem; /* Clear and prominent for key insights */
+  font-weight: 600; /* Semi-bold for analytical confidence */
+  letter-spacing: -0.01em; /* Slight tightening for precision */
+  line-height: 1.3; /* Compact for analytical focus */
+  color: #166534; /* Deep green for growth and understanding */
+  margin-bottom: var(--lab-space-6);
+
+  /* Add analytical sophistication */
+  text-shadow: 0 1px 2px rgba(22, 101, 52, 0.1);
+
+  /* Create visual separation for analytical insights */
+  padding-bottom: var(--lab-space-3);
+  border-bottom: 2px solid rgba(22, 163, 74, 0.25);
+}
+
+.impact-explanation ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lab-space-4);
+}
+
+.impact-explanation li {
+  /* Typography for analytical findings */
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue",
+    sans-serif;
+  font-size: 1rem; /* Clear reading size for analytical content */
+  font-weight: 450; /* Between normal and medium for analytical precision */
+  line-height: 1.6; /* Comfortable spacing for complex information */
+  color: #15803d; /* Rich green for positive analytical findings */
+  padding: var(--lab-space-4) var(--lab-space-5);
+  background: linear-gradient(135deg, #ffffff, #f6fffa);
+  border-radius: var(--lab-radius);
+  border-left: 3px solid #22c55e;
+  box-shadow:
+    0 2px 4px rgba(22, 163, 74, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+/* Different styling for different types of analytical findings */
+.impact-explanation li:has([emoji*="✅"]),
+.impact-explanation li[data-type="positive"] {
+  border-left-color: #16a34a; /* Green for positive impacts */
+  background: linear-gradient(135deg, #f0fdf4, #ffffff);
+}
+
+.impact-explanation li:has([emoji*="⚠️"]),
+.impact-explanation li[data-type="warning"] {
+  border-left-color: #f59e0b; /* Amber for warnings */
+  background: linear-gradient(135deg, #fffbeb, #ffffff);
+  color: #d97706;
+}
+
+.impact-explanation li:has([emoji*="⚖️"]),
+.impact-explanation li[data-type="balanced"] {
+  border-left-color: #6366f1; /* Indigo for balanced findings */
+  background: linear-gradient(135deg, #eef2ff, #ffffff);
+  color: #4338ca;
+}
+
+/* Style the emoji icons within explanations */
+.impact-explanation li::before {
+  content: "";
+  position: absolute;
+  left: var(--lab-space-2);
+  top: var(--lab-space-4);
+  width: 3px;
+  height: 3px;
+  background: currentColor;
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+/* ===== COMMUNITY INSIGHTS - TYPOGRAPHY OF SOCIAL CONNECTION ===== */
+/* Design Intent: Foster belonging, validation, and cultural awareness */
+.community-insights {
+  background: linear-gradient(135deg, #fef7ff, #fdf4ff, #faf5ff);
+  border-radius: var(--lab-radius-lg);
+  padding: var(--lab-space-8);
+  margin-top: var(--lab-space-6);
+  border: 1px solid #d946ef;
+  position: relative;
+  overflow: hidden;
+}
+
+.community-insights::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #d946ef, #c026d3, #a21caf);
+  opacity: 0.8;
+}
+
+.community-insights-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lab-space-6);
+}
+
+/* Style different types of insights with distinct personalities */
+.insight {
+  border-radius: var(--lab-radius-lg);
+  padding: var(--lab-space-6);
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.05),
+    0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.insight.popular {
+  /* Typography for social validation and belonging */
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5, #ffffff);
+  border: 1px solid #10b981;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue",
+    sans-serif;
+  font-size: 1.125rem; /* Prominent for positive validation */
+  font-weight: 600; /* Semi-bold for confidence */
+  line-height: 1.4; /* Comfortable for positive messaging */
+  color: #065f46; /* Deep green for success and belonging */
+
+  /* Add warmth and celebration */
+  text-shadow: 0 1px 2px rgba(6, 95, 70, 0.1);
+}
+
+.insight.minority {
+  /* Typography for independent thinking and uniqueness */
+  background: linear-gradient(135deg, #eff6ff, #dbeafe, #ffffff);
+  border: 1px solid #3b82f6;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 1.125rem; /* Prominent for empowerment */
+  font-weight: 650; /* Bolder for independence */
+  line-height: 1.4; /* Clear for empowerment messaging */
+  color: #1e40af; /* Deep blue for wisdom and independence */
+
+  /* Add distinction and pride */
+  text-shadow: 0 1px 2px rgba(30, 64, 175, 0.1);
+}
+
+.insight.balanced {
+  /* Typography for thoughtful equilibrium */
+  background: linear-gradient(135deg, #fffbeb, #fef3c7, #ffffff);
+  border: 1px solid #f59e0b;
+  font-family:
+    "Georgia", "Times New Roman", serif; /* Serif for thoughtful balance */
+  font-size: 1.125rem; /* Clear for balanced perspective */
+  font-weight: 500; /* Medium for thoughtful consideration */
+  line-height: 1.45; /* Generous for contemplative reading */
+  color: #d97706; /* Warm amber for balance and wisdom */
+
+  /* Add thoughtful sophistication */
+  text-shadow: 0 1px 2px rgba(217, 119, 6, 0.1);
+}
+
+/* Add visual emphasis to percentages within insights */
+.insight strong,
+.insight [data-percentage] {
+  font-weight: 700; /* Bold for statistical emphasis */
+  font-variant-numeric: tabular-nums; /* Consistent number spacing */
+  font-size: 1.1em; /* Slightly larger for statistical prominence */
+}
+
+.cultural-note {
+  background: linear-gradient(135deg, #ffffff, #fef7ff);
+  border-radius: var(--lab-radius);
+  padding: var(--lab-space-5);
+  border: 1px solid rgba(217, 70, 239, 0.2);
+  border-left: 3px solid #d946ef;
+  position: relative;
+}
+
+.cultural-note p {
+  /* Typography for cultural wisdom and empathy */
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue",
+    sans-serif;
+  font-size: 0.9375rem; /* Slightly smaller for supporting wisdom */
+  font-weight: 400; /* Regular for approachable wisdom */
+  line-height: 1.65; /* Generous for thoughtful consideration */
+  color: #a21caf; /* Rich purple for cultural insight */
+  margin: 0;
+
+  /* Add warmth and understanding */
+  opacity: 0.9;
+}
+
+.cultural-note em {
+  /* Style emphasized cultural insights */
+  font-style: normal; /* Remove default italic */
+  font-weight: 500; /* Medium weight for gentle emphasis */
+  color: #86198f; /* Slightly darker for hierarchy */
+}
+
 /* ===== STAKEHOLDER AND FRAMEWORK CARDS ===== */
 .stakeholder-cards,
 .framework-cards,
@@ -494,6 +1186,7 @@ body.dark-mode .scenario-reflection-modal,
 .framework-card,
 .insight-card {
   display: flex;
+  align-items: flex-start;
   gap: var(--lab-space-4);
   background: linear-gradient(135deg, #fdfdfe, #fafbfc);
   border-radius: var(--lab-radius);
@@ -526,12 +1219,36 @@ body.dark-mode .scenario-reflection-modal,
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
   /* Prevent emoji from being blurry or glitchy */
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
+  image-rendering: optimizeQuality;
   /* Ensure emoji stays crisp */
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Higher specificity for scenario reflection modal insight icons */
+.scenario-reflection-modal .insight-icon,
+.scenario-reflection-modal .stakeholder-icon {
+  font-size: var(--lab-text-2xl) !important;
+  flex-shrink: 0 !important;
+  /* Fix emoji rendering glitches on transform */
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  transform: translateZ(0) !important;
+  -webkit-transform: translateZ(0) !important;
+  /* Prevent emoji from being blurry or glitchy */
+  image-rendering: optimizeQuality !important;
+  /* Ensure emoji stays crisp */
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  /* Override any positioning from other CSS files */
+  position: static !important;
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+  color: inherit !important;
+  left: auto !important;
+  top: auto !important;
 }
 
 .stakeholder-content h5,
@@ -816,6 +1533,455 @@ body.dark-mode .scenario-reflection-modal,
     flex-direction: column;
     gap: var(--lab-space-2);
   }
+
+  /* Mobile optimization for insight cards */
+  .insight-card,
+  .stakeholder-card,
+  .framework-card {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--lab-space-3);
+  }
+
+  .scenario-reflection-modal .insight-icon,
+  .scenario-reflection-modal .stakeholder-icon {
+    font-size: 1.5rem !important; /* Slightly smaller on mobile */
+    align-self: center;
+  }
+
+  .insight-cards,
+  .stakeholder-cards,
+  .framework-cards {
+    gap: var(--lab-space-3); /* Tighter spacing on mobile */
+  }
+
+  /* Mobile typography optimization for exploration sections */
+  .next-exploration h4 {
+    font-size: 1.25rem; /* Smaller but still prominent */
+    margin-bottom: var(--lab-space-4);
+  }
+
+  .next-exploration .next-scenarios p {
+    font-size: 0.9375rem; /* Slightly smaller for mobile */
+    line-height: 1.5; /* Tighter line height */
+    margin-bottom: var(--lab-space-4);
+  }
+
+  .scenario-suggestions {
+    gap: var(--lab-space-3); /* Tighter spacing */
+  }
+
+  .suggestion-card {
+    padding: var(--lab-space-4); /* More compact padding */
+  }
+
+  .suggestion-title {
+    font-size: 1rem; /* Smaller titles on mobile */
+    line-height: 1.25;
+  }
+
+  .suggestion-desc {
+    font-size: 0.875rem; /* Smaller descriptions */
+  }
+
+  .research-impact h4 {
+    font-size: 1.375rem; /* Smaller but still authoritative */
+    margin-bottom: var(--lab-space-5);
+  }
+
+  .research-impact > p {
+    font-size: 1rem; /* Standard mobile reading size */
+    line-height: 1.6; /* Comfortable mobile line height */
+    margin-bottom: var(--lab-space-5);
+  }
+
+  .research-stats {
+    flex-direction: column; /* Stack stats vertically */
+    gap: var(--lab-space-3);
+    align-items: center;
+  }
+
+  .research-stats .stat {
+    font-size: 0.875rem; /* Smaller stat text */
+    padding: var(--lab-space-3) var(--lab-space-4);
+    width: 100%; /* Full width on mobile */
+    max-width: 280px; /* But not too wide */
+    text-align: center;
+  }
+
+  /* Mobile typography optimization for alternative perspectives */
+  .reflection-section.alternative-perspectives h4 {
+    font-size: 1.25rem; /* Smaller but still thoughtful */
+    margin-bottom: var(--lab-space-5);
+  }
+
+  .alternative-choice-analysis {
+    gap: var(--lab-space-5); /* Tighter spacing */
+  }
+
+  .alternative-option,
+  .what-if-question,
+  .reflection-prompt {
+    padding: var(--lab-space-4); /* More compact padding */
+  }
+
+  .alternative-option h5 {
+    font-size: 1rem; /* Smaller guidance text */
+    margin-bottom: var(--lab-space-3);
+  }
+
+  .alternative-text {
+    font-size: 1rem; /* Standard mobile reading size */
+    line-height: 1.55; /* Slightly tighter */
+    padding: var(--lab-space-3) var(--lab-space-4);
+  }
+
+  .alternative-text::before,
+  .alternative-text::after {
+    font-size: 1.25rem; /* Smaller quotation marks */
+  }
+
+  .what-if-question strong,
+  .reflection-prompt strong {
+    font-size: 1rem; /* Standard mobile size */
+    margin-bottom: var(--lab-space-2);
+  }
+
+  .impact-differences {
+    gap: var(--lab-space-2); /* Tighter list spacing */
+  }
+
+  .impact-differences li {
+    font-size: 0.875rem; /* Smaller supporting text */
+    line-height: 1.5;
+    padding: var(--lab-space-2);
+  }
+
+  /* Mobile typography optimization for impact explanation */
+  .impact-explanation h4 {
+    font-size: 1.25rem; /* Smaller but clear analytical header */
+    margin-bottom: var(--lab-space-5);
+  }
+
+  .impact-explanation {
+    padding: var(--lab-space-5); /* Compact padding */
+    margin-top: var(--lab-space-5);
+  }
+
+  .impact-explanation ul {
+    gap: var(--lab-space-3); /* Tighter spacing between findings */
+  }
+
+  .impact-explanation li {
+    font-size: 0.9375rem; /* Compact but readable analytical content */
+    line-height: 1.55;
+    padding: var(--lab-space-3) var(--lab-space-4);
+  }
+
+  /* Mobile typography optimization for community insights */
+  .community-insights {
+    padding: var(--lab-space-5); /* Compact padding */
+    margin-top: var(--lab-space-5);
+  }
+
+  .community-insights-container {
+    gap: var(--lab-space-5); /* Tighter spacing */
+  }
+
+  .insight {
+    padding: var(--lab-space-4); /* More compact insight cards */
+    font-size: 1rem; /* Standard mobile reading size */
+    line-height: 1.35;
+  }
+
+  .insight strong {
+    font-size: 1.05em; /* Slightly smaller emphasis */
+  }
+
+  .cultural-note {
+    padding: var(--lab-space-4); /* Compact cultural note */
+  }
+
+  .cultural-note p {
+    font-size: 0.875rem; /* Smaller supporting wisdom */
+    line-height: 1.6;
+  }
+}
+
+/* Extra small screens (small phones) - enhanced optimization */
+@media (max-width: 480px) {
+  .scenario-reflection-modal .insight-icon {
+    font-size: 1.25rem !important; /* Even smaller for tiny screens */
+  }
+
+  .insight-card,
+  .stakeholder-card,
+  .framework-card {
+    padding: var(--lab-space-3); /* Compact padding */
+    min-height: 100px; /* Smaller minimum height */
+  }
+
+  .reflection-step-content {
+    padding: var(--lab-space-3); /* Minimal padding for maximum content space */
+  }
+
+  .insight-cards,
+  .stakeholder-cards,
+  .framework-cards {
+    gap: var(--lab-space-2); /* Minimal gap for space efficiency */
+  }
+
+  /* Extra small screen typography optimization */
+  .next-exploration,
+  .research-impact {
+    padding: var(--lab-space-5); /* Compact padding for small screens */
+    margin-top: var(--lab-space-5);
+  }
+
+  .next-exploration h4,
+  .research-impact h4 {
+    font-size: 1.125rem; /* Smaller but readable headers */
+    margin-bottom: var(--lab-space-3);
+    padding-bottom: var(--lab-space-1);
+  }
+
+  .next-exploration .next-scenarios p {
+    font-size: 0.875rem; /* Compact but readable */
+    line-height: 1.45;
+    margin-bottom: var(--lab-space-3);
+  }
+
+  .research-impact > p {
+    font-size: 0.9375rem; /* Smaller but still meaningful */
+    line-height: 1.55;
+    margin-bottom: var(--lab-space-4);
+  }
+
+  .suggestion-card {
+    padding: var(--lab-space-3); /* Very compact */
+  }
+
+  .suggestion-title {
+    font-size: 0.9375rem; /* Smaller titles */
+    margin-bottom: var(--lab-space-1);
+  }
+
+  .suggestion-desc {
+    font-size: 0.8125rem; /* Very compact descriptions */
+    line-height: 1.4;
+  }
+
+  .research-stats .stat {
+    font-size: 0.8125rem; /* Compact stats */
+    padding: var(--lab-space-2) var(--lab-space-3);
+  }
+
+  /* Extra small screen typography for alternative perspectives */
+  .reflection-section.alternative-perspectives {
+    padding: var(--lab-space-5); /* Compact padding */
+    margin-top: var(--lab-space-4);
+  }
+
+  .reflection-section.alternative-perspectives h4 {
+    font-size: 1.125rem; /* Smaller but readable */
+    margin-bottom: var(--lab-space-4);
+    padding-bottom: var(--lab-space-2);
+  }
+
+  .alternative-choice-analysis {
+    gap: var(--lab-space-4); /* Even tighter spacing */
+  }
+
+  .alternative-option,
+  .what-if-question,
+  .reflection-prompt {
+    padding: var(--lab-space-3); /* Very compact */
+  }
+
+  .alternative-option h5 {
+    font-size: 0.9375rem; /* Smaller guidance */
+    margin-bottom: var(--lab-space-2);
+  }
+
+  .alternative-text {
+    font-size: 0.9375rem; /* Compact but readable */
+    line-height: 1.5;
+    padding: var(--lab-space-2) var(--lab-space-3);
+  }
+
+  .alternative-text::before,
+  .alternative-text::after {
+    font-size: 1.125rem; /* Smaller quotes */
+  }
+
+  .what-if-question strong,
+  .reflection-prompt strong {
+    font-size: 0.9375rem; /* Compact prompts */
+    margin-bottom: var(--lab-space-1);
+  }
+
+  .impact-differences li {
+    font-size: 0.8125rem; /* Very compact supporting text */
+    line-height: 1.4;
+    padding: var(--lab-space-1) var(--lab-space-2);
+  }
+
+  /* Extra small screen typography for impact explanation */
+  .impact-explanation {
+    padding: var(--lab-space-4); /* Very compact padding */
+    margin-top: var(--lab-space-4);
+  }
+
+  .impact-explanation h4 {
+    font-size: 1.125rem; /* Smaller analytical header */
+    margin-bottom: var(--lab-space-4);
+    padding-bottom: var(--lab-space-2);
+  }
+
+  .impact-explanation ul {
+    gap: var(--lab-space-2); /* Minimal spacing */
+  }
+
+  .impact-explanation li {
+    font-size: 0.875rem; /* Very compact analytical content */
+    line-height: 1.5;
+    padding: var(--lab-space-2) var(--lab-space-3);
+  }
+
+  /* Extra small screen typography for community insights */
+  .community-insights {
+    padding: var(--lab-space-4); /* Very compact padding */
+    margin-top: var(--lab-space-4);
+  }
+
+  .community-insights-container {
+    gap: var(--lab-space-4); /* Minimal spacing */
+  }
+
+  .insight {
+    padding: var(--lab-space-3); /* Compact insight cards */
+    font-size: 0.9375rem; /* Compact but readable */
+    line-height: 1.3;
+  }
+
+  .insight strong {
+    font-size: 1em; /* Standard emphasis size */
+  }
+
+  .cultural-note {
+    padding: var(--lab-space-3); /* Very compact */
+  }
+
+  .cultural-note p {
+    font-size: 0.8125rem; /* Very compact wisdom */
+    line-height: 1.55;
+  }
+}
+
+/* Medium screens (tablets) - intermediate optimization */
+@media (min-width: 481px) and (max-width: 768px) {
+  .scenario-reflection-modal .insight-icon {
+    font-size: 1.75rem !important; /* Intermediate size for tablets */
+  }
+
+  .insight-cards,
+  .stakeholder-cards,
+  .framework-cards {
+    gap: var(--lab-space-4); /* Better spacing for tablets */
+  }
+
+  .insight-card,
+  .stakeholder-card,
+  .framework-card {
+    min-height: 120px; /* Consistent card height on tablets */
+    padding: var(--lab-space-4);
+  }
+
+  .reflection-step-content {
+    padding: var(--lab-space-5); /* More generous padding on tablets */
+  }
+
+  /* Tablet typography optimization for exploration sections */
+  .next-exploration h4 {
+    font-size: 1.3125rem; /* Intermediate size */
+  }
+
+  .next-exploration .next-scenarios p {
+    font-size: 1rem; /* Standard size for tablets */
+    line-height: 1.55;
+  }
+
+  .research-impact h4 {
+    font-size: 1.4375rem; /* Intermediate authority size */
+  }
+
+  .research-impact > p {
+    font-size: 1.03125rem; /* Slightly larger for comfortable reading */
+    line-height: 1.6;
+  }
+
+  .research-stats {
+    gap: var(--lab-space-4); /* Better spacing for tablets */
+  }
+
+  .research-stats .stat {
+    font-size: 0.9375rem; /* Optimal tablet reading size */
+    padding: var(--lab-space-4) var(--lab-space-5);
+  }
+
+  /* Tablet typography optimization for alternative perspectives */
+  .reflection-section.alternative-perspectives h4 {
+    font-size: 1.3125rem; /* Intermediate thoughtful size */
+  }
+
+  .alternative-option h5 {
+    font-size: 1.0625rem; /* Good tablet reading size */
+  }
+
+  .alternative-text {
+    font-size: 1.03125rem; /* Slightly larger for comfortable reading */
+    line-height: 1.58;
+  }
+
+  .alternative-text::before,
+  .alternative-text::after {
+    font-size: 1.375rem; /* Intermediate quote size */
+  }
+
+  .what-if-question strong,
+  .reflection-prompt strong {
+    font-size: 1.03125rem; /* Clear tablet prompts */
+  }
+
+  .impact-differences li {
+    font-size: 0.9375rem; /* Good supporting text size */
+    line-height: 1.52;
+  }
+
+  /* Tablet typography optimization for impact explanation */
+  .impact-explanation h4 {
+    font-size: 1.3125rem; /* Intermediate analytical size */
+  }
+
+  .impact-explanation li {
+    font-size: 0.9375rem; /* Good tablet reading for analysis */
+    line-height: 1.58;
+  }
+
+  /* Tablet typography optimization for community insights */
+  .insight {
+    font-size: 1.0625rem; /* Good tablet size for social insights */
+    line-height: 1.38;
+  }
+
+  .insight strong {
+    font-size: 1.08em; /* Appropriate emphasis */
+  }
+
+  .cultural-note p {
+    font-size: 0.9375rem; /* Good tablet size for cultural wisdom */
+    line-height: 1.62;
+  }
 }
 
 /* ===== DARK MODE SUPPORT ===== */
@@ -831,6 +1997,19 @@ body.dark-mode .scenario-reflection-modal,
 }
 
 /* ===== ACCESSIBILITY ENHANCEMENTS ===== */
+/* Screen reader only content */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .progress-fill,
   .choice-bar-fill,
@@ -839,6 +2018,71 @@ body.dark-mode .scenario-reflection-modal,
   .choice-bar {
     transition: none;
   }
+}
+
+/* ===== MODAL OVERLAY EFFECTS ===== */
+/* When reflection modal is open, blur and dim background elements */
+body.modal-open .scenario-reflection-modal.show ~ .header,
+body.modal-open .scenario-reflection-modal.show ~ .main-nav,
+body.modal-open .scenario-reflection-modal.show ~ .nav-container,
+body.modal-open.reflection-modal-open .header,
+body.modal-open.reflection-modal-open .main-nav,
+body.modal-open.reflection-modal-open .nav-container {
+  opacity: 0.3;
+  filter: blur(2px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+/* Blur and dim floating action tabs when reflection modal is open */
+body.modal-open .scenario-reflection-modal.show ~ .floating-action-tab-link,
+body.modal-open .scenario-reflection-modal.show ~ .floating-surprise-tab-link,
+body.modal-open .scenario-reflection-modal.show ~ .floating-tour-tab-link,
+body.modal-open.reflection-modal-open .floating-action-tab-link,
+body.modal-open.reflection-modal-open .floating-surprise-tab-link,
+body.modal-open.reflection-modal-open .floating-tour-tab-link {
+  opacity: 0.2;
+  filter: blur(1px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+/* Alternative selector for when modal has specific class */
+.reflection-modal-active .header,
+.reflection-modal-active .main-nav,
+.reflection-modal-active .nav-container {
+  opacity: 0.3;
+  filter: blur(2px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.reflection-modal-active .floating-action-tab-link,
+.reflection-modal-active .floating-surprise-tab-link,
+.reflection-modal-active .floating-tour-tab-link {
+  opacity: 0.2;
+  filter: blur(1px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+/* Ensure modal backdrop doesn't interfere with our effects */
+.scenario-reflection-modal .modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+}
+
+/* Reset effects when modal is closed */
+body:not(.modal-open) .header,
+body:not(.modal-open) .main-nav,
+body:not(.modal-open) .nav-container,
+body:not(.modal-open) .floating-action-tab-link,
+body:not(.modal-open) .floating-surprise-tab-link,
+body:not(.modal-open) .floating-tour-tab-link {
+  opacity: 1;
+  filter: none;
+  pointer-events: auto;
+  transition: all 0.3s ease;
 }
 
 @media (prefers-contrast: high) {

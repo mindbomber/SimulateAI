@@ -612,6 +612,8 @@ export class ScenarioReflectionModal {
       setTimeout(() => {
         this.setupEventHandlers();
         this.initializeCharts();
+        // Scroll to top of initial step
+        this.scrollToTopOfStep();
       }, 0);
 
       if (this.performanceTracker) {
@@ -669,6 +671,8 @@ export class ScenarioReflectionModal {
       setTimeout(() => {
         this.setupEventHandlers();
         this.initializeCharts();
+        // Scroll to top of initial step
+        this.scrollToTopOfStep();
       }, 0);
 
       // Track fallback initialization
@@ -1700,6 +1704,57 @@ export class ScenarioReflectionModal {
     // Initialize charts if needed
     if (this.currentStep === SCENARIO_REFLECTION_STEPS.CHOICE_IMPACT) {
       this.initializeCharts();
+    }
+
+    // Scroll to top of step content
+    this.scrollToTopOfStep();
+  }
+
+  /**
+   * Scroll to top of step content area
+   */
+  scrollToTopOfStep() {
+    try {
+      // Find the scrollable content area
+      const contentElement = this.modal?.element?.querySelector(
+        ".reflection-step-content",
+      );
+
+      if (contentElement) {
+        // Check if user prefers reduced motion
+        const prefersReducedMotion = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
+
+        // Use smooth scroll behavior for better UX, respecting accessibility preferences
+        contentElement.scrollTo({
+          top: 0,
+          behavior: prefersReducedMotion ? "auto" : "smooth",
+        });
+
+        console.log("📜 Scrolled to top of step content");
+
+        // Optionally announce to screen readers that content has changed
+        if (this.config?.accessibility?.announceStepChanges) {
+          const announcement = document.createElement("div");
+          announcement.setAttribute("aria-live", "polite");
+          announcement.setAttribute("aria-atomic", "true");
+          announcement.setAttribute("class", "sr-only");
+          announcement.textContent = `Step ${this.currentStep + 1} content loaded`;
+          document.body.appendChild(announcement);
+
+          // Remove announcement after screen reader has had time to announce it
+          setTimeout(() => {
+            document.body.removeChild(announcement);
+          }, ENTERPRISE_CONSTANTS.SCREEN_READER_DELAY);
+        }
+      } else {
+        console.warn(
+          "🚨 Could not find reflection-step-content element for scrolling",
+        );
+      }
+    } catch (error) {
+      console.error("❌ Error scrolling to top of step:", error);
     }
   }
 

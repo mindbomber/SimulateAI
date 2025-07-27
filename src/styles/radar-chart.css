@@ -244,7 +244,7 @@ html.loaded .hero-radar-demo p {
   background: transparent;
 
   /* CRITICAL: Ensure crisp rendering without forcing pixelation */
-  image-rendering: optimizequality;
+  image-rendering: optimizeQuality;
 }
 
 /* Mobile optimization for radar demo */
@@ -396,7 +396,7 @@ html.loaded .hero-radar-demo p {
   /* Removed overflow: hidden to allow Chart.js tooltips to show */
 
   /* CRITICAL: Ensure crisp rendering without forcing pixelation */
-  image-rendering: optimizequality;
+  image-rendering: optimizeQuality;
 }
 
 /* Chart.js Tooltip Support - Ensure tooltips appear above all content */

@@ -270,7 +270,17 @@ export default class RadarChart {
 
     // === CHART CONFIGURATION ===
     this.chart = null;
-    this.currentScores = this.options.scores || { ...this.DEFAULT_SCORES };
+
+    // Ensure initial scores are whole numbers
+    if (this.options.scores) {
+      const wholeNumberScores = {};
+      for (const [axis, score] of Object.entries(this.options.scores)) {
+        wholeNumberScores[axis] = Math.max(1, Math.min(5, Math.round(score)));
+      }
+      this.currentScores = { ...this.DEFAULT_SCORES, ...wholeNumberScores };
+    } else {
+      this.currentScores = { ...this.DEFAULT_SCORES };
+    }
 
     // === ACCESSIBILITY INITIALIZATION ===
     // Note: Accessibility manager integration available if needed
@@ -572,7 +582,8 @@ export default class RadarChart {
         display: "block",
         margin: "0 auto",
         position: "relative",
-        zIndex: "1",
+        // FIXED: Use lower z-index for hero demo to avoid popover conflicts
+        zIndex: this.options.context === "hero-demo" ? "0" : "1",
       };
 
       const containerStyles = {
@@ -614,11 +625,12 @@ export default class RadarChart {
       // Apply container styles more conservatively for hero demo
       if (this.options.context === "hero-demo") {
         // For hero demo, only set essential chart container styles
+        // FIXED: Remove z-index to avoid stacking context conflicts with popover content
         Object.assign(this.container.style, {
           textAlign: "center",
           overflow: "visible",
           position: "relative",
-          zIndex: "10",
+          // Don't set z-index for hero demo to avoid conflicts with popovers (z-index: 1000)
           // Don't override width/height for hero demo - let CSS handle it
         });
       } else {
@@ -1008,7 +1020,13 @@ export default class RadarChart {
    * Set scores directly
    */
   setScores(scores) {
-    this.currentScores = { ...this.DEFAULT_SCORES, ...scores };
+    // Ensure all scores are whole numbers (1-5 range)
+    const wholeNumberScores = {};
+    for (const [axis, score] of Object.entries(scores)) {
+      wholeNumberScores[axis] = Math.max(1, Math.min(5, Math.round(score)));
+    }
+
+    this.currentScores = { ...this.DEFAULT_SCORES, ...wholeNumberScores };
     this.refreshChart();
   }
 
@@ -1255,9 +1273,9 @@ export default class RadarChart {
     dataset.pointBackgroundColor = RadarChart.config.pointColors["3"];
 
     // CRITICAL: Ensure polygon visibility from the start for scenario charts
-    // Use a pattern that's virtually neutral but guarantees polygon visibility
+    // Use pure default pattern to match neutral state
     // This prevents the "abrupt appearance" when first option is selected
-    const visiblePattern = [3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.02]; // Minimal variation
+    const visiblePattern = [3, 3, 3, 3, 3, 3, 3, 3]; // All neutral defaults
     dataset.data = visiblePattern;
 
     // Keep current scores as whole numbers for consistency
@@ -1388,9 +1406,9 @@ export default class RadarChart {
           description = "pure default pattern for hero demo";
           break;
         case "scenario":
-          // Scenario charts: Use minimal variation only if Chart.js requires it
-          pattern = [3, 3, 3, 3, 3, 3, 3, 4];
-          description = "minimal variation pattern for scenario chart";
+          // Scenario charts: Use pure neutral pattern for consistency
+          pattern = [3, 3, 3, 3, 3, 3, 3, 3];
+          description = "pure neutral pattern for scenario chart";
           break;
         case "test":
           // Test charts: Use pure defaults for predictable testing
@@ -1403,8 +1421,8 @@ export default class RadarChart {
             pattern = [3, 3, 3, 3, 3, 3, 3, 3];
             description = "pure default pattern (legacy demo)";
           } else {
-            pattern = [3, 3, 3, 3, 3, 3, 3, 4];
-            description = "minimal variation pattern (legacy scenario)";
+            pattern = [3, 3, 3, 3, 3, 3, 3, 3];
+            description = "pure neutral pattern (legacy scenario)";
           }
       }
 
@@ -1446,14 +1464,14 @@ export default class RadarChart {
 
     // OPTIMIZED: Check if already applied
     const currentData = this.chart.data.datasets[0].data;
-    const targetPattern = [3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.01];
+    const targetPattern = [3, 3, 3, 3, 3, 3, 3, 3]; // All neutral defaults
 
     if (this._arraysEqual(currentData, targetPattern)) {
       return; // Already applied, skip update
     }
 
-    // For scenario charts, ensure we have a very subtle variation that makes polygon visible
-    // This pattern is barely noticeable but ensures Chart.js renders the polygon
+    // For scenario charts, use pure neutral pattern to match default state
+    // Chart.js should handle polygon rendering correctly with equal values
     this.chart.data.datasets[0].data = targetPattern;
 
     // Keep current scores as neutral whole numbers for consistency
