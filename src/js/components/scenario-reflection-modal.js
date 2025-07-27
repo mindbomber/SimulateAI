@@ -50,6 +50,7 @@
 import ModalUtility from "./modal-utility.js";
 import { simulationInfo } from "../data/simulation-info.js";
 import { userProgress } from "../utils/simple-storage.js";
+import DataHandler from "../core/data-handler.js";
 import { simpleAnalytics } from "../utils/simple-analytics.js";
 import { loadScenarioReflectionConfig } from "../utils/scenario-reflection-config-loader.js";
 import eventDispatcher, {
@@ -157,6 +158,18 @@ export class ScenarioReflectionModal {
     this.modal = null;
     this.animationManager = null;
     this.accessibilityManager = null;
+
+    // Initialize DataHandler for improved data persistence
+    this.dataHandler = new DataHandler({
+      appName: "SimulateAI-Reflection",
+      version: "1.50",
+      enableFirebase: true,
+      enableCaching: true,
+      enableOfflineQueue: true,
+    });
+
+    // Migrate legacy data if needed
+    this._migrateLegacyData();
 
     // Enhanced community analytics
     this.communityStats = null;
@@ -279,6 +292,82 @@ export class ScenarioReflectionModal {
       );
     } catch (error) {
       console.error("Enterprise monitoring initialization failed:", error);
+    }
+  }
+
+  /**
+   * Migrate legacy research data from simple-storage to DataHandler
+   */
+  async _migrateLegacyData() {
+    try {
+      // Check if migration has already been done
+      const migrationStatus = await this.dataHandler.getData(
+        "data_migration_status",
+      );
+      if (migrationStatus?.reflectionDataMigrated) {
+        console.log("📦 Reflection data already migrated to DataHandler");
+        return;
+      }
+
+      console.log("🔄 Checking for legacy reflection data to migrate...");
+
+      // Get legacy data
+      const legacyData = userProgress.storage.get("research_data", []);
+
+      if (legacyData.length > 0) {
+        console.log(
+          `📦 Found ${legacyData.length} legacy reflection records, migrating...`,
+        );
+
+        // Enhance legacy data with missing fields
+        const enhancedData = legacyData.map((record) => ({
+          ...record,
+          instanceId:
+            record.instanceId ||
+            `migrated_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          sessionData: record.sessionData || {
+            currentStep: 0,
+            totalSteps: 4,
+            completionPercentage: 100, // Assume legacy data was completed
+            timeSpent: 0,
+          },
+        }));
+
+        // Save to DataHandler
+        const saveSuccess = await this.dataHandler.saveData(
+          "research_data",
+          enhancedData,
+        );
+
+        if (saveSuccess) {
+          console.log("✅ Legacy reflection data migrated successfully");
+
+          // Mark migration as complete
+          await this.dataHandler.saveData("data_migration_status", {
+            reflectionDataMigrated: true,
+            migrationDate: new Date().toISOString(),
+            migratedRecords: enhancedData.length,
+          });
+
+          // Optionally clear legacy data after successful migration
+          // userProgress.storage.set("research_data", []);
+          // console.log("🧹 Legacy data cleared after migration");
+        } else {
+          console.warn("⚠️ Migration failed, keeping legacy data");
+        }
+      } else {
+        console.log("📦 No legacy reflection data found");
+
+        // Still mark migration as complete to avoid future checks
+        await this.dataHandler.saveData("data_migration_status", {
+          reflectionDataMigrated: true,
+          migrationDate: new Date().toISOString(),
+          migratedRecords: 0,
+        });
+      }
+    } catch (error) {
+      console.error("❌ Failed to migrate legacy reflection data:", error);
+      // Don't throw - migration failure shouldn't prevent normal operation
     }
   }
 
@@ -2061,9 +2150,9 @@ export class ScenarioReflectionModal {
   /**
    * Save research data
    */
-  saveResearchData() {
+  async saveResearchData() {
     try {
-      console.log("💾 Saving research data...");
+      console.log("💾 Saving research data using DataHandler...");
 
       const researchRecord = {
         timestamp: new Date().toISOString(),
@@ -2072,12 +2161,22 @@ export class ScenarioReflectionModal {
         selectedOption: this.selectedOption?.id,
         reflectionData: this.reflectionData,
         communityStats: this.communityStats,
+        instanceId: this.instanceId,
+        sessionData: {
+          currentStep: this.currentStep,
+          totalSteps: this.totalSteps,
+          completionPercentage: Math.round(
+            (this.currentStep / this.totalSteps) * 100,
+          ),
+          timeSpent: Math.round(performance.now() - this.startTime),
+        },
       };
 
       console.log("📊 Research record:", researchRecord);
 
-      // Get existing research data
-      const existingData = userProgress.storage.get("research_data", []);
+      // Get existing research data using DataHandler
+      const existingData =
+        (await this.dataHandler.getData("research_data")) || [];
 
       // Add new record
       existingData.push(researchRecord);
@@ -2087,13 +2186,226 @@ export class ScenarioReflectionModal {
         existingData.splice(0, existingData.length - 100);
       }
 
-      // Save back to storage
-      userProgress.storage.set("research_data", existingData);
+      // Save back to storage using DataHandler (will sync to Firebase if available)
+      const saveSuccess = await this.dataHandler.saveData(
+        "research_data",
+        existingData,
+      );
 
-      console.log("✅ Research data saved successfully");
+      if (saveSuccess) {
+        console.log("✅ Research data saved successfully using DataHandler");
+
+        // Also save a summary for easier access
+        await this.dataHandler.saveData(
+          `reflection_summary_${this.options.categoryId}_${this.options.scenarioId}`,
+          {
+            lastReflection: researchRecord.timestamp,
+            totalReflections: existingData.filter(
+              (r) =>
+                r.categoryId === this.options.categoryId &&
+                r.scenarioId === this.options.scenarioId,
+            ).length,
+            averageCompletionPercentage:
+              this._calculateAverageCompletion(existingData),
+            lastReflectionData: researchRecord.reflectionData,
+          },
+        );
+      } else {
+        console.warn(
+          "⚠️ DataHandler save failed, falling back to legacy storage",
+        );
+        // Fallback to legacy storage if DataHandler fails
+        await this._saveLegacyResearchData(researchRecord);
+      }
     } catch (error) {
       console.error("❌ Failed to save research data:", error);
-      // Don't throw - research data saving is optional
+
+      // Fallback to legacy storage on error
+      try {
+        await this._saveLegacyResearchData({
+          timestamp: new Date().toISOString(),
+          categoryId: this.options.categoryId,
+          scenarioId: this.options.scenarioId,
+          selectedOption: this.selectedOption?.id,
+          reflectionData: this.reflectionData,
+          communityStats: this.communityStats,
+        });
+      } catch (fallbackError) {
+        console.error("❌ Even fallback save failed:", fallbackError);
+      }
+    }
+  }
+
+  /**
+   * Fallback method to save research data using legacy storage
+   */
+  async _saveLegacyResearchData(researchRecord) {
+    try {
+      console.log("💾 Using legacy storage fallback...");
+
+      // Get existing research data from legacy storage
+      const existingData = userProgress.storage.get("research_data", []);
+
+      // Add new record
+      existingData.push(researchRecord);
+
+      // Keep only the last 100 records
+      if (existingData.length > 100) {
+        existingData.splice(0, existingData.length - 100);
+      }
+
+      // Save back to legacy storage
+      userProgress.storage.set("research_data", existingData);
+
+      console.log("✅ Research data saved using legacy storage");
+    } catch (error) {
+      console.error("❌ Legacy storage save failed:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Calculate average completion percentage for analytics
+   */
+  _calculateAverageCompletion(researchData) {
+    if (!researchData || researchData.length === 0) return 0;
+
+    const completions = researchData
+      .filter((r) => r.sessionData?.completionPercentage != null)
+      .map((r) => r.sessionData.completionPercentage);
+
+    if (completions.length === 0) return 0;
+
+    return Math.round(
+      completions.reduce((sum, comp) => sum + comp, 0) / completions.length,
+    );
+  }
+
+  /**
+   * Get user's reflection history using DataHandler
+   */
+  async getUserReflectionHistory(categoryId = null, scenarioId = null) {
+    try {
+      const allReflections =
+        (await this.dataHandler.getData("research_data")) || [];
+
+      let filtered = allReflections;
+
+      if (categoryId) {
+        filtered = filtered.filter((r) => r.categoryId === categoryId);
+      }
+
+      if (scenarioId) {
+        filtered = filtered.filter((r) => r.scenarioId === scenarioId);
+      }
+
+      return {
+        reflections: filtered,
+        totalCount: filtered.length,
+        averageCompletion: this._calculateAverageCompletion(filtered),
+        lastReflection:
+          filtered.length > 0 ? filtered[filtered.length - 1] : null,
+        categories: [...new Set(filtered.map((r) => r.categoryId))],
+        scenarios: [...new Set(filtered.map((r) => r.scenarioId))],
+      };
+    } catch (error) {
+      console.error("❌ Failed to get reflection history:", error);
+      return {
+        reflections: [],
+        totalCount: 0,
+        averageCompletion: 0,
+        lastReflection: null,
+        categories: [],
+        scenarios: [],
+      };
+    }
+  }
+
+  /**
+   * Get reflection analytics for dashboard/insights
+   */
+  async getReflectionAnalytics() {
+    try {
+      const history = await this.getUserReflectionHistory();
+      const reflections = history.reflections;
+
+      if (reflections.length === 0) {
+        return {
+          totalReflections: 0,
+          averageCompletion: 0,
+          mostReflectedCategory: null,
+          mostReflectedScenario: null,
+          completionTrend: [],
+          timeSpentAnalytics: {},
+        };
+      }
+
+      // Category analysis
+      const categoryCount = {};
+      reflections.forEach((r) => {
+        categoryCount[r.categoryId] = (categoryCount[r.categoryId] || 0) + 1;
+      });
+      const mostReflectedCategory = Object.keys(categoryCount).reduce((a, b) =>
+        categoryCount[a] > categoryCount[b] ? a : b,
+      );
+
+      // Scenario analysis
+      const scenarioCount = {};
+      reflections.forEach((r) => {
+        scenarioCount[r.scenarioId] = (scenarioCount[r.scenarioId] || 0) + 1;
+      });
+      const mostReflectedScenario = Object.keys(scenarioCount).reduce((a, b) =>
+        scenarioCount[a] > scenarioCount[b] ? a : b,
+      );
+
+      // Time spent analysis
+      const timeSpentData = reflections
+        .filter((r) => r.sessionData?.timeSpent)
+        .map((r) => r.sessionData.timeSpent);
+
+      const timeSpentAnalytics =
+        timeSpentData.length > 0
+          ? {
+              average: Math.round(
+                timeSpentData.reduce((a, b) => a + b, 0) / timeSpentData.length,
+              ),
+              min: Math.min(...timeSpentData),
+              max: Math.max(...timeSpentData),
+              total: timeSpentData.reduce((a, b) => a + b, 0),
+            }
+          : {};
+
+      // Completion trend (last 10 reflections)
+      const recentReflections = reflections.slice(-10);
+      const completionTrend = recentReflections.map((r) => ({
+        date: r.timestamp,
+        completion: r.sessionData?.completionPercentage || 0,
+        category: r.categoryId,
+        scenario: r.scenarioId,
+      }));
+
+      return {
+        totalReflections: reflections.length,
+        averageCompletion: history.averageCompletion,
+        mostReflectedCategory,
+        mostReflectedScenario,
+        completionTrend,
+        timeSpentAnalytics,
+        categoryBreakdown: categoryCount,
+        scenarioBreakdown: scenarioCount,
+        firstReflection: reflections[0]?.timestamp,
+        lastReflection: history.lastReflection?.timestamp,
+      };
+    } catch (error) {
+      console.error("❌ Failed to get reflection analytics:", error);
+      return {
+        totalReflections: 0,
+        averageCompletion: 0,
+        mostReflectedCategory: null,
+        mostReflectedScenario: null,
+        completionTrend: [],
+        timeSpentAnalytics: {},
+      };
     }
   }
 

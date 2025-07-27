@@ -309,6 +309,222 @@ class DataHandler {
     return await this.saveData(`achievements_${userId}`, achievements);
   }
 
+  // Scenario completions
+  async getScenarioCompletions(userId = "default") {
+    return (await this.getData(`scenario_completions_${userId}`)) || [];
+  }
+
+  async saveScenarioCompletion(completionData, userId = "default") {
+    const completions = await this.getScenarioCompletions(userId);
+    completions.push({
+      ...completionData,
+      id: `${completionData.categoryId}_${completionData.scenarioId}_${Date.now()}`,
+      savedAt: new Date().toISOString(),
+    });
+    return await this.saveData(`scenario_completions_${userId}`, completions);
+  }
+
+  async getAllCompletions(userId = "default") {
+    return await this.getScenarioCompletions(userId);
+  }
+
+  async getAnalyticsData(userId = "default") {
+    const completions = await this.getScenarioCompletions(userId);
+    const research = await this.getResearchData(userId);
+
+    return {
+      totalScenarios: completions.length,
+      totalResearch: research.length,
+      completionsByCategory: this._groupBy(completions, "categoryId"),
+      lastActivity: Math.max(
+        ...completions.map((c) => new Date(c.timestamp).getTime()),
+        ...research.map((r) => new Date(r.timestamp).getTime()),
+      ),
+    };
+  }
+
+  _groupBy(array, key) {
+    return array.reduce((result, item) => {
+      const group = item[key];
+      result[group] = result[group] || [];
+      result[group].push(item);
+      return result;
+    }, {});
+  }
+
+  // Consent data management
+  async getConsentData(userId = "default") {
+    return await this.getData(`research_consent_${userId}`);
+  }
+
+  async saveConsentData(consentData, userId = "default") {
+    return await this.saveData(`research_consent_${userId}`, {
+      ...consentData,
+      savedAt: new Date().toISOString(),
+      id: `consent_${Date.now()}`,
+    });
+  }
+
+  // Navigation telemetry management
+  async getNavigationTelemetry(userId = "default") {
+    return (await this.getData(`nav_telemetry_${userId}`)) || [];
+  }
+
+  async saveNavigationTelemetry(telemetryData, userId = "default") {
+    const existing = await this.getNavigationTelemetry(userId);
+    const updated = Array.isArray(existing) ? existing : [];
+
+    if (Array.isArray(telemetryData)) {
+      updated.push(...telemetryData);
+    } else {
+      updated.push(telemetryData);
+    }
+
+    // Keep only last 100 entries
+    if (updated.length > 100) {
+      updated.splice(0, updated.length - 100);
+    }
+
+    return await this.saveData(`nav_telemetry_${userId}`, updated);
+  }
+
+  // Session management
+  async getSessionData(sessionKey, userId = "default") {
+    return await this.getData(`session_${sessionKey}_${userId}`);
+  }
+
+  async saveSessionData(sessionKey, sessionData, userId = "default") {
+    return await this.saveData(`session_${sessionKey}_${userId}`, {
+      ...sessionData,
+      savedAt: new Date().toISOString(),
+      sessionId: sessionKey,
+    });
+  }
+
+  // Comprehensive data export for analytics
+  async exportAllUserData(userId = "default") {
+    try {
+      const [
+        settings,
+        scenarios,
+        research,
+        badges,
+        consent,
+        navigation,
+        progress,
+        achievements,
+      ] = await Promise.all([
+        this.getData(`settings_manager_${userId}`),
+        this.getScenarioCompletions(userId),
+        this.getResearchData(userId),
+        this.getData(`badge_manager_state_${userId}`),
+        this.getConsentData(userId),
+        this.getNavigationTelemetry(userId),
+        this.getUserProgress(userId),
+        this.getUserAchievements(userId),
+      ]);
+
+      return {
+        exportDate: new Date().toISOString(),
+        userId,
+        settings,
+        scenarios,
+        research,
+        badges,
+        consent,
+        navigation,
+        progress,
+        achievements,
+        summary: {
+          totalScenarios: scenarios?.length || 0,
+          totalResearch: research?.length || 0,
+          totalNavigationEvents: navigation?.length || 0,
+          totalAchievements: achievements?.length || 0,
+          hasConsent: !!consent,
+          hasSettings: !!settings,
+        },
+      };
+    } catch (error) {
+      console.error("Failed to export user data:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Blog Comment Management Methods
+   */
+
+  /**
+   * Save blog comments for a specific post
+   */
+  async saveBlogComments(postId, comments) {
+    const commentsKey = `blog_comments_${postId}`;
+    const enrichedComments = {
+      postId,
+      comments: Array.isArray(comments) ? comments : [],
+      lastUpdated: new Date().toISOString(),
+      totalComments: Array.isArray(comments) ? comments.length : 0,
+    };
+
+    return await this.saveData(commentsKey, enrichedComments, {
+      priority: "medium",
+      syncToFirebase: true,
+    });
+  }
+
+  /**
+   * Get blog comments for a specific post
+   */
+  async getBlogComments(postId) {
+    const commentsKey = `blog_comments_${postId}`;
+    const data = await this.getData(commentsKey);
+    return data?.comments || [];
+  }
+
+  /**
+   * Save blog analytics for a specific post
+   */
+  async saveBlogAnalytics(postId, analytics) {
+    const analyticsKey = `blog_analytics_${postId}`;
+    const enrichedAnalytics = {
+      postId,
+      ...analytics,
+      lastUpdated: new Date().toISOString(),
+    };
+
+    return await this.saveData(analyticsKey, enrichedAnalytics, {
+      priority: "low",
+      syncToFirebase: true,
+    });
+  }
+
+  /**
+   * Get blog analytics for a specific post
+   */
+  async getBlogAnalytics(postId) {
+    const analyticsKey = `blog_analytics_${postId}`;
+    return await this.getData(analyticsKey);
+  }
+
+  /**
+   * Delete blog comments and analytics for a specific post
+   */
+  async deleteBlogData(postId) {
+    try {
+      const commentsKey = `blog_comments_${postId}`;
+      const analyticsKey = `blog_analytics_${postId}`;
+
+      await this.deleteData(commentsKey);
+      await this.deleteData(analyticsKey);
+
+      console.log(`✅ Blog data deleted for post ${postId}`);
+      return true;
+    } catch (error) {
+      console.error(`❌ Failed to delete blog data for post ${postId}:`, error);
+      return false;
+    }
+  }
+
   /**
    * Cache management
    */
@@ -485,10 +701,292 @@ class DataHandler {
   }
 
   /**
+   * User Profile Management Methods
+   */
+
+  /**
+   * Save user profile data
+   */
+  async saveUserProfile(profileData) {
+    const profileKey = "userProfile";
+    const enrichedProfile = {
+      ...profileData,
+      version: this.version,
+      lastSaved: new Date().toISOString(),
+      source: "user-metadata-collector",
+    };
+
+    return await this.saveData(profileKey, enrichedProfile, {
+      priority: "high",
+      syncToFirebase: true,
+      createBackup: true,
+    });
+  }
+
+  /**
+   * Get user profile data
+   */
+  async getUserProfile() {
+    return await this.getData("userProfile", {
+      includeMetadata: true,
+    });
+  }
+
+  /**
+   * Update specific profile section
+   */
+  async updateUserProfileSection(section, sectionData) {
+    try {
+      const currentProfile = (await this.getUserProfile()) || {};
+      const updatedProfile = {
+        ...currentProfile,
+        [section]: { ...currentProfile[section], ...sectionData },
+        updatedAt: new Date().toISOString(),
+      };
+
+      return await this.saveUserProfile(updatedProfile);
+    } catch (error) {
+      console.error(`Failed to update profile section ${section}:`, error);
+      return false;
+    }
+  }
+
+  /**
+   * Delete user profile data (GDPR compliance)
+   */
+  async deleteUserProfile() {
+    const profileKey = "userProfile";
+
+    try {
+      // Delete from Firebase if available
+      if (this.firebaseService && this.isOnline) {
+        await this.firebaseService.deleteUserData(profileKey);
+        console.log("✅ User profile deleted from Firebase");
+      }
+
+      // Delete from localStorage
+      localStorage.removeItem(this.generateStorageKey(profileKey));
+
+      // Clear from cache
+      this.cache.delete(profileKey);
+
+      console.log("✅ User profile deleted from all storage locations");
+      return true;
+    } catch (error) {
+      console.error("❌ Failed to delete user profile:", error);
+      return false;
+    }
+  }
+
+  /**
+   * Check if user has completed profile
+   */
+  async hasUserProfile() {
+    const profile = await this.getUserProfile();
+    return profile && Object.keys(profile).length > 0;
+  }
+
+  /**
+   * Get user profile completion status
+   */
+  async getUserProfileCompletion() {
+    const profile = await this.getUserProfile();
+    if (!profile) return { percentage: 0, sections: [] };
+
+    const sections = ["demographics", "philosophy", "consent"];
+    const completed = sections.filter((section) => {
+      const data = profile[section];
+      return data && Object.keys(data).length > 0;
+    });
+
+    return {
+      percentage: Math.round((completed.length / sections.length) * 100),
+      sections: completed,
+      totalSections: sections.length,
+      profile: profile,
+    };
+  }
+
+  /**
+   * Export user data for GDPR compliance
+   */
+  async exportUserData() {
+    try {
+      const userProfile = await this.getUserProfile();
+      const scenarioData = (await this.getData("scenarios")) || {};
+      const settingsData = (await this.getData("settings")) || {};
+      const badgeData = (await this.getData("badges")) || {};
+      const consentData = await this.getConsentData();
+      const navigationData = (await this.getData("navigationTelemetry")) || {};
+
+      return {
+        exportDate: new Date().toISOString(),
+        version: this.version,
+        userData: {
+          profile: userProfile,
+          scenarios: scenarioData,
+          settings: settingsData,
+          badges: badgeData,
+          consent: consentData,
+          navigation: navigationData,
+        },
+        metadata: {
+          source: "SimulateAI DataHandler",
+          exportFormat: "JSON",
+          gdprCompliant: true,
+        },
+      };
+    } catch (error) {
+      console.error("❌ Failed to export user data:", error);
+      return null;
+    }
+  }
+
+  /**
    * Compatibility aliases for components expecting get/set methods
    */
   async get(key, options = {}) {
     return await this.getData(key, options);
+  }
+
+  // === ONBOARDING TOUR MANAGEMENT ===
+
+  /**
+   * Save onboarding tour data and analytics
+   */
+  async saveOnboardingData(key, data) {
+    try {
+      const storageKey = this.generateStorageKey(`onboarding_${key}`);
+      const success = await this.saveData(storageKey, {
+        ...data,
+        savedAt: Date.now(),
+        version: this.config.version,
+      });
+
+      if (success) {
+        console.log(`[DataHandler] Onboarding data saved: ${key}`);
+      }
+
+      return success;
+    } catch (error) {
+      console.error(
+        `[DataHandler] Error saving onboarding data: ${key}`,
+        error,
+      );
+      return false;
+    }
+  }
+
+  /**
+   * Get onboarding tour data
+   */
+  async getOnboardingData(key) {
+    try {
+      const storageKey = this.generateStorageKey(`onboarding_${key}`);
+      const data = await this.getData(storageKey);
+      return data || null;
+    } catch (error) {
+      console.error(
+        `[DataHandler] Error getting onboarding data: ${key}`,
+        error,
+      );
+      return null;
+    }
+  }
+
+  /**
+   * Save onboarding tour analytics
+   */
+  async saveOnboardingAnalytics(sessionId, analytics) {
+    try {
+      const analyticsKey = `onboarding_analytics_${sessionId}`;
+      return await this.saveOnboardingData(analyticsKey, {
+        type: "analytics",
+        sessionId,
+        analytics,
+        timestamp: Date.now(),
+      });
+    } catch (error) {
+      console.error("[DataHandler] Error saving onboarding analytics", error);
+      return false;
+    }
+  }
+
+  /**
+   * Get onboarding tour analytics
+   */
+  async getOnboardingAnalytics(sessionId = null) {
+    try {
+      if (sessionId) {
+        const analyticsKey = `onboarding_analytics_${sessionId}`;
+        return await this.getOnboardingData(analyticsKey);
+      }
+
+      // Get all analytics if no session specified
+      const allData = await this.getOnboardingData("analytics");
+      return allData || [];
+    } catch (error) {
+      console.error("[DataHandler] Error getting onboarding analytics", error);
+      return null;
+    }
+  }
+
+  /**
+   * Save onboarding progress
+   */
+  async saveOnboardingProgress(progressData) {
+    try {
+      return await this.saveOnboardingData("progress", {
+        type: "progress",
+        ...progressData,
+        lastUpdated: Date.now(),
+      });
+    } catch (error) {
+      console.error("[DataHandler] Error saving onboarding progress", error);
+      return false;
+    }
+  }
+
+  /**
+   * Get onboarding progress
+   */
+  async getOnboardingProgress() {
+    try {
+      return await this.getOnboardingData("progress");
+    } catch (error) {
+      console.error("[DataHandler] Error getting onboarding progress", error);
+      return null;
+    }
+  }
+
+  /**
+   * Delete all onboarding data (GDPR compliance)
+   */
+  async deleteOnboardingData() {
+    try {
+      const keys = ["tour_data", "progress", "analytics"];
+      const deletePromises = keys.map((key) =>
+        this.deleteData(this.generateStorageKey(`onboarding_${key}`)),
+      );
+
+      await Promise.all(deletePromises);
+
+      // Also clear localStorage onboarding data
+      const localKeys = ["tour_completed", "has_visited"];
+      localKeys.forEach((key) => {
+        try {
+          localStorage.removeItem(key);
+        } catch (e) {
+          console.warn(`Failed to remove localStorage key: ${key}`, e);
+        }
+      });
+
+      console.log("[DataHandler] All onboarding data deleted");
+      return true;
+    } catch (error) {
+      console.error("[DataHandler] Error deleting onboarding data", error);
+      return false;
+    }
   }
 
   async set(key, data, options = {}) {

@@ -3,8 +3,23 @@
  * Manages consent form interactions, validation, and data storage
  */
 
+import DataHandler from "../core/data-handler.js";
+
 class ResearchConsentManager {
-  constructor() {
+  constructor(app = null) {
+    // Initialize DataHandler integration
+    this.app = app;
+    this.dataHandler = app?.dataHandler || null;
+
+    // If no app provided, create standalone DataHandler
+    if (!this.dataHandler) {
+      this.dataHandler = new DataHandler({
+        storageKey: "consentData",
+        analyticsEnabled: true,
+        syncEnabled: true,
+      });
+    }
+
     // Constants
     this.ANIMATION_DURATION = 200;
     this.FEEDBACK_DISPLAY_DURATION = 3000;
@@ -224,8 +239,8 @@ class ResearchConsentManager {
         throw new Error("Not all required consents are provided");
       }
 
-      // Store locally
-      this.storeConsentData();
+      // Store locally and in DataHandler
+      await this.storeConsentData();
 
       // Send to server (if implemented)
       await this.sendConsentToServer();
@@ -264,9 +279,13 @@ class ResearchConsentManager {
     });
   }
 
-  storeConsentData() {
+  async storeConsentData() {
     try {
-      // Store in localStorage
+      // Save to DataHandler first
+      await this.dataHandler.saveData("research_consent", this.consentData);
+      console.log("💾 Consent data saved to DataHandler");
+
+      // Also save to localStorage for immediate access and compatibility
       localStorage.setItem(
         "research_consent",
         JSON.stringify(this.consentData),
@@ -282,7 +301,60 @@ class ResearchConsentManager {
       );
     } catch (error) {
       console.error("Error storing consent data:", error);
-      throw new Error("Failed to store consent data locally");
+      throw new Error("Failed to store consent data");
+    }
+  }
+
+  /**
+   * Get consent data from DataHandler with localStorage fallback
+   */
+  async getConsentData() {
+    try {
+      // Try DataHandler first
+      const stored = await this.dataHandler.getData("research_consent");
+      if (stored) {
+        console.log("📄 Consent data loaded from DataHandler");
+        return stored;
+      }
+
+      // Fallback to localStorage
+      const localData = localStorage.getItem("research_consent");
+      if (localData) {
+        const parsed = JSON.parse(localData);
+        // Migrate to DataHandler
+        await this.dataHandler.saveData("research_consent", parsed);
+        console.log(
+          "📄 Consent data migrated from localStorage to DataHandler",
+        );
+        return parsed;
+      }
+
+      return null;
+    } catch (error) {
+      console.error("Error retrieving consent data:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Check if user has valid consent
+   */
+  async hasValidConsent() {
+    try {
+      const consentData = await this.getConsentData();
+      if (!consentData || !consentData.timestamp) {
+        return false;
+      }
+
+      // Check if consent is still valid (within validity period)
+      const consentDate = new Date(consentData.timestamp);
+      const now = new Date();
+      const daysSinceConsent = (now - consentDate) / this.MILLISECONDS_PER_DAY;
+
+      return daysSinceConsent <= this.CONSENT_VALIDITY_DAYS;
+    } catch (error) {
+      console.error("Error checking consent validity:", error);
+      return false;
     }
   }
 

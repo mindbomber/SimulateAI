@@ -5,9 +5,23 @@
 
 import { UI, TIMING } from "../utils/constants.js";
 import scrollManager from "../utils/scroll-manager.js";
+import DataHandler from "../core/data-handler.js";
 
 class SharedNavigation {
-  constructor() {
+  constructor(app = null) {
+    // Initialize DataHandler integration
+    this.app = app;
+    this.dataHandler = app?.dataHandler || null;
+
+    // If no app provided, create standalone DataHandler
+    if (!this.dataHandler) {
+      this.dataHandler = new DataHandler({
+        storageKey: "navigationData",
+        analyticsEnabled: true,
+        syncEnabled: true,
+      });
+    }
+
     this.navHTML = null;
     this.currentPage = null;
     this.isInitialized = false;
@@ -321,9 +335,9 @@ class SharedNavigation {
   }
 
   /**
-   * Flush telemetry data
+   * Flush telemetry data with DataHandler integration
    */
-  flushTelemetry() {
+  async flushTelemetry() {
     if (!this.telemetryQueue || this.telemetryQueue.length === 0) return;
 
     const batch = this.telemetryQueue.splice(0, this.telemetryBatchSize);
@@ -335,32 +349,97 @@ class SharedNavigation {
       });
     }
 
-    // Store locally as backup
+    // Store in DataHandler first
     try {
-      const stored = localStorage.getItem("nav_telemetry") || "[]";
-      const existing = JSON.parse(stored);
-      existing.push(...batch);
+      const existing = await this.getStoredTelemetry();
+      const updated = [...existing, ...batch];
 
       // Keep only last 100 entries
-      if (existing.length > 100) {
-        existing.splice(0, existing.length - 100);
+      if (updated.length > 100) {
+        updated.splice(0, updated.length - 100);
       }
 
-      localStorage.setItem("nav_telemetry", JSON.stringify(existing));
+      await this.dataHandler.saveData("nav_telemetry", updated);
+      console.log("📊 Navigation telemetry saved to DataHandler");
     } catch (error) {
-      // localStorage not available
+      console.warn("Failed to save telemetry to DataHandler:", error);
+
+      // Fallback to localStorage
+      try {
+        const stored = localStorage.getItem("nav_telemetry") || "[]";
+        const existing = JSON.parse(stored);
+        existing.push(...batch);
+
+        // Keep only last 100 entries
+        if (existing.length > 100) {
+          existing.splice(0, existing.length - 100);
+        }
+
+        localStorage.setItem("nav_telemetry", JSON.stringify(existing));
+      } catch (localError) {
+        console.warn("Failed to save telemetry to localStorage:", localError);
+      }
     }
   }
 
   /**
-   * Get session ID for telemetry
+   * Get stored telemetry data from DataHandler with localStorage fallback
    */
-  getSessionId() {
+  async getStoredTelemetry() {
+    try {
+      // Try DataHandler first
+      const stored = await this.dataHandler.getData("nav_telemetry");
+      if (stored && Array.isArray(stored)) {
+        return stored;
+      }
+
+      // Fallback to localStorage
+      const localData = localStorage.getItem("nav_telemetry");
+      if (localData) {
+        const parsed = JSON.parse(localData);
+        if (Array.isArray(parsed)) {
+          // Migrate to DataHandler
+          await this.dataHandler.saveData("nav_telemetry", parsed);
+          console.log(
+            "📊 Navigation telemetry migrated from localStorage to DataHandler",
+          );
+          return parsed;
+        }
+      }
+
+      return [];
+    } catch (error) {
+      console.warn("Error retrieving stored telemetry:", error);
+      return [];
+    }
+  }
+
+  /**
+   * Get session ID for telemetry with DataHandler integration
+   */
+  async getSessionId() {
     if (!this.sessionId) {
-      this.sessionId =
-        sessionStorage.getItem("nav_session_id") ||
-        `nav_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      sessionStorage.setItem("nav_session_id", this.sessionId);
+      // Try to get from DataHandler first
+      try {
+        this.sessionId = await this.dataHandler.getData("nav_session_id");
+      } catch (error) {
+        console.warn("Failed to get session ID from DataHandler:", error);
+      }
+
+      // Fallback to sessionStorage or generate new
+      if (!this.sessionId) {
+        this.sessionId =
+          sessionStorage.getItem("nav_session_id") ||
+          `nav_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+        // Store in both DataHandler and sessionStorage
+        try {
+          await this.dataHandler.saveData("nav_session_id", this.sessionId);
+        } catch (error) {
+          console.warn("Failed to save session ID to DataHandler:", error);
+        }
+        sessionStorage.setItem("nav_session_id", this.sessionId);
+      }
     }
     return this.sessionId;
   }

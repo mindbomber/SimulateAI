@@ -1,0 +1,854 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Metadata Collector - DataHandler Integration Test</title>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+
+      .test-container {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+
+      .test-header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .test-header h1 {
+        color: #2c3e50;
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .test-section {
+        margin-bottom: 30px;
+        padding: 20px;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        background: #f8f9fa;
+      }
+
+      .test-section h3 {
+        color: #495057;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .test-controls {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn-secondary {
+        background: #6c757d;
+        color: white;
+      }
+
+      .btn-success {
+        background: #28a745;
+        color: white;
+      }
+
+      .btn-warning {
+        background: #ffc107;
+        color: #212529;
+      }
+
+      .btn-danger {
+        background: #dc3545;
+        color: white;
+      }
+
+      .btn-info {
+        background: #17a2b8;
+        color: white;
+      }
+
+      .status-display {
+        padding: 15px;
+        border-radius: 8px;
+        margin: 10px 0;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+
+      .status-success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+      }
+
+      .status-info {
+        background: #d1ecf1;
+        border: 1px solid #bee5eb;
+        color: #0c5460;
+      }
+
+      .status-warning {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        color: #856404;
+      }
+
+      .status-error {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+      }
+
+      .profile-preview {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 15px 0;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 15px 0;
+      }
+
+      .analytics-card {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        text-align: center;
+      }
+
+      .analytics-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #667eea;
+      }
+
+      .analytics-label {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-top: 5px;
+      }
+
+      /* Modal styles for UserMetadataCollector */
+      .metadata-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .metadata-modal {
+        background: white;
+        border-radius: 16px;
+        padding: 0;
+        max-width: 600px;
+        width: 90%;
+        max-height: 80vh;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      .metadata-modal-header {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 20px 30px;
+        text-align: center;
+      }
+
+      .metadata-modal-header h2 {
+        margin: 0 0 15px 0;
+        font-size: 1.8rem;
+      }
+
+      .metadata-progress {
+        margin-top: 15px;
+      }
+
+      .metadata-progress-bar {
+        background: rgba(255, 255, 255, 0.2);
+        height: 8px;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 5px;
+      }
+
+      .metadata-progress-fill {
+        background: white;
+        height: 100%;
+        transition: width 0.3s ease;
+      }
+
+      .metadata-progress-text {
+        font-size: 0.9rem;
+        opacity: 0.9;
+      }
+
+      .metadata-modal-content {
+        padding: 30px;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .metadata-modal-footer {
+        padding: 20px 30px;
+        border-top: 1px solid #dee2e6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .metadata-modal-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .metadata-action-group {
+        display: flex;
+        gap: 10px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #495057;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 10px 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.3s ease;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .btn-outline {
+        background: transparent;
+        border: 2px solid #6c757d;
+        color: #6c757d;
+      }
+
+      .btn-outline:hover {
+        background: #6c757d;
+        color: white;
+      }
+
+      .rating-group {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin: 10px 0;
+      }
+
+      .rating-scale {
+        display: flex;
+        gap: 5px;
+      }
+
+      .rating-btn {
+        width: 40px;
+        height: 40px;
+        border: 2px solid #dee2e6;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .rating-btn:hover {
+        border-color: #667eea;
+        background: #f8f9fa;
+      }
+
+      .rating-btn.selected {
+        border-color: #667eea;
+        background: #667eea;
+        color: white;
+      }
+
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 10px 0;
+      }
+
+      .checkbox-group input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <div class="test-header">
+        <h1>👤 User Metadata Collector</h1>
+        <p>DataHandler Integration Test Suite</p>
+      </div>
+
+      <div class="test-section">
+        <h3>🚀 Core Functions</h3>
+        <div class="test-controls">
+          <button class="btn btn-primary" onclick="startMetadataCollection()">
+            Start Profile Collection
+          </button>
+          <button class="btn btn-info" onclick="loadExistingProfile()">
+            Load Existing Profile
+          </button>
+          <button class="btn btn-secondary" onclick="checkProfileStatus()">
+            Check Profile Status
+          </button>
+          <button class="btn btn-success" onclick="getProfileAnalytics()">
+            Get Analytics
+          </button>
+        </div>
+        <div id="core-status" class="status-display status-info">
+          Ready to test User Metadata Collector...
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h3>💾 Data Management</h3>
+        <div class="test-controls">
+          <button class="btn btn-warning" onclick="updateProfileSection()">
+            Update Demographics
+          </button>
+          <button class="btn btn-info" onclick="exportUserData()">
+            Export Data (GDPR)
+          </button>
+          <button class="btn btn-success" onclick="getProfileCompletion()">
+            Check Completion
+          </button>
+          <button class="btn btn-danger" onclick="deleteUserProfile()">
+            Delete Profile
+          </button>
+        </div>
+        <div id="data-status" class="status-display status-info">
+          Data management functions ready...
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h3>📊 Profile Analytics</h3>
+        <div class="analytics-grid" id="analytics-grid">
+          <div class="analytics-card">
+            <div class="analytics-value" id="completion-percentage">0%</div>
+            <div class="analytics-label">Profile Complete</div>
+          </div>
+          <div class="analytics-card">
+            <div class="analytics-value" id="sections-completed">0</div>
+            <div class="analytics-label">Sections Done</div>
+          </div>
+          <div class="analytics-card">
+            <div class="analytics-value" id="last-updated">Never</div>
+            <div class="analytics-label">Last Updated</div>
+          </div>
+          <div class="analytics-card">
+            <div class="analytics-value" id="has-consent">❌</div>
+            <div class="analytics-label">Consent Given</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h3>🔍 Profile Preview</h3>
+        <div class="profile-preview" id="profile-preview">
+          <em
+            >No profile data loaded. Click "Load Existing Profile" or complete
+            collection process.</em
+          >
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h3>🧪 Integration Status</h3>
+        <div id="integration-status" class="status-display status-info">
+          DataHandler Integration Status: ✅ UserMetadataCollector class
+          imported ✅ DataHandler methods added for user profile management ✅
+          Auto-save on step progression ✅ Profile persistence with Firebase
+          sync ✅ GDPR-compliant data export/deletion ✅ Real-time analytics and
+          completion tracking Ready for testing!
+        </div>
+      </div>
+    </div>
+
+    <!-- Include required modules -->
+    <script type="module">
+      import DataHandler from "./src/js/core/data-handler.js";
+      import { UserMetadataCollector } from "./src/js/components/user-metadata-collector.js";
+
+      // Global variables for testing
+      window.dataHandler = new DataHandler({
+        appName: "SimulateAI",
+        version: "1.50",
+        enableFirebase: true,
+        enableCaching: true,
+        enableOfflineQueue: true,
+      });
+
+      window.metadataCollector = null;
+
+      // Test functions
+      window.startMetadataCollection = async function () {
+        try {
+          updateStatus(
+            "core-status",
+            "Starting metadata collection modal...",
+            "info",
+          );
+
+          window.metadataCollector = new UserMetadataCollector();
+
+          window.metadataCollector.init({
+            optional: false,
+            onComplete: async (userData) => {
+              updateStatus(
+                "core-status",
+                `✅ Profile collection completed!\n\nUser Data:\n${JSON.stringify(userData, null, 2)}`,
+                "success",
+              );
+              await updateAnalytics();
+              await displayProfile();
+            },
+            onSkip: () => {
+              updateStatus(
+                "core-status",
+                "⚠️ Profile collection was skipped",
+                "warning",
+              );
+            },
+          });
+
+          updateStatus(
+            "core-status",
+            "✅ Metadata collection modal opened successfully!",
+            "success",
+          );
+        } catch (error) {
+          updateStatus(
+            "core-status",
+            `❌ Error starting collection: ${error.message}`,
+            "error",
+          );
+          console.error("Collection error:", error);
+        }
+      };
+
+      window.loadExistingProfile = async function () {
+        try {
+          updateStatus(
+            "core-status",
+            "Loading existing user profile...",
+            "info",
+          );
+
+          const profile = await window.dataHandler.getUserProfile();
+
+          if (profile) {
+            updateStatus(
+              "core-status",
+              `✅ Profile loaded successfully!\n\nProfile Data:\n${JSON.stringify(profile, null, 2)}`,
+              "success",
+            );
+            await updateAnalytics();
+            await displayProfile();
+          } else {
+            updateStatus(
+              "core-status",
+              "⚠️ No existing profile found in storage",
+              "warning",
+            );
+          }
+        } catch (error) {
+          updateStatus(
+            "core-status",
+            `❌ Error loading profile: ${error.message}`,
+            "error",
+          );
+          console.error("Load error:", error);
+        }
+      };
+
+      window.checkProfileStatus = async function () {
+        try {
+          updateStatus("core-status", "Checking profile status...", "info");
+
+          const hasProfile = await window.dataHandler.hasUserProfile();
+          const completion =
+            await window.dataHandler.getUserProfileCompletion();
+
+          const statusText = `Profile Status Check:
+                
+📋 Has Profile: ${hasProfile ? "✅ Yes" : "❌ No"}
+📊 Completion: ${completion.percentage}%
+📑 Completed Sections: ${completion.sections.join(", ") || "None"}
+📈 Total Sections: ${completion.totalSections}
+
+${hasProfile ? "Profile found in storage" : "No profile data available"}`;
+
+          updateStatus(
+            "core-status",
+            statusText,
+            hasProfile ? "success" : "warning",
+          );
+          await updateAnalytics();
+        } catch (error) {
+          updateStatus(
+            "core-status",
+            `❌ Error checking status: ${error.message}`,
+            "error",
+          );
+          console.error("Status check error:", error);
+        }
+      };
+
+      window.getProfileAnalytics = async function () {
+        try {
+          updateStatus(
+            "core-status",
+            "Generating profile analytics...",
+            "info",
+          );
+
+          const profile = await window.dataHandler.getUserProfile();
+          if (!profile) {
+            updateStatus(
+              "core-status",
+              "⚠️ No profile data available for analytics",
+              "warning",
+            );
+            return;
+          }
+
+          // Create a temporary collector to get analytics
+          const tempCollector = new UserMetadataCollector();
+          tempCollector.userData = profile;
+
+          const analytics = tempCollector.getProfileAnalytics();
+
+          const analyticsText = `📊 Profile Analytics:
+                
+🎯 Completion: ${analytics.completionPercentage}%
+📅 Last Updated: ${analytics.lastUpdated || "Unknown"}
+📋 Completed Sections: ${analytics.sectionsCompleted.join(", ") || "None"}
+👤 Demographics: ${analytics.demographicsComplete ? "✅ Complete" : "❌ Incomplete"}
+🧠 Philosophy: ${analytics.philosophyComplete ? "✅ Complete" : "❌ Incomplete"}  
+📝 Consent: ${analytics.consentGiven ? "✅ Given" : "❌ Not given"}
+
+Analytics generated successfully!`;
+
+          updateStatus("core-status", analyticsText, "success");
+          await updateAnalytics();
+        } catch (error) {
+          updateStatus(
+            "core-status",
+            `❌ Error generating analytics: ${error.message}`,
+            "error",
+          );
+          console.error("Analytics error:", error);
+        }
+      };
+
+      window.updateProfileSection = async function () {
+        try {
+          updateStatus(
+            "data-status",
+            "Updating demographics section...",
+            "info",
+          );
+
+          const testDemographics = {
+            age: "25-34",
+            gender: "Non-binary",
+            education: "Bachelor's Degree",
+            profession: "Technology",
+            location: "Test City",
+          };
+
+          const success = await window.dataHandler.updateUserProfileSection(
+            "demographics",
+            testDemographics,
+          );
+
+          if (success) {
+            updateStatus(
+              "data-status",
+              `✅ Demographics updated successfully!\n\nNew Demographics:\n${JSON.stringify(testDemographics, null, 2)}`,
+              "success",
+            );
+            await updateAnalytics();
+            await displayProfile();
+          } else {
+            updateStatus(
+              "data-status",
+              "❌ Failed to update demographics section",
+              "error",
+            );
+          }
+        } catch (error) {
+          updateStatus(
+            "data-status",
+            `❌ Error updating section: ${error.message}`,
+            "error",
+          );
+          console.error("Update error:", error);
+        }
+      };
+
+      window.exportUserData = async function () {
+        try {
+          updateStatus(
+            "data-status",
+            "Exporting user data for GDPR compliance...",
+            "info",
+          );
+
+          const exportData = await window.dataHandler.exportUserData();
+
+          if (exportData) {
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+              type: "application/json",
+            });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `simulateai-user-data-${new Date().toISOString().split("T")[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            updateStatus(
+              "data-status",
+              `✅ User data exported successfully!\n\nExport includes:\n${Object.keys(
+                exportData.userData,
+              )
+                .map((key) => `- ${key}`)
+                .join("\n")}\n\nFile downloaded automatically.`,
+              "success",
+            );
+          } else {
+            updateStatus(
+              "data-status",
+              "❌ Failed to export user data",
+              "error",
+            );
+          }
+        } catch (error) {
+          updateStatus(
+            "data-status",
+            `❌ Error exporting data: ${error.message}`,
+            "error",
+          );
+          console.error("Export error:", error);
+        }
+      };
+
+      window.getProfileCompletion = async function () {
+        try {
+          updateStatus(
+            "data-status",
+            "Checking profile completion status...",
+            "info",
+          );
+
+          const completion =
+            await window.dataHandler.getUserProfileCompletion();
+
+          const completionText = `📊 Profile Completion Status:
+                
+🎯 Overall Completion: ${completion.percentage}%
+📋 Completed Sections: ${completion.sections.length}/${completion.totalSections}
+✅ Done: ${completion.sections.join(", ") || "None"}
+📝 Remaining: ${completion.totalSections - completion.sections.length} sections
+
+${completion.percentage === 100 ? "🎉 Profile is complete!" : "📝 Profile needs more information"}`;
+
+          updateStatus(
+            "data-status",
+            completionText,
+            completion.percentage > 50 ? "success" : "warning",
+          );
+          await updateAnalytics();
+        } catch (error) {
+          updateStatus(
+            "data-status",
+            `❌ Error checking completion: ${error.message}`,
+            "error",
+          );
+          console.error("Completion check error:", error);
+        }
+      };
+
+      window.deleteUserProfile = async function () {
+        if (
+          !confirm(
+            "⚠️ This will permanently delete all user profile data. Are you sure?",
+          )
+        ) {
+          return;
+        }
+
+        try {
+          updateStatus("data-status", "Deleting user profile data...", "info");
+
+          const success = await window.dataHandler.deleteUserProfile();
+
+          if (success) {
+            updateStatus(
+              "data-status",
+              "✅ User profile deleted successfully!\n\nAll profile data has been removed from:\n- Local storage\n- Firebase (if connected)\n- Application cache\n\nThis action cannot be undone.",
+              "success",
+            );
+            await updateAnalytics();
+            document.getElementById("profile-preview").innerHTML =
+              "<em>Profile data deleted. No data available.</em>";
+          } else {
+            updateStatus(
+              "data-status",
+              "❌ Failed to delete user profile",
+              "error",
+            );
+          }
+        } catch (error) {
+          updateStatus(
+            "data-status",
+            `❌ Error deleting profile: ${error.message}`,
+            "error",
+          );
+          console.error("Delete error:", error);
+        }
+      };
+
+      // Helper functions
+      function updateStatus(elementId, message, type) {
+        const element = document.getElementById(elementId);
+        element.textContent = message;
+        element.className = `status-display status-${type}`;
+      }
+
+      async function updateAnalytics() {
+        try {
+          const completion =
+            await window.dataHandler.getUserProfileCompletion();
+          const profile = completion.profile;
+
+          document.getElementById("completion-percentage").textContent =
+            `${completion.percentage}%`;
+          document.getElementById("sections-completed").textContent =
+            completion.sections.length;
+          document.getElementById("last-updated").textContent =
+            profile?.updatedAt
+              ? new Date(profile.updatedAt).toLocaleDateString()
+              : "Never";
+          document.getElementById("has-consent").textContent =
+            profile?.consent && Object.keys(profile.consent).length > 0
+              ? "✅"
+              : "❌";
+        } catch (error) {
+          console.warn("Could not update analytics:", error);
+        }
+      }
+
+      async function displayProfile() {
+        try {
+          const profile = await window.dataHandler.getUserProfile();
+          const previewElement = document.getElementById("profile-preview");
+
+          if (profile) {
+            previewElement.innerHTML = `<pre>${JSON.stringify(profile, null, 2)}</pre>`;
+          } else {
+            previewElement.innerHTML = "<em>No profile data available.</em>";
+          }
+        } catch (error) {
+          document.getElementById("profile-preview").innerHTML =
+            `<em>Error loading profile: ${error.message}</em>`;
+        }
+      }
+
+      // Initialize analytics on page load
+      updateAnalytics();
+
+      console.log("🧪 User Metadata Collector Test Suite Ready");
+      console.log("✅ DataHandler integration active");
+      console.log("✅ Profile management methods available");
+      console.log("✅ GDPR compliance features enabled");
+    </script>
+  </body>
+</html>

@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scenario Modal DataHandler Integration Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-section {
+        background: white;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .status {
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+      button {
+        padding: 10px 20px;
+        margin: 5px;
+        border: none;
+        border-radius: 4px;
+        background: #007bff;
+        color: white;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      pre {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        overflow-x: auto;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🧪 Scenario Modal DataHandler Integration Test</h1>
+
+    <div class="test-section">
+      <h2>Test Status</h2>
+      <div id="test-status" class="status info">Ready to test</div>
+    </div>
+
+    <div class="test-section">
+      <h2>DataHandler Integration Test</h2>
+      <button id="test-datahandler">Test DataHandler</button>
+      <button id="test-scenario-completion">
+        Test Scenario Completion Save
+      </button>
+      <button id="test-get-completions">Get All Completions</button>
+      <button id="test-analytics">Get Analytics</button>
+      <button id="clear-data">Clear Test Data</button>
+      <div id="datahandler-result"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Scenario Modal Integration</h2>
+      <button id="test-modal-creation">Test Modal Creation</button>
+      <button id="simulate-completion">Simulate Completion</button>
+      <div id="modal-result"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Data Output</h2>
+      <pre id="data-output">No data yet...</pre>
+    </div>
+
+    <script type="module">
+      import DataHandler from "./src/js/core/data-handler.js";
+      import ScenarioModal from "./src/js/components/scenario-modal.js";
+
+      let dataHandler;
+      let scenarioModal;
+
+      // Initialize test
+      async function initTest() {
+        try {
+          // Test DataHandler creation
+          dataHandler = new DataHandler({
+            storageKey: "scenarioTestData",
+            analyticsEnabled: true,
+            syncEnabled: false, // Disable Firebase for testing
+          });
+
+          updateStatus("DataHandler initialized successfully", "success");
+          return true;
+        } catch (error) {
+          updateStatus(
+            `DataHandler initialization failed: ${error.message}`,
+            "error",
+          );
+          return false;
+        }
+      }
+
+      function updateStatus(message, type = "info") {
+        const statusDiv = document.getElementById("test-status");
+        statusDiv.textContent = message;
+        statusDiv.className = `status ${type}`;
+      }
+
+      function updateOutput(data) {
+        document.getElementById("data-output").textContent = JSON.stringify(
+          data,
+          null,
+          2,
+        );
+      }
+
+      // Test DataHandler basic functionality
+      document
+        .getElementById("test-datahandler")
+        .addEventListener("click", async () => {
+          try {
+            const testData = {
+              test: true,
+              timestamp: new Date().toISOString(),
+            };
+            await dataHandler.saveData("test_key", testData);
+            const retrieved = await dataHandler.getData("test_key");
+
+            updateOutput({ saved: testData, retrieved });
+            updateStatus("DataHandler basic test passed", "success");
+          } catch (error) {
+            updateStatus(`DataHandler test failed: ${error.message}`, "error");
+            updateOutput({ error: error.message });
+          }
+        });
+
+      // Test scenario completion save
+      document
+        .getElementById("test-scenario-completion")
+        .addEventListener("click", async () => {
+          try {
+            const completionData = {
+              categoryId: "test-category",
+              scenarioId: "test-scenario",
+              selectedOption: { id: "option-1", text: "Test Option" },
+              completed: true,
+              timestamp: new Date().toISOString(),
+              sessionId: `test_${Date.now()}`,
+            };
+
+            await dataHandler.saveScenarioCompletion(completionData);
+            updateOutput(completionData);
+            updateStatus("Scenario completion saved successfully", "success");
+          } catch (error) {
+            updateStatus(
+              `Scenario completion save failed: ${error.message}`,
+              "error",
+            );
+            updateOutput({ error: error.message });
+          }
+        });
+
+      // Get all completions
+      document
+        .getElementById("test-get-completions")
+        .addEventListener("click", async () => {
+          try {
+            const completions = await dataHandler.getAllCompletions();
+            updateOutput({ completions, count: completions.length });
+            updateStatus(
+              `Retrieved ${completions.length} completions`,
+              "success",
+            );
+          } catch (error) {
+            updateStatus(
+              `Failed to get completions: ${error.message}`,
+              "error",
+            );
+            updateOutput({ error: error.message });
+          }
+        });
+
+      // Get analytics
+      document
+        .getElementById("test-analytics")
+        .addEventListener("click", async () => {
+          try {
+            const analytics = await dataHandler.getAnalyticsData();
+            updateOutput(analytics);
+            updateStatus("Analytics retrieved successfully", "success");
+          } catch (error) {
+            updateStatus(`Failed to get analytics: ${error.message}`, "error");
+            updateOutput({ error: error.message });
+          }
+        });
+
+      // Clear test data
+      document
+        .getElementById("clear-data")
+        .addEventListener("click", async () => {
+          try {
+            await dataHandler.clearData();
+            updateOutput({ cleared: true });
+            updateStatus("Test data cleared", "success");
+          } catch (error) {
+            updateStatus(`Failed to clear data: ${error.message}`, "error");
+          }
+        });
+
+      // Test modal creation
+      document
+        .getElementById("test-modal-creation")
+        .addEventListener("click", async () => {
+          try {
+            scenarioModal = new ScenarioModal();
+            await scenarioModal.initializeConfiguration();
+
+            document.getElementById("modal-result").innerHTML = `
+                    <div class="success">✅ Scenario modal created successfully</div>
+                    <div>DataHandler initialized: ${scenarioModal.dataHandler ? "Yes" : "No"}</div>
+                `;
+            updateStatus("Scenario modal created with DataHandler", "success");
+          } catch (error) {
+            document.getElementById("modal-result").innerHTML = `
+                    <div class="error">❌ Modal creation failed: ${error.message}</div>
+                `;
+            updateStatus(`Modal creation failed: ${error.message}`, "error");
+          }
+        });
+
+      // Simulate completion
+      document
+        .getElementById("simulate-completion")
+        .addEventListener("click", async () => {
+          if (!scenarioModal) {
+            updateStatus("Create modal first", "error");
+            return;
+          }
+
+          try {
+            // Simulate completion data
+            const completionData = {
+              categoryId: "simulated-category",
+              scenarioId: "simulated-scenario",
+              selectedOption: { id: "sim-option-1", text: "Simulated Choice" },
+              completed: true,
+              timestamp: new Date().toISOString(),
+              sessionId: scenarioModal._generateSessionId(),
+            };
+
+            await scenarioModal.dataHandler.saveScenarioCompletion(
+              completionData,
+            );
+
+            document.getElementById("modal-result").innerHTML = `
+                    <div class="success">✅ Completion simulation successful</div>
+                    <pre>${JSON.stringify(completionData, null, 2)}</pre>
+                `;
+            updateStatus("Completion simulated and saved", "success");
+          } catch (error) {
+            document.getElementById("modal-result").innerHTML = `
+                    <div class="error">❌ Completion simulation failed: ${error.message}</div>
+                `;
+            updateStatus(
+              `Completion simulation failed: ${error.message}`,
+              "error",
+            );
+          }
+        });
+
+      // Initialize test on load
+      initTest();
+    </script>
+  </body>
+</html>

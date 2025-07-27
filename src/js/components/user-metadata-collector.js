@@ -1,3 +1,96 @@
+// Import DataHandler for centralized data management
+import DataHandler from "../core/data-handler.js";
+
+// Data options for forms
+const DEMOGRAPHIC_OPTIONS = {
+  ageRanges: [
+    "Under 18",
+    "18-24",
+    "25-34",
+    "35-44",
+    "45-54",
+    "55-64",
+    "65 or older",
+  ],
+  genderIdentities: [
+    "Male",
+    "Female",
+    "Non-binary",
+    "Prefer not to say",
+    "Other",
+  ],
+  educationLevels: [
+    "High School",
+    "Some College",
+    "Bachelor's Degree",
+    "Master's Degree",
+    "Doctoral Degree",
+    "Professional Degree",
+    "Other",
+  ],
+  professionCategories: [
+    "Student",
+    "Technology",
+    "Healthcare",
+    "Education",
+    "Business/Finance",
+    "Government",
+    "Non-profit",
+    "Arts/Media",
+    "Science/Research",
+    "Other",
+  ],
+  religiousAffiliations: [
+    "Christianity",
+    "Islam",
+    "Judaism",
+    "Hinduism",
+    "Buddhism",
+    "Atheist/Agnostic",
+    "Spiritual but not religious",
+    "Other",
+    "Prefer not to say",
+  ],
+};
+
+const PHILOSOPHICAL_OPTIONS = {
+  ethicalFrameworks: [
+    {
+      value: "utilitarianism",
+      label: "Utilitarianism - Greatest good for greatest number",
+    },
+    { value: "deontology", label: "Deontology - Duty-based ethics" },
+    { value: "virtue", label: "Virtue Ethics - Character-based morality" },
+    { value: "care", label: "Care Ethics - Relationships and compassion" },
+    { value: "mixed", label: "Mixed approach" },
+  ],
+  cognitiveStyles: [
+    { value: "analytical", label: "Analytical - Step-by-step reasoning" },
+    { value: "intuitive", label: "Intuitive - Gut-feeling based" },
+    { value: "systematic", label: "Systematic - Rule-based approach" },
+    { value: "creative", label: "Creative - Innovation-focused" },
+    { value: "balanced", label: "Balanced approach" },
+  ],
+  politicalOrientations: [
+    "Very Liberal",
+    "Liberal",
+    "Slightly Liberal",
+    "Moderate",
+    "Slightly Conservative",
+    "Conservative",
+    "Very Conservative",
+    "Other",
+  ],
+};
+
+const MORAL_FOUNDATIONS = {
+  care: "Care/Harm - Concern for others' suffering",
+  fairness: "Fairness/Cheating - Concern for fair treatment",
+  loyalty: "Loyalty/Betrayal - Concern for group cohesion",
+  authority: "Authority/Subversion - Respect for tradition and authority",
+  sanctity: "Sanctity/Degradation - Concern for purity and contamination",
+};
+
 // Constants
 const RATING_SCALE = [1, 2, 3, 4, 5, 6, 7];
 const STEP_DEMOGRAPHICS = 1;
@@ -11,6 +104,10 @@ export class UserMetadataCollector {
   constructor() {
     this.currentStep = 0;
     this.totalSteps = 5;
+
+    // Initialize DataHandler
+    this.dataHandler = DataHandler;
+
     this.userData = {
       demographics: {},
       philosophy: {
@@ -43,6 +140,84 @@ export class UserMetadataCollector {
     this.isOptional = false;
     this.onComplete = null;
     this.onSkip = null;
+
+    // Load existing user profile data
+    this.loadExistingUserProfile();
+  }
+
+  /**
+   * Load existing user profile data from DataHandler
+   */
+  async loadExistingUserProfile() {
+    try {
+      const existingProfile = await this.dataHandler.getUserProfile();
+      if (existingProfile) {
+        // Merge existing data with default structure
+        this.userData = {
+          ...this.userData,
+          ...existingProfile,
+          // Ensure nested objects are properly merged
+          demographics: {
+            ...this.userData.demographics,
+            ...existingProfile.demographics,
+          },
+          philosophy: {
+            ...this.userData.philosophy,
+            ...existingProfile.philosophy,
+            moralFoundations: {
+              ...this.userData.philosophy.moralFoundations,
+              ...existingProfile.philosophy?.moralFoundations,
+            },
+          },
+          engagement: {
+            ...this.userData.engagement,
+            ...existingProfile.engagement,
+          },
+          learning: { ...this.userData.learning, ...existingProfile.learning },
+          consent: { ...this.userData.consent, ...existingProfile.consent },
+          privacy: { ...this.userData.privacy, ...existingProfile.privacy },
+        };
+
+        console.log("✅ User profile loaded from DataHandler");
+      }
+    } catch (error) {
+      console.warn("⚠️ Could not load existing user profile:", error);
+    }
+  }
+
+  /**
+   * Save user profile data to DataHandler
+   */
+  async saveUserProfile() {
+    try {
+      // Add metadata
+      this.userData.updatedAt = new Date().toISOString();
+      if (!this.userData.createdAt) {
+        this.userData.createdAt = new Date().toISOString();
+      }
+      if (!this.userData.userId) {
+        this.userData.userId = this.generateUserId();
+      }
+
+      // Save to DataHandler with Firebase sync
+      await this.dataHandler.saveUserProfile(this.userData);
+      console.log("✅ User profile saved to DataHandler");
+      return true;
+    } catch (error) {
+      console.error("❌ Failed to save user profile:", error);
+      return false;
+    }
+  }
+
+  /**
+   * Save current step data automatically
+   */
+  async saveCurrentStepProgress() {
+    try {
+      await this.saveUserProfile();
+    } catch (error) {
+      console.warn("⚠️ Could not auto-save step progress:", error);
+    }
   }
 
   /**
@@ -799,26 +974,33 @@ export class UserMetadataCollector {
   /**
    * Go to next step
    */
-  nextStep() {
+  async nextStep() {
     if (!this.validateCurrentStep()) {
       return;
     }
 
     this.saveCurrentStepData();
 
+    // Auto-save progress to DataHandler
+    await this.saveCurrentStepProgress();
+
     if (this.currentStep < this.totalSteps - 1) {
       this.showStep(this.currentStep + 1);
     } else {
-      this.completeCollection();
+      await this.completeCollection();
     }
   }
 
   /**
    * Go to previous step
    */
-  previousStep() {
+  async previousStep() {
     if (this.currentStep > 0) {
       this.saveCurrentStepData();
+
+      // Auto-save progress to DataHandler
+      await this.saveCurrentStepProgress();
+
       this.showStep(this.currentStep - 1);
     }
   }
@@ -836,18 +1018,22 @@ export class UserMetadataCollector {
   /**
    * Complete the metadata collection
    */
-  completeCollection() {
+  async completeCollection() {
     this.saveCurrentStepData();
 
-    // Add timestamps
-    this.userData.createdAt = new Date().toISOString();
-    this.userData.updatedAt = new Date().toISOString();
-    this.userData.userId = this.generateUserId();
+    // Save final profile to DataHandler
+    const saved = await this.saveUserProfile();
+
+    if (saved) {
+      console.log("✅ User profile collection completed and saved");
+    } else {
+      console.warn("⚠️ Profile collection completed but save failed");
+    }
 
     // Close modal
     this.closeModal();
 
-    // Call completion callback
+    // Call completion callback with final data
     if (this.onComplete) {
       this.onComplete(this.userData);
     }
@@ -878,10 +1064,139 @@ export class UserMetadataCollector {
   }
 
   /**
-   * Load existing user data
+   * Load existing user data (legacy method for compatibility)
    */
   loadExistingData(userData) {
     this.userData = { ...this.userData, ...userData };
+  }
+
+  /**
+   * Update specific user profile sections
+   */
+  async updateProfileSection(section, data) {
+    try {
+      this.userData[section] = { ...this.userData[section], ...data };
+      await this.saveUserProfile();
+      console.log(`✅ Profile section '${section}' updated`);
+      return true;
+    } catch (error) {
+      console.error(`❌ Failed to update profile section '${section}':`, error);
+      return false;
+    }
+  }
+
+  /**
+   * Get user profile analytics
+   */
+  getProfileAnalytics() {
+    return {
+      completionPercentage: this.calculateCompletionPercentage(),
+      lastUpdated: this.userData.updatedAt,
+      sectionsCompleted: this.getCompletedSections(),
+      demographicsComplete: Object.keys(this.userData.demographics).length > 0,
+      philosophyComplete: Object.keys(this.userData.philosophy).length > 1,
+      consentGiven: Object.keys(this.userData.consent).length > 0,
+    };
+  }
+
+  /**
+   * Calculate profile completion percentage
+   */
+  calculateCompletionPercentage() {
+    const sections = ["demographics", "philosophy", "consent"];
+    const completed = sections.filter((section) => {
+      const data = this.userData[section];
+      return data && Object.keys(data).length > 0;
+    });
+    return Math.round((completed.length / sections.length) * 100);
+  }
+
+  /**
+   * Get completed profile sections
+   */
+  getCompletedSections() {
+    const sections = [];
+    if (Object.keys(this.userData.demographics).length > 0)
+      sections.push("demographics");
+    if (Object.keys(this.userData.philosophy).length > 1)
+      sections.push("philosophy");
+    if (Object.keys(this.userData.consent).length > 0) sections.push("consent");
+    return sections;
+  }
+
+  /**
+   * Export user profile data for GDPR compliance
+   */
+  async exportUserData() {
+    try {
+      const fullProfile = await this.dataHandler.getUserProfile();
+      return {
+        userProfile: fullProfile,
+        exportDate: new Date().toISOString(),
+        dataTypes: [
+          "demographics",
+          "philosophy",
+          "consent",
+          "engagement",
+          "learning",
+          "privacy",
+        ],
+        format: "JSON",
+      };
+    } catch (error) {
+      console.error("❌ Failed to export user data:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Delete user profile data for GDPR compliance
+   */
+  async deleteUserData() {
+    try {
+      await this.dataHandler.deleteUserProfile();
+      this.userData = this.getDefaultUserData();
+      console.log("✅ User profile data deleted");
+      return true;
+    } catch (error) {
+      console.error("❌ Failed to delete user data:", error);
+      return false;
+    }
+  }
+
+  /**
+   * Get default user data structure
+   */
+  getDefaultUserData() {
+    return {
+      demographics: {},
+      philosophy: {
+        moralFoundations: {},
+      },
+      engagement: {
+        scenarioCompletionCount: 0,
+        totalTimeSpent: 0,
+        averageDecisionTime: 0,
+        remixActivity: 0,
+        favoriteCategories: [],
+        streakCount: 0,
+        achievementUnlocked: [],
+      },
+      learning: {
+        conceptsExplored: [],
+        skillsAssessed: {},
+        learningGoals: [],
+        progressMilestones: [],
+        reflectionNotes: [],
+        growthAreas: [],
+      },
+      consent: {},
+      privacy: {
+        profileVisibility: "private",
+        sessionTracking: true,
+        analyticsOptOut: false,
+      },
+    };
   }
 }
 

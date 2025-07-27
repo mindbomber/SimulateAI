@@ -35,6 +35,7 @@ import scrollManager from "../utils/scroll-manager.js";
 import ModalUtility from "./modal-utility.js";
 import { simpleStorage } from "../utils/simple-storage.js";
 import { simpleAnalytics } from "../utils/simple-analytics.js";
+import DataHandler from "../core/data-handler.js";
 
 // === ENTERPRISE ONBOARDING CONSTANTS ===
 const ENTERPRISE_CONSTANTS = {
@@ -86,6 +87,10 @@ class OnboardingTour {
 
   constructor() {
     const startTime = performance.now();
+
+    // Initialize DataHandler integration
+    this.dataHandler = null;
+    this.initializeDataHandler();
 
     try {
       OnboardingTour.instanceCount++;
@@ -641,6 +646,33 @@ class OnboardingTour {
     this.init();
   }
 
+  /**
+   * Initialize DataHandler integration for advanced tour analytics
+   */
+  async initializeDataHandler() {
+    try {
+      this.dataHandler = new DataHandler({
+        appName: "SimulateAI-OnboardingTour",
+        version: "1.50",
+        enableFirebase: true,
+        enableCaching: true,
+        enableOfflineQueue: true,
+      });
+
+      logger.info(
+        "OnboardingTour",
+        "DataHandler initialized for tour analytics",
+      );
+    } catch (error) {
+      logger.warn(
+        "OnboardingTour",
+        "DataHandler initialization failed, using fallback",
+        error,
+      );
+      this.dataHandler = null;
+    }
+  }
+
   init() {
     logger.info("OnboardingTour", "Initializing onboarding coach marks system");
 
@@ -674,8 +706,55 @@ class OnboardingTour {
     return false;
   }
 
-  hasCompletedTour() {
-    return simpleStorage.get("tour_completed", false);
+  /**
+   * Check if onboarding tour has been completed with DataHandler integration
+   */
+  async hasCompletedTour() {
+    try {
+      // Try DataHandler first
+      if (this.dataHandler) {
+        const tourData = await this.dataHandler.getData("onboarding_tour_data");
+        if (tourData && tourData.completed) {
+          logger.info(
+            "OnboardingTour",
+            "Tour completion status loaded from DataHandler",
+            {
+              completed: tourData.completed,
+              completedAt: tourData.completedAt,
+              totalTours: tourData.totalCompletions,
+            },
+          );
+          return tourData.completed;
+        }
+      }
+
+      // Fallback to simpleStorage with migration
+      const legacyCompleted = simpleStorage.get("tour_completed", false);
+      if (legacyCompleted && this.dataHandler) {
+        // Migrate legacy data to DataHandler
+        const migrationData = {
+          completed: true,
+          completedAt: Date.now(),
+          totalCompletions: 1,
+          migratedFromLegacy: true,
+        };
+        await this.dataHandler.saveData("onboarding_tour_data", migrationData);
+        logger.info(
+          "OnboardingTour",
+          "Migrated tour completion from simpleStorage to DataHandler",
+        );
+        return true;
+      }
+
+      return legacyCompleted;
+    } catch (error) {
+      logger.warn(
+        "OnboardingTour",
+        "Error checking tour completion, using fallback",
+        error,
+      );
+      return simpleStorage.get("tour_completed", false);
+    }
   }
 
   startTour(tutorialNumber = 1) {
@@ -1381,6 +1460,9 @@ class OnboardingTour {
       });
       return;
     }
+
+    // Track step analytics with DataHandler
+    await this.trackStepAnalytics(step);
 
     logger.info(
       "OnboardingTour",
@@ -2303,7 +2385,7 @@ class OnboardingTour {
     }
   }
 
-  endTour() {
+  async endTour() {
     const STACK_TRACE_LINES = 5;
     logger.info("OnboardingTour", "Ending tour", {
       currentTutorial: this.currentTutorial,
@@ -2542,18 +2624,127 @@ class OnboardingTour {
       }, 100);
     }
 
-    // Track completion
+    // Track completion with enhanced analytics
     simpleAnalytics.trackEvent("tour_completed", {
       tutorial: this.currentTutorial,
       step: this.currentStep,
     });
 
-    // Mark as completed
-    simpleStorage.set("tour_completed", true);
+    // Save completion with DataHandler integration
+    await this.saveTourCompletion();
 
     // Clean up
     this.removeOverlay();
     this.isActive = false;
+  }
+
+  /**
+   * Save tour completion with comprehensive analytics
+   */
+  async saveTourCompletion() {
+    try {
+      const completionData = {
+        completed: true,
+        completedAt: Date.now(),
+        completedTutorial: this.currentTutorial,
+        totalSteps: this.currentStep + 1,
+        sessionId: this.instanceUuid,
+        userJourney: this.userJourney,
+        performanceMetrics: this.performanceMetrics,
+        deviceInfo: this.userJourney.deviceInfo,
+        totalCompletions: 1,
+      };
+
+      // Try DataHandler first
+      if (this.dataHandler) {
+        // Get existing data to increment completion count
+        const existingData = await this.dataHandler.getData(
+          "onboarding_tour_data",
+        );
+        if (existingData) {
+          completionData.totalCompletions =
+            (existingData.totalCompletions || 0) + 1;
+        }
+
+        await this.dataHandler.saveData("onboarding_tour_data", completionData);
+        logger.info("OnboardingTour", "Tour completion saved to DataHandler", {
+          tutorial: this.currentTutorial,
+          totalCompletions: completionData.totalCompletions,
+          sessionDuration: Date.now() - this.userJourney.startTime,
+        });
+
+        // Also save detailed analytics
+        await this.dataHandler.saveData("onboarding_analytics", {
+          sessionId: this.instanceUuid,
+          completedAt: Date.now(),
+          userJourney: this.userJourney,
+          performanceMetrics: this.performanceMetrics,
+          telemetryBatch: this.telemetryBatch,
+        });
+      }
+
+      // Fallback to simpleStorage
+      simpleStorage.set("tour_completed", true);
+    } catch (error) {
+      logger.warn(
+        "OnboardingTour",
+        "Error saving tour completion, using fallback",
+        error,
+      );
+      simpleStorage.set("tour_completed", true);
+    }
+  }
+
+  /**
+   * Track detailed step analytics with DataHandler
+   */
+  async trackStepAnalytics(step) {
+    try {
+      const stepData = {
+        sessionId: this.instanceUuid,
+        tutorial: this.currentTutorial,
+        stepIndex: this.currentStep,
+        stepId: step.id,
+        stepTitle: step.title,
+        timestamp: Date.now(),
+        timeOnPreviousStep: this.lastStepStartTime
+          ? Date.now() - this.lastStepStartTime
+          : 0,
+        userInteractions: this.userJourney.interactions.slice(-10), // Last 10 interactions
+        performanceSnapshot: {
+          ...this.performanceMetrics,
+        },
+      };
+
+      // Save to DataHandler if available
+      if (this.dataHandler) {
+        await this.dataHandler.saveData(
+          `step_analytics_${this.instanceUuid}_${Date.now()}`,
+          stepData,
+        );
+
+        // Also update progress tracking
+        const progressData = {
+          currentTutorial: this.currentTutorial,
+          currentStep: this.currentStep,
+          lastUpdated: Date.now(),
+          sessionId: this.instanceUuid,
+        };
+        await this.dataHandler.saveData("onboarding_progress", progressData);
+      }
+
+      // Update journey tracking
+      this.userJourney.steps.push({
+        stepId: step.id,
+        tutorial: this.currentTutorial,
+        stepIndex: this.currentStep,
+        startTime: Date.now(),
+      });
+
+      this.lastStepStartTime = Date.now();
+    } catch (error) {
+      logger.warn("OnboardingTour", "Error tracking step analytics", error);
+    }
   }
 
   /**

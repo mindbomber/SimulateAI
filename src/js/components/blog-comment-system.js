@@ -1,15 +1,31 @@
 /**
  * Blog Comment System Component
- * Handles displaying and managing comments on blog posts
+ * Handles displaying and managing comments on blog posts with DataHandler integration
  */
 
+// Import DataHandler for centralized data management
+import DataHandler from "../core/data-handler.js";
+
 export class BlogCommentSystem {
-  constructor(postId, containerId) {
+  constructor(postId, containerId, options = {}) {
     this.postId = postId;
     this.container = document.getElementById(containerId);
     this.comments = [];
     this.currentUser = null;
     this.isAuthenticated = false;
+
+    // Initialize DataHandler
+    this.dataHandler = options.dataHandler || DataHandler;
+    this.enableRealTimeSync = options.enableRealTimeSync !== false;
+
+    // Comment analytics
+    this.analytics = {
+      commentsLoaded: 0,
+      commentsPosted: 0,
+      commentsEdited: 0,
+      commentsDeleted: 0,
+      engagement: [],
+    };
 
     this.init();
   }
@@ -42,24 +58,111 @@ export class BlogCommentSystem {
 
   async loadComments() {
     try {
-      // In a real implementation, this would load from Firestore
-      // For now, we'll use localStorage for demo purposes
-      const storedComments = localStorage.getItem(`comments_${this.postId}`);
-      this.comments = storedComments ? JSON.parse(storedComments) : [];
+      // Try DataHandler first for comprehensive comment storage
+      if (this.dataHandler) {
+        const storedComments = await this.dataHandler.getData(
+          `blog_comments_${this.postId}`,
+        );
+
+        if (storedComments && Array.isArray(storedComments)) {
+          this.comments = storedComments;
+          this.analytics.commentsLoaded = storedComments.length;
+          console.log(
+            `✅ Loaded ${storedComments.length} comments from DataHandler for post ${this.postId}`,
+          );
+          return;
+        }
+      }
+
+      // Fallback to localStorage with migration
+      const localComments = localStorage.getItem(`comments_${this.postId}`);
+      if (localComments) {
+        const parsed = JSON.parse(localComments);
+        this.comments = Array.isArray(parsed) ? parsed : [];
+
+        // Migrate to DataHandler if available
+        if (this.dataHandler && this.comments.length > 0) {
+          await this.dataHandler.saveData(
+            `blog_comments_${this.postId}`,
+            this.comments,
+          );
+          console.log(
+            `📦 Migrated ${this.comments.length} comments from localStorage to DataHandler`,
+          );
+        }
+
+        this.analytics.commentsLoaded = this.comments.length;
+      } else {
+        this.comments = [];
+      }
     } catch (error) {
-      console.error("Error loading comments:", error);
+      console.error("❌ Error loading comments:", error);
       this.comments = [];
     }
   }
 
   async saveComments() {
     try {
+      // Save to DataHandler first for Firebase sync
+      if (this.dataHandler) {
+        const success = await this.dataHandler.saveData(
+          `blog_comments_${this.postId}`,
+          this.comments,
+        );
+        if (success) {
+          console.log(
+            `✅ Comments saved to DataHandler for post ${this.postId}`,
+          );
+        }
+      }
+
+      // Also save to localStorage as backup
       localStorage.setItem(
         `comments_${this.postId}`,
         JSON.stringify(this.comments),
       );
+
+      // Update analytics
+      await this.saveCommentAnalytics();
     } catch (error) {
-      console.error("Error saving comments:", error);
+      console.error("❌ Error saving comments:", error);
+    }
+  }
+
+  /**
+   * Save comment analytics to DataHandler
+   */
+  async saveCommentAnalytics() {
+    try {
+      if (this.dataHandler) {
+        const analyticsData = {
+          postId: this.postId,
+          ...this.analytics,
+          lastUpdated: new Date().toISOString(),
+        };
+
+        await this.dataHandler.saveData(
+          `blog_analytics_${this.postId}`,
+          analyticsData,
+        );
+      }
+    } catch (error) {
+      console.warn("⚠️ Could not save comment analytics:", error);
+    }
+  }
+
+  /**
+   * Get comment analytics for this post
+   */
+  async getCommentAnalytics() {
+    try {
+      if (this.dataHandler) {
+        return await this.dataHandler.getData(`blog_analytics_${this.postId}`);
+      }
+      return null;
+    } catch (error) {
+      console.warn("⚠️ Could not load comment analytics:", error);
+      return null;
     }
   }
 
@@ -337,6 +440,16 @@ export class BlogCommentSystem {
       };
 
       this.comments.unshift(newComment);
+
+      // Update analytics
+      this.analytics.commentsPosted++;
+      this.analytics.engagement.push({
+        type: "comment_posted",
+        timestamp: new Date().toISOString(),
+        userId: this.currentUser.uid,
+        commentId: newComment.id,
+      });
+
       await this.saveComments();
 
       // Clear form
@@ -349,8 +462,10 @@ export class BlogCommentSystem {
 
       // Show success message
       this.showMessage("Comment posted successfully!", "success");
+
+      console.log(`✅ Comment posted for post ${this.postId}`);
     } catch (error) {
-      console.error("Error posting comment:", error);
+      console.error("❌ Error posting comment:", error);
       this.showMessage("Failed to post comment. Please try again.", "error");
     }
   }
@@ -362,6 +477,14 @@ export class BlogCommentSystem {
     // Toggle like status
     comment.userLiked = !comment.userLiked;
     comment.likes = (comment.likes || 0) + (comment.userLiked ? 1 : -1);
+
+    // Track engagement
+    this.analytics.engagement.push({
+      type: comment.userLiked ? "comment_liked" : "comment_unliked",
+      timestamp: new Date().toISOString(),
+      userId: this.currentUser?.uid,
+      commentId: commentId,
+    });
 
     this.saveComments();
     this.render();
@@ -408,24 +531,45 @@ export class BlogCommentSystem {
     comment.isEdited = true;
     comment.editedAt = new Date().toISOString();
 
+    // Update analytics
+    this.analytics.commentsEdited++;
+    this.analytics.engagement.push({
+      type: "comment_edited",
+      timestamp: new Date().toISOString(),
+      userId: this.currentUser.uid,
+      commentId: commentId,
+    });
+
     await this.saveComments();
 
     this.render();
     this.setupEventListeners();
 
     this.showMessage("Comment updated successfully!", "success");
+    console.log(`✅ Comment edited for post ${this.postId}`);
   }
 
   async handleDelete(commentId) {
     if (!confirm("Are you sure you want to delete this comment?")) return;
 
     this.comments = this.comments.filter((c) => c.id !== commentId);
+
+    // Update analytics
+    this.analytics.commentsDeleted++;
+    this.analytics.engagement.push({
+      type: "comment_deleted",
+      timestamp: new Date().toISOString(),
+      userId: this.currentUser.uid,
+      commentId: commentId,
+    });
+
     await this.saveComments();
 
     this.render();
     this.setupEventListeners();
 
     this.showMessage("Comment deleted successfully!", "success");
+    console.log(`✅ Comment deleted for post ${this.postId}`);
   }
 
   async handleDeleteReply(replyId) {
@@ -503,6 +647,84 @@ export class BlogCommentSystem {
       toast.classList.remove("show");
       setTimeout(() => document.body.removeChild(toast), 300);
     }, 3000);
+  }
+
+  /**
+   * Export comment data for analytics or GDPR compliance
+   */
+  async exportCommentData() {
+    try {
+      const commentData = {
+        postId: this.postId,
+        comments: this.comments,
+        analytics: await this.getCommentAnalytics(),
+        exportDate: new Date().toISOString(),
+        totalComments: this.comments.length,
+        totalReplies: this.comments.reduce(
+          (sum, comment) => sum + (comment.replies?.length || 0),
+          0,
+        ),
+      };
+
+      return commentData;
+    } catch (error) {
+      console.error("❌ Failed to export comment data:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Delete all comment data for GDPR compliance
+   */
+  async deleteAllCommentData() {
+    try {
+      if (this.dataHandler) {
+        await this.dataHandler.deleteData(`blog_comments_${this.postId}`);
+        await this.dataHandler.deleteData(`blog_analytics_${this.postId}`);
+      }
+
+      // Also clear localStorage
+      localStorage.removeItem(`comments_${this.postId}`);
+
+      this.comments = [];
+      this.analytics = {
+        commentsLoaded: 0,
+        commentsPosted: 0,
+        commentsEdited: 0,
+        commentsDeleted: 0,
+        engagement: [],
+      };
+
+      this.render();
+      console.log(`✅ All comment data deleted for post ${this.postId}`);
+      return true;
+    } catch (error) {
+      console.error("❌ Failed to delete comment data:", error);
+      return false;
+    }
+  }
+
+  /**
+   * Get comment statistics
+   */
+  getCommentStats() {
+    const totalComments = this.comments.length;
+    const totalReplies = this.comments.reduce(
+      (sum, comment) => sum + (comment.replies?.length || 0),
+      0,
+    );
+    const totalLikes = this.comments.reduce(
+      (sum, comment) => sum + (comment.likes || 0),
+      0,
+    );
+
+    return {
+      totalComments,
+      totalReplies,
+      totalLikes,
+      totalEngagement: totalComments + totalReplies + totalLikes,
+      analytics: this.analytics,
+    };
   }
 }
 

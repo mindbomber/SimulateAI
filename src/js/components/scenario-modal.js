@@ -22,6 +22,7 @@ import scenarioDataManager from "../data/scenario-data-manager.js";
 import { getAllCategories } from "../../data/categories.js";
 import { typewriterSequence } from "../utils/typewriter.js";
 import { loadScenarioModalConfig } from "../utils/scenario-modal-config-loader.js";
+import DataHandler from "../core/data-handler.js";
 
 class ScenarioModal {
   constructor(options = {}) {
@@ -113,6 +114,13 @@ class ScenarioModal {
 
       // Initialize enterprise monitoring
       this._initializeEnterpriseMonitoring();
+
+      // Initialize DataHandler for scenario completion data
+      this.dataHandler = new DataHandler({
+        storageKey: "scenarioData",
+        analyticsEnabled: true,
+        syncEnabled: true,
+      });
 
       // Track constructor performance
       const constructorTime = performance.now() - startTime;
@@ -1724,7 +1732,20 @@ class ScenarioModal {
       option: this.selectedOption, // Legacy compatibility
       completed: true, // Mark as completed
       scenarioData: this.scenarioData, // Include the scenario data with options
+      timestamp: new Date().toISOString(),
+      sessionId: this._generateSessionId(),
     };
+
+    // Save to DataHandler first
+    try {
+      await this.dataHandler.saveScenarioCompletion(completionData);
+      logger.info(
+        "💾 Scenario completion data saved to DataHandler:",
+        completionData,
+      );
+    } catch (error) {
+      logger.error("❌ Failed to save scenario completion data:", error);
+    }
 
     // Dispatch initial scenario completion event (for immediate progress tracking)
     const event = new CustomEvent("scenario-completed", {
@@ -2357,6 +2378,37 @@ class ScenarioModal {
         failedRecoveries: 0,
         results: [],
       };
+    }
+  }
+
+  /**
+   * Generate unique session ID for tracking
+   */
+  _generateSessionId() {
+    return `scenario_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  /**
+   * Get scenario completion analytics data
+   */
+  async getScenarioAnalytics() {
+    try {
+      return await this.dataHandler.getAnalyticsData();
+    } catch (error) {
+      logger.error("Failed to retrieve scenario analytics:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Get all scenario completions
+   */
+  async getAllScenarioCompletions() {
+    try {
+      return await this.dataHandler.getAllCompletions();
+    } catch (error) {
+      logger.error("Failed to retrieve scenario completions:", error);
+      return [];
     }
   }
 
