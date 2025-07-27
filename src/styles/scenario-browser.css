@@ -348,7 +348,8 @@
   border: 2px solid #333 !important;
   color: #333 !important;
   font-size: 14px !important;
-  padding: 8px 12px !important;
+  /* Fixed: Preserve left padding for search icon */
+  padding: 8px 12px 8px 2.75rem !important;
   width: 100% !important;
   box-sizing: border-box !important;
 }
@@ -852,6 +853,14 @@
   position: relative;
 }
 
+/* Ensure all filter/sort containers have proper dropdown positioning */
+.filter-container,
+.sort-container {
+  position: relative;
+  /* Ensure container includes dropdown area for seamless hovering */
+  min-height: 40px; /* Minimum height to avoid layout shifts */
+}
+
 .filter-header {
   display: flex;
   justify-content: space-between;
@@ -893,41 +902,184 @@
   gap: var(--spacing-3);
 }
 
+/* ===== ENHANCED SORT CONTROLS - TYPOGRAPHY OF ANALYTICAL ORGANIZATION ===== */
+/* 
+  TYPOGRAPHICAL DESIGN PHILOSOPHY:
+  
+  This section embodies "typography of analytical organization" - each font choice, 
+  weight, spacing, and visual treatment is intentionally designed to:
+  
+  1. COGNITIVE AUTHORITY: Inspire confidence in users making analytical decisions
+     - Slightly heavier font weights (500-575) convey gentle authority
+     - System fonts ensure familiarity and trust
+     - Enhanced contrast (gray-800 to gray-950) provides clarity
+  
+  2. ANALYTICAL PRECISION: Communicate that this is thoughtful, deliberate action
+     - Subtle letter-spacing (-0.01em to -0.005em) creates visual tightness
+     - Consistent line-height (1.4-1.45) aids comfortable scanning
+     - Clean gradients and shadows suggest sophisticated organization
+  
+  3. COGNITIVE EASE: Reduce mental load during decision-making
+     - Optimized font sizes (15px buttons, 14px options) for readability
+     - Clear visual hierarchy through weight progression
+     - Smooth transitions and hover states provide feedback
+  
+  4. EMOTIONAL INTELLIGENCE: Typography that serves user's emotional state
+     - Text shadows provide subtle depth without aggression
+     - Gradual state changes (hover, focus, active) feel natural
+     - Premium feel through careful attention to visual details
+  
+  Design Intent: Convey thoughtful curation, analytical precision, and cognitive clarity
+*/
+
 .filter-btn,
 .sort-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-2);
-  padding: var(--spacing-2) var(--spacing-4);
+  padding: var(--spacing-3) var(--spacing-5);
   border: 1px solid var(--color-gray-300);
   border-radius: var(--radius-md);
   background: var(--color-white);
-  color: var(--color-gray-700);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
   cursor: pointer;
   transition: all var(--transition-base);
   white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+
+  /* Typography for analytical authority and precision */
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue",
+    Arial, sans-serif; /* Clean, readable system fonts for interface clarity */
+  font-size: 0.9375rem; /* 15px - slightly larger for better readability and presence */
+  font-weight: 500; /* Medium weight for gentle authority without aggression */
+  letter-spacing: -0.01em; /* Subtle tightening for precision and sophistication */
+  line-height: 1.4; /* Comfortable line height for easy reading */
+  color: var(--color-gray-800); /* Darker for better contrast and authority */
+
+  /* Subtle text shadow for depth and premium feel */
+  text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.02);
+
+  /* Enhanced visual hierarchy with subtle gradient */
+  background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* Sort button specific enhancements - conveying organizational intelligence */
+.sort-btn {
+  /* Slightly more authoritative styling to distinguish from filters */
+  font-weight: 550; /* Between medium and semibold for organizational authority */
+  color: var(--color-gray-900); /* Stronger color for sorting hierarchy */
+  border: 1px solid var(--color-gray-400); /* More defined border for importance */
+
+  /* Enhanced gradient for sorting authority */
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+
+  /* Subtle text effects for analytical sophistication */
+  text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.04);
+
+  /* Letter spacing optimized for analytical scanning */
+  letter-spacing: -0.005em; /* Very subtle tightening for precision */
 }
 
 .filter-btn:hover,
 .sort-btn:hover {
-  border-color: var(--color-gray-400);
-  background: var(--color-gray-50);
+  border-color: var(--color-gray-500);
+  transform: translateY(-1px); /* Subtle lift for engagement */
+
+  /* Enhanced hover background with sophistication */
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+
+  /* Improved shadow for hover state */
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.12),
+    0 2px 4px rgba(0, 0, 0, 0.08);
+
+  /* Text becomes more defined on hover */
+  color: var(--color-gray-900);
+  text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.06);
+}
+
+/* Sort button hover - enhanced analytical engagement */
+.sort-btn:hover {
+  border-color: var(--color-gray-600);
+  color: var(--color-gray-950); /* Maximum contrast for active engagement */
+
+  /* Premium gradient for active sorting state */
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+
+  /* Enhanced shadow for sorting authority */
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.15),
+    0 2px 6px rgba(0, 0, 0, 0.1);
+
+  /* Slightly more defined text shadow for active state */
+  text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.08);
 }
 
 .filter-btn:focus,
 .sort-btn:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-light);
+
+  /* Enhanced focus state with analytical clarity */
+  box-shadow:
+    0 0 0 3px var(--color-primary-light),
+    0 4px 12px rgba(0, 0, 0, 0.12),
+    0 2px 4px rgba(0, 0, 0, 0.08);
+
+  /* Text becomes more defined in focus state */
+  color: var(--color-gray-900);
+  text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.06);
+}
+
+/* Sort button focus - analytical precision */
+.sort-btn:focus {
+  /* Enhanced focus for sorting actions */
+  box-shadow:
+    0 0 0 3px rgba(59, 130, 246, 0.15),
+    /* Softer primary focus ring */ 0 4px 16px rgba(0, 0, 0, 0.15),
+    0 2px 6px rgba(0, 0, 0, 0.1);
+
+  color: var(--color-gray-950);
+  text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.08);
 }
 
 .filter-btn[aria-expanded="true"],
 .sort-btn[aria-expanded="true"] {
-  border-color: var(--color-primary);
-  background: var(--color-primary-50);
-  color: var(--color-primary-700);
+  border-color: var(--color-primary-600);
+  transform: translateY(1px); /* Subtle press effect */
+
+  /* Active state gradient with authority */
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: var(--color-primary-800);
+
+  /* Enhanced shadow for active dropdown state */
+  box-shadow:
+    0 2px 8px rgba(59, 130, 246, 0.2),
+    0 1px 3px rgba(0, 0, 0, 0.12);
+
+  /* Text shadow for active state clarity */
+  text-shadow: 0 0.5px 1px rgba(59, 130, 246, 0.1);
+}
+
+/* Sort button active state - organizational authority */
+.sort-btn[aria-expanded="true"] {
+  border-color: var(--color-primary-700);
+  color: var(--color-primary-900); /* Stronger color for active sorting */
+
+  /* Premium active gradient for sorting authority */
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+
+  /* Enhanced active shadow for sorting prominence */
+  box-shadow:
+    0 2px 10px rgba(59, 130, 246, 0.25),
+    0 1px 4px rgba(0, 0, 0, 0.15);
+
+  /* Stronger text shadow for active sorting state */
+  text-shadow: 0 0.5px 1px rgba(59, 130, 246, 0.15);
 }
 
 .filter-icon,
@@ -943,7 +1095,7 @@
   transform: rotate(180deg);
 }
 
-/* ===== FILTER DROPDOWN ===== */
+/* ===== CLEAN FILTER & SORT DROPDOWN - BORDERLESS DESIGN ===== */
 .filter-dropdown,
 .sort-dropdown {
   position: absolute;
@@ -951,13 +1103,18 @@
   right: 0;
   z-index: 100;
   background: var(--color-white);
-  border: 1px solid var(--color-gray-300);
+  /* Removed border for cleaner, modern look */
+  border: none;
   border-radius: var(--radius-md);
-  box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
+  /* Subtle shadow for elevation without heavy borders */
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.08);
   min-width: 200px;
   max-height: 300px;
   overflow-y: auto;
-  margin-top: var(--spacing-1);
+  /* Removed margin-top gap to allow seamless hover */
+  margin-top: 0;
   /* Critical display properties for dropdown functionality */
   display: block !important;
   opacity: 0;
@@ -1006,48 +1163,268 @@
   pointer-events: auto !important;
 }
 
-/* Emergency override: Show dropdowns on hover for testing */
-.filter-container:hover .filter-dropdown,
-.sort-container:hover .sort-dropdown {
+/* Enhanced hover states - work with JavaScript display control */
+.filter-container:hover .filter-dropdown[style*="display: block"],
+.sort-container:hover .sort-dropdown[style*="display: block"],
+.filter-dropdown[style*="display: block"]:hover,
+.sort-dropdown[style*="display: block"]:hover {
+  /* When JS has set display:block, ensure hover keeps it visible */
   opacity: 1 !important;
   visibility: visible !important;
   transform: translateY(0);
   pointer-events: auto !important;
 }
 
-/* ===== FILTER OPTIONS ===== */
+/* Alternative: Show dropdown on container hover regardless of JS state */
+.filter-container:hover .filter-dropdown,
+.sort-container:hover .sort-dropdown {
+  /* Force display and visibility when hovering container */
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0);
+  pointer-events: auto !important;
+}
+
+/* Ensure dropdown stays open when hovering over the dropdown itself */
+.filter-dropdown:hover,
+.sort-dropdown:hover {
+  /* Keep dropdown open when directly hovering over it */
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0);
+  pointer-events: auto !important;
+}
+
+/* Keep button in expanded visual state during container hover */
+.filter-container:hover .filter-btn,
+.sort-container:hover .sort-btn {
+  /* Visual feedback that dropdown area is active */
+  border-color: var(--color-primary-600);
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: var(--color-primary-800);
+}
+
+/* ===== ENHANCED FILTER & SORT OPTIONS - CLEAN BORDERLESS DESIGN ===== */
+/* Design Intent: Cognitive clarity, analytical precision, thoughtful selection */
+
 .filter-option,
 .sort-option {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
   cursor: pointer;
-  transition: background-color var(--transition-fast);
-  border-bottom: 1px solid var(--color-gray-100);
-  font-size: var(--font-size-sm);
-  color: var(--color-gray-700);
+  transition: all var(--transition-base);
+  /* Removed border for cleaner, more modern appearance */
+  border-bottom: none;
+  position: relative;
+  /* Subtle margin for visual separation without borders */
+  margin-bottom: 1px;
+
+  /* Enhanced typography for analytical selection and cognitive ease */
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue",
+    Arial, sans-serif; /* Clean, readable system fonts */
+  font-size: 0.875rem; /* 14px - optimal for scanning and selection */
+  font-weight: 450; /* Between normal and medium for subtle hierarchy */
+  letter-spacing: -0.003em; /* Very subtle tightening for precision */
+  line-height: 1.45; /* Comfortable for easy reading and scanning */
+  color: var(--color-gray-800); /* Clear contrast for analytical clarity */
+
+  /* Subtle text enhancement for option clarity */
+  text-shadow: 0 0.5px 0.5px rgba(0, 0, 0, 0.015);
+
+  /* Clean background for analytical focus */
+  background: transparent;
 }
 
-.filter-option:last-child,
-.sort-option:last-child {
-  border-bottom: none;
+/* Sort option specific styling - enhanced for organizational authority */
+.sort-option {
+  font-weight: 475; /* Slightly heavier for sorting hierarchy */
+  color: var(--color-gray-850); /* Stronger for sorting emphasis */
+  letter-spacing: -0.005em; /* Tighter for analytical precision */
+
+  /* Enhanced padding for sorting importance */
+  padding: var(--spacing-3) var(--spacing-4);
 }
+
+/* Button-specific sort option styling - ensure proper inheritance */
+button.sort-option {
+  /* Reset button defaults to inherit enhanced typography */
+  border: none;
+  background: inherit;
+  font-family: inherit; /* Inherit the enhanced font stack */
+  font-size: inherit; /* Inherit the enhanced font size */
+  font-weight: inherit; /* Inherit the enhanced font weight */
+  letter-spacing: inherit; /* Inherit the enhanced letter spacing */
+  line-height: inherit; /* Inherit the enhanced line height */
+  color: inherit; /* Inherit the enhanced color */
+  text-shadow: inherit; /* Inherit the enhanced text shadow */
+  text-align: left; /* Align text properly */
+  width: 100%; /* Full width for proper layout */
+
+  /* Enhanced button-specific properties */
+  cursor: pointer;
+  outline: none;
+
+  /* Ensure proper text rendering for buttons */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Removed last-child border rules since we're using borderless design */
 
 .filter-option:hover,
 .sort-option:hover {
   background: var(--color-gray-50);
+  color: var(--color-gray-900);
+  transform: translateX(2px); /* Subtle horizontal engagement */
+
+  /* Enhanced background with sophistication */
+  background: linear-gradient(
+    90deg,
+    rgba(248, 250, 252, 0.8) 0%,
+    rgba(241, 245, 249, 0.9) 100%
+  );
+
+  /* Subtle shadow for hover depth */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  /* Enhanced text clarity on hover */
+  text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.025);
+}
+
+/* Sort option hover - enhanced analytical engagement */
+.sort-option:hover {
+  color: var(--color-gray-950); /* Maximum clarity for sorting selection */
+  background: linear-gradient(
+    90deg,
+    rgba(241, 245, 249, 0.9) 0%,
+    rgba(226, 232, 240, 0.95) 100%
+  );
+
+  /* Enhanced shadow for sorting prominence */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+
+  /* Stronger text definition for analytical clarity */
+  text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.04);
+}
+
+/* Button-specific hover states - ensure proper inheritance */
+button.sort-option:hover {
+  /* Inherit all hover styles from parent */
+  color: inherit;
+  background: inherit;
+  box-shadow: inherit;
+  text-shadow: inherit;
+  transform: inherit;
+}
+
+button.filter-option:hover {
+  /* Inherit all hover styles from parent */
+  color: inherit;
+  background: inherit;
+  box-shadow: inherit;
+  text-shadow: inherit;
+  transform: inherit;
 }
 
 .filter-option.active,
 .sort-option.active {
   background: var(--color-primary-50);
-  color: var(--color-primary-700);
+  color: var(--color-primary-800);
+  font-weight: 550; /* Enhanced weight for active state authority */
+
+  /* Enhanced active state with analytical confidence */
+  background: linear-gradient(
+    90deg,
+    rgba(219, 234, 254, 0.8) 0%,
+    rgba(191, 219, 254, 0.9) 100%
+  );
+
+  /* Subtle shadow for active state */
+  box-shadow:
+    inset 0 0 0 1px var(--color-primary-200),
+    0 1px 3px rgba(59, 130, 246, 0.1);
+
+  /* Clear text shadow for active state */
+  text-shadow: 0 0.5px 1px rgba(59, 130, 246, 0.08);
+
+  /* Subtle left border for active visual hierarchy */
+  border-left: 3px solid var(--color-primary-400);
+  padding-left: calc(var(--spacing-4) - 3px); /* Adjust for border */
+}
+
+/* Sort option active - organizational authority */
+.sort-option.active {
+  font-weight: 575; /* Stronger weight for active sorting authority */
+  color: var(--color-primary-900); /* Maximum contrast for active sort */
+
+  /* Enhanced active background for sorting prominence */
+  background: linear-gradient(
+    90deg,
+    rgba(219, 234, 254, 0.9) 0%,
+    rgba(191, 219, 254, 0.95) 100%
+  );
+
+  /* Stronger shadow for active sorting state */
+  box-shadow:
+    inset 0 0 0 1px var(--color-primary-300),
+    0 1px 4px rgba(59, 130, 246, 0.15);
+
+  /* Enhanced text shadow for active sorting clarity */
+  text-shadow: 0 0.5px 1px rgba(59, 130, 246, 0.12);
+
+  /* Stronger left border for sorting hierarchy */
+  border-left: 3px solid var(--color-primary-600);
+}
+
+/* Button-specific active states - ensure proper inheritance */
+button.filter-option.active,
+button.sort-option.active {
+  /* Inherit all active styles from parent */
+  background: inherit;
+  color: inherit;
+  font-weight: inherit;
+  box-shadow: inherit;
+  text-shadow: inherit;
+  border-left: inherit;
+  padding-left: inherit;
+}
+
+button.sort-option.active {
+  /* Inherit enhanced sort-specific active styles */
+  background: inherit;
+  color: inherit;
+  font-weight: inherit;
+  box-shadow: inherit;
+  text-shadow: inherit;
+  border-left: inherit;
 }
 
 .filter-option .option-text,
 .sort-option .option-text {
   flex: 1;
+
+  /* Enhanced typography for option text clarity */
+  font-weight: inherit; /* Inherit from parent for consistency */
+  letter-spacing: inherit; /* Maintain parent's precision */
+  line-height: inherit; /* Consistent line height */
+
+  /* Ensure proper text rendering */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Sort option text - enhanced for analytical scanning */
+.sort-option .option-text {
+  /* Slightly enhanced for sorting importance */
+  font-weight: inherit;
+  color: inherit;
 }
 
 .filter-option .check-icon,
@@ -1056,12 +1433,33 @@
   height: 16px;
   color: var(--color-primary);
   opacity: 0;
-  transition: opacity var(--transition-fast);
+  transition: all var(--transition-base);
+  margin-left: var(--spacing-2);
+
+  /* Enhanced check icon for analytical confirmation */
+  filter: drop-shadow(0 0.5px 1px rgba(59, 130, 246, 0.15));
+}
+
+/* Sort option check icon - enhanced prominence */
+.sort-option .check-icon {
+  color: var(--color-primary-600); /* Slightly stronger for sorting authority */
+  filter: drop-shadow(0 0.5px 1px rgba(59, 130, 246, 0.2));
 }
 
 .filter-option.active .check-icon,
 .sort-option.active .check-icon {
   opacity: 1;
+  transform: scale(1.05); /* Subtle scale for confirmation */
+
+  /* Enhanced active check icon */
+  filter: drop-shadow(0 1px 2px rgba(59, 130, 246, 0.25));
+}
+
+/* Sort option active check icon - analytical confirmation */
+.sort-option.active .check-icon {
+  color: var(--color-primary-700);
+  transform: scale(1.1); /* Slightly larger for sorting confirmation */
+  filter: drop-shadow(0 1px 2px rgba(59, 130, 246, 0.3));
 }
 
 /* ===== TAG CHIPS ===== */
