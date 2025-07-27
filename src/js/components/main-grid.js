@@ -1351,26 +1351,6 @@ class MainGrid {
           </div>
         </div>
         <div class="controls-group">
-          <div class="filter-container">
-            <button class="filter-btn" aria-expanded="false">
-              <svg class="filter-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M2.628 1.601C5.028 1.206 7.49 1 10 1s4.973.206 7.372.601a.75.75 0 01.628.74v2.288a2.25 2.25 0 01-.659 1.59l-4.682 4.683a2.25 2.25 0 00-.659 1.59v3.037c0 .684-.31 1.33-.844 1.757l-1.937 1.55A.75.75 0 018 18.25v-5.757a2.25 2.25 0 00-.659-1.591L2.659 6.22A2.25 2.25 0 012 4.629V2.34a.75.75 0 01.628-.74z" clip-rule="evenodd"/>
-              </svg>
-              <span class="filter-text">All Categories</span>
-              <svg class="chevron-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
-              </svg>
-            </button>
-            <div class="filter-dropdown" style="display: none;">
-              <button type="button" class="filter-option active" data-category="all" role="option" aria-selected="true">
-                <span class="option-text">All Categories</span>
-                <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/>
-                </svg>
-              </button>
-              <!-- Category options will be populated by JavaScript -->
-            </div>
-          </div>
           <div class="sort-container">
             <button class="sort-btn" aria-expanded="false">
               <svg class="sort-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -1527,7 +1507,7 @@ class MainGrid {
   async renderScenarioViewFallback() {
     // Clear only the scenario cards, preserve the toolbar
     const existingCards = this.scenarioContainer.querySelectorAll(
-      ".scenario-card-wrapper, .scenario-count, .no-scenarios",
+      ".scenario-card-wrapper, .scenario-count, .scenario-view-progress-summary, .no-scenarios",
     );
     existingCards.forEach((card) => card.remove());
 
@@ -2614,6 +2594,54 @@ class MainGrid {
                   hasCategoryHeader: !!this.categoryHeader,
                 },
               );
+            }
+
+            // UPDATE SCENARIO VIEW PROGRESS SUMMARY RINGS
+            // This ensures the new visible progress rings are updated when scenarios are completed
+            const progressSummary = container.querySelector(
+              ".scenario-view-progress-summary",
+            );
+            if (progressSummary) {
+              const categoryProgressRing = progressSummary.querySelector(
+                `[data-category-id="${categoryId}"]`,
+              );
+              if (categoryProgressRing) {
+                // Update the mini progress ring
+                const progressCircle =
+                  categoryProgressRing.querySelector(".progress-circle");
+                const percentageSpan = categoryProgressRing.querySelector(
+                  ".progress-percentage-mini",
+                );
+                const progressText = categoryProgressRing
+                  .closest(".category-progress-item")
+                  ?.querySelector(".category-progress-text-mini");
+
+                if (progressCircle) {
+                  const newOffset = 100 - progress.percentage;
+                  progressCircle.style.strokeDashoffset = newOffset;
+                }
+
+                if (percentageSpan) {
+                  percentageSpan.textContent = `${progress.percentage}%`;
+                }
+
+                if (progressText) {
+                  progressText.textContent = `${progress.completed}/${progress.total}`;
+                }
+
+                // Update tooltip
+                const newTooltip = `${progress.completed}/${progress.total} scenarios completed (${progress.percentage}%)`;
+                categoryProgressRing.setAttribute("data-tooltip", newTooltip);
+                categoryProgressRing.setAttribute(
+                  "aria-label",
+                  `Category progress: ${progress.completed} of ${progress.total} scenarios completed`,
+                );
+
+                logger.debug("Updated scenario view progress summary ring", {
+                  categoryId,
+                  progress: `${progress.completed}/${progress.total} (${progress.percentage}%)`,
+                });
+              }
             }
           }
         }

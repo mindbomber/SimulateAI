@@ -1,0 +1,83 @@
+/* SCENARIO VIEW PROGRESS RING CSS */
+/* Mini progress ring styles for hover category headers in scenario view */
+
+.category-progress-ring-mini {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.category-progress-ring-mini:hover {
+  transform: scale(1.1);
+}
+
+.progress-percentage-mini {
+  position: absolute;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #1f2937);
+  pointer-events: none;
+}
+
+.category-info-mini {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1, 4px);
+  min-width: 0;
+}
+
+.category-icon-mini {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.category-title-mini {
+  font-weight: 600;
+  color: var(--color-text-primary, #1f2937);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.875rem;
+}
+
+.category-progress-text-mini {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary, #6b7280);
+  font-weight: 500;
+}
+
+/* Progress ring animations */
+.category-progress-ring-mini .progress-circle {
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Accessibility */
+.category-progress-ring-mini:focus {
+  outline: 2px solid var(--color-primary, #3b82f6);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+/* Dark theme support */
+
+[data-theme="dark"] .category-title-mini {
+  color: var(--color-text-primary-dark, #f9fafb);
+}
+
+[data-theme="dark"] .category-progress-text-mini {
+  color: var(--color-text-secondary-dark, #9ca3af);
+}
+
+[data-theme="dark"] .progress-percentage-mini {
+  color: var(--color-text-primary-dark, #f9fafb);
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .category-info-mini {
+    align-items: center;
+  }
+}

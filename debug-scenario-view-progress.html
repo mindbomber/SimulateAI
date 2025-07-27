@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Debug Scenario View Progress Rings</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 20px;
+        background: #f5f5f5;
+      }
+      .debug-panel {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .debug-log {
+        background: #1a1a1a;
+        color: #fff;
+        padding: 15px;
+        border-radius: 5px;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        white-space: pre-wrap;
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #333;
+      }
+      .debug-controls {
+        margin-bottom: 15px;
+      }
+      .btn {
+        background: #007cba;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-right: 10px;
+        margin-bottom: 10px;
+      }
+      .btn:hover {
+        background: #005a87;
+      }
+      .status-indicator {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 8px;
+      }
+      .status-good {
+        background: #28a745;
+      }
+      .status-warning {
+        background: #ffc107;
+      }
+      .status-error {
+        background: #dc3545;
+      }
+      .status-info {
+        background: #17a2b8;
+      }
+      h2 {
+        color: #333;
+        border-bottom: 2px solid #007cba;
+        padding-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔍 Scenario View Progress Ring Debug</h1>
+
+    <div class="debug-panel">
+      <h2>Controls</h2>
+      <div class="debug-controls">
+        <button class="btn" onclick="checkCurrentView()">
+          Check Current View
+        </button>
+        <button class="btn" onclick="analyzeProgressRings()">
+          Analyze Progress Rings
+        </button>
+        <button class="btn" onclick="compareWithCategoryView()">
+          Compare Views
+        </button>
+        <button class="btn" onclick="testProgressCalculation()">
+          Test Progress Calculation
+        </button>
+        <button class="btn" onclick="clearDebugLog()">Clear Log</button>
+      </div>
+    </div>
+
+    <div class="debug-panel">
+      <h2>Debug Log</h2>
+      <div id="debugLog" class="debug-log">
+        Click a button above to start debugging...\n
+      </div>
+    </div>
+
+    <script>
+      let debugLog = document.getElementById("debugLog");
+
+      function log(message, type = "info") {
+        const timestamp = new Date().toLocaleTimeString();
+        const icon =
+          {
+            success: "✅",
+            error: "❌",
+            warning: "⚠️",
+            info: "ℹ️",
+            debug: "🔍",
+          }[type] || "ℹ️";
+
+        debugLog.textContent += `[${timestamp}] ${icon} ${message}\n`;
+        debugLog.scrollTop = debugLog.scrollHeight;
+      }
+
+      function clearDebugLog() {
+        debugLog.textContent = "Debug log cleared...\n";
+      }
+
+      function checkCurrentView() {
+        log("=== CHECKING CURRENT VIEW ===", "info");
+
+        // Check if we're on app.html
+        if (!window.location.href.includes("app.html")) {
+          log(
+            "❌ Not on app.html. Please navigate to http://localhost:3000/app.html first",
+            "error",
+          );
+          return;
+        }
+
+        // Check which view is active
+        const scenarioContainer = document.querySelector(
+          "#scenario-view-container",
+        );
+        const categoryContainer = document.querySelector(
+          "#category-view-container",
+        );
+
+        if (!scenarioContainer || !categoryContainer) {
+          log("❌ Could not find view containers", "error");
+          return;
+        }
+
+        const scenarioVisible = scenarioContainer.style.display !== "none";
+        const categoryVisible = categoryContainer.style.display !== "none";
+
+        log(
+          `🎯 Scenario View Active: ${scenarioVisible}`,
+          scenarioVisible ? "success" : "warning",
+        );
+        log(
+          `📂 Category View Active: ${categoryVisible}`,
+          categoryVisible ? "success" : "warning",
+        );
+
+        if (scenarioVisible) {
+          log("✅ Currently in scenario view - perfect for testing", "success");
+        } else {
+          log(
+            "⚠️ Please switch to scenario view to test progress rings",
+            "warning",
+          );
+        }
+      }
+
+      function analyzeProgressRings() {
+        log("=== ANALYZING PROGRESS RINGS IN SCENARIO VIEW ===", "info");
+
+        const scenarioContainer = document.querySelector(
+          "#scenario-view-container",
+        );
+        if (!scenarioContainer) {
+          log("❌ Scenario container not found", "error");
+          return;
+        }
+
+        // Find all progress rings in scenario view
+        const progressRings = scenarioContainer.querySelectorAll(
+          ".category-progress-ring",
+        );
+        log(
+          `🎯 Found ${progressRings.length} progress rings in scenario view`,
+          "info",
+        );
+
+        if (progressRings.length === 0) {
+          log("❌ No progress rings found in scenario view!", "error");
+
+          // Check if there are scenario card wrappers
+          const scenarioWrappers = scenarioContainer.querySelectorAll(
+            ".scenario-card-wrapper",
+          );
+          log(
+            `📦 Found ${scenarioWrappers.length} scenario card wrappers`,
+            "info",
+          );
+
+          if (scenarioWrappers.length > 0) {
+            // Check the first wrapper for category headers
+            const firstWrapper = scenarioWrappers[0];
+            const categoryHeader = firstWrapper.querySelector(
+              ".scenario-hover-category-header",
+            );
+            log(
+              `🏷️ First wrapper has category header: ${!!categoryHeader}`,
+              categoryHeader ? "success" : "error",
+            );
+
+            if (categoryHeader) {
+              const progressRingInHeader = categoryHeader.querySelector(
+                ".category-progress-ring",
+              );
+              log(
+                `📊 Category header has progress ring: ${!!progressRingInHeader}`,
+                progressRingInHeader ? "success" : "error",
+              );
+
+              if (progressRingInHeader) {
+                analyzeProgressRing(progressRingInHeader, 0);
+              }
+            }
+          }
+          return;
+        }
+
+        // Analyze each progress ring
+        progressRings.forEach((ring, index) => {
+          log(`\n--- Progress Ring ${index + 1} ---`, "info");
+          analyzeProgressRing(ring, index);
+        });
+      }
+
+      function analyzeProgressRing(ring, index) {
+        try {
+          // Get basic information
+          const categoryId = ring.getAttribute("data-category-id");
+          const tooltip = ring.getAttribute("data-tooltip");
+          const ariaLabel = ring.getAttribute("aria-label");
+
+          log(
+            `Category ID: ${categoryId || "NOT SET"}`,
+            categoryId ? "success" : "error",
+          );
+          log(
+            `Tooltip: ${tooltip || "NOT SET"}`,
+            tooltip ? "success" : "error",
+          );
+          log(
+            `Aria Label: ${ariaLabel || "NOT SET"}`,
+            ariaLabel ? "success" : "error",
+          );
+
+          // Check progress circle
+          const progressCircle = ring.querySelector(".progress-circle");
+          if (progressCircle) {
+            const strokeDashoffset = progressCircle.style.strokeDashoffset;
+            const strokeDasharray = progressCircle.style.strokeDasharray;
+            log(
+              `Progress Circle - Offset: ${strokeDashoffset}, Array: ${strokeDasharray}`,
+              "info",
+            );
+          } else {
+            log("❌ No progress circle found in ring", "error");
+          }
+
+          // Check percentage display
+          const percentageSpan = ring.querySelector(".progress-percentage");
+          if (percentageSpan) {
+            log(`Percentage Display: ${percentageSpan.textContent}`, "success");
+          } else {
+            log("❌ No percentage display found", "error");
+          }
+
+          // Check if it has badge alert
+          const hasBadgeAlert = ring.classList.contains("badge-alert");
+          log(
+            `Badge Alert: ${hasBadgeAlert}`,
+            hasBadgeAlert ? "warning" : "info",
+          );
+
+          // Get actual progress from userProgress if available
+          if (categoryId && window.app && window.app.categoryGrid) {
+            const userProgress = window.app.categoryGrid.userProgress;
+            if (userProgress && userProgress[categoryId]) {
+              const categoryProgress = userProgress[categoryId];
+              const completed =
+                Object.values(categoryProgress).filter(Boolean).length;
+              const total = Object.keys(categoryProgress).length;
+              const percentage =
+                total > 0 ? Math.round((completed / total) * 100) : 0;
+
+              log(
+                `Actual Progress: ${completed}/${total} (${percentage}%)`,
+                "success",
+              );
+
+              // Compare with tooltip
+              if (tooltip && tooltip.includes(`${completed}/${total}`)) {
+                log("✅ Tooltip matches actual progress", "success");
+              } else {
+                log("❌ Tooltip does NOT match actual progress", "error");
+              }
+            } else {
+              log(
+                `⚠️ No user progress found for category ${categoryId}`,
+                "warning",
+              );
+            }
+          }
+        } catch (error) {
+          log(`❌ Error analyzing ring ${index}: ${error.message}`, "error");
+        }
+      }
+
+      function compareWithCategoryView() {
+        log("=== COMPARING SCENARIO VIEW WITH CATEGORY VIEW ===", "info");
+
+        const scenarioContainer = document.querySelector(
+          "#scenario-view-container",
+        );
+        const categoryContainer = document.querySelector(
+          "#category-view-container",
+        );
+
+        if (!scenarioContainer || !categoryContainer) {
+          log("❌ Could not find both view containers", "error");
+          return;
+        }
+
+        // Count progress rings in each view
+        const scenarioRings = scenarioContainer.querySelectorAll(
+          ".category-progress-ring",
+        );
+        const categoryRings = categoryContainer.querySelectorAll(
+          ".category-progress-ring",
+        );
+
+        log(`📊 Scenario View Progress Rings: ${scenarioRings.length}`, "info");
+        log(`📂 Category View Progress Rings: ${categoryRings.length}`, "info");
+
+        // Compare first rings if they exist
+        if (scenarioRings.length > 0 && categoryRings.length > 0) {
+          const scenarioRing = scenarioRings[0];
+          const categoryRing = categoryRings[0];
+
+          const scenarioTooltip = scenarioRing.getAttribute("data-tooltip");
+          const categoryTooltip = categoryRing.getAttribute("data-tooltip");
+
+          log(`First Scenario Ring Tooltip: ${scenarioTooltip}`, "info");
+          log(`First Category Ring Tooltip: ${categoryTooltip}`, "info");
+
+          if (scenarioTooltip === categoryTooltip) {
+            log("✅ Tooltips match between views", "success");
+          } else {
+            log("❌ Tooltips differ between views", "error");
+          }
+        }
+      }
+
+      function testProgressCalculation() {
+        log("=== TESTING PROGRESS CALCULATION ===", "info");
+
+        if (!window.app || !window.app.categoryGrid) {
+          log("❌ CategoryGrid not available", "error");
+          return;
+        }
+
+        try {
+          const userProgress = window.app.categoryGrid.userProgress;
+          log(
+            `📊 User Progress Data Available: ${!!userProgress}`,
+            userProgress ? "success" : "error",
+          );
+
+          if (userProgress) {
+            const categories = Object.keys(userProgress);
+            log(`📂 Categories with progress: ${categories.length}`, "info");
+
+            // Test getCategoryProgress function for each category
+            categories.forEach((categoryId) => {
+              const categoryProgress = userProgress[categoryId];
+              const completed =
+                Object.values(categoryProgress).filter(Boolean).length;
+              const total = Object.keys(categoryProgress).length;
+              const percentage =
+                total > 0 ? Math.round((completed / total) * 100) : 0;
+
+              log(
+                `${categoryId}: ${completed}/${total} (${percentage}%)`,
+                "info",
+              );
+
+              // Test MainGrid's getCategoryProgress method
+              if (window.app.categoryGrid.getCategoryProgress) {
+                const mainGridProgress =
+                  window.app.categoryGrid.getCategoryProgress(categoryId);
+                log(
+                  `  MainGrid result: ${mainGridProgress.completed}/${mainGridProgress.total} (${mainGridProgress.percentage}%)`,
+                  mainGridProgress.completed === completed
+                    ? "success"
+                    : "error",
+                );
+              }
+            });
+          }
+        } catch (error) {
+          log(
+            `❌ Error testing progress calculation: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      // Auto-run basic check when page loads
+      setTimeout(() => {
+        log(
+          "🚀 Debug tool loaded. Click buttons above to start testing.",
+          "info",
+        );
+        if (window.location.href.includes("app.html")) {
+          checkCurrentView();
+        }
+      }, 1000);
+    </script>
+  </body>
+</html>
