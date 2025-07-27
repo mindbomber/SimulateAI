@@ -17,7 +17,11 @@
 /**
  * Floating Surprise Tab Component
  * Professional floating "Surprise Me!" button that slides out on hover/click
+ * Enhanced with DataHandler integration for comprehensive analytics and user preferences
  */
+
+// Import DataHandler for enhanced data management
+import DataHandler from "../core/data-handler.js";
 
 // Constants
 const SURPRISE_MOBILE_BREAKPOINT = 768;
@@ -35,9 +39,230 @@ class FloatingSurpriseTab {
     this.collapseTimeout = null;
     this.lastClickTime = 0;
 
+    // DataHandler integration for enhanced analytics and persistence
+    this.dataHandler = null;
+    this.initializeDataHandler();
+
+    // Enhanced analytics tracking
+    this.surpriseMetrics = {
+      triggers: 0,
+      successes: 0,
+      failures: 0,
+      hovers: 0,
+      expansions: 0,
+      averageResponseTime: 0,
+      scenariosLaunched: [],
+      lastUsed: null,
+      sessionStart: Date.now(),
+    };
+
     this.init();
     this.bindEvents();
     this.listenToSettings();
+  }
+
+  /**
+   * Initialize DataHandler for enhanced data persistence and analytics
+   */
+  async initializeDataHandler() {
+    try {
+      this.dataHandler = new DataHandler();
+      await this.dataHandler.initialize();
+      await this.loadSurpriseMetrics();
+      await this.loadUserPreferences();
+      console.log("FloatingSurpriseTab: DataHandler initialized successfully");
+    } catch (error) {
+      console.warn(
+        "[FloatingSurpriseTab] DataHandler initialization failed, using fallback mode:",
+        error,
+      );
+      // Continue without DataHandler - use localStorage fallback
+      this.dataHandler = null;
+      this.loadSurpriseMetricsFromLocalStorage();
+      this.loadPreferencesFromLocalStorage();
+    }
+  }
+
+  /**
+   * Load surprise metrics from DataHandler
+   */
+  async loadSurpriseMetrics() {
+    if (!this.dataHandler) {
+      this.loadSurpriseMetricsFromLocalStorage();
+      return;
+    }
+
+    try {
+      const storedMetrics = await this.dataHandler.getData(
+        "floatingSurpriseTab_metrics",
+      );
+      if (storedMetrics) {
+        this.surpriseMetrics = {
+          ...this.surpriseMetrics,
+          ...storedMetrics,
+          sessionStart: Date.now(), // Reset session start
+        };
+      }
+    } catch (error) {
+      console.warn(
+        "[FloatingSurpriseTab] Failed to load surprise metrics from DataHandler, using localStorage:",
+        error,
+      );
+      this.loadSurpriseMetricsFromLocalStorage();
+    }
+  }
+
+  /**
+   * Load surprise metrics from localStorage fallback
+   */
+  loadSurpriseMetricsFromLocalStorage() {
+    try {
+      const saved = localStorage.getItem("floatingSurpriseTab_metrics");
+      if (saved) {
+        const storedMetrics = JSON.parse(saved);
+        this.surpriseMetrics = {
+          ...this.surpriseMetrics,
+          ...storedMetrics,
+          sessionStart: Date.now(),
+        };
+      }
+    } catch (error) {
+      console.warn(
+        "[FloatingSurpriseTab] Error loading metrics from localStorage:",
+        error,
+      );
+    }
+  }
+
+  /**
+   * Load user preferences from DataHandler
+   */
+  async loadUserPreferences() {
+    if (!this.dataHandler) {
+      this.loadPreferencesFromLocalStorage();
+      return;
+    }
+
+    try {
+      const preferences = await this.dataHandler.getData(
+        "floatingSurpriseTab_preferences",
+      );
+      if (preferences) {
+        this.userPreferences = preferences;
+      }
+    } catch (error) {
+      console.warn(
+        "[FloatingSurpriseTab] Failed to load user preferences from DataHandler, using localStorage:",
+        error,
+      );
+      this.loadPreferencesFromLocalStorage();
+    }
+  }
+
+  /**
+   * Load user preferences from localStorage fallback
+   */
+  loadPreferencesFromLocalStorage() {
+    try {
+      const saved = localStorage.getItem("floatingSurpriseTab_preferences");
+      if (saved) {
+        this.userPreferences = JSON.parse(saved);
+      }
+    } catch (error) {
+      console.warn(
+        "[FloatingSurpriseTab] Error loading preferences from localStorage:",
+        error,
+      );
+    }
+  }
+
+  /**
+   * Save surprise metrics to DataHandler or localStorage
+   */
+  async saveSurpriseMetrics() {
+    const metricsToSave = {
+      ...this.surpriseMetrics,
+      lastUpdated: Date.now(),
+    };
+
+    // Try DataHandler first
+    if (this.dataHandler) {
+      try {
+        await this.dataHandler.saveData(
+          "floatingSurpriseTab_metrics",
+          metricsToSave,
+        );
+        return;
+      } catch (error) {
+        console.warn(
+          "[FloatingSurpriseTab] Failed to save surprise metrics to DataHandler, using localStorage fallback:",
+          error,
+        );
+      }
+    }
+
+    // Fallback to localStorage
+    try {
+      localStorage.setItem(
+        "floatingSurpriseTab_metrics",
+        JSON.stringify(metricsToSave),
+      );
+    } catch (error) {
+      console.error(
+        "[FloatingSurpriseTab] Failed to save metrics to localStorage:",
+        error,
+      );
+    }
+  }
+
+  /**
+   * Track surprise interaction with enhanced analytics
+   */
+  trackSurpriseInteraction(action, metadata = {}) {
+    // Update metrics
+    this.surpriseMetrics[action] = (this.surpriseMetrics[action] || 0) + 1;
+    this.surpriseMetrics.lastUsed = Date.now();
+
+    // Calculate average response time for triggers
+    if (action === "triggers" && metadata.responseTime) {
+      const currentAvg = this.surpriseMetrics.averageResponseTime || 0;
+      const totalTriggers = this.surpriseMetrics.triggers;
+      this.surpriseMetrics.averageResponseTime =
+        (currentAvg * (totalTriggers - 1) + metadata.responseTime) /
+        totalTriggers;
+    }
+
+    // Track launched scenarios
+    if (action === "successes" && metadata.scenarioId) {
+      this.surpriseMetrics.scenariosLaunched.push({
+        scenarioId: metadata.scenarioId,
+        timestamp: Date.now(),
+      });
+
+      // Keep only last 50 scenarios
+      if (this.surpriseMetrics.scenariosLaunched.length > 50) {
+        this.surpriseMetrics.scenariosLaunched =
+          this.surpriseMetrics.scenariosLaunched.slice(-50);
+      }
+    }
+
+    // Save metrics (debounced)
+    this.saveSurpriseMetrics();
+
+    // Track with app analytics if available
+    if (window.app?.analyticsManager) {
+      window.app.analyticsManager.trackEvent("floating_surprise_tab", {
+        action,
+        isMobile: this.isMobile,
+        sessionDuration: Date.now() - this.surpriseMetrics.sessionStart,
+        totalUses: this.surpriseMetrics.triggers,
+        successRate:
+          this.surpriseMetrics.triggers > 0
+            ? this.surpriseMetrics.successes / this.surpriseMetrics.triggers
+            : 0,
+        ...metadata,
+      });
+    }
   }
 
   init() {
@@ -331,8 +556,15 @@ class FloatingSurpriseTab {
   triggerSurpriseMe() {
     console.log("FloatingSurpriseTab: triggerSurpriseMe called");
 
+    // Track surprise trigger attempt
+    this.trackSurpriseInteraction("surprise_triggered", {
+      timestamp: Date.now(),
+      source: "floating_tab",
+    });
+
     // Try multiple approaches to trigger surprise me functionality
     let success = false;
+    let successMethod = null;
 
     // Approach 1: Use main grid's launch random scenario method
     if (
@@ -343,11 +575,16 @@ class FloatingSurpriseTab {
       try {
         window.mainGrid.launchRandomScenario();
         success = true;
+        successMethod = "mainGrid.launchRandomScenario";
       } catch (error) {
         console.error(
           "FloatingSurpriseTab: Error with mainGrid.launchRandomScenario:",
           error,
         );
+        this.trackSurpriseInteraction("surprise_error", {
+          method: "mainGrid.launchRandomScenario",
+          error: error.message,
+        });
       }
     }
 
@@ -361,11 +598,16 @@ class FloatingSurpriseTab {
       try {
         window.app.launchRandomScenario();
         success = true;
+        successMethod = "app.launchRandomScenario";
       } catch (error) {
         console.error(
           "FloatingSurpriseTab: Error with app.launchRandomScenario:",
           error,
         );
+        this.trackSurpriseInteraction("surprise_error", {
+          method: "app.launchRandomScenario",
+          error: error.message,
+        });
       }
     }
 
@@ -379,11 +621,16 @@ class FloatingSurpriseTab {
       try {
         window.triggerSurpriseMe();
         success = true;
+        successMethod = "global.triggerSurpriseMe";
       } catch (error) {
         console.error(
           "FloatingSurpriseTab: Error with global triggerSurpriseMe:",
           error,
         );
+        this.trackSurpriseInteraction("surprise_error", {
+          method: "global.triggerSurpriseMe",
+          error: error.message,
+        });
       }
     }
 
@@ -395,11 +642,16 @@ class FloatingSurpriseTab {
         try {
           originalButton.click();
           success = true;
+          successMethod = "button.click";
         } catch (error) {
           console.error(
             "FloatingSurpriseTab: Error clicking original button:",
             error,
           );
+          this.trackSurpriseInteraction("surprise_error", {
+            method: "button.click",
+            error: error.message,
+          });
         }
       }
     }
@@ -413,21 +665,39 @@ class FloatingSurpriseTab {
         });
         document.dispatchEvent(event);
         success = true;
+        successMethod = "custom.event";
       } catch (error) {
         console.error(
           "FloatingSurpriseTab: Error dispatching custom event:",
           error,
         );
+        this.trackSurpriseInteraction("surprise_error", {
+          method: "custom.event",
+          error: error.message,
+        });
       }
     }
 
     if (success) {
+      // Track successful surprise trigger
+      this.trackSurpriseInteraction("surprise_success", {
+        method: successMethod,
+        timestamp: Date.now(),
+      });
+
       // Add visual feedback
       this.addSuccessFeedback();
     } else {
       console.warn(
         "FloatingSurpriseTab: All approaches failed to trigger surprise me",
       );
+
+      // Track complete failure
+      this.trackSurpriseInteraction("surprise_complete_failure", {
+        timestamp: Date.now(),
+        attempts: 5,
+      });
+
       this.addErrorFeedback();
     }
   }
@@ -467,6 +737,87 @@ class FloatingSurpriseTab {
         title.textContent = originalTitle;
         subtitle.textContent = originalSubtitle;
       }, SURPRISE_FEEDBACK_DURATION);
+    }
+  }
+
+  // === Analytics & Data Methods ===
+
+  async generateSurpriseReport() {
+    try {
+      const metrics =
+        await this.dataHandler.getAnalyticsData("surprise_metrics");
+      const totalTriggers = metrics?.trigger_count || 0;
+      const successfulTriggers = metrics?.success_count || 0;
+      const failureRate =
+        totalTriggers > 0
+          ? (
+              ((totalTriggers - successfulTriggers) / totalTriggers) *
+              100
+            ).toFixed(1)
+          : 0;
+
+      return {
+        totalSurpriseTriggers: totalTriggers,
+        successfulSurprises: successfulTriggers,
+        failureRate: `${failureRate}%`,
+        mostUsedMethod: metrics?.most_used_method || "unknown",
+        lastUsed: metrics?.last_used
+          ? new Date(metrics.last_used).toLocaleDateString()
+          : "never",
+        avgUsagePerDay: metrics?.daily_average || 0,
+      };
+    } catch (error) {
+      console.error(
+        "FloatingSurpriseTab: Error generating surprise report:",
+        error,
+      );
+      return null;
+    }
+  }
+
+  async exportSurpriseData() {
+    try {
+      const report = await this.generateSurpriseReport();
+      const allMetrics =
+        await this.dataHandler.getAnalyticsData("surprise_metrics");
+
+      const exportData = {
+        summary: report,
+        detailed_metrics: allMetrics,
+        export_timestamp: new Date().toISOString(),
+        component: "FloatingSurpriseTab",
+      };
+
+      const dataStr = JSON.stringify(exportData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: "application/json" });
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(dataBlob);
+      link.download = `surprise-tab-analytics-${Date.now()}.json`;
+      link.click();
+
+      console.log("FloatingSurpriseTab: Analytics data exported successfully");
+      return true;
+    } catch (error) {
+      console.error(
+        "FloatingSurpriseTab: Error exporting analytics data:",
+        error,
+      );
+      return false;
+    }
+  }
+
+  async resetSurpriseMetrics() {
+    try {
+      await this.dataHandler.clearAnalyticsData("surprise_metrics");
+      console.log("FloatingSurpriseTab: Surprise metrics reset successfully");
+      return true;
+    } catch (error) {
+      console.error(
+        "FloatingSurpriseTab: Error resetting surprise metrics:",
+        error,
+      );
+      return false;
     }
   }
 

@@ -17,7 +17,11 @@
 /**
  * Floating Action Tab Component
  * Professional floating donate button that slides out on hover/click
+ * Enhanced with DataHandler integration for comprehensive analytics and cross-device sync
  */
+
+// Import DataHandler for enhanced data management
+import DataHandler from "../core/data-handler.js";
 
 // Constants
 const MOBILE_BREAKPOINT = 768;
@@ -31,9 +35,204 @@ class FloatingActionTab {
     this.isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
     this.isInitialized = false;
 
+    // DataHandler integration for enhanced analytics and persistence
+    this.dataHandler = null;
+    this.initializeDataHandler();
+
+    // Analytics tracking
+    this.interactionMetrics = {
+      hovers: 0,
+      expansions: 0,
+      clicks: 0,
+      completions: 0,
+      lastInteraction: null,
+      sessionStart: Date.now(),
+    };
+
     this.init();
     this.bindEvents();
     this.listenToSettings();
+  }
+
+  /**
+   * Initialize DataHandler for enhanced data persistence and analytics
+   */
+  async initializeDataHandler() {
+    try {
+      this.dataHandler = new DataHandler();
+      await this.dataHandler.initialize();
+      await this.loadAnalyticsData();
+      await this.loadUserPreferences();
+      console.log("FloatingActionTab: DataHandler initialized successfully");
+    } catch (error) {
+      console.warn(
+        "[FloatingActionTab] DataHandler initialization failed, using fallback mode:",
+        error,
+      );
+      // Continue without DataHandler - use localStorage fallback
+      this.dataHandler = null;
+      this.loadAnalyticsFromLocalStorage();
+      this.loadPreferencesFromLocalStorage();
+    }
+  }
+
+  /**
+   * Load analytics data from DataHandler
+   */
+  async loadAnalyticsData() {
+    if (!this.dataHandler) {
+      this.loadAnalyticsFromLocalStorage();
+      return;
+    }
+
+    try {
+      const storedMetrics = await this.dataHandler.getData(
+        "floatingActionTab_analytics",
+      );
+      if (storedMetrics) {
+        this.interactionMetrics = {
+          ...this.interactionMetrics,
+          ...storedMetrics,
+          sessionStart: Date.now(), // Reset session start
+        };
+      }
+    } catch (error) {
+      console.warn(
+        "[FloatingActionTab] Failed to load analytics from DataHandler, using localStorage:",
+        error,
+      );
+      this.loadAnalyticsFromLocalStorage();
+    }
+  }
+
+  /**
+   * Load analytics data from localStorage fallback
+   */
+  loadAnalyticsFromLocalStorage() {
+    try {
+      const saved = localStorage.getItem("floatingActionTab_analytics");
+      if (saved) {
+        const storedMetrics = JSON.parse(saved);
+        this.interactionMetrics = {
+          ...this.interactionMetrics,
+          ...storedMetrics,
+          sessionStart: Date.now(),
+        };
+      }
+    } catch (error) {
+      console.warn(
+        "[FloatingActionTab] Error loading from localStorage:",
+        error,
+      );
+    }
+  }
+
+  /**
+   * Load user preferences from DataHandler
+   */
+  async loadUserPreferences() {
+    if (!this.dataHandler) {
+      this.loadPreferencesFromLocalStorage();
+      return;
+    }
+
+    try {
+      const preferences = await this.dataHandler.getData(
+        "floatingActionTab_preferences",
+      );
+      if (preferences) {
+        this.userPreferences = preferences;
+      }
+    } catch (error) {
+      console.warn(
+        "[FloatingActionTab] Failed to load user preferences from DataHandler, using localStorage:",
+        error,
+      );
+      this.loadPreferencesFromLocalStorage();
+    }
+  }
+
+  /**
+   * Load user preferences from localStorage fallback
+   */
+  loadPreferencesFromLocalStorage() {
+    try {
+      const saved = localStorage.getItem("floatingActionTab_preferences");
+      if (saved) {
+        this.userPreferences = JSON.parse(saved);
+      }
+    } catch (error) {
+      console.warn(
+        "[FloatingActionTab] Error loading preferences from localStorage:",
+        error,
+      );
+    }
+  }
+
+  /**
+   * Save analytics data to DataHandler
+   */
+  async saveAnalyticsData() {
+    const analyticsToSave = {
+      ...this.interactionMetrics,
+      lastUpdated: Date.now(),
+    };
+
+    // Try DataHandler first
+    if (this.dataHandler) {
+      try {
+        await this.dataHandler.saveData(
+          "floatingActionTab_analytics",
+          analyticsToSave,
+        );
+        return;
+      } catch (error) {
+        console.warn(
+          "[FloatingActionTab] Failed to save analytics to DataHandler, using localStorage fallback:",
+          error,
+        );
+      }
+    }
+
+    // Fallback to localStorage
+    try {
+      localStorage.setItem(
+        "floatingActionTab_analytics",
+        JSON.stringify(analyticsToSave),
+      );
+    } catch (error) {
+      console.error(
+        "[FloatingActionTab] Failed to save analytics to localStorage:",
+        error,
+      );
+    }
+  }
+
+  /**
+   * Track user interaction with enhanced analytics
+   */
+  trackInteraction(action, metadata = {}) {
+    // Update metrics
+    this.interactionMetrics[action] =
+      (this.interactionMetrics[action] || 0) + 1;
+    this.interactionMetrics.lastInteraction = {
+      action,
+      timestamp: Date.now(),
+      metadata,
+    };
+
+    // Save analytics data (debounced)
+    this.saveAnalyticsData();
+
+    // Track with app analytics if available
+    if (window.app?.analyticsManager) {
+      window.app.analyticsManager.trackEvent("floating_action_tab", {
+        action,
+        isMobile: this.isMobile,
+        sessionDuration: Date.now() - this.interactionMetrics.sessionStart,
+        ...metadata,
+      });
+    }
   }
 
   init() {
@@ -166,6 +365,9 @@ class FloatingActionTab {
 
   handleHover() {
     if (!this.isMobile) {
+      // Track hover interaction
+      this.trackInteraction("hovers", { device: "desktop" });
+
       // Add a small delay to make hover more intentional
       if (this.hoverTimeout) {
         clearTimeout(this.hoverTimeout);
@@ -189,6 +391,7 @@ class FloatingActionTab {
 
   handleFocus() {
     if (!this.isMobile) {
+      this.trackInteraction("focus", { device: "desktop", method: "keyboard" });
       this.expand();
     }
   }
@@ -201,6 +404,7 @@ class FloatingActionTab {
 
   handleTouchStart(e) {
     if (this.isMobile) {
+      this.trackInteraction("touchStart", { device: "mobile" });
       // Allow default behavior to ensure click events work
       this.createRipple(e.touches[0]);
     }
@@ -210,6 +414,7 @@ class FloatingActionTab {
     if (this.isMobile) {
       if (!this.isExpanded) {
         e.preventDefault();
+        this.trackInteraction("expansions", { device: "mobile" });
         this.expand();
 
         // Auto-collapse after delay
@@ -218,6 +423,10 @@ class FloatingActionTab {
         }, MOBILE_AUTO_COLLAPSE_DELAY);
       } else {
         // When expanded, navigate to donation page
+        this.trackInteraction("completions", {
+          device: "mobile",
+          destination: "donate.html",
+        });
         window.location.href = this.link.href;
       }
     }
@@ -227,7 +436,18 @@ class FloatingActionTab {
     if (e.key === "Enter" || e.key === " ") {
       if (this.isMobile) {
         e.preventDefault();
+        this.trackInteraction("keyboardActivation", {
+          device: "mobile",
+          key: e.key,
+        });
         this.toggle();
+      } else {
+        // Desktop keyboard navigation
+        this.trackInteraction("completions", {
+          device: "desktop",
+          method: "keyboard",
+          destination: "donate.html",
+        });
       }
     }
   }
@@ -243,6 +463,11 @@ class FloatingActionTab {
 
     this.isExpanded = true;
     this.container.classList.add("expanded");
+
+    // Track expansion
+    this.trackInteraction("expansions", {
+      device: this.isMobile ? "mobile" : "desktop",
+    });
 
     // Add ripple effect
     this.addRipple();
@@ -263,6 +488,43 @@ class FloatingActionTab {
       this.collapse();
     } else {
       this.expand();
+    }
+  }
+
+  /**
+   * Get analytics data for reporting
+   */
+  getAnalytics() {
+    return {
+      ...this.interactionMetrics,
+      conversionRate:
+        this.interactionMetrics.hovers > 0
+          ? this.interactionMetrics.completions / this.interactionMetrics.hovers
+          : 0,
+      expansionRate:
+        this.interactionMetrics.hovers > 0
+          ? this.interactionMetrics.expansions / this.interactionMetrics.hovers
+          : 0,
+      sessionDuration: Date.now() - this.interactionMetrics.sessionStart,
+    };
+  }
+
+  /**
+   * Export analytics data for external analysis
+   */
+  async exportAnalytics() {
+    if (!this.dataHandler) return null;
+
+    try {
+      const allData = await this.dataHandler.exportAllUserData();
+      return {
+        floatingActionTab: allData.floatingActionTab_analytics || {},
+        preferences: allData.floatingActionTab_preferences || {},
+        analytics: this.getAnalytics(),
+      };
+    } catch (error) {
+      console.warn("[FloatingActionTab] Failed to export analytics:", error);
+      return null;
     }
   }
 
@@ -316,7 +578,116 @@ class FloatingActionTab {
     }, RIPPLE_DURATION);
   }
 
+  // === Analytics & Reporting Methods ===
+
+  async generateDonationReport() {
+    try {
+      const analytics =
+        await this.dataHandler.getAnalyticsData("donation_analytics");
+      const interactions = analytics?.interactions || {};
+
+      const totalInteractions = Object.values(interactions).reduce(
+        (sum, count) => sum + count,
+        0,
+      );
+      const expansions = interactions.expansions || 0;
+      const clicks = interactions.clicks || 0;
+      const hovers = interactions.hovers || 0;
+
+      return {
+        totalInteractions,
+        expansions,
+        clicks,
+        hovers,
+        engagementRate:
+          totalInteractions > 0
+            ? ((clicks / totalInteractions) * 100).toFixed(1) + "%"
+            : "0%",
+        mostFrequentDevice:
+          analytics?.device_breakdown?.mobile >
+          analytics?.device_breakdown?.desktop
+            ? "mobile"
+            : "desktop",
+        sessionData: analytics?.session_metrics || {},
+        lastActive: analytics?.last_interaction
+          ? new Date(analytics.last_interaction).toLocaleDateString()
+          : "never",
+      };
+    } catch (error) {
+      console.error(
+        "FloatingActionTab: Error generating donation report:",
+        error,
+      );
+      return null;
+    }
+  }
+
+  async exportDonationAnalytics() {
+    try {
+      const report = await this.generateDonationReport();
+      const fullAnalytics =
+        await this.dataHandler.getAnalyticsData("donation_analytics");
+
+      const exportData = {
+        summary: report,
+        detailed_analytics: fullAnalytics,
+        preferences: await this.dataHandler.getUserPreferences(),
+        export_timestamp: new Date().toISOString(),
+        component: "FloatingActionTab",
+      };
+
+      const dataStr = JSON.stringify(exportData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: "application/json" });
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(dataBlob);
+      link.download = `donation-tab-analytics-${Date.now()}.json`;
+      link.click();
+
+      console.log("FloatingActionTab: Analytics data exported successfully");
+      return true;
+    } catch (error) {
+      console.error(
+        "FloatingActionTab: Error exporting analytics data:",
+        error,
+      );
+      return false;
+    }
+  }
+
+  async resetDonationMetrics() {
+    try {
+      await this.dataHandler.clearAnalyticsData("donation_analytics");
+      console.log("FloatingActionTab: Donation metrics reset successfully");
+      return true;
+    } catch (error) {
+      console.error(
+        "FloatingActionTab: Error resetting donation metrics:",
+        error,
+      );
+      return false;
+    }
+  }
+
+  getInteractionSummary() {
+    return {
+      sessionStart: this.interactionMetrics.sessionStart,
+      currentSession: Date.now() - this.interactionMetrics.sessionStart,
+      totalInteractions: this.interactionMetrics.totalInteractions,
+      lastInteractionType: this.interactionMetrics.lastInteractionType,
+      deviceType: this.isMobile ? "mobile" : "desktop",
+    };
+  }
+
   destroy() {
+    // Save final analytics data
+    if (this.dataHandler) {
+      this.trackInteraction("destroy", {
+        sessionDuration: Date.now() - this.interactionMetrics.sessionStart,
+      });
+      this.saveAnalyticsData();
+    }
+
     if (this.link && this.link.parentNode) {
       this.link.parentNode.removeChild(this.link);
     }
@@ -327,7 +698,7 @@ class FloatingActionTab {
 
 // Auto-initialize when DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
-  new FloatingActionTab();
+  window.floatingActionTab = new FloatingActionTab();
 });
 
 export default FloatingActionTab;

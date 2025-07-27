@@ -2098,3 +2098,640 @@ body:not(.modal-open) .floating-tour-tab-link {
     --lab-dark-gray: #000;
   }
 }
+
+/* ===== DARK MODE THEME FOR SCENARIO REFLECTION CONTENT ===== */
+/* Dark mode styling for the reflection content area */
+
+/* Dark mode CSS variables - override laboratory palette for dark theme */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark Laboratory Colors */
+    --lab-white: #0f172a;
+    --lab-light-gray: #1e293b;
+    --lab-gray: #334155;
+    --lab-dark-gray: #cbd5e1;
+    --lab-charcoal: #f1f5f9;
+    --lab-accent: #60a5fa;
+    --lab-accent-light: rgba(96, 165, 250, 0.15);
+  }
+}
+
+/* Force dark mode for scenario reflection content */
+body.dark-mode .scenario-reflection-content,
+[data-theme="dark"] .scenario-reflection-content,
+.dark-mode .scenario-reflection-content {
+  background: #0f172a !important;
+  color: #f1f5f9 !important;
+}
+
+/* Dark mode for reflection step content */
+body.dark-mode .reflection-step-content,
+[data-theme="dark"] .reflection-step-content,
+.dark-mode .reflection-step-content {
+  background: linear-gradient(135deg, #0f172a, #1e293b) !important;
+  color: #f1f5f9 !important;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Dark mode for headings and text */
+body.dark-mode .reflection-step-content h3,
+body.dark-mode .step-content h3,
+[data-theme="dark"] .reflection-step-content h3,
+[data-theme="dark"] .step-content h3 {
+  color: #f1f5f9 !important;
+}
+
+body.dark-mode .step-description,
+[data-theme="dark"] .step-description {
+  color: #cbd5e1 !important;
+}
+
+/* Dark mode for reflection progress */
+body.dark-mode .reflection-progress,
+[data-theme="dark"] .reflection-progress,
+.dark-mode .reflection-progress {
+  background: linear-gradient(135deg, #0f172a, #1e293b, #334155) !important;
+  border-bottom-color: #475569 !important;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(96, 165, 250, 0.1) !important;
+}
+
+body.dark-mode .progress-bar,
+[data-theme="dark"] .progress-bar,
+.dark-mode .progress-bar {
+  background: #475569 !important;
+}
+
+body.dark-mode .progress-fill,
+[data-theme="dark"] .progress-fill,
+.dark-mode .progress-fill {
+  background: linear-gradient(90deg, #60a5fa, #3b82f6) !important;
+}
+
+body.dark-mode .progress-label,
+[data-theme="dark"] .progress-label,
+.dark-mode .progress-label {
+  color: #f1f5f9 !important;
+}
+
+body.dark-mode .progress-text,
+[data-theme="dark"] .progress-text,
+.dark-mode .progress-text {
+  color: #cbd5e1 !important;
+}
+
+body.dark-mode .step-indicator,
+[data-theme="dark"] .step-indicator,
+.dark-mode .step-indicator {
+  background: #334155 !important;
+  border-color: #475569 !important;
+  color: #cbd5e1 !important;
+}
+
+body.dark-mode .step-indicator.active,
+[data-theme="dark"] .step-indicator.active,
+.dark-mode .step-indicator.active {
+  background: #60a5fa !important;
+  border-color: #60a5fa !important;
+  color: #0f172a !important;
+}
+
+body.dark-mode .step-indicator.completed,
+[data-theme="dark"] .step-indicator.completed,
+.dark-mode .step-indicator.completed {
+  background: #10b981 !important;
+  border-color: #10b981 !important;
+  color: #064e3b !important;
+}
+
+/* Dark mode for step titles */
+body.dark-mode .step-title,
+[data-theme="dark"] .step-title,
+.dark-mode .step-title {
+  color: #f1f5f9 !important;
+}
+
+body.dark-mode .progress-step.completed .step-title,
+body.dark-mode .progress-step.active .step-title,
+[data-theme="dark"] .progress-step.completed .step-title,
+[data-theme="dark"] .progress-step.active .step-title,
+.dark-mode .progress-step.completed .step-title,
+.dark-mode .progress-step.active .step-title {
+  color: #f1f5f9 !important;
+}
+
+/* Dark mode for choice summary */
+body.dark-mode .choice-summary,
+[data-theme="dark"] .choice-summary {
+  background: linear-gradient(135deg, #1e293b, #334155) !important;
+  border-left-color: #60a5fa !important;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-mode .option-display,
+[data-theme="dark"] .option-display {
+  background: linear-gradient(135deg, #1e293b, #334155) !important;
+  border-color: #475569 !important;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 1px 1px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-mode .option-text,
+body.dark-mode .option-reasoning,
+[data-theme="dark"] .option-text,
+[data-theme="dark"] .option-reasoning {
+  color: #f1f5f9 !important;
+}
+
+/* Dark mode for ethical impact visualization */
+body.dark-mode .impact-radar,
+[data-theme="dark"] .impact-radar {
+  background: linear-gradient(135deg, #1e293b, #334155) !important;
+  border-color: #475569 !important;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-mode .impact-radar::before,
+[data-theme="dark"] .impact-radar::before {
+  background: linear-gradient(90deg, #60a5fa, #3b82f6) !important;
+  opacity: 0.5 !important;
+}
+
+body.dark-mode .dimension-label,
+[data-theme="dark"] .dimension-label {
+  color: #f1f5f9 !important;
+}
+
+body.dark-mode .dimension-bar,
+[data-theme="dark"] .dimension-bar {
+  background: #475569 !important;
+}
+
+body.dark-mode .dimension-fill,
+[data-theme="dark"] .dimension-fill {
+  background: linear-gradient(90deg, #60a5fa, #3b82f6) !important;
+}
+
+body.dark-mode .dimension-value,
+[data-theme="dark"] .dimension-value {
+  color: #60a5fa !important;
+}
+
+/* Dark mode for community visualization */
+body.dark-mode .community-stats-summary,
+body.dark-mode .community-bar-chart,
+[data-theme="dark"] .community-stats-summary,
+[data-theme="dark"] .community-bar-chart {
+  background: linear-gradient(135deg, #1e293b, #334155) !important;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-mode .choice-bar,
+[data-theme="dark"] .choice-bar {
+  border-bottom-color: #475569 !important;
+}
+
+body.dark-mode .choice-bar.user-choice,
+[data-theme="dark"] .choice-bar.user-choice {
+  background: linear-gradient(135deg, #451a03, #78350f) !important;
+  border-color: #f59e0b !important;
+}
+
+body.dark-mode .choice-text,
+[data-theme="dark"] .choice-text {
+  color: #f1f5f9 !important;
+}
+
+body.dark-mode .choice-bar-container,
+[data-theme="dark"] .choice-bar-container {
+  background: #475569 !important;
+}
+
+body.dark-mode .choice-bar-fill,
+[data-theme="dark"] .choice-bar-fill {
+  background: linear-gradient(90deg, #60a5fa, #3b82f6) !important;
+}
+
+body.dark-mode .choice-count,
+[data-theme="dark"] .choice-count {
+  color: #cbd5e1 !important;
+}
+
+/* Dark mode for insights and cards */
+body.dark-mode .insight,
+body.dark-mode .reflection-section,
+[data-theme="dark"] .insight,
+[data-theme="dark"] .reflection-section {
+  background: linear-gradient(135deg, #1e293b, #334155) !important;
+  border-color: #475569 !important;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-mode .insight.popular,
+[data-theme="dark"] .insight.popular {
+  border-left-color: #10b981 !important;
+  background: linear-gradient(135deg, #064e3b, #1e293b) !important;
+  color: #f1f5f9 !important;
+}
+
+body.dark-mode .insight.minority,
+[data-theme="dark"] .insight.minority {
+  border-left-color: #60a5fa !important;
+  background: linear-gradient(135deg, #1e3a8a, #1e293b) !important;
+}
+
+body.dark-mode .insight.balanced,
+[data-theme="dark"] .insight.balanced {
+  border-left-color: #f59e0b !important;
+  background: linear-gradient(135deg, #451a03, #1e293b) !important;
+}
+
+body.dark-mode .reflection-section h4,
+[data-theme="dark"] .reflection-section h4 {
+  color: #f1f5f9 !important;
+}
+
+/* Dark mode for next exploration section */
+body.dark-mode .next-exploration,
+[data-theme="dark"] .next-exploration {
+  background: linear-gradient(135deg, #1e3a8a, #1e40af, #1e293b) !important;
+  border-color: #60a5fa !important;
+}
+
+body.dark-mode .next-exploration::before,
+[data-theme="dark"] .next-exploration::before {
+  background: linear-gradient(90deg, #60a5fa, #3b82f6, #2563eb) !important;
+}
+
+body.dark-mode .next-exploration h4,
+[data-theme="dark"] .next-exploration h4 {
+  color: #93c5fd !important;
+  border-bottom-color: rgba(96, 165, 250, 0.3) !important;
+  text-shadow: 0 1px 2px rgba(96, 165, 250, 0.2) !important;
+}
+
+body.dark-mode .next-exploration .next-scenarios p,
+[data-theme="dark"] .next-exploration .next-scenarios p {
+  color: #bfdbfe !important;
+}
+
+body.dark-mode .suggestion-card,
+[data-theme="dark"] .suggestion-card {
+  background: linear-gradient(135deg, #1e293b, #334155) !important;
+  border-color: rgba(96, 165, 250, 0.3) !important;
+}
+
+body.dark-mode .suggestion-card:hover,
+[data-theme="dark"] .suggestion-card:hover {
+  border-color: #60a5fa !important;
+  box-shadow: 0 8px 25px rgba(96, 165, 250, 0.25) !important;
+}
+
+body.dark-mode .suggestion-title,
+[data-theme="dark"] .suggestion-title {
+  color: #f1f5f9 !important;
+}
+
+body.dark-mode .suggestion-desc,
+[data-theme="dark"] .suggestion-desc {
+  color: #cbd5e1 !important;
+}
+
+/* Dark mode for research impact section */
+body.dark-mode .research-impact,
+[data-theme="dark"] .research-impact {
+  background: linear-gradient(135deg, #064e3b, #065f46, #1e293b) !important;
+  border-color: #10b981 !important;
+}
+
+body.dark-mode .research-impact::before,
+[data-theme="dark"] .research-impact::before {
+  background: linear-gradient(90deg, #10b981, #059669, #047857) !important;
+}
+
+body.dark-mode .research-impact h4,
+[data-theme="dark"] .research-impact h4 {
+  color: #6ee7b7 !important;
+  border-bottom-color: rgba(16, 185, 129, 0.4) !important;
+  text-shadow: 0 1px 3px rgba(16, 185, 129, 0.2) !important;
+}
+
+body.dark-mode .research-impact > p,
+[data-theme="dark"] .research-impact > p {
+  color: #a7f3d0 !important;
+}
+
+body.dark-mode .research-stats .stat,
+[data-theme="dark"] .research-stats .stat {
+  background: linear-gradient(135deg, #1e293b, #334155) !important;
+  color: #34d399 !important;
+  box-shadow:
+    0 4px 6px rgba(16, 185, 129, 0.2),
+    0 1px 3px rgba(0, 0, 0, 0.3) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+body.dark-mode .research-stats .stat:hover,
+[data-theme="dark"] .research-stats .stat:hover {
+  box-shadow:
+    0 6px 12px rgba(16, 185, 129, 0.25),
+    0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Dark mode for alternative perspectives section */
+body.dark-mode .reflection-section.alternative-perspectives,
+[data-theme="dark"] .reflection-section.alternative-perspectives {
+  background: linear-gradient(135deg, #581c87, #7c3aed, #1e293b) !important;
+  border-color: #a855f7 !important;
+}
+
+body.dark-mode .reflection-section.alternative-perspectives::before,
+[data-theme="dark"] .reflection-section.alternative-perspectives::before {
+  background: linear-gradient(90deg, #a855f7, #9333ea, #7c3aed) !important;
+}
+
+body.dark-mode .reflection-section.alternative-perspectives h4,
+[data-theme="dark"] .reflection-section.alternative-perspectives h4 {
+  color: #c4b5fd !important;
+  border-bottom-color: rgba(168, 85, 247, 0.4) !important;
+  text-shadow: 0 1px 2px rgba(168, 85, 247, 0.2) !important;
+}
+
+body.dark-mode .alternative-option,
+[data-theme="dark"] .alternative-option {
+  background: linear-gradient(135deg, #1e293b, #334155) !important;
+  border-color: rgba(168, 85, 247, 0.3) !important;
+  box-shadow:
+    0 2px 4px rgba(168, 85, 247, 0.15),
+    0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-mode .alternative-option h5,
+[data-theme="dark"] .alternative-option h5 {
+  color: #c4b5fd !important;
+}
+
+body.dark-mode .alternative-text,
+[data-theme="dark"] .alternative-text {
+  color: #ddd6fe !important;
+  background: rgba(168, 85, 247, 0.1) !important;
+  border-left-color: #a855f7 !important;
+}
+
+body.dark-mode .alternative-text::before,
+body.dark-mode .alternative-text::after,
+[data-theme="dark"] .alternative-text::before,
+[data-theme="dark"] .alternative-text::after {
+  color: #a855f7 !important;
+}
+
+body.dark-mode .what-if-question,
+[data-theme="dark"] .what-if-question {
+  background: linear-gradient(135deg, #1e293b, #334155) !important;
+  border-color: rgba(168, 85, 247, 0.2) !important;
+}
+
+body.dark-mode .what-if-question strong,
+[data-theme="dark"] .what-if-question strong {
+  color: #c4b5fd !important;
+}
+
+body.dark-mode .impact-differences li,
+[data-theme="dark"] .impact-differences li {
+  color: #ddd6fe !important;
+  background: rgba(168, 85, 247, 0.1) !important;
+  border-left-color: rgba(168, 85, 247, 0.4) !important;
+}
+
+body.dark-mode .impact-differences li em,
+[data-theme="dark"] .impact-differences li em {
+  color: #c4b5fd !important;
+}
+
+body.dark-mode .reflection-prompt,
+[data-theme="dark"] .reflection-prompt {
+  background: linear-gradient(135deg, #581c87, #7c3aed) !important;
+  border-color: rgba(168, 85, 247, 0.3) !important;
+  border-left-color: #a855f7 !important;
+  color: #ddd6fe !important;
+}
+
+body.dark-mode .reflection-prompt strong,
+[data-theme="dark"] .reflection-prompt strong {
+  color: #c4b5fd !important;
+}
+
+body.dark-mode .no-alternatives,
+[data-theme="dark"] .no-alternatives {
+  color: #ddd6fe !important;
+}
+
+/* Dark mode for impact explanation section */
+body.dark-mode .impact-explanation,
+[data-theme="dark"] .impact-explanation {
+  background: linear-gradient(135deg, #064e3b, #065f46, #1e293b) !important;
+  border-color: #10b981 !important;
+}
+
+body.dark-mode .impact-explanation::before,
+[data-theme="dark"] .impact-explanation::before {
+  background: linear-gradient(90deg, #10b981, #059669, #047857) !important;
+}
+
+body.dark-mode .impact-explanation h4,
+[data-theme="dark"] .impact-explanation h4 {
+  color: #6ee7b7 !important;
+  border-bottom-color: rgba(16, 185, 129, 0.4) !important;
+  text-shadow: 0 1px 2px rgba(16, 185, 129, 0.2) !important;
+}
+
+body.dark-mode .impact-explanation li,
+[data-theme="dark"] .impact-explanation li {
+  color: #a7f3d0 !important;
+  background: linear-gradient(135deg, #1e293b, #334155) !important;
+  border-left-color: #10b981 !important;
+  box-shadow:
+    0 2px 4px rgba(16, 185, 129, 0.15),
+    0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-mode .impact-explanation li[data-type="warning"],
+[data-theme="dark"] .impact-explanation li[data-type="warning"] {
+  border-left-color: #f59e0b !important;
+  background: linear-gradient(135deg, #451a03, #1e293b) !important;
+  color: #fbbf24 !important;
+}
+
+body.dark-mode .impact-explanation li[data-type="balanced"],
+[data-theme="dark"] .impact-explanation li[data-type="balanced"] {
+  border-left-color: #6366f1 !important;
+  background: linear-gradient(135deg, #1e1b4b, #1e293b) !important;
+  color: #a5b4fc !important;
+}
+
+/* Dark mode for community insights section */
+body.dark-mode .community-insights,
+[data-theme="dark"] .community-insights {
+  background: linear-gradient(135deg, #831843, #be185d, #1e293b) !important;
+  border-color: #ec4899 !important;
+}
+
+body.dark-mode .community-insights::before,
+[data-theme="dark"] .community-insights::before {
+  background: linear-gradient(90deg, #ec4899, #db2777, #be185d) !important;
+}
+
+body.dark-mode .cultural-note,
+[data-theme="dark"] .cultural-note {
+  background: linear-gradient(135deg, #1e293b, #334155) !important;
+  border-color: rgba(236, 72, 153, 0.3) !important;
+  border-left-color: #ec4899 !important;
+}
+
+body.dark-mode .cultural-note p,
+[data-theme="dark"] .cultural-note p {
+  color: #f9a8d4 !important;
+}
+
+body.dark-mode .cultural-note em,
+[data-theme="dark"] .cultural-note em {
+  color: #ec4899 !important;
+}
+
+/* Dark mode for stakeholder and framework cards */
+body.dark-mode .stakeholder-card,
+body.dark-mode .framework-card,
+body.dark-mode .insight-card,
+[data-theme="dark"] .stakeholder-card,
+[data-theme="dark"] .framework-card,
+[data-theme="dark"] .insight-card {
+  background: linear-gradient(135deg, #1e293b, #334155) !important;
+  border-color: #475569 !important;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 1px 1px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-mode .stakeholder-card:hover,
+body.dark-mode .framework-card:hover,
+body.dark-mode .insight-card:hover,
+[data-theme="dark"] .stakeholder-card:hover,
+[data-theme="dark"] .framework-card:hover,
+[data-theme="dark"] .insight-card:hover {
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.4),
+    0 1px 3px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-mode .stakeholder-content h5,
+body.dark-mode .framework-name,
+body.dark-mode .insight-content h5,
+[data-theme="dark"] .stakeholder-content h5,
+[data-theme="dark"] .framework-name,
+[data-theme="dark"] .insight-content h5 {
+  color: #f1f5f9 !important;
+}
+
+body.dark-mode .stakeholder-perspective,
+body.dark-mode .framework-description,
+body.dark-mode .insight-content p,
+[data-theme="dark"] .stakeholder-perspective,
+[data-theme="dark"] .framework-description,
+[data-theme="dark"] .insight-content p {
+  color: #cbd5e1 !important;
+}
+
+body.dark-mode .framework-card.strong,
+[data-theme="dark"] .framework-card.strong {
+  border-left-color: #10b981 !important;
+}
+
+body.dark-mode .framework-card.moderate,
+[data-theme="dark"] .framework-card.moderate {
+  border-left-color: #f59e0b !important;
+}
+
+/* Dark mode for form elements */
+body.dark-mode .demo-question,
+body.dark-mode .reflection-question,
+body.dark-mode .reflection-question-deep,
+[data-theme="dark"] .demo-question,
+[data-theme="dark"] .reflection-question,
+[data-theme="dark"] .reflection-question-deep {
+  background: linear-gradient(135deg, #1e293b, #334155) !important;
+  border-color: #475569 !important;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 1px 1px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-mode .demo-question label,
+body.dark-mode .reflection-question label,
+body.dark-mode .reflection-question-deep label,
+[data-theme="dark"] .demo-question label,
+[data-theme="dark"] .reflection-question label,
+[data-theme="dark"] .reflection-question-deep label {
+  color: #f1f5f9 !important;
+}
+
+body.dark-mode .demo-question select,
+body.dark-mode .reflection-question textarea,
+body.dark-mode .reflection-question-deep textarea,
+[data-theme="dark"] .demo-question select,
+[data-theme="dark"] .reflection-question textarea,
+[data-theme="dark"] .reflection-question-deep textarea {
+  background: linear-gradient(135deg, #1e293b, #334155) !important;
+  color: #f1f5f9 !important;
+  border-color: #475569 !important;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 1px 1px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-mode .demo-question select:focus,
+body.dark-mode .reflection-question textarea:focus,
+body.dark-mode .reflection-question-deep textarea:focus,
+[data-theme="dark"] .demo-question select:focus,
+[data-theme="dark"] .reflection-question textarea:focus,
+[data-theme="dark"] .reflection-question-deep textarea:focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.25) !important;
+}
+
+body.dark-mode .radio-group label:hover,
+[data-theme="dark"] .radio-group label:hover {
+  background: #334155 !important;
+}
+
+/* Dark mode for confidence scale */
+body.dark-mode .confidence-slider,
+[data-theme="dark"] .confidence-slider {
+  background: #475569 !important;
+}
+
+body.dark-mode .confidence-slider::-webkit-slider-thumb,
+[data-theme="dark"] .confidence-slider::-webkit-slider-thumb {
+  background: #60a5fa !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-mode .confidence-slider::-moz-range-thumb,
+[data-theme="dark"] .confidence-slider::-moz-range-thumb {
+  background: #60a5fa !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-mode .scale-labels,
+[data-theme="dark"] .scale-labels {
+  color: #cbd5e1 !important;
+}

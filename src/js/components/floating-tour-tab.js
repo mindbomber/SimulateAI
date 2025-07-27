@@ -20,6 +20,9 @@
  * Positioned above the surprise tab
  */
 
+// Import DataHandler for enhanced data management and future onboarding features
+import DataHandler from "../core/data-handler.js";
+
 // Constants
 const TOUR_MOBILE_BREAKPOINT = 768;
 const TOUR_MOBILE_AUTO_COLLAPSE_DELAY = 3000;
@@ -36,9 +39,134 @@ class FloatingTourTab {
     this.collapseTimeout = null;
     this.lastClickTime = 0;
 
+    // Initialize DataHandler for analytics and future onboarding features
+    this.dataHandler = null;
+    this.tourMetrics = {
+      sessionStart: Date.now(),
+      totalInteractions: 0,
+      tourTriggers: 0,
+      lastInteractionType: null,
+      onboardingProgress: {},
+    };
+
+    this.initializeDataHandler();
     this.init();
     this.bindEvents();
     this.listenToSettings();
+  }
+
+  async initializeDataHandler() {
+    try {
+      this.dataHandler = new DataHandler();
+      await this.dataHandler.initialize();
+      await this.loadTourMetrics();
+      console.log("FloatingTourTab: DataHandler initialized successfully");
+    } catch (error) {
+      console.warn(
+        "FloatingTourTab: DataHandler initialization failed, using fallback mode:",
+        error,
+      );
+      // Continue without DataHandler - use localStorage fallback
+      this.dataHandler = null;
+      this.loadTourMetricsFromLocalStorage();
+    }
+  }
+
+  async loadTourMetrics() {
+    if (!this.dataHandler) {
+      this.loadTourMetricsFromLocalStorage();
+      return;
+    }
+
+    try {
+      const savedMetrics =
+        await this.dataHandler.getAnalyticsData("tour_metrics");
+      if (savedMetrics) {
+        this.tourMetrics = {
+          ...this.tourMetrics,
+          ...savedMetrics,
+          sessionStart: Date.now(), // Reset session start for current session
+        };
+      }
+    } catch (error) {
+      console.warn(
+        "FloatingTourTab: Error loading tour metrics from DataHandler, using localStorage:",
+        error,
+      );
+      this.loadTourMetricsFromLocalStorage();
+    }
+  }
+
+  loadTourMetricsFromLocalStorage() {
+    try {
+      const saved = localStorage.getItem("floatingTourTab_metrics");
+      if (saved) {
+        const savedMetrics = JSON.parse(saved);
+        this.tourMetrics = {
+          ...this.tourMetrics,
+          ...savedMetrics,
+          sessionStart: Date.now(),
+        };
+      }
+    } catch (error) {
+      console.warn("FloatingTourTab: Error loading from localStorage:", error);
+    }
+  }
+
+  async saveTourMetrics() {
+    const metricsToSave = {
+      ...this.tourMetrics,
+      lastUpdated: Date.now(),
+    };
+
+    // Try DataHandler first
+    if (this.dataHandler) {
+      try {
+        await this.dataHandler.saveAnalyticsData("tour_metrics", metricsToSave);
+        return;
+      } catch (error) {
+        console.warn(
+          "FloatingTourTab: Error saving to DataHandler, using localStorage fallback:",
+          error,
+        );
+      }
+    }
+
+    // Fallback to localStorage
+    try {
+      localStorage.setItem(
+        "floatingTourTab_metrics",
+        JSON.stringify(metricsToSave),
+      );
+    } catch (error) {
+      console.error("FloatingTourTab: Error saving to localStorage:", error);
+    }
+  }
+
+  trackTourInteraction(interactionType, data = {}) {
+    this.tourMetrics.totalInteractions++;
+    this.tourMetrics.lastInteractionType = interactionType;
+
+    const interactionData = {
+      type: interactionType,
+      timestamp: Date.now(),
+      device: this.isMobile ? "mobile" : "desktop",
+      ...data,
+    };
+
+    // Store interaction for future onboarding analytics
+    if (!this.tourMetrics.interactions) {
+      this.tourMetrics.interactions = [];
+    }
+    this.tourMetrics.interactions.push(interactionData);
+
+    // Keep only last 50 interactions to prevent data bloat
+    if (this.tourMetrics.interactions.length > 50) {
+      this.tourMetrics.interactions = this.tourMetrics.interactions.slice(-50);
+    }
+
+    this.saveTourMetrics();
+    console.log(`FloatingTourTab: Tracked ${interactionType}`, interactionData);
   }
 
   init() {
@@ -182,6 +310,9 @@ class FloatingTourTab {
 
   handleMouseEnter() {
     if (!this.isMobile) {
+      // Track hover interaction
+      this.trackTourInteraction("hover_enter");
+
       // Add a small delay to make hover more intentional
       if (this.hoverTimeout) {
         clearTimeout(this.hoverTimeout);
@@ -194,6 +325,9 @@ class FloatingTourTab {
 
   handleMouseLeave() {
     if (!this.isMobile) {
+      // Track hover leave
+      this.trackTourInteraction("hover_leave");
+
       // Clear hover timeout if user leaves before delay
       if (this.hoverTimeout) {
         clearTimeout(this.hoverTimeout);
@@ -227,11 +361,13 @@ class FloatingTourTab {
 
       if (!this.isExpanded) {
         e.preventDefault();
+        this.trackTourInteraction("mobile_expand_click");
         this.expand();
         this.scheduleAutoCollapse();
       } else {
         // When expanded, trigger tour functionality
         e.preventDefault();
+        this.trackTourInteraction("mobile_tour_trigger");
         this.triggerTour();
       }
     }
@@ -248,6 +384,7 @@ class FloatingTourTab {
       }
       this.lastClickTime = now;
 
+      this.trackTourInteraction("desktop_tour_trigger");
       this.createRipple(e);
       this.triggerTour();
       // Remove focus to prevent persistent outline
@@ -266,6 +403,9 @@ class FloatingTourTab {
       }
       this.lastClickTime = now;
 
+      this.trackTourInteraction("keyboard_tour_trigger", {
+        key: e.key,
+      });
       this.createRipple(e);
       this.triggerTour();
       // Remove focus to prevent persistent outline
@@ -288,12 +428,16 @@ class FloatingTourTab {
   expand() {
     this.isExpanded = true;
     this.container.classList.add("expanded");
+    this.trackTourInteraction("tab_expanded", {
+      device: this.isMobile ? "mobile" : "desktop",
+    });
     this.clearCollapseTimeout();
   }
 
   collapse() {
     this.isExpanded = false;
     this.container.classList.remove("expanded");
+    this.trackTourInteraction("tab_collapsed");
     this.clearCollapseTimeout();
   }
 
@@ -353,25 +497,86 @@ class FloatingTourTab {
   }
 
   triggerTour() {
+    // Track tour trigger attempt
+    this.tourMetrics.tourTriggers++;
+    this.trackTourInteraction("tour_triggered", {
+      timestamp: Date.now(),
+      source: "floating_tab",
+    });
+
     // Provide visual feedback
     this.showFeedback();
 
+    let success = false;
+    let method = null;
+
     // Try multiple methods to trigger the tour
     if (typeof window.app !== "undefined" && window.app.startOnboardingTour) {
-      window.app.startOnboardingTour();
+      try {
+        window.app.startOnboardingTour();
+        success = true;
+        method = "app.startOnboardingTour";
+      } catch (error) {
+        console.error(
+          "FloatingTourTab: Error with app.startOnboardingTour:",
+          error,
+        );
+        this.trackTourInteraction("tour_error", {
+          method: "app.startOnboardingTour",
+          error: error.message,
+        });
+      }
     } else if (
       typeof window.sharedNav !== "undefined" &&
       window.sharedNav.handleTourAction
     ) {
-      window.sharedNav.handleTourAction();
+      try {
+        window.sharedNav.handleTourAction();
+        success = true;
+        method = "sharedNav.handleTourAction";
+      } catch (error) {
+        console.error(
+          "FloatingTourTab: Error with sharedNav.handleTourAction:",
+          error,
+        );
+        this.trackTourInteraction("tour_error", {
+          method: "sharedNav.handleTourAction",
+          error: error.message,
+        });
+      }
     } else {
       // Fallback: Try to find and click the tour button in navigation
       const tourBtn = document.getElementById("start-tour-nav");
       if (tourBtn) {
-        tourBtn.click();
+        try {
+          tourBtn.click();
+          success = true;
+          method = "button.click";
+        } catch (error) {
+          console.error("FloatingTourTab: Error clicking tour button:", error);
+          this.trackTourInteraction("tour_error", {
+            method: "button.click",
+            error: error.message,
+          });
+        }
       } else {
         this.showUnavailableFeedback();
+        this.trackTourInteraction("tour_unavailable", {
+          reason: "no_tour_button_found",
+        });
       }
+    }
+
+    if (success) {
+      this.trackTourInteraction("tour_success", {
+        method: method,
+        timestamp: Date.now(),
+      });
+    } else {
+      this.trackTourInteraction("tour_failure", {
+        timestamp: Date.now(),
+        attempts: 1,
+      });
     }
   }
 
@@ -395,7 +600,235 @@ class FloatingTourTab {
     }, TOUR_FEEDBACK_DURATION);
   }
 
+  // === Analytics & Future Onboarding Methods ===
+
+  async generateTourReport() {
+    try {
+      let metrics;
+
+      if (this.dataHandler) {
+        metrics = await this.dataHandler.getAnalyticsData("tour_metrics");
+      } else {
+        // Fallback to localStorage
+        const saved = localStorage.getItem("floatingTourTab_metrics");
+        metrics = saved ? JSON.parse(saved) : null;
+      }
+
+      const totalInteractions = metrics?.totalInteractions || 0;
+      const tourTriggers = metrics?.tourTriggers || 0;
+      const interactions = metrics?.interactions || [];
+
+      // Calculate engagement patterns
+      const hoverCount = interactions.filter(
+        (i) => i.type === "hover_enter",
+      ).length;
+      const clickCount = interactions.filter((i) =>
+        i.type.includes("tour_trigger"),
+      ).length;
+      const expandCount = interactions.filter(
+        (i) => i.type === "tab_expanded",
+      ).length;
+
+      return {
+        totalTourInteractions: totalInteractions,
+        tourTriggersAttempted: tourTriggers,
+        hoverEngagements: hoverCount,
+        clickEngagements: clickCount,
+        tabExpansions: expandCount,
+        deviceBreakdown: this.calculateDeviceBreakdown(interactions),
+        engagementRate:
+          totalInteractions > 0
+            ? ((clickCount / totalInteractions) * 100).toFixed(1) + "%"
+            : "0%",
+        lastUsed: metrics?.lastUpdated
+          ? new Date(metrics.lastUpdated).toLocaleDateString()
+          : "never",
+        onboardingReadiness: this.assessOnboardingReadiness(interactions),
+        dataSource: this.dataHandler ? "DataHandler" : "localStorage",
+      };
+    } catch (error) {
+      console.error("FloatingTourTab: Error generating tour report:", error);
+      return null;
+    }
+  }
+
+  calculateDeviceBreakdown(interactions) {
+    const deviceCounts = interactions.reduce((acc, interaction) => {
+      const device = interaction.device || "unknown";
+      acc[device] = (acc[device] || 0) + 1;
+      return acc;
+    }, {});
+
+    return deviceCounts;
+  }
+
+  assessOnboardingReadiness(interactions) {
+    // Future: This method will help determine if user is ready for advanced onboarding
+    const recentInteractions = interactions.filter(
+      (i) => Date.now() - i.timestamp < 7 * 24 * 60 * 60 * 1000, // Last 7 days
+    );
+
+    const engagement = recentInteractions.length;
+    const tourAttempts = recentInteractions.filter(
+      (i) => i.type === "tour_triggered",
+    ).length;
+
+    return {
+      recentEngagement: engagement,
+      recentTourAttempts: tourAttempts,
+      readinessScore: Math.min(100, engagement * 10 + tourAttempts * 25),
+      recommendations: this.generateOnboardingRecommendations(
+        engagement,
+        tourAttempts,
+      ),
+    };
+  }
+
+  generateOnboardingRecommendations(engagement, tourAttempts) {
+    const recommendations = [];
+
+    if (tourAttempts === 0) {
+      recommendations.push(
+        "User has not tried the tour yet - consider promoting tour visibility",
+      );
+    } else if (tourAttempts > 3) {
+      recommendations.push(
+        "High tour engagement - user may benefit from advanced features tutorial",
+      );
+    }
+
+    if (engagement < 3) {
+      recommendations.push(
+        "Low engagement - consider improving tour tab visibility or incentives",
+      );
+    } else if (engagement > 10) {
+      recommendations.push(
+        "High engagement - user is actively exploring, ready for guided learning paths",
+      );
+    }
+
+    return recommendations;
+  }
+
+  async exportTourAnalytics() {
+    try {
+      const report = await this.generateTourReport();
+
+      let fullMetrics;
+      if (this.dataHandler) {
+        fullMetrics = await this.dataHandler.getAnalyticsData("tour_metrics");
+      } else {
+        const saved = localStorage.getItem("floatingTourTab_metrics");
+        fullMetrics = saved ? JSON.parse(saved) : null;
+      }
+
+      const exportData = {
+        summary: report,
+        detailed_metrics: fullMetrics,
+        onboarding_insights: report?.onboardingReadiness || {},
+        export_timestamp: new Date().toISOString(),
+        component: "FloatingTourTab",
+        data_source: this.dataHandler ? "DataHandler" : "localStorage",
+      };
+
+      const dataStr = JSON.stringify(exportData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: "application/json" });
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(dataBlob);
+      link.download = `tour-tab-analytics-${Date.now()}.json`;
+      link.click();
+
+      console.log("FloatingTourTab: Analytics data exported successfully");
+      return true;
+    } catch (error) {
+      console.error("FloatingTourTab: Error exporting analytics data:", error);
+      return false;
+    }
+  }
+
+  async resetTourMetrics() {
+    try {
+      // Clear DataHandler data if available
+      if (this.dataHandler) {
+        await this.dataHandler.clearAnalyticsData("tour_metrics");
+      }
+
+      // Clear localStorage fallback
+      localStorage.removeItem("floatingTourTab_metrics");
+
+      // Reset in-memory metrics
+      this.tourMetrics = {
+        sessionStart: Date.now(),
+        totalInteractions: 0,
+        tourTriggers: 0,
+        lastInteractionType: null,
+        onboardingProgress: {},
+      };
+
+      console.log("FloatingTourTab: Tour metrics reset successfully");
+      return true;
+    } catch (error) {
+      console.error("FloatingTourTab: Error resetting tour metrics:", error);
+      return false;
+    }
+  }
+
+  // Future: Method to track onboarding progression
+  async updateOnboardingProgress(step, completed = true) {
+    try {
+      this.tourMetrics.onboardingProgress[step] = {
+        completed,
+        timestamp: Date.now(),
+        device: this.isMobile ? "mobile" : "desktop",
+      };
+
+      await this.saveTourMetrics();
+      this.trackTourInteraction("onboarding_progress", {
+        step,
+        completed,
+        totalStepsCompleted: Object.keys(
+          this.tourMetrics.onboardingProgress,
+        ).filter((key) => this.tourMetrics.onboardingProgress[key].completed)
+          .length,
+      });
+
+      console.log(
+        `FloatingTourTab: Onboarding step '${step}' marked as ${completed ? "completed" : "incomplete"}`,
+      );
+    } catch (error) {
+      console.error(
+        "FloatingTourTab: Error updating onboarding progress:",
+        error,
+      );
+    }
+  }
+
+  getTourInteractionSummary() {
+    return {
+      sessionStart: this.tourMetrics.sessionStart,
+      currentSessionDuration: Date.now() - this.tourMetrics.sessionStart,
+      totalInteractions: this.tourMetrics.totalInteractions,
+      tourTriggers: this.tourMetrics.tourTriggers,
+      lastInteractionType: this.tourMetrics.lastInteractionType,
+      deviceType: this.isMobile ? "mobile" : "desktop",
+      onboardingStepsCompleted: Object.keys(
+        this.tourMetrics.onboardingProgress || {},
+      ).filter((key) => this.tourMetrics.onboardingProgress[key].completed)
+        .length,
+    };
+  }
+
   destroy() {
+    // Save final analytics data before cleanup
+    if (this.dataHandler) {
+      this.trackTourInteraction("component_destroyed", {
+        sessionDuration: Date.now() - this.tourMetrics.sessionStart,
+        totalSessionInteractions: this.tourMetrics.totalInteractions,
+      });
+      this.saveTourMetrics();
+    }
+
     // Cleanup method
     this.clearCollapseTimeout();
     if (this.hoverTimeout) {
@@ -422,7 +855,5 @@ if (document.readyState === "loading") {
   }
 }
 
-// Export for module usage
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = FloatingTourTab;
-}
+// Export for ES6 module usage
+export default FloatingTourTab;
