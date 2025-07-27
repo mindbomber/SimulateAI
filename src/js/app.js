@@ -3398,13 +3398,15 @@ class SimulateAIApp {
    */
   async initializeEthicsRadarDemo() {
     try {
-      // Only initialize if the hero demo container exists
+      // Only initialize if the hero demo container exists and not already initialized
       const demoContainer = document.getElementById("hero-ethics-chart");
-      if (demoContainer) {
+      if (demoContainer && !ethicsDemo) {
         // Initialize the ethics radar demo
         ethicsDemo = new EthicsRadarDemo();
 
         logger.info("Ethics radar demo initialized successfully");
+      } else if (ethicsDemo) {
+        logger.info("Ethics radar demo already initialized, skipping");
       } else {
         logger.warn(
           "Hero ethics chart container not found, skipping radar demo initialization",
@@ -6390,13 +6392,17 @@ class EthicsRadarDemo {
         return;
       }
 
-      // Check if container is already in use
+      // Check if container is already in use and clean it selectively
       const container = document.getElementById("hero-ethics-chart");
       if (container.hasChildNodes()) {
         console.log(
-          "⚠️ EthicsRadarDemo: Container already has content, clearing it",
+          "⚠️ EthicsRadarDemo: Container has content, cleaning chart elements only",
         );
-        container.innerHTML = "";
+        // Only remove chart-related elements, preserve other UI components
+        const chartElements = container.querySelectorAll(
+          "canvas, .chartjs-tooltip, .chart-fallback",
+        );
+        chartElements.forEach((el) => el.remove());
       }
 
       // Get radar chart configuration (fix: use 'radarChart' not 'radar-chart')
@@ -6510,11 +6516,9 @@ class EthicsRadarDemo {
             }
           }, 50);
 
-          // TEMPORARILY DISABLE FEEDBACK TO TEST CHART UPDATES
-          // this.showFeedback(pattern);
-          console.log(
-            "📈 Pattern applied successfully - feedback disabled for testing",
-          );
+          // Re-enable feedback after fixing chart issues
+          this.showFeedback(pattern);
+          console.log("📈 Pattern applied successfully with feedback");
 
           // Show values in console for debugging
           console.log(

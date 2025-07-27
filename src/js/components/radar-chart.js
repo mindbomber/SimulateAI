@@ -595,11 +595,36 @@ export default class RadarChart {
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = "high";
 
-      // OPTIMIZED: Single DOM clear operation
-      this.container.innerHTML = "";
+      // OPTIMIZED: Clear only existing canvas elements, preserve other content
+      const existingCanvases = this.container.querySelectorAll("canvas");
+      existingCanvases.forEach((canvas) => canvas.remove());
 
-      // Apply all container styles in one batch to minimize reflows
-      Object.assign(this.container.style, containerStyles);
+      // For hero demo containers, preserve existing structure but remove old charts
+      if (this.options.context === "hero-demo") {
+        // Only remove chart-related elements, keep popover and other UI
+        const chartElements = this.container.querySelectorAll(
+          ".chartjs-tooltip, .chart-fallback",
+        );
+        chartElements.forEach((el) => el.remove());
+      } else {
+        // For other contexts, can safely clear all content
+        this.container.innerHTML = "";
+      }
+
+      // Apply container styles more conservatively for hero demo
+      if (this.options.context === "hero-demo") {
+        // For hero demo, only set essential chart container styles
+        Object.assign(this.container.style, {
+          textAlign: "center",
+          overflow: "visible",
+          position: "relative",
+          zIndex: "10",
+          // Don't override width/height for hero demo - let CSS handle it
+        });
+      } else {
+        // For other contexts, apply all container styles
+        Object.assign(this.container.style, containerStyles);
+      }
 
       this.container.appendChild(canvas);
 
@@ -698,9 +723,6 @@ export default class RadarChart {
         );
         this._ensureDefaultStateVisibility();
       }
-
-      // Attach event listeners after chart is fully rendered
-      this._attachEventListenersAfterRender();
     });
   }
 
@@ -1937,54 +1959,6 @@ export default class RadarChart {
     logger.info(
       `Mobile tooltip dismissal setup complete for ${chartType} radar chart`,
     );
-  }
-
-  /**
-   * Attach event listeners after chart rendering is complete
-   * This prevents interference with Chart.js initial polygon rendering
-   * @private
-   */
-  _attachEventListenersAfterRender() {
-    if (!this.chart) {
-      logger.warn(
-        "RadarChart",
-        "Cannot attach event listeners - chart not initialized",
-      );
-      return;
-    }
-
-    try {
-      // Add onClick handler to chart configuration using event coordinator
-      this.chart.options.onClick = (event, activeElements) => {
-        this.handleChartClick(event, activeElements);
-      };
-
-      // Set up mobile tooltip dismissal using event coordinator
-      if (this.options.isDemo || this.options.realTime) {
-        // Use event coordinator for conflict-free event handling
-        chartEventCoordinator.addEventHandler(
-          this.container,
-          "touchstart",
-          this.setupMobileTooltipDismissal.bind(this),
-          { passive: true },
-        );
-      }
-
-      // Update chart to apply new event handlers
-      this.chart.update("none");
-
-      logger.info("RadarChart", "Event listeners attached after chart render", {
-        instanceId: this.instanceId,
-        hasOnClick: !!this.chart.options.onClick,
-        chartType: this.options.isDemo ? "demo" : "scenario",
-      });
-    } catch (error) {
-      logger.error(
-        "RadarChart",
-        "Failed to attach event listeners after render",
-        error,
-      );
-    }
   }
 
   // === ENTERPRISE MONITORING METHODS ===
