@@ -57,8 +57,28 @@ class FloatingTourTab {
 
   async initializeDataHandler() {
     try {
-      this.dataHandler = new DataHandler();
-      await this.dataHandler.initialize();
+      // Access firebaseService from global app instance
+      const firebaseService =
+        window.app && window.app.firebaseService
+          ? window.app.firebaseService
+          : null;
+
+      if (!window.app) {
+        console.warn(
+          "FloatingTourTab: window.app not available, using localStorage only",
+        );
+      }
+
+      this.dataHandler = new DataHandler({
+        appName: "SimulateAI",
+        version: "1.40",
+        enableFirebase: !!firebaseService,
+        enableCaching: true,
+        enableOfflineQueue: true,
+        firebaseService: firebaseService,
+      });
+
+      await this.dataHandler.initialize(firebaseService);
       await this.loadTourMetrics();
       console.log("FloatingTourTab: DataHandler initialized successfully");
     } catch (error) {
@@ -841,18 +861,28 @@ class FloatingTourTab {
   }
 }
 
-// Auto-initialize when DOM is ready
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", () => {
-    if (!window.floatingTourTab) {
-      window.floatingTourTab = new FloatingTourTab();
-    }
-  });
-} else {
-  // DOM is already ready
+// Auto-initialize when DOM and app are ready
+function initializeFloatingTourTab() {
   if (!window.floatingTourTab) {
     window.floatingTourTab = new FloatingTourTab();
   }
+}
+
+function checkAppReady() {
+  // Check if app is available
+  if (window.app) {
+    initializeFloatingTourTab();
+  } else {
+    // Wait for app to be ready
+    setTimeout(checkAppReady, 100);
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", checkAppReady);
+} else {
+  // DOM is already ready
+  checkAppReady();
 }
 
 // Export for ES6 module usage

@@ -86,6 +86,17 @@ class DataHandler {
   }
 
   /**
+   * Helper method to safely check if Firebase service is authenticated
+   */
+  isFirebaseAuthenticated() {
+    return (
+      this.firebaseService &&
+      typeof this.firebaseService.isAuthenticated === "function" &&
+      this.firebaseService.isAuthenticated()
+    );
+  }
+
+  /**
    * Get data with caching and fallback
    */
   async getData(key, options = {}) {
@@ -110,7 +121,7 @@ class DataHandler {
       if (
         this.firebaseService &&
         this.isOnline &&
-        this.firebaseService.isAuthenticated()
+        this.isFirebaseAuthenticated()
       ) {
         try {
           data = await this.firebaseService.getData(key);
@@ -184,7 +195,7 @@ class DataHandler {
       if (
         this.firebaseService &&
         this.isOnline &&
-        this.firebaseService.isAuthenticated()
+        this.isFirebaseAuthenticated()
       ) {
         try {
           await this.firebaseService.saveData(key, data);
@@ -207,10 +218,7 @@ class DataHandler {
           );
           this.queueOperation("save", key, data, options);
         }
-      } else if (
-        this.firebaseService &&
-        this.firebaseService.isAuthenticated()
-      ) {
+      } else if (this.firebaseService && this.isFirebaseAuthenticated()) {
         // Queue for when online
         this.queueOperation("save", key, data, options);
         console.log(`[DataHandler] Queued Firebase save for ${key} (offline)`);
@@ -244,7 +252,7 @@ class DataHandler {
       if (
         this.firebaseService &&
         this.isOnline &&
-        this.firebaseService.isAuthenticated()
+        this.isFirebaseAuthenticated()
       ) {
         try {
           await this.firebaseService.removeData(key);
@@ -569,7 +577,7 @@ class DataHandler {
     if (
       !this.firebaseService ||
       !this.isOnline ||
-      !this.firebaseService.isAuthenticated()
+      !this.isFirebaseAuthenticated()
     ) {
       return;
     }
@@ -664,7 +672,7 @@ class DataHandler {
     try {
       // Test Firebase if available
       if (this.firebaseService && this.isOnline) {
-        health.firebase = this.firebaseService.isAuthenticated();
+        health.firebase = this.isFirebaseAuthenticated();
       }
     } catch (error) {
       health.firebase = false;

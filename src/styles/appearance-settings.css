@@ -21,73 +21,21 @@
  * Handles dark mode, font sizes, and accessibility options
  * 
  * ARCHITECTURE NOTES:
- * - Light mode relies on :root CSS custom properties (no overrides needed)
- * - Dark mode overrides CSS custom properties to change entire system
- * - Removed body:not(.dark-mode) selectors to prevent specificity conflicts
- * - Uses theme-* variables for consistent theming across components
+ * - Theme variables are now centralized in design-tokens.css
+ * - This file handles appearance-specific overrides and settings UI
+ * - Uses standardized --theme-* variables from design-tokens.css
  * - Integrates with media.css responsive system through CSS custom properties
  * - Responsive font scaling using --font-scale from media.css
  * - Device-specific theming adaptations using --container-padding
  */
 
-/* CSS Custom Properties for Theme System */
-:root {
-  /* Light mode theme variables */
-  --theme-bg-primary: var(--color-white, #fff);
-  --theme-bg-secondary: var(--color-gray-50, #f8fafc);
-  --theme-bg-tertiary: var(--color-gray-100, #f1f5f9);
-  --theme-text-primary: var(--color-gray-900, #333);
-  --theme-text-secondary: var(--color-gray-600, #666);
-  --theme-text-muted: #9ca3af;
-  --theme-border: var(--color-gray-200, #e2e8f0);
-  --theme-border-hover: var(--color-gray-300, #d1d5db);
-  --theme-shadow: rgb(0 0 0 / 10%);
-  --theme-shadow-hover: rgb(0 0 0 / 15%);
-  --theme-accent: var(--color-primary, #4a9eff);
-  --theme-accent-dark: var(--color-primary-dark, #3a8eef);
-  --theme-text-on-accent: var(--color-white, #fff);
-}
+/* ===== APPEARANCE-SPECIFIC DARK MODE OVERRIDES ===== */
+/* Note: Core theme variables are now defined in design-tokens.css */
 
-/* Dark Mode Theme Variables - Override CSS Custom Properties */
+/* Set overall page background and text color for dark mode */
 body.dark-mode {
-  /* Override theme system variables for dark mode */
-  --theme-bg-primary: #1a1a1a;
-  --theme-bg-secondary: #2d2d2d;
-  --theme-bg-tertiary: #3d3d3d;
-  --theme-text-primary: #fff;
-  --theme-text-secondary: #ccc;
-  --theme-text-muted: #9ca3af;
-  --theme-border: #444;
-  --theme-border-hover: #555;
-  --theme-shadow: rgb(0 0 0 / 40%);
-  --theme-shadow-hover: rgb(0 0 0 / 50%);
-  --theme-accent: #4a9eff;
-  --theme-accent-dark: #3a8eef;
-  --theme-text-on-accent: #fff;
-
-  /* Override main color system variables */
-  --color-white: #1a1a1a;
-  --color-gray-50: #2d2d2d;
-  --color-gray-100: #3d3d3d;
-  --color-gray-200: #444;
-  --color-gray-300: #555;
-  --color-gray-600: #ccc;
-  --color-gray-800: #ccc;
-  --color-gray-900: #fff;
-  --color-primary: #4a9eff;
-  --color-primary-dark: #3a8eef;
-
-  /* Legacy support variables */
-  --text-color: #fff;
-  --text-secondary: #ccc;
-  --border-color: #444;
-  --primary-color: #4a9eff;
-  --hover-bg: #3d3d3d;
-  --background-color: #2d2d2d;
-
-  /* Set overall page background and text color */
-  background-color: #1a1a1a !important;
-  color: #fff !important;
+  background-color: var(--theme-bg-primary) !important;
+  color: var(--theme-text-primary) !important;
 }
 
 /* Override any gradients that use color-primary-light and color-primary */

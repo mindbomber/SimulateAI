@@ -95,11 +95,385 @@ body.dark-mode .scenario-reflection-modal,
   z-index: 1199 !important; /* Just below modal content */
 }
 
+/* ===== RESPONSIVE MODAL BACKDROP ===== */
+/* Optimize backdrop for different viewport sizes */
+@media (max-width: 768px) {
+  .scenario-reflection-modal .modal-backdrop {
+    /* Reduce backdrop blur on tablets for better performance */
+    backdrop-filter: blur(6px);
+  }
+}
+
+@media (max-width: 480px) {
+  .scenario-reflection-modal .modal-backdrop {
+    /* Further reduce backdrop blur on mobile for optimal performance */
+    backdrop-filter: blur(4px);
+    /* Increase background opacity slightly for better contrast on small screens */
+    background-color: rgba(0, 0, 0, 0.65) !important;
+  }
+}
+
+/* For devices with reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .scenario-reflection-modal .modal-backdrop {
+    backdrop-filter: none;
+    background-color: rgba(0, 0, 0, 0.7) !important;
+  }
+}
+
 .scenario-reflection-modal .modal-dialog {
   max-width: 900px;
   width: 90vw;
   margin: 2rem auto;
   z-index: 1201 !important; /* Above modal backdrop */
+}
+
+/* ===== RESPONSIVE MODAL DIALOG - SMALLER VIEWPORTS ===== */
+/* Tablet landscape and smaller */
+@media (max-width: 1024px) {
+  .scenario-reflection-modal .modal-dialog {
+    max-width: 800px;
+    width: 92vw;
+    margin: 1.5rem auto;
+  }
+}
+
+/* Tablet portrait */
+@media (max-width: 768px) {
+  .scenario-reflection-modal .modal-dialog {
+    max-width: none;
+    width: 95vw;
+    margin: 1rem auto;
+  }
+}
+
+/* Mobile landscape */
+@media (max-width: 640px) {
+  .scenario-reflection-modal .modal-dialog {
+    width: 98vw;
+    margin: 0.5rem auto;
+  }
+}
+
+/* Mobile portrait */
+@media (max-width: 480px) {
+  .scenario-reflection-modal .modal-dialog {
+    width: 100vw;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .scenario-reflection-modal .modal-content {
+    border-radius: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* ===== RESPONSIVE CONTENT AREAS ===== */
+/* Tablet and smaller */
+@media (max-width: 768px) {
+  .reflection-progress {
+    padding: var(--lab-space-4);
+  }
+
+  .scenario-reflection-modal .progress-container {
+    margin-bottom: var(--lab-space-4);
+  }
+
+  .scenario-reflection-modal .progress-bar {
+    height: 3px;
+    margin-bottom: var(--lab-space-1);
+  }
+
+  .scenario-reflection-modal .progress-text {
+    font-size: var(--lab-text-xs);
+  }
+
+  /* progress-steps responsive styles are now handled in the main section above */
+
+  .scenario-reflection-modal .step-icon {
+    width: 28px;
+    height: 28px;
+    font-size: var(--lab-text-xs);
+  }
+
+  .scenario-reflection-modal .step-title {
+    font-size: 0.6875rem; /* Smaller on mobile */
+  }
+
+  .reflection-step-content {
+    padding: var(--lab-space-6);
+    max-height: calc(
+      100vh - 280px
+    ); /* Adjust for smaller header/footer on mobile */
+  }
+
+  .step-content h3 {
+    font-size: var(--lab-text-xl);
+    margin-bottom: var(--lab-space-4);
+  }
+}
+
+/* Mobile specific adjustments */
+@media (max-width: 480px) {
+  .reflection-progress {
+    padding: var(--lab-space-3);
+  }
+
+  .scenario-reflection-modal .progress-container {
+    margin-bottom: var(--lab-space-3);
+  }
+
+  .scenario-reflection-modal .progress-bar {
+    height: 2px;
+    margin-bottom: var(--lab-space-1);
+  }
+
+  .scenario-reflection-modal .progress-text {
+    font-size: 0.6875rem;
+    margin-bottom: var(--lab-space-2);
+  }
+
+  /* progress-steps responsive styles are now handled in the main section above */
+
+  .scenario-reflection-modal .step-icon {
+    width: 24px;
+    height: 24px;
+    font-size: 0.625rem;
+    margin-bottom: var(--lab-space-1);
+  }
+
+  .scenario-reflection-modal .step-title {
+    font-size: 0.625rem;
+    line-height: 1.2;
+  }
+
+  /* Improve progress step connections on mobile */
+  .scenario-reflection-modal .progress-step:not(:last-child)::after {
+    top: 12px; /* Adjust for smaller step icons */
+  }
+
+  .reflection-step-content {
+    padding: var(--lab-space-4);
+    min-height: 300px;
+    max-height: none; /* Allow full height on mobile */
+    flex: 1;
+  }
+
+  .step-content h3 {
+    font-size: var(--lab-text-lg);
+    margin-bottom: var(--lab-space-3);
+  }
+
+  .step-description {
+    margin-bottom: var(--lab-space-6);
+    font-size: var(--lab-text-sm);
+  }
+}
+
+/* Extra small mobile screens */
+@media (max-width: 360px) {
+  .reflection-progress {
+    padding: var(--lab-space-2);
+  }
+
+  /* progress-steps responsive styles are now handled in the main section above */
+
+  .scenario-reflection-modal .progress-step {
+    flex: 0 1 auto;
+    min-width: 60px;
+    margin-bottom: var(--lab-space-2);
+  }
+
+  /* progress-step connecting lines are now handled in the main section above */
+
+  .scenario-reflection-modal .step-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 0.5rem;
+  }
+
+  .scenario-reflection-modal .step-title {
+    font-size: 0.5625rem;
+    max-width: 50px; /* Slightly smaller for horizontal layout */
+    word-wrap: break-word;
+    text-align: center;
+    line-height: 1.1; /* Tighter line height for compact display */
+    margin-top: var(--lab-space-1); /* Small gap from icon */
+  }
+}
+
+/* ===== RESPONSIVE VISUALIZATIONS ===== */
+/* Mobile adjustments for charts and community data */
+@media (max-width: 768px) {
+  .community-bar-chart,
+  .impact-radar,
+  .community-stats-summary {
+    padding: var(--lab-space-4);
+    margin-bottom: var(--lab-space-6);
+  }
+
+  .choice-text {
+    font-size: var(--lab-text-sm);
+  }
+
+  .choice-percentage {
+    font-size: 0.625rem;
+  }
+
+  .choice-count {
+    font-size: var(--lab-text-xs);
+  }
+
+  .dimension-label {
+    min-width: 100px;
+    font-size: var(--lab-text-xs);
+  }
+
+  .dimension-value {
+    min-width: 40px;
+    font-size: var(--lab-text-xs);
+  }
+}
+
+@media (max-width: 480px) {
+  .community-bar-chart,
+  .impact-radar,
+  .community-stats-summary {
+    padding: var(--lab-space-3);
+    margin-bottom: var(--lab-space-4);
+  }
+
+  .choice-label {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--lab-space-2);
+  }
+
+  .your-choice-indicator {
+    align-self: flex-end;
+  }
+
+  .choice-text {
+    font-size: var(--lab-text-sm);
+    line-height: 1.4;
+  }
+
+  .impact-dimension {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--lab-space-2);
+  }
+
+  .dimension-label {
+    min-width: unset;
+    text-align: left;
+  }
+
+  .dimension-bar {
+    height: 16px;
+  }
+
+  .dimension-value {
+    min-width: unset;
+    text-align: center;
+    margin-top: var(--lab-space-1);
+  }
+}
+
+/* ===== RESPONSIVE CARDS AND RESEARCH ELEMENTS ===== */
+@media (max-width: 768px) {
+  .next-exploration,
+  .research-impact,
+  .reflection-section {
+    padding: var(--lab-space-6);
+    margin-top: var(--lab-space-6);
+  }
+
+  .research-stats {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--lab-space-3);
+  }
+
+  .research-stats .stat {
+    padding: var(--lab-space-3) var(--lab-space-4);
+    font-size: var(--lab-text-sm);
+  }
+
+  .scenario-suggestions {
+    gap: var(--lab-space-3);
+  }
+
+  .suggestion-card {
+    padding: var(--lab-space-4);
+  }
+
+  .suggestion-title {
+    font-size: var(--lab-text-base);
+  }
+
+  .suggestion-desc {
+    font-size: var(--lab-text-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .next-exploration,
+  .research-impact,
+  .reflection-section {
+    padding: var(--lab-space-4);
+    margin-top: var(--lab-space-4);
+  }
+
+  .next-exploration h4,
+  .research-impact h4,
+  .reflection-section h4 {
+    font-size: var(--lab-text-lg);
+    margin-bottom: var(--lab-space-4);
+  }
+
+  .research-stats {
+    gap: var(--lab-space-2);
+  }
+
+  .research-stats .stat {
+    padding: var(--lab-space-2) var(--lab-space-3);
+    font-size: var(--lab-text-xs);
+    width: 100%;
+    text-align: center;
+  }
+
+  .alternative-choice-analysis {
+    gap: var(--lab-space-4);
+  }
+
+  .alternative-option {
+    padding: var(--lab-space-4);
+  }
+
+  .alternative-option h5 {
+    font-size: var(--lab-text-base);
+    margin-bottom: var(--lab-space-3);
+  }
+
+  .alternative-text {
+    font-size: var(--lab-text-sm);
+    padding: var(--lab-space-3) var(--lab-space-4);
+  }
+
+  .what-if-question {
+    padding: var(--lab-space-4);
+  }
+
+  .impact-differences li {
+    font-size: var(--lab-text-sm);
+    padding: var(--lab-space-2);
+  }
 }
 
 .scenario-reflection-modal .modal-content {
@@ -124,7 +498,7 @@ body.dark-mode .scenario-reflection-modal,
   margin-bottom: var(--lab-space-6);
 }
 
-.progress-bar {
+.scenario-reflection-modal .progress-bar {
   width: 100%;
   height: 4px;
   background: var(--lab-gray);
@@ -133,28 +507,99 @@ body.dark-mode .scenario-reflection-modal,
   margin-bottom: var(--lab-space-2);
 }
 
-.progress-fill {
+.scenario-reflection-modal .progress-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--lab-accent), #1d4ed8);
   border-radius: 2px;
   transition: width 0.3s ease;
 }
 
-.progress-text {
+.scenario-reflection-modal .progress-text {
   font-size: var(--lab-text-sm);
   color: var(--lab-dark-gray);
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
 
-.progress-steps {
+.scenario-reflection-modal .progress-steps {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: var(--lab-space-4);
 }
 
-.progress-step {
+/* ===== ENHANCED RESPONSIVE PROGRESS STEPS ===== */
+/* Large tablet adjustments */
+@media (max-width: 1024px) {
+  .scenario-reflection-modal .progress-steps {
+    gap: var(--lab-space-3);
+  }
+}
+
+/* Medium tablet adjustments */
+@media (max-width: 768px) {
+  .scenario-reflection-modal .progress-steps {
+    gap: var(--lab-space-2);
+    /* Maintain horizontal layout but with tighter spacing */
+  }
+}
+
+/* Small tablet and large mobile */
+@media (max-width: 640px) {
+  .scenario-reflection-modal .progress-steps {
+    gap: var(--lab-space-1);
+    /* Consider vertical stacking if too crowded */
+  }
+
+  .scenario-reflection-modal .progress-step {
+    min-width: 0; /* Allow steps to shrink */
+    flex: 1;
+  }
+}
+
+/* Mobile landscape and portrait */
+@media (max-width: 480px) {
+  .scenario-reflection-modal .progress-steps {
+    gap: var(--lab-space-1);
+    /* Keep horizontal but very compact */
+    flex-wrap: nowrap; /* Prevent wrapping initially */
+    overflow-x: auto; /* Allow horizontal scroll if needed */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+
+  .scenario-reflection-modal .progress-step {
+    flex: 0 0 auto; /* Don't grow or shrink, maintain natural size */
+    min-width: 45px; /* Minimum touch target */
+  }
+}
+
+/* Very small mobile screens */
+@media (max-width: 360px) {
+  .scenario-reflection-modal .progress-steps {
+    /* Keep horizontal layout but with very compact spacing */
+    flex-direction: row; /* Keep icons next to each other */
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--lab-space-1);
+    overflow-x: auto; /* Allow horizontal scroll if needed */
+    -webkit-overflow-scrolling: touch;
+    padding: 0 var(--lab-space-1); /* Small padding for touch scroll */
+  }
+
+  .scenario-reflection-modal .progress-step {
+    flex: 0 0 auto; /* Don't grow or shrink */
+    min-width: 40px; /* Minimum width for touch targets */
+    max-width: 60px; /* Maximum width to ensure they fit */
+  }
+
+  .scenario-reflection-modal .progress-step:not(:last-child)::after {
+    /* Keep horizontal connecting lines but make them smaller */
+    top: 10px; /* Adjust for smaller step icons */
+    height: 1px; /* Thinner line */
+  }
+}
+
+.scenario-reflection-modal .progress-step {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -162,7 +607,7 @@ body.dark-mode .scenario-reflection-modal,
   position: relative;
 }
 
-.progress-step:not(:last-child)::after {
+.scenario-reflection-modal .progress-step:not(:last-child)::after {
   content: "";
   position: absolute;
   top: 15px;
@@ -173,11 +618,11 @@ body.dark-mode .scenario-reflection-modal,
   z-index: 0;
 }
 
-.progress-step.completed:not(:last-child)::after {
+.scenario-reflection-modal .progress-step.completed:not(:last-child)::after {
   background: var(--lab-accent);
 }
 
-.step-icon {
+.scenario-reflection-modal .step-icon {
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -194,18 +639,18 @@ body.dark-mode .scenario-reflection-modal,
   transition: all 0.2s ease;
 }
 
-.progress-step.completed .step-icon {
+.scenario-reflection-modal .progress-step.completed .step-icon {
   background: var(--lab-accent);
   color: white;
 }
 
-.progress-step.active .step-icon {
+.scenario-reflection-modal .progress-step.active .step-icon {
   background: var(--lab-accent);
   color: white;
   box-shadow: 0 0 0 3px var(--lab-accent-light);
 }
 
-.step-title {
+.scenario-reflection-modal .step-title {
   font-size: var(--lab-text-xs);
   color: var(--lab-charcoal);
   text-align: center;
@@ -213,8 +658,8 @@ body.dark-mode .scenario-reflection-modal,
   line-height: 1.3;
 }
 
-.progress-step.completed .step-title,
-.progress-step.active .step-title {
+.scenario-reflection-modal .progress-step.completed .step-title,
+.scenario-reflection-modal .progress-step.active .step-title {
   color: var(--lab-charcoal);
   font-weight: 600;
 }
@@ -1405,6 +1850,18 @@ body.dark-mode .scenario-reflection-modal,
 }
 
 /* ===== FOOTER - CLEAN NAVIGATION ===== */
+/* Modal footer container - ensure visibility across all viewports */
+.scenario-reflection-modal .modal-footer {
+  display: block !important;
+  position: relative;
+  flex-shrink: 0;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  min-height: auto;
+}
+
 .modal-footer-content {
   display: flex;
   justify-content: space-between;
@@ -1522,6 +1979,16 @@ body.dark-mode .scenario-reflection-modal,
 
   .step-title {
     display: none;
+  }
+
+  /* Ensure modal footer is always visible on mobile */
+  .scenario-reflection-modal .modal-footer {
+    display: block !important;
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    background: var(--lab-white);
+    border-top: 1px solid var(--lab-gray);
   }
 
   .modal-footer-content {
@@ -1723,6 +2190,24 @@ body.dark-mode .scenario-reflection-modal,
 
   .reflection-step-content {
     padding: var(--lab-space-3); /* Minimal padding for maximum content space */
+  }
+
+  /* Ensure footer stays visible on small phones */
+  .scenario-reflection-modal .modal-footer {
+    display: block !important;
+    position: sticky;
+    bottom: 0;
+    z-index: 15;
+    background: var(--lab-white);
+    border-top: 1px solid var(--lab-gray);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .modal-footer-content {
+    padding: var(--lab-space-3) var(--lab-space-4);
+    flex-direction: column;
+    gap: var(--lab-space-2);
+    align-items: center;
   }
 
   .insight-cards,
@@ -2071,6 +2556,8 @@ body.modal-open.reflection-modal-open .floating-tour-tab-link {
   background-color: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8px);
 }
+
+/* Responsive backdrop optimizations are handled above in the responsive section */
 
 /* Reset effects when modal is closed */
 body:not(.modal-open) .header,
