@@ -612,8 +612,10 @@ export class ScenarioReflectionModal {
       setTimeout(() => {
         this.setupEventHandlers();
         this.initializeCharts();
-        // Scroll to top of initial step
-        this.scrollToTopOfStep();
+        // Scroll to top of initial step - delay to ensure modal DOM is ready
+        setTimeout(() => {
+          this.scrollToTopOfStep();
+        }, 100);
       }, 0);
 
       if (this.performanceTracker) {
@@ -671,8 +673,10 @@ export class ScenarioReflectionModal {
       setTimeout(() => {
         this.setupEventHandlers();
         this.initializeCharts();
-        // Scroll to top of initial step
-        this.scrollToTopOfStep();
+        // Scroll to top of initial step - delay to ensure modal DOM is ready
+        setTimeout(() => {
+          this.scrollToTopOfStep();
+        }, 100);
       }, 0);
 
       // Track fallback initialization
@@ -1715,8 +1719,14 @@ export class ScenarioReflectionModal {
    */
   scrollToTopOfStep() {
     try {
-      // Find the scrollable content area
-      const contentElement = this.modal?.element?.querySelector(
+      // Only proceed if modal exists and is visible
+      if (!this.modal?.element) {
+        console.log("📜 Modal not ready, skipping scroll");
+        return;
+      }
+
+      // Find the scrollable content area within the modal
+      const contentElement = this.modal.element.querySelector(
         ".reflection-step-content",
       );
 
@@ -1732,7 +1742,7 @@ export class ScenarioReflectionModal {
           behavior: prefersReducedMotion ? "auto" : "smooth",
         });
 
-        console.log("📜 Scrolled to top of step content");
+        console.log("📜 Scrolled to top of step content within modal");
 
         // Optionally announce to screen readers that content has changed
         if (this.config?.accessibility?.announceStepChanges) {
@@ -1749,8 +1759,8 @@ export class ScenarioReflectionModal {
           }, ENTERPRISE_CONSTANTS.SCREEN_READER_DELAY);
         }
       } else {
-        console.warn(
-          "🚨 Could not find reflection-step-content element for scrolling",
+        console.log(
+          "� Could not find reflection-step-content element for scrolling - this is normal during initial load",
         );
       }
     } catch (error) {

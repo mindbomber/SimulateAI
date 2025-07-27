@@ -141,7 +141,8 @@ class ModalUtility {
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
       );
       if (firstFocusable) {
-        firstFocusable.focus();
+        // Prevent automatic scrolling when focusing the element
+        firstFocusable.focus({ preventScroll: true });
       }
     }, 100);
 

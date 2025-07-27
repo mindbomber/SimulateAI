@@ -907,7 +907,7 @@ class EnhancedBlogManager {
         "input, button, textarea, select",
       );
       if (firstFocusable) {
-        firstFocusable.focus();
+        firstFocusable.focus({ preventScroll: true });
       }
     }
   }

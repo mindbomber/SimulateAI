@@ -167,7 +167,7 @@ class FocusManager {
       typeof element.focus === "function"
     ) {
       try {
-        element.focus();
+        element.focus({ preventScroll: true });
         return true;
       } catch (error) {
         // Silent fail for focus restoration - avoid console.warn for linting
@@ -318,7 +318,7 @@ class FocusManager {
     // Check if focus is outside the container - bring it back
     if (!container.contains(currentElement)) {
       event.preventDefault();
-      firstElement.focus();
+      firstElement.focus({ preventScroll: true });
       return;
     }
 
@@ -326,13 +326,13 @@ class FocusManager {
       // Shift + Tab (backward)
       if (currentElement === firstElement) {
         event.preventDefault();
-        lastElement.focus();
+        lastElement.focus({ preventScroll: true });
       }
     } else {
       // Tab (forward)
       if (currentElement === lastElement) {
         event.preventDefault();
-        firstElement.focus();
+        firstElement.focus({ preventScroll: true });
       }
     }
   }
