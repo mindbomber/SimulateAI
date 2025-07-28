@@ -13,6 +13,8 @@
  * Organized for better maintainability and component organization.
  */
 
+@layer components {
+
 /* Import standardized media queries */
 @import url("./media.css");
 
@@ -1145,4 +1147,5 @@ body.dark-mode .floating-tour-tab.tour-unavailable {
    
    All floating tab related selectors are now consolidated into this single file
    for better maintainability and component organization.
-*/
+   =============================================== */
+} /* End @layer components */

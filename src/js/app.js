@@ -1741,11 +1741,13 @@ class SimulateAIApp {
       }
     }
 
-    // OPTIMIZED: Batch attribute and style changes
+    // OPTIMIZED: Batch attribute and style changes for enterprise error display
+    this._setElementAttributes(this.errorBoundary, {
+      "aria-hidden": "false",
+    });
     Object.assign(this.errorBoundary.style, {
       display: "flex",
     });
-    this.errorBoundary.setAttribute("aria-hidden", "false");
   }
 
   /**
@@ -1815,6 +1817,62 @@ class SimulateAIApp {
       });
     }
   }
+
+  /**
+   * Batch container setup for optimal performance
+   * @private
+   */
+  _batchContainerSetup(container, simulationTitle) {
+    // OPTIMIZED: Batch all container attribute and class changes
+    const attributes = {
+      "aria-busy": "true",
+      "aria-label": `Loading ${simulationTitle} simulation`,
+    };
+
+    // Use accessibility manager's setElementAttributes if available
+    if (
+      this.accessibilityManager &&
+      this.accessibilityManager.setElementAttributes
+    ) {
+      this.accessibilityManager.setElementAttributes(container, attributes);
+    } else {
+      // Fallback: batch set attributes manually
+      Object.entries(attributes).forEach(([key, value]) => {
+        container.setAttribute(key, value);
+      });
+    }
+
+    // Add loading class
+    container.classList.add("loading");
+  }
+
+  /**
+   * Utility method for batching element attribute updates
+   * @private
+   */
+  _setElementAttributes(element, attributes) {
+    if (
+      this.accessibilityManager &&
+      this.accessibilityManager.setElementAttributes
+    ) {
+      this.accessibilityManager.setElementAttributes(element, attributes);
+    } else {
+      // Fallback: batch set attributes manually
+      Object.entries(attributes).forEach(([key, value]) => {
+        element.setAttribute(key, value);
+      });
+    }
+  }
+
+  /**
+   * Utility method for batching style updates
+   * @private
+   */
+  _setElementStyles(element, styles) {
+    // Use Object.assign for optimal style batching
+    Object.assign(element.style, styles);
+  }
+
   initializeTheme() {
     // Detect system preferences
     const prefersReducedMotion = window.matchMedia?.(
@@ -2461,11 +2519,13 @@ class SimulateAIApp {
       }
     }
 
-    // OPTIMIZED: Batch attribute and style changes
+    // OPTIMIZED: Batch attribute and style changes for standard error display
+    this._setElementAttributes(this.errorBoundary, {
+      "aria-hidden": "false",
+    });
     Object.assign(this.errorBoundary.style, {
       display: "flex",
     });
-    this.errorBoundary.setAttribute("aria-hidden", "false");
   }
 
   /**
@@ -2473,11 +2533,13 @@ class SimulateAIApp {
    */
   hideError() {
     if (this.errorBoundary) {
-      // OPTIMIZED: Batch attribute and style changes
+      // OPTIMIZED: Batch attribute and style changes for error hiding
+      this._setElementAttributes(this.errorBoundary, {
+        "aria-hidden": "true",
+      });
       Object.assign(this.errorBoundary.style, {
         display: "none",
       });
-      this.errorBoundary.setAttribute("aria-hidden", "true");
     }
   }
 
@@ -3782,13 +3844,8 @@ class SimulateAIApp {
         throw new Error("Simulation container not found");
       }
 
-      // Add loading state to container
-      simulationContainer.classList.add("loading");
-      simulationContainer.setAttribute("aria-busy", "true");
-      simulationContainer.setAttribute(
-        "aria-label",
-        `Loading ${simConfig.title} simulation`,
-      );
+      // OPTIMIZED: Batch all container state changes
+      this._batchContainerSetup(simulationContainer, simConfig.title);
 
       // Clear previous content and remove any error states
       simulationContainer.innerHTML = "";
@@ -6288,28 +6345,32 @@ class SimulateAIApp {
       this.authService.updateAuthenticationUI(isAuthenticated, user);
     }
 
-    // Update any auth-dependent UI elements
+    // OPTIMIZED: Batch authentication UI updates for better performance
     const authButtons = document.querySelectorAll("[data-auth-required]");
     authButtons.forEach((button) => {
       if (isAuthenticated) {
+        this._setElementAttributes(button, { disabled: "false" });
         button.style.display = "";
-        button.disabled = false;
       } else {
+        this._setElementAttributes(button, { disabled: "true" });
         button.style.display = "none";
-        button.disabled = true;
       }
     });
 
-    // Update user-specific content
+    // OPTIMIZED: Batch user and guest content updates
     const userContent = document.querySelectorAll("[data-user-content]");
+    const guestContent = document.querySelectorAll("[data-guest-content]");
+
+    // Use DocumentFragment to batch DOM updates if many elements
+    const displayValue = isAuthenticated ? "" : "none";
+    const guestDisplayValue = isAuthenticated ? "none" : "";
+
     userContent.forEach((element) => {
-      element.style.display = isAuthenticated ? "" : "none";
+      element.style.display = displayValue;
     });
 
-    // Update guest content
-    const guestContent = document.querySelectorAll("[data-guest-content]");
     guestContent.forEach((element) => {
-      element.style.display = isAuthenticated ? "none" : "";
+      element.style.display = guestDisplayValue;
     });
 
     AppDebug.log(
@@ -6391,10 +6452,12 @@ function highlightChartChange(pattern) {
     clearTimeout(highlightChartChange.animationTimeout);
   }
 
-  // Add visual emphasis to show chart is updating
-  chartContainer.style.transition = "all 0.3s ease";
-  chartContainer.style.transform = "scale(1.02)";
-  chartContainer.style.boxShadow = "0 0 20px rgba(0, 123, 255, 0.5)";
+  // OPTIMIZED: Batch chart container style updates for better performance
+  Object.assign(chartContainer.style, {
+    transition: "all 0.3s ease",
+    transform: "scale(1.02)",
+    boxShadow: "0 0 20px rgba(0, 123, 255, 0.5)",
+  });
 
   // Reuse or create pattern label element to avoid repeated DOM creation
   let label = highlightChartChange.labelElement;
@@ -6436,8 +6499,11 @@ function highlightChartChange(pattern) {
 
   // Reset after animation with proper cleanup
   highlightChartChange.animationTimeout = setTimeout(() => {
-    chartContainer.style.transform = "scale(1)";
-    chartContainer.style.boxShadow = "none";
+    // OPTIMIZED: Batch reset style operations
+    Object.assign(chartContainer.style, {
+      transform: "scale(1)",
+      boxShadow: "none",
+    });
     if (label) {
       label.style.opacity = "0";
     }

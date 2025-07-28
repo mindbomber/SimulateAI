@@ -23,781 +23,892 @@
  * across all components for unified responsive behavior.
  */
 
-/* ===== CSS CUSTOM PROPERTIES FOR BREAKPOINTS ===== */
-:root {
-  /* Mobile Breakpoints */
-  --breakpoint-xs: 360px; /* Samsung Galaxy S21 */
-  --breakpoint-sm: 375px; /* iPhone SE */
-  --breakpoint-md: 390px; /* iPhone 12/13/14 */
-  --breakpoint-lg: 393px; /* Google Pixel 5 */
-  --breakpoint-xl: 428px; /* iPhone 12 Pro Max */
-
-  /* Tablet Breakpoints */
-  --breakpoint-tablet-sm: 768px; /* iPad Mini */
-  --breakpoint-tablet-md: 800px; /* Galaxy Tab S7+ */
-  --breakpoint-tablet-lg: 820px; /* iPad Air 5th Gen */
-  --breakpoint-tablet-xl: 1024px; /* iPad Pro 12.9" */
-
-  /* Laptop/Desktop Breakpoints */
-  --breakpoint-laptop-sm: 1280px; /* MacBook Air 13" */
-  --breakpoint-laptop-md: 1366px; /* Standard HD Laptop */
-  --breakpoint-laptop-lg: 1500px; /* Microsoft Surface Book */
-  --breakpoint-laptop-xl: 1536px; /* MacBook Pro 16" */
-
-  /* Ultra-wide Desktop */
-  --breakpoint-desktop-xl: 1920px; /* Full HD Desktop */
-  --breakpoint-desktop-2k: 2560px; /* 2K Desktop */
-  --breakpoint-desktop-4k: 3840px; /* 4K Desktop */
-}
-
-/* ===== MOBILE DEVICES ===== */
-
-/* Samsung Galaxy S21 (360×800) - Extra small mobile */
-@media only screen and (width >= 360px) and (width <= 374px) {
+@layer layout {
+  /* ===== CSS CUSTOM PROPERTIES FOR BREAKPOINTS ===== */
   :root {
-    --device-type: "mobile-xs";
-    --container-padding: 12px;
-    --font-scale: 0.85;
-    --touch-target-min: 44px;
-    --floating-tab-width: 200px;
-    --floating-tab-height: 48px;
-    --floating-tab-protrusion: 30px;
-  }
-}
+    /* Default fallback values for all viewports */
+    --container-padding: 16px; /* Safe default for any viewport */
+    --font-scale: 1; /* Standard scaling fallback */
+    --touch-target-min: 44px; /* Accessibility minimum */
+    --device-type: "unknown";
+    --device-category: "unknown";
 
-/* iPhone SE (375×667) - Small mobile */
-@media only screen and (width >= 375px) and (width <= 389px) {
-  :root {
-    --device-type: "mobile-sm";
-    --container-padding: 14px;
-    --font-scale: 0.9;
-    --touch-target-min: 44px;
-    --floating-tab-width: 210px;
-    --floating-tab-height: 50px;
-    --floating-tab-protrusion: 32px;
-  }
-}
+    /* Mobile Breakpoints */
+    --breakpoint-xs: 360px; /* Samsung Galaxy S21 */
+    --breakpoint-sm: 375px; /* iPhone SE */
+    --breakpoint-md: 390px; /* iPhone 12/13/14 */
+    --breakpoint-lg: 393px; /* Google Pixel 5 */
+    --breakpoint-xl: 428px; /* iPhone 12 Pro Max */
 
-/* iPhone 12/13/14 & Google Pixel 5 (390-393×844-851) - Modern mobile */
-@media only screen and (width >= 390px) and (width <= 399px) {
-  :root {
-    --device-type: "mobile-md";
-    --container-padding: 16px;
-    --font-scale: 0.95;
-    --touch-target-min: 44px;
-    --floating-tab-width: 220px;
-    --floating-tab-height: 52px;
-    --floating-tab-protrusion: 34px;
-  }
-}
+    /* Tablet Breakpoints */
+    --breakpoint-tablet-sm: 768px; /* iPad Mini */
+    --breakpoint-tablet-md: 800px; /* Galaxy Tab S7+ */
+    --breakpoint-tablet-lg: 820px; /* iPad Air 5th Gen */
+    --breakpoint-tablet-xl: 1024px; /* iPad Pro 12.9" */
 
-/* iPhone 12 Pro Max (428×926) - Large mobile */
-@media only screen and (width >= 400px) and (width <= 479px) {
-  :root {
-    --device-type: "mobile-lg";
-    --container-padding: 18px;
-    --font-scale: 1;
-    --touch-target-min: 44px;
-    --floating-tab-width: 240px;
-    --floating-tab-height: 54px;
-    --floating-tab-protrusion: 36px;
-  }
-}
+    /* Laptop/Desktop Breakpoints */
+    --breakpoint-laptop-sm: 1280px; /* MacBook Air 13" */
+    --breakpoint-laptop-md: 1366px; /* Standard HD Laptop */
+    --breakpoint-laptop-lg: 1500px; /* Microsoft Surface Book */
+    --breakpoint-laptop-xl: 1536px; /* MacBook Pro 16" */
 
-/* General mobile fallback (up to 767px) */
-@media only screen and (width <= 767px) {
-  :root {
-    --device-category: "mobile";
-    --layout-type: "single-column";
-    --nav-type: "bottom-nav";
-    --sidebar-behavior: "overlay";
-  }
-}
-
-/* ===== TABLET DEVICES ===== */
-
-/* iPad Mini & Samsung Galaxy Tab (768-820×1024-1280) - Small tablets */
-@media only screen and (width >= 768px) and (width <= 820px) {
-  :root {
-    --device-type: "tablet-sm";
-    --container-padding: 20px;
-    --font-scale: 1.05;
-    --touch-target-min: 44px;
-    --floating-tab-width: 260px;
-    --floating-tab-height: 58px;
-    --floating-tab-protrusion: 38px;
-  }
-}
-
-/* iPad Air 5th Gen & Large Tablets (821-1023×1180-1366) - Medium tablets */
-@media only screen and (width >= 821px) and (width <= 1023px) {
-  :root {
-    --device-type: "tablet-md";
-    --container-padding: 24px;
-    --font-scale: 1.1;
-    --touch-target-min: 44px;
-    --floating-tab-width: 270px;
-    --floating-tab-height: 59px;
-    --floating-tab-protrusion: 40px;
-  }
-}
-
-/* iPad Pro 12.9" (1024-1279×1366) - Large tablets */
-@media only screen and (width >= 1024px) and (width <= 1279px) {
-  :root {
-    --device-type: "tablet-lg";
-    --container-padding: 28px;
-    --font-scale: 1.15;
-    --touch-target-min: 44px;
-    --floating-tab-width: 280px;
-    --floating-tab-height: 60px;
-    --floating-tab-protrusion: 42px;
-  }
-}
-
-/* General tablet range */
-@media only screen and (width >= 768px) and (width <= 1279px) {
-  :root {
-    --device-category: "tablet";
-    --layout-type: "two-column";
-    --nav-type: "side-nav";
-    --sidebar-behavior: "collapse";
-  }
-}
-
-/* ===== LAPTOP DEVICES ===== */
-
-/* MacBook Air 13" & Standard HD (1280-1366×768-800) - Compact laptops */
-@media only screen and (width >= 1280px) and (width <= 1366px) {
-  :root {
-    --device-type: "laptop-sm";
-    --container-padding: 32px;
-    --font-scale: 1;
-    --touch-target-min: 40px;
-    --floating-tab-width: 300px;
-    --floating-tab-height: 62px;
-    --floating-tab-protrusion: 44px;
-  }
-}
-
-/* Microsoft Surface Book (1367-1535×1000) - Medium laptops */
-@media only screen and (width >= 1367px) and (width <= 1535px) {
-  :root {
-    --device-type: "laptop-md";
-    --container-padding: 36px;
-    --font-scale: 1.05;
-    --touch-target-min: 40px;
-    --floating-tab-width: 310px;
-    --floating-tab-height: 63px;
-    --floating-tab-protrusion: 46px;
-  }
-}
-
-/* MacBook Pro 16" (1536+×960+) - Large laptops */
-@media only screen and (width >= 1536px) and (width <= 1919px) {
-  :root {
-    --device-type: "laptop-lg";
-    --container-padding: 40px;
-    --font-scale: 1.1;
-    --touch-target-min: 40px;
-    --floating-tab-width: 320px;
-    --floating-tab-height: 64px;
-    --floating-tab-protrusion: 48px;
-  }
-}
-
-/* General laptop range */
-@media only screen and (width >= 1280px) and (width <= 1919px) {
-  :root {
-    --device-category: "laptop";
-    --layout-type: "multi-column";
-    --nav-type: "top-nav";
-    --sidebar-behavior: "persistent";
-  }
-}
-
-/* ===== DESKTOP DEVICES ===== */
-
-/* Full HD Desktop (1920-2559×1080+) */
-@media only screen and (width >= 1920px) and (width <= 2559px) {
-  :root {
-    --device-type: "desktop-fhd";
-    --container-padding: 48px;
-    --font-scale: 1.15;
-    --touch-target-min: 40px;
-    --floating-tab-width: 340px;
-    --floating-tab-height: 66px;
-    --floating-tab-protrusion: 50px;
-  }
-}
-
-/* 2K Desktop (2560-3839×1440+) */
-@media only screen and (width >= 2560px) and (width <= 3839px) {
-  :root {
-    --device-type: "desktop-2k";
-    --container-padding: 56px;
-    --font-scale: 1.25;
-    --touch-target-min: 40px;
-    --floating-tab-width: 360px;
-    --floating-tab-height: 68px;
-    --floating-tab-protrusion: 52px;
-  }
-}
-
-/* 4K Desktop (3840+×2160+) */
-@media only screen and (width >= 3840px) {
-  :root {
-    --device-type: "desktop-4k";
-    --container-padding: 64px;
-    --font-scale: 1.4;
-    --touch-target-min: 44px;
-    --floating-tab-width: 400px;
-    --floating-tab-height: 72px;
-    --floating-tab-protrusion: 54px;
-  }
-}
-
-/* General desktop range */
-@media only screen and (width >= 1920px) {
-  :root {
-    --device-category: "desktop";
-    --layout-type: "wide-multi-column";
-    --nav-type: "mega-nav";
-    --sidebar-behavior: "dual-sidebar";
-  }
-}
-
-/* ===== ORIENTATION-BASED ADJUSTMENTS ===== */
-
-/* Portrait orientation adjustments */
-@media only screen and (orientation: portrait) {
-  :root {
-    --orientation: "portrait";
-    --header-height: 80px;
-    --header-h: 80px;
-    --footer-height: 80px;
-  }
-}
-
-/* Landscape orientation adjustments */
-@media only screen and (orientation: landscape) {
-  :root {
-    --orientation: "landscape";
-    --header-height: 80px;
-    --header-h: 80px;
-    --footer-height: 64px;
-  }
-}
-
-/* ===== ACCESSIBILITY & PREFERENCE OVERRIDES ===== */
-
-/* High contrast mode */
-@media (prefers-contrast: high) {
-  :root {
-    --accessibility-mode: "high-contrast";
-    --border-width: 2px;
-    --focus-ring-width: 4px;
-  }
-}
-
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --animation-duration: 0ms;
-    --transition-duration: 0ms;
-    --accessibility-mode: "reduced-motion";
-  }
-}
-
-/* Increased text size preference */
-@media (prefers-reduced-data: reduce) {
-  :root {
-    --data-saver-mode: "enabled";
-    --image-quality: "low";
-    --animation-enabled: "false";
-  }
-}
-
-/* ===== PRINT STYLES ===== */
-@media print {
-  :root {
-    --device-type: "print";
-    --color-scheme: "light";
+    /* Ultra-wide Desktop */
+    --breakpoint-desktop-xl: 1920px; /* Full HD Desktop */
+    --breakpoint-desktop-2k: 2560px; /* 2K Desktop */
+    --breakpoint-desktop-4k: 3840px; /* 4K Desktop */
   }
 
-  /* Hide interactive elements in print */
-  .floating-tab-link,
-  .floating-tour-tab-link,
-  .floating-surprise-tab-link,
-  .floating-action-tab,
-  .floating-surprise-tab,
-  .floating-tour-tab,
-  nav,
-  .sidebar,
-  .modal,
-  .tooltip {
-    display: none !important;
-  }
-}
+  /* ===== MOBILE DEVICES ===== */
 
-/* ===== COMPONENT-SPECIFIC HELPER CLASSES ===== */
-
-/* Floating Tab Responsive Utilities */
-.floating-tab-responsive {
-  width: var(--floating-tab-width);
-  height: var(--floating-tab-height);
-  transform: translateX(calc(100% - var(--floating-tab-protrusion)));
-}
-
-/* Container Responsive Utilities */
-.container-responsive {
-  padding-left: var(--container-padding);
-  padding-right: var(--container-padding);
-}
-
-/* Font Scale Utilities */
-.text-responsive {
-  font-size: calc(1rem * var(--font-scale));
-}
-
-/* Touch Target Utilities */
-.touch-target {
-  min-height: var(--touch-target-min);
-  min-width: var(--touch-target-min);
-}
-
-/* ===== RESPONSIVE FLEXBOX UTILITIES ===== */
-
-/* Basic Flexbox */
-.flex {
-  display: flex;
-}
-
-.inline-flex {
-  display: inline-flex;
-}
-
-/* Flex Direction */
-.flex-row {
-  flex-direction: row;
-}
-
-.flex-col {
-  flex-direction: column;
-}
-
-.flex-row-reverse {
-  flex-direction: row-reverse;
-}
-
-.flex-col-reverse {
-  flex-direction: column-reverse;
-}
-
-/* Flex Wrap */
-.flex-wrap {
-  flex-wrap: wrap;
-}
-
-.flex-nowrap {
-  flex-wrap: nowrap;
-}
-
-.flex-wrap-reverse {
-  flex-wrap: wrap-reverse;
-}
-
-/* Justify Content */
-.justify-start {
-  justify-content: flex-start;
-}
-
-.justify-end {
-  justify-content: flex-end;
-}
-
-.justify-center {
-  justify-content: center;
-}
-
-.justify-between {
-  justify-content: space-between;
-}
-
-.justify-around {
-  justify-content: space-around;
-}
-
-.justify-evenly {
-  justify-content: space-evenly;
-}
-
-/* Align Items */
-.items-start {
-  align-items: flex-start;
-}
-
-.items-end {
-  align-items: flex-end;
-}
-
-.items-center {
-  align-items: center;
-}
-
-.items-baseline {
-  align-items: baseline;
-}
-
-.items-stretch {
-  align-items: stretch;
-}
-
-/* Align Content */
-.content-start {
-  align-content: flex-start;
-}
-
-.content-end {
-  align-content: flex-end;
-}
-
-.content-center {
-  align-content: center;
-}
-
-.content-between {
-  align-content: space-between;
-}
-
-.content-around {
-  align-content: space-around;
-}
-
-.content-evenly {
-  align-content: space-evenly;
-}
-
-/* Align Self */
-.self-auto {
-  align-self: auto;
-}
-
-.self-start {
-  align-self: flex-start;
-}
-
-.self-end {
-  align-self: flex-end;
-}
-
-.self-center {
-  align-self: center;
-}
-
-.self-stretch {
-  align-self: stretch;
-}
-
-.self-baseline {
-  align-self: baseline;
-}
-
-/* Flex Grow/Shrink */
-.flex-1 {
-  flex: 1 1 0%;
-}
-
-.flex-auto {
-  flex: 1 1 auto;
-}
-
-.flex-initial {
-  flex: 0 1 auto;
-}
-
-.flex-none {
-  flex: none;
-}
-
-.grow {
-  flex-grow: 1;
-}
-
-.grow-0 {
-  flex-grow: 0;
-}
-
-.shrink {
-  flex-shrink: 1;
-}
-
-.shrink-0 {
-  flex-shrink: 0;
-}
-
-/* Gap Utilities (responsive to container-padding) */
-.gap-xs {
-  gap: calc(var(--container-padding) * 0.25);
-}
-
-.gap-sm {
-  gap: calc(var(--container-padding) * 0.5);
-}
-
-.gap-md {
-  gap: var(--container-padding);
-}
-
-.gap-lg {
-  gap: calc(var(--container-padding) * 1.5);
-}
-
-.gap-xl {
-  gap: calc(var(--container-padding) * 2);
-}
-
-/* Responsive Flexbox - Mobile First */
-@media only screen and (width <= 767px) {
-  .mobile\:flex-col {
-    flex-direction: column;
+  /* Extra small viewports (under 360px) - Legacy or small devices */
+  @media only screen and (width <= 359px) {
+    :root {
+      --device-type: "mobile-xxs";
+      --container-padding: 8px; /* Minimal padding for very small screens */
+      --font-scale: 0.8; /* Smaller text scaling */
+      --touch-target-min: 44px; /* Maintain accessibility standards */
+      --floating-tab-width: 180px;
+      --floating-tab-height: 44px;
+      --floating-tab-protrusion: 24px;
+    }
   }
 
-  .mobile\:flex-wrap {
-    flex-wrap: wrap;
+  /* Samsung Galaxy S21 (360×800) - Extra small mobile */
+  @media only screen and (width >= 360px) and (width <= 374px) {
+    :root {
+      --device-type: "mobile-xs";
+      --container-padding: 12px;
+      --font-scale: 0.85;
+      --touch-target-min: 44px;
+      --floating-tab-width: 200px;
+      --floating-tab-height: 48px;
+      --floating-tab-protrusion: 30px;
+    }
   }
 
-  .mobile\:justify-center {
-    justify-content: center;
+  /* iPhone SE (375×667) - Small mobile */
+  @media only screen and (width >= 375px) and (width <= 389px) {
+    :root {
+      --device-type: "mobile-sm";
+      --container-padding: 14px;
+      --font-scale: 0.9;
+      --touch-target-min: 44px;
+      --floating-tab-width: 210px;
+      --floating-tab-height: 50px;
+      --floating-tab-protrusion: 32px;
+    }
   }
 
-  .mobile\:items-center {
-    align-items: center;
-  }
-}
-
-/* Responsive Flexbox - Tablet */
-@media only screen and (width >= 768px) and (width <= 1279px) {
-  .tablet\:flex-row {
-    flex-direction: row;
-  }
-
-  .tablet\:justify-between {
-    justify-content: space-between;
-  }
-}
-
-/* Responsive Flexbox - Desktop */
-@media only screen and (width >= 1280px) {
-  .desktop\:flex-row {
-    flex-direction: row;
+  /* iPhone 12/13/14 & Google Pixel 5 (390-393×844-851) - Modern mobile */
+  @media only screen and (width >= 390px) and (width <= 399px) {
+    :root {
+      --device-type: "mobile-md";
+      --container-padding: 16px;
+      --font-scale: 0.95;
+      --touch-target-min: 44px;
+      --floating-tab-width: 220px;
+      --floating-tab-height: 52px;
+      --floating-tab-protrusion: 34px;
+    }
   }
 
-  .desktop\:justify-start {
-    justify-content: flex-start;
-  }
-}
-
-/* ===== COMMON COMPONENT RESPONSIVE UTILITIES ===== */
-
-/* Most Frequently Used Breakpoint Classes */
-.mobile-hide {
-  display: block;
-}
-
-.mobile-show {
-  display: none;
-}
-
-.tablet-hide {
-  display: block;
-}
-
-.tablet-show {
-  display: none;
-}
-
-.desktop-hide {
-  display: block;
-}
-
-.desktop-show {
-  display: none;
-}
-
-/* Apply responsive visibility classes */
-@media only screen and (width <= 767px) {
-  .mobile-hide {
-    display: none !important;
+  /* iPhone 12 Pro Max (428×926) - Large mobile */
+  @media only screen and (width >= 400px) and (width <= 479px) {
+    :root {
+      --device-type: "mobile-lg";
+      --container-padding: 18px;
+      --font-scale: 1;
+      --touch-target-min: 44px;
+      --floating-tab-width: 240px;
+      --floating-tab-height: 54px;
+      --floating-tab-protrusion: 36px;
+    }
   }
 
-  .mobile-show {
-    display: block !important;
+  /* General mobile fallback (up to 767px) */
+  @media only screen and (width <= 767px) {
+    :root {
+      --device-category: "mobile";
+      --layout-type: "single-column";
+      --nav-type: "bottom-nav";
+      --sidebar-behavior: "overlay";
+    }
   }
 
-  /* Common mobile adjustments */
-  .mobile\:text-center {
-    text-align: center;
+  /* ===== TABLET DEVICES ===== */
+
+  /* iPad Mini & Samsung Galaxy Tab (768-820×1024-1280) - Small tablets */
+  @media only screen and (width >= 768px) and (width <= 820px) {
+    :root {
+      --device-type: "tablet-sm";
+      --container-padding: 20px;
+      --font-scale: 1.05;
+      --touch-target-min: 44px;
+      --floating-tab-width: 260px;
+      --floating-tab-height: 58px;
+      --floating-tab-protrusion: 38px;
+    }
   }
 
-  .mobile\:full-width {
+  /* iPad Air 5th Gen & Large Tablets (821-1023×1180-1366) - Medium tablets */
+  @media only screen and (width >= 821px) and (width <= 1023px) {
+    :root {
+      --device-type: "tablet-md";
+      --container-padding: 24px;
+      --font-scale: 1.1;
+      --touch-target-min: 44px;
+      --floating-tab-width: 270px;
+      --floating-tab-height: 59px;
+      --floating-tab-protrusion: 40px;
+    }
+  }
+
+  /* iPad Pro 12.9" (1024-1279×1366) - Large tablets */
+  @media only screen and (width >= 1024px) and (width <= 1279px) {
+    :root {
+      --device-type: "tablet-lg";
+      --container-padding: 28px;
+      --font-scale: 1.15;
+      --touch-target-min: 44px;
+      --floating-tab-width: 280px;
+      --floating-tab-height: 60px;
+      --floating-tab-protrusion: 42px;
+    }
+  }
+
+  /* General tablet range */
+  @media only screen and (width >= 768px) and (width <= 1279px) {
+    :root {
+      --device-category: "tablet";
+      --layout-type: "two-column";
+      --nav-type: "side-nav";
+      --sidebar-behavior: "collapse";
+    }
+  }
+
+  /* ===== LAPTOP DEVICES ===== */
+
+  /* MacBook Air 13" & Standard HD (1280-1366×768-800) - Compact laptops */
+  @media only screen and (width >= 1280px) and (width <= 1366px) {
+    :root {
+      --device-type: "laptop-sm";
+      --container-padding: 32px;
+      --font-scale: 1;
+      --touch-target-min: 40px;
+      --floating-tab-width: 300px;
+      --floating-tab-height: 62px;
+      --floating-tab-protrusion: 44px;
+    }
+  }
+
+  /* Microsoft Surface Book (1367-1535×1000) - Medium laptops */
+  @media only screen and (width >= 1367px) and (width <= 1535px) {
+    :root {
+      --device-type: "laptop-md";
+      --container-padding: 36px;
+      --font-scale: 1.05;
+      --touch-target-min: 40px;
+      --floating-tab-width: 310px;
+      --floating-tab-height: 63px;
+      --floating-tab-protrusion: 46px;
+    }
+  }
+
+  /* MacBook Pro 16" (1536+×960+) - Large laptops */
+  @media only screen and (width >= 1536px) and (width <= 1919px) {
+    :root {
+      --device-type: "laptop-lg";
+      --container-padding: 40px;
+      --font-scale: 1.1;
+      --touch-target-min: 40px;
+      --floating-tab-width: 320px;
+      --floating-tab-height: 64px;
+      --floating-tab-protrusion: 48px;
+    }
+  }
+
+  /* General laptop range */
+  @media only screen and (width >= 1280px) and (width <= 1919px) {
+    :root {
+      --device-category: "laptop";
+      --layout-type: "multi-column";
+      --nav-type: "top-nav";
+      --sidebar-behavior: "persistent";
+    }
+  }
+
+  /* ===== DESKTOP DEVICES ===== */
+
+  /* Full HD Desktop (1920-2559×1080+) */
+  @media only screen and (width >= 1920px) and (width <= 2559px) {
+    :root {
+      --device-type: "desktop-fhd";
+      --container-padding: 48px;
+      --font-scale: 1.15;
+      --touch-target-min: 40px;
+      --floating-tab-width: 340px;
+      --floating-tab-height: 66px;
+      --floating-tab-protrusion: 50px;
+    }
+  }
+
+  /* 2K Desktop (2560-3839×1440+) */
+  @media only screen and (width >= 2560px) and (width <= 3839px) {
+    :root {
+      --device-type: "desktop-2k";
+      --container-padding: 56px;
+      --font-scale: 1.25;
+      --touch-target-min: 40px;
+      --floating-tab-width: 360px;
+      --floating-tab-height: 68px;
+      --floating-tab-protrusion: 52px;
+    }
+  }
+
+  /* 4K Desktop (3840+×2160+) */
+  @media only screen and (width >= 3840px) {
+    :root {
+      --device-type: "desktop-4k";
+      --container-padding: 64px;
+      --font-scale: 1.4;
+      --touch-target-min: 44px;
+      --floating-tab-width: 400px;
+      --floating-tab-height: 72px;
+      --floating-tab-protrusion: 54px;
+    }
+  }
+
+  /* General desktop range */
+  @media only screen and (width >= 1920px) {
+    :root {
+      --device-category: "desktop";
+      --layout-type: "wide-multi-column";
+      --nav-type: "mega-nav";
+      --sidebar-behavior: "dual-sidebar";
+    }
+  }
+
+  /* ===== ORIENTATION-BASED ADJUSTMENTS ===== */
+
+  /* Portrait orientation adjustments */
+  @media only screen and (orientation: portrait) {
+    :root {
+      --orientation: "portrait";
+      --header-height: 80px;
+      --header-h: 80px;
+      --footer-height: 80px;
+    }
+  }
+
+  /* Landscape orientation adjustments */
+  @media only screen and (orientation: landscape) {
+    :root {
+      --orientation: "landscape";
+      --header-height: 80px;
+      --header-h: 80px;
+      --footer-height: 64px;
+    }
+  }
+
+  /* ===== ACCESSIBILITY & PREFERENCE OVERRIDES ===== */
+
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    :root {
+      --accessibility-mode: "high-contrast";
+      --border-width: 2px;
+      --focus-ring-width: 4px;
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --animation-duration: 0ms;
+      --transition-duration: 0ms;
+      --accessibility-mode: "reduced-motion";
+    }
+  }
+
+  /* Increased text size preference */
+  @media (prefers-reduced-data: reduce) {
+    :root {
+      --data-saver-mode: "enabled";
+      --image-quality: "low";
+      --animation-enabled: "false";
+    }
+  }
+
+  /* ===== PRINT STYLES ===== */
+  @media print {
+    :root {
+      --device-type: "print";
+      --color-scheme: "light";
+    }
+
+    /* Hide interactive elements in print */
+    .floating-tab-link,
+    .floating-tour-tab-link,
+    .floating-surprise-tab-link,
+    .floating-action-tab,
+    .floating-surprise-tab,
+    .floating-tour-tab,
+    nav,
+    .sidebar,
+    .modal,
+    .tooltip {
+      display: none !important;
+    }
+  }
+
+  /* ===== COMPONENT-SPECIFIC HELPER CLASSES ===== */
+
+  /* Floating Tab Responsive Utilities */
+  .floating-tab-responsive {
+    width: var(--floating-tab-width);
+    height: var(--floating-tab-height);
+    transform: translateX(calc(100% - var(--floating-tab-protrusion)));
+  }
+
+  /* Container Responsive Utilities */
+  .container-responsive {
+    padding-left: var(--container-padding);
+    padding-right: var(--container-padding);
+    /* Enhanced responsiveness for container spacing */
+    max-width: 100vw; /* Prevent horizontal overflow */
+    box-sizing: border-box; /* Include padding in width calculations */
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Hero-specific responsive enhancements */
+  .hero.container-responsive {
+    /* Ensure hero section adapts to all viewport sizes */
+    padding: calc(var(--container-padding) * 1.5) var(--container-padding);
+    /* Minimum padding for very small screens */
+    padding: max(calc(var(--container-padding) * 1.5), 12px)
+      max(var(--container-padding), 8px);
+    /* Responsive typography scaling */
+    font-size: calc(1rem * var(--font-scale));
+    /* Prevent content overflow */
+    overflow-x: hidden;
     width: 100%;
   }
 
-  .mobile\:padding-sm {
-    padding: var(--spacing-3);
+  /* Additional responsive container variants */
+  .container-responsive-tight {
+    padding-left: calc(var(--container-padding) * 0.75);
+    padding-right: calc(var(--container-padding) * 0.75);
   }
 
-  .mobile\:margin-auto {
-    margin: 0 auto;
+  .container-responsive-loose {
+    padding-left: calc(var(--container-padding) * 1.5);
+    padding-right: calc(var(--container-padding) * 1.5);
   }
-}
 
-@media only screen and (width >= 768px) and (width <= 1279px) {
+  /* Font Scale Utilities */
+  .text-responsive {
+    font-size: calc(1rem * var(--font-scale));
+  }
+
+  /* Enhanced responsive text utilities */
+  .text-responsive-small {
+    font-size: calc(0.875rem * var(--font-scale)); /* 14px base */
+  }
+
+  .text-responsive-large {
+    font-size: calc(1.125rem * var(--font-scale)); /* 18px base */
+  }
+
+  .text-responsive-heading {
+    font-size: calc(1.5rem * var(--font-scale)); /* 24px base */
+    line-height: calc(1.2 * var(--font-scale, 1));
+  }
+
+  /* Small viewport text optimization */
+  @media only screen and (width <= 360px) {
+    .text-responsive-heading {
+      font-size: calc(
+        1.25rem * var(--font-scale)
+      ); /* Smaller headings on tiny screens */
+    }
+
+    .hero.container-responsive .text-responsive-heading {
+      font-size: calc(
+        1.375rem * var(--font-scale)
+      ); /* Hero headings slightly larger */
+    }
+  }
+
+  /* Touch Target Utilities */
+  .touch-target {
+    min-height: var(--touch-target-min);
+    min-width: var(--touch-target-min);
+  }
+
+  /* ===== RESPONSIVE FLEXBOX UTILITIES ===== */
+
+  /* Basic Flexbox */
+  .flex {
+    display: flex;
+  }
+
+  .inline-flex {
+    display: inline-flex;
+  }
+
+  /* Flex Direction */
+  .flex-row {
+    flex-direction: row;
+  }
+
+  .flex-col {
+    flex-direction: column;
+  }
+
+  .flex-row-reverse {
+    flex-direction: row-reverse;
+  }
+
+  .flex-col-reverse {
+    flex-direction: column-reverse;
+  }
+
+  /* Flex Wrap */
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
+
+  .flex-nowrap {
+    flex-wrap: nowrap;
+  }
+
+  .flex-wrap-reverse {
+    flex-wrap: wrap-reverse;
+  }
+
+  /* Justify Content */
+  .justify-start {
+    justify-content: flex-start;
+  }
+
+  .justify-end {
+    justify-content: flex-end;
+  }
+
+  .justify-center {
+    justify-content: center;
+  }
+
+  .justify-between {
+    justify-content: space-between;
+  }
+
+  .justify-around {
+    justify-content: space-around;
+  }
+
+  .justify-evenly {
+    justify-content: space-evenly;
+  }
+
+  /* Align Items */
+  .items-start {
+    align-items: flex-start;
+  }
+
+  .items-end {
+    align-items: flex-end;
+  }
+
+  .items-center {
+    align-items: center;
+  }
+
+  .items-baseline {
+    align-items: baseline;
+  }
+
+  .items-stretch {
+    align-items: stretch;
+  }
+
+  /* Align Content */
+  .content-start {
+    align-content: flex-start;
+  }
+
+  .content-end {
+    align-content: flex-end;
+  }
+
+  .content-center {
+    align-content: center;
+  }
+
+  .content-between {
+    align-content: space-between;
+  }
+
+  .content-around {
+    align-content: space-around;
+  }
+
+  .content-evenly {
+    align-content: space-evenly;
+  }
+
+  /* Align Self */
+  .self-auto {
+    align-self: auto;
+  }
+
+  .self-start {
+    align-self: flex-start;
+  }
+
+  .self-end {
+    align-self: flex-end;
+  }
+
+  .self-center {
+    align-self: center;
+  }
+
+  .self-stretch {
+    align-self: stretch;
+  }
+
+  .self-baseline {
+    align-self: baseline;
+  }
+
+  /* Flex Grow/Shrink */
+  .flex-1 {
+    flex: 1 1 0%;
+  }
+
+  .flex-auto {
+    flex: 1 1 auto;
+  }
+
+  .flex-initial {
+    flex: 0 1 auto;
+  }
+
+  .flex-none {
+    flex: none;
+  }
+
+  .grow {
+    flex-grow: 1;
+  }
+
+  .grow-0 {
+    flex-grow: 0;
+  }
+
+  .shrink {
+    flex-shrink: 1;
+  }
+
+  .shrink-0 {
+    flex-shrink: 0;
+  }
+
+  /* Gap Utilities (responsive to container-padding) */
+  .gap-xs {
+    gap: calc(var(--container-padding) * 0.25);
+  }
+
+  .gap-sm {
+    gap: calc(var(--container-padding) * 0.5);
+  }
+
+  .gap-md {
+    gap: var(--container-padding);
+  }
+
+  .gap-lg {
+    gap: calc(var(--container-padding) * 1.5);
+  }
+
+  .gap-xl {
+    gap: calc(var(--container-padding) * 2);
+  }
+
+  /* Responsive Flexbox - Mobile First */
+  @media only screen and (width <= 767px) {
+    .mobile\:flex-col {
+      flex-direction: column;
+    }
+
+    .mobile\:flex-wrap {
+      flex-wrap: wrap;
+    }
+
+    .mobile\:justify-center {
+      justify-content: center;
+    }
+
+    .mobile\:items-center {
+      align-items: center;
+    }
+  }
+
+  /* Responsive Flexbox - Tablet */
+  @media only screen and (width >= 768px) and (width <= 1279px) {
+    .tablet\:flex-row {
+      flex-direction: row;
+    }
+
+    .tablet\:justify-between {
+      justify-content: space-between;
+    }
+  }
+
+  /* Responsive Flexbox - Desktop */
+  @media only screen and (width >= 1280px) {
+    .desktop\:flex-row {
+      flex-direction: row;
+    }
+
+    .desktop\:justify-start {
+      justify-content: flex-start;
+    }
+  }
+
+  /* ===== COMMON COMPONENT RESPONSIVE UTILITIES ===== */
+
+  /* Most Frequently Used Breakpoint Classes */
+  .mobile-hide {
+    display: block;
+  }
+
+  .mobile-show {
+    display: none;
+  }
+
   .tablet-hide {
-    display: none !important;
+    display: block;
   }
 
   .tablet-show {
-    display: block !important;
+    display: none;
   }
 
-  /* Common tablet adjustments */
-  .tablet\:two-column {
-    column-count: 2;
-    column-gap: var(--spacing-6);
-  }
-}
-
-@media only screen and (width >= 1280px) {
   .desktop-hide {
-    display: none !important;
+    display: block;
   }
 
   .desktop-show {
-    display: block !important;
+    display: none;
   }
 
-  /* Common desktop adjustments */
-  .desktop\:three-column {
-    column-count: 3;
-    column-gap: var(--spacing-8);
-  }
-}
+  /* Apply responsive visibility classes */
+  @media only screen and (width <= 767px) {
+    .mobile-hide {
+      display: none !important;
+    }
 
-/* ===== FREQUENTLY USED ACCESSIBILITY UTILITIES ===== */
+    .mobile-show {
+      display: block !important;
+    }
 
-/* Reduced motion utilities */
-@media (prefers-reduced-motion: reduce) {
-  .respect-motion {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+    /* Common mobile adjustments */
+    .mobile\:text-center {
+      text-align: center;
+    }
 
-  .no-motion {
-    animation: none !important;
-    transition: none !important;
-  }
-}
+    .mobile\:full-width {
+      width: 100%;
+    }
 
-/* High contrast utilities */
-@media (prefers-contrast: high) {
-  .high-contrast-border {
-    border: 2px solid currentColor !important;
+    .mobile\:padding-sm {
+      padding: var(--spacing-3);
+    }
+
+    .mobile\:margin-auto {
+      margin: 0 auto;
+    }
   }
 
-  .high-contrast-text {
-    color: CanvasText !important;
-    background: Canvas !important;
+  @media only screen and (width >= 768px) and (width <= 1279px) {
+    .tablet-hide {
+      display: none !important;
+    }
+
+    .tablet-show {
+      display: block !important;
+    }
+
+    /* Common tablet adjustments */
+    .tablet\:two-column {
+      column-count: 2;
+      column-gap: var(--spacing-6);
+    }
   }
 
-  .high-contrast-focus:focus {
-    outline: 3px solid Highlight !important;
-    outline-offset: 2px !important;
-  }
-}
+  @media only screen and (width >= 1280px) {
+    .desktop-hide {
+      display: none !important;
+    }
 
-/* Dark mode preference utilities */
-@media (prefers-color-scheme: dark) {
-  .auto-dark-bg {
-    background: #1a1a1a;
-    color: #ffffff;
-  }
+    .desktop-show {
+      display: block !important;
+    }
 
-  .auto-dark-border {
-    border-color: #404040;
-  }
-}
-
-/* Print utilities */
-@media print {
-  .print-hide {
-    display: none !important;
+    /* Common desktop adjustments */
+    .desktop\:three-column {
+      column-count: 3;
+      column-gap: var(--spacing-8);
+    }
   }
 
-  .print-show {
-    display: block !important;
+  /* ===== FREQUENTLY USED ACCESSIBILITY UTILITIES ===== */
+
+  /* Reduced motion utilities */
+  @media (prefers-reduced-motion: reduce) {
+    .respect-motion {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+
+    .no-motion {
+      animation: none !important;
+      transition: none !important;
+    }
   }
 
-  .print-page-break {
-    page-break-after: always;
+  /* High contrast utilities */
+  @media (prefers-contrast: high) {
+    .high-contrast-border {
+      border: 2px solid currentColor !important;
+    }
+
+    .high-contrast-text {
+      color: CanvasText !important;
+      background: Canvas !important;
+    }
+
+    .high-contrast-focus:focus {
+      outline: 3px solid Highlight !important;
+      outline-offset: 2px !important;
+    }
   }
 
-  .print-no-break {
-    page-break-inside: avoid;
+  /* Dark mode preference utilities */
+  @media (prefers-color-scheme: dark) {
+    .auto-dark-bg {
+      background: #1a1a1a;
+      color: #ffffff;
+    }
+
+    .auto-dark-border {
+      border-color: #404040;
+    }
   }
 
-  .print-black-text {
-    color: black !important;
+  /* Print utilities */
+  @media print {
+    .print-hide {
+      display: none !important;
+    }
+
+    .print-show {
+      display: block !important;
+    }
+
+    .print-page-break {
+      page-break-after: always;
+    }
+
+    .print-no-break {
+      page-break-inside: avoid;
+    }
+
+    .print-black-text {
+      color: black !important;
+    }
+
+    .print-white-bg {
+      background: white !important;
+    }
   }
 
-  .print-white-bg {
-    background: white !important;
+  /* Touch device utilities */
+  @media (hover: none) and (pointer: coarse) {
+    .touch-larger {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    .touch-spacing {
+      margin: 8px;
+    }
+
+    .touch-no-hover:hover {
+      /* Reset hover states on touch devices */
+      background: initial;
+      transform: none;
+      box-shadow: initial;
+    }
   }
-}
 
-/* Touch device utilities */
-@media (hover: none) and (pointer: coarse) {
-  .touch-larger {
-    min-height: 44px;
-    min-width: 44px;
+  /* ===== SMALL VIEWPORT SPECIFIC FIXES ===== */
+
+  /* Enhanced mobile support for very small screens */
+  @media only screen and (width <= 320px) {
+    .container-responsive {
+      /* Ultra-minimal padding for tiny screens */
+      padding-left: 6px;
+      padding-right: 6px;
+    }
+
+    .hero.container-responsive {
+      /* Reduce hero padding on tiny screens */
+      padding: 8px 6px;
+      min-height: 280px; /* Smaller minimum height */
+    }
+
+    .container-responsive-tight {
+      padding-left: 4px;
+      padding-right: 4px;
+    }
   }
 
-  .touch-spacing {
-    margin: 8px;
+  /* Landscape mobile adjustments */
+  @media only screen and (width <= 667px) and (orientation: landscape) {
+    .hero.container-responsive {
+      /* Adjust hero for landscape mobile */
+      padding: var(--container-padding) calc(var(--container-padding) * 1.25);
+      min-height: 200px; /* Smaller height in landscape */
+    }
   }
 
-  .touch-no-hover:hover {
-    /* Reset hover states on touch devices */
-    background: initial;
-    transform: none;
-    box-shadow: initial;
+  /* ===== DEBUGGING UTILITIES (Remove in production) ===== */
+  @media (width >= 1px) {
+    .debug-viewport::before {
+      content: "Device: " var(--device-type, "unknown") " | Category: "
+        var(--device-category, "unknown");
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: rgb(255 0 0 / 80%);
+      color: white;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-family: monospace;
+      z-index: 9999;
+      pointer-events: none;
+    }
   }
-}
 
-/* ===== DEBUGGING UTILITIES (Remove in production) ===== */
-@media (width >= 1px) {
-  .debug-viewport::before {
-    content: "Device: " var(--device-type, "unknown") " | Category: "
-      var(--device-category, "unknown");
-    position: fixed;
-    top: 0;
-    left: 0;
-    background: rgb(255 0 0 / 80%);
-    color: white;
-    padding: 4px 8px;
-    font-size: 12px;
-    font-family: monospace;
-    z-index: 9999;
-    pointer-events: none;
-  }
-}
+  /* ===== MEDIA QUERY CONSOLIDATION SUMMARY ===== */
 
-/* ===== MEDIA QUERY CONSOLIDATION SUMMARY ===== */
-
-/**
+  /**
  * CONSOLIDATION COMPLETED FOR:
  * 
  * ✅ category-grid.css (Phase 1) - Removed 4 duplicate media query blocks:
@@ -883,3 +994,4 @@
  *    
  * 🎯 PHASE 7 COMPLETE: scenario-card.css enhanced responsive design - .scenario-card now uses CSS variables for device-appropriate scaling!
  */
+} /* End @layer layout */

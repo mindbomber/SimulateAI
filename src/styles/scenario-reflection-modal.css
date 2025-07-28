@@ -2561,24 +2561,9 @@ body.modal-open.reflection-modal-open .floating-tour-tab-link {
 
 /* Responsive backdrop optimizations are handled above in the responsive section */
 
-/* Reset effects when modal is closed */
-body:not(.modal-open) header.header,
-body:not(.modal-open) .main-nav,
-body:not(.modal-open) .nav-container {
-  opacity: 1;
-  filter: none;
-  transition: all 0.3s ease;
-}
-
-/* Reset visual effects for floating tabs when modal is closed, but preserve their individual pointer-events settings */
-body:not(.modal-open) .floating-action-tab-link,
-body:not(.modal-open) .floating-surprise-tab-link,
-body:not(.modal-open) .floating-tour-tab-link {
-  opacity: 1;
-  filter: none;
-  transition: all 0.3s ease;
-  /* Don't override pointer-events - let each tab's CSS handle this correctly */
-}
+/* Note: Reset styles removed to prevent interference with shared navigation CSS.
+   Modal effects are only applied when the modal is open via the rules above.
+   When the modal closes, normal CSS specificity and cascade will restore default styles. */
 
 @media (prefers-contrast: high) {
   :root {

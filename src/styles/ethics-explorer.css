@@ -6,882 +6,884 @@
  * This file now contains only ethics-explorer specific UI components
  */
 
-/* Main Layout */
-.ethics-explorer-layout {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-}
-
-.explorer-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 2rem;
-  text-align: center;
-  box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
-}
-
-.header-content {
-  margin-bottom: 1.5rem;
-}
-
-.explorer-header h1 {
-  margin: 0 0 0.5rem;
-  font-size: 2.5rem;
-  font-weight: 700;
-}
-
-.explorer-subtitle {
-  margin: 0;
-  font-size: 1.2rem;
-  opacity: 0.9;
-}
-
-/* Game Progress Bar */
-.game-progress {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.progress-stats {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin-bottom: 1rem;
-}
-
-.stat-item {
-  text-align: center;
-  background: rgb(255 255 255 / 10%);
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  backdrop-filter: blur(10px);
-  min-width: 80px;
-}
-
-.stat-value {
-  display: block;
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #fff;
-}
-
-.stat-label {
-  display: block;
-  font-size: 0.85rem;
-  opacity: 0.8;
-  margin-top: 0.25rem;
-}
-
-.progress-bar {
-  background: rgb(255 255 255 / 20%);
-  height: 8px;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  background: linear-gradient(90deg, #10b981, #34d399);
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.5s ease;
-  box-shadow: 0 0 10px rgb(16 185 129 / 50%);
-}
-
-.explorer-main {
-  display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 1.5rem;
-  padding: 1.5rem;
-  flex: 1;
-  overflow: visible;
-  height: calc(100% - 120px);
-}
-
-/* Scenario Area */
-.scenario-area {
-  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
-  border-radius: 16px;
-  padding: 0;
-  box-shadow:
-    0 8px 32px rgb(0 0 0 / 8%),
-    0 0 0 1px rgb(255 255 255 / 50%);
-  overflow-y: auto;
-  height: 100%;
-  position: relative;
-  transition: all 0.3s ease;
-}
-
-.scenario-area:hover {
-  box-shadow:
-    0 12px 40px rgb(0 0 0 / 12%),
-    0 0 0 1px rgb(255 255 255 / 80%);
-}
-
-.scenario-area::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
-  border-radius: 16px 16px 0 0;
-  animation: progress-pulse 3s ease-in-out infinite;
-}
-
-@keyframes progress-pulse {
-  0%,
-  100% {
-    opacity: 0.8;
-  }
-
-  50% {
-    opacity: 1;
-  }
-}
-
-.scenario-selection,
-.scenario-exploration,
-.comparison-view,
-.final-celebration {
-  padding: 2rem;
-  position: relative;
-}
-
-/* Scenario Selection */
-.selection-header {
-  text-align: center;
-  margin-bottom: 3rem;
-  position: relative;
-}
-
-.selection-header::after {
-  content: "";
-  position: absolute;
-  bottom: -1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
-  border-radius: 2px;
-}
-
-.scenario-selection h2 {
-  color: #2d3748;
-  margin-bottom: 1rem;
-  font-size: 2rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.selection-subtitle {
-  color: #718096;
-  font-size: 1.1rem;
-  line-height: 1.6;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-/* ===== ETHICS EXPLORER SPECIFIC CARD COMPONENTS ===== */
-/* NOTE: Base .scenario-card styles are in scenario-browser.css under .ethics-explorer .scenario-card */
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 1rem 1.5rem 0;
-}
-
-.scenario-icon {
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
-  filter: grayscale(0.2);
-}
-
-.difficulty-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: #667eea;
-  background: rgb(102 126 234 / 10%);
-  border: 1px solid rgb(102 126 234 / 20%);
-}
-
-.completion-badge {
-  font-size: 1.5rem;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.7;
-  }
-}
-
-.card-content {
-  padding: 0 1.5rem 1rem;
-}
-
-.scenario-card h3 {
-  margin: 0 0 0.75rem;
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #2d3748;
-}
-
-.scenario-description {
-  margin-bottom: 1rem;
-  line-height: 1.5;
-  font-size: 0.95rem;
-  color: #4a5568;
-}
-
-.scenario-context {
-  font-style: italic;
-  opacity: 0.8;
-  margin-bottom: 0.75rem;
-  font-size: 0.9rem;
-  color: #718096;
-}
-
-.challenge-info {
-  background: rgb(102 126 234 / 5%);
-  border: 1px solid rgb(102 126 234 / 10%);
-  border-radius: 8px;
-  padding: 1rem;
-  margin: 1rem 0;
-}
-
-.challenge-text,
-.reward-text {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
-  color: #4a5568;
-}
-
-.challenge-text:last-child,
-.reward-text:last-child {
-  margin-bottom: 0;
-}
-
-.challenge-label,
-.reward-label {
-  font-weight: 600;
-  white-space: nowrap;
-  color: #667eea;
-}
-
-.scenario-progress {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin: 1rem 0;
-}
-
-.progress-bar-small {
-  flex: 1;
-  background: rgb(203 213 225 / 30%);
-  height: 6px;
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.progress-fill-small {
-  background: linear-gradient(90deg, #667eea, #764ba2);
-  height: 100%;
-  border-radius: 3px;
-  transition: width 0.5s ease;
-}
-
-.scenario-card.completed .progress-fill-small {
-  background: linear-gradient(90deg, #10b981, #059669);
-}
-
-.progress-text {
-  font-size: 0.8rem;
-  font-weight: 600;
-  white-space: nowrap;
-  color: #4a5568;
-}
-
-.scenario-meta {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.85rem;
-  color: #718096;
-  margin: 1rem 0;
-  gap: 1rem;
-}
-
-.scenario-meta span {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.card-action {
-  background: rgb(102 126 234 / 5%);
-  padding: 1rem 1.5rem;
-  text-align: center;
-  border-top: 1px solid rgb(203 213 225 / 30%);
-  margin-top: auto;
-}
-
-.action-text {
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: #667eea;
-}
-
-/* Exploration Tips */
-.exploration-tips {
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border: 2px solid #cbd5e0;
-  border-radius: 16px;
-  padding: 2rem;
-  margin-top: 2rem;
-}
-
-.tips-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.exploration-tips h3 {
-  color: #2d3748;
-  margin-bottom: 0.5rem;
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.tips-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-}
-
-.tip-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgb(0 0 0 / 5%);
-  transition: all 0.3s ease;
-}
-
-.tip-item:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 15px rgb(0 0 0 / 10%);
-}
-
-.tip-icon {
-  font-size: 2rem;
-  flex-shrink: 0;
-}
-
-.tip-content {
-  flex: 1;
-}
-
-.tip-content strong {
-  display: block;
-  color: #2d3748;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  font-size: 1.1rem;
-}
-
-.tip-content p {
-  color: #718096;
-  margin: 0;
-  line-height: 1.5;
-}
-
-/* Scenario Exploration */
-.scenario-exploration .scenario-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  padding: 1.5rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border-radius: 12px;
-  border-left: 4px solid #667eea;
-  position: relative;
-  box-shadow: 0 2px 4px rgb(0 0 0 / 5%);
-}
-
-.scenario-header::before {
-  content: "";
-  position: absolute;
-  top: -10px;
-  right: 1rem;
-  font-size: 1.5rem;
-  background: white;
-  padding: 0.5rem;
-  border-radius: 50%;
-  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.scenario-header.completed::before {
-  content: "✅";
-  opacity: 1;
-  animation: checkmark-bounce 0.6s ease-out;
-}
-
-.scenario-header h2 {
-  color: #2d3748;
-  margin: 0;
-  font-size: 1.8rem;
-  font-weight: 700;
-}
-
-.scenario-setting {
-  color: #718096;
-  font-size: 1rem;
-  margin: 0.5rem 0 0;
-  font-style: italic;
-}
-
-.back-btn {
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-  border: 1px solid #cbd5e1;
-  padding: 0.75rem 1.5rem;
-  border-radius: 25px;
-  font-weight: 600;
-  color: #475569;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.95rem;
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 1rem;
-}
-
-.back-btn::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgb(255 255 255 / 40%),
-    transparent
-  );
-  transition: left 0.5s ease;
-}
-
-.back-btn:hover {
-  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-  transform: translateX(-3px);
-  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
-}
-
-.back-btn:hover::before {
-  left: 100%;
-}
-
-.back-btn:active {
-  transform: translateX(-3px) scale(0.98);
-}
-
-/* Enhanced Focus States for Accessibility */
-.back-btn:focus,
-.action-btn:focus,
-.choice-option input[type="radio"]:focus + .option-content {
-  outline: 2px solid #667eea;
-  outline-offset: 2px;
-}
-
-/* Scenario Area Loading States */
-.scenario-area.loading {
-  position: relative;
-}
-
-.scenario-area.loading::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgb(255 255 255 / 80%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.scenario-area.loading::before {
-  content: "⏳";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 3rem;
-  z-index: 1001;
-  animation: loading-spin 1s linear infinite;
-}
-
-@keyframes loading-spin {
-  from {
-    transform: translate(-50%, -50%) rotate(0deg);
-  }
-
-  to {
-    transform: translate(-50%, -50%) rotate(360deg);
-  }
-}
-
-/* ===== RESPONSIVE DESIGN ===== */
-
-/* Print Styles */
-@media print {
-  .scenario-area {
-    box-shadow: none;
-    border: 1px solid #000;
-  }
-
-  .scenario-area::before,
-  .scenario-header::before,
-  .scenario-context::before,
-  .stakeholders-overview::before,
-  .choice-section::before,
-  .consequences-display::before {
-    display: none;
-  }
-
-  .back-btn,
-  .exploration-actions {
-    display: none;
-  }
-
-  .choice-option input[type="radio"]:checked + .option-content {
-    border: 2px solid #000;
-  }
-}
-
-/* Responsive Enhancements for Scenario Area */
-@media (width <= 768px) {
-  .scenario-area {
-    border-radius: 12px;
-  }
-
-  .scenario-header {
-    padding: 1.5rem;
-  }
-
-  .scenario-title-section h2 {
-    font-size: 1.6rem;
-  }
-
-  .scenario-context,
-  .stakeholders-overview,
-  .choice-section,
-  .consequences-display,
-  .exploration-actions {
-    margin: 1rem;
-    padding: 1.5rem;
-  }
-
-  .context-metadata {
+@layer components {
+  /* Main Layout */
+  .ethics-explorer-layout {
+    display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    height: 100%;
+    width: 100%;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   }
 
-  .stakeholders-list {
-    gap: 0.75rem;
+  .explorer-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
   }
 
-  .stakeholder-tag {
-    font-size: 0.9rem;
-    padding: 0.6rem 1rem;
+  .header-content {
+    margin-bottom: 1.5rem;
   }
 
-  .choice-group {
+  .explorer-header h1 {
+    margin: 0 0 0.5rem;
+    font-size: 2.5rem;
+    font-weight: 700;
+  }
+
+  .explorer-subtitle {
+    margin: 0;
+    font-size: 1.2rem;
+    opacity: 0.9;
+  }
+
+  /* Game Progress Bar */
+  .game-progress {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .progress-stats {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .stat-item {
+    text-align: center;
+    background: rgb(255 255 255 / 10%);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+    min-width: 80px;
+  }
+
+  .stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+  }
+
+  .stat-label {
+    display: block;
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin-top: 0.25rem;
+  }
+
+  .progress-bar {
+    background: rgb(255 255 255 / 20%);
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    background: linear-gradient(90deg, #10b981, #34d399);
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+    box-shadow: 0 0 10px rgb(16 185 129 / 50%);
+  }
+
+  .explorer-main {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 1.5rem;
     padding: 1.5rem;
+    flex: 1;
+    overflow: visible;
+    height: calc(100% - 120px);
   }
 
-  .option-implications {
-    grid-template-columns: 1fr;
+  /* Scenario Area */
+  .scenario-area {
+    background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+    border-radius: 16px;
+    padding: 0;
+    box-shadow:
+      0 8px 32px rgb(0 0 0 / 8%),
+      0 0 0 1px rgb(255 255 255 / 50%);
+    overflow-y: auto;
+    height: 100%;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .scenario-area:hover {
+    box-shadow:
+      0 12px 40px rgb(0 0 0 / 12%),
+      0 0 0 1px rgb(255 255 255 / 80%);
+  }
+
+  .scenario-area::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
+    border-radius: 16px 16px 0 0;
+    animation: progress-pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes progress-pulse {
+    0%,
+    100% {
+      opacity: 0.8;
+    }
+
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .scenario-selection,
+  .scenario-exploration,
+  .comparison-view,
+  .final-celebration {
+    padding: 2rem;
+    position: relative;
+  }
+
+  /* Scenario Selection */
+  .selection-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+  }
+
+  .selection-header::after {
+    content: "";
+    position: absolute;
+    bottom: -1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 2px;
+  }
+
+  .scenario-selection h2 {
+    color: #2d3748;
+    margin-bottom: 1rem;
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .selection-subtitle {
+    color: #718096;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* ===== ETHICS EXPLORER SPECIFIC CARD COMPONENTS ===== */
+  /* NOTE: Base .scenario-card styles are in scenario-browser.css under .ethics-explorer .scenario-card */
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1rem 1.5rem 0;
+  }
+
+  .scenario-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    filter: grayscale(0.2);
+  }
+
+  .difficulty-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #667eea;
+    background: rgb(102 126 234 / 10%);
+    border: 1px solid rgb(102 126 234 / 20%);
+  }
+
+  .completion-badge {
+    font-size: 1.5rem;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  .card-content {
+    padding: 0 1.5rem 1rem;
+  }
+
+  .scenario-card h3 {
+    margin: 0 0 0.75rem;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #2d3748;
+  }
+
+  .scenario-description {
+    margin-bottom: 1rem;
+    line-height: 1.5;
+    font-size: 0.95rem;
+    color: #4a5568;
+  }
+
+  .scenario-context {
+    font-style: italic;
+    opacity: 0.8;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    color: #718096;
+  }
+
+  .challenge-info {
+    background: rgb(102 126 234 / 5%);
+    border: 1px solid rgb(102 126 234 / 10%);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+
+  .challenge-text,
+  .reward-text {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #4a5568;
+  }
+
+  .challenge-text:last-child,
+  .reward-text:last-child {
+    margin-bottom: 0;
+  }
+
+  .challenge-label,
+  .reward-label {
+    font-weight: 600;
+    white-space: nowrap;
+    color: #667eea;
+  }
+
+  .scenario-progress {
+    display: flex;
+    align-items: center;
     gap: 0.75rem;
+    margin: 1rem 0;
   }
 
-  .stakeholder-grid {
-    grid-template-columns: 1fr;
+  .progress-bar-small {
+    flex: 1;
+    background: rgb(203 213 225 / 30%);
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-fill-small {
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+  }
+
+  .scenario-card.completed .progress-fill-small {
+    background: linear-gradient(90deg, #10b981, #059669);
+  }
+
+  .progress-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    color: #4a5568;
+  }
+
+  .scenario-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #718096;
+    margin: 1rem 0;
     gap: 1rem;
   }
 
-  .exploration-actions {
-    flex-direction: column;
+  .scenario-meta span {
+    display: flex;
     align-items: center;
+    gap: 0.25rem;
   }
 
-  .action-btn {
+  .card-action {
+    background: rgb(102 126 234 / 5%);
+    padding: 1rem 1.5rem;
+    text-align: center;
+    border-top: 1px solid rgb(203 213 225 / 30%);
+    margin-top: auto;
+  }
+
+  .action-text {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #667eea;
+  }
+
+  /* Exploration Tips */
+  .exploration-tips {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border: 2px solid #cbd5e0;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-top: 2rem;
+  }
+
+  .tips-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .exploration-tips h3 {
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  .tips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .tip-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgb(0 0 0 / 5%);
+    transition: all 0.3s ease;
+  }
+
+  .tip-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgb(0 0 0 / 10%);
+  }
+
+  .tip-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+
+  .tip-content {
+    flex: 1;
+  }
+
+  .tip-content strong {
+    display: block;
+    color: #2d3748;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  .tip-content p {
+    color: #718096;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* Scenario Exploration */
+  .scenario-exploration .scenario-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-radius: 12px;
+    border-left: 4px solid #667eea;
+    position: relative;
+    box-shadow: 0 2px 4px rgb(0 0 0 / 5%);
+  }
+
+  .scenario-header::before {
+    content: "";
+    position: absolute;
+    top: -10px;
+    right: 1rem;
+    font-size: 1.5rem;
+    background: white;
+    padding: 0.5rem;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .scenario-header.completed::before {
+    content: "✅";
+    opacity: 1;
+    animation: checkmark-bounce 0.6s ease-out;
+  }
+
+  .scenario-header h2 {
+    color: #2d3748;
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+
+  .scenario-setting {
+    color: #718096;
+    font-size: 1rem;
+    margin: 0.5rem 0 0;
+    font-style: italic;
+  }
+
+  .back-btn {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    border: 1px solid #cbd5e1;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+
+  .back-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
     width: 100%;
-    max-width: 280px;
-  }
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .scenario-area {
-    border: 2px solid #000;
-  }
-
-  .scenario-context,
-  .stakeholders-overview,
-  .choice-section,
-  .consequences-display {
-    border: 1px solid #000;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(255 255 255 / 40%),
+      transparent
+    );
+    transition: left 0.5s ease;
   }
 
-  .stakeholder-tag,
-  .action-btn {
-    border: 1px solid #000;
+  .back-btn:hover {
+    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+    transform: translateX(-3px);
+    box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
   }
-}
 
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-  .scenario-area,
-  .scenario-area::before,
-  .scenario-header::before,
-  .back-btn,
-  .back-btn::before,
-  .tip-item,
-  .progress-pulse,
-  .loading-spin,
-  .pulse,
-  .progress-fill,
-  .progress-fill-small {
-    transition: none !important;
-    animation: none !important;
+  .back-btn:hover::before {
+    left: 100%;
   }
-}
 
-/* ===== DARK MODE SUPPORT ===== */
-/* Dark mode support for ethics explorer */
-body.dark-mode .ethics-explorer-layout {
-  background: linear-gradient(
-    135deg,
-    var(--theme-bg-primary) 0%,
-    var(--theme-bg-secondary) 100%
-  );
-  color: var(--theme-text-primary);
-}
+  .back-btn:active {
+    transform: translateX(-3px) scale(0.98);
+  }
 
-body.dark-mode .explorer-header {
-  background: linear-gradient(
-    135deg,
-    var(--theme-accent) 0%,
-    var(--theme-accent-dark) 100%
-  );
-  color: var(--theme-text-on-accent);
-}
+  /* Enhanced Focus States for Accessibility */
+  .back-btn:focus,
+  .action-btn:focus,
+  .choice-option input[type="radio"]:focus + .option-content {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+  }
 
-body.dark-mode .explorer-header h1 {
-  color: var(--theme-text-on-accent);
-}
+  /* Scenario Area Loading States */
+  .scenario-area.loading {
+    position: relative;
+  }
 
-body.dark-mode .explorer-subtitle {
-  color: rgb(255 255 255 / 90%);
-}
+  .scenario-area.loading::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgb(255 255 255 / 80%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
 
-body.dark-mode .stat-item {
-  background: rgb(255 255 255 / 10%);
-  backdrop-filter: blur(10px);
-}
+  .scenario-area.loading::before {
+    content: "⏳";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    z-index: 1001;
+    animation: loading-spin 1s linear infinite;
+  }
 
-body.dark-mode .stat-value {
-  color: var(--theme-text-on-accent);
-}
+  @keyframes loading-spin {
+    from {
+      transform: translate(-50%, -50%) rotate(0deg);
+    }
 
-body.dark-mode .stat-label {
-  color: rgb(255 255 255 / 80%);
-}
+    to {
+      transform: translate(-50%, -50%) rotate(360deg);
+    }
+  }
 
-body.dark-mode .progress-bar {
-  background: rgb(255 255 255 / 20%);
-}
+  /* ===== RESPONSIVE DESIGN ===== */
 
-body.dark-mode .progress-fill {
-  background: linear-gradient(
-    90deg,
-    var(--theme-accent-light),
-    var(--theme-accent)
-  );
-  box-shadow: 0 0 10px var(--theme-accent-glow);
-}
+  /* Print Styles */
+  @media print {
+    .scenario-area {
+      box-shadow: none;
+      border: 1px solid #000;
+    }
 
-body.dark-mode .scenario-area {
-  background: linear-gradient(
-    135deg,
-    var(--theme-bg-secondary) 0%,
-    var(--theme-bg-tertiary) 100%
-  );
-  border: 1px solid var(--theme-border);
-}
+    .scenario-area::before,
+    .scenario-header::before,
+    .scenario-context::before,
+    .stakeholders-overview::before,
+    .choice-section::before,
+    .consequences-display::before {
+      display: none;
+    }
 
-body.dark-mode .scenario-area:hover {
-  box-shadow: 0 8px 25px var(--theme-shadow);
-}
+    .back-btn,
+    .exploration-actions {
+      display: none;
+    }
 
-body.dark-mode .scenario-selection h2 {
-  color: var(--theme-text-primary);
-  background: linear-gradient(
-    135deg,
-    var(--theme-accent) 0%,
-    var(--theme-accent-light) 100%
-  );
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+    .choice-option input[type="radio"]:checked + .option-content {
+      border: 2px solid #000;
+    }
+  }
 
-body.dark-mode .selection-subtitle {
-  color: var(--theme-text-secondary);
-}
+  /* Responsive Enhancements for Scenario Area */
+  @media (width <= 768px) {
+    .scenario-area {
+      border-radius: 12px;
+    }
 
-/* Dark mode card components */
-body.dark-mode .scenario-card h3 {
-  color: var(--theme-text-primary);
-}
+    .scenario-header {
+      padding: 1.5rem;
+    }
 
-body.dark-mode .scenario-description {
-  color: var(--theme-text-secondary);
-}
+    .scenario-title-section h2 {
+      font-size: 1.6rem;
+    }
 
-body.dark-mode .scenario-context {
-  color: var(--theme-text-secondary);
-}
+    .scenario-context,
+    .stakeholders-overview,
+    .choice-section,
+    .consequences-display,
+    .exploration-actions {
+      margin: 1rem;
+      padding: 1.5rem;
+    }
 
-body.dark-mode .challenge-info {
-  background: var(--theme-bg-tertiary);
-  border: 1px solid var(--theme-border);
-}
+    .context-metadata {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
 
-body.dark-mode .challenge-text,
-body.dark-mode .reward-text {
-  color: var(--theme-text-secondary);
-}
+    .stakeholders-list {
+      gap: 0.75rem;
+    }
 
-body.dark-mode .challenge-label,
-body.dark-mode .reward-label {
-  color: var(--theme-accent);
-}
+    .stakeholder-tag {
+      font-size: 0.9rem;
+      padding: 0.6rem 1rem;
+    }
 
-body.dark-mode .progress-text {
-  color: var(--theme-text-secondary);
-}
+    .choice-group {
+      padding: 1.5rem;
+    }
 
-body.dark-mode .scenario-meta {
-  color: var(--theme-text-secondary);
-}
+    .option-implications {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
 
-body.dark-mode .card-action {
-  background: var(--theme-bg-tertiary);
-  border-top: 1px solid var(--theme-border);
-}
+    .stakeholder-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
 
-body.dark-mode .action-text {
-  color: var(--theme-accent);
-}
+    .exploration-actions {
+      flex-direction: column;
+      align-items: center;
+    }
 
-body.dark-mode .exploration-tips {
-  background: linear-gradient(
-    135deg,
-    var(--theme-bg-secondary) 0%,
-    var(--theme-bg-tertiary) 100%
-  );
-  border: 2px solid var(--theme-border);
-}
+    .action-btn {
+      width: 100%;
+      max-width: 280px;
+    }
+  }
 
-body.dark-mode .exploration-tips h3 {
-  color: var(--theme-text-primary);
-}
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .scenario-area {
+      border: 2px solid #000;
+    }
 
-body.dark-mode .tip-item {
-  background: var(--theme-bg-tertiary);
-  box-shadow: 0 4px 6px var(--theme-shadow);
-}
+    .scenario-context,
+    .stakeholders-overview,
+    .choice-section,
+    .consequences-display {
+      border: 1px solid #000;
+    }
 
-body.dark-mode .tip-item:hover {
-  box-shadow: 0 8px 15px var(--theme-shadow-heavy);
-}
+    .stakeholder-tag,
+    .action-btn {
+      border: 1px solid #000;
+    }
+  }
 
-body.dark-mode .tip-content strong {
-  color: var(--theme-text-primary);
-}
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .scenario-area,
+    .scenario-area::before,
+    .scenario-header::before,
+    .back-btn,
+    .back-btn::before,
+    .tip-item,
+    .progress-pulse,
+    .loading-spin,
+    .pulse,
+    .progress-fill,
+    .progress-fill-small {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
 
-body.dark-mode .tip-content p {
-  color: var(--theme-text-secondary);
-}
+  /* ===== DARK MODE SUPPORT ===== */
+  /* Dark mode support for ethics explorer */
+  body.dark-mode .ethics-explorer-layout {
+    background: linear-gradient(
+      135deg,
+      var(--theme-bg-primary) 0%,
+      var(--theme-bg-secondary) 100%
+    );
+    color: var(--theme-text-primary);
+  }
 
-body.dark-mode .scenario-exploration .scenario-header {
-  background: linear-gradient(
-    135deg,
-    var(--theme-bg-secondary) 0%,
-    var(--theme-bg-tertiary) 100%
-  );
-  border-left: 4px solid var(--theme-accent);
-}
+  body.dark-mode .explorer-header {
+    background: linear-gradient(
+      135deg,
+      var(--theme-accent) 0%,
+      var(--theme-accent-dark) 100%
+    );
+    color: var(--theme-text-on-accent);
+  }
 
-body.dark-mode .scenario-header h2 {
-  color: var(--theme-text-primary);
-}
+  body.dark-mode .explorer-header h1 {
+    color: var(--theme-text-on-accent);
+  }
 
-body.dark-mode .scenario-setting {
-  color: var(--theme-text-secondary);
-}
+  body.dark-mode .explorer-subtitle {
+    color: rgb(255 255 255 / 90%);
+  }
 
-body.dark-mode .back-btn {
-  background: linear-gradient(
-    135deg,
-    var(--theme-bg-tertiary) 0%,
-    var(--theme-bg-secondary) 100%
-  );
-  border: 1px solid var(--theme-border);
-  color: var(--theme-text-primary);
-}
+  body.dark-mode .stat-item {
+    background: rgb(255 255 255 / 10%);
+    backdrop-filter: blur(10px);
+  }
 
-body.dark-mode .back-btn:hover {
-  background: linear-gradient(
-    135deg,
-    var(--theme-bg-secondary) 0%,
-    var(--theme-bg-primary) 100%
-  );
-  box-shadow: 0 4px 8px var(--theme-shadow);
-}
+  body.dark-mode .stat-value {
+    color: var(--theme-text-on-accent);
+  }
 
-body.dark-mode .difficulty-badge {
-  color: var(--theme-accent);
-  background: var(--theme-bg-tertiary);
-  border: 1px solid var(--theme-border);
-}
+  body.dark-mode .stat-label {
+    color: rgb(255 255 255 / 80%);
+  }
+
+  body.dark-mode .progress-bar {
+    background: rgb(255 255 255 / 20%);
+  }
+
+  body.dark-mode .progress-fill {
+    background: linear-gradient(
+      90deg,
+      var(--theme-accent-light),
+      var(--theme-accent)
+    );
+    box-shadow: 0 0 10px var(--theme-accent-glow);
+  }
+
+  body.dark-mode .scenario-area {
+    background: linear-gradient(
+      135deg,
+      var(--theme-bg-secondary) 0%,
+      var(--theme-bg-tertiary) 100%
+    );
+    border: 1px solid var(--theme-border);
+  }
+
+  body.dark-mode .scenario-area:hover {
+    box-shadow: 0 8px 25px var(--theme-shadow);
+  }
+
+  body.dark-mode .scenario-selection h2 {
+    color: var(--theme-text-primary);
+    background: linear-gradient(
+      135deg,
+      var(--theme-accent) 0%,
+      var(--theme-accent-light) 100%
+    );
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  body.dark-mode .selection-subtitle {
+    color: var(--theme-text-secondary);
+  }
+
+  /* Dark mode card components */
+  body.dark-mode .scenario-card h3 {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .scenario-description {
+    color: var(--theme-text-secondary);
+  }
+
+  body.dark-mode .scenario-context {
+    color: var(--theme-text-secondary);
+  }
+
+  body.dark-mode .challenge-info {
+    background: var(--theme-bg-tertiary);
+    border: 1px solid var(--theme-border);
+  }
+
+  body.dark-mode .challenge-text,
+  body.dark-mode .reward-text {
+    color: var(--theme-text-secondary);
+  }
+
+  body.dark-mode .challenge-label,
+  body.dark-mode .reward-label {
+    color: var(--theme-accent);
+  }
+
+  body.dark-mode .progress-text {
+    color: var(--theme-text-secondary);
+  }
+
+  body.dark-mode .scenario-meta {
+    color: var(--theme-text-secondary);
+  }
+
+  body.dark-mode .card-action {
+    background: var(--theme-bg-tertiary);
+    border-top: 1px solid var(--theme-border);
+  }
+
+  body.dark-mode .action-text {
+    color: var(--theme-accent);
+  }
+
+  body.dark-mode .exploration-tips {
+    background: linear-gradient(
+      135deg,
+      var(--theme-bg-secondary) 0%,
+      var(--theme-bg-tertiary) 100%
+    );
+    border: 2px solid var(--theme-border);
+  }
+
+  body.dark-mode .exploration-tips h3 {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .tip-item {
+    background: var(--theme-bg-tertiary);
+    box-shadow: 0 4px 6px var(--theme-shadow);
+  }
+
+  body.dark-mode .tip-item:hover {
+    box-shadow: 0 8px 15px var(--theme-shadow-heavy);
+  }
+
+  body.dark-mode .tip-content strong {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .tip-content p {
+    color: var(--theme-text-secondary);
+  }
+
+  body.dark-mode .scenario-exploration .scenario-header {
+    background: linear-gradient(
+      135deg,
+      var(--theme-bg-secondary) 0%,
+      var(--theme-bg-tertiary) 100%
+    );
+    border-left: 4px solid var(--theme-accent);
+  }
+
+  body.dark-mode .scenario-header h2 {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .scenario-setting {
+    color: var(--theme-text-secondary);
+  }
+
+  body.dark-mode .back-btn {
+    background: linear-gradient(
+      135deg,
+      var(--theme-bg-tertiary) 0%,
+      var(--theme-bg-secondary) 100%
+    );
+    border: 1px solid var(--theme-border);
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .back-btn:hover {
+    background: linear-gradient(
+      135deg,
+      var(--theme-bg-secondary) 0%,
+      var(--theme-bg-primary) 100%
+    );
+    box-shadow: 0 4px 8px var(--theme-shadow);
+  }
+
+  body.dark-mode .difficulty-badge {
+    color: var(--theme-accent);
+    background: var(--theme-bg-tertiary);
+    border: 1px solid var(--theme-border);
+  }
+} /* End @layer components */

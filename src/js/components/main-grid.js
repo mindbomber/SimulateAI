@@ -3570,12 +3570,16 @@ class MainGrid {
     scenariosContainer.innerHTML = "";
     tagsContainer.innerHTML = "";
 
-    // Add scenario results
+    // Add scenario results using DocumentFragment for batched insertion
     if (matchingScenarios.length > 0) {
+      const scenarioFragment = document.createDocumentFragment();
       matchingScenarios.forEach((scenario, index) => {
         const item = this.createAutocompleteItem(scenario, query, index);
-        scenariosContainer.appendChild(item);
+        scenarioFragment.appendChild(item);
       });
+      // Single DOM insertion instead of multiple appendChild calls
+      scenariosContainer.appendChild(scenarioFragment);
+
       const firstSection = dropdown.querySelector(
         ".autocomplete-section:first-child",
       );
@@ -3591,16 +3595,20 @@ class MainGrid {
       }
     }
 
-    // Add tag results
+    // Add tag results using DocumentFragment for batched insertion
     if (matchingTags.length > 0) {
+      const tagFragment = document.createDocumentFragment();
       matchingTags.forEach((tag, index) => {
         const item = this.createAutocompleteItem(
           tag,
           query,
           index + matchingScenarios.length,
         );
-        tagsContainer.appendChild(item);
+        tagFragment.appendChild(item);
       });
+      // Single DOM insertion instead of multiple appendChild calls
+      tagsContainer.appendChild(tagFragment);
+
       const lastSection = dropdown.querySelector(
         ".autocomplete-section:last-child",
       );
@@ -3653,13 +3661,23 @@ class MainGrid {
   createAutocompleteItem(item, query, index) {
     const element = document.createElement("div");
     element.className = "autocomplete-item";
-    element.setAttribute("role", "option");
-    element.setAttribute("data-index", index);
-    element.setAttribute("data-type", item.type);
+
+    // Batch attribute setting for better performance
+    const baseAttributes = {
+      role: "option",
+      "data-index": index,
+      "data-type": item.type,
+    };
 
     if (item.type === "scenario") {
-      element.setAttribute("data-scenario-id", item.id);
-      element.setAttribute("data-category-id", item.categoryId);
+      // Batch all scenario-related attributes
+      Object.assign(baseAttributes, {
+        "data-scenario-id": item.id,
+        "data-category-id": item.categoryId,
+      });
+
+      // Apply all attributes in one batch operation
+      this.setElementAttributes(element, baseAttributes);
 
       element.innerHTML = `
         <div class="autocomplete-item-icon">${item.categoryIcon}</div>
@@ -3669,7 +3687,13 @@ class MainGrid {
         </div>
       `;
     } else if (item.type === "tag") {
-      element.setAttribute("data-tag", item.tag);
+      // Batch all tag-related attributes
+      Object.assign(baseAttributes, {
+        "data-tag": item.tag,
+      });
+
+      // Apply all attributes in one batch operation
+      this.setElementAttributes(element, baseAttributes);
 
       element.innerHTML = `
         <div class="autocomplete-item-icon">🏷️</div>
@@ -3895,13 +3919,18 @@ class MainGrid {
         const categoryValue = option.getAttribute("data-category");
         const categoryText = option.textContent.trim();
 
-        // Update active state
+        // Update active state - batch operations for performance
         filterOptions.forEach((opt) => {
-          opt.classList.remove("active");
-          opt.setAttribute("aria-selected", "false");
+          this.setElementAttributes(opt, {
+            "aria-selected": "false",
+            class: opt.className.replace(/\bactive\b/, "").trim(),
+          });
         });
-        option.classList.add("active");
-        option.setAttribute("aria-selected", "true");
+
+        this.setElementAttributes(option, {
+          "aria-selected": "true",
+          class: option.className + " active",
+        });
 
         // Update button text to show selected category
         const filterTextElement = filterBtn.querySelector(".filter-text");
@@ -3971,13 +4000,18 @@ class MainGrid {
           option.querySelector(".option-text")?.textContent.trim() ||
           option.textContent.trim();
 
-        // Update active state
+        // Update active state - batch operations for performance
         sortOptions.forEach((opt) => {
-          opt.classList.remove("active");
-          opt.setAttribute("aria-selected", "false");
+          this.setElementAttributes(opt, {
+            "aria-selected": "false",
+            class: opt.className.replace(/\bactive\b/, "").trim(),
+          });
         });
-        option.classList.add("active");
-        option.setAttribute("aria-selected", "true");
+
+        this.setElementAttributes(option, {
+          "aria-selected": "true",
+          class: option.className + " active",
+        });
 
         // Update button text to show selected sort option
         const sortTextElement = sortBtn.querySelector(".sort-text");
@@ -5007,13 +5041,18 @@ class MainGrid {
           option.querySelector(".option-text")?.textContent.trim() ||
           option.textContent.trim();
 
-        // Update active state
+        // Update active state - batch operations for performance
         sortOptions.forEach((opt) => {
-          opt.classList.remove("active");
-          opt.setAttribute("aria-selected", "false");
+          this.setElementAttributes(opt, {
+            "aria-selected": "false",
+            class: opt.className.replace(/\bactive\b/, "").trim(),
+          });
         });
-        option.classList.add("active");
-        option.setAttribute("aria-selected", "true");
+
+        this.setElementAttributes(option, {
+          "aria-selected": "true",
+          class: option.className + " active",
+        });
 
         // Update button text
         const sortTextElement = sortBtn.querySelector(".sort-text");
@@ -5036,17 +5075,21 @@ class MainGrid {
         searchClear.style.display = "none";
       }
 
-      // Reset sort to default
+      // Reset sort to default - batch operations for performance
       sortOptions.forEach((opt) => {
-        opt.classList.remove("active");
-        opt.setAttribute("aria-selected", "false");
+        this.setElementAttributes(opt, {
+          "aria-selected": "false",
+          class: opt.className.replace(/\bactive\b/, "").trim(),
+        });
       });
       const defaultSort = this.categoryContainer.querySelector(
         ".sort-option[data-sort='alphabetical']",
       );
       if (defaultSort) {
-        defaultSort.classList.add("active");
-        defaultSort.setAttribute("aria-selected", "true");
+        this.setElementAttributes(defaultSort, {
+          "aria-selected": "true",
+          class: defaultSort.className + " active",
+        });
       }
       const sortTextElement = sortBtn.querySelector(".sort-text");
       if (sortTextElement) {

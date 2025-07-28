@@ -4,1412 +4,1414 @@
  * Consolidated from hero-demo.css, ethics-analysis.css, appearance-settings.css, and scenario-modal.css
  */
 
-/* ===== CSS CUSTOM PROPERTIES FOR RADAR CHART INTEGRATION ===== */
-:root {
-  /* Radar Chart Configuration Integration */
-  /* These properties are populated by radar-config-loader.js syncColorsWithCSS() function */
+@layer components {
+  /* ===== CSS CUSTOM PROPERTIES FOR RADAR CHART INTEGRATION ===== */
+  :root {
+    /* Radar Chart Configuration Integration */
+    /* These properties are populated by radar-config-loader.js syncColorsWithCSS() function */
 
-  /* Chart Sizing (synced with radar-chart-config.json) */
-  --radar-chart-size: 400px;
-  --radar-chart-default-size: 400px;
+    /* Chart Sizing (synced with radar-chart-config.json) */
+    --radar-chart-size: 400px;
+    --radar-chart-default-size: 400px;
 
-  /* Point Colors (dynamically set from config.pointColors) */
-  --radar-point-color-0: #ff4757; /* Poor score - red */
-  --radar-point-color-2: #ff6b35; /* Below average - orange */
-  --radar-point-color-2-5: #ffa726; /* Slightly below average - amber */
-  --radar-point-color-3: #ffeb3b; /* Neutral - yellow */
-  --radar-point-color-4: #8bc34a; /* Good - light green */
-  --radar-point-color-5: #4caf50; /* Excellent - green */
+    /* Point Colors (dynamically set from config.pointColors) */
+    --radar-point-color-0: #ff4757; /* Poor score - red */
+    --radar-point-color-2: #ff6b35; /* Below average - orange */
+    --radar-point-color-2-5: #ffa726; /* Slightly below average - amber */
+    --radar-point-color-3: #ffeb3b; /* Neutral - yellow */
+    --radar-point-color-4: #8bc34a; /* Good - light green */
+    --radar-point-color-5: #4caf50; /* Excellent - green */
 
-  /* Grid Colors (dynamically set from config.gridColors) */
-  --radar-grid-color-0: rgba(0, 0, 0, 0.1);
-  --radar-grid-color-1: rgba(0, 0, 0, 0.15);
-  --radar-grid-color-2: rgba(0, 0, 0, 0.2);
-  --radar-grid-color-default: rgba(0, 0, 0, 0.1);
+    /* Grid Colors (dynamically set from config.gridColors) */
+    --radar-grid-color-0: rgba(0, 0, 0, 0.1);
+    --radar-grid-color-1: rgba(0, 0, 0, 0.15);
+    --radar-grid-color-2: rgba(0, 0, 0, 0.2);
+    --radar-grid-color-default: rgba(0, 0, 0, 0.1);
 
-  /* Scoring Thresholds (dynamically set from config.scoring) */
-  --radar-max-score: 5;
-  --radar-min-score: 0;
-  --radar-neutral-score: 3;
-  --radar-positive-threshold: 4;
+    /* Scoring Thresholds (dynamically set from config.scoring) */
+    --radar-max-score: 5;
+    --radar-min-score: 0;
+    --radar-neutral-score: 3;
+    --radar-positive-threshold: 4;
 
-  /* Responsive Breakpoints (dynamically set from config.chart) */
-  --radar-mobile-breakpoint: 768px;
-  --radar-tablet-breakpoint: 1024px;
-  --radar-desktop-breakpoint: 1200px;
+    /* Responsive Breakpoints (dynamically set from config.chart) */
+    --radar-mobile-breakpoint: 768px;
+    --radar-tablet-breakpoint: 1024px;
+    --radar-desktop-breakpoint: 1200px;
 
-  /* Theme Integration Variables (populated by theme sync) */
-  /* Format: --radar-theme-{themeName}-{colorKey} */
-  /* Examples:
+    /* Theme Integration Variables (populated by theme sync) */
+    /* Format: --radar-theme-{themeName}-{colorKey} */
+    /* Examples:
    * --radar-theme-light-background: #ffffff;
    * --radar-theme-dark-background: #1a1a1a;
    * --radar-theme-high-contrast-accent: #ffff00;
    */
-}
-
-/* ===== RADAR CHART THEME CLASSES ===== */
-
-/* Base theme class modifications for radar charts */
-.radar-chart-container.theme-light,
-.hero-radar-chart.theme-light,
-.scenario-radar.theme-light {
-  background-color: var(--radar-theme-light-background, #ffffff);
-  border-color: var(--radar-theme-light-border, #e2e8f0);
-  color: var(--radar-theme-light-text, #333333);
-}
-
-.radar-chart-container.theme-dark,
-.hero-radar-chart.theme-dark,
-.scenario-radar.theme-dark {
-  background-color: var(--radar-theme-dark-background, #1a1a1a);
-  border-color: var(--radar-theme-dark-border, #444444);
-  color: var(--radar-theme-dark-text, #ffffff);
-}
-
-.radar-chart-container.theme-high-contrast,
-.hero-radar-chart.theme-high-contrast,
-.scenario-radar.theme-high-contrast {
-  background-color: var(--radar-theme-high-contrast-background, #000000);
-  border-color: var(--radar-theme-high-contrast-border, #ffffff);
-  color: var(--radar-theme-high-contrast-text, #ffffff);
-}
-
-/* Dynamic score coloring using CSS custom properties */
-.score-fill {
-  background-color: var(--radar-point-color-3); /* Default to neutral */
-}
-
-.score-fill[data-score="0"],
-.score-fill[data-score="1"] {
-  background-color: var(--radar-point-color-0);
-}
-
-.score-fill[data-score="2"] {
-  background-color: var(--radar-point-color-2);
-}
-
-.score-fill[data-score="2.5"] {
-  background-color: var(--radar-point-color-2-5);
-}
-
-.score-fill[data-score="3"] {
-  background-color: var(--radar-point-color-3);
-}
-
-.score-fill[data-score="4"] {
-  background-color: var(--radar-point-color-4);
-}
-
-.score-fill[data-score="5"] {
-  background-color: var(--radar-point-color-5);
-}
-
-/* Responsive radar chart adjustments using config breakpoints */
-@media (max-width: var(--radar-mobile-breakpoint, 768px)) {
-  .radar-chart-container {
-    padding: 1rem;
-    margin: 1rem 0;
   }
 
+  /* ===== RADAR CHART THEME CLASSES ===== */
+
+  /* Base theme class modifications for radar charts */
+  .radar-chart-container.theme-light,
+  .hero-radar-chart.theme-light,
+  .scenario-radar.theme-light {
+    background-color: var(--radar-theme-light-background, #ffffff);
+    border-color: var(--radar-theme-light-border, #e2e8f0);
+    color: var(--radar-theme-light-text, #333333);
+  }
+
+  .radar-chart-container.theme-dark,
+  .hero-radar-chart.theme-dark,
+  .scenario-radar.theme-dark {
+    background-color: var(--radar-theme-dark-background, #1a1a1a);
+    border-color: var(--radar-theme-dark-border, #444444);
+    color: var(--radar-theme-dark-text, #ffffff);
+  }
+
+  .radar-chart-container.theme-high-contrast,
+  .hero-radar-chart.theme-high-contrast,
+  .scenario-radar.theme-high-contrast {
+    background-color: var(--radar-theme-high-contrast-background, #000000);
+    border-color: var(--radar-theme-high-contrast-border, #ffffff);
+    color: var(--radar-theme-high-contrast-text, #ffffff);
+  }
+
+  /* Dynamic score coloring using CSS custom properties */
+  .score-fill {
+    background-color: var(--radar-point-color-3); /* Default to neutral */
+  }
+
+  .score-fill[data-score="0"],
+  .score-fill[data-score="1"] {
+    background-color: var(--radar-point-color-0);
+  }
+
+  .score-fill[data-score="2"] {
+    background-color: var(--radar-point-color-2);
+  }
+
+  .score-fill[data-score="2.5"] {
+    background-color: var(--radar-point-color-2-5);
+  }
+
+  .score-fill[data-score="3"] {
+    background-color: var(--radar-point-color-3);
+  }
+
+  .score-fill[data-score="4"] {
+    background-color: var(--radar-point-color-4);
+  }
+
+  .score-fill[data-score="5"] {
+    background-color: var(--radar-point-color-5);
+  }
+
+  /* Responsive radar chart adjustments using config breakpoints */
+  @media (max-width: var(--radar-mobile-breakpoint, 768px)) {
+    .radar-chart-container {
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+
+    .hero-radar-demo {
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+  }
+
+  @media (max-width: var(--radar-tablet-breakpoint, 1024px)) {
+    .radar-demo-container {
+      max-width: 90%;
+    }
+
+    .scenario-radar {
+      padding: 1.25rem;
+    }
+  }
+
+  /* ===== ORIGINAL RADAR CHART STYLES ===== */
+
+  /* Hero Radar Demo Section - Consolidated from hero-demo.css */
   .hero-radar-demo {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border: 2px solid #cbd5e0;
+    border-radius: 16px;
+    padding: 2rem;
+    margin: 2rem 0 0;
+    text-align: center;
+
+    /* Ensure visibility by default with optional animation enhancement */
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transition: all 0.3s ease-out;
+  }
+
+  /* Only apply entrance animation when page is loaded and animations are supported */
+  html.loaded .hero-radar-demo {
+    animation: heroRadarDemoEnter 0.9s ease-out forwards 0.7s;
+  }
+
+  .hero-radar-demo h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+
+    /* Ensure visibility by default with optional animation enhancement */
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.3s ease-out;
+  }
+
+  /* Only apply entrance animation when page is loaded and animations are supported */
+  html.loaded .hero-radar-demo h3 {
+    animation: heroRadarElementEnter 0.6s ease-out forwards 1s;
+  }
+
+  .hero-radar-demo p {
+    color: #4a5568;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    line-height: 1.6;
+
+    /* Ensure visibility by default with optional animation enhancement */
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.3s ease-out;
+  }
+
+  /* Only apply entrance animation when page is loaded and animations are supported */
+  html.loaded .hero-radar-demo p {
+    animation: heroRadarElementEnter 0.6s ease-out forwards 1.2s;
+  }
+
+  /* Hero Radar Container - Consolidated from hero-demo.css */
+  .hero-radar-container {
+    position: relative;
+    width: 100%;
+    max-width: 650px;
+    margin: 0 auto 2rem;
+    padding: 1rem;
+    background: rgb(255 255 255 / 80%);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
+  }
+
+  /* Demo radar container - Consolidated from ethics-analysis.css (similar to .radar-demo-container) */
+  .demo-radar-container {
+    max-width: 500px;
+    margin: 0 auto 2rem;
+    background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+    border-radius: 16px;
     padding: 1.5rem;
-    margin: 1.5rem 0;
+    box-shadow:
+      0 4px 12px rgb(0 0 0 / 8%),
+      0 1px 3px rgb(0 0 0 / 5%);
+    border: 1px solid rgb(226 232 240 / 80%);
+    transition: all 0.3s ease;
   }
-}
 
-@media (max-width: var(--radar-tablet-breakpoint, 1024px)) {
+  .demo-radar-container:hover {
+    box-shadow:
+      0 8px 20px rgb(0 0 0 / 12%),
+      0 2px 6px rgb(0 0 0 / 8%);
+    transform: translateY(-2px);
+    border-color: rgb(156 163 175 / 60%);
+  }
+
+  /* Minimal container for demo radar charts - gives more room */
   .radar-demo-container {
-    max-width: 90%;
-  }
-
-  .scenario-radar {
-    padding: 1.25rem;
-  }
-}
-
-/* ===== ORIGINAL RADAR CHART STYLES ===== */
-
-/* Hero Radar Demo Section - Consolidated from hero-demo.css */
-.hero-radar-demo {
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border: 2px solid #cbd5e0;
-  border-radius: 16px;
-  padding: 2rem;
-  margin: 2rem 0 0;
-  text-align: center;
-
-  /* Ensure visibility by default with optional animation enhancement */
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  transition: all 0.3s ease-out;
-}
-
-/* Only apply entrance animation when page is loaded and animations are supported */
-html.loaded .hero-radar-demo {
-  animation: heroRadarDemoEnter 0.9s ease-out forwards 0.7s;
-}
-
-.hero-radar-demo h3 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1a202c;
-  margin: 0 0 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-
-  /* Ensure visibility by default with optional animation enhancement */
-  opacity: 1;
-  transform: translateY(0);
-  transition: all 0.3s ease-out;
-}
-
-/* Only apply entrance animation when page is loaded and animations are supported */
-html.loaded .hero-radar-demo h3 {
-  animation: heroRadarElementEnter 0.6s ease-out forwards 1s;
-}
-
-.hero-radar-demo p {
-  color: #4a5568;
-  margin-bottom: 2rem;
-  font-size: 1rem;
-  line-height: 1.6;
-
-  /* Ensure visibility by default with optional animation enhancement */
-  opacity: 1;
-  transform: translateY(0);
-  transition: all 0.3s ease-out;
-}
-
-/* Only apply entrance animation when page is loaded and animations are supported */
-html.loaded .hero-radar-demo p {
-  animation: heroRadarElementEnter 0.6s ease-out forwards 1.2s;
-}
-
-/* Hero Radar Container - Consolidated from hero-demo.css */
-.hero-radar-container {
-  position: relative;
-  width: 100%;
-  max-width: 650px;
-  margin: 0 auto 2rem;
-  padding: 1rem;
-  background: rgb(255 255 255 / 80%);
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
-}
-
-/* Demo radar container - Consolidated from ethics-analysis.css (similar to .radar-demo-container) */
-.demo-radar-container {
-  max-width: 500px;
-  margin: 0 auto 2rem;
-  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow:
-    0 4px 12px rgb(0 0 0 / 8%),
-    0 1px 3px rgb(0 0 0 / 5%);
-  border: 1px solid rgb(226 232 240 / 80%);
-  transition: all 0.3s ease;
-}
-
-.demo-radar-container:hover {
-  box-shadow:
-    0 8px 20px rgb(0 0 0 / 12%),
-    0 2px 6px rgb(0 0 0 / 8%);
-  transform: translateY(-2px);
-  border-color: rgb(156 163 175 / 60%);
-}
-
-/* Minimal container for demo radar charts - gives more room */
-.radar-demo-container {
-  position: relative;
-  width: 100%;
-  max-width: 700px; /* Even larger for better label visibility */
-  margin: 0 auto;
-  padding: 1rem; /* Reduced padding for more space */
-  background: transparent; /* No background to blend with parent */
-  border-radius: 0; /* No border radius */
-  box-shadow: -4px 4px 8px rgb(0 0 0 / 12%); /* Subtle bottom-left shadow */
-  transition: none; /* No transitions */
-  border: none; /* No border */
-}
-
-.radar-demo-container canvas {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: 0 auto;
-  border-radius: 0; /* No border radius for cleaner look */
-  background: transparent;
-
-  /* CRITICAL: Ensure crisp rendering without forcing pixelation */
-  image-rendering: optimizeQuality;
-}
-
-/* Mobile optimization for radar demo */
-@media (width <= 768px) {
-  .radar-demo-container {
-    padding: 0.5rem; /* Minimal padding on mobile */
-    max-width: 100%; /* Use full width on mobile */
+    position: relative;
+    width: 100%;
+    max-width: 700px; /* Even larger for better label visibility */
+    margin: 0 auto;
+    padding: 1rem; /* Reduced padding for more space */
+    background: transparent; /* No background to blend with parent */
+    border-radius: 0; /* No border radius */
+    box-shadow: -4px 4px 8px rgb(0 0 0 / 12%); /* Subtle bottom-left shadow */
+    transition: none; /* No transitions */
+    border: none; /* No border */
   }
 
   .radar-demo-container canvas {
     max-width: 100%;
-    width: 100%;
     height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 0; /* No border radius for cleaner look */
+    background: transparent;
+
+    /* CRITICAL: Ensure crisp rendering without forcing pixelation */
+    image-rendering: optimizeQuality;
   }
-}
 
-/* Main radar chart container */
-.radar-chart-container {
-  position: relative;
-  width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 2rem;
-  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
-  border-radius: 16px;
-  box-shadow:
-    0 4px 12px rgb(0 0 0 / 8%),
-    0 1px 3px rgb(0 0 0 / 5%);
-  transition: all 0.3s ease;
-  border: 1px solid rgb(226 232 240 / 80%);
-}
+  /* Mobile optimization for radar demo */
+  @media (width <= 768px) {
+    .radar-demo-container {
+      padding: 0.5rem; /* Minimal padding on mobile */
+      max-width: 100%; /* Use full width on mobile */
+    }
 
-/* ===== CONTEXT-SPECIFIC RADAR CHART CONTAINERS ===== */
+    .radar-demo-container canvas {
+      max-width: 100%;
+      width: 100%;
+      height: auto;
+    }
+  }
 
-/* Hero demo context radar chart */
-.hero-radar-chart {
-  position: relative;
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 20px;
-  box-shadow:
-    0 8px 32px rgb(102 126 234 / 25%),
-    0 4px 16px rgb(0 0 0 / 10%);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgb(255 255 255 / 20%);
-}
-
-.hero-radar-chart:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow:
-    0 12px 48px rgb(102 126 234 / 35%),
-    0 8px 24px rgb(0 0 0 / 15%);
-}
-
-.hero-radar-chart canvas {
-  border-radius: 12px;
-  background: rgb(255 255 255 / 95%);
-  backdrop-filter: blur(10px);
-}
-
-/* Scenario modal context radar chart */
-.scenario-radar-chart {
-  position: relative;
-  width: 100%;
-  max-width: 450px;
-  margin: 0 auto;
-  padding: 1.5rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border-radius: 12px;
-  box-shadow:
-    0 2px 8px rgb(0 0 0 / 6%),
-    0 1px 3px rgb(0 0 0 / 4%);
-  border: 1px solid var(--color-gray-200);
-  transition: all 0.2s ease;
-}
-
-.scenario-radar-chart:hover {
-  box-shadow:
-    0 4px 16px rgb(0 0 0 / 10%),
-    0 2px 8px rgb(0 0 0 / 6%);
-  border-color: var(--color-primary);
-}
-
-.scenario-radar-chart canvas {
-  border-radius: 8px;
-  background: #fff;
-}
-
-/* Test/debug context radar chart */
-.test-radar-chart {
-  position: relative;
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
-  padding: 1rem;
-  background: #f1f5f9;
-  border-radius: 8px;
-  border: 2px dashed #cbd5e1;
-  box-shadow: 0 1px 3px rgb(0 0 0 / 5%);
-}
-
-.test-radar-chart::before {
-  content: "TEST CHART";
-  position: absolute;
-  top: 4px;
-  right: 8px;
-  font-size: 10px;
-  font-weight: bold;
-  color: #64748b;
-  opacity: 0.6;
-  letter-spacing: 1px;
-}
-
-.test-radar-chart canvas {
-  border-radius: 4px;
-  background: #fff;
-  border: 1px solid #e2e8f0;
-}
-
-/* ===== END CONTEXT-SPECIFIC CONTAINERS ===== */
-
-/* Existing radar chart container continues below */
-.radar-chart-container {
-  transition: all 0.3s ease;
-  border: 1px solid rgb(226 232 240 / 80%);
-}
-
-.radar-chart-container:hover {
-  box-shadow:
-    0 8px 20px rgb(0 0 0 / 12%),
-    0 2px 6px rgb(0 0 0 / 8%);
-  transform: translateY(-2px);
-  border-color: rgb(156 163 175 / 60%);
-}
-
-/* Chart canvas styling with clean background */
-.radar-chart-container canvas {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: 0 auto;
-  border-radius: 12px;
-  background: transparent;
-  box-shadow: 4px 4px 8px rgb(0 0 0 / 12%); /* Subtle bottom-right shadow similar to demo */
-
-  /* Removed overflow: hidden to allow Chart.js tooltips to show */
-
-  /* CRITICAL: Ensure crisp rendering without forcing pixelation */
-  image-rendering: optimizeQuality;
-}
-
-/* Chart.js Tooltip Support - Ensure tooltips appear above all content */
-canvas[role="img"] {
-  /* Allow tooltips to show by not clipping overflow */
-  position: relative;
-  z-index: 1;
-}
-
-/* ===== SIMPLIFIED CHART.JS TOOLTIP STYLING ===== */
-
-/* SIMPLIFIED: Chart.js handles tooltips automatically - just ensure proper z-index for modals */
-.scenario-modal .chartjs-tooltip,
-.scenario-modal-dialog .chartjs-tooltip {
-  z-index: 1060 !important; /* Above modal backdrop */
-}
-
-/* Enhanced tooltip styling using CSS backdrop-filter for modern browsers */
-.chartjs-tooltip {
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important;
-}
-
-/* PROTECT CategoryHeader tooltips from Chart.js interference */
-.progress-ring-tooltip {
-  display: block !important;
-  z-index: 1200 !important;
-  position: fixed !important;
-}
-
-/* CRITICAL: Scenario grid view protection - ensure radar charts show even when grid is hidden */
-.scenarios-grid[style*="display: none"] .radar-chart-container,
-.scenarios-grid[style*="display: none"] .scenario-radar,
-.view-content[style*="display: none"] .radar-chart-container,
-.view-content[style*="display: none"] .scenario-radar {
-  /* Override parent container inline display:none for radar charts */
-  display: block !important;
-  visibility: visible !important;
-  position: relative !important;
-}
-
-/* Fallback chart when Chart.js fails to load */
-.radar-chart-fallback {
-  padding: 1.5rem;
-  text-align: center;
-  background: var(--card-bg, #fff);
-  border-radius: 12px;
-  border: 2px dashed var(--border-color, #e0e0e0);
-}
-
-.radar-chart-fallback h4 {
-  margin: 0 0 1.5rem;
-  color: var(--text-primary, #333);
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
-.fallback-scores {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-.score-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.75rem;
-  background: var(--bg-secondary, #f8f9fa);
-  border-radius: 8px;
-  transition: background-color 0.2s ease;
-}
-
-.score-item:hover {
-  background: var(--bg-hover, #e9ecef);
-}
-
-.axis-label {
-  font-weight: 500;
-  color: var(--text-primary, #333);
-  min-width: 100px;
-  text-align: left;
-  font-size: 0.9rem;
-}
-
-.score-value {
-  font-weight: 600;
-  color: var(--accent-color, #007bff);
-  min-width: 40px;
-  text-align: center;
-  font-size: 0.9rem;
-}
-
-.score-bar {
-  flex: 1;
-  height: 8px;
-  background: var(--border-color, #e0e0e0);
-  border-radius: 4px;
-  overflow: hidden;
-  position: relative;
-}
-
-.score-fill {
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    var(--danger-color, #dc3545) 0%,
-    var(--warning-color, #ffc107) 50%,
-    var(--success-color, #28a745) 100%
-  );
-  border-radius: 4px;
-  transition: width 0.3s ease;
-  min-width: 2px;
-}
-
-/* Real-time radar chart for scenarios */
-.scenario-radar {
-  top: 2rem;
-  background: linear-gradient(
-    135deg,
-    rgb(102 126 234 / 10%) 0%,
-    rgb(118 75 162 / 8%) 50%,
-    rgb(240 171 252 / 10%) 100%
-  );
-  border: 2px solid transparent;
-  border-radius: 24px;
-  padding: 2rem;
-  margin-bottom: 1rem;
-  backdrop-filter: blur(20px);
-  box-shadow:
-    0 25px 50px -12px rgb(102 126 234 / 25%),
-    0 8px 32px rgb(0 0 0 / 12%),
-    inset 0 1px 0 rgb(255 255 255 / 60%);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-
-  /* Allow tooltips to overflow container */
-  overflow: visible;
-}
-
-.scenario-radar::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgb(102 126 234 / 10%) 0%,
-    rgb(118 75 162 / 5%) 100%
-  );
-  border-radius: 24px;
-  z-index: -1;
-}
-
-.scenario-radar::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(
-    90deg,
-    #667eea 0%,
-    #764ba2 25%,
-    #f093fb 50%,
-    #f5576c 75%,
-    #4facfe 100%
-  );
-  border-radius: 24px 24px 0 0;
-}
-
-.scenario-radar:hover {
-  box-shadow:
-    0 35px 70px -12px rgb(102 126 234 / 40%),
-    0 12px 48px rgb(0 0 0 / 18%),
-    inset 0 1px 0 rgb(255 255 255 / 80%);
-  transform: translateY(-2px) scale(1.01);
-  border-color: rgb(102 126 234 / 30%);
-}
-
-.scenario-radar .radar-title {
-  font-size: 1.25rem;
-  font-weight: 800;
-  margin-bottom: 0.75rem;
-  text-align: center;
-  color: #1a202c;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.025em;
-  text-shadow: 0 2px 4px rgb(0 0 0 / 10%);
-}
-
-.scenario-radar .radar-subtitle {
-  font-size: 0.95rem;
-  color: #4a5568;
-  text-align: center;
-  margin-bottom: 1.5rem;
-  opacity: 0.9;
-  font-weight: 500;
-}
-
-/* Results radar chart for category completion */
-.results-radar {
-  background: linear-gradient(
-    135deg,
-    var(--card-bg, #fff) 0%,
-    rgb(248 250 252 / 90%) 100%
-  );
-  border-radius: 20px;
-  padding: 2.5rem;
-  margin: 2rem 0;
-  box-shadow:
-    0 20px 25px -5px rgb(0 0 0 / 10%),
-    0 10px 10px -5px rgb(0 0 0 / 4%);
-  position: relative;
-
-  /* Allow tooltips to overflow container */
-  overflow: visible;
-}
-
-.results-radar::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(
-    90deg,
-    #667eea 0%,
-    #764ba2 25%,
-    #f093fb 50%,
-    #f5576c 75%,
-    #4facfe 100%
-  );
-}
-
-.results-radar .radar-title {
-  font-size: 1.75rem;
-  font-weight: 800;
-  margin-bottom: 0.75rem;
-  text-align: center;
-  color: var(--text-primary, #1a202c);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.025em;
-}
-
-.results-radar .radar-subtitle {
-  font-size: 1.1rem;
-  color: var(--text-secondary, #4a5568);
-  text-align: center;
-  margin-bottom: 2.5rem;
-  font-weight: 500;
-}
-
-/* Radar chart legend customization */
-.radar-legend {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border-color, #e0e0e0);
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  color: var(--text-secondary, #666);
-}
-
-.legend-color {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-}
-
-/* Responsive design */
-@media (width <= 768px) {
+  /* Main radar chart container */
   .radar-chart-container {
-    padding: 0.75rem;
-    margin: 0.5rem;
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+    border-radius: 16px;
+    box-shadow:
+      0 4px 12px rgb(0 0 0 / 8%),
+      0 1px 3px rgb(0 0 0 / 5%);
+    transition: all 0.3s ease;
+    border: 1px solid rgb(226 232 240 / 80%);
   }
 
-  /* Context-specific mobile responsive styles */
+  /* ===== CONTEXT-SPECIFIC RADAR CHART CONTAINERS ===== */
+
+  /* Hero demo context radar chart */
   .hero-radar-chart {
-    padding: 1.5rem;
-    max-width: 100%;
-    margin: 0.5rem;
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    box-shadow:
+      0 8px 32px rgb(102 126 234 / 25%),
+      0 4px 16px rgb(0 0 0 / 10%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgb(255 255 255 / 20%);
   }
 
+  .hero-radar-chart:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow:
+      0 12px 48px rgb(102 126 234 / 35%),
+      0 8px 24px rgb(0 0 0 / 15%);
+  }
+
+  .hero-radar-chart canvas {
+    border-radius: 12px;
+    background: rgb(255 255 255 / 95%);
+    backdrop-filter: blur(10px);
+  }
+
+  /* Scenario modal context radar chart */
   .scenario-radar-chart {
-    padding: 1rem;
-    max-width: 100%;
-    margin: 0.5rem;
-  }
-
-  .test-radar-chart {
-    padding: 0.75rem;
-    max-width: 100%;
-    margin: 0.5rem;
-  }
-
-  .scenario-radar {
-    position: static;
-    margin: 1rem 0;
-  }
-
-  .results-radar {
+    position: relative;
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
     padding: 1.5rem;
-    margin: 1rem 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-radius: 12px;
+    box-shadow:
+      0 2px 8px rgb(0 0 0 / 6%),
+      0 1px 3px rgb(0 0 0 / 4%);
+    border: 1px solid var(--color-gray-200);
+    transition: all 0.2s ease;
+  }
+
+  .scenario-radar-chart:hover {
+    box-shadow:
+      0 4px 16px rgb(0 0 0 / 10%),
+      0 2px 8px rgb(0 0 0 / 6%);
+    border-color: var(--color-primary);
+  }
+
+  .scenario-radar-chart canvas {
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  /* Test/debug context radar chart */
+  .test-radar-chart {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 1rem;
+    background: #f1f5f9;
+    border-radius: 8px;
+    border: 2px dashed #cbd5e1;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 5%);
+  }
+
+  .test-radar-chart::before {
+    content: "TEST CHART";
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    font-size: 10px;
+    font-weight: bold;
+    color: #64748b;
+    opacity: 0.6;
+    letter-spacing: 1px;
+  }
+
+  .test-radar-chart canvas {
+    border-radius: 4px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+  }
+
+  /* ===== END CONTEXT-SPECIFIC CONTAINERS ===== */
+
+  /* Existing radar chart container continues below */
+  .radar-chart-container {
+    transition: all 0.3s ease;
+    border: 1px solid rgb(226 232 240 / 80%);
+  }
+
+  .radar-chart-container:hover {
+    box-shadow:
+      0 8px 20px rgb(0 0 0 / 12%),
+      0 2px 6px rgb(0 0 0 / 8%);
+    transform: translateY(-2px);
+    border-color: rgb(156 163 175 / 60%);
+  }
+
+  /* Chart canvas styling with clean background */
+  .radar-chart-container canvas {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 12px;
+    background: transparent;
+    box-shadow: 4px 4px 8px rgb(0 0 0 / 12%); /* Subtle bottom-right shadow similar to demo */
+
+    /* Removed overflow: hidden to allow Chart.js tooltips to show */
+
+    /* CRITICAL: Ensure crisp rendering without forcing pixelation */
+    image-rendering: optimizeQuality;
+  }
+
+  /* Chart.js Tooltip Support - Ensure tooltips appear above all content */
+  canvas[role="img"] {
+    /* Allow tooltips to show by not clipping overflow */
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ===== SIMPLIFIED CHART.JS TOOLTIP STYLING ===== */
+
+  /* SIMPLIFIED: Chart.js handles tooltips automatically - just ensure proper z-index for modals */
+  .scenario-modal .chartjs-tooltip,
+  .scenario-modal-dialog .chartjs-tooltip {
+    z-index: 1060 !important; /* Above modal backdrop */
+  }
+
+  /* Enhanced tooltip styling using CSS backdrop-filter for modern browsers */
+  .chartjs-tooltip {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important;
+  }
+
+  /* PROTECT CategoryHeader tooltips from Chart.js interference */
+  .progress-ring-tooltip {
+    display: block !important;
+    z-index: 1200 !important;
+    position: fixed !important;
+  }
+
+  /* CRITICAL: Scenario grid view protection - ensure radar charts show even when grid is hidden */
+  .scenarios-grid[style*="display: none"] .radar-chart-container,
+  .scenarios-grid[style*="display: none"] .scenario-radar,
+  .view-content[style*="display: none"] .radar-chart-container,
+  .view-content[style*="display: none"] .scenario-radar {
+    /* Override parent container inline display:none for radar charts */
+    display: block !important;
+    visibility: visible !important;
+    position: relative !important;
+  }
+
+  /* Fallback chart when Chart.js fails to load */
+  .radar-chart-fallback {
+    padding: 1.5rem;
+    text-align: center;
+    background: var(--card-bg, #fff);
+    border-radius: 12px;
+    border: 2px dashed var(--border-color, #e0e0e0);
+  }
+
+  .radar-chart-fallback h4 {
+    margin: 0 0 1.5rem;
+    color: var(--text-primary, #333);
+    font-size: 1.2rem;
+    font-weight: 600;
   }
 
   .fallback-scores {
-    gap: 0.75rem;
-  }
-
-  .score-item {
-    padding: 0.5rem;
-    gap: 0.75rem;
-  }
-
-  .axis-label {
-    min-width: 80px;
-    font-size: 0.8rem;
-  }
-
-  .score-value {
-    min-width: 35px;
-    font-size: 0.8rem;
-  }
-
-  .radar-demo-container {
-    max-width: 100%;
-    padding: 1rem;
-  }
-}
-
-@media (width <= 480px) {
-  .radar-chart-container {
-    padding: 0.5rem;
-  }
-
-  /* Context-specific small mobile styles */
-  .hero-radar-chart {
-    padding: 1rem;
-    border-radius: 12px;
-  }
-
-  .scenario-radar-chart {
-    padding: 0.75rem;
-    border-radius: 8px;
-  }
-
-  .test-radar-chart {
-    padding: 0.5rem;
-    border-radius: 6px;
-  }
-
-  .results-radar .radar-title {
-    font-size: 1.25rem;
-  }
-
-  .scenario-radar .radar-title {
-    font-size: 0.9rem;
-  }
-
-  .score-item {
+    display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-
-  .axis-label,
-  .score-value {
-    min-width: auto;
-  }
-
-  .score-bar {
-    width: 100%;
-  }
-
-  .radar-demo-container {
-    padding: 0.5rem;
-  }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .scenario-radar,
-  .results-radar {
-    background: var(--card-bg-dark, #2d3748);
-    border-color: var(--border-color-dark, #4a5568);
-  }
-
-  .radar-chart-container {
-    background: linear-gradient(135deg, #fff 0%, #f8fafc 100%) !important;
-    border-color: rgb(226 232 240 / 80%) !important;
-  }
-
-  .radar-chart-fallback {
-    background: var(--card-bg-dark, #2d3748);
-    border-color: var(--border-color-dark, #4a5568);
-  }
-
-  .radar-chart-fallback h4,
-  .radar-title {
-    color: var(--text-primary-dark, #f7fafc);
-  }
-
-  .radar-subtitle {
-    color: var(--text-secondary-dark, #a0aec0);
+    gap: 1rem;
+    max-width: 400px;
+    margin: 0 auto;
   }
 
   .score-item {
-    background: var(--bg-secondary-dark, #4a5568);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: var(--bg-secondary, #f8f9fa);
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
   }
 
   .score-item:hover {
-    background: var(--bg-hover-dark, #2d3748);
+    background: var(--bg-hover, #e9ecef);
   }
 
   .axis-label {
-    color: var(--text-primary-dark, #f7fafc);
+    font-weight: 500;
+    color: var(--text-primary, #333);
+    min-width: 100px;
+    text-align: left;
+    font-size: 0.9rem;
+  }
+
+  .score-value {
+    font-weight: 600;
+    color: var(--accent-color, #007bff);
+    min-width: 40px;
+    text-align: center;
+    font-size: 0.9rem;
   }
 
   .score-bar {
-    background: var(--border-color-dark, #4a5568);
-  }
-}
-
-/* Animation classes for dynamic updates */
-.radar-updating {
-  opacity: 0.8;
-  transition: opacity 0.3s ease;
-  position: relative;
-}
-
-/* Removed loading spinner to eliminate gray dot */
-.radar-updating::after {
-  display: none;
-}
-
-@keyframes radar-spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.radar-updated {
-  opacity: 1;
-  animation: radar-pulse 0.6s ease-out;
-}
-
-@keyframes radar-pulse {
-  0% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.02);
-  }
-
-  100% {
-    transform: scale(1);
-  }
-}
-
-/* ===== HERO RADAR DEMO ENTRANCE ANIMATIONS ===== */
-/* Smooth slide-in animations for hero radar demo section */
-
-@keyframes heroRadarDemoEnter {
-  0% {
-    opacity: 0;
-    transform: translateY(50px) scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes heroRadarElementEnter {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes heroRadarDemoFallback {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* Additional fallback animations to ensure visibility */
-@keyframes heroRadarDemoVisible {
-  0% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes heroRadarElementVisible {
-  0% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Respect reduced motion preferences - disable radar demo animations for accessibility */
-@media (prefers-reduced-motion: reduce) {
-  .hero-radar-demo,
-  .hero-radar-demo h3,
-  .hero-radar-demo p {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-  }
-}
-
-/* Radar chart value indicators - removed to eliminate gray dot */
-.radar-chart-container::before {
-  display: none;
-}
-
-/* Floating action button style for radar interactions */
-.radar-action-button {
-  position: absolute;
-  bottom: 1rem;
-  right: 1rem;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-  color: white;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgb(102 126 234 / 40%);
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-}
-
-.radar-action-button:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 20px rgb(102 126 234 / 60%);
-}
-
-.radar-action-button:active {
-  transform: scale(0.95);
-}
-
-/* Accessibility improvements */
-.radar-chart-container:focus-within {
-  outline: 2px solid var(--focus-color, #007bff);
-  outline-offset: 2px;
-}
-
-.score-item:focus-within {
-  outline: 1px solid var(--focus-color, #007bff);
-  outline-offset: 1px;
-}
-
-/* Print styles */
-@media print {
-  .radar-chart-container,
-  .scenario-radar,
-  .results-radar {
-    background: white !important;
-    border: 1px solid #000 !important;
-    box-shadow: none !important;
-  }
-
-  .radar-title,
-  .axis-label {
-    color: #000 !important;
+    flex: 1;
+    height: 8px;
+    background: var(--border-color, #e0e0e0);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
   }
 
   .score-fill {
-    background: #666 !important;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      var(--danger-color, #dc3545) 0%,
+      var(--warning-color, #ffc107) 50%,
+      var(--success-color, #28a745) 100%
+    );
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    min-width: 2px;
   }
-}
 
-/* Dark mode support for radar charts - Enhanced with consolidation from appearance-settings.css */
-body.dark-mode .radar-demo-container {
-  background: transparent;
-  box-shadow: -4px 4px 8px var(--theme-shadow);
-}
+  /* Real-time radar chart for scenarios */
+  .scenario-radar {
+    top: 2rem;
+    background: linear-gradient(
+      135deg,
+      rgb(102 126 234 / 10%) 0%,
+      rgb(118 75 162 / 8%) 50%,
+      rgb(240 171 252 / 10%) 100%
+    );
+    border: 2px solid transparent;
+    border-radius: 24px;
+    padding: 2rem;
+    margin-bottom: 1rem;
+    backdrop-filter: blur(20px);
+    box-shadow:
+      0 25px 50px -12px rgb(102 126 234 / 25%),
+      0 8px 32px rgb(0 0 0 / 12%),
+      inset 0 1px 0 rgb(255 255 255 / 60%);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
 
-body.dark-mode .radar-chart-container {
-  background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%) !important;
-  border: 1px solid #444 !important;
-  box-shadow:
-    0 4px 12px rgb(0 0 0 / 40%),
-    0 1px 3px rgb(0 0 0 / 30%) !important;
-}
+    /* Allow tooltips to overflow container */
+    overflow: visible;
+  }
 
-body.dark-mode .radar-chart-container:hover {
-  box-shadow:
-    0 8px 20px rgb(0 0 0 / 50%),
-    0 2px 6px rgb(0 0 0 / 40%) !important;
-  border-color: #555 !important;
-}
+  .scenario-radar::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgb(102 126 234 / 10%) 0%,
+      rgb(118 75 162 / 5%) 100%
+    );
+    border-radius: 24px;
+    z-index: -1;
+  }
 
-body.dark-mode .radar-chart-container canvas {
-  background: transparent;
-  box-shadow: 4px 4px 8px var(--theme-shadow);
-}
+  .scenario-radar::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(
+      90deg,
+      #667eea 0%,
+      #764ba2 25%,
+      #f093fb 50%,
+      #f5576c 75%,
+      #4facfe 100%
+    );
+    border-radius: 24px 24px 0 0;
+  }
 
-/* Hero radar demo dark mode - Consolidated from appearance-settings.css */
-body.dark-mode .hero-radar-demo {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
-  color: #fff !important;
-  border-color: #444 !important;
-}
+  .scenario-radar:hover {
+    box-shadow:
+      0 35px 70px -12px rgb(102 126 234 / 40%),
+      0 12px 48px rgb(0 0 0 / 18%),
+      inset 0 1px 0 rgb(255 255 255 / 80%);
+    transform: translateY(-2px) scale(1.01);
+    border-color: rgb(102 126 234 / 30%);
+  }
 
-body.dark-mode .hero-radar-demo h3 {
-  color: #fff !important;
-  background: linear-gradient(135deg, #6bb4ff 0%, #9d4edd 100%) !important;
-  background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-}
+  .scenario-radar .radar-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    text-align: center;
+    color: #1a202c;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.025em;
+    text-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+  }
 
-body.dark-mode .hero-radar-demo p {
-  color: #ccc !important;
-}
+  .scenario-radar .radar-subtitle {
+    font-size: 0.95rem;
+    color: #4a5568;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    opacity: 0.9;
+    font-weight: 500;
+  }
 
-/* Hero radar container dark mode */
-body.dark-mode .hero-radar-container {
-  background: rgb(45 45 45 / 80%);
-  border-color: #444;
-  box-shadow: 0 4px 12px rgb(0 0 0 / 40%);
-}
+  /* Results radar chart for category completion */
+  .results-radar {
+    background: linear-gradient(
+      135deg,
+      var(--card-bg, #fff) 0%,
+      rgb(248 250 252 / 90%) 100%
+    );
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin: 2rem 0;
+    box-shadow:
+      0 20px 25px -5px rgb(0 0 0 / 10%),
+      0 10px 10px -5px rgb(0 0 0 / 4%);
+    position: relative;
 
-/* Demo radar container dark mode */
-body.dark-mode .demo-radar-container {
-  background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
-  border-color: #444;
-  box-shadow:
-    0 4px 12px rgb(0 0 0 / 40%),
-    0 1px 3px rgb(0 0 0 / 30%);
-}
+    /* Allow tooltips to overflow container */
+    overflow: visible;
+  }
 
-body.dark-mode .demo-radar-container:hover {
-  box-shadow:
-    0 8px 20px rgb(0 0 0 / 50%),
-    0 2px 6px rgb(0 0 0 / 40%);
-  border-color: #555;
-}
+  .results-radar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(
+      90deg,
+      #667eea 0%,
+      #764ba2 25%,
+      #f093fb 50%,
+      #f5576c 75%,
+      #4facfe 100%
+    );
+  }
 
-body.dark-mode .radar-chart-fallback {
-  background: var(--theme-bg-secondary);
-  border-color: var(--theme-border);
-}
+  .results-radar .radar-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    text-align: center;
+    color: var(--text-primary, #1a202c);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.025em;
+  }
 
-body.dark-mode .radar-chart-fallback h4 {
-  color: var(--theme-text-primary);
-}
+  .results-radar .radar-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-secondary, #4a5568);
+    text-align: center;
+    margin-bottom: 2.5rem;
+    font-weight: 500;
+  }
 
-body.dark-mode .score-item {
-  background: var(--theme-bg-tertiary);
-}
+  /* Radar chart legend customization */
+  .radar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color, #e0e0e0);
+  }
 
-body.dark-mode .score-item:hover {
-  background: var(--theme-bg-quaternary);
-}
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary, #666);
+  }
 
-body.dark-mode .axis-label {
-  color: var(--theme-text-primary);
-}
+  .legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+  }
 
-body.dark-mode .score-value {
-  color: var(--theme-accent);
-}
+  /* Responsive design */
+  @media (width <= 768px) {
+    .radar-chart-container {
+      padding: 0.75rem;
+      margin: 0.5rem;
+    }
 
-body.dark-mode .score-bar {
-  background: var(--theme-bg-quaternary);
-}
+    /* Context-specific mobile responsive styles */
+    .hero-radar-chart {
+      padding: 1.5rem;
+      max-width: 100%;
+      margin: 0.5rem;
+    }
 
-body.dark-mode .score-fill {
-  background: linear-gradient(
-    90deg,
-    var(--theme-accent),
-    var(--theme-accent-light)
-  );
-}
+    .scenario-radar-chart {
+      padding: 1rem;
+      max-width: 100%;
+      margin: 0.5rem;
+    }
 
-body.dark-mode .scenario-radar {
-  background: linear-gradient(
-    135deg,
-    var(--theme-bg-secondary) 0%,
-    var(--theme-bg-tertiary) 100%
-  );
-  border-color: var(--theme-border);
-  box-shadow: 0 8px 25px var(--theme-shadow);
-}
+    .test-radar-chart {
+      padding: 0.75rem;
+      max-width: 100%;
+      margin: 0.5rem;
+    }
 
-body.dark-mode .scenario-radar:hover {
-  box-shadow: 0 12px 30px var(--theme-shadow-heavy);
-  border-color: var(--theme-accent);
-}
+    .scenario-radar {
+      position: static;
+      margin: 1rem 0;
+    }
 
-body.dark-mode .scenario-radar .radar-title {
-  color: var(--theme-text-primary);
-  background: linear-gradient(
-    135deg,
-    var(--theme-accent) 0%,
-    var(--theme-accent-dark) 100%
-  );
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+    .results-radar {
+      padding: 1.5rem;
+      margin: 1rem 0;
+    }
 
-body.dark-mode .scenario-radar .radar-subtitle {
-  color: var(--theme-text-secondary);
-}
+    .fallback-scores {
+      gap: 0.75rem;
+    }
 
-body.dark-mode .results-radar {
-  background: linear-gradient(
-    135deg,
-    var(--theme-bg-secondary) 0%,
-    var(--theme-bg-tertiary) 100%
-  );
-  border: 1px solid var(--theme-border);
-  box-shadow: 0 10px 10px -5px var(--theme-shadow);
-}
+    .score-item {
+      padding: 0.5rem;
+      gap: 0.75rem;
+    }
 
-body.dark-mode .results-radar .radar-title {
-  color: var(--theme-text-primary);
-  background: linear-gradient(
-    135deg,
-    var(--theme-accent) 0%,
-    var(--theme-accent-dark) 100%
-  );
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+    .axis-label {
+      min-width: 80px;
+      font-size: 0.8rem;
+    }
 
-body.dark-mode .results-radar .radar-subtitle {
-  color: var(--theme-text-secondary);
-}
+    .score-value {
+      min-width: 35px;
+      font-size: 0.8rem;
+    }
 
-body.dark-mode .radar-legend {
-  border-color: var(--theme-border);
-}
+    .radar-demo-container {
+      max-width: 100%;
+      padding: 1rem;
+    }
+  }
 
-body.dark-mode .legend-item {
-  color: var(--theme-text-secondary);
-}
+  @media (width <= 480px) {
+    .radar-chart-container {
+      padding: 0.5rem;
+    }
 
-body.dark-mode .radar-action-button {
-  background: linear-gradient(
-    135deg,
-    var(--theme-accent) 0%,
-    var(--theme-accent-dark) 100%
-  );
-  box-shadow: 0 4px 12px var(--theme-shadow);
-  color: var(--theme-text-on-accent);
-}
+    /* Context-specific small mobile styles */
+    .hero-radar-chart {
+      padding: 1rem;
+      border-radius: 12px;
+    }
 
-body.dark-mode .radar-action-button:hover {
-  box-shadow: 0 6px 16px var(--theme-shadow-heavy);
-}
+    .scenario-radar-chart {
+      padding: 0.75rem;
+      border-radius: 8px;
+    }
 
-body.dark-mode .radar-chart-container:focus-within {
-  outline-color: var(--theme-accent);
-}
+    .test-radar-chart {
+      padding: 0.5rem;
+      border-radius: 6px;
+    }
 
-body.dark-mode .score-item:focus-within {
-  outline-color: var(--theme-accent);
-}
+    .results-radar .radar-title {
+      font-size: 1.25rem;
+    }
 
-/* ===== CHART.JS TOOLTIP CONFLICT RESOLUTION ===== */
+    .scenario-radar .radar-title {
+      font-size: 0.9rem;
+    }
 
-/* Scenario Modal Context - Consolidated radar chart selectors */
-.scenario-modal .radar-chart-container,
-.scenario-modal .scenario-radar,
-.scenario-modal .results-radar,
-.scenario-modal #scenario-radar-chart {
-  text-align: center;
-  position: relative !important;
-  width: 100% !important;
-  max-width: 420px !important; /* Increased max-width for larger chart */
-  margin: 1rem auto !important;
-  padding: 0.5rem !important; /* Reduce padding to give more space to chart */
-  background: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  border: none !important;
-  backdrop-filter: none !important;
+    .score-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
 
-  /* Force grid placement */
-  grid-area: auto;
+    .axis-label,
+    .score-value {
+      min-width: auto;
+    }
 
-  /* Ensure proper sizing for chart - increased min-height for labels */
-  min-height: 450px;
-  overflow: visible !important;
+    .score-bar {
+      width: 100%;
+    }
 
-  /* Ensure container can accommodate chart labels */
-  display: flex !important;
-  flex-direction: column;
-  justify-content: center;
+    .radar-demo-container {
+      padding: 0.5rem;
+    }
+  }
 
-  /* Ensure visibility and proper sizing */
-  visibility: visible !important;
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .scenario-radar,
+    .results-radar {
+      background: var(--card-bg-dark, #2d3748);
+      border-color: var(--border-color-dark, #4a5568);
+    }
 
-  /* Tooltip positioning */
-  z-index: auto !important; /* Don't create new stacking context */
+    .radar-chart-container {
+      background: linear-gradient(135deg, #fff 0%, #f8fafc 100%) !important;
+      border-color: rgb(226 232 240 / 80%) !important;
+    }
 
-  /* Prevent any text content from showing */
-}
+    .radar-chart-fallback {
+      background: var(--card-bg-dark, #2d3748);
+      border-color: var(--border-color-dark, #4a5568);
+    }
 
-/* Canvas specific styling for scenario modal radar charts - consolidated selectors */
-.scenario-modal .radar-chart-container canvas,
-.scenario-modal .scenario-radar canvas,
-.scenario-modal .results-radar canvas,
-.scenario-modal #scenario-radar-chart canvas {
-  max-width: 100% !important;
-  width: 400px !important; /* Increased width for chart */
-  height: 400px !important; /* Increased height for chart */
-  display: block !important;
-  margin: 0 auto !important;
+    .radar-chart-fallback h4,
+    .radar-title {
+      color: var(--text-primary-dark, #f7fafc);
+    }
 
-  /* Prevent clipping - ensure Chart.js has space for labels */
-  transform: none !important;
-  overflow: visible !important;
+    .radar-subtitle {
+      color: var(--text-secondary-dark, #a0aec0);
+    }
 
-  /* Remove padding to give more space to the chart itself */
-  padding: 0;
-  box-sizing: border-box;
-}
+    .score-item {
+      background: var(--bg-secondary-dark, #4a5568);
+    }
 
-/* Scenario modal chart legend styles */
-.scenario-modal .chart-legend h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1a202c;
-  margin: 0 0 1.5rem;
-  text-align: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+    .score-item:hover {
+      background: var(--bg-hover-dark, #2d3748);
+    }
 
-.scenario-modal .chart-legend {
-  margin-top: 1.5rem;
-}
+    .axis-label {
+      color: var(--text-primary-dark, #f7fafc);
+    }
 
-.scenario-modal .chart-legend p {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin: 0;
-  padding: 1rem;
-  background: rgb(102 126 234 / 5%);
-  border-radius: 10px;
-  font-size: 0.9rem;
-  color: #4a5568;
-  border: 1px solid rgb(102 126 234 / 10%);
-}
+    .score-bar {
+      background: var(--border-color-dark, #4a5568);
+    }
+  }
 
-/* Ensure no unwanted text content displays in radar charts - consolidated selectors */
-.scenario-modal .radar-chart-container:empty::before,
-.scenario-modal .scenario-radar:empty::before,
-.scenario-modal .results-radar:empty::before,
-.scenario-modal #scenario-radar-chart:empty::before {
-  content: "";
-  display: none;
-}
+  /* Animation classes for dynamic updates */
+  .radar-updating {
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+    position: relative;
+  }
 
-.scenario-modal .radar-chart-container:empty::after,
-.scenario-modal .scenario-radar:empty::after,
-.scenario-modal .results-radar:empty::after,
-.scenario-modal #scenario-radar-chart:empty::after {
-  content: "";
-  display: none;
-}
+  /* Removed loading spinner to eliminate gray dot */
+  .radar-updating::after {
+    display: none;
+  }
 
-/* Chart.js Tooltip Support - Consolidated from scenario-modal.css */
+  @keyframes radar-spin {
+    0% {
+      transform: rotate(0deg);
+    }
 
-/* Chart.js canvas tooltips - alternative tooltip implementation */
-.scenario-modal canvas[role="img"] + div[style*="position: absolute"],
-.scenario-modal-dialog canvas[role="img"] + div[style*="position: absolute"] {
-  z-index: 1060 !important;
-  position: fixed !important;
-}
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 
-/* Ensure Chart.js tooltip backdrop doesn't interfere */
-.scenario-modal .chart-tooltip:not(.progress-ring-tooltip),
-.scenario-modal-dialog .chart-tooltip:not(.progress-ring-tooltip) {
-  z-index: 1060 !important;
-  position: fixed !important;
-  pointer-events: none !important;
-}
+  .radar-updated {
+    opacity: 1;
+    animation: radar-pulse 0.6s ease-out;
+  }
 
-/* ===== CATEGORY HEADER TOOLTIP PROTECTION ===== */
+  @keyframes radar-pulse {
+    0% {
+      transform: scale(1);
+    }
 
-/* Ensure CategoryHeader tooltips always appear above scenario modals and Chart.js tooltips */
-.progress-ring-tooltip,
-.progress-ring-tooltip.visible {
-  z-index: 1200 !important; /* Always above scenario modals and Chart.js tooltips */
-  position: fixed !important;
-  pointer-events: none !important;
-}
+    50% {
+      transform: scale(1.02);
+    }
 
-/* Scenario modal context - ensure CategoryHeader tooltips remain on top */
-.scenario-modal .progress-ring-tooltip,
-.scenario-modal-dialog .progress-ring-tooltip,
-.scenario-modal .progress-ring-tooltip.visible,
-.scenario-modal-dialog .progress-ring-tooltip.visible {
-  z-index: 1200 !important;
-  position: fixed !important;
-  pointer-events: none !important;
-}
+    100% {
+      transform: scale(1);
+    }
+  }
 
-/* Additional tooltip fixes for scenario modals - consolidated radar selectors */
-.scenario-modal .radar-chart-container,
-.scenario-modal .scenario-radar,
-.scenario-modal .results-radar,
-.scenario-modal #scenario-radar-chart {
-  overflow: visible !important;
-}
+  /* ===== HERO RADAR DEMO ENTRANCE ANIMATIONS ===== */
+  /* Smooth slide-in animations for hero radar demo section */
 
-/* Ensure all radar chart containers allow tooltip overflow */
-.radar-demo-container,
-.radar-chart-container,
-.scenario-radar,
-.results-radar {
-  overflow: visible !important;
-}
+  @keyframes heroRadarDemoEnter {
+    0% {
+      opacity: 0;
+      transform: translateY(50px) scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
 
-/* Override any conflicting z-index rules from scenario modal - consolidated radar selectors */
-.scenario-modal .radar-chart-container canvas[role="img"],
-.scenario-modal .scenario-radar canvas[role="img"],
-.scenario-modal .results-radar canvas[role="img"],
-.scenario-modal #scenario-radar-chart canvas[role="img"],
-.scenario-modal canvas[role="img"],
-.scenario-modal-dialog canvas[role="img"] {
-  position: relative;
-  z-index: 2;
-}
+  @keyframes heroRadarElementEnter {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
-/* ===== INLINE STYLE CONFLICT PROTECTION ===== */
-/* CRITICAL: Ultimate protection against app.html inline style conflicts */
+  @keyframes heroRadarDemoFallback {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
 
-/* Protect all Chart.js elements from inline display:none */
-[class*="chartjs-"],
-[id*="chartjs-"] {
-  /* Force visibility for all Chart.js elements */
-  display: block !important;
-  visibility: visible !important;
-}
+  /* Additional fallback animations to ensure visibility */
+  @keyframes heroRadarDemoVisible {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
 
-/* Protect radar charts in hidden containers (like scenarios-grid with style="display: none") */
-[style*="display: none"] .radar-demo-container,
-[style*="display: none"] .radar-chart-container,
-[style*="display: none"] .scenario-radar,
-[style*="display: none"] .radar-demo-container canvas,
-[style*="display: none"] .radar-chart-container canvas,
-[style*="display: none"] .scenario-radar canvas,
-[style*="display: none"] canvas[id*="radar"],
-[style*="display: none"] canvas[class*="radar"] {
-  /* Override parent inline display:none specifically for radar charts */
-  display: block !important;
-  visibility: visible !important;
-  position: relative !important;
-  z-index: auto !important;
-}
+  @keyframes heroRadarElementVisible {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
-/* Protect search/filter containers that might contain radar charts */
-.search-container[style*="display: none"] .radar-chart-container,
-.scenario-controls-toolbar[style*="display: none"] .radar-chart-container,
-.autocomplete-dropdown[style*="display: none"] .radar-chart-container {
-  /* Override inline display:none for radar charts in UI containers */
-  display: block !important;
-  visibility: visible !important;
-}
+  /* Respect reduced motion preferences - disable radar demo animations for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-radar-demo,
+    .hero-radar-demo h3,
+    .hero-radar-demo p {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
 
-/* SIMPLIFIED: Chart.js tooltips are handled automatically - no complex overrides needed */
+  /* Radar chart value indicators - removed to eliminate gray dot */
+  .radar-chart-container::before {
+    display: none;
+  }
+
+  /* Floating action button style for radar interactions */
+  .radar-action-button {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgb(102 126 234 / 40%);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+  }
+
+  .radar-action-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgb(102 126 234 / 60%);
+  }
+
+  .radar-action-button:active {
+    transform: scale(0.95);
+  }
+
+  /* Accessibility improvements */
+  .radar-chart-container:focus-within {
+    outline: 2px solid var(--focus-color, #007bff);
+    outline-offset: 2px;
+  }
+
+  .score-item:focus-within {
+    outline: 1px solid var(--focus-color, #007bff);
+    outline-offset: 1px;
+  }
+
+  /* Print styles */
+  @media print {
+    .radar-chart-container,
+    .scenario-radar,
+    .results-radar {
+      background: white !important;
+      border: 1px solid #000 !important;
+      box-shadow: none !important;
+    }
+
+    .radar-title,
+    .axis-label {
+      color: #000 !important;
+    }
+
+    .score-fill {
+      background: #666 !important;
+    }
+  }
+
+  /* Dark mode support for radar charts - Enhanced with consolidation from appearance-settings.css */
+  body.dark-mode .radar-demo-container {
+    background: transparent;
+    box-shadow: -4px 4px 8px var(--theme-shadow);
+  }
+
+  body.dark-mode .radar-chart-container {
+    background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%) !important;
+    border: 1px solid #444 !important;
+    box-shadow:
+      0 4px 12px rgb(0 0 0 / 40%),
+      0 1px 3px rgb(0 0 0 / 30%) !important;
+  }
+
+  body.dark-mode .radar-chart-container:hover {
+    box-shadow:
+      0 8px 20px rgb(0 0 0 / 50%),
+      0 2px 6px rgb(0 0 0 / 40%) !important;
+    border-color: #555 !important;
+  }
+
+  body.dark-mode .radar-chart-container canvas {
+    background: transparent;
+    box-shadow: 4px 4px 8px var(--theme-shadow);
+  }
+
+  /* Hero radar demo dark mode - Consolidated from appearance-settings.css */
+  body.dark-mode .hero-radar-demo {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+    color: #fff !important;
+    border-color: #444 !important;
+  }
+
+  body.dark-mode .hero-radar-demo h3 {
+    color: #fff !important;
+    background: linear-gradient(135deg, #6bb4ff 0%, #9d4edd 100%) !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+  }
+
+  body.dark-mode .hero-radar-demo p {
+    color: #ccc !important;
+  }
+
+  /* Hero radar container dark mode */
+  body.dark-mode .hero-radar-container {
+    background: rgb(45 45 45 / 80%);
+    border-color: #444;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 40%);
+  }
+
+  /* Demo radar container dark mode */
+  body.dark-mode .demo-radar-container {
+    background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
+    border-color: #444;
+    box-shadow:
+      0 4px 12px rgb(0 0 0 / 40%),
+      0 1px 3px rgb(0 0 0 / 30%);
+  }
+
+  body.dark-mode .demo-radar-container:hover {
+    box-shadow:
+      0 8px 20px rgb(0 0 0 / 50%),
+      0 2px 6px rgb(0 0 0 / 40%);
+    border-color: #555;
+  }
+
+  body.dark-mode .radar-chart-fallback {
+    background: var(--theme-bg-secondary);
+    border-color: var(--theme-border);
+  }
+
+  body.dark-mode .radar-chart-fallback h4 {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .score-item {
+    background: var(--theme-bg-tertiary);
+  }
+
+  body.dark-mode .score-item:hover {
+    background: var(--theme-bg-quaternary);
+  }
+
+  body.dark-mode .axis-label {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .score-value {
+    color: var(--theme-accent);
+  }
+
+  body.dark-mode .score-bar {
+    background: var(--theme-bg-quaternary);
+  }
+
+  body.dark-mode .score-fill {
+    background: linear-gradient(
+      90deg,
+      var(--theme-accent),
+      var(--theme-accent-light)
+    );
+  }
+
+  body.dark-mode .scenario-radar {
+    background: linear-gradient(
+      135deg,
+      var(--theme-bg-secondary) 0%,
+      var(--theme-bg-tertiary) 100%
+    );
+    border-color: var(--theme-border);
+    box-shadow: 0 8px 25px var(--theme-shadow);
+  }
+
+  body.dark-mode .scenario-radar:hover {
+    box-shadow: 0 12px 30px var(--theme-shadow-heavy);
+    border-color: var(--theme-accent);
+  }
+
+  body.dark-mode .scenario-radar .radar-title {
+    color: var(--theme-text-primary);
+    background: linear-gradient(
+      135deg,
+      var(--theme-accent) 0%,
+      var(--theme-accent-dark) 100%
+    );
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  body.dark-mode .scenario-radar .radar-subtitle {
+    color: var(--theme-text-secondary);
+  }
+
+  body.dark-mode .results-radar {
+    background: linear-gradient(
+      135deg,
+      var(--theme-bg-secondary) 0%,
+      var(--theme-bg-tertiary) 100%
+    );
+    border: 1px solid var(--theme-border);
+    box-shadow: 0 10px 10px -5px var(--theme-shadow);
+  }
+
+  body.dark-mode .results-radar .radar-title {
+    color: var(--theme-text-primary);
+    background: linear-gradient(
+      135deg,
+      var(--theme-accent) 0%,
+      var(--theme-accent-dark) 100%
+    );
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  body.dark-mode .results-radar .radar-subtitle {
+    color: var(--theme-text-secondary);
+  }
+
+  body.dark-mode .radar-legend {
+    border-color: var(--theme-border);
+  }
+
+  body.dark-mode .legend-item {
+    color: var(--theme-text-secondary);
+  }
+
+  body.dark-mode .radar-action-button {
+    background: linear-gradient(
+      135deg,
+      var(--theme-accent) 0%,
+      var(--theme-accent-dark) 100%
+    );
+    box-shadow: 0 4px 12px var(--theme-shadow);
+    color: var(--theme-text-on-accent);
+  }
+
+  body.dark-mode .radar-action-button:hover {
+    box-shadow: 0 6px 16px var(--theme-shadow-heavy);
+  }
+
+  body.dark-mode .radar-chart-container:focus-within {
+    outline-color: var(--theme-accent);
+  }
+
+  body.dark-mode .score-item:focus-within {
+    outline-color: var(--theme-accent);
+  }
+
+  /* ===== CHART.JS TOOLTIP CONFLICT RESOLUTION ===== */
+
+  /* Scenario Modal Context - Consolidated radar chart selectors */
+  .scenario-modal .radar-chart-container,
+  .scenario-modal .scenario-radar,
+  .scenario-modal .results-radar,
+  .scenario-modal #scenario-radar-chart {
+    text-align: center;
+    position: relative !important;
+    width: 100% !important;
+    max-width: 420px !important; /* Increased max-width for larger chart */
+    margin: 1rem auto !important;
+    padding: 0.5rem !important; /* Reduce padding to give more space to chart */
+    background: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    backdrop-filter: none !important;
+
+    /* Force grid placement */
+    grid-area: auto;
+
+    /* Ensure proper sizing for chart - increased min-height for labels */
+    min-height: 450px;
+    overflow: visible !important;
+
+    /* Ensure container can accommodate chart labels */
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+
+    /* Ensure visibility and proper sizing */
+    visibility: visible !important;
+
+    /* Tooltip positioning */
+    z-index: auto !important; /* Don't create new stacking context */
+
+    /* Prevent any text content from showing */
+  }
+
+  /* Canvas specific styling for scenario modal radar charts - consolidated selectors */
+  .scenario-modal .radar-chart-container canvas,
+  .scenario-modal .scenario-radar canvas,
+  .scenario-modal .results-radar canvas,
+  .scenario-modal #scenario-radar-chart canvas {
+    max-width: 100% !important;
+    width: 400px !important; /* Increased width for chart */
+    height: 400px !important; /* Increased height for chart */
+    display: block !important;
+    margin: 0 auto !important;
+
+    /* Prevent clipping - ensure Chart.js has space for labels */
+    transform: none !important;
+    overflow: visible !important;
+
+    /* Remove padding to give more space to the chart itself */
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  /* Scenario modal chart legend styles */
+  .scenario-modal .chart-legend h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 1.5rem;
+    text-align: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .scenario-modal .chart-legend {
+    margin-top: 1.5rem;
+  }
+
+  .scenario-modal .chart-legend p {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 1rem;
+    background: rgb(102 126 234 / 5%);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: #4a5568;
+    border: 1px solid rgb(102 126 234 / 10%);
+  }
+
+  /* Ensure no unwanted text content displays in radar charts - consolidated selectors */
+  .scenario-modal .radar-chart-container:empty::before,
+  .scenario-modal .scenario-radar:empty::before,
+  .scenario-modal .results-radar:empty::before,
+  .scenario-modal #scenario-radar-chart:empty::before {
+    content: "";
+    display: none;
+  }
+
+  .scenario-modal .radar-chart-container:empty::after,
+  .scenario-modal .scenario-radar:empty::after,
+  .scenario-modal .results-radar:empty::after,
+  .scenario-modal #scenario-radar-chart:empty::after {
+    content: "";
+    display: none;
+  }
+
+  /* Chart.js Tooltip Support - Consolidated from scenario-modal.css */
+
+  /* Chart.js canvas tooltips - alternative tooltip implementation */
+  .scenario-modal canvas[role="img"] + div[style*="position: absolute"],
+  .scenario-modal-dialog canvas[role="img"] + div[style*="position: absolute"] {
+    z-index: 1060 !important;
+    position: fixed !important;
+  }
+
+  /* Ensure Chart.js tooltip backdrop doesn't interfere */
+  .scenario-modal .chart-tooltip:not(.progress-ring-tooltip),
+  .scenario-modal-dialog .chart-tooltip:not(.progress-ring-tooltip) {
+    z-index: 1060 !important;
+    position: fixed !important;
+    pointer-events: none !important;
+  }
+
+  /* ===== CATEGORY HEADER TOOLTIP PROTECTION ===== */
+
+  /* Ensure CategoryHeader tooltips always appear above scenario modals and Chart.js tooltips */
+  .progress-ring-tooltip,
+  .progress-ring-tooltip.visible {
+    z-index: 1200 !important; /* Always above scenario modals and Chart.js tooltips */
+    position: fixed !important;
+    pointer-events: none !important;
+  }
+
+  /* Scenario modal context - ensure CategoryHeader tooltips remain on top */
+  .scenario-modal .progress-ring-tooltip,
+  .scenario-modal-dialog .progress-ring-tooltip,
+  .scenario-modal .progress-ring-tooltip.visible,
+  .scenario-modal-dialog .progress-ring-tooltip.visible {
+    z-index: 1200 !important;
+    position: fixed !important;
+    pointer-events: none !important;
+  }
+
+  /* Additional tooltip fixes for scenario modals - consolidated radar selectors */
+  .scenario-modal .radar-chart-container,
+  .scenario-modal .scenario-radar,
+  .scenario-modal .results-radar,
+  .scenario-modal #scenario-radar-chart {
+    overflow: visible !important;
+  }
+
+  /* Ensure all radar chart containers allow tooltip overflow */
+  .radar-demo-container,
+  .radar-chart-container,
+  .scenario-radar,
+  .results-radar {
+    overflow: visible !important;
+  }
+
+  /* Override any conflicting z-index rules from scenario modal - consolidated radar selectors */
+  .scenario-modal .radar-chart-container canvas[role="img"],
+  .scenario-modal .scenario-radar canvas[role="img"],
+  .scenario-modal .results-radar canvas[role="img"],
+  .scenario-modal #scenario-radar-chart canvas[role="img"],
+  .scenario-modal canvas[role="img"],
+  .scenario-modal-dialog canvas[role="img"] {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ===== INLINE STYLE CONFLICT PROTECTION ===== */
+  /* CRITICAL: Ultimate protection against app.html inline style conflicts */
+
+  /* Protect all Chart.js elements from inline display:none */
+  [class*="chartjs-"],
+  [id*="chartjs-"] {
+    /* Force visibility for all Chart.js elements */
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  /* Protect radar charts in hidden containers (like scenarios-grid with style="display: none") */
+  [style*="display: none"] .radar-demo-container,
+  [style*="display: none"] .radar-chart-container,
+  [style*="display: none"] .scenario-radar,
+  [style*="display: none"] .radar-demo-container canvas,
+  [style*="display: none"] .radar-chart-container canvas,
+  [style*="display: none"] .scenario-radar canvas,
+  [style*="display: none"] canvas[id*="radar"],
+  [style*="display: none"] canvas[class*="radar"] {
+    /* Override parent inline display:none specifically for radar charts */
+    display: block !important;
+    visibility: visible !important;
+    position: relative !important;
+    z-index: auto !important;
+  }
+
+  /* Protect search/filter containers that might contain radar charts */
+  .search-container[style*="display: none"] .radar-chart-container,
+  .scenario-controls-toolbar[style*="display: none"] .radar-chart-container,
+  .autocomplete-dropdown[style*="display: none"] .radar-chart-container {
+    /* Override inline display:none for radar charts in UI containers */
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  /* SIMPLIFIED: Chart.js tooltips are handled automatically - no complex overrides needed */
+} /* End @layer components */

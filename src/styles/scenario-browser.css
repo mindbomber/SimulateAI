@@ -4,190 +4,191 @@
  * Organized for the ScenarioBrowser component
  */
 
-/* ===== SCENARIO BROWSER HERO ===== */
-.scenario-hero {
-  background: linear-gradient(
-    135deg,
-    var(--color-primary) 0%,
-    var(--color-primary-dark) 100%
-  );
-  color: var(--color-white);
-  text-align: center;
-  padding: var(--spacing-20) var(--spacing-6);
-  min-height: 500px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.scenario-hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(
-      circle at 20% 80%,
-      rgb(255 255 255 / 10%) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      circle at 80% 20%,
-      rgb(255 255 255 / 8%) 0%,
-      transparent 50%
+@layer components {
+  /* ===== SCENARIO BROWSER HERO ===== */
+  .scenario-hero {
+    background: linear-gradient(
+      135deg,
+      var(--color-primary) 0%,
+      var(--color-primary-dark) 100%
     );
-  pointer-events: none;
-}
+    color: var(--color-white);
+    text-align: center;
+    padding: var(--spacing-20) var(--spacing-6);
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
 
-.scenario-hero .hero-content {
-  max-width: 800px;
-  margin: 0 auto;
-  position: relative;
-  z-index: 2;
-}
+  .scenario-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(
+        circle at 20% 80%,
+        rgb(255 255 255 / 10%) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 80% 20%,
+        rgb(255 255 255 / 8%) 0%,
+        transparent 50%
+      );
+    pointer-events: none;
+  }
 
-.scenario-hero .hero-title {
-  font-size: var(--font-size-5xl);
-  font-weight: var(--font-weight-bold);
-  margin-bottom: var(--spacing-6);
-  line-height: var(--line-height-tight);
-  text-shadow: 0 2px 4px rgb(0 0 0 / 10%);
-}
+  .scenario-hero .hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+  }
 
-.scenario-hero .hero-description {
-  font-size: var(--font-size-xl);
-  line-height: var(--line-height-relaxed);
-  opacity: 0.95;
-  max-width: 600px;
-  margin: 0 auto;
-}
+  .scenario-hero .hero-title {
+    font-size: var(--font-size-5xl);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--spacing-6);
+    line-height: var(--line-height-tight);
+    text-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+  }
 
-/* ===== MAIN GRID CONTAINER ===== */
+  .scenario-hero .hero-description {
+    font-size: var(--font-size-xl);
+    line-height: var(--line-height-relaxed);
+    opacity: 0.95;
+    max-width: 600px;
+    margin: 0 auto;
+  }
 
-/* Categories section - main container for the grid component */
-.categories-section {
-  position: relative;
-  width: 100%;
-  min-height: 400px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-8);
-  padding: var(--spacing-6);
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  transition: all 0.3s ease;
-}
+  /* ===== MAIN GRID CONTAINER ===== */
 
-/* Dark mode support for categories section */
-.dark-mode .categories-section {
-  background: var(--color-surface-dark);
-  border: 1px solid var(--color-border-dark);
-}
-
-/* Responsive adjustments for categories section */
-@media (max-width: 768px) {
+  /* Categories section - main container for the grid component */
   .categories-section {
-    padding: var(--spacing-4);
+    position: relative;
+    width: 100%;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-8);
+    padding: var(--spacing-6);
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    transition: all 0.3s ease;
+  }
+
+  /* Dark mode support for categories section */
+  .dark-mode .categories-section {
+    background: var(--color-surface-dark);
+    border: 1px solid var(--color-border-dark);
+  }
+
+  /* Responsive adjustments for categories section */
+  @media (max-width: 768px) {
+    .categories-section {
+      padding: var(--spacing-4);
+      gap: var(--spacing-6);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .categories-section {
+      padding: var(--spacing-3);
+      gap: var(--spacing-4);
+      border-radius: var(--radius-md);
+    }
+  }
+
+  /* ===== SCENARIOS GRID LAYOUT - CONSOLIDATED ===== */
+
+  /* Base scenarios grid - supports multiple contexts and view modes */
+  .scenarios-grid {
+    display: flex;
+    overflow: auto hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    padding-bottom: var(--spacing-2);
     gap: var(--spacing-6);
   }
-}
 
-@media (max-width: 480px) {
-  .categories-section {
-    padding: var(--spacing-3);
-    gap: var(--spacing-4);
-    border-radius: var(--radius-md);
-  }
-}
+  /* Hide scrollbar only on touch devices where users can scroll without visual cues */
+  @media (hover: none) and (pointer: coarse) {
+    .scenarios-grid {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
 
-/* ===== SCENARIOS GRID LAYOUT - CONSOLIDATED ===== */
-
-/* Base scenarios grid - supports multiple contexts and view modes */
-.scenarios-grid {
-  display: flex;
-  overflow: auto hidden;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  padding-bottom: var(--spacing-2);
-  gap: var(--spacing-6);
-}
-
-/* Hide scrollbar only on touch devices where users can scroll without visual cues */
-@media (hover: none) and (pointer: coarse) {
-  .scenarios-grid {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    .scenarios-grid::-webkit-scrollbar {
+      display: none;
+    }
   }
 
-  .scenarios-grid::-webkit-scrollbar {
-    display: none;
-  }
-}
-
-/* Category view mode - horizontal scrolling within category sections */
-.scenarios-grid[data-view="category"] {
-  display: flex;
-  overflow: auto hidden;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  padding-bottom: var(--spacing-2);
-  gap: var(--spacing-6);
-}
-
-/* Hide scrollbar only on touch devices for category view */
-@media (hover: none) and (pointer: coarse) {
+  /* Category view mode - horizontal scrolling within category sections */
   .scenarios-grid[data-view="category"] {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    display: flex;
+    overflow: auto hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    padding-bottom: var(--spacing-2);
+    gap: var(--spacing-6);
   }
 
-  .scenarios-grid[data-view="category"]::-webkit-scrollbar {
-    display: none;
+  /* Hide scrollbar only on touch devices for category view */
+  @media (hover: none) and (pointer: coarse) {
+    .scenarios-grid[data-view="category"] {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .scenarios-grid[data-view="category"]::-webkit-scrollbar {
+      display: none;
+    }
   }
-}
 
-/* Grid layout mode for scenario browser and category grid scenario view */
-.scenarios-grid[data-view="scenario"] {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: var(--spacing-6);
-  padding: var(--spacing-4);
-  transition: all 0.3s ease;
-  border-radius: var(--radius-lg);
-  box-shadow: inset 0 0 0 1px transparent;
-  overflow: visible;
-  scroll-snap-type: none;
-}
+  /* Grid layout mode for scenario browser and category grid scenario view */
+  .scenarios-grid[data-view="scenario"] {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--spacing-6);
+    padding: var(--spacing-4);
+    transition: all 0.3s ease;
+    border-radius: var(--radius-lg);
+    box-shadow: inset 0 0 0 1px transparent;
+    overflow: visible;
+    scroll-snap-type: none;
+  }
 
-/* Ethics Explorer specific scenarios grid styling */
-.ethics-explorer .scenarios-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: var(--spacing-6);
-  padding: var(--spacing-4);
-  transition: all 0.3s ease;
-  border-radius: var(--radius-lg);
-  box-shadow: inset 0 0 0 1px transparent;
-}
+  /* Ethics Explorer specific scenarios grid styling */
+  .ethics-explorer .scenarios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--spacing-6);
+    padding: var(--spacing-4);
+    transition: all 0.3s ease;
+    border-radius: var(--radius-lg);
+    box-shadow: inset 0 0 0 1px transparent;
+  }
 
-.ethics-explorer .scenarios-grid:hover {
-  box-shadow: inset 0 0 0 1px rgb(74 144 226 / 15%);
-  animation: grid-glow 2s ease-in-out infinite;
-}
-
-@keyframes grid-glow {
-  0%,
-  100% {
+  .ethics-explorer .scenarios-grid:hover {
     box-shadow: inset 0 0 0 1px rgb(74 144 226 / 15%);
+    animation: grid-glow 2s ease-in-out infinite;
   }
 
-  50% {
-    box-shadow: inset 0 0 0 1px rgb(74 144 226 / 25%);
-  }
-}
+  @keyframes grid-glow {
+    0%,
+    100% {
+      box-shadow: inset 0 0 0 1px rgb(74 144 226 / 15%);
+    }
 
-/* ===== SCENARIO CARDS - MOVED TO COMPONENT FILE =====
+    50% {
+      box-shadow: inset 0 0 0 1px rgb(74 144 226 / 25%);
+    }
+  }
+
+  /* ===== SCENARIO CARDS - MOVED TO COMPONENT FILE =====
    Base scenario card styles have been consolidated to:
    📁 src/styles/scenario-card.css
    
@@ -201,709 +202,710 @@
    Context-specific overrides remain in scenario-card.css
    ============================================= */
 
-/* ===== BROWSER SPECIFIC STYLES ===== */
+  /* ===== BROWSER SPECIFIC STYLES ===== */
 
-/* ===== SCENARIO CARD WRAPPER WITH HOVER EFFECTS ===== */
-.scenario-card-wrapper {
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
-}
+  /* ===== SCENARIO CARD WRAPPER WITH HOVER EFFECTS ===== */
+  .scenario-card-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+  }
 
-.scenario-card-wrapper:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgb(0 0 0 / 12%);
-}
+  .scenario-card-wrapper:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgb(0 0 0 / 12%);
+  }
 
-/* ===== MINI PROGRESS RING STYLES FOR HOVER HEADERS ===== */
-/* Mini progress ring styles for hover category headers in scenario view */
-.category-progress-ring-mini {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: transform 0.2s ease;
-}
+  /* ===== MINI PROGRESS RING STYLES FOR HOVER HEADERS ===== */
+  /* Mini progress ring styles for hover category headers in scenario view */
+  .category-progress-ring-mini {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+  }
 
-.category-progress-ring-mini:hover {
-  transform: scale(1.1);
-}
+  .category-progress-ring-mini:hover {
+    transform: scale(1.1);
+  }
 
-.progress-percentage-mini {
-  position: absolute;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--color-text-primary, #1f2937);
-  pointer-events: none;
-}
+  .progress-percentage-mini {
+    position: absolute;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-primary, #1f2937);
+    pointer-events: none;
+  }
 
-.category-info-mini {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-1, 4px);
-  min-width: 0;
-}
+  .category-info-mini {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1, 4px);
+    min-width: 0;
+  }
 
-.category-icon-mini {
-  font-size: 1.25rem;
-  line-height: 1;
-}
+  .category-icon-mini {
+    font-size: 1.25rem;
+    line-height: 1;
+  }
 
-.category-title-mini {
-  font-weight: 600;
-  color: var(--color-text-primary, #1f2937);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 0.875rem;
-}
+  .category-title-mini {
+    font-weight: 600;
+    color: var(--color-text-primary, #1f2937);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.875rem;
+  }
 
-.category-progress-text-mini {
-  font-size: 0.75rem;
-  color: var(--color-text-secondary, #6b7280);
-  font-weight: 500;
-}
+  .category-progress-text-mini {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary, #6b7280);
+    font-weight: 500;
+  }
 
-/* Progress ring animations */
-.category-progress-ring-mini .progress-circle {
-  transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
+  /* Progress ring animations */
+  .category-progress-ring-mini .progress-circle {
+    transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
-/* Accessibility for mini progress rings */
-.category-progress-ring-mini:focus {
-  outline: 2px solid var(--color-primary, #3b82f6);
-  outline-offset: 2px;
-  border-radius: 50%;
-}
+  /* Accessibility for mini progress rings */
+  .category-progress-ring-mini:focus {
+    outline: 2px solid var(--color-primary, #3b82f6);
+    outline-offset: 2px;
+    border-radius: 50%;
+  }
 
-/* ===== SCENARIO CONTROLS TOOLBAR ===== */
-.scenario-controls-toolbar {
-  display: none;
-  align-items: center;
-  gap: var(--spacing-4);
-  padding: var(--spacing-4) 0 var(--spacing-6) 0;
-  margin-bottom: var(--spacing-2);
-  border-bottom: 1px solid var(--color-gray-200);
-  /* Ensure toolbar is always on its own row, outside grid layout */
-  grid-column: 1 / -1; /* Span full width when inside a grid container */
-  order: -1; /* Ensure it appears before grid items */
-}
-
-.scenarios-grid[data-view="scenario"] .scenario-controls-toolbar {
-  display: flex !important;
-}
-
-/* Additional selector for view-content compatibility */
-.scenarios-grid.view-content[data-view="scenario"] .scenario-controls-toolbar {
-  display: flex !important;
-}
-
-/* Fallback: Force display when scenario grid is visible */
-.scenarios-grid[data-view="scenario"]:not([style*="display: none"])
+  /* ===== SCENARIO CONTROLS TOOLBAR ===== */
   .scenario-controls-toolbar {
-  display: flex !important;
-}
+    display: none;
+    align-items: center;
+    gap: var(--spacing-4);
+    padding: var(--spacing-4) 0 var(--spacing-6) 0;
+    margin-bottom: var(--spacing-2);
+    border-bottom: 1px solid var(--color-gray-200);
+    /* Ensure toolbar is always on its own row, outside grid layout */
+    grid-column: 1 / -1; /* Span full width when inside a grid container */
+    order: -1; /* Ensure it appears before grid items */
+  }
 
-/* ===== CONSOLIDATED SCENARIO TOOLBAR CONTROLS ===== */
-/* Universal toolbar container styles - consolidated and simplified */
-.scenario-controls-toolbar .search-container,
-.scenario-controls-toolbar .filter-container,
-.scenario-controls-toolbar .sort-container,
-.scenario-controls-toolbar .controls-group {
-  /* Unified container layout */
-  display: flex !important;
-  align-items: center;
-  position: relative;
-  /* Prevent any hidden containers */
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-/* Search container specific */
-.scenario-controls-toolbar .search-container {
-  flex: 1;
-  max-width: 100%;
-}
-
-/* Controls group specific */
-.scenario-controls-toolbar .controls-group {
-  gap: var(--spacing-3);
-}
-
-/* Filter and sort containers specific */
-.scenario-controls-toolbar .filter-container,
-.scenario-controls-toolbar .sort-container {
-  /* Keep as inline-flex for button grouping */
-  display: inline-flex !important;
-}
-
-/* Enhanced button visibility for debugging */
-.scenario-controls-toolbar .search-input {
-  background: white !important;
-  border: 2px solid #333 !important;
-  color: #333 !important;
-  font-size: 14px !important;
-  /* Fixed: Preserve left padding for search icon */
-  padding: 8px 12px 8px 2.75rem !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-.scenario-controls-toolbar .filter-btn,
-.scenario-controls-toolbar .sort-btn {
-  background: #f0f0f0 !important;
-  border: 2px solid #333 !important;
-  color: #333 !important;
-  font-size: 14px !important;
-  padding: 8px 12px !important;
-  cursor: pointer !important;
-  pointer-events: auto !important;
-}
-
-.scenario-controls-toolbar .clear-all-btn {
-  background: #ff6b6b !important;
-  border: 2px solid #d63447 !important;
-  color: white !important;
-  font-size: 14px !important;
-  padding: 8px 12px !important;
-  cursor: pointer !important;
-  pointer-events: auto !important;
-}
-
-/* COMPLETE OVERRIDE: Force search input to proper width on larger screens */
-@media (width >= 769px) {
-  /* Override at the toolbar level */
   .scenarios-grid[data-view="scenario"] .scenario-controls-toolbar {
-    width: 100% !important;
-    max-width: none !important;
+    display: flex !important;
   }
 
-  /* Force search container to expand */
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-container {
-    flex: 1 !important;
-    min-width: 250px !important;
-    max-width: 450px !important;
-    width: 100% !important;
+  /* Additional selector for view-content compatibility */
+  .scenarios-grid.view-content[data-view="scenario"]
+    .scenario-controls-toolbar {
+    display: flex !important;
   }
 
-  /* Force input wrapper to expand */
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input-wrapper {
+  /* Fallback: Force display when scenario grid is visible */
+  .scenarios-grid[data-view="scenario"]:not([style*="display: none"])
+    .scenario-controls-toolbar {
+    display: flex !important;
+  }
+
+  /* ===== CONSOLIDATED SCENARIO TOOLBAR CONTROLS ===== */
+  /* Universal toolbar container styles - consolidated and simplified */
+  .scenario-controls-toolbar .search-container,
+  .scenario-controls-toolbar .filter-container,
+  .scenario-controls-toolbar .sort-container,
+  .scenario-controls-toolbar .controls-group {
+    /* Unified container layout */
+    display: flex !important;
+    align-items: center;
+    position: relative;
+    /* Prevent any hidden containers */
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Search container specific */
+  .scenario-controls-toolbar .search-container {
+    flex: 1;
+    max-width: 100%;
+  }
+
+  /* Controls group specific */
+  .scenario-controls-toolbar .controls-group {
+    gap: var(--spacing-3);
+  }
+
+  /* Filter and sort containers specific */
+  .scenario-controls-toolbar .filter-container,
+  .scenario-controls-toolbar .sort-container {
+    /* Keep as inline-flex for button grouping */
+    display: inline-flex !important;
+  }
+
+  /* Enhanced button visibility for debugging */
+  .scenario-controls-toolbar .search-input {
+    background: white !important;
+    border: 2px solid #333 !important;
+    color: #333 !important;
+    font-size: 14px !important;
+    /* Fixed: Preserve left padding for search icon */
+    padding: 8px 12px 8px 2.75rem !important;
     width: 100% !important;
-    min-width: 250px !important;
-    flex: 1 !important;
-    flex-grow: 1 !important;
-    flex-shrink: 0 !important;
     box-sizing: border-box !important;
   }
 
-  /* Force the actual input to expand */
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input {
-    width: 100% !important;
-    min-width: 250px !important;
-    flex: 1 !important;
-    flex-grow: 1 !important;
-    flex-shrink: 0 !important;
-    box-sizing: border-box !important;
-    max-width: none !important;
-  }
-}
-
-@media (width >= 1024px) {
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-container {
-    min-width: 300px !important;
-    max-width: 550px !important;
+  .scenario-controls-toolbar .filter-btn,
+  .scenario-controls-toolbar .sort-btn {
+    background: #f0f0f0 !important;
+    border: 2px solid #333 !important;
+    color: #333 !important;
+    font-size: 14px !important;
+    padding: 8px 12px !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
   }
 
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input-wrapper {
-    min-width: 300px !important;
+  .scenario-controls-toolbar .clear-all-btn {
+    background: #ff6b6b !important;
+    border: 2px solid #d63447 !important;
+    color: white !important;
+    font-size: 14px !important;
+    padding: 8px 12px !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
   }
 
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input {
-    min-width: 300px !important;
-  }
-}
+  /* COMPLETE OVERRIDE: Force search input to proper width on larger screens */
+  @media (width >= 769px) {
+    /* Override at the toolbar level */
+    .scenarios-grid[data-view="scenario"] .scenario-controls-toolbar {
+      width: 100% !important;
+      max-width: none !important;
+    }
 
-@media (width >= 1200px) {
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-container {
-    min-width: 350px !important;
-    max-width: 650px !important;
-  }
+    /* Force search container to expand */
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .search-container {
+      flex: 1 !important;
+      min-width: 250px !important;
+      max-width: 450px !important;
+      width: 100% !important;
+    }
 
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input-wrapper {
-    min-width: 350px !important;
-  }
+    /* Force input wrapper to expand */
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .search-input-wrapper {
+      width: 100% !important;
+      min-width: 250px !important;
+      flex: 1 !important;
+      flex-grow: 1 !important;
+      flex-shrink: 0 !important;
+      box-sizing: border-box !important;
+    }
 
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input {
-    min-width: 350px !important;
-  }
-}
-
-/* ===== MOBILE RESPONSIVE LAYOUT FOR SCENARIO TOOLBAR ===== */
-/* Mobile responsive layout for search toolbar */
-@media (width <= 768px) {
-  /* Stack search and controls vertically on mobile */
-  .scenarios-grid[data-view="scenario"] .scenario-controls-toolbar {
-    flex-direction: column !important;
-    align-items: stretch !important;
-    gap: var(--spacing-3) !important;
-    padding: var(--spacing-3) 0 var(--spacing-4) 0 !important;
-  }
-
-  /* Search container takes full width on mobile */
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-container {
-    width: 100% !important;
-    max-width: none !important;
-    min-width: 0 !important;
-    order: 1 !important; /* Search appears first */
-    margin-bottom: var(--spacing-2) !important;
+    /* Force the actual input to expand */
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .search-input {
+      width: 100% !important;
+      min-width: 250px !important;
+      flex: 1 !important;
+      flex-grow: 1 !important;
+      flex-shrink: 0 !important;
+      box-sizing: border-box !important;
+      max-width: none !important;
+    }
   }
 
-  /* Controls group appears below search */
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .controls-group {
-    width: 100% !important;
-    justify-content: center !important;
-    order: 2 !important; /* Controls appear second */
-    gap: var(--spacing-4) !important;
+  @media (width >= 1024px) {
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .search-container {
+      min-width: 300px !important;
+      max-width: 550px !important;
+    }
+
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .search-input-wrapper {
+      min-width: 300px !important;
+    }
+
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .search-input {
+      min-width: 300px !important;
+    }
   }
 
-  /* Clear all button responsive adjustments */
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .clear-all-container {
-    margin-left: 0 !important;
+  @media (width >= 1200px) {
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .search-container {
+      min-width: 350px !important;
+      max-width: 650px !important;
+    }
+
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .search-input-wrapper {
+      min-width: 350px !important;
+    }
+
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .search-input {
+      min-width: 350px !important;
+    }
   }
 
-  /* Mobile search input adjustments */
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input-wrapper {
-    width: 100% !important;
-    min-width: 0 !important;
+  /* ===== MOBILE RESPONSIVE LAYOUT FOR SCENARIO TOOLBAR ===== */
+  /* Mobile responsive layout for search toolbar */
+  @media (width <= 768px) {
+    /* Stack search and controls vertically on mobile */
+    .scenarios-grid[data-view="scenario"] .scenario-controls-toolbar {
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: var(--spacing-3) !important;
+      padding: var(--spacing-3) 0 var(--spacing-4) 0 !important;
+    }
+
+    /* Search container takes full width on mobile */
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .search-container {
+      width: 100% !important;
+      max-width: none !important;
+      min-width: 0 !important;
+      order: 1 !important; /* Search appears first */
+      margin-bottom: var(--spacing-2) !important;
+    }
+
+    /* Controls group appears below search */
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .controls-group {
+      width: 100% !important;
+      justify-content: center !important;
+      order: 2 !important; /* Controls appear second */
+      gap: var(--spacing-4) !important;
+    }
+
+    /* Clear all button responsive adjustments */
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .clear-all-container {
+      margin-left: 0 !important;
+    }
+
+    /* Mobile search input adjustments */
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .search-input-wrapper {
+      width: 100% !important;
+      min-width: 0 !important;
+    }
+
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .search-input {
+      width: 100% !important;
+      min-width: 0 !important;
+      font-size: 16px !important; /* Prevent zoom on iOS */
+    }
   }
 
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input {
-    width: 100% !important;
-    min-width: 0 !important;
-    font-size: 16px !important; /* Prevent zoom on iOS */
-  }
-}
+  /* Extra small mobile adjustments */
+  @media (width <= 480px) {
+    .scenarios-grid[data-view="scenario"] .scenario-controls-toolbar {
+      padding: var(--spacing-2) 0 var(--spacing-3) 0 !important;
+    }
 
-/* Extra small mobile adjustments */
-@media (width <= 480px) {
-  .scenarios-grid[data-view="scenario"] .scenario-controls-toolbar {
-    padding: var(--spacing-2) 0 var(--spacing-3) 0 !important;
-  }
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .controls-group {
+      flex-wrap: wrap !important;
+      justify-content: space-around !important;
+    }
 
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .controls-group {
-    flex-wrap: wrap !important;
-    justify-content: space-around !important;
-  }
+    /* Clear all button on extra small screens */
+    .clear-all-btn {
+      padding: var(--spacing-2) var(--spacing-3) !important;
+      font-size: var(--font-size-xs) !important;
+    }
 
-  /* Clear all button on extra small screens */
-  .clear-all-btn {
-    padding: var(--spacing-2) var(--spacing-3) !important;
-    font-size: var(--font-size-xs) !important;
-  }
+    .clear-all-text {
+      display: none !important; /* Hide text on very small screens */
+    }
 
-  .clear-all-text {
-    display: none !important; /* Hide text on very small screens */
+    .clear-all-icon {
+      width: 14px !important;
+      height: 14px !important;
+    }
   }
 
-  .clear-all-icon {
-    width: 14px !important;
-    height: 14px !important;
+  /* ===== SEARCH COMPONENTS ===== */
+  /* Base search container styles (not toolbar-specific) */
+  .search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
   }
-}
 
-/* ===== SEARCH COMPONENTS ===== */
-/* Base search container styles (not toolbar-specific) */
-.search-input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
+  .search-icon {
+    position: absolute;
+    left: var(--spacing-3);
+    width: 18px;
+    height: 18px;
+    color: var(--color-gray-400);
+    z-index: 2;
+    pointer-events: none;
+  }
 
-.search-icon {
-  position: absolute;
-  left: var(--spacing-3);
-  width: 18px;
-  height: 18px;
-  color: var(--color-gray-400);
-  z-index: 2;
-  pointer-events: none;
-}
+  .search-input {
+    width: 100%;
+    padding: var(--spacing-3) var(--spacing-10) var(--spacing-3) 2.75rem;
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    background: var(--color-white);
+    transition: all var(--transition-base);
+    box-sizing: border-box;
+  }
 
-.search-input {
-  width: 100%;
-  padding: var(--spacing-3) var(--spacing-10) var(--spacing-3) 2.75rem;
-  border: 1px solid var(--color-gray-300);
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-sm);
-  background: var(--color-white);
-  transition: all var(--transition-base);
-  box-sizing: border-box;
-}
+  .search-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+  }
 
-.search-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-light);
-}
+  .search-input::placeholder {
+    color: var(--color-gray-500);
+  }
 
-.search-input::placeholder {
-  color: var(--color-gray-500);
-}
+  .search-clear {
+    position: absolute;
+    right: var(--spacing-3);
+    width: 18px;
+    height: 18px;
+    color: var(--color-gray-400);
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-base);
+    z-index: 2;
+  }
 
-.search-clear {
-  position: absolute;
-  right: var(--spacing-3);
-  width: 18px;
-  height: 18px;
-  color: var(--color-gray-400);
-  background: none;
-  border: none;
-  cursor: pointer;
-  border-radius: var(--radius-sm);
-  transition: all var(--transition-base);
-  z-index: 2;
-}
+  .search-clear:hover {
+    color: var(--color-gray-600);
+    background: var(--color-gray-100);
+  }
 
-.search-clear:hover {
-  color: var(--color-gray-600);
-  background: var(--color-gray-100);
-}
+  /* ===== SEARCH AUTOCOMPLETE DROPDOWN ===== */
+  .search-autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: var(--color-white);
+    border: 1px solid var(--color-gray-300);
+    border-top: none;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 1px;
+  }
 
-/* ===== SEARCH AUTOCOMPLETE DROPDOWN ===== */
-.search-autocomplete-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  background: var(--color-white);
-  border: 1px solid var(--color-gray-300);
-  border-top: none;
-  border-radius: 0 0 var(--radius-md) var(--radius-md);
-  box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
-  max-height: 200px;
-  overflow-y: auto;
-  margin-top: 1px;
-}
+  /* Autocomplete sections */
+  .autocomplete-section {
+    border-bottom: 1px solid var(--color-gray-100);
+  }
 
-/* Autocomplete sections */
-.autocomplete-section {
-  border-bottom: 1px solid var(--color-gray-100);
-}
+  .autocomplete-section:last-child {
+    border-bottom: none;
+  }
 
-.autocomplete-section:last-child {
-  border-bottom: none;
-}
+  .autocomplete-section-header {
+    padding: var(--spacing-2) var(--spacing-3);
+    background: var(--color-gray-50);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--color-gray-100);
+  }
 
-.autocomplete-section-header {
-  padding: var(--spacing-2) var(--spacing-3);
-  background: var(--color-gray-50);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-gray-600);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-bottom: 1px solid var(--color-gray-100);
-}
+  .autocomplete-scenarios,
+  .autocomplete-tags {
+    padding: var(--spacing-1) 0;
+  }
 
-.autocomplete-scenarios,
-.autocomplete-tags {
-  padding: var(--spacing-1) 0;
-}
+  .autocomplete-no-results {
+    padding: var(--spacing-4);
+    text-align: center;
+  }
 
-.autocomplete-no-results {
-  padding: var(--spacing-4);
-  text-align: center;
-}
+  .no-results-text {
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-500);
+    font-style: italic;
+  }
 
-.no-results-text {
-  font-size: var(--font-size-sm);
-  color: var(--color-gray-500);
-  font-style: italic;
-}
+  .search-autocomplete-item {
+    padding: var(--spacing-3);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+    border-bottom: 1px solid var(--color-gray-100);
+  }
 
-.search-autocomplete-item {
-  padding: var(--spacing-3);
-  cursor: pointer;
-  transition: background-color var(--transition-fast);
-  border-bottom: 1px solid var(--color-gray-100);
-}
+  .search-autocomplete-item:last-child {
+    border-bottom: none;
+  }
 
-.search-autocomplete-item:last-child {
-  border-bottom: none;
-}
+  .search-autocomplete-item:hover {
+    background: var(--color-gray-50);
+  }
 
-.search-autocomplete-item:hover {
-  background: var(--color-gray-50);
-}
+  .search-autocomplete-item.highlighted {
+    background: var(--color-primary-50);
+    color: var(--color-primary-700);
+  }
 
-.search-autocomplete-item.highlighted {
-  background: var(--color-primary-50);
-  color: var(--color-primary-700);
-}
+  /* Autocomplete item aliases for JavaScript compatibility */
+  .autocomplete-item {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-3) var(--spacing-4);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+    border-bottom: 1px solid var(--color-gray-100);
+  }
 
-/* Autocomplete item aliases for JavaScript compatibility */
-.autocomplete-item {
-  display: flex;
-  align-items: center;
-  padding: var(--spacing-3) var(--spacing-4);
-  cursor: pointer;
-  transition: background-color var(--transition-fast);
-  border-bottom: 1px solid var(--color-gray-100);
-}
+  .autocomplete-item:last-child {
+    border-bottom: none;
+  }
 
-.autocomplete-item:last-child {
-  border-bottom: none;
-}
+  .autocomplete-item:hover {
+    background: var(--color-gray-50);
+  }
 
-.autocomplete-item:hover {
-  background: var(--color-gray-50);
-}
+  .autocomplete-item.highlighted {
+    background: var(--color-primary-50);
+    color: var(--color-primary-700);
+  }
 
-.autocomplete-item.highlighted {
-  background: var(--color-primary-50);
-  color: var(--color-primary-700);
-}
+  .autocomplete-item-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: var(--spacing-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-sm);
+    background: var(--color-gray-100);
+    color: var(--color-gray-600);
+    flex-shrink: 0;
+  }
 
-.autocomplete-item-icon {
-  width: 20px;
-  height: 20px;
-  margin-right: var(--spacing-3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font-size-sm);
-  border-radius: var(--radius-sm);
-  background: var(--color-gray-100);
-  color: var(--color-gray-600);
-  flex-shrink: 0;
-}
+  .autocomplete-item-content {
+    flex: 1;
+    min-width: 0;
+  }
 
-.autocomplete-item-content {
-  flex: 1;
-  min-width: 0;
-}
+  .autocomplete-item-title {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-gray-900);
+    margin-bottom: 2px;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-.autocomplete-item-title {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-gray-900);
-  margin-bottom: 2px;
-  line-height: 1.4;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+  .autocomplete-item-meta {
+    font-size: var(--font-size-xs);
+    color: var(--color-gray-500);
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-.autocomplete-item-meta {
-  font-size: var(--font-size-xs);
-  color: var(--color-gray-500);
-  line-height: 1.3;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+  /* ===== SCENARIO COUNT DISPLAY ===== */
+  .scenario-count {
+    margin-bottom: var(--spacing-6);
+    padding: var(--spacing-3) var(--spacing-4);
+    background: var(--color-gray-50);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-gray-200);
+    /* Ensure count is on its own row below toolbar when inside a grid container */
+    grid-column: 1 / -1; /* Span full width when inside a grid container */
+    order: 0; /* Appears after toolbar (which has order: -1) but before cards */
+  }
 
-/* ===== SCENARIO COUNT DISPLAY ===== */
-.scenario-count {
-  margin-bottom: var(--spacing-6);
-  padding: var(--spacing-3) var(--spacing-4);
-  background: var(--color-gray-50);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-gray-200);
-  /* Ensure count is on its own row below toolbar when inside a grid container */
-  grid-column: 1 / -1; /* Span full width when inside a grid container */
-  order: 0; /* Appears after toolbar (which has order: -1) but before cards */
-}
+  .count-text {
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-700);
+    margin: 0;
+    font-weight: var(--font-weight-medium);
+    text-align: center;
+  }
 
-.count-text {
-  font-size: var(--font-size-sm);
-  color: var(--color-gray-700);
-  margin: 0;
-  font-weight: var(--font-weight-medium);
-  text-align: center;
-}
+  .count-number {
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+  }
 
-.count-number {
-  font-weight: var(--font-weight-bold);
-  color: var(--color-primary);
-}
+  /* ===== FALLBACK UI COMPONENTS ===== */
+  .basic-fallback {
+    text-align: center;
+    padding: var(--spacing-20) var(--spacing-6);
+    background: var(--color-gray-50);
+    border-radius: var(--radius-xl);
+    border: 2px dashed var(--color-gray-300);
+    max-width: 600px;
+    margin: var(--spacing-12) auto;
+  }
 
-/* ===== FALLBACK UI COMPONENTS ===== */
-.basic-fallback {
-  text-align: center;
-  padding: var(--spacing-20) var(--spacing-6);
-  background: var(--color-gray-50);
-  border-radius: var(--radius-xl);
-  border: 2px dashed var(--color-gray-300);
-  max-width: 600px;
-  margin: var(--spacing-12) auto;
-}
+  .basic-fallback h2 {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-gray-800);
+    margin-bottom: var(--spacing-4);
+  }
 
-.basic-fallback h2 {
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-gray-800);
-  margin-bottom: var(--spacing-4);
-}
+  .basic-fallback p {
+    font-size: var(--font-size-lg);
+    color: var(--color-gray-600);
+    margin-bottom: var(--spacing-8);
+    line-height: var(--line-height-relaxed);
+  }
 
-.basic-fallback p {
-  font-size: var(--font-size-lg);
-  color: var(--color-gray-600);
-  margin-bottom: var(--spacing-8);
-  line-height: var(--line-height-relaxed);
-}
+  /* Basic button styling */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-3) var(--spacing-6);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    white-space: nowrap;
+    user-select: none;
+    min-height: 44px; /* Touch-friendly minimum */
+  }
 
-/* Basic button styling */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-3) var(--spacing-6);
-  border: 1px solid transparent;
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  line-height: 1.5;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all var(--transition-base);
-  white-space: nowrap;
-  user-select: none;
-  min-height: 44px; /* Touch-friendly minimum */
-}
+  .btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgb(59 130 246 / 15%);
+  }
 
-.btn:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgb(59 130 246 / 15%);
-}
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
 
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  pointer-events: none;
-}
+  .btn-primary {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+  }
 
-.btn-primary {
-  background: var(--color-primary);
-  color: var(--color-white);
-  border-color: var(--color-primary);
-}
+  .btn-primary:hover {
+    background: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgb(59 130 246 / 25%);
+  }
 
-.btn-primary:hover {
-  background: var(--color-primary-dark);
-  border-color: var(--color-primary-dark);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgb(59 130 246 / 25%);
-}
+  .btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgb(59 130 246 / 25%);
+  }
 
-.btn-primary:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgb(59 130 246 / 25%);
-}
+  /* ===== FILTER COMPONENTS ===== */
+  .filter-section {
+    background: var(--color-gray-50);
+    padding: var(--spacing-12) 0;
+    border-bottom: 1px solid var(--color-gray-200);
+  }
 
-/* ===== FILTER COMPONENTS ===== */
-.filter-section {
-  background: var(--color-gray-50);
-  padding: var(--spacing-12) 0;
-  border-bottom: 1px solid var(--color-gray-200);
-}
+  /* Filter section containers (NOT toolbar containers) */
+  .filter-section .filter-container,
+  .filter-section .sort-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-6);
+    position: relative;
+  }
 
-/* Filter section containers (NOT toolbar containers) */
-.filter-section .filter-container,
-.filter-section .sort-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 var(--spacing-6);
-  position: relative;
-}
+  /* Ensure all filter/sort containers have proper dropdown positioning */
+  .filter-container,
+  .sort-container {
+    position: relative;
+    /* Ensure container includes dropdown area for seamless hovering */
+    min-height: 40px; /* Minimum height to avoid layout shifts */
+  }
 
-/* Ensure all filter/sort containers have proper dropdown positioning */
-.filter-container,
-.sort-container {
-  position: relative;
-  /* Ensure container includes dropdown area for seamless hovering */
-  min-height: 40px; /* Minimum height to avoid layout shifts */
-}
+  .filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-8);
+  }
 
-.filter-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-8);
-}
+  .filter-header h2 {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-gray-900);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+  }
 
-.filter-header h2 {
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-gray-900);
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-3);
-}
+  .filter-header h2::before {
+    content: "🔍";
+    font-size: var(--font-size-xl);
+  }
 
-.filter-header h2::before {
-  content: "🔍";
-  font-size: var(--font-size-xl);
-}
+  .filter-controls {
+    background: var(--color-white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-8);
+    box-shadow: 0 4px 6px rgb(0 0 0 / 5%);
+    border: 1px solid var(--color-gray-200);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-6);
+    align-items: start;
+  }
 
-.filter-controls {
-  background: var(--color-white);
-  border-radius: var(--radius-xl);
-  padding: var(--spacing-8);
-  box-shadow: 0 4px 6px rgb(0 0 0 / 5%);
-  border: 1px solid var(--color-gray-200);
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--spacing-6);
-  align-items: start;
-}
+  /* Controls group in filter section context */
+  .filter-section .controls-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+  }
 
-/* Controls group in filter section context */
-.filter-section .controls-group {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-3);
-}
-
-/* ===== ENHANCED SORT CONTROLS - TYPOGRAPHY OF ANALYTICAL ORGANIZATION ===== */
-/* 
+  /* ===== ENHANCED SORT CONTROLS - TYPOGRAPHY OF ANALYTICAL ORGANIZATION ===== */
+  /* 
   TYPOGRAPHICAL DESIGN PHILOSOPHY:
   
   This section embodies "typography of analytical organization" - each font choice, 
@@ -932,1440 +934,1444 @@
   Design Intent: Convey thoughtful curation, analytical precision, and cognitive clarity
 */
 
-.filter-btn,
-.sort-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2);
-  padding: var(--spacing-3) var(--spacing-5);
-  border: 1px solid var(--color-gray-300);
-  border-radius: var(--radius-md);
-  background: var(--color-white);
-  cursor: pointer;
-  transition: all var(--transition-base);
-  white-space: nowrap;
-  position: relative;
-  overflow: hidden;
-
-  /* Typography for analytical authority and precision */
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue",
-    Arial, sans-serif; /* Clean, readable system fonts for interface clarity */
-  font-size: 0.9375rem; /* 15px - slightly larger for better readability and presence */
-  font-weight: 500; /* Medium weight for gentle authority without aggression */
-  letter-spacing: -0.01em; /* Subtle tightening for precision and sophistication */
-  line-height: 1.4; /* Comfortable line height for easy reading */
-  color: var(--color-gray-800); /* Darker for better contrast and authority */
-
-  /* Subtle text shadow for depth and premium feel */
-  text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.02);
-
-  /* Enhanced visual hierarchy with subtle gradient */
-  background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.08),
-    0 1px 2px rgba(0, 0, 0, 0.06);
-}
-
-/* Sort button specific enhancements - conveying organizational intelligence */
-.sort-btn {
-  /* Slightly more authoritative styling to distinguish from filters */
-  font-weight: 550; /* Between medium and semibold for organizational authority */
-  color: var(--color-gray-900); /* Stronger color for sorting hierarchy */
-  border: 1px solid var(--color-gray-400); /* More defined border for importance */
-
-  /* Enhanced gradient for sorting authority */
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-
-  /* Subtle text effects for analytical sophistication */
-  text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.04);
-
-  /* Letter spacing optimized for analytical scanning */
-  letter-spacing: -0.005em; /* Very subtle tightening for precision */
-}
-
-.filter-btn:hover,
-.sort-btn:hover {
-  border-color: var(--color-gray-500);
-  transform: translateY(-1px); /* Subtle lift for engagement */
-
-  /* Enhanced hover background with sophistication */
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-
-  /* Improved shadow for hover state */
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.12),
-    0 2px 4px rgba(0, 0, 0, 0.08);
-
-  /* Text becomes more defined on hover */
-  color: var(--color-gray-900);
-  text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.06);
-}
-
-/* Sort button hover - enhanced analytical engagement */
-.sort-btn:hover {
-  border-color: var(--color-gray-600);
-  color: var(--color-gray-950); /* Maximum contrast for active engagement */
-
-  /* Premium gradient for active sorting state */
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-
-  /* Enhanced shadow for sorting authority */
-  box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.15),
-    0 2px 6px rgba(0, 0, 0, 0.1);
-
-  /* Slightly more defined text shadow for active state */
-  text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.08);
-}
-
-.filter-btn:focus,
-.sort-btn:focus {
-  outline: none;
-  border-color: var(--color-primary);
-
-  /* Enhanced focus state with analytical clarity */
-  box-shadow:
-    0 0 0 3px var(--color-primary-light),
-    0 4px 12px rgba(0, 0, 0, 0.12),
-    0 2px 4px rgba(0, 0, 0, 0.08);
-
-  /* Text becomes more defined in focus state */
-  color: var(--color-gray-900);
-  text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.06);
-}
-
-/* Sort button focus - analytical precision */
-.sort-btn:focus {
-  /* Enhanced focus for sorting actions */
-  box-shadow:
-    0 0 0 3px rgba(59, 130, 246, 0.15),
-    /* Softer primary focus ring */ 0 4px 16px rgba(0, 0, 0, 0.15),
-    0 2px 6px rgba(0, 0, 0, 0.1);
-
-  color: var(--color-gray-950);
-  text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.08);
-}
-
-.filter-btn[aria-expanded="true"],
-.sort-btn[aria-expanded="true"] {
-  border-color: var(--color-primary-600);
-  transform: translateY(1px); /* Subtle press effect */
-
-  /* Active state gradient with authority */
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  color: var(--color-primary-800);
-
-  /* Enhanced shadow for active dropdown state */
-  box-shadow:
-    0 2px 8px rgba(59, 130, 246, 0.2),
-    0 1px 3px rgba(0, 0, 0, 0.12);
-
-  /* Text shadow for active state clarity */
-  text-shadow: 0 0.5px 1px rgba(59, 130, 246, 0.1);
-}
-
-/* Sort button active state - organizational authority */
-.sort-btn[aria-expanded="true"] {
-  border-color: var(--color-primary-700);
-  color: var(--color-primary-900); /* Stronger color for active sorting */
-
-  /* Premium active gradient for sorting authority */
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-
-  /* Enhanced active shadow for sorting prominence */
-  box-shadow:
-    0 2px 10px rgba(59, 130, 246, 0.25),
-    0 1px 4px rgba(0, 0, 0, 0.15);
-
-  /* Stronger text shadow for active sorting state */
-  text-shadow: 0 0.5px 1px rgba(59, 130, 246, 0.15);
-}
-
-.filter-icon,
-.sort-icon {
-  width: 16px;
-  height: 16px;
-  color: var(--color-gray-500);
-  transition: transform var(--transition-fast);
-}
-
-.filter-btn[aria-expanded="true"] .filter-icon,
-.sort-btn[aria-expanded="true"] .sort-icon {
-  transform: rotate(180deg);
-}
-
-/* ===== CLEAN FILTER & SORT DROPDOWN - BORDERLESS DESIGN ===== */
-.filter-dropdown,
-.sort-dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  z-index: 100;
-  background: var(--color-white);
-  /* Removed border for cleaner, modern look */
-  border: none;
-  border-radius: var(--radius-md);
-  /* Subtle shadow for elevation without heavy borders */
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.12),
-    0 2px 8px rgba(0, 0, 0, 0.08);
-  min-width: 200px;
-  max-height: 300px;
-  overflow-y: auto;
-  /* Removed margin-top gap to allow seamless hover */
-  margin-top: 0;
-  /* Critical display properties for dropdown functionality */
-  display: block !important;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-8px);
-  transition: all var(--transition-fast);
-  /* Ensure dropdowns are interactive when visible */
-  pointer-events: none;
-}
-
-/* Override JavaScript inline styles when dropdowns should be hidden */
-.filter-dropdown[style*="display: none"],
-.sort-dropdown[style*="display: none"] {
-  display: block !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-
-.filter-btn[aria-expanded="true"] + .filter-dropdown,
-.sort-btn[aria-expanded="true"] + .sort-dropdown {
-  opacity: 1 !important;
-  visibility: visible !important;
-  transform: translateY(0);
-  pointer-events: auto !important;
-}
-
-/* Handle JavaScript inline style overrides for visible dropdowns */
-.filter-btn[aria-expanded="true"] + .filter-dropdown[style*="display: block"],
-.sort-btn[aria-expanded="true"] + .sort-dropdown[style*="display: block"] {
-  display: block !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  transform: translateY(0);
-  pointer-events: auto !important;
-}
-
-/* Debug: Alternative CSS selectors to show dropdowns */
-.filter-btn.active + .filter-dropdown,
-.sort-btn.active + .sort-dropdown,
-.filter-btn:focus + .filter-dropdown,
-.sort-btn:focus + .sort-dropdown {
-  opacity: 1 !important;
-  visibility: visible !important;
-  transform: translateY(0);
-  pointer-events: auto !important;
-}
-
-/* Enhanced hover states - work with JavaScript display control */
-.filter-container:hover .filter-dropdown[style*="display: block"],
-.sort-container:hover .sort-dropdown[style*="display: block"],
-.filter-dropdown[style*="display: block"]:hover,
-.sort-dropdown[style*="display: block"]:hover {
-  /* When JS has set display:block, ensure hover keeps it visible */
-  opacity: 1 !important;
-  visibility: visible !important;
-  transform: translateY(0);
-  pointer-events: auto !important;
-}
-
-/* Alternative: Show dropdown on container hover regardless of JS state */
-.filter-container:hover .filter-dropdown,
-.sort-container:hover .sort-dropdown {
-  /* Force display and visibility when hovering container */
-  display: block !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  transform: translateY(0);
-  pointer-events: auto !important;
-}
-
-/* Ensure dropdown stays open when hovering over the dropdown itself */
-.filter-dropdown:hover,
-.sort-dropdown:hover {
-  /* Keep dropdown open when directly hovering over it */
-  display: block !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  transform: translateY(0);
-  pointer-events: auto !important;
-}
-
-/* Keep button in expanded visual state during container hover */
-.filter-container:hover .filter-btn,
-.sort-container:hover .sort-btn {
-  /* Visual feedback that dropdown area is active */
-  border-color: var(--color-primary-600);
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  color: var(--color-primary-800);
-}
-
-/* ===== ENHANCED FILTER & SORT OPTIONS - CLEAN BORDERLESS DESIGN ===== */
-/* Design Intent: Cognitive clarity, analytical precision, thoughtful selection */
-
-.filter-option,
-.sort-option {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--spacing-3) var(--spacing-4);
-  cursor: pointer;
-  transition: all var(--transition-base);
-  /* Removed border for cleaner, more modern appearance */
-  border-bottom: none;
-  position: relative;
-  /* Subtle margin for visual separation without borders */
-  margin-bottom: 1px;
-
-  /* Enhanced typography for analytical selection and cognitive ease */
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue",
-    Arial, sans-serif; /* Clean, readable system fonts */
-  font-size: 0.875rem; /* 14px - optimal for scanning and selection */
-  font-weight: 450; /* Between normal and medium for subtle hierarchy */
-  letter-spacing: -0.003em; /* Very subtle tightening for precision */
-  line-height: 1.45; /* Comfortable for easy reading and scanning */
-  color: var(--color-gray-800); /* Clear contrast for analytical clarity */
-
-  /* Subtle text enhancement for option clarity */
-  text-shadow: 0 0.5px 0.5px rgba(0, 0, 0, 0.015);
-
-  /* Clean background for analytical focus */
-  background: transparent;
-}
-
-/* Sort option specific styling - enhanced for organizational authority */
-.sort-option {
-  font-weight: 475; /* Slightly heavier for sorting hierarchy */
-  color: var(--color-gray-850); /* Stronger for sorting emphasis */
-  letter-spacing: -0.005em; /* Tighter for analytical precision */
-
-  /* Enhanced padding for sorting importance */
-  padding: var(--spacing-3) var(--spacing-4);
-}
-
-/* Button-specific sort option styling - ensure proper inheritance */
-button.sort-option {
-  /* Reset button defaults to inherit enhanced typography */
-  border: none;
-  background: inherit;
-  font-family: inherit; /* Inherit the enhanced font stack */
-  font-size: inherit; /* Inherit the enhanced font size */
-  font-weight: inherit; /* Inherit the enhanced font weight */
-  letter-spacing: inherit; /* Inherit the enhanced letter spacing */
-  line-height: inherit; /* Inherit the enhanced line height */
-  color: inherit; /* Inherit the enhanced color */
-  text-shadow: inherit; /* Inherit the enhanced text shadow */
-  text-align: left; /* Align text properly */
-  width: 100%; /* Full width for proper layout */
-
-  /* Enhanced button-specific properties */
-  cursor: pointer;
-  outline: none;
-
-  /* Ensure proper text rendering for buttons */
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Removed last-child border rules since we're using borderless design */
-
-.filter-option:hover,
-.sort-option:hover {
-  background: var(--color-gray-50);
-  color: var(--color-gray-900);
-  transform: translateX(2px); /* Subtle horizontal engagement */
-
-  /* Enhanced background with sophistication */
-  background: linear-gradient(
-    90deg,
-    rgba(248, 250, 252, 0.8) 0%,
-    rgba(241, 245, 249, 0.9) 100%
-  );
-
-  /* Subtle shadow for hover depth */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-
-  /* Enhanced text clarity on hover */
-  text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.025);
-}
-
-/* Sort option hover - enhanced analytical engagement */
-.sort-option:hover {
-  color: var(--color-gray-950); /* Maximum clarity for sorting selection */
-  background: linear-gradient(
-    90deg,
-    rgba(241, 245, 249, 0.9) 0%,
-    rgba(226, 232, 240, 0.95) 100%
-  );
-
-  /* Enhanced shadow for sorting prominence */
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-
-  /* Stronger text definition for analytical clarity */
-  text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.04);
-}
-
-/* Button-specific hover states - ensure proper inheritance */
-button.sort-option:hover {
-  /* Inherit all hover styles from parent */
-  color: inherit;
-  background: inherit;
-  box-shadow: inherit;
-  text-shadow: inherit;
-  transform: inherit;
-}
-
-button.filter-option:hover {
-  /* Inherit all hover styles from parent */
-  color: inherit;
-  background: inherit;
-  box-shadow: inherit;
-  text-shadow: inherit;
-  transform: inherit;
-}
-
-.filter-option.active,
-.sort-option.active {
-  background: var(--color-primary-50);
-  color: var(--color-primary-800);
-  font-weight: 550; /* Enhanced weight for active state authority */
-
-  /* Enhanced active state with analytical confidence */
-  background: linear-gradient(
-    90deg,
-    rgba(219, 234, 254, 0.8) 0%,
-    rgba(191, 219, 254, 0.9) 100%
-  );
-
-  /* Subtle shadow for active state */
-  box-shadow:
-    inset 0 0 0 1px var(--color-primary-200),
-    0 1px 3px rgba(59, 130, 246, 0.1);
-
-  /* Clear text shadow for active state */
-  text-shadow: 0 0.5px 1px rgba(59, 130, 246, 0.08);
-
-  /* Subtle left border for active visual hierarchy */
-  border-left: 3px solid var(--color-primary-400);
-  padding-left: calc(var(--spacing-4) - 3px); /* Adjust for border */
-}
-
-/* Sort option active - organizational authority */
-.sort-option.active {
-  font-weight: 575; /* Stronger weight for active sorting authority */
-  color: var(--color-primary-900); /* Maximum contrast for active sort */
-
-  /* Enhanced active background for sorting prominence */
-  background: linear-gradient(
-    90deg,
-    rgba(219, 234, 254, 0.9) 0%,
-    rgba(191, 219, 254, 0.95) 100%
-  );
-
-  /* Stronger shadow for active sorting state */
-  box-shadow:
-    inset 0 0 0 1px var(--color-primary-300),
-    0 1px 4px rgba(59, 130, 246, 0.15);
-
-  /* Enhanced text shadow for active sorting clarity */
-  text-shadow: 0 0.5px 1px rgba(59, 130, 246, 0.12);
-
-  /* Stronger left border for sorting hierarchy */
-  border-left: 3px solid var(--color-primary-600);
-}
-
-/* Button-specific active states - ensure proper inheritance */
-button.filter-option.active,
-button.sort-option.active {
-  /* Inherit all active styles from parent */
-  background: inherit;
-  color: inherit;
-  font-weight: inherit;
-  box-shadow: inherit;
-  text-shadow: inherit;
-  border-left: inherit;
-  padding-left: inherit;
-}
-
-button.sort-option.active {
-  /* Inherit enhanced sort-specific active styles */
-  background: inherit;
-  color: inherit;
-  font-weight: inherit;
-  box-shadow: inherit;
-  text-shadow: inherit;
-  border-left: inherit;
-}
-
-.filter-option .option-text,
-.sort-option .option-text {
-  flex: 1;
-
-  /* Enhanced typography for option text clarity */
-  font-weight: inherit; /* Inherit from parent for consistency */
-  letter-spacing: inherit; /* Maintain parent's precision */
-  line-height: inherit; /* Consistent line height */
-
-  /* Ensure proper text rendering */
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Sort option text - enhanced for analytical scanning */
-.sort-option .option-text {
-  /* Slightly enhanced for sorting importance */
-  font-weight: inherit;
-  color: inherit;
-}
-
-.filter-option .check-icon,
-.sort-option .check-icon {
-  width: 16px;
-  height: 16px;
-  color: var(--color-primary);
-  opacity: 0;
-  transition: all var(--transition-base);
-  margin-left: var(--spacing-2);
-
-  /* Enhanced check icon for analytical confirmation */
-  filter: drop-shadow(0 0.5px 1px rgba(59, 130, 246, 0.15));
-}
-
-/* Sort option check icon - enhanced prominence */
-.sort-option .check-icon {
-  color: var(--color-primary-600); /* Slightly stronger for sorting authority */
-  filter: drop-shadow(0 0.5px 1px rgba(59, 130, 246, 0.2));
-}
-
-.filter-option.active .check-icon,
-.sort-option.active .check-icon {
-  opacity: 1;
-  transform: scale(1.05); /* Subtle scale for confirmation */
-
-  /* Enhanced active check icon */
-  filter: drop-shadow(0 1px 2px rgba(59, 130, 246, 0.25));
-}
-
-/* Sort option active check icon - analytical confirmation */
-.sort-option.active .check-icon {
-  color: var(--color-primary-700);
-  transform: scale(1.1); /* Slightly larger for sorting confirmation */
-  filter: drop-shadow(0 1px 2px rgba(59, 130, 246, 0.3));
-}
-
-/* ===== TAG CHIPS ===== */
-.tag-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-1);
-  padding: var(--spacing-1) var(--spacing-3);
-  background: var(--color-primary-100);
-  color: var(--color-primary-700);
-  border-radius: var(--radius-full);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.tag-chip:hover {
-  background: var(--color-primary-200);
-  color: var(--color-primary-800);
-}
-
-.tag-chip.active,
-.tag-chip.selected {
-  background: var(--color-primary);
-  color: var(--color-white);
-}
-
-.tag-chip-remove {
-  width: 14px;
-  height: 14px;
-  border-radius: var(--radius-full);
-  background: var(--color-primary-200);
-  color: var(--color-primary-700);
-  border: none;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.tag-chip:hover .tag-chip-remove {
-  background: var(--color-primary-300);
-  color: var(--color-primary-800);
-}
-
-.tag-chip.active .tag-chip-remove {
-  background: rgb(255 255 255 / 20%);
-  color: var(--color-white);
-}
-
-/* ===== ACTIVE FILTERS DISPLAY ===== */
-.active-filters {
-  margin-bottom: var(--spacing-6);
-  min-height: 2.5rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-2);
-  align-items: center;
-}
-
-.filter-chip {
-  display: inline-flex;
-  align-items: center;
-  background: var(--color-primary);
-  color: var(--color-white);
-  padding: var(--spacing-2) var(--spacing-4);
-  border-radius: var(--radius-full);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  gap: var(--spacing-2);
-  box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
-  transition: all 0.2s ease;
-}
-
-.filter-chip:hover {
-  background: var(--color-primary-dark);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgb(0 0 0 / 15%);
-}
-
-.filter-chip .remove-chip {
-  background: rgb(255 255 255 / 20%);
-  border: none;
-  color: var(--color-white);
-  cursor: pointer;
-  font-size: var(--font-size-lg);
-  line-height: 1;
-  padding: var(--spacing-1);
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s ease;
-}
-
-.filter-chip .remove-chip:hover {
-  background: rgb(255 255 255 / 30%);
-}
-
-.active-filter-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-2);
-  padding: var(--spacing-2) var(--spacing-3);
-  background: var(--color-gray-100);
-  color: var(--color-gray-700);
-  border-radius: var(--radius-base);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-}
-
-.active-filter-remove {
-  width: 16px;
-  height: 16px;
-  color: var(--color-gray-500);
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: color var(--transition-fast);
-}
-
-.active-filter-remove:hover {
-  color: var(--color-gray-700);
-}
-
-/* ===== CLEAR ALL CONTROLS ===== */
-.clear-all-container {
-  position: relative;
-  margin-left: var(--spacing-2);
-}
-
-.clear-all-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2);
-  padding: var(--spacing-2) var(--spacing-4);
-  border: 1px solid var(--color-red-300);
-  border-radius: var(--radius-md);
-  background: var(--color-white);
-  color: var(--color-red-600);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  cursor: pointer;
-  transition: all var(--transition-base);
-  white-space: nowrap;
-}
-
-.clear-all-btn:hover {
-  border-color: var(--color-red-400);
-  background: var(--color-red-50);
-  color: var(--color-red-700);
-}
-
-.clear-all-btn:focus {
-  outline: none;
-  border-color: var(--color-red-500);
-  box-shadow: 0 0 0 3px var(--color-red-100);
-}
-
-.clear-all-btn:active {
-  background: var(--color-red-100);
-  transform: translateY(1px);
-}
-
-.clear-all-icon {
-  width: 16px;
-  height: 16px;
-  color: var(--color-red-500);
-  transition: color var(--transition-fast);
-}
-
-.clear-all-btn:hover .clear-all-icon {
-  color: var(--color-red-600);
-}
-
-.clear-all-text {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  line-height: 1;
-}
-
-/* ===== RESULTS AND PAGINATION ===== */
-.results-section {
-  padding: var(--spacing-12) 0;
-  background: var(--color-white);
-}
-
-.results-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 var(--spacing-6);
-}
-
-.results-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-8);
-  padding-bottom: var(--spacing-4);
-  border-bottom: 1px solid var(--color-gray-200);
-}
-
-.results-header h2 {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-gray-900);
-  margin: 0;
-}
-
-.results-count {
-  font-size: var(--font-size-sm);
-  color: var(--color-gray-600);
-  margin-bottom: var(--spacing-4);
-}
-
-.sort-controls {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-3);
-}
-
-.sort-controls label {
-  font-weight: var(--font-weight-medium);
-  color: var(--color-gray-700);
-  font-size: var(--font-size-sm);
-}
-
-.sort-select {
-  padding: var(--spacing-2) var(--spacing-3);
-  border: 2px solid var(--color-gray-200);
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-sm);
-  background: var(--color-white);
-  transition: border-color 0.2s ease;
-}
-
-.sort-select:focus {
-  outline: none;
-  border-color: var(--color-primary);
-}
-
-.load-more-container {
-  display: flex;
-  justify-content: center;
-  margin-top: var(--spacing-6);
-  text-align: center;
-}
-
-.load-more-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2);
-  padding: var(--spacing-3) var(--spacing-6);
-  border: 1px solid var(--color-primary);
-  border-radius: var(--radius-md);
-  background: var(--color-white);
-  color: var(--color-primary);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  cursor: pointer;
-  transition: all var(--transition-base);
-}
-
-.load-more-btn:hover {
-  background: var(--color-primary);
-  color: var(--color-white);
-}
-
-.load-more-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* ===== LOADING AND NO RESULTS STATES ===== */
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-20) var(--spacing-6);
-}
-
-.spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid var(--color-gray-200);
-  border-top: 4px solid var(--color-primary);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: var(--spacing-4);
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
+  .filter-btn,
+  .sort-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-3) var(--spacing-5);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    background: var(--color-white);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+
+    /* Typography for analytical authority and precision */
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue",
+      Arial, sans-serif; /* Clean, readable system fonts for interface clarity */
+    font-size: 0.9375rem; /* 15px - slightly larger for better readability and presence */
+    font-weight: 500; /* Medium weight for gentle authority without aggression */
+    letter-spacing: -0.01em; /* Subtle tightening for precision and sophistication */
+    line-height: 1.4; /* Comfortable line height for easy reading */
+    color: var(--color-gray-800); /* Darker for better contrast and authority */
+
+    /* Subtle text shadow for depth and premium feel */
+    text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.02);
+
+    /* Enhanced visual hierarchy with subtle gradient */
+    background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.08),
+      0 1px 2px rgba(0, 0, 0, 0.06);
   }
 
-  100% {
-    transform: rotate(360deg);
-  }
-}
+  /* Sort button specific enhancements - conveying organizational intelligence */
+  .sort-btn {
+    /* Slightly more authoritative styling to distinguish from filters */
+    font-weight: 550; /* Between medium and semibold for organizational authority */
+    color: var(--color-gray-900); /* Stronger color for sorting hierarchy */
+    border: 1px solid var(--color-gray-400); /* More defined border for importance */
 
-.loading-state p {
-  color: var(--color-gray-600);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-medium);
-}
+    /* Enhanced gradient for sorting authority */
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
 
-.no-results {
-  text-align: center;
-  padding: var(--spacing-20) var(--spacing-6);
-  background: var(--color-gray-50);
-  border-radius: var(--radius-xl);
-  margin: var(--spacing-8) 0;
-}
+    /* Subtle text effects for analytical sophistication */
+    text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.04);
 
-.no-results-icon {
-  font-size: 4rem;
-  margin-bottom: var(--spacing-4);
-  opacity: 0.5;
-}
-
-.no-results-title {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-gray-700);
-  margin-bottom: var(--spacing-2);
-}
-
-.no-results h3 {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-gray-800);
-  margin-bottom: var(--spacing-2);
-}
-
-.no-results-message {
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-relaxed);
-}
-
-.no-results p {
-  color: var(--color-gray-600);
-  margin-bottom: var(--spacing-6);
-  font-size: var(--font-size-lg);
-}
-
-/* ===== SCENARIO GRID RESPONSIVE ===== */
-.scenario-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-  gap: var(--spacing-8);
-}
-
-/* Grid utilities from main.css */
-.grid {
-  display: grid;
-}
-
-.grid-cols-1 {
-  grid-template-columns: repeat(1, 1fr);
-}
-
-.grid-cols-2 {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-.grid-cols-3 {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.gap-4 {
-  gap: var(--spacing-4);
-}
-
-.gap-8 {
-  gap: var(--spacing-8);
-}
-
-/* ===== DARK MODE SUPPORT ===== */
-/* Dark mode styles for scenario cards moved to scenario-card.css */
-
-/* Dark mode for scenarios grid - consolidated from category-grid.css */
-body.dark-mode .scenarios-grid {
-  background: var(--theme-bg-primary);
-}
-
-/* Dark mode for category view scenarios grid */
-body.dark-mode .scenarios-grid[data-view="category"] {
-  background: var(--theme-bg-primary);
-}
-
-/* Dark mode for scenario view scenarios grid */
-body.dark-mode .scenarios-grid[data-view="scenario"] {
-  background: var(--theme-bg-primary);
-}
-
-/* Dark mode for scenario controls toolbar - consolidated from category-grid.css */
-body.dark-mode .scenario-controls-toolbar {
-  background: var(--theme-bg-secondary);
-  border: 1px solid var(--theme-border);
-}
-
-/* Dark mode for search and filter components */
-body.dark-mode .search-input {
-  background: var(--theme-bg-secondary);
-  border-color: var(--theme-border);
-  color: var(--theme-text-primary);
-}
-
-body.dark-mode .search-input:focus {
-  border-color: var(--theme-accent);
-  box-shadow: 0 0 0 3px var(--theme-accent-light);
-}
-
-body.dark-mode .search-input::placeholder {
-  color: var(--theme-text-secondary);
-}
-
-body.dark-mode .filter-btn,
-body.dark-mode .sort-btn {
-  background: var(--theme-bg-secondary);
-  border-color: var(--theme-border);
-  color: var(--theme-text-primary);
-}
-
-body.dark-mode .filter-btn:hover,
-body.dark-mode .sort-btn:hover {
-  background: var(--theme-bg-tertiary);
-  border-color: var(--theme-border-hover);
-}
-
-body.dark-mode .filter-dropdown,
-body.dark-mode .sort-dropdown {
-  background: var(--theme-bg-secondary);
-  border-color: var(--theme-border);
-}
-
-body.dark-mode .filter-option,
-body.dark-mode .sort-option {
-  color: var(--theme-text-primary);
-  border-bottom-color: var(--theme-border);
-}
-
-body.dark-mode .filter-option:hover,
-body.dark-mode .sort-option:hover {
-  background: var(--theme-bg-tertiary);
-}
-
-body.dark-mode .search-autocomplete-dropdown {
-  background: var(--theme-bg-secondary);
-  border-color: var(--theme-border);
-}
-
-body.dark-mode .search-autocomplete-item {
-  color: var(--theme-text-primary);
-  border-bottom-color: var(--theme-border);
-}
-
-body.dark-mode .search-autocomplete-item:hover {
-  background: var(--theme-bg-tertiary);
-}
-
-/* Dark mode autocomplete items (JS compatibility aliases) */
-body.dark-mode .autocomplete-item {
-  color: var(--theme-text-primary);
-  border-bottom-color: var(--theme-border);
-}
-
-body.dark-mode .autocomplete-item:hover {
-  background: var(--theme-bg-tertiary);
-}
-
-body.dark-mode .autocomplete-item.highlighted {
-  background: var(--color-primary-900);
-  color: var(--color-primary-100);
-}
-
-body.dark-mode .autocomplete-item-icon {
-  background: var(--theme-bg-tertiary);
-  color: var(--theme-text-secondary);
-}
-
-body.dark-mode .autocomplete-item-title {
-  color: var(--theme-text-primary);
-}
-
-body.dark-mode .autocomplete-item-meta {
-  color: var(--theme-text-secondary);
-}
-
-/* Dark mode autocomplete sections */
-body.dark-mode .autocomplete-section-header {
-  background: var(--theme-bg-tertiary);
-  color: var(--theme-text-secondary);
-  border-bottom-color: var(--theme-border);
-}
-
-body.dark-mode .autocomplete-section {
-  border-bottom-color: var(--theme-border);
-}
-
-body.dark-mode .no-results-text {
-  color: var(--theme-text-secondary);
-}
-
-/* Dark mode count display */
-body.dark-mode .scenario-count {
-  background: var(--theme-bg-secondary);
-  border-color: var(--theme-border);
-}
-
-body.dark-mode .count-text {
-  color: var(--theme-text-primary);
-}
-
-body.dark-mode .count-number {
-  color: var(--theme-accent);
-}
-
-/* Dark mode fallback UI */
-body.dark-mode .basic-fallback {
-  background: var(--theme-bg-secondary);
-  border-color: var(--theme-border);
-}
-
-body.dark-mode .basic-fallback h2 {
-  color: var(--theme-text-primary);
-}
-
-body.dark-mode .basic-fallback p {
-  color: var(--theme-text-secondary);
-}
-
-/* Dark mode buttons */
-body.dark-mode .btn-primary {
-  background: var(--theme-accent);
-  border-color: var(--theme-accent);
-  color: var(--theme-bg-primary);
-}
-
-body.dark-mode .btn-primary:hover {
-  background: var(--theme-accent-light);
-  border-color: var(--theme-accent-light);
-}
-
-/* Dark mode for mini progress rings */
-body.dark-mode .category-title-mini {
-  color: var(--color-text-primary-dark, #f9fafb);
-}
-
-body.dark-mode .category-progress-text-mini {
-  color: var(--color-text-secondary-dark, #9ca3af);
-}
-
-body.dark-mode .progress-percentage-mini {
-  color: var(--color-text-primary-dark, #f9fafb);
-}
-
-/* ===== RESPONSIVE DESIGN ===== */
-
-/* Category view responsive - maintains horizontal scroll behavior */
-@media (width <= 768px) {
-  .scenarios-grid[data-view="category"] {
-    padding: var(--container-padding) var(--container-padding)
-      calc(var(--container-padding) * 2) var(--container-padding);
-    scroll-padding-left: var(--container-padding);
-    gap: calc(var(--container-padding) * 0.8);
-    -webkit-overflow-scrolling: touch;
-    touch-action: auto;
-  }
-}
-
-@media (width <= 480px) {
-  .scenarios-grid[data-view="category"] {
-    padding: calc(var(--container-padding) * 0.8)
-      calc(var(--container-padding) * 0.75) calc(var(--container-padding) * 1.5)
-      calc(var(--container-padding) * 0.75);
-    scroll-padding-left: calc(var(--container-padding) * 0.75);
-    gap: calc(var(--container-padding) * 0.8);
-  }
-}
-
-/* Scenarios grid responsive breakpoints - consolidated from category-grid.css */
-
-/* Mobile breakpoints - using CSS variables from media.css */
-@media (width <= 480px) {
-  .scenarios-grid {
-    padding: calc(var(--container-padding) * 0.8)
-      calc(var(--container-padding) * 0.75) calc(var(--container-padding) * 1.5)
-      calc(var(--container-padding) * 0.75);
-    scroll-padding-left: calc(var(--container-padding) * 0.75);
-    gap: calc(var(--container-padding) * 0.8);
-    width: 100%;
-    max-width: none;
-    margin: 0;
-    box-sizing: border-box;
-    overflow: auto hidden;
-    -webkit-overflow-scrolling: touch;
-    touch-action: auto;
-  }
-}
-
-@media (width >= 481px) and (width <= 768px) {
-  .scenarios-grid {
-    padding: var(--container-padding) var(--container-padding)
-      calc(var(--container-padding) * 2) var(--container-padding);
-    scroll-padding-left: var(--container-padding);
-    gap: var(--container-padding);
-    width: 100%;
-    max-width: none;
-    margin: 0;
-    box-sizing: border-box;
-    overflow: auto hidden;
-    -webkit-overflow-scrolling: touch;
-    touch-action: auto;
-  }
-}
-
-/* Tablet breakpoints - enhanced with CSS variables */
-@media (width >= 769px) and (width <= 1023px) {
-  .scenarios-grid[data-view="scenario"] {
-    padding: calc(var(--container-padding) * 1.2)
-      calc(var(--container-padding) * 1.4);
-    gap: calc(var(--container-padding) * 1.1);
-    box-sizing: border-box;
+    /* Letter spacing optimized for analytical scanning */
+    letter-spacing: -0.005em; /* Very subtle tightening for precision */
   }
 
-  /* Category view maintains flex layout with appropriate spacing */
-  .scenarios-grid[data-view="category"] {
-    padding: var(--container-padding) calc(var(--container-padding) * 1.2);
-    gap: calc(var(--container-padding) * 1.1);
-    box-sizing: border-box;
-  }
-}
+  .filter-btn:hover,
+  .sort-btn:hover {
+    border-color: var(--color-gray-500);
+    transform: translateY(-1px); /* Subtle lift for engagement */
 
-/* Large tablet / Small laptop breakpoints */
-@media (width >= 1024px) and (width <= 1279px) {
-  .scenarios-grid[data-view="scenario"] {
-    padding: calc(var(--container-padding) * 1.4)
-      calc(var(--container-padding) * 1.6);
-    gap: calc(var(--container-padding) * 1.2);
-    box-sizing: border-box;
-  }
+    /* Enhanced hover background with sophistication */
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 
-  /* Category view maintains flex layout with appropriate spacing */
-  .scenarios-grid[data-view="category"] {
-    padding: calc(var(--container-padding) * 1.2)
-      calc(var(--container-padding) * 1.4);
-    gap: calc(var(--container-padding) * 1.2);
-    box-sizing: border-box;
-  }
-}
+    /* Improved shadow for hover state */
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.12),
+      0 2px 4px rgba(0, 0, 0, 0.08);
 
-/* Desktop breakpoints - using responsive variables */
-@media (width >= 1280px) and (width <= 1919px) {
-  .scenarios-grid[data-view="scenario"] {
-    padding: calc(var(--container-padding) * 1.6)
-      calc(var(--container-padding) * 2);
-    gap: calc(var(--container-padding) * 1.3);
-    box-sizing: border-box;
+    /* Text becomes more defined on hover */
+    color: var(--color-gray-900);
+    text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.06);
   }
 
-  /* Category view maintains flex layout with appropriate spacing */
-  .scenarios-grid[data-view="category"] {
-    padding: calc(var(--container-padding) * 1.4)
-      calc(var(--container-padding) * 1.6);
-    gap: calc(var(--container-padding) * 1.3);
-    box-sizing: border-box;
-  }
-}
+  /* Sort button hover - enhanced analytical engagement */
+  .sort-btn:hover {
+    border-color: var(--color-gray-600);
+    color: var(--color-gray-950); /* Maximum contrast for active engagement */
 
-@media (width >= 1920px) {
-  .scenarios-grid[data-view="scenario"] {
-    padding: calc(var(--container-padding) * 2)
-      calc(var(--container-padding) * 3);
-    gap: calc(var(--container-padding) * 1.5);
-    box-sizing: border-box;
-  }
+    /* Premium gradient for active sorting state */
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
 
-  /* Category view maintains flex layout with appropriate spacing */
-  .scenarios-grid[data-view="category"] {
-    padding: calc(var(--container-padding) * 1.6)
-      calc(var(--container-padding) * 2);
-    gap: calc(var(--container-padding) * 1.5);
-    box-sizing: border-box;
-  }
-}
+    /* Enhanced shadow for sorting authority */
+    box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.15),
+      0 2px 6px rgba(0, 0, 0, 0.1);
 
-/* Large screens - optimize search width */
-@media (width >= 769px) {
-  .scenarios-grid[data-view="scenario"] .scenario-controls-toolbar {
-    width: 100% !important;
-    max-width: none !important;
+    /* Slightly more defined text shadow for active state */
+    text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.08);
   }
 
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-container {
-    flex: 1 !important;
-    min-width: 250px !important;
-    max-width: 450px !important;
-    width: 100% !important;
+  .filter-btn:focus,
+  .sort-btn:focus {
+    outline: none;
+    border-color: var(--color-primary);
+
+    /* Enhanced focus state with analytical clarity */
+    box-shadow:
+      0 0 0 3px var(--color-primary-light),
+      0 4px 12px rgba(0, 0, 0, 0.12),
+      0 2px 4px rgba(0, 0, 0, 0.08);
+
+    /* Text becomes more defined in focus state */
+    color: var(--color-gray-900);
+    text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.06);
   }
 
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input-wrapper {
-    width: 100% !important;
-    min-width: 250px !important;
-    flex: 1 !important;
-    flex-grow: 1 !important;
-    flex-shrink: 0 !important;
-    box-sizing: border-box !important;
+  /* Sort button focus - analytical precision */
+  .sort-btn:focus {
+    /* Enhanced focus for sorting actions */
+    box-shadow:
+      0 0 0 3px rgba(59, 130, 246, 0.15),
+      /* Softer primary focus ring */ 0 4px 16px rgba(0, 0, 0, 0.15),
+      0 2px 6px rgba(0, 0, 0, 0.1);
+
+    color: var(--color-gray-950);
+    text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.08);
   }
 
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input {
-    width: 100% !important;
-    min-width: 250px !important;
-    flex: 1 !important;
-    flex-grow: 1 !important;
-    flex-shrink: 0 !important;
-    box-sizing: border-box !important;
-    max-width: none !important;
-  }
-}
+  .filter-btn[aria-expanded="true"],
+  .sort-btn[aria-expanded="true"] {
+    border-color: var(--color-primary-600);
+    transform: translateY(1px); /* Subtle press effect */
 
-@media (width >= 1024px) {
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-container {
-    min-width: 300px !important;
-    max-width: 550px !important;
+    /* Active state gradient with authority */
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: var(--color-primary-800);
+
+    /* Enhanced shadow for active dropdown state */
+    box-shadow:
+      0 2px 8px rgba(59, 130, 246, 0.2),
+      0 1px 3px rgba(0, 0, 0, 0.12);
+
+    /* Text shadow for active state clarity */
+    text-shadow: 0 0.5px 1px rgba(59, 130, 246, 0.1);
   }
 
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input-wrapper {
-    min-width: 300px !important;
+  /* Sort button active state - organizational authority */
+  .sort-btn[aria-expanded="true"] {
+    border-color: var(--color-primary-700);
+    color: var(--color-primary-900); /* Stronger color for active sorting */
+
+    /* Premium active gradient for sorting authority */
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+
+    /* Enhanced active shadow for sorting prominence */
+    box-shadow:
+      0 2px 10px rgba(59, 130, 246, 0.25),
+      0 1px 4px rgba(0, 0, 0, 0.15);
+
+    /* Stronger text shadow for active sorting state */
+    text-shadow: 0 0.5px 1px rgba(59, 130, 246, 0.15);
   }
 
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input {
-    min-width: 300px !important;
-  }
-}
-
-@media (width >= 1200px) {
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-container {
-    min-width: 350px !important;
-    max-width: 650px !important;
+  .filter-icon,
+  .sort-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--color-gray-500);
+    transition: transform var(--transition-fast);
   }
 
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input-wrapper {
-    min-width: 350px !important;
+  .filter-btn[aria-expanded="true"] .filter-icon,
+  .sort-btn[aria-expanded="true"] .sort-icon {
+    transform: rotate(180deg);
   }
 
-  .scenarios-grid[data-view="scenario"]
-    .scenario-controls-toolbar
-    .search-input {
-    min-width: 350px !important;
+  /* ===== CLEAN FILTER & SORT DROPDOWN - BORDERLESS DESIGN ===== */
+  .filter-dropdown,
+  .sort-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 100;
+    background: var(--color-white);
+    /* Removed border for cleaner, modern look */
+    border: none;
+    border-radius: var(--radius-md);
+    /* Subtle shadow for elevation without heavy borders */
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.12),
+      0 2px 8px rgba(0, 0, 0, 0.08);
+    min-width: 200px;
+    max-height: 300px;
+    overflow-y: auto;
+    /* Removed margin-top gap to allow seamless hover */
+    margin-top: 0;
+    /* Critical display properties for dropdown functionality */
+    display: block !important;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all var(--transition-fast);
+    /* Ensure dropdowns are interactive when visible */
+    pointer-events: none;
   }
-}
 
-/* Mobile adjustments */
-@media (width <= 768px) {
-  .scenario-hero {
-    padding: var(--spacing-16) var(--spacing-4);
-    min-height: 400px;
+  /* Override JavaScript inline styles when dropdowns should be hidden */
+  .filter-dropdown[style*="display: none"],
+  .sort-dropdown[style*="display: none"] {
+    display: block !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
   }
 
-  .scenario-hero .hero-title {
-    font-size: var(--font-size-3xl);
+  .filter-btn[aria-expanded="true"] + .filter-dropdown,
+  .sort-btn[aria-expanded="true"] + .sort-dropdown {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0);
+    pointer-events: auto !important;
   }
 
-  .scenario-hero .hero-description {
+  /* Handle JavaScript inline style overrides for visible dropdowns */
+  .filter-btn[aria-expanded="true"] + .filter-dropdown[style*="display: block"],
+  .sort-btn[aria-expanded="true"] + .sort-dropdown[style*="display: block"] {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0);
+    pointer-events: auto !important;
+  }
+
+  /* Debug: Alternative CSS selectors to show dropdowns */
+  .filter-btn.active + .filter-dropdown,
+  .sort-btn.active + .sort-dropdown,
+  .filter-btn:focus + .filter-dropdown,
+  .sort-btn:focus + .sort-dropdown {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0);
+    pointer-events: auto !important;
+  }
+
+  /* Enhanced hover states - work with JavaScript display control */
+  .filter-container:hover .filter-dropdown[style*="display: block"],
+  .sort-container:hover .sort-dropdown[style*="display: block"],
+  .filter-dropdown[style*="display: block"]:hover,
+  .sort-dropdown[style*="display: block"]:hover {
+    /* When JS has set display:block, ensure hover keeps it visible */
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0);
+    pointer-events: auto !important;
+  }
+
+  /* Alternative: Show dropdown on container hover regardless of JS state */
+  .filter-container:hover .filter-dropdown,
+  .sort-container:hover .sort-dropdown {
+    /* Force display and visibility when hovering container */
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0);
+    pointer-events: auto !important;
+  }
+
+  /* Ensure dropdown stays open when hovering over the dropdown itself */
+  .filter-dropdown:hover,
+  .sort-dropdown:hover {
+    /* Keep dropdown open when directly hovering over it */
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0);
+    pointer-events: auto !important;
+  }
+
+  /* Keep button in expanded visual state during container hover */
+  .filter-container:hover .filter-btn,
+  .sort-container:hover .sort-btn {
+    /* Visual feedback that dropdown area is active */
+    border-color: var(--color-primary-600);
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: var(--color-primary-800);
+  }
+
+  /* ===== ENHANCED FILTER & SORT OPTIONS - CLEAN BORDERLESS DESIGN ===== */
+  /* Design Intent: Cognitive clarity, analytical precision, thoughtful selection */
+
+  .filter-option,
+  .sort-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-3) var(--spacing-4);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    /* Removed border for cleaner, more modern appearance */
+    border-bottom: none;
+    position: relative;
+    /* Subtle margin for visual separation without borders */
+    margin-bottom: 1px;
+
+    /* Enhanced typography for analytical selection and cognitive ease */
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue",
+      Arial, sans-serif; /* Clean, readable system fonts */
+    font-size: 0.875rem; /* 14px - optimal for scanning and selection */
+    font-weight: 450; /* Between normal and medium for subtle hierarchy */
+    letter-spacing: -0.003em; /* Very subtle tightening for precision */
+    line-height: 1.45; /* Comfortable for easy reading and scanning */
+    color: var(--color-gray-800); /* Clear contrast for analytical clarity */
+
+    /* Subtle text enhancement for option clarity */
+    text-shadow: 0 0.5px 0.5px rgba(0, 0, 0, 0.015);
+
+    /* Clean background for analytical focus */
+    background: transparent;
+  }
+
+  /* Sort option specific styling - enhanced for organizational authority */
+  .sort-option {
+    font-weight: 475; /* Slightly heavier for sorting hierarchy */
+    color: var(--color-gray-850); /* Stronger for sorting emphasis */
+    letter-spacing: -0.005em; /* Tighter for analytical precision */
+
+    /* Enhanced padding for sorting importance */
+    padding: var(--spacing-3) var(--spacing-4);
+  }
+
+  /* Button-specific sort option styling - ensure proper inheritance */
+  button.sort-option {
+    /* Reset button defaults to inherit enhanced typography */
+    border: none;
+    background: inherit;
+    font-family: inherit; /* Inherit the enhanced font stack */
+    font-size: inherit; /* Inherit the enhanced font size */
+    font-weight: inherit; /* Inherit the enhanced font weight */
+    letter-spacing: inherit; /* Inherit the enhanced letter spacing */
+    line-height: inherit; /* Inherit the enhanced line height */
+    color: inherit; /* Inherit the enhanced color */
+    text-shadow: inherit; /* Inherit the enhanced text shadow */
+    text-align: left; /* Align text properly */
+    width: 100%; /* Full width for proper layout */
+
+    /* Enhanced button-specific properties */
+    cursor: pointer;
+    outline: none;
+
+    /* Ensure proper text rendering for buttons */
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Removed last-child border rules since we're using borderless design */
+
+  .filter-option:hover,
+  .sort-option:hover {
+    background: var(--color-gray-50);
+    color: var(--color-gray-900);
+    transform: translateX(2px); /* Subtle horizontal engagement */
+
+    /* Enhanced background with sophistication */
+    background: linear-gradient(
+      90deg,
+      rgba(248, 250, 252, 0.8) 0%,
+      rgba(241, 245, 249, 0.9) 100%
+    );
+
+    /* Subtle shadow for hover depth */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+    /* Enhanced text clarity on hover */
+    text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.025);
+  }
+
+  /* Sort option hover - enhanced analytical engagement */
+  .sort-option:hover {
+    color: var(--color-gray-950); /* Maximum clarity for sorting selection */
+    background: linear-gradient(
+      90deg,
+      rgba(241, 245, 249, 0.9) 0%,
+      rgba(226, 232, 240, 0.95) 100%
+    );
+
+    /* Enhanced shadow for sorting prominence */
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+
+    /* Stronger text definition for analytical clarity */
+    text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Button-specific hover states - ensure proper inheritance */
+  button.sort-option:hover {
+    /* Inherit all hover styles from parent */
+    color: inherit;
+    background: inherit;
+    box-shadow: inherit;
+    text-shadow: inherit;
+    transform: inherit;
+  }
+
+  button.filter-option:hover {
+    /* Inherit all hover styles from parent */
+    color: inherit;
+    background: inherit;
+    box-shadow: inherit;
+    text-shadow: inherit;
+    transform: inherit;
+  }
+
+  .filter-option.active,
+  .sort-option.active {
+    background: var(--color-primary-50);
+    color: var(--color-primary-800);
+    font-weight: 550; /* Enhanced weight for active state authority */
+
+    /* Enhanced active state with analytical confidence */
+    background: linear-gradient(
+      90deg,
+      rgba(219, 234, 254, 0.8) 0%,
+      rgba(191, 219, 254, 0.9) 100%
+    );
+
+    /* Subtle shadow for active state */
+    box-shadow:
+      inset 0 0 0 1px var(--color-primary-200),
+      0 1px 3px rgba(59, 130, 246, 0.1);
+
+    /* Clear text shadow for active state */
+    text-shadow: 0 0.5px 1px rgba(59, 130, 246, 0.08);
+
+    /* Subtle left border for active visual hierarchy */
+    border-left: 3px solid var(--color-primary-400);
+    padding-left: calc(var(--spacing-4) - 3px); /* Adjust for border */
+  }
+
+  /* Sort option active - organizational authority */
+  .sort-option.active {
+    font-weight: 575; /* Stronger weight for active sorting authority */
+    color: var(--color-primary-900); /* Maximum contrast for active sort */
+
+    /* Enhanced active background for sorting prominence */
+    background: linear-gradient(
+      90deg,
+      rgba(219, 234, 254, 0.9) 0%,
+      rgba(191, 219, 254, 0.95) 100%
+    );
+
+    /* Stronger shadow for active sorting state */
+    box-shadow:
+      inset 0 0 0 1px var(--color-primary-300),
+      0 1px 4px rgba(59, 130, 246, 0.15);
+
+    /* Enhanced text shadow for active sorting clarity */
+    text-shadow: 0 0.5px 1px rgba(59, 130, 246, 0.12);
+
+    /* Stronger left border for sorting hierarchy */
+    border-left: 3px solid var(--color-primary-600);
+  }
+
+  /* Button-specific active states - ensure proper inheritance */
+  button.filter-option.active,
+  button.sort-option.active {
+    /* Inherit all active styles from parent */
+    background: inherit;
+    color: inherit;
+    font-weight: inherit;
+    box-shadow: inherit;
+    text-shadow: inherit;
+    border-left: inherit;
+    padding-left: inherit;
+  }
+
+  button.sort-option.active {
+    /* Inherit enhanced sort-specific active styles */
+    background: inherit;
+    color: inherit;
+    font-weight: inherit;
+    box-shadow: inherit;
+    text-shadow: inherit;
+    border-left: inherit;
+  }
+
+  .filter-option .option-text,
+  .sort-option .option-text {
+    flex: 1;
+
+    /* Enhanced typography for option text clarity */
+    font-weight: inherit; /* Inherit from parent for consistency */
+    letter-spacing: inherit; /* Maintain parent's precision */
+    line-height: inherit; /* Consistent line height */
+
+    /* Ensure proper text rendering */
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Sort option text - enhanced for analytical scanning */
+  .sort-option .option-text {
+    /* Slightly enhanced for sorting importance */
+    font-weight: inherit;
+    color: inherit;
+  }
+
+  .filter-option .check-icon,
+  .sort-option .check-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--color-primary);
+    opacity: 0;
+    transition: all var(--transition-base);
+    margin-left: var(--spacing-2);
+
+    /* Enhanced check icon for analytical confirmation */
+    filter: drop-shadow(0 0.5px 1px rgba(59, 130, 246, 0.15));
+  }
+
+  /* Sort option check icon - enhanced prominence */
+  .sort-option .check-icon {
+    color: var(
+      --color-primary-600
+    ); /* Slightly stronger for sorting authority */
+    filter: drop-shadow(0 0.5px 1px rgba(59, 130, 246, 0.2));
+  }
+
+  .filter-option.active .check-icon,
+  .sort-option.active .check-icon {
+    opacity: 1;
+    transform: scale(1.05); /* Subtle scale for confirmation */
+
+    /* Enhanced active check icon */
+    filter: drop-shadow(0 1px 2px rgba(59, 130, 246, 0.25));
+  }
+
+  /* Sort option active check icon - analytical confirmation */
+  .sort-option.active .check-icon {
+    color: var(--color-primary-700);
+    transform: scale(1.1); /* Slightly larger for sorting confirmation */
+    filter: drop-shadow(0 1px 2px rgba(59, 130, 246, 0.3));
+  }
+
+  /* ===== TAG CHIPS ===== */
+  .tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-1);
+    padding: var(--spacing-1) var(--spacing-3);
+    background: var(--color-primary-100);
+    color: var(--color-primary-700);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .tag-chip:hover {
+    background: var(--color-primary-200);
+    color: var(--color-primary-800);
+  }
+
+  .tag-chip.active,
+  .tag-chip.selected {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .tag-chip-remove {
+    width: 14px;
+    height: 14px;
+    border-radius: var(--radius-full);
+    background: var(--color-primary-200);
+    color: var(--color-primary-700);
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .tag-chip:hover .tag-chip-remove {
+    background: var(--color-primary-300);
+    color: var(--color-primary-800);
+  }
+
+  .tag-chip.active .tag-chip-remove {
+    background: rgb(255 255 255 / 20%);
+    color: var(--color-white);
+  }
+
+  /* ===== ACTIVE FILTERS DISPLAY ===== */
+  .active-filters {
+    margin-bottom: var(--spacing-6);
+    min-height: 2.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+    align-items: center;
+  }
+
+  .filter-chip {
+    display: inline-flex;
+    align-items: center;
+    background: var(--color-primary);
+    color: var(--color-white);
+    padding: var(--spacing-2) var(--spacing-4);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    gap: var(--spacing-2);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+    transition: all 0.2s ease;
+  }
+
+  .filter-chip:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgb(0 0 0 / 15%);
+  }
+
+  .filter-chip .remove-chip {
+    background: rgb(255 255 255 / 20%);
+    border: none;
+    color: var(--color-white);
+    cursor: pointer;
     font-size: var(--font-size-lg);
+    line-height: 1;
+    padding: var(--spacing-1);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
   }
 
-  .filter-header {
-    flex-direction: column;
-    gap: var(--spacing-4);
-    align-items: stretch;
+  .filter-chip .remove-chip:hover {
+    background: rgb(255 255 255 / 30%);
   }
 
-  .filter-controls {
-    grid-template-columns: 1fr;
-    padding: var(--spacing-6);
+  .active-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-2) var(--spacing-3);
+    background: var(--color-gray-100);
+    color: var(--color-gray-700);
+    border-radius: var(--radius-base);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .active-filter-remove {
+    width: 16px;
+    height: 16px;
+    color: var(--color-gray-500);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color var(--transition-fast);
+  }
+
+  .active-filter-remove:hover {
+    color: var(--color-gray-700);
+  }
+
+  /* ===== CLEAR ALL CONTROLS ===== */
+  .clear-all-container {
+    position: relative;
+    margin-left: var(--spacing-2);
+  }
+
+  .clear-all-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-2) var(--spacing-4);
+    border: 1px solid var(--color-red-300);
+    border-radius: var(--radius-md);
+    background: var(--color-white);
+    color: var(--color-red-600);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    white-space: nowrap;
+  }
+
+  .clear-all-btn:hover {
+    border-color: var(--color-red-400);
+    background: var(--color-red-50);
+    color: var(--color-red-700);
+  }
+
+  .clear-all-btn:focus {
+    outline: none;
+    border-color: var(--color-red-500);
+    box-shadow: 0 0 0 3px var(--color-red-100);
+  }
+
+  .clear-all-btn:active {
+    background: var(--color-red-100);
+    transform: translateY(1px);
+  }
+
+  .clear-all-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--color-red-500);
+    transition: color var(--transition-fast);
+  }
+
+  .clear-all-btn:hover .clear-all-icon {
+    color: var(--color-red-600);
+  }
+
+  .clear-all-text {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    line-height: 1;
+  }
+
+  /* ===== RESULTS AND PAGINATION ===== */
+  .results-section {
+    padding: var(--spacing-12) 0;
+    background: var(--color-white);
+  }
+
+  .results-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-6);
   }
 
   .results-header {
-    flex-direction: column;
-    gap: var(--spacing-4);
-    align-items: stretch;
-  }
-
-  .scenario-grid {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-6);
-  }
-
-  .scenario-actions {
-    flex-direction: column;
-  }
-
-  .scenario-controls-toolbar {
-    flex-direction: column;
-    gap: var(--spacing-3);
-    align-items: stretch;
-  }
-
-  .search-container {
-    order: -1;
-    margin-bottom: var(--spacing-3);
-  }
-
-  .controls-group {
-    flex-wrap: wrap;
+    display: flex;
     justify-content: space-between;
-  }
-
-  .clear-all-container {
-    margin-left: 0;
-    margin-top: var(--spacing-2);
-  }
-
-  .search-autocomplete-dropdown {
-    position: fixed;
-    top: auto;
-    left: var(--spacing-4);
-    right: var(--spacing-4);
-    margin-top: var(--spacing-2);
-  }
-}
-
-@media (width <= 480px) {
-  .filter-container,
-  .results-container {
-    padding: 0 var(--spacing-4);
-  }
-
-  .scenario-hero {
-    padding: var(--spacing-12) var(--spacing-4);
-  }
-
-  /* scenario-card-header and scenario-card-body mobile styles moved to scenario-card.css */
-
-  .filter-controls {
-    padding: var(--spacing-4);
-  }
-
-  /* Mini progress ring responsive adjustments */
-  .category-info-mini {
     align-items: center;
-  }
-}
-
-/* ===== ACCESSIBILITY ===== */
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-  .scenario-card-wrapper,
-  .filter-dropdown,
-  .sort-dropdown,
-  .search-autocomplete-dropdown {
-    transition: none;
-    animation: none;
+    margin-bottom: var(--spacing-8);
+    padding-bottom: var(--spacing-4);
+    border-bottom: 1px solid var(--color-gray-200);
   }
 
-  .scenario-card-wrapper:hover {
-    transform: none;
+  .results-header h2 {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-gray-900);
+    margin: 0;
   }
 
-  .scenario-card:hover {
-    transform: none;
+  .results-count {
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-600);
+    margin-bottom: var(--spacing-4);
   }
 
-  .btn-scenario-primary:hover,
-  .btn-scenario-secondary:hover,
-  .scenario-start-btn:hover,
-  .scenario-quick-start-btn:hover {
-    transform: none;
-  }
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .search-input,
-  .filter-btn,
-  .sort-btn {
-    border-width: 2px;
+  .sort-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
   }
 
-  .scenario-card {
-    border-width: 2px;
+  .sort-controls label {
+    font-weight: var(--font-weight-medium);
+    color: var(--color-gray-700);
+    font-size: var(--font-size-sm);
   }
-}
 
-/* ===============================================
+  .sort-select {
+    padding: var(--spacing-2) var(--spacing-3);
+    border: 2px solid var(--color-gray-200);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    background: var(--color-white);
+    transition: border-color 0.2s ease;
+  }
+
+  .sort-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+
+  .load-more-container {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--spacing-6);
+    text-align: center;
+  }
+
+  .load-more-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-3) var(--spacing-6);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-md);
+    background: var(--color-white);
+    color: var(--color-primary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all var(--transition-base);
+  }
+
+  .load-more-btn:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .load-more-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* ===== LOADING AND NO RESULTS STATES ===== */
+  .loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-20) var(--spacing-6);
+  }
+
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--color-gray-200);
+    border-top: 4px solid var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: var(--spacing-4);
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .loading-state p {
+    color: var(--color-gray-600);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .no-results {
+    text-align: center;
+    padding: var(--spacing-20) var(--spacing-6);
+    background: var(--color-gray-50);
+    border-radius: var(--radius-xl);
+    margin: var(--spacing-8) 0;
+  }
+
+  .no-results-icon {
+    font-size: 4rem;
+    margin-bottom: var(--spacing-4);
+    opacity: 0.5;
+  }
+
+  .no-results-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-gray-700);
+    margin-bottom: var(--spacing-2);
+  }
+
+  .no-results h3 {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-gray-800);
+    margin-bottom: var(--spacing-2);
+  }
+
+  .no-results-message {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+  }
+
+  .no-results p {
+    color: var(--color-gray-600);
+    margin-bottom: var(--spacing-6);
+    font-size: var(--font-size-lg);
+  }
+
+  /* ===== SCENARIO GRID RESPONSIVE ===== */
+  .scenario-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: var(--spacing-8);
+  }
+
+  /* Grid utilities from main.css */
+  .grid {
+    display: grid;
+  }
+
+  .grid-cols-1 {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .gap-4 {
+    gap: var(--spacing-4);
+  }
+
+  .gap-8 {
+    gap: var(--spacing-8);
+  }
+
+  /* ===== DARK MODE SUPPORT ===== */
+  /* Dark mode styles for scenario cards moved to scenario-card.css */
+
+  /* Dark mode for scenarios grid - consolidated from category-grid.css */
+  body.dark-mode .scenarios-grid {
+    background: var(--theme-bg-primary);
+  }
+
+  /* Dark mode for category view scenarios grid */
+  body.dark-mode .scenarios-grid[data-view="category"] {
+    background: var(--theme-bg-primary);
+  }
+
+  /* Dark mode for scenario view scenarios grid */
+  body.dark-mode .scenarios-grid[data-view="scenario"] {
+    background: var(--theme-bg-primary);
+  }
+
+  /* Dark mode for scenario controls toolbar - consolidated from category-grid.css */
+  body.dark-mode .scenario-controls-toolbar {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+  }
+
+  /* Dark mode for search and filter components */
+  body.dark-mode .search-input {
+    background: var(--theme-bg-secondary);
+    border-color: var(--theme-border);
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .search-input:focus {
+    border-color: var(--theme-accent);
+    box-shadow: 0 0 0 3px var(--theme-accent-light);
+  }
+
+  body.dark-mode .search-input::placeholder {
+    color: var(--theme-text-secondary);
+  }
+
+  body.dark-mode .filter-btn,
+  body.dark-mode .sort-btn {
+    background: var(--theme-bg-secondary);
+    border-color: var(--theme-border);
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .filter-btn:hover,
+  body.dark-mode .sort-btn:hover {
+    background: var(--theme-bg-tertiary);
+    border-color: var(--theme-border-hover);
+  }
+
+  body.dark-mode .filter-dropdown,
+  body.dark-mode .sort-dropdown {
+    background: var(--theme-bg-secondary);
+    border-color: var(--theme-border);
+  }
+
+  body.dark-mode .filter-option,
+  body.dark-mode .sort-option {
+    color: var(--theme-text-primary);
+    border-bottom-color: var(--theme-border);
+  }
+
+  body.dark-mode .filter-option:hover,
+  body.dark-mode .sort-option:hover {
+    background: var(--theme-bg-tertiary);
+  }
+
+  body.dark-mode .search-autocomplete-dropdown {
+    background: var(--theme-bg-secondary);
+    border-color: var(--theme-border);
+  }
+
+  body.dark-mode .search-autocomplete-item {
+    color: var(--theme-text-primary);
+    border-bottom-color: var(--theme-border);
+  }
+
+  body.dark-mode .search-autocomplete-item:hover {
+    background: var(--theme-bg-tertiary);
+  }
+
+  /* Dark mode autocomplete items (JS compatibility aliases) */
+  body.dark-mode .autocomplete-item {
+    color: var(--theme-text-primary);
+    border-bottom-color: var(--theme-border);
+  }
+
+  body.dark-mode .autocomplete-item:hover {
+    background: var(--theme-bg-tertiary);
+  }
+
+  body.dark-mode .autocomplete-item.highlighted {
+    background: var(--color-primary-900);
+    color: var(--color-primary-100);
+  }
+
+  body.dark-mode .autocomplete-item-icon {
+    background: var(--theme-bg-tertiary);
+    color: var(--theme-text-secondary);
+  }
+
+  body.dark-mode .autocomplete-item-title {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .autocomplete-item-meta {
+    color: var(--theme-text-secondary);
+  }
+
+  /* Dark mode autocomplete sections */
+  body.dark-mode .autocomplete-section-header {
+    background: var(--theme-bg-tertiary);
+    color: var(--theme-text-secondary);
+    border-bottom-color: var(--theme-border);
+  }
+
+  body.dark-mode .autocomplete-section {
+    border-bottom-color: var(--theme-border);
+  }
+
+  body.dark-mode .no-results-text {
+    color: var(--theme-text-secondary);
+  }
+
+  /* Dark mode count display */
+  body.dark-mode .scenario-count {
+    background: var(--theme-bg-secondary);
+    border-color: var(--theme-border);
+  }
+
+  body.dark-mode .count-text {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .count-number {
+    color: var(--theme-accent);
+  }
+
+  /* Dark mode fallback UI */
+  body.dark-mode .basic-fallback {
+    background: var(--theme-bg-secondary);
+    border-color: var(--theme-border);
+  }
+
+  body.dark-mode .basic-fallback h2 {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .basic-fallback p {
+    color: var(--theme-text-secondary);
+  }
+
+  /* Dark mode buttons */
+  body.dark-mode .btn-primary {
+    background: var(--theme-accent);
+    border-color: var(--theme-accent);
+    color: var(--theme-bg-primary);
+  }
+
+  body.dark-mode .btn-primary:hover {
+    background: var(--theme-accent-light);
+    border-color: var(--theme-accent-light);
+  }
+
+  /* Dark mode for mini progress rings */
+  body.dark-mode .category-title-mini {
+    color: var(--color-text-primary-dark, #f9fafb);
+  }
+
+  body.dark-mode .category-progress-text-mini {
+    color: var(--color-text-secondary-dark, #9ca3af);
+  }
+
+  body.dark-mode .progress-percentage-mini {
+    color: var(--color-text-primary-dark, #f9fafb);
+  }
+
+  /* ===== RESPONSIVE DESIGN ===== */
+
+  /* Category view responsive - maintains horizontal scroll behavior */
+  @media (width <= 768px) {
+    .scenarios-grid[data-view="category"] {
+      padding: var(--container-padding) var(--container-padding)
+        calc(var(--container-padding) * 2) var(--container-padding);
+      scroll-padding-left: var(--container-padding);
+      gap: calc(var(--container-padding) * 0.8);
+      -webkit-overflow-scrolling: touch;
+      touch-action: auto;
+    }
+  }
+
+  @media (width <= 480px) {
+    .scenarios-grid[data-view="category"] {
+      padding: calc(var(--container-padding) * 0.8)
+        calc(var(--container-padding) * 0.75)
+        calc(var(--container-padding) * 1.5)
+        calc(var(--container-padding) * 0.75);
+      scroll-padding-left: calc(var(--container-padding) * 0.75);
+      gap: calc(var(--container-padding) * 0.8);
+    }
+  }
+
+  /* Scenarios grid responsive breakpoints - consolidated from category-grid.css */
+
+  /* Mobile breakpoints - using CSS variables from media.css */
+  @media (width <= 480px) {
+    .scenarios-grid {
+      padding: calc(var(--container-padding) * 0.8)
+        calc(var(--container-padding) * 0.75)
+        calc(var(--container-padding) * 1.5)
+        calc(var(--container-padding) * 0.75);
+      scroll-padding-left: calc(var(--container-padding) * 0.75);
+      gap: calc(var(--container-padding) * 0.8);
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      box-sizing: border-box;
+      overflow: auto hidden;
+      -webkit-overflow-scrolling: touch;
+      touch-action: auto;
+    }
+  }
+
+  @media (width >= 481px) and (width <= 768px) {
+    .scenarios-grid {
+      padding: var(--container-padding) var(--container-padding)
+        calc(var(--container-padding) * 2) var(--container-padding);
+      scroll-padding-left: var(--container-padding);
+      gap: var(--container-padding);
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      box-sizing: border-box;
+      overflow: auto hidden;
+      -webkit-overflow-scrolling: touch;
+      touch-action: auto;
+    }
+  }
+
+  /* Tablet breakpoints - enhanced with CSS variables */
+  @media (width >= 769px) and (width <= 1023px) {
+    .scenarios-grid[data-view="scenario"] {
+      padding: calc(var(--container-padding) * 1.2)
+        calc(var(--container-padding) * 1.4);
+      gap: calc(var(--container-padding) * 1.1);
+      box-sizing: border-box;
+    }
+
+    /* Category view maintains flex layout with appropriate spacing */
+    .scenarios-grid[data-view="category"] {
+      padding: var(--container-padding) calc(var(--container-padding) * 1.2);
+      gap: calc(var(--container-padding) * 1.1);
+      box-sizing: border-box;
+    }
+  }
+
+  /* Large tablet / Small laptop breakpoints */
+  @media (width >= 1024px) and (width <= 1279px) {
+    .scenarios-grid[data-view="scenario"] {
+      padding: calc(var(--container-padding) * 1.4)
+        calc(var(--container-padding) * 1.6);
+      gap: calc(var(--container-padding) * 1.2);
+      box-sizing: border-box;
+    }
+
+    /* Category view maintains flex layout with appropriate spacing */
+    .scenarios-grid[data-view="category"] {
+      padding: calc(var(--container-padding) * 1.2)
+        calc(var(--container-padding) * 1.4);
+      gap: calc(var(--container-padding) * 1.2);
+      box-sizing: border-box;
+    }
+  }
+
+  /* Desktop breakpoints - using responsive variables */
+  @media (width >= 1280px) and (width <= 1919px) {
+    .scenarios-grid[data-view="scenario"] {
+      padding: calc(var(--container-padding) * 1.6)
+        calc(var(--container-padding) * 2);
+      gap: calc(var(--container-padding) * 1.3);
+      box-sizing: border-box;
+    }
+
+    /* Category view maintains flex layout with appropriate spacing */
+    .scenarios-grid[data-view="category"] {
+      padding: calc(var(--container-padding) * 1.4)
+        calc(var(--container-padding) * 1.6);
+      gap: calc(var(--container-padding) * 1.3);
+      box-sizing: border-box;
+    }
+  }
+
+  @media (width >= 1920px) {
+    .scenarios-grid[data-view="scenario"] {
+      padding: calc(var(--container-padding) * 2)
+        calc(var(--container-padding) * 3);
+      gap: calc(var(--container-padding) * 1.5);
+      box-sizing: border-box;
+    }
+
+    /* Category view maintains flex layout with appropriate spacing */
+    .scenarios-grid[data-view="category"] {
+      padding: calc(var(--container-padding) * 1.6)
+        calc(var(--container-padding) * 2);
+      gap: calc(var(--container-padding) * 1.5);
+      box-sizing: border-box;
+    }
+  }
+
+  /* Large screens - optimize search width */
+  @media (width >= 769px) {
+    .scenarios-grid[data-view="scenario"] .scenario-controls-toolbar {
+      width: 100% !important;
+      max-width: none !important;
+    }
+
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .search-container {
+      flex: 1 !important;
+      min-width: 250px !important;
+      max-width: 450px !important;
+      width: 100% !important;
+    }
+
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .search-input-wrapper {
+      width: 100% !important;
+      min-width: 250px !important;
+      flex: 1 !important;
+      flex-grow: 1 !important;
+      flex-shrink: 0 !important;
+      box-sizing: border-box !important;
+    }
+
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .search-input {
+      width: 100% !important;
+      min-width: 250px !important;
+      flex: 1 !important;
+      flex-grow: 1 !important;
+      flex-shrink: 0 !important;
+      box-sizing: border-box !important;
+      max-width: none !important;
+    }
+  }
+
+  @media (width >= 1024px) {
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .search-container {
+      min-width: 300px !important;
+      max-width: 550px !important;
+    }
+
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .search-input-wrapper {
+      min-width: 300px !important;
+    }
+
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .search-input {
+      min-width: 300px !important;
+    }
+  }
+
+  @media (width >= 1200px) {
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .search-container {
+      min-width: 350px !important;
+      max-width: 650px !important;
+    }
+
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .search-input-wrapper {
+      min-width: 350px !important;
+    }
+
+    .scenarios-grid[data-view="scenario"]
+      .scenario-controls-toolbar
+      .search-input {
+      min-width: 350px !important;
+    }
+  }
+
+  /* Mobile adjustments */
+  @media (width <= 768px) {
+    .scenario-hero {
+      padding: var(--spacing-16) var(--spacing-4);
+      min-height: 400px;
+    }
+
+    .scenario-hero .hero-title {
+      font-size: var(--font-size-3xl);
+    }
+
+    .scenario-hero .hero-description {
+      font-size: var(--font-size-lg);
+    }
+
+    .filter-header {
+      flex-direction: column;
+      gap: var(--spacing-4);
+      align-items: stretch;
+    }
+
+    .filter-controls {
+      grid-template-columns: 1fr;
+      padding: var(--spacing-6);
+    }
+
+    .results-header {
+      flex-direction: column;
+      gap: var(--spacing-4);
+      align-items: stretch;
+    }
+
+    .scenario-grid {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-6);
+    }
+
+    .scenario-actions {
+      flex-direction: column;
+    }
+
+    .scenario-controls-toolbar {
+      flex-direction: column;
+      gap: var(--spacing-3);
+      align-items: stretch;
+    }
+
+    .search-container {
+      order: -1;
+      margin-bottom: var(--spacing-3);
+    }
+
+    .controls-group {
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .clear-all-container {
+      margin-left: 0;
+      margin-top: var(--spacing-2);
+    }
+
+    .search-autocomplete-dropdown {
+      position: fixed;
+      top: auto;
+      left: var(--spacing-4);
+      right: var(--spacing-4);
+      margin-top: var(--spacing-2);
+    }
+  }
+
+  @media (width <= 480px) {
+    .filter-container,
+    .results-container {
+      padding: 0 var(--spacing-4);
+    }
+
+    .scenario-hero {
+      padding: var(--spacing-12) var(--spacing-4);
+    }
+
+    /* scenario-card-header and scenario-card-body mobile styles moved to scenario-card.css */
+
+    .filter-controls {
+      padding: var(--spacing-4);
+    }
+
+    /* Mini progress ring responsive adjustments */
+    .category-info-mini {
+      align-items: center;
+    }
+  }
+
+  /* ===== ACCESSIBILITY ===== */
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .scenario-card-wrapper,
+    .filter-dropdown,
+    .sort-dropdown,
+    .search-autocomplete-dropdown {
+      transition: none;
+      animation: none;
+    }
+
+    .scenario-card-wrapper:hover {
+      transform: none;
+    }
+
+    .scenario-card:hover {
+      transform: none;
+    }
+
+    .btn-scenario-primary:hover,
+    .btn-scenario-secondary:hover,
+    .scenario-start-btn:hover,
+    .scenario-quick-start-btn:hover {
+      transform: none;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .search-input,
+    .filter-btn,
+    .sort-btn {
+      border-width: 2px;
+    }
+
+    .scenario-card {
+      border-width: 2px;
+    }
+  }
+
+  /* ===============================================
    CONSOLIDATED SCENARIO BROWSER STYLES COMPLETE
    ===============================================
    
@@ -2402,3 +2408,4 @@ body.dark-mode .progress-percentage-mini {
    All scenario-related selectors are now consolidated into this single file
    for better maintainability and component organization.
    =============================================== */
+} /* End @layer components */

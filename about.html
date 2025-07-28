@@ -32,12 +32,24 @@
     <link rel="icon" type="image/svg+xml" href="src/assets/icons/favicon.svg" />
     <link rel="icon" type="image/png" href="src/assets/icons/favicon.png" />
 
-    <!-- Styles -->
+    <!-- Styles - Proper loading order for consistent navigation -->
+    <!-- 1. Design tokens foundation - MUST LOAD FIRST -->
+    <link rel="stylesheet" href="src/styles/design-tokens.css" />
+
+    <!-- 2. Media queries foundation -->
+    <link rel="stylesheet" href="src/styles/media.css" />
+
+    <!-- 3. Base styles -->
     <link rel="stylesheet" href="src/styles/main.css" />
+    <link rel="stylesheet" href="src/styles/accessibility.css" />
     <link rel="stylesheet" href="src/styles/navigation-highlight-fix.css" />
+
+    <!-- 4. Navigation with proper foundation -->
     <link rel="stylesheet" href="src/styles/shared-navigation.css" />
     <link rel="stylesheet" href="src/styles/settings-menu.css" />
     <link rel="stylesheet" href="src/styles/footer.css" />
+
+    <!-- 5. Page-specific styles LAST -->
     <link rel="stylesheet" href="src/styles/about-page.css" />
   </head>
   <body>

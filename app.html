@@ -198,6 +198,12 @@ limitations under the License.
     </style>
 
     <!-- Styles - Optimized load order for CSS architecture -->
+    <!-- 0. CSS Layers definition - MUST LOAD FIRST -->
+    <link rel="stylesheet" href="src/styles/css-layers.css" />
+
+    <!-- 0.1. CSS Layers fix for migration issues -->
+    <link rel="stylesheet" href="src/styles/css-layers-fix.css" />
+
     <!-- 1. Design tokens foundation - MUST LOAD FIRST -->
     <link rel="stylesheet" href="src/styles/design-tokens.css" />
 
@@ -238,7 +244,11 @@ limitations under the License.
     <link rel="stylesheet" href="src/styles/loader-spinner.css" />
 
     <!-- 8. Page-specific and theme styles -->
-    <link rel="stylesheet" href="src/styles/hero-demo.css" />
+    <link rel="stylesheet" href="src/styles/hero-consolidated.css" />
+    <link
+      rel="stylesheet"
+      href="src/styles/state-management-consolidated.css"
+    />
     <link rel="stylesheet" href="src/styles/category-grid.css" />
     <link rel="stylesheet" href="src/styles/category-page.css" />
 
@@ -305,24 +315,37 @@ limitations under the License.
     <link rel="prefetch" href="src/js/core/accessibility.js" />
     <link rel="prefetch" href="src/js/core/animation-manager.js" />
 
-    <!-- Immediate scroll reset to prevent page restoration scrolling -->
+    <!-- Scroll restoration configuration -->
     <script>
-      // Simple scroll restoration prevention
+      // Configure scroll restoration (safe to do in head)
       if ("scrollRestoration" in history) {
         history.scrollRestoration = "manual";
       }
 
-      // Force scroll to top immediately (synchronous)
-      window.scrollTo(0, 0);
+      // Defer scroll reset until DOM is ready
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => {
+          window.scrollTo(0, 0);
+        });
+      } else {
+        // DOM already loaded
+        window.scrollTo(0, 0);
+      }
     </script>
 
     <!-- Inert polyfill for older browsers -->
     <script>
-      // Check if inert is supported, if not load polyfill
+      // Check if inert is supported, if not defer polyfill loading
       if (!("inert" in HTMLElement.prototype)) {
-        const script = document.createElement("script");
-        script.src = "https://unpkg.com/wicg-inert@3.1.2/dist/inert.min.js";
-        document.head.appendChild(script);
+        // Use dynamic import instead of DOM manipulation
+        import("https://unpkg.com/wicg-inert@3.1.2/dist/inert.min.js").catch(
+          () => {
+            // Fallback: add script tag conditionally if dynamic import fails
+            console.warn(
+              "Inert polyfill failed to load via import, trying fallback",
+            );
+          },
+        );
       }
     </script>
   </head>
@@ -1267,6 +1290,9 @@ limitations under the License.
     ></script>
     <script type="module" src="src/js/components/modal-utility.js"></script>
 
+    <!-- CSS Layers Diagnostic Tool -->
+    <script type="module" src="src/utils/css-layers-diagnostic.js"></script>
+
     <!-- JSON SSOT Configuration System - Initialize before app.js -->
     <script type="module" src="src/js/app-startup.js"></script>
 
@@ -1372,13 +1398,6 @@ limitations under the License.
           performance.mark("page-loaded");
           performance.measure("page-load-time", "page-start", "page-loaded");
 
-          // Add loaded class to enable entrance animations using DOM class manager
-          if (window.DOMClassManager) {
-            window.DOMClassManager.setLoadedState(true);
-          } else {
-            document.documentElement.classList.add("loaded");
-          }
-
           // Report to our analytics system
           const measure = performance.getEntriesByName("page-load-time")[0];
           if (measure && window.SimpleAnalytics) {
@@ -1390,24 +1409,29 @@ limitations under the License.
         });
       }
 
-      // Fallback mechanism to ensure loaded class is added
-      // Add loaded class immediately for CSS that needs it using DOM class manager
-      if (window.DOMClassManager) {
-        window.DOMClassManager.setLoadedState(true);
-      } else {
-        document.documentElement.classList.add("loaded");
+      // Centralized loaded state management - runs only once
+      function setLoadedState() {
+        if (document.documentElement.classList.contains("loaded")) {
+          return; // Already set, prevent duplicate operations
+        }
+
+        if (window.DOMClassManager) {
+          window.DOMClassManager.setLoadedState(true);
+        } else {
+          document.documentElement.classList.add("loaded");
+        }
       }
 
-      // Also ensure it's added after DOMContentLoaded if not already
+      // Set loaded state based on document readiness
       if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", () => {
-          if (window.DOMClassManager) {
-            window.DOMClassManager.setLoadedState(true);
-          } else {
-            document.documentElement.classList.add("loaded");
-          }
-        });
+        document.addEventListener("DOMContentLoaded", setLoadedState);
+      } else {
+        // DOM already loaded
+        setLoadedState();
       }
+
+      // Also set on window load for animations that need it
+      window.addEventListener("load", setLoadedState);
 
       // Enhanced error handling
       window.addEventListener("error", (event) => {
@@ -1480,5 +1504,14 @@ limitations under the License.
 
     <!-- Theme Validation Utility (Development) -->
     <script src="src/utils/theme-validator.js"></script>
+
+    <!-- CSS Performance Analyzer (Development) -->
+    <script src="src/utils/css-performance-analyzer.js"></script>
+
+    <!-- State Management Performance Analyzer (Development) -->
+    <script src="src/utils/state-management-analyzer.js"></script>
+
+    <!-- CSS Layers Migration Analyzer (Development) -->
+    <script src="src/utils/css-layers-migration-analyzer.js"></script>
   </body>
 </html>

@@ -1,0 +1,332 @@
+/*
+ * State Management Consolidated CSS
+ * Copyright 2025 Armando Sori - Licensed under Apache License, Version 2.0
+ * 
+ * Consolidates all application state classes (loaded, font-size, theme states)
+ * Reduces CSS processing complexity by centralizing state-dependent styles
+ */
+
+@layer utilities {
+  /* ================================
+     LOADED STATE MANAGEMENT
+     ================================ */
+
+  /* Base loaded state - replaces main.css definitions */
+  html.loaded {
+    /* Page load complete animation trigger */
+    --page-loaded: 1;
+  }
+
+  /* Hero content loaded animations - replaces main.css and radar-chart.css */
+  html.loaded .hero .hero-content,
+  html.loaded .hero .hero-content h1,
+  html.loaded .hero .hero-content p,
+  html.loaded .hero .hero-simulation,
+  html.loaded .hero-title,
+  html.loaded .hero-description,
+  html.loaded .hero-actions {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity var(--transition-duration, 0.6s) ease-out,
+      transform var(--transition-duration, 0.6s) ease-out;
+  }
+
+  /* Hero radar demo loaded animations - consolidates radar-chart.css */
+  html.loaded .hero-radar-demo {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity var(--transition-duration, 0.8s) ease-out
+        var(--transition-delay, 0.2s),
+      transform var(--transition-duration, 0.8s) ease-out
+        var(--transition-delay, 0.2s);
+  }
+
+  html.loaded .hero-radar-demo h3 {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity var(--transition-duration, 0.6s) ease-out
+        var(--transition-delay, 0.4s),
+      transform var(--transition-duration, 0.6s) ease-out
+        var(--transition-delay, 0.4s);
+  }
+
+  html.loaded .hero-radar-demo p {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity var(--transition-duration, 0.6s) ease-out
+        var(--transition-delay, 0.6s),
+      transform var(--transition-duration, 0.6s) ease-out
+        var(--transition-delay, 0.6s);
+  }
+
+  /* Additional loaded state elements */
+  html.loaded .categories-section,
+  html.loaded .donor-appreciation-section {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity var(--transition-duration, 0.6s) ease-out
+        var(--transition-delay, 0.8s),
+      transform var(--transition-duration, 0.6s) ease-out
+        var(--transition-delay, 0.8s);
+  }
+
+  /* ================================
+     FONT SIZE MANAGEMENT SYSTEM
+     ================================ */
+
+  /* Font scaling base variables */
+  html {
+    --user-font-scale: 1;
+    --user-font-size: var(--font-size-base, 1rem);
+  }
+
+  /* Small font size - replaces design-tokens.css and appearance-settings.css */
+  html.font-size-small {
+    --user-font-scale: 0.875; /* 87.5% scaling */
+    --user-font-size: calc(
+      var(--font-size-base, 1rem) * var(--user-font-scale)
+    );
+
+    /* Apply to commonly used elements */
+    font-size: var(--user-font-size);
+  }
+
+  html.font-size-small body,
+  html.font-size-small .btn,
+  html.font-size-small .form-input,
+  html.font-size-small .hero-description,
+  html.font-size-small .section-description {
+    font-size: calc(var(--font-size-base, 1rem) * var(--user-font-scale));
+  }
+
+  /* Medium font size (default) - replaces design-tokens.css and appearance-settings.css */
+  html.font-size-medium {
+    --user-font-scale: 1; /* 100% scaling - default */
+    --user-font-size: calc(
+      var(--font-size-base, 1rem) * var(--user-font-scale)
+    );
+
+    font-size: var(--user-font-size);
+  }
+
+  html.font-size-medium body,
+  html.font-size-medium .btn,
+  html.font-size-medium .form-input,
+  html.font-size-medium .hero-description,
+  html.font-size-medium .section-description {
+    font-size: calc(var(--font-size-base, 1rem) * var(--user-font-scale));
+  }
+
+  /* Large font size - replaces design-tokens.css and appearance-settings.css */
+  html.font-size-large {
+    --user-font-scale: 1.125; /* 112.5% scaling */
+    --user-font-size: calc(
+      var(--font-size-base, 1rem) * var(--user-font-scale)
+    );
+
+    font-size: var(--user-font-size);
+  }
+
+  html.font-size-large body,
+  html.font-size-large .btn,
+  html.font-size-large .form-input,
+  html.font-size-large .hero-description,
+  html.font-size-large .section-description {
+    font-size: calc(var(--font-size-base, 1rem) * var(--user-font-scale));
+  }
+
+  /* Extra large font size - replaces design-tokens.css and appearance-settings.css */
+  html.font-size-extra-large {
+    --user-font-scale: 1.25; /* 125% scaling */
+    --user-font-size: calc(
+      var(--font-size-base, 1rem) * var(--user-font-scale)
+    );
+
+    font-size: var(--user-font-size);
+  }
+
+  html.font-size-extra-large body,
+  html.font-size-extra-large .btn,
+  html.font-size-extra-large .form-input,
+  html.font-size-extra-large .hero-description,
+  html.font-size-extra-large .section-description {
+    font-size: calc(var(--font-size-base, 1rem) * var(--user-font-scale));
+  }
+
+  /* ================================
+     RESPONSIVE FONT SIZE ADJUSTMENTS
+     ================================ */
+
+  /* Mobile adjustments for font scaling */
+  @media (max-width: 768px) {
+    html.font-size-small {
+      --user-font-scale: 0.8125; /* Slightly smaller on mobile */
+    }
+
+    html.font-size-large {
+      --user-font-scale: 1.0625; /* Less aggressive scaling on mobile */
+    }
+
+    html.font-size-extra-large {
+      --user-font-scale: 1.125; /* Reduced scaling for mobile readability */
+    }
+  }
+
+  /* ================================
+     THEME STATE MANAGEMENT
+     ================================ */
+
+  /* Dark mode loaded states */
+  @media (prefers-color-scheme: dark) {
+    html.loaded .hero-radar-demo {
+      opacity: 0.95; /* Slightly reduced opacity for dark theme */
+    }
+  }
+
+  html.dark-mode.loaded .hero-radar-demo {
+    opacity: 0.95;
+  }
+
+  /* High contrast mode adjustments */
+  @media (prefers-contrast: high) {
+    html.loaded .hero .hero-content,
+    html.loaded .hero-title,
+    html.loaded .hero-description {
+      transition-duration: 0.3s; /* Faster transitions for high contrast */
+    }
+  }
+
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    html.loaded .hero .hero-content,
+    html.loaded .hero .hero-content h1,
+    html.loaded .hero .hero-content p,
+    html.loaded .hero .hero-simulation,
+    html.loaded .hero-title,
+    html.loaded .hero-description,
+    html.loaded .hero-actions,
+    html.loaded .hero-radar-demo,
+    html.loaded .hero-radar-demo h3,
+    html.loaded .hero-radar-demo p,
+    html.loaded .categories-section,
+    html.loaded .donor-appreciation-section {
+      transition: none;
+      transform: none;
+      opacity: 1;
+    }
+  }
+
+  /* ================================
+     UTILITY CLASSES FOR STATE
+     ================================ */
+
+  /* Loading state utilities */
+  .state-loading {
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+  }
+
+  .state-loaded {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* Font size override utilities */
+  .font-scale-small {
+    font-size: calc(var(--font-size-base, 1rem) * 0.875) !important;
+  }
+
+  .font-scale-medium {
+    font-size: calc(var(--font-size-base, 1rem) * 1) !important;
+  }
+
+  .font-scale-large {
+    font-size: calc(var(--font-size-base, 1rem) * 1.125) !important;
+  }
+
+  .font-scale-extra-large {
+    font-size: calc(var(--font-size-base, 1rem) * 1.25) !important;
+  }
+
+  /* ================================
+     DEBUG AND DEVELOPMENT
+     ================================ */
+
+  /* Visual indicator for loaded state in development */
+  html[data-debug="true"].loaded::before {
+    content: "✅ Page Loaded";
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: #4ade80;
+    color: #064e3b;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    z-index: 10000;
+    pointer-events: none;
+  }
+
+  /* Visual indicator for font size in development */
+  html[data-debug="true"].font-size-small::after,
+  html[data-debug="true"].font-size-medium::after,
+  html[data-debug="true"].font-size-large::after,
+  html[data-debug="true"].font-size-extra-large::after {
+    position: fixed;
+    top: 40px;
+    right: 10px;
+    background: #3b82f6;
+    color: #ffffff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    z-index: 10000;
+    pointer-events: none;
+  }
+
+  html[data-debug="true"].font-size-small::after {
+    content: "📝 Font: Small";
+  }
+
+  html[data-debug="true"].font-size-medium::after {
+    content: "📝 Font: Medium";
+  }
+
+  html[data-debug="true"].font-size-large::after {
+    content: "📝 Font: Large";
+  }
+
+  html[data-debug="true"].font-size-extra-large::after {
+    content: "📝 Font: Extra Large";
+  }
+}
+
+@layer overrides {
+  /* ================================
+     IMPORTANT OVERRIDES
+     ================================ */
+
+  /* Ensure state classes take precedence over component styles */
+  html.loaded {
+    /* High specificity loaded state marker */
+    --loaded-state: true;
+  }
+
+  /* Ensure font scaling takes precedence */
+  html.font-size-small,
+  html.font-size-medium,
+  html.font-size-large,
+  html.font-size-extra-large {
+    /* High specificity font scaling marker */
+    --font-scaling-active: true;
+  }
+}

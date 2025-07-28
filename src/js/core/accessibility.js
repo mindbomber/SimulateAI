@@ -320,19 +320,19 @@ class AccessibilityManager {
     // Use centralized theme class updates
     this.updateThemeClasses();
 
-    // Update CSS custom properties for enhanced theming
-    const customProperties = {
-      "--accessibility-focus-color": this.theme.highContrast
-        ? "#ffff00"
-        : "#007bff",
-      "--accessibility-bg-color": this.theme.highContrast
-        ? "#000000"
-        : "#ffffff",
-    };
+    // Batch CSS custom properties update for better performance
+    const focusColor = this.theme.highContrast ? "#ffff00" : "#007bff";
+    const bgColor = this.theme.highContrast ? "#000000" : "#ffffff";
 
-    Object.entries(customProperties).forEach(([property, value]) => {
-      this.container.style.setProperty(property, value);
-    });
+    // Use cssText for batched custom property updates
+    const existingStyle = this.container.getAttribute("style") || "";
+    const customPropertiesStyle = `
+      --accessibility-focus-color: ${focusColor};
+      --accessibility-bg-color: ${bgColor};
+    `;
+
+    // Combine existing styles with new custom properties
+    this.container.style.cssText = existingStyle + customPropertiesStyle;
   }
 
   /**
@@ -723,22 +723,28 @@ class AccessibilityManager {
   }
 
   createAnnouncementRegions() {
+    // Use DocumentFragment for batched DOM insertion - reduces reflows from 4 to 1
+    const fragment = document.createDocumentFragment();
+
     // Primary announcement region (polite)
     this.liveRegion = this.createAnnouncementRegion(
       "polite",
       "accessibility-announcements",
+      fragment,
     );
 
     // Urgent announcements region (assertive)
     this.urgentRegion = this.createAnnouncementRegion(
       "assertive",
       "accessibility-urgent",
+      fragment,
     );
 
     // Status region for ongoing updates
     this.statusRegion = this.createAnnouncementRegion(
       "polite",
       "accessibility-status",
+      fragment,
     );
     this.statusRegion.setAttribute("aria-atomic", "false");
 
@@ -746,20 +752,29 @@ class AccessibilityManager {
     this.logRegion = this.createAnnouncementRegion(
       "polite",
       "accessibility-log",
+      fragment,
     );
     this.logRegion.setAttribute("role", "log");
+
+    // Single DOM insertion instead of 4 separate appendChild calls
+    document.body.appendChild(fragment);
   }
 
-  createAnnouncementRegion(liveType, id) {
+  createAnnouncementRegion(liveType, id, parentFragment = null) {
     if (document.getElementById(id)) {
       return document.getElementById(id);
     }
 
     const region = document.createElement("div");
-    region.id = id;
-    region.setAttribute("aria-live", liveType);
-    region.setAttribute("aria-atomic", "true");
-    region.className = "sr-only";
+
+    // Batch attribute setting using setElementAttributes
+    this.setElementAttributes(region, {
+      id: id,
+      "aria-live": liveType,
+      "aria-atomic": "true",
+      class: "sr-only",
+    });
+
     region.style.cssText = `
             position: absolute !important;
             left: -10000px !important;
@@ -769,7 +784,14 @@ class AccessibilityManager {
             clip: rect(1px, 1px, 1px, 1px) !important;
             white-space: nowrap !important;
         `;
-    document.body.appendChild(region);
+
+    // Append to fragment if provided, otherwise append to body
+    if (parentFragment) {
+      parentFragment.appendChild(region);
+    } else {
+      document.body.appendChild(region);
+    }
+
     return region;
   }
 
@@ -900,9 +922,13 @@ class AccessibilityManager {
     if (!this.theme.highContrast) return;
 
     this.accessibilityToolbar = document.createElement("div");
-    this.accessibilityToolbar.className = "accessibility-toolbar";
-    this.accessibilityToolbar.setAttribute("role", "toolbar");
-    this.accessibilityToolbar.setAttribute("aria-label", "Accessibility Tools");
+
+    // Batch toolbar attributes
+    this.setElementAttributes(this.accessibilityToolbar, {
+      class: "accessibility-toolbar",
+      role: "toolbar",
+      "aria-label": "Accessibility Tools",
+    });
 
     const toolbarButtons = [
       {
@@ -927,14 +953,25 @@ class AccessibilityManager {
       },
     ];
 
+    // Use DocumentFragment for batched button insertion
+    const buttonFragment = document.createDocumentFragment();
+
     toolbarButtons.forEach((button) => {
       const btn = document.createElement("button");
-      btn.id = button.id;
+
+      // Batch button attributes
+      this.setElementAttributes(btn, {
+        id: button.id,
+        "aria-label": button.label,
+      });
+
       btn.textContent = button.label;
-      btn.setAttribute("aria-label", button.label);
       btn.addEventListener("click", button.action);
-      this.accessibilityToolbar.appendChild(btn);
+      buttonFragment.appendChild(btn);
     });
+
+    // Single DOM insertion for all buttons
+    this.accessibilityToolbar.appendChild(buttonFragment);
 
     this.accessibilityToolbar.style.cssText = `
             position: fixed;
@@ -1125,50 +1162,41 @@ class AccessibilityManager {
     const { element } = component;
 
     try {
-      // Set ARIA attributes with enhanced support
-      this.setAriaAttribute(element, "role", config.role);
+      // Batch all ARIA attributes to reduce DOM mutations
+      const ariaAttributes = {};
 
-      if (config.focusable) {
-        element.setAttribute(
-          "tabindex",
-          element.hasAttribute("tabindex")
-            ? element.getAttribute("tabindex")
-            : "0",
-        );
+      if (config.role) {
+        ariaAttributes.role = config.role;
       }
 
       if (config.description) {
-        this.setAriaAttribute(element, "aria-label", config.description);
+        ariaAttributes["aria-label"] = config.description;
       }
 
-      // Enhanced ARIA attributes
       if (config.required) {
-        this.setAriaAttribute(element, "aria-required", "true");
+        ariaAttributes["aria-required"] = "true";
       }
 
       if (config.expanded !== undefined) {
-        this.setAriaAttribute(
-          element,
-          "aria-expanded",
-          config.expanded.toString(),
-        );
+        ariaAttributes["aria-expanded"] = config.expanded.toString();
       }
 
       if (config.selected !== undefined) {
-        this.setAriaAttribute(
-          element,
-          "aria-selected",
-          config.selected.toString(),
-        );
+        ariaAttributes["aria-selected"] = config.selected.toString();
       }
 
       if (config.pressed !== undefined) {
-        this.setAriaAttribute(
-          element,
-          "aria-pressed",
-          config.pressed.toString(),
-        );
+        ariaAttributes["aria-pressed"] = config.pressed.toString();
       }
+
+      if (config.focusable) {
+        ariaAttributes.tabindex = element.hasAttribute("tabindex")
+          ? element.getAttribute("tabindex")
+          : "0";
+      }
+
+      // Apply all attributes in a single batch operation
+      this.setElementAttributes(element, ariaAttributes);
 
       // Add keyboard event listeners with enhanced error handling
       this.addKeyboardListeners(element, component, config.keyboardActions);
@@ -1655,11 +1683,23 @@ class AccessibilityManager {
       const width = rect.width + ACCESSIBILITY_CONSTANTS.FOCUS_BORDER_PADDING;
       const height = rect.height + ACCESSIBILITY_CONSTANTS.FOCUS_BORDER_PADDING;
 
-      // Batch focus indicator style updates
+      // Batch focus indicator style updates with optimized CSS properties
       requestAnimationFrame(() => {
-        this.setElementAttributes(this.focusIndicator, {
-          style: `display: block; left: ${left}px; top: ${top}px; width: ${width}px; height: ${height}px;`,
-        });
+        // Use cssText for maximum performance - single style update
+        this.focusIndicator.style.cssText = `
+          display: block;
+          position: absolute;
+          left: ${left}px;
+          top: ${top}px;
+          width: ${width}px;
+          height: ${height}px;
+          border: 3px solid ${this.theme.highContrast ? "#ffff00" : "#007bff"};
+          border-radius: 4px;
+          box-shadow: ${this.theme.highContrast ? "none" : "0 0 0 1px white, 0 0 8px rgba(0, 123, 255, 0.3)"};
+          pointer-events: none;
+          transition: ${this.theme.reducedMotion ? "none" : "all 0.2s ease"};
+          z-index: 10001;
+        `;
 
         // Ensure focus indicator is visible
         if (this.theme.reducedMotion) {
