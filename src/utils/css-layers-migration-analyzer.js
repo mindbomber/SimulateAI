@@ -359,63 +359,75 @@ class CSSLayersMigrationAnalyzer {
     const plan = this.generateMigrationPlan();
     const usage = this.analyzeCurrentLayerUsage();
 
-    console.group("🔄 CSS Layers Migration Analysis");
+    // Only show detailed output if verbose logging is enabled
+    const showVerboseOutput =
+      localStorage.getItem("verbose-css-logs") === "true" ||
+      localStorage.getItem("quiet-logs") !== "true";
 
-    console.log("📊 Current Status:");
-    console.log(
-      `   • ✅ Files already migrated: ${this.cssFiles.migrated.length}`,
-    );
-    console.log(
-      `   • 🔄 Files needing migration: ${this.cssFiles.needsMigration.length}`,
-    );
-    console.log(
-      `   • 🎯 CSS Layers browser support: ${usage.browserSupport ? "Yes" : "No"}`,
-    );
-    console.log(
-      `   • 📈 Current layer usage detected: ${usage.layersDetected ? "Yes" : "No"}`,
-    );
+    if (showVerboseOutput) {
+      console.group("🔄 CSS Layers Migration Analysis");
 
-    console.log("\n🚀 Migration Plan:");
-    console.log(
-      `📋 Phase 1 - ${plan.phase1.title} (${plan.phase1.files.length} files)`,
-    );
-    plan.phase1.files.forEach((item) => {
-      console.log(`   • ${item.file} → @layer ${item.targetLayer}`);
-    });
-
-    console.log(
-      `📋 Phase 2 - ${plan.phase2.title} (${plan.phase2.files.length} files)`,
-    );
-    plan.phase2.files.forEach((item) => {
-      console.log(`   • ${item.file} → @layer ${item.targetLayer}`);
-    });
-
-    console.log(
-      `📋 Phase 3 - ${plan.phase3.title} (${plan.phase3.files.length} files)`,
-    );
-    plan.phase3.files.forEach((item) => {
-      console.log(`   • ${item.file} → @layer ${item.targetLayer}`);
-    });
-
-    console.log("\n🎯 Expected Benefits:");
-    console.log("   • Predictable CSS cascade without specificity wars");
-    console.log("   • Better browser optimization opportunities");
-    console.log("   • Easier maintenance and debugging");
-    console.log("   • Future-proof architecture for scaling");
-
-    console.log(`\n⏱️ Estimated effort: ${plan.estimatedTotalEffort}`);
-
-    // DataHandler integration status
-    if (this.dataHandler) {
-      console.log("\n💾 Migration Tracking:");
-      console.log("   • DataHandler integration active");
+      console.log("📊 Current Status:");
       console.log(
-        `   • ${this.sessionData.analysisEvents.length} events tracked`,
+        `   • ✅ Files already migrated: ${this.cssFiles.migrated.length}`,
       );
-      console.log("   • Cross-session migration progress saved");
-    }
+      console.log(
+        `   • 🔄 Files needing migration: ${this.cssFiles.needsMigration.length}`,
+      );
+      console.log(
+        `   • 🎯 CSS Layers browser support: ${usage.browserSupport ? "Yes" : "No"}`,
+      );
+      console.log(
+        `   • 📈 Current layer usage detected: ${usage.layersDetected ? "Yes" : "No"}`,
+      );
 
-    console.groupEnd();
+      console.log("\n🚀 Migration Plan:");
+      console.log(
+        `📋 Phase 1 - ${plan.phase1.title} (${plan.phase1.files.length} files)`,
+      );
+      plan.phase1.files.forEach((item) => {
+        console.log(`   • ${item.file} → @layer ${item.targetLayer}`);
+      });
+
+      console.log(
+        `📋 Phase 2 - ${plan.phase2.title} (${plan.phase2.files.length} files)`,
+      );
+      plan.phase2.files.forEach((item) => {
+        console.log(`   • ${item.file} → @layer ${item.targetLayer}`);
+      });
+
+      console.log(
+        `📋 Phase 3 - ${plan.phase3.title} (${plan.phase3.files.length} files)`,
+      );
+      plan.phase3.files.forEach((item) => {
+        console.log(`   • ${item.file} → @layer ${item.targetLayer}`);
+      });
+
+      console.log("\n🎯 Expected Benefits:");
+      console.log("   • Predictable CSS cascade without specificity wars");
+      console.log("   • Better browser optimization opportunities");
+      console.log("   • Easier maintenance and debugging");
+      console.log("   • Future-proof architecture for scaling");
+
+      console.log(`\n⏱️ Estimated effort: ${plan.estimatedTotalEffort}`);
+
+      // DataHandler integration status
+      if (this.dataHandler) {
+        console.log("\n💾 Migration Tracking:");
+        console.log("   • DataHandler integration active");
+        console.log(
+          `   • ${this.sessionData.analysisEvents.length} events tracked`,
+        );
+        console.log("   • Cross-session migration progress saved");
+      }
+
+      console.groupEnd();
+    } else {
+      // Just show a summary in quiet mode
+      console.log(
+        `🔄 CSS Layers Migration: ${this.cssFiles.migrated.length} migrated, ${this.cssFiles.needsMigration.length} pending`,
+      );
+    }
 
     return { plan, usage };
   }

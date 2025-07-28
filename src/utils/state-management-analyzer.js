@@ -253,30 +253,42 @@ class StateManagementAnalyzer {
       realWorldImpact,
     });
 
-    console.group("🎯 State Management CSS Optimization");
-    console.log("📊 Performance Improvements:");
-    console.log(`   • ${optimization.fileReduction}`);
-    console.log(`   • ${optimization.ruleReduction}`);
-    console.log(`   • ${optimization.loadedClassOptimization}`);
-    console.log(`   • ${optimization.fontSizeOptimization}`);
-    console.log(`   • ${optimization.cacheEfficiency}`);
-    console.log(`   • ${optimization.maintainability}`);
+    // Only show detailed output if verbose logging is enabled
+    const showVerboseOutput =
+      localStorage.getItem("verbose-css-logs") === "true" ||
+      localStorage.getItem("quiet-logs") !== "true";
 
-    // Enhanced real-world impact reporting
-    if (realWorldImpact) {
-      console.log("\n⚡ Real-World Performance Impact:");
-      console.log(`   • ${realWorldImpact.totalCSSFiles} CSS files loaded`);
+    if (showVerboseOutput) {
+      console.group("🎯 State Management CSS Optimization");
+      console.log("📊 Performance Improvements:");
+      console.log(`   • ${optimization.fileReduction}`);
+      console.log(`   • ${optimization.ruleReduction}`);
+      console.log(`   • ${optimization.loadedClassOptimization}`);
+      console.log(`   • ${optimization.fontSizeOptimization}`);
+      console.log(`   • ${optimization.cacheEfficiency}`);
+      console.log(`   • ${optimization.maintainability}`);
+
+      // Enhanced real-world impact reporting
+      if (realWorldImpact) {
+        console.log("\n⚡ Real-World Performance Impact:");
+        console.log(`   • ${realWorldImpact.totalCSSFiles} CSS files loaded`);
+        console.log(
+          `   • ${realWorldImpact.totalLoadTime}ms total CSS load time`,
+        );
+        console.log(`   • ${realWorldImpact.consolidationSavings}`);
+        console.log(
+          `   • ${realWorldImpact.stateManagementFiles} state management files`,
+        );
+      }
+
+      console.log("\n🎛️ Class-Specific Analysis:");
+      console.log("Before consolidation:");
+    } else {
+      // Just show a summary in quiet mode
       console.log(
-        `   • ${realWorldImpact.totalLoadTime}ms total CSS load time`,
-      );
-      console.log(`   • ${realWorldImpact.consolidationSavings}`);
-      console.log(
-        `   • ${realWorldImpact.stateManagementFiles} state management files`,
+        `🎯 State Management Optimization: ${optimization.fileReduction}, ${optimization.ruleReduction} processed`,
       );
     }
-
-    console.log("\n🎛️ Class-Specific Analysis:");
-    console.log("Before consolidation:");
     Object.entries(classAnalysis.before).forEach(([classCombo, files]) => {
       console.log(
         `   • class="${classCombo}" → ${files.length} files: ${files.join(", ")}`,

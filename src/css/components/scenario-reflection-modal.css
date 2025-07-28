@@ -586,37 +586,35 @@
   }
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .scenario-reflection-modal .modal-content {
-    background-color: #1a1a1a;
-    color: #ffffff;
-  }
+/* Manual dark mode support only - no system preference detection */
+.dark-mode .scenario-reflection-modal .modal-content {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
 
-  .reflection-progress {
-    background: linear-gradient(135deg, #2d3748, #4a5568);
-  }
+.dark-mode .reflection-progress {
+  background: linear-gradient(135deg, #2d3748, #4a5568);
+}
 
-  .choice-summary,
-  .impact-radar,
-  .community-bar-chart,
-  .demographic-questions,
-  .scenario-questions,
-  .insight-card {
-    background-color: #2d3748;
-    border-color: #4a5568;
-  }
+.dark-mode .choice-summary,
+.dark-mode .impact-radar,
+.dark-mode .community-bar-chart,
+.dark-mode .demographic-questions,
+.dark-mode .scenario-questions,
+.dark-mode .insight-card {
+  background-color: #2d3748;
+  border-color: #4a5568;
+}
 
-  .step-content h3 {
-    color: #ffffff;
-  }
+.dark-mode .step-content h3 {
+  color: #ffffff;
+}
 
-  .option-text {
-    color: #ffffff;
-  }
+.dark-mode .option-text {
+  color: #ffffff;
+}
 
-  .choice-text,
-  .insight-content h5 {
-    color: #ffffff;
-  }
+.dark-mode .choice-text,
+.dark-mode .insight-content h5 {
+  color: #ffffff;
 }

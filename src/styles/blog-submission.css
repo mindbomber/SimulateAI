@@ -1210,30 +1210,28 @@
   }
 }
 
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-  .submission-form-container {
-    background: var(--dark-surface);
-    border: 1px solid var(--dark-border);
-  }
+/* Manual Dark Mode Support Only - No System Preference Detection */
+.dark-mode .submission-form-container {
+  background: var(--dark-surface);
+  border: 1px solid var(--dark-border);
+}
 
-  .info-card {
-    background: var(--dark-card);
-    border-color: var(--dark-border);
-  }
+.dark-mode .info-card {
+  background: var(--dark-card);
+  border-color: var(--dark-border);
+}
 
-  .form-input,
-  .form-select,
-  .form-textarea {
-    background: var(--dark-input);
-    border-color: var(--dark-border);
-    color: var(--dark-text);
-  }
+.dark-mode .form-input,
+.dark-mode .form-select,
+.dark-mode .form-textarea {
+  background: var(--dark-input);
+  border-color: var(--dark-border);
+  color: var(--dark-text);
+}
 
-  .checkbox-custom {
-    background: var(--dark-input);
-    border-color: var(--dark-border);
-  }
+.dark-mode .checkbox-custom {
+  background: var(--dark-input);
+  border-color: var(--dark-border);
 }
 
 /* Emoji Avatar Styling */

@@ -266,73 +266,46 @@
     }
   }
 
-  /* Dark mode support */
-  @media (prefers-color-scheme: dark) {
-    .settings-menu {
-      background: #2d2d2d;
-      border-color: #555;
-    }
-
-    .settings-title {
-      color: #fff;
-    }
-
-    .toggle-label {
-      color: #fff;
-    }
-
-    .toggle-slider {
-      background: #555;
-    }
-
-    .settings-note {
-      background: rgb(26 115 232 / 20%);
-    }
-  }
-
-  /* ===== ENHANCED DARK MODE SUPPORT ===== */
-  body.dark-mode .settings-menu {
+  /* ===== MANUAL DARK MODE SUPPORT ONLY ===== */
+  .dark-mode .settings-menu {
     background: var(--theme-bg-secondary) !important;
     border: 1px solid var(--theme-border) !important;
     box-shadow: 0 8px 20px var(--theme-shadow-hover) !important;
   }
 
-  body.dark-mode .settings-title {
+  .dark-mode .settings-title {
     color: var(--theme-text-primary);
     border-bottom-color: var(--theme-border);
   }
 
-  body.dark-mode .settings-section {
+  .dark-mode .settings-section {
     border-bottom-color: var(--theme-border);
   }
 
-  body.dark-mode .toggle-label {
+  .dark-mode .toggle-label {
     color: var(--theme-text-primary);
   }
 
-  body.dark-mode .toggle-description {
+  .dark-mode .toggle-description {
     color: var(--theme-text-secondary);
   }
 
-  body.dark-mode .toggle-slider {
+  .dark-mode .toggle-slider {
     background: var(--theme-bg-primary);
     border: 1px solid var(--theme-border);
   }
 
-  body.dark-mode
-    .settings-toggle
-    input[type="checkbox"]:checked
-    + .toggle-slider {
+  .dark-mode .settings-toggle input[type="checkbox"]:checked + .toggle-slider {
     background: var(--color-primary);
     border-color: var(--color-primary);
   }
 
-  body.dark-mode .toggle-slider::before {
+  .dark-mode .toggle-slider::before {
     background: var(--theme-text-primary);
     border: 1px solid var(--theme-border);
   }
 
-  body.dark-mode
+  .dark-mode
     .settings-toggle
     input[type="checkbox"]:checked
     + .toggle-slider::before {
@@ -340,26 +313,26 @@
     border-color: white;
   }
 
-  body.dark-mode .settings-note {
+  .dark-mode .settings-note {
     background: rgb(74 158 255 / 10%);
     border: 1px solid rgb(74 158 255 / 30%);
     color: var(--theme-text-primary);
   }
 
-  body.dark-mode .settings-divider {
+  .dark-mode .settings-divider {
     border-color: var(--theme-border);
   }
 
-  body.dark-mode .settings-disabled {
+  .dark-mode .settings-disabled {
     opacity: 0.6;
   }
 
-  body.dark-mode .settings-disabled .toggle-slider {
+  .dark-mode .settings-disabled .toggle-slider {
     background: var(--theme-bg-primary);
     opacity: 0.5;
   }
 
-  body.dark-mode
+  .dark-mode
     .settings-disabled
     input[type="checkbox"]:checked
     + .toggle-slider {

@@ -2661,6 +2661,11 @@ export class ScenarioReflectionModal {
    * Advanced theme detection and adaptation
    */
   _detectTheme() {
+    // Check for manual dark mode class (standardized approach)
+    if (document.body.classList.contains("dark-mode")) {
+      return "dark";
+    }
+
     const root = document.documentElement;
     const computedStyle = getComputedStyle(root);
 
@@ -2668,14 +2673,6 @@ export class ScenarioReflectionModal {
     const primaryColor = computedStyle.getPropertyValue("--primary-color");
     const backgroundColor =
       computedStyle.getPropertyValue("--background-color");
-
-    // Detect dark mode
-    if (
-      window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches
-    ) {
-      return "dark";
-    }
 
     // Detect based on background color
     if (

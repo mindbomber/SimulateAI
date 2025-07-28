@@ -1734,15 +1734,14 @@
   /* ===== ACCESSIBILITY ENHANCEMENTS ===== */
   /* Reduced Motion - Moved to design-tokens.css for consolidation */
 
-  @media (prefers-color-scheme: dark) {
-    .enhanced-profile {
-      --background-color: #0f172a;
-      --surface-color: #1e293b;
-      --border-color: #334155;
-      --text-primary: #f8fafc;
-      --text-secondary: #cbd5e1;
-      --text-muted: #64748b;
-    }
+  /* Manual dark mode support only - no system preference detection */
+  .dark-mode .enhanced-profile {
+    --background-color: #0f172a;
+    --surface-color: #1e293b;
+    --border-color: #334155;
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #64748b;
   }
 
   /* ===== FOCUS STYLES FOR ACCESSIBILITY ===== */

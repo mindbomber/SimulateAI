@@ -177,51 +177,65 @@ class CSSPerformanceAnalyzer {
       realWorldImpact,
     });
 
-    console.group("🚀 CSS Optimization Results");
-    console.log("📊 Performance Improvements:");
-    console.log(`   • ${gains.fileReduction}`);
-    console.log(`   • ${gains.ruleReduction}`);
-    console.log(`   • ${gains.specificityReduction}`);
-    console.log(`   • ${gains.cacheEfficiency}`);
-    console.log(`   • ${gains.maintenanceGain}`);
+    // Only show detailed output if verbose logging is enabled
+    const showVerboseOutput =
+      localStorage.getItem("verbose-css-logs") === "true" ||
+      localStorage.getItem("quiet-logs") !== "true";
 
-    // Enhanced real-world impact reporting
-    if (realWorldImpact) {
-      console.log("\n⚡ Real-World Performance Impact:");
-      console.log(`   • ${realWorldImpact.totalCSSFiles} CSS files loaded`);
+    if (showVerboseOutput) {
+      console.group("🚀 CSS Optimization Results");
+      console.log("📊 Performance Improvements:");
+      console.log(`   • ${gains.fileReduction}`);
+      console.log(`   • ${gains.ruleReduction}`);
+      console.log(`   • ${gains.specificityReduction}`);
+      console.log(`   • ${gains.cacheEfficiency}`);
+      console.log(`   • ${gains.maintenanceGain}`);
+
+      // Enhanced real-world impact reporting
+      if (realWorldImpact) {
+        console.log("\n⚡ Real-World Performance Impact:");
+        console.log(`   • ${realWorldImpact.totalCSSFiles} CSS files loaded`);
+        console.log(
+          `   • ${realWorldImpact.totalLoadTime}ms total CSS load time`,
+        );
+        console.log(
+          `   • ${realWorldImpact.averagePerFile}ms average per file`,
+        );
+        console.log(`   • ${realWorldImpact.consolidationSavings}`);
+      }
+
+      console.log("\n📁 Before Consolidation:");
+      this.metrics.before.heroFiles.forEach((file) => {
+        console.log(`   • ${file} (contains .hero styles)`);
+      });
+
+      console.log("\n📁 After Consolidation:");
+      this.metrics.after.heroFiles.forEach((file) => {
+        console.log(`   • ${file} (all hero styles)`);
+      });
+
+      console.log("\n🎯 Architecture Benefits:");
+      console.log("   • CSS layers provide clear cascade hierarchy");
+      console.log("   • Predictable specificity without !important");
+      console.log("   • Better browser optimization opportunities");
+      console.log("   • Reduced network requests");
+      console.log("   • Improved maintainability");
+
+      // DataHandler integration status
+      if (this.dataHandler) {
+        console.log("\n💾 Persistent Analytics:");
+        console.log("   • DataHandler integration active");
+        console.log(`   • ${this.optimizationHistory.length} events tracked`);
+        console.log("   • Cross-session performance tracking enabled");
+      }
+
+      console.groupEnd();
+    } else {
+      // Just show a summary in quiet mode
       console.log(
-        `   • ${realWorldImpact.totalLoadTime}ms total CSS load time`,
+        `🚀 CSS Optimization: ${gains.fileReduction}, ${gains.ruleReduction} processed`,
       );
-      console.log(`   • ${realWorldImpact.averagePerFile}ms average per file`);
-      console.log(`   • ${realWorldImpact.consolidationSavings}`);
     }
-
-    console.log("\n📁 Before Consolidation:");
-    this.metrics.before.heroFiles.forEach((file) => {
-      console.log(`   • ${file} (contains .hero styles)`);
-    });
-
-    console.log("\n📁 After Consolidation:");
-    this.metrics.after.heroFiles.forEach((file) => {
-      console.log(`   • ${file} (all hero styles)`);
-    });
-
-    console.log("\n🎯 Architecture Benefits:");
-    console.log("   • CSS layers provide clear cascade hierarchy");
-    console.log("   • Predictable specificity without !important");
-    console.log("   • Better browser optimization opportunities");
-    console.log("   • Reduced network requests");
-    console.log("   • Improved maintainability");
-
-    // DataHandler integration status
-    if (this.dataHandler) {
-      console.log("\n💾 Persistent Analytics:");
-      console.log("   • DataHandler integration active");
-      console.log(`   • ${this.optimizationHistory.length} events tracked`);
-      console.log("   • Cross-session performance tracking enabled");
-    }
-
-    console.groupEnd();
 
     return gains;
   }
@@ -335,7 +349,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("load", () => {
       setTimeout(() => {
         const impact = analyzer.measureRealWorldImpact();
-        if (impact) {
+        if (impact && localStorage.getItem("quiet-logs") !== "true") {
           console.group("📈 Real-World Performance Metrics");
           console.log(`Total CSS files loaded: ${impact.totalCSSFiles}`);
           console.log(`Total CSS load time: ${impact.totalLoadTime}ms`);
@@ -343,7 +357,9 @@ document.addEventListener("DOMContentLoaded", () => {
           console.log(`${impact.consolidationSavings} from hero consolidation`);
           console.log(`Hero-related files: ${impact.heroFiles}`);
           console.groupEnd();
+        }
 
+        if (impact) {
           // Track load event
           analyzer.trackPerformanceEvent("window_load_measured", impact);
         }

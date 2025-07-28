@@ -799,16 +799,14 @@
     }
   }
 
-  /* Dark mode preference utilities */
-  @media (prefers-color-scheme: dark) {
-    .auto-dark-bg {
-      background: #1a1a1a;
-      color: #ffffff;
-    }
+  /* Manual dark mode utilities only - no system preference detection */
+  .dark-mode .auto-dark-bg {
+    background: #1a1a1a;
+    color: #ffffff;
+  }
 
-    .auto-dark-border {
-      border-color: #404040;
-    }
+  .dark-mode .auto-dark-border {
+    border-color: #404040;
   }
 
   /* Print utilities */

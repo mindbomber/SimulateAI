@@ -120,14 +120,6 @@
     pointer-events: none;
   }
 
-  /* Dark mode critical styles */
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #0d1117;
-      --text: #f0f6fc;
-    }
-  }
-
   body.dark-mode {
     --bg: #0d1117;
     --text: #f0f6fc;

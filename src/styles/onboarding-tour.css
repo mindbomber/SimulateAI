@@ -726,43 +726,41 @@
     }
   }
 
-  /* Dark mode support */
-  @media (prefers-color-scheme: dark) {
-    .tour-modal {
-      background: var(--color-gray-800, #1f2937);
-      color: var(--color-gray-100, #f3f4f6);
-    }
+  /* Manual dark mode support only - no system preference detection */
+  .dark-mode .tour-modal {
+    background: var(--color-gray-800, #1f2937);
+    color: var(--color-gray-100, #f3f4f6);
+  }
 
-    .tour-header {
-      border-bottom-color: var(--color-gray-700, #374151);
-    }
+  .dark-mode .tour-header {
+    border-bottom-color: var(--color-gray-700, #374151);
+  }
 
-    .tour-title {
-      color: var(--color-gray-100, #f3f4f6);
-    }
+  .dark-mode .tour-title {
+    color: var(--color-gray-100, #f3f4f6);
+  }
 
-    .tour-content {
-      color: var(--color-gray-300, #d1d5db);
-    }
+  .dark-mode .tour-content {
+    color: var(--color-gray-300, #d1d5db);
+  }
 
-    .tour-close-btn {
-      color: var(--color-gray-400, #9ca3af);
-    }
+  .dark-mode .tour-close-btn {
+    color: var(--color-gray-400, #9ca3af);
+  }
 
-    .tour-close-btn:hover {
-      background: var(--color-gray-700, #374151);
-      color: var(--color-gray-200, #e5e7eb);
-    }
+  .dark-mode .tour-close-btn:hover {
+    background: var(--color-gray-700, #374151);
+    color: var(--color-gray-200, #e5e7eb);
+  }
 
-    .tour-btn-secondary {
-      background: var(--color-gray-700, #374151);
-      color: var(--color-gray-200, #e5e7eb);
-      border-color: var(--color-gray-600, #6b7280);
-    }
+  .dark-mode .tour-btn-secondary {
+    background: var(--color-gray-700, #374151);
+    color: var(--color-gray-200, #e5e7eb);
+    border-color: var(--color-gray-600, #6b7280);
+  }
 
-    .tour-btn-secondary:hover {
-      background: var(--color-gray-600, #6b7280);
-    }
+  .dark-mode .tour-btn-secondary:hover {
+    background: var(--color-gray-600, #6b7280);
   }
 
   /* Text Selection Styling for Coach Marks */

@@ -259,18 +259,7 @@
     --content-width-full: 100%;
   }
 
-  /* ===== DARK MODE TOKENS ===== */
-  @media (prefers-color-scheme: dark) {
-    :root {
-      /* Override surface colors for automatic dark mode */
-      --color-surface: #0d1117;
-      --color-surface-secondary: #161b22;
-      --color-surface-tertiary: #21262d;
-      --color-on-surface: #f0f6fc;
-      --color-on-surface-secondary: #e6edf3;
-      --color-on-surface-tertiary: #7d8590;
-    }
-  }
+  /* ===== DARK MODE TOKENS - MANUAL TOGGLE ONLY ===== */
 
   /* Dark mode class overrides (when explicitly enabled) */
   body.dark-mode {

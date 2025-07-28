@@ -181,15 +181,9 @@
      THEME STATE MANAGEMENT
      ================================ */
 
-  /* Dark mode loaded states */
-  @media (prefers-color-scheme: dark) {
-    html.loaded .hero-radar-demo {
-      opacity: 0.95; /* Slightly reduced opacity for dark theme */
-    }
-  }
-
+  /* Manual dark mode only - no system preference detection */
   html.dark-mode.loaded .hero-radar-demo {
-    opacity: 0.95;
+    opacity: 0.95; /* Slightly reduced opacity for dark theme */
   }
 
   /* High contrast mode adjustments */

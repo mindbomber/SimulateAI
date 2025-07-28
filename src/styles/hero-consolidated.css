@@ -319,26 +319,7 @@
    THEME VARIATIONS
    ================================ */
 
-/* Dark Mode */
-@media (prefers-color-scheme: dark) {
-  .hero {
-    background: linear-gradient(
-      135deg,
-      var(--gradient-dark-start, #0d1117) 0%,
-      var(--gradient-dark-end, #1c2128) 100%
-    );
-  }
-
-  .hero-radar-demo {
-    background: var(--demo-background-dark, rgba(0, 0, 0, 0.3));
-  }
-
-  .demo-btn {
-    border-color: var(--demo-btn-border-dark, rgba(255, 255, 255, 0.2));
-    background: var(--demo-btn-background-dark, rgba(255, 255, 255, 0.05));
-  }
-}
-
+/* Dark Mode - Manual Toggle Only */
 .dark-mode .hero {
   background: linear-gradient(
     135deg,

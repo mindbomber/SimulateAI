@@ -101,19 +101,16 @@ body {
 
 /**
  * DARK MODE OPTIMIZATION
- * Consolidate all dark mode variables into single system
+ * Manual dark mode only - no system preference detection
  */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background-color: #0d1117;
-    --text-color: #f0f6fc;
-    --border-color: #30363d;
-    --card-background: #161b22;
-  }
-}
+.dark-mode {
+  /* Use CSS custom properties for dark mode variables */
+  --background-color: #0d1117;
+  --text-color: #f0f6fc;
+  --border-color: #30363d;
+  --card-background: #161b22;
 
-body.dark-mode {
-  /* Use CSS custom properties instead of hardcoded values */
+  /* Apply dark mode styles */
   background: var(--background-color);
   color: var(--text-color);
 }

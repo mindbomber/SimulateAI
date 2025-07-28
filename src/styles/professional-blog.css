@@ -427,271 +427,167 @@ Clean, minimal, intelligent design for thoughtful discourse
     }
   }
 
-  /* Dark Mode Support */
-  @media (prefers-color-scheme: dark) {
-    .blog-page {
-      background: #111;
-      color: #e5e5e5;
-    }
-
-    .blog-header {
-      background: #1a1a1a;
-      border-bottom-color: #333;
-    }
-
-    .blog-title {
-      color: #fff;
-    }
-
-    .blog-subtitle {
-      color: #999;
-    }
-
-    .btn-minimal {
-      border-color: #444;
-      color: #e5e5e5;
-    }
-
-    .btn-minimal:hover {
-      border-color: #666;
-      background: #2a2a2a;
-    }
-
-    .filter-section {
-      background: #1a1a1a;
-      border-bottom-color: #333;
-    }
-
-    .search-input,
-    .filter-select,
-    .sort-select {
-      background: #2a2a2a;
-      border-color: #444;
-      color: #e5e5e5;
-    }
-
-    .search-input:focus,
-    .filter-select:focus,
-    .sort-select:focus {
-      border-color: #4d9fff;
-      background: #333;
-    }
-
-    .article-card {
-      background: #1a1a1a;
-      border-color: #333;
-    }
-
-    .article-card:hover {
-      border-color: #555;
-      box-shadow: 0 8px 24px rgb(0 0 0 / 30%);
-    }
-
-    .article-title {
-      color: #fff;
-    }
-
-    .article-excerpt {
-      color: #ccc;
-    }
-
-    .article-tag {
-      background: #2a2a2a;
-      color: #ccc;
-    }
-
-    .article-tag:hover {
-      background: #333;
-    }
-
-    .article-footer {
-      border-top-color: #333;
-    }
-
-    .action-btn {
-      color: #999;
-    }
-
-    .action-btn:hover {
-      background: #2a2a2a;
-      color: #e5e5e5;
-    }
-
-    .featured-article {
-      background: linear-gradient(135deg, #1a2332 0%, #243447 100%);
-      border-color: #334155;
-    }
-
-    .featured-article .article-title {
-      color: #4d9fff;
-    }
-
-    .load-more-section {
-      border-top-color: #333;
-    }
-  }
-
-  /* Enhanced dark mode support using theme variables */
-  body.dark-mode .blog-page {
+  /* Manual Dark Mode Support Only - Enhanced with theme variables */
+  .dark-mode .blog-page {
     background: var(--theme-bg-primary);
     color: var(--theme-text-primary);
   }
 
-  body.dark-mode .blog-header {
+  .dark-mode .blog-header {
     background: var(--theme-bg-secondary);
     border-bottom-color: var(--theme-border);
   }
 
-  body.dark-mode .blog-title {
+  .dark-mode .blog-title {
     color: var(--theme-text-primary);
   }
 
-  body.dark-mode .blog-subtitle {
+  .dark-mode .blog-subtitle {
     color: var(--theme-text-secondary);
   }
 
-  body.dark-mode .btn-minimal {
+  .dark-mode .btn-minimal {
     border-color: var(--theme-border);
     color: var(--theme-text-primary);
     background: var(--theme-bg-secondary);
   }
 
-  body.dark-mode .btn-minimal:hover {
+  .dark-mode .btn-minimal:hover {
     border-color: var(--theme-accent);
     background: var(--theme-bg-tertiary);
   }
 
-  body.dark-mode .filter-section {
+  .dark-mode .filter-section {
     background: var(--theme-bg-secondary);
     border-bottom-color: var(--theme-border);
   }
 
-  body.dark-mode .search-input,
-  body.dark-mode .filter-select,
-  body.dark-mode .sort-select {
+  .dark-mode .search-input,
+  .dark-mode .filter-select,
+  .dark-mode .sort-select {
     background: var(--theme-bg-tertiary);
     border-color: var(--theme-border);
     color: var(--theme-text-primary);
   }
 
-  body.dark-mode .search-input:focus,
-  body.dark-mode .filter-select:focus,
-  body.dark-mode .sort-select:focus {
+  .dark-mode .search-input:focus,
+  .dark-mode .filter-select:focus,
+  .dark-mode .sort-select:focus {
     border-color: var(--theme-accent);
     background: var(--theme-bg-secondary);
     box-shadow: 0 0 0 3px rgb(var(--theme-accent-rgb), 0.1);
   }
 
-  body.dark-mode .filter-label {
+  .dark-mode .filter-label {
     color: var(--theme-text-secondary);
   }
 
-  body.dark-mode .article-card {
+  .dark-mode .article-card {
     background: var(--theme-bg-secondary);
     border-color: var(--theme-border);
   }
 
-  body.dark-mode .article-card:hover {
+  .dark-mode .article-card:hover {
     border-color: var(--theme-accent);
     box-shadow: 0 8px 24px var(--theme-shadow);
   }
 
-  body.dark-mode .article-title {
+  .dark-mode .article-title {
     color: var(--theme-text-primary);
   }
 
-  body.dark-mode .article-meta {
+  .dark-mode .article-meta {
     color: var(--theme-text-secondary);
   }
 
-  body.dark-mode .article-author {
+  .dark-mode .article-author {
     color: var(--theme-text-secondary);
   }
 
-  body.dark-mode .article-date,
-  body.dark-mode .article-reading-time {
+  .dark-mode .article-date,
+  .dark-mode .article-reading-time {
     color: var(--theme-text-muted);
   }
 
-  body.dark-mode .article-excerpt {
+  .dark-mode .article-excerpt {
     color: var(--theme-text-secondary);
   }
 
-  body.dark-mode .article-tag {
+  .dark-mode .article-tag {
     background: var(--theme-bg-tertiary);
     color: var(--theme-text-secondary);
     border: 1px solid var(--theme-border);
   }
 
-  body.dark-mode .article-tag:hover {
+  .dark-mode .article-tag:hover {
     background: var(--theme-bg-quaternary);
     color: var(--theme-text-primary);
   }
 
-  body.dark-mode .article-tag[data-category="format"] {
+  .dark-mode .article-tag[data-category="format"] {
     background: rgb(var(--theme-info-rgb), 0.1);
     color: var(--theme-info);
     border-color: var(--theme-info);
   }
 
-  body.dark-mode .article-tag[data-category="topic"] {
+  .dark-mode .article-tag[data-category="topic"] {
     background: rgb(var(--theme-success-rgb), 0.1);
     color: var(--theme-success);
     border-color: var(--theme-success);
   }
 
-  body.dark-mode .article-tag[data-category="depth"] {
+  .dark-mode .article-tag[data-category="depth"] {
     background: rgb(var(--theme-warning-rgb), 0.1);
     color: var(--theme-warning);
     border-color: var(--theme-warning);
   }
 
-  body.dark-mode .article-tag[data-category="audience"] {
+  .dark-mode .article-tag[data-category="audience"] {
     background: rgb(var(--theme-accent-rgb), 0.1);
     color: var(--theme-accent);
     border-color: var(--theme-accent);
   }
 
-  body.dark-mode .article-tag[data-category="platform"] {
+  .dark-mode .article-tag[data-category="platform"] {
     background: rgb(var(--theme-error-rgb), 0.1);
     color: var(--theme-error);
     border-color: var(--theme-error);
   }
 
-  body.dark-mode .article-footer {
+  .dark-mode .article-footer {
     border-top-color: var(--theme-border);
   }
 
-  body.dark-mode .article-engagement {
+  .dark-mode .article-engagement {
     color: var(--theme-text-secondary);
   }
 
-  body.dark-mode .action-btn {
+  .dark-mode .action-btn {
     color: var(--theme-text-secondary);
   }
 
-  body.dark-mode .action-btn:hover {
+  .dark-mode .action-btn:hover {
     background: var(--theme-bg-tertiary);
     color: var(--theme-text-primary);
   }
 
-  body.dark-mode .load-more-section {
+  .dark-mode .load-more-section {
     border-top-color: var(--theme-border);
   }
 
-  body.dark-mode .load-more {
+  .dark-mode .load-more {
     background: var(--theme-bg-secondary);
     color: var(--theme-text-primary);
     border: 1px solid var(--theme-border);
   }
 
-  body.dark-mode .load-more:hover {
+  .dark-mode .load-more:hover {
     background: var(--theme-accent);
     color: var(--theme-text-on-accent);
     border-color: var(--theme-accent);
   }
 
-  body.dark-mode .featured-article {
+  .dark-mode .featured-article {
     background: linear-gradient(
       135deg,
       var(--theme-bg-info) 0%,
@@ -700,12 +596,12 @@ Clean, minimal, intelligent design for thoughtful discourse
     border-color: var(--theme-info);
   }
 
-  body.dark-mode .featured-badge {
+  .dark-mode .featured-badge {
     background: var(--theme-accent);
     color: var(--theme-text-on-accent);
   }
 
-  body.dark-mode .featured-article .article-title {
+  .dark-mode .featured-article .article-title {
     color: var(--theme-accent);
   }
 

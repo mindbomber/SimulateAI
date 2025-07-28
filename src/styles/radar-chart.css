@@ -797,48 +797,46 @@
     }
   }
 
-  /* Dark mode support */
-  @media (prefers-color-scheme: dark) {
-    .scenario-radar,
-    .results-radar {
-      background: var(--card-bg-dark, #2d3748);
-      border-color: var(--border-color-dark, #4a5568);
-    }
+  /* Manual dark mode support only - no system preference detection */
+  .dark-mode .scenario-radar,
+  .dark-mode .results-radar {
+    background: var(--card-bg-dark, #2d3748);
+    border-color: var(--border-color-dark, #4a5568);
+  }
 
-    .radar-chart-container {
-      background: linear-gradient(135deg, #fff 0%, #f8fafc 100%) !important;
-      border-color: rgb(226 232 240 / 80%) !important;
-    }
+  .dark-mode .radar-chart-container {
+    background: linear-gradient(135deg, #fff 0%, #f8fafc 100%) !important;
+    border-color: rgb(226 232 240 / 80%) !important;
+  }
 
-    .radar-chart-fallback {
-      background: var(--card-bg-dark, #2d3748);
-      border-color: var(--border-color-dark, #4a5568);
-    }
+  .dark-mode .radar-chart-fallback {
+    background: var(--card-bg-dark, #2d3748);
+    border-color: var(--border-color-dark, #4a5568);
+  }
 
-    .radar-chart-fallback h4,
-    .radar-title {
-      color: var(--text-primary-dark, #f7fafc);
-    }
+  .dark-mode .radar-chart-fallback h4,
+  .dark-mode .radar-title {
+    color: var(--text-primary-dark, #f7fafc);
+  }
 
-    .radar-subtitle {
-      color: var(--text-secondary-dark, #a0aec0);
-    }
+  .dark-mode .radar-subtitle {
+    color: var(--text-secondary-dark, #a0aec0);
+  }
 
-    .score-item {
-      background: var(--bg-secondary-dark, #4a5568);
-    }
+  .dark-mode .score-item {
+    background: var(--bg-secondary-dark, #4a5568);
+  }
 
-    .score-item:hover {
-      background: var(--bg-hover-dark, #2d3748);
-    }
+  .dark-mode .score-item:hover {
+    background: var(--bg-hover-dark, #2d3748);
+  }
 
-    .axis-label {
-      color: var(--text-primary-dark, #f7fafc);
-    }
+  .dark-mode .axis-label {
+    color: var(--text-primary-dark, #f7fafc);
+  }
 
-    .score-bar {
-      background: var(--border-color-dark, #4a5568);
-    }
+  .dark-mode .score-bar {
+    background: var(--border-color-dark, #4a5568);
   }
 
   /* Animation classes for dynamic updates */

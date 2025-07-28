@@ -16,7 +16,14 @@ class CSSLayersDiagnostic {
   }
 
   runDiagnostics() {
-    console.group("🔍 CSS Layers Diagnostic Report");
+    // Only show detailed output if verbose logging is enabled
+    const showVerboseOutput =
+      localStorage.getItem("verbose-css-logs") === "true" ||
+      localStorage.getItem("quiet-logs") !== "true";
+
+    if (showVerboseOutput) {
+      console.group("🔍 CSS Layers Diagnostic Report");
+    }
 
     this.checkBrowserSupport();
     this.checkColorSystem();
@@ -24,7 +31,9 @@ class CSSLayersDiagnostic {
     this.checkLayerImplementation();
     this.generateReport();
 
-    console.groupEnd();
+    if (showVerboseOutput) {
+      console.groupEnd();
+    }
 
     return this.diagnostics;
   }

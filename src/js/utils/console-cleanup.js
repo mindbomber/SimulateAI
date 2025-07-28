@@ -20,6 +20,53 @@ class ConsoleCleanup {
       "Health check performed",
       "Telemetry batch flushed",
       "Event tracked",
+      "🎨 Theme validation available",
+      "CSS Optimization Results",
+      "📊 Performance Improvements:",
+      "⚡ Real-World Performance Impact:",
+      "📁 Before Consolidation:",
+      "📁 After Consolidation:",
+      "🎯 Architecture Benefits:",
+      "🎯 State Management CSS Optimization",
+      "🎛️ Class-Specific Analysis:",
+      "🚀 Overall Improvement:",
+      "📈 Specific Benefits:",
+      "⏱️ Page Load State Change Simulation",
+      "🔄 CSS Layers Migration Analysis",
+      "📊 Current Status:",
+      "🚀 Migration Plan:",
+      "📋 Phase",
+      "🎯 Expected Benefits:",
+      "⏱️ Estimated effort:",
+      "🔍 CSS Layers Diagnostic Report",
+      "📱 Browser Support:",
+      "🎨 Color System Values:",
+      "📝 Font System:",
+      "📊 CSS Layers Implementation:",
+      "📈 Layer Summary:",
+      "📋 Diagnostic Summary:",
+      "🔧 Recommendations:",
+      "💡 Quick Fixes:",
+      "🎯 Testing styles for:",
+      "Element",
+      "• Color:",
+      "• Background:",
+      "• Font Size:",
+      "• Font Family:",
+      "📈 Real-World Performance Metrics",
+      "Total CSS files loaded:",
+      "Total CSS load time:",
+      "Average per file:",
+      "Estimated",
+      "Hero-related files:",
+      "🔧 Tooltip Auto-Initializer:",
+      "Found",
+      "Processed",
+      "rings",
+      "DataHandler integration active",
+      "Running in standalone mode",
+      "ℹ️",
+      "🔗",
     ]);
   }
 
@@ -36,6 +83,8 @@ class ConsoleCleanup {
       error: console.error.bind(console),
       debug: console.debug.bind(console),
       log: console.log.bind(console),
+      group: console.group.bind(console),
+      groupEnd: console.groupEnd.bind(console),
     };
 
     this.isInitialized = true;
@@ -59,11 +108,13 @@ class ConsoleCleanup {
     };
 
     console.warn = (...args) => {
+      // Always show warnings but count them
       this.logCounts.warn++;
       this.originalMethods.warn(...args);
     };
 
     console.error = (...args) => {
+      // Always show errors but count them
       this.logCounts.error++;
       this.originalMethods.error(...args);
     };
@@ -72,6 +123,16 @@ class ConsoleCleanup {
       if (!this._shouldFilterMessage(args[0])) {
         this.originalMethods.log(...args);
       }
+    };
+
+    console.group = (...args) => {
+      if (!this._shouldFilterMessage(args[0])) {
+        this.originalMethods.log(...args);
+      }
+    };
+
+    console.groupEnd = () => {
+      // Usually called after filtered content, so suppress
     };
 
     console.info(

@@ -636,47 +636,7 @@
     ); /* Uses media.css floating tab sizes */
   }
 
-  /* System preference respecting */
-  @media (prefers-color-scheme: dark) {
-    body.theme-auto {
-      background-color: #1a1a1a;
-      color: #fff;
-    }
-
-    body.theme-auto .nav-container {
-      background-color: #2d2d2d;
-      border-bottom-color: #444;
-    }
-
-    body.theme-auto .nav-link {
-      color: #fff;
-    }
-
-    body.theme-auto .nav-link:hover {
-      color: #4a9eff;
-    }
-
-    body.theme-auto .settings-menu {
-      background-color: #2d2d2d !important;
-      border-color: #444 !important;
-    }
-
-    body.theme-auto .settings-title {
-      color: #fff !important;
-      border-bottom-color: #444 !important;
-    }
-
-    body.theme-auto .toggle-label,
-    body.theme-auto .settings-select-label {
-      color: #fff !important;
-    }
-
-    body.theme-auto .settings-select {
-      background-color: #3d3d3d !important;
-      border-color: #555 !important;
-      color: #fff !important;
-    }
-  }
+  /* Manual dark mode only - no system preference detection */
 
   @media (prefers-reduced-motion: reduce) {
     body.theme-auto *,
