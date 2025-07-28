@@ -33,17 +33,11 @@ import {
   onSnapshot,
   serverTimestamp,
   writeBatch,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+} from "firebase/firestore";
 
-import {
-  getAnalytics,
-  logEvent,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+import { getAnalytics, logEvent } from "firebase/analytics";
 
-import {
-  getPerformance,
-  trace,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-performance.js";
+import { getPerformance, trace } from "firebase/performance";
 
 /**
  * Analytics Configuration
@@ -115,37 +109,74 @@ const ANALYTICS_CONFIG = {
  */
 export class FirebaseAnalyticsService {
   constructor(firebaseApp, hybridDataService = null) {
-    this.app = firebaseApp;
-    this.db = getFirestore(firebaseApp);
-    this.analytics = getAnalytics(firebaseApp);
-    this.performance = getPerformance(firebaseApp);
-    this.hybridData = hybridDataService;
+    try {
+      this.app = firebaseApp;
+      this.db = getFirestore(firebaseApp);
 
-    // Check if we're in development mode
-    this.isDevelopmentMode =
-      window.location.hostname === "localhost" ||
-      window.location.hostname === "127.0.0.1";
+      // Initialize analytics with error handling
+      try {
+        this.analytics = getAnalytics(firebaseApp);
+      } catch (analyticsError) {
+        console.warn(
+          "Firebase Analytics initialization failed:",
+          analyticsError,
+        );
+        this.analytics = null;
+      }
 
-    // Initialize internal state
-    this.eventQueue = [];
-    this.metricsCache = new Map();
-    this.activeTraces = new Map();
-    this.sessionData = {
-      sessionId: this.generateSessionId(),
-      startTime: Date.now(),
-      userId: null,
-      events: [],
-    };
+      // Initialize performance with error handling
+      try {
+        this.performance = getPerformance(firebaseApp);
+      } catch (performanceError) {
+        console.warn(
+          "Firebase Performance initialization failed:",
+          performanceError,
+        );
+        this.performance = null;
+      }
 
-    // Start background processes only in production
-    this.initializeMonitoring();
-    this.startPerformanceTracking();
+      this.hybridData = hybridDataService;
 
-    // Only schedule analytics collection in production to prevent Firestore loops
-    if (!this.isDevelopmentMode) {
-      this.scheduleAnalyticsCollection();
+      // Check if we're in development mode
+      this.isDevelopmentMode =
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1";
+
+      // Initialize internal state
+      this.eventQueue = [];
+      this.metricsCache = new Map();
+      this.activeTraces = new Map();
+      this.sessionData = {
+        sessionId: this.generateSessionId(),
+        startTime: Date.now(),
+        userId: null,
+        events: [],
+      };
+
+      // Start background processes only in production
+      this.initializeMonitoring();
+      this.startPerformanceTracking();
+
+      // Only schedule analytics collection in production to prevent Firestore loops
+      if (!this.isDevelopmentMode) {
+        this.scheduleAnalyticsCollection();
+      }
+      // Analytics collection is disabled in development mode
+    } catch (error) {
+      console.error("Firebase Analytics Service initialization failed:", error);
+      // Set fallback values
+      this.analytics = null;
+      this.performance = null;
+      this.eventQueue = [];
+      this.metricsCache = new Map();
+      this.activeTraces = new Map();
+      this.sessionData = {
+        sessionId: this.generateSessionId(),
+        startTime: Date.now(),
+        userId: null,
+        events: [],
+      };
     }
-    // Analytics collection is disabled in development mode
   }
 
   /**
@@ -245,13 +276,19 @@ export class FirebaseAnalyticsService {
     // Add to queue for batch processing
     this.eventQueue.push(event);
 
-    // Log to Firebase Analytics
-    logEvent(this.analytics, eventType, {
-      file_size: data.fileSize || 0,
-      file_type: data.fileType || "unknown",
-      operation_duration: data.duration || 0,
-      success: data.success || true,
-    });
+    // Log to Firebase Analytics with safety check
+    if (this.analytics && typeof logEvent === "function") {
+      try {
+        logEvent(this.analytics, eventType, {
+          file_size: data.fileSize || 0,
+          file_type: data.fileType || "unknown",
+          operation_duration: data.duration || 0,
+          success: data.success || true,
+        });
+      } catch (analyticsError) {
+        console.warn("Analytics tracking failed:", analyticsError);
+      }
+    }
 
     // Store detailed event in Firestore
     await this.storeEvent(event);
@@ -364,11 +401,17 @@ export class FirebaseAnalyticsService {
       userAgent: navigator.userAgent,
     };
 
-    // Log to Firebase Analytics
-    logEvent(this.analytics, ANALYTICS_CONFIG.EVENTS.ERROR_OCCURRED, {
-      error_type: error.name || "Unknown",
-      error_fatal: context.fatal || false,
-    });
+    // Log to Firebase Analytics with safety check
+    if (this.analytics && typeof logEvent === "function") {
+      try {
+        logEvent(this.analytics, ANALYTICS_CONFIG.EVENTS.ERROR_OCCURRED, {
+          error_type: error.name || "Unknown",
+          error_fatal: context.fatal || false,
+        });
+      } catch (analyticsError) {
+        console.warn("Analytics error tracking failed:", analyticsError);
+      }
+    }
 
     // Store detailed error in Firestore
     await this.storeError(errorEvent);

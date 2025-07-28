@@ -2,10 +2,25 @@
  * Professional Donor Wall Component
  * Manages donor carousel, filtering, personalization, and Firebase integration
  * Features: Automated carousel, optional personalization, privacy controls
+ *
+ * Performance Optimizations:
+ * - DOM element caching to reduce querySelector calls
+ * - Batched DOM operations and element reuse
+ * - Optimized state change detection and updates
+ *
+ * DataHandler Integration:
+ * - Centralized donor data management and analytics
+ * - User preference persistence across sessions
+ * - Cross-device synchronization for authenticated users
+ * - Offline interaction queuing and smart caching
  */
 
 class ProfessionalDonorWall {
-  constructor() {
+  constructor(app = null) {
+    // DataHandler integration for centralized data management
+    this.app = app;
+    this.dataHandler = app?.dataHandler || null;
+
     this.currentSlide = 0;
     this.currentFilter = "recent";
     this.donors = [];
@@ -14,10 +29,23 @@ class ProfessionalDonorWall {
     this.autoplayInterval = null;
     this.isAutoplayPaused = false;
 
+    // Performance optimization: DOM element cache
+    this.domCache = new Map();
+    this.lastRenderedData = null; // For change detection
+
+    // DataHandler integration: User preferences tracking
+    this.userPreferences = {
+      lastFilter: "recent",
+      lastSlidePosition: 0,
+      autoplayEnabled: true,
+      viewPreferences: {},
+    };
+
     this.init();
   }
-
-  init() {
+  async init() {
+    this.cacheDOMElements(); // Cache frequently accessed elements
+    await this.loadUserPreferences(); // Load user preferences via DataHandler
     this.setupEventListeners();
     this.loadDonorData();
     this.startAutoplay();
@@ -26,19 +54,236 @@ class ProfessionalDonorWall {
     // Initialize accessibility features
     this.setupAccessibility();
 
-    console.log("Professional Donor Wall initialized");
+    console.log("Professional Donor Wall initialized with DataHandler support");
   }
 
   /**
-   * Load donor data (in production, this would come from Firebase)
+   * Load user preferences with DataHandler integration
+   */
+  async loadUserPreferences() {
+    if (!this.dataHandler) {
+      // Fallback to localStorage for non-DataHandler environments
+      this.loadPreferencesFromLocalStorage();
+      return;
+    }
+
+    try {
+      const stored = await this.dataHandler.getData("donorWall_preferences");
+      if (stored && Object.keys(stored).length > 0) {
+        this.userPreferences = { ...this.userPreferences, ...stored };
+
+        // Apply restored preferences
+        this.currentFilter = this.userPreferences.lastFilter || "recent";
+        this.currentSlide = this.userPreferences.lastSlidePosition || 0;
+
+        console.log("[DonorWall] Preferences loaded from DataHandler");
+      } else {
+        // Check for existing localStorage data to migrate
+        this.migratePreferencesFromLocalStorage();
+      }
+    } catch (error) {
+      console.warn("[DonorWall] Failed to load preferences:", error);
+      this.loadPreferencesFromLocalStorage();
+    }
+  }
+
+  /**
+   * Save user preferences via DataHandler
+   */
+  async saveUserPreferences() {
+    // Update current state
+    this.userPreferences.lastFilter = this.currentFilter;
+    this.userPreferences.lastSlidePosition = this.currentSlide;
+    this.userPreferences.timestamp = Date.now();
+
+    if (this.dataHandler) {
+      try {
+        await this.dataHandler.saveData(
+          "donorWall_preferences",
+          this.userPreferences,
+        );
+        console.log("[DonorWall] Preferences saved to DataHandler");
+      } catch (error) {
+        console.warn(
+          "[DonorWall] Failed to save preferences to DataHandler:",
+          error,
+        );
+        // Fallback to localStorage
+        this.savePreferencesToLocalStorage();
+      }
+    } else {
+      this.savePreferencesToLocalStorage();
+    }
+  }
+
+  /**
+   * Migrate existing localStorage preferences to DataHandler
+   */
+  async migratePreferencesFromLocalStorage() {
+    if (!this.dataHandler) return;
+
+    try {
+      const localData = localStorage.getItem(
+        "simulateai_donor_wall_preferences",
+      );
+      if (localData) {
+        const parsed = JSON.parse(localData);
+        await this.dataHandler.saveData("donorWall_preferences", parsed);
+        console.log(
+          "[DonorWall] Migrated preferences from localStorage to DataHandler",
+        );
+
+        // Clean up old localStorage entry
+        localStorage.removeItem("simulateai_donor_wall_preferences");
+      }
+    } catch (error) {
+      console.warn("[DonorWall] Failed to migrate preferences:", error);
+    }
+  }
+
+  /**
+   * Fallback preference loading from localStorage
+   */
+  loadPreferencesFromLocalStorage() {
+    try {
+      const stored = localStorage.getItem("simulateai_donor_wall_preferences");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        this.userPreferences = { ...this.userPreferences, ...parsed };
+        this.currentFilter = this.userPreferences.lastFilter || "recent";
+        this.currentSlide = this.userPreferences.lastSlidePosition || 0;
+      }
+    } catch (error) {
+      console.warn(
+        "[DonorWall] Failed to load preferences from localStorage:",
+        error,
+      );
+    }
+  }
+
+  /**
+   * Fallback preference saving to localStorage
+   */
+  savePreferencesToLocalStorage() {
+    try {
+      localStorage.setItem(
+        "simulateai_donor_wall_preferences",
+        JSON.stringify(this.userPreferences),
+      );
+    } catch (error) {
+      console.warn(
+        "[DonorWall] Failed to save preferences to localStorage:",
+        error,
+      );
+    }
+  }
+
+  /**
+   * Cache frequently accessed DOM elements for performance
+   */
+  cacheDOMElements() {
+    const elementsToCache = [
+      { key: "container", selector: ".donor-cards-container" },
+      { key: "prevBtn", selector: ".carousel-prev" },
+      { key: "nextBtn", selector: ".carousel-next" },
+      { key: "carousel", selector: ".donor-carousel-container" },
+      { key: "indicators", selector: ".carousel-indicators" },
+      {
+        key: "filterBtns",
+        selector: ".donor-wall-filters .filter-btn",
+        all: true,
+      },
+      { key: "ariaLive", selector: "#aria-live-polite" },
+      {
+        key: "totalDonorsStat",
+        selector: '.stat-number[data-stat="total-donors"]',
+      },
+      {
+        key: "thisMonthStat",
+        selector: '.stat-number[data-stat="this-month"]',
+      },
+      { key: "countriesStat", selector: '.stat-number[data-stat="countries"]' },
+    ];
+
+    elementsToCache.forEach(({ key, selector, all }) => {
+      if (all) {
+        this.domCache.set(key, document.querySelectorAll(selector));
+      } else {
+        this.domCache.set(key, document.querySelector(selector));
+      }
+    });
+  }
+
+  /**
+   * Get cached DOM element efficiently
+   */
+  getCachedElement(key) {
+    return this.domCache.get(key);
+  }
+
+  /**
+   * Generate data hash for change detection
+   */
+  generateDataHash(data) {
+    return JSON.stringify({
+      filteredDonors: data.map((d) => `${d.id}-${d.timestamp}`),
+      currentSlide: this.currentSlide,
+      cardsPerView: this.cardsPerView,
+    });
+  }
+
+  /**
+   * Load donor data with enhanced DataHandler integration
    */
   loadDonorData() {
     // Check if Firebase is available for real-time data
     if (window.firebase && window.firebase.firestore) {
       this.loadDonorDataFromFirebase();
     } else {
-      // Fallback to sample data
-      this.loadSampleDonorData();
+      // Enhanced fallback with DataHandler caching
+      this.loadSampleDonorDataWithCaching();
+    }
+  }
+
+  /**
+   * Enhanced sample data loading with DataHandler caching
+   */
+  async loadSampleDonorDataWithCaching() {
+    // Try to load cached donor data first
+    if (this.dataHandler) {
+      try {
+        const cachedDonors = await this.dataHandler.getData(
+          "donorWall_sampleData",
+        );
+        if (
+          cachedDonors &&
+          Array.isArray(cachedDonors) &&
+          cachedDonors.length > 0
+        ) {
+          this.donors = cachedDonors;
+          this.applyFilter(this.currentFilter);
+          this.updateStats();
+          console.log(
+            "[DonorWall] Loaded cached sample donor data from DataHandler",
+          );
+          return;
+        }
+      } catch (error) {
+        console.warn("[DonorWall] Failed to load cached donor data:", error);
+      }
+    }
+
+    // Load sample data and cache it
+    this.loadSampleDonorData();
+
+    // Cache the sample data for future use
+    if (this.dataHandler && this.donors.length > 0) {
+      try {
+        await this.dataHandler.saveData("donorWall_sampleData", this.donors);
+        console.log("[DonorWall] Cached sample donor data to DataHandler");
+      } catch (error) {
+        console.warn("[DonorWall] Failed to cache sample donor data:", error);
+      }
     }
   }
 
@@ -273,9 +518,9 @@ class ProfessionalDonorWall {
   }
 
   /**
-   * Apply filter to donor list
+   * Apply filter to donor list with DataHandler preference persistence
    */
-  applyFilter(filterType) {
+  async applyFilter(filterType) {
     this.currentFilter = filterType;
 
     switch (filterType) {
@@ -304,14 +549,56 @@ class ProfessionalDonorWall {
     this.currentSlide = 0;
     this.renderDonorCards();
     this.updateCarouselIndicators();
+
+    // Save filter preference via DataHandler
+    await this.saveUserPreferences();
+
+    // Track filter usage for analytics
+    await this.trackFilterUsage(filterType);
   }
 
   /**
-   * Render donor cards in the carousel
+   * Track filter usage analytics via DataHandler
+   */
+  async trackFilterUsage(filterType) {
+    if (!this.dataHandler) return;
+
+    try {
+      // Get existing analytics data
+      const analytics = (await this.dataHandler.getData(
+        "donorWall_analytics",
+      )) || {
+        filterUsage: {},
+        totalInteractions: 0,
+        lastUpdated: Date.now(),
+      };
+
+      // Update filter usage count
+      analytics.filterUsage[filterType] =
+        (analytics.filterUsage[filterType] || 0) + 1;
+      analytics.totalInteractions++;
+      analytics.lastUpdated = Date.now();
+
+      // Save updated analytics
+      await this.dataHandler.saveData("donorWall_analytics", analytics);
+      console.log(`[DonorWall] Tracked filter usage: ${filterType}`);
+    } catch (error) {
+      console.warn("[DonorWall] Failed to track filter usage:", error);
+    }
+  }
+
+  /**
+   * Render donor cards in the carousel with change detection and caching
    */
   renderDonorCards() {
-    const container = document.querySelector(".donor-cards-container");
+    const container = this.getCachedElement("container");
     if (!container) return;
+
+    // Optimize: Only re-render if data actually changed
+    const currentDataHash = this.generateDataHash(this.filteredDonors);
+    if (this.lastRenderedData === currentDataHash) {
+      return; // No changes, skip expensive DOM operations
+    }
 
     container.innerHTML = "";
 
@@ -325,11 +612,12 @@ class ProfessionalDonorWall {
       }, index * 100);
     });
 
+    this.lastRenderedData = currentDataHash; // Mark as rendered
     this.updateCarouselState();
   }
 
   /**
-   * Create individual donor card element
+   * Create individual donor card element with optimized DOM operations
    */
   createDonorCard(donor) {
     const card = document.createElement("div");
@@ -340,31 +628,26 @@ class ProfessionalDonorWall {
     // Create avatar section
     const avatar = this.createAvatar(donor);
 
-    // Create donor info section
+    // Create donor info section with batched element creation
     const info = document.createElement("div");
     info.className = "donor-info";
 
-    const name = document.createElement("h4");
-    name.className = "donor-name";
-    name.textContent = donor.displayName;
-
-    const since = document.createElement("p");
-    since.className = "donor-since";
-    since.textContent = `Supporting since ${this.formatDate(donor.supportSince)}`;
-
-    info.appendChild(name);
-    info.appendChild(since);
+    // Batch create info elements using innerHTML for better performance
+    const infoHTML = `
+      <h4 class="donor-name">${donor.displayName}</h4>
+      <p class="donor-since">Supporting since ${this.formatDate(donor.supportSince)}</p>
+    `;
+    info.innerHTML = infoHTML;
 
     // Add reflection if available and user has opted in
     if (donor.reflection && donor.visibility !== "anonymous") {
       const reflection = document.createElement("div");
       reflection.className = "donor-reflection";
-      const reflectionText = document.createElement("p");
-      reflectionText.textContent = donor.reflection;
-      reflection.appendChild(reflectionText);
+      reflection.innerHTML = `<p>${donor.reflection}</p>`;
       info.appendChild(reflection);
     }
 
+    // Assemble card efficiently
     card.appendChild(avatar);
     card.appendChild(info);
 
@@ -413,25 +696,26 @@ class ProfessionalDonorWall {
   }
 
   /**
-   * Setup event listeners
+   * Setup event listeners with cached elements for performance
    */
   setupEventListeners() {
-    // Filter buttons
-    document
-      .querySelectorAll(".donor-wall-filters .filter-btn")
-      .forEach((btn) => {
+    // Filter buttons - use cached elements
+    const filterBtns = this.getCachedElement("filterBtns");
+    if (filterBtns) {
+      filterBtns.forEach((btn) => {
         btn.addEventListener("click", (e) => {
           e.preventDefault();
           const filter = btn.getAttribute("data-filter");
-          this.setActiveFilter(btn, filter);
+          this.setActiveFilter(btn);
           this.applyFilter(filter);
           this.trackInteraction("filter_change", { filter });
         });
       });
+    }
 
-    // Carousel navigation
-    const prevBtn = document.querySelector(".carousel-prev");
-    const nextBtn = document.querySelector(".carousel-next");
+    // Carousel navigation - use cached elements
+    const prevBtn = this.getCachedElement("prevBtn");
+    const nextBtn = this.getCachedElement("nextBtn");
 
     if (prevBtn) {
       prevBtn.addEventListener("click", () => {
@@ -456,8 +740,8 @@ class ProfessionalDonorWall {
       }
     });
 
-    // Pause autoplay on hover
-    const carousel = document.querySelector(".donor-carousel-container");
+    // Pause autoplay on hover - use cached element
+    const carousel = this.getCachedElement("carousel");
     if (carousel) {
       carousel.addEventListener("mouseenter", () => this.pauseAutoplay());
       carousel.addEventListener("mouseleave", () => this.resumeAutoplay());
@@ -486,15 +770,16 @@ class ProfessionalDonorWall {
   }
 
   /**
-   * Set active filter button
+   * Set active filter button with cached elements
    */
-  setActiveFilter(clickedBtn, filter) {
-    document
-      .querySelectorAll(".donor-wall-filters .filter-btn")
-      .forEach((btn) => {
+  setActiveFilter(clickedBtn) {
+    const filterBtns = this.getCachedElement("filterBtns");
+    if (filterBtns) {
+      filterBtns.forEach((btn) => {
         btn.classList.remove("active");
         btn.setAttribute("aria-selected", "false");
       });
+    }
 
     clickedBtn.classList.add("active");
     clickedBtn.setAttribute("aria-selected", "true");
@@ -534,41 +819,50 @@ class ProfessionalDonorWall {
   }
 
   /**
-   * Go to next slide
+   * Go to next slide with preference persistence
    */
-  nextSlide() {
+  async nextSlide() {
     const maxSlides = this.getMaxSlides();
     this.currentSlide =
       this.currentSlide >= maxSlides ? 0 : this.currentSlide + 1;
     this.updateCarouselState();
+
+    // Save slide position for session persistence
+    await this.saveUserPreferences();
   }
 
   /**
-   * Go to previous slide
+   * Go to previous slide with preference persistence
    */
-  previousSlide() {
+  async previousSlide() {
     const maxSlides = this.getMaxSlides();
     this.currentSlide =
       this.currentSlide <= 0 ? maxSlides : this.currentSlide - 1;
     this.updateCarouselState();
+
+    // Save slide position for session persistence
+    await this.saveUserPreferences();
   }
 
   /**
-   * Go to specific slide
+   * Go to specific slide with preference persistence
    */
-  goToSlide(slideIndex) {
+  async goToSlide(slideIndex) {
     const maxSlides = this.getMaxSlides();
     this.currentSlide = Math.max(0, Math.min(slideIndex, maxSlides));
     this.updateCarouselState();
+
+    // Save slide position for session persistence
+    await this.saveUserPreferences();
   }
 
   /**
-   * Update carousel visual state
+   * Update carousel visual state with cached elements
    */
   updateCarouselState() {
-    const container = document.querySelector(".donor-cards-container");
-    const prevBtn = document.querySelector(".carousel-prev");
-    const nextBtn = document.querySelector(".carousel-next");
+    const container = this.getCachedElement("container");
+    const prevBtn = this.getCachedElement("prevBtn");
+    const nextBtn = this.getCachedElement("nextBtn");
 
     if (!container) return;
 
@@ -593,14 +887,13 @@ class ProfessionalDonorWall {
   }
 
   /**
-   * Update carousel indicators
+   * Update carousel indicators with cached elements
    */
   updateCarouselIndicators() {
-    const indicatorsContainer = document.querySelector(".carousel-indicators");
+    const indicatorsContainer = this.getCachedElement("indicators");
     if (!indicatorsContainer) return;
 
     const maxSlides = this.getMaxSlides();
-    const totalIndicators = maxSlides + 1;
 
     indicatorsContainer.innerHTML = "";
 
@@ -663,7 +956,7 @@ class ProfessionalDonorWall {
   }
 
   /**
-   * Update donor statistics
+   * Update donor statistics with cached elements
    */
   updateStats() {
     const totalDonors = this.donors.length;
@@ -678,17 +971,16 @@ class ProfessionalDonorWall {
 
     const countries = new Set(this.donors.map((donor) => donor.country)).size;
 
-    // Animate counter updates
-    this.animateCounter('.stat-number[data-stat="total-donors"]', totalDonors);
-    this.animateCounter('.stat-number[data-stat="this-month"]', thisMonth);
-    this.animateCounter('.stat-number[data-stat="countries"]', countries);
+    // Animate counter updates using cached elements
+    this.animateCounter(this.getCachedElement("totalDonorsStat"), totalDonors);
+    this.animateCounter(this.getCachedElement("thisMonthStat"), thisMonth);
+    this.animateCounter(this.getCachedElement("countriesStat"), countries);
   }
 
   /**
-   * Animate counter number
+   * Animate counter number with cached element
    */
-  animateCounter(selector, targetValue) {
-    const element = document.querySelector(selector);
+  animateCounter(element, targetValue) {
     if (!element) return;
 
     const currentValue = parseInt(element.textContent) || 0;
@@ -742,10 +1034,10 @@ class ProfessionalDonorWall {
   }
 
   /**
-   * Announce message to screen readers
+   * Announce message to screen readers using cached element
    */
   announceToScreenReader(message) {
-    const announcement = document.getElementById("aria-live-polite");
+    const announcement = this.getCachedElement("ariaLive");
     if (announcement) {
       announcement.textContent = message;
       setTimeout(() => {
@@ -755,22 +1047,39 @@ class ProfessionalDonorWall {
   }
 
   /**
-   * Track user interactions for analytics
+   * Enhanced interaction tracking with DataHandler persistence
+   * @param {string} action - Type of interaction (click, navigate, filter, etc.)
+   * @param {Object} data - Interaction details
    */
-  trackInteraction(action, data = {}) {
-    // In production, this would send to your analytics service
-    console.log("Donor Wall Interaction:", {
+  async trackInteraction(action, data = {}) {
+    const timestamp = new Date().toISOString();
+    const interaction = {
+      timestamp,
       action,
-      data,
-      timestamp: new Date(),
-    });
+      currentSlide: this.currentSlide,
+      currentFilter: this.currentFilter,
+      visibleDonors: this.currentDonors.length,
+      ...data,
+    };
 
-    // Example: Send to Google Analytics or custom analytics
-    if (typeof gtag !== "undefined") {
-      gtag("event", action, {
-        event_category: "donor_wall",
-        event_label: JSON.stringify(data),
-      });
+    try {
+      // Track via DataHandler for persistence and analytics
+      if (this.dataHandler) {
+        await this.dataHandler.trackUserInteraction("donor-wall", interaction);
+      }
+
+      // Fallback to console for debugging
+      console.log("Donor Wall Interaction:", interaction);
+
+      // Send to Google Analytics if available
+      if (typeof window !== "undefined" && typeof window.gtag !== "undefined") {
+        window.gtag("event", action, {
+          event_category: "donor_wall",
+          event_label: JSON.stringify(data),
+        });
+      }
+    } catch (error) {
+      console.warn("Failed to track donor wall interaction:", error);
     }
   }
 
@@ -808,7 +1117,10 @@ class ProfessionalDonorWall {
 document.addEventListener("DOMContentLoaded", () => {
   // Check if donor wall container exists on the page
   if (document.querySelector(".donor-appreciation-section")) {
-    window.professionalDonorWall = new ProfessionalDonorWall();
+    // Initialize with app instance for DataHandler integration
+    // Access global app instance if available
+    const app = window.app || window.simulateAI || null;
+    window.professionalDonorWall = new ProfessionalDonorWall(app);
 
     // Clean up on page unload
     window.addEventListener("beforeunload", () => {
@@ -820,6 +1132,10 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Export for module usage
-if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
-  module.exports = ProfessionalDonorWall;
+if (
+  typeof window !== "undefined" &&
+  typeof window.module !== "undefined" &&
+  typeof window.module.exports !== "undefined"
+) {
+  window.module.exports = ProfessionalDonorWall;
 }

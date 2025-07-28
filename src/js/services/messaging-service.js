@@ -31,13 +31,14 @@ const firebaseConfig = {
   measurementId: "G-XW8H062BMV",
 };
 
-// Import the functions you need from the SDKs you want to use
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+// Import the functions you need from the SDKs you want to use - Using local npm package instead of CDN
+import { initializeApp } from "firebase/app";
 import {
   getMessaging,
   getToken,
   onMessage,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
+  isSupported,
+} from "firebase/messaging";
 import {
   getFirestore,
   doc,
@@ -45,7 +46,7 @@ import {
   setDoc,
   collection,
   addDoc,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+} from "firebase/firestore";
 
 // Configuration constants
 const NOTIFICATION_CONFIG = {
@@ -130,12 +131,17 @@ class MessagingService {
 
   async init() {
     try {
-      // Check if messaging is supported
+      // Check if messaging is supported in this browser/environment
+      const messagingSupported = await isSupported();
       this.isSupported =
-        "serviceWorker" in navigator && "Notification" in window;
+        messagingSupported &&
+        "serviceWorker" in navigator &&
+        "Notification" in window;
 
       if (!this.isSupported) {
-        this.handleError("Push notifications not supported in this browser");
+        this.logInfo(
+          "Firebase Messaging not supported in this environment - skipping initialization",
+        );
         return;
       }
 

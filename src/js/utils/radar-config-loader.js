@@ -172,17 +172,42 @@ export function applyThemeToContainer(container, themeName, options = {}) {
 }
 
 /**
- * Optimized batch CSS property setter to reduce DOM mutations
+ * Global CSS property batching system to prevent multiple requestAnimationFrame calls
  */
-function setBatchedCSSProperties(scope, properties) {
-  if (!scope || !properties || Object.keys(properties).length === 0) return;
+let pendingCSSUpdates = new Map();
+let rafScheduled = false;
 
-  // Use requestAnimationFrame to batch style updates for better performance
-  requestAnimationFrame(() => {
+function flushCSSUpdates() {
+  pendingCSSUpdates.forEach((properties, scope) => {
     Object.entries(properties).forEach(([propertyName, value]) => {
       scope.style.setProperty(propertyName, value);
     });
   });
+
+  pendingCSSUpdates.clear();
+  rafScheduled = false;
+}
+
+/**
+ * Optimized batch CSS property setter to reduce DOM mutations
+ * Now truly batches all CSS updates across multiple function calls
+ */
+function setBatchedCSSProperties(scope, properties) {
+  if (!scope || !properties || Object.keys(properties).length === 0) return;
+
+  // Accumulate properties for this scope
+  if (!pendingCSSUpdates.has(scope)) {
+    pendingCSSUpdates.set(scope, {});
+  }
+
+  const existingProperties = pendingCSSUpdates.get(scope);
+  Object.assign(existingProperties, properties);
+
+  // Schedule a single RAF for all accumulated updates
+  if (!rafScheduled) {
+    rafScheduled = true;
+    requestAnimationFrame(flushCSSUpdates);
+  }
 }
 
 /**

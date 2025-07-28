@@ -3,7 +3,7 @@
  * Loads and manages the shared navigation HTML across all pages
  */
 
-import { UI, TIMING } from "../utils/constants.js";
+import { UI } from "../utils/constants.js";
 import scrollManager from "../utils/scroll-manager.js";
 import DataHandler from "../core/data-handler.js";
 
@@ -26,6 +26,9 @@ class SharedNavigation {
     this.currentPage = null;
     this.isInitialized = false;
     this.loadingPromise = null;
+
+    // DOM element cache for performance
+    this.domCache = new Map();
 
     // Enterprise-grade configuration
     this.config = {
@@ -59,13 +62,50 @@ class SharedNavigation {
     this.errorQueue = [];
     this.maxErrorQueue = 50;
 
-    // Cache management
-    this.cache = new Map();
-    this.cacheKeys = {
-      HTML: "nav_html",
-      USER_PREFS: "user_preferences",
-      TELEMETRY: "telemetry_data",
-    };
+    // Event listener management
+    this.eventListeners = new Map();
+    this.isListenersSetup = false;
+  }
+
+  /**
+   * Get cached DOM element or query and cache it
+   * @param {string} key - Cache key for the element
+   * @param {string} selector - CSS selector for the element
+   * @returns {Element|null} The cached or newly queried element
+   */
+  getCachedElement(key, selector) {
+    if (!this.domCache.has(key)) {
+      const element = document.querySelector(selector);
+      if (element) {
+        this.domCache.set(key, element);
+      }
+      return element;
+    }
+    return this.domCache.get(key);
+  }
+
+  /**
+   * Get cached DOM elements or query and cache them
+   * @param {string} key - Cache key for the elements
+   * @param {string} selector - CSS selector for the elements
+   * @returns {NodeList|Array} The cached or newly queried elements
+   */
+  getCachedElements(key, selector) {
+    if (!this.domCache.has(key)) {
+      const elements = document.querySelectorAll(selector);
+      if (elements.length > 0) {
+        this.domCache.set(key, Array.from(elements));
+      }
+      return elements;
+    }
+    return this.domCache.get(key);
+  }
+
+  /**
+   * Clear DOM cache when navigation is re-injected
+   */
+  clearDOMCache() {
+    this.domCache.clear();
   }
 
   /**
@@ -478,9 +518,9 @@ class SharedNavigation {
         this.navHTML = html;
         return html;
       })
-      .catch((_error) => {
-        // Error loading navigation HTML
-        // Fallback to basic navigation
+      .catch((error) => {
+        // Error loading navigation HTML - fallback to basic navigation
+        console.warn("Failed to load navigation HTML:", error.message);
         this.navHTML = this.createFallbackNavigation();
         return this.navHTML;
       });
@@ -526,15 +566,27 @@ class SharedNavigation {
   }
 
   /**
-   * Re-initialize components after navigation injection
+   * Re-initialize components after navigation injection with cache management
    */
   reinitializeAfterInjection() {
+    // Clear DOM cache since new elements have been injected
+    this.clearDOMCache();
+
+    // Clean up existing event listeners
+    this.removeAllEventListeners();
+
+    // Reset listener setup flags
+    this.isListenersSetup = false;
+
     // Re-setup event listeners since DOM has changed
     this.setupEventListeners();
     this.setActivePage(this.currentPage);
     this.initializeMobileNavigation();
     this.initializeMegaMenu();
     this.initializeDropdowns();
+
+    // Mark listeners as setup
+    this.isListenersSetup = true;
   }
 
   /**
@@ -568,36 +620,26 @@ class SharedNavigation {
   }
 
   /**
-   * Set the active page state in navigation
+   * Set the active page state in navigation with optimized DOM operations
    * @param {string} pageId - Page identifier
    */
   setActivePage(pageId) {
-    // Remove existing active states with responsive-friendly clearing
-    const navLinks = document.querySelectorAll(".nav-link");
-    navLinks.forEach((link) => {
-      link.classList.remove("active");
-      link.removeAttribute("aria-current");
+    // Skip if already the current page to prevent unnecessary work
+    if (this.currentPage === pageId) {
+      return;
+    }
 
-      // Add clearing class to force remove any residual styling
-      link.classList.add("nav-link-clear-active");
+    // Use cached elements for better performance
+    const navLinks = this.getCachedElements("navLinks", ".nav-link");
 
-      // Instead of setting inline styles, use removeProperty to clear any existing inline styles
-      // This preserves CSS cascade and responsive behavior
-      if (link.style.backgroundColor)
-        link.style.removeProperty("background-color");
-      if (link.style.color) link.style.removeProperty("color");
-      if (link.style.fontWeight) link.style.removeProperty("font-weight");
-      if (link.style.borderBottomColor)
-        link.style.removeProperty("border-bottom-color");
-    });
-
-    // Force reflow to ensure clearing takes effect
-    document.body.offsetHeight;
-
-    // Remove clearing classes after a brief delay
-    setTimeout(() => {
+    // Batch DOM operations for better performance
+    requestAnimationFrame(() => {
+      // Remove existing active states efficiently
       navLinks.forEach((link) => {
-        link.classList.remove("nav-link-clear-active");
+        if (link.classList.contains("active")) {
+          link.classList.remove("active");
+          link.removeAttribute("aria-current");
+        }
       });
 
       // Set new active state
@@ -606,9 +648,9 @@ class SharedNavigation {
         activeLink.classList.add("active");
         activeLink.setAttribute("aria-current", "page");
       }
-    }, 20);
 
-    this.currentPage = pageId;
+      this.currentPage = pageId;
+    });
   }
 
   /**
@@ -641,11 +683,17 @@ class SharedNavigation {
    * Setup general navigation link handlers for active state management
    */
   setupNavigationLinkHandlers() {
-    // Use more specific selector for better performance and clarity
-    const mainNavigation = document.querySelector("#main-navigation");
+    // Use cached elements for better performance
+    const mainNavigation = this.getCachedElement(
+      "mainNavigation",
+      "#main-navigation",
+    );
     if (!mainNavigation) return;
 
-    const navLinks = mainNavigation.querySelectorAll(".nav-link[data-page]");
+    const navLinks = this.getCachedElements(
+      "navLinksWithData",
+      ".nav-link[data-page]",
+    );
 
     navLinks.forEach((link) => {
       // Skip simulation-hub as it has its own handler
@@ -653,12 +701,16 @@ class SharedNavigation {
         return;
       }
 
-      link.addEventListener("click", () => {
+      const clickHandler = () => {
         const pageId = link.getAttribute("data-page");
         if (pageId) {
           this.setActivePage(pageId);
         }
-      });
+      };
+
+      link.addEventListener("click", clickHandler);
+      // Store for cleanup
+      this.eventListeners.set(link, { click: clickHandler });
     });
   }
 
@@ -683,7 +735,10 @@ class SharedNavigation {
    * Setup Simulation Hub navigation functionality
    */
   setupSimulationHubNavigation() {
-    const mainNavigation = document.querySelector("#main-navigation");
+    const mainNavigation = this.getCachedElement(
+      "mainNavigation",
+      "#main-navigation",
+    );
     if (!mainNavigation) return;
 
     const simulationHubLink = mainNavigation.querySelector(
@@ -694,10 +749,14 @@ class SharedNavigation {
       return;
     }
 
-    simulationHubLink.addEventListener("click", (e) => {
+    const clickHandler = (e) => {
       e.preventDefault();
       this.navigateToSimulationHub();
-    });
+    };
+
+    simulationHubLink.addEventListener("click", clickHandler);
+    // Store for cleanup
+    this.eventListeners.set(simulationHubLink, { click: clickHandler });
   }
 
   /**
@@ -877,97 +936,110 @@ class SharedNavigation {
   }
 
   /**
-   * Setup action button listeners (tour, surprise me, donate)
+   * Setup action button listeners (tour, surprise me, donate) with proper cleanup
    */
   setupActionButtonListeners() {
     // Prevent duplicate listener setup
-    if (this._actionListenersSetup) {
+    if (this.isListenersSetup) {
       return;
     }
 
-    // Note: Take Tour button has been moved to floating tour tab component
-    // No longer setting up tour button listeners here
-
-    // Surprise Me button - remove existing listeners first
-    const surpriseBtn = document.getElementById("surprise-me-nav");
+    // Surprise Me button - use proper cleanup instead of cloning
+    const surpriseBtn = this.getCachedElement(
+      "surpriseBtn",
+      "#surprise-me-nav",
+    );
     if (surpriseBtn) {
-      // Remove any existing listeners by cloning the element
-      const newSurpriseBtn = surpriseBtn.cloneNode(true);
-      surpriseBtn.parentNode.replaceChild(newSurpriseBtn, surpriseBtn);
+      // Remove existing listener if any
+      if (this.eventListeners.has(surpriseBtn)) {
+        const handlers = this.eventListeners.get(surpriseBtn);
+        Object.entries(handlers).forEach(([event, handler]) => {
+          surpriseBtn.removeEventListener(event, handler);
+        });
+      }
 
       // Add fresh listener
-      newSurpriseBtn.addEventListener("click", (e) => {
+      const clickHandler = (e) => {
         e.preventDefault();
         this.handleSurpriseAction();
-      });
+      };
+      surpriseBtn.addEventListener("click", clickHandler);
+      this.eventListeners.set(surpriseBtn, { click: clickHandler });
     }
 
     // Authentication buttons
-    const signInBtn = document.getElementById("sign-in-nav");
-    const profileBtn = document.getElementById("profile-nav");
-    const signOutBtn = document.getElementById("sign-out-nav");
+    const signInBtn = this.getCachedElement("signInBtn", "#sign-in-nav");
+    const signOutBtn = this.getCachedElement("signOutBtn", "#sign-out-nav");
 
     if (signInBtn) {
-      signInBtn.addEventListener("click", () => this.handleSignIn());
-    }
-    if (profileBtn) {
-      // Profile button will be handled by the dropdown system
-      // Individual menu items handle their own navigation
-    }
-    if (signOutBtn) {
-      signOutBtn.addEventListener("click", () => this.handleSignOut());
+      const signInHandler = () => this.handleSignIn();
+      signInBtn.addEventListener("click", signInHandler);
+      this.eventListeners.set(signInBtn, { click: signInHandler });
     }
 
-    // Mark action listeners as set up to prevent duplicates
-    this._actionListenersSetup = true;
+    if (signOutBtn) {
+      const signOutHandler = () => this.handleSignOut();
+      signOutBtn.addEventListener("click", signOutHandler);
+      this.eventListeners.set(signOutBtn, { click: signOutHandler });
+    }
   }
 
   /**
-   * Setup mobile navigation listeners
+   * Setup mobile navigation listeners with proper cleanup
    */
   setupMobileNavigationListeners() {
     // Prevent duplicate listener setup
-    if (this._mobileListenersSetup) {
+    if (this.isListenersSetup) {
       return;
     }
 
-    const navToggle = document.querySelector(".nav-toggle");
-    const mainNav = document.querySelector("#main-navigation");
+    const navToggle = this.getCachedElement("navToggle", ".nav-toggle");
+    const mainNav = this.getCachedElement("mainNav", "#main-navigation");
 
     if (!navToggle || !mainNav) {
       return;
     }
 
-    // Remove any existing listeners by cloning the button
-    const newNavToggle = navToggle.cloneNode(true);
-    navToggle.parentNode.replaceChild(newNavToggle, navToggle);
+    // Remove existing listeners if any
+    if (this.eventListeners.has(navToggle)) {
+      const handlers = this.eventListeners.get(navToggle);
+      Object.entries(handlers).forEach(([event, handler]) => {
+        navToggle.removeEventListener(event, handler);
+      });
+    }
 
-    // Add fresh listener to the new button
-    newNavToggle.addEventListener("click", (e) => {
+    // Add fresh listener
+    const clickHandler = (e) => {
       e.preventDefault();
       this.toggleMobileNav();
-    });
+    };
+
+    navToggle.addEventListener("click", clickHandler);
+    this.eventListeners.set(navToggle, { click: clickHandler });
 
     // Setup mobile-specific dropdown listeners
     this.setupMobileDropdownListeners();
 
     // Close mobile nav when clicking backdrop
-    const navBackdrop = document.querySelector(".nav-backdrop");
+    const navBackdrop = this.getCachedElement("navBackdrop", ".nav-backdrop");
     if (navBackdrop) {
-      navBackdrop.addEventListener("click", () => {
+      const backdropHandler = () => {
         this.closeMobileNav();
-      });
+      };
+      navBackdrop.addEventListener("click", backdropHandler);
+      this.eventListeners.set(navBackdrop, { click: backdropHandler });
     }
 
-    // Close mobile nav on escape key
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && mainNav.classList.contains("open")) {
-        this.closeMobileNav();
-      }
-    });
-
-    // Mark mobile listeners as set up
-    this._mobileListenersSetup = true;
+    // Close mobile nav on escape key - only set once
+    if (!this.eventListeners.has(document)) {
+      const keydownHandler = (e) => {
+        if (e.key === "Escape" && mainNav.classList.contains("open")) {
+          this.closeMobileNav();
+        }
+      };
+      document.addEventListener("keydown", keydownHandler);
+      this.eventListeners.set(document, { keydown: keydownHandler });
+    }
   }
 
   /**
@@ -1092,12 +1164,12 @@ class SharedNavigation {
   }
 
   /**
-   * Handle scroll events to show/hide navbar
+   * Handle scroll events to show/hide navbar with cached header element
    */
   onScroll() {
     const currentScrollY = window.scrollY || window.pageYOffset || 0;
     const scrollDelta = currentScrollY - this.lastScrollY;
-    const header = document.querySelector(".header");
+    const header = this.getCachedElement("header", ".header");
 
     if (!header) return;
 
@@ -1403,12 +1475,11 @@ class SharedNavigation {
   }
 
   /**
-   * Toggle mobile navigation
+   * Toggle mobile navigation with cached elements
    */
   toggleMobileNav() {
-    const navToggle = document.querySelector(".nav-toggle");
-    const mainNav = document.querySelector("#main-navigation");
-    const navBackdrop = document.querySelector(".nav-backdrop");
+    const navToggle = this.getCachedElement("navToggle", ".nav-toggle");
+    const mainNav = this.getCachedElement("mainNav", "#main-navigation");
 
     if (!navToggle || !mainNav) {
       return;
@@ -1424,12 +1495,12 @@ class SharedNavigation {
   }
 
   /**
-   * Open mobile navigation
+   * Open mobile navigation with cached elements
    */
   openMobileNav() {
-    const navToggle = document.querySelector(".nav-toggle");
-    const mainNav = document.querySelector("#main-navigation");
-    const navBackdrop = document.querySelector(".nav-backdrop");
+    const navToggle = this.getCachedElement("navToggle", ".nav-toggle");
+    const mainNav = this.getCachedElement("mainNav", "#main-navigation");
+    const navBackdrop = this.getCachedElement("navBackdrop", ".nav-backdrop");
 
     if (!navToggle || !mainNav) {
       return;
@@ -1445,9 +1516,6 @@ class SharedNavigation {
     navToggle.setAttribute("aria-expanded", "true");
     mainNav.setAttribute("aria-hidden", "false");
 
-    // Wait a moment then check the result
-    setTimeout(() => {}, 100);
-
     if (navBackdrop) {
       navBackdrop.classList.add("open");
     }
@@ -1457,12 +1525,12 @@ class SharedNavigation {
   }
 
   /**
-   * Close mobile navigation
+   * Close mobile navigation with cached elements
    */
   closeMobileNav() {
-    const navToggle = document.querySelector(".nav-toggle");
-    const mainNav = document.querySelector("#main-navigation");
-    const navBackdrop = document.querySelector(".nav-backdrop");
+    const navToggle = this.getCachedElement("navToggle", ".nav-toggle");
+    const mainNav = this.getCachedElement("mainNav", "#main-navigation");
+    const navBackdrop = this.getCachedElement("navBackdrop", ".nav-backdrop");
 
     if (!navToggle || !mainNav) return;
 
@@ -1707,8 +1775,8 @@ class SharedNavigation {
   /**
    * Handle errors in navigation loading or functionality
    */
-  handleError(_error) {
-    // SharedNavigation error occurred
+  handleError(error) {
+    console.warn("Navigation error:", error);
 
     // Try to ensure basic navigation is available
     if (!document.querySelector("header.header")) {
@@ -1773,26 +1841,18 @@ class SharedNavigation {
    * Remove all event listeners for complete cleanup
    */
   removeAllEventListeners() {
-    // This would be more comprehensive in a full implementation
-    // For now, we document what should be cleaned up
-    const eventTargets = [
-      ".nav-toggle",
-      ".nav-link",
-      ".dropdown-menu",
-      ".mega-menu",
-      ".nav-backdrop",
-    ];
-
-    eventTargets.forEach((selector) => {
-      const elements = document.querySelectorAll(selector);
-      elements.forEach((element) => {
-        // In a real implementation, we'd track and remove specific listeners
-        element.removeEventListener("click", () => {});
-        element.removeEventListener("keydown", () => {});
-        element.removeEventListener("mouseenter", () => {});
-        element.removeEventListener("mouseleave", () => {});
+    // Remove all tracked event listeners
+    for (const [element, handlers] of this.eventListeners) {
+      Object.entries(handlers).forEach(([event, handler]) => {
+        element.removeEventListener(event, handler);
       });
-    });
+    }
+    this.eventListeners.clear();
+
+    // Remove scroll listener
+    if (this.handleScroll) {
+      window.removeEventListener("scroll", this.handleScroll);
+    }
   }
 
   /**
@@ -2285,6 +2345,7 @@ window.debugMobileNav = function () {
   if (nav) {
     nav.toggleMobileNav();
   } else {
+    console.warn("SharedNavigation not initialized");
   }
 };
 
@@ -2295,6 +2356,7 @@ if (document.readyState === "loading") {
       window.sharedNav = new SharedNavigation();
       window.sharedNav.init();
     } else {
+      console.log("SharedNavigation already initialized");
     }
   });
 } else {
@@ -2303,5 +2365,6 @@ if (document.readyState === "loading") {
     window.sharedNav = new SharedNavigation();
     window.sharedNav.init();
   } else {
+    console.log("SharedNavigation already initialized");
   }
 }

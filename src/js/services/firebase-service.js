@@ -19,8 +19,8 @@
  * Handles authentication, database, and analytics
  */
 
-// Firebase imports
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+// Firebase imports - Using local npm package instead of CDN
+import { initializeApp } from "firebase/app";
 import appCheckService from "./app-check-service.js";
 import HybridDataService from "./hybrid-data-service.js";
 import FirebaseStorageService from "./firebase-storage-service.js";
@@ -49,7 +49,7 @@ import {
   browserSessionPersistence,
   browserLocalPersistence,
   inMemoryPersistence,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+} from "firebase/auth";
 import {
   getFirestore,
   doc,
@@ -64,19 +64,16 @@ import {
   updateDoc,
   deleteDoc,
   onSnapshot,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+} from "firebase/firestore";
 import {
   getStorage,
   ref,
   uploadBytes,
   getDownloadURL,
   deleteObject,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-import {
-  getAnalytics,
-  logEvent,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
-import { getPerformance } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-performance.js";
+} from "firebase/storage";
+import { getAnalytics, logEvent } from "firebase/analytics";
+import { getPerformance } from "firebase/performance";
 
 // Import messaging service
 import { MessagingService } from "./messaging-service.js";
@@ -377,9 +374,17 @@ export class FirebaseService {
       this.analytics = getAnalytics(this.app);
       this.performance = getPerformance(this.app);
 
-      // Initialize messaging service
-      this.messaging = new MessagingService(this.app);
-      await this.messaging.init();
+      // Initialize messaging service with error handling
+      try {
+        this.messaging = new MessagingService(this.app);
+        await this.messaging.init();
+      } catch (messagingError) {
+        console.warn(
+          "Firebase Messaging initialization failed:",
+          messagingError,
+        );
+        this.messaging = null;
+      }
 
       // Initialize hybrid data service
       this.hybridData = new HybridDataService(this.app);
@@ -391,18 +396,31 @@ export class FirebaseService {
         this.hybridData,
       );
 
-      // Initialize analytics service
-      this.analyticsService = new FirebaseAnalyticsService(
-        this.app,
-        this.hybridData,
-      );
+      // Initialize analytics service with error handling
+      try {
+        this.analyticsService = new FirebaseAnalyticsService(
+          this.app,
+          this.hybridData,
+        );
+      } catch (analyticsError) {
+        console.warn(
+          "Firebase Analytics Service initialization failed:",
+          analyticsError,
+        );
+        this.analyticsService = null;
+      }
 
       // Initialize performance tracing service
       this.performanceTracing = new PerformanceTracing(this);
 
-      // Initialize PWA service
-      this.pwaService = new PWAService(this);
-      await this.pwaService.init();
+      // Initialize PWA service with error handling
+      try {
+        this.pwaService = new PWAService(this);
+        await this.pwaService.init();
+      } catch (pwaError) {
+        console.warn("PWA Service initialization failed:", pwaError);
+        this.pwaService = null;
+      }
 
       // Connect storage service to hybrid data service
       this.hybridData.setStorageService(this.storageService);
@@ -2049,9 +2067,7 @@ export class FirebaseService {
       }
 
       // Import deleteUser function
-      const { deleteUser } = await import(
-        "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"
-      );
+      const { deleteUser } = await import("firebase/auth");
 
       // Delete the user from Firebase Authentication
       await deleteUser(this.auth.currentUser);

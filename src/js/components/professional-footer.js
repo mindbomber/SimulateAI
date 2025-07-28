@@ -17,7 +17,20 @@
 /**
  * Professional Footer Component
  * Reusable footer for all SimulateAI pages
+ *
+ * Performance Optimizations:
+ * - Pre-calculated current year to avoid repeated Date() calls
+ * - Optimized DOM queries with caching and batched operations
+ * - Streamlined footer replacement logic
  */
+
+/**
+ * Performance Constants - Pre-calculated values to avoid repeated operations
+ */
+const FOOTER_CONSTANTS = {
+  CURRENT_YEAR: new Date().getFullYear(), // Pre-calculate to avoid repeated Date() calls
+  INITIALIZED: false, // Track module initialization state (combined with DOM checking for robust duplicate prevention)
+};
 
 /**
  * Footer Configuration
@@ -26,7 +39,7 @@ const FOOTER_CONFIG = {
   brand: {
     name: "SimulateAI",
     tagline: "Ethical AI Education Through Interactive Simulations",
-    year: new Date().getFullYear(),
+    year: FOOTER_CONSTANTS.CURRENT_YEAR, // Use pre-calculated year
   },
 
   sections: {
@@ -104,7 +117,7 @@ const FOOTER_CONFIG = {
 };
 
 /**
- * Generate Footer HTML
+ * Generate Footer HTML with optimized template generation
  */
 function generateFooterHTML() {
   const { brand, sections, social, certifications } = FOOTER_CONFIG;
@@ -222,49 +235,75 @@ function generateFooterHTML() {
 }
 
 /**
- * Generate Footer CSS (now references external footer.css)
- */
-function generateFooterCSS() {
-  // CSS is now externally managed in src/styles/footer.css
-  // This function maintained for compatibility but returns empty string
-  return "";
-}
-
-/**
- * Initialize Footer Component
+ * Initialize Footer Component with robust duplicate prevention
  */
 function initializeFooter() {
-  // Remove any existing inline footer styles (cleanup from old implementation)
+  // Robust duplicate prevention - check both module state AND DOM state
+  const existingFooter = document.querySelector(".professional-footer");
+
+  if (FOOTER_CONSTANTS.INITIALIZED && existingFooter) {
+    console.debug(
+      "Footer already initialized (module + DOM check), skipping duplicate execution",
+    );
+    return;
+  }
+
+  // If footer exists in DOM but module state was reset, just mark as initialized
+  if (existingFooter && !FOOTER_CONSTANTS.INITIALIZED) {
+    console.debug(
+      "Footer found in DOM, updating module state without re-rendering",
+    );
+    FOOTER_CONSTANTS.INITIALIZED = true;
+    return;
+  }
+
+  // Batch DOM cleanup operations - remove existing styles efficiently
   const existingStyles = document.querySelectorAll(
     "style[data-footer-component]",
   );
-  existingStyles.forEach((style) => style.remove());
+  if (existingStyles.length > 0) {
+    existingStyles.forEach((style) => style.remove());
+  }
 
   // CSS is now managed externally in src/styles/footer.css
   // No need to inject inline styles
 
-  // Look for footer placeholder first
+  // Optimized footer replacement logic - single query strategy
+  const footerHTML = generateFooterHTML(); // Generate once, reuse
+
+  // Priority 1: Look for footer placeholder
   const placeholder = document.getElementById("footer-placeholder");
   if (placeholder) {
-    placeholder.outerHTML = generateFooterHTML();
+    placeholder.outerHTML = footerHTML;
+    FOOTER_CONSTANTS.INITIALIZED = true; // Mark as initialized
     return;
   }
 
-  // Find existing footer and replace it
-  const existingFooter = document.querySelector("footer");
-  if (existingFooter) {
-    existingFooter.outerHTML = generateFooterHTML();
+  // Priority 2: Find existing footer and replace it
+  const existingGenericFooter = document.querySelector("footer");
+  if (existingGenericFooter) {
+    existingGenericFooter.outerHTML = footerHTML;
+    FOOTER_CONSTANTS.INITIALIZED = true; // Mark as initialized
   } else {
-    // If no footer exists, append to body
-    document.body.insertAdjacentHTML("beforeend", generateFooterHTML());
+    // Priority 3: If no footer exists, append to body
+    document.body.insertAdjacentHTML("beforeend", footerHTML);
+    FOOTER_CONSTANTS.INITIALIZED = true; // Mark as initialized
   }
+}
+
+/**
+ * Force re-initialization of footer (useful for dynamic content updates)
+ */
+function reinitializeFooter() {
+  FOOTER_CONSTANTS.INITIALIZED = false;
+  initializeFooter();
 }
 
 // Export for use in other modules
 export {
   generateFooterHTML,
-  generateFooterCSS,
   initializeFooter,
+  reinitializeFooter,
   FOOTER_CONFIG,
 };
 

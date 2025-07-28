@@ -39,6 +39,28 @@ class FloatingTourTab {
     this.collapseTimeout = null;
     this.lastClickTime = 0;
 
+    // DOM caching system
+    this.cachedElements = new Map();
+    this.cachedMeasurements = new Map();
+    this.measurementInvalidated = true;
+
+    // Bound method references for event listeners
+    this.boundMethods = {
+      handleResize: this.handleResize.bind(this),
+      handleMouseEnter: this.handleMouseEnter.bind(this),
+      handleMouseLeave: this.handleMouseLeave.bind(this),
+      handleDesktopClick: this.handleDesktopClick.bind(this),
+      handleTouchStart: this.handleTouchStart.bind(this),
+      handleTouchEnd: this.handleTouchEnd.bind(this),
+      handleMobileClick: this.handleMobileClick.bind(this),
+      handleKeyDown: this.handleKeyDown.bind(this),
+      handleFocus: this.handleFocus.bind(this),
+      handleBlur: this.handleBlur.bind(this),
+    };
+
+    // Current event mode for smart listener management
+    this.currentEventMode = null;
+
     // Initialize DataHandler for analytics and future onboarding features
     this.dataHandler = null;
     this.tourMetrics = {
@@ -47,6 +69,7 @@ class FloatingTourTab {
       tourTriggers: 0,
       lastInteractionType: null,
       onboardingProgress: {},
+      interactions: [], // Initialize interactions array
     };
 
     this.initializeDataHandler();
@@ -105,7 +128,8 @@ class FloatingTourTab {
         this.tourMetrics = {
           ...this.tourMetrics,
           ...savedMetrics,
-          sessionStart: Date.now(), // Reset session start for current session
+          // Only reset session start if not already set
+          sessionStart: this.tourMetrics.sessionStart || Date.now(),
         };
       }
     } catch (error) {
@@ -125,7 +149,8 @@ class FloatingTourTab {
         this.tourMetrics = {
           ...this.tourMetrics,
           ...savedMetrics,
-          sessionStart: Date.now(),
+          // Only reset session start if not already set
+          sessionStart: this.tourMetrics.sessionStart || Date.now(),
         };
       }
     } catch (error) {
@@ -170,23 +195,116 @@ class FloatingTourTab {
     const interactionData = {
       type: interactionType,
       timestamp: Date.now(),
-      device: this.isMobile ? "mobile" : "desktop",
+      ...this.getDeviceInfo(),
       ...data,
     };
 
-    // Store interaction for future onboarding analytics
+    // Initialize interactions array if not present
     if (!this.tourMetrics.interactions) {
       this.tourMetrics.interactions = [];
     }
+
+    // Add new interaction
     this.tourMetrics.interactions.push(interactionData);
 
-    // Keep only last 50 interactions to prevent data bloat
+    // Maintain circular buffer - remove oldest when exceeding limit
     if (this.tourMetrics.interactions.length > 50) {
-      this.tourMetrics.interactions = this.tourMetrics.interactions.slice(-50);
+      this.tourMetrics.interactions.shift(); // Remove oldest item
     }
 
     this.saveTourMetrics();
     console.log(`FloatingTourTab: Tracked ${interactionType}`, interactionData);
+  }
+
+  // === Helper Methods ===
+
+  /**
+   * Get cached DOM element or query and cache it
+   */
+  getCachedElement(selector, parent = document) {
+    if (!this.cachedElements.has(selector)) {
+      const element = parent.querySelector(selector);
+      this.cachedElements.set(selector, element);
+    }
+    return this.cachedElements.get(selector);
+  }
+
+  /**
+   * Get cached measurements or calculate and cache them
+   */
+  getCachedMeasurement(element, measurementType = "rect") {
+    const key = `${element.className}-${measurementType}`;
+
+    if (this.measurementInvalidated || !this.cachedMeasurements.has(key)) {
+      let measurement;
+      switch (measurementType) {
+        case "rect":
+          measurement = element.getBoundingClientRect();
+          break;
+        case "offset":
+          measurement = {
+            width: element.offsetWidth,
+            height: element.offsetHeight,
+          };
+          break;
+        default:
+          measurement = element.getBoundingClientRect();
+      }
+      this.cachedMeasurements.set(key, measurement);
+      this.measurementInvalidated = false;
+    }
+
+    return this.cachedMeasurements.get(key);
+  }
+
+  /**
+   * Invalidate cached measurements (call on resize)
+   */
+  invalidateMeasurements() {
+    this.cachedMeasurements.clear();
+    this.measurementInvalidated = true;
+  }
+
+  /**
+   * Debounce helper method
+   */
+  checkDebounce() {
+    const now = Date.now();
+    if (now - this.lastClickTime < TOUR_DEBOUNCE_DELAY) {
+      return false;
+    }
+    this.lastClickTime = now;
+    return true;
+  }
+
+  /**
+   * Get device information for tracking
+   */
+  getDeviceInfo() {
+    return {
+      type: this.isMobile ? "mobile" : "desktop",
+      breakpoint: window.innerWidth,
+      timestamp: Date.now(),
+    };
+  }
+
+  /**
+   * Get current event mode for smart listener management
+   */
+  getEventMode() {
+    return this.isMobile ? "mobile" : "desktop";
+  }
+
+  /**
+   * Batch DOM style updates using requestAnimationFrame
+   */
+  batchStyleUpdate(element, styles) {
+    return new Promise((resolve) => {
+      requestAnimationFrame(() => {
+        Object.assign(element.style, styles);
+        resolve();
+      });
+    });
   }
 
   init() {
@@ -285,46 +403,107 @@ class FloatingTourTab {
 
   bindEvents() {
     // Handle resize events
-    window.addEventListener("resize", this.handleResize.bind(this));
+    window.addEventListener("resize", this.boundMethods.handleResize);
 
-    // Handle hover/click events
-    if (this.isMobile) {
+    // Update event listeners based on device type
+    this.updateEventListeners(true);
+
+    // Always bind keyboard navigation
+    this.link.addEventListener("keydown", this.boundMethods.handleKeyDown);
+    this.link.addEventListener("focus", this.boundMethods.handleFocus);
+    this.link.addEventListener("blur", this.boundMethods.handleBlur);
+  }
+
+  updateEventListeners(force = false) {
+    const newEventMode = this.getEventMode();
+
+    // Only update if mode changed or forced
+    if (this.currentEventMode === newEventMode && !force) {
+      return;
+    }
+
+    // Remove old listeners if they exist
+    if (this.currentEventMode !== null) {
+      this.removeEventListeners();
+    }
+
+    // Add new listeners based on device type
+    if (newEventMode === "mobile") {
       this.link.addEventListener(
         "touchstart",
-        this.handleTouchStart.bind(this),
+        this.boundMethods.handleTouchStart,
       );
-      this.link.addEventListener("touchend", this.handleTouchEnd.bind(this));
-      this.link.addEventListener("click", this.handleMobileClick.bind(this));
+      this.link.addEventListener("touchend", this.boundMethods.handleTouchEnd);
+      this.link.addEventListener("click", this.boundMethods.handleMobileClick);
     } else {
       this.link.addEventListener(
         "mouseenter",
-        this.handleMouseEnter.bind(this),
+        this.boundMethods.handleMouseEnter,
       );
       this.link.addEventListener(
         "mouseleave",
-        this.handleMouseLeave.bind(this),
+        this.boundMethods.handleMouseLeave,
       );
-      this.link.addEventListener("click", this.handleDesktopClick.bind(this));
+      this.link.addEventListener("click", this.boundMethods.handleDesktopClick);
     }
 
-    // Handle keyboard navigation
-    this.link.addEventListener("keydown", this.handleKeyDown.bind(this));
-    this.link.addEventListener("focus", this.handleFocus.bind(this));
-    this.link.addEventListener("blur", this.handleBlur.bind(this));
+    this.currentEventMode = newEventMode;
+  }
+
+  removeEventListeners() {
+    // Remove mobile listeners
+    this.link.removeEventListener(
+      "touchstart",
+      this.boundMethods.handleTouchStart,
+    );
+    this.link.removeEventListener("touchend", this.boundMethods.handleTouchEnd);
+    this.link.removeEventListener("click", this.boundMethods.handleMobileClick);
+
+    // Remove desktop listeners
+    this.link.removeEventListener(
+      "mouseenter",
+      this.boundMethods.handleMouseEnter,
+    );
+    this.link.removeEventListener(
+      "mouseleave",
+      this.boundMethods.handleMouseLeave,
+    );
+    this.link.removeEventListener(
+      "click",
+      this.boundMethods.handleDesktopClick,
+    );
   }
 
   unbindEvents() {
     // Cleanup method to remove event listeners if needed
-    window.removeEventListener("resize", this.handleResize.bind(this));
+    window.removeEventListener("resize", this.boundMethods.handleResize);
+
+    // Remove device-specific listeners
+    this.removeEventListeners();
+
+    // Remove always-bound listeners
+    this.link.removeEventListener("keydown", this.boundMethods.handleKeyDown);
+    this.link.removeEventListener("focus", this.boundMethods.handleFocus);
+    this.link.removeEventListener("blur", this.boundMethods.handleBlur);
   }
 
   handleResize() {
     const wasMobile = this.isMobile;
     this.isMobile = window.innerWidth <= TOUR_MOBILE_BREAKPOINT;
 
+    // Invalidate cached measurements
+    this.invalidateMeasurements();
+
+    // Only update event listeners if mobile state actually changed
     if (wasMobile !== this.isMobile) {
-      this.unbindEvents();
-      this.bindEvents();
+      this.updateEventListeners(true);
+
+      // Track device change
+      this.trackTourInteraction("device_change", {
+        from: wasMobile ? "mobile" : "desktop",
+        to: this.isMobile ? "mobile" : "desktop",
+        width: window.innerWidth,
+      });
     }
   }
 
@@ -364,20 +543,19 @@ class FloatingTourTab {
     }
   }
 
-  handleTouchEnd(_e) {
+  handleTouchEnd() {
     if (this.isMobile) {
       // Allow default behavior to ensure click events work
+      // No specific action needed for touch end
     }
   }
 
   handleMobileClick(e) {
     if (this.isMobile) {
-      // Check for debouncing
-      const now = Date.now();
-      if (now - this.lastClickTime < TOUR_DEBOUNCE_DELAY) {
+      // Check for debouncing using helper method
+      if (!this.checkDebounce()) {
         return;
       }
-      this.lastClickTime = now;
 
       if (!this.isExpanded) {
         e.preventDefault();
@@ -397,12 +575,10 @@ class FloatingTourTab {
     if (!this.isMobile) {
       e.preventDefault();
 
-      // Check for debouncing
-      const now = Date.now();
-      if (now - this.lastClickTime < TOUR_DEBOUNCE_DELAY) {
+      // Check for debouncing using helper method
+      if (!this.checkDebounce()) {
         return;
       }
-      this.lastClickTime = now;
 
       this.trackTourInteraction("desktop_tour_trigger");
       this.createRipple(e);
@@ -416,12 +592,10 @@ class FloatingTourTab {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
 
-      // Check for debouncing
-      const now = Date.now();
-      if (now - this.lastClickTime < TOUR_DEBOUNCE_DELAY) {
+      // Check for debouncing using helper method
+      if (!this.checkDebounce()) {
         return;
       }
-      this.lastClickTime = now;
 
       this.trackTourInteraction("keyboard_tour_trigger", {
         key: e.key,
@@ -446,15 +620,17 @@ class FloatingTourTab {
   }
 
   expand() {
+    if (this.isExpanded) return; // Prevent unnecessary state changes
+
     this.isExpanded = true;
     this.container.classList.add("expanded");
-    this.trackTourInteraction("tab_expanded", {
-      device: this.isMobile ? "mobile" : "desktop",
-    });
+    this.trackTourInteraction("tab_expanded", this.getDeviceInfo());
     this.clearCollapseTimeout();
   }
 
   collapse() {
+    if (!this.isExpanded) return; // Prevent unnecessary state changes
+
     this.isExpanded = false;
     this.container.classList.remove("expanded");
     this.trackTourInteraction("tab_collapsed");
@@ -476,11 +652,11 @@ class FloatingTourTab {
   }
 
   createRipple(event) {
-    const ripple = this.container.querySelector(".floating-tour-tab-ripple");
+    const ripple = this.getCachedElement(
+      ".floating-tour-tab-ripple",
+      this.container,
+    );
     if (!ripple) return;
-
-    // Clear any existing animation
-    ripple.style.animation = "none";
 
     // Get coordinates relative to the container
     let clientX, clientY;
@@ -492,28 +668,36 @@ class FloatingTourTab {
       clientY = event.clientY;
     } else {
       // Keyboard event - center the ripple
-      const rect = this.container.getBoundingClientRect();
+      const rect = this.getCachedMeasurement(this.container);
       clientX = rect.left + rect.width / 2;
       clientY = rect.top + rect.height / 2;
     }
 
-    const rect = this.container.getBoundingClientRect();
+    // Use cached measurement (only one getBoundingClientRect call)
+    const rect = this.getCachedMeasurement(this.container);
     const x = clientX - rect.left;
     const y = clientY - rect.top;
 
-    // Set position and trigger animation
-    ripple.style.left = `${x}px`;
-    ripple.style.top = `${y}px`;
+    // Batch style updates using requestAnimationFrame
+    this.batchStyleUpdate(ripple, {
+      left: `${x}px`,
+      top: `${y}px`,
+      animation: "none", // Reset animation first
+    }).then(() => {
+      // Start animation after reset
+      setTimeout(() => {
+        this.batchStyleUpdate(ripple, {
+          animation: `tour-ripple ${TOUR_RIPPLE_DURATION}ms ease-out`,
+        });
+      }, TOUR_RIPPLE_DELAY);
 
-    // Force reflow and start animation
-    setTimeout(() => {
-      ripple.style.animation = `tour-ripple ${TOUR_RIPPLE_DURATION}ms ease-out`;
-    }, TOUR_RIPPLE_DELAY);
-
-    // Clean up after animation
-    setTimeout(() => {
-      ripple.style.animation = "none";
-    }, TOUR_RIPPLE_DURATION + TOUR_RIPPLE_DELAY);
+      // Clean up after animation
+      setTimeout(() => {
+        this.batchStyleUpdate(ripple, {
+          animation: "none",
+        });
+      }, TOUR_RIPPLE_DURATION + TOUR_RIPPLE_DELAY);
+    });
   }
 
   triggerTour() {
@@ -849,15 +1033,28 @@ class FloatingTourTab {
       this.saveTourMetrics();
     }
 
-    // Cleanup method
+    // Cleanup all timeouts
     this.clearCollapseTimeout();
     if (this.hoverTimeout) {
       clearTimeout(this.hoverTimeout);
+      this.hoverTimeout = null;
     }
+
+    // Remove all event listeners
+    this.unbindEvents();
+
+    // Clean up DOM
     if (this.link && this.link.parentNode) {
       this.link.parentNode.removeChild(this.link);
     }
+
+    // Clear caches
+    this.cachedElements.clear();
+    this.cachedMeasurements.clear();
+
+    // Reset state
     this.isInitialized = false;
+    this.currentEventMode = null;
   }
 }
 
