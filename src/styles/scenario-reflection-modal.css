@@ -54,8 +54,10 @@ div.scenario-reflection-modal .modal-body {
   max-height: none !important; /* Remove any height constraints */
 }
 
-/* Fix body overflow when modal is open - prevent viewport scroll */
-body[style*="overflow: hidden"] {
+/* Fix body overflow when scenario reflection modal is open - prevent viewport scroll */
+/* More specific selector to avoid conflicts with other modals */
+body.modal-open:has(.scenario-reflection-modal.show)[style*="overflow: hidden"],
+body.reflection-modal-open[style*="overflow: hidden"] {
   overflow: hidden !important;
   position: fixed !important;
   width: 100% !important;
@@ -2507,10 +2509,10 @@ body.dark-mode .scenario-reflection-modal,
 
 /* ===== MODAL OVERLAY EFFECTS ===== */
 /* When reflection modal is open, blur and dim background elements */
-body.modal-open .scenario-reflection-modal.show ~ .header,
+body.modal-open .scenario-reflection-modal.show ~ header.header,
 body.modal-open .scenario-reflection-modal.show ~ .main-nav,
 body.modal-open .scenario-reflection-modal.show ~ .nav-container,
-body.modal-open.reflection-modal-open .header,
+body.modal-open.reflection-modal-open header.header,
 body.modal-open.reflection-modal-open .main-nav,
 body.modal-open.reflection-modal-open .nav-container {
   opacity: 0.3;
@@ -2533,7 +2535,7 @@ body.modal-open.reflection-modal-open .floating-tour-tab-link {
 }
 
 /* Alternative selector for when modal has specific class */
-.reflection-modal-active .header,
+.reflection-modal-active header.header,
 .reflection-modal-active .main-nav,
 .reflection-modal-active .nav-container {
   opacity: 0.3;
@@ -2560,7 +2562,7 @@ body.modal-open.reflection-modal-open .floating-tour-tab-link {
 /* Responsive backdrop optimizations are handled above in the responsive section */
 
 /* Reset effects when modal is closed */
-body:not(.modal-open) .header,
+body:not(.modal-open) header.header,
 body:not(.modal-open) .main-nav,
 body:not(.modal-open) .nav-container {
   opacity: 1;

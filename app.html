@@ -411,28 +411,28 @@ limitations under the License.
               <button
                 class="demo-btn"
                 data-pattern="utilitarian"
-                onclick="simulateEthicsPattern('utilitarian', this)"
+                aria-label="Apply utilitarian ethics pattern to the radar chart"
               >
                 Utilitarian
               </button>
               <button
                 class="demo-btn"
                 data-pattern="deontological"
-                onclick="simulateEthicsPattern('deontological', this)"
+                aria-label="Apply rights-based ethics pattern to the radar chart"
               >
                 Rights-Based
               </button>
               <button
                 class="demo-btn"
                 data-pattern="virtue"
-                onclick="simulateEthicsPattern('virtue', this)"
+                aria-label="Apply virtue ethics pattern to the radar chart"
               >
                 Virtue Ethics
               </button>
               <button
                 class="demo-btn balanced-btn"
                 data-pattern="balanced"
-                onclick="simulateEthicsPattern('balanced', this)"
+                aria-label="Apply balanced ethics pattern to the radar chart"
               >
                 Balanced
               </button>
@@ -1372,8 +1372,12 @@ limitations under the License.
           performance.mark("page-loaded");
           performance.measure("page-load-time", "page-start", "page-loaded");
 
-          // Add loaded class to enable entrance animations
-          document.documentElement.classList.add("loaded");
+          // Add loaded class to enable entrance animations using DOM class manager
+          if (window.DOMClassManager) {
+            window.DOMClassManager.setLoadedState(true);
+          } else {
+            document.documentElement.classList.add("loaded");
+          }
 
           // Report to our analytics system
           const measure = performance.getEntriesByName("page-load-time")[0];
@@ -1387,13 +1391,21 @@ limitations under the License.
       }
 
       // Fallback mechanism to ensure loaded class is added
-      // Add loaded class immediately for CSS that needs it
-      document.documentElement.classList.add("loaded");
+      // Add loaded class immediately for CSS that needs it using DOM class manager
+      if (window.DOMClassManager) {
+        window.DOMClassManager.setLoadedState(true);
+      } else {
+        document.documentElement.classList.add("loaded");
+      }
 
       // Also ensure it's added after DOMContentLoaded if not already
       if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", () => {
-          document.documentElement.classList.add("loaded");
+          if (window.DOMClassManager) {
+            window.DOMClassManager.setLoadedState(true);
+          } else {
+            document.documentElement.classList.add("loaded");
+          }
         });
       }
 

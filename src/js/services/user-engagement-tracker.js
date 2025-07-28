@@ -902,6 +902,99 @@ export class UserEngagementTracker {
   }
 
   /**
+   * Get user's preferred features based on usage patterns
+   */
+  getPreferredFeatures() {
+    try {
+      const featureUsage = this.featureUsage || {};
+      const features = Object.entries(featureUsage)
+        .sort(([, a], [, b]) => (b.count || 0) - (a.count || 0))
+        .slice(0, 5)
+        .map(([feature]) => feature);
+
+      return features.length > 0 ? features : ["basic_features"];
+    } catch (error) {
+      console.warn(
+        "[UserEngagementTracker] Error getting preferred features:",
+        error,
+      );
+      return ["basic_features"];
+    }
+  }
+
+  /**
+   * Analyze user's customization tendency
+   */
+  getCustomizationTendency() {
+    try {
+      const settingsChanges = this.settingsUsage?.totalChanges || 0;
+      if (settingsChanges > 10) return "high";
+      if (settingsChanges > 3) return "medium";
+      return "low";
+    } catch (error) {
+      console.warn(
+        "[UserEngagementTracker] Error getting customization tendency:",
+        error,
+      );
+      return "low";
+    }
+  }
+
+  /**
+   * Analyze user's help-seeking behavior
+   */
+  getHelpSeekingBehavior() {
+    try {
+      const helpInteractions = this.engagementMetrics?.helpInteractions || 0;
+      if (helpInteractions > 5) return "frequent";
+      if (helpInteractions > 1) return "occasional";
+      return "self_sufficient";
+    } catch (error) {
+      console.warn(
+        "[UserEngagementTracker] Error getting help seeking behavior:",
+        error,
+      );
+      return "self_sufficient";
+    }
+  }
+
+  /**
+   * Analyze user's session patterns
+   */
+  getSessionPatterns() {
+    try {
+      const avgSessionTime = this.engagementMetrics?.averageSessionTime || 0;
+      const sessionCount = this.engagementMetrics?.totalSessions || 0;
+
+      return {
+        averageSessionTime: avgSessionTime,
+        sessionFrequency:
+          sessionCount > 10
+            ? "frequent"
+            : sessionCount > 3
+              ? "regular"
+              : "occasional",
+        engagementDepth:
+          avgSessionTime > 300000
+            ? "deep"
+            : avgSessionTime > 60000
+              ? "moderate"
+              : "shallow",
+      };
+    } catch (error) {
+      console.warn(
+        "[UserEngagementTracker] Error getting session patterns:",
+        error,
+      );
+      return {
+        averageSessionTime: 0,
+        sessionFrequency: "occasional",
+        engagementDepth: "shallow",
+      };
+    }
+  }
+
+  /**
    * Generate insights for app improvement
    */
   generateInsights() {

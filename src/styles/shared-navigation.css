@@ -191,11 +191,156 @@
   background: white !important;
 }
 
+/* Enhanced Mobile Navigation for Smaller Viewports */
+@media only screen and (width <= 480px) {
+  .main-nav.force-visible,
+  .main-nav.open,
+  .main-nav.mobile-force-visible,
+  .main-nav.js-open {
+    /* Optimize for smaller screens - use slide-in drawer */
+    width: 85% !important;
+    max-width: 320px !important;
+    height: 100vh !important;
+    right: -100% !important;
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  .main-nav.force-visible.open,
+  .main-nav.open.mobile-force-visible,
+  .main-nav.mobile-force-visible.js-open {
+    right: 0 !important;
+  }
+}
+
+/* Extra Small Viewports - Even more compact */
+@media only screen and (width <= 375px) {
+  .main-nav.force-visible,
+  .main-nav.open,
+  .main-nav.mobile-force-visible,
+  .main-nav.js-open {
+    width: 90% !important;
+    max-width: 280px !important;
+    padding: 2rem 1rem !important;
+  }
+
+  /* Ensure navigation items are more compact */
+  .main-nav .nav-group .nav-link {
+    padding: 0.75rem !important;
+    font-size: 0.95rem !important;
+  }
+}
+
+/* Very Small Viewports - Ultra compact */
+@media only screen and (width <= 320px) {
+  .main-nav.force-visible,
+  .main-nav.open,
+  .main-nav.mobile-force-visible,
+  .main-nav.js-open {
+    width: 95% !important;
+    max-width: 260px !important;
+    padding: 1.5rem 0.75rem !important;
+  }
+
+  .main-nav .nav-group .nav-link {
+    padding: 0.5rem !important;
+    font-size: 0.9rem !important;
+  }
+}
+
 /* Generic Force-Visible Utility Classes */
 .force-visible {
   display: block !important;
   visibility: visible !important;
   opacity: 1 !important;
+}
+
+/* Mobile Navigation Backdrop */
+.nav-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9998;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Show backdrop when mobile nav is open */
+@media only screen and (width <= 480px) {
+  .main-nav.open ~ .nav-backdrop,
+  .main-nav.mobile-force-visible ~ .nav-backdrop,
+  body:has(.main-nav.open) .nav-backdrop,
+  body:has(.main-nav.mobile-force-visible) .nav-backdrop {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+/* Enhanced mobile navigation close button */
+.mobile-nav-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--nav-text-color);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+  z-index: 10000;
+}
+
+.mobile-nav-close:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+@media only screen and (width <= 375px) {
+  .mobile-nav-close {
+    top: 0.75rem;
+    right: 0.75rem;
+    font-size: 1.25rem;
+    padding: 0.375rem;
+  }
+}
+
+/* Landscape orientation adjustments for mobile devices */
+@media only screen and (max-height: 500px) and (orientation: landscape) {
+  .main-nav {
+    width: 60% !important;
+    max-width: 400px !important;
+    padding: 1rem !important;
+  }
+
+  .nav-group .nav-link {
+    padding: 0.5rem !important;
+    font-size: 0.9rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .nav-group {
+    gap: 0.5rem !important;
+  }
+}
+
+/* Accessibility: Ensure proper focus states on small screens */
+@media only screen and (width <= 480px) {
+  .nav-group .nav-link:focus {
+    outline: 2px solid var(--nav-text-color);
+    outline-offset: 2px;
+    background: rgba(99, 102, 241, 0.1);
+  }
+
+  /* Improve touch targets */
+  .nav-group .nav-link {
+    min-height: 48px; /* Ensure adequate touch target size */
+  }
 }
 
 .force-hidden {
@@ -221,15 +366,15 @@
 }
 
 /* Pre-launch modal specific - ensure navigation is behind the backdrop */
-.modal-backdrop:has(.pre-launch-modal) ~ .header,
+.modal-backdrop:has(.pre-launch-modal) ~ header.header,
 .modal-backdrop:has(.pre-launch-modal) ~ .nav-item-dropdown,
 .modal-backdrop:has(.pre-launch-modal) ~ .settings-menu {
   z-index: 500 !important; /* Well below modal backdrop */
 }
 
 /* Alternative approach - when pre-launch modal is active, reduce header z-index */
-body:has(.pre-launch-modal.visible) .header,
-body:has(.pre-launch-modal) .header {
+body:has(.pre-launch-modal.visible) header.header,
+body:has(.pre-launch-modal) header.header {
   z-index: 500 !important; /* Well below modal backdrop */
 }
 
@@ -785,8 +930,127 @@ body:has(.pre-launch-modal) .settings-menu {
     transform: translateY(0) !important;
   }
 
+  /* Enhanced header-visible support for mobile */
+  .header.header-visible {
+    transform: translateY(0);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Combined mobile states for better scroll behavior */
+  .header.scrolled.header-visible {
+    transform: translateY(0);
+    padding: var(--spacing-2) var(--spacing-4); /* Reduced padding on mobile */
+    backdrop-filter: blur(8px); /* Reduced blur for mobile performance */
+  }
+
   /* Mobile-specific performance optimizations */
   /* Note: .header-hidden behavior inherited from top-level selector */
+}
+
+/* Enhanced support for very small viewports (480px and below) */
+@media only screen and (width <= 480px) {
+  .header.header-visible {
+    transform: translateY(0);
+    padding: var(--spacing-2) var(--spacing-3); /* Compact padding for small screens */
+    height: calc(var(--header-h) - 10px); /* Slightly reduced height */
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .header.scrolled.header-visible {
+    transform: translateY(0);
+    padding: var(--spacing-1) var(--spacing-3); /* Even more compact when scrolled */
+    height: calc(
+      var(--header-h) - 15px
+    ); /* Further reduced height when scrolled */
+    backdrop-filter: blur(6px); /* Minimal blur for performance */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Lighter shadow */
+  }
+
+  /* Ensure navigation toggle is always accessible */
+  .header.header-visible .nav-toggle {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 1001; /* Above header */
+  }
+
+  /* Optimize logo sizing for small screens */
+  .header.header-visible .logo-full {
+    height: 48px; /* Smaller logo */
+  }
+
+  .header.header-visible .logo-compact {
+    height: 40px; /* Even smaller compact logo */
+  }
+}
+
+/* Support for extra small viewports (375px and below) */
+@media only screen and (width <= 375px) {
+  .header.header-visible {
+    padding: var(--spacing-1) var(--spacing-2); /* Minimal padding */
+    height: calc(var(--header-h) - 15px);
+  }
+
+  .header.scrolled.header-visible {
+    padding: var(--spacing-1) var(--spacing-2);
+    height: calc(var(--header-h) - 20px); /* Maximum compression */
+  }
+
+  /* Force compact logo on very small screens */
+  .header.header-visible .logo-full {
+    display: none;
+  }
+
+  .header.header-visible .logo-compact {
+    display: block;
+    height: 36px; /* Minimal logo size */
+  }
+}
+
+/* Support for small devices in landscape orientation */
+@media only screen and (max-height: 500px) and (orientation: landscape) {
+  .header.header-visible {
+    height: calc(var(--header-h) - 20px); /* Compact height in landscape */
+    padding: var(--spacing-1) var(--spacing-3);
+    position: fixed; /* Ensure it stays at top */
+    top: 0;
+    z-index: 1000;
+  }
+
+  .header.scrolled.header-visible {
+    height: calc(var(--header-h) - 25px); /* Even more compact when scrolled */
+    padding: var(--spacing-1) var(--spacing-2);
+    backdrop-filter: blur(4px); /* Minimal blur for landscape performance */
+  }
+
+  /* Ensure mobile nav toggle is always accessible in landscape */
+  .header.header-visible .nav-toggle {
+    padding: var(--spacing-1);
+    min-height: 36px;
+    min-width: 36px;
+  }
+}
+
+/* Accessibility and performance improvements for header-visible */
+@media (prefers-reduced-motion: reduce) {
+  .header.header-visible {
+    transition: none; /* Remove transitions for users who prefer reduced motion */
+  }
+
+  .header.scrolled.header-visible {
+    transition: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .header.header-visible {
+    border-bottom: 2px solid currentColor; /* High contrast border */
+    backdrop-filter: none; /* Remove blur for better contrast */
+    background: rgb(255 255 255 / 100%); /* Solid background for contrast */
+  }
+
+  .header.scrolled.header-visible {
+    box-shadow: 0 2px 0 currentColor; /* High contrast shadow */
+  }
 }
 
 /* Navigation Group Organization */
@@ -1169,7 +1433,8 @@ body:has(.pre-launch-modal) .settings-menu {
     position: fixed;
     top: 0;
     right: -100%;
-    width: 100%;
+    width: 85%;
+    max-width: 320px;
     height: 100vh;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
@@ -1181,10 +1446,33 @@ body:has(.pre-launch-modal) .settings-menu {
     transition:
       right 0.4s cubic-bezier(0.4, 0, 0.2, 1),
       transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 9998;
+    z-index: 9999; /* Higher than backdrop */
     overflow-y: auto;
-    transform: translateX(100%);
+    transform: translateX(0); /* Remove extra transform */
     border-left: 1px solid rgba(226, 232, 240, 0.3);
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.1);
+  }
+
+  /* When navigation is open, slide it in */
+  .main-nav.open {
+    right: 0;
+  }
+
+  /* Responsive adjustments for smaller mobile devices */
+  @media only screen and (width <= 375px) {
+    .main-nav {
+      width: 90%;
+      max-width: 280px;
+      padding: 2rem 1rem;
+    }
+  }
+
+  @media only screen and (width <= 320px) {
+    .main-nav {
+      width: 95%;
+      max-width: 260px;
+      padding: 1.5rem 0.75rem;
+    }
   }
 
   /* Mobile navigation open state handled by consolidated override system above */
@@ -1220,6 +1508,23 @@ body:has(.pre-launch-modal) .settings-menu {
     margin-bottom: 0.5rem;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+  }
+
+  /* Responsive nav-link adjustments for smaller screens */
+  @media only screen and (width <= 375px) {
+    .nav-group .nav-link {
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+    }
+  }
+
+  @media only screen and (width <= 320px) {
+    .nav-group .nav-link {
+      padding: 0.5rem;
+      font-size: 0.9rem;
+      margin-bottom: 0.125rem;
+    }
   }
 
   .nav-group .nav-link:hover {
@@ -1354,6 +1659,37 @@ body:has(.pre-launch-modal) .settings-menu {
   .nav-toggle {
     display: flex;
   }
+
+  /* Responsive toggle button for smaller screens */
+  @media only screen and (width <= 375px) {
+    .nav-toggle {
+      padding: 0.5rem;
+      width: 2rem;
+      height: 2rem;
+      min-width: 40px;
+      min-height: 40px;
+    }
+
+    .nav-toggle span {
+      width: 16px;
+      height: 1.5px;
+    }
+  }
+
+  @media only screen and (width <= 320px) {
+    .nav-toggle {
+      padding: 0.375rem;
+      width: 1.75rem;
+      height: 1.75rem;
+      min-width: 36px;
+      min-height: 36px;
+    }
+
+    .nav-toggle span {
+      width: 14px;
+      height: 1px;
+    }
+  }
 }
 
 /* Navigation Backdrop (Mobile) */
@@ -1364,15 +1700,32 @@ body:has(.pre-launch-modal) .settings-menu {
   width: 100%;
   height: 100%;
   background: rgb(0 0 0 / 50%);
-  z-index: 999;
+  z-index: 9998; /* Below navigation but above content */
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .nav-backdrop.open {
   opacity: 1;
   visibility: visible;
+}
+
+/* Responsive backdrop for smaller screens */
+@media only screen and (width <= 480px) {
+  .nav-backdrop {
+    background: rgb(0 0 0 / 40%); /* Slightly lighter on mobile */
+  }
+}
+
+@media only screen and (width <= 375px) {
+  .nav-backdrop {
+    background: rgb(0 0 0 / 35%); /* Even lighter on small screens */
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
 }
 
 /* Mega Menu Enhanced Styles */

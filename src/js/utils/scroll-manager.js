@@ -64,9 +64,13 @@ class ScrollManager {
     // Use the most reliable method for all browsers
     window.scrollTo(0, 0);
 
-    // Ensure smooth scrolling is enabled after reset
+    // Ensure smooth scrolling is enabled after reset using DOM class manager
     setTimeout(() => {
-      document.documentElement.classList.add("loaded");
+      if (window.DOMClassManager) {
+        window.DOMClassManager.setLoadedState(true);
+      } else {
+        document.documentElement.classList.add("loaded");
+      }
     }, 100);
   }
 

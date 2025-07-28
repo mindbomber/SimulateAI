@@ -46,16 +46,12 @@ const ENTERPRISE_CONSTANTS = {
   // Performance monitoring thresholds
   PERFORMANCE: {
     LOG_OPERATION_THRESHOLD: 5, // Max log operation time (ms)
-    FORMAT_MESSAGE_THRESHOLD: 2, // Max message formatting time (ms)
-    BUFFER_FLUSH_THRESHOLD: 20, // Max buffer flush time (ms)
-    SERIALIZATION_THRESHOLD: 3, // Max JSON serialization time (ms)
   },
 
   // Circuit breaker configuration
   CIRCUIT_BREAKER: {
     MAX_ERRORS: 5, // Circuit breaker trip threshold
     RECOVERY_TIMEOUT: 30000, // Auto-recovery timeout (30 seconds)
-    HEALTH_CHECK_INTERVAL: 5000, // Health check interval when circuit is open
   },
 
   // Log aggregation and telemetry
@@ -64,7 +60,6 @@ const ENTERPRISE_CONSTANTS = {
     FLUSH_INTERVAL: 30000, // Max time before flush (30 seconds)
     MAX_BUFFER_SIZE: 1000, // Maximum buffer size before force flush
     COMPRESSION_ENABLED: true, // Enable log compression
-    RETENTION_HOURS: 24, // Log retention period
   },
 
   // Enterprise telemetry configuration
@@ -79,7 +74,6 @@ const ENTERPRISE_CONSTANTS = {
       BUFFER_FLUSH: "buffer_flush",
       CIRCUIT_BREAKER: "circuit_breaker",
     },
-    CORRELATION_ID_ENABLED: true, // Enable correlation ID tracking
   },
 
   // Structured logging configuration
@@ -171,7 +165,7 @@ class Logger {
     // Initialize message deduplication to reduce console noise
     this.messageCache = new Map();
     this.maxCacheSize = 500;
-    this.quietMode = localStorage.getItem("quiet-logs") === "true";
+    this.quietMode = this._environmentCache.isQuietMode;
 
     // Log enterprise initialization (only in verbose mode)
     if (!this.quietMode) {
@@ -202,15 +196,17 @@ class Logger {
 
     // Check for common development indicators
     if (typeof window !== "undefined") {
-      // OPTIMIZED: Cache hostname to avoid repeated access
+      // OPTIMIZED: Cache hostname and storage values to avoid repeated access
       cache.hostname = window.location.hostname;
+      const debugFromStorage = localStorage.getItem("debug") === "true";
+      const quietFromStorage = localStorage.getItem("quiet-logs") === "true";
 
       cache.isDevelopment =
         cache.hostname === "localhost" ||
         cache.hostname === "127.0.0.1" ||
         cache.hostname.includes("dev") ||
         window.location.search.includes("debug=true") ||
-        localStorage.getItem("debug") === "true";
+        debugFromStorage;
 
       cache.isProduction =
         cache.hostname !== "localhost" &&
@@ -218,7 +214,7 @@ class Logger {
         !cache.hostname.includes("dev");
 
       // In production or quiet mode, reduce logging noise
-      cache.isQuietMode = localStorage.getItem("quiet-logs") === "true";
+      cache.isQuietMode = quietFromStorage;
 
       if (cache.isQuietMode) {
         // Only show errors and warnings in quiet mode
@@ -310,11 +306,9 @@ class Logger {
         return; // Skip duplicate message
       }
 
-      // Generate correlation ID if enabled
-      const correlationId = ENTERPRISE_CONSTANTS.TELEMETRY
-        .CORRELATION_ID_ENABLED
-        ? this.currentCorrelationId || this._generateCorrelationId()
-        : null;
+      // Generate correlation ID if enabled (always enabled in current config)
+      const correlationId =
+        this.currentCorrelationId || this._generateCorrelationId();
 
       // Create structured log entry
       const structuredLog = this._createStructuredLog(
@@ -389,18 +383,16 @@ class Logger {
 
   /**
    * Generate UUID for enterprise tracking
+   * OPTIMIZED: Modern arrow function syntax and improved readability
    * @returns {string} UUID
    * @private
    */
   _generateUUID() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-      /[xy]/g,
-      function (c) {
-        const r = (Math.random() * 16) | 0;
-        const v = c === "x" ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
-      },
-    );
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      const v = c === "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
   }
 
   /**
@@ -531,6 +523,7 @@ class Logger {
 
   /**
    * Get window session ID for tracking
+   * OPTIMIZED: Cache session ID to avoid repeated sessionStorage access
    * @private
    */
   _getWindowSessionId() {
@@ -538,13 +531,19 @@ class Logger {
 
     if (!window.sessionStorage) return null;
 
-    let sessionId = window.sessionStorage.getItem("enterprise-log-session-id");
-    if (!sessionId) {
-      sessionId = `win-session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      window.sessionStorage.setItem("enterprise-log-session-id", sessionId);
+    // Cache session ID to avoid repeated storage access
+    if (!this._cachedWindowSessionId) {
+      let sessionId = window.sessionStorage.getItem(
+        "enterprise-log-session-id",
+      );
+      if (!sessionId) {
+        sessionId = `win-session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        window.sessionStorage.setItem("enterprise-log-session-id", sessionId);
+      }
+      this._cachedWindowSessionId = sessionId;
     }
 
-    return sessionId;
+    return this._cachedWindowSessionId;
   }
 
   /**
@@ -708,9 +707,12 @@ class Logger {
    */
   _logTelemetry(eventType, data) {
     try {
+      // OPTIMIZED: Cache timestamp to avoid multiple Date.now() calls
+      const now = Date.now();
+
       const telemetryEvent = {
         eventType,
-        timestamp: Date.now(),
+        timestamp: now,
         instanceId: this.instanceId,
         sessionId: this.sessionId,
         data,
@@ -720,11 +722,11 @@ class Logger {
       // Add to batch
       this.telemetryBatch.push(telemetryEvent);
 
-      // Check if batch should be flushed
+      // OPTIMIZED: Check if batch should be flushed using cached timestamp
       const shouldFlush =
         this.telemetryBatch.length >=
           ENTERPRISE_CONSTANTS.TELEMETRY.BATCH_SIZE ||
-        Date.now() - this.lastTelemetryFlush >=
+        now - this.lastTelemetryFlush >=
           ENTERPRISE_CONSTANTS.TELEMETRY.FLUSH_INTERVAL;
 
       if (shouldFlush) {
@@ -1165,12 +1167,9 @@ const logger = new Logger();
 function exposeGlobalDebugFunctions() {
   if (typeof window === "undefined") return;
 
-  // Only expose in development environments
-  const isDevelopment =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1" ||
-    window.location.hostname.includes("dev") ||
-    localStorage.getItem("debug") === "true";
+  // OPTIMIZED: Reuse cached environment detection instead of duplicating logic
+  // Use the singleton logger instance to avoid creating a new instance
+  const isDevelopment = logger._environmentCache.isDevelopment;
 
   if (!isDevelopment) return;
 

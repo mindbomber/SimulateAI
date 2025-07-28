@@ -68,6 +68,7 @@ import logger from "./utils/logger.js";
 import focusManager from "./utils/focus-manager.js";
 import scrollManager from "./utils/scroll-manager.js";
 import { loopDetector } from "./utils/infinite-loop-detector.js";
+import DOMClassManager from "./utils/dom-class-manager.js";
 import configIntegrator from "./utils/config-integrator.js";
 import "./utils/console-cleanup.js"; // Initialize console cleanup utility
 import "./utils/tooltip-auto-init.js"; // Initialize automatic tooltips for all users
@@ -3388,8 +3389,12 @@ class SimulateAIApp {
    */
   initializeHeroAnimations() {
     try {
-      // Add 'loaded' class to html element to trigger CSS animations
-      document.documentElement.classList.add("loaded");
+      // Add 'loaded' class to html element to trigger CSS animations using DOM class manager
+      if (window.DOMClassManager) {
+        window.DOMClassManager.setLoadedState(true);
+      } else {
+        document.documentElement.classList.add("loaded");
+      }
 
       // Optional: Add slight delay to ensure all elements are rendered
       setTimeout(() => {
@@ -6376,17 +6381,49 @@ window.simulateEthicsPattern = function (pattern, buttonElement) {
   }
 };
 
-// Visual feedback function for pattern changes
+// Visual feedback function for pattern changes - optimized to prevent unnecessary DOM creation
 function highlightChartChange(pattern) {
   const chartContainer = document.getElementById("hero-ethics-chart");
   if (!chartContainer) return;
+
+  // Clear any existing animation timeout to prevent conflicts
+  if (highlightChartChange.animationTimeout) {
+    clearTimeout(highlightChartChange.animationTimeout);
+  }
 
   // Add visual emphasis to show chart is updating
   chartContainer.style.transition = "all 0.3s ease";
   chartContainer.style.transform = "scale(1.02)";
   chartContainer.style.boxShadow = "0 0 20px rgba(0, 123, 255, 0.5)";
 
-  // Show pattern name briefly
+  // Reuse or create pattern label element to avoid repeated DOM creation
+  let label = highlightChartChange.labelElement;
+  if (!label) {
+    label = document.createElement("div");
+    label.className = "pattern-feedback-label";
+    label.style.cssText = `
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #007bff;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 14px;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      animation: fadeInOut 2s ease-in-out;
+    `;
+
+    chartContainer.style.position = "relative";
+    chartContainer.appendChild(label);
+    highlightChartChange.labelElement = label;
+  }
+
+  // Update label content and show it
   const patternLabels = {
     utilitarian: "🎯 Utilitarian",
     deontological: "⚖️ Rights-Based",
@@ -6394,35 +6431,33 @@ function highlightChartChange(pattern) {
     balanced: "⚡ Balanced",
   };
 
-  const label = document.createElement("div");
   label.textContent = patternLabels[pattern] || pattern;
-  label.style.cssText = `
-    position: absolute;
-    top: -30px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #007bff;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-weight: bold;
-    font-size: 14px;
-    z-index: 1000;
-    animation: fadeInOut 2s ease-in-out;
-  `;
+  label.style.opacity = "1";
 
-  chartContainer.style.position = "relative";
-  chartContainer.appendChild(label);
-
-  // Reset after animation
-  setTimeout(() => {
+  // Reset after animation with proper cleanup
+  highlightChartChange.animationTimeout = setTimeout(() => {
     chartContainer.style.transform = "scale(1)";
     chartContainer.style.boxShadow = "none";
-    if (label.parentNode) {
-      label.remove();
+    if (label) {
+      label.style.opacity = "0";
     }
   }, 1000);
 }
+
+// Cleanup function for chart highlight
+highlightChartChange.cleanup = function () {
+  if (highlightChartChange.animationTimeout) {
+    clearTimeout(highlightChartChange.animationTimeout);
+    highlightChartChange.animationTimeout = null;
+  }
+  if (
+    highlightChartChange.labelElement &&
+    highlightChartChange.labelElement.parentNode
+  ) {
+    highlightChartChange.labelElement.remove();
+    highlightChartChange.labelElement = null;
+  }
+};
 
 window.resetEthicsDemo = function () {
   if (ethicsDemo) {
@@ -6459,9 +6494,23 @@ function positionPopoverAboveButton(button) {
   feedbackContainer.style.transform = "translateX(-50%)";
 }
 
-// Helper function to update button visual states
+// Helper function to update button visual states - optimized to prevent redundant DOM manipulation
 function updateButtonStates(activePattern) {
-  const buttons = document.querySelectorAll(".hero-demo-controls .demo-btn");
+  // Cache the button selection to avoid repeated queries
+  if (!updateButtonStates.cachedButtons) {
+    updateButtonStates.cachedButtons = document.querySelectorAll(
+      ".hero-demo-controls .demo-btn",
+    );
+  }
+
+  const buttons = updateButtonStates.cachedButtons;
+
+  // Track current active button to minimize DOM operations
+  if (!updateButtonStates.previousActive) {
+    updateButtonStates.previousActive = null;
+  }
+
+  let newActiveButton = null;
 
   buttons.forEach((button) => {
     const buttonText = button.textContent.toLowerCase();
@@ -6473,14 +6522,36 @@ function updateButtonStates(activePattern) {
     else if (buttonText.includes("virtue")) patternName = "virtue";
     else if (buttonText.includes("balanced")) patternName = "balanced";
 
-    // Update button state
+    // Update button state only if needed using DOM Class Manager
     if (activePattern === patternName) {
-      button.classList.add("active");
+      newActiveButton = button;
+      if (window.DOMClassManager) {
+        window.DOMClassManager.addClass(button, "active");
+      } else {
+        if (!button.classList.contains("active")) {
+          button.classList.add("active");
+        }
+      }
     } else {
-      button.classList.remove("active");
+      if (window.DOMClassManager) {
+        window.DOMClassManager.removeClass(button, "active");
+      } else {
+        if (button.classList.contains("active")) {
+          button.classList.remove("active");
+        }
+      }
     }
   });
+
+  // Update tracking for next call
+  updateButtonStates.previousActive = newActiveButton;
 }
+
+// Reset cached buttons when DOM structure might change
+updateButtonStates.clearCache = function () {
+  updateButtonStates.cachedButtons = null;
+  updateButtonStates.previousActive = null;
+};
 
 window.toggleRadarInstructions = function () {
   const accordion = document.querySelector(".radar-instructions-accordion");

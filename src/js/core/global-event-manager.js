@@ -438,14 +438,15 @@ class GlobalEventManager {
       this.notifyComponents("demo", { pattern, event });
       this.trackEvent("demo_pattern", { pattern });
 
-      // IMPORTANT: Also execute the inline onclick handler if it exists
-      // This ensures compatibility with existing onclick="simulateEthicsPattern(...)" handlers
-      if (btn.onclick && typeof btn.onclick === "function") {
+      // Call simulateEthicsPattern directly instead of relying on inline handlers
+      if (typeof window.simulateEthicsPattern === "function") {
         try {
-          btn.onclick.call(btn, event);
+          window.simulateEthicsPattern(pattern, btn);
         } catch (error) {
-          console.error("Error executing inline onclick handler:", error);
+          console.error("Error executing simulateEthicsPattern:", error);
         }
+      } else {
+        console.warn("simulateEthicsPattern function not found on window");
       }
 
       // Alternative: Look for onclick attribute and execute it

@@ -119,12 +119,25 @@ class UIBinder {
         this.applyComponentStyles(themeData.componentStyles);
       }
 
-      // Update body classes
+      // Update body classes - OPTIMIZED: Avoid unnecessary DOM mutations
       if (themeData.bodyClasses) {
-        document.body.className = document.body.className
-          .replace(/theme-\w+/g, "")
-          .trim();
-        document.body.classList.add(...themeData.bodyClasses);
+        const currentClasses = Array.from(document.body.classList);
+        const themeClassesToRemove = currentClasses.filter((cls) =>
+          cls.startsWith("theme-"),
+        );
+
+        // Only remove classes if there are any to remove
+        if (themeClassesToRemove.length > 0) {
+          document.body.classList.remove(...themeClassesToRemove);
+        }
+
+        // Only add classes that aren't already present
+        const classesToAdd = themeData.bodyClasses.filter(
+          (cls) => !document.body.classList.contains(cls),
+        );
+        if (classesToAdd.length > 0) {
+          document.body.classList.add(...classesToAdd);
+        }
       }
 
       // Save preference
@@ -187,9 +200,24 @@ class UIBinder {
 
   applyCSSVariables(variables) {
     const root = document.documentElement;
-    Object.entries(variables).forEach(([key, value]) => {
-      root.style.setProperty(key, value);
-    });
+    // OPTIMIZED: Batch CSS variable updates to reduce layout thrashing
+    const cssText = Object.entries(variables)
+      .map(([key, value]) => `${key}: ${value}`)
+      .join("; ");
+
+    // Apply all variables at once if possible, or fallback to individual application
+    if (cssText) {
+      try {
+        const currentStyle = root.style.cssText;
+        root.style.cssText =
+          currentStyle + (currentStyle ? "; " : "") + cssText;
+      } catch (error) {
+        // Fallback to individual property setting if batch fails
+        Object.entries(variables).forEach(([key, value]) => {
+          root.style.setProperty(key, value);
+        });
+      }
+    }
   }
 
   applyComponentStyles(styles) {
@@ -295,7 +323,7 @@ class UIBinder {
             </div>
         `;
 
-    // Event handlers
+    // OPTIMIZED: Cache DOM elements to avoid multiple queries
     const closeBtn = modal.querySelector(".ui-modal-close");
     const backdrop = modal.querySelector(".ui-modal-backdrop");
 
@@ -308,10 +336,16 @@ class UIBinder {
     closeBtn.addEventListener("click", closeModal);
     backdrop.addEventListener("click", closeModal);
 
-    // Action handlers
+    // Action handlers - OPTIMIZED: Batch DOM queries
     if (modalConfig.actions) {
+      const actionButtons = new Map();
       modalConfig.actions.forEach((action) => {
         const btn = modal.querySelector(`[data-action="${action.id}"]`);
+        if (btn) actionButtons.set(action.id, btn);
+      });
+
+      modalConfig.actions.forEach((action) => {
+        const btn = actionButtons.get(action.id);
         if (btn && action.handler) {
           btn.addEventListener("click", (e) => {
             const result = action.handler(e);
@@ -464,17 +498,20 @@ class UIBinder {
       const easing = config.easing || "ease-in-out";
 
       if (config.type === "fadeIn") {
-        element.style.opacity = "0";
-        element.style.transition = `opacity ${duration}ms ${easing}`;
+        // OPTIMIZED: Batch style applications to reduce layout thrashing
+        element.style.cssText += `opacity: 0; transition: opacity ${duration}ms ${easing};`;
 
         requestAnimationFrame(() => {
           element.style.opacity = "1";
           setTimeout(resolve, duration);
         });
       } else if (config.type === "slideIn") {
-        element.style.transform = "translateY(-20px)";
-        element.style.opacity = "0";
-        element.style.transition = `transform ${duration}ms ${easing}, opacity ${duration}ms ${easing}`;
+        // OPTIMIZED: Batch style applications to reduce layout thrashing
+        element.style.cssText += `
+          transform: translateY(-20px); 
+          opacity: 0; 
+          transition: transform ${duration}ms ${easing}, opacity ${duration}ms ${easing};
+        `;
 
         requestAnimationFrame(() => {
           element.style.transform = "translateY(0)";
@@ -587,19 +624,35 @@ class UIBinder {
 
   /**
    * Performance Monitoring
+   * OPTIMIZED: Throttled mutation observation to reduce performance overhead
    */
   setupPerformanceMonitoring() {
-    // Monitor DOM mutations
+    // Monitor DOM mutations with throttling to avoid excessive callbacks
     if (window.MutationObserver) {
+      let mutationCount = 0;
+      let throttleTimeout = null;
+
       const observer = new MutationObserver((mutations) => {
-        this.performanceMetrics.domOperations += mutations.length;
+        mutationCount += mutations.length;
+
+        // Throttle updates to avoid excessive metric updates
+        if (!throttleTimeout) {
+          throttleTimeout = setTimeout(() => {
+            this.performanceMetrics.domOperations += mutationCount;
+            mutationCount = 0;
+            throttleTimeout = null;
+          }, 100); // Update metrics every 100ms max
+        }
       });
 
       observer.observe(document.body, {
         childList: true,
         subtree: true,
-        attributes: true,
+        attributes: false, // OPTIMIZED: Skip attribute changes to reduce noise
       });
+
+      // Store observer reference for cleanup
+      this.mutationObserver = observer;
     }
   }
 
@@ -628,6 +681,39 @@ class UIBinder {
         prefersDark: document.body.classList.contains("ui-prefers-dark"),
       },
     };
+  }
+
+  /**
+   * Cleanup method to prevent memory leaks
+   * OPTIMIZED: Proper resource cleanup
+   */
+  destroy() {
+    // Disconnect mutation observer
+    if (this.mutationObserver) {
+      this.mutationObserver.disconnect();
+      this.mutationObserver = null;
+    }
+
+    // Clear all registries and caches
+    this.themeCache.clear();
+    this.componentRegistry.clear();
+    this.eventDelegates.clear();
+    this.animationQueue.length = 0;
+
+    // Remove global event listeners
+    document.removeEventListener("click", this.handleGlobalClick.bind(this));
+    document.removeEventListener(
+      "keydown",
+      this.handleGlobalKeydown.bind(this),
+    );
+    document.removeEventListener(
+      "focus",
+      this.handleGlobalFocus.bind(this),
+      true,
+    );
+
+    this.isInitialized = false;
+    console.log("[UIBinder] Cleanup complete");
   }
 }
 
